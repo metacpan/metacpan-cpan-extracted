@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.93  2025-02-13T13:25:00+00:00
+      - Improved malformed data error, thanks @gwselke.
+      https://rt.cpan.org/Ticket/Display.html?id=159293
+
 3.92  2025-01-15T21:50:00+00:00
       - Documented new map Map::Tube::RheinRuhr by @gwselke.
 

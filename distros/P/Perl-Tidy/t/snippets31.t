@@ -10,6 +10,16 @@
 #7 ils.ils
 #8 mutt.def
 #9 mutt.mutt1
+#10 c446.c446
+#11 c446.def
+#12 pot.def
+#13 pot.pot1
+#14 kblx.def
+#15 kblx.kblx1
+#16 kblx.kblx2
+#17 kblx.kblx3
+#18 kblx.kblx4
+#19 kblx.kblx5
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -30,10 +40,62 @@ BEGIN {
         'btct2' => "-btct=1 -atc -wtc=1",
         'btct3' => "-btct=1 -atc -wtc=1",
         'c424'  => "-naws -qwaf",
+        'c446'  => <<'----------',
+--qw-as-function
+--paren-tightness=2
+----------
         'def'   => "",
         'ils'   => "-nils -bos",
+        'kblx1' => <<'----------',
+-nbbc
+-blbs=0
+-blbp=0
+-nbbb
+-blao=0
+-blbc=0
+-kblx='b{' # inverse of -bbb
+----------
+        'kblx2' => <<'----------',
+-nbbc
+-blbs=0
+-blbp=0
+-nbbb
+-blao=0
+-blbc=0
+-kblx='b}' # inverse of -blbc
+----------
+        'kblx3' => <<'----------',
+-nbbc
+-blbs=0
+-blbp=0
+-nbbb
+-blao=0
+-blbc=0
+-kblx='{b' # inverse of -blao
+----------
+        'kblx4' => <<'----------',
+-nbbc
+-blbs=0
+-blbp=0
+-nbbb
+-blao=0
+-blbc=0
+-kblx='}b' # not an inverse
+----------
+        'kblx5' => <<'----------',
+-nbbc
+-blbs=0
+-blbp=0
+-nbbb
+-blao=0
+-blbc=0
+-kblx='bp' # inverse of -blbp
+----------
         'mutt1' => <<'----------',
 -mutt='q*'
+----------
+        'pot1' => <<'----------',
+-pot='->'
 ----------
     };
 
@@ -63,15 +125,72 @@ my @chars = qw(   | / - \ | / - \    );
 my @chars = qw(| / - \ | / - \ );
 ----------
 
+        'c446' => <<'----------',
+push @paths, qw(
+    ../\
+    c:.\\../\
+    c:/\..//
+    c://.\/./\
+    \\.\\../\
+    //\..//
+    //.\/./\
+);
+----------
+
         'ils' => <<'----------',
 $z = sqrt( $x**2 + $y**2 )
 ;
+----------
+
+        'kblx' => <<'----------',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
 ----------
 
         'mutt' => <<'----------',
 my $rlist = [qw(alpha beta gamma)];
 $aqx->appendChild(
         $parser->parse_balanced_chunk(qq(<param name="skv">$skv</param>)) );
+----------
+
+        'pot' => <<'----------',
+sub bla_p( $value = 42 ) {
+    return Mojo::Promise->resolve($value)->then( sub { shift() / 2 } ) ->then( sub { shift() + 6 } )->then( sub { shift() / 2 } ) ->catch( sub { warn shift } );
+}
 ----------
     };
 
@@ -217,6 +336,306 @@ my $rlist = [ qw(alpha beta gamma) ];
 $aqx->appendChild(
     $parser->parse_balanced_chunk( qq(<param name="skv">$skv</param>) ) );
 #9...........
+        },
+
+        'c446.c446' => {
+            source => "c446",
+            params => "c446",
+            expect => <<'#10...........',
+push @paths,
+  qw( ../\ c:.\\../\ c:/\..// c://.\/./\ \\.\\../\ //\..// //.\/./\ );
+#10...........
+        },
+
+        'c446.def' => {
+            source => "c446",
+            params => "def",
+            expect => <<'#11...........',
+push @paths, qw(
+  ../\
+  c:.\\../\
+  c:/\..//
+  c://.\/./\
+  \\.\\../\
+  //\..//
+  //.\/./\
+);
+#11...........
+        },
+
+        'pot.def' => {
+            source => "pot",
+            params => "def",
+            expect => <<'#12...........',
+sub bla_p( $value = 42 ) {
+    return Mojo::Promise->resolve($value)
+      ->then( sub { shift() / 2 } )
+      ->then( sub { shift() + 6 } )
+      ->then( sub { shift() / 2 } )
+      ->catch( sub { warn shift } );
+}
+#12...........
+        },
+
+        'pot.pot1' => {
+            source => "pot",
+            params => "pot1",
+            expect => <<'#13...........',
+sub bla_p( $value = 42 ) {
+    return Mojo::Promise->resolve($value)->then( sub { shift() / 2 } )
+      ->then( sub { shift() + 6 } )->then( sub { shift() / 2 } )
+      ->catch( sub { warn shift } );
+}
+#13...........
+        },
+
+        'kblx.def' => {
+            source => "kblx",
+            params => "def",
+            expect => <<'#14...........',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
+#14...........
+        },
+
+        'kblx.kblx1' => {
+            source => "kblx",
+            params => "kblx1",
+            expect => <<'#15...........',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
+#15...........
+        },
+
+        'kblx.kblx2' => {
+            source => "kblx",
+            params => "kblx2",
+            expect => <<'#16...........',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+}
+
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
+#16...........
+        },
+
+        'kblx.kblx3' => {
+            source => "kblx",
+            params => "kblx3",
+            expect => <<'#17...........',
+package A::B;
+
+sub write_line {
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+
+package C::D;
+
+sub dump_verbatim {
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
+#17...........
+        },
+
+        'kblx.kblx4' => {
+            source => "kblx",
+            params => "kblx4",
+            expect => <<'#18...........',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+# coment before side comment
+
+# comment after blank and comment
+#18...........
+        },
+
+        'kblx.kblx5' => {
+            source => "kblx",
+            params => "kblx5",
+            expect => <<'#19...........',
+package A::B;
+
+sub write_line {
+
+    my ( $self, $line ) = @_;
+
+    if ( defined($line) ) {
+        $self->write_line($line);
+    }
+    return;
+
+}
+package C::D;
+
+sub dump_verbatim {
+
+    my $self = shift;
+
+    # block comments
+    # block comments
+
+    my $rlines = $self->[_rlines_];
+
+    foreach my $line ( @{$rlines} ) {
+        my $input_line = $line->{_line_text};
+        $self->write_unindented_line($input_line);
+    }
+
+    return;
+
+}    ## static side comment
+
+# coment before side comment
+
+# comment after blank and comment
+#19...........
         },
     };
 

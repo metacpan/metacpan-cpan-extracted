@@ -4,7 +4,7 @@ App-gimpgitbuild - build GIMP from git
 
 # VERSION
 
-version 0.30.3
+version 0.32.0
 
 # SYNOPSIS
 

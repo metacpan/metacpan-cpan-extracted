@@ -16,7 +16,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20250105';
+our $VERSION = '20250214';
 use Carp;
 
 use constant DEVEL_MODE   => 0;
@@ -27,6 +27,8 @@ use constant LONG_MESSAGE => 256;
 
 # Maximum number of little messages; probably need not be changed.
 use constant MAX_NAG_MESSAGES => 6;
+
+my @unique_hash_keys_uu = qw( indent-columns );
 
 sub AUTOLOAD {
 

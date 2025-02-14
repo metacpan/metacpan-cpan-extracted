@@ -1,16 +1,16 @@
-# $Id: consume.t 561 2022-12-29 18:54:15Z whynot $
+# $Id: consume.t 564 2025-02-13 21:33:15Z whynot $
 # Copyright 2012, 2022 Eric Pozharski <whynot@pozharski.name>
+# Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 # GNU GPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
 
 use strict;
 use warnings;
-use 5.010;
 
 package main;
-use version 0.77; our $VERSION = version->declare( v2.3.2 );
+use version 0.77; our $VERSION = version->declare( v2.3.3 );
 
-use t::TestSuite qw| :switches :run |;
+use t::TestSuite qw| :switches :run :utils |;
 use Test::More;
 
 use Acme::FSM;
@@ -287,7 +287,7 @@ my %tunits =
 plan tests => 40;
 
 while( my( $tag, $tunit ) = each %tunits ) {
-    @ARGV && not qq|$tag| ~~ @ARGV                                   and next;
+    @ARGV && not AFSMTS_grep qq|$tag|, @ARGV                         and next;
     %st = %{shift @$tunit};
     AFSMTS_wrap;
     AFSMTS_deeply @{shift @$tunit}, qq|$tag consumes empty|;

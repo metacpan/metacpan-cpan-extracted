@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '3.92';
+$Test::Map::Tube::VERSION   = '3.93';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 3.92
+Version 3.93
 
 =cut
 
@@ -377,7 +377,7 @@ L<https://metacpan.org/dist/Map-Tube>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

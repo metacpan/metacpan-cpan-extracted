@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
@@ -909,7 +909,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
+	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -1812,6 +1812,7 @@ sub warnings_as_string
 		my @warnings = map { $_->{'warning'} } @{$self->{'warnings'}};
 		return join('; ', @warnings);
 	}
+	return '';
 }
 
 =head2 set_logger
@@ -1978,7 +1979,6 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to the author.
 This module is provided as-is without any warranty.
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings

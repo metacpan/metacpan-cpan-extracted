@@ -1,5 +1,9 @@
 Revision history for App-gimpgitbuild
 
+0.32.0   2025-02-13
+    - add GIMPGITBUILD__FORCE_TESTS_RE
+    - fix the GIMP Lua flag
+
 0.30.3   2023-07-08
     - runtime updates and fixes.
 

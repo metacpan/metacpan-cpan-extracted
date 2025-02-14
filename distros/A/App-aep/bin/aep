@@ -22,7 +22,7 @@ use Data::Dumper;
 use Carp qw(cluck longmess shortmess);
 
 # Version of this software
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 # Config defaults
 my $opt_conf_def = { 'AEP_SOCKETPATH' => '/tmp/aep.sock', };
@@ -60,7 +60,7 @@ my @opt_desc = (
     ],
     [
         'config-order=s',
-'The order to merge options together, comma separated, default is: env,file,args',
+        'The order to merge options together, comma separated, default is: env,file,args',
         {
             'default' => 'env,file,args',
         },
@@ -88,16 +88,17 @@ my @opt_desc = (
             'default' => "",
         },
     ],
+    [ 'command-norestart', 'If the command exits then do not attempt to restart it.', ],
     [
         'command-restart=i',
-'If the command exits how many times to retry it, default 0 set to -1 for infinate',
+        'If the command exits how many times to retry it, default 0 (seconds).',
         {
             'default' => 0,
         },
     ],
     [
         'command-restart-delay=i',
-'The time in milliseconds to wait before retrying the command, default 1000',
+        'The time in milliseconds to wait before retrying the command, default 1000',
         {
             'default' => 1000,
         },
@@ -105,7 +106,10 @@ my @opt_desc = (
     [],
     [
         'lock-server',
-'Act like a lock server, this means we will expect other aeps to connect to us, we in turn will say when they should actually start, this is to counter-act race issues when starting multi image containers such as docker-compose, default: no',
+        'Act like a lock server, this means we will expect other apps to '
+        . 'connect to us, we in turn will say when they should actually start, '
+        . 'this is to counter-act race issues when starting multi image '
+        . 'containers such as docker-compose, default: no',
         {
             'default' => 0,
         },
@@ -125,41 +129,47 @@ my @opt_desc = (
         },
     ],
     [
-        'lock-server-default-run=i',
-        'If we get sent an ID we do not know what to do with, tell it to run',
+        'lock-server-default=s',
+        'If we get sent an ID we do not know, the default action to take. '
+        . 'Valid options are: "ignore", "run" or "runlast" the default is ignore.',
         {
-            'default' => 0,
-        },
-    ],
-    [
-        'lock-server-default-ignore',
-        'If we get sent an ID we do not know what to do with, ignore it',
-        {
-            'default' => 1,
+            'default' => 'ignore',
         },
     ],
     [
         'lock-server-order',
-'The list of ids and the order to allow them to run, allows OR || operators, for example: db,redis1||redis2,redis1||redis2,nginx',
+        'The list of ids and the order to allow them to run, '
+        . 'operators, for example: db,redis1,redis2,redis3,redis4,nginx',
         {
             'default' => '',
-        },
-    ],
-    [
-        'lock-server-exhaust-action=s',
-'What to do if all clients have been started (list end), options are: exit, idle, restart or execute. The default is idle',
-        {
-            'default' => 'idle',
         },
     ],
     [],
     [
         'lock-client',
-'Become a lock client, this will mean your aep will connect to another aep to learn when it should run its command.',
+        'Become a lock client, this will mean your aep will connect to '
+        . 'another aep to learn when it should run its command.',
         {
             'default' => 0,
         },
     ],
+    [ 'lock-client-noretry', 'If the connection to a master fails, do not retry - overrides lock-client-retry', ],
+    [
+        'lock-client-retry=i',
+        'If the connection to a master fails, do not fail retry n many times, '
+        . 'if this is set to 0 it will retry infinately, defaults to: 3 (seconds)',
+        {
+            'default' => 3,
+        },
+    ],
+    [
+        'lock-client-retry-delay=i',
+        'How long to wait before retrying, default 5 (seconds)',
+        {
+            'default' => 0,
+        },
+    ],
+    [],
     [
         'lock-server-host=s',
         'What host to connect to, defaults to: aep-master',
@@ -176,7 +186,7 @@ my @opt_desc = (
     ],
     [
         'lock-trigger=s',
-'Please read perldoc App::aep example is to large for here, default is: none:time:10000',
+        'Please read --help-confog lock-trigger, default is: none:time:10000 (milliseconds)',
         {
             'default' => 'none:time:10000'
         },
@@ -198,40 +208,36 @@ my @opt_desc = (
     ],
     [
         'help-config=s',
-'print configuration examples for: config-env, config-files, config-arg or config-merge eg: help-config config-env',
-        {
-            'shortcircuit' => 1,
-        },
-    ],
-    [
-        'help-config',
-        'print configuration examples',
+        'print configuration examples for: config-env, config-files, '
+        . 'config-arg, config-merge or lock-trigger eg: help-config config-env',
         {
             'shortcircuit' => 1,
         },
     ],
     [
         'docker-health-check',
-'Call this from docker-compose for a health report, returns an exit of 0(success) or 1(failure)',
+        'Call this from docker-compose for a health report, returns an exit of 0(success) or 1(failure)',
         {
             'default' => 0,
         },
     ],
 );
-my $opt_index = do {
+my $opt_index = do
+{
     my $opt_map;
     my $opt_num = 0 - 1;
-    foreach my $opt_read (@opt_desc) {
+    foreach my $opt_read ( @opt_desc )
+    {
 
         # Increment out count every iteration
         $opt_num++;
 
         # Skip lines of text and blank arrays
-        if    ( ref($opt_read) ne 'ARRAY' )   { next }
-        elsif ( scalar( @{$opt_read} ) == 0 ) { next }
+        if    ( ref( $opt_read ) ne 'ARRAY' )   { next }
+        elsif ( scalar( @{ $opt_read } ) == 0 ) { next }
 
         # Create a map to the item
-        $opt_map->{ $opt_read->[0] } = $opt_num;
+        $opt_map->{ $opt_read->[ 0 ] } = $opt_num;
     }
 
     # Return the map
@@ -243,7 +249,7 @@ my @opt_spec = (
         'maximum number of command restarts',
         {
             'callbacks' => {
-                'is_positive' => sub { _check_positive_number(shift) },
+                'is_positive' => sub { _check_positive_number( shift ) },
             },
         },
     ],
@@ -252,7 +258,7 @@ my @opt_spec = (
         'specify a configuration file to use',
         {
             'callbacks' => {
-                'exists' => sub { _check_exists(shift) },
+                'exists' => sub { _check_exists( shift ) },
             },
         },
     ],
@@ -261,13 +267,15 @@ my @opt_spec = (
 # Read in our options
 my ( $opt, $usage ) = describe_options( @opt_desc, @opt_spec );
 
-if ( $opt->help ) {
+if ( $opt->help )
+{
     say $usage->text;
     exit 0;
 }
 
 # Define our main function that starts out perl POE kernel
-sub main (@args) {
+sub main ( @args )
+{
     my $options = {};
 
     # Default exit code of error
@@ -284,15 +292,15 @@ sub main (@args) {
     };
 
     # Create an appropriate heap for our session
-    my $func_map = _create_heap( $args[0], $args[1] );
-    $func_map->{'_'}->{'debug'}    = sub { _func_debug(@_) };
-    $func_map->{'_'}->{'set_exit'} = $exit_func;
+    my $func_map = _create_heap( $args[ 0 ], $args[ 1 ] );
+    $func_map->{ '_' }->{ 'debug' }    = sub { _func_debug( @_ ) };
+    $func_map->{ '_' }->{ 'set_exit' } = $exit_func;
 
     my $session = POE::Session::PlainCall->create(
         'package'   => 'App::aep',
-        'ctor_args' => [$options],
+        'ctor_args' => [ $options ],
         'heap'      => $func_map,
-        'states'    => [qw( _start sig_int sig_term sig_chld scheduler )],
+        'states'    => [ qw( _start sig_int sig_term sig_chld scheduler ) ],
     );
 
     $poe_kernel->run();
@@ -301,90 +309,107 @@ sub main (@args) {
     return ( $exit_code, $exit_reason );
 }
 
-sub _create_heap ( $opt, $usage ) {
+sub _create_heap ( $opt, $usage )
+{
     my $map = { '_' => {}, };
-    $map->{'_'}->{'opt'}     = $opt;
-    $map->{'_'}->{'usage'}   = $usage;
-    $map->{'_'}->{'default'} = $opt_conf_def;
-    $map->{'_'}->{'config'}  = {};
+    $map->{ '_' }->{ 'opt' }     = $opt;
+    $map->{ '_' }->{ 'usage' }   = $usage;
+    $map->{ '_' }->{ 'default' } = $opt_conf_def;
+    $map->{ '_' }->{ 'config' }  = {};
 
     # As it will be accessed a lot, keep a copy here
     my $env_prefix = $opt->env_prefix;
 
- # Collect appropriate enviromental variables and stash them in the funcmap/heap
-    foreach my $env_key ( keys %ENV ) {
-        my $env_val = $ENV{$env_key};
-        if ( $env_key =~ m{^\Q$env_prefix\E} ) {
-            $map->{'_'}->{'aep'}->{$env_key} = $env_val;
+    # Collect appropriate enviromental variables and stash them in the funcmap/heap
+    foreach my $env_key ( keys %ENV )
+    {
+        my $env_val = $ENV{ $env_key };
+        if ( $env_key =~ m{^\Q$env_prefix\E} )
+        {
+            $map->{ '_' }->{ 'aep' }->{ $env_key } = $env_val;
         }
-        else {
-            $map->{'_'}->{'env'}->{$env_key} = $env_val;
+        else
+        {
+            $map->{ '_' }->{ 'env' }->{ $env_key } = $env_val;
         }
     }
 
     # Process the resultant config
     # TODO
-    $map->{'_'}->{'config'} = $map->{'_'}->{'default'};
+    $map->{ '_' }->{ 'config' } = $map->{ '_' }->{ 'default' };
 
     return $map;
 }
 
 # Helper functions for repeated calls
-sub _default_opt_lookup ($def_opt_name) {
-    my $def = $opt_desc[ $opt_index->{$def_opt_name} ];
-    if ( scalar( @{$def} ) >= 2 ) {
-        $def = $def->[2];
+sub _default_opt_lookup ( $def_opt_name )
+{
+    my $def = $opt_desc[ $opt_index->{ $def_opt_name } ];
+    if ( scalar( @{ $def } ) >= 2 )
+    {
+        $def = $def->[ 2 ];
     }
-    if ( $def->{'default'} ) {
-        $def = $def->{'default'};
+    if ( $def->{ 'default' } )
+    {
+        $def = $def->{ 'default' };
     }
-    else {
+    else
+    {
         $def = 0;
     }
     return $def;
 }
 
-sub _check_exists ($val) {
-    if ( $val ne '$unset' ) { $val ? -e $val : undef }
-    else                    { 1 }
+sub _check_exists ( $val )
+{
+    if ( $val ne '$unset' ) { return $val ? -e $val : undef }
+    else                    { return 1 }
 }
 
-sub _check_positive_number ($val) {
+sub _check_positive_number ( $val )
+{
     return ( $val >= 0 ) ? 1 : undef;
 }
 
 # Show debug messages
-sub _func_debug ( $pipe, $line, $message ) {
+sub _func_debug ( $pipe, $line, $message )
+{
     my @buffer;
 
-    if ( $message && ref($message) eq 'HASH' ) {
+    if ( $message && ref( $message ) eq 'HASH' )
+    {
 
         # Fancy message - Add a default for lefttab (add more later)
-        if ( $message->{'lines'} && ref( $message->{'lines'} ) eq 'ARRAY' ) {
+        if ( $message->{ 'lines' } && ref( $message->{ 'lines' } ) eq 'ARRAY' )
+        {
 
             # nothing to do, makes sense
-            @buffer = @{ $message->{'lines'} };
+            @buffer = @{ $message->{ 'lines' } };
         }
-        else {
+        else
+        {
             # No idea what to do, re-pop it as dumper
-            push @buffer,
-              'Unexpected multiline format log packet, using data::dumper';
-            push @buffer, split( /\n/, Dumper( $message->{'lines'} ) );
+            push @buffer, 'Unexpected multiline format log packet, using data::dumper';
+            push @buffer, split( /\n/, Dumper( $message->{ 'lines' } ) );
         }
     }
-    else {
+    else
+    {
         push @buffer, $message;
     }
 
     my $msg_first        = 1;
     my $left_buffer_size = 0;
-    foreach my $out_msg (@buffer) {
-        if ( $msg_first++ == 1 ) {
+    foreach my $out_msg ( @buffer )
+    {
+        if ( $msg_first++ == 1 )
+        {
             my $msg_prefix = "AEP($pipe:$line) ";
-            $left_buffer_size = length($msg_prefix);
+            $left_buffer_size = length( $msg_prefix );
             say STDERR "\r$msg_prefix$out_msg";
         }
-        else {
+        else
+        {
             say STDERR ' ' x $left_buffer_size, $out_msg;
         }
     }
@@ -393,13 +418,11 @@ sub _func_debug ( $pipe, $line, $message ) {
 }
 
 # Call the main function with selected options
-exit do {
+exit do
+{
     my ( $exit_code, $exit_reason ) = main( $opt, $usage );
 
-    if (   ( !defined $exit_code )
-        || ( $exit_code !~ m#^\d+$# )
-        || ( $exit_code > 255 )
-        || ( $exit_code < 0 ) )
+    if ( ( !defined $exit_code ) || ( $exit_code !~ m#^\d+$# ) || ( $exit_code > 255 ) || ( $exit_code < 0 ) )
     {
         $exit_code = 255;
     }
@@ -407,11 +430,7 @@ exit do {
     _func_debug(
         'STDERR', __LINE__,
         {
-            'lines' => [
-                "Child exiting with: $exit_code",
-                "Status: $exit_reason",
-                'Perl exception: ' . $!,
-            ]
+            'lines' => [ "Child exiting with: $exit_code", "Status: $exit_reason", 'Perl exception: ' . $!, ]
         }
     );
 
@@ -443,3 +462,6 @@ This software is copyright (c) 2023 by Paul G Webster.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
+=cut
+
+1;

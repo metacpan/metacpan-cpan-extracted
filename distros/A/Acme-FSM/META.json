@@ -1,32 +1,42 @@
 {
    "abstract" : "Pseudo Finite State Machine",
    "author" : [
-      "Eric Pozharski <whynot@pozharski.name>"
+      "Eric Pozharski <wayside.ultimate@tuta.io>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-FSM",
+   "no_index" : {
+      "directory" : [
+         "directory",
+         "build_e7BB"
+      ],
+      "file" : [
+         "directory",
+         "build_e7BB"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : 0,
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "v0.31.0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "perl" : "v5.10.0",
             "version" : "v0.77.0"
          }
@@ -35,7 +45,7 @@
    "provides" : {
       "Acme::FSM" : {
          "file" : "lib/FSM.pm",
-         "version" : "v2.3.5"
+         "version" : "v2.3.6"
       }
    },
    "release_status" : "stable",
@@ -44,5 +54,6 @@
          "http://www.gnu.org/licenses/lgpl-3.0.txt"
       ]
    },
-   "version" : "v2.3.5"
+   "version" : "v2.3.6",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

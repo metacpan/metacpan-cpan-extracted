@@ -16,9 +16,9 @@ no warnings qw(void);
 use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
-use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
+use Sublike::Extended 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.15;
+package Sys::Async::Virt v0.0.16;
 
 use parent qw(IO::Async::Notifier);
 
@@ -36,22 +36,22 @@ use Protocol::Sys::Virt::Remote v11.0.0;
 use Protocol::Sys::Virt::Transport v11.0.0;
 use Protocol::Sys::Virt::URI v11.0.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.15;
-use Sys::Async::Virt::Domain v0.0.15;
-use Sys::Async::Virt::DomainCheckpoint v0.0.15;
-use Sys::Async::Virt::DomainSnapshot v0.0.15;
-use Sys::Async::Virt::Network v0.0.15;
-use Sys::Async::Virt::NetworkPort v0.0.15;
-use Sys::Async::Virt::NwFilter v0.0.15;
-use Sys::Async::Virt::NwFilterBinding v0.0.15;
-use Sys::Async::Virt::Interface v0.0.15;
-use Sys::Async::Virt::StoragePool v0.0.15;
-use Sys::Async::Virt::StorageVol v0.0.15;
-use Sys::Async::Virt::NodeDevice v0.0.15;
-use Sys::Async::Virt::Secret v0.0.15;
+use Sys::Async::Virt::Connection::Factory v0.0.16;
+use Sys::Async::Virt::Domain v0.0.16;
+use Sys::Async::Virt::DomainCheckpoint v0.0.16;
+use Sys::Async::Virt::DomainSnapshot v0.0.16;
+use Sys::Async::Virt::Network v0.0.16;
+use Sys::Async::Virt::NetworkPort v0.0.16;
+use Sys::Async::Virt::NwFilter v0.0.16;
+use Sys::Async::Virt::NwFilterBinding v0.0.16;
+use Sys::Async::Virt::Interface v0.0.16;
+use Sys::Async::Virt::StoragePool v0.0.16;
+use Sys::Async::Virt::StorageVol v0.0.16;
+use Sys::Async::Virt::NodeDevice v0.0.16;
+use Sys::Async::Virt::Secret v0.0.16;
 
-use Sys::Async::Virt::Callback v0.0.15;
-use Sys::Async::Virt::Stream v0.0.15;
+use Sys::Async::Virt::Callback v0.0.16;
+use Sys::Async::Virt::Stream v0.0.16;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -921,13 +921,14 @@ sub new($class, %args) {
         node_device_factory       => \&_node_device_factory,
         secret_factory            => \&_secret_factory,
 
-        url        => $args{url} // $ENV{LIBVIRT_DEFAULT_URI},
-        readonly   => $args{readonly},
-        connection => $args{connection},
-        transport  => $args{transport},
-        remote     => $args{remote},
-        factory    => $args{factory},
-        keepalive  => $args{keepalive},
+        url           => $args{url} // $ENV{LIBVIRT_DEFAULT_URI},
+        readonly      => $args{readonly},
+        connection    => $args{connection},
+        transport     => $args{transport},
+        remote        => $args{remote},
+        factory       => $args{factory},
+        keepalive     => $args{keepalive},
+        ping_interval => $args{ping_interval} // 60,
 
         on_close   => $args{on_close} // sub {},
         on_stream  => $args{on_stream},
@@ -1105,7 +1106,7 @@ sub _secret_instance($self, $id) {
     return $c;
 }
 
-extended async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
+async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
     die $log->fatal( "RPC call without remote connection (proc: $proc)" )
         unless $self->is_connected;
     my $serial = await $self->{remote}->call( $proc, $args );
@@ -1299,7 +1300,7 @@ async sub is_secure($self) {
                                 {}, unwrap => 'secure' ));
 }
 
-extended async sub connect($self, :$pump = undef) {
+async sub connect($self, :$pump = undef) {
     return if $self->{_state} ne 'DISCONNECTED';
 
     unless ($self->{connection}) {
@@ -1375,7 +1376,9 @@ extended async sub connect($self, :$pump = undef) {
         $self->{keepalive}->register( $self->{transport} );
         my $keep_pump = async sub {
             while (1) {
-                await $self->loop->delay_future( after => 10 );
+                await $self->loop->delay_future(
+                    after => $self->{ping_interval}
+                    );
                 $log->trace('Sending PING');
                 if (my $f = $self->{keepalive}->ping ) {
                     $self->adopt_future( $f );
@@ -1557,6 +1560,8 @@ async sub open($self) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
 async sub _close($self, $reason) {
     return unless $self->{_state} eq 'CONNECTED';
+    return if ($self->{_substate} eq 'CLOSING'
+               or $self->{_substate} eq 'CLEANING UP');
 
     $self->{_substate} = 'CLEANING UP';
     unless ($self->{connection}->is_read_eof
@@ -1579,8 +1584,14 @@ async sub _close($self, $reason) {
             await $self->_call( $remote->PROC_CONNECT_CLOSE );
 
             # stop loops reading from and writing to the connection
-            $self->{_input_pump_future}->cancel;
             $self->{_keepalive_pump_future}->cancel;
+            my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
+            $timeout->on_done(
+                sub {
+                    $log->info( 'Server failed to close connection timely; '
+                                . 'forcibly closing client socket' );
+                });
+            await Future->await_any( $timeout, $self->{_input_pump_future};
             $self->{connection}->close;
         }
         catch ($e) {
@@ -1589,8 +1600,15 @@ async sub _close($self, $reason) {
     }
     else {
         # stop loops reading from and writing to the connection
-        $self->{_input_pump_future}->cancel;
         $self->{_keepalive_pump_future}->cancel;
+        my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
+        $timeout->on_done(
+            sub {
+                $log->info( 'Server failed to close connection timely; '
+                            . 'forcibly closing client socket' );
+            });
+        await Future->await_any( $timeout, $self->{_input_pump_future};
+        $self->{connection}->close;
     }
 
     # These *should* have been de-allocated above; however,
@@ -2334,7 +2352,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.15
+v0.0.16
 
 Based on LibVirt tag v11.0.0
 
@@ -2558,6 +2576,16 @@ as part of the C<connect> procedure.
 An instance of L<Protocol::Sys::Virt::KeepAlive> or derived class configured
 to reply to PING messages using a PONG message as well as closing the
 C<connection> when the keepalive threshold is exceeded.
+
+=item * C<ping_interval> (optional)
+
+Interval in seconds between PING messages sent. Please keep in mind that the
+keepalive threshold is in number of messages not responded to, meaning that
+with a C<ping_interval> of 60 and a threshold of 5, it will take 5 minutes
+before a dead connection will be killed, if the operating system doesn't throw
+an error before it.
+
+When not supplied, defaults to C<60>.
 
 =item * C<url> (optional)
 
@@ -3888,6 +3916,34 @@ replies.
 
 =over 8
 
+=item * Talking to servers without the MIGRATION_PARAM feature
+ (v1.1.0 - 2013-07-01) is not - currently - supported
+
+=begin fill-templates
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_BEGIN
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_FINISH
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE2
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_BEGIN2
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM2
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM2
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_FINISH2
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_FINISH3
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3
+
+=end fill-templates
+
 =item * Talking to servers without the REMOTE_EVENT_CALLBACK feature
  (v1.3.3 - 2016-04-06) is not - currently - supported
 
@@ -3899,11 +3955,6 @@ replies.
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER_ANY
 
 =end fill-templates
-
-=item * Closing the server connection generates an error in the
- server logs (C<End of file while reading data: Input/output error>)
- which C<virt-manager> doesn't. Help figuring out what's going on
- is much appreciated.
 
 =back
 
@@ -3970,41 +4021,15 @@ towards implementation are greatly appreciated.
 
 =over 8
 
-=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
-
 =item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS
 
-=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3
-
 =item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS
 
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE2
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3
-
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3_PARAMS
-
-=back
-
-
-
-=item * @generate: server (src/libvirt_internal.h)
-
-=over 8
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3
 
 =back
 

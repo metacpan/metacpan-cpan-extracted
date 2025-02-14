@@ -4,19 +4,18 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
+
+The `Weather::Meteo` module provides an interface to the Open-Meteo API for retrieving historical weather data from 1940.
+It allows users to fetch weather information by specifying latitude, longitude, and a date.
+The module supports object-oriented usage and allows customization of the HTTP user agent.
 
       use Weather::Meteo;
 
       my $meteo = Weather::Meteo->new();
       my $weather = $meteo->weather({ latitude => 0.1, longitude => 0.2, date => '2022-12-25' });
-
-# DESCRIPTION
-
-Weather::Meteo provides an interface to open-meteo.com
-for historical weather data from 1940.
 
 # METHODS
 
@@ -80,6 +79,8 @@ Lots of thanks to the folks at [https://open-meteo.com](https://open-meteo.com).
 
 # BUGS
 
+This module is provided as-is without any warranty.
+
 Please report any bugs or feature requests to `bug-weather-meteo at rt.cpan.org`,
 or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Weather-Meteo](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Weather-Meteo).
@@ -120,6 +121,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2024 Nigel Horne.
+Copyright 2023-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

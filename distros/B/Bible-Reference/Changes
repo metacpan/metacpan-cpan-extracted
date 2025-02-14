@@ -1,5 +1,8 @@
 Revision history for Bible::Reference
 
+1.17      2025-02-13 13:31:30-08:00 America/Los_Angeles
+        - Perl minimum version align
+
 1.16      2024-10-08 10:06:17-07:00 America/Los_Angeles
         - Fix cross-object data bleed
 

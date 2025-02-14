@@ -1953,16 +1953,16 @@ This parameter causes perltidy to ignore the length of side comments when
 setting line breaks.  The default, B<-niscl>, is to include the length of
 side comments when breaking lines to stay within the length prescribed
 by the B<-l=n> maximum line length parameter.  For example, the following
-long single line would remain intact with -l=80 and -iscl:
+single line would remain intact with -l=50 and -iscl:
 
-     perltidy -l=80 -iscl
-        $vmsfile =~ s/;[\d\-]*$//; # Clip off version number; we can use a newer version
+    # perltidy -l=50 -iscl
+    $vmsfile =~ s/;[\d\-]*$//;    # Clip off version number
 
 whereas without the -iscl flag the line will be broken:
 
-     perltidy -l=80
-        $vmsfile =~ s/;[\d\-]*$//
-          ;    # Clip off version number; we can use a newer version
+    # perltidy -l=50
+    $vmsfile =~
+      s/;[\d\-]*$//;    # Clip off version number
 
 =item B<-ipc>,  B<--ignore-perlcritic-comments>
 
@@ -2250,24 +2250,28 @@ a hanging side comment.
 
 =back
 
-For example, assuming C<@month_of_year> is
-left-adjusted:
+For example, assuming C<@month_of_year> is left-adjusted, the default
+formatting for the following snippet is:
 
-    @month_of_year = (    # -sbc (default)
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
-    ##  'Dec', 'Nov'
-        'Nov', 'Dec');
-
-Without this convention, the above code would become
-
-    @month_of_year = (   # -nsbc
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
-
-        ##  'Dec', 'Nov'
-        'Nov', 'Dec'
+    # perltidy -sbc [default]
+    @month_of_year = (
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    ##  'Jul', 'Aug', 'Sep', 'Oct', 'Dec', 'Nov'
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     );
 
-which is not as clear.
+This can be useful for displaying code which has been commented out.
+Without this convention, the above code would become
+
+    # perltidy -nsbc
+    @month_of_year = (
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+
+        ##  'Jul', 'Aug', 'Sep', 'Oct', 'Dec', 'Nov'
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    );
+
+which is less clear.
 The default is to use B<-sbc>.  This may be deactivated with B<-nsbc>.
 
 =item B<-sbcp=string>, B<--static-block-comment-prefix=string>
@@ -4657,6 +4661,36 @@ Sometimes it turns out that the else block should not reachable, in which case
 an error exit might be appropriate. In any case, having the B<else> block can
 improve code maintainability.
 
+=head2 Controlling Breaks at Certain Chain Operators
+
+For a statment which consists of a chain of certain binary operators, the
+default line break logic is: (1) if a statement fits on one line, then it is
+formatted as one line, or (2) if the statement requires multiple lines, then a
+break is made at all of the chain operators. Additional rules apply, but this
+is the basic one.
+
+The parameter B<--pack-operator-types=s>, or B<-pot=s>, can be used to change
+this for certain operators which may be specified with the string B<s>. These
+are the concatenation operator B<s='.'> and the method call arrow
+B<s='-E<gt>'>.  When this parameter is selected for an operator, no special
+breaks are made, so there will be a minimal number of line breaks.
+For example, here is the default formatting for a method call chain:
+
+    # perltidy -l=60
+    Data::Dumper->new( [ \%errors ] )
+      ->Indent(2)
+      ->Terse(1)
+      ->Sortkeys(1)
+      ->Dump;
+
+and this is the alternative formatting with this parameter:
+
+    # perltidy -l=60 -pot='->'
+    Data::Dumper->new( [ \%errors ] )->Indent(2)->Terse(1)
+      ->Sortkeys(1)->Dump;
+
+Note that this option only applies to arrows which follow a closing paren.
+
 =head2 Retaining or Ignoring Existing Line Breaks
 
 Several additional parameters are available for controlling the extent
@@ -5058,22 +5092,9 @@ consequence is that introducing blank lines with these and other controls
 cannot be exactly undone, so some experimentation with these controls is
 recommended before using them.
 
-For example, suppose that for some reason we decide to introduce one blank
-space at the beginning and ending of all blocks.  We could do
-this using
-
-  perltidy -blao=2 -blbc=2 -blaol='*' -blbcl='*' filename
-
-Now suppose the script continues to be developed, but at some later date we
-decide we don't want these spaces after all. We might expect that running with
-the flags B<-blao=0> and B<-blbc=0> will undo them.  However, by default
-perltidy retains single blank lines, so the blank lines remain.
-
-We can easily fix this by telling perltidy to ignore old blank lines by
-including the added parameter B<--keep-old-blank-lines=0> and rerunning. Then
-the unwanted blank lines will be gone.  However, this will cause all old blank
-lines to be ignored, perhaps even some that were added by hand to improve
-formatting. So please be cautious when using these parameters.
+If necessary, it is possible to approximately undo these and other blank line
+controls with the parameter B<--keep-old-blank-lines-exceptions=s>
+described below.
 
 =item B<-mbl=n> B<--maximum-consecutive-blank-lines=n>
 
@@ -5095,10 +5116,84 @@ treated.
 The possible values of B<n> are:
 
  n=0 ignore all old blank lines
- n=1 stable: keep old blanks, but limited by the B<-mbl=n> flag
+ n=1 stable: keep old blanks, but limited by the B<-mbl=n> flag, but
+     remove existing blanks matching the B<--kblx=s> flag (next section)
  n=2 keep all old blank lines, regardless of the B<-mbl=n> flag
 
-The default is B<n=1>.
+The default and recommended setting is B<n=1>. With this option, you may
+selectively filter out selected blank lines from the input stream before
+formatting begins using the parameter described in the next section.
+
+The setting B<n=0> should be used with caution because it will remove
+all blank lines, including lines which might be essential for controlling
+vertical alignment, and for preventing unwanted hanging side comments.
+
+=item B<-kblx=s>,  B<--keep-old-blank-lines-exceptions=s>
+
+Most of the blank line controls described above specify a minimum number of
+blank lines, rather than a maximum, so they cannot be used remove lines.  This
+parameter allows blank lines to be removed by selectively ignoring them in the
+input stream.  It operates when B<--keep-old-blank-lines=1>, which is the
+default as described above. The selection of blank lines to exclude is made
+with a string with one or more of the following special values:
+
+   'b{' 'b}' '{b' '}b' 'bp' 'bs' 'bc' 'cb'
+
+In these symbols, the character B<b> indicates the location of B<blank lines>
+with respect to the next or previous token type. The token types B<{> and B<}>
+are opening and closing B<code blocks>, the character B<p> is a B<package>
+statement, B<s> is a B<sub> definition, and B<c> is a block B<comment>.
+
+So for example B<bs> means one or more B<blank lines before a sub>
+will be ignored in the input stream.  Note that this is approximately the
+opposite of the parameter B<-blanks-before-subs> described above.
+
+In fact, these parameters provide approximate inverses to all of the previously
+described blank line options. To simplify things, the block types to which the
+C<{> and C<}> operators apply are the same as the corresponding operator which
+adds blank lines, described above. The following table shows these
+relationships:
+
+   kblx=   Inverse  Applies to block types
+   b{      -bbb      if unless while until for foreach
+   b}      -blbc=i  -blbcl=s [default = sub]
+   {b      -blao=i  -blaol=s [default = sub]
+   }b      [none]   -blaol=s
+   bp      -blbp=n
+   bs      -blbs=n
+   bc      -bbc
+   cb      [none - comments before blanks]
+
+So, for example, the table indicates that to approximately remove the blank
+lines introduced by a B<-blao> operation we could use B<-kblx='{b'>.
+
+Some notes on using this parameter:
+
+=over 4
+
+=item *
+
+The parameter string may contain multiple operators provided that they are
+space-separated.
+
+=item *
+
+The comment deletion controls will keep at least one blank line between
+groups of comments, and between a side comment and following line comment.
+
+=item *
+
+These operations occur on the input stream, before other blank line operations,
+so they may be used in the same run as other blank line controls. So it can
+happen that these controls will remove blanks from the input stream
+while other controls add blank lines back.
+
+=item *
+
+These operations will normally only be needed occasionally to correct
+some problems, or undo an unwanted operation.
+
+=back
 
 =item B<-sob>,  B<--swallow-optional-blank-lines>
 
@@ -6073,11 +6168,15 @@ I<or other abbreviations>.  The main syntax requirement is that the new
 abbreviation along with its opening curly brace must begin on a new line.
 Space before and after the curly braces is optional.
 
-For a specific example, the following line
+For a specific example, the following definition
 
-  oneliner { --maximum-line-length=0 --noadd-newlines --noadd-terminal-newline}
+  oneliner {
+    --maximum-line-length=0
+    --noadd-newlines
+    --noadd-terminal-newline
+  }
 
-or equivalently with abbreviations
+or equivalently, with abbreviations,
 
   oneliner { -l=0 -nanl -natnl }
 
@@ -6355,12 +6454,6 @@ This can be useful in code which contains multiple packages.
 
 =item *
 
-This selects block types C<sub for foreach while> with 10 or more code lines.
-
-    perltidy -dbs -dbl=10 -dbt='sub for foreach while' somefile.pl >blocks.csv
-
-=item *
-
 This selects blocks with 2 or more code lines which are type C<sub> or which
 are inner loops.
 
@@ -6562,14 +6655,45 @@ strings in a file. For example:
 
    perltidy -duk File.pm >output.txt
 
-The lines in the output file list each unique key and its line number.
-Typically, most of the listed keys listed will be perfectly valid keys needed,
-for example, for communication with other modules or for future development.
-But the list might also include something unexpected, such as a misspelled key.
+The lines in the output file list unique keys and line numbers.
+
+Many programs contain sets of hash keys which are largely unique to that
+program but which are used for communication with other programs. A filter is
+used to avoid listing such keys. This filter is described in the next section.
 
 A program C<dump_unique_keys.pl> at
 L<https://github.com/perltidy/perltidy/tree/master/examples> can run perltidy
 with B<-duk> on multiple files, and then remove any common keys from the list.
+
+=item B<Use --warn-unique-keys-cutoff=N>, or B<-wukc=N>, to adjust the unique
+keys filter.
+
+This parameter controls the filter used by both B<--dump-unique-keys> and its
+counterpart B<--warn-unique-keys>, described below.  The filter works as
+follows: if a related set of keys has more than B<N> unique keys, then none of
+them are listed.  The default value is B<N=1>, which causes the minimum number
+of keys to be reported.  Increasing B<N> above 1 will allow more unique keys to
+be reported.
+
+Thus, a value B<N=1> will catch up to 1 error per set of related keys. A value
+B<N=2> will catch up to two errors per set, but at the same time may produce
+more unwanted warnings.
+
+For the special case B<N=1> some extra filtering is done to minimize unwanted
+warnings. For examples, unique keys in ALL CAPS are not reported for B<N=1>.
+
+=item B<Use --warn-unique-keys> to warn of possible misspelled hash keys
+
+The parameter B<--warn-unique-keys>, or B<-wuk>, can be used to produce a
+warning of a possible misspelled hash key during normal processing. It works
+like the previous B<-dump> version but writes to the standard error output
+if unique keys are found during normal formatting.
+
+For some scripts, this will produce unwanted warnings for a few keys, even
+though the filter described above attempts to avoid this. A way to avoid
+warnings for specific keys is to list them somewhere in the program in a B<qw>
+list. This will be seen during the key scan, and the then keys will not be
+considered unique.
 
 =item B<Use --dump-mixed-call-parens to find functions called both with and without parens>
 
@@ -6898,11 +7022,11 @@ B<--warn-mismatched-return-types=string>, or B<-wmrt=string>, can be used to lim
 To restrict the checking, set the string equal to the letter(s) of that warning,
 any B<x>, B<y>, B<o>, B<u>, or B<s>.  For example
 
-   perltidy -wmrt='x o s' somefile.pl
+   perltidy -wmr -wmrt='x o s' somefile.pl
 
 will format F<somefile.pl> and report issue types B<x>, B<o>, and B<s> but not
 types B<u> and B<y>.  All checks may be requested with B<-wmrt='*'> or
-B<-wmrt=1>.  This is the default.
+B<-wmrt=1>.  This is the default if this parameter is not specified.
 
 =item *
 
@@ -7243,7 +7367,7 @@ The following list shows all short parameter names which allow a prefix
  skp    sob    sobb   sohb   sop    sosb   sot    ssc    st     sts
  t      tac    tbc    toc    tp     tqw    trp    ts     tsc    tso
  vbc    vc     viu    vmll   vsc    vsn    vwe    w      wfc    wia
- wma    wme    wmr    wn     x      xbt    xci    xlp    xs
+ wma    wme    wmr    wn     wuk    x      xbt    xci    xlp    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -7342,7 +7466,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20250105
+This man page documents perltidy version 20250214
 
 =head1 BUG REPORTS
 

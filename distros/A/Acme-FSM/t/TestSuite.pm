@@ -1,21 +1,21 @@
-# $Id: TestSuite.pm 561 2022-12-29 18:54:15Z whynot $
+# $Id: TestSuite.pm 564 2025-02-13 21:33:15Z whynot $
 # Copyright 2012, 2013, 2022 Eric Pozharski <whynot@pozharski.name>
+# Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 # GNU LGPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+# qmdP Wc1x TJXv nTKr MbJk korM rYp3 zo57 DSKU kGG4 YES1 YgDi N1Xl wzqw 3HbC Y5xM Mn2s 6iIU fYQc UYWm nUF2 t1OM S675 6fg6 XOki d2hO |
 
 use strict;
 use warnings;
-use 5.010;
 
 package t::TestSuite;
-use version 0.77; our $VERSION = version->declare( v2.3.3 );
-use feature qw| switch |;
+use version 0.77; our $VERSION = version->declare( v2.3.4 );
 
 use base qw| Exporter |;
-# TODO:202212222201:whynot: B<&AFSMTS_smatch> or B<&AFSMTS_grep> or something is needed like yesterday.
 # XXX:202212222241:whynot: B<&AFSMTS_dump> isn't in use by unit-tests.  Also has cookoo dependency omitted from I<build_requires>.  Hmm.
 our %EXPORT_TAGS =
 ( diag     => [qw| &AFSMTS_diag  &AFSMTS_dump  &AFSMTS_croakson |],
+  utils    => [qw| &AFSMTS_smartmatch              &AFSMTS_grep |],
   run      =>
 [qw| &AFSMTS_wrap &AFSMTS_croakson &AFSMTS_deeply &AFSMTS_shift |],
   wraps    =>
@@ -27,6 +27,8 @@ our %EXPORT_TAGS =
 our @EXPORT_OK = ( map @$_, values %EXPORT_TAGS );
 
 use Module::Build;
+
+use Carp qw| croak |;
 
 =head1 NAME
 
@@ -505,6 +507,81 @@ Just dies with C<die switch> message.
 =cut
 
 sub AFSMTS_D  { die qq|die switch| }
+
+=item B<AFSMTS_smartmatch()>
+
+    use t::TestSuite qw/ :utils /;
+    fail 'assert' unless AFSMTS_smartmatch @result, @target;
+
+(B<v2.3.6>)
+I<rationale: on>
+Since B<v5.41.5> L<B<smartmatch>|perlop/Smartmatch Operator> is less then before
+(C<use 5.10> fails to compile double-tilde now).
+Unfortunately, testsuite used B<smartmatch> to compare two arrays
+and it can't.
+I<rationale: off>
+
+The sub-name is misleading -- this one isn't close to be drop in replacement for L<B<smartmatch>|perlop/Smartmatch Operator>
+(but it has potential nevertheless).
+
+Two B<ARRAY>s are compared for equality.
+
+=over
+
+=item *
+
+If sizes of arrays differ returns C<undef>
+
+=item *
+
+If any two elements mismatch then returns Perl's B<FALSE>
+
+=item *
+
+Otherwise returns Perl's B<TRUE>
+
+=item *
+
+Values are treated as plain scalars (it's too early for recursion)
+
+=back
+
+=cut
+
+sub AFSMTS_smartmatch ( \@\@ )                                 {
+    my( $jkCX1Y, $jlVW4H ) = @_;
+    @$jkCX1Y == @$jlVW4H                                      or return undef;
+    not grep $jkCX1Y->[$_] ne $jlVW4H->[$_], ( 0 .. $#$jkCX1Y ) }
+
+=item B<AFSMTS_grep()>
+
+    use t::TestSuite qw/ :utils /;
+    AFSTMTS_grep $item, @mass or next;
+
+(B<v2.3.6>)
+This should be in L<B<AFSMTS_smartmatch>|/AFSMTS_smartmatch()>.
+But that would be too much work for testsuite support.
+So it isn't.
+
+Verifies if I<$item> is present in I<@mass>
+
+=over
+
+=item *
+
+Returns Perl's B<TRUE> if I<$item> is present
+
+=item *
+
+Returns Perl's B<FALSE> otherwise
+
+=back
+
+=cut
+
+sub AFSMTS_grep ( $@ )                 {
+    my( $bnabT2, @ikHNm4 ) = @_;
+    not not grep $bnabT2 eq $_, @ikHNm4 }
 
 =back
 

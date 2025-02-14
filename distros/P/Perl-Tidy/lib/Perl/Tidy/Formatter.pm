@@ -76,7 +76,14 @@ use constant BACKSLASH    => q{\\};
 use Carp;
 use English    qw( -no_match_vars );
 use List::Util qw( min max first );    # min, max first are in Perl 5.8
-our $VERSION = '20250105';
+our $VERSION = '20250214';
+
+# List of hash keys to prevent -duk from listing them.
+# 'break-open-compact-parens' is an unimplemented option.
+# 'Unicode::Collate::Locale' is in the data for scan_unique_keys
+my @unique_hash_keys_uu =
+  qw( rOpts file_writer_object unlike isnt break-open-compact-parens }]
+  Unicode::Collate::Locale );
 
 # The Tokenizer will be loaded with the Formatter
 ##use Perl::Tidy::Tokenizer;    # for is_keyword()
@@ -270,6 +277,7 @@ my (
     $rOpts_whitespace_cycle,
     $rOpts_extended_block_tightness,
     $rOpts_extended_line_up_parentheses,
+    $rOpts_warn_unique_keys_cutoff,
 
     # Static hashes
     # INITIALIZER: BEGIN block
@@ -313,6 +321,8 @@ my (
     %is_re_match_op,
     %is_my_state_our,
     %is_keyword_with_special_leading_term,
+    %is_s_y_m_slash,
+    %is_sigil,
 
     # INITIALIZER: sub check_options
     $controlled_comma_style,
@@ -399,6 +409,9 @@ my (
     # INITIALIZER: sub initialize_call_paren_style
     %call_paren_style,
 
+    # INITIALIZER: sub initialize_pack_operator_types
+    %pack_operator_types,
+
     # INITIALIZER: sub initialize_warn_variable_types
     $rwarn_variable_types,
     $ris_warn_variable_excluded_name,
@@ -455,6 +468,9 @@ my (
     # INITIALIZER: sub make_keyword_group_list_pattern
     $keyword_group_list_pattern,
     $keyword_group_list_comment_pattern,
+
+    # INITIALIZER: sub initialize_keep_old_blank_lines_hash
+    %keep_old_blank_lines_exceptions,
 
     # INITIALIZER: sub make_closing_side_comment_prefix
     $closing_side_comment_prefix_pattern,
@@ -638,6 +654,7 @@ BEGIN {
         _rending_multiline_qw_seqno_by_K_   => $i++,
         _rKrange_multiline_qw_by_seqno_     => $i++,
         _rmultiline_qw_has_extra_level_     => $i++,
+        _ris_qwaf_by_seqno_                 => $i++,
 
         _rcollapsed_length_by_seqno_       => $i++,
         _rbreak_before_container_by_seqno_ => $i++,
@@ -645,6 +662,7 @@ BEGIN {
         _ris_assigned_structure_           => $i++,
         _ris_short_broken_eval_block_      => $i++,
         _ris_bare_trailing_comma_by_seqno_ => $i++,
+        _rtightness_override_by_seqno_     => $i++,
 
         _rseqno_non_indenting_brace_by_ix_ => $i++,
         _rmax_vertical_tightness_          => $i++,
@@ -943,6 +961,13 @@ BEGIN {
       qw( chmod formline grep join kill map pack printf push sprintf unshift );
     @is_keyword_with_special_leading_term{@q} = (1) x scalar(@q);
 
+    # used to check for certain token quote types
+    @q = qw( s y m / );
+    @is_s_y_m_slash{@q} = (1) x scalar(@q);
+
+    @q = qw( $ & % * @ );
+    @is_sigil{@q} = (1) x scalar(@q);
+
 } ## end BEGIN
 
 {    ## begin closure to count instances
@@ -1163,6 +1188,7 @@ sub new {
     $self->[_rending_multiline_qw_seqno_by_K_]   = {};
     $self->[_rKrange_multiline_qw_by_seqno_]     = {};
     $self->[_rmultiline_qw_has_extra_level_]     = {};
+    $self->[_ris_qwaf_by_seqno_]                 = {};
 
     $self->[_rcollapsed_length_by_seqno_]       = {};
     $self->[_rbreak_before_container_by_seqno_] = {};
@@ -1170,6 +1196,7 @@ sub new {
     $self->[_ris_assigned_structure_]           = {};
     $self->[_ris_short_broken_eval_block_]      = {};
     $self->[_ris_bare_trailing_comma_by_seqno_] = {};
+    $self->[_rtightness_override_by_seqno_]     = {};
 
     $self->[_rseqno_non_indenting_brace_by_ix_] = {};
     $self->[_rmax_vertical_tightness_]          = {};
@@ -2082,6 +2109,94 @@ sub cumulative_length_before_K {
     return ( $KK <= 0 ) ? 0 : $rLL->[ $KK - 1 ]->[_CUMULATIVE_LENGTH_];
 } ## end sub cumulative_length_before_K
 
+# Number of leading characters to remove for quote types
+# Zero values indicate types not used
+my %Q_leading_chars = (
+    "'"  => 1,
+    '"'  => 1,
+    '/'  => 1,
+    'm'  => 2,
+    's'  => 2,
+    'y'  => 2,
+    'tr' => 3,
+    'qx' => 3,
+    'qr' => 3,
+    'qq' => 3,
+    'q'  => 2,
+);
+
+# hash keys which are quotes may be one of these types
+my %is_simple_quote_type = (
+    "'"  => 1,
+    '"'  => 1,
+    'qq' => 1,
+    'q'  => 1,
+);
+
+sub Q_spy {
+
+    my ( $string, ($is_qwaf_Q) ) = @_;
+
+    # Look at the first few characters of a type Q token and identify
+    # its specific type, based on the above hash.
+
+    # Given:
+    #    $string = A token type Q; if multiline, then the first token.
+    #    $is_qwaf_Q = true if this is a special type Q within a qw list
+    #     formatted with -qwaf. These do not have containing quote marks.
+    # Returns:
+    #    - nothing if the type cannot be identified, or
+    #    - hash with these values otherwise:
+    #      nch = number of leading characters to remove to reveal the text
+    #      is_simple = true if this quote is one of these types: qq q ' "
+    #      is_interpolated = true if this quote type may contain code
+    #      ch_key = first one or two characters indicating type
+    #                  i.e. one of the above hash keys.
+    # Note:
+    #    - The number $nch is the minimum number; but it could be more
+    #      if there are spaces before before the leading '(' or other delimiter,
+    #    - This call works for multiline quotes provided that this sub is
+    #      called with the first Q token in the string, not an intermediate one.
+    #    - For efficiency, caller can handle common cases of leading ' or "
+    #    - On return, caller should check the token type with $ch_key to decide
+    #      how to parse further.
+    #    - For the simple quote-type operators, the inner text can be found as:
+    #      my $text = $is_qwaf_Q ? $string : substr( $string, $nch, -1 );
+    #    where:
+    #      $string = the concatenation of all type Q tokens, if multiline.
+
+    # Note that here we must check for the two char case first, then 1, because
+    # of ambiguity when $ch1='q'.
+
+    # Values for $is_qwaf_Q:
+    my $is_interpolated = 0;
+    my $is_simple       = 1;
+    my $nch             = 0;
+    my $ch_key          = EMPTY_STRING;
+
+    # Note that type Q tokens in a qwaf call are not contained within quotes
+    if ( !$is_qwaf_Q ) {
+        my $ch1 = substr( $string, 0, 1 );
+        my $ch2 = substr( $string, 0, 2 );
+        $nch    = $Q_leading_chars{$ch2};
+        $ch_key = $ch2;
+        if ( !defined($nch) ) {
+            $nch    = $Q_leading_chars{$ch1};
+            $ch_key = $ch1;
+        }
+        return if ( !defined($nch) );
+        $is_simple       = $is_simple_quote_type{$ch_key};
+        $is_interpolated = $ch1 ne 'q' && $ch1 ne "'";
+    }
+    return {
+        nch             => $nch,
+        is_simple       => $is_simple,
+        is_interpolated => $is_interpolated,
+## TBD: Unique key not used yet, for future use:
+##      ch_key          => $ch_key,
+    };
+} ## end sub Q_spy
+
 ###########################################
 # CODE SECTION 3: Check and process options
 ###########################################
@@ -2125,8 +2240,6 @@ sub check_options {
 
     initialize_missing_else_comment();
 
-    initialize_call_paren_style();
-
     initialize_warn_variable_types( $wvt_in_args, $num_files,
         $line_range_clipped );
 
@@ -2167,6 +2280,8 @@ sub check_options {
     }
 
     initialize_line_up_parentheses();
+
+    initialize_pack_operator_types();
 
     check_tabs();
 
@@ -2234,6 +2349,8 @@ EOM
     initialize_weld_fat_comma_rules();
 
     initialize_lpxl_lpil();
+
+    initialize_keep_old_blank_lines_hash();
 
     return;
 } ## end sub check_options
@@ -2905,6 +3022,47 @@ EOM
     return;
 } ## end sub initialize_line_up_parentheses
 
+sub initialize_pack_operator_types {
+
+    # Setup the control hash for --pack-operator-types
+    %pack_operator_types = ();
+
+    # This option is currently only implemented for '->' and '.' chains.
+    # The possibility exists to extend this to other chain operators
+    # in the future, but some programming and a lot of testing are required.
+    ##my @ok = qw( -> . && || and or : ? + - * / );
+    my @ok = qw( -> . );
+    my %is_ok;
+    @is_ok{@ok} = (1) x scalar(@ok);
+
+    my $long_name = 'pack-operator-types';
+    my %hash;
+    my @unknown;
+    if ( $rOpts->{$long_name} ) {
+        my @words = split_words( $rOpts->{$long_name} );
+        foreach my $word (@words) {
+            if   ( $word eq '?' )  { $word        = ':' }
+            if   ( $word eq '/' )  { $word        = '*' }
+            if   ( $word eq '-' )  { $word        = '+' }
+            if   ( $is_ok{$word} ) { $hash{$word} = 1 }
+            else                   { push @unknown, $word }
+        }
+        if (@unknown) {
+            my $num = @unknown;
+            local $LIST_SEPARATOR = SPACE;
+            Warn(<<EOM);
+$num unrecognized types(s) were input with --$long_name :
+@unknown
+EOM
+        }
+    }
+
+    # Transfer the result to the global hash
+    %pack_operator_types = %hash;
+
+    return;
+} ## end sub initialize_pack_operator_types
+
 sub check_tabs {
 
     # At present, tabs are not compatible with the line-up-parentheses style
@@ -3386,6 +3544,7 @@ sub initialize_global_option_vars {
     $rOpts_valign_wide_equals        = $rOpts->{'valign-wide-equals'};
     $rOpts_variable_maximum_line_length =
       $rOpts->{'variable-maximum-line-length'};
+    $rOpts_warn_unique_keys_cutoff = $rOpts->{'warn-unique-keys-cutoff'};
 
     # Note that both opening and closing tokens can access the opening
     # and closing flags of their container types.
@@ -4252,6 +4411,8 @@ sub set_whitespace_flags {
     my $K_closing_container   = $self->[_K_closing_container_];
     my $jmax                  = @{$rLL} - 1;
 
+    my $rtightness_override_by_seqno = $self->[_rtightness_override_by_seqno_];
+
     %opening_container_inside_ws = ();
     %closing_container_inside_ws = ();
 
@@ -4379,6 +4540,10 @@ sub set_whitespace_flags {
                 if ( $type eq 'w' && substr( $token, 0, 1 ) eq '^' ) {
                     $tightness_here = 1;
                 }
+
+                # c446
+                my $tseq = $rtightness_override_by_seqno->{$last_seqno};
+                if ( defined($tseq) ) { $tightness_here = $tseq }
 
                 #=============================================================
 
@@ -4566,6 +4731,10 @@ sub set_whitespace_flags {
                 my $ws_override = $closing_container_inside_ws{$seqno};
                 if ($ws_override) { $ws = $ws_override }
             }
+
+            # c446
+            my $tseq = $rtightness_override_by_seqno->{$seqno};
+            if ( defined($tseq) ) { $ws = $tseq > 0 ? WS_NO : WS_YES }
 
             $ws_4 = $ws_3 = $ws_2 = $ws
               if DEBUG_WHITE;
@@ -7163,6 +7332,76 @@ EOM
     return;
 } ## end sub make_closing_side_comment_prefix
 
+sub initialize_keep_old_blank_lines_hash {
+
+    # Initialize the control hash for --keep-old-blank-lines-exceptions
+    %keep_old_blank_lines_exceptions = ();
+    my $long_name  = 'keep-old-blank-lines-exceptions';
+    my $short_name = 'kblx';
+    my $opts       = $rOpts->{$long_name};
+    return if ( !defined($opts) );
+    my @words = split_words($opts);
+
+    # Valid input types:
+    my %top;
+    my %bottom;
+
+    my @q = qw( }b {b cb );
+    @top{@q} = (1) x scalar(@q);
+
+    @q = qw( b{ b} bs bp bc );
+    @bottom{@q} = (1) x scalar(@q);
+
+    my @unknown_types;
+
+    # Table of translations to make thes closer to perltidy token types
+    # This must include all characters except 'b'
+    my %translate = (
+        'c' => '#',
+        's' => 'S',
+        'p' => 'P',
+        '}' => '}',
+        '{' => '{',
+    );
+
+    foreach my $str (@words) {
+        if ( $top{$str} ) {
+            my $tok = substr( $str, 0, 1 );
+            $tok = $translate{$tok};
+            if ( !defined($tok) ) {
+                ## This can only happen if the input has introduced an new
+                ## character which is not in the translation table
+                DEVEL_MODE && Fault("No top translation for $str\n");
+                next;
+            }
+            $keep_old_blank_lines_exceptions{top}->{$tok} = 1;
+        }
+        elsif ( $bottom{$str} ) {
+            my $tok = substr( $str, 1, 1 );
+            $tok = $translate{$tok};
+            if ( !defined($tok) ) {
+                ## This can only happen if the input has introduced an new
+                ## character which is not in the translation table
+                DEVEL_MODE && Fault("No bottom translation for $str\n");
+                next;
+            }
+            $keep_old_blank_lines_exceptions{bottom}->{$tok} = 1;
+        }
+        else {
+            push @unknown_types, $str;
+        }
+        if (@unknown_types) {
+            my $num = @unknown_types;
+            local $LIST_SEPARATOR = SPACE;
+            Warn(<<EOM);
+$num unrecognized token types were input with --$short_name :
+@unknown_types
+EOM
+        }
+    }
+    return;
+} ## end sub initialize_keep_old_blank_lines_hash
+
 ##################################################
 # CODE SECTION 4: receive lines from the tokenizer
 ##################################################
@@ -7583,28 +7822,6 @@ EOM
             return;
         }
 
-        # c414 and c424: do not join a '\' and a closing ')' like here:
-        #   my @clock_chars = qw( | / - \ | / - \ );
-        if (
-               @words
-            && $closing
-            && substr( $words[-1], -1, 1 ) eq BACKSLASH
-            && (
-                !$rOpts_add_whitespace
-                || (   $tightness{')'} == 2
-                    || $tightness{')'} == 1 && @words == 1 )
-            )
-          )
-        {
-            # fix by including a space after the \
-            $words[-1] .= SPACE;
-
-            # and for symmetry, before the first word if the '(' is on this line
-            if ( $opening && $rOpts_add_whitespace ) {
-                $words[0] = SPACE . $words[0];
-            }
-        }
-
         #---------------------------------------------------------------------
         # This is the point of no return if the transformation has not started
         #---------------------------------------------------------------------
@@ -7622,9 +7839,9 @@ EOM
             $in_qw_seqno = ++$last_new_seqno;
             $added_seqno_count++;
             my $seqno = $in_qw_seqno;
+            $self->[_ris_qwaf_by_seqno_]->{$seqno} = 1;
 
             # update relevant seqno hashes
-            $self->[_K_opening_container_]->{$seqno} = @{$rLL};
             $rdepth_of_opening_seqno->[$seqno] = $nesting_depth;
             $nesting_depth++;
             $self->[_rI_opening_]->[$seqno] = @{$rSS};
@@ -7641,6 +7858,7 @@ EOM
             push @{$rLL}, $rtoken_qw;
 
             # make and push the '(' with the new sequence number
+            $self->[_K_opening_container_]->{$seqno} = @{$rLL};
             my $rtoken_opening = copy_token_as_type( $rtoken_q, '{', '(' );
             $rtoken_opening->[_TYPE_SEQUENCE_] = $seqno;
             push @{$rLL}, $rtoken_opening;
@@ -7710,6 +7928,17 @@ EOM
                 # be necessary to change the range [Kfirst,Klast] of the
                 # previous line and the current line.
                 $rLL->[-1]->[_TYPE_] = 'b';
+            }
+
+            # Force paren tightness = 0 if closing paren follows a backslash
+            # c414, c424, and c446. for example:
+            #   my @clock_chars = qw( | / - \ | / - \ );
+            my $iQ = $rLL->[-1]->[_TYPE_] eq 'Q' ? -1 : -2;
+            if ( substr( $rLL->[$iQ]->[_TOKEN_], -1, 1 ) eq BACKSLASH ) {
+                $self->[_rtightness_override_by_seqno_]->{$in_qw_seqno} = 0;
+                if ( !$rOpts_add_whitespace ) {
+                    $rLL->[$iQ]->[_TOKEN_] .= SPACE;
+                }
             }
 
             # follow input spacing before ')'
@@ -8097,6 +8326,11 @@ EOM
     if ( $rOpts->{'dump-unique-keys'} ) {
         $self->dump_unique_keys();
         Exit(0);
+    }
+
+    if ( $rOpts->{'warn-unique-keys'} ) {
+        $self->warn_unique_keys()
+          if ( $self->[_logger_object_] );
     }
 
     # Dump any requested block summary data
@@ -8803,36 +9037,90 @@ sub follow_if_chain {
     return $rchain;
 } ## end sub follow_if_chain
 
-sub dump_unique_keys {
+sub get_interpolated_hash_keys {
+
+    my ($str) = @_;
+
+    # Find hash keys of interpolated variables in a quoted string
+
+    # Given:
+    #  $str=a quoted string with possible interpolated vars
+    # Return:
+    #  ref to list of interpolated hash keys
+    # Example: for the string:
+    #  "$rhash->{key1} and $other_hash{'key2'} and ${$rlist}"
+    #  finds 'key1' and 'key2' and not '$rlist'
+    my @keys;
+    while ( $str =~ m/ \$[A-Za-z_]\w* (?:->)? \{ ([^\$\@\}][^\}]*) \}/gcx ) {
+        my $key = $1;
+        my $ch1 = substr( $key, 0, 1 );
+        if ( $ch1 eq "'" ) {
+            $key = substr( $key, 1, -1 );
+        }
+        push @keys, $key;
+    } ## end while ( $str =~ ...)
+    return \@keys;
+} ## end sub get_interpolated_hash_keys
+
+sub scan_unique_keys {
     my ($self) = @_;
 
-    # Implement --dump-unique-keys, -duk
-    # Dump a list of hash keys used just one time
+    # Scan for hash keys needed to implement --dump-unique-keys, -duk
+    use constant DEBUG_WUK => 0;
 
-    my $rLL                 = $self->[_rLL_];
-    my $Klimit              = $self->[_Klimit_];
-    my $ris_list_by_seqno   = $self->[_ris_list_by_seqno_];
-    my $K_opening_container = $self->[_K_opening_container_];
-    my $K_closing_container = $self->[_K_closing_container_];
+    # There are the main phases of the operation:
 
-    # stack holds [$seqno, $KK, $KK_last_nb]
-    my @stack;
+    # PHASE 1: We scan the file and store all hash keys found in the hash
+    # %{$rhash_key_trove}, including a count for each. These are keys which:
+    #   - occur before a fat comma, such as : "word => $val", and
+    #   - text which occurs within hash braces, like "$hash{word}" or
+    #     a slice like @hash{word1, word2};
+    # During this scan we save pointers to all quotes and here docs,
+    # for use in the second phase.
 
-    my $KK = -1;
-    my $KK_last_nb;
-    my $KK_this_nb = 0;
+    # PHASE 2: We find the keys which occur just once, and store their
+    # index in the hash %K_unique_key. Then we compare all quoted text
+    # with these unique keys.  If a key matches a quoted string, then
+    # it is removed from the set of unique keys.
 
-    my $K_end_skip = -1;
+    # PHASE 3: We apply a filter to remove sets of multiple related keys
+    # for which most keys are unique.  These are most likely used for
+    # communication with other code and thus unlikely to be errors.
 
-    #----------------------------------------------
-    # Main loop to examine all hash keys and quotes
-    #----------------------------------------------
-    my @Q_list;
-    my @K_start_qw_list;
-    my $rwords = {};
+    # PHASE 4: Any remaining keys are output along with their line number.
 
-    # Table of some known keys
-    my %is_known_key = (
+    # Current limitation:
+    # - Hash keys which occur within quoted text or here docs are processed as
+    #   quotes rather than as primary keys.
+
+    my $rLL                  = $self->[_rLL_];
+    my $Klimit               = $self->[_Klimit_];
+    my $ris_list_by_seqno    = $self->[_ris_list_by_seqno_];
+    my $K_opening_container  = $self->[_K_opening_container_];
+    my $K_closing_container  = $self->[_K_closing_container_];
+    my $ris_qwaf_by_seqno    = $self->[_ris_qwaf_by_seqno_];
+    my $rtype_count_by_seqno = $self->[_rtype_count_by_seqno_];
+
+    return if ( !defined($Klimit) || $Klimit < 1 );
+
+    # stack holds keys _seqno, _KK, _KK_last_nb, _is_slice
+    my @stack;                   # token stack during PHASE 1 scan
+    my $rhash_key_trove = {};    # all hash keys found in PHASE 1
+    my %K_unique_key;            # token index of the unique hash keys
+    my @Q_list;                  # list of type Q quote tokens in PHASE 1
+    my @mw_list;                 # list of type Q quotes associated with -qwaf
+    my @Q_getopts;               # list of any quote args to a sub getopts
+    my %first_key_by_id;         # debug info
+    my %saw_use_module;          # modules used; updated during main loop scan
+    my %is_known_module_key;     # set by sub $set_known_module_keys after scan
+
+    # See https://perldoc.perl.org/perlref
+    my %is_typeglob_slot_key;
+    my @q = qw( SCALAR ARRAY HASH CODE IO FILEHANDLE GLOB FORMAT NAME PACKAGE );
+    @is_typeglob_slot_key{@q} = (1) x scalar(@q);
+
+    # Table of keys of hashes which are always available
+    my %is_fixed_key = (
         ALRM     => { '$SIG' => 1 },
         TERM     => { '$SIG' => 1 },
         INT      => { '$SIG' => 1 },
@@ -8847,14 +9135,116 @@ sub dump_unique_keys {
         PERLLIB  => { '$ENV' => 1 },
     );
 
+    # Keys of some known modules
+    # Note that ExtUtils::MakeMaker has a large number of keys
+    # but they are not included here because they will typically
+    # be removed with the filter
+    my %known_module_keys = (
+
+        # Common core modules
+        'File::Temp' =>
+          [qw( CLEANUP DIR EXLOCK PERMS SUFFIX TEMPLATE TMPDIR UNLINK )],
+        'File::Path' => [
+            qw(
+              chmod  error group keep_root mode owner
+              result safe  uid   user      verbose
+            )
+        ],
+        'Test::More' => [qw( tests skip_all import )],
+        'Test::EOL'  => [qw( trailing_whitespace all_reasons )],
+        'Test'       => [qw( tests onfail   todo )],
+        'warnings'   => [qw( FATAL NONFATAL )],
+        'open'       => [qw( IN    OUT IO )],
+
+        'Unicode::Collate' => [
+            qw(
+              UCA_Version              alternate
+              backwards                entry
+              hangul_terminator        highestFFFF
+              identical                ignoreName
+              ignoreChar               ignore_level2
+              katakana_before_hiragana level
+              long_contraction         minimalFFFE
+              normalization            overrideCJK
+              overrideHangul           preprocess
+              rearrange                rewrite
+              suppress                 table
+              undefName                undefChar
+              upper_before_lower       variable
+            ),
+            qw(locale),
+        ],
+        'Config::Perl::V' => [
+            qw(
+              build config  derived environment
+              inc   options osname  patches
+              stamp version
+            )
+        ],
+        'HTTP::Tiny' => [
+            qw(
+              SSL_options  agent       cookie_jar default_headers
+              http_proxy   https_proxy keep_alive local_address
+              max_redirect max_size    no_proxy   proxy
+              timeout      verify_SSL
+            ),
+            qw( content data_callback peer successders trailer_callback ),
+            qw( content headers protocol reason redirects status url ),
+        ],
+        'Math::BigInt'   => [qw( lib try only upgrade )],
+        'Math::BigFloat' => [qw( lib try only )],
+        'Memoize'        => [qw( NORMALIZER INSTALL SCALAR_CACHE LIST_CACHE )],
+
+        # Other common modules
+        'DateTime' => [
+            qw(
+              year      month       week         day
+              hour      minute      second       nanosecond
+              years     months      weeks        days
+              hours     minutes     seconds      nanoseconds
+              time_zone epoch       name         object
+              to        day_of_year end_of_month formatter
+            )
+        ],
+        'Moo' => [
+            qw(
+              builder  clearer coerce   default handles   init_arg
+              is       isa     lazy     moosify predicate reader
+              required trigger weak_ref writer
+            )
+        ],
+        'Compress::Zlib' => [
+            qw(
+              -Level    -Method     -WindowBits -MemLevel
+              -Strategy -Dictionary -Bufsize
+            )
+        ],
+    );
+
+    # List of any parent modules with keys to load for a module.
+    # This can be extended as necessary.
+    my %parent_modules = (
+
+        # Unicode::Collate::Local is a subclass of Unicode::Colate
+        'Unicode::Collate::Locale' => ['Unicode::Collate'],
+    );
+
+    # Some keys associated with modules starting with a certain text
+    # These are used in the last step of filtering
+    my %modules_with_common_keys = (
+        CCFLAGS     => ['ExtUtils::'],
+        INSTALLDIRS => ['ExtUtils::'],
+        tests       => ['Test::'],
+    );
+
     my $add_known_keys = sub {
         my ( $rhash, $name ) = @_;
         foreach my $key ( keys %{$rhash} ) {
-            if ( !defined( $is_known_key{$key} ) ) {
-                $is_known_key{$key} = { $name => 1 };
+            if ( !defined( $is_fixed_key{$key} ) ) {
+                $is_fixed_key{$key} = { $name => 1 };
             }
             else {
-                $is_known_key{$key}->{$name} = 1;
+                $is_fixed_key{$key}->{$name} = 1;
             }
         }
     }; ## end $add_known_keys = sub
@@ -8864,49 +9254,324 @@ sub dump_unique_keys {
     $add_known_keys->( \%ENV,   '$ENV' );
     $add_known_keys->( \%ERRNO, '$!' );
 
-    my $is_known_hash = sub {
-        my ($key) = @_;
+    my $set_known_module_keys = sub {
+
+        # Look through the hash of 'use module' statements and populate
+        # %is_known_module_key, a hash of keys which are not unique if certain
+        # modules are used.  This is called just after we have finished
+        # scanning the file to help remove known keys.
+        foreach my $module_seen ( keys %saw_use_module ) {
+
+            # Add keys for this module if known
+            my $rkeys = $known_module_keys{$module_seen};
+            if ( defined($rkeys) ) {
+                foreach my $key ( @{$rkeys} ) {
+                    $is_known_module_key{$key} = 1;
+                }
+            }
+
+            # And add keys for any parent classes
+            my $rparent_list = $parent_modules{$module_seen};
+            if ( defined($rparent_list) ) {
+                foreach my $name ( @{$rparent_list} ) {
+                    my $rk = $known_module_keys{$name};
+                    if ( defined($rk) ) {
+                        foreach my $key ( @{$rk} ) {
+                            $is_known_module_key{$key} = 1;
+                        }
+                    }
+                }
+            }
+        }
+        return;
+    }; ## end $set_known_module_keys = sub
+
+    my $get_hash_name = sub {
+
+        # Get a name of the hash corresponding to a key in hash braces, if
+        # possible.  This will be used to identify related hash keys.
+        # We have just encountered token at $KK and about to close the stack.
+        #    $rOpts->{'something'}
+        #    |       |           |
+        #   $Khash   $Kbrace     $KK
+        return if ( !@stack );
+        my $Kbrace = $stack[-1]->{_KK};
+        my $Khash  = $stack[-1]->{_KK_last_nb};
+        return if ( !defined($Kbrace) );
+        return if ( !defined($Khash) );
+        return if ( $rLL->[$Kbrace]->[_TYPE_] ne 'L' );
+        my $Khash_end = $Khash;
+        my $token     = $rLL->[$Khash]->[_TOKEN_];
+
+        # Walk back to find a '$'
+        if ( $token eq '->' ) {
+            $Khash = $self->K_previous_code($Khash);
+            return if ( !defined($Khash) );
+            $token = $rLL->[$Khash]->[_TOKEN_];
+        }
+        if ( $token eq '}' ) {
+            my $seqno = $rLL->[$Khash]->[_TYPE_SEQUENCE_];
+            return if ( !defined($seqno) );
+            my $Ko = $K_opening_container->{$seqno};
+            return if ( !$Ko );
+            $Khash = $Ko - 1;
+            $token = $rLL->[$Khash]->[_TOKEN_];
+        }
+        my $ch1 = substr( $token, 0, 1 );
+        return if ( $ch1 ne '$' && $ch1 ne '*' );
+
+        # Construct the final name, removing any spaces
+        my $hash_name = $token;
+        my $count     = 0;
+        foreach my $Kh ( $Khash + 1 .. $Khash_end ) {
+            $hash_name .= $rLL->[$Kh]->[_TOKEN_];
+            $count++;
+        }
+        if ( $count > 0 ) { $hash_name =~ s/\s//g }
+        return $hash_name;
+    }; ## end $get_hash_name = sub
+
+    my $is_hash_slice = sub {
+
+        # We are at an opening hash brace.
+        # Look back to see if this is a slice.
+        # Return:
+        #  a name for the slice, or
+        #  undef if not a slice
+
+        my ($Ktest) = @_;
+        my $token = $rLL->[$Ktest]->[_TOKEN_];
+
+        # walk back to find a '$'
+        if ( $token eq '->' ) {
+            $Ktest = $self->K_previous_code($Ktest);
+            return if ( !defined($Ktest) );
+            $token = $rLL->[$Ktest]->[_TOKEN_];
+        }
+        if ( $token eq '}' ) {
+            my $seqno = $rLL->[$Ktest]->[_TYPE_SEQUENCE_];
+            return if ( !defined($seqno) );
+            my $Ko = $K_opening_container->{$seqno};
+            return if ( !$Ko );
+            $Ktest = $Ko - 1;
+            $token = $rLL->[$Ktest]->[_TOKEN_];
+        }
+        my $ch1 = substr( $token, 0, 1 );
+
+        # NOTE: at present, we require an @ sigil to recognize a hash slice.
+        if ( $ch1 eq '@' ) {
+
+            # convert sigil to '$' to match other group members
+            my $id = '$' . substr( $token, 1 );
+            return $id;
+        }
+        return;
+    }; ## end $is_hash_slice = sub
+
+    my %ancestor_seqno_cache;
+    my $get_ancestor_seqno = sub {
+        my ($seqno_in) = @_;
+
+        # The goal is to find the outermost common sequence number of
+        # a tree with hash keys and values. This is needed to help filter
+        # out large static data trees.
+
+        # Given:
+        #   $seqno_in = the sequence number of a list with hash key items
+        # Task:
+        #   Walk back up the tree in search of the outermost list container
+        # Return:
+        #   $seqno_out = The most outer ancestor matching ancestor seqno
+
+        # Be sure we have a valid starting sequence number
+        if ( !$seqno_in ) {
+            return;
+        }
+
+        # Handle a possible parenless-call:
+        # NOTE: A better strategy might be to keep track of the most recent
+        # keyword or function name and use it.
+        if ( $seqno_in <= SEQ_ROOT || !$ris_list_by_seqno->{$seqno_in} ) {
+            return $seqno_in;
+        }
+
+        # Continue for a normal list..
+
+        # use any cached value for efficiency
+        my $seqno_cache = $ancestor_seqno_cache{$seqno_in};
+        if ( defined($seqno_cache) ) { return $seqno_cache }
+
+        # This will be the outermost container found so far:
+        my $seqno_out = $seqno_in;
+
+        # Loop upward..
+        my $rparent_of_seqno = $self->[_rparent_of_seqno_];
+        while ( my $seqno = $rparent_of_seqno->{$seqno_out} ) {
+            last if ( $seqno == SEQ_ROOT );
+            if ( $seqno >= $seqno_out || $seqno < SEQ_ROOT ) {
+                ## shouldn't happen - parent containers have lower seq numbers
+                DEVEL_MODE && Fault(<<EOM);
+Error in 'get_ancestor_seqno': expecting seqno=$seqno < last seqno=$seqno_out
+EOM
+                last;
+            }
+
+            last if ( !$ris_list_by_seqno->{$seqno} );
+
+            # Be sure this container is part of a list structure, and not for
+            # example a sub call within a list. The previous token should
+            # be an opening token or comma or fat comma
+            my $Ko   = $K_opening_container->{$seqno_out};
+            my $Kp   = $self->K_previous_code($Ko);
+            my $tokp = $Kp ? $rLL->[$Kp]->[_TOKEN_] : ';';
+            if (   $tokp eq ','
+                || $tokp eq '=>'
+                || $is_opening_token{$tokp} )
+            {
+
+                # looks ok, keep going
+                $seqno_out = $seqno;
+                next;
+            }
+
+            last;
+        } ## end while ( my $seqno = $rparent_of_seqno...)
+
+        $ancestor_seqno_cache{$seqno_in} = $seqno_out;
+        return $seqno_out;
+    }; ## end $get_ancestor_seqno = sub
+
+    my $is_fixed_hash = sub {
+        my ( $key, $all_caps, $id ) = @_;
 
         # Given a hash key '$key',
         # Return:
         #   true if it is known and should be excluded
         #   false if it is not known
 
-        my $rhash_names = $is_known_key{$key};
-        return if ( !$rhash_names );
+        my $rhash_names = $is_fixed_key{$key};
+
+        # allow any key in all caps to match %ENV
+        return if ( !$rhash_names && !$all_caps );
 
         # The key is known, now see if its hash name is known
-        return if ( !@stack );
-        my $Kbrace = $stack[-1]->[1];
-        my $Khash  = $stack[-1]->[2];
-        return if ( !defined($Kbrace) );
-        return if ( !defined($Khash) );
-        return if ( $rLL->[$Kbrace]->[_TYPE_] ne 'L' );
-        my $hash_name = $rLL->[$Khash]->[_TOKEN_];
-        return if ( !$rhash_names->{$hash_name} );
-        return 1;
-    }; ## end $is_known_hash = sub
+        return   if ( !$id );
+        return 1 if ( $all_caps && $id eq '$ENV' );
+        return 1 if ( $rhash_names->{$id} );
+        return;
+    }; ## end $is_fixed_hash = sub
+
+    my $is_known_key = sub {
+        my ($key) = @_;
+
+        # Return:
+        #   true if $key is a known key and not unique
+        #   false otherwise
+
+        # This sub must be called after the file is scanned, so that all
+        # 'use' statements have been seen.
+
+        my $info = $rhash_key_trove->{$key};
+        if ( !defined($info) ) {
+            DEVEL_MODE && Fault("shouldn't happen\n");
+            return;
+        }
+
+        my $count = $info->{count};
+        if ( $count > 1 ) {
+            DEVEL_MODE && Fault("shouldn't happen\n");
+            return 1;
+        }
+
+        #-----------------------------------------------------------------
+        # Category 1: keys associated with certain 'use module' statements
+        #-----------------------------------------------------------------
+        if ( $is_known_module_key{$key} ) {
+            return 1;
+        }
+
+        my $id = $info->{hash_id};
+        return if ( !$id );
+
+        #-----------------------------------------------------------------------
+        # Category 2: # typeglob key: *foo{SCALAR}, or  *{$stash->{$var}}{ARRAY}
+        #-----------------------------------------------------------------------
+        if ( $is_typeglob_slot_key{$key} && substr( $id, 0, 1 ) eq '*' ) {
+            return 1;
+        }
+
+        #-----------------------------------------------------------
+        # Category 3: a key for a fixed hash like %ENV, %SIG, %ERRNO
+        #-----------------------------------------------------------
+        my $all_caps = $key =~ /^[A-Z_]+$/;
+        if ( ( $is_fixed_key{$key} || $all_caps )
+            && $is_fixed_hash->( $key, $all_caps, $id ) )
+        {
+            return 1;
+        }
+
+        #---------------------------
+        # Category 4: $Config values
+        #---------------------------
+        if ( $id eq '$Config' || $id eq '$Config::Config' ) {
+            return 1;
+        }
+
+        return;
+    }; ## end $is_known_key = sub
 
     my $push_KK_last_nb = sub {
 
-        # if the previous nonblank token was a hash key of type
+        # If the previous nonblank token was a hash key of type
         # 'Q' or 'w', then update its count
+        my ( $KK_last_nb, ($parent_seqno) ) = @_;
 
-        # We are ignoring constant definitions
-        if ( $KK < $K_end_skip ) { return }
+        # Given:
+        #   $KK_last_nb = index of a hash key token
+        #   $parent_seqno = sequence number of container:
+        #    - required for a key followed by '=>'
+        #    - not required for a key in hash braces
 
         my $type_last  = $rLL->[$KK_last_nb]->[_TYPE_];
         my $token_last = $rLL->[$KK_last_nb]->[_TOKEN_];
         my $word;
         if ( $type_last eq 'w' ) {
+
             $word = $token_last;
+
+            # Combine a leading '-' if any
+            if ( @mw_list && $mw_list[-1] eq $KK_last_nb ) {
+                $word = '-' . $word;
+
+                # and remove it from the list of quoted words
+                pop @mw_list;
+            }
         }
         elsif ( $type_last eq 'Q' ) {
-            $word = substr( $token_last, 1, -1 );
 
-            # Ignore text with interpolated values
+            return if ( length($token_last) < 2 );
+
+            # Assume that this is not a multiline Q, since this is a hash key.
+            my $is_interpolated;
             my $ch0 = substr( $token_last, 0, 1 );
             if ( $ch0 eq '"' ) {
+                $word            = substr( $token_last, 1, -1 );
+                $is_interpolated = 1;
+            }
+            elsif ( $ch0 eq "'" ) {
+                $word = substr( $token_last, 1, -1 );
+            }
+            else {
+                my $rQ_info = Q_spy($token_last);
+                if ( defined($rQ_info) && $rQ_info->{is_simple} ) {
+                    $is_interpolated = $rQ_info->{is_interpolated};
+                    my $nch = $rQ_info->{nch};
+                    $word = substr( $token_last, $nch, -1 );
+                }
+            }
+
+            # Ignore text with interpolated values
+            if ($is_interpolated) {
                 foreach my $sigil ( '$', '@' ) {
                     my $pos = index( $word, $sigil );
                     next   if ( $pos < 0 );
@@ -8916,117 +9581,516 @@ sub dump_unique_keys {
                 }
             }
 
-            pop @Q_list;
+            # We accept this as a hash key, so remove it from the quote list
+            if ( @Q_list && $Q_list[-1]->[0] eq $KK_last_nb ) {
+                pop @Q_list;
+            }
+            else {
+                ## Shouldn't happen
+            }
         }
         else {
+
             # not a quote - possibly identifier
             return;
         }
         return unless ($word);
 
         # Bump count of known keys by 1 so that they will not appear as unique
-        my $one = 1;
-        if ( $is_known_key{$word} && $is_known_hash->($word) ) { $one++ }
+        if ( !defined( $rhash_key_trove->{$word} ) ) {
 
-        if ( !defined( $rwords->{$word} ) ) {
-            $rwords->{$word} = [ $one, $KK_last_nb ];
+            my $slice_name = @stack ? $stack[-1]->{_slice_name} : EMPTY_STRING;
+            my $id         = $parent_seqno;
+            if ($slice_name) {
+                $id = $slice_name;
+            }
+            elsif ( !$id ) {
+                $id = $get_hash_name->();
+            }
+            else {
+                $id = $get_ancestor_seqno->($parent_seqno);
+            }
+            $rhash_key_trove->{$word} = {
+                count    => 1,
+                hash_id  => $id,
+                K        => $KK_last_nb,
+                is_known => 0,
+            };
+
+            # save debug info
+            if ( defined($id) && !defined( $first_key_by_id{$id} ) ) {
+                $first_key_by_id{$id} = $word;
+            }
         }
         else {
-            $rwords->{$word}->[0]++;
+            $rhash_key_trove->{$word}->{count}++;
         }
         return;
     }; ## end $push_KK_last_nb = sub
 
-    #--------------------------
-    # Main loop over all tokens
-    #--------------------------
-    while ( ++$KK <= $Klimit ) {
+    my $delete_getopt_subword = sub {
 
-        my $type = $rLL->[$KK]->[_TYPE_];
-        next if ( $type eq 'b' );
-        next if ( $type eq '#' );
-        $KK_last_nb = $KK_this_nb;
-        $KK_this_nb = $KK;
-        my $seqno = $rLL->[$KK]->[_TYPE_SEQUENCE_];
-        if ($seqno) {
-            if ( $is_opening_type{$type} ) {
+        my ($word_in) = @_;
 
-                if ( $type eq 'L' ) {
+        # Given:
+        #   $word= a string which may or may not be a key to Getopts::Long,
+        # Return:
+        #   Find any corresponding hash key and remove from the unique key list
 
-                    # Skip past something like ${word}
-                    if ( $KK_last_nb && $rLL->[$KK_last_nb]->[_TYPE_] eq 't' ) {
-                        my $Kc = $K_closing_container->{$seqno};
-                        my $Kn = $self->K_next_code($KK);
-                        $Kn = $self->K_next_code($Kn);
-                        if ( $Kn && $Kc && $Kn == $Kc && $Kc > $K_end_skip ) {
-                            $K_end_skip = $Kc;
+        # Input:               Output:
+        # 'func-mask|M=s'      'func-mask'
+        # 'foo=s{2,4}'         'foo'
+        my $word = $word_in;
+
+        # split on pipe symbols; the first word is the key
+        my @parts = split /\|/, $word;
+        return if ( !@parts );
+        $word = $parts[0];
+
+        # remove one or two optional leading dashes
+        $word =~ s/^--?//;
+
+        # remove any trailing flag
+        if ( @parts == 1 ) {
+            $word =~ s/^([\w_\-]+)(?:[\!|\+]|=s|:s|=i|:i|=f|:f)/$1/;
+        }
+
+        # give up if the possible key name does not look reasonable
+        if ( !$word || $word !~ /^[\w\-]+$/ ) {
+            return;
+        }
+
+        if ( $K_unique_key{$word} ) {
+            delete $K_unique_key{$word};
+        }
+        return;
+    }; ## end $delete_getopt_subword = sub
+
+    my $dubious_key = sub {
+
+        my ($key) = @_;
+
+        # Given:
+        #   $key = a key which is unique and about to be filtered out
+        # Return:
+        #   true if we should not filter it out for some reason
+        #   false if it is ok to filter it out
+
+        # Do not remove a key with mixed interior underscores and dashes,
+        # such as 'encode-output_strings', since this is a common typo.
+        my $len            = length($key);
+        my $pos_dash       = index( $key, '-', 1 );
+        my $pos_underscore = index( $key, '_', 1 );
+        my $interior_dash  = $pos_dash > 0 && $pos_dash < $len - 1;
+        my $interior_underscore =
+          $pos_underscore > 0 && $pos_underscore < $len - 1;
+        if ( $interior_dash && $interior_underscore ) { return 1 }
+
+        # additonal checks can go here
+
+        # ok to filter this key out
+        return;
+    }; ## end $dubious_key = sub
+
+    my $delete_key_if_saw_call = sub {
+        my ( $key, $subname ) = @_;
+
+        # Look for something like "plan('tests'=>" or "plan tests=>"
+        return if ( !defined( $K_unique_key{$key} ) );
+        my $K  = $K_unique_key{$key};
+        my $Kp = $self->K_previous_nonblank($K);
+        if ( defined($Kp) && $rLL->[$Kp]->[_TOKEN_] eq '(' ) {
+            $Kp = $self->K_previous_nonblank($Kp);
+        }
+        if ( defined($Kp) && $rLL->[$Kp]->[_TOKEN_] eq $subname ) {
+            delete $K_unique_key{$key};
+        }
+        return;
+    }; ## end $delete_key_if_saw_call = sub
+
+    my $filter_out_large_sets = sub {
+
+        # Look for containers of multiple hash keys which are only defined
+        # once, and remove them from further consideration. These are probably
+        # for communication with other packages and thus not of interest.  The
+        # idea is that it is unlikely that the user has misspelled an entire
+        # set of keys.
+
+        my @debug_output;
+
+        # Count keys by container:
+        # _pre_q count is the count before using quotes
+        # _post_q count is the count after using quotes
+        my %total_count_by_id;
+        my %unique_count_by_id_pre_q;
+        my %unique_count_by_id_post_q;
+        foreach my $key ( keys %{$rhash_key_trove} ) {
+            my $count   = $rhash_key_trove->{$key}->{count};
+            my $hash_id = $rhash_key_trove->{$key}->{hash_id};
+            next if ( !$hash_id );
+            $total_count_by_id{$hash_id}++;
+            $unique_count_by_id_pre_q{$hash_id}++ if ( $count == 1 );
+            $unique_count_by_id_post_q{$hash_id}++
+              if ( $K_unique_key{$key} );
+        }
+
+        # Find sets of keys which are all, or nearly all, unique.
+        my %delete_this_id;
+        foreach my $id ( keys %total_count_by_id ) {
+            my $total_count = $total_count_by_id{$id};
+
+            #---------------------------------------
+            # This is only for sets of multiple keys
+            #---------------------------------------
+            next if ( $total_count <= 1 );
+
+            my $unique_count_pre_q  = $unique_count_by_id_pre_q{$id};
+            my $unique_count_post_q = $unique_count_by_id_post_q{$id};
+            next if ( !$unique_count_pre_q );
+
+            if ( !defined($unique_count_post_q) ) {
+                $unique_count_post_q = 0;
+            }
+
+            # Filter rule: do not issue a warning for a related group
+            # of keys which has more than N unique keys. The default
+            # value of N is 2. Delete keys which get filtered out.
+            $delete_this_id{$id} =
+              $unique_count_post_q > $rOpts_warn_unique_keys_cutoff;
+
+            if ( DEBUG_WUK && defined($id) ) {
+                my $key    = $first_key_by_id{$id};
+                my $Kfirst = $rhash_key_trove->{$key}->{K};
+
+                # TODO: escape $key if it would cause trouble in a .csv file.
+                #  (low priority since this is debug output)
+                if ( defined($Kfirst) ) {
+                    my $lno = $rLL->[$Kfirst]->[_LINE_INDEX_] + 1;
+                    my $issue_warning =
+                        $unique_count_post_q == 0 ? 'NO'
+                      : $delete_this_id{$id}      ? 'NO'
+                      :                             'YES';
+                    push @debug_output,
+                      [
+                        $lno,                "$id",
+                        "$key",              $total_count,
+                        $unique_count_pre_q, $unique_count_post_q,
+                        $issue_warning
+                      ];
+                }
+            }
+        }
+
+        # locate keys to be deleted
+        my %mark_as_non_unique;
+        my %is_dubious_key;
+        my $dubious_count = 0;
+        foreach my $key ( keys %{$rhash_key_trove} ) {
+            my $hash_id = $rhash_key_trove->{$key}->{hash_id};
+            next if ( !$hash_id );
+            next if ( !$delete_this_id{$hash_id} );
+            if ( $dubious_key->($key) ) {
+                $is_dubious_key{$key} = 1;
+                $dubious_count++;
+            }
+            $mark_as_non_unique{$key} = 1;
+        }
+
+        # Remove keys to be deleted from further consideration
+        foreach my $key ( keys %mark_as_non_unique ) {
+
+            # but keep dubious keys if there is just 1
+            if ( $is_dubious_key{$key} && $dubious_count == 1 ) { next }
+
+            if ( $K_unique_key{$key} ) { delete $K_unique_key{$key} }
+        }
+
+        return if ( !%K_unique_key );
+
+        # Check for some keys which are common to a lot of modules
+        # For example, many modules beginning with 'Test::' have a 'tests' key
+        foreach my $key ( keys %K_unique_key ) {
+            my $rmodules = $modules_with_common_keys{$key};
+
+            # This is a common key
+            if ($rmodules) {
+                foreach my $module ( @{$rmodules} ) {
+
+                    # If we saw a module which matches the start of the name...
+                    foreach my $module_seen ( keys %saw_use_module ) {
+
+                        # we can remove it
+                        if ( index( $module_seen, $module ) == 0 ) {
+                            delete $K_unique_key{$key};
+                            last;
                         }
                     }
                 }
-                push @stack, [ $seqno, $KK, $KK_last_nb ];
             }
-            elsif ( $is_closing_type{$type} ) {
 
-                if ( $type eq 'R' ) {
+            next if ( !$K_unique_key{$key} );
 
-                    # require a single item within the hash braces
-                    my $Ko = $K_opening_container->{$seqno};
-                    my $Kn = $self->K_next_code($Ko);
-                    if ( defined($Kn) && $Kn == $KK_last_nb ) {
-                        $push_KK_last_nb->();
-                    }
+            # Some additional filters when the cutoff is 1
+            if ( $rOpts_warn_unique_keys_cutoff <= 1 ) {
+
+                # Delete key if it is not contained in a list
+                # i.e. use overload 'xx' => ...
+                my $hash_id = $rhash_key_trove->{$key}->{hash_id};
+                if ( !$hash_id || $hash_id eq '1' ) {
+                    delete $K_unique_key{$key};
+                    next;
                 }
 
-                my $item = pop @stack;
-                if ( !$item || $item->[0] != $seqno ) {
-                    if (DEVEL_MODE) {
-
-                        # shouldn't happen for a balanced file
-                        my $num = @stack;
-                        my $got = $num ? $item->[0] : 'undef';
-                        my $lno = $rLL->[$KK]->[_LINE_INDEX_];
-                        Fault <<EOM;
-stack error at seqno=$seqno type=$type num=$num got seqno=$got lno=$lno
-EOM
-                    }
+                # Delete key if ALL CAPS
+                if ( $key eq uc($key) ) {
+                    delete $K_unique_key{$key};
+                    next;
                 }
-            }
-            else {
-                ## ternary
+
+                if ( $key eq 'tests' ) {
+                    $delete_key_if_saw_call->( $key, 'plan' );
+                    next;
+                }
             }
         }
-        else {
-            if ( $type eq '=>' ) {
-                my $parent_seqno = $self->parent_seqno_by_K($KK);
-                if ( $parent_seqno && $ris_list_by_seqno->{$parent_seqno} ) {
-                    $push_KK_last_nb->();
-                }
-            }
-            elsif ( $type eq 'Q' ) {
-                push @Q_list, $KK;
-            }
-            elsif ( $type eq 'q' ) {
-                if ( !defined($KK_last_nb)
-                    || $rLL->[$KK_last_nb]->[_TYPE_] ne 'q' )
-                {
-                    push @K_start_qw_list, $KK;
-                }
-            }
-            elsif ( $type eq 'k' ) {
 
-                # Look for 'use constant' and define its ending token
-                if ( $rLL->[$KK]->[_TOKEN_] eq 'use' ) {
+        if (@debug_output) {
+            @debug_output = sort { $a->[0] <=> $b->[0] } @debug_output;
+            print <<EOM;
+line,id,first-key,total-count,early-count,late-count,warn?
+EOM
+            foreach my $rvals (@debug_output) {
+                my $line = join ',', @{$rvals};
+                print $line, "\n";
+            }
+        }
+        return;
+    }; ## end $filter_out_large_sets = sub
+
+    my $delete_unique_quoted_words = sub {
+
+        my ( $rlist, $missing_GetOptions_keys ) = @_;
+
+        # Given:
+        #  $rlist = ref to list of words seen in quotes, or a single word
+        #  $missing_GetOptions_keys = true if we saw 'use Getopt::Long'
+        #    but did not see its control hash
+        # Task:
+        #  remove matches to the current list of unique words
+
+        if ( !ref($rlist) ) { $rlist = [$rlist] }
+
+        foreach my $word ( @{$rlist} ) {
+
+            # remove quotes
+            if ( $K_unique_key{$word} ) {
+                delete $K_unique_key{$word};
+            }
+            if (   $missing_GetOptions_keys
+                && $word !~ /^\w[\w\-]*$/
+                && $word !~ /\s/ )
+            {
+                $delete_getopt_subword->($word);
+            }
+        }
+        return;
+    }; ## end $delete_unique_quoted_words = sub
+
+    my $is_static_hash_key = sub {
+
+        my ($Ktest) = @_;
+
+        # Return:
+        #   true if $Ktest is a simple fixed quote-like hash key
+        #   false otherwise
+        return if ( !defined($Ktest) );
+        my $type = $rLL->[$Ktest]->[_TYPE_];
+
+        # This is just for barewords and quoted text
+        return unless ( $type eq 'w' || $type eq 'Q' );
+
+        # Backup one token at a dashed bareword
+        if ( @mw_list && $mw_list[-1] eq $Ktest ) { $Ktest -= 1 }
+
+        # Now look back for a comma or opening hash brace
+        $Ktest -= 1;
+        return if ( $Ktest <= 0 );
+        $type = $rLL->[$Ktest]->[_TYPE_];
+        if ( $type eq 'b' ) {
+            $Ktest--;
+            $type = $rLL->[$Ktest]->[_TYPE_];
+        }
+        if ( $type eq '#' ) {
+            $Ktest--;
+            $type = $rLL->[$Ktest]->[_TYPE_];
+            if ( $type eq 'b' ) {
+                $Ktest--;
+                $type = $rLL->[$Ktest]->[_TYPE_];
+            }
+        }
+        if ( $type eq 'L' ) { return 1 }
+        if ( $type eq ',' ) {
+            if ( @stack && $stack[-1]->{_slice_name} ) {
+                return 1;
+            }
+        }
+        return;
+    }; ## end $is_static_hash_key = sub
+
+    # Optimization: we just need to look at these non-blank types
+    my %is_special_check_type = ( %is_opening_type, %is_closing_type );
+    @q = qw( => Q q k U w h );
+    push @q, ',';
+    @is_special_check_type{@q} = (1) x scalar(@q);
+
+    # Values defined during token scan:
+    my @K_start_qw_list;
+    my $Getopt_Std_hash_id;    # name of option hash for 'use Getopt::Std'
+    my $ix_HERE_END = -1;      # the line index of the last here target read
+    my @keys_in_HERE_docs;
+    my @GetOptions_keys;
+    my $saw_Getopt_Long;       # for 'use Getopt::Long'
+    my $saw_Getopt_Std;        # for 'use Getopt::Std'
+    my %is_GetOptions_call_by_seqno;
+    my %is_GetOptions_call;
+    @q = qw( GetOptions GetOptionsFromArray GetOptionsFromString );
+    @is_GetOptions_call{@q} = (1) x scalar(@q);
+
+    #----------------------------------------------------------------
+    # PHASE 1: loop over all tokens to find hash keys and save quotes
+    #----------------------------------------------------------------
+    my $KK         = -1;
+    my $K_end_skip = -1;    # allow skipping hash definitions in code sections
+    my $KK_last_nb;         # previous non-blank, non-comment value of $KK
+    my $type;
+    while ( ++$KK <= $Klimit ) {
+
+        # Skip a blank token
+        if ( ( $type = $rLL->[$KK]->[_TYPE_] ) eq 'b' ) { next }
+
+        # Skip token types which do not need to be examined
+        elsif ( !$is_special_check_type{$type} ) {
+            $KK_last_nb = $KK if ( $type ne '#' );
+            next;
+        }
+
+        #-----------------------------------------------------------
+        # NOTE: update $KK_last_nb before any 'next' out of the loop
+        #-----------------------------------------------------------
+        elsif ( $is_opening_type{$type} ) {
+            my $seqno = $rLL->[$KK]->[_TYPE_SEQUENCE_];
+            if ( !$seqno ) {
+                ## tokenization error - shouldn't happen
+                DEVEL_MODE && Fault("no sequence number for type $type\n");
+                $KK_last_nb = $KK;
+                next;
+            }
+
+            my $slice_name;
+            if ( $type eq 'L' ) {
+
+                # Skip past something like ${word}
+                my $type_last =
+                  defined($KK_last_nb)
+                  ? $rLL->[$KK_last_nb]->[_TYPE_]
+                  : 'b';
+                if ( $type_last eq 't' ) {
+                    my $Kc = $K_closing_container->{$seqno};
                     my $Kn = $self->K_next_code($KK);
-                    next if ( !defined($Kn) );
-                    next if ( $rLL->[$Kn]->[_TOKEN_] ne 'constant' );
                     $Kn = $self->K_next_code($Kn);
-                    next if ( !defined($Kn) );
+                    if ( $Kn && $Kc && $Kn == $Kc && $Kc > $K_end_skip ) {
+                        $K_end_skip = $Kc;
+                    }
+                }
+
+                # check for a slice
+                my $rtype_count = $rtype_count_by_seqno->{$seqno};
+                if ( $rtype_count->{','} ) {
+                    $slice_name = $is_hash_slice->($KK_last_nb);
+                }
+            }
+            push @stack,
+              {
+                _seqno      => $seqno,
+                _KK         => $KK,
+                _KK_last_nb => $KK_last_nb,
+                _slice_name => $slice_name,
+              };
+        }
+        elsif ( $is_closing_type{$type} ) {
+            my $seqno = $rLL->[$KK]->[_TYPE_SEQUENCE_];
+            if ( !$seqno ) {
+                ## tokenization error - shouldn't happen
+                DEVEL_MODE && Fault("no sequence number for type $type\n");
+                $KK_last_nb = $KK;
+                next;
+            }
+            if ( $type eq 'R' ) {
+                if ( $is_static_hash_key->($KK_last_nb) ) {
+                    $push_KK_last_nb->($KK_last_nb)
+                      if ( $KK_last_nb > $K_end_skip );
+                }
+            }
+            my $item = pop @stack;
+            if ( !$item || $item->{_seqno} != $seqno ) {
+                if (DEVEL_MODE) {
+
+                    # shouldn't happen for a balanced file
+                    my $num = @stack;
+                    my $got = $num ? $item->{_seqno} : 'undef';
+                    my $lno = $rLL->[$KK]->[_LINE_INDEX_];
+                    Fault <<EOM;
+stack error at seqno=$seqno type=$type num=$num got seqno=$got lno=$lno
+EOM
+                }
+            }
+        }
+        elsif ( $type eq ',' ) {
+
+            # in a slice?
+            if ( @stack && $stack[-1]->{_slice_name} ) {
+                if ( $is_static_hash_key->($KK_last_nb) ) {
+                    $push_KK_last_nb->($KK_last_nb)
+                      if ( $KK_last_nb > $K_end_skip );
+                }
+            }
+        }
+        elsif ( $type eq 'k' ) {
+
+            # Look for 'use constant' and define its ending token
+            my $token = $rLL->[$KK]->[_TOKEN_];
+            if ( $token eq 'use' || $token eq 'require' ) {
+                my $Kn = $self->K_next_code($KK);
+                if ( !defined($Kn) ) {
+                    $KK_last_nb = $KK;
+                    next;
+                }
+                my $token_n = $rLL->[$Kn]->[_TOKEN_];
+                $saw_use_module{$token_n} = $Kn;
+
+                # Check for some specific modules
+                if ( index( $token_n, 'Getopt::Std' ) == 0 ) {
+                    $saw_Getopt_Std = 1;
+                }
+                elsif ( index( $token_n, 'Getopt::Long' ) == 0 ) {
+                    $saw_Getopt_Long = 1;
+                }
+                elsif ( $token_n eq 'constant' && $token eq 'use' ) {
+
+                    # Handle 'use constant' ... we will skip these hash keys.
+                    # For example, we do not want to mark '_mode_' and '_uid_'
+                    # here as unique hash keys since they become subs:
+                    #     use constant { _mode_  => 2, _uid_ => 4 }
+                    $Kn = $self->K_next_code($Kn);
+                    if ( !defined($Kn) ) {
+                        $KK_last_nb = $KK;
+                        next;
+                    }
                     my $seqno_n = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
                     if ($seqno_n) {
 
-                        # skip a block of constant definitions
-                        my $token_n = $rLL->[$Kn]->[_TOKEN_];
-                        if ( $token_n eq '{' ) {
+                        # Set flag to skip over a block of constant definitions.
+                        if ( $rLL->[$Kn]->[_TOKEN_] eq '{' ) {
                             $K_end_skip = $K_closing_container->{$seqno_n};
                         }
                         else {
@@ -9039,63 +10103,342 @@ EOM
                         $K_end_skip = $Kn + 1;
                     }
                 }
-            }
-            else {
-                # continue search
+                else {
+                    ## not special
+                }
             }
         }
+        elsif ( $type eq 'Q' ) {
+
+            # Find the entire range in case of multiline quotes.
+            my $KK_end_Q = $KK;
+            while ($KK_end_Q < $Klimit
+                && $rLL->[ $KK_end_Q + 1 ]->[_TYPE_] eq 'Q' )
+            {
+                $KK_end_Q++;
+            }
+
+            # Save for later comparison with hash keys.
+            my $seqno_Q = @stack ? $stack[-1]->{_seqno} : undef;
+            push @Q_list, [ $KK, $KK_end_Q, $seqno_Q ];
+
+            # Move loop index to the end of this quote
+            $KK = $KK_end_Q;
+        }
+        elsif ( $type eq 'q' ) {
+            if ( !defined($KK_last_nb)
+                || $rLL->[$KK_last_nb]->[_TYPE_] ne 'q' )
+            {
+                push @K_start_qw_list, $KK;
+            }
+        }
+        elsif ( $type eq 'U' || $type eq 'w' ) {
+
+            # 'GetOptions(' will marked be type 'U'
+            # 'GetOptions (' will be marked type 'w' # has space '('
+            my $token = $rLL->[$KK]->[_TOKEN_];
+
+            # Look GetOptions call (Getopt::Long, for example:
+            #    GetOptions ("length=i" => \$length,
+            #                "file=s"   => \$data)
+            if ( $is_GetOptions_call{$token} ) {
+                my $Kn = $self->K_next_nonblank($KK);
+                if ( $Kn && $rLL->[$Kn]->[_TOKEN_] eq '(' ) {
+                    my $seqno_n = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+                    $is_GetOptions_call_by_seqno{$seqno_n} = 1;
+                }
+            }
+
+            # Look getopts call (Getopt::Std), for example:
+            #    getopts('oif:')
+            #    getopts('oif:', \my %opts);
+            #    getopt('oDI:', \my %opts);
+            elsif ( $token eq 'getopts' || $token eq 'getopt' ) {
+                my $Kn = $self->K_next_nonblank($KK);
+                if ( $Kn && $rLL->[$Kn]->[_TOKEN_] eq '(' ) {
+
+                    # Look for the first arg as a quoted string
+                    my $seqno_n = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+                    $Kn = $self->K_next_nonblank($Kn);
+                    if ( $Kn && $rLL->[$Kn]->[_TYPE_] eq 'Q' ) {
+                        push @Q_getopts, $Kn;
+                    }
+
+                    # Look for hash name if two-arg call
+                    $Kn = $self->K_next_nonblank($Kn);
+                    if ( $Kn && $rLL->[$Kn]->[_TYPE_] eq ',' ) {
+                        my $Kc = $K_closing_container->{$seqno_n};
+                        $Kn = $self->K_previous_code($Kc);
+                        my $id = $rLL->[$Kn]->[_TOKEN_];
+                        $id =~ s/^\%/\$/;
+                        $Getopt_Std_hash_id = $id;
+                    }
+                }
+            }
+
+            # check for -word
+            elsif ($KK > 0
+                && $rLL->[ $KK - 1 ]->[_TOKEN_] eq '-'
+                && $rLL->[ $KK - 1 ]->[_TYPE_] eq 'm' )
+            {
+                push @mw_list, $KK;
+            }
+            else {
+                ## no other special checks
+            }
+        }
+        elsif ( $type eq '=>' ) {
+            my $parent_seqno = $self->parent_seqno_by_K($KK);
+            if ( $is_GetOptions_call_by_seqno{$parent_seqno} ) {
+                push @GetOptions_keys, $KK_last_nb;
+            }
+            else {
+                $push_KK_last_nb->( $KK_last_nb, $parent_seqno )
+                  if ( $KK_last_nb > $K_end_skip );
+            }
+        }
+
+        # a here doc - look for interpolated hash keys
+        elsif ( $type eq 'h' ) {
+            my $ix_line = $rLL->[$KK]->[_LINE_INDEX_];
+            my $ix_HERE = max( $ix_HERE_END, $ix_line );
+
+            # collect the here doc text
+            ( $ix_HERE_END, my $here_text ) = $self->get_here_text($ix_HERE);
+
+            # Any found keys are saved for checking against keys found
+            # in the text, but they are not entered as candidates for
+            # unique keys.
+            my $token = $rLL->[$KK]->[_TOKEN_];
+            if ( is_interpolated_here_doc($token) ) {
+                my $rkeys = get_interpolated_hash_keys($here_text);
+                push @keys_in_HERE_docs, @{$rkeys};
+            }
+        }
+        else {
+            DEVEL_MODE && Fault("missing code for type $type\n");
+        }
+        $KK_last_nb = $KK;
+
     } ## end while ( ++$KK <= $Klimit )
 
-    # find hash keys seen just one time
-    my %unique_words;
-    foreach my $key ( keys %{$rwords} ) {
-        my ( $count, $K ) = @{ $rwords->{$key} };
+    # Make a list of keys known to any modules which have been seen
+    $set_known_module_keys->();
+
+    my $missing_GetOptions_keys =
+         $saw_Getopt_Long
+      && %is_GetOptions_call_by_seqno
+      && !@GetOptions_keys;
+
+    #----------------------------------------------------
+    # PHASE 2: remove unique keys which match quoted text
+    #----------------------------------------------------
+
+    # Find hash keys seen just one time
+    foreach my $key ( keys %{$rhash_key_trove} ) {
+        my $count = $rhash_key_trove->{$key}->{count};
         next if ( $count != 1 );
-        $unique_words{$key} = $K;
+
+        # Filter out some known keys
+        if ( $is_known_key->($key) ) {
+            $rhash_key_trove->{$key}->{is_known} = 1;
+            next;
+        }
+
+        my $K = $rhash_key_trove->{$key}->{K};
+        $K_unique_key{$key} = $K;
     }
 
-    return if ( !%unique_words );
+    return if ( !%K_unique_key );
 
-    # check each unique word against the list of type Q tokens
+    # Now go back and look for these keys in any saved quotes ...
+
+    # Check each unique word against the list of type Q tokens
     if (@Q_list) {
         my $imax = $#Q_list;
         foreach my $i ( 0 .. $imax ) {
 
-            # Ignore multiline quotes
-            my $K = $Q_list[$i];
-            if (   ( $i == 0 || $Q_list[ $i - 1 ] + 1 != $K )
-                && ( $i == $imax || $Q_list[ $i + 1 ] != $K + 1 ) )
-            {
+            my ( $K, $Kend, $seqno_Q ) = @{ $Q_list[$i] };
+            my $string = $rLL->[$K]->[_TOKEN_];
 
-                # remove quotes
-                my $word = substr( $rLL->[$K]->[_TOKEN_], 1, -1 );
-
-                if ( $unique_words{$word} ) {
-                    delete $unique_words{$word};
+            # Determine the quote type from its leading characters.
+            # Note that tokens in a qwaf call are not contained in quote marks.
+            my $is_qwaf_Q = defined($seqno_Q) && $ris_qwaf_by_seqno->{$seqno_Q};
+            my $ib        = 0;
+            my $is_interpolated = 0;
+            if ( !$is_qwaf_Q ) {
+                next if ( length($string) < 2 );
+                my $ch1 = substr( $string, 0, 1 );
+                if ( $ch1 eq '"' ) {
+                    $ib              = 1;
+                    $is_interpolated = 1;
                 }
+                elsif ( $ch1 eq "'" ) {
+                    $ib              = 1;
+                    $is_interpolated = 0;
+                }
+                else {
+                    my $rQ_info = Q_spy($string);
+                    next if ( !defined($rQ_info) );
+                    $ib              = $rQ_info->{nch};
+                    $is_interpolated = $rQ_info->{is_interpolated};
+                }
+            }
+
+            my $is_multiline = 0;
+            if ( $Kend > $K ) {
+                $is_multiline = 1;
+                foreach my $Kx ( $K + 1 .. $Kend ) {
+                    $string .= $rLL->[$Kx]->[_TOKEN_];
+                }
+            }
+
+            # Strip off leading and ending quote characters.
+            # Note: we do not need to be precise on removing ending characters
+            # in this case.
+            my $word = $is_qwaf_Q ? $string : substr( $string, $ib, -1 );
+
+            if ($is_interpolated) {
+                my $rkeys = get_interpolated_hash_keys($word);
+                foreach my $key ( @{$rkeys} ) {
+                    if ( $K_unique_key{$key} ) {
+                        delete $K_unique_key{$key};
+                    }
+                }
+            }
+
+            # Ignore multiline quotes for the remaining checks
+            if ( !$is_multiline ) {
+                $delete_unique_quoted_words->( $word,
+                    $missing_GetOptions_keys );
+            }
+        }
+    }
+    return if ( !%K_unique_key );
+
+    # Check list of barewords quoted with a leading dash
+    if (@mw_list) {
+        foreach my $Kmw (@mw_list) {
+            my $word = '-' . $rLL->[$Kmw]->[_TOKEN_];
+            if ( $K_unique_key{$word} ) {
+                delete $K_unique_key{$word};
             }
         }
     }
 
-    return if ( !%unique_words );
+    return if ( !%K_unique_key );
+
+    # Check words against any hash keys in here docs
+    foreach my $key (@keys_in_HERE_docs) {
+        if ( $K_unique_key{$key} ) {
+            delete $K_unique_key{$key};
+        }
+    }
+
+    return if ( !%K_unique_key );
+
+    # Check words against any option keys passed to GetOptions
+    foreach my $Kopt (@GetOptions_keys) {
+        my $word = $rLL->[$Kopt]->[_TOKEN_];
+
+        my $ch1 = substr( $word, 0, 1 );
+        if ( $ch1 eq "'" || $ch1 eq '"' ) {
+            $word = substr( $word, 1, -1 );
+        }
+
+        if ( $K_unique_key{$word} ) {
+            delete $K_unique_key{$word};
+        }
+
+        # remove any optional flag and retry
+        if (   $word !~ /^\w[\w\-]*$/
+            && $word !~ /\s/ )
+        {
+            $delete_getopt_subword->($word);
+        }
+    }
+
+    return if ( !%K_unique_key );
+
+    # For two-arg call to Getopt::Std ...
+    if ( $Getopt_Std_hash_id && $saw_Getopt_Std ) {
+
+        # If we managed to read the first arg..remove single letters seen
+        foreach my $Kopt (@Q_getopts) {
+            my $word = $rLL->[$Kopt]->[_TOKEN_];
+            my $ch1  = substr( $word, 0, 1 );
+            if ( $ch1 eq "'" || $ch1 eq '"' ) {
+                $word = substr( $word, 1, -1 );
+            }
+            $word =~ s/://g;
+            my @letters = split //, $word;
+            foreach my $letter (@letters) {
+                if ( $K_unique_key{$letter} ) {
+                    delete $K_unique_key{$letter};
+                }
+            }
+        }
+
+        # If we found a getopts hash name but did not read the first string,
+        # remove all single-character keys in that hash name (typically $opt)
+        if ( !@Q_getopts ) {
+            foreach my $key ( keys %K_unique_key ) {
+                next if ( length($key) != 1 );
+                next if ( $key !~ /[A-Za-z\?]/ );
+
+                # For now, delete any single letter key.
+                # The hash name can become a ref with different name
+                # through sub calls.
+                ##my $hash_id = $rhash_key_trove->{$key}->{hash_id};
+                ##if ( $hash_id && $hash_id eq $Getopt_Std_hash_id ) {
+                delete $K_unique_key{$key};
+                ##}
+            }
+        }
+    }
+
+    return if ( !%K_unique_key );
 
     # Remove any keys which are also in a qw list
     foreach my $Kqw (@K_start_qw_list) {
         my ( $K_last_q_uu, $rlist ) = $self->get_qw_list($Kqw);
-        foreach my $word ( @{$rlist} ) {
-            if ( $unique_words{$word} ) {
-                delete $unique_words{$word};
+        if ( !defined($rlist) ) {
+            ## shouldn't happen: must be a bad index $Kqw in @K_start_qw_list
+            my ( $lno, $type_qw, $token_qw ) = qw ( undef undef undef );
+            if (   defined($Kqw)
+                && $Kqw >= 0
+                && $Kqw <= $Klimit )
+            {
+                $lno      = $rLL->[$Kqw]->[_LINE_INDEX_] + 1;
+                $type_qw  = $rLL->[$Kqw]->[_TYPE_];
+                $token_qw = $rLL->[$Kqw]->[_TOKEN_];
             }
+            DEVEL_MODE
+              && Fault(
+"$lno: Empty return for K=$Kqw type='$type_qw' token='$token_qw'\n"
+              );
+            next;
         }
+
+        $delete_unique_quoted_words->( $rlist, $missing_GetOptions_keys );
     }
 
-    return if ( !%unique_words );
+    return if ( !%K_unique_key );
 
-    # report unique words
+    #------------------------------------------------------------------
+    # PHASE 3: filter out multiple related keys which are mostly unique
+    #------------------------------------------------------------------
+    $filter_out_large_sets->();
+
+    return if ( !%K_unique_key );
+
+    #-------------------------------------------
+    # PHASE 4: Report any remaining unique words
+    #-------------------------------------------
     my $output_string = EMPTY_STRING;
     my @list;
-    foreach my $word ( keys %unique_words ) {
-        my $K   = $unique_words{$word};
+    foreach my $word ( keys %K_unique_key ) {
+        my $K   = $K_unique_key{$word};
         my $lno = $rLL->[$K]->[_LINE_INDEX_] + 1;
         push @list, [ $word, $lno ];
     }
@@ -9104,6 +10447,17 @@ EOM
         my ( $word, $lno ) = @{$item};
         $output_string .= "$word,$lno\n";
     }
+    return $output_string;
+
+} ## end sub scan_unique_keys
+
+sub dump_unique_keys {
+    my ($self) = @_;
+
+    # Dump a list of hash keys used just one time to STDOUT
+    # This sub is called when
+    #   --dump-unique-keys (-duk) is set.
+    my $output_string = $self->scan_unique_keys();
     if ($output_string) {
         my $input_stream_name = get_input_stream_name();
         chomp $output_string;
@@ -9112,10 +10466,26 @@ EOM
 $output_string
 EOM
     }
-
     return;
-
 } ## end sub dump_unique_keys
+
+sub warn_unique_keys {
+    my ($self) = @_;
+
+    # process a --warn-unique-keys command
+
+    my $wuk_key       = 'warn-unique-keys';
+    my $wukc_key      = 'warn-unique-keys-cutoff';
+    my $output_string = $self->scan_unique_keys();
+    if ($output_string) {
+        my $message =
+"Begin scan for --$wuk_key using --$wukc_key=$rOpts_warn_unique_keys_cutoff\n";
+        $message .= $output_string;
+        $message .= "End scan for --$wuk_key\n";
+        warning($message);
+    }
+    return;
+} ## end sub warn_unique_keys
 
 sub dump_block_summary {
     my ($self) = @_;
@@ -10678,6 +12048,7 @@ sub expand_quoted_word_list {
     my $Klimit = @{$rLL} - 1;
     my @list;
     my $Kn = $Kbeg - 1;
+    my $is_qwaf_Q;
     while ( ++$Kn <= $Klimit ) {
 
         my $type  = $rLL->[$Kn]->[_TYPE_];
@@ -10685,11 +12056,11 @@ sub expand_quoted_word_list {
 
         next if ( $type eq 'b' );
         next if ( $type eq '#' );
-        next if ( $token eq '(' );
-        next if ( $token eq ')' );
-        next if ( $token eq ',' );
+        next if ( $type eq ',' );
         last if ( $type eq ';' );
         last if ( $token eq '}' );
+        next if ( $token eq '(' );
+        if ( $token eq ')' ) { $is_qwaf_Q = 0; next }
 
         if ( $type eq 'q' ) {
 
@@ -10700,13 +12071,38 @@ sub expand_quoted_word_list {
             push @list, @{$rlist};
         }
         elsif ( $type eq 'Q' ) {
-
-            # single quoted word
-            next if ( length($token) < 3 );
-            my $name = substr( $token, 1, -1 );
-            push @list, $name;
+            my $name;
+            if ($is_qwaf_Q) {
+                $name = $token;
+            }
+            elsif ( length($token) > 2 ) {
+                my $ch0 = substr( $token, 0, 1 );
+                if ( $ch0 eq '"' || $ch0 eq "'" ) {
+                    $name = substr( $token, 1, -1 );
+                }
+                else {
+                    my $rQ_info = Q_spy($token);
+                    if ( defined($rQ_info) && $rQ_info->{is_simple} ) {
+                        my $nch = $rQ_info->{nch};
+                        $name = substr( $token, $nch, -1 );
+                    }
+                }
+            }
+            else {
+                ## empty string
+            }
+            if ( defined($name) ) { push @list, $name }
         }
-
+        elsif ( $type eq 'U' ) {
+            if ( $token eq 'qw' ) {
+                $Kn = $self->K_next_nonblank($Kn);
+                return if ( !defined($Kn) || $rLL->[$Kn]->[_TOKEN_] ne '(' );
+                my $seqno = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+                return if ( !defined($seqno) );
+                return if ( !$self->[_ris_qwaf_by_seqno_]->{$seqno} );
+                $is_qwaf_Q = $seqno;
+            }
+        }
         else {
 
             # Give up on anything else..
@@ -11095,6 +12491,7 @@ sub scan_variable_usage {
 
     my $checkin_new_constant = sub {
         my ( $KK, $word ) = @_;
+        return if ( !defined($word) );
         my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
         my $rvars      = {
             count      => 0,
@@ -11143,11 +12540,20 @@ sub scan_variable_usage {
         my $type_n  = $rLL->[$Kn]->[_TYPE_];
         my $token_n = $rLL->[$Kn]->[_TOKEN_];
 
-        # version?
+        # step past a version
         if ( $type_n eq 'n' || $type_n eq 'v' ) {
             $Kn      = $self->K_next_code($Kn);
             $type_n  = $rLL->[$Kn]->[_TYPE_];
             $token_n = $rLL->[$Kn]->[_TOKEN_];
+        }
+
+        # patch for qw as function (qwaf)
+        my $is_qwaf_Q;
+        if ( $type_n eq 'U' && $token_n eq 'qw' ) {
+            $Kn        = $self->K_next_code($Kn);
+            $type_n    = $rLL->[$Kn]->[_TYPE_];
+            $token_n   = $rLL->[$Kn]->[_TOKEN_];
+            $is_qwaf_Q = 1;
         }
 
         if ( $token_n eq '(' ) {
@@ -11161,13 +12567,31 @@ sub scan_variable_usage {
             $checkin_new_constant->( $Kn, $token_n );
         }
 
-        # use constant '_meth1_',1;
+        # use constant '_meth1_',1  or other quote type
         elsif ( $type_n eq 'Q' ) {
 
-            # don't try to handle anything strange
-            if ( length($token_n) < 3 ) { return }
-            my $name = substr( $token_n, 1, -1 );
-            $checkin_new_constant->( $Kn, $name );
+            # This Q token is assumed to be a single token
+            my $name;
+            if ($is_qwaf_Q) {
+                $name = $token_n;
+            }
+            elsif ( length($token_n) > 2 ) {
+                my $ch0 = substr( $token_n, 0, 1 );
+                if ( $ch0 eq '"' || $ch0 eq "'" ) {
+                    $name = substr( $token_n, 1, -1 );
+                }
+                else {
+                    my $rQ_info = Q_spy($token_n);
+                    if ( defined($rQ_info) && $rQ_info->{is_simple} ) {
+                        my $nch = $rQ_info->{nch};
+                        $name = substr( $token_n, $nch, -1 );
+                    }
+                }
+            }
+            else {
+                ## empty string
+            }
+            $checkin_new_constant->( $Kn, $name ) if ( defined($name) );
         }
 
         # use constant qw(_meth2_ 2);
@@ -11213,7 +12637,18 @@ sub scan_variable_usage {
                     }
                     elsif ( $type eq 'Q' ) {
                         if ( length($token) < 3 ) { return }
-                        my $name = substr( $token, 1, -1 );
+                        my $ch0 = substr( $token, 0, 1 );
+                        my $name;
+                        if ( $ch0 eq '"' || $ch0 eq "'" ) {
+                            $name = substr( $token, 1, -1 );
+                        }
+                        else {
+                            my $rQ_info = Q_spy($token);
+                            if ( defined($rQ_info) && $rQ_info->{is_simple} ) {
+                                my $nch = $rQ_info->{nch};
+                                $name = substr( $token, $nch, -1 );
+                            }
+                        }
                         $checkin_new_constant->( $Kx, $name );
                     }
                     else {
@@ -11273,8 +12708,10 @@ sub scan_variable_usage {
 
             if ( !$count ) {
 
-                # typically global vars are for external access so we
+                # Typically global vars are for external access so we
                 # do not report them as type 'u' (unused)
+                # NOTE: 'use vars' is not currently needed in the following
+                # test but is retained in case coding ever changes
                 next if ( $keyword eq 'our' || $keyword eq 'use vars' );
 
                 push @warnings,
@@ -11805,16 +13242,17 @@ EOM
             #-----------
             elsif ( $type eq 'h' ) {
 
-                # scan here-doc if it is interpolated
-                if ( $check_unused && is_interpolated_here_doc($token) ) {
-                    my $ix_HERE = max( $ix_HERE_END, $ix_line );
+                if ($check_unused) {
 
                     # collect the here doc text
+                    my $ix_HERE = max( $ix_HERE_END, $ix_line );
                     ( $ix_HERE_END, my $here_text ) =
                       $self->get_here_text($ix_HERE);
 
-                    # scan the here-doc text
-                    $scan_quoted_text->($here_text);
+                    # scan here-doc if it is interpolated
+                    if ( is_interpolated_here_doc($token) ) {
+                        $scan_quoted_text->($here_text);
+                    }
                 }
             }
 
@@ -12036,8 +13474,8 @@ EOM
         @warnings =
           sort { $a->{K} <=> $b->{K} || $a->{letter} cmp $b->{letter} }
 
-          # FIXME: this limitation may eventually just be for 'our' vars
-          # after 'use vars' coding is finalized
+          # NOTE: 'use vars' is not currently needed in the following test
+          # but is retained in case coding ever changes
           grep {
             ( $_->{keyword} ne 'our' && $_->{keyword} ne 'use vars' )
               || !$is_exempted_global_name{ $_->{name} }
@@ -12608,11 +14046,11 @@ sub scan_call_parens {
         my $rwarning = {
             token       => $token,
             token_next  => $token_Kn,
-            want        => $want_paren,
             note        => $note,
             line_number => $rLL->[$KK]->[_LINE_INDEX_] + 1,
-            KK          => $KK,
-            Kn          => $Kn,
+##          want        => $want_paren,
+##          KK          => $KK,
+##          Kn          => $Kn,
         };
         push @{$rwarnings}, $rwarning;
     }
@@ -13084,10 +14522,8 @@ EOM
 my %wU;
 my %wiq;
 my %is_wit;
-my %is_sigil;
 my %is_nonlist_keyword;
 my %is_nonlist_type;
-my %is_s_y_m_slash;
 my %is_unexpected_equals;
 my %is_ascii_type;
 
@@ -13103,9 +14539,6 @@ BEGIN {
     @q = qw( w i t );    # for c250: added new types 'P', 'S', formerly 'i'
     @is_wit{@q} = (1) x scalar(@q);
 
-    @q = qw( $ & % * @ );
-    @is_sigil{@q} = (1) x scalar(@q);
-
     # Parens following these keywords will not be marked as lists. Note that
     # 'for' is not included and is handled separately, by including 'f' in the
     # hash %is_counted_type, since it may or may not be a c-style for loop.
@@ -13115,9 +14548,6 @@ BEGIN {
     # Parens following these types will not be marked as lists
     @q = qw( && || );
     @is_nonlist_type{@q} = (1) x scalar(@q);
-
-    @q = qw( s y m / );
-    @is_s_y_m_slash{@q} = (1) x scalar(@q);
 
     @q = qw( = == != );
     @is_unexpected_equals{@q} = (1) x scalar(@q);
@@ -14276,24 +15706,37 @@ EOM
         my $is_list;
         my $rtype_count = $rtype_count_by_seqno->{$seqno};
         if ($rtype_count) {
-            my $comma_count     = $rtype_count->{','};
-            my $fat_comma_count = $rtype_count->{'=>'};
-            my $semicolon_count = $rtype_count->{';'};
-            if ( $rtype_count->{'f'} ) {
-                $semicolon_count += $rtype_count->{'f'};
-            }
 
             # We will define a list to be a container with one or more commas
-            # and no semicolons. Note that we have included the semicolons
-            # in a 'for' container in the semicolon count to keep c-style for
-            # statements from being formatted as lists.
-            if ( ( $comma_count || $fat_comma_count ) && !$semicolon_count ) {
+            # and no semicolons.
+
+            my $token_opening = $rLL_new->[$K_opening]->[_TOKEN_];
+            if ( $rtype_count->{';'} ) {
+
+                # Not a list .. check for possible error. For now, just see if
+                # this ';' is in a '(' or '[' container. Checking type '{' is
+                # tricky and not done yet.
+                if ( $token_opening eq '(' || $token_opening eq '[' ) {
+                    my $lno = $rLL_new->[$K_opening]->[_LINE_INDEX_] + 1;
+                    complain(<<EOM);
+Unexpected ';' in container beginning with '$token_opening' at line $lno
+EOM
+                }
+            }
+
+            # Type 'f' is semicolon in a c-style 'for' statement
+            elsif ( $rtype_count->{'f'} ) {
+                ## not a list
+            }
+            elsif ( $rtype_count->{','} || $rtype_count->{'=>'} ) {
+
+                # has commas but no semicolons
                 $is_list = 1;
 
                 # We need to do one more check for a parenthesized list:
                 # At an opening paren following certain tokens, such as 'if',
                 # we do not want to format the contents as a list.
-                if ( $rLL_new->[$K_opening]->[_TOKEN_] eq '(' ) {
+                if ( $token_opening eq '(' ) {
                     my $Kp = $self->K_previous_code( $K_opening, $rLL_new );
                     if ( defined($Kp) ) {
                         my $type_p  = $rLL_new->[$Kp]->[_TYPE_];
@@ -14304,6 +15747,9 @@ EOM
                           : !$is_nonlist_type{$type_p};
                     }
                 }
+            }
+            else {
+                ## no commas or semicolons - not a list
             }
         }
 
@@ -17687,9 +19133,9 @@ sub count_sub_return_args {
         # retain old vars during transition phase
         # Note: using <= to match old results but could use <
         if ( !defined($return_count_min) || $count <= $return_count_min ) {
-            $return_count_min           = $count;
-            $item->{return_count_min}   = $count;
-            $item->{K_return_count_min} = $K_return;
+            $return_count_min = $count;
+            $item->{return_count_min} = $count;
+##          $item->{K_return_count_min} = $K_return;
         }
 
         # Note: using >= to match old results but could use >
@@ -18358,10 +19804,10 @@ sub cross_check_sub_calls {
         next unless defined($arg_count);
         if ( $call_type eq '->' ) {
             $arg_count += 1;
-            $upper_bound_call_info{$key}->{method_call_count}++;
+##          $upper_bound_call_info{$key}->{method_call_count}++;
         }
         else {
-            $upper_bound_call_info{$key}->{direct_call_count}++;
+##          $upper_bound_call_info{$key}->{direct_call_count}++;
         }
         my $max = $upper_bound_call_info{$key}->{max_arg_count};
         my $min = $upper_bound_call_info{$key}->{min_arg_count};
@@ -18694,7 +20140,7 @@ sub cross_check_sub_calls {
                   $rsub_item->{return_count_indefinite};
                 $rK_return_list =
                   $self->[_rK_return_by_sub_seqno_]->{$seqno_sub};
-                $common_hash{$key}->{rK_return_list} = $rK_return_list;
+##              $common_hash{$key}->{rK_return_list} = $rK_return_list;
                 $rK_return_count_hash = $rsub_item->{rK_return_count_hash};
             }
         }
@@ -21642,7 +23088,8 @@ sub break_before_list_opening_containers {
         next unless ($break_option);
 
         # Do not use -bbx under stress for stability ... fixes b1300
-        # TODO: review this; do we also need to look at stress_level_lalpha?
+        # NOTE: Testing in v20240501 showed that this check is no longer
+        # needed for stability, but there is little point in removing it.
         my $level = $rLL->[$KK]->[_LEVEL_];
         if ( $level >= $stress_level_beta ) {
             DEBUG_BBX
@@ -22126,7 +23573,8 @@ sub extended_ci {
 
         # Fix for b1197 b1198 b1199 b1200 b1201 b1202
         # Do not apply -xci if we are running out of space
-        # TODO: review this; do we also need to look at stress_level_alpha?
+        # NOTE: Testing in v20240501 showed that this check is no longer
+        # needed for stability, but there is little point in removing it.
         if ( $level >= $stress_level_beta ) {
             DEBUG_XCI
               && print
@@ -23323,6 +24771,389 @@ sub set_excluded_lp_containers {
     return;
 } ## end sub set_excluded_lp_containers
 
+sub keep_old_blank_lines_exclusions {
+    my ( $self, $rwant_blank_line_after ) = @_;
+
+    # Set a flag to remove selected blank lines from the input stream
+
+    return if ( !%keep_old_blank_lines_exceptions );
+    my $top_control    = $keep_old_blank_lines_exceptions{top};
+    my $bottom_control = $keep_old_blank_lines_exceptions{bottom};
+
+    my $rLL                  = $self->[_rLL_];
+    my $rlines               = $self->[_rlines_];
+    my $rblock_type_of_seqno = $self->[_rblock_type_of_seqno_];
+    my $i_first_blank;    # first blank of a group
+    my $i_last_blank;     # last blank of a group
+
+    my $line_CODE_info = sub {
+
+        # Given:
+        #   $ii = index of a line
+        # Return:
+        #   undef if not a line of code, or
+        #   {Kfirst=>$Kfirst, Klast=>$Klast, CODE_type=>$CODE_type}
+
+        my ($ii) = @_;
+        return if ( $ii < 0 );
+        my $line_of_tokens = $rlines->[$ii];
+        my $line_type      = $line_of_tokens->{_line_type};
+        return if ( $line_type ne 'CODE' );
+        my $CODE_type = $line_of_tokens->{_code_type};
+        my $rK_range  = $line_of_tokens->{_rK_range};
+        my ( $Kfirst, $Klast ) = @{$rK_range};
+        return if ( !defined($Klast) );
+        return {
+            Kfirst    => $Kfirst,
+            Klast     => $Klast,
+            CODE_type => $CODE_type,
+        };
+    }; ## end $line_CODE_info = sub
+
+    my $top_match = sub {
+        my ($ii) = @_;
+
+        # Decide if line at index $ii matches the criterion in the control hash
+        # for deleting blank lines which follow this line.
+
+        # Possible top tests are : '{b' '}b' '#b'
+        # where 'b' denotes the blank line position
+
+        # Given:
+        #   $ii = index of a line of code to be checked
+
+        # Return:
+        #  false if no match
+        #   1 if match without restriction on blank line removal
+        #  -1 for match which requires keeping 1 essential blank line
+
+        my $line_of_tokens = $rlines->[$ii];
+        my $line_type      = $line_of_tokens->{_line_type};
+        return if ( $line_type ne 'CODE' );
+
+        # Note that we could also check for block comments here
+        # my $CODE_type = $line_of_tokens->{_code_type};
+        # return if ($CODE_type);
+
+        my $rK_range = $line_of_tokens->{_rK_range};
+        my ( $Kfirst, $Klast ) = @{$rK_range};
+        return if ( !defined($Klast) );
+        my $type_last = $rLL->[$Klast]->[_TYPE_];
+
+        # See if line has a comment
+        my $Klast_true = $Klast;
+        if ( $type_last eq '#' ) {
+
+            # For a full line comment...
+            if ( $Klast eq $Kfirst ) {
+
+                # Check for a block comment control, type '#b'
+                if ( $top_control->{$type_last} ) {
+
+                    # Always keep 1 blank line if the lines above and below
+                    # the blank lines are full-line comments
+                    my $Kn = $self->K_next_nonblank($Klast);
+                    return ( defined($Kn) && $rLL->[$Kn]->[_TYPE_] eq '#' )
+                      ? -1
+                      : 1;
+                }
+
+                # Nothing to do
+                return;
+            }
+
+            # For a side comment .. back up 1 token
+            $Klast = $self->K_previous_nonblank($Klast);
+            return if ( !defined($Klast) || $Klast < $Kfirst );
+            $type_last = $rLL->[$Klast]->[_TYPE_];
+        }
+
+        # Check for possible top test
+        if ( $top_control->{$type_last} ) {
+
+            # '{b' = inverse of -blao=i
+            # '}b'   not an inverse but uses the -blao pattern if set
+            if ( $type_last ne '{' && $type_last ne '}' ) {
+                ## unexpected type - shouldn't happen
+                DEVEL_MODE && Fault("Unexpected top test type: '$type_last'\n");
+                return;
+            }
+            my $seqno = $rLL->[$Klast]->[_TYPE_SEQUENCE_];
+            return if ( !$seqno );
+            my $block_type = $rblock_type_of_seqno->{$seqno};
+            if (   $block_type
+                && $block_type =~ /$blank_lines_after_opening_block_pattern/ )
+            {
+
+                # This is a match ...
+
+                # Ok to delete all blanks if no side comment here
+                if ( $Klast_true == $Klast ) { return 1 }
+
+                # Ok to delete all blanks if no block comment ahead
+                my $Kn = $self->K_next_nonblank($Klast_true);
+                if ( !defined($Kn) || $rLL->[$Kn]->[_TYPE_] ne '#' ) {
+                    return 1;
+                }
+
+                # If there is code below it is a block comment of some type.
+                # We must leave 1 blank if it is possible to form a hanging
+                # side comment.
+
+                # Ok to delete all blanks if this side comment is static
+                my $token = $rLL->[$Klast_true]->[_TOKEN_];
+                if ( $token =~ /$static_side_comment_pattern/ ) { return 1 }
+
+                my $rinfo = $line_CODE_info->( $i_last_blank + 1 );
+
+                # If no code below, then ok to delete blanks
+                return 1 if ( !defined($rinfo) );
+
+                # If static block comment below, ok to delete blanks
+                my $CODE_type_bottom = $rinfo->{CODE_type};
+                if ( $CODE_type_bottom eq 'SBC' || $CODE_type_bottom eq 'SBCX' )
+                {
+                    return 1;
+                }
+
+                # The top line has simple side comment, the bottom line is a
+                # non-static comment, so we must keep at least 1 blank line to
+                # avoid forming a hanging side comment. This logic is slightly
+                # simplified but on the safe side.
+                return -1;
+            }
+
+            # Not a match
+            return;
+        }
+
+        # Not a match
+        return;
+    }; ## end $top_match = sub
+
+    my $bottom_match = sub {
+        my ($ii) = @_;
+
+        # Decide if line at index $ii matches the criterion in the control hash
+        # for deleting blank lines which precede this line.
+
+        # Possible bottom tests are : 'b#' 'b{' 'b}' 'bS' 'bP'
+        # where 'b' denotes the blank line position, S=sub, P=package
+
+        # Given:
+        #   $ii = index of a line of code to be checked
+
+        # Return:
+        #  false if no match
+        #   1 if match without restriction
+        #  -1 for match which requires keeping 1 essential blank line
+
+        my $line_of_tokens = $rlines->[$ii];
+        my $line_type      = $line_of_tokens->{_line_type};
+        return if ( $line_type ne 'CODE' );
+
+        my $rK_range = $line_of_tokens->{_rK_range};
+        my ( $Kfirst, $Klast ) = @{$rK_range};
+        return if ( !defined($Klast) );
+        my $type_last = $rLL->[$Klast]->[_TYPE_];
+        if ( $type_last eq '#' ) {
+
+            # Handle a full-line comment
+            if ( $Klast eq $Kfirst ) {
+
+                # Check for a block comment 'b#'
+                if ( $bottom_control->{$type_last} ) {
+
+                    # This bottom line is a comment. Now check for comments
+                    # above. Quick check:
+                    my $Kp = $self->K_previous_nonblank($Kfirst);
+                    if ( !defined($Kp) || $rLL->[$Kp]->[_TYPE_] ne '#' ) {
+                        return 1;
+                    }
+
+                    # Only upper comment is possible
+                    my $rinfo = $line_CODE_info->( $i_first_blank - 1 );
+
+                    # No code above - ok to delete blanks
+                    return 1 if ( !defined($rinfo) );
+
+                    my $Kfirst_top = $rinfo->{Kfirst};
+                    my $Klast_top  = $rinfo->{Klast};
+
+                    # If full line comment above then we must keep one blank
+                    if ( $Kfirst_top == $Klast_top ) { return -1 }
+
+                    # We should have a side comment above by the preliminary
+                    # check
+                    my $type_top = $rLL->[$Klast_top]->[_TYPE_];
+                    return 1 if ( $type_top ne '#' );    ## shouldn't happen
+
+                    # A static side comment above cannot form hanging side
+                    # comment below - ok to remove all blank lines.
+                    my $token_top = $rLL->[$Klast_top]->[_TOKEN_];
+                    if ( $token_top =~ /$static_side_comment_pattern/ ) {
+                        return 1;
+                    }
+
+                    # A static block comment below cannot form hanging side
+                    # comment - ok to remove all blank lines.
+                    my $CODE_type = $line_of_tokens->{_code_type};
+                    if ( $CODE_type eq 'SBC' || $CODE_type eq 'SBCX' ) {
+                        return 1;
+                    }
+
+                    # A new hanging side comment could be formed if we remove
+                    # all blank lines, so we must leave 1
+                    return -1;
+                }
+
+                # Not a match
+                return;
+            }
+
+            # This line has a side comment .. back up 1 token
+            $Klast = $self->K_previous_nonblank($Klast);
+            return if ( !defined($Klast) || $Klast < $Kfirst );
+            $type_last = $rLL->[$Klast]->[_TYPE_];
+        }
+
+        # Bottom tests: 'b{' 'b}' 'bS' 'bP'
+        # All of these are based on the first token of the line following
+        # the blank lines.
+        my $token_first = $rLL->[$Kfirst]->[_TOKEN_];
+        my $type_first  = $rLL->[$Kfirst]->[_TYPE_];
+
+        # Special check for case 'b{', inverse of -bbb
+        if ( $type_first eq 'k' ) {
+            if (   $bottom_control->{'{'}
+                && $is_if_unless_while_until_for_foreach{$token_first}
+                && !$rLL->[$Kfirst]->[_CI_LEVEL_] )
+            {
+
+                # NOTE: we check ci to insure that this is not a trailing
+                # operation, but no checks are currently made to see if this is
+                # a one-line block. So this will remove more blanks
+                # than the corresponding -bbb option adds.
+                return 1;
+            }
+
+            # Apply 'S' to BEGIN and END blocks to make the inverse of -bbs
+            if ( $bottom_control->{'S'} ) {
+                if ( $token_first eq 'BEGIN' || $token_first eq 'END' ) {
+                    return 1;
+                }
+            }
+            return;
+        }
+
+        # For other tests 'b}' 'bS' 'bP' the token types match
+        if ( $bottom_control->{$type_first} ) {
+
+            # 'b}' inverse of -blbc
+            if ( $type_first eq '}' ) {
+                my $seqno = $rLL->[$Kfirst]->[_TYPE_SEQUENCE_];
+                return if ( !$seqno );
+                my $block_type = $rblock_type_of_seqno->{$seqno};
+                return if ( !$block_type );
+                if (
+                    $block_type =~ /$blank_lines_before_closing_block_pattern/ )
+                {
+                    return 1;
+                }
+            }
+            elsif ( $type_first eq 'P' ) { return 1 }
+            elsif ( $type_first eq 'S' ) {
+
+                # NOTE: no checks are currently made to see if this is a
+                # one-line or multi-line sub. So this will remove more blanks
+                # than the corresponding -bbs option adds. And see above patch
+                # which makes this work for BEGIN and END blocks.
+                return 1;
+            }
+            else {
+                ## unexpected type
+            }
+        }
+        return;
+    }; ## end $bottom_match = sub
+
+    my $end_blank_group = sub {
+
+        my ( ($ending_in_blank) ) = @_;
+
+        # Decide if the blank lines group in the index range
+        # $i_first_blank .. $i_last_blank should be deleted.
+
+        # Given:
+        #   $ending_in_blank = true if the last blank is the end of file
+        #                      false if not
+        # Return:
+        #   true if this group should be deleted
+        #   false if not
+
+        if ( !defined($i_first_blank) || !defined($i_last_blank) ) { return }
+
+        # Check code line before start of blank group
+        my $delete_blanks;
+        if ( $top_control && $i_first_blank > 0 ) {
+            $delete_blanks = $top_match->( $i_first_blank - 1 );
+        }
+
+        # Check code line after end of blank group
+        if ( !$delete_blanks && $bottom_control && !$ending_in_blank ) {
+            $delete_blanks =
+              $bottom_match->( $i_last_blank + 1, $bottom_control );
+        }
+
+        # Signal deletion by setting the deletion flag for this group
+        if ($delete_blanks) {
+
+            # A negative $delete_blanks flag indicates to keep 1 essential blank
+            # See b1504 for example of conflict with kgb logic
+            if ( $delete_blanks < 0 ) { $i_first_blank++ }
+            foreach my $ii ( $i_first_blank .. $i_last_blank ) {
+                if ( !defined( $rwant_blank_line_after->{$ii} ) ) {
+                    $rwant_blank_line_after->{$ii} = 2;
+                }
+            }
+        }
+
+        $i_first_blank = undef;
+        $i_last_blank  = undef;
+        return;
+    }; ## end $end_blank_group = sub
+
+    # Main loop to locate groups of blank lines and decide if they
+    # they should be deleted
+    my $i = -1;
+    foreach my $line_of_tokens ( @{$rlines} ) {
+        $i++;
+        my $line_type = $line_of_tokens->{_line_type};
+        if ( $line_type ne 'CODE' ) {
+            if ( defined($i_last_blank) ) {
+                $end_blank_group->();
+            }
+            next;
+        }
+        my $CODE_type = $line_of_tokens->{_code_type};
+        if ( $CODE_type eq 'BL' ) {
+            if ( !defined($i_first_blank) ) {
+                $i_first_blank = $i;
+            }
+            $i_last_blank = $i;
+        }
+        else {
+            if ( defined($i_first_blank) ) {
+                $end_blank_group->();
+            }
+        }
+    }
+    if ( defined($i_first_blank) ) {
+        $end_blank_group->(1);
+    }
+    return;
+} ## end sub keep_old_blank_lines_exclusions
+
 ######################################
 # CODE SECTION 6: Process line-by-line
 ######################################
@@ -23347,6 +25178,9 @@ sub process_all_lines {
 
     # set locations for blanks around long runs of keywords
     my $rwant_blank_line_after = $self->keyword_group_scan();
+
+    $self->keep_old_blank_lines_exclusions($rwant_blank_line_after)
+      if ( $rOpts_keep_old_blank_lines == 1 );
 
     my $line_type      = EMPTY_STRING;
     my $i_last_POD_END = -10;
@@ -27237,7 +29071,8 @@ EOM
                 $self->break_all_chain_tokens( $ri_first, $ri_last );
 
                 $self->break_method_call_chains( $ri_first, $ri_last )
-                  if ( %{ $self->[_rseqno_arrow_call_chain_start_] } );
+                  if ( %{ $self->[_rseqno_arrow_call_chain_start_] }
+                    && !$pack_operator_types{'->'} );
 
                 $self->break_equals( $ri_first, $ri_last )
                   if @{$ri_first} >= 3;
@@ -27621,7 +29456,7 @@ sub break_method_call_chains {
     my ( $self, $ri_left, $ri_right ) = @_;
 
     # If there is a break at any member of a method call chain, break
-    # at each method call in the chain (all or none logic). git #171.
+    # at each method call in the chain (all or none logic). See git #171.
 
     # Given:
     #   $ri_first - reference to list of the first index $i for each output
@@ -27766,6 +29601,8 @@ sub break_all_chain_tokens {
 
     # loop over all chain types
     foreach my $key (@keys) {
+
+        next if ( $pack_operator_types{$key} );
 
         # loop over all interior chain tokens
         foreach my $itest ( @{ $interior_chain_type{$key} } ) {
@@ -29492,7 +31329,8 @@ EOM
               $summed_lengths_to_go[$ibeg_2];
             my $iend_1_minus = max( $ibeg_1, iprev_to_go($iend_1) );
 
-            my $combine_ok = (
+            my $combine_ok = $pack_operator_types{'.'};
+            $combine_ok ||= (
 
                 # ... unless there is just one and we can reduce
                 # this to two lines if we do.  For example, this
@@ -29727,7 +31565,8 @@ EOM
             my $summed_len_2 = $summed_lengths_to_go[ $iend_2 + 1 ] -
               $summed_lengths_to_go[$ibeg_2];
 
-            my $combine_ok = (
+            my $combine_ok = $pack_operator_types{'.'};
+            $combine_ok ||= (
 
                 # ... unless there is just one and we can reduce
                 # this to two lines if we do.  For example, this
@@ -31588,7 +33427,7 @@ sub do_colon_breaks {
 
                 $self->table_maker(
                     {
-                        depth            => $dd,
+##                      depth            => $dd,
                         i_opening_paren  => $opening_structure_index_stack[$dd],
                         i_closing_paren  => $i,
                         item_count       => $item_count_stack[$dd],
@@ -32816,7 +34655,8 @@ EOM
 
             # This option fixes b1240 but not b1235, b1237 with new -lp,
             # but this gives better formatting than the previous option.
-            # TODO: see if stress_level_alpha should also be considered
+            # NOTE: Testing in v20240501 showed that this check is no longer
+            # needed for stability, but there is little point in removing it.
             $do_not_break_apart ||=
               $levels_to_go[$i_opening] > $stress_level_beta;
         }
@@ -34348,13 +36188,13 @@ EOM
             _item_count_B      => $item_count,
 
             # New variables
-            _columns                 => $columns,
-            _formatted_columns       => $formatted_columns,
-            _formatted_lines         => $formatted_lines,
-            _max_width               => $max_width,
-            _new_identifier_count    => $new_identifier_count,
-            _number_of_fields        => $number_of_fields,
-            _odd_or_even             => $odd_or_even,
+            _columns              => $columns,
+            _formatted_columns    => $formatted_columns,
+            _formatted_lines      => $formatted_lines,
+            _max_width            => $max_width,
+            _new_identifier_count => $new_identifier_count,
+            _number_of_fields     => $number_of_fields,
+##          _odd_or_even             => $odd_or_even,
             _packed_columns          => $packed_columns,
             _packed_lines            => $packed_lines,
             _pair_width              => $pair_width,
@@ -40361,6 +42201,9 @@ sub set_vertical_tightness_flags {
     my $ibeg = $ri_first->[$nline];
     my $iend = $ri_last->[$nline];
 
+    # Fix for b1503
+    my $is_under_stress = $levels_to_go[$ibeg] > $high_stress_level;
+
     # Define these values for each vertical tightness type:
     my (
 
@@ -40410,6 +42253,10 @@ sub set_vertical_tightness_flags {
                $type_sequence_to_go[$iend]
             && !$block_type_to_go[$iend]
             && $is_opening_token{$token_end}
+
+            # minimal fix for b1503; this also works ok without the 'w' check
+            # but that changes more existing code.
+            && !( $is_under_stress && $types_to_go[$ibeg_next] eq 'w' )
             && (
                 $opening_vertical_tightness{$token_end} > 0
 

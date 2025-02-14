@@ -1,5 +1,8 @@
 Revision history for Bible::OBML
 
+2.09      2025-02-13 13:30:59-08:00 America/Los_Angeles
+        - Perl minimum version align
+
 2.08      2025-01-28 11:45:32-08:00 America/Los_Angeles
         - exact::class attr leak guard
 

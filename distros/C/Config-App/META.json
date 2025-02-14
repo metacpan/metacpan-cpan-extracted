@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -43,7 +43,7 @@
             "POSIX" : "0",
             "URI" : "0",
             "YAML::XS" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,7 +56,7 @@
             "Test2::V0" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       }
    },
@@ -72,9 +72,9 @@
          "web" : "https://github.com/gryphonshafer/Config-App"
       }
    },
-   "version" : "1.17",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "1.18",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -22,7 +22,7 @@ CARP: {
 		);
 		does_carp_that_matches(
 			sub {
-				new_ok('Weather::Meteo')->weather({ latitude => 160, longtitude => -14, date => 'xyzzy' })
+				new_ok('Weather::Meteo')->weather({ latitude => 160, longitude => -14, date => 'xyzzy' })
 			},
 			qr/is not a valid date/
 		);

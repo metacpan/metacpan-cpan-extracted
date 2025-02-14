@@ -1,7 +1,7 @@
 package Bible::OBML::Gateway;
 # ABSTRACT: Bible Gateway content conversion to Open Bible Markup Language
 
-use 5.020;
+use 5.022;
 
 use exact;
 use exact::class;
@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.09'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 has translation => 'NIV';
 has reference   => sub { Bible::Reference->new( bible => 'Protestant' ) };
@@ -376,7 +376,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.09
+version 2.10
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)

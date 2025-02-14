@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.020"
+            "perl" : "5.022"
          }
       },
       "develop" : {
@@ -41,7 +41,7 @@
             "Text::Wrap" : "0",
             "exact" : "1.14",
             "exact::class" : "1.10",
-            "perl" : "5.020"
+            "perl" : "5.022"
          }
       },
       "test" : {
@@ -51,7 +51,7 @@
             "IPC::Open3" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "perl" : "5.020",
+            "perl" : "5.022",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -69,7 +69,7 @@
          "web" : "https://github.com/gryphonshafer/Bible-OBML"
       }
    },
-   "version" : "2.08",
+   "version" : "2.09",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"

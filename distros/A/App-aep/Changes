@@ -1,7 +1,10 @@
 Revision history for perl application aep (Advanced Entry Point)
 
+0.010     2025-02-13 21:54:36 GMT
+  - Preparing for first release
+  - Corrected POD error
 0.009     2023-06-02 23:25:46 BST
-
+  - Added abstract
 0.008     2019-12-08 01:25:15 GMT
   - Added base POE in, updated cpanfile
   - Updated several documentation aspects

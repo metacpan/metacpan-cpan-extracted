@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.92';
+$Map::Tube::VERSION   = '3.93';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.92
+Version 3.93
 
 =cut
 
@@ -569,9 +569,10 @@ sub get_map_data {
             return $data;
         }
 
+        $@ =~ s/\s+at\s+\S*?\.pm\s+line\s+.*$//;
         Map::Tube::Exception::MalformedMapData->throw({
             method      => $method,
-            message     => "ERROR: Malformed Map Data ($xml).",
+            message     => "ERROR: Malformed Map Data ($xml): $@",
             filename    => $caller->[1],
             line_number => $caller->[2] });
     }
@@ -586,7 +587,7 @@ sub get_map_data {
 
             Map::Tube::Exception::MalformedMapData->throw({
                 method      => $method,
-                message     => "ERROR: Malformed Map Data ($json).",
+                message     => "ERROR: Malformed Map Data ($json): $@",
                 filename    => $caller->[1],
                 line_number => $caller->[2] });
         }
@@ -1480,7 +1481,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2010 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

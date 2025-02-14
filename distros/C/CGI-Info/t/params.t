@@ -18,7 +18,7 @@ PARAMS: {
 
 	my $i = new_ok('CGI::Info');
 	ok(!defined($i->warnings()));
-	ok(!defined($i->warnings_as_string()));
+	ok($i->warnings_as_string() eq '');
 	my %p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));

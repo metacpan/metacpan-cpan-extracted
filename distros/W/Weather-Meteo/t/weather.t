@@ -49,7 +49,7 @@ WEATHER: {
 
 		# Data prior to 1940 is not in the database
 
-		is($meteo->weather(latitude => 51.34, longitute => 1.42, date => '1704-11-14'), undef, 'pre 1940 data is not found');
+		is($meteo->weather(latitude => 51.34, longitude => 1.42, date => '1704-11-14'), undef, 'pre 1940 data is not found');
 
 		is(ref($meteo->ua()), 'LWP::UserAgent', 'get ua works');
 	}

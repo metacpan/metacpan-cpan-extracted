@@ -1,26 +1,34 @@
 ---
 abstract: 'Pseudo Finite State Machine'
 author:
-  - 'Eric Pozharski <whynot@pozharski.name>'
+  - 'Eric Pozharski <wayside.ultimate@tuta.io>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: v0.31.0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Acme-FSM
+no_index:
+  directory:
+    - directory
+    - build_e7BB
+  file:
+    - directory
+    - build_e7BB
 provides:
   Acme::FSM:
     file: lib/FSM.pm
-    version: v2.3.5
+    version: v2.3.6
 requires:
+  Carp: '0'
   perl: v5.10.0
   version: v0.77.0
 resources:
   license: http://www.gnu.org/licenses/lgpl-3.0.txt
-version: v2.3.5
+version: v2.3.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

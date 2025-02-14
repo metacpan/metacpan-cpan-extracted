@@ -235,6 +235,9 @@ sub _Lexer
         # Due to https://github.com/briandfoy/chemistry-elements/issues/16, Chemistry::Elements < 1.079 has 'Ha' instead of 'Db'
         if(      $atom->{symbol} eq '*'  || $atom->{symbol} eq 'Db' ) {
             # OK
+        } elsif( $atom->{symbol} eq lc $atom->{symbol} &&
+                 $atom->{symbol} !~ /^(as|se|[bcnops])$/ ) {
+            die "aromatic chemical element '$atom->{symbol}' is not allowed\n";
         } elsif( $atom->{symbol} eq 'Ha' ||
                  !Chemistry::Elements->new( $atom->{symbol} ) ) {
             die "chemical element with symbol '$atom->{symbol}' is unknown\n";

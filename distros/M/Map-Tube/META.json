@@ -106,6 +106,6 @@
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "3.92",
+   "version" : "3.93",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

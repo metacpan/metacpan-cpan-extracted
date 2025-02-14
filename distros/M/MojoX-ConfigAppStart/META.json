@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.008"
+            "perl" : "5.016"
          }
       },
       "develop" : {
@@ -38,7 +38,7 @@
             "Carp" : "0",
             "Config::App" : "0",
             "Mojolicious::Commands" : "0",
-            "perl" : "5.008",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -50,7 +50,7 @@
             "IPC::Open3" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "perl" : "5.008"
+            "perl" : "5.016"
          }
       }
    },
@@ -66,9 +66,9 @@
          "web" : "https://github.com/gryphonshafer/MojoX-ConfigAppStart"
       }
    },
-   "version" : "1.03",
-   "x_generated_by_perl" : "v5.35.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "1.04",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

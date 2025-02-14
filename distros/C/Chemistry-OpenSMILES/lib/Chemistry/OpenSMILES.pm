@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.11.5'; # VERSION
+our $VERSION = '0.11.6'; # VERSION
 
 use strict;
 use warnings;
@@ -575,9 +575,14 @@ sub _validate($@)
                              grep { !is_aromatic_bond( $moiety, @$_ ) }
                                   $moiety->edges );
 
+    # Due to the issue in Graph, bridges() returns strings instead of real objects.
+    # Graph issue: https://github.com/graphviz-perl/Graph/issues/29
+    # The code below works on buggy (< 0.9727) as well as fixed (>= 0.9727) versions.
+    my %vertices_by_name = map { $_ => $_ } $aromatic->vertices;
+    my @bridges = map { [ map { $vertices_by_name{$_} } @$_ ] } $aromatic->bridges;
     for my $bridge (sort { min( map { $_->{number} } @$a ) <=> min( map { $_->{number} } @$b ) ||
                            max( map { $_->{number} } @$a ) <=> max( map { $_->{number} } @$b ) }
-                         $aromatic->bridges) {
+                         @bridges) {
         my( $A, $B ) = sort { $a->{number} <=> $b->{number} } @$bridge;
         warn sprintf 'aromatic bond between atoms %s(%d) and %s(%d) ' .
                      'is outside an aromatic ring' . "\n",

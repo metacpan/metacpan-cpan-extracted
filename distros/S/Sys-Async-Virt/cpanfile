@@ -14,7 +14,7 @@ requires 'Protocol::Sys::Virt::Remote' => '10.10.13';
 requires 'Protocol::Sys::Virt::Remote::XDR' => '10.10.13';
 requires 'Protocol::Sys::Virt::UNIXSocket' => '10.10.13';
 requires 'Protocol::Sys::Virt::URI' => '10.10.13';
-requires 'Sublike::Extended';
+requires 'Sublike::Extended' => '0.29';  # treat 'sub' as extended keyword
 
 on test => sub {
     requires 'Test2::V0';

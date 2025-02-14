@@ -1,7 +1,7 @@
 package Bible::OBML;
 # ABSTRACT: Open Bible Markup Language parser and renderer
 
-use 5.020;
+use 5.022;
 
 use exact;
 use exact::class;
@@ -12,7 +12,7 @@ use Bible::Reference;
 
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 has _load             => sub { {} };
 has indent_width      => 4;
@@ -345,7 +345,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

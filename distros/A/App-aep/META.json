@@ -1,5 +1,5 @@
 {
-   "abstract" : "turns baubles into trinkets",
+   "abstract" : "Allows you to run a command within a container and control its start up",
    "author" : [
       "Paul G Webster <daemon@cpan.org>"
    ],
@@ -71,14 +71,14 @@
    "provides" : {
       "App::aep" : {
          "file" : "lib/App/aep.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.032001"
+         "version" : "5.036000"
       },
       "plugins" : [
          {
@@ -87,7 +87,6 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
                   "exclude_match" : [],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -98,7 +97,7 @@
                }
             },
             "name" : "@Starter::Git/Git::GatherDir",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
@@ -128,7 +127,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Starter::Git/Test::ReportPrereqs",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -203,12 +202,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
             "name" : "@Starter::Git/Git::Check",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion",
@@ -250,7 +249,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -258,7 +257,7 @@
                }
             },
             "name" : "@Starter::Git/Release_Commit",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -267,12 +266,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.009",
+                  "tag" : "0.010",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -280,7 +279,7 @@
                }
             },
             "name" : "@Starter::Git/Git::Tag",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -316,7 +315,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -324,7 +323,7 @@
                }
             },
             "name" : "@Starter::Git/Version_Bump_Commit",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -336,12 +335,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
             "name" : "@Starter::Git/Git::Push",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
@@ -474,8 +473,8 @@
          "version" : "6.030"
       }
    },
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

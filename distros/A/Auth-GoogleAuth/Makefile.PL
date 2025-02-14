@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Auth-GoogleAuth",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Auth::GoogleAuth",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.07",
   "test" => {
     "TESTS" => "t/*.t"
   }

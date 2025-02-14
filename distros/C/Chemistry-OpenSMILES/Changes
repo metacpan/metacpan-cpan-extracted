@@ -1,3 +1,9 @@
+0.11.6 2025-02-14
+
+    - Restoring incompatibility with Perl Graph package versions before
+      v0.9727 which have a bug in bridges().
+    - Limiting the set of allowed aromatic elements.
+
 0.11.5 2025-02-13
 
     - Fixing a bug failing to recognise @TB10.

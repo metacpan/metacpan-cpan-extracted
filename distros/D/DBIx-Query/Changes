@@ -1,5 +1,8 @@
 Revision history for DBIx::Query
 
+1.16      2025-02-13 13:32:04-08:00 America/Los_Angeles
+        - Perl minimum version align
+
 1.15      2024-03-28 12:26:27-07:00 America/Los_Angeles
         - Carp SQL parsing errors
         - Ignore reserved words SQL parse errors when not specifying an explicit

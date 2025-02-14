@@ -7,7 +7,7 @@ use 1.028;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "turns baubles into trinkets",
+  "ABSTRACT" => "Allows you to run a command within a container and control its start up",
   "AUTHOR" => "Paul G Webster <daemon\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

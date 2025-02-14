@@ -8,12 +8,12 @@ build_requires:
   IPC::Open3: '0'
   Test2::V0: '0'
   Test::More: '0'
-  perl: '5.020'
+  perl: '5.022'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.020'
+  perl: '5.022'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -28,12 +28,12 @@ requires:
   Text::Wrap: '0'
   exact: '1.14'
   exact::class: '1.10'
-  perl: '5.020'
+  perl: '5.022'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bible-OBML/issues
   homepage: https://github.com/gryphonshafer/Bible-OBML
   repository: https://github.com/gryphonshafer/Bible-OBML.git
-version: '2.08'
+version: '2.09'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

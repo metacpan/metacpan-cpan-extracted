@@ -1,5 +1,8 @@
 Revision history for MIDI-Drummer
 
+0.5013 2025-02-13 20:04:06
+    - Add the setup attribute.
+
 0.5012 2025-02-11 16:11:52
     - Improve documentation.
 

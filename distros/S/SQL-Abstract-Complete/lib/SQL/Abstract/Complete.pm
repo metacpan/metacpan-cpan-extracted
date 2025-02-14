@@ -1,7 +1,7 @@
 package SQL::Abstract::Complete;
 # ABSTRACT: Generate complete SQL from Perl data structures
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use Storable 'dclone';
 use vars '@ISA';
 @ISA = 'SQL::Abstract';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 sub new {
     my $self = shift;
@@ -164,7 +164,7 @@ SQL::Abstract::Complete - Generate complete SQL from Perl data structures
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![test](https://github.com/gryphonshafer/SQL-Abstract-Complete/workflows/test/badge.svg)](https://github.com/gryphonshafer/SQL-Abstract-Complete/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete)

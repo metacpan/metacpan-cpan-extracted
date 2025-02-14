@@ -45,7 +45,7 @@
             "Protocol::Sys::Virt::Remote::XDR" : "v10.10.13",
             "Protocol::Sys::Virt::UNIXSocket" : "v10.10.13",
             "Protocol::Sys::Virt::URI" : "v10.10.13",
-            "Sublike::Extended" : "0",
+            "Sublike::Extended" : "0.29",
             "perl" : "v5.26.0"
          }
       },
@@ -63,6 +63,6 @@
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.0.15",
+   "version" : "v0.0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

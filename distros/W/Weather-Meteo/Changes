@@ -1,6 +1,11 @@
 Revision history for Weather::Meteo
 
-0.09
+0.10	Thu Feb 13 07:47:59 EST 2025
+	Better handling of JSON decode errors
+	Added t/30-basics.t
+	Better arg checking
+
+0.09	Thu May 30 16:27:39 EDT 2024
 	Attempt to fix https://www.cpantesters.org/cpan/report/cb5e2b52-a699-11ee-9c1e-22106e8775ea
 	Added t/carp.t
 	The date argument to weather() can now be a DateTime, or similar, object

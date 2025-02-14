@@ -1,5 +1,5 @@
 ---
-abstract: 'turns baubles into trinkets'
+abstract: 'Allows you to run a command within a container and control its start up'
 author:
   - 'Paul G Webster <daemon@cpan.org>'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::aep:
     file: lib/App/aep.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   App::cpanminus: '1.7044'
   Carp: '0'
@@ -43,10 +43,10 @@ requires:
   Try::Tiny: '0'
   YAML::XS: '0'
   perl: '1.028'
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
-    version: '5.032001'
+    version: '5.036000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -54,7 +54,6 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
           exclude_match: []
-          follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
@@ -62,7 +61,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Starter::Git/Git::GatherDir'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Starter::Git/MetaYAML'
@@ -86,12 +85,12 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Starter::Git/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -143,10 +142,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Starter::Git/Git::Check'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -178,12 +177,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Starter::Git/Release_Commit'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -191,16 +190,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.009'
+          tag: '0.010'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Starter::Git/Git::Tag'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -227,12 +226,12 @@ x_Dist_Zilla:
             - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Starter::Git/Version_Bump_Commit'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -241,10 +240,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Starter::Git/Git::Push'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Starter::Git/TestRelease'
@@ -277,9 +276,9 @@ x_Dist_Zilla:
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -344,8 +343,8 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.030'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

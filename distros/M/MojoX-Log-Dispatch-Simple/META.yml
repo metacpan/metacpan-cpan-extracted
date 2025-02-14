@@ -9,12 +9,12 @@ build_requires:
   Log::Dispatch: '0'
   Test2::V0: '0'
   Test::More: '0'
-  perl: '5.010'
+  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.016'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,14 +23,14 @@ name: MojoX-Log-Dispatch-Simple
 requires:
   Mojo::Base: '0'
   Mojo::Util: '0'
-  perl: '5.010'
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/issues
   homepage: https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple
   repository: https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple.git
-version: '1.12'
-x_generated_by_perl: v5.35.4
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '1.13'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

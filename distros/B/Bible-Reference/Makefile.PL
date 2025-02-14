@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.022;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Bible-Reference",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Bible::Reference",
   "PREREQ_PM" => {
     "exact" => "1.14",
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.16",
+  "VERSION" => "1.17",
   "test" => {
     "TESTS" => "t/*.t"
   }

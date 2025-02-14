@@ -1,14 +1,14 @@
 package MojoX::Log::Dispatch::Simple;
 # ABSTRACT: Simple Log::Dispatch replacement of Mojo::Log
 
-use 5.010;
+use 5.016;
 use strict;
 use warnings;
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -143,7 +143,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple)

@@ -8,7 +8,7 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20250105';
+our $VERSION = '20250214';
 use Carp;
 use English qw( -no_match_vars );
 
@@ -361,7 +361,7 @@ sub complain {
         $self->{_complaint_count}++;
         if ($msg_line_number) {
 
-            # TODO: consider using same prefix as warning()
+            # NOTE: consider using same prefix as warning()
             $msg = $msg_line_number . ':' . $msg;
         }
         $self->write_logfile_entry($msg);

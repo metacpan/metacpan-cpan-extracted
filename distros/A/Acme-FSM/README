@@ -1,53 +1,60 @@
-OVERVIEW
 
-  Acme::FSM implements something resembling Finite State Machine.  If
-  you're looking for rigor then look somewhere else.  If you're looking
-  for feature set then keep looking.
+==== OVERVIEW ====
 
-  What A::F does is mechanics with zero awarness of inputs and/or
-  outputs (any or both might be missing).  Implementation is definetely
-  crude.  That stems from historical burden -- it's a fork!
+    Acme::FSM implements something resembling Finite State Machine.  If
+    you're looking for rigor then look somewhere else.  If you're looking
+    for feature set then keep looking.
 
-  If you're not demotivated yet then Acme::FSM has more.
+    What A::F does is mechanics with zero awarness of inputs and/or outputs
+    (any or both might be missing).  Implementation is definetely crude. 
+    That stems from historical burden -- it's a fork!
 
-  Test-suite scores 1083 units.
+    If you're not demotivated yet then Acme::FSM has more.
 
-INSTALL
+    Test-suite scores 1083 units.
 
-      perl Build.PL
-      ./Build build
-      ./Build test
-      ./Build install
 
-  A::F doesn't need anything (even core modules).  However,
+==== INSTALL ====
 
-  perl
-      *v5.10*, but that's not verified yet.
+        perl Build.PL
+        ./Build build
+        ./Build test
+        ./Build install
 
-  version
-      *v0.77*.  That's definetely contradicts perl.  I haven't dug
-      through Changes yet, can't say when The Core has switched to
-      *v0.77* though.
+    A::F doesn't need anything (even core modules).  However,
 
-  "Carp"
-      Whatever comes with perl, hopefully.
+:   perl
+        *v5.10*, but that's not verified yet.
 
-  Module::Build
-      Whatever comes with perl.  Cut off version to be determined yet.
+        (v2.3.6) It's complicated now.
 
-AVAILABILITY
+:   version
+        *v0.77*.  That's definetely contradicts perl.  I haven't dug through
+        Changes yet, can't say when The Core has switched to *v0.77* though.
 
-  # TODO:202207292136:whynot: Fill me in.
+:   ``Carp''
+        Whatever comes with perl, hopefully.
 
-BUGS
+:   Module::Build
+        Whatever comes with perl.  Cut off version to be determined yet.
 
-  # TODO:202207292141:whynot: Fill me in.
 
-COPYRIGHT AND LICENSING
+==== AVAILABILITY ====
 
-      Copyright 2012, 2013, 2022 Eric Pozharski <whynto@pozharski.name>
+    # TODO:202207292136:whynot: Fill me in.
 
-      GNU LGPLv3
 
-      AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+==== BUGS ====
+
+    # TODO:202207292141:whynot: Fill me in.
+
+
+==== COPYRIGHT AND LICENSING ====
+
+        Copyright 2012, 2013, 2022 Eric Pozharski <whynto@pozharski.name>
+        Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
+
+        GNU LGPLv3
+
+        AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
 

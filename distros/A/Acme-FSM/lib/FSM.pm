@@ -1,16 +1,15 @@
 # Original Author:      Dale M. Amon
-# $Id: FSM.pm 561 2022-12-29 18:54:15Z whynot $
+# $Id: FSM.pm 564 2025-02-13 21:33:15Z whynot $
 # Copyright 2012, 2013, 2022 Eric Pozharski <whynot@pozharski.name>
+# Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 # GNU LGPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
 
 use strict;
 use warnings;
-use 5.010;
 
 package Acme::FSM;
-use version 0.77; our $VERSION = version->declare( v2.3.5 );
-use feature qw| switch |;
+use version 0.77; our $VERSION = version->declare( v2.3.6 );
 
 use Carp qw| croak |;
 
@@ -1747,6 +1746,7 @@ And, finally, B<A::F> implodes upon itself:
     http://www.cpan.org/authors/id/D/DA/DALEAMON/DMAMisc-1.01-3.tar.gz
 
     Copyright 2012, 2013, 2022 Eric Pozharski <whynto@pozharski.name>
+    Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 
     GNU LGPLv3
 

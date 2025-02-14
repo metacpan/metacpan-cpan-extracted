@@ -34,6 +34,8 @@ my $test_requires = {
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,
+	'Test::DescribeMe' => 0,
+	'Test::MockModule' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
@@ -50,6 +52,15 @@ if($online_tests) {
 	}
 } else {
 	unlink('t/online.enabled');
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -72,8 +83,7 @@ WriteMakefile(
 		'LWP::Protocol::https' => 0,
 		'Scalar::Util' => 0,
 		'URI' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	}, dist => $dist,
 	clean		=> { FILES => 'Weather-Meteo-*' },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
@@ -96,10 +106,8 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
 	# See https://www.cpantesters.org/cpan/report/b38913a6-8e30-11ee-884e-494b6e8775
-	return 0 if($ENV{'AUTOMATED_TESTING'});	# Don't overload the server by default
-	return 0 if(!-t STDIN);
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'} || $ENV{'AUTOMATED_TESTING'} || $ENV{'NONINTERACTIVE_TESTING'} || (!-t STDIN));
 
 	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'open-meteo.com:443',

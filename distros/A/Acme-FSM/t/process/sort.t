@@ -1,16 +1,17 @@
-# $Id: sort.t 561 2022-12-29 18:54:15Z whynot $
+# $Id: sort.t 564 2025-02-13 21:33:15Z whynot $
 # Copyright 2012, 2013, 2022 Eric Pozharski <whynot@pozharski.name>
+# Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 # GNU GPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+# xasi BmhM NCac 5Ddl 1BfZ 2c8C DnV6 uFln ulW1 twae assr JOYl 5Boi uEX5 lqqr jIOe WNto Hwlb JWMF eZnj uQU3 UQzN XJ2T JXdQ mgz3 E25x ZeOo oz0U S76l N7D6 5MIS |
 
 use strict;
 use warnings;
-use 5.010;
 
 package main;
-use version 0.77; our $VERSION = version->declare( v2.3.2 );
+use version 0.77; our $VERSION = version->declare( v2.3.3 );
 
-use t::TestSuite qw| :switches :run |;
+use t::TestSuite qw| :switches :run :utils |;
 use Test::More;
 
 plan tests => 9;
@@ -130,11 +131,12 @@ for ( 2 .. @$super )                          {
     my $base = [ @{$inbase[0]} ];
     push @$base, shift @$base;
     unshift @inbase, $base, [ reverse @$base ] }
-while( @inbase )       {
+while( @inbase )                       {
     AFSMTS_wrap;
-    my $backup = [ $inbase[0] ];
-    fail qq|@$backup|                                                   unless
-      \@input ~~ $super }
+# XXX:202501120433:whynot: This is cranky.
+    my $backup = defined $inbase[0] ? [ $inbase[0] ] : [[ qw|***qG1k***| ]];
+    fail qq|@{$backup->[0]}|                                            unless
+      AFSMTS_smartmatch @input, @$super }
 pass q|success, you know|;
 
 # vim: set filetype=perl

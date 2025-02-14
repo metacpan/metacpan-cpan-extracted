@@ -1,5 +1,15 @@
 -----
 
+0.0.16   2025-02-13
+    [Added]
+       * Condigurable PING message interval
+    [Changed]
+       * Increased minimum required Sublike::Extended (to v0.29)
+       * Declare extra entrypoints as unsupported, because newer
+         entrypoints exist (for over a decade)
+       * Wait for server to close connection after PROC_CLOSE message
+         sent to server and response received.
+
 0.0.15   2025-02-08
     [Added]
        * Implemented 25 additional entrypoints;

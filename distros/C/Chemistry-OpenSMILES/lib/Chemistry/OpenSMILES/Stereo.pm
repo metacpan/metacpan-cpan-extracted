@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Stereo;
 
 # ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.11.5'; # VERSION
+our $VERSION = '0.11.6'; # VERSION
 
 use strict;
 use warnings;

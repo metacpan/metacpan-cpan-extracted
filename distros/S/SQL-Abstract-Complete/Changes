@@ -1,5 +1,8 @@
 Revision history for SQL::Abstract::Complete
 
+1.10      2025-02-13 13:33:13-08:00 America/Los_Angeles
+        - Perl minimum version align
+
 1.09      2024-03-28 12:22:27-07:00 America/Los_Angeles
         - Slightly better handling of columns in get()
 

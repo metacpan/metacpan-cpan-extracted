@@ -1,5 +1,8 @@
 Revision history for Bible::OBML::Gateway
 
+2.10      2025-02-13 13:31:13-08:00 America/Los_Angeles
+        - Perl minimum version align
+
 2.09      2025-01-28 11:46:13-08:00 America/Los_Angeles
         - exact::class attr leak guard
 

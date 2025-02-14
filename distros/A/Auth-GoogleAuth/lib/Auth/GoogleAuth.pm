@@ -1,7 +1,7 @@
 package Auth::GoogleAuth;
 # ABSTRACT: Google Authenticator TBOT Abstraction
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ use URI::Escape 'uri_escape';
 use Convert::Base32 qw( encode_base32 decode_base32 );
 use Carp 'croak';
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 my @accessors = qw( secret secret32 issuer key_id );
 __PACKAGE__->mk_accessors(@accessors);
@@ -140,7 +140,7 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Auth-GoogleAuth/workflows/test/badge.svg)](https://github.com/gryphonshafer/Auth-GoogleAuth/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth)

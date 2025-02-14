@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::Worker;
-$App::gimpgitbuild::API::Worker::VERSION = '0.30.3';
+$App::gimpgitbuild::API::Worker::VERSION = '0.32.0';
 use strict;
 use warnings;
 use 5.014;
@@ -32,16 +32,28 @@ sub _do_system
 
 my $PAR_JOBS = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
 my $skip_builds_re;
+my $forcify_tests_re;
 
 BEGIN
 {
-    my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
-    if ( exists $ENV{$KEY} )
     {
-        my $re_str = $ENV{$KEY};
-        $skip_builds_re = qr/$re_str/;
+        my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
+        if ( exists $ENV{$KEY} )
+        {
+            my $re_str = $ENV{$KEY};
+            $skip_builds_re = qr/$re_str/;
+        }
+    }
+    {
+        my $KEY = "GIMPGITBUILD__FORCE_TESTS_RE";
+        if ( exists $ENV{$KEY} )
+        {
+            my $re_str = $ENV{$KEY};
+            $forcify_tests_re = qr/$re_str/;
+        }
     }
 }
+
 my $BUILD_DIR = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
         // "to-del--gimpgitbuild--build-dir" );
 
@@ -50,9 +62,29 @@ my $BUILD_DIR = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
 # Ubuntu/etc. places it under $prefix/lib/$arch by default.
 my $UBUNTU_MESON_LIBDIR_OVERRIDE = "-D libdir=lib";
 
+sub _wrap_check
+{
+    my ( $self, $id, $cmd ) = @_;
+    my $ret = $cmd
+        . (
+        (
+            length( $ENV{SKIP_CHECK} )
+                or ( defined($forcify_tests_re) and $id =~ $forcify_tests_re )
+        ) ? " || true" : ''
+        );
+    return ($ret);
+}
+
 sub _check
 {
-    return ( length( $ENV{SKIP_CHECK} ) ? "true" : "make check" );
+    my ( $self, $id ) = @_;
+    return $self->_wrap_check( $id, "make check" );
+}
+
+sub _ninja_check
+{
+    my ( $self, $id ) = @_;
+    return $self->_wrap_check( $id, "ninja test" );
 }
 
 sub _git_sync
@@ -154,7 +186,7 @@ qq#meson setup --prefix="$prefix" $UBUNTU_MESON_LIBDIR_OVERRIDE @{$extra_meson_a
             $shell_cmd->(qq#ninja $PAR_JOBS#),
             @{
                 $test_install_order->(
-                    [ $shell_cmd->(qq#ninja $PAR_JOBS test#), ],
+                    [ $shell_cmd->(qq#@{[$self->_ninja_check($id)]}#), ],
                     [ $shell_cmd->(qq#ninja $PAR_JOBS install#), ]
                 )
             },
@@ -170,7 +202,7 @@ qq#meson setup --prefix="$prefix" $UBUNTU_MESON_LIBDIR_OVERRIDE @{$extra_meson_a
             $shell_cmd->(qq#make $PAR_JOBS#),
             @{
                 $test_install_order->(
-                    [ $shell_cmd->(qq#@{[_check()]}#), ],
+                    [ $shell_cmd->(qq#@{[$self->_check($id)]}#), ],
                     [ $shell_cmd->(qq#make install#), ]
                 )
             },
@@ -309,7 +341,7 @@ sub _run_all
         {
             id                   => "gimp",
             extra_configure_args => [ qw# --enable-debug --with-lua=no #, ],
-            extra_meson_args     => [ qw# -Dlua=disabled #, ],
+            extra_meson_args     => [ qw# #, ],
             git_checkout_subdir  => "git/gimp",
             install_before_test  => 1,
             url                  => $worker->_get_gnome_git_url("gimp"),
@@ -367,7 +399,7 @@ App::gimpgitbuild::API::Worker - common API
 
 =head1 VERSION
 
-version 0.30.3
+version 0.32.0
 
 =head1 METHODS
 

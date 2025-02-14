@@ -1,6 +1,6 @@
 package Map::Tube::Line;
 
-$Map::Tube::Line::VERSION   = '3.92';
+$Map::Tube::Line::VERSION   = '3.93';
 $Map::Tube::Line::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Line - Class to represent the line in the map.
 
 =head1 VERSION
 
-Version 3.92
+Version 3.93
 
 =cut
 
@@ -166,7 +166,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2010 - 2025 Mohammad Sajid Anwar.
 
 This  program  is  free software;  you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You  may obtain a copy of the full

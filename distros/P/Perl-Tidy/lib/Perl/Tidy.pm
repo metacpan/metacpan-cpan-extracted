@@ -136,8 +136,13 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250105';
+    $VERSION = '20250214';
 } ## end BEGIN
+
+{
+    # List of hash keys to prevent -duk from listing them.
+    my @unique_hash_keys_uu = qw( html-toc-extension html-src-extension * );
+}
 
 sub DESTROY {
     my $self = shift;
@@ -3471,6 +3476,7 @@ sub generate_options {
     @option_string = qw(
       html!
       noprofile
+      nopro
       no-profile
       npro
       recombine!
@@ -3721,8 +3727,9 @@ sub generate_options {
     $add_option->( 'stack-opening-paren',                     'sop',   '!' );
     $add_option->( 'stack-opening-square-bracket',            'sosb',  '!' );
 
-    # FIXME: --vt and --vtc are actually expansions now, so these two lines
-    # should eventually be removed.
+    # NOTE: --vt and --vtc are actually expansions now, so these two lines
+    # might eventually be removed. But search for 'msdos' to see notes about
+    # an issue with 'msdos' that could be a problem if msdos is still used.
     $add_option->( 'vertical-tightness',         'vt',  '=i' );
     $add_option->( 'vertical-tightness-closing', 'vtc', '=i' );
 
@@ -3743,6 +3750,7 @@ sub generate_options {
     $add_option->( 'brace-left-list',                        'bll',   '=s' );
     $add_option->( 'brace-left-exclusion-list',              'blxl',  '=s' );
     $add_option->( 'break-after-labels',                     'bal',   '=i' );
+    $add_option->( 'pack-operator-types',                    'pot',   '=s' );
 
     # This was an experiment mentioned in git #78, originally named -bopl. I
     # expanded it to also open logical blocks, based on git discussion #100,
@@ -3781,6 +3789,7 @@ sub generate_options {
     $add_option->( 'long-block-line-count',           'lbl',  '=i' );
     $add_option->( 'maximum-consecutive-blank-lines', 'mbl',  '=i' );
     $add_option->( 'keep-old-blank-lines',            'kbl',  '=i' );
+    $add_option->( 'keep-old-blank-lines-exceptions', 'kblx', '=s' );
 
     $add_option->( 'keyword-group-blanks-list',         'kgbl', '=s' );
     $add_option->( 'keyword-group-blanks-size',         'kgbs', '=s' );
@@ -3817,6 +3826,8 @@ sub generate_options {
     $add_option->( 'want-call-parens',             'wcp',  '=s' );
     $add_option->( 'nowant-call-parens',           'nwcp', '=s' );
 
+    $add_option->( 'warn-unique-keys',                      'wuk',   '!' );
+    $add_option->( 'warn-unique-keys-cutoff',               'wukc',  '=i' );
     $add_option->( 'warn-mismatched-args',                  'wma',   '!' );
     $add_option->( 'warn-mismatched-arg-types',             'wmat',  '=s' );
     $add_option->( 'warn-mismatched-arg-undercount-cutoff', 'wmauc', '=i' );
@@ -3981,6 +3992,7 @@ sub generate_options {
       minimum-space-to-comment=4
       warn-mismatched-arg-undercount-cutoff=4
       warn-mismatched-arg-overcount-cutoff=1
+      warn-unique-keys-cutoff=1
       nobrace-left-and-indent
       nocuddled-else
       nodelete-old-whitespace
@@ -4156,9 +4168,10 @@ sub generate_options {
         'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
         'starting-indentation-level'                => [ 0, undef ],
         'timeout-in-seconds'                        => [ 0, undef ],
+        'valign-signed-numbers-limit'               => [ 0, undef ],
         'vertical-tightness'                        => [ 0, 2 ],
         'vertical-tightness-closing'                => [ 0, 3 ],
-        'valign-signed-numbers-limit'               => [ 0, undef ],
+        'warn-unique-keys-cutoff'                   => [ 1, undef ],
         'whitespace-cycle'                          => [ 0, undef ],
     );
 
@@ -4337,10 +4350,12 @@ sub generate_options {
         'vtc=0' => [qw(pvtc=0 bvtc=0 sbvtc=0)],
         'vtc=1' => [qw(pvtc=1 bvtc=1 sbvtc=1)],
         'vtc=2' => [qw(pvtc=2 bvtc=2 sbvtc=2)],
+        'vtc=3' => [qw(pvtc=3 bvtc=3 sbvtc=3)],
 
         'vertical-tightness-closing=0' => [qw(pvtc=0 bvtc=0 sbvtc=0)],
         'vertical-tightness-closing=1' => [qw(pvtc=1 bvtc=1 sbvtc=1)],
         'vertical-tightness-closing=2' => [qw(pvtc=2 bvtc=2 sbvtc=2)],
+        'vertical-tightness-closing=3' => [qw(pvtc=3 bvtc=3 sbvtc=3)],
 
         'otr'                   => [qw(opr ohbr osbr)],
         'opening-token-right'   => [qw(opr ohbr osbr)],
@@ -4570,7 +4585,7 @@ sub _process_command_line {
     foreach my $i (@ARGV) {
 
         $i =~ s/^--/-/;
-        if ( $i =~ /^-(npro|noprofile|no-profile)$/ ) {
+        if ( $i =~ /^-(npro|noprofile|nopro|no-profile)$/ ) {
             $saw_ignore_profile = 1;
         }
 

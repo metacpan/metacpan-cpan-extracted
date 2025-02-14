@@ -1,6 +1,6 @@
 # ABSTRACT: gimp build
 package App::gimpgitbuild;
-$App::gimpgitbuild::VERSION = '0.30.3';
+$App::gimpgitbuild::VERSION = '0.32.0';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ App-gimpgitbuild - build GIMP from git
 
 =head1 VERSION
 
-version 0.30.3
+version 0.32.0
 
 =head1 SYNOPSIS
 

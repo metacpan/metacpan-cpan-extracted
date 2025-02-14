@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.022;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Bible-OBML-Gateway",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Bible::OBML::Gateway",
   "PREREQ_PM" => {
     "Bible::OBML" => "2.06",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.09",
+  "VERSION" => "2.10",
   "test" => {
     "TESTS" => "t/*.t t/Bible/OBML/*.t"
   }

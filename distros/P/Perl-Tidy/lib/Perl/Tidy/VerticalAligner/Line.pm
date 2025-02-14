@@ -10,8 +10,13 @@ package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
 
-our $VERSION = '20250105';
+our $VERSION = '20250214';
 use English qw( -no_match_vars );
+
+{
+    # List of hash keys to prevent -duk from listing them.
+    my @unique_hash_keys_uu = qw( maximum_line_length );
+}
 
 sub AUTOLOAD {
 

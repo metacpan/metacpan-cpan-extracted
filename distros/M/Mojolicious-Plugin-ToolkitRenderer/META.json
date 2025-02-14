@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.010"
+            "perl" : "5.016"
          }
       },
       "develop" : {
@@ -38,7 +38,7 @@
             "Mojo::Base" : "0",
             "Mojo::Exception" : "0",
             "Template" : "0",
-            "perl" : "5.010",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -52,7 +52,7 @@
             "Test2::MojoX" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "perl" : "5.010"
+            "perl" : "5.016"
          }
       }
    },
@@ -68,9 +68,9 @@
          "web" : "https://github.com/gryphonshafer/Mojo-Plugin-Toolkit"
       }
    },
-   "version" : "1.12",
-   "x_generated_by_perl" : "v5.35.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "1.13",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -1,14 +1,14 @@
-# $Id: diag.t 561 2022-12-29 18:54:15Z whynot $
+# $Id: diag.t 564 2025-02-13 21:33:15Z whynot $
 # Copyright 2013, 2022 Eric Pozharski <whynot@pozharski.name>
+# Copyright 2025 Eric Pozharski <wayside.ultimate@tuta.io>
 # GNU GPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
 
 use strict;
 use warnings;
-use 5.010;
 
 package main;
-use version 0.77; our $VERSION = version->declare( v2.3.3 );
+use version 0.77; our $VERSION = version->declare( v2.3.4 );
 
 use t::TestSuite qw| :diag :wraps |;
 use Test::More tests => 25;
