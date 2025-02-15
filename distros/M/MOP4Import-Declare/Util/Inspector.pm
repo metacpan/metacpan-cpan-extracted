@@ -5,7 +5,10 @@ use warnings;
 use Carp;
 use MOP4Import::Base::CLI_JSON -as_base
   , [fields =>
-     [lib => doc => "library directory list. SCALAR, ARRAY or ':' separated STRING"]
+     [lib =>
+      doc => "library directory list. SCALAR, ARRAY or ':' separated STRING",
+      zsh_completer => ": :_directories",
+    ]
    ];
 
 use MOP4Import::NamedCodeAttributes ();

@@ -10,11 +10,10 @@ use File::Which;
 
 use EBook::Ishmael::EBook;
 
-unless (
-	defined which 'pdftohtml' and
-	defined which 'pdfinfo'
-) {
-	plan skip_all => "Poppler utils are not installed";
+my $TEST_PDF = $ENV{TEST_PDF} // (defined which('pdftohtml') and defined which('pdfinfo'));
+
+unless ($TEST_PDF) {
+	plan skip_all => "TEST_PDF set to 0, or poppler utils are not installed";
 }
 
 my $PDF = File::Spec->catfile(qw/t data gpl3.pdf/);

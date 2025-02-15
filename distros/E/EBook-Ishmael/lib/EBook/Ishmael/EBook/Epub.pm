@@ -1,9 +1,10 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
+use Cwd;
 use File::Basename;
 use File::Path;
 use File::Spec;
@@ -33,6 +34,24 @@ sub heuristic {
 	close $fh;
 
 	return $mag eq $MAGIC;
+}
+
+# Archive::Zip does not support unzipping files to symlinked directories for
+# security reasons. This poses a problem on some platforms such as Darwin, as
+# their temporary directory is symlinked. This sub tries to find a suitable
+# directory for unzipping.
+sub _tmpdir {
+
+	if (not -l File::Spec->tmpdir) {
+		return tempdir(CLEANUP => 1);
+	# If tmpdir is not available, try working directory.
+	} elsif (! -l cwd and -r cwd) {
+		return tempdir(DIR => cwd, CLEANUP => 1);
+	# Can't think of anything else :-/
+	} else {
+		die "Could not find a suitable extract directory for EPUB\n";
+	}
+
 }
 
 # Set _rootfile based on container.xml's rootfile@full-path attribute.
@@ -194,7 +213,7 @@ sub read {
 		$m->unixFileAttributes($m->isDirectory() ? 0755 : 0644);
 	}
 
-	my $tmpdir = tempdir("shiori.XXXXXX", TMPDIR => 1, CLEANUP => 1);
+	my $tmpdir = _tmpdir;
 
 	unless ($zip->extractTree('', $tmpdir) == AZ_OK) {
 		die "Could not unzip $src to $tmpdir\n";

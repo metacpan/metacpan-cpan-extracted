@@ -50,6 +50,20 @@ sub request {
 	my ($self, %params) = @_;
 	my $url = URI->new($self->base_url . $params{url});
 	my $res;
+
+	my $stream_cb = delete $params{data}{stream_cb};
+	$self->ua->remove_handler();
+	if ($stream_cb) {
+		$self->ua->add_handler(response_data => sub {
+			my($response, $ua, $handler, $data) = @_; 
+			$data = $self->json->decode($data);
+			for (@{$data}) {
+				$stream_cb->(WebService::Ollama::Response->new(%{$_}));
+			}
+			return 1;
+		});
+	}
+
 	if ($params{type} eq 'GET') { 
 		$url->query_form($params{data});
 		$res = $self->ua->get($url);

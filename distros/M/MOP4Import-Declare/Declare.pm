@@ -3,7 +3,7 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 use Carp;
 use mro qw/c3/;
 

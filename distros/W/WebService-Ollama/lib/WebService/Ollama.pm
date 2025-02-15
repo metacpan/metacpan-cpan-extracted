@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moo;
 
@@ -238,7 +238,7 @@ WebService::Ollama - ollama client
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -251,9 +251,16 @@ Version 0.03
 
 	$ollama->load_completion_model;
 
+	my $string = "";
+
 	my $why = $ollama->completion(
 		prompt => 'Why is the sky blue?',
-	);
+		stream => 1,
+		stream_cb => sub {
+			my ($res) = @_;
+			$string .= $res->response;
+		}
+	); # returns all chunked responses as an array
 
 	$ollama->unload_completion_model;
 
@@ -312,6 +319,10 @@ name of the model to create
 =item stream
 
 (optional) if false the response will be returned as a single response object, rather than a stream of objects
+
+=item stream_cb
+
+(optional) cb to handle stream data
 
 =item quantize
 
@@ -460,6 +471,10 @@ the prompt template to use (overrides what is defined in the Modelfile)
 =item stream
 
 if false the response will be returned as a single response object, rather than a stream of objects
+
+=item stream_cb
+
+(optional) cb to handle stream data
 
 =item raw
 

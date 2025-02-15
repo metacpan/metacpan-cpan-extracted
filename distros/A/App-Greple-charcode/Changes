@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9906 2025-02-14T11:47:25Z
+
+    - implement alias module -Mcc for -Mcharcode
+    - introduce "utf8" and "utf16" parameter
+    - add examples
+
 0.9905 2025-02-11T06:00:26Z
 
     - change param "align" to "alignto"

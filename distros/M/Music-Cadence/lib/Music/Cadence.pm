@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1507';
+our $VERSION = '0.1510';
 
 use Moo;
 use strictures 2;
@@ -302,14 +302,13 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1507
+version 0.1510
 
 =head1 SYNOPSIS
 
   use Music::Cadence;
 
   my $mc = Music::Cadence->new;
-
   my $chords = $mc->cadence;
   # [G B D], [C E G C]
 
@@ -335,7 +334,6 @@ version 0.1507
     key    => 'C#',
     octave => 5,
   );
-
   $chords = $mc->cadence;
   # [G#5 C5 D#5], [C#5 F5 G#5 C#6]
 
@@ -344,7 +342,6 @@ version 0.1507
     octave => 5,
     format => 'midi',
   );
-
   $chords = $mc->cadence;
   # [Gs5 C5 Ds5], [Cs5 F5 Gs5 Cs6]
 
@@ -374,8 +371,8 @@ version 0.1507
 
 C<Music::Cadence> generates a pair of musical cadence chords.
 
-These chords are added to the end of a musical phrase, and are used to
-suggest a sense of anticipation, pause, finality, etc.
+These chords are often added to the end of a musical phrase, and are
+used to suggest a sense of anticipation, pause, finality, etc.
 
 =head1 ATTRIBUTES
 
@@ -459,9 +456,8 @@ Default: C<0>
 
 =head2 new
 
-  $mc = Music::Cadence->new;  # Use defaults
-
-  $mc = Music::Cadence->new(  # Override defaults
+  $mc = Music::Cadence->new; # Use defaults
+  $mc = Music::Cadence->new( # Override defaults
     key     => $key,
     scale   => $scale,
     octave  => $octave,
@@ -475,7 +471,6 @@ Create a new C<Music::Cadence> object.
 =head2 cadence
 
   $chords = $mc->cadence;     # Use defaults
-
   $chords = $mc->cadence(     # Override defaults
     key       => $key,        # See above
     scale     => $scale,      # "
@@ -606,11 +601,11 @@ L<https://www.musictheory.net/lessons/55>
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Gene Boggs.
+This software is copyright (c) 2019-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

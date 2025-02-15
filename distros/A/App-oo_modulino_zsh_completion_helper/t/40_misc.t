@@ -26,7 +26,8 @@ is_deeply(
   [
     qw(Foo::Bar::Baz),
     "$testDir/lib",
-    1
+    1,
+    '' # $is_class
  ], "find_package_from_pm should resolve symlink"
 );
 

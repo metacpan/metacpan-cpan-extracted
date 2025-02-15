@@ -39,7 +39,7 @@ provides:
     file: Base/JSON.pm
   MOP4Import::Declare:
     file: Declare.pm
-    version: '0.061'
+    version: '0.062'
   MOP4Import::Declare::Type:
     file: Declare/Type.pm
   MOP4Import::FieldSpec:
@@ -87,5 +87,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/perl-mop4import-declare
-version: '0.061'
+version: '0.062'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

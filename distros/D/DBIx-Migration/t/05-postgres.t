@@ -10,7 +10,7 @@ use Test::Fatal qw( dies_ok );
 use Test::PgTAP import => [ qw( tables_are ) ];
 
 eval { require Test::PostgreSQL };
-plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
+plan skip_all => 'Test::PostgreSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
@@ -37,7 +37,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
   plan tests => 2;
 
   is $m->version, 0, 'check version';
-  tables_are [ 'dbix_migration' ], 'check tables';
+  tables_are [ 'public.dbix_migration' ], 'check tables';
 };
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
@@ -64,7 +64,7 @@ $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
 $target_version = 2;
-ok $m->migrate, 'migrate to newest version';
+ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 
 $target_version = 0;

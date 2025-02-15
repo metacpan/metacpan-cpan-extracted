@@ -58,7 +58,7 @@ $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
 $target_version = 2;
-ok $m->migrate, 'migrate to newest version';
+ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 
 $target_version = 0;

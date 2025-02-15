@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -266,7 +266,7 @@ developer documentation).
 
 =head1 METHODS
 
-=head2 $i = EBook::Ishmael->new()
+=head2 $i = EBook::Ishmael->init()
 
 Reads C<@ARGV> and returns a blessed C<EBook::Ishmael> object. Consult the
 manual for L<ishmael> for a list of options that are available.
@@ -293,7 +293,7 @@ Dump the HTML-ified contents of a given ebook, C<--html> mode.
 
 =head2 $i->run()
 
-Runs L<ishmael> based on the parameters processed during C<new()>.
+Runs L<ishmael> based on the parameters processed during C<init()>.
 
 =head1 AUTHOR
 

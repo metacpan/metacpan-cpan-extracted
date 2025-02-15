@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.94  2025-02-14T22::00+00:00
+      - Fixed the dist package.
+
 3.93  2025-02-13T13:25:00+00:00
       - Improved malformed data error, thanks @gwselke.
       https://rt.cpan.org/Ticket/Display.html?id=159293

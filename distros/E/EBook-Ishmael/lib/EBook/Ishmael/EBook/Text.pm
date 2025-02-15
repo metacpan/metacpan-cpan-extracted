@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -10,14 +10,15 @@ use File::Spec;
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::TextToHtml;
 
-# Check for txt suffix, as that is the only indicator that a file is just a
-# text file that I can think of.
+# Use -T to check if file is a text file. EBook.pm's ebook_id() makes sure
+# to use the Text heuristic last, so that it doesn't incorrectly identify other
+# plain text ebook formats as just text.
 sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
 
-	return $file =~ /\.txt$/;
+	return -T $file;
 
 }
 

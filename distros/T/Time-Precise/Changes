@@ -16,3 +16,5 @@ Revision history for Time-Precise
   Added functions localtime_ts and gmtime_ts to get a timestamp SQL style.
 1.0014  2025-02-04
   Removed microseconds from _ts frunctions when $Time::Precise::PRECISION is zero.
+1.0016  2025-02-14
+  Fixed a test case that was failing in different time zones.

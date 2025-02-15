@@ -58,6 +58,8 @@ t/examples/t_Case05.pm
 t/examples/t_Case1.pm
 t/examples/t_Case2.pm
 t/examples/t_Foo.pm
+t/examples/wo_m4i_class_meth_att.pm
+t/examples/wo_m4i_method_att1.pm
 t/t_Case1.pm
 t/t_lib.pl
 t/t_lib.pm

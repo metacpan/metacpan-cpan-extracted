@@ -22,7 +22,7 @@
       },
       "runtime" : {
          "requires" : {
-            "MOP4Import::Declare" : "0.061",
+            "MOP4Import::Declare" : "0.062",
             "Module::Runtime" : "0",
             "perl" : "5.010"
          }
@@ -37,7 +37,7 @@
    "provides" : {
       "App::oo_modulino_zsh_completion_helper" : {
          "file" : "lib/App/oo_modulino_zsh_completion_helper.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "url" : "https://github.com/hkoba/perl-App-oo_modulino_zsh_completion_helper.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -97452,3 +97452,14 @@ U/UT/UTASHIRO/Text-ANSI-Fold-2.30.tar.gz
 G/GR/GRYPHON/Unit-Duration-1.04.tar.gz
 G/GR/GRYPHON/Util-CommandLine-1.08.tar.gz
 N/NH/NHORNE/Weather-Meteo-0.10.tar.gz
+U/UT/UTASHIRO/App-Greple-charcode-0.9906.tar.gz
+H/HK/HKOBA/App-oo_modulino_zsh_completion_helper-0.06.tar.gz
+S/SV/SVW/DBIx-Migration-0.12.tar.gz
+S/SA/SAMYOUNG/EBook-Ishmael-0.04.tar.gz
+M/MA/MANWAR/Map-Tube-3.94.tar.gz
+H/HK/HKOBA/MOP4Import-Declare-0.062.tar.gz
+G/GE/GENE/Music-Cadence-0.1510.tar.gz
+Z/ZA/ZARABOZO/Time-Precise-1.0016.tar.gz
+N/NH/NHORNE/Weather-Meteo-0.11.tar.gz
+L/LN/LNATION/WebService-Jina-0.02.tar.gz
+L/LN/LNATION/WebService-Ollama-0.04.tar.gz

@@ -14,6 +14,7 @@ t/carp.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
+t/limiting.t
 t/links.t
 t/no404s.t
 t/noplan.t

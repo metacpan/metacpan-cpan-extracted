@@ -8,7 +8,7 @@ use Time::HiRes;
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK $PRECISION );
 use subs qw(localtime gmtime time sleep );
-$VERSION   = '1.0014';
+$VERSION   = '1.0016';
 
 @ISA    = qw(Exporter);
 @EXPORT = qw(time localtime gmtime sleep timegm timelocal is_valid_date is_leap_year time_hashref gmtime_hashref get_time_from get_gmtime_from localtime_ts gmtime_ts);

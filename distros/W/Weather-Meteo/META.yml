@@ -32,16 +32,19 @@ no_index:
     - t
     - inc
 requires:
+  CHI: '0'
   Encode: '0'
+  ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Scalar::Util: '0'
+  Time::HiRes: '0'
   URI: '0'
   constant: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/Weather-Meteo/issues
   repository: git://github.com/nigelhorne/Weather-Meteo.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

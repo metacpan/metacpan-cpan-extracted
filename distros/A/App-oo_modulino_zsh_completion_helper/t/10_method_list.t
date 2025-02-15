@@ -48,4 +48,16 @@ END
 
 }
 
+SKIP: {
+  skip "requires v5.38", 1 unless $] >= 5.038;
+
+  my $testFn = "$FindBin::Bin/../samples/1-methods/lib/GreetingsClass.pm";
+
+  is(scalar qx($^X $cmdFn zsh_methods pmfile $testFn)
+     , <<END, "All *methods* in the Class");
+hello
+hi
+END
+}
+
 done_testing();

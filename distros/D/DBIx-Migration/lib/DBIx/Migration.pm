@@ -3,7 +3,7 @@ use warnings;
 
 package DBIx::Migration;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use subs 'dbh';
 
@@ -45,7 +45,7 @@ sub _build_dbh {
 sub migrate {
   my ( $self, $wanted ) = @_;
 
-  $wanted = $self->_newest unless defined $wanted;
+  $wanted = $self->_latest unless defined $wanted;
 
   my $fatal_error;
   my $return_value = Try::Tiny::try {
@@ -152,20 +152,20 @@ sub _files {
   return ( @files and @$need == @files ) ? \@files : undef;
 }
 
-sub _newest {
+sub _latest {
   my $self = shift;
 
   opendir( my $dh, $self->dir )
     or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
-  my $newest = 0;
+  my $latest = 0;
   while ( my $file = readdir( $dh ) ) {
     next unless $file =~ /_up\.sql\z/;
     $file =~ /\D*(\d+)_up.sql\z/;
-    $newest = $1 if $1 > $newest;
+    $latest = $1 if $1 > $latest;
   }
   closedir( $dh );
 
-  return $newest;
+  return $latest;
 }
 
 sub _create_migration_table {

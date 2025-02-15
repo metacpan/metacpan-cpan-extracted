@@ -1,9 +1,15 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.12 Fri Feb 14 10:34:02 CET 2025
+        - Improve internal Test::PgTAP test functions
+        - Use SERIAL instead of GENERATED AS IDENTITY in PostgreSQL related
+          trigger test to make CPAN testers happy
+        - Introduce CLI sub module to be able to test dbix-migration script
+
 0.11 Fri Feb  7 17:12:55 CET 2025
         - Change the object system
         - Fix removal of SQL comments
-        - Add "dbix_migration_delimiter" annotation
+        - Add dbix_migration_delimiter annotation
 
 0.10 Fri Feb  7 10:11:04 CET 2025
         - Add API test
@@ -46,7 +52,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Fixed the multiple sql statement bug
 
 0.02  2005-10-24 01:00:00
-        - Default to newest version
+        - Default to latest version
 
 0.01  2005-10-24 00:00:00
         - First release

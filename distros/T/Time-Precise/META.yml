@@ -22,5 +22,5 @@ no_index:
 requires:
   Time::HiRes: '0'
   perl: '5.006'
-version: '1.0014'
+version: '1.0016'
 x_serialization_backend: YAML::XS version v0.902.0

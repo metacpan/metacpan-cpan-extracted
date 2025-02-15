@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -77,11 +77,14 @@ WriteMakefile(
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'constant' => 0,
+		'CHI' => 0,
 		'Encode' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
 		'Scalar::Util' => 0,
+		'Time::HiRes' => 0,
 		'URI' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Weather-Meteo-*' },

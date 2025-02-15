@@ -1,0 +1,85 @@
+=pod
+
+=head1 NAME
+
+dbix-migration - Seamless database up- and downgrades
+
+=head1 VERSION
+
+0.11
+
+=head1 SYNOPSIS
+
+=over
+
+=item dbix-migration [ B<-V> | B<-h> ]
+
+=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] I<dsn> [ I<directory> [ I<version> ] ]
+
+=back
+
+=head1 DESCRIPTION
+
+This script prints the current migration version if invoked with the I<dsn>
+argument only. The script applies the migrations up to the given target
+I<version> if the I<direction> and I<version> arguments are specified too. If
+the I<version> is missing the latest migration version will be used.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-V> Print version information and exit.
+
+=item B<-h> Print long help message and exit.
+
+=item B<-v> Print verbose information.
+
+=item B<-u> I<username> Set database username.
+
+=item B<-p> I<password> Set database password.
+
+=back
+
+=head1 ARGUMENTS
+
+=over
+
+=item I<dsn> Data source name.
+
+=item I<directory> Directory that contains the migrations.
+
+=item I<version> Version to migrate to. If not specified the latest migration will be taken.
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item run()
+
+Executes this script.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIx::Migration>
+
+=head1 AUTHOR
+
+Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Sven Willenbuecher, <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2005 Sebastian Riedel. All rights reserved.
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

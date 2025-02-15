@@ -23,10 +23,11 @@ no_index:
 requires:
   Archive::Zip: '0'
   Compress::Zlib: '0'
+  Cwd: '0'
   File::Basename: '0'
   File::Path: '0'
   File::Spec: '0'
-  File::Temp: '0'
+  File::Temp: '0.10'
   File::Which: '0'
   JSON: '0'
   List::Util: '0'
@@ -35,5 +36,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/ishmael/issues
   repository: https://codeberg.org/1-1sam/ishmael.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

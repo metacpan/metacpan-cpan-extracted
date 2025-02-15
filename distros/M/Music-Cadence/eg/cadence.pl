@@ -5,10 +5,10 @@
 use strict;
 use warnings;
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-ToRoman);
 use MIDI::Util qw(setup_score);
 use Music::Cadence;
 use Music::Scales;
+use Music::VoiceGen;
 
 my $max    = shift || 16;
 my $note   = shift || 'C';
@@ -34,9 +34,15 @@ my $mc = Music::Cadence->new(
     format => 'midinum',
 );
 
+my $voice = Music::VoiceGen->new(
+    pitches   => \@scale,
+    intervals => [qw/-4 -3 -2 2 3 4/],
+);
+#use Data::Dumper; warn Dumper $voice->possibles; exit;
+
 for my $i ( 1 .. $max ) {
     # Get a random selection of scale notes and add them to the score
-    my @notes = map { $scale[ int rand @scale ] } 1 .. 2;
+    my @notes = map { $voice->rand } 1 .. 2;
     $score->n( $quarter, $_ ) for @notes;
 
     # Add a half cadence after every 4th iteration

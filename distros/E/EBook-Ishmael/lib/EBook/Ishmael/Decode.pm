@@ -1,6 +1,6 @@
 package EBook::Ishmael::Decode;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ EBook::Ishmael::Decode - Ebook decoding routines
 
 B<EBook::Ishmael::Decode> is a module that provides subroutines for decoding
 various kinds of encoded ebook text. For L<ishmael> user documentation, you
-consult its manual (this is developer documentation).
+should consult its manual (this is developer documentation).
 
 =head1 SUBROUTINES
 

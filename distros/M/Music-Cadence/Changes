@@ -1,5 +1,14 @@
 Revision history for Music-Cadence
 
+0.1510 2025-02-14 23:43:39
+    - Improve the eg/cadence.pl program.
+
+0.1509 2025-02-14 20:54:51
+    - Lose local author lib line in eg/.
+    - Modernize test suite.
+
+0.1508 ... Whoops!
+
 0.1507 2023-06-03 16:48:38
     - Improve documentation.
 

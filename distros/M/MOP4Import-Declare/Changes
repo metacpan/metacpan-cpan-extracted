@@ -1,5 +1,8 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.062 2025-02-15
+    * GH-96 - Fix info_code_attributes_of to detect builtin attributes like `:method` too.
+
 0.061 2025-02-02
     * GH-95 - new pragma `[code_attributes => @names]`
     * GH-93 - MOP4Import::Declare now respects `@EXPORT`

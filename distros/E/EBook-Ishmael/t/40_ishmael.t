@@ -11,13 +11,14 @@ use File::Which;
 use EBook::Ishmael;
 use EBook::Ishmael::TextBrowserDump;
 
+my $TEST_PDF = $ENV{TEST_PDF} // (defined which('pdftohtml') and which('pdfinfo'));
+
 my @FILES = map { File::Spec->catfile(qw(t data), $_) } qw(
 	gpl3.epub gpl3.fb2 gpl3.html gpl3.mobi gpl3.pdb gpl3.txt gpl3.xhtml
 	gpl3.ztxt
 );
 
-# Only test PDF if required utilities are installed.
-if (defined which('pdftohtml') and defined which('pdfinfo')) {
+if ($TEST_PDF) {
 	push @FILES, File::Spec->catfile(qw(t data gpl3.pdf));
 }
 

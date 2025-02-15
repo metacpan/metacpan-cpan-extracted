@@ -58,12 +58,42 @@ my $testDir = "$FindBin::Bin/examples";
     )], "list_options_of";
 
   is_deeply $inspector->info_code_attributes_of(t_Case1 => "cmd_foo")
-    , +{Doc => q(this is foo command)}
+    , +{Doc => q(this is foo command), method => 1}
     , "info_code_attributes_of(t_Case1 => cmd_foo)";
+
+  is_deeply $inspector->info_code_attributes_of(t_Case1 => "bar")
+    , +{Doc => q(bar), method => 1}
+    , "info_code_attributes_of(t_Case1 => bar)";
+
+  is_deeply $inspector->info_code_attributes_of(t_Case1 => "baz")
+    , +{Doc => q(baz)}
+    , "info_code_attributes_of(t_Case1 => baz)";
+
+  is_deeply $inspector->info_code_attributes_of(t_Case1 => "qux")
+    , +{method => 1}
+    , "info_code_attributes_of(t_Case1 => qux)";
+
+  is_deeply $inspector->info_code_attributes_of(t_Case1 => "QuuuuuuX")
+    , +{}
+    , "info_code_attributes_of(t_Case1 => QuuuuuuX)";
 
   is_deeply $inspector->info_code_attributes_of(t_Case1 => "onconfigure_bar")
     , +{Doc => q(bar option), ZshCompleter => q(:filename:_files)}
     , "info_code_attributes_of(t_Case1 => onconfigure_bar)";
+}
+
+SKIP: {
+  skip "requires v5.38", 1 unless $] >= 5.038;
+
+  my $inspector = MOP4Import::Util::Inspector->new(lib => $testDir);
+
+  is_deeply $inspector->info_code_attributes_of(wo_m4i_method_att1 => "foo")
+    , +{method => 1}
+    , "info_code_attributes_of(wo_m4i_method_att1 => foo)";
+
+  is_deeply $inspector->info_code_attributes_of(wo_m4i_method_att1 => "bar")
+    , +{}
+    , "info_code_attributes_of(wo_m4i_method_att1 => bar)";
 }
 
 {
@@ -81,4 +111,15 @@ Options from t_Case1:
   --bar           bar option
 }, "output of cmd_help";
 }
+
+{
+  my $inspector = MOP4Import::Util::Inspector->new(lib => $testDir);
+
+  is_deeply $inspector->info_code_attributes_of(wo_m4i_method_att1 => 'foo')
+    , +{method => 1}, "info_code_attributes_of() can detect :method attribute";
+
+  is_deeply $inspector->info_code_attributes_of(wo_m4i_method_att1 => 'bar')
+    , +{}, "info_code_attributes_of() returns empty hash if no attributes found";
+}
+
 done_testing;

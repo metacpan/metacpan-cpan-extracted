@@ -17,7 +17,7 @@ DBIx::Migration - Seamless database schema up- and downgrades
   # Migrate database to version 1
   $m->migrate( 1 );
 
-  # Migrate database to the newest/highest version
+  # Migrate database to the latest version
   $m->migrate;
 
   # ~/Projects/myapp/db/migrations/schema_1_up.sql
@@ -68,7 +68,7 @@ previous example it is the "/" (slash) character.
 
 =head1 METHODS
 
-=over 4
+=over
 
 =item $self->debug( $debug )
 
@@ -89,7 +89,7 @@ Get/Set dbh.
 =item $self->migrate( $version )
 
 Migrate database to version. Returns true in case of success; otherwise false.
-If called without the version argument the newest migration version will be
+If called without the version argument the latest migration version will be
 used.
 
 =item $self->password( $password )
@@ -121,7 +121,22 @@ compatibility.
 
 =item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-=item * L<Using pgTAP|https://pgtap.org/documentation.html#usingpgtap>
+=back
+
+=head1 TODOS
+
+=over
+
+=item *
+
+Make the C<DBIx::Migration> class immutable (get rid of setters). It is
+unclear how to handle C<$dir>. This change would break the backwards
+compatibility.
+
+=item *
+
+Implement proper logging. Printing debug information to stdout conflicts with
+the stdout output of C<DBIx::Migration::CLI>.
 
 =back
 

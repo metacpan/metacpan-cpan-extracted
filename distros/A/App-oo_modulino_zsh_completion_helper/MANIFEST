@@ -12,6 +12,7 @@ README.md
 samples/1-methods/lib/Derived.pm
 samples/1-methods/lib/Greetings.pm
 samples/1-methods/lib/Greetings_oo_modulino.pm
+samples/1-methods/lib/GreetingsClass.pm
 samples/2-options/lib/Derived.pm
 samples/2-options/lib/Greetings_oo_modulino_with_fields.pm
 samples/3-mop4import-declare/Greetings_CLI_JSON.pm

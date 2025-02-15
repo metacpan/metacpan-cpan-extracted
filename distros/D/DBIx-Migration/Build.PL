@@ -18,6 +18,7 @@ my $build = Module::Build->new(
     'Test::Deep'        => 0,
     'Test::Fatal'       => 0,
     'Test::More'        => 1.001005,    # Subtests accept args
+    'Test::Output'      => 0,
     'Test::PostgreSQL'  => 0
   },
   recommends => {
@@ -31,6 +32,8 @@ my $build = Module::Build->new(
     'DBI'         => 1.33,              # DBI::clone() is in use
     'File::Slurp' => 0,
     'File::Spec'  => 0,
+    'Pod::Find'   => 0,
+    'Pod::Usage'  => 1.64,
     'Try::Tiny'   => 0
   },
   create_readme => 1,

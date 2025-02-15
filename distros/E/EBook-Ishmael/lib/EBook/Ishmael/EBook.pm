@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -24,7 +24,14 @@ sub ebook_id {
 
 	my $file = shift;
 
-	for my $f (sort keys %EBOOK_FORMATS) {
+	for my $f (
+		# Make sure text is last
+		sort {
+			return  1 if $a eq 'text';
+			return -1 if $b eq 'text';
+			return $a cmp $b;
+		} keys %EBOOK_FORMATS
+	) {
 
 		if ($EBOOK_FORMATS{ $f }->heuristic($file)) {
 			return $f;

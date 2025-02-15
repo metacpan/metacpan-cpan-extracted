@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Carp;
+use CHI;
 use JSON::MaybeXS;
 use LWP::UserAgent;
 use Scalar::Util;
+use Time::HiRes;
 use URI;
 
 use constant FIRST_YEAR => 1940;
@@ -17,11 +19,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -33,6 +35,35 @@ The module supports object-oriented usage and allows customization of the HTTP u
 
       my $meteo = Weather::Meteo->new();
       my $weather = $meteo->weather({ latitude => 0.1, longitude => 0.2, date => '2022-12-25' });
+
+=over 4
+
+=item * Caching
+
+Identical requests are cached (using L<CHI> or a user-supplied caching object),
+reducing the number of HTTP requests to the API and speeding up repeated queries.
+
+This module leverages L<CHI> for caching geocoding responses.
+When a geocode request is made,
+a cache key is constructed from the request.
+If a cached response exists,
+it is returned immediately,
+avoiding unnecessary API calls.
+
+=item * Rate-Limiting
+
+A minimum interval between successive API calls can be enforced to ensure that the API is not overwhelmed and to comply with any request throttling requirements.
+
+Rate-limiting is implemented using L<Time::HiRes>.
+A minimum interval between API
+calls can be specified via the C<min_interval> parameter in the constructor.
+Before making an API call,
+the module checks how much time has elapsed since the
+last request and,
+if necessary,
+sleeps for the remaining time.
+
+=back
 
 =head1 METHODS
 
@@ -47,6 +78,34 @@ The module supports object-oriented usage and allows customization of the HTTP u
     my @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
+
+Creates a new instance. Acceptable options include:
+
+=over 4
+
+=item * C<cache>
+
+A caching object.
+If not provided,
+an in-memory cache is created with a default expiration of one hour.
+
+=item * C<host>
+
+The API host endpoint.
+Defaults to L<https://archive-api.open-meteo.com>.
+
+=item * C<min_interval>
+
+Minimum number of seconds to wait between API requests.
+Defaults to C<0> (no delay).
+Use this option to enforce rate-limiting.
+
+=item * C<ua>
+
+An object to use for HTTP requests.
+If not provided, a default user agent is created.
+
+=back
 
 =cut
 
@@ -69,15 +128,29 @@ sub new {
 	}
 	my $host = $args{host} || 'archive-api.open-meteo.com';
 
-	return bless { ua => $ua, host => $host }, $class;
+	# Set up caching (default to an in-memory cache if none provided)
+	my $cache = $args{cache} || CHI->new(
+		driver => 'Memory',
+		global => 1,
+		expires_in => '1 day',
+	);
+
+	# Set up rate-limiting: minimum interval between requests (in seconds)
+	my $min_interval = $args{min_interval} || 0;	# default: no delay
+
+	return bless {
+		min_interval => $min_interval,
+		last_request => 0,	# Initialize last_request timestamp
+		%args,
+		cache => $cache,
+		host => $host,
+		ua => $ua
+	}, $class;
 }
 
 =head2 weather
 
     use Geo::Location::Point;
-
-The date argument can be an ISO-8601 formatted date,
-or an object that understands the strftime method.
 
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
@@ -89,6 +162,9 @@ or an object that understands the strftime method.
     use DateTime;
     my $dt = DateTime->new(year => 2024, month => 2, day => 1);
     $weather = $meteo->weather({ location => $ramsgate, date => $dt });
+
+The date argument can be an ISO-8601 formatted date,
+or an object that understands the strftime method.
 
 Takes an optional argument, tz, which defaults to 'Europe/London'.
 For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
@@ -102,7 +178,8 @@ sub weather
 
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
-	} elsif((@_ == 2) && Scalar::Util::blessed($_[0]) && ($_[0]->can('latitude'))) {
+	} elsif((scalar(@_) == 2) && Scalar::Util::blessed($_[0]) && ($_[0]->can('latitude'))) {
+		# Two arguments - a location object and a date
 		my $location = $_[0];
 		$param{latitude} = $location->latitude();
 		$param{longitude} = $location->longitude();
@@ -128,13 +205,21 @@ sub weather
 		$latitude = $location->latitude();
 		$longitude = $location->longitude();
 	}
-	if((!defined($latitude)) || (!defined($longitude))) {
+	if((!defined($latitude)) || (!defined($longitude)) || (!defined($date))) {
 		Carp::croak('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD")');
 		return;
 	}
 
+	# Handle numbers starting with a decimal point
+	if($latitude =~ /^\./) {
+		$latitude = "0$latitude";
+	}
+	if($longitude =~ /^\./) {
+		$longitude = "0$longitude";
+	}
+
 	if(($latitude !~ /^-?\d+(\.\d+)?$/) || ($longitude !~ /^-?\d+(\.\d+)?$/)) {
-		Carp::croak(__PACKAGE__, ': Invalid latitude/longitude format');
+		Carp::croak(__PACKAGE__, ": Invalid latitude/longitude format ($latitude, $longitude)");
 	}
 
 	if(Scalar::Util::blessed($date) && $date->can('strftime')) {
@@ -169,7 +254,23 @@ sub weather
 
 	$url =~ s/%2C/,/g;
 
+	# Create a cache key based on the location, date and time zone (might want to use a stronger hash function if needed)
+	my $cache_key = "weather:$latitude:$longitude:$date:$tz";
+	if(my $cached = $self->{cache}->get($cache_key)) {
+		return $cached;
+	}
+
+	# Enforce rate-limiting: ensure at least min_interval seconds between requests
+	my $now = time();
+	my $elapsed = $now - $self->{last_request};
+	if($elapsed < $self->{min_interval}) {
+		Time::HiRes::sleep($self->{min_interval} - $elapsed);
+	}
+
 	my $res = $self->{ua}->get($url);
+
+	# Update last_request timestamp
+	$self->{last_request} = time();
 
 	if($res->is_error()) {
 		Carp::carp(ref($self), ": $url API returned error: ", $res->status_line());
@@ -190,6 +291,9 @@ sub weather
 			return;
 		}
 		if(defined($rc->{'hourly'})) {
+			# Cache the result before returning it
+			$self->{'cache'}->set($cache_key, $rc);
+
 			return $rc;	# No support for list context, yet
 		}
 	}

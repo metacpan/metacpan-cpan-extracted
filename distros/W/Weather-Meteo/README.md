@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -16,6 +16,31 @@ The module supports object-oriented usage and allows customization of the HTTP u
 
       my $meteo = Weather::Meteo->new();
       my $weather = $meteo->weather({ latitude => 0.1, longitude => 0.2, date => '2022-12-25' });
+
+- Caching
+
+    Identical requests are cached (using [CHI](https://metacpan.org/pod/CHI) or a user-supplied caching object),
+    reducing the number of HTTP requests to the API and speeding up repeated queries.
+
+    This module leverages [CHI](https://metacpan.org/pod/CHI) for caching geocoding responses.
+    When a geocode request is made,
+    a cache key is constructed from the request.
+    If a cached response exists,
+    it is returned immediately,
+    avoiding unnecessary API calls.
+
+- Rate-Limiting
+
+    A minimum interval between successive API calls can be enforced to ensure that the API is not overwhelmed and to comply with any request throttling requirements.
+
+    Rate-limiting is implemented using [Time::HiRes](https://metacpan.org/pod/Time%3A%3AHiRes).
+    A minimum interval between API
+    calls can be specified via the `min_interval` parameter in the constructor.
+    Before making an API call,
+    the module checks how much time has elapsed since the
+    last request and,
+    if necessary,
+    sleeps for the remaining time.
 
 # METHODS
 
@@ -31,12 +56,33 @@ The module supports object-oriented usage and allows customization of the HTTP u
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 
+Creates a new instance. Acceptable options include:
+
+- `cache`
+
+    A caching object.
+    If not provided,
+    an in-memory cache is created with a default expiration of one hour.
+
+- `host`
+
+    The API host endpoint.
+    Defaults to [https://archive-api.open-meteo.com](https://archive-api.open-meteo.com).
+
+- `min_interval`
+
+    Minimum number of seconds to wait between API requests.
+    Defaults to `0` (no delay).
+    Use this option to enforce rate-limiting.
+
+- `ua`
+
+    An object to use for HTTP requests.
+    If not provided, a default user agent is created.
+
 ## weather
 
     use Geo::Location::Point;
-
-The date argument can be an ISO-8601 formatted date,
-or an object that understands the strftime method.
 
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
@@ -48,6 +94,9 @@ or an object that understands the strftime method.
     use DateTime;
     my $dt = DateTime->new(year => 2024, month => 2, day => 1);
     $weather = $meteo->weather({ location => $ramsgate, date => $dt });
+
+The date argument can be an ISO-8601 formatted date,
+or an object that understands the strftime method.
 
 Takes an optional argument, tz, which defaults to 'Europe/London'.
 For that to work set TIMEZONEDB\_KEY to be your API key from [https://timezonedb.com](https://timezonedb.com).

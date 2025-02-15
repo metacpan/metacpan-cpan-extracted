@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Metadata;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -296,7 +296,7 @@ Returns a plain hash ref of the object's metadata.
 
 =head2 Accessors
 
-Each accessor method is a both a setter and getter. When ran with no arguments,
+Each accessor method is both a setter and getter. When ran with no arguments,
 returns the array ref currently in the field. When ran with an array ref as
 argument, sets that field to the given array ref.
 

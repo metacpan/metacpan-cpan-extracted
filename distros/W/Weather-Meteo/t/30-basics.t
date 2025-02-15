@@ -43,7 +43,12 @@ $mock_ua->mock(get => sub {
 	return $response;
 });
 
+# Clear the cache to force using the invalid response
+cmp_ok(ref($meteo->{'cache'}->get('weather:51.34:1.42:2022-12-25:Europe/London')), 'eq', 'HASH');
+$meteo->{'cache'}->remove('weather:51.34:1.42:2022-12-25:Europe/London');
+
 my $json_fail = $meteo->weather({ latitude => 51.34, longitude => 1.42, date => '2022-12-25' });
 ok(!defined($json_fail), 'Invalid JSON response handled correctly');
+diag(Data::Dumper->new([$json_fail])->Dump()) if($json_fail);
 
 done_testing();

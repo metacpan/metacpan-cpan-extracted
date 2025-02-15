@@ -13,7 +13,7 @@ SYNOPSIS
       # Migrate database to version 1
       $m->migrate( 1 );
 
-      # Migrate database to the newest/highest version
+      # Migrate database to the latest version
       $m->migrate;
 
       # ~/Projects/myapp/db/migrations/schema_1_up.sql
@@ -78,7 +78,7 @@ METHODS
 
     $self->migrate( $version )
         Migrate database to version. Returns true in case of success;
-        otherwise false. If called without the version argument the newest
+        otherwise false. If called without the version argument the latest
         migration version will be used.
 
     $self->password( $password )
@@ -103,7 +103,13 @@ SEE ALSO
     *   Liquibase endDelimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-    *   Using pgTAP <https://pgtap.org/documentation.html#usingpgtap>
+TODOS
+    *   Make the "DBIx::Migration" class immutable (get rid of setters). It
+        is unclear how to handle $dir. This change would break the backwards
+        compatibility.
+
+    *   Implement proper logging. Printing debug information to stdout
+        conflicts with the stdout output of "DBIx::Migration::CLI".
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

@@ -1,5 +1,21 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.04  Feb 14 2025
+  Added:
+    - Support for TEST_PDF environment variable in tests. This allows you to
+      force enable/disable tests for PDFs regardless of whether poppler utils
+      are installed or not.
+  Changes:
+    - Introduced Cwd dependency.
+    - Specified File::Temp version 0.10 as minimum required version.
+  Improvements:
+    - More accurate text heuristic.
+  Fixes:
+    - Try to unzip epub to working directory if temporary directory is
+      symlinked, as Archive::Zip does not support unzipping to symlinked
+      directories. This was primarily an issue with Darwin platforms.
+    - Corrected some documentation errors.
+
 0.03  Feb 11 2025
   Changes:
     - ishmael now uses a format-agnostic interface for handling ebook metadata.

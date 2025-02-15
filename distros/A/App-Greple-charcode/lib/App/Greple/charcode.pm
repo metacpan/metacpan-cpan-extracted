@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9905";
+our $VERSION = "0.9906";
 
 =encoding utf-8
 
@@ -53,16 +53,23 @@ B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<command option> ] ...
     --config KEY[=VALUE],...
              (KEY: column char width code name visible align)
 
+B<greple> B<-Mcc> ...
+
+B<greple> B<-Mcc> [ I<module option> ] -- [ I<command option> ] ...
+
+    -Mcc           alias module for -Mcharcode
+
 =head1 VERSION
 
-Version 0.9905
+Version 0.9906
 
 =head1 DESCRIPTION
 
-C<App::Greple::charcode> displays Unicode information about the
-matched characters.  It can also visualize zero-width combining or
-hidden characters, which can be useful for examining text containing
-visually indistinguishable or imperceptible elements.
+Greple module C<-Mcharcode> (or C<-Mcc> for short) displays
+information about the matched characters.  It can also visualize
+Unicode zero-width combining or hidden characters, which can be useful
+for examining text containing visually indistinguishable or
+imperceptible elements.
 
 The following output, retrieved from this document for non-ASCII
 characters (C<\P{ASCII}>), shows that the character C<\N{VARIATION
@@ -299,6 +306,32 @@ line option C<--annotate::config>.
 
     greple -Mannotate --annotate::config alignto=80 ...
 
+=head1 EXAMPLES
+
+=head2 HOMOGLYPH
+
+    greple -Mcc -P ASCII --align-side --cm=S t/homoglyph
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
+</p>
+
+=head2 BOX DRAWINGS
+
+    perldoc -m App::ansicolumn::Border | greple -Mline -Mcc --code -- --outstand --mc=10,
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/box-drawing.png">
+</p>
+
+=head2 AYNU ITAK
+
+    greple -Mcc --outstand --split t/ainu.txt
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/aynu.png">
+</p>
+
 =head1 INSTALL
 
     cpanm -n App::Greple::charcode
@@ -324,19 +357,25 @@ Kazumasa Utashiro
 
 =cut
 
+use Exporter 'import';
+our @EXPORT_OK = qw(config);
+our %EXPORT_TAGS = (alias => \@EXPORT_OK);
+
+use Encode qw(encode decode);
 use Getopt::EX::Config;
 use Hash::Util qw(lock_keys);
 use Data::Dumper;
+use Text::ANSI::Fold::Util qw(ansi_width);
 
 use App::Greple::annotate;
 
-our $opt_annotate = 0;
-
 our $config = Getopt::EX::Config->new(
     column  => 1,
+    visible => 1,
     char    => 0,
     width   => 0,
-    visible => 1,
+    utf8    => 0,
+    utf16   => 0,
     code    => 0,
     name    => 1,
     alignto => \$App::Greple::annotate::config->{alignto},
@@ -345,6 +384,10 @@ our $config = Getopt::EX::Config->new(
 my %type = ( alignto => '=i', '*' => '!' );
 lock_keys %{$config};
 
+our %CONFIG_TAGS = (
+    field => [ qw(column visible char width utf8 utf16 code name) ],
+);
+
 sub finalize {
     our($mod, $argv) = @_;
     $config->deal_with(
@@ -352,10 +395,17 @@ sub finalize {
 	(
 	    map {
 		my $type = $type{$_} // $type{'*'};
-		( $_.$type => ref $config->{$_} ? $config->{$_} : \$config->{$_} ) ;
+		my $ref = ref $config->{$_} ? $config->{$_} : \$config->{$_};
+		( $_.$type => $ref ) ;
 	    }
 	    keys %{$config}
 	),
+	'all:1' => sub {
+	    for ($CONFIG_TAGS{field}->@*) {
+		my $ref = ref $config->{$_} ? $config->{$_} : \$config->{$_};
+		$$ref = $_[1];
+	    }
+	},
     );
 }
 
@@ -363,7 +413,7 @@ use Unicode::UCD qw(charinfo);
 
 sub charname {
     local $_ = @_ ? shift : $_;
-    s/(.)/name($1)/ger;
+    s/(.)/name($1)/sger;
 }
 
 sub name {
@@ -372,8 +422,21 @@ sub name {
 }
 
 sub charcode {
-    local $_ = @_ ? shift : $_;
-    state $format = [ qw(\x{%02x} \x{%04x}) ];
+    local *_ = @_ ? \$_[0] : \$_;
+    s/(.)/code($1)/ger;
+}
+
+sub utf8 {
+    utf('UTF-8', @_);
+}
+
+sub utf16 {
+    utf('UTF-16', @_);
+}
+
+sub utf {
+    my $code = shift;
+    local $_ = encode($code, @_ ? shift : $_);
     s/(.)/code($1)/ger;
 }
 
@@ -394,7 +457,7 @@ my %cmap = (
 );
 
 sub control {
-    local $_ = @_ ? shift : $_;
+    local $_ = @_ ? $_[0] : $_;
     if (s/\A([\t\n\r\f\b\a\e])/$cmap{$1}/e) {
 	$_;
     } elsif (s/\A([\x00-\x1f])/sprintf "\\c%c", ord($1)+0x40/e) {
@@ -404,31 +467,35 @@ sub control {
     }
 }
 
+my $invisible_re = $ENV{INVISIBLE_RE} = qr/[^\pL\pN\pP\pS]/;
+
 sub visible {
-    local $_ = @_ ? shift : $_;
-    s{([^\pL\pN\pP\pS])}{control($1)}ger;
+    local *_ = @_ ? \$_[0] : \$_;
+    s{($invisible_re)}{control($1)}ger;
+}
+
+sub width {
+    local *_ = @_ ? \$_[0] : \$_;
+    ansi_width($_);
 }
 
 sub describe {
-    local $_ = shift;
+    my %param = @_;
+    my $column = $param{column};
+    local $_   = $param{match};
     my @s;
-    push @s, "{$_}"                         if $config->{char};
-    push @s, sprintf("\\w{%d}", vwidth($_)) if $config->{width};
-    push @s, visible($_)                    if $config->{visible};
-    push @s, join '', map { charcode } /./g if $config->{code};
-    push @s, join '', map { charname } /./g if $config->{name};
+    push @s, sprintf("%3d ", $column)     if $config->{column};
+    push @s, sprintf("%s", visible)       if $config->{visible};
+    push @s, sprintf("raw=\"%s\"", $_)    if $config->{char};
+    push @s, sprintf("w=%d", width)       if $config->{width};
+    push @s, sprintf("utf8=%s", utf8)     if $config->{utf8};
+    push @s, sprintf("utf16=%s", utf16)   if $config->{utf16};
+    push @s, sprintf("code=%s", charcode) if $config->{code};
+    push @s, sprintf("name=%s", charname) if $config->{name};
     join "\N{NBSP}", @s;
 }
 
-sub annotate {
-    my %param = @_;
-    my $annon = '';
-    $annon .= sprintf("%3d ", $param{column}) if $config->{column};
-    $annon .= describe($param{match});
-    $annon;
-}
-
-$App::Greple::annotate::ANNOTATE = \&annotate;
+$App::Greple::annotate::ANNOTATE = \&describe;
 
 1;
 
@@ -461,6 +528,9 @@ option --noncanon    --decomposition-type=NonCanon
 option --combined \
     --precomposed --composite
 
+option --INVISIBLE --cm=N -E '$ENV{INVISIBLE_RE}'
+option --invisible --cm=N -E '(?!\p{Blank}|\R)$ENV{INVISIBLE_RE}'
+
 option --outstand \
     --combined -E '(?#outstand)(?=\P{ASCII})\X'
 
@@ -483,8 +553,11 @@ expand --visible-option \
     --charcode::config code=0,name=0,visible=1 \
     --cm=N
 
+option --ansicode-raw \
+    -E '(?#ansicode)(?:ANSI-RESET)+|(?:ANSI-CSI)'
+
 option --ansicode \
-    --visible-option -E '(?#ansicode)(?:ANSI-RESET)+|(?:ANSI-CSI)'
+    --visible-option --ansicode-raw
 
 option --ansicode-each \
     --visible-option -E ANSI-CSI

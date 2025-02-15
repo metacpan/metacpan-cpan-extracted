@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Skeleton;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 

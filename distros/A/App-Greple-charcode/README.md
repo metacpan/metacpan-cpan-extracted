@@ -46,16 +46,23 @@ App::Greple::charcode - greple module to annotate unicode character data
       --config KEY[=VALUE],...
                (KEY: column char width code name visible align)
 
+**greple** **-Mcc** ...
+
+**greple** **-Mcc** \[ _module option_ \] -- \[ _command option_ \] ...
+
+    -Mcc           alias module for -Mcharcode
+
 # VERSION
 
-Version 0.9905
+Version 0.9906
 
 # DESCRIPTION
 
-`App::Greple::charcode` displays Unicode information about the
-matched characters.  It can also visualize zero-width combining or
-hidden characters, which can be useful for examining text containing
-visually indistinguishable or imperceptible elements.
+Greple module `-Mcharcode` (or `-Mcc` for short) displays
+information about the matched characters.  It can also visualize
+Unicode zero-width combining or hidden characters, which can be useful
+for examining text containing visually indistinguishable or
+imperceptible elements.
 
 The following output, retrieved from this document for non-ASCII
 characters (`\P{ASCII}`), shows that the character `\N{VARIATION
@@ -275,6 +282,38 @@ Module-specific `---config` option can be called by normal command
 line option `--annotate::config`.
 
     greple -Mannotate --annotate::config alignto=80 ...
+
+# EXAMPLES
+
+## HOMOGLYPH
+
+    greple -Mcc -P ASCII --align-side --cm=S t/homoglyph
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
+    </p>
+</div>
+
+## BOX DRAWINGS
+
+    perldoc -m App::ansicolumn::Border | greple -Mline -Mcc --code -- --outstand --mc=10,
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/box-drawing.png">
+    </p>
+</div>
+
+## AYNU ITAK
+
+    greple -Mcc --outstand --split t/ainu.txt
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/aynu.png">
+    </p>
+</div>
 
 # INSTALL
 

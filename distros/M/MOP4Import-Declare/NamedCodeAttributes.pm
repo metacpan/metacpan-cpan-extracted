@@ -21,8 +21,16 @@ use MOP4Import::Opts;
 my %named_code_attributes;
 
 sub MODIFY_CODE_ATTRIBUTES {
-  my $pack = shift;
   my $caller = [caller(1)];
+  (undef, my ($filename, $lineno)) = @$caller;
+  print "\n\n### Got CODE_ATTR at file $filename line $lineno: "
+    . MOP4Import::Util::terse_dump(@_[2..$#_])."\n\n"
+    if DEBUG;
+
+  # Call m4i_CODE_ATTR_dict to make sure builtin atts are registered.
+  m4i_CODE_ATTR_dict($_[0], $_[1]);
+
+  my $pack = shift;
   m4i_CODE_ATTR_dispatch($pack, $caller, @_);
 }
 
@@ -40,12 +48,14 @@ sub FETCH_CODE_ATTRIBUTES {
   } keys %$atts;
 }
 
+sub _fetch_builtin_attrs {
+  # Sorry for using the internal function, but I need this.
+  attributes::_fetch_attrs($_[0]);
+}
+
 sub m4i_CODE_ATTR_dispatch {
   my ($pack, $caller, $code, @attrs) = @_;
   (undef, my ($filename, $lineno)) = @$caller;
-  print "\n\n### Got CODE_ATTR at file $filename line $lineno: "
-    . MOP4Import::Util::terse_dump(@attrs)."\n\n"
-    if DEBUG;
   my @unknowns;
   foreach my $attStr (@attrs) {
     my ($attName, $text) = $attStr =~ m{^([A-Z]\w*)(?:\((.*)\))?\z}s or do {
@@ -81,7 +91,21 @@ sub m4i_CODE_ATTR_add {
 
 sub m4i_CODE_ATTR_dict {
   my ($_pack, $code) = @_;
-  $named_code_attributes{$code};
+
+  $named_code_attributes{$code} //= do {
+    my $atts = +{};
+
+    # To make sure infinite recursion of FETCH_CODE_ATTRIBUTES,
+    # I want to avoid calling attributes::get($code) here.
+    foreach my $attDesc (_fetch_builtin_attrs($code)) {
+      my ($name, $value) = $attDesc =~ m{^([^\(]+)([\(].*)?\z}
+        or Carp::croak "Can't parse attribute $attDesc";
+      $value =~ s/^\(|\)\z//g if defined $value;
+      $atts->{$name} = $value // 1;
+    }
+
+    $atts;
+  };
 }
 
 sub m4i_CODE_ATTR_get {

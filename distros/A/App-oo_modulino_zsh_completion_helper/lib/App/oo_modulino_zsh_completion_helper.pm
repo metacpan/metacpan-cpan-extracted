@@ -4,10 +4,16 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use MOP4Import::Base::CLI_JSON -as_base
-  , [fields => [eol => default => "\n"]]
+  , [fields =>
+     [eol => default => "\n"],
+     [lib =>
+      doc => "library directory list. SCALAR, ARRAY or ':' separated STRING",
+      zsh_completer => ": :_directories",
+    ],
+   ]
   ;
 
 use MOP4Import::FieldSpec;
@@ -23,8 +29,9 @@ use MOP4Import::Types
   ;
 
 sub cli_inspector {
+  (my MY $self) = @_;
   require MOP4Import::Util::Inspector;
-  'MOP4Import::Util::Inspector'->new;
+  'MOP4Import::Util::Inspector'->new(lib => $self->{lib});
 }
 
 sub onconfigure_zero {
@@ -87,7 +94,8 @@ sub zsh_methods {
 
   my ZshParams $opts = \%opts;
 
-  my ($targetClass, $has_shbang) = $self->load_module_from_pm($opts->{pmfile})
+  my ($targetClass, $has_shbang, $is_class)
+    = $self->load_module_from_pm($opts->{pmfile})
     or Carp::croak "Can't extract class name from $opts->{pmfile}";
 
   my $insp = $self->cli_inspector;
@@ -100,8 +108,16 @@ sub zsh_methods {
   # one universal_argument => find superclasses too.
   # two universal_argument => find all methods including getters, new,...
 
-  my @gather_default = (($methodPrefix || (($universal_argument || 0) >= 4*4))
-                        ? (all => 1) : (no_getter => 1));
+  my @gather_default = (is_class => $is_class, do {
+    if ($methodPrefix || (($universal_argument || 0) >= 4*4)) {
+      (all => 1)
+    } else {
+      (no_getter => 1,
+       ($is_class ? (method_only => 1) : ()),
+     )
+    }
+  });
+
   my @methods = $self->gather_methods_from($targetClass, undef, @gather_default);
   if ($methodPrefix or $universal_argument) {
     my %seen; $seen{$_} = 1 for @methods;
@@ -139,11 +155,20 @@ sub gather_methods_from {
   (my MY $self, my $targetClass, my $seenDict, my %opts) = @_;
   my $no_getter = delete $opts{no_getter};
   my $all       = delete $opts{all};
+  my $meth_only = delete $opts{method_only};
+  my $is_class  = delete $opts{is_class};
+  if (%opts) {
+    Carp::croak "Unknown options: ".join(", ", keys %opts);
+  }
+  $self->cli_inspector->require_module($targetClass);
   MOP4Import::Util::function_names(
     from => $targetClass,
     matching => qr{^(?:cmd_)?[a-z]},
     grep => sub {
       my ($realName, $code) = @_;
+      if ($is_class and $_ eq "new") {
+        return 0;
+      }
       s/^cmd_//;
       if ($seenDict->{$_}++) {
         return 0;
@@ -156,7 +181,12 @@ sub gather_methods_from {
       }
       if ($all) {
         return 1;
-      } else {
+      }
+      elsif ($meth_only) {
+        return 0
+          if not $self->cli_inspector->info_code_attribute(method => $code);
+      }
+      else {
         return 0 if MOP4Import::Base::Configure->can($_);
       }
       if ($no_getter) {
@@ -172,7 +202,8 @@ sub gather_methods_from {
 sub load_module_from_pm {
   (my MY $self, my $pmFile) = @_;
 
-  my ($modname, $libpath, $has_shbang) = $self->find_package_from_pm($pmFile)
+  my ($modname, $libpath, $has_shbang, $is_class)
+    = $self->find_package_from_pm($pmFile)
     or Carp::croak "Can't find module name and library root from $pmFile'";
 
   {
@@ -180,7 +211,7 @@ sub load_module_from_pm {
     Module::Runtime::require_module($modname);
   }
 
-  wantarray ? ($modname, $has_shbang) : $modname;
+  wantarray ? ($modname, $has_shbang, $is_class) : $modname;
 }
 
 sub find_package_from_pm {
@@ -201,15 +232,23 @@ sub find_package_from_pm {
   my $has_shbang = m{^\#!};
 
   while (/(?:^|\n) [\ \t]*     (?# line beginning + space)
-	  package  [\n\ \t]+   (?# newline is allowed here)
-	  ([\w:]+)             (?# module name)
-	  \s* [;\{]            (?# statement or block)
-	 /xsg) {
-    my ($modname) = $1;
+
+          (?<keyword> package|class)  [\n\ \t]+
+                               (?# newline is allowed here)
+
+          (?<modName> [\w:]+)
+                               (?# module name)
+          \s* [;\{]            (?# statement or block)
+         /xsg) {
+
+    my $modname = $+{modName};
+    my $is_class = $+{keyword} eq "class";
 
     # Tail of $modname should be equal to it's rootname.
     if (my $libprefix = $self->test_modname_with_path($modname, \@dir)) {
-      return wantarray ? ($modname, $libprefix, $has_shbang) : $modname;
+      return wantarray
+        ? ($modname, $libprefix, $has_shbang, $is_class)
+        : $modname;
     }
   }
   return;

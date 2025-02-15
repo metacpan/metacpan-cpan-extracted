@@ -1,6 +1,6 @@
 -- dbix_migration_delimiter:/ bar
-CREATE TABLE product_price_changes (
-  id INT GENERATED ALWAYS AS IDENTITY,
+CREATE TABLE myschema.product_price_changes (
+  id SERIAL,
   product_id INT NOT NULL,
   old_price NUMERIC(10,2) NOT NULL,
   new_price NUMERIC(10,2) NOT NULL,
@@ -8,13 +8,13 @@ CREATE TABLE product_price_changes (
 );
 /
 -- some usual comment
-CREATE OR REPLACE FUNCTION log_price_changes()
+CREATE OR REPLACE FUNCTION myschema.log_price_changes()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL
 AS $$
 BEGIN
   IF NEW.price <> OLD.price THEN
-    INSERT INTO product_price_changes(product_id,old_price,new_price,changed_on)
+    INSERT INTO myschema.product_price_changes(product_id,old_price,new_price,changed_on)
     VALUES(OLD.id,OLD.price,NEW.price,now());
   END IF;
 
@@ -24,6 +24,6 @@ $$
 /
 CREATE TRIGGER price_changes
   BEFORE UPDATE
-  ON products
+  ON myschema.products
   FOR EACH ROW
-  EXECUTE FUNCTION log_price_changes();
+  EXECUTE FUNCTION myschema.log_price_changes();

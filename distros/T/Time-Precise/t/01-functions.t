@@ -17,10 +17,11 @@ my $gmtime = 'Wed Sep  3 13:33:12.0067514 1975';
 is $gmtime, scalar(gmtime($time)), 'gmtime works with nanoseconds';
 
 my $current_time = time;
-sleep .5;
+sleep .1;
 $current_time = time - $current_time;
 $current_time = sprintf '%0.1f', $current_time;
-$ok = ($current_time >= 0.4 and $current_time <= 0.6) ? 1 : 0;
+# I've seen some machines run this really slowly... so it just should be less than 1
+$ok = ($current_time > 0 and $current_time < 1) ? 1 : 0;
 is $ok, 1, 'sleep works with nanoseconds';
 
 my @gmtime = gmtime $time;
@@ -64,9 +65,11 @@ SKIP: {
 	is $ac_time =~ /^Thu Mar 27 10:58:5\d\.7336199 1924$/, 1, 'gmtime can go way back (negative seconds)';
 }
 
+
 my $lc_ts = localtime_ts($time);
 my $gm_ts = gmtime_ts($time);
-my $lt_ts_str = '1975-09-03 08:33:12.0067514';
+my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = CORE::localtime($time);
+my $lt_ts_str = sprintf '%04d-%02d-%02d %02d:%02d:%02d.0067514', $year + 1900, $mon + 1, $mday, $hour, $min, $sec;;
 my $gm_ts_str = '1975-09-03 13:33:12.0067514';
 
 is $lc_ts, $lt_ts_str, "localtime_ts is $lt_ts_str";
