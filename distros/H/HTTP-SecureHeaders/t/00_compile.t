@@ -1,9 +1,7 @@
-use strict;
-use Test::More 0.98;
+use Test2::V0;
 
-use_ok $_ for qw(
-    HTTP::SecureHeaders
-);
+use HTTP::SecureHeaders;
+
+pass;
 
 done_testing;
-

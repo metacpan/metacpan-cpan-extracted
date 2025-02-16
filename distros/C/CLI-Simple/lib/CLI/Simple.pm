@@ -1,5 +1,7 @@
 package CLI::Simple;
 
+# a Simple, Fast & Easy way to create scripts
+
 use strict;
 use warnings;
 
@@ -15,7 +17,7 @@ use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
 use CLI::Simple::Utils qw(normalize_options);
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
 use parent qw(Class::Accessor::Fast Exporter);
 
@@ -77,7 +79,7 @@ sub new {
 
   my $stash = \%{ $class . $DOUBLE_COLON };
 
-  local (*alias);    ## no critic
+  local (*alias);
 
   use vars qw($DEFAULT_OPTIONS $EXTRA_OPTIONS $OPTION_SPECS $COMMANDS $LOGGING);
 
@@ -91,9 +93,8 @@ sub new {
   $option_specs    //= $OPTION_SPECS;
   $commands        //= $COMMANDS;
 
-  croak 'usage: '
-    . $class
-    . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
+  croak sprintf
+    "error: both 'option_specs' and 'command' are required\n:usage: %s->new( option_specs => specs, commands => commands);\n"
     if !$option_specs || !$commands;
 
   $default_options //= {};
@@ -125,7 +126,13 @@ sub new {
 
   my $self = $class->SUPER::new( \%cli_options );
 
-  $self->set__command( shift @ARGV // $EMPTY );
+  my $command = shift @ARGV // 'default';
+
+  if ( $command eq 'help' || ( $self->can('get_help') && $self->get_help ) ) {
+    $self->usage;
+  }
+
+  $self->set__command($command);
 
   $self->set__command_args( [@ARGV] );
 
@@ -271,14 +278,14 @@ CLI::Simple - a framework for creating option driven Perl scripts
  sub list { 
    my ($self) = @_
 
-   # retrieve a command argument with name
-   my $file = $self->get_arg(qw(file));
+   # retrieve a command argument
+   my ($file) = $self->get_args();
    ...
  }
 
  sub main {
   CLI::Simple->new(
-   option_specs    => [ qw( help formt=s ) ],
+   option_specs    => [ qw( help format=s ) ],
    default_options => { format => 'json' }, # set some defaults
    extra_options   => [ qw( content ) ], # non-option, setter/getter
    commands        => { execute => \&execute, list => \&list,  }
@@ -293,7 +300,7 @@ scripts? Want a standard, simple way to create a Perl script?
 C<CLI::Simple> makes it easy to create scripts that take I<options>,
 I<commands> and I<arguments>.
 
-This documentation describes version 0.0.7.
+This documentation describes version 0.0.8.
 
 =head2 Features
 
@@ -419,17 +426,23 @@ the script return code.
 
 =head2 get_args
 
- get_args(var-name, ... );
+Return the arguments that follow the command.
 
-In scalar context returns a reference to the hash of arguments. In
-array context will return a list of key/value pairs.
+ get_args(var-name, ... )
+ get_args()
+
+With arguments, in scalar context returns a reference to the hash of
+arguments by assigning each positional argument to a key value.  In
+array context returns a list of key/value pairs.
+
+With no arguments returns the array of command arguments.
 
 Example:
 
  sub send_message {
    my ($self) = @_;
 
-   my (%args) = $self->get_args(qw(message email));
+   my %args = $self->get_args(qw(message email));
    
    _send_message($arg{message}, $args{email});
 
@@ -643,7 +656,7 @@ a script or test harness for your class.
 To make it easy to use such a module, I've created a C<bash> script that
 calls the module with the arguments passed on the command line.
 
-The script (C<modulino>) is include in this distribution.
+The script (C<modulino>) is included in this distribution.
 
 You can also use the included C<create-modulino.pl> script to create a
 symbolic link to your class that will be executed as if it is a Perl
@@ -690,6 +703,6 @@ L<Getopt::Long>, L<CLI::Simple::Utils>
 
 =head1 AUTHOR
 
-Rob Lauer - <rlauer6@comcast.net>
+Rob Lauer - <bigfoot@cpan.org>
 
 =cut

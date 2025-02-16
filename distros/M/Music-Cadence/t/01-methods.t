@@ -10,6 +10,7 @@ use_ok 'Music::Cadence';
 subtest defaults => sub {
     my $mc = new_ok 'Music::Cadence';
 
+    is $mc->verbose, 0, 'default verbose';
     is $mc->key, 'C', 'default key';
     is $mc->scale, 'major', 'default scale';
     is $mc->octave, 0, 'default octave';

@@ -5,7 +5,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Sub::Middler',
     VERSION_FROM      => 'lib/Sub/Middler.pm', 
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+
+        "Export::These"=>0
+    
+      }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Sub/Middler.pm', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
     LICENSE           => 'mit',
@@ -17,7 +21,7 @@ WriteMakefile(
           repository =>{
             type => "git",
             url => "git://github.com/drclaw1394/perl-sub-middler.git",
-            web => "http://github.com/drclaw1394/perl-sub-middler",
+            web => "https://github.com/drclaw1394/perl-sub-middler",
           }
         }
       }

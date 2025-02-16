@@ -7,27 +7,15 @@ use File::Basename;
 use DateTime::Format::ISO8601;
 use Carp;
 
-extends 'SReview::Files::Access::Base';
+use SReview::Files::Collection::Net;
+
+extends 'SReview::Files::Access::Net';
 
 has 's3object' => (
 	is => 'ro',
 	required => 1,
 	isa => 'Net::Amazon::S3::Bucket',
 );
-
-has '+filename' => (
-	predicate => 'has_download',
-);
-
-has 'workdir' => (
-	is => 'ro',
-	lazy => 1,
-	builder => '_get_workdir',
-);
-
-sub _get_workdir {
-	return tempdir(CLEANUP => 1);
-}
 
 sub _get_file {
 	my $self = shift;
@@ -36,6 +24,9 @@ sub _get_file {
 	my $dir = $self->workdir;
 
 	if($self->has_data) {
+                if($self->download_verbose) {
+                        print "downloading " . $self->relname . " to " . $self->filename . "\n";
+                }
 		my ($fh, $file) = tempfile("s3-XXXXXX", dir => $dir, SUFFIX => ".$ext");
 		$self->s3object->get_key_filename($self->relname, "GET", $file);
 		return $file;
@@ -52,13 +43,13 @@ sub _probe_mtime {
 	return DateTime::Format::ISO8601->parse_datetime($meta->{last_modified});
 }
 
-sub _probe_basepath {
-	return shift->workdir;
-}
-
 sub store_file {
 	my $self = shift;
 	return if(!$self->has_download);
+
+        if($self->download_verbose) {
+                print "uploading " . $self->filename . " to " . $self->onhost_pathname . " via s3\n";
+        }
 
 	$self->s3object->add_key_filename($self->relname, $self->filename, {}) or croak($self->s3object->errstr);
 
@@ -70,22 +61,6 @@ sub delete {
 	$self->s3object->delete_key($self->relname)
 }
 
-sub valid_path_filename {
-	my $self = shift;
-
-	my $path = join('/', $self->workdir, $self->relname);
-	make_path(dirname($path));
-	symlink($self->filename, $path);
-	return $path;
-}
-
-sub DEMOLISH {
-	my $self = shift;
-	if($self->has_download) {
-		unlink($self->filename);
-	}
-}
-
 no Moose;
 
 package SReview::Files::Collection::S3;
@@ -95,7 +70,7 @@ use Net::Amazon::S3;
 use DateTime::Format::ISO8601;
 use SReview::Config::Common;
 
-extends "SReview::Files::Collection::Base";
+extends "SReview::Files::Collection::Net";
 
 has 's3object' => (
 	is => 'ro',
@@ -145,6 +120,7 @@ sub _probe_children {
 				baseurl => $self->baseurl,
 				mtime => DateTime::Format::ISO8601->parse_datetime($key->{last_modified}),
 				relname => $key->{key},
+                                download_verbose => $self->download_verbose
 			);
 		}
 	};

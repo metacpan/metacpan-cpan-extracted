@@ -1,22 +1,33 @@
 package SReview::Web::Controller::Talk;
 
+use strict;
+use warnings;
+
+use feature "signatures";
+no warnings "experimental::signatures";
+
 use Mojo::Base 'Mojolicious::Controller';
-use SReview::API::Helpers qw/db_query update_with_json add_with_json/;
+use SReview::API::Helpers qw/db_query update_with_json add_with_json is_authed/;
 use Mojo::Util 'slugify';
 use Mojo::JSON qw/encode_json decode_json/;
 use DateTime::Format::Pg;
 
 use SReview::Talk;
 
-sub format_talks {
-	my $talks = shift;
+sub format_talks($c, $talks) {
 	foreach my $talk(@$talks) {
 		$talk->{starttime} = DateTime::Format::Pg->parse_datetime($talk->{starttime})->iso8601();
 		$talk->{endtime} = DateTime::Format::Pg->parse_datetime($talk->{endtime})->iso8601();
 		if($talk->{flags}) {
 			$talk->{flags} = decode_json($talk->{flags});
 		}
+                if(!is_authed($c)) {
+                        delete($talk->{nonce});
+                        delete($talk->{reviewer});
+                        delete($talk->{comments});
+                }
 	}
+	
 	return $talks;
 }
 
@@ -36,13 +47,31 @@ sub listByEvent {
 	my $event = db_query($c->dbh, "SELECT id FROM events WHERE id = ?", $eventId);
 
 	if(scalar(@$event) < 1) {
-		$c->res->code(404);
-		$c->render(text => "not found");
+                $c->render(openapi => { errors => [ { message => 'not found' } ] }, status => 404);
 		return;
 	}
 
 	my $res = db_query($c->dbh, "SELECT talks.* FROM talks WHERE event = ?", $eventId);
-	$res = format_talks($res);
+	$res = format_talks($c, $res);
+
+	$c->render(openapi => $res);
+}
+
+sub talksByState {
+        my $c = shift->openapi->valid_input or return;
+
+	my $eventId = $c->param("eventId");
+	my $state = $c->param("state");
+
+	my $event = db_query($c->dbh, "SELECT id FROM events WHERE id = ?", $eventId);
+
+	if(scalar(@$event) < 1) {
+                $c->render(openapi => { errors => [ { message => 'not found' } ] }, status => 404);
+		return;
+	}
+
+	my $res = db_query($c->dbh, "SELECT talks.* FROM talks WHERE event = ? AND state = ?", $eventId, $state);
+	$res = format_talks($c, $res);
 
 	$c->render(openapi => $res);
 }
@@ -55,8 +84,7 @@ sub add {
 	my $event = db_query($c->dbh, "SELECT id FROM events WHERE id = ?", $eventId);
 
 	if(scalar(@$event) < 1) {
-		$c->res->code(404);
-		$c->render(text => "Event not found");
+                $c->render(openapi => { errors => [ { message => 'Event not found' } ] }, status => 404);
 		return;
 	}
 
@@ -78,8 +106,7 @@ sub update {
 	my $talk_check = db_query($c->dbh, "SELECT id FROM talks WHERE id = ? AND event = ?", $talkId, $eventId);
 
 	if(scalar(@$talk_check) < 1) {
-		$c->res->code(404);
-		$c->render(text => 'Talk not found in given event');
+                $c->render(openapi => { errors => [ { message => 'Talk not found in given event' } ] }, status => 404);
 		return;
 	}
 
@@ -103,8 +130,7 @@ sub delete {
 	my $event = db_query($c->dbh, "SELECT id FROM events WHERE id = ?", $eventId);
 
 	if(scalar(@$event) < 1) {
-		$c->res->code(404);
-		$c->render(text => 'Event not found');
+                $c->render(openapi => { errors => [ { message => 'Event not found' } ] }, status => 404);
 		return;
 	}
 
@@ -120,8 +146,7 @@ sub setSpeakers {
 	my $event = db_query($c->dbh, "SELECT id FROM talks WHERE id = ? AND event = ?", $talkId, $eventId);
 
 	if(scalar(@$event) < 1) {
-		$c->res->code(404);
-		$c->render(text => 'Event or talk not found');
+                $c->render(openapi => { errors => [ { message => 'Event or talk not found' } ] }, status => 404);
 		return;
 	}
 
@@ -141,15 +166,13 @@ sub setSpeakers {
 	foreach my $speakerId(@$speakers) {
 		my $speaker = db_query($dbh, 'SELECT id FROM speakers WHERE id = ?', $speakerId);
 		if(scalar(@$speaker) < 1) {
-			$c->res->code(404);
-			$c->render(text => 'Speaker not found');
+                        $c->render(openapi => { errors => [ { message => 'Speaker not found' } ] }, status => 404);
 			$dbh->rollback;
 			return;
 		}
 		db_query($dbh, 'INSERT INTO speakers_talks(speaker, talk) VALUES(?, ?) RETURNING speaker', $speakerId, $talkId);
 		if($dbh->err) {
-			$c->res->code(400);
-			$c->render(text => 'Could not add speaker:' . $dbh->errmsg);
+                        $c->render(openapi => { errors => [ { message => 'Could not add speaker:' . $dbh->errmsg } ] }, status => 400);
 			$dbh->rollback;
 			return;
 		}
@@ -171,16 +194,14 @@ sub addSpeakers {
 	my $event = db_query($c->dbh, "SELECT id FROM talks WHERE event = ? AND id = ?", $eventId, $talkId);
 
 	if(scalar(@$event) < 1) {
-		$c->res->code(404);
-		$c->render(text => 'Event or talk not found');
+                $c->render(openapi => { errors => [ { message => 'Event or talk not found' } ] }, status => 404);
 		return;
 	}
 
 	my $speakers = $c->req->json;
 
 	if(scalar(@$speakers) < 1) {
-		$c->res->code(400);
-		$c->render(text => 'at least one speaker is required');
+                $c->render(openapi => { errors => [ { message => 'at least one speaker is required' } ] }, status => 400);
 		return;
 	}
 	my $dbh = $c->dbh;
@@ -190,8 +211,7 @@ sub addSpeakers {
 	foreach my $speakerId(@$speakers) {
 		my $speaker = db_query($dbh, 'SELECT id FROM speakers WHERE id = ?', $speakerId);
 		if(scalar(@$speaker) < 1) {
-			$c->res->code(404);
-			$c->render(text => 'Speaker not found');
+                        $c->render(openapi => { errors => [ { message => 'Speaker not found' } ] }, status => 404);
 			$dbh->rollback;
 			return;
 		}
@@ -199,8 +219,7 @@ sub addSpeakers {
 			db_query($dbh, 'INSERT INTO speakers_talks(speaker, talk) VALUES(?, ?) RETURNING speaker', $speakerId, $talkId);
 		};
 		if($@ && $dbh->err) {
-			$c->res->code(400);
-			$c->render(text => 'Could not add speaker:' . $dbh->errstr);
+                        $c->render(openapi => { errors => [ { message => 'Could not add speaker:' . $dbh->errstr } ] }, status => 400);
 			$dbh->rollback;
 			return;
 		}
@@ -222,12 +241,11 @@ sub getById {
 	my $talk = db_query($c->dbh, "SELECT talks.* FROM talks WHERE event = ? AND id = ?", $eventId, $talkId);
 
 	if(scalar(@$talk) < 1) {
-		$c->res->code(404);
-		$c->render(text => "Event or talk not found");
+                $c->render(openapi => { errors => [ { message => "Event or talk not found" } ] }, status => 404);
 		return;
 	}
 
-	$c->render(openapi => format_talks($talk)->[0]);
+	$c->render(openapi => format_talks($c, $talk)->[0]);
 }
 
 sub getByNonce {
@@ -238,11 +256,10 @@ sub getByNonce {
 	my $talk = db_query($c->dbh, "SELECT talks.* FROM talks WHERE nonce = ?", $nonce);
 
 	if(scalar(@$talk) < 1) {
-		$c->res->code(404);
-		$c->render(text => "not found");
+                $c->render(openapi => { errors => [ { message => "not found" } ] }, status => 404);
 		return;
 	}
-	$c->render(openapi => format_talks($talk)->[0]);
+	$c->render(openapi => format_talks($c, $talk)->[0]);
 }
 
 sub getCorrections {
@@ -254,8 +271,7 @@ sub getCorrections {
 	my $talk = db_query($c->dbh, "SELECT id FROM talks WHERE event = ? AND id = ?", $eventId, $talkId);
 
 	if(scalar(@$talk) < 1) {
-		$c->res->code(404);
-		$c->render(text => "event or talk not found");
+                $c->render(openapi => { errors => [ { message => "event or talk not found" } ] }, status => 404);
 		return;
 	}
 
@@ -273,8 +289,7 @@ sub getRelativeName {
 	my $talk = db_query($c->dbh, "SELECT id FROM talks WHERE event = ? AND id = ?", $eventId, $talkId);
 
 	if(scalar(@$talk) < 1) {
-		$c->res->code(404);
-		$c->render(text => "event or talk not found");
+                $c->render(openapi => { errors => [ { message => "event or talk not found" } ] }, status => 404);
 		return;
 	}
 

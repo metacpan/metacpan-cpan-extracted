@@ -64,7 +64,7 @@ WebService::Chroma::Tenant - chromadb tenant
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

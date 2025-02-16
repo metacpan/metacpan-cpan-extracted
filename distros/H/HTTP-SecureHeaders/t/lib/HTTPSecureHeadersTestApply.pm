@@ -1,7 +1,6 @@
 package HTTPSecureHeadersTestApply;
-use strict;
-use warnings;
-use Test::More;
+
+use Test2::V0;
 
 use HTTP::SecureHeaders;
 
@@ -37,7 +36,7 @@ sub main {
 
         $secure_headers->apply($headers);
 
-        is_deeply data_headers($headers), {
+        is data_headers($headers), {
             'Content-Security-Policy'           => "default-src 'self' https:; font-src 'self' https: data:; img-src 'self' https: data:; object-src 'none'; script-src https:; style-src 'self' https: 'unsafe-inline'",
             'Strict-Transport-Security'         => 'max-age=631138519',
             'X-Content-Type-Options'            => 'nosniff',
@@ -65,7 +64,7 @@ sub main {
 
         $secure_headers->apply($headers);
 
-        is_deeply data_headers($headers), {
+        is data_headers($headers), {
             'Content-Security-Policy'           => "default-src 'self'",
             'Strict-Transport-Security'         => 'max-age=631138519; includeSubDomains',
             'X-Content-Type-Options'            => 'nosniff',
@@ -90,7 +89,7 @@ sub main {
         is get_headers($headers, 'X-Frame-Options'), 'DENY';
     };
 
-    subtest 'For unnessary HTTP header, use undef in the constructor.' => sub {
+    subtest 'For unnecessary HTTP header, use undef in the constructor.' => sub {
         my $secure_headers = HTTP::SecureHeaders->new(
             content_security_policy => undef,
         );

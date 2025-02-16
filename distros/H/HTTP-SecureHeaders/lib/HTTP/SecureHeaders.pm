@@ -5,7 +5,7 @@ use warnings;
 use Carp ();
 use Scalar::Util ();
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 our %DEFAULT_HEADERS = (
     content_security_policy           => "default-src 'self' https:; font-src 'self' https: data:; img-src 'self' https: data:; object-src 'none'; script-src https:; style-src 'self' https: 'unsafe-inline'",
@@ -262,34 +262,18 @@ B<NOTE>: To protect against these attacks, sanitization of user input values and
 
 =head2 HTTP::SecureHeaders->new(%args)
 
-C<new> method is HTTP::SecureHeaders constructor. The following arguments are available.
+Create an object that is a collection of secure headers that you wish to apply to the HTTP Header. Following headers are available and these values are the default values, refer to the following sites L<https://github.com/github/secure_headers#default-values>.
 
     my $secure_headers = HTTP::SecureHeaders->new(
-        content_security_policy           => "default-src 'self'",
-        strict_transport_security         => 'max-age=631138519; includeSubDomains',
+        content_security_policy           => default-src 'self' https:; font-src 'self' https: data:; img-src 'self' https: data:; object-src 'none'; script-src https:; style-src 'self' https: 'unsafe-inline',
+        strict_transport_security         => 'max-age=631138519',
         x_content_type_options            => 'nosniff',
         x_download_options                => 'noopen',
-        x_frame_options                   => 'DENY',
+        x_frame_options                   => 'SAMEORIGIN',
         x_permitted_cross_domain_policies => 'none',
-        x_xss_protection                  => '1',
-        referrer_policy                   => 'no-referrer',
+        x_xss_protection                  => '1; mode=block',
+        referrer_policy                   => 'strict-origin-when-cross-origin',
     );
-
-By default, the following HTTP headers are set.
-This default value refers to the following sites L<https://github.com/github/secure_headers#default-values>.
-
-    my $secure_headers = HTTP::SecureHeaders->new()
-    # =>
-
-    Content-Security-Policy: default-src 'self' https:; font-src 'self' https: data:; img-src 'self' https: data:; object-src 'none'; script-src https:; style-src 'self' https: 'unsafe-inline'
-    Strict-Transport-Security: max-age=631138519
-    X-Content-Type-Options: nosniff
-    X-Download-Options: noopen
-    X-Frame-Options: SAMEORIGIN
-    X-Permitted-Cross-Domain-Policies: none
-    X-XSS-Protection: 1; mode=block
-    Referrer-Policy: strict-origin-when-cross-origin,
-
 
 =head2 $self->apply($headers)
 
@@ -347,6 +331,8 @@ B<NOTE>: If you use undef instead of OPT_OUT, HTTP::Headers cannot remove them.
 =head1 SEE ALSO
 
 =over 4
+
+=item L<Plack::Middleware::SecureHeaders>
 
 =item L<https://github.com/github/secure_headers>
 

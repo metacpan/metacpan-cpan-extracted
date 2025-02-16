@@ -49,8 +49,8 @@ sub mw2 {
 
 # DESCRIPTION
 
-A small module, facilitating linking together subroutines, acting as middleware
-or filters into chains with low runtime overhead.
+A small module, facilitating linking subroutines together, acting as middleware
+,filters or chains with low runtime overhead.
 
 To achieve this, the  'complexity' is offloaded to the definition of
 middleware/filters subroutines. They must be wrapped in subroutines
@@ -58,16 +58,32 @@ appropriately to facilitate the lexical binding of linking variables.
 
 This differs from other 'sub chaining' modules as it does not use a loop
 internally to iterate over a list of subroutines at runtime. As such there is
-no implicit call to the 'next' item in the chain. Each stage can run the
-following stage synchronously or asynchronously or not at all. Each element in
-the chain is responsible for how and when it calls the 'next'.
+no implicit synchronous call to the 'next' item in the chain. Each stage can run
+the following stage synchronously or asynchronously or not at all. Each element
+in the chain is responsible for how and when it calls the 'next'.
 
 Finally the arguments and signatures of each stage of middleware are completely
 user defined and are not interfered with by this module. This allows reuse of
 the `@_` array in calling subsequent stages for ultimate performance if you
 know what you're doing.
 
+As a general guide it's suggested the last argument to a stage be a subroutine
+reference to allow callbacks and asynchronous usage. Instead of a flat list of
+multiple inputs into a stage, it is suggested to also contain these in a array
+
 # API
+
+## Inline linking
+
+```
+linker mw1, ..., dispatch
+```
+
+From v0.3.0, the `linker` subroutine is exported and will do an inline build
+and link for a given middlewares and dispatch routine
+
+The return value is the head of the linked chain, and is equivalent to created
+a `Sub::Middler` object, adding middleware, and the calling the link method.
 
 ## Managing a chain
 
@@ -204,11 +220,11 @@ Ruben Westerberg, <drclaw@mac.com>
 
 # REPOSITORTY and BUGS
 
-Please report any bugs via git hub: [http://github.com/drclaw1394/perl-sub-middler](http://github.com/drclaw1394/perl-sub-middler)
+Please report any bugs via git hub: [https://github.com/drclaw1394/perl-sub-middler](https://github.com/drclaw1394/perl-sub-middler)
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 by Ruben Westerberg
+Copyright (C) 2025 by Ruben Westerberg
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl or the MIT

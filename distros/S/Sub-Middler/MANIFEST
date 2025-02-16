@@ -3,7 +3,7 @@ examples/synopsis.pl
 lib/Sub/Middler.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md

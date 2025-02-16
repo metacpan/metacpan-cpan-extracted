@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1510';
+our $VERSION = '0.1511';
 
 use Moo;
 use strictures 2;
+use Data::Dumper::Compact qw(ddc);
 use List::Util qw(any);
 use Music::Chord::Note ();
 use Music::Chord::Positions ();
@@ -16,6 +17,12 @@ use Music::ToRoman ();
 use namespace::clean;
 
 with('Music::PitchNum');
+
+
+has verbose => (
+    is      => 'ro',
+    default => sub { 0 },
+);
 
 
 has key => (
@@ -89,7 +96,9 @@ sub cadence {
                 $top = $note . ++$octave;
             }
         }
+        print ddc($top) if $self->verbose;
         push @$chord, $top;
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     elsif ( $type eq 'imperfect' && $inversion ) {
@@ -106,9 +115,11 @@ sub cadence {
     elsif ( $type eq 'imperfect' ) {
         my $note = $variation == 1 ? $scale_notes[4] : $scale_notes[6];
         my $chord = $self->_generate_chord( $key, $scale, $note, $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
 
         $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     elsif ( $type eq 'evaded' && $self->seven ) {
@@ -124,36 +135,44 @@ sub cadence {
 
         my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
         $chord = $self->_invert_chord( $chord, $inversion->{1}, $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
 
         $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
         $chord = $self->_invert_chord( $chord, $inversion->{2}, $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     elsif ( $type eq 'plagal' ) {
         my $chord = $self->_generate_chord( $key, $scale, $scale_notes[3], $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
 
         $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     elsif ( $type eq 'half' ) {
         my $chord = $self->_generate_chord( $key, $scale, $scale_notes[ $leading - 1 ], $octave );
         $chord = $self->_invert_chord( $chord, $inversion->{1}, $octave )
             if $inversion && $inversion->{1};
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
 
         $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
         $chord = $self->_invert_chord( $chord, $inversion->{2}, $octave )
             if $inversion && $inversion->{2};
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     elsif ( $type eq 'deceptive' ) {
         my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
 
         my $note = $variation == 1 ? $scale_notes[5] : $scale_notes[3];
         $chord = $self->_generate_chord( $key, $scale, $note, $octave );
+        print ddc($chord) if $self->verbose;
         push @$cadence, $chord;
     }
     else {
@@ -302,7 +321,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1510
+version 0.1511
 
 =head1 SYNOPSIS
 
@@ -375,6 +394,14 @@ These chords are often added to the end of a musical phrase, and are
 used to suggest a sense of anticipation, pause, finality, etc.
 
 =head1 ATTRIBUTES
+
+=head2 verbose
+
+  $verbose = $mc->verbose;
+
+Show progress.
+
+Default: C<0>
 
 =head2 key
 

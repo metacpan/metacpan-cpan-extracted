@@ -1,10 +1,6 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
 use HTTP::SecureHeaders;
-
-sub check { HTTP::SecureHeaders::check_x_frame_options(@_) }
 
 my @OK = (
     'SAMEORIGIN',
@@ -22,11 +18,11 @@ my @NG = (
 );
 
 subtest 'OK cases' => sub {
-    ok check($_), $_ for @OK;
+    ok HTTP::SecureHeaders::check_x_frame_options($_), $_ for @OK;
 };
 
 subtest 'NG cases' => sub {
-    ok !check($_), $_ for @NG_for_simplicity, @NG;
+    ok !HTTP::SecureHeaders::check_x_frame_options($_), $_ for @NG_for_simplicity, @NG;
 };
 
 done_testing;

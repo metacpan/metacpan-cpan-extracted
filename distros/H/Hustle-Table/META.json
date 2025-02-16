@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Template::Plex" : "v0.4.2",
-            "enum" : "0",
+            "constant::more" : "0",
             "perl" : "5.026000"
          }
       },
@@ -48,9 +48,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/drclaw1394/perl5-hustle-table.git",
-         "web" : "http://github.com/drclaw1394/perl5-hustle-table"
+         "web" : "https://github.com/drclaw1394/perl5-hustle-table"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.7.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

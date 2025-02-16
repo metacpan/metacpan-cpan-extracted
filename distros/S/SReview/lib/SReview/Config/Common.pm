@@ -66,8 +66,10 @@ sub setup {
 	$config->define_computed('dbistring', \&compute_dbistring);
 	$config->define('accessmethods', 'The way to access files for each collection. Can be \'direct\' or \'S3\'. For the latter, the \'$s3_access_config\' configuration needs to be set, too', {input => 'direct', output => 'direct', intermediate => 'direct'});
 	$config->define('s3_access_config', 'Configuration for accessing S3-compatible buckets. Any option that can be passed to the "new" method of the Net::Amazon::S3 Perl module can be passed to any of the child hashes of the toplevel hash. Uses the same toplevel keys as the "$accessmethods" configuration item, but falls back to "default"', {default => {}});
+        $config->define('sftp_access_config', 'Configuration for accessing SFTP hosts. Should be set to a hash keyed to the collection name, with each element being an array of arguments that can be passed to Net::SSH2\'s auth method', {default => {username => "sreview"}});
 	$config->define_computed('s3_access_config', \&compute_accessconfig);
 	$config->define('api_key', 'The API key, to allow access to the API', undef);
+        $config->define('canonical_duration', 'The canonical duration to set for Media::Convert::Asset', undef);
 
 	# Values for sreview-web
 	$config->define('event', 'The event to handle by this instance of SReview.');
@@ -118,6 +120,7 @@ sub setup {
 		notification => 'sreview-skip <%== $talkid %>',
 		announcing => 'sreview-skip <%== $talkid %>',
 		injecting => 'sreview-inject -t <%== $talkid %>',
+		transcribing => 'sreview-transcribe <%== $talkid %>',
 	});
 	$config->define('query_limit', 'A maximum number of jobs that should be submitted in a single loop in sreview-dispatch. 0 means no limit.', 1);
 	$config->define('published_headers', 'The HTTP headers that indicate that the video is available now. Use _code for the HTTP status code.', undef);
@@ -143,7 +146,10 @@ sub setup {
 	# Values for upload script
 	$config->define('upload_actions', 'An array of commands to run on each file to be uploaded. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $file %>', 'ready for upload']]);
 	$config->define('remove_actions', 'An array of commands to run on each file to be removed, when final review determines that the file needs to be reprocessed. Same format as upload_actions', [['echo', '<%== $file %>', 'ready for removal']]);
+        $config->define('sync_extensions', 'An array of extensions of files to sync');
+	$config->define('sync_actions', 'An array of commands to run on each file to be synced. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $file %>', 'ready for sync']]);
 	$config->define('cleanup', 'Whether to remove files after they have been published. Possible values: "all" (removes all files), "previews" (removes the output of sreview-cut, but not that of sreview-transcode), and "output" (removes the output of sreview-transcode, but not the output of sreview-cut). Other values will not remove files', 'none');
+
 	# for sreview-copy
 	$config->define('extra_collections', 'A hash of extra collection basenames. Can be used by sreview-copy.', undef);
 
@@ -170,6 +176,10 @@ sub setup {
 	# for final review
 	$config->define('finalhosts', 'A list of hosts that may host videos for final review, to be added to Content-Security-Policy "media-src" directive.', undef);
 	$config->define('output_video_url_format', 'A Mojo::Template that will produce the URLs for the produced videos. Can use the $talk variable for the SReview::Talk, and the $exten variable for the extension of the current video profile');
+
+	# for transcription
+	$config->define('transcribe_command', 'A Mojo::Template for the command to transcribe a video.', undef);
+        $config->define('transcribe_source_extension', 'The extension of the video to be used when running sreview-transcribe', 'webm');
 
 	return $config;
 }

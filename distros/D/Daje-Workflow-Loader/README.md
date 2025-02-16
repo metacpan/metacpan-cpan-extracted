@@ -29,41 +29,17 @@ the Daje-Workflow engine
 
 # REQUIRES
 
-[Daje::Config](https://metacpan.org/pod/Daje%3A%3AConfig) 
+[Daje::Workflow::Details::Analyser](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ADetails%3A%3AAnalyser) 
+
+[Daje::Workflow::Roadmap::Load](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ARoadmap%3A%3ALoad) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 
 # METHODS
 
-## get\_activity($self,
+## add\_error($self,
 
-    get_activity($self,();
-
-## get\_next\_state($self,
-
-    get_next_state($self,();
-
-## get\_post\_checks($self,
-
-    get_post_checks($self,();
-
-## get\_pre\_checks($self,
-
-    get_pre_checks($self,();
-
-## get\_state($self,
-
-    get_state($self,();
-
-## get\_state\_observers($self,
-
-    get_state_observers($self,();
-
-## get\_workflow($self,
-
-    get_workflow($self,();
-
-Get the entire workflow as a hashref
+    add_error($self,();
 
 ## load($self)
 

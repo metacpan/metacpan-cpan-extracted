@@ -1,9 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Requires qw(
-    Plack::Util
-);
+use Test2::V0;
+use Test2::Require::Module 'Plack::Util';
 
 use HTTP::SecureHeaders;
 use Plack::Util;
@@ -17,7 +13,7 @@ my $headers = Plack::Util::headers($data);
 
 $secure_headers->apply($headers);
 
-is_deeply +{ @$data }, {
+is +{ @$data }, {
     'Content-Security-Policy'           => "default-src 'self' https:",
     'Strict-Transport-Security'         => 'max-age=631138519',
     'X-Content-Type-Options'            => 'nosniff',

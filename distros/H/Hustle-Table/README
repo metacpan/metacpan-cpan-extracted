@@ -33,16 +33,18 @@ SYNOPSIS
             my %cache;
             my $dispatch = $table->prepare_dispatcher(cache=>\%cache);
 
-    Call dispatcher to return the matching entry and any regex captures
+    Call dispatcher to return the matching entries and any regex captures.
+    Multiple items can be tested in a single call
 
-      my ($entry, $captures)=$dispatch->("thing to match");
+      my @results=$dispatch->("thing to match", "another thing", ...);      
+      # @results contains pairs of entries and capture arrays
 
 DESCRIPTION
     This module provides a class to construct a routing table and build a
     high performance dispatcher from it.
 
     A table can have any combination of regex, subroutine, exact string,
-    begin string end string or numeric matching of entries. The order in
+    begin string, end string or numeric matching of entries. The order in
     which the entries are added defines their precedence. First in, first
     tested.
 
@@ -51,19 +53,20 @@ DESCRIPTION
 
     Once all the entries have been added to the table, a dispatcher is
     prepared/created. The dispatcher is an anonymous subroutine, which tests
-    its argument against the matcher in each entry in the table.
+    its arguments against the matcher in each entry in the table.
 
-    It returns a list containing the first entry that matched, and if
-    applicable, an anonymous array of any captures from regex matching.
+    NOTE:From v0.7.0 results are returned a list containing pairs of
+    matching entries and an anonymous array of any captures from regex
+    matching if applicable.
+
+    Prior to v0.7.0, testing would stop after the first match.
 
     If more entries are required to be added to the table, the dispatcher
     must be prepared again.
 
     A cache (hash) is used to drastically improve table lookup performance.
-    Entries are automatically added to the cache. A cache hit with a regex
-    matcher will re execute the regexp to ensure the captures are returned
-    as expected. Removal of cache entries is up to the user to implement on
-    a application basis.
+    Entries are automatically added to the cache. Removal of cache entries
+    is up to the user to implement on a application basis.
 
   API Change
     From v0.6.0: Regexp from non core Regexp engines are now usable as a
@@ -238,8 +241,12 @@ COMPARISON TO OTHER MODULES
 AUTHOR
     Ruben Westerberg, <drclaw@mac.com>
 
+REPOSITORTY and BUGS
+    Please report any bugs via git hub:
+    <http://github.com/drclaw1394/perl5-hustle-table>
+
 COPYRIGHT AND LICENSE
-    Copyright (C) 2022 by Ruben Westerberg
+    Copyright (C) 2025 by Ruben Westerberg
 
     Licensed under MIT
 

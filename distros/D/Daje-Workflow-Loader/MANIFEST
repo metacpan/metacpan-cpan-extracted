@@ -7,8 +7,11 @@ MYMETA.json
 MYMETA.yml
 README.md
 cpanfile
+lib/Daje/Workflow/Details/Analyser.pm
 lib/Daje/Workflow/Loader.pm
+lib/Daje/Workflow/Roadmap/Load.pm
 minil.toml
+script/loader.pl
 t/00_compile.t
 t/test_load.t
 META.yml

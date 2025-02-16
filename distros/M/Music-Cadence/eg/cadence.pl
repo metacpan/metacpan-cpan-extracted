@@ -32,6 +32,7 @@ my $mc = Music::Cadence->new(
     scale  => $type,
     octave => $octave,
     format => 'midinum',
+    # verbose => 1,
 );
 
 my $voice = Music::VoiceGen->new(

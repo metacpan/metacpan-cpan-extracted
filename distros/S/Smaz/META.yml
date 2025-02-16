@@ -22,12 +22,12 @@ no_index:
 provides:
   Smaz:
     file: lib/Smaz.pm
-    version: '1.03'
+    version: '1.04'
 requires:
   Import::Export: '1.00'
   open: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/SMAZ.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

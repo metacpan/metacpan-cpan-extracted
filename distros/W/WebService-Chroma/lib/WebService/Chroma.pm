@@ -1,6 +1,6 @@
 package WebService::Chroma;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use 5.006;
 use strict;
@@ -50,6 +50,11 @@ has embeddings_class => (
 	lazy => 1,
 );
 
+has embeddings_api_key => (
+	is => 'ro',
+	lazy => 1,
+);
+
 has embeddings_base_url => (
 	is => 'ro',
 	lazy => 1,
@@ -67,7 +72,8 @@ has ua => (
 			base_url => $_[0]->base_url,
 			embeddings_class => $_[0]->embeddings_class,
 			embeddings_model => $_[0]->embeddings_model,
-			embeddings_base_url => $_[0]->embeddings_base_url
+			embeddings_base_url => $_[0]->embeddings_base_url,
+			embeddings_api_key => $_[0]->embeddings_api_key
 		);
 	}
 );
@@ -139,7 +145,7 @@ WebService::Chroma - chromadb client
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -223,6 +229,12 @@ Instantiate a new L<WebService::Chroma> object.
 		embeddings_base_url => 'http://localhost:11434'
 	);
 
+...
+
+	my $chroma = WebService::Chroma->new(
+		embeddings_class => 'Jina',
+		embeddings_api_key => '...',
+	);
 
 =head3 base_url
 
@@ -230,11 +242,15 @@ The base url for chroma default is http://localhost:8000.
 
 =head3 embeddings_class
 
-The embeddings class used to generate embeddings current built in options are Ollama or OpenAI.
+The embeddings class used to generate embeddings current built in options are Jina, Ollama or OpenAI.
 
 =head3 embeddings_model
 
-The embeddings class model the default for Ollama is nomic-embed-text and the default for OpenAI is text-embedding-3-large.
+The embeddings class model the default for Jina is jina-clip-v2 the default for Ollama is nomic-embed-text and the default for OpenAI is text-embedding-3-large.
+
+=head3 embeddings_api_key
+
+The embeddings class api_key.
 
 =head3 embeddings_base_url
 

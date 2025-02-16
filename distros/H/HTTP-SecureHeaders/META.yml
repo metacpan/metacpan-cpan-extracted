@@ -3,13 +3,11 @@ abstract: 'manage security headers with many safe defaults'
 author:
   - 'kfly8 <kfly@cpan.org>'
 build_requires:
-  Module::Build::Tiny: '0.035'
-  Test::More: '0.98'
-  Test::Requires: '0.06'
+  Test2::V0: '0.000147'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.17, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,16 +26,16 @@ no_index:
 provides:
   HTTP::SecureHeaders:
     file: lib/HTTP/SecureHeaders.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Carp: '0'
-  Scalar::Util: '0'
-  perl: '5.008001'
+  perl: '5.014000'
 resources:
   bugtracker: https://github.com/kfly8/p5-HTTP-SecureHeaders/issues
   homepage: https://github.com/kfly8/p5-HTTP-SecureHeaders
   repository: https://github.com/kfly8/p5-HTTP-SecureHeaders.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:KFLY
+x_contributors:
+  - 'kobaken <kentafly88@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

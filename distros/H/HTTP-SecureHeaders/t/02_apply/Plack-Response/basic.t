@@ -1,9 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Requires qw(
-    Plack::Response
-);
+use Test2::V0;
+use Test2::Require::Module 'Plack::Response';
 
 use lib qw(./t/lib);
 

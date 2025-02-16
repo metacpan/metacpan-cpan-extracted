@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use open ":std", ":encoding(UTF-8)";
 use base 'Import::Export';
 
@@ -341,7 +341,7 @@ Smaz - compression for very small strings!
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 

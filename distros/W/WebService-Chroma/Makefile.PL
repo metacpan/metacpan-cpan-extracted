@@ -23,7 +23,8 @@ my %WriteMakefileArgs = (
 	'OpenAI::API' => 0,
 	'MooX::ValidateSubs' => 0,
 	'Type::Tiny' => 0,
-	'Module::Load' => 0
+	'Module::Load' => 0,
+	'WebService::Jina' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-Chroma-*' },

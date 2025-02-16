@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Export::These" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -39,9 +41,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/drclaw1394/perl-sub-middler.git",
-         "web" : "http://github.com/drclaw1394/perl-sub-middler"
+         "web" : "https://github.com/drclaw1394/perl-sub-middler"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.3.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

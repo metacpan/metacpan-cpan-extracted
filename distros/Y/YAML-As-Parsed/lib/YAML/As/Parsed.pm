@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::As::Parsed; # git description: v1.72-7-g8682f63
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Tie::IxHash;
 
@@ -766,7 +766,7 @@ YAML::As::Parsed - Read/Write YAML predictably
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

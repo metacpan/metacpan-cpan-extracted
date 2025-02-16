@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'Import::Export';
 
@@ -30,7 +30,7 @@ Term::ANSI::Sprintf - sprintf with ANSI colors
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

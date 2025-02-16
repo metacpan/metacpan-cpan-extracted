@@ -31,10 +31,11 @@ requires:
   Mojolicious::Plugin::OpenAPI: '4.03'
   Moose: '0'
   Net::Amazon::S3: '0'
+  Net::SSH2: '0'
   Net::SSH::AuthorizedKeysFile: '0'
   Text::Format: '0'
 resources:
   homepage: https://yoe.github.io/SReview
   repository: https://github.com/yoe/SReview.git
-version: v0.10.0
+version: v0.11.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

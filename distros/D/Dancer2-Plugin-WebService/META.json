@@ -1,10 +1,10 @@
 {
-   "abstract" : "RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access",
+   "abstract" : "REST apis with login, persistent data, multiple in/out formats, IP security, role based access",
    "author" : [
       "George Bouras <george.mpouras@yandex.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,13 +43,13 @@
    "provides" : {
       "Dancer2::Plugin::WebService" : {
          "file" : "lib/Dancer2/Plugin/WebService.pm",
-         "version" : "v4.5.0"
+         "version" : "v4.7.2"
       }
    },
    "release_status" : "stable",
-   "version" : "4.5.0",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "4.7.2",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

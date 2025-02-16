@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.6.0");
+our $VERSION="v0.7.0";
 
 use strict;
 use warnings;
@@ -9,14 +9,17 @@ use Template::Plex;
 #use feature "refaliasing";
 no warnings "experimental";
 
-use Carp qw<carp croak>;
 
 
 
-use constant DEBUG=>0;
+use constant::more DEBUG=>0;
 
 #constants for entry fields
-use enum (qw<matcher_ value_ type_ default_>);
+use constant::more {matcher_=>0,
+  value_=>1,
+  type_=>2,
+  default_=>3
+};
 
 #Public API
 #
@@ -35,7 +38,7 @@ sub add {
 			if(/ARRAY/){
 				#warn $item->$*;
 				$entry=$item;
-				croak "Incorrect number of items in dispatch vector. Should be 3" unless $entry->@* == 3;
+				die "Incorrect number of items in dispatch vector. Should be 3" unless $entry->@* == 3;
 			}
 
 			elsif(/HASH/){
@@ -59,8 +62,6 @@ sub add {
 			}
 
 		}
-
-		#croak "matcher not specified" unless defined $entry->[matcher_];
 
 		if(defined $entry->[matcher_]){
 			#Append to the end of the normal matching list 
@@ -89,6 +90,11 @@ sub prepare_dispatcher{
 	my $self=shift;
 	my %options=@_;
 	my $cache=$options{cache}//{};
+
+  # Force delete cached entries when rebuilding dispather
+  for(keys %$cache){
+    delete $cache->{$_};
+  }
 	$self->_prepare_online_cached($cache);
 }
 
@@ -100,14 +106,13 @@ sub _prepare_online_cached {
 	my $table=shift; #self
 	my $cache=shift;
 	if(ref $cache ne "HASH"){
-		carp "Cache provided isn't a hash. Using internal cache with no size limits";
+		warn "Cache provided isn't a hash. Using internal cache with no size limits";
 		$cache={};
 	}
 
 	my $sub_template=
 	'	 
 	@{[do {
-		my $do_capture;
 		my $d="";
 
     my $pack=ref $item->[Hustle::Table::matcher_];
@@ -120,8 +125,7 @@ sub _prepare_online_cached {
 
 		for($item->[Hustle::Table::type_]){
       if($is_regex){
-			  $d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
-				$do_capture=1;
+        $d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
       }
 			elsif(ref($item->[Hustle::Table::matcher_]) eq "CODE"){
 
@@ -143,17 +147,17 @@ sub _prepare_online_cached {
         #assume a regex - even if a basic string
 				$item->[Hustle::Table::matcher_]=qr{$item->[Hustle::Table::matcher_]};
 				$item->[Hustle::Table::type_]=undef;
-				$do_capture=1;
-				$d.=\'($input=~m{\' . $item->[Hustle::Table::matcher_].\'})\';
-                        }
+        $is_regex=1;
+        redo;
+      }
 		}
 
 
-		if($do_capture){
-			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\'], [@{^CAPTURE}]);\';
+		if($is_regex){
+			$d.=\' and (push $cache->{$input}->@*, $table->[\'.$index.\'], [@{^CAPTURE}]);\';
 		}	
 		else {
-			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\']);\';
+			$d.=\' and (push $cache->{$input}->@*, $table->[\'.$index.\'],  undef);\';
 
 		}
 		$d;
@@ -162,51 +166,48 @@ sub _prepare_online_cached {
 
 	my $template=
 	'
-	my \$input;
 	my \$entry;
   no warnings "numeric";
 	sub {
-		\$input=shift;
-		\$entry=\$cache->{\$input};
-		#Locate cached regex types, perform capture, and return
-		#Locate cached non regex types and return
-		#\$entry
-			\$entry->[Hustle::Table::type_]
-			? return \$entry
-			: (\$input=~ \$entry->[Hustle::Table::matcher_])
-				and return (\$entry, [\@{^CAPTURE}])
+    my \@output;
+    for my \$input (\@_){
+      \$entry=\$cache->{\$input};
+      \$entry and return \$entry->\@*;
 
 
-			if \$entry;
+
+      #Build the logic for matcher entry in order of listing
+      @{[do {
+        my $index=0;
+        my $base={index=>0, item=>undef};
+        my $sub=$self->load([$sub], $base);
+        map {
+          $base->{index}=$_;
+          $base->{item}=$table->[$_];
+          my $s=$sub->render;
+          $s;
+        } 0..$table->@*-2;
+      }]}
 
 
-		#Build the logic for matcher entry in order of listing
-		@{[do {
-			my $index=0;
-			my $base={index=>0, item=>undef};
-			my $sub=$self->load([$sub], $base);
-			map {
-				$base->{index}=$_;
-				$base->{item}=$table->[$_];
-				my $s=$sub->render;
-				$s;
-			} 0..$table->@*-2;
-		}]}
-
-
-		#If we get here we cache and return the default matcher
-		\$cache->{\$input}=\$table->[\@\$table-1];
+      for(\$cache->{\$input}//=[]){
+        # If we get here and nothing matched, we force default match
+        push \$_->\@*, \$table->[\@\$table-1], undef unless \$_->\@*;
+        
+        # Copy to output
+        push \@output, \$_->@*;
+      } 
+    }
+    return \@output;
 	} ';
 
 	my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});
 	my $s=$top_level->render;
-	#say STDERR $s;
-	#my $line=1;
-	#print map $_."\n", split "\n", $s;
 	my $ss=eval $s;
-	#print $@;
 	$ss;
 }
+
+
 
 1;
 __END__

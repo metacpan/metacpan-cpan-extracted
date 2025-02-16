@@ -4,7 +4,7 @@
       "kfly8 <kfly@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.17",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -42,23 +42,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Scalar::Util" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.014000"
          }
       },
       "test" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035",
-            "Test::More" : "0.98",
-            "Test::Requires" : "0.06"
+            "Test2::V0" : "0.000147"
          }
       }
    },
    "provides" : {
       "HTTP::SecureHeaders" : {
          "file" : "lib/HTTP/SecureHeaders.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -73,8 +69,11 @@
          "web" : "https://github.com/kfly8/p5-HTTP-SecureHeaders"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:KFLY",
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_contributors" : [
+      "kobaken <kentafly88@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

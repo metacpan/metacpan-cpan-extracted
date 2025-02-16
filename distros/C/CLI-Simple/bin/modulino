@@ -14,17 +14,28 @@
 pgm=$(basename $0)
 
 if [ "$pgm" = "modulino" ]; then
-    extension="${1##*.}"
-    bindir=$(dirname $(which modulino))
+    MODULE="$1";
+
+    if test -z "$MODULE"; then
+        echo "usage: modulino MODULE-NAME"
+        echo "        examples: modulino Foo::Bar"
+        echo "                  modulino Foo/Bar.pm"
+        exit 1;
+    fi
+
+    $MODULINO_PATH=$(command -v modulino)
+
+    extension="${MODULE##*.}"
+    bindir=$(dirname $(command -v modulino))
     
-    if [ "$extension" = "$(basename $1)" ]; then
-        echo ln -s $(which modulino) ${bindir}/$(echo "$1" | perl -ne 's/::/-/g; print lc;')
+    if [ "$extension" = "$(basename $MODULE)" ]; then
+        echo ln -s $MODULINO_PATH ${bindir}/$(echo "$MODULE" | perl -ne 's/::/-/g; print lc;')
     else
-        filename="${1%.*}"
-        echo ln -s $(which modulino) ${bindir}/$(echo $filename | perl -ne 's/\//-/g; print lc')
+        filename="${MODULE%.*}"
+        echo ln -s $MODULINO_PATH ${bindir}/$(echo $filename | perl -ne 's/\//-/g; print lc')
     fi
 else  
-    REALPATH=$(which realpath)
+    REALPATH=$(command -v realpath)
     REALPATH=${REALPATH:-readlink -f}
 
     path=$(basename $($REALPATH $0))

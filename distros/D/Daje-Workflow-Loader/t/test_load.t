@@ -7,8 +7,11 @@ use Daje::Workflow::Loader;
 
 sub test_load() {
     my $loader = Daje::Workflow::Loader->new(
-        path => '/home/jan/Project/Daje-Workflow-Loader/conf'
-    )->load();
+        path => '/home/jan/Project/Daje-Workflow-Workflows/Workflows',
+        type => 'workflow',
+    );
+
+    $loader->load();
 
     return 1;
 }

@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-WebService::Jina::Response - ollama response
+WebService::Jina::Response - jina response
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -82,7 +82,7 @@ LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-webservice-ollama at rt.cpan.org>, or through
+Please report any bugs or feature requests to C<bug-webservice-jina at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Jina>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 

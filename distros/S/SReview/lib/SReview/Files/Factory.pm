@@ -14,6 +14,12 @@ has 'url' => (
 	builder => '_probe_url',
 );
 
+has 'download_verbose' => (
+        is => 'rw',
+        isa => 'Bool',
+        default => 0,
+);
+
 no Moose;
 
 package SReview::Files::Access::Base;
@@ -197,6 +203,13 @@ has 'fileclass' => (
 	required => 1,
 );
 
+has 'collection_name' => (
+        isa => 'Str',
+        is => 'ro',
+        default => '(unknown)',
+        lazy => 1,
+);
+
 sub _probe_baseurl {
 	my $self = shift;
 	
@@ -309,12 +322,12 @@ sub delete_files {
 		} elsif ($names[0] gt $ownfiles[0]->url) {
 			shift @ownfiles;
 		} else {
-			carp "${names[0]} is not a member of this collection, ignored";
+			carp "ignoring request to delete file or directory ${names[0]} from collection " . $self->collection_name . ", as it does not exist";
 			shift @names;
 		}
 	};
 	if(scalar(@names)) {
-		carp "${names[0]} is not a member of this collection, ignored";
+                carp "ignoring request to delete file or directory ${names[0]} from collection " . $self->collection_name . ", as it does not exist";
 	}
 	foreach my $file(@to_delete) {
 		$file->delete;
@@ -350,13 +363,13 @@ sub _probe_children {
 	foreach my $file(glob($self->globpattern)) {
 		my $child;
 		if(-d $file) {
-			$child = SReview::Files::Collection::direct->new(baseurl => join("/", $self->baseurl, basename($file)));
+			$child = SReview::Files::Collection::direct->new(baseurl => join("/", $self->baseurl, basename($file)), download_verbose => $self->download_verbose);
 		} else {
 			my $basename = substr($file, length($self->baseurl));
 			while(substr($basename, 0, 1) eq '/') {
 				$basename = substr($basename, 1);
 			}
-			$child = SReview::Files::Access::direct->new(baseurl => $self->baseurl, relname => $basename);
+			$child = SReview::Files::Access::direct->new(baseurl => $self->baseurl, relname => $basename, download_verbose => $self->download_verbose);
 		}
 		push @return, $child;
 	}
@@ -403,9 +416,9 @@ sub create {
 		die "$@: $!";
 	}
 	if($target eq "input") {
-		return "SReview::Files::Collection::$method"->new(globpattern => $relname);
+		return "SReview::Files::Collection::$method"->new(globpattern => $relname, collection_name => $target);
 	} else {
-		return "SReview::Files::Collection::$method"->new(baseurl => $relname);
+		return "SReview::Files::Collection::$method"->new(baseurl => $relname, collection_name => $target);
 	}
 }
 

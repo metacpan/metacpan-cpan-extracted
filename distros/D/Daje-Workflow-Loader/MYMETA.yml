@@ -24,17 +24,21 @@ no_index:
     - author
     - builder
 provides:
+  Daje::Workflow::Details::Analyser:
+    file: lib/Daje/Workflow/Details/Analyser.pm
   Daje::Workflow::Loader:
     file: lib/Daje/Workflow/Loader.pm
-    version: '0.07'
+    version: '0.13'
+  Daje::Workflow::Roadmap::Load:
+    file: lib/Daje/Workflow/Roadmap/Load.pm
 requires:
   Daje::Config: '0.03'
   Mojo::Base: '0'
-  perl: '5.008001'
+  perl: v5.40.0
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Load/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Load
   repository: https://github.com/janeskil1525/Daje-Workflow-Load.git
-version: '0.07'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP-SecureHeaders
 
+0.02 2025-02-16T09:05:09Z
+    - Support above perl v5.14
+    - Update deps
+
 0.01 2022-05-06T10:58:02Z
 
     - original version

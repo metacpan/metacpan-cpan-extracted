@@ -1,9 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Requires qw(
-    HTTP::Headers::Fast
-);
+use Test2::V0;
+use Test2::Require::Module 'HTTP::Headers::Fast';
 
 use lib qw(./t/lib);
 

@@ -68,19 +68,21 @@ sub request {
 			return 1;
 		});
 	}
-
+	my %headers = %{ $params{headers} || {} };
 	if ($params{type} eq 'GET') { 
 		$url->query_form($params{data});
-		$res = $self->ua->get($url);
+		$res = $self->ua->get($url, %headers);
 	} elsif ($params{type} eq 'DELETE') {
 		$res = $self->ua->delete(
 			$url,
+			%headers,
 			content => $self->json->encode([$params{data}]), 
 			'Content-Type' => 'application/json'
 		);
 	} else {
 		$res = $self->ua->post(
-			$url, 
+			$url,
+			%headers,
 			content => $self->json->encode([$params{data}]), 
 			'Content-Type' => 'application/json'
 		);
@@ -90,7 +92,6 @@ sub request {
 
 sub response {
 	my ($self, $res) = @_;
-
 	if ($res->is_success) {
 		if ($res->content_type eq 'text/plain') {
 			return $res->decoded_content;

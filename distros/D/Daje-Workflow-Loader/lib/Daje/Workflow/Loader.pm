@@ -1,7 +1,5 @@
-package Daje::Workflow::Loader;
-use Mojo::Base -base, -signatures;
-
-
+use v5.40;
+use experimental 'class';
 
 # NAME
 # ====
@@ -49,78 +47,65 @@ use Mojo::Base -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-use Daje::Config;
+class Daje::Workflow::Loader {
 
-has 'workflow';
-has 'path';
+    field $path :param;
+    field $type :param :reader;
+    field $error :reader;
+    field $has_error :reader = 0;
+    field $loader :reader;
+    field $analyser :reader;
 
-our $VERSION = "0.07";
+    use Daje::Workflow::Roadmap::Load;;
+    use Daje::Workflow::Details::Analyser;
+
+    our $VERSION = "0.13";
+
+    method load() {
+
+        $self->_load();
+        if($has_error == 0) {
+            $self->_analyser();
+        }
+        return 1;
+    }
+
+    method _analyser() {
+        eval {
+            $analyser = Daje::Workflow::Details::Analyser->new(
+                loader => $loader,
+            );
+            $analyser->analyze();
+        };
+        $self->add_error($@) if $@;
+    }
+
+    method _load() {
+        eval {
+            $loader = Daje::Workflow::Roadmap::Load->new(
+                type => $type,
+                path => $path,
+            );
+            $loader->load();
+        };
+        $self->add_error($@) if $@;
+    }
+
+    method add_error( $new_error =  "") {
+        return 1 unless length($new_error) > 0;
+
+        my $err = $error;
+        $err = "" unless $err;
+        $error = $err . ' ' . $new_error;
+        $has_error = 1;
+    }
+}
 
 # Load the data into the object
-sub load($self) {
-    my $workflow = Daje::Config->new(
-        path => $self->path,
-        type => 'workflow',
-    )->load();
-
-    $self->workflow($workflow);
-
-    return 1;
-}
-
-# Get the entire workflow as a hashref
-sub get_workflow($self, $workflow) {
-    return $self->workflow()->{workflow};
-}
-
-#
-sub get_state($self, $workflow, $state_name) {
-    my $flow = $self->workflow->{$workflow};
-    my $length = scalar @{$flow};
-    my $state;
-    for (my $i = 0; $i < $length; $i++) {
-        if (@{$flow}[$i]->{name} eq $state_name) {
-            $state = @{$flow}[$i];
-        }
-    }
-
-    return $state;
-}
-
-sub get_pre_checks($self, $workflow, $state_name) {
-    my $state = $self->get_state($workflow, $state_name);
-    return $state->{state}->{pre_checks};
-}
-
-sub get_post_checks($self, $workflow, $state_name) {
-    my $state = $self->get_state($workflow, $state_name);
-    return $state->{state}->{post_checks};
-}
-
-sub get_next_state($self, $workflow, $state_name) {
-    my $state = $self->get_state($workflow, $state_name);
-    return $state->{next_state};
-}
-
-sub get_state_observers($self, $workflow, $state_name) {
-    my $state = $self->get_state($workflow, $state_name);
-    return $state->{state}->{observers};
-}
-
-sub get_activity($self, $workflow, $state_name, $activity_name) {
-    my $activity;
-    my $activities = $self->get_state($workflow, $state_name)->{state}->{activities};
-    my $length = scalar @{$activities};
-    for (my $i = 0; $i < $length; $i++) {
-        if (@{$activities}[$i]->{name} eq $activity_name) {
-            $activity = @{$activities}[$i];
-        }
-    }
-    return $activity;
-}
 
 1;
 __END__
+
 
 
 
@@ -174,43 +159,18 @@ the Daje-Workflow engine
 
 =head1 REQUIRES
 
-L<Daje::Config> 
+L<Daje::Workflow::Details::Analyser> 
+
+L<Daje::Workflow::Roadmap::Load> 
 
 L<Mojo::Base> 
 
 
 =head1 METHODS
 
-=head2 get_activity($self,
+=head2 add_error($self,
 
- get_activity($self,();
-
-=head2 get_next_state($self,
-
- get_next_state($self,();
-
-=head2 get_post_checks($self,
-
- get_post_checks($self,();
-
-=head2 get_pre_checks($self,
-
- get_pre_checks($self,();
-
-=head2 get_state($self,
-
- get_state($self,();
-
-=head2 get_state_observers($self,
-
- get_state_observers($self,();
-
-=head2 get_workflow($self,
-
- get_workflow($self,();
-
-Get the entire workflow as a hashref
-
+ add_error($self,();
 
 =head2 load($self)
 

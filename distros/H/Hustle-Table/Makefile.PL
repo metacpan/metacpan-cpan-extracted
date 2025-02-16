@@ -13,7 +13,7 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.26.0',		#ref aliasing => 5.24
 						#@{^CAPTURE}=> 5.26
 	PREREQ_PM => {
-		enum=>0,
+    "constant::more"=>0,
 		"Template::Plex"=>"v0.4.2",
 	},
 	AUTHOR => 'Ruben Westerberg <drclaw@mac.com>',
@@ -30,7 +30,7 @@ WriteMakefile(
 			repository =>{
 				type => "git",
 				url => "git://github.com/drclaw1394/perl5-hustle-table.git",
-				web => "http://github.com/drclaw1394/perl5-hustle-table",
+				web => "https://github.com/drclaw1394/perl5-hustle-table",
 			}
 		}
 	}

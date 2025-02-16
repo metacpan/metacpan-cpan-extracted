@@ -1,3 +1,18 @@
+Sat Feb 15 09:25:47 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.8]:
+	* VERSION: bump
+	* cpan/buildspec.yml
+	(extra-files): examples
+	* src/main/bash/bin/modulino.sh.in
+	- help
+	- use command, not which
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- minor formatting tweaks
+	- documenation, pod updates
+	(new): invoke help before init
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+
 Sat Jun 22 10:52:48 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.0.7]:

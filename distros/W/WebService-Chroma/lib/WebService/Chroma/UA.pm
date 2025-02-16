@@ -18,6 +18,16 @@ has embeddings_model => (
 	}
 );
 
+has embeddings_api_key => (
+	is => 'rw',
+	lazy => 1,
+	trigger => sub {
+		if ($_[1] && $_[0]->embeddings) {
+			$_[0]->embeddings->api_key($_[1]);
+		}
+	}
+);
+
 has embeddings_base_url => (
 	is => 'rw',
 	trigger => sub {
@@ -33,7 +43,12 @@ has embeddings_class => (
 		return unless $_[1];
 		my $class = 'WebService::Chroma::Embeddings::' . $_[1];
 		load $class;
-		$_[0]->embeddings($class->new(($_[0]->embeddings_model ? (model => $_[0]->embeddings_model) : ())));
+		$_[0]->embeddings(
+			$class->new(
+				($_[0]->embeddings_model ? (model => $_[0]->embeddings_model) : ()),
+				($_[0]->embeddings_api_key ? (api_key => $_[0]->embeddings_api_key) : ()),
+			)
+		);
 	}
 );
 

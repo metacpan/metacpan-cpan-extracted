@@ -3,6 +3,7 @@ ignore.txt
 lib/WebService/Chroma.pm
 lib/WebService/Chroma/Collection.pm
 lib/WebService/Chroma/DB.pm
+lib/WebService/Chroma/Embeddings/Jina.pm
 lib/WebService/Chroma/Embeddings/Ollama.pm
 lib/WebService/Chroma/Embeddings/OpenAI.pm
 lib/WebService/Chroma/Tenant.pm
@@ -11,7 +12,6 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
-t/01-odea.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

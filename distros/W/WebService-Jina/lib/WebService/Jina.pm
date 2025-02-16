@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use WebService::Jina::UA;
 use Moo;
@@ -39,19 +39,22 @@ sub deepsearch {
 
 	$self->ua->post(
 		url => 'https://deepsearch.jina.ai/v1/chat/completions',
+		headers => delete $args{headers},
 		data => \%args
 	);
 }
 
 sub reader {
-	my ($self, $url) = @_;
+	my ($self, %args) = @_;
 
-	if (! $url) {
+	if (! $args{url}) {
 		die "no url defined for reader";
 	}
-
-	$self->ua->get(
-		url => "https://r.jina.ai/$url"
+	
+	$self->ua->post(
+		url => "https://r.jina.ai/",
+		headers => delete $args{headers},
+		data => \%args
 	);
 }
 
@@ -79,7 +82,8 @@ sub embedding {
 
 	$self->ua->post(
 		url => 'https://api.jina.ai/v1/embeddings',
-		data => \%args
+		headers => delete $args{headers},
+		data => \%args,
 	);
 }
 
@@ -100,6 +104,7 @@ sub rerank {
 
 	$self->ua->post(
 		url => 'https://api.jina.ai/v1/rerank',
+		headers => delete $args{headers},
 		data => \%args
 	);
 
@@ -126,6 +131,7 @@ sub classify {
 
 	$self->ua->post(
 		url => 'https://api.jina.ai/v1/classify',
+		headers => delete $args{headers},
 		data => \%args
 	);
 }
@@ -147,6 +153,7 @@ sub segment {
 
 	$self->ua->post(
 		url => 'https://api.jina.ai/v1/segment',
+		headers => delete $args{headers},
 		data => \%args
 	);
 }
@@ -164,7 +171,7 @@ WebService::Jina - Jina client
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -198,7 +205,7 @@ Version 0.02
 
 	...
 
-	my $reader = $jina->reader("https://lnation.org");
+	my $reader = $jina->reader(url => "https://lnation.org");
 
 	...
 
@@ -307,7 +314,19 @@ DeepSearch combines web searching, reading, and reasoning for comprehensive inve
 
 Feeding web information into LLMs is an important step of grounding, yet it can be challenging. The simplest method is to scrape the webpage and feed the raw HTML. However, scraping can be complex and often blocked, and raw HTML is cluttered with extraneous elements like markups and scripts. The Reader API addresses these issues by extracting the core content from a URL and converting it into clean, LLM-friendly text, ensuring high-quality input for your agent and RAG systems.
 
-	my $reader = $jina->reader("https://lnation.org");
+	my $reader = $jina->reader(url => "https://lnation.org");
+
+
+	my $reader = $jina->reader(
+		url => "https://lnation.org",
+		jsonSchema => { ... },
+		instruction => "...",
+		headers => {
+                	"Accept" => 'application/json',
+                	"X-Respond-With" => "readerlm-v2"
+        	}
+	);
+
 
 =cut
 

@@ -1,9 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0;
 
 use lib qw(./t/lib);
 
-use Test::More;
 use HTTPSecureHeadersTestApply;
 
 {

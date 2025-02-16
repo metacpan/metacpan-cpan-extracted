@@ -1,5 +1,8 @@
 Revision history for Music-Cadence
 
+0.1511 2025-02-15 16:13:21
+    - Add the verbose attribute.
+
 0.1510 2025-02-14 23:43:39
     - Improve the eg/cadence.pl program.
 
