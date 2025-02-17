@@ -1,7 +1,6 @@
 package Module::Pluggable;
 
 use strict;
-use vars qw($VERSION $FORCE_SEARCH_ALL_PATHS);
 use Module::Pluggable::Object;
 
 use if $] > 5.017, 'deprecate';
@@ -11,8 +10,8 @@ use if $] > 5.017, 'deprecate';
 # Peter Gibbons: I wouldn't say I've been missing it, Bob!
 
 
-$VERSION = '5.2';
-$FORCE_SEARCH_ALL_PATHS = 0;
+our $VERSION = '6.3';
+our $FORCE_SEARCH_ALL_PATHS = 0;
 
 sub import {
     my $class        = shift;
@@ -31,7 +30,7 @@ sub import {
     my $finder       = Module::Pluggable::Object->new(%opts);
     my $subroutine   = sub { my $self = shift; return $finder->plugins(@_) };
 
-    my $searchsub = sub {
+    my $search_path_sub = sub {
               my $self = shift;
               my ($action,@paths) = @_;
 
@@ -41,6 +40,15 @@ sub import {
               return $finder->{'search_path'};
     };
 
+    my $search_dirs_sub = sub {
+              my $self = shift;
+              my ($action,@paths) = @_;
+
+              $finder->{'search_dirs'} = ["${package}::Plugin"] if ($action eq 'add'  and not   $finder->{'search_dirs'} );
+              push @{$finder->{'search_dirs'}}, @paths      if ($action eq 'add');
+              $finder->{'search_dirs'}       = \@paths      if ($action eq 'new');
+              return $finder->{'search_dirs'};
+    };
 
     my $onlysub = sub {
         my ($self, $only) = @_;
@@ -67,7 +75,8 @@ sub import {
     no warnings qw(redefine prototype);
 
     *{"$package\::$sub"}        = $subroutine;
-    *{"$package\::search_path"} = $searchsub;
+    *{"$package\::search_path"} = $search_path_sub;
+    *{"$package\::search_dirs"} = $search_dirs_sub;
     *{"$package\::only"}        = $onlysub;
     *{"$package\::except"}      = $exceptsub;
 
@@ -223,8 +232,8 @@ and similarly for only which will only load plugins which match.
 Remember you can use the module more than once
 
     package MyClass;
-    use Module::Pluggable search_path => 'MyClass::Filters' sub_name => 'filters';
-    use Module::Pluggable search_path => 'MyClass::Plugins' sub_name => 'plugins';
+    use Module::Pluggable search_path => 'MyClass::Filters', sub_name => 'filters';
+    use Module::Pluggable search_path => 'MyClass::Plugins', sub_name => 'plugins';
 
 and then later ...
 
@@ -368,6 +377,19 @@ Gets passed the plugin name and the error.
 
 The default on_require_error handler is to C<carp> the error and return 0.
 
+=head2 after_require <plugin>
+
+Gets passed the plugin name.
+
+If 0 is returned then this plugin will be required but not instantiated or
+returned as a plugin.
+
+=head2 before_instantiate <plugin>
+
+Gets passed the plugin name.
+
+If 0 is returned, then instantiation will not occur.
+
 =head2 on_instantiate_error <plugin> <err>
 
 Gets called when there's an error on instantiating the plugin.
@@ -376,11 +398,13 @@ Gets passed the plugin name and the error.
 
 The default on_instantiate_error handler is to C<carp> the error and return 0.
 
-=head2 after_require <plugin>
+=head2 after_instantiate <plugin> <obj>
 
-Gets passed the plugin name.
+Gets passed the plugin name and the object that was instentiated.
+i.e. the return value of C<Plugin->new()>
 
-If 0 is returned then this plugin will be required but not returned as a plugin.
+The return value must be <obj> and will be returned AS the plugin.
+If the return value is not true, then nothing will be returned as a plugin.
 
 =head1 METHODs
 

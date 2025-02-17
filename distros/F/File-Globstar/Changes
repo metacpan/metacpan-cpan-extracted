@@ -1,11 +1,14 @@
 Revision history for Perl extension File-Globstar.
 
-v1.0.0  2023-07-12
+v1.1.0  2025-02-17
+	- issues fixed:
+	  * https://github.com/gflohr/File-Globstar/issues/7
+
+v1.0.0 2023-07-12
 	- bumped version to 1.x because the module seems to be mature by now
 	- use GitHub actions for continuous integration
 	- handle periods/dots in directory names correctly (thanks to Ben Martin)
 	- issues fixed:
-	  * https://github.com/gflohr/File-Globstar/issues/7
 	  * https://github.com/gflohr/File-Globstar/issues/8
 	  * https://github.com/gflohr/File-Globstar/issues/9
 	  * https://github.com/gflohr/File-Globstar/issues/10

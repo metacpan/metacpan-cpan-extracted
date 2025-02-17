@@ -1,7 +1,7 @@
 package CPANPLUS::Dist::Sample;
 
 use vars qw[$VERSION];
-$VERSION = "0.9914";
+$VERSION = "0.9916";
 
 =pod
 

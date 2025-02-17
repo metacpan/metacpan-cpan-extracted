@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use meta;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
 	my $caller = caller();
@@ -55,7 +55,7 @@ Xerarch - Introspection
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

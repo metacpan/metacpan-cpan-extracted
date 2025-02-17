@@ -1,7 +1,7 @@
 package Factory::Sub;
 use 5.006; use strict; use warnings;
 use Import::Into; use Carp qw/croak/; use Coerce::Types::Standard qw//;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use overload 
 	"&{}" => sub {my $self = shift; sub { $self->call(@_) }},
@@ -78,7 +78,7 @@ Factory::Sub - Generate a factory of subs
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

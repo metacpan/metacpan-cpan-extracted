@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9906";
+our $VERSION = "0.9907";
 
 =encoding utf-8
 
@@ -13,55 +13,55 @@ our $VERSION = "0.9906";
 App::Greple::charcode - greple module to annotate unicode character data
 
 =for html <p>
-<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
+<img width="566" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
 </p>
 
 =head1 SYNOPSIS
 
-B<greple> B<-Mcharcode> ...
+  greple -Mcharcode ...
+  greple -Mcharcode [ module option ] -- [ command option ] ...
 
-B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<command option> ] ...
+    COMMAND OPTION
+      --no-annotate  do not print annotation
+      --[no-]align   align annotations
+      --align-all    align to the same column for all lines
+      --align-side   align to the longest line
 
-  COMMAND OPTION
-    --no-annotate  do not print annotation
-    --[no-]align   align annotations
-    --align-all    align to the same column for all lines
-    --align-side   align to the longest line
+    UNICODE
+      --composite    find composite character (combining character sequence)
+      --precomposed  find precomposed character
+      --combined     find both composite and precomposed characters
+      --dt=type      specify decomposition type
+      --surrogate    find character in UTF-16 surrogate pair range
+      --outstand     find non-ASCII combining characters
+      -p/-P prop     find \p{prop} or \P{prop} characters
 
-  UNICODE
-    --composite    find composite character (combining character sequence)
-    --precomposed  find precomposed character
-    --combined     find both composite and precomposed characters
-    --dt=type      specify decomposition type
-    --surrogate    find character in UTF-16 surrogate pair range
-    --outstand     find non-ASCII combining characters
-    -p/-P prop     find \p{prop} or \P{prop} characters
+    ANSI
+      --ansicode     find ANSI terminal control sequences
 
-  ANSI
-    --ansicode     find ANSI terminal control sequences
+    MODULE OPTION
+       --column[=#]  display column number
+      --visible[=#]  display character name
+         --char[=#]  display character itself
+        --width[=#]  display width
+         --utf8[=#]  display UTF-8 encoding
+        --utf16[=#]  display UTF-16 encoding
+         --code[=#]  display unicode code point
+         --name[=#]  display character name
+        --split[=#]  put annotattion for each character
+      --alignto[=#]  align annotation to #
 
-  MODULE OPTION
-    --[no-]column  display column number
-    --[no-]char    display character itself
-    --[no-]width   display width
-    --[no-]code    display character code
-    --[no-]name    display character name
-    --[no-]visible display character name
-    --[no-]split   put annotattion for each character
-    --alignto=#    align annotation to #
+      --config KEY[=VALUE],...
+               (KEY: column char width code name visible align)
 
-    --config KEY[=VALUE],...
-             (KEY: column char width code name visible align)
+  greple -Mcc ...
+  greple -Mcc [ module option ] -- [ command option ] ...
 
-B<greple> B<-Mcc> ...
-
-B<greple> B<-Mcc> [ I<module option> ] -- [ I<command option> ] ...
-
-    -Mcc           alias module for -Mcharcode
+      -Mcc  alias module for -Mcharcode
 
 =head1 VERSION
 
-Version 0.9906
+Version 0.9907
 
 =head1 DESCRIPTION
 
@@ -217,45 +217,66 @@ Set configuration parameters.
 
 =item B<column>
 
-=item B<-->[B<no->]B<column>
+=item B<--column>[=I<#>]
 
 Show column number.
 Default C<1>.
 
+=item B<visible>
+
+=item B<--visible>[=I<#>]
+
+Display invisible characters in a visible string representation.
+Default C<0>.
+
 =item B<char>
 
-=item B<-->[B<no->]B<char>
+=item B<--char>[=I<#>]
 
 Show the character itself.
 Default C<0>.
 
 =item B<width>
 
-=item B<-->[B<no->]B<width>
+=item B<--width>[=I<#>]
 
 Show the width.
 Default C<0>.
 
+=item B<utf8>
+
+=item B<--utf8>[=I<#>]
+
+Show the UTF-8 encoding in hex.
+Default C<0>.
+
+=item B<utf16>
+
+=item B<--utf16>[=I<#>]
+
+Show the UTF-16 encoding in hex.
+Default C<0>.
+
 =item B<code>
 
-=item B<-->[B<no->]B<code>
+=item B<--code>[=I<#>]
 
-Show the character code in hex.
+Show the character code point in hex.
 Default C<1>.
 
 =item B<name>
 
-=item B<-->[B<no->]B<name>
+=item B<--name>[=I<#>]
 
 Show the Unicode name of the character.
 Default C<1>.
 
-=item B<visible>
+=item B<split>
 
-=item B<-->[B<no->]B<visible>
+=item B<--split>[=I<#>]
 
-Display invisible characters in a visible string representation.
-Default C<0>.
+If a pattern matching multiple characters is given, annotate each
+character independently.
 
 =item B<alignto>=I<column>
 
@@ -269,13 +290,6 @@ I<column> can be negative; if C<-1> is specified, align to the same
 column for all lines.  If C<-2> is specified, align to the longest
 line length, regardless of match position.
 
-=item B<split>
-
-=item B<-->[B<no->]B<split>
-
-If a pattern matching multiple characters is given, annotate each
-character independently.
-
 =back
 
 =head1 CONFIGURATION
@@ -287,24 +301,24 @@ Configuration parameters can be set in several ways.
 The start function of a module can be specified at the same time as
 the module declaration.
 
-    greple -Mannotate::config(alignto=0)
+    greple -Mcharcode::config(alignto=0)
 
-    greple -Mannotate::config=alignto=80
+    greple -Mcharcode::config=alignto=80
 
 =head2 PRIVATE MODULE OPTION
 
-Module-specific options are specified between C<-Mannotate> and C<-->.
+Module-specific options are specified between C<-Mcharcode> and C<-->.
 
-    greple -Mannotate --config alignto=80 -- ...
+    greple -Mcharcode --config alignto=80 -- ...
 
-    greple -Mannotate --alignto=80 -- ...
+    greple -Mcharcode --alignto=80 -- ...
 
 =head2 GENERIC MODULE OPTION
 
 Module-specific C<---config> option can be called by normal command
-line option C<--annotate::config>.
+line option C<--charcode::config>.
 
-    greple -Mannotate --annotate::config alignto=80 ...
+    greple -Mcharcode --charcode::config alignto=80 ...
 
 =head1 EXAMPLES
 
@@ -357,11 +371,11 @@ Kazumasa Utashiro
 
 =cut
 
-use Exporter 'import';
+use Exporter qw(import);
 our @EXPORT_OK = qw(config);
 our %EXPORT_TAGS = (alias => \@EXPORT_OK);
 
-use Encode qw(encode decode);
+use Encode ();
 use Getopt::EX::Config;
 use Hash::Util qw(lock_keys);
 use Data::Dumper;
@@ -378,10 +392,10 @@ our $config = Getopt::EX::Config->new(
     utf16   => 0,
     code    => 0,
     name    => 1,
-    alignto => \$App::Greple::annotate::config->{alignto},
     split   => \$App::Greple::annotate::config->{split},
+    alignto => \$App::Greple::annotate::config->{alignto},
 );
-my %type = ( alignto => '=i', '*' => '!' );
+my %type = ( '*' => ':1' );
 lock_keys %{$config};
 
 our %CONFIG_TAGS = (
@@ -394,7 +408,7 @@ sub finalize {
 	$argv,
 	(
 	    map {
-		my $type = $type{$_} // $type{'*'};
+		my $type = $type{$_} // $type{'*'} // '';
 		my $ref = ref $config->{$_} ? $config->{$_} : \$config->{$_};
 		( $_.$type => $ref ) ;
 	    }
@@ -426,24 +440,18 @@ sub charcode {
     s/(.)/code($1)/ger;
 }
 
-sub utf8 {
-    utf('UTF-8', @_);
-}
-
-sub utf16 {
-    utf('UTF-16', @_);
-}
-
-sub utf {
+sub utf8  { encode('UTF-8',  @_) }
+sub utf16 { encode('UTF-16', @_) }
+sub encode {
     my $code = shift;
-    local $_ = encode($code, @_ ? shift : $_);
-    s/(.)/code($1)/ger;
+    local *_ = @_ ? \$_[0] : \$_;
+    Encode::encode($code, $_) =~ s/(.)/code($1)/ger;
 }
 
 sub code {
     state $format = [ qw(\x{%02x} \x{%04x}) ];
-    my $ord = ord($_[0]);
-    sprintf($format->[$ord > 0xff], $ord);
+    my $ord = ord $_[0];
+    sprintf $format->[$ord > 0xff], $ord;
 }
 
 my %cmap = (
@@ -480,18 +488,16 @@ sub width {
 }
 
 sub describe {
-    my %param = @_;
-    my $column = $param{column};
-    local $_   = $param{match};
+    (my $column, local $_) = { @_ }->@{ qw(column match) };
     my @s;
-    push @s, sprintf("%3d ", $column)     if $config->{column};
-    push @s, sprintf("%s", visible)       if $config->{visible};
-    push @s, sprintf("raw=\"%s\"", $_)    if $config->{char};
-    push @s, sprintf("w=%d", width)       if $config->{width};
-    push @s, sprintf("utf8=%s", utf8)     if $config->{utf8};
-    push @s, sprintf("utf16=%s", utf16)   if $config->{utf16};
-    push @s, sprintf("code=%s", charcode) if $config->{code};
-    push @s, sprintf("name=%s", charname) if $config->{name};
+    push @s, sprintf '%3d ',      $column  if $config->{column};
+    push @s, sprintf '%s',        visible  if $config->{visible};
+    push @s, sprintf 'char="%s"', $_       if $config->{char};
+    push @s, sprintf 'w=%d',      width    if $config->{width};
+    push @s, sprintf 'utf8=%s',   utf8     if $config->{utf8};
+    push @s, sprintf 'utf16=%s',  utf16    if $config->{utf16};
+    push @s, sprintf 'code=%s',   charcode if $config->{code};
+    push @s, sprintf 'name=%s',   charname if $config->{name};
     join "\N{NBSP}", @s;
 }
 

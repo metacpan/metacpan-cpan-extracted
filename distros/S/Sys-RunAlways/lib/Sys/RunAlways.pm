@@ -1,7 +1,7 @@
 package Sys::RunAlways;
 
 # version info
-$VERSION= '0.06';
+$VERSION= '0.07';
 
 # be as strict and verbose as possible
 use strict;
@@ -81,7 +81,7 @@ loaded, is always running on the server.
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.07.
 
 =head1 METHODS
 

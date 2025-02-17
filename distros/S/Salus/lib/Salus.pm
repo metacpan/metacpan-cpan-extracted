@@ -3,7 +3,7 @@ package Salus;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Salus::Header;
 use Salus::Table;
@@ -89,13 +89,13 @@ Salus - checksummed csvs
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 =head1 SYNOPSIS
 
-	package Corruption;
+	package Employees;
 
 	use Salus all => 1;
 
@@ -119,14 +119,14 @@ Version 0.08
 
 ...
 
-	my $unethical = Corruption->new(
+	my $employees = Employees->new(
 		file => 't/test.csv',
 		unprotected_read => 1
 	);
 
-	$unethical->read();
+	$employees->read();
 
-	$unethical->write('t/test2.csv');
+	$employees->write('t/test2.csv');
 
 =head1 ATTRIBUTES
 

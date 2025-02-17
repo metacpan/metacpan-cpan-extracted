@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # ABSTRACT: A small, simple, correct HTTP/1.1 client
 
-our $VERSION = '0.080';
+our $VERSION = '0.090';
 
 sub _croak { require Carp; Carp::croak(@_) }
 
@@ -40,10 +40,15 @@ sub _croak { require Carp; Carp::croak(@_) }
 #pod * C<timeout> — Request timeout in seconds (default is 60) If a socket open,
 #pod   read or write takes longer than the timeout, the request response status code
 #pod   will be 599.
-#pod * C<verify_SSL> — A boolean that indicates whether to validate the SSL
-#pod   certificate of an C<https> — connection (default is false)
+#pod * C<verify_SSL> — A boolean that indicates whether to validate the TLS/SSL
+#pod   certificate of an C<https> — connection (default is true). Changed from false
+#pod   to true in version 0.083.
 #pod * C<SSL_options> — A hashref of C<SSL_*> — options to pass through to
 #pod   L<IO::Socket::SSL>
+#pod * C<$ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT}> - Changes the default
+#pod   certificate verification behavior to not check server identity if set to 1.
+#pod   Only effective if C<verify_SSL> is not set. Added in version 0.083.
+#pod
 #pod
 #pod An accessor/mutator method exists for each attribute.
 #pod
@@ -60,7 +65,8 @@ sub _croak { require Carp; Carp::croak(@_) }
 #pod the persistent connection will be dropped.  If you want persistent connections
 #pod across multiple destinations, use multiple HTTP::Tiny objects.
 #pod
-#pod See L</SSL SUPPORT> for more on the C<verify_SSL> and C<SSL_options> attributes.
+#pod See L</TLS/SSL SUPPORT> for more on the C<verify_SSL> and C<SSL_options>
+#pod attributes.
 #pod
 #pod =cut
 
@@ -111,11 +117,17 @@ sub timeout {
 sub new {
     my($class, %args) = @_;
 
+    # Support lower case verify_ssl argument, but only if verify_SSL is not
+    # true.
+    if ( exists $args{verify_ssl} ) {
+        $args{verify_SSL}  ||= $args{verify_ssl};
+    }
+
     my $self = {
         max_redirect => 5,
         timeout      => defined $args{timeout} ? $args{timeout} : 60,
         keep_alive   => 1,
-        verify_SSL   => $args{verify_SSL} || $args{verify_ssl} || 0, # no verification by default
+        verify_SSL   => defined $args{verify_SSL} ? $args{verify_SSL} : _verify_SSL_default(),
         no_proxy     => $ENV{no_proxy},
     };
 
@@ -132,6 +144,13 @@ sub new {
     $self->_set_proxies;
 
     return $self;
+}
+
+sub _verify_SSL_default {
+    my ($self) = @_;
+    # Check if insecure default certificate verification behaviour has been
+    # changed by the user by setting PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT=1
+    return (($ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT} || '') eq '1') ? 0 : 1;
 }
 
 sub _set_proxies {
@@ -225,7 +244,7 @@ HERE
 #pod form data hash or array reference to the given URL with a C<content-type> of
 #pod C<application/x-www-form-urlencoded>.  If data is provided as an array
 #pod reference, the order is preserved; if provided as a hash reference, the terms
-#pod are sorted on key and value for consistency.  See documentation for the
+#pod are sorted by key for consistency.  See documentation for the
 #pod C<www_form_urlencode> method for details on the encoding.
 #pod
 #pod The URL must have unsafe characters escaped and international domain names
@@ -245,9 +264,10 @@ sub post_form {
     while ( my ($key, $value) = each %{$args->{headers} || {}} ) {
         $headers->{lc $key} = $value;
     }
-    delete $args->{headers};
 
     return $self->request('POST', $url, {
+            # Any existing 'headers' key in $args will be overridden with a
+            # normalized version below.
             %$args,
             content => $self->www_form_urlencode($data),
             headers => {
@@ -389,6 +409,10 @@ sub mirror {
 #pod customizing the action of the callback based on the C<status> or C<headers>
 #pod received prior to the content body.)
 #pod
+#pod Content data in the request/response is handled as "raw bytes".  Any
+#pod encoding/decoding (with associated headers) are the responsibility of the
+#pod caller.
+#pod
 #pod The C<request> method returns a hashref containing the response.  The hashref
 #pod will have the following keys:
 #pod
@@ -486,7 +510,10 @@ sub www_form_urlencode {
     (ref $data eq 'HASH' || ref $data eq 'ARRAY')
         or _croak("form data must be a hash or array reference\n");
 
-    my @params = ref $data eq 'HASH' ? %$data : @$data;
+    my @params
+        = ref $data eq 'HASH'
+        ? map { ($_ => $data->{$_}) } sort keys %$data
+        : @$data;
     @params % 2 == 0
         or _croak("form data reference must have an even number of terms\n");
 
@@ -503,7 +530,7 @@ sub www_form_urlencode {
         }
     }
 
-    return join("&", (ref $data eq 'ARRAY') ? (@terms) : (sort @terms) );
+    return join("&", @terms);
 }
 
 #pod =method can_ssl
@@ -528,18 +555,18 @@ sub can_ssl {
 
     my($ok, $reason) = (1, '');
 
-    # Need IO::Socket::SSL 1.42 for SSL_create_ctx_callback
+    # Need IO::Socket::SSL 1.968 for default_ca()
     local @INC = @INC;
     pop @INC if $INC[-1] eq '.';
-    unless (eval {require IO::Socket::SSL; IO::Socket::SSL->VERSION(1.42)}) {
+    unless (eval {require IO::Socket::SSL; IO::Socket::SSL->VERSION(1.968)}) {
         $ok = 0;
-        $reason .= qq/IO::Socket::SSL 1.42 must be installed for https support\n/;
+        $reason .= qq/IO::Socket::SSL 1.968 or later must be installed for https support\n/;
     }
 
     # Need Net::SSLeay 1.49 for MODE_AUTO_RETRY
     unless (eval {require Net::SSLeay; Net::SSLeay->VERSION(1.49)}) {
         $ok = 0;
-        $reason .= qq/Net::SSLeay 1.49 must be installed for https support\n/;
+        $reason .= qq/Net::SSLeay 1.49 or later must be installed for https support\n/;
     }
 
     # If an object, check that SSL config lets us get a CA if necessary
@@ -548,7 +575,7 @@ sub can_ssl {
             SSL_options => $self->{SSL_options},
             verify_SSL  => $self->{verify_SSL},
         );
-        unless ( eval { $handle->_find_CA_file; 1 } ) {
+        unless ( eval { $handle->_find_CA; 1 } ) {
             $ok = 0;
             $reason .= "$@";
         }
@@ -1055,7 +1082,7 @@ sub new {
         timeout          => 60,
         max_line_size    => 16384,
         max_header_lines => 64,
-        verify_SSL       => 0,
+        verify_SSL       => HTTP::Tiny::_verify_SSL_default(),
         SSL_options      => {},
         %args
     }, $class;
@@ -1614,29 +1641,29 @@ sub can_reuse {
         return 1;
 }
 
-# Try to find a CA bundle to validate the SSL cert,
-# prefer Mozilla::CA or fallback to a system file
-sub _find_CA_file {
-    my $self = shift();
+sub _find_CA {
+    my $self = shift;
 
-    my $ca_file =
-      defined( $self->{SSL_options}->{SSL_ca_file} )
-      ? $self->{SSL_options}->{SSL_ca_file}
-      : $ENV{SSL_CERT_FILE};
+    my $ca_file = $self->{SSL_options}->{SSL_ca_file};
 
     if ( defined $ca_file ) {
         unless ( -r $ca_file ) {
             die qq/SSL_ca_file '$ca_file' not found or not readable\n/;
         }
-        return $ca_file;
+        return ( SSL_ca_file => $ca_file );
     }
 
-    local @INC = @INC;
-    pop @INC if $INC[-1] eq '.';
-    return Mozilla::CA::SSL_ca_file()
-        if eval { require Mozilla::CA; 1 };
+    # Return default_ca() parameters from IO::Socket::SSL. It looks for the
+    # default bundle and directory from Net::SSLeay, handles $ENV{SSL_CERT_FILE}
+    # and $ENV{SSL_CERT_DIR}, and finally fails over to Mozilla::CA
+    #
+    my %default_ca = IO::Socket::SSL::default_ca();
+    return %default_ca if %default_ca;
 
-    # cert list copied from golang src/crypto/x509/root_unix.go
+    # If IO::Socket::SSL::default_ca() was unable to find a CA bundle, look for
+    # one in well known locations as a last resort. Cert list copied from golang
+    # src/crypto/x509/root_unix.go
+    #
     foreach my $ca_bundle (
         "/etc/ssl/certs/ca-certificates.crt",     # Debian/Ubuntu/Gentoo etc.
         "/etc/pki/tls/certs/ca-bundle.crt",       # Fedora/RHEL
@@ -1647,11 +1674,18 @@ sub _find_CA_file {
         "/etc/pki/tls/cacert.pem",                # OpenELEC
         "/etc/certs/ca-certificates.crt",         # Solaris 11.2+
     ) {
-        return $ca_bundle if -e $ca_bundle;
+        return ( SSL_ca_file => $ca_bundle ) if -e $ca_bundle;
     }
 
     die qq/Couldn't find a CA bundle with which to verify the SSL certificate.\n/
-      . qq/Try installing Mozilla::CA from CPAN\n/;
+      . qq/Try installing one from your OS vendor, or Mozilla::CA from CPAN\n/;
+}
+
+# not for internal use; backcompat shim only
+sub _find_CA_file {
+    my $self = shift;
+    my %res = $self->_find_CA();
+    return $res{SSL_ca_file};
 }
 
 # for thread safety, we need to know thread id if threads are loaded
@@ -1675,7 +1709,8 @@ sub _ssl_args {
         $ssl_args{SSL_verifycn_scheme}  = 'http'; # enable CN validation
         $ssl_args{SSL_verifycn_name}    = $host;  # set validation hostname
         $ssl_args{SSL_verify_mode}      = 0x01;   # enable cert validation
-        $ssl_args{SSL_ca_file}          = $self->_find_CA_file;
+
+        %ssl_args = ( %ssl_args, $self->_find_CA );
     }
     else {
         $ssl_args{SSL_verifycn_scheme}  = 'none'; # disable CN validation
@@ -1704,7 +1739,7 @@ HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 =head1 VERSION
 
-version 0.080
+version 0.090
 
 =head1 SYNOPSIS
 
@@ -1797,11 +1832,15 @@ C<timeout> — Request timeout in seconds (default is 60) If a socket open, read
 
 =item *
 
-C<verify_SSL> — A boolean that indicates whether to validate the SSL certificate of an C<https> — connection (default is false)
+C<verify_SSL> — A boolean that indicates whether to validate the TLS/SSL certificate of an C<https> — connection (default is true). Changed from false to true in version 0.083.
 
 =item *
 
 C<SSL_options> — A hashref of C<SSL_*> — options to pass through to L<IO::Socket::SSL>
+
+=item *
+
+C<$ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT}> - Changes the default certificate verification behavior to not check server identity if set to 1. Only effective if C<verify_SSL> is not set. Added in version 0.083.
 
 =back
 
@@ -1820,7 +1859,8 @@ attributes are modified via accessor, or if the process ID or thread ID change,
 the persistent connection will be dropped.  If you want persistent connections
 across multiple destinations, use multiple HTTP::Tiny objects.
 
-See L</SSL SUPPORT> for more on the C<verify_SSL> and C<SSL_options> attributes.
+See L</TLS/SSL SUPPORT> for more on the C<verify_SSL> and C<SSL_options>
+attributes.
 
 =head2 get|head|put|post|patch|delete
 
@@ -1843,7 +1883,7 @@ This method executes a C<POST> request and sends the key/value pairs from a
 form data hash or array reference to the given URL with a C<content-type> of
 C<application/x-www-form-urlencoded>.  If data is provided as an array
 reference, the order is preserved; if provided as a hash reference, the terms
-are sorted on key and value for consistency.  See documentation for the
+are sorted by key for consistency.  See documentation for the
 C<www_form_urlencode> method for details on the encoding.
 
 The URL must have unsafe characters escaped and international domain names
@@ -1942,6 +1982,10 @@ containing a chunk of the response body, the second argument will be the
 in-progress response hash reference, as described below.  (This allows
 customizing the action of the callback based on the C<status> or C<headers>
 received prior to the content body.)
+
+Content data in the request/response is handled as "raw bytes".  Any
+encoding/decoding (with associated headers) are the responsibility of the
+caller.
 
 The C<request> method returns a hashref containing the response.  The hashref
 will have the following keys:
@@ -2043,11 +2087,11 @@ proxy
 timeout
 verify_SSL
 
-=head1 SSL SUPPORT
+=head1 TLS/SSL SUPPORT
 
 Direct C<https> connections are supported only if L<IO::Socket::SSL> 1.56 or
 greater and L<Net::SSLeay> 1.49 or greater are installed. An error will occur
-if new enough versions of these modules are not installed or if the SSL
+if new enough versions of these modules are not installed or if the TLS
 encryption fails. You can also use C<HTTP::Tiny::can_ssl()> utility function
 that returns boolean to see if the required modules are installed.
 
@@ -2055,7 +2099,7 @@ An C<https> connection may be made via an C<http> proxy that supports the CONNEC
 command (i.e. RFC 2817).  You may not proxy C<https> via a proxy that itself
 requires C<https> to communicate.
 
-SSL provides two distinct capabilities:
+TLS/SSL provides two distinct capabilities:
 
 =over 4
 
@@ -2069,37 +2113,29 @@ Verification of server identity
 
 =back
 
-B<By default, HTTP::Tiny does not verify server identity>.
+B<By default, HTTP::Tiny verifies server identity>.
 
-Server identity verification is controversial and potentially tricky because it
-depends on a (usually paid) third-party Certificate Authority (CA) trust model
-to validate a certificate as legitimate.  This discriminates against servers
-with self-signed certificates or certificates signed by free, community-driven
-CA's such as L<CAcert.org|http://cacert.org>.
+This was changed in version 0.083 due to security concerns. The previous default
+behavior can be enabled by setting C<$ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT}>
+to 1.
 
-By default, HTTP::Tiny does not make any assumptions about your trust model,
-threat level or risk tolerance.  It just aims to give you an encrypted channel
-when you need one.
+Verification is done by checking that that the TLS/SSL connection has a valid
+certificate corresponding to the host name of the connection and that the
+certificate has been verified by a CA. Assuming you trust the CA, this will
+protect against L<machine-in-the-middle
+attacks|http://en.wikipedia.org/wiki/Machine-in-the-middle_attack>.
 
-Setting the C<verify_SSL> attribute to a true value will make HTTP::Tiny verify
-that an SSL connection has a valid SSL certificate corresponding to the host
-name of the connection and that the SSL certificate has been verified by a CA.
-Assuming you trust the CA, this will protect against a L<man-in-the-middle
-attack|http://en.wikipedia.org/wiki/Man-in-the-middle_attack>.  If you are
-concerned about security, you should enable this option.
+Certificate verification requires a file or directory containing trusted CA
+certificates.
 
-Certificate verification requires a file containing trusted CA certificates.
+C<IO::Socket::SSL::default_ca()> is called to detect the default location of
+your CA certificates. This also supports the environment variables
+C<SSL_CERT_FILE> and C<SSL_CERT_DIR>, and will fail over to L<Mozilla::CA> if no
+certs are found.
 
-If the environment variable C<SSL_CERT_FILE> is present, HTTP::Tiny
-will try to find a CA certificate file in that location.
-
-If the L<Mozilla::CA> module is installed, HTTP::Tiny will use the CA file
-included with it as a source of trusted CA's.  (This means you trust Mozilla,
-the author of Mozilla::CA, the CPAN mirror where you got Mozilla::CA, the
-toolchain used to install it, and your operating system security, right?)
-
-If that module is not available, then HTTP::Tiny will search several
-system-specific default locations for a CA certificate file:
+If C<IO::Socket::SSL::default_ca()> is not able to find usable CA certificates,
+HTTP::Tiny will search several well-known system-specific default locations for
+a CA certificate file as a last resort:
 
 =over 4
 
@@ -2115,13 +2151,33 @@ system-specific default locations for a CA certificate file:
 
 /etc/ssl/ca-bundle.pem
 
+=item *
+
+/etc/openssl/certs/ca-certificates.crt
+
+=item *
+
+/etc/ssl/cert.pem
+
+=item *
+
+/usr/local/share/certs/ca-root-nss.crt
+
+=item *
+
+/etc/pki/tls/cacert.pem
+
+=item *
+
+/etc/certs/ca-certificates.crt
+
 =back
 
 An error will be occur if C<verify_SSL> is true and no CA certificate file
 is available.
 
-If you desire complete control over SSL connections, the C<SSL_options> attribute
-lets you provide a hash reference that will be passed through to
+If you desire complete control over TLS/SSL connections, the C<SSL_options>
+attribute lets you provide a hash reference that will be passed through to
 C<IO::Socket::SSL::start_SSL()>, overriding any options set by HTTP::Tiny. For
 example, to provide your own trusted CA file:
 
@@ -2131,7 +2187,7 @@ example, to provide your own trusted CA file:
 
 The C<SSL_options> attribute could also be used for such things as providing a
 client certificate for authentication to a server or controlling the choice of
-cipher used for the SSL connection. See L<IO::Socket::SSL> documentation for
+cipher used for the TLS/SSL connection. See L<IO::Socket::SSL> documentation for
 details.
 
 =head1 PROXY SUPPORT
@@ -2294,10 +2350,6 @@ L<LWP::UserAgent> - If HTTP::Tiny isn't enough for you, this is the "standard" w
 
 =item *
 
-L<Mozilla::CA> - Required if you want to validate SSL certificates
-
-=item *
-
 L<Net::SSLeay> - Required for SSL support
 
 =back
@@ -2309,7 +2361,7 @@ L<Net::SSLeay> - Required for SSL support
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/chansen/p5-http-tiny/issues>.
+at L<https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -2317,9 +2369,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/chansen/p5-http-tiny>
+L<https://github.com/Perl-Toolchain-Gang/HTTP-Tiny>
 
-  git clone https://github.com/chansen/p5-http-tiny.git
+  git clone https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git
 
 =head1 AUTHORS
 
@@ -2337,7 +2389,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alan Gardner Alessandro Ghedini A. Sinan Unur Brad Gilbert brian m. carlson Chris Nehren Weyl Claes Jakobsson Clinton Gormley Craig Berry David Golden Mitchell Dean Pearce Edward Zborowski Felipe Gasper Greg Kennedy James E Keenan Raspass Jeremy Mates Jess Robinson Karen Etheridge Lukas Eklund Martin J. Evans Martin-Louis Bright Matthew Horsfall Michael R. Davis Mike Doherty Nicolas Rochelemagne Olaf Alders Olivier Mengué Petr Písař sanjay-cpu Serguei Trouchelle Shoichi Kaji SkyMarshal Sören Kornetzki Steve Grazzini Syohei YOSHIDA Tatsuhiko Miyagawa Tom Hukins Tony Cook Xavier Guimard
+=for stopwords Alan Gardner Alessandro Ghedini A. Sinan Unur Brad Gilbert brian m. carlson Chris Nehren Weyl Claes Jakobsson Clinton Gormley Craig Berry David Golden Mitchell Dean Pearce Edward Zborowski Felipe Gasper Graham Knop Greg Kennedy James E Keenan Raspass Jeremy Mates Jess Robinson Karen Etheridge Lukas Eklund Martin J. Evans Martin-Louis Bright Matthew Horsfall Michael R. Davis Mike Doherty Nicolas Rochelemagne Olaf Alders Olivier Mengué Petr Písař sanjay-cpu Serguei Trouchelle Shoichi Kaji SkyMarshal Sören Kornetzki Steve Grazzini Stig Palmquist Syohei YOSHIDA Tatsuhiko Miyagawa Tom Hukins Tony Cook Xavier Guimard
 
 =over 4
 
@@ -2383,10 +2435,6 @@ Craig A. Berry <craigberry@mac.com>
 
 =item *
 
-Craig Berry <cberry@cpan.org>
-
-=item *
-
 David Golden <xdg@xdg.me>
 
 =item *
@@ -2404,6 +2452,10 @@ Edward Zborowski <ed@rubensteintech.com>
 =item *
 
 Felipe Gasper <felipe@felipegasper.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 
@@ -2495,6 +2547,10 @@ Steve Grazzini <steve.grazzini@grantstreet.com>
 
 =item *
 
+Stig Palmquist <git@stig.io>
+
+=item *
+
 Syohei YOSHIDA <syohex@gmail.com>
 
 =item *
@@ -2517,7 +2573,7 @@ Xavier Guimard <yadd@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Christian Hansen.
+This software is copyright (c) 2024 by Christian Hansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

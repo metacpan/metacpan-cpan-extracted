@@ -46,6 +46,7 @@ inc/bundle/Module/Metadata.pm
 inc/bundle/Module/Pluggable.pm
 inc/bundle/Module/Pluggable/Object.pm
 inc/bundle/Object/Accessor.pm
+inc/bundle/parent.pm
 inc/bundle/Package/Constants.pm
 inc/bundle/Params/Check.pm
 inc/bundle/Parse/CPAN/Meta.pm

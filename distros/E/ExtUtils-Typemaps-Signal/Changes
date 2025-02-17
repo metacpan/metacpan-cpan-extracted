@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Typemaps-Signal
 
+0.008     2025-02-16 16:26:30+01:00 Europe/Brussels
+          - Allow Time::Spec objects for time values
+
 0.007     2025-02-04 04:33:55+01:00 Europe/Brussels
           - use "\x{23}" instead of "%:" to escape #
           - Eliminate siginfo_t from typemap

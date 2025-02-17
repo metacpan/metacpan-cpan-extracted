@@ -1,4 +1,4 @@
-Module::Find version 0.16
+Module::Find version 0.17
 =========================
 
 Module::Find lets you find and use modules in categories. This can be very 
@@ -22,9 +22,15 @@ This module requires these other modules and libraries:
   File::Spec
   File::Find
 
+Optionally, the following modules can be installed to run further tests:
+
+  Test::CPAN::Meta
+  Test::Pod
+  Test::Pod::Coverage
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2004-2022 Christian Renz <crenz@web42.com>. All rights reserved.
+Copyright (C) 2004-2025 Christian Renz <crenz@web42.com>. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

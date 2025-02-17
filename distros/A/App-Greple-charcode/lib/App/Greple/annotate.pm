@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9906";
+our $VERSION = "0.9907";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ B<greple> B<-Mannotate> [ I<module option> ] -- [ I<command option> ] ...
 
 =head1 VERSION
 
-Version 0.9906
+Version 0.9907
 
 =head1 DESCRIPTION
 
@@ -49,6 +49,19 @@ to disable it.
 
 Set configuration paarameters.
 
+=item B<-->[B<no->]B<align>
+
+Align annotation or not.
+Default true.
+
+=item B<--align-all>
+
+Align to the same column for all lines
+
+=item B<--align-side>
+
+Align to the longest line length, regardless of match position.
+
 =back
 
 =head1 MODULE OPTIONS and PARAMS
@@ -71,12 +84,13 @@ I<column> can be negative; if C<-1> is specified, align to the same
 column for all lines.  If C<-2> is specified, align to the longest
 line length, regardless of match position.
 
-=item B<--split>, B<--no-split>
+=item B<--split>[=I<#>]
 
 =item config(B<split>=[I<#>])
 
-Defaults to C<0>.  If a pattern matching multiple characters is given,
-annotate each character individually.
+Defaults to C<0>.  Use C<--split> or C<--split=1> to enable it.  If a
+pattern matching multiple characters is given, annotate each character
+individually.
 
 =back
 
@@ -160,7 +174,7 @@ our $config = Getopt::EX::Config->new(
     alignto => 1,
     split => 0,
 );
-my %type = ( alignto => '=i', '*' => '!' );
+my %type = ( '*' => ':1' );
 lock_keys %{$config};
 
 sub finalize {
@@ -334,7 +348,7 @@ sub _prepare {
 		$current->push( do {
 		    my $maker = sub {
 			my($head, $match) = @_;
-			sprintf("%s%s─ %s", $indent, $head,
+			sprintf("%s%s─\N{NBSP}%s", $indent, $head,
 				$ANNOTATE->(column => $start, match => $match));
 		    };
 		    if ($config->{split}) {

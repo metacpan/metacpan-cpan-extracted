@@ -8,7 +8,7 @@
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
 package File::Globstar::ListMatch;
-$File::Globstar::ListMatch::VERSION = 'v1.0.0';
+$File::Globstar::ListMatch::VERSION = 'v1.1.0';
 use strict;
 
 use Locale::TextDomain qw(File-Globstar);

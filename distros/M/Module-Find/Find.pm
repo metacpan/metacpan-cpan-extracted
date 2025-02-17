@@ -7,7 +7,7 @@ use warnings;
 use File::Spec;
 use File::Find;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 our $basedir = undef;
 our @results = ();
@@ -357,6 +357,11 @@ Fixes L<issue #9|https://github.com/crenz/Module-Find/issues/9>. Note that on Wi
 the patch to C<File::Find> from L<perl5/PR #20008|https://github.com/Perl/perl5/pull/20008> 
 will be required for proper operation. 
 
+=item 0.17, 2025-02-16
+
+Fixes L<issue 13|https://github.com/crenz/Module-Find/issues/13> / L<148978|https://rt.cpan.org/Ticket/Display.html?id=148978>
+where warnings where produced upon extracting the installation archive, which prevented installation under cpanm and other tools.
+
 =back
 
 =head1 DEVELOPMENT NOTES
@@ -373,7 +378,7 @@ Christian Renz, E<lt>crenz@web42.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2022 by Christian Renz <crenz@web42.com>. All rights reserved.
+Copyright 2004-2025 by Christian Renz <crenz@web42.com>. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

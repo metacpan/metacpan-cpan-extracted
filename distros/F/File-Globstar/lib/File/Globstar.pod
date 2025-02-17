@@ -22,9 +22,9 @@ File::Globstar - Globbing With Double Asterisk Expansion
 
 =head1 DESCRIPTION
 
-Shortcut: If you want to implement file inclusion or exclusion in the style
+Important: If you want to implement file inclusion or exclusion in the style
 of L<.gitignore|https://git-scm.com/docs/gitignore>, have a look at
-L<File::Globstar::ListMatch>.
+L<File::Globstar::ListMatch> instead.
 
 Many globbing implementations have been recently extended to accept the
 pattern F<**> in place of a path element.  The double asterisk matches
@@ -37,33 +37,38 @@ The convention is especially popular
 in the Node.js ecosystem and is also used by L<git|https://git-scm.com/>
 when evaluating ignore patterns (see L<https://git-scm.com/docs/gitignore>).
 
+When you read the documentation below, you may come to the conclusion that
+using this module is really complicated given that there are so many special
+rules about slashes, exclamation marks, asterisks/stars and so on.  In fact,
+these rules are only hard to describe precisely.  But they pretty much do
+exactly what you expect from them and what you are used to from the moment
+that you had first entered a "*" in a terminal window.
+
 =head2 FUNCTIONS
 
 =over 4
 
-=item B<globstar PATTERN[, DIRECTORY]>
+=item B<globstar PATTERN>
 
-Return all files and directories matching B<PATTERN> in B<DIRECTORY>.
-B<DIRECTORY> defaults to the current directory if empty or
-undefined.
+Return all files and directories matching B<PATTERN>.  Relative paths are
+interpreted relatively to the current working directory.
 
 An invalid B<PATTERN> matches nothing and B<globstar()> returns an empty
 list for it.
 
-The function I<only> expand the sequence "**" (at the appropriate) positions.
+The function I<only> expands the sequence "**" (at the appropriate) positions.
 All other heavy lifting is done by L<File::Glob::bsd_glob()> (which is also
-the backend for the standard Perl B<glob> operator <HANDLE>.
+the backend for the standard Perl B<glob> operator <PATTERN>).
 
-Currently, only the (forward!) slash is accepted as a path separator!
+Only the (forward!) slash is accepted as a path separator!
 
 =item B<fnmatchstar PATTERN, STRING[, OPTIONS]>
 
-Returns 1 if B<STRING> matches B<PATTERN>, false otherwise.  If a Perl truthy
-value is passed as the optional third argument, case is ignored for the
-match.
+Returns 1 if B<STRING> matches B<PATTERN>, false otherwise.
 
 B<OPTIONS> is an optional hash of named arguments.  The only
-supported option is "ignoreCase" at the moment.
+supported option is "ignoreCase" at the moment.  As the name suggests, it
+enforces case-insensitive matching.
 
 Invalid B<PATTERN>s never match.
 
@@ -89,7 +94,7 @@ a slash.  Likewise it must be followed by a slash or the end of the pattern.
 
 =item B<[RANGE]>, B<[!RANGE]>
 
-A character range or a negated character range that is preceded by an
+A character range or a negated character range marked by a leading
 exclamation mark.  A range cannot be empty.
 
 The following features are supported:
@@ -113,7 +118,8 @@ A character class like "[:print:]", "[:upper:]", "[:lower:]".  Example:
 
 This pattern stands for exactly one character, either one of the ASCII
 digits 0, 1, 2, 3, 4, 5, 6, 7, 8, or 9 or any lowercase character
-(according to the current locale).
+(according to the current locale).  See L<perlre> for a list of supported
+character classes.
 
 =item B<\CHARACTER>
 
@@ -133,7 +139,7 @@ This pattern matches either a closing square bracket "]" or a hyphen "-".
 
 Note that POSIX collation classes (for example "[.ch.]") and POSIX equivalence
 classes (for example "[=a=]") are not supported.  Rationale: B<bsd_glob()>
-does not support them and in Perl regular expression character classes they
+does not support them and in Perl regular expression character classes
 are currently not supported and their usage throws an exception.
 
 =back
@@ -160,23 +166,18 @@ parentheses.
 
 =over 8
 
-=item B<*> If B<PATTERN> begins with an exclamation mark, it is discarded,
-and the B<PATTERN> is marked as negated (current "/src/**/.deps/").
+=item B<*> If B<PATTERN> begins with an exclamation mark, the exclamation mark is discarded, and the B<PATTERN> is marked as negated (current "/src/**/.deps/").
 
-=item B<*> If B<PATTERN> ends with a slash, it is discarded,
-and the B<PATTERN> is marked as a "directory match" (current "/src/**/.deps").
+=item B<*> If B<PATTERN> ends with a slash, the slash is discarded, and the B<PATTERN> is marked as a "directory match" (current "/src/**/.deps").
 
-=item B<*> If B<PATTERN> begins with a slash, it is discarded,
-and the B<PATTERN> is marked as a "full path match" (current "src/**/.deps").
+=item B<*> If B<PATTERN> begins with a slash, the slash is discarded, and the B<PATTERN> is marked as a "full path match" (current "src/**/.deps").
 
-=item B<*> If B<PATTERN> is not already marked as a "full path match", every
-remaining slash will activate "full path match" (no modification in this
-last step).
+=item B<*> If B<PATTERN> is not already marked as a "full path match", every remaining slash will activate "full path match" (no modification in this last step).
 
 =back
 
 Note that the pre-processing step is skipped, if you pass a compiled regular
-expression instead of a (scalar) string for B<PATTERN>.  And to be honest,
+expression instead of a (scalar) string for B<PATTERN>.  And actually,
 B<pnmatchstar()> does not really do the pre-processing.  It is in fact done by
 B<translatestar()> when called with the option B<pathMode>.  See
 below for details.
@@ -186,28 +187,22 @@ pre-processed:
 
 =over 8
 
-=item B<*> A possible trailing slash is discarded, and the B<STRING> is then
-marked as representing a "directory".  The example string would now be
-"lib/File/Globstar" without the trailing slash.
+=item B<*> A possible trailing slash is discarded, and the B<STRING> is then marked as representing a "directory".  The example string would now be "lib/File/Globstar" without the trailing slash.
 
-=item B<*> If full path mode is B<NOT> active (either because of a leading
-or innner slash in B<PATTERN>), a possible leading "directory portion" of
-B<STRING> is discarded.  The "directory portion" is everything until and
-including the last slash in B<STRING>.  The example string would have been
-truncated to just "Globstar" by now.
+=item B<*> If full path mode is B<NOT> active (either because of a leading or innner slash in B<PATTERN>), a possible leading "directory portion" of B<STRING> is discarded.  The "directory portion" is everything until and including the last slash in B<STRING>.  The example string would have been truncated to just "Globstar" by now.
 
 =back
 
 The resulting B<STRING> is then compared to B<PATTERN>.  If it matches, and
-B<PATTERN> was not negated, 1 is returned.  Likewise, if it doesn't match and
+B<PATTERN> was not negated, 1 is returned.  Likewise, if it does not match and
 B<PATTERN> was negated.
 
 In "directory mode" (B<PATTERN> ended with a slash), a match also requires
 that B<STRING> is considered a directory.  It either needs a trailing slash
 or you must pass the option B<isDirectory> with a truthy value.
 
-In full path mode, the comparison continues and "ascends": The "base name"
-of B<STRING>, that is the last slash and everything following it is discarded,
+In full path mode, the comparison continues and "ascends": The "base name" of
+B<STRING> - that is the last slash and everything following it - is discarded,
 and B<pnmatchstar()> is called recursively, but always with the option
 B<isDirectory> set to 1 until a match is found.  If it never matches,
 the function ultimately returns false.
@@ -272,7 +267,7 @@ The option was intrucded in version 0.2.
 
 =item B<quotestar STRING[, NEGATABLE]>
 
-Escapes all characters special to globstar patterns.  This are:
+Escapes all characters special to globstar patterns.  They are:
 
 =over 8
 
@@ -286,8 +281,8 @@ Escapes all characters special to globstar patterns.  This are:
 
 =back
 
-If the optional argument B<NEGATABLE> is truthy, a leading exclamation mark
-will also be backslash-escaped.
+If the optional argument B<NEGATABLE> is a truthy value, a leading exclamation
+mark will also be backslash-escaped.
 
 =back
 
@@ -439,11 +434,11 @@ never as a path separator.  On the other hand, the underlying function
 B<bsd_glob()> from B<File::Glob> I<does> support other path separators than
 a slash.
 
-This behavior may change in the future.  The main reason why the backslash
+This behaviour may change in the future.  The main reason why the backslash
 is not supported as a path separator is that I have no idea how B<bsd_glob()>
 behaves exactly, for example under Windows.  Patches are welcome!
 
-=item B<UNIFORM BEHAVIOR OF GLOBSTAR() AND FNMATCHSTAR()>
+=item B<UNIFORM BEHAVIOUR OF GLOBSTAR() AND FNMATCHSTAR()>
 
 The functions should theoretically behave accordingly.  If B<globstar()>
 returns a filename for a certain pattern, then B<fnmatchstar()> should
@@ -454,7 +449,7 @@ cannot be guaranteed.  Please file a bug if you find a discrepancy.
 
 =item B<CASE-INSENSITIVE FILE SYSTEMS>
 
-The behavior of B<globstar()> completely depends on the behavior of
+The behaviour of B<globstar()> completely depends on the behavior of
 the underlying L<File::Glob>.  For B<fnmatchstar()> you can pass a third
 argument specifying whether the match should be done case-insensitively or
 not.
@@ -473,5 +468,5 @@ all rights reserved.
 
 =head1 SEE ALSO
 
-File::Glob(3pm), File::Globstar::Listmatch(3pm), glob(3), glob(7), fnmatch(3),
-glob(1), perl(1)
+L<File::Glob>, L<File::Globstar::Listmatch>, L<perlre>, glob(3), glob(7),
+fnmatch(3), glob(1), perl(1)

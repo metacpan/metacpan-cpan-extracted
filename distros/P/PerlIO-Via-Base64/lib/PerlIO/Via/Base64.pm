@@ -4,7 +4,7 @@ package PerlIO::Via::Base64;
 # Set the version info
 
 use strict;
-$PerlIO::Via::Base64::VERSION = 0.04;
+$PerlIO::Via::Base64::VERSION = 0.05;
 
 # Make sure the encoding/decoding stuff is available
 

@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::Most;
+use Test::RequiresInternet ('nominatim.openstreetmap.org' => 'https');
+
+BEGIN { use_ok('HTML::OSM') }
+
+# Helper to silence warnings in error-checking tests
+local $SIG{__WARN__} = sub { };
+
+# 1. Object Creation Tests
+my $osm = HTML::OSM->new();
+isa_ok($osm, 'HTML::OSM', 'Object is of class HTML::OSM');
+
+# Check default values
+is($osm->{zoom}, 12, 'Default zoom is 12');
+is($osm->{height}, '400px', 'Default height is 400px');
+is($osm->{width}, '600px', 'Default width is 600px');
+is_deeply($osm->{coordinates}, [], 'Coordinates default to an empty array');
+
+# Invalid constructor arguments
+dies_ok { HTML::OSM->new({ coordinates => 'not an array' }) } 'Dies with invalid coordinate structure';
+
+# 2. Marker Handling Tests
+# Valid marker addition
+ok($osm->add_marker([37.7749, -122.4194], html => 'San Francisco'), 'Valid marker added successfully');
+is(scalar @{$osm->{coordinates}}, 1, 'One marker is present');
+
+# Invalid marker inputs
+ok(!$osm->add_marker([undef, undef], html => 'Invalid'), 'Rejects marker with undefined coordinates');
+ok(!$osm->add_marker([200, 300], html => 'Out of range'), 'Rejects out-of-range coordinates');
+ok(!$osm->add_marker('not an array'), 'Dies with invalid marker type');
+
+# 3. Centering Tests
+# Valid center
+ok($osm->center([40.7128, -74.0060]), 'Centering on New York');
+is_deeply($osm->{center}, [40.7128, -74.0060], 'Center is correctly updated');
+
+# Invalid center inputs
+ok(!$osm->center([999, 999]), 'Invalid coordinates do not update the center');
+dies_ok { $osm->center('not an array') } 'Dies on invalid center type';
+
+# 4. Zoom Level Tests
+# Valid zoom changes
+$osm->zoom(8);
+is($osm->zoom(), 8, 'Zoom updated successfully to 8');
+
+# Invalid zoom changes
+dies_ok { $osm->zoom('invalid') } 'Dies on invalid zoom type';
+dies_ok { $osm->zoom(-5) } 'Dies on negative zoom level';
+
+# 5. Geocoding Tests
+# Simulate address lookup (Requires proper mocking for real tests)
+ok(!$osm->add_marker(['xyzzy']), 'Rejects when geocoding fails');
+
+# 6. Map Rendering Tests
+my ($head, $body) = $osm->onload_render();
+like($head, qr/leaflet/, 'Leaflet script is included in the head');
+like($body, qr/map\.setView/, 'Body includes map initialization');
+
+# No coordinates error
+my $osm_empty = HTML::OSM->new();
+dies_ok { $osm_empty->onload_render() } 'Dies if no coordinates are provided';
+
+# 7. Clone Tests
+my $osm_clone = $osm->new(zoom => 15);
+isa_ok($osm_clone, 'HTML::OSM', 'Cloned object is still HTML::OSM');
+is($osm_clone->{zoom}, 15, 'Cloned object has updated zoom');
+
+done_testing();

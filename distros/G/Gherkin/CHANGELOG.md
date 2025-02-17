@@ -8,6 +8,19 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [32.0.0] - 2025-02-17
+### Changed
+- [.NET] Reduce NuGet size by only targeting .NET Standard 2.0
+- [.NET] Changed some types from class to struct, removed IGherkinLine interface and changes some functions from Array to Enumerable
+- [Ruby] Update minimum ruby requirement from 3.0 to 3.2
+- [Ruby] Introduce rubocop subgems to facilitate optimisations
+- [JavaScript] BREAKING CHANGE: Update supported Node.js versions to 18, 20, 22 and 23 ([#365](https://github.com/cucumber/gherkin/pull/365))
+
+### Fixed
+- [.NET] Fix NuGet package generation
+- [c] Optimise error handling for empty datatable rows
+- [Perl] Optimise error handling for unclosed DocStrings
+
 ## [31.0.0] - 2025-01-29
 ### Added
 - [All] Allow comment inside descriptions ([#334](https://github.com/cucumber/gherkin/pull/334))
@@ -733,7 +746,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v31.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v32.0.0...HEAD
+[32.0.0]: https://github.com/cucumber/gherkin/compare/v31.0.0...v32.0.0
 [31.0.0]: https://github.com/cucumber/gherkin/compare/v30.0.4...v31.0.0
 [30.0.4]: https://github.com/cucumber/gherkin/compare/v30.0.3...v30.0.4
 [30.0.3]: https://github.com/cucumber/gherkin/compare/v30.0.2...v30.0.3

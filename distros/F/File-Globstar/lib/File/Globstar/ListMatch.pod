@@ -29,9 +29,9 @@ File::Globstar::ListMatch - Match File Names Against List Of Patterns
     # Ignore all compiled object files.
     src/**/*.o
     # Ignore all hidden files.
-    '.*'
+    .*
     # But not this one.
-    '.gitignore'
+    .gitignore
     EOF
     $matcher = File::Globstar::ListMatch->new(\$pattern);
 
@@ -42,17 +42,35 @@ File::Globstar::ListMatch - Match File Names Against List Of Patterns
 
 =head1 DESCRIPTION
 
-Files containing list of files are very common as arguments to command-line options such
-as "--ignore", "--exclude" or "--include".  A well-known example is the
-syntax used by L<git|https://git-scm.com/> as described in
+Files containing lists of files are very common as arguments to command-line
+options such as "--ignore", "--exclude" or "--include".  A well-known example
+is the syntax used by L<git|https://git-scm.com/> as described in
 L<https://git-scm.com/docs/gitignore>.
 
 This module implements the same functionality in Perl.
 
 While the module will normally be used for matching against filenames, no
-file system operations are done.  Only strings are compared.  The reason for
+filesystem operations are done.  Only strings are compared.  The reason for
 this is that it should be possible to match names of deleted files as
 well as existing files.
+
+When you read the documentation below, you may come to the conclusion that
+using this module is really complicated given that there are so many special
+rules about slashes, exclamation marks, asterisks/stars and so on.  In fact,
+these rules are only hard to describe precisely.  But they pretty much do
+exactly what you expect from them and what you are used to from the moment
+that you had first entered a "*" in a terminal window.
+
+That being said, do not spend too much time thinking what the difference
+between "/src/backup" and "src/backup" in a F<.gitignore> file is.  Just try
+it out and leave it as it is, once it works.  Only if you want to know
+why "/src/backup" and "src/backup" do exactly the same, you can use this
+documentation as a reference.
+
+Similarily, the description of the "ignore mode" and "include mode" below
+sounds pretty convoluted.  But the mere presence of a the word "ignore" in the
+name of the F<.gitignore> file switches your brain to "ignore mode" and the
+subtle difference between the two modes just reflect what your brain expects.
 
 =head2 INPUT FILE FORMAT
 
@@ -114,12 +132,12 @@ subsequently to all patterns.  If none of the patterns match or if the last
 match was against a negated pattern, the overall result is false.  Otherwise it
 is true.
 
-If a patterrn contains a slash ("/"), the match is done against the full
+If a patterrn contains a slash ("/"), the match is performed against the full
 path name, otherwise just against the basename of the file
 with a leading "directory" part stripped off.
 
 If a pattern starts with a leading slash, that slash is stripped off for
-the purpose of comparison but the string must match relative to the
+the purpose of comparison but the string must match relatively to the
 base "directory".
 
 The semantics of a match are the same as for B<fnmatchstar()> in
@@ -164,7 +182,7 @@ key-value pairs.  Currently recogized:
 
 Controls, whether to ignore case, when matching.  A true value will cause
 case to be ignored.  The default value is false, so that matches are done
-in a case-sensitive manner.  This is an appropriate setting for both
+in a case-sensitive manner.  This is an appropriate setting also for both
 case-sensitive and case-preserving file systems.
 
 =item B<filename =E<gt> FILENAME>
@@ -203,8 +221,8 @@ ignored but the recursion also stops here.
 The exact rule is: You cannot re-include a file by negating a pattern if one
 of the file's parent directories would be excluded.
 
-This is the  behavior of git, when evaluating ignore lists.  If you want to
-avoid that behavior, see below for B<matchInclude()>.
+This is the  behaviour of git, when evaluating ignore lists.  If you want to
+avoid that behaviour, see below for B<matchInclude()>.
 
 On the other hand, the following is possible:
 
@@ -229,13 +247,13 @@ This is an alias for B<match()>
 Does the same as B<match()> but all negations are valid.
 
 The metaphor for include mode is different from exclude mode that is
-assumed by B<match()> resp. B<matchExclude()>.  In include mode you would
+assumed by B<match()> resp. B<matchExclude()>.  In include mode you
 interpret all patterns as globbing patterns.  A positive, non-negated
-pattern would cause the matching files to be added to result list.  A
+pattern causes the matching files to be added to the result list.  A
 negated pattern will remove the matching files from the result list.  The
-operation would happen recursively if a directory gets added or removed.
+operation happens recursively if a directory gets added or removed.
 
-We take almost the same example as for B<match()> above:
+Take almost the same example as for B<match()> above:
 
     docs/_*
     !docs/_posts/archive
@@ -269,7 +287,7 @@ Line 2 would then kickout the last three matches from the result list.
 =item B<patterns>
 
 Returns the patterns as a list of compiled regular expressions.  This is
-useful probably only for testing.
+probably only useful for testing the module itself.
 
 =back
 
@@ -288,5 +306,5 @@ all rights reserved.
 
 =head1 SEE ALSO
 
-File::Globstar(3pm), File::Glob(3pm), glob(3), glob(7), fnmatch(3), glob(1),
+L<File::Globstar>, L<File::Glob>, glob(3), glob(7), fnmatch(3), glob(1),
 perl(1)

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use HTML::OSM;
+
+my $map = HTML::OSM->new(coordinates => [
+	[ undef, undef, '1810 Melrose St, Madison, WI' ],
+	[ undef, undef, '1210 W Dayton St, Madison, WI'],
+	[  39.1155, -77.5644, 'Leesburg, VA' ]
+]);
+
+my ($head, $map_div) = $map->onload_render();
+
+my $html = qq {
+	<!DOCTYPE html>
+	<html>
+	<head>
+};
+
+$html .= $head;
+
+$html .= qq {
+	</head>
+	<body>
+};
+
+$html .= $map_div;
+
+$html .= qq {
+	</body>
+	</html>
+};
+
+write_file('map.html', $html);
+print "Interactive map saved as map.html. Open this file in a browser.\n";

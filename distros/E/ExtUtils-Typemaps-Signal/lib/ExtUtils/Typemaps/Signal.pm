@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Signal;
-$ExtUtils::Typemaps::Signal::VERSION = '0.007';
+$ExtUtils::Typemaps::Signal::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -43,10 +43,12 @@ T_SIGNO
 	$var = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
 
 T_TIMESPEC
-	{
-	NV input = SvNV($arg);
-	$var.tv_sec  = (time_t) floor(input);
-	$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
+	if (SvROK($arg) && sv_derived_from($arg, \"Time::Spec\")) {
+		$var = *(struct timespec*)SvPV_nolen(SvRV($arg));
+	} else {
+		NV input = SvNV($arg);
+		$var.tv_sec  = (time_t) floor(input);
+		$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
 	}
 
 OUTPUT
@@ -73,7 +75,7 @@ ExtUtils::Typemaps::Signal - A typemap for dealing with signal related types
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

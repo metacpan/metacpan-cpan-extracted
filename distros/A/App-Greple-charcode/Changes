@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9907 2025-02-17T01:38:53Z
+
+    - update parameter setting style
+
 0.9906 2025-02-14T11:47:25Z
 
     - implement alias module -Mcc for -Mcharcode

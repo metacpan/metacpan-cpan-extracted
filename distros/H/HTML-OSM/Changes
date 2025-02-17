@@ -1,0 +1,13 @@
+Revision history for HTML-OSM
+
+0.03	Sun Feb 16 21:36:35 EST 2025
+	Change the default size to be the same as HTML::GoogleMaps::V3
+	Improved handling when an ARRAY is returned by Nominatim
+	Remove the search and reset buttons
+	Use %20 rather than ' ' in the URL
+
+0.02	Sun Feb 16 14:44:32 EST 2025
+	Added rate-limiting and caching support
+
+0.01	Sun Feb 16 12:46:54 EST 2025
+        First draft

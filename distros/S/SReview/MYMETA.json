@@ -64,6 +64,6 @@
          "web" : "https://github.com/yoe/SReview"
       }
    },
-   "version" : "v0.11.0",
+   "version" : "v0.11.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

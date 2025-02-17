@@ -5,56 +5,56 @@ App::Greple::charcode - greple module to annotate unicode character data
 
 <div>
     <p>
-    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
+    <img width="566" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
     </p>
 </div>
 
 # SYNOPSIS
 
-**greple** **-Mcharcode** ...
+    greple -Mcharcode ...
+    greple -Mcharcode [ module option ] -- [ command option ] ...
 
-**greple** **-Mcharcode** \[ _module option_ \] -- \[ _command option_ \] ...
+      COMMAND OPTION
+        --no-annotate  do not print annotation
+        --[no-]align   align annotations
+        --align-all    align to the same column for all lines
+        --align-side   align to the longest line
 
-    COMMAND OPTION
-      --no-annotate  do not print annotation
-      --[no-]align   align annotations
-      --align-all    align to the same column for all lines
-      --align-side   align to the longest line
+      UNICODE
+        --composite    find composite character (combining character sequence)
+        --precomposed  find precomposed character
+        --combined     find both composite and precomposed characters
+        --dt=type      specify decomposition type
+        --surrogate    find character in UTF-16 surrogate pair range
+        --outstand     find non-ASCII combining characters
+        -p/-P prop     find \p{prop} or \P{prop} characters
 
-    UNICODE
-      --composite    find composite character (combining character sequence)
-      --precomposed  find precomposed character
-      --combined     find both composite and precomposed characters
-      --dt=type      specify decomposition type
-      --surrogate    find character in UTF-16 surrogate pair range
-      --outstand     find non-ASCII combining characters
-      -p/-P prop     find \p{prop} or \P{prop} characters
+      ANSI
+        --ansicode     find ANSI terminal control sequences
 
-    ANSI
-      --ansicode     find ANSI terminal control sequences
+      MODULE OPTION
+         --column[=#]  display column number
+        --visible[=#]  display character name
+           --char[=#]  display character itself
+          --width[=#]  display width
+           --utf8[=#]  display UTF-8 encoding
+          --utf16[=#]  display UTF-16 encoding
+           --code[=#]  display unicode code point
+           --name[=#]  display character name
+          --split[=#]  put annotattion for each character
+        --alignto[=#]  align annotation to #
 
-    MODULE OPTION
-      --[no-]column  display column number
-      --[no-]char    display character itself
-      --[no-]width   display width
-      --[no-]code    display character code
-      --[no-]name    display character name
-      --[no-]visible display character name
-      --[no-]split   put annotattion for each character
-      --alignto=#    align annotation to #
+        --config KEY[=VALUE],...
+                 (KEY: column char width code name visible align)
 
-      --config KEY[=VALUE],...
-               (KEY: column char width code name visible align)
+    greple -Mcc ...
+    greple -Mcc [ module option ] -- [ command option ] ...
 
-**greple** **-Mcc** ...
-
-**greple** **-Mcc** \[ _module option_ \] -- \[ _command option_ \] ...
-
-    -Mcc           alias module for -Mcharcode
+        -Mcc  alias module for -Mcharcode
 
 # VERSION
 
-Version 0.9906
+Version 0.9907
 
 # DESCRIPTION
 
@@ -203,40 +203,58 @@ section for more information.
     Set configuration parameters.
 
 - **column**
-- **--**\[**no-**\]**column**
+- **--column**\[=_#_\]
 
     Show column number.
     Default `1`.
 
+- **visible**
+- **--visible**\[=_#_\]
+
+    Display invisible characters in a visible string representation.
+    Default `0`.
+
 - **char**
-- **--**\[**no-**\]**char**
+- **--char**\[=_#_\]
 
     Show the character itself.
     Default `0`.
 
 - **width**
-- **--**\[**no-**\]**width**
+- **--width**\[=_#_\]
 
     Show the width.
     Default `0`.
 
-- **code**
-- **--**\[**no-**\]**code**
+- **utf8**
+- **--utf8**\[=_#_\]
 
-    Show the character code in hex.
+    Show the UTF-8 encoding in hex.
+    Default `0`.
+
+- **utf16**
+- **--utf16**\[=_#_\]
+
+    Show the UTF-16 encoding in hex.
+    Default `0`.
+
+- **code**
+- **--code**\[=_#_\]
+
+    Show the character code point in hex.
     Default `1`.
 
 - **name**
-- **--**\[**no-**\]**name**
+- **--name**\[=_#_\]
 
     Show the Unicode name of the character.
     Default `1`.
 
-- **visible**
-- **--**\[**no-**\]**visible**
+- **split**
+- **--split**\[=_#_\]
 
-    Display invisible characters in a visible string representation.
-    Default `0`.
+    If a pattern matching multiple characters is given, annotate each
+    character independently.
 
 - **alignto**=_column_
 - **--alignto**=_column_
@@ -249,12 +267,6 @@ section for more information.
     column for all lines.  If `-2` is specified, align to the longest
     line length, regardless of match position.
 
-- **split**
-- **--**\[**no-**\]**split**
-
-    If a pattern matching multiple characters is given, annotate each
-    character independently.
-
 # CONFIGURATION
 
 Configuration parameters can be set in several ways.
@@ -264,24 +276,24 @@ Configuration parameters can be set in several ways.
 The start function of a module can be specified at the same time as
 the module declaration.
 
-    greple -Mannotate::config(alignto=0)
+    greple -Mcharcode::config(alignto=0)
 
-    greple -Mannotate::config=alignto=80
+    greple -Mcharcode::config=alignto=80
 
 ## PRIVATE MODULE OPTION
 
-Module-specific options are specified between `-Mannotate` and `--`.
+Module-specific options are specified between `-Mcharcode` and `--`.
 
-    greple -Mannotate --config alignto=80 -- ...
+    greple -Mcharcode --config alignto=80 -- ...
 
-    greple -Mannotate --alignto=80 -- ...
+    greple -Mcharcode --alignto=80 -- ...
 
 ## GENERIC MODULE OPTION
 
 Module-specific `---config` option can be called by normal command
-line option `--annotate::config`.
+line option `--charcode::config`.
 
-    greple -Mannotate --annotate::config alignto=80 ...
+    greple -Mcharcode --charcode::config alignto=80 ...
 
 # EXAMPLES
 

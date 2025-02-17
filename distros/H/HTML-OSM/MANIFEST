@@ -1,0 +1,23 @@
+Changes
+examples/england
+examples/locations
+examples/onmap_render
+lib/HTML/OSM.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/10-compile.t
+t/20-new.t
+t/30-basics.t
+t/comment-spelling.t
+t/eof.t
+t/eol.t
+t/limiting.t
+t/mock.t
+t/pod-coverage.t
+t/pod-snippets.t
+t/pod-synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

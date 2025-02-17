@@ -8,7 +8,7 @@
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
 package File::Globstar;
-$File::Globstar::VERSION = 'v1.0.0';
+$File::Globstar::VERSION = 'v1.1.0';
 use strict;
 
 use Locale::TextDomain qw(File-Globstar);
@@ -86,6 +86,10 @@ sub _find_all($) {
 sub _globstar($$;$) {
 	my ($pattern, $directory, $flags) = @_;
 
+	# This should fix https://github.com/gflohr/File-Globstar/issues/7
+	# although I can actually not reproduce the behaviour described there.
+	my @flags = defined $flags ? ($flags) : ();
+
 	$directory = '' if !defined $directory;
 	$pattern = $_ if !@_;
 
@@ -96,7 +100,7 @@ sub _globstar($$;$) {
 	} elsif ($pattern =~ s{^\*\*/}{}) {
 		my %found_files;
 		foreach my $directory ('', _find_directories $directory) {
-			foreach my $file (_globstar $pattern, $directory, $flags) {
+			foreach my $file (_globstar $pattern, $directory, @flags) {
 				$found_files{$file} = 1;
 			}
 		}
@@ -120,7 +124,7 @@ sub _globstar($$;$) {
 			$current .= '/';
 
 			# Expand until here.
-			my @directories = bsd_glob $current, $flags;
+			my @directories = bsd_glob $current, @flags;
 
 			# And search in every subdirectory;
 			my %found_dirs;
@@ -150,7 +154,7 @@ sub _globstar($$;$) {
 			return keys %found_files;
 		} elsif ('**' eq $pattern) {
 			my %found_files;
-			foreach my $directory (bsd_glob $current, $flags) {
+			foreach my $directory (bsd_glob $current, @flags) {
 				$found_files{$directory . '/'} = 1;
 				foreach my $file (_find_all $directory) {
 					$found_files{$file} = 1;
@@ -163,7 +167,7 @@ sub _globstar($$;$) {
 	}
 
 	# Pattern without globstar.  Just return the normal expansion.
-	return bsd_glob $current, $flags;
+	return bsd_glob $current, @flags;
 }
 
 sub globstar {
