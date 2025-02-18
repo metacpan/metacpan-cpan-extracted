@@ -3,29 +3,22 @@ use warnings;
 
 package DBIx::Migration;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
-use subs 'dbh';
-
-use Class::Tiny qw( debug dbh dir dsn password username );
+use Moo;
+use MooX::SetOnce;
 
 use DBI                   qw();
 use File::Slurp           qw();
 use File::Spec::Functions qw();
 use Try::Tiny             qw();
 
-sub dbh {
-  my $self = shift;
+use namespace::clean -except => [ qw( before ) ];
 
-  if ( @_ ) {
-    $self->{ dbh } = $_[ 0 ];
-  }
-  unless ( defined $self->{ dbh } ) {
-    $self->{ dbh } = $self->_build_dbh;
-  }
-
-  return $self->{ dbh };
-}
+has dbh                             => ( is => 'lazy' );
+has debug                           => ( is => 'rw' );
+has dir                             => ( is => 'rw', once => 1 );
+has [ qw( dsn password username ) ] => ( is => 'ro' );
 
 sub _build_dbh {
   my $self = shift;
@@ -40,6 +33,22 @@ sub _build_dbh {
       AutoCommit => 1    # see below "begin_work" based transaction handling
     }
   );
+}
+
+sub BUILD {
+  my ( $self, $args ) = @_;
+
+  if ( exists $args->{ dsn } ) {
+    die 'dsn and dbh cannot be used at the same time'
+      if exists $args->{ dbh };
+  } elsif ( exists $args->{ dbh } ) {
+    foreach ( qw( dsn username password ) ) {
+      die "dbh and $_ cannot be used at the same time"
+        if exists $args->{ $_ };
+    }
+  } else {
+    die 'both dsn and dbh are not set';
+  }
 }
 
 sub migrate {

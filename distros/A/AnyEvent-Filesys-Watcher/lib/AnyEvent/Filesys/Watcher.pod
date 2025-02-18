@@ -1,0 +1,267 @@
+=head1 NAME
+
+AnyEvent::Filesys::Watcher - Watch file system for changes
+
+=head1 SYNOPSIS
+
+    use AnyEvent::Filesys::Watcher;
+
+    $watcher = AnyEvent::Filesys::Watcher->new(
+        directories => ['src', 'deps'],
+        interval => 2.0,
+        filter => sub { shift !~ /\.(swp|tmp)$/ },
+        callback => sub {
+        my (@events) = @_;
+            # Process.
+        },
+    );
+
+=head1 DESCRIPTION
+
+This module is very similar to B<AnyEvent::Filesys::Notify>.  The main
+difference is that it is not based on L<Moo> and has therefore has less
+dependencies.
+
+See L</"DIFFERENCES TO AnyEvent::Filesys::Notify"> for other differences.
+
+=head1 CONSTRUCTORS
+
+The following constructors are available:
+
+=over 4
+
+=item B<new(OPTIONS)>
+
+Creates a new B<AnyEvent::Filesys::Watcher>.  The constructor may throw an
+exception in case of an error!
+
+In fact, it createss an instance of one of the subclasses
+L<AnyEvent::Filesys::Watcher::Fallback> (all platforms),
+L<AnyEvent::Filesys::Watcher::FSEvents> (macOS),
+L<AnyEvent::Filesys::Watcher::INotify2> (Linux),
+L<AnyEvent::Filesys::Watcher::KQueue> (BSD/macOS),
+L<AnyEvent::Filesys::Watcher::ReadDirectoryChanges> (MS-DOS aka Windows) that
+all inherit from this module.
+
+If the instantiation of the subclass fails, an instance of
+L<AnyEvent::Filesys::Watcher::Fallback> is returned unless a specific backend
+was explicitely requested with the constructor argument "backend" (see below).
+
+B<OPTIONS> is a hash of named options:
+
+=over 8
+
+=item B<directories DIRECTORIES>
+
+B<DIRECTORIES> is a reference to an array of directories to monitor. A single
+directory can also be passed as a scalar.
+
+Optional. The default is the base directory, see "base_dir" below.
+
+=item B<dirs DIRECTORIES>
+
+This is an alias for the option "directories".
+
+=item B<base_dir BASE_DIRECTORY>
+
+Relative path names for the "directories" option are resolved relative to
+B<BASE_DIRECTORY>.
+
+The default is the current working directory at the time that the
+object was instantiated.
+
+=item B<callback CALLBACK>
+
+A code reference that is called, when a modification to the monitored
+directories is deteced. The callback is passed a list of
+L<AnyEvent::Filesys::Watcher::Event>s.
+
+This option is mandatory.
+
+=item B<cb CALLBACK>
+
+This is an alias for the parameter B<callback>.
+
+This argument is required if the argument B<callback> has not been given.
+
+=item B<interval SECONDS>
+
+Specifies the time in fractional seconds between file system checks
+for the L<AnyEvent::Filesys::Watcher::Fallback> implementation.
+
+Specifies the latency for L<Mac::FSEvents> for the
+L<AnyEvent::Filesys::Watcher::FSEvents> implementation.
+
+Ignored for all other backends.
+
+Optional. The default is backend-specific.
+
+=item B<filter FILTER>
+
+B<FILTER> should either be a regular expression or a code reference.  If this
+is a regular expression, only (absolute) file names matching that regular
+expressions can cause an event.
+
+If B<FILTER> is a code reference, the subrouting receives the absolute file
+name as an argument and should return a truthy value for all files that
+should cause an event.
+
+Optional. By default, all events are passed through.
+
+=item B<raw_events CALLBACK>
+
+Allows you to subscribe to the raw events returned by the os-specific backend.
+The B<CALLBACK> gets invoked with a list of these backend-specific options and
+should return a list of backend-specific options. Did you read this? You have
+to return a list of events.
+
+You can use this option if you are interested in the original events from your
+backend or if you want to filter these events before being processed.
+
+You can use both the option "callback" and "raw_events" but the filter
+specified with the "filter" option is, of course, not applied to the raw
+events because their exact structure is backend-specific.
+
+Optional. Note that the option "callback" is still mandatory, even if you have
+passed a callback to "raw_options".  Some backends require post-processing
+of events and they have to be instances of L<AnyEvent::Filesys::Watcher::Event>.
+
+=item B<backend BACKEND>
+
+Force the use of the specified backend. The backend is assumed to
+have the "AnyEvent::Filesys::Watcher" prefix, but you can force
+a fully qualified name by prefixing it with a plus.
+
+Optional. The default is os-dependent: For Linux it is
+L<AnyEvent::Filesys::Watcher::Inotify2>, for Mac OS it is
+L<AnyEvent::Filesys::Watcher::FSEvents>, for BSD systems it is
+L<AnyEvent::Filesys::Watcher::KQueue>, for MS-DOS it is
+L<AnyEvent::Filesys::Watcher::ReadDirectoryChhanges> and for all other systems
+it is L<AnyEvent::Filesys::Watcher::Fallback>.
+
+=back
+
+=back
+
+=head1 METHODS
+
+The public API consists of the following methods:
+
+=over 4
+
+=item B<directories>
+
+Getter for the array reference of directories that get monitored.
+
+=item B<callback [CALLBACK]>
+
+Getter/setter for the callback.
+
+=item B<interval>
+
+Getter for the interval between polls.
+
+=item B<filter [FILTER]>
+
+Getter/setter for the filter.
+
+=back
+
+=head1 INSTALLATION
+
+You should install one of the helper module that provides
+the binding for the operating system's filesystem watch functionality:
+
+=head2 Linux
+
+Install L<Linux::Inotify2>:
+
+    $ cpanm Linux::Inotify2
+
+=head2 Mac OS
+
+Install L<Mac::FSEvents>:
+
+    $ cpanm Mac::FSEvents
+
+Versions before 0.20 do not build on recent macOS instances.
+
+=head2 BSD and macOS
+
+Install L<IO::KQueue> and L<BSD::Resource>
+
+    $ cpanm IO::KQueue BSD::Resource
+
+This would also work for Mac OS but you have little reason to prefer
+L<IO::KQueue> over L<Mac::FSEvents> unless you are a developer or just
+curious.
+
+=head2 MS-DOS ("Windows")
+
+Install L<Filesys::Notify::Win32::ReadDirectoryChanges>.
+
+This backend causes spurious errors. If that happens, please use the
+fallback backend.
+
+=head1 USAGE RECOMMENDATIONS
+
+Different platforms have different notions about file system changes and how
+to report them.  This module tries to remove these differences and always
+report the same events for a certain file type change.  The test suite
+tests this behaviour but still you should not rely on it.
+
+A robust implementation using this module should follow two rules:
+
+=over 4
+
+=item Do not expect events to come in a certain order.
+
+=item Treat the events "modified" and "created" equally as "existing file has changed"
+
+=back
+
+=head1 DIFFERENCES TO AnyEvent::Filesys::Notify
+
+=over 4
+
+=item If you specify a subroutine as a filter, that subroutine receives events as arguments, not paths.
+
+=item The constructor argument "no_external" is ignored.
+
+=item There is no method "no_external()".
+
+=item Methods and named arguments are "directories" and not "dirs".
+
+=item Methods and named arguments are "callback" and not "cb".
+
+=item The named argument "skip_subdirs" is not supported.
+
+=item The named argument "parse_events" is ignored.  Events are parsed by the backend, if possible, otherwise the file system is scanned.
+
+=item None of the L<Moose> methods like "does()" are implemented.
+
+=item No type checking is done on arguments.
+
+=back
+
+=head1 BUGS
+
+Please report bugs to the issue tracker at
+L<GitHub|https://github.com/gflohr/AnyEvent-Filesys-Watcher/issues>.
+
+=head1 AUTHOR
+
+B<AnyEvent::Filesys::Watcher> was written by L<Guido Flohr|http://www.guido-flohr.net/>.
+
+=head1 SEE ALSO
+
+L<AnyEvent::Filesys::Watcher::Event>,
+L<AnyEvent::Filesys::Watcher::Fallback>,
+L<AnyEvent::Filesys::Watcher::FSEvents>,
+L<AnyEvent::Filesys::Watcher::INotify2>,
+L<AnyEvent::Filesys::Watcher::KQueue>,
+L<AnyEvent::Filesys::Watcher::ReadDirectoryChanges>,
+L<Linux::Inotify2>,
+L<Mac::FSEvents>,
+L<IO::KQueue>, L<BSD::Resource>,
+L<AnyEvent::Filesys::Notify>, perl(1)

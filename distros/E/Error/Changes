@@ -1,3 +1,8 @@
+0.17030         2025-02-18
+    - Fix die/warn hooks for perl 5.41.9 changes
+        - https://github.com/shlomif/perl-error.pm/pull/4
+        - Thanks @mauke .
+
 0.17029         2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

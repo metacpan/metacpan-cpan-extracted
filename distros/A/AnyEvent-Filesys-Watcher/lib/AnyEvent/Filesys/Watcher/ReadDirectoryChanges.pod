@@ -1,0 +1,152 @@
+=head1 NAME
+
+AnyEvent::Filesys::Watcher::ReadDirectoryChanges - MS-DOS file system watcher
+
+=head1 SYNOPSIS
+
+    $watcher = AnyEvent::Filesys::Watcher::FileSystemWatcher->new(
+        directories => ['lib', 't'],
+        callback => sub { warn "you're working too much"},
+    );
+
+    # This has the same effect as:
+
+    $watcher = AnyEvent::Filesys::Watcher->new(
+        backend => 'ReadDirectoryChanges',
+        directories => ['lib', 't'],
+        callback => sub { warn "you're working too much"},
+    );
+
+=head1 DESCRIPTION
+
+This is the MS-DOS backend for L<AnyEvent::Filesys::Watcher>.  It uses
+L<Filesys::Notify::Win32::ReadDirectoryChanges> as the underlying implementation.
+
+=head1 CONSTRUCTOR
+
+You should normally call the
+L<constructor of the base class|AnyEvent::Filesys::Watch/"CONSTRUCTOR"> that
+will pick the optimal backend for the current platform.
+
+The following constructors are available:
+
+=over 4
+
+=item B<new(OPTIONS)>
+
+Creates a new B<AnyEvent::Filesys::Watcher>.  The constructor may throw an
+exception in case of an error!
+
+B<OPTIONS> is a hash of named options:
+
+=over 8
+
+=item B<directories DIRECTORIES>
+
+B<DIRECTORIES> is a reference to an array of directories to monitor. A single
+directory can also be passed as a scalar.
+
+Optional. The default is the base directory, see "base_dir" below.
+
+=item B<dirs DIRECTORIES>
+
+This is an alias for the option "directories".
+
+=item B<base_dir BASE_DIRECTORY>
+
+Relative path names for the "directories" option are resolved relative to
+B<BASE_DIRECTORY>.
+
+The default is the current working directory at the time that the
+object was instantiated.
+
+=item B<callback CALLBACK>
+
+A code reference that is called, when a modification to the monitored
+directories is deteced. The callback is passed a list of
+L<AnyEvent::Filesys::Watcher::Events>.
+
+One of the options "callback" or "raw_events" (see below) are required.
+
+=item B<cb CALLBACK>
+
+This is an alias for the parameter B<callback>.
+
+This argument is required if the argument B<callback> has not been given.
+
+=item B<filter FILTER>
+
+B<FILTER> should either be a regular expression or a code reference.  If this
+is a regular expression, only (absolute) file names matching that regular
+expressions can cause an event.
+
+If B<FILTER> is a code reference, the subrouting receives the absolute file
+name as an argument and should return a truthy value for all files that
+should cause an event.
+
+Optional. By default, all events are passed through.
+
+=item B<raw_events CALLBACK>
+
+Allows you to subscribe to the raw events returned by the os-specific backend.
+The B<CALLBACK> gets invoked with a list of these backend-specific options and
+should return a list of backend-specific options. Did you read this? You have
+to return a list of events.
+
+You can use this option if you are interested in the original events from your
+backend or if you want to filter these events before being processed.
+
+You can use both the option "callback" and "raw_events" but the filter
+specified with the "filter" option is, of course, not applied to the raw
+events because their exact structure is backend-specific.
+
+One of the options "callback" (see above) or "raw_events" are required.
+
+=back
+
+All other options are ignored.
+
+=back
+
+=head1 METHODS
+
+See the base class L<AnyEvent::Filesys::Watcher>. This module does not have
+any additional public methods.
+
+=head1 ORIGINAL AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
+
+=item *
+
+Dave Hayes E<lt>dave@jetcafe.orgE<gt>
+
+=item *
+
+Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
+
+=item *
+
+Ettore Di Giacinto (@mudler)
+
+=item *
+
+Martin Barth (@ufobat)
+
+=back
+
+=head1 AUTHOR
+
+Guido Flohr E<lt>guido.flohr@cantanea.comE<gt>.
+
+=head1 SEE ALSO
+
+L<Filesys::Notify::Win32::ReadDirectoryChanges>, L<AnyEvent::Filesys::Watcher>, perl(1)

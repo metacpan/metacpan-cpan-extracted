@@ -6,7 +6,7 @@ dbix-migration - Seamless database up- and downgrades
 
 =head1 VERSION
 
-0.11
+0.13
 
 =head1 SYNOPSIS
 

@@ -5,9 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
-  IPC::Open3: '0'
-  POSIX: '0'
-  Perl::OSType: '1.009'
+  Perl::OSType: '0'
   Test::Exception: '0.43'
   Test::Simple: '1.302188'
   Time::HiRes: '0'
@@ -15,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,28 +31,17 @@ recommends:
   Time::HiRes: '0'
   Time::Piece: '0'
   Type::Tiny: '0'
-  bytes: '0'
 requires:
-  B: '0'
   Carp: '0'
   Class::Accessor: '0.34'
   Class::Method::Modifiers: '2.11'
-  Config: '0'
   Devel::Assert: '1.06'
   Devel::StrictMode: '0.003'
   Encode: '0'
-  Encode::Alias: '0'
-  Encode::Byte: '0'
-  Encode::Encoding: '0'
-  Encode::Unicode: '0'
-  English: '0'
   Exporter: '0'
-  IO::File: '0'
-  IO::Handle: '0'
+  IO: '0'
   IO::Null: '1.01'
-  List::Util: '0'
-  Scalar::Util: '0'
-  Symbol: '0'
+  Scalar::List::Utils: '0'
   Win32: '0.54'
   Win32::API: '0.79'
   Win32::Console: '0.10'
@@ -62,13 +49,11 @@ requires:
   constant: '0'
   namespace::sweep: '0.006'
   perl: '5.014'
-  strict: '0'
   threads: '0'
   threads::shared: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/brickpool/Win32-Console-DotNet/issues
   repository: https://github.com/brickpool/Win32-Console-DotNet.git
-version: '0.005003'
+version: '0.005004'
 x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,11 @@
 Revision history for File-Print-Many
 
+0.04	Mon Feb 17 07:58:49 EST 2025
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Added t/30-basics.t
+	Refactor
+
 0.03	Mon Oct 23 09:37:43 EDT 2023
 	Use Test::File::Contents for testing
 

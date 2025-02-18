@@ -325,8 +325,7 @@
     <station id="vrr_30116" name="Haunerfeldstr." line="vrr_301:16" link="vrr_30115,vrr_30117"/>
     <station id="vrr_30117" name="Hermann-Löns-Str." line="vrr_301:17" link="vrr_30116,vrr_30118"/>
     <station id="vrr_30118" name="Erlestr." line="vrr_301:18" link="vrr_30117,vrr_30119"/>
-    <!-- *** connect to Buer Rathaus -->
-    <station id="vrr_30119" name="Buer Rathaus/Kunstmuseum" line="vrr_301:19" link="vrr_30118,vrr_30120"/>
+    <station id="vrr_30119" name="Buer Rathaus/Kunstmuseum" line="vrr_301:19" link="vrr_30118,vrr_30120" other_link="walk:vrr_30201"/>
     <station id="vrr_30120" name="Hagenstr." line="vrr_301:20" link="vrr_30119,vrr_30121"/>
     <station id="vrr_30121" name="Vinckestr." line="vrr_301:21" link="vrr_30120,vrr_30122"/>
     <station id="vrr_30122" name="Zeche Hugo" line="vrr_301:22" link="vrr_30121,vrr_30123"/>
@@ -343,7 +342,7 @@
     <station id="vrr_u1102" name="Schloss Horst" line="vrr_301:33,vrr_U11:2" link="vrr_30134,vrr_u1101,vrr_u1103"/>
     <station id="vrr_30134" name="Essener Str." line="vrr_301:34,vrr_705:10,vrr_707:10" link="vrr_70113,vrr_70509,vrr_u1102"/>
     <!-- 302 -->
-    <station id="vrr_30201" name="Buer Rathaus" line="vrr_302:1" link="vrr_30202"/>
+    <station id="vrr_30201" name="Buer Rathaus" line="vrr_302:1" link="vrr_30202" other_link="walk:vrr_30119"/>
     <station id="vrr_30202" name="Buer Bergmannsheil" line="vrr_302:2" link="vrr_30201,vrr_30203"/>
     <station id="vrr_30203" name="Berger See" line="vrr_302:3" link="vrr_30202,vrr_30204"/>
     <station id="vrr_30204" name="VELTINS-Arena" line="vrr_302:4" link="vrr_30203,vrr_30205"/>
@@ -376,8 +375,7 @@
     <station id="vrr_30234" name="Wattenscheider Str." line="vrr_302:34,vrr_305:7,vrr_310:7" link="vrr_30233,vrr_30235,vrr_30506"/>
     <station id="vrr_30235" name="Jacob-Mayer-Str./Jahrhunderthalle" line="vrr_302:35,vrr_305:8,vrr_310:8" link="vrr_30234,vrr_30236"/>
     <station id="vrr_30236" name="Bochumer Verein/Jahrhunderthalle" line="vrr_302:36,vrr_305:9,vrr_310:9" link="vrr_30235,vrr_u3511"/>
-    <!-- Connect this to Bochum Rathaus  ************************ -->
-    <station id="vrr_u3511" name="Bochum Rathaus (Süd)" line="vrr_302:37,vrr_305:10,vrr_310:10,vrr_U35:11" link="vrr_30236,vrr_u3510,vrr_u3512"/>
+    <station id="vrr_u3511" name="Bochum Rathaus (Süd)" line="vrr_302:37,vrr_305:10,vrr_310:10,vrr_U35:11" link="vrr_30236,vrr_u3510,vrr_u3512" other_link="walk:vrr_30602"/>
     <station id="vrr_u3510" name="Bochum Hbf" line="vrr_302:38,vrr_305:11,vrr_306:1,vrr_308_318:14,vrr_310:11,vrr_316:11,vrr_S1:31,vrr_U35:10" link="vrr_30239,vrr_30602,vrr_308_31813,vrr_308_31815,vrr_s130,vrr_s132,vrr_u3509,vrr_u3511"/>
     <station id="vrr_30239" name="Lohring" line="vrr_302:39,vrr_305:12,vrr_310:12" link="vrr_30240,vrr_u3510"/>
     <station id="vrr_30240" name="Freigrafendamm" line="vrr_302:40,vrr_305:13,vrr_310:13" link="vrr_30239,vrr_30241"/>
@@ -403,7 +401,7 @@
     <station id="vrr_30505" name="Engelsburger Str." line="vrr_305:5,vrr_310:5" link="vrr_30504,vrr_30506"/>
     <station id="vrr_30506" name="Erzstr." line="vrr_305:6,vrr_310:6" link="vrr_30234,vrr_30505"/>
     <!-- 306 -->
-    <station id="vrr_30602" name="Bochum Rathaus" line="vrr_306:2,vrr_316:12" link="vrr_30603,vrr_u3510"/>
+    <station id="vrr_30602" name="Bochum Rathaus" line="vrr_306:2,vrr_316:12" link="vrr_30603,vrr_u3510" other_link="walk:vrr_u3511"/>
     <station id="vrr_30603" name="Brückstr." line="vrr_306:3,vrr_316:13" link="vrr_30602,vrr_30604"/>
     <station id="vrr_30604" name="Präsident Bf" line="vrr_306:4,vrr_316:14" link="vrr_30603,vrr_30605"/>
     <station id="vrr_30605" name="Robertstr." line="vrr_306:5,vrr_316:15" link="vrr_30604,vrr_u4111"/>
@@ -564,7 +562,7 @@
     <station id="vrr_70617" name="Tußmannstr." line="vrr_706:17" link="vrr_70407,vrr_70618"/>
     <station id="vrr_70618" name="Zoo Düsseldorf" line="vrr_706:18,vrr_S1:11,vrr_S11:4,vrr_S6:13" link="vrr_70110,vrr_70617,vrr_u7110,vrr_u7112"/>
     <station id="vrr_u7110" name="Schillerplatz" line="vrr_706:19,vrr_708:5,vrr_U71:10" link="vrr_u7109,vrr_u7111"/>
-    <!-- unidirectional: Zoo -> Schillerplatz -> Brehmplatz and Brehmplatz -> Zoo  ********************* -->
+    <!-- unidirectional: Zoo -> Schillerplatz -> Brehmplatz and Brehmplatz -> Zoo -->
     <station id="vrr_u7109" name="Brehmplatz" line="vrr_706:20,vrr_708:4,vrr_U71:9" link="vrr_70618,vrr_70621,vrr_u7108,vrr_u7110"/>
     <station id="vrr_70621" name="Schumannstr." line="vrr_706:21" link="vrr_u7109,vrr_u7216"/>
     <station id="vrr_u7216" name="Lindemannstr." line="vrr_706:22,vrr_U72:16,vrr_U73:15,vrr_U83:9" link="vrr_70621,vrr_70623,vrr_u7111,vrr_u7215"/>
@@ -596,7 +594,7 @@
     <station id="vrr_u8301" name="Gerresheim Krankenhaus" line="vrr_709:1,vrr_U83:1" link="vrr_u8302"/>
     <station id="vrr_u8302" name="Heinrich-Könn-Str." line="vrr_709:2,vrr_U83:2" link="vrr_u7309,vrr_u8301"/>
     <station id="vrr_u7309" name="Auf der Hardt/LVR-Klinikum" line="vrr_709:3,vrr_U73:9,vrr_U83:3" link="vrr_u7308,vrr_u7310,vrr_u8302"/>
-    <!-- unidirectional: Pöhlenweg -> Auf der Hardt; Auf der Hardt -> Vor der Hardt -> Pöhlenweg  ******************* -->
+    <!-- unidirectional: Pöhlenweg -> Auf der Hardt; Auf der Hardt -> Vor der Hardt -> Pöhlenweg -->
     <station id="vrr_u7310" name="Vor der Hardt" line="vrr_709:4,vrr_U73:10,vrr_U83:4" link="vrr_u7309,vrr_u7311"/>
     <station id="vrr_u7311" name="Pöhlenweg" line="vrr_709:5,vrr_U73:11,vrr_U83:5" link="vrr_u7309,vrr_u7310,vrr_u7312"/>
     <station id="vrr_u7312" name="Staufenplatz" line="vrr_709:6,vrr_U73:12,vrr_U83:6" link="vrr_u7214,vrr_u7311"/>
@@ -740,11 +738,9 @@
     <station id="vrr_s1114" name="Neuss Süd" line="vrr_S11:14" link="vrr_s1115,vrr_u7501"/>
     <station id="vrr_s1115" name="Norf" line="vrr_S11:15" link="vrr_s1114,vrr_s1116"/>
     <station id="vrr_s1116" name="Allerheiligen" line="vrr_S11:16" link="vrr_s1115,vrr_s1117"/>
-    <station id="vrr_s1117" name="Nievenheim" line="vrr_S11:17" link="vrr_s1116,vrr_s1118"/>
-    <!-- connect to KoelnBonn ********************** -->
-    <station id="vrr_s1118" name="Dormagen" line="vrr_S11:18" link="vrr_s1117,vrr_s1119"/>
-    <!-- connect to KoelnBonn ********************** -->
-    <station id="vrr_s1119" name="Dormagen Chempark" line="vrr_S11:19" link="vrr_s1118"/>
+    <station id="vrr_s1117" name="Nievenheim" line="vrr_S11:17" link="vrr_s1116,vrr_s1118"/>   <!-- overlap with KoelnBonn map -->
+    <station id="vrr_s1118" name="Dormagen" line="vrr_S11:18" link="vrr_s1117,vrr_s1119"/>     <!-- overlap with KoelnBonn map -->
+    <station id="vrr_s1119" name="Dormagen Chempark" line="vrr_S11:19" link="vrr_s1118"/>      <!-- overlap with KoelnBonn map -->
     <!-- S2 -->
     <station id="vrr_s202" name="Kray Nord" line="vrr_S2:2" link="vrr_s203,vrr_u1118"/>
     <station id="vrr_s203" name="Rotthausen" line="vrr_S2:3" link="vrr_10701,vrr_s202"/>
@@ -815,9 +811,7 @@
     <station id="vrr_u7242" name="Benrath" line="vrr_S6:20,vrr_S68:5,vrr_U72:42" link="vrr_s619,vrr_s621,vrr_u7241,vrr_u7243"/>
     <station id="vrr_s621" name="Garath" line="vrr_S6:21,vrr_S68:4" link="vrr_s622,vrr_u7242"/>
     <station id="vrr_s622" name="Hellerhof" line="vrr_S6:22,vrr_S68:3" link="vrr_s621,vrr_s623"/>
-    <!-- connect to KoelnBonn ********************** -->
-    <station id="vrr_s623" name="Berghausen" line="vrr_S6:23,vrr_S68:2" link="vrr_s622,vrr_s624"/>
-    <!-- connect to KoelnBonn ********************** -->
+    <station id="vrr_s623" name="Berghausen" line="vrr_S6:23,vrr_S68:2" link="vrr_s622,vrr_s624"/> <!-- overlap with RheinRuhr -->
     <station id="vrr_s624" name="Langenfeld" line="vrr_S6:24,vrr_S68:1" link="vrr_s623"/>
     <!-- S68 -->
     <station id="vrr_s816" name="Erkrath" line="vrr_S68:13,vrr_S8:16" link="vrr_s817,vrr_u7301"/>
@@ -1158,7 +1152,7 @@
     <station id="vrr_u7806" name="Theodor-Heuss-Brücke" line="vrr_U78:6,vrr_U79:18" link="vrr_u7805,vrr_u7807"/>
     <station id="vrr_u7807" name="Kennedydamm" line="vrr_U78:7,vrr_U79:19" link="vrr_u7806,vrr_u7808"/>
     <station id="vrr_u7808" name="ERGO-Platz/Klever Str." line="vrr_U78:8,vrr_U79:20" link="vrr_u7023,vrr_u7807"/>
-    <!-- unidirectional: Mörikestr -> Sportpark Nord -> Merkur **************************** -->
+    <!-- unidirectional: Mörikestr -> Sportpark Nord -> Merkur -->
     <station id="vrr_u7812" name="Sportpark Nord/Europaplatz" line="vrr_U78:12" link="vrr_u7801"/>
     <!-- U79 -->
     <station id="vrr_u7905" name="Grunewald" line="vrr_U79:5" link="vrr_u7904,vrr_u7906"/>

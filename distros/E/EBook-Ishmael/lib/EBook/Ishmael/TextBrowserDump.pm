@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -16,6 +16,14 @@ our $CAN_DUMP = 0;
 # From links
 my $WIDTH_MAX = 512;
 my $WIDTH_MIN = 10;
+
+my @ORDER = qw(
+	lynx
+	links
+	elinks
+	w3m
+	queequeg
+);
 
 my %Browsers = (
 	'lynx' => {
@@ -46,11 +54,18 @@ my %Browsers = (
 		Width => '-cols',
 		Xhtml => [],
 	},
+	'queequeg' => {
+		Bins  => [ qw(queequeg) ],
+		Bin   => undef,
+		Opts  => [],
+		Width => '-w',
+		Xhtml => [],
+	},
 );
 
 my $Default = undef;
 
-for my $k (sort keys %Browsers) {
+for my $k (@ORDER) {
 
 	my $bin = first { which $_ } @{ $Browsers{ $k }->{Bins} };
 
@@ -144,6 +159,8 @@ programs to be installed:
 
 =item L<w3m(1)>
 
+=item L<queequeg(1)>
+
 =back
 
 =head1 SUBROUTINES
@@ -199,6 +216,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
+L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
 
 =cut

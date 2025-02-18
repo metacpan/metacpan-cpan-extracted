@@ -24,5 +24,7 @@ README
 SIGNATURE
 t/App-Wikidata-Template-CS-CitaceMonografie/01-use.t
 t/App-Wikidata-Template-CS-CitaceMonografie/02-version.t
+t/App-Wikidata-Template-CS-CitaceMonografie/03-new.t
+t/App-Wikidata-Template-CS-CitaceMonografie/04-run.t
 xt/App-Wikidata-Template-CS-CitaceMonografie/01-pod_coverage.t
 xt/App-Wikidata-Template-CS-CitaceMonografie/02-pod.t

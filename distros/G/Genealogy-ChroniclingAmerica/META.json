@@ -44,6 +44,8 @@
       "test" : {
          "requires" : {
             "Test::DescribeMe" : "0",
+            "Test::HTTPStatus" : "0",
+            "Test::MockObject" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -67,6 +69,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-ChroniclingAmerica"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

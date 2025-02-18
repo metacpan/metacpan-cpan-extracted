@@ -2,19 +2,19 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015, 2024 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015, 2025 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
 # Mail: gws@cpan.org
 #
 package Map::Tube::Hamburg;
-use 5.10.0;
+use 5.12.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.1');
+our $VERSION = version->declare('v0.1.2');
 
 =encoding utf8
 
@@ -44,7 +44,7 @@ with 'Map::Tube';
 =head1 DESCRIPTION
 
 This module allows to find the shortest route between any two given tube
-stations in Hamburg. In fact, underground, S-Bahn, and AKN (Altona-Kaltenkrichen-Neumünster) lines
+stations in Hamburg. In fact, underground, S-Bahn, and AKN (Altona-Kaltenkirchen-Neumünster) lines
 are covered for the wider Hamburg area.
 All interesting methods are provided by the role L<Map::Tube>.
 

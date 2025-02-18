@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Hamburg.
 
+0.1.2 2025-02-17
+  - Require Map::Tube 3.94 and adapt tests accordingly.
+  - Remove support for Perl 5.10 because of test failing for Perl < 5.11.
+  - Reorganised internal IDs for lines and stations.
+  - Enhanced tests.
+
 0.1.1 2024-12-11
   - Require Map::Tube 3.83 and adapt tests accordingly.
   - Fix test failing on older Perls.

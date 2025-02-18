@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tube name="Glasgow tube">
   <lines>
-    <line id="SPT" name="SPT" color="#68232E"/>
+    <line id="gg_SPT" name="SPT" color="#68232E"/>
   </lines>
   <stations>
-    <station id="KB" name="Kelvinbridge"      line="SPT:1"  link="SG,HH"/>
-    <station id="SG" name="St George's Cross" line="SPT:2"  link="CC,KB"/>
-    <station id="CC" name="Cowcaddens"        line="SPT:3"  link="BU,SG"/>
-    <station id="BU" name="Buchanan Street"   line="SPT:4"  link="SE,CC"/>
-    <station id="SE" name="St Enoch"          line="SPT:5"  link="BS,BU"/>
-    <station id="BS" name="Bridge Street"     line="SPT:6"  link="WS,SE"/>
-    <station id="WS" name="West Street"       line="SPT:7"  link="SR,BS"/>
-    <station id="SR" name="Shields Road"      line="SPT:8"  link="KP,WS"/>
-    <station id="KP" name="Kinning Park"      line="SPT:9"  link="CN,SR"/>
-    <station id="CN" name="Cessnock"          line="SPT:10" link="IB,KP"/>
-    <station id="IB" name="Ibrox"             line="SPT:11" link="GO,CN"/>
-    <station id="GO" name="Govan"             line="SPT:12" link="PA,IB"/>
-    <station id="PA" name="Partick"           line="SPT:13" link="KH,GO"/>
-    <station id="KH" name="Kelvinhall"        line="SPT:14" link="HH,PA"/>
-    <station id="HH" name="Hillhead"          line="SPT:15" link="KB,KH"/>
+    <station id="gg_kb" name="Kelvinbridge"      line="gg_SPT:1"  link="gg_sg,gg_hh"/>
+    <station id="gg_sg" name="St George's Cross" line="gg_SPT:2"  link="gg_cc,gg_kb"/>
+    <station id="gg_cc" name="Cowcaddens"        line="gg_SPT:3"  link="gg_bu,gg_sg"/>
+    <station id="gg_bu" name="Buchanan Street"   line="gg_SPT:4"  link="gg_se,gg_cc"/>
+    <station id="gg_se" name="St Enoch"          line="gg_SPT:5"  link="gg_bs,gg_bu"/>
+    <station id="gg_bs" name="Bridge Street"     line="gg_SPT:6"  link="gg_ws,gg_se"/>
+    <station id="gg_ws" name="West Street"       line="gg_SPT:7"  link="gg_sr,gg_bs"/>
+    <station id="gg_sr" name="Shields Road"      line="gg_SPT:8"  link="gg_kp,gg_ws"/>
+    <station id="gg_kp" name="Kinning Park"      line="gg_SPT:9"  link="gg_cn,gg_sr"/>
+    <station id="gg_cn" name="Cessnock"          line="gg_SPT:10" link="gg_ib,gg_kp"/>
+    <station id="gg_ib" name="Ibrox"             line="gg_SPT:11" link="gg_go,gg_cn"/>
+    <station id="gg_go" name="Govan"             line="gg_SPT:12" link="gg_pa,gg_ib"/>
+    <station id="gg_pa" name="Partick"           line="gg_SPT:13" link="gg_kh,gg_go"/>
+    <station id="gg_kh" name="Kelvinhall"        line="gg_SPT:14" link="gg_hh,gg_pa"/>
+    <station id="gg_hh" name="Hillhead"          line="gg_SPT:15" link="gg_kb,gg_kh"/>
   </stations>
 </tube>

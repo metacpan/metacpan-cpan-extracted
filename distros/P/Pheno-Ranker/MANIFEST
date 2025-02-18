@@ -62,7 +62,9 @@ t/pxf_random_100.json
 t/qr_codes/107_week_0_arm_1.compressed.png
 t/qr_codes/107_week_0_arm_1.pdf
 t/qr_codes/107_week_0_arm_1.png
+t/qr_codes/output.compressed.json
 t/qr_codes/output.json
+t/qr_codes/pdf/107_week_0_arm_1.pdf
 t/rank.txt
 t/ref_align.csv
 t/ref_align.target.csv

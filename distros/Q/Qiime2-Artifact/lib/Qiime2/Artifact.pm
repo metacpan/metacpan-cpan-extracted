@@ -12,7 +12,7 @@ use YAML::PP;
 use Capture::Tiny ':all';
 use File::Basename;
 
-$Qiime2::Artifact::VERSION = '0.12.0';
+$Qiime2::Artifact::VERSION = '0.13.0';
 
 sub _crash($ $);
 
@@ -326,6 +326,45 @@ sub get {
     _crash($self, "<$key> is not an attribute of this Artifact");
   }
 }
+
+sub get_bib {
+    my ($self) = @_;
+    
+    # Check if the artifact is properly loaded
+    _crash($self, "Artifact not loaded") unless defined $self->{loaded};
+    
+    # Initialize variables
+    my $citations_file = $self->{id} . '/provenance/citations.bib';
+    my $bib_content;
+    
+    # Try to get bibliography content
+    eval {
+        # Get the content of citations.bib from the zip file
+        $bib_content = $self->_getArtifactText($citations_file);
+    };
+    
+    if ($@) {
+        # Handle error if file extraction fails
+        _verbose($self, "Error extracting bibliography: $@");
+        return undef;
+    }
+    
+    # Check if we got any content
+    if (!defined $bib_content || length($bib_content) == 0) {
+        _verbose($self, "No bibliography found in $citations_file");
+        return undef;
+    }
+    
+    # Debug output if enabled
+    _debug($self, "Bibliography extracted from $citations_file", $bib_content) if $self->{debug};
+    
+    # Store bibliography in object for future reference
+    $self->{bibliography} = $bib_content;
+    
+    return $bib_content;
+}
+
+
 sub _debug {
   my ($self, $msg, $data, $opt) = @_;
   return 0 if not defined $self->{debug} or  $self->{debug} == 0;
@@ -389,7 +428,7 @@ Qiime2::Artifact - A parser for Qiime2 artifact files
 
 =head1 VERSION
 
-version 0.12.0
+version 0.13.0
 
 =head1 Wiki
 
@@ -432,7 +471,24 @@ Enable verbose reporting (for developers)
 
 =item B<get($key)>
 
-Return the $artifact->{$key}, and throws an error if the error is not found.
+Return the C<$artifact->{$key}>, and throws an error if the error is not found.
+
+=back
+
+=item B<get_bib()>
+
+Extracts and returns the bibliography information from the QIIME2 artifact.
+The bibliography is stored in BibTeX format within the artifact's zip file
+at C<{uuid}/provenance/citations.bib>.
+
+Returns:
+    - The content of the bibliography file if found
+    - undef if no bibliography is found or if extraction fails
+
+Example:
+
+  my $bib = $artifact->get_bib();
+  print $bib if defined $bib;
 
 =back
 

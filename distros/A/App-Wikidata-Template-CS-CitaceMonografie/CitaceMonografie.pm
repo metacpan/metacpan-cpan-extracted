@@ -6,12 +6,13 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Getopt::Std;
+use List::Util 1.33 qw(none);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::API;
 use Wikibase::Datatype::Query;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 Readonly::Array our @LANGUAGES => ('mul', 'cs', 'en');
 
@@ -42,12 +43,15 @@ sub run {
 		'm' => 'www.wikidata.org',
 		'p' => 0,
 	};
-	if (! getopts('hl:m:p', $self->{'_opts'}) || $self->{'_opts'}->{'h'}) {
+	if (! getopts('hl:m:p', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
+
 		print STDERR "Usage: $0 [-h] [-l lang] [-m mediawiki_site] [-p] [--version] wd_id\n";
-		print STDERR "\t-h\t\t\tHelp.\n";
+		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-l lang\t\t\tLanguage used (default is English = en)\n";
 		print STDERR "\t-m mediawiki_site\tMediaWiki site (default is www.wikidata.org).\n";
-		print STDERR "\t-m\t\t\tPretty print.\n";
+		print STDERR "\t-p\t\t\tPretty print.\n";
 		print STDERR "\t--version\t\tPrint version.\n";
 		print STDERR "\twd_id\t\t\tWikidata id (qid or pid or lid).\n";
 		return 1;
@@ -63,7 +67,7 @@ sub run {
 	my $item = $self->{'_api'}->get_item($wd_id);
 
 	# Check for edition.
-	if ($self->{'_q'}->query($item, 'P31') ne 'Q3331189') {
+	if (none { $self->{'_q'}->query($item, 'P31') eq $_ } ('Q3331189', 'Q21112633')) {
 		err "This item isn't book edition.";
 	}
 
@@ -373,12 +377,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2018-2023 Michal Josef Špaček
+© 2018-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

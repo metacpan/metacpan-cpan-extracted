@@ -1,4 +1,5 @@
 bin/ishmael
+bin/queequeg
 Changes
 lib/EBook/Ishmael.pm
 lib/EBook/Ishmael/Decode.pm

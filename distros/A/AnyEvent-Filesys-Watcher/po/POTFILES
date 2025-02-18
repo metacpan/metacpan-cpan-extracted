@@ -1,0 +1,6 @@
+../lib/AnyEvent/Filesys/Watcher/Event.pod
+../lib/AnyEvent/Filesys/Watcher/Backend/FSEvents.pod
+../lib/AnyEvent/Filesys/Watcher/Backend/KQueue.pod
+../lib/AnyEvent/Filesys/Watcher/Backend/Inotify2.pod
+../lib/AnyEvent/Filesys/Watcher/Backend/Fallback.pod
+../lib/AnyEvent/Filesys/Watcher.pod

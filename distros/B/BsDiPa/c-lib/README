@@ -47,6 +47,16 @@ Contact: steffen at sdaoden dot eu.
 RELEASES
 --------
 
+v0.6.1, 2025-02-17:
+  - Coverity.com (project 31371 / s-bsdipa) FIXes for the s-bsdipa
+    example program: one unused value, one fd resource leak.
+    (Tool design changed without that being adopted in early design
+    stage: obviously not enough iterations and/or too much fuzz.)
+  - bsdipa_patch() CHANGE: until now field lengths were not verified
+    in the (unusual) .pc_patch_dat==NULL case, as the user was expected
+    to have done this before; instead, always check anything.
+  -- Do not increment minor number nonetheless, no ABI change.
+
 v0.6.0, 2025-01-31:
   - Adds struct s_bsdipa_patch_ctx::pc_max_allowed_restored_len, which
     allows to configure the maximum allowed size of the restored data.

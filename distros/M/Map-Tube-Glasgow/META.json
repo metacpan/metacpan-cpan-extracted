@@ -34,15 +34,16 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.77",
+            "Map::Tube" : "3.94",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "test" : {
          "recommends" : {
             "Graph" : "0",
+            "Test::Kwalitee" : "0",
             "Test::Map::Tube" : "0",
             "XML::Twig" : "0"
          },
@@ -54,7 +55,7 @@
    "provides" : {
       "Map::Tube::Glasgow" : {
          "file" : "lib/Map/Tube/Glasgow.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.72.2"
       }
    },
    "release_status" : "stable",
@@ -63,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Glasgow@rt.cpan.org"
       }
    },
-   "version" : "v0.72.1",
+   "version" : "v0.72.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,8 @@
 Revision history for Perl extension Map::Tube::RheinRuhr.
 
+0.2.0 2025-02-17
+  - Add other_links to Bochum and Buer Rathaus.
+  - Enhanced tests.
+
 0.1.0 2025-01-15
   - initial release

@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "aggregate",
       "aggregator",
@@ -70,7 +70,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.0.3"
+         "version" : "v3.1.3"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -112,7 +112,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/davorg/perlanet/issues"
+         "web" : "https://github.com/davorg-cpan/perlanet/issues"
       },
       "homepage" : "http://perlanet.mag-sol.com/",
       "license" : [
@@ -120,10 +120,10 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/davorg/perlanet.git",
-         "web" : "https://github.com/davorg/perlanet"
+         "url" : "git://github.com/davorg-cpan/perlanet.git",
+         "web" : "https://github.com/davorg-cpan/perlanet"
       }
    },
-   "version" : "v3.0.3",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v3.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

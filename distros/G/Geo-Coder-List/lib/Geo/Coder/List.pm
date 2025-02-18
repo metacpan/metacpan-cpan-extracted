@@ -20,11 +20,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -42,15 +42,14 @@ L<HTML::GoogleMaps::V3>
 
 Creates a Geo::Coder::List object.
 
-Takes an optional argument 'cache' which takes an cache object that supports
-get() and set() methods.
+Takes an optional argument 'cache' which is a reference to a HASH or an object that supports C<get()> and C<set()> methods.
 Takes an optional argument 'debug',
 the higher the number,
 the more debugging.
 The licences of some geo coders,
 such as Google,
 specifically prohibit caching API calls,
-so be careful to only use with those services that allow it.
+so be careful to only use those services that allow it.
 
     use Geo::Coder::List;
     use CHI;
@@ -82,7 +81,7 @@ sub new
 
 =head2 push
 
-Add an encoder to list of encoders.
+Add an encoder to the list of encoders.
 
     use Geo::Coder::List;
     use Geo::Coder::GooglePlaces;
@@ -90,7 +89,7 @@ Add an encoder to list of encoders.
     my $list = Geo::Coder::List->new()->push(Geo::Coder::GooglePlaces->new());
 
 Different encoders can be preferred for different locations.
-For example this code uses geocode.ca for Canada and US addresses,
+For example, this code uses geocode.ca for Canada and US addresses,
 and OpenStreetMap for other places:
 
     my $geo_coderlist = Geo::Coder::List->new()
@@ -142,6 +141,12 @@ sub geocode {
 
 	if((!defined($location)) || (length($location) == 0)) {
 		Carp::carp(__PACKAGE__, ' usage: geocode(location => $location)');
+		return;
+	}
+
+	# Fail when the input is just a set of numbers
+	if($params->{'location'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), ", $params->{location});
 		return;
 	}
 
@@ -396,6 +401,9 @@ sub geocode {
 							$lat = $l->{'features'}[0]{'geometry'}{'coordinates'}[1];
 							$long = $l->{'features'}[0]{'geometry'}{'coordinates'}[0];
 							$l->{'debug'} = __LINE__;
+						} else {
+							# GeoApify doesn't give an error if a location is not found
+							next ENCODER;
 						}
 					} else {
 						$l->{'debug'} = __LINE__;
@@ -404,8 +412,13 @@ sub geocode {
 					if(defined($lat) && defined($long)) {
 						$l->{geometry}{location}{lat} = $lat;
 						$l->{geometry}{location}{lng} = $long;
+						# Compatibility
+						$l->{'lat'} = $lat;
+						$l->{'lon'} = $long;
 					} else {
 						delete $l->{'geometry'};
+						delete $l->{'lat'};
+						delete $l->{'lon'};
 					}
 
 					if($l->{'standard'}{'countryname'}) {
@@ -418,6 +431,7 @@ sub geocode {
 					$l->{geocoder} = $geocoder;
 					$l->{'lat'} //= $l->{geometry}{location}{lat};
 					$l->{'lng'} //= $l->{geometry}{location}{lng};
+					$l->{'lon'} //= $l->{geometry}{location}{lng};
 					my $log = {
 						line => $call_details[2],
 						location => $location,
@@ -429,6 +443,7 @@ sub geocode {
 					CORE::push @{$self->{'log'}}, $log;
 					last POSSIBLE_LOCATION;
 				}
+						print __LINE__, "\n";
 			}
 		}
 
@@ -731,7 +746,11 @@ sub _cache {
 				$duration = '1 month';
 			}
 			print Data::Dumper->new([$value])->Dump() if($self->{'debug'});
-			$self->{'cache'}->set($key, $value, $duration);
+			if(ref($self->{'cache'}) eq 'HASH') {
+				$self->{'cache'}->{$key} = $value;
+			} else {
+				$self->{'cache'}->set($key, $value, $duration);
+			}
 		}
 		return $rc;
 	}
@@ -739,7 +758,11 @@ sub _cache {
 	# Retrieve from the cache
 	my $rc = $locations{$key};	# In the L1 cache?
 	if((!defined($rc)) && $self->{'cache'}) {	# In the L2 cache?
-		$rc = $self->{'cache'}->get($key);
+		if(ref($self->{'cache'}) eq 'HASH') {
+			$rc = $self->{'cache'}->{$key};
+		} else {
+			$rc = $self->{'cache'}->get($key);
+		}
 	}
 	if(defined($rc)) {
 		if(ref($rc) eq 'HASH') {	# else - it will be an array of hashes
@@ -748,12 +771,14 @@ sub _cache {
 			}
 			$rc->{'lat'} //= $rc->{geometry}{location}{lat};
 			$rc->{'lng'} //= $rc->{geometry}{location}{lng};
+			$rc->{'lon'} //= $rc->{geometry}{location}{lng};
 		}
 	}
 	return $rc;
 }
 
-# Helper routine to parse the arguments given to a function,
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);
@@ -763,7 +788,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if ref $_[0] eq 'HASH';
+	return $_[0] if(ref $_[0] eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -772,16 +797,21 @@ sub _get_params
 	if(($num_args == 1) && (defined $default)) {
 		# %rc = ($default => shift);
 		return { $default => shift };
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif($num_args == 0 && defined $default) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
 }
+
 
 =head1 AUTHOR
 
@@ -826,7 +856,7 @@ L<https://metacpan.org/release/Geo-Coder-List>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2024 Nigel Horne.
+Copyright 2016-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

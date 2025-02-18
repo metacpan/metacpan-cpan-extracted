@@ -5,7 +5,7 @@ use warnings;
 
 use App::Wikidata::Template::CS::CitaceMonografie;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::Wikidata::Template::CS::CitaceMonografie->new->run;
@@ -76,12 +76,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2018-2023 Michal Josef Špaček
+© 2018-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

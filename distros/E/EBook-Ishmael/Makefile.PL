@@ -29,10 +29,11 @@ my %WriteMakefileArgs = (
         'File::Which' => '0',
         'JSON' => '0',
         'List::Util' => '0',
-        'XML::LibXML' => '0',
+        'XML::LibXML' => '1.70',
     },
     EXE_FILES => [
         'bin/ishmael',
+        'bin/queequeg',
     ],
     META_MERGE => {
         'meta-spec' => { version => 2 },

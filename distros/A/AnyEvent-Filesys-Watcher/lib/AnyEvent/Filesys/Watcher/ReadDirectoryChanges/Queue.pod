@@ -1,0 +1,105 @@
+=head1 NAME
+
+AnyEvent::Filesys::Watcher::ReadDirectoryChanges::Queue - I/O Wrapper Around Thread::Queue
+
+=head1 SYNOPSIS
+
+    use AnyEvent::Filesys::Watcher::FileSystemWatcher::Queue;
+    use IO::Select;
+
+    $q = AnyEvent::Filesys::Watcher::FileSystemWatcher::Queue->new;
+    $q->queue('foo', 'bar', 'baz');
+
+    # Get an IO::Handle for the queue.
+    $handle = $q->handle;
+    $q->pending;     # Returns 3.
+
+    # Or use IO for that:
+    $s = IO::Select->new;
+    $s->add($handle);
+    $s->can_read(0); # True. Data available.
+
+    $q->dequeue;     # Returns 'foo'.
+    $q->pending;     # Returns 2.
+    $s->can_read(0); # True. Still data available.
+
+    $q->dequeue(2);  # Returns ('foo', 'bar').
+    $q->pending;     # Returns 0;
+    $s->can_read(0); # False. No more data available.
+
+=head1 DESCRIPTION
+
+This is a wrapper around L<Thread::Queue> which exposes a small subset of
+L<Thread;:Queue>'s API, more precisely, just enough API to pass it as a queue
+to L<Filesys::Notify::Win32::ReadDirectoryChanges>.  Only those methods that
+L<Filesys::Notify::Win32::ReadDirectoryChanges> currently uses are implemented.
+
+The module also wraps an L<IO::Handle> with somewhat odd semantics.  Whenever
+there is data pending in the queue, the handle will be ready to read.  As soon
+as the queue is empty, the handle will block when being read from.
+
+The sole motivation of this construct is to be able to integrate
+L<Filesys::Notify::Win32> with I/O multiplexing, for example with
+L<AE::io|AnyEvent/"I/O Watchers">.
+
+The module makes no effort to be thread-safe (if you want to call the Perl
+interpreter threads really threads).  It is probably possible that the
+selectable handle that you get may signal that data is available but actually
+there is no data available.  As a pre-caution, you should always check the
+queue with the L<pending()|/pending> method before you actually read data with
+L<enqueue()|/enqueue>.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new([ITEMS])>
+
+See L<Thread::Queue/new>.
+
+=item B<handle>
+
+Returns an L<IO::Handle> that can be polled with L<select()|perlfunc/select>
+(the 2nd variant that calls the B<select(2)> syscall).
+
+You can also read from this handle but this is unnecessary and dangerous.
+
+It is unnecessary because C<dequeue()> (see below) implicitely reads from the
+handle until it has no more data available.  And what you can read from the
+handle is nonsense (currently an arbitrary number of "1" characters).
+
+It is also dangerous, at least for single-threaded applications, because the
+call will block if there is no data available in the queue. For a
+single-threaded application that would lead to a deadlock, because while
+being blocked, no data can be enqueued.
+
+=item B<enqueue(ITEMS)>
+
+See L<Thread;:Queue/enqueue>.
+
+=item B<dequeue([COUNT])>
+
+See L<Thread;:Queue/dequeue>.
+
+Note: Even if the L<handle()|/handle> you have received is ready for reading,
+there is no absolute guarantee that there is really data available in the
+queue.  Therefore, you should always call L<pending()|/pending> before you
+dequeue data or your application will block.
+
+=item B<pending>
+
+Returns the number of pending items in the queue, see L<Thread;:Queue/pending>.
+
+This method is actually not needed by L<Filesys::Notify::ReadDirectoryChanges>
+but necessary for checking that there is really data available in the queue.
+
+=back
+
+=head1 AUTHOR
+
+Guido Flohr E<lt>guido.flohr@cantanea.comE<gt>.
+
+=head1 SEE ALSO
+
+L<Filesys::Notify::Win32::ReadDirectoryChanges>, L<IO::Handle>,
+L<Thread::Queue>, perl(1)

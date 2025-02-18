@@ -61,7 +61,7 @@ use namespace::sweep;
 
 # version '...'
 our $version = 'v4.6.0';
-our $VERSION = '0.005003';
+our $VERSION = '0.005004';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -151,7 +151,7 @@ BEGIN {
 The I<Win32::Console::DotNet> class offers fundamental support for Windows
 applications that read from and write to a console.
 
-The I<Win32::Console::DotNet> class is based on the L<Windows::Console> module 
+The I<Win32::Console::DotNet> class is based on the L<Win32::Console> module 
 and provides an I<.NET> compatible API. 
 
 The I<.NET> API provides a number of benefits that allow developers to 
@@ -4432,9 +4432,10 @@ Methods inherited from class L<UNIVERSAL>
 # ------------------------------------------------------------------------
 
 # see SYNOPSIS using this code
-#---------------
-package System {
-#---------------
+#-------
+package # hidden from CPAN
+System {
+#-------
   use strict;
   use warnings;
   use Exporter qw( import );
@@ -4447,9 +4448,10 @@ package System {
 }
 
 # see Utilapiset.h and Winuser.h documentation for Beep() and GetKeyState()
-#--------------------
-package Win32Native {
-#--------------------
+#------------
+package # hidden from CPAN
+Win32Native {
+#------------
   use strict;
   use warnings;
   use English qw( -no_match_vars );
@@ -4480,9 +4482,10 @@ package Win32Native {
 
 # Most of the content was taken from L</IO::Null>, L</IO::String> and 
 # I<system.io.__debugoutputtextwriter.cs>
-#----------------------------------
-package IO::DebugOutputTextWriter {
-#----------------------------------
+#--------------------------
+package # hidden from CPAN
+IO::DebugOutputTextWriter {
+#--------------------------
   use strict;
   use warnings;
   use Symbol ();
@@ -4925,6 +4928,8 @@ The requirements necessary for the runtime are listed below:
 
 =item * L<namespace::sweep> 
 
+=item * L<Win32::API> 
+
 =item * L<Win32::Console> 
 
 =back
@@ -4954,7 +4959,7 @@ The requirements necessary for the runtime are listed below:
 
 =item *
 
-2024 by J. Schneider L<https://github.com/brickpool/>
+2024, 2025 by J. Schneider E<lt>brickpool@cpan.orgE<gt>
 
 =back
 
@@ -4984,8 +4989,8 @@ from L<Types::Standard> and L<Type::Nano>)
 
 =item *
 
-2020 by Jens Rehsack E<lt>rehsack@cpan.orgE<gt> (Code snippet 
-from L<Params::Util::PP>)
+2020 by Jens Rehsack E<lt>rehsack@cpan.orgE<gt> (Code snippet from 
+L<Params::Util::PP>)
 
 =back
 

@@ -19,11 +19,11 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ If latitude and/or longitude is undefined,
 the label is taken to be a location to be added.
 If no coordinates are provided, an error will be thrown.
 
-=item * geocoder
+=item * C<geocoder>
 
 An optional geocoder object such as L<Geo::Coder::List> or L<Geo::Coder::Free>.
 
@@ -137,7 +137,7 @@ Width (in pixels or using your own unit), the default is 600px.
 
 =item * zoom
 
-An optional zoom level for the map, with a default value of 12.
+An optional zoom level for the map, with a default value of 17.
 
 =back
 
@@ -195,7 +195,7 @@ sub new
 		height => $args{'height'} || '400px',
 		host => $args{'host'} || 'nominatim.openstreetmap.org/search',
 		width => $args{'width'} || '600px',
-		zoom => $args{zoom} || 12,
+		zoom => $args{zoom} || 17,
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
 		%args
@@ -296,6 +296,8 @@ sub center
 		} elsif($point->can('latitude')) {
 			$lat = $point->latitude();
 			$lon = $point->longitude();
+		} elsif(!ref($point)) {
+			($lat, $lon) = $self->_fetch_coordinates($point);
 		} else {
 			die 'add_marker(): what is the type of point?'
 		}
@@ -345,12 +347,18 @@ sub _fetch_coordinates
 			if(Scalar::Util::blessed($rc) && $rc->can('latitude')) {
 				return ($rc->latitude(), $rc->longitude());
 			}
-			if((ref($rc) eq 'HASH') && defined($rc->{'lat'}) && defined($rc->{'lon'})) {
-				return ($rc->{'lat'}, $rc->{'lon'});
+			if(ref($rc) eq 'HASH') {
+				if(defined($rc->{'lat'}) && defined($rc->{'lon'})) {
+					return ($rc->{'lat'}, $rc->{'lon'});
+				}
+				if(defined($rc->{'geometry'}{'location'}{'lat'})) {
+					return ($rc->{'geometry'}{'location'}{'lat'}, $rc->{'geometry'}{'location'}{'lng'});
+				}
 			}
 			if(ref($rc) eq 'ARRAY') {
 				return $rc;
 			}
+			print ref($rc), "\n";
 		}
 		return;
 	}
@@ -548,8 +556,8 @@ sub _validate
 	my($lat, $lon) = @_;
 
 	# Validate Latitude and Longitude
-	if (!defined $lat || !defined $lon || $lat !~ /^-?\d+(\.\d+)?$/ || $lon !~ /^-?\d+(\.\d+)?$/) {
-		Carp::carp("Skipping invalid coordinate: ($lat, $lon)");
+	if(!defined $lat || !defined $lon || $lat !~ /^-?\d*(\.\d+)?$/ || $lon !~ /^-?\d*(\.\d+)?$/) {
+		Carp::carp("Skipping invalid coordinate: ($lat, $lon)") if(defined($lat) && defined($lon));
 		return 0;
 	}
 	if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {

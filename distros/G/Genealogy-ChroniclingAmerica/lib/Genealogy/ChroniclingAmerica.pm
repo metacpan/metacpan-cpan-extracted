@@ -16,11 +16,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -41,19 +41,75 @@ our $VERSION = '0.04';
 	print "$url\n";
     }
 
+=head1 DESCRIPTION
+
+The **Genealogy::ChroniclingAmerica** Perl module allows users to search for historical newspaper records from the **Chronicling America** archive,
+maintained by the Library of Congress.
+By providing a person's first name,
+last name,
+and state,
+the module constructs and executes search queries,
+retrieving URLs to relevant newspaper pages in JSON format.
+It supports additional filters like date of birth and date of death,
+enforces **rate-limiting** to comply with API request limits,
+and includes robust error handling and validation.
+Ideal for genealogy research,
+this module streamlines access to historical newspaper archives with an easy-to-use interface.
+
+=over 4
+
+=item * Rate-Limiting
+
+A minimum interval between successive API calls can be enforced to ensure that the API is not overwhelmed and to comply with any request throttling requirements.
+
+Rate-limiting is implemented using L<Time::HiRes>.
+A minimum interval between API
+calls can be specified via the C<min_interval> parameter in the constructor.
+Before making an API call,
+the module checks how much time has elapsed since the
+last request and,
+if necessary,
+sleeps for the remaining time.
+
+=back
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
 Creates a Genealogy::ChroniclingAmerica object.
 
-It takes three mandatory arguments state, firstname and lastname.
-State must be the full name, not an abbreviation.
+It takes three mandatory arguments:
 
-There are four optional arguments: middlename, date_of_birth, date_of_death, ua and host:
-host is the domain of the site to search, the default is chroniclingamerica.loc.gov.
-ua is a pointer to an object that understands get and env_proxy messages, such
-as L<LWP::UserAgent::Throttled>.
+=over 4
+
+=item * C<firstname>
+
+=item * C<lastname>
+
+=item * C<state> - Must be the full name,
+not an abbreviation.
+
+=back
+
+Accepts the following optional arguments:
+
+=over 4
+
+=item * C<middlename>
+
+=item * C<date_of_birth>
+
+=item * C<date_of_death>
+
+=item * C<host> - The domain of the site to search, the default is L<https://chroniclingamerica.loc.gov>.
+
+=item * C<ua> - An object that understands get and env_proxy messages,
+such as L<LWP::UserAgent::Throttled>.
+
+=item * C<min_interval> - Amount to rate limit.
+
+=back
 
 =cut
 
@@ -68,7 +124,7 @@ sub new {
 		%args = %{$_[0]};
 	} elsif(ref($_[0]) || !defined($_[0])) {
 		Carp::croak('Usage: ', __PACKAGE__, '->new(%args)');
-	} elsif(@_ % 2 == 0) {
+	} elsif((@_ % 2) == 0) {
 		%args = @_;
 	}
 
@@ -88,10 +144,24 @@ sub new {
 		Carp::croak('First name is not optional');
 		return;	# Don't know why this is needed, but it is
 	}
+
+	# Fail when the input is just a set of numbers
+	if($args{'firstname'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{firstname}");
+		return;
+	}
+
 	unless(defined($args{'lastname'})) {
 		Carp::croak('Last name is not optional');
 		return;
 	}
+
+	# Fail when the input is just a set of numbers
+	if($args{'lastname'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{lastname}");
+		return;
+	}
+
 	unless($args{'state'}) {
 		Carp::croak('State is not optional');
 		return;
@@ -102,12 +172,23 @@ sub new {
 		return;
 	}
 
+	# Fail when the input contains a number
+	if($args{'state'} =~ /\d/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{state}");
+		return;
+	}
+
 	my $ua = $args{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	$ua->env_proxy(1) unless($args{'ua'});
 
+	# Set up rate-limiting: minimum interval between requests (in seconds)
+	my $min_interval = $args{min_interval} || 0;	# default: no delay
+
 	my $rc = {
+		%args,
+		min_interval => $min_interval,
 		ua => $ua,
-		host => $args{'host'} || 'chroniclingamerica.loc.gov'
+		host => $args{'host'} || 'chroniclingamerica.loc.gov',
 	};
 
 	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($args{'state'})) );
@@ -148,8 +229,18 @@ sub new {
 		die $resp->status_line();
 	}
 
+	# Update last_request timestamp
+	$rc->{'last_request'} = time();
+
 	$rc->{'json'} = JSON::MaybeXS->new();
-	my $data = $rc->{'json'}->decode($resp->content());
+	my $data;
+
+	eval { $data = $rc->{'json'}->decode($resp->content()) };
+
+	if($@) {
+		Carp::carp("Failed to parse JSON response: $@");
+		return;
+	}
 
 	# ::diag(Data::Dumper->new([$data])->Dump());
 
@@ -202,8 +293,18 @@ sub get_next_entry
 
 	# ::diag(Data::Dumper->new([$entry])->Dump());
 
+	# Enforce rate-limiting: ensure at least min_interval seconds between requests.
+	my $now = time();
+	my $elapsed = $now - $self->{last_request};
+	if($elapsed < $self->{min_interval}) {
+		Time::HiRes::sleep($self->{min_interval} - $elapsed);
+	}
+
 	# Make the API request
 	my $resp = $self->{'ua'}->get($entry->{'url'});
+
+	# Update last_request timestamp
+	$self->{last_request} = time();
 
 	# Handle error responses
 	if($resp->is_error()) {
@@ -229,18 +330,20 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 If a middle name is given and no match is found,
 it should search again without the middle name.
 
-Please report any bugs or feature requests to C<bug-genealogy-chroniclingamerica at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Genealogy-ChroniclingAmerica>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
 =head1 SEE ALSO
 
 L<https://github.com/nigelhorne/gedcom>
 L<https://chroniclingamerica.loc.gov>
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-genealogy-chroniclingamerica at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Genealogy-ChroniclingAmerica>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
@@ -262,7 +365,7 @@ L<https://metacpan.org/release/Genealogy-ChroniclingAmerica>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2024 Nigel Horne.
+Copyright 2018-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

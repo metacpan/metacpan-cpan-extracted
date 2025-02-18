@@ -10,7 +10,7 @@ use Test::Needs 'Test::Carp';
 Test::Carp->import();
 
 my $g = new_ok('Geo::Coder::List');
-does_carp_that_matches(sub { my $location = $g->geocode(); }, qr/usage: geocode\(/);
+does_croak_that_matches(sub { my $location = $g->geocode() }, qr/Usage: /);
 does_carp_that_matches(sub { my $location = $g->geocode(''); }, qr/usage: geocode\(/);
 does_carp_that_matches(sub { my $location = $g->geocode({ location => '' }); }, qr/usage: geocode\(/);
 does_carp_that_matches(sub { my $location = $g->geocode(location => ''); }, qr/usage: geocode\(/);

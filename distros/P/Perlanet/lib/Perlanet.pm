@@ -7,7 +7,6 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
-use Carp;
 use DateTime::Duration;
 use DateTime;
 use Perlanet::Entry;
@@ -18,7 +17,7 @@ use XML::Feed;
 
 use Perlanet::Types;
 
-our $VERSION = '3.0.3';
+our $VERSION = '3.1.3';
 
 with 'MooseX::Traits';
 
@@ -38,7 +37,8 @@ has 'ua' => (
 sub _build_ua {
   my $self = shift;
   my $ua = LWP::UserAgent->new(
-    agent => "Perlanet/$VERSION"
+    agent   => "Perlanet/$VERSION",
+    timeout => 20,
   );
   $ua->show_progress(1) if -t STDOUT;
   $ua->env_proxy;
@@ -206,19 +206,30 @@ sub fetch_feeds {
     my $response = $self->fetch_page($feed->feed);
 
     if ($response->is_error) {
-      carp 'Error retrieving ' . $feed->feed;
-      carp $response->http_response->status_line;
+      warn 'Error retrieving ' . $feed->feed, "\n";
+      warn $response->http_response->status_line, "\n";
       next;
     }
 
     unless (length $response->content) {
-      carp 'No data returned from ' . $feed->feed;
+      warn 'No data returned from ' . $feed->feed, "\n";
       next;
     }
 
     try {
       my $data = $response->content;
+
+      die 'No data from ' . $feed->feed . "\n" unless $data;
+
       my $xml_feed = XML::Feed->parse(\$data);
+
+      unless ($xml_feed) {
+        warn "Can't make an object from " . $feed->feed . "\n";
+        my $content_type = $response->content_type;
+        warn "Content type: $content_type\n" if $content_type;
+        my $extract = substr $data, 0, 100;
+        die "[$extract]\n";
+      }
 
       $feed->_xml_feed($xml_feed);
       $feed->title($xml_feed->title) unless $feed->title;
@@ -226,8 +237,8 @@ sub fetch_feeds {
       push @valid_feeds, $feed;
     }
     catch {
-      carp 'Errors parsing ' . $feed->feed;
-      carp $_ if defined $_;
+      warn 'Errors parsing ' . $feed->feed, "\n";
+      warn "$_\n" if defined $_;
     };
   }
 

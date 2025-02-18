@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Métro de Tolouse">
+  <lines>
+    <line id="tou_A" name="A" color="#FD2A17"/>
+    <line id="tou_B" name="B" color="#FFDA37"/>
+    <!-- Train -->
+    <line id="tou_LIO" name="LiO" color="#7559A5"/>
+    <!-- Ligne C not yet operational as of February 2025 -->
+    <!-- Tram -->
+    <line id="tou_T1" name="T1" color="#05518A"/>
+    <!-- Funiculaire -->
+    <line id="tou_T__L__O" name="Téléo" color="#EC1977"/>
+  </lines>
+  <stations>
+    <!-- A -->
+    <station id="tou_a01" name="Balma - Gramont" line="tou_A:1" link="tou_a02"/>
+    <station id="tou_a02" name="Argoulets" line="tou_A:2" link="tou_a01,tou_a03"/>
+    <station id="tou_a03" name="Roseraie" line="tou_A:3" link="tou_a02,tou_a04"/>
+    <station id="tou_a04" name="Jolimont" line="tou_A:4" link="tou_a03,tou_a05"/>
+    <station id="tou_a05" name="Marengo" line="tou_A:5" link="tou_a04,tou_a06"/>
+    <station id="tou_a06" name="Jean Jaurès" line="tou_A:6,tou_B:9" link="tou_a05,tou_a07,tou_b08,tou_b10"/>
+    <station id="tou_a07" name="Capitole" line="tou_A:7" link="tou_a06,tou_a08"/>
+    <station id="tou_a08" name="Esquirol" line="tou_A:8" link="tou_a07,tou_a09"/>
+    <station id="tou_a09" name="St Cyprien - République" line="tou_A:9" link="tou_a08,tou_a10"/>
+    <station id="tou_a10" name="Patte d'Oie" line="tou_A:10" link="tou_a09,tou_a11"/>
+    <station id="tou_a11" name="Arènes" line="tou_A:11,tou_LIO:1,tou_T1:7" link="tou_a10,tou_a12,tou_lio02,tou_t106,tou_t108"/>
+    <station id="tou_a12" name="Fontaine Lestang" line="tou_A:12" link="tou_a11,tou_a13"/>
+    <station id="tou_a13" name="Mermoz" line="tou_A:13" link="tou_a12,tou_a14"/>
+    <station id="tou_a14" name="Bagatelle" line="tou_A:14" link="tou_a13,tou_a15"/>
+    <station id="tou_a15" name="Mirail - Université" line="tou_A:15" link="tou_a14,tou_a16"/>
+    <station id="tou_a16" name="Reynerie" line="tou_A:16" link="tou_a15,tou_a17"/>
+    <station id="tou_a17" name="Bellefontaine" line="tou_A:17" link="tou_a16,tou_a18"/>
+    <station id="tou_a18" name="Basso Cambo" line="tou_A:18" link="tou_a17"/>
+    <!-- B -->
+    <station id="tou_b01" name="Borderouge" line="tou_B:1" link="tou_b02"/>
+    <station id="tou_b02" name="Trois Cocus" line="tou_B:2" link="tou_b01,tou_b03"/>
+    <station id="tou_b03" name="La Vache" line="tou_B:3" link="tou_b02,tou_b04"/>
+    <station id="tou_b04" name="Barrière de Paris" line="tou_B:4" link="tou_b03,tou_b05"/>
+    <station id="tou_b05" name="Minimes - Claude Nougaro" line="tou_B:5" link="tou_b04,tou_b06"/>
+    <station id="tou_b06" name="Canal du Midi" line="tou_B:6" link="tou_b05,tou_b07"/>
+    <station id="tou_b07" name="Compans Caffarelli" line="tou_B:7" link="tou_b06,tou_b08"/>
+    <station id="tou_b08" name="Jeanne d'Arc" line="tou_B:8" link="tou_a06,tou_b07"/>
+    <station id="tou_b10" name="François Verdier" line="tou_B:10" link="tou_a06,tou_b11"/>
+    <station id="tou_b11" name="Carmes" line="tou_B:11" link="tou_b10,tou_b12"/>
+    <station id="tou_b12" name="Palais de Justice" line="tou_B:12,tou_T1:1" link="tou_b11,tou_b13,tou_t102"/>
+    <station id="tou_b13" name="Saint Michel - Marcel Langer" line="tou_B:13" link="tou_b12,tou_b14"/>
+    <station id="tou_b14" name="Empalot" line="tou_B:14" link="tou_b13,tou_b15"/>
+    <station id="tou_b15" name="Saint Agne" line="tou_B:15" link="tou_b14,tou_b16"/>
+    <station id="tou_b16" name="Saouzelong" line="tou_B:16" link="tou_b15,tou_b17"/>
+    <station id="tou_b17" name="Rangeuil" line="tou_B:17" link="tou_b16,tou_b18"/>
+    <station id="tou_b18" name="Faculté de Pharmacie" line="tou_B:18" link="tou_b17,tou_b19"/>
+    <station id="tou_b19" name="Université Paul Sabatier" line="tou_B:19,tou_T__L__O:1" link="tou_b18,tou_b20,tou_t__l__o02"/>
+    <station id="tou_b20" name="Ramonville" line="tou_B:20" link="tou_b19"/>
+    <!-- LiO -->
+    <station id="tou_lio02" name="Le TOEC" line="tou_LIO:2" link="tou_a11,tou_lio03"/>
+    <station id="tou_lio03" name="Lardenne" line="tou_LIO:3" link="tou_lio02,tou_lio04"/>
+    <station id="tou_lio04" name="Saint Martin du Touch" line="tou_LIO:4" link="tou_lio03,tou_lio05"/>
+    <station id="tou_lio05" name="Ramassiers" line="tou_LIO:5" link="tou_lio04,tou_lio06"/>
+    <station id="tou_lio06" name="Colomiers Gare SNCF" line="tou_LIO:6" link="tou_lio05"/>
+    <!-- T1 -->
+    <station id="tou_t102" name="Île du Ramier" line="tou_T1:2" link="tou_b12,tou_t103"/>
+    <station id="tou_t103" name="Fer à Cheval" line="tou_T1:3" link="tou_t102,tou_t104"/>
+    <station id="tou_t104" name="Av. Muret - M. Cavaillé" line="tou_T1:4" link="tou_t103,tou_t105"/>
+    <station id="tou_t105" name="Croix de Pierre" line="tou_T1:5" link="tou_t104,tou_t106"/>
+    <station id="tou_t106" name="Déodat de Séverac" line="tou_T1:6" link="tou_a11,tou_t105"/>
+    <station id="tou_t108" name="Hippodrome" line="tou_T1:8" link="tou_a11,tou_t109"/>
+    <station id="tou_t109" name="Zénith" line="tou_T1:9" link="tou_t108,tou_t110"/>
+    <station id="tou_t110" name="Cartoucherie" line="tou_T1:10" link="tou_t109,tou_t111"/>
+    <station id="tou_t111" name="Purpan" line="tou_T1:11" link="tou_t110,tou_t112"/>
+    <station id="tou_t112" name="Arènes Romaines" line="tou_T1:12" link="tou_t111,tou_t113"/>
+    <station id="tou_t113" name="Ancely" line="tou_T1:13" link="tou_t112,tou_t114"/>
+    <station id="tou_t114" name="Servanty Airbus" line="tou_T1:14" link="tou_t113,tou_t115"/>
+    <station id="tou_t115" name="Guyenne - Berry" line="tou_T1:15" link="tou_t114,tou_t116"/>
+    <station id="tou_t116" name="Pasteur - Mairie de Blagnac" line="tou_T1:16" link="tou_t115,tou_t117"/>
+    <station id="tou_t117" name="Place du Relais" line="tou_T1:17" link="tou_t116,tou_t118"/>
+    <station id="tou_t118" name="Odyssud – Ritouret" line="tou_T1:18" link="tou_t117,tou_t119"/>
+    <station id="tou_t119" name="Patinoire - Barradels" line="tou_T1:19" link="tou_t118,tou_t120"/>
+    <station id="tou_t120" name="Grand Noble" line="tou_T1:20" link="tou_t119,tou_t121"/>
+    <station id="tou_t121" name="Place G. Brassens" line="tou_T1:21" link="tou_t120,tou_t122"/>
+    <station id="tou_t122" name="Andromède Lycée" line="tou_T1:22" link="tou_t121,tou_t123"/>
+    <station id="tou_t123" name="Beauzelle - Aeroscopia" line="tou_T1:23" link="tou_t122,tou_t124"/>
+    <station id="tou_t124" name="Aéroconstellation" line="tou_T1:24" link="tou_t123,tou_t125"/>
+    <station id="tou_t125" name="MEETT" line="tou_T1:25" link="tou_t124"/>
+    <!-- Téléo -->
+    <station id="tou_t__l__o02" name="Hôpital Rangueil - Louis Lareng" line="tou_T__L__O:2" link="tou_b19,tou_t__l__o03"/>
+    <station id="tou_t__l__o03" name="Oncopole - Lise Enjalbert" line="tou_T__L__O:3" link="tou_t__l__o02"/>
+  </stations>
+</tube>

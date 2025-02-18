@@ -10,7 +10,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use Term::ANSIColor qw(:constants);
 use File::Spec;
-
+use Data::Dumper;
 my $VERSION = '0.12.0';
 
 # Command line options
@@ -149,9 +149,12 @@ sub process_artifact {
         if ($opt->{bibtex}) {
             # Append citations to bibtex file
             # Would need to implement citation extraction from artifact
+            my $citation = $artifact->get_bib();
+            open my $fh, '>>', $opt->{bibtex} or die "Cannot open $opt->{bibtex}: $!";
+            print $fh $citation;
+            close $fh;
         } else {
-            say "Citation information for $basename:";
-            # Would print citation information here
+            say $artifact->get_bib();
         }
     }
 }
@@ -168,15 +171,11 @@ qzoom - A script to print metadata from Qiime2 artifacts
 
 =head1 VERSION
 
-version 0.12.0
+version 0.13.0
 
 =head1 SYNOPSIS
 
 qzoom.pl [options] <artifact1.qza/v> [<artifact2.qza ...]
-
-=head1 NAME
-
-qzoom.pl - a helper utility to extract data from Qiime2 artifacts
 
 =head1 OPTIONS
 
@@ -228,9 +227,51 @@ Print verbose output.
 
 =back
 
-=head1 AUTHOR
+=head2 EXAMPLES
 
-Andrea Telatin <andrea@telatin.com>
+=over 4
+
+=item Get attributes from single artifact:
+
+  qzoom  data/reads.qzv
+
+Will produce:
+
+  reads.qzv [HTML Visualization]
+    UUID: 44df755f-c76f-46b8-9011-ba50f6716d4c
+    QIIME2 version: 2019.10.0
+    Files: 26
+
+=item List multiple artifacts:
+
+    qzoom data/reads.qz*
+
+Will simply list one artifact after the other.
+
+    reads.qza [Data Artifact]
+      UUID: cf3d88d9-51e8-411a-a52b-10646b2940c1
+      QIIME2 version: 2019.10.0
+      Files: 10
+    reads.qzv [HTML Visualization]
+      UUID: 44df755f-c76f-46b8-9011-ba50f6716d4c
+      QIIME2 version: 2019.10.0
+      Files: 26
+
+=item List in tabular format:
+
+    qzoom -t data/*.qz{a,v}
+
+Will produce:
+
+  FILENAME                       UUID                                 TYPE     VERSION         FILES
+  ----------------------------------------------------------------------------------------------------
+  reads.qza                      cf3d88d9-51e8-411a-a52b-10646b2940c1 DATA     2019.10.0       10
+  reads.qzv                      44df755f-c76f-46b8-9011-ba50f6716d4c VIZ      2019.10.0       26
+  table.qza                      d27b6a68-5c6e-46d9-9866-7b4d46cca533 DATA     2018.6.0        1
+  tree-derived.qza               54e4cde6-29d4-4da9-a6f1-9324b7780819 DATA     2019.10.0       1
+  tree-imported.qza              c2d390bf-c37f-412e-9d17-dd8f5a7ef2cf DATA     2019.10.0       1
+
+=back
 
 =head1 AUTHOR
 

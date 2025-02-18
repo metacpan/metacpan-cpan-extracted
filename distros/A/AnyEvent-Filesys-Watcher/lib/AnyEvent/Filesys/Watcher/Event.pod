@@ -1,0 +1,98 @@
+=head1 NAME
+
+AnyEvent::Filesys::Watcher::Event - Filesystem Change Events
+
+=head1 SYNOPSIS
+
+	die "AnyEvent::Filesys::Watcher::Event should not be used"
+	    . " directly. Use AnyEvent::Filesys::Watcher instead";
+
+=head1 DESCRIPTION
+
+This class provides an abstraction for filesystem change events
+for L<AnyEvent::Filesys::Watcher>.
+
+=head1 CONSTRUCTORS
+
+The following constructors are available:
+
+=over 4
+
+=item B<new(ARGUMENTS)>
+
+Creates an event instance.  The following named arguments are supported:
+
+=over 8
+
+=item B<path PATH>
+
+B<PATH> must be the absolute path to the file that changed.  Required.
+
+=item B<type TYPE>
+
+B<TYPE> must be one of "created", "modified", "deleted".  Required.
+
+=item B<is_directory BOOLEAN>
+
+B<BOOLEAN> must be a a truthy value for directories, false otherwise.
+
+=item B<id ID>
+
+B<ID> must be a unique identifier. Optional.
+
+=item B<timestamp TIMESTAMP>
+
+Should be a reference to a two-element array with the seconds and the
+microseconds since the epoch.  If missing, it defaults to what
+L<Time::HiRes::gettimeofday()|Time::HiRes/gettimeofday> returns.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<path>
+
+Returns the path.
+
+=item B<type>
+
+Returns the type as a string.
+
+=item B<isDirectory>
+
+Returns a truthy value for directories, false otherwise.
+
+=item B<isCreated>
+
+Returns a truty value if the event was triggered by a file creation.
+
+=item B<isDeleted>
+
+Returns a truty value if the event was triggered by a file deletion.
+
+=item B<isModified>
+
+Returns a truty value if the event was triggered by a file modification.
+
+=item B<id>
+
+Returns the unique id if specified.
+
+=item B<timestamp>
+
+Returns the timestamp of the event.
+
+=item B<cmp>
+
+Compare the timestamps of two events and returns -1, 0, or 1 like the
+operator C<cmp> does. This can be used, when sorting two events.
+
+=back
+
+=head1 SEE ALSO
+
+L<AnyEvent::Filesys::Watcher>, perl(1)

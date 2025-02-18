@@ -3,9 +3,15 @@ abstract: 'Command line tool for create Czech Wikipedia template for monography 
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
+  File::Object: 0
+  File::Spec::Functions: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
+  Test::Warn: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -26,6 +32,7 @@ requires:
   Class::Utils: 0
   Error::Pure: 0
   Getopt::Std: 0
+  List::Util: 1.33
   Readonly: 0
   Unicode::UTF8: 0
   Wikibase::API: 0.04
@@ -36,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
-version: '0.02'
+version: '0.03'

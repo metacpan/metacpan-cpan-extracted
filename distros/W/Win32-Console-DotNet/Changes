@@ -1,19 +1,26 @@
 Revision history for Win32::Console::DotNet
 
+0.5.4   2025-02-18
+        - Bugfix test case 'GetCursorPosition_Invoke_ReturnsExpected'
+        - Bugfix test case 'CursorTop_Set_GetReturnsExpected'
+        - Update the dependency (version) of the 'Perl::OSType' module.
+        - Update (POD) documentation
+        - Remove non dual modules as a dependency if part of >= perl 5.14.
+
 0.5.3   2024-09-09
-        - Remove 'Type::Nano' as a prerequisite
+        - Remove 'Type::Nano' as a prerequisite (see 0.2)
         - Change from 'Class::Tiny/Class::Tiny::Antlers' to 'Class::Accessor'
         - Change replace '&Class::Tiny::Antlers::confess' with '&Carp::confess'
         - Change from 'PerlX::Assert' to 'Devel::Assert'
         - Update 'MakeFile.PL' reverts 'Platform::Windows' (see 0.5.1)
 
 0.5.2   2024-08-28
-        - Update '34ThreadSafety.t' surpress warnings for redirected handles
+        - Update '34ThreadSafety.t' suppress warnings for redirected handles
         - Update 'WriteLine' redundant intercept warnings
 
 0.5.1   2024-08-26
-        - Bugfix error handling in 'CursorSize' and 'CursorVisible'
-        - Bigfix '03ConsoleDotNet.t' aborts with an exception
+        - Bugfix error handling in 'CursorSize' and 'CursorVisible' (GH #17)
+        - Bugfix '03ConsoleDotNet.t' aborts with an exception (GH #16)
         - Update 'MakeFile.PL' and add a dependency on 'Platform::Windows'
         - Update Tests
 
@@ -30,21 +37,21 @@ Revision history for Win32::Console::DotNet
         - Update Samples
 
 0.4.4   2024-08-19
-        - Bugfix Retrieval of 'Title' with a length of exactly 1024 characters
-        - Bugfix 'MoveBufferArea' dies without error code on 1x1 regions
+        - Bugfix 'Title' retrieval with a length of exactly 1024 chars (GH #14)
+        - Bugfix 'MoveBufferArea' dies w/o error code on 1x1 regions (GH #15)
 
 0.4.3   2024-08-13
-        - Bugfix 'GetBufferInfo' incorrect check on argument '$succeeded'
+        - Bugfix 'GetBufferInfo' incorrect check on argument '$succeeded' 
         - Add/Change Samples, Tests
 
 0.4.2   2024-08-12
-        - Bugfix 'Read' identification of 'eof'
-        - Bugfix 'StdConUnicodeEncoding' UTF-16 endianess
-        - Bugfix 'ConsoleKeyInfo' constructor definition
-        - Bugfix 'Input/OutputEncoding' dies when console is detached
+        - Bugfix 'Read' identification of 'eof' (GH #13)
+        - Bugfix 'StdConUnicodeEncoding' UTF-16 endianess (GH #12)
+        - Bugfix 'ConsoleKeyInfo' constructor definition (GH #11)
+        - Bugfix 'Input/OutputEncoding' dies when console is detached (GH #10)
 
 0.4.1   2024-07-29
-        - Bugfix 'ResizeTest' in '04ManualTest.t'
+        - Bugfix 'ResizeTest' in '04ManualTest.t' 
         - Bugfix 'ReadKey' return value
 
 0.4     2024-07-28
@@ -56,13 +63,13 @@ Revision history for Win32::Console::DotNet
         - Change 'DebugOutputTextWriter' to 'IO::DebugOutputTextWriter'
 
 0.3.2   2024-07-28
-        - Bugfix 'SetWindowSize/SetWindowPosition' set incorrect attributes
-        - Bugfix 'ReadKey' meaning of 'KeyDown' event
-        - Bugfix 'ReadKey' dies if event type is not 'KEY_EVENT/MOUSE_EVENT'
-        - Bugfix 'Readline' does not return 'undef' for 'eof'
+        - Bugfix 'SetWindowSize/SetWindowPosition' set wrong attributes (GH #7)
+        - Bugfix 'ReadKey' meaning of 'KeyDown' event (GH #5)
+        - Bugfix 'ReadKey' dies if event type is not 'KEY/MOUSE_EVENT' (GH #6)
+        - Bugfix 'Readline' does not return 'undef' for 'eof' (GH #4)
 
 0.3.1   2024-07-05
-        - Bugfix 'Beep', 'ReadKey', 'ReadLine'
+        - Bugfix 'Beep' (GH #1), 'ReadKey' (GH #2, #3), 'ReadLine'
         - Update (POD) documentation
 
 0.3     2024-07-03

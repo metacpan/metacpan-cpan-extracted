@@ -1,5 +1,19 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.05  Feb 17 2025
+  Added:
+    - queequeg: ishmael's own HTML dumper script that acts as a fallback
+      formatter if none are available.
+  Changes:
+    - Specify XML::LibXML version 1.70 as minimum required version.
+  Improvements:
+    - If temporary directory and working directory are not ok directories to
+      unzip epub to, try HOME directory.
+    - When reading HTML documents, ishmael attempts to recover malformed HTML.
+  Fixes:
+    - Check if working directory is writable instead of readable when creating
+      temporary epub extract directory.
+
 0.04  Feb 14 2025
   Added:
     - Support for TEST_PDF environment variable in tests. This allows you to

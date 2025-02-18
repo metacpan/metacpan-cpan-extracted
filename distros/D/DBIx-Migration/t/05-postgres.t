@@ -19,14 +19,11 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
 note 'dsn: ', $pgsql->dsn;
 local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
 
-plan tests => 15;
+plan tests => 14;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new;
-dies_ok { $m->version } '"dsn" not set';
-
-$m->dsn( $pgsql->dsn );
+my $m = DBIx::Migration->new(dsn => $pgsql->dsn );
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';

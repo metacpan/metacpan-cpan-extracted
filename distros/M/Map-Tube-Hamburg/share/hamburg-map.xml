@@ -2,234 +2,234 @@
 
 <tube name="Hamburg U- and S-Bahn and AKN">
   <lines>
-    <line id="U1"  name="U1"  color="#0071BB"/>
-    <line id="U2"  name="U2"  color="#EE1D25"/>
-    <line id="U3"  name="U3"  color="#FFDC01"/>
-    <line id="U4"  name="U4"  color="#00AAAD"/>
-    <line id="S1"  name="S1"  color="#21B1A4"/>
-    <line id="S2"  name="S2"  color="#B72851"/>
-    <line id="S3"  name="S3"  color="#662D91"/>
-    <line id="S5"  name="S5"  color="#0094C2"/>
-    <line id="A1"  name="A1"  color="#F7941D"/>
-    <line id="A2"  name="A2"  color="#F7941D"/>
-    <line id="A3"  name="A3"  color="#F7941D"/>
+    <line id="hh_U1"  name="U1"  color="#0071BB"/>
+    <line id="hh_U2"  name="U2"  color="#EE1D25"/>
+    <line id="hh_U3"  name="U3"  color="#FFDC01"/>
+    <line id="hh_U4"  name="U4"  color="#00AAAD"/>
+    <line id="hh_S1"  name="S1"  color="#21B1A4"/>
+    <line id="hh_S2"  name="S2"  color="#B72851"/>
+    <line id="hh_S3"  name="S3"  color="#662D91"/>
+    <line id="hh_S5"  name="S5"  color="#0094C2"/>
+    <line id="hh_A1"  name="A1"  color="#F7941D"/>
+    <line id="hh_A2"  name="A2"  color="#F7941D"/>
+    <line id="hh_A3"  name="A3"  color="#F7941D"/>
   </lines>
   <stations>
     <!-- U1 -->
-    <station id="u101" name="Norderstedt Mitte"            line="U1:1,A2:1"   link="u102,a201"/>
-    <station id="u102" name="Richtweg"                     line="U1:2"        link="u101,u103"/>
-    <station id="u103" name="Garstedt"                     line="U1:3"        link="u102,u104"/>
-    <station id="u104" name="Ochsenzoll"                   line="U1:4"        link="u103,u105"/>
-    <station id="u105" name="Kiwittsmoor"                  line="U1:5"        link="u104,u106"/>
-    <station id="u106" name="Langenhorn Nord"              line="U1:6"        link="u105,u107"/>
-    <station id="u107" name="Langenhorn Markt"             line="U1:7"        link="u106,u108"/>
-    <station id="u108" name="Fuhlsbüttel Nord"             line="U1:8"        link="u107,u109"/>
-    <station id="u109" name="Fuhlsbüttel"                  line="U1:9"        link="u108,u110"/>
-    <station id="u110" name="Klein Borstel"                line="U1:10"       link="u109,u111"/>
-    <station id="u111" name="Ohlsdorf"                     line="U1:11,S1:5"  link="u110,u112,s104,s105,s106"/>
-    <station id="u112" name="Sengelmannstraße (City Nord)" line="U1:12"       link="u111,u113"/>
-    <station id="u113" name="Alsterdorf"                   line="U1:13"       link="u112,u114"/>
-    <station id="u114" name="Lattenkamp (Sporthalle)"      line="U1:14"       link="u113,u115"/>
-    <station id="u115" name="Hudtwalckerstraße"            line="U1:15"       link="u114,u116"/>
-    <station id="u116" name="Kellinghusenstraße"           line="U1:16,U3:5"  link="u115,u117,u304,u305"/>
-    <station id="u117" name="Klosterstern"                 line="U1:17"       link="u116,u118"/>
-    <station id="u118" name="Hallerstraße"                 line="U1:18"       link="u117,u119"/>
-    <station id="u119" name="Stephansplatz (Oper/CCH)"     line="U1:19"       link="u118,u120" other_link="cch:s202"/>
-    <station id="u120" name="Jungfernstieg"                line="U1:20,U2:14,U4:4,S1:16,S3:15" link="u119,u121,u213,u214,u403,s111,s112" other_link="rathaus_jungfernstieg:u313"/>
-    <station id="u121" name="Meßberg"                      line="U1:22"       link="u120,u122"/>
-    <station id="u122" name="Steinstraße"                  line="U1:23"       link="u121,u123"/>
-    <station id="u123" name="Hauptbahnhof Süd"             line="U1:24,U3:17" link="u122,u124,u314,u215" other_link="hauptbahnhof:s111"/>
-    <station id="u124" name="Lohmühlenstraße"              line="U1:25"       link="u123,u125"/>
-    <station id="u125" name="Lübecker Straße"              line="U1:26,U3:19" link="u124,u126,u215,u315"/>
-    <station id="u126" name="Wartenau"                     line="U1:27"       link="u125,u127"/>
-    <station id="u127" name="Ritterstraße"                 line="U1:28"       link="u126,u128"/>
-    <station id="u128" name="Wandsbeker Chaussee"          line="U1:29,S1:11" link="u127,u129,s108,s109"/>
-    <station id="u129" name="Wandsbek Markt"               line="U1:30"       link="u128,u130"/>
-    <station id="u130" name="Straßburger Straße"           line="U1:31"       link="u129,u131"/>
-    <station id="u131" name="Alter Teichweg"               line="U1:32"       link="u130,u132"/>
-    <station id="u132" name="Wandsbek-Gartenstadt"         line="U1:33,U3:26" link="u131,u133,u319"/>
-    <station id="u133" name="Trabrennbahn"                 line="U1:34"       link="u132,u134"/>
-    <station id="u134" name="Farmsen"                      line="U1:35"       link="u133,u135"/>
-    <station id="u135" name="Oldenfelde"                   line="U1:36"       link="u134,u136"/>
-    <station id="u136" name="Berne"                        line="U1:37"       link="u135,u137"/>
-    <station id="u137" name="Meiendorfer Weg"              line="U1:38"       link="u136,u138"/>
-    <station id="u138" name="Volksdorf"                    line="U1:39"       link="u137,u139,u142"/>
-    <station id="u139" name="Buckhorn"                     line="U1:40"       link="u138,u140"/>
-    <station id="u140" name="Holsbüttel"                   line="U1:41"       link="u139,u141"/>
-    <station id="u141" name="Ohlstedt"                     line="U1:42"       link="u140"/>
-    <station id="u142" name="Buchenkamp"                   line="U1:43"       link="u138,u143"/>
-    <station id="u143" name="Ahrensburg West"              line="U1:44"       link="u142,u144"/>
-    <station id="u144" name="Ahrensburg Ost"               line="U1:45"       link="u143,u145"/>
-    <station id="u145" name="Schmalenbeck"                 line="U1:46"       link="u144,u146"/>
-    <station id="u146" name="Klekut"                       line="U1:47"       link="u145,u147"/>
-    <station id="u147" name="Großhansdorf"                 line="U1:48"       link="u146"/>
+    <station id="hh_u101" name="Norderstedt Mitte"            line="hh_U1:1,hh_A2:1"   link="hh_u102,hh_a201"/>
+    <station id="hh_u102" name="Richtweg"                     line="hh_U1:2"        link="hh_u101,hh_u103"/>
+    <station id="hh_u103" name="Garstedt"                     line="hh_U1:3"        link="hh_u102,hh_u104"/>
+    <station id="hh_u104" name="Ochsenzoll"                   line="hh_U1:4"        link="hh_u103,hh_u105"/>
+    <station id="hh_u105" name="Kiwittsmoor"                  line="hh_U1:5"        link="hh_u104,hh_u106"/>
+    <station id="hh_u106" name="Langenhorn Nord"              line="hh_U1:6"        link="hh_u105,hh_u107"/>
+    <station id="hh_u107" name="Langenhorn Markt"             line="hh_U1:7"        link="hh_u106,hh_u108"/>
+    <station id="hh_u108" name="Fuhlsbüttel Nord"             line="hh_U1:8"        link="hh_u107,hh_u109"/>
+    <station id="hh_u109" name="Fuhlsbüttel"                  line="hh_U1:9"        link="hh_u108,hh_u110"/>
+    <station id="hh_u110" name="Klein Borstel"                line="hh_U1:10"       link="hh_u109,hh_u111"/>
+    <station id="hh_u111" name="Ohlsdorf"                     line="hh_U1:11,hh_S1:5"  link="hh_u110,hh_u112,hh_s104,hh_s105,hh_s106"/>
+    <station id="hh_u112" name="Sengelmannstraße (City Nord)" line="hh_U1:12"       link="hh_u111,hh_u113"/>
+    <station id="hh_u113" name="Alsterdorf"                   line="hh_U1:13"       link="hh_u112,hh_u114"/>
+    <station id="hh_u114" name="Lattenkamp (Sporthalle)"      line="hh_U1:14"       link="hh_u113,hh_u115"/>
+    <station id="hh_u115" name="Hudtwalckerstraße"            line="hh_U1:15"       link="hh_u114,hh_u116"/>
+    <station id="hh_u116" name="Kellinghusenstraße"           line="hh_U1:16,hh_U3:5"  link="hh_u115,hh_u117,hh_u304,hh_u305"/>
+    <station id="hh_u117" name="Klosterstern"                 line="hh_U1:17"       link="hh_u116,hh_u118"/>
+    <station id="hh_u118" name="Hallerstraße"                 line="hh_U1:18"       link="hh_u117,hh_u119"/>
+    <station id="hh_u119" name="Stephansplatz (Oper/CCH)"     line="hh_U1:19"       link="hh_u118,hh_u120" other_link="cch:hh_s202"/>
+    <station id="hh_u120" name="Jungfernstieg"                line="hh_U1:20,hh_U2:14,hh_U4:4,hh_S1:16,hh_S3:15" link="hh_u119,hh_u121,hh_u213,hh_u214,hh_u403,hh_s111,hh_s112" other_link="rathaus_jungfernstieg:hh_u313"/>
+    <station id="hh_u121" name="Meßberg"                      line="hh_U1:22"       link="hh_u120,hh_u122"/>
+    <station id="hh_u122" name="Steinstraße"                  line="hh_U1:23"       link="hh_u121,hh_u123"/>
+    <station id="hh_u123" name="Hauptbahnhof Süd"             line="hh_U1:24,hh_U3:17" link="hh_u122,hh_u124,hh_u314,hh_u215" other_link="hauptbahnhof:hh_s111"/>
+    <station id="hh_u124" name="Lohmühlenstraße"              line="hh_U1:25"       link="hh_u123,hh_u125"/>
+    <station id="hh_u125" name="Lübecker Straße"              line="hh_U1:26,hh_U3:19" link="hh_u124,hh_u126,hh_u215,hh_u315"/>
+    <station id="hh_u126" name="Wartenau"                     line="hh_U1:27"       link="hh_u125,hh_u127"/>
+    <station id="hh_u127" name="Ritterstraße"                 line="hh_U1:28"       link="hh_u126,hh_u128"/>
+    <station id="hh_u128" name="Wandsbeker Chaussee"          line="hh_U1:29,hh_S1:11" link="hh_u127,hh_u129,hh_s108,hh_s109"/>
+    <station id="hh_u129" name="Wandsbek Markt"               line="hh_U1:30"       link="hh_u128,hh_u130"/>
+    <station id="hh_u130" name="Straßburger Straße"           line="hh_U1:31"       link="hh_u129,hh_u131"/>
+    <station id="hh_u131" name="Alter Teichweg"               line="hh_U1:32"       link="hh_u130,hh_u132"/>
+    <station id="hh_u132" name="Wandsbek-Gartenstadt"         line="hh_U1:33,hh_U3:26" link="hh_u131,hh_u133,hh_u319"/>
+    <station id="hh_u133" name="Trabrennbahn"                 line="hh_U1:34"       link="hh_u132,hh_u134"/>
+    <station id="hh_u134" name="Farmsen"                      line="hh_U1:35"       link="hh_u133,hh_u135"/>
+    <station id="hh_u135" name="Oldenfelde"                   line="hh_U1:36"       link="hh_u134,hh_u136"/>
+    <station id="hh_u136" name="Berne"                        line="hh_U1:37"       link="hh_u135,hh_u137"/>
+    <station id="hh_u137" name="Meiendorfer Weg"              line="hh_U1:38"       link="hh_u136,hh_u138"/>
+    <station id="hh_u138" name="Volksdorf"                    line="hh_U1:39"       link="hh_u137,hh_u139,hh_u142"/>
+    <station id="hh_u139" name="Buckhorn"                     line="hh_U1:40"       link="hh_u138,hh_u140"/>
+    <station id="hh_u140" name="Holsbüttel"                   line="hh_U1:41"       link="hh_u139,hh_u141"/>
+    <station id="hh_u141" name="Ohlstedt"                     line="hh_U1:42"       link="hh_u140"/>
+    <station id="hh_u142" name="Buchenkamp"                   line="hh_U1:43"       link="hh_u138,hh_u143"/>
+    <station id="hh_u143" name="Ahrensburg West"              line="hh_U1:44"       link="hh_u142,hh_u144"/>
+    <station id="hh_u144" name="Ahrensburg Ost"               line="hh_U1:45"       link="hh_u143,hh_u145"/>
+    <station id="hh_u145" name="Schmalenbeck"                 line="hh_U1:46"       link="hh_u144,hh_u146"/>
+    <station id="hh_u146" name="Klekut"                       line="hh_U1:47"       link="hh_u145,hh_u147"/>
+    <station id="hh_u147" name="Großhansdorf"                 line="hh_U1:48"       link="hh_u146"/>
 
     <!-- U2 -->
-    <station id="u201" name="Niendorf Nord"                line="U2:1"        link="u202"/>
-    <station id="u202" name="Schippelsweg"                 line="U2:2"        link="u201,u203"/>
-    <station id="u203" name="Joachim-Mähl-Straße"          line="U2:3"        link="u202,u204"/>
-    <station id="u204" name="Niendorf Markt"               line="U2:4"        link="u203,u205"/>
-    <station id="u205" name="Hagendeel"                    line="U2:5"        link="u204,u206"/>
-    <station id="u206" name="Hagenbecks Tierpark"          line="U2:6"        link="u205,u207"/>
-    <station id="u207" name="Lutterothstraße"              line="U2:7"        link="u206,u208"/>
-    <station id="u208" name="Osterstraße"                  line="U2:8"        link="u207,u209"/>
-    <station id="u209" name="Emilienstraße"                line="U2:9"        link="u208,u210"/>
-    <station id="u210" name="Christuskirche"               line="U2:10"       link="u209,u211"/>
-    <station id="u211" name="Schlump"                      line="U2:11,U3:8" link="u210,u212,u306,u307"/>
-    <station id="u212" name="Messehallen"                  line="U2:12"       link="u211,u213"/>
-    <station id="u213" name="Gänsemarkt (Oper)"            line="U2:13"       link="u212,u120"/>
-    <station id="u214" name="Hauptbahnhof Nord"            line="U2:15,U4:5"  link="u120,u215" other_link="hauptbahnhof:s111"/>
-    <station id="u215" name="Berliner Tor"                 line="U2:16,U3:18,U4:6,S1:14,S2:6" link="u214,u216,u123,u125,s110,s111,s203"/>
-    <station id="u216" name="Burgstraße"                   line="U2:17,U4:7"  link="u215,u217"/>
-    <station id="u217" name="Hammer Kirche"                line="U2:18,U4:8"  link="u216,u218"/>
-    <station id="u218" name="Rauhes Haus"                  line="U2:19,U4:9"  link="u217,u219"/>
-    <station id="u219" name="Horner Rennbahn"              line="U2:20,U4:10" link="u218,u220"/>
-    <station id="u220" name="Legienstraße"                 line="U2:21,U4:11" link="u219,u221"/>
-    <station id="u221" name="Billstedt"                    line="U2:22,U4:12" link="u220,u222"/>
-    <station id="u222" name="Merkenstraße"                 line="U2:23"       link="u221,u223"/>
-    <station id="u223" name="Steinfurter Allee"            line="U2:24"       link="u222,u224"/>
-    <station id="u224" name="Mümmelmannsberg"              line="U2:25"       link="u223"/>
+    <station id="hh_u201" name="Niendorf Nord"                line="hh_U2:1"        link="hh_u202"/>
+    <station id="hh_u202" name="Schippelsweg"                 line="hh_U2:2"        link="hh_u201,hh_u203"/>
+    <station id="hh_u203" name="Joachim-Mähl-Straße"          line="hh_U2:3"        link="hh_u202,hh_u204"/>
+    <station id="hh_u204" name="Niendorf Markt"               line="hh_U2:4"        link="hh_u203,hh_u205"/>
+    <station id="hh_u205" name="Hagendeel"                    line="hh_U2:5"        link="hh_u204,hh_u206"/>
+    <station id="hh_u206" name="Hagenbecks Tierpark"          line="hh_U2:6"        link="hh_u205,hh_u207"/>
+    <station id="hh_u207" name="Lutterothstraße"              line="hh_U2:7"        link="hh_u206,hh_u208"/>
+    <station id="hh_u208" name="Osterstraße"                  line="hh_U2:8"        link="hh_u207,hh_u209"/>
+    <station id="hh_u209" name="Emilienstraße"                line="hh_U2:9"        link="hh_u208,hh_u210"/>
+    <station id="hh_u210" name="Christuskirche"               line="hh_U2:10"       link="hh_u209,hh_u211"/>
+    <station id="hh_u211" name="Schlump"                      line="hh_U2:11,hh_U3:8" link="hh_u210,hh_u212,hh_u306,hh_u307"/>
+    <station id="hh_u212" name="Messehallen"                  line="hh_U2:12"       link="hh_u211,hh_u213"/>
+    <station id="hh_u213" name="Gänsemarkt (Oper)"            line="hh_U2:13"       link="hh_u212,hh_u120"/>
+    <station id="hh_u214" name="Hauptbahnhof Nord"            line="hh_U2:15,hh_U4:5"  link="hh_u120,hh_u215" other_link="hauptbahnhof:hh_s111"/>
+    <station id="hh_u215" name="Berliner Tor"                 line="hh_U2:16,hh_U3:18,hh_U4:6,hh_S1:14,hh_S2:6" link="hh_u214,hh_u216,hh_u123,hh_u125,hh_s110,hh_s111,hh_s203"/>
+    <station id="hh_u216" name="Burgstraße"                   line="hh_U2:17,hh_U4:7"  link="hh_u215,hh_u217"/>
+    <station id="hh_u217" name="Hammer Kirche"                line="hh_U2:18,hh_U4:8"  link="hh_u216,hh_u218"/>
+    <station id="hh_u218" name="Rauhes Haus"                  line="hh_U2:19,hh_U4:9"  link="hh_u217,hh_u219"/>
+    <station id="hh_u219" name="Horner Rennbahn"              line="hh_U2:20,hh_U4:10" link="hh_u218,hh_u220"/>
+    <station id="hh_u220" name="Legienstraße"                 line="hh_U2:21,hh_U4:11" link="hh_u219,hh_u221"/>
+    <station id="hh_u221" name="Billstedt"                    line="hh_U2:22,hh_U4:12" link="hh_u220,hh_u222"/>
+    <station id="hh_u222" name="Merkenstraße"                 line="hh_U2:23"       link="hh_u221,hh_u223"/>
+    <station id="hh_u223" name="Steinfurter Allee"            line="hh_U2:24"       link="hh_u222,hh_u224"/>
+    <station id="hh_u224" name="Mümmelmannsberg"              line="hh_U2:25"       link="hh_u223"/>
 
     <!-- U3 -->
-    <station id="u301" name="Barmbek"                      line="U3:1,S1:9"   link="u302,u318,u319,s107,s108"/> <!-- is also U3:24! -->
-    <station id="u302" name="Saarlandstraße"               line="U3:2"        link="u301,u303"/>
-    <station id="u303" name="Borgweg (Stadtpark)"          line="U3:3"        link="u302,u304"/>
-    <station id="u304" name="Sierichstraße"                line="U3:4"        link="u303,u116"/>
-    <station id="u305" name="Eppendorfer Baum"             line="U3:6"        link="u116,u306"/>
-    <station id="u306" name="Hoheluftbrücke"               line="U3:7"        link="u305,u211"/>
-    <station id="u307" name="Sternschanze (Messe)"         line="U3:9,S2:3,S5:7" link="u211,u308,s201,s202"/>
-    <station id="u308" name="Feldstraße (Heiligengeistfeld)" line="U3:10"     link="u307,u309"/>
-    <station id="u309" name="St. Pauli"                    line="U3:11"       link="u308,u310"/>
-    <station id="u310" name="Landungsbrücken"              line="U3:12,S1:18,S3:13" link="u309,u311,s112,s113"/>
-    <station id="u311" name="Baumwall (Elbphilharmonie)"   line="U3:13"       link="u310,u312"/>
-    <station id="u312" name="Rödingsmarkt"                 line="U3:14"       link="u311,u313"/>
-    <station id="u313" name="Rathaus"                      line="U3:15"       link="u312,u314" other_link="rathaus_jungfernstieg:u120"/>
-    <station id="u314" name="Mönckebergstraße"             line="U3:16"       link="u313,u123"/>
-    <station id="u315" name="Uhlandstraße"                 line="U3:20"       link="u125,u316"/>
-    <station id="u316" name="Mundsburg"                    line="U3:21"       link="u315,u317"/>
-    <station id="u317" name="Hamburger Straße"             line="U3:22"       link="u316,u318"/>
-    <station id="u318" name="Dehnhaide"                    line="U3:23"       link="u317,u301"/>
-    <station id="u319" name="Habichtstraße"                line="U3:25"       link="u301,u132"/>
+    <station id="hh_u301" name="Barmbek"                      line="hh_U3:1,hh_S1:9"   link="hh_u302,hh_u318,hh_u319,hh_s107,hh_s108"/>
+    <station id="hh_u302" name="Saarlandstraße"               line="hh_U3:2"        link="hh_u301,hh_u303"/>
+    <station id="hh_u303" name="Borgweg (Stadtpark)"          line="hh_U3:3"        link="hh_u302,hh_u304"/>
+    <station id="hh_u304" name="Sierichstraße"                line="hh_U3:4"        link="hh_u303,hh_u116"/>
+    <station id="hh_u305" name="Eppendorfer Baum"             line="hh_U3:6"        link="hh_u116,hh_u306"/>
+    <station id="hh_u306" name="Hoheluftbrücke"               line="hh_U3:7"        link="hh_u305,hh_u211"/>
+    <station id="hh_u307" name="Sternschanze (Messe)"         line="hh_U3:9,hh_S2:3,hh_S5:7" link="hh_u211,hh_u308,hh_s201,hh_s202"/>
+    <station id="hh_u308" name="Feldstraße (Heiligengeistfeld)" line="hh_U3:10"     link="hh_u307,hh_u309"/>
+    <station id="hh_u309" name="St. Pauli"                    line="hh_U3:11"       link="hh_u308,hh_u310"/>
+    <station id="hh_u310" name="Landungsbrücken"              line="hh_U3:12,hh_S1:18,hh_S3:13" link="hh_u309,hh_u311,hh_s112,hh_s113"/>
+    <station id="hh_u311" name="Baumwall (Elbphilharmonie)"   line="hh_U3:13"       link="hh_u310,hh_u312"/>
+    <station id="hh_u312" name="Rödingsmarkt"                 line="hh_U3:14"       link="hh_u311,hh_u313"/>
+    <station id="hh_u313" name="Rathaus"                      line="hh_U3:15"       link="hh_u312,hh_u314" other_link="rathaus_jungfernstieg:hh_u120"/>
+    <station id="hh_u314" name="Mönckebergstraße"             line="hh_U3:16"       link="hh_u313,hh_u123"/>
+    <station id="hh_u315" name="Uhlandstraße"                 line="hh_U3:20"       link="hh_u125,hh_u316"/>
+    <station id="hh_u316" name="Mundsburg"                    line="hh_U3:21"       link="hh_u315,hh_u317"/>
+    <station id="hh_u317" name="Hamburger Straße"             line="hh_U3:22"       link="hh_u316,hh_u318"/>
+    <station id="hh_u318" name="Dehnhaide"                    line="hh_U3:23"       link="hh_u317,hh_u301"/>
+    <station id="hh_u319" name="Habichtstraße"                line="hh_U3:24"       link="hh_u301,hh_u132"/>
 
     <!-- U4 -->
-    <station id="u401" name="Elbbrücken"                   line="U4:1,S3:18,S5:11" link="u402,s309,s310"/>
-    <station id="u402" name="Hafencity Universität"        line="U4:2"        link="u401,u403"/>
-    <station id="u403" name="Überseequartier"              line="U4:3"        link="u402,u120"/>
+    <station id="hh_u401" name="Elbbrücken"                   line="hh_U4:1,hh_S3:18,hh_S5:11" link="hh_u402,hh_s309,hh_s310"/>
+    <station id="hh_u402" name="Hafencity Universität"        line="hh_U4:2"        link="hh_u401,hh_u403"/>
+    <station id="hh_u403" name="Überseequartier"              line="hh_U4:3"        link="hh_u402,hh_u120"/>
 
     <!-- S1 -->
-    <station id="s101" name="Poppenbüttel"                 line="S1:1"        link="s102"/>
-    <station id="s102" name="Wellingsbüttel"               line="S1:2"        link="s101,s103"/>
-    <station id="s103" name="Hoheneichen"                  line="S1:3"        link="s102,s104"/>
-    <station id="s104" name="Kornweg (Klein Borstel)"      line="S1:4"        link="s103,u111"/>
-    <station id="s105" name="Hamburg Airport (Flughafen)"  line="S1:6"        link="u111"/>
-    <station id="s106" name="Rübenkamp (City Nord)"        line="S1:7"        link="u111,s107"/>
-    <station id="s107" name="Alte Wöhr (Stadtpark)"        line="S1:8"        link="s106,u301"/>
-    <station id="s108" name="Friedrichsberg"               line="S1:10"       link="u301,u128"/>
-    <station id="s109" name="Hasselbrook"                  line="S1:12"       link="u128,s110"/>
-    <station id="s110" name="Landwehr"                     line="S1:13"       link="s109,u215"/>
-    <station id="s111" name="Hauptbahnhof"                 line="S1:15,S2:5,S3:16,S5:9" link="u215,u120,s202,s309" other_link="hauptbahnhof:u123,hauptbahnhof:u214"/>
-    <station id="s112" name="Stadthausbrücke"              line="S1:17,S3:14" link="u120,u310"/>
-    <station id="s113" name="Reeperbahn"                   line="S1:19,S3:12" link="u310,s114"/>
-    <station id="s114" name="Königstraße"                  line="S1:20,S3:11" link="s113,s115"/>
-    <station id="s115" name="Altona"                       line="S1:21,S2:1,S3:10" link="s114,s116,s201,s308"/> <!--change link s308 to s309 when Diebsteich becomes operational -->
-    <station id="s116" name="Ortensen"                     line="S1:22"       link="s115,s117"/>
-    <station id="s117" name="Bahrenfeld"                   line="S1:23"       link="s116,s118"/>
-    <station id="s118" name="Othmarschen"                  line="S1:24"       link="s117,s119"/>
-    <station id="s119" name="Klein Flottbek (Botanischer Garten)" line="S1:25" link="s118,s120"/>
-    <station id="s120" name="Hochkamp"                     line="S1:26"       link="s119,s121"/>
-    <station id="s121" name="Blankenese"                   line="S1:27"       link="s120,s122"/>
-    <station id="s122" name="Iserbrook"                    line="S1:28"       link="s121,s123"/>
-    <station id="s123" name="Sülldorf"                     line="S1:29"       link="s122,s124"/>
-    <station id="s124" name="Rissen"                       line="S1:30"       link="s123,s125"/>
-    <station id="s125" name="Wedel"                        line="S1:31"       link="s124"/>
+    <station id="hh_s101" name="Poppenbüttel"                 line="hh_S1:1"        link="hh_s102"/>
+    <station id="hh_s102" name="Wellingsbüttel"               line="hh_S1:2"        link="hh_s101,hh_s103"/>
+    <station id="hh_s103" name="Hoheneichen"                  line="hh_S1:3"        link="hh_s102,hh_s104"/>
+    <station id="hh_s104" name="Kornweg (Klein Borstel)"      line="hh_S1:4"        link="hh_s103,hh_u111"/>
+    <station id="hh_s105" name="Hamburg Airport (Flughafen)"  line="hh_S1:6"        link="hh_u111"/>
+    <station id="hh_s106" name="Rübenkamp (City Nord)"        line="hh_S1:7"        link="hh_u111,hh_s107"/>
+    <station id="hh_s107" name="Alte Wöhr (Stadtpark)"        line="hh_S1:8"        link="hh_s106,hh_u301"/>
+    <station id="hh_s108" name="Friedrichsberg"               line="hh_S1:10"       link="hh_u301,hh_u128"/>
+    <station id="hh_s109" name="Hasselbrook"                  line="hh_S1:12"       link="hh_u128,hh_s110"/>
+    <station id="hh_s110" name="Landwehr"                     line="hh_S1:13"       link="hh_s109,hh_u215"/>
+    <station id="hh_s111" name="Hauptbahnhof"                 line="hh_S1:15,hh_S2:5,hh_S3:16,hh_S5:9" link="hh_u215,hh_u120,hh_s202,hh_s309" other_link="hauptbahnhof:hh_u123,hauptbahnhof:hh_u214"/>
+    <station id="hh_s112" name="Stadthausbrücke"              line="hh_S1:17,hh_S3:14" link="hh_u120,hh_u310"/>
+    <station id="hh_s113" name="Reeperbahn"                   line="hh_S1:19,hh_S3:12" link="hh_u310,hh_s114"/>
+    <station id="hh_s114" name="Königstraße"                  line="hh_S1:20,hh_S3:11" link="hh_s113,hh_s115"/>
+    <station id="hh_s115" name="Altona"                       line="hh_S1:21,hh_S2:1,hh_S3:10" link="hh_s114,hh_s116,hh_s201,hh_s308"/> <!--change link s308 to s309 when Diebsteich becomes operational -->
+    <station id="hh_s116" name="Ortensen"                     line="hh_S1:22"       link="hh_s115,hh_s117"/>
+    <station id="hh_s117" name="Bahrenfeld"                   line="hh_S1:23"       link="hh_s116,hh_s118"/>
+    <station id="hh_s118" name="Othmarschen"                  line="hh_S1:24"       link="hh_s117,hh_s119"/>
+    <station id="hh_s119" name="Klein Flottbek (Botanischer Garten)" line="hh_S1:25" link="hh_s118,hh_s120"/>
+    <station id="hh_s120" name="Hochkamp"                     line="hh_S1:26"       link="hh_s119,hh_s121"/>
+    <station id="hh_s121" name="Blankenese"                   line="hh_S1:27"       link="hh_s120,hh_s122"/>
+    <station id="hh_s122" name="Iserbrook"                    line="hh_S1:28"       link="hh_s121,hh_s123"/>
+    <station id="hh_s123" name="Sülldorf"                     line="hh_S1:29"       link="hh_s122,hh_s124"/>
+    <station id="hh_s124" name="Rissen"                       line="hh_S1:30"       link="hh_s123,hh_s125"/>
+    <station id="hh_s125" name="Wedel"                        line="hh_S1:31"       link="hh_s124"/>
 
     <!-- S2 -->
-    <station id="s201" name="Holstenstraße"                line="S2:2,S5:6"   link="s115,u307,s308"/> <!-- change link s308 to s309 when Diebsteich becomes operational -->
-    <station id="s202" name="Dammtor (Messe/CCH)"          line="S2:4,S5:8"   link="u307,s111" other_link="cch:u119"/>
-    <station id="s203" name="Rothenburgsort"               line="S2:7"        link="u215,s204"/>
-    <station id="s204" name="Tiefstack"                    line="S2:8"        link="s203,s205"/>
-    <station id="s205" name="Billwerder-Moorfleet"         line="S2:9"        link="s204,s206"/>
-    <station id="s206" name="Mittlerer Landweg"            line="S2:10"        link="s205,s207"/>
-    <station id="s207" name="Allermöhe"                    line="S2:11"        link="s206,s208"/>
-    <station id="s208" name="Nettelnburg"                  line="S2:12"        link="s207,s209"/>
-    <station id="s209" name="Bergedorf"                    line="S2:13"        link="s208,s210"/>
-    <station id="s210" name="Reinbek"                      line="S2:14"        link="s209,s211"/>
-    <station id="s211" name="Wohltorf"                     line="S2:15"        link="s210,s212"/>
-    <station id="s212" name="Aumühle"                      line="S2:16"        link="s211"/>
+    <station id="hh_s201" name="Holstenstraße"                line="hh_S2:2,hh_S5:6"   link="hh_s115,hh_u307,hh_s308"/> <!-- change link s308 to s309 when Diebsteich becomes operational -->
+    <station id="hh_s202" name="Dammtor (Messe/CCH)"          line="hh_S2:4,hh_S5:8"   link="hh_u307,hh_s111" other_link="cch:hh_u119"/>
+    <station id="hh_s203" name="Rothenburgsort"               line="hh_S2:7"        link="hh_u215,hh_s204"/>
+    <station id="hh_s204" name="Tiefstack"                    line="hh_S2:8"        link="hh_s203,hh_s205"/>
+    <station id="hh_s205" name="Billwerder-Moorfleet"         line="hh_S2:9"        link="hh_s204,hh_s206"/>
+    <station id="hh_s206" name="Mittlerer Landweg"            line="hh_S2:10"        link="hh_s205,hh_s207"/>
+    <station id="hh_s207" name="Allermöhe"                    line="hh_S2:11"        link="hh_s206,hh_s208"/>
+    <station id="hh_s208" name="Nettelnburg"                  line="hh_S2:12"        link="hh_s207,hh_s209"/>
+    <station id="hh_s209" name="Bergedorf"                    line="hh_S2:13"        link="hh_s208,hh_s210"/>
+    <station id="hh_s210" name="Reinbek"                      line="hh_S2:14"        link="hh_s209,hh_s211"/>
+    <station id="hh_s211" name="Wohltorf"                     line="hh_S2:15"        link="hh_s210,hh_s212"/>
+    <station id="hh_s212" name="Aumühle"                      line="hh_S2:16"        link="hh_s211"/>
 
     <!-- S3 -->
-    <station id="s301" name="Pinneberg"                    line="S3:1"        link="s302"/>
-    <station id="s302" name="Thesdorf"                     line="S3:2"        link="s301,s303"/>
-    <station id="s303" name="Halstenbek"                   line="S3:3"        link="s302,s304"/>
-    <station id="s304" name="Krupunder"                    line="S3:4"        link="s303,s305"/>
-    <station id="s305" name="Elbgaustraße"                 line="S3:5,S5:1"   link="s304,s306"/>
-    <station id="s306" name="Eidelstedt"                   line="S3:6,S5:2,A1:1" link="s305,s307,a101"/>
-    <station id="s307" name="Stellingen (Arenen)"          line="S3:7,S5:3"   link="s306,s308"/>
-    <station id="s308" name="Langenfelde"                  line="S3:8,S5:4"   link="s307,s115,s201"/> <!-- change link s115 to s309 and kill s201 when Diebsteich becomes operational -->
-    <!-- still under construction as of end-2024: station id="s309" name="Diebsteich"                   line="S3:9,S5:5"  link="s308,s115,s201"/> -->
-    <station id="s309" name="Hammerbrook (City Süd)"       line="S3:17,S5:10" link="s111,u401"/>
-    <station id="s310" name="Veddel (BallinStadt)"         line="S3:19,S5:12" link="u401,s311"/>
-    <station id="s311" name="Wilhelmsburg"                 line="S3:20,S5:13" link="s310,s312"/>
-    <station id="s312" name="Harburg"                      line="S3:21,S5:14" link="s311,s313"/>
-    <station id="s313" name="Harburg Rathaus"              line="S3:22,S5:15" link="s312,s314"/>
-    <station id="s314" name="Heimfeld (TU Hamburg)"        line="S3:23,S5:16" link="s313,s315"/>
-    <station id="s315" name="Neuwiedenthal"                line="S3:24,S5:17" link="s314,s316"/>
-    <station id="s316" name="Neugraben"                    line="S3:25,S5:18" link="s315,s501"/>
+    <station id="hh_s301" name="Pinneberg"                    line="hh_S3:1"        link="hh_s302"/>
+    <station id="hh_s302" name="Thesdorf"                     line="hh_S3:2"        link="hh_s301,hh_s303"/>
+    <station id="hh_s303" name="Halstenbek"                   line="hh_S3:3"        link="hh_s302,hh_s304"/>
+    <station id="hh_s304" name="Krupunder"                    line="hh_S3:4"        link="hh_s303,hh_s305"/>
+    <station id="hh_s305" name="Elbgaustraße"                 line="hh_S3:5,hh_S5:1"   link="hh_s304,hh_s306"/>
+    <station id="hh_s306" name="Eidelstedt"                   line="hh_S3:6,hh_S5:2,hh_A1:1" link="hh_s305,hh_s307,hh_a101"/>
+    <station id="hh_s307" name="Stellingen (Arenen)"          line="hh_S3:7,hh_S5:3"   link="hh_s306,hh_s308"/>
+    <station id="hh_s308" name="Langenfelde"                  line="hh_S3:8,hh_S5:4"   link="hh_s307,hh_s115,hh_s201"/> <!-- change link s115 to s309 and kill s201 when Diebsteich becomes operational -->
+    <!-- still under construction as of end-2024: station id="hh_s309" name="Diebsteich"                   line="hh_S3:9,hh_S5:5"  link="hh_s308,hh_s115,hh_s201"/> -->
+    <station id="hh_s309" name="Hammerbrook (City Süd)"       line="hh_S3:17,hh_S5:10" link="hh_s111,hh_u401"/>
+    <station id="hh_s310" name="Veddel (BallinStadt)"         line="hh_S3:19,hh_S5:12" link="hh_u401,hh_s311"/>
+    <station id="hh_s311" name="Wilhelmsburg"                 line="hh_S3:20,hh_S5:13" link="hh_s310,hh_s312"/>
+    <station id="hh_s312" name="Harburg"                      line="hh_S3:21,hh_S5:14" link="hh_s311,hh_s313"/>
+    <station id="hh_s313" name="Harburg Rathaus"              line="hh_S3:22,hh_S5:15" link="hh_s312,hh_s314"/>
+    <station id="hh_s314" name="Heimfeld (TU Hamburg)"        line="hh_S3:23,hh_S5:16" link="hh_s313,hh_s315"/>
+    <station id="hh_s315" name="Neuwiedenthal"                line="hh_S3:24,hh_S5:17" link="hh_s314,hh_s316"/>
+    <station id="hh_s316" name="Neugraben"                    line="hh_S3:25,hh_S5:18" link="hh_s315,hh_s501"/>
 
     <!-- S5 -->
-    <station id="s501" name="Fischbek"                     line="S5:19"       link="s316,s502"/>
-    <station id="s502" name="Neu Wulmstorf"                line="S5:20"       link="s501,s503"/>
-    <station id="s503" name="Buxtehude"                    line="S5:21"       link="s502,s504"/>
-    <station id="s504" name="Neukloster"                   line="S5:22"       link="s503,s505"/>
-    <station id="s505" name="Horneburg"                    line="S5:23"       link="s504,s506"/>
-    <station id="s506" name="Dollem"                       line="S5:24"       link="s505,s507"/>
-    <station id="s507" name="Agathenburg"                  line="S5:25"       link="s506,s508"/>
-    <station id="s508" name="Stade"                        line="S5:26"       link="s507"/>
+    <station id="hh_s501" name="Fischbek"                     line="hh_S5:19"       link="hh_s316,hh_s502"/>
+    <station id="hh_s502" name="Neu Wulmstorf"                line="hh_S5:20"       link="hh_s501,hh_s503"/>
+    <station id="hh_s503" name="Buxtehude"                    line="hh_S5:21"       link="hh_s502,hh_s504"/>
+    <station id="hh_s504" name="Neukloster"                   line="hh_S5:22"       link="hh_s503,hh_s505"/>
+    <station id="hh_s505" name="Horneburg"                    line="hh_S5:23"       link="hh_s504,hh_s506"/>
+    <station id="hh_s506" name="Dollem"                       line="hh_S5:24"       link="hh_s505,hh_s507"/>
+    <station id="hh_s507" name="Agathenburg"                  line="hh_S5:25"       link="hh_s506,hh_s508"/>
+    <station id="hh_s508" name="Stade"                        line="hh_S5:26"       link="hh_s507"/>
 
     <!-- A1 -->
-    <station id="a101" name="Eidelstedt Zentrum"           line="A1:2"        link="s306,a102"/>
-    <station id="a102" name="Hörgensweg"                   line="A1:3"        link="a101,a103"/>
-    <station id="a103" name="Schnelsen"                    line="A1:4"        link="a102,a104"/>
-    <station id="a104" name="Burgwedel"                    line="A1:5"        link="a103,a105"/>
-    <station id="a105" name="Bönningstedt"                 line="A1:6"        link="a104,a106"/>
-    <station id="a106" name="Hasloh"                       line="A1:7"        link="a105,a107"/>
-    <station id="a107" name="Quickborn Süd"                line="A1:8"        link="a106,a108"/>
-    <station id="a108" name="Quickborn"                    line="A1:9"        link="a107,a109"/>
-    <station id="a109" name="Ellerau"                      line="A1:10"       link="a108,a110"/>
-    <station id="a110" name="Tanneneck"                    line="A1:11"       link="a109,a111"/>
-    <station id="a111" name="Ulzburg Süd"                  line="A1:12,A2:7,A3:1" link="a110,a205,a206"/>
+    <station id="hh_a101" name="Eidelstedt Zentrum"           line="hh_A1:2"        link="hh_s306,hh_a102"/>
+    <station id="hh_a102" name="Hörgensweg"                   line="hh_A1:3"        link="hh_a101,hh_a103"/>
+    <station id="hh_a103" name="Schnelsen"                    line="hh_A1:4"        link="hh_a102,hh_a104"/>
+    <station id="hh_a104" name="Burgwedel"                    line="hh_A1:5"        link="hh_a103,hh_a105"/>
+    <station id="hh_a105" name="Bönningstedt"                 line="hh_A1:6"        link="hh_a104,hh_a106"/>
+    <station id="hh_a106" name="Hasloh"                       line="hh_A1:7"        link="hh_a105,hh_a107"/>
+    <station id="hh_a107" name="Quickborn Süd"                line="hh_A1:8"        link="hh_a106,hh_a108"/>
+    <station id="hh_a108" name="Quickborn"                    line="hh_A1:9"        link="hh_a107,hh_a109"/>
+    <station id="hh_a109" name="Ellerau"                      line="hh_A1:10"       link="hh_a108,hh_a110"/>
+    <station id="hh_a110" name="Tanneneck"                    line="hh_A1:11"       link="hh_a109,hh_a111"/>
+    <station id="hh_a111" name="Ulzburg Süd"                  line="hh_A1:12,hh_A2:7,hh_A3:1" link="hh_a110,hh_a205,hh_a206"/>
 
     <!-- A2 -->
-    <station id="a201" name="Moorbekhalle (Schulzentrum Nord)" line="A2:2"    link="u101,a202"/>
-    <station id="a202" name="Friedrichsgabe"                line="A2:3"       link="a201,a203"/>
-    <station id="a203" name="Quickborner Straße"            line="A2:4"       link="a202,a204"/>
-    <station id="a204" name="Haslohfurth"                   line="A2:5"       link="a203,a205"/>
-    <station id="a205" name="Meeschensee"                   line="A2:6"       link="a204,a111"/>
-    <station id="a206" name="Henstedt-Ulzburg"              line="A2:8,A3:2"  link="a111,a207,a301"/>
-    <station id="a207" name="Kaltenkirchen Süd"             line="A2:9"       link="a206,a208"/>
-    <station id="a208" name="Kaltenkirchen"                 line="A2:10"      link="a207,a209"/>
-    <station id="a209" name="Holstentherme"                 line="A2:11"      link="a208,a210"/>
-    <station id="a210" name="Dodenhof"                      line="A2:12"      link="a209,a211"/>
-    <station id="a211" name="Nützen"                        line="A2:13"      link="a210,a212"/>
-    <station id="a212" name="Lentföhrden"                   line="A2:14"      link="a211,a213"/>
-    <station id="a213" name="Bad Bramstedt Kurhaus"         line="A2:15"      link="a212,a214"/>
-    <station id="a214" name="Bad Bramstedt"                 line="A2:16"      link="a213,a215"/>
-    <station id="a215" name="Wiemersdorf"                   line="A2:17"      link="a214,a216"/>
-    <station id="a216" name="Großenaspe"                    line="A2:18"      link="a215,a217"/>
-    <station id="a217" name="Boostedt"                      line="A2:19"      link="a216,a218"/>
-    <station id="a218" name="Neumünster Süd"                line="A2:20"      link="a217,a219"/>
-    <station id="a219" name="Neumünster"                    line="A2:21"      link="a218"/>
+    <station id="hh_a201" name="Moorbekhalle (Schulzentrum Nord)" line="hh_A2:2"    link="hh_u101,hh_a202"/>
+    <station id="hh_a202" name="Friedrichsgabe"                line="hh_A2:3"       link="hh_a201,hh_a203"/>
+    <station id="hh_a203" name="Quickborner Straße"            line="hh_A2:4"       link="hh_a202,hh_a204"/>
+    <station id="hh_a204" name="Haslohfurth"                   line="hh_A2:5"       link="hh_a203,hh_a205"/>
+    <station id="hh_a205" name="Meeschensee"                   line="hh_A2:6"       link="hh_a204,hh_a111"/>
+    <station id="hh_a206" name="Henstedt-Ulzburg"              line="hh_A2:8,hh_A3:2"  link="hh_a111,hh_a207,hh_a301"/>
+    <station id="hh_a207" name="Kaltenkirchen Süd"             line="hh_A2:9"       link="hh_a206,hh_a208"/>
+    <station id="hh_a208" name="Kaltenkirchen"                 line="hh_A2:10"      link="hh_a207,hh_a209"/>
+    <station id="hh_a209" name="Holstentherme"                 line="hh_A2:11"      link="hh_a208,hh_a210"/>
+    <station id="hh_a210" name="Dodenhof"                      line="hh_A2:12"      link="hh_a209,hh_a211"/>
+    <station id="hh_a211" name="Nützen"                        line="hh_A2:13"      link="hh_a210,hh_a212"/>
+    <station id="hh_a212" name="Lentföhrden"                   line="hh_A2:14"      link="hh_a211,hh_a213"/>
+    <station id="hh_a213" name="Bad Bramstedt Kurhaus"         line="hh_A2:15"      link="hh_a212,hh_a214"/>
+    <station id="hh_a214" name="Bad Bramstedt"                 line="hh_A2:16"      link="hh_a213,hh_a215"/>
+    <station id="hh_a215" name="Wiemersdorf"                   line="hh_A2:17"      link="hh_a214,hh_a216"/>
+    <station id="hh_a216" name="Großenaspe"                    line="hh_A2:18"      link="hh_a215,hh_a217"/>
+    <station id="hh_a217" name="Boostedt"                      line="hh_A2:19"      link="hh_a216,hh_a218"/>
+    <station id="hh_a218" name="Neumünster Süd"                line="hh_A2:20"      link="hh_a217,hh_a219"/>
+    <station id="hh_a219" name="Neumünster"                    line="hh_A2:21"      link="hh_a218"/>
 
     <!-- A3 -->
-    <station id="a301" name="Alveslohe"                     line="A3:3"    link="a206,a302"/>
-    <station id="a302" name="Langeln"                       line="A3:4"    link="a301,a303"/>
-    <station id="a303" name="Barmstedt"                     line="A3:5"    link="a302,a304"/>
-    <station id="a304" name="Barmstedt Brunnenstraße"       line="A3:6"    link="a303,a305"/>
-    <station id="a305" name="Voßloch"                       line="A3:7"    link="a304,a306"/>
-    <station id="a306" name="Bokholt"                       line="A3:8"    link="a305,a307"/>
-    <station id="a307" name="Sparrleshoop"                  line="A3:9"    link="a306,a308"/>
-    <station id="a308" name="Langenmoor"                    line="A3:10"   link="a307,a309"/>
-    <station id="a309" name="Elmshorn"                      line="A3:11"   link="a308"/>
+    <station id="hh_a301" name="Alveslohe"                     line="hh_A3:3"    link="hh_a206,hh_a302"/>
+    <station id="hh_a302" name="Langeln"                       line="hh_A3:4"    link="hh_a301,hh_a303"/>
+    <station id="hh_a303" name="Barmstedt"                     line="hh_A3:5"    link="hh_a302,hh_a304"/>
+    <station id="hh_a304" name="Barmstedt Brunnenstraße"       line="hh_A3:6"    link="hh_a303,hh_a305"/>
+    <station id="hh_a305" name="Voßloch"                       line="hh_A3:7"    link="hh_a304,hh_a306"/>
+    <station id="hh_a306" name="Bokholt"                       line="hh_A3:8"    link="hh_a305,hh_a307"/>
+    <station id="hh_a307" name="Sparrleshoop"                  line="hh_A3:9"    link="hh_a306,hh_a308"/>
+    <station id="hh_a308" name="Langenmoor"                    line="hh_A3:10"   link="hh_a307,hh_a309"/>
+    <station id="hh_a309" name="Elmshorn"                      line="hh_A3:11"   link="hh_a308"/>
 
   </stations>
 </tube>

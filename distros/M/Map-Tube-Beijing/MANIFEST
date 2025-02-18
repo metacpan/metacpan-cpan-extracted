@@ -6,14 +6,11 @@ MANIFEST.SKIP
 README
 share/beijing-map.xml
 t/00-load.t
-t/01-xml.t
-t/02-xml.t
-t/02-xml-alt.t
-t/03-map.t
-t/03-map-alt.t
-t/04-nodes-alt.t
-t/05-lines-alt.t
-t/06-routes-alt.t
+t/01-map-data.t
+t/02-map.t
+t/02-map-alt.t
+t/03-nodes.t
+t/04-lines.t
 t/10-manifest.t
 t/11-meta-json.t
 t/12-meta-yml.t
@@ -22,6 +19,7 @@ t/14-signature.t
 t/20-pod.t
 t/21-pod-coverage.t
 t/22-changes.t
+t/23-kwalitee.t
 SIGNATURE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

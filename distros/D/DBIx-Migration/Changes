@@ -1,5 +1,12 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.13 Mon Feb 17 17:37:24 CET 2025
+        - Use EXECUTE PROCEDURE instead of EXECUTE FUNCTION in PostgreSQL
+          related trigger test to make CPAN testers happy
+        - Fix version information
+        - Its time to use the Moo object system
+        - Make objects immutable
+
 0.12 Fri Feb 14 10:34:02 CET 2025
         - Improve internal Test::PgTAP test functions
         - Use SERIAL instead of GENERATED AS IDENTITY in PostgreSQL related

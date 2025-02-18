@@ -30,7 +30,7 @@ You can also look for information at:
 =head2 LICENSE AND COPYRIGHT
 
 	Copyright (c) Microsoft Corporation.
-	Copyright (c) 2024 by J. Schneider.
+	Copyright (c) 2024, 2025 by J. Schneider.
 
 The library files are licensed under MIT licence.
 

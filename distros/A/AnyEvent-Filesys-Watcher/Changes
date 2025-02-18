@@ -1,0 +1,16 @@
+Changes for Anyevent::Filesys::Watch.
+
+v0.1.1  2025-02-18
+	This is the first release.  Changes to AnyEvent::Filesys::Notify:
+	* The constructor argument "no_external" is ignored.
+	* There is no method "no_external()".
+	* Methods and named arguments are "directories" and not "dirs".
+	* Methods and named arguments are "callback" and not "cb".
+	* The named argument is "skip_subdirectories" and not "skip_subdirs".
+	* The method is "skipSubdirectories" and not "skip_subdirs".
+	* The method is "parseEvents" and not "parse_events".
+	* None of the L<Moose> methods like "does()" are implemented.
+	* No type checking is done on arguments.
+	* The "directories" argument to new can be a scalar for just one directory.
+    * You can instantiate the platform-specific backends directly if you cannot help
+

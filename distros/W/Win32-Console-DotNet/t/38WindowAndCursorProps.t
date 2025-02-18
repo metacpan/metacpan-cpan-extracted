@@ -349,7 +349,7 @@ subtest 'GetCursorPosition_Invoke_ReturnsExpected' => sub {
 
       TODO: {
         local $TODO = 'Get position in test situation';
-        Console->SetCursorPosition(10, 12);
+        lives_ok { Console->SetCursorPosition(10, 12) };
         is Console->CursorLeft, 10, 'Equal';
         is Console->CursorTop, 12, 'Equal';
         is_deeply Console->GetCursorPosition(), [10, 12], 'Equal';
@@ -414,7 +414,7 @@ subtest 'CursorTop_Set_GetReturnsExpected' => sub {
 
       TODO: {
         local $TODO = 'Get position in test situation';
-        Console->CursorTop( 10 );
+        lives_ok { Console->CursorTop( 10 ) };
         is Console->CursorTop, 10, 'Equal';
 
         Console->CursorTop( $origTop );

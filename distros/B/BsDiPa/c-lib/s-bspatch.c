@@ -110,7 +110,7 @@ s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat){
 	x = a_bspatch_xin(dat);
 	if(x < 0)
 		goto jleave;
-	y = x;
+	y = x; /* If we generated the header, data *plus* control block fits in _OFF_MAX! */
 	hp->h_ctrl_len = x;
 	dat += sizeof(x);
 
@@ -134,6 +134,7 @@ s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat){
 	x = a_bspatch_xin(dat);
 	if(x < 0)
 		goto jleave;
+	/* If we generated the header, the latter is true. */
 	if(x >= s_BSDIPA_OFF_MAX || (size_t)x >= SIZE_MAX / sizeof(s_bsdipa_off_t))
 		goto jleave;
 	if(x - hp->h_extra_len != hp->h_diff_len)
@@ -163,37 +164,50 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 	rv = s_BSDIPA_INVAL;
 
 	if(pcp->pc_patch_dat != NULL){
-		s_bsdipa_off_t y;
 		uint64_t x;
 
 		pcp->pc_diff_dat = pcp->pc_ctrl_dat = pcp->pc_patch_dat;
 
 		x = pcp->pc_patch_len;
 
-		y = pcp->pc_header.h_ctrl_len;
-		if(y < 0 || x < (uint64_t)y)
+		respos = pcp->pc_header.h_ctrl_len;
+		if(respos < 0 || x < (uint64_t)respos)
 			goto jleave;
-		x -= y;
-		pcp->pc_diff_dat += y;
+		x -= respos;
+		pcp->pc_diff_dat += respos;
 
-		y = pcp->pc_header.h_diff_len;
-		if(y < 0 || x < (uint64_t)y)
+		respos = pcp->pc_header.h_diff_len;
+		if(respos < 0 || x < (uint64_t)respos)
 			goto jleave;
-		x -= y;
-		pcp->pc_diff_dat += y;
+		x -= respos;
+		pcp->pc_diff_dat += respos;
 
 		pcp->pc_extra_dat = pcp->pc_diff_dat;
-		y = pcp->pc_header.h_extra_len;
-		if(y < 0 || x < (uint64_t)y)
+		respos = pcp->pc_header.h_extra_len;
+		if(respos < 0 || x < (uint64_t)respos)
 			goto jleave;
 		/* xxx Do not care about excess data in patch? */
+	}else{
+		respos = pcp->pc_header.h_ctrl_len;
+		if(respos < 0 || respos >= s_BSDIPA_OFF_MAX)
+			goto jleave;
+		respos = pcp->pc_header.h_diff_len;
+		if(respos < 0 || respos >= s_BSDIPA_OFF_MAX)
+			goto jleave;
+		aftpos = pcp->pc_header.h_extra_len;
+		if(aftpos < 0 || aftpos >= s_BSDIPA_OFF_MAX)
+			goto jleave;
+		if(s_BSDIPA_OFF_MAX - aftpos <= respos)
+			goto jleave;
+		respos += aftpos;
+		if(s_BSDIPA_OFF_MAX - respos <= pcp->pc_header.h_ctrl_len)
+			goto jleave;
 	}
 
 	/* The effective limit is smaller, but that is up to diff generation: "just do it" */
 	if(pcp->pc_after_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
 
-	/* (We document "no verification if patch_dat!=NULL case", and parse_header() already tested that, but..) */
 	if(pcp->pc_header.h_before_len < 0 || pcp->pc_header.h_before_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
 

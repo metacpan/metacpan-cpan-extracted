@@ -1,0 +1,390 @@
+[
+    {
+        "diseases": [
+            {
+                "diseaseCode": {
+                    "id": "NCIT:C3138"
+                }
+            }
+        ],
+        "ethnicity": {
+            "id": "NCIT:C41261"
+        },
+        "exposures": [
+            {
+                "exposureCode": {
+                    "id": "NCIT:C154329"
+                },
+                "unit": {
+                    "id": "NCIT:C65108"
+                }
+            },
+            {
+                "exposureCode": {
+                    "id": "NCIT:C2190"
+                },
+                "unit": {
+                    "id": "NCIT:C17998"
+                }
+            }
+        ],
+        "id": "107:week_0_arm_1",
+        "interventionsOrProcedures": [
+            {
+                "bodySite": {
+                    "id": "NCIT:C12736"
+                }
+            },
+            {
+                "bodySite": {
+                    "id": "NCIT:C12736"
+                },
+                "procedureCode": {
+                    "id": "NCIT:C157823"
+                }
+            }
+        ],
+        "measures": [
+            {
+                "assayCode": {
+                    "id": "NCIT:C117748"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67376"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67376"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C20451"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67327"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67327"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C38037"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C48508"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C48508"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C51948"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67242"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67242"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C51951"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67242"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67242"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C55098"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67376"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67376"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C61025"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C67376"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C67376"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C64547"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C48508"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C48508"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C64548"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C85710"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C85710"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C64796"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C25613"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C25613"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C64848"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C64783"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C64783"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C74679"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C48508"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C48508"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            },
+            {
+                "assayCode": {
+                    "id": "NCIT:C90505"
+                },
+                "measurementValue": {
+                    "quantity": {
+                        "referenceRange": {
+                            "unit": {
+                                "id": "NCIT:C98734"
+                            }
+                        },
+                        "unit": {
+                            "id": "NCIT:C98734"
+                        }
+                    }
+                },
+                "procedure": {
+                    "procedureCode": {
+                        "id": "NCIT:C27232"
+                    }
+                }
+            }
+        ],
+        "sex": {
+            "id": "NCIT:C20197"
+        },
+        "treatments": [
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38295"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C1027"
+                }
+            },
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38288"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C195"
+                }
+            },
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38295"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C287"
+                }
+            },
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38288"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C290"
+                }
+            },
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38288"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C642"
+                }
+            },
+            {
+                "routeOfAdministration": {
+                    "id": "NCIT:C38288"
+                },
+                "treatmentCode": {
+                    "id": "NCIT:C769"
+                }
+            }
+        ],
+        "id_from_qr": "107_week_0_arm_1.compressed"
+    }
+]

@@ -4,8 +4,19 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Geo::Coder::CA: '0'
+  Geo::Coder::DataScienceToolkit: '0'
+  Geo::Coder::GeocodeFarm: '0'
+  Geo::Coder::OSM: '0'
+  Geo::Coder::OpenCage: '0'
+  Geo::Coder::Ovi: '0'
+  Geo::Coder::Postcodes: '0'
+  LWP::UserAgent::Throttled: '0.04'
+  Test::Carp: '0'
   Test::Deep: '0'
   Test::DescribeMe: '0'
+  Test::LWP::UserAgent: '0'
+  Test::MockModule: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -33,5 +44,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List
   repository: git://github.com/nigelhorne/Geo-Coder-List.git
-version: '0.34'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.35'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

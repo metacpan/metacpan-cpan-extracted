@@ -8,8 +8,10 @@ my $build = Module::Build->new(
   license            => 'perl',
   module_name        => 'DBIx::Migration',
   configure_requires => {
-    'CPAN::Meta::Converter' => 2.15,
-    'Module::Build'         => 0.42
+    'CPAN::Meta::Converter' => 2.150010,
+    'CPAN::Meta::YAML'      => 0.020,
+    'Module::Build'         => 0.42,
+    'JSON::PP'              => 4.16
   },
   test_requires => {
     'DBD::SQLite'       => 0,
@@ -27,19 +29,22 @@ my $build = Module::Build->new(
     'Test::Pod::Coverage' => 1.04
   },
   requires => {
-    'perl'        => '5.8.9',
-    'Class::Tiny' => 0,
-    'DBI'         => 1.33,              # DBI::clone() is in use
-    'File::Slurp' => 0,
-    'File::Spec'  => 0,
-    'Pod::Find'   => 0,
-    'Pod::Usage'  => 1.64,
-    'Try::Tiny'   => 0
+    'perl'             => '5.8.9',
+    'DBI'              => 1.33,         # DBI::clone() is in use
+    'File::Slurp'      => 0,
+    'File::Spec'       => 0,
+    'Moo'              => 0,
+    'MooX::SetOnce'    => 0,
+    'Pod::Find'        => 0,
+    'Pod::Usage'       => 1.64,
+    'Try::Tiny'        => 0,
+    'namespace::clean' => 0
   },
-  create_readme => 1,
-  script_files  => [ glob( 'script/*' ) ],
-  test_files    => [ glob( 't/*.t' ) ],
-  meta_merge    => {
+  create_readme  => 1,
+  script_files   => [ glob( 'script/*' ) ],
+  test_files     => [ glob( 't/*.t' ) ],
+  add_to_cleanup => [ 'cover_db/*' ],
+  meta_merge     => {
     'meta-spec' => {
       version => 2
     },

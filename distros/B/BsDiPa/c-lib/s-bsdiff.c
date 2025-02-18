@@ -286,7 +286,7 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 					overlap = (lastscan + lenf) - (scan - lenb);
 					s = Ss = lens = 0;
 					for(i = 0; i < overlap; ++i){
-						if(befdat[lastscan +lenf - overlap + i
+						if(befdat[lastscan + lenf - overlap + i
 								] == aftdat[lastpos + lenf - overlap + i])
 							++s;
 						if(befdat[scan - lenb + i] == aftdat[pos - lenb + i])

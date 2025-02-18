@@ -8,6 +8,7 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/10-new.t
+t/30-basics.t
 t/carp.t
 t/chronicling.t
 t/comment-spelling.t
@@ -15,6 +16,7 @@ t/dist.t
 t/eof.t
 t/eol.t
 t/kwalitee.t
+t/limiting.t
 t/manifest.t
 t/modules-used.t
 t/no404s.t

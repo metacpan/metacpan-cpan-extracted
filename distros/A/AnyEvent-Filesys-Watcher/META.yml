@@ -1,0 +1,52 @@
+---
+abstract: 'Watch file system for changes'
+author:
+  - 'Guido Flohr <guido.flohr@cantanea.com>'
+build_requires:
+  Data::Dump: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Test::Exception: '0.43'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Test::Without::Module: '0.21'
+  autodie: '0'
+  lib: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Filesys-Watcher
+requires:
+  AnyEvent: '0'
+  Carp: '0'
+  Cwd: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IO::Select: '0'
+  Locale::TextDomain: '0'
+  Path::Iterator::Rule: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Time::HiRes: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/gflohr/AnyEvent-Filesys-Watcher/issues
+  homepage: https://github.com/gflohr/AnyEvent-Filesys-Watcher#readme
+  repository: git://github.com/gflohr/Anyevent-Filesys-Watch.git
+version: v0.1.1
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'

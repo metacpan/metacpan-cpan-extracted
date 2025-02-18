@@ -4,7 +4,7 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 # VERSION
 
-Version 0.03
+Version 0.05
 
 # SYNOPSIS
 
@@ -82,7 +82,7 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
     the label is taken to be a location to be added.
     If no coordinates are provided, an error will be thrown.
 
-- geocoder
+- `geocoder`
 
     An optional geocoder object such as [Geo::Coder::List](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AList) or [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree).
 
@@ -112,7 +112,7 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
 
 - zoom
 
-    An optional zoom level for the map, with a default value of 12.
+    An optional zoom level for the map, with a default value of 17.
 
 ## add\_marker
 

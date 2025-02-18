@@ -3,7 +3,7 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015/2024 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015, 2025 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -11,12 +11,12 @@
 #
 
 package Map::Tube::Beijing;
-use 5.10.0;
+use 5.12.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.12.3');
+our $VERSION = version->declare('v0.12.4');
 
 =encoding utf8
 

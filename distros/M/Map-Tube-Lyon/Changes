@@ -1,5 +1,14 @@
 Revision history for Perl extension Map::Tube::Lyon.
 
+0.62.2 2025-02-17
+  - Require Map::Tube 3.94 and adapt tests accordingly.
+  - Remove support for Perl 5.10 because of test failing for Perl < 5.11.
+  - Reorganised internal IDs for lines and stations.
+  - Added two stations.
+  - Fixed lines serving two stations.
+  - Fixed line indices.
+  - Enhanced tests.
+
 0.62.1 2024-12-09
   - Added tests
   - Switched tests from deprecated XML::Simple to XML::Twig
@@ -10,7 +19,7 @@ Revision history for Perl extension Map::Tube::Lyon.
   - Added RhoneExpress line
   - Added test for preferred route
   - Fixed test 02-xml.t
-
+      1
 0.61.0 2024-11-05
   - Adapted for use with Map::Tube 3.77
   - Bumped Perl version to 5.10.0

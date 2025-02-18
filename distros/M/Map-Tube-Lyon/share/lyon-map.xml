@@ -2,173 +2,175 @@
 
 <tube name="Métro, funiculaires et tramways de Lyon">
   <lines>
-    <line id="A"  name="A"  color="#E1001A"/>
-    <line id="B"  name="B"  color="#0094D7"/>
-    <line id="C"  name="C"  color="#F19400"/>
-    <line id="D"  name="D"  color="#008F36"/>
-    <line id="F1" name="F1" color="#EE1C24"/>
-    <line id="F2" name="F2" color="#F49AC2"/>
-    <line id="T1" name="T1" color="#F172AC"/>
-    <line id="T2" name="T2" color="#9B95C9"/>
-    <line id="T3" name="T3" color="#F68C59"/>
-    <line id="T4" name="T4" color="#F68E84"/>
-    <line id="T5" name="T5" color="#8DC73F"/>
-    <line id="T6" name="T6" color="#A4846F"/>
-    <line id="T7" name="T7" color="#4FB848"/>
-    <line id="RE" name="RhônExpress" color="#00B6AD"/>
+    <line id="ly_A"  name="A"  color="#E1001A"/>
+    <line id="ly_B"  name="B"  color="#0094D7"/>
+    <line id="ly_C"  name="C"  color="#F19400"/>
+    <line id="ly_D"  name="D"  color="#008F36"/>
+    <line id="ly_F1" name="F1" color="#EE1C24"/>
+    <line id="ly_F2" name="F2" color="#F49AC2"/>
+    <line id="ly_T1" name="T1" color="#F172AC"/>
+    <line id="ly_T2" name="T2" color="#9B95C9"/>
+    <line id="ly_T3" name="T3" color="#F68C59"/>
+    <line id="ly_T4" name="T4" color="#F68E84"/>
+    <line id="ly_T5" name="T5" color="#8DC73F"/>
+    <line id="ly_T6" name="T6" color="#A4846F"/>
+    <line id="ly_T7" name="T7" color="#4FB848"/>
+    <line id="ly_RE" name="RhônExpress" color="#00B6AD"/>
   </lines>
   <stations>
-    <station id="s001" name="Perrache" line="A:1,T1:8,T2:4" link="s002,s055,s057,s075"/>
-    <station id="s002" name="Ampère - Victor Hugo" line="A:2" link="s003,s001"/>
-    <station id="s003" name="Bellecour" line="A:3,D:5" link="s004,s002,s033,s035"/>
-    <station id="s004" name="Cordeliers" line="A:4" link="s005,s003"/>
-    <station id="s005" name="Hôtel de Ville - Louis Pradel" line="A:5,C:1" link="s006,s004,s026"/>
-    <station id="s006" name="Foch" line="A:6" link="s007,s005"/>
-    <station id="s007" name="Masséna" line="A:7" link="s008,s006"/>
-    <station id="s008" name="Charpennes - Charles Hernu" line="A:8,B:2,T1:19,T4:5" link="s009,s007,s016,s067,s069"/>
-    <station id="s009" name="République - Villeurbanne" line="A:9" link="s010,s008"/>
-    <station id="s010" name="Gratte-Ciel" line="A:10" link="s011,s009"/>
-    <station id="s011" name="Flachet - Alain Gilles" line="A:11" link="s012,s010"/>
-    <station id="s012" name="Cusset" line="A:12" link="s013,s011"/>
-    <station id="s013" name="Laurent-Bonnevay - Astroballe" line="A:13" link="s014,s012"/>
-    <station id="s014" name="Vaulx-en-Velin - La Soie" line="A:14,T3:6,T7:1,RE:2" link="s013,s025,s104,s105,s144"/>
+    <station id="ly_s001" name="Perrache" line="ly_A:1,ly_T1:8,ly_T2:4" link="ly_s002,ly_s055,ly_s057,ly_s075"/>
+    <station id="ly_s002" name="Ampère - Victor Hugo" line="ly_A:2" link="ly_s003,ly_s001"/>
+    <station id="ly_s003" name="Bellecour" line="ly_A:3,ly_D:5" link="ly_s004,ly_s002,ly_s033,ly_s035"/>
+    <station id="ly_s004" name="Cordeliers" line="ly_A:4" link="ly_s005,ly_s003"/>
+    <station id="ly_s005" name="Hôtel de Ville - Louis Pradel" line="ly_A:5,ly_C:1" link="ly_s006,ly_s004,ly_s026"/>
+    <station id="ly_s006" name="Foch" line="ly_A:6" link="ly_s007,ly_s005"/>
+    <station id="ly_s007" name="Masséna" line="ly_A:7" link="ly_s008,ly_s006"/>
+    <station id="ly_s008" name="Charpennes - Charles Hernu" line="ly_A:8,ly_B:2,ly_T1:20,ly_T4:5" link="ly_s009,ly_s007,ly_s016,ly_s067,ly_s069"/>
+    <station id="ly_s009" name="République - Villeurbanne" line="ly_A:9" link="ly_s010,ly_s008"/>
+    <station id="ly_s010" name="Gratte-Ciel" line="ly_A:10" link="ly_s011,ly_s009"/>
+    <station id="ly_s011" name="Flachet - Alain Gilles" line="ly_A:11" link="ly_s012,ly_s010"/>
+    <station id="ly_s012" name="Cusset" line="ly_A:12" link="ly_s013,ly_s011"/>
+    <station id="ly_s013" name="Laurent-Bonnevay - Astroballe" line="ly_A:13" link="ly_s014,ly_s012"/>
+    <station id="ly_s014" name="Vaulx-en-Velin - La Soie" line="ly_A:14,ly_T3:6,ly_T7:1,ly_RE:2" link="ly_s013,ly_s025,ly_s104,ly_s105,ly_s144"/>
 
-    <station id="s015" name="Gare Part-Dieu - Villette" line="T3:1,T4:8" link="s101,s110" other_link="rue:s025"/>
-    <station id="s025" name="Lyon Part-Dieu" line="RE:1" link="s014" other_link="rue:s015,rue:s017"/>
-    <station id="s016" name="Brotteaux" line="B:1" link="s008,s017"/>
-    <station id="s017" name="Gare Part-Dieu - Vivier Merle" line="B:3,T1:17" link="s018,s016,s064,s066" other_link="rue:s025"/>
-    <station id="s018" name="Place Guichard - Bourse du Travail" line="B:4" link="s019,s017"/>
-    <station id="s019" name="Saxe-Gambetta" line="B:5,D:6" link="s020,s018,s035,s037"/>
-    <station id="s020" name="Jean Macé" line="B:6,T2:6" link="s021,s019,s075,s076"/>
-    <station id="s021" name="Place Jean Jaurès" line="B:7" link="s022,s020"/>
-    <station id="s022" name="Debourg" line="B:8,T1:1,T6:1" link="s023,s021,s050,s133"/>
-    <station id="s023" name="Stade de Gerland - Le LOU" line="B:9" link="s024,s022"/>
-    <station id="s024" name="Gare d'Oullins" line="B:10" link="s023,s045"/>
-    <station id="s045" name="Oullins Centre" line="B:11" link="s024,s046"/>
-    <station id="s046" name="Saint-Genis-Laval - Hôpital Lyon Sud" line="B:12" link="s045"/>
+    <station id="ly_s015" name="Gare Part-Dieu - Villette" line="ly_T3:1,ly_T4:8" link="ly_s101,ly_s110,ly_s066" other_link="rue:ly_s025,rue:ly_s146"/>
+    <station id="ly_s025" name="Lyon Part-Dieu" line="ly_RE:1" link="ly_s014" other_link="rue:ly_s015,rue:ly_s017,rue:ly_s066,rue:ly_s146"/>
+    <station id="ly_s016" name="Brotteaux" line="ly_B:1" link="ly_s008,ly_s017"/>
+    <station id="ly_s017" name="Gare Part-Dieu - Vivier Merle" line="ly_B:3,ly_T1:17" link="ly_s018,ly_s016,ly_s064,ly_s066" other_link="rue:ly_s025"/>
+    <station id="ly_s018" name="Place Guichard - Bourse du Travail" line="ly_B:4" link="ly_s019,ly_s017"/>
+    <station id="ly_s019" name="Saxe-Gambetta" line="ly_B:5,ly_D:7" link="ly_s020,ly_s018,ly_s035,ly_s037"/>
+    <station id="ly_s020" name="Jean Macé" line="ly_B:6,ly_T2:6" link="ly_s021,ly_s019,ly_s075,ly_s076"/>
+    <station id="ly_s021" name="Place Jean Jaurès" line="ly_B:7" link="ly_s022,ly_s020"/>
+    <station id="ly_s022" name="Debourg" line="ly_B:8,ly_T1:1,ly_T6:1" link="ly_s023,ly_s021,ly_s050,ly_s133"/>
+    <station id="ly_s023" name="Stade de Gerland - Le LOU" line="ly_B:9" link="ly_s024,ly_s022"/>
+    <station id="ly_s024" name="Gare d'Oullins" line="ly_B:10" link="ly_s023,ly_s045"/>
+    <station id="ly_s045" name="Oullins Centre" line="ly_B:11" link="ly_s024,ly_s046"/>
+    <station id="ly_s046" name="Saint-Genis-Laval - Hôpital Lyon Sud" line="ly_B:12" link="ly_s045"/>
 
-    <station id="s026" name="Croix-Paquet" line="C:2" link="s005,s027"/>
-    <station id="s027" name="Croix-Rousse" line="C:3" link="s028,s026"/>
-    <station id="s028" name="Henon" line="C:4" link="s029,s027"/>
-    <station id="s029" name="Cuire" line="C:5" link="s028"/>
+    <station id="ly_s026" name="Croix-Paquet" line="ly_C:2" link="ly_s005,ly_s027"/>
+    <station id="ly_s027" name="Croix-Rousse" line="ly_C:3" link="ly_s028,ly_s026"/>
+    <station id="ly_s028" name="Henon" line="ly_C:4" link="ly_s029,ly_s027"/>
+    <station id="ly_s029" name="Cuire" line="ly_C:5" link="ly_s028"/>
 
-    <station id="s030" name="Gare de Vaise - G. Collomb" line="D:1" link="s031"/>
-    <station id="s031" name="Valmy" line="D:2" link="s032,s030"/>
-    <station id="s032" name="Gorge de Loup" line="D:3" link="s033,s031"/>
-    <station id="s033" name="Vieux Lyon - Cathédrale Saint-Jean" line="D:4,F1:1,F2:1" link="s003,s032,s047,s049"/>
-    <station id="s035" name="Guillotière - Gabriel Péri" line="D:5,T1:12" link="s003,s019,s059,s061"/>
-    <station id="s037" name="Garibaldi" line="D:7" link="s038,s019"/>
-    <station id="s038" name="Sans Souci" line="D:8" link="s039,s037"/>
-    <station id="s039" name="Monplaisir - Lumière" line="D:9" link="s040,s038"/>
-    <station id="s040" name="Grange Blanche" line="D:10,T2:13,T5:1" link="s041,s039,s081,s082"/>
-    <station id="s041" name="Laënnec" line="D:11" link="s042,s040"/>
-    <station id="s042" name="Mermoz - Pinel" line="D:12,T6:10" link="s043,s041,s139,s140"/>
-    <station id="s043" name="Parilly" line="D:13" link="s044,s042"/>
-    <station id="s044" name="Gare de Vénissieux" line="D:14,T4:19" link="s043,s118,s119"/>
+    <station id="ly_s030" name="Gare de Vaise - G. Collomb" line="ly_D:1" link="ly_s031"/>
+    <station id="ly_s031" name="Valmy" line="ly_D:2" link="ly_s032,ly_s030"/>
+    <station id="ly_s032" name="Gorge de Loup" line="ly_D:3" link="ly_s033,ly_s031"/>
+    <station id="ly_s033" name="Vieux Lyon - Cathédrale Saint-Jean" line="ly_D:4,ly_F1:1,ly_F2:1" link="ly_s003,ly_s032,ly_s047,ly_s049"/>
+    <station id="ly_s035" name="Guillotière - Gabriel Péri" line="ly_D:6,ly_T1:12" link="ly_s003,ly_s019,ly_s059,ly_s061"/>
+    <station id="ly_s037" name="Garibaldi" line="ly_D:8" link="ly_s038,ly_s019"/>
+    <station id="ly_s038" name="Sans Souci" line="ly_D:9" link="ly_s039,ly_s037"/>
+    <station id="ly_s039" name="Monplaisir - Lumière" line="ly_D:10" link="ly_s040,ly_s038"/>
+    <station id="ly_s040" name="Grange Blanche" line="ly_D:11,ly_T2:13,ly_T5:1" link="ly_s041,ly_s039,ly_s081,ly_s082"/>
+    <station id="ly_s041" name="Laënnec" line="ly_D:12" link="ly_s042,ly_s040"/>
+    <station id="ly_s042" name="Mermoz - Pinel" line="ly_D:13,ly_T6:10" link="ly_s043,ly_s041,ly_s139,ly_s140"/>
+    <station id="ly_s043" name="Parilly" line="ly_D:14" link="ly_s044,ly_s042"/>
+    <station id="ly_s044" name="Gare de Vénissieux" line="ly_D:15,ly_T4:19" link="ly_s043,ly_s118,ly_s119"/>
 
-    <station id="s047" name="Minimes - Théatres Romains" line="F1:2" link="s033,s048"/>
-    <station id="s048" name="Saint-Just" line="F1:3" link="s047"/>
+    <station id="ly_s047" name="Minimes - Théatres Romains" line="ly_F1:2" link="ly_s033,ly_s048"/>
+    <station id="ly_s048" name="Saint-Just" line="ly_F1:3" link="ly_s047"/>
 
-    <station id="s049" name="Fourvière" line="F2:2" link="s033"/>
+    <station id="ly_s049" name="Fourvière" line="ly_F2:2" link="ly_s033"/>
 
-    <station id="s050" name="ENS Lyon" line="T1:2" link="s022,s051"/>
-    <station id="s051" name="Halle Tony Garnier" line="T1:3" link="s050,s052"/>
-    <station id="s052" name="Musée des Confluences" line="T1:4" link="s051,s053"/>
-    <station id="s053" name="Hôtel de Région Montrochet" line="T1:5,T2:1" link="s052,s054"/>
-    <station id="s054" name="Sainte-Blandine" line="T1:6,T2:2" link="s053,s055"/>
-    <station id="s055" name="Place des Archives" line="T1:7,T2:3" link="s054,s001"/>
-    <station id="s057" name="Quai Claude Bernard" line="T1:9" link="s001,s058"/>
-    <station id="s058" name="Rue de l'Université" line="T1:10" link="s057,s059"/>
-    <station id="s059" name="Saint-André" line="T1:11" link="s058,s035"/>
-    <station id="s061" name="Liberté" line="T1:13" link="s035,s062"/>
-    <station id="s062" name="Saxe Préfecture" line="T1:14" link="s061,s063"/>
-    <station id="s063" name="Palais de Justice - Mairie du 3e" line="T1:15" link="s062,s064"/>
-    <station id="s064" name="Part-Dieu Auditorium" line="T1:16" link="s063,s017"/>
-    <station id="s066" name="Thiers-Lafayette" line="T1:18,T4:7" link="s017,s067"/>
-    <station id="s067" name="Collège Bellecombe" line="T1:19,T4:6" link="s066,s008"/>
-    <station id="s069" name="Le Tonkin" line="T1:20,T4:4" link="s008,s070"/>
-    <station id="s070" name="Condorcet" line="T1:21,T4:3" link="s069,s071"/>
-    <station id="s071" name="Université Lyon 1" line="T1:22,T4:2" link="s070,s072"/>
-    <station id="s072" name="La Doua - Gaston Berger" line="T1:23,T4:1" link="s071,s073"/>
-    <station id="s073" name="INSA - Einstein" line="T1:24" link="s072,s074"/>
-    <station id="s074" name="Croix-Luizet" line="T1:25" link="s073"/>
+    <station id="ly_s050" name="ENS Lyon" line="ly_T1:2" link="ly_s022,ly_s051"/>
+    <station id="ly_s051" name="Halle Tony Garnier" line="ly_T1:3" link="ly_s050,ly_s052"/>
+    <station id="ly_s052" name="Musée des Confluences" line="ly_T1:4" link="ly_s051,ly_s053"/>
+    <station id="ly_s053" name="Hôtel de Région Montrochet" line="ly_T1:5,ly_T2:1" link="ly_s052,ly_s054"/>
+    <station id="ly_s054" name="Sainte-Blandine" line="ly_T1:6,ly_T2:2" link="ly_s053,ly_s055"/>
+    <station id="ly_s055" name="Place des Archives" line="ly_T1:7,ly_T2:3" link="ly_s054,ly_s001"/>
+    <station id="ly_s057" name="Quai Claude Bernard" line="ly_T1:9" link="ly_s001,ly_s058"/>
+    <station id="ly_s058" name="Rue de l'Université" line="ly_T1:10" link="ly_s057,ly_s059"/>
+    <station id="ly_s059" name="Saint-André" line="ly_T1:11" link="ly_s058,ly_s035"/>
+    <station id="ly_s061" name="Liberté" line="ly_T1:13" link="ly_s035,ly_s062"/>
+    <station id="ly_s062" name="Saxe Préfecture" line="ly_T1:14" link="ly_s061,ly_s063"/>
+    <station id="ly_s063" name="Palais de Justice - Mairie du 3e" line="ly_T1:15" link="ly_s062,ly_s064"/>
+    <station id="ly_s064" name="Part-Dieu Auditorium" line="ly_T1:16" link="ly_s063,ly_s017"/>
+    <station id="ly_s146" name="Part-Dieu - Villette Sud" line="ly_T4:30" link="ly_s110" other_link="rue:ly_s015,rue:ly_s025"/>
+    <station id="ly_s066" name="Thiers-Lafayette" line="ly_T1:18,ly_T4:7" link="ly_s017,ly_s067,ly_s015" other_link="rue:ly_s025"/>
+    <station id="ly_s067" name="Collège Bellecombe" line="ly_T1:19,ly_T4:6" link="ly_s066,ly_s008"/>
+    <station id="ly_s069" name="Le Tonkin" line="ly_T1:21,ly_T4:4" link="ly_s008,ly_s070"/>
+    <station id="ly_s070" name="Condorcet" line="ly_T1:22,ly_T4:3" link="ly_s069,ly_s071"/>
+    <station id="ly_s071" name="Université Lyon 1" line="ly_T1:23,ly_T4:2" link="ly_s070,ly_s072"/>
+    <station id="ly_s072" name="La Doua - Gaston Berger" line="ly_T1:24,ly_T4:1" link="ly_s071,ly_s073"/>
+    <station id="ly_s073" name="INSA - Einstein" line="ly_T1:25" link="ly_s072,ly_s074"/>
+    <station id="ly_s074" name="Croix-Luizet" line="ly_T1:26" link="ly_s073"/>
 
-    <station id="s075" name="Centre Berthelot - Sciences Po Lyon" line="T2:5" link="s001,s020"/>
-    <station id="s076" name="Garibaldi - Berthelot" line="T2:7" link="s020,s077"/>
-    <station id="s077" name="Route de Vienne" line="T2:8" link="s076,s078"/>
-    <station id="s078" name="Jet d'Eau - Mendès France" line="T2:9,T4:12" link="s077,s079,s112,s113"/>
-    <station id="s079" name="Villon" line="T2:10" link="s078,s080"/>
-    <station id="s080" name="Bachut Mairie du 8ème" line="T2:11" link="s079,s081"/>
-    <station id="s081" name="Jean XXIII - Marise Bastyé" line="T2:12" link="s080,s040"/>
-    <station id="s082" name="Ambroise Paré" line="T2:14,T5:2" link="s040,s083"/>
-    <station id="s083" name="Desgenettes" line="T2:15,T5:3,T6:12" link="s082,s084,s140,s141"/>
-    <station id="s084" name="Essarts - Iris" line="T2:16,T5:4" link="s083,s085"/>
-    <station id="s085" name="Boutasse - Camille Rousset" line="T2:17" link="s084,s086"/>
-    <station id="s086" name="Hôtel de Ville - Bron" line="T2:18,T5:5" link="s085,s087"/>
-    <station id="s087" name="Les Alizés" line="T2:19,T5:6" link="s086,s088,s129"/>
-    <station id="s088" name="Rebufer" line="T2:20" link="s087,s089"/>
-    <station id="s089" name="Parilly Université - Hippodrome" line="T2:21" link="s088,s090"/>
-    <station id="s090" name="Europe - Université" line="T2:22" link="s089,s091"/>
-    <station id="s091" name="Porte des Alpes" line="T2:23" link="s090,s092"/>
-    <station id="s092" name="Parc Technologique" line="T2:24" link="s091,s093"/>
-    <station id="s093" name="Haut de Feuilly" line="T2:25" link="s092,s094"/>
-    <station id="s094" name="Salvador Allende" line="T2:26" link="s093,s095"/>
-    <station id="s095" name="Alfred de Vigny" line="T2:27" link="s094,s096"/>
-    <station id="s096" name="Saint-Priest Hôtel de Ville" line="T2:28" link="s095,s097"/>
-    <station id="s097" name="Esplanade des Arts" line="T2:29" link="s096,s098"/>
-    <station id="s098" name="Jules Ferry" line="T2:30" link="s097,s099"/>
-    <station id="s099" name="Cordière" line="T2:31" link="s098,s100"/>
-    <station id="s100" name="Saint-Priest Bel Air" line="T2:32" link="s099"/>
+    <station id="ly_s075" name="Centre Berthelot - Sciences Po Lyon" line="ly_T2:5" link="ly_s001,ly_s020"/>
+    <station id="ly_s076" name="Garibaldi - Berthelot" line="ly_T2:7" link="ly_s020,ly_s077"/>
+    <station id="ly_s077" name="Route de Vienne" line="ly_T2:8" link="ly_s076,ly_s078"/>
+    <station id="ly_s078" name="Jet d'Eau - Mendès France" line="ly_T2:9,ly_T4:12" link="ly_s077,ly_s079,ly_s112,ly_s113"/>
+    <station id="ly_s079" name="Villon" line="ly_T2:10" link="ly_s078,ly_s080"/>
+    <station id="ly_s080" name="Bachut Mairie du 8ème" line="ly_T2:11" link="ly_s079,ly_s081"/>
+    <station id="ly_s081" name="Jean XXIII - Marise Bastyé" line="ly_T2:12" link="ly_s080,ly_s040"/>
+    <station id="ly_s082" name="Ambroise Paré" line="ly_T2:14,ly_T5:2" link="ly_s040,ly_s083"/>
+    <station id="ly_s083" name="Desgenettes" line="ly_T2:15,ly_T5:3,ly_T6:12" link="ly_s082,ly_s084,ly_s140,ly_s141"/>
+    <station id="ly_s084" name="Essarts - Iris" line="ly_T2:16,ly_T5:4" link="ly_s083,ly_s085"/>
+    <station id="ly_s085" name="Boutasse - Camille Rousset" line="ly_T2:17,ly_T5:5" link="ly_s084,ly_s086"/>
+    <station id="ly_s086" name="Hôtel de Ville - Bron" line="ly_T2:18,ly_T5:6" link="ly_s085,ly_s087"/>
+    <station id="ly_s087" name="Les Alizés" line="ly_T2:19,ly_T5:7" link="ly_s086,ly_s088,ly_s129"/>
+    <station id="ly_s088" name="Rebufer" line="ly_T2:20" link="ly_s087,ly_s089"/>
+    <station id="ly_s089" name="Parilly Université - Hippodrome" line="ly_T2:21" link="ly_s088,ly_s090"/>
+    <station id="ly_s090" name="Europe - Université" line="ly_T2:22" link="ly_s089,ly_s091"/>
+    <station id="ly_s091" name="Porte des Alpes" line="ly_T2:23" link="ly_s090,ly_s092"/>
+    <station id="ly_s092" name="Parc Technologique" line="ly_T2:24" link="ly_s091,ly_s093"/>
+    <station id="ly_s093" name="Haut de Feuilly" line="ly_T2:25" link="ly_s092,ly_s094"/>
+    <station id="ly_s094" name="Salvador Allende" line="ly_T2:26" link="ly_s093,ly_s095"/>
+    <station id="ly_s095" name="Alfred de Vigny" line="ly_T2:27" link="ly_s094,ly_s096"/>
+    <station id="ly_s096" name="Saint-Priest Hôtel de Ville" line="ly_T2:28" link="ly_s095,ly_s097"/>
+    <station id="ly_s097" name="Esplanade des Arts" line="ly_T2:29" link="ly_s096,ly_s098"/>
+    <station id="ly_s098" name="Jules Ferry" line="ly_T2:30" link="ly_s097,ly_s099"/>
+    <station id="ly_s099" name="Cordière" line="ly_T2:31" link="ly_s098,ly_s100"/>
+    <station id="ly_s100" name="Saint-Priest Bel Air" line="ly_T2:32" link="ly_s099"/>
 
-    <station id="s101" name="Dauphiné - Lacassagne" line="T3:2" link="s015,s102"/>
-    <station id="s102" name="Reconnaissance - Balzac" line="T3:3" link="s101,s103"/>
-    <station id="s103" name="Gare de Villeurbanne" line="T3:4" link="s102,s104"/>
-    <station id="s104" name="Bel Air - Les Brosses" line="T3:5" link="s103,s014"/>
-    <station id="s105" name="Décines Centre" line="T3:7,T7:2" link="s014,s106"/>
-    <station id="s106" name="Décines Grand Large" line="T3:8,T7:3" link="s105,s107,s143"/>
-    <station id="s107" name="Meyzieu Gare" line="T3:9" link="s106,s108"/>
-    <station id="s108" name="Meyzieu Zi" line="T3:10" link="s107,s109"/>
-    <station id="s109" name="Meyzieu Les Panettes" line="T3:11" link="s108"/>
+    <station id="ly_s101" name="Dauphiné - Lacassagne" line="ly_T3:2" link="ly_s015,ly_s102"/>
+    <station id="ly_s102" name="Reconnaissance - Balzac" line="ly_T3:3" link="ly_s101,ly_s103"/>
+    <station id="ly_s103" name="Gare de Villeurbanne" line="ly_T3:4" link="ly_s102,ly_s104"/>
+    <station id="ly_s104" name="Bel Air - Les Brosses" line="ly_T3:5" link="ly_s103,ly_s014"/>
+    <station id="ly_s105" name="Décines Centre" line="ly_T3:7,ly_T7:2" link="ly_s014,ly_s106"/>
+    <station id="ly_s106" name="Décines Grand Large" line="ly_T3:8,ly_T7:3" link="ly_s105,ly_s107,ly_s143"/>
+    <station id="ly_s107" name="Meyzieu Gare" line="ly_T3:9" link="ly_s106,ly_s108"/>
+    <station id="ly_s108" name="Meyzieu Zi" line="ly_T3:10" link="ly_s107,ly_s109"/>
+    <station id="ly_s109" name="Meyzieu Les Panettes" line="ly_T3:11" link="ly_s108"/>
 
-    <station id="s110" name="Archives Départementales" line="T4:9" link="s015,s111"/>
-    <station id="s111" name="Manufacture Montluc" line="T4:10" link="s110,s112"/>
-    <station id="s112" name="Lycée Colbert" line="T4:11" link="s111,s078"/>
-    <station id="s113" name="Lycée Lumière" line="T4:13" link="s078,s114"/>
-    <station id="s114" name="États-Unis Musée Tony Garnier" line="T4:14" link="s113,s115"/>
-    <station id="s115" name="Beauvisage CSL" line="T4:15,T6:6" link="s114,s116,s136,s137"/>
-    <station id="s116" name="États-Unis Viviani" line="T4:16" link="s115,s117"/>
-    <station id="s117" name="Joliot Curie - Marcel Sembat" line="T4:17" link="s116,s118"/>
-    <station id="s118" name="La Borelle" line="T4:18" link="s117,s044"/>
-    <station id="s119" name="Croizat - Paul Bert" line="T4:20" link="s044,s120"/>
-    <station id="s120" name="Marcel Houël - Hôtel de Ville" line="T4:21" link="s119,s121"/>
-    <station id="s121" name="Lycée Jacques Brel" line="T4:22" link="s120,s122"/>
-    <station id="s122" name="Herriot - Cagne" line="T4:23" link="s121,s123"/>
-    <station id="s123" name="Vénissy Frida Kahlo" line="T4:24" link="s122,s124"/>
-    <station id="s124" name="Division Leclerc" line="T4:25" link="s123,s125"/>
-    <station id="s125" name="Maurice Thorez" line="T4:26" link="s124,s126"/>
-    <station id="s126" name="Lénine - Corsière" line="T4:27" link="s125,s127"/>
-    <station id="s127" name="Darnaise" line="T4:28" link="s126,s128"/>
-    <station id="s128" name="Hôpital Feyzin Vénissieux" line="T4:29" link="s127"/>
+    <station id="ly_s110" name="Archives Départementales" line="ly_T4:9" link="ly_s015,ly_s111,ly_s146"/>
+    <station id="ly_s111" name="Manufacture Montluc" line="ly_T4:10" link="ly_s110,ly_s112"/>
+    <station id="ly_s112" name="Lycée Colbert" line="ly_T4:11" link="ly_s111,ly_s078"/>
+    <station id="ly_s113" name="Lycée Lumière" line="ly_T4:13" link="ly_s078,ly_s114"/>
+    <station id="ly_s114" name="États-Unis Musée Tony Garnier" line="ly_T4:14" link="ly_s113,ly_s115"/>
+    <station id="ly_s115" name="Beauvisage CSL" line="ly_T4:15,ly_T6:6" link="ly_s114,ly_s116,ly_s136,ly_s137"/>
+    <station id="ly_s116" name="États-Unis Viviani" line="ly_T4:16" link="ly_s115,ly_s117"/>
+    <station id="ly_s117" name="Joliot Curie - Marcel Sembat" line="ly_T4:17" link="ly_s116,ly_s118"/>
+    <station id="ly_s118" name="La Borelle" line="ly_T4:18" link="ly_s117,ly_s044"/>
+    <station id="ly_s119" name="Croizat - Paul Bert" line="ly_T4:20" link="ly_s044,ly_s120"/>
+    <station id="ly_s120" name="Marcel Houël - Hôtel de Ville" line="ly_T4:21" link="ly_s119,ly_s121"/>
+    <station id="ly_s121" name="Lycée Jacques Brel" line="ly_T4:22" link="ly_s120,ly_s122"/>
+    <station id="ly_s122" name="Herriot - Cagne" line="ly_T4:23" link="ly_s121,ly_s123"/>
+    <station id="ly_s123" name="Vénissy Frida Kahlo" line="ly_T4:24" link="ly_s122,ly_s124"/>
+    <station id="ly_s124" name="Division Leclerc" line="ly_T4:25" link="ly_s123,ly_s125"/>
+    <station id="ly_s125" name="Maurice Thorez" line="ly_T4:26" link="ly_s124,ly_s126"/>
+    <station id="ly_s126" name="Lénine - Corsière" line="ly_T4:27" link="ly_s125,ly_s127"/>
+    <station id="ly_s127" name="Darnaise" line="ly_T4:28" link="ly_s126,ly_s128"/>
+    <station id="ly_s128" name="Hôpital Feyzin Vénissieux" line="ly_T4:29" link="ly_s127"/>
 
-    <station id="s129" name="De Tassigny - Curial" line="T5:7" link="s087,s130"/>
-    <station id="s130" name="Lycée Jean-Paul Sartre" line="T5:8" link="s129,s131"/>
-    <station id="s131" name="Parc du Chêne" line="T5:9" link="s130,s132"/>
-    <station id="s132" name="Eurexpo" line="T5:10" link="s131"/>
+    <station id="ly_s129" name="De Tassigny - Curial" line="ly_T5:8" link="ly_s087,ly_s130"/>
+    <station id="ly_s130" name="Lycée Jean-Paul Sartre" line="ly_T5:9" link="ly_s129,ly_s131"/>
+    <station id="ly_s131" name="Parc du Chêne" line="ly_T5:10" link="ly_s130,ly_s147"/>
+    <station id="ly_s147" name="Chassieu - ZAC du Chêne" line="ly_T5:11" link="ly_s131,ly_s132"/>
+    <station id="ly_s132" name="Eurexpo" line="ly_T5:12" link="ly_s147"/>
 
-    <station id="s133" name="Challemel-Lacour - Artillerie" line="T6:2" link="s022,s134"/>
-    <station id="s134" name="Moulin à Vent" line="T6:3" link="s133,s135"/>
-    <station id="s135" name="Petite Guille" line="T6:4" link="s134,s136"/>
-    <station id="s136" name="Beauvisage - Pressensé" line="T6:5" link="s135,s115"/>
-    <station id="s137" name="Grange Rouge - Santy" line="T6:7" link="s115,s138"/>
-    <station id="s138" name="Mermoz Californie" line="T6:8" link="s137,s139"/>
-    <station id="s139" name="Mermoz - Moselle" line="T6:9" link="s138,s042"/>
-    <station id="s140" name="Essarts - Laënnec" line="T6:11" link="s042,s083"/>
-    <station id="s141" name="Vinatier" line="T6:13" link="s083,s142"/>
-    <station id="s142" name="Hôpitaux Est - Pinel" line="T6:14" link="s141"/>
+    <station id="ly_s133" name="Challemel-Lacour - Artillerie" line="ly_T6:2" link="ly_s022,ly_s134"/>
+    <station id="ly_s134" name="Moulin à Vent" line="ly_T6:3" link="ly_s133,ly_s135"/>
+    <station id="ly_s135" name="Petite Guille" line="ly_T6:4" link="ly_s134,ly_s136"/>
+    <station id="ly_s136" name="Beauvisage - Pressensé" line="ly_T6:5" link="ly_s135,ly_s115"/>
+    <station id="ly_s137" name="Grange Rouge - Santy" line="ly_T6:7" link="ly_s115,ly_s138"/>
+    <station id="ly_s138" name="Mermoz Californie" line="ly_T6:8" link="ly_s137,ly_s139"/>
+    <station id="ly_s139" name="Mermoz - Moselle" line="ly_T6:9" link="ly_s138,ly_s042"/>
+    <station id="ly_s140" name="Essarts - Laënnec" line="ly_T6:11" link="ly_s042,ly_s083"/>
+    <station id="ly_s141" name="Vinatier" line="ly_T6:13" link="ly_s083,ly_s142"/>
+    <station id="ly_s142" name="Hôpitaux Est - Pinel" line="ly_T6:14" link="ly_s141"/>
 
-    <station id="s143" name="Décine OL Vallée" line="T7:4" link="s106"/>
+    <station id="ly_s143" name="Décine OL Vallée" line="ly_T7:4" link="ly_s106"/>
 
-    <station id="s144" name="Meyzieu Z.I." line="RE:3" link="s014,s145"/>
-    <station id="s145" name="Aéroport Lyon - Saint Exupéry" line="RE:4" link="s144"/>
+    <station id="ly_s144" name="Meyzieu Z.I." line="ly_RE:3" link="ly_s014,ly_s145"/>
+    <station id="ly_s145" name="Aéroport Lyon - Saint Exupéry" line="ly_RE:4" link="ly_s144"/>
   </stations>
 </tube>

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -75,7 +75,10 @@ sub new {
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_dom} = XML::LibXML->load_html(location => $file);
+	$self->{_dom} = XML::LibXML->load_html(
+		location => $file,
+		recover => 2,
+	);
 
 	$self->_read_metadata;
 

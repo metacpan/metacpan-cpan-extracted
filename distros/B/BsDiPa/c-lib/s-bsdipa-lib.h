@@ -225,14 +225,17 @@ struct s_bsdipa_patch_ctx{
 	uint8_t const *pc_after_dat; /* Source: after ("current") data, plus length. */
 	uint64_t pc_after_len;
 	/* 0=unlimited, otherwise upper limit in bytes.
-	 * This does not change the effective limit, but it may constrain it further. */
+	 * This does not change the effective limit, but it may constrain it further.
+	 * (One could instead look at pc_header.h_before_len before applying the patch,
+	 * but for "minimal" users like the BsDiPa.xs perl module it is easier to simply set this field
+	 * and let the C code act accordingly.) */
 	uint64_t pc_max_allowed_restored_len;
 	/* Patch data: one can *either* set .pc_patch_dat plus length, *or* the individual fields.
 	 * For the former case s_bsdipa_patch_parse_header() can be used to create .pc_header,
 	 * and .pc_patch_dat and .pc_patch_len are to be set thereafter.
 	 * In and for the latter case .pc_patch_dat must be NULL, .pc_header must have been filled in,
-	 * and all of .pc_ctrl_dat, .pc_diff_dat and .pc_extra_dat must be set (to valid values:
-	 * *no* verification of header lengths is done in that mode).
+	 * and all of .pc_ctrl_dat, .pc_diff_dat and .pc_extra_dat must be set.
+	 * The lengths of .pc_header are verified in either case.
 	 * NOTE: .pc_ctrl_dat, .pc_diff_dat, .pc_extra_dat and .pc_header are modified! */
 	uint8_t const *pc_patch_dat;
 	uint64_t pc_patch_len;
@@ -260,7 +263,8 @@ void s_bsdipa_diff_free(struct s_bsdipa_diff_ctx *dcp);
 
 /* Deserialize a header from dat (at least sizeof(*hp)) into hp.
  * Returns _OK, or _INVAL if input is senseless (negative lengths, overflows, etc).
- * Note the header could be stored distinct from data, so overflow check does not account for header size. */
+ * Note the header could be stored distinct from data, so overflow check does not account for header size.
+ * However, it assumes s_bsdipa_diff() generated the header: strict verification is performed. */
 enum s_bsdipa_state s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat);
 
 /* Create restored data as documented for s_bsdipa_patch_ctx.

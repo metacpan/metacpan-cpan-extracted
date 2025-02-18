@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;
 
-die "OS unsupported\n" if $^O ne 'MSWin32';
+die "OS unsupported\n" if $^O eq 'cygwin';
 
 WriteMakefile(
   NAME              => 'Win32::Console::DotNet',
@@ -32,7 +32,6 @@ WriteMakefile(
   },
 
   TEST_REQUIRES => {
-    'Perl::OSType'    => 1.009,
     'Test::Exception' => 0.43,
     'Test::Simple'    => 1.302188,
   },
@@ -55,29 +54,31 @@ WriteMakefile(
     prereqs => {
       runtime => {
         requires => { # v5.14 builtin modules
-          'B'                 => 0,
-          'Carp'              => 0,
-          'Config'            => 0,
-          'constant'          => 0,
-          'Encode'            => 0,
-          'Encode::Alias'     => 0,
-          'Encode::Byte'      => 0,
-          'Encode::Encoding'  => 0,
-          'Encode::Unicode'   => 0,
-          'English'           => 0,
-          'Exporter'          => 0,
-          'IO::File'          => 0,
-          'IO::Handle'        => 0,
-          'List::Util'        => 0,
-          'strict'            => 0,
-          'Scalar::Util'      => 0,
-          'Symbol'            => 0,
-          'threads'           => 0,
-          'threads::shared'   => 0,
-          'warnings'          => 0,
+#          'B'                   => 0,
+          'Carp'                => 0,
+#          'Config'              => 0,
+          'constant'            => 0,
+          'Encode'              => 0,
+#          'Encode::Alias'       => 0,
+#          'Encode::Byte'        => 0,
+#          'Encode::Encoding'    => 0,
+#          'Encode::Unicode'     => 0,
+#          'English'             => 0,
+          'Exporter'            => 0,
+          'IO'                  => 0,
+#          'IO::File'            => 0,
+#          'IO::Handle'          => 0,
+          'Scalar::List::Utils' => 0,
+#          'List::Util'          => 0,
+#          'Scalar::Util'        => 0,
+#          'strict'              => 0,
+#          'Symbol'              => 0,
+          'threads'             => 0,
+          'threads::shared'     => 0,
+#          'warnings'            => 0,
         },
         recommends => {
-          'bytes'         => 0,
+#          'bytes'         => 0,
           'Capture::Tiny' => 0,
           'CLDR::Number'  => 0,
           'DateTime'      => 0,
@@ -89,11 +90,12 @@ WriteMakefile(
       },
       test => {
         requires => { # v5.14 builtin modules
-          'autodie'           => 0,
-          'FindBin'           => 0,
-          'IPC::Open3'        => 0,
-          'POSIX'             => 0,
-          'Time::HiRes'       => 0,
+          'autodie'       => 0,
+          'FindBin'       => 0,
+#          'IPC::Open3'    => 0,
+          'Perl::OSType'  => 0,
+#          'POSIX'         => 0,
+          'Time::HiRes'   => 0,
         },
       },
     },

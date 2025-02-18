@@ -1,0 +1,60 @@
+=head1 AnyEvent-Filesys-Watcher - Watch file system for changes
+
+This is a drop-in replacement for
+LL<https://github.com/mvgrimes/AnyEvent-Filesys-Notify>
+but with fewer dependencies.
+
+See the manual page
+LL<https://github.com/gflohr/AnyEvent-Filesys-Watcher/blob/main/lib/AnyEvent/Filesys/Watcher.pod>
+for details.
+
+=head1 INSTALLATION
+
+Unless your operating system is missing in the list below, you have to
+install a helper module that provides the binding for the kernel
+filesystem watch functionality.
+
+If the command C<cpanm> is not available on your system, see
+L<http://www.cpan.org/modules/INSTALL.html> for instructions on how to
+install Perl modules.
+
+=head2 Linux
+
+Install C<Linux::Inotify2>:
+
+ $ cpanm Linux::Inotify2
+
+=head2 Mac OS
+
+Install a fork of C<Mac::FSEvents>:
+
+ $ git clone https://github.com/skaji/Mac-FSEvents
+ $ cd Mac-FSEvents
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+The current version 0.14 of C<Mac::FSEvents> available on CPAN does not
+build on recent Mac OS versions. This will hopefully change soon.
+
+=head2 MS-DOS "Windows"
+
+Install C<Filesys::Notify::Win32::ReadDirectoryChanges>:
+
+ $ cpanm Filesys::Notify::Win32::ReadDirectoryChanges
+
+=head2 BSD
+
+Install C<IO::KQueue> and C<BSD::Resource>
+
+ $ cpanm IO::KQueue BSD::Resource
+
+This would also work for Mac OS but you have little reason to prefer
+C<IO::KQueue> over C<Mac::FSEvents> unless you are a developer or just
+curious.
+
+=head1 AUTHOR
+
+C<AnyEvent::Filesys::Watcher> was originally written as
+C<AnyEvent::Filesys::Notify> by Mark Grimes, L<mailto:mgrimes@cpan.org> and
+others, and later heavily modifyed by LL<http://www.guido-flohr.net/>.

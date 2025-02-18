@@ -2,13 +2,17 @@ NAME
     DBIx::Migration - Seamless database schema up- and downgrades
 
 SYNOPSIS
+      use DBIx::Migration ();
+
       my $m = DBIx::Migration->new(
-        dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
-        dir => '~/Projects/myapp/db/migrations'
+        dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
       );
 
       # Get current version from database
       my $version = $m->version;
+
+      # Set directory before applying migrations
+      $m->dir( '~/Projects/myapp/db/migrations' );
 
       # Migrate database to version 1
       $m->migrate( 1 );
@@ -18,8 +22,8 @@ SYNOPSIS
 
       # ~/Projects/myapp/db/migrations/schema_1_up.sql
       CREATE TABLE foo (
-          id INTEGER PRIMARY KEY,
-          bar TEXT
+        id INTEGER PRIMARY KEY,
+        bar TEXT
       );
 
       # ~/Projects/myapp/db/migrations/schema_1_down.sql
@@ -27,8 +31,8 @@ SYNOPSIS
 
       # ~/Projects/myapp/db/migrations/schema_2_up.sql
       CREATE TABLE bar (
-          id INTEGER PRIMARY KEY,
-          baz TEXT
+        id INTEGER PRIMARY KEY,
+        baz TEXT
       );
 
       # ~/Projects/myapp/db/migrations/schema_2_down.sql
@@ -39,11 +43,11 @@ DESCRIPTION
     implementation is based on migrations. A migration is a ".sql" script.
     Although not mandatory the script name begins with a prefix like for
     example "schema_". It follows a version number that is a positive
-    integer. After an underscore "_" the script name ends with the migration
-    type that is either "up" or "down". Migrations are stored in a directory
-    and are applied in order to a database. Usually the version number of
-    the first migration is 1. The version numbers of the other migrations
-    have to be ascending without gaps.
+    integer. After an "_" (underscore) character the script name ends with
+    the migration type that is either "up" or "down". Migrations are stored
+    in a directory and are applied in order to a database. Usually the
+    version number of the first migration is 1. The version numbers of the
+    other migrations have to be ascending without gaps.
 
     During processing the content of each migration is read with the
     "binmode" of ":raw" into a scalar. The content is split into sections
@@ -64,50 +68,43 @@ DESCRIPTION
     In the previous example it is the "/" (slash) character.
 
 METHODS
+    $self->BUILD( $args )
+        Validate object.
+
     $self->debug( $debug )
-        Enable/Disable debug messages.
+        Enable/disable debug messages.
 
     $self->dir( $dir )
-        Get/Set directory that contains migrations.
+        Get/set-once directory that contains migrations.
 
-    $self->dsn( $dsn )
-        Get/Set dsn.
+    $self->dsn
+        Get data source name.
 
-    $self->dbh( $dbh )
-        Get/Set dbh.
+    $self->dbh
+        Get database handle.
 
     $self->migrate( $version )
         Migrate database to version. Returns true in case of success;
         otherwise false. If called without the version argument the latest
         migration version will be used.
 
-    $self->password( $password )
-        Get/Set database password.
+    $self->password
+        Get database password.
 
-    $self->username( $username )
-        Get/Set database username.
+    $self->username
+        Get database username.
 
     $self->version
-        Get migration version from database. Will be undef if no migration
+        Get migration version from database. Will be "undef" if no migration
         has taken place yet. The version is stored in the table
-        dbix_migration. The name of this table may change in the future so
+        "dbix_migration". The name of this table may change in the future so
         don't rely on it.
-
-CAVEATS
-    After the "dbh" was used for the first time changing the "dsn",
-    "password", or "username" has no impact. The reason is the mutable
-    (offering setter methods) design of this module. Changing this will
-    break the backwards compatibility.
 
 SEE ALSO
     *   Liquibase endDelimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
 TODOS
-    *   Make the "DBIx::Migration" class immutable (get rid of setters). It
-        is unclear how to handle $dir. This change would break the backwards
-        compatibility.
-
     *   Implement proper logging. Printing debug information to stdout
         conflicts with the stdout output of "DBIx::Migration::CLI".
 

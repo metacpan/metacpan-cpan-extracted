@@ -34,6 +34,7 @@ t/13_provenance.t
 t/14_unzip_path.t
 t/14_verbose_debug.t
 t/15_viz.t
+t/16_bib.t
 t/release-00-pod.t
 t/release-03-minimum-standards.t
 t/release-05-changes.t

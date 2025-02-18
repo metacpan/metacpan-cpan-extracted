@@ -1,5 +1,18 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
+0.12.4 2025-02-17
+  - Require Map::Tube 3.94.
+  - Remove support for Perl 5.10 because of test failing for Perl < 5.11.
+  - BREAKING CHANGE: the attributes name and name_alt have switched their meaning, i.e.,
+    name now contains pinyin names, and name_alt contains the original Chinese names.
+    (This is to make Map::Tube::Beijing play more nicely with standard tools from the
+    Map::Tube universe.)
+  - Enhanced tests.
+  - NOTE: Reorganising the internal IDs is still under consideration.
+
+0.12.3 2024-12-09
+  - Added tests
+
 0.12.3 2024-12-09
   - Added tests
 

@@ -34,11 +34,14 @@ either CPAN or your system's package manager:
 system:
 * `perl` (>= `5.16`)
 * Poppler's `pdfinfo` and `pdftohtml` (optional; for PDF support)
-* One of the following text web browsers:
-  - `elinks`
-  - `links`
-  - `lynx`
-  - `w3m`
+
+The following text web browsers can be installed for **ishmael** to use for
+formatting HTML. If none are installed, **ishmael** will use its own HTML
+formatting script called **queequeg**.
+* `elinks`
+* `links`
+* `lynx`
+* `w3m`
 
 Once the aforementioned dependencies are installed, **ishmael** can then be
 installed via the following commands:

@@ -8,18 +8,15 @@ use File::Temp            qw( tempdir );
 use File::Spec::Functions qw( catdir catfile curdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 18 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
 like exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db' )->version },
   qr/unable to open database file/, 'missing database file';
 
-my $m = DBIx::Migration->new;
-dies_ok { $m->version } '"dsn" not set';
-
 my $tempdir = tempdir( CLEANUP => 1 );
-$m->dsn( 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
+my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
 note 'dsn: ', $m->dsn;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';

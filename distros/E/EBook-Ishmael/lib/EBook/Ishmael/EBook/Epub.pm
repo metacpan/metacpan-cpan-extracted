@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -45,8 +45,16 @@ sub _tmpdir {
 	if (not -l File::Spec->tmpdir) {
 		return tempdir(CLEANUP => 1);
 	# If tmpdir is not available, try working directory.
-	} elsif (! -l cwd and -r cwd) {
+	} elsif (! -l cwd and -w cwd) {
 		return tempdir(DIR => cwd, CLEANUP => 1);
+	# Try HOME environment variable...
+	} elsif (
+		exists $ENV{HOME} and
+		-d $ENV{HOME}     and
+		! -l $ENV{HOME}   and
+		-w $ENV{HOME}
+	) {
+		return tempdir(DIR => $ENV{HOME}, CLEANUP => 1);
 	# Can't think of anything else :-/
 	} else {
 		die "Could not find a suitable extract directory for EPUB\n";

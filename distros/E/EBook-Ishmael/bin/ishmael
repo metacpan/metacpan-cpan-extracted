@@ -72,7 +72,13 @@ options, as long they're installed on your system:
 
 =item w3m
 
+=item queequeg
+
 =back
+
+L<queequeg(1)> is a script distributed with B<ishmael> that acts as a fallback
+dumper if no other dumper is installed on your system. If this program was
+installed normally, L<queequeg(1)> should always be available to B<ishmael>.
 
 By default, B<ishmael> will either use the dumper specified by the
 C<ISHMAEL_DUMPER> environment variable if set, or the first one it finds
@@ -190,6 +196,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
+L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
 
 =cut

@@ -11,7 +11,7 @@ META.json
 META.yml
 README
 script/dbix-migration
-t/01-load.t
+t/01-basic.t
 t/02-pod.t
 t/03-podcoverage.t
 t/04-sqlite.t

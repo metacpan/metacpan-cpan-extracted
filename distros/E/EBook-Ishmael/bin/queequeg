@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use XML::LibXML;
+
+my $HELP = <<"HERE";
+Usage: $0 [options] file
+
+Options:
+  -w|--width=<width>   Max output line width
+  -h|--help            Print this help message
+HERE
+
+my %INLINE = map { $_ => 1 } qw(
+	a img span em i b strong mark s sub small address site sup q wbr time code
+	audio video
+);
+
+my $WIDTH_MAX = 512;
+my $WIDTH_MIN = 10;
+
+my $Columns = 80;
+
+sub wrap {
+
+	my $str = shift;
+
+	my $cm1 = $Columns - 1;
+
+	return $str
+		# Hyphenate long words
+		=~ s/(\S{$cm1})(\S{2,})/$1- $2/gr
+		=~ s/(.{,$Columns})(\s|$)/$1\n/gr;
+
+}
+
+sub para2text {
+
+	my $node = shift;
+
+	return join('', map { _html2text($_) } $node->childNodes) . "\n\n";
+
+}
+
+sub heading2text {
+
+	my $node = shift;
+
+	return uc join('', map { _html2text($_) } $node->childNodes) . "\n\n";
+
+}
+
+sub break2text { "\n" }
+
+sub inline2text {
+
+	my $node = shift;
+
+	return join '', map { _html2text($_) } $node->childNodes;
+
+}
+
+sub item2text {
+
+	my $node = shift;
+
+	return '* ' . join('', map { _html2text($_) } $node->childNodes) . "\n\n";
+
+}
+
+sub _html2text {
+
+	my $node = shift;
+
+	my %handle = (
+		para => {
+			isa => sub { shift eq 'p' },
+			sub => \&para2text,
+		},
+		heading => {
+			isa => sub { shift =~ /^h[1-6]$/ },
+			sub => \&heading2text,
+		},
+		break => {
+			isa => sub { shift eq 'br' },
+			sub => \&break2text,
+		},
+		inline => {
+			isa => sub { exists $INLINE{ shift() } },
+			sub => \&inline2text,
+		},
+		item => {
+			isa => sub { shift eq 'li' },
+			sub => \&item2text,
+		},
+	);
+
+	if (ref $node eq 'XML::LibXML::Element') {
+
+		for my $k (keys %handle) {
+			if ($handle{ $k }->{isa}(lc $node->nodeName)) {
+				return $handle{ $k }->{sub}->($node);
+			}
+		}
+
+		return join('', map { _html2text($_) } $node->childNodes) . "\n\n";
+
+	} elsif (ref $node eq 'XML::LibXML::Text') {
+		return $node->data =~ s/\s+/ /gr;
+	} else {
+		return '';
+	}
+
+}
+
+sub html2text {
+
+	my $node = shift;
+
+	return wrap(
+		_html2text($node)
+			# Trim paragraph whitespace
+			=~ s/^\ +|\ +$//mgr
+			# Truncate spaces
+			=~ s/\ +/ /gr
+	# Truncate paragraph breaks
+	) =~ s/(\s*\n){3,}/\n\n/gr;
+
+}
+
+sub main {
+
+	my $param = {
+		Html  => undef,
+		Width => 80,
+	};
+
+	Getopt::Long::config('bundling');
+	GetOptions(
+		'width|w=i' => \$param->{Width},
+		'help|h' => sub { print $HELP; exit 0 },
+	) or die "Error in command line arguments\n";
+
+	$param->{Html} = shift @ARGV or die $HELP;
+
+	unless ($param->{Width} >= $WIDTH_MIN and $param->{Width} <= $WIDTH_MAX) {
+		die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
+	}
+
+	$Columns = $param->{Width};
+
+	binmode *STDOUT, ':utf8';
+
+	my $dom = XML::LibXML->load_html(
+		location => $param->{Html},
+		recover => 2,
+		encoding => 'utf8',
+	);
+
+	my ($body) = $dom->findnodes('/html/body');
+
+	$body //= $dom->documentElement;
+
+	say html2text($body);
+
+	1;
+
+}
+
+main;
+
+=head1 NAME
+
+queequeg - Formatted HTML dumper for ishmael
+
+=head1 SYNOPSIS
+
+  queequeg [options] file
+
+=head1 DESCRIPTION
+
+B<queequeg> is a script that reads a given HTML file and dumps its formatted
+contents to F<stdout>. It's designed to be L<ishmael>'s fallback dumper if no
+other valid one is installed on your system. It tries to do as minimal
+formatting as possible, which some users might find preferrable over the more
+advanced formatting other dumpers are capable of.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-w>|B<--width>=I<width>
+
+Specify maximum output line width. Defaults to C<80>.
+
+=item B<-h>|B<--help>
+
+Print help message and exit.
+
+=back
+
+=head1 RESTRICTIONS
+
+It's slow.
+
+It doesn't do much formatting. It mainly just splits the given file's text into
+seperate paragraphs and makes sure their contents are within the line width. If
+more advanced formatting is desired, you should use one of the alternative
+dumpers L<ishmael> supports.
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg Page|https://codeberg.org/1-1sam/ishmael>. Comments and pull
+requests are welcome!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+L<ishmael(1)>, L<lynx(1)>, L<links(1)>, L<elinks(1)>, L<w3m(1)>
+
+=cut

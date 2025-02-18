@@ -26,4 +26,4 @@ CREATE TRIGGER price_changes
   BEFORE UPDATE
   ON myschema.products
   FOR EACH ROW
-  EXECUTE FUNCTION myschema.log_price_changes();
+  EXECUTE PROCEDURE myschema.log_price_changes();

@@ -1,3 +1,12 @@
+0.03 2025-02-17T13:53:04+01:00
+ - Add basic run() tests.
+ - Add constructor tests.
+ - Fix help.
+ - Fix required options of tool.
+ - Improve help.
+ - Provision fix of P31 check (add support for translated edition).
+ - Update copyright years.
+
 0.02 2024-11-26T15:50:21+01:00
  - Fix fetching of number of pages.
  - Rewrite queries to accept 'mul' language.

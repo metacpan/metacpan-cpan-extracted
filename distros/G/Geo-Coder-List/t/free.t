@@ -63,7 +63,7 @@ FREE: {
 			->push({ regex => qr/^[\w\s]+,\s*[\w\s],\s*(UK|England|Wales|Scotland)$/i, geocoder => $geo_coder_free })
 			->push(new_ok('Geo::Coder::Free::Local'));
 
-		ok(!defined($geo_coder_list->geocode()));
+		dies_ok { $geo_coder_list->geocode() } 'no args given to geocode dies';
 
 		cmp_deeply($geo_coder_list->geocode('NCBI, MEDLARS DR, BETHESDA, MONTGOMERY, MD, USA'),
 			methods('lat' => num(39.00, 1e-2), 'long' => num(-77.10, 1e-2)));
