@@ -21,7 +21,7 @@ subtest '-V' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( '-V' ) } "Version:\n  0.13\n\n", 'check stdout';
+  stdout_is { $got_exitval = $coderef->( '-V' ) } "Version:\n  0.14\n\n", 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
@@ -64,7 +64,7 @@ subtest 'version is undefined' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( $dsn ) } '', 'check stdout';
+  stdout_is { $got_exitval = $coderef->( $dsn ) } "\n", 'check stdout';
   is $got_exitval, 0, 'check exit value';
 };
 
@@ -81,7 +81,7 @@ subtest 'version is 0' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( $dsn ) } '0', 'check stdout';
+  stdout_is { $got_exitval = $coderef->( $dsn ) } "0\n", 'check stdout';
   is $got_exitval, 0, 'check exit value';
 };
 
@@ -97,7 +97,7 @@ subtest 'version is latest' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( $dsn ) } '2', 'check stdout';
+  stdout_is { $got_exitval = $coderef->( $dsn ) } "2\n", 'check stdout';
   is $got_exitval, 0, 'check exit value';
 };
 

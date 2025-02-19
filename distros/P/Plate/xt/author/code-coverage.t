@@ -3,7 +3,7 @@ use Test::More tests => 3;
 use Devel::Cover::DB;
 
 my @criteria = qw(subroutine statement branch);
-my $db = new Devel::Cover::DB db => 'cover_db';
+my $db = Devel::Cover::DB->new(db => 'cover_db');
 merge_runs $db;
 calculate_summary $db map { $_ => 1 } @criteria;
 

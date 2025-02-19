@@ -3,7 +3,7 @@ package Terse::Helper;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Cwd qw/cwd/;
 use Module::Generate;
 use base 'Terse';
@@ -395,7 +395,7 @@ Terse::Helper - Utility for generating Terse skeleton code.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

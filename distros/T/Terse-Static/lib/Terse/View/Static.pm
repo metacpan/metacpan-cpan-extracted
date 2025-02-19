@@ -60,7 +60,7 @@ Terse::View::Static - Serve static resources view
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

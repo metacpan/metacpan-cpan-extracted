@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.45';
+$Map::Tube::Plugin::Graph::VERSION   = '0.46';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =cut
 
@@ -107,10 +107,10 @@ sub as_graph {
   my $g = Graph->new(multiedged=>1);
   my (%station2line, %station2station);
   for my $station (@{ $self->get_stations }) {
-    my $from = $station->name;
+    my $from = $station->id;
     @{ $station2line{$from} }{ map $_->name, @{$station->line} } = ();
     @{ $station2station{$from} }{
-      map $self->get_node_by_id($_)->name, split /\,/,$station->link
+      map $self->get_node_by_id($_)->id, split /\,/,$station->link
     } = ();
   }
   for my $from (keys %station2station) {
@@ -222,7 +222,7 @@ L<https://metacpan.org/dist/Map-Tube-Plugin-Graph>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
 
 This program is free software; you can redistribute it and / or modify it under
 the terms of the the Artistic License (2.0). You may obtain a copy of the full

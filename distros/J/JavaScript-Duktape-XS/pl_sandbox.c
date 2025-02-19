@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "pl_util.h"
 #include "pl_sandbox.h"
-#include "ppport.h"
 
 #define SANDBOX_DEBUG_MEMORY   0
 #define SANDBOX_DEBUG_RUNTIME  0

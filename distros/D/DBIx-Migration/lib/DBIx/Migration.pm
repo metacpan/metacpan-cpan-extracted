@@ -1,24 +1,24 @@
-use strict;
-use warnings;
-
 package DBIx::Migration;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
 use MooX::SetOnce;
+use MooX::StrictConstructor;
 
-use DBI                   qw();
-use File::Slurp           qw();
-use File::Spec::Functions qw();
-use Try::Tiny             qw();
+use DBI                     ();
+use DBI::Const::GetInfoType qw( %GetInfoType );
+use File::Slurp             qw( read_file );
+use File::Spec::Functions   qw( catfile );
+use Log::Any                qw( $Logger );
+use Try::Tiny               qw( catch try );
 
-use namespace::clean -except => [ qw( before ) ];
+use namespace::clean -except => [ qw( before new ) ];
 
-has dbh                             => ( is => 'lazy' );
-has debug                           => ( is => 'rw' );
-has dir                             => ( is => 'rw', once => 1 );
-has [ qw( dsn password username ) ] => ( is => 'ro' );
+has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
+has tracking_table                    => ( is => 'lazy', init_arg => undef );
+has dir                               => ( is => 'rw',   once     => 1 );
+has [ qw( password username ) ]       => ( is => 'ro' );
 
 sub _build_dbh {
   my $self = shift;
@@ -33,6 +33,28 @@ sub _build_dbh {
       AutoCommit => 1    # see below "begin_work" based transaction handling
     }
   );
+}
+
+sub _build_dsn {
+  my $self = shift;
+
+  return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
+}
+
+sub _build_tracking_schema {
+  my $self = shift;
+
+  if ( my ( undef, $driver ) = DBI->parse_dsn( $self->dsn ) ) {
+    return 'public' if $driver eq 'Pg';
+  }
+  return;
+}
+
+sub _build_tracking_table {
+  my $self = shift;
+
+  my $tracking_schema = $self->tracking_schema;
+  return ( defined $tracking_schema ? "$tracking_schema." : '' ) . 'dbix_migration';
 }
 
 sub BUILD {
@@ -57,19 +79,19 @@ sub migrate {
   $wanted = $self->_latest unless defined $wanted;
 
   my $fatal_error;
-  my $return_value = Try::Tiny::try {
+  my $return_value = try {
     my $version = $self->version;
 
     # enable transaction turning AutoCommit off
     $self->{ _dbh } = $self->dbh->clone( {} );
     $self->{ _dbh }->begin_work;
 
-    $self->_create_migration_table, $version = 0 unless defined $version;
+    $self->_create_tracking_table, $version = 0 unless defined $version;
 
     my @need;
     my $type;
     if ( $wanted == $version ) {
-      print qq/Database is already at version $wanted\n/ if $self->debug;
+      $Logger->debugf( 'Database is already at migration version %d', $wanted );
       return 1;
     } elsif ( $wanted > $version ) {    # upgrade
       $type = 'up';
@@ -85,31 +107,29 @@ sub migrate {
       for my $file ( @$files ) {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
-        print qq/Processing "$name"\n/ if $self->debug;
-        my $text      = File::Slurp::read_file( $name );
+        $Logger->debugf( "Processing migration '%s'", $name );
+        my $text      = read_file( $name );
         my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
-        print qq/Delimiter is $delimiter\n/ if $self->debug;
+        $Logger->debugf( "Migration section delimiter is '%s'", $delimiter );
         $text =~ s/\s*--.*$//mg;
         for my $sql ( split /$delimiter/, $text ) {
           $sql =~ s/\A\s*//;
           next unless $sql =~ /\w/;
-          print qq/$sql\n/ if $self->debug;
           # prepend $sql to error message
           local $self->{ _dbh }->{ HandleError } = sub { $_[ 0 ] = "$sql\n$_[0]"; return 0; };
           $self->{ _dbh }->do( $sql );
         }
         $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
-        $self->_update_migration_table( $ver );
+        $self->_update_tracking_table( $ver );
       }
       return 1;
     } else {
       my $newver = $self->version;
-      print qq/Database is at version $newver, couldn't migrate to version $wanted\n/
-        if ( $self->debug && ( $wanted != $newver ) );
+      $Logger->debugf( "Database is at version %d, couldn't migrate to version %d", $newver, $wanted )
+        if $wanted != $newver;
       return 0;
     }
-  }
-  Try::Tiny::catch {
+  } catch {
     $fatal_error = $_;
   };
 
@@ -129,8 +149,10 @@ sub version {
 
   my $dbh = $self->dbh;
   eval {
-    my $sth = $dbh->prepare( <<'EOF');
-SELECT value FROM dbix_migration WHERE name = ?;
+    my $tracking_table = $self->tracking_table;
+    $Logger->debugf( "Reading tracking table '%s'", $tracking_table );
+    my $sth = $dbh->prepare( <<"EOF");
+SELECT value FROM $tracking_table WHERE name = ?;
 EOF
     $sth->execute( 'version' );
     my $version = undef;
@@ -151,8 +173,8 @@ sub _files {
       or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
     while ( my $file = readdir( $dh ) ) {
       next unless $file =~ /\D*${i}_$type\.sql\z/;
-      $file = File::Spec::Functions::catfile( $self->dir, $file );
-      print qq/Found "$file"\n/ if $self->debug;
+      $file = catfile( $self->dir, $file );
+      $Logger->debugf( "Found migration '%s'", $file );
       push @files, { name => $file, version => $i };
     }
     closedir( $dh );
@@ -177,22 +199,26 @@ sub _latest {
   return $latest;
 }
 
-sub _create_migration_table {
+sub _create_tracking_table {
   my $self = shift;
 
-  $self->{ _dbh }->do( <<'EOF');
-CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+  my $tracking_table = $self->tracking_table;
+  $Logger->debugf( "Creating tracking table '%s'", $tracking_table );
+  $self->{ _dbh }->do( <<"EOF");
+CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
-  $self->{ _dbh }->do( <<'EOF', undef, 'version', 0 );
-INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
+  $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
+INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? );
 EOF
 }
 
-sub _update_migration_table {
+sub _update_tracking_table {
   my ( $self, $version ) = @_;
 
-  $self->{ _dbh }->do( <<'EOF', undef, $version, 'version' );
-UPDATE dbix_migration SET value = ? WHERE name = ?;
+  my $tracking_table = $self->tracking_table;
+  $Logger->debugf( "Updating tracking table '%s'", $tracking_table );
+  $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
+UPDATE $tracking_table SET value = ? WHERE name = ?;
 EOF
 }
 

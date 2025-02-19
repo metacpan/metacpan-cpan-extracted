@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Stockholm Rail Network">
+  <lines>
+    <!-- Pendeltåg (Commuter Rail) -->
+    <line id="ST_40" name="40" color="#F266A6"/>
+    <line id="ST_41" name="41" color="#F266A6"/>
+    <line id="ST_42" name="42" color="#F266A6"/>
+    <line id="ST_43" name="43" color="#F266A6"/>
+    <line id="ST_44" name="44" color="#F266A6"/>
+    <line id="ST_48" name="48" color="#F266A6"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_BLA" name="Blå linjen (10)" color="#0296D9"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_BLA1" name="Blå linjen (11)" color="#0296D9"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_GRONA" name="Gröna linjen (17)" color="#1EB25A"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_GRONA1" name="Gröna linjen (18)" color="#1EB25A"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_GRONA2" name="Gröna linjen (19)" color="#1EB25A"/>
+    <!-- Spårvagn (Tram) -->
+    <line id="ST_LIDING" name="Lidingöbanan (21)" color="#B66931"/>
+    <!-- Spårvagn (Tram) -->
+    <line id="ST_NOCKEB" name="Nockebybanan (12)" color="#728CA5"/>
+    <!-- Lokalbana (Light rail) -->
+    <line id="ST_ROSLAG" name="Roslagsbanan (27)" color="#A25EA6"/>
+    <!-- Lokalbana (Light rail) -->
+    <line id="ST_ROSLAG1" name="Roslagsbanan (28)" color="#A25EA6"/>
+    <!-- Lokalbana (Light rail) -->
+    <line id="ST_ROSLAG2" name="Roslagsbanan (29)" color="#A25EA6"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_RODA" name="Röda linjen (13)" color="#E61E26"/>
+    <!-- Tunnelbana (Metro) -->
+    <line id="ST_RODA1" name="Röda linjen (14)" color="#E61E26"/>
+    <!-- Lokalbana (Light rail) -->
+    <line id="ST_SALTSJ" name="Saltsjöbanan (25)" color="#03AAAE"/>
+    <!-- Lokalbana (Light rail) -->
+    <line id="ST_SALTSJ1" name="Saltsjöbanan (26)" color="#03AAAE"/>
+    <!-- Spårvagn (Tram) -->
+    <line id="ST_SPARVA" name="Spårväg City (7)" color="#818580"/>
+    <!-- Spårvagn (Tram) -->
+    <line id="ST_TVARBA" name="Tvärbanan (30)" color="#E3861E"/>
+    <!-- Spårvagn (Tram) -->
+    <line id="ST_TVARBA1" name="Tvärbanan (31)" color="#E3861E"/>
+  </lines>
+  <stations>
+    <!-- 40 -->
+    <station id="st_4001" name="Uppsala centrum" line="ST_40:1" link="st_4002"/>
+    <station id="st_4002" name="Arlanda centrum" line="ST_40:2" link="st_4001,st_4003"/>
+    <station id="st_4003" name="Upplands Väsby" line="ST_40:3,ST_41:3,ST_42:3" link="st_4002,st_4004,st_4102"/>
+    <station id="st_4004" name="Rotebro" line="ST_40:4,ST_41:4,ST_42:4" link="st_4003,st_4005"/>
+    <station id="st_4005" name="Norrviken" line="ST_40:5,ST_41:5,ST_42:5" link="st_4004,st_4006"/>
+    <station id="st_4006" name="Häggvik" line="ST_40:6,ST_41:6,ST_42:6" link="st_4005,st_4007"/>
+    <station id="st_4007" name="Sollentuna" line="ST_40:7,ST_41:7,ST_42:7" link="st_4006,st_4008"/>
+    <station id="st_4008" name="Helenelund" line="ST_40:8,ST_41:8,ST_42:8" link="st_4007,st_4009"/>
+    <station id="st_4009" name="Ulriksdal" line="ST_40:9,ST_41:9,ST_42:9" link="st_4008,st_4010"/>
+    <station id="st_4010" name="Solna" line="ST_40:10,ST_41:10,ST_42:10" link="st_4009,st_grona18" other_link="walk:st_tvarba01"/>
+    <station id="st_grona18" name="Odenplan" line="ST_40:11,ST_41:11,ST_42:11,ST_43:9,ST_44:9,ST_GRONA:18,ST_GRONA1:18,ST_GRONA2:18" link="st_4010,st_4308,st_bla13,st_grona17,st_grona19"/>
+    <station id="st_bla13" name="T-Centralen" line="ST_40:12,ST_41:12,ST_42:12,ST_43:10,ST_44:10,ST_BLA:13,ST_BLA1:11,ST_GRONA:21,ST_GRONA1:21,ST_GRONA2:21,ST_RODA:5,ST_RODA1:8,ST_SPARVA:1" link="st_4013,st_bla12,st_bla14,st_grona18,st_grona20,st_roda04,st_roda06"/>
+    <station id="st_4013" name="Stockholms södra" line="ST_40:13,ST_41:13,ST_42:13,ST_43:11,ST_44:11" link="st_bla13,st_tvarba16" other_link="walk:st_roda08"/>
+    <station id="st_tvarba16" name="Årstaberg" line="ST_40:14,ST_41:14,ST_42:14,ST_43:12,ST_44:12,ST_TVARBA:16" link="st_4013,st_4015,st_tvarba15,st_tvarba17"/>
+    <station id="st_4015" name="Älvsjö" line="ST_40:15,ST_41:15,ST_42:15,ST_43:13,ST_44:13" link="st_4016,st_grona135,st_tvarba16"/>
+    <station id="st_4016" name="Stuvsta" line="ST_40:16,ST_41:16,ST_44:14" link="st_4015,st_4017"/>
+    <station id="st_4017" name="Huddinge" line="ST_40:17,ST_41:17,ST_44:15" link="st_4016,st_4018"/>
+    <station id="st_4018" name="Flemingsberg" line="ST_40:18,ST_41:18,ST_44:16" link="st_4017,st_4019"/>
+    <station id="st_4019" name="Tullinge" line="ST_40:19,ST_41:19,ST_44:17" link="st_4018,st_4020"/>
+    <station id="st_4020" name="Tumba" line="ST_40:20,ST_41:20,ST_44:18" link="st_4019,st_4021"/>
+    <station id="st_4021" name="Rönninge" line="ST_40:21,ST_41:21,ST_44:19" link="st_4020,st_4022"/>
+    <station id="st_4022" name="Östertälje" line="ST_40:22,ST_41:22,ST_44:20" link="st_4021,st_4023"/>
+    <station id="st_4023" name="Södertälje hamn" line="ST_40:23,ST_41:23,ST_44:21,ST_48:2" link="st_4022,st_4024,st_4803"/>
+    <station id="st_4024" name="Södertälje centrum" line="ST_40:24,ST_41:24,ST_44:22,ST_48:1" link="st_4023"/>
+    <!-- 41 -->
+    <station id="st_4101" name="Märsta" line="ST_41:1,ST_42:1" link="st_4102"/>
+    <station id="st_4102" name="Rosersberg" line="ST_41:2,ST_42:2" link="st_4003,st_4101"/>
+    <!-- 42 -->
+    <station id="st_grona135" name="Farsta strand" line="ST_42:16,ST_43:14,ST_GRONA1:35" link="st_4015,st_4217,st_grona134"/>
+    <station id="st_4217" name="Trångsund" line="ST_42:17,ST_43:15" link="st_4218,st_grona135"/>
+    <station id="st_4218" name="Skogås" line="ST_42:18,ST_43:16" link="st_4217,st_4219"/>
+    <station id="st_4219" name="Vega" line="ST_42:19,ST_43:17" link="st_4218,st_4220"/>
+    <station id="st_4220" name="Handen" line="ST_42:20,ST_43:18" link="st_4219,st_4221"/>
+    <station id="st_4221" name="Jordbro" line="ST_42:21,ST_43:19" link="st_4220,st_4222"/>
+    <station id="st_4222" name="Västerhaninge" line="ST_42:22,ST_43:20" link="st_4221,st_4223"/>
+    <station id="st_4223" name="Krigslida" line="ST_42:23,ST_43:21" link="st_4222,st_4224"/>
+    <station id="st_4224" name="Tungelsta" line="ST_42:24,ST_43:22" link="st_4223,st_4225"/>
+    <station id="st_4225" name="Hemfosa" line="ST_42:25,ST_43:23" link="st_4224,st_4226"/>
+    <station id="st_4226" name="Segersäng" line="ST_42:26,ST_43:24" link="st_4225,st_4227"/>
+    <station id="st_4227" name="Ösmo" line="ST_42:27,ST_43:25" link="st_4226,st_4228"/>
+    <station id="st_4228" name="Nynäsgård" line="ST_42:28,ST_43:26" link="st_4227,st_4229"/>
+    <station id="st_4229" name="Gröndalsviken" line="ST_42:29,ST_43:27" link="st_4228,st_4230"/>
+    <station id="st_4230" name="Nynäshamn" line="ST_42:30,ST_43:28" link="st_4229"/>
+    <!-- 43 -->
+    <station id="st_4301" name="Bålsta" line="ST_43:1,ST_44:1" link="st_4302"/>
+    <station id="st_4302" name="Bro" line="ST_43:2,ST_44:2" link="st_4301,st_4303"/>
+    <station id="st_4303" name="Kungsängen" line="ST_43:3,ST_44:3" link="st_4302,st_4304"/>
+    <station id="st_4304" name="Kallhäll" line="ST_43:4,ST_44:4" link="st_4303,st_4305"/>
+    <station id="st_4305" name="Jakobsberg" line="ST_43:5,ST_44:5" link="st_4304,st_4306"/>
+    <station id="st_4306" name="Barkarby" line="ST_43:6,ST_44:6" link="st_4305,st_4307"/>
+    <station id="st_4307" name="Spånga" line="ST_43:7,ST_44:7" link="st_4306,st_4308"/>
+    <station id="st_4308" name="Sundbyberg" line="ST_43:8,ST_44:8" link="st_4307,st_grona18" other_link="walk:st_bla06"/>
+    <!-- 44 -->
+    <!-- 48 -->
+    <station id="st_4803" name="Södertälje syd" line="ST_48:3" link="st_4023,st_4804"/>
+    <station id="st_4804" name="Järna" line="ST_48:4" link="st_4803,st_4805"/>
+    <station id="st_4805" name="Mölnbo" line="ST_48:5" link="st_4804,st_4806"/>
+    <station id="st_4806" name="Gnesta" line="ST_48:6" link="st_4805"/>
+    <!-- Blå linjen (10) -->
+    <station id="st_bla01" name="Hjulsta" line="ST_BLA:1" link="st_bla02"/>
+    <station id="st_bla02" name="Tensta" line="ST_BLA:2" link="st_bla01,st_bla03"/>
+    <station id="st_bla03" name="Rinkeby" line="ST_BLA:3" link="st_bla02,st_bla04"/>
+    <station id="st_bla04" name="Rissne" line="ST_BLA:4" link="st_bla03,st_bla05"/>
+    <station id="st_bla05" name="Duvbo" line="ST_BLA:5" link="st_bla04,st_bla06"/>
+    <station id="st_bla06" name="Sundbybergs centrum" line="ST_BLA:6,ST_TVARBA:4" link="st_bla05,st_bla07,st_tvarba03,st_tvarba05" other_link="walk:st_4308"/>
+    <station id="st_bla07" name="Solna strand" line="ST_BLA:7" link="st_bla06,st_bla08"/>
+    <station id="st_bla08" name="Huvudsta" line="ST_BLA:8" link="st_bla07,st_bla09"/>
+    <station id="st_bla09" name="Västra skogen" line="ST_BLA:9,ST_BLA1:7" link="st_bla08,st_bla10,st_bla106"/>
+    <station id="st_bla10" name="Stadshagen" line="ST_BLA:10,ST_BLA1:8" link="st_bla09,st_bla11"/>
+    <station id="st_bla11" name="Fridhemsplan" line="ST_BLA:11,ST_BLA1:9,ST_GRONA:16,ST_GRONA1:16,ST_GRONA2:16" link="st_bla10,st_bla12,st_grona15,st_grona17"/>
+    <station id="st_bla12" name="Rådhuset" line="ST_BLA:12,ST_BLA1:10" link="st_bla11,st_bla13"/>
+    <station id="st_bla14" name="Kungsträdgården" line="ST_BLA:14,ST_BLA1:12,ST_SPARVA:2" link="st_bla13,st_sparva03"/>
+    <!-- Blå linjen (11) -->
+    <station id="st_bla101" name="Akalla" line="ST_BLA1:1" link="st_bla102"/>
+    <station id="st_bla102" name="Husby" line="ST_BLA1:2" link="st_bla101,st_bla103"/>
+    <station id="st_bla103" name="Kista" line="ST_BLA1:3" link="st_bla102,st_bla104"/>
+    <station id="st_bla104" name="Hallonbergen" line="ST_BLA1:4" link="st_bla103,st_bla105"/>
+    <station id="st_bla105" name="Näckrosen" line="ST_BLA1:5" link="st_bla104,st_bla106"/>
+    <station id="st_bla106" name="Solna centrum" line="ST_BLA1:6,ST_TVARBA:2" link="st_bla09,st_bla105,st_tvarba01,st_tvarba03"/>
+    <!-- Gröna linjen (17) -->
+    <station id="st_grona01" name="Hässelby strand" line="ST_GRONA:1,ST_GRONA1:1,ST_GRONA2:1" link="st_grona02"/>
+    <station id="st_grona02" name="Hässelby gård" line="ST_GRONA:2,ST_GRONA1:2,ST_GRONA2:2" link="st_grona01,st_grona03"/>
+    <station id="st_grona03" name="Johannelund" line="ST_GRONA:3,ST_GRONA1:3,ST_GRONA2:3" link="st_grona02,st_grona04"/>
+    <station id="st_grona04" name="Vällingby" line="ST_GRONA:4,ST_GRONA1:4,ST_GRONA2:4" link="st_grona03,st_grona05"/>
+    <station id="st_grona05" name="Råcksta" line="ST_GRONA:5,ST_GRONA1:5,ST_GRONA2:5" link="st_grona04,st_grona06"/>
+    <station id="st_grona06" name="Blackeberg" line="ST_GRONA:6,ST_GRONA1:6,ST_GRONA2:6" link="st_grona05,st_grona07"/>
+    <station id="st_grona07" name="Islandstorget" line="ST_GRONA:7,ST_GRONA1:7,ST_GRONA2:7" link="st_grona06,st_grona08"/>
+    <station id="st_grona08" name="Ängbyplan" line="ST_GRONA:8,ST_GRONA1:8,ST_GRONA2:8" link="st_grona07,st_grona09"/>
+    <station id="st_grona09" name="åkeshov" line="ST_GRONA:9,ST_GRONA1:9,ST_GRONA2:9" link="st_grona08,st_grona10"/>
+    <station id="st_grona10" name="Brommaplan" line="ST_GRONA:10,ST_GRONA1:10,ST_GRONA2:10" link="st_grona09,st_grona11"/>
+    <station id="st_grona11" name="Abrahamsberg" line="ST_GRONA:11,ST_GRONA1:11,ST_GRONA2:11" link="st_grona10,st_grona12"/>
+    <station id="st_grona12" name="Stora mossen" line="ST_GRONA:12,ST_GRONA1:12,ST_GRONA2:12" link="st_grona11,st_grona13"/>
+    <station id="st_grona13" name="Alvik" line="ST_GRONA:13,ST_GRONA1:13,ST_GRONA2:13,ST_NOCKEB:10,ST_TVARBA:9,ST_TVARBA1:5" link="st_grona12,st_grona14,st_nockeb09,st_tvarba08,st_tvarba10"/>
+    <station id="st_grona14" name="Kristineberg" line="ST_GRONA:14,ST_GRONA1:14,ST_GRONA2:14" link="st_grona13,st_grona15"/>
+    <station id="st_grona15" name="Thorildsplan" line="ST_GRONA:15,ST_GRONA1:15,ST_GRONA2:15" link="st_bla11,st_grona14"/>
+    <station id="st_grona17" name="S:t Eriksplan" line="ST_GRONA:17,ST_GRONA1:17,ST_GRONA2:17" link="st_bla11,st_grona18"/>
+    <station id="st_grona19" name="Rådmansgatan" line="ST_GRONA:19,ST_GRONA1:19,ST_GRONA2:19" link="st_grona18,st_grona20"/>
+    <station id="st_grona20" name="Hötorget" line="ST_GRONA:20,ST_GRONA1:20,ST_GRONA2:20" link="st_bla13,st_grona19"/>
+    <station id="st_roda06" name="Gamla stan" line="ST_GRONA:22,ST_GRONA1:22,ST_GRONA2:22,ST_RODA:6,ST_RODA1:9" link="st_bla13,st_roda07"/>
+    <station id="st_roda07" name="Slussen" line="ST_GRONA:23,ST_GRONA1:23,ST_GRONA2:23,ST_RODA:7,ST_RODA1:10,ST_SALTSJ:1" link="st_grona24,st_roda06,st_roda08,st_saltsj02"/>
+    <station id="st_grona24" name="Medborgarplatsen" line="ST_GRONA:24,ST_GRONA1:24,ST_GRONA2:24" link="st_grona25,st_roda07"/>
+    <station id="st_grona25" name="Skanstull" line="ST_GRONA:25,ST_GRONA1:25,ST_GRONA2:25" link="st_grona24,st_grona26"/>
+    <station id="st_grona26" name="Gullmarsplan" line="ST_GRONA:26,ST_GRONA1:26,ST_GRONA2:26,ST_TVARBA:21" link="st_grona227,st_grona25,st_grona27,st_tvarba22"/>
+    <station id="st_grona27" name="Skärmarbrink" line="ST_GRONA:27,ST_GRONA1:27" link="st_grona128,st_grona26,st_grona28"/>
+    <station id="st_grona28" name="Hammarbyhöjden" line="ST_GRONA:28" link="st_grona27,st_grona29"/>
+    <station id="st_grona29" name="Björkhagen" line="ST_GRONA:29" link="st_grona28,st_grona30"/>
+    <station id="st_grona30" name="Kärrtorp" line="ST_GRONA:30" link="st_grona29,st_grona31"/>
+    <station id="st_grona31" name="Bagarmossen" line="ST_GRONA:31" link="st_grona30,st_grona32"/>
+    <station id="st_grona32" name="Skarpnäck" line="ST_GRONA:32" link="st_grona31"/>
+    <!-- Gröna linjen (18) -->
+    <station id="st_grona128" name="Blåsut" line="ST_GRONA1:28" link="st_grona129,st_grona27"/>
+    <station id="st_grona129" name="Sandsborg" line="ST_GRONA1:29" link="st_grona128,st_grona130"/>
+    <station id="st_grona130" name="Skogskyrkogården" line="ST_GRONA1:30" link="st_grona129,st_grona131"/>
+    <station id="st_grona131" name="Tallkrogen" line="ST_GRONA1:31" link="st_grona130,st_grona132"/>
+    <station id="st_grona132" name="Gubbängen" line="ST_GRONA1:32" link="st_grona131,st_grona133"/>
+    <station id="st_grona133" name="Hökarängen" line="ST_GRONA1:33" link="st_grona132,st_grona134"/>
+    <station id="st_grona134" name="Farsta" line="ST_GRONA1:34" link="st_grona133,st_grona135"/>
+    <!-- Gröna linjen (19) -->
+    <station id="st_grona227" name="Globen" line="ST_GRONA2:27,ST_TVARBA:20" link="st_grona228,st_grona26,st_tvarba19"/>
+    <station id="st_grona228" name="Enskede gård" line="ST_GRONA2:28" link="st_grona227,st_grona229"/>
+    <station id="st_grona229" name="Sockenplan" line="ST_GRONA2:29" link="st_grona228,st_grona230"/>
+    <station id="st_grona230" name="Svedmyra" line="ST_GRONA2:30" link="st_grona229,st_grona231"/>
+    <station id="st_grona231" name="Stureby" line="ST_GRONA2:31" link="st_grona230,st_grona232"/>
+    <station id="st_grona232" name="Bandhagen" line="ST_GRONA2:32" link="st_grona231,st_grona233"/>
+    <station id="st_grona233" name="Högdalen" line="ST_GRONA2:33" link="st_grona232,st_grona234"/>
+    <station id="st_grona234" name="Rågsved" line="ST_GRONA2:34" link="st_grona233,st_grona235"/>
+    <station id="st_grona235" name="Hagsätra" line="ST_GRONA2:35" link="st_grona234"/>
+    <!-- Lidingöbanan (21) -->
+    <station id="st_roda01" name="Ropsten" line="ST_LIDING:1,ST_RODA:1" link="st_liding02,st_roda02"/>
+    <station id="st_liding02" name="Torsvik" line="ST_LIDING:2" link="st_liding03,st_roda01"/>
+    <station id="st_liding03" name="Baggeby" line="ST_LIDING:3" link="st_liding02,st_liding04"/>
+    <station id="st_liding04" name="Bodal" line="ST_LIDING:4" link="st_liding03,st_liding05"/>
+    <station id="st_liding05" name="Larsberg" line="ST_LIDING:5" link="st_liding04,st_liding06"/>
+    <station id="st_liding06" name="AGA" line="ST_LIDING:6" link="st_liding05,st_liding07"/>
+    <station id="st_liding07" name="Skärsätra" line="ST_LIDING:7" link="st_liding06,st_liding08"/>
+    <station id="st_liding08" name="Kottla" line="ST_LIDING:8" link="st_liding07,st_liding09"/>
+    <station id="st_liding09" name="Högberga" line="ST_LIDING:9" link="st_liding08,st_liding10"/>
+    <station id="st_liding10" name="Brevik" line="ST_LIDING:10" link="st_liding09,st_liding11"/>
+    <station id="st_liding11" name="Käppala" line="ST_LIDING:11" link="st_liding10,st_liding12"/>
+    <station id="st_liding12" name="Gåshaga" line="ST_LIDING:12" link="st_liding11,st_liding13"/>
+    <station id="st_liding13" name="Gåshaga brygga" line="ST_LIDING:13" link="st_liding12"/>
+    <!-- Nockebybanan (12) -->
+    <station id="st_nockeb01" name="Nockeby" line="ST_NOCKEB:1" link="st_nockeb02"/>
+    <station id="st_nockeb02" name="Nockeby torg" line="ST_NOCKEB:2" link="st_nockeb01,st_nockeb03"/>
+    <station id="st_nockeb03" name="Olovslund" line="ST_NOCKEB:3" link="st_nockeb02,st_nockeb04"/>
+    <station id="st_nockeb04" name="Höglandstorget" line="ST_NOCKEB:4" link="st_nockeb03,st_nockeb05"/>
+    <station id="st_nockeb05" name="ålstens gård" line="ST_NOCKEB:5" link="st_nockeb04,st_nockeb06"/>
+    <station id="st_nockeb06" name="ålstens gatan" line="ST_NOCKEB:6" link="st_nockeb05,st_nockeb07"/>
+    <station id="st_nockeb07" name="Smedslätten" line="ST_NOCKEB:7" link="st_nockeb06,st_nockeb08"/>
+    <station id="st_nockeb08" name="Klövervägen" line="ST_NOCKEB:8" link="st_nockeb07,st_nockeb09"/>
+    <station id="st_nockeb09" name="Alléparken" line="ST_NOCKEB:9" link="st_grona13,st_nockeb08"/>
+    <!-- Roslagsbanan (27) -->
+    <station id="st_roslag01" name="Stockholms Östra" line="ST_ROSLAG:1,ST_ROSLAG1:1,ST_ROSLAG2:1" link="st_roda104" other_link="walk:st_roda105"/>
+    <station id="st_roda104" name="Universitetet" line="ST_RODA1:4,ST_ROSLAG:2,ST_ROSLAG1:2,ST_ROSLAG2:2" link="st_roda103,st_roda105,st_roslag01,st_roslag03,st_roslag203"/>
+    <station id="st_roslag03" name="Mörby" line="ST_ROSLAG:3,ST_ROSLAG1:3,ST_ROSLAG2:4" link="st_roda104,st_roslag04,st_roslag203"/>
+    <station id="st_roslag04" name="Djursholms Ösby" line="ST_ROSLAG:4,ST_ROSLAG1:4,ST_ROSLAG2:5" link="st_roslag03,st_roslag05,st_roslag105,st_roslag206"/>
+    <station id="st_roslag05" name="Roslags Näsby" line="ST_ROSLAG:5,ST_ROSLAG1:8" link="st_roslag04,st_roslag06,st_roslag107,st_roslag109"/>
+    <station id="st_roslag06" name="Tibble" line="ST_ROSLAG:6" link="st_roslag05,st_roslag07"/>
+    <station id="st_roslag07" name="Ensta" line="ST_ROSLAG:7" link="st_roslag06,st_roslag08"/>
+    <station id="st_roslag08" name="Visinge" line="ST_ROSLAG:8" link="st_roslag07,st_roslag09"/>
+    <station id="st_roslag09" name="Täby kirkby" line="ST_ROSLAG:9" link="st_roslag08,st_roslag10"/>
+    <station id="st_roslag10" name="Kragstalund" line="ST_ROSLAG:10" link="st_roslag09,st_roslag11"/>
+    <station id="st_roslag11" name="Bällsta" line="ST_ROSLAG:11" link="st_roslag10,st_roslag12"/>
+    <station id="st_roslag12" name="Vallentuna" line="ST_ROSLAG:12" link="st_roslag11,st_roslag13"/>
+    <station id="st_roslag13" name="Ormsta" line="ST_ROSLAG:13" link="st_roslag12,st_roslag14"/>
+    <station id="st_roslag14" name="Molnby" line="ST_ROSLAG:14" link="st_roslag13,st_roslag15"/>
+    <station id="st_roslag15" name="Lindholmen" line="ST_ROSLAG:15" link="st_roslag14,st_roslag16"/>
+    <station id="st_roslag16" name="Frösunda" line="ST_ROSLAG:16" link="st_roslag15,st_roslag17"/>
+    <station id="st_roslag17" name="Ekskogen" line="ST_ROSLAG:17" link="st_roslag16,st_roslag18"/>
+    <station id="st_roslag18" name="Kårsta" line="ST_ROSLAG:18" link="st_roslag17"/>
+    <!-- Roslagsbanan (28) -->
+    <station id="st_roslag105" name="Bråvallavägen" line="ST_ROSLAG1:5" link="st_roslag04,st_roslag106"/>
+    <station id="st_roslag106" name="Djursholms Ekeby" line="ST_ROSLAG1:6" link="st_roslag105,st_roslag107"/>
+    <station id="st_roslag107" name="Enebyberg" line="ST_ROSLAG1:7" link="st_roslag05,st_roslag106"/>
+    <station id="st_roslag109" name="Täby centrum" line="ST_ROSLAG1:9" link="st_roslag05,st_roslag110"/>
+    <station id="st_roslag110" name="Galoppfältet" line="ST_ROSLAG1:10" link="st_roslag109,st_roslag111"/>
+    <station id="st_roslag111" name="Viggbyholm" line="ST_ROSLAG1:11" link="st_roslag110,st_roslag112"/>
+    <station id="st_roslag112" name="Hägernäs" line="ST_ROSLAG1:12" link="st_roslag111,st_roslag113"/>
+    <station id="st_roslag113" name="Arninge" line="ST_ROSLAG1:13" link="st_roslag112,st_roslag114"/>
+    <station id="st_roslag114" name="Rydbo" line="ST_ROSLAG1:14" link="st_roslag113,st_roslag115"/>
+    <station id="st_roslag115" name="Täljö" line="ST_ROSLAG1:15" link="st_roslag114,st_roslag116"/>
+    <station id="st_roslag116" name="åkers runö" line="ST_ROSLAG1:16" link="st_roslag115,st_roslag117"/>
+    <station id="st_roslag117" name="åkersberga" line="ST_ROSLAG1:17" link="st_roslag116,st_roslag118"/>
+    <station id="st_roslag118" name="Tunagård" line="ST_ROSLAG1:18" link="st_roslag117,st_roslag119"/>
+    <station id="st_roslag119" name="Österskär" line="ST_ROSLAG1:19" link="st_roslag118"/>
+    <!-- Roslagsbanan (29) -->
+    <station id="st_roslag203" name="Stocksund" line="ST_ROSLAG2:3" link="st_roda104,st_roslag03"/>
+    <station id="st_roslag206" name="Vendevägen" line="ST_ROSLAG2:6" link="st_roslag04,st_roslag207"/>
+    <station id="st_roslag207" name="Östberga" line="ST_ROSLAG2:7" link="st_roslag206,st_roslag208"/>
+    <station id="st_roslag208" name="Altorp" line="ST_ROSLAG2:8" link="st_roslag207,st_roslag209"/>
+    <station id="st_roslag209" name="Lahäll" line="ST_ROSLAG2:9" link="st_roslag208,st_roslag210"/>
+    <station id="st_roslag210" name="Näsby allé" line="ST_ROSLAG2:10" link="st_roslag209,st_roslag211"/>
+    <station id="st_roslag211" name="Näsbypark" line="ST_ROSLAG2:11" link="st_roslag210"/>
+    <!-- Röda linjen (13) -->
+    <station id="st_roda02" name="Gärdet" line="ST_RODA:2" link="st_roda01,st_roda03"/>
+    <station id="st_roda03" name="Karlaplan" line="ST_RODA:3" link="st_roda02,st_roda04"/>
+    <station id="st_roda04" name="Östermalmstorg" line="ST_RODA:4,ST_RODA1:7" link="st_bla13,st_roda03,st_roda106"/>
+    <station id="st_roda08" name="Mariatorget" line="ST_RODA:8,ST_RODA1:11" link="st_roda07,st_roda09" other_link="walk:st_4013"/>
+    <station id="st_roda09" name="Zinkensdamm" line="ST_RODA:9,ST_RODA1:12" link="st_roda08,st_roda10"/>
+    <station id="st_roda10" name="Hornstull" line="ST_RODA:10,ST_RODA1:13" link="st_roda09,st_roda11"/>
+    <station id="st_roda11" name="Liljeholmen" line="ST_RODA:11,ST_RODA1:14,ST_TVARBA:14" link="st_roda10,st_roda115,st_roda12,st_tvarba13,st_tvarba15"/>
+    <station id="st_roda12" name="Aspudden" line="ST_RODA:12" link="st_roda11,st_roda13"/>
+    <station id="st_roda13" name="Örnsberg" line="ST_RODA:13" link="st_roda12,st_roda14"/>
+    <station id="st_roda14" name="Axelsberg" line="ST_RODA:14" link="st_roda13,st_roda15"/>
+    <station id="st_roda15" name="Mälarhöjden" line="ST_RODA:15" link="st_roda14,st_roda16"/>
+    <station id="st_roda16" name="Bredäng" line="ST_RODA:16" link="st_roda15,st_roda17"/>
+    <station id="st_roda17" name="Sätra" line="ST_RODA:17" link="st_roda16,st_roda18"/>
+    <station id="st_roda18" name="Skärholmen" line="ST_RODA:18" link="st_roda17,st_roda19"/>
+    <station id="st_roda19" name="Vårberg" line="ST_RODA:19" link="st_roda18,st_roda20"/>
+    <station id="st_roda20" name="Vårby gård" line="ST_RODA:20" link="st_roda19,st_roda21"/>
+    <station id="st_roda21" name="Masmo" line="ST_RODA:21" link="st_roda20,st_roda22"/>
+    <station id="st_roda22" name="Fittja" line="ST_RODA:22" link="st_roda21,st_roda23"/>
+    <station id="st_roda23" name="Alby" line="ST_RODA:23" link="st_roda22,st_roda24"/>
+    <station id="st_roda24" name="Hallunda" line="ST_RODA:24" link="st_roda23,st_roda25"/>
+    <station id="st_roda25" name="Norsborg" line="ST_RODA:25" link="st_roda24"/>
+    <!-- Röda linjen (14) -->
+    <station id="st_roda101" name="Mörby centrum" line="ST_RODA1:1" link="st_roda102"/>
+    <station id="st_roda102" name="Danderyds sjukhus" line="ST_RODA1:2" link="st_roda101,st_roda103"/>
+    <station id="st_roda103" name="Bergshamra" line="ST_RODA1:3" link="st_roda102,st_roda104"/>
+    <station id="st_roda105" name="Tekniska högskolan" line="ST_RODA1:5" link="st_roda104,st_roda106" other_link="walk:st_roslag01"/>
+    <station id="st_roda106" name="Stadion" line="ST_RODA1:6" link="st_roda04,st_roda105"/>
+    <station id="st_roda115" name="Midsommarkransen" line="ST_RODA1:15" link="st_roda11,st_roda116"/>
+    <station id="st_roda116" name="Telefonplan" line="ST_RODA1:16" link="st_roda115,st_roda117"/>
+    <station id="st_roda117" name="Hägerstensåsen" line="ST_RODA1:17" link="st_roda116,st_roda118"/>
+    <station id="st_roda118" name="Västertorp" line="ST_RODA1:18" link="st_roda117,st_roda119"/>
+    <station id="st_roda119" name="Fruängen" line="ST_RODA1:19" link="st_roda118"/>
+    <!-- Saltsjöbanan (25) -->
+    <station id="st_saltsj02" name="Henriksdal" line="ST_SALTSJ:2" link="st_roda07,st_tvarba26"/>
+    <station id="st_tvarba26" name="Sickla" line="ST_SALTSJ:3,ST_TVARBA:26" link="st_saltsj02,st_saltsj04,st_tvarba25"/>
+    <station id="st_saltsj04" name="Nacka" line="ST_SALTSJ:4" link="st_saltsj05,st_tvarba26"/>
+    <station id="st_saltsj05" name="Saltsjö-Järla" line="ST_SALTSJ:5" link="st_saltsj04,st_saltsj06"/>
+    <station id="st_saltsj06" name="Lillängen" line="ST_SALTSJ:6" link="st_saltsj05,st_saltsj07"/>
+    <station id="st_saltsj07" name="Storängen" line="ST_SALTSJ:7" link="st_saltsj06,st_saltsj08"/>
+    <station id="st_saltsj08" name="Saltsjö-Duvnäs" line="ST_SALTSJ:8" link="st_saltsj07,st_saltsj09"/>
+    <station id="st_saltsj09" name="Östervik" line="ST_SALTSJ:9" link="st_saltsj08,st_saltsj10"/>
+    <station id="st_saltsj10" name="Fisksätra" line="ST_SALTSJ:10" link="st_saltsj09,st_saltsj11"/>
+    <station id="st_saltsj11" name="Igelboda" line="ST_SALTSJ:11,ST_SALTSJ1:1" link="st_saltsj10,st_saltsj102,st_saltsj12"/>
+    <station id="st_saltsj12" name="Neglinge" line="ST_SALTSJ:12" link="st_saltsj11,st_saltsj13"/>
+    <station id="st_saltsj13" name="Ringvägen" line="ST_SALTSJ:13" link="st_saltsj12,st_saltsj14"/>
+    <station id="st_saltsj14" name="Saltsjöbaden" line="ST_SALTSJ:14" link="st_saltsj13"/>
+    <!-- Saltsjöbanan (26) -->
+    <station id="st_saltsj102" name="Tippen" line="ST_SALTSJ1:2" link="st_saltsj103,st_saltsj11"/>
+    <station id="st_saltsj103" name="Tattby" line="ST_SALTSJ1:3" link="st_saltsj102,st_saltsj104"/>
+    <station id="st_saltsj104" name="Erstaviksbadet" line="ST_SALTSJ1:4" link="st_saltsj103,st_saltsj105"/>
+    <station id="st_saltsj105" name="Solsidan" line="ST_SALTSJ1:5" link="st_saltsj104"/>
+    <!-- Spårväg City (7) -->
+    <station id="st_sparva03" name="Nybroplan" line="ST_SPARVA:3" link="st_bla14,st_sparva04"/>
+    <station id="st_sparva04" name="Styrmansgatan" line="ST_SPARVA:4" link="st_sparva03,st_sparva05"/>
+    <station id="st_sparva05" name="Djurgårdsbron" line="ST_SPARVA:5" link="st_sparva04,st_sparva06"/>
+    <station id="st_sparva06" name="Nordiska museet/Vasamuseet" line="ST_SPARVA:6" link="st_sparva05,st_sparva07"/>
+    <station id="st_sparva07" name="Liljevalchs/Gröna Lund" line="ST_SPARVA:7" link="st_sparva06,st_sparva08"/>
+    <station id="st_sparva08" name="Skansen" line="ST_SPARVA:8" link="st_sparva07,st_sparva09"/>
+    <station id="st_sparva09" name="Djurgårdsskolan" line="ST_SPARVA:9" link="st_sparva08,st_sparva10"/>
+    <station id="st_sparva10" name="Waldemarsudde" line="ST_SPARVA:10" link="st_sparva11"/>
+    <station id="st_sparva11" name="Bellmansro" line="ST_SPARVA:11" link="st_sparva09"/>
+    <!-- Tvärbanan (30) -->
+    <station id="st_tvarba01" name="Solna station" line="ST_TVARBA:1" link="st_bla106" other_link="walk:st_4010"/>
+    <station id="st_tvarba03" name="Solna Business Park" line="ST_TVARBA:3" link="st_bla06,st_bla106"/>
+    <station id="st_tvarba05" name="Bällsta bro" line="ST_TVARBA:5" link="st_bla06,st_tvarba06"/>
+    <station id="st_tvarba06" name="Karlsbodvägen" line="ST_TVARBA:6" link="st_tvarba05,st_tvarba07"/>
+    <station id="st_tvarba07" name="Norra Ulvsunda" line="ST_TVARBA:7,ST_TVARBA1:3" link="st_tvarba06,st_tvarba08,st_tvarba102"/>
+    <station id="st_tvarba08" name="Johannesfred" line="ST_TVARBA:8,ST_TVARBA1:4" link="st_grona13,st_tvarba07"/>
+    <station id="st_tvarba10" name="Alviks strand" line="ST_TVARBA:10,ST_TVARBA1:6" link="st_grona13,st_tvarba11"/>
+    <station id="st_tvarba11" name="Stora Essingen" line="ST_TVARBA:11" link="st_tvarba10,st_tvarba12"/>
+    <station id="st_tvarba12" name="Gröndal" line="ST_TVARBA:12" link="st_tvarba11,st_tvarba13"/>
+    <station id="st_tvarba13" name="Trekanten" line="ST_TVARBA:13" link="st_roda11,st_tvarba12"/>
+    <station id="st_tvarba15" name="Årstadal" line="ST_TVARBA:15" link="st_roda11,st_tvarba16"/>
+    <station id="st_tvarba17" name="Årstafältet" line="ST_TVARBA:17" link="st_tvarba16,st_tvarba18"/>
+    <station id="st_tvarba18" name="Valla torg" line="ST_TVARBA:18" link="st_tvarba17,st_tvarba19"/>
+    <station id="st_tvarba19" name="Linde" line="ST_TVARBA:19" link="st_grona227,st_tvarba18"/>
+    <station id="st_tvarba22" name="Mårtensdal" line="ST_TVARBA:22" link="st_grona26,st_tvarba23"/>
+    <station id="st_tvarba23" name="Luma" line="ST_TVARBA:23" link="st_tvarba22,st_tvarba24"/>
+    <station id="st_tvarba24" name="Sickla kaj" line="ST_TVARBA:24" link="st_tvarba23,st_tvarba25"/>
+    <station id="st_tvarba25" name="Sickla udde" line="ST_TVARBA:25" link="st_tvarba24,st_tvarba26"/>
+    <!-- Tvärbanan (31) -->
+    <station id="st_tvarba101" name="Bromma flygplats" line="ST_TVARBA1:1" link="st_tvarba102"/>
+    <station id="st_tvarba102" name="Bromma Blocks" line="ST_TVARBA1:2" link="st_tvarba07,st_tvarba101"/>
+  </stations>
+</tube>

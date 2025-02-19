@@ -5,4 +5,4 @@ use warnings;
 
 use DBIx::Migration::CLI ();
 
-DBIx::Migration::CLI::run( @ARGV );
+exit( DBIx::Migration::CLI::run( @ARGV ) );

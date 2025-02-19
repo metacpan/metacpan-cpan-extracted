@@ -42,7 +42,7 @@ Terse::Controller::Static - Serve static resources controller
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

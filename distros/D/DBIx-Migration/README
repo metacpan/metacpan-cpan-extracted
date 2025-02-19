@@ -8,7 +8,7 @@ SYNOPSIS
         dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
       );
 
-      # Get current version from database
+      # Get current migration version from database
       my $version = $m->version;
 
       # Set directory before applying migrations
@@ -20,35 +20,38 @@ SYNOPSIS
       # Migrate database to the latest version
       $m->migrate;
 
-      # ~/Projects/myapp/db/migrations/schema_1_up.sql
+      -- ~/Projects/myapp/db/migrations/schema_1_up.sql
       CREATE TABLE foo (
         id INTEGER PRIMARY KEY,
         bar TEXT
       );
 
-      # ~/Projects/myapp/db/migrations/schema_1_down.sql
+      -- ~/Projects/myapp/db/migrations/schema_1_down.sql
       DROP TABLE foo;
 
-      # ~/Projects/myapp/db/migrations/schema_2_up.sql
+      -- ~/Projects/myapp/db/migrations/schema_2_up.sql
       CREATE TABLE bar (
         id INTEGER PRIMARY KEY,
         baz TEXT
       );
 
-      # ~/Projects/myapp/db/migrations/schema_2_down.sql
+      -- ~/Projects/myapp/db/migrations/schema_2_down.sql
       DROP TABLE bar;
 
 DESCRIPTION
-    This module provides seamless database schema up- and downgrades. The
-    implementation is based on migrations. A migration is a ".sql" script.
-    Although not mandatory the script name begins with a prefix like for
-    example "schema_". It follows a version number that is a positive
-    integer. After an "_" (underscore) character the script name ends with
-    the migration type that is either "up" or "down". Migrations are stored
-    in a directory and are applied in order to a database. Usually the
-    version number of the first migration is 1. The version numbers of the
-    other migrations have to be ascending without gaps.
+    This class provides seamless database schema up- and downgrades.
 
+  Migrations
+    The implementation of this class is based on migrations. A migration is
+    a ".sql" script. Although not mandatory the script name begins with a
+    prefix like for example "schema_". It follows a version number that is a
+    positive integer. After an "_" (underscore) character the script name
+    ends with the migration type that is either "up" or "down". Migrations
+    are stored in a directory and are applied in order to a database.
+    Usually the version number of the first migration is 1. The version
+    numbers of the other migrations have to be ascending without gaps.
+
+  Processing
     During processing the content of each migration is read with the
     "binmode" of ":raw" into a scalar. The content is split into sections
     using the default SQL delimiter ";" (semicolon). Each section is
@@ -67,12 +70,23 @@ DESCRIPTION
     to be a single printable ASCII character, excluding the space character.
     In the previous example it is the "/" (slash) character.
 
+  Schema support
+    The schema support of this implementation should be considered
+    experimental. For a PostgreSQL database you may set the managed schema
+    (the schema of your single-schema application) using the "search_path"
+    connect option:
+
+      my $m = DBIx::Migration->new(
+        dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema
+      );
+
+    The migration object stores the current migration version in the
+    tracking table. Its default unqualified name is "dbix_migration". The
+    table belongs by default to the "public" tracking schema.
+
 METHODS
     $self->BUILD( $args )
         Validate object.
-
-    $self->debug( $debug )
-        Enable/disable debug messages.
 
     $self->dir( $dir )
         Get/set-once directory that contains migrations.
@@ -91,22 +105,33 @@ METHODS
     $self->password
         Get database password.
 
+    $self->tracking_schema
+        Get schema that the tracking table belongs to.
+
+    $self->tracking_table
+        Get tracking table. If the tracking schema is defined the tracking
+        table name is fully qualified.
+
     $self->username
         Get database username.
 
     $self->version
         Get migration version from database. Will be "undef" if no migration
-        has taken place yet. The version is stored in the table
-        "dbix_migration". The name of this table may change in the future so
-        don't rely on it.
+        has taken place yet. The version is stored in the tracking table.
+
+LOGGING
+    The logging of this class is based on a static Log::Any logger. Its
+    category is the class name itself. The easiest way to enable logging is
+    to set the "LOG_ANY_DEFAULT_ADAPTER" environment variable:
+
+      LOG_ANY_DEFAULT_ADAPTER=Stderr
 
 SEE ALSO
     *   Liquibase endDelimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-TODOS
-    *   Implement proper logging. Printing debug information to stdout
-        conflicts with the stdout output of "DBIx::Migration::CLI".
+    *   Liquibase tracking schema
+        <https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

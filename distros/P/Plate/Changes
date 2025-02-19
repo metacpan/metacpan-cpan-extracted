@@ -1,5 +1,8 @@
 Revision history for Plate
 
+1.7       2025-02-19 00:30:46+00:00 UTC
+    - Add setting for pragmas used in templates
+
 1.6       2024-07-02 10:47:39+00:00 UTC
     - New filter method to apply filters manually
     - Make does_exist, can_serve & filter callable inside templates

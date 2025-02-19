@@ -10,19 +10,18 @@
 #define va_copy(dest, src)  __va_copy(dest, src)
 #endif
 
-static int print_console_messages(duk_uint_t flags, void* data,
+static int print_console_messages(pTHX_ duk_uint_t flags,
                                   const char* fmt, va_list ap)
 {
-    dTHX;
     PerlIO* fp = (flags & DUK_CONSOLE_TO_STDERR) ? PerlIO_stderr() : PerlIO_stdout();
     int ret = PerlIO_vprintf(fp, fmt, ap);
 
-    UNUSED_ARG(data);
     if (flags & DUK_CONSOLE_FLUSH) {
         PerlIO_flush(fp);
     }
     return ret;
 }
+
 
 
 static void save_msg(pTHX_ Duk* duk, const char* target, SV* message)
@@ -59,11 +58,10 @@ static void save_msg(pTHX_ Duk* duk, const char* target, SV* message)
     }
 }
 
-static int save_console_messages(duk_uint_t flags, void* data,
+
+static int save_console_messages(pTHX_ Duk* duk,duk_uint_t flags,
                                  const char* fmt, va_list ap)
 {
-    dTHX;
-    Duk* duk = (Duk*) data;
     const char* target = (flags & DUK_CONSOLE_TO_STDERR) ? "stderr" : "stdout";
     SV* message = newSVpvs("");
     va_list args_copy;
@@ -73,17 +71,29 @@ static int save_console_messages(duk_uint_t flags, void* data,
     return SvCUR(message);
 }
 
+int pl_console_callback(void* data, duk_uint_t flags,const char* fmt, va_list ap)
+{
+    dTHX;
+    Duk* duk = (Duk*) data;
+
+    if (duk->flags & DUK_OPT_FLAG_SAVE_MESSAGES) {
+        return save_console_messages(aTHX_ duk,flags,fmt,ap);
+    }
+    else {
+        return print_console_messages(aTHX_ flags,fmt,ap);
+    }
+}
+
 int pl_console_init(Duk* duk)
 {
     /* initialize console object */
     duk_console_init(duk->ctx, DUK_CONSOLE_PROXY_WRAPPER | DUK_CONSOLE_FLUSH);
-
-    if (duk->flags & DUK_OPT_FLAG_SAVE_MESSAGES) {
-        duk_console_register_handler(save_console_messages, duk);
-    }
-    else {
-        duk_console_register_handler(print_console_messages, duk);
-    }
+    
+    /* save our duk pointer to the ctx so it can get it back later when we do callbacks */
+    duk_push_thread_stash(duk->ctx,duk->ctx);
+    duk_push_pointer(duk->ctx, duk);
+    duk_put_prop_string(duk->ctx, -2, PL_NAME_CONSOLE_GENERIC_CALLBACK); 
+    duk_pop(duk->ctx);
 
     return 0;
 }

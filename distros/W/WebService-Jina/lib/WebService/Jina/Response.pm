@@ -34,7 +34,7 @@ WebService::Jina::Response - jina response
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

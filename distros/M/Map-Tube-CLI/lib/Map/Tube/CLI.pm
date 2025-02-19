@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.80';
+$Map::Tube::CLI::VERSION   = '0.81';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
@@ -218,6 +218,8 @@ sure you have the latest maps when you install.
 =item * L<Sofia|Map::Tube::Sofia>
 
 =item * L<Tbilisi|Map::Tube::Tbilisi>
+
+=item * L<Toulouse|Map::Tube::Toulouse>
 
 =item * L<Tokyo|Map::Tube::Tokyo>
 
@@ -594,6 +596,7 @@ sub _supported_maps {
         'SOFIA'           => 'Map::Tube::Sofia',
         'TBILISI'         => 'Map::Tube::Tbilisi',
         'TOKYO'           => 'Map::Tube::Tokyo',
+        'TOULOUSE'        => 'Map::Tube::Toulouse',
         'VIENNA'          => 'Map::Tube::Vienna',
         'WARSAW'          => 'Map::Tube::Warsaw',
         'YEKATERINBURG'   => 'Map::Tube::Yekaterinburg',
@@ -640,7 +643,7 @@ L<http://metacpan.org/dist/Map-Tube-CLI/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

@@ -19,29 +19,24 @@
 
 /* XXX: Init console object using duk_def_prop() when that call is available. */
 
-typedef struct ConsoleConfig {
-    ConsoleHandler* handler;
-    void* data;
-} ConsoleConfig;
-
-static ConsoleConfig console_config;
-
-int duk_console_log(duk_uint_t flags, const char* fmt, ...)
+int duk_console_log(duk_context *ctx,duk_uint_t flags, const char* fmt, ...)
 {
     int ret = 0;
-    if (console_config.handler) {
-        va_list ap;
-        va_start(ap, fmt);
-        ret = console_config.handler(flags, console_config.data, fmt, ap);
-        va_end(ap);
-    }
-    return ret;
-}
+	void* ourData;
+    va_list ap;
+    va_start(ap, fmt);
+		
+	/* Get our duk pointer for this ctx*/
+	duk_push_thread_stash(ctx,ctx);
+    duk_get_prop_string(ctx, -1, PL_NAME_CONSOLE_GENERIC_CALLBACK); 
+    ourData = duk_get_pointer(ctx, -1);
+	duk_pop(ctx);
 
-void duk_console_register_handler(ConsoleHandler* handler, void* data)
-{
-    console_config.handler = handler;
-    console_config.data = data;
+	if (ourData) {
+		ret = pl_console_callback(ourData,flags,fmt, ap);
+	}
+    va_end(ap);
+    return ret;
 }
 
 static duk_ret_t duk__console_log_helper(duk_context *ctx, const char *error_name) {
@@ -76,7 +71,7 @@ static duk_ret_t duk__console_log_helper(duk_context *ctx, const char *error_nam
 		duk_get_prop_string(ctx, -1, "stack");
 	}
 
-    duk_console_log(flags, "%s\n", duk_to_string(ctx, -1));
+    duk_console_log(ctx, flags, "%s\n", duk_to_string(ctx, -1));
 	return 0;
 }
 

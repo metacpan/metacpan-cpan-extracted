@@ -10,7 +10,7 @@ use Storable ();
 use Carp ();
 use Data::Dumper ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 # eventually clean these up
 my ( %IS_ROLE, %REQUIRED_BY, %HAS_ROLES, %ALLOWED_BY, %PROVIDES );
@@ -351,13 +351,12 @@ sub _get_methods {
     my $stash = do { no strict 'refs'; \%{"${target}::"} };
 
     my %methods;
-    foreach my $item ( values %$stash ) {
+    foreach my $name ( keys %$stash ) {
+        my $item = $stash->{$name};
 
         next unless my $code = _get_valid_method( $target, $item );
 
         # this prevents a "modification of read-only value" error.
-        my $name = $item;
-        $name =~ s/^\*$target\:://;
         my $source = _sub_package($code);
         $methods{$name} = {
             code   => $code,
@@ -369,8 +368,10 @@ sub _get_methods {
 
 sub _get_valid_method {
     my ( $target, $item ) = @_;
-    return if ref $item;
-    my $code = *$item{CODE} or return;
+    my $code = ref $item eq 'CODE' ? $item
+             : ref \$item eq 'GLOB' ? *$item{CODE}
+             : undef;
+    return if !defined $code;
 
     my $source = _sub_package($code) or return;
 

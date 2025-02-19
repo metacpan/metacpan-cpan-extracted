@@ -1,7 +1,7 @@
 #!perl -T
 use 5.020;
 use warnings;
-use Test::More tests => 49;
+use Test::More tests => 50;
 
 BEGIN {
     if ($ENV{AUTHOR_TESTING}) {
@@ -42,6 +42,9 @@ qr"^Can't set path to ", "Can't set invalid path";
 
 like eval { Plate->new(filters => 'not a hash') } // $@,
 qr"^\QInvalid filters (not a hash reference) ", "Can't set invalid filters";
+
+like eval { Plate->new(pragmas => 'not an array') } // $@,
+qr"^\QInvalid pragmas (not an array reference) ", "Can't set invalid pragmas";
 
 like eval { Plate->new(vars => ['not a hash']) } // $@,
 qr"^\QInvalid vars (not a hash reference) ", "Can't set invalid vars";

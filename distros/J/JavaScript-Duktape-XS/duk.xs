@@ -81,6 +81,22 @@ static void tear_down(Duk* duk)
     duk_destroy_heap(duk->ctx);
 }
 
+static void destroy_duktape_object(pTHX_ Duk* duk)
+ {   
+  if (duk) {   
+    /* Free Perl objects.  */
+    SvREFCNT_dec((SV *) duk->stats);
+    SvREFCNT_dec((SV *) duk->msgs);
+    if( duk->version) {
+      SvREFCNT_dec((SV *) duk->version);
+    }
+
+    hv_clear(duk->funcref);  
+    SvREFCNT_dec((SV *) duk->funcref);
+    free(duk);
+  }
+}
+
 static Duk* create_duktape_object(pTHX_ HV* opt)
 {
     Duk* duk = (Duk*) malloc(sizeof(Duk));
@@ -90,6 +106,7 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
 
     duk->stats = newHV();
     duk->msgs = newHV();
+    duk->funcref = newHV();
 
     if (opt) {
         hv_iterinit(opt);
@@ -127,6 +144,10 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
                 duk->max_timeout_us = param > MAX_TIMEOUT_MINIMUM ? param : MAX_TIMEOUT_MINIMUM;
                 continue;
             }
+            if (memcmp(kstr, DUK_OPT_NAME_CATCH_PERL_EXCEPTIONS, klen) == 0) {
+                duk->flags |= SvTRUE(value) ? DUK_OPT_FLAG_CATCH_PERL_EXCEPTIONS : 0;
+                continue;
+            }
             croak("Unknown option %*.*s\n", (int) klen, (int) klen, kstr);
         }
     }
@@ -140,6 +161,7 @@ static int session_dtor(pTHX_ SV* sv, MAGIC* mg)
     Duk* duk = (Duk*) mg->mg_ptr;
     UNUSED_ARG(sv);
     tear_down(duk);
+    destroy_duktape_object(aTHX_ duk);
     return 0;
 }
 
@@ -172,7 +194,7 @@ get_stats(Duk* duk)
 void
 reset_stats(Duk* duk)
   PPCODE:
-    duk->stats = newHV();
+    hv_clear(duk->stats);
 
 HV*
 get_msgs(Duk* duk)
@@ -183,7 +205,7 @@ get_msgs(Duk* duk)
 void
 reset_msgs(Duk* duk)
   PPCODE:
-    duk->msgs = newHV();
+    hv_clear(duk->msgs);
 
 SV*
 get(Duk* duk, const char* name)
@@ -236,30 +258,26 @@ instanceof(Duk* duk, const char* object, const char* class)
     RETVAL = pl_instanceof_global_or_property(aTHX_ ctx, object, class);
     pl_stats_stop(aTHX_ duk, &stats, "instanceof");
   OUTPUT: RETVAL
-
+  
 int
 set(Duk* duk, const char* name, SV* value)
   PREINIT:
-    duk_context* ctx = 0;
     Stats stats;
   CODE:
     TIMEOUT_RESET(duk);
-    ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
-    RETVAL = pl_set_global_or_property(aTHX_ ctx, name, value);
+    RETVAL = pl_set_global_or_property(aTHX_ duk, name, value);
     pl_stats_stop(aTHX_ duk, &stats, "set");
   OUTPUT: RETVAL
 
 int
 remove(Duk* duk, const char* name)
   PREINIT:
-    duk_context* ctx = 0;
     Stats stats;
   CODE:
     TIMEOUT_RESET(duk);
-    ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
-    RETVAL = pl_del_global_or_property(aTHX_ ctx, name);
+    RETVAL = pl_del_global_or_property(aTHX_ duk, name);
     pl_stats_stop(aTHX_ duk, &stats, "remove");
   OUTPUT: RETVAL
 

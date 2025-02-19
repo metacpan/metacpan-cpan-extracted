@@ -2,7 +2,7 @@ package ANSI::Palette;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use base 'Import::Export';
 
 our %EX = (
@@ -201,7 +201,7 @@ ANSI::Palette - ANSI Color palettes
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -246,7 +246,7 @@ prints a font color palette containing the 8 base colors
 prints a font color palette containing the 8 base colors and the bright variation.
 
 	\e[Nm
-        30 31 32 33 34 35 36 37
+	30 31 32 33 34 35 36 37
 	\e[N;1m
 	30 31 32 33 34 35 36 37
 

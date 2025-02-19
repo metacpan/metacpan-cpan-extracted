@@ -1,0 +1,47 @@
+{
+   "abstract" : "A wrapper for the reslirp-tunnel application",
+   "author" : [
+      "Salvador FandiÃ±o <sfandino@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-ReslirpTunnel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validate::Domain" : "0.15",
+            "Data::Validate::IP" : "0.31",
+            "File::XDG" : "1.03",
+            "Log::Any" : "1.717",
+            "Net::OpenSSH" : "0.84",
+            "Path::Tiny" : "0.146"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

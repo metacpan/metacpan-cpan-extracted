@@ -1,6 +1,6 @@
 package Terse::Plugin::Glitch;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 use Glitch;
 use YAML::XS;
 use JSON;
@@ -53,7 +53,7 @@ Terse::Plugin::Glitch - The great new Terse::Plugin::Glitch!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -63,7 +63,7 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-	package Intangible;
+	package MyApp;
 
 	use base 'Terse';
 	use Terse::Plugin::Glitch;
@@ -82,7 +82,7 @@ Perhaps a little code snippet.
 
 	...
 
-	package Intangible::Money::Plugin::Glitch;
+	package MyApp::Plugin::Glitch;
 
 	use base 'Terse::Plugin::Glitch';
 
@@ -92,7 +92,7 @@ Perhaps a little code snippet.
 		$self->format = 'YAML';
 	}
 
-	package Intagible::Money;
+	package MyApp;
 
 	use base 'Terse::App';
 

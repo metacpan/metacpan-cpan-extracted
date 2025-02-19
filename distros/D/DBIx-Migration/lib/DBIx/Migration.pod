@@ -12,7 +12,7 @@ DBIx::Migration - Seamless database schema up- and downgrades
     dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
   );
 
-  # Get current version from database
+  # Get current migration version from database
   my $version = $m->version;
 
   # Set directory before applying migrations
@@ -24,35 +24,40 @@ DBIx::Migration - Seamless database schema up- and downgrades
   # Migrate database to the latest version
   $m->migrate;
 
-  # ~/Projects/myapp/db/migrations/schema_1_up.sql
+  -- ~/Projects/myapp/db/migrations/schema_1_up.sql
   CREATE TABLE foo (
     id INTEGER PRIMARY KEY,
     bar TEXT
   );
 
-  # ~/Projects/myapp/db/migrations/schema_1_down.sql
+  -- ~/Projects/myapp/db/migrations/schema_1_down.sql
   DROP TABLE foo;
 
-  # ~/Projects/myapp/db/migrations/schema_2_up.sql
+  -- ~/Projects/myapp/db/migrations/schema_2_up.sql
   CREATE TABLE bar (
     id INTEGER PRIMARY KEY,
     baz TEXT
   );
 
-  # ~/Projects/myapp/db/migrations/schema_2_down.sql
+  -- ~/Projects/myapp/db/migrations/schema_2_down.sql
   DROP TABLE bar;
 
 =head1 DESCRIPTION
 
-This module provides seamless database schema up- and downgrades. The
-implementation is based on migrations. A migration is a C<.sql> script.
-Although not mandatory the script name begins with a prefix like for example
-C<schema_>. It follows a version number that is a positive integer. After an
-C<_> (underscore) character the script name ends with the migration type that
-is either C<up> or C<down>. Migrations are stored in a directory and are
-applied in order to a database. Usually the version number of the first
-migration is 1. The version numbers of the other migrations have to be
-ascending without gaps.
+This class provides seamless database schema up- and downgrades.
+
+=head2 Migrations
+
+The implementation of this class is based on migrations. A migration is a
+C<.sql> script.  Although not mandatory the script name begins with a prefix
+like for example C<schema_>. It follows a version number that is a positive
+integer. After an C<_> (underscore) character the script name ends with the
+migration type that is either C<up> or C<down>. Migrations are stored in a
+directory and are applied in order to a database. Usually the version number of
+the first migration is 1. The version numbers of the other migrations have to
+be ascending without gaps.
+
+=head2 Processing
 
 During processing the content of each migration is read with the C<binmode> of
 C<:raw> into a scalar. The content is split into sections using the default SQL
@@ -71,6 +76,20 @@ The annotation has to be specified in the first line. The delimiter has to be
 a single printable ASCII character, excluding the space character. In the
 previous example it is the C</> (slash) character.
 
+=head2 Schema support
+
+The schema support of this implementation should be considered experimental.
+For a PostgreSQL database you may set the managed schema (the schema of your
+single-schema application) using the C<search_path> connect option:
+
+  my $m = DBIx::Migration->new(
+    dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema
+  );
+
+The migration object stores the current migration version in the tracking
+table. Its default unqualified name is C<dbix_migration>. The table belongs by
+default to the C<public> tracking schema.
+
 =head1 METHODS
 
 =over
@@ -78,10 +97,6 @@ previous example it is the C</> (slash) character.
 =item $self->BUILD( $args )
 
 Validate object.
-
-=item $self->debug( $debug )
-
-Enable/disable debug messages.
 
 =item $self->dir( $dir )
 
@@ -105,6 +120,15 @@ used.
 
 Get database password.
 
+=item $self->tracking_schema
+
+Get schema that the tracking table belongs to.
+
+=item $self->tracking_table
+
+Get tracking table. If the tracking schema is defined the tracking table name
+is fully qualified.
+
 =item $self->username
 
 Get database username.
@@ -112,10 +136,17 @@ Get database username.
 =item $self->version
 
 Get migration version from database. Will be C<undef> if no migration has taken
-place yet. The version is stored in the table C<dbix_migration>. The name of
-this table may change in the future so don't rely on it.
+place yet. The version is stored in the tracking table.
 
 =back
+
+=head1 LOGGING
+
+The logging of this class is based on a static L<Log::Any> logger. Its category
+is the class name itself. The easiest way to enable logging is to set the
+C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
+
+  LOG_ANY_DEFAULT_ADAPTER=Stderr
 
 =head1 SEE ALSO
 
@@ -123,16 +154,7 @@ this table may change in the future so don't rely on it.
 
 =item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-=back
-
-=head1 TODOS
-
-=over
-
-=item *
-
-Implement proper logging. Printing debug information to stdout conflicts with
-the stdout output of C<DBIx::Migration::CLI>.
+=item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
 =back
 

@@ -1,6 +1,6 @@
 package Terse::Plugin::CHI;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use base 'Terse::Plugin';
 use CHI; use JSON;
 
@@ -38,7 +38,7 @@ Terse::Plugin::CHI - Terse response cache
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -63,12 +63,8 @@ Perhaps a little code snippet.
 	sub my_land {
 		my ($self, $t) = @_;
 		$t->plugin('cache')->get($t) && return;
-		...
-		$t->response->name = 'Robert the Bruce II';
-		$t->response->conquers = 'England';
-		$t->response->independence = [qw/England Scotland Wales Ireland/];
-		$t->response->commonwealth = 'dissolved';
-		$t->response->global = 'unity';
+		... 
+		$t->response = $response;
 		$t->plugin('cache')->set($t) && return;
 	}
 

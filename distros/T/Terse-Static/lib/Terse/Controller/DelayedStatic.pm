@@ -43,7 +43,7 @@ Terse::Controller::DelayedStatic - Serve delayed static resources controller
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

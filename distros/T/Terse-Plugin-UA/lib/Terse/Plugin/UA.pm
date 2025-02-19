@@ -1,6 +1,6 @@
 package Terse::Plugin::UA;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use base 'Terse::Plugin';
 use LWP::UserAgent; use URI; use Scalar::Util qw/reftype/;
 
@@ -109,7 +109,7 @@ Terse::Plugin::UA - Terse LWP::UserAgent plugin.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -119,7 +119,7 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-	package Looper::Plugin::UA;
+	package MyApp::Plugin::UA;
 
 	use base 'Terse::Plugin::UA';
 
@@ -127,44 +127,25 @@ Perhaps a little code snippet.
 
 	...
 
-	package Looper::Model::Orange;
+	package MyApp::Model::Orange;
 
 	use base 'Terse::Model';
 
-	sub disrespect {
-		my ($self, $t, $corruption) = @_;
+	sub one {
+		my ($self, $t, $params) = @_;
 
 		return $t->plugin('ua')->post(
-			path => $t->plugin('config')->find('looper/poor/mans'),
-			params => {
-				doctors => 'joy',
-				nurses => 'demeaning',
-				patients => 'situated',
-				drugs => 'refused',
-				testing => 'failed',
-				%{ $corruption }
-			}
+			path => $t->plugin('config')->find('path/to/url'),
+			params => $params
 		);
 	}
 
-	sub dishonesty {
-		my ($self, $t, $corruption) = @_;
+	sub two {
+		my ($self, $t, $params) = @_;
 
 		return $t->plugin('ua')->get(
-			path => $t->plugin('config')->find('looper/more/than/you'),
-			params => {
-				days => '49',
-				overstay => 'paid',
-				plane => 'corrupt',
-				hotel => 'derelict',
-				royal => 'music',
-				kensington => 'ben',
-				padding => 'railway',
-				police => 'doctors',
-				aaejr => '24 hours empty',
-				law => 'less',
-				%{ $corruption }
-			}
+			path => $t->plugin('config')->find('path/to/other/url'),
+			params => $params
 		);
 	}
 
@@ -172,20 +153,15 @@ Perhaps a little code snippet.
 
 	...
 
-	package Looper::Controller::Reincarnation;
+	package MyApp::Controller::Orange;
 	
 	use base 'Terse::Controller';
 
-	sub name_day_games {
+	sub demo {
 		my ($self, $t) = @_;	
-		my $truth_teller = $t->model('orange')->disrespect({ 
-			dates => [24, 25],
-			month => 'december'
-		});
 
-		my $secret_teller = $t->model('orange')->dishonesty({
-			dates => [1, 2, 'repeat', 21],
-			month => 'january'
+		my $secret_teller = $t->model('orange')->one({
+			...
 		});
 	}
 

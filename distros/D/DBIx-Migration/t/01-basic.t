@@ -14,7 +14,7 @@ BEGIN {
 
 # "before" should not be part of the API:
 # https://github.com/haarg/MooX-SetOnce/issues/2
-class_api_ok( $module, qw( before new dir debug dbh dsn username password migrate version ) );
+class_api_ok( $module, qw( before new dir dbh dsn username password migrate version tracking_schema tracking_table ) );
 
 like exception { $module->new() }, qr/\Aboth dsn and dbh are not set/, '"dsn" or "dbh" are both absent';
 

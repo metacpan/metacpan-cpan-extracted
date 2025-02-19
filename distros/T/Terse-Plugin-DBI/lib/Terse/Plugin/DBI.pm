@@ -1,6 +1,6 @@
 package Terse::Plugin::DBI;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.03'; 
+our $VERSION = '0.04'; 
 use base 'Terse::Plugin';
 
 use DBI;
@@ -32,7 +32,7 @@ Terse::Plugin::DBI - DBI in Terse
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -42,7 +42,7 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-	package Corruption::Plugin::DBI;
+	package MyApp::Plugin::DBI;
 
 	use base 'Terse::Plugin::DBI';
 
@@ -56,14 +56,14 @@ Perhaps a little code snippet.
 
 	...
 	
-	package Corruption::Model::Elementalist;
+	package MyApp::Model::List;
 
 	use base 'Terse::Model';
 
 	sub get {
 		my ($self, $t, $name) = @_;
 
-		my $sh = $t->plugin('dbi')->prepare(q|select mind, movement, sense, sight, smell, taste from secrets where name = ?|);
+		my $sh = $t->plugin('dbi')->prepare(q|select * from lists where name = ?|);
 
 		$sh->execute($name) or $t->logError($sh->errstr, 404) && return;
 	
@@ -74,14 +74,14 @@ Perhaps a little code snippet.
 
 	...
 
-	package Corruption::Controller::Hospital;
+	package MyApp::Controller::List
 
 	use base 'Terse::Controller';
 
 	sub mockery {
 		my ($self, $t) = @_;
 
-		$t->model('elementalist')->get('simon peter');
+		$t->model('list')->get('my-list');
 	}
 	
 	1;

@@ -72,6 +72,7 @@
             "Map::Tube::Sofia" : "0",
             "Map::Tube::Tbilisi" : "0",
             "Map::Tube::Tokyo" : "0",
+            "Map::Tube::Toulouse" : "0",
             "Map::Tube::Vienna" : "0",
             "Map::Tube::Warsaw" : "0",
             "Map::Tube::Yekaterinburg" : "0",
@@ -87,6 +88,6 @@
          "web" : "https://github.com/manwar/Task-Map-Tube-Bundle"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

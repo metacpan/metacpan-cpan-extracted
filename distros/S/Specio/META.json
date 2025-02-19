@@ -110,163 +110,163 @@
    "provides" : {
       "Specio" : {
          "file" : "lib/Specio.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Coercion" : {
          "file" : "lib/Specio/Coercion.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::AnyCan" : {
          "file" : "lib/Specio/Constraint/AnyCan.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::AnyDoes" : {
          "file" : "lib/Specio/Constraint/AnyDoes.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::AnyIsa" : {
          "file" : "lib/Specio/Constraint/AnyIsa.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Enum" : {
          "file" : "lib/Specio/Constraint/Enum.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Intersection" : {
          "file" : "lib/Specio/Constraint/Intersection.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::ObjectCan" : {
          "file" : "lib/Specio/Constraint/ObjectCan.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::ObjectDoes" : {
          "file" : "lib/Specio/Constraint/ObjectDoes.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::ObjectIsa" : {
          "file" : "lib/Specio/Constraint/ObjectIsa.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Parameterizable" : {
          "file" : "lib/Specio/Constraint/Parameterizable.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Parameterized" : {
          "file" : "lib/Specio/Constraint/Parameterized.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Role::CanType" : {
          "file" : "lib/Specio/Constraint/Role/CanType.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Role::DoesType" : {
          "file" : "lib/Specio/Constraint/Role/DoesType.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Role::Interface" : {
          "file" : "lib/Specio/Constraint/Role/Interface.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Role::IsaType" : {
          "file" : "lib/Specio/Constraint/Role/IsaType.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Simple" : {
          "file" : "lib/Specio/Constraint/Simple.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Structurable" : {
          "file" : "lib/Specio/Constraint/Structurable.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Structured" : {
          "file" : "lib/Specio/Constraint/Structured.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Constraint::Union" : {
          "file" : "lib/Specio/Constraint/Union.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Declare" : {
          "file" : "lib/Specio/Declare.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::DeclaredAt" : {
          "file" : "lib/Specio/DeclaredAt.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Exception" : {
          "file" : "lib/Specio/Exception.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Exporter" : {
          "file" : "lib/Specio/Exporter.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Helpers" : {
          "file" : "lib/Specio/Helpers.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Builtins" : {
          "file" : "lib/Specio/Library/Builtins.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Numeric" : {
          "file" : "lib/Specio/Library/Numeric.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Perl" : {
          "file" : "lib/Specio/Library/Perl.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::String" : {
          "file" : "lib/Specio/Library/String.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Structured" : {
          "file" : "lib/Specio/Library/Structured.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Structured::Dict" : {
          "file" : "lib/Specio/Library/Structured/Dict.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Structured::Map" : {
          "file" : "lib/Specio/Library/Structured/Map.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Library::Structured::Tuple" : {
          "file" : "lib/Specio/Library/Structured/Tuple.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::OO" : {
          "file" : "lib/Specio/OO.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::PartialDump" : {
          "file" : "lib/Specio/PartialDump.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Registry" : {
          "file" : "lib/Specio/Registry.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Role::Inlinable" : {
          "file" : "lib/Specio/Role/Inlinable.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::Subs" : {
          "file" : "lib/Specio/Subs.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Specio::TypeChecks" : {
          "file" : "lib/Specio/TypeChecks.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Test::Specio" : {
          "file" : "lib/Test/Specio.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       }
    },
    "release_status" : "stable",
@@ -281,7 +281,7 @@
          "web" : "https://github.com/houseabsolute/Specio"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -741,7 +741,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1010,7 +1010,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                }
             },
@@ -1026,7 +1026,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                }
             },
@@ -1069,7 +1069,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                }
             },
@@ -1099,7 +1099,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1116,12 +1116,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.49",
+                  "tag" : "v0.50",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1141,7 +1141,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                }
             },
@@ -1182,7 +1182,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1202,7 +1202,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.48.1",
                   "repo_root" : "."
                }
             },

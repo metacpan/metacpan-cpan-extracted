@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.46  2025-02-18T23:20:00+00:00
+      - Updated method as_graph() to take station id and not name
+        when preparing data for Graphviz to avoid case when name
+        contains something like ":" and throw error on map generation.
+        https://rt.cpan.org/Public/Bug/Display.html?id=159671
+
 0.45  2024-09-04T12:50:00+00:00
       - Removed broken/unwanted links.
 

@@ -41,7 +41,7 @@ Terse::Plugin::Config - JSON configs
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

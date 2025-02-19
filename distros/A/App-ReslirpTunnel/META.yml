@@ -1,0 +1,28 @@
+---
+abstract: 'A wrapper for the reslirp-tunnel application'
+author:
+  - 'Salvador FandiÃ±o <sfandino@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ReslirpTunnel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Validate::Domain: '0.15'
+  Data::Validate::IP: '0.31'
+  File::XDG: '1.03'
+  Log::Any: '1.717'
+  Net::OpenSSH: '0.84'
+  Path::Tiny: '0.146'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

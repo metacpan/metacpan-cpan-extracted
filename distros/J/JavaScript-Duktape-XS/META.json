@@ -4,7 +4,7 @@
       "Gonzalo Diethelm (gonzus@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://github.com/gonzus/JavaScript-Duktape-XS"
       }
    },
-   "version" : "0.000079",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.000081",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

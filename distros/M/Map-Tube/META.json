@@ -59,43 +59,43 @@
    "provides" : {
       "Map::Tube" : {
          "file" : "lib/Map/Tube.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Cookbook" : {
          "file" : "lib/Map/Tube/Cookbook.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Line" : {
          "file" : "lib/Map/Tube/Line.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Node" : {
          "file" : "lib/Map/Tube/Node.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Pluggable" : {
          "file" : "lib/Map/Tube/Pluggable.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Route" : {
          "file" : "lib/Map/Tube/Route.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Table" : {
          "file" : "lib/Map/Tube/Table.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Types" : {
          "file" : "lib/Map/Tube/Types.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Map::Tube::Utils" : {
          "file" : "lib/Map/Tube/Utils.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       },
       "Test::Map::Tube" : {
          "file" : "lib/Test/Map/Tube.pm",
-         "version" : "3.94"
+         "version" : "3.95"
       }
    },
    "release_status" : "stable",
@@ -106,6 +106,6 @@
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "3.94",
+   "version" : "3.95",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

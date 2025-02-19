@@ -66,7 +66,7 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
     is( $dur->delta_days,        -2,  'delta_days should be -2' );
     is( $dur->delta_minutes,     -64, 'delta_minutes should be 64' );
     is( $dur->delta_seconds,     -21, 'delta_seconds should be 20' );
-    is( $dur->delta_nanoseconds, 0,   'delta_nanoseconds should be 0' );
+    is( $dur->delta_nanoseconds,  0,  'delta_nanoseconds should be 0' );
 
     is( $dur->years,       0,  'Years' );
     is( $dur->months,      1,  'Months' );
@@ -209,8 +209,8 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
 
     my $dur = $dt2 - $dt1;
 
-    is( $dur->delta_days,        0,   'days is 0' );
-    is( $dur->delta_seconds,     0,   'seconds is 0' );
+    is( $dur->delta_days,         0,  'days is 0' );
+    is( $dur->delta_seconds,      0,  'seconds is 0' );
     is( $dur->delta_nanoseconds, -10, 'nanoseconds is -10' );
     ok( $dur->is_negative, 'duration is negative' );
 }
@@ -232,9 +232,9 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
 
     my $dur = $dt2 - $dt1;
 
-    is( $dur->delta_days,        0,   'delta_days is 0' );
+    is( $dur->delta_days,         0,  'delta_days is 0' );
     is( $dur->delta_minutes,     -1,  'delta_minutes is -1' );
-    is( $dur->delta_seconds,     0,   'delta_seconds is 0' );
+    is( $dur->delta_seconds,      0,  'delta_seconds is 0' );
     is( $dur->delta_nanoseconds, -10, 'nanoseconds is -10' );
     ok( $dur->is_negative, 'duration is negative' );
 }
@@ -279,7 +279,7 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
 
     my $dur = $dt2 - $dt1;
 
-    is( $dur->delta_days,    0,   'days is 0' );
+    is( $dur->delta_days,     0,  'days is 0' );
     is( $dur->delta_seconds, -59, 'seconds is -59' );
     is(
         $dur->delta_nanoseconds, -999_999_990,
@@ -355,10 +355,10 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
 
     my $dur = $date1->subtract_datetime_absolute($date2);
 
-    is( $dur->delta_months,      0,          'delta_months is 0' );
-    is( $dur->delta_minutes,     0,          'delta_minutes is 0' );
+    is( $dur->delta_months,       0,         'delta_months is 0' );
+    is( $dur->delta_minutes,      0,         'delta_minutes is 0' );
     is( $dur->delta_seconds,     -2_855_061, 'delta_seconds is -2,855,061' );
-    is( $dur->delta_nanoseconds, 0,          'delta_nanoseconds is 0' );
+    is( $dur->delta_nanoseconds,  0,         'delta_nanoseconds is 0' );
 }
 
 {
@@ -388,7 +388,7 @@ undef $ENV{PERL_DATETIME_DEFAULT_TZ};
         my $neg_diff = $p->[0]->subtract_datetime( $p->[1] );
 
         is( $neg_diff->delta_days,   -1, '-1 day diff at end of month' );
-        is( $neg_diff->delta_months, 0,  '0 month diff at end of month' );
+        is( $neg_diff->delta_months,  0, '0 month diff at end of month' );
     }
 }
 

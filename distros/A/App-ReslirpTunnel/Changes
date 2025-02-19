@@ -1,0 +1,9 @@
+Revision history for Perl extension App::ReslirpTunnel.
+
+0.02  Feb 18, 2025
+      - Documentation improvements.
+
+0.01  Sun Feb  2 19:20:34 2025
+      - original version; created by h2xs 1.23 with options
+        -AXn App::SlirpTunnel
+

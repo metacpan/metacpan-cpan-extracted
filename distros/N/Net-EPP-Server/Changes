@@ -1,0 +1,9 @@
+Revision history for perl module Net::EPP::Server:
+
+0.003 - 2025-02-19
+  - fix copyright date
+  - minor documentation update
+
+0.002 - 2025-02-19
+  - fix dependency
+  - minor documentation updates

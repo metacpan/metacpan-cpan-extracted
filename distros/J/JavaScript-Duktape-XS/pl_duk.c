@@ -17,6 +17,7 @@
 static duk_ret_t perl_caller(duk_context* ctx);
 
 static HV* seen;
+static int skip_func_create = 0; /*A flag, when set we skip the creation of a perl function */
 
 static inline SV* _cstr_to_svpv(pTHX_ const char* cstr, STRLEN clen) {
     SV* ret = newSVpv(cstr, clen);
@@ -59,7 +60,7 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                 /* if the JS function has a slot with the Perl callback, */
                 /* then we know we created it, so we return that */
                 if (duk_get_prop_lstring(ctx, pos, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
-                    ret = (SV*) duk_get_pointer(ctx, pos);
+                    ret = newSVsv((SV*) duk_get_pointer(ctx, pos));
                 }
                 duk_pop(ctx); /* pop function / null pointer */
             } else if (duk_is_array(ctx, pos)) {
@@ -83,16 +84,28 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                     array_top = duk_get_length(ctx, pos);
                     for (j = 0; j < array_top; ++j) {
                         SV* nested = 0;
-                        if (!duk_get_prop_index(ctx, pos, j)) {
-                            continue; /* index doesn't exist => end of array */
+
+                        bool exists = duk_get_prop_index(ctx, pos, j);
+
+                        /* NB: A nonexistent array value does NOT mean that */
+                        /* we are at the end of the array; for example, you */
+                        /* can do `foo[1] = 1` without defining `foo[0]`. */
+
+                        if (exists) {
+                            nested = sv_2mortal(pl_duk_to_perl_impl(aTHX_ ctx, -1, seen));
                         }
-                        nested = sv_2mortal(pl_duk_to_perl_impl(aTHX_ ctx, -1, seen));
-                        duk_pop(ctx); /* value in current pos */
-                        if (!nested) {
-                            croak("Could not create Perl SV for array\n");
-                        }
-                        if (av_store(values_array, j, nested)) {
-                            SvREFCNT_inc(nested);
+
+                        /* Even if the array value is nonexistent we still */
+                        /* have to remove it from the stack. */
+                        duk_pop(ctx);
+
+                        if (exists) {
+                            if (!nested) {
+                                croak("Could not create Perl SV for array\n");
+                            }
+                            if (av_store(values_array, j, nested)) {
+                                SvREFCNT_inc(nested);
+                            }
                         }
                     }
                 }
@@ -154,6 +167,8 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
     return ret;
 }
 
+#include <stdio.h>
+
 static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int ref)
 {
     int ret = 1;
@@ -172,7 +187,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
         const char* vstr = SvPVutf8(value, vlen);
         duk_push_lstring(ctx, vstr, vlen);
     } else if (SvIOK(value)) {
-        long val = SvIV(value);
+        duk_int64_t val = SvIV(value);
         if (ref && (val == 0 || val == 1)) {
             duk_push_boolean(ctx, val);
         } else {
@@ -273,15 +288,23 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
         } else if (type == SVt_PVCV) {
             /* use perl_caller as generic handler, but store the real callback */
             /* in a slot, from where we can later retrieve it */
-            SV* func = newSVsv(value);
-            duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
-            if (!func) {
-                croak("Could not create copy of Perl callback\n");
-            }
-            duk_push_pointer(ctx, func);
-            if (! duk_put_prop_lstring(ctx, -2, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
-                croak("Could not associate C dispatcher and Perl callback\n");
-            }
+
+            /* if the flag is set, it means we have already created the function and we don't need to do anything */
+            if (skip_func_create==1) {
+				skip_func_create = 0;
+			}
+			else {
+				/* In cases where we have a function references as part of the object - not sure of the use case here?*/
+				SV* func = newSVsv(value);
+				duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
+				if (!func) {
+				   croak("Could not create copy of Perl callback\n");
+				}
+				duk_push_pointer(ctx, func);
+				if (! duk_put_prop_lstring(ctx, -2, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
+				   croak("Could not associate C dispatcher and Perl callback\n");
+				}
+			}
         } else {
             croak("Don't know how to deal with an undetermined Perl reference (type: %d)\n", type);
             ret = 0;
@@ -379,6 +402,7 @@ int pl_call_perl_sv(duk_context* ctx, SV* func)
     duk_idx_t nargs = 0;
     SV* ret = 0;
     SV *err_tmp;
+    Duk *duk;
 
     /* prepare Perl environment for calling the CV */
     dTHX;
@@ -404,7 +428,21 @@ int pl_call_perl_sv(duk_context* ctx, SV* func)
 
     err_tmp = ERRSV;
     if (SvTRUE(err_tmp)) {
-        croak("Perl sub died with error: %s", SvPV_nolen(err_tmp));
+        /* Get our duk pointer for this ctx. */
+        duk_push_thread_stash(ctx,ctx);
+        duk_get_prop_string(ctx, -1, PL_NAME_CONSOLE_GENERIC_CALLBACK);
+        duk = (Duk*) duk_get_pointer(ctx, -1);
+        duk_pop(ctx);
+
+        if (duk->flags & DUK_OPT_FLAG_CATCH_PERL_EXCEPTIONS) {
+              duk_push_error_object(ctx, DUK_ERR_ERROR, SvPV_nolen(err_tmp));
+              PUTBACK;
+              FREETMPS;
+              LEAVE;
+              return duk_throw(ctx);
+        } else {
+            croak("Perl sub died with error: %s", SvPV_nolen(err_tmp));
+        }
     }
 
     /* get returned value from Perl and push its JS equivalent back in */
@@ -515,19 +553,37 @@ SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name)
     return ret;
 }
 
-int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* value)
+int pl_set_global_or_property(pTHX_ Duk* duk, const char* name, SV* value)
 {
     int len = 0;
     int last_dot = 0;
+	duk_context* ctx = duk->ctx;
 
-    /* fprintf(stderr, "STACK: %ld\n", (long) duk_get_top(ctx)); */
+    last_dot = find_last_dot(name, &len);
+
+    /* Treat perl functions differently as we need to keep track of them so we don't create memory leaks when using closures*/
+    if (SvROK(value)) {
+		SV* ref = SvRV(value);
+		if (SvTYPE(ref) == SVt_PVCV) {
+            /*We have a coderef, inc the ref count to keep it alive, and save the name in out struct to we can drop it again later */
+            SvREFCNT_inc(value);
+            hv_store(duk->funcref, name, len, value, 0);
+			duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
+			duk_push_pointer(ctx, value);
+			if (! duk_put_prop_lstring(ctx, -2, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
+			    croak("Could not associate C dispatcher and Perl callback\n");
+			}
+            /*Set the flag so we know not to create this function later.  */
+			skip_func_create = 1;
+		}
+	}
 
     if (pl_perl_to_duk(aTHX_ value, ctx)) {
         /* that put value in stack */
     } else {
         return 0;
     }
-    last_dot = find_last_dot(name, &len);
+
     if (last_dot < 0) {
         if (duk_put_global_lstring(ctx, name, len)) {
             /* that consumed value that was in stack */
@@ -554,10 +610,15 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
     return 1;
 }
 
-int pl_del_global_or_property(pTHX_ duk_context* ctx, const char* name)
+int pl_del_global_or_property(pTHX_ Duk* duk, const char* name)
 {
+	duk_context* ctx = duk->ctx;
     int len = 0;
     int last_dot = find_last_dot(name, &len);
+
+    /* treat perl functions differently, if the name exists in the hash, it'll drop reference count */
+	hv_delete(duk->funcref,name,len,0);
+    
     if (last_dot < 0) {
         duk_push_global_object(ctx);
         duk_del_prop_lstring(ctx, -1, name, len);
@@ -586,7 +647,7 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
         duk_uint_t flags = 0;
 
         /* flags |= DUK_COMPILE_STRICT; */
-
+        
         pl_stats_start(aTHX_ duk, &stats);
         if (!file) {
             /* Compile the requested code without a reference to the file where it lives */
@@ -600,7 +661,7 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
         pl_stats_stop(aTHX_ duk, &stats, "compile");
         if (rc != DUK_EXEC_SUCCESS) {
             /* Only for an error this early we print something out and bail out */
-            duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+            duk_console_log(ctx,DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
                             "JS could not compile code: %s\n",
                             duk_safe_to_string(ctx, -1));
             break;

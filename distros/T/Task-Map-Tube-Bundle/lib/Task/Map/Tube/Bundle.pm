@@ -1,6 +1,6 @@
 package Task::Map::Tube::Bundle;
 
-$Task::Map::Tube::Bundle::VERSION   = '0.03';
+$Task::Map::Tube::Bundle::VERSION   = '0.04';
 $Task::Map::Tube::Bundle::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Task::Map::Tube::Bundle - Bundles Map::Tube::* map packages.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 DESCRIPTION
 
@@ -112,6 +112,8 @@ L<https://github.com/manwar/Task-Map-Tube-Bundle>
 
 =item L<Map::Tube::Tbilisi>
 
+=item L<Map::Tube::Toulouse>
+
 =item L<Map::Tube::Tokyo>
 
 =item L<Map::Tube::Vienna>
@@ -154,7 +156,7 @@ L<https://metacpan.org/dist/Task-Map-Tube-Bundle/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2024 Mohammad Sajid Anwar.
+Copyright (C) 2024 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

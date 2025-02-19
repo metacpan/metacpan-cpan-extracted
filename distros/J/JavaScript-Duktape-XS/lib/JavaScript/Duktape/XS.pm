@@ -6,7 +6,7 @@ use parent 'Exporter';
 use JSON::PP;  # required to properly handle booleans
 use XSLoader;
 
-our $VERSION = '0.000079';
+our $VERSION = '0.000081';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -25,17 +25,18 @@ engine
 
 =head1 VERSION
 
-Version 0.000079
+Version 0.000081
 
 =head1 SYNOPSIS
 
     my $vm = JavaScript::Duktape::XS->new();
 
     my $options = {
-        gather_stats     => 1,
-        save_messages    => 1,
-        max_memory_bytes => 256*1024,
-        max_timeout_us   => 2*1_000_000,
+        gather_stats          => 1,
+        save_messages         => 1,
+        max_memory_bytes      => 256*1024,
+        max_timeout_us        => 2*1_000_000,
+        catch_perl_exceptions => 1,
     };
     my $vm = JavaScript::Duktape::XS->new($options);
 
@@ -112,6 +113,15 @@ not used, there is no limit in place.
 
 Limit the execution runtime of any single JavaScript call to this many
 microseconds.  If this option is not used, there is no limit in place.
+
+=head3 catch_perl_exceptions
+
+Convert Perl exceptions that are thrown with C<die()> into a JavaScript
+C<Error> object. These exception can then be caught in a C<catch> block in
+the JavaScript code that had invoked Perl.  If this option is not used, Perl
+exceptions are fatal from JavaScript's perspective and cannot be caught.
+
+This option was added in version 0.000080.
 
 =head2 set
 

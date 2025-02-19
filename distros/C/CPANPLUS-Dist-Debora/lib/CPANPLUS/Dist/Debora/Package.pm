@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Carp qw(croak);
 use Config;
@@ -729,6 +729,9 @@ sub _get_packager {
 
     if (!$email) {
         my $host = hostfqdn;
+        if (!$host) {
+            $host = 'localhost';
+        }
         $host =~ s{[.]$}{}xms;
         $email = $user . q{@} . $host;
     }
@@ -1234,7 +1237,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

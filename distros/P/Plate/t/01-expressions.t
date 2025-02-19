@@ -1,7 +1,7 @@
 #!perl -T
 use 5.020;
 use warnings;
-use Test::More tests => 32;
+use Test::More tests => 34;
 
 BEGIN {
     if ($ENV{AUTHOR_TESTING}) {
@@ -187,5 +187,17 @@ is $plate->serve(\<<''), "Hi5\n\n\nExtra\n\nLines\n\n\n7up", 'Precompiled multi-
 $plate->set(filters => undef);
 like eval { $plate->serve(\'<% 1 |html %>') } // $@,
 qr"^No 'html' filter defined ", 'Remove all filters';
+
+$plate->set(pragmas => ['no strict']);
+is $plate->serve(\<<''), 'No strict', 'No strict';
+% $undeclared_var = "No";
+<% $undeclared_var %> strict
+
+SKIP: {
+    skip 'Test pragma "use 5.036"', 1 if $] < 5.036;
+
+    $plate->set(pragmas => ['use 5.036']);
+    is eval { $plate->serve(\"% my \$x = bless {}, 'Obj';\n<% \$x isa 'Obj' ? 'Y' : 'N' %>") } // $@, 'Y', 'Use 5.036';
+}
 
 ok !$warned, 'No warnings';

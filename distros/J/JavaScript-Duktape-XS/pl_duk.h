@@ -7,15 +7,17 @@
 #include "perl.h"
 #include "ppport.h"
 
-#define DUK_OPT_NAME_GATHER_STATS      "gather_stats"
-#define DUK_OPT_NAME_SAVE_MESSAGES     "save_messages"
-#define DUK_OPT_NAME_MAX_MEMORY_BYTES  "max_memory_bytes"
-#define DUK_OPT_NAME_MAX_TIMEOUT_US    "max_timeout_us"
+#define DUK_OPT_NAME_GATHER_STATS           "gather_stats"
+#define DUK_OPT_NAME_SAVE_MESSAGES          "save_messages"
+#define DUK_OPT_NAME_MAX_MEMORY_BYTES       "max_memory_bytes"
+#define DUK_OPT_NAME_MAX_TIMEOUT_US         "max_timeout_us"
+#define DUK_OPT_NAME_CATCH_PERL_EXCEPTIONS  "catch_perl_exceptions"
 
-#define DUK_OPT_FLAG_GATHER_STATS      0x01
-#define DUK_OPT_FLAG_SAVE_MESSAGES     0x02
-#define DUK_OPT_FLAG_MAX_MEMORY_BYTES  0x04
-#define DUK_OPT_FLAG_MAX_TIMEOUT_US    0x08
+#define DUK_OPT_FLAG_GATHER_STATS           0x01
+#define DUK_OPT_FLAG_SAVE_MESSAGES          0x02
+#define DUK_OPT_FLAG_MAX_MEMORY_BYTES       0x04
+#define DUK_OPT_FLAG_MAX_TIMEOUT_US         0x08
+#define DUK_OPT_FLAG_CATCH_PERL_EXCEPTIONS  0x10
 
 #define PL_NAME_ROOT              "_perl_"
 #define PL_NAME_GENERIC_CALLBACK  "generic_callback"
@@ -36,6 +38,7 @@ typedef struct Duk {
     HV* version;
     HV* stats;
     HV* msgs;
+    HV* funcref; /* Structure to hold the name and references to perl callbacks */
     size_t total_allocated_bytes;
     size_t max_allocated_bytes;
     double max_timeout_us;;
@@ -73,8 +76,8 @@ SV* pl_exists_global_or_property(pTHX_ duk_context* ctx, const char* name);
 SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name);
 SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object, const char* class);
 SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name);
-int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* value);
-int pl_del_global_or_property(pTHX_ duk_context* ctx, const char* name);
+int pl_set_global_or_property(pTHX_ Duk* duk, const char* name, SV* value);
+int pl_del_global_or_property(pTHX_ Duk* duk, const char* name);
 SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file);
 
 /* Run the Duktape GC */
@@ -83,5 +86,5 @@ int pl_run_gc(Duk* duk);
 SV* pl_global_objects(pTHX_ duk_context* ctx);
 
 HV* pl_get_version_info(pTHX);
-
+int pl_console_callback(void* data, duk_uint_t flags,const char* fmt, va_list ap);
 #endif

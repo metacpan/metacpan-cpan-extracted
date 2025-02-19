@@ -1,6 +1,6 @@
 use 5.020;
 use warnings;
-package Plate 1.6;
+package Plate 1.7;
 
 use Carp 'croak';
 use File::Spec;
@@ -236,8 +236,11 @@ sub _write {
         or croak "Can't write $_[0]: $!";
     print $fh $_[1];
 }
+sub _pkg {
+    join ';', @{$$Plate::_s{pragmas}}, "package $$Plate::_s{package};";
+}
 sub _eval {
-    eval "package $$Plate::_s{package};$_[0]";
+    eval $_[0];
 }
 sub _compile {
     my($pl, $file) = @_;
@@ -251,18 +254,19 @@ sub _compile {
     local @Plate::_l;
     # Precompile
     $pl = _parse $pl, $re_pre, $file, '';
-    $pl = "sub{$line$pl}";
+    my $pkg = _pkg;
+    $pl = "${pkg}sub{$line$pl}";
     $sub = _eval $pl
         or croak $@.'Plate precompilation failed';
     defined($pl = eval { $sub->() })
         or croak $@.'Plate precompilation failed';
     # Compile
     $pl = _parse $pl, $re_run, $file, '';
-    $pl = "$$Plate::_s{once}sub{$$Plate::_s{init}$line$pl}";
+    $pl = "$pkg$$Plate::_s{once}sub{$$Plate::_s{init}$line$pl}";
     $sub = _eval $pl
         or croak $@.'Plate compilation failed';
     # Cache
-    _write $_[2], "use 5.020;use warnings;use utf8;package $$Plate::_s{package};$pl" if defined $_[2];
+    _write $_[2], $pkg.'use utf8;'.substr($pl, length $pkg) if defined $_[2];
     $$Plate::_s{mod}{$_[3]} = $_[4] if defined $_[4];
     return $sub;
 }
@@ -374,7 +378,7 @@ localised global variables.
 Templates can also include other templates, with optional content
 and even define or override templates & filters locally.
 
-All templates have strict, warnings, utf8 and Perl 5.20 features enabled.
+All templates have strict, warnings and Perl 5.20 features enabled by default.
 
 =head2 Example
 
@@ -586,6 +590,17 @@ An empty string (the default) refers to the current directory.
 If set to C<undef> then the filesystem will not be searched,
 only cached templates will be served.
 
+=item C<< pragmas => [] >>
+
+A list of pragmas to use when compiling templates.
+
+All templates have strict, warnings and Perl 5.20 features enabled by default,
+but these defaults can be changed. Eg:
+
+    my $plate = Plate->new(pragmas => ['use 5.040', 'no strict', 'no warnings']);
+
+This will enable all features from Perl 5.40 and disable strict and warnings.
+
 =item C<< static => undef >>
 
 If set to a false value (the default),
@@ -638,6 +653,7 @@ sub new {
         once => '',
         package => 'Plate::Template',
         path => '',
+        pragmas => [],
         static => undef,
         suffix => '.plate',
         umask => 077,
@@ -853,6 +869,11 @@ sub _set_package {
     defined $_[1] and $_[1] =~ /^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$/
         or croak "Invalid package name '".($_[1]  // '')."'";
     $_[0]{package} = $_[1];
+}
+sub _set_pragmas {
+    ref $_[1] eq 'ARRAY'
+        or croak "Invalid pragmas (not an array reference)";
+    @{$_[0]{pragmas}} = @{$_[1]};
 }
 sub _set_vars {
     $_[1] // return undef %{$_[0]{vars}};

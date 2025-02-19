@@ -1,0 +1,410 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use App::ReslirpTunnel;
+
+my $remote_port;
+my $remote_user;
+my $remote_os;
+my $remote_shell;
+my $ssh_command;
+my @more_ssh_args;
+my $reslirp_command;
+my @more_reslirp_args;
+
+my $remote_network;
+my $remote_netmask;
+my $remote_dns = '3';
+my $remote_gw = '2';
+my $local_ip = '30';
+my $device;
+my @route_nets;
+my @route_hosts;
+my @route_hosts_local;
+my @route_hosts_dns;
+my @route_hosts_ssh;
+my @forward_dns_ssh;
+my $log_to_stderr;
+my $log_file;
+my $log_level = 'warn';
+my $dont_close_stdio;
+my $run_in_foreground;
+
+sub parse_network {
+    my $arg = shift;
+    $arg =~ /^(\d+\.\d+\.\d+\.\d+)(?:\/(\d+))?$/ or die "Bar network argument: $arg";
+    $remote_network = $1;
+    $remote_netmask = $2 if defined $2;
+}
+
+my $ipv4_re = qr/(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))/;
+
+sub parse_route_host {
+    my (undef, $arg) = @_;
+    if (my ($addrs, $host) = $arg =~ /^($ipv4_re(?:,$ipv4_re)*)(?:=([^=]+))?$/o) {
+        push @route_hosts, { host => $host, addrs => [split /,/, $addrs] };
+    }
+    else {
+        die "Bad argument for --route-host: $arg\n";
+    }
+}
+
+sub parse_route_net {
+    my (undef, $arg) = @_;
+    if (my ($net, $mask) = $arg =~ /^($ipv4_re)\/(\d+)$/) {
+        push @route_nets, { addr => $net, mask => $mask };
+    }
+    else {
+        die "Bad argument for --route-net: $arg\n";
+    }
+}
+
+sub parse_forward_dns_ssh {
+    my (undef, $arg) = @_;
+    if (my ($domain, $iface) = $arg =~ /^([^=]+)=(.*)$/) {
+        push @forward_dns_ssh, { domain => $domain, iface => $iface }
+    }
+    else {
+        die "Bad argument for --forward-dns-ssh: $arg\n";
+    }
+}
+GetOptions( 'C|reslirp-cmd|reslirp-command=s' => \$reslirp_command,
+            'D|log-level=s' => \$log_level,
+            'E|log-to-stderr' => \$log_to_stderr,
+            'F|forward-dns-ssh=s' => \&parse_forward_dns_ssh,
+            'H|route-host-dns=s' => sub { push @route_hosts_dns, $_[1] },
+            'I|tap-device=s' => \$device,
+            'L|log-file=s' => \$log_file,
+            'N|route-net|route-network=s' => \&parse_route_net,
+            'O|route-host-local=s' => sub { push @route_hosts_local, $_[1] },
+            'R|remote-os=s' => \$remote_os,
+            'S|remote-shell=s' => \$remote_shell,
+            'a|local-ip=s' => \$local_ip,
+            'd|remote-dns=s' => \$remote_dns,
+            'f|run-in-foreground' => \$run_in_foreground,
+            'g|remote-gw=s' => \$remote_gw,
+            'm|remote-netmask=s' => \$remote_netmask,
+            'n|remote-network=s' => sub { parse_network($_[1]) },
+            'p|remote-port=s' => \$remote_port,
+            'r|reslirp-arg=s' => sub { push @more_reslirp_args, $_[1] },
+            's|ssh-arg=s' => sub { push @more_ssh_args, $_[1] },
+            's|ssh-cmd|ssh-command=s' => \$ssh_command,
+            'l|remote-user=s' => \$remote_user,
+            'h|route-host=s' => \&parse_route_host,
+            'W|route-host-ssh=s' => sub { push @route_hosts_ssh, $_[1] },
+            'dont-close-stdio' => \$dont_close_stdio )
+    or die <<"USAGE";
+Usage: $0 [options]
+Options:
+  -C, --reslirp-cmd, --reslirp-command <command>  Specify the reSLIRP command
+  -D, --log-level <level>                         Specify the log level
+  -E, --log-to-stderr                             Log to standard error
+  -F, --forward-dns-ssh <dns>=<remote_iface>      Specify additional forward DNS
+  -H, --route-host-dns <hostname>                 Add route for host (resolve using remote DNS)
+  -I, --tap-device <device>                       Specify the tap device (autodetected by default)
+  -L, --log-file <file>                           Specify the log file (by default logs to a file in ~/.local/state/reslirp-tunnel/logs)
+  -N, --route-net <ipv4>/<mask>                   Add route for network
+  -O, --route-host-local <hostname>               Add route for host (resolve locally)
+  -R, --remote-os <os>                            Specify the remote operating system (autodetected by default)
+  -S, --remote-shell <shell>                      Specify the remote shell (autodetected by default)
+  -a, --local-ip <ip>                             Specify the local IP (defaults to 10.0.2.30)
+  -d, --remote-dns <dns>                          Specify the remote DNS (defaults to 10.0.2.3)
+  -f, --run-in-foreground                         Run in foreground
+  -g, --remote-gw <gateway>                       Specify the remote gateway (defaults to 10.0.2.2)
+  -m, --remote-netmask <netmask>                  Specify the remote netmask (defaults to 255.255.255.0)
+  -n, --remote-network <network>                  Specify the remote network (defaults to 10.0.2.0/24)
+  -p, --remote-port <port>                        Specify the remote port (defaults to 22)
+  -r, --reslirp-arg <arg>                         Specify additional reSLIRP arguments
+  -s, --ssh-arg <arg>                             Specify additional SSH arguments
+  -s, --ssh-cmd, --ssh-command <command>          Specify the SSH command
+  -l, --remote-user <user>                        Specify the remote user
+  -h, --route-host <ipv4>[=<hostname>]            Add route for host
+  -W, --route-host-ssh <hostname>                 Add route for host (resolve using remote command run through SSH)
+  --dont-close-stdio                              Don't close stdio
+USAGE
+my $remote_host = shift @ARGV // "localhost";
+
+# Allow remote address to accept port in the format hostname:port
+if ($remote_host =~ /^(.*?):(\d+)$/) {
+    $remote_port = $2;
+    $remote_host = $1;
+}
+
+$log_level =~ /^(debug|info|warn|error)$/ or die "Invalid log level: $log_level\n";
+
+if (defined $device) {
+    $device = "tap$device" if $device =~ /^\d+$/;
+}
+
+my $tunnel = App::ReslirpTunnel->new(app_name => 'reslirp-tunnel',
+                                   remote_port => $remote_port,
+                                   remote_host => $remote_host,
+                                   remote_user => $remote_user,
+                                   remote_os => $remote_os,
+                                   remote_network => $remote_network,
+                                   remote_netmask => $remote_netmask,
+                                   remote_gw => $remote_gw,
+                                   remote_dns => $remote_dns,
+                                   local_ip => $local_ip,
+                                   ssh_command => $ssh_command,
+                                   more_ssh_args => \@more_ssh_args,
+                                   more_reslirp_args => \@more_reslirp_args,
+                                   reslirp_command => $reslirp_command,
+                                   forward_dns_ssh => \@forward_dns_ssh,
+                                   route_nets => \@route_nets,
+                                   route_hosts => \@route_hosts,
+                                   route_hosts_local => \@route_hosts_local,
+                                   route_hosts_dns => \@route_hosts_dns,
+                                   route_hosts_ssh => \@route_hosts_ssh,
+                                   log_to_stderr => $log_to_stderr,
+                                   log_file => $log_file,
+                                   log_level => $log_level,
+                                   run_in_foreground => $run_in_foreground,
+                                   dont_close_stdio => $dont_close_stdio,
+                                   device => $device);
+
+$tunnel->go;
+
+=pod
+
+=head1 NAME
+
+reslirp-tunnel - A script to set up a reSLIRP tunnel over SSH for remote connections
+
+=head1 SYNOPSIS
+
+reslirp-tunnel [options] [remote_host]
+=head1 DESCRIPTION
+
+C<reslirp-tunnel> establishes a reSLIRP tunnel to a specified remote
+host using SSH. It enables users to configure various networking
+options and manages IP routing rules along with DNS resolution
+configuration, greatly simplifying the setup process for a reSLIRP
+tunnel.
+
+The program is designed to be executed by a non-root user. It
+automatically invokes sudo in the background, which typically prompts
+the user for a password to perform privileged operations.
+
+Also, the program is intended to be run on Linux system using
+C<systemd>.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-C, --reslirp-cmd, --reslirp-command> I<command>
+
+Specify the reSLIRP command to be used.
+
+By default, it uses C<C:\Program Files\reSLIRP\reslirp.ext>. When the
+remote Operating System is Windows and C<reslirp> otherwise.
+
+=item B<-s, --ssh-cmd, --ssh-command> I<command>
+
+Specify the SSH command to be used.
+
+=item B<-R, --remote-os> I<os>
+
+Specify the remote operating system.
+
+When not given, C<reslirp-tunnel> would try to autodetect the remote
+Operating System running some commands over the SSH channel.
+
+=item B<-S, --remote-shell> I<shell>
+
+Specify the remote shell.
+
+C<reslirp-tunnel> also tries to autodetect the remote shell when it is
+not explicitly given using this flag.
+
+=item B<-n, --remote-network> I<network>
+
+Specify the remote network (defaults to 10.0.2.0/24).
+
+=item B<-m, --remote-netmask> I<netmask>
+
+Specify the remote netmask (defaults to 255.255.255.0).
+
+=item B<-g, --remote-gw> I<gateway>
+
+Specify the remote gateway (defaults to 10.0.2.2).
+
+=item B<-d, --remote-dns> I<dns>
+
+Specify the remote DNS (defaults to 10.0.2.3).
+
+=item B<-a, --local-ip> I<ip>
+
+Specify the local IP (defaults to 10.0.2.30).
+
+=item B<-i, --tap-device> I<device>
+
+Specify the tap device.
+
+By default, C<reslirp-tunnel> will use the first tap device available.
+
+=item B<-s, --ssh-arg> I<arg>
+
+Specify additional SSH arguments.
+
+=item B<-r, --reslirp-arg> I<arg>
+
+Specify additional reslirp arguments.
+
+=item B<-E, --log-to-stderr>
+
+Log to standard error.
+
+=item B<-L, --log-file> I<file>
+
+Specify the log file (by default logs to a file in ~/.local/state/reslirp-tunnel/logs).
+
+=item B<-D, --log-level> I<level>
+
+Specify the log level (debug, info, warn, error).
+
+=item B<-l, --remote-user> I<user>
+
+Specify the remote user used for logging in.
+
+=item B<-p, --remote-port> I<port>
+
+Specify the remote port (defaults to 22).
+
+=item B<-F, --forward-dns-ssh> I<dns>=I<remote_iface>
+
+Resolves the given domain using the remote DNS server attached to the
+given interface in the remote machine.
+
+This is useful for resolving using the DNS provided by a VPN
+client running in the target machine.
+
+=item B<-N, --route-net, --route-network> I<ipv4>/<mask>
+
+Route the traffics to the given network through the reSLIRP tunnel.
+
+=item B<-h, --route-host, --route-host-local> I<host>
+
+=item B<-H, --route-host-dns> I<host>
+
+=item B<-W, --route-host-ssh> I<host>
+
+When one or more hosts are given using any of these options, the
+script changes the local network configuration so that traffic going
+to the given machines is routed through the reSLIRP tunnel.
+
+The difference between these options is how the script resolves the
+hostnames:
+
+=over 8
+
+=item B<--route-host, --route-host-local>
+
+Resolves the host locally using the OS resolver.
+
+=item B<--route-host-dns>
+
+Resolves the host using the remote DNS provided by reSLIRP which
+forwards the request to any configured DNS server. Though, note that
+this doesn't usually work when the remote hosts runs Windows.
+
+=item B<--route-host-ssh>
+
+Resolves the host using commands run on the remote machine through the
+SSH connection. Effectively, this approach resolves the names using
+the resolver configuration in the remote machine.
+
+=back
+
+The addresses are resolved at launch time and then cached in a local
+DNS server set up by C<reslirp-tunnel>. The configuration of C<systemd>
+resolver is also adjusted so that the DNS service is used for those
+hosts.
+
+Finally, a set of IP rules are also added for directing the traffic
+through the tunnel.
+
+=item B<-f>, B<--run-in-foreground>
+
+By default, C<reslirp-tunnel> detaches from the terminal once the
+slave sudo process begins and the SSH connection is established. This
+option disables that behavior.
+
+=item B<--dont-close-stdio>
+
+Preserve standard input/output.
+
+By default, when C<reslirp-tunnel> forks itself into the background,
+it closes its standard input and output channels. This can complicate
+matters by preventing error messages from being printed
+afterward. Enabling this option ensures that the standard input/output
+channels remain open.
+
+=back
+
+=head1 EXAMPLES
+
+  reslirp-tunnel --route-net=10.0.0.0/8 --forward-dns-ssh=windows.net localhost:4022
+
+=head1 UNDER THE HOOD
+
+Those are the actions performed under the hood by C<reslirp-tunnel>:
+
+
+=over 8
+
+=item 1.
+
+Initiates a slave process using C<sudo> to carry out privileged operations.
+
+=item 2.
+
+Establishes an SSH connection to the designated remote host.
+
+=item 3.
+
+Forks itself into the background and closes its standard input and output channels.
+
+=item 4.
+
+Creates a C<tap> device.
+
+=item 5.
+
+Executes C<reSLIRP> on the remote machine, linking it to the C<tap> device through an SSH channel.
+
+=item 6.
+
+If necessary, retrieves information about the remote machine's network configuration by executing commands over the SSH channel.
+
+=item 7.
+
+If necessary, starts a local DNS server (C<dnsmasq>) linked to the C<tap> device, configuring it to serve the various hosts and domains specified on the command line.
+
+=item 8.
+
+Adds all required routes to direct IP traffic through the tunnel, in accordance with the provided command line parameters.
+
+=item 9.
+
+If something goes wrong, or the process receives a signal, it cleans
+up, waiting for the child processes to exit and terminates.
+
+Note that IP routes and DNS configurations are attached to the C<tap>
+device, so they are automatically removed when the device is deleted.
+
+=back
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2025 by Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.38.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

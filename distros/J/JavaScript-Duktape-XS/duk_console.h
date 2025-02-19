@@ -20,18 +20,13 @@ extern "C" {
 /* Send output to stderr. */
 #define DUK_CONSOLE_TO_STDERR      (1 << 3)
 
-/* The console handler prototype */
-typedef int (ConsoleHandler)(duk_uint_t flags, void* data,
-                             const char* fmt, va_list ap);
+#define PL_NAME_CONSOLE_GENERIC_CALLBACK  "__perl__duk__"
 
 /* Initialize the console system */
 extern void duk_console_init(duk_context *ctx, duk_uint_t flags);
 
-/* Register a console handler */
-extern void duk_console_register_handler(ConsoleHandler* handler, void* data);
-
 /* Public function to log messages, callable from C */
-extern int duk_console_log(duk_uint_t flags, const char* fmt, ...);
+extern int duk_console_log(duk_context *ctx,duk_uint_t flags, const char* fmt, ...);
 
 #if defined(__cplusplus)
 }

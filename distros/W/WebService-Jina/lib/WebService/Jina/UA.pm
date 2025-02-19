@@ -18,6 +18,8 @@ has ua => (
 	is => 'ro',
 	default => sub {
 		my $ua = LWP::UserAgent->new();
+		use Data::Dumper;
+		warn Dumper $_[0]->api_key;
 		$ua->default_header('Authorization' => 'Bearer ' . $_[0]->api_key);
 		$ua->default_header('User-Agent' => 'Mozilla/5.0');
 		return $ua;

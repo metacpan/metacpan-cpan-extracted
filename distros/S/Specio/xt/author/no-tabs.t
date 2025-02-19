@@ -65,6 +65,7 @@ my @files = (
     't/inheritance.t',
     't/inline-environment.t',
     't/inline.t',
+    't/integer-edge-case.t',
     't/intersection.t',
     't/lib/Specio/Library/CannotSub.pm',
     't/lib/Specio/Library/Coercions.pm',

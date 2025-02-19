@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.95  2025-02-18T14::05+00:00
+      - Updated pod and documented Map::Tube::Toulouse.
+
 3.94  2025-02-14T22::00+00:00
       - Fixed the dist package.
 

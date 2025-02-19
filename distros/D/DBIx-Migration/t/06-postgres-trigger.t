@@ -21,14 +21,16 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
-note 'dsn: ', $pgsql->dsn;
-local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
+note 'tracking schema: ', my $tracking_schema = 'public';
+note 'managed schema: ',  my $managed_schema  = 'myschema';
+note 'dsn: ',             my $dsn             = $pgsql->dsn . ";options=--search_path=$managed_schema";
+local $Test::PgTAP::Dbh = DBI->connect( $dsn );
 
 plan tests => 9;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new( dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ) );
+my $m = DBIx::Migration->new( dsn => $dsn, dir => catdir( curdir, qw( t sql trigger ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -41,28 +43,28 @@ sub migrate_to_version_assertion {
 my $target_version = 1;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-tables_are 'myschema', [ qw( products ) ], 'Check tables';
-tables_are [ qw( public.dbix_migration myschema.products ) ];
+tables_are $managed_schema, [ qw( products ) ], 'Check tables';
+tables_are [ "$tracking_schema.dbix_migration", "$managed_schema.products" ];
 
 $target_version = 2;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
-tables_are 'myschema', [ qw( products product_price_changes ) ], 'Check tables';
-tables_are [ qw( public.dbix_migration myschema.products myschema.product_price_changes ) ];
-triggers_are 'myschema', 'products', [ qw( price_changes ) ];
-triggers_are 'products', [ qw( myschema.price_changes ) ];
+tables_are $managed_schema, [ qw( products product_price_changes ) ], 'Check tables';
+tables_are [ "$tracking_schema.dbix_migration", map { "$managed_schema.$_" } qw( products product_price_changes ) ];
+triggers_are $managed_schema, 'products', [ qw( price_changes ) ];
+triggers_are 'products', [ "$managed_schema.price_changes" ];
 
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
 
-  my $sth = $m->dbh->prepare( 'INSERT INTO myschema.products (name, price) VALUES (?, ?);' );
+  my $sth = $m->dbh->prepare( "INSERT INTO $managed_schema.products (name, price) VALUES (?, ?);" );
   ok $sth->execute( 'Product 1', 10.0 ), 'insert a product';
 
-  $sth = $m->dbh->prepare( 'UPDATE myschema.products SET price = ? WHERE id = ?' );
+  $sth = $m->dbh->prepare( "UPDATE $managed_schema.products SET price = ? WHERE id = ?;" );
   ok $sth->execute( 20.0, 1 ), 'update the previously inserted product';
 
   local $Test::DatabaseRow::dbh = $m->dbh;
   all_row_ok(
-    sql         => 'SELECT * FROM myschema.product_price_changes',
+    sql         => "SELECT * FROM $managed_schema.product_price_changes;",
     tests       => [ id => 1, product_id => 1, old_price => 10.0, new_price => 20.0 ],
     description => 'check product changes row'
   );

@@ -61,7 +61,7 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir, debug => 0 );
+my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
@@ -69,9 +69,8 @@ ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
 
 $tempdir = tempdir( CLEANUP => 1 );
 my $m2 = DBIx::Migration->new(
-  dsn   => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ),
-  dir   => catdir( curdir, qw( t sql rollback ) ),
-  debug => 0
+  dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ),
+  dir => catdir( curdir, qw( t sql rollback ) ),
 );
 
 dies_ok { $m2->migrate } 'second migration section is broken';

@@ -3,7 +3,7 @@ package Specio::Library::Builtins;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 use parent 'Specio::Exporter';
 
@@ -147,14 +147,24 @@ declare(
         defined( %s )
         && !ref( %s )
         && (
-               do { ( my $val1 = %s ) =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/ }
+               do {
+                   my $val1 = %s;
+                   $val1 =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/
+                   && $val1 == int($val1)
+               }
            )
     )
     ||
     (
         Scalar::Util::blessed( %s )
         && defined overload::Method( %s, '0+' )
-        && do { ( my $val2 = %s + 0 ) =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/ }
+        && (
+               do {
+                   my $val2 = %s + 0;
+                   $val2 =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/
+                   && $val2 == int($val2)
+               }
+           )
     )
 )
 EOF
@@ -459,7 +469,7 @@ Specio::Library::Builtins - Implements type constraint objects for Perl's built-
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 DESCRIPTION
 
@@ -584,7 +594,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -1,3 +1,13 @@
+0.000081    2025-02-19
+            * Upgrade to Ducktape 2.7.0.
+            * Fix / prevent CVE-2021-46322.
+            * Upgrade ppport.h to version 3.6.2.
+            Thanks to gflohr for taking care of all this.
+
+0.000080    2021-09-27
+            * Fix minor memory leaks in statistics, get/set messages and main object destruction
+            * Fix memory leak when using closures and perl callbacks in Set
+
 0.000079    2021-09-16
             * Teach XS to translate ArrayBuffer & TypedArray to Perl.
             * Fix character-encoding oddities, add documentation.

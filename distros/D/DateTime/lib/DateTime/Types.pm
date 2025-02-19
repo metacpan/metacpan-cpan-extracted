@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.65';
+our $VERSION = '1.66';
 
 use parent 'Specio::Exporter';
 
-use Specio 0.18;
+use Specio 0.50;
 use Specio::Declare;
 use Specio::Library::Builtins -reexport;
 use Specio::Library::Numeric -reexport;
@@ -170,7 +170,7 @@ DateTime::Types - Types used for parameter checking in DateTime
 
 =head1 VERSION
 
-version 1.65
+version 1.66
 
 =head1 DESCRIPTION
 
@@ -195,7 +195,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2023 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 
