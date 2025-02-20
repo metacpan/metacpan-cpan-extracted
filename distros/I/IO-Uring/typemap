@@ -61,10 +61,12 @@ T_SIGSET
 T_SIGNO
 	$var = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
 T_TIMESPEC
-	{
-	NV input = SvNV($arg);
-	$var.tv_sec  = (time_t) floor(input);
-	$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
+	if (SvROK($arg) && sv_derived_from($arg, \"Time::Spec\")) {
+		$var = *(struct timespec*)SvPV_nolen(SvRV($arg));
+	} else {
+		NV input = SvNV($arg);
+		$var.tv_sec  = (time_t) floor(input);
+		$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
 	}
 T_OPAQUEOBJ
     {

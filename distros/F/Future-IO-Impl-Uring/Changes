@@ -1,4 +1,8 @@
 Revision history for Future-IO-Impl-Uring
 
+0.002     2025-02-19 17:05:07+01:00 Europe/Brussels
+          - Make syswrite_exactly actually work
+          - Make sleep and waitpid also cancelable
+
 0.001     2025-02-05 20:59:59+01:00 Europe/Brussels
           Initial release to an unsuspecting world

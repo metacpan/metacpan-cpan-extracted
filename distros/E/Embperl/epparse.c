@@ -140,6 +140,7 @@ static int CheckProcInfo      (/*i/o*/ register req * r,
 		{
 		strncpy (r -> errdat1, "BuildTokenHash", sizeof (r -> errdat1)) ;
 		sprintf (r -> errdat2, "%s => procinfo", pToken -> sText) ;
+		free (pSortTokenHash) ;
 		return rcNotHashRef ;
 		}
 	    if (strcmp (pKey, "embperl") == 0)
@@ -147,6 +148,7 @@ static int CheckProcInfo      (/*i/o*/ register req * r,
 	    else if (strncmp (pKey, "embperl#", 8) == 0 && (n = atoi (pKey+8)) > 0)
 		embperl_CompileInitItem (r, (HV *)(SvRV (pSVValue)), pToken -> nNodeName, pToken -> nNodeType, n, ppCompilerInfo) ;
 	    }
+		free (pSortTokenHash) ;
 	}	    
 
 

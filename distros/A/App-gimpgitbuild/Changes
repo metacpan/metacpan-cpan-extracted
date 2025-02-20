@@ -1,5 +1,10 @@
 Revision history for App-gimpgitbuild
 
+0.32.1   2025-02-20
+    - simplify the regex environment variables' code.
+        - thanks to @mauke
+    - update docs.
+
 0.32.0   2025-02-13
     - add GIMPGITBUILD__FORCE_TESTS_RE
     - fix the GIMP Lua flag

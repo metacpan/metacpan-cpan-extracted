@@ -2,6 +2,15 @@
 
 =encoding iso8859-1
 
+=head1 3.0.1  19. Feb 2025
+
+    - Fix memory leak in epparse.c
+    - Make unstructured_forwar/backward_jump a normal error, that 
+      does not exit the program and clarify the error message
+    - Limit length of formdata to 64M (not for file upload), to 
+      avoid huge memory allocation/failures
+    - Fix missing escape of name attribute in hidden command
+
 =head1 3.0.0  24. Nov 2023
 
     - Final 3.0.0 version, no changes since 3.0.0-rc.2

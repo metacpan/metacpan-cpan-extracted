@@ -298,6 +298,7 @@ test/cmp/error.htm
 test/cmp/errormismatch.htm
 test/cmp/errormismatchcmd.htm
 test/cmp/errorfirstrun.htm
+test/cmp/error_forward_jump.htm
 test/cmp/errpage.htm
 test/cmp/escape.htm
 test/cmp/escraw.htm
@@ -324,6 +325,7 @@ test/cmp/getsess.htm
 test/cmp/geturlsess.htm
 test/cmp/heredoc.htm
 test/cmp/hidden.htm
+test/cmp/hidden_escape.htm
 test/cmp/hostconfig.htm
 test/cmp/hostconfig.htm.3
 test/cmp/hostconfig.htm.4
@@ -505,6 +507,7 @@ test/html/errmsg.htm
 test/html/errmsg2.htm
 test/html/error.htm
 test/html/errorfirstrun.htm
+test/html/error_forward_jump.htm
 test/html/escape.htm
 test/html/escraw.htm
 test/html/escutf8.htm
@@ -530,6 +533,7 @@ test/html/getnosess.htm
 test/html/getsess.htm
 test/html/heredoc.htm
 test/html/hidden.htm
+test/html/hidden_escape.htm
 test/html/hostconfig.htm
 test/html/http.htm
 test/html/if.htm

@@ -33,7 +33,7 @@ no warnings "uninitialized" ;
 @ISA = qw(Embperl);
 
 
-$VERSION = '3.0.0';
+$VERSION = '3.0.1';
 
 
 sub _quote_hdr

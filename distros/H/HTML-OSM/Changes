@@ -1,5 +1,8 @@
 Revision history for HTML-OSM
 
+0.06	Wed Feb 19 08:20:29 EST 2025
+	Remove unwanted <head> and <title> information
+
 0.05	Mon Feb 17 20:24:18 EST 2025
 	More compatiblity with Geo::Coder::* modules
 	Allow coordinates to start with a decimal point, e.g. "-.516667"

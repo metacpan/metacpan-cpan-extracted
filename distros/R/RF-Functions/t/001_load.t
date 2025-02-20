@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests => 24;
 use Test::Number::Delta;
-use RF::Functions qw{db_ratio ratio2db ratio_db db2ratio fsl_mhz_km fsl_ghz_km fsl_hz_m fsl_mhz_mi dbi_dbd dbd_dbi dbd2dbi dbi2dbd dipole_gain};
+use RF::Functions qw{db_ratio ratio2db ratio_db db2ratio fsl_mhz_km fsl_ghz_km fsl_hz_m fsl_mhz_mi dbi_dbd dbd_dbi dbd2dbi dbi2dbd dipole_gain distance_fcc};
 
 delta_within(db_ratio(2),    3.0103, 1e-4, 'db_ratio');
 delta_within(db_ratio(1/2), -3.0103, 1e-4, 'db_ratio');
@@ -50,3 +50,5 @@ is(dbi2dbd(2.15), 0, 'dbd_dbi');
   like($error, qr/required/);
 }
 
+sub d {my ($d,$m,$s)=@_; return($d + ($m + $s/60)/60)};
+delta_within(distance_fcc(d(qw{67 34 54.65443}),-1*d(qw{118 23 54.24523}), d(qw{67 45 32.65433}),-1*d(qw{118 34 43.23454})), 21193.2643/1000, 1e-3, 'distance_fcc');

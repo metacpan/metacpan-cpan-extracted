@@ -4,7 +4,6 @@ use warnings;
 use Module::Build qw();
 
 my $build = Module::Build->new(
-  create_makefile_pl => 'passthrough',
   license            => 'perl',
   module_name        => 'DBIx::Migration',
   configure_requires => {
@@ -33,7 +32,7 @@ my $build = Module::Build->new(
     'DBI'                     => 1.33,      # DBI::clone() is in use
     'File::Slurp'             => 0,
     'File::Spec'              => 0,
-    'Log::Any'                => 0,
+    'Log::Any'                => 1.044,     # Flexible naming of imported log object
     'Moo'                     => 0,
     'MooX::SetOnce'           => 0,
     'MooX::StrictConstructor' => 0,

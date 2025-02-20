@@ -1,5 +1,9 @@
 Revision history for Geo::LibProj::FFI
 
+1.01  2025-02-19
+
+ - Fix segmentation fault on armel and armhf. (GH #4) (Andreas Vögele)
+
 1.00  2024-05-12
 
  - Documentation update: Future major changes are no longer expected for this

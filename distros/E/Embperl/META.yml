@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   File::Spec: '0.8'
-version: v3.0.0
+version: v3.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -71,7 +71,7 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
     If not provided,
     an in-memory cache is created with a default expiration of one hour.
 
-- coordinates
+- `coordinates`
 
     An array reference containing a list of coordinates.
     Each entry should be an array with latitude, longitude, and an optional label, in the format:

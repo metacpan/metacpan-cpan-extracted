@@ -6,7 +6,7 @@ use FindBin::libs;
 use URI::Shortener;
 use Capture::Tiny qw{capture_merged};
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 subtest 'happy path' => sub {
     my $s = URI::Shortener->new(
@@ -49,3 +49,28 @@ subtest 'going to the circle 8 track' => sub {
     is( $s->shorten('foo'), 'bar/A', "Works fine, right?");
     like( exception { capture_merged { $s->shorten('hug') } }, qr/too many failures/i, "Stack smashing guard encountered");
 };
+
+# Alternative names
+subtest 'alternative names' => sub {
+    my $s = URI::Shortener->new(
+        domain => 'ACGT',
+        prefix => 'https://go.mydomain.test/short',
+        dbname => ':memory:',
+        seed   => 1337,
+        length => 10,
+        uri_tablename    => 'shortener_uris',
+        prefix_tablename => 'shortener_prefix',
+        uri_idxname      => 'shortener_uri_idx',
+        prefix_idxname   => 'shortener_prefix_idx',
+        cipher_idxname   => 'shortener_cipher_idx',
+        created_idxname  => 'shortener_created_idx',
+    );
+    my $uri   = 'https://mydomain.test/somePath';
+    my $short = $s->shorten($uri);
+    is( $short,               'https://go.mydomain.test/short/CTTACCGGTC', "I do this...for da shorteez.  Especially URIs" );
+    $short = $s->shorten($uri);
+    is( $short,               'https://go.mydomain.test/short/CTTACCGGTC', "caching works" );
+    is( $s->lengthen($short), $uri,                                "Lengthens, Hardens, Girthens & Fully Pleasures your URI" );
+    $s->prune_before( time() + 10 );
+    is( $s->lengthen($short), undef, "Pruning works" );
+}

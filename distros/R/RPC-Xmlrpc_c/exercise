@@ -40,7 +40,7 @@ sub testValue() {
                   ]),
               RPC::Xmlrpc_c::Value->newStruct(
                   { red   => RPC::Xmlrpc_c::Value->newString('hello'),
-                    green => RPC::Xmlrpc_c::Value->newString('goodbye'),    
+                    green => RPC::Xmlrpc_c::Value->newString('goodbye'),
                   }),
               RPC::Xmlrpc_c::Value->newNil()
              ]
@@ -60,12 +60,12 @@ sub testCallXml() {
 
     my @params = (RPC::Xmlrpc_c::Value->newInt(5),
                   RPC::Xmlrpc_c::Value->newInt(7));
-              
+
     RPC::Xmlrpc_c::Client::callXml(METHOD => 'sample.add',
                                    PARAMS => \@params,
                                    XML    => \my $xml,
                                    ERROR  => \my $error);
-    
+
     if ($error) {
         print STDERR ("Failed.  $error\n");
     } else {
@@ -94,9 +94,9 @@ sub testClient() {
           } else {
               my @params = (RPC::Xmlrpc_c::Value->newInt(5),
                             RPC::Xmlrpc_c::Value->newInt(7));
-              
+
               print("Testing call() with XML-RPC values\n");
-              
+
               $client->call(CARRIAGEPARM  => {
                                 SERVERURL => 'http://localhost:8080/RPC2',
                                              },
@@ -104,7 +104,7 @@ sub testClient() {
                             PARAMS        => \@params,
                             RESULT_XMLRPC => \my $result,
                             ERROR         => \my $error);
-                       
+
               if ($error) {
                   print STDERR ("Failed.  $error\n");
               } else {
@@ -132,7 +132,7 @@ sub testClientSimple() {
                       PARAMS    => ['sample.add'],
                       RESULT    => \my $result,
                       ERROR     => \my $error);
-                       
+
         if ($error) {
             print STDERR ("Failed.  $error\n");
         } else {

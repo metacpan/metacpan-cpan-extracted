@@ -5,7 +5,7 @@ use IO::Socket::UNIX;
 
 use strict;
 use warnings;
-use JSON;
+use JSON::PP;
 use POSIX;
 
 sub new {
@@ -23,7 +23,7 @@ sub recv_packet {
     my $data = $self->_read_bytes($len);
     utf8::decode($data);
     # warn "Packet received: $data\n";
-    my $r = JSON::decode_json($data);
+    my $r = JSON::PP::decode_json($data);
     return $r;
 }
 
@@ -45,7 +45,7 @@ sub _read_bytes {
 
 sub send_packet {
     my ($self, $data) = @_;
-    my $json = JSON::encode_json($data);
+    my $json = JSON::PP::encode_json($data);
     # warn "sending $json\n";
     utf8::encode($json);
     my $bytes = pack("N", length $json) . $json;

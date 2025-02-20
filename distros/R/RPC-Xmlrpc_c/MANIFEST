@@ -1,0 +1,19 @@
+Value/Makefile.PL
+Value/Value.c
+Value/Value.pm
+exercise
+HISTORY
+Client/Curl/Makefile.PL
+Client/Curl/Curl.c
+Client/Curl/Curl.pm
+Client/Makefile.PL
+Client/Client.pm
+Client/Client.xs
+Client/typemap
+Makefile.PL
+MANIFEST
+README
+ClientSimple/Makefile.PL
+ClientSimple/ClientSimple.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

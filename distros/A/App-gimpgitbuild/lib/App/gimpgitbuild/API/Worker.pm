@@ -1,12 +1,12 @@
 package App::gimpgitbuild::API::Worker;
-$App::gimpgitbuild::API::Worker::VERSION = '0.32.0';
+$App::gimpgitbuild::API::Worker::VERSION = '0.32.1';
 use strict;
 use warnings;
 use 5.014;
 
 use Moo;
 
-use Path::Tiny                       qw/ path cwd /;
+use Path::Tiny                       qw/ cwd path /;
 use Git::Sync::App                   ();
 use App::gimpgitbuild::API::GitBuild ();
 
@@ -30,29 +30,11 @@ sub _do_system
     }
 }
 
-my $PAR_JOBS = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
-my $skip_builds_re;
-my $forcify_tests_re;
-
-BEGIN
-{
-    {
-        my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
-        if ( exists $ENV{$KEY} )
-        {
-            my $re_str = $ENV{$KEY};
-            $skip_builds_re = qr/$re_str/;
-        }
-    }
-    {
-        my $KEY = "GIMPGITBUILD__FORCE_TESTS_RE";
-        if ( exists $ENV{$KEY} )
-        {
-            my $re_str = $ENV{$KEY};
-            $forcify_tests_re = qr/$re_str/;
-        }
-    }
-}
+my $PAR_JOBS       = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
+my $skip_builds_re = $ENV{"GIMPGITBUILD__SKIP_BUILDS_RE"} // "^(*FAIL)";
+$skip_builds_re = qr/$skip_builds_re/;
+my $forcify_tests_re = $ENV{"GIMPGITBUILD__FORCE_TESTS_RE"} // "^(*FAIL)";
+$forcify_tests_re = qr/$forcify_tests_re/;
 
 my $BUILD_DIR = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
         // "to-del--gimpgitbuild--build-dir" );
@@ -69,7 +51,7 @@ sub _wrap_check
         . (
         (
             length( $ENV{SKIP_CHECK} )
-                or ( defined($forcify_tests_re) and $id =~ $forcify_tests_re )
+                or ( $id =~ $forcify_tests_re )
         ) ? " || true" : ''
         );
     return ($ret);
@@ -105,7 +87,7 @@ sub _git_build
     my $SHELL_PREFIX         = "set -e -x";
     my $install_before_test  = ( $args->{install_before_test} // '' );
 
-    if ( defined($skip_builds_re) and $id =~ $skip_builds_re )
+    if ( $id =~ $skip_builds_re )
     {
         return;
     }
@@ -399,7 +381,7 @@ App::gimpgitbuild::API::Worker - common API
 
 =head1 VERSION
 
-version 0.32.0
+version 0.32.1
 
 =head1 METHODS
 

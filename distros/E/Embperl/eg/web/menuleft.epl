@@ -97,16 +97,16 @@ $app  = $r -> app ;
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
     [- $linkuri = $r -> {baseuri} . ($epreq -> param -> language eq 'de'?'pod/doc/Embperl.-page-12-.htm':'pod/doc/Embperl.-page-18-.htm') -]
-    [- menuitem ($linkuri, 'Stable 3.0.0', 0, 1) -]
+    [- menuitem ($linkuri, 'Stable 3.0.1', 0, 1) -]
     <tr> 
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
-
-    [- menuitem ($linkuri, 'Beta 3.0.0-rc.2', 0, 1) -]
+[#
+    [- menuitem ($linkuri, 'Beta 3.0.1-rc.2', 0, 1) -]
     <tr>
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
-
+#]
 
     <tr>
         <td align="left" valign="top">

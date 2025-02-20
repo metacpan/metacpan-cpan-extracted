@@ -21,7 +21,7 @@ subtest '-V' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( '-V' ) } "Version:\n  0.14\n\n", 'check stdout';
+  stdout_is { $got_exitval = $coderef->( '-V' ) } "Version:\n  0.15\n\n", 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 

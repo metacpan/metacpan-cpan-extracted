@@ -2,7 +2,7 @@ use v5.14;
 use warnings;
 
 # ABSTRACT: Foreign function interface to PROJ coordinate transformation software
-package Geo::LibProj::FFI 1.00;
+package Geo::LibProj::FFI 1.01;
 
 
 use Alien::proj 1.07;
@@ -96,7 +96,7 @@ my $ffi = FFI::Platypus->new(
 );
 FFI::C->ffi($ffi);
 
-my $c = Convert::Binary::C->new;
+my $c = Convert::Binary::C->new(Alignment => 0);
 
 $ffi->load_custom_type('::StringPointer' => 'string_pointer');
 # string* should also work, but doesn't in $ffi->cast
@@ -214,37 +214,37 @@ $ffi->custom_type( 'PJ_PRIME_MERIDIANS' => {
 
 # Geodetic, mostly spatiotemporal coordinate types
 {
-	package Geo::LibProj::FFI::PJ_XYZT 1.00;
+	package Geo::LibProj::FFI::PJ_XYZT 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z t }) }
-	package Geo::LibProj::FFI::PJ_UVWT 1.00;
+	package Geo::LibProj::FFI::PJ_UVWT 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w t })->uvwt }
-	package Geo::LibProj::FFI::PJ_LPZT 1.00;
+	package Geo::LibProj::FFI::PJ_LPZT 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z t }) }
-	package Geo::LibProj::FFI::PJ_OPK 1.00;
+	package Geo::LibProj::FFI::PJ_OPK 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ o p k 0 }) }
 	# Rotations: omega, phi, kappa
-	package Geo::LibProj::FFI::PJ_ENU 1.00;
+	package Geo::LibProj::FFI::PJ_ENU 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ e n u 0 }) }
 	# East, North, Up
-	package Geo::LibProj::FFI::PJ_GEOD 1.00;
+	package Geo::LibProj::FFI::PJ_GEOD 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ s a1 a2 0 }) }
 	# Geodesic length, fwd azi, rev azi
 }
 
 # Classic proj.4 pair/triplet types - moved into the PJ_ name space
 {
-	package Geo::LibProj::FFI::PJ_UV 1.00;
+	package Geo::LibProj::FFI::PJ_UV 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v 0 0 })->uv }
-	package Geo::LibProj::FFI::PJ_XY 1.00;
+	package Geo::LibProj::FFI::PJ_XY 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y 0 0 }) }
-	package Geo::LibProj::FFI::PJ_LP 1.00;
+	package Geo::LibProj::FFI::PJ_LP 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi 0 0 }) }
 	
-	package Geo::LibProj::FFI::PJ_XYZ 1.00;
+	package Geo::LibProj::FFI::PJ_XYZ 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z 0 }) }
-	package Geo::LibProj::FFI::PJ_UVW 1.00;
+	package Geo::LibProj::FFI::PJ_UVW 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w 0 })->uvw }
-	package Geo::LibProj::FFI::PJ_LPZ 1.00;
+	package Geo::LibProj::FFI::PJ_LPZ 1.01;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z 0 }) }
 }
 
@@ -256,7 +256,7 @@ $ffi->custom_type( 'PJ_PRIME_MERIDIANS' => {
 	# FFI::Platypus. Workaround: Use a Record with some additional Perl
 	# glue. The performance may not be perfect, but seems satisfactory.
 	
-	package Geo::LibProj::FFI::PJ_COORD 1.00;
+	package Geo::LibProj::FFI::PJ_COORD 1.01;
 	use FFI::Platypus::Record;
 	record_layout_1(qw{ double[4] v });
 	# First and foremost, it really is "just 4 numbers in a vector"
@@ -381,7 +381,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD)' => 'PJ_COORD');
 
 
 {
-	package Geo::LibProj::FFI::PJ_INFO 1.00;
+	package Geo::LibProj::FFI::PJ_INFO 1.01;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		int    => 'major',       # Major release number
@@ -400,7 +400,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD)' => 'PJ_COORD');
 $ffi->type('record(Geo::LibProj::FFI::PJ_INFO)' => 'PJ_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_PROJ_INFO 1.00;
+	package Geo::LibProj::FFI::PJ_PROJ_INFO 1.01;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		string => 'id',           # Name of the projection in question
@@ -413,7 +413,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_INFO)' => 'PJ_INFO');
 $ffi->type('record(Geo::LibProj::FFI::PJ_PROJ_INFO)' => 'PJ_PROJ_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_GRID_INFO 1.00;
+	package Geo::LibProj::FFI::PJ_GRID_INFO 1.01;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		'string(32)'  => 'gridname_NUL',         # name of grid
@@ -433,7 +433,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_PROJ_INFO)' => 'PJ_PROJ_INFO');
 $ffi->type('record(Geo::LibProj::FFI::PJ_GRID_INFO)' => 'PJ_GRID_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_INIT_INFO 1.00;
+	package Geo::LibProj::FFI::PJ_INIT_INFO 1.01;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		'string(32)'  => 'name_NUL',        # name of init file
@@ -579,7 +579,7 @@ Geo::LibProj::FFI - Foreign function interface to PROJ coordinate transformation
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -860,7 +860,7 @@ for further documentation.
 
 =item * L<Geo::Proj4>
 
-=item * L<PDL::GIS::Proj>
+=item * L<PDL::Transform::Proj4>
 
 =item * PROJ C API Reference:
 L<Data types|https://proj.org/development/reference/datatypes.html>,
@@ -883,9 +883,15 @@ and the module author didn't design the API.
 
 Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
+=head1 CONTRIBUTOR
+
+=for stopwords Andreas Vögele
+
+Andreas Vögele <andreas@andreasvoegele.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2024 by Arne Johannessen.
+This software is Copyright (c) 2021-2025 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

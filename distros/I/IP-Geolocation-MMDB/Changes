@@ -1,5 +1,9 @@
 Revision history for IP::Geolocation::MMDB
 
+1.012  2025-02-20 09:00:30 CET
+
+  - Use pkgconf if Alien::libmaxminddb is unavailable
+
 1.011  2025-01-22 09:09:04 CET
 
   - Add a get method that returns the prefix length

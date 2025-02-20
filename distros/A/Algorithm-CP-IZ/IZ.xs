@@ -319,7 +319,7 @@ static IZBOOL prepareSimpleVS(int index) {
     }
   }
   else if (index >= vsSimpleArraySize) {
-    size_t newSize = vsSimpleArraySize + 1000;
+    size_t newSize = index + 1000;
     size_t i;
 
     vsSimple* newArray;
@@ -1965,5 +1965,30 @@ CODE:
         if (!cs_isIn(vint, val)) continue;
         av_store(RETVAL, i++, newSViv(val));
     }
+OUTPUT:
+    RETVAL
+
+void
+set_name(rv, s)
+    SV* rv;
+    const char* s
+PREINIT:
+    CSint* vint;
+CODE:
+    vint = INT2PTR(CSint*, SvIV(SvRV(rv)));
+    cs_setName(vint, (char*)s);
+
+SV*
+get_name(rv)
+    SV* rv;
+PREINIT:
+    CSint* vint;
+CODE:
+    const char* cstr = NULL;
+    vint = INT2PTR(CSint*, SvIV(SvRV(rv)));
+    cstr = cs_getName(vint);
+    if (!cstr) XSRETURN_UNDEF;
+    RETVAL = newSVpv(cstr, strlen(cstr));
+    SvUTF8_on(RETVAL);
 OUTPUT:
     RETVAL

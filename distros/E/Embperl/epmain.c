@@ -180,6 +180,7 @@ static char * DoLogError (/*i/o*/ struct tReq * r,
         case rcTimeFormatErr:           msg ="[%d]ERR:  %d: %s Format error in %s = %s" ; break ;
         case rcSubCallNotRequest:       msg ="[%d]ERR:  %d: %s A Embperl sub is called and no Embperl request is running  %s %s" ; break ;
         case rcNotScalarRef:            msg ="[%d]ERR:  %d: %s %s need scalar in '%s'" ; break ; 
+        case rcFormDataTruncated:       msg ="[%d]ERR:  %d: %s Formdata exceeded length of %s bytes, truncated" ; break ; 
 
 	default:                        msg ="[%d]ERR:  %d: %s Error (no description) %s %s" ; break ; 
         }

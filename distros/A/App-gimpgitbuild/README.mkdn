@@ -4,7 +4,7 @@ App-gimpgitbuild - build GIMP from git
 
 # VERSION
 
-version 0.32.0
+version 0.32.1
 
 # SYNOPSIS
 
@@ -17,8 +17,9 @@ gimpgitbuild is a command line utility to automatically build
 and some of its dependencies from its version control git repositories:
 [https://developer.gimp.org/git.html](https://developer.gimp.org/git.html) .
 
-Use it only if your paths and environment does not contain too many
-nasty characters because we interpolate strings into the shell a lot.
+Use it only if your paths and environment do not contain too many nasty
+characters (such as whitespace, quotes, or backspace ) because we interpolate
+strings into the shell a lot.
 
 So far, it is quite opinionated, but hopefully we'll allow for better
 customization using [https://en.wikipedia.org/wiki/Environment\_variable](https://en.wikipedia.org/wiki/Environment_variable)
@@ -31,6 +32,7 @@ and a [rewrite in perl 5](https://github.com/shlomif/shlomif-computer-settings/b
 
 # SEE ALSO
 
+- [Shlomi Fish's Wrapper script/configuration](https://github.com/shlomif/shlomif-computer-settings/blob/master/shlomif-settings/home-bin-executables/bin/gimpgitbuild-runner--simplified-non-debug.bash)
 - [https://www.gimp.org/](https://www.gimp.org/)
 
 # SUPPORT

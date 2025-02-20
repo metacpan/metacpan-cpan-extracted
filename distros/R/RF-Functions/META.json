@@ -4,13 +4,13 @@
       "Michael R. Davis <mdavis@localdomain>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "RF-Functions",
    "no_index" : {
@@ -51,5 +51,6 @@
          "web" : "https://github.com/mrdvt92/perl-RF-Functions.git"
       }
    },
-   "version" : "0.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

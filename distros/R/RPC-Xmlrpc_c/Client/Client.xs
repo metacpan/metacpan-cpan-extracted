@@ -24,7 +24,7 @@ returnCreateData(xmlrpc_env      const env,
 
     if (!env.fault_occurred) {
         SV * const execObj      = SvRV(execObjR);
-    
+
         sv_setuv(execObj, (unsigned long)clientP);
     }
 }
@@ -48,7 +48,7 @@ returnCallData(xmlrpc_env     const env,
 
     if (!env.fault_occurred) {
         SV * const result = SvRV(resultR);
-    
+
         sv_setuv(result, (unsigned long)resultP);
     }
 }
@@ -132,7 +132,7 @@ _clientCreate(_transportOps, _transport, execObjR, errorRetR)
     {
         xmlrpc_client * clientP;
         xmlrpc_env env;
-            
+
         xmlrpc_env_init(&env);
 
         if (!SvROK(execObjR))
@@ -152,7 +152,7 @@ _clientCreate(_transportOps, _transport, execObjR, errorRetR)
             clientParms.transportparm_size = 0;
             clientParms.transportOpsP      = transportOpsP;
             clientParms.transportP         = transportP;
- 
+
             xmlrpc_client_create(&env, 0, "", "",
                                  &clientParms, XMLRPC_CPSIZE(transportP),
                                  &clientP);
@@ -192,13 +192,13 @@ _clientCall(_client, serverUrl, methodName, _paramArray, resultR, errorRetR)
 
         xmlrpc_server_info * serverInfoP;
         xmlrpc_env env;
-        
+
         XMLRPC_ASSERT_ARRAY_OK(paramArrayP);
 
         xmlrpc_env_init(&env);
-        
+
         serverInfoP = xmlrpc_server_info_new(&env, serverUrl);
-        
+
         if (!env.fault_occurred) {
             xmlrpc_client_call2(&env, clientP, serverInfoP, methodName,
                                 paramArrayP, &resultP);
@@ -227,21 +227,22 @@ _callXml(methodName, _paramArray, xmlR, errorRetR)
 
         xmlrpc_env env;
 
-        xmlrpc_mem_block output;
+        xmlrpc_mem_block * outputP;
 
         XMLRPC_ASSERT_ARRAY_OK(paramArrayP);
 
         xmlrpc_env_init(&env);
 
-        XMLRPC_TYPED_MEM_BLOCK_INIT(char, &env, &output, 0);
+        outputP = XMLRPC_MEMBLOCK_NEW(char, &env, 0);
 
-        xmlrpc_serialize_call(&env, &output, methodName, paramArrayP);
+        xmlrpc_serialize_call(&env, outputP, methodName, paramArrayP);
 
-        returnCallXmlData(env, &output, xmlR, errorRetR);
+        returnCallXmlData(env, outputP, xmlR, errorRetR);
 
-        XMLRPC_TYPED_MEM_BLOCK_CLEAN(char, &output);  
+        XMLRPC_MEMBLOCK_FREE(char, outputP);
 
         xmlrpc_env_clean(&env);
     }
+
 
 

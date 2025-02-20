@@ -13,7 +13,8 @@ lib/IO/Uring.pm
 lib/IO/Uring.xs
 planner/xs.pl
 t/00-compile.t
-t/echo.t
+t/01probe.t
+t/10echo.t
 typemap
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

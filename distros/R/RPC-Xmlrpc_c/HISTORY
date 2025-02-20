@@ -1,5 +1,11 @@
 Written by Bryan Henderson, San Jose California, December 2006.
 
+25.02.19 Release 1.06
+
+         Adapt to current Xmlrpc-c interface in which memblock is opaque.
+
+         Add _BSD_SOURCE so it compiles with more libc.
+
 13.11.08 Release 1.05
 
          Add ability to control the Curl timeout transport parameter.

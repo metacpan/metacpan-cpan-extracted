@@ -1,6 +1,6 @@
 # ABSTRACT: gimp build
 package App::gimpgitbuild;
-$App::gimpgitbuild::VERSION = '0.32.0';
+$App::gimpgitbuild::VERSION = '0.32.1';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ App-gimpgitbuild - build GIMP from git
 
 =head1 VERSION
 
-version 0.32.0
+version 0.32.1
 
 =head1 SYNOPSIS
 
@@ -33,8 +33,9 @@ L<GIMP|https://www.gimp.org/> (= the "GNU Image Manipulation Program")
 and some of its dependencies from its version control git repositories:
 L<https://developer.gimp.org/git.html> .
 
-Use it only if your paths and environment does not contain too many
-nasty characters because we interpolate strings into the shell a lot.
+Use it only if your paths and environment do not contain too many nasty
+characters (such as whitespace, quotes, or backspace ) because we interpolate
+strings into the shell a lot.
 
 So far, it is quite opinionated, but hopefully we'll allow for better
 customization using L<https://en.wikipedia.org/wiki/Environment_variable>
@@ -48,6 +49,8 @@ and a L<rewrite in perl 5|https://github.com/shlomif/shlomif-computer-settings/b
 =head1 SEE ALSO
 
 =over 4
+
+=item * L<Shlomi Fish's Wrapper script/configuration|https://github.com/shlomif/shlomif-computer-settings/blob/master/shlomif-settings/home-bin-executables/bin/gimpgitbuild-runner--simplified-non-debug.bash>
 
 =item * L<https://www.gimp.org/>
 

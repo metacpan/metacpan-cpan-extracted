@@ -6,6 +6,7 @@ use warnings;
 use UNIVERSAL;
 
 use overload '""' => \&stringify;
+use overload 'bool' => sub { $_[0] };
 
 use Algorithm::CP::IZ::ParamValidator qw(validate);
 
@@ -64,17 +65,15 @@ sub new {
     bless \$ptr, $class;
 }
 
-my %Names;
-
 sub name {
     my $self = $_[0];
     my $key = $self->key;
 
     if (@_ == 1) {
-	return $Names{$key};
+	return $self->get_name;
     }
 
-    $Names{$key} = $_[1];
+    $self->set_name($_[1]);
 }
 
 sub InArray {
@@ -128,7 +127,6 @@ sub NotInInterval {
 sub _invalidate {
     my $self = shift;
 
-    delete $Names{$self->key};
     bless $self, __PACKAGE__ . "::InvalidInt";
 }
 
@@ -140,6 +138,11 @@ sub select_value {
 	     "Usage: selectValue(method, value)");
     return Algorithm::CP::IZ::cs_selectValue($self, $method, $value);
 }
+
+sub DESTROY {
+    my $self = shift;
+}
+
 
 1;
 

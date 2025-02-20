@@ -21,7 +21,7 @@ use base qw(Embperl::Form::Validate::Default);
 use utf8 ;
 
 my
-$VERSION = '3.0.0' ;
+$VERSION = '3.0.1' ;
 
 my %errutf8 =
     (

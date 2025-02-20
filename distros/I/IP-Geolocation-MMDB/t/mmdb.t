@@ -8,17 +8,19 @@ use utf8;
 
 use Test::More;
 
-use Alien::libmaxminddb;
 use File::Spec::Functions qw(catfile);
 use IP::Geolocation::MMDB;
 use Math::BigInt 1.999806;
 
 my $version = IP::Geolocation::MMDB::libmaxminddb_version;
 
-my $expected_version = Alien::libmaxminddb->version;
+my $expected_version = eval {
+    require Alien::libmaxminddb;
+    Alien::libmaxminddb->version;
+};
 
 # Check if the module was linked against the wrong library version.
-if ($version ne $expected_version) {
+if (defined $expected_version && $version ne $expected_version) {
     plan skip_all => "Error: wrong libmaxminddb version, got $version, "
         . "expected $expected_version";
 }

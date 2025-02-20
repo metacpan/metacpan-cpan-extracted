@@ -32,6 +32,72 @@ typedef int DirDescriptor;
 typedef siginfo_t* Signal__Info;
 typedef struct __kernel_timespec* Time__Spec;
 
+typedef struct {
+	const char* value;
+	size_t length;
+} op_entry;
+
+static op_entry methods[] = {
+	{ STR_WITH_LEN("nop") },
+	{ STR_WITH_LEN("readv") },
+	{ STR_WITH_LEN("writev") },
+	{ STR_WITH_LEN("fsync") },
+	{ STR_WITH_LEN("read_fixed") },
+	{ STR_WITH_LEN("write_fixed") },
+	{ STR_WITH_LEN("poll_add") },
+	{ STR_WITH_LEN("poll_remove") },
+	{ STR_WITH_LEN("sync_file_range") },
+	{ STR_WITH_LEN("sendmsg") },
+	{ STR_WITH_LEN("recvmsg") },
+	{ STR_WITH_LEN("timeout") },
+	{ STR_WITH_LEN("timeout_remove") },
+	{ STR_WITH_LEN("accept") },
+	{ STR_WITH_LEN("cancel") },
+	{ STR_WITH_LEN("link_timeout") },
+	{ STR_WITH_LEN("connect") },
+	{ STR_WITH_LEN("fallocate") },
+	{ STR_WITH_LEN("openat") },
+	{ STR_WITH_LEN("close") },
+	{ STR_WITH_LEN("files_update") },
+	{ STR_WITH_LEN("statx") },
+	{ STR_WITH_LEN("read") },
+	{ STR_WITH_LEN("write") },
+	{ STR_WITH_LEN("fadvise") },
+	{ STR_WITH_LEN("madvise") },
+	{ STR_WITH_LEN("send") },
+	{ STR_WITH_LEN("recv") },
+	{ STR_WITH_LEN("openat2") },
+	{ STR_WITH_LEN("epoll_ctl") },
+	{ STR_WITH_LEN("splice") },
+	{ STR_WITH_LEN("provide_buffers") },
+	{ STR_WITH_LEN("remove_buffers") },
+	{ STR_WITH_LEN("tee") },
+	{ STR_WITH_LEN("shutdown") },
+	{ STR_WITH_LEN("renameat") },
+	{ STR_WITH_LEN("unlinkat") },
+	{ STR_WITH_LEN("mkdirat") },
+	{ STR_WITH_LEN("symlinkat") },
+	{ STR_WITH_LEN("linkat") },
+	{ STR_WITH_LEN("msg_ring") },
+	{ STR_WITH_LEN("fsetxattr") },
+	{ STR_WITH_LEN("setxattr") },
+	{ STR_WITH_LEN("fgetxattr") },
+	{ STR_WITH_LEN("getxattr") },
+	{ STR_WITH_LEN("socket") },
+	{ STR_WITH_LEN("uring_cmd") },
+	{ STR_WITH_LEN("send_zc") },
+	{ STR_WITH_LEN("sendmsg_zc") },
+	{ STR_WITH_LEN("read_multishot") },
+	{ STR_WITH_LEN("waitid") },
+	{ STR_WITH_LEN("futex_wait") },
+	{ STR_WITH_LEN("futex_wake") },
+	{ STR_WITH_LEN("futex_waitv") },
+	{ STR_WITH_LEN("fixed_fd_install") },
+	{ STR_WITH_LEN("ftruncate") },
+	{ STR_WITH_LEN("bind") },
+	{ STR_WITH_LEN("listen") },
+};
+
 #undef SvPV
 #define SvPV(sv, len) SvPVbyte(sv, len)
 #undef SvPV_nolen
@@ -63,6 +129,8 @@ BOOT:
 
 	URING_CONSTANT(FSYNC_DATASYNC);
 
+	URING_CONSTANT(RECVSEND_POLL_FIRST);
+
 	URING_CONSTANT(TIMEOUT_ABS);
 	URING_CONSTANT(TIMEOUT_BOOTTIME);
 	URING_CONSTANT(TIMEOUT_REALTIME);
@@ -72,6 +140,7 @@ BOOT:
 	CONSTANT(RENAME_EXCHANGE);
 	CONSTANT(RENAME_NOREPLACE);
 
+	CONSTANT(AT_SYMLINK_FOLLOW);
 	CONSTANT(AT_REMOVEDIR);
 
 	CONSTANT(P_PID);
@@ -137,10 +206,37 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 	self->cqe_count = 0;
 
 
+SV* probe(IO::Uring self)
+CODE:
+	struct io_uring_probe* probe = io_uring_get_probe_ring(&self->uring);
+	HV* operations = newHV();
+    for (int i = 0; i < probe->ops_len; ++i) {
+		int op = probe->ops[i].op;
+		if (op > sizeof methods / sizeof *methods)
+			continue;
+		SV* value = probe->ops[i].flags & IO_URING_OP_SUPPORTED ? &PL_sv_yes : &PL_sv_no;
+		hv_store(operations, methods[i].value, methods[i].length, value, 0);
+	}
+	io_uring_free_probe(probe);
+	RETVAL = newRV_noinc((SV*)operations);
+OUTPUT:
+	RETVAL
+
 UV accept(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_accept(sqe, fd, NULL, NULL, SOCK_CLOEXEC);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV bind(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_bind(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
 	io_uring_sqe_set_flags(sqe, iflags);
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
@@ -245,6 +341,17 @@ CODE:
 	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
 	io_uring_sqe_set_data(sqe, cancel_data);
 	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV listen(IO::Uring self, FileDescriptor fd, UV backlog, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_listen(sqe, fd, backlog);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
 OUTPUT:
 	RETVAL
 
@@ -374,6 +481,28 @@ UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), 
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV socket(IO::Uring self, int domain, int type, int protocols, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_socket(sqe, domain, type, protocols, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);

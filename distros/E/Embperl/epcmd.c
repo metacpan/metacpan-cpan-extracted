@@ -812,7 +812,7 @@ static int CmdHidden (/*i/o*/ register req * r,
                if (ppsv && (!(r -> Component.Config.bOptions & optNoHiddenEmptyValue) || *SvPV (*ppsv, na)))
                     {
                     oputs (r, "<input type=\"hidden\" name=\"") ;
-                    oputs (r, pKey) ;
+                    OutputToHtml (r, pKey) ;
                     oputs (r, "\" value=\"") ;
                     OutputToHtml (r, SvPV (*ppsv, na)) ;
                     oputs (r, "\">\n") ;
@@ -833,7 +833,7 @@ static int CmdHidden (/*i/o*/ register req * r,
                 if (!(r -> Component.Config.bOptions & optNoHiddenEmptyValue) || *SvPV (psv, na)) 
 		    {
                     oputs (r, "<input type=\"hidden\" name=\"") ;
-                    oputs (r, pKey) ;
+                    OutputToHtml (r, pKey) ;
                     oputs (r, "\" value=\"") ;
                     OutputToHtml (r, SvPV (psv, na)) ;
                     oputs (r, "\">\n") ;

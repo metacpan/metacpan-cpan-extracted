@@ -334,26 +334,29 @@ int embperlCmd_Hidden	(/*i/o*/ register req *     r,
             if (ppsv && (pKey = SvPV(*ppsv, nKey)) && !hv_exists (pSubHash, pKey, nKey))
                 {
                 STRLEN lppsv ;
-		ppsv = hv_fetch (pAddHash, pKey, nKey, 0) ;
+                ppsv = hv_fetch (pAddHash, pKey, nKey, 0) ;
                 
-               if (ppsv && (!(r -> Component.Config.bOptions & optNoHiddenEmptyValue) || *SvPV (*ppsv, lppsv)))
+                if (ppsv && (!(r -> Component.Config.bOptions & optNoHiddenEmptyValue) || *SvPV (*ppsv, lppsv)))
                     {
                     char * s ;
-		    STRLEN     l ;
+		            STRLEN     l ;
                     SV * sEscapedText ;
-		    tNode xInputNode = Node_appendChild (r -> pApp, pDomTree, pNewNode -> xNdx, nRepeatLevel, ntypTag, 0, "input", 5, 0, 0, NULL) ;
+		            tNode xInputNode = Node_appendChild (r -> pApp, pDomTree, pNewNode -> xNdx, nRepeatLevel, ntypTag, 0, "input", 5, 0, 0, NULL) ;
                     tNode xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "type", 4, 0, 0, NULL) ;
                                        Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, "hidden", 6, 0, 0, NULL) ;
 		    
                           xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "name", 4, 0, 0, NULL) ;
-                                       Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, pKey, nKey, 0, 0, NULL) ;
+
+                    sEscapedText = Escape (r, pKey, nKey, r -> Component.nCurrEscMode, NULL, '\0') ;
+                    s = SV2String (sEscapedText, l) ;
+                                       Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
                           xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "value", 5, 0, 0, NULL) ;
 
-		    s = SvPV (*ppsv, l) ;			  
+		            s = SvPV (*ppsv, l) ;			  
                     sEscapedText = Escape (r, s, l, r -> Component.nCurrEscMode, NULL, '\0') ;
                     s = SV2String (sEscapedText, l) ;
 			  
-	            Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
+	                Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
                     SvREFCNT_dec (sEscapedText) ;
                     }
                 }
@@ -375,21 +378,24 @@ int embperlCmd_Hidden	(/*i/o*/ register req *     r,
                 if (!(r -> Component.Config.bOptions & optNoHiddenEmptyValue) || *SvPV (psv, lpsv)) 
                     {
                     char * s ;
-		    STRLEN     l ;
+		            STRLEN     l ;
                     SV * sEscapedText ;
-		    tNode xInputNode = Node_appendChild (r -> pApp, pDomTree, pNewNode -> xNdx, nRepeatLevel, ntypTag, 0, "input", 5, 0, 0, NULL) ;
+		            tNode xInputNode = Node_appendChild (r -> pApp, pDomTree, pNewNode -> xNdx, nRepeatLevel, ntypTag, 0, "input", 5, 0, 0, NULL) ;
                     tNode xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "type", 4, 0, 0, NULL) ;
                                        Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, "hidden", 6, 0, 0, NULL) ;
 		    
                           xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "name", 4, 0, 0, NULL) ;
-                                       Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, pKey, nKey, 0, 0, NULL) ;
+                        
+                    sEscapedText = Escape (r, pKey, nKey, r -> Component.nCurrEscMode, NULL, '\0') ;
+                    s = SV2String (sEscapedText, l) ;
+                                       Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
                           xAttr      = Node_appendChild (r -> pApp, pDomTree, xInputNode, nRepeatLevel, ntypAttr, 0, "value", 5, 0, 0, NULL) ;
 
-		    s = SvPV (psv, l) ;			  
+		            s = SvPV (psv, l) ;			  
                     sEscapedText = Escape (r, s, l, r -> Component.nCurrEscMode, NULL, '\0') ;
                     s = SV2String (sEscapedText, l) ;
 			  
-	            Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
+	                Node_appendChild (r -> pApp, pDomTree, xAttr, nRepeatLevel, ntypAttrValue, 0, s, l, 0, 0, NULL) ;
                     SvREFCNT_dec (sEscapedText) ;
                     }
                 }

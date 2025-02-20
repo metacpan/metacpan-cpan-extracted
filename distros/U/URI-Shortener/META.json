@@ -4,7 +4,7 @@
       "George S. Baugh <george@troglodyne.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -21,10 +21,12 @@
       },
       "develop" : {
          "requires" : {
+            "FindBin::libs" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::EOL" : "0",
+            "Test::Fatal" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
@@ -39,9 +41,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Carp::Always" : "0",
             "Crypt::PRNG" : "0",
+            "DBD::Pg" : "0",
             "DBD::SQLite" : "0",
+            "DBD::mysql" : "0",
             "DBI" : "0",
             "File::Touch" : "0",
             "List::Util" : "1.33",
@@ -53,7 +58,6 @@
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
             "FindBin::libs" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0"
@@ -63,7 +67,7 @@
    "provides" : {
       "URI::Shortener" : {
          "file" : "lib/URI/Shortener.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       }
    },
    "release_status" : "stable",
@@ -78,8 +82,9 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/URI-Shorten"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "MIT"
 }
 

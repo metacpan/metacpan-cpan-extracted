@@ -1,4 +1,4 @@
-Geo::LibProj::FFI 1.00
+Geo::LibProj::FFI 1.01
 
 This module is a foreign function interface to the PROJ <https://proj.org/>
 coordinate transformation / projection library. Please see the PROJ
@@ -22,7 +22,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Geo-LibProj-FFI-1.00.tar.gz
+  cpanm Geo-LibProj-FFI-1.01.tar.gz
 
 You can also install the module manually by following these steps:
 
@@ -37,7 +37,7 @@ on installing CPAN modules.
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2024 by Arne Johannessen.
+This software is Copyright (c) 2021-2025 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

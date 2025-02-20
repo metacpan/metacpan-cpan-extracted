@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 77;
+use Test::More tests => 79;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 # create(min, max)
@@ -250,4 +250,13 @@ SKIP: {
     my $v = $iz->create_int(0, 1);
 
     eval 'use Test::LeakTrace; no_leaks_ok { my $d = $v->domain;  };';
+}
+
+# boolean
+{
+    my $x0 = $iz->create_int(0);
+    ok($x0);
+
+    my $x1 = $iz->create_int(1);
+    ok($x1);
 }

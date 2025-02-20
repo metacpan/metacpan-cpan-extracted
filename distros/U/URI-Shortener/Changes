@@ -1,5 +1,9 @@
 Revision history for URI-Shorten
 
+1.004 2025-02-19 TEODESIAN
+    - Add support for mysql/postgres
+    - Add support for alternative table/index names
+
 1.003 2024-05-08 TEODESIAN
     - Improve POD
 

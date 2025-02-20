@@ -1,5 +1,5 @@
 package Future::IO::Impl::Uring;
-$Future::IO::Impl::Uring::VERSION = '0.001';
+$Future::IO::Impl::Uring::VERSION = '0.002';
 use 5.020;
 use warnings;
 use experimental 'signatures';
@@ -62,7 +62,7 @@ sub connect($self, $fh, $name) {
 sub sleep($self, $seconds) {
 	my $future = Future::IO::Uring::_Future->new;
 	my $time_spec = Time::Spec->new($seconds);
-	$ring->timeout($time_spec, 0, 0, IOSQE_ASYNC, sub($res, $flags) {
+	my $id = $ring->timeout($time_spec, 0, 0, 0, sub($res, $flags) {
 		if ($res != -ETIME) {
 			local $! = -$res;
 			$future->fail("sleep: $!\n");
@@ -71,6 +71,7 @@ sub sleep($self, $seconds) {
 		}
 		$time_spec;
 	});
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
 	return $future;
 }
 
@@ -96,7 +97,6 @@ sub _sysread($fh, $future, $id, $buffer, $length, $offset) {
 		if ($res >= 0) {
 			if ($offset + $res == $length) {
 				$future->done($buffer);
-				#				$future->done($length ? $buffer : ());
 			} else {
 				_sysread($fh, $future, $id, $buffer, $length, $offset + $res);
 			}
@@ -132,10 +132,14 @@ sub syswrite($self, $fh, $buffer) {
 	return $future;
 }
 
-sub _subwrite($future, $fh, $buffer, $written) {
-	$ring->write($fh, $buffer, -1, sub($res, $flags) {
+sub _syswrite($future, $fh, $buffer, $written) {
+	$ring->write($fh, substr($buffer, $written), -1, sub($res, $flags) {
 		if ($res > 0) {
-
+			if ($res + $written == length $buffer) {
+				$future->done(length $buffer);
+			} else {
+				_syswrite($future, $fh, $buffer, $res + $written);
+			}
 		} else {
 			local $! = -$res;
 			$future->fail("syswrite: $!\n", syswrite => $fh, $!);
@@ -145,20 +149,21 @@ sub _subwrite($future, $fh, $buffer, $written) {
 
 sub syswrite_exactly($self, $fh, $buffer) {
 	my $future = Future::IO::Uring::_Future->new;
-	_syswrite($fh, $buffer, 0);
+	_syswrite($future, $fh, $buffer, 0);
 	return $future;
 }
 
 sub waitpid($self, $pid) {
 	my $future = Future::IO::Uring::_Future->new;
 	my $info = Signal::Info->new;
-	$ring->waitid(P_PID, $pid, $info, WEXITED, 0, 0, sub($res, $flags) {
+	my $id = $ring->waitid(P_PID, $pid, $info, WEXITED, 0, 0, sub($res, $flags) {
 		if ($res >= 0) {
 			$future->done($info->code == CLD_EXITED ? ($info->status << 8) : $info->status);
 		} else {
 			$future->fail("waitpid: $!");
 		}
 	});
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
 	return $future;
 }
 
@@ -186,7 +191,7 @@ Future::IO::Impl::Uring - A Future::IO implementation for IO::Uring
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

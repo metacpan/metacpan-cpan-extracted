@@ -1,8 +1,8 @@
 Name:           perl-RF-Functions
-Version:        0.04
+Version:        0.06
 Release:        2%{?dist}
 Summary:        Perl Exporter for Radio Frequency (RF) Functions
-License:        CHECK(Distributable)
+License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/RF-Functions/
 Source0:        http://www.cpan.org/modules/by-module/RF/RF-Functions-%{version}.tar.gz
@@ -12,12 +12,13 @@ BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Number::Delta)
 BuildRequires:  perl(Test::Simple)
+BuildRequires:  perl(Math::Round)
 Requires:       perl(Exporter)
 Requires:       perl(Math::Round)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
-RF::Functions is an Exporter for common RF function. I plan to add additional
+RF::Functions is a lib for common RF function. I plan to add additional
 functions as I need them.
 
 %prep

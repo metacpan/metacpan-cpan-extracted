@@ -51,7 +51,7 @@ use vars qw(
 @ISA = qw(Exporter DynaLoader);
 
 
-$VERSION = '3.0.0';
+$VERSION = '3.0.1';
 
 
 $volume = (File::Spec -> splitpath ($Embperl::cwd))[0] ;

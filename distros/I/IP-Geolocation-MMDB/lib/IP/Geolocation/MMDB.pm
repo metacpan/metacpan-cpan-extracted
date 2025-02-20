@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.011;
+our $VERSION = 1.012;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -57,7 +57,7 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
@@ -250,6 +250,10 @@ The classes aren't Moo classes.
 There is no replacement for MaxMind::DB::Reader::Decoder.
 
 =back
+
+=head1 SEE ALSO
+
+See L<Geo::Location::IP> for object-oriented wrapper classes.
 
 =head1 ACKNOWLEDGEMENTS
 

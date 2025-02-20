@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'RF::Functions',
     VERSION_FROM      => 'lib/RF/Functions.pm',
+    LICENSE           => 'mit',
     PREREQ_PM         => {
                           'Exporter'            => 0,
                           'POSIX'               => 0,

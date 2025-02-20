@@ -122,6 +122,10 @@ use lib '.';
         'version'    => 2,
         'condition'  => '$] >= 5.006000',
         },
+    'error_forward_jump.htm' => { 
+        'errors'     => 1,
+        'version'    => 2,
+        },
     'unclosed.htm' => { 
         'errors'     => '1',
         },
@@ -315,6 +319,9 @@ use lib '.';
     'hidden.htm' => { 
         'query_info' => 'feld1=Wert1&feld2=Wert2&feld3=Wert3&feld4=Wert4?foo=bar',
         },
+    'hidden_escape.htm' => {
+        'query_info' => '%22%3E%3Cscript%3Ealert%28%22hello%22%29%3B%3C%2Fscript%3E=1',
+    },
     'java.htm' => { },
     'inputjava.htm' => { },
     'inputjs2.htm' => {

@@ -1,11 +1,10 @@
 package App::ReslirpTunnel;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
 
-use JSON;
 use Socket;
 use Data::Validate::Domain qw(is_hostname);
 use Data::Validate::IP qw(is_ipv4);
@@ -13,6 +12,7 @@ use Path::Tiny;
 use File::XDG;
 use POSIX;
 use Net::OpenSSH;
+use JSON::PP;
 
 use parent 'App::ReslirpTunnel::Logger';
 
@@ -77,7 +77,7 @@ sub _init_logger {
         $fn = $parent_dir->child($self->{timestamp}.".reslirp-tunnel.log");
         eval {
             my $sl = $parent_dir->child('latest.reslirp-tunnel.log');
-            unlink $sl if -e $sl;
+            unlink $sl if -l $sl;
             symlink $fn, $sl;
         };
     }
@@ -104,8 +104,9 @@ sub _init_config {
     $self->{run_in_foreground} = $args->{run_in_foreground} // 0;
     $self->{dont_close_stdio} = $args->{dont_close_stdio} // 0;
 
-    $self->{remote_host} = $args->{remote_host};
-    $self->{remote_port} = $args->{remote_port};
+    $self->{ssh_host} = $args->{ssh_host};
+    $self->{ssh_port} = $args->{ssh_port};
+    $self->{ssh_user} = $args->{ssh_user};
 
     $self->{remote_network} = $args->{remote_network} // '10.0.2.0';
     is_ipv4($self->{remote_network}) or $self->_die("Invalid remote network address, $self->{remote_network}");
@@ -194,9 +195,9 @@ sub _send_to_background {
 
 sub _init_ssh {
     my $self = shift;
-    my $host = $self->{remote_host} // $self->_die("No remote host specified");
-    my $port = $self->{remote_port};
-    my $user = $self->{remote_user};
+    my $host = $self->{ssh_host} // $self->_die("No remote host specified");
+    my $port = $self->{ssh_port};
+    my $user = $self->{ssh_user};
     my $cmd = $self->{args}{ssh_command};
     my $more_args = $self->{args}{more_ssh_args};
     my @args = (host => $host);
@@ -344,7 +345,7 @@ sub _resolve_remote_iface_dns__windows {
     my $out = $ssh->capture({remote_shell=> 'MSWin'}, 'powershell', '-Command', "Get-DnsClientServerAddress | ConvertTo-Json");
     my @addrs;
     eval {
-        for my $record (@{decode_json($out)}) {
+        for my $record (@{JSON::PP::decode_json($out)}) {
             if ($record->{InterfaceAlias} eq $iface and
                 $record->{AddressFamily} eq '2') {
                 push @addrs, @{$record->{ServerAddresses}};
@@ -512,7 +513,7 @@ sub _resolve_remote_host_with_shell__windows {
     my $out = $ssh->capture({remote_shell=> 'MSWin'}, 'powershell', '-Command', "Resolve-DnsName $host | ConvertTo-Json");
     my @addrs;
     eval {
-        my $records = decode_json($out);
+        my $records = JSON::PP::decode_json($out);
         my @names = $host;
         for my $r (@$records) {
             push @names, $r->{NameHost} if $r->{Type} == 5;

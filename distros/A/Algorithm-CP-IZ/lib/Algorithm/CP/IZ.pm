@@ -44,7 +44,7 @@ our %EXPORT_TAGS = ( 'value_selector' => [ qw(
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'value_selector'} } );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -110,7 +110,7 @@ sub DESTROY {
 
     for my $v (@$vars) {
 	# we must check existence of variable for global destruction.
-	$v->_invalidate($v) if ($v);
+	$v->_invalidate if (defined $v);
     }
 
     Algorithm::CP::IZ::cs_end();
@@ -321,8 +321,7 @@ sub create_int {
 	$ret->name($name);
     }
 
-    my $vars = $self->{_vars};
-    push(@$vars, $ret);
+    $self->_register_variable($ret);
 
     return $ret;
 }
@@ -837,7 +836,13 @@ sub _register_variable {
     my ($self, $var) = @_;
 
     my $vars = $self->{_vars};
-    push(@$vars, $var);
+    if (scalar @$vars == 0 || defined($vars->[scalar(@$vars)-1])) {
+	push(@$vars, $var);
+    }
+    else {
+	$vars->[scalar(@$vars)-1] = $var;
+    }
+    weaken($vars->[scalar(@$vars)-1]);
 }
 
 sub _argv_func {

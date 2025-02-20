@@ -20,7 +20,7 @@ package Embperl::Form::Validate::Default;
 use strict;
 use vars qw($VERSION %error_messages %script_functions %prefixes);
 
-$VERSION = '3.0.0' ;
+$VERSION = '3.0.1' ;
 
 %script_functions = ();
 %prefixes = ();

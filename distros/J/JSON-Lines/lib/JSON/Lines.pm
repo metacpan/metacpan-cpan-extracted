@@ -1,10 +1,10 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.01';
+use 5.006; use strict; use warnings; our $VERSION = '1.02';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
 BEGIN {
-	$JSON = JSON->new;
+	$JSON = JSON->new->utf8;
 	$LINES = qr{ ([\[\{] (?: (?> [^\[\]\{\}]+ ) | (??{ $LINES }) )* [\]\}]) }x;
 	%EX = (
 		jsonl => [qw/all/]
@@ -182,7 +182,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

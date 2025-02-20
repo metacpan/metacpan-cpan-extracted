@@ -88,6 +88,7 @@ typedef enum s_bsdipa_state (*s_bsdipa_io_write_ptf)(void *cookie, uint8_t const
 # ifdef s_BSDIPA_IO_READ
 /* I/O read hook.  It is assumed that pcp->pc_patch_dat and .pc_patch_len represent the entire (constant) patch data.
  * Output will be allocated via .pc_mem and stored in .pc_restored_dat and .pc_restored_len as a continuous chunk.
+ * .pc_max_allowed_restored_len must also be set as it is already evaluated as documented.
  * On error that memory, if any, will be freed, and .pc_restored_dat will be NULL.
  * On success .pc_header is filled in; it is up to the user to update .pc_patch* with the .pc_restored* fields
  * and call s_bsdipa_patch() to apply the real patch.  (.pc_restored_dat will be overwritten by s_bsdipa_patch().) */
@@ -149,6 +150,13 @@ s_bsdipa_io_read_raw(struct s_bsdipa_patch_ctx *pcp){
 	rv = s_bsdipa_patch_parse_header(&pcp->pc_header, pd);
 	if(rv != s_BSDIPA_OK)
 		goto jleave;
+
+	/* Do not perform any action at all on size excess */
+	if(pcp->pc_max_allowed_restored_len != 0 &&
+			pcp->pc_max_allowed_restored_len < (uint64_t)pcp->pc_header.h_before_len){
+		rv = s_BSDIPA_FBIG;
+		goto jleave;
+	}
 
 	pl -= sizeof(pcp->pc_header);
 	pd += sizeof(pcp->pc_header);
@@ -419,6 +427,13 @@ s_bsdipa_io_read_zlib(struct s_bsdipa_patch_ctx *pcp){
 	rv = s_bsdipa_patch_parse_header(&pcp->pc_header, hbuf);
 	if(rv != s_BSDIPA_OK)
 		goto jdone;
+
+	/* Do not perform any action at all on size excess */
+	if(pcp->pc_max_allowed_restored_len != 0 &&
+			pcp->pc_max_allowed_restored_len < (uint64_t)pcp->pc_header.h_before_len){
+		rv = s_BSDIPA_FBIG;
+		goto jdone;
+	}
 
 	/* Guaranteed to work! */
 	reslen = pcp->pc_header.h_ctrl_len + pcp->pc_header.h_diff_len + pcp->pc_header.h_extra_len;

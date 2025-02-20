@@ -49,8 +49,7 @@ use vars qw(
 
 @ISA = qw(Exporter DynaLoader);
 
-# should be 3.0.0-rc.1 but Dynaloader doesn't like it ...
-$VERSION = '3.0.0' ;
+$VERSION = '3.0.1' ;
 
 
 if ($modperl  = $ENV{MOD_PERL})

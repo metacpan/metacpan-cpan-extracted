@@ -27,7 +27,7 @@ BEGIN
     } 
 
 
-$VERSION = '3.0.0' ;
+$VERSION = '3.0.1' ;
 
 =encoding iso8859-1
 

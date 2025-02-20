@@ -1,5 +1,17 @@
 Revision history for Perl extension App::ReslirpTunnel.
 
+0.05  Feb 20, 2025
+      - Use JSON::PP from core instead of JSON (bug report and
+        solution by Slaven Rezić).
+
+0.04  Feb 19, 2025
+      - Add support for configuration file and profiles
+      - Argument parsing improvements.
+      - Documentation fixes.
+
+0.03  Feb 19, 2025
+      - Add Socket::MsgHdr dependency.
+
 0.02  Feb 18, 2025
       - Documentation improvements.
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension RF::Functions.
 
+0.06 2025-02-19
+  - Added function okumura_hata_env_mhz_km_m_m
+
+0.05 2024-04-11
+  - Added function distance_fcc
+
 0.04 2022-12-02
   - Added functions dbi_dbd, dbd2dbi, dbd_dbi, dbi2dbd, dipole_gain
 

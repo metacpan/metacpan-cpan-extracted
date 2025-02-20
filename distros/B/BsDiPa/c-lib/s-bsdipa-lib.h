@@ -200,7 +200,7 @@ struct s_bsdipa_diff_ctx{
 	 * For binary data sizeof(void*) is useful, higher values (16, 32) impose savings for text.
 	 * There is no maximum imposed, but the algorithm does *not* perform integer overflow checks! */
 	s_bsdipa_off_t dc_magic_window;
-	/* Allocated result data (freed by s_bsdipa_diff_free()) */
+	/* Outputs: (allocated result data; freed by s_bsdipa_diff_free()). */
 	s_bsdipa_off_t dc_ctrl_len; /* Sum of dc_ctrl lengths. MUST be first meaningful result field! */
 	s_bsdipa_off_t dc_diff_len; /* Length of .dc_diff_dat. */
 	s_bsdipa_off_t dc_extra_len; /* Length of .dc_extra_dat. */
@@ -243,7 +243,7 @@ struct s_bsdipa_patch_ctx{
 	uint8_t const *pc_diff_dat;
 	uint8_t const *pc_extra_dat;
 	struct s_bsdipa_header pc_header; /* Deserialized header. */
-	/* Allocated result data (freed by s_bsdipa_patch_free()).
+	/* Outputs (allocated result data; freed by s_bsdipa_patch_free()).
 	 * (The buffer is guaranteed to have room for one additional byte.) */
 	uint8_t *pc_restored_dat;
 	s_bsdipa_off_t pc_restored_len; /* (Actually a copy of pc_header.h_before_len.) */

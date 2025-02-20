@@ -22,6 +22,17 @@ elsif (!($byteorder == 1234 || $byteorder == 12345678)) {
  warn "Unknown byte order: $byteorder\n";
  die "OS unsupported\n";
 }
+my ($ccflags, $libs, $version);
+if (eval { require Alien::libmaxminddb }) {
+ $ccflags = Alien::libmaxminddb->cflags;
+ $libs = Alien::libmaxminddb->libs;
+ $version = Alien::libmaxminddb->version;
+}
+else {
+ chomp($ccflags = `pkgconf --cflags libmaxminddb` // q{});
+ chomp($libs = `pkgconf --libs libmaxminddb` // '-lmaxminddb');
+ chomp($version = `pkgconf --modversion libmaxminddb` // q{});
+}
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Read MaxMind DB files",
@@ -46,7 +57,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.011",
+  "VERSION" => "1.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,8 +65,8 @@ my %WriteMakefileArgs = (
 
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
-    CCFLAGS => Alien::libmaxminddb->cflags . ' ' . $Config{ccflags},
-    LIBS => [ Alien::libmaxminddb->libs ],
+    CCFLAGS => join(q{ }, $ccflags, $Config{ccflags}),
+    LIBS => [ $libs ],
     DEFINE => join(q{ }, @defines),
 );
 
@@ -80,10 +91,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# Alien::Base->atleast_version might not be available.
-use Alien::libmaxminddb;
-my $version = Alien::libmaxminddb->version;
-if ($version =~ m{^(0|1\.[01])\.}) {
+if (defined $version && $version =~ m{^(0|1\.[01])\.}) {
   warn "Error: libmaxminddb $version is too old.\n";
   die "OS unsupported\n";
 }

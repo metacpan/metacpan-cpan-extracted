@@ -58,6 +58,10 @@ SV * embperl_ThreadDataRV ;
 #define EMBPERL_EscMode_NAME    EMBPERL_PACKAGE_STR"::escmode"
 #define EMBPERL_CurrNode_NAME    EMBPERL_PACKAGE_STR"::_ep_node"
 
+#define MAX_FORMDATA_SIZE      67108864 /* 64 MB */
+#define MAX_FORMDATA_SIZE_XXSTR(A)  MAX_FORMDATA_SIZE_XSTR(A)
+#define MAX_FORMDATA_SIZE_XSTR(A)   #A
+#define MAX_FORMDATA_SIZE_STR   MAX_FORMDATA_SIZE_XXSTR(MAX_FORMDATA_SIZE)
 
 static int  bInitDone = 0 ; /* c part is already initialized */
 static int  nRequestCount = 1 ;
@@ -1254,7 +1258,12 @@ static int embperl_SetupFormData (/*i/o*/ register req * r)
         return ok ;
         }
    
-    
+    if (len > MAX_FORMDATA_SIZE)
+        {
+        LogErrorParam (r, rcFormDataTruncated, MAX_FORMDATA_SIZE_STR, NULL) ;
+        len = MAX_FORMDATA_SIZE ;
+        }
+
     if (len == 0)
         {
         p = r -> Param.sQueryInfo ;

@@ -98,6 +98,7 @@ enum tRc
     rcSubCallNotRequest,
     rcTokenNotFound,  
     rcNotScalarRef,
+    rcFormDataTruncated,
     rcForbidden = 403,
     rcNotFound  = 404,
     rcDecline   = -1
