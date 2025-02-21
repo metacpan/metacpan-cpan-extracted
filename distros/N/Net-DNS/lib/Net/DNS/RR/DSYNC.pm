@@ -2,7 +2,7 @@ package Net::DNS::RR::DSYNC;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DSYNC.pm 1996 2024-12-16 13:05:08Z willem $)[2];
+our $VERSION = (qw$Id: DSYNC.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -88,8 +88,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name DSYNC rrtype scheme port target');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name DSYNC rrtype scheme port target');
 
 =head1 DESCRIPTION
 
@@ -107,36 +107,36 @@ other unpredictable behaviour.
 
 =head2 rrtype
 
-    $rrtype = $rr->rrtype;
-    $rr->rrtype($rrtype);
+	$rrtype = $rr->rrtype;
+	$rr->rrtype($rrtype);
 
 The type of generalized NOTIFY for which this DSYNC RR defines the
 desired target address.
 
 =head2 scheme
 
-    $scheme = $rr->scheme;
-    $rr->scheme( $scheme );
+	$scheme = $rr->scheme;
+	$rr->scheme( $scheme );
 
-The scheme indicates the mode used for locating the desired notification address.
+The scheme indicates the mode used for locating the notification address.
 This is an 8 bit unsigned integer.
 Records with value 0 (null scheme) are ignored by consumers.
 
 =head2 port
 
-    $port = $rr->port;
-    $rr->port( $port );
+	$port = $rr->port;
+	$rr->port( $port );
 
 The port on the host providing the notification service.
 This is a 16 bit unsigned integer.
 
 =head2 target
 
-    $target = $rr->target;
-    $rr->target( $target );
+	$target = $rr->target;
+	$rr->target( $target );
 
 The domain name of the target host providing the service
-of listening for generalized notifications of the specified type.
+which listens for notifications of the specified type.
 This name MUST resolve to one or more address records.
 
 

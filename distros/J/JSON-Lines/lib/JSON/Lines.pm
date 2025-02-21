@@ -1,10 +1,10 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.03';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
 BEGIN {
-	$JSON = JSON->new->utf8;
+	$JSON = JSON->new;
 	$LINES = qr{ ([\[\{] (?: (?> [^\[\]\{\}]+ ) | (??{ $LINES }) )* [\]\}]) }x;
 	%EX = (
 		jsonl => [qw/all/]
@@ -27,7 +27,7 @@ sub jsonl {
 sub new {
 	my ($pkg, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
 	my $self = bless { headers => [] }, $pkg;
-	exists $args{$_} && $JSON->$_($args{$_}) for qw/pretty canonical/;
+	exists $args{$_} && $JSON->$_($args{$_}) for qw/pretty canonical utf8/;
 	$self->{$_} = $args{$_} for qw/parse_headers error_cb success_cb/;
 	$self;
 }
@@ -182,7 +182,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -289,6 +289,7 @@ Instantiate a new JSON::Lines object.
 		success_cb => sub { if ($_[0] eq 'encode') { ... } },
 		error_cb => sub { if ($_[0] eq 'decode') { ... } },
 		canonical => 1,
+		utf8 => 1,
 		pretty => 1,
 		parse_headers => 1
 	);
@@ -304,6 +305,10 @@ Callback called on unsucessfull encode or decode of an item.
 =head3 canonical
 
 Print in canonical order.
+
+=head3 utf8
+
+utf8 encode/decode
 
 =head3 pretty
 

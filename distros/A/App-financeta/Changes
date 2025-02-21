@@ -1,3 +1,154 @@
+Thu Feb 20 13:08:09 2025 -0500
+2ec22e80c5bb00b3b702a983f293f65df7ecb42a
+Making highcharts the default. updating version for release
+
+Thu Feb 20 11:22:49 2025 -0500
+d635aacf8120b850dd881199486dc79ec96a8adb
+updating manifest
+
+Sun Nov 24 17:30:18 2024 -0500
+3ecd625387004859cf538c3c7c1f13dba85a8f42
+a highcharts test script added as a way to test theories
+
+Sun Nov 24 10:11:12 2024 -0500
+20edee713c1a059d5a79606a1bdde638318e3133
+if the data is not present, do not generate JS
+
+Sun Nov 24 10:10:22 2024 -0500
+1e54ac55b9f427bab7388541a26f029a1dcd9ac0
+if the data is not present do not generate javascript
+
+Thu Nov 21 12:38:48 2024 -0500
+02b971710fb31e4aa5d323b1603c9b7e685a19c3
+adding a test PDL script for a blog post
+
+Fri Nov 15 18:51:36 2024 -0500
+8bab1c674f582edc8503a5b276fa9521bc051dd2
+tempdir on windows also uses APPDATA if needed. /tmp only for non-windows platforms
+
+Fri Nov 15 18:48:23 2024 -0500
+ebf3b3fa010f7ff845b8aeaa4c3c28b57f71762b
+Dark mode check is now correctly implemented
+
+Thu Nov 14 10:57:19 2024 -0500
+b719bcff210ec52d07b8642850093a35059a9c18
+Runtime P&L now done for gnuplot too
+
+Thu Nov 14 08:48:06 2024 -0500
+b047fb0d5299f8fc26f69cedb8a60740182b33c8
+Runtime P&L code fixed and this time it is correct
+
+Wed Nov 13 22:49:07 2024 -0500
+bc17bc6d2d98c31d4c65829bedd804686bbaedc3
+Runtime p&l added to the chart
+
+Tue Nov 12 17:03:46 2024 -0500
+6f3e84ae2b28b28c194c3ed78c5d7e066ea64f26
+auto-close the plot after idle time
+
+Tue Nov 12 16:24:32 2024 -0500
+f5512ac836e4f05c787a9a8159bfbad6e7f97d1b
+Handle dark mode in the code editor
+
+Mon Nov 11 22:04:14 2024 -0500
+48245af59cca99010260424d231ac53ac212e982
+update changelog
+
+Mon Nov 11 22:03:34 2024 -0500
+2bad1400d42074255f04480013aceda316e7e752
+Adding Template::Toolkit to the dependencies
+
+Tue May 7 07:46:26 2024 -0400
+7bee477022611f501ed8ad5ac9c67b49efbe26ad
+moving wxt to above windows in the stack of terminals allowed
+
+Mon Nov 11 21:32:45 2024 -0500
+5b38b1194675f9fdaf5bc47cb4a21ebdf8d93dac
+updating CHanges
+
+Mon Nov 11 21:30:59 2024 -0500
+fa6ccd6cf467d63573142d86929bc9af55375e5a
+updating version number
+
+Mon Nov 11 21:13:47 2024 -0500
+8742a21591d9d6e2ad786f7574f5c27c4114333b
+moving some code around
+
+Mon Nov 11 21:08:31 2024 -0500
+09603329812828f33f20897673ddfb61b20df5e5
+finishing the candlestick display for Highcharts
+
+Mon Nov 11 20:37:28 2024 -0500
+b497c7ad3a0d30d5c2da9fca87ef4ec0c7fb2c4f
+Handle the charts for additional indicators.
+
+Mon Nov 11 12:24:57 2024 -0500
+856698a99aad002fc1054a5563cba98c5d83d51b
+buy/sell signals are now in highcharts
+
+Mon Nov 11 00:21:36 2024 -0500
+58df6c7ef5c0f686e8df04943d44f7a63340b638
+Adding highcharts update
+
+Mon Nov 11 00:20:42 2024 -0500
+7c2c9fce0b4ae07947f07ef1df21d0c87ae77432
+Adding HighCharts as a plotting engine. can only do basic data plots, not indicators or signals.
+
+Tue May 7 00:22:43 2024 -0400
+204d0b3820265f7815efc1897293752bfde0407f
+Fixing the Gnuplot issue in Windows
+
+Sat Mar 25 16:05:21 2023 -0400
+ab7f4b99727a250f665697e1438f32af630ef5c4
+fixing bug in object name
+
+Wed Mar 22 21:48:44 2023 -0400
+24b9872d35697319729faf73dd219130982b7809
+Adding Cryptocurrency exchange Gemini public data support to this UI
+
+Mon Mar 20 23:18:04 2023 -0400
+595746ca292225bcdc3afd484629ac6d75bc72f8
+Getting ready to add multiple sources for supporting research
+
+Tue Mar 14 11:35:36 2023 -0400
+87e7a4149755bb37ab3c2f7dda241d0a84586d0f
+Progress bar looks better now and works like a progress bar with a test application to view it
+
+Mon Mar 13 11:13:58 2023 -0400
+cd5c8ab027600d7568f08dc5d3e6b7dd978a4279
+Removing class based instantiation of PDL and using just  the exported functions
+
+Mon Mar 13 11:04:50 2023 -0400
+1bd80007d837f2d16f120e030ccf8451f8672561
+Moving the download data function to its own module so that we can add more data download functions
+
+Mon Mar 13 09:38:10 2023 -0400
+8685eb040ade95f40b561efeda65bee317db33a6
+moving the gui modules into the gui folder
+
+Wed Mar 8 12:04:04 2023 -0500
+02f24bd0d9cb449f59a946e7e0ddb42f6fed0729
+Moving the last Pod file into the module itself
+
+Wed Mar 8 12:00:26 2023 -0500
+8629a934017fa5a0c419e43b2e8a0bc92a981062
+Making the progress bar prettier!
+
+Wed Mar 8 08:28:50 2023 -0500
+7b1444fc1ea24e11ac9186427ec44d8f309ce1fc
+Progress Bar moved out into its own class now and usage updated
+
+Tue Mar 7 15:54:11 2023 -0500
+a7237c6581a715457ab5fa54d7faa5971370df62
+Moving the security wizard out of the gui.pm file into its own class
+
+Tue Feb 28 21:54:05 2023 -0500
+9411656c06c94465c6674fce457ad787f405a5a2
+fixing the indexing issue in PAUSE by adding a version for the last remaining package
+
+Tue Feb 28 21:40:48 2023 -0500
+cffacbf94d6d411b3adc8f78e92eb3ff01c4dc36
+Bump version for release to PAUSE
 Mon Nov 11 22:03:34 2024 -0500
 2bad1400d42074255f04480013aceda316e7e752
 Adding Template::Toolkit to the dependencies

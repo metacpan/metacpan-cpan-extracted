@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 34-NSEC3-flags.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 34-NSEC3-flags.t 2003 2025-01-21 12:06:06Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -23,8 +23,8 @@ plan tests => 3;
 my $rr = Net::DNS::RR->new( type => 'NSEC3' );
 
 
-my $optout = $rr->optout;
-ok( !$optout, 'Boolean optout flag has default value' );
+my $optout = $rr->optout(0);
+ok( !$optout, 'Boolean optout flag cleared' );
 
 $rr->optout( !$optout );
 ok( $rr->optout, 'Boolean optout flag toggled' );

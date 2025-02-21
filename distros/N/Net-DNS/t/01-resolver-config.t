@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-config.t 1981 2024-06-17 13:22:14Z willem $	-*-perl-*-
+# $Id: 01-resolver-config.t 2013 2025-02-11 15:52:59Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -22,13 +22,10 @@ eval {
 
 my $resolver = Net::DNS::Resolver->new();
 my $class    = ref($resolver);
-
-my $isa = $resolver->OS_CONF;
-diag $isa unless $isa =~ /::UNIX$/;
-
 ok( $resolver->isa('Net::DNS::Resolver'), 'new() created object' );
 
-ok( $class->new( debug => 1 )->_diag('_diag("debug message");'), 'debug message' );
+my ($isa) = $resolver->OS_CONF;
+ok( $class->new( debug => 1 )->_diag(qq(_diag("$isa");)), 'debug message' );
 
 
 $class->nameservers(qw(127.0.0.1 ::1));				# check class methods
@@ -43,34 +40,33 @@ ok( $class->string(),	   '$class->string' );
 
 ok( $resolver->domain('example.com'),	  '$resolver->domain' );       # check instance methods
 ok( $resolver->searchlist('example.com'), '$resolver->searchlist' );
-$resolver->nameservers(qw(127.0.0.1 ::1));
+$resolver->nameservers(qw(127.0.0.1 ::1 ::ffff:127.0.0.1 fe80::1234%1));
 ok( scalar( $resolver->nameservers() ), '$resolver->nameservers' );
 $resolver->nameservers();
 is( scalar( $resolver->nameservers() ), 0, 'delete nameservers' );
 
 
-$resolver->nameservers(qw(127.0.0.1 ::1 ::ffff:127.0.0.1 fe80::1234%1));
-$resolver->force_v4(0);						# set by default if no IPv6
-$resolver->prefer_v6(1);
-my ($IPv6) = $resolver->nameserver();
-is( $IPv6, '::1', '$resolver->prefer_v6(1)' );
+my ($IPv4) = $resolver->nameserver(qw(127.0.0.1));
+is( $IPv4, '127.0.0.1', 'IPv4 nameserver' );
 
+my ($IPv6) = $resolver->nameserver(qw(::1));
 
-$resolver->nameservers(qw(127.0.0.1 ::1));
-$resolver->force_v6(0);
-$resolver->prefer_v4(1);
-my ($address) = $resolver->nameserver();
-is( $address, '127.0.0.1', '$resolver->prefer_v4(1)' );
+SKIP: {
+	skip( 'IPv6 specific test', 6 ) unless $IPv6;
+	is( $IPv6, '::1', 'IPv6 nameserver' );
 
+	my ($pref4) = $class->new( prefer_v4 => 1 )->nameserver(qw(::1 127.0.0.1));
+	is( $pref4, '127.0.0.1', '$resolver->prefer_v4(1)' );
 
-$resolver->force_v6(1);
-ok( !$resolver->nameservers(qw(127.0.0.1)), '$resolver->force_v6(1)' );
-like( $resolver->errorstring, '/IPv4.+disabled/', 'errorstring: IPv4 disabled' );
+	my ($force4) = $class->new( force_v4 => 1 )->nameserver(qw(::1 127.0.0.1));
+	is( $force4, '127.0.0.1', '$resolver->force_v4(1)' );
 
+	my ($pref6) = $class->new( prefer_v6 => 1 )->nameserver(qw(127.0.0.1 ::1));
+	is( $pref6, '::1', '$resolver->prefer_v6(1)' );
 
-$resolver->force_v4(1);
-ok( !$resolver->nameservers(qw(::)), '$resolver->force_v4(1)' );
-like( $resolver->errorstring, '/IPv6.+disabled/', 'errorstring: IPv6 disabled' );
+	my ($force6) = $class->new( force_v6 => 1 )->nameserver(qw(127.0.0.1 ::1));
+	is( $force6, '::1', '$resolver->force_v6(1)' );
+}
 
 
 foreach my $ip (qw(127.0.0.1 ::1)) {

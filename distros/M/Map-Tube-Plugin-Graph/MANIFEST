@@ -3,10 +3,13 @@ lib/Map/Tube/Plugin/Graph.pm
 lib/Map/Tube/Plugin/Graph/Utils.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
 t/as_image.t
+t/unusual-station-name.t
+t/unusual-station-name.xml
+t/lib/Sample.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

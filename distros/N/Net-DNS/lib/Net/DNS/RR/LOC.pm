@@ -2,7 +2,7 @@ package Net::DNS::RR::LOC;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: LOC.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: LOC.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -214,8 +214,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name LOC latitude longitude altitude size hp vp');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name LOC latitude longitude altitude size hp vp');
 
 =head1 DESCRIPTION
 
@@ -233,12 +233,12 @@ other unpredictable behaviour.
 
 =head2 latitude
 
-    $latitude = $rr->latitude;
-    ($deg, $min, $sec, $ns ) = $rr->latitude;
+	$latitude = $rr->latitude;
+	($deg, $min, $sec, $ns ) = $rr->latitude;
 
-    $rr->latitude( 42.357990 );
-    $rr->latitude( 42, 21, 28.764, 'N' );
-    $rr->latitude( '42 21 28.764 N' );
+	$rr->latitude( 42.357990 );
+	$rr->latitude( 42, 21, 28.764, 'N' );
+	$rr->latitude( '42 21 28.764 N' );
 
 When invoked in scalar context, latitude is returned in degrees,
 a negative ordinate being south of the equator.
@@ -252,12 +252,12 @@ or formatted string. Trailing zero values are optional.
 
 =head2 longitude
 
-    $longitude = $rr->longitude;
-    ($deg, $min, $sec, $ew ) = $rr->longitude;
+	$longitude = $rr->longitude;
+	($deg, $min, $sec, $ew ) = $rr->longitude;
 
-    $rr->longitude( -71.014338 );
-    $rr->longitude( 71, 0, 51.617, 'W' );
-    $rr->longitude( '71 0 51.617 W' );
+	$rr->longitude( -71.014338 );
+	$rr->longitude( 71, 0, 51.617, 'W' );
+	$rr->longitude( '71 0 51.617 W' );
 
 When invoked in scalar context, longitude is returned in degrees,
 a negative ordinate being west of the prime meridian.
@@ -268,43 +268,43 @@ as appropriate.
 
 =head2 altitude
 
-    $altitude = $rr->altitude;
+	$altitude = $rr->altitude;
 
 Represents altitude, in metres, relative to the WGS 84 reference
 spheroid used by GPS.
 
 =head2 size
 
-    $size = $rr->size;
+	$size = $rr->size;
 
 Represents the diameter, in metres, of a sphere enclosing the
 described entity.
 
 =head2 hp
 
-    $hp = $rr->hp;
+	$hp = $rr->hp;
 
 Represents the horizontal precision of the data expressed as the
 diameter, in metres, of the circle of error.
 
 =head2 vp
 
-    $vp = $rr->vp;
+	$vp = $rr->vp;
 
 Represents the vertical precision of the data expressed as the
 total spread, in metres, of the distribution of possible values.
 
 =head2 latlon
 
-    ($lat, $lon) = $rr->latlon;
-    $rr->latlon($lat, $lon);
+	($lat, $lon) = $rr->latlon;
+	$rr->latlon($lat, $lon);
 
 Representation of the latitude and longitude coordinate pair as
 signed floating-point degrees.
 
 =head2 version
 
-    $version = $rr->version;
+	$version = $rr->version;
 
 Version of LOC protocol.
 
@@ -342,6 +342,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1876|https://tools.ietf.org/html/rfc1876>
+L<RFC1876|https://iana.org/go/rfc1876>
 
 =cut

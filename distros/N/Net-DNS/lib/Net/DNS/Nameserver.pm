@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1996 2024-12-16 13:05:08Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,22 +12,22 @@ Net::DNS::Nameserver - DNS server class
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Nameserver;
+	use Net::DNS::Nameserver;
 
-    my $nameserver = Net::DNS::Nameserver->new(
-	LocalAddr	=> ['::1', '127.0.0.1'],
-	LocalPort	=> 15353,
-	ZoneFile	=> 'filename'
-	);
+	my $nameserver = Net::DNS::Nameserver->new(
+			LocalAddr	=> ['::1', '127.0.0.1'],
+			LocalPort	=> 15353,
+			ZoneFile	=> 'filename'
+			);
 
-    my $nameserver = Net::DNS::Nameserver->new(
-	LocalAddr	=> '10.1.2.3',
-	LocalPort	=> 15353,
-	ReplyHandler	=> \&reply_handler
-    );
+	my $nameserver = Net::DNS::Nameserver->new(
+			LocalAddr	=> '10.1.2.3',
+			LocalPort	=> 15353,
+			ReplyHandler	=> \&reply_handler
+			);
 
-    $nameserver->start_server($timeout);
-    $nameserver->stop_server;
+	$nameserver->start_server($timeout);
+	$nameserver->stop_server;
 
 
 =head1 DESCRIPTION
@@ -49,7 +49,7 @@ use Net::DNS;
 use Net::DNS::ZoneFile;
 
 use IO::Select;
-use IO::Socket::IP 0.38;
+use IO::Socket::IP;
 use IO::Socket;
 use Socket;
 
@@ -86,7 +86,7 @@ sub new {
 		);
 	my $self = bless \%self, $class;
 
-	$self->ReadZoneFile( $self{ZoneFile} ) if exists $self{ZoneFile};
+	$self->_ReadZoneFile( $self{ZoneFile} ) if exists $self{ZoneFile};
 
 	croak 'No reply handler!' unless ref( $self{ReplyHandler} ) eq "CODE";
 
@@ -101,10 +101,10 @@ sub new {
 
 
 #------------------------------------------------------------------------------
-# ReadZoneFile - Read zone file used by default reply handler
+# _ReadZoneFile - Read zone file used by default reply handler
 #------------------------------------------------------------------------------
 
-sub ReadZoneFile {
+sub _ReadZoneFile {
 	my ( $self, $file ) = @_;
 	my $zonefile = Net::DNS::ZoneFile->new($file);
 
@@ -125,16 +125,16 @@ sub ReadZoneFile {
 
 	$self->{namelist}     = [sort { length($b) <=> length($a) } keys %$RRhash];
 	$self->{zonelist}     = [sort { length($b) <=> length($a) } @zonelist];
-	$self->{ReplyHandler} = sub { $self->ReplyHandler(@_) };
+	$self->{ReplyHandler} = sub { $self->_ReplyHandler(@_) };
 	return;
 }
 
 
 #------------------------------------------------------------------------------
-# ReplyHandler - Default reply handler serving RRs from zone file
+# _ReplyHandler - Default reply handler serving RRs from zone file
 #------------------------------------------------------------------------------
 
-sub ReplyHandler {
+sub _ReplyHandler {
 	my ( $self, $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
 	my $RRhash = $self->{index};
 	my $rcode;
@@ -203,10 +203,10 @@ sub ReplyHandler {
 
 
 #------------------------------------------------------------------------------
-# make_reply - Make a reply packet.
+# _make_reply - Make a reply packet.
 #------------------------------------------------------------------------------
 
-sub make_reply {
+sub _make_reply {
 	my ( $self, $query, $sock ) = @_;
 	my $verbose = $self->{Verbose};
 
@@ -307,10 +307,10 @@ sub make_reply {
 
 
 #------------------------------------------------------------------------------
-# TCP_connection - Handle a TCP connection.
+# _TCP_connection - Handle a TCP connection.
 #------------------------------------------------------------------------------
 
-sub TCP_connection {
+sub _TCP_connection {
 	my ( $self, $socket, $buffer ) = @_;
 	my $verbose = $self->{Verbose};
 
@@ -320,7 +320,7 @@ sub TCP_connection {
 		undef $query;		## force FORMERR reply
 	}
 
-	my $reply = $self->make_reply( $query, $socket );
+	my $reply = $self->_make_reply( $query, $socket );
 	die 'Failed to create reply' unless defined $reply;
 
 	my $segment = $reply->data;
@@ -334,23 +334,24 @@ sub TCP_connection {
 	return;
 }
 
-sub read_tcp {
+sub _read_tcp {
 	my ( $socket, $verbose ) = @_;
 
-	my $l = '';
+	my $header = '';
 	local $! = 0;
-	my $n = sysread( $socket, $l, 2 );
+	my $n = sysread( $socket, $header, 2 );
 	unless ( defined $n ) {
 		redo if $!{EINTR};	## retry if aborted by signal
 		die "sysread: $!";
 	}
-	return if $n == 0;
-	my $msglen = unpack 'n', $l;
+	return '' if $n == 0;
+	return '' if length($header) < 2;
+	my $msglen = unpack 'n', $header;
 
 	my $buffer = '';
-	while ( $msglen > ( my $l = length $buffer ) ) {
+	while ( $msglen > ( my $len = length $buffer ) ) {
 		local $! = 0;
-		my $n = sysread( $socket, $buffer, ( $msglen - $l ), $l );
+		my $n = sysread( $socket, $buffer, ( $msglen - $len ), $len );
 		unless ( defined $n ) {
 			redo if $!{EINTR};	## retry if aborted by signal
 			die "sysread: $!";
@@ -369,10 +370,10 @@ sub read_tcp {
 
 
 #------------------------------------------------------------------------------
-# UDP_connection - Handle a UDP connection.
+# _UDP_connection - Handle a UDP connection.
 #------------------------------------------------------------------------------
 
-sub UDP_connection {
+sub _UDP_connection {
 	my ( $self, $socket, $buffer ) = @_;
 	my $verbose = $self->{Verbose};
 
@@ -382,7 +383,7 @@ sub UDP_connection {
 		undef $query;		## force FORMERR reply
 	}
 
-	my $reply = $self->make_reply( $query, $socket );
+	my $reply = $self->_make_reply( $query, $socket );
 	die 'Failed to create reply' unless defined $reply;
 
 	my @UDPsize = ( $query && $self->{Truncate} ) ? $query->edns->UDPsize || 512 : ();
@@ -396,7 +397,7 @@ sub UDP_connection {
 	return;
 }
 
-sub read_udp {
+sub _read_udp {
 	my ( $socket, $verbose ) = @_;
 	my $buffer = '';
 	$socket->recv( $buffer, 9000 );	## payload limit for Ethernet "Jumbo" packet
@@ -414,11 +415,11 @@ sub read_udp {
 # Socket mechanics.
 #------------------------------------------------------------------------------
 
-use constant DEBUG => 0;
+use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 
-sub logmsg { return warn join '', "$0 $$: @_ at ", scalar localtime(), "\n" }
+sub _logmsg { warn( join '', "$0 $$: @_ at ", scalar localtime(), "\n" ); return }
 
-sub TCP_socket {
+sub _TCP_socket {
 	my ( $ip, $port ) = @_;
 	my $socket = IO::Socket::IP->new(
 		LocalAddr => $ip,
@@ -430,18 +431,19 @@ sub TCP_socket {
 		)
 			or die "can't setup TCP socket: $!";
 
-	logmsg "TCP server [$ip] port $port" if DEBUG;
+	_logmsg "TCP server [$ip] port $port" if DEBUG;
 	return $socket;
 }
 
-sub TCP_server {
+sub _TCP_server {
 	my ( $self, $ip, $port, $timeout ) = @_;
-	my $listen = TCP_socket( $ip, $port );
+	my $listen = _TCP_socket( $ip, $port );
 	my $select = IO::Select->new($listen);
 
 	my $expired;
-	local $SIG{ALRM} = sub { $expired++ };
-	local $SIG{TERM} = sub { $expired++ };
+	my $terminate = sub { $expired++ };
+	local $SIG{ALRM} = $terminate;
+	local $SIG{TERM} = $terminate;
 	alarm $timeout;
 	until ($expired) {
 		local $! = 0;
@@ -455,8 +457,8 @@ sub TCP_server {
 				$select->add( $listen->accept );
 				next;
 			}
-			if ( my $buffer = read_tcp( $socket, $self->{Verbose} ) ) {
-				spawn( sub { $self->TCP_connection( $socket, $buffer ) } );
+			if ( my $buffer = _read_tcp( $socket, $self->{Verbose} ) ) {
+				_spawn( sub { $self->_TCP_connection( $socket, $buffer ) } );
 			} else {
 				close($socket);
 				$select->remove($socket);
@@ -468,7 +470,7 @@ sub TCP_server {
 }
 
 
-sub UDP_socket {
+sub _UDP_socket {
 	my ( $ip, $port ) = @_;
 	my $socket = IO::Socket::IP->new(
 		LocalAddr => $ip,
@@ -479,18 +481,19 @@ sub UDP_socket {
 		)
 			or die "can't setup UDP socket: $!";
 
-	logmsg "UDP server [$ip] port $port" if DEBUG;
+	_logmsg "UDP server [$ip] port $port" if DEBUG;
 	return $socket;
 }
 
-sub UDP_server {
+sub _UDP_server {
 	my ( $self, $ip, $port, $timeout ) = @_;
-	my $socket = UDP_socket( $ip, $port );
+	my $socket = _UDP_socket( $ip, $port );
 	my $select = IO::Select->new($socket);
 
 	my $expired;
-	local $SIG{ALRM} = sub { $expired++ };
-	local $SIG{TERM} = sub { $expired++ };
+	my $terminate = sub { $expired++ };
+	local $SIG{ALRM} = $terminate;
+	local $SIG{TERM} = $terminate;
 	alarm $timeout;
 	until ($expired) {
 		local $! = 0;
@@ -500,8 +503,8 @@ sub UDP_server {
 		};
 
 		foreach my $client (@ready) {
-			my $buffer = read_udp( $client, $self->{Verbose} );
-			spawn( sub { $self->UDP_connection( $client, $buffer ) } );
+			my $buffer = _read_udp( $client, $self->{Verbose} );
+			_spawn( sub { $self->_UDP_connection( $client, $buffer ) } );
 		}
 		sleep(0) if MSWin;
 	}
@@ -513,27 +516,29 @@ sub UDP_server {
 # Process mechanics.
 #------------------------------------------------------------------------------
 
-sub spawn {
+my $noop = sub { };
+
+sub _spawn {
 	my $coderef = shift;
 	unless ( defined( my $pid = fork() ) ) {
 		die "cannot fork: $!";
 	} elsif ($pid) {
-		logmsg "begat $pid" if DEBUG;
+		_logmsg "begat $pid" if DEBUG;
 		return $pid;		## parent
 	}
 
 	# else ...
-	local $SIG{TERM} = sub { };
-	local $SIG{CHLD} = \&reaper;
+	local $SIG{TERM} = $noop;
+	local $SIG{CHLD} = \&_reaper;
 	$coderef->();			## child
 	exit;
 }
 
-sub reaper {
+sub _reaper {
 	local ( $!, $? );		## protect error and exit status
-	$SIG{CHLD} = \&reaper;		## no critic	sysV semantics
+	$SIG{CHLD} = \&_reaper;		## no critic	sysV semantics
 	while ( abs( my $pid = waitpid( -1, POSIX ? WNOHANG : 0 ) ) > 1 ) {
-		logmsg "reaped $pid" if DEBUG;
+		_logmsg "reaped $pid" if DEBUG;
 	}
 	return;
 }
@@ -546,17 +551,18 @@ sub start_server {
 	my ( $self, $timeout ) = @_;
 	$timeout ||= 600;
 	croak 'Attempt to start ', ref($self), ' in a subprocess' unless $$ == $pid;
+	_logmsg('start server') if DEBUG;
 
 	foreach my $ip ( @{$self->{LocalAddr}} ) {
 		my $port = $self->{LocalPort};
-		push @pid, spawn sub { $self->TCP_server( $ip, $port, $timeout ) };
-		push @pid, spawn sub { $self->UDP_server( $ip, $port, $timeout ) };
+		push @pid, _spawn sub { $self->_TCP_server( $ip, $port, $timeout ) };
+		push @pid, _spawn sub { $self->_UDP_server( $ip, $port, $timeout ) };
 	}
 	return;
 }
 
 sub stop_server {
-	logmsg "killing @pid" if DEBUG;
+	_logmsg('stop server') if DEBUG;
 	kill 'TERM', @pid;
 	return;
 }
@@ -564,56 +570,9 @@ sub stop_server {
 END {
 	local ( $!, $? );		## protect error and exit status
 	while ( abs( my $pid = waitpid( -1, 0 ) ) > 1 ) {
-		logmsg "reaped $pid" if DEBUG;
+		_logmsg "reaped $pid" if DEBUG;
 	}
-	logmsg "terminated" if DEBUG;
-}
-
-
-#------------------------------------------------------------------------------
-# main_loop - Start nameserver loop.
-#------------------------------------------------------------------------------
-
-sub main_loop {				## historical
-	carp 'deprecated method; prefer start_server()';
-	&start_server;
-	exit;
-}
-
-
-#------------------------------------------------------------------------------
-# loop_once - Single-transaction nameserver
-#------------------------------------------------------------------------------
-
-my ( @TCP, @UDP );
-
-sub loop_once {				## historical
-	my ( $self, @timeout ) = @_;
-	unless (@UDP) {
-		foreach my $ip ( @{$self->{LocalAddr}} ) {
-			push @TCP, TCP_socket( $ip, $self->{LocalPort} );
-			push @UDP, UDP_socket( $ip, $self->{LocalPort} );
-		}
-	}
-	my $select = IO::Select->new( @TCP, @UDP );
-	my %listen = map { ( $_, 1 ) } @TCP;
-	while ( scalar( my @ready = $select->can_read(@timeout) ) ) {
-		my ($socket) = @ready;
-		if ( $socket->socktype() == SOCK_DGRAM ) {
-			my $buffer = read_udp( $socket, $self->{Verbose} );
-			$self->UDP_connection( $socket, $buffer );
-			last;
-		} else {
-			if ( $listen{$socket} ) {
-				$select->add( $socket->accept );
-				next;
-			}
-			my $buffer = read_tcp( $socket, $self->{Verbose} );
-			$self->TCP_connection( $socket, $buffer ) if $buffer;
-			close($socket);
-			last;
-		}
-	}
+	_logmsg "terminated" if DEBUG;
 }
 
 
@@ -625,41 +584,65 @@ __END__
 
 =head2 new
 
-    $nameserver = Net::DNS::Nameserver->new(
-	LocalAddr	=> ['::1', '127.0.0.1'],
-	LocalPort	=> 15353,
-	ZoneFile	=> "filename"
-	);
+	$nameserver = Net::DNS::Nameserver->new(
+			LocalAddr	=> ['::1', '127.0.0.1'],
+			LocalPort	=> 15353,
+			ZoneFile	=> "filename"
+			);
 
-    $nameserver = Net::DNS::Nameserver->new(
-	LocalAddr	=> '10.1.2.3',
-	LocalPort	=> 15353,
-	ReplyHandler	=> \&reply_handler,
-	Verbose		=> 1,
-	Truncate	=> 0
-    );
+	$nameserver = Net::DNS::Nameserver->new(
+			LocalAddr	=> '10.1.2.3',
+			LocalPort	=> 15353,
+			ReplyHandler	=> \&reply_handler,
+			Verbose		=> 1,
+			Truncate	=> 0
+			);
 
 Instantiates a Net::DNS::Nameserver object.
 An exception is raised if the object could not be created.
 
 Each instance is configured using the following optional arguments:
 
-    LocalAddr		IP address on which to listen	Defaults to loopback address
-    LocalPort		Port on which to listen
-    ZoneFile		Name of file containing RRs
-			accessed using the internal
-			reply-handling subroutine
-    ReplyHandler	Reference to customised
-			reply-handling subroutine
-    NotifyHandler	Reference to reply-handling
-			subroutine for queries with
-			opcode NOTIFY (RFC1996)
-    UpdateHandler	Reference to reply-handling
-			subroutine for queries with
-			opcode UPDATE (RFC2136)
-    Verbose		Report internal activity	Defaults to 0 (off)
-    Truncate		Truncates UDP packets that
-			are too big for the reply	Defaults to 1 (on)
+=over 4
+
+=item	LocalAddr
+
+IP address on which to listen.
+Defaults to the local loopback address.
+
+=item	LocalPort
+
+Port on which to listen.
+
+=item	ZoneFile
+
+Name of file containing RRs accessed using the internal reply-handling subroutine.
+
+=item	ReplyHandler
+
+Reference to customised reply-handling subroutine.
+
+=item	NotifyHandler
+
+Reference to reply-handling subroutine
+for queries with opcode NOTIFY (RFC1996).
+
+=item	UpdateHandler
+
+Reference to reply-handling subroutine
+for queries with opcode UPDATE (RFC2136).
+
+=item	Verbose
+
+Report internal activity.
+Defaults to 0 (off).
+
+=item	Truncate
+
+Truncates UDP packets that are too big for the reply.
+Defaults to 1 (on).
+
+=back
 
 The LocalAddr attribute may alternatively be specified as an array
 of IP addresses to listen to.
@@ -670,12 +653,33 @@ It must either return the response code and references to the answer,
 authority, and additional sections of the response, or undef to leave
 the query unanswered.  Common response codes are:
 
-    NOERROR	No error
-    FORMERR	Format error
-    SERVFAIL	Server failure
-    NXDOMAIN	Non-existent domain (name doesn't exist)
-    NOTIMP	Not implemented
-    REFUSED	Query refused
+=over 4
+
+=item NOERROR
+
+No error
+
+=item FORMERR
+
+Format error
+
+=item SERVFAIL
+
+Server failure
+
+=item NXDOMAIN
+
+Non-existent domain (name doesn't exist)
+
+=item NOTIMP
+
+Not implemented
+
+=item REFUSED
+
+Query refused
+
+=back
 
 For advanced usage it may also contain a headermask containing an
 hashref with the settings for the C<aa>, C<ra>, and C<ad>
@@ -701,7 +705,7 @@ and truncate the reply packet in the code of the ReplyHandler.
 
 =head2 start_server
 
-    $ns->start_server( <TIMEOUT_IN_SECONDS> );
+	$ns->start_server( <TIMEOUT_IN_SECONDS> );
 
 Starts a server process for each of the specified UDP and TCP sockets
 which continuously responds to user connections.
@@ -712,7 +716,7 @@ If called with no parameter a default timeout of 10 minutes is applied.
 
 =head2 stop_server
 
-    $ns->stop_server();
+	$ns->stop_server();
 
 Terminates all server processes in an orderly fashion.
 
@@ -724,43 +728,42 @@ Terminates all server processes in an orderly fashion.
 The following example is a self-contained test script which queries DNS
 zonefile data served by an embedded Net::DNS::Nameserver instance.
 
-    use strict;
-    use warnings;
-    use Test::More;
+	use strict;
+	use warnings;
+	use Test::More;
 
-    plan skip_all => 'Net::DNS::Nameserver not available'
-		unless eval { require Net::DNS::Nameserver }
-		and Net::DNS::Nameserver->can('start_server');
-    plan tests => 2;
+	plan skip_all => 'Net::DNS::Nameserver not available'
+			unless eval { require Net::DNS::Nameserver }
+			and Net::DNS::Nameserver->can('start_server');
+	plan tests => 2;
 
-    my $resolver = Net::DNS::Resolver->new(
-	nameserver => ['::1', '127.0.0.1'],
-	port	   => 15353
-	);
- 
-    my $ns = Net::DNS::Nameserver->new(
-	LocalAddr => [$resolver->nameserver],
-	LocalPort => $resolver->port,
-	Verbose	  => 0,
-	ZoneFile  => \*DATA
-	)
-		|| die "couldn't create nameserver object";
+	my $resolver = Net::DNS::Resolver->new(
+			nameserver => ['::1', '127.0.0.1'],
+			port	   => 15353
+			);
+	
+	my $ns = Net::DNS::Nameserver->new(
+			LocalAddr => [$resolver->nameserver],
+			LocalPort => $resolver->port,
+			Verbose	  => 0,
+			ZoneFile  => \*DATA
+			) or die "couldn't create nameserver object";
 
-    $ns->start_server(10);
+	$ns->start_server(10);
 
-    my $reply = $resolver->send(qw(example.com SOA));
-    is( ref($reply), 'Net::DNS::Packet', 'received reply packet' );
-    my ($rr) = $reply->answer;
-    is( $rr->type, 'SOA', 'answer contains SOA record' );
+	my $reply = $resolver->send(qw(example.com SOA));
+	is( ref($reply), 'Net::DNS::Packet', 'received reply packet' );
+	my ($rr) = $reply->answer;
+	is( $rr->type, 'SOA', 'answer contains SOA record' );
 
-    $ns->stop_server();
+	$ns->stop_server();
 
-    exit;
+	exit;
 
-    __DATA__
-    $ORIGIN example.com.
-    @	IN SOA	mname rname 2023 2h 1h 2w 1h
-    www	IN A	93.184.216.34
+	__DATA__
+	$ORIGIN example.com.
+	@	IN SOA	mname rname 2023 2h 1h 2w 1h
+	www	IN A	93.184.216.34
 
 
 =head2 Example 2: Free-standing customised DNS nameserver
@@ -771,47 +774,47 @@ answered with NXDOMAIN.	 Authority and additional sections are left empty.
 The $peerhost variable catches the IP address of the peer host, so that
 additional filtering on a per-host basis may be applied.
 
-    use strict;
-    use warnings;
-    use Net::DNS::Nameserver;
+	use strict;
+	use warnings;
+	use Net::DNS::Nameserver;
 
-    sub reply_handler {
-	my ( $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
-	my ( $rcode, @ans, @auth, @add );
+	sub reply_handler {
+		my ( $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
+		my ( $rcode, @ans, @auth, @add );
 
-	print "Received query from $peerhost to " . $conn->{sockhost} . "\n";
-	$query->print;
+		print "Received query from $peerhost to " . $conn->{sockhost} . "\n";
+		$query->print;
 
-	if ( $qtype eq "A" && $qname eq "foo.example.com" ) {
-		my ( $ttl, $rdata ) = ( 3600, "10.1.2.3" );
-		my $rr = Net::DNS::RR->new("$qname $ttl $qclass $qtype $rdata");
-		push @ans, $rr;
-		$rcode = "NOERROR";
-	} elsif ( $qname eq "foo.example.com" ) {
-		$rcode = "NOERROR";
+		if ( $qtype eq "A" && $qname eq "foo.example.com" ) {
+			my ( $ttl, $rdata ) = ( 3600, "10.1.2.3" );
+			my $rr = Net::DNS::RR->new("$qname $ttl $qclass $qtype $rdata");
+			push @ans, $rr;
+			$rcode = "NOERROR";
+		} elsif ( $qname eq "foo.example.com" ) {
+			$rcode = "NOERROR";
 
-	} else {
-		$rcode = "NXDOMAIN";
+		} else {
+			$rcode = "NXDOMAIN";
+		}
+
+		# mark the answer as authoritative (by setting the 'aa' flag)
+		my $headermask = {aa => 1};
+
+		# specify EDNS options	{ option => value }
+		my $optionmask = {};
+
+		return ( $rcode, \@ans, \@auth, \@add, $headermask, $optionmask );
 	}
 
-	# mark the answer as authoritative (by setting the 'aa' flag)
-	my $headermask = {aa => 1};
+	my $ns = Net::DNS::Nameserver->new(
+			LocalPort    => 15353,
+			ReplyHandler => \&reply_handler,
+			Verbose	     => 1
+			) or die "couldn't create nameserver object";
 
-	# specify EDNS options	{ option => value }
-	my $optionmask = {};
+	$ns->start_server(60);
 
-	return ( $rcode, \@ans, \@auth, \@add, $headermask, $optionmask );
-    }
-
-    my $ns = Net::DNS::Nameserver->new(
-	LocalPort    => 15353,
-	ReplyHandler => \&reply_handler,
-	Verbose	     => 1
-	) or die "couldn't create nameserver object";
-
-    $ns->start_server(60);
-
-    exit;	# leaving nameserver processes running
+	exit;	# leaving nameserver processes running for 60 seconds
 
 
 =head1 BUGS
@@ -820,8 +823,8 @@ Limitations in perl make it impossible to guarantee that replies to UDP
 queries from Net::DNS::Nameserver are sent from the IP-address to which
 the query was directed, the source address being chosen by the operating
 system based upon its notion of "closest address". This limitation is
-mitigated by creating a separate set of sockets and server subprocesses
-bound to each IP address.
+mitigated to some extent by creating a separate socket and subprocess
+for each IP address.
 
 
 =head1 COPYRIGHT

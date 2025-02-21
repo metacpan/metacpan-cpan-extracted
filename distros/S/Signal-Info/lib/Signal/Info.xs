@@ -11,10 +11,30 @@ typedef siginfo_t* Signal__Info;
 #define siginfo_pid(self) (self)->si_pid
 #define siginfo_uid(self) (self)->si_uid
 #define siginfo_status(self) (self)->si_status
+
+#ifdef HAVE_SI_BAND
 #define siginfo_band(self) (self)->si_band
+#else
+#define siginfo_band(self)
+#endif
+
+#ifdef HAVE_SI_FD
 #define siginfo_fd(self) (self)->si_fd
+#else
+#define siginfo_fd(self)
+#endif
+
+#ifdef HAVE_SI_TIMERID
 #define siginfo_timerid(self) (self)->si_timerid
+#else
+#define siginfo_timerid(self) 0
+#endif
+
+#ifdef HAVE_SI_OVERRUN
 #define siginfo_overrun(self) (self)->si_overrun
+#else
+#define siginfo_overrun(self) 0
+#endif
 
 #define siginfo_addr(self) PTR2UV((self)->si_addr)
 
@@ -59,20 +79,11 @@ UV siginfo_ptr(Signal::Info self)
 
 UV siginfo_addr(Signal::Info self)
 
-#ifdef si_fd
 IV siginfo_fd(Signal::Info self)
 
-#endif
-
-#ifdef si_timerid
 IV siginfo_timerid(Signal::Info self)
 
-#endif
-
-#ifdef si_overrun
 IV siginfo_overrun(Signal::Info self)
-
-#endif
 
 BOOT:
 	HV* stash = get_hv("Signal::Info::", FALSE);
@@ -99,20 +110,24 @@ BOOT:
 	CONSTANT(BUS_ADRALN);
 	CONSTANT(BUS_ADRERR);
 	CONSTANT(BUS_OBJERR);
+#ifdef TRAP_BRKPT
 	CONSTANT(TRAP_BRKPT);
 	CONSTANT(TRAP_TRACE);
+#endif
 	CONSTANT(CLD_EXITED);
 	CONSTANT(CLD_KILLED);
 	CONSTANT(CLD_DUMPED);
 	CONSTANT(CLD_TRAPPED);
 	CONSTANT(CLD_STOPPED);
 	CONSTANT(CLD_CONTINUED);
+#ifdef POLL_IN
 	CONSTANT(POLL_IN);
 	CONSTANT(POLL_OUT);
 	CONSTANT(POLL_MSG);
 	CONSTANT(POLL_ERR);
 	CONSTANT(POLL_PRI);
 	CONSTANT(POLL_HUP);
+#endif
 	CONSTANT(SI_USER);
 	CONSTANT(SI_QUEUE);
 	CONSTANT(SI_TIMER);

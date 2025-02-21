@@ -19,7 +19,7 @@ name: DBIx-DataModel
 provides:
   DBIx::DataModel:
     file: lib/DBIx/DataModel.pm
-    version: '3.11'
+    version: '3.12'
   DBIx::DataModel::Carp:
     file: lib/DBIx/DataModel/Carp.pm
   DBIx::DataModel::Compatibility::V0:
@@ -129,5 +129,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/DBIx-DataModel
-version: '3.11'
+version: '3.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

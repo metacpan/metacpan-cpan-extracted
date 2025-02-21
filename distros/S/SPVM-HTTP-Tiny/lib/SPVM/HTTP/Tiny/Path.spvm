@@ -70,7 +70,7 @@ class HTTP::Tiny::Path {
     # Build path
     my $parts = $self->parts;
     
-    my $path = Fn->join("/", (string[])Fn->map($parts, method : object ($part : object) { return HTTP::Tiny::Util->url_escape((string)$part, "^A-Za-z0-9\-._~!\$&\'()*+,;=:@"); }));
+    my $path = Fn->join("/", (string[])Fn->map(method : string ($part : string) { return HTTP::Tiny::Util->url_escape($part, "^A-Za-z0-9\-._~!\$&\'()*+,;=:@"); }, $parts));
     
     if ($self->leading_slash) {
       $path = "/$path";

@@ -2,7 +2,7 @@ package Net::DNS::RR::SRV;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SRV.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: SRV.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -102,8 +102,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name SRV priority weight port target');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SRV priority weight port target');
 
 =head1 DESCRIPTION
 
@@ -121,29 +121,29 @@ other unpredictable behaviour.
 
 =head2 priority
 
-    $priority = $rr->priority;
-    $rr->priority( $priority );
+	$priority = $rr->priority;
+	$rr->priority( $priority );
 
 Returns the priority for this target host.
 
 =head2 weight
 
-    $weight = $rr->weight;
-    $rr->weight( $weight );
+	$weight = $rr->weight;
+	$rr->weight( $weight );
 
 Returns the weight for this target host.
 
 =head2 port
 
-    $port = $rr->port;
-    $rr->port( $port );
+	$port = $rr->port;
+	$rr->port( $port );
 
 Returns the port number for the service on this target host.
 
 =head2 target
 
-    $target = $rr->target;
-    $rr->target( $target );
+	$target = $rr->target;
+	$rr->target( $target );
 
 Returns the domain name of the target host.
 
@@ -188,6 +188,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC2782|https://tools.ietf.org/html/rfc2782>
+L<RFC2782|https://iana.org/go/rfc2782>
 
 =cut

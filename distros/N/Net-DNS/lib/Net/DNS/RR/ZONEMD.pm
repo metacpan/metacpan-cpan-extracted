@@ -2,7 +2,7 @@ package Net::DNS::RR::ZONEMD;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ZONEMD.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: ZONEMD.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -102,10 +102,10 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new("example.com. ZONEMD 2018031500 1 1
-	FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE
-	7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE");
+	use Net::DNS;
+	$rr = Net::DNS::RR->new("example.com. ZONEMD 2018031500 1 1
+		FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE
+		7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE");
 
 =head1 DESCRIPTION
 
@@ -123,15 +123,15 @@ other unpredictable behaviour.
 
 =head2 serial
 
-    $serial = $rr->serial;
-    $rr->serial( $serial );
+	$serial = $rr->serial;
+	$rr->serial( $serial );
 
 Unsigned 32-bit integer zone serial number.
 
 =head2 scheme
 
-    $scheme = $rr->scheme;
-    $rr->scheme( $scheme );
+	$scheme = $rr->scheme;
+	$rr->scheme( $scheme );
 
 The scheme field is an 8-bit unsigned integer that identifies the
 methods by which data is collated and presented as input to the
@@ -139,23 +139,23 @@ hashing function.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
 The algorithm field is an 8-bit unsigned integer that identifies
 the cryptographic hash algorithm used to construct the digest.
 
 =head2 digest
 
-    $digest = $rr->digest;
-    $rr->digest( $digest );
+	$digest = $rr->digest;
+	$rr->digest( $digest );
 
 Hexadecimal representation of the digest over the zone content.
 
 =head2 digestbin
 
-    $digestbin = $rr->digestbin;
-    $rr->digestbin( $digestbin );
+	$digestbin = $rr->digestbin;
+	$rr->digestbin( $digestbin );
 
 Binary representation of the digest over the zone content.
 
@@ -191,6 +191,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC8976|https://tools.ietf.org/html/rfc8976>
+L<RFC8976|https://iana.org/go/rfc8976>
 
 =cut

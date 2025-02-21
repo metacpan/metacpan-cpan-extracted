@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.81';
+$Map::Tube::CLI::VERSION   = '0.82';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.81
+Version 0.82
 
 =cut
 
@@ -216,6 +216,8 @@ sure you have the latest maps when you install.
 =item * L<Singapore|Map::Tube::Singapore>
 
 =item * L<Sofia|Map::Tube::Sofia>
+
+=item * L<Stockholm|Map::Tube::Stockholm>
 
 =item * L<Tbilisi|Map::Tube::Tbilisi>
 
@@ -594,6 +596,7 @@ sub _supported_maps {
         'SAMARA'          => 'Map::Tube::Samara',
         'SINGAPORE'       => 'Map::Tube::Singapore',
         'SOFIA'           => 'Map::Tube::Sofia',
+        'STOCKHOLM'       => 'Map::Tube::Stockholm',
         'TBILISI'         => 'Map::Tube::Tbilisi',
         'TOKYO'           => 'Map::Tube::Tokyo',
         'TOULOUSE'        => 'Map::Tube::Toulouse',

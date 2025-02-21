@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-05-30'; # DATE
-our $VERSION = '0.104'; # VERSION
+# DATE
+# VERSION
 
 use 5.010;
 use strict;
@@ -125,21 +125,7 @@ if ($Opts{version}) {
 
 #say $res ? "Getopt failed" : "Getopt succeeded";
 # ABSTRACT: Script to demonstrate Getopt::Long::Subcommand
-# PODNAME: demo-getopt-long-subcommand
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-demo-getopt-long-subcommand - Script to demonstrate Getopt::Long::Subcommand
-
-=head1 VERSION
-
-This document describes version 0.104 of demo-getopt-long-subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2021-05-30.
+# PODNAME:
 
 =head1 SYNOPSIS
 
@@ -158,66 +144,3 @@ Test completion:
  # and so on
 
 =head2
-
-=head1 COMPLETION
-
-This script has shell tab completion capability with support for several
-shells.
-
-=head2 bash
-
-To activate bash completion for this script, put:
-
- complete -C demo-getopt-long-subcommand demo-getopt-long-subcommand
-
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is recommended, however, that you install modules using L<cpanm-shcompgen>
-which can activate shell completion for scripts immediately.
-
-=head2 tcsh
-
-To activate tcsh completion for this script, put:
-
- complete demo-getopt-long-subcommand 'p/*/`demo-getopt-long-subcommand`/'
-
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is also recommended to install C<shcompgen> (see above).
-
-=head2 other shells
-
-For fish and zsh, install C<shcompgen> as described above.
-
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Long-Subcommand>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Subcommand>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Subcommand>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

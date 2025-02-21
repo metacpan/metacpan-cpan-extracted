@@ -2,7 +2,7 @@ package Net::DNS::RR::ISDN;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ISDN.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: ISDN.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -83,8 +83,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name ISDN ISDNaddress sa');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name ISDN ISDNaddress sa');
 
 =head1 DESCRIPTION
 
@@ -104,8 +104,8 @@ other unpredictable behaviour.
 
 =head2 address
 
-    $address = $rr->address;
-    $rr->address( $address );
+	$address = $rr->address;
+	$rr->address( $address );
 
 The ISDN-address is a string of characters, normally decimal
 digits, beginning with the E.163 country code and ending with
@@ -113,8 +113,8 @@ the DDI if any.
 
 =head2 sa
 
-    $sa = $rr->sa;
-    $rr->sa( $sa );
+	$sa = $rr->sa;
+	$rr->sa( $sa );
 
 The optional subaddress (SA) is a string of hexadecimal digits.
 

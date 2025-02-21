@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.989063'
+  SPVM: '0.990045'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.989063'
+  SPVM: '0.990045'
   SPVM::File::Temp: '0.021'
   SPVM::IO: '0.211'
   SPVM::Mozilla::CA: '0.001'
@@ -27,5 +27,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-HTTP-Tiny.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

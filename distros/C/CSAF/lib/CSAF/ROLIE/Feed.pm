@@ -109,15 +109,15 @@ sub add_entry {
 
         my $integrity = $options->{integrity};
 
-        push @{$link}, {href => "$csaf_url.sha256", ref => 'hash'}
+        push @{$link}, {href => "$csaf_url.sha256", rel => 'hash'}
             if (defined $integrity->{sha256} && $integrity->{sha256});
 
-        push @{$link}, {href => "$csaf_url.sha512", ref => 'hash'}
+        push @{$link}, {href => "$csaf_url.sha512", rel => 'hash'}
             if (defined $integrity->{sha512} && $integrity->{sha512});
 
     }
 
-    push @{$link}, {href => "$csaf_url.asc", ref => 'signature'}
+    push @{$link}, {href => "$csaf_url.asc", rel => 'signature'}
         if (defined $options->{signature} && $options->{signature});
 
     my $is_updated = 0;
@@ -198,7 +198,7 @@ sub render {
     $self->init;
 
     my $json = Cpanel::JSON::XS->new->utf8->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed
-        ->stringify_infnan->escape_slash(0)->allow_dupkeys->pretty;
+        ->stringify_infnan->escape_slash(0)->allow_dupkeys->pretty->space_before(0);
 
     my @sorted_entries = sort { $b->updated->epoch <=> $a->updated->epoch } @{$self->entry->to_array};
     $self->entry->items(\@sorted_entries);

@@ -3,8 +3,8 @@ NAME
     shell tab completion
 
 VERSION
-    This document describes version 0.317 of Getopt::Long::Complete (from
-    Perl distribution Getopt-Long-Complete), released on 2023-02-21.
+    This document describes version 0.318 of Getopt::Long::Complete (from
+    Perl distribution Getopt-Long-Complete), released on 2025-02-21.
 
 SYNOPSIS
   First example (simple)
@@ -78,8 +78,8 @@ DESCRIPTION
     STDOUT and then the program will exit. Otherwise, Getopt::Long's
     GetOptions is called.
 
-    To keep completion quick, you should do "GetOptions()" or
-    "GetOptionsWithCompletion()" as early as possible in your script.
+    To keep completion quick, you should do GetOptions() or
+    GetOptionsWithCompletion() as early as possible in your script.
     Preferably before loading lots of other Perl modules.
 
     To activate tab completion in bash, put your script somewhere in "PATH"
@@ -236,8 +236,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020, 2017, 2016, 2015, 2014 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

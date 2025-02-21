@@ -57,6 +57,7 @@ WriteMakefile(
         'Map::Tube::Samara'          => '0',
         'Map::Tube::Singapore'       => '0',
         'Map::Tube::Sofia'           => '0',
+        'Map::Tube::Stockholm'       => '0',
         'Map::Tube::Tbilisi'         => '0',
         'Map::Tube::Toulouse'        => '0',
         'Map::Tube::Tokyo'           => '0',

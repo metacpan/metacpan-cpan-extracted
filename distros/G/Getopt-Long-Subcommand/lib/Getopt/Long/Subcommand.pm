@@ -1,17 +1,17 @@
 package Getopt::Long::Subcommand;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-30'; # DATE
-our $DIST = 'Getopt-Long-Subcommand'; # DIST
-our $VERSION = '0.104'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use Log::ger;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-02-21'; # DATE
+our $DIST = 'Getopt-Long-Subcommand'; # DIST
+our $VERSION = '0.105'; # VERSION
+
 ## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT = qw(
                     GetOptions
@@ -299,7 +299,7 @@ Getopt::Long::Subcommand - Process command-line options, with subcommands and co
 
 =head1 VERSION
 
-This document describes version 0.104 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2021-05-30.
+This document describes version 0.105 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2025-02-21.
 
 =head1 SYNOPSIS
 
@@ -504,6 +504,52 @@ Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Lon
 
 Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Subcommand>.
 
+=head1 SEE ALSO
+
+L<Getopt::Long>
+
+L<Getopt::Long::Complete>
+
+L<Perinci::CmdLine> - a more full featured command-line application framework,
+also with subcommands and completion.
+
+L<Pod::Weaver::Section::Completion::GetoptLongSubcommand>
+
+=head1 AUTHOR
+
+perlancar
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Subcommand>
@@ -523,27 +569,5 @@ subcommand option with the same name as common option.
 
 Similarly, options for a subcommand takes precedence over its sub-subcommand,
 and so on.
-
-=head1 SEE ALSO
-
-L<Getopt::Long>
-
-L<Getopt::Long::Complete>
-
-L<Perinci::CmdLine> - a more full featured command-line application framework,
-also with subcommands and completion.
-
-L<Pod::Weaver::Section::Completion::GetoptLongSubcommand>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

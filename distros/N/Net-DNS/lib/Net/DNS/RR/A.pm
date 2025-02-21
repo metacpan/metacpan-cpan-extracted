@@ -2,7 +2,7 @@ package Net::DNS::RR::A;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: A.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: A.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -66,14 +66,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN A address');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN A address');
 
-    $rr = Net::DNS::RR->new(
-	name	=> 'example.com',
-	type	=> 'A',
-	address => '192.0.2.1'
-	);
+	$rr = Net::DNS::RR->new(
+			name	=> 'example.com',
+			type	=> 'A',
+			address => '192.0.2.1'
+			);
 
 =head1 DESCRIPTION
 
@@ -91,8 +91,8 @@ other unpredictable behaviour.
 
 =head2 address
 
-    $IPv4_address = $rr->address;
-    $rr->address( $IPv4_address );
+	$IPv4_address = $rr->address;
+	$rr->address( $IPv4_address );
 
 Version 4 IP address represented using dotted-quad notation.
 

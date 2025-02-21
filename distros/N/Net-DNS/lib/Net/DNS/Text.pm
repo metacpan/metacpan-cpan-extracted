@@ -3,7 +3,7 @@ package Net::DNS::Text;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Text.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: Text.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,16 +12,16 @@ Net::DNS::Text - DNS text representation
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Text;
+	use Net::DNS::Text;
 
-    $object = Net::DNS::Text->new('example');
-    $string = $object->string;
+	$object = Net::DNS::Text->new('example');
+	$string = $object->string;
 
-    $object = Net::DNS::Text->decode( \$data, $offset );
-    ( $object, $next ) = Net::DNS::Text->decode( \$data, $offset );
+	$object = Net::DNS::Text->decode( \$data, $offset );
+	( $object, $next ) = Net::DNS::Text->decode( \$data, $offset );
 
-    $data = $object->encode;
-    $text = $object->value;
+	$data = $object->encode;
+	$text = $object->value;
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
 
 =head2 new
 
-    $object = Net::DNS::Text->new('example');
+	$object = Net::DNS::Text->new('example');
 
 Creates a text object which encapsulates a single character
 string component of a resource record.
@@ -92,9 +92,9 @@ sub new {
 
 =head2 decode
 
-    $object = Net::DNS::Text->decode( \$buffer, $offset );
+	$object = Net::DNS::Text->decode( \$buffer, $offset );
 
-    ( $object, $next ) = Net::DNS::Text->decode( \$buffer, $offset );
+	( $object, $next ) = Net::DNS::Text->decode( \$buffer, $offset );
 
 Creates a text object which represents the decoded data at the
 indicated offset within the data buffer.
@@ -129,7 +129,7 @@ sub decode {
 
 =head2 encode
 
-    $data = $object->encode;
+	$data = $object->encode;
 
 Returns the wire-format encoded representation of the text object
 suitable for inclusion in a DNS packet buffer.
@@ -144,7 +144,7 @@ sub encode {
 
 =head2 raw
 
-    $data = $object->raw;
+	$data = $object->raw;
 
 Returns the wire-format encoded representation of the text object
 without the explicit length field.
@@ -159,7 +159,7 @@ sub raw {
 
 =head2 value
 
-    $value = $text->value;
+	$value = $text->value;
 
 Character string representation of the text object.
 
@@ -174,7 +174,7 @@ sub value {
 
 =head2 string
 
-    $string = $text->string;
+	$string = $text->string;
 
 Conditionally quoted RFC1035 zone file representation of the text object.
 
@@ -191,7 +191,7 @@ sub string {
 
 =head2 unicode
 
-    $string = $text->unicode;
+	$string = $text->unicode;
 
 Conditionally quoted Unicode representation of the text object.
 

@@ -109,6 +109,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
+SECURITY.md
 t/00-load.t
 t/10-mandatory-6.1.06.t
 t/10-mandatory-6.1.07.t

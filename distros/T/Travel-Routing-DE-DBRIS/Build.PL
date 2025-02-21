@@ -26,6 +26,7 @@ Module::Build->new(
 		'DateTime::Duration'                  => 0,
 		'DateTime::Format::Strptime'          => 0,
 		'Getopt::Long'                        => 0,
+		'IO::Uncompress::Gunzip'              => 0,
 		'JSON'                                => 0,
 		'List::Util'                          => 0,
 		'LWP::UserAgent'                      => 0,

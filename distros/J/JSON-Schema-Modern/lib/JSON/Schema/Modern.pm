@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.600-3-g5b1d1ec9
+package JSON::Schema::Modern; # git description: v0.601-11-g72ea27d0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -322,7 +322,9 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
       $for_canonical_uri,
     );
 
-    $self->_traverse_subschema($schema_reference, $state);
+    my $valid = $self->_traverse_subschema($schema_reference, $state);
+    die 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
+    die 'result is true but there are errors' if $valid and $state->{errors}->@*;
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
@@ -426,6 +428,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
     $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
     warn 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
+    warn 'result is true but there are errors' if $valid and $state->{errors}->@*;
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
@@ -471,10 +474,28 @@ sub validate_schema ($self, $schema, $config_override = {}) {
 }
 
 sub get ($self, $uri_reference) {
-  my $schema_info = $self->_fetch_from_uri($uri_reference);
-  return if not $schema_info;
-  my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
-  return wantarray ? ($subschema, $schema_info->{canonical_uri}) : $subschema;
+  if (wantarray) {
+    my $schema_info = $self->_fetch_from_uri($uri_reference);
+    return if not $schema_info;
+    my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
+    return ($subschema, $schema_info->{canonical_uri});
+  }
+  else {  # abridged version of _fetch_from_uri
+    $uri_reference = Mojo::URL->new($uri_reference) if not is_ref($uri_reference);
+    my $fragment = $uri_reference->fragment;
+    my $resource = $self->_get_or_load_resource($uri_reference->clone->fragment(undef));
+    return if not $resource;
+
+    my $schema;
+    if (not length($fragment) or $fragment =~ m{^/}) {
+      $schema = $resource->{document}->get($resource->{path}.($fragment//''));
+    }
+    else {  # we are following a URI with a plain-name fragment
+      return if not my $subresource = ($resource->{anchors}//{})->{$fragment};
+      $schema = $resource->{document}->get($subresource->{path});
+    }
+    return is_ref($schema) ? dclone($schema) : $schema;
+  }
 }
 
 sub get_document ($self, $uri_reference) {
@@ -575,22 +596,31 @@ sub _traverse_subschema ($self, $schema, $state) {
       $state->{keyword} = $keyword;
 
       my $old_spec_version = $state->{spec_version};
+      my $error_count = $state->{errors}->@*;
 
       if (not $sub->($vocabulary, $schema, $state)) {
-        die 'traverse result is false but there are no errors (keyword: '.$keyword.')' if not $state->{errors}->@*;
+        die 'traverse result is false but there are no errors (keyword: '.$keyword.')'
+          if $error_count == $state->{errors}->@*;
         $valid = 0;
         next;
       }
+      warn 'traverse result is true but there are errors (keyword: '.$keyword.')'
+        if $error_count != $state->{errors}->@*;
 
       # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
       undef $keyword_list if $state->{spec_version} ne $old_spec_version;
 
       if (my $callback = $state->{callbacks}{$keyword}) {
+        $error_count = $state->{errors}->@*;
+
         if (not $callback->($schema, $state)) {
-          die 'callback result is false but there are no errors (keyword: '.$keyword.')' if not $state->{errors}->@*;
+          die 'callback result is false but there are no errors (keyword: '.$keyword.')'
+            if $error_count == $state->{errors}->@*;
           $valid = 0;
           next;
         }
+        die 'callback result is true but there are errors (keyword: '.$keyword.')'
+          if $error_count != $state->{errors}->@*;
       }
     }
   }
@@ -598,7 +628,7 @@ sub _traverse_subschema ($self, $schema, $state) {
   delete $state->{keyword};
 
   if ($self->strict and keys %unknown_keywords) {
-    ()= E($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
+    $valid = E($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
   }
 
@@ -710,6 +740,9 @@ sub _eval_subschema ($self, $data, $schema, $state) {
             last ALL_KEYWORDS if $state->{short_circuit};
             next;
           }
+
+          warn 'evaluation result is true but there are errors (keyword: '.$keyword.')'
+            if $error_count != $state->{errors}->@*;
         }
         catch ($e) {
           die $e if $e->$_isa('JSON::Schema::Modern::Error');
@@ -731,6 +764,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
           last ALL_KEYWORDS if $state->{short_circuit};
           next;
         }
+        warn 'callback result is true but there are errors (keyword: '.$keyword.')'
+          if $error_count != $state->{errors}->@*;
       }
     }
   }
@@ -1212,7 +1247,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::MINFO;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MINFO.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: MINFO.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -73,8 +73,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR('name MINFO rmailbx emailbx');
+	use Net::DNS;
+	$rr = Net::DNS::RR('name MINFO rmailbx emailbx');
 
 =head1 DESCRIPTION
 
@@ -92,8 +92,8 @@ other unpredictable behaviour.
 
 =head2 rmailbx
 
-    $rmailbx = $rr->rmailbx;
-    $rr->rmailbx( $rmailbx );
+	$rmailbx = $rr->rmailbx;
+	$rr->rmailbx( $rmailbx );
 
 A domain name  which specifies a mailbox which is
 responsible for the mailing list or mailbox.  If this
@@ -105,8 +105,8 @@ This field provides a more general mechanism.
 
 =head2 emailbx
 
-    $emailbx = $rr->emailbx;
-    $rr->emailbx( $emailbx );
+	$emailbx = $rr->emailbx;
+	$rr->emailbx( $emailbx );
 
 A domain name  which specifies a mailbox which is to
 receive error messages related to the mailing list or

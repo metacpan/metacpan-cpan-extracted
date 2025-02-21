@@ -2,7 +2,7 @@ package Net::DNS::RR::MG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MG.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: MG.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -61,8 +61,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name MG mgmname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name MG mgmname');
 
 =head1 DESCRIPTION
 
@@ -80,8 +80,8 @@ other unpredictable behaviour.
 
 =head2 mgmname
 
-    $mgmname = $rr->mgmname;
-    $rr->mgmname( $mgmname );
+	$mgmname = $rr->mgmname;
+	$rr->mgmname( $mgmname );
 
 A domain name which specifies a mailbox which is a member
 of the mail group specified by the owner name.

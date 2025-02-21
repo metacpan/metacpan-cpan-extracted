@@ -2,7 +2,7 @@ package Net::DNS::RR::NAPTR;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NAPTR.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: NAPTR.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,13 +20,13 @@ use Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	@{$self}{qw(order preference)} = unpack "\@$offset n2", $$data;
 	( $self->{flags},   $offset ) = Net::DNS::Text->decode( $data, $offset + 4 );
 	( $self->{service}, $offset ) = Net::DNS::Text->decode( $data, $offset );
 	( $self->{regexp},  $offset ) = Net::DNS::Text->decode( $data, $offset );
-	$self->{replacement} = Net::DNS::DomainName2535->decode( $data, $offset );
+	$self->{replacement} = Net::DNS::DomainName2535->decode( $data, $offset, @opaque );
 	return;
 }
 
@@ -119,8 +119,9 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name NAPTR order preference flags service regexp replacement');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name NAPTR ( order preference
+			flags service regexp replacement )');
 
 =head1 DESCRIPTION
 
@@ -138,8 +139,8 @@ other unpredictable behaviour.
 
 =head2 order
 
-    $order = $rr->order;
-    $rr->order( $order );
+	$order = $rr->order;
+	$rr->order( $order );
 
 A 16-bit unsigned integer specifying the order in which the NAPTR
 records must be processed to ensure the correct ordering of rules.
@@ -147,8 +148,8 @@ Low numbers are processed before high numbers.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16-bit unsigned integer that specifies the order in which NAPTR
 records with equal "order" values should be processed, low numbers
@@ -156,8 +157,8 @@ being processed before high numbers.
 
 =head2 flags
 
-    $flags = $rr->flags;
-    $rr->flags( $flags );
+	$flags = $rr->flags;
+	$rr->flags( $flags );
 
 A string containing flags to control aspects of the rewriting and
 interpretation of the fields in the record.  Flags are single
@@ -165,16 +166,16 @@ characters from the set [A-Z0-9].
 
 =head2 service
 
-    $service = $rr->service;
-    $rr->service( $service );
+	$service = $rr->service;
+	$rr->service( $service );
 
 Specifies the service(s) available down this rewrite path. It may
 also specify the protocol used to communicate with the service.
 
 =head2 regexp
 
-    $regexp = $rr->regexp;
-    $rr->regexp;
+	$regexp = $rr->regexp;
+	$rr->regexp;
 
 A string containing a substitution expression that is applied to
 the original string held by the client in order to construct the
@@ -182,8 +183,8 @@ next domain name to lookup.
 
 =head2 replacement
 
-    $replacement = $rr->replacement;
-    $rr->replacement( $replacement );
+	$replacement = $rr->replacement;
+	$rr->replacement( $replacement );
 
 The next NAME to query for NAPTR, SRV, or address records
 depending on the value of the flags field.
@@ -224,6 +225,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC3403|https://tools.ietf.org/html/rfc3403>
+L<RFC3403|https://iana.org/go/rfc3403>
 
 =cut

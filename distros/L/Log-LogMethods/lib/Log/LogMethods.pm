@@ -15,7 +15,7 @@ use Moo::Role;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.009';
+our $VERSION='1.010';
 our $SKIP_TRIGGER=0;
 
 # used as a place holder for extended format data
@@ -340,6 +340,17 @@ sub log_debug {
   $self->log_to_log4perl('DEBUG',$self->LOOK_BACK_DEPTH,@args);
 }
 
+=item * $self->log_trace('some trace message')
+
+Same as calling $self->trace('some trace message');
+
+=cut
+
+sub log_trace {
+  my ( $self, @args ) = @_;
+  $self->log_to_log4perl('TRACE',$self->LOOK_BACK_DEPTH,@args);
+}
+
 =back
 
 =head2 ATTRIBUTES 
@@ -487,7 +498,7 @@ Compile time code, generates basic Startin Finsihed log messages for a given "LE
 Arguments:
 
   stack: stack hashref
-  level: level(WARN|ALWAYS|INFO|ERROR|TRACE|DEBUG)
+  level: level(WARN|ALWAYS|INFO|ERROR|DEBUG|TRACE)
   code:  code ref to replcae
 
 =cut
@@ -534,7 +545,7 @@ Compile time code, generates Benchmarking log for a given function: Startin Fins
 Arguments:
 
   stack: stack hashref
-  level: level(WARN|ALWAYS|INFO|ERROR|TRACE|DEBUG)
+  level: level(WARN|ALWAYS|INFO|ERROR|DEBUG|TRACE)
   code:  code ref to replcae
 
 =cut
@@ -667,7 +678,7 @@ Low Level check and log to log4perl logger object
 
 Arguments:
 
-  level: Log Level (ALWAYS|ERROR|WARN|INFO|DEBUG) 
+  level: Log Level (ALWAYS|ERROR|WARN|INFO|DEBUG|TRACE) 
   trace: level number or $trace
   args:  list of strings to log
 

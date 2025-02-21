@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 
 use 5.020;
 use Moo;
@@ -224,11 +224,12 @@ sub validate ($self) {
 
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
+  my $self = bless($data, $class);
   foreach my $attr (qw(schema _entities _checksum)) {
     die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
-      if not exists $class->{$attr};
+      if not exists $self->{$attr};
   }
-  bless($data, $class);
+  return $self;
 }
 
 1;
@@ -247,7 +248,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

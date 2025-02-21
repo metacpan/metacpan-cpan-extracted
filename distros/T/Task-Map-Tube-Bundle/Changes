@@ -1,5 +1,8 @@
 Revision history for Task::Map::Tube::Bundle
 
+0.05  2025-02-20
+      - Updated pod w.r.t the new map: Stockholm.
+
 0.04  2025-02-18
       - Updated pod w.r.t the new map: Toulouse.
 

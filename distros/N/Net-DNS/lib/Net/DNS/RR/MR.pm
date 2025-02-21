@@ -2,7 +2,7 @@ package Net::DNS::RR::MR;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MR.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: MR.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -61,8 +61,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR('name MR newname');
+	use Net::DNS;
+	$rr = Net::DNS::RR('name MR newname');
 
 =head1 DESCRIPTION
 
@@ -80,8 +80,8 @@ other unpredictable behaviour.
 
 =head2 newname
 
-    $newname = $rr->newname;
-    $rr->newname( $newname );
+	$newname = $rr->newname;
+	$rr->newname( $newname );
 
 A domain name which specifies a mailbox which is the
 proper rename of the specified mailbox.

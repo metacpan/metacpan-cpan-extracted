@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Getopt/Long/Complete.pm','script/demo-getopt-long-complete'];
+my $filenames = ['lib/Getopt/Long/Complete.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

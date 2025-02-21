@@ -2,7 +2,7 @@ package Net::DNS::RR::TKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TKEY.pm 1908 2023-03-15 07:28:50Z willem $)[2];
+our $VERSION = (qw$Id: TKEY.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -135,7 +135,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
+	use Net::DNS;
+	$rr = new Net::DNS::RR('example.com IN TKEY ...	');
 
 =head1 DESCRIPTION
 
@@ -153,8 +154,8 @@ other unpredictable behaviour.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
 The algorithm name is in the form of a domain name with the same
 meaning as in [RFC 2845].  The algorithm determines how the secret
@@ -163,47 +164,47 @@ the algorithm specific key.
 
 =head2 inception
 
-    $inception = $rr->inception;
-    $rr->inception( $inception );
+	$inception = $rr->inception;
+	$rr->inception( $inception );
 
 Time expressed as the number of non-leap seconds modulo 2**32 since the
 beginning of January 1970 GMT.
 
 =head2 expiration
 
-    $expiration = $rr->expiration;
-    $rr->expiration( $expiration );
+	$expiration = $rr->expiration;
+	$rr->expiration( $expiration );
 
 Time expressed as the number of non-leap seconds modulo 2**32 since the
 beginning of January 1970 GMT.
 
 =head2 mode
 
-    $mode = $rr->mode;
-    $rr->mode( $mode );
+	$mode = $rr->mode;
+	$rr->mode( $mode );
 
 The mode field specifies the general scheme for key agreement or the
 purpose of the TKEY DNS message, as defined in [RFC2930(2.5)].
 
 =head2 error
 
-    $error = $rr->error;
-    $rr->error( $error );
+	$error = $rr->error;
+	$rr->error( $error );
 
 The error code field is an extended RCODE.
 
 =head2 key
 
-    $key = $rr->key;
-    $rr->key( $key );
+	$key = $rr->key;
+	$rr->key( $key );
 
 Sequence of octets representing the key exchange data.
 The meaning of this data depends on the mode.
 
 =head2 other
 
-    $other = $rr->other;
-    $rr->other( $other );
+	$other = $rr->other;
+	$rr->other( $other );
 
 Content not defined in the [RFC2930] specification but may be used
 in future extensions.
@@ -240,6 +241,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC2930|https://tools.ietf.org/html/rfc2930>
+L<RFC2930|https://iana.org/go/rfc2930>
 
 =cut

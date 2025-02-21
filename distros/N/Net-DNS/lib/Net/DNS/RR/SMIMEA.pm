@@ -2,7 +2,7 @@ package Net::DNS::RR::SMIMEA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SMIMEA.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: SMIMEA.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -108,8 +108,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name SMIMEA usage selector matchingtype certificate');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SMIMEA usage selector matchingtype certificate');
 
 =head1 DESCRIPTION
 
@@ -131,24 +131,24 @@ other unpredictable behaviour.
 
 =head2 usage
 
-    $usage = $rr->usage;
-    $rr->usage( $usage );
+	$usage = $rr->usage;
+	$rr->usage( $usage );
 
 8-bit integer value which specifies the provided association that
 will be used to match the certificate.
 
 =head2 selector
 
-    $selector = $rr->selector;
-    $rr->selector( $selector );
+	$selector = $rr->selector;
+	$rr->selector( $selector );
 
 8-bit integer value which specifies which part of the certificate
 presented by the server will be matched against the association data.
 
 =head2 matchingtype
 
-    $matchingtype = $rr->matchingtype;
-    $rr->matchingtype( $matchingtype );
+	$matchingtype = $rr->matchingtype;
+	$rr->matchingtype( $matchingtype );
 
 8-bit integer value which specifies how the certificate association
 is presented.
@@ -157,21 +157,21 @@ is presented.
 
 =head2 cert
 
-    $cert = $rr->cert;
-    $rr->cert( $cert );
+	$cert = $rr->cert;
+	$rr->cert( $cert );
 
 Hexadecimal representation of the certificate data.
 
 =head2 certbin
 
-    $certbin = $rr->certbin;
-    $rr->certbin( $certbin );
+	$certbin = $rr->certbin;
+	$rr->certbin( $certbin );
 
 Binary representation of the certificate data.
 
 =head2 babble
 
-    print $rr->babble;
+	print $rr->babble;
 
 The babble() method returns the 'BubbleBabble' representation of the
 digest if the Digest::BubbleBabble package is available, otherwise
@@ -217,7 +217,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC8162|https://tools.ietf.org/html/rfc8162>
-L<RFC6698|https://tools.ietf.org/html/rfc6698>
+L<RFC8162|https://iana.org/go/rfc8162>
+L<RFC6698|https://iana.org/go/rfc6698>
 
 =cut

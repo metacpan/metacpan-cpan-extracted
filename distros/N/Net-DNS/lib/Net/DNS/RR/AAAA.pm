@@ -2,7 +2,7 @@ package Net::DNS::RR::AAAA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AAAA.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: AAAA.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -88,14 +88,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN AAAA address');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN AAAA address');
 
-    $rr = Net::DNS::RR->new(
-	name	=> 'example.com',
-	type	=> 'AAAA',
-	address => '2001:DB8::8:800:200C:417A'
-	);
+	$rr = Net::DNS::RR->new(
+			name	=> 'example.com',
+			type	=> 'AAAA',
+			address => '2001:DB8::8:800:200C:417A'
+			);
 
 =head1 DESCRIPTION
 
@@ -113,21 +113,21 @@ other unpredictable behaviour.
 
 =head2 address
 
-    $IPv6_address = $rr->address;
+	$IPv6_address = $rr->address;
 
 Returns the text representation of the IPv6 address.
 
 
 =head2 address_long
 
-    $IPv6_address = $rr->address_long;
+	$IPv6_address = $rr->address_long;
 
 Returns the text representation specified in RFC3513, 2.2(1).
 
 
 =head2 address_short
 
-    $IPv6_address = $rr->address_short;
+	$IPv6_address = $rr->address_short;
 
 Returns the textual form of address recommended by RFC5952.
 
@@ -167,6 +167,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC3596|https://tools.ietf.org/html/rfc3596>
+L<RFC3596|https://iana.org/go/rfc3596>
 
 =cut

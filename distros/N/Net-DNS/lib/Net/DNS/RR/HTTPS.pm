@@ -2,7 +2,7 @@ package Net::DNS::RR::HTTPS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: HTTPS.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: HTTPS.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR::SVCB);
 
@@ -20,8 +20,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName alpn=h3-29,h3-28,h3-27,h2 ...');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName alpn=h3-29,h3-28,h3-27,h2 ...');
 
 =head1 DESCRIPTION
 

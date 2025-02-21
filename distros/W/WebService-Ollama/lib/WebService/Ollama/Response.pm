@@ -31,7 +31,7 @@ has [qw/
 
 sub json_response {
 	my ($self) = shift;
-	my $aoa = jsonl( parse_headers => 1, decode => 1, data => $self->response ? $self->response : $self->message->{content} );
+	my $aoa = jsonl( decode => 1, data => $self->response ? $self->response : $self->message->{content} );
 	return scalar @{$aoa} == 1 ? $aoa->[0] : $aoa;
 }
 
@@ -45,7 +45,7 @@ WebService::Ollama::Response - ollama response
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

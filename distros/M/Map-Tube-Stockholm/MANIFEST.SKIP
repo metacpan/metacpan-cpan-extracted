@@ -62,4 +62,4 @@
 #!end included /usr/perl5.18.4p/lib/site_perl/5.18.4/ExtUtils/MANIFEST.SKIP
 
 ^\.travis\.yml$
-^Map-Tube-Glasgow-.*.tar.gz$
+^Map-Tube-Stockholm-.*.tar.gz$

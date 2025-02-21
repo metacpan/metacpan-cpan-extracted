@@ -1,3 +1,7 @@
+0.007 2025-02-21
+  [Requirement Changes]
+    * Require SPVM 0.990045.
+    
 0.006 2025-02-12
   [Internal Changes]
     * Add many internal classes. These internal classes are separated in other distribution in the future.

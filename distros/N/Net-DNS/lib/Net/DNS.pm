@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.49';
+$VERSION = '1.50';
 $VERSION = eval {$VERSION};
-our $SVNVERSION = (qw$Id: DNS.pm 1999 2024-12-27 11:58:05Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 2015 2025-02-21 08:37:21Z willem $)[2];
 
 
 =head1 NAME
@@ -15,7 +15,9 @@ Net::DNS - Perl Interface to the Domain Name System
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
+	use Net::DNS;
+	my $resolver = Net::DNS::Resolver->new(...);
+	my $response = $resolver->send(...);
 
 =head1 DESCRIPTION
 
@@ -263,25 +265,25 @@ DNS updates, zone serial number management, and simple DNS queries.
 
 =head2 version
 
-    use Net::DNS;
-    print Net::DNS->version, "\n";
+	use Net::DNS;
+	print Net::DNS->version, "\n";
 
 Returns the version of Net::DNS.
 
 
 =head2 rr
 
-    # Use a default resolver -- can not get an error string this way.
-    use Net::DNS;
-    my @rr = rr("example.com");
-    my @rr = rr("example.com", "AAAA");
-    my @rr = rr("example.com", "AAAA", "IN");
+	# Use a default resolver -- can not get an error string this way.
+	use Net::DNS;
+	my @rr = rr("example.com");
+	my @rr = rr("example.com", "AAAA");
+	my @rr = rr("example.com", "AAAA", "IN");
 
-    # Use your own resolver object.
-    my $res = Net::DNS::Resolver->new;
-    my @rr  = rr($res, "example.com" ... );
+	# Use your own resolver object.
+	my $res = Net::DNS::Resolver->new;
+	my @rr  = rr($res, "example.com" ... );
 
-    my ($ptr) = rr("2001:DB8::dead:beef");
+	my ($ptr) = rr("2001:DB8::dead:beef");
 
 The C<rr()> method provides simple RR lookup for scenarios where
 the full flexibility of Net::DNS is not required.
@@ -294,13 +296,13 @@ See L</EXAMPLES> for more complete examples.
 
 =head2 mx
 
-    # Use a default resolver -- can not get an error string this way.
-    use Net::DNS;
-    my @mx = mx("example.com");
+	# Use a default resolver -- can not get an error string this way.
+	use Net::DNS;
+	my @mx = mx("example.com");
 
-    # Use your own resolver object.
-    my $res = Net::DNS::Resolver->new;
-    my @mx  = mx($res, "example.com");
+	# Use your own resolver object.
+	my $res = Net::DNS::Resolver->new;
+	my @mx  = mx($res, "example.com");
 
 Returns a list of L<Net::DNS::RR::MX> objects representing the MX
 records for the specified name.
@@ -315,10 +317,10 @@ This method does not look up address records; it resolves MX only.
 The Net::DNS module provides auxiliary functions which support
 dynamic DNS update requests.
 
-    $update = Net::DNS::Update->new( 'example.com' );
+	$update = Net::DNS::Update->new( 'example.com' );
 
-    $update->push( prereq => nxrrset('example.com. AAAA') );
-    $update->push( update => rr_add('example.com. 86400 AAAA 2001::DB8::F00') );
+	$update->push( prereq => nxrrset('example.com. AAAA') );
+	$update->push( update => rr_add('example.com. 86400 AAAA 2001::DB8::F00') );
 
 =head2 yxrrset
 
@@ -326,13 +328,13 @@ Use this method to add an "RRset exists" prerequisite to a dynamic
 update packet.	There are two forms, value-independent and
 value-dependent:
 
-    # RRset exists (value-independent)
-    $update->push( pre => yxrrset("host.example.com AAAA") );
+	# RRset exists (value-independent)
+	$update->push( pre => yxrrset("host.example.com AAAA") );
 
 Meaning:  At least one RR with the specified name and type must exist.
 
-    # RRset exists (value-dependent)
-    $update->push( pre => yxrrset("host.example.com AAAA 2001:DB8::1") );
+	# RRset exists (value-dependent)
+	$update->push( pre => yxrrset("host.example.com AAAA 2001:DB8::1") );
 
 Meaning:  At least one RR with the specified name and type must
 exist and must have matching data.
@@ -345,7 +347,7 @@ be created.
 Use this method to add an "RRset does not exist" prerequisite to
 a dynamic update packet.
 
-    $update->push( pre => nxrrset("host.example.com AAAA") );
+	$update->push( pre => nxrrset("host.example.com AAAA") );
 
 Meaning:  No RRs with the specified name and type can exist.
 
@@ -357,7 +359,7 @@ be created.
 Use this method to add a "name is in use" prerequisite to a dynamic
 update packet.
 
-    $update->push( pre => yxdomain("host.example.com") );
+	$update->push( pre => yxdomain("host.example.com") );
 
 Meaning:  At least one RR with the specified name must exist.
 
@@ -369,7 +371,7 @@ be created.
 Use this method to add a "name is not in use" prerequisite to a
 dynamic update packet.
 
-    $update->push( pre => nxdomain("host.example.com") );
+	$update->push( pre => nxdomain("host.example.com") );
 
 Meaning:  No RR with the specified name can exist.
 
@@ -380,7 +382,7 @@ be created.
 
 Use this method to add RRs to a zone.
 
-    $update->push( update => rr_add("host.example.com AAAA 2001:DB8::c001:a1e") );
+	$update->push( update => rr_add("host.example.com AAAA 2001:DB8::c001:a1e") );
 
 Meaning:  Add this RR to the zone.
 
@@ -396,18 +398,18 @@ be created.
 Use this method to delete RRs from a zone.  There are three forms:
 delete all RRsets, delete an RRset, and delete a specific RR.
 
-    # Delete all RRsets.
-    $update->push( update => rr_del("host.example.com") );
+	# Delete all RRsets.
+	$update->push( update => rr_del("host.example.com") );
 
 Meaning:  Delete all RRs having the specified name.
 
-    # Delete an RRset.
-    $update->push( update => rr_del("host.example.com AAAA") );
+	# Delete an RRset.
+	$update->push( update => rr_del("host.example.com AAAA") );
 
 Meaning:  Delete all RRs having the specified name and type.
 
-    # Delete a specific RR.
-    $update->push( update => rr_del("host.example.com AAAA 2001:DB8::dead:beef") );
+	# Delete a specific RR.
+	$update->push( update => rr_del("host.example.com AAAA 2001:DB8::dead:beef") );
 
 Meaning:  Delete the RR which matches the specified argument.
 
@@ -423,18 +425,18 @@ be created.
 The Net::DNS module provides auxiliary functions which support
 policy-driven zone serial numbering regimes.
 
-    $soa->serial(SEQUENTIAL);
-    $soa->serial(YYYMMDDxx);
+	$soa->serial(SEQUENTIAL);
+	$soa->serial(YYYMMDDxx);
 
 =head2 SEQUENTIAL
 
-    $successor = $soa->serial( SEQUENTIAL );
+	$successor = $soa->serial( SEQUENTIAL );
 
 The existing serial number is incremented modulo 2**32.
 
 =head2 UNIXTIME
 
-    $successor = $soa->serial( UNIXTIME );
+	$successor = $soa->serial( UNIXTIME );
 
 The Unix time scale will be used as the basis for zone serial
 numbering. The serial number will be incremented if the time
@@ -442,7 +444,7 @@ elapsed since the previous update is less than one second.
 
 =head2 YYYYMMDDxx
 
-    $successor = $soa->serial( YYYYMMDDxx );
+	$successor = $soa->serial( YYYYMMDDxx );
 
 The 32 bit value returned by the auxiliary C<YYYYMMDDxx()> function
 will be used as the base for the date-coded zone serial number.
@@ -460,9 +462,8 @@ class method. See L<Net::DNS::RR> for details.
 
 =head2 rrsort
 
-    use Net::DNS;
-
-    my @sorted = rrsort( $rrtype, $attribute, @rr_array );
+	use Net::DNS;
+	my @sorted = rrsort( $rrtype, $attribute, @rr_array );
 
 C<rrsort()> selects all RRs from the input array that are of the type defined
 by the first argument. Those RRs are sorted based on the attribute that is
@@ -473,7 +474,7 @@ code.
 
 For instance:
 
-    my @prioritysorted = rrsort( "SRV", "priority", @rr_array );
+	my @prioritysorted = rrsort( "SRV", "priority", @rr_array );
 
 returns the SRV records sorted from lowest to highest priority and for
 equal priorities from highest to lowest weight.
@@ -481,7 +482,7 @@ equal priorities from highest to lowest weight.
 If the function does not exist then a numerical sort on the attribute
 value is performed.
 
-    my @portsorted = rrsort( "SRV", "port", @rr_array );
+	my @portsorted = rrsort( "SRV", "port", @rr_array );
 
 If the attribute is not defined then either the C<default_sort()> function or
 "canonical sorting" (as defined by DNSSEC) will be used.
@@ -503,100 +504,85 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 
 =head2 Look up host addresses.
 
-    use Net::DNS;
-    my $res   = Net::DNS::Resolver->new;
-    my $reply = $res->search("www.example.com", "AAAA");
+	use Net::DNS;
+	my $res   = Net::DNS::Resolver->new;
+	my $reply = $res->search( "www.example.com", "AAAA" );
+	die "query failed: ", $res->errorstring unless $reply;
 
-    if ($reply) {
-	foreach my $rr ($reply->answer) {
-	    print $rr->address, "\n" if $rr->can("address");
+	foreach my $rr ( $reply->answer ) {
+		print $rr->address, "\n" if $rr->can("address");
 	}
-    } else {
-	warn "query failed: ", $res->errorstring, "\n";
-    }
 
 
 =head2 Find the nameservers for a domain.
 
-    use Net::DNS;
-    my $res   = Net::DNS::Resolver->new;
-    my $reply = $res->query("example.com", "NS");
+	use Net::DNS;
+	my $res   = Net::DNS::Resolver->new;
+	my $reply = $res->query( "example.com", "NS");
+	die "query failed: ", $res->errorstring unless $reply;
 
-    if ($reply) {
-	foreach $rr (grep { $_->type eq "NS" } $reply->answer) {
-	    print $rr->nsdname, "\n";
+	foreach $rr ( grep {$_->type eq "NS"} $reply->answer ) {
+		print $rr->nsdname, "\n";
 	}
-    } else {
-	warn "query failed: ", $res->errorstring, "\n";
-    }
 
 
 =head2 Find the MX records for a domain.
 
-    use Net::DNS;
-    my $name = "example.com";
-    my $res  = Net::DNS::Resolver->new;
-    my @mx   = mx($res, $name);
+	use Net::DNS;
+	my $name = "example.com";
+	my $res  = Net::DNS::Resolver->new;
+	my @mx   = mx( $res, $name );
 
-    if (@mx) {
 	foreach $rr (@mx) {
-	    print $rr->preference, "\t", $rr->exchange, "\n";
+		print $rr->preference, "\t", $rr->exchange, "\n";
 	}
-    } else {
-	warn "Can not find MX records for $name: ", $res->errorstring, "\n";
-    }
 
 
 =head2 Print domain SOA record in zone file format.
 
-    use Net::DNS;
-    my $res   = Net::DNS::Resolver->new;
-    my $reply = $res->query("example.com", "SOA");
+	use Net::DNS;
+	my $res   = Net::DNS::Resolver->new;
+	my $reply = $res->query( "example.com", "SOA" );
+	die "query failed: ", $res->errorstring unless $reply;
 
-    if ($reply) {
-	foreach my $rr ($reply->answer) {
-	    $rr->print;
+	foreach my $rr ( $reply->answer ) {
+		$rr->print;
 	}
-    } else {
-	warn "query failed: ", $res->errorstring, "\n";
-    }
 
 
 =head2 Perform a zone transfer and print all the records.
 
-    use Net::DNS;
-    my $res  = Net::DNS::Resolver->new;
-    $res->tcp_timeout(20);
-    $res->nameservers("ns.example.com");
+	use Net::DNS;
+	my $res  = Net::DNS::Resolver->new(
+		nameservers => ["a.iana-servers.net", "b.iana-servers.net"],
+		tcp_timeout => 20
+		);
 
-    my @zone = $res->axfr("example.com");
+	my @zone = $res->axfr("example.com");
+	warn $res->errorstring if $res->errorstring;
 
-    foreach $rr (@zone) {
-	$rr->print;
-    }
-
-    warn $res->errorstring if $res->errorstring;
+	foreach $rr (@zone) {
+		$rr->print;
+	}
 
 
 =head2 Perform a background query and print the reply.
 
-    use Net::DNS;
-    my $res    = Net::DNS::Resolver->new;
-    $res->udp_timeout(10);
-    $res->tcp_timeout(20);
-    my $socket = $res->bgsend("host.example.com", "AAAA");
+	use Net::DNS;
+	my $res    = Net::DNS::Resolver->new;
+	$res->udp_timeout(10);
+	$res->tcp_timeout(20);
+	my $socket = $res->bgsend( "www.example.com", "AAAA" );
 
-    while ( $res->bgbusy($socket) ) {
-	# do some work here while waiting for the response
-	# ...and some more here
-    }
+	while ( $res->bgbusy($socket) ) {
+		# do some work here whilst awaiting the response
+		# ...and some more here
+	}
 
-    my $packet = $res->bgread($socket);
-    if ($packet) {
+	my $packet = $res->bgread($socket);
+	die "query failed: ", $res->errorstring unless $packet;
+
 	$packet->print;
-    } else {
-	warn "query failed: ", $res->errorstring, "\n";
-    }
 
 
 =head1 BUGS
@@ -643,7 +629,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 AUTHOR INFORMATION
 
-Net::DNS is maintained at NLnet Labs (www.nlnetlabs.nl) by Willem Toorop.
+Net::DNS is maintained at NLnet Labs (www.nlnetlabs.nl) by Willem Toorop
+and Dick Franks.
 
 Between 2005 and 2012 Net::DNS was maintained by Olaf Kolkman.
 

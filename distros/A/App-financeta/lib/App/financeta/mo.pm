@@ -1,5 +1,5 @@
 package App::financeta::mo;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 #use Mo qw/build builder default import/;
 #   The following line of code was produced from the previous line by

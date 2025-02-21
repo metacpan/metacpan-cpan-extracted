@@ -56,6 +56,7 @@ requires:
   Map::Tube::Samara: '0'
   Map::Tube::Singapore: '0'
   Map::Tube::Sofia: '0'
+  Map::Tube::Stockholm: '0'
   Map::Tube::Tbilisi: '0'
   Map::Tube::Tokyo: '0'
   Map::Tube::Toulouse: '0'
@@ -65,5 +66,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Task-Map-Tube-Bundle.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

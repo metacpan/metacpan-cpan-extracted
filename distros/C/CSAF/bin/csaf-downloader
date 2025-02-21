@@ -36,7 +36,7 @@ csaf-downloader - CSAF Downloader
           --include=REGEXP          Include file
           --exclude=REGEXP          Exclude file
 
-          --after=Validate          Download CSAF documents more recent than a specific date
+          --after=DATE              Download CSAF documents more recent than a specific date
           --before=DATE             Download CSAF documents older than a specific date
 
       -v, --verbose                 Verbose

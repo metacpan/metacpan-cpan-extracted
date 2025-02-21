@@ -2,7 +2,7 @@ package Net::DNS::RR::X25;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: X25.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: X25.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -64,8 +64,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name X25 PSDNaddress');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name X25 PSDNaddress');
 
 =head1 DESCRIPTION
 
@@ -85,8 +85,8 @@ other unpredictable behaviour.
 
 =head2 address
 
-    $address = $rr->address;
-    $rr->address( $address );
+	$address = $rr->address;
+	$rr->address( $address );
 
 The PSDN-address is a string of decimal digits, beginning with
 the 4 digit DNIC (Data Network Identification Code), as specified

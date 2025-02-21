@@ -1,5 +1,5 @@
 {
-   "abstract" : "Interface to the Stockholm tube map",
+   "abstract" : "Interface to the Stockholm tube and tram map",
    "author" : [
       "Gisbert W. Selke <gws@cpan.org>"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::Stockholm" : {
          "file" : "lib/Map/Tube/Stockholm.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Stockholm@rt.cpan.org"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1982 2024-07-23 16:16:53Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,10 +12,10 @@ Net::DNS::Header - DNS packet header
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
+	use Net::DNS;
 
-    $packet = Net::DNS::Packet->new();
-    $header = $packet->header;
+	$packet = Net::DNS::Packet->new();
+	$header = $packet->header;
 
 
 =head1 DESCRIPTION
@@ -36,8 +36,8 @@ use Net::DNS::Parameters qw(:opcode :rcode);
 
 =head2 $packet->header
 
-    $packet = Net::DNS::Packet->new();
-    $header = $packet->header;
+	$packet = Net::DNS::Packet->new();
+	$header = $packet->header;
 
 Net::DNS::Header objects emanate from the Net::DNS::Packet header()
 method, and contain an opaque reference to the parent Packet object.
@@ -49,7 +49,7 @@ structures.
 
 =head2 string
 
-    print $packet->header->string;
+	print $packet->header->string;
 
 Returns a string representation of the packet header.
 
@@ -99,7 +99,7 @@ QQ
 
 =head2 print
 
-    $packet->header->print;
+	$packet->header->print;
 
 Prints the string representation of the packet header.
 
@@ -113,8 +113,8 @@ sub print {
 
 =head2 id
 
-    print "query id = ", $packet->header->id, "\n";
-    $packet->header->id(1234);
+	print "query id = ", $packet->header->id, "\n";
+	$packet->header->id(1234);
 
 Gets or sets the query identification number.
 
@@ -129,8 +129,8 @@ sub id {
 
 =head2 opcode
 
-    print "query opcode = ", $packet->header->opcode, "\n";
-    $packet->header->opcode("UPDATE");
+	print "query opcode = ", $packet->header->opcode, "\n";
+	$packet->header->opcode("UPDATE");
 
 Gets or sets the query opcode (the purpose of the query).
 
@@ -150,8 +150,8 @@ sub opcode {
 
 =head2 rcode
 
-    print "query response code = ", $packet->header->rcode, "\n";
-    $packet->header->rcode("SERVFAIL");
+	print "query response code = ", $packet->header->rcode, "\n";
+	$packet->header->rcode("SERVFAIL");
 
 Gets or sets the query response code (the status of the query).
 
@@ -178,8 +178,8 @@ sub rcode {
 
 =head2 qr
 
-    print "query response flag = ", $packet->header->qr, "\n";
-    $packet->header->qr(0);
+	print "query response flag = ", $packet->header->qr, "\n";
+	$packet->header->qr(0);
 
 Gets or sets the query response flag.
 
@@ -193,8 +193,8 @@ sub qr {
 
 =head2 aa
 
-    print "response is ", $packet->header->aa ? "" : "non-", "authoritative\n";
-    $packet->header->aa(0);
+	print "response is ", $packet->header->aa ? "" : "non-", "authoritative\n";
+	$packet->header->aa(0);
 
 Gets or sets the authoritative answer flag.
 
@@ -208,8 +208,8 @@ sub aa {
 
 =head2 tc
 
-    print "packet is ", $packet->header->tc ? "" : "not ", "truncated\n";
-    $packet->header->tc(0);
+	print "packet is ", $packet->header->tc ? "" : "not ", "truncated\n";
+	$packet->header->tc(0);
 
 Gets or sets the truncated packet flag.
 
@@ -223,8 +223,8 @@ sub tc {
 
 =head2 rd
 
-    print "recursion was ", $packet->header->rd ? "" : "not ", "desired\n";
-    $packet->header->rd(0);
+	print "recursion was ", $packet->header->rd ? "" : "not ", "desired\n";
+	$packet->header->rd(0);
 
 Gets or sets the recursion desired flag.
 
@@ -238,8 +238,8 @@ sub rd {
 
 =head2 ra
 
-    print "recursion is ", $packet->header->ra ? "" : "not ", "available\n";
-    $packet->header->ra(0);
+	print "recursion is ", $packet->header->ra ? "" : "not ", "available\n";
+	$packet->header->ra(0);
 
 Gets or sets the recursion available flag.
 
@@ -265,7 +265,7 @@ sub z {
 
 =head2 ad
 
-    print "The response has ", $packet->header->ad ? "" : "not", "been verified\n";
+	print "The response has ", $packet->header->ad ? "" : "not", "been verified\n";
 
 Relevant in DNSSEC context.
 
@@ -283,8 +283,8 @@ sub ad {
 
 =head2 cd
 
-    print "checking was ", $packet->header->cd ? "not" : "", "desired\n";
-    $packet->header->cd(0);
+	print "checking was ", $packet->header->cd ? "not" : "", "desired\n";
+	$packet->header->cd(0);
 
 Gets or sets the checking disabled flag.
 
@@ -298,7 +298,7 @@ sub cd {
 
 =head2 qdcount, zocount
 
-    print "# of question records: ", $packet->header->qdcount, "\n";
+	print "# of question records: ", $packet->header->qdcount, "\n";
 
 Returns the number of records in the question section of the packet.
 In dynamic update packets, this field is known as C<zocount> and refers
@@ -315,7 +315,7 @@ sub qdcount {
 
 =head2 ancount, prcount
 
-    print "# of answer records: ", $packet->header->ancount, "\n";
+	print "# of answer records: ", $packet->header->ancount, "\n";
 
 Returns the number of records in the answer section of the packet
 which may, in the case of corrupt packets, differ from the actual
@@ -334,7 +334,7 @@ sub ancount {
 
 =head2 nscount, upcount
 
-    print "# of authority records: ", $packet->header->nscount, "\n";
+	print "# of authority records: ", $packet->header->nscount, "\n";
 
 Returns the number of records in the authority section of the packet
 which may, in the case of corrupt packets, differ from the actual
@@ -353,7 +353,7 @@ sub nscount {
 
 =head2 arcount, adcount
 
-    print "# of additional records: ", $packet->header->arcount, "\n";
+	print "# of additional records: ", $packet->header->arcount, "\n";
 
 Returns the number of records in the additional section of the packet
 which may, in the case of corrupt packets, differ from the actual
@@ -378,8 +378,8 @@ sub adcount { return &arcount; }
 
 =head2 do, co
 
-    print "DNSSEC_OK flag was ", $packet->header->do ? "not" : "", "set\n";
-    $packet->header->do(1);
+	print "DNSSEC_OK flag was ", $packet->header->do ? "not" : "", "set\n";
+	$packet->header->do(1);
 
 Gets or sets the named EDNS flag.
 
@@ -403,7 +403,7 @@ EDNS extended rcodes are handled transparently by $packet->header->rcode().
 
 =head2 UDP packet size
 
-    $udp_max = $packet->edns->UDPsize;
+	$udp_max = $packet->edns->UDPsize;
 
 EDNS offers a mechanism to advertise the maximum UDP packet size
 which can be assembled by the local network stack.
@@ -418,11 +418,11 @@ sub size {				## historical
 
 =head2 edns
 
-    $header  = $packet->header;
-    $version = $header->edns->version;
-    @options = $header->edns->options;
-    $option  = $header->edns->option(n);
-    $udp_max = $packet->edns->UDPsize;
+	$header  = $packet->header;
+	$version = $header->edns->version;
+	@options = $header->edns->options;
+	$option  = $header->edns->option(n);
+	$udp_max = $packet->edns->UDPsize;
 
 Auxiliary function which provides access to the EDNS protocol
 extension OPT RR.

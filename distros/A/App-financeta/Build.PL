@@ -76,7 +76,7 @@ $build->dispatch('distmeta');
 $build->dispatch('manifest');
 
 __END__
-#### COPYRIGHT: 2013. Vikas N Kumar. All Rights Reserved
+#### COPYRIGHT: 2013-2025. Vikas N Kumar. All Rights Reserved
 #### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 #### DATE: 18th Dec 2013
 #### LICENSE: Refer LICENSE file.

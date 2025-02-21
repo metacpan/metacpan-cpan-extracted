@@ -69,7 +69,7 @@ SV* random_bytes(size_t wanted)
 		int i;
 		for (i = 0; i < wanted; i += 8)
 			_rdrand64_step((unsigned long long*)(data + i));
-		if (wanted % 4)
+		if (wanted % 8)
 			data[wanted] = '\0';
 #elif defined(HAVE_RDRAND32)
 		if (wanted % 4)

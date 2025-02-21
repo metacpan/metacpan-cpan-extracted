@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="test">
+  <lines>
+    <line id="ugly_line_id" name="nice line name" color="#550000"/>
+  </lines>
+  <stations>
+    <station id="ugly_but_ok_id_A" name="S:trange station name" line="ugly_line_id:1" link="ugly_but_ok_id_B"/>
+    <station id="ugly_but_ok_id_B" name="Nice station name"     line="ugly_line_id:2" link="ugly_but_ok_id_A"/>
+  </stations>
+</tube>

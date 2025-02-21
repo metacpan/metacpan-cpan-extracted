@@ -3,7 +3,7 @@ package Net::DNS::DomainName;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DomainName.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: DomainName.pm 2005 2025-01-28 13:22:10Z willem $)[2];
 
 
 =head1 NAME
@@ -12,13 +12,13 @@ Net::DNS::DomainName - DNS name representation
 
 =head1 SYNOPSIS
 
-    use Net::DNS::DomainName;
+	use Net::DNS::DomainName;
 
-    $object = Net::DNS::DomainName->new('example.com');
-    $name = $object->name;
-    $data = $object->encode;
+	$object = Net::DNS::DomainName->new('example.com');
+	$name = $object->name;
+	$data = $object->encode;
 
-    ( $object, $next ) = Net::DNS::DomainName->decode( \$data, $offset );
+	( $object, $next ) = Net::DNS::DomainName->decode( \$data, $offset );
 
 =head1 DESCRIPTION
 
@@ -48,35 +48,17 @@ use Carp;
 
 =head2 new
 
-    $object = Net::DNS::DomainName->new('example.com');
+	$object = Net::DNS::DomainName->new('example.com');
 
 Creates a domain name object which identifies the domain specified
 by the character string argument.
 
 
-=head2 canonical
-
-    $data = $object->canonical;
-
-Returns the canonical wire-format representation of the domain name
-as defined in RFC2535(8.1).
-
-=cut
-
-sub canonical {
-	my @label = shift->_wire;
-	for (@label) {
-		tr /\101-\132/\141-\172/;
-	}
-	return join '', map { pack 'C a*', length($_), $_ } @label, '';
-}
-
-
 =head2 decode
 
-    $object = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
+	$object = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
 
-    ( $object, $next ) = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
+	( $object, $next ) = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
 
 Creates a domain name object which represents the DNS domain name
 identified by the wire-format data at the indicated offset within
@@ -131,7 +113,7 @@ sub decode {
 
 =head2 encode
 
-    $data = $object->encode;
+	$data = $object->encode;
 
 Returns the wire-format representation of the domain name suitable
 for inclusion in a DNS packet buffer.
@@ -140,6 +122,24 @@ for inclusion in a DNS packet buffer.
 
 sub encode {
 	return join '', map { pack 'C a*', length($_), $_ } shift->_wire, '';
+}
+
+
+=head2 canonical
+
+	$data = $object->canonical;
+
+Returns the canonical wire-format representation of the domain name
+as defined in RFC2535(8.1).
+
+=cut
+
+sub canonical {
+	my @label = shift->_wire;
+	for (@label) {
+		tr /\101-\132/\141-\172/;
+	}
+	return join '', map { pack 'C a*', length($_), $_ } @label, '';
 }
 
 
@@ -154,29 +154,16 @@ Net::DNS::DomainName1035 implements a subclass of domain name
 objects which are to be encoded using the compressed wire format
 defined in RFC1035.
 
-    use Net::DNS::DomainName;
+	$data = $object->encode( $offset, $hash );
 
-    $object = Net::DNS::DomainName1035->new('compressible.example.com');
-    $data   = $object->encode( $offset, $hash );
-
-    ( $object, $next ) = Net::DNS::DomainName1035->decode( \$data, $offset );
-
-Note that RFC3597 implies that the RR types defined in RFC1035
-section 3.3 are the only types eligible for compression.
-
-
-=head2 encode
-
-    $data = $object->encode( $offset, $hash );
-
-Returns the wire-format representation of the domain name suitable
-for inclusion in a DNS packet buffer.
-
-The optional arguments are the offset within the packet data where
+The arguments are the offset within the packet data where
 the domain name is to be stored and a reference to a hash table used
 to index compressed names within the packet.
 
-If the hash reference is undefined, encode() returns the lowercase
+Note that RFC3597 implies that only the RR types defined in RFC1035(3.3)
+are eligible for compression of domain names occuring in RDATA.
+
+If the hash reference is undefined, encode() returns the lower case
 uncompressed canonical representation defined in RFC2535(8.1).
 
 =cut
@@ -215,34 +202,26 @@ our @ISA = qw(Net::DNS::DomainName);
 Net::DNS::DomainName2535 implements a subclass of domain name
 objects which are to be encoded using uncompressed wire format.
 
-Note that RFC3597, and latterly RFC4034, specifies that the lower
-case canonical encoding defined in RFC2535 is to be used for RR
-types defined prior to RFC3597.
+	$data = $object->encode( $offset, $hash );
 
-    use Net::DNS::DomainName;
+The arguments are the offset within the packet data where
+the domain name is to be stored and a reference to a hash table used
+to index names already encoded within the packet.
 
-    $object = Net::DNS::DomainName2535->new('incompressible.example.com');
-    $data   = $object->encode( $offset, $hash );
+If the hash reference is undefined, encode() returns the lower case
+uncompressed canonical representation defined in RFC2535(8.1).
 
-    ( $object, $next ) = Net::DNS::DomainName2535->decode( \$data, $offset );
-
-
-=head2 encode
-
-    $data = $object->encode( $offset, $hash );
-
-Returns the uncompressed wire-format representation of the domain
-name suitable for inclusion in a DNS packet buffer.
-
-If the hash reference is undefined, encode() returns the lowercase
-canonical form defined in RFC2535(8.1).
+Note that RFC3597, and latterly RFC4034, specifies that the lower case
+canonical form is to be used for RR types defined prior to RFC3597.
 
 =cut
 
 sub encode {
 	my ( $self, $offset, $hash ) = @_;
 	return $self->canonical unless defined $hash;
-	return join '', map { pack 'C a*', length($_), $_ } $self->_wire, '';
+	my $name = join '.', my @labels = $self->_wire;
+	$hash->{$name} = $offset if $offset < 0x4000;
+	return join '', map { pack 'C a*', length($_), $_ } @labels, '';
 }
 
 1;

@@ -222,11 +222,13 @@ sub _handle_SQL_error {
     return 1;                                                              # otherwise, don't skip
    });
 
-  # clear the DBI error, to make sure that upper levels like DBIx::RetryOverDisconnects will use
-  # our $dbi_errstr and not DBI->errstr
-  $dbh->set_err(undef, "");
+  # re-inject $dbi_errstr also into DBI handles, because some upper levels like DBIx::RetryOverDisconnects 
+  # may ignore the error raised by croak and use DBI::errstr instead -- not what we want here !
+  no warnings 'uninitialized';
+  $dbh->set_err($DBI::err, $dbi_errstr) if $DBI::err and $dbi_errstr ne $DBI::errstr;
 
-  croak $dbi_errstr;
+  # raise the error through Carp::Object, which will automatically apply the frame filter just set above
+  croak $dbi_errstr; 
 }
 
   

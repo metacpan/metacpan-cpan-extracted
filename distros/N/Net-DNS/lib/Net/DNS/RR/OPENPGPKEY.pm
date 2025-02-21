@@ -2,7 +2,7 @@ package Net::DNS::RR::OPENPGPKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPENPGPKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: OPENPGPKEY.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -70,8 +70,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name OPENPGPKEY key');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name OPENPGPKEY key');
 
 =head1 DESCRIPTION
 
@@ -89,15 +89,15 @@ other unpredictable behaviour.
 
 =head2 key
 
-    $key = $rr->key;
-    $rr->key( $key );
+	$key = $rr->key;
+	$rr->key( $key );
 
 Base64 encoded representation of the OpenPGP public key material.
 
 =head2 keybin
 
-    $keybin = $rr->keybin;
-    $rr->keybin( $keybin );
+	$keybin = $rr->keybin;
+	$rr->keybin( $keybin );
 
 OpenPGP public key material consisting of
 a single OpenPGP transferable public key in RFC4880 format.
@@ -134,6 +134,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC7929|https://tools.ietf.org/html/rfc7929>
+L<RFC7929|https://iana.org/go/rfc7929>
 
 =cut

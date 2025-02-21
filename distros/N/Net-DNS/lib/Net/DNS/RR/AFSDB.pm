@@ -2,7 +2,7 @@ package Net::DNS::RR::AFSDB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AFSDB.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: AFSDB.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -71,8 +71,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name AFSDB subtype hostname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name AFSDB subtype hostname');
 
 =head1 DESCRIPTION
 
@@ -90,16 +90,16 @@ other unpredictable behaviour.
 
 =head2 subtype
 
-    $subtype = $rr->subtype;
-    $rr->subtype( $subtype );
+	$subtype = $rr->subtype;
+	$rr->subtype( $subtype );
 
 A 16 bit integer which indicates the service offered by the
 listed host.
 
 =head2 hostname
 
-    $hostname = $rr->hostname;
-    $rr->hostname( $hostname );
+	$hostname = $rr->hostname;
+	$rr->hostname( $hostname );
 
 The hostname field is a domain name of a host that has a server
 for the cell named by the owner name of the RR.

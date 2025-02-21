@@ -1,5 +1,10 @@
 Revision history for Signal-Info
 
+0.004     2025-02-20 12:59:01+01:00 Europe/Brussels
+          - Switch to Dist::Build
+          - Run configure check for various siginfo fields
+          - Conditionally define less portable siginfo codes
+
 0.003     2025-02-12 15:52:53+01:00 Europe/Brussels
           - Split Time::Spec into its own distribution
 

@@ -21,3 +21,5 @@
 1.009
  - Plays nicer with MODIFY_CODE_ATTRIBUTES in a parent class
  - now handles bad code attributes properly, does not die returns a list
+1.010
+  - Added log_trace method

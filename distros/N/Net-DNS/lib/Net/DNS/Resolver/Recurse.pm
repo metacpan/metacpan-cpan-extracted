@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1981 2024-06-17 13:22:14Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,13 +12,13 @@ Net::DNS::Resolver::Recurse - DNS recursive resolver
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Resolver::Recurse;
+	use Net::DNS::Resolver::Recurse;
 
-    my $resolver = new Net::DNS::Resolver::Recurse();
+	my $resolver = new Net::DNS::Resolver::Recurse();
 
-    $resolver->hints('198.41.0.4');	# A.ROOT-SERVER.NET.
+	$resolver->hints('198.41.0.4');	# A.ROOT-SERVER.NET.
 
-    my $packet = $resolver->send( 'www.rob.com.au.', 'A' );
+	my $packet = $resolver->send( 'www.rob.com.au.', 'A' );
 
 
 =head1 DESCRIPTION
@@ -42,7 +42,7 @@ Additional module-specific methods are described below.
 This method specifies a list of the IP addresses of nameservers to
 be used to discover the addresses of the root nameservers.
 
-    $resolver->hints(@ip);
+	$resolver->hints(@ip);
 
 If no hints are passed, the priming query is directed to nameservers
 drawn from a built-in list of IP addresses.
@@ -65,7 +65,7 @@ sub hints {
 The query(), search() and send() methods produce the same result
 as their counterparts in Net::DNS::Resolver.
 
-    $packet = $resolver->send( 'www.example.com.', 'A' );
+	$packet = $resolver->send( 'www.example.com.', 'A' );
 
 Server-side recursion is suppressed by clearing the recurse flag in
 query packets and recursive name resolution is performed explicitly.
@@ -167,14 +167,14 @@ which is then invoked at each stage of the recursive lookup.
 
 For example to emulate dig's C<+trace> function:
 
-    my $coderef = sub {
+	my $coderef = sub {
 	my $packet = shift;
 
 	printf ";; Received %d bytes from %s\n\n",
 		$packet->answersize, $packet->answerfrom;
-    };
+	};
 
-    $resolver->callback($coderef);
+	$resolver->callback($coderef);
 
 The callback subroutine is not called
 for queries for missing glue records.

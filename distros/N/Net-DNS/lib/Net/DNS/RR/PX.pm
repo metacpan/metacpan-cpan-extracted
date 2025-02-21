@@ -2,7 +2,7 @@ package Net::DNS::RR::PX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: PX.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: PX.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -91,8 +91,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name PX preference map822 mapx400');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name PX preference map822 mapx400');
 
 =head1 DESCRIPTION
 
@@ -110,8 +110,8 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16 bit integer which specifies the preference
 given to this RR among others at the same owner.
@@ -119,16 +119,16 @@ Lower values are preferred.
 
 =head2 map822
 
-    $map822 = $rr->map822;
-    $rr->map822( $map822 );
+	$map822 = $rr->map822;
+	$rr->map822( $map822 );
 
 A domain name element containing <rfc822-domain>, the
 RFC822 part of the MIXER Conformant Global Address Mapping.
 
 =head2 mapx400
 
-    $mapx400 = $rr->mapx400;
-    $rr->mapx400( $mapx400 );
+	$mapx400 = $rr->mapx400;
+	$rr->mapx400( $mapx400 );
 
 A <domain-name> element containing the value of
 <x400-in-domain-syntax> derived from the X.400 part of
@@ -166,6 +166,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC2163|https://tools.ietf.org/html/rfc2163>
+L<RFC2163|https://iana.org/go/rfc2163>
 
 =cut

@@ -3,7 +3,7 @@ package Net::DNS::Mailbox;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Mailbox.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: Mailbox.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,10 +12,10 @@ Net::DNS::Mailbox - DNS mailbox representation
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Mailbox;
+	use Net::DNS::Mailbox;
 
-    $mailbox = Net::DNS::Mailbox->new('user@example.com');
-    $address = $mailbox->address;
+	$mailbox = Net::DNS::Mailbox->new('user@example.com');
+	$address = $mailbox->address;
 
 =head1 DESCRIPTION
 
@@ -41,9 +41,9 @@ use base qw(Net::DNS::DomainName);
 
 =head2 new
 
-    $mailbox = Net::DNS::Mailbox->new('John Doe <john.doe@example.com>');
-    $mailbox = Net::DNS::Mailbox->new('john.doe@example.com');
-    $mailbox = Net::DNS::Mailbox->new('john\.doe.example.com');
+	$mailbox = Net::DNS::Mailbox->new('John Doe <john.doe@example.com>');
+	$mailbox = Net::DNS::Mailbox->new('john.doe@example.com');
+	$mailbox = Net::DNS::Mailbox->new('john\.doe.example.com');
 
 Creates a mailbox object representing the RFC822 mail address specified by
 the character string argument. An encoded domain name is also accepted for
@@ -73,7 +73,7 @@ sub new {
 
 =head2 address
 
-    $address = $mailbox->address;
+	$address = $mailbox->address;
 
 Returns a character string containing the RFC822 mailbox address
 corresponding to the encoded domain name representation described

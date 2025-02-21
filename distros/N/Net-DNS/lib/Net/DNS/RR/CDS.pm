@@ -2,7 +2,7 @@ package Net::DNS::RR::CDS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CDS.pm 1909 2023-03-23 11:36:16Z willem $)[2];
+our $VERSION = (qw$Id: CDS.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR::DS);
 
@@ -38,8 +38,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name CDS keytag algorithm digtype digest');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name CDS keytag algorithm digtype digest');
 
 =head1 DESCRIPTION
 
@@ -93,6 +93,6 @@ DEALINGS IN THE SOFTWARE.
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
 L<Net::DNS::RR::DS>
-L<RFC7344|https://tools.ietf.org/html/rfc7344>
+L<RFC7344|https://iana.org/go/rfc7344>
 
 =cut

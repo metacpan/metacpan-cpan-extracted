@@ -2,7 +2,7 @@ package Net::DNS::RR::KX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: KX.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: KX.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -80,8 +80,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name KX preference exchange');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name KX preference exchange');
 
 =head1 DESCRIPTION
 
@@ -99,8 +99,8 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16 bit integer which specifies the preference
 given to this RR among others at the same owner.
@@ -108,8 +108,8 @@ Lower values are preferred.
 
 =head2 exchange
 
-    $exchange = $rr->exchange;
-    $rr->exchange( $exchange );
+	$exchange = $rr->exchange;
+	$rr->exchange( $exchange );
 
 A domain name which specifies a host willing
 to act as a key exchange for the owner name.
@@ -146,6 +146,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC2230|https://tools.ietf.org/html/rfc2230>
+L<RFC2230|https://iana.org/go/rfc2230>
 
 =cut

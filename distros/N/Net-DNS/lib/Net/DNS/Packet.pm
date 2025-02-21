@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1982 2024-07-23 16:16:53Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 
 =head1 NAME
@@ -12,11 +12,11 @@ Net::DNS::Packet - DNS protocol packet
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Packet;
+	use Net::DNS::Packet;
 
-    $query = Net::DNS::Packet->new( 'example.com', 'MX', 'IN' );
+	$query = Net::DNS::Packet->new( 'example.com', 'MX', 'IN' );
 
-    $reply = $resolver->send( $query );
+	$reply = $resolver->send( $query );
 
 
 =head1 DESCRIPTION
@@ -43,10 +43,10 @@ BEGIN {
 
 =head2 new
 
-    $packet = Net::DNS::Packet->new( 'example.com' );
-    $packet = Net::DNS::Packet->new( 'example.com', 'MX', 'IN' );
+	$packet = Net::DNS::Packet->new( 'example.com' );
+	$packet = Net::DNS::Packet->new( 'example.com', 'MX', 'IN' );
 
-    $packet = Net::DNS::Packet->new();
+	$packet = Net::DNS::Packet->new();
 
 If passed a domain, type, and class, new() creates a Net::DNS::Packet
 object which is suitable for making a DNS query for the specified
@@ -77,9 +77,9 @@ sub new {
 
 =head2 decode
 
-    $packet = Net::DNS::Packet->decode( \$data );
-    $packet = Net::DNS::Packet->decode( \$data, 1 );	# debug
-    $packet = Net::DNS::Packet->new( \$data ... );
+	$packet = Net::DNS::Packet->decode( \$data );
+	$packet = Net::DNS::Packet->decode( \$data, 1 );	# debug
+	$packet = Net::DNS::Packet->new( \$data ... );
 
 A new packet object is created by decoding the DNS packet data
 contained in the scalar referenced by the first argument.
@@ -91,7 +91,7 @@ Decoding errors, including data corruption and truncation, are
 collected in the $@ ($EVAL_ERROR) variable.
 
 
-    ( $packet, $length ) = Net::DNS::Packet->decode( \$data );
+	( $packet, $length ) = Net::DNS::Packet->decode( \$data );
 
 If called in array context, returns a packet object and the number
 of octets successfully decoded.
@@ -180,8 +180,8 @@ sub decode {
 
 =head2 encode
 
-    $data = $packet->encode;
-    $data = $packet->encode( $size );
+	$data = $packet->encode;
+	$data = $packet->encode( $size );
 
 Returns the packet data in binary format, suitable for sending as a
 query or update request to a nameserver.
@@ -219,7 +219,7 @@ sub encode {
 
 =head2 header
 
-    $header = $packet->header;
+	$header = $packet->header;
 
 Constructor method which returns a Net::DNS::Header object which
 represents the header section of the packet.
@@ -234,9 +234,8 @@ sub header {
 
 =head2 edns
 
-    $edns    = $packet->edns;
-    $version = $edns->version;
-    $UDPsize = $edns->size;
+	$version = $packet->edns->version;
+	$UDPsize = $packet->edns->size;
 
 Auxiliary function which provides access to the EDNS protocol
 extension OPT RR.
@@ -254,7 +253,7 @@ sub edns {
 
 =head2 reply
 
-    $reply = $query->reply( $UDPmax );
+	$reply = $query->reply( $UDPmax );
 
 Constructor method which returns a new reply packet.
 
@@ -293,7 +292,7 @@ sub reply {
 
 =head2 question, zone
 
-    @question = $packet->question;
+	@question = $packet->question;
 
 Returns a list of Net::DNS::Question objects representing the
 question section of the packet.
@@ -313,7 +312,7 @@ sub zone { return &question }
 
 =head2 answer, pre, prerequisite
 
-    @answer = $packet->answer;
+	@answer = $packet->answer;
 
 Returns a list of Net::DNS::RR objects representing the answer
 section of the packet.
@@ -335,7 +334,7 @@ sub prerequisite { return &answer }
 
 =head2 authority, update
 
-    @authority = $packet->authority;
+	@authority = $packet->authority;
 
 Returns a list of Net::DNS::RR objects representing the authority
 section of the packet.
@@ -355,7 +354,7 @@ sub update { return &authority }
 
 =head2 additional
 
-    @additional = $packet->additional;
+	@additional = $packet->additional;
 
 Returns a list of Net::DNS::RR objects representing the additional
 section of the packet.
@@ -370,7 +369,7 @@ sub additional {
 
 =head2 print
 
-    $packet->print;
+	$packet->print;
 
 Prints the entire packet to the currently selected output filehandle
 using the master file format mandated by RFC1035.
@@ -385,7 +384,7 @@ sub print {
 
 =head2 string
 
-    print $packet->string;
+	print $packet->string;
 
 Returns a string representation of the packet.
 
@@ -443,7 +442,7 @@ sub string {
 
 =head2 from
 
-    print "packet received from ", $packet->from, "\n";
+	print "packet received from ", $packet->from, "\n";
 
 Returns the IP address from which this packet was received.
 This method will return undef for user-created packets.
@@ -461,7 +460,7 @@ sub answerfrom { return &from; }				# uncoverable pod
 
 =head2 size
 
-    print "packet size: ", $packet->size, " octets\n";
+	print "packet size: ", $packet->size, " octets\n";
 
 Returns the size of the packet in octets as it was received from a
 nameserver.  This method will return undef for user-created packets
@@ -478,12 +477,12 @@ sub answersize { return &size; }				# uncoverable pod
 
 =head2 push
 
-    $ancount = $packet->push( prereq => $rr );
-    $nscount = $packet->push( update => $rr );
-    $arcount = $packet->push( additional => $rr );
+	$ancount = $packet->push( prereq => $rr );
+	$nscount = $packet->push( update => $rr );
+	$arcount = $packet->push( additional => $rr );
 
-    $nscount = $packet->push( update => $rr1, $rr2, $rr3 );
-    $nscount = $packet->push( update => @rr );
+	$nscount = $packet->push( update => $rr1, $rr2, $rr3 );
+	$nscount = $packet->push( update => @rr );
 
 Adds RRs to the specified section of the packet.
 
@@ -502,12 +501,12 @@ sub push {
 
 =head2 unique_push
 
-    $ancount = $packet->unique_push( prereq => $rr );
-    $nscount = $packet->unique_push( update => $rr );
-    $arcount = $packet->unique_push( additional => $rr );
+	$ancount = $packet->unique_push( prereq => $rr );
+	$nscount = $packet->unique_push( update => $rr );
+	$arcount = $packet->unique_push( additional => $rr );
 
-    $nscount = $packet->unique_push( update => $rr1, $rr2, $rr3 );
-    $nscount = $packet->unique_push( update => @rr );
+	$nscount = $packet->unique_push( update => $rr1, $rr2, $rr3 );
+	$nscount = $packet->unique_push( update => @rr );
 
 Adds RRs to the specified section of the packet provided that the
 RRs are not already present in the same section.
@@ -529,9 +528,9 @@ sub unique_push {
 
 =head2 pop
 
-    my $rr = $packet->pop( 'pre' );
-    my $rr = $packet->pop( 'update' );
-    my $rr = $packet->pop( 'additional' );
+	my $rr = $packet->pop( 'pre' );
+	my $rr = $packet->pop( 'update' );
+	my $rr = $packet->pop( 'additional' );
 
 Removes a single RR from the specified section of the packet.
 
@@ -562,16 +561,16 @@ sub _section {				## returns array reference for section
 
 =head2 sign_tsig
 
-    $query = Net::DNS::Packet->new( 'www.example.com', 'A' );
+	$query = Net::DNS::Packet->new( 'www.example.com', 'A' );
 
-    $query->sign_tsig(
+	$query->sign_tsig(
 		$keyfile,
 		fudge => 60
 		);
 
-    $reply = $res->send( $query );
+	$reply = $res->send( $query );
 
-    $reply->verify( $query ) || die $reply->verifyerr;
+	$reply->verify( $query ) || die $reply->verifyerr;
 
 Attaches a TSIG resource record object, which will be used to sign
 the packet (see RFC 2845).
@@ -585,7 +584,7 @@ must uniquely identify the key shared between the parties, and the
 algorithm name must identify the signing function to be used with the
 specified key.
 
-    $tsig = Net::DNS::RR->new(
+	$tsig = Net::DNS::RR->new(
 		name		=> 'tsig.example',
 		type		=> 'TSIG',
 		algorithm	=> 'custom-algorithm',
@@ -596,22 +595,22 @@ specified key.
 					}
 		);
 
-    $query->sign_tsig( $tsig );
+	$query->sign_tsig( $tsig );
 
 
 The response to an inbound request is signed by presenting the request
 in place of the key parameter.
 
-    $response = $request->reply;
-    $response->sign_tsig( $request, @options );
+	$response = $request->reply;
+	$response->sign_tsig( $request, @options );
 
 
 Multi-packet transactions are signed by chaining the sign_tsig()
 calls together as follows:
 
-    $opaque  =	$packet1->sign_tsig( 'Kexample.+165+13281.private' );
-    $opaque  =	$packet2->sign_tsig( $opaque );
-		$packet3->sign_tsig( $opaque );
+	$opaque = $packet1->sign_tsig( 'Kexample.+165+13281.private' );
+	$opaque = $packet2->sign_tsig( $opaque );
+	$opaque = $packet3->sign_tsig( $opaque );
 
 The opaque intermediate object references returned during multi-packet
 signing are not intended to be accessed by the end-user application.
@@ -636,21 +635,22 @@ sub sign_tsig {
 
 =head2 verify and verifyerr
 
-    $packet->verify()		|| die $packet->verifyerr;
-    $reply->verify( $query )	|| die $reply->verifyerr;
+	$reply->verify($query) || die $reply->verifyerr;
 
-Verify TSIG signature of packet or reply to the corresponding query.
+Verify TSIG signature of a reply to the corresponding query.
 
 
-    $opaque  =	$packet1->verify( $query ) || die $packet1->verifyerr;
-    $opaque  =	$packet2->verify( $opaque );
-    $verifed =	$packet3->verify( $opaque ) || die $packet3->verifyerr;
+	$opaque  = $packet1->verify( $query ) || die $packet1->verifyerr;
+	$opaque  = $packet2->verify( $opaque );
+	$verifed = $packet3->verify( $opaque ) || die $packet3->verifyerr;
 
-The opaque intermediate object references returned during multi-packet
-verify() will be undefined (Boolean false) if verification fails.
-Access to the object itself, if it exists, is expressly forbidden.
-Testing at every stage may be omitted, which results in a BADSIG error
+Verify TSIG signature of a multi-packet reply to the corresponding query.
+
+The opaque intermediate object references returned by verify() at each
+stage will be undefined (Boolean false) if verification fails.
+Testing at every stage is not necessary, which produces a BADSIG error
 on the final packet in the absence of more specific information.
+Access to the objects themselves, if they exist, is expressly forbidden.
 
 =cut
 
@@ -673,17 +673,17 @@ The requisite cryptographic components are not integrated into
 Net::DNS but reside in the Net::DNS::SEC distribution available
 from CPAN.
 
-    $update = Net::DNS::Update->new('example.com');
-    $update->push( update => rr_add('foo.example.com A 10.1.2.3'));
-    $update->sign_sig0('Kexample.com+003+25317.private');
+	$update = Net::DNS::Update->new('example.com');
+	$update->push( update => rr_add('foo.example.com A 10.1.2.3'));
+	$update->sign_sig0('Kexample.com+003+25317.private');
 
 Execution will be terminated if Net::DNS::SEC is not available.
 
 
 =head2 verify SIG0
 
-    $packet->verify( $keyrr )		|| die $packet->verifyerr;
-    $packet->verify( [$keyrr, ...] )	|| die $packet->verifyerr;
+	$packet->verify( $keyrr )		|| die $packet->verifyerr;
+	$packet->verify( [$keyrr, ...] )	|| die $packet->verifyerr;
 
 Verify SIG0 packet signature against one or more specified KEY RRs.
 
@@ -713,7 +713,7 @@ sub sign_sig0 {
 
 =head2 sigrr
 
-    $sigrr = $packet->sigrr() || die 'unsigned packet';
+	$sigrr = $packet->sigrr() || die 'unsigned packet';
 
 The sigrr method returns the signature RR from a signed packet
 or undefined if the signature is absent.
@@ -845,7 +845,7 @@ sub _quid {				## generate (short-term) unique query ID
 	my $self = shift;
 	my $id	 = $self->{id};
 	$cache1->{$id}++ if $id;				# cache non-zero ID
-	return $id if defined $id;
+	return $id	 if defined $id;
 	( $cache2, $cache1, $limit ) = ( $cache1, {0 => 1}, 50 ) unless $limit--;
 	$id = int rand(0xffff);					# two layer ID cache
 	$id = int rand(0xffff) while $cache1->{$id}++ + exists( $cache2->{$id} );

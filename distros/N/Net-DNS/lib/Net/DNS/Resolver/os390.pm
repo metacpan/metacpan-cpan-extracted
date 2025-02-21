@@ -2,7 +2,7 @@ package Net::DNS::Resolver::os390;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: os390.pm 1981 2024-06-17 13:22:14Z willem $)[2];
+our $VERSION = (qw$Id: os390.pm 2007 2025-02-08 16:45:23Z willem $)[2];
 
 
 =head1 NAME
@@ -37,7 +37,7 @@ my @dataset = (				## plausible places to seek resolver configuration
 
 my $homedir = $ENV{HOME};
 my $dotfile = '.resolv.conf';
-my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
+my @dotfile = grep { -f $_ && -o $_ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
 
 
 my %option = (				## map MVS config option names
@@ -142,7 +142,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Resolver;
+	use Net::DNS::Resolver;
 
 =head1 DESCRIPTION
 

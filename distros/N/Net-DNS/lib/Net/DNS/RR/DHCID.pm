@@ -2,7 +2,7 @@ package Net::DNS::RR::DHCID;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DHCID.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: DHCID.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -18,22 +18,6 @@ use integer;
 use MIME::Base64;
 
 
-sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
-
-	my $size = $self->{rdlength} - 3;
-	@{$self}{qw(identifiertype digesttype digest)} = unpack "\@$offset nC a$size", $$data;
-	return;
-}
-
-
-sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $self = shift;
-
-	return pack 'nC a*', map { $self->$_ } qw(identifiertype digesttype digest);
-}
-
-
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
@@ -45,9 +29,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
-	my $data = MIME::Base64::decode( join "", @argument );
-	my $size = length($data) - 3;
-	@{$self}{qw(identifiertype digesttype digest)} = unpack "n C a$size", $data;
+	$self->rdata( MIME::Base64::decode( join "", @argument ) );
 	return;
 }
 
@@ -70,26 +52,11 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 #	|      0xffff	   | Undefined; RESERVED.			    |
 #	+------------------+------------------------------------------------+
 
+sub identifiertype { return unpack 'n', shift->{rdata} || return }
 
-sub identifiertype {
-	my ( $self, @value ) = @_;
-	for (@value) { $self->{identifiertype} = 0 + $_ }
-	return $self->{identifiertype} || 0;
-}
+sub digesttype { return unpack 'x2C', shift->{rdata} || return }
 
-
-sub digesttype {
-	my ( $self, @value ) = @_;
-	for (@value) { $self->{digesttype} = 0 + $_ }
-	return $self->{digesttype} || 0;
-}
-
-
-sub digest {
-	my ( $self, @value ) = @_;
-	for (@value) { $self->{digest} = $_ }
-	return $self->{digest} || "";
-}
+sub digest { return unpack 'x3a*', shift->{rdata} || return }
 
 
 1;
@@ -98,17 +65,17 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('client.example.com. DHCID ( AAAB
-	xLmlskllE0MVjd57zHcWmEH3pCQ6VytcKD//7es/deY=');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('client.example.com. DHCID ( AAAB
+		xLmlskllE0MVjd57zHcWmEH3pCQ6VytcKD//7es/deY= )');
 
-    $rr = Net::DNS::RR->new(
-	name	       => 'client.example.com',
-	type	       => 'DHCID',
-	digest	       => 'ObfuscatedIdentityData',
-	digesttype     => 1,
-	identifiertype => 2,
-	);
+	$rr = Net::DNS::RR->new(
+		name		=> 'client.example.com',
+		type		=> 'DHCID',
+		digest		=> 'ObfuscatedIdentityData',
+		digesttype	=> 1,
+		identifiertype	=> 2,
+		);
 
 =head1 DESCRIPTION
 
@@ -126,24 +93,23 @@ other unpredictable behaviour.
 
 =head2 identifiertype
 
-    $identifiertype = $rr->identifiertype;
-    $rr->identifiertype( $identifiertype );
+	$identifiertype = $rr->identifiertype;
 
 The 16-bit identifier type describes the form of host identifier
 used to construct the DHCP identity information.
 
+
 =head2 digesttype
 
-    $digesttype = $rr->digesttype;
-    $rr->digesttype( $digesttype );
+	$digesttype = $rr->digesttype;
 
 The 8-bit digest type number describes the message-digest
 algorithm used to obfuscate the DHCP identity information.
 
+
 =head2 digest
 
-    $digest = $rr->digest;
-    $rr->digest( $digest );
+	$digest = $rr->digest;
 
 Binary representation of the digest of DHCP identity information.
 
@@ -179,6 +145,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4701|https://tools.ietf.org/html/rfc4701>
+L<RFC4701|https://iana.org/go/rfc4701>
 
 =cut

@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.989063');
+my %configure_and_runtime_requires = ('SPVM' => '0.990045');
 
 WriteMakefile(
   NAME              => 'SPVM::HTTP::Tiny',

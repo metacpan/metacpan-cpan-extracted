@@ -10,7 +10,7 @@ use File::ShareDir 'dist_file';
 use File::Spec::Functions qw(rel2abs catfile);
 use Cwd qw(getcwd);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 our @EXPORT_OK = (
     qw(dumper log_filter get_icon_path get_file_path)
@@ -80,7 +80,7 @@ sub get_file_path {
 
 1;
 __END__
-### COPYRIGHT: 2014-2023 Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025 Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 1st Jan 2023
 ### LICENSE: Refer LICENSE file
@@ -95,7 +95,7 @@ App::financeta::utils is an internal utility library for App::financeta.
 
 =head1 VERSION
 
-0.15
+0.16
 
 
 =head1 METHODS
@@ -124,7 +124,7 @@ The commandline script that calls C<App::financeta>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+Copyright (C) 2013-2025. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
 
 =head1 LICENSE
 

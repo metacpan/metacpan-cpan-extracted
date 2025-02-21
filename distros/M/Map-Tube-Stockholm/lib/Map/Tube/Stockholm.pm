@@ -2,7 +2,7 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015, 2024 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2025 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,13 +14,13 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.0');
+our $VERSION = version->declare('v0.1.1');
 
 =encoding utf8
 
 =head1 NAME
 
-Map::Tube::Stockholm - Interface to the Stockholm tube map
+Map::Tube::Stockholm - Interface to the Stockholm tube and tram map
 
 =cut
 
@@ -43,7 +43,7 @@ with 'Map::Tube';
 
 =head1 DESCRIPTION
 
-This module allows to find the shortest route between any two given tube
+This module allows to find the shortest route between any two given tube or tram
 stations in Stockholm. All interesting methods are provided by the role L<Map::Tube>.
 
 =head1 METHODS
@@ -63,6 +63,33 @@ that is a part of this distribution. For further information see L<Map::Tube>.
 This read-only accessor returns whatever was specified as the XML source at
 construction.
 
+=head1 NOTE CONCERNING DIAGRAM CREATION
+
+This note concerns only those who want to produce network diagrams using
+L<Map::Tube::Plugin::Graph> (also pertaining to L<Map::Tube::CLI>) or
+L<Map::Tube::GraphViz>.
+
+There is a potential conflict between an advanced feature of the (excellent) L<GraphViz2>
+module and the Swedish station names, which may lead to an exception being thrown.
+
+Users of L<Map::Tube::Plugin::Graph> are encouraged to upgrade to at least version 0.48,
+which solves the issue cleanly. This also applies to indirect use of this module
+through L<Map::Tube::CLI> and the corresponding command line programme.
+
+Users of L<Map::Tube::GraphViz> can prevent any issue cleanly by defining a function
+as follows:
+
+	sub mynode_id {
+		my ($self, $node) = @_;
+		return $node->id;
+	};
+
+and supplying this as a callback function when creating the diagram:
+
+	my $g = Map::Tube::GraphViz->new( 'tube' => $tube,
+		callback_node_id => \&mynode_id, );
+
+
 =head1 ERRORS
 
 If something goes wrong, maybe because the map information file was corrupted,
@@ -80,7 +107,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Map::Tube>, L<Map::Tube::GraphViz>.
+L<Map::Tube>, L<Map::Tube::GraphViz>, L<Map::Tube::Plugin::Graph>.
 
 =cut
 

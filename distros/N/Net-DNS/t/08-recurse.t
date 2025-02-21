@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1965 2024-02-14 09:19:32Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 2007 2025-02-08 16:45:23Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -21,7 +21,7 @@ eval {
 	my $resolver = Net::DNS::Resolver->new();
 	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
-	my $reply = $resolver->send(qw(. NS IN)) || die $!;
+	my $reply = $resolver->send(qw(. NS IN)) || die $resolver->errorstring;
 
 	my @ns = grep { $_->type eq 'NS' } $reply->answer, $reply->authority;
 	exit plan skip_all => 'Local nameserver broken' unless scalar @ns;
@@ -34,7 +34,7 @@ eval {
 	my $resolver = Net::DNS::Resolver->new( nameservers => [@hints] );
 	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
-	my $reply = $resolver->send(qw(. NS IN)) || die $!;
+	my $reply = $resolver->send(qw(. NS IN)) || die $resolver->errorstring;
 	my $from  = $reply->from();
 
 	my @ns = grep { $_->type eq 'NS' } $reply->answer;
@@ -43,7 +43,7 @@ eval {
 	exit plan skip_all => "Non-authoritative response from $from" unless $reply->header->aa;
 
 	1;
-} || exit( plan skip_all => "Cannot access global root nameservers: $@" );
+} || exit( plan skip_all => "Cannot reach global root: $@" );
 
 
 plan tests => 12;

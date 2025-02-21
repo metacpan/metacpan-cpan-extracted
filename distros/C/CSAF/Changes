@@ -1,5 +1,10 @@
 Revision history for CSAF.
 
+0.25 2025-02-20
+    - FIX typo in ROLIE (GH#4)
+    - Removed space before the ":" in JSON (GH#3)
+    - FIX Invalid CVSS computation (6.1.9) test (GH#2)
+
 0.24 2024-10-26
     - Improved default HTML template
     - Improved "6.1.9 Invalid CVSS computation" (mandatory test)

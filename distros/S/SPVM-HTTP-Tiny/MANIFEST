@@ -7,6 +7,12 @@
 Changes
 lib/SPVM/HTTP/Tiny.pm
 lib/SPVM/HTTP/Tiny.spvm
+lib/SPVM/HTTP/Tiny/Asset.pm
+lib/SPVM/HTTP/Tiny/Asset.spvm
+lib/SPVM/HTTP/Tiny/Asset/File.pm
+lib/SPVM/HTTP/Tiny/Asset/File.spvm
+lib/SPVM/HTTP/Tiny/Asset/Memory.pm
+lib/SPVM/HTTP/Tiny/Asset/Memory.spvm
 lib/SPVM/HTTP/Tiny/CookieJar/Interface.pm
 lib/SPVM/HTTP/Tiny/CookieJar/Interface.spvm
 lib/SPVM/HTTP/Tiny/Daemon.pm

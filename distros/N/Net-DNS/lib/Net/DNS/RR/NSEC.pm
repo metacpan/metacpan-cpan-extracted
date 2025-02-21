@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: NSEC.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -226,8 +226,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new( 'name NSEC nxtdname typelist' );
+	use Net::DNS;
+	$rr = Net::DNS::RR->new( 'name NSEC nxtdname typelist' );
 
 =head1 DESCRIPTION
 
@@ -245,8 +245,8 @@ other unpredictable behaviour.
 
 =head2 nxtdname
 
-    $nxtdname = $rr->nxtdname;
-    $rr->nxtdname( $nxtdname );
+	$nxtdname = $rr->nxtdname;
+	$rr->nxtdname( $nxtdname );
 
 The Next Domain field contains the next owner name (in the
 canonical ordering of the zone) that has authoritative data
@@ -254,8 +254,8 @@ or contains a delegation point NS RRset.
 
 =head2 typelist
 
-    @typelist = $rr->typelist;
-    $typelist = $rr->typelist;
+	@typelist = $rr->typelist;
+	$typelist = $rr->typelist;
 
 typelist() identifies the RRset types that exist at the NSEC RR
 owner name.  When called in scalar context, the list is interpolated
@@ -263,14 +263,14 @@ into a string.
 
 =head2 typemap
 
-    $exists = $rr->typemap($rrtype);
+	$exists = $rr->typemap($rrtype);
 
 typemap() returns a Boolean true value if the specified RRtype occurs
 in the type bitmap of the NSEC record.
 
 =head2 match
 
-    $matched = $rr->match( 'example.foo' );
+	$matched = $rr->match( 'example.foo' );
 
 match() returns a Boolean true value if the canonical form of the name
 argument matches the canonical owner name of the NSEC RR.
@@ -278,7 +278,7 @@ argument matches the canonical owner name of the NSEC RR.
 
 =head2 covers
 
-    $covered = $rr->covers( 'example.foo' );
+	$covered = $rr->covers( 'example.foo' );
 
 covers() returns a Boolean true value if the canonical form of the name,
 or one of its ancestors, falls between the owner name and the nxtdname
@@ -286,8 +286,8 @@ field of the NSEC record.
 
 =head2 encloser, nextcloser, wildcard
 
-    $encloser = $rr->encloser( 'example.foo' );
-    print "encloser: $encloser\n" if $encloser;
+	$encloser = $rr->encloser( 'example.foo' );
+	print "encloser: $encloser\n" if $encloser;
 
 encloser() returns the name of a provable encloser of the query name
 argument obtained from the NSEC RR.

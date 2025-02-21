@@ -2,7 +2,7 @@ package Net::DNS::RR::SSHFP;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SSHFP.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: SSHFP.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -98,8 +98,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name SSHFP algorithm fptype fp');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SSHFP algorithm fptype fp');
 
 =head1 DESCRIPTION
 
@@ -117,16 +117,16 @@ other unpredictable behaviour.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
 The 8-bit algorithm number describes the algorithm used to
 construct the public key.
 
 =head2 fptype
 
-    $fptype = $rr->fptype;
-    $rr->fptype( $fptype );
+	$fptype = $rr->fptype;
+	$rr->fptype( $fptype );
 
 The 8-bit fingerprint type number describes the message-digest
 algorithm used to calculate the fingerprint of the public key.
@@ -135,21 +135,21 @@ algorithm used to calculate the fingerprint of the public key.
 
 =head2 fp
 
-    $fp = $rr->fp;
-    $rr->fp( $fp );
+	$fp = $rr->fp;
+	$rr->fp( $fp );
 
 Hexadecimal representation of the fingerprint digest.
 
 =head2 fpbin
 
-    $fpbin = $rr->fpbin;
-    $rr->fpbin( $fpbin );
+	$fpbin = $rr->fpbin;
+	$rr->fpbin( $fpbin );
 
 Returns opaque octet string representing the fingerprint digest.
 
 =head2 babble
 
-    print $rr->babble;
+	print $rr->babble;
 
 The babble() method returns the 'BabbleBubble' representation of
 the fingerprint if the Digest::BubbleBabble package is available,
@@ -199,6 +199,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4255|https://tools.ietf.org/html/rfc4255>
+L<RFC4255|https://iana.org/go/rfc4255>
 
 =cut

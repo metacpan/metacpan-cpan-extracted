@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,15 +12,15 @@ Net::DNS::ZoneFile - DNS zone file
 
 =head1 SYNOPSIS
 
-    use Net::DNS::ZoneFile;
+	use Net::DNS::ZoneFile;
 
-    $zonefile = Net::DNS::ZoneFile->new( 'named.example' );
+	$zonefile = Net::DNS::ZoneFile->new( 'named.example' );
 
-    while ( $rr = $zonefile->read ) {
-	$rr->print;
-    }
+	while ( $rr = $zonefile->read ) {
+		$rr->print;
+	}
 
-    @zone = $zonefile->read;
+	@zone = $zonefile->read;
 
 
 =head1 DESCRIPTION
@@ -64,10 +64,10 @@ require Net::DNS::RR;
 
 =head2 new
 
-    $zonefile = Net::DNS::ZoneFile->new( 'filename', ['example.com'] );
+	$zonefile = Net::DNS::ZoneFile->new( 'filename', ['example.com'] );
 
-    $handle   = IO::File->new( 'filename', '<:encoding(ISO8859-7)' );
-    $zonefile = Net::DNS::ZoneFile->new( $handle, ['example.com'] );
+	$handle   = IO::File->new( 'filename', '<:encoding(ISO8859-7)' );
+	$zonefile = Net::DNS::ZoneFile->new( $handle, ['example.com'] );
 
 The new() constructor returns a Net::DNS::ZoneFile object which
 represents the zone file specified in the argument list.
@@ -109,8 +109,8 @@ sub new {
 
 =head2 read
 
-    $rr = $zonefile->read;
-    @rr = $zonefile->read;
+	$rr = $zonefile->read;
+	@rr = $zonefile->read;
 
 When invoked in scalar context, read() returns a Net::DNS::RR object
 representing the next resource record encountered in the zone file,
@@ -146,7 +146,7 @@ sub read {
 	my $rr = eval {
 		local $SIG{__DIE__};
 		$self->_getRR;					# return single RR
-		};
+	};
 	croak join ' ', $@, ' file', $self->name, 'line', $self->line, "\n " if $@;
 	return $rr;
 }
@@ -154,7 +154,7 @@ sub read {
 
 =head2 name
 
-    $filename = $zonefile->name;
+	$filename = $zonefile->name;
 
 Returns the name of the current zone file.
 Embedded $INCLUDE directives will cause this to differ from the
@@ -169,7 +169,7 @@ sub name {
 
 =head2 line
 
-    $line = $zonefile->line;
+	$line = $zonefile->line;
 
 Returns the number of the last line read from the current zone file.
 
@@ -184,7 +184,7 @@ sub line {
 
 =head2 origin
 
-    $origin = $zonefile->origin;
+	$origin = $zonefile->origin;
 
 Returns the fully qualified name of the current origin within the
 zone file.
@@ -199,7 +199,7 @@ sub origin {
 
 =head2 ttl
 
-    $ttl = $zonefile->ttl;
+	$ttl = $zonefile->ttl;
 
 Returns the default TTL as specified by the $TTL directive.
 
@@ -217,20 +217,20 @@ CPAN distribution will continue to operate with minimal change using
 the compatibility interface described below.
 New application code should use the object-oriented interface.
 
-    use Net::DNS::ZoneFile;
+	use Net::DNS::ZoneFile;
 
-    $listref = Net::DNS::ZoneFile->read( $filename );
-    $listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
+	$listref = Net::DNS::ZoneFile->read( $filename );
+	$listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
-    $listref = Net::DNS::ZoneFile->readfh( $filehandle );
-    $listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
+	$listref = Net::DNS::ZoneFile->readfh( $filehandle );
+	$listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
 
-    $listref = Net::DNS::ZoneFile->parse(  $string );
-    $listref = Net::DNS::ZoneFile->parse( \$string );
-    $listref = Net::DNS::ZoneFile->parse(  $string, $include_dir );
-    $listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
+	$listref = Net::DNS::ZoneFile->parse( $string );
+	$listref = Net::DNS::ZoneFile->parse( $string, $include_dir );
+	$listref = Net::DNS::ZoneFile->parse( \$string );
+	$listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
 
-    $_->print for @$listref;
+	$_->print for @$listref;
 
 The optional second argument specifies the default path for filenames.
 The current working directory is used by default.
@@ -238,15 +238,15 @@ The current working directory is used by default.
 Although not available in the original implementation, the RR list can
 be obtained directly by calling any of these methods in list context.
 
-    @rr = Net::DNS::ZoneFile->read( $filename, $include_dir );
+	@rr = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
 The partial result is returned if an error is encountered by the parser.
 
 
 =head2 read
 
-    $listref = Net::DNS::ZoneFile->read( $filename );
-    $listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
+	$listref = Net::DNS::ZoneFile->read( $filename );
+	$listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
 read() parses the contents of the specified file
 and returns a reference to the list of Net::DNS::RR objects.
@@ -319,8 +319,8 @@ sub _read {
 
 =head2 readfh
 
-    $listref = Net::DNS::ZoneFile->readfh( $filehandle );
-    $listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
+	$listref = Net::DNS::ZoneFile->readfh( $filehandle );
+	$listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
 
 readfh() parses data from the specified file handle
 and returns a reference to the list of Net::DNS::RR objects.
@@ -335,10 +335,10 @@ sub readfh {
 
 =head2 parse
 
-    $listref = Net::DNS::ZoneFile->parse(  $string );
-    $listref = Net::DNS::ZoneFile->parse( \$string );
-    $listref = Net::DNS::ZoneFile->parse(  $string, $include_dir );
-    $listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
+	$listref = Net::DNS::ZoneFile->parse( $string );
+	$listref = Net::DNS::ZoneFile->parse( $string, $include_dir );
+	$listref = Net::DNS::ZoneFile->parse( \$string );
+	$listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
 
 parse() interprets the text in the argument string
 and returns a reference to the list of Net::DNS::RR objects.

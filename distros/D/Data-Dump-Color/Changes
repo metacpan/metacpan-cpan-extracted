@@ -1,3 +1,10 @@
+0.250   2025-02-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Hide Win32::Console::ANSI from cpanspec (GH#16).
+
+
 0.249   2023-02-03  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Make sure we already instantiate color theme object for

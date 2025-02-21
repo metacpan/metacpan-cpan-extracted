@@ -9,7 +9,7 @@ package Net::DNS::Parameters;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1996 2024-12-16 13:05:08Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use integer;
 use Carp;
@@ -454,7 +454,7 @@ Net::DNS::Parameters - DNS parameter assignments
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Parameters;
+	use Net::DNS::Parameters;
 
 
 =head1 DESCRIPTION

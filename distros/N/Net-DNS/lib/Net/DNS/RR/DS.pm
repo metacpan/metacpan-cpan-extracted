@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -260,15 +260,15 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name DS keytag algorithm digtype digest');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name DS keytag algorithm digtype digest');
 
-    use Net::DNS::SEC;
-    $ds = Net::DNS::RR::DS->create(
-	$dnskeyrr,
-	digtype => 'SHA256',
-	ttl	=> 3600
-	);
+	use Net::DNS::SEC;
+	$ds = Net::DNS::RR::DS->create(
+			$dnskeyrr,
+			digtype => 'SHA256',
+			ttl	=> 3600
+			);
 
 =head1 DESCRIPTION
 
@@ -286,15 +286,15 @@ other unpredictable behaviour.
 
 =head2 keytag
 
-    $keytag = $rr->keytag;
-    $rr->keytag( $keytag );
+	$keytag = $rr->keytag;
+	$rr->keytag( $keytag );
 
 The 16-bit numerical key tag of the key. (RFC2535 4.1.6)
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
 Decimal representation of the 8-bit algorithm field.
 
@@ -303,8 +303,8 @@ to perform mnemonic and numeric code translation.
 
 =head2 digtype
 
-    $digtype = $rr->digtype;
-    $rr->digtype( $digtype );
+	$digtype = $rr->digtype;
+	$rr->digtype( $digtype );
 
 Decimal representation of the 8-bit digest type field.
 
@@ -313,21 +313,21 @@ to perform mnemonic and numeric code translation.
 
 =head2 digest
 
-    $digest = $rr->digest;
-    $rr->digest( $digest );
+	$digest = $rr->digest;
+	$rr->digest( $digest );
 
 Hexadecimal representation of the digest over the label and key.
 
 =head2 digestbin
 
-    $digestbin = $rr->digestbin;
-    $rr->digestbin( $digestbin );
+	$digestbin = $rr->digestbin;
+	$rr->digestbin( $digestbin );
 
 Binary representation of the digest over the label and key.
 
 =head2 babble
 
-    print $rr->babble;
+	print $rr->babble;
 
 The babble() method returns the 'BubbleBabble' representation of the
 digest if the Digest::BubbleBabble package is available, otherwise
@@ -343,11 +343,11 @@ method is called.
 
 =head2 create
 
-    use Net::DNS::SEC;
+	use Net::DNS::SEC;
 
-    $dsrr = Net::DNS::RR::DS->create( $keyrr, digtype => 'SHA-256' );
-    $keyrr->print;
-    $dsrr->print;
+	$dsrr = Net::DNS::RR::DS->create( $keyrr, digtype => 'SHA-256' );
+	$keyrr->print;
+	$dsrr->print;
 
 This constructor takes a DNSKEY argument and will return the
 corresponding DS RR constructed using the specified algorithm.
@@ -356,7 +356,7 @@ The digest algorithm defaults to SHA-1.
 
 =head2 verify
 
-    $verify = $dsrr->verify($keyrr);
+	$verify = $dsrr->verify($keyrr);
 
 The boolean verify method will return true if the hash over the key
 RR provided as the argument conforms to the data in the DS itself

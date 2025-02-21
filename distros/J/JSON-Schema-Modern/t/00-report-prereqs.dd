@@ -1,7 +1,6 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'Dist::CheckConflicts' => '0.02',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.020'
                                       }
@@ -46,7 +45,6 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Digest::MD5' => '0',
-                                      'Dist::CheckConflicts' => '0.02',
                                       'Exporter' => '0',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',

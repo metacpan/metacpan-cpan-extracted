@@ -1,5 +1,5 @@
 package Crypt::SysRandom::XS;
-$Crypt::SysRandom::XS::VERSION = '0.007';
+$Crypt::SysRandom::XS::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Crypt::SysRandom::XS - Perl interface to system randomness, XS version
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ This module uses whatever C interface is available to procure cryptographically 
 
 =head2 random_bytes($count)
 
-This will fetch a string of C<$count> random bytes containing cryptographically secure random date.
+This will fetch a string of C<$count> random bytes containing cryptographically secure random data.
 
 =head1 AUTHOR
 

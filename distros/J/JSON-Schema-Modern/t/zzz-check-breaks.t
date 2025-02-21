@@ -13,11 +13,10 @@ SKIP: {
 # this data duplicates x_breaks in META.json
 my $breaks = {
   "JSON::Schema::Modern::Document::OpenAPI" => "< 0.079",
-  "JSON::Schema::Modern::Vocabulary::OpenAPI" => "< 0.017",
+  "JSON::Schema::Modern::Vocabulary::OpenAPI" => "< 0.080",
   "Mojolicious::Plugin::OpenAPI::Modern" => "< 0.014",
   "OpenAPI::Modern" => "< 0.077",
-  "Test::Mojo::Role::OpenAPI::Modern" => "< 0.007",
-  "builtin::Backport" => "<= 0.02"
+  "Test::Mojo::Role::OpenAPI::Modern" => "< 0.007"
 };
 
 use CPAN::Meta::Requirements;

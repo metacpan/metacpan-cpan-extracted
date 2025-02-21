@@ -6,7 +6,7 @@ use Carp ();
 use File::Spec ();
 use Moo::Role;
 # ABSTRACT: A role that handles filepaths for improved portability
-our $VERSION = '0.096'; # VERSION
+our $VERSION = '0.098'; # VERSION
 
 
 sub chomp_portable {
@@ -60,7 +60,7 @@ Archive::BagIt::Role::Portability - A role that handles filepaths for improved p
 
 =head1 VERSION
 
-version 0.096
+version 0.098
 
 =head2 chomp_portable($line)
 

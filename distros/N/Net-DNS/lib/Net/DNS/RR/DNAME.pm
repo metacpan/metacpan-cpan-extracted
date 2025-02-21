@@ -2,7 +2,7 @@ package Net::DNS::RR::DNAME;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNAME.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: DNAME.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -66,8 +66,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name DNAME target');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name DNAME target');
 
 =head1 DESCRIPTION
 
@@ -85,8 +85,8 @@ other unpredictable behaviour.
 
 =head2 target
 
-    $target = $rr->target;
-    $rr->target( $target );
+	$target = $rr->target;
+	$rr->target( $target );
 
 Redirection target domain name which is to be substituted
 for its owner as a suffix of a domain name.
@@ -123,6 +123,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC6672|https://tools.ietf.org/html/rfc6672>
+L<RFC6672|https://iana.org/go/rfc6672>
 
 =cut

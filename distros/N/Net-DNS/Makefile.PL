@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1957 2024-01-10 14:54:10Z willem $	-*-perl-*-
+# $Id: Makefile.PL 2007 2025-02-08 16:45:23Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -103,7 +103,6 @@ my $online_tests = 2;			##  2 = non-fatal, 1 = on, 0 = off  ##
 
 my @options = (
 	'online-tests!'		 => \$online_tests,
-	'noonline-tests'	 => sub { $online_tests = 0; },
 	'non-fatal-online-tests' => sub { $online_tests = 2; },
 	'IPv6-tests!'		 => \$IPv6_tests,
 	'help!'			 => \$help
@@ -305,8 +304,7 @@ sub postamble {
 	return <<'END';
 test_cover :
 	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
-	cover
+	cover -test
 END
 }
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1980 2024-06-02 10:16:33Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -546,12 +546,13 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $tsig = Net::DNS::RR::TSIG->create( $keyfile );
+	use Net::DNS;
+	$tsig = Net::DNS::RR::TSIG->create( $keyfile );
 
-    $tsig = Net::DNS::RR::TSIG->create( $keyfile,
-					fudge => 300
-					);
+	$tsig = Net::DNS::RR::TSIG->create(
+				$keyfile,
+				fudge => 300
+				);
 
 =head1 DESCRIPTION
 
@@ -569,42 +570,42 @@ other unpredictable behaviour.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
 A domain name which specifies the name of the algorithm.
 
 =head2 key
 
-    $rr->key( $key );
+	$rr->key( $key );
 
 Base64 representation of the key material.
 
 =head2 keybin
 
-    $rr->keybin( $keybin );
+	$rr->keybin( $keybin );
 
 Binary representation of the key material.
 
 =head2 time_signed
 
-    $time_signed = $rr->time_signed;
-    $rr->time_signed( $time_signed );
+	$time_signed = $rr->time_signed;
+	$rr->time_signed( $time_signed );
 
 Signing time as the number of seconds since 1 Jan 1970 00:00:00 UTC.
 The default signing time is the current time.
 
 =head2 fudge
 
-    $fudge = $rr->fudge;
-    $rr->fudge( $fudge );
+	$fudge = $rr->fudge;
+	$rr->fudge( $fudge );
 
 "fudge" represents the permitted error in the signing time.
 The default fudge is 300 seconds.
 
 =head2 mac
 
-    $rr->mac( $mac );
+	$rr->mac( $mac );
 
 Message authentication code (MAC).
 The programmer must call the Net::DNS::Packet data()
@@ -612,43 +613,43 @@ object method before this will return anything meaningful.
 
 =head2 macbin
 
-    $macbin = $rr->macbin;
-    $rr->macbin( $macbin );
+	$macbin = $rr->macbin;
+	$rr->macbin( $macbin );
 
 Binary message authentication code (MAC).
 
 =head2 prior_mac
 
-    $prior_mac = $rr->prior_mac;
-    $rr->prior_mac( $prior_mac );
+	$prior_mac = $rr->prior_mac;
+	$rr->prior_mac( $prior_mac );
 
 Prior message authentication code (MAC).
 
 =head2 prior_macbin
 
-    $prior_macbin = $rr->prior_macbin;
-    $rr->prior_macbin( $prior_macbin );
+	$prior_macbin = $rr->prior_macbin;
+	$rr->prior_macbin( $prior_macbin );
 
 Binary prior message authentication code.
 
 =head2 request_mac
 
-    $request_mac = $rr->request_mac;
-    $rr->request_mac( $request_mac );
+	$request_mac = $rr->request_mac;
+	$rr->request_mac( $request_mac );
 
 Request message authentication code (MAC).
 
 =head2 request_macbin
 
-    $request_macbin = $rr->request_macbin;
-    $rr->request_macbin( $request_macbin );
+	$request_macbin = $rr->request_macbin;
+	$rr->request_macbin( $request_macbin );
 
 Binary request message authentication code.
 
 =head2 original_id
 
-    $original_id = $rr->original_id;
-    $rr->original_id( $original_id );
+	$original_id = $rr->original_id;
+	$rr->original_id( $original_id );
 
 The message ID from the header of the original packet.
 
@@ -656,7 +657,7 @@ The message ID from the header of the original packet.
 
 =head2 vrfyerrstr
 
-     $rcode = $tsig->error;
+	$rcode = $tsig->error;
 
 Returns the RCODE covering TSIG processing.  Common values are
 NOERROR, BADSIG, BADKEY, and BADTIME.  See RFC8945 for details.
@@ -664,7 +665,7 @@ NOERROR, BADSIG, BADKEY, and BADTIME.  See RFC8945 for details.
 
 =head2 other
 
-     $other = $tsig->other;
+	$other = $tsig->other;
 
 This field should be empty unless the error is BADTIME, in which
 case it will contain the server time as the number of seconds since
@@ -672,15 +673,15 @@ case it will contain the server time as the number of seconds since
 
 =head2 sig_function
 
-    sub signing_function {
-	my ( $keybin, $data ) = @_;
+	sub signing_function {
+		my ( $keybin, $data ) = @_;
 
-	my $hmac = Digest::HMAC->new( $keybin, 'Digest::MD5' );
-	$hmac->add( $data );
-	return $hmac->digest;
-    }
+		my $hmac = Digest::HMAC->new( $keybin, 'Digest::MD5' );
+		hmac->add( $data );
+		return $hmac->digest;
+	}
 
-    $tsig->sig_function( \&signing_function );
+	$tsig->sig_function( \&signing_function );
 
 This sets the signing function to be used for this TSIG record.
 The default signing function is HMAC-MD5.
@@ -688,7 +689,7 @@ The default signing function is HMAC-MD5.
 
 =head2 sig_data
 
-     $sigdata = $tsig->sig_data($packet);
+	$sigdata = $tsig->sig_data($packet);
 
 Returns the packet packed according to RFC8945 in a form for signing. This
 is only needed if you want to supply an external signing function, such as is
@@ -697,23 +698,24 @@ needed for TSIG-GSS.
 
 =head2 create
 
-    $tsig = Net::DNS::RR::TSIG->create( $keyfile );
+	$tsig = Net::DNS::RR::TSIG->create( $keyfile );
 
-    $tsig = Net::DNS::RR::TSIG->create( $keyfile,
-					fudge => 300
-					);
+	$tsig = Net::DNS::RR::TSIG->create(
+				$keyfile,
+				fudge => 300
+				);
 
 Returns a TSIG RR constructed using the parameters in the specified
 key file, which is assumed to have been generated by tsig-keygen.
 
 =head2 verify
 
-    $verify = $tsig->verify( $data );
-    $verify = $tsig->verify( $packet );
+	$verify = $tsig->verify( $data );
+	$verify = $tsig->verify( $packet );
 
-    $verify = $tsig->verify( $reply,  $query );
+	$verify = $tsig->verify( $reply,  $query );
 
-    $verify = $tsig->verify( $packet, $prior );
+	$verify = $tsig->verify( $packet, $prior );
 
 The boolean verify method will return true if the hash over the
 packet data conforms to the data in the TSIG itself
@@ -721,7 +723,7 @@ packet data conforms to the data in the TSIG itself
 
 =head1 TSIG Keys
 
-The TSIG authentication mechanism employs shared secret keys
+The TSIG authentication mechanism employs a shared secret key
 to establish a trust relationship between two entities.
 
 It should be noted that it is possible for more than one key
@@ -730,7 +732,7 @@ to be in use simultaneously between any such pair of entities.
 TSIG keys are generated using the tsig-keygen utility
 distributed with ISC BIND:
 
-    tsig-keygen -a HMAC-SHA256 host1-host2.example.
+	tsig-keygen -a HMAC-SHA256 host1-host2.example.
 
 Other algorithms may be substituted for HMAC-SHA256 in the above example.
 
@@ -744,10 +746,10 @@ by forging the message authentication code (MAC).
 The generated key must be added to the /etc/named.conf configuration
 or a separate file introduced by the $INCLUDE directive:
 
-    key "host1-host2.example. {
-	algorithm hmac-sha256;
-	secret "Secret+known+only+by+participating+entities=";
-    };
+	key "host1-host2.example. {
+		algorithm hmac-sha256;
+		secret "Secret+known+only+by+participating+entities=";
+	};
 
 
 =head1 ACKNOWLEDGMENT
@@ -757,9 +759,8 @@ by Chris Turbeville.
 
 Support for external signing functions was added by Andrew Tridgell.
 
-TSIG verification, BIND keyfile handling and support for HMAC-SHA1,
-HMAC-SHA224, HMAC-SHA256, HMAC-SHA384 and HMAC-SHA512 functions was
-added by Dick Franks.
+Support for HMAC-SHA1, HMAC-SHA224, HMAC-SHA256, HMAC-SHA384,
+HMAC-SHA512 and BIND keyfile handling was added by Dick Franks.
 
 
 =head1 BUGS
@@ -807,5 +808,7 @@ L<perl> L<Net::DNS> L<Net::DNS::RR>
 L<RFC8945|https://iana.org/go/rfc8945>
 
 L<TSIG Algorithm Names|https://iana.org/assignments/tsig-algorithm-names>
+
+L<BIND Administrator Reference Manual|https://bind9.readthedocs.io/en/latest/>
 
 =cut

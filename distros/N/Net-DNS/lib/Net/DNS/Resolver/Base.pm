@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1996 2024-12-16 13:05:08Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 2011 2025-02-11 15:18:03Z willem $)[2];
 
 
 #
@@ -25,9 +25,10 @@ our $VERSION = (qw$Id: Base.pm 1996 2024-12-16 13:05:08Z willem $)[2];
 # [Revised March 2016, June 2018]
 
 
-use constant OS_SPEC => defined eval "require Net::DNS::Resolver::$^O";	## no critic
-use constant OS_CONF => join '::', 'Net::DNS::Resolver', OS_SPEC ? $^O : 'UNIX';
-use base OS_CONF;
+use constant OS_SPEC => "Net::DNS::Resolver::$^O";
+use constant OS_UNIX => "Net::DNS::Resolver::UNIX";
+use constant OS_CONF => grep eval "require $_", OS_SPEC, OS_UNIX;	## no critic
+use base (OS_CONF)[0];
 
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
@@ -94,8 +95,8 @@ use constant PACKETSZ => 512;
 		adflag		=> 0,	# see RFC6840, 5.7
 		cdflag		=> 0,	# see RFC6840, 5.9
 		udppacketsize	=> 0,	# value bounded below by PACKETSZ
-		force_v4	=> ( IPv6 ? 0 : 1 ),
-		force_v6	=> 0,	# only relevant if IPv6 is supported
+		force_v4	=> 0,
+		force_v6	=> 0,
 		prefer_v4	=> 0,
 		prefer_v6	=> 0,
 		},
@@ -320,25 +321,24 @@ sub nameservers {
 	if ( scalar(@ns) || !defined(wantarray) ) {
 		my @ipv4 = grep { _ipv4($_) } @ip;
 		my @ipv6 = grep { _ipv6($_) } @ip;
+		my @map4 = map	{"::FFFF:$_"} @ipv4;
 		$self->{nameservers} = \@ip;
 		$self->{nameserver4} = \@ipv4;
 		$self->{nameserver6} = \@ipv6;
+		$self->{mapped_IPv4} = \@map4;
 	}
 
-	my @ns4 = $self->{force_v6} ? () : @{$self->{nameserver4}};
-	my @ns6 = $self->{force_v4} ? () : @{$self->{nameserver6}};
+	my @IPv4 = @{$self->{nameserver4}};
+	my @IPv6 = IPv6 ? @{$self->{nameserver6}} : ();
 
-	my @nameservers = @{$self->{nameservers}};
-	@nameservers = ( @ns4, @ns6 ) if $self->{prefer_v4} || !scalar(@ns6);
-	@nameservers = ( @ns6, @ns4 ) if $self->{prefer_v6} || !scalar(@ns4);
+	my @IPlist = @IPv6 ? @{$self->{nameservers}} : @IPv4;
+	@IPlist = ( @IPv6, @IPv4 ) if $self->{prefer_v6};
+	@IPlist = ( @IPv4, @IPv6 ) if $self->{prefer_v4};
+	@IPlist = @IPv6 if $self->{force_v6};
+	@IPlist = @IPv4 if $self->{force_v4};
 
-	return @nameservers if scalar @nameservers;
-
-	my $error = 'no nameservers';
-	$error = 'IPv4 transport disabled' if scalar(@ns4) < scalar @{$self->{nameserver4}};
-	$error = 'IPv6 transport disabled' if scalar(@ns6) < scalar @{$self->{nameserver6}};
-	$self->errorstring($error);
-	return @nameservers;
+	$self->errorstring('no nameservers') unless @IPlist;
+	return @IPlist;
 }
 
 sub nameserver { return &nameservers; }
@@ -373,10 +373,9 @@ sub _reset_errorstring {
 }
 
 sub errorstring {
-	my $self = shift;
-	my $text = shift || return $self->{errorstring};
-	$self->_diag( 'errorstring:', $text );
-	return $self->{errorstring} = $text;
+	my ( $self, $text ) = @_;
+	$self->_diag( 'errorstring:', $self->{errorstring} = $text ) if $text;
+	return $self->{errorstring};
 }
 
 
@@ -446,23 +445,25 @@ sub _send_tcp {
 	foreach my $ip (@ns) {
 		$self->_diag( 'tcp send', "[$ip]" );
 
-		my $socket = $self->_create_tcp_socket($ip);
+		my $connection = $self->_create_tcp_socket($ip);
 		$self->errorstring($!);
-		my $select = IO::Select->new( $socket || next );
+		my $select = IO::Select->new( $connection || next );
 
-		$socket->send($tcp_packet);
+		$connection->send($tcp_packet);
 		$self->errorstring($!);
 
-		my ($peer) = $select->can_read($timeout);
-		next unless $peer;				# uncoverable branch true
-		my $buffer = _read_tcp($peer);
-		my $host   = $self->{replyfrom} = $peer->peerhost;
-		$self->_diag( 'packet from', "[$host]", length($buffer), 'octets' );
+		my @ready = $select->can_read($timeout);
+		next unless @ready;				# uncoverable branch true
+		my $socket = shift @ready;
+		my $buffer = _read_tcp($socket);
+
+		$self->{replyfrom} = $ip;
+		$self->_diag( 'packet from', "[$ip]", length($buffer), 'octets' );
 
 		my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 		$self->errorstring($@);
 		next unless $self->_accept_reply( $reply, $query );
-		$reply->from($host);
+		$reply->from( $socket->peerhost );
 
 		if ( $self->{tsig_rr} && !$reply->verify($query) ) {
 			$self->errorstring( $reply->verifyerr );
@@ -475,8 +476,8 @@ sub _send_tcp {
 		$fallback = $reply;
 	}
 
-	$self->{errorstring} = $fallback->header->rcode if $fallback;
-	$self->errorstring('query timed out') unless $self->{errorstring};
+	$self->errorstring( $fallback->header->rcode ) if $fallback;
+	$self->errorstring('query timed out') unless $self->errorstring;
 	return $fallback;
 }
 
@@ -521,17 +522,19 @@ NAMESERVER: foreach my $ns (@ns) {
 					if TESTS && Scalar::Util::tainted($sockaddr);
 
 			my $reply;
-			while ( my ($socket) = $select->can_read($timeout) ) {
+			while ( my @ready = $select->can_read($timeout) ) {
+				my $socket = shift @ready;
 				my $buffer = _read_udp($socket);
 
-				my $peer = $self->{replyfrom} = $socket->peerhost;
-				$self->_diag( "packet from [$peer]", length($buffer), 'octets' );
+				$self->{replyfrom} = $ip;
+				$self->_diag( 'packet from', "[$ip]", length($buffer), 'octets' );
 
 				my $packet = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 				$self->errorstring($@);
 				next unless $self->_accept_reply( $packet, $query );
+
+				$packet->from( $socket->peerhost );
 				$reply = $packet;
-				$reply->from($peer);
 				last;
 			}					#SELECT LOOP
 
@@ -553,8 +556,8 @@ NAMESERVER: foreach my $ns (@ns) {
 		$timeout += $timeout;
 	}							#RETRY LOOP
 
-	$self->{errorstring} = $fallback->header->rcode if $fallback;
-	$self->errorstring('query timed out') unless $self->{errorstring};
+	$self->errorstring( $fallback->header->rcode ) if $fallback;
+	$self->errorstring('query timed out') unless $self->errorstring;
 	return $fallback;
 }
 
@@ -677,14 +680,14 @@ sub _bgread {
 	my $dgram  = $handle->socktype() == SOCK_DGRAM;
 	my $buffer = $dgram ? _read_udp($handle) : _read_tcp($handle);
 
-	my $peer = $self->{replyfrom} = $handle->peerhost;
-	$self->_diag( "packet from [$peer]", length($buffer), 'octets' );
+	my $peerhost = $self->{replyfrom} = $handle->peerhost;
+	$self->_diag( "packet from [$peerhost]", length($buffer), 'octets' );
 
 	my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 	$self->errorstring($@);
 
 	return unless $self->_accept_reply( $reply, $query );
-	$reply->from($peer);
+	$reply->from($peerhost);
 
 	return $reply unless $self->{tsig_rr} && !$reply->verify($query);
 	$self->errorstring( $reply->verifyerr );
@@ -871,17 +874,18 @@ sub _create_tcp_socket {
 
 	my $ip6_addr = IPv6 && _ipv6($ip);
 	$socket = IO::Socket::IP->new(
-		LocalAddr => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
-		LocalPort => $self->{srcport},
-		PeerAddr  => $ip,
-		PeerPort  => $self->{port},
-		Proto	  => 'tcp',
-		Timeout	  => $self->{tcp_timeout},
+		LocalAddr	 => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
+		LocalPort	 => $self->{srcport},
+		PeerAddr	 => $ip,
+		PeerPort	 => $self->{port},
+		Proto		 => 'tcp',
+		Timeout		 => $self->{tcp_timeout},
+		GetAddrInfoFlags => AI_NUMERICHOST,
 		@sockopt
 		)
 			if USE_SOCKET_IP;
 
-	unless (USE_SOCKET_IP) {
+	unless ( USE_SOCKET_IP or $ip6_addr ) {
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,
@@ -890,8 +894,7 @@ sub _create_tcp_socket {
 			Proto	  => 'tcp',
 			Timeout	  => $self->{tcp_timeout},
 			@sockopt
-			)
-				unless $ip6_addr;
+			);
 	}
 
 	$self->{persistent}{$sock_key} = $socket if $self->{persistent_tcp};
@@ -908,23 +911,23 @@ sub _create_udp_socket {
 
 	my $ip6_addr = IPv6 && _ipv6($ip);
 	$socket = IO::Socket::IP->new(
-		LocalAddr => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
-		LocalPort => $self->{srcport},
-		Proto	  => 'udp',
-		Type	  => SOCK_DGRAM,
+		LocalAddr	 => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
+		LocalPort	 => $self->{srcport},
+		Proto		 => 'udp',
+		Type		 => SOCK_DGRAM,
+		GetAddrInfoFlags => AI_NUMERICHOST,
 		@sockopt
 		)
 			if USE_SOCKET_IP;
 
-	unless (USE_SOCKET_IP) {
+	unless ( USE_SOCKET_IP or $ip6_addr ) {
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,
 			Proto	  => 'udp',
 			Type	  => SOCK_DGRAM,
 			@sockopt
-			)
-				unless $ip6_addr;
+			);
 	}
 
 	$self->{persistent}{$sock_key} = $socket if $self->{persistent_udp};
@@ -1047,9 +1050,9 @@ sub srcaddr {
 
 sub tsig {
 	my ( $self, $arg, @etc ) = @_;
+	return $arg unless $arg;
+	return $arg if ref($arg) eq 'Net::DNS::RR::TSIG';
 	$self->{tsig_rr} = eval {
-		return $arg unless $arg;
-		return $arg if ref($arg) eq 'Net::DNS::RR::TSIG';
 		local $SIG{__DIE__};
 		require Net::DNS::RR::TSIG;
 		Net::DNS::RR::TSIG->create( $arg, @etc );
@@ -1103,7 +1106,7 @@ sub _diag {				## debug output
 		foreach ( grep { $_->can('address') } @glue ) {
 			push @{$glue{lc $_->name}}, $_->address;
 		}
-		map {@$_} values %glue;
+		return map {@$_} values %glue;
 	};
 
 	my @ip;
@@ -1147,7 +1150,7 @@ Net::DNS::Resolver::Base - DNS resolver base class
 
 =head1 SYNOPSIS
 
-    use base qw(Net::DNS::Resolver::Base);
+	use base qw(Net::DNS::Resolver::Base);
 
 =head1 DESCRIPTION
 

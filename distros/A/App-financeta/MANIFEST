@@ -24,6 +24,8 @@ share/chart-line-solid.png
 share/chart.tt
 share/icon.gif
 share/spinner.svg
+share/testpdl.pl
+share/testpdljs.pl
 t/00_use.t
 t/01_lang.t
 t/02_exec.t

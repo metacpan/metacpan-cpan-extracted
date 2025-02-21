@@ -50,7 +50,7 @@ cmp_result(
   'evaluated against an empty schema',
 );
 
-cmp_deeply(
+cmp_result(
   $js->evaluate(1, 'https://my_schema')->TO_JSON,
   my $result = {
     valid => true,
@@ -66,7 +66,7 @@ cmp_deeply(
   'evaluate data against schema with custom dialect; format and unknown keywords are collected as annotations',
 );
 
-cmp_deeply(
+cmp_result(
   $js->evaluate('foo', 'https://my_schema')->TO_JSON,
   $result,
   'evaluate data against schema with custom dialect; format-annotation is used',
@@ -102,14 +102,17 @@ cmp_deeply(
   'thawed object contains all the right keys',
 );
 
+$frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($js);
+Sereal::Decoder->new->decode($frozen, $thawed);
+
 cmp_result(
   $thawed->evaluate($schema, {})->TO_JSON,
   { valid => true },
   'evaluate again against an empty schema',
 );
 
-cmp_deeply(
-  $js->evaluate('hi', 'https://my_schema')->TO_JSON,
+cmp_result(
+  $thawed->evaluate('hi', 'https://my_schema')->TO_JSON,
   {
     valid => true,
     annotations => [

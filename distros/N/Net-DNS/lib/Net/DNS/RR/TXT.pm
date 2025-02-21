@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -82,21 +82,23 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new( 'name TXT	txtdata ...' );
+	use Net::DNS;
+	$rr = Net::DNS::RR->new( 'name TXT	txtdata ...' );
 
-    $rr = Net::DNS::RR->new( name    => 'name',
-			     type    => 'TXT',
-			     txtdata => 'single text string'
-			     );
+	$rr = Net::DNS::RR->new(
+			name	=> 'name',
+			type	=> 'TXT',
+			txtdata => 'single text string'
+			);
 
-    $rr = Net::DNS::RR->new( name    => 'name',
-			     type    => 'TXT',
-			     txtdata => [ 'multiple', 'strings', ... ]
-			     );
+	$rr = Net::DNS::RR->new(
+			name	=> 'name',
+			type	=> 'TXT',
+			txtdata => [ 'multiple', 'strings', ... ]
+			);
 
-    use utf8;
-    $rr = Net::DNS::RR->new( 'jp TXT	古池や　蛙飛込む　水の音' );
+	use utf8;
+	$rr = Net::DNS::RR->new( 'jp TXT	古池や　蛙飛込む　水の音' );
 
 =head1 DESCRIPTION
 
@@ -114,10 +116,10 @@ other unpredictable behaviour.
 
 =head2 txtdata
 
-    $string = $rr->txtdata;
-    @list   = $rr->txtdata;
+	$string = $rr->txtdata;
+	@list	= $rr->txtdata;
 
-    $rr->txtdata( @list );
+	$rr->txtdata( @list );
 
 When invoked in scalar context, txtdata() returns a concatenation
 of the descriptive text elements each separated by a single space

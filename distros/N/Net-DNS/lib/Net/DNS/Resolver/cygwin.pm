@@ -2,7 +2,7 @@ package Net::DNS::Resolver::cygwin;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: cygwin.pm 1981 2024-06-17 13:22:14Z willem $)[2];
+our $VERSION = (qw$Id: cygwin.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -137,7 +137,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Resolver;
+	use Net::DNS::Resolver;
 
 =head1 DESCRIPTION
 

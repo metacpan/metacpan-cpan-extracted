@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
@@ -86,8 +86,18 @@ sub _build_main {
 
 sub _create_label {
     my ($self, $mw, $grosspnl) = @_;
+    my $is_dark_mode = 0;
+    if ($mw->backColor ne cl::White) {
+        $log->debug("TradeReport window is in dark mode\n");
+        $is_dark_mode = 1;
+    }
     my $txt = sprintf "Net Income: \$%0.02f", $grosspnl;
-    my $color = ($grosspnl > 0) ? cl::Blue : cl::Red;
+    my $color;
+    if ($is_dark_mode) {
+        $color = ($grosspnl > 0) ? cl::LightGreen : cl::Magenta;
+    } else {
+        $color = ($grosspnl > 0) ? cl::Blue : cl::Red;
+    }
     my @sz = $mw->size;
     return $mw->insert('Label',
         name => 'tradereport_label',
@@ -236,7 +246,7 @@ sub save {
 
 1;
 __END__
-### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 29th Sept 2014
 ### LICENSE: Refer LICENSE file

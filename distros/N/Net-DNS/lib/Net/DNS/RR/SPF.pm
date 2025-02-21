@@ -2,7 +2,7 @@ package Net::DNS::RR::SPF;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SPF.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: SPF.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR::TXT);
 
@@ -31,18 +31,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name SPF spfdata ...');
-
-    $rr = Net::DNS::RR->new( name    => 'name',
-			    type    => 'SPF',
-			    spfdata => 'single text string'
-			    );
-
-    $rr = Net::DNS::RR->new( name    => 'name',
-			    type    => 'SPF',
-			    spfdata => [ 'multiple', 'strings', ... ]
-			    );
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SPF spfdata ...');
 
 =head1 DESCRIPTION
 
@@ -65,10 +55,10 @@ other unpredictable behaviour.
 
 =head2 txtdata
 
-    $string = $rr->spfdata;
-    @list   = $rr->spfdata;
+	$string = $rr->spfdata;
+	@list	= $rr->spfdata;
 
-    $rr->spfdata( @list );
+	$rr->spfdata( @list );
 
 When invoked in scalar context, spfdata() returns the policy text as
 a single string, with text elements concatenated without intervening
@@ -109,6 +99,6 @@ DEALINGS IN THE SOFTWARE.
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
 L<Net::DNS::RR::TXT>
-L<RFC7208|https://tools.ietf.org/html/rfc7208>
+L<RFC7208|https://iana.org/go/rfc7208>
 
 =cut

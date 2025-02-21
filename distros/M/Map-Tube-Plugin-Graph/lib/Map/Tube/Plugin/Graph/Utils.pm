@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.46';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.48';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 =cut
 
@@ -84,8 +84,11 @@ sub graph_line_image {
     my %line = map +($_=>undef), @line_v;
     my %neighbour = map +($_=>undef), $g->neighbours_by_radius(@line_v, 1);
     $g->filter_vertices(sub { exists $line{$_[1]} || exists $neighbour{$_[1]} });
-    $g->set_vertex_attribute($_, graphviz=>{color => $color, fontcolor => $color})
-      for @line_v;
+    for my $v(@line_v) {
+        my $attrs = $g->get_vertex_attributes($v) // { };
+        $attrs->{graphviz}{color} = $attrs->{graphviz}{fontcolor} = $color;
+        $g->set_vertex_attribute($v, graphviz=>$attrs->{graphviz});
+    }
     my %seen;
     $g->filter_edges(sub {
       return 0 if exists $neighbour{$_[1]}; # zap if from is neighbour

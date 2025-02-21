@@ -7,7 +7,7 @@ use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
 use Log::Any::Adapter 'Stderr';
 use App::financeta::gui;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 
 sub print_banner {
@@ -56,14 +56,14 @@ sub run {
         log_level => $log_level,
         debug => $opts{debug},
         brand => __PACKAGE__,
-        plot_engine => $opts{plot_engine} // 'gnuplot',
+        plot_engine => $opts{plot_engine} // 'highcharts',
     );
     return $gui->run;
 }
 
 1;
 __END__
-### COPYRIGHT: 2013-2023 Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025 Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 15th Aug 2014
 ### LICENSE: Refer LICENSE file
@@ -79,7 +79,7 @@ as an application. It handles command line processing of C<financeta>.
 
 =head1 VERSION
 
-0.15
+0.16
 
 DESCRIPTION
 
@@ -144,7 +144,7 @@ It may or may not work here.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+Copyright (C) 2013-2025. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
 
 =head1 LICENSE
 

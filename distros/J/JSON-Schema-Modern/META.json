@@ -33,7 +33,6 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Dist::CheckConflicts" : "0.02",
             "Module::Build::Tiny" : "0.034",
             "perl" : "5.020"
          }
@@ -78,7 +77,6 @@
             "Carp" : "0",
             "Cpanel::JSON::XS" : "4.38",
             "Digest::MD5" : "0",
-            "Dist::CheckConflicts" : "0.02",
             "Exporter" : "0",
             "Feature::Compat::Try" : "0",
             "File::ShareDir" : "0",
@@ -242,67 +240,67 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::ResultNode" : {
          "file" : "lib/JSON/Schema/Modern/ResultNode.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       }
    },
    "release_status" : "stable",
@@ -317,7 +315,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.601",
+   "version" : "0.602",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041007"
@@ -973,7 +971,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20241220"
+                  "Module::CoreList" : "5.20250120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1191,7 +1189,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.601",
+                  "tag" : "v0.602",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1492,11 +1490,10 @@
    "x_authority" : "cpan:ETHER",
    "x_breaks" : {
       "JSON::Schema::Modern::Document::OpenAPI" : "< 0.079",
-      "JSON::Schema::Modern::Vocabulary::OpenAPI" : "< 0.017",
+      "JSON::Schema::Modern::Vocabulary::OpenAPI" : "< 0.080",
       "Mojolicious::Plugin::OpenAPI::Modern" : "< 0.014",
       "OpenAPI::Modern" : "< 0.077",
-      "Test::Mojo::Role::OpenAPI::Modern" : "< 0.007",
-      "builtin::Backport" : "<= 0.02"
+      "Test::Mojo::Role::OpenAPI::Modern" : "< 0.007"
    },
    "x_generated_by_perl" : "v5.41.7",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",

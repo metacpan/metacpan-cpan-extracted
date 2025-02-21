@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 
 =head1 NAME
@@ -12,15 +12,15 @@ Net::DNS::RR - DNS resource record base class
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
+	use Net::DNS;
 
-    $rr = Net::DNS::RR->new('example.com IN AAAA 2001:DB8::1');
+	$rr = Net::DNS::RR->new('example.com IN AAAA 2001:DB8::1');
 
-    $rr = Net::DNS::RR->new(
-	    owner   => 'example.com',
-	    type    => 'AAAA',
-	    address => '2001:DB8::1'
-	    );
+	$rr = Net::DNS::RR->new(
+			owner	=> 'example.com',
+			type	=> 'AAAA',
+			address => '2001:DB8::1'
+			);
 
 
 =head1 DESCRIPTION
@@ -64,10 +64,10 @@ sub new {
 
 =head2 new (from string)
 
-    $aaaa  = Net::DNS::RR->new('host.example.com. 86400 AAAA 2001:DB8::1');
-    $mx	   = Net::DNS::RR->new('example.com. 7200 MX 10 mailhost.example.com.');
-    $cname = Net::DNS::RR->new('www.example.com 300 IN CNAME host.example.com');
-    $txt   = Net::DNS::RR->new('txt.example.com 3600 HS TXT "text data"');
+	$aaaa	= Net::DNS::RR->new('host.example.com. 86400 AAAA 2001:DB8::1');
+	$mx	= Net::DNS::RR->new('example.com. 7200 MX 10 mailhost.example.com.');
+	$cname	= Net::DNS::RR->new('www.example.com 300 IN CNAME host.example.com');
+	$txt	= Net::DNS::RR->new('txt.example.com 3600 HS TXT "text data"');
 
 Returns an object of the appropriate RR type, or a L<Net::DNS::RR> object
 if the type is not implemented. The attribute values are extracted from the
@@ -143,21 +143,21 @@ sub _new_string {
 
 =head2 new (from hash)
 
-    $rr = Net::DNS::RR->new(%hash);
+	$rr = Net::DNS::RR->new(%hash);
 
-    $rr = Net::DNS::RR->new(
-	    owner   => 'host.example.com',
-	    ttl	    => 86400,
-	    class   => 'IN',
-	    type    => 'AAAA',
-	    address => '2001:DB8::1'
-	    );
- 
-    $rr = Net::DNS::RR->new(
-	    owner   => 'txt.example.com',
-	    type    => 'TXT',
-	    txtdata => [ 'one', 'two' ]
-	    );
+	$rr = Net::DNS::RR->new(
+			owner	=> 'host.example.com',
+			ttl	=> 86400,
+			class	=> 'IN',
+			type	=> 'AAAA',
+			address => '2001:DB8::1'
+			);
+	
+	$rr = Net::DNS::RR->new(
+			owner	=> 'txt.example.com',
+			type	=> 'TXT',
+			txtdata => [ 'one', 'two' ]
+			);
 
 Returns an object of the appropriate RR type, or a L<Net::DNS::RR> object
 if the type is not implemented. Consult the relevant manual pages for the
@@ -200,7 +200,7 @@ sub _new_hash {
 
 =head2 decode
 
-    ( $rr, $next ) = Net::DNS::RR->decode( \$data, $offset, @opaque );
+	( $rr, $next ) = Net::DNS::RR->decode( \$data, $offset, @opaque );
 
 Decodes a DNS resource record at the specified location within a
 DNS packet.
@@ -246,7 +246,7 @@ sub decode {
 
 =head2 encode
 
-    $data = $rr->encode( $offset, @opaque );
+	$data = $rr->encode( $offset, @opaque );
 
 Returns the C<Net::DNS::RR> in binary format suitable for inclusion
 in a DNS packet buffer.
@@ -272,14 +272,14 @@ sub encode {
 
 =head2 canonical
 
-    $data = $rr->canonical;
+	$data = $rr->canonical;
 
 Returns the C<Net::DNS::RR> in canonical binary format suitable for
 DNSSEC signature validation.
 
 The absence of the associative array argument signals to subordinate
-encoders that the canonical uncompressed lower case form of embedded
-domain names is to be used.
+encoders that the canonical uncompressed form of embedded domain
+names is to be used.
 
 =cut
 
@@ -295,7 +295,7 @@ sub canonical {
 
 =head2 print
 
-    $rr->print;
+	$rr->print;
 
 Prints the resource record to the currently selected output filehandle.
 Calls the string method to get the formatted RR representation.
@@ -310,7 +310,7 @@ sub print {
 
 =head2 string
 
-    print $rr->string, "\n";
+	print $rr->string, "\n";
 
 Returns a string representation of the RR using the master file format
 mandated by RFC1035.
@@ -344,7 +344,7 @@ sub string {
 
 =head2 plain
 
-    $plain = $rr->plain;
+	$plain = $rr->plain;
 
 Returns a simplified single-line representation of the RR.
 This facilitates interaction with programs like nsupdate
@@ -359,7 +359,7 @@ sub plain {
 
 =head2 token
 
-    @token = $rr->token;
+	@token = $rr->token;
 
 Returns a token list representation of the RR zone file string.
 
@@ -384,7 +384,7 @@ sub token {
 
 =head2 generic
 
-    $generic = $rr->generic;
+	$generic = $rr->generic;
 
 Returns the generic RR representation defined in RFC3597. This facilitates
 creation of zone files containing RRs unrecognised by outdated nameservers
@@ -408,7 +408,7 @@ sub generic {
 
 =head2 owner name
 
-    $name = $rr->owner;
+	$name = $rr->owner;
 
 Returns the owner name of the record.
 
@@ -425,7 +425,7 @@ sub name { return &owner; }		## historical
 
 =head2 type
 
-    $type = $rr->type;
+	$type = $rr->type;
 
 Returns the record type.
 
@@ -440,7 +440,7 @@ sub type {
 
 =head2 class
 
-    $class = $rr->class;
+	$class = $rr->class;
 
 Resource record class.
 
@@ -455,8 +455,8 @@ sub class {
 
 =head2 ttl
 
-    $ttl = $rr->ttl;
-    $ttl = $rr->ttl(3600);
+	$ttl = $rr->ttl;
+	$ttl = $rr->ttl(3600);
 
 Resource record time to live in seconds.
 
@@ -536,7 +536,7 @@ sub rdatastr {				## historical RR subtype method
 
 =head2 rdata
 
-    $rr = Net::DNS::RR->new( type => NULL, rdata => 'arbitrary' );
+	$rr = Net::DNS::RR->new( type => NULL, rdata => 'arbitrary' );
 
 Resource record data section when viewed as opaque octets.
 
@@ -555,7 +555,7 @@ sub rdata {
 
 =head2 rdstring
 
-    $rdstring = $rr->rdstring;
+	$rdstring = $rr->rdstring;
 
 Returns a string representation of the RR-specific data.
 
@@ -574,7 +574,7 @@ sub rdstring {
 
 =head2 rdlength
 
-    $rdlength = $rr->rdlength;
+	$rdlength = $rr->rdlength;
 
 Returns the uncompressed length of the encoded RR-specific data.
 
@@ -596,13 +596,13 @@ comparator function used for a particular RR based on its attributes.
 
 =head2 set_rrsort_func
 
-    my $function = sub {	## numerically ascending order
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
-    };
+	my $function = sub {	## numerically ascending order
+		$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+		};
 
-    Net::DNS::RR::MX->set_rrsort_func( 'preference', $function );
+	Net::DNS::RR::MX->set_rrsort_func( 'preference', $function );
 
-    Net::DNS::RR::MX->set_rrsort_func( 'default_sort', $function );
+	Net::DNS::RR::MX->set_rrsort_func( 'default_sort', $function );
 
 set_rrsort_func() must be called as a class method. The first argument is
 the attribute name on which the sorting is to take place. If you specify
@@ -634,8 +634,8 @@ sub set_rrsort_func {
 
 =head2 get_rrsort_func
 
-    $function = Net::DNS::RR::MX->get_rrsort_func('preference');
-    $function = Net::DNS::RR::MX->get_rrsort_func();
+	$function = Net::DNS::RR::MX->get_rrsort_func('preference');
+	$function = Net::DNS::RR::MX->get_rrsort_func();
 
 get_rrsort_func() returns a reference to the comparator function.
 

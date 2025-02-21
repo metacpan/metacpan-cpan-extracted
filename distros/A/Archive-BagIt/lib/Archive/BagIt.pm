@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.096'; # VERSION
+our $VERSION = '0.098'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -311,14 +311,24 @@ sub _find_baginfo_idx {
 ###############################################
 
 
-sub verify_baginfo {
-    my ($self) = @_;
+sub _verify_baginfo {
+    my ($self, $info) = @_;
     my %keys;
-    my $info = $self->bag_info();
     my $ret = 1;
     if (defined $info) {
-        foreach my $entry (@{$self->bag_info()}) {
+        foreach my $entry (@{$info}) {
             my ($key, $value) = %{$entry};
+            my $res = _check_key($key); # check key
+            if ($res ne "") {
+                push @{$self->{errors}}, $res;
+                $ret = undef;
+            }
+            $res = _check_value($value); # check value
+            if ($res ne "") {
+                push @{$self->{errors}}, $res;
+                $ret = undef;
+            }
+            # code to prepare check of uniqueness
             if ($self->is_baginfo_key_reserved($key)) {
                 $keys{ lc $key }++;
             }
@@ -326,6 +336,7 @@ sub verify_baginfo {
                 $keys{ $key }++
             }
         }
+        # check for uniqueness
         foreach my $key (keys %keys) {
             if ($self->is_baginfo_key_reserved_as_uniq($key)) {
                 if ($keys{$key} > 1) {
@@ -334,19 +345,35 @@ sub verify_baginfo {
                 }
             }
         }
-    }
-    # check for payload oxum
-    my ($loaded_payloadoxum) = $self->get_baginfo_values_by_key('Payload-Oxum');
-    if (defined $loaded_payloadoxum) {
-        my ($octets, $streamcount) = $self->calc_payload_oxum();
-        if ("$octets.$streamcount" ne $loaded_payloadoxum) {
-            push @{$self->{errors}}, "Payload-Oxum differs, calculated $octets.$streamcount but $loaded_payloadoxum was expected by bag-info.txt";
-            $ret = undef;
+
+        # check for payload oxum
+        my ($loaded_payloadoxum) = $self->get_baginfo_values_by_key('Payload-Oxum');
+        if (defined $loaded_payloadoxum) {
+            my ($octets, $streamcount) = $self->calc_payload_oxum();
+            if ("$octets.$streamcount" ne $loaded_payloadoxum) {
+                push @{$self->{errors}}, "Payload-Oxum differs, calculated $octets.$streamcount but $loaded_payloadoxum was expected by bag-info.txt";
+                $ret = undef;
+            }
+        }
+        else {
+            push @{$self->{warnings}}, "Payload-Oxum was expected in bag-info.txt, but not found!"; # payload-oxum is recommended, but optional
         }
     } else {
-        push @{$self->{warnings}}, "Payload-Oxum was expected in bag-info.txt, but not found!"; # payload-oxum is recommended, but optional
+        if (exists $self->{bag_info_file}) {
+            push @{$self->{errors}}, "'bag-info.txt' exists, but is not (partially) parseable!";
+            $ret = undef;
+        }
     }
     return $ret;
+}
+
+sub verify_baginfo {
+    my ($self) = @_;
+    my $info = $self->bag_info();
+    if (List::Util::any { /the baginfo file .* could not be parsed correctly/ } @{$self->{'errors'}}) {
+        return;
+    }
+    return $self->_verify_baginfo($info);
 }
 
 ###############################################
@@ -383,18 +410,65 @@ sub _replace_baginfo_by_first_match {
 
 ###############################################
 
+sub _check_key {
+    my ($key) = @_;
+    if (!defined $key) {
+        return "key should match '[^\\r\\n:]+', but is not defined";
+    }
+    if ($key =~ m/[\r\n]/s) {
+        return "key should match '[^\\r\\n:]+', but contains newlines (key='$key')";
+    }
+    if ($key =~ m/:/) {
+        return "key should not contain a colon! (key='$key')";
+    }
+    if ($key =~ m/^$/) {
+        return "key should have a length > null (key='')";
+    }
+    return "";
+}
+
+###############################################
+
+sub _check_key_or_croak {
+    my ($key) = @_;
+    my $res = _check_key($key);
+    if ($res eq "") { return 1;}
+    croak $res;
+}
+
+###############################################
+
+sub _check_value {
+    my ($value) = @_;
+    if (!defined $value) { return "value should match '[^\\r\\n:]+', but is not defined"; }
+    if ($value =~ m/^$/s) { return "value should have a length > null (value='')"; }
+    return "";
+}
+
+###############################################
+
+sub _check_value_or_croak {
+    my ($value) = @_;
+    my $res = _check_value($value);
+    if ($res eq "") { return 1;}
+    croak $res;
+}
+
+###############################################
 
 sub append_baginfo_by_key {
     my ($self, $searchkey, $newvalue) = @_;
-    if (defined $searchkey) {
-        if (-1 < index($searchkey, ":")) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
-        if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
-            if (defined $self->get_baginfo_values_by_key($searchkey)) {
-                # hmm, search key is marked as uniq and still exists
-                return;
+    if (_check_key_or_croak($searchkey)) {
+        if (defined $newvalue) {
+            if (-1 < index($searchkey, ":")) {croak "key should not contain a colon! (searchkey='$searchkey')";}
+            if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
+                if (defined $self->get_baginfo_values_by_key($searchkey)) {
+                    # hmm, search key is marked as uniq and still exists
+                    return;
+                }
             }
+            push @{$self->{bag_info}}, { $searchkey => $newvalue };
         }
-        push @{$self->{bag_info}}, {$searchkey => $newvalue};
     }
     return 1;
 }
@@ -404,7 +478,7 @@ sub append_baginfo_by_key {
 
 sub add_or_replace_baginfo_by_key {
     my ($self, $searchkey, $newvalue) = @_;
-    if (defined $searchkey) {
+    if ( _check_key_or_croak($searchkey) ) {
         if (-1 < index($searchkey, ":")) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
         if (defined $self->{bag_info}) {
             my $idx = $self->_replace_baginfo_by_first_match( $searchkey, $newvalue);
@@ -682,6 +756,54 @@ sub __sort_bag_info {
     return @sorted;
 }
 
+
+sub _extract_key_from_textblob {
+    my ($self, $textblob) = @_;
+    my $key;
+    my $rx_word = qr{[^: \t\r\n]+};# Hint: this word definition for bag-info.txt-keys differs from word definition of bag-info.txt-values!
+    my $rx_spc = qr{\s}; #qr{[\t ]};
+    if ($textblob =~ s/\A($rx_word)$rx_spc*:$rx_spc*//m) {
+        # label if starts with chars not colon or whitespace followed by zero or more spaces, a colon, zero or more spaces
+        if ($textblob eq "") {
+            push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '$textblob', empty value detected";
+            return ($1, undef);
+        }
+        $key = $1;
+    } else {
+        push @{$self->{errors}}, "the baginfo file '".$self->{bag_info_file}."' could not be parsed correctly, because following text blob not fullfill the match requirements for keys: '$textblob'";
+    }
+    return ($key, $textblob);
+}
+
+sub _extract_value_from_textblob {
+    my ($self, $textblob) = @_;
+    if ($textblob eq "") {
+        push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because value is empty";
+        return (undef, "");
+    }
+    my $value;
+    # Ex1:
+    # |bar
+    # | baz   --> one value: bar\n  baz\n  tss
+    # | tss
+    # Ex2:
+    # |bar    --> one value: bar
+    # |baz
+    # Ex3:
+    # |bar:baz -> one value: bar:baz
+    my $rx_word = qr{[^ \t\r\n]+}; # Hint: this word definition for bag-info.txt-values differs from word definition of bag-info.txt-keys!
+    my $rx_spc = qr{[\t ]+};
+    my $rx_word_spc_word = qr{($rx_word($rx_spc$rx_word)*)};
+    if ($textblob =~ s/\A($rx_word_spc_word([\r\n]$rx_spc$rx_word_spc_word)+)[\r\n]*//ms) {
+        $value = $1;
+    } elsif ($textblob =~ s/\A($rx_word_spc_word)[\r\n]*//s) {
+        $value = $1;
+    } else {
+        push @{$self->{errors}}, "the baginfo file '".$self->{bag_info_file}."' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '$textblob'";
+    }
+    return ($value, $textblob);
+}
+
 sub _parse_bag_info { # parses a bag-info textblob
     my ($self, $textblob) = @_;
     #    metadata elements are OPTIONAL and MAY be repeated.  Because "bag-
@@ -708,19 +830,20 @@ sub _parse_bag_info { # parses a bag-info textblob
     #    not form part of the label or value.
     # find all labels
     my @labels;
-    while ($textblob =~ s/^([^:\s]+)\s*:\s*//m) { # label if starts with chars not colon or whitespace followed by zero or more spaces, a colon, zero or more spaces
-        # label found
-        my $label = $1;
-        my $value='';
-        if ($textblob =~ s/(.+?)(?=^\S)//ms) {
-            # value if rest string starts with chars not \r and/or \n until a non-whitespace after \r\n
-            $value = chomp_portable($1);
-        } elsif ($textblob =~ s/(.*)//s) {
-            $value = chomp_portable($1);
+    while (1) {
+        last if ($textblob eq "");
+        my ($key, $value);
+        ($key, $textblob) = $self->_extract_key_from_textblob($textblob);
+        last unless (defined $key);
+        last unless (defined $textblob );
+        ($value, $textblob) = $self->_extract_value_from_textblob($textblob);
+        last unless (defined $value);
+        if (defined $key) {
+            my $entry = { $key => $value };
+            push @labels, $entry;
         }
-        if (defined $label) {
-            push @labels, { $label => $value };
-        }
+
+
     }
     # The RFC does not allow reordering:
     #my @sorted = __sort_bag_info(@labels);
@@ -740,6 +863,7 @@ sub _build_bag_info {
         }
         close($BAGINFO);
         my $lines = join("", @lines);
+        $self->{bag_info_file}=$file;
         return $self->_parse_bag_info($lines);
     }
     # bag-info.txt is optional
@@ -911,10 +1035,18 @@ sub create_baginfo {
     # The RFC does not allow reordering:
     my $metadata_path = $self->metadata_path();
     my $bag_info_path = File::Spec->catfile( $metadata_path, "bag-info.txt");
+    if (
+            (exists $self->{errors})
+            and ((scalar @{$self->{errors}}) > 0)
+    ) {
+        croak "Could not create baginfo, because current file $bag_info_path has parsing errors!";
+    }
     open(my $BAGINFO, ">:encoding(UTF-8)", $bag_info_path) or croak("Can't open $bag_info_path for writing: $!");
     foreach my $entry (@{ $self->bag_info() }) {
         my %tmp = %{ $entry };
         my ($key, $value) = %tmp;
+        _check_key_or_croak($key);
+        _check_value_or_croak($value);
         if (-1 < index($key,":")) { carp "key should not contain a colon! (searchkey='$key')"; }
         print($BAGINFO "$key: $value\n");
     }
@@ -992,7 +1124,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.096
+version 0.098
 
 =head1 NAME
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::CERT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CERT.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: CERT.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -180,8 +180,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN CERT certtype keytag algorithm cert');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN CERT certtype keytag algorithm cert');
 
 =head1 DESCRIPTION
 
@@ -199,20 +199,20 @@ other unpredictable behaviour.
 
 =head2 certtype
 
-    $certtype = $rr->certtype;
+	$certtype = $rr->certtype;
 
 Returns the certtype code for the certificate (in numeric form).
 
 =head2 keytag
 
-    $keytag = $rr->keytag;
-    $rr->keytag( $keytag );
+	$keytag = $rr->keytag;
+	$rr->keytag( $keytag );
 
 Returns the key tag for the public key in the certificate
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
+	$algorithm = $rr->algorithm;
 
 Returns the algorithm used by the certificate (in numeric form).
 
@@ -220,15 +220,15 @@ Returns the algorithm used by the certificate (in numeric form).
 
 =head2 certbin
 
-    $certbin = $rr->certbin;
-    $rr->certbin( $certbin );
+	$certbin = $rr->certbin;
+	$rr->certbin( $certbin );
 
 Binary representation of the certificate.
 
 =head2 cert
 
-    $cert = $rr->cert;
-    $rr->cert( $cert );
+	$cert = $rr->cert;
+	$rr->cert( $cert );
 
 Base64 representation of the certificate.
 

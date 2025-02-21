@@ -2,7 +2,7 @@ package Net::DNS::RR::SOA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SOA.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: SOA.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -161,8 +161,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name SOA mname rname 0 14400 3600 1814400 3600');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SOA mname rname 0 14400 3600 1814400 3600');
 
 =head1 DESCRIPTION
 
@@ -180,24 +180,24 @@ other unpredictable behaviour.
 
 =head2 mname
 
-    $mname = $rr->mname;
-    $rr->mname( $mname );
+	$mname = $rr->mname;
+	$rr->mname( $mname );
 
 The domain name of the name server that was the
 original or primary source of data for this zone.
 
 =head2 rname
 
-    $rname = $rr->rname;
-    $rr->rname( $rname );
+	$rname = $rr->rname;
+	$rr->rname( $rname );
 
 The mailbox which identifies the person responsible
 for maintaining this zone.
 
 =head2 serial
 
-    $serial = $rr->serial;
-    $serial = $rr->serial(value);
+	$serial = $rr->serial;
+	$serial = $rr->serial(value);
 
 Unsigned 32 bit version number of the original copy of the zone.
 Zone transfers preserve this value.
@@ -208,23 +208,23 @@ replacement value argument satisfies the ordering constraint.
 
 =head2 refresh
 
-    $refresh = $rr->refresh;
-    $rr->refresh( $refresh );
+	$refresh = $rr->refresh;
+	$rr->refresh( $refresh );
 
 A 32 bit time interval before the zone should be refreshed.
 
 =head2 retry
 
-    $retry = $rr->retry;
-    $rr->retry( $retry );
+	$retry = $rr->retry;
+	$rr->retry( $retry );
 
 A 32 bit time interval that should elapse before a
 failed refresh should be retried.
 
 =head2 expire
 
-    $expire = $rr->expire;
-    $rr->expire( $expire );
+	$expire = $rr->expire;
+	$rr->expire( $expire );
 
 A 32 bit time value that specifies the upper limit on
 the time interval that can elapse before the zone is no
@@ -232,8 +232,8 @@ longer authoritative.
 
 =head2 minimum
 
-    $minimum = $rr->minimum;
-    $rr->minimum( $minimum );
+	$minimum = $rr->minimum;
+	$rr->minimum( $minimum );
 
 The unsigned 32 bit minimum TTL field that should be
 exported with any RR from this zone.
@@ -245,7 +245,7 @@ widely used zone serial numbering policies.
 
 =head2 Strictly Sequential
 
-    $successor = $soa->serial( SEQUENTIAL );
+	$successor = $soa->serial( SEQUENTIAL );
 
 The existing serial number is incremented modulo 2**32 because the
 value returned by the auxiliary SEQUENTIAL() function can never
@@ -253,7 +253,7 @@ satisfy the serial number ordering constraint.
 
 =head2 Date Encoded
 
-    $successor = $soa->serial( YYYYMMDDxx );
+	$successor = $soa->serial( YYYYMMDDxx );
 
 The 32 bit value returned by the auxiliary YYYYMMDDxx() function will
 be used if it satisfies the ordering constraint, otherwise the serial
@@ -264,7 +264,7 @@ information to remain useful.
 
 =head2 Time Encoded
 
-    $successor = $soa->serial( UNIXTIME );
+	$successor = $soa->serial( UNIXTIME );
 
 The 32 bit value returned by the auxiliary UNIXTIME() function will
 used if it satisfies the ordering constraint, otherwise the existing

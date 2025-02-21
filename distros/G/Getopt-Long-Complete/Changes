@@ -1,3 +1,8 @@
+0.318   2025-02-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Move demo script from script/ to demoscript/.
+
+
 0.317   2023-02-21  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

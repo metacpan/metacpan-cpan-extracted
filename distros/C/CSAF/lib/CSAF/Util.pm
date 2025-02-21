@@ -36,7 +36,10 @@ my %LOG_LEVELS = (
     8 => 'TRACE',
 );
 
-sub Time::Piece::TO_JSON { shift->datetime }
+{
+    no warnings qw{ redefine };
+    sub Time::Piece::TO_JSON { shift->datetime }
+}
 
 sub schema_cache_path { catfile(resources_path(),  'cache') }
 sub tt_templates_path { catfile(resources_path(),  'template') }

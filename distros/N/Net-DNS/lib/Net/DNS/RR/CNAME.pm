@@ -2,7 +2,7 @@ package Net::DNS::RR::CNAME;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CNAME.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: CNAME.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -63,14 +63,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name CNAME cname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name CNAME cname');
 
-    $rr = Net::DNS::RR->new(
-	name  => 'alias.example.com',
-	type  => 'CNAME',
-	cname => 'example.com',
-	);
+	$rr = Net::DNS::RR->new(
+			name  => 'alias.example.com',
+			type  => 'CNAME',
+			cname => 'example.com',
+			);
 
 =head1 DESCRIPTION
 
@@ -88,8 +88,8 @@ other unpredictable behaviour.
 
 =head2 cname
 
-    $cname = $rr->cname;
-    $rr->cname( $cname );
+	$cname = $rr->cname;
+	$rr->cname( $cname );
 
 A domain name which specifies the canonical or primary name for
 the owner.  The owner name is an alias.

@@ -3,7 +3,7 @@ package Net::DNS::Question;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Question.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: Question.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,9 +12,9 @@ Net::DNS::Question - DNS question record
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Question;
+	use Net::DNS::Question;
 
-    $question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
+	$question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
 
 =head1 DESCRIPTION
 
@@ -36,12 +36,12 @@ use Net::DNS::DomainName;
 
 =head2 new
 
-    $question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
-    $question = Net::DNS::Question->new('example.com', 'A', 'IN');
-    $question = Net::DNS::Question->new('example.com');
+	$question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
+	$question = Net::DNS::Question->new('example.com', 'A', 'IN');
+	$question = Net::DNS::Question->new('example.com');
 
-    $question = Net::DNS::Question->new('2001::DB8::dead:beef', 'PTR', 'IN');
-    $question = Net::DNS::Question->new('2001::DB8::dead:beef');
+	$question = Net::DNS::Question->new('2001::DB8::dead:beef', 'PTR', 'IN');
+	$question = Net::DNS::Question->new('2001::DB8::dead:beef');
 
 Creates a question object from the domain, type, and class passed as
 arguments. One or both type and class arguments may be omitted and
@@ -86,9 +86,9 @@ sub new {
 
 =head2 decode
 
-    $question = Net::DNS::Question->decode(\$data, $offset);
+	$question = Net::DNS::Question->decode(\$data, $offset);
 
-    ($question, $offset) = Net::DNS::Question->decode(\$data, $offset);
+	($question, $offset) = Net::DNS::Question->decode(\$data, $offset);
 
 Decodes the question record at the specified location within a DNS
 wire-format packet.  The first argument is a reference to the buffer
@@ -122,7 +122,7 @@ sub decode {
 
 =head2 encode
 
-    $data = $question->encode( $offset, $hash );
+	$data = $question->encode( $offset, $hash );
 
 Returns the Net::DNS::Question in binary format suitable for
 inclusion in a DNS packet buffer.
@@ -141,7 +141,7 @@ sub encode {
 
 =head2 string
 
-    print "string = ", $question->string, "\n";
+	print "string = ", $question->string, "\n";
 
 Returns a string representation of the question record.
 
@@ -155,7 +155,7 @@ sub string {
 
 =head2 print
 
-    $object->print;
+	$object->print;
 
 Prints the record to the standard output.  Calls the string() method
 to get the string representation.
@@ -170,7 +170,7 @@ sub print {
 
 =head2 name
 
-    $name = $question->name;
+	$name = $question->name;
 
 Internationalised domain name corresponding to the qname attribute.
 
@@ -181,10 +181,10 @@ further queries.
 When required to communicate with humans, the 'proper' domain name
 should be extracted from a query or reply packet.
 
-    $query = Net::DNS::Packet->new( $example, 'SOA' );
-    $reply = $resolver->send($query) or die;
-    ($question) = $reply->question;
-    $name = $question->name;
+	$query = Net::DNS::Packet->new( $example, 'SOA' );
+	$reply = $resolver->send($query) or die;
+	($question) = $reply->question;
+	$name = $question->name;
 
 =cut
 
@@ -197,8 +197,8 @@ sub name {
 
 =head2 qname, zname
 
-    $qname = $question->qname;
-    $zname = $question->zname;
+	$qname = $question->qname;
+	$zname = $question->zname;
 
 Fully qualified domain name in the form required for a query
 transmitted to a nameserver.  In dynamic update packets, this
@@ -217,9 +217,9 @@ sub zname { return &qname; }
 
 =head2 qtype, ztype, type
 
-    $qtype = $question->type;
-    $qtype = $question->qtype;
-    $ztype = $question->ztype;
+	$qtype = $question->type;
+	$qtype = $question->qtype;
+	$ztype = $question->ztype;
 
 Returns the question type attribute.  In dynamic update packets,
 this attribute is known as ztype() and refers to the zone type.
@@ -238,9 +238,9 @@ sub ztype { return &type; }
 
 =head2 qclass, zclass, class
 
-    $qclass = $question->class;
-    $qclass = $question->qclass;
-    $zclass = $question->zclass;
+	$qclass = $question->class;
+	$qclass = $question->qclass;
+	$zclass = $question->zclass;
 
 Returns the question class attribute.  In dynamic update packets,
 this attribute is known as zclass() and refers to the zone class.

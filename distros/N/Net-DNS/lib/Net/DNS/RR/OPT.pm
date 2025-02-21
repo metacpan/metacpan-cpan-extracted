@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1998 2024-12-18 14:16:04Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 2005 2025-01-28 13:22:10Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -121,7 +121,7 @@ sub json {
 QQ
 	}
 
-	my $flags  = sprintf '%04x', $self->flags;
+	my $flags  = $self->flags;
 	my $rcode  = $self->rcode;
 	my $size   = $self->udpsize;
 	my @format = map { join( "\n\t\t\t", $self->_format_option($_) ) } $self->options;
@@ -130,7 +130,7 @@ QQ
 
 	return <<"QQ";
  {	"EDNS-VERSION":	$version,
-	"FLAGS":	"$flags",
+	"FLAGS":	$flags,
 	"RCODE":	$rcode,
 	"UDPSIZE":	$size,
 	"OPTIONS":	[@indent@option ]
@@ -504,23 +504,23 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    my $packet = Net::DNS::Packet->new( ... );
+	use Net::DNS;
+	my $packet = Net::DNS::Packet->new( ... );
 
-    $packet->header->do(1);		# extended header flag 
+	$packet->header->do(1);		# extended header flag 
 
-    $packet->edns->UDPsize(1232);	# UDP payload size
+	$packet->edns->UDPsize(1232);	# UDP payload size
 
-    $packet->edns->option( 'NSID'	=> {'OPTION-DATA' => 'rawbytes'} );
-    $packet->edns->option( 'DAU'	=> [8, 10, 13, 14, 15, 16] );
-    $packet->edns->option( 'TCP-KEEPALIVE'  => 200 );
-    $packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123} );
-    $packet->edns->option( '65023'	=> {'BASE16' => '076578616d706c6500'} );
+	$packet->edns->option( 'NSID' => {'OPTION-DATA' => 'rawbytes'} );
+	$packet->edns->option( 'DAU'  => [8, 10, 13, 14, 15, 16] );
+	$packet->edns->option( 'TCP-KEEPALIVE' => 200 );
+	$packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123} );
+	$packet->edns->option( '65023' => {'BASE16' => '076578616d706c6500'} );
 
-    $packet->edns->print;
+	$packet->edns->print;
 
 	;; {	"EDNS-VERSION":	0,
-	;;	"FLAGS":	"8000",
+	;;	"FLAGS":	32768,
 	;;	"RCODE":	0,
 	;;	"UDPSIZE":	1232,
 	;;	"OPTIONS":	[
@@ -568,7 +568,7 @@ reassembled in the network stack of the originating host.
 
 =head2 rcode
 
-	$extended_rcode	  = $packet->header->rcode;
+	$extended_rcode = $packet->header->rcode;
 
 The 12 bit extended RCODE. The most significant 8 bits are obtained from
 the OPT record. The least significant 4 bits reside in the packet
@@ -626,8 +626,10 @@ option value:
 
 	$packet->edns->option( 'DAU' => [8, 10, 13, 14, 15, 16] );
 
-	$packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123,
-						    'EXTRA-TEXT' => ""} );
+	$packet->edns->option( 'EXTENDED-ERROR' => {
+					'INFO-CODE'  => 123,
+					'EXTRA-TEXT' => ""
+					} );
 
 
 =head1 COPYRIGHT

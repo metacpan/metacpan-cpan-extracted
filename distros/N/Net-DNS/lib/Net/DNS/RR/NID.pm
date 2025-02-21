@@ -2,7 +2,7 @@ package Net::DNS::RR::NID;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NID.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: NID.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -56,7 +56,7 @@ sub preference {
 sub nodeid {
 	my ( $self, $idnt ) = @_;
 	$self->{nodeid} = pack 'n4', map { hex($_) } split /:/, $idnt if defined $idnt;
-	return $self->{nodeid} ? sprintf( '%0.4x:%0.4x:%0.4x:%0.4x', unpack 'n4', $self->{nodeid} ) : undef;
+	return $self->{nodeid} ? join( ':', unpack 'H4H4H4H4', $self->{nodeid} ) : undef;
 }
 
 
@@ -75,15 +75,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN NID preference nodeid');
-
-    $rr = Net::DNS::RR->new(
-	name	   => 'example.com',
-	type	   => 'NID',
-	preference => 10,
-	nodeid	   => '8:800:200C:417A'
-	);
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN NID preference nodeid');
 
 =head1 DESCRIPTION
 
@@ -104,8 +97,8 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16 bit unsigned integer in network byte order that indicates the
 relative preference for this NID record among other NID records
@@ -114,7 +107,7 @@ higher values.
 
 =head2 nodeid
 
-    $nodeid = $rr->nodeid;
+	$nodeid = $rr->nodeid;
 
 The NodeID field is an unsigned 64-bit value in network byte order.
 The text representation uses the same syntax (i.e., groups of 4
@@ -153,6 +146,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC6742|https://tools.ietf.org/html/rfc6742>
+L<RFC6742|https://iana.org/go/rfc6742>
 
 =cut

@@ -37,9 +37,12 @@ Debian repository and are not covered by its quality assurance process.
 To install the latest release, run:
 
 ```
-wget https://lib.finalrewind.org/deb/libtravel-routing-de-dbris-perl_latest_all.deb
-sudo apt install ./libtravel-routing-de-dbris-perl_latest_all.deb
-rm libtravel-routing-de-dbris-perl_latest_all.deb
+wget https://lib.finalrewind.org/deb/libtravel-status-de-dbris-perl_latest_all.deb \
+     https://lib.finalrewind.org/deb/libtravel-routing-de-dbris-perl_latest_all.deb
+sudo apt install ./libtravel-status-de-dbris-perl_latest_all.deb \
+                 ./libtravel-routing-de-dbris-perl_latest_all.deb
+rm libtravel-status-de-dbris-perl_latest_all.deb \
+   libtravel-routing-de-dbris-perl_latest_all.deb
 ```
 
 Uninstallation works as usual:

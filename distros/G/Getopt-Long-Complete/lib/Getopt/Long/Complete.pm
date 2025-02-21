@@ -23,9 +23,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-21'; # DATE
+our $DATE = '2025-02-21'; # DATE
 our $DIST = 'Getopt-Long-Complete'; # DIST
-our $VERSION = '0.317'; # VERSION
+our $VERSION = '0.318'; # VERSION
 
 # we don't want to always load Getopt::Long to avoid startup overhead.
 our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2); # copied from Getopt::Long
@@ -149,7 +149,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.317 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2023-02-21.
+This document describes version 0.318 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2025-02-21.
 
 =head1 SYNOPSIS
 
@@ -407,7 +407,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

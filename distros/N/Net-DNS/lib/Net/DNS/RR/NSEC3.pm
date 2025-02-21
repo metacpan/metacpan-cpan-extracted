@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC3;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC3.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: NSEC3.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR::NSEC);
 
@@ -111,9 +111,8 @@ sub flags {
 
 sub optout {
 	my ( $self, @value ) = @_;
-	for ( $self->{flags} |= 0 ) {
-		if ( scalar @value ) {
-			$_ |= 0x01;
+	if ( scalar @value ) {
+		for ( $self->{flags} |= 0x01 ) {
 			$_ ^= 0x01 unless shift @value;
 		}
 	}
@@ -323,8 +322,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name NSEC3 algorithm flags iterations salt hnxtname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name NSEC3 algorithm flags iterations salt hnxtname');
 
 =head1 DESCRIPTION
 
@@ -351,19 +350,19 @@ other unpredictable behaviour.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
-The Hash Algorithm field is represented as an unsigned decimal
-integer.  The value has a maximum of 255.
+The 8-bit algorithm field is represented as an unsigned decimal integer,
+but may be specified using the algorithm mnemonic.
 
 algorithm() may also be invoked as a class method or simple function
 to perform mnemonic and numeric code translation.
 
 =head2 flags
 
-    $flags = $rr->flags;
-    $rr->flags( $flags );
+	$flags = $rr->flags;
+	$rr->flags( $flags );
 
 The Flags field is an unsigned decimal integer
 interpreted as eight concatenated Boolean values. 
@@ -372,11 +371,11 @@ interpreted as eight concatenated Boolean values.
 
 =item optout
 
- $rr->optout(1);
+	$rr->optout(1);
 
- if ( $rr->optout ) {
-	...
- }
+	if ( $rr->optout ) {
+		...
+	}
 
 Boolean Opt Out flag.
 
@@ -384,16 +383,16 @@ Boolean Opt Out flag.
 
 =head2 iterations
 
-    $iterations = $rr->iterations;
-    $rr->iterations( $iterations );
+	$iterations = $rr->iterations;
+	$rr->iterations( $iterations );
 
 The Iterations field is represented as an unsigned decimal
 integer.  The value is between 0 and 65535, inclusive. 
 
 =head2 salt
 
-    $salt = $rr->salt;
-    $rr->salt( $salt );
+	$salt = $rr->salt;
+	$rr->salt( $salt );
 
 The Salt field is represented as a contiguous sequence of hexadecimal
 digits. A "-" (unquoted) is used in string format to indicate that the
@@ -401,24 +400,24 @@ salt field is absent.
 
 =head2 saltbin
 
-    $saltbin = $rr->saltbin;
-    $rr->saltbin( $saltbin );
+	$saltbin = $rr->saltbin;
+	$rr->saltbin( $saltbin );
 
 The Salt field as a sequence of octets. 
 
 =head2 hnxtname
 
-    $hnxtname = $rr->hnxtname;
-    $rr->hnxtname( $hnxtname );
+	$hnxtname = $rr->hnxtname;
+	$rr->hnxtname( $hnxtname );
 
 The Next Hashed Owner Name field points to the next node that has
 authoritative data or contains a delegation point NS RRset.
 
 =head2 typelist
 
-    @typelist = $rr->typelist;
-    $typelist = $rr->typelist;
-    $rr->typelist( @typelist );
+	@typelist = $rr->typelist;
+	$typelist = $rr->typelist;
+	$rr->typelist( @typelist );
 
 typelist() identifies the RRset types that exist at the domain name
 matched by the NSEC3 RR.  When called in scalar context, the list is
@@ -426,21 +425,21 @@ interpolated into a string.
 
 =head2 typemap
 
-    $exists = $rr->typemap($rrtype);
+	$exists = $rr->typemap($rrtype);
 
 typemap() returns a Boolean true value if the specified RRtype occurs
 in the type bitmap of the NSEC3 record.
 
 =head2 match
 
-    $matched = $rr->match( 'example.foo' );
+	$matched = $rr->match( 'example.foo' );
 
 match() returns a Boolean true value if the hash of the domain name
 argument matches the hashed owner name of the NSEC3 RR.
 
 =head2 covers
 
-    $covered = $rr->covers( 'example.foo' );
+	$covered = $rr->covers( 'example.foo' );
 
 covers() returns a Boolean true value if the hash of the domain name
 argument, or ancestor of that name, falls between the owner name and
@@ -448,8 +447,8 @@ the next hashed owner name of the NSEC3 RR.
 
 =head2 encloser, nextcloser, wildcard
 
-    $encloser = $rr->encloser( 'example.foo' );
-    print "encloser: $encloser\n" if $encloser;
+	$encloser = $rr->encloser( 'example.foo' );
+	print "encloser: $encloser\n" if $encloser;
 
 encloser() returns the name of a provable encloser of the query name
 argument obtained from the NSEC3 RR.

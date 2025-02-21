@@ -80,6 +80,7 @@ lib/Net/DNS/RR/OPENPGPKEY.pm
 lib/Net/DNS/RR/OPT.pm
 lib/Net/DNS/RR/PTR.pm
 lib/Net/DNS/RR/PX.pm
+lib/Net/DNS/RR/RESINFO.pm
 lib/Net/DNS/RR/RP.pm
 lib/Net/DNS/RR/RRSIG.pm
 lib/Net/DNS/RR/RT.pm

@@ -2,7 +2,7 @@ package Net::DNS::Resolver::os2;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: os2.pm 1981 2024-06-17 13:22:14Z willem $)[2];
+our $VERSION = (qw$Id: os2.pm 2007 2025-02-08 16:45:23Z willem $)[2];
 
 
 =head1 NAME
@@ -14,11 +14,11 @@ Net::DNS::Resolver::os2 - OS2 resolver class
 
 my $config_file = 'resolv';
 my @config_path = ( $ENV{ETC} || '/etc' );
-my @config_file = grep { -f $_ && -r _ } map {"$_/$config_file"} @config_path;
+my @config_file = grep { -f $_ && -r $_ } map {"$_/$config_file"} @config_path;
 
 my $homedir = $ENV{HOME};
 my $dotfile = '.resolv.conf';
-my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
+my @dotfile = grep { -f $_ && -o $_ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
 
 
 sub _init {
@@ -41,7 +41,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Resolver;
+	use Net::DNS::Resolver;
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,87 @@
 ==================================================
-Changes from 2024-01-30 00:00:00 +0000 to present.
+Changes from 2024-02-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.096 at 2025-01-29 08:01:30 +0000
+version 0.098 at 2025-02-21 08:24:17 +0000
 ------------------------------------------
+
+  Change: 9f82ff81a3305692343d36ade4bff7dbe6e658b0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:21:12 +0000
+
+    - added tests 
+
+  Change: 43001e03c603c6339b1359a417c5a998f9c76def
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:20:36 +0000
+
+    - rewrite of _parse_baginfo() using _extract_key_from_textblob() and
+    _extract_value_from_textblob() 
+
+  Change: d6f656633fe299a8c04df140aeca5bf26234b6ea
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:19:47 +0000
+
+    - added tests for _extract_key_from_textblob() and
+    _extract_value_from_textblob() 
+
+  Change: 4c3233f2c7ab9f839775c84d1b70006af247d407
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:18:15 +0000
+
+    - added _extract_key_from_textblob() and
+    _extract_value_from_textblob() 
+
+  Change: 0c74a9201b31979e99db019a3e440965607ca586
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:16:51 +0000
+
+    - added _check_value_or_corak() 
+
+  Change: 58fdeb75acad682bed142caeff661367d6c7bd61
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-21 09:15:38 +0000
+
+    - fixed return code 
+
+------------------------------------------
+version 0.097 at 2025-02-20 12:36:56 +0000
+------------------------------------------
+
+  Change: f6984c23240eba63ae208cec972e7f31d446d80b
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2025-02-20 13:36:56 +0000
+
+    Released 0.097 
+
+  Change: 3206eccbf7fe122c1afc96318fd664d4d5fa2f76
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-20 13:34:35 +0000
+
+    - minor, renamed to private method 
+
+  Change: e01551190ef45f4eb8d5f3ed7904e75e22c731f4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-20 13:22:04 +0000
+
+    - bugfix, improve verify_baginfo() to check key and value problems 
+
+  Change: a66b1d0b6048efb515adf5d3a4f2d4cb4970df86
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-20 13:19:31 +0000
+
+    - add verify_baginfo() related tests 
+
+------------------------------------------
+version 0.096 at 2025-01-29 08:02:59 +0000
+------------------------------------------
+
+  Change: 4a7021fe3860b7ff1bd67f7bdb06bf37a2602f47
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2025-01-29 09:02:59 +0000
+
+    Released 0.096 
 
   Change: 679d662f6021a9f6fb78dcfd4e55aeebc3367400
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -52,5 +129,5 @@ version 0.096 at 2025-01-29 08:01:30 +0000
     - minor, improved string compare 
 
 =================================================
-Plus 44 releases after 2024-01-30 00:00:00 +0000.
+Plus 44 releases after 2024-02-22 00:00:00 +0000.
 =================================================

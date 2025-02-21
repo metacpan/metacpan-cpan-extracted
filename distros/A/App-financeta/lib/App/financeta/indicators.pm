@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
@@ -16,7 +16,7 @@ use JSON::XS qw(encode_json);
 
 $PDL::doubleformat = "%0.6lf";
 has debug => 0;
-has plot_engine => 'gnuplot';
+has plot_engine => 'highcharts';
 has color_idx => 0;
 has colors => [qw(
     red
@@ -177,6 +177,29 @@ sub _plot_highcharts_additional {
     my @plotinfo = $self->_plot_highcharts_general($xdata, $output);
     return { additional => \@plotinfo };
 }
+
+sub _plot_gnuplot_buysell {
+    my ($self, $xdata, $output) = @_;
+    my $ret = { general => undef, additional => undef };
+    my @bsg = ();
+    my @bsa = ();
+    foreach (@$output) {
+        if ($_->[0] =~ /Buy|Sell/i) {
+            push @bsg, $_;
+        } else {
+            push @bsa, $_;
+        }
+    }
+    $ret->{general} = $self->_plot_gnuplot_general($xdata, \@bsg) if @bsg;
+    $ret->{additional} = $self->_plot_gnuplot_general($xdata, \@bsa) if @bsa;
+    return $ret;
+}
+
+sub _plot_highcharts_buysell {
+    ## not required
+    return undef;
+}
+
 
 sub _plot_gnuplot_candlestick {
     my ($self, $xdata, $output) = @_;
@@ -2536,27 +2559,53 @@ sub get_plot_args($$$) {
 }
 
 has buysell => {
-    gnuplot => \&_plot_gnuplot_general,
-    ##NOT USED for HighCharts
-    highcharts => \&_plot_highcharts_general,
+    gnuplot => \&_plot_gnuplot_buysell,
+    ## DO NOT USE
+    highcharts => \&_plot_highcharts_buysell,
 };
 
 sub get_plot_args_buysell {
-    my ($self, $xdata, $buys, $sells) = @_;
+    my ($self, $xdata, $buys, $sells, $rtpnl) = @_;
     my $plotref = $self->buysell->{lc($self->plot_engine)};
     $log->warn("There is no plotting function available for buy-sell") unless ref $plotref eq 'CODE';
+    return undef unless ref $plotref eq 'CODE';
     my $output = [
         # plotting beautifier
         [ 'Buys', $buys->setbadif($buys == 0), { with => 'points', pointtype => 5, linecolor => 'green', }, 'buys' ],
         [ 'Sells', $sells->setbadif($sells == 0), { with => 'points', pointtype => 7, linecolor => 'red', }, 'sells' ],
     ];
+    if (ref $rtpnl eq 'PDL' and $self->plot_engine =~ /gnuplot/i) {
+        push @$output, [
+            'Runtime Profit',
+            $rtpnl->setbadif($rtpnl <= 0),
+            {
+                with => 'filledcurves above y=0 fc "green"',
+                fillstyle => 'solid',
+            },
+            'rtpnl',
+        ];
+        push @$output, [
+            'Runtime Drawdown',
+            $rtpnl->setbadif($rtpnl >= 0),
+            {
+                with => 'filledcurves below y=0 fc "red"',
+                fillstyle => 'solid',
+            },
+            'rtpnl',
+        ];
+    } else {
+        push @$output, [ 'Runtime P&L', $rtpnl->setbadif($rtpnl == 0), {}, 'rtpnl', ];
+    }
     return &$plotref($self, $xdata, $output) if ref $plotref eq 'CODE';
 }
 
 sub calculate_pnl {
-    my ($self, $xdata, $buysells) = @_;
+    my ($self, $xdata, $pxdata, $buysells) = @_;
+    $log->info("Px: ", $pxdata);
     my $buys = $buysells->{buys};
+    $log->info("Buys:", $buys);
     my $sells = $buysells->{sells};
+    $log->info("Sells: ", $sells);
     my $qty = $buysells->{quantity} || 100;
     my $b_idx = which( $buys > 0 );
     my $s_idx = which( $sells > 0 );
@@ -2727,12 +2776,29 @@ sub calculate_pnl {
     $buysells->{orig_sells} = $sells;
     $buysells->{buys} = $final_buys;
     $buysells->{sells} = $final_sells;
+    ## calculate RTPNL
+    ##TODO: handle short trades
+    my $buyflags = zeroes($final_buys->dim(0));
+    $buyflags->index(which($final_buys > 0)) .= 1; ## set 1 where it is a buy
+    my $sellflags = zeroes($final_sells->dim(0));
+    $sellflags->index(which($final_sells > 0)) .= -1; ## set -1 where it is a sell
+    my $netflags = $buyflags + $sellflags;## spread the buy to each day until sell
+    my $netflags2 = $netflags->cumusumover;
+    $netflags2 = $netflags2 - $sellflags;## move the buy to the sell day as well
+    $log->debug("netflags2: ", $netflags2);
+    my $buypx_daily = locf($final_buys->setbadif($final_buys == 0));
+    $buypx_daily = $buypx_daily * $netflags2;
+    my $px_daily = $pxdata * $netflags2;
+    my $rtpnl = $px_daily - $buypx_daily;
+    $rtpnl *= $qty;
+    $buysells->{rtpnl} = $rtpnl;
+    $log->debug("rtpnl: ", $buysells->{rtpnl});
     return $buysells;
 }
 
 1;
 __END__
-### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 17th Aug 2014
 ### LICENSE: Refer LICENSE file

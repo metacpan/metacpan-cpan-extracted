@@ -2,7 +2,7 @@ package Net::DNS::RR::MX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MX.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: MX.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -89,8 +89,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name MX preference exchange');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name MX preference exchange');
 
 =head1 DESCRIPTION
 
@@ -108,8 +108,8 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16 bit integer which specifies the preference
 given to this RR among others at the same owner.
@@ -117,8 +117,8 @@ Lower values are preferred.
 
 =head2 exchange
 
-    $exchange = $rr->exchange;
-    $rr->exchange( $exchange );
+	$exchange = $rr->exchange;
+	$rr->exchange( $exchange );
 
 A domain name which specifies a host willing
 to act as a mail exchange for the owner name.

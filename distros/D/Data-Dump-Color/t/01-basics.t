@@ -3,8 +3,8 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More 0.98;
 use Test::Exception;
+use Test::More 0.98;
 
 use Capture::Tiny qw(capture);
 use Data::Dump::Color qw(dump dd ddx);

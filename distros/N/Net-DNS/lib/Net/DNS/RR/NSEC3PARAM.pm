@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC3PARAM;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC3PARAM.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: NSEC3PARAM.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -101,8 +101,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name NSEC3PARAM algorithm flags iterations salt');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name NSEC3PARAM algorithm flags iterations salt');
 
 =head1 DESCRIPTION
 
@@ -129,32 +129,31 @@ other unpredictable behaviour.
 
 =head2 algorithm
 
-    $algorithm = $rr->algorithm;
-    $rr->algorithm( $algorithm );
+	$algorithm = $rr->algorithm;
+	$rr->algorithm( $algorithm );
 
-The Hash Algorithm field is represented as an unsigned decimal
-integer.  The value has a maximum of 255. 
+The 8-bit algorithm field is represented as an unsigned decimal integer. 
 
 =head2 flags
 
-    $flags = $rr->flags;
-    $rr->flags( $flags );
+	$flags = $rr->flags;
+	$rr->flags( $flags );
 
-The Flags field is represented as an unsigned decimal integer.
-The value has a maximum of 255. 
+The Flags field is an unsigned decimal integer
+interpreted as eight concatenated Boolean values. 
 
 =head2 iterations
 
-    $iterations = $rr->iterations;
-    $rr->iterations( $iterations );
+	$iterations = $rr->iterations;
+	$rr->iterations( $iterations );
 
 The Iterations field is represented as an unsigned decimal
 integer.  The value is between 0 and 65535, inclusive. 
 
 =head2 salt
 
-    $salt = $rr->salt;
-    $rr->salt( $salt );
+	$salt = $rr->salt;
+	$rr->salt( $salt );
 
 The Salt field is represented as a contiguous sequence of hexadecimal
 digits. A "-" (unquoted) is used in string format to indicate that the
@@ -162,8 +161,8 @@ salt field is absent.
 
 =head2 saltbin
 
-    $saltbin = $rr->saltbin;
-    $rr->saltbin( $saltbin );
+	$saltbin = $rr->saltbin;
+	$rr->saltbin( $saltbin );
 
 The Salt field as a sequence of octets. 
 

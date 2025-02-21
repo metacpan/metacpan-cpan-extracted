@@ -2,7 +2,7 @@ package Net::DNS::RR::GPOS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: GPOS.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: GPOS.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -102,8 +102,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name GPOS latitude longitude altitude');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name GPOS latitude longitude altitude');
 
 =head1 DESCRIPTION
 
@@ -121,22 +121,22 @@ other unpredictable behaviour.
 
 =head2 latitude
 
-    $latitude = $rr->latitude;
-    $rr->latitude( $latitude );
+	$latitude = $rr->latitude;
+	$rr->latitude( $latitude );
 
 Floating-point representation of latitude, in degrees.
 
 =head2 longitude
 
-    $longitude = $rr->longitude;
-    $rr->longitude( $longitude );
+	$longitude = $rr->longitude;
+	$rr->longitude( $longitude );
 
 Floating-point representation of longitude, in degrees.
 
 =head2 altitude
 
-    $altitude = $rr->altitude;
-    $rr->altitude( $altitude );
+	$altitude = $rr->altitude;
+	$rr->altitude( $altitude );
 
 Floating-point representation of altitude, in metres.
 
@@ -172,6 +172,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1712|https://tools.ietf.org/html/rfc1712>
+L<RFC1712|https://iana.org/go/rfc1712>
 
 =cut

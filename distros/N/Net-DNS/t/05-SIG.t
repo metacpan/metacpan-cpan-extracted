@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SIG.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-SIG.t 2005 2025-01-28 13:22:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -135,18 +135,19 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 }
 
 
-ok( Net::DNS::RR::SIG::_ordered( undef,	      0 ),	    '_ordered( undef, 0 )' );
-ok( Net::DNS::RR::SIG::_ordered( 0,	      1 ),	    '_ordered( 0, 1 )' );
-ok( Net::DNS::RR::SIG::_ordered( 0x7fffffff,  0x80000000 ), '_ordered( 0x7fffffff, 0x80000000 )' );
-ok( Net::DNS::RR::SIG::_ordered( 0xffffffff,  0 ),	    '_ordered( 0xffffffff, 0 )' );
-ok( Net::DNS::RR::SIG::_ordered( -2,	      -1 ),	    '_ordered( -2, -1 )' );
-ok( Net::DNS::RR::SIG::_ordered( -1,	      0 ),	    '_ordered( -1, 0 )' );
-ok( !Net::DNS::RR::SIG::_ordered( undef,      undef ),	    '!_ordered( undef, undef )' );
-ok( !Net::DNS::RR::SIG::_ordered( 0,	      undef ),	    '!_ordered( 0, undef )' );
-ok( !Net::DNS::RR::SIG::_ordered( 0x80000000, 0x7fffffff ), '!_ordered( 0x80000000, 0x7fffffff )' );
-ok( !Net::DNS::RR::SIG::_ordered( 0,	      0xffffffff ), '!_ordered( 0, 0xffffffff )' );
-ok( !Net::DNS::RR::SIG::_ordered( -1,	      -2 ),	    '!_ordered( -1, -2 )' );
-ok( !Net::DNS::RR::SIG::_ordered( 0,	      -1 ),	    '!_ordered( 0, -1 )' );
+sub test_order {
+	my @arg = @_;
+	my ( $a, $b ) = map { defined($_) ? $_ : 'undef' } @arg;
+	ok( Net::DNS::RR::SIG::_ordered(@arg),		  "_ordered( $a, $b )" );
+	ok( !Net::DNS::RR::SIG::_ordered( reverse @arg ), "!_ordered( $b, $a )" );
+}
+
+test_order( 0,		 1 );
+test_order( 0x7fffffff, 0x80000000 );
+test_order( 0xffffffff,	 0 );
+test_order( -1,		 0 );
+test_order( -2,		-1 );
+test_order( undef,	 0 );
 
 
 Net::DNS::RR->new("$name $type @data")->print;

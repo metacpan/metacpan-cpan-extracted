@@ -2,7 +2,7 @@ package Net::DNS::RR::URI;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: URI.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: URI.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -93,8 +93,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name URI priority weight target');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name URI priority weight target');
 
 =head1 DESCRIPTION
 
@@ -112,8 +112,8 @@ other unpredictable behaviour.
 
 =head2 priority
 
-    $priority = $rr->priority;
-    $rr->priority( $priority );
+	$priority = $rr->priority;
+	$rr->priority( $priority );
 
 The priority of the target URI in this RR.
 The range of this number is 0-65535.
@@ -123,8 +123,8 @@ load across targets with equal priority.
 
 =head2 weight
 
-    $weight = $rr->weight;
-    $rr->weight( $weight );
+	$weight = $rr->weight;
+	$rr->weight( $weight );
 
 A server selection mechanism. The weight field specifies a relative
 weight for entries with the same priority.  Larger weights SHOULD be
@@ -133,8 +133,8 @@ range of this number is 0-65535.
 
 =head2 target
 
-    $target = $rr->target;
-    $rr->target( $target );
+	$target = $rr->target;
+	$rr->target( $target );
 
 The URI of the target. Resolution of the URI is according to the
 definitions for the Scheme of the URI.
@@ -171,6 +171,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC7553|https://tools.ietf.org/html/rfc7553>
+L<RFC7553|https://iana.org/go/rfc7553>
 
 =cut

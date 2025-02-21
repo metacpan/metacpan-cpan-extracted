@@ -4,9 +4,9 @@ use strict;
 use parent 'ColorThemeBase::Static::FromStructColors';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2025-02-21'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.249'; # VERSION
+our $VERSION = '0.250'; # VERSION
 
 sub _ansi256fg {
     my $code = shift;
@@ -46,7 +46,7 @@ ColorTheme::Data::Dump::Color::Default256 - Default color theme for Data::Dump::
 
 =head1 VERSION
 
-This document describes version 0.249 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2023-02-03.
+This document describes version 0.250 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2025-02-21.
 
 =head1 HOMEPAGE
 
@@ -80,7 +80,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2018, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

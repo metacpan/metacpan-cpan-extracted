@@ -3,7 +3,7 @@ package Net::DNS::Domain;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Domain.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: Domain.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -12,10 +12,10 @@ Net::DNS::Domain - DNS domains
 
 =head1 SYNOPSIS
 
-    use Net::DNS::Domain;
+	use Net::DNS::Domain;
 
-    $domain = Net::DNS::Domain->new('example.com');
-    $name   = $domain->name;
+	$domain = Net::DNS::Domain->new('example.com');
+	$name   = $domain->name;
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ my $utf8  = UTF8  ? Encode::find_encoding('utf8')  : undef;	# Variables won't; c
 
 =head2 new
 
-    $object = Net::DNS::Domain->new('example.com');
+	$object = Net::DNS::Domain->new('example.com');
 
 Creates a domain object which represents the DNS domain specified
 by the character string argument. The argument consists of a
@@ -139,7 +139,7 @@ sub new {
 
 =head2 name
 
-    $name = $domain->name;
+	$name = $domain->name;
 
 Returns the domain name as a character string corresponding to the
 "common interpretation" to which RFC1034, 3.1, paragraph 9 alludes.
@@ -171,7 +171,7 @@ sub name {
 
 =head2 fqdn
 
-    $fqdn = $domain->fqdn;
+	$fqdn = $domain->fqdn;
 
 Returns a character string containing the fully qualified domain
 name, including the trailing dot.
@@ -186,7 +186,7 @@ sub fqdn {
 
 =head2 xname
 
-    $xname = $domain->xname;
+	$xname = $domain->xname;
 
 Interprets an extended name containing Unicode domain name labels
 encoded as Punycode A-labels.
@@ -216,7 +216,7 @@ sub xname {
 
 =head2 label
 
-    @label = $domain->label;
+	@label = $domain->label;
 
 Identifies the domain by means of a list of domain labels.
 
@@ -234,7 +234,7 @@ sub label {
 
 =head2 string
 
-    $string = $object->string;
+	$string = $object->string;
 
 Returns a character string containing the fully qualified domain
 name as it appears in a zone file.
@@ -249,9 +249,9 @@ sub string { return &fqdn }
 
 =head2 origin
 
-    $create = Net::DNS::Domain->origin( $ORIGIN );
-    $result = &$create( sub{ Net::DNS::RR->new( 'mx MX 10 a' ); } );
-    $expect = Net::DNS::RR->new( "mx.$ORIGIN. MX 10 a.$ORIGIN." );
+	$create = Net::DNS::Domain->origin( $ORIGIN );
+	$result = &$create( sub{ Net::DNS::RR->new( 'mx MX 10 a' ); } );
+	$expect = Net::DNS::RR->new( "mx.$ORIGIN. MX 10 a.$ORIGIN." );
 
 Class method which returns a reference to a subroutine wrapper
 which executes a given constructor in a dynamically scoped context

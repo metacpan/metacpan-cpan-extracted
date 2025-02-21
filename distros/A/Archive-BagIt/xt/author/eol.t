@@ -56,6 +56,7 @@ my @files = (
     't/src/src_files/2',
     't/store_bag.t',
     't/verify_bag.t',
+    't/verify_baginfo.t',
     't/verify_simple.t'
 );
 

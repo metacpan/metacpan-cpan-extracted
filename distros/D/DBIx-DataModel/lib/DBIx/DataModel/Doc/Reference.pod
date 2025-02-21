@@ -1294,7 +1294,7 @@ are already filtered out, but client applications may have additional layers to 
 for example L<DBI::RetryOverDisconnects> or L<DBIx::Connector>.
 
 The filtering coderef will receive as single argument a hashref with keys C<caller> and C<args> --
-see L<Devel::StrackTrace/Devel::StackTrace->new(%named_params)>.
+see L<Devel::StrackTrace>.
 
 
 =head3 handleError_policy()

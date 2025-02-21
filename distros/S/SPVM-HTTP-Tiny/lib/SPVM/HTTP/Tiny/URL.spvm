@@ -115,14 +115,14 @@ class HTTP::Tiny::URL {
     
     my $parts = Fn->split(".", $host, -1);
     
-    my $parts_punycode_encoded = (string[])Fn->map($parts, method : string ($part : string) {
+    my $parts_punycode_encoded = (string[])Fn->map(method : string ($part : string) {
       if (my $match = Re->m($part, "[^\x00-\x7f]")) {
         return  "xn--" . HTTP::Tiny::Util->punycode_encode($match->cap1);
       }
       else {
         return $part;
       }
-    });
+    }, $parts);
     
     my $ihost = Fn->join(".", $parts_punycode_encoded);
     
@@ -133,14 +133,14 @@ class HTTP::Tiny::URL {
     
     my $parts = Fn->split(".", $ihost, -1);
     
-    my $parts_punycode_decoded = (string[])Fn->map($parts, method : string ($part : string) {
+    my $parts_punycode_decoded = (string[])Fn->map(method : string ($part : string) {
       if (my $match = Re->m($part, "^xn--(.+)$")) {
         return  HTTP::Tiny::Util->punycode_decode($match->cap1);
       }
       else {
         return $part;
       }
-    });
+    }, $parts);
     
     my $host = Fn->join(".", $parts_punycode_decoded);
     

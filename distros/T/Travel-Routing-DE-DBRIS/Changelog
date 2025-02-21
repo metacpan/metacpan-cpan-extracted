@@ -1,3 +1,8 @@
+Travel::Routing::DE::DBRIS 0.06 - Thu Feb 20 2025
+
+    * Handle gzip-compressed bahn.de responses -- older versions of this
+      module no longer work
+
 Travel::Routing::DE::DBRIS 0.05 - Sat Feb 08 2025
 
     * dbris: Bump dependency version to really fix --json

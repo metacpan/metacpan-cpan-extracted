@@ -92,7 +92,7 @@ sub progress {
 
 1;
 __END__
-### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 30th Aug 2014
 ### LICENSE: Refer LICENSE file

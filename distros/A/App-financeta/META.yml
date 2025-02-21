@@ -28,47 +28,47 @@ no_index:
 provides:
   App::financeta:
     file: lib/App/financeta.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::data:
     file: lib/App/financeta/data.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::data::gemini:
     file: lib/App/financeta/data/gemini.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::data::yahoo:
     file: lib/App/financeta/data/yahoo.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::gui:
     file: lib/App/financeta/gui.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::gui::editor:
     file: lib/App/financeta/gui/editor.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::gui::progress_bar:
     file: lib/App/financeta/gui/progress_bar.pm
   App::financeta::gui::security_wizard:
     file: lib/App/financeta/gui/security_wizard.pm
   App::financeta::gui::tradereport:
     file: lib/App/financeta/gui/tradereport.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::indicators:
     file: lib/App/financeta/indicators.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::language:
     file: lib/App/financeta/language.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::language::grammar:
     file: lib/App/financeta/language.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::language::receiver:
     file: lib/App/financeta/language.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::mo:
     file: lib/App/financeta/mo.pm
-    version: '0.15'
+    version: '0.16'
   App::financeta::utils:
     file: lib/App/financeta/utils.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Browser::Open: '0.04'
   Capture::Tiny: '0.48'
@@ -105,5 +105,5 @@ resources:
   bugtracker: https://github.com/vikasnkumar/financeta/issues
   license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
   repository: https://github.com/vikasnkumar/financeta
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

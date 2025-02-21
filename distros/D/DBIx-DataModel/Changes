@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.12 20.02.2025
+  - fix bug introduced in v3.11 : SQL errors properly raised exceptions, but would also incorrectly reset DBI::err and DBI::errstr
+
 v3.11 28.04.2024
   - Carp::Clan replaced by Carp::Object
   - new Schema attribute: 'frame_filter' (to be transmitted to Devel::StackTrace)

@@ -2,7 +2,7 @@ package Net::DNS::RR::RT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RT.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: RT.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -78,8 +78,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name RT preference intermediate');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name RT preference intermediate');
 
 =head1 DESCRIPTION
 
@@ -97,16 +97,16 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
- A 16 bit integer representing the preference of the route.
+A 16 bit integer representing the preference of the route.
 Smaller numbers indicate more preferred routes.
 
 =head2 intermediate
 
-    $intermediate = $rr->intermediate;
-    $rr->intermediate( $intermediate );
+	$intermediate = $rr->intermediate;
+	$rr->intermediate( $intermediate );
 
 The domain name of a host which will serve as an intermediate
 in reaching the host specified by the owner name.

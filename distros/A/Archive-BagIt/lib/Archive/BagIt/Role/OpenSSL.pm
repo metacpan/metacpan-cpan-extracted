@@ -7,7 +7,7 @@ use Carp qw(carp);
 use Moo::Role;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.096'; # VERSION
+our $VERSION = '0.098'; # VERSION
 
 
 has 'async_support' => (
@@ -77,7 +77,7 @@ Archive::BagIt::Role::OpenSSL - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.096
+version 0.098
 
 =head2 has_async_support()
 

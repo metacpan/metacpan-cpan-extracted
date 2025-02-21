@@ -21,7 +21,7 @@ has ua => (
 has json => (
 	is => 'ro',
 	default => sub {
-		JSON::Lines->new;
+		JSON::Lines->new( utf8 => 1 );
 	}
 );
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::NS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NS.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: NS.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -63,14 +63,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name NS nsdname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name NS nsdname');
 
-    $rr = Net::DNS::RR->new(
-	name	=> 'example.com',
-	type	=> 'NS',
-	nsdname => 'ns.example.com',
-	);
+	$rr = Net::DNS::RR->new(
+			name	=> 'example.com',
+			type	=> 'NS',
+			nsdname => 'ns.example.com',
+			);
 
 =head1 DESCRIPTION
 
@@ -88,8 +88,8 @@ other unpredictable behaviour.
 
 =head2 nsdname
 
-    $nsdname = $rr->nsdname;
-    $rr->nsdname( $nsdname );
+	$nsdname = $rr->nsdname;
+	$rr->nsdname( $nsdname );
 
 A domain name which specifies a host which should be
 authoritative for the specified class and domain.

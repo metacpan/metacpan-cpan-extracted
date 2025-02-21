@@ -2,7 +2,7 @@ package Net::DNS::RR::HINFO;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: HINFO.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: HINFO.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -70,8 +70,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name HINFO cpu os');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name HINFO cpu os');
 
 =head1 DESCRIPTION
 
@@ -89,15 +89,15 @@ other unpredictable behaviour.
 
 =head2 cpu
 
-    $cpu = $rr->cpu;
-    $rr->cpu( $cpu );
+	$cpu = $rr->cpu;
+	$rr->cpu( $cpu );
 
 Returns the CPU type for this RR.
 
 =head2 os
 
-    $os = $rr->os;
-    $rr->os( $os );
+	$os = $rr->os;
+	$rr->os( $os );
 
 Returns the operating system type for this RR.
 
@@ -133,6 +133,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1035(3.3.2)|https://tools.ietf.org/html/rfc1035>
+L<RFC1035(3.3.2)|https://iana.org/go/rfc1035#section-3.3.2>
 
 =cut

@@ -1,22 +1,22 @@
 #!/usr/bin/perl
-# $Id: 05-CAA.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-CAA.t 2003 2025-01-21 12:06:06Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use Net::DNS;
 
 
-my $name = 'CAA.example';
+my $name = 'nocerts.example,com';
 my $type = 'CAA';
 my $code = 257;
 my @attr = qw( flags tag value );
-my @data = qw( 128 issue example.net );
+my @data = ( 0, 'issue', ";" );
 my @also = qw( critical );
 
-my $wire = '800569737375656578616d706c652e6e6574';
+my $wire = '000569737375653b';
 
 my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
 is( $typecode, $code, "$type RR type code = $code" );
@@ -57,11 +57,12 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 	}
 
 	ok( $rr->critical(1),  'set $rr->critical' );
+	ok( $rr->flags,	       '$rr->flags changed' );
 	ok( !$rr->critical(0), 'clear $rr->critical' );
 }
 
 
-Net::DNS::RR->new("$name $type @data")->print;
+Net::DNS::RR->new( name => $name, type => $type, %$hash )->print;
 
 exit;
 

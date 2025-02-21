@@ -2,7 +2,7 @@ package Net::DNS::RR::MB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MB.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: MB.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -61,8 +61,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name MB madname');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name MB madname');
 
 =head1 DESCRIPTION
 
@@ -80,8 +80,8 @@ other unpredictable behaviour.
 
 =head2 madname
 
-    $madname = $rr->madname;
-    $rr->madname( $madname );
+	$madname = $rr->madname;
+	$rr->madname( $madname );
 
 A domain name which specifies a host which has the
 specified mailbox.

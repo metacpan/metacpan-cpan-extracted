@@ -2,7 +2,7 @@ package Net::DNS::RR::EUI48;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: EUI48.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: EUI48.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -59,14 +59,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN EUI48 address');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN EUI48 address');
 
-    $rr = Net::DNS::RR->new(
-	name	=> 'example.com',
-	type	=> 'EUI48',
-	address => '00-00-5e-00-53-2a'
-	);
+	$rr = Net::DNS::RR->new(
+			name	=> 'example.com',
+			type	=> 'EUI48',
+			address => '00-00-5e-00-53-2a'
+			);
 
 =head1 DESCRIPTION
 
@@ -126,6 +126,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC7043|https://tools.ietf.org/html/rfc7043>
+L<RFC7043|https://iana.org/go/rfc7043>
 
 =cut

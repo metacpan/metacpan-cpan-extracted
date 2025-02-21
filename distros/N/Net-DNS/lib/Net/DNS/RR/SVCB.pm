@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1996 2024-12-16 13:05:08Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -332,8 +332,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName SvcParams');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name SVCB  SvcPriority TargetName SvcParams');
 
 =head1 DESCRIPTION
 
@@ -354,8 +354,8 @@ other unpredictable behaviour.
 
 =head2 SvcPriority
 
-    $svcpriority = $rr->svcpriority;
-    $rr->svcpriority( $svcpriority );
+	$svcpriority = $rr->svcpriority;
+	$rr->svcpriority( $svcpriority );
 
 The priority of this record
 (relative to others, with lower values preferred). 
@@ -363,8 +363,8 @@ A value of 0 indicates AliasMode.
 
 =head2 TargetName
 
-    $rr->targetname( $targetname );
-    $effecivetarget = $rr->targetname;
+	$rr->targetname( $targetname );
+	$effecivetarget = $rr->targetname;
 
 The domain name of either the alias target (for AliasMode)
 or the alternative endpoint (for ServiceMode).
@@ -377,11 +377,11 @@ owner name of this record must be used as the effective TargetName.
 
 =head2 mandatory, alpn, no-default-alpn, port, ipv4hint, ech, ipv6hint
 
-    $rr = Net::DNS::RR->new( 'svcb.example. SVCB 1 svcb.example. port=1234' );
+	$rr = Net::DNS::RR->new( 'svcb.example. SVCB 1 svcb.example. port=1234' );
 
-    $rr->port(1234);
-    $octets = $rr->port();	# 0x04 0xD2
-    $octets = $rr->key3();
+	$rr->port(1234);
+	$octets = $rr->port();	# 0x04 0xD2
+	$octets = $rr->key3();
 
 Constructor methods for mnemonic SvcParams prescribed by RFC9460.
 When invoked without arguments, the methods return the value
@@ -390,9 +390,9 @@ The behaviour with undefined arguments is not specified.
 
 =head2 keyNN
 
-    $keynn = $rr->keyNN;
-    $rr->keyNN( $keynn );
-    $rr->keyNN( undef );
+	$keynn = $rr->keyNN;
+	$rr->keyNN( $keynn );
+	$rr->keyNN( undef );
 
 Generic constructor and accessor methods for SvcParams.
 The key index NN is a decimal integer in the range 0 .. 65535.

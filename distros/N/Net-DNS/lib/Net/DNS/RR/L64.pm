@@ -2,7 +2,7 @@ package Net::DNS::RR::L64;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: L64.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: L64.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -78,15 +78,15 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('name IN L64 preference locator64');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('name IN L64 preference locator64');
 
-    $rr = Net::DNS::RR->new(
-	name	   => 'example.com',
-	type	   => 'L64',
-	preference => 10,
-	locator64  => '2001:0DB8:1140:1000'
-	);
+	$rr = Net::DNS::RR->new(
+			name	   => 'example.com',
+			type	   => 'L64',
+			preference => 10,
+			locator64  => '2001:0DB8:1140:1000'
+			);
 
 =head1 DESCRIPTION
 
@@ -107,8 +107,8 @@ other unpredictable behaviour.
 
 =head2 preference
 
-    $preference = $rr->preference;
-    $rr->preference( $preference );
+	$preference = $rr->preference;
+	$rr->preference( $preference );
 
 A 16 bit unsigned integer in network byte order that indicates the
 relative preference for this L64 record among other L64 records
@@ -117,7 +117,7 @@ higher values.
 
 =head2 locator64
 
-    $locator64 = $rr->locator64;
+ $locator64 = $rr->locator64;
 
 The Locator64 field is an unsigned 64-bit integer in network byte
 order that has the same syntax and semantics as a 64-bit IPv6
@@ -155,6 +155,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC6742|https://tools.ietf.org/html/rfc6742>
+L<RFC6742|https://iana.org/go/rfc6742>
 
 =cut

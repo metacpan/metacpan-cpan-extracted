@@ -566,7 +566,7 @@ sub TEST_6_1_9 {
 
                 foreach my $score (@scores) {
 
-                    if ($cvss_v2->$score && $cvss->$score != $cvss_v2->$score) {
+                    if (($cvss_v2->$score && $cvss->$score) && ($cvss->$score != $cvss_v2->$score)) {
                         $self->add_message(
                             category => 'mandatory',
                             path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v2",
@@ -604,7 +604,7 @@ sub TEST_6_1_9 {
 
                 foreach my $score (@scores) {
 
-                    if ($cvss_v3->$score && $cvss->$score != $cvss_v3->$score) {
+                    if (($cvss_v3->$score && $cvss->$score) && ($cvss->$score != $cvss_v3->$score)) {
                         $self->add_message(
                             category => 'mandatory',
                             path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v3",
@@ -617,7 +617,7 @@ sub TEST_6_1_9 {
 
                 foreach my $severity (@severities) {
 
-                    if ($cvss_v3->$severity && $cvss->$severity ne $cvss_v3->$severity) {
+                    if (($cvss_v3->$severity && $cvss->$severity) && ($cvss->$severity ne $cvss_v3->$severity)) {
                         $self->add_message(
                             category => 'mandatory',
                             path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v3",

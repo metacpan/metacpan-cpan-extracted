@@ -1,4 +1,17 @@
-$Id: Changes 1999 2024-12-27 11:58:05Z willem $                       -*-text-*-
+$Id: Changes 2015 2025-02-21 08:37:21Z willem $                       -*-text-*-
+
+
+**** 1.50 Feb 21, 2025
+
+	Minor code improvements in Resolver::Base.
+	Add RESINFO package for resolver information.
+	Documentation revision and reformatting.
+
+Fix rt.cpan.org #158714
+	Fedora41: IPv4 loopback disabled in IPv6-only configuration
+
+Fix rt.cpan.org #158706
+	Use of uninitialized value [in _send_udp]
 
 
 **** 1.49 Dec 27, 2024

@@ -1,3 +1,9 @@
+0.105   2025-02-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Move demo script from script/ to demo/ to avoid it being
+          installed when it's not desirable [GH#4].
+
+
 0.104   2021-05-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Show summaries of subcommand in completion.

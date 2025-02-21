@@ -2,7 +2,7 @@ package Net::DNS::RR::DELEG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DELEG.pm 1965 2024-02-14 09:19:32Z willem $)[2];
+our $VERSION = (qw$Id: DELEG.pm 2003 2025-01-21 12:06:06Z willem $)[2];
 
 use base qw(Net::DNS::RR::SVCB);
 
@@ -20,9 +20,9 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    $rr = Net::DNS::RR->new('alias  DELEG 0 target');
-    $rr = Net::DNS::RR->new('domain DELEG 1 nameserver ipv6hint=2001:db8::f00');
+	use Net::DNS;
+	$rr = Net::DNS::RR->new('alias DELEG 0 target');
+	$rr = Net::DNS::RR->new('child DELEG 1 nameserver ipv6hint=2001:db8::f00');
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,6 @@ DEALINGS IN THE SOFTWARE.
 L<perl> L<Net::DNS> L<Net::DNS::RR>
 L<Net::DNS::RR::SVCB>
 
-L<RFC9460|https://tools.ietf.org/html/rfc9460>
+L<RFC9460|https://iana.org/go/rfc9460>
 
 =cut

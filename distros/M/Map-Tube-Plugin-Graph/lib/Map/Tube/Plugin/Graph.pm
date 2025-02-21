@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.46';
+$Map::Tube::Plugin::Graph::VERSION     = '0.48';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 =cut
 
@@ -112,6 +112,8 @@ sub as_graph {
     @{ $station2station{$from} }{
       map $self->get_node_by_id($_)->id, split /\,/,$station->link
     } = ();
+    $g->add_vertex($from);
+    $g->set_vertex_attribute( $from, graphviz => { label => $station->name } );
   }
   for my $from (keys %station2station) {
     my @tos = keys %{$station2station{$from}};

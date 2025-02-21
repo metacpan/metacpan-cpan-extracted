@@ -2,50 +2,12 @@
 use strict;
 use warnings;
 
+if ("$]" < 5.038) {
+  die "This distribution will not install where builtin::Backport exists.\n"
+    if eval { +require builtin::Backport; 1 };
+}
 
 use v5.20.0;
 use Module::Build::Tiny 0.034;
-check_conflicts();
 Build_PL();
 
-
-sub check_conflicts {
-    return if "$]" >= 5.038;
-
-    if ( eval {
-package JSON::Schema::Modern::Conflicts;
-require Dist::CheckConflicts;
-Dist::CheckConflicts->import(
-  -dist => 'JSON::Schema::Modern',
-  -conflicts => { 'builtin::Backport' => '0.02' }
-); 1;
-}
- ) {
-        if ( eval { JSON::Schema::Modern::Conflicts->check_conflicts; 1 } ) {
-            return;
-        }
-        else {
-            my $err = $@;
-            $err =~ s/^/    /mg;
-            die "***\n$err***\n";
-        }
-    }
-    else {
-        print <<'EOF';
-***
-    Your toolchain doesn't support configure_requires, so Dist::CheckConflicts
-    hasn't been installed yet. You should check for conflicting modules
-    manually by examining the list of conflicts in JSON::Schema::Modern::Conflicts once the installation
-    finishes.
-***
-EOF
-    }
-
-    return if $ENV{AUTOMATED_TESTING} || $ENV{NONINTERACTIVE_TESTING};
-
-    # More or less copied from Module::Build
-    return if $ENV{PERL_MM_USE_DEFAULT};
-    return unless -t STDIN && ( -t STDOUT || !( -f STDOUT || -c STDOUT ) );
-
-    sleep 4;
-}

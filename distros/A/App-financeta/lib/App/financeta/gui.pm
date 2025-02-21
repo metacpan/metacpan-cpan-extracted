@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter get_icon_path get_file_path);
@@ -54,8 +54,9 @@ has timezone => 'America/New_York';
 has brand => __PACKAGE__;
 has main => (builder => '_build_main');
 has tmpdir => ( default => sub {
-    my $dir = $ENV{TEMP} || $ENV{TMP} if $^O =~ /Win32|Cygwin/i;
-    $dir //= $ENV{TMPDIR} || File::Spec->tmpdir || '/tmp';
+    my $dir = $ENV{TEMP} || $ENV{TMP} || $ENV{APPDATA} if $^O =~ /Win32|Cygwin/i;
+    $dir //= $ENV{TMPDIR} || File::Spec->tmpdir;
+    $dir //= '/tmp' unless $^O =~ /Win32|Cygwin/i;
     $dir = File::Spec->catdir($dir, $ENV{USER} || getlogin(), 'financeta');
     File::Path::make_path($dir) unless -d $dir;
     return $dir;
@@ -65,7 +66,7 @@ has datadir => ( default => sub {
     File::Path::make_path($dir) unless -d $dir;
     return $dir;
 });
-has plot_engine => 'gnuplot';
+has plot_engine => 'highcharts';
 has current => {};
 has indicator => (builder => '_build_indicator');
 has tab_was_closed => 0;
@@ -365,6 +366,44 @@ sub _menu_items {
                         $win->menu->uncheck('plot_close');
                         $win->menu->uncheck('plot_closev');
                         $win->menu->uncheck('plot_cdl');
+                    },
+                    $self,
+                ],
+                [
+                    sprintf('-%splot_using_highcharts', ($self->plot_engine eq 'highcharts') ? '*' : ''),
+                    'Use HighCharts', '', '',
+                    sub {
+                        my ($win, $item) = @_;
+                        $win->menu->check('plot_using_highcharts');
+                        $win->menu->uncheck('plot_using_gnuplot');
+                        my $gui = $win->menu->options($item);
+                        unless (ref $gui eq __PACKAGE__) {
+                            $log->error("Invalid gui object passed to menu item $item");
+                            return;
+                        }
+                        $gui->plot_engine('highcharts');
+                        $gui->indicator->plot_engine('highcharts');
+                        $log->info("Changing plot engine to " . $self->plot_engine);
+                        my $pwin = $win->{plot};
+                        $pwin->close if $pwin;
+                    },
+                    $self,
+                ],
+                [
+                    sprintf('-%splot_using_gnuplot', ($self->plot_engine eq 'gnuplot') ? '*' : ''),
+                    'Use Gnuplot', '', '',
+                    sub {
+                        my ($win, $item) = @_;
+                        $win->menu->check('plot_using_gnuplot');
+                        $win->menu->uncheck('plot_using_highcharts');
+                        my $gui = $win->menu->options($item);
+                        unless (ref $gui eq __PACKAGE__) {
+                            $log->error("Invalid gui object passed to menu item $item");
+                            return;
+                        }
+                        $gui->plot_engine('gnuplot');
+                        $gui->indicator->plot_engine('gnuplot');
+                        $log->info("Changing plot engine to " . $self->plot_engine);
                     },
                     $self,
                 ],
@@ -1359,6 +1398,8 @@ sub enable_menu_options {
     $win->menu->plot_closev->enabled(1);
     $win->menu->plot_cdl->enabled(1);
     $win->menu->plot_cdlv->enabled(1);
+    $win->menu->plot_using_highcharts->enabled(1);
+    $win->menu->plot_using_gnuplot->enabled(1);
     $win->menu->add_indicator->enabled(1);
     $win->menu->edit_rules->enabled(1);
     $win->menu->execute_rules->enabled(1);
@@ -1378,6 +1419,8 @@ sub disable_menu_options {
     $win->menu->plot_closev->enabled(0);
     $win->menu->plot_cdl->enabled(0);
     $win->menu->plot_cdlv->enabled(0);
+    $win->menu->plot_using_highcharts->enabled(0);
+    $win->menu->plot_using_gnuplot->enabled(0);
     $win->menu->add_indicator->enabled(0);
     $win->menu->remove_indicator->enabled(0);
     $win->menu->edit_rules->enabled(0);
@@ -1907,7 +1950,7 @@ sub execute_rules {
         my $buysells = &$coderef(@var_pdls); # invoke the rules sub
         if (defined $buysells and ref $buysells eq 'HASH') {
             $log->debug("Retrieved buy-sells successfully from code-ref");
-            $buysells = $self->indicator->calculate_pnl($data(, (0)), $buysells);
+            $buysells = $self->indicator->calculate_pnl($data(, (0)), $data(, (4)), $buysells);
             if ($buysells) {
                 $log->debug("Done applying P&L calcs to buy-sells");
                 if ($self->set_tab_buysells_by_name($win, $tabname, $buysells)) {
@@ -1917,6 +1960,7 @@ sub execute_rules {
                 $log->debug("SELLS: ", $buysells->{sells});
                 $log->debug("Longs PnL: ", $buysells->{longs_pnl});
                 $log->debug("Shorts PnL: ", $buysells->{shorts_pnl});
+                $log->debug("Runtime P&L: ", $buysells->{rtpnl});
             } else {
                 $log->warn("Failed to calculate P&L on executed rules");
             }
@@ -1943,7 +1987,7 @@ sub plot_data {
         $log->info("PDL::Graphics::Gnuplot $PDL::Graphics::Gnuplot::VERSION is being used");
         return $self->plot_data_gnuplot(@_);
     } elsif (lc($self->plot_engine) eq 'highcharts') {
-        $log->info("Using Highcharts to do plotting");
+        $log->info("Using HighCharts to do plotting");
         return $self->plot_data_highcharts(@_);
     }
     $log->warn($self->plot_engine . " is not supported yet.");
@@ -2009,15 +2053,20 @@ sub plot_data_gnuplot {
         defined $buysell->{buys} and defined $buysell->{sells}) {
         my $buys = $buysell->{buys};
         my $sells = $buysell->{sells};
+        my $rtpnl = $buysell->{rtpnl};
         if (ref $buys eq 'PDL' and ref $sells eq 'PDL') {
             my $bsplot = $self->indicator->get_plot_args_buysell(
-                $data(,(0)), $buys, $sells);
+                $data(,(0)), $buys, $sells, $rtpnl);
             if (defined $bsplot and ref $bsplot eq 'ARRAY') {
                 push @general_plot, @$bsplot if scalar @$bsplot;
             } elsif (ref $bsplot eq 'HASH') {
                 my $bsplot_gen = $bsplot->{general};
                 if ($bsplot_gen) {
                     push @general_plot, @$bsplot_gen if scalar @$bsplot_gen;
+                }
+                my $bsplot_addon = $bsplot->{additional};
+                if (ref $bsplot_addon eq 'ARRAY' and scalar (@$bsplot_addon)) {
+                    push @addon_plot, @$bsplot_addon;
                 }
             }
         } else {
@@ -2566,6 +2615,8 @@ sub plot_data_highcharts {
             next unless $iplot;
             if (ref $iplot eq 'ARRAY') {
                 foreach my $ph (@$iplot) {
+                    use Data::Dumper;
+                    print Dumper($ph), "\n";
                     $ph->{id} = lc "$symbol-$ph->{id}";
                     $ph->{y_axis} = 0;
                     $ph->{type} = ($ph->{impulses}) ? 'column' : 'line';
@@ -2615,7 +2666,7 @@ sub plot_data_highcharts {
         }
     }
     ## handle buys and sells
-    ##TODO: handle realtime P&L and draw an area plot
+    ##handle runtime P&L and draw an area plot
     if (defined $buysell and ref $buysell eq 'HASH' and
         defined $buysell->{buys} and defined $buysell->{sells}) {
         my $buys = $buysell->{buys};
@@ -2654,6 +2705,17 @@ sub plot_data_highcharts {
         } else {
             $log->warn("Unable to plot invalid buy-sell data");
         }
+        if (ref $buysell->{rtpnl} eq 'PDL') {
+            my $rpdl = pdl($data(, (0)) * 1000, $buysell->{rtpnl})->transpose;
+            my $rpdljs = encode_json $rpdl->unpdl;
+            push @charts, {
+                title => "Runtime P&L",
+                data => $rpdljs,
+                type => 'area',
+                id => lc "$symbol-runtime-pnl",
+                y_axis => $next_y_axis + 1,
+            };
+        }
     }
     my %y_axes_index = ();
     foreach (@charts) {
@@ -2666,6 +2728,7 @@ sub plot_data_highcharts {
     my $ttconf = {
         page => {
             title => "$chart_type_pretty plot of $symbol",
+            close_on_idle => 1,
         },
         chart => {
             height => $cheight . "px",
@@ -2697,7 +2760,7 @@ sub plot_data_highcharts {
 1;
 
 __END__
-### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2025. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 3rd Jan 2014
 ### LICENSE: Refer LICENSE file
@@ -2715,7 +2778,7 @@ research with Technical Analysis.
 
 =head1 VERSION
 
-0.15
+0.16
 
 =head1 METHODS
 
@@ -2788,7 +2851,7 @@ The commandline script that calls C<App::financeta>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+Copyright (C) 2013-2025. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
 
 =head1 LICENSE
 

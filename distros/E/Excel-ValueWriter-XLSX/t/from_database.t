@@ -30,7 +30,7 @@ SKIP : {
   my $writer = Excel::ValueWriter::XLSX->new();
   $writer->add_sheets_from_database($dbh);
 
-  my $test_DBIDM = eval "use DBIx::DataModel; 1";
+  my $test_DBIDM = eval "use DBIx::DataModel 3.0; 1";
   if ($test_DBIDM) {
     DBIx::DataModel
         ->Schema('Chinook')

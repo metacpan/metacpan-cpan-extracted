@@ -26,6 +26,36 @@
         </div>
         <hr/>
     <script type="text/javascript">
+        [% IF page.close_on_idle %]
+        try {
+            const poll = () => {
+                const interval = 10000;
+                let _poller = null;
+                const repeat = () => {
+                    console.log(`~ Polling: ${Date.now()}.`);
+                };
+                return {
+                    start: () => { _poller = setInterval(repeat, interval); },
+                    stop: () => { console.log('~ Poller stopped.'); clearInterval(_poller); }
+                };
+            };
+            const poller = poll();
+            poller.start();
+            const onVisibilityChange = () => {
+                if (document.visibilityState === 'hidden') {
+                    poller.stop();
+                    console.log("Closing the window due to lack of use");
+                    window.close();
+                } else {
+                    poller.start();
+                }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange, false);
+        } catch (err) {
+            console.error("visibility change has failed: " + err);
+        }
+        [% END %]
+        [% IF chart %]
         var yaxes = [];
         [% FOREACH el IN chart.yaxes_index %]
             [% SWITCH el %]
@@ -62,6 +92,15 @@
                     offset: 0,
                     resize: { enabled: true },
                 });
+            [% CASE 4 %]
+                yaxes.push({
+                    labels: { align: 'left' },
+                    top: "1000px",
+                    height: "200px",
+                    opposite: true,
+                    offset: 0,
+                    resize: { enabled: true },
+                });
             [% END %]
         [% END %]
         window.chart = new Highcharts.stockChart('chart-container', {
@@ -88,6 +127,12 @@
                         symbol: "[% el.marker_symbol %]",
                     },
                     [% END %]
+                    [% IF el.type == 'area' %]
+                    color: 'green',
+                    negativeColor: 'red',
+                    threshold: 0,
+                    marker: { enabled: true },
+                    [% END %]
                 },
             [% END %]
             ],
@@ -102,6 +147,7 @@
                 }]
             }
         });
+        [% END %]
     </script>
     </body>
 </html>
