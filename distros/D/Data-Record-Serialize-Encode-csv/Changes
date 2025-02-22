@@ -1,5 +1,12 @@
 Revision history for Data-Record-Serialize-Encode-csv
 
+0.03      2025-02-21 12:04:50-05:00 America/New_York
+
+  [BUG FIX]
+
+    * Encode::csv::setup incorrectly assumed there was a filehandle
+      available, even when sending to a non-filehandle sink.
+
 0.02      2022-09-03 10:45:25-04:00 America/New_York
 
   [DOC FIX]

@@ -15,7 +15,7 @@ The main driver class for App::LinkSite.
 use Feature::Compat::Class;
 
 class App::LinkSite {
-  our $VERSION = '0.0.11';
+  our $VERSION = '0.0.12';
   use strict;
   use warnings;
   use feature qw[say signatures];
@@ -108,6 +108,9 @@ The main driver method for the process.
       debug("Copy CNAME");
       path('./CNAME')->copy("$out/CNAME");
     }
+
+    debug("Copy input JSON file");
+    path($file)->copy($out);
   }
 
 =head2 do_this

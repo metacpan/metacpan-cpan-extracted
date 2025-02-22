@@ -1,0 +1,18 @@
+{
+   "name" : "Test map unconnected",
+   "lines" : {
+               "line" : [
+                          { "id" : "A", "name" : "A", "color" : "red"     },
+                          { "id" : "B", "name" : "B", "color" : "#FFFF00" }
+                        ]
+             },
+   "stations" : {
+                  "station" : [
+                                { "id" : "A1", "name" : "Station A1",  "line" : "A:2", "link" : "A2"    },
+                                { "id" : "A2", "name" : "Stazione A2", "line" : "A:1", "link" : "A1,A3" },
+                                { "id" : "A3", "name" : "Gare A3",     "line" : "A:3", "link" : "A2"    },
+                                { "id" : "B1", "name" : "Bahnhof B1",  "line" : "B:1", "link" : "B2"    },
+                                { "id" : "B2", "name" : "Stanice B2",  "line" : "B:2", "link" : "B1"    }
+                              ]
+                }
+}

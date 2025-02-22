@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -28,7 +28,7 @@ cpan-get - Tool to fetch module from CPAN archive.
 
 =head1 SYNOPSIS
 
- cpan-get [-h] [--version] module_name[module_version]
+ cpan-get [-f] [-h] [--version] module_name[module_version]
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,10 @@ Vision of this module is:
 =head1 ARGUMENTS
 
 =over 8
+
+=item * C<-f>
+
+ Force download and rewrite of existing file.
 
 =item * C<-h>
 
@@ -133,12 +137,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

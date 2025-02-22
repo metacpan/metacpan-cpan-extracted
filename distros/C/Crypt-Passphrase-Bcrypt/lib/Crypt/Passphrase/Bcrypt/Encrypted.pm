@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Bcrypt::Encrypted;
-$Crypt::Passphrase::Bcrypt::Encrypted::VERSION = '0.008';
+$Crypt::Passphrase::Bcrypt::Encrypted::VERSION = '0.009';
 use 5.014;
 use warnings;
 
@@ -62,9 +62,11 @@ sub recode_hash {
 	$to //= $self->{active};
 	if (my ($hash_type, $alg, $subtype, $id, $cost, $salt, $hash) = _unpack_hash($input)) {
 		return $input if $id eq $to and $alg eq $self->{cipher};
-		my $decrypted = $self->decrypt_hash($alg, $id, $salt, $hash);
-		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $decrypted);
-		return _pack_hash($hash_type, $self->{cipher}, $subtype, $to, $cost, $salt, $encrypted);
+		return eval {
+			my $decrypted = $self->decrypt_hash($alg, $id, $salt, $hash);
+			my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $decrypted);
+			_pack_hash($hash_type, $self->{cipher}, $subtype, $to, $cost, $salt, $encrypted);
+		} // $input;
 	}
 	elsif (($hash_type, $subtype, $cost, $salt, $hash) = _unpack_raw) {
 		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $hash);
@@ -134,7 +136,7 @@ Crypt::Passphrase::Bcrypt::Encrypted - A base-class for encrypting/peppered Argo
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

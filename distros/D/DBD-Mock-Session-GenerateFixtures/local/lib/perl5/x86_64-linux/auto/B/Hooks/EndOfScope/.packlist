@@ -1,0 +1,13 @@
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/B/Hooks/EndOfScope.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/B/Hooks/EndOfScope/PP.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/B/Hooks/EndOfScope/PP/FieldHash.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/B/Hooks/EndOfScope/PP/HintHash.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/B/Hooks/EndOfScope/XS.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/man/man3/B::Hooks::EndOfScope.3
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/man/man3/B::Hooks::EndOfScope::PP.3
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/man/man3/B::Hooks::EndOfScope::XS.3
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/B/Hooks/EndOfScope.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/B/Hooks/EndOfScope/PP.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/B/Hooks/EndOfScope/PP/FieldHash.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/B/Hooks/EndOfScope/PP/HintHash.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/B/Hooks/EndOfScope/XS.pm

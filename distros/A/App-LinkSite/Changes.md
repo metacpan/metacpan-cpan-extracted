@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.12] - 2025-02-22
+
+### Added
+
+- Publish the input JSON to the website
+
 ## [0.0.11] - 2024-11-25
 
 ### Fixed

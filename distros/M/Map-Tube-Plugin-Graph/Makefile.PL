@@ -23,7 +23,7 @@ WriteMakefile(
         'namespace::autoclean' => '0.28',
         'GraphViz2'            => '2.63',
         'MIME::Base64'         => '3.14',
-        'Map::Tube'            => '3.95',
+        'Map::Tube'            => '3.96',
         'Map::Tube::Exception' => '3.18',
         'Graph'                => '0.9732',
     },
@@ -32,8 +32,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.48' },
-            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.48' },
+            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.49' },
+            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.49' },
         },
         resources => {
             repository => {

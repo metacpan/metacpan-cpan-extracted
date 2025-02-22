@@ -4,23 +4,37 @@ use warnings;
 use Test::More import => [ qw( is is_deeply like note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
-use File::Temp            qw( tempdir );
-use File::Spec::Functions qw( catdir catfile curdir );
+use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
 plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
-like exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db' )->version },
-  qr/unable to open database file/, 'missing database file';
+subtest 'wrong dsn' => sub {
+  plan tests => 2;
+
+  like
+    exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . cwd->child( qw( t missing test.db ) ) )->version },
+    qr/unable to open database file/, 'calling version() throws exception';
+
+  like exception {
+    DBIx::Migration->new(
+      dsn => 'dbi:SQLite:dbname=' . cwd->child( qw( t missing test.db ) ),
+      dir => cwd->child( qw( t sql basic ) )
+    )->migrate
+  }, qr/unable to open database file/, 'calling migrate() throws exception';
+};
 
 my $tempdir = tempdir( CLEANUP => 1 );
-my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
+my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ) );
 note 'dsn: ', $m->dsn;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
+
+dies_ok { $m->migrate( 0 ) } '"dir" not set';
+$m->dir( cwd->child( qw( t sql basic ) ) );
 
 ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
 
@@ -30,9 +44,6 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
   is $m->version, 0, 'check version';
   is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ '"main"."dbix_migration"' ], 'check tables';
 };
-
-dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( catdir( curdir, qw( t sql basic ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -69,8 +80,8 @@ ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
 
 $tempdir = tempdir( CLEANUP => 1 );
 my $m2 = DBIx::Migration->new(
-  dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ),
-  dir => catdir( curdir, qw( t sql rollback ) ),
+  dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ),
+  dir => cwd->child( qw( t sql rollback ) )
 );
 
 dies_ok { $m2->migrate } 'second migration section is broken';

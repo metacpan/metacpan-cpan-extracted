@@ -6,12 +6,13 @@ use warnings;
 use App::CPAN::Get::MetaCPAN;
 use App::CPAN::Get::Utils qw(process_module_name_and_version);
 use Class::Utils qw(set_params);
+use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 use LWP::UserAgent;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -52,13 +53,15 @@ sub run {
 
 	# Process arguments.
 	$self->{'_opts'} = {
+		'f' => 0,
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'})
+	if (! getopts('fh', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 1) {
 
-		print STDERR "Usage: $0 [-h] [--version] module_name[module_version]\n";
+		print STDERR "Usage: $0 [-f] [-h] [--version] module_name[module_version]\n";
+		print STDERR "\t-f\t\tForce download and rewrite of existing file.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_name\tModule name. e.g. ".
@@ -81,7 +84,13 @@ sub run {
 	# Save.
 	my $download_url = URI->new($search_hr->{'download_url'});
 	my $file_to_save = ($download_url->path_segments)[-1];
-	$self->{'_cpan'}->save($search_hr->{'download_url'}, $file_to_save);
+	eval {
+		$self->{'_cpan'}->save($search_hr->{'download_url'}, $file_to_save, $self->{'_opts'});
+	};
+	if ($EVAL_ERROR) {
+		print $EVAL_ERROR;
+		return 1;
+	}
 
 	print "Package on '$search_hr->{'download_url'}' was downloaded.\n";
 	
@@ -166,6 +175,7 @@ Returns 1 for error, 0 for success.
 L<App::CPAN::Get::MetaCPAN>,
 L<App::CPAN::Get::Utils>,
 L<Class::Utils>,
+L<English>,
 L<Error::Pure>,
 L<Getopt::Std>,
 L<LWP::UserAgent>,
@@ -183,12 +193,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

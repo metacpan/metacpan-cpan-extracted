@@ -52,6 +52,7 @@ WriteMakefile(
         'Map::Tube::NizhnyNovgorod'  => '0',
         'Map::Tube::Novosibirsk'     => '0',
         'Map::Tube::Prague'          => '0',
+        'Map::Tube::Oslo'            => '0',
         'Map::Tube::Rome'            => '0',
         'Map::Tube::SaintPetersburg' => '0',
         'Map::Tube::Samara'          => '0',

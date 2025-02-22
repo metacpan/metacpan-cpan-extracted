@@ -13,6 +13,8 @@ build_requires:
   Rose::DB::Object::Manager: '0.813'
   Sub::Override: '0.12'
   Test2::V0: '0.000145'
+  Try::Tiny: '0.32'
+  autodie: '2.37'
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -41,4 +43,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DragosTrif/DBD-Fixtures
-version: 0.05
+version: 0.06

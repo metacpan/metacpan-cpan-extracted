@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 sub send {
@@ -14,8 +14,20 @@ sub send {
     $self->_csv->say( $self->fh, [ @{ $_[0] }{ @{ $self->output_fields } }  ]);
 }
 
+sub say {
+    my $self = shift;
+    $self->fh->say( @_ );
+}
+
+sub print {
+    my $self = shift;
+    $self->fh->print( @_ );
+}
+
 with 'Data::Record::Serialize::Role::Encode::CSV';
 with 'Data::Record::Serialize::Role::Sink::Stream';
+
+
 
 
 
@@ -49,7 +61,7 @@ Data::Record::Serialize::Encode::csv_stream - encode a record as csv
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -72,6 +84,8 @@ encoder with the B<Data::Record::Serialize::Sink::stream|stream> sink.
 
 =for Pod::Coverage encode
 send
+say
+print
 
 =head1 CONSTRUCTOR OPTIONS
 

@@ -11,7 +11,7 @@ package main;
 
 use 5.006;
 use strict; use warnings;
-use Test::Map::Tube;
+use Test::Map::Tube tests => 1;
 
-local $SIG{__WARN__} = sub {};
-not_ok_map(BadSample->new);
+# local $SIG{__WARN__} = sub {};
+not_ok_map_data(BadSample->new);

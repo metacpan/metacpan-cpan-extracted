@@ -2,7 +2,7 @@
 
 use 5.006;
 use strict; use warnings;
-use Test::More;
+use Test::More tests => 1;
 
 my $min_ver = '0.87';
 eval "use Map::Tube::London $min_ver";
@@ -15,5 +15,3 @@ my $exp = $map->get_stations($map->get_line_by_name($line));
 my $got = $map->get_line_by_name($line)->get_stations;
 
 is_deeply($exp, $got, "Test index station for line.");
-
-done_testing();

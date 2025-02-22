@@ -76,19 +76,19 @@ The annotation has to be specified in the first line. The delimiter has to be
 a single printable ASCII character, excluding the space character. In the
 previous example it is the C</> (slash) character.
 
-=head2 Schema support
+=head2 Managed schema vs tracking schema
 
-The schema support of this implementation should be considered experimental.
+The schema support of this implementation should be considered B<experimental>.
 For a PostgreSQL database you may set the managed schema (the schema of your
 single-schema application) using the C<search_path> connect option:
 
   my $m = DBIx::Migration->new(
-    dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema
+    dsn => 'dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema'
   );
 
-The migration object stores the current migration version in the tracking
-table. Its default unqualified name is C<dbix_migration>. The table belongs by
-default to the C<public> tracking schema.
+The migration object stores the current migration version in a tracking table.
+Its default unqualified name is C<dbix_migration>. The table belongs by default
+to the C<public> tracking schema.
 
 =head1 METHODS
 
@@ -152,9 +152,11 @@ C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
 
 =over
 
-=item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
+=item * L<Liquibase end delimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
 =item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
+
+=item * L<App::Sqitch>
 
 =back
 

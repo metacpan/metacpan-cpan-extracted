@@ -15,7 +15,7 @@ use URI;
 
 Readonly::Scalar our $FASTAPI => qw(https://fastapi.metacpan.org/v1/download_url/);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub new {
 	my ($class, @params) = @_;
@@ -73,7 +73,19 @@ sub search {
 }
 
 sub save {
-	my ($self, $uri, $file) = @_;
+	my ($self, $uri, $file, $opts_hr) = @_;
+
+	my $force = 0;
+	if (defined $opts_hr
+		&& exists $opts_hr->{'f'}
+		&& $opts_hr->{'f'}) {
+
+		$force = 1;
+	}
+
+	if (-r $file && ! $force) {
+		err "File '$file' exists.";
+	}
 
 	my $content = $self->_fetch($uri);
 
@@ -312,12 +324,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

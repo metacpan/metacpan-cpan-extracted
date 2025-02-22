@@ -64,6 +64,7 @@
             "Map::Tube::NizhnyNovgorod" : "0",
             "Map::Tube::Novosibirsk" : "0",
             "Map::Tube::Nuremberg" : "0",
+            "Map::Tube::Oslo" : "0",
             "Map::Tube::Prague" : "0",
             "Map::Tube::Rome" : "0",
             "Map::Tube::SaintPetersburg" : "0",
@@ -89,6 +90,6 @@
          "web" : "https://github.com/manwar/Task-Map-Tube-Bundle"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

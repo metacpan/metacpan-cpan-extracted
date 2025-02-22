@@ -1,10 +1,20 @@
+0.135	Fri Feb 21 21:06:54 EST 2025
+	Added t/30-basics.t
+	Fixed RT#126034	- note that this is a change in the way Bidirectional works, and will break old code
+		The old code is in Array::Iterator::LegacyBiDirectional if that API is needed
+	Make a local copy of the array so that changes to the array don't break things
+
+0.134	Fri Feb 21 09:45:27 EST 2025
+	Added support for GitHub Actions
+	Ensure the subclasses also have versions
+
+0.133 Fri Feb 21 08:18:02 EST 2025
+	New Maintainer
+
 0.132   2023-11-21  Released-By: PERLANCAR; Urgency: low
-
         - No functional changes.
-
         - Mark distribution as up for adoption since I'm no longer using
           it.
-
 
 0.131   2021-09-26  Released-By: PERLANCAR; Urgency: low
 

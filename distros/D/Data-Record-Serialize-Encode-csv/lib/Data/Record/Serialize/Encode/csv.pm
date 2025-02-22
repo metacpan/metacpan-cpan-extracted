@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 with 'Data::Record::Serialize::Role::Encode::CSV';
 
@@ -47,7 +47,7 @@ Data::Record::Serialize::Encode::csv - encode a record as csv
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

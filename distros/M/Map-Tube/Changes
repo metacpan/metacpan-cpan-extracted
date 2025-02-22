@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.96  2025-02-21T12::35+00:00
+      - Updated pod and documented Map::Tube::Stockholm.
+      - Restructured and improved the entire test suite, thanks @gws.
+
 3.95  2025-02-18T14::05+00:00
       - Updated pod and documented Map::Tube::Toulouse.
 

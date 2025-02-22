@@ -1,0 +1,1386 @@
+=head2 Sun Jan 26 12:26:22 2025: C<Module> L<Dist::CheckConflicts|Dist::CheckConflicts>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:25 2025: C<Module> L<Try::Tiny|Try::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:25 2025: C<Module> L<Test::Fatal|Test::Fatal>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.017>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:26 2025: C<Module> L<XString|XString>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:27 2025: C<Module> L<Devel::StackTrace|Devel::StackTrace>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:28 2025: C<Module> L<MRO::Compat|MRO::Compat>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:28 2025: C<Module> L<Sub::Quote|Sub::Quote>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.006008>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:29 2025: C<Module> L<Eval::Closure|Eval::Closure>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.14>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:30 2025: C<Module> L<Clone|Clone>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.47>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:31 2025: C<Module> L<Specio|Specio>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.49>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:32 2025: C<Module> L<File::ShareDir::Install|File::ShareDir::Install>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.14>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:34 2025: C<Module> L<Class::Inspector|Class::Inspector>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.36>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:35 2025: C<Module> L<File::ShareDir|File::ShareDir>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.118>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:36 2025: C<Module> L<Class::Data::Inheritable|Class::Data::Inheritable>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:37 2025: C<Module> L<Exception::Class|Exception::Class>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.45>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:37 2025: C<Module> L<Params::ValidationCompiler|Params::ValidationCompiler>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:39 2025: C<Module> L<Sub::Exporter::Progressive|Sub::Exporter::Progressive>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.001013>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:40 2025: C<Module> L<Module::Implementation|Module::Implementation>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:41 2025: C<Module> L<Variable::Magic|Variable::Magic>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.64>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:42 2025: C<Module> L<B::Hooks::EndOfScope|B::Hooks::EndOfScope>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:45 2025: C<Module> L<Package::Stash::XS|Package::Stash::XS>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.30>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:45 2025: C<Module> L<Package::Stash|Package::Stash>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: bin/package-stash-conflicts>
+
+=back
+
+=head2 Sun Jan 26 12:26:46 2025: C<Module> L<namespace::clean|namespace::clean>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:46 2025: C<Module> L<namespace::autoclean|namespace::autoclean>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:50 2025: C<Module> L<DateTime::Locale|DateTime::Locale>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:52 2025: C<Module> L<Class::Singleton|Class::Singleton>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.6>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:53 2025: C<Module> L<DateTime::TimeZone|DateTime::TimeZone>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.64>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:54 2025: C<Module> L<DateTime|DateTime>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.65>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:55 2025: C<Module> L<DateTime::Format::Strptime|DateTime::Format::Strptime>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.79>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:58 2025: C<Module> L<DateTime::Format::Builder|DateTime::Format::Builder>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.83>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:26:59 2025: C<Module> L<Rose::Object|Rose::Object>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.860>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:00 2025: C<Module> L<Clone::PP|Clone::PP>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:01 2025: C<Module> L<Carp::Clan|Carp::Clan>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 6.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:04 2025: C<Module> L<Bit::Vector|Bit::Vector>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 7.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:06 2025: C<Module> L<ExtUtils::Config|ExtUtils::Config>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.010>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:07 2025: C<Module> L<ExtUtils::Helpers|ExtUtils::Helpers>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.028>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:08 2025: C<Module> L<ExtUtils::InstallPaths|ExtUtils::InstallPaths>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.014>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:09 2025: C<Module> L<DateTime::Format::Oracle|DateTime::Format::Oracle>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:10 2025: C<Module> L<Time::Clock|Time::Clock>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:10 2025: C<Module> L<Rose::DateTime|Rose::DateTime>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.540>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:16 2025: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.647>
+
+=item *
+
+C<EXE_FILES: dbilogstrip dbiprof dbiproxy>
+
+=back
+
+=head2 Sun Jan 26 12:27:19 2025: C<Module> L<Params::Util|Params::Util>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.102>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:20 2025: C<Module> L<Sub::Install|Sub::Install>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.929>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:21 2025: C<Module> L<Data::OptList|Data::OptList>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.114>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:21 2025: C<Module> L<Sub::Exporter|Sub::Exporter>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.991>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:22 2025: C<Module> L<Rose::DB|Rose::DB>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.786>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:23 2025: C<Module> L<Rose::DB::Object|Rose::DB::Object>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.822>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:27:32 2025: C<Module> L<File::Slurper|File::Slurper>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.014>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:02 2025: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.76>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:07 2025: C<Module> L<Cpanel::JSON::XS|Cpanel::JSON::XS>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 4.39>
+
+=item *
+
+C<EXE_FILES: bin/cpanel_json_xs>
+
+=back
+
+=head2 Sun Jan 26 12:28:08 2025: C<Module> L<Sub::Override|Sub::Override>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:11 2025: C<Module> L<Term::Table|Term::Table>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.024>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:12 2025: C<Module> L<Test::Simple|Test::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.302209>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:14 2025: C<Module> L<Test::Deep|Test::Deep>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.204>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:16 2025: C<Module> L<Capture::Tiny|Capture::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.50>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:17 2025: C<Module> L<Algorithm::Diff|Algorithm::Diff>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.201>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:17 2025: C<Module> L<Text::Diff|Text::Diff>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.45>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:18 2025: C<Module> L<Test::Differences|Test::Differences>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.71>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:19 2025: C<Module> L<Sub::Uplevel|Sub::Uplevel>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.2800>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:19 2025: C<Module> L<Test::Warn|Test::Warn>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:20 2025: C<Module> L<Test::Exception|Test::Exception>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:20 2025: C<Module> L<Test::Most|Test::Most>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.38>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jan 26 12:28:22 2025: C<Module> L<DBD::Mock::Session::GenerateFixtures|DBD::Mock::Session::GenerateFixtures>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

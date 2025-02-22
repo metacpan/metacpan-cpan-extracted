@@ -30,15 +30,16 @@ my $build = Module::Build->new(
   requires => {
     'perl'                    => '5.8.9',
     'DBI'                     => 1.33,      # DBI::clone() is in use
-    'File::Slurp'             => 0,
     'File::Spec'              => 0,
     'Log::Any'                => 1.044,     # Flexible naming of imported log object
     'Moo'                     => 0,
     'MooX::SetOnce'           => 0,
     'MooX::StrictConstructor' => 0,
+    'Path::Tiny'              => 0.062,
     'Pod::Find'               => 0,
     'Pod::Usage'              => 1.64,
     'Try::Tiny'               => 0,
+    'Types::Path::Tiny'       => 0,
     'namespace::clean'        => 0
   },
   create_readme  => 1,

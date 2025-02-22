@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Test line name uc duplicate">
+  <lines>
+    <line id="A"  name="a" color="red"/>
+    <line id="B"  name="B" color="#FFFF00"/>
+  </lines>
+  <stations>
+    <station id="A1" name="Station A1"  line="A:2"     link="A2"   />
+    <station id="A2" name="Stazione A2" line="A:1"     link="A1,A3"/>
+    <station id="A3" name="Gare A3"     line="A:3,B:3" link="A2,B1"/>
+    <station id="B1" name="Bahnhof B1"  line="A:4,B:1" link="A3,B2"/>
+    <station id="B2" name="Stanice B2"  line="B:2"     link="B1"   />
+  </stations>
+</tube>

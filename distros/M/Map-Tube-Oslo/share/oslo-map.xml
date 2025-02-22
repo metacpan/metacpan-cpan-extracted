@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Oslo Tube and Tram">
+  <lines>
+    <!-- T-bane (Underground) -->
+    <line id="OSL_1" name="1" color="#009CDC"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_12" name="12" color="#86499C"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_13" name="13" color="#00A1DF"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_15" name="15" color="#F0679A"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_17" name="17" color="#ED1E2F"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_18" name="18" color="#FCAF19"/>
+    <!-- Trikk (Tram) -->
+    <line id="OSL_19" name="19" color="#4BB747"/>
+    <!-- T-bane (Underground) -->
+    <line id="OSL_2" name="2" color="#EA5A0B"/>
+    <!-- T-bane (Underground) -->
+    <line id="OSL_3" name="3" color="#A762A4"/>
+    <!-- T-bane (Underground) -->
+    <line id="OSL_4" name="4" color="#004899"/>
+    <!-- T-bane (Underground) -->
+    <line id="OSL_5" name="5" color="#3AA935"/>
+  </lines>
+  <stations>
+    <!-- 1 -->
+    <station id="osl_101" name="Frognerseteren" line="OSL_1:1" link="osl_102"/>
+    <station id="osl_102" name="Volksenkollen" line="OSL_1:2" link="osl_101,osl_103"/>
+    <station id="osl_103" name="Lillevann" line="OSL_1:3" link="osl_102,osl_104"/>
+    <station id="osl_104" name="Skogen" line="OSL_1:4" link="osl_103,osl_105"/>
+    <station id="osl_105" name="Voksenlia" line="OSL_1:5" link="osl_104,osl_106"/>
+    <station id="osl_106" name="Holmenkollen" line="OSL_1:6" link="osl_105,osl_107"/>
+    <station id="osl_107" name="Besserud" line="OSL_1:7" link="osl_106,osl_108"/>
+    <station id="osl_108" name="Midtstuen" line="OSL_1:8" link="osl_107,osl_109"/>
+    <station id="osl_109" name="Skådalen" line="OSL_1:9" link="osl_108,osl_110"/>
+    <station id="osl_110" name="Vettakollen" line="OSL_1:10" link="osl_109,osl_112"/>
+    <station id="osl_111" name="Gulleråsen" line="OSL_1:11" link="osl_110"/>
+    <station id="osl_112" name="Gråkammen" line="OSL_1:12" link="osl_111,osl_113"/>
+    <station id="osl_113" name="Slemdal" line="OSL_1:13" link="osl_112,osl_114"/>
+    <station id="osl_114" name="Ris" line="OSL_1:14" link="osl_113,osl_115"/>
+    <station id="osl_115" name="Gaustad" line="OSL_1:15" link="osl_114,osl_116"/>
+    <station id="osl_116" name="Vinderen" line="OSL_1:16" link="osl_115,osl_117"/>
+    <station id="osl_117" name="Steinerud" line="OSL_1:17" link="osl_116,osl_118"/>
+    <station id="osl_118" name="Frøen" line="OSL_1:18" link="osl_117,osl_119"/>
+    <station id="osl_119" name="Majorstuen" line="OSL_1:19,OSL_12:31,OSL_15:29,OSL_19:1,OSL_2:11,OSL_3:16,OSL_4:21,OSL_5:21" link="osl_118,osl_120,osl_1230,osl_1902,osl_210,osl_420"/>
+    <station id="osl_120" name="Nationaltheatret" line="OSL_1:20,OSL_13:13,OSL_15:21,OSL_2:12,OSL_3:17,OSL_4:22,OSL_5:20" link="osl_119,osl_121,osl_1220,osl_1224"/>
+    <station id="osl_121" name="Stortinget" line="OSL_1:21,OSL_2:13,OSL_3:18,OSL_4:23,OSL_5:19" link="osl_120,osl_122"/>
+    <station id="osl_122" name="Jernbanetorget" line="OSL_1:22,OSL_12:18,OSL_15:18,OSL_17:16,OSL_18:16,OSL_19:10,OSL_2:14,OSL_3:19,OSL_4:24,OSL_5:18" link="osl_121,osl_1217,osl_1219,osl_123,osl_1316,osl_1715"/>
+    <station id="osl_123" name="Grønland" line="OSL_1:23,OSL_2:15,OSL_3:20,OSL_4:25,OSL_5:17" link="osl_122,osl_124"/>
+    <station id="osl_124" name="Tøyen" line="OSL_1:24,OSL_2:16,OSL_3:21,OSL_4:26,OSL_5:16" link="osl_123,osl_125,osl_515"/>
+    <station id="osl_125" name="Ensjø" line="OSL_1:25,OSL_2:17,OSL_3:22,OSL_4:27" link="osl_124,osl_126"/>
+    <station id="osl_126" name="Helsfyr" line="OSL_1:26,OSL_2:18,OSL_3:23,OSL_4:28" link="osl_125,osl_127"/>
+    <station id="osl_127" name="Brynseng" line="OSL_1:27,OSL_2:19,OSL_3:24,OSL_4:29" link="osl_126,osl_128,osl_220"/>
+    <station id="osl_128" name="Høyenhall" line="OSL_1:28,OSL_4:30" link="osl_127,osl_129"/>
+    <station id="osl_129" name="Manglerud" line="OSL_1:29,OSL_4:31" link="osl_128,osl_130"/>
+    <station id="osl_130" name="Ryen" line="OSL_1:30,OSL_4:32" link="osl_129,osl_131"/>
+    <station id="osl_131" name="Brattlikollen" line="OSL_1:31,OSL_4:33" link="osl_130,osl_132"/>
+    <station id="osl_132" name="Karlsrud" line="OSL_1:32,OSL_4:34" link="osl_131,osl_133"/>
+    <station id="osl_133" name="Lambertseter" line="OSL_1:33,OSL_4:35" link="osl_132,osl_134"/>
+    <station id="osl_134" name="Munkelia" line="OSL_1:34,OSL_4:36" link="osl_133,osl_135"/>
+    <station id="osl_135" name="Bergkrystallen" line="OSL_1:35,OSL_4:37" link="osl_134"/>
+    <!-- 12 -->
+    <station id="osl_1201" name="Kjelsås" line="OSL_12:1,OSL_15:1" link="osl_1202"/>
+    <station id="osl_1202" name="Kjelsåsalléen" line="OSL_12:2,OSL_15:2" link="osl_1201,osl_1203"/>
+    <station id="osl_1203" name="Grefsen stadion" line="OSL_12:3,OSL_15:3" link="osl_1202,osl_1204"/>
+    <station id="osl_1204" name="Grefsen platået" line="OSL_12:4,OSL_15:4" link="osl_1203,osl_1205"/>
+    <station id="osl_1205" name="Glads vei" line="OSL_12:5,OSL_15:5" link="osl_1204,osl_1206"/>
+    <station id="osl_1206" name="Doktor Smiths vei" line="OSL_12:6,OSL_15:6" link="osl_1205,osl_1207"/>
+    <station id="osl_1207" name="Disen" line="OSL_12:7,OSL_15:7" link="osl_1206,osl_416"/>
+    <station id="osl_416" name="Storo" line="OSL_12:8,OSL_15:8,OSL_18:26,OSL_4:16,OSL_5:26" link="osl_1207,osl_1209,osl_1726,osl_415,osl_417"/>
+    <station id="osl_1209" name="Grefsenveien" line="OSL_12:9,OSL_15:9,OSL_18:25" link="osl_1210,osl_416"/>
+    <station id="osl_1210" name="Sandaker senter" line="OSL_12:10,OSL_15:10,OSL_18:24" link="osl_1209,osl_1211"/>
+    <station id="osl_1211" name="Torshov" line="OSL_12:11,OSL_15:11,OSL_18:23" link="osl_1210,osl_1212"/>
+    <station id="osl_1212" name="Biermanns gate" line="OSL_12:12,OSL_15:12,OSL_18:22" link="osl_1211,osl_1213"/>
+    <station id="osl_1213" name="Birkelunden" line="OSL_12:13,OSL_15:13,OSL_18:21" link="osl_1212,osl_1214"/>
+    <station id="osl_1214" name="Olaf Ryes plass" line="OSL_12:14,OSL_15:14,OSL_18:20" link="osl_1213,osl_1215"/>
+    <station id="osl_1215" name="Schous plass" line="OSL_12:15,OSL_15:15,OSL_18:19" link="osl_1214,osl_1216"/>
+    <station id="osl_1216" name="Nybrua" line="OSL_12:16,OSL_15:16,OSL_17:18,OSL_18:18" link="osl_1215,osl_1217,osl_1719"/>
+    <station id="osl_1217" name="Storgata" line="OSL_12:17,OSL_15:17,OSL_17:17,OSL_18:17" link="osl_1216,osl_122"/>
+    <station id="osl_1219" name="Dronningens gate" line="OSL_12:19,OSL_13:15,OSL_15:19" link="osl_122,osl_1220,osl_1316"/>
+    <station id="osl_1220" name="Øvre Slottsgate" line="OSL_12:20,OSL_13:14,OSL_15:20" link="osl_120,osl_1219,osl_1221"/>
+    <station id="osl_1221" name="Kontraskjaeret" line="OSL_12:21" link="osl_1220,osl_1222"/>
+    <station id="osl_1222" name="Aker brygge" line="OSL_12:22" link="osl_1221,osl_1223"/>
+    <station id="osl_1223" name="Ruseløkka" line="OSL_12:23" link="osl_1222,osl_1224"/>
+    <station id="osl_1224" name="Solli" line="OSL_12:24,OSL_13:12,OSL_15:22" link="osl_120,osl_1223,osl_1225,osl_1311"/>
+    <station id="osl_1225" name="Niels Juels gate" line="OSL_12:25,OSL_15:23" link="osl_1224,osl_1226"/>
+    <station id="osl_1226" name="Lille Frogner allé" line="OSL_12:26,OSL_15:24" link="osl_1225,osl_1227"/>
+    <station id="osl_1227" name="Elisenberg" line="OSL_12:27,OSL_15:25" link="osl_1226,osl_1228"/>
+    <station id="osl_1228" name="Frogner plass" line="OSL_12:28,OSL_15:26" link="osl_1227,osl_1229"/>
+    <station id="osl_1229" name="Vigelandsparken" line="OSL_12:29,OSL_15:27" link="osl_1228,osl_1230"/>
+    <station id="osl_1230" name="Frogner stadion" line="OSL_12:30,OSL_15:28" link="osl_119,osl_1229"/>
+    <!-- 13 -->
+    <station id="osl_1301" name="Lilleaker" line="OSL_13:1" link="osl_1302"/>
+    <station id="osl_1302" name="Sollerud" line="OSL_13:2" link="osl_1301,osl_1303"/>
+    <station id="osl_1303" name="Furulund" line="OSL_13:3" link="osl_1302,osl_1304"/>
+    <station id="osl_1304" name="Ullern" line="OSL_13:4" link="osl_1303,osl_1305"/>
+    <station id="osl_1305" name="Abbediengen" line="OSL_13:5" link="osl_1304,osl_1306"/>
+    <station id="osl_1306" name="Hoff" line="OSL_13:6" link="osl_1305,osl_1307"/>
+    <station id="osl_1307" name="Skøyen" line="OSL_13:7" link="osl_1306,osl_1308"/>
+    <station id="osl_1308" name="Thune" line="OSL_13:8" link="osl_1307,osl_1309"/>
+    <station id="osl_1309" name="Nobels gate" line="OSL_13:9" link="osl_1308,osl_1310"/>
+    <station id="osl_1310" name="Skarpsno" line="OSL_13:10" link="osl_1309,osl_1311"/>
+    <station id="osl_1311" name="Skillebekk" line="OSL_13:11" link="osl_1224,osl_1310"/>
+    <station id="osl_1316" name="Bjørvika" line="OSL_13:16,OSL_19:11" link="osl_1219,osl_122,osl_1317"/>
+    <station id="osl_1317" name="Middelalderparken" line="OSL_13:17,OSL_19:12" link="osl_1316,osl_1318"/>
+    <station id="osl_1318" name="Oslo Hospital" line="OSL_13:18,OSL_19:13" link="osl_1317,osl_1319"/>
+    <station id="osl_1319" name="Ekebergparken" line="OSL_13:19,OSL_19:14" link="osl_1318,osl_1321"/>
+    <station id="osl_1320" name="Jomfrubråten" line="OSL_13:20,OSL_19:15" link="osl_1319"/>
+    <station id="osl_1321" name="Sportsplassen" line="OSL_13:21,OSL_19:16" link="osl_1320,osl_1322"/>
+    <station id="osl_1322" name="Holtet" line="OSL_13:22,OSL_19:17" link="osl_1321,osl_1323"/>
+    <station id="osl_1323" name="Sørli" line="OSL_13:23,OSL_19:18" link="osl_1322,osl_1324"/>
+    <station id="osl_1324" name="Kastellet" line="OSL_13:24,OSL_19:19" link="osl_1323,osl_1325"/>
+    <station id="osl_1325" name="Bråten" line="OSL_13:25,OSL_19:20" link="osl_1324,osl_1326"/>
+    <station id="osl_1326" name="Saeter" line="OSL_13:26,OSL_19:21" link="osl_1325,osl_1327"/>
+    <station id="osl_1327" name="Ljabru" line="OSL_13:27,OSL_19:22" link="osl_1326"/>
+    <!-- 15 -->
+    <!-- 17 -->
+    <station id="osl_1701" name="Gaustadalléen" line="OSL_17:1,OSL_18:1" link="osl_419"/>
+    <station id="osl_419" name="Forskningsparken" line="OSL_17:2,OSL_18:2,OSL_4:19,OSL_5:23" link="osl_1701,osl_1703,osl_418,osl_420"/>
+    <station id="osl_1703" name="Universitetet Blindern" line="OSL_17:3,OSL_18:3" link="osl_1704,osl_419"/>
+    <station id="osl_1704" name="John Colletts plass" line="OSL_17:4,OSL_18:4" link="osl_1703,osl_1705"/>
+    <station id="osl_1705" name="Ullevål sykehus" line="OSL_17:5,OSL_18:5" link="osl_1704,osl_1706"/>
+    <station id="osl_1706" name="Adamstuen" line="OSL_17:6,OSL_18:6" link="osl_1705,osl_1707"/>
+    <station id="osl_1707" name="Stensgata" line="OSL_17:7,OSL_18:7" link="osl_1706,osl_1708"/>
+    <station id="osl_1708" name="Bislett" line="OSL_17:8,OSL_18:8" link="osl_1707,osl_1709"/>
+    <station id="osl_1709" name="Dalsbergstien" line="OSL_17:9,OSL_18:9" link="osl_1708,osl_1711"/>
+    <station id="osl_1710" name="Frydenlund" line="OSL_17:10,OSL_18:10,OSL_19:5" link="osl_1709,osl_1711"/>
+    <station id="osl_1711" name="Welhavens gate" line="OSL_17:11,OSL_18:11,OSL_19:4" link="osl_1712,osl_1903"/>
+    <station id="osl_1712" name="Holbergs plass" line="OSL_17:12,OSL_18:12,OSL_19:6" link="osl_1710,osl_1713"/>
+    <station id="osl_1713" name="Tullinløkka" line="OSL_17:13,OSL_18:13,OSL_19:7" link="osl_1712,osl_1714"/>
+    <station id="osl_1714" name="Tinghuset" line="OSL_17:14,OSL_18:14,OSL_19:8" link="osl_1713,osl_1715"/>
+    <station id="osl_1715" name="Stortorvet" line="OSL_17:15,OSL_18:15,OSL_19:9" link="osl_122,osl_1714"/>
+    <station id="osl_1719" name="Heimdalsgata" line="OSL_17:19" link="osl_1216,osl_1720"/>
+    <station id="osl_1720" name="Lakkegata skole" line="OSL_17:20" link="osl_1719,osl_1721"/>
+    <station id="osl_1721" name="Sofienberg" line="OSL_17:21" link="osl_1720,osl_515"/>
+    <station id="osl_515" name="Carl Berners plass" line="OSL_17:22,OSL_5:15" link="osl_124,osl_1721,osl_1723,osl_415,osl_514"/>
+    <station id="osl_1723" name="Rosenhoff" line="OSL_17:23" link="osl_1724,osl_515"/>
+    <station id="osl_1724" name="Sinsenterrassen" line="OSL_17:24" link="osl_1723,osl_1725"/>
+    <station id="osl_1725" name="Sinsenkrysset" line="OSL_17:25" link="osl_1724,osl_1726"/>
+    <station id="osl_1726" name="Grefsen stasjon" line="OSL_17:26,OSL_18:27" link="osl_1725,osl_416"/>
+    <!-- 18 -->
+    <!-- 19 -->
+    <station id="osl_1902" name="Bogstadveien" line="OSL_19:2" link="osl_119,osl_1903"/>
+    <station id="osl_1903" name="Homannsbyen" line="OSL_19:3" link="osl_1712,osl_1902"/>
+    <!-- 2 -->
+    <station id="osl_201" name="Østerås" line="OSL_2:1" link="osl_202"/>
+    <station id="osl_202" name="Lijordet" line="OSL_2:2" link="osl_201,osl_203"/>
+    <station id="osl_203" name="Eiksmarka" line="OSL_2:3" link="osl_202,osl_204"/>
+    <station id="osl_204" name="Ekraveien" line="OSL_2:4" link="osl_203,osl_205"/>
+    <station id="osl_205" name="Røa" line="OSL_2:5" link="osl_204,osl_206"/>
+    <station id="osl_206" name="Hovseter" line="OSL_2:6" link="osl_205,osl_207"/>
+    <station id="osl_207" name="Holmen" line="OSL_2:7" link="osl_206,osl_208"/>
+    <station id="osl_208" name="Makrellbekken" line="OSL_2:8" link="osl_207,osl_209"/>
+    <station id="osl_209" name="Smestad" line="OSL_2:9,OSL_3:14" link="osl_208,osl_210,osl_313"/>
+    <station id="osl_210" name="Borgen" line="OSL_2:10,OSL_3:15" link="osl_119,osl_209"/>
+    <station id="osl_220" name="Hellerud" line="OSL_2:20,OSL_3:25" link="osl_127,osl_221,osl_326"/>
+    <station id="osl_221" name="Tveita" line="OSL_2:21" link="osl_220,osl_222"/>
+    <station id="osl_222" name="Haugerud" line="OSL_2:22" link="osl_221,osl_223"/>
+    <station id="osl_223" name="Trosterud" line="OSL_2:23" link="osl_222,osl_224"/>
+    <station id="osl_224" name="Lindeberg" line="OSL_2:24" link="osl_223,osl_225"/>
+    <station id="osl_225" name="Furuset" line="OSL_2:25" link="osl_224,osl_226"/>
+    <station id="osl_226" name="Ellingsrudåsen" line="OSL_2:26" link="osl_225"/>
+    <!-- 3 -->
+    <station id="osl_301" name="Kolsås" line="OSL_3:1" link="osl_302"/>
+    <station id="osl_302" name="Hauger" line="OSL_3:2" link="osl_301,osl_303"/>
+    <station id="osl_303" name="Gjettum" line="OSL_3:3" link="osl_302,osl_304"/>
+    <station id="osl_304" name="Avløs" line="OSL_3:4" link="osl_303,osl_305"/>
+    <station id="osl_305" name="Haslum" line="OSL_3:5" link="osl_304,osl_306"/>
+    <station id="osl_306" name="Gjønnes" line="OSL_3:6" link="osl_305,osl_307"/>
+    <station id="osl_307" name="Bekkestua" line="OSL_3:7" link="osl_306,osl_308"/>
+    <station id="osl_308" name="Ringstabekk" line="OSL_3:8" link="osl_307,osl_309"/>
+    <station id="osl_309" name="Jar" line="OSL_3:9" link="osl_308,osl_310"/>
+    <station id="osl_310" name="Bjørnsletta" line="OSL_3:10" link="osl_309,osl_311"/>
+    <station id="osl_311" name="Åsjordet" line="OSL_3:11" link="osl_310,osl_312"/>
+    <station id="osl_312" name="Ullernåsen" line="OSL_3:12" link="osl_311,osl_313"/>
+    <station id="osl_313" name="Montebello" line="OSL_3:13" link="osl_209,osl_312"/>
+    <station id="osl_326" name="Godlia" line="OSL_3:26" link="osl_220,osl_327"/>
+    <station id="osl_327" name="Skøyenåsen" line="OSL_3:27" link="osl_326,osl_328"/>
+    <station id="osl_328" name="Oppsal" line="OSL_3:28" link="osl_327,osl_329"/>
+    <station id="osl_329" name="Ulsrud" line="OSL_3:29" link="osl_328,osl_330"/>
+    <station id="osl_330" name="Bøler" line="OSL_3:30" link="osl_329,osl_331"/>
+    <station id="osl_331" name="Bogerud" line="OSL_3:31" link="osl_330,osl_332"/>
+    <station id="osl_332" name="Skullerud" line="OSL_3:32" link="osl_331,osl_333"/>
+    <station id="osl_333" name="Mortensrud" line="OSL_3:33" link="osl_332"/>
+    <!-- 4 -->
+    <station id="osl_401" name="Vestli" line="OSL_4:1,OSL_5:1" link="osl_402"/>
+    <station id="osl_402" name="Stovner" line="OSL_4:2,OSL_5:2" link="osl_401,osl_403"/>
+    <station id="osl_403" name="Rommen" line="OSL_4:3,OSL_5:3" link="osl_402,osl_404"/>
+    <station id="osl_404" name="Romsås" line="OSL_4:4,OSL_5:4" link="osl_403,osl_405"/>
+    <station id="osl_405" name="Grorud" line="OSL_4:5,OSL_5:5" link="osl_404,osl_406"/>
+    <station id="osl_406" name="Ammerud" line="OSL_4:6,OSL_5:6" link="osl_405,osl_407"/>
+    <station id="osl_407" name="Kalbakken" line="OSL_4:7,OSL_5:7" link="osl_406,osl_408"/>
+    <station id="osl_408" name="Rødtved" line="OSL_4:8,OSL_5:8" link="osl_407,osl_409"/>
+    <station id="osl_409" name="Veitvet" line="OSL_4:9,OSL_5:9" link="osl_408,osl_410"/>
+    <station id="osl_410" name="Linderud" line="OSL_4:10,OSL_5:10" link="osl_409,osl_411"/>
+    <station id="osl_411" name="Vollebekk" line="OSL_4:11,OSL_5:11" link="osl_410,osl_412"/>
+    <station id="osl_412" name="Risløkka" line="OSL_4:12,OSL_5:12" link="osl_411,osl_413"/>
+    <station id="osl_413" name="Økern" line="OSL_4:13,OSL_5:13" link="osl_412,osl_414,osl_514"/>
+    <station id="osl_414" name="Løren" line="OSL_4:14" link="osl_413,osl_415"/>
+    <station id="osl_415" name="Sinsen" line="OSL_4:15,OSL_5:27" link="osl_414,osl_416,osl_515"/>
+    <station id="osl_417" name="Nydalen" line="OSL_4:17,OSL_5:25" link="osl_416,osl_418"/>
+    <station id="osl_418" name="Ullevål stadion" line="OSL_4:18,OSL_5:24" link="osl_417,osl_419,osl_528"/>
+    <station id="osl_420" name="Blindern" line="OSL_4:20,OSL_5:22" link="osl_119,osl_419"/>
+    <!-- 5 -->
+    <station id="osl_514" name="Hasle" line="OSL_5:14" link="osl_413,osl_515"/>
+    <station id="osl_528" name="Berg" line="OSL_5:28" link="osl_418,osl_529"/>
+    <station id="osl_529" name="Tåsen" line="OSL_5:29" link="osl_528,osl_530"/>
+    <station id="osl_530" name="Østhorn" line="OSL_5:30" link="osl_529,osl_531"/>
+    <station id="osl_531" name="Holstein" line="OSL_5:31" link="osl_530,osl_532"/>
+    <station id="osl_532" name="Kringsjå" line="OSL_5:32" link="osl_531,osl_533"/>
+    <station id="osl_533" name="Sognsvann" line="OSL_5:33" link="osl_532"/>
+  </stations>
+</tube>

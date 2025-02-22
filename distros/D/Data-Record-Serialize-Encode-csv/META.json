@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -140,15 +140,15 @@
    "provides" : {
       "Data::Record::Serialize::Encode::csv" : {
          "file" : "lib/Data/Record/Serialize/Encode/csv.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Data::Record::Serialize::Encode::csv_stream" : {
          "file" : "lib/Data/Record/Serialize/Encode/csv_stream.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Data::Record::Serialize::Role::Encode::CSV" : {
          "file" : "lib/Data/Record/Serialize/Role/Encode/CSV.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -163,9 +163,9 @@
          "web" : "https://gitlab.com/djerius/data-record-serialize-encode-csv"
       }
    },
-   "version" : "0.02",
-   "x_generated_by_perl" : "v5.28.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

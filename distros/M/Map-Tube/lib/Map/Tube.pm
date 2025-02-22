@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.95';
+$Map::Tube::VERSION   = '3.96';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.95
+Version 3.96
 
 =cut
 
@@ -75,11 +75,11 @@ documented in L<Map::Tube::Cookbook>.
     |                      |          | Sofia, Tbilisi, Vienna, Warsaw,          |
     |                      |          | Yekaterinburg                            |
     |                      |          |                                          |
+    | Gisbert W Selke      | GWS      | 8 (Beijing, Glasgow, Hamburg, KoelnBonn, |
+    |                      |          | Lyon, Rhein/Ruhr, Stockholm, Toulouse)   |
+    |                      |          |                                          |
     | Mohammad Sajid Anwar | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                      |          | Madrid, NYC, Tokyo)                      |
-    |                      |          |                                          |
-    | Gisbert W Selke      | GWS      | 7 (Beijing, Glasgow, Hamburg, KoelnBonn, |
-    |                      |          | Lyon, Rhein/Ruhr, Toulouse)              |
     |                      |          |                                          |
     | Renee Baecker        | RENEEB   | 1 (Frankfurt)                            |
     |                      |          |                                          |
@@ -585,6 +585,7 @@ sub get_map_data {
                 return $data;
             }
 
+            $@ =~ s/\s+at\s+\S*?\.pm\s+line\s+.*$//;
             Map::Tube::Exception::MalformedMapData->throw({
                 method      => $method,
                 message     => "ERROR: Malformed Map Data ($json): $@",

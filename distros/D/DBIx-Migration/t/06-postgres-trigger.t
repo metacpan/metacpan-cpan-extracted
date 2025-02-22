@@ -3,9 +3,9 @@ use warnings;
 
 #https://estuary.dev/postgresql-triggers/
 
-use File::Spec::Functions qw( catdir curdir );
+use Path::Tiny qw( cwd );
 
-use lib catdir( curdir, qw( t lib ) );
+use lib cwd->child( qw( t lib ) )->stringify;
 
 use Test::More import => [ qw( is note ok plan subtest ) ];
 use Test::PgTAP import => [ qw( tables_are triggers_are ) ];
@@ -30,7 +30,7 @@ plan tests => 9;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new( dsn => $dsn, dir => catdir( curdir, qw( t sql trigger ) ) );
+my $m = DBIx::Migration->new( dsn => $dsn, dir => cwd->child( qw( t sql trigger ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

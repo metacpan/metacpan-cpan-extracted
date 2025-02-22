@@ -12,7 +12,7 @@ use Text::CSV;
 
 use namespace::clean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub _needs_eol { 1 }
 
@@ -74,7 +74,9 @@ sub _build__csv {
 
 sub setup {
     my $self = shift;
-    $self->_csv->say( $self->fh, $self->output_fields );
+    $self->_csv->combine( @{ $self->output_fields } )
+      or croak( 'error creating CSV header' );
+    $self->say( $self->_csv->string );
 }
 
 
@@ -110,7 +112,7 @@ Data::Record::Serialize::Role::Encode::CSV - encode a record as csv
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,11 +50,11 @@
    "provides" : {
       "Crypt::Passphrase::Bcrypt" : {
          "file" : "lib/Crypt/Passphrase/Bcrypt.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::Bcrypt::Encrypted" : {
          "file" : "lib/Crypt/Passphrase/Bcrypt/Encrypted.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -68,9 +68,9 @@
          "web" : "https://github.com/Leont/crypt-passphrase-bcrypt"
       }
    },
-   "version" : "0.008",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "0.009",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

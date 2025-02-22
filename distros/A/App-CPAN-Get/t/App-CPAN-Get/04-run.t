@@ -123,7 +123,8 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [--version] module_name[module_version]
+Usage: $script [-f] [-h] [--version] module_name[module_version]
+	-f		Force download and rewrite of existing file.
 	-h		Print help.
 	--version	Print version.
 	module_name	Module name. e.g. App::Pod::Example

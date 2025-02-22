@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase-Bcrypt
 
+0.009     2025-02-22 01:09:02+01:00 Europe/Brussels
+          - Add a length_check option
+          - Make recode_hash fail gracefully
+
 0.008     2024-01-28 19:12:49+01:00 Europe/Brussels
           - Add Crypt::Passphrase::Bcrypt::Encrypted
 

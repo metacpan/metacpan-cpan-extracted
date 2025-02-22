@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT like use_ok ) ], tests => 6;
+use Test::More import => [ qw( BAIL_OUT like use_ok ) ], tests => 5;
 use Test::API import => [ qw( class_api_ok ) ];
 use Test::Fatal qw( exception );
 
@@ -23,6 +23,3 @@ like exception { $module->new( dsn => 'dbi:Mem:', dbh => DBI->connect( 'dbi:Mem:
 
 like exception { $module->new( dbh => DBI->connect( 'dbi:Mem:', undef, undef, {} ), username => 'foo' ) },
   qr/\Adbh and username cannot be used at the same time/, '"dbh" and "username" are mutually exclusive';
-
-like exception { my $m = $module->new( dsn => 'dbi:Mem:' ); $m->dir( 'foo' ); $m->dir( 'bar' ) },
-  qr/\Acannot change value of SetOnce attribute dir/, '"dir" is a set-once attribute';

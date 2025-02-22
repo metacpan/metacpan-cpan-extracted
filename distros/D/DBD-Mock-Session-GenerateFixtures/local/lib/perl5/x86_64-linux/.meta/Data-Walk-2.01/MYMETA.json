@@ -1,0 +1,26 @@
+{
+   "abstract" : "Traverse Perl data structures.",
+   "author" : [
+      "Guido Flohr <guido.flohr@cantanea.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Walk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {},
+   "release_status" : "stable",
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

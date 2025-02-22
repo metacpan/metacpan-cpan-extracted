@@ -10,7 +10,7 @@ package main;
 
 use 5.008;
 use strict; use warnings;
-use Test::More;
+use Test::More tests => 10;
 use Test::Exception;
 
 my $map = MetacharsMap->new;
@@ -77,5 +77,3 @@ like( $@,
       qr/\QERROR: Route not found from [$s5] to [$s1]\E/,
       'Non-connected stations'
     );
-
-done_testing;

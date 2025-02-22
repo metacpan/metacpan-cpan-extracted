@@ -1,0 +1,93 @@
+#!/home/dragos/perl5/perlbrew/perls/perl-5.36.3/bin/perl 
+
+use strict;
+use warnings;
+use vars '$VERSION';
+
+$VERSION = '0.8';
+
+use Getopt::Long qw[];
+
+Getopt::Long::Configure( "no_ignore_case" );
+Getopt::Long::Configure( "bundling" );
+Getopt::Long::GetOptions(
+    'v|verbose'     => \( my $verbose = 0 ),
+    'h|help|?'      => sub { usage( -verbose => 1 ); exit; },
+    'H|man'         => sub { usage( -verbose => 2 ); exit; },
+    'V|version'     => sub { version();              exit; },
+) or exit 1;
+
+my $word = shift(@ARGV)
+  or usage( "$0: missing word\n" );
+
+my @check = (
+    'ANSI/ISO SQL' => 'SQL::ReservedWords',
+    'DB2'          => 'SQL::ReservedWords::DB2',
+    'MySQL'        => 'SQL::ReservedWords::MySQL',
+    'ODBC'         => 'SQL::ReservedWords::ODBC',
+    'Oracle'       => 'SQL::ReservedWords::Oracle',
+    'PostgreSQL'   => 'SQL::ReservedWords::PostgreSQL',
+    'SQLite'       => 'SQL::ReservedWords::SQLite',
+    'SQL Server'   => 'SQL::ReservedWords::SQLServer',
+    'Sybase'       => 'SQL::ReservedWords::Sybase'
+);
+
+my @reserved_by = ();
+
+while ( my ( $name, $package ) = splice( @check, 0, 2 ) ) {
+
+    eval "require $package;";
+
+    die $@ if $@;
+
+    if ( $package->is_reserved( $word ) ) {
+        push @reserved_by, $verbose ? $package->reserved_by($word) : $name;
+    }
+}
+
+my $reserved_by = join "\n    ", @reserved_by;
+
+print <<REPORT;
+
+  Word '$word' is reserved by:
+
+    $reserved_by
+
+REPORT
+
+sub usage {
+    require Pod::Usage;
+    Pod::Usage::pod2usage( @_ );
+}
+
+sub version {
+    printf "sqlrw v%s\n", $VERSION;
+}
+
+__END__
+
+=head1 NAME
+
+sqlrw -- Reserved SQL words by standard and vendors.
+
+=head1 SYNOPSIS
+
+sqlrw [options] word
+
+Options:
+
+        -v, --verbose   Display versions
+        -h, --help      Display this help
+        -H, --man       Longer manpage
+        -V, --version   Display version info
+
+=head1 AUTHOR
+
+Christian Hansen C<chansen@cpan.org>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

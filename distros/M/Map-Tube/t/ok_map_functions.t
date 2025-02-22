@@ -4,6 +4,6 @@ use 5.006;
 use strict; use warnings;
 use lib 't/';
 use Sample;
-use Test::Map::Tube;
+use Test::Map::Tube tests => 1;
 
 ok_map_functions(Sample->new);

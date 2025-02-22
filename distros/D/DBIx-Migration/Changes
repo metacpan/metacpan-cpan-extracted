@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.16 Fri Feb 21 13:07:18 CET 2025
+        - Fix documentation
+        - Properly handle broken dsn
+        - Use Path::Tiny
+
 0.15 Wed Feb 19 16:54:12 CET 2025
         - Remove "passthrough" style of Makefile.PL
         - Fix Log::Any minimum version requirement

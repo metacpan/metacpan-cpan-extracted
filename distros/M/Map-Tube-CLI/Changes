@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+0.83  Fri Feb 21 17:30:00 2025
+      - Added support for new map: Oslo.
+      - Upgraded dependency on Map::Tube v3.96.
+
 0.82  Thu Feb 20 21:10:00 2025
       - Added support for new map: Stockholm.
 

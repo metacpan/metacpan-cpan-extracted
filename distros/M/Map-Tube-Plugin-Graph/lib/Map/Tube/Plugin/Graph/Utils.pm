@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.48';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.49';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
@@ -120,7 +120,9 @@ sub graph_map_image {
       next if keys %lines != 1;
       my $l = (keys %lines)[0];
       next unless defined (my $color = $l2c->{$l});
-      $g->set_vertex_attribute($v, graphviz=>{color => $color, fontcolor => $color});
+      my $attrs = $g->get_vertex_attributes($v);
+      $attrs->{graphviz}{color} = $attrs->{graphviz}{fontcolor} = $color;
+      $g->set_vertex_attribute($v, graphviz=>$attrs->{graphviz});
     }
     my %seen; $g->filter_edges(sub { !$seen{$_[1]}{$_[2]}++ });
     GraphViz2->from_graph($g)->run(format => 'png')->dot_output;

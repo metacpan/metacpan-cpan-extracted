@@ -1,0 +1,10 @@
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/bin/package-stash-conflicts
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/Package/Stash.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/Package/Stash/Conflicts.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/lib/site_perl/5.36.3/Package/Stash/PP.pm
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/man/man3/Package::Stash.3
+/home/dragos/perl5/perlbrew/perls/perl-5.36.3/man/man3/Package::Stash::PP.3
+/home/dragos/projects/dbd_mock_dump_data/local/bin/package-stash-conflicts
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/Package/Stash.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/Package/Stash/Conflicts.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/Package/Stash/PP.pm

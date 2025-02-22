@@ -2,7 +2,7 @@ NAME
     cpan-get - Tool to fetch module from CPAN archive.
 
 SYNOPSIS
-     cpan-get [-h] [--version] module_name[module_version]
+     cpan-get [-f] [-h] [--version] module_name[module_version]
 
 DESCRIPTION
     Vision of this module is:
@@ -13,6 +13,10 @@ DESCRIPTION
      * testable and tested distribution
 
 ARGUMENTS
+    *       "-f"
+
+             Force download and rewrite of existing file.
+
     *       "-h"
 
              Print help.
@@ -86,10 +90,10 @@ ACKNOWLEDGMENTS
      Paul Evans for notes about usage.
 
 LICENSE AND COPYRIGHT
-    © 2021-2024 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

@@ -1,0 +1,9 @@
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/Pool.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/Pool/db.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/Session.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/StatementTrack.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/StatementTrack/Iterator.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/db.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/dr.pm
+/home/dragos/projects/dbd_mock_dump_data/local/lib/perl5/DBD/Mock/st.pm

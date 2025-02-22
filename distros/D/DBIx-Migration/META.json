@@ -30,15 +30,16 @@
          },
          "requires" : {
             "DBI" : "1.33",
-            "File::Slurp" : "0",
             "File::Spec" : "0",
             "Log::Any" : "1.044",
             "Moo" : "0",
             "MooX::SetOnce" : "0",
             "MooX::StrictConstructor" : "0",
+            "Path::Tiny" : "0.062",
             "Pod::Find" : "0",
             "Pod::Usage" : "1.64",
             "Try::Tiny" : "0",
+            "Types::Path::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.8.9"
          }
@@ -59,11 +60,11 @@
    "provides" : {
       "DBIx::Migration" : {
          "file" : "lib/DBIx/Migration.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "DBIx::Migration::CLI" : {
          "file" : "lib/DBIx/Migration/CLI.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -79,6 +80,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

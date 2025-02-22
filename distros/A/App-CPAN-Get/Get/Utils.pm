@@ -8,7 +8,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(process_module_name_and_version);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Code from Menlo::CLI::Compat
 sub process_module_name_and_version {
@@ -107,12 +107,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

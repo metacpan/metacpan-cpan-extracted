@@ -15,13 +15,13 @@ typedef siginfo_t* Signal__Info;
 #ifdef HAVE_SI_BAND
 #define siginfo_band(self) (self)->si_band
 #else
-#define siginfo_band(self)
+#define siginfo_band(self) 0
 #endif
 
 #ifdef HAVE_SI_FD
 #define siginfo_fd(self) (self)->si_fd
 #else
-#define siginfo_fd(self)
+#define siginfo_fd(self) 0
 #endif
 
 #ifdef HAVE_SI_TIMERID

@@ -11,7 +11,7 @@ package main;
 use 5.006;
 use strict; use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Exception tests => 11;
 
 my $map = UnidirectionMap->new;
 
@@ -54,5 +54,3 @@ throws_ok { $map->get_shortest_route( 'E street', 'V alley'  ) } qr/Route not fo
 
 throws_ok { $map->get_shortest_route( 'E street', 'V alley'  )->preferred() } qr/Route not found/,
     'Testing lines 2 and 5: non-existing route due to unconnectedness, preferred';
-
-done_testing;

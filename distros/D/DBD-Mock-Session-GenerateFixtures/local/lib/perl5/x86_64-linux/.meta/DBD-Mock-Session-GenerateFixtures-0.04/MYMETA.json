@@ -1,0 +1,63 @@
+{
+   "abstract" : "This distribution generates fixtures for DBD-Mock-Session module",
+   "author" : [
+      "Dragos Trif <drd.trif@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.21, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBD-Mock-Session-GenerateFixtures",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.74",
+            "DBI" : "1.643",
+            "Exporter::NoWork" : "0.03",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test2::V0" : "0.000145"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.52",
+            "Cpanel::JSON::XS" : "4.37",
+            "DBD::Mock" : "1.59",
+            "Data::Walk" : "2.01",
+            "English" : "1.11",
+            "File::Path" : "2.18",
+            "File::Slurper" : "0.014",
+            "File::Spec" : "3.84",
+            "Readonly" : "2.05",
+            "Sub::Override" : "0.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/DragosTrif/DBD-Fixtures"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

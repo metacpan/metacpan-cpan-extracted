@@ -47,4 +47,7 @@ ok($hashed->needs_rehash($hash1), 'Unprehashed hash needs rehashing');
 ok($hashed->verify_password('password', '$bcrypt-sha256$v=2,t=2b,r=12$n79VH.0Q2TMWmt3Oqt9uku$Kq4Noyk3094Y2QlB8NdRT8SvGiI4ft2'));
 ok($hashed->verify_password('password', '$bcrypt-sha256$v=2,t=2b,r=13$AmytCA45b12VeVg0YdDT3.$IZTbbJKgJlD5IJoCWhuDUqYjnJwNPlO'));
 
+is eval { $passphrase->hash_password(scalar("X" x 100)) }, undef, 'Expect exception on overlong ';
+like $@, qr/^Password is only allowed to be 72 characters, got 100 characters/;
+
 done_testing;

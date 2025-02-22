@@ -3,7 +3,7 @@
 use 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Test::More;
+use Test::More tests => 5;
 
 my $min_ver = 1.36;
 eval "use Map::Tube::London $min_ver";
@@ -70,5 +70,3 @@ is( $ret,
          ),
     'Barking - Morden: preferred version'
   );
-
-done_testing;
