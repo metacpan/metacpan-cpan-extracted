@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp qw( croak );
 use DateTime 1.45;
@@ -1001,7 +1001,7 @@ sub _fractional_second {
     my %p = @_;
 
     ## no critic (ValuesAndExpressions::ProhibitMismatchedOperators)
-    $p{parsed}{nanosecond} = ".$p{ parsed }{ nanosecond }" * 10**9;
+    $p{parsed}{nanosecond} = int( ".$p{ parsed }{ nanosecond }" * 10**9 );
 
     return 1;
 }
@@ -1103,7 +1103,7 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -1719,8 +1719,6 @@ L<DateTime::Format::Builder>
 
 Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Format-ISO8601/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for DateTime-Format-ISO8601 can be found at L<https://github.com/houseabsolute/DateTime-Format-ISO8601>.
@@ -1741,7 +1739,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Doug Bell joe Liam Widdowson Thomas Klausner
+=for stopwords Doug Bell joe Liam Widdowson Thomas Klausner William Ricker
 
 =over 4
 
@@ -1761,11 +1759,15 @@ Liam Widdowson <lbw@telstra.com>
 
 Thomas Klausner <domm@plix.at>
 
+=item *
+
+William Ricker <bill.n1vux@gmail.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Joshua Hoblitt.
+This software is copyright (c) 2025 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,13 +1,18 @@
 Revision history for Map::Tube
 
-3.96  2025-02-21T12::35+00:00
+3.97  2025-02-22T22:55:00+00:00
+      - Proposed patch for the reported issues below, thanks @SREZIC.
+      https://rt.cpan.org/Ticket/Display.html?id=159900
+      https://rt.cpan.org/Ticket/Display.html?id=159941
+
+3.96  2025-02-21T12:35:00+00:00
       - Updated pod and documented Map::Tube::Stockholm.
       - Restructured and improved the entire test suite, thanks @gws.
 
-3.95  2025-02-18T14::05+00:00
+3.95  2025-02-18T14:05:00+00:00
       - Updated pod and documented Map::Tube::Toulouse.
 
-3.94  2025-02-14T22::00+00:00
+3.94  2025-02-14T22:00:00+00:00
       - Fixed the dist package.
 
 3.93  2025-02-13T13:25:00+00:00

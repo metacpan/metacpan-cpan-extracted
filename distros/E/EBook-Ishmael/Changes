@@ -1,5 +1,14 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.06  Feb 22 2025
+  - When ran with no arguments, queequeg reads input from stdin.
+  - queequeg now accepts multiple files as argument.
+  - --output option now works with --metadata and --meta-json options.
+  - Removed extra newline from json output.
+  - No longer bothering categorizing Changes entries.
+  - AZW support.
+  - Add support for Huff/CDIC MOBI compression scheme.
+
 0.05  Feb 17 2025
   Added:
     - queequeg: ishmael's own HTML dumper script that acts as a fallback

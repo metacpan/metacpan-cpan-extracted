@@ -1,44 +1,93 @@
 {
-   "abstract" : "Module designed to query the ADS",
+   "abstract" : "Perl library to connect with the Harvard Astrophysical Data Service",
    "author" : [
-      "Alasdair Allan <aa@astro.ex.ac.uk>"
+      "Boyd Duffee <duffee@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "open_source"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-ADS",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::RPM" : "0",
+            "Dist::Zilla::Plugin::Repository" : "0"
+         },
+         "requires" : {
+            "FindBin" : "0",
+            "Mojo::File" : "0",
+            "perl" : "5.026"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "LWP" : "5.53",
-            "Net::Domain" : "2.13",
-            "Pod::Usage" : "1.14",
-            "Test::More" : "0.65"
+            "Data::Dumper::Concise" : "0",
+            "Feature::Compat::Try" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "PerlX::Maybe" : "0",
+            "Types::Standard" : "0",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojo::UserAgent::Mockable" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test2::V0" : "0"
          }
       }
    },
+   "provides" : {
+      "Astro::ADS" : {
+         "file" : "lib/Astro/ADS.pm",
+         "version" : "1.90"
+      },
+      "Astro::ADS::Paper" : {
+         "file" : "lib/Astro/ADS/Paper.pm",
+         "version" : "1.90"
+      },
+      "Astro::ADS::Result" : {
+         "file" : "lib/Astro/ADS/Result.pm",
+         "version" : "1.90"
+      },
+      "Astro::ADS::Role::ResultMapper" : {
+         "file" : "lib/Astro/ADS/Role/ResultMapper.pm",
+         "version" : "1.90"
+      },
+      "Astro::ADS::Search" : {
+         "file" : "lib/Astro/ADS/Search.pm",
+         "version" : "1.90"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.26"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/duffee/astro-ads/issues"
+      },
+      "homepage" : "https://github.com/duffee/astro-ads",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/duffee/astro-ads.git",
+         "web" : "https://github.com/duffee/astro-ads"
+      }
+   },
+   "version" : "1.90",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
 }
+

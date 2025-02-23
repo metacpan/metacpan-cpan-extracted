@@ -97611,3 +97611,13 @@ M/MA/MANWAR/Map-Tube-Plugin-Graph-0.49.tar.gz
 B/BR/BRTASTIC/Mooish-Base-0.001.tar.gz
 L/LE/LEONT/Signal-Info-0.005.tar.gz
 M/MA/MANWAR/Task-Map-Tube-Bundle-0.06.tar.gz
+L/LI/LICHTKIND/App-GUI-Cellgraph-0.71.tar.gz
+P/PE/PERLANCAR/ArrayData-Lingua-Word-ID-KBBI-ByClass-Verb-0.001.tar.gz
+D/DU/DUFFEE/Astro-ADS-1.90.tar.gz
+D/DR/DROLSKY/DateTime-Format-ISO8601-0.17.tar.gz
+S/SA/SAMYOUNG/EBook-Ishmael-0.06.tar.gz
+S/SH/SHLOMIF/Games-Solitaire-BlackHole-Solver-0.16.0.tar.gz
+M/MA/MANWAR/Map-Tube-3.97.tar.gz
+L/LN/LNATION/MooX-Private-Attribute-1.03.tar.gz
+G/GE/GENE/Music-ToRoman-0.2002.tar.gz
+S/SH/SHLOMIF/XML-RSS-1.65.tar.gz

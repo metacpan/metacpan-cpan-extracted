@@ -1,0 +1,20 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=ack%2Caff%2Caff_id%2Calternate_bibcode%2Calternate_title%2Carxiv_class%2Cauthor%2Cauthor_count%2Cauthor_norm%2Cbibcode%2Cbibgroup%2Cbibstem%2Ccitation%2Ccitation_count%2Ccite_read_boost%2Cclassic_factor%2Ccomment%2Ccopyright%2Cdata%2Cdatabase%2Cdate%2Cdoctype%2Cdoi%2Ceid%2Centdate%2Centry_date%2Cesources%2Cfacility%2Cfirst_author%2Cfirst_author_norm%2Cgrant%2Cgrant_agencies%2Cgrant_id%2Cid%2Cidentifier%2Cindexstamp%2Cinst%2Cisbn%2Cissn%2Cissue%2Ckeyword%2Ckeyword_norm%2Ckeyword_schema%2Clang%2Clinks_data%2Cnedid%2Cnedtype%2Corcid_pub%2Corcid_other%2Corcid_user%2Cpage%2Cpage_count%2Cpage_range%2Cproperty%2Cpub%2Cpub_raw%2Cpubdate%2Cpubnote%2Cread_count%2Creference%2Csimbid%2Ctitle%2Cvizier%2Cvolume%2Cyear&q=dark+matter HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=ack%2Caff%2Caff_id%2Calternate_bibcode%2Calternate_title%2Carxiv_class%2Cauthor%2Cauthor_count%2Cauthor_norm%2Cbibcode%2Cbibgroup%2Cbibstem%2Ccitation%2Ccitation_count%2Ccite_read_boost%2Cclassic_factor%2Ccomment%2Ccopyright%2Cdata%2Cdatabase%2Cdate%2Cdoctype%2Cdoi%2Ceid%2Centdate%2Centry_date%2Cesources%2Cfacility%2Cfirst_author%2Cfirst_author_norm%2Cgrant%2Cgrant_agencies%2Cgrant_id%2Cid%2Cidentifier%2Cindexstamp%2Cinst%2Cisbn%2Cissn%2Cissue%2Ckeyword%2Ckeyword_norm%2Ckeyword_schema%2Clang%2Clinks_data%2Cnedid%2Cnedtype%2Corcid_pub%2Corcid_other%2Corcid_user%2Cpage%2Cpage_count%2Cpage_range%2Cproperty%2Cpub%2Cpub_raw%2Cpubdate%2Cpubnote%2Cread_count%2Creference%2Csimbid%2Ctitle%2Cvizier%2Cvolume%2Cyear&q=dark+matter",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nDate: Wed, 12 Feb 2025 12:34:16 GMT\r\n\r\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   }
+]

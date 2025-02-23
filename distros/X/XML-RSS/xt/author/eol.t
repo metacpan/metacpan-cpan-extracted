@@ -53,6 +53,7 @@ my @files = (
     't/encode-output.t',
     't/encoding.t',
     't/generated/placeholder.txt',
+    't/guid-outside-item.t',
     't/guid.t',
     't/load.t',
     't/render-upon-init.t',

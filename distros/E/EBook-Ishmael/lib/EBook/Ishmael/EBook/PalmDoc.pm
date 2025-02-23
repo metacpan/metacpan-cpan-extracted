@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use strict;
 use warnings;
 

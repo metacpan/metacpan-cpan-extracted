@@ -1,11 +1,14 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use strict;
 use warnings;
 
+use XML::LibXML;
+
 use EBook::Ishmael::Decode qw(lz77_decode);
 use EBook::Ishmael::EBook::PDB;
+use EBook::Ishmael::MobiHuff;
 
 # Many thanks to Tommy Persson, the original author of mobi2html, a script
 # which much of this code is based off of.
@@ -120,6 +123,8 @@ sub _decode_record {
 		return $encode;
 	} elsif ($self->{_compression} == 2) {
 		return lz77_decode($encode);
+	} elsif ($self->{_compression} == 17480) {
+		return $self->{_huff}->decode($encode);
 	}
 
 }
@@ -175,6 +180,7 @@ sub new {
 		_version     => undef,
 		_exth_flag   => undef,
 		_extra_data  => undef,
+		_huff        => undef,
 	};
 
 	bless $self, $class;
@@ -195,7 +201,11 @@ sub new {
 		undef,
 	) = unpack "n n N n n n n", $hdr;
 
-	if ($self->{_compression} != 1 and $self->{_compression} != 2) {
+	unless (
+		$self->{_compression} == 1 or
+		$self->{_compression} == 2 or
+		$self->{_compression} == 17480
+	) {
 		die "Mobi $self->{Source} uses an unsupported compression level\n";
 	}
 
@@ -221,6 +231,18 @@ sub new {
 	my ($toff, $tlen) = unpack "N N", substr $mobihdr, 0x54 - 16;
 	$self->{_exth_flag}  = unpack "N", substr $mobihdr, 0x70;
 	$self->{_extra_data} = unpack "n", substr $mobihdr, 0xf2 - 16;
+	my ($hoff, $hcount) = unpack "N N", substr $mobihdr, 0x70 - 16;
+
+	if ($self->{_compression} == 17480) {
+
+		unless ($EBook::Ishmael::MobiHuff::UNPACK_Q) {
+			die "Cannot read AZW $self->{Source}; perl does not support " .
+			    "unpacking 64-bit integars\n";
+		}
+
+		my @huffs = map { $self->{_pdb}->record($_)->data } ($hoff .. $hoff + $hcount - 1);
+		$self->{_huff} = EBook::Ishmael::MobiHuff->new(@huffs);
+	}
 
 	$self->{Metadata}->title([ substr $hdr, $toff, $tlen ]);
 

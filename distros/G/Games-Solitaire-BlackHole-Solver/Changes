@@ -1,5 +1,8 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.16.0  2025-02-23
+        - Keep track and report the number of checked postions.
+
 0.14.0  2025-02-06
         - Experimental support for solving several deal-filenames
         in the same executable invocation was improved with a oneline-header

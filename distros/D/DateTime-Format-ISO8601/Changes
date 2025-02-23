@@ -1,3 +1,10 @@
+0.17     2025-02-22
+
+- Fixed an issue with converting floating point second values to nanoseconds. These could be
+  converted to numbers which Perl stringified as an integer, but which really had a non-integer
+  component. Fixed by @n1vux (Bill Ricker). Fixes GH #14 via PR #15.
+
+
 0.16     2021-02-14
 
 - Add support for YYYYMMDDThhmm[+-]hhmm and YYYY-MM-DDThh:mm+hh:mm

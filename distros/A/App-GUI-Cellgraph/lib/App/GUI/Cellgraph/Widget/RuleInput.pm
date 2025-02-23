@@ -1,26 +1,27 @@
+
+# input pattern of a subrule in current colors as one passive widget
+
+package App::GUI::Cellgraph::Widget::RuleInput;
 use v5.12;
 use warnings;
 use Wx;
-
-
-package App::GUI::Cellgraph::Widget::RuleInput; # passive image
 use base qw/Wx::Panel/;
 
 sub new {
-    my ( $class, $parent, $cell_size, $pattern, $colors, $type ) = @_;
+    my ( $class, $parent, $cell_size, $pattern, $colors ) = @_;
 
-    return unless ref $pattern eq 'ARRAY' and ref $colors eq 'ARRAY' and @$colors and @$pattern;
-    for (@$colors){ return unless ref $_ eq 'ARRAY' and @$_ == 3 }
+    return unless ref $colors eq 'ARRAY' and defined $pattern;
+    map { return unless ref $_ eq 'ARRAY' and @$_ == 3 } @$colors;
 
-    my $sum_type = $type ? 1 : 0;
+    $pattern = [split //, $pattern];
     my $ignore_center = !( @$pattern % 2);
-
-    my $cell_count = @$pattern + $sum_type + $ignore_center;
+    my $cell_count = @$pattern + $ignore_center;
     my $x = ($cell_size + 1) * $cell_count + 1;
     my $y = $cell_size + 2;
     my $half_count = int (@$pattern / 2);
 
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x, $y]);
+
     $self->{'pattern'} = $pattern;
     $self->{'colors'} = $colors;
 
@@ -31,26 +32,16 @@ sub new {
         $dc->SetBackground( Wx::Brush->new( $bg_color, &Wx::wxBRUSHSTYLE_SOLID ) );
         $dc->Clear();
         my $base_x = 0;
-        if ($sum_type) {
-            $base_x += $cell_size + 1;
-            my $quarter = int ( $cell_size / 5 );
-            my $half    = int ( $cell_size / 2 );
-            $dc->SetPen( Wx::Pen->new( Wx::Colour->new( 0, 0, 0 ), 1, &Wx::wxPENSTYLE_SOLID ) );
-            $dc->DrawLine( $quarter,          1 + $quarter, $cell_size - (2*$quarter),          1 + $quarter);
-            $dc->DrawLine( $quarter, $cell_size - $quarter, $cell_size - (2*$quarter), $cell_size - $quarter);
-            $dc->DrawLine( $quarter,          1 + $quarter, $half, $half);
-            $dc->DrawLine( $quarter, $cell_size - $quarter, $half, $half);
-        }
         if ($ignore_center) {
             $dc->SetPen( Wx::Pen->new( Wx::Colour->new( 0, 0, 0 ), 1, &Wx::wxPENSTYLE_SOLID ) );
-            my $cross_x = ($half_count + $sum_type) * ($cell_size + 1);
+            my $cross_x = $half_count * ($cell_size + 1);
             $dc->DrawLine( $cross_x,              0, $cross_x + $cell_size + 1, $cell_size + 1);
             $dc->DrawLine( $cross_x, $cell_size + 1, $cross_x + $cell_size + 1,              0);
         }
         $dc->SetPen( Wx::Pen->new( Wx::Colour->new( 170, 170, 170 ), 1, &Wx::wxPENSTYLE_SOLID ) );
         $dc->DrawLine(  $base_x,    0, $x-1,    0 );
         $dc->DrawLine(  $base_x, $y-1, $x-1, $y-1 );
-        $dc->DrawLine( $_,    0,   $_, $y-1 ) for map { ($cell_size + 1) * $_ }  $sum_type .. $cell_count;
+        $dc->DrawLine( $_,    0,   $_, $y-1 ) for map { ($cell_size + 1) * $_ }  0 .. $cell_count;
 
         for my $cell_nr (0 .. $half_count - 1) {
             next if $pattern->[$cell_nr] >= @{$self->{'colors'}};

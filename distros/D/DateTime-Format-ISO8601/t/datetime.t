@@ -119,6 +119,12 @@ my @tests = (
         qw( YYYY-Www-DThh:mm+hh 1985-W15-5T10:15+04 1985-04-12T10:15:00 ),
         { time_zone => '+0400' }
     ],
+    [
+        # Expect for DT GH #145 HGuillemet = DTFI GH #22
+        qw( YYYYMMDDThhmmss.ssZ  2025-02-17T11:14:00.065341560Z ),
+        '2025-02-17T11:14:00',
+        { nanosecond => 65_341_560, time_zone => 'UTC', },
+    ],
 );
 
 subtest(

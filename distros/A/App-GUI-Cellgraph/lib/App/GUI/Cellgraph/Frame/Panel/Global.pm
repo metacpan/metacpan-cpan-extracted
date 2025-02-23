@@ -1,132 +1,244 @@
+
+# global settings panel
+
+package App::GUI::Cellgraph::Frame::Panel::Global;
 use v5.12;
 use warnings;
 use Wx;
-
-package App::GUI::Cellgraph::Frame::Panel::Global;
 use base qw/Wx::Panel/;
-# use App::GUI::Cellgraph::Widget::SliderCombo;
+use App::GUI::Cellgraph::Compute::Subrule;
+
+# action threshhold , value
 
 sub new {
-    my ( $class, $parent ) = @_;
+    my ( $class, $parent, $subrule_calc ) = @_;
+    return unless ref $subrule_calc eq 'App::GUI::Cellgraph::Compute::Subrule';
     my $self = $class->SUPER::new( $parent, -1);
+
+    $self->{'subrules'} = $subrule_calc;
     $self->{'call_back'} = sub {};
 
+    $self->create_label( 'logicals', 'State Rules', 'Section for rule logic settings' );
+    $self->create_label( 'actions', 'Action Rules', 'Section for action rule logic settings' );
+    $self->create_label( 'visuals',  'Visual Settings', 'Section for settings regarding appearances' );
+    $self->create_label( 'input_size',  'Input Size :',  'Size of neighbourhood - from how many cells compute new cell state ?' );
+    $self->create_label( 'state_count', 'Cell States :','How many states a cell can have ?' );
+    $self->create_label( 'subrule_selection',   'Select :',   'Which selection of subrules are distinct? Rest gets bundled.' );
+    $self->create_label( 'result_application', 'Result :', 'Result of a subrule should replace previous value (insert) or be added to it ?' );
+    $self->create_label( 'rule_count',  'Sub - Rules :','Amount of subrules and possible rules resulting from current settings.' );
+    $self->create_label( 'action_threshold','Threshold :',  'How to paint gaps between cell squares ?' );
+    $self->create_label( 'action_spread',  'Spread :',  'How many neighbours get influenced by cells action rules ?' );
+    $self->create_label( 'action_change',  'Change :',  'How much the action value always changes from round to round (never goes negative or above 1) ?' );
+    $self->create_label( 'grid',       'Grid Style :',  'How to paint gaps between cell squares ?' );
+    $self->create_label( 'cell_size',   'Cell Size :',  'Visual size of the cells in pixel.' );
+    $self->create_label( 'direction',   'Direction :',  'painting direction and pattern mirroring style' );
 
-    $self->{'settings_keys'} = [qw/grid_type cell_size paint_direction circular_grid state_count input_size/];#action_values action_threshold
-    $self->{'grid_lbl'} = Wx::StaticText->new( $self, -1, 'Grid Style:');
-    $self->{'cell_size_lbl'} = Wx::StaticText->new( $self, -1, 'Size :');
-    $self->{'direction_lbl'} = Wx::StaticText->new( $self, -1, 'Direction :');
-    $self->{'input_size_lbl'} = Wx::StaticText->new( $self, -1, 'Rule Input :');
-    $self->{'state_ab_lbl'} = Wx::StaticText->new( $self, -1, 'Cell States :');
-    $self->{'circular_grid'} = Wx::CheckBox->new( $self, -1, '  Circular');
-    # $self->{'action_ab_lbl'} = Wx::StaticText->new( $self, -1, 'Action Values :');
-    # $self->{'threshhold_lbl'} = Wx::StaticText->new( $self, -1, 'Threshold :');
-    $self->{'grid_type'} = Wx::ComboBox->new( $self, -1, 'lines', [-1,-1],[90, -1], ['lines', 'gaps', 'no']);
-    $self->{'cell_size'} = Wx::ComboBox->new( $self, -1, '3', [-1,-1],[65, -1], [qw/1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 25 30/], &Wx::wxTE_READONLY);
-    $self->{'paint_direction'} = Wx::ComboBox->new( $self, -1, 'top_down', [-1,-1],[120, -1], [qw/top_down outside_in inside_out/], &Wx::wxTE_READONLY);
-    $self->{'state_count'} = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[65, -1], [qw/2 3 4 5 6 7 8 9/], &Wx::wxTE_READONLY);
-    $self->{'input_size'} = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[65, -1], [qw/2 3 4 5 6 7/], &Wx::wxTE_READONLY);
-    # $self->{'action_values'} = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[75, -1], [qw/2 3 4 5 6 7 8 9/], &Wx::wxTE_READONLY);
-    # $self->{'action_threshold'} = Wx::ComboBox->new( $self, -1, '1', [-1,-1],[75, -1], [qw/0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2/], &Wx::wxTE_READONLY);
+    $self->{'widget'}{'grid_circular'}    = Wx::CheckBox->new( $self, -1, '  Circular');
+    $self->{'widget'}{'action_rules_apply'} = Wx::CheckBox->new( $self, -1, '  Apply');
+    $self->{'widget'}{'fill_cells'}       = Wx::CheckBox->new( $self, -1, '  Fill');
 
-    $self->{'grid_lbl'}->SetToolTip('how to display the cell map');
-    $self->{'grid_type'}->SetToolTip('how to display the cell map');
-    $self->{'cell_size_lbl'}->SetToolTip('visual size of the cells in pixel');
-    $self->{'cell_size'}->SetToolTip('visual size of the cells in pixel');
-    $self->{'direction_lbl'}->SetToolTip('painting direction');
-    $self->{'paint_direction'}->SetToolTip('painting direction');
-    $self->{'input_size_lbl'}->SetToolTip('Size of neighbourhood - from how many cells compute new cell state ?');
-    $self->{'input_size'}->SetToolTip('Size of neighbourhood (how many cells) to compute new cell state from ?');
-    $self->{'state_ab_lbl'}->SetToolTip('How many states a cell can have?');
-    $self->{'state_count'}->SetToolTip('How many states a cell can have?');
-    $self->{'circular_grid'}->SetToolTip('using cells on the endges as neighbours to each other');
-    # $self->{'action_values'}->SetToolTip('how many action values between 0 and 1 a cell can emit to itself and neighbours?');
-    # $self->{'action_threshold'}->SetToolTip('when action value of a cell is equal or higher the cell will be active?');
+    $self->{'widget'}{'subrule_count'}    = Wx::TextCtrl->new( $self, -1, 8, [-1,-1], [ 45, -1], &Wx::wxTE_READONLY );
+    $self->{'widget'}{'rule_count'}       = Wx::TextCtrl->new( $self, -1, 8, [-1,-1], [ 125, -1], &Wx::wxTE_READONLY );
 
-    Wx::Event::EVT_CHECKBOX( $self, $self->{$_}, sub { $self->{'call_back'}->() }) for qw/circular_grid/;
-    Wx::Event::EVT_COMBOBOX( $self, $self->{$_}, sub { $self->{'call_back'}->() }) for @{$self->{'settings_keys'}};
+    $self->{'widget'}{'input_size'}        = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[65, -1], [qw/2 3 4 5 6 7/], &Wx::wxTE_READONLY);
+    $self->{'widget'}{'state_count'}       = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[65, -1], [qw/2 3 4 5 6 7 8 9/], &Wx::wxTE_READONLY);
+    $self->{'widget'}{'subrule_selection'} = Wx::ComboBox->new( $self, -1, '2', [-1,-1],[118, -1], [qw/all symmetric sorted summing/], &Wx::wxTE_READONLY); # median
+    $self->{'widget'}{'result_application'}= Wx::ComboBox->new( $self, -1, '2', [-1,-1],[110, -1], [qw/insert rotate add add_rot subtract multiply/], &Wx::wxTE_READONLY);
+    $self->{'widget'}{'action_threshold'}  = Wx::ComboBox->new( $self, -1, '0.6', [-1,-1],[90, -1], [0, 0.1,0.2,0.3,0.4,0.5,0.6,0.65,0.7,0.75,0.8,0.85, 0.9, 0.95,1.0]);
+    $self->{'widget'}{'action_spread'}     = Wx::ComboBox->new( $self, -1, '0.6', [-1,-1],[65, -1], [0,1,2,3]);
+    $self->{'widget'}{'action_change'}     = Wx::ComboBox->new( $self, -1, '0.6', [-1,-1],[85, -1], ['-1','-0.9','-0.8','-0.7','-0.6','-0.5','-0.4','-0.3','-0.2','-.1',0,'+0.1','+0.2','+0.3','+0.4','+0.5','+0.6','+0.7','+0.8','+0.9','+1']);
+    $self->{'widget'}{'grid_type'}         = Wx::ComboBox->new( $self, -1, 'lines', [-1,-1],[90, -1], ['lines', 'gaps', 'no']);
+    $self->{'widget'}{'cell_size'}         = Wx::ComboBox->new( $self, -1, '3', [-1,-1],[75, -1], [qw/1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 25 30/], &Wx::wxTE_READONLY);
+    $self->{'widget'}{'paint_direction'}   = Wx::ComboBox->new( $self, -1, 'top_down', [-1,-1],[120, -1], [qw/top_down outside_in inside_out/], &Wx::wxTE_READONLY);
 
-    my $std_attr = &Wx::wxALIGN_LEFT | &Wx::wxGROW | &Wx::wxALIGN_CENTER_HORIZONTAL;
-    my $row_attr = $std_attr | &Wx::wxLEFT;
-    my $all_attr = $std_attr | &Wx::wxALL;
+    $self->{'widget'}{'rule_count'}->SetToolTip('Count of subrules that a rule sonsists of with current settings?');
+    $self->{'widget'}{'subrule_count'}->SetToolTip('Count of possible rules with current amount of subrules?');
+    $self->{'widget'}{'input_size'}->SetToolTip('Size of neighbourhood (how many cells) to compute new cell state from ?');
+    $self->{'widget'}{'state_count'}->SetToolTip('How many states a cell can have?');
+    $self->{'widget'}{'rule_count'}->SetToolTip('Count of Rules resulting from current settings');
+    $self->{'widget'}{'subrule_count'}->SetToolTip('Count of Subrules resulting from current settings');
+    $self->{'widget'}{'subrule_selection'}->SetToolTip("symmetric = an asymetric rule and its mirror have same result\nsumming = all rules with same sum of input states have same result");
+    $self->{'widget'}{'result_application'}->SetToolTip("Result of a subrule should replace previous value (insert) or be added to it ?");
+    $self->{'widget'}{'action_rules_apply'}->SetToolTip( "should action rules determine if a (state) rule gets applied this round.");
+    $self->{'widget'}{'action_threshold'}->SetToolTip( "Action potential of a cell has to be at least this big so state can change.");
+    $self->{'widget'}{'action_spread'}->SetToolTip( "How many neighbours get influenced by cells action rules ?");
+    $self->{'widget'}{'action_change'}->SetToolTip( "How much the action value always changes from round to round (never goes negative or above 1) ?");
+    $self->{'widget'}{'grid_type'}->SetToolTip('How to paint gaps between cell squares');
+    $self->{'widget'}{'cell_size'}->SetToolTip('visual size of the cells in pixel');
+    $self->{'widget'}{'paint_direction'}->SetToolTip('painting direction');
+    $self->{'widget'}{'grid_circular'}->SetToolTip('cells on the edges become neighbours to each other');
+    $self->{'widget'}{'fill_cells'}->SetToolTip('fill cell squares with color, or just pain rectangles');
 
-    my $grid_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    $grid_sizer->AddSpacer( 15 );
-    $grid_sizer->Add( $self->{'grid_lbl'}, 0, $all_attr, 7);
-    $grid_sizer->Add( $self->{'grid_type'}, 0, $row_attr, 8);
-    $grid_sizer->AddSpacer( 33 );
-    $grid_sizer->Add( $self->{'cell_size_lbl'}, 0, $all_attr, 7);
-    $grid_sizer->AddSpacer( 3 );
-    $grid_sizer->Add( $self->{'cell_size'}, 0, $row_attr, 8);
-    $grid_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'widget'}{$_}, sub { $self->{'call_back'}->() })
+        for qw/grid_circular action_rules_apply fill_cells/;
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'widget'}{$_}, sub { $self->{'call_back'}->() })
+        for qw/grid_type cell_size action_threshold action_spread action_change paint_direction result_application/;
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'widget'}{$_}, sub { $self->compute_subrule_count; $self->{'call_back'}->() })
+        for qw/state_count input_size subrule_selection/;
 
-    my $paint_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    $paint_sizer->AddSpacer( 15 );
-    $paint_sizer->Add( $self->{'direction_lbl'}, 0, $all_attr, 7);
-    $paint_sizer->Add( $self->{'paint_direction'}, 0, $row_attr, 8);
-    $paint_sizer->AddSpacer( 40 );
-    $paint_sizer->Add( $self->{'circular_grid'}, 0, $row_attr, 8);
-    $paint_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    my $std_attr = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL;
+    my $sep_attr = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT | &Wx::wxGROW;
+    my $all_attr = $std_attr | &Wx::wxALL | &Wx::wxGROW;
+    my $indent   = 15;
 
-    my $rule_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    $rule_sizer->AddSpacer( 15 );
-    $rule_sizer->Add( $self->{'input_size_lbl'}, 0, $all_attr, 8);
-    $rule_sizer->Add( $self->{'input_size'}, 0, $row_attr, 8);
-    $rule_sizer->AddSpacer( 21 );
-    $rule_sizer->Add( $self->{'state_ab_lbl'}, 0, $all_attr, 7);
-    $rule_sizer->Add( $self->{'state_count'}, 0, $row_attr, 8);
-    $rule_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    my $rule1_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $rule1_sizer->AddSpacer( $indent );
+    $rule1_sizer->Add( $self->{'label'}{'input_size'}, 0, $std_attr, 0);
+    $rule1_sizer->AddSpacer( 10 );
+    $rule1_sizer->Add( $self->{'widget'}{'input_size'}, 0, $std_attr, 0);
+    $rule1_sizer->AddSpacer( 40 );
+    $rule1_sizer->Add( $self->{'label'}{'state_count'}, 0, $std_attr, 0);
+    $rule1_sizer->AddSpacer( 10 );
+    $rule1_sizer->Add( $self->{'widget'}{'state_count'}, 0, $std_attr, 0);
+    $rule1_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
-    my $action_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    $action_sizer->AddSpacer( 23 );
-    $action_sizer->Add( $self->{'action_ab_lbl'}, 0, $all_attr, 7);
-    $action_sizer->Add( $self->{'action_values'}, 0, $row_attr, 8);
-    $action_sizer->AddSpacer( 18 );
-    $action_sizer->Add( $self->{'threshhold_lbl'}, 0, $all_attr, 7);
-    $action_sizer->Add( $self->{'action_threshold'}, 0, $row_attr, 8);
-    $action_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    my $rule2_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $rule2_sizer->AddSpacer( $indent );
+    $rule2_sizer->Add( $self->{'label'}{'subrule_selection'}, 0, $std_attr, 0);
+    $rule2_sizer->AddSpacer( 10 );
+    $rule2_sizer->Add( $self->{'widget'}{'subrule_selection'}, 0, $std_attr, 0);
+    $rule2_sizer->AddSpacer( 15 );
+    $rule2_sizer->Add( $self->{'label'}{'rule_count'}, 0,   $std_attr, 0);
+    $rule2_sizer->AddSpacer( 10 );
+    $rule2_sizer->Add( $self->{'widget'}{'subrule_count'}, 0, $std_attr, 0);
+    $rule2_sizer->AddSpacer( 5 );
+    $rule2_sizer->Add( $self->{'widget'}{'rule_count'}, 0,  $std_attr, 0);
+    $rule2_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
-    my $row_space = 20;
+    my $rule3_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $rule3_sizer->AddSpacer( $indent );
+    $rule3_sizer->Add( $self->{'label'}{'result_application'}, 0, $std_attr, 0);
+    $rule3_sizer->AddSpacer( 10 );
+    $rule3_sizer->Add( $self->{'widget'}{'result_application'}, 0, $std_attr, 0);
+    $rule3_sizer->AddSpacer( 97 );
+    $rule3_sizer->Add( $self->{'widget'}{'grid_circular'}, 0, $std_attr, 0);
+    $rule3_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+
+    my $action1_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $action1_sizer->AddSpacer( $indent );
+    $action1_sizer->Add( $self->{'widget'}{'action_rules_apply'}, 0, $std_attr, 0);
+    $action1_sizer->AddSpacer( 115 );
+    $action1_sizer->Add( $self->{'label'}{'action_threshold'}, 0, $std_attr, 0);
+    $action1_sizer->AddSpacer( 10 );
+    $action1_sizer->Add( $self->{'widget'}{'action_threshold'}, 0, $std_attr, 0);
+    $action1_sizer->AddSpacer( 15 );
+    $action1_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+
+    my $action2_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $action2_sizer->AddSpacer( $indent );
+    $action2_sizer->Add( $self->{'label'}{'action_spread'}, 0, $std_attr, 0);
+    $action2_sizer->AddSpacer( 10 );
+    $action2_sizer->Add( $self->{'widget'}{'action_spread'}, 0, $std_attr, 0);
+    $action2_sizer->AddSpacer( 73 );
+    $action2_sizer->Add( $self->{'label'}{'action_change'}, 0, $std_attr, 0);
+    $action2_sizer->AddSpacer( 10 );
+    $action2_sizer->Add( $self->{'widget'}{'action_change'}, 0, $std_attr, 0);
+    $action2_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+
+    my $visual1_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $visual1_sizer->AddSpacer( $indent );
+    $visual1_sizer->Add( $self->{'label'}{'direction'}, 0, $std_attr, 0);
+    $visual1_sizer->AddSpacer( 10 );
+    $visual1_sizer->Add( $self->{'widget'}{'paint_direction'}, 0, $std_attr, 0);
+    $visual1_sizer->AddSpacer( 85 );
+    $visual1_sizer->Add( $self->{'widget'}{'fill_cells'}, 0, $std_attr, 0);
+    $visual1_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+
+    my $visual2_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $visual2_sizer->AddSpacer( $indent );
+    $visual2_sizer->Add( $self->{'label'}{'grid'}, 0, $std_attr, 0);
+    $visual2_sizer->AddSpacer( 10 );
+    $visual2_sizer->Add( $self->{'widget'}{'grid_type'}, 0, $std_attr, 0);
+    $visual2_sizer->AddSpacer( 30 );
+    $visual2_sizer->Add( $self->{'label'}{'cell_size'}, 0, $std_attr, 0);
+    $visual2_sizer->AddSpacer( 10 );
+    $visual2_sizer->Add( $self->{'widget'}{'cell_size'}, 0, $std_attr, 0);
+    $visual2_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+
+    my $row_space = 15;
     my $main_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
+    $main_sizer->AddSpacer( $row_space-5 );
+    $main_sizer->Add( $self->{'label'}{'logicals'}, 0, &Wx::wxALIGN_CENTER_HORIZONTAL , 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( $grid_sizer, 0, $std_attr, 0);
+    $main_sizer->Add( $rule1_sizer, 0, $std_attr, 0);
+    $main_sizer->AddSpacer( $row_space);
+    $main_sizer->Add( $rule2_sizer, 0, $std_attr, 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( $paint_sizer, 0, $std_attr, 0);
+    $main_sizer->Add( $rule3_sizer, 0, $std_attr, 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( Wx::StaticLine->new( $self, -1), 0, $row_attr|&Wx::wxRIGHT, $row_space );
+    $main_sizer->Add( Wx::StaticLine->new( $self, -1), 0, $sep_attr, $row_space );
+    $main_sizer->AddSpacer( $row_space-5 );
+    $main_sizer->Add( $self->{'label'}{'actions'}, 0, &Wx::wxALIGN_CENTER_HORIZONTAL , 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( $rule_sizer, 0, $std_attr, 0);
+    $main_sizer->Add( $action1_sizer, 0, $std_attr, 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( Wx::StaticLine->new( $self, -1), 0, $row_attr|&Wx::wxRIGHT, $row_space );
+    $main_sizer->Add( $action2_sizer, 0, $std_attr, 0);
     $main_sizer->AddSpacer( $row_space );
-    $main_sizer->Add( $action_sizer, 0, $std_attr, 0);
+    $main_sizer->Add( Wx::StaticLine->new( $self, -1), 0, $sep_attr, $row_space );
+    $main_sizer->AddSpacer( $row_space-5 );
+    $main_sizer->Add( $self->{'label'}{'visuals'}, 0, &Wx::wxALIGN_CENTER_HORIZONTAL , 0);
+    $main_sizer->AddSpacer( $row_space );
+    $main_sizer->Add( $visual1_sizer, 0, $std_attr, 0);
+    $main_sizer->AddSpacer( $row_space );
+    $main_sizer->Add( $visual2_sizer, 0, $std_attr, 0);
+    $main_sizer->AddSpacer( $row_space );
     $main_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
-
     $self->SetSizer( $main_sizer );
     $self->init;
     $self;
 }
-
-sub init        { $_[0]->set_settings({ grid_type => 'lines', cell_size => 3, paint_direction => 'top_down',
-                                    state_count => 2, input_size => 3, circular_grid => 0}) } #action_values => 2, action_threshold => 1
-
-sub get_settings {
-    my ($self) = @_;
-    my $settings = { map { $_ => $self->{$_}->GetValue } @{$self->{'settings_keys'}} };
-    $settings;
-}
-
-sub set_settings {
-    my ($self, $settings) = @_;
-    return unless ref $settings eq 'HASH';
-    $self->{$_}->SetValue( $settings->{$_} ) for @{$self->{'settings_keys'}};
-}
-
-sub SetCallBack {
+sub set_callback {
     my ($self, $code) = @_;
     return unless ref $code eq 'CODE';
     $self->{'call_back'} = $code;
 }
 
+my $default_settings = {
+    input_size => 3, state_count => 2, grid_circular => 1,
+    subrule_selection => 'all', subrule_count => 8, rule_count => 256,
+    result_application => 'insert',
+    action_rules_apply => 0, action_spread => 0,
+    action_change => -0.6, action_threshold => 0.7,
+    paint_direction => 'top_down', grid_type => 'lines', cell_size => 3,
+    fill_cells => 1,
+};
+
+sub init        { $_[0]->set_settings( $default_settings ) }
+sub get_settings {
+    my ($self) = @_;
+    my $settings = { map { $_ => $self->{'widget'}{$_}->GetValue } keys %{$self->{'widget'}} };
+}
+sub get_state   { $_[0]->get_settings() }
+sub set_settings {
+    my ($self, $settings) = @_;
+    return unless ref $settings eq 'HASH';
+    my $change = 0;
+    for my $key (keys %{$self->{'widget'}}) {
+        my $value = (exists $settings->{$key}) ? $settings->{$key} : $default_settings->{$key};
+        next if $value eq $self->{'widget'}{$key}->GetValue;
+        $self->{'widget'}{$key}->SetValue( $value );
+        $change++;
+    }
+    $self->compute_subrule_count if $change;
+}
+
+sub compute_subrule_count {
+    my ($self) = @_;
+    $self->{'subrules'}->renew(
+        $self->{'widget'}{'input_size'}->GetValue,
+        $self->{'widget'}{'state_count'}->GetValue,
+        $self->{'widget'}{'subrule_selection'}->GetValue
+    );
+    $self->{'widget'}{'subrule_count'}->SetValue( $self->{'subrules'}->independent_count );
+    $self->{'widget'}{'rule_count'}->SetValue( $self->{'subrules'}->state_count ** $self->{'subrules'}->independent_count );
+}
+
+sub create_label {
+    my ($self, $id, $text, $help) = @_;
+    return unless defined $text and $text and not exists $self->{'label'}{ $id };
+    $self->{'label'}{ $id } = Wx::StaticText->new( $self, -1, $text );
+    $self->{'label'}{ $id }->SetToolTip( $help ) if defined $help and $help;
+    $self->{'label'}{ $id }
+}
 
 1;

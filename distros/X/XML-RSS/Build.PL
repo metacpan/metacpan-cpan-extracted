@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "XML-RSS",
-  "dist_version" => "1.64",
+  "dist_version" => "1.65",
   "license" => "perl",
   "module_name" => "XML::RSS",
   "recursive_test_files" => 1,

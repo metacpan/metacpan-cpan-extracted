@@ -8,7 +8,7 @@ use Getopt::Long;
 use XML::LibXML;
 
 my $HELP = <<"HERE";
-Usage: $0 [options] file
+Usage: $0 [options] [file ...]
 
 Options:
   -w|--width=<width>   Max output line width
@@ -145,7 +145,7 @@ sub main {
 		'help|h' => sub { print $HELP; exit 0 },
 	) or die "Error in command line arguments\n";
 
-	$param->{Html} = shift @ARGV or die $HELP;
+	$param->{Html} = @ARGV ? [ @ARGV ] : undef;
 
 	unless ($param->{Width} >= $WIDTH_MIN and $param->{Width} <= $WIDTH_MAX) {
 		die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
@@ -155,17 +155,38 @@ sub main {
 
 	binmode *STDOUT, ':utf8';
 
-	my $dom = XML::LibXML->load_html(
-		location => $param->{Html},
-		recover => 2,
-		encoding => 'utf8',
-	);
+	# Read from stdin if no file provided.
+	if (not defined $param->{Html}) {
 
-	my ($body) = $dom->findnodes('/html/body');
+		my $dom = XML::LibXML->load_html(
+			IO => *STDIN,
+			recover => 2,
+			encoding => 'utf8',
+		);
 
-	$body //= $dom->documentElement;
+		my ($body) = $dom->findnodes('/html/body');
+		$body //= $dom->documentElement;
 
-	say html2text($body);
+		say html2text($body);
+
+	} else {
+
+		say join "\n\n", map {
+
+			my $dom = XML::LibXML->load_html(
+				location => $_,
+				recover => 2,
+				encoding => 'utf8',
+			);
+
+			my ($body) = $dom->findnodes('/html/body');
+			$body //= $dom->documentElement;
+
+			html2text($body);
+
+		} @{ $param->{Html} };
+
+	}
 
 	1;
 
@@ -179,15 +200,17 @@ queequeg - Formatted HTML dumper for ishmael
 
 =head1 SYNOPSIS
 
-  queequeg [options] file
+  queequeg [options] [file ...]
 
 =head1 DESCRIPTION
 
-B<queequeg> is a script that reads a given HTML file and dumps its formatted
+B<queequeg> is a script that reads given HTML files and dumps their formatted
 contents to F<stdout>. It's designed to be L<ishmael>'s fallback dumper if no
 other valid one is installed on your system. It tries to do as minimal
 formatting as possible, which some users might find preferrable over the more
 advanced formatting other dumpers are capable of.
+
+When ran with no arguments, reads HTML from F<stdin>.
 
 =head1 OPTIONS
 

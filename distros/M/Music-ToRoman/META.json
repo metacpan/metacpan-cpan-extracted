@@ -65,7 +65,7 @@
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.2001",
+   "version" : "0.2002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

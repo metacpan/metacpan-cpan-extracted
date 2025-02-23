@@ -1,5 +1,5 @@
 package XML::RSS::Private::Output::Base;
-$XML::RSS::Private::Output::Base::VERSION = '1.64';
+$XML::RSS::Private::Output::Base::VERSION = '1.65';
 use strict;
 use warnings;
 
@@ -1153,7 +1153,7 @@ __END__
 
 =head1 VERSION
 
-version 1.64
+version 1.65
 
 =head1 METHODS
 

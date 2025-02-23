@@ -78,35 +78,35 @@
    "provides" : {
       "XML::RSS" : {
          "file" : "lib/XML/RSS.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::Base" : {
          "file" : "lib/XML/RSS/Private/Output/Base.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::Roles::ImageDims" : {
          "file" : "lib/XML/RSS/Private/Output/Roles/ImageDims.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::Roles::ModulesElems" : {
          "file" : "lib/XML/RSS/Private/Output/Roles/ModulesElems.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::V0_9" : {
          "file" : "lib/XML/RSS/Private/Output/V0_9.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::V0_91" : {
          "file" : "lib/XML/RSS/Private/Output/V0_91.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::V1_0" : {
          "file" : "lib/XML/RSS/Private/Output/V1_0.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       },
       "XML::RSS::Private::Output::V2_0" : {
          "file" : "lib/XML/RSS/Private/Output/V2_0.pm",
-         "version" : "1.64"
+         "version" : "1.65"
       }
    },
    "release_status" : "stable",
@@ -121,10 +121,10 @@
          "web" : "https://github.com/shlomif/perl-XML-RSS"
       }
    },
-   "version" : "1.64",
+   "version" : "1.65",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.040000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -592,7 +592,7 @@
          "version" : "6.032"
       }
    },
-   "x_generated_by_perl" : "v5.40.0",
+   "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

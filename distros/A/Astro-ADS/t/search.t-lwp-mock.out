@@ -1,0 +1,56 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=bibcode&q=star HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=bibcode&q=star",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Headers: Accept, Authorization, Content-Type, Orcid-Authorization, X-BB-Api-Client-Version, X-CSRFToken\r\nAccess-Control-Allow-Methods: DELETE, GET, OPTIONS, POST, PUT\r\nAccess-Control-Allow-Origin: http://0.0.0.0:8000, http://adsabs.harvard.edu, http://adsx.cfa.harvard.edu:8888, http://hourly.adslabs.org, http://localhost:8000, http://playground.scixplorer.org, http://sciencediscoveryengine.nasa.gov, http://sciencediscoveryengine.test.nasa.gov, http://scixplorer.org, http://sde-lrm.nasa-impact.net, http://sde-qa.nasa-impact.net, http://ui.adsabs.harvard.edu, http://ui.adslabs.org, http://www.scixplorer.org, https://arxiv.org, https://beta.arxiv.org, https://demo.adsabs.harvard.edu, https://dev.adsabs.harvard.edu, https://dev.scixplorer.org, https://devui.adsabs.harvard.edu, https://experimental-bumblebee.us-east-1.elasticbeanstalk.com, https://playground.scixplorer.org, https://prod.adsabs.harvard.edu, https://sciencediscoveryengine.nasa.gov, https://sciencediscoveryengine.test.nasa.gov, https://scixplorer.org, https://sde-lrm.nasa-impact.net, https://sde-qa.nasa-impact.net, https://staging-bumblebee.elasticbeanstalk.com, https://staging-bumblebee.us-east-1.elasticbeanstalk.com, https://ui.adsabs.harvard.edu, https://www.scixplorer.org\r\nConnection: keep-alive\r\nContent-Length: 877\r\nContent-Type: application/json\r\nDate: Wed, 12 Feb 2025 22:13:15 GMT\r\nRetry-After: 83734\r\nSet-Cookie: session=.eJyrVopPK0otzlCyKikqTdVRis9MUbKqVlJIUrJSiszyyvCrysjwDfHLiMwKrPINAeJc1wo_F18Tv1xX48hcvxy_kHSDqCxPW6VaoN6C1KLcxLzUvBKYaaXFqUVgE5WMDY2NjZRqAQ3LJEY.Z60c-w.oxj-HkUhbmXnZzYjqtrD3rFlExI; Expires=Fri, 13-Feb-2026 04:13:15 GMT; Secure; HttpOnly; Path=/; SameSite=None\r\nVary: Origin\r\nX-RateLimit-Limit: 5000\r\nX-RateLimit-Remaining: 4997\r\nX-RateLimit-Reset: 1739482130\r\n\r\n{\n  \"responseHeader\":{\n    \"status\":0,\n    \"QTime\":29,\n    \"params\":{\n      \"q\":\"star\",\n      \"fl\":\"bibcode\",\n      \"start\":\"0\",\n      \"internal_logging_params\":\"X-Amzn-Trace-Id=Root=1-67ad1cfb-61f0133c1de5a7c96bc798b8\",\n      \"boost\":\"add(doctype_boost, 1)\",\n      \"rows\":\"10\",\n      \"wt\":\"json\"}},\n  \"response\":{\"numFound\":646864,\"start\":0,\"numFoundExact\":true,\"docs\":[\n      {\n        \"bibcode\":\"2011Natur.477..207S\"},\n      {\n        \"bibcode\":\"2003NanoL...3..459S\"},\n      {\n        \"bibcode\":\"2006PNAS..103..921S\"},\n      {\n        \"bibcode\":\"2011NIMPA.659..106A\"},\n      {\n        \"bibcode\":\"2004NanoL...4.1587S\"},\n      {\n        \"bibcode\":\"2004AdM....16.2049S\"},\n      {\n        \"bibcode\":\"2003MaMol..36..553S\"},\n      {\n        \"bibcode\":\"2006nucl.ex...1042S\"},\n      {\n        \"bibcode\":\"2014ApJ...784...44L\"},\n      {\n        \"bibcode\":\"2003NanoL...3.1421S\"}]\n  }}\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=bibcode&q=dark+energy HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=bibcode&q=dark+energy",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Headers: Accept, Authorization, Content-Type, Orcid-Authorization, X-BB-Api-Client-Version, X-CSRFToken\r\nAccess-Control-Allow-Methods: DELETE, GET, OPTIONS, POST, PUT\r\nAccess-Control-Allow-Origin: http://0.0.0.0:8000, http://adsabs.harvard.edu, http://adsx.cfa.harvard.edu:8888, http://hourly.adslabs.org, http://localhost:8000, http://playground.scixplorer.org, http://sciencediscoveryengine.nasa.gov, http://sciencediscoveryengine.test.nasa.gov, http://scixplorer.org, http://sde-lrm.nasa-impact.net, http://sde-qa.nasa-impact.net, http://ui.adsabs.harvard.edu, http://ui.adslabs.org, http://www.scixplorer.org, https://arxiv.org, https://beta.arxiv.org, https://demo.adsabs.harvard.edu, https://dev.adsabs.harvard.edu, https://dev.scixplorer.org, https://devui.adsabs.harvard.edu, https://experimental-bumblebee.us-east-1.elasticbeanstalk.com, https://playground.scixplorer.org, https://prod.adsabs.harvard.edu, https://sciencediscoveryengine.nasa.gov, https://sciencediscoveryengine.test.nasa.gov, https://scixplorer.org, https://sde-lrm.nasa-impact.net, https://sde-qa.nasa-impact.net, https://staging-bumblebee.elasticbeanstalk.com, https://staging-bumblebee.us-east-1.elasticbeanstalk.com, https://ui.adsabs.harvard.edu, https://www.scixplorer.org\r\nConnection: keep-alive\r\nContent-Length: 885\r\nContent-Type: application/json\r\nDate: Wed, 12 Feb 2025 22:13:20 GMT\r\nRetry-After: 83729\r\nSet-Cookie: session=.eJyrVopPK0otzlCyKikqTdVRis9MUbKqVlJIUrJS8g0PNYnMDcqNrPI0isqNNI3Misr1NXI1inJJyfWtSq_0C4_Kjsryyow0crVVqgXqLUgtyk3MS80rgZlWWpxaBDZRydjQ2NhIqRYA8eAkAQ.Z60dAA.xJFt7AshFy-uTMFEjIeKgiX83AA; Expires=Fri, 13-Feb-2026 04:13:20 GMT; Secure; HttpOnly; Path=/; SameSite=None\r\nVary: Origin\r\nX-RateLimit-Limit: 5000\r\nX-RateLimit-Remaining: 4996\r\nX-RateLimit-Reset: 1739482130\r\n\r\n{\n  \"responseHeader\":{\n    \"status\":0,\n    \"QTime\":4799,\n    \"params\":{\n      \"q\":\"dark energy\",\n      \"fl\":\"bibcode\",\n      \"start\":\"0\",\n      \"internal_logging_params\":\"X-Amzn-Trace-Id=Root=1-67ad1cfb-1c5923ba0c11c8006e4fdc05\",\n      \"boost\":\"add(doctype_boost, 1)\",\n      \"rows\":\"10\",\n      \"wt\":\"json\"}},\n  \"response\":{\"numFound\":74858,\"start\":0,\"numFoundExact\":true,\"docs\":[\n      {\n        \"bibcode\":\"2006IJMPD..15.1753C\"},\n      {\n        \"bibcode\":\"2003RvMP...75..559P\"},\n      {\n        \"bibcode\":\"2016MNRAS.460.1270D\"},\n      {\n        \"bibcode\":\"2015AJ....150..150F\"},\n      {\n        \"bibcode\":\"2024AJ....168...58D\"},\n      {\n        \"bibcode\":\"2005astro.ph.10346T\"},\n      {\n        \"bibcode\":\"2004PhLB..603....1L\"},\n      {\n        \"bibcode\":\"2010LRR....13....3D\"},\n      {\n        \"bibcode\":\"2008ARA&A..46..385F\"},\n      {\n        \"bibcode\":\"2011CoTPh..56..525L\"}]\n  }}\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 1
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=bibcode&q=star+neutron HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=bibcode&q=star+neutron",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Headers: Accept, Authorization, Content-Type, Orcid-Authorization, X-BB-Api-Client-Version, X-CSRFToken\r\nAccess-Control-Allow-Methods: DELETE, GET, OPTIONS, POST, PUT\r\nAccess-Control-Allow-Origin: http://0.0.0.0:8000, http://adsabs.harvard.edu, http://adsx.cfa.harvard.edu:8888, http://hourly.adslabs.org, http://localhost:8000, http://playground.scixplorer.org, http://sciencediscoveryengine.nasa.gov, http://sciencediscoveryengine.test.nasa.gov, http://scixplorer.org, http://sde-lrm.nasa-impact.net, http://sde-qa.nasa-impact.net, http://ui.adsabs.harvard.edu, http://ui.adslabs.org, http://www.scixplorer.org, https://arxiv.org, https://beta.arxiv.org, https://demo.adsabs.harvard.edu, https://dev.adsabs.harvard.edu, https://dev.scixplorer.org, https://devui.adsabs.harvard.edu, https://experimental-bumblebee.us-east-1.elasticbeanstalk.com, https://playground.scixplorer.org, https://prod.adsabs.harvard.edu, https://sciencediscoveryengine.nasa.gov, https://sciencediscoveryengine.test.nasa.gov, https://scixplorer.org, https://sde-lrm.nasa-impact.net, https://sde-qa.nasa-impact.net, https://staging-bumblebee.elasticbeanstalk.com, https://staging-bumblebee.us-east-1.elasticbeanstalk.com, https://ui.adsabs.harvard.edu, https://www.scixplorer.org\r\nConnection: keep-alive\r\nContent-Length: 886\r\nContent-Type: application/json\r\nDate: Wed, 12 Feb 2025 22:13:25 GMT\r\nRetry-After: 83725\r\nSet-Cookie: session=.eJyrVopPK0otzlCyKikqTdVRis9MUbKqVlJIUrJSigoJrfB1Sa7yd_HLiKzKyPUL96z0dXE0iAqJyvR1CTX0DfGsiMr1yvDNSrZVqgXqLUgtyk3MS80rgZlWWpxaBDZRydjQ2NhIqRYA_sskJQ.Z60dBQ.3dSsGP0_8PdgQz4aw8Hp_ljJ_O4; Expires=Fri, 13-Feb-2026 04:13:25 GMT; Secure; HttpOnly; Path=/; SameSite=None\r\nVary: Origin\r\nX-RateLimit-Limit: 5000\r\nX-RateLimit-Remaining: 4995\r\nX-RateLimit-Reset: 1739482131\r\n\r\n{\n  \"responseHeader\":{\n    \"status\":0,\n    \"QTime\":3576,\n    \"params\":{\n      \"q\":\"star neutron\",\n      \"fl\":\"bibcode\",\n      \"start\":\"0\",\n      \"internal_logging_params\":\"X-Amzn-Trace-Id=Root=1-67ad1d00-6a51e05b6beed8aa025d3980\",\n      \"boost\":\"add(doctype_boost, 1)\",\n      \"rows\":\"10\",\n      \"wt\":\"json\"}},\n  \"response\":{\"numFound\":60688,\"start\":0,\"numFoundExact\":true,\"docs\":[\n      {\n        \"bibcode\":\"2019ApJ...887L..21R\"},\n      {\n        \"bibcode\":\"2017ApJ...848L..12A\"},\n      {\n        \"bibcode\":\"1979ApJ...232..259G\"},\n      {\n        \"bibcode\":\"2003ApJ...591..288H\"},\n      {\n        \"bibcode\":\"1998PhRvC..58.1804A\"},\n      {\n        \"bibcode\":\"2016ApJ...821...38S\"},\n      {\n        \"bibcode\":\"2001ApJ...550..426L\"},\n      {\n        \"bibcode\":\"2002A&A...387..993P\"},\n      {\n        \"bibcode\":\"1992ApJ...395L..83N\"},\n      {\n        \"bibcode\":\"2010MNRAS.406.2650M\"}]\n  }}\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 2
+   }
+]

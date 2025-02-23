@@ -1,0 +1,38 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=bibcode&q=author%3APaunzen HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=bibcode&q=author%3APaunzen",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Headers: Accept, Authorization, Content-Type, Orcid-Authorization, X-BB-Api-Client-Version, X-CSRFToken\r\nAccess-Control-Allow-Methods: DELETE, GET, OPTIONS, POST, PUT\r\nAccess-Control-Allow-Origin: http://0.0.0.0:8000, http://adsabs.harvard.edu, http://adsx.cfa.harvard.edu:8888, http://hourly.adslabs.org, http://localhost:8000, http://playground.scixplorer.org, http://sciencediscoveryengine.nasa.gov, http://sciencediscoveryengine.test.nasa.gov, http://scixplorer.org, http://sde-lrm.nasa-impact.net, http://sde-qa.nasa-impact.net, http://ui.adsabs.harvard.edu, http://ui.adslabs.org, http://www.scixplorer.org, https://arxiv.org, https://beta.arxiv.org, https://demo.adsabs.harvard.edu, https://dev.adsabs.harvard.edu, https://dev.scixplorer.org, https://devui.adsabs.harvard.edu, https://experimental-bumblebee.us-east-1.elasticbeanstalk.com, https://playground.scixplorer.org, https://prod.adsabs.harvard.edu, https://sciencediscoveryengine.nasa.gov, https://sciencediscoveryengine.test.nasa.gov, https://scixplorer.org, https://sde-lrm.nasa-impact.net, https://sde-qa.nasa-impact.net, https://staging-bumblebee.elasticbeanstalk.com, https://staging-bumblebee.us-east-1.elasticbeanstalk.com, https://ui.adsabs.harvard.edu, https://www.scixplorer.org\r\nConnection: keep-alive\r\nContent-Length: 884\r\nContent-Type: application/json\r\nDate: Thu, 13 Feb 2025 06:54:04 GMT\r\nRetry-After: 52486\r\nSet-Cookie: session=.eJyrVopPK0otzlCyKikqTdVRis9MUbKqVlJIUrJSigqJNPSrCjTwM_Itj8oKy_TLcsv0zfU18M31ygKJ-bqHGvq6e2VHhnjaKtUC9RakFuUm5qXmlcBMKy1OLQKbqGRsaGxspFQLAMzlI1Y.Z62XDA.7b_n9-mxJZgVakrsJmARZc64j1k; Expires=Fri, 13-Feb-2026 12:54:04 GMT; Secure; HttpOnly; Path=/; SameSite=None\r\nVary: Origin\r\nX-RateLimit-Limit: 5000\r\nX-RateLimit-Remaining: 4992\r\nX-RateLimit-Reset: 1739482131\r\n\r\n{\n  \"responseHeader\":{\n    \"status\":0,\n    \"QTime\":97,\n    \"params\":{\n      \"q\":\"author:Paunzen\",\n      \"fl\":\"bibcode\",\n      \"start\":\"0\",\n      \"internal_logging_params\":\"X-Amzn-Trace-Id=Root=1-67ad970c-2899458465755df07c5ab009\",\n      \"boost\":\"add(doctype_boost, 1)\",\n      \"rows\":\"10\",\n      \"wt\":\"json\"}},\n  \"response\":{\"numFound\":437,\"start\":0,\"numFoundExact\":true,\"docs\":[\n      {\n        \"bibcode\":\"2012Msngr.147...25G\"},\n      {\n        \"bibcode\":\"2021MNRAS.504..356D\"},\n      {\n        \"bibcode\":\"2022A&A...666A.121R\"},\n      {\n        \"bibcode\":\"2024MNRAS.527.9548H\"},\n      {\n        \"bibcode\":\"2022A&A...666A.120G\"},\n      {\n        \"bibcode\":\"2024SSRv..220...24K\"},\n      {\n        \"bibcode\":\"2019MNRAS.490.4040A\"},\n      {\n        \"bibcode\":\"2015A&A...580A..23P\"},\n      {\n        \"bibcode\":\"2021yCat..75040356D\"},\n      {\n        \"bibcode\":\"2024A&A...687A.176K\"}]\n  }}\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /v1/search/query?fl=bibcode&q=author%3APaunzen&start=10 HTTP/1.1\r\nAccept-Encoding: gzip\r\nAuthorization: Bearer TOKEN_REMOVED\r\nHost: api.adsabs.harvard.edu\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "api.adsabs.harvard.edu",
+            "path" : "/v1/search/query",
+            "query" : "fl=bibcode&q=author%3APaunzen&start=10",
+            "scheme" : "https"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Headers: Accept, Authorization, Content-Type, Orcid-Authorization, X-BB-Api-Client-Version, X-CSRFToken\r\nAccess-Control-Allow-Methods: DELETE, GET, OPTIONS, POST, PUT\r\nAccess-Control-Allow-Origin: http://0.0.0.0:8000, http://adsabs.harvard.edu, http://adsx.cfa.harvard.edu:8888, http://hourly.adslabs.org, http://localhost:8000, http://playground.scixplorer.org, http://sciencediscoveryengine.nasa.gov, http://sciencediscoveryengine.test.nasa.gov, http://scixplorer.org, http://sde-lrm.nasa-impact.net, http://sde-qa.nasa-impact.net, http://ui.adsabs.harvard.edu, http://ui.adslabs.org, http://www.scixplorer.org, https://arxiv.org, https://beta.arxiv.org, https://demo.adsabs.harvard.edu, https://dev.adsabs.harvard.edu, https://dev.scixplorer.org, https://devui.adsabs.harvard.edu, https://experimental-bumblebee.us-east-1.elasticbeanstalk.com, https://playground.scixplorer.org, https://prod.adsabs.harvard.edu, https://sciencediscoveryengine.nasa.gov, https://sciencediscoveryengine.test.nasa.gov, https://scixplorer.org, https://sde-lrm.nasa-impact.net, https://sde-qa.nasa-impact.net, https://staging-bumblebee.elasticbeanstalk.com, https://staging-bumblebee.us-east-1.elasticbeanstalk.com, https://ui.adsabs.harvard.edu, https://www.scixplorer.org\r\nConnection: keep-alive\r\nContent-Length: 886\r\nContent-Type: application/json\r\nDate: Thu, 13 Feb 2025 06:54:04 GMT\r\nRetry-After: 52486\r\nSet-Cookie: session=.eJyrVopPK0otzlCyKikqTdVRis9MUbKqVlJIUrJS8g0PNYnMDcqNrPI0isqNNI3Misr1NXI1inJJyfWtSq_0C4_Kjsryyow0crVVqgXqLUgtyk3MS80rgZlWWpxaBDZRydjQ2NhIqRYA8eAkAQ.Z62XDA.EhqYU2RKklsUC_R4zWm3R9Es7GE; Expires=Fri, 13-Feb-2026 12:54:04 GMT; Secure; HttpOnly; Path=/; SameSite=None\r\nVary: Origin\r\nX-RateLimit-Limit: 5000\r\nX-RateLimit-Remaining: 4991\r\nX-RateLimit-Reset: 1739482131\r\n\r\n{\n  \"responseHeader\":{\n    \"status\":0,\n    \"QTime\":62,\n    \"params\":{\n      \"q\":\"author:Paunzen\",\n      \"fl\":\"bibcode\",\n      \"start\":\"10\",\n      \"internal_logging_params\":\"X-Amzn-Trace-Id=Root=1-67ad970c-10f7ffd265824ffe6e9e3bea\",\n      \"boost\":\"add(doctype_boost, 1)\",\n      \"rows\":\"10\",\n      \"wt\":\"json\"}},\n  \"response\":{\"numFound\":437,\"start\":10,\"numFoundExact\":true,\"docs\":[\n      {\n        \"bibcode\":\"2024A&A...689A.270P\"},\n      {\n        \"bibcode\":\"2016A&A...585A.150N\"},\n      {\n        \"bibcode\":\"2023ApJS..269...32S\"},\n      {\n        \"bibcode\":\"2022A&A...666A.142S\"},\n      {\n        \"bibcode\":\"2023A&A...676A..55L\"},\n      {\n        \"bibcode\":\"2021MNRAS.506.1073H\"},\n      {\n        \"bibcode\":\"2024A&A...687A.208P\"},\n      {\n        \"bibcode\":\"2023A&A...676A..88P\"},\n      {\n        \"bibcode\":\"2025MNRAS.536...72F\"},\n      {\n        \"bibcode\":\"2016AN....337..239P\"}]\n  }}\n",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 1
+   }
+]

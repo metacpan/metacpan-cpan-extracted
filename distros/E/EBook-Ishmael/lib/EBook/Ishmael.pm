@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -58,7 +58,22 @@ HERE
 my %FORMAT_ALTS = (
 	'fb2'   => 'fictionbook2',
 	'xhtml' => 'html',
+	'azw'   => 'mobi',
 );
+
+sub _get_out {
+
+	my $file = shift;
+
+	if (defined $file) {
+		open my $fh, '>', $file
+			or die "Failed to open $file for writing: $!\n";
+		return $fh;
+	} else {
+		return *STDOUT;
+	}
+
+}
 
 sub init {
 
@@ -123,17 +138,11 @@ sub text {
 
 	$ebook->html($tmp);
 
-	my $oh;
-	if (defined $self->{Output}) {
-		open $oh, '>', $self->{Output}
-			or die "Failed to open $self->{Output} for writing: $!\n";
-	} else {
-		$oh = *STDOUT;
-	}
+	my $oh = _get_out($self->{Output});
 
 	print { $oh } browser_dump $tmp, { browser => $self->{Dumper}, width => $self->{Width} };
 
-	close $oh if defined $self->{Output};
+	close $oh unless $oh eq *STDOUT;
 
 	1;
 
@@ -150,14 +159,16 @@ sub meta {
 
 	my %meta = %{ $ebook->metadata };
 
-	return 1 unless %meta;
+	my $oh = _get_out($self->{Output});
 
 	# Make room for colon and extra space
 	my $klen = max map { length($_) + 2 } keys %meta;
 
 	for my $k (sort keys %meta) {
-		say pack("A$klen", "$k:"), join(", ", @{ $meta{ $k } });
+		say { $oh } pack("A$klen", "$k:"), join(", ", @{ $meta{ $k } });
 	}
+
+	close $oh unless $oh eq *STDOUT;
 
 	1;
 
@@ -174,6 +185,8 @@ sub meta_json {
 
 	my $meta = $ebook->metadata;
 
+	my $oh = _get_out($self->{Output});
+
 	for my $k (keys %{ $meta }) {
 		# Flatten arrays that contain a single item
 		if (@{ $meta->{ $k } } == 1) {
@@ -181,7 +194,9 @@ sub meta_json {
 		}
 	}
 
-	say to_json($meta, { utf8 => 1, pretty => 1, canonical => 1 });
+	print { $oh } to_json($meta, { utf8 => 1, pretty => 1, canonical => 1 });
+
+	close $oh unless $oh eq *STDOUT;
 
 	1;
 
@@ -208,17 +223,11 @@ sub html {
 		$self->{Format}
 	);
 
-	my $oh;
-	if (defined $self->{Output}) {
-		open $oh, '>', $self->{Output}
-			or die "Failed to open $self->{Output} for writing: $!\n";
-	} else {
-		$oh = *STDOUT;
-	}
+	my $oh = _get_out($self->{Output});
 
 	say { $oh } $ebook->html;
 
-	close $oh if defined $self->{Output};
+	close $oh unless $oh eq *STDOUT;
 
 	1;
 

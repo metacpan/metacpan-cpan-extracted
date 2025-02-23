@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.14.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.16.0';
 use Moo;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
@@ -77,8 +77,9 @@ else
 has [
     '_active_record',            '_active_task',
     '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
-    '_prelude_iter',             '_positions',
-    '_tasks',                    '_task_idx',
+    '_num_traversed_positions',  '_prelude_iter',
+    '_positions',                '_tasks',
+    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -304,6 +305,14 @@ sub _end_report
             $self->get_max_num_played_cards()
         );
     }
+    $output_handle->printf(
+        "Total number of states checked is %u.\n",
+        scalar( $self->_num_traversed_positions() ),
+    );
+    $output_handle->printf(
+        "This scan generated %u states.\n",
+        scalar( keys %{ $self->_positions } ),
+    );
 
     return;
 }
@@ -361,6 +370,7 @@ sub _set_up_initial_position
     my ( $self, $talon_ptr ) = @_;
 
     $self->_max_iters_limit_exceeded(0);
+    $self->_num_traversed_positions(0);
 
     my $init_state = "";
 
@@ -749,6 +759,7 @@ sub _find_moves
     my $offset           = $self->_bits_offset();
     my $used             = '';
     my @fnd;
+    $self->_num_traversed_positions( 1 + $self->_num_traversed_positions() );
     foreach my $i ( 0 .. $_num_foundations - 1 )
     {
         my $v = vec( $state, $i, 8 );
@@ -784,7 +795,7 @@ sub _find_moves
                     if ( !$exists )
                     {
                         $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                        if ( keys(%$positions) > $max_iters_limit )
+                        if ( keys(%$positions) >= $max_iters_limit )
                         {
                             $self->_max_iters_limit_exceeded(1);
                             if ( $self->_do_not_err_on_exceeding_max_iters_limit
@@ -828,7 +839,7 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.14.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.16.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -853,7 +864,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.14.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.16.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -872,7 +883,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.14.0
+version 0.16.0
 
 =head1 METHODS
 

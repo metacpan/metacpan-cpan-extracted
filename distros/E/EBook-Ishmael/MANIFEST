@@ -16,6 +16,7 @@ lib/EBook/Ishmael/EBook/PDF.pm
 lib/EBook/Ishmael/EBook/Skeleton.pm
 lib/EBook/Ishmael/EBook/Text.pm
 lib/EBook/Ishmael/EBook/zTXT.pm
+lib/EBook/Ishmael/MobiHuff.pm
 lib/EBook/Ishmael/TextBrowserDump.pm
 lib/EBook/Ishmael/TextToHtml.pm
 LICENSE

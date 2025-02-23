@@ -1,8 +1,39 @@
+
+0.71 2025-02-22  lichtkind
+-------
+    * = cleanup fix release
+    * ? small POD fixes
+    * & remove dead code
+    * & separate defaut configs
+
+0.7 2025-02-20  lichtkind
+-------
+    * = major feature release
+    * * overhauled action/activity rule logic
+    * * able to set starting row of action values
+    * + making action rules optional
+    * + adding symmetric state rules only mode
+    * + adding sorting state rules only mode
+    * + making summing state rules mapping optional
+    * + different types of subrule result application
+    * + new faster drawing style option: not filled squares
+    * + buttons to randomize colors and activity values
+    * / GUI overhaul
+    * / subrules are numbered
+    * / adjusted window size so draw board is fully seen
+    * ? rewrote most POD documentation
+    * ? increase GUI based documentation
+    * ? better tool tips
+    * & code cleanup
+    * & full picture draw is now 3 times faster (dropped brush usage)
+    * & faster start (does sketches image only once)
+    * ! fix redraw move blib bug
+
 0.33 2025-01-25  lichtkind
 -------
     * = bug fix release
     * ! first row status is now saved in a settings file
-    * ! ensure config fils have ending .ini
+    * ! ensure image settings files have ending .ini
 
 0.32 2023-11-17  lichtkind
 -------
@@ -32,8 +63,8 @@
 
 0.26 2023-09-30  lichtkind
 -------
-    * = bug fix
-    * adopt code to new GTC API
+    * = bug fix release
+    * & adopt code to new GTC API
 
 0.25 2023-02-23  lichtkind
 -------
@@ -45,7 +76,7 @@
 
 0.2  2023-01-30  lichtkind
 -------
-    * = colors
+    * = major feature relese colors
     * * new Color panel with many functions (see Color sections in POD)
     * + setting changes trigger only a sketch for faster interactions
     * + draw button for full images
@@ -53,7 +84,7 @@
 
 0.1  2022-12-25  lichtkind
 -------
-    * = multi level fix
+    * = multi level bug fix release
     * + bring back cell mobility with previous fixed feature set
     * ? update docs
     * ! crashes on most buttons to get related rules
@@ -77,5 +108,4 @@
 
 
 TODO:
-
-  meta settings for action rules
+ switch to prima widgt toolkit

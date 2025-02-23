@@ -87,6 +87,8 @@ TD
 6C
 5H
 4D
+Total number of states checked is 8636.
+This scan generated 8672 states.
 EOF
 
 {
@@ -1209,6 +1211,8 @@ Foundations: [ 5H -> 4D ]
 :
 :
 
+Total number of states checked is 8636.
+This scan generated 8672 states.
 EOF
 
 {
@@ -1322,8 +1326,7 @@ EOF
     unlink($sol_fn);
 }
 
-my $MAX_NUM_PLAYED_CARDS_RE =
-    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
+my $MAX_NUM_PLAYED_CARDS_RE = qr/\AAt most ([0-9]+) cards could be played\.$/ms;
 
 my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-played-cards");
 
@@ -1477,19 +1480,89 @@ sub _test_multiple_verdict_lines
     my %is_verdict_line = map { $_ => 1, }
         ( "Solved!", "Unsolved!", "Exceeded max_iters_limit !" );
     my ($args) = @_;
-    my ( $name, $want, $input_lines ) =
-        @{$args}{qw/ name expected_results input_lines/};
+    my ( $name, $expected_files_checks, $want, $input_lines ) =
+        @{$args}{qw/ name expected_files_checks expected_results input_lines/};
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return subtest $name => sub {
         plan tests => 2;
-        my @matches = (
-            map {
-                my $l = $_;
-                chomp $l;
-                $is_verdict_line{$l} ? ($l) : ();
+        $input_lines =
+            [ map { my $l = as_lf($_); chomp $l; $l } @$input_lines ];
+        my @matches;
+        my $deal_idx = 0;
+        while (@$input_lines)
+        {
+            my $dealstart = shift @$input_lines;
+            my ($fn) = $dealstart =~ /^\[\= Starting file (\S+) \=\]$/ms
+                or die "cannot match";
+            if ( not $expected_files_checks->( $deal_idx, $fn ) )
+            {
+                die "filename check";
             }
-            map { as_lf($_) } @$input_lines,
-        );
+            my $dealverdict = shift @$input_lines;
+            if ( $is_verdict_line{$dealverdict} )
+            {
+                push @matches, $dealverdict;
+            }
+            else
+            {
+                die "mismatch";
+            }
+            my $at_most_num_cards__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+                /^At most (?:(?:0)|(?:[1-9][0-9]*)) cards could be played\.\z/ms
+                )
+            {
+                $at_most_num_cards__line = 1;
+                shift @$input_lines;
+            }
+            my $traversed_states_count__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+/^Total number of states checked is (?:(?:0)|(?:[1-9][0-9]*))\.\z/ms,
+                )
+            {
+                $traversed_states_count__line = 1;
+                shift @$input_lines;
+            }
+            my $generated_states_count__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+                /^This scan generated (?:(?:0)|(?:[1-9][0-9]*)) states\.\z/ms )
+            {
+                $generated_states_count__line = 1;
+                shift @$input_lines;
+            }
+            if (0)
+            {
+                while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
+                {
+                    diag( "unrecognised: '" . $input_lines->[0] . "'" );
+                    shift @$input_lines;
+                }
+            }
+            my $dealend = shift @$input_lines;
+            if ( $dealend ne "[= END of file $fn =]" )
+            {
+                die "dealend mismatch";
+            }
+            if ( not $at_most_num_cards__line )
+            {
+                die "At most cards played line is absent";
+            }
+            if ( not $traversed_states_count__line )
+            {
+                die "'checked states' line is absent";
+            }
+            if ( not $generated_states_count__line )
+            {
+                die "'This scan generated' line is absent";
+            }
+        }
+        continue
+        {
+            ++$deal_idx;
+        }
 
         is( scalar(@matches), scalar(@$want), "lines count." );
 
@@ -1498,30 +1571,35 @@ sub _test_multiple_verdict_lines
 }
 
 {
-    my $sol_fn = _filename("_test_multiple_verdict_lines.bh.sol.txt");
+    my $sol_fn        = _filename("_test_multiple_verdict_lines.bh.sol.txt");
+    my @deals_indexes = ( 11, 12, 13, 25, );
 
     # TEST
     ok(
         system(
-            $^X, "-Mblib", $BHS, "--max-iters", 2000,
+            $^X, "-Mblib", $BHS, "--quiet", "--max-iters", 2000,
             @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
-            _filename_maxiters2000(11),
-            _filename_maxiters2000(12),
-            _filename_maxiters2000(13),
-            _filename_maxiters2000(25),
-
+            ( map { _filename_maxiters2000($_), } @deals_indexes ),
         )
     );
 
     # TEST
     _test_multiple_verdict_lines(
         {
-            name             => "max-num-played on no moves",
+            name             => "test multiple verdict lines",
             expected_results => [
                 "Exceeded max_iters_limit !", "Solved!",
                 "Exceeded max_iters_limit !", "Unsolved!"
             ],
-            input_lines => [ path($sol_fn)->lines_utf8() ]
+            expected_files_checks => sub {
+                my $i       = shift;
+                my $dealidx = $deals_indexes[$i];
+                my $fn      = path(shift);
+                my $bn      = $fn->basename();
+
+                return ( $bn =~ m#bh\Q$dealidx\E\.board#ms );
+            },
+            input_lines => [ path($sol_fn)->lines_utf8() ],
         }
     );
 

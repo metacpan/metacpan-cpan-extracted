@@ -4,7 +4,7 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 # VERSION
 
-version 0.16
+version 0.17
 
 # SYNOPSIS
 
@@ -381,8 +381,6 @@ Everyone at the DateTime `Asylum`.
 
 Bugs may be submitted at [https://github.com/houseabsolute/DateTime-Format-ISO8601/issues](https://github.com/houseabsolute/DateTime-Format-ISO8601/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for DateTime-Format-ISO8601 can be found at [https://github.com/houseabsolute/DateTime-Format-ISO8601](https://github.com/houseabsolute/DateTime-Format-ISO8601).
@@ -398,10 +396,11 @@ The source code repository for DateTime-Format-ISO8601 can be found at [https://
 - joe <draxil@gmail.com>
 - Liam Widdowson <lbw@telstra.com>
 - Thomas Klausner <domm@plix.at>
+- William Ricker <bill.n1vux@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Joshua Hoblitt.
+This software is copyright (c) 2025 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

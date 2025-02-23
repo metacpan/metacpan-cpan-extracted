@@ -32,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ToRoman
   repository: https://github.com/ology/Music-ToRoman.git
-version: '0.2001'
+version: '0.2002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

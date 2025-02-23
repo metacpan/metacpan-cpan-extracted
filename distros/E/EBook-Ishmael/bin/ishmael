@@ -32,17 +32,17 @@ B<ishmael> currently supports the following ebook formats:
 
 =item EPUB
 
-=item FictionBook2
+=item MOBI
 
-=item HTML
+=item AZW
 
-=item XHTML
-
-=item Mobi
-
-=item PalmDoc
+=item HTML/XHTML
 
 =item PDF
+
+=item FictionBook2
+
+=item PalmDoc
 
 =item zTXT
 
@@ -101,6 +101,8 @@ heuristics, manually specify the format. The following are valid options
 =item xhtml
 
 =item mobi
+
+=item azw
 
 =item palmdoc
 

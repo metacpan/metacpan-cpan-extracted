@@ -1,5 +1,10 @@
 Revision history for Perl module XML::RSS
 
+1.65    2025-02-23
+    - Fix <*:guid> outside a feed's item element
+        - https://github.com/shlomif/perl-XML-RSS/issues/24
+        - Thanks to @steve-piner
+
 1.64    2024-10-16
     - Avoid double $VERSION
         - https://github.com/shlomif/perl-XML-RSS/pull/23

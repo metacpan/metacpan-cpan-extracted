@@ -1,9 +1,9 @@
 package XML::RSS;
-$XML::RSS::VERSION = '1.64';
+$XML::RSS::VERSION = '1.65';
 use strict;
 use warnings;
 
-use Carp qw/ confess croak /;
+use Carp        qw/ confess croak /;
 use XML::Parser ();
 
 use XML::RSS::Private::Output::Base  ();
@@ -286,7 +286,7 @@ sub _get_dc_ok_fields {
           subject
           title
           type
-          )
+        )
     ];
 }
 
@@ -906,9 +906,36 @@ sub _start_array_element {
 }
 
 sub _last_item {
-    my $self = shift;
+    my $self      = shift;
+    my $items     = $self->{'items'};
+    my $num_items = $self->{num_items};
 
-    return ($self->{'items'}->[$self->{num_items} - 1] ||= {});
+    if( (($num_items != @$items + 1) and ($num_items != @$items ))) # or (not @$items))
+    {
+        confess "num_items [ $num_items vs @{[scalar@$items]} ] is not big enough";
+    }
+    my $pos =$num_items - 1;
+    if ($pos < 0)
+    {
+        push @$items, +{};
+        ++$pos;
+        if ($pos != 0)
+        {
+            confess "num_items [ $num_items vs @{[scalar@$items]} ] is not big enough";
+        }
+    }
+    elsif ($pos > $#$items)
+    {
+        push @$items, +{};
+        # ++$pos;
+        if ($pos !=$#$items)
+        {
+            confess "num_items [ $num_items vs @{[scalar@$items]} ] is not big enough";
+        }
+    }
+
+
+    return ($items->[$pos]);
 }
 
 sub _handle_start {
@@ -1019,10 +1046,10 @@ sub _handle_start {
 
         # guid element is a permanent link unless isPermaLink attribute is set to false
     }
-    elsif ($el eq 'guid') {
+    elsif (($el eq 'guid')
+            and ($self->{_inside_item_elem})) {
         $self->_last_item->{'isPermaLink'} =
           ((!exists($attribs{'isPermaLink'})) || (lc($attribs{'isPermaLink'}) ne 'false'));
-
         # beginning of taxo li element in item element
         #'http://purl.org/rss/1.0/modules/taxonomy/' => 'taxo'
     }
@@ -1508,7 +1535,7 @@ XML::RSS - creates and updates RSS files
 
 =head1 VERSION
 
-version 1.64
+version 1.65
 
 =head1 SYNOPSIS
 

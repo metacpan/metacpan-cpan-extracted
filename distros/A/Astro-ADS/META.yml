@@ -1,25 +1,50 @@
 ---
-abstract: 'Module designed to query the ADS'
+abstract: 'Perl library to connect with the Harvard Astrophysical Data Service'
 author:
-  - 'Alasdair Allan <aa@astro.ex.ac.uk>'
+  - 'Boyd Duffee <duffee@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Mojo::UserAgent::Mockable: '0'
+  Test2::Tools::Compare: '0'
+  Test2::V0: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
-license: open_source
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Astro-ADS
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Astro::ADS:
+    file: lib/Astro/ADS.pm
+    version: '1.90'
+  Astro::ADS::Paper:
+    file: lib/Astro/ADS/Paper.pm
+    version: '1.90'
+  Astro::ADS::Result:
+    file: lib/Astro/ADS/Result.pm
+    version: '1.90'
+  Astro::ADS::Role::ResultMapper:
+    file: lib/Astro/ADS/Role/ResultMapper.pm
+    version: '1.90'
+  Astro::ADS::Search:
+    file: lib/Astro/ADS/Search.pm
+    version: '1.90'
 requires:
-  LWP: 5.53
-  Net::Domain: 2.13
-  Pod::Usage: 1.14
-  Test::More: 0.65
-version: 1.26
+  Data::Dumper::Concise: '0'
+  Feature::Compat::Try: '0'
+  Mojolicious: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  PerlX::Maybe: '0'
+  Types::Standard: '0'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/duffee/astro-ads/issues
+  homepage: https://github.com/duffee/astro-ads
+  repository: https://github.com/duffee/astro-ads.git
+version: '1.90'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: MIT

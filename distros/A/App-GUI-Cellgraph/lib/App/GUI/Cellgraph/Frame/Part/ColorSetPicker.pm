@@ -20,10 +20,10 @@ sub new {
     $self->{'set_names'} = [ sort keys %{$self->{'sets'}} ];
     $self->{'set_index'} = 1;
 
-    my $btnw = 50; my $btnh = 20;# button width and height
+    my $btnw = 46; my $btnh = 17;# button width and height
     $self->{'select'} = Wx::ComboBox->new( $self, -1, $self->current_set_name, [-1,-1], [170, -1], $self->{'set_names'});
-    $self->{'<'}    = Wx::Button->new( $self, -1, '<',       [-1,-1], [ 30, 20] );
-    $self->{'>'}    = Wx::Button->new( $self, -1, '>',       [-1,-1], [ 30, 20] );
+    $self->{'<'}    = Wx::Button->new( $self, -1, '<',       [-1,-1], [ 27, $btnh] );
+    $self->{'>'}    = Wx::Button->new( $self, -1, '>',       [-1,-1], [ 27, $btnh] );
     $self->{'load'} = Wx::Button->new( $self, -1, 'Load',    [-1,-1], [$btnw, $btnh] );
     $self->{'del'}  = Wx::Button->new( $self, -1, 'Del',     [-1,-1], [$btnw, $btnh] );
     $self->{'save'} = Wx::Button->new( $self, -1, 'Save',    [-1,-1], [$btnw, $btnh] );
@@ -69,29 +69,34 @@ sub new {
         $self->update_select();
     });
 
-    my $vset_attr = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_HORIZONTAL | &Wx::wxGROW | &Wx::wxTOP| &Wx::wxBOTTOM;
-    my $all_attr  = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_HORIZONTAL | &Wx::wxGROW | &Wx::wxALL;
+    my $std_attr = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL| &Wx::wxGROW;
+    my $tb_attr = $std_attr | &Wx::wxTOP| &Wx::wxBOTTOM;
+    my $button_attr  = &Wx::wxLEFT | $tb_attr;
+    my $all_attr = $std_attr | &Wx::wxALL;
     my $row1 = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $row1->AddSpacer( 10 );
-    $row1->Add( $self->{'select'}, 0, $vset_attr, 5 );
-    $row1->Add( $self->{'<'},      0, $vset_attr, 5 );
-    $row1->Add( $self->{'>'},      0, $vset_attr, 5 );
+    $row1->Add( $self->{'del'},  0, $button_attr,  5 );
+    $row1->AddSpacer( 10 );
+    $row1->Add( $self->{'select'}, 0, $tb_attr, 5 );
+    $row1->Add( $self->{'<'},      0, $tb_attr, 5 );
+    $row1->Add( $self->{'>'},      0, $tb_attr, 5 );
     $row1->AddSpacer( 5 );
-    $row1->Add( $self->{'load'}, 0, $all_attr,  3 );
-    $row1->Add( $self->{'del'},  0, $all_attr,  3 );
-    $row1->Add( $self->{'save'}, 0, $all_attr,  3 );
-    $row1->Add( $self->{'new'},  0, $all_attr,  3 );
+    $row1->Add( $self->{'load'}, 0, $button_attr,  5 );
+    $row1->AddSpacer( 5 );
+    $row1->Add( $self->{'new'},  0, $button_attr,  5 );
+    $row1->AddSpacer( 5 );
+    $row1->Add( $self->{'save'}, 0, $button_attr,  5 );
     $row1->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $row2 = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
-    $row2->AddSpacer( 10 );
+    $row2->AddSpacer( 60 );
     $row2->Add( $self->{'display'}[$_], 0, $all_attr, 5 ) for 0 .. 8;
     $row2->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $sizer->Add( $row1, 0, $all_attr, 0 );
+    $sizer->Add( $row1, 0, $tb_attr, 0 );
     $sizer->AddSpacer( 5 );
-    $sizer->Add( $row2, 0, $all_attr, 0 );
+    $sizer->Add( $row2, 0, $tb_attr, 0 );
     $self->SetSizer($sizer);
 
     $self->update_display;

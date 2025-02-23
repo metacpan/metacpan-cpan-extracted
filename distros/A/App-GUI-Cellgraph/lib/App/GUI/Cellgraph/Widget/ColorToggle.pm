@@ -12,8 +12,10 @@ sub new {
 
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x+2, $y+2]);
     $self->{'colors'} = $colors;
-    $self->{'init'} = $start // 0;
     $self->{'callback'} = sub {};
+    $self->{'init'} = $start // 0;
+    $self->{'value'} = -1;
+    $self->{'responsive'} = -1;
 
     Wx::Event::EVT_PAINT( $self, sub {
         my( $cpanel, $event ) = @_;
@@ -29,6 +31,7 @@ sub new {
     } );
 
     Wx::Event::EVT_LEFT_DOWN( $self, sub {
+        return unless $self->{'responsive'};
         my $value = $self->GetValue;
         $value++;
         $value = 0 if $value > $self->GetMaxValue;
@@ -36,6 +39,7 @@ sub new {
         $self->{'callback'}->( $self->{'value'}  );
     });
     Wx::Event::EVT_RIGHT_DOWN( $self, sub {
+        return unless $self->{'responsive'};
         my $value = $self->GetValue;
         $value--;
         $value = $self->GetMaxValue if $value < 0;
@@ -53,6 +57,7 @@ sub GetValue { $_[0]->{'value'} }
 sub SetValue {
     my ( $self, $value ) = @_;
     return unless defined $value and $value > -1 and $value <= $self->GetMaxValue;
+    return if $self->{'value'} == $value;
     $self->{'value'} = $value;
     $self->Refresh;
 }
@@ -67,6 +72,12 @@ sub SetColors {
     $self->{'init'} = $#colors if $self->{'init'} > $#colors;
     $self->SetValue( $#colors ) if $self->{'value'} > $#colors;
     $self->Refresh;
+}
+
+sub Enable {
+    my ( $self, $enable ) = @_;
+    return unless defined $enable;
+    $self->{'responsive'} = $enable;
 }
 
 sub SetCallBack {

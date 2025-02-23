@@ -1,162 +1,194 @@
+
+# compute each cells state and action value
+
+package App::GUI::Cellgraph::Compute::Grid;
 use v5.12;
 use warnings;
 use Wx;
+use Benchmark;
 
-package App::GUI::Cellgraph::Compute::Grid;
+sub create {
+    my ($state, $grid_size, $sketch_length) = @_;
+    return unless defined $grid_size and ref $state eq 'HASH' and exists $state->{'global'}{'input_size'};
+    my $grid_circular = $state->{'global'}{'grid_circular'};
+    my $grow_direction = $state->{'global'}{'paint_direction'};
+    my $result_calc = $state->{'rules'}{'calc'};
+    my $inputs = $state->{'global'}{'input_size'};
+    my $state_count = $state->{'global'}{'state_count'};
+    my $input_overhang = int $inputs / 2;
+    my $self_input     = $inputs % 2;
+    my $odd_grid_size  = $grid_size % 2;
+    my $half_grid_size = int($grid_size / 2);
+    # my $t0 = Benchmark->new;
 
-
-sub now {
-    my ($size, $settings) = @_;
-    return unless ref $settings eq 'HASH';
-    my $rule_size = $settings->{'global'}{'input_size'};
-    my $cylinder_grid = $settings->{'global'}{'circular_grid'};
-    my ($size_x, $size_y);  # set grid size 3x * y
-    if (ref $size eq 'ARRAY'){
-        $size_x = $size->[0];
-        $size_y = $size->[1];
-    } else {
-        $size_x = $size;
-        $size_y = $size;
-    }
-    my $xskew_factor = int $rule_size / 2;
-    my $paint_extra_x = $cylinder_grid ? 0 : ($xskew_factor * $size_y);
-    my $comp_size_x = $size_x + (2 * $paint_extra_x);
-
-    my $action_grid  = [ [(1) x $comp_size_x] ];
-    my $state_grid   = [ [] ];
-    my $iterator = compile_iterator($settings, $comp_size_x);
-    die "comile error $@" if $@;
-
-    my @start_states = @{ $settings->{'start'}{'list'} }; # init state values
-    if ($settings->{'start'}{'repeat'}) {
+    my @start_states = @{ $state->{'start'}{'state_list'} };
+    if ($state->{'start'}{'repeat_states'}) { # repeat first row into left and right direction
         my @repeat = @start_states;
-        my $prepend_length = int( ($comp_size_x - @start_states) / 2);
+        my $prepend_length = int( ($grid_size - @start_states) / 2);
         unshift @start_states, @repeat for 1 .. $prepend_length / @repeat;
         unshift @start_states, @repeat[ $#repeat - ( $prepend_length % @repeat) .. $#repeat];
-        my $append_length = $comp_size_x - @start_states;
+        my $append_length = $grid_size - @start_states;
         push @start_states, @repeat for 1 .. $append_length / @repeat;
         push @start_states, @repeat[0 .. $append_length % @repeat];
     } else {
-        if (@start_states < $comp_size_x) { # center predefined first row
-            push @start_states, (0) x int( ($comp_size_x - @start_states) / 2);
-            unshift @start_states, (0) x ($comp_size_x - @start_states);
-        } else {
-            splice @start_states, $comp_size_x;
-        }
+        if (@start_states < $grid_size) { # center predefined first row
+            push @start_states, (0) x int( ($grid_size - @start_states) / 2);
+            unshift @start_states, (0) x ($grid_size - @start_states);
+        } else { splice @start_states, $grid_size }
+    }
+    my @start_action = map {$_/5} @{ $state->{'start'}{'action_list'} };
+    if ($state->{'start'}{'repeat_action'}) { # repeat first row into left and right direction
+        my @repeat = @start_action;
+        my $prepend_length = int( ($grid_size - @start_action) / 2);
+        unshift @start_action, @repeat for 1 .. $prepend_length / @repeat;
+        unshift @start_action, @repeat[ $#repeat - ( $prepend_length % @repeat) .. $#repeat];
+        my $append_length = $grid_size - @start_action;
+        push @start_action, @repeat for 1 .. $append_length / @repeat;
+        push @start_action, @repeat[0 .. $append_length % @repeat];
+    } else {
+        if (@start_action < $grid_size) { # center predefined first row
+            push @start_action, (0) x int( ($grid_size - @start_action) / 2);
+            unshift @start_action, (0) x ($grid_size - @start_action);
+        } else { splice @start_action, $grid_size }
     }
 
-    $state_grid->[0] = \@start_states;
-    my $last_row =  exists $settings->{'sketch'} ? $settings->{'sketch'} : $size_y - 1;
-    for my $row_i (1 .. $last_row) { # compute next row
-        ($state_grid->[$row_i], $action_grid->[$row_i])
-            = $iterator->( $state_grid->[$row_i - 1], $action_grid->[$row_i - 1]);
+    my $state_grid  = [ [@start_states] ];
+    my $paint_grid  = [ [] ];
+    my @empty_row   =  (0) x $grid_size;
+    my $row_start = "'".('0' x $input_overhang)."'";
+    my @cell_states = @start_states;
+    my @cell_action = @start_action;
+    my (@subrule_nr, @prev_states, @prev_action);
+    my $compute_right_stop = $grid_size - 1 - $input_overhang;
+    my $compute_rows = ($sketch_length)                ? $sketch_length :
+                       ($grow_direction eq 'top_down') ? $grid_size     :
+                                                         ($half_grid_size + $odd_grid_size);
+    my %subrule_from_pattern = map {$_ => $result_calc->subrules->effective_pattern_nr( $_ )} $result_calc->subrules->all_pattern;
+    my %result_from_subrule  = map {$_ => $result_calc->get_subrule_result( $_ )} $result_calc->subrules->index_iterator;
+
+    my @action_result_from_subrule = @{$state->{'action'}{'result_list'}};
+    my @action_spread_from_subrule = @{$state->{'action'}{'spread_list'}};
+    my @action_spread_decrease = ($state->{'global'}{'action_spread'}) ? (map
+        { ($action_spread_from_subrule[$_] - $action_result_from_subrule[$_]) / $state->{'global'}{'action_spread'} }
+            $result_calc->subrules->index_iterator) : ();
+    my @init_spread = ( (0) x ($grid_size - 1 + (2 * int($state->{'global'}{'action_spread'}))) );
+    my $result_op = $state->{'global'}{'result_application'};
+    my $state_max = $result_calc->subrules->independent_count;
+    my $next_result = ($result_op eq 'insert')   ? '$subrule_nr[$_]' :
+                      ($result_op eq 'rotate')   ? '(               1 + $subrule_nr[$_]) % $state_max' :
+                      ($result_op eq 'add')      ? '($cell_states[$_] + $subrule_nr[$_]) % $state_max' :
+                      ($result_op eq 'add_rot')  ? '($cell_states[$_]+1+$subrule_nr[$_]) % $state_max' :
+                      ($result_op eq 'subtract') ? '($cell_states[$_] - $subrule_nr[$_] + $state_max) % $state_max' :
+                                                   '($cell_states[$_] * $subrule_nr[$_]) % $state_max' ;
+    $next_result = ' $result_from_subrule{ '.$next_result.' } ';
+    $next_result = ' ($cell_action[$_] >= '.$state->{'global'}{'action_threshold'}.
+                    ') ? '.$next_result.' : $cell_states[$_] ' if $state->{'global'}{'action_rules_apply'};
+
+
+    my $code =     'for my $row_nr (1 .. '.($compute_rows - 1).') {'."\n".
+                   (($state->{'global'}{'action_spread'}) ? '  my @action_spread = @init_spread;'."\n" :'').
+                   '  @prev_states = @cell_states;'."\n";
+
+
+    my $code_end = '  @cell_states = map { '.$next_result.' } 0 .. '.($grid_size-1).";\n\n".
+                   '  $state_grid->[$row_nr] = [@cell_states];'."\n".'}';
+
+    if ($state->{'global'}{'action_rules_apply'}){
+        $code .=    '  @prev_action = @cell_action;'."\n";
+        my $calc_action = '  @cell_action = map { $action_result_from_subrule[$_] } @subrule_nr'.";\n".
+                          '  @cell_action = map { $cell_action[$_] + $prev_action[$_] + '.$state->{'global'}{'action_change'}.' } 0 .. '.($grid_size-1).";\n";
+        $calc_action.= '  for my $x ( 0 .. '.($grid_size-1).' ) { '."\n".
+                       '    my $real_pos = $x + '.$state->{'global'}{'action_spread'}.";\n".
+                       '    my $action = $cell_action[$x];'."\n".
+                       '    my $delta = my $decrease = $action_spread_decrease[ $subrule_nr[$x] ];'."\n".
+                       '    for my $d (1..'.$state->{'global'}{'action_spread'}.') { '."\n".
+                       '      $action_spread[$real_pos + $d ] += $action + $delta;'."\n".
+                       '      $action_spread[$real_pos - $d ] += $action - $delta;'."\n".
+                       '      $delta += $decrease'."\n".
+                       '  }}'."\n".
+                       '  @cell_action = map { $cell_action[$_] + $action_spread[$_+'.$state->{'global'}{'action_spread'}.'] } 0 .. '.($grid_size-1).";\n"
+                          if $state->{'global'}{'action_spread'};
+
+        $calc_action   .= '  @cell_action = map { ($_ < 0) ? 0 : ($_ > 1) ? 1 : $_ } @cell_action'.";\n";
+        $code_end = $calc_action . $code_end;
     }
 
-    if ($paint_extra_x){
-        for my $row (@$state_grid) { # cut grid back to requested size
-            splice @$row, 0, $paint_extra_x;
-            splice @$row, $size_x;
+    my $wrap_overhang = 'join("", @prev_states[-'.$input_overhang.' .. -1])';
+    my $right_overhang = 'join("", @prev_states[0 .. '.$input_overhang.'-1])';
+
+    if ($self_input) {
+        my $eval_pattern = '$subrule_from_pattern{ $pattern }';
+        $code .= '  my $pattern = "0".'
+              .($grid_circular ? $wrap_overhang : $row_start).'.'.$right_overhang.";\n"
+              .'  for my $x_pos (0 .. '.$compute_right_stop.'){'."\n"
+              .'  '.move_pattern_string('$pattern','$x_pos+'.$input_overhang)
+              .'    $subrule_nr[$x_pos] = '.$eval_pattern.";\n  }\n"
+              .'  for my $x_pos ('.($compute_right_stop + 1).' .. '.($grid_size - 1).'){'."\n"
+              .'  '.move_pattern_string('$pattern', ($grid_circular ? '$x_pos+'.($input_overhang - $grid_size) : undef ))
+              .'    $subrule_nr[$x_pos] = '.$eval_pattern.";\n  }\n\n";
+    } else {
+        my $eval_pattern = '$subrule_from_pattern{ $left_pattern.$right_pattern }';
+        $code .= '  my $left_pattern = '.($grid_circular ? $wrap_overhang : $row_start).";\n"
+              .  '  my $right_pattern = join("", @prev_states[1 .. '.$input_overhang.']);'."\n"
+              .  '  $subrule_nr[0] = '.$eval_pattern.";\n\n"
+              .  '  for my $x_pos (1 .. '.$compute_right_stop.'){'."\n"
+              .  '  '.move_pattern_string('$left_pattern','$x_pos-1')
+              .  '  '.move_pattern_string('$right_pattern','$x_pos+'.$input_overhang)
+              .  '    $subrule_nr[$x_pos] = '.$eval_pattern.";\n  }\n"
+              .  '  for my $x_pos ('.($compute_right_stop+1).' .. '.($grid_size - 1).'){'."\n"
+              .  '  '.move_pattern_string('$left_pattern','$x_pos-1')
+              .  '  '.move_pattern_string('$right_pattern', ($grid_circular ? '$x_pos+'.($input_overhang - $grid_size) : undef) )
+              .  '    $subrule_nr[$x_pos] = '.$eval_pattern.";\n  }\n\n";
+    }
+
+    #say $code . $code_end;
+    my $result = eval( $code . $code_end);
+    say "compile in code:\n$code\n\n error: $@" if $@;
+    # say "got grid in:",timestr( timediff(Benchmark->new, $t0) );
+
+    if ($sketch_length){
+        $state_grid->[$_] = [@empty_row] for $compute_rows .. $grid_size - 1;
+        return $state_grid;
+    }
+    return $state_grid if $grow_direction eq 'top_down';
+
+    # implementing paint directions
+    if ($grow_direction eq 'inside_out') {
+        $paint_grid->[$half_grid_size][$half_grid_size]
+            = $state_grid->[0][$half_grid_size] if $odd_grid_size;      # center cell state
+
+        for my $y_pos ($odd_grid_size .. $half_grid_size - 1 + $odd_grid_size){
+            my $cy_pos = $half_grid_size - $y_pos - 1 + $odd_grid_size; # mirror on Center pos
+            my $dy_pos = $half_grid_size + $y_pos;
+            for my $x_pos ($half_grid_size - $y_pos .. $half_grid_size + $y_pos){
+                my $bx_pos = $grid_size - 1 - $x_pos;
+                $paint_grid->[$cy_pos][$bx_pos] = $paint_grid->[$bx_pos][$dy_pos] =
+                $paint_grid->[$dy_pos] [$x_pos] = $paint_grid-> [$x_pos][$cy_pos] = $state_grid->[$y_pos][$x_pos];
+            }
         }
     }
-    $state_grid;
+    if ($grow_direction eq 'outside_in') {
+        $paint_grid->[$half_grid_size][$half_grid_size]
+            = $state_grid->[$half_grid_size][$half_grid_size] if $odd_grid_size; # center cell state
+
+        for my $y_pos (0 .. $half_grid_size - 1){
+            my $by_pos = $grid_size - 1 - $y_pos;
+            for my $x_pos ($y_pos .. $by_pos - 1){
+                my $bx_pos = $grid_size - 1 - $x_pos;
+                $paint_grid->[$y_pos] [$x_pos]  = $paint_grid->[$x_pos] [$by_pos] =
+                $paint_grid->[$by_pos][$bx_pos] = $paint_grid->[$bx_pos][$y_pos]  = $state_grid->[$y_pos][$x_pos];
+            }
+        }
+    }
+    $paint_grid;
 }
 
-sub compile_iterator {
-    my ($settings, $comp_size_x) = @_;
-    my $transfer_function = $settings->{'rules'}{'f'}; # state transfer
-    my $action_function = $settings->{'mobile'}{'f'};  # action state transfer function
-    my $rule_size = $settings->{'global'}{'input_size'};
-    my $act_size = 3;
-    my $states = $settings->{'global'}{'state_count'};
-    my $subrule_count = $states ** $rule_size;
-    my $action_count = $states ** $act_size;
-    my $x_skew_width = int $rule_size / 2; # propagation skew
-    my $a_skew_width = 1;
-    my $x_skew_distance = $x_skew_width + 1;
-    my $ignore_current_cell = !($rule_size % 2);
-    my $sum_mode = $settings->{'rules'}{'sum_mode'};
-    my $last_x_index = $comp_size_x - 1;
-    my $row_stop = $last_x_index - $x_skew_width; # end of normal processing
-    my $self_factor = $sum_mode ? 1 : $states ** ($x_skew_width-1); # helper to remove self state value
-    my $circular_grid = $settings->{'global'}{'circular_grid'};
-
-    # eval code macros
-    my $shift_val = $sum_mode ? '' : '  $state *= '.$states.';'."\n";
-
-    # eval code head
-    my $code = "sub { \n".'  my ($state_row, $action_row) = @_;'."\n";
-    $code .= '  my ($new_state_row, $new_action_row, $arow) = ([], [(0) x $comp_size_x], [(0) x $comp_size_x]);'."\n";
-    $code .= '  my $state = 0; my $active = 0;'."\n";
-    # compute state rules - row start, first element
-    if ($circular_grid){
-        $code .= $shift_val.'  $state += $state_row->['.$_.'];'."\n" for $comp_size_x - $x_skew_width .. $last_x_index;
-    }
-    $code .= $shift_val.'  $state += $state_row->[0];'."\n" unless $ignore_current_cell;
-    $code .= $shift_val.'  $state += $state_row->['.$_.'];'."\n" for reverse 1 .. $x_skew_width;
-    $code .= '  $new_state_row->[0] = $transfer_function->[$state];'."\n";
-    $code .= '  $arow->[0] = $action_function->[$state];'."\n";
-    # - next elements (without state value crop)
-    for my $cell_i ( 1 .. $x_skew_width ){
-        $code .= '  $state += '.$self_factor.' * ($state_row->['.($cell_i - 1).'] - $state_row->['.$cell_i.']);'."\n" if $ignore_current_cell;
-        $code .=    $shift_val . '  $state += $state_row->['.($cell_i + $x_skew_width).'];'."\n";
-        if ($circular_grid) {
-            $code .= $sum_mode
-                   ? '  $state -= $state_row->['.($cell_i + $last_x_index - $x_skew_width).'];'."\n"
-                   : '  $state %= '.$subrule_count.';'."\n";
-        }
-        $code .= '  $new_state_row->['.$cell_i.'] = $transfer_function->[$state];'."\n";
-        $code .= '  $arow->['.$cell_i.'] = $action_function->[$state];'."\n";
-
-    }
-    # - main loop
-    $code .= '  for my $cell_i ('.$x_skew_distance." .. $row_stop ){\n";
-    $code .= '    $state += '.$self_factor.' * ($state_row->[$cell_i - 1] - $state_row->[$cell_i]);'."\n" if $ignore_current_cell;
-    $code .= '  '.$shift_val if $shift_val;
-    $code .= '    $state += $state_row->[$cell_i + '.$x_skew_width.'];'."\n";
-    $code .= $sum_mode
-           ? '    $state -= $state_row->[$cell_i - '.$x_skew_distance.'];'."\n"
-           : '    $state %= '.$subrule_count.';'."\n";
-    $code .= '    $new_state_row->[$cell_i] = $transfer_function->[$state];'."\n";
-    $code .= '    $arow->[$cell_i] = $action_function->[$state];'."\n";
-    $code .= '  }'."\n";
-    # - last elements (only add next state val if circular)
-    for my $cell_i ( $row_stop + 1 .. $last_x_index){
-        $code .= '  $state += '.$self_factor.' * ($state_row->['.($cell_i - 1).'] - $state_row->['.$cell_i.']);'."\n" if $ignore_current_cell;
-        $code .=    $shift_val;
-        $code .= '  $state += $state_row->['.($cell_i - $comp_size_x + $x_skew_width).'];'."\n" if $circular_grid;
-        $code .= $sum_mode
-           ? '    $state -= $state_row->['.($cell_i - $x_skew_distance).'];'."\n"
-           : '    $state %= '.$subrule_count.';'."\n";
-        $code .= '  $new_state_row->['.$cell_i.'] = $transfer_function->[$state];'."\n";
-        $code .= '  $arow->['.$cell_i.'] = $action_function->[$state];'."\n";
-    };
-
-    # compute action rules
-    $code .= '  $new_action_row->['.$last_x_index.'] = 1 if $arow->[0] & 4;'."\n" if $settings->{'global'}{'circular_grid'};
-    $code .= '  $new_action_row->[0] = 1 if $arow->[0] & 2;'."\n";
-    $code .= '  $new_action_row->[1] = 1 if $arow->[0] & 1;'."\n";
-
-    $code .= '  for my $cell_i ( 1 .. '.($last_x_index - 1)." ){\n";
-    $code .= '    $active = $arow->[$cell_i];'."\n";
-    $code .= '    $new_action_row->[$cell_i - 1 ] = 1 if $active & 4;'."\n";
-    $code .= '    $new_action_row->[$cell_i     ] = 1 if $active & 2;'."\n";
-    $code .= '    $new_action_row->[$cell_i + 1 ] = 1 if $active & 1;'."\n";
-    $code .= "  }\n";
-    $code .= '  $active = $arow->['.$last_x_index.'];'."\n";
-    $code .= '  say $state unless defined $active;'."\n";
-    $code .= '  $new_action_row->['.($last_x_index - 1).'] = 1 if $active & 4;'."\n";
-    $code .= '  $new_action_row->['.$last_x_index.']       = 1 if $active & 2;'."\n";
-    $code .= '  $new_action_row->[ 0 ] = 1                     if $active & 1;'."\n" if $settings->{'global'}{'circular_grid'};
-
-    # apply action rules
-    $code .= '  for ( 0 .. '.$last_x_index." ){\n";
-    $code .= '    $new_state_row->[$_] = $state_row->[$_] unless $action_row->[$_];'."\n";
-    $code .= "  }\n".'  ($new_state_row, $new_action_row)'."\n}"; # return solution
-    # say $code;
-    eval $code;
+sub move_pattern_string {
+    my ($var, $index) = @_;
+    my $str = '  '.$var.' = substr('.$var.',1).';
+    $str .= (defined $index) ? '$prev_states['.$index.']': "'0'";
+    return $str.";\n";
 }
 
 1;
-
-# - flexible activity grid
 __END__

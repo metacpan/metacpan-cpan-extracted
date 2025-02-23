@@ -7,12 +7,12 @@ using the dump feature found in many text web browsers, like `lynx(1)`.
 
 **ishmael** currently supports the following ebook formats:
 * EPUB
-* FictionBook2
-* HTML
-* XHTML
-* Mobi
-* PalmDoc
+* MOBI
+* AZW
+* HTML/XHTML
 * PDF (poorly, but supported nonetheless)
+* FictionBook2
+* PalmDoc
 * zTXT
 * Text
 
