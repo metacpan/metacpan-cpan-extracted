@@ -70,6 +70,8 @@
     '-='   => \&overload_sub_eq,
     '*='   => \&overload_mul_eq,
     '/='   => \&overload_div_eq,
+    '%'    => \&overload_fmod,
+    '%='   => \&overload_fmod_eq,
     '""'   => \&overload_string,
     '>'    => \&overload_gt,
     '>='   => \&overload_gte,
@@ -84,10 +86,10 @@
     'abs'  => \&overload_abs,
     '**'   => \&overload_pow,
     '**='  => \&overload_pow_eq,
-    '<<'   => \&overload_mul_2exp,
-    '<<='  => \&overload_mul_2exp_eq,
-    '>>'   => \&overload_div_2exp,
-    '>>='  => \&overload_div_2exp_eq,
+    '<<'   => \&overload_lshift,
+    '<<='  => \&overload_lshift_eq,
+    '>>'   => \&overload_rshift,
+    '>>='  => \&overload_rshift_eq,
     'atan2'=> \&overload_atan2,
     'cos'  => \&overload_cos,
     'sin'  => \&overload_sin,
@@ -118,9 +120,9 @@ Rmpfr_agm Rmpfr_ai
 Rmpfr_asin Rmpfr_asinh Rmpfr_asinpi Rmpfr_asinu
 Rmpfr_atan Rmpfr_atan2 Rmpfr_atan2pi Rmpfr_atan2u Rmpfr_atanh Rmpfr_atanpi Rmpfr_atanu
 Rmpfr_beta
-Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float128_p Rmpfr_buildopt_gmpinternals_p
-Rmpfr_buildopt_sharedcache_p Rmpfr_buildopt_tls_p Rmpfr_buildopt_tune_case
-Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
+Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float16_p Rmpfr_buildopt_float128_p
+Rmpfr_buildopt_gmpinternals_p Rmpfr_buildopt_sharedcache_p Rmpfr_buildopt_tls_p
+Rmpfr_buildopt_tune_case Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
 Rmpfr_clear Rmpfr_clear_divby0 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag
 Rmpfr_clear_nanflag Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_clears
 Rmpfr_cmp Rmpfr_cmp_IV Rmpfr_cmp_NV Rmpfr_cmp_d Rmpfr_cmp_f Rmpfr_cmp_float128 Rmpfr_cmp_ld
@@ -147,8 +149,8 @@ Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr
 Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT128 Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
 Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
 Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin Rmpfr_get_emin_max
-Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_float128 Rmpfr_get_flt Rmpfr_get_ld
-Rmpfr_get_ld_2exp Rmpfr_get_patches Rmpfr_get_prec Rmpfr_get_q Rmpfr_get_si Rmpfr_get_sj
+Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_float128 Rmpfr_get_flt Rmpfr_get_float16
+Rmpfr_get_ld Rmpfr_get_ld_2exp Rmpfr_get_patches Rmpfr_get_prec Rmpfr_get_q Rmpfr_get_si Rmpfr_get_sj
 Rmpfr_get_str Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt Rmpfr_get_ui Rmpfr_get_uj
 Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_2exp Rmpfr_get_z_exp
 Rmpfr_grandom Rmpfr_greater_p Rmpfr_greaterequal_p Rmpfr_hypot Rmpfr_inexflag_p Rmpfr_inf_p
@@ -177,7 +179,7 @@ Rmpfr_root Rmpfr_rootn_ui Rmpfr_round Rmpfr_round_nearest_away Rmpfr_roundeven
 Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64 Rmpfr_set_FLOAT128
 Rmpfr_set_IV Rmpfr_set_LD Rmpfr_set_NV Rmpfr_set_d Rmpfr_set_default_prec
 Rmpfr_set_default_rounding_mode Rmpfr_set_divby0 Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
-Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_float128 Rmpfr_set_flt Rmpfr_set_inexflag Rmpfr_set_inf
+Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_float128 Rmpfr_set_flt Rmpfr_set_float16 Rmpfr_set_inexflag Rmpfr_set_inf
 Rmpfr_set_ld Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec Rmpfr_set_prec_raw
 Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui
 Rmpfr_set_ui_2exp Rmpfr_set_uj Rmpfr_set_uj_2exp Rmpfr_set_underflow Rmpfr_set_z Rmpfr_set_z_2exp
@@ -200,7 +202,7 @@ prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.34';
+    our $VERSION = '4.35';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -1743,10 +1745,57 @@ sub _hex_fmt_ok {
      return 1;
   }
   else {return 1} # No %a formatting requested. Proceed as normal.
-
-
-
 }
+
+sub overload_lshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::MPFR: When overloading '<<', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift(@_) if $_[1] >= 0;
+  return _overload_rshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_lshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::MPFR: When overloading '<<=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift_eq(@_) if $_[1] >= 0;
+  return _overload_rshift_eq($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::MPFR: When overloading '>>', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift(@_) if $_[1] >= 0;
+  return _overload_lshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::MPFR: When overloading '>>=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift_eq(@_) if $_[1] >= 0;
+  return _overload_lshift_eq($_[0], -$_[1], $_[2]);
+}
+
+sub overload_fmod {
+  if(ref($_[1]) ne 'Math::MPFR') {
+    return _overload_fmod($_[0], Math::MPFR->new($_[1]), 0) unless $_[2];
+    return _overload_fmod(Math::MPFR->new($_[1]), $_[0], 0);
+  }
+  return _overload_fmod(@_);
+}
+
+sub overload_fmod_eq {
+  if(ref($_[1]) ne 'Math::MPFR') {
+    return _overload_fmod_eq($_[0], Math::MPFR->new($_[1]), 0) unless $_[2];
+    return _overload_fmod_eq(Math::MPFR->new($_[1]), $_[0], 0);
+  }
+  return _overload_fmod_eq(@_);
+}
+
+
 1;
 
 __END__

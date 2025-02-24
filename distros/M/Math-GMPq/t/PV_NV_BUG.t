@@ -29,9 +29,9 @@ cmp_ok(Math::GMPq->new($nv_1), '==', '3/2',
 cmp_ok(Math::GMPq->new(1) * $nv_1, '==', '3/2',
        "NV slot was used by overload_mul()");              # Test 4
 
-my $nv_2 = '1.7';
+my $nv_2 = '0x1.7';
 
-if($nv_2 > 1) {      # True
+if($nv_2) {      # True
 
   cmp_ok(_ITSA($nv_2), '==', 4, "PV slot will be used");   # Test 5
 

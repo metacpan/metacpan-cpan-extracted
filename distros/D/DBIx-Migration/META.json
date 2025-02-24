@@ -46,6 +46,7 @@
       },
       "test" : {
          "requires" : {
+            "DBD::Mock" : "0",
             "DBD::SQLite" : "0",
             "Test::API" : "0",
             "Test::DatabaseRow" : "0",
@@ -60,11 +61,11 @@
    "provides" : {
       "DBIx::Migration" : {
          "file" : "lib/DBIx/Migration.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "DBIx::Migration::CLI" : {
          "file" : "lib/DBIx/Migration/CLI.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -80,6 +81,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

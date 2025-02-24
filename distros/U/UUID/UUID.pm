@@ -11,7 +11,7 @@ require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.36';
+$VERSION = '0.37';
 
 %EXPORT_TAGS = (
     'all' => [qw(
@@ -546,7 +546,7 @@ persistent state.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2024 by Rick Myers.
+This software is Copyright (c) 2014-2025 by Rick Myers.
 
 This is free software, licensed under:
 

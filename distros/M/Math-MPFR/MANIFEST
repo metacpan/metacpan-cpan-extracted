@@ -12,6 +12,7 @@ CHANGES
 checklib.in
 have_d64.in
 have_d128.in
+have_float16.in
 have_f128.in
 try_dec64.in
 try_dec128.in
@@ -31,6 +32,7 @@ t/_1aaa_v.t
 t/_1basic.t
 t/_itsa.t
 t/_2exp.t
+t/_Float16.t
 t/anomaly.t
 t/anytoa.t
 t/atonum.t
@@ -89,6 +91,8 @@ t/overload_cmp_q.t
 t/overload_cmp_z.t
 t/overload_cross_class.t
 t/overload_float128.t
+t/overload_math_gmp.t
+t/overload_mod.t
 t/overload_shift.t
 t/overload_switch.t
 t/overloadex.t

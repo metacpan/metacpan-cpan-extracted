@@ -1,4 +1,11 @@
 
+0.72 2025-02-23  lichtkind
+-------
+    * = fix release
+    * / making main window smaller
+    * ? small POD fixes
+    * ! fix tests
+
 0.71 2025-02-22  lichtkind
 -------
     * = cleanup fix release
@@ -108,4 +115,5 @@
 
 
 TODO:
- switch to prima widgt toolkit
+ switch to prima widget toolkit
+ event driven data store

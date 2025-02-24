@@ -3,7 +3,7 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.9902';
+our $VERSION = '0.9903';
 
 use Data::Dumper;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -44,6 +44,7 @@ sub getopt {
     return if @{ $argv //= [] } == 0;
     GetOptionsFromArray(
 	$argv,
+	$obj,
 	"config|C=s" => sub {
 	    $obj->config(arg2kvlist($_[1]));
 	},
@@ -127,7 +128,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =head1 DESCRIPTION
 
@@ -189,15 +190,31 @@ style option specifications.
         our($mod, $argv) = @_;
         $config->deal_with(
             $argv,
-            "width!" => \$config->{width},
-            "code!"  => \$config->{code},
-            "name=s" => \$config->{name},
+            "width!",
+            "code!",
+            "name=s",
         );
     }
 
 Then you can use module private option like this:
 
     example -Mcharcode --width --no-code --name=Benjy -- ...
+
+The reason why it is not necessary to specify the destination of the
+value is that the hash object is passed when calling the
+C<Getopt::Long> library.  The above code is equivalent to the
+following code.  See L<Getopt::Long/Storing options values in a hash>
+for detail.
+
+    sub finalize {
+        our($mod, $argv) = @_;
+        $config->deal_with(
+            $argv,
+            "width!" => \$config->{width},
+            "code!"  => \$config->{code},
+            "name=s" => \$config->{name},
+        );
+    }
 
 =head1 METHODS
 
@@ -246,12 +263,8 @@ definition with that call.
 
     sub finalize {
         our($mod, $argv) = @_;
-        my @optdef = (
-            "width!" => \$config->{width},
-            "code!"  => \$config->{code},
-            "name=s" => \$config->{name},
-        );
-        $config->deal_with($argv, @optdef);
+        $config->deal_with($argv,
+                           "width!", "code!", "name=s");
     }
 
 =back

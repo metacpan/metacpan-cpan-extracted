@@ -8,7 +8,7 @@
 =head1 DEPENDENCIES
 
    This module needs the GMP C library - available from:
-   https://gmplib.org
+   L<https://gmplib.org>
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@
    Basically this module simply wraps nearly all of
    the integer functions provided by that library.
    The documentation below extensively plagiarises
-   the documentation at http://gmplib.org.
+   the documentation at L<https://gmplib.org>.
    See the Math::GMPz test suite for examples of
    usage.
 
@@ -1109,10 +1109,9 @@
     Check that '~', '%', and '%=' are working as you expect
     (especially in relation to negative values).
 
-    Attempting to use the overloaded operators with objects that
-    have been blessed into some package other than 'Math::BigInt',
-   'Math::GMPz', 'Math::GMP', 'Math::GMPq' (limited operations), or
-   'Math::MPFR' (limited operations) will not work.
+    Attempting to use the overloaded operators with objects that have
+    been blessed into some package other than 'Math::BigInt', 'Math::GMP',
+   'Math::GMPz', 'Math::GMPq', or 'Math::MPFR' will not work.
 
     Math::MPFR objects can be provided as the second arg  with '+',
     '-', '*', '/' and '**' operators - in which case the operation will

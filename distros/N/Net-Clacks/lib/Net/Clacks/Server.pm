@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 29;
+our $VERSION = 30;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -444,7 +444,7 @@ sub _init($self) {
     }
 
     print "------- Parsing config file $fname ------\n";
-    my $config = XMLin($filedata, ForceArray => [ 'ip', 'socket', 'user' ]);
+    my $config = XMLin($filedata, ForceArray => [ 'ip', 'socket', 'user', 'item' ]);
 
     my $hname = hostname;
 
@@ -635,6 +635,13 @@ sub _init($self) {
                 my $cmd = 'chmod ' . $config->{socketchmod} . ' ' . $socket;
                 print $cmd, "\n";
                 `$cmd`;
+            }
+
+            if(defined($config->{socketcommands})) {
+                foreach my $cmd (@{$config->{socketcommands}->{item}}) {
+                    print "Running Socket command: $cmd\n";
+                    `$cmd`;
+                }
             }
         }
     }

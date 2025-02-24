@@ -7,7 +7,7 @@
 =head1 DEPENDENCIES
 
    This module needs the GMP C library - available from:
-   https://gmplib.org.
+   L<https://gmplib.org>.
 
 =head1 DESCRIPTION
 
@@ -15,7 +15,7 @@
    Basically this module simply wraps all of the 'mpq'
    (rational number) functions provided by that library.
    The documentation below extensively plagiarises the GMP
-   documentation (which can be found at http://gmplib.org).
+   documentation (which can be found at L<https://gmplib.org>).
    See also the Math::GMPq test suite for examples of usage.
 
    IMPORTANT:
@@ -505,20 +505,19 @@
 
    OPERATOR OVERLOADING
 
-   Overloading occurs with numbers, strings,Math::GMPq objects and, to a
-   limited extent, with Math::GMPz objects, and Math::MPFR objects
-   (iff version 3.13 or later of Math::MPFR has been installed).
+   Overloading occurs with numbers, strings,Math::GMPq objects,
+   Math::GMPz objects and Math::MPFR objects
    Strings are first converted to Math::GMPq objects, then canonicalized.
    See the Rmpq_set_str documentation (above) in the section "ASSIGNMENT
    FUNCTIONS" regarding permissible string formats.
    The following operators are overloaded:
 
-    + - * / **
-    += -= *= /= **=
+    + - * / % **
+    += -= *= /= %= **=
     ++ --
     == != !
     < <= > >= <=>
-    "" abs 0+
+    "" abs 0+ int
     =
 
     NOTE: Making use of the '=' overloading is not recommended unless
@@ -526,13 +525,19 @@
           read it thoroughly, including the documentation regarding
           'copy constructors'.
 
+    For general compatibility with perl in general and Math::BigRat in
+    particular, overloading of the '&', '|', '^', '~', '%', '>>' and
+   '<<' operators has now been added.
+
     Atempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::GMPq'
-    or 'Math::MPFR'/'Math::GMPz'/'Math::GMP'/'Math::MPFR' (limited
-    applications) will not work.
+    or 'Math::MPFR'/'Math::GMPz'/'Math::GMP' will not work. (Support
+    for Math::GMP objects is limited.)
+
     Math::MPFR objects can be provided as the second arg with '+',
-    '-', '*', '/' and '**' operators, but will work only if Math::MPFR
-    is at version 3.13 or later - in which case the operation will
+    '-', '*', '/', '%' and '**' operators if Math::MPFR is at version
+    3.13 or greater. (Support for '%' overloading requires
+    Math-MPFR-4.35 or later.) In these cases, the operation will
     return a Math::MPFR object (calculated using default Math::MPFR
     precision and default Math::MPFR rounding mode).
     For comparisons (==, !=, <, <=, >, >=, <=>) between Math::MPFR and
@@ -540,17 +545,16 @@
     as the Math::GMPq overloading does not accommodate such comparisons.
     eg - do ($mpfr_obj > $mpq_obj), not ($mpq_obj < $mpfr_obj).
 
-
     Math::GMPz and Math::GMP objects can be provided as the second
     arg with comparison operators ( == != < <= > >= <=> ) and the '+',
     '+=',  '-', '-=', '*', '*=', '/', '/=', '**' and '**=' operators.
 
-    Math::MPFR objects can provided as the second arg  with '+', '-',
+    Math::MPFR objects can be provided as the second arg  with '+', '-',
     '*', '/' and '**'  operators - in which case the operation will
     return a Math::MPFR object.
     If $Math::GMPq::RETYPE is set to 1 (as is the default setting), then
     Math::MPFR objects can also be provided as the second arg with
-   '+=', '*=', '-=', '/=' and '**=' operators. In such instances,
+   '+=', '*=', '-=', '/=', '%=', and '**=' operators. In such instances,
     the Math::GMPq object becomes (is "retyped" to) a Math::MPFR object
     that contains the result of the operation, using default Math::MPFR
     precision and default Math::MPFR rounding mode.

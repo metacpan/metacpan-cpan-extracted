@@ -19,6 +19,11 @@ BEGIN: {
 if (! libpng_supports ('eXIf')) {
     plan skip_all => "This libpng doesn't support the eXIf chunk"
 }
+my $libpng_version = Image::PNG::Libpng::get_libpng_ver ();
+my ($x, $major, $minor) = ($libpng_version =~ m!([0-9]+)\.([0-9]+)\.([0-9]+)!);
+if ($major >= 6 && $minor >= 47) {
+    plan skip_all => "Faulty libpng does not handle eXif";
+}
 
 # This file doesn't contain an exif chunk
 

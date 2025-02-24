@@ -18,7 +18,7 @@ require Exporter;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-02-21'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.250'; # VERSION
+our $VERSION = '0.251'; # VERSION
 
 $DEBUG = $ENV{DEBUG};
 
@@ -791,7 +791,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.250 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2025-02-21.
+This document describes version 0.251 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2025-02-21.
 
 =head1 SYNOPSIS
 
@@ -805,14 +805,14 @@ Sample screenshots:
 
 =begin html
 
-<img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.250/share/images/Screenshot_20210624_071713%2Epng" />
+<img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.251/share/images/Screenshot_20210624_071713%2Epng" />
 
 =end html
 
 
 =begin html
 
-<img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.250/share/images/Screenshot_20210624_071341%2Epng" />
+<img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.251/share/images/Screenshot_20210624_071341%2Epng" />
 
 =end html
 

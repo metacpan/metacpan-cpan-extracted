@@ -13,20 +13,20 @@ use Scalar::Util 'looks_like_number';
 use Text::sprintfn ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-23'; # DATE
+our $DATE = '2025-02-24'; # DATE
 our $DIST = 'Data-Unixish'; # DIST
-our $VERSION = '1.573'; # VERSION
+our $VERSION = '1.574'; # VERSION
 
 our %SPEC;
 
 $SPEC{sprintfn} = {
     v => 1.1,
     summary => 'Like sprintf, but use sprintfn() from Text::sprintfn',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Unlike in *sprintf*, with this function, hash will also be processed.
 
-_
+MARKDOWN
     args => {
         %common_args,
         format => {
@@ -121,7 +121,7 @@ Data::Unixish::sprintfn - Like sprintf, but use sprintfn() from Text::sprintfn
 
 =head1 VERSION
 
-This document describes version 1.573 of Data::Unixish::sprintfn (from Perl distribution Data-Unixish), released on 2023-09-23.
+This document describes version 1.574 of Data::Unixish::sprintfn (from Perl distribution Data-Unixish), released on 2025-02-24.
 
 =head1 SYNOPSIS
 
@@ -224,7 +224,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

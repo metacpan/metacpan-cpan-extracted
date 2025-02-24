@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
@@ -76,15 +76,31 @@ style option specifications.
         our($mod, $argv) = @_;
         $config->deal_with(
             $argv,
-            "width!" => \$config->{width},
-            "code!"  => \$config->{code},
-            "name=s" => \$config->{name},
+            "width!",
+            "code!",
+            "name=s",
         );
     }
 
 Then you can use module private option like this:
 
     example -Mcharcode --width --no-code --name=Benjy -- ...
+
+The reason why it is not necessary to specify the destination of the
+value is that the hash object is passed when calling the
+`Getopt::Long` library.  The above code is equivalent to the
+following code.  See ["Storing options values in a hash" in Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong#Storing-options-values-in-a-hash)
+for detail.
+
+    sub finalize {
+        our($mod, $argv) = @_;
+        $config->deal_with(
+            $argv,
+            "width!" => \$config->{width},
+            "code!"  => \$config->{code},
+            "name=s" => \$config->{name},
+        );
+    }
 
 # METHODS
 
@@ -130,12 +146,8 @@ Then you can use module private option like this:
 
         sub finalize {
             our($mod, $argv) = @_;
-            my @optdef = (
-                "width!" => \$config->{width},
-                "code!"  => \$config->{code},
-                "name=s" => \$config->{name},
-            );
-            $config->deal_with($argv, @optdef);
+            $config->deal_with($argv,
+                               "width!", "code!", "name=s");
         }
 
 # SEE ALSO

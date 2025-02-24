@@ -9,7 +9,6 @@ use File::Spec;
 use App::GUI::Cellgraph::Config::Default;
 
 my $file_name = File::Spec->catfile( File::HomeDir->my_home, '.config', 'cellgraph');
-
 my $dir = '';
 
 sub new {

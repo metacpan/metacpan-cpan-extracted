@@ -69,19 +69,19 @@
    "provides" : {
       "ColorTheme::Data::Dump::Color::Default16" : {
          "file" : "lib/ColorTheme/Data/Dump/Color/Default16.pm",
-         "version" : "0.250"
+         "version" : "0.251"
       },
       "ColorTheme::Data::Dump::Color::Default256" : {
          "file" : "lib/ColorTheme/Data/Dump/Color/Default256.pm",
-         "version" : "0.250"
+         "version" : "0.251"
       },
       "ColorTheme::Data::Dump::Color::Light" : {
          "file" : "lib/ColorTheme/Data/Dump/Color/Light.pm",
-         "version" : "0.250"
+         "version" : "0.251"
       },
       "Data::Dump::Color" : {
          "file" : "lib/Data/Dump/Color.pm",
-         "version" : "0.250"
+         "version" : "0.251"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Dump-Color"
       }
    },
-   "version" : "0.250",
+   "version" : "0.251",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -10,9 +10,9 @@ use Module::Load;
 use Package::Util::Lite qw(package_exists);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-23'; # DATE
+our $DATE = '2025-02-24'; # DATE
 our $DIST = 'Data-Unixish'; # DIST
-our $VERSION = '1.573'; # VERSION
+our $VERSION = '1.574'; # VERSION
 
 our %SPEC;
 
@@ -31,7 +31,7 @@ $SPEC{apply} = {
                 ['array*', of => ['any' => of => [['str*'], ['array*']]]],
             ]],
             req => 1,
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 A list of functions to apply. Each element is either a string (function name),
 or a 2-element array (function names + arguments hashref). If you do not want to
@@ -45,7 +45,7 @@ Example:
         ['head', {items=>5}], # specify arguments
     ]
 
-_
+MARKDOWN
         },
 
     },
@@ -120,7 +120,7 @@ Data::Unixish::Apply - Apply one or more dux functions
 
 =head1 VERSION
 
-This document describes version 1.573 of Data::Unixish::Apply (from Perl distribution Data-Unixish), released on 2023-09-23.
+This document describes version 1.574 of Data::Unixish::Apply (from Perl distribution Data-Unixish), released on 2025-02-24.
 
 =head1 SYNOPSIS
 
@@ -215,7 +215,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

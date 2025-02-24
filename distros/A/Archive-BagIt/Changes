@@ -1,10 +1,44 @@
 ==================================================
-Changes from 2024-02-22 00:00:00 +0000 to present.
+Changes from 2024-02-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.098 at 2025-02-21 08:24:17 +0000
+version 0.099 at 2025-02-24 09:27:03 +0000
 ------------------------------------------
+
+  Change: 33ebfc16a3f202b1c41dedb3a74a3d0de2bdaa1c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-24 10:25:30 +0000
+
+    fixed regex in _extract_key_from_textblob() 
+
+  Change: b8149643abd3ee7b13cd150b7a0f4e56a785292a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-24 10:24:30 +0000
+
+    - fixed testcase 
+
+  Change: 11760bf4072d6b7bed3ccc799d0aa7e120c46ae9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-24 10:24:15 +0000
+
+    - added unit test to check newline after key 
+
+  Change: 5e74d75da4a43d323b46346b94ba8d9863f50ce1
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-24 10:23:42 +0000
+
+    - added specific test bag 
+
+------------------------------------------
+version 0.098 at 2025-02-21 08:25:03 +0000
+------------------------------------------
+
+  Change: 33abbce21cab87400377daedfcf50adde2c6f974
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2025-02-21 09:25:03 +0000
+
+    Released 0.098 
 
   Change: 9f82ff81a3305692343d36ade4bff7dbe6e658b0
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -129,5 +163,5 @@ version 0.096 at 2025-01-29 08:02:59 +0000
     - minor, improved string compare 
 
 =================================================
-Plus 44 releases after 2024-02-22 00:00:00 +0000.
+Plus 44 releases after 2024-02-25 00:00:00 +0000.
 =================================================

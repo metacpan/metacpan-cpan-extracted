@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -68,7 +68,7 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
-            "File::Temp" : "0.2307",
+            "File::Temp" : "0.2310",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0.98"
@@ -78,191 +78,191 @@
    "provides" : {
       "Data::Unixish" : {
          "file" : "lib/Data/Unixish.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::Apply" : {
          "file" : "lib/Data/Unixish/Apply.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::Util" : {
          "file" : "lib/Data/Unixish/Util.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::avg" : {
          "file" : "lib/Data/Unixish/avg.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::bool" : {
          "file" : "lib/Data/Unixish/bool.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::cat" : {
          "file" : "lib/Data/Unixish/cat.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::centerpad" : {
          "file" : "lib/Data/Unixish/centerpad.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::chain" : {
          "file" : "lib/Data/Unixish/chain.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::cond" : {
          "file" : "lib/Data/Unixish/cond.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::count" : {
          "file" : "lib/Data/Unixish/count.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::date" : {
          "file" : "lib/Data/Unixish/date.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::grep" : {
          "file" : "lib/Data/Unixish/grep.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::head" : {
          "file" : "lib/Data/Unixish/head.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::indent" : {
          "file" : "lib/Data/Unixish/indent.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::join" : {
          "file" : "lib/Data/Unixish/join.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::lc" : {
          "file" : "lib/Data/Unixish/lc.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::lcfirst" : {
          "file" : "lib/Data/Unixish/lcfirst.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::lins" : {
          "file" : "lib/Data/Unixish/lins.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::linum" : {
          "file" : "lib/Data/Unixish/linum.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::lpad" : {
          "file" : "lib/Data/Unixish/lpad.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::ltrim" : {
          "file" : "lib/Data/Unixish/ltrim.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::map" : {
          "file" : "lib/Data/Unixish/map.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::num" : {
          "file" : "lib/Data/Unixish/num.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::pick" : {
          "file" : "lib/Data/Unixish/pick.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::rand" : {
          "file" : "lib/Data/Unixish/rand.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::randstr" : {
          "file" : "lib/Data/Unixish/randstr.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::rev" : {
          "file" : "lib/Data/Unixish/rev.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::rins" : {
          "file" : "lib/Data/Unixish/rins.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::rpad" : {
          "file" : "lib/Data/Unixish/rpad.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::rtrim" : {
          "file" : "lib/Data/Unixish/rtrim.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::shuf" : {
          "file" : "lib/Data/Unixish/shuf.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::sort" : {
          "file" : "lib/Data/Unixish/sort.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::splice" : {
          "file" : "lib/Data/Unixish/splice.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::split" : {
          "file" : "lib/Data/Unixish/split.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::sprintf" : {
          "file" : "lib/Data/Unixish/sprintf.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::sprintfn" : {
          "file" : "lib/Data/Unixish/sprintfn.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::subsort" : {
          "file" : "lib/Data/Unixish/subsort.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::sum" : {
          "file" : "lib/Data/Unixish/sum.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::tail" : {
          "file" : "lib/Data/Unixish/tail.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::trim" : {
          "file" : "lib/Data/Unixish/trim.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::trunc" : {
          "file" : "lib/Data/Unixish/trunc.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::uc" : {
          "file" : "lib/Data/Unixish/uc.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::ucfirst" : {
          "file" : "lib/Data/Unixish/ucfirst.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::wc" : {
          "file" : "lib/Data/Unixish/wc.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::wrap" : {
          "file" : "lib/Data/Unixish/wrap.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Data::Unixish::yes" : {
          "file" : "lib/Data/Unixish/yes.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       },
       "Test::Data::Unixish" : {
          "file" : "lib/Test/Data/Unixish.pm",
-         "version" : "1.573"
+         "version" : "1.574"
       }
    },
    "release_status" : "stable",
@@ -277,10 +277,10 @@
          "web" : "https://github.com/perlancar/perl-Data-Unixish"
       }
    },
-   "version" : "1.573",
+   "version" : "1.574",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038000"
+         "version" : "5.040000"
       },
       "plugins" : [
          {
@@ -302,52 +302,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -357,27 +357,27 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.608"
+            "version" : "0.610"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -393,7 +393,7 @@
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -424,7 +424,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -435,7 +435,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.25.1",
+                  "git_version" : "2.39.5",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -443,7 +443,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Git::Contributors",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -453,17 +453,17 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.03"
+            "version" : "0.02"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -473,7 +473,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.032"
                      }
                   ],
                   "include_underscores" : 0
@@ -485,7 +485,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -524,67 +524,67 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::PERLANCAR/Name",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::PERLANCAR/Version",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/prelude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::PERLANCAR/Leftovers",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/postlude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
@@ -619,7 +619,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::PERLANCAR/Authors",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -634,7 +634,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
@@ -644,7 +644,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",
@@ -654,7 +654,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::PERLANCAR/SingleEncoding",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
@@ -670,7 +670,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -784,7 +784,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -795,7 +795,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Extras",
@@ -811,62 +811,62 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.032"
          }
       ],
       "zilla" : {
@@ -874,7 +874,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.032"
       }
    },
    "x_authority" : "cpan:PERLANCAR",
@@ -883,8 +883,8 @@
       "Steven Haryanto <stevenharyanto@gmail.com>",
       "Toby Inkster <mail@tobyinkster.co.uk>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

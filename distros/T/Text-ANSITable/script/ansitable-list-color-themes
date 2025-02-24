@@ -8,9 +8,9 @@ use Module::Load::Util qw(instantiate_class_with_optional_args);
 use Text::ANSITable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-14'; # DATE
+our $DATE = '2025-02-24'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.609'; # VERSION
+our $VERSION = '0.610'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 
@@ -69,7 +69,7 @@ ansitable-list-color-themes - List available color themes for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.609 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2023-07-14.
+This document describes version 0.610 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2025-02-24.
 
 =head1 SYNOPSIS
 
@@ -123,14 +123,14 @@ Sample output:
  .-------------------------------------------------------.
  |  num   percent%          date           bool?   text  |
  |                                                       |
- |    1     40,00%   2023-07-14 06:12:41     Y     hello |
- | -3.3    100,00%   2023-07-14 06:12:41     N     world |
+ |    1     40.00%   2025-02-24 11:03:43     Y     hello |
+ | -3.3    100.00%   2025-02-24 11:03:43     N     world |
  |                                                       |
- |    1     10,00%   2013-05-02 09:26:24     N     x1    |
- |    2     20,00%   2013-05-02 12:13:04     Y     x2    |
- |    3     30,00%   2013-05-02 14:59:44     Y     x3    |
- |    4     40,00%   2013-05-02 17:46:24     Y     x4    |
- |    5     50,00%   2013-05-02 20:33:04     Y     x5    |
+ |    1     10.00%   2013-05-02 09:26:24     N     x1    |
+ |    2     20.00%   2013-05-02 12:13:04     Y     x2    |
+ |    3     30.00%   2013-05-02 14:59:44     Y     x3    |
+ |    4     40.00%   2013-05-02 17:46:24     Y     x4    |
+ |    5     50.00%   2013-05-02 20:33:04     Y     x5    |
  `-------------------------------------------------------'
 
 =head1 HOMEPAGE
@@ -165,7 +165,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

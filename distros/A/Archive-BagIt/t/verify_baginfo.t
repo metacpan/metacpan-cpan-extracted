@@ -3,11 +3,11 @@ use warnings;
 use diagnostics;
 use File::Temp qw(tempdir);
 use File::Slurp qw(read_file write_file);
-use Test::More tests =>39;
+use Test::More tests =>43;
 use Test::Exception;
 use Test::File;
 use Archive::BagIt;
-
+BEGIN { chdir 't' if -d 't' }
 my @ROOT = grep {length} 'src';
 ### TESTS
 my $SRC_BAG = File::Spec->catdir( @ROOT, 'src_bag');
@@ -29,6 +29,8 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
     my @tmp;
     @tmp= $bag->_extract_key_from_textblob("foo:");
     is_deeply(\@tmp, ["foo", undef], "extract_key_from_textblob('foo:')");
+    @tmp= $bag->_extract_key_from_textblob("foo:\nbar");
+    is_deeply(\@tmp, ["foo", "\nbar"], "extract_key_from_textblob('foo:\\nbar')");
     @tmp= $bag->_extract_key_from_textblob("foo:bar");
     is_deeply(\@tmp, ["foo", "bar"], "extract_key_from_textblob('foo:bar')");
     @tmp= $bag->_extract_key_from_textblob("foo: bar");
@@ -107,7 +109,7 @@ BAGINFO
     $bag->{"bag_info"} = $got;
     ok(!$bag->verify_baginfo(), "bag-info verify invalid");
     #is_deeply( $bag->{warnings}, ["Payload-Oxum was expected in bag-info.txt, but not found!"], "bag-info parsing valid, warning for missed payload oxum");
-    is_deeply($bag->{errors}, ["the baginfo file '$SRC_BAG/bag-info.txt' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '', empty value detected"], "bag-info parsing valid, error logged" );
+    is_deeply($bag->{errors}, ["the baginfo file '$SRC_BAG/bag-info.txt' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '\n'"], "bag-info parsing valid, error logged" );
 }
 
 {
@@ -146,16 +148,26 @@ BAGINFO
     delete $bag->{'warnings'};
     delete $bag->{'errors'};
     delete $bag->{'bag_info'};
-    my $input =<<BAGINFO;
+    my $input = <<BAGINFO;
 test:
 Bagging-Date: 2025-02-20
 Bag-Software-Agent: Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>
 Payload-Oxum: 1.1
 Bag-Size: 1 B
 BAGINFO
-    my $got = $bag->_parse_bag_info( $input );
+    my $expected = <<EXPECTED;
+
+Bagging-Date: 2025-02-20
+Bag-Software-Agent: Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>
+Payload-Oxum: 1.1
+Bag-Size: 1 B
+EXPECTED
+
+    my $got = $bag->_parse_bag_info($input);
+    is_deeply($got, [], "bag-info verify fully valid, parsed output");
     #is_deeply($bag->{warnings}, ["Payload-Oxum was expected in bag-info.txt, but not found!"], "bag-info parsing fully valid, warning for missed payload oxum");
-    is_deeply($bag->{errors}, undef, "bag-info verify fully valid, no error log exists");
+    is_deeply($bag->{errors},
+        ["the baginfo file 'src/src_bag/bag-info.txt' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '$expected'"], "bag-info verify fully valid, no error log exists");
 }
 
 {
@@ -181,10 +193,12 @@ BAGINFO
 
     my $bag4=$Class->new($dir);
     ok(!$bag4->verify_baginfo(), "verify_baginfo() with broken bag-info.txt");
-    throws_ok(sub{$bag4->verify_bag({report_all_errors => 1})}, qr{the baginfo file .* could not be parsed correctly, because following text blob not fullfill the match requirements for values: '', empty value detected}, "verify_bag() with broken bag-info.txt");
+    throws_ok(sub{$bag4->verify_bag({report_all_errors => 1})}, qr{the baginfo file .* could not be parsed correctly, because following text blob not fullfill the match requirements for values}, "verify_bag() with broken bag-info.txt");
+}
 
-
-
+{
+    my $bag = new_ok("Archive::BagIt" => [ bag_path => File::Spec->catdir(@ROOT, 'broken_baginfo') ]);
+    throws_ok(sub {$bag->verify_bag({ report_all_errors => 1 })}, qr{bag verify for bagit version '1.0' failed with invalid files.\nthe baginfo file .* could not be parsed correctly, because following text blob not fullfill the match requirements for values}, "broken baginfo bag");
 }
 
 1;

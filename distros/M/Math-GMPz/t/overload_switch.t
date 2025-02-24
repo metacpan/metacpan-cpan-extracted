@@ -39,16 +39,16 @@ cmp_ok(6 <=> $two, '>', 0, "IV <=> Math::GMPz object");
 
 my $iv = 50000;
 eval {my $res = $iv << Math::GMPz->new(5);};
-like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '<<' can't be a Math::GMPz object");
+like($@, qr/argument that specifies the number of bits to be/, "Right hand operand of '<<' can't be a Math::GMPz object");
 
 eval {my $res = $iv >> Math::GMPz->new(5);};
-like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '>>' can't be a Math::GMPz object");
+like($@, qr/argument that specifies the number of bits to be/, "Right hand operand of '>>' can't be a Math::GMPz object");
 
 eval {$iv <<= Math::GMPz->new(5);};
-like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '<<=' can't be a Math::GMPz object");
+like($@, qr/argument that specifies the number of bits to be/, "Right hand operand of '<<=' can't be a Math::GMPz object");
 
 eval {$iv >>= Math::GMPz->new(5);};
-like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '>>=' can't be a Math::GMPz object");
+like($@, qr/argument that specifies the number of bits to be/, "Right hand operand of '>>=' can't be a Math::GMPz object");
 
 
 

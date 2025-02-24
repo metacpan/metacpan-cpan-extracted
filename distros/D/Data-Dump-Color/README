@@ -2,7 +2,7 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.250 of Data::Dump::Color (from Perl
+    This document describes version 0.251 of Data::Dump::Color (from Perl
     distribution Data-Dump-Color), released on 2025-02-21.
 
 SYNOPSIS

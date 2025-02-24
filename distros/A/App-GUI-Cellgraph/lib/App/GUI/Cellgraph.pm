@@ -7,7 +7,7 @@ use warnings;
 use Wx;
 use utf8;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use base qw/Wx::App/;
 use App::GUI::Cellgraph::Frame;
@@ -84,11 +84,11 @@ and a deeper B<understanding> about how cellular automatons work.
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/30.png"      alt=""  width="300" height="300">
-<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/cascadestar.png"    alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/blauberg.png"alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/7io.png"     alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/teppich2.png"alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/igt.png"    alt=""  width="300" height="300">
-<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/blauberg.png"alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Cellgraph/main/example/POD/cascadestar.png"    alt=""  width="300" height="300">
 </p>
 
 
@@ -124,7 +124,7 @@ More details about this mechanics are to be found in the chapter
 "I<General Settings>" and "I<Action Rules>".
 
 
-=head2 GUI
+=head1 GUI
 
 The general layout is very simple: the picture gets drawn on the left
 window side. On the right side you change the settings from which the

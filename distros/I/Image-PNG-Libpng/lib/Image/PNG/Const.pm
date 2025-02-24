@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -132,6 +132,7 @@ PNG_INFO_PLTE
 PNG_INFO_acTL
 PNG_INFO_bKGD
 PNG_INFO_cHRM
+PNG_INFO_cICP
 PNG_INFO_eXIf
 PNG_INFO_fcTL
 PNG_INFO_gAMA
@@ -164,6 +165,7 @@ PNG_ITXT_COMPRESSION_zTXt
 PNG_KEYWORD_MAX_LENGTH
 PNG_MAXIMUM_INFLATE_WINDOW
 PNG_MAX_PALETTE_LENGTH
+PNG_MIPS_MMI
 PNG_MIPS_MSA
 PNG_NO_FILTERS
 PNG_OFFSET_MICROMETER
@@ -345,11 +347,12 @@ use constant {
     PNG_IMAGE_WARNING => 1,
     PNG_INFO_IDAT => 0x8000,
     PNG_INFO_PLTE => 0x0008,
-    PNG_INFO_acTL => 0x20000,
+    PNG_INFO_acTL => 0x40000,
     PNG_INFO_bKGD => 0x0020,
     PNG_INFO_cHRM => 0x0004,
+    PNG_INFO_cICP => 0x20000,
     PNG_INFO_eXIf => 0x10000,
-    PNG_INFO_fcTL => 0x40000,
+    PNG_INFO_fcTL => 0x80000,
     PNG_INFO_gAMA => 0x0001,
     PNG_INFO_hIST => 0x0040,
     PNG_INFO_iCCP => 0x1000,
@@ -380,12 +383,13 @@ use constant {
     PNG_KEYWORD_MAX_LENGTH => 79,
     PNG_MAXIMUM_INFLATE_WINDOW => 2,
     PNG_MAX_PALETTE_LENGTH => 256,
+    PNG_MIPS_MMI => 12,
     PNG_MIPS_MSA => 6,
     PNG_NO_FILTERS => 0x00,
     PNG_OFFSET_MICROMETER => 1,
     PNG_OFFSET_PIXEL => 0,
     PNG_OPTION_INVALID => 1,
-    PNG_OPTION_NEXT => 12,
+    PNG_OPTION_NEXT => 14,
     PNG_OPTION_OFF => 2,
     PNG_OPTION_ON => 3,
     PNG_OPTION_UNSET => 0,
@@ -950,7 +954,7 @@ PNG_INFO_PLTE has value 0x0008.
 
 =item PNG_INFO_acTL
 
-PNG_INFO_acTL has value 0x20000.
+PNG_INFO_acTL has value 0x40000.
 
 =item PNG_INFO_bKGD
 
@@ -960,13 +964,17 @@ PNG_INFO_bKGD has value 0x0020.
 
 PNG_INFO_cHRM has value 0x0004.
 
+=item PNG_INFO_cICP
+
+PNG_INFO_cICP has value 0x20000.
+
 =item PNG_INFO_eXIf
 
 PNG_INFO_eXIf has value 0x10000.
 
 =item PNG_INFO_fcTL
 
-PNG_INFO_fcTL has value 0x40000.
+PNG_INFO_fcTL has value 0x80000.
 
 =item PNG_INFO_gAMA
 
@@ -1088,6 +1096,10 @@ PNG_MAXIMUM_INFLATE_WINDOW has value 2.
 
 PNG_MAX_PALETTE_LENGTH has value 256.
 
+=item PNG_MIPS_MMI
+
+PNG_MIPS_MMI has value 12.
+
 =item PNG_MIPS_MSA
 
 PNG_MIPS_MSA has value 6.
@@ -1110,7 +1122,7 @@ PNG_OPTION_INVALID has value 1.
 
 =item PNG_OPTION_NEXT
 
-PNG_OPTION_NEXT has value 12.
+PNG_OPTION_NEXT has value 14.
 
 =item PNG_OPTION_OFF
 
@@ -1273,18 +1285,18 @@ all the symbols in this module:
 =head1 ABOUT THIS MODULE
 
 This Perl module was generated from the file F<png.h> supplied with
-version 1.6.40 of libpng.
+version 1.6.45 of libpng.
 
 
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2024
+2011-2025
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

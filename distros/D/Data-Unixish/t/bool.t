@@ -12,7 +12,7 @@ test_dux_func(
     tests => [
         {
             name => 'perl notion, style',
-            args => {style=>'y_n', notion=>'perl'},
+            args => {style=>'y_n'},
             in   => [1, " ", "", 0, [], {}, undef],
             out  => ['y', 'y', 'n', 'n', 'y', 'y', undef],
         },
@@ -24,11 +24,10 @@ test_dux_func(
         },
         {
             name => 'true_char & false_char',
-            args => {true_char => 'BETUL', false_char => 'SALAH', notion=>'perl'},
+            args => {true_char => 'BETUL', false_char => 'SALAH'},
             in   => [1, 0, undef],
             out  => ["BETUL", "SALAH", undef],
         },
-        # TODO: test other notions
     ],
 );
 

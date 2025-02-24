@@ -1,3 +1,13 @@
+0.661   2025-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Derp, typo.
+
+
+0.660   2025-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add prereq to LWP::Protocol::https (GH#2).
+
+
 0.659   2022-11-02  Released-By: PERLANCAR; Urgency: medium
 
 	- (Again) Update to WWW::PAUSE::Simple 0.453 (fix parsing of release

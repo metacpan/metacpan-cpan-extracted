@@ -1,0 +1,26 @@
+Sun Feb 23 16:11:01 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.06]:
+	* README.md: generated
+	* lib/Data/NestedKey.pm
+	- pod tweaks
+	- overload "";
+	(new): allow empty argument list
+	(set): support +/- syntax for adding removing elements
+	* t/01-append.t: unit test for new features
+
+Sun Feb 23 10:47:14 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* .gitignore: new
+	* ChangeLog: new
+	* Makefile.PL: new
+	* README.md: new
+	* lib/Data/NestedKey.pm: new
+	* t/01-as_string.t: new
+	* t/01-basic.t: new
+	* MANIFEST: new
+	* LICENSE: new
+
+
+

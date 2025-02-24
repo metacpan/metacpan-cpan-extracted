@@ -1,3 +1,7 @@
+0.59 2025-02-24
+
+- eXif, hIST tests switched off for libpng version 1.6.47 or above
+
 0.58 2024-01-27
 
 - Remove documentation for any2gray8 (does not exist)

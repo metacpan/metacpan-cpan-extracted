@@ -1,7 +1,7 @@
 
-# global settings panel
+#  panel for general settings of image
 
-package App::GUI::Cellgraph::Frame::Panel::Global;
+package App::GUI::Cellgraph::Frame::Panel::General;
 use v5.12;
 use warnings;
 use Wx;

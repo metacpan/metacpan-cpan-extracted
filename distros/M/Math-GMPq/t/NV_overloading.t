@@ -47,10 +47,10 @@ else {
   print "not ok 4\n";
 }
 
-eval{$ret = Math::GMPq->new(10) * "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul/) {print "ok 5\n"}
+$ret = Math::GMPq->new(10) * "61.2";
+if("$ret" eq '612') {print "ok 5\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 5\n";
 }
 
@@ -95,10 +95,11 @@ else {
   warn "\n\$\@: $@\n";
   print "not ok 10\n";
 }
-eval{$ret = Math::GMPq->new(10) + "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_add/) {print "ok 11\n"}
+
+$ret = Math::GMPq->new(10) + "61.2";
+if("$ret" eq '356/5') {print "ok 11\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 11\n";
 }
 
@@ -145,10 +146,10 @@ else {
   print "not ok 16\n";
 }
 
-eval{$ret = Math::GMPq->new(10) / "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_div/) {print "ok 17\n"}
+$ret = Math::GMPq->new(10) / "61.2";
+if("$ret" eq '25/153') {print "ok 17\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 17\n";
 }
 
@@ -195,10 +196,10 @@ else {
   print "not ok 22\n";
 }
 
-eval{$ret = Math::GMPq->new(10) - "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub/) {print "ok 23\n"}
+$ret = Math::GMPq->new(10) - "61.2";
+if("$ret" eq '-256/5') {print "ok 23\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 23\n";
 }
 
@@ -247,24 +248,18 @@ else {
   print "not ok 28\n";
 }
 
-eval{$ret *= "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul_eq/) {print "ok 29\n"}
+$ret *= "61.2";
+if($ret == 612) {print "ok 29\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 29\n";
 }
 
-$ret *= 61.2;
+$ret *= 1.5;
 
-if($ret == '21532835718365185/35184372088832' ||
-   $ret == '88198495102423793665/144115188075855872' ||
-   $ret == '387901083669838196857991180845055/633825300114114700748351602688' ||
-   $ret == '24825669354869644598911435574083585/40564819207303340847894502572032') {print "ok 30\n"}
+if($ret == 918) {print "ok 30\n"}
 else {
-  warn "\n Expected:\n   21532835718365185/35184372088832 or ",
-                   "\n   88198495102423793665/144115188075855872 or ",
-                   "\n   387901083669838196857991180845055/633825300114114700748351602688 or ",
-                   "\n   24825669354869644598911435574083585/40564819207303340847894502572032\nGot: $ret\n";
+  warn "\n Expected: 918\nGot: $ret\n";
   print "not ok 30\n";
 }
 
@@ -296,25 +291,19 @@ else {
   print "not ok 34\n";
 }
 
-eval{$ret += "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_add_eq/) {print "ok 35\n"}
+$ret += "2.5";
+if($ret == 920.5) {print "ok 35\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 35\n";
 }
 
-# $ret is 612
-$ret += 61.2;
+# $ret is 920.5
+$ret += 2.5;
 
-if($ret == '47372238580403407/70368744177664' ||
-   $ret == '194036689225332346063/288230376151711744' ||
-   $ret == '853382384073644033087580597859121/1267650600228229401496703205376' ||
-   $ret == '54616472580713218117605158262983887/81129638414606681695789005144064') {print "ok 36\n"}
+if($ret == 923) {print "ok 36\n"}
 else {
-  warn "\n Expected:\n   47372238580403407/70368744177664 or ",
-                   "\n   194036689225332346063/288230376151711744 or ",
-                   "\n   853382384073644033087580597859121/1267650600228229401496703205376 or ",
-                   "\n   54616472580713218117605158262983887/81129638414606681695789005144064\nGot: $ret\n";
+  warn "\n Expected: 925\nGot: $ret\n";
   print "not ok 36\n";
 }
 
@@ -346,24 +335,18 @@ else {
   print "not ok 40\n";
 }
 
-eval{$ret -= "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub_eq/) {print "ok 41\n"}
+$ret -= 60.5;
+if($ret == '1725/2') {print "ok 41\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 41\n";
 }
 
-$ret -= 61.2;
+$ret -= 60.5;
 
-if($ret == '21532835718365185/35184372088832' ||
-   $ret == '88198495102423793665/144115188075855872' ||
-   $ret == '387901083669838196857991180845055/633825300114114700748351602688' ||
-   $ret == '24825669354869644598911435574083585/40564819207303340847894502572032') {print "ok 42\n"}
+if($ret == '802') {print "ok 42\n"}
 else {
-  warn "\n Expected:\n   21532835718365185/35184372088832 or ",
-                   "\n   88198495102423793665/144115188075855872 or ",
-                   "\n   387901083669838196857991180845055/633825300114114700748351602688 or ",
-                   "\n   24825669354869644598911435574083585/40564819207303340847894502572032\nGot: $ret\n";
+  warn "\n Expected: 802\nGot: $ret\n";
   print "not ok 42\n";
 }
 
@@ -395,18 +378,18 @@ else {
   print "not ok 46\n";
 }
 
-eval{$ret /= "61.2"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_div_eq/) {print "ok 47\n"}
+$ret /= "6.25";
+if($ret == '3208/25') {print "ok 47\n"}
 else {
-  warn "\n\$\@: $@\n";
+  warn "\nGOT: $ret\n";
   print "not ok 47\n";
 }
 
-$ret /= 61.2;
+$ret /= 6.25;
 
-if($ret == 10) {print "ok 48\n"}
+if($ret == '12832/625') {print "ok 48\n"}
 else {
-  warn "\n Expected 10\nGot: $ret\n";
+  warn "\n Expected 12832/625\nGot: $ret\n";
   print "not ok 48\n";
 }
 
@@ -451,12 +434,8 @@ else {
   print "not ok 53\n";
 }
 
-eval{$x = (Math::GMPq->new(10) == "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_equiv/) {print "ok 54\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 54\n";
-}
+if(Math::GMPq->new(10) == "61.2") { print "not ok 54\n" }
+else { print "ok 54\n" }
 
 my $dec = 10.0;
 if(Math::GMPq->new(10) == $dec) {print "ok 55\n"}
@@ -507,12 +486,8 @@ else {
   print "not ok 60\n";
 }
 
-eval{$x = (Math::GMPq->new(10) != "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_not_equiv/) {print "ok 61\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 61\n";
-}
+if(Math::GMPq->new(10) != "61.2") { print "ok 61\n" }
+else { print "not ok 61\n" }
 
 $dec += 0.9;;
 if(Math::GMPq->new(10) != $dec) {print "ok 62\n"}
@@ -563,12 +538,8 @@ else {
   print "not ok 67\n";
 }
 
-eval{$x = (Math::GMPq->new(10) < "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_lt/) {print "ok 68\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 68\n";
-}
+if(Math::GMPq->new(10) < "61.2") { print "ok 68\n" }
+else { print "not ok 68\n" }
 
 $dec += 2.0;
 
@@ -620,12 +591,8 @@ else {
   print "not ok 74\n";
 }
 
-eval{$x = (Math::GMPq->new(10) <= "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_lte/) {print "ok 75\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 75\n";
-}
+if(Math::GMPq->new(10) <= "61.2") { print "ok 75\n" }
+else { print "not ok 75\n" }
 
 $dec -= 2.0;
 if(Math::GMPq->new(10) <= $dec) {print "ok 76\n"}
@@ -676,12 +643,8 @@ else {
   print "not ok 81\n";
 }
 
-eval{$x = (Math::GMPq->new(10) >= "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_gte/) {print "ok 82\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 82\n";
-}
+if(Math::GMPq->new(10) >= "61.2") { print "not ok 82\n" }
+else { print "ok 82\n" }
 
 $dec -= 1.0;
 
@@ -733,12 +696,8 @@ else {
   print "not ok 88\n";
 }
 
-eval{$x = (Math::GMPq->new(10) > "61.2")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_gt/) {print "ok 89\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 89\n";
-}
+if(Math::GMPq->new(10) > "61.2") { print "not ok 89\n" }
+else { print "ok 89\n" }
 
 $dec -= 1.0;
 if(Math::GMPq->new(10) > $dec) {print "ok 90\n"}
@@ -840,12 +799,9 @@ else {
   print "not ok 103\n";
 }
 
-eval{$x = (Math::GMPq->new(10) <=> "61.2")};
+if((Math::GMPq->new(10) <=> "61.2") > 0) { print "ok 104\n" }
 if($@ =~ /Invalid string supplied to Math::GMPq::overload_spaceship/) {print "ok 104\n"}
-else {
-  warn "\n\$\@: $@\n";
-  print "not ok 104\n";
-}
+else {  print "not ok 104\n" }
 
 if((Math::GMPq->new(10) <=> $inf) < 0){print "ok 105\n"}
 else {

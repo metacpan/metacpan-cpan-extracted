@@ -473,7 +473,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $inex = Rmpfr_set_z($rop, $z, $rnd); # $z is a mpz object.
    $inex = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
    $inex = Rmpfr_set_f($rop, $f, $rnd); # $f is a mpf object.
-   $inex = Rmpfr_set_flt($rop, $float, $rnd);# mpfr-3.0.0 and later only
+   $inex = Rmpfr_set_flt($rop, $float, $rnd);    # mpfr-3.0.0 and later only
+   $inex = Rmpfr_set_float16($rop, $f16, $rnd);  # mpfr-4.3.0 and later only
+                                                 # & only on 64-bit systems.
    $inex = Rmpfr_set_float128($rop, $f128, $rnd);# nvtype is __float128
                                                # && mpfr-4.0.0 or later
                                                # && mpfr lib built with
@@ -503,6 +505,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     number (this happens for 0.1 for instance), in which case it is
     first rounded by the C compiler to a double-precision number,
     and then only to a mpfr floating-point number.
+    Rmpfr_set_float16 is currently unavailable to 32-bit systems.
 
     NOTE:
          1) Rmpfr_set_IV requires that $iv has it's IOK flag set, and
@@ -712,9 +715,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $str = Rmpfr_get_str($op, $base, $digits, $rnd);
     Returns a string of the form, eg, '8.3456712@2'
-    which means '834.56712'.
-    The third argument to Rmpfr_get_str() specifies the number of digits
-    required to be output in the mantissa. (Trailing zeroes are removed.)
+    which means '834.56712'. The "mantissa" portion fo the returned
+    string will be presented in base $base. The "exponent" portion will
+    be in base 10. $digits specifies the number of digits required
+    to be output in the mantissa. (Trailing zeroes are removed.)
     If $digits is 0, the number of digits of the mantissa is chosen
     large enough so that re-reading the printed value with the same
     precision, assuming both output and input use rounding to nearest,
@@ -723,11 +727,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     (respectively) a NaN, a negative infinity or a positive infinity.
 
    ($str, $si) = Rmpfr_deref2($op, $base, $digits, $rnd);
-    Returns the mantissa to $str (as a string of digits, prefixed with
-    a minus sign if $op is negative), and returns the exponent to $si.
-    There's an implicit decimal point to the left of the first digit in
-    $str. The third argument to Rmpfr_deref2() specifies the number of
-    digits required to be output in the mantissa.
+    Returns the mantissa to $str (as a string of base $base digits,
+    prefixed with a minus sign if $op is negative), and returns the
+    exponent to $si as a base 10 value. There's an implicit decimal
+    point to the left of the first digit in $str. $digits specifies
+    the number of digits required to be output in the mantissa.
     If $digits is 0, the number of digits of the mantissa is chosen
     large enough so that re-reading the printed value with the same
     precision, assuming both output and input use rounding to nearest,
@@ -779,8 +783,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                            # && mpfr-4.0.0 or later
                                            # && mpfr lib built with
                                            # --enable-float128.
-   $NV     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
-   $float  = Rmpfr_get_flt($op, $rnd);   # mpfr-3.0.0 and later
+   $NV = Rmpfr_get_NV     ($op, $rnd);   # double/long double/__float128
+   $NV = Rmpfr_get_flt    ($op, $rnd);   # mpfr-3.0.0 and later
+   $NV = Rmpfr_get_float16($op, $rnd);   # mpfr-4.3.0 and later, and
+                                         # only on 64-bit systems.
    Rmpfr_get_LD($LD, $op, $rnd);         # $LD is a Math::LongDouble object.
    Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
                                          # mpfr lib built with
@@ -793,9 +799,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                         # --enable-float128.
                                         # $F128 is a Math::Float128
                                         # object.
-    Convert $op to a 'double', a 'long double', a __float128, an 'NV',
-    a float, a Math::LongDouble object, a Math::Decimal64 object, or
-    a Math::Float128 object using the rounding mode $rnd.
+    Convert $op to a 'double', a 'long double', a '__float128', an 'NV',
+    a 'float', a '_Float16', a Math::LongDouble object,
+''' a Math::Decimal64 object, or a Math::Float128 object using the
+    rounding mode $rnd.
+    Rmpfr_get_float16 is currently unavailable to 32-bit systems.
 
    $double = Rmpfr_get_d1($op);
     Convert $op to a double, using the default MPFR rounding mode.
@@ -2421,8 +2429,8 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     is not "false".)
 
     The following operators are overloaded:
-     + - * / ** sqrt (Return object has default precision)
-     += -= *= /= **= ++ -- (Precision remains unchanged)
+     + - * / % ** sqrt (Return object has default precision)
+     += -= *= /= %= **= ++ -- (Precision remains unchanged)
      < <= > >= == != <=>
      ! bool
      abs atan2 cos sin log exp (Return object has default precision)
@@ -2432,11 +2440,17 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
      ""  (Interpolates the value of the Math::MPFR object to a
           decimal string)
 
-     << >> <<= >>= (These just increase/decrease the exponent by the
-                    value of the given "shift" argument. Negative
-                    values for the 'shift' argument are allowed - in
-                    which case the shift value is multiplied by -1
-                    and the direction of the shift is reversed.)
+     << >> <<= >>= (The Math::MPFR object is first truncated to an integer
+                    value. Left shifts will increase the exponent by the
+                    value of the given " left shift" argument. For right
+                    shifts, the Math::MPFR object's value is then altered
+                    according to the rules of integer right shifts.
+                    Thereby, for both left and right shifts the resultant
+                    value of the object is an integer value.
+                    Negative values for the 'shift' argument are allowed,
+                    in which case the shift value is multiplied by -1
+                    and the direction of the shift is reversed.
+                    This is consistent with perl's shifting of NVs.)
 
      = (The copy has the same precision as the copied object.)
 
@@ -2448,11 +2462,14 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     Furthermore, all overloaded comparisons ( < <= > >= == != <=> )
     between Math::MPFR and Math::GMPz objects or between Math::MPFR
     and Math::GMPq objects are permitted.
+    Comparison oprations between Math::MPFR and Math::GMP objects
+    must be constructed such that Math::MPFR (not Math::GMP)
+    overloading is invoked.
 
     Some additional cross-class overloading is also allowed.
     Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
-    Math::GMPq or Math::GMPf object. Then it is now permissible to
-    do:
+    Math::GMPq, Math::GMPf or Math::GMP object. Then it is now
+    permissible to do:
 
      $M + $G;
      $M += $G;
@@ -2466,6 +2483,9 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
      $M / $G;
      $M /= $G;
 
+     $M % $G;  (Wraps the mpfr_fmod function)
+     $M %= $G; (Wraps the mpfr_fmod function)
+
      $M ** $G;
      $M **= $G;
 
@@ -2478,34 +2498,43 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
      $G / $M;
      $G ** $M;
 
+    (But note that such operations involving Math::GMP will
+    silently fail or crash if used.)
     Again, each of those operations returns a Math::MPFR object
     containing the result of the operation.
-    Each operation is conducted using default Math::MPFR rounding
-    mode and default Math::MPFR precision.
+    Each operation is performed to "infinite: precision, and then
+    rounded to default precision using default Math::MPFR rounding.
     The precision of the returned Math::MPFR object will therefore
     differ from the precision of $M unless the precision of $M is
-     the default.
+    the default.
+
+    With Math::GMPz (0.63 or later) or Math::GMPq (0.58 or later)
+    it is also now permissible to do:
+
+    $G % $M:
 
     NOTE: In overloading a ** (power) operation that involves a
-    Math::GMPq object, it is necessary to convert the Math::GMPq
-    object to an mpfr_t (the type of value encapsulated in the
-    Math::MPFR object). This conversion is done using current default
-    precision and current default rounding mode.
+    Math::GMPq object, the value of the Math::GMPq object is
+    assigned to a Math::MPFR object. This assignment is done using
+    current default precision and current default rounding mode.
 
     The following is allowed for Math::GMPq objects (if
     $Math::GMPq::VERSION >= 0.54 && $Math::GMPq::RETYPE == 1) and
     for Math::GMPz (if $Math::GMPz::VERSION >= 0.57 &&
-    $Math::GMPz::RETYPE == 1), but not for Math::GMPf :
+    $Math::GMPz::RETYPE == 1), but not for Math::GMPf or
+    Math::GMP :
 
      $G += $M;
      $G -= $M;
      $G *= $M;
      $G /= $M;
+     $G %= $M; (Math::GMPz >= 0.63; Math::GMPq >= 0.58)
      $G **= $M;
 
     When this usage is permitted, the result of the operation is
-    returned as a Math::MPFR object, calculated using Math::MPFR
-    default precision and Math::MPFR default rounding mode.
+    returned as a Math::MPFR object, calculated to "infinite"
+    precision and rounded to Math::MPFR default precision, using
+    Math::MPFR default rounding mode.
 
     To determine the type and value of the second argument received
     by the overloading subroutine, it works through the following

@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Config
 
+0.9903 2025-02-24T02:37:28Z
+
+    - call Getopt::Long library with hash object
+
 0.9902 2025-01-27T02:30:30Z
 
     - fix bug and stop to use Exporter

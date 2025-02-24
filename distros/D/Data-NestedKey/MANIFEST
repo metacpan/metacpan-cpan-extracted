@@ -1,0 +1,10 @@
+lib/Data/NestedKey.pm
+t/01-basic.t
+t/01-as_string.t
+Makefile.PL
+MANIFEST
+README.md
+LICENSE
+ChangeLog
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

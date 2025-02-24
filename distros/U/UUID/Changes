@@ -1,5 +1,9 @@
 Revision history for Perl extension UUID.
 
+0.37 Mon Feb 24 04:25:27 EST 2025
+  - Fix build under gcc-15 default ISO C23.
+    - Thanks Petr Pisar. [rt.cpan.org #159112]
+
 0.36 Sat Jun 22 21:24:39 EDT 2024
   - Fix distro tests run from read-only location.
     - Thanks Petr Pisar. [rt.cpan.org #153854]

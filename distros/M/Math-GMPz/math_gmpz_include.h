@@ -146,7 +146,7 @@
 
 #if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
 #define CHECK_MP_BITCNT_T_OVERFLOW(x)							\
-     if((mp_bitcnt_t)SvUVX(x) < SvUVX(x))						\
+     if((mp_bitcnt_t)SvUV(x) < SvUV(x))							\
        croak("Magnitude of UV argument overflows mp_bitcnt_t");
 #else
 #define CHECK_MP_BITCNT_T_OVERFLOW(x)

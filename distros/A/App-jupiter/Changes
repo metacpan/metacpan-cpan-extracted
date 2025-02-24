@@ -1,3 +1,8 @@
+1.09
+
+- Removed a test that depended on the exact libxml2 library linked
+  with XML::LibXML.
+
 1.08
 
 - Strip emails from RSS 2.0 authors.

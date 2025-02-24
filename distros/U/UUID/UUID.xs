@@ -158,16 +158,6 @@ BOOT:
         UCXT.cc.pid    = 0;
         UCXT.thread_id = 0;
 
-        svp = hv_fetchs(PL_modglobal, "Time::NVtime", 0);
-        if (!svp)         croak("Time::HiRes is required");
-        if (!SvIOK(*svp)) croak("Time::NVtime isn't a function pointer");
-        UCXT.myNVtime = INT2PTR(NV(*)(), SvIV(*svp));
-        if (0) { /* test */
-            (*UCXT.myNVtime)(aTHX);
-            printf("The current time is: %" NVff "\n", (*MY_CXT.myNVtime)());
-            exit(0);
-        }
-
         svp = hv_fetchs(PL_modglobal, "Time::U2time", 0);
         if (!svp)         croak("Time::HiRes is required");
         if (!SvIOK(*svp)) croak("Time::U2time isn't a function pointer");

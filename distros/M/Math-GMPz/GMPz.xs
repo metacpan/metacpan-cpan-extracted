@@ -2494,7 +2494,7 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
 
 }
 
-SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * overload_mod (pTHX_ SV * a, SV * b, SV * third) {
      mpz_t *mpz_t_obj;
      SV * obj_ref, * obj;
      MBI_DECLARATIONS
@@ -2512,10 +2512,10 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
      if(SV_IS_IOK(b)) {
        Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        if(SWITCH_ARGS) {
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+         mpz_mod(*mpz_t_obj, *mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))));
          return obj_ref;
        }
-       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+       mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *mpz_t_obj);
        return obj_ref;
      }
 #else
@@ -2523,19 +2523,19 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
        if(SvUOK(b)) {
          if(SWITCH_ARGS) {
            mpz_set_ui(*mpz_t_obj, SvUVX(b));
-           mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+           mpz_mod(*mpz_t_obj, *mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))));
            return obj_ref;
          }
-         mpz_mod_ui(*mpz_t_obj, *a, SvUVX(b));
+         mpz_mod_ui(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), SvUVX(b));
          return obj_ref;
        }
 
        mpz_set_si(*mpz_t_obj, SvIVX(b));
        if(SWITCH_ARGS) {
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+         mpz_mod(*mpz_t_obj, *mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))));
          return obj_ref;
        }
-       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+       mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *mpz_t_obj);
        return obj_ref;
      }
 #endif
@@ -2550,29 +2550,40 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
           croak(" Invalid string (%s) supplied to Math::GMPz::overload_mod", SvPV_nolen(b));
        if(SWITCH_ARGS) {
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+         mpz_mod(*mpz_t_obj, *mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))));
          return obj_ref;
        }
-       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+       mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *mpz_t_obj);
        return obj_ref;
      }
 
      if(SV_IS_NOK(b)) {
        Rmpz_set_NV(aTHX_ mpz_t_obj, b);
        if(SWITCH_ARGS) {
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+         mpz_mod(*mpz_t_obj, *mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))));
          return obj_ref;
        }
-       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+       mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *mpz_t_obj);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
-         mpz_mod(*mpz_t_obj, *a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
+         mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
-         }
+       }
+
+       if(strEQ(h, "Math::MPFR")) { /* will return if called */
+         _overload_callback("Math::MPFR::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+         return obj_ref;
+       }
+
+       if(strEQ(h, "Math::GMPq")) { /* will return if called */
+         _overload_callback("Math::GMPq::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+         return obj_ref;
+       }
+
        if(strEQ(h, "Math::BigInt")) {
          VALIDATE_MBI_OBJECT
            croak("Invalid Math::BigInt object supplied to Math::GMPz::overload_mod");
@@ -2580,13 +2591,13 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
          MBI_GMP_INSERT
 
          if(mpz) {
-           mpz_mod(*mpz_t_obj, *a, (mpz_srcptr)mpz);
+           mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), (mpz_srcptr)mpz);
            /* if(strEQ("-", sign)) ...... sign of divisor has no bearing on mod */
            return obj_ref;
          }
 
          mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0);
-         mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+         mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *mpz_t_obj);
          return obj_ref;
        }
      }
@@ -2641,76 +2652,40 @@ SV * overload_abs(pTHX_ mpz_t * p, SV * second, SV * third) {
      return obj_ref;
 }
 
-SV * overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
-     if(SWITCH_ARGS) croak("The argument that specifies the number of bits to be left-shifted must be an IV");
+     /* b will always be >= 0 */
 
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         CHECK_MP_BITCNT_T_OVERFLOW(b)
-         New(1, mpz_t_obj, 1, mpz_t);
-         if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
-         obj_ref = newSV(0);
-         obj = newSVrv(obj_ref, "Math::GMPz");
-         mpz_init(*mpz_t_obj);
-         mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
-         sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-         SvREADONLY_on(obj);
-         return obj_ref;
-       }
-
-       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_lshift");
-       CHECK_MP_BITCNT_T_OVERFLOW(b)
-       New(1, mpz_t_obj, 1, mpz_t);
-       if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
-       obj_ref = newSV(0);
-       obj = newSVrv(obj_ref, "Math::GMPz");
-       mpz_init(*mpz_t_obj);
-       mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
-       sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-       SvREADONLY_on(obj);
-       return obj_ref;
-     }
-
-     croak("Invalid argument supplied to Math::GMPz::overload_lshift");
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+     New(1, mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz");
+     mpz_init(*mpz_t_obj);
+     mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
 }
 
-SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
-     if(SWITCH_ARGS) croak("The argument that specifies the number of bits to be right-shifted must be an IV");
+     /* b will always be >= 0 */
 
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         CHECK_MP_BITCNT_T_OVERFLOW(b)
-         New(1, mpz_t_obj, 1, mpz_t);
-         if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
-         obj_ref = newSV(0);
-         obj = newSVrv(obj_ref, "Math::GMPz");
-         mpz_init(*mpz_t_obj);
-         mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
-         sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-         SvREADONLY_on(obj);
-         return obj_ref;
-       }
-
-       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_rshift");
-       CHECK_MP_BITCNT_T_OVERFLOW(b)
-       New(1, mpz_t_obj, 1, mpz_t);
-       if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
-       obj_ref = newSV(0);
-       obj = newSVrv(obj_ref, "Math::GMPz");
-       mpz_init(*mpz_t_obj);
-       mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
-       sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-       SvREADONLY_on(obj);
-       return obj_ref;
-     }
-
-     croak("Invalid argument supplied to Math::GMPz::overload_rshift");
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+     New(1, mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz");
+     mpz_init(*mpz_t_obj);
+     mpz_div_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
 }
 
 SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
@@ -4055,50 +4030,24 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_pow_eq. Exponent must fit into an unsigned long");
 }
 
-SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
+SV * _overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
-     if(SWITCH_ARGS) croak("The argument that specifies the number of bits to be right-shifted must be an IV");
+     /* b will always be >= 0 */
 
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         CHECK_MP_BITCNT_T_OVERFLOW(b)
-         SvREFCNT_inc(a);
-         mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
-         return a;
-       }
-
-       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_rshift_eq");
-       CHECK_MP_BITCNT_T_OVERFLOW(b)
-       SvREFCNT_inc(a);
-       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
-       return a;
-     }
-
-     SvREFCNT_dec(a);
-     croak("Invalid argument supplied to Math::GMPz::overload_rshift_eq");
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+     SvREFCNT_inc(a);
+     mpz_div_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
+     return a;
 }
 
-SV * overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
+SV * _overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
-     if(SWITCH_ARGS) croak("The argument that specifies the number of bits to be left-shifted must be an IV");
+     /* b will always be >= 0 */
 
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         CHECK_MP_BITCNT_T_OVERFLOW(b)
-         SvREFCNT_inc(a);
-         mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
-         return a;
-       }
-
-       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_lshift_eq");
-       CHECK_MP_BITCNT_T_OVERFLOW(b)
-       SvREFCNT_inc(a);
-       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
-       return a;
-     }
-
-     SvREFCNT_dec(a);
-     croak("Invalid argument supplied to Math::GMPz::overload_lshift_eq");
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+     SvREFCNT_inc(a);
+     mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
+     return a;
 }
 
 void overload_inc(pTHX_ SV * p, SV * second, SV * third) {
@@ -4176,6 +4125,22 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
        if(strEQ(h, "Math::GMPz")) {
          mpz_mod(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
+           _overload_callback("Math::MPFR::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+           return a;
+         }
+         else warn("This operation (%%=) requires that $Math::GMPz::RETYPE is TRUE\n");
+       }
+
+       if(strEQ(h, "Math::GMPq")) {
+         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
+           _overload_callback("Math::GMPq::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+           return a;
+         }
+         else warn("This operation (%%=) requires that $Math::GMPz::RETYPE is TRUE\n");
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -5549,7 +5514,7 @@ int autocorrelation_20000(pTHX_ mpz_t * bitstream, unsigned long offset) {
       mpz_mul_2exp(temp, temp, 19999 + offset);
       mpz_add(*bitstream, *bitstream, temp);
     }
-   if(mpz_sizeinbase(*bitstream, 2) != 20000 + offset) croak("Bit sequence has length of %d bits in autocorrelation_20000 function; should have size of %d bits", (int)mpz_sizeinbase(*bitstream, 2), 20000 + offset);
+   if(mpz_sizeinbase(*bitstream, 2) != 20000 + offset) croak("Bit sequence has length of %d bits in autocorrelation_20000 function; should have size of %d bits", (int)mpz_sizeinbase(*bitstream, 2), (int)20000 + (int)offset);
 
     for(i = 0; i < 19999; ++i) {
       if(mpz_tstbit(*bitstream, i) ^ mpz_tstbit(*bitstream, i + offset)) count += 1;
@@ -5703,9 +5668,10 @@ int _ld_printf_broken(void) {
 #endif
 }
 
-
-
-
+int _looks_like_number(pTHX_ SV * in) {
+  if(looks_like_number(in)) return 1;
+  return 0;
+}
 
 
 MODULE = Math::GMPz  PACKAGE = Math::GMPz
@@ -5821,7 +5787,7 @@ void
 Rmpz_set_uj (copy, original)
 	mpz_t *	copy
 	UV	original
-        CODE:
+        PPCODE:
         Rmpz_set_uj(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5829,7 +5795,7 @@ void
 Rmpz_set_sj (copy, original)
 	mpz_t *	copy
 	IV	original
-        CODE:
+        PPCODE:
         Rmpz_set_sj(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5837,7 +5803,7 @@ void
 Rmpz_set_IV (copy, original)
 	mpz_t *	copy
 	SV *	original
-        CODE:
+        PPCODE:
         Rmpz_set_IV(aTHX_ copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5906,7 +5872,7 @@ void
 _mpf_set_dd (q, p)
 	mpf_t *	q
 	SV *	p
-        CODE:
+        PPCODE:
         _mpf_set_dd(q, p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5914,7 +5880,7 @@ void
 Rmpz_set_NV (copy, original)
 	mpz_t *	copy
 	SV *	original
-        CODE:
+        PPCODE:
         Rmpz_set_NV(aTHX_ copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5958,28 +5924,28 @@ OUTPUT:  RETVAL
 void
 DESTROY (p)
 	mpz_t *	p
-        CODE:
+        PPCODE:
         DESTROY(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear (p)
 	mpz_t *	p
-        CODE:
+        PPCODE:
         Rmpz_clear(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear_mpz (p)
 	mpz_t *	p
-        CODE:
+        PPCODE:
         Rmpz_clear_mpz(p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear_ptr (p)
 	mpz_t *	p
-        CODE:
+        PPCODE:
         Rmpz_clear_ptr(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5987,7 +5953,7 @@ void
 Rmpz_realloc2 (integer, bits)
 	mpz_t *	integer
 	SV *	bits
-        CODE:
+        PPCODE:
         Rmpz_realloc2(aTHX_ integer, bits);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5995,7 +5961,7 @@ void
 Rmpz_set (copy, original)
 	mpz_t *	copy
 	mpz_t *	original
-        CODE:
+        PPCODE:
         Rmpz_set(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6003,7 +5969,7 @@ void
 Rmpz_set_q (copy, original)
 	mpz_t *	copy
 	mpq_t *	original
-        CODE:
+        PPCODE:
         Rmpz_set_q(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6011,7 +5977,7 @@ void
 Rmpz_set_f (copy, original)
 	mpz_t *	copy
 	mpf_t *	original
-        CODE:
+        PPCODE:
         Rmpz_set_f(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6019,7 +5985,7 @@ void
 Rmpz_set_si (copy, original)
 	mpz_t *	copy
 	long	original
-        CODE:
+        PPCODE:
         Rmpz_set_si(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6027,7 +5993,7 @@ void
 Rmpz_set_ui (copy, original)
 	mpz_t *	copy
 	unsigned long	original
-        CODE:
+        PPCODE:
         Rmpz_set_ui(copy, original);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6035,7 +6001,7 @@ void
 Rmpz_set_d (copy, d)
 	mpz_t *	copy
 	double	d
-        CODE:
+        PPCODE:
         Rmpz_set_d(copy, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6044,7 +6010,7 @@ Rmpz_set_str (copy, original, base)
 	mpz_t *	copy
 	SV *	original
 	int	base
-        CODE:
+        PPCODE:
         Rmpz_set_str(aTHX_ copy, original, base);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6052,7 +6018,7 @@ void
 Rmpz_swap (a, b)
 	mpz_t *	a
 	mpz_t *	b
-        CODE:
+        PPCODE:
         Rmpz_swap(a, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6067,10 +6033,10 @@ Rmpz_get_si (n)
 void
 Rmpz_get_d_2exp (n)
 	mpz_t *	n
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpz_get_d_2exp(aTHX_ n);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 Rmpz_getlimbn (p, n)
@@ -6085,7 +6051,7 @@ Rmpz_add (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_add(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6094,7 +6060,7 @@ Rmpz_add_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpz_add_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6103,7 +6069,7 @@ Rmpz_sub (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_sub(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6112,7 +6078,7 @@ Rmpz_sub_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpz_sub_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6121,7 +6087,7 @@ Rmpz_ui_sub (dest, num, src)
 	mpz_t *	dest
 	unsigned long	num
 	mpz_t *	src
-        CODE:
+        PPCODE:
         Rmpz_ui_sub(dest, num, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6130,7 +6096,7 @@ Rmpz_mul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_mul(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6139,7 +6105,7 @@ Rmpz_mul_si (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	long	num
-        CODE:
+        PPCODE:
         Rmpz_mul_si(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6148,7 +6114,7 @@ Rmpz_mul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpz_mul_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6157,7 +6123,7 @@ Rmpz_addmul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_addmul(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6166,7 +6132,7 @@ Rmpz_addmul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpz_addmul_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6175,7 +6141,7 @@ Rmpz_submul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_submul(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6184,7 +6150,7 @@ Rmpz_submul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpz_submul_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6193,7 +6159,7 @@ Rmpz_mul_2exp (dest, src1, b)
 	mpz_t *	dest
 	mpz_t *	src1
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_mul_2exp(aTHX_ dest, src1, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6202,7 +6168,7 @@ Rmpz_div_2exp (dest, src1, b)
 	mpz_t *	dest
 	mpz_t *	src1
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_div_2exp(aTHX_ dest, src1, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6210,7 +6176,7 @@ void
 Rmpz_neg (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        CODE:
+        PPCODE:
         Rmpz_neg(dest, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6218,7 +6184,7 @@ void
 Rmpz_abs (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        CODE:
+        PPCODE:
         Rmpz_abs(dest, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6227,7 +6193,7 @@ Rmpz_cdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_cdiv_q(q, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6236,7 +6202,7 @@ Rmpz_cdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_cdiv_r(mod, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6246,7 +6212,7 @@ Rmpz_cdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_cdiv_qr(q, r, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6279,7 +6245,7 @@ Rmpz_cdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_cdiv_q_2exp(aTHX_ q, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6288,7 +6254,7 @@ Rmpz_cdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_cdiv_r_2exp(aTHX_ r, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6297,7 +6263,7 @@ Rmpz_fdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_fdiv_q(q, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6306,7 +6272,7 @@ Rmpz_div (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_div(q, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6315,7 +6281,7 @@ Rmpz_fdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_fdiv_r(mod, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6325,7 +6291,7 @@ Rmpz_fdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_fdiv_qr(q, r, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6335,7 +6301,7 @@ Rmpz_divmod (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_divmod(q, r, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6381,7 +6347,7 @@ Rmpz_fdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_fdiv_q_2exp(aTHX_ q, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6390,7 +6356,7 @@ Rmpz_fdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_fdiv_r_2exp(aTHX_ r, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6399,7 +6365,7 @@ Rmpz_mod_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_mod_2exp(aTHX_ r, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6408,7 +6374,7 @@ Rmpz_tdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_tdiv_q(q, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6417,7 +6383,7 @@ Rmpz_tdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_tdiv_r(mod, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6427,7 +6393,7 @@ Rmpz_tdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_tdiv_qr(q, r, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6460,7 +6426,7 @@ Rmpz_tdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_tdiv_q_2exp(aTHX_ q, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6469,7 +6435,7 @@ Rmpz_tdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        CODE:
+        PPCODE:
         Rmpz_tdiv_r_2exp(aTHX_ r, n, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6478,7 +6444,7 @@ Rmpz_mod (r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_mod(r, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6493,7 +6459,7 @@ Rmpz_divexact (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	mpz_t *	d
-        CODE:
+        PPCODE:
         Rmpz_divexact(dest, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6502,7 +6468,7 @@ Rmpz_divexact_ui (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	unsigned long	d
-        CODE:
+        PPCODE:
         Rmpz_divexact_ui(dest, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6551,7 +6517,7 @@ Rmpz_powm (dest, base, exp, mod)
 	mpz_t *	base
 	mpz_t *	exp
 	mpz_t *	mod
-        CODE:
+        PPCODE:
         Rmpz_powm(dest, base, exp, mod);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6561,7 +6527,7 @@ Rmpz_powm_ui (dest, base, exp, mod)
 	mpz_t *	base
 	unsigned long	exp
 	mpz_t *	mod
-        CODE:
+        PPCODE:
         Rmpz_powm_ui(dest, base, exp, mod);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6570,7 +6536,7 @@ Rmpz_pow_ui (dest, base, exp)
 	mpz_t *	dest
 	mpz_t *	base
 	unsigned long	exp
-        CODE:
+        PPCODE:
         Rmpz_pow_ui(dest, base, exp);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6579,7 +6545,7 @@ Rmpz_ui_pow_ui (dest, base, exp)
 	mpz_t *	dest
 	unsigned long	base
 	unsigned long	exp
-        CODE:
+        PPCODE:
         Rmpz_ui_pow_ui(dest, base, exp);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6593,7 +6559,7 @@ void
 Rmpz_sqrt (r, n)
 	mpz_t *	r
 	mpz_t *	n
-        CODE:
+        PPCODE:
         Rmpz_sqrt(r, n);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6602,7 +6568,7 @@ Rmpz_sqrtrem (root, rem, src)
 	mpz_t *	root
 	mpz_t *	rem
 	mpz_t *	src
-        CODE:
+        PPCODE:
         Rmpz_sqrtrem(root, rem, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6626,7 +6592,7 @@ void
 Rmpz_nextprime (prime, init)
 	mpz_t *	prime
 	mpz_t *	init
-        CODE:
+        PPCODE:
         Rmpz_nextprime(prime, init);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6640,7 +6606,7 @@ Rmpz_gcd (gcd, src1, src2)
 	mpz_t *	gcd
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_gcd(gcd, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6657,7 +6623,7 @@ Rmpz_gcdext (g, s, t, a, b)
 	mpz_t *	t
 	mpz_t *	a
 	mpz_t *	b
-        CODE:
+        PPCODE:
         Rmpz_gcdext(g, s, t, a, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6666,7 +6632,7 @@ Rmpz_lcm (lcm, src1, src2)
 	mpz_t *	lcm
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_lcm(lcm, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6675,7 +6641,7 @@ Rmpz_lcm_ui (lcm, src1, src2)
 	mpz_t *	lcm
 	mpz_t *	src1
 	unsigned long	src2
-        CODE:
+        PPCODE:
         Rmpz_lcm_ui(lcm, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6733,7 +6699,7 @@ void
 Rmpz_fac_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_fac_ui(fac, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6741,7 +6707,7 @@ void
 Rmpz_2fac_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_2fac_ui(fac, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6750,7 +6716,7 @@ Rmpz_mfac_uiui (fac, b, c)
 	mpz_t *	fac
 	unsigned long	b
 	unsigned long	c
-        CODE:
+        PPCODE:
         Rmpz_mfac_uiui(fac, b, c);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6758,7 +6724,7 @@ void
 Rmpz_primorial_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_primorial_ui(fac, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6767,7 +6733,7 @@ Rmpz_bin_ui (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	unsigned long	d
-        CODE:
+        PPCODE:
         Rmpz_bin_ui(dest, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6776,7 +6742,7 @@ Rmpz_bin_si (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	long	d
-        CODE:
+        PPCODE:
         Rmpz_bin_si(dest, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6785,7 +6751,7 @@ Rmpz_bin_uiui (dest, n, d)
 	mpz_t *	dest
 	unsigned long	n
 	unsigned long	d
-        CODE:
+        PPCODE:
         Rmpz_bin_uiui(dest, n, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6793,7 +6759,7 @@ void
 Rmpz_fib_ui (dest, b)
 	mpz_t *	dest
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_fib_ui(dest, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6802,7 +6768,7 @@ Rmpz_fib2_ui (fn, fnsub1, b)
 	mpz_t *	fn
 	mpz_t *	fnsub1
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_fib2_ui(fn, fnsub1, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6810,7 +6776,7 @@ void
 Rmpz_lucnum_ui (dest, b)
 	mpz_t *	dest
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_lucnum_ui(dest, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6819,7 +6785,7 @@ Rmpz_lucnum2_ui (ln, lnsub1, b)
 	mpz_t *	ln
 	mpz_t *	lnsub1
 	unsigned long	b
-        CODE:
+        PPCODE:
         Rmpz_lucnum2_ui(ln, lnsub1, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6875,7 +6841,7 @@ Rmpz_and (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_and(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6884,7 +6850,7 @@ Rmpz_ior (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_ior(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6893,7 +6859,7 @@ Rmpz_xor (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        CODE:
+        PPCODE:
         Rmpz_xor(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6901,7 +6867,7 @@ void
 Rmpz_com (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        CODE:
+        PPCODE:
         Rmpz_com(dest, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6940,7 +6906,7 @@ void
 Rmpz_setbit (num, bit_index)
 	mpz_t *	num
 	SV *	bit_index
-        CODE:
+        PPCODE:
         Rmpz_setbit(aTHX_ num, bit_index);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6948,7 +6914,7 @@ void
 Rmpz_clrbit (num, bit_index)
 	mpz_t *	num
 	SV *	bit_index
-        CODE:
+        PPCODE:
         Rmpz_clrbit(aTHX_ num, bit_index);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6969,7 +6935,7 @@ Rmpz_import (rop, count, order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	SV *	op
-        CODE:
+        PPCODE:
         Rmpz_import(aTHX_ rop, count, order, size, endian, nails, op);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6993,7 +6959,7 @@ Rmpz_import_UV (rop, count, order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	AV *	op
-        CODE:
+        PPCODE:
         Rmpz_import_UV(aTHX_ rop, count, order, size, endian, nails, op);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7004,10 +6970,10 @@ Rmpz_export_UV (order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	mpz_t *	op
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpz_export_UV(aTHX_ order, size, endian, nails, op);
-        return; /* assume stack size is correct */
+        return;
 
 int
 Rmpz_fits_ulong_p (in)
@@ -7061,10 +7027,10 @@ Rsieve_gmp (x_arg, a, number)
 	int	x_arg
 	int	a
 	mpz_t *	number
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rsieve_gmp(aTHX_ x_arg, a, number);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 Rfermat_gmp (num, base)
@@ -7178,10 +7144,10 @@ OUTPUT:  RETVAL
 void
 eratosthenes (x_arg)
 	SV *	x_arg
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         eratosthenes(aTHX_ x_arg);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 trial_div_ul (num, x_arg)
@@ -7197,7 +7163,7 @@ Rmpz_rootrem (root, rem, u, d)
 	mpz_t *	rem
 	mpz_t *	u
 	unsigned long	d
-        CODE:
+        PPCODE:
         Rmpz_rootrem(root, rem, u, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7205,7 +7171,7 @@ void
 Rmpz_combit (num, bitpos)
 	mpz_t *	num
 	SV *	bitpos
-        CODE:
+        PPCODE:
         Rmpz_combit(aTHX_ num, bitpos);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7247,7 +7213,7 @@ OUTPUT:  RETVAL
 
 SV *
 overload_mod (a, b, third)
-	mpz_t *	a
+	SV *	a
 	SV *	b
 	SV *	third
 CODE:
@@ -7282,21 +7248,21 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
-overload_lshift (a, b, third)
+_overload_lshift (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_lshift (aTHX_ a, b, third);
+  RETVAL = _overload_lshift (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_rshift (a, b, third)
+_overload_rshift (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_rshift (aTHX_ a, b, third);
+  RETVAL = _overload_rshift (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
@@ -7467,21 +7433,21 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
-overload_rshift_eq (a, b, third)
+_overload_rshift_eq (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_rshift_eq (aTHX_ a, b, third);
+  RETVAL = _overload_rshift_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_lshift_eq (a, b, third)
+_overload_lshift_eq (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_lshift_eq (aTHX_ a, b, third);
+  RETVAL = _overload_lshift_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 void
@@ -7489,7 +7455,7 @@ overload_inc (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        CODE:
+        PPCODE:
         overload_inc(aTHX_ p, second, third);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7498,7 +7464,7 @@ overload_dec (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        CODE:
+        PPCODE:
         overload_dec(aTHX_ p, second, third);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7616,7 +7582,7 @@ OUTPUT:  RETVAL
 void
 Rmpz_urandomb (p, ...)
 	SV *	p
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpz_urandomb(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
@@ -7624,7 +7590,7 @@ Rmpz_urandomb (p, ...)
 void
 Rmpz_urandomm (x, ...)
 	SV *	x
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpz_urandomm(aTHX_ x);
         XSRETURN_EMPTY; /* return empty stack */
@@ -7632,7 +7598,7 @@ Rmpz_urandomm (x, ...)
 void
 Rmpz_rrandomb (x, ...)
 	SV *	x
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpz_rrandomb(aTHX_ x);
         XSRETURN_EMPTY; /* return empty stack */
@@ -7647,7 +7613,7 @@ OUTPUT:  RETVAL
 void
 rand_clear (p)
 	SV *	p
-        CODE:
+        PPCODE:
         rand_clear(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7731,7 +7697,7 @@ Rmpz_powm_sec (dest, base, exp, mod)
 	mpz_t *	base
 	mpz_t *	exp
 	mpz_t *	mod
-        CODE:
+        PPCODE:
         Rmpz_powm_sec(dest, base, exp, mod);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7760,7 +7726,7 @@ Rprbg_ms (outref, p, q, seed, bits_required)
 	mpz_t *	q
 	mpz_t *	seed
 	unsigned long	bits_required
-        CODE:
+        PPCODE:
         Rprbg_ms(aTHX_ outref, p, q, seed, bits_required);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7771,7 +7737,7 @@ Rprbg_bbs (outref, p, q, seed, bits_required)
 	mpz_t *	q
 	mpz_t *	seed
 	unsigned long	bits_required
-        CODE:
+        PPCODE:
         Rprbg_bbs(aTHX_ outref, p, q, seed, bits_required);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7810,10 +7776,10 @@ void
 autocorrelation (bitstream, offset)
 	mpz_t *	bitstream
 	int	offset
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         autocorrelation(aTHX_ bitstream, offset);
-        return; /* assume stack size is correct */
+        return;
 
 int
 autocorrelation_20000 (bitstream, offset)
@@ -7854,7 +7820,7 @@ OUTPUT:  RETVAL
 void
 _dump_mbi_gmp (b)
 	SV *	b
-        CODE:
+        PPCODE:
         _dump_mbi_gmp(aTHX_ b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -7903,4 +7869,11 @@ _has_pv_nv_bug ()
 int
 _ld_printf_broken ()
 
+
+int
+_looks_like_number (in)
+	SV *	in
+CODE:
+  RETVAL = _looks_like_number (aTHX_ in);
+OUTPUT:  RETVAL
 

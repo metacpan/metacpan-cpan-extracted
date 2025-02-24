@@ -14,6 +14,7 @@ my $build = Module::Build->new(
   },
   test_requires => {
     'DBD::SQLite'       => 0,
+    'DBD::Mock'         => 0,
     'Test::API'         => 0,
     'Test::DatabaseRow' => 0,
     'Test::Deep'        => 0,

@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.098'; # VERSION
+our $VERSION = '0.099'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -762,7 +762,7 @@ sub _extract_key_from_textblob {
     my $key;
     my $rx_word = qr{[^: \t\r\n]+};# Hint: this word definition for bag-info.txt-keys differs from word definition of bag-info.txt-values!
     my $rx_spc = qr{\s}; #qr{[\t ]};
-    if ($textblob =~ s/\A($rx_word)$rx_spc*:$rx_spc*//m) {
+    if ($textblob =~ s/\A($rx_word)$rx_spc*:[\t ]*//m) {
         # label if starts with chars not colon or whitespace followed by zero or more spaces, a colon, zero or more spaces
         if ($textblob eq "") {
             push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because following text blob not fullfill the match requirements for values: '$textblob', empty value detected";
@@ -842,8 +842,6 @@ sub _parse_bag_info { # parses a bag-info textblob
             my $entry = { $key => $value };
             push @labels, $entry;
         }
-
-
     }
     # The RFC does not allow reordering:
     #my @sorted = __sort_bag_info(@labels);
@@ -1124,7 +1122,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.098
+version 0.099
 
 =head1 NAME
 

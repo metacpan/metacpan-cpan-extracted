@@ -31,8 +31,8 @@ warn "# MATH_GMPz_UV_MAX is ", MATH_GMPz_UV_MAX(), "\n";
 warn "# LD_PRINTF_BROKEN is ", Math::GMPz::_ld_printf_broken(), "\n";
 warn "# GMPZ_WIN32_FMT_BUG is ", Math::GMPz::GMPZ_WIN32_FMT_BUG, "\n";
 
-if($Math::GMPz::VERSION eq '0.62' && $Math::GMPz::Random::VERSION eq '0.62' &&
-   $Math::GMPz::V::VERSION eq '0.62' &&
+if($Math::GMPz::VERSION eq '0.63' && $Math::GMPz::Random::VERSION eq '0.63' &&
+   $Math::GMPz::V::VERSION eq '0.63' &&
    Math::GMPz::_get_xs_version() eq $Math::GMPz::VERSION) {print "ok 1\n"}
 else {
   print "not ok 1\n";

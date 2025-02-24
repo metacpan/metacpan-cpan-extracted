@@ -425,7 +425,7 @@ typedef _Decimal128 D128;
 
 # endif
 
-#elif defined(USE_LONG_DOUBLE)
+#elif defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
 #define MATH_MPFR_MAX_DIG 21
 #define NVSIZE_BITS 64
 #define MATH_MPFR_NV_MAX 0xf.fffffffffffffffp+16380L

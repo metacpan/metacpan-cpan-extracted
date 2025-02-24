@@ -17,6 +17,7 @@ Random/t/gmp_random.t
 README
 t/_1aaa_v.t
 t/_1basic.t
+t/bitwise.t
 t/_itsa.t
 t/cmp_z.t
 t/divby0.t
@@ -26,6 +27,7 @@ t/NV_overloading.t
 t/NOK_and_POK.t
 t/overload.t
 t/overload_cross_class.t
+t/overload_mod.t
 t/overload_op_eq.t
 t/overload_switch.t
 t/use64bitint.t

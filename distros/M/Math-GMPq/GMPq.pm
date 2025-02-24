@@ -35,6 +35,8 @@ use overload
     '-='   => \&overload_sub_eq,
     '*='   => \&overload_mul_eq,
     '/='   => \&overload_div_eq,
+    '%'    => \&overload_fmod,
+    '%='   => \&overload_fmod_eq,
     '**='  => \&overload_pow_eq,
     '""'   => \&overload_string,
     '0+'   => \&overload_num,
@@ -48,7 +50,16 @@ use overload
     '!'    => \&overload_not,
     '='    => \&overload_copy,
     'int'  => \&overload_int,
+    '&'    => \&overload_and,
+    '|'    => \&overload_ior,
+    '^'    => \&overload_xor,
+    '~'    => \&overload_com,
+    '>>'   => \&overload_rshift,
+    '<<'   => \&overload_lshift,
+    '>>='  => \&overload_rshift_eq,
+    '<<='  => \&overload_lshift_eq,
     'abs'  => \&overload_abs;
+
 
     my @untagged = qw(
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
@@ -59,6 +70,7 @@ IOK_flag NOK_flag POK_flag
 my @tagged = qw(
 GMPQ_PV_NV_BUG GMPQ_WIN32_FMT_BUG
 Rmpq_abs Rmpq_add Rmpq_canonicalize Rmpq_clear Rmpq_cmp Rmpq_cmp_si Rmpq_cmp_ui
+Rmpq_and Rmpq_ior Rmpq_xor Rmpq_com
 Rmpq_cmp_z Rmpq_add_z Rmpq_sub_z Rmpq_z_sub Rmpq_mul_z Rmpq_div_z Rmpq_z_div
 Rmpq_pow_ui
 Rmpq_create_noval Rmpq_denref Rmpq_div Rmpq_div_2exp Rmpq_equal
@@ -82,7 +94,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.57';
+    our $VERSION = '0.58';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -144,7 +156,7 @@ sub new {
     # Die if there are any additional args (unless $type == _POK_T)
     if($type == _UOK_T || $type == _IOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-      Rmpq_set_str($ret, $arg1, 10);
+      _Rmpq_set_str($ret, $arg1, 10);
       return $ret;
     }
 
@@ -158,8 +170,20 @@ sub new {
       if(@_ > 1) {die "Too many arguments supplied to new() - expected no more than two"}
       $base = shift if @_;
       if(($base < 2 && $base != 0) || $base > 62) {die "Invalid value for base"}
-      Rmpq_set_str($ret, $arg1, $base);
+      if( ($base == 0 || $base == 10) && _looks_like_number($arg1) ) {
+        # Added in 0.58:
+        # Convert (eg) a string such as '20.14e-1' into
+        # an acceptable input arg of '2014/1000'.
+        $arg1 = _reformatted($arg1);
+      }
+      _Rmpq_set_str($ret, $arg1, $base);
       Rmpq_canonicalize($ret);
+      return $ret;
+    }
+
+    if($type == _MATH_GMPz_T || $type == _MATH_GMP_T) { # Math::GMPz or Math::GMP object
+      if(@_) {die "Too many arguments supplied to new() - expected only one"}
+      Rmpq_set_z($ret, $arg1);
       return $ret;
     }
 
@@ -267,6 +291,306 @@ sub Rmpq_snprintf {
     }
 
     return $len;
+}
+
+sub Rmpq_set_str {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && ($_[2] == 0 || $_[2] == 10) ) {
+    _Rmpq_set_str($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else { _Rmpq_set_str($_[0], $_[1], $_[2]) }
+}
+
+sub _reformatted {
+  # The argument has already been as assessed
+  # as looks_like_number()
+  my ($sign, $ppos) = ('', '');
+  my $arg = shift;
+  $arg =~ s/^0+//;
+  my($man, $exp) = split /e/i, $arg;
+  return '0' unless defined $man;
+  $exp = 0 if !$exp;
+  if($man =~ s/^[\+\-]//) { $sign = '-' if $& eq'-' }
+  my $len = length($man);
+  $len --;
+  for my $i (0 .. $len) {
+    if(substr($man, $i, 1) eq '.') {
+      substr ($man, $i, 1, '');
+      $ppos = "$i";
+      last;
+    }
+  }
+
+  return '0' unless $man =~ /[^0]/;
+
+  $ppos = $len if $ppos eq '';
+  $exp += $ppos - $len;
+
+  $man =~ s/^0+//;
+  return $sign . $man . ('0' x $exp) . '/1' if $exp >= 0;
+  return $sign . $man . '/1' . ('0' x -$exp);
+}
+
+sub overload_add {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_add($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_add($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_add_eq {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_add_eq($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_add_eq($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_mul {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_mul($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_mul($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_mul_eq {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_mul_eq($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_mul_eq($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_sub {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_sub($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_sub($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_sub_eq {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_sub_eq($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_sub_eq($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_div {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_div($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_div($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_div_eq {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_div_eq($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_div_eq($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_pow {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_pow($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_pow($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_pow_eq {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_pow_eq($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_pow_eq($_[0], $_[1], $_[2]);
+  }
+}
+
+##### overloaded comparisons #####
+
+sub overload_gt {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_gt($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_gt($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_gte {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_gte($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_gte($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_lt {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_lt($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_lt($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_and {
+  my $itsa = _itsa($_[1]);
+  my $ret = Math::GMPq->new();
+  if($itsa == 7) {
+    Rmpq_and($ret, $_[0], $_[1]);
+    return $ret;
+  }
+  my $arg1 = _to_mpq($itsa, $_[1], '&');
+  return Rmpq_and($ret,$_[0], $arg1);
+  return $ret;
+}
+
+sub overload_ior {
+  my $itsa = _itsa($_[1]);
+  my $ret = Math::GMPq->new();
+  if($itsa == 7) {
+    Rmpq_ior($ret, $_[0], $_[1]);
+    return $ret;
+  }
+  my $arg1 = _to_mpq($itsa, $_[1], '&');
+  return Rmpq_ior($ret,$_[0], $arg1);
+  return $ret;
+}
+
+sub overload_xor {
+  my $itsa = _itsa($_[1]);
+  my $ret = Math::GMPq->new();
+  if($itsa == 7) {
+    Rmpq_xor($ret, $_[0], $_[1]);
+    return $ret;
+  }
+  my $arg1 = _to_mpq($itsa, $_[1], '&');
+  return Rmpq_xor($ret,$_[0], $arg1);
+  return $ret;
+}
+
+sub overload_com {
+  my $ret = Math::GMPq->new();
+  Rmpq_com($ret, $_[0]);
+  return $ret;
+}
+
+sub _to_mpq {
+  my ($itsa, $arg, $op) = (shift, shift);
+  die "Bad argument given to '$op' overloading" unless $itsa;
+  return Math::GMPq->new($arg) if $itsa <= 4;
+  if($itsa == 8 || $itsa == 9) {
+    my $ret = Math::GMPq->new();
+    Rmpq_set_z($ret, $arg);
+    return $ret;
+  }
+  die "Bad argument given to '$op' overloading";
+}
+
+sub overload_lte {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_lte($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_lte($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_spaceship {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_spaceship($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_spaceship($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_equiv {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_equiv($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_equiv($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_not_equiv {
+  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    _overload_not_equiv($_[0], _reformatted($_[1]), $_[2]);
+  }
+  else {
+    _overload_not_equiv($_[0], $_[1], $_[2]);
+  }
+}
+
+sub overload_lshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPq: When overloading '<<', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift(@_) if $_[1] >= 0;
+  return _overload_rshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_lshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPq: When overloading '<<=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift_eq(@_) if $_[1] >= 0;
+  return _overload_rshift_eq($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPq: When overloading '>>', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift(@_) if $_[1] >= 0;
+  return _overload_lshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPq: When overloading '>>=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift_eq(@_) if $_[1] >= 0;
+  return _overload_lshift_eq($_[0], -$_[1], $_[2]);
+}
+
+sub overload_fmod {
+  if(ref($_[1]) eq 'Math::MPFR') {
+    return Math::MPFR::_overload_fmod(Math::MPFR->new($_[0]), $_[1], 0);
+  }
+  if(ref($_[1]) ne 'Math::GMPq') {
+    return _overload_fmod($_[0], Math::GMPq->new($_[1]), 0) unless $_[2];
+    return _overload_fmod(Math::GMPq->new($_[1]), $_[0], 0);
+  }
+  return _overload_fmod(@_);
+}
+
+sub overload_fmod_eq {
+  if(ref($_[1]) eq 'Math::MPFR') {
+    return Math::MPFR::_overload_fmod(Math::MPFR->new($_[0]), $_[1], 0);
+  }
+  if(ref($_[1]) ne 'Math::GMPq') {
+    return _overload_fmod_eq($_[0], Math::GMPq->new($_[1]), 0) unless $_[2];
+    return _overload_fmod_eq(Math::GMPq->new($_[1]), $_[0], 0);
+  }
+  return _overload_fmod_eq(@_);
 }
 
 sub __GNU_MP_VERSION            () {return ___GNU_MP_VERSION()}

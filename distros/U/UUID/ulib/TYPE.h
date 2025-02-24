@@ -153,7 +153,6 @@ typedef struct {
   U8                gen_node[6];  /* need 64bit align */
   U16               __align;
   U8                gen_real_node[6];  /* need 64bit align */
-  NV                (*myNVtime)();
   void              (*myU2time)(pTHX_ UV ret[2]);
   int               gen_has_real_node;
   int               gen_use_unique;

@@ -933,31 +933,33 @@ else {
 
 my $shifter = Math::GMPz->new(123);
 
-eval { my $ret = $shifter << -1; };
-if($@ =~ /Negative shift not allowed/) { print "ok 48\n"}
+# Negative shifts are allowed as of Math::GMPz-0.63.
+
+my $ret = $shifter << -1;
+if($ret == 61) { print "ok 48\n"}
 else {
-   warn "\$\@: $@\n";
+   warn "GOT: $ret\n";
    print "not ok 48\n";
 }
 
-eval { my $ret = $shifter >> -1; };
-if($@ =~ /Negative shift not allowed/) { print "ok 49\n"}
+$ret = $shifter >> -1;
+if($ret == 246) { print "ok 49\n"}
 else {
-   warn "\$\@: $@\n";
+   warn "GOT: $ret\n";
    print "not ok 49\n";
 }
 
-eval { $shifter <<= -1; };
-if($@ =~ /Negative shift not allowed/) { print "ok 50\n"}
+$shifter <<= -1;
+if($shifter == 61) { print "ok 50\n"}
 else {
-   warn "\$\@: $@\n";
+   warn "GOT: $shifter\n";
    print "not ok 50\n";
 }
 
-eval { $shifter >>= -1; };
-if($@ =~ /Negative shift not allowed/) { print "ok 51\n"}
+$shifter >>= -1;
+if($shifter == 122) { print "ok 51\n"}
 else {
-   warn "\$\@: $@\n";
+   warn "GOT: $shifter\n";
    print "not ok 51\n";
 }
 

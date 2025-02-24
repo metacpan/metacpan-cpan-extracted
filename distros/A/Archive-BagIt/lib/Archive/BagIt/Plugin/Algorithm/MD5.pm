@@ -5,7 +5,7 @@ use Carp qw( croak );
 use Moo;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm', 'Archive::BagIt::Role::OpenSSL';
-our $VERSION = '0.098'; # VERSION
+our $VERSION = '0.099'; # VERSION
 # ABSTRACT: The MD5 algorithm plugin (default for v0.97)
 
 has '+plugin_name' => (
@@ -36,7 +36,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.098
+version 0.099
 
 =head1 AVAILABILITY
 

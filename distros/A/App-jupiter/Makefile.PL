@@ -57,7 +57,7 @@ sub postamble {
   push @ret, <<'EOT';
 README.md: script/jupiter
 	pod2markdown $< $@
-	grep -L ERROR $@
+	! grep ERROR $@
 EOT
   return join "\n", @ret;
 }

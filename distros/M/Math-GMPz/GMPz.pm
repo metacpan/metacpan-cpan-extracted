@@ -124,7 +124,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.62';
+    our $VERSION = '0.63';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -522,6 +522,39 @@ sub Rmpz_snprintf {
 
     return $len;
 }
+
+sub overload_lshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPz: When overloading '<<', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift(@_) if $_[1] >= 0;
+  return _overload_rshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_lshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPz: When overloading '<<=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_lshift_eq(@_) if $_[1] >= 0;
+  return _overload_rshift_eq($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPz: When overloading '>>', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift(@_) if $_[1] >= 0;
+  return _overload_lshift($_[0], -$_[1], $_[2]);
+}
+
+sub overload_rshift_eq {
+  if($_[2] || !_looks_like_number($_[1])) {
+    die "Math::GMPz: When overloading '>>=', the argument that specifies the number of bits to be shifted must be a perl number";
+  }
+  return _overload_rshift_eq(@_) if $_[1] >= 0;
+  return _overload_lshift_eq($_[0], -$_[1], $_[2]);
+}
+
 
 sub __GNU_MP_VERSION            () {return ___GNU_MP_VERSION()}
 sub __GNU_MP_VERSION_MINOR      () {return ___GNU_MP_VERSION_MINOR()}

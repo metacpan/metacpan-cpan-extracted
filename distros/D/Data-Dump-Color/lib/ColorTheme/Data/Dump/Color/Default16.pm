@@ -7,7 +7,7 @@ use Term::ANSIColor;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-02-21'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.250'; # VERSION
+our $VERSION = '0.251'; # VERSION
 
 sub _ansi16 {
     my ($fg, $bg) = @_;
@@ -52,7 +52,7 @@ ColorTheme::Data::Dump::Color::Default16 - Default color theme for Data::Dump::C
 
 =head1 VERSION
 
-This document describes version 0.250 of ColorTheme::Data::Dump::Color::Default16 (from Perl distribution Data-Dump-Color), released on 2025-02-21.
+This document describes version 0.251 of ColorTheme::Data::Dump::Color::Default16 (from Perl distribution Data-Dump-Color), released on 2025-02-21.
 
 =head1 HOMEPAGE
 

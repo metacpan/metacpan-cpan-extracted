@@ -1,4 +1,14 @@
-1.573   2023-09-23  Released-By: PERLANCAR; Urgency: medium
+1.574   2025-02-24  Released-By: PERLANCAR; Urgency: high
+
+        [BUG FIXES]
+
+        - [dux function bool] Fix backward incompatibility by defaulting back to
+          'perl' notion. (Ref: https://github.com/perlancar/perl-Text-ANSITable/issues/9)
+
+        - [dux function bool] Notion 'n1+en_id' has not been added.
+
+
+1.573   2023-09-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [dux function bool][ux] Add more mainstream notions: n1+en,
           n1+id, n1+en_id and default to n1+en_id.

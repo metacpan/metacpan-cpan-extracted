@@ -6,12 +6,12 @@ META.json
 META.yml
 Makefile.PL
 README
+demoscript/demo-data-dump-color
 dist.ini
 lib/ColorTheme/Data/Dump/Color/Default16.pm
 lib/ColorTheme/Data/Dump/Color/Default256.pm
 lib/ColorTheme/Data/Dump/Color/Light.pm
 lib/Data/Dump/Color.pm
-script/demo-data-dump-color
 share/examples/example.pl
 share/examples/example2.pl
 share/images/Screenshot_20210624_071341.png

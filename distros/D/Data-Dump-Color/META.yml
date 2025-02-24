@@ -23,16 +23,16 @@ name: Data-Dump-Color
 provides:
   ColorTheme::Data::Dump::Color::Default16:
     file: lib/ColorTheme/Data/Dump/Color/Default16.pm
-    version: '0.250'
+    version: '0.251'
   ColorTheme::Data::Dump::Color::Default256:
     file: lib/ColorTheme/Data/Dump/Color/Default256.pm
-    version: '0.250'
+    version: '0.251'
   ColorTheme::Data::Dump::Color::Light:
     file: lib/ColorTheme/Data/Dump/Color/Light.pm
-    version: '0.250'
+    version: '0.251'
   Data::Dump::Color:
     file: lib/Data/Dump/Color.pm
-    version: '0.250'
+    version: '0.251'
 recommends:
   Scalar::Util::LooksLikeNumber: '0'
 requires:
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color
   homepage: https://metacpan.org/release/Data-Dump-Color
   repository: git://github.com/perlancar/perl-Data-Dump-Color.git
-version: '0.250'
+version: '0.251'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

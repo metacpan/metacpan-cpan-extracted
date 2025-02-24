@@ -9,6 +9,12 @@ BEGIN: {
     use IPNGLT;
 };
 
+my $libpng_version = Image::PNG::Libpng::get_libpng_ver ();
+my ($x, $major, $minor) = ($libpng_version =~ m!([0-9]+)\.([0-9]+)\.([0-9]+)!);
+if ($major >= 6 && $minor >= 47) {
+    plan skip_all => "Faulty libpng $libpng_version does not handle hIST";
+}
+
 my @tests = (
 {
     file => 'ch1n3p04',

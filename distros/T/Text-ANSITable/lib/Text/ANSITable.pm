@@ -8,12 +8,13 @@ use Moo;
 use ColorThemeUtil::ANSI qw(item_color_to_ansi);
 #use List::Util qw(first);
 use Scalar::Util 'looks_like_number';
-require Win32::Console::ANSI if $^O =~ /Win/;
+require # hide from cpanspec
+    Win32::Console::ANSI if $^O =~ /Win/;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-14'; # DATE
+our $DATE = '2025-02-24'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.609'; # VERSION
+our $VERSION = '0.610'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -1776,7 +1777,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.609 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2023-07-14.
+This document describes version 0.610 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2025-02-24.
 
 =head1 SYNOPSIS
 
@@ -3364,7 +3365,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

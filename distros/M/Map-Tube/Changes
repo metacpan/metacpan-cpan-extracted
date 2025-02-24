@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.98  2025-02-24T21:45:00+00:00
+      - Proposed patch for the reported issue, thanks @SREZIC.
+      https://rt.cpan.org/Ticket/Display.html?id=160042
+
 3.97  2025-02-22T22:55:00+00:00
       - Proposed patch for the reported issues below, thanks @SREZIC.
       https://rt.cpan.org/Ticket/Display.html?id=159900

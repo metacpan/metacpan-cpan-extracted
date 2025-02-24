@@ -24,6 +24,7 @@ WriteMakefile(
         'Test::Lib'       => 0,
         'Test::More'      => '1.001014',
         'Test::Exception' => 0,
+        'Graph'           => 0,
     },
     PREREQ_PM                  => {
         'overload'             => 0,
@@ -51,16 +52,16 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '3.97' },
-            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '3.97' },
-            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '3.97' },
-            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '3.97' },
-            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '3.97' },
-            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '3.97' },
-            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '3.97' },
-            'Map::Tube::Cookbook'  => { file => 'lib/Map/Tube/Cookbook.pm' , version => '3.97' },
-            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '3.97' },
-            'Test::Map::Tube'      => { file => 'lib/Test/Map/Tube.pm'     , version => '3.97' },
+            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '3.98' },
+            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '3.98' },
+            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '3.98' },
+            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '3.98' },
+            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '3.98' },
+            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '3.98' },
+            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '3.98' },
+            'Map::Tube::Cookbook'  => { file => 'lib/Map/Tube/Cookbook.pm' , version => '3.98' },
+            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '3.98' },
+            'Test::Map::Tube'      => { file => 'lib/Test/Map/Tube.pm'     , version => '3.98' },
         },
         prereqs => {
             test => {

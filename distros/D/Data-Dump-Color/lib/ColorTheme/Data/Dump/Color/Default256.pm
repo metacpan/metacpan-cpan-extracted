@@ -6,7 +6,7 @@ use parent 'ColorThemeBase::Static::FromStructColors';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-02-21'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.250'; # VERSION
+our $VERSION = '0.251'; # VERSION
 
 sub _ansi256fg {
     my $code = shift;
@@ -46,7 +46,7 @@ ColorTheme::Data::Dump::Color::Default256 - Default color theme for Data::Dump::
 
 =head1 VERSION
 
-This document describes version 0.250 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2025-02-21.
+This document describes version 0.251 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2025-02-21.
 
 =head1 HOMEPAGE
 

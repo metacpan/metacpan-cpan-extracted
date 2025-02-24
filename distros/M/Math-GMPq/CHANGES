@@ -1,5 +1,15 @@
 Revision history for Perl module Math::GMPq
 
+0.58
+ - Add overloading of '%' and '%='.
+ - Add oveloading of '&', '|', '^', '~', '>>' and '<<' for compatibility with perl
+   and Math::BigRat.
+ - Allow new() to assign strings of the form (eg)'2.014' or '201.4e-2'. In both
+   of those instances the object would be assigned the value '1007/500' - which
+   differs from the value assigned by the NV 2.014. By default, on perls whose NV
+   is 'double', '4535124824762089/2251799813685248 would be assigned ny 2.014.
+
+
 0.57
  - On Windows only: set the constant GMPQ_WIN32_FMT_BUG to 0 if the gmp
    library was built with -D__USE_MINGW_ANSI_STDIO; else set it to 1.

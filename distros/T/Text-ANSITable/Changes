@@ -1,3 +1,10 @@
+0.610   2025-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Hide Win32::Console::ANSI from cpanspec (GH#10).
+
+        - [dist] Update prereq to fixed Data::Unixish::bool 1.574 (GH#9).
+
+
 0.609   2023-07-14  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.
@@ -84,7 +91,7 @@
           styles and cell_fgcolor/cell_bgcolor).
 
 
-0.599_001  2020-06-16  Released-By: PERLANCAR; Backward-Compatible: no
+0.599_001  2020-06-16  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         [border style]
 

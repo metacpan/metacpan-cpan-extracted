@@ -1,0 +1,45 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Data::Dump::Color;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+my $data = {
+    undef => undef,
+    int => 2,
+    int2 => -3,
+    float => 1.234,
+    Regexp => qr/^(foo)bar.+?\z/,
+    str => "A string with \n newlines",
+    array => [
+        [],
+        [1,2,3,4,5],
+        [6,7,8,9,10],
+        ["foo", "bar", "baz", "qux", "quux", "long"x20],
+    ],
+    hash => {
+        key1 => {},
+        key2 => [""],
+        key3 => undef,
+    },
+};
+
+dd $data;
+
+say '';
+say "# To set color theme, you can set DATA_DUMP_COLOR_THEME environment. To list color themes, use list-color-theme-modules utility.";
+say "# To disable color, set environment COLOR=0 or NO_COLOR=1 (which defeats the purpose of this module but migh tbe useful at times.";
+say "# To disable color, you can also use the NoColor color theme.";
+say "# To dump JSON/YAML data using this module, use the json2dd or yaml2dd script.";
+say "# To convert data dump to JSON/YAML, use the dd2json or dd2yaml script.";
+say "# For more examples, see share/examples/ directory in the distribution.";
+
+# ABSTRACT: Demo for Data::Dump::Color
+# PODNAME:

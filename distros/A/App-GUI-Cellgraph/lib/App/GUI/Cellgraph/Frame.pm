@@ -1,5 +1,5 @@
 
-# main window, functions and logic
+# main window, menu, functions
 
 use v5.12;
 use warnings;
@@ -9,7 +9,7 @@ use Wx::AUI;
 package App::GUI::Cellgraph::Frame;
 use base qw/Wx::Frame/;
 use App::GUI::Cellgraph::Widget::ProgressBar;
-use App::GUI::Cellgraph::Frame::Panel::Global;
+use App::GUI::Cellgraph::Frame::Panel::General;
 use App::GUI::Cellgraph::Frame::Panel::Start;
 use App::GUI::Cellgraph::Frame::Panel::Rules;
 use App::GUI::Cellgraph::Frame::Panel::Action;
@@ -24,18 +24,18 @@ sub new {
     my $self = $class->SUPER::new( $parent, -1, $title );
     $self->SetIcon( Wx::GetWxPerlIcon() );
     $self->CreateStatusBar( 1 );
-    #$self->SetStatusWidths(2, 800, 100);
+    $self->SetStatusWidths(2, 800, 100);
     Wx::InitAllImageHandlers();
     $self->{'title'} = $title;
     $self->{'config'} = App::GUI::Cellgraph::Config->new();
     my $sr_calc = App::GUI::Cellgraph::Compute::Subrule->new( 3, 2, 'all' );
     $self->{'img_size'} = 700;
     $self->{'img_format'} = 'png';
-    my $window_size = [1295, 890];
+    my $window_size = [1200, 840];
 
     # create GUI parts
     $self->{'tabs'}            = Wx::AuiNotebook->new( $self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
-    $self->{'panel'}{'global'} = App::GUI::Cellgraph::Frame::Panel::Global->new( $self->{'tabs'}, $sr_calc );
+    $self->{'panel'}{'global'} = App::GUI::Cellgraph::Frame::Panel::General->new( $self->{'tabs'}, $sr_calc );
     $self->{'panel'}{'start'}  = App::GUI::Cellgraph::Frame::Panel::Start->new(  $self->{'tabs'} );
     $self->{'panel'}{'rules'}  = App::GUI::Cellgraph::Frame::Panel::Rules->new(  $self->{'tabs'}, $sr_calc );
     $self->{'panel'}{'action'} = App::GUI::Cellgraph::Frame::Panel::Action->new( $self->{'tabs'}, $sr_calc );
@@ -50,7 +50,7 @@ sub new {
     $self->{'tabs'}{'selected'} = 0;
     $self->{'progress'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 400, 10, $self->{'panel'}{'color'}->get_active_colors);
 
-    $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self, 800 );
+    $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self, 700 );
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
     $self->{'btn'}{'draw'} = $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[50, 40] );
 
@@ -135,14 +135,14 @@ sub new {
 
     my $main_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     $main_sizer->Add( $board_sizer, 0, &Wx::wxEXPAND, 0);
-    $main_sizer->Add( $setting_sizer, 1, &Wx::wxEXPAND|&Wx::wxLEFT, 0);
+    $main_sizer->Add( $setting_sizer, 1, &Wx::wxEXPAND, 0);
 
     $self->SetSizer($main_sizer);
     $self->SetAutoLayout( 1 );
     $self->{'tabs'}->SetFocus;
-    $self->SetSize( $window_size );
-    $self->SetMinSize( $window_size );
+    #$self->SetMinSize( $window_size );
     $self->SetMaxSize( $window_size );
+    $self->SetSize( $window_size );
 
     $self->update_recent_settings_menu();
     $self->sketch( );

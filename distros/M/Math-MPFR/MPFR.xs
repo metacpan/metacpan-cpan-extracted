@@ -3306,7 +3306,7 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_mul(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return obj_ref;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_mul_z(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))),
                               *(INT2PTR(mpz_t * , SvIVX(SvRV(b)))),
                               __gmpfr_default_rounding_mode);
@@ -3431,7 +3431,7 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
                             __gmpfr_default_rounding_mode);
       return obj_ref;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_add_z(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))),
                               *(INT2PTR(mpz_t * , SvIVX(SvRV(b)))),
                               __gmpfr_default_rounding_mode);
@@ -3561,7 +3561,7 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_sub(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return obj_ref;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_sub_z(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))),
                                    *(INT2PTR(mpz_t * , SvIVX(SvRV(b)))),
                                    __gmpfr_default_rounding_mode);
@@ -3692,7 +3692,7 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_div(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return obj_ref;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
 
       if(SWITCH_ARGS) {
         Rmpfr_z_div(mpfr_t_obj, INT2PTR(mpz_t * , SvIVX(SvRV(b))),
@@ -3854,7 +3854,7 @@ SV * overload_gt(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(0);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       ret = mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
       if(ret > 0) return newSViv(1);
       return newSViv(0);
@@ -3957,7 +3957,7 @@ SV * overload_gte(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(0);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       ret = mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
       if(ret >= 0) return newSViv(1);
       return newSViv(0);
@@ -4063,7 +4063,7 @@ SV * overload_lt(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(0);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       ret = mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
       if(ret < 0) return newSViv(1);
       return newSViv(0);
@@ -4166,7 +4166,7 @@ SV * overload_lte(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(0);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       ret = mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
       if(ret <= 0) return newSViv(1);
       return newSViv(0);
@@ -4276,7 +4276,7 @@ SV * overload_spaceship(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(mpfr_cmp_q(*a, *(INT2PTR(mpq_t *, SvIVX(SvRV(b))))));
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       return newSViv(mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b))))));
     }
   }
@@ -4376,7 +4376,7 @@ SV * overload_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(1);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       if(mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))))) return newSViv(0);
       return newSViv(1);
     }
@@ -4477,7 +4477,7 @@ SV * overload_not_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
       return newSViv(0);
     }
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       if(mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))))) return newSViv(1);
       return newSViv(0);
     }
@@ -4618,7 +4618,7 @@ SV * overload_pow(pTHX_ SV * p, SV * b, SV * third) {
       mpfr_pow(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return obj_ref;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       if(SWITCH_ARGS) {
         mpfr_init2(t, (mpfr_prec_t)mpz_sizeinbase(*(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), 2));
         mpfr_set_z(t, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
@@ -5021,8 +5021,8 @@ void Rmpfr_randseed(pTHX_ SV * state, SV * seed) {
   if(sv_isobject(seed)) {
     const char* h = HvNAME(SvSTASH(SvRV(seed)));
 
-    if(strEQ(h, "Math::GMP") ||
-       strEQ(h, "GMP::Mpz") ||
+    if(strEQ(h, "Math::GMP")  ||
+       strEQ(h, "GMP::Mpz")   ||
        strEQ(h, "Math::GMPz"))
          gmp_randseed(*(INT2PTR(gmp_randstate_t *, SvIVX(SvRV(state)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(seed)))));
     else croak("2nd arg to Rmpfr_randseed is of invalid type");
@@ -5139,7 +5139,7 @@ SV * overload_pow_eq(pTHX_ SV * p, SV * b, SV * third) {
       mpfr_pow(*(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return p;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_pow_z(*(INT2PTR(mpfr_t *, SvIV(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIV(SvRV(p)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return p;
     }
@@ -5249,7 +5249,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_div(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_div_z(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
@@ -5363,7 +5363,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_sub(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_sub_z(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
@@ -5471,7 +5471,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_add(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_add_z(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
@@ -5578,7 +5578,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
       mpfr_mul(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpfr_mul_z(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))), __gmpfr_default_rounding_mode);
       return a;
     }
@@ -6027,6 +6027,14 @@ SV * Rmpfr_buildopt_tls_p(pTHX) {
   return newSViv(mpfr_buildopt_tls_p());
 }
 
+SV * Rmpfr_buildopt_float16_p(pTHX) {
+#if MPFR_VERSION >= 262912
+  return newSViv(mpfr_buildopt_float16_p());
+#else
+  croak("'mpfr_buildopt_float16_p' not implemented until MPFR-4.3.0");
+#endif
+}
+
 SV * Rmpfr_buildopt_decimal_p(pTHX) {
   return newSViv(mpfr_buildopt_decimal_p());
 }
@@ -6061,8 +6069,38 @@ SV * Rmpfr_get_flt(pTHX_ mpfr_t * a, SV * round) {
   return newSVnv(mpfr_get_flt(*a, (mpfr_rnd_t)SvUV(round)));
 }
 
+SV * Rmpfr_get_float16(pTHX_ mpfr_t * a, SV * round) {
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+#  if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
+   return newSVnv(mpfr_get_float16(*a, (mpfr_rnd_t)SvUV(round)));
+#  else
+   PERL_UNUSED_ARG2(a, round);
+   croak("Perl interface to Rmpfr_get_float16 not available. The '_Float16' type was not recognized");
+#  endif
+#else
+  PERL_UNUSED_ARG2(a, round);
+  croak("Perl interface to Rmpfr_get_float16 not available for this version (%s) of the mpfr library. We need at least version 4.3.0",
+         MPFR_VERSION_STRING);
+#endif
+}
+
 SV * Rmpfr_set_flt(pTHX_ mpfr_t * rop, SV * f, SV * round) {
   return newSViv(mpfr_set_flt(*rop, (float)SvNV(f), (mpfr_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_set_float16(pTHX_ mpfr_t * rop, SV * f, SV * round) {
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+#  if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
+   return newSViv(mpfr_set_flt(*rop, (_Float16)SvNV(f), (mpfr_rnd_t)SvUV(round)));
+#  else
+   PERL_UNUSED_ARG3(rop, f, round);
+   croak("Perl interface to Rmpfr_set_float16 not available. The '_Float16' type was not recognized");
+#  endif
+#else
+  PERL_UNUSED_ARG3(rop, f, round);
+  croak("Perl interface to Rmpfr_set_float16 not available for this version (%s) of the mpfr library. We need at least version 4.3.0",
+         MPFR_VERSION_STRING);
+#endif
 }
 
 SV * Rmpfr_urandom(pTHX_ mpfr_t * rop, gmp_randstate_t* state, SV * round) {
@@ -6163,114 +6201,84 @@ void overload_dec(pTHX_ SV * a, SV * b, SV * third) {
   mpfr_sub_ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), 1, __gmpfr_default_rounding_mode);
 }
 
-SV * overload_mul_2exp(pTHX_ SV * a, SV * b, SV * third) {
+SV * _overload_lshift(pTHX_ mpfr_t * a, SV * b, SV * third) {
+  /* b will be +ve ... otherwise overload_rshift would have been called. */
   mpfr_t * mpfr_t_obj;
   SV * obj_ref, * obj;
+
+#if IVSIZE > LONGSIZE
+      if( SvUV(b) > (unsigned long)SvUV(b) ) croak ("In Math::MPFR overloading of '<<' operator, the 'shift' operand overflows 'long int'");
+#endif
 
   NEW_MATH_MPFR_OBJECT("Math::MPFR",overload_mul_2exp) /* defined in math_mpfr_include.h */
   mpfr_init(*mpfr_t_obj);
   PERL_UNUSED_ARG(third);
   OBJ_READONLY_ON /*defined in math_mpfr_include.h */
 
-  if(SV_IS_IOK(b)) {
-    if(SvUOK(b)) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-    croak ("In overloading of '<<' operator, the 'shift' operand overflows 'long int'");
-#else
-    mpfr_mul_2ui(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
-#endif
-    }
-    else  {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-      if(SvIVX(b) > 2147483647 || SvIVX(b) < -2147483647) croak ("In overloading of '<<' operator, the 'shift' operand overflows 'long int'");
-#endif
-      mpfr_mul_2si(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), (long)SvIVX(b), __gmpfr_default_rounding_mode);
-    }
-    return obj_ref;
-  }
-  croak ("In overloading of '<<' operator, the 'shift' operand must be a perl integer value (IV)");
+  mpfr_trunc(*mpfr_t_obj, *a);
+  mpfr_mul_2ui(*mpfr_t_obj, *mpfr_t_obj, (unsigned long)SvUV(b), __gmpfr_default_rounding_mode);
+  return obj_ref;
+
 }
 
-SV * overload_div_2exp(pTHX_ SV * a, SV * b, SV * third) {
+SV * _overload_rshift(pTHX_ mpfr_t * a, SV * b, SV * third) {
+  /* b will be +ve ... otherwise overload_lshift would have been called. */
   mpfr_t * mpfr_t_obj;
   SV * obj_ref, * obj;
-  PERL_UNUSED_ARG(third);
+  mpz_t z;
 
-  NEW_MATH_MPFR_OBJECT("Math::MPFR",overload_div_2exp) /* defined in math_mpfr_include.h */
+#if IVSIZE > LONGSIZE
+      if( SvUV(b) > (mp_bitcnt_t)SvUV(b) ) croak ("In Math::MPFR overloading of '>>' operator, the 'shift' operand overflows 'long int'");
+#endif
+
+  NEW_MATH_MPFR_OBJECT("Math::MPFR",overload_mul_2exp) /* defined in math_mpfr_include.h */
   mpfr_init(*mpfr_t_obj);
+  PERL_UNUSED_ARG(third);
   OBJ_READONLY_ON /*defined in math_mpfr_include.h */
 
-  if(SV_IS_IOK(b)) {
-    if(SvUOK(b)) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-    croak ("In overloading of '>>' operator, the 'shift' operand overflows 'long int'");
-#else
-    mpfr_div_2ui(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
-#endif
-    }
-    else  {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-      if(SvIVX(b) > 2147483647 || SvIVX(b) < -2147483647) croak ("In overloading of '>>' operator, the 'shift' operand overflows 'long int'");
-#endif
-      mpfr_div_2si(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), (long)SvIVX(b), __gmpfr_default_rounding_mode);
-    }
-    return obj_ref;
+  if(!mpfr_number_p(*a)) { /* Is either an Inf or NaN */
+     if(mpfr_nan_p(*a)) return obj_ref;  /* return NaN */
+     mpfr_set_inf(*mpfr_t_obj, mpfr_sgn(*a));
+     return obj_ref; /* Return appropriately signed Inf */
   }
-  croak ("In overloading of '>>' operator, the 'shift' operand must be a perl integer value (IV)");
+  mpz_init(z);
+  mpfr_get_z(z, *a, GMP_RNDZ); /* Truncate *a */
+  mpz_div_2exp(z, z, (mp_bitcnt_t)SvUV(b));
+  mpfr_set_z(*mpfr_t_obj, z, __gmpfr_default_rounding_mode);
+  mpz_clear(z);
+  return obj_ref;
 }
 
-SV * overload_mul_2exp_eq(pTHX_ SV * a, SV * b, SV * third) {
-  PERL_UNUSED_ARG(third);
-  SvREFCNT_inc(a);
-  if(SV_IS_IOK(b)) {
-    if(SvUOK(b)) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-    SvREFCNT_dec(a);
-    croak ("In overloading of '<<=' operator, the 'shift' operand overflows 'long int'");
-#else
-    mpfr_mul_2ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+SV * _overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
+  /* b will be +ve ... otherwise overload_rshift_eq would have been called. */
+
+#if IVSIZE > LONGSIZE
+      if( SvUV(b) > (unsigned long) SvUV(b) ) croak ("In Math::MPFR overloading of '<<=' operator, the 'shift' operand overflows 'long int'");
 #endif
-    }
-    else {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-      if(SvIVX(b) > 2147483647 || SvIVX(b) < -2147483647) {
-        SvREFCNT_dec(a);
-        croak ("In overloading of '<<=' operator, the 'shift' operand overflows 'long int'");
-      }
-#endif
-      mpfr_mul_2si(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), (long)SvIVX(b), __gmpfr_default_rounding_mode);
-    }
+
+    SvREFCNT_inc(a);
+    mpfr_trunc(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))));
+    mpfr_mul_2ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), (unsigned long)SvUV(b), __gmpfr_default_rounding_mode);
     return a;
-  }
-  SvREFCNT_dec(a);
-  croak ("In overloading of '<<=' operator, the 'shift' operand must be a perl integer value (IV)");
 }
 
-SV * overload_div_2exp_eq(pTHX_ SV * a, SV * b, SV * third) {
-  PERL_UNUSED_ARG(third);
-  SvREFCNT_inc(a);
-  if(SV_IS_IOK(b)) {
-    if(SvUOK(b)) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-    SvREFCNT_dec(a);
-    croak ("In overloading of '>>=' operator, the 'shift' operand overflows 'long int'");
-#else
-    mpfr_div_2ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+SV * _overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
+  /* b will be +ve ... otherwise overload_lshift_eq would have been called. */
+  mpz_t z;
+
+#if IVSIZE > LONGSIZE
+      if( SvUV(b) > (mp_bitcnt_t) SvUV(b) ) croak ("In Math::MPFR overloading of '>>=' operator, the 'shift' operand overflows 'long int'");
 #endif
-    }
-    else {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-      if(SvIVX(b) > 2147483647 || SvIVX(b) < -2147483647) {
-        SvREFCNT_dec(a);
-        croak ("In overloading of '>>=' operator, the 'shift' operand overflows 'long int'");
-      }
-#endif
-      mpfr_div_2si(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), (long)SvIVX(b), __gmpfr_default_rounding_mode);
-    }
+
+    SvREFCNT_inc(a);
+    if(  mpfr_nan_p( *(INT2PTR(mpfr_t *, SvIVX(SvRV(a))))) ||
+         mpfr_inf_p( *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))))   ) return a;
+    mpz_init(z);
+    mpfr_get_z(z, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), GMP_RNDZ); /* Truncate *a */
+    mpz_div_2exp(z, z, (mp_bitcnt_t)SvUV(b));
+    mpfr_set_z(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), z, __gmpfr_default_rounding_mode);
+    mpz_clear(z);
     return a;
-  }
-  SvREFCNT_dec(a);
-  croak ("In overloading of '>>=' operator, the 'shift' operand must be a perl integer value (IV)");
 }
 
 SV * _wrap_count(pTHX) {
@@ -6630,6 +6638,7 @@ void Rmpfr_get_FLOAT128(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 
 SV * Rmpfr_set_FLOAT128(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
 #if (!defined(MPFR_VERSION) || (MPFR_VERSION < MPFR_VERSION_NUM(4,0,0)))
+  PERL_UNUSED_ARG3(rop, op, rnd);
   croak("Perl interface to Rmpfr_set_FLOAT128 not available for this version (%s) of the mpfr library. We need at least version 4.0.0",
          MPFR_VERSION_STRING);
 #endif
@@ -9087,6 +9096,14 @@ SV * _gmp_cc(pTHX) {
 #endif
 }
 
+int _have_float16(void) {
+#if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
+  return 1;
+#else
+  return 0;
+#endif
+}
+
 /********************************************/
 /********************************************/
 
@@ -9148,6 +9165,31 @@ SV * _gmp_snprintf_nv(pTHX_ SV * s, SV * bytes, SV * a, SV * b, int buflen) {
      croak("Unrecognised type supplied as argument to _gmp_snprintf_nv");
 }
 
+int _looks_like_number(pTHX_ SV * in) {
+     if(looks_like_number(in)) return 1;
+     return 0;
+}
+
+SV * _overload_fmod (pTHX_ mpfr_t * a, mpfr_t *b, SV * third) {
+     mpfr_t * mpfr_t_obj;
+     SV * obj_ref, * obj;
+
+     NEW_MATH_MPFR_OBJECT("Math::MPFR", _overload_fmod) /* defined in math_mpfr_include.h */
+     mpfr_init(*mpfr_t_obj);
+     OBJ_READONLY_ON /*defined in math_mpfr_include.h */
+
+     if(SWITCH_ARGS) mpfr_fmod(*mpfr_t_obj, *b, *a, __gmpfr_default_rounding_mode);
+     else mpfr_fmod(*mpfr_t_obj, *a, *b, __gmpfr_default_rounding_mode);
+     return obj_ref;
+}
+
+SV * _overload_fmod_eq (pTHX_ SV * a, mpfr_t *b, SV * third) {
+
+     PERL_UNUSED_ARG(third);
+     SvREFCNT_inc(a);
+     mpfr_fmod(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *b, __gmpfr_default_rounding_mode);
+     return a;
+}
 
 
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
@@ -12511,6 +12553,13 @@ OUTPUT:  RETVAL
 
 
 SV *
+Rmpfr_buildopt_float16_p ()
+CODE:
+  RETVAL = Rmpfr_buildopt_float16_p (aTHX);
+OUTPUT:  RETVAL
+
+
+SV *
 Rmpfr_buildopt_decimal_p ()
 CODE:
   RETVAL = Rmpfr_buildopt_decimal_p (aTHX);
@@ -12568,12 +12617,29 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_get_float16 (a, round)
+	mpfr_t *	a
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_get_float16 (aTHX_ a, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_set_flt (rop, f, round)
 	mpfr_t *	rop
 	SV *	f
 	SV *	round
 CODE:
   RETVAL = Rmpfr_set_flt (aTHX_ rop, f, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_set_float16 (rop, f, round)
+	mpfr_t *	rop
+	SV *	f
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_set_float16 (aTHX_ rop, f, round);
 OUTPUT:  RETVAL
 
 SV *
@@ -12686,39 +12752,39 @@ overload_dec (a, b, third)
         XSRETURN_EMPTY; /* return empty stack */
 
 SV *
-overload_mul_2exp (a, b, third)
-	SV *	a
+_overload_lshift (a, b, third)
+	mpfr_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_mul_2exp (aTHX_ a, b, third);
+  RETVAL = _overload_lshift (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_div_2exp (a, b, third)
-	SV *	a
+_overload_rshift (a, b, third)
+	mpfr_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_div_2exp (aTHX_ a, b, third);
+  RETVAL = _overload_rshift (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_mul_2exp_eq (a, b, third)
+_overload_lshift_eq (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_mul_2exp_eq (aTHX_ a, b, third);
+  RETVAL = _overload_lshift_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_div_2exp_eq (a, b, third)
+_overload_rshift_eq (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_div_2exp_eq (aTHX_ a, b, third);
+  RETVAL = _overload_rshift_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
@@ -13372,6 +13438,10 @@ CODE:
 OUTPUT:  RETVAL
 
 
+int
+_have_float16 ()
+
+
 SV *
 _gmp_printf_nv (a, b)
 	SV *	a
@@ -13408,5 +13478,30 @@ _gmp_snprintf_nv (s, bytes, a, b, buflen)
 	int	buflen
 CODE:
   RETVAL = _gmp_snprintf_nv (aTHX_ s, bytes, a, b, buflen);
+OUTPUT:  RETVAL
+
+int
+_looks_like_number (in)
+	SV *	in
+CODE:
+  RETVAL = _looks_like_number (aTHX_ in);
+OUTPUT:  RETVAL
+
+SV *
+_overload_fmod (a, b, third)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	third
+CODE:
+  RETVAL = _overload_fmod (aTHX_ a, b, third);
+OUTPUT:  RETVAL
+
+SV *
+_overload_fmod_eq (a, b, third)
+	SV *	a
+	mpfr_t *	b
+	SV *	third
+CODE:
+  RETVAL = _overload_fmod_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 

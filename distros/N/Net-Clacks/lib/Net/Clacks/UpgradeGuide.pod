@@ -352,6 +352,17 @@ Increase the Listen queue (=how many new connections can be handled per cycle) f
 
 This version is fully backwards compatible to Version 28
 
+=head2 VERSION 30
+
+Support "socketcommands" in XML config. This can be used for example for changing the usergroup of a Unix Domain Socket (so multiple linux users in the same group can access the clacks UDS socket).
+
+    <socketcommands>
+        <item>chmod g+rwx /home/PC_LINUXUSER/temp/PC_PROJECTNAME_LC_clacks.sock</item>
+        <item>chgrp clacksusers /home/PC_LINUXUSER/temp/PC_PROJECTNAME_LC_clacks.sock</item>
+    </socketcommands>
+
+This version is fully backwards compatible to Version 29
+
 
 =head1 AUTHOR
 

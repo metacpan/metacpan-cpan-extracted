@@ -1,3 +1,4 @@
+## no critic: Subroutines::ProhibitExplicitReturnUndef
 package Data::Unixish::bool;
 
 use 5.010;
@@ -10,9 +11,9 @@ use warnings;
 use Data::Unixish::Util qw(%common_args);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-23'; # DATE
+our $DATE = '2025-02-24'; # DATE
 our $DIST = 'Data-Unixish'; # DIST
-our $VERSION = '1.573'; # VERSION
+our $VERSION = '1.574'; # VERSION
 
 our %SPEC;
 
@@ -20,23 +21,29 @@ sub _is_true {
     my ($val, $notion) = @_;
 
     if ($notion =~ /^n1/) {
-        return undef unless defined($val); ## no critic: Subroutines::ProhibitExplicitReturnUndef
+        return undef unless defined($val);
         return 0 if ref($val) eq 'ARRAY' && !@$val;
         return 0 if ref($val) eq 'HASH'  && !keys(%$val);
-        if ($notion =~ /\+.*en(\z|_)/) {
-            return undef if $val =~ /^(undef|undefined|null|)$/i; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+        if ($notion eq 'n1+en_id') {
+            return undef if $val =~ /^(undef|undefined|null|)$/i;
+            return 0 if $val =~ /^(no|n|false|f|tidak|tdk|t|salah|s|bukan)$/i;
+            return 1;
+        } elsif ($notion eq 'n1+en') {
+            return undef if $val =~ /^(undef|undefined|null|)$/i;
             return 0 if $val =~ /^(no|n|false|f)$/i;
             return 1;
-        } elsif ($notion =~ /\+.*id(\z|_)/) {
-            return undef if $val =~ /^(null|kosong|)$/i; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+        } elsif ($notion eq 'n1+en_id') {
+            return undef if $val =~ /^(undef|undefined|null|kosong|)$/i;
             return 0 if $val =~ /^(tidak|tdk|t|salah|s|bukan)$/i;
             return 1;
-        } else {
+        } elsif ($notion eq 'n1') {
             return $val ? 1:0;
+        } else {
+            die "Unknown notion '$notion'";
         }
     } else {
         # perl
-        return undef unless defined($val); ## no critic: Subroutines::ProhibitExplicitReturnUndef
+        return undef unless defined($val);
         return $val ? 1:0;
     }
 }
@@ -60,9 +67,9 @@ my %styles = (
 $SPEC{bool} = {
     v => 1.1,
     summary => 'Format boolean',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
     args => {
         %common_args,
         style => {
@@ -83,20 +90,25 @@ _
         },
         notion => {
             summary => 'What notion to use to determine true/false',
-            schema => [str => in=>[qw/perl n1 n1+en n1+id n1+en_id/], default => 'n1+en_id'],
-            description => <<'_',
+            schema => [str => in=>[qw/perl n1 n1+en n1+id n1+en_id/], default => 'perl'],
+            description => <<'MARKDOWN',
 
 `perl` uses Perl notion.
 
 `n1` (for lack of better name) is just like Perl notion, but empty array and
 empty hash is considered false.
 
+`n1+en` is like `n1` but also handle 'Yes', 'No', 'true', 'false', etc
+(English).
+
+`n1+id` is like `n1` but also handle 'ya', 'tidak', etc (Indonesian).
+
 `n1+en_id` is like `n1` but also handle 'Yes', 'No', 'true', 'false', etc
 (English) and 'ya', 'tidak', etc (Indonesian).
 
 TODO: add Ruby, Python, PHP, JavaScript, etc notion.
 
-_
+MARKDOWN
         },
         # XXX: flag to ignore references
     },
@@ -117,7 +129,7 @@ sub bool {
 sub _bool_begin {
     my $args = shift;
 
-    $args->{notion} //= 'n1+en_id';
+    $args->{notion} //= 'perl';
     $args->{style}  //= 'one_zero';
     $args->{style} = 'one_zero' if !$styles{$args->{style}};
 
@@ -147,7 +159,7 @@ Data::Unixish::bool - Format boolean
 
 =head1 VERSION
 
-This document describes version 1.573 of Data::Unixish::bool (from Perl distribution Data-Unixish), released on 2023-09-23.
+This document describes version 1.574 of Data::Unixish::bool (from Perl distribution Data-Unixish), released on 2025-02-24.
 
 =head1 SYNOPSIS
 
@@ -190,7 +202,7 @@ Instead of style, you can also specify character for true value.
 
 Input stream (e.g. array or filehandle).
 
-=item * B<notion> => I<str> (default: "n1+en_id")
+=item * B<notion> => I<str> (default: "perl")
 
 What notion to use to determine trueE<sol>false.
 
@@ -198,6 +210,11 @@ C<perl> uses Perl notion.
 
 C<n1> (for lack of better name) is just like Perl notion, but empty array and
 empty hash is considered false.
+
+C<n1+en> is like C<n1> but also handle 'Yes', 'No', 'true', 'false', etc
+(English).
+
+C<n1+id> is like C<n1> but also handle 'ya', 'tidak', etc (Indonesian).
 
 C<n1+en_id> is like C<n1> but also handle 'Yes', 'No', 'true', 'false', etc
 (English) and 'ya', 'tidak', etc (Indonesian).
@@ -290,7 +307,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -20,9 +20,6 @@ my %WriteMakefileArgs = (
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Data-Dump-Color",
-  "EXE_FILES" => [
-    "script/demo-data-dump-color"
-  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Data::Dump::Color",
@@ -52,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.250",
+  "VERSION" => "0.251",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,1638 +1,1037 @@
-@  changeset:   203:51ba83316803
+@  changeset:   205:5ca5550843d1
 |  tag:         tip
 |  user:        Rene Schickbauer <cavac@palebluedot>
-|  date:        Mon Jun 24 11:43:12 2024 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Bump copyright date (it's now 2024)
+|  date:        Mon Feb 24 10:13:19 2025 +0100
+|  summary:     Add "socketcommands" support
 |
+o  changeset:   204:e68046b8a700
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Mon Jun 24 11:44:06 2024 +0200
+|  summary:     Prepare for release of Version 29
+|
+o  changeset:   203:51ba83316803
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Mon Jun 24 11:43:12 2024 +0200
+|  summary:     Bump copyright date (it's now 2024)
 |
 o  changeset:   202:546ee0b25ab5
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Mon Jun 24 11:42:13 2024 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/permissiontestclient.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Bump version to 29
-|
+|  summary:     Bump version to 29
 |
 o  changeset:   201:d2e3d989839b
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Mon Jun 24 11:39:06 2024 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Increase Listen queue for new incoming connections to make initial startup more reliable
-|
+|  summary:     Increase Listen queue for new incoming connections to make initial startup more reliable
 |
 o  changeset:   200:c7597854c050
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 13:44:25 2023 +0100
-|  files:       Changes lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Prepare for release of Version 28
-|
+|  summary:     Prepare for release of Version 28
 |
 o  changeset:   199:bfad51286b33
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 13:40:52 2023 +0100
-|  files:       MANIFEST
-|  description:
-|  Update MANIFEST
-|
+|  summary:     Update MANIFEST
 |
 o  changeset:   198:e3800dd48389
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 13:40:11 2023 +0100
-|  files:       example/permissiontestclient.pl lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add runOnce() so allow using external event loops. Add example client to show how to handle the "permission_denied" error message available in Net::Clacks::Server 28.
-|
+|  summary:     Add runOnce() so allow using external event loops. Add example client to show how to handle the "permission_denied" error message available in Net::Clacks::Server 28.
 |
 o  changeset:   197:a5baf425ba60
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 11:59:50 2023 +0100
-|  files:       example/clacks_master.xml example/clacks_master_unixdomainsocket.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml
-|  description:
-|  Slightly adapt example configs
-|
+|  summary:     Slightly adapt example configs
 |
 o  changeset:   196:0f4a0863a419
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 11:54:15 2023 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version number to 28
-|
+|  summary:     Bump version number to 28
 |
 o  changeset:   195:b5a71b9425a2
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 11:53:25 2023 +0100
-|  files:       example/clacks_master.xml example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add multi-user support with different permissions
-|
+|  summary:     Add multi-user support with different permissions
 |
 o  changeset:   194:afc2926d9319
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Wed Dec 13 11:04:35 2023 +0100
-|  files:       Makefile.PL
-|  description:
-|  STart on Version 28: Declare MIN_PERL_VERSION in Makefile.PL (thanks, kcott from PerlMonks!)
-|
+|  summary:     STart on Version 28: Declare MIN_PERL_VERSION in Makefile.PL (thanks, kcott from PerlMonks!)
 |
 o  changeset:   193:0d97835b7252
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 21 11:17:24 2023 +0100
-|  files:       Changes
-|  description:
-|  Update Changes file
-|
+|  summary:     Update Changes file
 |
 o  changeset:   192:4c83cf8fbaa6
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 21 10:53:57 2023 +0100
-|  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Return info lines instead of printing to STDERR in runOnce() in PostgreSQL2Clacks
-|
+|  summary:     Return info lines instead of printing to STDERR in runOnce() in PostgreSQL2Clacks
 |
 o  changeset:   191:f46952f8b3e5
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Fri Mar 10 14:29:29 2023 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clacks_master_unixdomainsocket.xml example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Start working on Clacks version 27
-|
+|  summary:     Start working on Clacks version 27
 |
 o  changeset:   190:6b1e5ac5ea3e
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 12:56:49 2023 +0100
-|  files:       Changes devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Emergency release of Version 26 due to wrong documentation in PostgreSQL2Clacks
-|
+|  summary:     Emergency release of Version 26 due to wrong documentation in PostgreSQL2Clacks
 |
 o  changeset:   189:64b62a5ee47d
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 12:46:14 2023 +0100
-|  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm
-|  description:
-|  BF Config
-|
+|  summary:     BF Config
 |
 o  changeset:   188:6ea035a80ef8
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 12:14:19 2023 +0100
-|  files:       Changes
-|  description:
-|  Prepare for Version 25 release
-|
+|  summary:     Prepare for Version 25 release
 |
 o  changeset:   187:4aaaed3585be
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 12:13:07 2023 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm t/perlcriticrc
-|  description:
-|  Fix some Perl::Critic issues
-|
+|  summary:     Fix some Perl::Critic issues
 |
 o  changeset:   186:ff5fc8cc1d46
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 11:38:35 2023 +0100
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/UpgradeGuide.pod t/01-use.t
-|  description:
-|  Bugfixes, update docs
-|
+|  summary:     Bugfixes, update docs
 |
 o  changeset:   185:660ad765d181
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 10:41:13 2023 +0100
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Updated docs
-|
+|  summary:     Updated docs
 |
 o  changeset:   184:6376b222e0e9
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed Mar 01 16:54:55 2023 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump Version to 25
-|
+|  summary:     Bump Version to 25
 |
 o  changeset:   183:56703587996c
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed Mar 01 16:54:21 2023 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Update copyright
-|
+|  summary:     Update copyright
 |
 o  changeset:   182:f03862bb215b
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed Mar 01 16:52:20 2023 +0100
-|  files:       MANIFEST lib/Net/Clacks/PostgreSQL2Clacks.pm
-|  description:
-|  Start working on PostgreSQL2Clacks
-|
+|  summary:     Start working on PostgreSQL2Clacks
 |
 o  changeset:   181:c990cc8226ba
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Nov 24 11:24:54 2022 +0100
-|  files:       lib/Net/Clacks/ClacksCache.pm
-|  description:
-|  Fix ClacksCache clacks_notify()
-|
+|  summary:     Fix ClacksCache clacks_notify()
 |
 o  changeset:   180:0638683e515e
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Nov 24 11:24:11 2022 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Switch to Perl 5.36 and use sub signatures
-|
+|  summary:     Switch to Perl 5.36 and use sub signatures
 |
 o  changeset:   179:6fcdd8a78191
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jun 13 14:06:25 2022 +0200
-|  files:       Changes
-|  description:
-|  Update Changes file
-|
+|  summary:     Update Changes file
 |
 o  changeset:   178:604b2eac0d0f
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jun 13 14:05:49 2022 +0200
-|  files:       lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Update Upgradeguide in preparation for V24 release
-|
+|  summary:     Update Upgradeguide in preparation for V24 release
 |
 o  changeset:   177:9d7c0ae888de
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jun 13 13:02:06 2022 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Remembering Sheila
-|
+|  summary:     Remembering Sheila
 |
 o  changeset:   176:834711d8a805
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed May 04 15:39:59 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Trying to fix endless loop on unclean client disconnect
-|
+|  summary:     Trying to fix endless loop on unclean client disconnect
 |
 o  changeset:   175:672b61c11b79
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 16:29:41 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Re-factor state machine in run() into many smaller functions
-|
+|  summary:     Re-factor state machine in run() into many smaller functions
 |
 o  changeset:   174:0cdeefc95c59
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 14:46:20 2022 +0200
-|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm
-|  description:
-|  Refactor code to use $self for all variables in run(). This will enable further modularization.
-|
+|  summary:     Refactor code to use $self for all variables in run(). This will enable further modularization.
 |
 o  changeset:   173:22743173e6f6
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 13:58:47 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Make cache cleaning interval configureable
-|
+|  summary:     Make cache cleaning interval configureable
 |
 o  changeset:   172:55757e55b0bc
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 13:53:32 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Update upgradeguide. Make sure we differentiate between deleted and non-deleted cache items in cleanup routine
-|
+|  summary:     Update upgradeguide. Make sure we differentiate between deleted and non-deleted cache items in cleanup routine
 |
 o  changeset:   171:7d57ea55c692
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 13:42:33 2022 +0200
-|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm
-|  description:
-|  Cleanup
-|
+|  summary:     Cleanup
 |
 o  changeset:   170:74be4272c50d
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 13:29:03 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Upgrade internal cache handling and persistancefile format
-|
+|  summary:     Upgrade internal cache handling and persistancefile format
 |
 o  changeset:   169:ab53f94dbc0d
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 10:29:32 2022 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 24
-|
+|  summary:     Bump version to 24
 |
 o  changeset:   168:1f86d7d3b7e7
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 25 10:28:47 2022 +0200
-|  files:       Makefile.PL lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Better sanity checks. Fix cache cleaning algorithm
-|
+|  summary:     Better sanity checks. Fix cache cleaning algorithm
 |
 o  changeset:   167:9e7348b72d85
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Sun Apr 24 21:33:43 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Sanity check that we have valid timestamps before sending KEYSYNC
-|
+|  summary:     Sanity check that we have valid timestamps before sending KEYSYNC
 |
 o  changeset:   166:c6e7ef9286a8
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 11 15:03:45 2022 +0200
-|  files:       Changes
-|  description:
-|  Update Changes file for release of V23
-|
+|  summary:     Update Changes file for release of V23
 |
 o  changeset:   165:9df090eface9
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Apr 11 13:22:32 2022 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Check that a tcp port has been given when we need to listen to IP adresses
-|
+|  summary:     Check that a tcp port has been given when we need to listen to IP adresses
 |
 o  changeset:   164:e223c7a36797
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Apr 11 13:21:54 2022 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  BF: Make readtimeout default to 0 (no wait)
-|
+|  summary:     BF: Make readtimeout default to 0 (no wait)
 |
 o  changeset:   163:ad62dfafe20b
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 11 13:13:14 2022 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  BF
-|
+|  summary:     BF
 |
 o  changeset:   162:8077fdc98a4a
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Apr 11 13:11:55 2022 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Switch to function signatures
-|
+|  summary:     Switch to function signatures
 |
 o  changeset:   161:c36e930d1dd9
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Wed Mar 02 16:58:56 2022 +0100
-|  files:       example/README.txt example/chat.pl example/chatbot.pl example/clacks_master.xml example/clacks_master_unixdomainsocket.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml example/clock.pl
-|  description:
-|  Make sure we use IANA "dynamic ports" as default ports
-|
+|  summary:     Make sure we use IANA "dynamic ports" as default ports
 |
 o  changeset:   160:914cd9fa2164
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 15:45:03 2022 +0100
-|  files:       Changes
-|  description:
-|  Update Changes file
-|
+|  summary:     Update Changes file
 |
 o  changeset:   159:354d21aee379
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 15:44:24 2022 +0100
-|  files:       MANIFEST.SKIP
-|  description:
-|  Fix MANIFEST.SKIP
-|
+|  summary:     Fix MANIFEST.SKIP
 |
 o  changeset:   158:894e2d4fca46
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 15:42:18 2022 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Cleanup some ifs, disable debug statements, make sure we only save access time on RETRIEVE if we actually retrieve a key
-|
+|  summary:     Cleanup some ifs, disable debug statements, make sure we only save access time on RETRIEVE if we actually retrieve a key
 |
 o  changeset:   157:a0f0cb48e300
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 15:21:48 2022 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  More fixes regarding KEYSYNC and persistancefile
-|
+|  summary:     More fixes regarding KEYSYNC and persistancefile
 |
 o  changeset:   156:94d56198c3e5
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 14:55:02 2022 +0100
-|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Fix some KEYSYNC issues and issues with loading persistance files
-|
+|  summary:     Fix some KEYSYNC issues and issues with loading persistance files
 |
 o  changeset:   155:618a162ea42f
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 13:54:46 2022 +0100
-|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Track accesstime for clackscache entries
-|
+|  summary:     Track accesstime for clackscache entries
 |
 o  changeset:   154:f998545fcf50
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 12:59:25 2022 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Move the clackcache variables into $self
-|
+|  summary:     Move the clackcache variables into $self
 |
 o  changeset:   153:529d7291dbd0
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 11:53:28 2022 +0100
-|  files:       example/README.txt example/clacks_master.xml example/clacks_master_unixdomainsocket.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Make sure persistance file is saved on exit. Work around interclacks node timesync problems for KEYSYNC
-|
+|  summary:     Make sure persistance file is saved on exit. Work around interclacks node timesync problems for KEYSYNC
 |
 o  changeset:   152:b542c1934d4c
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Mon Feb 28 14:21:42 2022 +0100
-|  files:       Changes
-|  description:
-|  Update Changes
-|
+|  summary:     Update Changes
 |
 o  changeset:   151:a16b2107a4a4
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Mon Feb 28 14:21:19 2022 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Fix some "undefined blablabla" and wrong STDOUT prints regarding persistance files
-|
+|  summary:     Fix some "undefined blablabla" and wrong STDOUT prints regarding persistance files
 |
 o  changeset:   150:af04b784b4fa
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Feb 26 00:32:14 2022 +0100
-|  files:       Changes
-|  description:
-|  Update CHanges file
-|
+|  summary:     Update CHanges file
 |
 o  changeset:   149:5307bcb221bd
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Feb 26 00:19:22 2022 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump to Version 21
-|
+|  summary:     Bump to Version 21
 |
 o  changeset:   148:d2c2ecd0a6dc
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Feb 26 00:18:19 2022 +0100
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  GNU Sven Guckes
-|
+|  summary:     GNU Sven Guckes
 |
 o  changeset:   147:1d07118e9a50
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Feb 26 00:12:22 2022 +0100
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add a SETANDSTORE command to reduce network bandwidth in certain cases
-|
+|  summary:     Add a SETANDSTORE command to reduce network bandwidth in certain cases
 |
 o  changeset:   146:cabc49c054b6
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Fri Jan 14 15:44:46 2022 +0100
-|  files:       lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  BF
-|
+|  summary:     BF
 |
 o  changeset:   145:069c272fe02d
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Fri Jan 14 15:43:01 2022 +0100
-|  files:       Changes lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Update docs for release
-|
+|  summary:     Update docs for release
 |
 o  changeset:   144:55ed1ba21267
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Fri Jan 14 15:40:40 2022 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bugfix: Wrong package name in Net::Clacks.pm
-|
+|  summary:     Bugfix: Wrong package name in Net::Clacks.pm
 |
 o  changeset:   143:ed100d123c25
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Fri Jan 14 13:40:29 2022 +0100
-|  files:       Changes
-|  description:
-|  Update Changes file
-|
+|  summary:     Update Changes file
 |
 o  changeset:   142:8fc4d88cfc64
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Fri Jan 14 13:39:55 2022 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Add missing function
-|
+|  summary:     Add missing function
 |
 o  changeset:   141:0683c38e4bab
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Fri Jan 14 13:37:13 2022 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  BF, Prepare for release of version 19
-|
+|  summary:     BF, Prepare for release of version 19
 |
 o  changeset:   140:b1cfe41fd2cb
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Fri Jan 14 13:34:28 2022 +0100
-|  files:       Makefile.PL devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Port dynamic config loading from PageCamel to Clacks
-|
+|  summary:     Port dynamic config loading from PageCamel to Clacks
 |
 o  changeset:   139:209c1d4b8f15
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Wed Jul 07 13:18:14 2021 +0200
-|  files:       lib/Net/Clacks.pm t/01-use.t
-|  description:
-|  Add missing "1;" at the end of Net/Clacks.pm
-|
+|  summary:     Add missing "1;" at the end of Net/Clacks.pm
 |
 o  changeset:   138:43ca06769e20
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jul 05 13:45:31 2021 +0200
-|  files:       Changes
-|  description:
-|  Upodates Changes file
-|
+|  summary:     Upodates Changes file
 |
 o  changeset:   137:857454901ffa
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jul 05 13:36:43 2021 +0200
-|  files:       .hgignore example/clacks_master.xml example/clacks_master_unixdomainsocket.xml lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Use a multi-stage approach to try to preserve data by trying to load the backup and the temporary persistance file as fallback.
-|
+|  summary:     Use a multi-stage approach to try to preserve data by trying to load the backup and the temporary persistance file as fallback.
 |
 o  changeset:   136:116e68cbe261
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jul 05 10:10:35 2021 +0200
-|  files:       Makefile.PL devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Start on Version 18: Reliability upgrades
-|
+|  summary:     Start on Version 18: Reliability upgrades
 |
 o  changeset:   135:746384333ec1
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Sep 29 15:26:43 2020 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm
-|  description:
-|  Remove unneeded STDERR output
-|
+|  summary:     Remove unneeded STDERR output
 |
 o  changeset:   134:a98fd5b0192b
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Sep 29 15:22:00 2020 +0200
-|  files:       Changes
-|  description:
-|  Changes
-|
+|  summary:     Changes
 |
 o  changeset:   133:b612b25e04cb
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Sep 29 15:21:48 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add Checks for ::Client function call arguments
-|
+|  summary:     Add Checks for ::Client function call arguments
 |
 o  changeset:   132:ff34dc6bfa18
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Fri Sep 04 13:43:53 2020 +0200
-|  files:       Changes
-|  description:
-|  Changes file
-|
+|  summary:     Changes file
 |
 o  changeset:   131:6d06bba9101d
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Fri Sep 04 13:43:23 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add proper error message on broken persistance files. Bump to version 16
-|
+|  summary:     Add proper error message on broken persistance files. Bump to version 16
 |
 o  changeset:   130:dd545111c99a
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Aug 08 23:50:41 2020 +0200
-|  files:       Changes
-|  description:
-|  Update Changes file for release
-|
+|  summary:     Update Changes file for release
 |
 o  changeset:   129:c85bf9bc6157
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Aug 08 23:50:15 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Add persistanceinterval setting (defaults to 10)
-|
+|  summary:     Add persistanceinterval setting (defaults to 10)
 |
 o  changeset:   128:fbe24a387a3a
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Jul 13 11:15:06 2020 +0200
-|  files:       Changes
-|  description:
-|  Update Changes
-|
+|  summary:     Update Changes
 |
 o  changeset:   127:d4d7fb0f2a11
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Jul 13 11:13:07 2020 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  BF variable scope
-|
+|  summary:     BF variable scope
 |
 o  changeset:   126:113d97933daa
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Jul 13 10:40:44 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Bump to version 14
-|
+|  summary:     Bump to version 14
 |
 o  changeset:   125:6210e57b37d6
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Jul 13 10:37:50 2020 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Check more network error conditions
-|
+|  summary:     Check more network error conditions
 |
 o  changeset:   124:9b6626f801ee
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Jun 30 17:57:31 2020 +0200
-|  files:       Changes
-|  description:
-|  Update Changes
-|
+|  summary:     Update Changes
 |
 o  changeset:   123:b8e3527c11c4
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Jun 30 17:56:59 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Fix cache for deleted keys, bump to Version 13
-|
+|  summary:     Fix cache for deleted keys, bump to Version 13
 |
 o  changeset:   122:5aea89316a45
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:58:48 2020 +0200
-|  files:       Changes
-|  description:
-|  Update Changes
-|
+|  summary:     Update Changes
 |
 o  changeset:   121:98710de3fcfa
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:58:34 2020 +0200
-|  files:       MANIFEST Makefile.PL
-|  description:
-|  MANIFEST, BF Makefile.PL
-|
+|  summary:     MANIFEST, BF Makefile.PL
 |
 o  changeset:   120:704f93edb66b
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:57:11 2020 +0200
-|  files:       Changes
-|  description:
-|  Update Changes file
-|
+|  summary:     Update Changes file
 |
 o  changeset:   119:656d70082f07
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:56:32 2020 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 12
-|
+|  summary:     Bump version to 12
 |
 o  changeset:   118:d906766d694e
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:55:50 2020 +0200
-|  files:       lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Update docs
-|
+|  summary:     Update docs
 |
 o  changeset:   117:a07d4edeb64b
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 09 14:55:32 2020 +0200
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks.pod
-|  description:
-|  Change Clacks.pod back to Clacks.pm to allow "cpan install Net::Clacks"
-|
+|  summary:     Change Clacks.pod back to Clacks.pm to allow "cpan install Net::Clacks"
 |
 o  changeset:   116:f293c3e90f68
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Jun 09 14:47:37 2020 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Allow cleaner disconnect for ClacksCache
-|
+|  summary:     Allow cleaner disconnect for ClacksCache
 |
 o  changeset:   115:d96448310e1d
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 12 10:49:48 2020 +0100
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Add access to raw socket for IO::Select stuff and similar
-|
+|  summary:     Add access to raw socket for IO::Select stuff and similar
 |
 o  changeset:   114:83f5c977322d
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Mar 11 20:12:38 2020 +0100
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Change docs to show that doNetwork takes an optional read timeout argument
-|
+|  summary:     Change docs to show that doNetwork takes an optional read timeout argument
 |
 o  changeset:   113:95845bbcea84
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:37:06 2020 +0100
-|  files:       Changes
-|  description:
-|  Update Changes again
-|
+|  summary:     Update Changes again
 |
 o  changeset:   112:69a8c1cc562f
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:36:34 2020 +0100
-|  files:       MANIFEST Makefile.PL devscripts/setcopyright.pl lib/Net/Clacks.pm lib/Net/Clacks.pod lib/Net/Clacks/UpgradeGuide.pod
-|  description:
-|  Split documentation and UpgradeGuide, because the upgrade guide gets longer and longer and longer and longer and longer....
-|
+|  summary:     Split documentation and UpgradeGuide, because the upgrade guide gets longer and longer and longer and longer and longer....
 |
 o  changeset:   111:79752633b55f
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:15:50 2020 +0100
-|  files:       Changes lib/Net/Clacks.pm
-|  description:
-|  Final update of docs before release
-|
+|  summary:     Final update of docs before release
 |
 o  changeset:   110:2afdec6ea408
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:08:58 2020 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 11
-|
+|  summary:     Bump version to 11
 |
 o  changeset:   109:a415968e12b2
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:08:34 2020 +0100
-|  files:       example/chat.pl example/chatbot.pl example/clock.pl
-|  description:
-|  Clean disconnect in cliewnt examples
-|
+|  summary:     Clean disconnect in cliewnt examples
 |
 o  changeset:   108:36b83cd2e90e
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:05:00 2020 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Update copyright
-|
+|  summary:     Update copyright
 |
 o  changeset:   107:f382a3e57f28
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:03:21 2020 +0100
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks/Client.pm
-|  description:
-|  Major bugfix should prevent hangs when Net::Clacks::Client is DESTROYed
-|
+|  summary:     Major bugfix should prevent hangs when Net::Clacks::Client is DESTROYed
 |
 o  changeset:   106:520fa6712c8c
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed Nov 13 17:38:05 2019 +0100
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Fewer useless messages when killing the process
-|
+|  summary:     Fewer useless messages when killing the process
 |
 o  changeset:   105:44d3a5694fe7
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Wed Nov 13 16:27:24 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Fix some unicode stuff (preventive merge from pagecamel_framework, not actual bug)
-|
+|  summary:     Fix some unicode stuff (preventive merge from pagecamel_framework, not actual bug)
 |
 o  changeset:   104:a05465f70905
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 15:01:17 2019 +0100
-|  files:       Changes
-|  description:
-|  Update Changes file in preparation for release
-|
+|  summary:     Update Changes file in preparation for release
 |
 o  changeset:   103:fe24c816fd92
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 15:00:25 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version number to 10
-|
+|  summary:     Bump version number to 10
 |
 o  changeset:   102:9883e3551d8a
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 14:59:00 2019 +0100
-|  files:       lib/Net/Clacks.pm
-|  description:
-|  Start documenting Version 10 changes
-|
+|  summary:     Start documenting Version 10 changes
 |
 o  changeset:   101:9e8a64181d26
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 14:47:23 2019 +0100
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Implement very basic error handling via "OVERHEAD E"
-|
+|  summary:     Implement very basic error handling via "OVERHEAD E"
 |
 o  changeset:   100:7576dbe56b05
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 13:25:18 2019 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  intersparse KEYSYNC with PING to maintain a "rolling" timeout during lengthy keysyncs
-|
+|  summary:     intersparse KEYSYNC with PING to maintain a "rolling" timeout during lengthy keysyncs
 |
 o  changeset:   99:43f9d2e7b850
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 13:18:49 2019 +0100
-|  files:       example/clacks_slaveserver2.xml
-|  description:
-|  Use unix domain sockets interclacks mode for example slave server 2
-|
+|  summary:     Use unix domain sockets interclacks mode for example slave server 2
 |
 o  changeset:   98:a841804a32ae
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 13:18:15 2019 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Interclacks can now use unix domain sockets as well
-|
+|  summary:     Interclacks can now use unix domain sockets as well
 |
 o  changeset:   97:e2bfe6d5f6f6
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 12:59:48 2019 +0100
-|  files:       example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml
-|  description:
-|  Fix examples
-|
+|  summary:     Fix examples
 |
 o  changeset:   96:40634506fa9b
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 12:57:13 2019 +0100
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Only do the clientID stuff on UDS if we actually load IO::Socket::UNIX
-|
+|  summary:     Only do the clientID stuff on UDS if we actually load IO::Socket::UNIX
 |
 o  changeset:   95:163bcae9f5fb
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 12:45:58 2019 +0100
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Don't use SSL on Unix domain sockets (local connections). Lowers CPU usage and provides shorter round trip time
-|
+|  summary:     Don't use SSL on Unix domain sockets (local connections). Lowers CPU usage and provides shorter round trip time
 |
 o  changeset:   94:ca7ebfe176d5
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 11:48:26 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Update pragmas
-|
+|  summary:     Update pragmas
 |
 o  changeset:   93:6f31209087b1
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Nov 05 15:05:01 2019 +0100
-|  files:       Changes
-|  description:
-|  Update "Changes" file in preparation for yet another release
-|
+|  summary:     Update "Changes" file in preparation for yet another release
 |
 o  changeset:   92:2b1f01b693ae
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Nov 05 15:03:21 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Add the option "socketchmod" to clacks server to automatically chmod the socket file
-|
+|  summary:     Add the option "socketchmod" to clacks server to automatically chmod the socket file
 |
 o  changeset:   91:6c9b5827a504
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Thu Oct 24 12:44:58 2019 +0200
-|  files:       example/clacks_master_unixdomainsocket.xml lib/Net/Clacks/Server.pm
-|  description:
-|  Better throttle timing+defaults, make sure syswrite is always eval'd
-|
+|  summary:     Better throttle timing+defaults, make sure syswrite is always eval'd
 |
 o  changeset:   90:52e62062f83f
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 17:00:56 2019 +0200
-|  files:       Changes
-|  description:
-|  Updated Changes file
-|
+|  summary:     Updated Changes file
 |
 o  changeset:   89:64198b152bb3
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 17:00:16 2019 +0200
-|  files:       MANIFEST example/chat_unixdomainsocket.pl example/clacks_master.xml example/clacks_master_unixdomainsocket.xml
-|  description:
-|  Make examples clearer
-|
+|  summary:     Make examples clearer
 |
 o  changeset:   88:e2c7631b15cd
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 16:52:40 2019 +0200
-|  files:       MANIFEST devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 8
-|
+|  summary:     Bump version to 8
 |
 o  changeset:   87:6df4a26becfc
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 16:48:29 2019 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  More fixes for disconnect handling
-|
+|  summary:     More fixes for disconnect handling
 |
 o  changeset:   86:54d46c6eff84
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 16:46:16 2019 +0200
-|  files:       lib/Net/Clacks.pm
-|  description:
-|  Updated docs
-|
+|  summary:     Updated docs
 |
 o  changeset:   85:cd2d5a46223e
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 14:57:28 2019 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  POD, Perl::Critic
-|
+|  summary:     POD, Perl::Critic
 |
 o  changeset:   84:0b441534fc26
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 14:42:55 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Cleanup
-|
+|  summary:     Cleanup
 |
 o  changeset:   83:fcbeb8f6e4de
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 14:39:52 2019 +0200
-|  files:       MANIFEST lib/Net/Clacks/SSL.pm
-|  description:
-|  CLeanup
-|
+|  summary:     CLeanup
 |
 o  changeset:   82:ef94a24f951b
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 14:18:24 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Better detection of closed sockets that lowers CPU usage
-|
+|  summary:     Better detection of closed sockets that lowers CPU usage
 |
 o  changeset:   81:cbb6df1315e5
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 13:50:51 2019 +0200
-|  files:       example/chat_unixdomainsocket.pl example/clacks_master.xml lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/SSL.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Start supporting Unix Domain Sockets
-|
+|  summary:     Start supporting Unix Domain Sockets
 |
 o  changeset:   80:f4e1d4971868
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Oct 09 10:22:22 2019 +0200
-|  files:       Changes devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Release version 7
-|
+|  summary:     Release version 7
 |
 o  changeset:   79:bad7fa609ea7
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Oct 09 10:21:31 2019 +0200
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Updated documentation in preparation for version 7 release
-|
+|  summary:     Updated documentation in preparation for version 7 release
 |
 o  changeset:   78:4fad979fb01e
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 15:27:12 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Updated POD
-|
+|  summary:     Updated POD
 |
 o  changeset:   77:d44cee91d51e
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 15:22:25 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm t/perlcriticrc
-|  description:
-|  Perl::Critic
-|
+|  summary:     Perl::Critic
 |
 o  changeset:   76:91e7e971a13c
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 12:09:36 2019 +0200
-|  files:       Changes devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Prepare for release 6.3
-|
+|  summary:     Prepare for release 6.3
 |
 o  changeset:   75:cbbff5e82e9e
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 12:06:35 2019 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Add a small random reconnect delay to the client
-|
+|  summary:     Add a small random reconnect delay to the client
 |
 o  changeset:   74:18746767c08c
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 11:57:31 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Be a bit more responsive waiting for the first client
-|
+|  summary:     Be a bit more responsive waiting for the first client
 |
 o  changeset:   73:11b921603766
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 08 11:53:59 2019 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Add some timeouts and sanity checks
-|
+|  summary:     Add some timeouts and sanity checks
 |
 o  changeset:   72:f605c2ddc186
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 11:03:29 2019 +0200
-|  files:       Changes
-|  description:
-|  Update Changes file and release
-|
+|  summary:     Update Changes file and release
 |
 o  changeset:   71:9aaed77d066d
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 11:02:07 2019 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Prepare release 6.2
-|
+|  summary:     Prepare release 6.2
 |
 o  changeset:   70:6895a7fdefcb
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 10:55:39 2019 +0200
-|  files:       MANIFEST
-|  description:
-|  MANIFEST
-|
+|  summary:     MANIFEST
 |
 o  changeset:   69:00b24d558d81
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 10:54:39 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Send KEYSYNC from slave to master AFTER the server has finished its sync (=when the server notifies us with the end of lock_for_sync)
-|
+|  summary:     Send KEYSYNC from slave to master AFTER the server has finished its sync (=when the server notifies us with the end of lock_for_sync)
 |
 o  changeset:   68:79cea41b9dd6
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 10:38:29 2019 +0200
-|  files:       example/clacks_slaveserver.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml example/rawclient.pl lib/Net/Clacks/Server.pm
-|  description:
-|  Trying to fix a special case where a distconnect from master with multiple slaves will result in KEYSYNC loops. The most likely cause is immediate reconnect of all clients instead of one-by-one.
-|
+|  summary:     Trying to fix a special case where a distconnect from master with multiple slaves will result in KEYSYNC loops. The most likely cause is immediate reconnect of all clients instead of one-by-one.
 |
 o  changeset:   67:5d518147d41f
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Mon Oct 07 10:03:29 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Wait between reconnect attemmpts to interclacks master
-|
+|  summary:     Wait between reconnect attemmpts to interclacks master
 |
 o  changeset:   66:0c3c5cca6f3e
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Sep 18 11:45:29 2019 +0200
-|  files:       Changes devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Release 6.1
-|
+|  summary:     Release 6.1
 |
 o  changeset:   65:db93daac2a03
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Sep 18 11:43:46 2019 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Fix substr bugs
-|
+|  summary:     Fix substr bugs
 |
 o  changeset:   64:4487e65aea0e
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 18 20:36:06 2019 +0200
-|  files:       Changes
-|  description:
-|  Prepare for 6.0 release
-|
+|  summary:     Prepare for 6.0 release
 |
 o  changeset:   63:f8f7ac6344ea
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 20:31:50 2019 +0200
-|  files:       lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Update documentation
-|
+|  summary:     Update documentation
 |
 o  changeset:   62:efc16af17dda
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 20:08:55 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  CLean up cmdline output
-|
+|  summary:     CLean up cmdline output
 |
 o  changeset:   61:185441faf746
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Tue Jun 18 20:03:32 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Use existing interclacks forwarding for much of KEYSYNC handling
-|
+|  summary:     Use existing interclacks forwarding for much of KEYSYNC handling
 |
 o  changeset:   60:d031dc2e46dd
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Tue Jun 18 19:58:23 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Sync bugfixes
-|
+|  summary:     Sync bugfixes
 |
 o  changeset:   59:f6ed8571791a
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Tue Jun 18 19:35:48 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Fix more sync stuff
-|
+|  summary:     Fix more sync stuff
 |
 o  changeset:   58:f2ef812e8cde
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 19:20:28 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  BF
-|
+|  summary:     BF
 |
 o  changeset:   57:98a519e6e6f8
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Tue Jun 18 19:16:21 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Smarter sending of keys known in interclacks client to server
-|
+|  summary:     Smarter sending of keys known in interclacks client to server
 |
 o  changeset:   56:ac568fa45a4c
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 19:00:33 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Fix some sync bugs
-|
+|  summary:     Fix some sync bugs
 |
 o  changeset:   55:1be45188781b
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 18:41:16 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  BF
-|
+|  summary:     BF
 |
 o  changeset:   54:fd831fb2a99e
 |  user:        Rene Schickbauer <cavac@dsky>
 |  date:        Tue Jun 18 18:36:38 2019 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  BF
-|
+|  summary:     BF
 |
 o  changeset:   53:44418014974c
 |  user:        Rene Schickbauer <cavac@rosetta>
 |  date:        Tue Jun 18 18:10:01 2019 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Try a more intelligent interclacks sync mode using local timestamps
-|
+|  summary:     Try a more intelligent interclacks sync mode using local timestamps
 |
 o  changeset:   52:245b71908c79
 |  user:        Rene Schickbauer <cavac@pitop>
 |  date:        Wed Jun 12 10:27:54 2019 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Implement the FLUSH command
-|
+|  summary:     Implement the FLUSH command
 |
 o  changeset:   51:73f25852dee1
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed May 08 02:04:50 2019 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Clackscache can now (optionally) persist over restarts
-|
+|  summary:     Clackscache can now (optionally) persist over restarts
 |
 o  changeset:   50:af6b657a6a31
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:41:42 2019 +0100
-|  files:       Changes
-|  description:
-|  Update "Changes" file
-|
+|  summary:     Update "Changes" file
 |
 o  changeset:   49:75c14a5ac7cb
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:40:40 2019 +0100
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Better remembrance code
-|
+|  summary:     Better remembrance code
 |
 o  changeset:   48:2da43894612a
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:06:21 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 5.1
-|
+|  summary:     Bump version to 5.1
 |
 o  changeset:   47:0466fbbb86bc
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:05:37 2019 +0100
-|  files:       devscripts/resetpod.pl devscripts/setcopyright.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Fix some copyright stuff
-|
+|  summary:     Fix some copyright stuff
 |
 o  changeset:   46:7d02c43c1786
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:03:23 2019 +0100
-|  files:       README devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm t/01-use.t t/04-perlcritic.t t/perlcriticrc
-|  description:
-|  Rename as all Maplat stuff to PageCamel, to keep it in line with framework
-|
+|  summary:     Rename as all Maplat stuff to PageCamel, to keep it in line with framework
 |
 o  changeset:   45:6389f4bb3a7a
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Mon Feb 04 21:51:08 2019 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Add meta function setAndStore() so we can save some annoying "duplicate" lines in pagecamel_framework
-|
+|  summary:     Add meta function setAndStore() so we can save some annoying "duplicate" lines in pagecamel_framework
 |
 o  changeset:   44:6118b5f15edb
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Wed Dec 12 12:33:23 2018 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 4.9
-|
+|  summary:     Bump version to 4.9
 |
 o  changeset:   43:4afedc404bde
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 04 15:04:57 2018 +0200
-|  files:       Makefile.PL devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Tester reported this software backwards compatible to 5.10.1, so change minimum perl version
-|
+|  summary:     Tester reported this software backwards compatible to 5.10.1, so change minimum perl version
 |
 o  changeset:   42:9ba0a2f94f97
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 04 14:57:46 2018 +0200
-|  files:       t/01-use.t
-|  description:
-|  Fix test after removal of Async file
-|
+|  summary:     Fix test after removal of Async file
 |
 o  changeset:   41:5e6ea769ef75
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 04 14:15:49 2018 +0200
-|  files:       Changes
-|  description:
-|  Prepare for 4.8 release
-|
+|  summary:     Prepare for 4.8 release
 |
 o  changeset:   40:f308b1387d48
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 04 14:13:46 2018 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chatbot.pl example/clock.pl example/server.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Update version and copyright
-|
+|  summary:     Update version and copyright
 |
 o  changeset:   39:1234a3b6b15e
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 04 14:10:53 2018 +0200
-|  files:       MANIFEST example/README.txt example/chatbot.pl example/clock.pl
-|  description:
-|  Better examples
-|
+|  summary:     Better examples
 |
 o  changeset:   38:5943d65c8e03
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Wed Oct 03 14:24:03 2018 +0200
-|  files:       MANIFEST Makefile.PL devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks.pod lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Try to fix CPAN problems
-|
+|  summary:     Try to fix CPAN problems
 |
 o  changeset:   37:3256b573075b
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 02 08:12:16 2018 +0200
-|  files:       Changes lib/Net/Clacks.pod lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm
-|  description:
-|  Update some docs
-|
+|  summary:     Update some docs
 |
 o  changeset:   36:f71c4f5301c9
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 02 08:04:55 2018 +0200
-|  files:       MANIFEST example/chat.pl example/clacks_master.xml example/clacks_slaveserver.xml example/clock.pl example/exampleserver.crt example/exampleserver.key
-|  description:
-|  Fix examples
-|
+|  summary:     Fix examples
 |
 o  changeset:   35:fe403df2833c
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 02 07:28:58 2018 +0200
-|  files:       Changes README
-|  description:
-|  CPAN docs update
-|
+|  summary:     CPAN docs update
 |
 o  changeset:   34:b34c82a87303
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Sep 14 13:36:46 2018 +0200
-|  files:       MANIFEST Makefile.PL lib/Net/Clacks.pod lib/Net/Clacks/Server.pm
-|  description:
-|  Start writing documentation
-|
+|  summary:     Start writing documentation
 |
 o  changeset:   33:49956237c44c
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Sep 14 13:36:17 2018 +0200
-|  files:       lib/Net/Clacks/Client/Async.pm
-|  description:
-|  Remove unsupported Async module
-|
+|  summary:     Remove unsupported Async module
 |
 o  changeset:   32:656624483073
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Fri Sep 14 11:50:10 2018 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Fix Perl::Critic
-|
+|  summary:     Fix Perl::Critic
 |
 o  changeset:   31:262ba92abf13
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Aug 14 19:59:32 2018 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Client/Async.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Updated version
-|
+|  summary:     Updated version
 |
 o  changeset:   30:b47536f994ed
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Aug 14 19:56:35 2018 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Send DEBUG (in monitor mode) for connects and disconnects of clients
-|
+|  summary:     Send DEBUG (in monitor mode) for connects and disconnects of clients
 |
 o    changeset:   29:de2e40d5c9c9
 |\   parent:      28:67039a1d96b3
 | |  parent:      27:af7bbe22c754
 | |  user:        Rene Schickbauer <cavac@illinsvdev01>
 | |  date:        Fri Nov 24 10:00:28 2017 +0100
-| |  description:
-| |  Merge
-| |
+| |  summary:     Merge
 | |
 | o  changeset:   28:67039a1d96b3
 | |  parent:      26:cdda9b918c96
 | |  user:        Rene Schickbauer <cavac@illinsvdev01>
 | |  date:        Fri Nov 24 09:59:55 2017 +0100
-| |  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Client/Async.pm lib/Net/Clacks/Server.pm
-| |  description:
-| |  Add clacks_keylist() function to ClacksCache, bump version to 4.5
-| |
+| |  summary:     Add clacks_keylist() function to ClacksCache, bump version to 4.5
 | |
 o |  changeset:   27:af7bbe22c754
 |/   user:        Rene Schickbauer <cavac@cables.cavac.at>
 |    date:        Sun Nov 12 14:11:56 2017 +0100
-|    files:       Makefile.PL
-|    description:
-|    dd missing requirements in Makefile.PL
-|
+|    summary:     dd missing requirements in Makefile.PL
 |
 o  changeset:   26:cdda9b918c96
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Nov 10 12:59:01 2017 +0100
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Client/Async.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Add "raw" functionality to Client lib
-|
+|  summary:     Add "raw" functionality to Client lib
 |
 o  changeset:   25:843caf259404
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 24 12:25:25 2017 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  BF shorter sleep time
-|
+|  summary:     BF shorter sleep time
 |
 o  changeset:   24:f85de513c912
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 24 12:18:37 2017 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  For some (currently unknown) reason sysread only gives us a single line when using SSL. So try until we don't get any more data.
-|
+|  summary:     For some (currently unknown) reason sysread only gives us a single line when using SSL. So try until we don't get any more data.
 |
 o  changeset:   23:aa0f34c5a0de
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Oct 20 12:25:51 2017 +0200
-|  files:       MANIFEST lib/Net/Clacks/Client/Async.pm t/01-use.t
-|  description:
-|  Start work on totally async client (unfinished)
-|
+|  summary:     Start work on totally async client (unfinished)
 |
 o  changeset:   22:ab70763b26d2
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Oct 20 12:07:03 2017 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Adapt keylist to new protocol, add clientlist function
-|
+|  summary:     Adapt keylist to new protocol, add clientlist function
 |
 o  changeset:   21:2153bd446f68
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Fri Oct 20 12:06:42 2017 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Change protocol slightly to have a defined start/end tag for lists
-|
+|  summary:     Change protocol slightly to have a defined start/end tag for lists
 |
 o  changeset:   20:4b4b44199296
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 19 15:19:54 2017 +0200
-|  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  BF (especially in interclacks mode)
-|
+|  summary:     BF (especially in interclacks mode)
 |
 o  changeset:   19:0a6f79c4ab4f
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 19 11:27:50 2017 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  BF, Bump version to 4.3
-|
+|  summary:     BF, Bump version to 4.3
 |
 o  changeset:   18:fe251303371a
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Thu Oct 19 10:11:13 2017 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm
-|  description:
-|  Unify config names
-|
+|  summary:     Unify config names
 |
 o    changeset:   17:b992949d95d4
 |\   parent:      16:46ee74a615eb
 | |  parent:      14:232e7ae01cfe
 | |  user:        Rene Schickbauer <cavac@illinsvdev01>
 | |  date:        Tue Oct 17 15:23:30 2017 +0200
-| |  files:       lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-| |  description:
-| |  Merge from cavac.at
-| |
+| |  summary:     Merge from cavac.at
 | |
 | o  changeset:   16:46ee74a615eb
 | |  user:        Rene Schickbauer <cavac@illinsvdev01>
 | |  date:        Tue Oct 17 14:47:02 2017 +0200
-| |  files:       lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-| |  description:
-| |  Added mandatory authentication and lock-for-sync mode (for interclacks sync)
-| |
+| |  summary:     Added mandatory authentication and lock-for-sync mode (for interclacks sync)
 | |
 | o  changeset:   15:675c4b7837e5
 | |  parent:      12:478bba79a309
 | |  user:        Rene Schickbauer <cavac@illinsvdev01>
 | |  date:        Tue Oct 17 09:42:43 2017 +0200
-| |  files:       Makefile.PL lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-| |  description:
-| |  Use SSL in Clacks
-| |
+| |  summary:     Use SSL in Clacks
 | |
 o |  changeset:   14:232e7ae01cfe
 | |  user:        Rene Schickbauer <cavac@rosetta>
 | |  date:        Mon Oct 16 18:38:42 2017 +0200
-| |  files:       lib/Net/Clacks/Client.pm
-| |  description:
-| |  GNU Ivy Bdubs
-| |
+| |  summary:     GNU Ivy Bdubs
 | |
 o |  changeset:   13:9888848cfe91
 |/   user:        Rene Schickbauer <cavac@rosetta>
 |    date:        Mon Oct 16 18:36:43 2017 +0200
-|    files:       lib/Net/Clacks/Server.pm
-|    description:
-|    GNU Terry Pratchett
-|
+|    summary:     GNU Terry Pratchett
 |
 o  changeset:   12:478bba79a309
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 12:52:25 2017 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Actually make sure we flush the output buffer in memcached compat mode
-|
+|  summary:     Actually make sure we flush the output buffer in memcached compat mode
 |
 o  changeset:   11:1fcf3d7f26c0
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 12:10:04 2017 +0200
-|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Bump version to 4.2 to show major overhaul of clacks
-|
+|  summary:     Bump version to 4.2 to show major overhaul of clacks
 |
 o  changeset:   10:c494e054d842
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 12:09:19 2017 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm
-|  description:
-|  Fix pragmas
-|
+|  summary:     Fix pragmas
 |
 o  changeset:   9:ce229df4a417
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 12:07:47 2017 +0200
-|  files:       lib/Net/Clacks/Client.pm
-|  description:
-|  Better timeout handling in clacks client
-|
+|  summary:     Better timeout handling in clacks client
 |
 o  changeset:   8:160a55e8d89e
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 12:04:04 2017 +0200
-|  files:       Makefile.PL
-|  description:
-|  Add IO::Select to requirements in Makefile.PL
-|
+|  summary:     Add IO::Select to requirements in Makefile.PL
 |
 o  changeset:   7:7f2a9ac95c15
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 11:24:54 2017 +0200
-|  files:       lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Server.pm
-|  description:
-|  Better clacks performance
-|
+|  summary:     Better clacks performance
 |
 o  changeset:   6:710a9644028d
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Mon Oct 16 09:37:08 2017 +0200
-|  files:       MANIFEST lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UDPWriter.pm t/01-use.t
-|  description:
-|  Phase out UDP mode of Clacks, move basic Memchached compat to Net::Clacks
-|
+|  summary:     Phase out UDP mode of Clacks, move basic Memchached compat to Net::Clacks
 |
 o  changeset:   5:ead749d4b242
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 03 14:27:08 2017 +0200
-|  files:       MANIFEST example/chat.pl example/clacks_master.xml example/clacks_slaveserver.xml example/server.pl lib/Net/Clacks/Server.pm
-|  description:
-|  Add simple examples
-|
+|  summary:     Add simple examples
 |
 o  changeset:   4:12e892f08f26
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 03 13:07:34 2017 +0200
-|  files:       lib/Net/Clacks/Server.pm
-|  description:
-|  Doc
-|
+|  summary:     Doc
 |
 o  changeset:   3:e518b1dbbe4b
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 03 13:02:20 2017 +0200
-|  files:       MANIFEST devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UDPWriter.pm t/perlcriticrc
-|  description:
-|  Code cleanup
-|
+|  summary:     Code cleanup
 |
 o  changeset:   2:6e39ea8b0509
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 03 11:37:45 2017 +0200
-|  files:       t/01-helperscompile.t t/01-use.t t/02-pod.t t/03-pod.t t/03-podcoverage.t t/04-perlcritic.t t/04-podcoverage.t t/30-perlcritic.t
-|  description:
-|  Rename some files
-|
+|  summary:     Rename some files
 |
 o  changeset:   1:d0b5949bf336
 |  user:        Rene Schickbauer <cavac@illinsvdev01>
 |  date:        Tue Oct 03 11:32:45 2017 +0200
-|  files:       MANIFEST Makefile.PL
-|  description:
-|  MANIFEST. Makefile.PL
-|
+|  summary:     MANIFEST. Makefile.PL
 |
 o  changeset:   0:523069b7ee68
    user:        Rene Schickbauer <cavac@illinsvdev01>
    date:        Tue Oct 03 11:30:01 2017 +0200
-   files:       .hgignore Changes MANIFEST MANIFEST.SKIP Makefile.PL README devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UDPWriter.pm t/01-helperscompile.t t/03-pod.t t/04-podcoverage.t t/30-perlcritic.t t/perlcriticrc
-   description:
-   Turn Clacks into its own module
-
+   summary:     Turn Clacks into its own module
 

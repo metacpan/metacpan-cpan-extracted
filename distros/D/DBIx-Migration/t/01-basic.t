@@ -18,8 +18,8 @@ class_api_ok( $module, qw( before new dir dbh dsn username password migrate vers
 
 like exception { $module->new() }, qr/\Aboth dsn and dbh are not set/, '"dsn" or "dbh" are both absent';
 
-like exception { $module->new( dsn => 'dbi:Mem:', dbh => DBI->connect( 'dbi:Mem:', undef, undef, {} ) ) },
+like exception { $module->new( dsn => 'dbi:Mock:', dbh => DBI->connect( 'dbi:Mock:', undef, undef, {} ) ) },
   qr/\Adsn and dbh cannot be used at the same time/, '"dsn" and "dbh" are mutually exclusive';
 
-like exception { $module->new( dbh => DBI->connect( 'dbi:Mem:', undef, undef, {} ), username => 'foo' ) },
+like exception { $module->new( dbh => DBI->connect( 'dbi:Mock:', undef, undef, {} ), username => 'foo' ) },
   qr/\Adbh and username cannot be used at the same time/, '"dbh" and "username" are mutually exclusive';

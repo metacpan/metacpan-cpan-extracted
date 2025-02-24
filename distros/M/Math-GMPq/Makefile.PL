@@ -105,6 +105,8 @@ my $libopts = '-lgmp';
 $libopts    = '-lquadmath -lgmp'
   if ($^O eq 'cygwin' && $use_quadmath);
 
+if($Config{longsize} < $Config{ivsize}) { $defines .= " -D_GMP_INDEX_OVERFLOW"  }
+
 my %options = (
   NAME => 'Math::GMPq',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',

@@ -1,0 +1,5 @@
+test: 
+Bagging-Date: 2025-02-24
+Bag-Software-Agent: Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>
+Payload-Oxum: 2.1
+Bag-Size: 2 B
