@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.165   2025-02-24
+        - Simplify the progress bar.
+        - Make Term::TablePrint::ProgressBar visible.[GH #3 mrdvt92]
+        - Update option 'max_rows'.
+
 0.164   2024-10-28
         - Term::Choose minimum version 1.767.
 

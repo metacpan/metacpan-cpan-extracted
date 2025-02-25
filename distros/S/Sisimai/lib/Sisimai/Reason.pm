@@ -7,17 +7,17 @@ my $ModulePath = __PACKAGE__->path;
 my $GetRetried = __PACKAGE__->retry;
 my $ClassOrder = [
     [qw/MailboxFull MesgTooBig ExceedLimit Suspend HasMoved NoRelaying AuthFailure UserUnknown
-        Filtered RequirePTR NotCompliantRFC BadReputation Rejected HostUnknown SpamDetected Speeding
-        TooManyConn Blocked/
+        Filtered RequirePTR NotCompliantRFC BadReputation ContentError Rejected HostUnknown
+        SpamDetected Speeding TooManyConn Blocked/
     ],
     [qw/MailboxFull AuthFailure BadReputation Speeding SpamDetected VirusDetected PolicyViolation 
         NoRelaying SystemError NetworkError Suspend ContentError SystemFull NotAccept Expired
-        SecurityError MailerError/
+        FailedSTARTTLS SecurityError Suppressed MailerError/
     ],
     [qw/MailboxFull MesgTooBig ExceedLimit Suspend UserUnknown Filtered Rejected HostUnknown
-        SpamDetected Speeding TooManyConn Blocked SpamDetected AuthFailure SecurityError SystemError
-        NetworkError Suspend Expired ContentError HasMoved SystemFull NotAccept MailerError
-        NoRelaying SyntaxError OnHold/
+        SpamDetected Speeding TooManyConn Blocked SpamDetected AuthFailure FailedSTARTTLS
+        SecurityError SystemError NetworkError Suspend Expired ContentError HasMoved SystemFull
+        NotAccept MailerError NoRelaying Suppressed SyntaxError OnHold/
     ],
 ];
 
@@ -26,18 +26,29 @@ sub retry {
     # @return   [Hash] Reason list
     return {
         'undefined' => 1, 'onhold' => 1, 'systemerror' => 1, 'securityerror' => 1, 'expired' => 1,
-        'suspend' => 1, 'networkerror' => 1, 'hostunknown' => 1, 'userunknown'=> 1
+        'networkerror' => 1, 'hostunknown' => 1, 'userunknown'=> 1
     };
+}
+
+sub is_explicit {
+    # is_explicit() returns 0 when the argument is empty or is "undefined" or is "onhold"
+    # @param    string argv1  Reason name
+    # @return   bool          false: The reaosn is not explicit
+    my $class = shift;
+    my $argv1 = shift || return 0;
+
+    return 0 if $argv1 eq "undefined" || $argv1 eq "onhold" || $argv1 eq "";
+    return 1;
 }
 
 sub index {
     # All the error reason list Sisimai support
     # @return   [Array] Reason list
     return [qw/
-        AuthFailure BadReputation Blocked ContentError ExceedLimit Expired Filtered HasMoved
-        HostUnknown MailboxFull MailerError MesgTooBig NetworkError NotAccept NotCompliantRFC
-        OnHold Rejected NoRelaying SpamDetected VirusDetected PolicyViolation SecurityError
-        Speeding Suspend RequirePTR SystemError SystemFull TooManyConn UserUnknown SyntaxError/
+        AuthFailure BadReputation Blocked ContentError ExceedLimit Expired FailedSTARTTLS Filtered
+        HasMoved HostUnknown MailboxFull MailerError MesgTooBig NetworkError NotAccept NotCompliantRFC
+        OnHold Rejected NoRelaying SpamDetected VirusDetected PolicyViolation SecurityError Speeding
+        Suspend RequirePTR SystemError SystemFull TooManyConn Suppressed UserUnknown SyntaxError/
     ];
 }
 
@@ -52,7 +63,7 @@ sub path {
     return $table;
 }
 
-sub get {
+sub find {
     # Detect the bounce reason
     # @param    [Hash]   argvs  Decoded email object
     # @return   [String]        Bounce reason or undef if the argument is missing or not HASH
@@ -101,10 +112,10 @@ sub get {
 }
 
 sub anotherone {
-    # Detect the other bounce reason, fall back method for get()
+    # Detect the other bounce reason, fall back method for find()
     # @param    [Hash] argvs    Decoded email structure
     # @return   [String]        Bounce reason or undef if the argument is missing or not HASH
-    # @see get
+    # @see      find()
     my $class = shift;
     my $argvs = shift // return undef;
     return $argvs->{'reason'} if $argvs->{'reason'};
@@ -115,13 +126,10 @@ sub anotherone {
     my $actiontext = $argvs->{'action'}            // '';
     my $statuscode = $argvs->{'deliverystatus'}    // '';
     my $reasontext = Sisimai::SMTP::Status->name($statuscode) || '';
+    my $trytomatch = $reasontext eq '' ? 1 : 0;
+       $trytomatch = 1 if exists $GetRetried->{ $reasontext } || $codeformat ne 'SMTP';
 
-    TRY_TO_MATCH: while(1) {
-        my $trytomatch   = $reasontext eq '' ? 1 : 0;
-           $trytomatch ||= 1 if exists $GetRetried->{ $reasontext };
-           $trytomatch ||= 1 if $codeformat ne 'SMTP';
-        last unless $trytomatch;
-
+    while($trytomatch) {
         # Could not decide the reason by the value of Status:
         for my $e ( $ClassOrder->[1]->@* ) {
             # Trying to match with other patterns in Sisimai::Reason::* classes
@@ -132,7 +140,7 @@ sub anotherone {
             $reasontext = lc $e;
             last;
         }
-        last(TRY_TO_MATCH) if $reasontext;
+        last if $reasontext;
 
         # Check the value of Status:
         my $code2digit = substr($statuscode, 0, 3) || '';
@@ -153,7 +161,7 @@ sub anotherone {
             require Sisimai::Reason::SyntaxError;
             $reasontext = 'syntaxerror' if Sisimai::Reason::SyntaxError->true($argvs);
         }
-        last(TRY_TO_MATCH) if $reasontext;
+        last if $reasontext;
 
         # Check the value of Action: field, first
         if( CORE::index($actiontext, 'delayed') == 0 || CORE::index($actiontext, 'expired') == 0 ) {
@@ -162,13 +170,13 @@ sub anotherone {
 
         } else {
             # Check the value of SMTP command
-            my $thecommand = $argvs->{'smtpcommand'} // '';
+            my $thecommand = $argvs->{'command'} // '';
             if( $thecommand eq 'EHLO' || $thecommand eq 'HELO' ) {
                 # Rejected at connection or after EHLO|HELO
                 $reasontext = 'blocked';
             }
         }
-        last(TRY_TO_MATCH);
+        last;
     }
     return $reasontext;
 }
@@ -225,18 +233,18 @@ Sisimai::Reason - Detect the bounce reason
 =head1 DESCRIPTION
 
 C<Sisimai::Reason> detects the bounce reason from the content of C<Sisimai::Fact> object as an argument
-of C<get()> method. This class is called only C<Sisimai::Fact> class.
+of C<find()> method. This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head2 C<B<anotherone(I<Sisimai::Fact object>)>>
 
 C<anotherone()> method is a method for detecting the bounce reason, it works as a fall back method
-of C<get()> and called only from C<get()> method.
+of C<find()> and called only from C<find()> method.
 
 C<match()> detects the bounce reason from given text as a error message.
 
@@ -247,7 +255,7 @@ of the method. However, this method is low analytical precision.
 
 =head1 LIST OF BOUNCE REASONS
 
-C<Sisimai::Reason->get()> method detects the reason of bounce with decoding the bounced messages.
+C<Sisimai::Reason->find()> method detects the reason of bounce with decoding the bounced messages.
 The following reasons will be set in the value of C<reason> property of C<Sisimai::Fact> instance.
 The list of all the bounce reasons is available at L<https://libsisimai.org/en/reason/>.
 

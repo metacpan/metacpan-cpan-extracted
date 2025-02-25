@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v5.1.0"
+         "version" : "v5.2.0"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -80,32 +80,20 @@
       "Sisimai::Fact::YAML" : {
          "file" : "lib/Sisimai/Fact/YAML.pm"
       },
+      "Sisimai::LDA" : {
+         "file" : "lib/Sisimai/LDA.pm"
+      },
       "Sisimai::Lhost" : {
          "file" : "lib/Sisimai/Lhost.pm"
       },
       "Sisimai::Lhost::Activehunter" : {
          "file" : "lib/Sisimai/Lhost/Activehunter.pm"
       },
-      "Sisimai::Lhost::Amavis" : {
-         "file" : "lib/Sisimai/Lhost/Amavis.pm"
-      },
       "Sisimai::Lhost::AmazonSES" : {
          "file" : "lib/Sisimai/Lhost/AmazonSES.pm"
       },
-      "Sisimai::Lhost::AmazonWorkMail" : {
-         "file" : "lib/Sisimai/Lhost/AmazonWorkMail.pm"
-      },
-      "Sisimai::Lhost::Aol" : {
-         "file" : "lib/Sisimai/Lhost/Aol.pm"
-      },
       "Sisimai::Lhost::ApacheJames" : {
          "file" : "lib/Sisimai/Lhost/ApacheJames.pm"
-      },
-      "Sisimai::Lhost::Barracuda" : {
-         "file" : "lib/Sisimai/Lhost/Barracuda.pm"
-      },
-      "Sisimai::Lhost::Bigfoot" : {
-         "file" : "lib/Sisimai/Lhost/Bigfoot.pm"
       },
       "Sisimai::Lhost::Biglobe" : {
          "file" : "lib/Sisimai/Lhost/Biglobe.pm"
@@ -137,20 +125,17 @@
       "Sisimai::Lhost::FML" : {
          "file" : "lib/Sisimai/Lhost/FML.pm"
       },
-      "Sisimai::Lhost::Facebook" : {
-         "file" : "lib/Sisimai/Lhost/Facebook.pm"
-      },
       "Sisimai::Lhost::GMX" : {
          "file" : "lib/Sisimai/Lhost/GMX.pm"
-      },
-      "Sisimai::Lhost::GSuite" : {
-         "file" : "lib/Sisimai/Lhost/GSuite.pm"
       },
       "Sisimai::Lhost::Gmail" : {
          "file" : "lib/Sisimai/Lhost/Gmail.pm"
       },
       "Sisimai::Lhost::GoogleGroups" : {
          "file" : "lib/Sisimai/Lhost/GoogleGroups.pm"
+      },
+      "Sisimai::Lhost::GoogleWorkspace" : {
+         "file" : "lib/Sisimai/Lhost/GoogleWorkspace.pm"
       },
       "Sisimai::Lhost::IMailServer" : {
          "file" : "lib/Sisimai/Lhost/IMailServer.pm"
@@ -161,23 +146,11 @@
       "Sisimai::Lhost::KDDI" : {
          "file" : "lib/Sisimai/Lhost/KDDI.pm"
       },
-      "Sisimai::Lhost::MXLogic" : {
-         "file" : "lib/Sisimai/Lhost/MXLogic.pm"
-      },
       "Sisimai::Lhost::MailFoundry" : {
          "file" : "lib/Sisimai/Lhost/MailFoundry.pm"
       },
       "Sisimai::Lhost::MailMarshalSMTP" : {
          "file" : "lib/Sisimai/Lhost/MailMarshalSMTP.pm"
-      },
-      "Sisimai::Lhost::MailRu" : {
-         "file" : "lib/Sisimai/Lhost/MailRu.pm"
-      },
-      "Sisimai::Lhost::McAfee" : {
-         "file" : "lib/Sisimai/Lhost/McAfee.pm"
-      },
-      "Sisimai::Lhost::MessageLabs" : {
-         "file" : "lib/Sisimai/Lhost/MessageLabs.pm"
       },
       "Sisimai::Lhost::MessagingServer" : {
          "file" : "lib/Sisimai/Lhost/MessagingServer.pm"
@@ -185,32 +158,14 @@
       "Sisimai::Lhost::Notes" : {
          "file" : "lib/Sisimai/Lhost/Notes.pm"
       },
-      "Sisimai::Lhost::Office365" : {
-         "file" : "lib/Sisimai/Lhost/Office365.pm"
-      },
       "Sisimai::Lhost::OpenSMTPD" : {
          "file" : "lib/Sisimai/Lhost/OpenSMTPD.pm"
-      },
-      "Sisimai::Lhost::Outlook" : {
-         "file" : "lib/Sisimai/Lhost/Outlook.pm"
       },
       "Sisimai::Lhost::Postfix" : {
          "file" : "lib/Sisimai/Lhost/Postfix.pm"
       },
-      "Sisimai::Lhost::PowerMTA" : {
-         "file" : "lib/Sisimai/Lhost/PowerMTA.pm"
-      },
-      "Sisimai::Lhost::ReceivingSES" : {
-         "file" : "lib/Sisimai/Lhost/ReceivingSES.pm"
-      },
-      "Sisimai::Lhost::SendGrid" : {
-         "file" : "lib/Sisimai/Lhost/SendGrid.pm"
-      },
       "Sisimai::Lhost::Sendmail" : {
          "file" : "lib/Sisimai/Lhost/Sendmail.pm"
-      },
-      "Sisimai::Lhost::SurfControl" : {
-         "file" : "lib/Sisimai/Lhost/SurfControl.pm"
       },
       "Sisimai::Lhost::V5sendmail" : {
          "file" : "lib/Sisimai/Lhost/V5sendmail.pm"
@@ -227,20 +182,8 @@
       "Sisimai::Lhost::X3" : {
          "file" : "lib/Sisimai/Lhost/X3.pm"
       },
-      "Sisimai::Lhost::X4" : {
-         "file" : "lib/Sisimai/Lhost/X4.pm"
-      },
-      "Sisimai::Lhost::X5" : {
-         "file" : "lib/Sisimai/Lhost/X5.pm"
-      },
       "Sisimai::Lhost::X6" : {
          "file" : "lib/Sisimai/Lhost/X6.pm"
-      },
-      "Sisimai::Lhost::Yahoo" : {
-         "file" : "lib/Sisimai/Lhost/Yahoo.pm"
-      },
-      "Sisimai::Lhost::Yandex" : {
-         "file" : "lib/Sisimai/Lhost/Yandex.pm"
       },
       "Sisimai::Lhost::Zoho" : {
          "file" : "lib/Sisimai/Lhost/Zoho.pm"
@@ -250,9 +193,6 @@
       },
       "Sisimai::Lhost::qmail" : {
          "file" : "lib/Sisimai/Lhost/qmail.pm"
-      },
-      "Sisimai::MDA" : {
-         "file" : "lib/Sisimai/MDA.pm"
       },
       "Sisimai::Mail" : {
          "file" : "lib/Sisimai/Mail.pm"
@@ -275,6 +215,9 @@
       "Sisimai::Order" : {
          "file" : "lib/Sisimai/Order.pm"
       },
+      "Sisimai::RFC1123" : {
+         "file" : "lib/Sisimai/RFC1123.pm"
+      },
       "Sisimai::RFC1894" : {
          "file" : "lib/Sisimai/RFC1894.pm"
       },
@@ -284,6 +227,12 @@
       "Sisimai::RFC3464" : {
          "file" : "lib/Sisimai/RFC3464.pm"
       },
+      "Sisimai::RFC3464::ThirdParty" : {
+         "file" : "lib/Sisimai/RFC3464/ThirdParty.pm"
+      },
+      "Sisimai::RFC3464::ThirdParty::PowerMTA" : {
+         "file" : "lib/Sisimai/RFC3464/ThirdParty.pm"
+      },
       "Sisimai::RFC3834" : {
          "file" : "lib/Sisimai/RFC3834.pm"
       },
@@ -292,6 +241,9 @@
       },
       "Sisimai::RFC5965" : {
          "file" : "lib/Sisimai/RFC5965.pm"
+      },
+      "Sisimai::RFC791" : {
+         "file" : "lib/Sisimai/RFC791.pm"
       },
       "Sisimai::Reason" : {
          "file" : "lib/Sisimai/Reason.pm"
@@ -316,6 +268,9 @@
       },
       "Sisimai::Reason::Expired" : {
          "file" : "lib/Sisimai/Reason/Expired.pm"
+      },
+      "Sisimai::Reason::FailedSTARTTLS" : {
+         "file" : "lib/Sisimai/Reason/FailedSTARTTLS.pm"
       },
       "Sisimai::Reason::Feedback" : {
          "file" : "lib/Sisimai/Reason/Feedback.pm"
@@ -371,6 +326,9 @@
       "Sisimai::Reason::Speeding" : {
          "file" : "lib/Sisimai/Reason/Speeding.pm"
       },
+      "Sisimai::Reason::Suppressed" : {
+         "file" : "lib/Sisimai/Reason/Suppressed.pm"
+      },
       "Sisimai::Reason::Suspend" : {
          "file" : "lib/Sisimai/Reason/Suspend.pm"
       },
@@ -401,14 +359,23 @@
       "Sisimai::Rhost" : {
          "file" : "lib/Sisimai/Rhost.pm"
       },
+      "Sisimai::Rhost::Aol" : {
+         "file" : "lib/Sisimai/Rhost/Aol.pm"
+      },
       "Sisimai::Rhost::Apple" : {
          "file" : "lib/Sisimai/Rhost/Apple.pm"
       },
       "Sisimai::Rhost::Cox" : {
          "file" : "lib/Sisimai/Rhost/Cox.pm"
       },
+      "Sisimai::Rhost::Facebook" : {
+         "file" : "lib/Sisimai/Rhost/Facebook.pm"
+      },
       "Sisimai::Rhost::FrancePTT" : {
          "file" : "lib/Sisimai/Rhost/FrancePTT.pm"
+      },
+      "Sisimai::Rhost::GSuite" : {
+         "file" : "lib/Sisimai/Rhost/GSuite.pm"
       },
       "Sisimai::Rhost::GoDaddy" : {
          "file" : "lib/Sisimai/Rhost/GoDaddy.pm"
@@ -422,6 +389,9 @@
       "Sisimai::Rhost::KDDI" : {
          "file" : "lib/Sisimai/Rhost/KDDI.pm"
       },
+      "Sisimai::Rhost::MessageLabs" : {
+         "file" : "lib/Sisimai/Rhost/MessageLabs.pm"
+      },
       "Sisimai::Rhost::Microsoft" : {
          "file" : "lib/Sisimai/Rhost/Microsoft.pm"
       },
@@ -430,6 +400,9 @@
       },
       "Sisimai::Rhost::NTTDOCOMO" : {
          "file" : "lib/Sisimai/Rhost/NTTDOCOMO.pm"
+      },
+      "Sisimai::Rhost::Outlook" : {
+         "file" : "lib/Sisimai/Rhost/Outlook.pm"
       },
       "Sisimai::Rhost::Spectrum" : {
          "file" : "lib/Sisimai/Rhost/Spectrum.pm"
@@ -446,8 +419,8 @@
       "Sisimai::SMTP::Command" : {
          "file" : "lib/Sisimai/SMTP/Command.pm"
       },
-      "Sisimai::SMTP::Error" : {
-         "file" : "lib/Sisimai/SMTP/Error.pm"
+      "Sisimai::SMTP::Failure" : {
+         "file" : "lib/Sisimai/SMTP/Failure.pm"
       },
       "Sisimai::SMTP::Reply" : {
          "file" : "lib/Sisimai/SMTP/Reply.pm"
@@ -479,7 +452,7 @@
          "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v5.1.0",
+   "version" : "v5.2.0",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

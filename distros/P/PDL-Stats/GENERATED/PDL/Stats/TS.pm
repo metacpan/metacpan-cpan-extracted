@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 1 "lib/PDL/Stats/TS.pd"
+
+#line 6 "lib/PDL/Stats/TS.pd"
 
 =encoding utf8
 
@@ -32,28 +33,28 @@ PDL::Stats::TS -- basic time series functions
 
 =head1 DESCRIPTION
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are broadcastable and methods that are NOT broadcastable, respectively. Plots require L<PDL::Graphics::PGPLOT>.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to
+methods that are threadable and methods that are NOT threadable,
+respectively. Plots require L<PDL::Graphics::Simple>.
 
-***EXPERIMENTAL!*** In particular, bad value support is spotty and may be shaky. USE WITH DISCRETION! 
+***EXPERIMENTAL!*** In particular, bad value support is spotty and may be shaky. USE WITH DISCRETION!
 
 =head1 SYNOPSIS
 
     use PDL::LiteF;
-    use PDL::NiceSlice;
     use PDL::Stats::TS;
 
     my $r = $data->acf(5);
 
 =cut
 
+use strict;
+use warnings;
 use Carp;
 use PDL::LiteF;
-use PDL::NiceSlice;
 use PDL::Stats::Basic;
 use PDL::Stats::Kmeans;
-
-my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
-#line 57 "lib/PDL/Stats/TS.pm"
+#line 58 "lib/PDL/Stats/TS.pm"
 
 
 =head1 FUNCTIONS
@@ -69,7 +70,15 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 =for sig
 
-  Signature: (x(t); [o]r(h); IV lag=>h)
+ Signature: (x(t); [o]r(h); IV lag=>h)
+ Types: (float double)
+
+=for usage
+
+ $r = acf($x, $lag);
+ acf($x, $r, $lag);  # all arguments given
+ $r = $x->acf($lag); # method call
+ $x->acf($r, $lag);
 
 =for ref
 
@@ -77,20 +86,24 @@ Autocorrelation function for up to lag h. If h is not specified it's set to t-1 
 
 acf does not process bad values.
 
-=for usage
+=for example
 
 usage:
 
-    perldl> $a = sequence 10
+    pdl> $a = sequence 10
 
     # lags 0 .. 5
 
-    perldl> p $a->acf(5)
+    pdl> p $a->acf(5)
     [1 0.7 0.41212121 0.14848485 -0.078787879 -0.25757576]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-acf does not process bad values.
+C<acf> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -99,14 +112,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 74 "lib/PDL/Stats/TS.pd"
+#line 79 "lib/PDL/Stats/TS.pd"
 sub PDL::acf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
   PDL::_acf_int($self, my $r = PDL->null, $h+1);
   $r;
 }
-#line 110 "lib/PDL/Stats/TS.pm"
+#line 123 "lib/PDL/Stats/TS.pm"
 
 *acf = \&PDL::acf;
 
@@ -119,7 +132,15 @@ sub PDL::acf {
 
 =for sig
 
-  Signature: (x(t); [o]v(h); IV lag=>h)
+ Signature: (x(t); [o]v(h); IV lag=>h)
+ Types: (float double)
+
+=for usage
+
+ $v = acvf($x, $lag);
+ acvf($x, $v, $lag);  # all arguments given
+ $v = $x->acvf($lag); # method call
+ $x->acvf($v, $lag);
 
 =for ref
 
@@ -127,25 +148,29 @@ Autocovariance function for up to lag h. If h is not specified it's set to t-1 b
 
 acvf does not process bad values.
 
-=for usage
+=for example
 
 usage:
 
-    perldl> $a = sequence 10
+    pdl> $a = sequence 10
 
     # lags 0 .. 5
 
-    perldl> p $a->acvf(5)
+    pdl> p $a->acvf(5)
     [82.5 57.75 34 12.25 -6.5 -21.25]
 
     # autocorrelation
-    
-    perldl> p $a->acvf(5) / $a->acvf(0)
+
+    pdl> p $a->acvf(5) / $a->acvf(0)
     [1 0.7 0.41212121 0.14848485 -0.078787879 -0.25757576]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-acvf does not process bad values.
+C<acvf> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -154,14 +179,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 129 "lib/PDL/Stats/TS.pd"
+#line 134 "lib/PDL/Stats/TS.pd"
 sub PDL::acvf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
   PDL::_acvf_int($self, my $v = PDL->null, $h+1);
   $v;
 }
-#line 165 "lib/PDL/Stats/TS.pm"
+#line 190 "lib/PDL/Stats/TS.pm"
 
 *acvf = \&PDL::acvf;
 
@@ -174,15 +199,27 @@ sub PDL::acvf {
 
 =for sig
 
-  Signature: (x(t); indx d(); [o]xd(t))
+ Signature: (x(t); indx d(); [o]xd(t))
+ Types: (float double)
+
+=for usage
+
+ $xd = dseason($x, $d);
+ dseason($x, $d, $xd);  # all arguments given
+ $xd = $x->dseason($d); # method call
+ $x->dseason($d, $xd);
 
 =for ref
 
 Deseasonalize data using moving average filter the size of period d.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-dseason processes bad values.
+C<dseason> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -201,21 +238,31 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(t); indx q(); [o]xf(t))
+ Signature: (x(t); indx q(); [o]xf(t))
+ Types: (float double)
+
+=for usage
+
+ $xf = fill_ma($x, $q);
+ fill_ma($x, $q, $xf);  # all arguments given
+ $xf = $x->fill_ma($q); # method call
+ $x->fill_ma($q, $xf);
 
 =for ref
 
 Fill missing value with moving average. xf(t) = sum(x(t-q .. t-1, t+1 .. t+q)) / 2q.
 
+=for bad
+
 fill_ma does handle bad values. Output pdl bad flag is cleared unless the specified window size q is too small and there are still bad values.
 
-=for usage
+=pod
 
-  my $x_filled = $x->fill_ma( $q );
+Broadcasts over its inputs.
 
 =for bad
 
-fill_ma processes bad values.
+C<fill_ma> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -224,7 +271,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 252 "lib/PDL/Stats/TS.pd"
+#line 251 "lib/PDL/Stats/TS.pd"
 sub PDL::fill_ma {
   my ($x, $q) = @_;
   PDL::_fill_ma_int($x, $q, my $x_filled = PDL->null);
@@ -233,7 +280,7 @@ sub PDL::fill_ma {
 #    if $x_filled->badflag;
   return $x_filled;
 }
-#line 237 "lib/PDL/Stats/TS.pm"
+#line 284 "lib/PDL/Stats/TS.pm"
 
 *fill_ma = \&PDL::fill_ma;
 
@@ -246,15 +293,27 @@ sub PDL::fill_ma {
 
 =for sig
 
-  Signature: (x(t); a(); [o]xf(t))
+ Signature: (x(t); a(); [o]xf(t))
+ Types: (float double)
+
+=for usage
+
+ $xf = filter_exp($x, $a);
+ filter_exp($x, $a, $xf);  # all arguments given
+ $xf = $x->filter_exp($a); # method call
+ $x->filter_exp($a, $xf);
 
 =for ref
 
 Filter, exponential smoothing. xf(t) = a * x(t) + (1-a) * xf(t-1)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-filter_exp does not process bad values.
+C<filter_exp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -273,15 +332,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(t); indx q(); [o]xf(t))
+ Signature: (x(t); indx q(); [o]xf(t))
+ Types: (float double)
+
+=for usage
+
+ $xf = filter_ma($x, $q);
+ filter_ma($x, $q, $xf);  # all arguments given
+ $xf = $x->filter_ma($q); # method call
+ $x->filter_ma($q, $xf);
 
 =for ref
 
 Filter, moving average. xf(t) = sum(x(t-q .. t+q)) / (2q + 1)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-filter_ma does not process bad values.
+C<filter_ma> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -300,21 +371,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = mae($a, $b);
+ mae($a, $b, $c);  # all arguments given
+ $c = $a->mae($b); # method call
+ $a->mae($b, $c);
 
 =for ref
 
 Mean absolute error. MAE = 1/n * sum( abs(y - y_pred) )
 
-=for usage
+=pod
 
-Usage:
-
-    $mae = $y->mae( $y_pred );
+Broadcasts over its inputs.
 
 =for bad
 
-mae processes bad values.
+C<mae> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -333,21 +410,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = mape($a, $b);
+ mape($a, $b, $c);  # all arguments given
+ $c = $a->mape($b); # method call
+ $a->mape($b, $c);
 
 =for ref
 
 Mean absolute percent error. MAPE = 1/n * sum(abs((y - y_pred) / y))
 
-=for usage
+=pod
 
-Usage:
-
-    $mape = $y->mape( $y_pred );
+Broadcasts over its inputs.
 
 =for bad
 
-mape processes bad values.
+C<mape> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -366,21 +449,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = wmape($a, $b);
+ wmape($a, $b, $c);  # all arguments given
+ $c = $a->wmape($b); # method call
+ $a->wmape($b, $c);
 
 =for ref
 
 Weighted mean absolute percent error. avg(abs(error)) / avg(abs(data)). Much more robust compared to mape with division by zero error (cf. Schütz, W., & Kolassa, 2006).
 
-=for usage
+=pod
 
-Usage:
-
-    $wmape = $y->wmape( $y_pred );
+Broadcasts over its inputs.
 
 =for bad
 
-wmape processes bad values.
+C<wmape> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -399,34 +488,46 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (r(h); longlong t(); [o]Q())
+ Signature: (r(h); longlong t(); [o]Q())
+ Types: (float double)
+
+=for usage
+
+ $Q = portmanteau($r, $t);
+ portmanteau($r, $t, $Q);  # all arguments given
+ $Q = $r->portmanteau($t); # method call
+ $r->portmanteau($t, $Q);
 
 =for ref
 
 Portmanteau significance test (Ljung-Box) for autocorrelations.
 
-=for usage
+=for example
 
 Usage:
 
-    perldl> $a = sequence 10
+    pdl> $a = sequence 10
 
     # acf for lags 0-5
     # lag 0 excluded from portmanteau
-    
-    perldl> p $chisq = $a->acf(5)->portmanteau( $a->nelem )
+
+    pdl> p $chisq = $a->acf(5)->portmanteau( $a->nelem )
     11.1753902662994
-   
+
     # get p-value from chisq distr
 
-    perldl> use PDL::GSL::CDF
-    perldl> p 1 - gsl_cdf_chisq_P( $chisq, 5 )
+    pdl> use PDL::GSL::CDF
+    pdl> p 1 - gsl_cdf_chisq_P( $chisq, 5 )
     0.0480112934306748
   
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-portmanteau does not process bad values.
+C<portmanteau> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -445,7 +546,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(p); b(p); [o]pred(t); IV end=>t)
+ Signature: (x(p); b(p); [o]pred(t); IV end=>t)
+ Types: (float double)
+
+=for usage
+
+ $pred = pred_ar($x, $b, $end);
+ pred_ar($x, $b, $pred, $end);  # all arguments given
+ $pred = $x->pred_ar($b, $end); # method call
+ $x->pred_ar($b, $pred, $end);
 
 =for ref
 
@@ -457,25 +566,29 @@ pred_ar does not process bad values.
 
   CONST  => 1,
 
-=for usage
+=for example
 
 Usage:
 
-    perldl> $x = sequence 2
+    pdl> $x = sequence 2
 
       # last element is constant
-    perldl> $b = pdl(.8, -.2, .3)
+    pdl> $b = pdl(.8, -.2, .3)
 
-    perldl> p $x->pred_ar($b, 7)
+    pdl> p $x->pred_ar($b, 7)
     [0       1     1.1    0.74   0.492  0.3656 0.31408]
- 
+
       # no constant
-    perldl> p $x->pred_ar($b(0:1), 7, {const=>0})
+    pdl> p $x->pred_ar($b(0:1), 7, {const=>0})
     [0       1     0.8    0.44   0.192  0.0656 0.01408]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-pred_ar does not process bad values.
+C<pred_ar> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -484,25 +597,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 468 "lib/PDL/Stats/TS.pd"
+#line 425 "lib/PDL/Stats/TS.pd"
 sub PDL::pred_ar {
   my ($x, $b, $t, $opt) = @_;
   my %opt = ( CONST => 1 );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
   $b = PDL->topdl($b); # allows passing simple number
   my $ext;
   if ($opt{CONST}) {
     my $t_ = $t - ( $x->dim(0) - $b->dim(0) + 1 );
-    PDL::_pred_ar_int($x(-$b->dim(0)+1:-1, ), $b(0:-2), $ext = PDL->null, $t_);
-    $ext($b->dim(0)-1:-1) += $b(-1);
-    return $x->append( $ext( $b->dim(0)-1 : -1 ) );
+    PDL::_pred_ar_int($x->slice([-$b->dim(0)+1,-1]), $b->slice('0:-2'), $ext = PDL->null, $t_);
+    $ext->slice([$b->dim(0)-1,-1]) += $b->slice(-1);
+    return $x->append( $ext->slice([$b->dim(0)-1,-1]) );
   } else {
     my $t_ = $t - ( $x->dim(0) - $b->dim(0) );
-    PDL::_pred_ar_int($x(-$b->dim(0):-1, ), $b, $ext = PDL->null, $t_);
-    return $x->append($ext($b->dim(0) : -1));
+    PDL::_pred_ar_int($x->slice([-$b->dim(0),-1]), $b, $ext = PDL->null, $t_);
+    return $x->append($ext->slice([$b->dim(0),-1]));
   }
 }
-#line 506 "lib/PDL/Stats/TS.pm"
+#line 619 "lib/PDL/Stats/TS.pm"
 
 *pred_ar = \&PDL::pred_ar;
 
@@ -510,13 +623,14 @@ sub PDL::pred_ar {
 
 
 
-#line 515 "lib/PDL/Stats/TS.pd"
+#line 472 "lib/PDL/Stats/TS.pd"
 
-#line 516 "lib/PDL/Stats/TS.pd"
+#line 473 "lib/PDL/Stats/TS.pd"
 
 =head2 season_m
 
-Given length of season, returns seasonal mean and var for each period (returns seasonal mean only in scalar context).
+Given length of season, returns seasonal mean and variance for each period
+(returns seasonal mean only in scalar context).
 
 =for options
 
@@ -525,13 +639,9 @@ Default options (case insensitive):
     START_POSITION => 0,     # series starts at this position in season
     MISSING        => -999,  # internal mark for missing points in season
     PLOT  => 0,              # boolean
-      # see PDL::Graphics::PGPLOT::Window for next options
-    WIN   => undef,          # pass pgwin object for more plotting control
-    DEV   => '/xs',          # open and close dev for plotting if no WIN
-                             # defaults to '/png' in Windows
+     # see PDL::Graphics::Simple for next options
+    WIN   => undef,          # pass pgswin object for more plotting control
     COLOR => 1,
-
-See PDL::Graphics::PGPLOT for detailed graphing options.
 
 =for usage
 
@@ -546,14 +656,10 @@ sub PDL::season_m {
     START_POSITION => 0,     # series starts at this position in season
     MISSING        => -999,  # internal mark for missing points in season
     PLOT  => 0,
-    WIN   => undef,          # pass pgwin object for more plotting control
-    DEV   => $DEV,           # see PDL::Graphics::PGPLOT for more info
+    WIN   => undef,          # pass pgswin object for more plotting control
     COLOR => 1,
   );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  if ($opt{PLOT}) {
-    require PDL::Graphics::PGPLOT::Window;
-  }
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
 
   my $n_season = ($self->dim(0) + $opt{START_POSITION}) / $d;
   $n_season = pdl($n_season)->ceil->sum->sclr;
@@ -562,7 +668,7 @@ sub PDL::season_m {
   $dims[0] = $n_season * $d;
   my $data = zeroes( @dims ) + $opt{MISSING};
 
-  $data($opt{START_POSITION} : $opt{START_POSITION} + $self->dim(0)-1, ) .= $self;
+  $data->slice([$opt{START_POSITION},$opt{START_POSITION} + $self->dim(0)-1]) .= $self;
   $data->badflag(1);
   $data->inplace->setvaltobad( $opt{MISSING} );
 
@@ -573,20 +679,15 @@ sub PDL::season_m {
   my ($m, $ms) = $data->centroid( $s );
 
   if ($opt{PLOT}) {
-    my $w = $opt{WIN};
-    if (!$w) {
-      $w = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
-      $w->env( 0, $d-1, $m->minmax,
-              {XTitle=>'period', YTitle=>'mean'} );
-    }
-    $w->points( sequence($d), $m, {COLOR=>$opt{COLOR}, PLOTLINE=>1} );
-
-    if ($m->squeeze->ndims < 2) {
-      $w->errb( sequence($d), $m, sqrt( $ms / $s->sumover ),
-               {COLOR=>$opt{COLOR}} );
-    }
-    $w->close
-      unless $opt{WIN};
+    require PDL::Graphics::Simple;
+    my $w = $opt{WIN} || PDL::Graphics::Simple::pgswin();
+    my $seq = sequence($d);
+    my $errb_length = sqrt( $ms / $s->sumover )->squeeze;
+    my $col = $opt{COLOR};
+    my @plots = map +(with=>'lines', ke=>"Data $col", style=>$col++, $seq, $_), $m->dog;
+    push @plots, with=>'errorbars', ke=>'Error', style=>$opt{COLOR}, $seq, $m->squeeze, $errb_length
+      if $m->squeeze->ndims < 2 && ($errb_length > 0)->any;
+    $w->plot(@plots, { xlabel=>'period', ylabel=>'mean' });
   }
 
   return wantarray? ($m, $ms) : $m;
@@ -596,65 +697,39 @@ sub PDL::season_m {
 
 =for ref
 
-Plots deseasonalized data and original data points. Opens and closes default window for plotting unless a pgwin object is passed in options. Returns deseasonalized data. 
+Plots deseasonalized data and original data points. Opens and closes
+default window for plotting unless a C<WIN> object is passed in
+options. Returns deseasonalized data.
 
 =for options
 
 Default options (case insensitive):
 
     WIN   => undef,
-    DEV   => '/xs',    # open and close dev for plotting if no WIN
-                       # defaults to '/png' in Windows
     COLOR => 1,        # data point color
-
-See PDL::Graphics::PGPLOT for detailed graphing options.
 
 =cut
 
 *plot_dseason = \&PDL::plot_dseason;
 sub PDL::plot_dseason {
-  require PDL::Graphics::PGPLOT::Window;
+  require PDL::Graphics::Simple;
   my ($self, $d, $opt) = @_;
   !defined($d) and croak "please set season period length";
   $self = $self->squeeze;
-
-  my $dsea;
   my %opt = (
       WIN   => undef,
-      DEV   => $DEV,
       COLOR => 1,       # data point color
   );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-
-  $dsea = $self->dseason($d);
-
-  my $w = $opt{WIN};
-  if (!$opt{WIN}) {
-    $w = PDL::Graphics::PGPLOT::Window::pgwin( $opt{DEV} );
-    $w->env( 0, $self->dim(0)-1, $self->minmax,
-          {XTitle=>'T', YTitle=>'DV'} );
-  }
-
-  my $missn = ushort $self->max->sclr + 1;   # ushort in case precision issue
-  $w->line( sequence($self->dim(0)), $dsea->setbadtoval( $missn ),
-           {COLOR=>$opt{COLOR}+1, MISSING=>$missn} );
-  $w->points( sequence($self->dim(0)), $self, {COLOR=>$opt{COLOR}} );
-  $w->close
-    unless $opt{WIN};
-
-  return $dsea; 
-}
-
-*filt_exp = \&PDL::filt_exp;
-sub PDL::filt_exp {
-  print STDERR "filt_exp() deprecated since version 0.5.0. Please use filter_exp() instead\n";
-  return filter_exp( @_ );
-}
-
-*filt_ma = \&PDL::filt_ma;
-sub PDL::filt_ma {
-  print STDERR "filt_ma() deprecated since version 0.5.0. Please use filter_ma() instead\n";
-  return filter_ma( @_ );
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
+  my $dsea = $self->dseason($d);
+  my $w = $opt{WIN} || PDL::Graphics::Simple::pgswin();
+  my $seq = sequence($self->dim(0));
+  my $col = $opt{COLOR};
+  my @plots = map +(with=>'lines', ke=>"Data $col", style=>$col++, $seq, $_), $dsea->dog;
+  $col = $opt{COLOR};
+  push @plots, map +(with=>'points', ke=>"De-seasonalised $col", style=>$col++, $seq, $_), $self->dog;
+  $w->plot(@plots, { xlabel=>'T', ylabel=>'DV' });
+  return $dsea;
 }
 
 =head1 METHODS
@@ -670,38 +745,30 @@ Plots and returns autocorrelations for a time series.
 Default options (case insensitive):
 
     SIG  => 0.05,      # can specify .10, .05, .01, or .001
-    DEV  => '/xs',     # open and close dev for plotting
-                       # defaults to '/png' in Windows
+    WIN  => undef,
 
 =for usage
 
 Usage:
 
-    perldl> $a = sequence 10
-    
-    perldl> p $r = $a->plot_acf(5)
+    pdl> $a = sequence 10
+
+    pdl> p $r = $a->plot_acf(5)
     [1 0.7 0.41212121 0.14848485 -0.078787879 -0.25757576]
 
 =cut
 
 *plot_acf = \&PDL::plot_acf;
 sub PDL::plot_acf {
-  require PDL::Graphics::PGPLOT::Window;
-  my $opt = pop @_
-    if ref $_[-1] eq 'HASH';
+  require PDL::Graphics::Simple;
+  my $opt = ref($_[-1]) eq 'HASH' ? pop @_ : undef;
   my ($self, $h) = @_;
   my $r = $self->acf($h);
-    
   my %opt = (
-      SIG => 0.05,
-      DEV => $DEV,
+    SIG => 0.05,
+    WIN  => undef,
   );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-
-  my $w = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
-  $w->env(-1, $h+1, -1.05, 1.05, {XTitle=>'lag', YTitle=>'acf'});
-  $w->line(pdl(-1,$h+1), zeroes(2));   # x axis
-
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
   my $y_sig = ($opt{SIG} == 0.10)?   1.64485362695147
             : ($opt{SIG} == 0.05)?   1.95996398454005
             : ($opt{SIG} == 0.01)?   2.5758293035489
@@ -712,17 +779,16 @@ sub PDL::plot_acf {
     carp "SIG outside of recognized value. default to 0.05";
     $y_sig = 1.95996398454005;
   }
-
-  $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)),
-            { LINESTYLE=>"Dashed" } );
-  $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)) * -1,
-            { LINESTYLE=>"Dashed" } );
-  for my $lag (0..$h) {
-    $w->line( ones(2)*$lag, pdl(0, $r($lag)) );
-  }
-  $w->close;
-
-  return $r;
+  my $w = $opt{WIN} || PDL::Graphics::Simple::pgswin();
+  my $seq = pdl(-1,$h+1);
+  my $y_seq = ones(2) * $y_sig / sqrt($self->dim(0)) * -1;
+  $w->plot(
+    with=>'lines', $seq, zeroes(2), # x axis
+    with=>'lines', style=>2, $seq,  $y_seq,
+    with=>'lines', style=>2, $seq, -$y_seq,
+    (map +(with=>'lines', ones(2)*$_, pdl(0, $r->slice("($_)"))), 0..$h), { xlabel=>'lag', ylabel=>'acf', }
+  );
+  $r;
 }
 
 =head1 	REFERENCES
@@ -738,7 +804,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 742 "lib/PDL/Stats/TS.pm"
+#line 808 "lib/PDL/Stats/TS.pm"
 
 # Exit with OK status
 

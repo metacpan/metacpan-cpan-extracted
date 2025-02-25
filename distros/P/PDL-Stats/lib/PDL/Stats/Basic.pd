@@ -1,10 +1,16 @@
-pp_add_exported('', 'binomial_test', 'rtable', 'which_id', 
-);
+use strict;
+use warnings;
+
+my $F = [qw(F D)];
+
+pp_add_exported(qw(binomial_test rtable which_id code_ivs
+));
 
 pp_addpm({At=>'Top'}, <<'EOD');
 
+use strict;
+use warnings;
 use PDL::LiteF;
-use PDL::NiceSlice;
 use Carp;
 
 eval { require PDL::Core; require PDL::GSL::CDF; };
@@ -16,21 +22,20 @@ PDL::Stats::Basic -- basic statistics and related utilities such as standard dev
 
 =head1 DESCRIPTION
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are broadcastable and methods that are NOT broadcastable, respectively.
 
 Does not have mean or median function here. see SEE ALSO.
 
 =head1 SYNOPSIS
 
     use PDL::LiteF;
-    use PDL::NiceSlice;
     use PDL::Stats::Basic;
 
     my $stdv = $data->stdv;
 
 or
 
-    my $stdv = stdv( $data );  
+    my $stdv = stdv( $data );
 
 =cut
 
@@ -38,343 +43,245 @@ EOD
 
 pp_addhdr('
 #include <math.h>
-
 '
 );
 
 pp_def('stdv',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, a2 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     if (N < 1) { $SETBAD(b()); continue; }
-    $b() = sqrt( a2 / N - pow(sa/N,2) );
+    $b() = sqrt( (a2 - sa*sa/N) / N );
   ',
-  Doc      => '
-
-=for ref
-
-Sample standard deviation.
-
-=cut
-  ',
-
+  Doc      => 'Sample standard deviation.',
 );
 
 pp_def('stdv_unbiased',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, a2 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     if (N < 2) { $SETBAD(b()); continue; }
-    $b() = pow( a2/(N-1) - pow(sa/N,2) * N/(N-1), .5 );
+    $b() = pow( (a2 - sa*sa/N) / (N-1), .5 );
   ',
-  Doc      => '
-
-=for ref
-
-Unbiased estimate of population standard deviation.
-
-=cut
-  ',
-
+  Doc      => 'Unbiased estimate of population standard deviation.',
 );
 
 pp_def('var',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) a2 = 0, sa = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
-      a2 += pow($a(), 2);
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     if (N < 1) { $SETBAD(b()); continue; }
-    $b() = a2 / N - pow(sa/N, 2);
+    $b() = (a2 - sa*sa/N) / N;
   ',
-  Doc      => '
-
-=for ref
-
-Sample variance.
-
-=cut
-  ',
-
+  Doc      => 'Sample variance.',
 );
 
 pp_def('var_unbiased',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) a2 = 0, sa = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
-      a2 += pow($a(), 2);
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
+      a2 += $a() * $a();
       sa += $a();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 2) { $SETBAD(b()); continue; }
-    $b() = (a2 - pow(sa/N, 2) * N) / (N-1);
+    $b() = (a2 - sa*sa/N) / (N-1);
   ',
-  Doc      => '
-
-=for ref
-
-Unbiased estimate of population variance.
-
-=cut
-  ',
-
+  Doc      => 'Unbiased estimate of population variance.',
 );
 
 pp_def('se',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, a2 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     if (N < 2) { $SETBAD(b()); continue; }
-    $b() = sqrt( (a2/(N-1) - pow(sa/N,2) * N/(N-1)) / N );
+    $b() = sqrt( (a2 - sa*sa/N) / (N*(N-1)) );
   ',
   Doc      => '
-
 =for ref
 
 Standard error of the mean. Useful for calculating confidence intervals.
 
-=for usage
+=for example
 
     # 95% confidence interval for samples with large N
-
     $ci_95_upper = $data->average + 1.96 * $data->se;
     $ci_95_lower = $data->average - 1.96 * $data->se;
-
-=cut
-
   ',
-
 );
 
 pp_def('ss',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, a2 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     if (N < 1) { $SETBAD(b()); continue; }
-    $b() = a2 - N * pow(sa/N,2);
+    $b() = a2 - sa*sa/N;
   ',
-  Doc      => '
-
-=for ref
-
-Sum of squared deviations from the mean.
-
-=cut
-  ',
-
+  Doc      => 'Sum of squared deviations from the mean.',
 );
 
 pp_def('skew',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d3 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 1) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
       if ( $ISGOOD($a()) ) {
         d   = $a() - m;
-        d2 += pow(d, 2);
-        d3 += pow(d, 3);
+        d2 += d*d;
+        d3 += d*d*d;
       }
     %}
     $b() = d3/N / pow(d2/N, 1.5);
   ',
-  Doc      => '
-
-=for ref
-
-Sample skewness, measure of asymmetry in data. skewness == 0 for normal distribution.
-
-=cut
-  ',
-
+  Doc      => 'Sample skewness, measure of asymmetry in data. skewness == 0 for normal distribution.',
 );
 
 pp_def('skew_unbiased',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d3 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 3) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
       PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
-      d2 += pow(d, 2);
-      d3 += pow(d, 3);
+      d2 += d*d;
+      d3 += d*d*d;
     %}
     $b() = sqrt(N*(N-1)) / (N-2) * d3/N / pow(d2/N, 1.5);
   ',
-  Doc      => '
-
-=for ref
-
-Unbiased estimate of population skewness. This is the number in GNumeric Descriptive Statistics.
-
-=cut
-  ',
-
+  Doc      => 'Unbiased estimate of population skewness. This is the number in GNumeric Descriptive Statistics.',
 );
 
 pp_def('kurt',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d4 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 1) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
       PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
-      d2 += pow(d, 2);
-      d4 += pow(d, 4);
+      d2 += d*d;
+      d4 += d*d*d*d;
     %}
-    $b() = N * d4 / pow(d2,2) - 3;
+    $b() = N * d4 / (d2*d2) - 3;
   ',
-  Doc      => '
-
-=for ref
-
-Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distribution. 
-
-=cut
-  ',
-
+  Doc      => 'Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distribution.',
 );
 
 pp_def('kurt_unbiased',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); [o]b()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d4 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 4) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
       PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
-      d2 += pow(d, 2);
-      d4 += pow(d, 4);
+      d2 += d*d;
+      d4 += d*d*d*d;
     %}
-    $b() = ((N-1)*N*(N+1) * d4 / pow(d2,2) - 3 * pow(N-1,2)) / ((N-2)*(N-3));
+    $b() = ((N-1)*N*(N+1) * d4 / (d2*d2) - 3 * (N-1)*(N-1)) / ((N-2)*(N-3));
   ',
-  Doc      => '
-
-=for ref
-
-Unbiased estimate of population kurtosis. This is the number in GNumeric Descriptive Statistics.
-
-=cut
-  ',
-
+  Doc      => 'Unbiased estimate of population kurtosis. This is the number in GNumeric Descriptive Statistics.',
 );
 
 pp_def('cov',
-  Pars      => 'a(n); b(n); float+ [o]c()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(n); [o]c()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
     $GENERIC(c) ab = 0, sa = 0, sb = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue; N++;,)
       ab += $a() * $b();
       sa += $a();
       sb += $b();
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 1) { $SETBAD(c()); continue; }
-    $c() = ab / N - (sa/N) * (sb/N);
+    $c() = (ab - sa*sb/N) / N;
   ',
-  Doc      => '
-
-=for ref
-
-Sample covariance. see B<corr> for ways to call
-
-=cut
-  ',
-
+  Doc      => 'Sample covariance. see B<corr> for ways to call',
 );
 
 pp_def('cov_table',
-  Pars      => 'a(n,m); float+ [o]c(m,m)',
+  Pars      => 'a(n,m); [o]c(m,m)',
   HandleBad => 1,
   RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
   Code  => '
@@ -385,11 +292,10 @@ for (i=0; i<M; i++) {
     $GENERIC(c) ab = 0, sa = 0, sb = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue; N++;,)
       sa += a_ = $a(m=>i);
       sb += b_ = $a(m=>j);
       ab += a_ * b_;
-      PDL_IF_BAD(N++;,)
     %}
     if (N < 2) {
       $SETBAD($c(m0=>i, m1=>j));
@@ -405,17 +311,17 @@ for (i=0; i<M; i++) {
   Doc      => '
 =for ref
 
-Square covariance table. Gives the same result as threading using B<cov> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
+Square covariance table. Gives the same result as broadcasting using B<cov> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
 
-=for usage
+=for example
 
 Usage:
 
     # 5 obs x 3 var, 2 such data tables
 
-    perldl> $a = random 5, 3, 2
+    pdl> $a = random 5, 3, 2
 
-    perldl> p $cov = $a->cov_table
+    pdl> p $cov = $a->cov_table
     [
      [
       [ 8.9636438 -1.8624472 -1.2416588]
@@ -429,7 +335,7 @@ Usage:
      ]
     ]
     # diagonal elements of the cov table are the variances
-    perldl> p $a->var
+    pdl> p $a->var
     [
      [ 8.9636438  14.341514  9.8690655]
      [  10.32644  15.051779  5.4465141]
@@ -437,17 +343,14 @@ Usage:
 
 for the same cov matrix table using B<cov>,
 
-    perldl> p $a->dummy(2)->cov($a->dummy(1)) 
-
-=cut
-
+    pdl> p $a->dummy(2)->cov($a->dummy(1))
   ',
 
 );
 
 pp_def('corr',
-  Pars      => 'a(n); b(n); float+ [o]c()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(n); [o]c()',
+  GenericTypes => $F,
   HandleBad => 1,
   RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
   Code  => '
@@ -455,18 +358,17 @@ pp_def('corr',
     ab=0; sa=0; sb=0; a2=0; b2=0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue; N++;,)
       ab += $a() * $b();
       sa += $a();
       sb += $b();
-      a2 += pow($a(), 2);
-      b2 += pow($b(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
+      b2 += $b() * $b();
     %}
     if (N < 2) { $SETBAD(c()); continue; }
     cov = ab - (sa * sb) / N;
-    va  = a2 - pow(sa,2) / N;
-    vb  = b2 - pow(sb,2) / N;
+    va  = a2 - sa*sa / N;
+    vb  = b2 - sb*sb / N;
     $c() = cov / sqrt( va * vb );
   ',
   Doc      => '
@@ -474,19 +376,19 @@ pp_def('corr',
 
 Pearson correlation coefficient. r = cov(X,Y) / (stdv(X) * stdv(Y)).
 
-=for usage 
+=for example
 
 Usage:
 
-    perldl> $a = random 5, 3
-    perldl> $b = sequence 5,3
-    perldl> p $a->corr($b)
+    pdl> $a = random 5, 3
+    pdl> $b = sequence 5,3
+    pdl> p $a->corr($b)
 
     [0.20934208 0.30949881 0.26713007]
 
 for square corr table
 
-    perldl> p $a->corr($a->dummy(1))
+    pdl> p $a->corr($a->dummy(1))
 
     [
      [           1  -0.41995259 -0.029301192]
@@ -495,14 +397,11 @@ for square corr table
     ]
 
 but it is easier and faster to use B<corr_table>.
-
-=cut
   ',
-
 );
 
 pp_def('corr_table',
-  Pars      => 'a(n,m); float+ [o]c(m,m)',
+  Pars      => 'a(n,m); [o]c(m,m)',
   HandleBad => 1,
   RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
   Code  => '
@@ -514,13 +413,12 @@ for (i=0; i<M; i++) {
     ab=0; sa=0; sb=0; a2=0; b2=0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue; N++;,)
       sa += a_ = $a(m=>i);
       sb += b_ = $a(m=>j);
       ab += a_ * b_;
-      a2 += pow(a_, 2);
-      b2 += pow(b_, 2);
-      PDL_IF_BAD(N++;,)
+      a2 += a_ * a_;
+      b2 += b_ * b_;
     %}
     if (N < 2) {
       $SETBAD($c(m0=>i, m1=>j));
@@ -528,8 +426,8 @@ for (i=0; i<M; i++) {
       continue;
     }
     cov = ab - (sa * sb) / N;
-    va  = a2 - pow(sa,2) / N;
-    vb  = b2 - pow(sb,2) / N;
+    va  = a2 - sa*sa / N;
+    vb  = b2 - sb*sb / N;
     r   = cov / sqrt( va * vb );
     $c(m0=>i, m1=>j) =
     $c(m0=>j, m1=>i) = r;
@@ -548,17 +446,17 @@ for (i=0; i<M; i++) {
   Doc      => '
 =for ref
 
-Square Pearson correlation table. Gives the same result as threading using B<corr> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
+Square Pearson correlation table. Gives the same result as broadcasting using B<corr> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
 
-=for usage
+=for example
 
 Usage:
 
     # 5 obs x 3 var, 2 such data tables
- 
-    perldl> $a = random 5, 3, 2
-    
-    perldl> p $a->corr_table
+
+    pdl> $a = random 5, 3, 2
+
+    pdl> p $a->corr_table
     [
      [
      [          1 -0.69835951 -0.18549048]
@@ -574,29 +472,29 @@ Usage:
 
 for the same result using B<corr>,
 
-    perldl> p $a->dummy(2)->corr($a->dummy(1)) 
+    pdl> p $a->dummy(2)->corr($a->dummy(1))
 
 This is also how to use B<t_corr> and B<n_pair> with such a table.
-
-=cut
-
   ',
-
 );
 
 pp_def('t_corr',
   Pars      => 'r(); n(); [o]t()',
-  GenericTypes => [F, D],
+  GenericTypes => $F,
   HandleBad => 1,
   Code   => '
     PDL_IF_BAD(
     if ($ISBAD(r()) || $ISBAD(n()) ) { $SETBAD( $t() ); continue; }
     if ($n() <= 2) { $SETBAD(t()); continue; }
     ,)
-    $t() = $r() / pow( (1 - pow($r(), 2)) / ($n() - 2) , .5);
+    $t() = $r() / pow( (1 - $r()*$r()) / ($n() - 2) , .5);
   ',
   Doc       => '
-=for usage
+=for ref
+
+t significance test for Pearson correlations.
+
+=for example
 
     $corr   = $data->corr( $data->dummy(1) );
     $n      = $data->n_pair( $data->dummy(1) );
@@ -605,14 +503,7 @@ pp_def('t_corr',
     use PDL::GSL::CDF;
 
     $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t_corr->abs, $n-2 ));
-
-=for ref
-
-t significance test for Pearson correlations.
-
-=cut
   ',
-
 );
 
 pp_def('n_pair',
@@ -627,20 +518,12 @@ pp_def('n_pair',
     %},)
     $c() = N;
   ',
-  Doc       => '
-
-=for ref
-
-Returns the number of good pairs between 2 lists. Useful with B<corr> (esp. when bad values are involved)
-
-=cut
-  ',
-
+  Doc       => 'Returns the number of good pairs between 2 lists. Useful with B<corr> (esp. when bad values are involved)',
 );
 
 pp_def('corr_dev',
-  Pars      => 'a(n); b(n); float+ [o]c()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(n); [o]c()',
+  GenericTypes => $F,
   HandleBad => 1,
   RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
   Code   => '
@@ -648,11 +531,10 @@ pp_def('corr_dev',
     ab = 0; a2 = 0; b2 = 0;
     PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue; N++;,)
       ab += $a() * $b();
-      a2 += pow($a(), 2);
-      b2 += pow($b(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
+      b2 += $b() * $b();
     %}
     if (N < 2) { $SETBAD(c()); continue; }
     cov = ab / N;
@@ -660,22 +542,12 @@ pp_def('corr_dev',
     vb  = b2 / N;
     $c() = cov / sqrt( va * vb );
   ',
-  Doc       => '
-=for usage
-
-    $corr = $a->dev_m->corr_dev($b->dev_m);
-
-=for ref
-
-Calculates correlations from B<dev_m> vals. Seems faster than doing B<corr> from original vals when data pdl is big
-
-=cut
-  ',
+  Doc       => 'Calculates correlations from B<dev_m> vals. Seems faster than doing B<corr> from original vals when data pdl is big',
 );
 
 pp_def('t_test',
-  Pars      => 'a(n); b(m); float+ [o]t(); [o]d()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(m); [o]t(); [o]d()',
+  GenericTypes => $F,
   HandleBad => 1,
   RedoDimsCode => '
     if ($SIZE(n) < 2) $CROAK("too few N");
@@ -684,15 +556,14 @@ pp_def('t_test',
   Code   => '
     $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), M = PDL_IF_BAD(0,$SIZE(m)), sa = 0, sb = 0, a2 = 0, b2 = 0;
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     loop (m) %{
       PDL_IF_BAD(if ($ISBAD($b())) continue;,)
       sb += $b();
-      b2 += pow($b(), 2);
+      b2 += $b() * $b();
       PDL_IF_BAD(M++;,)
     %}
     if (N < 2 || M < 2) {
@@ -701,32 +572,27 @@ pp_def('t_test',
       continue;
     }
     $d() = N + M - 2;
-    $GENERIC(t) va = (a2 - pow(sa/N, 2) * N) / (N-1);
-    $GENERIC(t) vb = (b2 - pow(sb/M, 2) * M) / (M-1);
+    $GENERIC(t) va = (a2 - sa*sa/N) / (N-1);
+    $GENERIC(t) vb = (b2 - sb*sb/M) / (M-1);
     $GENERIC(t) sdiff = sqrt( (1/N + 1/M) * ((N-1)*va + (M-1)*vb) / $d() );
     $t() = (sa/N - sb/M) / sdiff;
   ',
   Doc       => '
-
-=for usage
-
-    my ($t, $df) = t_test( $pdl1, $pdl2 );
-
-    use PDL::GSL::CDF;
-
-    my $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t->abs, $df ));
-
 =for ref
 
 Independent sample t-test, assuming equal var.
 
-=cut
+=for example
+
+    my ($t, $df) = t_test( $pdl1, $pdl2 );
+    use PDL::GSL::CDF;
+    my $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t->abs, $df ));
   ',
 );
 
 pp_def('t_test_nev',
-  Pars      => 'a(n); b(m); float+ [o]t(); [o]d()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(m); [o]t(); [o]d()',
+  GenericTypes => $F,
   HandleBad => 1,
   RedoDimsCode => '
     if ($SIZE(n) < 2) $CROAK("too few N");
@@ -735,57 +601,43 @@ pp_def('t_test_nev',
   Code   => '
     $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), M = PDL_IF_BAD(0,$SIZE(m)), sa = 0, sb = 0, a2 = 0, b2 = 0;
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a())) continue; N++;,)
       sa += $a();
-      a2 += pow($a(), 2);
-      PDL_IF_BAD(N++;,)
+      a2 += $a() * $a();
     %}
     loop (m) %{
-      PDL_IF_BAD(if ($ISBAD($b())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($b())) continue; M++;,)
       sb += $b();
-      b2 += pow($b(), 2);
-      PDL_IF_BAD(M++;,)
+      b2 += $b() * $b();
     %}
     if (N < 2 || M < 2) {
       $SETBAD($t());
       $SETBAD($d());
       continue;
     }
-    $GENERIC(t) se_a_2 = (a2 - pow(sa/N,2)*N) / (N*(N-1));
-    $GENERIC(t) se_b_2 = (b2 - pow(sb/M,2)*M) / (M*(M-1));
+    $GENERIC(t) se_a_2 = (a2 - sa*sa/N) / (N*(N-1));
+    $GENERIC(t) se_b_2 = (b2 - sb*sb/M) / (M*(M-1));
     $GENERIC(t) sdiff = sqrt( se_a_2 + se_b_2 );
     $t() = (sa/N - sb/M) / sdiff;
-    $d() = pow(se_a_2 + se_b_2, 2)
-         / ( pow(se_a_2,2) / (N-1) + pow(se_b_2,2) / (M-1) )
+    $d() = (se_a_2 + se_b_2)*(se_a_2 + se_b_2)
+         / ( se_a_2*se_a_2 / (N-1) + se_b_2*se_b_2 / (M-1) )
          ;
 ',
-  Doc       => '
-
-=for ref
-
-Independent sample t-test, NOT assuming equal var. ie Welch two sample t test. Df follows Welch-Satterthwaite equation instead of Satterthwaite (1946, as cited by Hays, 1994, 5th ed.). It matches GNumeric, which matches R.
-
-=for usage
-
-    my ($t, $df) = $pdl1->t_test( $pdl2 );
-
-=cut
-  ',
+  Doc       => 'Independent sample t-test, NOT assuming equal var. ie Welch two sample t test. Df follows Welch-Satterthwaite equation instead of Satterthwaite (1946, as cited by Hays, 1994, 5th ed.). It matches GNumeric, which matches R.',
 );
 
 pp_def('t_test_paired',
-  Pars      => 'a(n); b(n); float+ [o]t(); [o]d()',
-  GenericTypes => [F, D],
+  Pars      => 'a(n); b(n); [o]t(); [o]d()',
+  GenericTypes => $F,
   HandleBad => 1,
   RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
   Code   => '
     $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), s_dif = 0, diff2 = 0;
     loop (n) %{
-      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue; N++;,)
       $GENERIC(t) diff = $a() - $b();
       s_dif += diff;
-      diff2 += pow(diff, 2);
-      PDL_IF_BAD(N++;,)
+      diff2 += diff*diff;
     %}
     if (N < 2) {
       $SETBAD($t());
@@ -793,15 +645,9 @@ pp_def('t_test_paired',
       continue;
     }
     $d() = N - 1;
-    $t() = s_dif / sqrt( N * ( diff2 - pow(s_dif/N,2)*N ) / (N-1) );
+    $t() = s_dif / sqrt( ( N*diff2 - s_dif*s_dif ) / (N-1) );
   ',
-  Doc       => '
-=for ref
-
-Paired sample t-test.
-
-=cut
-  ',
+  Doc       => 'Paired sample t-test.',
 );
 
 pp_addpm pp_line_numbers(__LINE__, <<'EOD');
@@ -818,7 +664,7 @@ Binomial test. One-tailed significance test for two-outcome distribution. Given 
 
 This function does NOT currently support bad value in the number of successes.
 
-=for usage
+=for example
 
 Usage:
 
@@ -882,7 +728,7 @@ Sample file diet.txt:
     bcm	68	268	1
     clq	67	180	2
     dwm	70	200	2
-  
+
     ($data, $idv, $ido) = rtable 'diet.txt';
 
     # By default prints out data info and @$idv index and element
@@ -916,9 +762,9 @@ sub rtable {
               MISSN   => -999,
               NROW    => '',
             );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  $opt{V} and print STDERR "reading $src for data and id... ";
-  
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
+  $opt{V} and print "reading $src for data and id... ";
+
   local $PDL::undefval = $opt{MISSN};
 
   my $id_c = [];     # match declaration of $id_r for return purpose
@@ -935,8 +781,8 @@ sub rtable {
     my @entries = split /$opt{SEP}/, $_, -1;
 
     $opt{R_ID} and push @$id_r, shift @entries;
-  
-      # rudimentary check for numeric entry 
+
+      # rudimentary check for numeric entry
     for (@entries) { $_ = $opt{MISSN} unless defined $_ and m/\d\b/ }
 
     push @data, pdl( $opt{TYPE}, \@entries );
@@ -945,13 +791,13 @@ sub rtable {
       if $opt{NROW} and $c_row == $opt{NROW};
   }
   # not explicitly closing $fh_in here in case it's passed from outside
-  # $fh_in will close by going out of scope if opened here. 
+  # $fh_in will close by going out of scope if opened here.
 
   $data = pdl $opt{TYPE}, @data;
   @data = ();
     # rid of last col unless there is data there
-  $data = $data(0:$data->getdim(0)-2, )->sever
-    unless ( nelem $data(-1, )->where($data(-1, ) != $opt{MISSN}) ); 
+  $data = $data->slice([0, $data->getdim(0)-2])->sever
+    unless ( nelem $data->slice(-1)->where($data->slice(-1) != $opt{MISSN}) );
 
   my ($idv, $ido) = ($id_r, $id_c);
     # var in columns instead of rows
@@ -959,10 +805,10 @@ sub rtable {
     and ($data, $idv, $ido) = ($data->inplace->transpose, $id_c, $id_r);
 
   if ($opt{V}) {
-    print STDERR "OK.\ndata table as PDL dim o x v: " . $data->info . "\n";
-    $idv and print STDERR "$_\t$$idv[$_]\n" for (0..$#$idv);
+    print "OK.\ndata table as PDL dim o x v: " . $data->info . "\n";
+    $idv and print "$_\t$$idv[$_]\n" for 0..$#$idv;
   }
- 
+
   $data = $data->setvaltobad( $opt{MISSN} );
   $data->check_badflag;
   return wantarray? (@$idv? ($data, $idv, $ido) : ($data, $ido)) : $data;
@@ -970,7 +816,7 @@ sub rtable {
 
 =head2 group_by
 
-Returns pdl reshaped according to the specified factor variable. Most useful when used in conjunction with other threading calculations such as average, stdv, etc. When the factor variable contains unequal number of cases in each level, the returned pdl is padded with bad values to fit the level with the most number of cases. This allows the subsequent calculation (average, stdv, etc) to return the correct results for each level.
+Returns pdl reshaped according to the specified factor variable. Most useful when used in conjunction with other broadcasting calculations such as average, stdv, etc. When the factor variable contains unequal number of cases in each level, the returned pdl is padded with bad values to fit the level with the most number of cases. This allows the subsequent calculation (average, stdv, etc) to return the correct results for each level.
 
 Usage:
 
@@ -985,7 +831,7 @@ Usage:
 	pdl> p $a->group_by( $factor )->average
 	[2 7]
 
-    # more complex case with threading and unequal number of n across levels in the factor
+    # more complex case with broadcasting and unequal number of n across levels in the factor
 
 	pdl> p $a = sequence 10,2
 	[
@@ -1064,7 +910,7 @@ sub PDL::group_by {
         my $label;
         if (ref $factor eq 'ARRAY') {
             $label  = _ordered_uniq($factor);
-            $factor = _array_to_pdl($factor);
+            $factor = code_ivs($factor);
         } else {
             my $perl_factor = [$factor->list];
             $label  = _ordered_uniq($perl_factor);
@@ -1087,7 +933,7 @@ sub PDL::group_by {
     my %seen;
     my @uniq_cells = grep {! $seen{$_}++ } @cells;
 
-    my $flat_factor = _array_to_pdl( \@cells );
+    my $flat_factor = code_ivs( \@cells );
 
     my $p_reshaped = _group_by_single_factor( $p, $flat_factor );
 
@@ -1138,9 +984,9 @@ sub _group_by_single_factor {
     die "Data pdl and factor pdl do not match!"
         unless $factor->dim(0) == $p->dim(0);
 
-    # get active dim that will be split according to factor and dims to thread over
-	my @p_threaddims = $p->dims;
-	my $p_dim0 = shift @p_threaddims;
+    # get active dim that will be split according to factor and dims to broadcast over
+	my @p_broadcastdims = $p->dims;
+	my $p_dim0 = shift @p_broadcastdims;
 
     my $uniq = $factor->uniq;
 
@@ -1154,10 +1000,10 @@ sub _group_by_single_factor {
 	my $max = pdl(\@uniq_ns)->max->sclr;
 
     my $badvalue = int($p->max + 1);
-    my $p_tmp = ones($max, @p_threaddims, $uniq->nelem) * $badvalue;
+    my $p_tmp = ones($max, @p_broadcastdims, $uniq->nelem) * $badvalue;
     for (0 .. $#uniq_ns) {
-        my $i = which $factor == $uniq($_);
-        $p_tmp->dice_axis(-1,$_)->squeeze->(0:$uniq_ns[$_]-1, ) .= $p($i, );
+        my $i = which $factor == $uniq->slice($_);
+        $p_tmp->dice_axis(-1,$_)->squeeze->slice([0,$uniq_ns[$_]-1]) .= $p->slice($i);
     }
 
     $p_tmp->badflag(1);
@@ -1187,35 +1033,19 @@ Lookup specified var (obs) ids in $idv ($ido) (see B<rtable>) and return indices
 
 sub which_id {
   my ($id, $id_s) = @_;
-
-  my %ind;
-  @ind{ @$id } = ( 0 .. $#$id );
-
-  my @ind_select;
-  for (@$id_s) {
-    defined( $ind{$_} ) and push @ind_select, $ind{$_};
-  }
-  return pdl @ind_select;
+  my %ind; @ind{ @$id } = (0 .. $#$id);
+  pdl grep defined, map $ind{$_}, @$id_s;
 }
 
-sub _array_to_pdl {
+my %code_bad = map +($_=>1), '', 'BAD';
+sub code_ivs {
   my ($var_ref) = @_;
   $var_ref = [ $var_ref->list ] if UNIVERSAL::isa($var_ref, 'PDL');
-
-  my (%level, $l);
-  $l = 0;
-  for (@$var_ref) {
-    if (defined($_) and $_ ne '' and $_ ne 'BAD') {
-      $level{$_} = $l ++
-        if !exists $level{$_};
-    }
-  }
-
-  my $pdl = pdl( map { (defined($_) and $_ ne '' and $_ ne 'BAD')?  $level{$_} : -1 } @$var_ref );
-  $pdl = $pdl->setvaltobad(-1);
+  my @filtered = map !defined($_) || $code_bad{$_} ? undef : $_, @$var_ref;
+  my ($l, %level) = 0; $level{$_} //= $l++ for grep defined, @filtered;
+  my $pdl = pdl(map defined($_) ? $level{$_} : -1, @filtered)->setvaltobad(-1);
   $pdl->check_badflag;
-
-  return wantarray? ($pdl, \%level) : $pdl;
+  wantarray ? ($pdl, \%level) : $pdl;
 }
 
 

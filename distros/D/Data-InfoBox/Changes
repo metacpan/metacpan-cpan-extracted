@@ -1,3 +1,7 @@
+0.05 2025-02-24T22:34:11+01:00
+ - Add Tags::HTML::InfoBox to SEE ALSO section in doc.
+ - Fix dependencies.
+
 0.04 2025-02-11T16:54:43+01:00
  - API Change: Remove 'icon_char' and 'icon_url' parameters.
  - Add another fixture with icons and items.

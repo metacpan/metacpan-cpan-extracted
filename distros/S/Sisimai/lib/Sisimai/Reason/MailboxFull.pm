@@ -44,6 +44,7 @@ sub match {
         'maildir delivery failed: domaindisk quota ',
         'mailfolder is full',
         'no space left on device',
+        'not enough disk space',
         'not enough storage space in',
         'not sufficient disk space',
         'over the allowed quota',
@@ -85,10 +86,7 @@ sub true {
     # Status: 4.2.2
     # Diagnostic-Code: SMTP; 450 4.2.2 <***@example.jp>... Mailbox Full
     return 1 if (Sisimai::SMTP::Status->name($argvs->{'deliverystatus'}) || '') eq 'mailboxfull';
-
-    # Check the value of Diagnosic-Code: header with patterns
-    return 1 if __PACKAGE__->match(lc $argvs->{'diagnosticcode'});
-    return 0;
+    return __PACKAGE__->match(lc $argvs->{'diagnosticcode'});
 }
 
 1;

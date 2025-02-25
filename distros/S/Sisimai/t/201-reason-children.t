@@ -12,6 +12,7 @@ my $ReasonChildren = {
     'ContentError'    => ['550 5.6.0 the headers in this message contain improperly-formatted binary content'],
     'ExceedLimit'     => ['5.2.3 Message too large'],
     'Expired'         => ['421 4.4.7 Delivery time expired'],
+    'FailedSTARTTLS'  => ['538 5.7.10 STARTTLS is required to send mail'],
     'Filtered'        => ['550 5.1.2 User reject'],
     'HasMoved'        => ['550 5.1.6 address neko@cat.cat has been replaced by neko@example.jp'],
     'HostUnknown'     => ['550 5.2.1 Host Unknown'],
@@ -29,6 +30,7 @@ my $ReasonChildren = {
     'SecurityError'   => ['570 5.7.0 Authentication failure'],
     'SpamDetected'    => ['570 5.7.7 Spam Detected'],
     'Speeding'        => ['451 4.7.1 <smtp.example.jp[192.0.2.3]>: Client host rejected: Please try again slower'],
+#   'Suppressed'      => ['There is no sample email which is returned due to being listed in the suppression list'],
     'Suspend'         => ['550 5.0.0 Recipient suspend the service'],
     'SystemError'     => ['500 5.3.5 System config error'],
     'SystemFull'      => ['550 5.0.0 Mail system full'],
@@ -58,7 +60,7 @@ for my $e ( keys %$ReasonChildren ) {
 
         $cv->{'reason'} = 'undefined';
         $cv->{'diagnosticcode'} = $ReasonChildren->{ $e }->[0];
-        $cv->{'smtpcommand'} = $e =~ /\A(?:Rejected|NotAccept)/ ? 'MAIL' : $ss->smtpcommand;
+        $cv->{'command'} = $e =~ /\A(?:Rejected|NotAccept)/ ? 'MAIL' : $ss->command;
         is $r->true($cv), 1, $e.'->true('.$cv->{'diagnosticcode'}.') = 1';
     }
 

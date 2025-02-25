@@ -3,13 +3,13 @@ use v5.26;
 use strict;
 use warnings;
 
-sub get {
+sub find {
     # Detect bounce reason from au(KDDI)
     # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason au.com and ezweb.ne.jp
     # @since v4.22.6
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return undef; return "" unless $argvs->{'diagnosticcode'};
 
     state $messagesof = {
         'filtered'    => '550 : user unknown',  # The response was: 550 : User unknown
@@ -43,14 +43,14 @@ Sisimai::Rhost::KDDI - Detect the bounce reason returned from au (KDDI).
 =head1 DESCRIPTION
 
 C<Sisimai::Rhost::KDDI> detects the bounce reason from the content of C<Sisimai::Fact> object as an
-argument of C<get()> method when the value of C<rhost> of the object is C<msmx.au.com> or C<lsean.ezweb.ne.jp>.
+argument of C<find()> method when the value of C<rhost> of the object is C<msmx.au.com> or C<lsean.ezweb.ne.jp>.
 This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head1 AUTHOR
 

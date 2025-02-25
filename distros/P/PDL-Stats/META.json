@@ -22,12 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDL" : "2.096"
+            "PDL" : "2.099"
          }
       },
       "configure" : {
          "requires" : {
-            "PDL" : "2.096"
+            "PDL" : "2.099"
          }
       },
       "develop" : {
@@ -38,10 +38,10 @@
       "runtime" : {
          "recommends" : {
             "PDL::GSL" : "0",
-            "PDL::Graphics::PGPLOT" : "0"
+            "PDL::Graphics::Simple" : "0"
          },
          "requires" : {
-            "PDL" : "2.096",
+            "PDL" : "2.099",
             "perl" : "5.016"
          }
       },
@@ -54,12 +54,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Stats/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/PDLPorters/PDL-Stats",
+         "url" : "git://github.com/PDLPorters/PDL-Stats.git",
          "web" : "https://github.com/PDLPorters/PDL-Stats"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.853",
+   "version" : "0.854",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

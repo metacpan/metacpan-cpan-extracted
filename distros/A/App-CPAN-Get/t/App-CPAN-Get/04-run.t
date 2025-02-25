@@ -123,9 +123,10 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-f] [-h] [--version] module_name[module_version]
+Usage: $script [-f] [-h] [-o out_dir] [--version] module_name[module_version]
 	-f		Force download and rewrite of existing file.
 	-h		Print help.
+	-o out_dir	Output directory (default is actual).
 	--version	Print version.
 	module_name	Module name. e.g. App::Pod::Example
 	module_version	Module version. e.g. \@1.23, ~1.23 etc.

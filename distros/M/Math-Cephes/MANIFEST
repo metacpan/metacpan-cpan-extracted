@@ -1,22 +1,17 @@
+.gitignore
+arrays.c
+arrays.h
+Cephes.bs
 Cephes.i
 Cephes_wrap.c
 Changes
 INSTALL
-LICENSE
-MANIFEST
-MANIFEST.SKIP
-META.yml                                 Module meta-data (added by MakeMaker)
-Makefile.PL
-README
-arrays.c
-arrays.h
 lib/Math/Cephes.pm
 lib/Math/Cephes.pod
 lib/Math/Cephes/Complex.pm
 lib/Math/Cephes/Fraction.pm
 lib/Math/Cephes/Matrix.pm
 lib/Math/Cephes/Polynomial.pm
-libmd/Makefile.PL
 libmd/acosh.c
 libmd/airy.c
 libmd/arcdot.c
@@ -78,11 +73,14 @@ libmd/jv.c
 libmd/k0.c
 libmd/k1.c
 libmd/kn.c
+libmd/libmd.a
 libmd/log.c
 libmd/log10.c
 libmd/log2.c
 libmd/lrand.c
 libmd/lsqrt.c
+libmd/Makefile.PL
+libmd/mconf.h
 libmd/minv.c
 libmd/mtherr.c
 libmd/mtransp.c
@@ -109,6 +107,7 @@ libmd/setpmsvc.c.win32
 libmd/setprec.387
 libmd/setprec.688
 libmd/setprec.87
+libmd/setprec.c
 libmd/setprec.c.unix
 libmd/setprelf.387
 libmd/shichi.c
@@ -123,6 +122,7 @@ libmd/spence.c
 libmd/sqrt.387
 libmd/sqrt.688
 libmd/sqrt.87
+libmd/sqrt.c
 libmd/sqrt.c.src
 libmd/sqrt.spa
 libmd/sqrtelf.387
@@ -135,12 +135,19 @@ libmd/unity.c
 libmd/yn.c
 libmd/zeta.c
 libmd/zetac.c
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+pm_to_blib
 pmath
+README
 scripts/bump-version-number.pl
 t/99pod.t
 t/bessels.t
 t/betas.t
 t/cmplx.t
+t/cpan-changes.t
 t/dists.t
 t/elliptics.t
 t/explog.t
@@ -154,6 +161,7 @@ t/misc.t
 t/new_cmplx-2.t
 t/new_cmplx.t
 t/poly.t
+t/style-trailing-space.t
 t/trig.t
 t/utils.t
 META.json                                Module JSON meta-data (added by MakeMaker)

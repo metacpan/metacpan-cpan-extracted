@@ -7,7 +7,7 @@ use Sisimai::SMTP::Status;
 # https://technet.microsoft.com/en-us/library/bb232118
 # https://learn.microsoft.com/en-us/Exchange/mail-flow-best-practices/non-delivery-reports-in-exchange-online/non-delivery-reports-in-exchange-online
 # https://learn.microsoft.com/en-us/Exchange/mail-flow/non-delivery-reports-and-bounce-messages/non-delivery-reports-and-bounce-messages
-sub get {
+sub find {
     # Detect bounce reason from Exchange Server 2019 or older and Exchange Online
     # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason for Exchange Online
@@ -25,42 +25,9 @@ sub get {
             # - The sending message sent over IPv6 must pass either SPF or DKIM.
             ['4.7.26', 0, 0, 'must pass either spf or dkim validation, this message is not signed'],
 
-            # - Records are DNSSEC authentic, but one or multiple of these scenarios occurred:
-            #   - The destination mail server's certificate doesn't match with what is expected per
-            #     the authentic TLSA record.
-            #   - Authentic TLSA record is misconfigured.
-            #   - Destination domain is being attacked.
-            #   - Any other DANE failure.
-            # - This message usually indicates an issue on the destination email server. Check the
-            #   validity of recipient address and determine if the destination server is configured
-            #   correctly to receive messages. 
-            # - For more information about DANE, see: https://datatracker.ietf.org/doc/html/rfc7671
-            ['4.7.323', 0, 0, 'tlsa-invalid: The domain failed dane validation'],
-            ['5.7.323', 0, 0, 'tlsa-invalid: The domain failed dane validation'],
-
-            # - The destination domain indicated it was DNSSEC-authentic, but Exchange Online was 
-            #   not able to verify it as DNSSEC-authentic.
-            ['4.7.324', 0, 0, 'dnssec-invalid: destination domain returned invalid dnssec records'],
-            ['5.7.324', 0, 0, 'dnssec-invalid: destination domain returned invalid dnssec records'],
-
-            # - This happens when the presented certificate identities (CN and SAN) of a destina-
-            #   tion SMTP target host don't match any of the domains or MX host.
-            # - This message usually indicates an issue on the destination email server. Check the
-            #   validity of recipient address and determine if the destination server is configured
-            #   correctly to receive messages. For more information, see How SMTP DNS-based Authen-
-            #   tication of Named Entities (DANE) works to secure email communications.
-            ['4.7.325', 0, 0, 'certificate-host-mismatch: remote certificate must have a common name or subject alternative name matching the hostname (dane)'],
-            ['5.7.325', 0, 0, 'certificate-host-mismatch: remote certificate must have a common name or subject alternative name matching the hostname (dane)'],
-
             # - The destination email system uses SPF to validate inbound mail, and there's a prob-
             #   lem with your SPF configuration.
             ['5.7.23', 0, 0, 'the message was rejected because of sender policy framework violation'],
-
-            # - DNSSEC checks have passed, yet upon establishing the connection the destination
-            #   mail server provides a certificate that is expired.
-            # - A valid X.509 certificate that isn't expired must be presented. X.509 certificates
-            #   must be renewed after their expiration, commonly annually.
-            ['5.7.322', 0, 0, "certificate-expired: destination mail server's certificate is expired"],
 
             # - Access denied, sending domain [$SenderDomain] does not pass DMARC verification
             # - The sender's domain in the 5322.From address doesn't pass DMARC.
@@ -145,7 +112,6 @@ sub get {
 
             # Previous versions of Exchange Server ------------------------------------------------
             ['5.5.4',  0, 0, 'invalid domain name'],
-            ['5.7.51', 0, 0, 'restrictdomainstoipaddresses or restrictdomainstocertificate'],
 
             # Undocumented error messages ---------------------------------------------------------
             # - 550 5.7.1 Unfortunately, messages from [10.0.2.5] weren't sent. Please contact your
@@ -225,6 +191,65 @@ sub get {
             #   couldn't be delivered to the original sender.
             ['5.4.300', 0, 0, 'message expired'],
         ],
+        'failedstarttls' => [
+            # Exchange Online ---------------------------------------------------------------------
+            # - MX hosts of <domain> failed MTA-STS validation The destination MX host is not the
+            #   expected host per the domain's STS policy
+            ["4.4.8", 0, 0, " failed mta-sts validation"],
+            ["5.4.8", 0, 0, " failed mta-sts validation"],
+
+            # - DNSSEC checks have passed, yet upon connection, destination mail server doesn't re-
+            #   spond to the STARTTLS command. The destination server responds to the STARTTLS com-
+            #   mand, but the TLS handshake fails.
+            # - This message usually indicates an issue on the destination email server. Check the
+            #   validity of the recipient address. Determine if the destination server is configur-
+            #   ed correctly to receive the messages.
+            ['4.4.317', 0, 0, 'starttls is required to send mail'],
+            ['5.4.317', 0, 0, 'starttls is required to send mail'],
+
+            # - Remote certificate failed MTA-STS validation. Reason: <validityStatus> The destina-
+            #   tion mail server's certificate must chain to a trusted root Certificate Authority
+            #   and the Common Name or Subject Alternative Name must contain an entry for the host
+            #   name in the STS policy.
+            ["4.7.5", 0, 0, "remote certificate failed mta-sts validation"],
+            ["5.7.5", 0, 0, "remote certificate failed mta-sts validation"],
+
+            # - DNSSEC checks have passed, yet upon establishing the connection the destination
+            #   mail server provides a certificate that is expired.
+            # - A valid X.509 certificate that isn't expired must be presented. X.509 certificates
+            #   must be renewed after their expiration, commonly annually.
+            ['5.7.51',  0, 0, 'restrictdomainstoipaddresses or restrictdomainstocertificate'],
+            ['4.7.321', 0, 0, 'starttls-not-supported: destination mail server must support tls to receive mail'],
+            ['5.7.321', 0, 0, 'starttls-not-supported: destination mail server must support tls to receive mail'],
+            ['5.7.322', 0, 0, "certificate-expired: destination mail server's certificate is expired"],
+
+            # - Records are DNSSEC authentic, but one or multiple of these scenarios occurred:
+            #   - The destination mail server's certificate doesn't match with what is expected per
+            #     the authentic TLSA record.
+            #   - Authentic TLSA record is misconfigured.
+            #   - Destination domain is being attacked.
+            #   - Any other DANE failure.
+            # - This message usually indicates an issue on the destination email server. Check the
+            #   validity of recipient address and determine if the destination server is configured
+            #   correctly to receive messages. 
+            # - For more information about DANE, see: https://datatracker.ietf.org/doc/html/rfc7671
+            ['4.7.323', 0, 0, 'tlsa-invalid: The domain failed dane validation'],
+            ['5.7.323', 0, 0, 'tlsa-invalid: The domain failed dane validation'],
+
+            # - The destination domain indicated it was DNSSEC-authentic, but Exchange Online was 
+            #   not able to verify it as DNSSEC-authentic.
+            ['4.7.324', 0, 0, 'dnssec-invalid: destination domain returned invalid dnssec records'],
+            ['5.7.324', 0, 0, 'dnssec-invalid: destination domain returned invalid dnssec records'],
+
+            # - This happens when the presented certificate identities (CN and SAN) of a destina-
+            #   tion SMTP target host don't match any of the domains or MX host.
+            # - This message usually indicates an issue on the destination email server. Check the
+            #   validity of recipient address and determine if the destination server is configured
+            #   correctly to receive messages. For more information, see How SMTP DNS-based Authen-
+            #   tication of Named Entities (DANE) works to secure email communications.
+            ['4.7.325', 0, 0, 'certificate-host-mismatch: remote certificate must have a common name or subject alternative name matching the hostname (dane)'],
+            ['5.7.325', 0, 0, 'certificate-host-mismatch: remote certificate must have a common name or subject alternative name matching the hostname (dane)'],
+        ],
         'mailboxfull' => [
             # Exchange Server 2019 ----------------------------------------------------------------
             # - The recipient's mailbox has exceeded its storage quota and is no longer able to ac-
@@ -270,7 +295,7 @@ sub get {
             ['5.4.6', 0, 0, 'hop count exceeded - possible mail loop'],
 
             # Exchange Online ---------------------------------------------------------------------
-	        # - Microsoft 365 or Office 365 is trying to send a message to an email server outside
+            # - Microsoft 365 or Office 365 is trying to send a message to an email server outside
             #   of Microsoft 365 or Office 365, but attempts to connect to it are failing due to a
             #   network connection issue at the external server's location.
             # - This error almost always indicates an issue with the receiving server or network
@@ -278,6 +303,7 @@ sub get {
             #   dress of the server or service that's generating the error, which you can use to
             #   identify the party responsible for fixing this.
             ['4.4.316', 0, 0, 'connection refused'], # [Message=Socket error code 10061]
+            ['5.4.316', 0, 0, 'connection refused'], # [Message=Socket error code 10061]
 
             # - A configuration error has caused an email loop. 5.4.6 is generated by on-premises
             #   Exchange server (you'll see this code in hybrid environments). 5.4.14 is generated
@@ -293,6 +319,10 @@ sub get {
             ['5.4.4',  0, 0, 'invalid arguments'],
             ['5.4.6',  0, 0, 'routing loop detected'],
             ['5.4.14', 0, 0, 'routing loop detected'],
+
+            # Imported from Sisimai::Lhost::Office365
+            ['4.4.312', 0, 0, 'dns query failed'],  # [Message=InfoNoRecords]
+            ['5.4.312', 0, 0, 'dns query failed'],  # [Message=InfoNoRecords]
         ],
         'norelaying' => [
             # Exchange Server 2019 ----------------------------------------------------------------
@@ -337,6 +367,7 @@ sub get {
         ],
         'notaccept' => [
             ['4.3.2', 0, 0, 'system not accepting network messages'],
+            ['4.4.4', 0, 0, 'hosted tenant which has no mail-enabled subscriptions'],
 
             # Exchange Server 2019 ----------------------------------------------------------------
             # - You're using the ABP Routing agent, and the recipient isn't a member of the global
@@ -457,19 +488,6 @@ sub get {
             ['5.7.3', 0, 0, 'cannot achieve exchange server authentication'],
             ['5.7.3', 0, 0, 'not authorized'],
 
-            # Exchange Online ---------------------------------------------------------------------
-            # - DNSSEC checks have passed, yet upon connection, destination mail server doesn't re-
-            #   spond to the STARTTLS command. The destination server responds to the STARTTLS com-
-            #   mand, but the TLS handshake fails.
-            # - This message usually indicates an issue on the destination email server. Check the
-            #   validity of the recipient address. Determine if the destination server is configur-
-            #   ed correctly to receive the messages.
-            ['4.4.317', 0, 0, 'starttls is required to send mail'],
-            ['5.4.317', 0, 0, 'starttls is required to send mail'],
-
-            ['4.7.321', 0, 0, 'starttls-not-supported: destination mail server must support tls to receive mail'],
-            ['5.7.321', 0, 0, 'starttls-not-supported: destination mail server must support tls to receive mail'],
-
             # - The sending email system didn't authenticate with the receiving email system. The
             #   receiving email system requires authentication before message submission.
             # - This error occurs when the receiving server must be authenticated before message
@@ -493,7 +511,7 @@ sub get {
         ],
         'speeding' => [
             # Exchange Online ---------------------------------------------------------------------
-	        # - The recipient mailbox's ability to accept messages is being throttled because it's
+            # - The recipient mailbox's ability to accept messages is being throttled because it's
             #   receiving too many messages too quickly. This is done so a single recipient's mail
             #   processing doesn't unfairly impact other recipients sharing the same mailbox data-
             #   base.
@@ -653,6 +671,12 @@ sub get {
             #   envelope recipients into smaller chunks (chunking) and resend the message.
             ['4.5.3', 0, 0, 'too many recipients'],
 
+            # - 451 4.7.652 The mail server [192.0.2.251] has exceeded the maximum number of
+            #   connections. (S3115) [Name=Protocol Filter Agent][AGT=PFA][MxId=11BA9B3FA168ABBF]
+            #   [BN3PEPF0000B370.namprd21.prod.outlook.com 2025-02-20T14:30:32.425Z 08DD4D9FD5AFF45C]
+            #   (in reply to MAIL FROM command))
+            ["4.7.652", 0, 0, "has exceeded the maximum number of connections"],
+
             # Previous versions of Exchange Server ------------------------------------------------
             ['5.2.122', 0, 0, 'the recipient has exceeded their limit for'],
         ],
@@ -716,6 +740,9 @@ sub get {
 
             # Previous versions of Exchange Server ------------------------------------------------
             ['5.1.2', 0, 0, 'invalid x.400 address'],
+
+            # Imported from Sisimai::/Lhost::Office365
+            ['5.1.351', 0, 0, 'remote server returned unknown recipient or mailbox unavailable'],
         ],
     };
 
@@ -764,14 +791,14 @@ older and Office 365.
 =head1 DESCRIPTION
 
 C<Sisimai::Rhost::Microsoft> detects the bounce reason from the content of C<Sisimai::Fact> object
-as an argument of C<get()> method when the value of C<rhost> of the object is C<*.protection.outlook.com>.
+as an argument of C<find()> method when the value of C<rhost> of the object is C<*.protection.outlook.com>.
 This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head1 AUTHOR
 
@@ -779,7 +806,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

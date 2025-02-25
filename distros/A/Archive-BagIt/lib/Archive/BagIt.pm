@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.099'; # VERSION
+our $VERSION = '0.100'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -759,6 +759,10 @@ sub __sort_bag_info {
 
 sub _extract_key_from_textblob {
     my ($self, $textblob) = @_;
+    if (!defined $textblob) {
+        push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because textblob for key extraction is undefined";
+        return (undef, undef);
+    }
     my $key;
     my $rx_word = qr{[^: \t\r\n]+};# Hint: this word definition for bag-info.txt-keys differs from word definition of bag-info.txt-values!
     my $rx_spc = qr{\s}; #qr{[\t ]};
@@ -777,8 +781,12 @@ sub _extract_key_from_textblob {
 
 sub _extract_value_from_textblob {
     my ($self, $textblob) = @_;
+    if (!defined $textblob) {
+        push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because textblob for value extraction is undefined";
+        return (undef, undef);
+    }
     if ($textblob eq "") {
-        push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because value is empty";
+        push @{$self->{errors}}, "the baginfo file '" . $self->{bag_info_file} . "' could not be parsed correctly, because textblob for value extraction is empty";
         return (undef, "");
     }
     my $value;
@@ -830,6 +838,7 @@ sub _parse_bag_info { # parses a bag-info textblob
     #    not form part of the label or value.
     # find all labels
     my @labels;
+    croak "_parse_baginfo() called with undef value!" unless (defined $textblob);
     while (1) {
         last if ($textblob eq "");
         my ($key, $value);
@@ -1122,7 +1131,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head1 NAME
 

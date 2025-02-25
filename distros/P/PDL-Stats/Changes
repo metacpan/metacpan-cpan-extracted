@@ -1,3 +1,16 @@
+0.854 2025-02-25
+- fix anova_rptd problem depending on grouping of IVs (part of RT#97925)
+- do all plotting with PDL::Graphics::Simple
+- add Basic::code_ivs
+- all OLS and ANOVA now add the 1s column in design at pos 0 so intercepts now B_0
+- add GLM::anova_design_matrix
+- fix anova_design_matrix for between-subject >2 values (rest of RT#97925)
+- add demo
+- remove filt_exp and filt_ma, deprecated in 2011
+- now an exception to give anova n-observations <= product of categories in IVs
+- anova cell means keys now separated by "|" not "#" to sort logically
+- add GLM::plot_stripchart
+
 0.853 2025-01-03
 - uses PDL 2.096+ lib/*.pd format for quicker builds
 
@@ -178,7 +191,7 @@
 
 0.2.6	10/12/2009
   - anova bad value se bug fix
-  - centroid bad value empty cluser bug fix
+  - centroid bad value empty cluster bug fix
   - basic, glm, distr rid of nan and use bad value instead
 
 0.2.5   09/17/2009
@@ -194,7 +207,7 @@
   - use short-circuit ISBAD(a) || ISBAD(b) instead of ISGOOD(a) && ISGOOD(b) in bad value processing.
 
 0.2.3   08/24/2009
-  - ***anova interface change*** IV names now passed in \%opt instead of @ ref. I appologize for the interface change, but it matches the new method plot_means, and makes it easier to pass IVs themselves. I promise that such interface changes will be extremely rare, if at all.
+  - ***anova interface change*** IV names now passed in \%opt instead of @ ref. I apologize for the interface change, but it matches the new method plot_means, and makes it easier to pass IVs themselves. I promise that such interface changes will be extremely rare, if at all.
   - anova now supports bad value in DV.
   - Added plot_means in PDL::Stats::GLM. anova plots highest order interaction by default.
   - Added plot_scree in PDL::Stats::GLM. pca does scree plot by default.

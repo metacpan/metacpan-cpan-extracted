@@ -8,11 +8,12 @@ use App::CPAN::Get::Utils qw(process_module_name_and_version);
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
+use File::Spec::Functions qw(catfile);
 use Getopt::Std;
 use LWP::UserAgent;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -55,14 +56,16 @@ sub run {
 	$self->{'_opts'} = {
 		'f' => 0,
 		'h' => 0,
+		'o' => undef,
 	};
-	if (! getopts('fh', $self->{'_opts'})
+	if (! getopts('fho:', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 1) {
 
-		print STDERR "Usage: $0 [-f] [-h] [--version] module_name[module_version]\n";
+		print STDERR "Usage: $0 [-f] [-h] [-o out_dir] [--version] module_name[module_version]\n";
 		print STDERR "\t-f\t\tForce download and rewrite of existing file.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
+		print STDERR "\t-o out_dir\tOutput directory (default is actual).\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_name\tModule name. e.g. ".
 			"App::Pod::Example\n";
@@ -70,6 +73,13 @@ sub run {
 		return 1;
 	}
 	$self->{'_module_name_and_version'} = shift @ARGV;
+
+	if (defined $self->{'_opts'}->{'o'}) {
+		if (! -d $self->{'_opts'}->{'o'}) {
+			print STDERR "Directory '$self->{'_opts'}->{'o'}' doesn't exist.\n";
+			return 1;
+		}
+	}
 
 	# Parse module name and version.
 	($self->{'_module_name'}, $self->{'_module_version_range'})
@@ -84,6 +94,9 @@ sub run {
 	# Save.
 	my $download_url = URI->new($search_hr->{'download_url'});
 	my $file_to_save = ($download_url->path_segments)[-1];
+	if ($self->{'_opts'}->{'o'}) {
+		$file_to_save = catfile($self->{'_opts'}->{'o'}, $file_to_save);
+	}
 	eval {
 		$self->{'_cpan'}->save($search_hr->{'download_url'}, $file_to_save, $self->{'_opts'});
 	};
@@ -177,6 +190,7 @@ L<App::CPAN::Get::Utils>,
 L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
+L<File::Spec::Functions>,
 L<Getopt::Std>,
 L<LWP::UserAgent>,
 L<Scalar::Util>.
@@ -199,6 +213,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

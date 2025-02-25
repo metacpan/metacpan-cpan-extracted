@@ -10,7 +10,7 @@
 
 This is a collection of statistics modules in Perl Data Language, with a quick-start guide for non-PDL people.
 
-They make perldl--the simple shell for PDL--work like a teenie weenie R, but with PDL threading--"the fast (and automagic) vectorised iteration of 'elementary operations' over arbitrary slices of multidimensional data"--on procedures including t-test, ordinary least squares regression, and kmeans.
+They make perldl--the simple shell for PDL--work like a teenie weenie R, but with PDL broadcasting--"the fast (and automagic) vectorised iteration of 'elementary operations' over arbitrary slices of multidimensional data"--on procedures including t-test, ordinary least squares regression, and kmeans.
 
 Of course, they also work in perl scripts.
 
@@ -18,12 +18,9 @@ Of course, they also work in perl scripts.
 
 - PDL
 
-  Perl Data Language. Preferably installed with a Fortran compiler. A
-  few methods (logistic regression and all plotting methods) will only
-  work with a Fortran compiler and some methods (ordinary least squares
-  regression and pca) work much faster with a Fortran compiler.
+  Perl Data Language.
 
-  The required PDL version is 2.057.
+  The required PDL version is 2.096.
 
 - PDL::GSL (Optional)
 
@@ -32,14 +29,10 @@ Of course, they also work in perl scripts.
   PDL::Stats::GLM. GSL is otherwise NOT required for the core PDL::Stats
   modules to work, ie Basic, Kmeans, and GLM.
 
-- PGPLOT (Optional)
+- PDL::Graphics::Simple (Optional)
 
-  PDL-Stats currently uses PGPLOT for plotting. There are
-  three pgplot/PGPLOT modules, which cause much confusion upon
-  installation. First there is the pgplot Fortran library. Then there is
-  the perl PGPLOT module, which is the perl interface to pgplot. Finally
-  there is PDL::Graphics::PGPLOT, which depends on pgplot and PGPLOT,
-  that PDL-Stats uses for plotting.
+  PDL-Stats currently uses this for plotting. It can use any of several
+  engines to achieve this.
 
 ## INSTALLATION
 
@@ -70,15 +63,6 @@ If you don't have permission to run sudo, you can specify an alternative path,
 then add `/home/user/my_perl_lib` to your PERL5LIB environment variable.
 
 If you have trouble installing PDL, you can look for help at the PDL wiki or PDL mailing list.
-
-### Windows
-
-Thanks to Sisyphus, Windows users can download and install the ppm version of PDL-Stats and all dependencies using the PPM utility included in ActiveState perl or Strawberry perl. You can also get the PPM utility from CPAN.
-
-    ppm install http://www.sisyphusion.tk/ppm/PGPLOT.ppd
-    ppm install http://www.sisyphusion.tk/ppm/PDL.ppd
-    ppm install http://www.sisyphusion.tk/ppm/PDL-Stats.ppd
-
 
 ## SUPPORT AND DOCUMENTATION
 

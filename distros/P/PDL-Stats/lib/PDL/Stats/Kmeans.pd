@@ -1,28 +1,33 @@
+use strict;
+use warnings;
+
+my $F = [qw(F D)];
+
 pp_add_exported('', 'random_cluster', 'iv_cluster');
 
 pp_addpm({At=>'Top'}, <<'EOD');
 
+use strict;
+use warnings;
 use Carp;
 use PDL::LiteF;
-use PDL::NiceSlice;
 use PDL::Stats::Basic;
 
 =head1 NAME
 
-PDL::Stats::Kmeans -- classic k-means cluster analysis 
+PDL::Stats::Kmeans -- classic k-means cluster analysis
 
 =head1 DESCRIPTION
 
 Assumes that we have data pdl dim [observation, variable] and the goal is to put observations into clusters based on their values on the variables. The terms "observation" and "variable" are quite arbitrary but serve as a reminder for "that which is being clustered" and "that which is used to cluster".
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are non-threadable, respectively.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are broadcastable and methods that are non-broadcastable, respectively.
 
 =head1 SYNOPSIS
 
 Implement a basic k-means procedure,
- 
+
     use PDL::LiteF;
-    use PDL::NiceSlice;
     use PDL::Stats;
 
     my ($data, $idv, $ido) = rtable( $file );
@@ -34,7 +39,7 @@ Implement a basic k-means procedure,
       # start out with 8 random clusters
     $cluster = random_cluster( $data->dim(0), 8 );
       # iterate to minimize total ss
-      # stop when no more changes in cluster membership 
+      # stop when no more changes in cluster membership
     do {
       $cluster_last = $cluster;
       ($centroid, $ss_centroid) = $data->centroid( $cluster );
@@ -44,19 +49,15 @@ Implement a basic k-means procedure,
 or, use the B<kmeans> function provided here,
 
     my %k = $data->kmeans( \%opt );
-    print "$_\t$k{$_}\n" for (sort keys %k);
+    print "$_\t$k{$_}\n" for sort keys %k;
 
 plot the clusters if there are only 2 vars in $data,
 
-    use PDL::Graphics::PGPLOT::Window;
+    use PDL::Graphics::Simple;
 
     my ($win, $c);
-    $win = pgwin 'xs';
-    $win->env($data( ,0)->minmax, $data( ,1)->minmax);
-
-    $win->points( $data->dice_axis(0,which($k{cluster}->(,$_)))->dog,
-                  {COLOR=>++$c} )
-      for (0 .. $k{cluster}->dim(1)-1);
+    $win = pgswin();
+    $win->plot(map +(with=>'points', $data->dice_axis(0,which($k{cluster}->(,$_)))->dog), 0 .. $k{cluster}->dim(1)-1);
 
 =cut
 
@@ -73,18 +74,14 @@ pp_addhdr('
 
 pp_addpm pp_line_numbers(__LINE__, <<'EOD' );
 
-# my tmp var for PDL 2.007 slice upate
-my $_tmp;
-
 =head2 random_cluster
-
-=for sig
-
-  Signature: (short [o]cluster(o,c); int obs=>o; int clu=>c)
 
 =for ref
 
-Creates masks for random mutually exclusive clusters. Accepts two parameters, num_obs and num_cluster. Extra parameter turns into extra dim in mask. May loop a long time if num_cluster approaches num_obs because empty cluster is not allowed.
+Creates masks for random mutually exclusive clusters. Accepts two
+parameters, num_obs and num_cluster. Extra parameter turns into extra
+dim in mask. May loop a long time if num_cluster approaches num_obs
+because empty cluster is not allowed.
 
 =for usage
 
@@ -94,32 +91,30 @@ Creates masks for random mutually exclusive clusters. Accepts two parameters, nu
 
   # can't be called on pdl
 sub random_cluster {
-  my ($obs, $clu) = @_;
+  my ($obs, $clu, @extra) = @_;
     # extra param in @_ made into extra dim
-  my $cluster = zeroes @_;
+  my $cluster = zeroes short(), @_;
   do {
-    $cluster->inplace->_random_cluster();
+    (random($obs, @extra) * $obs)->_random_cluster($cluster);
   } while (PDL::any $cluster->sumover == 0 );
-  return $cluster;
+  $cluster;
 }
 
 EOD
 
 pp_def('_random_cluster',
-  Pars  => 'short a(o,c); short [o]b(o,c)',
-  Inplace   => 1,
-  GenericTypes => [U],
+  Pars  => 'rand_data(o); [o]b(o,c)',
+  GenericTypes => ['S'],
   RedoDimsCode => 'if ($SIZE(c) > $SIZE(o)) $CROAK("more cluster than obs!");',
   Code  => '
-/* threading w time only srand produces identical clusters */
-long r;
-srand( time( NULL ) + r++);
 PDL_Indx nc = $SIZE(c);
+broadcastloop %{
 loop (o) %{
-  PDL_Indx cl = rand() % nc; /* XXX-FIXME rand() is not 64bit friendly here! */
+  PDL_Indx cl = $rand_data() % nc;
   loop (c) %{
-    $b() = (c == cl)? 1 : 0;
+    $b() = (c == cl) ? 1 : 0;
   %}
+%}
 %}
   ',
   Doc   => undef,
@@ -127,7 +122,7 @@ loop (o) %{
 
 pp_def('which_cluster',
   Pars  => 'short a(o,c); indx [o]b(o)',
-  GenericTypes => [U,L],
+  GenericTypes => [qw(U L)],
   HandleBad    => 1,
   Code  => '
 loop(o) %{
@@ -149,21 +144,21 @@ Does not support overlapping clusters. If an obs has TRUE value for multiple clu
 Usage:
 
       # create a cluster mask dim [obs x clu]
-    perldl> p $c_mask = iv_cluster [qw(a a b b c c)]
+    pdl> p $c_mask = iv_cluster [qw(a a b b c c)]
     [
      [1 1 0 0 0 0]
      [0 0 1 1 0 0]
      [0 0 0 0 1 1]
     ]
       # get cluster membership list dim [obs]
-    perldl> p $ic = $c_mask->which_cluster                
+    pdl> p $ic = $c_mask->which_cluster
     [0 0 1 1 2 2]
 ',
 );
 
 pp_def('assign',
   Pars  => 'data(o,v); centroid(c,v); short [o]cluster(o,c)',
-  GenericTypes => [F,D],
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
 PDL_Indx cl = 0;
@@ -174,7 +169,8 @@ loop (o) %{
     PDL_Indx nvc = 0;
     loop (v) %{
       PDL_IF_BAD(if ($ISBAD($data()) || $ISBAD($centroid())) continue;,)
-      ssc += pow($data() - $centroid(), 2);
+      $GENERIC() diff = $data() - $centroid();
+      ssc += diff*diff;
       nvc ++;
     %}
     if (nvc) {
@@ -204,22 +200,22 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
 
 =for usage
 
-    perldl> p $centroid = xvals 2, 3
+    pdl> p $centroid = xvals 2, 3
     [
      [0 1]
      [0 1]
      [0 1]
     ]
 
-    perldl> p $b = qsort( random 4, 3 )
+    pdl> p $b = qsort( random 4, 3 )
     [
      [0.022774068 0.032513883  0.13890034  0.30942479]
      [ 0.16943853  0.50262636  0.56251531   0.7152271]
      [ 0.23964483  0.59932745  0.60967495  0.78452117]
     ]
-      # notice that 1st 3 obs in $b are on average closer to 0 
+      # notice that 1st 3 obs in $b are on average closer to 0
       # and last obs closer to 1
-    perldl> p $b->assign( $centroid )
+    pdl> p $b->assign( $centroid )
     [
      [1 1 1 0]    # cluster 0 membership
      [0 0 0 1]    # cluster 1 membership
@@ -228,8 +224,8 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
 );
 
 pp_def('centroid',
-  Pars  => 'data(o,v); cluster(o,c); float+ [o]m(c,v); float+ [o]ss(c,v)',
-  GenericTypes => [F,D],
+  Pars  => 'data(o,v); cluster(o,c); [o]m(c,v); [o]ss(c,v)',
+  GenericTypes => $F,
   HandleBad => 1,
   Code  => '
 $GENERIC(m) s[ $SIZE(c) ][ $SIZE(v) ], s2[ $SIZE(c) ][ $SIZE(v) ];
@@ -248,7 +244,7 @@ loop (c) %{
     loop (v) %{
       PDL_IF_BAD(if ($ISBAD($data())) continue;,)
       s[c][v]  += $data();
-      s2[c][v] += pow($data(), 2);
+      s2[c][v] += $data()*$data();
       PDL_IF_BAD(n[c][v]++;,)
     %}
   %}
@@ -273,26 +269,26 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
 =for usage
 
       # data is 10 obs x 3 var
-    perldl> p $d = sequence 10, 3
+    pdl> p $d = sequence 10, 3
     [
      [ 0  1  2  3  4  5  6  7  8  9]
      [10 11 12 13 14 15 16 17 18 19]
      [20 21 22 23 24 25 26 27 28 29]
     ]
       # create two clusters by value on 1st var
-    perldl> p $a = $d( ,(0)) <= 5
+    pdl> p $a = $d( ,(0)) <= 5
     [1 1 1 1 1 1 0 0 0 0]
- 
-    perldl> p $b = $d( ,(0)) > 5
+
+    pdl> p $b = $d( ,(0)) > 5
     [0 0 0 0 0 0 1 1 1 1]
 
-    perldl> p $c = cat $a, $b
+    pdl> p $c = cat $a, $b
     [
      [1 1 1 1 1 1 0 0 0 0]
      [0 0 0 0 0 0 1 1 1 1]
     ]
 
-    perldl> p $d->centroid($c)
+    pdl> p $d->centroid($c)
       # mean for 2 cluster x 3 var
     [
      [ 2.5  7.5]
@@ -323,8 +319,8 @@ sub _scree_ind {
     croak "1D pdl only please";
 
   my $a = zeroes 2, $self->nelem;
-  ($_tmp = $a->slice('(0)')) .= sequence $self->nelem;
-  ($_tmp = $a->slice('(1)')) .= $self;
+  $a->slice('(0)') .= sequence $self->nelem;
+  $a->slice('(1)') .= $self;
 
   my $d = _d_point2line( $a, $a->slice(':,(0)'), $a->slice(':,(-1)') );
 
@@ -345,8 +341,8 @@ sub _d_point2line {
 EOD
 
 pp_def('_d_p2l',
-  Pars      => 'xc(); yc(); xa(); ya(); xb(); yb(); float+ [o]d()',
-  GenericTypes => [F, D],
+  Pars      => 'xc(); yc(); xa(); ya(); xb(); yb(); [o]d()',
+  GenericTypes => $F,
   HandleBad => 1,
   Code   => '
 PDL_IF_BAD(if ($ISBAD(xc()) || $ISBAD(yc()) || $ISBAD(xa()) || $ISBAD(ya()) || $ISBAD(xb()) || $ISBAD(yb()) ) { $SETBAD(d()); continue; },)
@@ -354,7 +350,7 @@ $GENERIC(d) xba, yba;
 xba = $xb() - $xa();
 yba = $yb() - $ya();
 $d() = fabs( xba * ($ya() - $yc()) - ($xa() - $xc()) * yba )
-     / sqrt( pow(xba,2) + pow(yba,2) );
+     / hypot( xba, yba );
   ',
   Doc      => undef,
 );
@@ -364,29 +360,68 @@ pp_addpm pp_line_numbers(__LINE__, <<'EOD');
 
 =for ref
 
-Implements classic k-means cluster analysis. Given a number of observations with values on a set of variables, kmeans puts the observations into clusters that maximizes within-cluster similarity with respect to the variables. Tries several different random seeding and clustering in parallel. Stops when cluster assignment of the observations no longer changes. Returns the best result in terms of R2 from the random-seeding trials.
+Implements classic k-means cluster analysis.
 
-Instead of random seeding, kmeans also accepts manual seeding. This is done by providing a centroid to the function, in which case clustering will proceed from the centroid and there is no multiple tries.
+=for example
 
-There are two distinct advantages from seeding with a centroid compared to seeding with predefined cluster membership of a subset of the observations ie "seeds",
+  $data = grandom(200, 2); # two rows = two dimensions
+  %k = $data->kmeans; # use default of 3 clusters
+  print "$_\t$k{$_}\n" for sort keys %k;
+  $w->plot(
+    (map +(with=>'points', style=>$_+1, ke=>"Cluster ".($_+1),
+      $data->dice_axis(0,which($k{cluster}->slice(",$_")))->dog),
+      0 .. $k{cluster}->dim(1)-1),
+    (map +(with=>'circles', style=>$_+1, ke=>"Centroid ".($_+1), $k{centroid}->slice($_)->dog, 0.1),
+      0 .. $k{centroid}->dim(0)-1),
+    {le=>'tr'},
+  );
 
-(1) a centroid could come from a previous study with a different set of observations;
+Given a number of observations with values on a set of variables,
+kmeans puts the observations into clusters that maximizes within-cluster
+similarity with respect to the variables. Tries several different random
+seeding and clustering in parallel. Stops when cluster assignment of the
+observations no longer changes. Returns the best result in terms of R2
+from the random-seeding trials.
 
-(2) a centroid could even be "fictional", or in more proper parlance, an idealized prototype with respect to the actual data. For example, if there are 10 person's ratings of 1 to 5 on 4 movies, ie a ratings pdl of dim [10 obs x 4 var], providing a centroid like 
+Instead of random seeding, kmeans also accepts manual seeding. This is
+done by providing a centroid to the function, in which case clustering
+will proceed from the centroid and there is no multiple tries.
+
+There are two distinct advantages from seeding with a centroid compared to
+seeding with predefined cluster membership of a subset of the observations
+ie "seeds":
+
+=over
+
+=item *
+
+a centroid could come from a previous study with a different set of observations;
+
+=item *
+
+a centroid could even be "fictional", or in more proper parlance,
+an idealized prototype with respect to the actual data. For example,
+if there are 10 person's ratings of 1 to 5 on 4 movies, ie a ratings
+pdl of dim [10 obs x 4 var], providing a centroid like
 
   [
    [5 0 0 0]
    [0 5 0 0]
    [0 0 5 0]
    [0 0 0 5]
-  ] 
+  ]
 
-will produce 4 clusters of people with each cluster favoring a different one of the 4 movies. Clusters from an idealized centroid may not give the best result in terms of R2, but they sure are a lot more interpretable.
+will produce 4 clusters of people with each cluster favoring a different
+one of the 4 movies. Clusters from an idealized centroid may not give the
+best result in terms of R2, but they sure are a lot more interpretable.
 
-If clustering has to be done from predefined clusters of seeds, simply calculate the centroid using the B<centroid> function and feed it to kmeans,
+=back
+
+If clustering has to be done from predefined clusters of seeds, simply
+calculate the centroid using the B<centroid> function and feed it
+to kmeans,
 
   my ($centroid, $ss) = $rating($iseeds, )->centroid( $seeds_cluster );
-
   my %k = $rating->kmeans( { CNTRD=>$centroid } );
 
 kmeans supports bad value*.
@@ -410,7 +445,7 @@ Usage:
 
   # suppose we have 4 person's ratings on 5 movies
 
-  perldl> p $rating = ceil( random(4, 5) * 5 ) 
+  pdl> p $rating = ceil( random(4, 5) * 5 )
   [
    [3 2 2 3]
    [2 4 5 4]
@@ -421,14 +456,14 @@ Usage:
 
   # we want to put the 4 persons into 2 groups
 
-  perldl> %k = $rating->kmeans( {NCLUS=>2} )
+  pdl> %k = $rating->kmeans( {NCLUS=>2} )
 
   # by default prints back options used
   # as well as info for all tries and iterations
 
   CNTRD	=> Null
   FULL	=> 0
-  NCLUS	=> 2
+  NCLUS	=> 3
   NSEED	=> 4
   NTRY	=> 5
   V     => 1
@@ -436,7 +471,7 @@ Usage:
   iter 0 R2 [0.024390244 0.024390244 0.26829268  0.4796748  0.4796748]
   iter 1 R2 [0.46341463 0.46341463  0.4796748  0.4796748  0.4796748]
 
-  perldl> p "$_\t$k{$_}\n" for (sort keys %k)
+  pdl> p "$_\t$k{$_}\n" for sort keys %k
 
   R2      0.479674796747968
   centroid       # mean ratings for 2 group x 5 movies
@@ -447,13 +482,13 @@ Usage:
    [         3          3]
    [         4  2.6666667]
   ]
- 
+
   cluster        # 4 persons' membership in two groups
   [
    [1 0 0 0]
    [0 1 1 1]
   ]
-  
+
   n       [1 3]  # cluster size
   ss
   [
@@ -464,7 +499,17 @@ Usage:
    [         0 0.66666667]
   ]
 
-Now, for the valiant, kmeans is threadable. Say you gathered 10 persons' ratings on 5 movies from 2 countries, so the data is dim [10,5,2], and you want to put the 10 persons from each country into 3 clusters, just specify NCLUS => [3,1], and there you have it. The key is for NCLUS to include $data->ndims - 1 numbers. The 1 in [3,1] turns into a dummy dim, so the 3-cluster operation is repeated on both countries. Similarly, when seeding, CNTRD needs to have ndims that at least match the data ndims. Extra dims in CNTRD will lead to threading (convenient if you want to try out different centroid locations, for example, but you will have to hand pick the best result). See stats_kmeans.t for examples w 3D and 4D data.
+Now, for the valiant, kmeans is broadcastable. Say you gathered 10
+persons' ratings on 5 movies from 2 countries, so the data is dim
+[10,5,2], and you want to put the 10 persons from each country into
+3 clusters, just specify NCLUS => [3,1], and there you have it. The
+key is for NCLUS to include $data->ndims - 1 numbers. The 1 in [3,1]
+turns into a dummy dim, so the 3-cluster operation is repeated on both
+countries. Similarly, when seeding, CNTRD needs to have ndims that at
+least match the data ndims. Extra dims in CNTRD will lead to broadcasting
+(convenient if you want to try out different centroid locations,
+for example, but you will have to hand pick the best result). See
+F<t/kmeans.t> for examples w 3D and 4D data.
 
 *With bad value, R2 is based on average of variances instead of sum squared error.
 
@@ -476,14 +521,14 @@ sub PDL::kmeans {
   my %opt = (
     V     => 1,         # prints simple status
     FULL  => 0,         # returns results for all seeding trials
-  
+
     CNTRD => PDL->null, # optional. pdl [clu x var]. disables next 3 opts
-  
+
     NTRY  => 5,         # num of random seeding trials
     NSEED => 1000,      # num of initial seeds, use NSEED up to max obs
     NCLUS => 3,         # num of clusters
   );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
   if (defined($opt{CNTRD}) and $opt{CNTRD}->nelem) {
     $opt{NTRY}  = 1;
     $opt{NSEED} = $self->dim(0);
@@ -492,16 +537,16 @@ sub PDL::kmeans {
   else {
     $opt{NSEED} = pdl($self->dim(0), $opt{NSEED})->min->sclr;
   }
-  $opt{V} and print STDERR "$_\t=> $opt{$_}\n" for (sort keys %opt);
- 
+  $opt{V} and print "$_\t=> $opt{$_}\n" for sort keys %opt;
+
   my $ss_ms = $self->badflag?  'ms' : 'ss';
   my $ss_total
     = $self->badflag?  $self->var->average : $self->ss->sumover;
-  $opt{V} and print STDERR "overall $ss_ms:\t$ss_total\n";
+  $opt{V} and print "overall $ss_ms:\t$ss_total\n";
 
   my ($centroid, $ss_cv, $R2, $clus_this, $clus_last);
 
-    # NTRY made into extra dim in $cluster for threading
+    # NTRY made into extra dim in $cluster for broadcasting
   my @nclus = (ref $opt{NCLUS} eq 'ARRAY')? @{$opt{NCLUS}} : ($opt{NCLUS});
   $clus_this
     = (defined($opt{CNTRD}) and $opt{CNTRD}->nelem) ?
@@ -509,7 +554,7 @@ sub PDL::kmeans {
     : random_cluster($opt{NSEED}, @nclus, $opt{NTRY} )
     ;
 
-  ($centroid, $ss_cv) = $self(0:$opt{NSEED} - 1, )->centroid( $clus_this );
+  ($centroid, $ss_cv) = $self->slice([0,$opt{NSEED} - 1])->centroid( $clus_this );
     # now obs in $clus_this matches $self
   $clus_this = $self->assign( $centroid );
   ($centroid, $ss_cv) = $self->centroid( $clus_this );
@@ -519,21 +564,21 @@ sub PDL::kmeans {
     $R2 = $self->badflag? 1 - $ss_cv->average->average / $ss_total
         :                 1 - $ss_cv->sumover->sumover / $ss_total
         ;
-    $opt{V} and print STDERR join(' ',('iter', $iter++, 'R2', $R2)) . "\n";
+    $opt{V} and print join(' ',('iter', $iter++, 'R2', $R2)) . "\n";
 
     $clus_last = $clus_this;
-   
+
     $clus_this = $self->assign( $centroid );
     ($centroid, $ss_cv) = $self->centroid( $clus_this );
   }
   while ( any long(abs($clus_this - $clus_last))->sumover->sumover > 0 );
 
-  $opt{FULL} and 
+  $opt{FULL} and
     return (
       centroid => PDL::squeeze( $centroid ),
       cluster  => PDL::squeeze( $clus_this ),
       n        => PDL::squeeze( $clus_this )->sumover,
-      R2       => PDL::squeeze( $R2 ), 
+      R2       => PDL::squeeze( $R2 ),
       $ss_ms   => PDL::squeeze( $ss_cv ),
     );
 
@@ -545,16 +590,16 @@ sub PDL::kmeans {
       centroid => $centroid->dice_axis(-1,$i_best)->sever->squeeze,
       cluster  => $clus_this->dice_axis(-1,$i_best)->sever->squeeze,
       n        => $clus_this->dice_axis(-1,$i_best)->sever->squeeze->sumover,
-      R2       => $R2->dice_axis(-1,$i_best)->sever->squeeze, 
+      R2       => $R2->dice_axis(-1,$i_best)->sever->squeeze,
       $ss_ms   => $ss_cv->dice_axis(-1,$i_best)->sever->squeeze,
     );
 
-  # now for threading beyond 2D data
+  # now for broadcasting beyond 2D data
 
   # can't believe i'm using a perl loop :P
 
   $i_best = $i_best->flat->sever;
-  my @i_best = map { $opt{NTRY} * $_ + $i_best(($_)) }
+  my @i_best = map { $opt{NTRY} * $_ + $i_best->slice("($_)") }
                0 .. $i_best->nelem - 1;
 
   my @shapes;
@@ -576,9 +621,9 @@ $centroid->mv(-1,2)->clump(2..$centroid->ndims-1)->dice_axis(2,\@i_best)->sever-
     R2       =>
 $R2->mv(-1,0)->clump(0..$R2->ndims-1)->dice_axis(0,\@i_best)->sever->reshape( @{ $shapes[2] } )->sever,
 
-    $ss_ms   => 
+    $ss_ms   =>
 $ss_cv->mv(-1,2)->clump(2..$ss_cv->ndims-1)->dice_axis(2,\@i_best)->sever->reshape( @{ $shapes[0] } )->sever,
-  ); 
+  );
 }
 
 =head1 METHODS
@@ -595,20 +640,20 @@ This is the method used for mean and var in anova. The difference between iv_clu
 
 Usage:
 
-    perldl> @bake = qw( y y y n n n )
-   
+    pdl> @bake = qw( y y y n n n )
+
     # accepts @ ref or 1d pdl
 
-    perldl> p $bake = iv_cluster( \@bake )
+    pdl> p $bake = iv_cluster( \@bake )
     [
      [1 1 1 0 0 0]
      [0 0 0 1 1 1]
     ]
-    
-    perldl> p $rating = sequence 6
+
+    pdl> p $rating = sequence 6
     [0 1 2 3 4 5]
 
-    perldl> p $rating->centroid( $bake )
+    pdl> p $rating->centroid( $bake )
     # mean for each iv level
     [
      [1 4]
@@ -623,18 +668,20 @@ Usage:
 *iv_cluster = \&PDL::iv_cluster;
 sub PDL::iv_cluster {
   my ($var_ref) = @_;
-
-  my ($var, $map_ref) = PDL::Stats::Basic::_array_to_pdl( $var_ref );
+  my ($var, $map_ref) = PDL::Stats::Basic::code_ivs( $var_ref );
   my $var_a = yvals( short, $var->nelem, $var->max->sclr + 1 ) == $var;
-
   $var_a = $var_a->setbadif( $var->isbad ) if $var->badflag;
-
-  return wantarray? ($var_a, $map_ref) : $var_a;
+  wantarray ? ($var_a, $map_ref) : $var_a;
 }
 
 =head2 pca_cluster
 
-Assign variables to components ie clusters based on pca loadings or scores. One way to seed kmeans (see Ding & He, 2004, and Su & Dy, 2004 for other ways of using pca with kmeans). Variables are assigned to their most associated component. Note that some components may not have any variable that is most associated with them, so the returned number of clusters may be smaller than NCOMP.
+Assign variables to components ie clusters based on pca loadings or
+scores. One way to seed kmeans (see Ding & He, 2004, and Su & Dy, 2004
+for other ways of using pca with kmeans). Variables are assigned to
+their most associated component. Note that some components may not have
+any variable that is most associated with them, so the returned number
+of clusters may be smaller than NCOMP.
 
 Default options (case insensitive):
 
@@ -643,6 +690,7 @@ Default options (case insensitive):
   NCOMP => undef, # max number of components to consider. determined by
                   # scree plot black magic if not specified
   PLOT  => 0,     # pca scree plot with cutoff at NCOMP
+  WIN   => undef, # pass pgswin object for more plotting control
 
 Usage:
 
@@ -650,16 +698,16 @@ Usage:
     # $data is pdl dim [word x doc]
   ($data, $idd, $idw) = get_data 'doc_word_info.txt';
 
-  perldl> %p = $data->pca;
+  pdl> %p = $data->pca;
     # $cluster is pdl mask dim [doc x ncomp]
-  perldl> $cluster  = $p{loading}->pca_cluster;
+  pdl> $cluster  = $p{loading}->pca_cluster;
 
     # pca clusters var while kmeans clusters obs. hence transpose
-  perldl> ($m, $ss) = $data->transpose->centroid( $cluster );
-  perldl> %k = $data->transpose->kmeans( { cntrd=>$m } );
+  pdl> ($m, $ss) = $data->transpose->centroid( $cluster );
+  pdl> %k = $data->transpose->kmeans( { cntrd=>$m } );
 
     # take a look at cluster 0 doc ids
-  perldl> p join("\n", @$idd[ list which $k{cluster}->( ,0) ]);
+  pdl> p join("\n", @$idd[ list which $k{cluster}->( ,0) ]);
 
 =cut
 
@@ -673,8 +721,9 @@ sub PDL::pca_cluster {
     NCOMP => undef, # max number of components to consider. determined by
                     # scree plot black magic if not specified
     PLOT  => 0,     # pca scree plot with cutoff at NCOMP
+    WIN   => undef, # pass pgswin object for more plotting control
   );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
 
   my $var = sumover($self ** 2) / $self->dim(0);
   if (!$opt{NCOMP}) {
@@ -682,25 +731,25 @@ sub PDL::pca_cluster {
     my $comps = ($self->dim(1) > 300)? int($self->dim(1) * .1)
               :                        pdl($self->dim(1), 30)->min
               ;
-    $var = $var(0:$comps-1)->sever;
+    $var = $var->slice([0,$comps-1])->sever;
     $opt{NCOMP} = _scree_ind( $var );
   }
   $opt{PLOT} and do {
     require PDL::Stats::GLM;
-    $var->plot_scree( {NCOMP=>$var->dim(0), CUT=>$opt{NCOMP}} );
+    $var->plot_screes({NCOMP=>$var->dim(0), CUT=>$opt{NCOMP}, WIN=>$opt{WIN}});
   };
 
-  my $c = $self->( ,0:$opt{NCOMP}-1)->transpose->abs->maximum_ind;
+  my $c = $self->slice(':',[0,$opt{NCOMP}-1])->transpose->abs->maximum_ind;
 
   if ($opt{ABS}) {
     $c = $c->iv_cluster;
   }
   else {
-    my @c = map { ($self->($_,$c($_)) >= 0)? $c($_)*2 : $c($_)*2 + 1 }
+    my @c = map { ($self->slice($_,$c->slice($_)) >= 0)? $c->slice($_)*2 : $c->slice($_)*2 + 1 }
                 ( 0 .. $c->dim(0)-1 );
     $c = iv_cluster( \@c );
   }
-  $opt{V} and print STDERR "cluster membership mask as " . $c->info . "\n";
+  $opt{V} and print "cluster membership mask as " . $c->info . "\n";
 
   return $c;
 }

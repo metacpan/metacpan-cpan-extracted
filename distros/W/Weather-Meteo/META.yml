@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Weather-Meteo/issues
   repository: git://github.com/nigelhorne/Weather-Meteo.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

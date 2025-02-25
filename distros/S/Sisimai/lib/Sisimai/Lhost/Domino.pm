@@ -31,6 +31,8 @@ sub inquire {
     state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = { 'message' => ['Your message'] };
     state $messagesof = {
+        'filtered'    => ['Cannot route mail to user'],
+        'systemerror' => ['Several matches found in Domino Directory'],
         'userunknown' => [
             'not listed in Domino Directory',
             'not listed in public Name & Address Book',
@@ -38,10 +40,9 @@ sub inquire {
             "non répertorié dans l'annuaire Domino",
             'Domino ディレクトリには見つかりません',
         ],
-        'filtered'    => ['Cannot route mail to user'],
-        'systemerror' => ['Several matches found in Domino Directory'],
     };
 
+    require Sisimai::RFC1123;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -78,6 +79,7 @@ sub inquire {
         $v = $dscontents->[-1];
         if( $e eq 'was not delivered to:' ) {
             # was not delivered to:
+            #   kijitora@example.net
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
@@ -93,6 +95,7 @@ sub inquire {
 
         } elsif( $e eq 'because:' ) {
             # because:
+            #   User some.name (kijitora@example.net) not listed in Domino Directory
             $v->{'diagnosis'} = $e;
 
         } else {
@@ -104,12 +107,13 @@ sub inquire {
                 #   Subject: Nyaa
                 $subjecttxt = substr($e, 11,); 
 
-            } elsif( my $f = Sisimai::RFC1894->match($e) ) {
+            } else {
                 # There are some fields defined in RFC3464, try to match
-                next unless my $o = Sisimai::RFC1894->field($e);
-                next if $o->[-1] eq 'addr';
+                my $f = Sisimai::RFC1894->match($e); next if $f < 1;
+                my $o = Sisimai::RFC1894->field($e); next unless $o;
+                next if $o->[3] eq 'addr';
 
-                if( $o->[-1] eq 'code' ) {
+                if( $o->[3] eq 'code' ) {
                     # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                     $v->{'spec'}      ||= $o->[1];
                     $v->{'diagnosis'} ||= $o->[2];
@@ -117,6 +121,7 @@ sub inquire {
                 } else {
                     # Other DSN fields defined in RFC3464
                     next unless exists $fieldtable->{ $o->[0] };
+                    next if $o->[3] eq "host" && Sisimai::RFC1123->is_internethost($o->[2]) == 0;
                     $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
 
                     next unless $f == 1;
@@ -200,7 +205,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

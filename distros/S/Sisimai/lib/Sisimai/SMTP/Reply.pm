@@ -2,7 +2,9 @@ package Sisimai::SMTP::Reply;
 use v5.26;
 use strict;
 use warnings;
+
 # http://www.ietf.org/rfc/rfc5321.txt
+# -------------------------------------------------------------------------------------------------
 #   4.2.1.  Reply Code Severities and Theory
 #
 #   There are four values for the first digit of the reply code:
@@ -102,8 +104,9 @@ state $ReplyCode5 = [
     # 554   Transaction failed (Or, in the case of a connection-opening response, "No SMTP service here")
     # 555   MAIL FROM/RCPT TO parameters not recognized or not implemented
     # 556   Domain does not accept mail (See RFC7504)
+    # 557   draft-moore-email-addrquery-01
     550, 552, 553, 551, 521, 525, 502, 520, 523, 524, 530, 533, 534, 535, 538, 551, 555, 556, 554,
-    500, 501, 502, 503, 504,
+    557, 500, 501, 502, 503, 504,
 ];
 state $CodeOfSMTP = { '2' => $ReplyCode2, '4' => $ReplyCode4, '5' => $ReplyCode5 };
 
@@ -118,16 +121,15 @@ sub test {
     my $reply = int $argv1;
     my $first = int($reply / 100);
 
-    return 0 if $reply < 200;
-    return 0 if $reply > 559;
+    return 0 if $reply < 211;
+    return 0 if $reply > 557;
     return 0 if $reply % 100 > 59;
 
     if( $first == 2 ) {
         # 2yz
-        return 1 if $reply == 235;
-        return 0 if $reply <  211;
-        return 0 if $reply >  252;
-        return 0 if $reply >  221 && $reply < 250;
+        return 1 if $reply == 235;                  # 235 is a valid code for AUTH (RFC4954)
+        return 0 if $reply >  253;                  # The maximum code of 2xy is 253 (RFC5248)
+        return 0 if $reply >  221 && $reply < 250;  # There is no reply code between 221 and 250
         return 1;
     }
 
@@ -152,26 +154,31 @@ sub find {
     return '' if length $argv1 < 3;
     return '' if index(uc($argv1), 'X-UNIX;') > -1;
 
+    my $esmtperror = ' '.$argv1.' ';
+    my $esmtpreply = '';
     my $statuscode = substr($argv2, 0, 1) || '';
     my $replycodes = $statuscode eq '5' || $statuscode eq '4' || $statuscode eq '2'
                      ? $CodeOfSMTP->{ $statuscode }
                      : [$CodeOfSMTP->{'5'}->@*, $CodeOfSMTP->{'4'}->@*, $CodeOfSMTP->{'2'}->@*];
-    my $esmtperror = ' '.$argv1.' ';
-    my $esmtpreply = '';    # SMTP Reply Code
-    my $replyindex = -1;    # A position of SMTP reply code found by the index()
-    my $formerchar =  0;    # a character that is one character before the SMTP reply code
-    my $latterchar =  0;    # a character that is one character after  the SMTP reply code
 
     for my $e ( @$replycodes ) {
         # Try to find an SMTP Reply Code from the given string
-        $replyindex = index($esmtperror, $e); next if $replyindex == -1;
-        $formerchar = ord(substr($esmtperror, $replyindex - 1, 1)) || 0;
-        $latterchar = ord(substr($esmtperror, $replyindex + 3, 1)) || 0;
+        my $appearance = index($esmtperror, $e); next if $appearance == -1;
+        my $startingat = 1;
+        my $mesglength = length $esmtperror;
 
-        next if $formerchar > 45 && $formerchar < 58;
-        next if $latterchar > 45 && $latterchar < 58;
-        $esmtpreply = $e;
-        last;
+        while( $startingat + 3 < $mesglength ) {
+            # Find all the reply code in the error message
+            my $replyindex = index($esmtperror, $e, $startingat); last if $replyindex == -1;
+            my $formerchar = ord(substr($esmtperror, $replyindex - 1, 1)) || 0;
+            my $latterchar = ord(substr($esmtperror, $replyindex + 3, 1)) || 0;
+
+            if( $formerchar > 45 && $formerchar < 58 ){ $startingat += $replyindex + 3; next }
+            if( $latterchar > 45 && $latterchar < 58 ){ $startingat += $replyindex + 3; next }
+            $esmtpreply = $e;
+            last;
+        }
+        last if $esmtpreply;
     }
     return $esmtpreply;
 }

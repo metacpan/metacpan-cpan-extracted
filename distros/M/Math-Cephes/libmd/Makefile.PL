@@ -31,7 +31,7 @@ unless ($is_387 or $is_sol) {
 }
 
 opendir(DIR, '.') or die "Cannot opendir '.': $!\n";
-my @objs = map {s/\.c$/.o/; $_} grep { /\.c$/ } readdir DIR;
+my @objs = map {s/\.c$/.o/; $_} grep { /\.c$/ } sort readdir DIR;
 closedir DIR;
 my %objs = map {$_ => 1} @objs;
 foreach (qw(setprec.o sqrt.o)) {

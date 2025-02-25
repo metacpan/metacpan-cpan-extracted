@@ -2,8 +2,9 @@ use 5.10.0;
 use warnings;
 use strict;
 use Test::More tests => 1;
-
 use Time::Piece;
+
+
 my $t = localtime;
 my $this_year = $t->year;
 
@@ -11,6 +12,7 @@ my @files = (
     'README',
     'LICENSE',
     'lib/Term/TablePrint.pm',
+    'lib/Term/TablePrint/ProgressBar.pm',
 );
 
 my $author = 'Matth..?us Kiem';
@@ -31,8 +33,5 @@ for my $file ( @files ) {
 }
 
 
-
-
 ok( $error == 0, "Copyright year" ) or diag( $diag );
 diag( "\n" );
-

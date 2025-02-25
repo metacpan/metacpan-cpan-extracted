@@ -1,5 +1,9 @@
 Revision history for Weather::Meteo
 
+0.12	Mon Feb 24 07:44:44 EST 2025
+	Corrected the documentation for tz
+	Handle "0.25" as a co-ordinate
+
 0.11	Fri Feb 14 08:11:25 EST 2025
 	More useful error message
 	Handle numbers starting with a decimal point

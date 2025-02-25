@@ -28,7 +28,7 @@ my $Results = {
         ['5.1.1',   '550', 'userunknown',     1],
         ['5.1.1',   '550', 'userunknown',     1],
         ['5.1.1',   '550', 'userunknown',     1],
-        ['5.1.0',   '550', 'userunknown',     1],
+        ['5.1.1',   '550', 'userunknown',     1],
         ['5.1.1',   '550', 'userunknown',     1],
         ['5.0.0',   '554', 'filtered',        0],
         ['5.1.1',   '550', 'userunknown',     1],
@@ -56,9 +56,7 @@ can_ok $Package, @{ $Methods->{'class'} };
 MAKETEST: {
     is $Package->rise, undef;
     is $Package->rise({'data' => ''}), undef;
-    is $Package->rise({'data' => 'test', 'load' => ''}), undef;
-    is $Package->rise({'data' => 'test', 'load' => [], 'order' => ''}), undef;
-    is $Package->rise({'data' => 'test', 'load' => [], 'order' => []}), undef;
+    is $Package->rise({'data' => 'test' }), undef;
 
     my $json = JSON->new;
     my $call = sub {

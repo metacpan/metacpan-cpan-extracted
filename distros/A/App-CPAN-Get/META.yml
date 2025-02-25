@@ -40,6 +40,7 @@ requires:
   English: 0
   Error::Pure: 0
   Exporter: 0
+  File::Spec::Functions: 0
   Getopt::Std: 0
   IO::Barf: 0
   LWP::UserAgent: 0
@@ -52,4 +53,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Get
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Get
-version: '0.13'
+version: '0.14'

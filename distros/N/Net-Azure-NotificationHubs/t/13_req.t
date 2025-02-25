@@ -54,20 +54,13 @@ subtest 'with path, payload' => sub {
 
 subtest 'strange instance with path, payload' => sub {
     local $Net::Azure::NotificationHubs::DEFAULT_API_VERSION = undef;
-    $hub = Net::Azure::NotificationHubs->new(
-        connection_string => 'Endpoint=sb://mysvc.servicebus.windows.net/;SharedAccessKeyName=mykey;SharedAccessKey=AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=',
-        hub_name          => 'myhub',
-        apns_expiry       => '2020-10-10T20:20+09:00'
-    );
-    my $payload = {name => 'oreore', age => 35};
-    my $req = $hub->_req('/foo', $payload);
-    isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    is $req->method, 'POST', 'request method is "POST"';
-    is $req->uri->path, '/foo', 'request path is "/foo"';
-    is_deeply {$req->uri->query_form}, {api_version => ''}, 'query params is api_version: null';
-    is $req->header('Content-Type'), 'application/atom+xml;charset=utf-8', 'Content-Type is "application/atom+xml;charset=utf-8"'; 
-    is $req->header('Authorization'), $hub->authorizer->token($req->uri->as_string), 'Authorization header is generated completely';
-    is_deeply $hub->serializer->decode($req->content), $payload, 'Content is a payload data that encoded to JSON format';   
+    throws_ok {
+        Net::Azure::NotificationHubs->new(
+            connection_string => 'Endpoint=sb://mysvc.servicebus.windows.net/;SharedAccessKeyName=mykey;SharedAccessKey=AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=',
+            hub_name          => 'myhub',
+            apns_expiry       => '2020-10-10T20:20+09:00'
+        )
+    } qr/api_version is required/;
 };
 
 done_testing;

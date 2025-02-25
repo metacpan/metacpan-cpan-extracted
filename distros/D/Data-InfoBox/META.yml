@@ -29,8 +29,6 @@ no_index:
     - xt
 requires:
   Data::Icon: 0
-  Data::InfoBox: 0
-  Data::InfoBox::Item: 0.03
   Data::Text::Simple: 0
   Mo: 0
   Mo::utils: 0.21
@@ -42,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-InfoBox
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-InfoBox
-version: '0.04'
+version: '0.05'

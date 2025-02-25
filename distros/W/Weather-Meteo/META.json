@@ -78,6 +78,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

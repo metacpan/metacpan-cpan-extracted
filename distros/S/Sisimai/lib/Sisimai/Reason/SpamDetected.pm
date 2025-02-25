@@ -107,6 +107,7 @@ sub match {
     ];
     state $pairs = [
         ['greylisted', ' please try again in'],
+        ['mail score (', ' over '],
         ['mail rejete. mail rejected. ', '506'],
         ['our filters rate at and above ', ' percent probability of being spam'],
         ['rejected by ', ' (spam)'],
@@ -116,11 +117,8 @@ sub match {
         ['spam ', ' exceeded'],
         ['this message scored ', ' spam points'],
     ];
-    state $regex = qr/(?:\d[.]\d[.]\d|\d{3})[ ]spam\z/;
-
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 1 if grep { Sisimai::String->aligned(\$argv1, $_) } @$pairs;
-    return 1 if $argv1 =~ $regex;
     return 0;
 }
 
@@ -138,14 +136,13 @@ sub true {
     return 1 if $argvs->{'reason'} eq 'spamdetected';
     return 1 if (Sisimai::SMTP::Status->name($argvs->{'deliverystatus'}) || '') eq 'spamdetected';
 
-    # The value of "reason" isn't "spamdetected" when the value of "smtpcommand" is an SMTP command
-    # to be sent before the SMTP DATA command because all the MTAs read the headers and the entire
+    # The value of "reason" isn't "spamdetected" when the value of "command" is an SMTP command to
+    # be sent before the SMTP DATA command because all the MTAs read the headers and the entire
     # message body after the DATA command.
-    my $thecommand = $argvs->{'smtpcommand'} || '';
+    my $thecommand = $argvs->{'command'} || '';
     return 0 if $thecommand eq 'CONN' || $thecommand eq 'EHLO' || $thecommand eq 'HELO'
              || $thecommand eq 'MAIL' || $thecommand eq 'RCPT';
-    return 1 if __PACKAGE__->match(lc $argvs->{'diagnosticcode'});
-    return 0;
+    return __PACKAGE__->match(lc $argvs->{'diagnosticcode'});
 }
 
 1;

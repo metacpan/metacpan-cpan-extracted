@@ -27,7 +27,7 @@ my $self_job_id = $ENV{SLURM_JOB_ID} // undef;
 GetOptions(
     'u|user=s' => \$opt_user,
     'n|name=s' => \$opt_name,
-    'r|refresh=i' => $refresh_time,
+    'r|refresh=i' => \$refresh_time,
     'verbose' => \$opt_verbose_bool,
     'version' => sub { say "waitjobs v", $NBI::Slurm::VERSION; exit },
     'debug' => \$opt_debug_bool,
@@ -40,18 +40,22 @@ my $queue = NBI::Queue->new(
 );
 # If $self_job_id is anq integer, remove it from the queue
 if (defined $self_job_id and $self_job_id =~ /^\d+$/) {
-    print STDERR "Ignoring current job id $self_job_id\n";
+    print STDERR timelog("waitjobs"), "Ignoring current job id $self_job_id\n";
     $queue->remove($self_job_id);
 }
 
 my @starting_ids = @{$queue->ids()};
-print STDERR "[waitjob] There are ", 
-  GREEN, BOLD, $queue->len(), RESET  " jobs for ",
+print STDERR timelog("waitjobs"),  "There are ", 
+  GREEN, BOLD, scalar @starting_ids, RESET  " jobs for ",
   GREEN, BOLD, $opt_user,     RESET, " with name matching ",
   GREEN, BOLD, $opt_name,     RESET, "\n";
 
 while (scalar @starting_ids > 0) {
-    my $current_jobs = NBI::Queue->new();
+    # Create the new queue with the same parameters as the initial queue
+    my $current_jobs = NBI::Queue->new(
+        -username => $opt_user,
+        -name => $opt_name,
+    );
     my @current_ids = @{$current_jobs->ids()};
 
     # Remove from @starting_ids all the jobs that are NOT in @current_ids
@@ -63,11 +67,13 @@ while (scalar @starting_ids > 0) {
     }
     @starting_ids = @new_starting_ids;
     if ($opt_verbose_bool) {
-        say STDERR "Waiting for ", scalar @starting_ids, " jobs to finish";
+        say STDERR timelog("waitjobs"), "Waiting for ", scalar @starting_ids, " jobs to finish (refresh in $refresh_time seconds)";
     }
     sleep $refresh_time;
 }
 
+
+say STDERR timelog("waitjobs"), "No jobs left: quitting\n";
 
 sub usage {
     say STDERR<<END;
@@ -97,7 +103,7 @@ waitjobs - Wait for selected jobs to exit the queue
 
 =head1 VERSION
 
-version 0.9.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -173,7 +179,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Andrea Telatin.
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
 
 This is free software, licensed under:
 

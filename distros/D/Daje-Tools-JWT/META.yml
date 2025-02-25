@@ -1,0 +1,41 @@
+---
+abstract: "It's module for JWT's"
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Tools-JWT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Tools::JWT:
+    file: lib/Daje/Tools/JWT.pm
+    version: '0.01'
+requires:
+  Data::Dumper: '0'
+  Mojo::Base: '0'
+  Mojo::JWT: '0'
+  perl: '5.040000'
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Tools-JWT/issues
+  homepage: https://github.com/janeskil1525/Daje-Tools-JWT
+  repository: https://github.com/janeskil1525/Daje-Tools-JWT.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

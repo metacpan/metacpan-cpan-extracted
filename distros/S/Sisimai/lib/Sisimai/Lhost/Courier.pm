@@ -26,6 +26,7 @@ sub inquire {
     }
     return undef unless $match;
 
+    require Sisimai::RFC1123;
     require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: :message/rfc822', 'Content-Type: text/rfc822-headers'];
@@ -73,7 +74,7 @@ sub inquire {
             next unless my $o = Sisimai::RFC1894->field($e);
             $v = $dscontents->[-1];
 
-            if( $o->[-1] eq 'addr' ) {
+            if( $o->[3] eq 'addr' ) {
                 # Final-Recipient: rfc822; kijitora@example.jp
                 # X-Actual-Recipient: rfc822; kijitora@example.co.jp
                 if( $o->[0] eq 'final-recipient' ) {
@@ -90,7 +91,7 @@ sub inquire {
                     # X-Actual-Recipient: rfc822; kijitora@example.co.jp
                     $v->{'alias'} = $o->[2];
                 }
-            } elsif( $o->[-1] eq 'code' ) {
+            } elsif( $o->[3] eq 'code' ) {
                 # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                 $v->{'spec'} = $o->[1];
                 $v->{'diagnosis'} = $o->[2];
@@ -98,6 +99,7 @@ sub inquire {
             } else {
                 # Other DSN fields defined in RFC3464
                 next unless exists $fieldtable->{ $o->[0] };
+                next if $o->[3] eq "host" && Sisimai::RFC1123->is_internethost($o->[2]) == 0;
                 $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
 
                 next unless $f == 1;
@@ -194,7 +196,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

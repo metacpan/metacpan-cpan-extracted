@@ -277,7 +277,11 @@ polcos( x, y, nn )
   double a, sc;
   double *w, *c;
   int i;
+#ifdef ANSIPROT
+  double md_sin(double), md_cos(double);
+#else
   double md_sin(), md_cos();
+#endif
   if (nn > N)
     {
       mtherr ("polatn", OVERFLOW);

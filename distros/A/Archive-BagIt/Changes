@@ -1,10 +1,27 @@
 ==================================================
-Changes from 2024-02-25 00:00:00 +0000 to present.
+Changes from 2024-02-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.099 at 2025-02-24 09:27:03 +0000
+version 0.100 at 2025-02-25 08:54:56 +0000
 ------------------------------------------
+
+  Change: 0b176a133eb125b794aaa3de6d0f6146ff37ae14
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-02-25 09:52:52 +0000
+
+    - fixed issues if bag-info.txt is empty or undefined, unit tests
+    added, too 
+
+------------------------------------------
+version 0.099 at 2025-02-24 09:27:50 +0000
+------------------------------------------
+
+  Change: 4bb18f7afd748a03f2dde00ae1650023d6ac74d5
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2025-02-24 10:27:50 +0000
+
+    Released 0.099 
 
   Change: 33ebfc16a3f202b1c41dedb3a74a3d0de2bdaa1c
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -163,5 +180,5 @@ version 0.096 at 2025-01-29 08:02:59 +0000
     - minor, improved string compare 
 
 =================================================
-Plus 44 releases after 2024-02-25 00:00:00 +0000.
+Plus 44 releases after 2024-02-26 00:00:00 +0000.
 =================================================

@@ -21,7 +21,7 @@ use Class::Accessor::Lite (
     ]],
 );
 
-our $VERSION             = "0.08";
+our $VERSION             = "0.09";
 our $DEFAULT_API_VERSION = "2015-04";
 our $DEFAULT_TIMEOUT     = 60;
 
@@ -30,7 +30,7 @@ sub new {
     
     $param{agent}         = HTTP::Tiny->new(agent => sprintf('%s/%s', $class, $VERSION));
     $param{serializer}    = JSON->new->utf8(1);
-    $param{api_version} ||= $DEFAULT_API_VERSION;
+    $param{api_version} ||= $DEFAULT_API_VERSION || croak 'api_version is required';
 
     if (!defined $param{authorizer}) {
         $param{authorizer} = eval {

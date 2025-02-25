@@ -3,7 +3,7 @@ use v5.26;
 use strict;
 use warnings;
 
-sub get {
+sub find {
     # Detect bounce reason from Yahoo Inc. (*.yahoodns.net)
     # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason for YahooInc
@@ -12,7 +12,7 @@ sub get {
     #           https://www.postmastery.com/yahoo-postmaster/
     # @since v5.1.0
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return undef; return "" unless $argvs->{'diagnosticcode'};
 
     state $messagesof = {
         'authfailure' => [
@@ -32,7 +32,7 @@ sub get {
             # - 550 relaying denied for <***@yahoo.com>
             'relaying denied for ',
         ],
-        'notcomplaintrfc' => ['headers are not rfc compliant'],
+        'notcompliantrfc' => ['headers are not rfc compliant'],
         'policyviolation' => [
             # - 554 Message not allowed - [PH01] Email not accepted for policy reasons.
             #   Please visit https://postmaster.yahooinc.com/error-codes
@@ -117,14 +117,14 @@ Sisimai::Rhost::YahooInc - Detect the bounce reason returned from Yahoo Inc.
 =head1 DESCRIPTION
 
 C<Sisimai::Rhost::YahooInc> detects the bounce reason from the content of C<Sisimai::Fact> object
-as an argument of C<get()> method when the value of C<rhost> of the object end with C<*.yahoodns.net>.
+as an argument of C<find()> method when the value of C<rhost> of the object end with C<*.yahoodns.net>.
 This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head1 AUTHOR
 

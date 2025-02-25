@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils 0.21 qw(check_array_object check_array_required);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has items => (
 	is => 'ro',
@@ -124,6 +124,10 @@ L<Mo::utils>.
 
 Data object for info box item.
 
+=item L<Tags::HTML::InfoBox>
+
+Tags helper for HTML info box.
+
 =item L<Test::Shared::Fixture::Data::InfoBox::Street>
 
 Street info box fixture.
@@ -148,6 +152,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

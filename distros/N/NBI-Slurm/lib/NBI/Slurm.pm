@@ -7,8 +7,8 @@ use NBI::Job;
 use NBI::Opts;
 use base qw(Exporter);
 our @ISA = qw(Exporter);
-our @EXPORT = qw(Job Opts load_config has_queue %FORMAT_STRINGS);
-$NBI::Slurm::VERSION = '0.9.0';
+our @EXPORT = qw(Job Opts load_config has_queue timelog %FORMAT_STRINGS);
+$NBI::Slurm::VERSION = '0.10.0';
 
 
 
@@ -139,6 +139,18 @@ sub days_since_update {
     return $days_since_update;
 }
 
+sub timelog {
+    my $tag = shift;
+    $tag = "nbi-slurm" unless defined $tag;
+    my ($sec, $min, $hour, $day, $month, $year) = localtime(time);
+    $year += 1900;  # Adjust year (localtime returns years since 1900)
+    $month += 1;    # Adjust month (localtime returns 0-11)
+    
+    # Format with leading zeros
+    return sprintf("[%s:%04d-%02d-%02d %02d:%02d:%02d]\t", 
+            $tag, $year, $month, $day, $hour, $min, $sec);
+}
+
 1;
 
 __END__
@@ -153,7 +165,7 @@ NBI::Slurm - NBI Slurm module
 
 =head1 VERSION
 
-version 0.9.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -254,6 +266,16 @@ The C<NBI::Slurm> package includes the following classes:
 
 =back
 
+=head1 FUNCTIONS
+
+The C<NBI::Slurm> package provides the following functions:
+
+=over 4
+
+=item * B<timelog(str)>: Generate a timestamp for logging purposes, with an optional tag (string)
+
+=back
+
 Please refer to the documentation for each class for more information on their methods and usage.
 
 =head1 AUTHOR
@@ -262,7 +284,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Andrea Telatin.
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
 
 This is free software, licensed under:
 

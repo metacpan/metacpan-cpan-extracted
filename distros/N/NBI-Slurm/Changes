@@ -1,3 +1,7 @@
+0.10.0  2024-09-16
+
+* Bugfix in `runjobs` to change the refresh rate, added timestamp
+
 0.9.0	2024-09-16
 
 * Implements a first use of Job Array

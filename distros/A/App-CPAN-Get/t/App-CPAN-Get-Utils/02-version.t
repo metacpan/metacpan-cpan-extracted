@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($App::CPAN::Get::Utils::VERSION, 0.13, 'Version.');
+is($App::CPAN::Get::Utils::VERSION, 0.14, 'Version.');

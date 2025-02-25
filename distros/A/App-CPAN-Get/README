@@ -2,7 +2,7 @@ NAME
     cpan-get - Tool to fetch module from CPAN archive.
 
 SYNOPSIS
-     cpan-get [-f] [-h] [--version] module_name[module_version]
+     cpan-get [-f] [-h] [-o out_dir] [--version] module_name[module_version]
 
 DESCRIPTION
     Vision of this module is:
@@ -15,20 +15,27 @@ DESCRIPTION
 ARGUMENTS
     *       "-f"
 
-             Force download and rewrite of existing file.
+            Force download and rewrite of existing file.
 
     *       "-h"
 
-             Print help.
+            Print help.
+
+    *       "-o out_dir"
+
+            Output directory.
+
+            Default value is actual directory.
 
     *       "--version"
 
-             Print version of script.
+            Print version of script.
 
     *       "module_name"
 
-             Perl module name.
-             e.g. App::Pod::Example
+            Perl module name.
+
+            e.g. App::Pod::Example
 
     *       "module_version"
 
@@ -53,12 +60,12 @@ SEE ALSO
     cpan
         easily interact with CPAN from the command line
 
-        "cpan -g Some::Module"
+        "cpan -g App::Pod::Example"
 
     cpanp
         The CPANPLUS launcher
 
-        "cpanp d --fetchdir=. Some::Module"
+        "cpanp d --fetchdir=. App::Pod::Example"
 
     cpanget
         Shell tool in cpanspec project.
@@ -95,5 +102,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.14
 

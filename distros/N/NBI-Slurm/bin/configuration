@@ -60,6 +60,7 @@ session_hours=12
 # IMAGES FOR HPC
 
 # Default destination when --move an image
+# Should be a place readable by all users in the HPC cluster
 default_dest=/qib/platforms/Informatics/transfer/outgoing/singularity/core/
 
 # Where to place the package
@@ -89,7 +90,7 @@ configuration_file_info - How to make your configuration file for NBI::Slurm too
 
 =head1 VERSION
 
-version 0.9.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -214,7 +215,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Andrea Telatin.
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
 
 This is free software, licensed under:
 

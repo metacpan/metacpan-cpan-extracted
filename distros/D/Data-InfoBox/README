@@ -75,6 +75,9 @@ SEE ALSO
     Data::InfoBox::Item
         Data object for info box item.
 
+    Tags::HTML::InfoBox
+        Tags helper for HTML info box.
+
     Test::Shared::Fixture::Data::InfoBox::Street
         Street info box fixture.
 
@@ -92,5 +95,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

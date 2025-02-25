@@ -71,4 +71,3 @@ RATE_LIMIT: {
 
 	cmp_ok(ref($cache->get('weather:39.1155:-77.5644:2023-12-25:Europe/London')), 'eq', 'HASH');
 }
-

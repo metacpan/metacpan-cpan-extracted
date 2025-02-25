@@ -3,14 +3,14 @@ use v5.26;
 use strict;
 use warnings;
 
-sub get {
+sub find {
     # Detect bounce reason from Google Workspace
     # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason for Google Workspace
     # @see      https://support.google.com/a/answer/3726730?hl=en
     # @since v4.0.0
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return undef; return "" unless $argvs->{'diagnosticcode'};
     return '' unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
     return '' unless Sisimai::SMTP::Status->test($argvs->{'deliverystatus'});
 
@@ -174,6 +174,22 @@ sub get {
             #   error messages. https://support.google.com/a/answer/3221692
             ['451', '4.4.2', 'timeout - closing connection'],
         ],
+        "failedstarttls" => [
+            # - 530 5.7.0 Must issue a STARTTLS command first. For more information, go to About
+            #   SMTP error messages and review RFC 3207 specifications.
+            ['530', '5.7.0', 'must issue a starttls command first'],
+            ['454', '5.5.1', 'starttls may not be repeated'],
+
+            # - 421 4.7.0 TLS required for RCPT domain, closing connection. For more information,
+            #   go to Email encryption in transit. https://support.google.com/mail/answer/6330403
+            ['421', '4.7.0', 'tls required for rcpt domain'],
+
+            # - 421 4.7.29 Your email has been rate limited because this message wasn't sent over a
+            #   TLS connection. Gmail requires all bulk email senders to use TLS/SSL for SMTP conn-
+            #   ections.
+            ['421', '4.7.29', 'senders to use tls/ssl for smtp'],
+            ['550', '5.7.29', 'senders to use tls/ssl for smtp'],
+        ],
         'mailboxfull' => [
             # - 452 4.2.2 The recipient's inbox is out of storage space.
             #   Please direct the recipient to https://support.google.com/mail/?p=OverQuotaTemp
@@ -331,12 +347,8 @@ sub get {
             ['550', '5.7.25', 'does not match the ip address of the hostname'],
         ],
         'securityerror' => [
-            # - 421 4.7.0 TLS required for RCPT domain, closing connection. For more information,
-            #   go to Email encryption in transit. https://support.google.com/mail/answer/6330403
-            #
             # - 454 4.7.0 Too many login attempts, please try again later. For more information, go
             #   to Add Gmail to another email client. https://support.google.com/mail/answer/7126229
-            ['421', '4.7.0', 'tls required for rcpt domain'],
             ['454', '4.7.0', 'too many login attempts'],
 
             # - 503 5.7.0 No identity changes permitted. For more information, go to About SMTP
@@ -365,12 +377,6 @@ sub get {
             #   https://support.google.com/accounts/troubleshooter/2402620
             ['535', '5.7.1', 'username and password not accepted'],
             ['535', '5.7.8', 'username and password not accepted'],
-
-            # - 421 4.7.29 Your email has been rate limited because this message wasn't sent over a
-            #   TLS connection. Gmail requires all bulk email senders to use TLS/SSL for SMTP conn-
-            #   ections.
-            ['421', '4.7.29', 'senders to use tls/ssl for smtp'],
-            ['550', '5.7.29', 'senders to use tls/ssl for smtp'],
         ],
         'spamdetected' => [
             # - 421 4.7.0 This message is suspicious due to the nature of the content or the links
@@ -431,7 +437,6 @@ sub get {
             ['454', '4.5.0',  'smtp protocol violation'],
             ['525', '5.7.10', 'smtp protocol violation'],
             ['535', '5.5.4',  'optional argument not permitted'],
-            ['454', '5.5.1',  'starttls may not be repeated'],
 
             # - 501 5.5.2 Syntax error, cannot decode response. For more information, go to About
             #   SMTP error messages.
@@ -460,10 +465,6 @@ sub get {
             ['503', '5.5.1', 'no data after bdat'],
             ['504', '5.7.4', 'unrecognized authentication type'],
             ['504', '5.7.4', 'xoauth is no longer supported'],
-
-            # - 530 5.7.0 Must issue a STARTTLS command first. For more information, go to About
-            #   SMTP error messages and review RFC 3207 specifications.
-            ['530', '5.7.0', 'must issue a starttls command first'],
             ['554', '5.7.0', 'too many unauthenticated commands'],
         ],
         'systemerror' => [
@@ -517,8 +518,8 @@ sub get {
         ],
     };
 
-    my $statuscode = substr($argvs->{'deliverystatus'}, 2); # 421   => 21
-    my $esmtpreply = substr($argvs->{'replycode'}, 1, 2);   # 5.7.1 => 7.1
+    my $statuscode = substr($argvs->{'deliverystatus'}, 2); # 5.7.1 => 7.1
+    my $esmtpreply = substr($argvs->{'replycode'}, 1, 2);   #   421 =>  21
     my $issuedcode = lc $argvs->{'diagnosticcode'};
     my $reasontext = '';
 
@@ -552,14 +553,14 @@ Sisimai::Rhost::Google - Detect the bounce reason returned from Google Workspace
 =head1 DESCRIPTION
 
 C<Sisimai::Rhost::Google> detects the bounce reason from the content of C<Sisimai::Fact> object as
-an argument of C<get()> method when the value of C<rhost> of the object is C<aspmx.l.google.com>.
+an argument of C<find()> method when the value of C<rhost> of the object is C<aspmx.l.google.com>.
 This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head1 AUTHOR
 

@@ -43,13 +43,11 @@ subtest 'with connection_string, api_version' => sub {
 subtest 'with connection_string and undefined default values' => sub {
     local $Net::Azure::NotificationHubs::DEFAULT_API_VERSION = undef;
 
-    my $hub = Net::Azure::NotificationHubs->new(
-        connection_string => 'Endpoint=sb://mysvc.servicebus.windows.net/;SharedAccessKeyName=mykey;SharedAccessKey=AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=;EntityPath=myentity',
-    );
-
-    isa_ok $hub, 'Net::Azure::NotificationHubs';
-    isa_ok $hub->authorizer, 'Net::Azure::Authorization::SAS';
-    is $hub->api_version, undef, 'api_version is undef';
+    throws_ok {
+        Net::Azure::NotificationHubs->new(
+            connection_string => 'Endpoint=sb://mysvc.servicebus.windows.net/;SharedAccessKeyName=mykey;SharedAccessKey=AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=;EntityPath=myentity',
+        );
+    } qr/api_version is required/, 'throws "api_version is required"';
 };
 
 done_testing;

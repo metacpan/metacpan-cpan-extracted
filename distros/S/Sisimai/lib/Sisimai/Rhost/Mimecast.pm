@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Sisimai::SMTP::Reply;
 
-sub get {
+sub find {
     # Detect bounce reason from https://www.mimecast.com/
     # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason at Mimecast
     # @since v4.25.15
     my $class = shift;
     my $argvs = shift // return undef;
+    return '' unless $argvs->{'diagnosticcode'};
     return '' unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
 
     state $messagesof = {
@@ -83,6 +84,32 @@ sub get {
             # - Check to confirm there are no significant time discrepancies on the mail server.
             #   Discontinue journaling old messages past the expiry threshold.
             [550, 'Journal messages past the expiration'],
+        ],
+        'failedstarttls' => [
+            # - This email has been sent using SMTP, but TLS is required by policy.
+            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS.
+            #   Alternatively, ensure the certificates on the mail server haven't expired. If using
+            #   a proxy server, ensure it isn't intercepting the traffic and modifying encryption
+            #   parameters.
+            [553, 'this route requires encryption (tls)'],
+
+            # - A TLS connection has been attempted using a TLS version that is lower than TLS 1.2.
+            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS.
+            #   Alternatively, ensure the mail server attempting to connect is using the appropri-
+            #   ate version of TLS.
+            [553, 'this route requires tls version 1.2 or greater'],
+
+            # - A secure connection was attempted using ciphers that do not meet the configured ci-
+            #   pher strength.
+            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS. Alter-
+            #   natively, ensure the certificates on the mail server haven't expired. If using a
+            #   proxy server, ensure it isn't intercepting the traffic and modifying encryption
+            #   parameters.
+            [553, 'this route requires high-strength ciphers'],
+
+            # - Validation on your umbrella account's domain name does not conform to your DNS.
+            # - Check you DNS has the required umbrella accounts listed as comma-separated values.
+            [554, 'configuration is invalid for this certificate'],
         ],
         'mesgtoobig' => [
             # - The email size either exceeds an Email Size Limit policy or is larger than the
@@ -180,31 +207,6 @@ sub get {
             [535, 'incorrect authentication data'],
             [550, 'submitter failed to disabled'],
             [550, 'submitter failed to authenticate'],
-
-            # - This email has been sent using SMTP, but TLS is required by policy.
-            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS.
-            #   Alternatively, ensure the certificates on the mail server haven't expired. If using
-            #   a proxy server, ensure it isn't intercepting the traffic and modifying encryption
-            #   parameters.
-            [553, 'this route requires encryption (tls)'],
-
-            # - A TLS connection has been attempted using a TLS version that is lower than TLS 1.2.
-            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS.
-            #   Alternatively, ensure the mail server attempting to connect is using the appropri-
-            #   ate version of TLS.
-            [553, 'this route requires tls version 1.2 or greater'],
-
-            # - A secure connection was attempted using ciphers that do not meet the configured ci-
-            #   pher strength.
-            # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS. Alter-
-            #   natively, ensure the certificates on the mail server haven't expired. If using a
-            #   proxy server, ensure it isn't intercepting the traffic and modifying encryption
-            #   parameters.
-            [553, 'this route requires high-strength ciphers'],
-
-            # - Validation on your umbrella account's domain name does not conform to your DNS.
-            # - Check you DNS has the required umbrella accounts listed as comma-separated values.
-            [554, 'configuration is invalid for this certificate'],
         ],
         'systemerror' => [
             # - The Mimecast server is under maximum load.
@@ -319,14 +321,14 @@ Sisimai::Rhost::Mimecast - Detect the bounce reason returned from Mimecast
 =head1 DESCRIPTION
 
 C<Sisimai::Rhost::Mimecast> detects the bounce reason from the content of C<Sisimai::Fact> object
-as an argument of C<get()> method when the value of C<rhost> or C<destination> of the object is
+as an argument of C<find()> method when the value of C<rhost> or C<destination> of the object is
 C<mimecast.com>. This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Fact Object>)>>
+=head2 C<B<find(I<Sisimai::Fact Object>)>>
 
-C<get()> method detects the bounce reason.
+C<find()> method detects the bounce reason.
 
 =head1 AUTHOR
 

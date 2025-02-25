@@ -13,6 +13,7 @@
  */
 
 /*							cpmul	*/
+#include "mconf.h"
 
 #ifdef ANSIPROT
 extern void * malloc (long);
@@ -21,12 +22,6 @@ extern void free (void *);
 void * malloc();
 void free ();
 #endif
-
-typedef struct
-	{
-	double r;
-	double i;
-	}cmplx;
 
 int 
 cpmul_wrap( ar, ai, da, br, bi, db, cr, ci, dc )

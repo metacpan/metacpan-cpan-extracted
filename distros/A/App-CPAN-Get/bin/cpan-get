@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -28,7 +28,7 @@ cpan-get - Tool to fetch module from CPAN archive.
 
 =head1 SYNOPSIS
 
- cpan-get [-f] [-h] [--version] module_name[module_version]
+ cpan-get [-f] [-h] [-o out_dir] [--version] module_name[module_version]
 
 =head1 DESCRIPTION
 
@@ -45,20 +45,27 @@ Vision of this module is:
 
 =item * C<-f>
 
- Force download and rewrite of existing file.
+Force download and rewrite of existing file.
 
 =item * C<-h>
 
- Print help.
+Print help.
+
+=item * C<-o out_dir>
+
+Output directory.
+
+Default value is actual directory.
 
 =item * C<--version>
 
- Print version of script.
+Print version of script.
 
 =item * C<module_name>
 
- Perl module name.
- e.g. App::Pod::Example
+Perl module name.
+
+e.g. App::Pod::Example
 
 =item * C<module_version>
 
@@ -91,13 +98,13 @@ There are some posibilities how to define:
 
 easily interact with CPAN from the command line
 
-C<cpan -g Some::Module>
+C<cpan -g App::Pod::Example>
 
 =item L<cpanp>
 
 The CPANPLUS launcher
 
-C<cpanp d --fetchdir=. Some::Module>
+C<cpanp d --fetchdir=. App::Pod::Example>
 
 =item L<cpanget>
 
@@ -143,6 +150,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

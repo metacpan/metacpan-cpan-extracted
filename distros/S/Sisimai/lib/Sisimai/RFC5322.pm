@@ -2,7 +2,7 @@ package Sisimai::RFC5322;
 use v5.26;
 use strict;
 use warnings;
-use Sisimai::String;
+use Sisimai::RFC791;
 use Sisimai::Address;
 use constant HEADERTABLE => {
     'messageid' => ['message-id'],
@@ -12,14 +12,6 @@ use constant HEADERTABLE => {
     'addresser' => [qw|from return-path reply-to errors-to reverse-path x-postfix-sender envelope-from x-envelope-from|],
     'recipient' => [qw|to delivered-to forward-path envelope-to x-envelope-to resent-to apparently-to|],
 };
-
-my $HEADERINDEX = {};
-BUILD_FLATTEN_RFC822HEADER_LIST: {
-    # Convert $HEADER: hash reference to flatten hash reference for being called from Sisimai::Lhost::*
-    for my $v ( values HEADERTABLE()->%* ) {
-        $HEADERINDEX->{ $_ } = 1 for @$v;
-    }
-}
 
 sub FIELDINDEX {
     return [qw|
@@ -34,11 +26,11 @@ sub FIELDINDEX {
 sub HEADERFIELDS {
     # Grouped RFC822 headers
     # @param    [String] group  RFC822 Header group name
-    # @return   [Array,Hash]    RFC822 Header list
+    # @return   [Array]         RFC822 Header list
     my $class = shift;
-    my $group = shift || return $HEADERINDEX;
+    my $group = shift || return [];
     return HEADERTABLE->{ $group } if exists HEADERTABLE->{ $group };
-    return HEADERTABLE;
+    return [];
 }
 
 sub LONGFIELDS {
@@ -140,7 +132,7 @@ sub received {
         next unless defined $token->{ $e };
         next unless length  $token->{ $e };
         next unless index($token->{ $e }, '[') == 0;
-        $token->{ $e } = shift Sisimai::String->ipv4($token->{ $e })->@* || '';
+        $token->{ $e } = shift Sisimai::RFC791->find($token->{ $e })->@* || '';
     }
 
     $token->{'from'} ||= '';
@@ -149,7 +141,7 @@ sub received {
         last if $token->{'from'} eq 'localhost';
         last if $token->{'from'} eq 'localhost.localdomain';
         last if index($token->{'from'}, '.') < 0;   # A hostname without a domain name
-        last if scalar Sisimai::String->ipv4($token->{'from'})->@*;
+        last if scalar Sisimai::RFC791->find($token->{'from'})->@*;
 
         # No need to rewrite $token->{'from'}
         $right = 1;

@@ -1,6 +1,12 @@
 Revision history for Math::Cephes
 
-0.5305  May 06, 2016
+0.5306  2025-02-25
+    - Convert Changes to CPAN::Changes format.
+    - Some patches from debian.org for better portability.
+        - Thanks!
+    - Modernization / refactoring.
+
+0.5305  2016-05-06
     - Remove trailing whitespace - with a test.
     - Add LICENSE file (CPANTS).
     - Add "use warnings" (CPANTS).
@@ -11,55 +17,55 @@ Revision history for Math::Cephes
         - Thanks to Slaven Rezic for the report and to BINGOS for a proposed
         fix.
 
-0.5304  Jan 31, 2014
+0.5304  2014-01-31
     - Add scripts/bump-version-number.pl to bump the version number.
     - Add license to META.yml and a LICENSE file (CPANTS).
     - Add "use warnings;" to all modules (CPANTS).
 
-0.5303  Oct 11, 2013
+0.5303  2013-10-11
   - Add Repository CPAN Metadata.
     - thanks to David Steinbrunner
 
-0.5302  Nov 11, 2012
+0.5302  2012-11-11
   - Fix https://rt.cpan.org/Ticket/Display.html?id=81105 .
     - Fails on perls with nvsize != 8.
     - Due to using Test::More::is() for floating-point comparisons.
     - Thanks to ANDK for the report.
 
-0.5301  Nov 11, 2012
+0.5301  2012-11-11
   - Fix the second test case (without explicit use Math::Cephes::Complex)
   in https://rt.cpan.org/Ticket/Display.html?id=80624 .
 
-0.53    Nov 10, 2012
+0.53    2012-11-10
   - Fix the exporting of new_cmplx:
     - https://rt.cpan.org/Ticket/Display.html?id=80624
 
-0.52    Nov 02, 2012
+0.52    2012-11-02
   - Change the author to a different account.
     - Done to try and avoid getting over report that the module "has no
     active maintainer").
 
-0.51    Oct 23, 2012
+0.51    2012-10-23
   - Fix the auto-generation of META.yml/META.json.
     - There was a NO_META in the Makefile.PL (WTF?), which preserved
     the existing META.
 
-0.50    Oct 23, 2012
+0.50    2012-10-23
   - New version to get over a CPAN/PAUSE's SNAFU.
     - The CPAN clients don't install the right version.
     - Thanks to aero for the report, and John M. Gamble and Steffen
     Mueller for some insights.
 
-0.48    Jul 14, 2012
+0.48    2012-07-14
   - Apply patch to Makefile.PL to fix builds on x86-64 Macintosh:
     - https://rt.cpan.org/Ticket/Display.html?id=75730
     - Thanks to Ian Barton for the report and the patch.
   - Update lib/Math/Cephes.pod with up-to-date information.
 
-0.47    Jan 6, 2009
+0.47    2009-01-06
   - dmake requires creation of dummy libmd file (reported by Sisyphus)
 
-0.46    Jan 2, 2009
+0.46    2009-01-02
   - Intel Mac support (dsteinbrunner):
       http://rt.cpan.org/Public/Bug/Display.html?id=25842
   - support for building on cygwin (patch supplied by Sisyphus)
@@ -70,14 +76,14 @@ Revision history for Math::Cephes
     on some platforms:
       http://cpantesters.perl.org/show/Math-Cephes.html
 
-0.45    July 26, 2007
+0.45    2007-07-26
   - fix bug in Math::Cephes::Complex to allow 0 as a value
     (thanks to Dan Connelly)
 
-0.44    Apr 7, 2007
+0.44    2007-04-07
   - allow Darwin to use default config for Mac OSX 10 (Chip Stewart)
 
-0.43    June 17, 2006
+0.43    2006-06-17
   - add lgam to list of functions in "gammas" tag
     (spotted by Philip Lijnzaad)
   - allow clr() method of Math::Cephes::Matrix to accept
@@ -85,16 +91,16 @@ Revision history for Math::Cephes
   - incorporate a couple of small changes in igam.c, igami.c,
     polylog.c, and hyperg.c to bring them in synch to cephes 0.28.
 
-0.42    March 21, 2004
+0.42    2004-03-21
   - fix bug in Math::Cephes::Polynomial in the mult routine
     to get the right size of the resulting polynomial
 
-0.41    Dec 30, 2003
+0.41    2003-12-30
   - use dummy setprec.c for Darwin
   - remove unneeded Math::cephes::fract
   - create bogus libmd/libmd lib, to avoid MakeMaker warning
 
-0.40    Dec 20, 2003
+0.40    2003-12-20
 
   - move Cephes_wrap.c and arrays.c to top-level directory
     and configure Makefile.PL to build static libmd.
@@ -104,7 +110,7 @@ Revision history for Math::Cephes
     collisions with system functions (thanks to Thomas
     Puzia and David Martin for pointing out the problem)
 
-0.36    Sept 12, 2002
+0.36    2002-09-12
 
   - added functions that require arrays into and out from
     C (simpson's rule, polynomial and matrix routines).
@@ -112,12 +118,12 @@ Revision history for Math::Cephes
   - added Solaris mconf.h that mostly works (thanks to
     Jost Krieger).
 
-0.25	Oct 25, 2000
+0.25    2000-10-25
 
   - changed Cephes_wrap.c to compile when MULTIPLICITY
     in perl 5.6.0 is defined (addition of pTHX_)
 
-0.20    Mar 12, 2000
+0.20    2000-03-12
 
   - changed name from Math::Functions to Math::Cephes
   - added Math::Cephes::Fraction and Math::Cephes::Complex
@@ -127,6 +133,6 @@ Revision history for Math::Cephes
   - some changes to the pmath script, including the interface
     to handle fractions and complex numbers
 
-0.10	Feb 14, 2000
+0.10    2000-02-14
 
   - original version, created by Swig with help from h2xs

@@ -12,7 +12,7 @@ my @fract = qw(euclid fract mixed_fract);
 @EXPORT_OK = (@fract);
 %EXPORT_TAGS = ('fract' => [@fract]);
 
-$VERSION = '0.5305';
+$VERSION = '0.5306';
 #use Math::Cephes qw(new_fract euclid);
 require Math::Cephes;
 @ISA = qw( Math::Cephes );

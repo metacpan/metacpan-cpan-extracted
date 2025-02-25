@@ -130,7 +130,7 @@ NBI::QueuedJob - NBI::QueuedJob, to describe a job from the SLURM queue (squeue)
 
 =head1 VERSION
 
-version 0.9.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Andrea Telatin.
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
 
 This is free software, licensed under:
 

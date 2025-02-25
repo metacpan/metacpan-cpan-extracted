@@ -1,0 +1,13 @@
+Cephes.bs
+Cephes_wrap.o
+MYMETA.json
+MYMETA.yml
+Makefile
+arrays.o
+blib
+libmd/*.o
+libmd/libmd.a
+libmd/mconf.h
+libmd/setprec.c
+libmd/sqrt.c
+pm_to_blib

@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -98,8 +98,10 @@ Creates a new instance. Acceptable options include:
 The date argument can be an ISO-8601 formatted date,
 or an object that understands the strftime method.
 
-Takes an optional argument, tz, which defaults to 'Europe/London'.
-For that to work set TIMEZONEDB\_KEY to be your API key from [https://timezonedb.com](https://timezonedb.com).
+Takes an optional argument, tz, containing the time zone.
+If not given, the module tries to work it out from the given location,
+for that to work set TIMEZONEDB\_KEY to be your API key from [https://timezonedb.com](https://timezonedb.com).
+If all else fails, the module falls back to Europe/London.
 
 ## ua
 

@@ -6,7 +6,7 @@ use namespace::autoclean;
 use IO::Async::Loop;
 use IO::Async::Stream;
 use Net::SSLeay ();
-our $VERSION = '0.099'; # VERSION
+our $VERSION = '0.100'; # VERSION
 # ABSTRACT: handles asynchronous digest calculation using openssl
 
 sub BEGIN {
@@ -92,7 +92,7 @@ Archive::BagIt::Role::OpenSSL::Async - handles asynchronous digest calculation u
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head1 AVAILABILITY
 

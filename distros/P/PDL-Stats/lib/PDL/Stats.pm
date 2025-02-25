@@ -3,7 +3,7 @@ package PDL::Stats;
 use strict;
 use warnings;
 
-our $VERSION = '0.853';
+our $VERSION = '0.854';
 
 sub import {
   my $pkg = (caller())[0];
@@ -35,8 +35,6 @@ Properly formatted documentations online at http://pdl-stats.sf.net
 =head1 SYNOPSIS
 
     use PDL::LiteF;        # loads fewer modules
-    use PDL::NiceSlice;    # preprocessor for easier pdl indexing syntax
-
     use PDL::Stats;
 
     # Is equivalent to the following:
@@ -77,7 +75,7 @@ The magic word that puts PDL::Stats at your disposal. pdl creates a PDL numeric 
     # do a two-way analysis of variance with y as DV and x1 x2 as IVs
 
     my %result = pdl(@y)->anova( \@x1, \@x2 );
-    print "$_\t$result{$_}\n" for (sort keys %result);
+    print "$_\t$result{$_}\n" for sort keys %result;
 
 If you have a list of list, ie array of array refs, pdl will create a multi-dimensional data object.
 
@@ -101,7 +99,7 @@ PDL::Stats puts observations in the first dimension and variables in the second 
     # you can do all kinds of fancy stuff on such a 2D pdl.
 
     my %result = $a->kmeans( {NCLUS=>2} );
-    print "$_\t$result{$_}\n" for (sort keys %result);
+    print "$_\t$result{$_}\n" for sort keys %result;
 
 Make sure the array of array refs is rectangular. If the array refs are of unequal sizes, pdl will pad it out with 0s to match the longest list.
 
@@ -121,19 +119,19 @@ This is not a function, but a concept. You will see something like this frequent
 
     stdv
 
-      Signature: (a(n); float+ [o]b())
+      Signature: (a(n); [o]b())
 
-The signature tells you what the function expects as input and what kind of output it produces. a(n) means it expects a 1D pdl with n elements; [o] is for output, b() means its a scalar. So stdv will take your 1D list and give back a scalar. float+ you can ignore; but if you insist, it means the output is at float or double precision. The name a or b or c is not important. What's important is the thing in the parenthesis.
+The signature tells you what the function expects as input and what kind of output it produces. a(n) means it expects a 1D pdl with n elements; [o] is for output, b() means its a scalar. So stdv will take your 1D list and give back a scalar. The name a or b or c is not important. What's important is the thing in the parenthesis.
 
     corr
 
-      Signature: (a(n); b(n); float+ [o]c())
+      Signature: (a(n); b(n); [o]c())
 
 Here the function corr takes two inputs, two 1D pdl with the same numbers of elements, and gives back a scalar.
 
     t_test
 
-      Signature: (a(n); b(m); float+ [o]t(); [o]d())
+      Signature: (a(n); b(m); [o]t(); [o]d())
 
 Here the function t_test can take two 1D pdls of unequal size (n==m is certainly fine), and give back two scalars, t-value and degrees of freedom. Yes we accommodate t-tests with unequal sample sizes.
 
@@ -145,11 +143,11 @@ Here is one of the most complicated signatures in the package. This is a functio
 
 Got the idea? Then we can see how PDL does its magic :)
 
-=head2 Threading
+=head2 Broadcasting
 
-Another concept. The first thing to know is that, threading is optional.
+Another concept. The first thing to know is that, broadcasting is optional.
 
-PDL threading means automatically repeating the operation on extra elements or dimensions fed to a function. For a function with a signature like this
+PDL broadcasting means automatically repeating the operation on extra elements or dimensions fed to a function. For a function with a signature like this
 
     gsl_cdf_tdist_P
 
@@ -183,11 +181,11 @@ The same function is repeated on each element in the list you provided. If you h
 
 The df's are automatically matched with the t's to give you the results.
 
-An example of threading thru extra dimension(s):
+An example of broadcasting over extra dimension(s):
 
     stdv
 
-      Signature: (a(n); float+ [o]b())
+      Signature: (a(n); [o]b())
 
 if the input is of 2D, say you want to compute the stdv for each of the 3 variables,
 
@@ -206,9 +204,9 @@ if the input is of 2D, say you want to compute the stdv for each of the 3 variab
 
 Here the function was given an input with an extra dimension of size 3, so it repeats the stdv operation on the extra dimension 3 times, and gives back a 1D pdl of size 3.
 
-Threading works for arbitrary number of dimensions, but it's best to refrain from higher dim pdls unless you have already decided to become a PDL wiz / witch.
+Broadcasting works for arbitrary number of dimensions, but it's best to refrain from higher dim pdls unless you have already decided to become a PDL wiz / witch.
 
-Not all PDL::Stats methods thread. As a rule of thumb, if a function has a signature attached to it, it threads.
+Not all PDL::Stats methods broadcast. As a rule of thumb, if a function has a signature attached to it, it broadcasts.
 
 =head2 perldl
 

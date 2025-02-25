@@ -1,4 +1,5 @@
 Changes
+lib/PDL/Demos/Stats.pm
 lib/PDL/Stats.pm
 lib/PDL/Stats/Basic.pd
 lib/PDL/Stats/GLM.pd
@@ -8,11 +9,10 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 t/00-report-prereqs.t
-t/stats_basic.t
-t/stats_glm.t
-t/stats_kmeans.t
-t/stats_ols_rptd.t
-t/stats_ts.t
+t/basic.t
+t/glm.t
+t/kmeans.t
+t/ts.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Stats/Basic.pm             mod=PDL::Stats::Basic pd=lib/PDL/Stats/Basic.pd (added by pdlpp_mkgen)

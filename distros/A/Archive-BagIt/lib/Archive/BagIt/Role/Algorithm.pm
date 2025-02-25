@@ -5,7 +5,7 @@ use Moo::Role;
 use Carp qw(croak);
 with 'Archive::BagIt::Role::Plugin';
 # ABSTRACT: A role that defines the interface to a hashing algorithm
-our $VERSION = '0.099'; # VERSION
+our $VERSION = '0.100'; # VERSION
 
 has 'name' => (
     is => 'ro',
@@ -47,7 +47,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head2 get_optimal_bufsize($fh)
 

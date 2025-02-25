@@ -19,11 +19,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -166,8 +166,10 @@ sub new {
 The date argument can be an ISO-8601 formatted date,
 or an object that understands the strftime method.
 
-Takes an optional argument, tz, which defaults to 'Europe/London'.
-For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
+Takes an optional argument, tz, containing the time zone.
+If not given, the module tries to work it out from the given location,
+for that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
+If all else fails, the module falls back to Europe/London.
 
 =cut
 
@@ -214,8 +216,14 @@ sub weather
 	if($latitude =~ /^\./) {
 		$latitude = "0$latitude";
 	}
+	if($latitude =~ /^\-\.(\d+)$/) {
+		$latitude = "-0.$1";
+	}
 	if($longitude =~ /^\./) {
 		$longitude = "0$longitude";
+	}
+	if($longitude =~ /^\-\.(\d+)$/) {
+		$longitude = "-0.$1";
 	}
 
 	if(($latitude !~ /^-?\d+(\.\d+)?$/) || ($longitude !~ /^-?\d+(\.\d+)?$/)) {

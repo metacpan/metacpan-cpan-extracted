@@ -13,6 +13,10 @@ my $libmd = catdir $cwd, 'libmd';
 my $arch = $Config{archname};
 my $is_win32 = ($arch =~ /MSWin32/i && $Config{cc} eq 'cl');
 my $is_387 = ($arch =~ /^i\d+-linux/i);
+my $is_s390 = ($arch =~ /^s390x?-/i);
+my $is_m68k = ($arch =~ /^m68k-/i);
+my $is_ppc = ($arch =~ /^powerpc(64)?-/i);
+my $is_parisc = ($arch =~ /^hppa-/i);
 my $is_sol = ($arch =~ /sun4-solaris|sparc/i);
 my $is_dar = ($arch =~ /darwin/i);
 my $is_cyg = ($arch =~ /cygwin/i || ($arch =~ /MSWin32/i && !$is_win32));
@@ -24,8 +28,8 @@ my $dmake  = ($Config{make} eq 'dmake');
 if ($dmake) {
     my $lib = 'libmd' . $Config{lib_ext};
     my $dummy = catfile $libmd, $lib;
-    open(DUMMY, ">$dummy") or die "Cannot create $dummy: $!";
-    close DUMMY;
+    open(my $dummy_fh, '>',$dummy) or die "Cannot create $dummy: $!";
+    close $dummy_fh;
 }
 ######################################
 
@@ -81,7 +85,7 @@ my $vals = {RETSIGTYPE => {define => 'void', undef => 'int'},
 if ($is_win32 or $is_387 or $is_cyg) {
     $defs{IBMPC} = 1;
 }
-elsif ($is_sol) {
+elsif ($is_sol or $is_s390 or $is_m68k or $is_ppc or $is_parisc) {
     $defs{WORDS_BIGENDIAN} = 1;
     $defs{FLOAT_WORDS_BIGENDIAN} = 1;
     $defs{UNK} = 1;
@@ -105,22 +109,22 @@ else {
     $defs{UNK} = 1;
 }
 my $match = join '|', keys %defs;
-open(MCONF, ">$mconf") or die "Cannot open $mconf: $!";
+open(my $mconf_fh, '>', $mconf) or die "Cannot open $mconf: $!";
 while (my $line = <DATA>) {
     if ($line =~ /\#define\s+($match)/) {
         my $def = $1;
-        print MCONF fix_mconf($def, $defs{$def});
+        print {$mconf_fh} fix_mconf($def, $defs{$def});
     }
     elsif ($line =~ /^\#define XPD/) {
         my $lds = $Config{longdblsize};
         my $xpd = ($is_387 and $lds and $lds == 12) ? '0,' : '';
-        print MCONF qq{\#define XPD $xpd\n};
+        print {$mconf_fh} qq{\#define XPD $xpd\n};
     }
     else {
-        print MCONF $line;
+        print {$mconf_fh} $line;
     }
 }
-close MCONF;
+close $mconf_fh;
 
 
 WriteMakefile(%opts);
@@ -352,7 +356,7 @@ typedef struct
 #ifdef __STDC__
 #define ANSIPROT
 /* #include "protos.h" */
-int mtherr();
+int mtherr(char *, int);
 #else
 int mtherr();
 #endif

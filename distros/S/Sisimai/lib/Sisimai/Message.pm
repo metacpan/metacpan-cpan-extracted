@@ -15,18 +15,20 @@ state $Fields1894 = Sisimai::RFC1894->FIELDINDEX;
 state $Fields5322 = Sisimai::RFC5322->FIELDINDEX;
 state $Fields5965 = Sisimai::RFC5965->FIELDINDEX;
 state $FieldTable = { map { lc $_ => $_ } ($Fields1894->@*, $Fields5322->@*, $Fields5965->@*) };
-state $ReplacesAs = { 'Content-Type' => [['message/xdelivery-status', 'message/delivery-status']] };
-state $Boundaries = ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'];
+state $Boundaries = ["Content-Type: message/rfc822", "Content-Type: text/rfc822-headers"];
+state $ReplacesAs = {
+    "Content-Type" => [
+        ["message/xdelivery-status",         "message/delivery-status"],
+        ["message/disposition-notification", "message/delivery-status"],
+    ],
+};
 
-my $ToBeLoaded = [];
 my $TryOnFirst = [];
 
 sub rise {
     # Constructor of Sisimai::Message
     # @param         [Hash] argvs   Email text data
     # @options argvs [String] data  Entire email message
-    # @options argvs [Array]  load  User defined MTA module list
-    # @options argvs [Array]  order The order of MTA modules
     # @options argvs [Code]   hook  Reference to callback method
     # @return        [Hash]         Structured email data
     #                [Undef]        If each value of the arguments are missing
@@ -35,16 +37,6 @@ sub rise {
     my $email = $argvs->{'data'} || return undef;
     my $thing = { 'from' => '', 'header' => {}, 'rfc822' => '', 'ds' => [], 'catch' => undef };
     my $param = {};
-
-    # 0. Load specified MTA modules
-    for my $e ('load', 'order') {
-        # Order of MTA modules
-        next unless exists $argvs->{ $e };
-        next unless ref $argvs->{ $e } eq 'ARRAY';
-        next unless scalar $argvs->{ $e }->@*;
-        $param->{ $e } = $argvs->{ $e };
-    }
-    $ToBeLoaded = __PACKAGE__->load(%$param);
 
     my $aftersplit = undef;
     my $beforefact = undef;
@@ -70,7 +62,7 @@ sub rise {
             if( $p1 > -1 ) {
                 # Delete quoted strings, quote symbols(>)
                 $cq = Sisimai::String->sweep(substr($cq, index($cq, ':') + 1,));
-                s/^[>]+[ ]//gm, s/^[>]$//gm for $aftersplit->[2];
+                s/^[>][ ]//gm, s/^[>]$//gm for $aftersplit->[2];
             }
             $thing->{'header'}->{'subject'} = $cq;
         }
@@ -83,7 +75,8 @@ sub rise {
 
         # 5. Try to sift again
         #    There is a bounce message inside of mutipart/*, try to sift the first message/rfc822
-        #    part as a entire message body again.
+        #    part as a entire message body again. rfc3464/1086-a847b090.eml is the email but the
+        #    results decodd by sisimai are unstable.
         $parseagain++;
         $email =  Sisimai::RFC5322->part(\$aftersplit->[2], $Boundaries, 1)->[1];
         $email =~ s/\A[\r\n\s]+//m;
@@ -99,48 +92,7 @@ sub rise {
     return $thing;
 }
 
-sub load {
-    # Load MTA modules which specified at 'order' and 'load' in the argument
-    # @param         [Hash] argvs       Module information to be loaded
-    # @options argvs [Array]  load      User defined MTA module list
-    # @options argvs [Array]  order     The order of MTA modules
-    # @return        [Array]            Module list
-    # @since v4.20.0
-    my $class = shift;
-    my $argvs = { @_ };
-
-    my @modulelist;
-    my $tobeloaded = [];
-
-    for my $e ('load', 'order') {
-        # The order of MTA modules specified by user
-        next unless exists $argvs->{ $e };
-        next unless ref $argvs->{ $e } eq 'ARRAY';
-        next unless scalar $argvs->{ $e }->@*;
-
-        push @modulelist, $argvs->{'order'}->@* if $e eq 'order';
-        next unless $e eq 'load';
-
-        # Load user defined MTA module
-        for my $v ( $argvs->{'load'}->@* ) {
-            # Load user defined MTA module
-            eval {
-                (my $modulepath = $v) =~ s|::|/|g;
-                require $modulepath.'.pm';
-            };
-            next if $@;
-            push @$tobeloaded, $v;
-        }
-    }
-
-    for my $e ( @modulelist ) {
-        # Append the custom order of MTA modules
-        next if grep { $e eq $_ } @$tobeloaded;
-        push @$tobeloaded, $e;
-    }
-    return $tobeloaded;
-}
-
+sub load { warn ' ***warning: Sisimai::Message->load will be removed at v5.3.0'; return [] }
 sub part {
     # Divide email data up headers and a body part.
     # @param         [String] email  Email data
@@ -233,7 +185,7 @@ sub makemap {
         # MIME-Encoded subject field or ASCII characters only
         my $r = [];
         if( Sisimai::RFC2045->is_encoded(\$headermaps->{'subject'}) ) {
-            # split the value of Subject by $borderline
+            # split the Subject: field by " "
             for my $v ( split(/ /, $headermaps->{'subject'}) ) {
                 # Insert value to the array if the string is MIME encoded text
                 push @$r, $v if Sisimai::RFC2045->is_encoded(\$v);
@@ -255,99 +207,99 @@ sub tidy {
     my $class = shift;
     my $argv0 = shift || return '';
     my $email = '';
+    my @lines = split("\n", $$argv0);
+    my $index = -1;
 
-    return '' unless $argv0;
-    return '' unless length $$argv0;
-
-    for my $e ( split("\n", $$argv0) ) {
+    for my $e ( @lines ) {
         # Find and tidy up fields defined in RFC5322, RFC1894, and RFC5965
         # 1. Find a field label defined in RFC5322, RFC1894, or RFC5965 from this line
         my $p0 = index($e, ':');
         my $cf = substr(lc $e, 0, $p0);
+        my $fn = $FieldTable->{ $cf } || '';
 
-        unless( $FieldTable->{ $cf } ) {
-            # There is neither ":" character nor a field listed in @fieldindex
-            $email .= $e."\n";
-            next;
-        }
+        # There is neither ":" character nor the field listed in $FieldTable
+        $index++;
+        if( $fn eq '' ){ $email .= $e."\n"; next }
 
-        # 2. There is a field label defined in RFC5322, RFC1894, or RFC5965 from this line.
-        #    Code below replaces the field name with a valid name listed in @fieldindex when
-        #    the field name does not match with a valid name.
-        #    - Before: Message-id: <...>
-        #    - After:  Message-Id: <...>
-        my $fieldlabel = $FieldTable->{ $cf };
-        my $substring0 = substr($e, 0, $p0);
-        substr($e, 0, $p0, $fieldlabel) if $substring0 ne $fieldlabel;
-
-        # 3. There is no " " (space character) immediately after ":"
-        #    - before: Content-Type:text/plain
-        #    - After:  Content-Type: text/plain
-        $substring0 = substr($e, $p0 + 1, 1);
-        substr($e, $p0, 1, ': ') if $substring0 ne ' ';
-
-        # 4. Remove redundant space characters after ":"
-        while(1) {
-            # - Before: Message-Id:    <...>
-            # - After:  Message-Id: <...>
-            last unless $p0 + 2 < length($e);
-            last unless substr($e, $p0 + 2, 1) eq ' ';
-            substr($e, $p0 + 2, 1, '');
-        }
-
-        # 5. Tidy up a sub type of each field defined in RFC1894 such as Reporting-MTA: DNS;...
-        my $p1 = index($e, ';');
+        # 2. Tidy up a sub type of each field defined in RFC1894 such as Reporting-MTA: DNS;...
+        my $ab = [];
+        my $bf = substr($e, $p0 + 1,);
+        my $p1 = index($bf, ';');
         while(1) {
             # Such as Diagnostic-Code, Remote-MTA, and so on
             # - Before: Diagnostic-Code: SMTP;550 User unknown
             # - After:  Diagnostic-Code: smtp; 550 User unknown
-            last unless $p1 > $p0;
-            last unless grep { $fieldlabel eq $_ } (@$Fields1894, 'Content-Type');
+            last unless grep { $fn eq $_ } (@$Fields1894, 'Content-Type');
 
-            $substring0 = substr($e, $p0 + 2, $p1 - $p0 - 1);
-            substr($e, $p0 + 2, length($substring0), sprintf("%s ", lc $substring0));
-            last;
-        }
+            if( $p1 > 0 ) {
+                # The field including one or more ";"
+                for my $f (split(';', $bf)) {
+                    # 2-1. Trim leading and trailing space characters from the current buffer
+                    while( index($f, ' ') == 0 )    { $f = substr($f, 1,) }
+                    while( substr($f, -1, 1) eq ' '){ $f = substr($f, 0, length($f) - 1) }
+                    my $ps = '';
 
-        # 6. Remove redundant space characters after ";"
-        while(1) {
-            # - Before: Diagnostic-Code: SMTP;      550 User unknown
-            # - After:  Diagnostic-Code: SMTP; 550 User unknown
-            last unless $p1 + 2 < length($e);
-            last unless substr($e, $p1 + 2, 1) eq ' ';
-            substr($e, $p1 + 2, 1, '');
-        }
+                    # 2-2. Convert some parameters to the lower-cased string
+                    while(1) {
+                        # For example,
+                        # - Content-Type: Message/delivery-status => message/delivery-status
+                        # - Content-Type: Charset=UTF8            => charset=utf8
+                        # - Reporting-MTA: DNS; ...               => dns
+                        # - Final-Recipient: RFC822; ...          => rfc822
+                        last if index($f, ' ') > 0;
 
-        # 7. Tidy up a value, and a parameter of Content-Type: field
-        while(1) {
-            # Replace the value of "Content-Type" field
-            last unless exists $ReplacesAs->{ $fieldlabel };
-            my $p2 = 0;
+                        my $p2 = index($f, '=');
+                        if( $p2 > 0 ) {
+                            # charset=, boundary=, and other pairs divided by "="
+                            $ps = lc substr($f, 0, $p2);
+                            substr($f, 0, $p2, $ps);
+                        }
+                        $f = lc $f if $ps ne 'boundary';
+                        last;
+                    }
+                    push @$ab, $f;
+                }
 
-            for my $f ( $ReplacesAs->{ $fieldlabel }->@* ) {
-                # Content-Type: message/xdelivery-status
-                $p2 = index($e, $f->[0]);
-                next unless $p2 > 1;
+                while(1) {
+                    # Diagnostic-Code: x-unix;
+                    #   /var/email/kijitora/Maildir/tmp/1000000000.A000000B00000.neko22:
+                    #   Disk quota exceeded
+                    last unless $fn eq 'Diagnostic-Code';
+                    last unless scalar(@$ab) == 1;
+                    last unless index($lines[$index + 1], ' ') == 0;
 
-                substr($e, $p2, length $f->[0], $f->[1]);
-                $p1 = index($e, ';');
-                last;
+                    push @$ab, '';
+                    last;
+                }
+                $bf = join('; ', @$ab); $ab = []; # Insert " " (space characer) immediately after ";"
+
+            } else {
+                # There is no ";" in the field
+                last if index($fn, '-Date')       > 0;  # Arrival-Date, Last-Attempt-Date
+                last if index($fn, '-Message-ID') > 0;  # X-Original-Message-ID
+                $bf = lc $bf;
             }
-
-            # A parameter name of Content-Type field should be a lower-cased string
-            # - Before: Content-Type: text/plain; CharSet=ascii; Boundary=...
-            # - After:  Content-Type: text/plain; charset=ascii; boundary=...
-            last unless $fieldlabel eq 'Content-Type';
-            $p2 = index($e, '=');
-            last unless $p2 > 0;
-            last unless $p2 > $p1;
-
-            $substring0 = substr($e, $p1 + 2, $p2 - $p1 - 2); 
-            substr($e, $p1 + 2, $p2 - $p1 - 2, lc $substring0);
-
             last;
         }
-        $email .= $e."\n";
+
+        # 3. Tidy up a value, and a parameter of Content-Type: field
+        if( exists $ReplacesAs->{ $fn } ) {
+            # Replace the value of "Content-Type" field
+            for my $f ( $ReplacesAs->{ $fn }->@* ) {
+                # - Before: Content-Type: message/xdelivery-status; ...
+                # - After:  Content-Type: message/delivery-status; ...
+                $p1 = index($bf, $f->[0]); next if $p1 < 0;
+                substr($bf, $p1, length $f->[0], $f->[1]);
+            }
+        }
+
+        # 4. Concatenate the field name and the field value
+        for my $f ( split(' ', $bf) ) {
+            # Remove redundant space characters
+            next if length $f == 0;
+            push @$ab, $f;
+        }
+        $email .= sprintf("%s: %s\n", $fn, join(' ', @$ab));
     }
 
     $email .= "\n" if substr($email, -2, 2) ne "\n\n";
@@ -420,21 +372,11 @@ sub sift {
     my $havesifted = undef;
     my $modulename = '';
     DECODER: while(1) {
-        # 1. User-Defined Module
-        # 2. MTA Module Candidates to be tried on first
-        # 3. Sisimai::Lhost::*
-        # 4. Sisimai::RFC3464
-        # 5. Sisimai::ARF
-        # 6. Sisimai::RFC3834
-        USER_DEFINED: for my $r ( @$ToBeLoaded ) {
-            # Call user defined MTA modules
-            next if exists $haveloaded->{ $r };
-            $havesifted = $r->inquire($mailheader, $bodystring);
-            $haveloaded->{ $r } = 1;
-            $modulename = $r;
-            last(DECODER) if $havesifted;
-        }
-
+        # 1. MTA Module Candidates to be tried on first
+        # 2. Sisimai::Lhost::*
+        # 3. Sisimai::RFC3464
+        # 4. Sisimai::ARF
+        # 5. Sisimai::RFC3834
         TRY_ON_FIRST_AND_DEFAULTS: for my $r ( @$TryOnFirst, @$defaultset ) {
             # Try MTA module candidates
             next if exists $haveloaded->{ $r };
@@ -457,6 +399,7 @@ sub sift {
             # Feedback Loop message
             require Sisimai::ARF;
             $havesifted = Sisimai::ARF->inquire($mailheader, $bodystring);
+            $modulename = "ARF";
             last(DECODER) if $havesifted;
         }
 

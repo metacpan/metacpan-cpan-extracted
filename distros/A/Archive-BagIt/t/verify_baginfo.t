@@ -3,7 +3,7 @@ use warnings;
 use diagnostics;
 use File::Temp qw(tempdir);
 use File::Slurp qw(read_file write_file);
-use Test::More tests =>43;
+use Test::More tests =>50;
 use Test::Exception;
 use Test::File;
 use Archive::BagIt;
@@ -27,6 +27,10 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
     is(Archive::BagIt::_check_value(), "value should match '[^\\r\\n:]+', but is not defined", "_check_value()");
     $bag->{bag_info_file}="$SRC_BAG/bag-info.txt";
     my @tmp;
+    @tmp= $bag->_extract_key_from_textblob(undef);
+    is_deeply(\@tmp, [undef, undef], "extract_key_from_textblob(undef)");
+    @tmp= $bag->_extract_key_from_textblob("");
+    is_deeply(\@tmp, [undef, ""], "extract_key_from_textblob('')");
     @tmp= $bag->_extract_key_from_textblob("foo:");
     is_deeply(\@tmp, ["foo", undef], "extract_key_from_textblob('foo:')");
     @tmp= $bag->_extract_key_from_textblob("foo:\nbar");
@@ -48,6 +52,8 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
     @tmp= $bag->_extract_key_from_textblob("foo:bar:baz");
     is_deeply(\@tmp, ["foo", "bar:baz"], "extract_key_from_textblob('foo:bar:baz')");
     ###
+    @tmp= $bag->_extract_value_from_textblob(undef);
+    is_deeply(\@tmp, [undef, undef], "extract_value_from_textblob(undef)");
     @tmp= $bag->_extract_value_from_textblob("");
     is_deeply(\@tmp, [undef, ""], "extract_value_from_textblob('')");
     @tmp= $bag->_extract_value_from_textblob("bar");
@@ -64,6 +70,23 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
     is_deeply(\@tmp, ["bar:baz", ""], "extract_value_from_textblob('bar:baz')");
     @tmp= $bag->_extract_value_from_textblob("bar\nfoo:baz");
     is_deeply(\@tmp, ["bar", "foo:baz"], "extract_value_from_textblob('bar\\nfoo:baz')");
+}
+
+{
+    delete $bag->{'warnings'};
+    delete $bag->{'errors'};
+    delete $bag->{'bag_info'};
+    throws_ok( sub{$bag->_parse_bag_info( undef )}, qr{_parse_baginfo.* called with undef value}, "bag-info parsing undef");
+}
+{
+    delete $bag->{'warnings'};
+    delete $bag->{'errors'};
+    delete $bag->{'bag_info'};
+    my $got = $bag->_parse_bag_info( "" );
+    is_deeply( $got, [], "bag-info parsing valid empty");
+    $bag->{"bag_info"} = $got;
+    ok($bag->verify_baginfo(), "bag-info verify valid empty");
+    is_deeply( $bag->{warnings}, ["Payload-Oxum was expected in bag-info.txt, but not found!"], "bag-info parsing valid empty, warning for missed payload oxum");
 }
 
 {

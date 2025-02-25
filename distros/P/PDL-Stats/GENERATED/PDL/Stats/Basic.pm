@@ -3,7 +3,7 @@
 #
 package PDL::Stats::Basic;
 
-our @EXPORT_OK = qw(binomial_test rtable which_id stdv stdv_unbiased var var_unbiased se ss skew skew_unbiased kurt kurt_unbiased cov cov_table corr corr_table t_corr n_pair corr_dev t_test t_test_nev t_test_paired );
+our @EXPORT_OK = qw(binomial_test rtable which_id code_ivs stdv stdv_unbiased var var_unbiased se ss skew skew_unbiased kurt kurt_unbiased cov cov_table corr corr_table t_corr n_pair corr_dev t_test t_test_nev t_test_paired );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -22,10 +22,12 @@ use DynaLoader;
 
 
 
-#line 4 "lib/PDL/Stats/Basic.pd"
 
+#line 9 "lib/PDL/Stats/Basic.pd"
+
+use strict;
+use warnings;
 use PDL::LiteF;
-use PDL::NiceSlice;
 use Carp;
 
 eval { require PDL::Core; require PDL::GSL::CDF; };
@@ -37,24 +39,23 @@ PDL::Stats::Basic -- basic statistics and related utilities such as standard dev
 
 =head1 DESCRIPTION
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are broadcastable and methods that are NOT broadcastable, respectively.
 
 Does not have mean or median function here. see SEE ALSO.
 
 =head1 SYNOPSIS
 
     use PDL::LiteF;
-    use PDL::NiceSlice;
     use PDL::Stats::Basic;
 
     my $stdv = $data->stdv;
 
 or
 
-    my $stdv = stdv( $data );  
+    my $stdv = stdv( $data );
 
 =cut
-#line 58 "lib/PDL/Stats/Basic.pm"
+#line 59 "lib/PDL/Stats/Basic.pm"
 
 
 =head1 FUNCTIONS
@@ -70,18 +71,27 @@ or
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = stdv($a);
+ stdv($a, $b);  # all arguments given
+ $b = $a->stdv; # method call
+ $a->stdv($b);
 
 =for ref
 
 Sample standard deviation.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-stdv processes bad values.
+C<stdv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -100,18 +110,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = stdv_unbiased($a);
+ stdv_unbiased($a, $b);  # all arguments given
+ $b = $a->stdv_unbiased; # method call
+ $a->stdv_unbiased($b);
 
 =for ref
 
 Unbiased estimate of population standard deviation.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-stdv_unbiased processes bad values.
+C<stdv_unbiased> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -130,18 +149,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = var($a);
+ var($a, $b);  # all arguments given
+ $b = $a->var; # method call
+ $a->var($b);
 
 =for ref
 
 Sample variance.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-var processes bad values.
+C<var> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -160,18 +188,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = var_unbiased($a);
+ var_unbiased($a, $b);  # all arguments given
+ $b = $a->var_unbiased; # method call
+ $a->var_unbiased($b);
 
 =for ref
 
 Unbiased estimate of population variance.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-var_unbiased processes bad values.
+C<var_unbiased> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -190,24 +227,34 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = se($a);
+ se($a, $b);  # all arguments given
+ $b = $a->se; # method call
+ $a->se($b);
 
 =for ref
 
 Standard error of the mean. Useful for calculating confidence intervals.
 
-=for usage
+=for example
 
     # 95% confidence interval for samples with large N
-
     $ci_95_upper = $data->average + 1.96 * $data->se;
     $ci_95_lower = $data->average - 1.96 * $data->se;
-
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-se processes bad values.
+C<se> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -226,18 +273,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = ss($a);
+ ss($a, $b);  # all arguments given
+ $b = $a->ss; # method call
+ $a->ss($b);
 
 =for ref
 
 Sum of squared deviations from the mean.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-ss processes bad values.
+C<ss> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -256,18 +312,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = skew($a);
+ skew($a, $b);  # all arguments given
+ $b = $a->skew; # method call
+ $a->skew($b);
 
 =for ref
 
 Sample skewness, measure of asymmetry in data. skewness == 0 for normal distribution.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-skew processes bad values.
+C<skew> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -286,18 +351,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = skew_unbiased($a);
+ skew_unbiased($a, $b);  # all arguments given
+ $b = $a->skew_unbiased; # method call
+ $a->skew_unbiased($b);
 
 =for ref
 
 Unbiased estimate of population skewness. This is the number in GNumeric Descriptive Statistics.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-skew_unbiased processes bad values.
+C<skew_unbiased> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -316,18 +390,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = kurt($a);
+ kurt($a, $b);  # all arguments given
+ $b = $a->kurt; # method call
+ $a->kurt($b);
 
 =for ref
 
-Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distribution. 
+Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distribution.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-kurt processes bad values.
+C<kurt> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -346,18 +429,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); [o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = kurt_unbiased($a);
+ kurt_unbiased($a, $b);  # all arguments given
+ $b = $a->kurt_unbiased; # method call
+ $a->kurt_unbiased($b);
 
 =for ref
 
 Unbiased estimate of population kurtosis. This is the number in GNumeric Descriptive Statistics.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-kurt_unbiased processes bad values.
+C<kurt_unbiased> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -376,18 +468,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = cov($a, $b);
+ cov($a, $b, $c);  # all arguments given
+ $c = $a->cov($b); # method call
+ $a->cov($b, $c);
 
 =for ref
 
 Sample covariance. see B<corr> for ways to call
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-cov processes bad values.
+C<cov> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -406,21 +507,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); float+ [o]c(m,m))
+ Signature: (a(n,m); [o]c(m,m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = cov_table($a);
+ cov_table($a, $c);  # all arguments given
+ $c = $a->cov_table; # method call
+ $a->cov_table($c);
 
 =for ref
 
-Square covariance table. Gives the same result as threading using B<cov> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
+Square covariance table. Gives the same result as broadcasting using B<cov> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
 
-=for usage
+=for example
 
 Usage:
 
     # 5 obs x 3 var, 2 such data tables
 
-    perldl> $a = random 5, 3, 2
+    pdl> $a = random 5, 3, 2
 
-    perldl> p $cov = $a->cov_table
+    pdl> p $cov = $a->cov_table
     [
      [
       [ 8.9636438 -1.8624472 -1.2416588]
@@ -434,7 +544,7 @@ Usage:
      ]
     ]
     # diagonal elements of the cov table are the variances
-    perldl> p $a->var
+    pdl> p $a->var
     [
      [ 8.9636438  14.341514  9.8690655]
      [  10.32644  15.051779  5.4465141]
@@ -442,13 +552,16 @@ Usage:
 
 for the same cov matrix table using B<cov>,
 
-    perldl> p $a->dummy(2)->cov($a->dummy(1)) 
-
+    pdl> p $a->dummy(2)->cov($a->dummy(1))
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-cov_table processes bad values.
+C<cov_table> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -467,25 +580,33 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = corr($a, $b);
+ corr($a, $b, $c);  # all arguments given
+ $c = $a->corr($b); # method call
+ $a->corr($b, $c);
 
 =for ref
 
 Pearson correlation coefficient. r = cov(X,Y) / (stdv(X) * stdv(Y)).
 
-=for usage 
+=for example
 
 Usage:
 
-    perldl> $a = random 5, 3
-    perldl> $b = sequence 5,3
-    perldl> p $a->corr($b)
+    pdl> $a = random 5, 3
+    pdl> $b = sequence 5,3
+    pdl> p $a->corr($b)
 
     [0.20934208 0.30949881 0.26713007]
 
 for square corr table
 
-    perldl> p $a->corr($a->dummy(1))
+    pdl> p $a->corr($a->dummy(1))
 
     [
      [           1  -0.41995259 -0.029301192]
@@ -494,13 +615,15 @@ for square corr table
     ]
 
 but it is easier and faster to use B<corr_table>.
-
-=cut
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-corr processes bad values.
+C<corr> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -519,21 +642,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); float+ [o]c(m,m))
+ Signature: (a(n,m); [o]c(m,m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = corr_table($a);
+ corr_table($a, $c);  # all arguments given
+ $c = $a->corr_table; # method call
+ $a->corr_table($c);
 
 =for ref
 
-Square Pearson correlation table. Gives the same result as threading using B<corr> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
+Square Pearson correlation table. Gives the same result as broadcasting using B<corr> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
 
-=for usage
+=for example
 
 Usage:
 
     # 5 obs x 3 var, 2 such data tables
- 
-    perldl> $a = random 5, 3, 2
-    
-    perldl> p $a->corr_table
+
+    pdl> $a = random 5, 3, 2
+
+    pdl> p $a->corr_table
     [
      [
      [          1 -0.69835951 -0.18549048]
@@ -549,15 +681,18 @@ Usage:
 
 for the same result using B<corr>,
 
-    perldl> p $a->dummy(2)->corr($a->dummy(1)) 
+    pdl> p $a->dummy(2)->corr($a->dummy(1))
 
 This is also how to use B<t_corr> and B<n_pair> with such a table.
-
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-corr_table processes bad values.
+C<corr_table> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -576,9 +711,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (r(); n(); [o]t())
+ Signature: (r(); n(); [o]t())
+ Types: (float double)
 
 =for usage
+
+ $t = t_corr($r, $n);
+ t_corr($r, $n, $t);  # all arguments given
+ $t = $r->t_corr($n); # method call
+ $r->t_corr($n, $t);
+
+=for ref
+
+t significance test for Pearson correlations.
+
+=for example
 
     $corr   = $data->corr( $data->dummy(1) );
     $n      = $data->n_pair( $data->dummy(1) );
@@ -587,17 +734,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     use PDL::GSL::CDF;
 
     $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t_corr->abs, $n-2 ));
-
-=for ref
-
-t significance test for Pearson correlations.
-
-=cut
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-t_corr processes bad values.
+C<t_corr> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -616,18 +761,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); indx [o]c())
+ Signature: (a(n); b(n); indx [o]c())
+ Types: (long longlong)
+
+=for usage
+
+ $c = n_pair($a, $b);
+ n_pair($a, $b, $c);  # all arguments given
+ $c = $a->n_pair($b); # method call
+ $a->n_pair($b, $c);
 
 =for ref
 
 Returns the number of good pairs between 2 lists. Useful with B<corr> (esp. when bad values are involved)
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-n_pair processes bad values.
+C<n_pair> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -646,22 +800,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (float double)
 
 =for usage
 
-    $corr = $a->dev_m->corr_dev($b->dev_m);
+ $c = corr_dev($a, $b);
+ corr_dev($a, $b, $c);  # all arguments given
+ $c = $a->corr_dev($b); # method call
+ $a->corr_dev($b, $c);
 
 =for ref
 
 Calculates correlations from B<dev_m> vals. Seems faster than doing B<corr> from original vals when data pdl is big
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-corr_dev processes bad values.
+C<corr_dev> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -680,26 +839,34 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(m); float+ [o]t(); [o]d())
+ Signature: (a(n); b(m); [o]t(); [o]d())
+ Types: (float double)
 
 =for usage
 
-    my ($t, $df) = t_test( $pdl1, $pdl2 );
-
-    use PDL::GSL::CDF;
-
-    my $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t->abs, $df ));
+ ($t, $d) = t_test($a, $b);
+ t_test($a, $b, $t, $d);    # all arguments given
+ ($t, $d) = $a->t_test($b); # method call
+ $a->t_test($b, $t, $d);
 
 =for ref
 
 Independent sample t-test, assuming equal var.
 
-=cut
+=for example
+
+    my ($t, $df) = t_test( $pdl1, $pdl2 );
+    use PDL::GSL::CDF;
+    my $p_2tail = 2 * (1 - gsl_cdf_tdist_P( $t->abs, $df ));
   
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-t_test processes bad values.
+C<t_test> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -718,22 +885,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(m); float+ [o]t(); [o]d())
+ Signature: (a(n); b(m); [o]t(); [o]d())
+ Types: (float double)
+
+=for usage
+
+ ($t, $d) = t_test_nev($a, $b);
+ t_test_nev($a, $b, $t, $d);    # all arguments given
+ ($t, $d) = $a->t_test_nev($b); # method call
+ $a->t_test_nev($b, $t, $d);
 
 =for ref
 
 Independent sample t-test, NOT assuming equal var. ie Welch two sample t test. Df follows Welch-Satterthwaite equation instead of Satterthwaite (1946, as cited by Hays, 1994, 5th ed.). It matches GNumeric, which matches R.
 
-=for usage
+=pod
 
-    my ($t, $df) = $pdl1->t_test( $pdl2 );
-
-=cut
-  
+Broadcasts over its inputs.
 
 =for bad
 
-t_test_nev processes bad values.
+C<t_test_nev> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -752,18 +924,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]t(); [o]d())
+ Signature: (a(n); b(n); [o]t(); [o]d())
+ Types: (float double)
+
+=for usage
+
+ ($t, $d) = t_test_paired($a, $b);
+ t_test_paired($a, $b, $t, $d);    # all arguments given
+ ($t, $d) = $a->t_test_paired($b); # method call
+ $a->t_test_paired($b, $t, $d);
 
 =for ref
 
 Paired sample t-test.
 
-=cut
-  
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-t_test_paired processes bad values.
+C<t_test_paired> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -777,9 +958,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 807 "lib/PDL/Stats/Basic.pd"
+#line 653 "lib/PDL/Stats/Basic.pd"
 
-#line 808 "lib/PDL/Stats/Basic.pd"
+#line 654 "lib/PDL/Stats/Basic.pd"
 
 =head2 binomial_test
 
@@ -793,7 +974,7 @@ Binomial test. One-tailed significance test for two-outcome distribution. Given 
 
 This function does NOT currently support bad value in the number of successes.
 
-=for usage
+=for example
 
 Usage:
 
@@ -856,7 +1037,7 @@ Sample file diet.txt:
     bcm	68	268	1
     clq	67	180	2
     dwm	70	200	2
-  
+
     ($data, $idv, $ido) = rtable 'diet.txt';
 
     # By default prints out data info and @$idv index and element
@@ -890,9 +1071,9 @@ sub rtable {
               MISSN   => -999,
               NROW    => '',
             );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  $opt{V} and print STDERR "reading $src for data and id... ";
-  
+  if ($opt) { $opt{uc $_} = $opt->{$_} for keys %$opt; }
+  $opt{V} and print "reading $src for data and id... ";
+
   local $PDL::undefval = $opt{MISSN};
 
   my $id_c = [];     # match declaration of $id_r for return purpose
@@ -909,8 +1090,8 @@ sub rtable {
     my @entries = split /$opt{SEP}/, $_, -1;
 
     $opt{R_ID} and push @$id_r, shift @entries;
-  
-      # rudimentary check for numeric entry 
+
+      # rudimentary check for numeric entry
     for (@entries) { $_ = $opt{MISSN} unless defined $_ and m/\d\b/ }
 
     push @data, pdl( $opt{TYPE}, \@entries );
@@ -919,13 +1100,13 @@ sub rtable {
       if $opt{NROW} and $c_row == $opt{NROW};
   }
   # not explicitly closing $fh_in here in case it's passed from outside
-  # $fh_in will close by going out of scope if opened here. 
+  # $fh_in will close by going out of scope if opened here.
 
   $data = pdl $opt{TYPE}, @data;
   @data = ();
     # rid of last col unless there is data there
-  $data = $data(0:$data->getdim(0)-2, )->sever
-    unless ( nelem $data(-1, )->where($data(-1, ) != $opt{MISSN}) ); 
+  $data = $data->slice([0, $data->getdim(0)-2])->sever
+    unless ( nelem $data->slice(-1)->where($data->slice(-1) != $opt{MISSN}) );
 
   my ($idv, $ido) = ($id_r, $id_c);
     # var in columns instead of rows
@@ -933,10 +1114,10 @@ sub rtable {
     and ($data, $idv, $ido) = ($data->inplace->transpose, $id_c, $id_r);
 
   if ($opt{V}) {
-    print STDERR "OK.\ndata table as PDL dim o x v: " . $data->info . "\n";
-    $idv and print STDERR "$_\t$$idv[$_]\n" for (0..$#$idv);
+    print "OK.\ndata table as PDL dim o x v: " . $data->info . "\n";
+    $idv and print "$_\t$$idv[$_]\n" for 0..$#$idv;
   }
- 
+
   $data = $data->setvaltobad( $opt{MISSN} );
   $data->check_badflag;
   return wantarray? (@$idv? ($data, $idv, $ido) : ($data, $ido)) : $data;
@@ -944,7 +1125,7 @@ sub rtable {
 
 =head2 group_by
 
-Returns pdl reshaped according to the specified factor variable. Most useful when used in conjunction with other threading calculations such as average, stdv, etc. When the factor variable contains unequal number of cases in each level, the returned pdl is padded with bad values to fit the level with the most number of cases. This allows the subsequent calculation (average, stdv, etc) to return the correct results for each level.
+Returns pdl reshaped according to the specified factor variable. Most useful when used in conjunction with other broadcasting calculations such as average, stdv, etc. When the factor variable contains unequal number of cases in each level, the returned pdl is padded with bad values to fit the level with the most number of cases. This allows the subsequent calculation (average, stdv, etc) to return the correct results for each level.
 
 Usage:
 
@@ -959,7 +1140,7 @@ Usage:
 	pdl> p $a->group_by( $factor )->average
 	[2 7]
 
-    # more complex case with threading and unequal number of n across levels in the factor
+    # more complex case with broadcasting and unequal number of n across levels in the factor
 
 	pdl> p $a = sequence 10,2
 	[
@@ -1037,7 +1218,7 @@ sub PDL::group_by {
         my $label;
         if (ref $factor eq 'ARRAY') {
             $label  = _ordered_uniq($factor);
-            $factor = _array_to_pdl($factor);
+            $factor = code_ivs($factor);
         } else {
             my $perl_factor = [$factor->list];
             $label  = _ordered_uniq($perl_factor);
@@ -1060,7 +1241,7 @@ sub PDL::group_by {
     my %seen;
     my @uniq_cells = grep {! $seen{$_}++ } @cells;
 
-    my $flat_factor = _array_to_pdl( \@cells );
+    my $flat_factor = code_ivs( \@cells );
 
     my $p_reshaped = _group_by_single_factor( $p, $flat_factor );
 
@@ -1111,9 +1292,9 @@ sub _group_by_single_factor {
     die "Data pdl and factor pdl do not match!"
         unless $factor->dim(0) == $p->dim(0);
 
-    # get active dim that will be split according to factor and dims to thread over
-	my @p_threaddims = $p->dims;
-	my $p_dim0 = shift @p_threaddims;
+    # get active dim that will be split according to factor and dims to broadcast over
+	my @p_broadcastdims = $p->dims;
+	my $p_dim0 = shift @p_broadcastdims;
 
     my $uniq = $factor->uniq;
 
@@ -1127,10 +1308,10 @@ sub _group_by_single_factor {
 	my $max = pdl(\@uniq_ns)->max->sclr;
 
     my $badvalue = int($p->max + 1);
-    my $p_tmp = ones($max, @p_threaddims, $uniq->nelem) * $badvalue;
+    my $p_tmp = ones($max, @p_broadcastdims, $uniq->nelem) * $badvalue;
     for (0 .. $#uniq_ns) {
-        my $i = which $factor == $uniq($_);
-        $p_tmp->dice_axis(-1,$_)->squeeze->(0:$uniq_ns[$_]-1, ) .= $p($i, );
+        my $i = which $factor == $uniq->slice($_);
+        $p_tmp->dice_axis(-1,$_)->squeeze->slice([0,$uniq_ns[$_]-1]) .= $p->slice($i);
     }
 
     $p_tmp->badflag(1);
@@ -1160,35 +1341,19 @@ Lookup specified var (obs) ids in $idv ($ido) (see B<rtable>) and return indices
 
 sub which_id {
   my ($id, $id_s) = @_;
-
-  my %ind;
-  @ind{ @$id } = ( 0 .. $#$id );
-
-  my @ind_select;
-  for (@$id_s) {
-    defined( $ind{$_} ) and push @ind_select, $ind{$_};
-  }
-  return pdl @ind_select;
+  my %ind; @ind{ @$id } = (0 .. $#$id);
+  pdl grep defined, map $ind{$_}, @$id_s;
 }
 
-sub _array_to_pdl {
+my %code_bad = map +($_=>1), '', 'BAD';
+sub code_ivs {
   my ($var_ref) = @_;
   $var_ref = [ $var_ref->list ] if UNIVERSAL::isa($var_ref, 'PDL');
-
-  my (%level, $l);
-  $l = 0;
-  for (@$var_ref) {
-    if (defined($_) and $_ ne '' and $_ ne 'BAD') {
-      $level{$_} = $l ++
-        if !exists $level{$_};
-    }
-  }
-
-  my $pdl = pdl( map { (defined($_) and $_ ne '' and $_ ne 'BAD')?  $level{$_} : -1 } @$var_ref );
-  $pdl = $pdl->setvaltobad(-1);
+  my @filtered = map !defined($_) || $code_bad{$_} ? undef : $_, @$var_ref;
+  my ($l, %level) = 0; $level{$_} //= $l++ for grep defined, @filtered;
+  my $pdl = pdl(map defined($_) ? $level{$_} : -1, @filtered)->setvaltobad(-1);
   $pdl->check_badflag;
-
-  return wantarray? ($pdl, \%level) : $pdl;
+  wantarray ? ($pdl, \%level) : $pdl;
 }
 
 =head1 SEE ALSO
@@ -1210,7 +1375,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1214 "lib/PDL/Stats/Basic.pm"
+#line 1379 "lib/PDL/Stats/Basic.pm"
 
 # Exit with OK status
 

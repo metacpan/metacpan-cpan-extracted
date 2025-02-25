@@ -16,20 +16,21 @@ sub inquire {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
-    my $sessx = 0;
 
     if( index($mhead->{'subject'}, 'SMTP server: errors from ') > 0 ) {
         # src/smtpd/smtpd_chat.c:|337: post_mail_fprintf(notice, "Subject: %s SMTP server: errors from %s",
         # src/smtpd/smtpd_chat.c:|338:   var_mail_name, state->namaddr);
-        $match++;
-        $sessx++;
+        $match = 2;
+
     } else {
         # Subject: Undelivered Mail Returned to Sender
-        $match++ if $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
+        $match = 1 if $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
     }
     return undef if $match == 0;
     return undef if $mhead->{'x-aol-ip'};
 
+    require Sisimai::RFC1123;
+    require Sisimai::SMTP::Reply;
     require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'];
@@ -54,10 +55,10 @@ sub inquire {
     my $v = undef;
     my $p = '';
 
-    if( $sessx ) {
+    if( $match == 2 ) {
         # The message body starts with 'Transcript of session follows.'
         require Sisimai::SMTP::Transcript;
-        my $transcript = Sisimai::SMTP::Transcript->rise(\$emailparts->[0], 'In:', 'Out:');
+        my $transcript = Sisimai::SMTP::Transcript->rise($emailparts->[0], 'In:', 'Out:');
 
         return undef unless $transcript;
         return undef unless scalar @$transcript;
@@ -113,7 +114,7 @@ sub inquire {
                 next unless my $o = Sisimai::RFC1894->field($e);
                 $v = $dscontents->[-1];
 
-                if( $o->[-1] eq 'addr' ) {
+                if( $o->[3] eq 'addr' ) {
                     # Final-Recipient: rfc822; kijitora@example.jp
                     # X-Actual-Recipient: rfc822; kijitora@example.co.jp
                     if( $o->[0] eq 'final-recipient' ) {
@@ -130,15 +131,16 @@ sub inquire {
                         # X-Actual-Recipient: rfc822; kijitora@example.co.jp
                         $v->{'alias'} = $o->[2];
                     }
-                } elsif( $o->[-1] eq 'code' ) {
+                } elsif( $o->[3] eq 'code' ) {
                     # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                     $v->{'spec'} = $o->[1];
-                    $v->{'spec'} = 'SMTP' if $v->{'spec'} eq 'X-POSTFIX';
+                    $v->{'spec'} = 'SMTP' if uc $v->{'spec'} eq 'X-POSTFIX';
                     $v->{'diagnosis'} = $o->[2];
 
                 } else {
                     # Other DSN fields defined in RFC3464
                     next unless exists $fieldtable->{ $o->[0] };
+                    next if $o->[3] eq "host" && Sisimai::RFC1123->is_internethost($o->[2]) == 0;
                     $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
 
                     next unless $f == 1;
@@ -165,8 +167,7 @@ sub inquire {
                     # Alternative error message and recipient
                     if( index($e, ' (in reply to ') > -1 || index($e, 'command)') > -1 ) {
                         # 5.1.1 <userunknown@example.co.jp>... User Unknown (in reply to RCPT TO
-                        my $q = Sisimai::SMTP::Command->find($e);
-                        push @commandset, $q if $q;
+                        my $cv = Sisimai::SMTP::Command->find($e); push @commandset, $cv if $cv;
                         $anotherset->{'diagnosis'} .= ' '.$e if $anotherset->{'diagnosis'};
 
                     } elsif( Sisimai::String->aligned(\$e, ['<', '@', '>', '(expanded from <', '):']) ) {
@@ -323,7 +324,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.164';
+our $VERSION = '0.165';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -180,7 +180,7 @@ sub print_table {
         $self->__reset();
         return;
     }
-    my $data_row_count = @$tbl_orig - 1;
+    my $data_row_count = @$tbl_orig - 1; ##
     my $info_row = '';
     if ( $self->{max_rows} && $data_row_count > $self->{max_rows} ) {
         $info_row = sprintf( 'Limited to %s rows', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
@@ -244,11 +244,10 @@ sub print_table {
 sub __get_data {
     my ( $self, $tbl_orig, $const ) = @_;
     my $term_w = get_term_width() + $const->{extra_w};
+    my $items_count = $const->{data_row_count} * @{$tbl_orig->[0]}; ##
     my $progress = Term::TablePrint::ProgressBar->new( {
-        data_row_count => $const->{data_row_count},
-        col_count => scalar @{$tbl_orig->[0]},
-        threshold => $self->{progress_bar},
-        count_progress_bars => 3,
+        total => $const->{data_row_count} * 3 + 2, # +2: two of three loops include the header row
+        show_progress_bar => $self->{progress_bar} < $items_count,
     } );
     my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
     my ( $w_col_names, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $const, $progress );
@@ -389,8 +388,11 @@ sub __write_table {
 sub __copy_table {
     my ( $self, $tbl_orig, $progress ) = @_;
     my $tbl_copy = [];
-    my $count = $progress->set_progress_bar();            #
+    $progress->set_progress_bar();
     ROW: for my $row ( @$tbl_orig ) {
+        if ( $self->{max_rows} && @$tbl_copy > $self->{max_rows} ) { ##
+            last;
+        }
         my $tmp_row = [];
         COL: for ( @$row ) {
             my $str = $_; # this is where the copying happens
@@ -419,26 +421,19 @@ sub __copy_table {
             push @$tmp_row, $str;
         }
         push @$tbl_copy, $tmp_row;
-        if ( @$tbl_copy == $self->{max_rows} ) { ###
-            last;
+        if ( $progress->{show_progress_bar} ) {
+            if ( ++$progress->{count} > $progress->{next_update} ) {
+                $progress->update_progress_bar();
+            }
         }
-        if ( $progress->{count_progress_bars} ) {         #
-            if ( $count >= $progress->{next_update} ) {   #
-                $progress->update_progress_bar( $count ); #
-            }                                             #
-            ++$count;                                     #
-        }                                                 #
     }
-    if ( $progress->{count_progress_bars} ) {             #
-        $progress->last_update_progress_bar( $count );    #
-    }                                                     #
     return $tbl_copy
 }
 
 
 sub __calc_col_width {
     my ( $self, $tbl_copy, $const, $progress ) = @_;
-    my $count = $progress->set_progress_bar();            #
+    $progress->set_progress_bar();            #
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
     my $col_count = @col_idx;
     my $w_col_names = [];
@@ -479,12 +474,11 @@ sub __calc_col_width {
                 }
             }
         }
-        if ( $progress->{count_progress_bars} ) {         #
-            if ( $count >= $progress->{next_update} ) {   #
-                $progress->update_progress_bar( $count ); #
-            }                                             #
-            ++$count;                                     #
-        }                                                 #
+        if ( $progress->{show_progress_bar} ) {
+            if ( ++$progress->{count} > $progress->{next_update} ) {
+                $progress->update_progress_bar();
+            }
+        }
     }
     for my $col ( @col_idx ) {
         if ( $w_int->[$col] + $w_fract->[$col] > $w_cols->[$col] ) {
@@ -492,9 +486,6 @@ sub __calc_col_width {
         }
     }
     unshift @$tbl_copy, $col_names;
-    if ( $progress->{count_progress_bars} ) {             #
-        $progress->last_update_progress_bar( $count );    #
-    }                                                     #
     return $w_col_names, $w_cols, $w_int, $w_fract;
 }
 
@@ -610,7 +601,7 @@ sub __calc_avail_col_width {
 
 sub __cols_to_string {
     my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $const, $progress ) = @_;
-    my $count = $progress->set_progress_bar();            #
+    $progress->set_progress_bar();
     my $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
     my $regex_number = $const->{regex_number};
     my $one_precision_w = length sprintf "%.1e", 123;
@@ -716,16 +707,16 @@ sub __cols_to_string {
             }
         }
         $tbl_copy->[$row] = $str;   # overwrite $tbl_copy to save memory
-        if ( $progress->{count_progress_bars} ) {         #
-            if ( $count >= $progress->{next_update} ) {   #
-                $progress->update_progress_bar( $count ); #
-            }                                             #
-            ++$count;                                     #
-        }                                                 #
+        if ( $progress->{show_progress_bar} ) {
+            if ( ++$progress->{count} > $progress->{next_update} ) {
+                $progress->update_progress_bar();
+            }
+        }
     }
-    if ( $progress->{count_progress_bars} ) {             #
-        $progress->last_update_progress_bar( $count );    #
-    }                                                     #
+    if ( $progress->{show_progress_bar} ) {
+        #$progress->{count} = $progress->{total};
+        $progress->update_progress_bar();
+    }
     return $tbl_copy; # $tbl_copy is now $tbl_print
 }
 
@@ -843,7 +834,7 @@ sub __search {
     no warnings 'uninitialized';
     my @col_idx = ( 0 .. $#{$tbl_orig->[0]} );
     # begin: "1" to skipp the header row
-    # end: "data_row_count" as it its because +1 for the header row and -1 to get the 0-based index
+    # end: "data_row_count" as it its because +1 for the header row and -1 to get the 0-based index ##
     for my $idx_row ( 1 .. $const->{data_row_count} ) {
         for ( @col_idx ) {
             if ( $tbl_orig->[$idx_row][$_] =~ /$search->{filter}/ ) {
@@ -940,7 +931,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.164
+Version 0.165
 
 =cut
 
@@ -1190,7 +1181,10 @@ Default: undef
 
 Set the maximum number of used table rows. The used table rows are kept in memory.
 
-To disable the automatic limit set I<max_rows> to 0.
+I<max_rows> does not include the header row: I<max_rows> set to C<3> would print the header row plus 3 table rows.
+
+To disable the automatic limit, do not set "max_rows" or set "max_rows" to "undef". Setting "max_rows" to 0 could mean
+in a future release to limit the output to 0 data rows.
 
 If the number of table rows is higher than I<max_rows>, the last row of the output tells that the limit has been
 reached.

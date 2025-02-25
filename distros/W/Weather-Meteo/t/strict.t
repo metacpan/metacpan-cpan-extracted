@@ -3,16 +3,9 @@
 use strict;
 use warnings;
 
-use Test::Most;
+use Test::DescribeMe qw(author);
+use Test::Needs 'Test::Strict';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Strict';
-	if($@) {
-		plan(skip_all => 'Test::Strict required for testing use strict');
-	} else {
-		all_perl_files_ok();
-		warnings_ok('lib/Weather/Meteo.pm');
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+Test::Strict->import();
+all_perl_files_ok();
+warnings_ok('lib/Weather/Meteo.pm');
