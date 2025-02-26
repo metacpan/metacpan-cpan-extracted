@@ -1,13 +1,13 @@
-use strict;
+use 5.014;
 use warnings;
 
+use lib '.';
 use Test::DBO Sponge => 'Sponge', tests => 7;
 
-MySponge::db::setup([qw(id alias)], ['vlyon', 22]);
+MySpongeDBI::db::setup([qw(id alias)], ['vlyon', 22]);
 
 # Create the DBO
-my $dbh = MySponge->connect('DBI:Sponge:') or die $DBI::errstr;
-my $dbo = DBIx::DBO->new($dbh);
+my $dbo = DBIx::DBO->connect('DBI:Sponge:') or die $DBI::errstr;
 my $t = $dbo->table($Test::DBO::test_tbl) or die sql_err($dbo);
 my $q = $dbo->query($t) or die sql_err($dbo);
 

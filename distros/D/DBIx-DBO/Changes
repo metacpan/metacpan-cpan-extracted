@@ -1,5 +1,11 @@
 Revision history for DBIx-DBO
 
+0.50	Feb 25, 2025
+	- Switch repo to GitHub.
+	- Require perl 5.14.
+	- Added MariaDB support.
+	- Bug fixes.
+
 0.40	Jan 14, 2014
 	- Added new subquery capabilities.
 	- Implemented ROWNUM pagging for Oracle. (Victor)

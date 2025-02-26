@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -14,10 +14,11 @@ use EBook::Ishmael::EBook::Mobi;
 use EBook::Ishmael::EBook::PalmDoc;
 use EBook::Ishmael::EBook::PDF;
 use EBook::Ishmael::EBook::Text;
+use EBook::Ishmael::EBook::XHTML;
 use EBook::Ishmael::EBook::zTXT;
 
 our %EBOOK_FORMATS = map { lc $_ => "EBook::Ishmael::EBook::$_" } qw(
-	Epub FictionBook2 HTML Mobi PalmDoc PDF Text zTXT
+	Epub FictionBook2 HTML Mobi PalmDoc PDF Text XHTML zTXT
 );
 
 sub ebook_id {
@@ -81,9 +82,6 @@ This page will not only detail B<EBook::Ishmael::EBook>'s methods, but some of
 the methods of the various specific ebook modules that this module uses, as they
 all (mostly) share the same API.
 
-If you would like documentation on writing your own ebook format module, consult
-the documentation for L<EBook::Ishmael::EBook::Skeleton>.
-
 =head1 METHODS
 
 =head2 $e = EBook::Ishmael::EBook->new($file, [ $type ])
@@ -93,13 +91,26 @@ the format of C<$file> or C<$type>. C<$type> is the name of the format you would
 like to read C<$file> as. If not specified, C<new()> will try to identify
 C<$file>'s format automatically via a series of heuristics.
 
-=head2 $html = $e->html()
+=head2 $html = $e->html([$out])
 
-Returns a string of the HTML-ified contents of the ebook object.
+Dumps the ebook's HTML-ified contents. Contents will be written to C<$out>, if
+provided, otherwise it will be returned as a string.
 
 =head2 $meta = $e->meta()
 
 Returns a hash ref of the ebook object's metadata.
+
+=head2 $raw = $e->raw([$out])
+
+Dumps the ebook's raw, unformatted text contents.
+
+=head2 $bool = $e->has_cover()
+
+Returns bool of whether the ebook has a cover image or not.
+
+=head2 $cover = $e->cover([$out])
+
+Dumps the ebook's cover image data. Returns C<undef> is there is no cover.
 
 =head1 SUBROUTINES
 
@@ -133,6 +144,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<EBook::Ishmael>, L<EBook::Ishmael::EBook::Skeleton>
+L<EBook::Ishmael>,
 
 =cut

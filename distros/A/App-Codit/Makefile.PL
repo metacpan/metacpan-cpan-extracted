@@ -15,10 +15,10 @@ my %prereq = (
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.032',
 	'Tk::AppWindow'       => '0.21',
-	'Tk::CodeText'        => '0.63',
+	'Tk::CodeText'        => '0.64',
 	'Tk::FileBrowser'     =>	'0.09',
 	'Tk::PodViewer'       =>	'0.06',
-	'Tk::QuickForm'       =>	'0.08',
+	'Tk::QuickForm'       =>	'0.09',
 	'Tk::Terminal'        =>	'0.03',
 );
 
@@ -30,17 +30,17 @@ WriteMakefile(
 	AUTHOR				=> 'Hans Jeuken <hanje at cpan dot org>',
 	EXE_FILES => ['bin/codit'],
 	LICENSE				=> 'perl',
-    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
-      'meta-spec' => { version => 2 },
-      resources => {
-         repository => {
-            type => 'git',
-            url  => "git://github.com/haje61/$git.git",
-            web  => "https://github.com/haje61/$git",
-         },
-         bugtracker => {
-            web  => "https://github.com/haje61/$git/issues",
-         },
-      }}
-    ) : () ),
+	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => "git://github.com/haje61/$git.git",
+				web  => "https://github.com/haje61/$git",
+			},
+			bugtracker => {
+				web  => "https://github.com/haje61/$git/issues",
+			},
+		}}
+	) : () ),
 );

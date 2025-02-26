@@ -1,14 +1,17 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
 use File::Spec;
+use MIME::Base64;
 
 use XML::LibXML;
 
 use EBook::Ishmael::EBook::Metadata;
+
+my $NS = "http://www.gribuser.ru/xml/fictionbook/2.0";
 
 # The following 3 hashes each correspond to an entry in a FictionBook's
 # description node, which contains all of the metadata of a FictionBook
@@ -46,6 +49,24 @@ my %TITLE = (
 		my $node = shift;
 
 		return language => $node->textContent;
+
+	},
+	'src-lang' => sub {
+
+		my $node = shift;
+
+		return language => $node->textContent;
+
+	},
+	'translator' => sub {
+
+		my $node = shift;
+
+		my $name = join(' ',
+			grep { /\S/ } map { $_->textContent } $node->childNodes
+		);
+
+		return contributor => $name;
 
 	},
 );
@@ -90,6 +111,14 @@ my %DOCUMENT = (
 		return format => "FictionBook2 " . $node->textContent;
 
 	},
+	'src-ocr' => sub {
+
+		my $node = shift;
+
+		return author => $node->textContent
+
+	},
+
 );
 
 my %PUBLISH = (
@@ -100,16 +129,40 @@ my %PUBLISH = (
 		return created => $node->textContent;
 
 	},
+	'publisher' => sub {
+
+		my $node = shift;
+
+		my $name = join(' ',
+			grep { /\S/ } map { $_->textContent } $node->childNodes
+		);
+
+		return contributor => $name;
+
+	},
+	'book-name' => sub {
+
+		my $node = shift;
+
+		return title => $node->textContent;
+
+	},
 );
 
-# Just check for fb2 suffix, anything more would require us to parse XML, which
-# would be too heavy for a quick heuristic.
 sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
 
-	return $file =~ /\.fb2$/;
+	return 1 if $file =~ /\.fb2$/;
+	return 0 unless -T $file;
+
+	open my $fh, '<', $file
+		or die "Failed to open $file for reading: $!\n";
+	read $fh, my ($head), 1024;
+	close $fh;
+
+	return $head =~ /<\s*FictionBook[^<>]+xmlns\s*=\s*"\Q$NS\E"[^<>]*>/;
 
 }
 
@@ -155,6 +208,24 @@ sub _read_metadata {
 		}
 	}
 
+	my ($covmeta) = $xpc->findnodes('./FictionBook:coverpage', $title);
+
+	# Put if code inside own block so we can easily last out of it.
+	if (defined $covmeta) {{
+
+		my ($img) = $xpc->findnodes('./FictionBook:image', $covmeta)
+			or last;
+		my $href = $img->getAttribute('l:href') or last;
+		$href =~ s/^#//;
+
+		my ($binary) = $xpc->findnodes(
+			"/FictionBook:FictionBook/FictionBook:binary[\@id=\"$href\"]"
+		) or last;
+
+		$self->{_cover} = $binary;
+
+	}}
+
 	return 1;
 
 }
@@ -168,6 +239,7 @@ sub new {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
 		_dom     => undef,
+		_cover   => undef,
 	};
 
 	bless $self, $class;
@@ -207,13 +279,40 @@ sub html {
 		'/FictionBook:body'
 	) or die "Invalid FictionBook2 file $self->{Source}\n";
 
-	for my $b (@bodies) {
-		print { $fh } map { $_->toString } $b->childNodes;
-	}
+	print { $fh } map { $_->toString } map { $_->childNodes } @bodies;
 
 	close $fh;
 
 	return $out // $html;
+
+}
+
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh, ':utf8';
+
+	my $ns = $self->{_dom}->documentElement->namespaceURI;
+
+	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
+	$xpc->registerNs('FictionBook', $ns);
+
+	my @bodies = $xpc->findnodes(
+		'/FictionBook:FictionBook' .
+		'/FictionBook:body'
+	) or die "Invalid FictionBook2 file $self->{Source}\n";
+
+	print { $fh } map { $_->textContent } @bodies;
+
+	close $fh;
+
+	return $out // $raw;
 
 }
 
@@ -222,6 +321,35 @@ sub metadata {
 	my $self = shift;
 
 	return $self->{Metadata}->hash;
+
+}
+
+sub has_cover {
+
+	my $self = shift;
+
+	return defined $self->{_cover};
+
+}
+
+sub cover {
+
+	my $self = shift;
+	my $out  = shift;
+
+	return undef unless $self->has_cover;
+
+	my $bin;
+
+	open my $fh, '>', $out // \$bin
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh;
+
+	print { $fh } decode_base64($self->{_cover}->textContent);
+
+	close $fh;
+
+	return $out // $bin;
 
 }
 

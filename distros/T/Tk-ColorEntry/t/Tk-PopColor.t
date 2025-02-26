@@ -30,6 +30,7 @@ if (defined $app) {
 	);
 	$pop = $frame->PopColor(
 		-depthselect => 1,
+		-notationselect => 1,
 		-historyfile => 't/colorentry_history',
 		-updatecall => sub {
 			my $color = shift;

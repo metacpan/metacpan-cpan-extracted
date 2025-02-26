@@ -13,6 +13,8 @@ Construct Tk::Widget 'ColorPicker';
 require Tk::NoteBook;
 require Tk::Pane;
 use Imager::Screenshot 'screenshot';
+use Math::Round;
+use Scalar::Util qw(looks_like_number);
 
 my @colspaces = (
 	[qw[RGB Red Green Blue]],
@@ -25,6 +27,32 @@ my %depthvalues = (
 	8 => 1,
 	12 => 1,
 	16 => 1,
+);
+
+my %convertcalls = (
+	cmy => \&convertCMY,
+	cmyX => \&convertCMYx,
+	hex => \&convertHEX,
+	hsv => \&convertHSV,
+	rgb => \&convertRGB,
+	rgbX => \&convertRGBx,
+);
+
+my %notationcalls = (
+	cmy => \&getCMY,
+	cmyX => \&getCMYx,
+	hex => \&getHEX,
+	hsv => \&getHSV,
+	rgb => \&getRGB,
+	rgbX => \&getRGBx,
+);
+
+my %validatecalls = (
+	cmy => \&validateCMY,
+	cmyX => \&validateCMYx,
+	hsv => \&validateHSV,
+	rgb => \&validateRGB,
+	rgbX => \&validateRGBx,
 );
 
 =head1 NAME
@@ -82,6 +110,48 @@ Default value 'sunken'. Relief of the indicator labels in the recent tab.
 
 Default value 32.Specifies the maximum number of entries in the history list.
 
+=item Switch: B<-notation>
+
+Selects in which notation the color should be represented. Default value I<hex>.
+Possible values are:
+
+=over 4
+
+=item B<cmy> C<cmy(0.5, 0.5, 0.5)>
+
+The channel values can be between 0 and 1. It works with 3 decimals precision. For maximum
+accuracy set your dolor depth to 12 bits per color.
+
+=item B<cmyX> C<cmy8(127, 127, 127)>
+
+The X stands for the color depth. The channel values are integers ranging from 0 to the max channel
+value for the current selected color depth.
+
+=item B<hex> C<#7F7F7F>
+
+The hexadecimal notation of a color.
+
+=item B<hsv> C<hsv(360, 0, 0.5)>
+
+Hue value can be between 0 and 360 degrees with 1 decimal precision.
+Saturation and value range from 0 to 1 with 3 decimals precision.
+
+=item B<rgb> C<rgb(0.5, 0.5, 0.5)>
+
+The channel values can be between 0 and 1. It works with 3 decimals precision. For maximum
+accuracy set your dolor depth to 12 bits per color.
+
+=item B<rgbX> C<rgb8(127, 127, 127)>
+
+The X stands for the color depth. The channel values are integers ranging from 0 to the max channel
+value for the current selected color depth.
+
+=back
+
+=item Switch: B<-notationselect>
+
+Default value 0. If set a menubutton is diplayed allowing you to select a notation.
+
 =item Switch: B<-sliderheight>
 
 Default value 200. Sets the length of all channel sliders.
@@ -110,12 +180,15 @@ sub Populate {
 	$self->SUPER::Populate($args);
 	
 	my $dvar = '';
+	my $nvar = '';
 	my $rvar = '';
 	$self->{COLORDEPTH} = \$dvar;
 	$self->{CONFIG} = 1;
 	$self->{DEPTHVAR} = \$rvar; #used for the radiobuttons in depthselect
 	$self->{HISTORY} = [];
+	$self->{NOTATION} = \$nvar;
 	$self->{SLIDERHEIGHT} = 200;
+	$self->{CURRENT} = '';
 
 	my $pick = $self->Button(
 		-text => 'Pick',
@@ -185,6 +258,8 @@ sub Populate {
 		-indicatorwidth => ['PASSIVE', undef, undef, 4],
 		-indrelief => ['PASSIVE', undef, undef, 'sunken'],
 		-maxhistory => ['PASSIVE', undef, undef, 32],
+		-notation => ['METHOD', undef, undef, 'hex'],
+		-notationselect => ['METHOD', undef, undef, 0],
 		-sliderheight => ['METHOD', 'sliderHeight', 'SliderHeight', 200],
 		-updatecall => ['CALLBACK', undef, undef, sub {}],
 		DEFAULT => [ $self ],
@@ -347,6 +422,83 @@ sub ConfigMode {
 	return $self->{CONFIG}
 }
 
+sub convert {
+	my ($self, $color) = @_;
+	my $not = $self->notationDetect($color);
+	return undef unless defined $not;
+	my $call = $convertcalls{$not};
+	return &$call($self, $color);
+}
+
+sub convertBase {
+	my ($self, $val, $space) = @_;
+	if ($val =~ /^$space\((.+)\)$/) {
+		my $parstring = "$1, ";
+		my @vals;
+		for (1 .. 3) {
+			if ($parstring =~ s/^^([^,]+),\s*//) {
+				my $number = $1;
+				if (looks_like_number($number)) {
+					if (($space eq 'hsv') and ($_ eq 1)) {
+						$number = $self->numround($number, 1);
+					} else {
+						$number = $self->numround($number, 3);
+					}
+					push @vals, $number
+				}
+			}
+		}
+		return @vals
+	}
+}
+
+sub convertBaseX {
+	my ($self, $val, $space) = @_;
+	if ($val =~ /^$space\d+\((.+)\)$/) {
+		my $parstring = "$1, ";
+		my @vals;
+		for (1 .. 3) {
+			if ($parstring =~ s/^([^,]+),\s*//) {
+				my $number = $1;
+				push @vals, $number if $number =~ /^\d+$/
+			}
+		}
+		return @vals
+	}
+}
+
+=item B<convertCMY>I<($string)>
+
+Returns the hex formatted representation of a cmy formatted string.
+
+=cut
+
+sub convertCMY {
+	my ($self, $string) = @_;
+	my ($cyan, $magenta, $yellow) = $self->convertBase($string, 'cmy');
+	my $max = $self->maxChannelValue;
+	my $red = int((1 - $cyan) * $max);
+	my $green = int((1 - $magenta) * $max);
+	my $blue = int((1 - $yellow) * $max);
+	return $self->rgb2hex($red, $green, $blue);
+}
+
+=item B<convertCMYx>I<($string)>
+
+Returns the hex formatted representation of a cmyX formatted string.
+
+=cut
+
+sub convertCMYx {
+	my ($self, $string) = @_;
+	my ($cyan, $magenta, $yellow) = $self->convertBaseX($string, 'cmy');
+	my $max = $self->maxChannelValue;
+	my $red = $max - $cyan;
+	my $green = $max - $magenta;
+	my $blue = $max - $yellow;
+	return $self->rgb2hex($red, $green, $blue);
+}
+
 =item B<convertDepth>(I<$string>, ?<I$depth>?)
 
 Converts the depth of $string to $depth.
@@ -378,6 +530,60 @@ sub convertDepth {
 	return '#' . $r. $g . $b
 }
 
+=item B<convertHEX>I<($string)>
+
+Returns the hex formatted representation of a hex formatted string.
+So basically it does nothing but return it's input.
+
+=cut
+
+sub convertHEX {
+	my ($self, $string) = @_;
+	return $string
+}
+
+
+=item B<convertHSV>I<($string)>
+
+Returns the hex formatted representation of a hsv formatted string.
+
+=cut
+
+sub convertHSV {
+	my ($self, $string) = @_;
+	my ($hue, $sat, $val) = $self->convertBase($string, 'hsv');
+	return $self->rgb2hex($self->hsv2rgb($hue, $sat, $val));
+}
+
+=item B<convertRGB>I<($string)>
+
+Returns the hex formatted representation of a rgb formatted string.
+
+=cut
+
+sub convertRGB {
+	my ($self, $string) = @_;
+	my ($red, $green, $blue) = $self->convertBase($string, 'rgb');
+	my $max = $self->maxChannelValue;
+	$red = int($red * $max);
+	$green = int($green * $max);
+	$blue = int($blue * $max);
+	return $self->rgb2hex($red, $green, $blue);
+}
+
+
+=item B<convertRGBx>I<($string)>
+
+Returns the hex formatted representation of a rgbX formatted string.
+
+=cut
+
+sub convertRGBx {
+	my ($self, $string) = @_;
+	my ($red, $green, $blue) = $self->convertBaseX($string, 'rgb');
+	return $self->rgb2hex($red, $green, $blue);
+}
+
 sub depthselect {
 	my ($self, $flag) = @_; 
 	if (defined $flag) {
@@ -387,7 +593,12 @@ sub depthselect {
 					-before => $self->Subwidget('Pick'),
 					-fill => 'x',
 				);
-				$bpcframe->Label(-text => 'Depth:')->pack(-side => 'left', -padx => 2, -pady => 2);
+				$bpcframe->Label(
+					-anchor => 'e',
+					-justify => 'right',
+					-text => 'Depth:',
+					-width => 7,
+				)->pack(-side => 'left', -padx => 2, -pady => 2);
 				for (4, 8, 12, 16) {
 					my $depth = $_;
 					$bpcframe->Radiobutton(
@@ -407,6 +618,83 @@ sub depthselect {
 		}
 	}
 	return defined $self->Subwidget('DepthSelect');
+}
+
+=item B<getCMY>
+
+Returns a cmy formatted representation of the current color.
+
+=cut
+
+sub getCMY {
+	my $self = shift;
+	return $self->notationCMY($self->getHEX);
+}
+
+=item B<getCMYx>
+
+Returns a cmyX formatted representation of the current color.
+
+=cut
+
+sub getCMYx {
+	my $self = shift;
+	return $self->notationCMYx($self->getHEX);
+}
+
+=item B<getHEX>
+
+Returns a hex formatted representation of the current color.
+
+=cut
+
+sub getHEX {
+	return $_[0]->{CURRENT};
+}
+
+=item B<getHSV>
+
+Returns a hsv formatted representation of the current color.
+
+=cut
+
+sub getHSV {
+	my $self = shift;
+	return $self->notationHSV($self->getHEX);
+}
+
+=item B<getRGB>
+
+Returns a rgb formatted representation of the current color.
+
+=cut
+
+sub getRGB {
+	my $self = shift;
+	return $self->notationRGB($self->getHEX);
+}
+
+=item B<getRGBx>
+
+Returns a rgbX formatted representation of the current color.
+
+=cut
+
+sub getRGBx {
+	my $self = shift;
+	return $self->notationRGBx($self->getHEX);
+}
+
+sub hex2cmy {
+	my ($self, $hex) = @_;
+	my ($red, $green, $blue) = $self->hex2rgb($hex);
+	my $max = $self->maxChannelValue;
+	return ($max - $red, $max- $green, $max - $blue)
+}
+
+sub hex2hsv {
+	my ($self, $hex) = @_;
+	return $self->rgb2hsv($self->hex2rgb($hex))
 }
 
 =item B<hex2rgb>I<($hex)>
@@ -688,6 +976,186 @@ sub maxChannelValue {
 	return (2**$depth) - 1 if $depth ne '';
 }
 
+sub notation {
+	my $self = shift;
+	my $nvar = $self->{NOTATION};
+	if (@_) {
+		$$nvar = shift;
+		$self->UpdateCall($self->getHEX);
+	}
+	return $$nvar
+}
+
+=item B<notationCMY>I<($hexcolor)>
+
+Returns a cmy formatted string of a hex color.
+
+=cut
+
+sub notationCMY {
+	my ($self, $hex) = @_;
+	my ($cyan, $magenta, $yellow) = $self->hex2cmy($hex);
+	my $max = $self->maxChannelValue;
+	$cyan = $self->numround($cyan / $max, 3);
+	$magenta = $self->numround($magenta / $max, 3);
+	$yellow = $self->numround($yellow / $max, 3);
+	return "cmy($cyan, $magenta, $yellow)"
+}
+
+=item B<notationCMYx>I<($hexcolor)>
+
+Returns a cmyX formatted string of a hex color.
+
+=cut
+
+sub notationCMYx {
+	my ($self, $hex) = @_;
+	my ($cyan, $magenta, $yellow) = $self->hex2cmy($hex);
+	my $depth = $self->cget('-colordepth');
+	return "cmy$depth($cyan, $magenta, $yellow)"
+}
+
+sub notationCurrent {
+	my ($self, $color) = @_;
+	$color = $self->{CURRENT} unless defined $color;
+	return unless $self->validate($color);
+	$color = $self->convert($color);
+	my $notationcall = $notationcalls{$self->cget('-notation')};
+	return &$notationcall($self, $color);
+}
+
+=item B<notationDetect>I<($color)>
+
+Tries to detect the notation of I>$color> and returns
+what it finds. Returns undef if it does not detect a valid notation.
+
+=cut
+
+sub notationDetect {
+	my ($self, $color) = @_;
+	my $repeat = $self->colordepth / 4;
+	return 'cmy' if $color =~ /^cmy\(.+\)$/;
+	return 'cmyX' if $color =~ /^cmy\d+\(.+\)$/;
+	return 'hex' if $color =~ /^#(?:[0-9a-fA-F]{3}){$repeat}$/;
+	return 'hsv' if $color =~ /^hsv\(.+\)$/;
+	return 'rgb' if $color =~ /^rgb\(.+\)$/;
+	return 'rgbX' if $color =~ /^rgb\d+\(.+\)$/;
+	return undef
+}
+
+=item B<notationHEX>I<($hexcolor)>
+
+Returns a hex formatted string of a hex color.
+So basically it just returns it's input.
+
+=cut
+
+sub notationHEX {
+	my ($self, $hex) = @_;
+	return $hex;
+}
+
+=item B<notationHSV>I<($hexcolor)>
+
+Returns a hsc formatted string of a hex color.
+
+=cut
+
+sub notationHSV {
+	my ($self, $hex) = @_;
+	my ($hue, $saturation, $value) = $self->hex2hsv($hex);
+	$hue = $self->numround($hue, 1);
+	$saturation = $self->numround($saturation, 3);
+	$value = $self->numround($value, 3);
+	return "hsv($hue, $saturation, $value)"
+}
+
+=item B<notationRGB>I<($hexcolor)>
+
+Returns a rgb formatted string of a hex color.
+
+=cut
+
+sub notationRGB {
+	my ($self, $hex) = @_;
+	my ($red, $green, $blue) = $self->hex2rgb($hex);
+	my $max = $self->maxChannelValue;
+	$red = $self->numround($red / $max, 3);
+	$green = $self->numround($green / $max, 3);
+	$blue = $self->numround($blue / $max, 3);
+	return "rgb($red, $green, $blue)"
+}
+
+=item B<notationRGBx>I<($hexcolor)>
+
+Returns a rgbX formatted string of a hex color.
+
+=cut
+
+sub notationRGBx {
+	my ($self, $hex) = @_;
+	my ($red, $green, $blue) = $self->hex2rgb($hex);
+	my $depth = $self->cget('-colordepth');
+	return "rgb$depth($red, $green, $blue)"
+}
+
+sub notationselect {
+	my ($self, $flag) = @_; 
+	if (defined $flag) {
+		if ($flag) {		
+			unless (defined $self->Subwidget('NotationSelect')) {
+				my $fmframe = $self->Frame->pack(
+					-before => $self->Subwidget('Pick'),
+					-fill => 'x',
+				);
+				$fmframe->Label(
+					-anchor => 'e',
+					-justify => 'right',
+					-text => 'Format:',
+					-width => 7,
+				)->pack(-side => 'left', -padx => 2, -pady => 2);
+				my $var = '';
+				my @menuitems;
+				for ('cmy', 'cmyX', 'hex', 'hsv', 'rgb', 'rgbX') {
+					my $t = $_;
+					push @menuitems,	['command' => $t,
+						-command => sub {
+							$var = $t;
+							$self->configure(-notation => $t)
+						},
+					];
+
+				}
+				my $mb = $fmframe->Menubutton(
+					-anchor => 'w',
+					-textvariable => $self->{NOTATION},
+				)->pack(-side => 'left', -expand => 1, -fill => 'x', -padx => 2, -pady => 2);
+				$mb->configure(-menu => $mb->Menu(
+						-tearoff => 0,
+						-menuitems => \@menuitems,
+				)); 
+				
+				$self->Advertise('NotationSelect', $fmframe)
+			}
+		} else {
+			if (defined $self->Subwidget('NotationSelect')) {
+				$self->Subwidget('NotationSelect')->destroy;
+				$self->Advertise('NotationSelect', undef);
+			}
+		}
+	}
+	return defined $self->Subwidget('NotationSelect');
+}
+
+sub numround {
+	my ($self, $number, $decimals) = @_;
+	my $mult = 10 ** $decimals;
+	$number = $number * $mult;
+	$number = round($number);
+	$number = $number / $mult;
+	return $number;
+}
+
 sub pickActivate {
 	my $self = shift;
 	return if $self->pickInProgress;
@@ -749,7 +1217,10 @@ Changes all sliders to match $color
 
 sub put {
 	my ($self, $color) = @_;
-	$self->UpdateAll($color) if ($self->validate($color));
+	return unless $self->validate($color);
+	my $hex = $self->convert($color);
+	$self->{CURRENT} = $hex;
+	$self->UpdateAll($hex);
 }
 
 =item B<rgb2hex>(I<$red>, I<$green>, I<$blue>, ?I<$depth>?)
@@ -828,6 +1299,7 @@ sub sliderheight {
 
 sub UpdateAll {
 	my ($self, $value) = @_;
+	return unless defined $value;
 	$self->UpdateCMY($value);
 	$self->UpdateHSV($value);
 	$self->UpdateRGB($value);
@@ -836,20 +1308,22 @@ sub UpdateAll {
 sub UpdateCall {
 	my ($self, $value) = @_;
 	return if $self->ConfigMode;
-	$self->Callback('-updatecall', $value);
+	$self->{CURRENT} = $value;
+	my $text = $self->notationCurrent($value);
+	$self->Callback('-updatecall', $text) if defined $text;
 }
 
 sub UpdateCMY {
 	my ($self, $value) = @_;
-	my ($red, $green, $blue) = $self->hex2rgb($value);
+	my ($cyan, $magenta, $yellow) = $self->hex2cmy($value);
 	my $max = $self->maxChannelValue;
 	my $pool = $self->{VARPOOL};
 	my $cvar = $pool->{'Cyan'};
-	$$cvar = $max - $red;
+	$$cvar = $cyan;
 	my $mvar = $pool->{'Magenta'};
-	$$mvar = $max- $green;
+	$$mvar = $magenta;
 	my $yvar = $pool->{'Yellow'};
-	$$yvar = $max - $blue;
+	$$yvar = $yellow;
 }
 
 sub UpdateHSV {
@@ -882,14 +1356,92 @@ sub UpdateRGB {
 
 =item B<validate>(?I<$color>?)
 
-Returns true if $color is a valid hexcolor.
+Returns true if $color is a valid color.
 
 =cut
 
 sub validate {
 	my ($self, $val) = @_;
-	my $repeat = $self->colordepth / 4;
-	return $val =~ /^#(?:[0-9a-fA-F]{3}){$repeat}$/
+	my $not = $self->notationDetect($val);
+	return 0 unless defined $not;
+	return 1 if $not eq 'hex';
+	my $call = $validatecalls{$not};
+	return &$call($self, $val)
+}
+
+sub validateCMY {
+	my ($self, $val) = @_;
+	return $self->validateSpace($val, 'cmy');
+}
+
+sub validateCMYx {
+	my ($self, $val) = @_;
+	return $self->validateSpaceX($val, 'cmy');
+}
+
+sub validateHSV {
+	my ($self, $val) = @_;
+	return 0 unless $val =~ /^hsv\((.+)\)$/;
+	my $parstring = "$1, ";
+	for (1 .. 3) {
+		if ($parstring =~ s/^([^,]+),\s*//) {
+			return 0 unless looks_like_number($1);
+			return 0 if $1 < 0;
+			if ($_ eq 1) {
+				return 0 if $1 > 360
+			} else {
+				return 0 if $1 > 1
+			}
+		} else {
+			return 0
+		}
+	}
+	return 1
+}
+
+sub validateRGB {
+	my ($self, $val) = @_;
+	return $self->validateSpace($val, 'rgb');
+}
+
+sub validateRGBx {
+	my ($self, $val) = @_;
+	return $self->validateSpaceX($val, 'rgb');
+}
+
+sub validateSpace {
+	my ($self, $val, $space) = @_;
+	return 0 unless $val =~ /^$space\((.+)\)$/;
+	my $parstring = "$1, ";
+	for (1 .. 3) {
+		if ($parstring =~ s/^([^,]+),\s*//) {
+			my $number = $1;
+			return 0 unless looks_like_number($number);
+			return 0 if $1 < 0;
+			return 0 if $1 > 1
+		} else {
+			return 0
+		}
+	}
+	return 1
+}
+
+sub validateSpaceX {
+	my ($self, $val, $space) = @_;
+	return 0 unless $val =~ /^$space(\d+)\((.+)\)$/;
+	my $depth = $1;
+	my $parstring = "$2, ";
+	return 0 unless $depth eq $self->cget('-colordepth');
+	for (1 .. 3) {
+		if ($parstring =~ s/^([^,]+),\s*//) {
+			my $number = $1;
+			return 0 unless $number =~ /^\d+$/;
+			return 0 if $number > ((2**$depth) - 1)
+		} else {
+			return 0
+		}
+	}
+	return 1
 }
 
 =back

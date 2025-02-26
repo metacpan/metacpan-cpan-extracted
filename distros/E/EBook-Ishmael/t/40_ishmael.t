@@ -11,7 +11,9 @@ use File::Which;
 use EBook::Ishmael;
 use EBook::Ishmael::TextBrowserDump;
 
-my $TEST_PDF = $ENV{TEST_PDF} // (defined which('pdftohtml') and which('pdfinfo'));
+my $TEST_PDF =
+	$ENV{TEST_PDF} //
+	(which('pdftohtml') and which('pdfinfo') and which('pdftopng'));
 
 my @FILES = map { File::Spec->catfile(qw(t data), $_) } qw(
 	gpl3.epub gpl3.fb2 gpl3.html gpl3.mobi gpl3.pdb gpl3.txt gpl3.xhtml
@@ -21,6 +23,9 @@ my @FILES = map { File::Spec->catfile(qw(t data), $_) } qw(
 if ($TEST_PDF) {
 	push @FILES, File::Spec->catfile(qw(t data gpl3.pdf));
 }
+
+# ebooks that have covers
+my %COVERS = map { $_ => 1 } qw(epub fb2 mobi pdf);
 
 for my $f (@FILES) {
 
@@ -47,6 +52,20 @@ for my $f (@FILES) {
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m w/ $file ok");
+
+	@ARGV = ('-r', $f);
+	$ishmael = EBook::Ishmael->init();
+
+	ok($ishmael->run, "-r w/ $file ok");
+
+	if (exists $COVERS{ (split /\./, $file)[-1] }) {
+
+		@ARGV = ('-c', $f);
+		$ishmael = EBook::Ishmael->init();
+
+		ok($ishmael->run, "-c w/ $file ok");
+
+	}
 
 	SKIP: {
 

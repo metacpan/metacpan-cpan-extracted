@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+
+MODULE=OrePAN2::S3
+
+MODULINO=$(echo $MODULE | perl -M$MODULE -ne 'chomp; s/::/\//g; $m="$_.pm"; print $INC{$m};' 2>/dev/null)
+
+if test -n "$MODULINO"; then
+    POSIXLY_CORRECT=1 perl $MODULINO $command "$@"
+else
+    echo "ERROR: unable to find OrePAN::S3"
+    exit 1;
+fi

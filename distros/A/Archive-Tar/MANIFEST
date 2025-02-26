@@ -17,6 +17,7 @@ t/06_error.t
 t/07_ptardiff.t
 t/08_ptargrep.t
 t/09_roundtrip.t
+t/10_ptar.t
 t/90_symlink.t
 t/99_pod.t
 t/src/header/signed.tar

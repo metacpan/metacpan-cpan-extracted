@@ -46,8 +46,8 @@ sub Populate {
 		-contentautocomplete => [{-autocomplete => $xt}],
 		-contentautoindent => [{-autoindent => $xt}],
 		-contentbackground => [{-background => $xt}],
-		-contentbgdspace => ['PASSIVE', undef, undef, '#E600A8'],
-		-contentbgdtab => ['PASSIVE', undef, undef, '#B5C200'],
+		-contentbgdspace => [{-spacebackground => $text}],
+		-contentbgdtab => [{-tabbackground => $text}],
 		-contentbookmarkcolor => [{-bookmarkcolor => $text}],
 		-contentfindbg => ['PASSIVE'],
 		-contentfindfg => ['PASSIVE'],
@@ -59,6 +59,7 @@ sub Populate {
 		-contentfontsize => ['PASSIVE'],
 		-contentindent => [{-indentstyle => $xt}],
 		-contentposition => [{-position => $text}],
+		-contentshowspaces => [{-showspaces => $text}],
 		-contentsyntax => [{-syntax => $text}],
 		-contenttabs => [{-tabs => $xt}],
 		-contentwrap => [{-wrap => $xt}],
@@ -104,14 +105,6 @@ sub Close {
 sub configureTags {
 	my $self = shift;
 	my $widg = $self->CWidg;
-
-	#configuring space and tabs indicators
-	for ('dtab', 'dspace') {
-		my $bgopt = $self->cget("-contentbg$_");
-		$widg->tagConfigure($_,
-			-background => $bgopt,
-		);
-	}
 
 	#configuring the find options
 	my @findoptions = ();

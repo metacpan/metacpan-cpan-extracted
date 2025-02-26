@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Tk;
 require Tk::Balloon;
 use Tk;
@@ -24,10 +24,11 @@ if (defined $app) {
 	);
 	$entry = $frame->ColorEntry(
 		-balloon => $balloon,
-		-command => sub { $l->configure(-background => shift) },
+		-command => sub { $l->configure(-background => $entry->getHEX) },
 		-depthselect => 1,
 		-indicatorwidth => 4,
 		-historyfile => 't/colorentry_history',
+		-notationselect => 1,
 	)->pack(
 		-fill => 'x',
 	);
@@ -36,6 +37,11 @@ if (defined $app) {
 
 push @tests, (
 	[ sub { return defined $entry }, 1, 'ColorEntry widget created' ],
+	[ sub {
+		$entry->put('#477F47');
+		return $entry->get 
+	}, '#477F47', 'Putting color' ],
+	
 );
 
 

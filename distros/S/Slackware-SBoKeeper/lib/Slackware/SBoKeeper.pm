@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 use strict;
 use warnings;
 
@@ -220,132 +220,157 @@ my @CONFIG_PATHS = (
 
 my $SLACKWARE_VERSION = Slackware::SBoKeeper::System->version();
 
-my $DEFAULT_DATADIR = "$HOME/.local/share/$PRGNAM";
+my $DEFAULT_DATADIR = $> == 0
+	? "/var/lib/$PRGNAM"
+	: "$HOME/.local/share/$PRGNAM";
+
+my $OLD_ROOT_DATA = "/root/.local/share/$PRGNAM/data.$PRGNAM";
 
 # Hash of commands and some info about them
 # Method: Reference to the method to call.
 # NeedDatabase: Does a database need to already be present?
 # NeedSlack: Does the command only work on Slackware systems?
+# NeedWrite: Does the command require write permissions to the data file?
 # Args: Minimum number of args needed.
 my %COMMANDS = (
 	'add' => {
 		Method       => \&add,
 		NeedDatabase => 0,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'tack' => {
 		Method       => \&tack,
 		NeedDatabase => 0,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'addish' => {
 		Method       => \&addish,
 		NeedDatabase => 0,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'tackish' => {
 		Method       => \&tackish,
 		NeedDatabase => 0,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'rm' => {
 		Method       => \&rm,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'clean' => {
 		Method       => \&clean,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 0,
 	},
 	'rdeps' => {
 		Method       => \&rdeps,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 1,
 	},
 	'deps' => {
 		Method       => \&deps,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 1,
 	},
 	'depadd' => {
 		Method       => \&depadd,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 2,
 	},
 	'deprm' => {
 		Method       => \&deprm,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 2,
 	},
 	'pull' => {
 		Method       => \&pull,
 		NeedDatabase => 0,
 		NeedSlack    => 1,
+		NeedWrite    => 1,
 		Args         => 0,
 	},
 	'diff' => {
 		Method       => \&diff,
 		NeedDatabase => 1,
 		NeedSlack    => 1,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'depwant' => {
 		Method       => \&depwant,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'depextra' => {
 		Method       => \&depextra,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'unmanual' => {
 		Method       => \&unmanual,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 1,
 		Args         => 1,
 	},
 	'print' => {
 		Method       => \&sbokeeper_print,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'tree' => {
 		Method       => \&tree,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'rtree' => {
 		Method       => \&rtree,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 1,
 	},
 	'dump' => {
 		Method       => \&dump,
 		NeedDatabase => 1,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 	'help' => {
 		Method       => \&help,
 		NeedDatabase => 0,
 		NeedSlack    => 0,
+		NeedWrite    => 0,
 		Args         => 0,
 	},
 );
@@ -354,11 +379,12 @@ my $CONFIG_READERS = {
 	'DataFile' => sub {
 
 		my $val = shift;
+		my $param = shift;
 
 		$val =~ s/^~/$HOME/;
 
 		unless (File::Spec->file_name_is_absolute($val)) {
-			die "DataFile must be absolute path\n";
+			$val = File::Spec->catfile(dirname($param->{File}), $val);
 		}
 
 		return $val;
@@ -367,11 +393,12 @@ my $CONFIG_READERS = {
 	'SBoPath' => sub {
 
 		my $val = shift;
+		my $param = shift;
 
 		$val =~ s/^~/$HOME/;
 
 		unless (File::Spec->file_name_is_absolute($val)) {
-			die "SBoPath must be absolute path\n";
+			$val = File::Spec->catfile(dirname($param->{File}), $val);
 		}
 
 		unless (-d $val) {
@@ -389,23 +416,28 @@ my $CONFIG_READERS = {
 	'Blacklist' => sub {
 
 		my $val = shift;
+		my $param = shift;
 
 		$val =~ s/^~/$HOME/;
 
 		my %blacklist;
 
-		if ($val =~ /^\//) {
-			%blacklist = read_blacklist($val);
+		my $blfile = File::Spec->file_name_is_absolute($val)
+			? $val
+			: File::Spec->catfile(dirname($param->{File}), $val);
+
+		if (-f $blfile) {
+			%blacklist = read_blacklist($blfile);
+		# SlackBuild packages cannot contain a slash character, so the user
+		# probably means for $val to be a blacklist file, but the blacklist file
+		# does not exist.
+		} elsif ($val =~ /\//) {
+			die "$val does not look like a blacklist file or list\n";
 		} else {
 			%blacklist = map { $_ => 1 } split /\s/, $val;
 		}
 
 		return \%blacklist;
-
-	},
-	'PkgtoolLogs' => sub {
-
-		warn "'PkgtoolLogs' is deprecated\n";
 
 	},
 };
@@ -517,36 +549,40 @@ sub get_default_sbopath {
 	}
 
 	# Default repo locations for popular SlackBuild package managers. This sub
-	# finds the first SlackBuild package manager that is installed in the
-	# following list then returns its default repo location.
+	# finds a list of default repos that are present on the system and then
+	# returns the one that was last modified (based on the repo's ChangeLog).
 	my %sbopaths = (
-		'00_sbopkg'    => "/var/lib/sbopkg/SBo/$SLACKWARE_VERSION",
-		'01_sbotools'  => "/usr/sbo/repo",
-		'02_sbotools2' => "/usr/sbo/repo",
-		'03_sbpkg'     => "/var/lib/sbpkg/SBo/$SLACKWARE_VERSION",
-		'04_slpkg'     => "/var/lib/slpkg/repos/sbo",
-		'05_slackrepo' => "/var/lib/slackrepo/SBo/slackbuilds",
-		# sboui should be last as it can be used with other
-		# package management tools, meaning if it is installed along with
-		# another manager it could possibly be using their default repo.
-		'06_sboui'     => "/var/lib/sboui/repo",
+		'sbopkg'    => "/var/lib/sbopkg/SBo/$SLACKWARE_VERSION",
+		'sbotools'  => "/usr/sbo/repo",
+		'sbotools2' => "/usr/sbo/repo",
+		'sbpkg'     => "/var/lib/sbpkg/SBo/$SLACKWARE_VERSION",
+		'slpkg'     => "/var/lib/slpkg/repos/sbo",
+		'slackrepo' => "/var/lib/slackrepo/SBo/slackbuilds",
+		'sboui'     => "/var/lib/sboui/repo",
 	);
+
+	my @potential;
 
 	foreach my $m (sort keys %sbopaths) {
 
-		my $p = $m =~ s/^\d+_//r;
-
-		unless (Slackware::SBoKeeper::System->installed($p)) {
+		unless (Slackware::SBoKeeper::System->installed($m)) {
 			next;
 		}
 
 		next unless -d $sbopaths{$m};
 
-		return $sbopaths{$m};
+		push @potential, $sbopaths{$m};
 
 	}
 
-	return undef;
+	# Pick the directory with the ChangeLog with the latest mod time.
+	@potential =
+		map { $_->[0] }
+		sort { $b->[1] <=> $a->[1] }
+		map { [ $_, -f "$_/ChangeLog.txt" ? (stat "$_/ChangeLog.txt")[9] : 0 ] }
+		@potential;
+
+	return @potential ? $potential[0] : undef;
 
 }
 
@@ -641,7 +677,7 @@ sub package_branch {
 
 	# Add '(missing)' if package is not present in database but depended on by
 	# another package.
-	printf "%s%s %s\n", '  ' x $level, $pkg, $has ? '' : '(missing?)';
+	printf "%s%s%s\n", '  ' x $level, $pkg, $has ? '' : ' (missing?)';
 
 	return unless $has;
 
@@ -835,7 +871,7 @@ sub clean {
 
 	$self->{Args} = ['@unnecessary'];
 
-	rm($self);
+	$self->rm;
 
 }
 
@@ -1198,20 +1234,14 @@ sub tree {
 		$self->{Blacklist}
 	);
 
-	my @pkgs;
-	if (@{$self->{Args}}) {
+	my @pkgs = @{$self->{Args}}
+		? alias_expand($sbokeeper, $self->{Args})
+		: grep { $sbokeeper->is_manual($_) } $sbokeeper->packages;
 
-		@pkgs = alias_expand($sbokeeper, $self->{Args});
-
-		foreach my $p (@pkgs) {
-			die "$p is not present in package database\n"
-				unless $sbokeeper->has($p);
+	foreach my $p (@pkgs) {
+		unless ($sbokeeper->has($p)) {
+			die "$p is not present in package database\n";
 		}
-
-	} else {
-
-		@pkgs = grep { $sbokeeper->is_manual($_) } $sbokeeper->packages;
-
 	}
 
 	foreach my $p (@pkgs) {
@@ -1341,8 +1371,18 @@ sub init {
 	$self->{Blacklist} ||= {};
 
 	unless ($self->{DataFile}) {
-		make_path($DEFAULT_DATADIR) unless -d $DEFAULT_DATADIR;
-		$self->{DataFile} = "$DEFAULT_DATADIR/data.$PRGNAM";
+		# If the old default root data file exists, use it but warn the user
+		# that they should consider moving it to the new default location.
+		if ($> == 0 and -f $OLD_ROOT_DATA) {
+			warn "Using $OLD_ROOT_DATA data file, which was the default " .
+			     "root data file path prior to $PRGNAM 2.05. You should " .
+			     "consider moving the data file to the new default path " .
+			     "$DEFAULT_DATADIR/data.$PRGNAM and deleting the old one.\n";
+			$self->{DataFile} = $OLD_ROOT_DATA;
+		} else {
+			make_path($DEFAULT_DATADIR) unless -d $DEFAULT_DATADIR;
+			$self->{DataFile} = "$DEFAULT_DATADIR/data.$PRGNAM";
+		}
 	}
 
 	unless ($self->{SBoPath}) {
@@ -1382,6 +1422,13 @@ sub run {
 		not Slackware::SBoKeeper::System->is_slackware()
 	) {
 		die "'$self->{Command}' can only be used in Slackware systems\n";
+	}
+
+	if (
+		$COMMANDS{$self->{Command}}->{NeedWrite} and
+		(-e $self->{DataFile} and ! -w $self->{DataFile})
+	) {
+		die "'$self->{Command}' requires a writable database, $self->{DataFile} is not writable\n";
 	}
 
 	if (+@{$self->{Args}} < $COMMANDS{$self->{Command}}->{Args}) {

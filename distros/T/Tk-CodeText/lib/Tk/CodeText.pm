@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.63';
+$VERSION = '0.65';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -22,6 +22,7 @@ require Tk::CodeText::Theme;
 require Tk::DialogBox;
 require Tk::Font;
 require Tk::XText;
+require Tk::YAMessage;
 
 
 Construct Tk::Widget 'CodeText';
@@ -155,6 +156,10 @@ The waiting time in miliseconds before an autocomplete pop up can occur. Default
 
 Boolean. Default value I<false>. Enables or disables autocomplete.
 
+=item Name: B<autoIndent>
+
+=item Class: B<AutoIndent>
+
 =item Switch: B<-autoindent>
 
 By default 0. If set the text will be indented to the 
@@ -185,7 +190,7 @@ in the bookmarks menu.
 =item Switch: B<-configdir>
 
 An empty string by default. If set to an existing folder that folder will be used
-for config files. Currently there is only one of those. The recent colors for the 
+for config files. Currently there is only one of those: The recent colors for the 
 TagsEditor.
 
 =item Switch: B<-contextmenu>
@@ -219,6 +224,10 @@ line by line basis. This is the time between lines.
 
 Default value 'tab'. You can also set it to a number.
 In that case an indent will be the number of spaces.
+
+=item Name: B<linesPerCycle>
+
+=item Class: B<LinesPerCycle>
 
 =item Switch: B<-linespercycle>
 
@@ -273,6 +282,25 @@ scrollbars will be created. See also L<Tk::Scrolled>.
 
 Only available at create time.
 
+=item Name: B<showSpaces>
+
+=item Class: B<ShowSpaces>
+
+=item Switch: B<-showspaces>
+
+Default value 0. If set the leading and trailing spaces on each line
+will be highlighted in their own back ground color. See also the 
+B<-spacebackground> and B<-tabbackground> options.
+
+=item Name: B<spaceBackground>
+
+=item Class: B<SpaceBackground>
+
+=item Switch: B<-spacebackground>
+
+Default value #0098C2. The background color shown to leading and
+trailing spaces when the B<-showspaces> option is set.
+
 =item Switch: B<-statusinterval>
 
 By default 200 ms. Update interval for the status bar.
@@ -312,6 +340,15 @@ will be hidden.
 
 Default value 'None'. Sets and returns the currently
 used syntax definition.
+
+=item Name: B<tabBackground>
+
+=item Class: B<TabBackground>
+
+=item Switch: B<-tabbackground>
+
+Default value #B5C200. The background color shown to leading and
+trailing spaces when the B<-showspaces> option is set.
 
 =item Switch: B<-themefile>
 
@@ -371,6 +408,9 @@ sub Populate {
 	$self->{NUMBERSVISIBLE} = 0;
 	$self->{NUMBERINF} = [];
 	$self->{POSTCONFIG} = 0;
+	$self->{SHOWSPACES} = 0;
+	$self->{SPACESCOMPLETED} = 1;
+	$self->{SPACESLOOPACTIVE} = 0;
 	$self->{STATUSVISIBLE} = 0;
 	$self->{SYNTAX} = 'None';
 	$self->{THEME} = $theme;
@@ -528,13 +568,17 @@ sub Populate {
 	my $fg = $l->cget('-foreground');
 	$l->destroy;
 
+	$text->tagConfigure('Hidden', -elide => 1);
+	$text->tagConfigure('Space', -background => 'blue');
+	$text->tagConfigure('Tab', -background => 'blue');
+
 	$self->ConfigSpecs(
 		-bookmarkcolor => [qw/PASSIVE bookmarkColor BookmarkColor/, '#71D0CC'],
 		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
-		-font => ['METHOD', undef, undef, 'Courier 10'],
+		-font => [qw/METHOD font Font/, 'Courier 10'],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
-		-linespercycle => ['METHOD', undef, undef, 10],
+		-linespercycle => [qw/METHOD linesPerCycle LinesPerCycle/, 10],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
 			-data => $minusimg,
 			-foreground => $fg,
@@ -548,9 +592,12 @@ sub Populate {
 		-saveimage => [$statusbar],
 		-showfolds => [qw/METHOD showFolds ShowFolds/, 1],
 		-shownumbers => [qw/METHOD showNumers ShowNumbers/, 1],
+		-showspaces => [qw/METHOD showSpaces ShowSpaces/, 0],
 		-showstatus => [qw/METHOD showStatus ShowStatus/, 1],
 		-syntax => [qw/METHOD syntax Syntax/, 'None'],
 		-statusinterval => [$statusbar],
+		-spacebackground => [qw/METHOD spaceBackground SpaceBackground/, '#0098C2'],
+		-tabbackground => [qw/METHOD tabBackground TabBackground/, '#B5C200'],
 		-themefile => ['METHOD'],
 		DEFAULT => [ $text ],
 	);
@@ -559,7 +606,6 @@ sub Populate {
 		DEFAULT => $text,
 	);
 
-	$self->tagConfigure('Hidden', -elide => 1);
 
  	$self->after(10, sub {
 		$self->{POSTCONFIG} = 1;
@@ -876,6 +922,85 @@ sub FindClose {
 	$self->Subwidget('SandR')->packForget;
 }
 
+=item B<fixIndent>
+
+Works on the entire text unless a selection is set. In that case works only on the selection.
+Checks all lines in the working range for incorrect indentation and attempts to repair.
+
+=cut
+
+sub fixIndent {
+	my ($self, $icon) = @_;
+	my ($begin, $end) = $self->getRange;
+
+	#pop the dialog
+	my @padding = (-padx => 10, -pady => 10);
+	my $q = $self->{POPSPACESPERTABS};
+	unless (defined $q) {
+		$q = $self->YADialog(
+			-title => 'Fix indent',
+			-buttons => [qw(Ok Cancel)],
+		);
+		$q->Label(-image => $icon)->pack(-side => 'left', @padding) if defined $icon;
+		my $f = $q->Frame->pack(-side => 'left', @padding);
+		$f->Label(
+			-anchor => 'w',
+			-text => 'Spaces per tab',
+		)->pack(-fill => 'x', -padx => 2, -pady => 2);
+		my $e = $f->Entry->pack(-fill => 'x', -padx => 2, -pady => 2);
+		$self->{POPENTRY} = $e;
+		$e->focus;
+		$e->bind('<Return>', sub { 
+			$q->{PRESSED} = 'Ok' 
+		});
+		$self->{POPSPACESPERTABS} = $q;
+	}
+	
+	my $answer = $q->Show(-popover => $self->toplevel);
+	if ($answer eq 'Ok') {
+		my $spaces_per_tab = $self->{POPENTRY}->get;
+		return unless $spaces_per_tab =~ /^\d+$/;
+		
+		for ($begin .. $end) {
+			my $line = $_;
+			my $b = $self->index("$line.0");
+			my $e = $self->index("$line.0 lineend");
+			my $text = $self->get($b, $e);
+			
+			if ($text =~ /^([\s|\t]+)/) {
+				my $spaces = $1;
+				my $s = 0;
+				my $pos = 0;
+				my $itext = '';
+				$itext = "$itext " while length($itext) ne $spaces_per_tab;
+				while ($spaces ne '') {
+					my $char = substr $spaces, 0, 1, '';
+					if ($self->cget('-indentstyle') eq 'tab') {
+						if ($char eq "\t") {
+							$s = 0;
+						} else {
+							$s ++;
+							if ($s eq $spaces_per_tab) {
+								my $linepos = $self->index("$b + $pos c");
+								$self->replace($linepos, "$linepos + $s c", "\t");
+								$s = 0;
+								$pos ++;
+							}
+						}
+					} else {
+						if ($char eq "\t") {
+							my $linepos = $self->index("$b + $pos c");
+							$self->replace($linepos, "$linepos + 1 c", $itext);
+							$pos = $pos + length($itext) - 1;
+						}
+						$pos ++
+					}
+				}
+			}
+		}
+	}
+}
+
 sub foldButton {
 	my ($self, $line) = @_;
 	my $folds = $self->Kamelon->Formatter->Folds;
@@ -1093,6 +1218,26 @@ The info is a hash with keys -family -size -weight -slant -underline -overstrike
 
 =cut
 
+=item B<getRange>
+
+Checks for a selection and returns the line numbers of the begin and the end. If no selection is set
+it returns 1 and the line number of the last line.
+
+=cut
+
+sub getRange {
+	my $self = shift;
+	my $begin = 1;
+	my $end = $self->linenumber('end - 1c');
+	my @sel = $self->tagRanges('sel');
+	if (@sel) {
+		$begin = $self->linenumber(shift @sel);
+		$end = $self->linenumber(shift @sel);
+	}
+	return ($begin, $end);
+}
+
+
 =item B<goTo>I<($index)>
 
 Sets the insert cursor to $index.
@@ -1139,6 +1284,9 @@ sub highlightLine {
 			my $tag = shift @h;
 			$xt->tagAdd($tag, "$num.$start", "$num.$pos");
 		};
+		$xt->tagRaise('Find');
+		$xt->tagRaise('Space');
+		$xt->tagRaise('Tab');
 		$xt->tagRaise('sel');
 	};
 	$cli->[$num] = [ $kam->StateGet ];
@@ -1345,6 +1493,7 @@ sub OnModify {
 	my ($self, $index) = @_;
 	$self->highlightCheck($index);
 	$self->bookmarkCheck;
+	$self->spacesCheck($index);
 	$self->Callback('-modifiedcall', $index);
 }
 
@@ -1367,6 +1516,29 @@ Replaces the text from index I<$begin> to I<$end> with the text in I<$string>.
 Counts for one event in the undo stack.
 
 =cut
+
+=item B<removeTrailingSpaces>
+
+Works on the entire text unless a selection is set. In that case works only on the selection.
+Checks all lines in the working range for trailing spaces or tabs and removes them.
+
+=cut
+
+sub removeTrailingSpaces {
+	my $self = shift;
+	my ($begin, $end) = $self->getRange;
+	for ($begin .. $end) {
+		my $line = $_;
+		my $b = $self->index("$line.0");
+		my $e = $self->index("$line.0 lineend");
+		my $text = $self->get($b, $e);
+		if ($text =~ /(\s+)$/) {
+			my $spaces = $1;
+			my $l = length($spaces);
+			$self->delete("$e - $l c", $e);
+		}
+	}
+}
 
 =item B<save>I<($file)>
 
@@ -1444,6 +1616,15 @@ sub shownumbers {
 	return $self->{NUMBERSVISIBLE}
 }
 
+sub showspaces {
+	my $self = shift;
+	if (@_) {
+		$self->{SHOWSPACES} = shift;
+		$self->spacesPurge(1, 1) if $self->{POSTCONFIG};
+	}
+	return $self->{SHOWSPACES}
+}
+
 sub showstatus {
 	my ($self, $flag) = @_;
 	my $f = $self->Subwidget('Statusbar');
@@ -1462,6 +1643,117 @@ sub showstatus {
 	return $self->{STATUSVISIBLE};
 }
 
+sub spacebackground {
+	my $self = shift;
+	if (@_) {
+		$self->tagConfigure('Space', -background => shift);
+	}
+	return $self->tagCget('Space', '-background');
+}
+
+sub spacesCheck {
+	my ($self, $pos) = @_;
+	return unless $self->cget('-showspaces');
+	my $line = $self->linenumber($pos);
+	my $completed = $self->spacesCompleted;
+	$self->spacesPurge($line) if $line <= $self->spacesCompleted;
+}
+
+sub spacesCompleted {
+	my $self = shift;
+	$self->{SPACESCOMPLETED} = shift if @_;
+	return $self->{SPACESCOMPLETED}
+}
+
+sub spacesLine {
+	my ($self, $line) = @_;
+	my $begin = $self->index("$line.0");
+	my $end = $self->index("$begin lineend");
+	my $text = $self->get($begin, $end);
+	for ('Space', 'Tab') {
+		$self->tagRemove($_, $begin, $end)
+	}
+	if ($text =~ /^([\s|\t]+)/) {
+		my $spaces = $1;
+		my $count = 0;
+		while ($spaces ne '') {
+			my $char = substr $spaces, 0, 1, '';
+			my $next = $count + 1;
+			$self->tagAdd('Space', "$begin + $count c", "$begin + $next c") if $char eq ' ';
+			$self->tagAdd('Tab', "$begin + $count c", "$begin + $next c") if $char eq "\t";
+			$count ++
+		}
+	}
+	if ($text =~ /(\s+)$/) {
+		my $spaces = $1;
+		my $l = length($spaces);
+		$end = $self->index("$end - $l c");
+		my $count = 0;
+		while ($spaces ne '') {
+			my $char = substr $spaces, 0, 1, '';
+			my $next = $count + 1;
+			$self->tagAdd('Space', "$end + $count c", "$end + $next c") if $char eq ' ';
+			$self->tagAdd('Tab', "$end + $count c", "$end + $next c") if $char eq "\t";
+			$count ++
+		}
+	}
+	$self->tagRaise('Space');
+	$self->tagRaise('Tab');
+}
+
+sub spacesLoop {
+	my $self = shift;
+	unless ($self->cget('-showspaces')) {
+		$self->spacesLoopActive(0);
+		return
+	}
+	my $xt = $self->Subwidget('XText');
+	my $lpc = $self->cget('-linespercycle');
+	my $complete = $self->spacesCompleted;
+	$self->spacesRemove($complete, $complete + $lpc);
+	for (1 .. $lpc) {
+		my $complete = $self->spacesCompleted;
+		if ($complete <= $xt->linenumber('end - 1c')) {
+			$self->spacesLoopActive(1);
+			$self->spacesLine($complete);
+			$complete ++;
+			$self->spacesCompleted($complete);
+		} else {
+			$self->spacesLoopActive(0);
+		}
+		last unless $self->spacesLoopActive;
+	}
+	$self->after($self->highlightinterval, ['spacesLoop', $self]) if $self->spacesLoopActive;
+}
+
+sub spacesLoopActive {
+	my $self = shift;
+	$self->{SPACESLOOPACTIVE} = shift if @_;
+	return $self->{SPACESLOOPACTIVE}
+}
+
+sub spacesPurge {
+	my ($self, $line, $remove) = @_;
+	$line = 1 unless defined $line;
+	$remove = 0 unless defined $remove;
+
+	$self->spacesRemove($line) if $remove;
+	$self->spacesCompleted($line);
+
+	$self->spacesLoop unless $self->spacesLoopActive;
+}
+
+sub spacesRemove {
+	my ($self, $begin, $end) = @_;
+	$begin = 1 unless defined $begin;
+	$end = $self->linenumber('end') unless defined $end;
+	$begin = "$begin.0";
+	$end = $self->index("$end.0 lineend");
+	
+	for ('Space', 'Tab') {
+		$self->tagRemove($_, $begin, $end)
+	}
+}
 
 sub syntax {
 	my ($self, $new) = @_;
@@ -1490,6 +1782,14 @@ sub syntax {
 		$self->{SYNTAX} = $new;
 	}
 	return $self->{SYNTAX}
+}
+
+sub tabbackground {
+	my $self = shift;
+	if (@_) {
+		$self->tagConfigure('Tab', -background => shift);
+	}
+	return $self->tagCget('Tab', '-background');
 }
 
 =item B<tags>
@@ -1644,6 +1944,8 @@ sub ViewMenuItems {
 	tie $a, 'Tk::Configure', $self, '-autoindent';
 	my $c;
 	tie $c, 'Tk::Configure', $self, '-autocomplete';
+	my $d;
+	tie $d, 'Tk::Configure', $self, '-showspaces';
 	my $f;
 	tie $f, 'Tk::Configure', $self, '-showfolds';
 	my $n;
@@ -1677,6 +1979,7 @@ sub ViewMenuItems {
 	my @items = ( 
 		[checkbutton => '~Auto indent', @values, -variable => \$a],
 		[checkbutton => 'A~uto complete', @values, -variable => \$c],
+		[checkbutton => '~Show spaces and tabs', @values, -variable => \$d],
 		['cascade'=> '~Wrap', -tearoff => 0, -menuitems => [
 			[radiobutton => 'Word', -variable => \$v, -value => 'word'],
 			[radiobutton => 'Character', -variable => \$v, -value => 'char'],
@@ -1693,6 +1996,9 @@ sub ViewMenuItems {
 		[checkbutton => 'Code ~folds', @values, -variable => \$f],
 		[checkbutton => '~Line numbers', @values, -variable => \$n],
 		[checkbutton => '~Status bar', @values, -variable => \$s],
+		'separator',
+		[command => '~Fix indentation', -command => [fixIndent => $self]],
+		[command => '~Remove trailing spaces', -command => [removeTrailingSpaces => $self]],
 	);
 	return @items
 }

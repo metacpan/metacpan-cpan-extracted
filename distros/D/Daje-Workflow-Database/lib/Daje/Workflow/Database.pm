@@ -40,7 +40,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 has 'pg';
 has 'migrations';
@@ -143,6 +143,37 @@ ALTER TABLE history
 
 ALTER TABLE history
     DROP COLUMN class;
+
+-- 4 up
+
+CREATE TABLE IF NOT EXISTS workflow_connections
+(
+    workflow_connections_pkey serial not null primary key,
+    editnum bigint NOT NULL DEFAULT 1,
+    insby varchar NOT NULL DEFAULT 'System',
+    insdatetime timestamp without time zone NOT NULL DEFAULT NOW(),
+    modby varchar NOT NULL DEFAULT 'System',
+    moddatetime timestamp without time zone NOT NULL DEFAULT NOW(),
+    workflow_fkey bigint not null,
+    connector varchar NOT NULL,
+    connector_fkey BIGINT NOT NULL,
+    CONSTRAINT workflow_connections_fkey FOREIGN KEY (workflow_fkey)
+        REFERENCES workflow (workflow_pkey)
+);
+
+CREATE UNIQUE INDEX idx_workflow_connections_connector_connector_fkey
+    ON workflow_connections(connector, connector_fkey);
+
+CREATE UNIQUE INDEX idx_workflow_connections_workflow_fkey
+    ON workflow_connections(workflow_fkey);
+
+CREATE INDEX idx_workflow_connections_workflow_fkey_connector_connector_fkey
+    ON workflow_connections(workflow_fkey, connector, connector_fkey);
+
+-- 4 down
+
+DROP TABLE workflow_connections;
+
 __END__
 
 

@@ -23,4 +23,8 @@ ok($ebook->metadata->{Modified}[0], 'metadata modified ok');
 
 ok($ebook->html, "html ok");
 
+ok(!$ebook->has_cover, "has no cover");
+
+ok(! defined $ebook->cover, "has no cover");
+
 done_testing();

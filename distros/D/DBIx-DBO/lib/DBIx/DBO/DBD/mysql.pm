@@ -1,4 +1,4 @@
-use strict;
+use 5.014;
 use warnings;
 
 package # hide from PAUSE
@@ -6,16 +6,9 @@ package # hide from PAUSE
 use Carp qw(croak);
 
 sub _get_table_schema {
-    my($class, $me, $schema, $table) = @_;
+    my($class, $me, $table) = @_;
 
-    if (defined $schema and length $schema) {
-        (my $q_schema = $me->rdbh->quote($schema)) =~ s/([\\_%])/\\$1/g;
-        my($got_schema) = $me->selectrow_array('SHOW DATABASES LIKE '.$q_schema);
-        croak 'Invalid table: '.$class->_qi($me, $schema, $table) unless defined $got_schema;
-        return $got_schema;
-    }
-
-    ($schema) = $me->selectrow_array('SELECT DATABASE()');
+    my($schema) = $me->selectrow_array('SELECT DATABASE()');
     croak 'Invalid table: '.$class->_qi($me, $table).' (No database selected)' unless defined $schema;
     return $schema;
 }
@@ -47,15 +40,19 @@ sub _save_last_insert_id {
 sub _get_config {
     my $class = shift;
     my $val = $class->SUPER::_get_config(@_);
-    # MySQL supports LIMIT on UPDATE/DELETE by default
-    ($_[0] ne 'LimitRowUpdate' and $_[0] ne 'LimitRowDelete' or defined $val) ? $val : 1;
+    # In MySQL support for LIMIT on UPDATE/DELETE is on by default
+    $val // ($_[0] eq 'LimitRowUpdate' || $_[0] eq 'LimitRowDelete' || undef);
 }
 
 # Query
 sub _calc_found_rows {
     my($class, $me) = @_;
-    if ($me->sql =~ / SQL_CALC_FOUND_ROWS /) {
-        $me->run unless $me->_sth->{Executed};
+
+    # If sth and sql =~ SQL_CALC_FOUND_ROWS, then SELECT FOUND_ROWS
+    # If no sth and CalcFoundRows, then run, and SELECT FOUND_ROWS
+    if ($me->{sth}
+        ? $me->{sql} =~ / SQL_CALC_FOUND_ROWS /
+        : ($me->config('CalcFoundRows') and $me->run or croak $me->rdbh->errstr)) {
         return $me->{Found_Rows} = ($class->_selectrow_array($me, 'SELECT FOUND_ROWS()'))[0];
     }
     $class->SUPER::_calc_found_rows($me);
@@ -63,15 +60,16 @@ sub _calc_found_rows {
 
 sub _build_sql_select {
     my($class, $me) = @_;
+
     my $sql = $class->SUPER::_build_sql_select($me);
-    $sql =~ s/SELECT /SELECT SQL_CALC_FOUND_ROWS / if $me->config('CalcFoundRows');
+    $sql =~ s/^SELECT /SELECT SQL_CALC_FOUND_ROWS / if $me->config('CalcFoundRows') and not $me->{build_data}{_super_query};
     return $sql;
 }
 
 # MySQL doesn't allow the use of aliases in the WHERE clause
 sub _alias_preference {
     my($class, $me, $method) = @_;
-    $method ||= ((caller(2))[3] =~ /\b(\w+)$/);
+    $method ||= ((caller(2))[3] =~ /\b(\w+)$/)[0];
     return 0 if $method eq 'join_on' or $method eq 'where';
     return 1;
 }

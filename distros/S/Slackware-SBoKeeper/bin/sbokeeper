@@ -26,8 +26,9 @@ packages and their dependencies. It is B<not> a package manager itself, it
 simply helps in the task of managing SlackBuilds.
 
 The package database is a text file that stores all of B<sbokeeper>'s package
-data. By default, it is stored in I<~/.local/share/sbokeeper/data.sbokeeper>,
-but it can be configured to be stored in another location.
+data. By default, it is stored in either F</var/lib/sbokeeper/data.sbokeeper> if
+you are running as a root or F<~/.local/share/sbokeeper/data.sbokeeper> for
+normal users, but it can be configured to be stored in another location.
 
 =head1 CONFIGURATION
 
@@ -44,16 +45,19 @@ file in the following paths in descending order:
 
 =over 4
 
-=item I<~/.config/sbokeeper.conf>
+=item F<~/.config/sbokeeper.conf>
 
-=item I<~/.sbokeeper.conf>
+=item F<~/.sbokeeper.conf>
 
-=item I</etc/sbokeeper.conf>
+=item F</etc/sbokeeper.conf>
 
 =back
 
 If no configuration file is found, B<sbokeeper> will use default values for
 everything.
+
+Fields that take path names as value can take either an absolute path or a path
+relative to the location of the configuration file.
 
 The following are valid configuration entries:
 
@@ -61,17 +65,18 @@ The following are valid configuration entries:
 
 =item B<DataFile>
 
-Absolute path to file where package database will be stored. A '~' can be
+Path to file where package database will be stored. A '~' can be
 expanded into the running user's home directory, but other kinds of shell
 expansion are not performed.
 
 Can be overridden by the B<-d> option.
 
-Default value is I<~/.local/share/sbokeeper/data.sbokeeper>.
+Default value is F</var/lib/sbokeeper/data.sbokeeper> for the root user and
+F<~/.local/share/sbokeeper/data.sbokeeper> for normal users.
 
 =item B<SBoPath>
 
-Absolute to path to directory where local SlackBuild repository is kept. The
+Path to directory where local SlackBuild repository is kept. The
 directory should look something like this:
 
  SBoPath
@@ -132,10 +137,10 @@ The default value is '_SBo'.
 
 List of packages or path to blacklist file that tells what packages to ignore.
 
-If B<Blacklist> starts with a slash or tilde (C<'/'> or C<'~'>), B<sbokeeper>
-will interpret the option as a path to a blacklist file and read the blacklist
-from that. Otherwise, B<sbokeeper> will treat B<Blacklist> as a white-space
-seperated list of packages to blacklist.
+If B<Blacklist> looks like path name, B<sbokeeper> will interpret the option as
+a path to a blacklist file and read the blacklist from that. Otherwise,
+B<sbokeeper> will treat B<Blacklist> as a white-space seperated list of packages
+to blacklist.
 
 A blacklist file is a text file that contains a list of packages to blacklist,
 with each package having its own line. Blank lines and lines starting with
@@ -146,7 +151,7 @@ hashes (C<'#'>) are ignored.
   lua
   avahi
 
-Can be overridden with the B<-b> option.
+Can be overridden with the B<-B> option.
 
 B<sbokeeper> does not use a blacklist by default.
 

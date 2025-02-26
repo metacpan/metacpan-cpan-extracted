@@ -10,7 +10,7 @@ using the dump feature found in many text web browsers, like `lynx(1)`.
 * MOBI
 * AZW
 * HTML/XHTML
-* PDF (poorly, but supported nonetheless)
+* PDF
 * FictionBook2
 * PalmDoc
 * zTXT
@@ -33,7 +33,7 @@ either CPAN or your system's package manager:
 **ishmael** also depends on the following programs to be installed on your
 system:
 * `perl` (>= `5.16`)
-* Poppler's `pdfinfo` and `pdftohtml` (optional; for PDF support)
+* `poppler-utils` (optional; for PDF support)
 
 The following text web browsers can be installed for **ishmael** to use for
 formatting HTML. If none are installed, **ishmael** will use its own HTML

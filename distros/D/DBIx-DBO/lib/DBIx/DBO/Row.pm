@@ -1,14 +1,16 @@
 package DBIx::DBO::Row;
 
-use strict;
+use 5.014;
 use warnings;
+use DBIx::DBO;
+
 use Carp 'croak';
 use Scalar::Util qw(blessed weaken);
 use Storable ();
 
 use overload '@{}' => sub {${$_[0]}->{array} || []}, '%{}' => sub {${$_[0]}->{hash}}, fallback => 1;
 
-sub _table_class { ${$_[0]}->{DBO}->_table_class }
+sub query_class { ${$_[0]}->{DBO}->query_class }
 
 *_isa = \&DBIx::DBO::DBD::_isa;
 
@@ -42,7 +44,7 @@ DBIx::DBO::Row - An OO interface to SQL queries and results.  Encapsulates a fet
 
 Create and return a new C<Row> object.
 The object returned represents rows in the given table/query.
-Can take the same arguments as L<DBIx::DBO::Table/new> or a L<Query|DBIx::DBO::Query> object can be used.
+Can take the same arguments as L<DBIx::DBO::Query/new> or a L<Query|DBIx::DBO::Query> object can be used.
 
 =cut
 
@@ -54,57 +56,29 @@ sub new {
 }
 
 sub _init {
-    my($class, $dbo, $parent) = @_;
-    croak 'Missing parent for new Row' unless defined $parent;
+    my($class, $dbo, @args) = @_;
 
     my $me = bless \{ DBO => $dbo, array => undef, hash => {} }, $class;
-    $parent = $me->_table_class->new($dbo, $parent) unless blessed $parent;
+    my $parent = (@args == 1 and _isa($args[0], 'DBIx::DBO::Query'))
+    ? $args[0]
+    : $me->query_class->new($dbo, @args);
 
-    $$me->{build_data}{LimitOffset} = [1];
     if ($parent->isa('DBIx::DBO::Query')) {
         croak 'This query is from a different DBO connection' if $parent->{DBO} != $dbo;
-        $$me->{Parent} = $parent;
         # We must weaken this to avoid a circular reference
+        $$me->{Parent} = $parent;
         weaken $$me->{Parent};
-        $parent->columns;
-        $$me->{Tables} = [ @{$parent->{Tables}} ];
-        $$me->{Columns} = $parent->{Columns};
-        $$me->{build_data}{from} = $dbo->{dbd_class}->_build_from($parent);
-        $me->_copy_build_data;
-    } elsif ($parent->isa('DBIx::DBO::Table')) {
-        croak 'This table is from a different DBO connection' if $parent->{DBO} != $dbo;
-        $$me->{build_data} = {
-            show => '*',
-            Showing => [],
-            from => $parent->_from,
-            group => '',
-            order => '',
-        };
-        $$me->{Tables} = [ $parent ];
-        $$me->{Columns} = $parent->{Columns};
+        # Add a weak ref onto the list of attached_rows to release freed rows
+        push @{ $$me->{Parent}{attached_rows} }, $me;
+        weaken $$me->{Parent}{attached_rows}[-1];
     } else {
         croak 'Invalid parent for new Row';
     }
     return wantarray ? ($me, $me->tables) : $me;
 }
 
-sub _copy_build_data {
-    my $me = $_[0];
-    # Store needed build_data
-    for my $f (qw(Showing From_Bind Quick_Where Where_Data Where_Bind group Group_Bind order Order_Bind)) {
-        $$me->{build_data}{$f} = $me->_copy($$me->{Parent}{build_data}{$f}) if exists $$me->{Parent}{build_data}{$f};
-    }
-}
-
-sub _copy {
-    my($me, $val) = @_;
-    return bless [$me, $val->[1]], 'DBIx::DBO::Column'
-        if _isa($val, 'DBIx::DBO::Column') and $val->[0] == $$me->{Parent};
-    ref $val eq 'ARRAY' ? [map $me->_copy($_), @$val] : ref $val eq 'HASH' ? {map $me->_copy($_), %$val} : $val;
-}
-
 sub _build_data {
-    ${$_[0]}->{build_data};
+    ${$_[0]}->{build_data} // ${$_[0]}->{Parent}{build_data};
 }
 
 =head3 C<tables>
@@ -114,15 +88,17 @@ Return a list of L<Table|DBIx::DBO::Table> objects for this row.
 =cut
 
 sub tables {
-    @{${$_[0]}->{Tables}};
+    my $me = $_[0];
+    return @{ ${exists $$me->{Parent} ? $$me->{Parent} : $$me}{Tables} };
 }
 
 sub _table_idx {
     my($me, $tbl) = @_;
-    for my $i (0 .. $#{$$me->{Tables}}) {
-        return $i if $tbl == $$me->{Tables}[$i];
+    my $tables = ${exists $$me->{Parent} ? $$me->{Parent} : $$me}{Tables};
+    for my $i (0 .. $#$tables) {
+        return $i if $tbl == $tables->[$i];
     }
-    return;
+    return undef;
 }
 
 sub _table_alias {
@@ -130,7 +106,7 @@ sub _table_alias {
     return undef if $tbl == $me;
     my $i = $me->_table_idx($tbl);
     croak 'The table is not in this query' unless defined $i;
-    @{$$me->{Tables}} > 1 ? 't'.($i + 1) : ();
+    return $me->tables > 1 ? 't'.($i + 1) : ();
 }
 
 =head3 C<columns>
@@ -142,17 +118,15 @@ Return a list of column names.
 sub columns {
     my($me) = @_;
 
-    return $$me->{Parent}->columns if $$me->{Parent};
+    return $$me->{Parent}->columns if exists $$me->{Parent};
 
-    @{$$me->{Columns}} = do {
-        if (@{$$me->{build_data}{Showing}}) {
-            map {
+    $$me->{Columns} //= [
+        @{$me->_build_data->{select}}
+        ? map {
                 _isa($_, 'DBIx::DBO::Table', 'DBIx::DBO::Query') ? ($_->columns) : $me->_build_col_val_name(@$_)
-            } @{$$me->{build_data}{Showing}};
-        } else {
-            map { $_->columns } @{$$me->{Tables}};
-        }
-    } unless @{$$me->{Columns}};
+            } @{$me->_build_data->{select}}
+        : map { $_->columns } $me->tables
+    ];
 
     @{$$me->{Columns}};
 }
@@ -162,18 +136,20 @@ sub columns {
 sub _column_idx {
     my($me, $col) = @_;
     my $idx = -1;
-    for my $shown (@{$$me->{build_data}{Showing}} ? @{$$me->{build_data}{Showing}} : @{$$me->{Tables}}) {
-        if (_isa($shown, 'DBIx::DBO::Table')) {
-            if ($col->[0] == $shown and exists $shown->{Column_Idx}{$col->[1]}) {
-                return $idx + $shown->{Column_Idx}{$col->[1]};
+    my @show;
+    @show = @{$me->_build_data->{select}} or @show = $me->tables;
+    for my $fld (@show) {
+        if (_isa($fld, 'DBIx::DBO::Table')) {
+            if ($col->[0] == $fld and exists $fld->{Column_Idx}{$col->[1]}) {
+                return $idx + $fld->{Column_Idx}{$col->[1]};
             }
-            $idx += keys %{$shown->{Column_Idx}};
+            $idx += keys %{$fld->{Column_Idx}};
             next;
         }
         $idx++;
-        return $idx if not defined $shown->[1] and @{$shown->[0]} == 1 and $col == $shown->[0][0];
+        return $idx if not defined $fld->[1] and @{$fld->[0]} == 1 and $col == $fld->[0][0];
     }
-    return;
+    return undef;
 }
 
 =head3 C<column>
@@ -187,9 +163,9 @@ Returns a column reference from the name or alias.
 sub column {
     my($me, $col) = @_;
     my @show;
-    @show = @{$$me->{build_data}{Showing}} or @show = @{$$me->{Tables}};
+    @show = @{$me->_build_data->{select}} or @show = $me->tables;
     for my $fld (@show) {
-        return $$me->{Column}{$col} ||= bless [$me, $col], 'DBIx::DBO::Column'
+        return $$me->{Column}{$col} //= bless [$me, $col], 'DBIx::DBO::Column'
             if (_isa($fld, 'DBIx::DBO::Table') and exists $fld->{Column_Idx}{$col})
             or (_isa($fld, 'DBIx::DBO::Query') and eval { $fld->column($col) })
             or (ref($fld) eq 'ARRAY' and exists $fld->[2]{AS} and $col eq $fld->[2]{AS});
@@ -211,8 +187,8 @@ sub _inner_col {
 
 sub _check_alias {
     my($me, $col) = @_;
-    for my $fld (@{$$me->{build_data}{Showing}}) {
-        return $$me->{Column}{$col} ||= bless [$me, $col], 'DBIx::DBO::Column'
+    for my $fld (@{$me->_build_data->{select}}) {
+        return $$me->{Column}{$col} //= bless [$me, $col], 'DBIx::DBO::Column'
             if ref($fld) eq 'ARRAY' and exists $fld->[2]{AS} and $col eq $fld->[2]{AS};
     }
 }
@@ -262,11 +238,9 @@ sub load {
     # Use Quick_Where to load a row, but make sure to restore its value afterward
     my $old_qw = $#{$$me->{build_data}{Quick_Where}};
     push @{$$me->{build_data}{Quick_Where}}, @_;
-    undef $$me->{build_data}{where};
     my $sql = $$me->{DBO}{dbd_class}->_build_sql_select($me);
     my @bind = $$me->{DBO}{dbd_class}->_bind_params_select($me);
     $old_qw < 0 ? delete $$me->{build_data}{Quick_Where} : ($#{$$me->{build_data}{Quick_Where}} = $old_qw);
-    delete $$me->{build_data}{where};
     delete $$me->{build_data}{Where_Bind};
 
     return $me->_load($sql, @bind);
@@ -294,16 +268,30 @@ sub _load {
 sub _detach {
     my $me = $_[0];
     if (exists $$me->{Parent}) {
-        $$me->{Columns} = [ @{$$me->{Columns}} ];
-        $$me->{array} = [ @$me ];
-        $$me->{hash} = { %$me };
-        undef $$me->{Parent}{Row};
+        $$me->{array} &&= \@{ $$me->{array} };
+        $$me->{hash} = \%{ $$me->{hash} };
+        for ($$me->{Parent}{Row}, @{ $$me->{Parent}{attached_rows} }) {
+            undef $_ if defined $_ and $_ == $me;
+        }
+        # Store needed build_data
+        $$me->{Tables} = [ @{$$me->{Parent}{Tables}} ];
+        $$me->{build_data}{from_sql} = $$me->{DBO}{dbd_class}->_build_from($$me->{Parent});
+        for my $f (qw(select From_Bind where order group)) {
+            $$me->{build_data}{$f} = $me->_copy($$me->{Parent}{build_data}{$f}) if exists $$me->{Parent}{build_data}{$f};
+        }
         # Save config from Parent
         if ($$me->{Parent}{Config} and %{$$me->{Parent}{Config}}) {
             $$me->{Config} = { %{$$me->{Parent}{Config}}, $$me->{Config} ? %{$$me->{Config}} : () };
         }
     }
     delete $$me->{Parent};
+}
+
+sub _copy {
+    my($me, $val) = @_;
+    return bless [$me, $val->[1]], 'DBIx::DBO::Column'
+        if _isa($val, 'DBIx::DBO::Column') and $val->[0] == $$me->{Parent};
+    ref $val eq 'ARRAY' ? [map $me->_copy($_), @$val] : ref $val eq 'HASH' ? {map $me->_copy($_), %$val} : $val;
 }
 
 =head3 C<update>
@@ -325,7 +313,7 @@ sub update {
     croak "Can't update an empty row" unless $$me->{array};
     my @update = $$me->{DBO}{dbd_class}->_parse_set($me, @_);
     local $$me->{build_data} = $$me->{DBO}{dbd_class}->_build_data_matching_this_row($me);
-    $$me->{build_data}{LimitOffset} = ($me->config('LimitRowUpdate') and $me->tables == 1) ? [1] : undef;
+    $$me->{build_data}{limit} = ($me->config('LimitRowUpdate') and $me->tables == 1) ? [1] : undef;
     my $sql = $$me->{DBO}{dbd_class}->_build_sql_update($me, @update);
 
     my $rv = $$me->{DBO}{dbd_class}->_do($me, $sql, undef, $$me->{DBO}{dbd_class}->_bind_params_update($me));
@@ -351,7 +339,7 @@ sub delete {
     my $me = shift;
     croak "Can't delete an empty row" unless $$me->{array};
     local $$me->{build_data} = $$me->{DBO}{dbd_class}->_build_data_matching_this_row($me);
-    $$me->{build_data}{LimitOffset} = ($me->config('LimitRowDelete') and $me->tables == 1) ? [1] : undef;
+    $$me->{build_data}{limit} = ($me->config('LimitRowDelete') and $me->tables == 1) ? [1] : undef;
     my $sql = $$me->{DBO}{dbd_class}->_build_sql_delete($me, @_);
 
     undef $$me->{array};
@@ -401,37 +389,30 @@ sub rdbh { ${$_[0]}->{DBO}->rdbh }
 
 Get or set the C<Row> config settings.  When setting an option, the previous value is returned.  When getting an option's value, if the value is undefined, the C<Query> object (If the the C<Row> belongs to one) or L<DBIx::DBO|DBIx::DBO>'s value is returned.
 
-See L<DBIx::DBO/Available_config_options>.
+See L<DBIx::DBO/"Available config options">.
 
 =cut
 
 sub config {
     my $me = shift;
     my $opt = shift;
-    return $$me->{DBO}{dbd_class}->_set_config($$me->{Config} ||= {}, $opt, shift) if @_;
-    $$me->{DBO}{dbd_class}->_get_config($opt, $$me->{Config} ||= {}, defined $$me->{Parent} ? ($$me->{Parent}{Config}) : (), $$me->{DBO}{Config}, \%DBIx::DBO::Config);
+    return $$me->{DBO}{dbd_class}->_set_config($$me->{Config} //= {}, $opt, shift) if @_;
+    $$me->{DBO}{dbd_class}->_get_config($opt, $$me->{Config} //= {}, defined $$me->{Parent} ? ($$me->{Parent}{Config}) : (), $$me->{DBO}{Config}, \%DBIx::DBO::Config);
 }
 
-*STORABLE_freeze = sub {
-    my($me, $cloning) = @_;
-    return unless exists $$me->{Parent};
+if (eval { Storable->VERSION(2.38) }) {
+    *STORABLE_freeze = sub {
+        my($me, $cloning) = @_;
+        $me->_detach;
+        my $frozen = Storable::nfreeze($$me);
+        return $frozen;
+    };
 
-    # Simulate detached row
-    local $$me->{Columns} = [ @{$$me->{Columns}} ];
-    # Save config from Parent
-    my $parent = delete $$me->{Parent};
-    local $$me->{Config} = { %{$parent->{Config}}, $$me->{Config} ? %{$$me->{Config}} : () }
-        if $parent->{Config} and %{$parent->{Config}};
-
-    my $frozen = Storable::nfreeze($me);
-    $$me->{Parent} = $parent;
-    return $frozen;
-} if $Storable::VERSION >= 2.38;
-
-*STORABLE_thaw = sub {
-    my($me, $cloning, @frozen) = @_;
-    $$me = { %${ Storable::thaw(@frozen) } }; # Copy the hash, or Storable will wipe it out!
-} if $Storable::VERSION >= 2.38;
+    *STORABLE_thaw = sub {
+        my($me, $cloning, @frozen) = @_;
+        $$me = \%{ Storable::thaw(@frozen) }; # Copy the hash, or Storable will wipe it out
+    };
+}
 
 sub DESTROY {
     undef %${$_[0]};
@@ -447,13 +428,23 @@ Classes can easily be created for tables in your database.
 Assume you want to create a simple C<Row> class for a "Users" table:
 
   package My::User;
-  our @ISA = qw(DBIx::DBO::Row);
+  use parent 'DBIx::DBO::Row';
   
   sub new {
       my($class, $dbo) = @_;
       
-      $class->SUPER::new($dbo, 'Users'); # Create the Row for the "Users" table
+      return $class->SUPER::new($dbo, 'Users');
   }
+
+=head3 C<query_class>
+
+If you want this Row to belong to an existing Query class,
+just define the C<query_class> method to return the class name of the parent Query.
+
+  package My::User;
+  use parent 'DBIx::DBO::Row';
+  
+  sub query_class { 'My::Users' }
 
 =head1 SEE ALSO
 

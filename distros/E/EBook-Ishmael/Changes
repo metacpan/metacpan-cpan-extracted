@@ -1,5 +1,26 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.07  Feb 25 2025
+  - Added -r/--raw option: Dumps the raw, unformatted text contents of a given
+    ebook.
+  - Added -c/--cover option: Dump the cover image of a given ebook if one is
+    present.
+    - As a result, pdftopng is an additional dependency if one wishes to dump
+      PDF covers. pdftopng should be included with most versions of
+      poppler-utils.
+    - MIME::Base64 was also added as a dependency, although it should be
+      included with Perl core.
+  - XHTML is now considered a seperate format from HTML (although its class is
+    derived from the HTML class, so it should act mostly the same except for
+    being called XHTML rather than HTML).
+  - Recognize some more FictionBook2 metadata.
+  - Improve some format heuristics.
+    - FictionBook2, HTML, XHTML
+  - When reading EPUBs, try not to dump items that are not under the
+    "application/xhtml+xml" media type.
+  - Moved PDB modules out of EBook namespace.
+  - Removed EBook::Ishmael::EBook::Skeleton.
+
 0.06  Feb 22 2025
   - When ran with no arguments, queequeg reads input from stdin.
   - queequeg now accepts multiple files as argument.

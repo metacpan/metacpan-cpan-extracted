@@ -11,7 +11,7 @@ use EBook::Ishmael::EBook;
 my $HTML = File::Spec->catfile(qw/t data gpl3.xhtml/);
 
 my $ebook = EBook::Ishmael::EBook->new($HTML);
-isa_ok($ebook, 'EBook::Ishmael::EBook::HTML');
+isa_ok($ebook, 'EBook::Ishmael::EBook::XHTML');
 
 like($ebook->{Source}, qr/\Q$HTML\E$/, "source ok");
 
@@ -26,5 +26,9 @@ is_deeply(
 );
 
 ok($ebook->html, "html ok");
+
+ok(!$ebook->has_cover, "has no cover");
+
+ok(! defined $ebook->cover, "has no cover");
 
 done_testing();

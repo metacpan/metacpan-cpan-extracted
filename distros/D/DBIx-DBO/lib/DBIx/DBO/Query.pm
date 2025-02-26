@@ -1,24 +1,18 @@
 package DBIx::DBO::Query;
 
-use strict;
+use 5.014;
 use warnings;
+use DBIx::DBO;
+
 use Carp 'croak';
 use Devel::Peek 'SvREFCNT';
+use Hash::Util 'hv_store';
+use Scalar::Util 'weaken';
 
 use overload '**' => \&column, fallback => 1;
 
-BEGIN {
-    if ($] < 5.008_009) {
-        require XSLoader;
-        XSLoader::load(__PACKAGE__, $DBIx::DBO::VERSION);
-    } else {
-        require Hash::Util;
-        *_hv_store = \&Hash::Util::hv_store;
-    }
-}
-
-sub _table_class { $_[0]{DBO}->_table_class }
-sub _row_class { $_[0]{DBO}->_row_class }
+sub table_class { $_[0]{DBO}->table_class }
+sub row_class { $_[0]{DBO}->row_class }
 
 *_isa = \&DBIx::DBO::DBD::_isa;
 
@@ -115,7 +109,7 @@ B<NB>: This will not remove the JOINs or JOIN ON clauses.
 
 sub reset {
     my $me = shift;
-    $me->finish;
+    $me->_inactivate;
     $me->unwhere;
     $me->distinct(0);
     $me->show;
@@ -152,22 +146,13 @@ sub _table_alias {
     # Don't use aliases, when there's only 1 table unless its a subquery
     return undef if $me->tables == 1 and _isa($tbl, 'DBIx::DBO::Table');
 
-    my $_from_alias = $me->{build_data}{_from_alias} ||= {};
-    return $_from_alias->{$tbl} ||= 't'.scalar(keys %$_from_alias);
+    my $_from_alias = ($me->{build_data}{_super_query} // $me)->_build_data->{_from_alias} //= {};
+    return $_from_alias->{$tbl} //= 't'.scalar(keys %$_from_alias);
 }
 
-sub _from {
-    my($me, $parent_build_data) = @_;
-    $parent_build_data->{_subqueries}{$me} = $me->sql;
-    local(
-        $me->{build_data}{_from_alias},
-        $me->{build_data}{from},
-        $me->{build_data}{show},
-        $me->{build_data}{where},
-        $me->{build_data}{orderby},
-        $me->{build_data}{groupby},
-        $me->{build_data}{having}
-    ) = ($parent_build_data->{_from_alias});
+sub _as_table {
+    my($me, $super_query) = @_;
+    local $me->{build_data}{_super_query} = $super_query;
     return '('.$me->{DBO}{dbd_class}->_build_sql_select($me).')';
 }
 
@@ -181,10 +166,10 @@ sub columns {
     my($me) = @_;
 
     @{$me->{Columns}} = do {
-        if (@{$me->{build_data}{Showing}}) {
+        if (@{$me->{build_data}{select}}) {
             map {
                 _isa($_, 'DBIx::DBO::Table', 'DBIx::DBO::Query') ? ($_->columns) : $me->_build_col_val_name(@$_)
-            } @{$me->{build_data}{Showing}};
+            } @{$me->{build_data}{select}};
         } else {
             map { $_->columns } @{$me->{Tables}};
         }
@@ -205,7 +190,7 @@ sub _build_col_val_name {
         } elsif (ref $_ eq 'SCALAR') {
             $$_;
         } elsif (_isa($_, 'DBIx::DBO::Query')) {
-            $_->_from($me->{build_data});
+            $_->_as_table($me);
         }
     } @$fld;
     return $ary[0] unless defined $func;
@@ -226,9 +211,9 @@ The C<**> method is a shortcut for the C<column> method.
 sub column {
     my($me, $col) = @_;
     my @show;
-    @show = @{$me->{build_data}{Showing}} or @show = @{$me->{Tables}};
+    @show = @{$me->{build_data}{select}} or @show = @{$me->{Tables}};
     for my $fld (@show) {
-        return $me->{Column}{$col} ||= bless [$me, $col], 'DBIx::DBO::Column'
+        return $me->{Column}{$col} //= bless [$me, $col], 'DBIx::DBO::Column'
             if (_isa($fld, 'DBIx::DBO::Table') and exists $fld->{Column_Idx}{$col})
             or (_isa($fld, 'DBIx::DBO::Query') and eval { $fld->column($col) })
             or (ref($fld) eq 'ARRAY' and exists $fld->[2]{AS} and $col eq $fld->[2]{AS});
@@ -250,8 +235,8 @@ sub _inner_col {
 
 sub _check_alias {
     my($me, $col) = @_;
-    for my $fld (@{$me->{build_data}{Showing}}) {
-        return $me->{Column}{$col} ||= bless [$me, $col], 'DBIx::DBO::Column'
+    for my $fld (@{$me->{build_data}{select}}) {
+        return $me->{Column}{$col} //= bless [$me, $col], 'DBIx::DBO::Column'
             if ref($fld) eq 'ARRAY' and exists $fld->[2]{AS} and $col eq $fld->[2]{AS};
     }
 }
@@ -275,21 +260,19 @@ You can also add a subquery by passing that Query as the value with an alias, Eg
 # TODO: Keep track of all aliases in use and die if a used alias is removed
 sub show {
     my $me = shift;
-    undef $me->{sql};
-    undef $me->{build_data}{from};
-    undef $me->{build_data}{show};
-    undef @{$me->{build_data}{Showing}};
+    $me->_inactivate;
+    undef @{$me->{build_data}{select}};
     undef @{$me->{Columns}};
     for my $fld (@_) {
         if (_isa($fld, 'DBIx::DBO::Table', 'DBIx::DBO::Query')) {
             croak 'Invalid table to show' unless defined $me->_table_idx($fld);
-            push @{$me->{build_data}{Showing}}, $fld;
+            push @{$me->{build_data}{select}}, $fld;
             push @{$me->{Columns}}, $fld->columns;
             next;
         }
         # If the $fld is just a scalar use it as a column name not a value
         my @col = $me->{DBO}{dbd_class}->_parse_col_val($me, $fld, Aliases => 0);
-        push @{$me->{build_data}{Showing}}, \@col;
+        push @{$me->{build_data}{select}}, \@col;
         push @{$me->{Columns}}, $me->_build_col_val_name(@col);
     }
 }
@@ -304,8 +287,7 @@ Takes a boolean argument to add or remove the DISTINCT clause for the returned r
 
 sub distinct {
     my $me = shift;
-    undef $me->{sql};
-    undef $me->{build_data}{show};
+    $me->_inactivate;
     my $distinct = $me->{build_data}{Show_Distinct};
     $me->{build_data}{Show_Distinct} = shift() ? 1 : undef if @_;
 }
@@ -333,9 +315,11 @@ sub join_table {
     } elsif (_isa($tbl, 'DBIx::DBO::Query')) {
         # Subquery
         croak 'This table is from a different DBO connection' if $me->{DBO} != $tbl->{DBO};
+        $tbl->_add_up_query($me);
     } else {
-        $tbl = $me->_table_class->new($me->{DBO}, $tbl);
+        $tbl = $me->table_class->new($me->{DBO}, $tbl);
     }
+    $me->_inactivate;
     if (defined $type) {
         $type =~ s/^\s*/ /;
         $type =~ s/\s*$/ /;
@@ -345,13 +329,9 @@ sub join_table {
         $type = ', ';
     }
     push @{$me->{Tables}}, $tbl;
-    push @{$me->{build_data}{Join}}, $type;
-    push @{$me->{build_data}{Join_On}}, undef;
+    push @{$me->{build_data}{join_types}}, $type;
     push @{$me->{Join_Bracket_Refs}}, [];
     push @{$me->{Join_Brackets}}, [];
-    undef $me->{sql};
-    undef $me->{build_data}{from};
-    undef $me->{build_data}{show};
     undef @{$me->{Columns}};
     return $tbl;
 }
@@ -379,14 +359,13 @@ sub join_on {
     $me->_validate_where_fields(@$col1, @$col2);
 
     # Force a new search
-    undef $me->{sql};
-    undef $me->{build_data}{from};
+    $me->_inactivate;
 
-    # Find the current Join_On reference
-    my $ref = $me->{build_data}{Join_On}[$i] ||= [];
+    # Find the current join reference
+    my $ref = $me->{build_data}{"join$i"} ||= [];
     $ref = $ref->[$_] for (@{$me->{Join_Bracket_Refs}[$i]});
 
-    $me->{build_data}{Join}[$i] = ' JOIN ' if $me->{build_data}{Join}[$i] eq ', ';
+    $me->{build_data}{join_types}[$i] = ' JOIN ' if $me->{build_data}{join_types}[$i] eq ', ';
     $me->_add_where($ref, $op, $col1, $col1_func, $col1_opt, $col2, $col2_func, $col2_opt, @_);
 }
 
@@ -396,7 +375,7 @@ sub join_on {
   $query->join_on(...
   $query->close_join_on_bracket($table);
 
-Equivalent to L<open_bracket|/open_bracket__close_bracket>, but for the JOIN ON clause.
+Equivalent to L<open_bracket|/"open_bracket, close_bracket">, but for the JOIN ON clause.
 The first argument is the table being joined onto.
 
 =cut
@@ -405,7 +384,7 @@ sub open_join_on_bracket {
     my $me = shift;
     my $tbl = shift or croak 'Invalid table object for join on clause';
     my $i = $me->_table_idx($tbl) or croak 'No such table object in the join';
-    $me->_open_bracket($me->{Join_Brackets}[$i], $me->{Join_Bracket_Refs}[$i], $me->{build_data}{Join_On}[$i] ||= [], @_);
+    $me->_open_bracket($me->{Join_Brackets}[$i], $me->{Join_Bracket_Refs}[$i], $me->{build_data}{"join$i"} ||= [], @_);
 }
 
 sub close_join_on_bracket {
@@ -419,7 +398,7 @@ sub close_join_on_bracket {
 
 Restrict the query with the condition specified (WHERE clause).
 
-  $query->where($expression1, $operator, $expression2);
+  $query->where($expression1, $operator, $expression2, %options);
 
 C<$operator> is one of: C<'=', '<E<gt>', '<', 'E<gt>', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'BETWEEN', 'NOT BETWEEN', ...>
 
@@ -459,17 +438,20 @@ A Query object, to be used as a subquery.
 
 =item *
 
-A hash reference: see L</Complex_expressions>
+A hash reference: see L</"Complex expressions">
 
 =back
 
-Multiple C<where> expressions are combined I<cleverly> using the preferred aggregator C<'AND'> (unless L<open_bracket|/open_bracket__close_bracket> was used to change this).  So that when you add where expressions to the query, they will be C<AND>ed together.  However some expressions that refer to the same column will automatically be C<OR>ed instead where this makes sense, currently: C<'='>, C<'IS NULL'>, C<'E<lt>=E<gt>'>, C<'IN'> and C<'BETWEEN'>.  Similarly, when the preferred aggregator is C<'OR'> the following operators will be C<AND>ed together: C<'!='>, C<'IS NOT NULL'>, C<'E<lt>E<gt>'>, C<'NOT IN'> and C<'NOT BETWEEN'>.
+Multiple C<where> expressions are combined I<cleverly> using the preferred aggregator C<'AND'> (unless L<open_bracket|/"open_bracket, close_bracket"> was used to change this).  So that when you add where expressions to the query, they will be C<AND>ed together.  However some expressions that refer to the same column will automatically be C<OR>ed instead where this makes sense, currently: C<'='>, C<'IS NULL'>, C<'E<lt>=E<gt>'>, C<'IN'> and C<'BETWEEN'>.  Similarly, when the preferred aggregator is C<'OR'> the following operators will be C<AND>ed together: C<'!='>, C<'IS NOT NULL'>, C<'E<lt>E<gt>'>, C<'NOT IN'> and C<'NOT BETWEEN'>.
+The chosen aggregator can also be overriden by passing a C<FORCE> option with a string C<'AND'> or C<'OR'>.
 
   $query->where('id', '=', 5);
   $query->where('name', '=', 'Bob');
   $query->where('id', '=', 7);
+  $query->where('age', '<', 20, FORCE => 'OR');
+  $query->where('age', '>', 30, FORCE => 'OR');
   $query->where(...
-  # Produces: WHERE ("id" = 5 OR "id" = 7) AND "name" = 'Bob' AND ...
+  # Produces: WHERE ("id" = 5 OR "id" = 7) AND "name" = 'Bob' AND ("age" < 20 OR "age" > 30) AND ...
 
 =cut
 
@@ -485,11 +467,10 @@ sub where {
     $me->_validate_where_fields(@$fld, @$val);
 
     # Force a new search
-    undef $me->{sql};
-    undef $me->{build_data}{where};
+    $me->_inactivate;
 
-    # Find the current Where_Data reference
-    my $ref = $me->{build_data}{Where_Data} ||= [];
+    # Find the current where reference
+    my $ref = $me->{build_data}{where} ||= [];
     $ref = $ref->[$_] for (@{$me->{Where_Bracket_Refs}});
 
     $me->_add_where($ref, $op, $fld, $fld_func, $fld_opt, $val, $val_func, $val_opt, @_);
@@ -507,7 +488,7 @@ If no column is provided, the I<whole> WHERE clause is removed.
 
 sub unwhere {
     my $me = shift;
-    $me->_del_where('Where', @_);
+    $me->_del_where('where', @_);
 }
 
 sub _validate_where_fields {
@@ -530,10 +511,10 @@ sub _del_where {
         my($fld, $fld_func, $fld_opt) = $me->{DBO}{dbd_class}->_parse_col_val($me, shift);
         # TODO: Validate the fields?
 
-        return unless exists $me->{build_data}{$clause.'_Data'};
-        # Find the current Where_Data reference
-        my $ref = $me->{build_data}{$clause.'_Data'};
-        $ref = $ref->[$_] for (@{$me->{$clause.'_Bracket_Refs'}});
+        return unless exists $me->{build_data}{$clause};
+        # Find the current where reference
+        my $ref = $me->{build_data}{$clause};
+        $ref = $ref->[$_] for (@{$me->{"\u${clause}_Bracket_Refs"}});
 
         local $Data::Dumper::Indent = 0;
         local $Data::Dumper::Maxdepth = 2;
@@ -551,13 +532,12 @@ sub _del_where {
         }
         splice @$ref, $_, 1 for reverse @match;
     } else {
-        delete $me->{build_data}{$clause.'_Data'};
-        $me->{$clause.'_Bracket_Refs'} = [];
-        $me->{$clause.'_Brackets'} = [];
+        delete $me->{build_data}{$clause};
+        $me->{"\u${clause}_Bracket_Refs"} = [];
+        $me->{"\u${clause}_Brackets"} = [];
     }
     # This forces a new search
-    undef $me->{sql};
-    undef $me->{build_data}{lc $clause};
+    $me->_inactivate;
 }
 
 ##
@@ -636,7 +616,7 @@ Without any parenthesis C<'AND'> is the preferred aggregator.
 
 sub open_bracket {
     my $me = shift;
-    $me->_open_bracket($me->{Where_Brackets}, $me->{Where_Bracket_Refs}, $me->{build_data}{Where_Data} ||= [], @_);
+    $me->_open_bracket($me->{Where_Brackets}, $me->{Where_Bracket_Refs}, $me->{build_data}{where} ||= [], @_);
 }
 
 sub _open_bracket {
@@ -679,12 +659,11 @@ To remove the GROUP BY clause simply call C<group_by> without any columns.
 
 sub group_by {
     my $me = shift;
-    undef $me->{sql};
-    undef $me->{build_data}{group};
-    undef @{$me->{build_data}{GroupBy}};
+    $me->_inactivate;
+    undef @{$me->{build_data}{group}};
     for my $col (@_) {
         my @group = $me->{DBO}{dbd_class}->_parse_col_val($me, $col);
-        push @{$me->{build_data}{GroupBy}}, \@group;
+        push @{$me->{build_data}{group}}, \@group;
     }
 }
 
@@ -708,11 +687,10 @@ sub having {
     $me->_validate_where_fields(@$fld, @$val);
 
     # Force a new search
-    undef $me->{sql};
-    undef $me->{build_data}{having};
+    $me->_inactivate;
 
-    # Find the current Having_Data reference
-    my $ref = $me->{build_data}{Having_Data} ||= [];
+    # Find the current having reference
+    my $ref = $me->{build_data}{having} ||= [];
     $ref = $ref->[$_] for (@{$me->{Having_Bracket_Refs}});
 
     $me->_add_where($ref, $op, $fld, $fld_func, $fld_opt, $val, $val_func, $val_opt, @_);
@@ -730,7 +708,7 @@ If no column is provided, the I<whole> HAVING clause is removed.
 
 sub unhaving {
     my $me = shift;
-    $me->_del_where('Having', @_);
+    $me->_del_where('having', @_);
 }
 
 =head3 C<order_by>
@@ -746,12 +724,11 @@ To remove the ORDER BY clause simply call C<order_by> without any columns.
 
 sub order_by {
     my $me = shift;
-    undef $me->{sql};
-    undef $me->{build_data}{order};
-    undef @{$me->{build_data}{OrderBy}};
+    $me->_inactivate;
+    undef @{$me->{build_data}{order}};
     for my $col (@_) {
         my @order = $me->{DBO}{dbd_class}->_parse_col_val($me, $col);
-        push @{$me->{build_data}{OrderBy}}, \@order;
+        push @{$me->{build_data}{order}}, \@order;
     }
 }
 
@@ -772,11 +749,10 @@ TODO: Implement the new "FIRST n / NEXT n" clause if connected to a 12c database
 
 sub limit {
     my($me, $rows, $offset) = @_;
-    undef $me->{sql};
-    undef $me->{build_data}{limit};
-    return undef $me->{build_data}{LimitOffset} unless defined $rows;
+    $me->_inactivate;
+    return undef $me->{build_data}{limit} unless defined $rows;
     /^\d+$/ or croak "Invalid argument '$_' in limit" for grep defined, $rows, $offset;
-    @{$me->{build_data}{LimitOffset}} = ($rows, $offset);
+    @{$me->{build_data}{limit}} = ($rows, $offset);
 }
 
 =head3 C<arrayref>
@@ -856,7 +832,7 @@ Returns a L<Row|DBIx::DBO::Row> object or undefined if there are no more rows.
 sub fetch {
     my $me = $_[0];
     # Prepare and/or execute the query if needed
-    $me->_sth and ($me->{Active} or $me->run)
+    exists $me->{cache} or $me->{Active} or $me->run
         or croak $me->rdbh->errstr;
     # Detach the old row if there is still another reference to it
     if (defined $me->{Row} and SvREFCNT(${$me->{Row}}) > 1) {
@@ -882,7 +858,7 @@ sub fetch {
         $me->{Active} = 0;
     }
     $$row->{hash} = {};
-    return;
+    return undef;
 }
 
 =head3 C<row>
@@ -896,7 +872,7 @@ Returns the L<Row|DBIx::DBO::Row> object for the current row from the query or a
 sub row {
     my $me = $_[0];
     $me->sql; # Build the SQL and detach the Row if needed
-    $me->{Row} ||= $me->_row_class->new($me->{DBO}, $me);
+    $me->{Row} //= $me->row_class->new($me->{DBO}, $me);
 }
 
 =head3 C<run>
@@ -910,19 +886,24 @@ This is called automatically before fetching the first row.
 
 sub run {
     my $me = shift;
-    $me->sql; # Build the SQL and detach the Row if needed
+
     if (defined $me->{Row}) {
         undef ${$me->{Row}}->{array};
         ${$me->{Row}}->{hash} = {};
     }
 
-    my $rv = $me->_execute or return undef;
-    $me->{Active} = 1;
+    undef $me->{Found_Rows};
+
+    # Prepare and execute the statement
+    my $rv = $me->_execute
+        or return $me->_inactivate; # Don't leave a failed sth behind
+
     $me->_bind_cols_to_hash;
     if ($me->config('CacheQuery')) {
         $me->{cache}{data} = $me->{sth}->fetchall_arrayref;
         $me->{cache}{idx} = 0;
     } else {
+        $me->{Active} = 1;
         delete $me->{cache};
     }
     return $rv;
@@ -930,9 +911,16 @@ sub run {
 
 sub _execute {
     my $me = shift;
-    $me->{DBO}{dbd_class}->_sql($me, $me->sql, $me->{DBO}{dbd_class}->_bind_params_select($me));
-    $me->_sth or return;
-    $me->{sth}->execute($me->{DBO}{dbd_class}->_bind_params_select($me));
+
+    if ($me->{sth}) {
+        $me->{DBO}{dbd_class}->_sql($me, $me->{sql}, @{ $me->{bind} });
+    } else {
+        $me->{sql} = $me->{DBO}{dbd_class}->_build_sql_select($me);
+        $me->{bind} = [ $me->{DBO}{dbd_class}->_bind_params_select($me) ];
+        $me->{DBO}{dbd_class}->_sql($me, $me->{sql}, @{ $me->{bind} });
+        $me->{sth} = $me->rdbh->prepare($me->{sql});
+    }
+    return $me->{sth} && $me->{sth}->execute(@{ $me->{bind} });
 }
 
 sub _bind_cols_to_hash {
@@ -945,7 +933,7 @@ sub _bind_cols_to_hash {
             $me->{hash} = \my %hash;
             my $i = 0;
             for (@{$me->{Columns}}) {
-                _hv_store(%hash, $_, $me->{cache}{array}[$i]) unless exists $hash{$_};
+                hv_store(%hash, $_, $me->{cache}{array}[$i]) unless exists $hash{$_};
                 $i++;
             }
         } else {
@@ -970,7 +958,6 @@ This uses the DBI C<rows> method which is unreliable in some situations (See L<D
 
 sub rows {
     my $me = shift;
-    $me->sql; # Ensure the Row_Count is cleared if needed
     $me->{DBO}{dbd_class}->_rows($me) unless defined $me->{Row_Count};
     $me->{Row_Count};
 }
@@ -987,15 +974,14 @@ Returns undefined if there is an error.
 sub count_rows {
     my $me = shift;
     local $me->{Config}{CalcFoundRows} = 0;
+    local $me->{build_data}{select} = [[[], 1]];
     my $old_sb = delete $me->{build_data}{Show_Bind};
-    $me->{build_data}{show} = '1';
 
     my $sql = 'SELECT COUNT(*) FROM ('.$me->{DBO}{dbd_class}->_build_sql_select($me).') t';
     my($count) = $me->{DBO}{dbd_class}->_selectrow_array($me, $sql, undef,
         $me->{DBO}{dbd_class}->_bind_params_select($me));
 
     $me->{build_data}{Show_Bind} = $old_sb if $old_sb;
-    undef $me->{build_data}{show};
     return $count;
 }
 
@@ -1012,101 +998,7 @@ Returns undefined if there is an error or is unable to determine the number of f
 
 sub found_rows {
     my $me = shift;
-    $me->{DBO}{dbd_class}->_calc_found_rows($me) unless defined $me->{Found_Rows};
-    $me->{Found_Rows};
-}
-
-=head3 C<sql>
-
-  my $sql = $query->sql;
-
-Returns the SQL statement string.
-
-=cut
-
-sub _search_where_chunk {
-    map {
-        ref $_->[0] eq 'ARRAY' ? _search_where_chunk(@$_) : ($_->[1], $_->[4])
-    } @_
-}
-
-our @_RECURSIVE_SQ;
-sub sql {
-    my $me = shift;
-    # Check for changes to subqueries and recursion
-    croak 'Recursive subquery found' if grep $me eq $_, @_RECURSIVE_SQ;
-    local @_RECURSIVE_SQ = (@_RECURSIVE_SQ, $me);
-    for my $fld (@{$me->{build_data}{Showing}}) {
-        if (ref $fld eq 'ARRAY' and @{$fld->[0]} == 1 and _isa($fld->[0][0], 'DBIx::DBO::Query')) {
-            my $sq = $fld->[0][0];
-            if ($sq->sql ne ($me->{build_data}{_subqueries}{$sq} ||= '')) {
-                undef $me->{sql};
-                undef $me->{build_data}{show};
-            }
-        }
-    }
-    for my $sq (@{$me->{Tables}}) {
-        if (_isa($sq, 'DBIx::DBO::Query')) {
-            if ($sq->sql ne ($me->{build_data}{_subqueries}{$sq} ||= '')) {
-                undef $me->{sql};
-                undef $me->{build_data}{from};
-            }
-        }
-    }
-    for my $w (map { $_ ? _search_where_chunk(@$_) : () } @{$me->{build_data}{Join_On}}) {
-        if (@$w == 1 and _isa($w->[0], 'DBIx::DBO::Query')) {
-            my $sq = $w->[0];
-            if ($sq->sql ne ($me->{build_data}{_subqueries}{$sq} ||= '')) {
-                undef $me->{sql};
-                undef $me->{build_data}{from};
-            }
-        }
-    }
-    for my $w (_search_where_chunk(@{$me->{build_data}{Where_Data}})) {
-        if (@$w == 1 and _isa($w->[0], 'DBIx::DBO::Query')) {
-            my $sq = $w->[0];
-            if ($sq->sql ne ($me->{build_data}{_subqueries}{$sq} ||= '')) {
-                undef $me->{sql};
-                undef $me->{build_data}{where};
-            }
-        }
-    }
-    $me->{sql} || $me->_build_sql;
-}
-
-sub _build_sql {
-    my $me = shift;
-    undef $me->{sth};
-    undef $me->{hash};
-    undef $me->{Row_Count};
-    undef $me->{Found_Rows};
-    delete $me->{cache};
-    $me->{Active} = 0;
-    if (defined $me->{Row}) {
-        if (SvREFCNT(${$me->{Row}}) > 1) {
-            $me->{Row}->_detach;
-        } else {
-            undef ${$me->{Row}}->{array};
-            undef %{$me->{Row}};
-
-            $me->{sql} = $me->{DBO}{dbd_class}->_build_sql_select($me, $me->{build_data});
-            $me->{Row}{from} = $me->{DBO}{dbd_class}->_build_from($me, $me->{build_data});
-            $me->{Row}->_copy_build_data;
-            return $me->{sql};
-        }
-    }
-    undef @{$me->{Columns}};
-
-    $me->{sql} = $me->{DBO}{dbd_class}->_build_sql_select($me);
-}
-
-# Get the DBI statement handle for the query.
-# It may not have been executed yet.
-sub _sth {
-    my $me = shift;
-    # Ensure the sql is rebuilt if needed
-    my $sql = $me->sql;
-    $me->{sth} ||= $me->rdbh->prepare($sql);
+    return $me->{Found_Rows} // $me->{DBO}{dbd_class}->_calc_found_rows($me);
 }
 
 =head3 C<update>
@@ -1127,6 +1019,66 @@ sub update {
     $me->{DBO}{dbd_class}->_do($me, $sql, undef, $me->{DBO}{dbd_class}->_bind_params_update($me));
 }
 
+=head3 C<sql>
+
+  my $sql = $query->sql;
+
+Returns the SQL statement string.
+
+=cut
+
+sub _recursion_check {
+    my($me, @upquery) = @_;
+
+    state @_recursion_check;
+    push @_recursion_check, $me;
+
+    for my $upquery (@upquery) {
+        if (grep $upquery eq $_, @_recursion_check) {
+            undef @_recursion_check;
+            croak 'Recursive subquery found';
+        }
+        exists $upquery->{up_queries}
+            and $upquery->_recursion_check(grep defined($_), @{ $upquery->{up_queries} });
+    }
+
+    pop @_recursion_check;
+}
+
+sub _add_up_query {
+    my($me, $upquery) = @_;
+
+    $me->_recursion_check($upquery);
+
+    my $uq = $me->{up_queries} //= [];
+    push @$uq, $upquery;
+    weaken $uq->[-1];
+}
+
+sub sql {
+    my $me = shift;
+    return $me->{DBO}{dbd_class}->_build_sql_select($me);
+}
+
+sub _inactivate {
+    my $me = shift;
+    $me->_empty_row;
+    # Also inactivate super queries
+    if (exists $me->{up_queries}) {
+        defined $_ and $_->_inactivate for @{ $me->{up_queries} };
+    }
+    # Reset the query
+    delete $me->{cache};
+    undef $me->{sth};
+    undef $me->{sql};
+    undef $me->{bind};
+    undef $me->{hash};
+    undef $me->{Active};
+    undef $me->{Row_Count};
+    undef $me->{Found_Rows};
+    undef @{$me->{Columns}};
+}
+
 =head3 C<finish>
 
   $query->finish;
@@ -1139,19 +1091,26 @@ This ensures that the next call to L</fetch> will return the first row from the 
 
 sub finish {
     my $me = shift;
-    if (defined $me->{Row}) {
-        if (SvREFCNT(${$me->{Row}}) > 1) {
-            $me->{Row}->_detach;
-        } else {
-            undef ${$me->{Row}}{array};
-            ${$me->{Row}}{hash} = {};
-        }
-    }
+    $me->_empty_row;
+    # Restart the query
     if (exists $me->{cache}) {
         $me->{cache}{idx} = 0;
     } else {
         $me->{sth}->finish if $me->{sth} and $me->{sth}{Active};
         $me->{Active} = 0;
+    }
+}
+
+sub _empty_row {
+    my $me = shift;
+    # Detach or empty the Row
+    if (defined $me->{Row}) {
+        if (SvREFCNT(${$me->{Row}}) > 1) {
+            $me->{Row}->_detach;
+        } else {
+            undef ${$me->{Row}}->{array};
+            ${$me->{Row}}->{hash} = {};
+        }
     }
 }
 
@@ -1184,15 +1143,15 @@ sub rdbh { $_[0]{DBO}->rdbh }
 
 Get or set this C<Query> object's config settings.  When setting an option, the previous value is returned.  When getting an option's value, if the value is undefined, the L<DBIx::DBO|DBIx::DBO>'s value is returned.
 
-See: L<DBIx::DBO/Available_config_options>.
+See: L<DBIx::DBO/"Available config options">.
 
 =cut
 
 sub config {
     my $me = shift;
     my $opt = shift;
-    return $me->{DBO}{dbd_class}->_set_config($me->{Config} ||= {}, $opt, shift) if @_;
-    $me->{DBO}{dbd_class}->_get_config($opt, $me->{Config} ||= {}, $me->{DBO}{Config}, \%DBIx::DBO::Config);
+    return $me->{DBO}{dbd_class}->_set_config($me->{Config} //= {}, $opt, shift) if @_;
+    $me->{DBO}{dbd_class}->_get_config($opt, $me->{Config} //= {}, $me->{DBO}{Config}, \%DBIx::DBO::Config);
 }
 
 sub STORABLE_freeze {
@@ -1201,6 +1160,7 @@ sub STORABLE_freeze {
 
     local $me->{sth};
     local $me->{Row};
+    local $me->{attached_rows};
     local $me->{hash} unless exists $me->{cache};
     local $me->{Active} = 0 unless exists $me->{cache};
     local $me->{cache}{idx} = 0 if exists $me->{cache};
@@ -1213,6 +1173,12 @@ sub STORABLE_thaw {
 }
 
 sub DESTROY {
+    # Detach any attached Rows
+    if (my $attached_rows = delete $_[0]->{attached_rows} and ${^GLOBAL_PHASE} ne 'DESTRUCT') {
+        for my $row (@$attached_rows) {
+            $row->_detach if defined $row;
+        }
+    }
     undef %{$_[0]};
 }
 
@@ -1270,7 +1236,9 @@ Classes can easily be created for tables in your database.
 Assume you want to create a C<Query> and C<Row> class for a "Users" table:
 
   package My::Users;
-  our @ISA = qw(DBIx::DBO::Query);
+  use parent 'DBIx::DBO::Query';
+  
+  sub row_class { 'My::User' }
   
   sub new {
       my($class, $dbo) = @_;
@@ -1278,24 +1246,20 @@ Assume you want to create a C<Query> and C<Row> class for a "Users" table:
       # Create the Query for the "Users" table
       my $self = $class->SUPER::new($dbo, 'Users');
       
-      # We could even add some JOINs or other clauses here ...
+      # ... add JOINs, WHEREs or other clauses here ...
       
       return $self;
   }
-  
-  sub _row_class { 'My::User' } # Rows are blessed into this class
 
 
   package My::User;
-  our @ISA = qw(DBIx::DBO::Row);
+  use parent 'DBIx::DBO::Row';
   
-  sub new {
-      my($class, $dbo, $parent) = @_;
-      
-      $parent ||= My::Users->new($dbo); # The Row will use the same table as it's parent
-      
-      $class->SUPER::new($dbo, $parent);
-  }
+  sub query_class { 'My::Users' }
+
+=head3 C<table_class>, C<row_class>
+
+The C<Table> and C<Row> objects created by this C<Query> will be blessed into the classes returned by these methods.
 
 =head1 SEE ALSO
 

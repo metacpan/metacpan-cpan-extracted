@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::QuickForm.
 
+0.09  Tye Feb 25 2025
+	- Fixed bug in color type.
+
 0.08  Sat Feb 08 2025
 	- Added option -colorhistoryfile.
 	- Fixed using a single color picker for all color types.

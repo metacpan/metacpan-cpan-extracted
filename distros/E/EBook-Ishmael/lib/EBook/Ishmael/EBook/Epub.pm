@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -164,6 +164,10 @@ sub _read_rootfile {
 			"./package:item[\@id=\"$id\"]", $manif
 		) or next;
 
+		unless (($item->getAttribute('media-type') // '') eq 'application/xhtml+xml') {
+			next;
+		}
+
 		my $href = $item->getAttribute('href') or next;
 
 		$href = File::Spec->catfile($self->{_contdir}, $href);
@@ -173,6 +177,26 @@ sub _read_rootfile {
 		push @{ $self->{_spine} }, $href;
 
 	}
+
+	my ($covmeta) = $xpc->findnodes('./package:meta[@name="cover"]', $meta);
+
+	# Put if code in own block so that we can last out of it.
+	if (defined $covmeta) {{
+
+		my $covcont = $covmeta->getAttribute('content') or last;
+
+		my ($covitem) = $xpc->findnodes("./package:item[\@id=\"$covcont\"]", $manif)
+			or last;
+
+		my $covhref = $covitem->getAttribute('href') or last;
+
+		my $covpath = File::Spec->catfile($self->{_contdir}, $covhref);
+
+		last unless -f $covpath;
+
+		$self->{_cover} = $covpath;
+
+	}}
 
 	return 1;
 
@@ -194,6 +218,7 @@ sub new {
 		_contdir   => undef,
 		# List of content files in order specified by spine.
 		_spine     => [],
+		_cover     => undef,
 	};
 
 	bless $self, $class;
@@ -255,10 +280,11 @@ sub html {
 	binmode $fh, ':utf8';
 
 	# Go through each file in _spine and extract the body of the XHTML tree.
-	for my $f (@{ $self->{_spine} }) {
 
-		my $dom = XML::LibXML->load_xml(location => $f);
-		my $ns = $dom->documentElement->namespaceURI();
+	print { $fh } map {
+
+		my $dom = XML::LibXML->load_xml(location => $_);
+		my $ns = $dom->documentElement->namespaceURI;
 
 		my $xpc = XML::LibXML::XPathContext->new($dom);
 		$xpc->registerNs('html', $ns);
@@ -266,13 +292,45 @@ sub html {
 		my ($body) = $xpc->findnodes('/html:html/html:body')
 			or next;
 
-		print { $fh } map { $_->toString } $body->childNodes();
+		map { $_->toString } $body->childNodes;
 
-	}
+	} @{ $self->{_spine} };
 
 	close $fh;
 
 	return $out // $html;
+
+}
+
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh, ':utf8';
+
+	print { $fh } join "\n\n", map {
+
+		my $dom = XML::LibXML->load_xml(location => $_);
+		my $ns = $dom->documentElement->namespaceURI;
+
+		my $xpc = XML::LibXML::XPathContext->new($dom);
+		$xpc->registerNs('html', $ns);
+
+		my ($body) = $xpc->findnodes('/html:html/html:body')
+			or next;
+
+		$body->textContent;
+
+	} @{ $self->{_spine} };
+
+	close $fh;
+
+	return $out // $raw;
 
 }
 
@@ -281,6 +339,42 @@ sub metadata {
 	my $self = shift;
 
 	return $self->{Metadata}->hash;
+
+}
+
+sub has_cover {
+
+	my $self = shift;
+
+	return defined $self->{_cover};
+
+}
+
+sub cover {
+
+	my $self = shift;
+	my $out  = shift;
+
+	return undef unless defined $self->{_cover};
+
+	my $bin;
+
+	open my $rh, '<', $self->{_cover}
+		or die "Failed to open $self->{_cover} for reading: $!\n";
+	binmode $rh;
+
+	open my $wh, '>', $out // \$bin
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $wh;
+
+	while (CORE::read $rh, my ($buf), 1024) {
+		print { $wh } $buf;
+	}
+
+	close $rh;
+	close $wh;
+
+	return $out // $bin;
 
 }
 

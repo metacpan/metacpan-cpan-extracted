@@ -1,0 +1,20 @@
+Tue Feb 25 16:24:50 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* .gitignore: new
+	* ChangeLog: new
+	* LICENSE: new
+	* Makefile: new
+	* README.md: new
+	* bin/create-insecure-bucket: new
+	* bin/orepan2-s3: new
+	* bin/orepan2-s3-index: new
+	* buildspec.yml: new
+	* extra-files: new
+	* lib/OrePAN2/S3.pm: new
+	* orepan2-s3.json: new
+	* provides: new
+	* requires: new
+	* resources: new
+	* test-requires: new
+

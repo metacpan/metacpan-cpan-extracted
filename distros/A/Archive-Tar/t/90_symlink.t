@@ -8,11 +8,34 @@ use File::Path;
 use Test::More;
 use Config;
 
+my $win32_symlink_enabled = 0;
+
+if($^O =~ /MSWin32/i && $Config{d_symlink}) {
+  # Creation of symlinks is available to this system,
+  # but might not have been enabled. We check on this
+  # by checking whether symlink() actually works.
+
+  if(-e '../Makefile.PL') {
+    symlink '../Makefile.PL', 'make.sym';
+    if(-e 'make.sym') {
+      $win32_symlink_enabled = 1;
+      unlink 'make.sym';
+    }
+  }
+  else {
+    warn "Cannot establish whether symlink() is enabled as Makefile.PL was not found";
+    $win32_symlink_enabled = 1; # We have no reason to assume otherwise.
+  }
+}
+
 ### developer tests mostly
-plan skip_all => "Skipping tests on this platform"
-  if ($^O !~ /(linux|bsd|darwin|solaris|hpux|aix|
+if (($^O !~ /(linux|bsd|darwin|solaris|hpux|aix|
               sunos|dynixptx|haiku|irix|next|dec_osf|svr4|sco_sv|unicos|
-              cygwin)/x and !$Config{d_symlink});
+            cygwin)/x and !$Config{d_symlink})
+            ||
+            ($^O =~ /MSWin/i and !$win32_symlink_enabled)) {
+  plan skip_all => "Skipping tests on this platform";
+}
 plan 'no_plan';
 
 my $Class   = 'Archive::Tar';

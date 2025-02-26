@@ -104,10 +104,10 @@ for (1 .. 20) {
 			for (1 .. 5) {
 				$text->TimerReset;
 				$text->highlightPurge(1);
-				pause(1000);
+				pause(4000);
 				push @t, $text->TimerResult;
 			}
-			my $min = 10000;
+			my $min = 10000000000000;
 			my $max = 0;
 			my $avg = 0;
 			my $speed = 0;
@@ -118,6 +118,7 @@ for (1 .. 20) {
 				$avg = $avg + $timed;
 			}
 			$avg = $avg / 5;
+			print "average $avg\n";
 			$speed = $filesize / $avg;
 			push @times, [$lines_per_cycle, $min, $max, $avg, $speed]; 
 			

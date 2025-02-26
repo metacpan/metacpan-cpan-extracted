@@ -1,3 +1,8 @@
+3.04  25/02/2025 (Dan Church, Arne Johannessen && SISYPHUS)
+- Fix handling filenames with trailing whitespace
+- Allow --format=ustar option for ptar
+- GH#21402 Symlink tests on Windows
+
 3.02  13/04/2023 (Manfred Stock)
 - Test block sizes up to (2**31 - 1) bytes only (fix for 32bit perls)
 - Don't match on message from exception in symlink test

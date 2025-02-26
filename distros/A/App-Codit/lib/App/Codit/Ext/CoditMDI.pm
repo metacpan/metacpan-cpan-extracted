@@ -436,66 +436,8 @@ sub docFixIndent {
 	my ($self, $name) = @_;
 	$name = $self->docSelected unless defined $name;
 	my $widg = $self->docGet($name)->CWidg;
+	$widg->fixIndent
 
-	my $val = $widg->cget('-indentstyle');
-	$val = $self->{FIXINDENTSPACES} if $val eq 'tab';
-	$val = 3 unless defined $val;
-	my $spaces_per_tab = $self->popEntry('Spaces', 'Spaces per tab:', $val);
-	$self->{FIXINDENTSPACES} = $spaces_per_tab;
-
-	if (defined $spaces_per_tab) {
-		my $macro = $self->macroInit($name, 'fix_indent', ['docFixIndentCycle', $self, $spaces_per_tab]);
-
-		#if a selection exists only do selection
-		my @sel = $widg->tagRanges('sel');
-		if (@sel) {
-			$macro->line($widg->linenumber(shift @sel));
-			$macro->last($widg->linenumber(shift @sel));
-		}
-
-		$macro->start;
-	}
-}
-
-sub docFixIndentCycle {
-	my ($self, $spaces_per_tab, $widg, $line) = @_;
-	my $begin = $widg->index("$line.0");
-	my $end = $widg->index("$begin lineend");
-	my $text = $widg->get($begin, $end);
-	if ($text =~ /^([\s|\t]+)/) {
-		my $spaces = $1;
-		my $s = 0;
-		my $pos = 0;
-		my $itext = '';
-		$itext = "$itext " while length($itext) ne $spaces_per_tab;
-		while ($spaces ne '') {
-			my $char = substr $spaces, 0, 1, '';
-			if ($widg->cget('-indentstyle') eq 'tab') {
-				if ($char eq "\t") {
-					$s = 0;
-				} else {
-					$s ++;
-					my $lp = $pos;
-					my $linepos = $widg->index("$begin + $lp c");
-					$widg->delete($linepos, "$linepos + 1 c");
-					if ($s eq $spaces_per_tab) {
-						$widg->insert($linepos, "\t");
-						$s = 0;
-						$pos ++;
-					}
-				}
-#				$pos ++;
-			} else {
-				if ($char eq "\t") {
-					my $linepos = $widg->index("$begin + $pos c");
-					$widg->delete($linepos, "$linepos + 1 c");
-					$widg->insert($linepos, $itext);
-					$pos = $pos + $spaces_per_tab - 1;
-				}
-				$pos ++
-			}
-		}
-	}
 }
 
 sub docGetSel {
@@ -537,59 +479,19 @@ sub docPopFindReplace {
 sub docRemoveTrailing {
 	my ($self, $name) = @_;
 	$name = $self->docSelected unless defined $name;
-
-	my $macro = $self->macroInit($name, 'trailing', ['docRemoveTrailingCycle', $self]);
 	my $widg = $self->docGet($name)->CWidg;
-
-	#if a selection exists only do selection
-	my @sel = $widg->tagRanges('sel');
-	if (@sel) {
-		$macro->line($widg->linenumber(shift @sel));
-		$macro->last($widg->linenumber(shift @sel));
-	}
-
-	$macro->start;
-}
-
-sub docRemoveTrailingCycle {
-	my ($self, $widg, $line) = @_;
-	my $begin = $widg->index("$line.0");
-	my $end = $widg->index("$line.0 lineend");
-	my $text = $widg->get($begin, $end);
-	if ($text =~ /(\s+)$/) {
-		my $spaces = $1;
-		my $l = length($spaces);
-		$widg->delete("$end - $l c", $end);
-	}
+	$widg->removeTrailingSpaces;
 }
 
 sub docSelect {
 	my ($self, $name) = @_;
 	return if $self->selectDisabled;
 	$self->SUPER::docSelect($name);
-	if ($self->docShowSpaces) {
-		$self->spaceMacroAdd($name);
-	} else {
-		$self->spaceMacroRemove($name);
-	}
 }
 
 sub docShowSpaces {
-	my ($self, $flag) = @_;
-	my $cur = $self->{SHOWSPACES};
-	if ((defined $flag) and ($flag ne $cur)) {
-		$self->{SHOWSPACES} = $flag;
-		my $sel = $self->docSelected;
-		if (defined $sel) {
-#			my $widg = $self->docGet($sel)->CWidg;
-			if ($flag) {
-				$self->spaceMacroAdd($sel);
-			} else {
-				$self->spaceMacroRemove($sel);
-			}
-		}
-	}
-	return $self->{SHOWSPACES}
+	my $self = shift;
+	return $self->docOption('-showspaces', @_);
 }
 
 sub docSelectFirst {
@@ -841,6 +743,7 @@ sub MenuItems {
 		[ 'menu_separator', 'Tools::',          't1' ],
 		[ 'menu_normal',    'Tools::',          'R~emove trailing spaces',   'doc_remove_trailing',],
 		[ 'menu_normal',    'Tools::',          'F~ix indentation',   'doc_fix_indent',],
+		[ 'menu_normal',		  'appname::h1',	   '~Report a problem',  'report_issue'	],
 	);
 }
 

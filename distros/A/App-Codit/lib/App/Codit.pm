@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.17";
+$VERSION="0.18";
 use Tk;
 use App::Codit::CodeTextManager;
 use Config;
@@ -240,6 +240,18 @@ for opening files through the command line.
 
 =back
 
+=head1 COMMANDS
+
+Codit defines one command.
+
+=over 4
+
+=item Switch B<-report_issue>
+
+Opens the issues web page of the App::Codit github repository.
+
+=back
+
 =head1 METHODS
 
 B<App::Codit> inherits L<Tk::AppWindow> and all of its methods.
@@ -266,10 +278,10 @@ sub Populate {
 #		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
 		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Selector Help Settings Plugins]],
-		-preconfig => [
-			-uniqueinstance => ['METHOD', undef, undef, 0],
-		],
 		-documentinterface => 'CoditMDI',
+#		-menuitems => [
+#			[	'menu_normal',		'Codit::Quit',	"~Report a problem", 'report_issue'	],
+#		],
 		-namespace => 'App::Codit',
 		-rawiconpath => [ $rawdir ],
 		-savegeometry => 1,
@@ -386,6 +398,7 @@ sub Populate {
 			'-contentindent',
 			'-contentmatchbg',
 			'-contentmatchfg',
+			'-contentshowspaces',
 			'-contentsyntax',
 			'-contenttabs',
 			'-contentwrap',
@@ -408,7 +421,7 @@ sub Populate {
 			-contentautoindent => ['boolean', 'Auto indent'],
 			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],
 			'*column',
-			-doc_show_spaces => ['boolean', 'Show spaces'],
+			-contentshowspaces => ['boolean', 'Show spaces'],
 			-contentindent => ['text', 'Indent style', -regex => qr/^\d+|tab$/, -width => 4],
 			'*end',
 			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
@@ -501,9 +514,14 @@ sub Populate {
 
 	$self->extGet('Panels')->panelHide('TOOL');
 	$self->extGet('Panels')->panelHide('RIGHT');
-
+	
+	$self->cmdConfig(
+		report_issue => ['ReportIssue', $self],
+	);
+	
 	$self->addPostConfig('DoPostConfig', $self);
 	$self->ConfigSpecs(
+		-uniqueinstance => ['METHOD', undef, undef, 0],
 		DEFAULT => ['SELF'],
 	);
 }
@@ -606,6 +624,12 @@ sub mdi {
 	return $_[0]->extGet('CoditMDI');
 }
 
+#sub MenuItems {
+#	return (
+#		[ 'menu_normal',		  'appname::h1',	   '~Report a problem',  'report_issue'	],
+#	)
+#}
+
 =item B<panels>
 
 Returns a reference to the Panels extension.
@@ -614,6 +638,11 @@ Returns a reference to the Panels extension.
 
 sub panels {
 	return $_[0]->extGet('Panels');
+}
+
+sub ReportIssue {
+	my $self = shift;
+	$self->openURL('https://github.com/haje61/App-Codit/issues');
 }
 
 sub SetThemeFile {

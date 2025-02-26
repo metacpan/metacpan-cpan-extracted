@@ -1,0 +1,312 @@
+#!/usr/bin/env bash
+#-*- mode:sh; -*-
+
+########################################################################
+usage() {
+########################################################################
+    cat <<EOF
+Usage: $0 options command args
+
+Options
+-------
+  -h, --help             Display this help message
+  -P, --prefix           Path prefix in the S3 bucket
+  -b, --bucket           S3 Bucket Name
+  -p, --profile          AWS Profile
+  -x, --no-invalidate    Do not invalidate cache
+  -c, --config           Config file name (default: .orepan2-s3.json)
+  -r, --region           AWS region (default: us-east-1)
+  -d, --distribution-id  CloudFront distribution id
+
+Commands
+--------
+add {file}               Add a tarball to the repository
+invalidate               Invalidate CloudFront cache
+help                     Display this help message
+
+Notes
+-----
+1. use -x to when adding a new module to repository to prevent invalidating cache.
+   (invalidations are not immediate)
+2. default configuration file is .orepan2-s3.json and should be in your home directory
+
+EOF
+
+    exit 1
+}
+
+########################################################################
+install_config() {
+########################################################################
+    dist_dir=$(perl -MFile::ShareDir=dist_dir -e 'print dist_dir("OrePAN2-S3");')
+
+    if test -z "$dist_dir"; then
+       echo "ERROR: could not find OrePAN2::S3 distribution directory"
+       exit 1
+    fi
+      
+    if test -e "$dist_dir/orepan2-s3.json"; then
+        echo "installing '.orepan2-s3.json' in $HOME - update this file before proceeding"
+        cp "$dist_dir/orepan2-s3.json" "$HOME/.orepan2-s3.json"
+    fi
+
+    exit 1
+}
+
+########################################################################
+find_distribution_id() {
+########################################################################
+    if test -z "$TAG_VALUE"; then
+        echo "$NOT_OK set CloudFront distribution Name tag!"
+        usage
+    fi
+
+    # Get all CloudFront distribution IDs
+    DISTRIBUTION_IDS=$($AWS cloudfront list-distributions --query "DistributionList.Items[*].Id" --profile "$AWS_PROFILE" --output text)
+
+
+    # Loop through each distribution and check its tags
+    for ID in $DISTRIBUTION_IDS; do
+        TAG_MATCH=$($AWS cloudfront list-tags-for-resource --profile "$AWS_PROFILE" \
+                         --resource "arn:aws:cloudfront::$AWS_ACCOUNT:distribution/$ID" \
+                         --query "Tags.Items[?Key=='Name' && Value=='$TAG_VALUE']" --output text)
+        
+        if [[ -n "$TAG_MATCH" ]]; then
+            echo "$OK Found CloudFront Distribution with Name=$TAG_VALUE: $ID"
+            DISTRIBUTION_ID="$ID"
+            break
+        fi
+    done
+
+    # Output the result
+    if [[ -z "$DISTRIBUTION_ID" ]]; then
+        echo "$NOT_OK No CloudFront distribution found with Name=$TAG_VALUE"
+        exit 1;
+    else
+        echo "CloudFront Distribution ID: $DISTRIBUTION_ID"
+    fi
+}
+
+########################################################################
+create_index() {
+########################################################################
+    index=$(mktemp)
+    
+    orepan2-s3-index -c $CONFIG_FILE create >$index
+    
+    orepan2-s3-index -c $CONFIG_FILE upload $index
+
+    rm $index
+}
+
+########################################################################
+invalidate_cache() {
+########################################################################
+    $AWS cloudfront create-invalidation \
+         --distribution-id "$DISTRIBUTION_ID" \
+         --paths "${INVALIDATION_PATHS[@]}" --profile "$AWS_PROFILE"
+}
+
+########################################################################
+cleanup() {
+########################################################################
+    test -n "$TEMP_DIR" && rm -rf "$TEMP_DIR"
+}
+
+########################################################################
+add() {
+########################################################################
+    if test -z "$BUCKET"; then
+        echo "$NOT_OK no bucket!";
+        exit 1;
+    fi
+
+    if test -z "$AWS_PROFILE"; then
+        echo "$NOT_OK no profile!";
+        exit 1;
+    fi
+
+    # Create a temporary directory
+    TEMP_DIR=$(mktemp -d)
+
+    # Set an exit trap to always run cleanup
+    trap cleanup EXIT
+
+    # Sync S3 contents to the temporary directory
+    $AWS s3 sync "s3://$BUCKET/$PATH_PREFIX" "$TEMP_DIR/$PATH_PREFIX" --profile "$AWS_PROFILE"
+
+    orepan2-inject "$FILE" "$TEMP_DIR/$PATH_PREFIX"
+
+    # Check if orepan2-inject was successful
+    if [[ $? -ne 0 ]]; then
+        echo "$NOT_OK orepan2-inject failed." >&2
+        exit 1
+    fi
+
+    orepan2-indexer "$TEMP_DIR/$PATH_PREFIX"
+
+    $AWS s3 sync "$TEMP_DIR/$PATH_PREFIX" "s3://$BUCKET/$PATH_PREFIX" --profile "$AWS_PROFILE"
+}
+
+########################################################################
+set_defaults() {
+########################################################################
+    test -z "$AWS_PROFILE" &&  AWS_PROFILE=$(echo $CONFIG | jq -r '.AWS.profile // ""')
+    test -z "$AWS_REGION" && AWS_REGION=$(echo $CONFIG | jq -r '.AWS.region // "us-east-1"')
+    test -z "$DISTRIBUTION_ID" && DISTRIBUTION_ID=$(echo $CONFIG | jq -r '.CloudFront.DistributionId // ""')
+    test -z "$PATH_PREFIX" && PATH_PREFIX=$(echo $CONFIG | jq -r '.AWS.prefix // ""')
+    test -z "$BUCKET" && BUCKET=$(echo $CONFIG | jq -r '.AWS.bucket // ""')
+
+    AWS_ACCOUNT=$(echo $CONFIG | jq -r '.AWS.account // ""')
+    test -z "$AWS_ACCOUNT" && AWS_ACCOUNT=$($AWS sts get-caller-identity --query 'Account' --output text --profile "$AWS_PROFILE")
+
+}
+
+########################################################################
+# MAIN SCRIPT STARTS HERE
+########################################################################
+set -oue pipefail
+
+# Initialize variables
+CONFIG_FILE=""
+FILE=""
+TAG_VALUE=""
+AWS_PROFILE=""
+AWS_REGION=""
+DISTRIBUTION_ID=""
+PATH_PREFIX=""
+BUCKET=""
+NO_INVALIDATE=""
+NOT_OK="ERROR"
+OK="";
+
+# Parse command-line options using getopt
+OPTIONS=$(getopt -o hp:t:P:c:d:b:x \
+                 --long help,profile:,tag:,prefix:,config:,distribution-id:,bucket:,no-invalidate -- "$@")
+
+if [ $? -ne 0 ]; then
+    echo "$NOT_OK Error parsing options." >&2
+    exit 1
+fi
+
+eval set -- "$OPTIONS"
+
+# Extract options
+while true; do
+    case "$1" in
+        -h|--help)
+            usage;
+            ;;
+
+        -c|--config)
+            CONFIG_FILE="$2"
+            shift 2
+            ;;
+
+        -P|--prefix)
+            PATH_PREFIX="$2"
+            shift 2
+            ;;
+
+        -t|--tag)
+            TAG_VALUE="$2"
+            shift 2
+            ;;
+
+        -p|--profile)
+            AWS_PROFILE="$2"
+            shift 2
+            ;;
+
+        -d|--distribution-id)
+            DISTRIBUTION_ID="$2"
+            shift 2
+            ;;
+
+        -b|--bucket)
+            BUCKET="$2"
+            shift 2
+            ;;
+
+        -x|--no-invalidate)
+            NO_INVALIDATE="$1"
+            shift 1
+            ;;
+
+        --)
+            shift
+            break
+            ;;
+    esac
+done
+
+COMMAND=${1:-}
+
+test -z "$COMMAND" && COMMAND="help"
+
+shift
+FILE=${1:-}
+
+AWS=$(command -v aws)
+
+if test -z "$AWS"; then
+    echo "$NOT_OK no aws command!"
+    exit 1
+fi
+
+test -z "$CONFIG_FILE" && CONFIG_FILE="$HOME/.orepan2-s3.json"
+
+if ! test -e "$CONFIG_FILE"; then
+    echo "$NOT_OK $CONFIG_FILE not found!"
+    install_config
+fi
+
+CONFIG=$(cat $CONFIG_FILE)
+
+set_defaults
+
+INVALIDATION_PATHS=()
+INVALIDATION_PATHS+=("/$PATH_PREFIX/modules/02packages.details.txt.gz")
+INVALIDATION_PATHS+=("/$PATH_PREFIX/orepan2-cache.json")
+INVALIDATION_PATHS+=("/index.html")
+
+if test -n "$FILE"; then
+    INVALIDATION_PATHS+=("/$PATH_PREFIX/authors/D/DU/DUMMY/$(basename $FILE)")
+fi
+
+case "$COMMAND" in 
+    help)
+        usage
+        ;;
+
+    invalidate)
+        echo "invalidate"
+        if test -z "$DISTRIBUTION_ID"; then
+            echo "ERROR: No DistributionId in your configuration file."
+        else
+            invalidate_cache
+        fi
+        ;;
+
+    add)
+        if test -z "$FILE"; then
+            echo "$NOT_OK no file specified"
+            usage
+        fi
+
+        add
+
+        create_index
+
+        if test -z "$NO_INVALIDATE"; then
+            if test -n "$DISTRIBUTION_ID"; then
+                invalidate_cache
+            fi
+        fi
+        ;;
+        
+    *)
+        echo "$NOT_OK no such command $COMMAND"
+        exit;
+        ;;
+esac

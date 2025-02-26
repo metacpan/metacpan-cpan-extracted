@@ -56,7 +56,7 @@
    "provides" : {
       "Daje::Workflow::Database" : {
          "file" : "lib/Daje/Workflow/Database.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-Database"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.008001;
 use parent qw(Exporter);
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Unicode::EastAsianWidth;
 
 our @EXPORT_OK = qw(vwidth vtrim);
@@ -49,18 +49,23 @@ sub InVWPP0Halfwidth() {
 sub vwidth { width(@_) }
 sub vtrim  {  trim(@_) }
 
+# E_Modifier not following E_Base has full-width visual representation
+my $EM = $^V ge v5.28 ? '(?>(?<!\p{Line_Break=E_Base})\p{Line_Break=E_Modifier})'
+                      : '(?!)' ;
+$EM = qr/$EM/; # to avoid error on v5.24
+
 sub width {
     my $str = shift;
 
     my $ret = 0;
     if ($EastAsian) {
-        while ($str =~ /((?:(?<!\N{U+200D})\p{InVWPP1Fullwidth})+)
-                       |((?:(?<!\N{U+200D})\p{InVWPP1Halfwidth})+)/xg) {
+        while ($str =~ /((?:$EM|(?<!\N{U+200D})\p{InVWPP1Fullwidth})+)
+                       |((?:    (?<!\N{U+200D})\p{InVWPP1Halfwidth})+)/xg) {
             $ret += $1 ? length($1) * 2 : length($2)
         }
     } else {
-        while ($str =~ /((?:(?<!\N{U+200D})\p{InVWPP0Fullwidth})+)
-                       |((?:(?<!\N{U+200D})\p{InVWPP0Halfwidth})+)/xg) {
+        while ($str =~ /((?:$EM|(?<!\N{U+200D})\p{InVWPP0Fullwidth})+)
+                       |((?:    (?<!\N{U+200D})\p{InVWPP0Halfwidth})+)/xg) {
             $ret += $1 ? length($1) * 2 : length($2)
         }
     }

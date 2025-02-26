@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.63';
+$VERSION = '0.64';
 use strict;
 use warnings;
 use Carp;
@@ -1043,7 +1043,8 @@ sub FindandReplace {
 	my ($self, $mode, $case, $find, $replace) = @_;
 	my $insert = $self->index('insert');
 	my $line = $self->linenumber($insert);
-	my @hits = $self->FindInLine($line, $mode, $case, $find);
+	my $search = $self->FindExpression($mode, $case, $find);
+	my @hits = $self->FindInLine($line, $search);
 	for (@hits) {
 		my ($begin, $end, $captures) = @$_;
 		if ($begin eq $insert) {
@@ -1138,9 +1139,11 @@ sub FindInLine {
 
 sub FindNext {
 	my ($self, $direction, $mode, $case, $pattern, $first) = @_;
+#	print "FindNext $direction, $mode, $case, $pattern\n";
 	$first = 1 unless defined $first;
 	my $search = $self->FindExpression($mode, $case, $pattern);
 	return unless defined $search;
+#	print "search $search\n";
 	$self->FindClear;
 	my $pos = $self->index('insert');
 	my $start = $self->linenumber($pos);
@@ -1150,6 +1153,7 @@ sub FindNext {
 			my $linenum = $_;
 			my @hits = $self->FindInLine($linenum, $search);
 			if (@hits) {
+#				print "we have hits\n";
 				while ((@hits) and ($self->compare($pos, '>=', $hits[0]->[0]))) { shift @hits	}
 				if (@hits) {
 					my $hit = $hits[0];

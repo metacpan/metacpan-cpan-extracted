@@ -1,7 +1,8 @@
-use strict;
+use 5.014;
 use warnings;
 
 # Create the DBO (2 tests)
+use lib '.';
 use Test::DBO Sponge => 'Sponge', tests => 18;
 
 # DBO-only Subclass
@@ -15,10 +16,10 @@ my $quoted = $dbo->{dbd_class}->_qi($dbo, $Test::DBO::test_db, $Test::DBO::test_
 is $quoted, qq{"$Test::DBO::test_db"."$Test::DBO::test_tbl"}, 'Only::DBO Method _qi';
 
 # Empty Subclasses
-sub SubClass::_dbd_class { 'SubClass::DBD' }
-sub SubClass::_table_class { 'SubClass::Table' }
-sub SubClass::_query_class { 'SubClass::Query' }
-sub SubClass::_row_class   { 'SubClass::Row' }
+sub SubClass::dbd_class { 'SubClass::DBD' }
+sub SubClass::table_class { 'SubClass::Table' }
+sub SubClass::query_class { 'SubClass::Query' }
+sub SubClass::row_class   { 'SubClass::Row' }
 @SubClass::ISA = qw(DBIx::DBO);
 @SubClass::DBD::ISA = qw(DBIx::DBO::DBD);
 @SubClass::Table::ISA = qw(DBIx::DBO::Table);
@@ -57,7 +58,7 @@ isa_ok $r = MyRow->new($dbo, $t), 'MyRow', '$r';
     package # hide from PAUSE
         My::Query;
     use base 'SubClass::Query';
-    sub _row_class { 'My::Row' }
+    sub row_class { 'My::Row' }
     sub new {
         my($class, $dbo) = @_;
         my($me, $t1) = $class->SUPER::new($dbo, $Test::DBO::test_tbl);
@@ -70,11 +71,7 @@ isa_ok $r = MyRow->new($dbo, $t), 'MyRow', '$r';
     package # hide from PAUSE
         My::Row;
     use base 'SubClass::Row';
-    sub new {
-        my($class, $dbo, $parent) = @_;
-        $parent ||= My::Query->new($dbo);
-        return $class->SUPER::new($dbo, $parent);
-    }
+    sub query_class { 'My::Query' }
 }
 
 sub build_from {
@@ -86,7 +83,6 @@ my $from = qq{$quoted "t1" JOIN $quoted "t2" ON "t1"."id" = "t2"."id"};
 
 $q = My::Query->new($dbo);
 isa_ok $q, 'My::Query', '$q';
-note $q->sql;
 is build_from($q, $q->{build_data}), $from,
     'Subclassed Query represents the table join automatically';
 

@@ -1,13 +1,13 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
 use Compress::Zlib;
 
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::EBook::PDB;
+use EBook::Ishmael::PDB;
 use EBook::Ishmael::TextToHtml;
 
 my $TYPE = 'zTXT';
@@ -106,7 +106,7 @@ sub new {
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_pdb} = EBook::Ishmael::EBook::PDB->new($file);
+	$self->{_pdb} = EBook::Ishmael::PDB->new($file);
 
 	my $hdr = $self->{_pdb}->record(0)->data;
 
@@ -169,6 +169,24 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+
+	print { $fh } $self->_text;
+
+	close $fh;
+
+	return $out // $raw;
+
+}
+
 sub metadata {
 
 	my $self = shift;
@@ -176,5 +194,9 @@ sub metadata {
 	return $self->{Metadata}->hash;
 
 }
+
+sub has_cover { 0 }
+
+sub cover { undef }
 
 1;

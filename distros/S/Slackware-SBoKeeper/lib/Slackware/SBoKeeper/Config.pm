@@ -1,11 +1,13 @@
 package Slackware::SBoKeeper::Config;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 use 5.016;
 use strict;
 use warnings;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(read_config);
+
+use File::Spec;
 
 sub read_config {
 
@@ -16,6 +18,10 @@ sub read_config {
 
 	open my $fh, '<', $file
 		or die "Failed to open config file $file for reading: $!\n";
+
+	my $param = {
+		File => File::Spec->rel2abs($file),
+	};
 
 	my $ln = 0;
 	while (my $l = readline $fh) {
@@ -42,7 +48,7 @@ sub read_config {
 		}
 
 		eval {
-			$config->{$field} = $callback->{$field}($val);
+			$config->{$field} = $callback->{$field}($val, $param);
 			1; # so that $config->{$field} being 0 won't cause problems.
 		} or do {
 			my $e = $@ || 'Something went wrong';
@@ -90,6 +96,18 @@ read, otherwise C<read_config> will fail on unknown fields.
 
 Configuration files consists of lines of key-value pairs, seperated by an
 equal sign (=). Blank lines and comments are ignored.
+
+The subroutines in C<$callbacks> can take two arguments, the first is the value
+of the field and the second is a hash ref of extra data that might be useful to
+the subroutine. The hash ref can have the following fields:
+
+=over 4
+
+=item File
+
+Absolute path of the config file being read.
+
+=back
 
 C<read_config> must be manually imported.
 

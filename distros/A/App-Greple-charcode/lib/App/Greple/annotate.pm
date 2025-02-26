@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9907";
+our $VERSION = "0.9908";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ B<greple> B<-Mannotate> [ I<module option> ] -- [ I<command option> ] ...
 
 =head1 VERSION
 
-Version 0.9907
+Version 0.9908
 
 =head1 DESCRIPTION
 
@@ -61,6 +61,10 @@ Align to the same column for all lines
 =item B<--align-side>
 
 Align to the longest line length, regardless of match position.
+
+=item B<--alignto>=I<column>
+
+Align to I<column> position.
 
 =back
 
@@ -174,21 +178,14 @@ our $config = Getopt::EX::Config->new(
     alignto => 1,
     split => 0,
 );
-my %type = ( '*' => ':1' );
 lock_keys %{$config};
+my %type = ( '*' => ':1' );
+sub optspec { $_[0] . ( $type{$_[0]} // $type{'*'} // '' ) }
 
 sub finalize {
     our($mod, $argv) = @_;
-    $config->deal_with(
-	$argv,
-	(
-	    map {
-		my $type = $type{$_} // $type{'*'};
-		( $_.$type => ref $config->{$_} ? $config->{$_} : \$config->{$_} ) ;
-	    }
-	    keys %{$config}
-	),
-    );
+    $config->deal_with($argv,
+		       map(optspec($_), keys %{$config}));
 }
 
 use Text::ANSI::Fold::Util qw(ansi_width);
@@ -348,7 +345,8 @@ sub _prepare {
 		$current->push( do {
 		    my $maker = sub {
 			my($head, $match) = @_;
-			sprintf("%s%s─\N{NBSP}%s", $indent, $head,
+			sprintf("%s%s%s\N{NBSP}%s",
+				$indent, $head, '─',
 				$ANNOTATE->(column => $start, match => $match));
 		    };
 		    if ($config->{split}) {

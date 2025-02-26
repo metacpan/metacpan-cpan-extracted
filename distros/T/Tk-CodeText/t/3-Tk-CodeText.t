@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 31;
 use Test::Tk;
 use Tk;
 
@@ -16,7 +16,9 @@ if (defined $app) {
 		-autocomplete => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
+		-indentstyle => 3,
 		-logcall => sub { print STDERR shift, "\n" },
+		-showspaces => 1,
 #		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
 #		-readonly => 1,
 		-syntax => 'XML',
@@ -84,7 +86,8 @@ if (defined $app) {
 }
 
 #testing accessors
-testaccessors($text, qw /Colored ColorInf FoldButtons highlightinterval linespercycle LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
+testaccessors($text, qw /Colored ColorInf FoldButtons highlightinterval linespercycle 
+	LoopActive NoHighlighting SaveFirstVisible SaveLastVisible spacesCompleted spacesLoopActive/);
 
 push @tests, (
 	[ sub { return defined $text }, 1, 'CodeText widget created' ],

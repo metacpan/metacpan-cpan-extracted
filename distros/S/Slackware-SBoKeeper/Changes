@@ -1,5 +1,21 @@
 Revision history for sbokeeper.
 
+2.05 (2/25/2025):
+  * When determining the default SBo repo location to use, sbokeeper takes into
+    account ChangeLog modification time. This means that, in theory, the repo
+    that was last updated will take priority over all others. This should
+    hopefully make the default repo location more DWIM-y.
+  * The new default data file path for root is /var/lib/sbokeeper/data.sbokeeper,
+    instead of /root/.local/share/sbokeeper/data.sbokeeper. If the old data file
+    path exists, sbokeeper will still use it but warn the user that they should
+    move it to another location.
+  * sbokeeper now supports relative path names in config files.
+  * sbokeeper does a write check for commands that require writing to the
+    database.
+  * Config file reader no longer recognizes PkgtoolLogs.
+  * Removed trailing space from package lists.
+  * Fixed some errors in documentation.
+
 2.04 (2/6/2025):
   Added:
     * Blacklist config option: Specify a list of packages that sbokeeper will

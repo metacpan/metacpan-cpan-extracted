@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -32,6 +32,8 @@ Pressing escape causes the ColorPop to widthdraw. If a pick operation is active
 cancels the pick operation instead.
 
 =head1 OPTIONS
+
+You can use many options of L<Tk::ColorPicker>.
 
 =over 4
 
@@ -68,6 +70,8 @@ Reference to the variable where the current value is held.
 
 =head1 METHODS
 
+You can use many methods of L<Tk::ColorPicker>.
+
 =over 4
 
 =cut
@@ -100,11 +104,12 @@ sub Populate {
 		},
 		-widget => $self,
 	) unless defined $pop;
+	$self->Advertise('Pop', $pop);
 
 	$entry->bind('<Button-1>', [$self, 'popBlock']);
 	$entry->bind('<ButtonRelease-1>', [$self, 'popFlip']);
 	$entry->bind('<Return>', [$self, 'popFlip']);
-	$entry->bind('<FocusOut>', [$self, 'popDown']);
+#	$entry->bind('<FocusOut>', [$self, 'popDown']);
 	$entry->bind('<Key>', [$self, 'OnKey']);
 	$entry->bind('<Escape>', [$self, 'OnEscape']);
 
@@ -142,7 +147,9 @@ sub EntryUpdate {
 	my $display = $self->Subwidget('Display');
 	my $val = $entry->get;
 	if ($self->validate($val)) {
-		$display->configure(-background => $val);
+		my $pop = $self->Subwidget('Pop');
+		my $current = $pop->getHEX;	
+		$display->configure(-background => $current) if $self->validate($current);
 		$entry->configure(-foreground => $self->cget('-entryforeground'));
 	} else {
 		$display->configure(-background => $self->cget('-background'));
@@ -240,13 +247,9 @@ sub put {
 	}
 	my $var = $self->Subwidget('Entry')->cget('-textvariable');
 	$$var = $color;
+	my $pop = $self->Subwidget('Pop');
+	$pop->put($color);
 	$self->EntryUpdate;
-}
-
-sub validate {
-	my ($self, $val) = @_;
-	my $repeat = $self->cget('-popcolor')->colordepth / 4;
-	return $val =~ /^#(?:[0-9a-fA-F]{3}){$repeat}$/
 }
 
 =back

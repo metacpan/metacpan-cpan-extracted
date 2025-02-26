@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -12,13 +12,22 @@ use EBook::Ishmael::EBook::Metadata;
 
 my $XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
-# Nothing fancy, just check if the file has an html suffix.
 sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
 
-	return $file =~ /\.x?html?$/;
+	return 1 if $file =~ /\.html?$/;
+	return 0 unless -T $file;
+
+	open my $fh, '<', $file
+		or die "Failed to open $file for reading: $!\n";
+	read $fh, my ($head), 1024;
+	close $fh;
+
+	return 0 if $head =~ /<[^<>]+xmlns\s*=\s*"$XHTML_NS"[^<>]*>/;
+
+	return $head =~ /<\s*html[^<>]*>/;
 
 }
 
@@ -110,6 +119,28 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh, ':utf8';
+
+	my ($body) = $self->{_dom}->findnodes('/html/body');
+	$body //= $self->{_dom}->documentElement;
+
+	print { $fh } $body->textContent;
+
+	close $fh;
+
+	return $out // $raw;
+
+}
+
 sub metadata {
 
 	my $self = shift;
@@ -117,5 +148,9 @@ sub metadata {
 	return $self->{Metadata}->hash;
 
 }
+
+sub has_cover { 0 }
+
+sub cover { undef }
 
 1;

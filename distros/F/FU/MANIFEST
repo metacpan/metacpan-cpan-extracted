@@ -1,0 +1,43 @@
+bench.PL
+c/common.c
+c/fcgi.c
+c/fdpass.c
+c/jsonfmt.c
+c/jsonparse.c
+c/khashl.h
+c/libpq.h
+c/pgconn.c
+c/pgst.c
+c/pgtypes.c
+c/xmlwr.c
+ChangeLog
+COPYING
+FU.pm
+FU.xs
+FU/Benchmarks.pod
+FU/Log.pm
+FU/Pg.pm
+FU/SQL.pm
+FU/Util.pm
+FU/Validate.pm
+FU/XMLWriter.pm
+FU/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/fcgi.t
+t/fdpass.t
+t/httpdate.t
+t/json_format.t
+t/json_parse.t
+t/pgconnect.t
+t/pgtypes-dynamic.t
+t/pgtypes.t
+t/query.t
+t/sql.t
+t/to_bool.t
+t/validate.t
+t/xmlwr.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

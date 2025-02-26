@@ -10,13 +10,13 @@ lib/EBook/Ishmael/EBook/HTML.pm
 lib/EBook/Ishmael/EBook/Metadata.pm
 lib/EBook/Ishmael/EBook/Mobi.pm
 lib/EBook/Ishmael/EBook/PalmDoc.pm
-lib/EBook/Ishmael/EBook/PDB.pm
-lib/EBook/Ishmael/EBook/PDB/Record.pm
 lib/EBook/Ishmael/EBook/PDF.pm
-lib/EBook/Ishmael/EBook/Skeleton.pm
 lib/EBook/Ishmael/EBook/Text.pm
+lib/EBook/Ishmael/EBook/XHTML.pm
 lib/EBook/Ishmael/EBook/zTXT.pm
 lib/EBook/Ishmael/MobiHuff.pm
+lib/EBook/Ishmael/PDB.pm
+lib/EBook/Ishmael/PDB/Record.pm
 lib/EBook/Ishmael/TextBrowserDump.pm
 lib/EBook/Ishmael/TextToHtml.pm
 LICENSE
@@ -36,6 +36,7 @@ t/16_pdf.t
 t/17_mobi.t
 t/18_fb2.t
 t/40_ishmael.t
+t/data/gerwinski-gnu-head.png
 t/data/gpl3.epub
 t/data/gpl3.fb2
 t/data/gpl3.html

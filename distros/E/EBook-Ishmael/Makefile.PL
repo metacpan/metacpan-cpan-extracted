@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
         'File::Which' => '0',
         'JSON' => '0',
         'List::Util' => '0',
+        'MIME::Base64' => '0',
         'XML::LibXML' => '1.70',
     },
     EXE_FILES => [

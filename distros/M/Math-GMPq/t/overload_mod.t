@@ -37,9 +37,14 @@ $num *= 217.6;
 eval {require Math::GMPz;};
 
 if(!$@) {
-  cmp_ok($num % 15, '==', $num % Math::GMPz->new(15), "Math::GMPz object correctly evaluated");
-  cmp_ok(ref(Math::GMPz->new(2500) % $num), 'eq', 'Math::GMPq', "Math::GMPz object (switched): returns a Math::GMPq object");
-  cmp_ok(2500 % $num, '==', Math::GMPz->new(2500) % $num, "Math::GMPz object (switched): Math::GMPz object correctly evaluated");
+  if($Math::GMPz::VERSION >= 0.63) {
+    cmp_ok($num % 15, '==', $num % Math::GMPz->new(15), "Math::GMPz object correctly evaluated");
+    cmp_ok(ref(Math::GMPz->new(2500) % $num), 'eq', 'Math::GMPq', "Math::GMPz object (switched): returns a Math::GMPq object");
+    cmp_ok(2500 % $num, '==', Math::GMPz->new(2500) % $num, "Math::GMPz object (switched): Math::GMPz object correctly evaluated");
+  }
+  else {
+  warn "Skipped Math::GMPz tests - have Math-GMPz-$Math::GMPz::VERSION; need at least version 0.63";
+  }
 }
 else {
   warn "Skipped Math::GMPz tests - couldn't load Math::GMPz";

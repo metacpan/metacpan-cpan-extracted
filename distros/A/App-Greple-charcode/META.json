@@ -43,10 +43,12 @@
       "runtime" : {
          "requires" : {
             "App::Greple" : "9.2101",
+            "App::ansicolumn" : "0",
             "Getopt::EX::Config" : "0.9902",
             "Hash::Util" : "0",
             "Text::ANSI::Fold" : "2.29",
             "Text::ANSI::Fold::Util" : "0",
+            "Text::VisualWidth::PP" : "0.08",
             "Unicode::UCD" : "0",
             "perl" : "5.024"
          }
@@ -60,14 +62,14 @@
    "provides" : {
       "App::Greple::annotate" : {
          "file" : "lib/App/Greple/annotate.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::cc" : {
          "file" : "lib/App/Greple/cc.pm"
       },
       "App::Greple::charcode" : {
          "file" : "lib/App/Greple/charcode.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       }
    },
    "release_status" : "stable",
@@ -82,7 +84,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-charcode"
       }
    },
-   "version" : "0.9907",
+   "version" : "0.9908",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

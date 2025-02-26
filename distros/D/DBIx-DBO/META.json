@@ -4,21 +4,21 @@
       "Vernon Lyon <vlyon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-DBO",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Temp" : 0,
+            "File::Temp" : "0",
             "Module::Build" : "0.30",
-            "Test::More" : "0.62"
+            "Test::More" : "0.88"
          }
       },
       "configure" : {
@@ -28,6 +28,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "DBD::MariaDB" : "1.22",
             "DBD::Oracle" : "1.13",
             "DBD::Pg" : "2",
             "DBD::SQLite" : "1.31",
@@ -35,40 +36,38 @@
             "Storable" : "2.38"
          },
          "requires" : {
-            "DBI" : "1.50",
-            "perl" : "5.008001"
+            "DBI" : "1.55",
+            "perl" : "5.014"
          }
       }
    },
    "provides" : {
       "DBIx::DBO" : {
          "file" : "lib/DBIx/DBO.pm",
-         "version" : "0.40"
+         "version" : "0.50"
       },
       "DBIx::DBO::Query" : {
-         "file" : "lib/DBIx/DBO/Query.pm",
-         "version" : 0
+         "file" : "lib/DBIx/DBO/Query.pm"
       },
       "DBIx::DBO::Row" : {
-         "file" : "lib/DBIx/DBO/Row.pm",
-         "version" : 0
+         "file" : "lib/DBIx/DBO/Row.pm"
       },
       "DBIx::DBO::Table" : {
-         "file" : "lib/DBIx/DBO/Table.pm",
-         "version" : 0
+         "file" : "lib/DBIx/DBO/Table.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-DBO"
+         "web" : "https://github.com/vlyon/DBIx-DBO/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://vlyon.svn.beanstalkapp.com/src/dbo"
+         "url" : "git://github.com/vlyon/DBIx-DBO.git"
       }
    },
-   "version" : "0.40"
+   "version" : "0.50",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

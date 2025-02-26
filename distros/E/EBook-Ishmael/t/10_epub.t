@@ -47,4 +47,12 @@ is_deeply(
 
 ok($ebook->html, "html ok");
 
+ok($ebook->has_cover, "has cover");
+
+is(
+	substr($ebook->cover, 0, 3),
+	pack("CCC", 0xff, 0xd8, 0xff),
+	"cover looks like a jpeg"
+);
+
 done_testing();

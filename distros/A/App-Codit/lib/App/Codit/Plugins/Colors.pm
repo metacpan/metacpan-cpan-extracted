@@ -9,7 +9,7 @@ App::Codit::Plugins::Colors - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.18;
 
 require Tk::ColorPicker;
 use Tie::Watch;
@@ -60,7 +60,7 @@ sub new {
 		-command => sub {
 			if ($picker->validate($color)) {
 				$self->cmdExecute('edit_insert', 'insert', $color);
-				$picker->historyAdd($color);
+				$picker->historyAdd($picker->getHEX);
 				$picker->historyUpdate;
 			}
 		},
@@ -72,7 +72,7 @@ sub new {
 			if ($picker->validate($color)) {
 				$self->clipboardClear;
 				$self->clipboardAppend($color);
-				$picker->historyAdd($color);
+				$picker->historyAdd($picker->getHEX);
 				$picker->historyUpdate;
 			}
 		},
@@ -87,6 +87,7 @@ sub new {
 
 	$picker = $page->ColorPicker(
 		-depthselect => 1,
+		-notationselect => 1,
 		-historyfile => $self->extGet('ConfigFolder')->ConfigFolder . '/color_history',
 		-updatecall => ['updatePicker', $self],
 	)->pack(-padx => 2, -pady => 2, -expand => 1, -fill => 'both');
@@ -107,7 +108,7 @@ sub _ent {
 
 sub _ind {
 	my ($self, $value) = @_;
-	$self->{INDICATOR}->configure(-background => $value) if defined $value;
+	$self->{INDICATOR}->configure(-background => $self->_pick->convert($value)) if defined $value;
 	return $self->{INDICATOR}
 }
 
@@ -120,11 +121,13 @@ sub _pick {
 sub SelectionCheck {
 	my $self = shift;
 	my @sel = $self->cmdExecute('doc_get_sel');
+	my $pick = $self->_pick;
 	if (@sel) {
 		my $text = $self->cmdExecute('doc_get_text', @sel);
 		chomp($text);
 		if ($self->_pick->validate($text)) {
-			$self->_ent($text);
+			$pick->put($text);
+			$self->_ent($pick->notationCurrent);
 			$self->updateEntry;
 		}
 	}
@@ -140,8 +143,9 @@ sub Unload {
 sub updateEntry {
 	my ($self, $value) = @_;
 	$value = $self->_ent->get unless defined $value;
+	my $pick = $self->_pick;
 	if ($self->_pick->validate($value)) {
-		$self->_ind($value);
+		$self->_ind($pick->getHEX);
 		$self->_ent->configure(-foreground => $self->configGet('-foreground'));
 		$self->_pick($value);
 	} else {
@@ -153,7 +157,7 @@ sub updateEntry {
 sub updatePicker {
 	my ($self, $value) = @_;
 	$self->_ent($value);
-	$self->_ind($value);
+	$self->_ind($self->_pick->getHEX);
 }
 
 =head1 LICENSE

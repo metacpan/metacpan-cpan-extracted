@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9907";
+our $VERSION = "0.9908";
 
 =encoding utf-8
 
@@ -18,8 +18,7 @@ App::Greple::charcode - greple module to annotate unicode character data
 
 =head1 SYNOPSIS
 
-  greple -Mcharcode ...
-  greple -Mcharcode [ module option ] -- [ command option ] ...
+  greple -Mcharcode [ module option -- ] [ command option ] ...
 
     COMMAND OPTION
       --no-annotate  do not print annotation
@@ -27,16 +26,15 @@ App::Greple::charcode - greple module to annotate unicode character data
       --align-all    align to the same column for all lines
       --align-side   align to the longest line
 
-    UNICODE
+      PATTERNS
       --composite    find composite character (combining character sequence)
       --precomposed  find precomposed character
       --combined     find both composite and precomposed characters
+      --outstand     find --combined and non-ASCII characters
       --dt=type      specify decomposition type
       --surrogate    find character in UTF-16 surrogate pair range
       --outstand     find non-ASCII combining characters
       -p/-P prop     find \p{prop} or \P{prop} characters
-
-    ANSI
       --ansicode     find ANSI terminal control sequences
 
     MODULE OPTION
@@ -52,24 +50,22 @@ App::Greple::charcode - greple module to annotate unicode character data
       --alignto[=#]  align annotation to #
 
       --config KEY[=VALUE],...
-               (KEY: column char width code name visible align)
 
-  greple -Mcc ...
-  greple -Mcc [ module option ] -- [ command option ] ...
+  greple -Mcc [ module option -- ] [ command option ] ...
 
       -Mcc  alias module for -Mcharcode
 
 =head1 VERSION
 
-Version 0.9907
+Version 0.9908
 
 =head1 DESCRIPTION
 
 Greple module C<-Mcharcode> (or C<-Mcc> for short) displays
-information about the matched characters.  It can also visualize
-Unicode zero-width combining or hidden characters, which can be useful
-for examining text containing visually indistinguishable or
-imperceptible elements.
+information about the matched characters.  It can visualize Unicode
+zero-width combining or hidden characters, which can be useful for
+examining text containing visually indistinguishable or imperceptible
+elements.
 
 The following output, retrieved from this document for non-ASCII
 characters (C<\P{ASCII}>), shows that the character C<\N{VARIATION
@@ -332,7 +328,7 @@ line option C<--charcode::config>.
 
 =head2 BOX DRAWINGS
 
-    perldoc -m App::ansicolumn::Border | greple -Mline -Mcc --code -- --outstand --mc=10,
+    perldoc -m App::ansicolumn::Border | greple -Mcc --code -- --outstand --mc=10,
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/box-drawing.png">
@@ -395,8 +391,9 @@ our $config = Getopt::EX::Config->new(
     split   => \$App::Greple::annotate::config->{split},
     alignto => \$App::Greple::annotate::config->{alignto},
 );
-my %type = ( '*' => ':1' );
 lock_keys %{$config};
+my %type = ( '*' => ':1' );
+sub optspec { $_[0] . ( $type{$_[0]} // $type{'*'} // '' ) }
 
 our %CONFIG_TAGS = (
     field => [ qw(column visible char width utf8 utf16 code name) ],
@@ -406,14 +403,7 @@ sub finalize {
     our($mod, $argv) = @_;
     $config->deal_with(
 	$argv,
-	(
-	    map {
-		my $type = $type{$_} // $type{'*'} // '';
-		my $ref = ref $config->{$_} ? $config->{$_} : \$config->{$_};
-		( $_.$type => $ref ) ;
-	    }
-	    keys %{$config}
-	),
+	map(optspec($_), keys %{$config}),
 	'all:1' => sub {
 	    for ($CONFIG_TAGS{field}->@*) {
 		my $ref = ref $config->{$_} ? $config->{$_} : \$config->{$_};
@@ -432,12 +422,16 @@ sub charname {
 
 sub name {
     my $char = shift;
-    "\\N{" . Unicode::UCD::charinfo(ord($char))->{name} . "}";
+    if (my $info = Unicode::UCD::charinfo(ord($char))) {
+	"\\N{" . $info->{name} . "}";
+    } else {
+	"[noinfo]";
+    }
 }
 
 sub charcode {
     local *_ = @_ ? \$_[0] : \$_;
-    s/(.)/code($1)/ger;
+    s/(.)/code($1)/sger;
 }
 
 sub utf8  { encode('UTF-8',  @_) }
@@ -490,14 +484,14 @@ sub width {
 sub describe {
     (my $column, local $_) = { @_ }->@{ qw(column match) };
     my @s;
-    push @s, sprintf '%3d ',      $column  if $config->{column};
-    push @s, sprintf '%s',        visible  if $config->{visible};
-    push @s, sprintf 'char="%s"', $_       if $config->{char};
-    push @s, sprintf 'w=%d',      width    if $config->{width};
-    push @s, sprintf 'utf8=%s',   utf8     if $config->{utf8};
-    push @s, sprintf 'utf16=%s',  utf16    if $config->{utf16};
-    push @s, sprintf 'code=%s',   charcode if $config->{code};
-    push @s, sprintf 'name=%s',   charname if $config->{name};
+    push @s, sprintf        '%3d' , $column  if $config->{column};
+    push @s, sprintf        '%s'  , visible  if $config->{visible};
+    push @s, sprintf  'char="%s"' , $_       if $config->{char};
+    push @s, sprintf     'w=%d'   , width    if $config->{width};
+    push @s, sprintf  'utf8=%s'   , utf8     if $config->{utf8};
+    push @s, sprintf 'utf16=%s'   , utf16    if $config->{utf16};
+    push @s, sprintf  'code=%s'   , charcode if $config->{code};
+    push @s, sprintf  'name=%s'   , charname if $config->{name};
     join "\N{NBSP}", @s;
 }
 
@@ -538,7 +532,7 @@ option --INVISIBLE --cm=N -E '$ENV{INVISIBLE_RE}'
 option --invisible --cm=N -E '(?!\p{Blank}|\R)$ENV{INVISIBLE_RE}'
 
 option --outstand \
-    --combined -E '(?#outstand)(?=\P{ASCII})\X'
+    --combined -E '(?#non-ascii)(?=\P{ASCII})\X'
 
 define ANSI-CSI <<EOL
     (?xn)
@@ -573,3 +567,5 @@ option --ansicode-seq \
 
 option -p -E '\p{$<shift>}'
 option -P -E '\P{$<shift>}'
+
+option --align-field --of 'ansicolumn -trs " " -o " "'

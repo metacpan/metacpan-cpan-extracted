@@ -1,0 +1,76 @@
+{
+   "abstract" : "OrePAN2::S3",
+   "author" : [
+      "Rob Lauer <rlauer6@comcast.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OrePAN2-S3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::Credentials" : "0",
+            "Amazon::S3" : "0",
+            "Archive::Tar" : "0",
+            "Bedrock::Template" : "0",
+            "CLI::Simple" : "0",
+            "JSON" : "0",
+            "OrePAN2::Index" : "0",
+            "Readonly" : "0",
+            "YAML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "OrePAN2::S3" : {
+         "file" : "lib/OrePAN2/S3.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rlauer6@comcast.net",
+         "web" : "http://github.com/rlauer6/orepan2-s3/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/orepan2-s3.git",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/orepan2-s3.git",
+         "web" : "http://github.com/rlauer6/orepan2-s3"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

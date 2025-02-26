@@ -1,7 +1,8 @@
-use strict;
+use 5.014;
 use warnings;
 
 my $dbo;
+use lib '.';
 use Test::DBO mysql => 'MySQL', try_connect => \$dbo;
 
 # Try to ensure a connection by guessing
@@ -22,7 +23,7 @@ if ($dbo->do("CREATE DATABASE $quoted_db")) {
     $quoted_db = $dbo->{dbd_class}->_qi($dbo, $Test::DBO::test_db);
 }
 
-plan tests => 115;
+plan tests => $Test::DBO::test_count + 8;
 
 # Create the DBO (3 tests)
 pass "Connect to MySQL $quoted_db database";
@@ -36,44 +37,42 @@ $Test::DBO::can{multi_table_update} = 1;
 $Test::DBO::can{auto_increment_id} = 'INT NOT NULL AUTO_INCREMENT PRIMARY KEY';
 $Test::DBO::can{truncate} = 1;
 
-# Table methods: do, select* (28 tests)
 my $t = Test::DBO::basic_methods($dbo);
-
 # Pick a random available collation
 if (my $collation = $dbo->selectrow_hashref('SHOW TABLE STATUS LIKE ?', undef, scalar($t->name))->{Collation}) {
     if (my $charset = $dbo->selectrow_hashref('SHOW COLLATION LIKE ?', undef, $collation)->{Charset}) {
         note "Table's default character set and collation is '$charset', '$collation'";
-        if (my $ci = $dbo->selectall_arrayref('SHOW COLLATION LIKE ?', {Slice => {}}, $charset.'%')) {
-            my @ci = grep $_ ne $collation, map $_->{Collation}, @$ci;
+        if (my $ci = $dbo->selectall_arrayref('SHOW COLLATION', {Slice => {}})) {
+            my @ci = grep $_ ne $collation, map $_->{Collation}, grep $_->{Charset} eq $charset, @$ci;
             $Test::DBO::can{collate} = $ci[int rand @ci];
         }
     }
 }
-
-# Advanced table methods: insert, update, delete (2 tests)
 Test::DBO::advanced_table_methods($dbo, $t);
-
-# Row methods: (20 tests)
 Test::DBO::row_methods($dbo, $t);
-
-# Query methods: (32 tests)
 my $q = Test::DBO::query_methods($dbo, $t);
 
-# MySQL CalcFoundRows: (2 tests)
+# MySQL CalcFoundRows: (5 tests)
 $q->limit(2);
-$q->config(CalcFoundRows => 1);
+unlike $q->sql, qr/ SQL_CALC_FOUND_ROWS /, "Don't use SQL_CALC_FOUND_ROWS by default in MySQL";
+$dbo->config(CalcFoundRows => 1);
 like $q->sql, qr/ SQL_CALC_FOUND_ROWS /, 'Use SQL_CALC_FOUND_ROWS in MySQL';
 $q->found_rows;
 is $q->config('LastSQL')->[1], 'SELECT FOUND_ROWS()', 'Use FOUND_ROWS() in MySQL';
+$q->run;
+$q->found_rows;
+is $q->config('LastSQL')->[1], 'SELECT FOUND_ROWS()', 'Use FOUND_ROWS() in MySQL after every run';
 
-# Advanced query methods: (15 tests)
+my $sq = $dbo->query($Test::DBO::test_tbl);
+$sq->show({FUNC => 'MAX(?)', COL => 'id'});
+$q->where($sq, '=', \7);
+ok $q->run, "Don't use SQL_CALC_FOUND_ROWS in subqueries" or diag sql_err($q);
+$q->unwhere;
+
 Test::DBO::advanced_query_methods($dbo, $t, $q);
-
-# Join methods: (12 tests)
 Test::DBO::join_methods($dbo, $t->{Name});
 
 END {
-    # Cleanup (1 test)
     Test::DBO::cleanup($dbo) if $dbo;
 }
 

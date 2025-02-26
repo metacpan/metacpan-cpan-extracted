@@ -126,6 +126,13 @@ Specify the outputted line width. Defaults to C<80>.
 
 Dump the HTML-ified contents of the ebook instead of the formatted plain text.
 
+=item B<-c>|B<--cover>
+
+Dump the ebook's cover image, it has one. You should use
+the B<-o> option or redirect output to somewhere other than F<stdout>, as this
+option will otherwise write binary data directly to F<stdout>, which can be
+harmful.
+
 =item B<-i>|B<--identify>
 
 Instead of dumping the text contents of an ebook, try to identify its format
@@ -138,6 +145,10 @@ Dump the ebook's metadata in JSON form.
 =item B<-m>|B<--metadata>
 
 Dump the ebook's metadata.
+
+=item B<-r>|B<--raw>
+
+Dump the ebook's raw, unformatted text contents.
 
 =item B<-h>|B<--help>
 

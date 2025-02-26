@@ -1,6 +1,6 @@
-package EBook::Ishmael::EBook::PDB::Record;
+package EBook::Ishmael::PDB::Record;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -57,13 +57,13 @@ sub uid {
 
 =head1 NAME
 
-EBook::Ishmael::EBook::PDB::Record - L<ishmael> PDB record interface
+EBook::Ishmael::PDB::Record - ishmael PDB record interface
 
 =head1 SYNOPSIS
 
-  use EBook::Ishmael::EBook::PDB::Record;
+  use EBook::Ishmael::PDB::Record;
 
-  my $rec = EBook::Ishmael::EBook::PDB::Record->new(
+  my $rec = EBook::Ishmael::PDB::Record->new(
       $data,
       {
           Offset => $offset,
@@ -74,15 +74,15 @@ EBook::Ishmael::EBook::PDB::Record - L<ishmael> PDB record interface
 
 =head1 DESCRIPTION
 
-B<EBook::Ishmael::EBook::PDB::Record> is a module that provides an interface
+B<EBook::Ishmael::PDB::Record> is a module that provides an interface
 for reading Palm PDB records. For L<ishmael> user documentation, you should
 consult its manual (this is developer documentation).
 
 =head1 METHODS
 
-=head2 $r = EBook::Ishmael::EBook::PDB::Record->new($data, $info)
+=head2 $r = EBook::Ishmael::PDB::Record->new($data, $info)
 
-Returns a blessed B<EBook::Ishmael::EBook::PDB::Record> object. C<$data> is a
+Returns a blessed B<EBook::Ishmael::PDB::Record> object. C<$data> is a
 scalar holding the record's data, C<$info> is a hash ref of the record's info
 data.
 
@@ -137,6 +137,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<EBook::Ishmael::EBook::PDB>
+L<EBook::Ishmael::PDB>
 
 =cut

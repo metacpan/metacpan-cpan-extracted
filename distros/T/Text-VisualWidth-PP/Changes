@@ -1,5 +1,18 @@
 Revision history for Perl module Text::VisualWidth::PP
 
+0.08 2025-02-26T06:47:09Z
+
+    commit d10bff3580c0914cf716170a4e9a232b5b508a3e
+    Author: Kazumasa Utashiro <kaz@utashiro.com>
+    Date:   Fri Feb 21 16:04:43 2025 +0900
+
+        Update Emoji_Modifier handling. Fix #11
+
+        * count width of E_Modifier not following E_Base
+          - Still define utf8::Is_Emoji_Modifier for < v5.32
+          - Line_Break=E_Base/E_Modifier properties are available from v5.28
+            (available in v5.26 but not stable)
+
 0.07 2025-01-30T00:55:49Z
 
     commit 84273797f32fc98eb05e90cca32967e37dd2e9df

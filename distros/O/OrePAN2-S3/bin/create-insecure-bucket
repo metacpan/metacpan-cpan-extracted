@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# -*- mode: sh -*-
+#
+# Script to create an AWS S3 bucket for static website hosting
+# with access restricted to a specified IP address.
+#
+# Usage:
+#   ./create_s3_website.sh <bucket-name> <allowed-ip> [region]
+#
+
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <bucket-name> <allowed-ip> [region]
+
+Creates an AWS S3 bucket configured for static website hosting,
+with access restricted to the specified IP address.
+
+Arguments:
+  <bucket-name>  The name of the S3 bucket (must be globally unique).
+  <allowed-ip>   The public IP address allowed to access the bucket.
+  [region]       (Optional) AWS region (default: us-east-1).
+
+Requirements:
+  - AWS CLI must be installed and configured.
+  - The bucket name must be globally unique.
+  - The IP address can specify a CIDR range (usually /32 though)
+EOF
+}
+
+# Check dependencies
+if ! command -v aws &>/dev/null; then
+    echo "Error: AWS CLI is not installed." >&2
+    exit 1
+fi
+
+# Validate input arguments
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+    usage
+    exit 1
+fi
+
+BUCKET_NAME=$1
+ALLOWED_IP=$2
+REGION=${3:-us-east-1}
+
+# Create the bucket (Handle region correctly)
+echo "Creating S3 bucket: $BUCKET_NAME in region $REGION..."
+
+if [[ "$REGION" == "us-east-1" ]]; then
+    aws s3api create-bucket --bucket "$BUCKET_NAME"
+else
+    aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" \
+        --create-bucket-configuration LocationConstraint="$REGION"
+fi
+
+# Enable static website hosting
+echo "Configuring S3 bucket for website hosting..."
+aws s3 website "s3://$BUCKET_NAME" --index-document index.html --error-document error.html
+
+# Define bucket policy to allow only the specified IP
+POLICY=$(cat <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAccessFromSpecificIP",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::$BUCKET_NAME/*",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": "$ALLOWED_IP"
+        }
+      }
+    }
+  ]
+}
+EOF
+)
+
+# Apply bucket policy
+echo "Applying bucket policy to restrict access to IP: $ALLOWED_IP..."
+echo "$POLICY" | aws s3api put-bucket-policy --bucket "$BUCKET_NAME" --policy file://<(cat)
+
+# Output website URL
+if [[ "$REGION" == "us-east-1" ]]; then
+    WEBSITE_URL="http://$BUCKET_NAME.s3-website-us-east-1.amazonaws.com/"
+else
+    WEBSITE_URL="http://$BUCKET_NAME.s3-website-$REGION.amazonaws.com/"
+fi
+
+echo "S3 bucket '$BUCKET_NAME' is now configured as a website with access restricted to IP: $ALLOWED_IP"
+echo "Website URL: $WEBSITE_URL"

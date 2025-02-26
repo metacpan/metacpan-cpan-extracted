@@ -5,19 +5,19 @@ package CLI::Simple;
 use strict;
 use warnings;
 
-use Carp;
-use English qw(-no_match_vars);
-use Data::Dumper;
-use FindBin qw($RealBin $RealScript);
-use Log::Log4perl;
-use JSON qw(decode_json);
-use List::Util qw(zip none);
-use Getopt::Long qw(:config no_ignore_case);
-use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
 use CLI::Simple::Utils qw(normalize_options);
+use Carp;
+use Data::Dumper;
+use English qw(-no_match_vars);
+use FindBin qw($RealBin $RealScript);
+use Getopt::Long qw(:config no_ignore_case);
+use JSON qw(decode_json);
+use List::Util qw(zip none);
+use Log::Log4perl;
+use Pod::Usage;
 
-our $VERSION = '0.0.8';
+our $VERSION = '0.0.9';
 
 use parent qw(Class::Accessor::Fast Exporter);
 
@@ -129,6 +129,11 @@ sub new {
   my $command = shift @ARGV // 'default';
 
   if ( $command eq 'help' || ( $self->can('get_help') && $self->get_help ) ) {
+    # custom help function?
+    if ( $commands->{help} ) {
+      exit $commands->{help}->();
+    }
+
     $self->usage;
   }
 
@@ -223,6 +228,14 @@ sub usage {
 }
 
 ########################################################################
+sub command {
+########################################################################
+  my ($self) = @_;
+
+  return $self->get__command;
+}
+
+########################################################################
 sub run {
 ########################################################################
   my ($self) = @_;
@@ -230,10 +243,6 @@ sub run {
   my $program = $self->get__program;
 
   my $command = $self->get__command || 'default';
-
-  if ( $command eq 'help' || ( $self->can('get_help') && $self->get_help ) ) {
-    $self->usage;
-  }
 
   my $commands = $self->get__commands;
   $commands->{default} //= \&usage;
@@ -300,7 +309,7 @@ scripts? Want a standard, simple way to create a Perl script?
 C<CLI::Simple> makes it easy to create scripts that take I<options>,
 I<commands> and I<arguments>.
 
-This documentation describes version 0.0.8.
+This documentation describes version 0.0.9.
 
 =head2 Features
 
@@ -415,6 +424,10 @@ those passed to C<Getopt::Long>.
 =back
 
 Instantiates a new C<CLI::Simple> object.
+
+=head2 command
+
+Returns the command presented on the command line.
 
 =head2 run
 
@@ -552,9 +565,38 @@ at the bottom of your script in a USAGE section (head1).
   ....
 
 If the command specified is 'help' or if you have added an optional
-C<--help> option, users can then access the usage section from the command line.
+C<--help> option, users can access the usage section.
 
- perl myscript.pm -h perl myscript.pm help
+ perl myscript.pm -h
+
+ perl myscript.pm help
+
+=head2 Custom C<help() Method
+
+If you don't make this module your parent class and your module
+already has POD that is what you want displayed by C<CLI::Simple>'s
+help facility, create your own custom help method and set that as one
+of your commands.
+
+  ...
+  commands => {
+    help => \&help,
+    ...
+  }
+
+This situation occurs when for example, you have a class that is
+typically used by other scripts or modules but also has the capability
+of running the modulino pattern. Run as a modulino the script's usage
+notes might differ from those in the module itself.
+
+ caller or __PACKAGE__->main()
+
+Without creating your own help function, C<CLI::Simple>'s help
+facility will output the usage notes in your POD. That may or may not
+have been what you wanted, hence the ability to override that behavior
+by providing your own C<help()> method that will be called when that
+module is run as a script and either C<--help> option or help command is
+used.
 
 =head1 LOGGING
 

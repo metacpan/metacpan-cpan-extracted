@@ -4,6 +4,8 @@ use strict;
 
 use Test::More;
 
+use File::Spec;
+
 use Slackware::SBoKeeper::Config qw(read_config);
 
 plan tests => 1;
@@ -15,6 +17,7 @@ my $config = read_config($TEST_FILE, {
 	ExtraEquals     => sub { shift =~ s/=//gr },
 	ExtraWhitespace => sub { shift =~ s/\s+//gr },
 	Zero            => sub { shift },
+	TestFile        => sub { $_[1]->{File} },
 });
 
 is_deeply(
@@ -24,6 +27,7 @@ is_deeply(
 		ExtraEquals     => ' None  Of  These',
 		ExtraWhitespace => 'Weirdwhitespace',
 		Zero            => '0',
+		TestFile        => File::Spec->rel2abs($TEST_FILE),
 	},
 	'read_config() read file correctly'
 );

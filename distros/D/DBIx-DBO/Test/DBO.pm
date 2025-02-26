@@ -3,35 +3,18 @@ use Test::More;
 package # Hide from PAUSE
     Test::DBO;
 
-use 5.008;
-use strict;
+use 5.014;
 use warnings;
 use sigtrap qw(die normal-signals);
 
 use Scalar::Util qw(blessed reftype);
 use Test::More;
 use DBIx::DBO;
+
 BEGIN {
-    require Carp::Heavy if eval "$Carp::VERSION < 1.12";
-
-    # If we are using a version of Test::More older than 0.82 ...
-    unless (exists $Test::More::{note}) {
-        eval q#
-            sub Test::More::note {
-                local $Test::Builder::{_print_diag} = $Test::Builder::{_print};
-                Test::More->builder->diag(@_);
-            }
-            *note = \&Test::More::note;
-            no strict 'refs';
-            *{caller(2).'::note'} = \&note;
-        #;
-        die $@ if $@;
-    }
-
     # Set up DebugSQL if requested
-    if ($ENV{DBO_DEBUG_SQL}) {
-        diag "DBO_DEBUG_SQL=$ENV{DBO_DEBUG_SQL}";
-        DBIx::DBO->config(DebugSQL => $ENV{DBO_DEBUG_SQL});
+    if ($ENV{DBO_TEST_SQL}) {
+        diag "DBO_TEST_SQL=$ENV{DBO_TEST_SQL}";
     }
 
     # Set up $Carp::Verbose if requested
@@ -48,16 +31,19 @@ BEGIN {
             my $loc = Carp::short_error_loc();
             my %i = Carp::caller_info($loc);
             $me->config(LastSQL => [$i{'sub'}, @_]);
-            my $dbg = $ENV{DBO_DEBUG_SQL} or return;
+            my $dbg = $ENV{DBO_TEST_SQL} or return;
             my $trace;
             if ($dbg > 1) {
                 $trace = "\t$i{sub_name} called at $i{file} line $i{line}\n";
+                # Add an extra stack level
+                %i = Carp::caller_info($loc - 1);
+                $trace = "\t$i{sub_name} called at $i{file} line $i{line}\n$trace";
                 $trace .= "\t$i{sub_name} called at $i{file} line $i{line}\n" while %i = Carp::caller_info(++$loc);
             } else {
                 $trace = "\t$i{sub} called at $i{file} line $i{line}\n";
             }
             my $sql = shift;
-            Test::More::diag "DEBUG_SQL: $sql\nDEBUG_SQL: (".join(', ', map $me->rdbh->quote($_), @_).")\n".$trace;
+            Test::More::diag "RUN_SQL: $sql\nRUN_SQL: (".join(', ', map $me->rdbh->quote($_), @_).")\n".$trace;
         });
 
     {
@@ -76,26 +62,25 @@ BEGIN {
         # Fix SvREFCNT with Devel::Cover
         package # Hide from PAUSE
             DBIx::DBO::Query;
-        *DBIx::DBO::Query::SvREFCNT = sub {
-            return Devel::Peek::SvREFCNT($_[0]) - 1;
+        *DBIx::DBO::Query::SvREFCNT = sub (\[$@%&*]) {
+            return Devel::Peek::SvREFCNT(${$_[0]}) - 3;
         } if exists $INC{'Devel/Cover.pm'};
     }
 }
 
 our $dbd;
 our $dbd_name;
-(our $test_db = "DBO_${DBIx::DBO::VERSION}_test_db") =~ s/\W/_/g;
-(our $test_sch = "DBO_${DBIx::DBO::VERSION}_test_sch") =~ s/\W/_/g;
-(our $test_tbl = "DBO_${DBIx::DBO::VERSION}_test_tbl") =~ s/\W/_/g;
+our $test_db = "DBO_${DBIx::DBO::VERSION}_test_db" =~ s/\W/_/gr;
+our $test_sch = "DBO_${DBIx::DBO::VERSION}_test_sch" =~ s/\W/_/gr;
+our $test_tbl = "DBO_${DBIx::DBO::VERSION}_test_tbl" =~ s/\W/_/gr;
 our @_cleanup_sql;
 our $case_sensitivity_sql = 'SELECT ? LIKE ?';
 our %can;
+our $test_count = 117;
 
 sub import {
-    my $class = shift;
-    $dbd = shift or return;
-    $dbd_name = shift;
-    my %opt = splice @_;
+    (my $class, $dbd, $dbd_name, my %opt) = @_;
+    defined $dbd or return;
 
     grep $_ eq $dbd, DBI->available_drivers
         or plan skip_all => "No $dbd driver available!";
@@ -111,7 +96,7 @@ sub import {
     unless (eval { DBIx::DBO::DBD->_require_dbd_class($dbd) }) {
         if ($@ =~ /^Can't locate ([\w\/]+)\.pm in \@INC /m) {
             # Module is not installed
-            ($_ = "$1 is required") =~ s'/'::'g;
+            $_ = "$1 is required" =~ s'/'::'gr;
         } elsif ($@ =~ /^([\w:]+ version [\d\.]+ required.*?) at /m) {
             # Module is not correct version
             ($_ = $1);
@@ -141,7 +126,7 @@ sub import {
     }
 
     # Query tests must produce the same result regardless of caching
-    DBIx::DBO->config(CacheQuery => defined $ENV{DBO_CACHE_QUERY} ? $ENV{DBO_CACHE_QUERY} : int rand 2);
+    DBIx::DBO->config(CacheQuery => $ENV{DBO_CACHE_QUERY} // int rand 2);
 
     if (exists $opt{try_connect}) {
         try_to_connect($opt{try_connect});
@@ -150,11 +135,12 @@ sub import {
     note "DBD::$dbd ".${ $::DBD::{$dbd.'::'}{VERSION} } if exists $opt{try_connect} or exists $opt{connect_ok};
 
     return unless exists $opt{tests};
+    $opt{tests} =~ s/^\+(\d+)$/$test_count + $1/e;
 
     if (exists $opt{connect_ok}) {
         my $dbo = connect_ok(@{$opt{connect_ok}}) or plan skip_all => "Can't connect: $DBI::errstr";
 
-        plan tests => $opt{tests};
+        plan tests => $opt{tests} + 2;
         pass "Connect to $dbd_name";
         isa_ok $dbo, 'DBIx::DBO', '$dbo';
     } else {
@@ -175,8 +161,8 @@ sub sql_err {
 
 sub connect_dbo {
     my($dsn, $user, $pass) = @_;
-    defined $dsn or $dsn = '';
-    DBIx::DBO->connect("DBI:$dbd:$dsn", $user, $pass, {RaiseError => 0});
+    $dsn //= '';
+    DBIx::DBO->connect("DBI:$dbd:$dsn", $user, $pass, {HandleError => sub { note $_[0]; 1 }});
 }
 
 sub try_to_connect {
@@ -194,15 +180,24 @@ sub connect_ok {
     return try_to_connect($dbo_ref) || ($$dbo_ref = connect_dbo(@_));
 }
 
+my $table_data;
+my $quoted_table;
+sub is_table_data($$) {
+    my($dbo, $message) = @_;
+    my $rv = $dbo->selectall_arrayref("SELECT * FROM $quoted_table") or diag sql_err($dbo);
+    @$rv = sort { $a->[0] <=> $b->[0] } @$rv; # Sort by id
+    is_deeply $rv, $table_data, $message;
+}
+
 sub basic_methods {
     my $dbo = shift;
+    $quoted_table = $dbo->{dbd_class}->_qi($dbo, $test_sch, $test_tbl);
 
     note 'Testing with: CacheQuery => '.DBIx::DBO->config('CacheQuery');
 
     # Create a DBO from DBI handles
     isa_ok(DBIx::DBO->new($dbo->{dbh}, $dbo->{rdbh}), 'DBIx::DBO', 'Method DBIx::DBO->new, $dbo');
 
-    my $quoted_table = $dbo->{dbd_class}->_qi($dbo, $test_sch, $test_tbl);
     my @quoted_cols = map $dbo->{dbd_class}->_qi($dbo, $_), qw(type id name);
     my $t;
     my $create_table = "CREATE TABLE $quoted_table ($quoted_cols[1] ".
@@ -271,12 +266,13 @@ sub basic_methods {
     $rv = $dbo->selectrow_arrayref("SELECT * FROM $quoted_table") or diag sql_err($dbo);
     is_deeply $rv, [1,'John Doe'], 'Method DBIx::DBO->selectrow_arrayref';
 
-    $rv = $dbo->selectall_arrayref("SELECT * FROM $quoted_table") or diag sql_err($dbo);
-    is_deeply $rv, [[1,'John Doe'],[2,'Jane Smith']], 'Method DBIx::DBO->selectall_arrayref';
+    $table_data = [[1,'John Doe'],[2,'Jane Smith']];
+    is_table_data $dbo, 'Method DBIx::DBO->selectall_arrayref';
 
     # Insert via table object
     $rv = $t->insert(id => 3, name => 'Uncle Arnie') or diag sql_err($t);
     ok $rv, 'Method DBIx::DBO::Table->insert';
+    push @$table_data, [3,'Uncle Arnie'];
 
     is_deeply [$t->columns], [qw(id name)], 'Method DBIx::DBO::Table->columns';
 
@@ -284,23 +280,12 @@ sub basic_methods {
     my $c = $t->column('id');
     isa_ok $c, 'DBIx::DBO::Column', '$c';
 
-    # Fetch one value from the Table
-    is $t->fetch_value($t ** 'name', id => 3), 'Uncle Arnie', 'Method DBIx::DBO::Table->fetch_value';
-
-    # Fetch one value from the Table
-    is_deeply $t->fetch_hash(id => \3), {id=>3,name=>'Uncle Arnie'}, 'Method DBIx::DBO::Table->fetch_hash';
-
-    # Fetch one value from the Table
-    my $r = $t->fetch_row(id => 3, name => \'NOT NULL');
-    is $r->{name}, 'Uncle Arnie', 'Method DBIx::DBO::Table->fetch_row';
-
-    # Fetch a column arrayref from the Table
-    is_deeply $t->fetch_column($t ** 'name', id => 3), ['Uncle Arnie'], 'Method DBIx::DBO::Table->fetch_column';
-
     # Advanced insert using a column object
     $rv = $t->insert($c => {FUNC => '4'}, name => 'NotUsed', name => \"'James Bond'") or diag sql_err($t);
     ok $rv, 'Method DBIx::DBO::Table->insert (complex values)';
-    is $t->fetch_value('name', id => 4), 'James Bond', 'Method DBIx::DBO::Table->insert (remove duplicate cols)';
+    push @$table_data, [4,'James Bond'];
+
+    is_table_data $dbo, 'Method DBIx::DBO::Table->insert (remove duplicate cols)';
 
     # Delete via table object
     $rv = $t->delete(id => 3) or diag sql_err($t);
@@ -325,24 +310,30 @@ sub basic_methods {
             skip 'TRUNCATE TABLE is not supported', 1;
         }
         $t->truncate or diag sql_err($t);
-        is $t->fetch_value('id'), undef, 'Method DBIx::DBO::Table->truncate';
+        undef @$table_data;
+        is_table_data $dbo, 'Method DBIx::DBO::Table->truncate';
     }
+    @$table_data = sort { $a->[0] <=> $b->[0] } map [@$_{qw(id name)}], @$bulk_data;
 
     # Bulk insert
     $rv = $t->bulk_insert(rows => [map [@$_{qw(id name)}], @$bulk_data]) or diag sql_err($t);
     is $rv, 4, 'Method DBIx::DBO::Table->bulk_insert (ARRAY)';
+    is_table_data $dbo, 'Table contents are correct';
     $t->delete or diag sql_err($t);
 
     $rv = $t->bulk_insert(rows => \@$bulk_data) or diag sql_err($t);
     is $rv, 4, 'Method DBIx::DBO::Table->bulk_insert (HASH)';
+    is_table_data $dbo, 'Table contents are correct';
     $t->delete or diag sql_err($t);
 
     $rv = $t->bulk_insert(columns => [qw(name id)], rows => [map [@$_{qw(name id)}], @$bulk_data]) or diag sql_err($t);
     is $rv, 4, 'Method DBIx::DBO::Table->bulk_insert (ARRAY)';
+    is_table_data $dbo, 'Table contents are correct';
     $t->delete or diag sql_err($t);
 
     $rv = $t->bulk_insert(columns => [qw(name id)], rows => \@$bulk_data) or diag sql_err($t);
     is $rv, 4, 'Method DBIx::DBO::Table->bulk_insert (HASH)';
+    is_table_data $dbo, 'Table contents are correct';
 
     return $t;
 }
@@ -371,7 +362,7 @@ sub skip_advanced_table_methods {
     my $dbo = shift;
     my $t = shift;
 
-    note "No advanced table tests for $dbd_name";
+    skip "No advanced table tests for $dbd_name", 2;
     $t->insert(id => 6, name => 'Harry Harrelson') or diag sql_err($t);
     $t->insert(id => 7, name => 'Amanda Huggenkiss') or diag sql_err($t);
 }
@@ -380,7 +371,7 @@ sub row_methods {
     my $dbo = shift;
     my $t = shift;
 
-    my $r = DBIx::DBO::Row->new($dbo, $t->_from);
+    my $r = DBIx::DBO::Row->new($dbo, $t->_as_table);
     isa_ok $r, 'DBIx::DBO::Row', '$r (using quoted table name)';
 
     $r = $dbo->row([ @$t{qw(Schema Name)} ]);
@@ -426,7 +417,7 @@ sub row_methods {
 sub query_methods {
     my $dbo = shift;
     my $t = shift;
-    my $quoted_table = $t->_from;
+    $quoted_table = $t->_as_table;
 
     # Create a query object
     my $q = $dbo->query($t);
@@ -441,20 +432,27 @@ sub query_methods {
 
     # Sort the result
     $q->order_by('id');
-    pass 'Method DBIx::DBO::Query->order_by';
+    like $q->sql, qr/ ORDER BY .*id/, 'Method DBIx::DBO::Query->order_by';
 
     # Get a valid sth
-    isa_ok $q->_sth, 'DBI::st', '$q->_sth' or diag "SQL command failed: _sth\n  $q->{sql}\n".$q->rdbh->errstr;
+    ok $q->run, 'Method DBIx::DBO::Query->run' or diag sql_err($q);
+    isa_ok $q->{sth}, 'DBI::st', '$q->{sth}';
 
     # Get a Row object
     my $r = $q->row;
     isa_ok $r, 'DBIx::DBO::Row', '$q->row';
-    my $r_str = "$r";
+    undef $q;
+    ok !exists $$r->{Parent}, 'Row detaches when the parent query is destroyed';
+
+    # Get another attached Row
+    $q = $dbo->query($t);
+    $r = $q->row;
 
     $q->config(Testing => 123);
     is $r->config('Testing'), 123, 'Row gets config from parent Query';
 
     # Alter the SQL to ensure the row is detached and rebuilt
+    my $r_str = "$r";
     $q->order_by('id');
     $r = $q->row;
     isnt $r_str, "$r", 'Row rebuilds SQL and detaches when a ref still exists';
@@ -466,7 +464,7 @@ sub query_methods {
     # Fetch the first row
     $r = $q->fetch;
     ok $r->isa('DBIx::DBO::Row'), 'Method DBIx::DBO::Query->fetch';
-    is $r_str, "$r", 'Re-use the same row object';
+    is "$r", $r_str, 'Re-use the same row object';
     is_deeply [$q->columns], [qw(id name)], 'Method DBIx::DBO::Query->columns (after fetch)';
 
     # Fetch another row
@@ -476,12 +474,14 @@ sub query_methods {
 
     # Re-run the query
     $q->run or diag sql_err($q);
-    is $q->fetch->{name}, 'John Doe', 'Method DBIx::DBO::Query->run';
+    is $q->fetch->{name}, 'John Doe', 'Method DBIx::DBO::Query->run (rerun)';
     $q->finish;
-    is $q->fetch->{name}, 'John Doe', 'Method DBIx::DBO::Query->finish';
+    ok $q->{Row}->is_empty, 'Method DBIx::DBO::Query->finish (Row is now empty)';
+    is $q->fetch->{name}, 'John Doe', 'Method DBIx::DBO::Query->finish (fetch returns the first Row)';
 
     # Count the number of rows
-    1 while $q->fetch;
+    is_deeply [map ref $q->fetch, 1..5], [('DBIx::DBO::Row') x 5], 'Fetched 5 more Rows';
+    is $q->fetch, undef, 'Fetch exhausted (no more rows)';
     is $q->rows, 6, 'Row count is 6';
 
     # WHERE clause
@@ -530,19 +530,22 @@ sub query_methods {
 
     # Update & Load a Row with aliased columns
     $q->show($t, {COL => 'id', AS => 'key'});
+    $q->order_by({COL => 'id', ORDER => 'DESC' });
     $q->group_by;
     is_deeply [$q->columns], [qw(id name key)], 'Method DBIx::DBO::Query->columns (with aliases)';
     $r = $q->fetch;
     is_deeply [$q->columns], [qw(id name key)], 'Method DBIx::DBO::Query->columns (after fetch)';
+    isa_ok $q ** 'key', 'DBIx::DBO::Column', '$q ** $alias';
+
+    # After changing the Query, test that the Row still works as before
+    $q->show('id');
+    $q->order_by('id');
+    is join(' ', $r->columns), 'id name key', 'Method DBIx::DBO::Row->columns (unchanged by parent)';
+    is $r->{key}, 16, 'Alias returns correct value' or diag sql_err($r);
     ok $r->update(id => $r->{key}), 'Can update a Row despite using aliases' or diag sql_err($r);
     ok $r->load(id => 15), 'Can load a Row despite using aliases' or diag sql_err($r);
 
-    isa_ok $q ** 'key', 'DBIx::DBO::Column', q{$q ** $alias};
-
     # Limit & limit with Offset
-    $q->show('id');
-    $q->order_by('id');
-
     $q->limit(3);
     $got = [];
     for (my $row; $row = $q->fetch; push @$got, $row->[0]) {}
@@ -618,7 +621,7 @@ sub advanced_query_methods {
 }
 
 sub skip_advanced_query_methods {
-    note "No advanced query tests for $dbd_name";
+    skip "No advanced query tests for $dbd_name", 15;
 }
 
 sub join_methods {
@@ -677,7 +680,7 @@ sub join_methods {
     $q->limit(1, 3);
 
     SKIP: {
-        $q->_sth or diag sql_err($q) or fail 'LEFT JOIN' or skip 'No Left Join', 3;
+        $q->run or diag sql_err($q) or fail 'LEFT JOIN' or skip 'No Left Join', 3;
         $r = $q->fetch or fail 'LEFT JOIN' or skip 'No Left Join', 3;
 
         is_deeply [@$r[0..3]], [14, 'James Bond', undef, undef], 'LEFT JOIN';
@@ -692,6 +695,10 @@ sub join_methods {
     }
 
     $q->finish;
+}
+
+sub skip_join_methods {
+    skip "No query join tests for $dbd_name", 12;
 }
 
 sub todo_cleanup {
@@ -724,7 +731,7 @@ sub Dump {
             $var = 'r';
         }
     }
-    $var = 'dump' unless defined $var;
+    $var //= 'dump';
     require Data::Dumper;
     local $Data::Dumper::Sortkeys = 1;
     local $Data::Dumper::Quotekeys = 0;
@@ -792,23 +799,32 @@ sub _get_table_info {
     return $me->{TableInfo}{''}{$table} ||= $fake_table_info;
 }
 
-# When testing via MySponge, fake table contents
+# Replace DBI::connect for testing via MySpongeDBI
+{
+    no warnings 'redefine';
+    my $old_dbi_connect = \&DBI::connect;
+    *DBI::connect = sub {
+        return $old_dbi_connect->('MySpongeDBI', @_[1 .. $#_]) if $_[1] eq 'DBI:Sponge:';
+        goto &$old_dbi_connect;
+    };
+}
+
+# When testing via MySpongeDBI, fake table contents
 package # Hide from PAUSE
-    MySponge::db;
-@MySponge::ISA = ('DBI');
-@MySponge::db::ISA = ('DBI::db');
-@MySponge::st::ISA = ('DBI::st');
-my @cols;
+    MySpongeDBI::db;
+@MySpongeDBI::ISA = ('DBI');
+@MySpongeDBI::db::ISA = ('DBI::db');
+@MySpongeDBI::st::ISA = ('DBI::st');
+my $cols;
 my @rows;
 sub setup {
-    @cols = @{shift()};
-    @rows = @_;
+    ($cols, @rows) = @_;
 }
 sub prepare {
     my($dbh, $sql, $attr) = @_;
     $attr ||= {};
-    $attr->{NAME} ||= \@cols;
-    $attr->{rows} ||= \@rows;
+    $attr->{NAME} ||= $cols;
+    $attr->{rows} ||= [ @rows ];
     $dbh->SUPER::prepare($sql, $attr);
 }
 

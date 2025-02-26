@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -67,6 +67,30 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $wh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+
+	open my $rh, '<', $self->{Source}
+		or die "Failed to open $self->{Source} for reading: $!\n";
+
+	local $/ = undef;
+
+	print { $wh } readline $rh;
+
+	close $rh;
+	close $wh;
+
+	return $out // $raw;
+
+}
+
 sub metadata {
 
 	my $self = shift;
@@ -74,5 +98,9 @@ sub metadata {
 	return $self->{Metadata}->hash;
 
 }
+
+sub has_cover { 0 }
+
+sub cover { undef }
 
 1;

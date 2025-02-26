@@ -10,6 +10,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Imager' => '1.019',
 		'Imager::Screenshot' => '0.014',
+		'Math::Round' => '0.08',
 		'Test::Tk' => '3.03',
 		'Tk' => '804.030',
 		'Tk::PopList' => '0.09',

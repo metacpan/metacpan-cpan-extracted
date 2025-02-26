@@ -1,10 +1,11 @@
-use strict;
+use 5.014;
 use warnings;
 
+use lib '.';
 use Test::DBO ExampleP => 'ExampleP';
-use Test::DBO Sponge => 'Sponge', tests => 45;
+use Test::DBO Sponge => 'Sponge', tests => 46;
 
-MySponge::db::setup([qw(id name age)], [123, 'vlyon', 77]);
+MySpongeDBI::db::setup([qw(id name age)], [123, 'vlyon', 77]);
 
 {
     my $warn = '';
@@ -38,7 +39,7 @@ like $@, qr/^Invalid read-write database handle /, 'DBIx::DBO->new validate read
 eval { DBIx::DBO->new(undef, 123) };
 like $@, qr/^Invalid read-only database handle /, 'DBIx::DBO->new validate read-only $dbh';
 
-my $dbh1 = MySponge->connect('DBI:Sponge:') or die $DBI::errstr;
+my $dbh1 = DBI->connect('DBI:Sponge:') or die $DBI::errstr;
 my $dbh2 = DBI->connect('DBI:ExampleP:') or die $DBI::errstr;
 
 eval { DBIx::DBO->new($dbh1, $dbh1, {dbd => 'NoDBD'}) };
@@ -64,6 +65,12 @@ my $t2 = $dbo->table($Test::DBO::test_tbl);
 
 eval { $t->new('no_dbo_object') };
 like $@, qr/^Invalid DBO Object /, 'Requires DBO object';
+
+eval { $dbo->table };
+like $@, qr/^No table name supplied /, 'Valid table arguments';
+
+eval { $dbo->table('') };
+like $@, qr/^No table name supplied /, 'Valid table arguments';
 
 eval { $dbo->table('no_such_table') };
 like $@, qr/^Invalid table: "no_such_table" /, 'Ensure table exists';
@@ -144,14 +151,10 @@ eval { DBIx::DBO::Row->new };
 like $@, qr/^Invalid DBO Object for new Row /, 'Row requires a DBO';
 
 eval { $r->new($dbo) };
-like $@, qr/^Missing parent for new Row /, 'Row requires a parent';
+like $@, qr/^No table specified in new Query /, 'Row requires a parent';
 
 eval { $dbo->row($r) };
-like $@, qr/^Invalid parent for new Row /, 'Row requires a valid parent';
-
-$r = $t->fetch_row;
-eval { $r->value('WrongColumn') };
-like $@, qr/^No such column: "WrongColumn" /, 'Empty row';
+like $@, qr/^Invalid table: /, 'Row requires a valid parent';
 
 $dbo->disconnect;
 eval { $dbo->connect_readonly };

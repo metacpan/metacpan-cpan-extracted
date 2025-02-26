@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -109,13 +109,13 @@ sub browser_dump {
 		die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
 	}
 
-	my $cmd = sprintf("%s %s %d %s %s %s",
+	my $cmd = sprintf
+		"%s %s %d %s %s \"%s\"",
 		$Browsers{ $browser }->{Bin},
 		$Browsers{ $browser }->{Width}, $width,
 		join(" ", @{ $Browsers{ $browser }->{Opts} }),
 		($xhtml ? join(" ", @{ $Browsers{ $browser }->{Xhtml} }) : ''),
-		"\"$file\""
-	);
+		$file;
 
 	my $dump = qx/$cmd/;
 

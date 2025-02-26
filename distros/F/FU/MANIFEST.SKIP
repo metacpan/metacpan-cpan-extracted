@@ -1,0 +1,9 @@
+~($|/)
+(^|/)\.
+^MANIFEST\.bak
+^Makefile\.old
+^Makefile$
+^pm_to_blib
+^blib/
+^FU-[^/]+/
+^FU\.(c|bs|o)

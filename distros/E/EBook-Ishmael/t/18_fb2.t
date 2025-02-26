@@ -21,7 +21,7 @@ is_deeply(
 		Contributor => [ 'Unknown' ],
 		Author => [ 'Unknown' ],
 		Created => [
-			'8.2.2025',
+			'25.2.2025',
 			'0101',
 		],
 		Genre => [ 'antique' ],
@@ -35,5 +35,13 @@ is_deeply(
 );
 
 ok($ebook->html, "html ok");
+
+ok($ebook->has_cover, "has cover");
+
+is(
+	substr($ebook->cover, 0, 3),
+	pack("CCC", 0xff, 0xd8, 0xff),
+	"cover looks liek a jpeg"
+);
 
 done_testing();

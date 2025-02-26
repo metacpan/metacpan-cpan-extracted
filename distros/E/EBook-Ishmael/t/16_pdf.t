@@ -10,7 +10,9 @@ use File::Which;
 
 use EBook::Ishmael::EBook;
 
-my $TEST_PDF = $ENV{TEST_PDF} // (defined which('pdftohtml') and defined which('pdfinfo'));
+my $TEST_PDF =
+	$ENV{TEST_PDF} //
+	(which('pdftohtml') and which('pdfinfo') and which('pdftopng'));
 
 unless ($TEST_PDF) {
 	plan skip_all => "TEST_PDF set to 0, or poppler utils are not installed";
@@ -40,5 +42,13 @@ ok($ebook->metadata->{Created}[0], 'metadata creation date ok');
 ok($ebook->metadata->{Modified}[0], 'metadata modification date ok');
 
 ok($ebook->html, "html ok");
+
+ok($ebook->has_cover, "has cover");
+
+is(
+	substr($ebook->cover, 0, 8),
+	pack("CCCCCCCC", 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a),
+	"cover looks like a png"
+);
 
 done_testing();

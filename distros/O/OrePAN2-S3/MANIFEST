@@ -1,0 +1,11 @@
+bin/create-insecure-bucket
+bin/orepan2-s3
+bin/orepan2-s3-index
+ChangeLog
+lib/OrePAN2/S3.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+share/orepan2-s3.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

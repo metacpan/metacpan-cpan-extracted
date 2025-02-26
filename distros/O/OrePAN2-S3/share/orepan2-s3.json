@@ -1,0 +1,11 @@
+{
+    "AWS": {
+        "profile" : "prod",
+        "region" : "us-east-1",
+        "bucket" : "my-bucket",
+        "prefix" : "orepan2"
+    },
+    "CloudFront" : {
+        "DistributionId" : "**************"
+    }
+}

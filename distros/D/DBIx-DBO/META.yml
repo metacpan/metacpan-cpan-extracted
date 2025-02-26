@@ -3,42 +3,41 @@ abstract: 'An OO interface to SQL queries and results.  Easily constructs SQL qu
 author:
   - 'Vernon Lyon <vlyon@cpan.org>'
 build_requires:
-  File::Temp: 0
-  Module::Build: 0.30
-  Test::More: 0.62
+  File::Temp: '0'
+  Module::Build: '0.30'
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.30
+  Module::Build: '0.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-DBO
 provides:
   DBIx::DBO:
     file: lib/DBIx/DBO.pm
-    version: 0.40
+    version: '0.50'
   DBIx::DBO::Query:
     file: lib/DBIx/DBO/Query.pm
-    version: 0
   DBIx::DBO::Row:
     file: lib/DBIx/DBO/Row.pm
-    version: 0
   DBIx::DBO::Table:
     file: lib/DBIx/DBO/Table.pm
-    version: 0
 recommends:
-  DBD::Oracle: 1.13
-  DBD::Pg: 2
-  DBD::SQLite: 1.31
-  DBD::mysql: 4.004
-  Storable: 2.38
+  DBD::MariaDB: '1.22'
+  DBD::Oracle: '1.13'
+  DBD::Pg: '2'
+  DBD::SQLite: '1.31'
+  DBD::mysql: '4.004'
+  Storable: '2.38'
 requires:
-  DBI: 1.50
-  perl: 5.008001
+  DBI: '1.55'
+  perl: '5.014'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-DBO
+  bugtracker: https://github.com/vlyon/DBIx-DBO/issues
   license: http://dev.perl.org/licenses/
-  repository: https://vlyon.svn.beanstalkapp.com/src/dbo
-version: 0.40
+  repository: git://github.com/vlyon/DBIx-DBO.git
+version: '0.50'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

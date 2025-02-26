@@ -1,7 +1,8 @@
 package # hide from PAUSE
     DBIx::DBO::DBD;
 
-use strict;
+use 5.014;
+use mro;
 use warnings;
 use Carp 'croak';
 use Scalar::Util 'blessed';
@@ -29,19 +30,16 @@ sub _init_dbo {
 }
 
 sub _get_table_schema {
-    my($class, $me, $schema, $table) = @_;
+    my($class, $me, $table) = @_;
 
-    my $q_schema = $schema;
-    my $q_table = $table;
-    $q_schema =~ s/([\\_%])/\\$1/g if defined $q_schema;
-    $q_table =~ s/([\\_%])/\\$1/g;
+    my $q_table = $table =~ s/([\\_%])/\\$1/gr;
 
     # First try just these types
-    my $info = $me->rdbh->table_info(undef, $q_schema, $q_table,
+    my $info = $me->rdbh->table_info(undef, undef, $q_table,
         'TABLE,VIEW,GLOBAL TEMPORARY,LOCAL TEMPORARY,SYSTEM TABLE')->fetchall_arrayref;
     # Then if we found nothing, try any type
-    $info = $me->rdbh->table_info(undef, $q_schema, $q_table)->fetchall_arrayref if $info and @$info == 0;
-    croak 'Invalid table: '.$class->_qi($me, $schema, $table) unless $info and @$info == 1 and $info->[0][2] eq $table;
+    $info = $me->rdbh->table_info(undef, undef, $q_table)->fetchall_arrayref if $info and @$info == 0;
+    croak 'Invalid table: '.$class->_qi($me, $table) unless $info and @$info == 1 and $info->[0][2] eq $table;
     return $info->[0][1];
 }
 
@@ -65,7 +63,7 @@ sub _get_table_info {
     $h{PrimaryKeys} = [];
     $class->_set_table_key_info($me, $schema, $table, \%h);
 
-    return $me->{TableInfo}{defined $schema ? $schema : ''}{$table} = \%h;
+    return $me->{TableInfo}{$schema // ''}{$table} = \%h;
 }
 
 sub _set_table_key_info {
@@ -117,7 +115,7 @@ sub _qi {
     my($class, $me, @id) = @_;
     return $me->rdbh->quote_identifier(@id) if $me->config('QuoteIdentifier');
     # Strip off any null/undef elements (ie schema)
-    shift(@id) while @id and not (defined $id[0] and length $id[0]);
+    shift(@id) while @id and not length $id[0];
     return join '.', @id;
 }
 
@@ -130,7 +128,6 @@ sub _sql {
     my $dbg = $me->config('DebugSQL') or return;
     my($sql, @bind) = @_;
 
-    require Carp::Heavy if eval "$Carp::VERSION < 1.12";
     my $loc = Carp::short_error_loc();
     my %i = Carp::caller_info($loc);
     my $trace;
@@ -212,7 +209,7 @@ sub _bind_params_delete {
 
 sub _build_table {
     my($class, $me, $t) = @_;
-    my $from = $t->_from($me->{build_data});
+    my $from = $t->_as_table($me);
     my $alias = $me->_table_alias($t);
     $alias = defined $alias ? ' '.$class->_qi($me, $alias) : '';
     return $from.$alias;
@@ -221,43 +218,43 @@ sub _build_table {
 sub _build_show {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{show} if defined $h->{show};
     my $distinct = $h->{Show_Distinct} ? 'DISTINCT ' : '';
     undef @{$h->{Show_Bind}};
-    return $h->{show} = $distinct.'*' unless @{$h->{Showing}};
-    my @flds;
-    for my $fld (@{$h->{Showing}}) {
-        if (_isa($fld, 'DBIx::DBO::Table', 'DBIx::DBO::Query')) {
-            push @flds, $class->_qi($me, $me->_table_alias($fld) || $fld->{Name}).'.*';
-        } else {
-            $h->{_subqueries}{$fld->[0][0]} = $fld->[0][0]->sql if _isa($fld->[0][0], 'DBIx::DBO::Query');
-            push @flds, $class->_build_val($me, $h->{Show_Bind}, @$fld);
-        }
-    }
-    return $h->{show} = $distinct.join(', ', @flds);
+    return $distinct.'*' unless @{$h->{select}};
+
+    # Parse a list of columns & tables into fields
+    my @flds = map {
+        _isa($_, 'DBIx::DBO::Table', 'DBIx::DBO::Query')
+        ? $class->_qi($me, $me->_table_alias($_) || $_->{Name}).'.*'
+        : $class->_build_val($me, $h->{Show_Bind}, @$_)
+    } @{$h->{select}};
+    return $distinct.join(', ', @flds);
 }
 
 sub _build_from {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{from} if defined $h->{from};
+
+    # Row objects have cached the SQL and bind values
+    return $h->{from_sql} if exists $h->{from_sql};
+
     undef @{$h->{From_Bind}};
     my @tables = $me->tables;
-    $h->{from} = $class->_build_table($me, $tables[0]);
+    my $from = $class->_build_table($me, $tables[0]);
     for (my $i = 1; $i < @tables; $i++) {
-        $h->{from} .= $h->{Join}[$i].$class->_build_table($me, $tables[$i]);
-        $h->{from} .= ' ON '.join(' AND ', $class->_build_where_chunk($me, $h->{From_Bind}, 'OR', $h->{Join_On}[$i]))
-            if $h->{Join_On}[$i];
+        $from .= $h->{join_types}[$i].$class->_build_table($me, $tables[$i]);
+        $from .= ' ON '.join(' AND ', $class->_build_where_chunk($me, $h->{From_Bind}, 'OR', $h->{"join$i"}))
+            if $h->{"join$i"};
     }
-    return $h->{from};
+    return $from;
 }
 
 sub _parse_col_val {
     my($class, $me, $col, %c) = @_;
-    unless (defined $c{Aliases}) {
-        (my $method = (caller(1))[3]) =~ s/.*:://;
-        $c{Aliases} = $class->_alias_preference($me, $method);
-    }
+    $c{Aliases} //= do {
+        my($method) = (caller(1))[3] =~ /(\w+)$/;
+        $class->_alias_preference($me, $method);
+    };
     return $class->_parse_val($me, $col, Check => 'Column', %c) if ref $col;
     return [ $class->_parse_col($me, $col, $c{Aliases}) ];
 }
@@ -299,49 +296,56 @@ sub _build_col {
 }
 
 sub _parse_val {
-    my($class, $me, $fld, %c) = @_;
-    $c{Check} = '' unless defined $c{Check};
+    my($class, $me, $val, %c) = @_;
+    $c{Check} //= '';
 
+    my @fld;
     my $func;
     my $opt;
-    if (ref $fld eq 'SCALAR') {
+    if (ref $val eq 'SCALAR') {
         croak 'Invalid '.($c{Check} eq 'Column' ? 'column' : 'field').' reference (scalar ref to undef)'
-            unless defined $$fld;
-        $func = $$fld;
-        $fld = [];
-    } elsif (ref $fld eq 'HASH') {
-        $func = $fld->{FUNC} if exists $fld->{FUNC};
-        $opt->{AS} = $fld->{AS} if exists $fld->{AS};
-        if (exists $fld->{ORDER}) {
-            croak 'Invalid ORDER, must be ASC or DESC' if $fld->{ORDER} !~ /^(A|DE)SC$/i;
-            $opt->{ORDER} = uc $fld->{ORDER};
+            unless defined $$val;
+        $func = $$val;
+    } elsif (ref $val eq 'HASH') {
+        $func = $val->{FUNC} if exists $val->{FUNC};
+        $opt->{AS} = $val->{AS} if exists $val->{AS};
+        if (exists $val->{ORDER}) {
+            croak 'Invalid ORDER, must be ASC or DESC' if $val->{ORDER} !~ /^(A|DE)SC$/i;
+            $opt->{ORDER} = uc $val->{ORDER};
         }
-        $opt->{COLLATE} = $fld->{COLLATE} if exists $fld->{COLLATE};
-        if (exists $fld->{COL}) {
-            croak 'Invalid HASH containing both COL and VAL' if exists $fld->{VAL};
-            my @cols = ref $fld->{COL} eq 'ARRAY' ? @{$fld->{COL}} : $fld->{COL};
-            $fld = [ map $class->_parse_col($me, $_, $c{Aliases}), @cols ];
-        } else {
-            $fld = exists $fld->{VAL} ? $fld->{VAL} : [];
+        $opt->{COLLATE} = $val->{COLLATE} if exists $val->{COLLATE};
+        if (exists $val->{COL}) {
+            croak 'Invalid HASH containing both COL and VAL' if exists $val->{VAL};
+            my @cols = ref $val->{COL} eq 'ARRAY' ? @{$val->{COL}} : ($val->{COL});
+            @fld = map $class->_parse_col($me, $_, $c{Aliases}), @cols;
+        } elsif (exists $val->{VAL}) {
+            @fld = ref $val->{VAL} eq 'ARRAY' ? @{$val->{VAL}} : ($val->{VAL});
         }
-    } elsif (_isa($fld, 'DBIx::DBO::Column')) {
-        return [ $class->_valid_col($me, $fld) ];
+    } elsif (ref $val eq 'ARRAY') {
+        @fld = @$val;
+    } elsif (_isa($val, 'DBIx::DBO::Column')) {
+        return [ $class->_valid_col($me, $val) ];
+    } else {
+        @fld = ($val);
     }
-    $fld = [$fld] unless ref $fld eq 'ARRAY';
 
     # Swap placeholders
-    my $with = @$fld;
+    my $with = @fld;
     if (defined $func) {
         my $need = $class->_substitute_placeholders($me, $func);
         croak "The number of params ($with) does not match the number of placeholders ($need)" if $need != $with;
     } elsif ($with != 1 and $c{Check} ne 'Auto') {
         croak 'Invalid '.($c{Check} eq 'Column' ? 'column' : 'field')." reference (passed $with params instead of 1)";
     }
-    return ($fld, $func, $opt);
+    # Check for subqueries
+    for my $subquery (grep _isa($_, 'DBIx::DBO::Query'), @fld) {
+        $subquery->_add_up_query($me);
+    }
+    return (\@fld, $func, $opt);
 }
 
 sub _substitute_placeholders {
-    my($class, $me) = @_;
+    #my($class, $me, $func) = @_;
     my $num_placeholders = 0;
     $_[2] =~ s/((?<!\\)(['"`]).*?[^\\]\2|\?)/$1 eq '?' ? (++$num_placeholders, PLACEHOLDER) : $1/eg;
     return $num_placeholders;
@@ -363,7 +367,7 @@ sub _build_val {
         } elsif (ref $_ eq 'SCALAR') {
             $$_;
         } elsif (_isa($_, 'DBIx::DBO::Query')) {
-            $_->_from($me->{build_data});
+            $_->_as_table($me);
         } else {
             croak 'Invalid field: '.$_;
         }
@@ -384,12 +388,11 @@ sub _build_val {
 sub _build_where {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{where} if defined $h->{where};
     undef @{$h->{Where_Bind}};
     my @where;
     push @where, $class->_build_quick_where($me, $h->{Where_Bind}, @{$h->{Quick_Where}}) if exists $h->{Quick_Where};
-    push @where, $class->_build_where_chunk($me, $h->{Where_Bind}, 'OR', $h->{Where_Data}) if exists $h->{Where_Data};
-    return $h->{where} = join ' AND ', @where;
+    push @where, $class->_build_where_chunk($me, $h->{Where_Bind}, 'OR', $h->{where}) if exists $h->{where};
+    return join ' AND ', @where;
 }
 
 # Construct the WHERE contents of one set of parentheses
@@ -490,38 +493,35 @@ sub _build_set {
 sub _build_group {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{group} if defined $h->{group};
     undef @{$h->{Group_Bind}};
-    return $h->{group} = join ', ', map $class->_build_val($me, $h->{Group_Bind}, @$_), @{$h->{GroupBy}};
+    return join ', ', map $class->_build_val($me, $h->{Group_Bind}, @$_), @{$h->{group}};
 }
 
 # Construct the HAVING clause
 sub _build_having {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{having} if defined $h->{having};
     undef @{$h->{Having_Bind}};
     my @having;
-    push @having, $class->_build_where_chunk($me, $h->{Having_Bind}, 'OR', $h->{Having_Data}) if exists $h->{Having_Data};
-    return $h->{having} = join ' AND ', @having;
+    push @having, $class->_build_where_chunk($me, $h->{Having_Bind}, 'OR', $h->{having}) if exists $h->{having};
+    return join ' AND ', @having;
 }
 
 sub _build_order {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{order} if defined $h->{order};
     undef @{$h->{Order_Bind}};
-    return $h->{order} = join ', ', map $class->_build_val($me, $h->{Order_Bind}, @$_), @{$h->{OrderBy}};
+    return join ', ', map $class->_build_val($me, $h->{Order_Bind}, @$_), @{$h->{order}};
 }
 
 sub _build_limit {
     my($class, $me) = @_;
     my $h = $me->_build_data;
-    return $h->{limit} if defined $h->{limit};
-    return $h->{limit} = '' unless defined $h->{LimitOffset};
-    $h->{limit} = 'LIMIT '.$h->{LimitOffset}[0];
-    $h->{limit} .= ' OFFSET '.$h->{LimitOffset}[1] if $h->{LimitOffset}[1];
-    return $h->{limit};
+    return '' unless defined $h->{limit};
+    my $sql = 'LIMIT ';
+    $sql .= $h->{limit}[0] >= 0 ? $h->{limit}[0] : 18446744073709551615;
+    $sql .= ' OFFSET '.$h->{limit}[1] if $h->{limit}[1];
+    return $sql;
 }
 
 sub _get_config {
@@ -545,15 +545,18 @@ sub _set_config {
 # Query methods
 sub _rows {
     my($class, $me) = @_;
-    $me->_sth and ($me->{sth}{Executed} or $me->run)
+    if (exists $me->{cache}) {
+        return $me->{Row_Count} = @{ $me->{cache}{data} };
+    }
+    $me->{sth} or $me->run
         or croak $me->rdbh->errstr;
-    my $rows = $me->_sth->rows;
+    my $rows = $me->{sth}->rows;
     $me->{Row_Count} = $rows == -1 ? undef : $rows;
 }
 
 sub _calc_found_rows {
     my($class, $me) = @_;
-    local $me->{build_data}{limit} = '';
+    local $me->{build_data}{limit};
     $me->{Found_Rows} = $me->count_rows;
 }
 
@@ -654,7 +657,6 @@ sub _reset_row_on_update {
             my @cidx = map $me->_column_idx($_), @cols;
             unless (grep $cant_update[$_], @cidx) {
                 my %bd = %{$$me->{build_data}};
-                delete $bd{Where_Data};
                 delete $bd{where};
                 $bd{Quick_Where} = [map { $cols[$_] => $$me->{array}[ $cidx[$_] ] } 0 .. $#cols];
                 my($sql, @bind) = do {
@@ -674,19 +676,20 @@ sub _build_data_matching_this_row {
     my($class, $me) = @_;
     # Identify the row by the PrimaryKeys if any, otherwise by all Columns
     my @quick_where;
-    for my $tbl (@{$$me->{Tables}}) {
+    for my $tbl ($me->tables) {
         for my $col (map $tbl ** $_, @{$tbl->{ @{$tbl->{PrimaryKeys}} ? 'PrimaryKeys' : 'Columns' }}) {
             my $i = $me->_column_idx($col);
             defined $i or croak 'The '.$class->_qi($me, $tbl->{Name}, $col->[1]).' field needed to identify this row, was not included in this query';
             push @quick_where, $col => $$me->{array}[$i];
         }
     }
+    my $bd = $me->_build_data;
     my %h = (
-        Showing => $$me->{build_data}{Showing},
-        from => $$me->{build_data}{from},
+        select => $bd->{select},
+        from_sql => exists $$me->{Parent} ? $class->_build_from($$me->{Parent}) : $bd->{from_sql},
         Quick_Where => \@quick_where
     );
-    $h{From_Bind} = $$me->{build_data}{From_Bind} if exists $$me->{build_data}{From_Bind};
+    $h{From_Bind} = $bd->{From_Bind} if exists $bd->{From_Bind};
     return \%h;
 }
 
@@ -706,9 +709,9 @@ sub _require_dbd_class {
     if ($rv) {
         warn @warn if @warn;
     } else {
-        (my $file = $dbd_class.'.pm') =~ s'::'/'g;
-        if ($@ !~ / \Q$file\E in \@INC /) {
-            (my $err = $@) =~ s/\n.*$//; # Remove the last line
+        my $file = $dbd_class =~ s|::|/|gr;
+        if ("$@" !~ / \Q$file.pm\E in \@INC /) {
+            my $err = $@ =~ s/\n.*$//r; # Remove the last line
             chomp @warn;
             chomp $err;
             croak join "\n", @warn, $err, "Can't load $dbd driver";
@@ -725,10 +728,7 @@ sub _require_dbd_class {
         unless (@{$dbd_class.'::ISA'}) {
             my @isa = map $_->_require_dbd_class($dbd), grep $_->isa(__PACKAGE__), @{$class.'::ISA'};
             @{$dbd_class.'::ISA'} = ($class, @isa);
-            if (@isa) {
-                mro::set_mro($dbd_class, 'c3');
-                Class::C3::initialize() if $] < 5.009_005;
-            }
+            mro::set_mro($dbd_class, 'c3') if @isa;
         }
         push @CARP_NOT, $dbd_class;
         $inheritance{$class}{$dbd} = $dbd_class;

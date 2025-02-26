@@ -92,8 +92,7 @@ Returns the L<Config::Grammar> parser for the configuration of this plugin.
 
 =cut
 
-has grammar => sub {
-    my $self = shift;
+has grammar => sub ($self) {
     return {
         _doc => 'Base class documentation string. Should be overwritten by the child class',
         _vars => [qw(tab-name)],
@@ -158,8 +157,8 @@ the current controller
 
 =cut
 
-has controller => sub {
-    shift->user->controller;
+has controller => sub ($self) {
+    return $self->user->controller if $self->user;
 }, weak => 1;
 
 =head2 app
@@ -168,8 +167,8 @@ the app object
 
 =cut
 
-has app => sub {
-    shift->user->app;
+has app => sub ($self) {
+    return $self->user->app if $self->user;
 }, weak => 1;
 
 =head2 log
@@ -178,10 +177,9 @@ the log object
 
 =cut
 
-has log => sub {
-    my $self = shift;
-    return $self->controller->log if $self->user and $self->controller;
-    $self->app->log;
+has log => sub ($self) {
+    return $self->controller->log if $self->controller;
+    return $self->app->log if $self->app
 };
 
 =head2 args

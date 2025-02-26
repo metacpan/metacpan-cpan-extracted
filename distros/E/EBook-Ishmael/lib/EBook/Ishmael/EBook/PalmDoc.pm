@@ -1,12 +1,12 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
 use EBook::Ishmael::Decode qw(lz77_decode);
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::EBook::PDB;
+use EBook::Ishmael::PDB;
 use EBook::Ishmael::TextToHtml;
 
 my $TYPE    = 'TEXt';
@@ -80,7 +80,7 @@ sub new {
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_pdb} = EBook::Ishmael::EBook::PDB->new($file);
+	$self->{_pdb} = EBook::Ishmael::PDB->new($file);
 
 	my $hdr = $self->{_pdb}->record(0)->data;
 
@@ -141,6 +141,24 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+
+	print { $fh } map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1;
+
+	close $fh;
+
+	return $out // $raw;
+
+}
+
 sub metadata {
 
 	my $self = shift;
@@ -148,5 +166,9 @@ sub metadata {
 	return $self->{Metadata}->hash;
 
 }
+
+sub has_cover { 0 }
+
+sub cover { undef }
 
 1;

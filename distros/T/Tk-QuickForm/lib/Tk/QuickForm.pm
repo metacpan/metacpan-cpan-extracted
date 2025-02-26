@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use Tk;
 use base qw(Tk::Frame);

@@ -1,12 +1,10 @@
-package EBook::Ishmael::EBook::PDB;
+package EBook::Ishmael::PDB;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
-use EBook::Ishmael::EBook::PDB::Record;
-
-# Not actually a normal Ebook module. Used by PDB-based ebook formats.
+use EBook::Ishmael::PDB::Record;
 
 my $HEADER_COMMON = 78;
 my $RECORD_INFO = 8;
@@ -109,7 +107,7 @@ sub new {
 
 		read $fh, my ($buf), $size;
 
-		push @{ $self->{Recs} }, EBook::Ishmael::EBook::PDB::Record->new(
+		push @{ $self->{Recs} }, EBook::Ishmael::PDB::Record->new(
 			$buf,
 			$recs[$i]
 		);
@@ -261,25 +259,25 @@ sub size {
 
 =head1 NAME
 
-EBook::Ishmael::EBook::PDB - L<ishmael> PDB interface
+EBook::Ishmael::PDB - ishmael PDB interface
 
 =head1 SYNOPSIS
 
-  use EBook::Ishmael::EBook::PDB;
+  use EBook::Ishmael::PDB;
 
-  my $pdb = EBook::Ishmael::EBook::PDB->new($file);
+  my $pdb = EBook::Ishmael::PDB->new($file);
 
 =head1 DESCRIPTION
 
-B<EBook::Ishmael::EBook::PDB> is a simple interface for reading Palm PDB files.
+B<EBook::Ishmael::PDB> is a simple interface for reading Palm PDB files.
 For L<ishmael> user documentation, you should consult its manual (this is
 developer documentation).
 
 =head1 METHODS
 
-=head2 $p = EBook::Ishmael::EBook::PDB->new($pdb)
+=head2 $p = EBook::Ishmael::PDB->new($pdb)
 
-Returns a blessed C<EBook::Ishmael::EBook::PDB> object representing the given
+Returns a blessed C<EBook::Ishmael::PDB> object representing the given
 PDB file C<$pdb>.
 
 =head2 $n = $p->name()
@@ -369,6 +367,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<EBook::Ishmael::EBook::PDB::Record>
+L<EBook::Ishmael::PDB::Record>
 
 =cut

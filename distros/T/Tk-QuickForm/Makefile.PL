@@ -7,7 +7,7 @@ WriteMakefile(
 		'Scalar::Util::Numeric' => 0,
 		'Test::Tk'		=> '3.02',
 		'Tk'			=> '804.033',
-		'Tk::ColorEntry'	=> '0.10',
+		'Tk::ColorEntry'	=> '0.11',
 		'Tk::FileBrowser'	=> '0.09',
 		'Tk::FontDialog'	=> '0.15',
 		'Tk::ListEntry'	=> '0.03',

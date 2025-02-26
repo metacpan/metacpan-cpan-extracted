@@ -28,7 +28,7 @@ use Slackware::SBoKeeper::System;
 # on the system's state:
 # * pull
 
-plan tests => 102;
+plan tests => 105;
 
 my $TMP_DATA = 'tmp-data.txt';
 my $DATA_DIR = File::Spec->catfile(qw(t data datafiles));
@@ -345,6 +345,43 @@ is_deeply(
 		'luajit' => 1,
 	},
 	"Blacklist config file option is ok"
+);
+
+create_test_config(
+	$TEST_CONF,
+	{
+		DataFile  => $TMP_DATA,
+		SBoPath   => $TEST_REPO,
+		Blacklist => $TEST_BLACKLIST,
+	}
+);
+
+@ARGV = ('-c', $TEST_CONF, 'help');
+$obj = Slackware::SBoKeeper->init();
+
+is(
+	$obj->get('DataFile'),
+	File::Spec->catfile(cwd(), $TMP_DATA),
+	"Relative DataFile config file option is ok"
+);
+is(
+	$obj->get('SBoPath'),
+	File::Spec->catfile(cwd(), $TEST_REPO),
+	"Relative SBoPath config file option is ok"
+);
+is_deeply(
+	$obj->get('Blacklist'),
+	{
+		'python3-setuptools-opt'  => 1,
+		'python3-packaging-opt'   => 1,
+		'python3-build'           => 1,
+		'python3-pyproject-hooks' => 1,
+		'python3-installer'       => 1,
+		'python3-flit_core'       => 1,
+		'python3-meson-opt'       => 1,
+		'python3-wheel'           => 1,
+	},
+	"Blacklist config option w/ relative blacklist file is ok"
 );
 
 create_test_config(

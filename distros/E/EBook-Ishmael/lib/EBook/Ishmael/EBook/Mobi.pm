@@ -1,13 +1,13 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
 use XML::LibXML;
 
 use EBook::Ishmael::Decode qw(lz77_decode);
-use EBook::Ishmael::EBook::PDB;
+use EBook::Ishmael::PDB;
 use EBook::Ishmael::MobiHuff;
 
 # Many thanks to Tommy Persson, the original author of mobi2html, a script
@@ -57,6 +57,23 @@ sub heuristic {
 	close $fh;
 
 	return $type eq $TYPE && $creator eq $CREATOR;
+
+}
+
+sub _clean_html {
+
+	my $html = shift;
+
+	$$html =~ s/<mbp:pagebreak\s*\//<br style=\"page-break-after:always\" \//g;
+	$$html =~ s/<mbp:pagebreak\s*/<br style=\"page-break-after:always\" \//g;
+	$$html =~ s/<\/mbp:pagebreak>//g;
+	$$html =~ s/<guide>.*?<\/guide>//g;
+	$$html =~ s/<\/?mbp:nu>//g;
+	$$html =~ s/<\/?mbp:section//g;
+	$$html =~ s/<\/?mbp:frameset>//g;
+	$$html =~ s/<\/?mbp:slave-frame>//g;
+
+	return 1;
 
 }
 
@@ -135,6 +152,15 @@ sub _read_exth {
 	my $self = shift;
 	my $exth = shift;
 
+	# Special exth handlers that do not handle normal metadata.
+	my %special = (
+		201 => sub {
+			defined $self->{_imgrec}
+				? $self->{_coverrec} = $self->{_imgrec} + unpack "N", shift
+				: undef
+		},
+	);
+
 	my ($doctype, $len, $items) = unpack "a4 N N", $exth;
 
 	my $pos = 12;
@@ -148,6 +174,8 @@ sub _read_exth {
 		if (exists $EXTH_RECORDS{ $id }) {
 			my ($k, $v) = $EXTH_RECORDS{ $id }->($content);
 			push @{ $self->{Metadata}->$k }, $v;
+		} elsif (exists $special{ $id }) {
+			$special{ $id }->($content);
 		}
 
 		$pos += $size;
@@ -181,13 +209,15 @@ sub new {
 		_exth_flag   => undef,
 		_extra_data  => undef,
 		_huff        => undef,
+		_imgrec      => undef,
+		_coverrec    => undef,
 	};
 
 	bless $self, $class;
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_pdb} = EBook::Ishmael::EBook::PDB->new($file);
+	$self->{_pdb} = EBook::Ishmael::PDB->new($file);
 
 	my $hdr = $self->{_pdb}->record(0)->data;
 
@@ -229,6 +259,7 @@ sub new {
 	) = unpack "a4 N N N N N", $mobihdr;
 
 	my ($toff, $tlen) = unpack "N N", substr $mobihdr, 0x54 - 16;
+	$self->{_imgrec} = unpack "N", substr $mobihdr, 0x6c - 16;
 	$self->{_exth_flag}  = unpack "N", substr $mobihdr, 0x70;
 	$self->{_extra_data} = unpack "n", substr $mobihdr, 0xf2 - 16;
 	my ($hoff, $hcount) = unpack "N N", substr $mobihdr, 0x70 - 16;
@@ -276,14 +307,7 @@ sub html {
 
 	my $cont = join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1);
 
-	$cont =~ s/<mbp:pagebreak\s*\//<br style=\"page-break-after:always\" \//g;
-	$cont =~ s/<mbp:pagebreak\s*/<br style=\"page-break-after:always\" \//g;
-	$cont =~ s/<\/mbp:pagebreak>//g;
-	$cont =~ s/<guide>.*?<\/guide>//g;
-	$cont =~ s/<\/?mbp:nu>//g;
-	$cont =~ s/<\/?mbp:section//g;
-	$cont =~ s/<\/?mbp:frameset>//g;
-	$cont =~ s/<\/?mbp:slave-frame>//g;
+	_clean_html(\$cont);
 
 	print { $fh } $cont;
 
@@ -293,11 +317,67 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+	my $out  = shift;
+
+	my $raw = '';
+
+	open my $fh, '>', $out // \$raw
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+
+	my $cont = join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1);
+
+	_clean_html(\$cont);
+
+	my $dom = XML::LibXML->load_html(
+		string => $cont,
+		recover => 2
+	);
+
+	print { $fh } $dom->textContent;
+
+	close $fh;
+
+	return $out // $raw;
+
+}
+
 sub metadata {
 
 	my $self = shift;
 
 	return $self->{Metadata}->hash;
+
+}
+
+sub has_cover {
+
+	my $self = shift;
+
+	return defined $self->{_coverrec} && $self->{_coverrec} < $self->{_pdb}->recnum;
+
+}
+
+sub cover {
+
+	my $self = shift;
+	my $out  = shift;
+
+	return undef unless $self->has_cover;
+
+	my $bin;
+
+	open my $fh, '>', $out // \$bin
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh;
+
+	print { $fh } $self->{_pdb}->record($self->{_coverrec})->data;
+
+	close $fh;
+
+	return $out // $bin;
 
 }
 

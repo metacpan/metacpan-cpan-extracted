@@ -8,7 +8,7 @@ use Tk;
 # use Tk::GtkSettings;
 # applyGtkSettings;
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 BEGIN { 
 	use_ok('Tk::QuickForm::CBaseClass');
 	use_ok('Tk::QuickForm::CBooleanItem');
@@ -253,6 +253,10 @@ if (defined $app) {
 
 @tests = (
 	[sub { return defined $form }, 1, 'created Tk::QuickForm'],
+	[sub { 
+		$form->put(-color1_0 => '#477F47');
+		return $form->get('-color1_0');
+	}, '#477F47', 'put / get test'],
 );
 
 starttesting;

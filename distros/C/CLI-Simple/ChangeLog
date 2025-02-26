@@ -1,3 +1,15 @@
+Tue Feb 25 10:00:08 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.9]:
+	* VERSION: bump
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- pod tweaks
+	(new)
+	- allow for custom help() method
+	(command): new
+	(run): remove help invocation as it now happens in new()
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+
 Sat Feb 15 09:25:47 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.0.8]:

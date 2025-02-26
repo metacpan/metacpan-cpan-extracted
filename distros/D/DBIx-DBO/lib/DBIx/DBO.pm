@@ -1,12 +1,11 @@
-package DBIx::DBO;
-
-use 5.008;
-use strict;
+use 5.014;
 use warnings;
+
+package DBIx::DBO 0.50;
+
 use DBI;
 use Carp qw(carp croak);
 
-our $VERSION;
 our %Config = (
     AutoReconnect => 0,
     CacheQuery => 0,
@@ -14,28 +13,17 @@ our %Config = (
     OnRowUpdate => 'simple',
     QuoteIdentifier => 1,
 );
-my $need_c3_initialize;
 my @ConnectArgs;
-
-BEGIN {
-    $VERSION = '0.40';
-    # The C3 method resolution order is required.
-    if ($] < 5.009_005) {
-        require MRO::Compat;
-    } else {
-        require mro;
-    }
-}
 
 use DBIx::DBO::DBD;
 use DBIx::DBO::Table;
 use DBIx::DBO::Query;
 use DBIx::DBO::Row;
 
-sub _dbd_class   { 'DBIx::DBO::DBD' }
-sub _table_class { 'DBIx::DBO::Table' }
-sub _query_class { 'DBIx::DBO::Query' }
-sub _row_class   { 'DBIx::DBO::Row' }
+sub dbd_class   { 'DBIx::DBO::DBD' }
+sub table_class { 'DBIx::DBO::Table' }
+sub query_class { 'DBIx::DBO::Query' }
+sub row_class   { 'DBIx::DBO::Row' }
 
 *_isa = \&DBIx::DBO::DBD::_isa;
 
@@ -149,17 +137,17 @@ sub new {
     if (defined $dbh) {
         croak 'Invalid read-write database handle' unless _isa($dbh, 'DBI::db');
         $new->{dbh} = $dbh;
-        $new->{dbd} ||= $dbh->{Driver}{Name};
+        $new->{dbd} //= $dbh->{Driver}{Name};
     }
     if (defined $rdbh) {
         croak 'Invalid read-only database handle' unless _isa($rdbh, 'DBI::db');
         croak 'The read-write and read-only connections must use the same DBI driver'
             if $dbh and $dbh->{Driver}{Name} ne $rdbh->{Driver}{Name};
         $new->{rdbh} = $rdbh;
-        $new->{dbd} ||= $rdbh->{Driver}{Name};
+        $new->{dbd} //= $rdbh->{Driver}{Name};
     }
     croak "Can't create the DBO, unknown database driver" unless $new->{dbd};
-    $new->{dbd_class} = $me->_dbd_class->_require_dbd_class($new->{dbd});
+    $new->{dbd_class} = $me->dbd_class->_require_dbd_class($new->{dbd});
     $me->_init($new);
 }
 
@@ -176,13 +164,11 @@ sub connect {
         croak 'DBO is already connected' if $me->{dbh};
         $me->_check_driver($_[0]) if @_;
         if ($me->config('AutoReconnect')) {
-            $me->{ConnectArgs} = scalar @ConnectArgs unless defined $me->{ConnectArgs};
-            $conn = $me->{ConnectArgs};
+            $conn = $me->{ConnectArgs} //= scalar @ConnectArgs;
         } else {
             undef $ConnectArgs[$me->{ConnectArgs}] if defined $me->{ConnectArgs};
             delete $me->{ConnectArgs};
         }
-#        $conn = $me->{ConnectArgs} //= scalar @ConnectArgs if $me->config('AutoReconnect');
         $me->{dbh} = $me->_connect($conn, @_) or return;
         return $me;
     }
@@ -199,13 +185,11 @@ sub connect_readonly {
         undef $me->{rdbh};
         $me->_check_driver($_[0]) if @_;
         if ($me->config('AutoReconnect')) {
-            $me->{ConnectReadOnlyArgs} = scalar @ConnectArgs unless defined $me->{ConnectReadOnlyArgs};
-            $conn = $me->{ConnectReadOnlyArgs};
+            $conn = $me->{ConnectReadOnlyArgs} //= scalar @ConnectArgs;
         } else {
             undef $ConnectArgs[$me->{ConnectReadOnlyArgs}] if defined $me->{ConnectReadOnlyArgs};
             delete $me->{ConnectReadOnlyArgs};
         }
-#        $conn = $me->{ConnectReadOnlyArgs} //= scalar @ConnectArgs if $me->config('AutoReconnect');
         $me->{rdbh} = $me->_connect($conn, @_) or return;
         return $me;
     }
@@ -228,38 +212,34 @@ sub _check_driver {
             "The read-write and read-only connections must use the same DBI driver";
 }
 
+# Our HandleError adds a stack trace to PrintError & RaiseError
+sub _handle_error {
+    if ($Config{DebugSQL} > 1) {
+        $_[0] = Carp::longmess($_[0]);
+        return 0;
+    }
+    carp $_[1]->errstr if $_[1]->{PrintError};
+    croak $_[1]->errstr if $_[1]->{RaiseError};
+    return 1;
+}
+
 sub _connect {
-    my $me = shift;
-    my $conn_idx = shift;
-    my @conn;
+    my($me, $conn_idx, @conn) = @_;
 
-    if (@_) {
-        my($dsn, $user, $auth, $attr) = @_;
-        my %attr = %$attr if ref($attr) eq 'HASH';
-
-        # Add a stack trace to PrintError & RaiseError
-        $attr{HandleError} = sub {
-            if ($Config{DebugSQL} > 1) {
-                $_[0] = Carp::longmess($_[0]);
-                return 0;
-            }
-            carp $_[1]->errstr if $_[1]->{PrintError};
-            croak $_[1]->errstr if $_[1]->{RaiseError};
-            return 1;
-        } unless exists $attr{HandleError};
-
-        # AutoCommit is always on
-        %attr = (PrintError => 0, RaiseError => 1, %attr, AutoCommit => 1);
-        @conn = ($dsn, $user, $auth, \%attr);
-
+    if (@conn) {
         # If a conn index is given then store the connection args
         $ConnectArgs[$conn_idx] = \@conn if defined $conn_idx;
     } elsif (defined $conn_idx and $ConnectArgs[$conn_idx]) {
-        # If a conn index is given then retrieve the connection args
+        # Retrieve the connection args
         @conn = @{$ConnectArgs[$conn_idx]};
     } else {
         croak "Can't auto-connect as AutoReconnect was not set";
     }
+
+    my %attr;
+    %attr = %{$conn[3]} if ref $conn[3] eq 'HASH';
+    # AutoCommit is always on
+    %attr = (HandleError => \&_handle_error, PrintError => 0, RaiseError => 1, %attr, AutoCommit => 1);
 
     local @DBIx::DBO::CARP_NOT = qw(DBI);
     DBI->connect(@conn);
@@ -277,7 +257,7 @@ Tables can be specified by their name or an arrayref of schema and table name or
 =cut
 
 sub table {
-    $_[0]->_table_class->new(@_);
+    $_[0]->table_class->new(@_);
 }
 
 =head3 C<query>
@@ -295,7 +275,7 @@ In list context, the C<Query> object and L<Table|DBIx::DBO::Table> objects will 
 =cut
 
 sub query {
-    $_[0]->_query_class->new(@_);
+    $_[0]->query_class->new(@_);
 }
 
 =head3 C<row>
@@ -307,7 +287,7 @@ Create and return a new L<Row|DBIx::DBO::Row> object.
 =cut
 
 sub row {
-    $_[0]->_row_class->new(@_);
+    $_[0]->row_class->new(@_);
 }
 
 =head3 C<selectrow_array>, C<selectrow_arrayref>, C<selectrow_hashref>, C<selectall_arrayref>
@@ -370,7 +350,7 @@ Mainly for internal use.
 
 sub table_info {
     my($me, $table) = @_;
-    croak 'No table name supplied' unless defined $table and length $table;
+    croak 'No table name supplied' unless length $table;
 
     my $schema;
     if (_isa($table, 'DBIx::DBO::Table')) {
@@ -378,12 +358,12 @@ sub table_info {
         ($schema, $table) = @$table{qw(Schema Name)};
     } else {
         ($schema, $table) = ref $table eq 'ARRAY' ? @$table : $me->{dbd_class}->_unquote_table($me, $table);
-        defined $schema or $schema = $me->{dbd_class}->_get_table_schema($me, $schema, $table);
+        $schema //= $me->{dbd_class}->_get_table_schema($me, $table);
 
         $me->{dbd_class}->_get_table_info($me, $schema, $table)
-            unless exists $me->{TableInfo}{defined $schema ? $schema : ''}{$table};
+            unless exists $me->{TableInfo}{$schema // ''}{$table};
     }
-    return ($schema, $table, $me->{TableInfo}{defined $schema ? $schema : ''}{$table});
+    return ($schema, $table, $me->{TableInfo}{$schema // ''}{$table});
 }
 
 =head3 C<disconnect>
@@ -508,18 +488,19 @@ sub config {
     my($me, $opt) = @_;
     if (@_ > 2) {
         return ref $me
-            ? $me->{dbd_class}->_set_config($me->{Config} ||= {}, $opt, $_[2])
-            : $me->_dbd_class->_set_config(\%Config, $opt, $_[2]);
+            ? $me->{dbd_class}->_set_config($me->{Config} //= {}, $opt, $_[2])
+            : $me->dbd_class->_set_config(\%Config, $opt, $_[2]);
     }
     return ref $me
-        ? $me->{dbd_class}->_get_config($opt, $me->{Config} ||= {}, \%Config)
-        : $me->_dbd_class->_get_config($opt, \%Config);
+        ? $me->{dbd_class}->_get_config($opt, $me->{Config} //= {}, \%Config)
+        : $me->dbd_class->_get_config($opt, \%Config);
 }
 
 sub STORABLE_freeze {
     my $me = $_[0];
     return unless ref $me->{dbh} or ref $me->{rdbh};
 
+    # Stash the unfreezable bits
     my %stash = map { $_ => delete $me->{$_} } qw(dbh rdbh ConnectArgs ConnectReadOnlyArgs);
     $me->{dbh} = "$stash{dbh}" if defined $stash{dbh};
     $me->{rdbh} = "$stash{rdbh}" if defined $stash{rdbh};
@@ -528,19 +509,21 @@ sub STORABLE_freeze {
     }
 
     my $frozen = Storable::nfreeze($me);
-    defined $stash{$_} and $me->{$_} = $stash{$_} for qw(dbh rdbh ConnectArgs ConnectReadOnlyArgs);
+
+    # Restore the stashed bits
+    for (qw(dbh rdbh ConnectArgs ConnectReadOnlyArgs)) {
+        $me->{$_} = $stash{$_} if defined $stash{$_};
+    }
+
     return $frozen;
 }
 
 sub STORABLE_thaw {
     my($me, $cloning, $frozen) = @_;
+
     %$me = %{ Storable::thaw($frozen) };
-    if ($me->config('AutoReconnect')) {
-        for (qw(ConnectArgs ConnectReadOnlyArgs)) {
-            $me->{$_} = push(@ConnectArgs, $me->{$_}) - 1 if $me->{$_};
-        }
-    } else {
-        delete $me->{$_} for qw(ConnectArgs ConnectReadOnlyArgs);
+    for (qw(ConnectArgs ConnectReadOnlyArgs)) {
+        $me->{$_} = push(@ConnectArgs, $me->{$_}) - 1 if exists $me->{$_};
     }
 }
 
@@ -587,16 +570,18 @@ C<DBIx::DBO> can be subclassed like any other object oriented module.
   our @ISA = qw(DBIx::DBO);
   ...
 
+=head3 C<table_class>, C<query_class>, C<row_class>
+
 The C<DBIx::DBO> object is used to create C<Table>, C<Query> and C<Row> objects.
-The classes these objects are blessed into are provided by C<_table_class>, C<_query_class> & C<_row_class> methods.
+The classes these objects are blessed into are provided by C<table_class>, C<query_class> & C<row_class> methods.
 So to subclass all the C<DBIx::DBO::*> objects, we need to provide our own class names via those methods.
 
   package MySubClass;
   our @ISA = qw(DBIx::DBO);
   
-  sub _table_class { 'MySubClass::Table' }
-  sub _query_class { 'MySubClass::Query' }
-  sub _row_class   { 'MySubClass::Row' }
+  sub table_class { 'MySubClass::Table' }
+  sub query_class { 'MySubClass::Query' }
+  sub row_class   { 'MySubClass::Row' }
   
   ...
 
@@ -607,11 +592,13 @@ So to subclass all the C<DBIx::DBO::*> objects, we need to provide our own class
 
 Now all new objects created will be blessed into these classes.
 
+=head3 C<dbd_class>
+
 This leaves only the C<DBIx::DBO::DBD> hidden class, which acts as a SQL engine.
 This class is also determined in the same way as other objects,
-so to subclass C<DBIx::DBO::DBD> add a C<_dbd_class> method to C<DBIx::DBO> with the new class name.
+so to subclass C<DBIx::DBO::DBD> add a C<dbd_class> method to C<DBIx::DBO> with the new class name.
 
-  sub _dbd_class { 'MySubClass::DBD' }
+  sub dbd_class { 'MySubClass::DBD' }
 
 Since databases differ slightly in their SQL, this class contains all the SQL specific calls for different DBDs.
 They are found in the class C<DBIx::DBO::DBD::xxx> where I<xxx> is the name of the driver for this DBI handle.
@@ -658,7 +645,7 @@ Please report any bugs or feature requests to C<bug-dbix-dbo AT rt.cpan.org>, or
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2014 Vernon Lyon, all rights reserved.
+Copyright 2009-2025 Vernon Lyon, all rights reserved.
 
 This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

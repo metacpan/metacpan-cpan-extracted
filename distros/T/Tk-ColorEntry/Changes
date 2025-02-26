@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::ColorEntry.
 
+0.11  Tue Feb 25 2025
+	- Added options -notation and -notationselect to Tk::ColorPicker.
+	- Added all conversion routines for all notations.
+
 0.10  Sat Feb 08 2025
 	- Added warnings when opening history file fails.
 

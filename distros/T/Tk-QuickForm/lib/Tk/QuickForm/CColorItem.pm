@@ -10,7 +10,7 @@ Tk::QuickForm::CColorItem - ColorEntry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CColorItem';
@@ -58,8 +58,7 @@ sub createHandler {
 
 sub put {
 	my ($self, $color) = @_;
-	$self->SUPER::put($color);
-	$self->Subwidget('Entry')->EntryUpdate;
+	$self->Subwidget('Entry')->put($color);
 }
 
 =head1 LICENSE

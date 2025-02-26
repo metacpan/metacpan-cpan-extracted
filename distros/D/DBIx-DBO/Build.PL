@@ -13,14 +13,15 @@ my %build = (
     },
     build_requires => {
         'Module::Build' => '0.30',
-        'Test::More' => 0.62,
+        'Test::More' => 0.88,
         'File::Temp' => 0,
     },
     requires => {
-        'perl' => 5.008_001,
-        'DBI' => '1.50',
+        'perl' => 5.014,
+        'DBI' => '1.55',
     },
     recommends => {
+        'DBD::MariaDB' => '1.22',
         'DBD::mysql' => 4.004,
         'DBD::Pg' => 2,
         'DBD::SQLite' => 1.31,
@@ -29,23 +30,11 @@ my %build = (
     },
     meta_merge => {
         resources => {
-            bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-DBO',
-            repository => 'https://vlyon.svn.beanstalkapp.com/src/dbo',
+            bugtracker => 'https://github.com/vlyon/DBIx-DBO/issues',
+            repository => 'git://github.com/vlyon/DBIx-DBO.git',
         },
     },
 );
-
-if ($] < 5.008_009) {
-    # Perl prior to 5.8.9 didn't have hv_store, so we'll need to build it
-    $build{needs_compiler} = 1;
-    $build{build_requires}{'ExtUtils::CBuilder'} = 0;
-    $build{xs_files}{'QueryXS.xs'} = 'lib/DBIx/DBO/Query.xs';
-}
-
-if ($] < 5.009_005) {
-    # Perl prior to 5.9.5 didn't have mro, so we'll need to use Class::C3
-    $build{requires}{'MRO::Compat'} = 0.09;
-}
 
 unless (exists &Scalar::Util::weaken) {
     # The pure-perl Scalar::Util doesn't contain weaken(), Task::Weaken will try to fix it or give an error

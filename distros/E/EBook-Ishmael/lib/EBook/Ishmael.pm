@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -19,6 +19,8 @@ use constant {
 	MODE_META_JSON => 2,
 	MODE_ID        => 3,
 	MODE_HTML      => 4,
+	MODE_RAW_TIME  => 5,
+	MODE_COVER     => 6,
 };
 
 my $PRGNAM = 'ishmael';
@@ -36,9 +38,11 @@ Options:
   -o|--output=<file>     Write output to file
   -w|--width=<width>     Specify output line width
   -H|--html              Dump ebook HTML
+  -c|--cover             Dump ebook cover image
   -i|--identify          Identify ebook format
   -j|--meta-json         Print ebook metadata in JSON
   -m|--metadata          Print ebook metadata
+  -r|--raw               Dump the raw, unformatted ebook text
 
   -h|--help      Print help message
   -v|--version   Print version/copyright info
@@ -57,7 +61,6 @@ HERE
 
 my %FORMAT_ALTS = (
 	'fb2'   => 'fictionbook2',
-	'xhtml' => 'html',
 	'azw'   => 'mobi',
 );
 
@@ -95,9 +98,11 @@ sub init {
 		'output|o=s'  => \$self->{Output},
 		'width|w=i'   => \$self->{Width},
 		'html|H'      => sub { $self->{Mode} = MODE_HTML },
+		'cover|c'     => sub { $self->{Mode} = MODE_COVER },
 		'identify|i'  => sub { $self->{Mode} = MODE_ID },
 		'meta-json|j' => sub { $self->{Mode} = MODE_META_JSON },
 		'metadata|m'  => sub { $self->{Mode} = MODE_META },
+		'raw|r'       => sub { $self->{Mode} = MODE_RAW_TIME },
 		'help|h'    => sub { print $HELP;        exit 0; },
 		'version|v' => sub { print $VERSION_MSG; exit 0; },
 	) or die "Error in command line arguments\n$HELP";
@@ -233,6 +238,49 @@ sub html {
 
 }
 
+sub raw {
+
+	my $self = shift;
+
+	my $ebook = EBook::Ishmael::EBook->new(
+		$self->{Ebook},
+		$self->{Format}
+	);
+
+	my $oh = _get_out($self->{Output});
+
+	say { $oh } $ebook->raw;
+
+	close $oh unless $oh eq *STDOUT;
+
+	1;
+
+}
+
+sub cover {
+
+	my $self = shift;
+
+	my $ebook = EBook::Ishmael::EBook->new(
+		$self->{Ebook},
+		$self->{Format}
+	);
+
+	unless ($ebook->has_cover) {
+		die "$self->{Ebook} does not have a cover\n";
+	}
+
+	my $oh = _get_out($self->{Output});
+	binmode $oh;
+
+	print { $oh } $ebook->cover;
+
+	close $oh unless $oh eq *STDOUT;
+
+	1;
+
+}
+
 sub run {
 
 	my $self = shift;
@@ -247,6 +295,10 @@ sub run {
 		$self->id;
 	} elsif ($self->{Mode} == MODE_HTML) {
 		$self->html;
+	} elsif ($self->{Mode} == MODE_RAW_TIME) {
+		$self->raw;
+	} elsif ($self->{Mode} == MODE_COVER) {
+		$self->cover;
 	}
 
 	1;
@@ -299,6 +351,15 @@ Identify the format of the given ebook, C<--identify> mode.
 =head2 $i->html()
 
 Dump the HTML-ified contents of a given ebook, C<--html> mode.
+
+=head2 $i->raw()
+
+Dump the raw, unformatted text contents of a given ebook, C<--raw> mode.
+
+=head2 $i->cover()
+
+Dump the binary data of the cover image of a given ebook, if one is present,
+C<--cover> mode.
 
 =head2 $i->run()
 

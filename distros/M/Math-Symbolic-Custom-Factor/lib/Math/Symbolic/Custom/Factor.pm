@@ -15,11 +15,11 @@ Math::Symbolic::Custom::Factor - Re-arrange a Math::Symbolic expression into a p
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -334,10 +334,10 @@ sub factorize {
             
                 my $sqrt_y = int_rt(abs($acc), 2);               # y (accumulator) must be a square
                 my $sqrt_x = int_rt($mult, 2);                   # x constant multiplier must be a square
-                
-                if ( defined($sqrt_x) && defined($sqrt_y) ) {
-                    
-					my ($vv, $pow) = split(/:/, $t);
+                my ($vv, $pow) = split(/:/, $t);                 # power must be a square (> 1)
+
+                if ( defined($sqrt_x) && ($pow > 1) && ($pow % 2 == 0) && defined($sqrt_y) ) {
+                    					
 					my $v = $n_funcs{$vv}->{name};
                 
                     if ( $pow == 2 ) {
@@ -539,9 +539,11 @@ sub factorize {
             # test for polynomial
             # FIXME: looping around test_polynomial() like this is slow
             my ($var, $coeffs, $disc, $roots) = $nt->test_polynomial();
-            my $degree = scalar(@{$coeffs})-1;
 
             last POLY_FACTOR unless defined $var;
+            last POLY_FACTOR unless defined $coeffs;
+
+            my $degree = scalar(@{$coeffs})-1;
             last POLY_FACTOR if $degree <= 1;
 
             # check if all the coefficients are constant integers
