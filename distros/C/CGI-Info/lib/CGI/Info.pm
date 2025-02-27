@@ -27,15 +27,15 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 
-The CGI::Info module,
+The C<CGI::Info> module,
 is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
@@ -94,7 +94,7 @@ sub new
 	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
 		# If the first argument is a hash reference, dereference it
 		%args = %{$_[0]};
-	} elsif((@_ % 2) == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		# If there is an even number of arguments, treat them as key-value pairs
 		%args = @_;
 	} else {
@@ -108,7 +108,8 @@ sub new
 			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
 		}
-		warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
 	}
 
 	if(!defined($class)) {
@@ -129,7 +130,6 @@ sub new
 	return bless {
 		max_upload_size => 512 * 1024,
 		allow => undef,
-		expect => undef,
 		upload_dir => undef,
 		%args	# Overwrite defaults with given arguments
 	}, $class;
@@ -401,22 +401,19 @@ separated string.
 
 The returned hash value can be passed into L<CGI::Untaint>.
 
-Takes four optional parameters: allow, expect, logger and upload_dir.
+Takes four optional parameters: allow, logger and upload_dir.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is a regular expression of permitted values for
-the key.
+The value for each entry is either a permitted value,
+a regular expression of permitted values for
+the key,
+or a hash of rules rather like C<Params::Validate> but much more comprehensive.
+
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
-
-Expect is a reference to a list of arguments that you expect to see and pass on.
-Arguments not in the list are silently ignored.
-This is useful to help to block attacks on your site.
-Its use is deprecated, use allow instead.
-Expect will be removed in a later version.
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
@@ -428,7 +425,7 @@ such as a L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
 or a filename.
 
-The allow, expect, logger and upload_dir arguments can also be passed to the
+The allow, logger and upload_dir arguments can also be passed to the
 constructor.
 
 	use CGI::Info;
@@ -456,13 +453,14 @@ constructor.
 						# to prevent XSS, and non-empty
 						# as a sanity check
 	};
-	my $paramsref = $info->params(allow => $allowed);
 	# or
-	my @expected = ('foo', 'bar');
-	my $paramsref = $info->params({
-		expect => \@expected,
-		upload_dir = $info->tmpdir()
-	});
+	$allowed = {
+		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ }, # String, basic email format check
+		age => { type => 'integer', min => 0, max => 150 }, # Integer between 0 and 150
+		bio => { type => 'string', optional => 1 }, # String, optional
+		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
+	};
+	my $paramsref = $info->params(allow => $allowed);
 	if(defined($paramsref)) {
 		my $ids = CGI::IDS->new();
 		$ids->set_scan_keys(scan_keys => 1);
@@ -503,14 +501,14 @@ sub params {
 	if(defined($params->{allow})) {
 		$self->{allow} = $params->{allow};
 	}
-	if(defined($params->{expect})) {
-		if(ref($params->{expect}) eq 'ARRAY') {
-			$self->{expect} = $params->{expect};
-			$self->_warn('expect is deprecated, use allow instead');
-		} else {
-			$self->_warn('expect must be a reference to an array');
-		}
-	}
+	# if(defined($params->{expect})) {
+		# if(ref($params->{expect}) eq 'ARRAY') {
+			# $self->{expect} = $params->{expect};
+			# $self->_warn('expect is deprecated, use allow instead');
+		# } else {
+			# $self->_warn('expect must be a reference to an array');
+		# }
+	# }
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
@@ -756,24 +754,46 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_info("Discard unallowed argument '$key'");
+				$self->_notice("Discard unallowed argument '$key'");
 				$self->status(422);
-				next;
+				next;	# Skip to the next parameter
 			}
 
 			# Do we allow any value, or must it be validated?
-			if(defined($self->{allow}->{$key})) {
-				if($value !~ $self->{allow}->{$key}) {
-					$self->_info("Block $key = $value");
-					$self->status(422);
-					next;
+			if(defined(my $schema = $self->{allow}->{$key})) {	# Get the schema for this key
+				if(!ref($schema)) {
+					# Can only contain one value
+					if($value ne $schema) {
+						$self->_notice("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+				} elsif(ref($schema) eq 'Regexp') {
+					if($value !~ $schema) {
+						# Simple regex
+						$self->_notice("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+				} else {
+					# Set of rules
+					my @value = ($value);
+					eval {
+						$value = _validate_strict({ $key => $schema }, { $key => $value });
+					};
+					if($@) {
+						$self->_notice("Block $key = $value: $@");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+					$value = $value->{$key};
 				}
 			}
 		}
 
-		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
-			next;
-		}
+		# if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
+			# next;
+		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
 
@@ -898,6 +918,159 @@ sub param {
 	return;
 }
 
+# Helper routine that validates a set of parameters against a schema.
+#
+# This function takes two arguments:
+#
+# $schema A reference to a hash that defines the validation rules for each parameter.  The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
+# $params A reference to a hash containing the parameters to be validated.  The keys of the hash are the parameter names, and the values are the parameter values.
+#
+# The schema can define the following rules for each parameter:
+#
+# type The data type of the parameter.  Valid types are string, integer, and number.
+# min The minimum length (for strings) or value (for numbers).
+# max The maximum length (for strings) or value (for numbers).
+# matches A regular expression that the parameter value must match.
+# callback A code reference to a subroutine that performs custom validation logic. The subroutine should accept the parameter value as an argument and return true if the value is valid, false otherwise.
+# optional A boolean value indicating whether the parameter is optional. If true, the parameter is not required.  If false or omitted, the parameter is required.
+#
+# If a parameter is optional and its value is `undef`, validation will be skipped for that parameter.
+#
+# If the validation fails, the function will croak with an error message describing the validation failure.
+#
+# If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
+
+# For example:
+#	my $schema = {
+#		username => { type => 'string', min => 3, max => 50 },
+#		age => { type => 'integer', min => 0, max => 150 },
+#	};
+#
+# my $params = {
+#	username => 'john_doe',
+#	age => '30', # Will be coerced to integer
+# };
+#
+# my $validated_params = validate_strict($schema, $params);
+#
+# if (defined $validated_params) {
+#	print "Example 1: Validation successful!\n";
+#	print 'Username: ' . $validated_params->{username} . "\n";
+#	print 'Age: ' . $validated_params->{age} . "\n"; # It's an integer now!
+# } else {
+#	print "Example 1: Validation failed: $@\n";
+# }
+
+sub _validate_strict
+{
+	my ($schema, $params) = @_;
+
+	# Check if schema and params are references to hashes
+	unless((ref($schema) eq 'HASH') && (ref($params) eq 'HASH')) {
+		croak 'validate_strict: schema and params must be hash references';
+	}
+
+	my %validated_params;
+
+	foreach my $key (keys %$schema) {
+		my $rules = $schema->{$key};
+		my $value = $params->{$key};
+
+		# Check if the parameter is required
+		if((ref($rules) eq 'HASH') && (!exists($rules->{optional})) && (!exists($params->{$key}))) {
+			croak "validate_strict: Required parameter '$key' is missing";
+		}
+
+		# Handle optional parameters
+		next if((ref($rules) eq 'HASH') && exists($rules->{optional}) && (!defined($value)));
+
+		# If rules are a simple type string
+		if(ref($rules) eq '') {
+			$rules = { type => $rules };
+		}
+
+		# Validate based on rules
+		if(ref($rules) eq 'HASH') {
+			foreach my $rule_name (keys %$rules) {
+				my $rule_value = $rules->{$rule_name};
+
+				if($rule_name eq 'type') {
+					my $type = lc($rule_value);
+
+					if($type eq 'string') {
+						unless((ref($value) eq '') || (defined($value) && ($value =~ /^.*$/))) { # Allow undef for optional strings
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
+						}
+					} elsif($type eq 'integer') {
+						if($value !~ /^-?\d+$/) {
+							croak "validate_strict: Parameter '$key' must be an integer";
+						}
+						$value = int($value); # Coerce to integer
+					} elsif($type eq 'number') {
+						if($value !~ /^-?\d+(?:\.\d+)?$/) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a number");
+						}
+						$value = eval $value; # Coerce to number (be careful with eval)
+
+					} else {
+						croak "validate_strict: Unknown type '$type'";
+					}
+				} elsif($rule_name eq 'min') {
+					if($rules->{'type'} eq 'string') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
+						if(length($value) < $rule_value) {
+							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'integer') {
+						if($value < $rule_value) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be at least $rule_value");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless min value $rule_value");
+					}
+				} elsif($rule_name eq 'max') {
+					if($rules->{'type'} eq 'string') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
+						if(length($value) > $rule_value) {
+							croak("validate_strict: Parameter '$key' must be no longer than $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'integer') {
+						if($value > $rule_value) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be no more than $rule_value");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless max value $rule_value");
+					}
+				} elsif($rule_name eq 'matches') {
+					unless ($value =~ $rule_value) {
+						croak "validate_strict: Parameter '$key' must match '$rule_value'";
+					}
+				} elsif ($rule_name eq 'callback') {
+					unless (defined &$rule_value) {
+						croak(__PACKAGE__, "::validate_strict: callback for '$key' must be a code reference");
+					}
+					my $res = $rule_value->($value);
+					unless ($res) {
+						croak "validate_strict: Parameter '$key' failed callback validation";
+					}
+				} elsif($rule_name eq 'optional') {
+					# Already handled at the beginning of the loop
+				} else {
+					croak "validate_strict: Unknown rule '$rule_name'";
+				}
+			}
+		}
+
+		$validated_params{$key} = $value;
+	}
+
+	return \%validated_params;
+}
+
 # Helper routine to parse the arguments given to a function.
 # Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
@@ -905,29 +1078,29 @@ sub param {
 #	when called _get_params('arg', @_);
 sub _get_params
 {
-	shift;  # Discard the first argument (typically $self)
+	my $self = shift;
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
 	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my %rc;
-	my $num_args = scalar @_;
+	my $num_args = scalar(@_);
 
 	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
+	if(($num_args == 1) && defined($default)) {
 		# %rc = ($default => shift);
 		return { $default => shift };
 	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], '()');
+	} elsif(($num_args == 0) && defined($default)) {
+		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], "($default => \$val)");
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
 	} elsif($num_args == 0) {
 		return;
 	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
@@ -1044,10 +1217,20 @@ sub _multipart_data {
 	return @pairs;
 }
 
+# Robust filename generation (preventing overwriting)
 sub _create_file_name {
 	my ($self, $args) = @_;
+	my $filename = $$args{filename} . '_' . time;
 
-	return $$args{filename} . '_' . time;
+	my $counter = 0;
+	my $rc;
+
+	do {
+		$rc = $filename . ($counter ? "_$counter" : '');
+		$counter++;
+	} until(! -e $rc);	# Check if file exists
+
+	return $rc;
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
@@ -1443,7 +1626,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|CriteoBot|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1871,6 +2054,11 @@ sub _info {
 	$self->_log('info', @_);
 }
 
+sub _notice {
+	my $self = shift;
+	$self->_log('notice', @_);
+}
+
 sub _trace {
 	my $self = shift;
 	$self->_log('trace', @_);
@@ -1906,7 +2094,7 @@ sub _warn {
 			Sys::Syslog::setlogsock($self->{syslog});
 		}
 		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning', $warning);
+		syslog('warning|local0', $warning);
 		closelog();
 	}
 
@@ -1979,16 +2167,8 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-This module is provided as-is without any warranty.
-
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.
-
-Please report any bugs or feature requests to C<bug-cgi-info at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.
@@ -1997,10 +2177,23 @@ things to happen.
 
 =head1 SEE ALSO
 
-L<HTTP::BrowserDetect>,
-L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
+=over 4
+
+=item * L<HTTP::BrowserDetect>
+
+=item * L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
+
+=back
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-cgi-info at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 

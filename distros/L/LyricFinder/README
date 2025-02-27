@@ -2,7 +2,7 @@ NAME
     LyricFinder - Fetch song lyrics from several internet lyric sites.
 
 AUTHOR
-    This module is Copyright (c) 2020-2024 by
+    This module is Copyright (c) 2020-2025 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -66,10 +66,11 @@ DESCRIPTION
     The supported and currently-installed modules are:
     LyricFinder::ApiLyricsOvh (for searching api.lyrics.ovh),
     LyricFinder::AZLyrics (www.azlyrics.com), LyricFinder::ChartLyrics
-    (api.lyrics.com), LyricFinder::Genius (genius.com), LyricFinder::Letras
-    (www.letras.mus.br), and LyricFinder::Musixmatch (www.musixmatch.com).
-    There is a special module for storing and / or fetching lyrics (.lrc)
-    files already stored locally, called LyricFinder::Cache.
+    (api.chartlyrics.com), LyricFinder::Genius (genius.com),
+    LyricFinder::Letras (www.letras.mus.br), LyricFinder::Lrclib
+    (lrclib.net), and LyricFinder::Musixmatch (www.musixmatch.com). There is
+    a special module for storing and / or fetching lyrics (.lrc) files
+    already stored locally, called LyricFinder::Cache.
 
     This module is derived from the (older) Lyrics::Fetcher collection of
     modules by (c) 2007-2020 David Precious, but currently supports more
@@ -100,8 +101,8 @@ DESCRIPTION
     IP-address possibly being banned by a lyrics site for "too-frequent
     scraping / usage"! NOTE: If you want to prevent the usage of one or more
     of the specific sites, simply specify the *-omit* argument with a
-    reference to a list of module names to skip, ie. *-omit =*
-    'AZLyrics,Genius'> in the *new LyricFinder()* function. If you want to
+    reference to a list of module names to skip, ie. *-omit =*>
+    *'AZLyrics,Genius'* in the *new LyricFinder()* function. If you want to
     use one or more specific sites, or enforce a specific search order, you
     can call the fetch() method with a third argument consisting of the site
     module name, ie. "Musixmatch", or reference to an array of site module
@@ -222,7 +223,7 @@ SUBROUTINES/METHODS
             actual song lyrics returned. Default *0* (false) - show any
             additional site-specific information.
 
-        -omit => *"site-module[,site-module2...]]*
+        -omit => *"site-module[, site-module2...]"*
             Permits omitting specific sites which are currently installed
             from being searched (namely when using *random* or *all*). For
             example, to exclude the Musixmatch site, specify: *-omit* =>
@@ -377,7 +378,8 @@ SUBROUTINES/METHODS
         modules actually tried when fetching lyrics. This is useful to see
         what sites were actually hit and in what order if *random* order is
         being used. Similar to order(), except only sites actually hit are
-        shown (the last one is the one that successfully fetched the lyrics.
+        shown (the last one is the one that successfully fetched the
+        lyrics).
 
     *$scalar* = $finder->url()
         Returns the actual URL used to fetch the lyrics from the site
@@ -426,7 +428,7 @@ SEE ALSO
         <http://search.cpan.org/dist/LyricFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 2020-2024 Jim Turner.
+    Copyright (c) 2020-2025 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy

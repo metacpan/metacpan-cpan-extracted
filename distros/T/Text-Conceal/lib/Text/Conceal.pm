@@ -1,6 +1,6 @@
 package Text::Conceal;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use v5.14;
 use warnings;
@@ -29,6 +29,7 @@ my %default = (
     visible   => 0,
     ordered   => 1,
     duplicate => 0,
+    zerowidth => undef,
 );
 
 sub new {
@@ -88,6 +89,7 @@ sub decode {
 	# do not use "each @replace" here
 	for my $i (keys @replace) {
 	    my($regex, $orig, $len) = @{$replace[$i]};
+	    $regex // next;
 	    if (s/$regex/_replace(${^MATCH}, $orig, $len)/pe) {
 		if ($obj->{duplicate}) {
 		    ;
@@ -146,7 +148,13 @@ sub concealer {
     my $b = shift @a;
     return sub {
 	my $len = $obj->{length}->($_[0] =~ s/\X\cH+//gr);
-	return if $len < 1;
+	if ($len == 0) {
+	    if (defined(my $zerowidth = $obj->{zerowidth})) {
+		return($zerowidth, undef, $len);
+	    } else {
+		return;
+	    }
+	}
 	my $a = $a[ (state $n)++ % @a ];
 	my $bl = $len - 1;
 	( $a . ($b x $bl), qr/\A${lead}\K\Q$a$b\E{0,$bl}(?!\Q$b\E)/, $len );
@@ -185,7 +193,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -316,6 +324,19 @@ time, the conversion fails. By setting this parameter to 1, it is
 possible to allow a string to appear multiple times. However, doing so
 will increase the probability of failure if a large number of strings
 are attempted to be converted.
+
+=item B<zerowidth> => I<string> (default undef)
+
+It is possible that the string to be converted does not have a display
+width.  For example, it may be a zero-width character such as
+C<\N{WORD JOINER}>, or it may be an ANSI sequence with no content.
+Since it is impossible to generate a zero-width alternative string, in
+such cases no conversion is done by default, and you will probably get
+an undesirable result.  If an empty string is given for C<zerowidth>,
+the original data will be lost, but it should be visually
+indistinguishable.  If some mark (e.g., "\0") is given, the mark will
+appear in the result, and it may be possible to deal with it in some
+way from the surrounding information.
 
 =back
 

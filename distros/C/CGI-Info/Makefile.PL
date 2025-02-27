@@ -29,8 +29,9 @@ WriteMakefile(
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
-	PL_FILES	=> {},
-	TEST_REQUIRES => {
+	PL_FILES	=> {}, CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, TEST_REQUIRES => {
 		'File::Temp' => 0,
 		'LWP::UserAgent' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857

@@ -48,7 +48,8 @@ sum(...)
 			PUSHMARK(SP);
 			call_sv(callback, 3);
 			SPAGAIN;
-			sum += SvNV(POPs);
+			SV * val = POPs;
+			sum += SvNV(val);
 			PUTBACK;
 		}
 		RETVAL = newSVnv(sum);
@@ -69,7 +70,8 @@ min(...)
 			PUSHMARK(SP);
 			call_sv(callback, G_SCALAR);
 			SPAGAIN;
-			double ret = SvNV(POPs);
+			SV * val = POPs;
+			double ret = SvNV(val);
 			if (!set || ret < min) {
 				min = ret;
 				set = true;
@@ -93,7 +95,8 @@ max(...)
 			PUSHMARK(SP);
 			call_sv(callback, G_SCALAR);
 			SPAGAIN;
-			int ret = SvNV(POPs);
+			SV * val = POPs;
+			int ret = SvNV(val);
 			if (!set || ret > max) {
 				max = ret;
 				set = true;
@@ -117,7 +120,8 @@ mean(...)
 			PUSHMARK(SP);
 			call_sv(callback, 3);
 			SPAGAIN;
-			sum += SvNV(POPs);
+			SV * val = POPs;
+			sum += SvNV(val);
 			PUTBACK;
 		}
 		RETVAL = newSVnv(sum / (items - 1));
@@ -137,7 +141,8 @@ median(...)
 			PUSHMARK(SP);
 			call_sv(callback, 3);
 			SPAGAIN;
-			median[i - 1] = SvNV(POPs);
+			SV * val = POPs;
+			median[i - 1] = SvNV(val);
 			PUTBACK;
 		}
 		qsort( median, items - 1, sizeof(double), compare );
@@ -163,7 +168,8 @@ mode(...)
 			PUSHMARK(SP);
 			call_sv(callback, 3);
 			SPAGAIN;
-			arr[i - 1] = SvNV(POPs);
+			SV * val = POPs;
+			arr[i - 1] = SvNV(val);
 			PUTBACK;
 		}
 		RETVAL = newSVnv(mode(arr, items - 1));

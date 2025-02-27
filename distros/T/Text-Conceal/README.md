@@ -16,7 +16,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -137,6 +137,19 @@ into single chunk if possible.
         possible to allow a string to appear multiple times. However, doing so
         will increase the probability of failure if a large number of strings
         are attempted to be converted.
+
+    - **zerowidth** => _string_ (default undef)
+
+        It is possible that the string to be converted does not have a display
+        width.  For example, it may be a zero-width character such as
+        `\N{WORD JOINER}`, or it may be an ANSI sequence with no content.
+        Since it is impossible to generate a zero-width alternative string, in
+        such cases no conversion is done by default, and you will probably get
+        an undesirable result.  If an empty string is given for `zerowidth`,
+        the original data will be lost, but it should be visually
+        indistinguishable.  If some mark (e.g., "\\0") is given, the mark will
+        appear in the result, and it may be possible to deal with it in some
+        way from the surrounding information.
 
 - **encode**
 - **decode**

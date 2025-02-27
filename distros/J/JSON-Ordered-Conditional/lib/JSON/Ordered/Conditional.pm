@@ -1,6 +1,6 @@
 package JSON::Ordered::Conditional;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use JSON::MultiValueOrdered; use base 'Struct::Conditional';
 
 use Tie::IxHash;
@@ -96,7 +96,7 @@ JSON::Ordered::Conditional - A conditional language within an ordered JSON struc
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

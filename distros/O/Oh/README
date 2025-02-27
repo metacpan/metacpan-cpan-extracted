@@ -1,0 +1,34 @@
+oh version 0.01
+===============
+
+INTRODUCTION
+
+oh is an experimental project aimed at implementing a Lisp interpreter in Perl. While it’s currently a prototype, it demonstrates the core concepts of Lisp evaluation, including basic syntax, macros, lambda functions, and object-oriented integration with Perl.
+
+At this stage, the project is more of a proof of concept than a fully polished tool. It is intended for experimenting with Lisp in Perl and exploring the language's potential.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ perl, make
+
+LICENSE
+
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication  
+
+To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide.  
+
+This software is distributed without any warranty.  
+
+You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+
+

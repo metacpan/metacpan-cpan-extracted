@@ -2,7 +2,7 @@ package String::Mask;
 use 5.006; use strict; use warnings;
 use base 'Import::Export';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our %EX = (
 	mask => [qw/all/]
 );
@@ -41,7 +41,7 @@ String::Mask - mask sensitive data
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 

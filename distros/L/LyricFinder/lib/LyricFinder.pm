@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use parent 'LyricFinder::_Class';
 
-# LyricFinder - A Derived work, by (c) 2020-2024 Jim Turner <turnerjw784 at yahoo.com> of:
+# LyricFinder - A Derived work, by (c) 2020-2025 Jim Turner <turnerjw784 at yahoo.com> of:
 #
 # Lyrics Fetcher
 #
@@ -34,10 +34,10 @@ use parent 'LyricFinder::_Class';
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-our $VERSION = '1.32';
+our $VERSION = '1.40';
 our $DEBUG = 0;  # If you want debug messages, set debug to a true value
 
-my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics ChartLyrics Genius Letras Musixmatch));
+my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics ChartLyrics Genius Letras Lrclib Musixmatch));
 
 my %haveit;
 
@@ -223,7 +223,7 @@ LyricFinder - Fetch song lyrics from several internet lyric sites.
 
 =head1 AUTHOR
 
-This module is Copyright (c) 2020-2024 by
+This module is Copyright (c) 2020-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -290,14 +290,14 @@ lyrics sites for song lyrics, and, if found, returns them as a string.
 The supported and currently-installed modules are:  
 L<LyricFinder::ApiLyricsOvh> (for searching api.lyrics.ovh), 
 L<LyricFinder::AZLyrics> (www.azlyrics.com), 
-L<LyricFinder::ChartLyrics> (api.lyrics.com), L<LyricFinder::Genius> 
-(genius.com), L<LyricFinder::Letras> (www.letras.mus.br), and 
-L<LyricFinder::Musixmatch> (www.musixmatch.com).  There is a 
-special module for storing and / or fetching lyrics (.lrc) files already 
-stored locally, called L<LyricFinder::Cache>.
+L<LyricFinder::ChartLyrics> (api.chartlyrics.com), L<LyricFinder::Genius> 
+(genius.com), L<LyricFinder::Letras> (www.letras.mus.br), 
+L<LyricFinder::Lrclib> (lrclib.net), and L<LyricFinder::Musixmatch> 
+(www.musixmatch.com).  There is a special module for storing and / or fetching 
+lyrics (.lrc) files already stored locally, called L<LyricFinder::Cache>.
 
-This module is derived from the (older) L<Lyrics::Fetcher> collection of modules 
-by (c) 2007-2020 David Precious, but currently supports 
+This module is derived from the (older) L<Lyrics::Fetcher> collection of 
+modules by (c) 2007-2020 David Precious, but currently supports 
 more lyric sites (6) and bundles all the supported site modules together here 
 (simply install this one module).  We have reworked the "Cache" module to 
 cache lyrics files by artist and song title on disk in the user's desired 
@@ -323,7 +323,7 @@ reduces the odds of a user's IP-address possibly being banned by a lyrics site
 for "too-frequent scraping / usage"!  NOTE:  If you want to prevent the usage 
 of one or more of the specific sites, simply specify the I<-omit> argument with 
 a reference to a list of module names to skip, 
-ie. I<-omit => 'AZLyrics,Genius'> in the I<new LyricFinder()> function.  
+ie. I<-omit =>> I<'AZLyrics,Genius'> in the I<new LyricFinder()> function.  
 If you want to use one or more specific sites, or enforce 
 a specific search order, you can call the fetch() method with a third 
 argument consisting of the site module name, ie. "Musixmatch", or reference to 
@@ -446,7 +446,7 @@ information below the lyrics text.  If specified or given a I<true> value,
 this will be suppressed and only the actual song lyrics returned.    
 Default I<0> (false) - show any additional site-specific information.
 
-=item B<-omit> => I<"site-module[,site-module2...]]>
+=item B<-omit> => I<"site-module[, site-module2...]">
 
 Permits omitting specific sites which are currently installed from being 
 searched (namely when using I<random> or I<all>).  For example, to 
@@ -605,7 +605,7 @@ Returns either a comma-separated list or an array of the site modules
 actually tried when fetching lyrics.  This is useful to see what sites were 
 actually hit and in what order if I<random> order is being used.  Similar 
 to B<order>(), except only sites actually hit are shown (the last one is 
-the one that successfully fetched the lyrics.
+the one that successfully fetched the lyrics).
 
 =item I<$scalar> = $finder->B<url>()
 
@@ -667,7 +667,7 @@ L<http://search.cpan.org/dist/LyricFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020-2024 Jim Turner.
+Copyright (c) 2020-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

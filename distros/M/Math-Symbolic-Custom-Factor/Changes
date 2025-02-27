@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-Factor
 
+0.13    Thu Feb 27 09:30 2025
+
+        - Fixed bug in difference of squares factoring
+
 0.12    Tue Feb 25 09:30 2025
 
         - Fixed bug in factoring polynomials

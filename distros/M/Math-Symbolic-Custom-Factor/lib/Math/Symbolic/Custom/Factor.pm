@@ -15,11 +15,11 @@ Math::Symbolic::Custom::Factor - Re-arrange a Math::Symbolic expression into a p
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -336,7 +336,7 @@ sub factorize {
                 my $sqrt_x = int_rt($mult, 2);                   # x constant multiplier must be a square
                 my ($vv, $pow) = split(/:/, $t);                 # power must be a square (> 1)
 
-                if ( defined($sqrt_x) && ($pow > 1) && ($pow % 2 == 0) && defined($sqrt_y) ) {
+                if ( ($t !~ /,/) && defined($sqrt_x) && ($pow > 1) && ($pow % 2 == 0) && defined($sqrt_y) ) {
                     					
 					my $v = $n_funcs{$vv}->{name};
                 

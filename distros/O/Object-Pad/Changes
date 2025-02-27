@@ -1,5 +1,9 @@
 Revision history for Object-Pad
 
+0.820   2025-02-26
+        [BUGFIXES]
+         * Account for perl 5.41.9's GV-less stash optimisation (RT159823)
+
 0.819   2025-01-10
         [CHANGES]
          * Initial experimental attempt to support lexical `my class` syntax

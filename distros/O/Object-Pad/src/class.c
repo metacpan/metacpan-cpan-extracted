@@ -1426,7 +1426,15 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
     SV *mname = methodmeta->name;
 
     HE *he = hv_fetch_ent(srcstash, mname, 0, 0);
-    if(!he || !HeVAL(he) || !GvCV((GV *)HeVAL(he)))
+    SV *heval = he ? HeVAL(he) : NULL;
+    CV *cv =
+      !heval                                          ? NULL :
+      /* perl since 5.41.9 might store RV to CV directly in the stash */
+      SvROK(heval) && SvTYPE(SvRV(heval)) == SVt_PVCV ? (CV *)SvRV(heval) :
+      SvTYPE(heval) == SVt_PVGV                       ? GvCV(heval) :
+                                                        NULL;
+
+    if(!cv)
       croak("ARGH expected to find CODE called %" SVf " in package %" SVf,
         SVfARG(mname), SVfARG(rolemeta->name));
 
@@ -1444,7 +1452,6 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
       croak("Method '%" SVf "' clashes with the one provided by role %" SVf,
         SVfARG(mname), SVfARG(rolemeta->name));
 
-    CV *cv = GvCV((GV *)HeVAL(he));
     if(!methodmeta->is_common) {
       CV *newcv = embed_cv(cv, embedding);
       GvCV_set(*gvp, newcv);

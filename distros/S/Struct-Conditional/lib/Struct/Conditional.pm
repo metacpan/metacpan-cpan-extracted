@@ -1,5 +1,5 @@
 package Struct::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '1.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.03';
 use Clone qw/clone/;
 
 sub new {
@@ -217,7 +217,7 @@ Struct::Conditional - A Conditional language within a perl struct.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 

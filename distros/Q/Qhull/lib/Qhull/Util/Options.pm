@@ -8,7 +8,7 @@ use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 use Log::Any '$log';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use parent 'Exporter::Tiny';
 
@@ -58,9 +58,6 @@ my sub croak {
 }
 
 ## no critic (Variables::ProhibitPackageVars)
-## no critic (Community::MultidimensionalArrayEmulation)
-# there isn't any of the above in the below; the Perl::Critic rule is
-# just confused
 
 our $Int               = $RE{num}{int};
 our $PositiveOrZeroInt = $RE{num}{int}{ -sign => q{} };
@@ -1132,7 +1129,7 @@ Qhull::Util::Options - Options for Qhull and gang
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -1171,6 +1168,7 @@ that's what B<TI> and B<TO> do.  Will need to append to the option
 name for other options.
 
 =for Pod::Coverage CATEGORIES
+CATEGORIES_NAMES
 CAT_COMPUTE
 CAT_CONTROL
 CAT_INPUT
@@ -1183,6 +1181,7 @@ CAT_PRECISION
 CAT_PRINT
 CAT_TRACE
 OPTIONS
+OPTIONS_NAMES
 OPTION_A
 OPTION_C
 OPTION_E

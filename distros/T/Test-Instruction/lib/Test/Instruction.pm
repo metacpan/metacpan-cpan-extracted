@@ -1,6 +1,6 @@
 package Test::Instruction;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.05';
+use 5.006; use strict; use warnings; our $VERSION = '0.06';
 use Compiled::Params::OO qw/cpo/;
 use Types::Standard qw/Optional Str Int Bool Any CodeRef ArrayRef HashRef/;
 use B qw/svref_2object/;
@@ -523,13 +523,13 @@ Test::Instruction - A test framework
 
 =head1 VERSION
 
-Version 0.02
+Version 0.06
 
 =cut
 
 =head1 SYNOPSIS
 
-    	use Test::Instruction qw/all/;
+	use Test::Instruction qw/all/;
 
 	use Module::To::Test;
 

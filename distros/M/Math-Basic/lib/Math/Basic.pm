@@ -3,7 +3,7 @@ package Math::Basic;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 use base qw/Import::Export/;
 
@@ -92,7 +92,7 @@ Math::Basic - basic math
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 

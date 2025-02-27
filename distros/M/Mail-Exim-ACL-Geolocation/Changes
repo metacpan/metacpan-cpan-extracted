@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::ACL::Geolocation
 
+1.005  2025-02-26 12:26:42 CET
+
+  - Add asn_lookup
+
 1.004  2022-12-24 10:50:02 CET
 
   - Minor documentation changes

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if command -v rlwrap &>/dev/null; then
+    rlwrap perl -MOh -e 'Oh::process_args' "$@"
+else
+    perl -MOh -e 'Oh::process_args' "$@"
+fi

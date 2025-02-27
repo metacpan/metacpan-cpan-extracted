@@ -13,6 +13,9 @@ sub create($self){
     $self->pg->db->query("CREATE DATABASE " . $self->dbname());
     $self->_connect($self->dbname());
 
+    my $default = $self->_get_defaults();
+    $self->pg->db->query($default);
+
     my $sql = $self->context->{context}->{sql};
     my $length = scalar @{$sql};
     for (my $i = 0; $i < $length; $i++) {
@@ -50,6 +53,15 @@ sub _dbname($self) {
     $string = lc($string);
     $self->dbname($string);
 
+}
+
+sub _get_defaults ($self) {
+    return qq{
+        CREATE TABLE workflow (
+            workflow_pkey BIGINT NOT NULL PRIMARY KEY,
+            test VARCHAR
+        );
+    } ;
 }
 1;
 

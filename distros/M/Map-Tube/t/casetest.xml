@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="casetest">
+<lines><line id="A" name="Line A"/></lines>
+<stations>
+<station id="s1" name="Station 1" line="A" link="s2"/>
+<station id="s2" name="Station 2" line="a" link="s1,s3"/>
+<station id="s3" name="Station 3" line="a" link="s2"/>
+</stations>
+</tube>

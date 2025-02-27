@@ -7,7 +7,7 @@ use Clone qw/clone/;
 use MooX::ReturnModifiers qw/return_has return_sub/;
 use namespace::clean ();
 
-our $VERSION = '1.07009';
+our $VERSION = '1.07010';
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -90,14 +90,13 @@ __END__
 MooX::LazierAttributes - Lazier Attributes.
 
 =for html
-
 <a href="https://travis-ci.org/ThisUsedToBeAnEmail/MooX-LazierAttributes"><img src="https://travis-ci.org/ThisUsedToBeAnEmail/MooX-LazierAttributes.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/r/ThisUsedToBeAnEmail/MooX-LazierAttributes?branch=master"><img src="https://coveralls.io/repos/ThisUsedToBeAnEmail/MooX-LazierAttributes/badge.svg?branch=master" alt="Coverage Status"></a>
 <a href="https://metacpan.org/pod/MooX-LazierAttributes"><img src="https://badge.fury.io/pl/MooX-LazierAttributes.svg" alt="CPAN version"></a>
 
 =head1 VERSION
 
-Version 1.07009
+Version 1.07010
 
 =cut
 

@@ -9,7 +9,7 @@ use experimental 'signatures', 'lexical_subs', 'declared_refs', 'refaliasing';
 use Ref::Util qw( is_arrayref is_hashref );
 use Log::Any '$log';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Qhull::Util::Options ':all';
 
@@ -431,7 +431,7 @@ Qhull::Util - Various bits and pieces
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

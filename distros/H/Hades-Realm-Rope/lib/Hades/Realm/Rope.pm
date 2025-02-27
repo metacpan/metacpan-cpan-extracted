@@ -2,7 +2,7 @@ package Hades::Realm::Rope;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -159,7 +159,7 @@ Hades::Realm::Rope - Hades realm for Rope
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

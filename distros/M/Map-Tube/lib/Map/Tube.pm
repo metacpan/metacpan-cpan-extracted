@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.98';
+$Map::Tube::VERSION   = '3.99';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.98
+Version 3.99
 
 =cut
 
@@ -921,7 +921,7 @@ sub _init_map {
     }
     my $master_line_data = {};
     foreach (@lines) {
-        $master_line_data->{$_->{id}} = 1;
+        $master_line_data->{lc $_->{id}} = 1;
     }
 
     my $has_station_index = {};
@@ -953,7 +953,7 @@ sub _init_map {
                 $has_station_index->{$_line} = 1;
             }
 
-            if (!exists $master_line_data->{$_line}) {
+            if (!exists $master_line_data->{lc $_line}) {
                 Map::Tube::Exception::InvalidStationLineId->throw({
                     method      => $method,
                     message     => "ERROR: Invalid line [$_line] for station [$name].",

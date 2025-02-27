@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw/Import::Export/;
 
@@ -26,11 +26,11 @@ __END__
 
 =head1 NAME
 
-Math::Basic::XS - The great new Math::Basic::XS!
+Math::Basic::XS - basic math faster
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

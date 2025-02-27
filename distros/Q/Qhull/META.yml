@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,19 +33,19 @@ no_index:
 provides:
   Qhull:
     file: lib/Qhull.pm
-    version: '0.06'
+    version: '0.07'
   Qhull::Options:
     file: lib/Qhull/Options.pm
-    version: '0.06'
+    version: '0.07'
   Qhull::PP:
     file: lib/Qhull/PP.pm
-    version: '0.06'
+    version: '0.07'
   Qhull::Util:
     file: lib/Qhull/Util.pm
-    version: '0.06'
+    version: '0.07'
   Qhull::Util::Options:
     file: lib/Qhull/Util/Options.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Alien::Qhull: v8.0.2.2
   CXC::Exporter::Util: '0.05'
@@ -53,6 +53,7 @@ requires:
   Eval::Closure: '0'
   Exporter::Shiny: '0'
   Exporter::Tiny: '0'
+  Feature::Compat::Defer: '0'
   File::Slurper: '0'
   File::Spec: '0'
   List::Util: '0'
@@ -73,7 +74,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Qhull
   repository: https://gitlab.com/djerius/p5-qhull.git
-version: '0.06'
-x_generated_by_perl: v5.38.2
+version: '0.07'
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

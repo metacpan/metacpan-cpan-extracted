@@ -1,12 +1,16 @@
 use Test::More;
-
+use strict;
+use warnings;
 use Math::Basic::XS qw/all/;
 
 my $sum = sum { $_ } 1, 2, 3, 4, 5;
+is($sum, 15);
+
+$sum = sum { $_ } 1, 2, 3, 4, 5;
 
 is($sum, 15);
 
-$sum = sum { $_->{inner} } bless({ inner => 1 }, 'Test'), { inner => 2 }, { inner => 3 }, { inner => 4 };
+$sum = sum { return $_->{inner} } bless({ inner => 1 }, 'Test'), { inner => 2 }, { inner => 3 }, { inner => 4 };
 
 is($sum, 10);
 

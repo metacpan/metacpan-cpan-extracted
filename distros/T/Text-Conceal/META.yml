@@ -4,6 +4,7 @@ author:
   - 'Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
+  Text::VisualWidth::PP: '0.08'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,15 +27,15 @@ no_index:
 provides:
   Text::Conceal:
     file: lib/Text/Conceal.pm
-    version: '1.04'
+    version: '1.05'
 requires:
-  Text::ANSI::Fold: '2.2702'
+  Text::ANSI::Fold: '2.30'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/Text-Conceal/issues
   homepage: https://github.com/tecolicom/Text-Conceal
   repository: https://github.com/tecolicom/Text-Conceal.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

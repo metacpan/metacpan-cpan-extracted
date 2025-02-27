@@ -38,7 +38,7 @@ use Mojo::Pg;
 #
 #
 
-our $VERSION = "0.12";
+our $VERSION = "0.15";
 
 has 'pg';
 has 'dbname';

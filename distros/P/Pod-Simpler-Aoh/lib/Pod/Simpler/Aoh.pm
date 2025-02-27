@@ -6,7 +6,7 @@ use Types::Standard qw/Str ArrayRef HashRef Bool/;
 
 extends 'Pod::Simple';
 
-our $VERSION = '0.09';
+our $VERSION = '1.00';
 
 attributes(
     pod => [ rw, ArrayRef, { lzy_array, clr } ],
@@ -139,7 +139,7 @@ Pod::Simpler::Aoh - Parse pod into an array of hashes.
 
 =head1 VERSION
 
-Version 0.09
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -157,8 +157,8 @@ Parse POD into an array of hashes
     [
         {
             identifier => 'head1',
-            title => NAME,
-            content => 'Some::Module - Mehhhh?',
+            title => 'NAME',
+            content => 'Some::Module - ...',
         },
         ......
 
@@ -176,9 +176,9 @@ Parse POD into an array of hashes
     [
         {
             identifier => 'head1',
-            title => NAME,
+            title => 'NAME',
             content => [ {
-               content => 'Some::Module - Mehhhh?',
+               content => 'Some::Module - ...',
                element_name => 'Para'
             } ]
         },

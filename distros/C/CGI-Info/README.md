@@ -16,11 +16,11 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.92
+Version 0.93
 
 # SYNOPSIS
 
-The CGI::Info module,
+The `CGI::Info` module,
 is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
@@ -159,22 +159,19 @@ separated string.
 
 The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint).
 
-Takes four optional parameters: allow, expect, logger and upload\_dir.
+Takes four optional parameters: allow, logger and upload\_dir.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is a regular expression of permitted values for
-the key.
+The value for each entry is either a permitted value,
+a regular expression of permitted values for
+the key,
+or a hash of rules rather like `Params::Validate` but much more comprehensive.
+
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
-
-Expect is a reference to a list of arguments that you expect to see and pass on.
-Arguments not in the list are silently ignored.
-This is useful to help to block attacks on your site.
-Its use is deprecated, use allow instead.
-Expect will be removed in a later version.
 
 Upload\_dir is a string containing a directory where files being uploaded are to
 be stored.
@@ -186,7 +183,7 @@ such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::A
 a reference to code,
 or a filename.
 
-The allow, expect, logger and upload\_dir arguments can also be passed to the
+The allow, logger and upload\_dir arguments can also be passed to the
 constructor.
 
         use CGI::Info;
@@ -214,13 +211,14 @@ constructor.
                                                 # to prevent XSS, and non-empty
                                                 # as a sanity check
         };
-        my $paramsref = $info->params(allow => $allowed);
         # or
-        my @expected = ('foo', 'bar');
-        my $paramsref = $info->params({
-                expect => \@expected,
-                upload_dir = $info->tmpdir()
-        });
+        $allowed = {
+                email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ }, # String, basic email format check
+                age => { type => 'integer', min => 0, max => 150 }, # Integer between 0 and 150
+                bio => { type => 'string', optional => 1 }, # String, optional
+                ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
+        };
+        my $paramsref = $info->params(allow => $allowed);
         if(defined($paramsref)) {
                 my $ids = CGI::IDS->new();
                 $ids->set_scan_keys(scan_keys => 1);
@@ -460,17 +458,8 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
-Please report any bugs or feature requests to the author.
-This module is provided as-is without any warranty.
-
 is\_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.
-
-Please report any bugs or feature requests to `bug-cgi-info at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info).
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.
@@ -479,10 +468,18 @@ things to happen.
 
 # SEE ALSO
 
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect),
-[https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
+- [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
+- [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to `bug-cgi-info at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 

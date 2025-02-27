@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use Exporter::Shiny 'qhull';
@@ -24,7 +24,7 @@ use Qhull::Util 'parse_output';
 use Qhull::Util::Options 'CAT_OUTPUT_FORMAT';
 use Qhull::Options;
 use System::Command;
-
+use Feature::Compat::Defer;
 
 use Alien::Qhull;
 
@@ -220,8 +220,10 @@ sub qhull ( @coords ) {
             $fh->close or croak( "error closing $save_input" );
         }
 
+        # ensure that the sub-process' sstdin is closed, regardless of
+        # how this block is exited.
+        defer { $cmd->stdin->close };
         $feed->( $cmd->stdin );
-        $cmd->stdin->close;
     }
 
     my $stderr = do {
@@ -277,7 +279,7 @@ Qhull::PP - Pure Perl interface to Qhull
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

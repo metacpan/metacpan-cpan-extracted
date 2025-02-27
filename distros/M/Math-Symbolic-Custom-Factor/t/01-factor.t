@@ -73,9 +73,9 @@ my %factor_tests = (
     "Test 063"  =>  { 'expr' => '3*y^2 - 4', 'factors' => 1 },
     "Test 064"  =>  { 'expr' => '3*y^3 - 4', 'factors' => 1 },
     "Test 065"  =>  { 'expr' => '3*y^4 - 4', 'factors' => 1 },
+    "Test 066"  =>  { 'expr' => 'm*y - 4', 'factors' => 1 },
 );
 
-#foreach my $test (@factor_tests) {
 while ( my ($test_num, $test) = each %factor_tests ) {
 		
 	my $f1 = parse_from_string($test->{expr});

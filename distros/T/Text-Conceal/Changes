@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Conceal
 
+1.05 2025-02-27T08:12:26Z
+
+    - introduce "zerowidth" parameter
+
 1.04 2025-01-18T02:58:22Z
 
     - requires Text::ANSI::Fold@2.2702

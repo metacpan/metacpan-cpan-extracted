@@ -1,0 +1,405 @@
+=pod
+
+=head1 NAME
+
+oh
+
+=head1 SYNOPSIS
+
+=head2 Command Line Interface:
+
+Evaluate code:
+
+ oh e "(print :oh)"
+
+Evaluate code and launch a REPL:
+
+ oh e "(setq oh 3)" i
+
+Load files:
+
+ oh file.oh file2.oh
+
+Load files and launch a REPL:
+
+ oh file1 i file2 i
+
+Load files named i and e:
+
+ oh f i f e
+
+Launch a REPL:
+
+ oh
+
+=head2 Module Interface:
+
+    use Oh qw/interpret_string evaluate_element/;
+
+    my $result = interpret_string '(+ 1 2 3)';
+    
+    my $same_result = evaluate_element ['+', 1, 2, 3];
+
+=head1 INSTALLATION
+
+    cpan Oh
+
+=head1 DESCRIPTION
+
+This is a lisp interpreter written in perl trying to get the best of both worlds:
+
+From perl it inherits the portability, unix scripting features and the whole CPAN.
+
+Fron lisp inherits lisp evaluation rules, s-expressions and macros.
+
+I always thought of lisp as a black box with no access to the external world and always thought that perl could be the perfect slave for lisp, being lisp the mind and perl the body.
+
+I think that the best way to blend both is to make an interpreter in perl or a transpiler to perl (or any other language where we want to steal features from).
+
+The main concern is to interoperate with perl as much as possible while having proper lisp evaluation rules.
+
+The current implementation is in a prototype state and everything is subject to change.
+
+However you are encouraged to test this interpreter and push it to its limits in order to give constructive feedback and help with its improvement and evolution.
+
+The language has the following operators, macros and functions:
+
+set, setq, get, let, lambda, defun, define, fun, macro, defmacro, +, if, when, unless, perl-fun, perl-defun, print, car, cdr, funcall, eval, load, eval-string, try, anon, sub, quote, unquote, quasiquote, flatten...
+
+It has more, but it's lacking a lot of things a proper language should have.
+
+=head2 defun
+
+defun is common lisp's defun:
+
+ (defun oh (one &optional (two 2) three &key four (five 5))
+  (list one two three four five))
+
+=head2 define
+
+define is scheme's define:
+
+ (define oh 3)
+
+This creates a new symbol named 'oh' in the current environment with the value 3
+
+ (define (oh x . y) 
+  (list x y))
+
+ (oh 1 2 3)
+
+This defines a new function named 'oh' using scheme style lambda arguments.
+
+It will return the list: (1 (2 3))
+
+=head2 let
+
+The operator let works a bit differently than in scheme or cl:
+
+ (let (a 1 b 2 c 3)
+  (list a b c))
+
+In cl or scheme it would be instead:
+
+ (let ((a 1) (b 2) (c 3))
+  (list a b c))
+
+=head2 defmacro
+
+defmacro defines a macro with common lisp style lambda arguments:
+
+ (defmacro oh (arg1 &rest arg-list)
+  `(list ,arg1 ,@arg-list))
+
+=head2 macro
+
+macro defines a macro with scheme style lambda arguments:
+
+ (macro oh (arg1 . arg-list)
+  `(list ,arg1 ,@arg-list))
+
+=head2 setq
+
+setq sets or updates a symbol
+
+ (setq oh 3)
+
+equivalent to:
+
+ (define oh 3)
+
+with the difference that if setq finds the symbol in the parent scope it will mutate that symbol instead, while define will always create a new symbol in the current environment, no matter if another symbol exists.
+
+=head2 set
+
+set is a function instead of an operator and has dual behavior.
+
+It can set symbols like setq if the symbol is quoted and set hash tables or lists if the first element is one of them.
+
+ (set 'oh 3)
+
+This is equivalent to:
+
+ (setq oh 3)
+
+It will also update it if it exists in a parent scope.
+
+ (setq some-list '(1 2 3))
+
+This creates a new symbol named 'some-list' that retains the list: (1 2 3)
+
+=head2 get
+
+The function 'get' will return an element from a list or hash table.
+
+ (get some-list 0)
+
+This returns the first element of the list returned by the 'some-list' symbol, which in our case was the 1.
+
+ (set some-list 0 24)
+
+This mutates the first element of the list and sets it to the value 24. In our case the list is now: (24 2 3)
+
+get and set when using lists can also receive negative indices, they will access the element starting from the end.
+
+ (get some-list -1)
+
+This returns the last element of some list, in our case was the number 3.
+
+=head2 hash tables
+
+They work the same with hash tables, accepting symbols as keys.
+
+ (setq some-hash (hash one 1 two 2 three (+ 1 2)))
+
+ (get some-hash 'one)
+
+ (set some-hash 'one 24)
+
+=head2 lambda
+
+Lambda works with cl style lambda arguments:
+
+ (lambda (x &rest y)
+  (list x y))
+
+But lambda is just a macro:
+
+ (macro lambda (args . code)
+  `(anon (lisp-args ,args) ,@code))
+
+=head2 anon
+
+The operator 'anon' creates a lambda with no argument bindings.
+
+lisp-args and scheme-args are just an operator that performs the binding from a lambda argument list.
+
+The 'anon' operator provides no bindings, but when the interpreter evaluates a lambda, it will set a symbol named 'args' with the list of arguments it receives.
+
+ ((anon args) 1 2 3)
+
+This returns the list of arguments: (1 2 3)
+
+=head2 sub
+
+The 'sub' operator creates a lambda and sets it in the current environment.
+
+ (sub list args)
+
+ (list 1 2 3)
+
+sub and anon do not provide argument bindings. The arguments will be present in the symbol 'args' when a lambda is evaluated.
+
+=head2 fun
+
+defun, fun and define are macros using sub and scheme-args or lisp-args
+
+ (macro fun (name args . code)
+  `(sub ,name (scheme-args ,args) ,@code))
+
+ (macro defun (name args . code)
+  `(sub ,name (lisp-args ,args) ,@code))
+
+ (macro define (name . value)
+  (if (listp name)
+   `(fun ,(car name) ,(cdr name) ,@value)
+   `(setq ,name ,(car value))))
+
+=head2 perl-sub
+
+perl-sub creates perl subroutines in a given package:
+
+ (perl-sub package-name fun-name code...)
+
+It does not provide argument bindings, being similar to sub, but it actually creates a perl subroutine in a perl package
+
+ (perl-sub oh hello_world
+  (print "Hello, world"))
+
+Now this function is a perl subroutine named 'hello_world' and it exists in the perl package named 'oh'
+
+Which means that is now accessible from perl:
+
+ oh::hello_world();
+
+The interpreter can also call perl subroutines from a module:
+
+ (oh::hello_world)
+
+=head2 perl-defun
+
+The perl-defun macro provides a way to define perl subroutines using cl style bindings:
+
+ (macro perl-defun (module name args . code)
+  `(perl-sub ,module ,name (lisp-args ,args) ,@code))
+
+ (perl-defun oh print_something (&optional (something 'oh))
+  (print something))
+
+ (oh::print_something "Hello, world")
+
+=head2 perl-fun
+
+The perl-fun macro is similar, but provides scheme style bindings:
+
+ (macro perl-fun (module name args . code)
+  `(perl-sub ,module ,name (scheme-args ,args) ,@code))
+
+ (perl-fun oh print_something something
+  (print (car something)))
+
+ (oh::print_something "Hello, world")
+
+=head2 method
+
+There is also the function called 'method' which will expect an object as the first argument and the name of the method as the second. It can also take the name of a module as the first argument.
+
+ (use IO::Socket)
+
+ (method 'IO::Socket 'new 'localhost:8080)
+
+That would return an IO::Socket object if there was a server in localhost listening at port 8080.
+
+perl-sub, perl-fun and perl-defun allow us to create perl subroutines into a perl package.
+
+If the perl package does not exist it will be created, because packages in perl autovivify.
+
+That means that we can create perl classes, since they are just packages.
+
+=head2 parent
+
+There is also the 'parent' operator which creates inheritance by pushing to the perl's ISA array on the package.
+
+ (use Bot::BasicBot)
+
+ (perl-fun bot said (bot args)
+  (unless (or (eq (get args) 'NickServ)
+              (eq (get args) 'ChanServ))
+   'hey))
+
+ (parent bot Bot::BasicBot)
+
+ (method (method 'bot 'new (qw server irc.libera.chat port 6667 nick superbot)) 'run)
+
+=head2 use
+
+The use operator loads a perl module.
+
+ (use Path::Tiny)
+
+ (use IO::Socket)
+
+=head2 bindings
+
+The bindings function imports perl subroutines into the interpreter from a package name that receives as the first argument:
+
+ (use Curses)
+
+ (bindings (qw Curses initscr raw refresh endwin addstr getch))
+
+Now those functions exist in the interpreter:
+
+ (initscr)
+ (raw)
+ (addstr "oh...")
+ (refresh)
+ (getch)
+ (endwin)
+
+This way we do not need to do it like this:
+
+ (Curses::initscr)
+ (Curses::raw)
+ (Curses::addstr "oh...")
+
+=head2 quote
+
+quote is an operator that returns its first and only argument
+
+ (quote oh)
+
+It is something so common in lisp that it deserves a shortcut.
+
+ 'oh
+
+The quote symbol is a reader symbol like ( or " that reads one element and returns the list: (quote oh)
+
+Which means that 'oh and (quote oh) are equivalent.
+
+=head2 quasiquote and unquote
+
+quasiquote is an operator similar to quote, but when it receives a list as first and only argument, it will traverse that list recursively and check for lists with unquote as the first element like: (unquote x) and evaluate them, while quoting the other lists or elements.
+
+ (quasiquote (1 2 (unquote (+ 1 2))))
+
+This returns a list with: (1 2 3) since the expression (+ 1 2) was evaluated as it's inside the unquote operator.
+
+They also have their own shortcuts like quote does.
+
+The comma ',' is unquote and the backtick '`' is quasiquote:
+
+ `(1 2 ,(+ 1 2))
+
+The reader returns: (quasiquote (1 2 (unquote (+ 1 2))))
+
+
+=head2 quote words
+
+qw is an operator that autoquotes words.
+
+ (qw oh my cat is nice)
+
+This operator does not actually return any list, the words will be 'flattened' as if they were symbols being quoted.
+
+ (list (qw oh my cat))
+
+is equivalent to:
+
+ (list 'oh 'my 'cat)
+
+It is taken from perl qw// and serves as an autoquote mechanism.
+
+
+=head1 TODO
+
+I have to create a better abstraction for creating perl classes.
+
+=head1 BUGS
+
+I'm pretty sure that the common lisp style argument binding has some bugs, since I did not test it thoroughly.
+
+The scheme like arguments might also have bugs.
+
+It is likely that a lot of bugs are waiting for the right moment to destroy my dreams.
+
+=head1 LICENSE
+
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+
+To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide.
+
+This software is distributed without any warranty.
+
+https://creativecommons.org/publicdomain/zero/1.0/
+
+=cut

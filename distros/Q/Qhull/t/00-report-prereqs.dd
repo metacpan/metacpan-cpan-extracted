@@ -81,6 +81,7 @@ do { my $x = {
                                       'Eval::Closure' => '0',
                                       'Exporter::Shiny' => '0',
                                       'Exporter::Tiny' => '0',
+                                      'Feature::Compat::Defer' => '0',
                                       'File::Slurper' => '0',
                                       'File::Spec' => '0',
                                       'List::Util' => '0',

@@ -6,44 +6,87 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.004;
+our $VERSION = 1.005;
 
 use Exporter qw(import);
 use IP::Geolocation::MMDB;
-use List::Util qw(first);
 
-our @EXPORT_OK = qw(country_code);
+our @EXPORT_OK = qw(country_code asn_lookup);
 
-our @DIRECTORIES = qw(
+my @directories = qw(
     /var/lib/GeoIP
     /usr/local/share/GeoIP
     /usr/share/GeoIP
     /opt/share/GeoIP
+    /var/db/GeoIP
 );
 
-our @DATABASES = qw(
+my @country_databases = qw(
     GeoIP2-Country.mmdb
     GeoIP2-City.mmdb
     dbip-country.mmdb
     dbip-city.mmdb
-    dbip-location.mmdb
     GeoLite2-Country.mmdb
     GeoLite2-City.mmdb
     dbip-country-lite.mmdb
     dbip-city-lite.mmdb
 );
 
-our $DATABASE = $ENV{IP_GEOLOCATION_MMDB} || first {-r} map {
-    my $dir = $_;
-    map {"$dir/$_"} @DATABASES
-} @DIRECTORIES;
+my @asn_databases = qw(
+    GeoIP2-ASN.mmdb
+    dbip-asn.mmdb
+    GeoLite2-ASN.mmdb
+    dbip-asn-lite.mmdb
+);
 
-our $MMDB = eval { IP::Geolocation::MMDB->new(file => $DATABASE) };
+my $country_reader = eval {
+    my $filename = $ENV{COUNTRY_DB}
+        || _first_database(\@directories, \@country_databases);
+    IP::Geolocation::MMDB->new(file => $filename);
+};
+
+my $asn_reader = eval {
+    my $filename = $ENV{ASN_DB}
+        || _first_database(\@directories, \@asn_databases);
+    IP::Geolocation::MMDB->new(file => $filename);
+};
 
 sub country_code {
     my $ip_address = shift;
 
-    return eval { $MMDB->getcc($ip_address) };
+    return eval { $country_reader->getcc($ip_address) };
+}
+
+sub asn_lookup {
+    my $ip_address = shift;
+
+    my $asn_tag;
+    my $asn = eval { $asn_reader->record_for_address($ip_address) };
+    if (defined $asn) {
+        my $number = $asn->{autonomous_system_number};
+        if (defined $number) {
+            $asn_tag = $number;
+            my $organization = $asn->{autonomous_system_organization};
+            if (defined $organization) {
+                $asn_tag .= q{ } . $organization;
+            }
+        }
+    }
+    return $asn_tag;
+}
+
+sub _first_database {
+    my ($directories, $databases) = @_;
+
+    for my $dir (@{$directories}) {
+        for my $db (@{$databases}) {
+            my $filename = $dir . q{/} . $db;
+            if (-r $filename) {
+                return $filename;
+            }
+        }
+    }
+    return;
 }
 
 1;
@@ -53,11 +96,11 @@ __END__
 
 =head1 NAME
 
-Mail::Exim::ACL::Geolocation - Map IP addresses to country codes
+Mail::Exim::ACL::Geolocation - Map IP addresses to location information
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -65,14 +108,18 @@ version 1.004
 
     warn
       domains = +local_domains : +relay_to_domains
+
       set acl_m_country_code = ${perl{country_code}{$sender_host_address}}
       add_header = X-Sender-Host-Country: $acl_m_country_code
 
+      set acl_m_asn = ${perl{asn_lookup}{$sender_host_address}}
+      add_header = X-Sender-Host-ASN: $acl_m_asn
+
 =head1 DESCRIPTION
 
-A Perl module for the Exim mailer that maps IP addresses to two-letter country
-codes such as "DE", "FR" and "US".  SpamAssassin can use these country codes
-to filter junk email.
+A Perl module for the Exim mailer that maps IP addresses to country codes and
+Autonomous Systems.  Spam filters can use this information to filter junk
+email.
 
 =head1 SUBROUTINES/METHODS
 
@@ -80,8 +127,15 @@ to filter junk email.
 
   my $country_code = country_code($ip_address);
 
-Maps an IP address to a country.  Returns the country code or the undefined
-value.
+Maps an IP address to a country.  Returns a two-letter country code or the
+undefined value.
+
+=head2 asn_lookup
+
+  my $asn = asn_lookup($ip_address);
+
+Maps an IP address to an Autonomous System.  Returns the Autonomous System
+number and organization or the undefined value.
 
 =head1 DIAGNOSTICS
 
@@ -93,7 +147,7 @@ None.
 
 Create a file such as F</etc/exim/exim.pl>.  Add the following Perl code.
 
-  use Mail::Exim::ACL::Geolocation qw(country_code);
+  use Mail::Exim::ACL::Geolocation qw(country_code asn_lookup);
 
 Edit Exim's configuration file.  Enable Perl in the main section.
 
@@ -107,8 +161,12 @@ the message header.
 
     warn
       domains = +local_domains : +relay_to_domains
+
       set acl_m_country_code = ${perl{country_code}{$sender_host_address}}
       add_header = X-Sender-Host-Country: $acl_m_country_code
+
+      set acl_m_asn = ${perl{asn_lookup}{$sender_host_address}}
+      add_header = X-Sender-Host-ASN: $acl_m_asn
 
 =head2 SpamAssassin
 
@@ -122,9 +180,9 @@ the message is sent from a country that you usually don't get email from.
   tflags UNCOMMON_COUNTRY noautolearn
   score UNCOMMON_COUNTRY 0.1
 
-See L<https://en.wikipedia.org/wiki/ISO_3166-2> for a list of two-letter
-country codes.  A useful list for businesses with contacts in Western Europe
-and North America is:
+See L<https://en.wikipedia.org/wiki/ISO_3166-2> for a list of country codes.
+A useful list for businesses with contacts in Western Europe and North America
+is:
 
   (?:AT|BE|CA|CH|DE|DK|ES|EU|FI|FR|GB|IE|IS|IT|LU|NL|NO|PT|SE|US)
 
@@ -137,24 +195,27 @@ Combine your new rule with other rules.
 
 =head1 DEPENDENCIES
 
-Requires the Perl module L<IP::Geolocation::MMDB> from CPAN and the modules
-L<Exporter> and L<List::Util>, which are distributed with Perl.
+Requires the Perl module L<IP::Geolocation::MMDB> from CPAN.
 
-Requires an IP to country database in the MaxMind DB file format from
+Requires geolocation databases in the MaxMind DB file format from
 L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.  The
 module searches the directories F</var/lib/GeoIP>, F</usr/local/share/GeoIP>,
-F</usr/share/GeoIP> and F</opt/share/GeoIP> for one of the following database
-files:
+F</usr/share/GeoIP>, F</opt/share/GeoIP> and F</var/db/GeoIP> for the
+following database files:
 
   GeoIP2-Country.mmdb
   GeoIP2-City.mmdb
   dbip-country.mmdb
   dbip-city.mmdb
-  dbip-location.mmdb
   GeoLite2-Country.mmdb
   GeoLite2-City.mmdb
   dbip-country-lite.mmdb
   dbip-city-lite.mmdb
+
+  GeoIP2-ASN.mmdb
+  dbip-asn.mmdb
+  GeoLite2-ASN.mmdb
+  dbip-asn-lite.mmdb
 
 =head1 INCOMPATIBILITIES
 
@@ -174,7 +235,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2025 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

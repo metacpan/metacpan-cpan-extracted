@@ -86,3 +86,7 @@ Revision history for LyricFinder
         special characters.
         - LyricFinder::Genius - Add a note in the docs about potential spam 
         embedded in lyrics text returned.
+1.40    2025/02/26
+        - Added LyricFinder::Lrclib (lrclib.net) - a new free open-source site 
+        recently included by the fine folks at Audacious audio player in their 
+        latest development release of Audacious.

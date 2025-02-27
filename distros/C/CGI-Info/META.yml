@@ -23,7 +23,7 @@ build_requires:
   strict: '0'
   warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -57,5 +57,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '0.92'
+version: '0.93'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

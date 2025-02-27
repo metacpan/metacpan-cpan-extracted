@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker;
 die "OS unsupported\n" if $^O eq 'MSWin32';
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Map IP addresses to country codes",
+  "ABSTRACT" => "Map IP addresses to location information",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,7 +23,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Exporter" => 0,
     "IP::Geolocation::MMDB" => 0,
-    "List::Util" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Spec::Functions" => 0,
   "IP::Geolocation::MMDB" => 0,
-  "List::Util" => 0,
   "Test::More" => 0,
   "utf8" => 0,
   "warnings" => 0

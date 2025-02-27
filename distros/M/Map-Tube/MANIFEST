@@ -18,6 +18,7 @@ script/map-data-converter
 share/color-names.txt
 t/00-load.t
 t/bad-sample.xml
+t/casetest.xml
 t/common-lines-map.json
 t/common-lines-map.t
 t/metachars.t
@@ -25,6 +26,7 @@ t/metachars-map.xml
 t/unidirection-map.xml
 t/unidirection-map.t
 t/good-map.xml
+t/99-casetest.t
 t/invalid-role.t
 t/line-stations.t
 t/map.t

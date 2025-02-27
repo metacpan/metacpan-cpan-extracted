@@ -12,24 +12,6 @@ BEGIN { use_ok('CGI::Info') }
 my $info;
 my $upload_dir = tempdir(CLEANUP => 1);
 
-subtest 'Allowed Parameters' => sub {
-	local %ENV = (
-		GATEWAY_INTERFACE => 'CGI/1.1',
-		REQUEST_METHOD => 'GET',
-		QUERY_STRING => 'allowed_param=123&disallowed_param=evil',
-	);
-
-	$info = CGI::Info->new(allow => { allowed_param => qr/^\d+$/ });
-	my $params = $info->params();
-
-	is_deeply(
-		$params,
-		{ allowed_param => '123' },
-		'Only allowed parameters are present'
-	);
-	cmp_ok($info->status(), '==', 422, 'Status is not OK when disallowed params are used');
-};
-
 subtest 'SQL Injection Detection' => sub {
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',

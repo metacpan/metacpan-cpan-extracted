@@ -2507,7 +2507,7 @@ SV * _itsa(pTHX_ SV * a) {
     return newSVuv(2);
   }
   if(SV_IS_POK(a)) {
-#if defined(MPFR_PV_NV_BUG)        /* perl can set the POK flag when it should not */
+#if defined(GMPQ_PV_NV_BUG)        /* perl can set the POK flag when it should not */
     if(SvNOK(a) && !SvIOKp(a))
       return newSVuv(3);        /* designate it as NV */
 #endif
