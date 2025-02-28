@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::HyperlinkResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Hyperlink** | **Hyperlink** |  |
+**Hyperlink** | **Hyperlink** | A public property named "Hyperlink" of type Hyperlink with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

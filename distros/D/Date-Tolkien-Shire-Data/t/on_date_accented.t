@@ -52,7 +52,7 @@ $events{2} = { 14 => "Frodo and Sam look in the Mirror of Galadriel, 1419.\n" .
 	       27 => "Aragorn reaches the west-cliff at sunrise, 1419.\n" .
 		   "${E_acute}omer sets out from Eastfold against Th${e_acute}oden's orders to pursue the Orcs, 1419.\n",
 	       28 => "${E_acute}omer overtakes the Orcs just outside of Fangorn Forest, 1419.\n",
-	       29 => "Meriodoc and Pippin escape and meet Treebeard, 1419.\n" .
+	       29 => "Meriadoc and Pippin escape and meet Treebeard, 1419.\n" .
 		   "The Rohirrim attack at sunrise and destroy the Orcs, 1419.\n" .
 		   "Frodo descends from the Emyn Muil and meets Gollum, 1419.\n" .
 		   "Faramir sees the funeral boat of Boromir, 1419.\n",

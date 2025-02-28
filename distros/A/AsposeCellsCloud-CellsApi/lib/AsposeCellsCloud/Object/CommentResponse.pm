@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'comment' => {
      	datatype => 'Comment',
      	base_name => 'Comment',
-     	description => '',
+     	description => 'The class has a public property "Comment" of type "Comment" that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

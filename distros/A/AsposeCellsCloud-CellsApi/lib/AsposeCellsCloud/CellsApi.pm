@@ -4547,6 +4547,41 @@ sub post_convert_workbook_to_csv{
 }
 
 #
+# PostConvertWorksheetToImageRequest
+#
+# 
+# 
+# @convertWorksheetOptions  ConvertWorksheetOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostConvertWorksheetToImageRequest',
+            description => 'PostConvertWorksheetToImage Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_worksheet_to_image' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_convert_worksheet_to_image{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # PostExportRequest
 #
 # 
@@ -9487,6 +9522,45 @@ sub post_worksheet_cells_range_row_height{
 }
 
 #
+# PostWorksheetCellsRangeToImageRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rangeConvertRequest  RangeConvertRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeToImageRequest',
+            description => 'PostWorksheetCellsRangeToImage Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_to_image' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_to_image{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # PutWorksheetCellsRangeRequest
 #
 # Insert a range of cells and shift existing cells based on the specified shift option.
@@ -10121,6 +10195,111 @@ sub post_worksheet_sparkline_group{
 }
 
 #
+# PostCharacterCountRequest
+#
+# 
+# 
+# @characterCountOptions  CharacterCountOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCharacterCountRequest',
+            description => 'PostCharacterCount Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_character_count' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_character_count{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostWordsCountRequest
+#
+# 
+# 
+# @wordsCountOptions  WordsCountOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWordsCountRequest',
+            description => 'PostWordsCount Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_words_count' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_words_count{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostSpecifyWordsCountRequest
+#
+# 
+# 
+# @specifyWordsCountOptions  SpecifyWordsCountOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSpecifyWordsCountRequest',
+            description => 'PostSpecifyWordsCount Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_specify_words_count' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_specify_words_count{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # PostRunTaskRequest
 #
 # Run tasks.
@@ -10158,7 +10337,7 @@ sub post_run_task{
 #
 # PostAddTextContentRequest
 #
-# 
+# Adds text content to a workbook at specified positions within cells based on provided options using ASP.NET Core Web API.
 # 
 # @addTextOptions  AddTextOptions (required)     
 #
@@ -10171,7 +10350,7 @@ sub post_run_task{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_add_text_content' } = { 
-    	summary => '',
+    	summary => 'Adds text content to a workbook at specified positions within cells based on provided options using ASP.NET Core Web API.',
         params => $params,
         returns => 'FileInfo',
     };
@@ -11410,6 +11589,8 @@ sub get_worksheets{
 # @horizontalResolution  int   Image horizontal resolution.  
 # @area  string   Represents the range to be printed.  
 # @pageIndex  int   Represents the page to be printed  
+# @onePagePerSheet  boolean     
+# @printHeadings  boolean     
 # @folder  string   The folder where the file is situated.  
 # @storageName  string   The storage name where the file is situated.   
 #

@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class Summary:             - Features: Active class participation, group projects, quizzes, and final exam.',
                                   class => 'SeriesItems',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'category_data' => {
      	datatype => 'string',
      	base_name => 'CategoryData',
-     	description => '',
+     	description => 'This property allows setting and getting data for the category.',
      	format => '',
      	read_only => '',
      		},

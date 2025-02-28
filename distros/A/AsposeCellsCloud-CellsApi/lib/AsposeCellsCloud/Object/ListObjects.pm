@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'list_object_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'ListObjectList',
-     	description => '',
+     	description => 'A property named ListObjectList that is a list of LinkElement objects.',
      	format => '',
      	read_only => '',
      		},

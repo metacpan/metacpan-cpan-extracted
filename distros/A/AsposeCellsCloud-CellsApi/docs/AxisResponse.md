@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::AxisResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Axis** | **Axis** |  |
+**Axis** | **Axis** | A property named "Axis" of type "Axis" with both getter and setter methods is present in the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'hyperlink' => {
      	datatype => 'Hyperlink',
      	base_name => 'Hyperlink',
-     	description => '',
+     	description => 'A public property named "Hyperlink" of type Hyperlink with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

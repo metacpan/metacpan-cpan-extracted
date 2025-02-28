@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SaveResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SaveResult** | **SaveResult** |  |
+**SaveResult** | **SaveResult** | This class property represents a "SaveResult" XML element. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

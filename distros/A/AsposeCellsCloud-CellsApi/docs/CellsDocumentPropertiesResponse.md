@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellsDocumentPropertiesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DocumentProperties** | **CellsDocumentProperties** |  |
+**DocumentProperties** | **CellsDocumentProperties** | The class has a property that represents the document properties of cells. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

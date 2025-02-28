@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'range' => {
      	datatype => 'Range',
      	base_name => 'Range',
-     	description => '',
+     	description => 'This class has a property named "Range" of type Range with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

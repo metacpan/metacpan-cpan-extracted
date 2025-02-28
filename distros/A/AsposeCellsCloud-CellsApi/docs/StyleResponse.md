@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::StyleResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Style** | **Style** |  |
+**Style** | **Style** | A property named "Style" of type "Style" is defined with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

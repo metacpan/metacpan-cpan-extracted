@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 25.1
+    version: 25.2
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -611,6 +611,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm
   AsposeCellsCloud::Object::ProtectWorkbookRequest:
     file: lib/AsposeCellsCloud/Object/ProtectWorkbookRequest.pm
+  AsposeCellsCloud::Object::RangeConvertRequest:
+    file: lib/AsposeCellsCloud/Object/RangeConvertRequest.pm
   AsposeCellsCloud::Object::RangeCopyRequest:
     file: lib/AsposeCellsCloud/Object/RangeCopyRequest.pm
   AsposeCellsCloud::Object::RangeSetOutlineBorderRequest:
@@ -665,10 +667,20 @@ provides:
     file: lib/AsposeCellsCloud/Object/AddTextOptions.pm
   AsposeCellsCloud::Object::BaseOperateOptions:
     file: lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
+  AsposeCellsCloud::Object::CharacterCountOptions:
+    file: lib/AsposeCellsCloud/Object/CharacterCountOptions.pm
+  AsposeCellsCloud::Object::CombinationSourceData:
+    file: lib/AsposeCellsCloud/Object/CombinationSourceData.pm
   AsposeCellsCloud::Object::ConvertTextOptions:
     file: lib/AsposeCellsCloud/Object/ConvertTextOptions.pm
+  AsposeCellsCloud::Object::ConvertWorksheetOptions:
+    file: lib/AsposeCellsCloud/Object/ConvertWorksheetOptions.pm
+  AsposeCellsCloud::Object::DataOutputLocation:
+    file: lib/AsposeCellsCloud/Object/DataOutputLocation.pm
   AsposeCellsCloud::Object::ExtractTextOptions:
     file: lib/AsposeCellsCloud/Object/ExtractTextOptions.pm
+  AsposeCellsCloud::Object::MergeTableOptions:
+    file: lib/AsposeCellsCloud/Object/MergeTableOptions.pm
   AsposeCellsCloud::Object::RemoveCharactersByCharacter:
     file: lib/AsposeCellsCloud/Object/RemoveCharactersByCharacter.pm
   AsposeCellsCloud::Object::RemoveCharactersByPosition:
@@ -681,12 +693,18 @@ provides:
     file: lib/AsposeCellsCloud/Object/ScopeItem.pm
   AsposeCellsCloud::Object::ScopeOptions:
     file: lib/AsposeCellsCloud/Object/ScopeOptions.pm
+  AsposeCellsCloud::Object::SpecifyWordsCountOptions:
+    file: lib/AsposeCellsCloud/Object/SpecifyWordsCountOptions.pm
   AsposeCellsCloud::Object::SplitTextOptions:
     file: lib/AsposeCellsCloud/Object/SplitTextOptions.pm
+  AsposeCellsCloud::Object::TablePositionInfo:
+    file: lib/AsposeCellsCloud/Object/TablePositionInfo.pm
   AsposeCellsCloud::Object::TrimContentOptions:
     file: lib/AsposeCellsCloud/Object/TrimContentOptions.pm
   AsposeCellsCloud::Object::WordCaseOptions:
     file: lib/AsposeCellsCloud/Object/WordCaseOptions.pm
+  AsposeCellsCloud::Object::WordsCountOptions:
+    file: lib/AsposeCellsCloud/Object/WordsCountOptions.pm
   AsposeCellsCloud::Object::CellValue:
     file: lib/AsposeCellsCloud/Object/CellValue.pm
   AsposeCellsCloud::Object::CustomParserConfig:
@@ -1095,6 +1113,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostConvertWorkbookToSQLRequest.pm
   AsposeCellsCloud::Request::PostConvertWorkbookToCSVRequest:
     file: lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm
+  AsposeCellsCloud::Request::PostConvertWorksheetToImageRequest:
+    file: lib/AsposeCellsCloud/Request/PostConvertWorksheetToImageRequest.pm
   AsposeCellsCloud::Request::PostExportRequest:
     file: lib/AsposeCellsCloud/Request/PostExportRequest.pm
   AsposeCellsCloud::Request::PostWorkbookExportXMLRequest:
@@ -1345,6 +1365,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeColumnWidthRequest.pm
   AsposeCellsCloud::Request::PostWorksheetCellsRangeRowHeightRequest:
     file: lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeRowHeightRequest.pm
+  AsposeCellsCloud::Request::PostWorksheetCellsRangeToImageRequest:
+    file: lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeToImageRequest.pm
   AsposeCellsCloud::Request::PutWorksheetCellsRangeRequest:
     file: lib/AsposeCellsCloud/Request/PutWorksheetCellsRangeRequest.pm
   AsposeCellsCloud::Request::DeleteWorksheetCellsRangeRequest:
@@ -1377,6 +1399,12 @@ provides:
     file: lib/AsposeCellsCloud/Request/PutWorksheetSparklineGroupRequest.pm
   AsposeCellsCloud::Request::PostWorksheetSparklineGroupRequest:
     file: lib/AsposeCellsCloud/Request/PostWorksheetSparklineGroupRequest.pm
+  AsposeCellsCloud::Request::PostCharacterCountRequest:
+    file: lib/AsposeCellsCloud/Request/PostCharacterCountRequest.pm
+  AsposeCellsCloud::Request::PostWordsCountRequest:
+    file: lib/AsposeCellsCloud/Request/PostWordsCountRequest.pm
+  AsposeCellsCloud::Request::PostSpecifyWordsCountRequest:
+    file: lib/AsposeCellsCloud/Request/PostSpecifyWordsCountRequest.pm
   AsposeCellsCloud::Request::PostRunTaskRequest:
     file: lib/AsposeCellsCloud/Request/PostRunTaskRequest.pm
   AsposeCellsCloud::Request::PostAddTextContentRequest:
@@ -1586,5 +1614,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 25.1
+version: 25.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

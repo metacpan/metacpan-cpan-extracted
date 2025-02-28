@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **Scale** | **double** | Gets and sets the picture format scale.  |
 **TilePicOption** | **TilePicOption** | Gets or sets tile picture option.  |
 **PicFormatOption** | **PicFormatOption** | Gets or sets picture format option.  |
-**Image** | **LinkElement** |  |  
+**Image** | **LinkElement** | The class has a public property named "Image" of type LinkElement that can be accessed and set. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

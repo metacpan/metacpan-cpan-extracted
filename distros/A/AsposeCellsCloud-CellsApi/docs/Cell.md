@@ -22,7 +22,7 @@ Name | Type | Description | Notes
 **IsInTable** | **boolean** | Indicates whether this cell is part of table formula. |
 **IsStyleSet** | **boolean** | Indicates if the cell's style is set. If return false, it means this cell has a default cell format. |
 **HtmlString** | **string** | Gets and sets the html string which contains data and some formats in this cell. |
-**Style** | **LinkElement** |  |
+**Style** | **LinkElement** | This class property represents a style element with the specified XML element name. |
 **Worksheet** | **string** | Gets the parent worksheet. |
 **link** | **Link** |  |  
 

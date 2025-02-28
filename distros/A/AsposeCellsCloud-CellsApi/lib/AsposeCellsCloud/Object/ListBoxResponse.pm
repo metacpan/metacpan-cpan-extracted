@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'ListBox',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A property "Shape" of type ListBox with read and write access is available for the class.',
      	format => '',
      	read_only => '',
      		},

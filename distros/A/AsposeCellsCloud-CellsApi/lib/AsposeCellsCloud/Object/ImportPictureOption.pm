@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: The features of the topic were explored, discussing its components, patterns, and significance.',
                                   class => 'ImportPictureOption',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'upper_left_row' => {
      	datatype => 'int',
      	base_name => 'UpperLeftRow',
-     	description => '',
+     	description => 'A property "UpperLeftRow" of type integer with a public getter and setter is defined.',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'ComboBox',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A public property of type ComboBox named Shape with get and set accessors.',
      	format => '',
      	read_only => '',
      		},

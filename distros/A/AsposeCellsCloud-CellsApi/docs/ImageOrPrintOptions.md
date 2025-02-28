@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TextCrossType** | **string** | TextCrossType |
 **GridlineType** | **string** | GridlineType |
-**OutputBlankPageWhenNothingToPrint** | **boolean** |  |
+**OutputBlankPageWhenNothingToPrint** | **boolean** | Indicates whether to output a blank page when there is nothing to print. |
 **CheckWorkbookDefaultFont** | **boolean** |  |
 **DefaultFont** | **string** |  |
 **IsOptimized** | **boolean** |  |

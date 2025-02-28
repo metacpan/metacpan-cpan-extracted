@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m here to help! Just provide me with the features you`d like to summarize.',
                                   class => 'ImportIntArrayOption',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'first_row' => {
      	datatype => 'int',
      	base_name => 'FirstRow',
-     	description => '',
+     	description => 'This class has a public property named "FirstRow" of type integer with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

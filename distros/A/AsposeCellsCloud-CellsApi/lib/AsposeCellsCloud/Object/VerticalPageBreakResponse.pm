@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'vertical_page_break' => {
      	datatype => 'VerticalPageBreak',
      	base_name => 'VerticalPageBreak',
-     	description => '',
+     	description => 'The class has a property that represents a vertical page break.',
      	format => '',
      	read_only => '',
      		},

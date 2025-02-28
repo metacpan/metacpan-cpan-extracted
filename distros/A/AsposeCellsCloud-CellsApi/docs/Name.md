@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::Name;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Comment** | **string** | Gets and sets the comment of the name.                        Only applies for Excel 2007. |
-**WorksheetIndex** | **int** |  |
+**WorksheetIndex** | **int** | Property Summary: WorksheetIndex is an optional integer property marked with the XmlElement attribute "worksheetindex". |
 **IsReferred** | **boolean** | Indicates whether this name is referred by other formulas. |
 **IsVisible** | **boolean** | Indicates whether the name is visible. |
 **R1C1RefersTo** | **string** | Gets or sets a R1C1 reference of the . |

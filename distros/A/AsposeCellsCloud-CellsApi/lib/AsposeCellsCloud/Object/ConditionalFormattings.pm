@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'count' => {
      	datatype => 'int',
      	base_name => 'Count',
-     	description => '',
+     	description => 'The property "Count" is decorated with [XmlElement("count")] attribute for XML serialization.',
      	format => '',
      	read_only => '',
      		},

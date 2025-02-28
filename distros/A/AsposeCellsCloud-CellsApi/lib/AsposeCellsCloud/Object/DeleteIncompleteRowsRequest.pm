@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m here to help! Could you please provide the features you would like me to summarize?',
                                   class => 'DeleteIncompleteRowsRequest',
                                   required => [], # TODO
 }                                 );
@@ -157,7 +157,7 @@ __PACKAGE__->method_documentation({
      'ranges' => {
      	datatype => 'ARRAY[Range]',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'A property named "Ranges" of type IList of Range, with a default value of an empty List of Range.',
      	format => '',
      	read_only => '',
      		},    

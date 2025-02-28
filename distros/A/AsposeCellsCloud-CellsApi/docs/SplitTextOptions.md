@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SplitTextOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | The property "Name" is a publicly accessible and overridable property of type string in the class. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Worksheet** | **string** |  |

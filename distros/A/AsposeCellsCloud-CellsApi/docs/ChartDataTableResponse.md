@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ChartDataTableResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ChartDataTable** | **ChartDataTable** |  |
+**ChartDataTable** | **ChartDataTable** | This property allows access to a ChartDataTable object for storing and manipulating data related to a chart. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

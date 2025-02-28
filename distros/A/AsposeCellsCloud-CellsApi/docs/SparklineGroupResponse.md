@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SparklineGroupResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SparklineGroup** | **SparklineGroup** |  |
+**SparklineGroup** | **SparklineGroup** | A property that allows access to a Sparkline group containing multiple Sparkline objects. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

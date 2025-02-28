@@ -1,5 +1,10 @@
 Revision history for Test-Fixme
 
+0.17      2025-02-27 09:14:52 -0800
+  - Skip tests requiring symlinks on Windows, where for newer versions
+    of Strawberry Perl (at least) they are supported, but the environment
+    is not typically configured for them (gh#8, gh#9)
+
 0.16      2016-05-06 07:26:50 -0400
   - Add support for MSYS2
 

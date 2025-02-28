@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'legend_entries' => {
      	datatype => 'LegendEntries',
      	base_name => 'LegendEntries',
-     	description => '',
+     	description => 'Property Summary: The class includes a property for managing legend entries.',
      	format => '',
      	read_only => '',
      		},

@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'code' => {
      	datatype => 'int',
      	base_name => 'Code',
-     	description => '',
+     	description => 'The property "Code" allows for accessing and modifying the HTTP status code of the response.',
      	format => '',
      	read_only => '',
      		},

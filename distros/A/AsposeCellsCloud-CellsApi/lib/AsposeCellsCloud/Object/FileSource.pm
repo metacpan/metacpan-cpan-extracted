@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m sorry, I just realized you didn`t provide any features for me to summarize. Please provide the features you`d like me to summarize for the class.',
                                   class => 'FileSource',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'file_source_type' => {
      	datatype => 'string',
      	base_name => 'FileSourceType',
-     	description => '',
+     	description => 'A property named FileSourceType of type FileSourceType that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

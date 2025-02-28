@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'LineShape',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The class has a public property called Shape of type LineShape that can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

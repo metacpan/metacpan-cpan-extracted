@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportPosition;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SheetName** | **string** |  |
+**SheetName** | **string** | "Property SheetName of type string with a public get and set accessor." |
 **RowIndex** | **int** |  |
 **ColumnIndex** | **int** |  |  
 

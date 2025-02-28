@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'rotation' => {
      	datatype => 'double',
      	base_name => 'Rotation',
-     	description => '',
+     	description => 'Gets or sets roation of the watermark in degrees.',
      	format => '',
      	read_only => '',
      		},

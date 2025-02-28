@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::DataLabels;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **IsAutoText** | **boolean** | Indicates the text is auto generated. |
-**IsDeleted** | **boolean** |  |
+**IsDeleted** | **boolean** | A nullable boolean property "IsDeleted" indicating whether an object has been deleted. |
 **LinkedSource** | **string** |  |
 **Number** | **int** | Gets and sets the built-in number format. |
 **NumberFormat** | **string** | Represents the format string for the DataLabels object. |

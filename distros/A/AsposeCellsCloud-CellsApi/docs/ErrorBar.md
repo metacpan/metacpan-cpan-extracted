@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ErrorBar;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Link** | **Link** |  |
+**Link** | **Link** | A property named "Link" of type "Link" that can be accessed and modified. |
 **Amount** | **double** | Represents amount of error bar.                         The amount must be greater than or equal to zero. |
 **DisplayType** | **string** | Represents error bar display type. |
 **MinusValue** | **string** | Represents negative error amount when error bar type is Custom. |

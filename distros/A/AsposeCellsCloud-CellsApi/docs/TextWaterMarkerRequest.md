@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TextWaterMarkerRequest;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Text** | **string** |  |
+**Text** | **string** | A property named Text of type string that can be accessed and modified. |
 **FontName** | **string** | Indicates font name. |
 **FontSize** | **int** | Indicates font size. |
 **Height** | **int** | Indicates image height. |

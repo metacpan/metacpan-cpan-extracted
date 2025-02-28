@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'document_properties' => {
      	datatype => 'CellsDocumentProperties',
      	base_name => 'DocumentProperties',
-     	description => '',
+     	description => 'The class has a property that represents the document properties of cells.',
      	format => '',
      	read_only => '',
      		},

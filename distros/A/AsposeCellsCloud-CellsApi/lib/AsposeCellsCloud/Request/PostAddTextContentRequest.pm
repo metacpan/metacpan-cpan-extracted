@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_add_text_content' } = { 
-    	summary => '',
+    	summary => 'Adds text content to a workbook at specified positions within cells based on provided options using ASP.NET Core Web API.',
         params => $params,
         returns => 'FileInfo',
     };

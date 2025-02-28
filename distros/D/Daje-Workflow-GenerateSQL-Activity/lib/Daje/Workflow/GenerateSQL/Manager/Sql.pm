@@ -135,15 +135,15 @@ sub create_table_sql($self, $table) {
 
 }
 
-# sub create_sql($self, $json, $tablename) {
-#     my $sql_stmt = Daje::Workflow::GenerateSQL::Manager::Sql->new(
-#         json      => $json,
-#         templates  => $self->templates,
-#         tablename => $tablename,
-#     );
-#     my $result = $sql_stmt->create_sql();
-#     return $result;
-# }
+sub create_sql($self, $json, $tablename) {
+    my $sql_stmt = Daje::Workflow::GenerateSQL::Script::Sql->new(
+        json      => $json,
+        templates  => $self->templates,
+        tablename => $tablename,
+    );
+    $sql_stmt->create_sql();
+    return $sql_stmt->sql();
+}
 
 sub fill_template($self, $name, $fields, $foreignkeys, $indexes, $sql) {
     my $template = $self->templates->get_data_section('table');

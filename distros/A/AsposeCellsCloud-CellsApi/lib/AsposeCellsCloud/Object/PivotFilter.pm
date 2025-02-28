@@ -192,7 +192,7 @@ __PACKAGE__->method_documentation({
      'top10_filter' => {
      	datatype => 'Top10Filter',
      	base_name => 'Top10Filter',
-     	description => '',
+     	description => 'A property that allows for setting and getting a Top10Filter object for filtering data.',
      	format => '',
      	read_only => '',
      		},    

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'CellName',
-     	description => '',
+     	description => 'Property: CellName attribute with XmlElement tag in the class.',
      	format => '',
      	read_only => '',
      		},

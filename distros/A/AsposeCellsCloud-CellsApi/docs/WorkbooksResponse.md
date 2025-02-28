@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WorkbooksResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Workbooks** | **ARRAY[LinkElement]** |  |
+**Workbooks** | **ARRAY[LinkElement]** | Property Summary: Contains a list of "Workbook" elements under the "Workbooks" array in XML format. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

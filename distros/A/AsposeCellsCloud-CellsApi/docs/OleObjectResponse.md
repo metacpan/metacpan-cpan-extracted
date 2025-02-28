@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::OleObjectResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**OleObject** | **OleObject** |  |
+**OleObject** | **OleObject** | This class has a property named OleObject of type OleObject with both read and write capabilities. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

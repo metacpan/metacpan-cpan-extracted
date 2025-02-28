@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'row_index' => {
      	datatype => 'int',
      	base_name => 'rowIndex',
-     	description => '',
+     	description => 'A public integer property called "rowIndex" with both getter and setter.',
      	format => '',
      	read_only => '',
      		},

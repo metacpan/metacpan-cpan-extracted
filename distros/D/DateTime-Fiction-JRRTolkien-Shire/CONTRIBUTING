@@ -1,0 +1,32 @@
+IMPORTANT -- If you find a typo in the "What happened on this date"
+output, DO NOT fix it here. That text was refactored into
+Date::Tolkien::Shire::Data so it could be shared with
+Date::Tolkien::Shire.
+
+I welcome bug reports, patches, and suggestions. My preferred way to
+recieve these is via the RT system at
+https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire,
+but I happily accept them either through GitHub at
+https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire, by
+electronic mail to WYANT AT cpan DOT org, or any other way that works
+for you, though I can not accept owls because I have no facilities to
+house them. Non-RT requests may be turned into RT tickets by me unless
+you specifically request otherwise. The bug report, patch, or suggestion
+(if acted on) will also be acknowledged in the Changes file unless you
+specifically request othewise.
+
+Requests for information probably do not need to be tickets in RT or
+GitHub, and my preferred route for these is by electronic mail, but
+again anything that works for you is probably fine with me.
+
+I try hard never to reject a bug report outright, though I may edit
+patches, believe that a different fix is more in line with my vision for
+the code, or even that the report is due to a misunderstanding and
+address it with a documentation change. Whatever I decide I will give
+you time to respond (typically a week or so), and whatever I actually do
+I will give you time to see if it meets your needs before I do a
+production release.
+
+GitHub pull requests should be made on a topic branch rather than the
+master branch. If you have something big in mind I would appreciate a
+heads-up in some form prior to the pull request.

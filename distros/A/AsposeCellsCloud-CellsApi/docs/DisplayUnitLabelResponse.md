@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::DisplayUnitLabelResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DisplayUnitLabel** | **DisplayUnitLabel** |  |
+**DisplayUnitLabel** | **DisplayUnitLabel** | This property allows access to the display unit label for the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'axis' => {
      	datatype => 'Axis',
      	base_name => 'Axis',
-     	description => '',
+     	description => 'A property named "Axis" of type "Axis" with both getter and setter methods is present in the class.',
      	format => '',
      	read_only => '',
      		},

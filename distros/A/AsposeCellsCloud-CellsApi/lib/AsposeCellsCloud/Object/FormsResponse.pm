@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'forms' => {
      	datatype => 'Forms',
      	base_name => 'Forms',
-     	description => '',
+     	description => 'This class has a property named Forms of type Forms that has both a getter and setter.',
      	format => '',
      	read_only => '',
      		},

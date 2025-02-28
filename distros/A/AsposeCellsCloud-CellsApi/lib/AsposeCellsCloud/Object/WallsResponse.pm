@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'walls' => {
      	datatype => 'Walls',
      	base_name => 'Walls',
-     	description => '',
+     	description => 'The class has a public property named `Walls` of type `Walls`.',
      	format => '',
      	read_only => '',
      		},

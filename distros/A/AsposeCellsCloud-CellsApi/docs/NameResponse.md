@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::NameResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **Name** |  |
+**Name** | **Name** | A public property that allows getting and setting a value of type "Name". |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

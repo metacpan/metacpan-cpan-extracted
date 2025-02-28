@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::CPAN::Changes' 
+BEGIN {
+  plan skip_all => 'test requires Test::CPAN::Changes'
     unless eval q{ use Test::CPAN::Changes; 1 };
 };
 use Test::CPAN::Changes;
@@ -25,3 +25,5 @@ do {
 changes_file_ok;
 
 done_testing;
+
+

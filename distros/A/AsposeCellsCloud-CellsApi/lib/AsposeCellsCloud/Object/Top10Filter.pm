@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'field_index' => {
      	datatype => 'int',
      	base_name => 'FieldIndex',
-     	description => '',
+     	description => 'An integer property named FieldIndex that can be accessed and modified.            ',
      	format => '',
      	read_only => '',
      		},

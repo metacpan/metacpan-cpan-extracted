@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Link;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Href** | **string** |  |
+**Href** | **string** | Has a property named Href with the attribute ElementName set to "href". |
 **Rel** | **string** |  |
 **Title** | **string** |  |
 **Type** | **string** |  |  

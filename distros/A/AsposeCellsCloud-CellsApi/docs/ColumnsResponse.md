@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ColumnsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Columns** | **Columns** |  |
+**Columns** | **Columns** | This property allows access to the columns within the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

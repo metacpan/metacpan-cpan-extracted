@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotFilterResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PivotFilter** | **PivotFilter** |  |
+**PivotFilter** | **PivotFilter** | Property Summary: Contains a pivot filter for data manipulation. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

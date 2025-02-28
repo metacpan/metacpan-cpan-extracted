@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'drop_bars' => {
      	datatype => 'DropBars',
      	base_name => 'DropBars',
-     	description => '',
+     	description => 'The class has a property named `DropBars` of type `DropBars` with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

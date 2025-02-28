@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RangeValueResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CellsList** | **ARRAY[Cell]** |  |
+**CellsList** | **ARRAY[Cell]** | Property Summary: Contains a list of elements labeled as "Cell". |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

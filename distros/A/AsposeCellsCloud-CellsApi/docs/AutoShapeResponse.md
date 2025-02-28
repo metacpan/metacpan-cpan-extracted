@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::AutoShapeResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AutoShape** | **AutoShape** |  |
+**AutoShape** | **AutoShape** | A public property named "AutoShape" of type "AutoShape" with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

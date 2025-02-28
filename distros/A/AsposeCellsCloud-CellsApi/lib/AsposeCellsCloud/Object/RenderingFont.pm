@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Gets name of the font.',
      	format => '',
      	read_only => '',
      		},

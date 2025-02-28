@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pivot_table_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'PivotTableList',
-     	description => '',
+     	description => 'Xml property "PivotTableList" of the class contains a list of "LinkElement" objects with the element name "PivotTable".',
      	format => '',
      	read_only => '',
      		},

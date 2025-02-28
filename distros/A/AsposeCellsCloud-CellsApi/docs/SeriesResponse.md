@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SeriesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Series** | **Series** |  |
+**Series** | **Series** | A public property named "Series" of type Series with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

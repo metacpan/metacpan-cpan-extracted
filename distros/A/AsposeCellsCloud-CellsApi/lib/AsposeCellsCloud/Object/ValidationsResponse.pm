@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'validations' => {
      	datatype => 'Validations',
      	base_name => 'Validations',
-     	description => '',
+     	description => 'This class has a public property named "Validations" of type "Validations" that includes both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

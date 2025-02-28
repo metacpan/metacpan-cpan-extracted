@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ConvertTextOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | The class has a public property called "Name" of type string that can be accessed and modified. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Worksheet** | **string** |  |

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'Oval',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The class has a public property called "Shape" of type "Oval" with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

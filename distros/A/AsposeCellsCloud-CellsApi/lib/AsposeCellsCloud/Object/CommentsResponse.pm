@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'comments' => {
      	datatype => 'Comments',
      	base_name => 'Comments',
-     	description => '',
+     	description => 'Property Summary: "The Comments property represents an XML element named `comments` within the class."',
      	format => '',
      	read_only => '',
      		},

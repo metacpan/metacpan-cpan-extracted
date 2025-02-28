@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::HtmlSaveOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ExportPageHeaders** | **boolean** |  |
+**ExportPageHeaders** | **boolean** | Indicates whether exporting page headers. |
 **ExportPageFooters** | **boolean** |  |
 **ExportRowColumnHeadings** | **boolean** |  |
 **ShowAllSheets** | **boolean** |  |

@@ -11,7 +11,7 @@ use Sample;
 my %tests = (
               'good-map.xml'                  => undef, # supposed to pass
               'line-name-uc-nonduplicate.xml' => undef, # supposed to pass
-              'line-name-duplicate.xml'       => 'Line name A defined more than once (ids A, Ax)',                   # supposed to fail
+              'line-name-duplicate.xml'       => 'Line name A defined more than once (ids A, AX)',                   # supposed to fail
               'line-name-uc-duplicate.xml'    => 'Line name A defined more than once with different spelling: A, a', # supposed to fail
             );
 

@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Could you please provide me with the features you would like me to summarize into a class summary?',
                                   class => 'ImportCSVDataOption',
                                   required => [], # TODO
 }                                 );
@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'separator_string' => {
      	datatype => 'string',
      	base_name => 'SeparatorString',
-     	description => '',
+     	description => 'A property named SeparatorString of type string that can be accessed and modified publicly.',
      	format => '',
      	read_only => '',
      		},

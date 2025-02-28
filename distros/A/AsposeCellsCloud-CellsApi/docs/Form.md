@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Form;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FormType** | **string** |  |
+**FormType** | **string** | A property named "FormType" of type string which can be both accessed and modified. |
 **CheckedValue** | **string** |  |
 **Shadow** | **boolean** |  |
 **InputRange** | **string** |  |

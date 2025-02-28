@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pivot_filter' => {
      	datatype => 'PivotFilter',
      	base_name => 'PivotFilter',
-     	description => '',
+     	description => 'Property Summary: Contains a pivot filter for data manipulation.',
      	format => '',
      	read_only => '',
      		},

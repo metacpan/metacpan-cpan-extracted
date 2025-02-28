@@ -159,7 +159,7 @@ __PACKAGE__->method_documentation({
      'image_format' => {
      	datatype => 'string',
      	base_name => 'ImageFormat',
-     	description => '',
+     	description => 'This class has a property called "ImageFormat" that allows getting and setting a string value.',
      	format => '',
      	read_only => '',
      		},

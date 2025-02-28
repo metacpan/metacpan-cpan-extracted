@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WorksheetResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Worksheet** | **Worksheet** |  |
+**Worksheet** | **Worksheet** | The class has a property called "Worksheet" of type "Worksheet" that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

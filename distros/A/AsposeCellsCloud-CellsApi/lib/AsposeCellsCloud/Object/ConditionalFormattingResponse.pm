@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'conditional_formatting' => {
      	datatype => 'ConditionalFormatting',
      	base_name => 'ConditionalFormatting',
-     	description => '',
+     	description => 'This class has a property named ConditionalFormatting of type ConditionalFormatting that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

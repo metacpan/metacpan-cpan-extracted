@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'row' => {
      	datatype => 'Row',
      	base_name => 'Row',
-     	description => '',
+     	description => 'This class has a public property named "Row" of type "Row" with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

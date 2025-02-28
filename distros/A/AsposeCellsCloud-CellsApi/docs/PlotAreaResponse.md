@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PlotAreaResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PlotArea** | **PlotArea** |  |
+**PlotArea** | **PlotArea** | A property that allows getting and setting the PlotArea for the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

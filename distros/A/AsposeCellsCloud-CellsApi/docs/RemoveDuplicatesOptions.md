@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RemoveDuplicatesOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | The class has a public property "Name" of type string that can be both read and written. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Worksheet** | **string** |  |

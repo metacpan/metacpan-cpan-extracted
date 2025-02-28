@@ -132,7 +132,7 @@ __PACKAGE__->method_documentation({
      'alt_text_description' => {
      	datatype => 'string',
      	base_name => 'AltTextDescription',
-     	description => '',
+     	description => 'Gets the description of the alt text',
      	format => '',
      	read_only => '',
      		},

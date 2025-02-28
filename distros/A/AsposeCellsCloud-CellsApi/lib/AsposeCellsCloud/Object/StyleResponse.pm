@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'style' => {
      	datatype => 'Style',
      	base_name => 'Style',
-     	description => '',
+     	description => 'A property named "Style" of type "Style" is defined with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

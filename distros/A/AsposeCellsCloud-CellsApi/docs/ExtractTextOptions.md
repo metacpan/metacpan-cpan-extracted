@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ExtractTextOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | This class has a public property for storing and retrieving a name value. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Worksheet** | **string** |  |

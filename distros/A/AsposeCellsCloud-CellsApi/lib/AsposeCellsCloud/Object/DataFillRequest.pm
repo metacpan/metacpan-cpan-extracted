@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Please provide the features you would like me to summarize.',
                                   class => 'DataFillRequest',
                                   required => [], # TODO
 }                                 );

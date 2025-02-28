@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shapes' => {
      	datatype => 'Shapes',
      	base_name => 'Shapes',
-     	description => '',
+     	description => 'The class has a property called "Shapes" with XML serialization attribute "XmlElement" for specifying the element name in the XML representation.',
      	format => '',
      	read_only => '',
      		},

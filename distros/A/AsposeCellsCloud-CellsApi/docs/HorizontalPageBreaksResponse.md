@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::HorizontalPageBreaksResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**HorizontalPageBreaks** | **HorizontalPageBreaks** |  |
+**HorizontalPageBreaks** | **HorizontalPageBreaks** | The property "HorizontalPageBreaks" allows getting and setting horizontal page breaks for the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

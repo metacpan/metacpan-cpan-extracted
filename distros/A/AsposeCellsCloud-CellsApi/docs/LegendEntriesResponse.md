@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::LegendEntriesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**LegendEntries** | **LegendEntries** |  |
+**LegendEntries** | **LegendEntries** | Property Summary: The class includes a property for managing legend entries. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

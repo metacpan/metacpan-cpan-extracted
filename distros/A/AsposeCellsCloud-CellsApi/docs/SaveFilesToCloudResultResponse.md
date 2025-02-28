@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SaveFilesToCloudResultResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SaveFilesToCloudResult** | **SaveFilesToCloudResult** |  |
+**SaveFilesToCloudResult** | **SaveFilesToCloudResult** | Property: SaveFilesToCloudResult that allows getting and setting an object of type SaveFilesToCloudResult. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellsDrawingResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **CellsDrawing** |  |
+**Shape** | **CellsDrawing** | This class has a public property named Shape of type CellsDrawing. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

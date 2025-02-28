@@ -165,7 +165,7 @@ __PACKAGE__->method_documentation({
      'image' => {
      	datatype => 'LinkElement',
      	base_name => 'Image',
-     	description => '',
+     	description => 'The class has a public property named "Image" of type LinkElement that can be accessed and set.',
      	format => '',
      	read_only => '',
      		},    

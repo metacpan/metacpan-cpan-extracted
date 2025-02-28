@@ -224,7 +224,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'The class has a public property named "Name" with a getter and setter method.',
      	format => '',
      	read_only => '',
      		},

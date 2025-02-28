@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::ComboBox;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DropDownLines** | **int** | Gets or sets the number of list lines displayed in the drop-down portion of a combo box. |
-**InputRange** | **string** |  |
+**InputRange** | **string** | Property Summary: Contains a public string property named "InputRange" with both get and set accessors. |
 **SelectedCell** | **LinkElement** | Gets the selected cell in the input range of the combo box. |
 **SelectedIndex** | **int** | Gets or sets the index number of the currently selected item in a list box or combo box.                        Zero-based. |
 **SelectedValue** | **string** | Gets the selected value of the combox box. |

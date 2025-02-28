@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WorkbookResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Workbook** | **Workbook** |  |
+**Workbook** | **Workbook** | Workbook property of the class allows access to and modification of a Workbook object. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

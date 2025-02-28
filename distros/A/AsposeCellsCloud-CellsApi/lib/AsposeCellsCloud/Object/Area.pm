@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'format' => {
      	datatype => 'string',
      	base_name => 'Format',
-     	description => '',
+     	description => 'This class has a property named "Format" of type string with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

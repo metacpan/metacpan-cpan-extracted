@@ -226,7 +226,7 @@ __PACKAGE__->method_documentation({
      'emf_render_setting' => {
      	datatype => 'string',
      	base_name => 'EmfRenderSetting',
-     	description => '',
+     	description => 'Setting for rendering Emf metafile.',
      	format => '',
      	read_only => '',
      		},

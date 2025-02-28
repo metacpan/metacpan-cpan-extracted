@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::VerticalPageBreakResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**VerticalPageBreak** | **VerticalPageBreak** |  |
+**VerticalPageBreak** | **VerticalPageBreak** | The class has a property that represents a vertical page break. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

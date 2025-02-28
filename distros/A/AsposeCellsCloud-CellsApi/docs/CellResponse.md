@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Cell** | **Cell** |  |
+**Cell** | **Cell** | A property named "Cell" of type "Cell" that has both a getter and a setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

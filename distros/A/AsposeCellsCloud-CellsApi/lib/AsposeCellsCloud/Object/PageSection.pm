@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: Includes interactive discussions, group projects, guest speakers, and practical applications of course material.',
                                   class => 'PageSection',
                                   required => [], # TODO
 }                                 );
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'picture' => {
      	datatype => 'string',
      	base_name => 'Picture',
-     	description => '',
+     	description => 'A property named "Picture" with both getter and setter methods of type string is defined.',
      	format => '',
      	read_only => '',
      		},

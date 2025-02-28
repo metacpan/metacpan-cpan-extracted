@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m here to help! Please provide me with the features that need to be summarized.',
                                   class => 'ConditionalFormatting',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'sqref' => {
      	datatype => 'string',
      	base_name => 'sqref',
-     	description => '',
+     	description => 'A public property called "sqref" of type string with a getter and a setter is defined in the class.',
      	format => '',
      	read_only => '',
      		},

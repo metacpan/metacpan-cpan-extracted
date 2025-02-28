@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '"Summary: The class covers a range of features including advanced machine learning techniques, statistical analysis tools, and computer vision algorithms."',
                                   class => 'Forms',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'form_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'FormList',
-     	description => '',
+     	description => 'Property: FormList is a list of LinkElements that are serialized as "form" XML elements.',
      	format => '',
      	read_only => '',
      		},

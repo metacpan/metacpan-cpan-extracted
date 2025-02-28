@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'save_files_to_cloud_result' => {
      	datatype => 'SaveFilesToCloudResult',
      	base_name => 'SaveFilesToCloudResult',
-     	description => '',
+     	description => 'Property: SaveFilesToCloudResult that allows getting and setting an object of type SaveFilesToCloudResult.',
      	format => '',
      	read_only => '',
      		},

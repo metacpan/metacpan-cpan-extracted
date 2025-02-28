@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'save_result' => {
      	datatype => 'SaveResult',
      	base_name => 'SaveResult',
-     	description => '',
+     	description => 'This class property represents a "SaveResult" XML element.',
      	format => '',
      	read_only => '',
      		},

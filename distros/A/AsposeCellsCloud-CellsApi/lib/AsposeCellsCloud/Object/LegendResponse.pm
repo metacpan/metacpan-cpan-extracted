@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'legend' => {
      	datatype => 'Legend',
      	base_name => 'Legend',
-     	description => '',
+     	description => 'This class has a public property called "Legend" of type "Legend" which has both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/display
 eg/on-date
 eg/scal
@@ -13,6 +14,7 @@ MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/basic.t
 t/date_to_day_of_year.t
 t/day_of_week.t

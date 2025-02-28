@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RangesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Ranges** | **Ranges** |  |
+**Ranges** | **Ranges** | This class has a property named "Ranges" of type "Ranges" that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

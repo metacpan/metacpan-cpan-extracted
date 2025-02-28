@@ -28,7 +28,7 @@ Name | Type | Description | Notes
 **TextDirection** | **string** | Represents text reading order.  |
 **VerticalAlignment** | **string** | Gets or sets the vertical alignment type of the text in a cell.  |
 **HorizontalAlignment** | **string** | Gets or sets the horizontal alignment type of the text in a cell.  |
-**BorderCollection** | **ARRAY[Border]** |  |
+**BorderCollection** | **ARRAY[Border]** | A public property named `BorderCollection` that is a list of `Border` objects. |
 **BackgroundThemeColor** | **ThemeColor** | Gets and sets the background theme color.  |
 **ForegroundThemeColor** | **ThemeColor** | Gets and sets the foreground theme color.  |  
 

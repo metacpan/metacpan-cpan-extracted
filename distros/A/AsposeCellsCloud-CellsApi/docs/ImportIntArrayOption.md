@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportIntArrayOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FirstRow** | **int** |  |
+**FirstRow** | **int** | This class has a public property named "FirstRow" of type integer with both get and set accessors. |
 **FirstColumn** | **int** |  |
 **IsVertical** | **boolean** |  |
 **Data** | **ARRAY[int?]** |  |

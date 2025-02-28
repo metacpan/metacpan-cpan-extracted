@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TaskRunResultResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskRunResult** | **TaskRunResult** |  |
+**TaskRunResult** | **TaskRunResult** | This class has a property named "TaskRunResult" of type "TaskRunResult" that can be both accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

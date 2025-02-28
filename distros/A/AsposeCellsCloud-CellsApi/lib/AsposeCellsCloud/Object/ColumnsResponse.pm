@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'columns' => {
      	datatype => 'Columns',
      	base_name => 'Columns',
-     	description => '',
+     	description => 'This property allows access to the columns within the class.',
      	format => '',
      	read_only => '',
      		},

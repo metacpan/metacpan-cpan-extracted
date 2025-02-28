@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CommentsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Comments** | **Comments** |  |
+**Comments** | **Comments** | Property Summary: "The Comments property represents an XML element named 'comments' within the class." |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

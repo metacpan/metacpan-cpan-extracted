@@ -22,7 +22,7 @@ Name | Type | Description | Notes
 **GridlineType** | **string** | Gets or sets gridline type. |
 **TextCrossType** | **string** | Gets or sets displaying text type when the text width is larger than cell width. |
 **DefaultEditLanguage** | **string** | Gets or sets default edit language. |
-**EmfRenderSetting** | **string** |  |
+**EmfRenderSetting** | **string** | Setting for rendering Emf metafile. |
 **MergeAreas** | **boolean** |  |
 **SortExternalNames** | **boolean** |  |
 **UpdateSmartArt** | **boolean** |  |

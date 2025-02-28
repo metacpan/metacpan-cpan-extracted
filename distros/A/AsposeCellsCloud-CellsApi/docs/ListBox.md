@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ListBox;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**InputRange** | **string** |  |
+**InputRange** | **string** | This property stores the input range for the class. |
 **ItemCount** | **int** | Gets the number of items in the list box. |
 **PageChange** | **int** | Specifies the amount by which the control's value is changed                         when the user clicks on the scrollbar's page up or page down region. |
 **SelectedCells** | **ARRAY[LinkElement]** | Gets the selected cells.                        Returns null if the input range is not set or no item is selected |

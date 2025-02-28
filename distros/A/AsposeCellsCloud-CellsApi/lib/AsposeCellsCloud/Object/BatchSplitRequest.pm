@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: Identifying key features of a statistical dataset and methods for data analysis.',
                                   class => 'BatchSplitRequest',
                                   required => [], # TODO
 }                                 );

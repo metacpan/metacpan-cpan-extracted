@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'range_list' => {
      	datatype => 'ARRAY[Range]',
      	base_name => 'RangeList',
-     	description => '',
+     	description => 'Property Summary: Contains a list of ranges specified by the XmlElement "Range".',
      	format => '',
      	read_only => '',
      		},    

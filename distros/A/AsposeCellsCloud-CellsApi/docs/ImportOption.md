@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::ImportOption;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DestinationWorksheet** | **string** | Destination worksheet name.   |
-**IsInsert** | **boolean** |  |
+**IsInsert** | **boolean** | A boolean property `IsInsert` that can be both read and written. |
 **ImportDataType** | **string** |  |
 **DataSource** | **DataSource** |  |
 **Source** | **FileSource** |  |  

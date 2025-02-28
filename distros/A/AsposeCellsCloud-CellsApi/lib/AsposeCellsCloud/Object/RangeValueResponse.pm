@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'cells_list' => {
      	datatype => 'ARRAY[Cell]',
      	base_name => 'CellsList',
-     	description => '',
+     	description => 'Property Summary: Contains a list of elements labeled as "Cell".',
      	format => '',
      	read_only => '',
      		},

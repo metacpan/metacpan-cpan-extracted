@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class features: Weekly lectures, group projects, midterm and final exams, and participation in class discussions.',
                                   class => 'FilesResult',
                                   required => [], # TODO
 }                                 );

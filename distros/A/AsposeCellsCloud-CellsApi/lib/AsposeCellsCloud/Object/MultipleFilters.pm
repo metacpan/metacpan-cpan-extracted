@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'match_blank' => {
      	datatype => 'boolean',
      	base_name => 'MatchBlank',
-     	description => '',
+     	description => 'A nullable boolean property that determines if a blank space should be matched.',
      	format => '',
      	read_only => '',
      		},

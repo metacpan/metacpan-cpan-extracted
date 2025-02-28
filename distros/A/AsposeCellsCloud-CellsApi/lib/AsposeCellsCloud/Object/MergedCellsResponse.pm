@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'merged_cells' => {
      	datatype => 'MergedCells',
      	base_name => 'MergedCells',
-     	description => '',
+     	description => 'Property Summary: Contains information about merged cells within a spreadsheet.',
      	format => '',
      	read_only => '',
      		},

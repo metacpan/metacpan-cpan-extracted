@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'picture' => {
      	datatype => 'Picture',
      	base_name => 'Picture',
-     	description => '',
+     	description => 'Property Summary: This class has a public property named "Picture" of type "Picture" that has both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

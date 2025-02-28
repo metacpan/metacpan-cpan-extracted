@@ -22,13 +22,13 @@ no_index:
 provides:
   Map::Tube::Oslo:
     file: lib/Map/Tube/Oslo.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   File::Share: '0'
-  Map::Tube: '3.94'
+  Map::Tube: '3.99'
   Moo: '0'
   namespace::clean: '0'
   perl: '5.012'
 resources: {}
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

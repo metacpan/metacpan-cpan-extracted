@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'ranges' => {
      	datatype => 'Ranges',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'This class has a property named "Ranges" of type "Ranges" that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

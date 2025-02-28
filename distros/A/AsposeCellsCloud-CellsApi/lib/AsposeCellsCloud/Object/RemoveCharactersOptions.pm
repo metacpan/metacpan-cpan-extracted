@@ -122,7 +122,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: The class features discussing effective communication strategies, developing problem-solving skills, and increasing self-awareness for personal growth.',
                                   class => 'RemoveCharactersOptions',
                                   required => [], # TODO
 }                                 );
@@ -132,7 +132,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Name property with a getter and setter override that returns a string.',
      	format => '',
      	read_only => '',
      		},

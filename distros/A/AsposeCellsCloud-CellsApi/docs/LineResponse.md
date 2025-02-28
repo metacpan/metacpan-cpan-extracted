@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::LineResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Line** | **Line** |  |
+**Line** | **Line** | A public property named "Line" of type Line with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

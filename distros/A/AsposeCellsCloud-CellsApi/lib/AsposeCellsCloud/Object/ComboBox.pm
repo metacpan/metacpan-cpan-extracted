@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'input_range' => {
      	datatype => 'string',
      	base_name => 'InputRange',
-     	description => '',
+     	description => 'Property Summary: Contains a public string property named "InputRange" with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

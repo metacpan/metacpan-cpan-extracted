@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::FormsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Forms** | **Forms** |  |
+**Forms** | **Forms** | This class has a property named Forms of type Forms that has both a getter and setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

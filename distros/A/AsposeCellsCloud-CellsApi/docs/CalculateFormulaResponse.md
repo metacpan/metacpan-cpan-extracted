@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CalculateFormulaResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Result** | **string** |  |
+**Result** | **string** | A public property "Result" that can be accessed and modified with a string data type. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

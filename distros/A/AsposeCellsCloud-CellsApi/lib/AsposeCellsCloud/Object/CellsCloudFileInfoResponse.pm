@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'file_info' => {
      	datatype => 'CellsCloudFileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'A property named `FileInfo` of type `CellsCloudFileInfo` is defined for the class.',
      	format => '',
      	read_only => '',
      		},

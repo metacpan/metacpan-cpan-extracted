@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Rows;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MaxRow** | **int** |  |
+**MaxRow** | **int** | This property allows access to set and retrieve the maximum row value in the class. |
 **RowsCount** | **int** |  |
 **RowsList** | **ARRAY[LinkElement]** |  |
 **link** | **Link** |  |  

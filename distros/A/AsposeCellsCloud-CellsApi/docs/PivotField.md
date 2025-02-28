@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotField;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AutoShowCount** | **int** |  |
+**AutoShowCount** | **int** | Represent the number of top or bottom items            that are automatically shown in the specified PivotTable field. |
 **AutoShowField** | **int** |  |
 **AutoSortField** | **int** |  |
 **BaseField** | **int** |  |

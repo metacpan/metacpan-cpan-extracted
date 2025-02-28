@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: Understanding the various features and tools available in Adobe Illustrator to create dynamic and professional vector graphics, including shapes, text, brushes, gradients, and layers.',
                                   class => 'GradientFillStop',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'color' => {
      	datatype => 'Color',
      	base_name => 'Color',
-     	description => '',
+     	description => 'Color property of type DTO.Color that has a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

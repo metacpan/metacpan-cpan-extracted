@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ChartResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Chart** | **Chart** |  |
+**Chart** | **Chart** | A property named "Chart" of type Chart is defined with a getter and setter in the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

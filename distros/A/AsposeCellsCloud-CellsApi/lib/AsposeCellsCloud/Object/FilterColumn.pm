@@ -147,7 +147,7 @@ __PACKAGE__->method_documentation({
      'multiple_filters' => {
      	datatype => 'MultipleFilters',
      	base_name => 'MultipleFilters',
-     	description => '',
+     	description => 'This class contains a property named "MultipleFilters" of type "MultipleFilters" that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

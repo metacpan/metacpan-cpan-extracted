@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Cells** | **Cells** |  |
+**Cells** | **Cells** | Property Summary: The class has a property called "Cells" which is annotated with the [XmlElement("cells")] attribute. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

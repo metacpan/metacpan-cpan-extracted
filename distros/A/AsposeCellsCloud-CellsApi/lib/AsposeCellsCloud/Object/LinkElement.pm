@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: The features include automatic emergency braking, lane keeping assist, adaptive cruise control, blind spot monitoring, and rear cross-traffic alert.',
                                   class => 'LinkElement',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'link' => {
      	datatype => 'Link',
      	base_name => 'link',
-     	description => '',
+     	description => 'The class has a property named "link" of type Link, which has a public get and set accessors.',
      	format => '',
      	read_only => '',
      		},    

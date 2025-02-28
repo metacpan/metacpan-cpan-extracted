@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'merged_cell' => {
      	datatype => 'MergedCell',
      	base_name => 'MergedCell',
-     	description => '',
+     	description => 'A property named "MergedCell" of type "MergedCell" which allows getting and setting its value.',
      	format => '',
      	read_only => '',
      		},

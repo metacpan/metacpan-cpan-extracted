@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::GroupBoxResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **GroupBox** |  |
+**Shape** | **GroupBox** | The class has a property named "Shape" of type GroupBox that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -227,7 +227,7 @@ __PACKAGE__->method_documentation({
      'style' => {
      	datatype => 'LinkElement',
      	base_name => 'Style',
-     	description => '',
+     	description => 'This class property represents a style element with the specified XML element name.',
      	format => '',
      	read_only => '',
      		},

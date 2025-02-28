@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'cell_count' => {
      	datatype => 'int',
      	base_name => 'CellCount',
-     	description => '',
+     	description => 'The class has a public property "CellCount" of type integer that can be read and modified.',
      	format => '',
      	read_only => '',
      		},

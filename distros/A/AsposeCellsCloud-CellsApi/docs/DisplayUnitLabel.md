@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::DisplayUnitLabel;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**LinkedSource** | **string** |  |
+**LinkedSource** | **string** | A public property named "LinkedSource" with a string data type can be set and accessed. |
 **RotationAngle** | **int** |  |
 **Text** | **string** | Gets or sets the text of display unit label. |
 **TextHorizontalAlignment** | **string** |  |

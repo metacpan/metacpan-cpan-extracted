@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class Summary: The features discussed include natural language processing, image recognition, data visualization, clustering, regression, classification, and recommendation systems.',
                                   class => 'ProtectSheetParameter',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'protection_type' => {
      	datatype => 'string',
      	base_name => 'ProtectionType',
-     	description => '',
+     	description => 'Property Summary: Defines a public string property for the ProtectionType.',
      	format => '',
      	read_only => '',
      		},

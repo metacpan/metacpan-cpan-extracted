@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'error_bar' => {
      	datatype => 'ErrorBar',
      	base_name => 'ErrorBar',
-     	description => '',
+     	description => 'The class has a public property named ErrorBar of type ErrorBar with a getter and setter.',
      	format => '',
      	read_only => '',
      		},

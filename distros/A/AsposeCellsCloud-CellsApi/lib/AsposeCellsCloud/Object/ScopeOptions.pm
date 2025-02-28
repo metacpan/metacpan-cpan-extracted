@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Here is the class summary: "The features discussed include real-time collaboration, templates for various projects, task assignment and tracking, deadline reminders, and file storage and sharing."            ',
                                   class => 'ScopeOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'scope' => {
      	datatype => 'string',
      	base_name => 'Scope',
-     	description => '',
+     	description => 'Property Summary: The Scope property in the class is decorated with a JsonConverter attribute using StringEnumConverter.            ',
      	format => '',
      	read_only => '',
      		},

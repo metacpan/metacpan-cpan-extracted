@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'is_deleted' => {
      	datatype => 'boolean',
      	base_name => 'IsDeleted',
-     	description => '',
+     	description => 'A nullable boolean property "IsDeleted" indicating whether an object has been deleted.',
      	format => '',
      	read_only => '',
      		},

@@ -149,7 +149,7 @@ __PACKAGE__->method_documentation({
      'protection_type' => {
      	datatype => 'string',
      	base_name => 'ProtectionType',
-     	description => '',
+     	description => 'This property defines the protection type of an object.',
      	format => '',
      	read_only => '',
      		},

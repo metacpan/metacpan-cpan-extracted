@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Trendline;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**link** | **Link** |  |
+**link** | **Link** | The class has a property named "link" of type "Link" that can be accessed and modified. |
 **Backward** | **double** | Returns or sets the number of periods (or units on a scatter chart) that the trendline extends backward.                         The number of periods must be greater than or equal to zero.                        If the chart type is column ,the number of periods must be between 0 and 0.5 |
 **DataLabels** | **DataLabels** | Represents the DataLabels object for the specified series. |
 **DisplayEquation** | **boolean** | Represents if the equation for the trendline is displayed on the chart (in the same data label as the R-squared value). Setting this property to True automatically turns on data labels. |

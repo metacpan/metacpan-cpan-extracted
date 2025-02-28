@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportStringArrayOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FirstRow** | **int** |  |
+**FirstRow** | **int** | A property named "FirstRow" of type integer with both a getter and a setter is defined in the class. |
 **FirstColumn** | **int** |  |
 **IsVertical** | **boolean** |  |
 **Data** | **ARRAY[string]** |  |

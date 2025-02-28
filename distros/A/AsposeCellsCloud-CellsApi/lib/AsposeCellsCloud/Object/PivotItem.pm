@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'index' => {
      	datatype => 'int',
      	base_name => 'Index',
-     	description => '',
+     	description => 'Gets the index of the pivot item in cache field.',
      	format => '',
      	read_only => '',
      		},

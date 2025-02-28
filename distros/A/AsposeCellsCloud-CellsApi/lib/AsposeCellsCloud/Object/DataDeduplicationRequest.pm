@@ -136,7 +136,7 @@ __PACKAGE__->method_documentation({
      'deduplication_region' => {
      	datatype => 'DeduplicationRegion',
      	base_name => 'DeduplicationRegion',
-     	description => '',
+     	description => 'This class has a property named "DeduplicationRegion" of type "DeduplicationRegion" with a default value of a new instance of the "DeduplicationRegion" class.',
      	format => '',
      	read_only => '',
      		},

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::LineShapeResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **LineShape** |  |
+**Shape** | **LineShape** | The class has a public property called Shape of type LineShape that can be both accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

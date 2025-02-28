@@ -136,7 +136,7 @@ __PACKAGE__->method_documentation({
      'worksheet_index' => {
      	datatype => 'int',
      	base_name => 'WorksheetIndex',
-     	description => '',
+     	description => 'Property Summary: WorksheetIndex is an optional integer property marked with the XmlElement attribute "worksheetindex".',
      	format => '',
      	read_only => '',
      		},

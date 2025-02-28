@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'horizontal_page_breaks' => {
      	datatype => 'HorizontalPageBreaks',
      	base_name => 'HorizontalPageBreaks',
-     	description => '',
+     	description => 'The property "HorizontalPageBreaks" allows getting and setting horizontal page breaks for the class.',
      	format => '',
      	read_only => '',
      		},

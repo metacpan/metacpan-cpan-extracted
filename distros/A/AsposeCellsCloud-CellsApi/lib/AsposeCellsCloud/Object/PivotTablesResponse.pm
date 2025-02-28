@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pivot_tables' => {
      	datatype => 'PivotTables',
      	base_name => 'PivotTables',
-     	description => '',
+     	description => 'This class has a property named PivotTables of type PivotTables that can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

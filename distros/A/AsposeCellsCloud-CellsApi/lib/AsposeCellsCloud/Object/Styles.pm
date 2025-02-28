@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'style_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'StyleList',
-     	description => '',
+     	description => 'This property contains a list of elements with the tag "style".',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'tick_labels' => {
      	datatype => 'TickLabels',
      	base_name => 'TickLabels',
-     	description => '',
+     	description => 'Property that represents tick labels for a class.',
      	format => '',
      	read_only => '',
      		},

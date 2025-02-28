@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'A property "Name" of type string with a getter and setter is declared in the class.',
      	format => '',
      	read_only => '',
      		},

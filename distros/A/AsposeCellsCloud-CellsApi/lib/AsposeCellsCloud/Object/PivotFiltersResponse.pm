@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pivot_filters' => {
      	datatype => 'ARRAY[PivotFilter]',
      	base_name => 'PivotFilters',
-     	description => '',
+     	description => 'Property summary: Contains a list of PivotFilter objects.',
      	format => '',
      	read_only => '',
      		},

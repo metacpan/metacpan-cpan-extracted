@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'document_property' => {
      	datatype => 'CellsDocumentProperty',
      	base_name => 'DocumentProperty',
-     	description => '',
+     	description => 'A property named DocumentProperty of type CellsDocumentProperty is defined with get and set accessors.',
      	format => '',
      	read_only => '',
      		},

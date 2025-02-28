@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'input_range' => {
      	datatype => 'string',
      	base_name => 'InputRange',
-     	description => '',
+     	description => 'This property stores the input range for the class.',
      	format => '',
      	read_only => '',
      		},

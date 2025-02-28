@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ChartsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Charts** | **Charts** |  |
+**Charts** | **Charts** | Property Summary: Includes an XML element named "charts" that contains a property of type Charts.Charts. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

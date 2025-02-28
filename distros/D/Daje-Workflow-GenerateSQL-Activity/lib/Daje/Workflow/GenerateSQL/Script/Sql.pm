@@ -1,29 +1,31 @@
 package Daje::Workflow::GenerateSQL::Script::Sql;
 use Mojo::Base 'Daje::Workflow::GenerateSQL::Base::Common', -base, -signatures;
-
-#use v5.30;
+use v5.40;
 
 use Syntax::Keyword::Match qw(match);
 
 has 'tablename' => "";
 
 sub create_sql($self) {
+
     my $sql = "";
     my $json = $self->json->{sql};
     my $length = scalar @{$json};
     for (my $i = 0; $i < $length; $i++) {
-        my $type = $self->templates->get_section(@{$json}[$i]->{type});
-        my $template = $self->templates->get_section($type);
+        my $type = @{$json}[$i]->{type};
+        my $template = $self->templates->get_data_section($type);
         my $table_name = $self->tablename;
         match ($type : eq) {
             case('insert') {
+                my $fields = @{$json}[$i]->{fields};
+                my $values =@{$json}[$i]->{values};
                 $template =~ s/<<tablename>>/$table_name/ig;
-                $template =~ s/<<fields>>/@{$json}[$i]->{fields}/ig;
-                $template =~ s/<<values>>/@{$json}[$i]->{values}/ig;
+                $template =~ s/<<fields>>/$fields/ig;
+                $template =~ s/<<values>>/$values/ig;
             }
             default { $template = "" }
         }
-        $sql .= $template . '\n';
+        $sql .= $template;
     }
     $self->set_sql($sql);
     return;

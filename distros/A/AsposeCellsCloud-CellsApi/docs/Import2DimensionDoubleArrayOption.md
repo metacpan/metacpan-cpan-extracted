@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Import2DimensionDoubleArrayOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FirstRow** | **int** |  |
+**FirstRow** | **int** | The class has a property named "FirstRow" of type integer with get and set accessors. |
 **FirstColumn** | **int** |  |
 **Data** | **ARRAY[double?]** |  |
 **DestinationWorksheet** | **string** |  |

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'ArcShape',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A public property Shape of type ArcShape that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

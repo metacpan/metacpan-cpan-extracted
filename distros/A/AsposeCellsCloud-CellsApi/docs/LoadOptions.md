@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::LoadOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ConvertNumericData** | **string** |  |
+**ConvertNumericData** | **string** | This class has a public property named "ConvertNumericData" of type string that can be read from and written to. |
 **InterruptMonitor** | **string** | Gets and sets the interrupt monitor. |
 **LanguageCode** | **string** | Gets or sets the user interface language of the Workbook version based on CountryCode that has saved the file. |
 **LoadDataOptions** | **string** |  |

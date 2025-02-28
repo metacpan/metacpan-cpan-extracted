@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'ole_object' => {
      	datatype => 'OleObject',
      	base_name => 'OleObject',
-     	description => '',
+     	description => 'This class has a property named OleObject of type OleObject with both read and write capabilities.',
      	format => '',
      	read_only => '',
      		},

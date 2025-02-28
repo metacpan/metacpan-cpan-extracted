@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+4.01  2025-02-27T21:30:00+00:00
+      - Improved test and pod, thanks @GWS.
+
 3.99  2025-02-26T20:40:00+00:00
       - Line Id is no longer case sensitive.
 

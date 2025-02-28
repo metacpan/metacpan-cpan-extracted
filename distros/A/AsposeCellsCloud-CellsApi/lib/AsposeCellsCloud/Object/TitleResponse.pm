@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'title' => {
      	datatype => 'Title',
      	base_name => 'Title',
-     	description => '',
+     	description => 'This class has a property called "Title" of type "Title" with both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

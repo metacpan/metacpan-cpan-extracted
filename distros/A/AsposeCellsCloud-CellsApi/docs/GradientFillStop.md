@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::GradientFillStop;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Color** | **Color** |  |
+**Color** | **Color** | Color property of type DTO.Color that has a getter and a setter. |
 **Position** | **double** |  |
 **Transparency** | **double** |  |  
 

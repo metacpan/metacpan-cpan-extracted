@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: The features include fast and reliable performance, high-quality camera with portrait mode, long-lasting battery life, and a durable water-resistant design.            ',
                                   class => 'RemoveCharactersByCharacter',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'remove_text_method' => {
      	datatype => 'string',
      	base_name => 'RemoveTextMethod',
-     	description => '',
+     	description => 'Property: "RemoveTextMethod" is serialized using a string representation of the enum value.',
      	format => '',
      	read_only => '',
      		},

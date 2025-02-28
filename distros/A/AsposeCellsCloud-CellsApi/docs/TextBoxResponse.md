@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TextBoxResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **TextBox** |  |
+**Shape** | **TextBox** | A public property named "Shape" of type TextBox is defined with both get and set accessors. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

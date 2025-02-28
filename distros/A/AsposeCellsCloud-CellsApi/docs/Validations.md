@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Validations;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Count** | **int** |  |
+**Count** | **int** | Property summary: The property "Count" with an XML element name "count" returns the number of items in the "ValidationList". |
 **ValidationList** | **ARRAY[LinkElement]** |  |
 **link** | **Link** |  |  
 

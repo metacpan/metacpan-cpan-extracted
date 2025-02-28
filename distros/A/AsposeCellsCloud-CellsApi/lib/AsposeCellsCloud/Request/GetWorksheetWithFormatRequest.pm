@@ -66,6 +66,8 @@ sub new {
 # GetWorksheetWithFormatRequest.horizontalResolution : Image horizontal resolution.  ,
 # GetWorksheetWithFormatRequest.area : Represents the range to be printed.  ,
 # GetWorksheetWithFormatRequest.pageIndex : Represents the page to be printed  ,
+# GetWorksheetWithFormatRequest.onePagePerSheet :   ,
+# GetWorksheetWithFormatRequest.printHeadings :   ,
 # GetWorksheetWithFormatRequest.folder : The folder where the file is situated.  ,
 # GetWorksheetWithFormatRequest.storageName : The storage name where the file is situated.   
 
@@ -132,6 +134,14 @@ sub run_http_request {
 
     if(defined $self->page_index){
         $query_params->{'pageIndex'} = $client->to_query_value($self->page_index);      
+    }
+
+    if(defined $self->one_page_per_sheet){
+        $query_params->{'onePagePerSheet'} = $client->to_query_value($self->one_page_per_sheet);      
+    }
+
+    if(defined $self->print_headings){
+        $query_params->{'printHeadings'} = $client->to_query_value($self->print_headings);      
     }
 
     if(defined $self->folder){
@@ -201,6 +211,20 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'one_page_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'onePagePerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'print_headings' => {
+     	datatype => 'string',
+     	base_name => 'printHeadings',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
@@ -226,6 +250,8 @@ __PACKAGE__->attribute_map( {
     'horizontal_resolution' => 'horizontalResolution',
     'area' => 'area',
     'page_index' => 'pageIndex',
+    'one_page_per_sheet' => 'onePagePerSheet',
+    'print_headings' => 'printHeadings',
     'folder' => 'folder',
     'storage_name' => 'storageName' 
 } );

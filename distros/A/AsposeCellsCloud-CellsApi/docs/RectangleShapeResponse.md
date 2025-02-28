@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RectangleShapeResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **RectangleShape** |  |
+**Shape** | **RectangleShape** | A public property named "Shape" that is of type RectangleShape and can be both accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

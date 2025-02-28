@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'worksheet_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'WorksheetList',
-     	description => '',
+     	description => 'A property named "WorksheetList" that contains a list of elements with the XML element name "worksheet".',
      	format => '',
      	read_only => '',
      		},

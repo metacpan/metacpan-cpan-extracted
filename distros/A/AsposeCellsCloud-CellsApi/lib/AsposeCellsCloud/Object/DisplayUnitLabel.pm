@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'linked_source' => {
      	datatype => 'string',
      	base_name => 'LinkedSource',
-     	description => '',
+     	description => 'A public property named "LinkedSource" with a string data type can be set and accessed.',
      	format => '',
      	read_only => '',
      		},

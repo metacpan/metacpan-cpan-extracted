@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotTable;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AltTextDescription** | **string** |  |
+**AltTextDescription** | **string** | Gets the description of the alt text |
 **AltTextTitle** | **string** |  |
 **AutoFormatType** | **string** |  |
 **BaseFields** | **ARRAY[PivotField]** |  |

@@ -1,6 +1,6 @@
 package Map::Tube::Cookbook;
 
-$Map::Tube::Cookbook::VERSION   = '3.99';
+$Map::Tube::Cookbook::VERSION   = '4.01';
 $Map::Tube::Cookbook::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Cookbook - Cookbook for Map::Tube library.
 
 =head1 VERSION
 
-Version 3.99
+Version 4.01
 
 =cut
 
@@ -94,19 +94,19 @@ defines one 'line' of the map. The node C<line> has to have the
 attributes C<id> and C<name>. Optionally it can have C<color> as well.
 They are explained below:
 
-    +-----------+---------------------------------------------------------------+
-    | Attribute | Description                                                   |
-    +-----------+---------------------------------------------------------------+
-    |           |                                                               |
-    | id        | Unique line id of the map. Ideally should be numeric but can  |
-    |           | be alphanumeric. It shouldn't contain "," or ":".             |
-    |           |                                                               |
-    | name      | Line name of the map. It should be unique since this name is  |
-    |           | what end users will typically use.                            |
-    |           |                                                               |
-    | color     | Line color is optional. It should have color name or hexcode. |
-    |           |                                                               |
-    +-----------+---------------------------------------------------------------+
+    +------------+---------------------------------------------------------------+
+    | Attribute  | Description                                                   |
+    +------------+---------------------------------------------------------------+
+    |            |                                                               |
+    | id         | Unique line id of the map. It should consist of printable     |
+    |            | characters from 7-bit ASCII. It shouldn't contain "," or ":". |
+    |            |                                                               |
+    | name       | Line name of the map. It should be unique since this name is  |
+    |            | what end users will typically use.                            |
+    |            |                                                               |
+    | color      | Line color is optional. It should have color name or hexcode. |
+    |            |                                                               |
+    +------------+---------------------------------------------------------------+
 
 Example from L<Map::Tube::Delhi> as shown below:
 
@@ -117,35 +117,35 @@ C<station> is used to represent a 'station' of the map. It must have
 attributes C<id>, C<name>, C<line> and C<link>. It can optionally have
 an attribute C<other_link>.
 
-    +------------+--------------------------------------------------------------+
-    | Attribute  | Description                                                  |
-    +------------+--------------------------------------------------------------+
-    |            |                                                              |
-    | id         | Unique station id of the map. Ideally should be numeric but  |
-    |            | can be alphanumeric. It shouldn't contain ",".               |
-    |            |                                                              |
-    | name       | Station name of the map. It should be unique since this name |
-    |            | is what end users will typically use.                        |
-    |            |                                                              |
-    | line       | Represents the station line along with the station index on  |
-    |            | the line. It should be ":" separated, e.g. "Red:2", meaning  |
-    |            | this is the second station on line 'Red'. Station index      |
-    |            | is NOT mandatory but nice to have. If the station is served  |
-    |            | by more than one line, they should all be listed, separated  |
-    |            | by ",". For example, "Red:9,Green:16".                       |
-    |            | The lines are referenced by id, not by name.                 |
-    |            |                                                              |
-    | link       | Represents all linked stations to this station, e.g. "B04"   |
-    |            | If it is linked to more than one station, they should all be |
-    |            | listed, separated by ",". For example, "B04,B02".            |
-    |            | The stations are referenced by id, not by name.              |
-    |            |                                                              |
-    | other_link | This attribute is optional. This is useful if the station is |
-    |            | linked via some other form of link and not by any of the     |
-    |            | lines, e.g., some stations are linked by tunnel.             |
-    |            | This can be defined as "Tunnel:B02".                         |
-    |            |                                                              |
-    +------------+--------------------------------------------------------------+
+    +------------+---------------------------------------------------------------+
+    | Attribute  | Description                                                   |
+    +------------+---------------------------------------------------------------+
+    |            |                                                               |
+    | id         | Unique line id of the map. It should consist of printable     |
+    |            | characters from 7-bit ASCII. It shouldn't contain "," or ":". |
+    |            |                                                               |
+    | name       | Station name of the map. It should be unique since this name  |
+    |            | is what end users will typically use.                         |
+    |            |                                                               |
+    | line       | Represents the station line along with the station index on   |
+    |            | the line. It should be ":" separated, e.g. "Red:2", meaning   |
+    |            | this is the second station on line 'Red'. Station index       |
+    |            | is NOT mandatory but nice to have. If the station is served   |
+    |            | by more than one line, they should all be listed, separated   |
+    |            | by ",". For example, "Red:9,Green:16".                        |
+    |            | The lines are referenced by id, not by name.                  |
+    |            |                                                               |
+    | link       | Represents all linked stations to this station, e.g. "B04"    |
+    |            | If it is linked to more than one station, they should all be  |
+    |            | listed, separated by ",". For example, "B04,B02".             |
+    |            | The stations are referenced by id, not by name.               |
+    |            |                                                               |
+    | other_link | This attribute is optional. This is useful if the station is  |
+    |            | linked via some other form of link and not by any of the      |
+    |            | lines, e.g., some stations are linked by tunnel.              |
+    |            | This can be defined as "Tunnel:B02".                          |
+    |            |                                                               |
+    +------------+---------------------------------------------------------------+
 
 Example from L<Map::Tube::London> without station index:
 
@@ -215,12 +215,15 @@ terminology, which straightforwardly translates into JSON.)
 
 =item * Map files SHOULD be UTF8-coded.
 
+=item * All C<id>s and names of both lines and stations are treated as case-insensitive, i.e.,
+        C<MYNAME>, C<myname>, and C<MyName> are considered to be identical.
+
 =item * The top level element MUST be a C<< <tube> >> element. It MAY have a C<name> attribute
         giving the human-readable name of the map.
         It MAY also have other attributes, which will in general be ignored by L<Map::Tube>.
 
 =item * Under C<< <tube> >>, there MUST be exactly one C<< <lines> >> and exactly one
-		C<< <stations> >> element.
+        C<< <stations> >> element.
 
 =item * Under the C<< <lines> >> element, there MUST be one or more C<< <line> >> elements,
         each completely defining one tube line.
@@ -235,11 +238,11 @@ terminology, which straightforwardly translates into JSON.)
 =item * The value of the C<id> attribute SHOULD consist of 7-bit printing characters without
         spaces. It MUST NOT contain a comma (",") or a colon (":"). In general, it will be a
         rather short string, but this is not required. Each C<id> MUST be unique among the lines.
-        Line C<id>s are case-insensitive, so any two line C<id>s must not differ only in case.
-        Any line C<id> SHOULD not occur also as a station C<id>. C<id>s are usually not seen by
+        Line C<id>s are case-insensitive, so any two line C<id>s MUST NOT differ only in case.
+        Any line C<id> SHOULD NOT occur also as a station C<id>. C<id>s are usually not seen by
         end users.
 
-=item * The C<name> attribute MAY be any string. It SHOULD be unique among the lines (but it MAY
+=item * The C<name> attribute MAY be any string. It MUST be unique among the lines (but it MAY
         be the same as a station C<name>). Typically, end users will interact with these names,
         so this should be kept in mind when choosing names.
 
@@ -261,12 +264,11 @@ terminology, which straightforwardly translates into JSON.)
 =item * The value of the C<id> attribute SHOULD consist of 7-bit printing characters without
         spaces. It MUST NOT contain a comma (",") or a colon (":"). In general, it will be a
         rather short string, but this is not required. Each C<id> MUST be unique among the stations.
-        Station C<id>s are case-sensitive, so two station's C<id>s MAY differ only in case
-        (although this is not considered good practice).
-        Any station C<id> SHOULD not occur also as a line C<id>. C<id>s are usually not seen by
+        Station C<id>s are case-insensitive, so two station's C<id>s MUST NOT differ only in case.
+        Any station C<id> SHOULD NOT occur also as a line C<id>. C<id>s are usually not seen by
         end users.
 
-=item * The C<name> attribute MAY be any string. It SHOULD be unique among the stations (but it
+=item * The C<name> attribute MAY be any string. It MUST be unique among the stations (but it
         MAY be the same as a line C<name>). Typically, end users will interact with these names,
         so this should be kept in mind when choosing names.
 
@@ -278,8 +280,8 @@ terminology, which straightforwardly translates into JSON.)
         (":") and a positive integer. The line C<id> signifies a line serving this station. If the
         extended form is used, the integer signifies the position of this station on the line.
         Typically, the station at one (arbitrarily chosen) end will be denoted by 1, the next one
-        by 2, etc. The numbers do not have to be consecutive, but they MUST be in strictly
-        increasing order.
+        by 2, etc. The numbers NEED NOT be consecutive, but they MUST be in strictly increasing
+        order.
 
 =item * Each line MUST either throughout use the extended I<line-spec> form or the short form.
         Any given line MUST NOT use the extended form at some stations and the short form at
@@ -317,7 +319,7 @@ terminology, which straightforwardly translates into JSON.)
 =item * For each C<other-link-spec> at some station (say, with C<id> I<A>) that names another
         station (say, with C<id> I<B>), there MUST be a corresponding C<other-link-spec> at
         station I<B> that uses the same identifier and names station I<A>. (In other words,
-        C<other-link-spec>s MUST come in pairs, making all such connections bidirectional).
+        C<other-link-spec>s MUST come in pairs, making all such connections bidirectional.)
 
 =item * A station MUST NOT name itself in its C<link> attribute nor in its C<other_link>
         atttribute.
@@ -332,10 +334,10 @@ terminology, which straightforwardly translates into JSON.)
         will in general be ignored by most L<Map::Tube> software. However, your software may make
         use of the additional data either for its own purposes, or it may make these attributes
         usable for L<Map::Tube>. E.g., L<Map::Tube::Beijing> and L<Map::Tube::Hongkong> (q.v.) both
-        use additional C<name_alt> attributes in order to provide not only Latin-script versions
-        of the names but, as an alternative, also Han (Chinese script) names. The version to
-        use is decided when the L<Map::Tube> object is instantiated. (This could also be used to
-        specify alternative station names in I<n>-lingual areas (where I<n> > 1).
+        use additional C<name_alt> attributes in order to provide not only Latin-script (Pinyin)
+        versions of the names but, as an alternative, also Han (Chinese script) names. The version
+        to use is decided when the L<Map::Tube> object is instantiated. (This could also be used to
+        specify alternative station names in I<n>-lingual areas (where I<n> > 1).)
 
 =back
 

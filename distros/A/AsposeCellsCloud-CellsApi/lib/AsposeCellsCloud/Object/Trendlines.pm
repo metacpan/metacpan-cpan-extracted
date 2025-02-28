@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'trendline_list' => {
      	datatype => 'ARRAY[Trendline]',
      	base_name => 'TrendlineList',
-     	description => '',
+     	description => 'This property allows for a list of Trendline objects to be stored under the XmlElement "TrendLine".',
      	format => '',
      	read_only => '',
      		},

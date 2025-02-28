@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Allows to specify options when rendering worksheet to images, printing worksheet or rendering chart to image.',
+__PACKAGE__->class_documentation({description => '           Allows to specify options when rendering worksheet to images, printing worksheet or rendering chart to image.           ',
                                   class => 'ImageOrPrintOptions',
                                   required => [], # TODO
 }                                 );
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'output_blank_page_when_nothing_to_print' => {
      	datatype => 'boolean',
      	base_name => 'OutputBlankPageWhenNothingToPrint',
-     	description => '',
+     	description => 'Indicates whether to output a blank page when there is nothing to print.',
      	format => '',
      	read_only => '',
      		},

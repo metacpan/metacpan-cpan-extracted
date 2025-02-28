@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::AutoFilterResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AutoFilter** | **AutoFilter** |  |
+**AutoFilter** | **AutoFilter** | A property named "AutoFilter" with a type of "AutoFilter" that can be read from and written to. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

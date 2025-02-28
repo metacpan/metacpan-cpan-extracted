@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart_point' => {
      	datatype => 'ChartPoint',
      	base_name => 'ChartPoint',
-     	description => '',
+     	description => 'A public property "ChartPoint" that can store and retrieve instances of the "ChartPoint" data type.',
      	format => '',
      	read_only => '',
      		},

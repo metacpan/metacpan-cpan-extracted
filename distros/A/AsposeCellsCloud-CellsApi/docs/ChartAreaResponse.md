@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ChartAreaResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ChartArea** | **ChartArea** |  |
+**ChartArea** | **ChartArea** | This class has a property named "ChartArea" of type ChartArea with a getter and setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

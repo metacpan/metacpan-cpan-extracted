@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'max_row' => {
      	datatype => 'int',
      	base_name => 'MaxRow',
-     	description => '',
+     	description => 'This property allows access to set and retrieve the maximum row value in the class.',
      	format => '',
      	read_only => '',
      		},

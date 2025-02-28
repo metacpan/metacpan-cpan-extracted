@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::OvalResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **Oval** |  |
+**Shape** | **Oval** | The class has a public property called "Shape" of type "Oval" with both get and set accessors. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

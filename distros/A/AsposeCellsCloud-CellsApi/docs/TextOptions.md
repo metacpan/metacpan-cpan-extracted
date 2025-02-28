@@ -21,7 +21,7 @@ Name | Type | Description | Notes
 **IsStrikeout** | **boolean** |  |
 **IsSubscript** | **boolean** |  |
 **IsSuperscript** | **boolean** |  |
-**Name** | **string** |  |
+**Name** | **string** | The class has a public property named "Name" with a getter and setter method. |
 **Size** | **int** |  |
 **Underline** | **string** |  |  
 

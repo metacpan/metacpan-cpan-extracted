@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'trendlines' => {
      	datatype => 'Trendlines',
      	base_name => 'Trendlines',
-     	description => '',
+     	description => 'This property allows access to the Trendlines feature and set new values for it.',
      	format => '',
      	read_only => '',
      		},

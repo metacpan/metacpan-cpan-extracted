@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ProtectSheetParameter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ProtectionType** | **string** |  |
+**ProtectionType** | **string** | Property Summary: Defines a public string property for the ProtectionType. |
 **Password** | **string** |  |
 **AllowEditArea** | **ARRAY[string]** |  |
 **AllowDeletingColumn** | **string** |  |

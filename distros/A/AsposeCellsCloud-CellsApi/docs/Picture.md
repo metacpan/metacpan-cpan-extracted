@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **BorderWeight** | **double** | Gets or sets the weight of the border line of a picture in units of pt. |
 **OriginalHeight** | **int** | Gets the original height of the picture. |
 **OriginalWidth** | **int** | Gets the original width of the picture. |
-**ImageFormat** | **string** |  |
+**ImageFormat** | **string** | This class has a property called "ImageFormat" that allows getting and setting a string value. |
 **SourceFullName** | **string** | Gets or sets the path and name of the source file for the linked image. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |

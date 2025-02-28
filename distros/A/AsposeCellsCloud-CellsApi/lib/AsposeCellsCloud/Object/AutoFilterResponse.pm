@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'auto_filter' => {
      	datatype => 'AutoFilter',
      	base_name => 'AutoFilter',
-     	description => '',
+     	description => 'A property named "AutoFilter" with a type of "AutoFilter" that can be read from and written to.',
      	format => '',
      	read_only => '',
      		},

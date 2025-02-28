@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I can help with that. Just provide me with the features you`d like me to summarize.',
                                   class => 'ImportPosition',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'SheetName',
-     	description => '',
+     	description => '"Property SheetName of type string with a public get and set accessor."',
      	format => '',
      	read_only => '',
      		},

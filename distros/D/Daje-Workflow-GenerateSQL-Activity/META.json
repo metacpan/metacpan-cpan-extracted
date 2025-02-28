@@ -48,7 +48,7 @@
             "Mojo::Base" : "0",
             "Mojo::File" : "0",
             "Syntax::Keyword::Match" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.040000"
          }
       },
       "test" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "Daje::Workflow::GenerateSQL::Activity" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Activity.pm",
-         "version" : "1.05"
+         "version" : "1.07"
       },
       "Daje::Workflow::GenerateSQL::Base::Common" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Base/Common.pm"
@@ -97,7 +97,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity"
       }
    },
-   "version" : "1.05",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

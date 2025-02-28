@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'cells' => {
      	datatype => 'Cells',
      	base_name => 'Cells',
-     	description => '',
+     	description => 'Property Summary: The class has a property called "Cells" which is annotated with the [XmlElement("cells")] attribute.',
      	format => '',
      	read_only => '',
      		},

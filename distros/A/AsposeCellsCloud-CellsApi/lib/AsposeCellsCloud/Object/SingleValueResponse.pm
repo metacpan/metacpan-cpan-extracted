@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'value' => {
      	datatype => 'SingleValue',
      	base_name => 'Value',
-     	description => '',
+     	description => 'A property named "Value" of type "SingleValue" that can be accessed and modified is declared in the class.',
      	format => '',
      	read_only => '',
      		},

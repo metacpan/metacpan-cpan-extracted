@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'conditional_formattings' => {
      	datatype => 'ConditionalFormattings',
      	base_name => 'ConditionalFormattings',
-     	description => '',
+     	description => 'A property named ConditionalFormattings of type ConditionalFormattings is defined with both getter and setter methods in the class.',
      	format => '',
      	read_only => '',
      		},

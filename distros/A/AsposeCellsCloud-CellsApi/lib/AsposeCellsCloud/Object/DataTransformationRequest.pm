@@ -159,7 +159,7 @@ __PACKAGE__->method_documentation({
      'region' => {
      	datatype => 'string',
      	base_name => 'Region',
-     	description => '',
+     	description => 'This class has a property named "Region" of type string with both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

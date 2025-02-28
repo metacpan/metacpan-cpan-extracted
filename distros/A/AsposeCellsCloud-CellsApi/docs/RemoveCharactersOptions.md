@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RemoveCharactersOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | Name property with a getter and setter override that returns a string. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Worksheet** | **string** |  |

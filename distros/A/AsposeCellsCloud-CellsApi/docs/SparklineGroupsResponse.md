@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SparklineGroupsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SparklineGroups** | **SparklineGroups** |  |
+**SparklineGroups** | **SparklineGroups** | This class has a property named "SparklineGroups" of type "SparklineGroups" for managing sparkline groups. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

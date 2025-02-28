@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'annotations_permission' => {
      	datatype => 'boolean',
      	base_name => 'AnnotationsPermission',
-     	description => '',
+     	description => 'Indicates whether to allow to add or modify text annotations, fill in interactive form fields.',
      	format => '',
      	read_only => '',
      		},

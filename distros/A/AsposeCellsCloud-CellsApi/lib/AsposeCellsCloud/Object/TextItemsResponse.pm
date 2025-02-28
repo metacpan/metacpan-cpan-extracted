@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'text_items' => {
      	datatype => 'TextItems',
      	base_name => 'TextItems',
-     	description => '',
+     	description => 'This property allows access to a collection of TextItems.',
      	format => '',
      	read_only => '',
      		},

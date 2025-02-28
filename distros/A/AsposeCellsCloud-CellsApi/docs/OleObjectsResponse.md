@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::OleObjectsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**OleObjects** | **OleObjects** |  |
+**OleObjects** | **OleObjects** | Property `OleObjects` of type `OleObjects` that can be accessed and modified publicly within the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

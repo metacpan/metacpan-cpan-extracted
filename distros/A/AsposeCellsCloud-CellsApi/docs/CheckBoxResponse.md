@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CheckBoxResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **CheckBox** |  |
+**Shape** | **CheckBox** | A public property named Shape of type CheckBox is defined with both get and set accessors. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

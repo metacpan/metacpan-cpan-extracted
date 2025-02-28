@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'cell' => {
      	datatype => 'Cell',
      	base_name => 'Cell',
-     	description => '',
+     	description => 'A property named "Cell" of type "Cell" that has both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

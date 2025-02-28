@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'Label',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The property "Shape" is of type Label and has both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

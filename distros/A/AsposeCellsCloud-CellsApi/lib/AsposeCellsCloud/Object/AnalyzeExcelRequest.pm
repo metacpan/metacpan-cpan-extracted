@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Can you please provide the features that you would like me to summarize for the class?',
                                   class => 'AnalyzeExcelRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'files' => {
      	datatype => 'ARRAY[FileInfo]',
      	base_name => 'Files',
-     	description => '',
+     	description => 'The class has a property called "Files" that is a list of FileInfo objects with a default value of an empty list.',
      	format => '',
      	read_only => '',
      		},

@@ -166,6 +166,13 @@ __PACKAGE__->method_documentation({
      	description => 'In ms excel, when copying formulas which refer to other worksheets while copying a worksheet to another one,            the copied formulas should refer to source workbook.            However, for some situations user may need the copied formulas refer to worksheets with the same name            in the same workbook, such as when those worksheets have been copied before this copy operation,            then this property should be kept as true. ',
      	format => '',
      	read_only => '',
+     		},
+     'copy_theme' => {
+     	datatype => 'boolean',
+     	base_name => 'CopyTheme',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -175,7 +182,8 @@ __PACKAGE__->swagger_types( {
     'copy_names' => 'boolean',
     'extend_to_adjacent_range' => 'boolean',
     'refer_to_destination_sheet' => 'boolean',
-    'refer_to_sheet_with_same_name' => 'boolean' 
+    'refer_to_sheet_with_same_name' => 'boolean',
+    'copy_theme' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -184,7 +192,8 @@ __PACKAGE__->attribute_map( {
     'copy_names' => 'CopyNames',
     'extend_to_adjacent_range' => 'ExtendToAdjacentRange',
     'refer_to_destination_sheet' => 'ReferToDestinationSheet',
-    'refer_to_sheet_with_same_name' => 'ReferToSheetWithSameName' 
+    'refer_to_sheet_with_same_name' => 'ReferToSheetWithSameName',
+    'copy_theme' => 'CopyTheme' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

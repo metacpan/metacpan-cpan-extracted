@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'workbooks' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'Workbooks',
-     	description => '',
+     	description => 'Property Summary: Contains a list of "Workbook" elements under the "Workbooks" array in XML format.',
      	format => '',
      	read_only => '',
      		},

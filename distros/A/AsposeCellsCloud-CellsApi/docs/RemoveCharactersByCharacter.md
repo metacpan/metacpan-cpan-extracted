@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RemoveCharactersByCharacter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**RemoveTextMethod** | **string** |  |
+**RemoveTextMethod** | **string** | Property: "RemoveTextMethod" is serialized using a string representation of the enum value. |
 **RemoveCharacters** | **ARRAY[string]** |  |
 **RemoveCharacterSetsType** | **string** |  |  
 

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m glad to help! Please provide me with the features you would like me to summarize.',
                                   class => 'Link',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'href' => {
      	datatype => 'string',
      	base_name => 'Href',
-     	description => '',
+     	description => 'Has a property named Href with the attribute ElementName set to "href".',
      	format => '',
      	read_only => '',
      		},

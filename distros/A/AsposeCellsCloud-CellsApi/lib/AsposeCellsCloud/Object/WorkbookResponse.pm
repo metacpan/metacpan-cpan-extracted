@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'workbook' => {
      	datatype => 'Workbook',
      	base_name => 'Workbook',
-     	description => '',
+     	description => 'Workbook property of the class allows access to and modification of a Workbook object.',
      	format => '',
      	read_only => '',
      		},

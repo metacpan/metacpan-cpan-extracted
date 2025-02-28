@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ErrorBarResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ErrorBar** | **ErrorBar** |  |
+**ErrorBar** | **ErrorBar** | The class has a public property named ErrorBar of type ErrorBar with a getter and setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

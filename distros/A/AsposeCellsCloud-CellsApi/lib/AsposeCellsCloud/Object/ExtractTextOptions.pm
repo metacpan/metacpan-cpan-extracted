@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Could you please provide me with the features you would like me to summarize for you?',
                                   class => 'ExtractTextOptions',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'This class has a public property for storing and retrieving a name value.',
      	format => '',
      	read_only => '',
      		},

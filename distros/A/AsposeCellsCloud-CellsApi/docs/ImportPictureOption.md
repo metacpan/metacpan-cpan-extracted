@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportPictureOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**UpperLeftRow** | **int** |  |
+**UpperLeftRow** | **int** | A property "UpperLeftRow" of type integer with a public getter and setter is defined. |
 **UpperLeftColumn** | **int** |  |
 **LowerRightRow** | **int** |  |
 **LowerRightColumn** | **int** |  |

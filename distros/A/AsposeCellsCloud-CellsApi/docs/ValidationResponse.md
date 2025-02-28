@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ValidationResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Validation** | **Validation** |  |
+**Validation** | **Validation** | The class has a public property for Validation. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

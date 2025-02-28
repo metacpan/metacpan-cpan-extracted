@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'sparkline_group' => {
      	datatype => 'SparklineGroup',
      	base_name => 'SparklineGroup',
-     	description => '',
+     	description => 'A property that allows access to a Sparkline group containing multiple Sparkline objects.',
      	format => '',
      	read_only => '',
      		},

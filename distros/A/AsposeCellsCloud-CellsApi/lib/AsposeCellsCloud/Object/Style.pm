@@ -271,7 +271,7 @@ __PACKAGE__->method_documentation({
      'border_collection' => {
      	datatype => 'ARRAY[Border]',
      	base_name => 'BorderCollection',
-     	description => '',
+     	description => 'A public property named `BorderCollection` that is a list of `Border` objects.',
      	format => '',
      	read_only => '',
      		},

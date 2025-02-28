@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SingleValueResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Value** | **SingleValue** |  |
+**Value** | **SingleValue** | A property named "Value" of type "SingleValue" that can be accessed and modified is declared in the class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

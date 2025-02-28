@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'auto_show_count' => {
      	datatype => 'int',
      	base_name => 'AutoShowCount',
-     	description => '',
+     	description => 'Represent the number of top or bottom items            that are automatically shown in the specified PivotTable field.',
      	format => '',
      	read_only => '',
      		},

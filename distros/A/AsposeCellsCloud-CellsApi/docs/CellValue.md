@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellValue;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**rowIndex** | **int** |  |
+**rowIndex** | **int** | A public integer property called "rowIndex" with both getter and setter. |
 **columnIndex** | **int** |  |
 **type** | **string** |  |
 **value** | **string** |  |

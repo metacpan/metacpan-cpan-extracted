@@ -11,8 +11,8 @@ eval( "require Text::Levenshtein::XS;" );
 plan skip_all => 'This test requires the Text::Levenshtein::XS module to be installed' if $@;
 
 my %tests = (
-              'good-map.xml'               => undef, # supposed to pass
-              'station-names-similar.xml'  => 'Similar names maybe due to typo? :Station A1:Statione A2:', # supposed to fail
+              'good-map.xml'              => undef, # supposed to pass
+              'station-names-similar.xml' => 'Similar names maybe due to typo? :Station A1:Statione A2:', # supposed to fail
             );
 
 my @localdir = File::Spec->splitdir($0);

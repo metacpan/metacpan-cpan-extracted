@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SeriesesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Serieses** | **SeriesItems** |  |
+**Serieses** | **SeriesItems** | A property named "Serieses" of type "SeriesItems" is defined in the class with both getter and setter access. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

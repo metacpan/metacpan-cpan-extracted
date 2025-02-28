@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TrimContentOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DataSource** | **DataSource** |  |
+**DataSource** | **DataSource** | This class has a public property named DataSource of type DataSource that has both a getter and a setter method.             |
 **FileInfo** | **FileInfo** |  |
 **TrimContent** | **string** |  |
 **TrimLeading** | **boolean** |  |

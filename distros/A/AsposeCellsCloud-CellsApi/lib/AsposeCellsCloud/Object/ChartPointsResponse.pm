@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart_points' => {
      	datatype => 'ChartPoints',
      	base_name => 'ChartPoints',
-     	description => '',
+     	description => 'This class has a property named `ChartPoints` of type `ChartPoints` that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

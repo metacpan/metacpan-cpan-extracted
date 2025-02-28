@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RadioButtonResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **RadioButton** |  |
+**Shape** | **RadioButton** | This class has a public property named "Shape" of type RadioButton with both getter and setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

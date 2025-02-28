@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m sorry, but you haven`t provided any specific content for me to summarize. Please provide the features you would like to be summarized.            ',
                                   class => 'TrimContentOptions',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'This class has a public property named DataSource of type DataSource that has both a getter and a setter method.            ',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'task_run_result' => {
      	datatype => 'TaskRunResult',
      	base_name => 'TaskRunResult',
-     	description => '',
+     	description => 'This class has a property named "TaskRunResult" of type "TaskRunResult" that can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

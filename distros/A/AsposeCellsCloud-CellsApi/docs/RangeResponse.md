@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RangeResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Range** | **Range** |  |
+**Range** | **Range** | This class has a property named "Range" of type Range with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ConditionalFormatting;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**sqref** | **string** |  |
+**sqref** | **string** | A public property called "sqref" of type string with a getter and a setter is defined in the class. |
 **FormatConditions** | **ARRAY[FormatCondition]** |  |
 **link** | **Link** |  |  
 

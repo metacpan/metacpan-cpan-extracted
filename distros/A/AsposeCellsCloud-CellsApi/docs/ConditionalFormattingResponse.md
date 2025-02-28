@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ConditionalFormattingResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ConditionalFormatting** | **ConditionalFormatting** |  |
+**ConditionalFormatting** | **ConditionalFormatting** | This class has a property named ConditionalFormatting of type ConditionalFormatting that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::AutoShapesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AutoShapes** | **AutoShapes** |  |
+**AutoShapes** | **AutoShapes** | The class has a property named "AutoShapes" decorated with the XmlElement attribute "shapes". |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

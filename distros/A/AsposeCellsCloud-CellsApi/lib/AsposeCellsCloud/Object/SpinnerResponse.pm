@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'Spinner',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A property named Shape of type Spinner, with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

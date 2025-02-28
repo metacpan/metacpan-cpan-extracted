@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'charts' => {
      	datatype => 'Charts',
      	base_name => 'Charts',
-     	description => '',
+     	description => 'Property Summary: Includes an XML element named "charts" that contains a property of type Charts.Charts.',
      	format => '',
      	read_only => '',
      		},

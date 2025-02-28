@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **FieldIndex** | **int** | Gets and sets the column offset in the range.  |
 **FilterType** | **string** | Gets and sets the type fo filtering data.  |
-**MultipleFilters** | **MultipleFilters** |  |
+**MultipleFilters** | **MultipleFilters** | This class contains a property named "MultipleFilters" of type "MultipleFilters" that can be both read and written. |
 **ColorFilter** | **ColorFilter** |  |
 **CustomFilters** | **ARRAY[CustomFilter]** |  |
 **DynamicFilter** | **DynamicFilter** |  |

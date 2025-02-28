@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'fill_format' => {
      	datatype => 'FillFormat',
      	base_name => 'FillFormat',
-     	description => '',
+     	description => 'Property Summary: Allows access to the FillFormat property to get or set fill formatting properties for an object.',
      	format => '',
      	read_only => '',
      		},

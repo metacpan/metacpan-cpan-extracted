@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'form' => {
      	datatype => 'Form',
      	base_name => 'Form',
-     	description => '',
+     	description => 'Property summary: A public property named "Form" with both get and set accessors, allowing access to a Form object.',
      	format => '',
      	read_only => '',
      		},

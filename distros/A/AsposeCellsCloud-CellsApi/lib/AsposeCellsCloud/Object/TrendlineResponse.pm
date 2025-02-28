@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'trendline' => {
      	datatype => 'Trendline',
      	base_name => 'Trendline',
-     	description => '',
+     	description => 'The class has a public property called "Trendline" of type "Trendline" that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

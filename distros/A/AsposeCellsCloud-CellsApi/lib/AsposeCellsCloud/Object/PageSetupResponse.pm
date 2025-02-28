@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'page_setup' => {
      	datatype => 'PageSetup',
      	base_name => 'PageSetup',
-     	description => '',
+     	description => 'Property Summary: The class has a public property named PageSetup of type PageSetup that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SeriesItems;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CategoryData** | **string** |  |
+**CategoryData** | **string** | This property allows setting and getting data for the category. |
 **IsColorVaried** | **boolean** |  |
 **SecondCatergoryData** | **string** |  |
 **SeriesList** | **ARRAY[Series]** |  |

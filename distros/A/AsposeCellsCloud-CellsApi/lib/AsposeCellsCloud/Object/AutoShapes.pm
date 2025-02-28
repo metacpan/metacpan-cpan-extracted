@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Sure! Just provide me with the features you would like me to summarize into one sentence.',
                                   class => 'AutoShapes',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'auto_shape_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'AutoShapeList',
-     	description => '',
+     	description => 'Property Summary: Contains a list of LinkElement objects identified by the XML element "autoshape".',
      	format => '',
      	read_only => '',
      		},

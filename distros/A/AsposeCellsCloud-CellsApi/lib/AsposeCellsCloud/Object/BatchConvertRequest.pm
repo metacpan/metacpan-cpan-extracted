@@ -178,7 +178,7 @@ __PACKAGE__->method_documentation({
      'page_wide_fit_on_per_sheet' => {
      	datatype => 'boolean',
      	base_name => 'PageWideFitOnPerSheet',
-     	description => '',
+     	description => 'A nullable Boolean property that determines whether the content should be fit to the entire page width on each sheet.',
      	format => '',
      	read_only => '',
      		},

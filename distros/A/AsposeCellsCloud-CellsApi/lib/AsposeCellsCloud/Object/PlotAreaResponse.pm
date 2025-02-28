@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'plot_area' => {
      	datatype => 'PlotArea',
      	base_name => 'PlotArea',
-     	description => '',
+     	description => 'A property that allows getting and setting the PlotArea for the class.',
      	format => '',
      	read_only => '',
      		},

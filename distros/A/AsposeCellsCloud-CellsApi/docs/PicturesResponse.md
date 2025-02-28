@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PicturesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Pictures** | **Pictures** |  |
+**Pictures** | **Pictures** | This class has a property called "Pictures" with the feature of being serialized as "pictures" in XML elements. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

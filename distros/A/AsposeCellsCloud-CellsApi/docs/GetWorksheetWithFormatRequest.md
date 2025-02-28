@@ -15,6 +15,8 @@ Name | Type | Description | Notes
 **horizontal_resolution** | **int** | Image horizontal resolution. |
 **area** | **string** | Represents the range to be printed. |
 **page_index** | **int** | Represents the page to be printed |
+**one_page_per_sheet** | **boolean** |  |
+**print_headings** | **boolean** |  |
 **folder** | **string** | The folder where the file is situated. |
 **storage_name** | **string** | The storage name where the file is situated. |  
 

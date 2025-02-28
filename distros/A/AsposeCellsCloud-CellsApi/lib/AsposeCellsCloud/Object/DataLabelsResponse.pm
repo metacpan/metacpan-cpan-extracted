@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'data_labels' => {
      	datatype => 'DataLabels',
      	base_name => 'DataLabels',
-     	description => '',
+     	description => 'This class has a property named DataLabels of type DataLabels that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

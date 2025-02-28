@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'linked_source' => {
      	datatype => 'string',
      	base_name => 'LinkedSource',
-     	description => '',
+     	description => 'A property named LinkedSource with both set and get accessors is defined.',
      	format => '',
      	read_only => '',
      		},

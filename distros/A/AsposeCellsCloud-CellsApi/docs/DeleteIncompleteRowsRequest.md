@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **OutFileFormat** | **string** | finish to data cleansing, outfile`s file format. |
 **CheckExcelRestriction** | **boolean** | Whether check restriction of Spreadsheet file when user modify cells related objects. |
 **Region** | **string** | The regional settings for workbook. |
-**Ranges** | **ARRAY[Range]** |  |  
+**Ranges** | **ARRAY[Range]** | A property named "Ranges" of type IList of Range, with a default value of an empty List of Range. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

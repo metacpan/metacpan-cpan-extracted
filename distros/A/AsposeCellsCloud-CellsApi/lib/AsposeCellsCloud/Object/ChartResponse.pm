@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart' => {
      	datatype => 'Chart',
      	base_name => 'Chart',
-     	description => '',
+     	description => 'A property named "Chart" of type Chart is defined with a getter and setter in the class.',
      	format => '',
      	read_only => '',
      		},

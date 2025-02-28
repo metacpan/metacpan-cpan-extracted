@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::FindResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Count** | **int** |  |
+**Count** | **int** | Property Summary: This property is annotated with the XML element name "count" and represents an integer value. |
 **TextItems** | **TextItems** |  |
 **Code** | **int** |  |
 **Status** | **string** |  |  

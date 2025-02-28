@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'links' => {
      	datatype => 'ARRAY[Link]',
      	base_name => 'Links',
-     	description => '',
+     	description => 'Property Summary: Contains a list of links represented by the class link.',
      	format => '',
      	read_only => '',
      		},

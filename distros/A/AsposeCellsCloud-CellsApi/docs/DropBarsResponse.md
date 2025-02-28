@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::DropBarsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DropBars** | **DropBars** |  |
+**DropBars** | **DropBars** | The class has a property named `DropBars` of type `DropBars` with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

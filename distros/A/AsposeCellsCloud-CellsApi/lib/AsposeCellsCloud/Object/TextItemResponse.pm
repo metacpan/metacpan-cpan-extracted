@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'text_item' => {
      	datatype => 'TextItem',
      	base_name => 'TextItem',
-     	description => '',
+     	description => 'The class has a property that allows getting and setting a TextItem object.',
      	format => '',
      	read_only => '',
      		},

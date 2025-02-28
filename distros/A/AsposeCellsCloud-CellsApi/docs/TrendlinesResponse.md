@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TrendlinesResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Trendlines** | **Trendlines** |  |
+**Trendlines** | **Trendlines** | This property allows access to the Trendlines feature and set new values for it. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

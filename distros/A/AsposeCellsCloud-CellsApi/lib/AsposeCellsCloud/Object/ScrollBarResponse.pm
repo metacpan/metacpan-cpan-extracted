@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'ScrollBar',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The class has a public property named `Shape` of type `ScrollBar` that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

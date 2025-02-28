@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'ole_object_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'OleObjectList',
-     	description => '',
+     	description => 'Property Summary: Contains a list of elements identified as "oleobject" within XML data.',
      	format => '',
      	read_only => '',
      		},

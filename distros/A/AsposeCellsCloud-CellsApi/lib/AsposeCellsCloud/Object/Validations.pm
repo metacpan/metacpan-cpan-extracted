@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'count' => {
      	datatype => 'int',
      	base_name => 'Count',
-     	description => '',
+     	description => 'Property summary: The property "Count" with an XML element name "count" returns the number of items in the "ValidationList".',
      	format => '',
      	read_only => '',
      		},

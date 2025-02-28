@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use FindBin ();
 use File::Spec;
 use Test::More tests => 14;
 
@@ -62,6 +61,7 @@ qr{^You must specify a single directory, or reference to a list of directories},
 SKIP: {    # Check that non files do not get returned.
     skip( "MSYS2 does not support symlinks", 4 ) if $^O eq 'msys';
     skip( "cannot create symlink", 4 ) unless eval { symlink( "", "" ); 1 };
+    skip( "symlinks are not typically configured for Windows", 4 ) if $^O eq 'MSWin32';
 
     my $dir         = "t/dirs/types";
     my $target      = "normal.txt";
@@ -82,7 +82,7 @@ SKIP: {    # Check that non files do not get returned.
 }
 
 {   # Test that you can pass in just a file
-    my @list = eval { Test::Fixme::list_files(File::Spec->catfile($FindBin::Bin, 'dirs', 'normal', 'three.pm')) };
+    my @list = eval { Test::Fixme::list_files(File::Spec->catfile('t', 'dirs', 'normal', 'three.pm')) };
     diag $@ if $@;
     like $list[0], qr{three.pm$}, "can give list_files directories or files";
 }

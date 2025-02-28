@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PictureResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Picture** | **Picture** |  |
+**Picture** | **Picture** | Property Summary: This class has a public property named "Picture" of type "Picture" that has both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'count' => {
      	datatype => 'int',
      	base_name => 'Count',
-     	description => '',
+     	description => 'Property Summary: An integer property named Count with an XML element name "count."',
      	format => '',
      	read_only => '',
      		},

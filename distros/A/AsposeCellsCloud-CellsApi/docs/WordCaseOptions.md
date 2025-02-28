@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WordCaseOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DataSource** | **DataSource** |  |
+**DataSource** | **DataSource** | This class has a public property named "DataSource" of type DataSource that has both a getter and a setter.             |
 **FileInfo** | **FileInfo** |  |
 **WordCaseType** | **string** |  |
 **ScopeOptions** | **ScopeOptions** |  |  

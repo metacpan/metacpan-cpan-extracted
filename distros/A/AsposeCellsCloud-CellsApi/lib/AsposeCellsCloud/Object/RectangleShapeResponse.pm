@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'RectangleShape',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A public property named "Shape" that is of type RectangleShape and can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

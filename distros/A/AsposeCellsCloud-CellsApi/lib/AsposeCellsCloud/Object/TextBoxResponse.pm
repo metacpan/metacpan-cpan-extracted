@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'TextBox',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A public property named "Shape" of type TextBox is defined with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

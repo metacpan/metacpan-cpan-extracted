@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'display_unit_label' => {
      	datatype => 'DisplayUnitLabel',
      	base_name => 'DisplayUnitLabel',
-     	description => '',
+     	description => 'This property allows access to the display unit label for the class.',
      	format => '',
      	read_only => '',
      		},

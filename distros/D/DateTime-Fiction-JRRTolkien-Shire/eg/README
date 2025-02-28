@@ -6,4 +6,9 @@ date-convert - This Perl script converts between calendars using the
     appropriate DateTime modules. By default it converts from Gregorian
     to Shire Reckoning, but any pair of DateTime modules can be used.
 
+on-date - This Perl script displays the 'on_date()' text for the
+    specified date, which can be either Gregorian (year month day) or,
+    with the --shire option, the given Shire date (year month day or
+    year holiday).
+
 # ex: set filetype=text textwidth=72 autoindent :

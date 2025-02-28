@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ArcShapeResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **ArcShape** |  |
+**Shape** | **ArcShape** | A public property Shape of type ArcShape that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

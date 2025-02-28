@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'names' => {
      	datatype => 'Names',
      	base_name => 'Names',
-     	description => '',
+     	description => 'Property: This property represents an XML element named "names" and holds a Names object.',
      	format => '',
      	read_only => '',
      		},

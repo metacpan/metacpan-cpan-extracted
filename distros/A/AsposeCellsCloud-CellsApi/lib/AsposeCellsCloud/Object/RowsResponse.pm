@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'rows' => {
      	datatype => 'Rows',
      	base_name => 'Rows',
-     	description => '',
+     	description => 'A property named "Rows" of type "Rows" which has both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

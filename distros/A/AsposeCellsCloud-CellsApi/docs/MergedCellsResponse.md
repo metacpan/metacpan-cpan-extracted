@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::MergedCellsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MergedCells** | **MergedCells** |  |
+**MergedCells** | **MergedCells** | Property Summary: Contains information about merged cells within a spreadsheet. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

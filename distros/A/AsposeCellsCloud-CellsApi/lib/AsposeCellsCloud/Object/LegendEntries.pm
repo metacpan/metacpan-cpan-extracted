@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Sure, please provide me with the features you would like me to summarize in one sentence for the class summary.',
                                   class => 'LegendEntries',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'legend_entry_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'legendEntryList',
-     	description => '',
+     	description => 'Property: Utilizes XML element "LengendEntry" to represent a list of LinkElement items in the class.',
      	format => '',
      	read_only => '',
      		},

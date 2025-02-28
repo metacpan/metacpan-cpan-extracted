@@ -135,7 +135,7 @@ __PACKAGE__->method_documentation({
      'pattern' => {
      	datatype => 'string',
      	base_name => 'Pattern',
-     	description => '',
+     	description => 'A property "Pattern" of type string with a getter and setter is defined.',
      	format => '',
      	read_only => '',
      		},

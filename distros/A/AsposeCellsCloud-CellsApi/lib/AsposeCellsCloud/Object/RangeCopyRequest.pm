@@ -147,6 +147,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'target_workbook' => {
+     	datatype => 'string',
+     	base_name => 'TargetWorkbook',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'paste_options' => {
      	datatype => 'PasteOptions',
      	base_name => 'PasteOptions',
@@ -160,6 +167,7 @@ __PACKAGE__->swagger_types( {
     'operate' => 'string',
     'source' => 'Range',
     'target' => 'Range',
+    'target_workbook' => 'string',
     'paste_options' => 'PasteOptions' 
 } );
 
@@ -167,6 +175,7 @@ __PACKAGE__->attribute_map( {
     'operate' => 'Operate',
     'source' => 'Source',
     'target' => 'Target',
+    'target_workbook' => 'TargetWorkbook',
     'paste_options' => 'PasteOptions' 
 } );
 

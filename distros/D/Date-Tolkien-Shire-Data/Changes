@@ -1,3 +1,8 @@
+0.010		2025-02-27	T. R. Wyant
+    Add CONTRIBUTING and SECURITY.
+    Correct spelling of 'Meriadoc' in 2/29 on_date. Thanks to Blaine
+    Motsinger (renderorange) for spotting this.
+
 0.009		2021-08-17	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

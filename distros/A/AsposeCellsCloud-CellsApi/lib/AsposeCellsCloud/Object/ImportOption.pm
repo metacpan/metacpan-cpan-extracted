@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class Summary: This class covers the features of artificial intelligence, machine learning, deep learning, and natural language processing.',
                                   class => 'ImportOption',
                                   required => [], # TODO
 }                                 );
@@ -136,7 +136,7 @@ __PACKAGE__->method_documentation({
      'is_insert' => {
      	datatype => 'boolean',
      	base_name => 'IsInsert',
-     	description => '',
+     	description => 'A boolean property `IsInsert` that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

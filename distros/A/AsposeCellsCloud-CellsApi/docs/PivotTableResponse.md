@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotTableResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PivotTable** | **PivotTable** |  |
+**PivotTable** | **PivotTable** | PivotTable property of type PivotTable that can be both read and written. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

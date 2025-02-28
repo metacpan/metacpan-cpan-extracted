@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'CheckBox',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'A public property named Shape of type CheckBox is defined with both get and set accessors.',
      	format => '',
      	read_only => '',
      		},

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WorkbookReplaceResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Matches** | **int** |  |
+**Matches** | **int** | Property summary: An integer property named "Matches" with an XmlElement attribute. |
 **Workbook** | **LinkElement** |  |
 **Code** | **int** |  |
 **Status** | **string** |  |  

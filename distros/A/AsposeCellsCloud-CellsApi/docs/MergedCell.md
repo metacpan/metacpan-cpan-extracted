@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::MergedCell;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EndColumn** | **int** |  |
+**EndColumn** | **int** | An integer property named "EndColumn" with the XML element name "endcolumn". |
 **EndRow** | **int** |  |
 **StartColumn** | **int** |  |
 **StartRow** | **int** |  |

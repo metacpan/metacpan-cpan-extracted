@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::LegendEntryResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**LegendEntry** | **LegendEntry** |  |
+**LegendEntry** | **LegendEntry** | A public property called LegendEntry of type LegendEntry with both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

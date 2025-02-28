@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'hyperlinks' => {
      	datatype => 'Hyperlinks',
      	base_name => 'Hyperlinks',
-     	description => '',
+     	description => 'This class has a property named "Hyperlinks" of type Hyperlinks which can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

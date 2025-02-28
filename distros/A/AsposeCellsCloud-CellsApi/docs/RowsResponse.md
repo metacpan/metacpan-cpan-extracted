@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RowsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Rows** | **Rows** |  |
+**Rows** | **Rows** | A property named "Rows" of type "Rows" which has both getter and setter methods. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

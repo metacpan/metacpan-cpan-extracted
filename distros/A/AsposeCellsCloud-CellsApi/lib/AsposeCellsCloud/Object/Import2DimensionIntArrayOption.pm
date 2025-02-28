@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m here to help! Please provide the features you`d like me to summarize.',
                                   class => 'Import2DimensionIntArrayOption',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'first_row' => {
      	datatype => 'int',
      	base_name => 'FirstRow',
-     	description => '',
+     	description => 'This property allows getting and setting the value of the first row in a class.',
      	format => '',
      	read_only => '',
      		},

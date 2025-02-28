@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Test::Lib;
 use File::Spec;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Map::Tube;
 use Sample;
 
 my %tests = (
-              'good-map.xml'             => undef, # supposed to pass
-              'line-id-duplicate.xml'    => 'Line id A defined more than once', # supposed to fail
+              'good-map.xml'               => undef, # supposed to pass
+              'line-id-duplicate.xml'      => 'Line id A defined 2 times', # supposed to fail
+              'line-id-case-duplicate.xml' => 'Line id A defined more than once in different writing (case)', # supposed to fail
             );
 
 my @localdir = File::Spec->splitdir($0);

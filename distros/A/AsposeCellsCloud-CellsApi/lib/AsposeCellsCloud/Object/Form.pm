@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Please provide the features you would like me to summarize into one sentence for the class.',
                                   class => 'Form',
                                   required => [], # TODO
 }                                 );
@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'form_type' => {
      	datatype => 'string',
      	base_name => 'FormType',
-     	description => '',
+     	description => 'A property named "FormType" of type string which can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

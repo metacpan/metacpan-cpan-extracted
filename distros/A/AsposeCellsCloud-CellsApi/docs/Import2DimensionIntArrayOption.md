@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Import2DimensionIntArrayOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FirstRow** | **int** |  |
+**FirstRow** | **int** | This property allows getting and setting the value of the first row in a class. |
 **FirstColumn** | **int** |  |
 **Data** | **ARRAY[int?]** |  |
 **DestinationWorksheet** | **string** |  |

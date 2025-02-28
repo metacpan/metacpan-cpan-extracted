@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Please provide me with the features you would like me to summarize for the class.            ',
                                   class => 'ScopeItem',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'worksheet_name' => {
      	datatype => 'string',
      	base_name => 'WorksheetName',
-     	description => '',
+     	description => 'A property "WorksheetName" of type string with an initial value of an empty string.            ',
      	format => '',
      	read_only => '',
      		},

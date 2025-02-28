@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'export_page_headers' => {
      	datatype => 'boolean',
      	base_name => 'ExportPageHeaders',
-     	description => '',
+     	description => 'Indicates whether exporting page headers.',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart_data_table' => {
      	datatype => 'ChartDataTable',
      	base_name => 'ChartDataTable',
-     	description => '',
+     	description => 'This property allows access to a ChartDataTable object for storing and manipulating data related to a chart.',
      	format => '',
      	read_only => '',
      		},

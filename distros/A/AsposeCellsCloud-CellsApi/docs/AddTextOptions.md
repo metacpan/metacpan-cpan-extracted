@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::AddTextOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
+**Name** | **string** | The class has a public property named "Name" with a getter and setter method. |
 **DataSource** | **DataSource** |  |
 **FileInfo** | **FileInfo** |  |
 **Text** | **string** |  |

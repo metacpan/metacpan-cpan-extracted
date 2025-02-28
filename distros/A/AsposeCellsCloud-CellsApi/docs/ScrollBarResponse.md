@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ScrollBarResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **ScrollBar** |  |
+**Shape** | **ScrollBar** | The class has a public property named `Shape` of type `ScrollBar` that can be both read and written. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

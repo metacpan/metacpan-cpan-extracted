@@ -1,0 +1,61 @@
+{
+   "abstract" : "Work with equations of Math::Symbolic expressions",
+   "author" : [
+      "Matt Johnson <mjohnson@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Symbolic-Custom-Equation",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Symbolic" : "0.613",
+            "Math::Symbolic::Custom::Collect" : "0.32",
+            "Math::Symbolic::Custom::Factor" : "0.13",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjohnson108/p5-msc-equation/issues"
+      },
+      "homepage" : "https://github.com/mjohnson108/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjohnson108/p5-msc-equation.git",
+         "web" : "https://github.com/mjohnson108/p5-msc-equation"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

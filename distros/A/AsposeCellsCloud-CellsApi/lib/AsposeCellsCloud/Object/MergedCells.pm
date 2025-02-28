@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Sure, could you please provide me with the features you would like me to summarize?',
                                   class => 'MergedCells',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'count' => {
      	datatype => 'int',
      	base_name => 'Count',
-     	description => '',
+     	description => 'An integer property labeled as "count" and marked as an XML element in the class.',
      	format => '',
      	read_only => '',
      		},

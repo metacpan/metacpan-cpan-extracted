@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart_area' => {
      	datatype => 'ChartArea',
      	base_name => 'ChartArea',
-     	description => '',
+     	description => 'This class has a property named "ChartArea" of type ChartArea with a getter and setter.',
      	format => '',
      	read_only => '',
      		},

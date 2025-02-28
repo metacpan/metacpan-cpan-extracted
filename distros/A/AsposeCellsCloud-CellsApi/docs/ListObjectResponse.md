@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ListObjectResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ListObject** | **ListObject** |  |
+**ListObject** | **ListObject** | A property that represents a list object within the Tables class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

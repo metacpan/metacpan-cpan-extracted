@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'list_objects' => {
      	datatype => 'ListObjects',
      	base_name => 'ListObjects',
-     	description => '',
+     	description => 'A property named "ListObjects" of type "Tables.ListObjects" that can be both accessed and modified.',
      	format => '',
      	read_only => '',
      		},

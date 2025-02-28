@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'floor' => {
      	datatype => 'Floor',
      	base_name => 'Floor',
-     	description => '',
+     	description => 'This class has a public property "Floor" of type "Floor" with both a getter and a setter.',
      	format => '',
      	read_only => '',
      		},

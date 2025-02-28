@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m here to help! Just let me know the features you would like me to summarize for you.',
                                   class => 'RemoveDuplicatesOptions',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'The class has a public property "Name" of type string that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

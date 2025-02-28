@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '3.99';
+$Test::Map::Tube::VERSION   = '4.01';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Module for testing Map::Tube data and features.
 
 =head1 VERSION
 
-Version 3.99
+Version 4.01
 
 =head1 DESCRIPTION
 
@@ -231,7 +231,7 @@ sub not_ok_map_data($;$$) {
     my $test_level = $tb->level( );
     $tb->level( $test_level+1 );
 
-	my( $ok, @messages ) = ok_map_data( $map, $argref, $message );
+    my( $ok, @messages ) = ok_map_data( $map, $argref, $message );
     if (wantarray) {
         if ($ok) {
             my $name = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
@@ -258,7 +258,7 @@ sub not_ok_map($;$$) {
     my $test_level = $tb->level( );
     $tb->level( $test_level+1 );
 
-	my( $ok, @messages ) = not_ok_map_data( $map, $argref, $message );
+    my( $ok, @messages ) = not_ok_map_data( $map, $argref, $message );
     if (wantarray) {
         $tb->level( $test_level );
         return ( $ok, @messages );
@@ -304,20 +304,20 @@ sub ok_map_loadable($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $object, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
                       : 'An object';
     my $max_msg = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_messages} ) )
                       ? $argref->{max_messages}
                       : 0;
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     if ( !defined($object) ) {
@@ -351,12 +351,12 @@ sub ok_line_names_unique($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -365,7 +365,7 @@ sub ok_line_names_unique($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     # Check that no line name comes up more than once (taking into account exact spelling):
@@ -406,12 +406,12 @@ sub ok_line_ids_unique($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -420,12 +420,22 @@ sub ok_line_ids_unique($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
-    my @dup_ids = sort grep { $rawinfo->{line_ids_defined}->{$_} > 1 } keys %{ $rawinfo->{line_ids_defined} };
-    ( $ok, @results ) = _emit_diagnostics( $name, wantarray, $ok, "Line id $_ defined more than once", \@results,
-                                           $max_msg ) for @dup_ids;
+    my @dup_ids = sort grep { scalar( @{ $rawinfo->{line_ids_defined}->{$_} } ) > 1 } keys %{ $rawinfo->{line_ids_defined} };
+    for (@dup_ids) {
+      my $msg;
+      my $n = scalar( @{ $rawinfo->{line_ids_defined}->{$_} } );
+      if ( ( $n == 2 ) &&
+           ( uc( $rawinfo->{line_ids_defined}->{$_}->[0] ) eq uc( $rawinfo->{line_ids_defined}->{$_}->[1] ) ) &&
+           (     $rawinfo->{line_ids_defined}->{$_}->[0]   ne      $rawinfo->{line_ids_defined}->{$_}->[1]    ) ) {
+         $msg = "Line id $_ defined more than once in different writing (case)";
+      } else {
+         $msg = "Line id $_ defined $n times";
+      }
+      ( $ok, @results ) = _emit_diagnostics( $name, wantarray, $ok, $msg, \@results, $max_msg );
+    }
 
     $ok = $tb->ok( 1, $name ) if $ok;
 
@@ -434,13 +444,14 @@ sub ok_line_ids_unique($;$) {
 
 
 sub ok_station_names_different($;$) {
-    # Station ids must be unique, but since newer versions of Map::Tube already test this on init,
-    # we don't repeat this. Instead, we check here whether no two station names look "similar
-    # enough" to assume one might be a typo for the other.
+    # Station ids must be unique (case-insensitive), but since newer versions of Map::Tube
+    # already test this on init, we don't repeat this. The same goes for station names.
+    # Instead, we check here whether no two station names look "similar enough" to assume
+    # one might be a typo for the other.
     # This is in many ways a fallible test and cannot be applied indiscriminately.
     # Hence, it can be tweaked in two ways:
     #    a) by setting the maximum Levenshtein distance for two names to be considered equal. Set
-    #       to 0 in order not to test at all.
+    #       to 0 in order to test only for complete equality.
     #    b) by setting a threshold for the total number of similar entries below which no problem
     #       will be reported. Default is 0 (so all issues will be reported). Set it, e.g., to 5
     #       if you know that your map contains 5 legitimate pairs of similar entries.
@@ -456,13 +467,13 @@ sub ok_station_names_different($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb            = Test::More->builder( );
+    my $tb          = Test::More->builder( );
     $map            = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name        = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                           ? $argref->{name}
@@ -470,14 +481,14 @@ sub ok_station_names_different($;$) {
     my $max_msg     = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_messages} ) )
                           ? $argref->{max_messages}
                           : 0;
-    my $dist_limit    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{dist_limit}  ) )
+    my $dist_limit  = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{dist_limit}  ) )
                           ? $argref->{dist_limit}
                           : 2;
     my $max_allowed = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_allowed} ) )
                           ? $argref->{max_allowed}
                           : 0;
     my $rawinfo     = $map->{_rawinfo};
-    my $ok            = 1;
+    my $ok          = 1;
     my @results;
 
     eval 'use Text::Levenshtein::XS qw(distance)';
@@ -533,13 +544,13 @@ sub ok_station_names_complete($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb            = Test::More->builder( );
+    my $tb          = Test::More->builder( );
     $map            = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name        = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                           ? $argref->{name}
@@ -551,7 +562,7 @@ sub ok_station_names_complete($;$) {
                           ? $argref->{max_allowed}
                           : 0;
     my $rawinfo     = $map->{_rawinfo};
-    my $ok            = 1;
+    my $ok          = 1;
     my @results;
 
     my @incomplete_names;
@@ -594,13 +605,13 @@ sub ok_lines_used($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -609,7 +620,7 @@ sub ok_lines_used($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     my @unserve_line_ids = sort grep { !$rawinfo->{line_ids_used}{$_} && !exists( $rawinfo->{other_link_used}{$_} ) }
@@ -658,13 +669,13 @@ sub ok_stations_linked_share_lines($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -673,7 +684,7 @@ sub ok_stations_linked_share_lines($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     for my $station1 ( sort keys %{ $rawinfo->{station_linked_to_stations} } ) {
@@ -739,13 +750,13 @@ sub ok_links_bidirectional($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb               = Test::More->builder( );
+    my $tb             = Test::More->builder( );
     $map               = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name           = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                              ? $argref->{name}
@@ -754,14 +765,14 @@ sub ok_links_bidirectional($;$) {
                              ? $argref->{max_messages}
                              : 0;
     my %skip_lines_ids = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{exclude} ) )
-                             ? ( map { $_ => 1 } ( ( ref($argref->{exclude}) eq 'ARRAY' )
+                             ? ( map { uc($_) => 1 } ( ( ref($argref->{exclude}) eq 'ARRAY' )
                                                          ? @{ $argref->{exclude} }
                                                          : $argref->{exclude}
-                                                   )
+                                                     )
                                )
                              : ( );
     my $rawinfo        = $map->{_rawinfo};
-    my $ok               = 1;
+    my $ok             = 1;
     my @results;
 
     for my $station( sort keys %{ $rawinfo->{station_linked_to_stations} } ) {
@@ -802,13 +813,13 @@ sub ok_lines_indexed($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -817,7 +828,7 @@ sub ok_lines_indexed($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     my @partially_indexed = sort grep { ( $rawinfo->{line_ids_indexed}{$_} != 0 ) &&
@@ -862,13 +873,13 @@ sub ok_lines_run_through($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb               = Test::More->builder( );
+    my $tb             = Test::More->builder( );
     $map               = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name           = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                              ? $argref->{name}
@@ -877,14 +888,14 @@ sub ok_lines_run_through($;$) {
                              ? $argref->{max_messages}
                              : 0;
     my %skip_lines_ids = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{exclude} ) )
-                             ? ( map { $_ => 1 } ( ( ref($argref->{exclude}) eq 'ARRAY' )
-                                                         ? @{ $argref->{exclude} }
-                                                         : $argref->{exclude}
-                                                 )
+                           ? ( map { uc($_) => 1 } ( ( ref($argref->{exclude}) eq 'ARRAY' )
+                                                       ? @{ $argref->{exclude} }
+                                                       : $argref->{exclude}
+                                                   )
                                )
                              : ( );
     my $rawinfo        = $map->{_rawinfo};
-    my $ok               = 1;
+    my $ok             = 1;
     my @results;
 
     eval 'use Graph';
@@ -937,13 +948,13 @@ sub ok_map_connected($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb            = Test::More->builder( );
+    my $tb          = Test::More->builder( );
     $map            = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name        = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                           ? $argref->{name}
@@ -955,7 +966,7 @@ sub ok_map_connected($;$) {
                           ? $argref->{max_allowed}
                           : 0;
     my $rawinfo     = $map->{_rawinfo};
-    my $ok            = 1;
+    my $ok          = 1;
     my @results;
 
     eval 'use Graph';
@@ -1007,7 +1018,7 @@ sub ok_map_connected($;$) {
                   my $unlink = $graph->is_reachable( $station1, $_ ) ? ( $_ . '//' . $station1 ) : ( $station1 . '//' . $_ );
                   push( @unlinked, $unlink );
                 }
-                ($ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
+                ($ok, @results) = _emit_diagnostics( $name, wantarray, $ok,
                                                       'Not every station reachable from every other station -- map has ' .
                                                       scalar(@components) .
                                                       ' separate components; e.g., stations with ids ' .
@@ -1037,13 +1048,13 @@ sub ok_line_definitions($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     $map        = _prepare_raw_map($map) unless exists $map->{_rawinfo};
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
@@ -1052,7 +1063,7 @@ sub ok_line_definitions($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     ($ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
@@ -1088,20 +1099,20 @@ sub ok_station_ids($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
                       : ( $map->name( ) // 'A Map::Tube' );
     my $max_msg = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_messages} ) )
                       ? $argref->{max_messages}
                       : 0;
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     ($ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
@@ -1126,20 +1137,20 @@ sub ok_stations_linked($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
                       : ( $map->name( ) // 'A Map::Tube' );
     my $max_msg = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_messages} ) )
                       ? $argref->{max_messages}
                       : 0;
-    my $ok       = 1;
+    my $ok      = 1;
     my @results;
 
     my %linked;
@@ -1170,7 +1181,7 @@ sub ok_stations_self_linked($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
@@ -1185,7 +1196,7 @@ sub ok_stations_self_linked($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     ($ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
@@ -1212,20 +1223,20 @@ sub ok_stations_multilinked($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
     #
     my ( $map, $argref ) = @_;
-    my $tb        = Test::More->builder( );
+    my $tb      = Test::More->builder( );
     my $name    = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{name} ) )
                       ? $argref->{name}
                       : ( $map->name( ) // 'A Map::Tube' );
     my $max_msg = ( defined($argref) && ( ref($argref) eq 'HASH' ) && exists( $argref->{max_messages} ) )
                       ? $argref->{max_messages}
                       : 0;
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     for my $station ( sort keys %{ $map->{nodes} } ) {
@@ -1257,7 +1268,7 @@ sub ok_stations_multilined($;$) {
     # Return:
     #  in scalar context: a boolean indicating success (truey) or failure (falsey).
     #                      Any diagnostics will have been output at the time of return.
-    #  in array contect:  a list containing a boolean (as above), followed by all diagnostic
+    #  in array context:  a list containing a boolean (as above), followed by all diagnostic
     #                      messages (if any).
     #                      It is the responsibility of the caller to display these messages
     #                      to the user.
@@ -1272,7 +1283,7 @@ sub ok_stations_multilined($;$) {
                       ? $argref->{max_messages}
                       : 0;
     my $rawinfo = $map->{_rawinfo};
-    my $ok        = 1;
+    my $ok      = 1;
     my @results;
 
     for my $station ( sort keys %{ $rawinfo->{station_line_count} } ) {
@@ -1463,7 +1474,7 @@ sub _prepare_raw_map {
 
 
 sub _prepare_xml_map {
-  # analyse the original map data (XML format) and store it
+  # analyse the original map data (XML format) and store them
   # surreptitiously in the Map::Tube object for later use.
   eval 'use XML::Twig';
   plan skip_all => 'XML::Twig required' if $@;
@@ -1480,13 +1491,15 @@ sub _prepare_xml_map {
 
   my $line = $root->first_child('lines')->first_child('line');
   while ($line) {
-    my $id     = $line->att('id');
-    my $name = $line->att('name');
+    my $id_case = $line->att('id');
+    my $id      = uc($id_case);
+    my $name    = $line->att('name');
     $line_names_uc{uc($name)} //= { };
     $line_names{$name} //= [ ];
     $line_names_uc{uc($name)}{$name}++;
     push( @{ $line_names{$name} }, $id );
-    $line_ids_defined{$id}++;
+    $line_ids_defined{$id} //= [ ];
+    push( @{ $line_ids_defined{$id} }, $id_case );
     $line_ids_used{$id}    = 0;
     $line_ids_indexed{$id} = 0;
     $line = $line->next_sibling( );
@@ -1494,21 +1507,23 @@ sub _prepare_xml_map {
 
   my $station = $root->first_child('stations')->first_child('station');
   while ($station) {
-    my $id      = $station->att('id');
-    my $name  = $station->att('name');
+    my $id   = $station->att('id');
+    my $name = $station->att('name');
     $station_names{$name} //= [ ];
     push( @{ $station_names{$name} }, $id );
     $station_ids_defined{$id}++;
     $station_ids_used{$_}++                   for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
     $station_linked_to_stations{$id}{$_} |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
 
-    for ( map { ( split( /:/) )[0] } split( /,/, $station->att('line') ) ) {
-      $line_ids_used{$_}++;
+    for ( map { uc( ( split( /:/) )[0] ) } split( /,/, $station->att('line') ) ) {
+      $line_ids_used{uc($_)}++;
       $station_served_by_lines{$id}{$_} |= 1;
       $station_line_count{$id}{$_}++;
     }
     for ( grep { scalar( split(/:/) ) > 1 } split( /,/, $station->att('line') ) ) {
+      # line entry with station index
       my( $line, $idx ) = split( /:/, $_ );
+      $line = uc($line);
       $line_ids_indexed{$line}++;
       $line_id_has_indices{$line}{$idx}++;
     }
@@ -1526,7 +1541,7 @@ sub _prepare_xml_map {
     $station = $station->next_sibling( );
   }
 
-  $map->{_rawinfo} = { line_names                  => \%line_names,
+  $map->{_rawinfo} = { line_names                 => \%line_names,
                        line_names_uc              => \%line_names_uc,
                        line_ids_defined           => \%line_ids_defined,
                        line_ids_used              => \%line_ids_used,
@@ -1538,14 +1553,14 @@ sub _prepare_xml_map {
                        station_line_count          => \%station_line_count,
                        other_link_used              => \%other_link_used,
                        station_linked_to_stations => \%station_linked_to_stations,
-                       station_served_by_lines      => \%station_served_by_lines,
+                       station_served_by_lines    => \%station_served_by_lines,
                      };
   return $map;
 }
 
 
 sub _prepare_json_map {
-  # analyse the original map data (JSON format) and store it
+  # analyse the original map data (JSON format) and store them
   # surreptitiously in the Map::Tube object for later use.
   eval 'use Map::Tube::Utils';
   plan skip_all => 'Map::Tube::Utils required (should have been installed along with Map::Tube)' if $@;
@@ -1560,33 +1575,36 @@ sub _prepare_json_map {
   my $json = Map::Tube::Utils::to_perl( $map->json( ) );
 
   for my $line ( @{ $json->{lines}{line} } ) {
-    my $id     = $line->{id};
-    my $name = $line->{name};
+    my $id_case = $line->{id};
+    my $id      = uc($id_case);
+    my $name    = $line->{name};
     $line_names_uc{uc($name)} //= { };
     $line_names{$name} //= [ ];
     $line_names_uc{uc($name)}{$name}++;
     push( @{ $line_names{$name} }, $id );
-    $line_ids_defined{$id}++;
+    $line_ids_defined{$id} //= [ ];
+    push( @{ $line_ids_defined{$id} }, $id_case );
     $line_ids_used{$id}    = 0;
     $line_ids_indexed{$id} = 0;
   }
 
   for my $station ( @{ $json->{stations}{station} } ) {
-    my $id      = $station->{id};
-    my $name  = $station->{name};
+    my $id   = $station->{id};
+    my $name = $station->{name};
     $station_names{$name} //= [ ];
     push( @{ $station_names{$name} }, $id );
     $station_ids_defined{$id}++;
     $station_ids_used{$_}++                   for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
     $station_linked_to_stations{$id}{$_} |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
 
-    for ( map { ( split( /:/) )[0] } split( /,/, $station->{line} ) ) {
+    for ( map { uc( ( split( /:/) )[0] ) } split( /,/, $station->{line} ) ) {
       $line_ids_used{$_}++;
       $station_served_by_lines{$id}{$_} |= 1;
       $station_line_count{$id}{$_}++;
     }
     for ( grep { scalar( split(/:/) ) > 1 } split( /,/, $station->{line} ) ) {
       my( $line, $idx ) = split( /:/, $_ );
+      $line = uc($line);
       $line_ids_indexed{$line}++;
       $line_id_has_indices{$line}{$idx}++;
     }
@@ -1597,25 +1615,24 @@ sub _prepare_json_map {
         $other_link_used{$ol}++;
         $station_ids_used{$target}++;
         $station_linked_to_stations{$id}{$target} |= 2;
-        $station_served_by_lines{$id}{$ol}          |= 2;
+        $station_served_by_lines{$id}{$ol}        |= 2;
       }
     }
-
   }
 
-  $map->{_rawinfo} = { line_names                  => \%line_names,
+  $map->{_rawinfo} = { line_names                 => \%line_names,
                        line_names_uc              => \%line_names_uc,
                        line_ids_defined           => \%line_ids_defined,
                        line_ids_used              => \%line_ids_used,
                        line_ids_indexed           => \%line_ids_indexed,
-                       line_id_has_indices          => \%line_id_has_indices,
+                       line_id_has_indices        => \%line_id_has_indices,
                        station_names              => \%station_names,
-                       station_ids_defined          => \%station_ids_defined,
+                       station_ids_defined        => \%station_ids_defined,
                        station_ids_used           => \%station_ids_used,
-                       station_line_count          => \%station_line_count,
+                       station_line_count         => \%station_line_count,
                        other_link_used              => \%other_link_used,
                        station_linked_to_stations => \%station_linked_to_stations,
-                       station_served_by_lines      => \%station_served_by_lines,
+                       station_served_by_lines    => \%station_served_by_lines,
                      };
   return $map;
 }
@@ -1731,7 +1748,7 @@ Here are two full examples:
 
     ok_map_data( Map::Tube::London->new,
                  { ok_map_connected => undef, # Do not check whether the map is connected
-				   ok_links_bidirectional => { exclude => [ 'Elizabeth', 'Piccadilly' ] },
+                   ok_links_bidirectional => { exclude => [ 'Elizabeth', 'Piccadilly' ] },
                                               # Do check whether all lines are fully bidirectional,
                                               # except the two named lines
                    ok_station_names_different => 1, # Check for similar-looking names
@@ -1765,7 +1782,8 @@ Checks whether the map object is defined, looks like a Map::Tube object and cont
 per Map::Tube built-in base line checks. It does not perform any deep data validity checks beyond.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 The other individual tests presuppose that the map has successfully loaded, so it is good practice
 to always check this condition first.
@@ -1785,7 +1803,8 @@ the expected maximum number of components may be specified in the optional argum
 key C<max_allowed>. The value defaults to 1.
 
 Otherwise, the only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head2 The individual developer tests focussing on lines
@@ -1798,7 +1817,8 @@ Also checks whether color specifications are either a standard hex HTML color co
 a name from a pre-defined set of color names (see L<Map::Tube::Utils>).
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_line_names_unique( $map [, \%args] )
@@ -1808,16 +1828,17 @@ Checks whether line names are unique, even when disregarding case.
 not need to repeat that test.)
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_line_ids_unique( $map [, \%args] )
 
-Checks whether line ids are unique. Note that line IDs (as opposed to station IDs) are
-case-sensitive, i.e., C<"LINE"> and C<"line"> are two different lines.
+Checks whether line ids are unique, even when disregarding case.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_lines_used( $map [, \%args] )
@@ -1830,7 +1851,8 @@ we do not ned to repeat that test.) Also, lines must not come up both in ordinar
 and in C<other_link>.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_lines_indexed( $map [, \%args] )
@@ -1841,7 +1863,8 @@ then there must not be any station with the attribute C<line="LINE1">. (This is 
 syntactical requirement of L<Map::Tube> needed for proper functioning.)
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_lines_run_through( $map [, \%args] )
@@ -1860,7 +1883,8 @@ a list of line IDs. Here are two examples:
     ok_lines_run_through( Map::Tube::London->new, { exclude => [ 'Piccadilly', 'Jubilee' ] } );
 
 Otherwise, the only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_links_bidirectional( $map [, \%args] )
@@ -1868,7 +1892,8 @@ L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok
 Checks whether all links are bidirectional, i.e., whether all links work symmetrically in both
 directions. Note that it is perfectly legal for this not to be the case, however, so this is a
 fallible test. For this reason, this is one of the tests that is not performed by
-L<ok_map_data( )|/ok_map_data-map-args-message> by default, because the rate of false positives is considered to be too high.
+L<ok_map_data( )|/ok_map_data-map-args-message> by default, because the rate of false positives
+is considered to be too high.
 
 It is, however, good practice to include this optional test when starting to develop a map,
 because it catches a substantial part of hard-to-notice accidental omissions of links. If
@@ -1882,7 +1907,8 @@ or a reference to a list of line IDs. Here are two examples:
     ok_links_bidirectional( Map::Tube::London->new, { exclude => [ 'Piccadilly', 'Elizabeth' ] } );
 
 Otherwise, the only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head2 The individual developer tests focussing on stations
@@ -1893,7 +1919,8 @@ L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok
 Checks whether any station IDs contain a comma or a colon, which is not allowed for syntactical reasons.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_station_names_different( $map [, \%args] )
@@ -1906,9 +1933,10 @@ having a distance of at most 2 are considered "too similar".
 
 It is, of course, perfectly legal for two station names to look "similar". Hence, this is in
 many ways a fallible test and cannot be applied indiscriminately. For that reason, it is not
-among the tests carried out by L<ok_map_data( )|/ok_map_data-map-args-message> by default. During development, it is
-nevertheless a good idea to use this test. It can be tweaked in two ways using the optional
-hash ref argument in order to prevent over-alerting. Both ways may be used at the same time.
+among the tests carried out by L<ok_map_data( )|/ok_map_data-map-args-message> by default.
+During development, it is nevertheless a good idea to use this test. It can be tweaked in two
+ways using the optional hash ref argument in order to prevent over-alerting. Both ways may be
+used at the same time.
 
 =over 4
 
@@ -1932,7 +1960,8 @@ While this test is useful to find accidental typos, there do exist maps where th
 rate is so high that this test becomes useless.
 
 Otherwise, the only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_station_names_complete( $map [, \%args] )
@@ -1943,16 +1972,18 @@ C<Baker Street>.
 
 It is, of course, perfectly legal for such a situation to happen, e.g., C<New Cross> and
 C<New Cross Gate>. Hence, this is in many ways a fallible test and cannot be applied
-indiscriminately. For that reason, it is not among the tests carried out by L<ok_map_data( )|/ok_map_data-map-args-message>
-by default. During development, it is nevertheless a good idea to use this test. It can be
-tweaked using the optional hash ref argument with the key C<max_allowed> to declare that a
-certain number of hits is expected and is not considered to be problematic. Only if this
-threshold is exceeded will the test be considered a fail. The default threshold is 0 so that
-all issues will be reported, but if you know that your map contains five legitimate pairs of
-such station names, specify C<{ max_allowed =E<gt> 5 }>.
+indiscriminately. For that reason, it is not among the tests carried out by
+L<ok_map_data( )|/ok_map_data-map-args-message> by default. During development, it is
+nevertheless a good idea to use this test. It can be tweaked using the optional hash ref
+argument with the key C<max_allowed> to declare that a certain number of hits is expected
+and is not considered to be problematic. Only if this threshold is exceeded will the test
+be considered a fail. The default threshold is 0 so that all issues will be reported, but
+if you know that your map contains five legitimate pairs of such station names, specify
+C<{ max_allowed =E<gt> 5 }>.
 
 Otherwise, the only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_stations_linked( $map [, \%args] )
@@ -1961,7 +1992,8 @@ This checks whether all stations that are named as the target of a link are also
 declared as a station.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_stations_self_linked( $map [, \%args] )
@@ -1969,7 +2001,8 @@ L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok
 This checks whether any station declares a link to itself, which should not happen.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_stations_multilinked( $map [, \%args] )
@@ -1979,7 +2012,8 @@ This checks whether any station lists another station as the target of a link mo
 each linked station once only.)
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_stations_multilined( $map [, \%args] )
@@ -1989,7 +2023,8 @@ lines using the C<line> attribute. By contrast, in C<other_link> it is perfectly
 given "line" to occur more than once.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head3 ok_stations_linked_share_lines( $map [, \%args] )
@@ -2005,7 +2040,8 @@ C<other_link> at the target station. E.g., if station with ID C<D> has the attri
 C<other_link="tunnel:E">, then station C<E> must have the attribute C<other_link="tunnel:D">.
 
 The only optional arguments used are C<name> and C<max_messages>, as described for
-L<ok_map_data( )|/ok_map_data-map-args-message>. The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
+L<ok_map_data( )|/ok_map_data-map-args-message>.
+The return value is as for L<ok_map_data( )|/ok_map_data-map-args-message>.
 
 
 =head1 CONTRIBUTORS

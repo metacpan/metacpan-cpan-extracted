@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'validation' => {
      	datatype => 'Validation',
      	base_name => 'Validation',
-     	description => '',
+     	description => 'The class has a public property for Validation.',
      	format => '',
      	read_only => '',
      		},

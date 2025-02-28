@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'list_object' => {
      	datatype => 'ListObject',
      	base_name => 'ListObject',
-     	description => '',
+     	description => 'A property that represents a list object within the Tables class.',
      	format => '',
      	read_only => '',
      		},

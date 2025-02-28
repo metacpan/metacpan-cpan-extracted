@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class summary: Important features to consider when designing a new website include user-friendly navigation, responsive design for different devices, visually appealing layouts, and fast loading speed.            ',
                                   class => 'RemoveCharactersByPosition',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'the_first_n_characters' => {
      	datatype => 'int',
      	base_name => 'TheFirstNCharacters',
-     	description => '',
+     	description => 'This property allows access to a public integer named "TheFirstNCharacters" for getting and setting its value.',
      	format => '',
      	read_only => '',
      		},

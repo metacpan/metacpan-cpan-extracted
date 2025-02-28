@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'auto_shape' => {
      	datatype => 'AutoShape',
      	base_name => 'AutoShape',
-     	description => '',
+     	description => 'A public property named "AutoShape" of type "AutoShape" with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::MergedCellResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MergedCell** | **MergedCell** |  |
+**MergedCell** | **MergedCell** | A property named "MergedCell" of type "MergedCell" which allows getting and setting its value. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

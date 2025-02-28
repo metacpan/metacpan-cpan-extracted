@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'settings' => {
      	datatype => 'WorkbookSettings',
      	base_name => 'settings',
-     	description => '',
+     	description => 'The class has a public property called "settings" of type WorkbookSettings that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

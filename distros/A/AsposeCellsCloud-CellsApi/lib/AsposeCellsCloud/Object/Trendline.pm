@@ -133,7 +133,7 @@ __PACKAGE__->method_documentation({
      'link' => {
      	datatype => 'Link',
      	base_name => 'link',
-     	description => '',
+     	description => 'The class has a property named "link" of type "Link" that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

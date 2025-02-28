@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'auto_shapes' => {
      	datatype => 'AutoShapes',
      	base_name => 'AutoShapes',
-     	description => '',
+     	description => 'The class has a property named "AutoShapes" decorated with the XmlElement attribute "shapes".',
      	format => '',
      	read_only => '',
      		},

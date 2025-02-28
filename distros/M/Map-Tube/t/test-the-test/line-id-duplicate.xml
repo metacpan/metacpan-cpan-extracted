@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tube name="Test line id duplicate">
   <lines>
-    <line id="A" name="A"  color="red"/>
-    <line id="B" name="B"  color="#FFFF00"/>
-    <line id="A" name="Ax" color="#green"/>
+    <line id="A" name="Line A"  color="red"/>
+    <line id="B" name="Line B"  color="#FFFF00"/>
+    <line id="A" name="Line A duplicate id" color="#green"/>
   </lines>
   <stations>
     <station id="A1" name="Station A1"  line="A:2"     link="A2"   />

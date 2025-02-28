@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Comment;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CellName** | **string** |  |
+**CellName** | **string** | Property: CellName attribute with XmlElement tag in the class. |
 **Author** | **string** | Gets and sets Name of the original comment author |
 **HtmlNote** | **string** | Gets and sets the html string which contains data and some formats in this comment. |
 **Note** | **string** | Represents the content of comment. |

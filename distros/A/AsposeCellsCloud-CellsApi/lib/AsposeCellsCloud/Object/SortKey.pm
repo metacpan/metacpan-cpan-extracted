@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'custom_list' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'CustomList',
-     	description => '',
+     	description => 'This class includes a property named CustomList that is an array of strings with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

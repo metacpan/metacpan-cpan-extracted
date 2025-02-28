@@ -1,3 +1,11 @@
+0.908		2025-02-27	T. R. Wyant
+    Add CONTRIBUTING and SECURITY.
+
+    Add example eg/on-date.
+
+    Correct 'Meriodoc' to 'Meriadoc'. Thanks to Blaine Motsinger
+    (renderorange) for catching this.
+
 0.907		2021-08-17	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

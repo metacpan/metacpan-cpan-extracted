@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PdfSecurityOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AnnotationsPermission** | **boolean** |  |
+**AnnotationsPermission** | **boolean** | Indicates whether to allow to add or modify text annotations, fill in interactive form fields. |
 **AssembleDocumentPermission** | **boolean** |  |
 **ExtractContentPermission** | **boolean** |  |
 **FillFormsPermission** | **boolean** |  |

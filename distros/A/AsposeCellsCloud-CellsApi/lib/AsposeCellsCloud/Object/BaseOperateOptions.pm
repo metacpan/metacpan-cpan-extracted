@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'The property "Name" is a virtual string type with a public access modifier and a default value of an empty string.',
      	format => '',
      	read_only => '',
      		},    

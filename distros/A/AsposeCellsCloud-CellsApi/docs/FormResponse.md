@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::FormResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Form** | **Form** |  |
+**Form** | **Form** | Property summary: A public property named "Form" with both get and set accessors, allowing access to a Form object. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

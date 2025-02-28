@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class Summary: The features include real-time collaboration, file sharing, scheduling, task tracking, and discussion forums to enhance communication and productivity.',
                                   class => 'MultipleFilter',
                                   required => [], # TODO
 }                                 );

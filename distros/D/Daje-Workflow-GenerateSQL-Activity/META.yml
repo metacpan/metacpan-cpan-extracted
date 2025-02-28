@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow::GenerateSQL::Activity:
     file: lib/Daje/Workflow/GenerateSQL/Activity.pm
-    version: '1.05'
+    version: '1.07'
   Daje::Workflow::GenerateSQL::Base::Common:
     file: lib/Daje/Workflow/GenerateSQL/Base/Common.pm
   Daje::Workflow::GenerateSQL::Manager::Sql:
@@ -49,11 +49,11 @@ requires:
   Mojo::Base: '0'
   Mojo::File: '0'
   Syntax::Keyword::Match: '0'
-  perl: '5.008001'
+  perl: '5.040000'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity
   repository: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity.git
-version: '1.05'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

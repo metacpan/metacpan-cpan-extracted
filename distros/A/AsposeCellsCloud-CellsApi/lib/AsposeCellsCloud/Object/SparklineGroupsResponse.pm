@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'sparkline_groups' => {
      	datatype => 'SparklineGroups',
      	base_name => 'SparklineGroups',
-     	description => '',
+     	description => 'This class has a property named "SparklineGroups" of type "SparklineGroups" for managing sparkline groups.',
      	format => '',
      	read_only => '',
      		},

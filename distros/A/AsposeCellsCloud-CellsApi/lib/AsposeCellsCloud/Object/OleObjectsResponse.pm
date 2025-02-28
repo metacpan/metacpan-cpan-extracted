@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'ole_objects' => {
      	datatype => 'OleObjects',
      	base_name => 'OleObjects',
-     	description => '',
+     	description => 'Property `OleObjects` of type `OleObjects` that can be accessed and modified publicly within the class.',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pivot_table' => {
      	datatype => 'PivotTable',
      	base_name => 'PivotTable',
-     	description => '',
+     	description => 'PivotTable property of type PivotTable that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

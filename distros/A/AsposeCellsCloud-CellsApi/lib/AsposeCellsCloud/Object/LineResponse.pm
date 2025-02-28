@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'line' => {
      	datatype => 'Line',
      	base_name => 'Line',
-     	description => '',
+     	description => 'A public property named "Line" of type Line with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'GroupBox',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The class has a property named "Shape" of type GroupBox that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

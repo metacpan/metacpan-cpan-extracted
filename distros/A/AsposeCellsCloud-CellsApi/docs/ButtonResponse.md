@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ButtonResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shape** | **Button** |  |
+**Shape** | **Button** | The class has a property named "Shape" of type Button that can be both read and written. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

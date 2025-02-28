@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'serieses' => {
      	datatype => 'SeriesItems',
      	base_name => 'Serieses',
-     	description => '',
+     	description => 'A property named "Serieses" of type "SeriesItems" is defined in the class with both getter and setter access.',
      	format => '',
      	read_only => '',
      		},

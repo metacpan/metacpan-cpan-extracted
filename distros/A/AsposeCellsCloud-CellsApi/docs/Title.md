@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::Title;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **IsVisible** | **boolean** | Represents whether the title is visible. |
-**LinkedSource** | **string** |  |
+**LinkedSource** | **string** | A property named LinkedSource with both set and get accessors is defined. |
 **RotationAngle** | **int** |  |
 **Text** | **string** | Gets or sets the text of display unit label. |
 **TextDirection** | **string** |  |

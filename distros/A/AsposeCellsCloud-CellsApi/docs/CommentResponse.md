@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CommentResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Comment** | **Comment** |  |
+**Comment** | **Comment** | The class has a public property "Comment" of type "Comment" that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

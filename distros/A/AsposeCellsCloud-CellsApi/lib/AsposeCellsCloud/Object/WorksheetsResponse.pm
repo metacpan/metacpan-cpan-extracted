@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'worksheets' => {
      	datatype => 'Worksheets',
      	base_name => 'Worksheets',
-     	description => '',
+     	description => 'Property `Worksheets` of type `Worksheets` with the XML element name "worksheets" is defined in the class.',
      	format => '',
      	read_only => '',
      		},

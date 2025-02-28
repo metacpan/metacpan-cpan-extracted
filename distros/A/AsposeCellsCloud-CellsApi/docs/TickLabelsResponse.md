@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TickLabelsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TickLabels** | **TickLabels** |  |
+**TickLabels** | **TickLabels** | Property that represents tick labels for a class. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

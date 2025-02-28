@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportCSVDataOption;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SeparatorString** | **string** |  |
+**SeparatorString** | **string** | A property named SeparatorString of type string that can be accessed and modified publicly. |
 **ConvertNumericData** | **boolean** |  |
 **FirstRow** | **int** |  |
 **FirstColumn** | **int** |  |

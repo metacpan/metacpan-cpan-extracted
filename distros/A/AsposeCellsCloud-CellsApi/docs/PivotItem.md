@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotItem;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Index** | **int** |  |
+**Index** | **int** | Gets the index of the pivot item in cache field. |
 **IsHidden** | **boolean** | Represents whether the specified item visible. |
 **Name** | **string** | Gets the name |
 **Value** | **string** | Gets the value of the specified item. |  

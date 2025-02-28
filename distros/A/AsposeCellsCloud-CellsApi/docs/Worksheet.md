@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Worksheet;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Links** | **ARRAY[Link]** |  |
+**Links** | **ARRAY[Link]** | Property Summary: Contains a list of links represented by the class link. |
 **DisplayRightToLeft** | **boolean** | Indicates if the specified worksheet is displayed from right to left instead of from left to right.            Default is false.  |
 **DisplayZeros** | **boolean** | True if zero values are displayed.  |
 **FirstVisibleColumn** | **int** | Represents first visible column index.  |

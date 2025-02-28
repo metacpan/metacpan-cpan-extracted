@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::TrendlineResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Trendline** | **Trendline** |  |
+**Trendline** | **Trendline** | The class has a public property called "Trendline" of type "Trendline" that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

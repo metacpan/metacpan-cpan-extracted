@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'CellsDrawing',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'This class has a public property named Shape of type CellsDrawing.',
      	format => '',
      	read_only => '',
      		},

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'column' => {
      	datatype => 'Column',
      	base_name => 'Column',
-     	description => '',
+     	description => 'This class has a public property called "Column" of type "Column" with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

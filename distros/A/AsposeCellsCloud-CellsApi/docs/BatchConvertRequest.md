@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 **OutFolder** | **string** | The directory that stores files whose format conversion was successful. |
 **OutStorage** | **string** | Aspose Cloud storage name. |
 **Region** | **string** | The regional settings for workbook. |
-**PageWideFitOnPerSheet** | **boolean** |  |
+**PageWideFitOnPerSheet** | **boolean** | A nullable Boolean property that determines whether the content should be fit to the entire page width on each sheet. |
 **PageTallFitOnPerSheet** | **boolean** |  |
 **SaveOptions** | **SaveOptions** | Indicates save options. |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'picture_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'PictureList',
-     	description => '',
+     	description => 'Property Summary: Contains a list of elements with the XML element name "picture."',
      	format => '',
      	read_only => '',
      		},

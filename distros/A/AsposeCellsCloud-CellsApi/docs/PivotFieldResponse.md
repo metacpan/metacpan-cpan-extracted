@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::PivotFieldResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PivotField** | **PivotField** |  |
+**PivotField** | **PivotField** | This class has a property named "PivotField" of type PivotField which can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'Button',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'The class has a property named "Shape" of type Button that can be both read and written.',
      	format => '',
      	read_only => '',
      		},

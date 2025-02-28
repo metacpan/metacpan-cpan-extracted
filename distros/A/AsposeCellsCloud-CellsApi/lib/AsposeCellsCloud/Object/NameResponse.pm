@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'Name',
      	base_name => 'Name',
-     	description => '',
+     	description => 'A public property that allows getting and setting a value of type "Name".',
      	format => '',
      	read_only => '',
      		},

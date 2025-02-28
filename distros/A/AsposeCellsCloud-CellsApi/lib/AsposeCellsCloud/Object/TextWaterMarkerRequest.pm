@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'text' => {
      	datatype => 'string',
      	base_name => 'Text',
-     	description => '',
+     	description => 'A property named Text of type string that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'title' => {
      	datatype => 'string',
      	base_name => 'Title',
-     	description => '',
+     	description => 'This class has a public property "Title" of type string with a default value of an empty string.',
      	format => '',
      	read_only => '',
      		},

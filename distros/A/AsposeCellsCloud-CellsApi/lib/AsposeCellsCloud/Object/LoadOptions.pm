@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'convert_numeric_data' => {
      	datatype => 'string',
      	base_name => 'ConvertNumericData',
-     	description => '',
+     	description => 'This class has a public property named "ConvertNumericData" of type string that can be read from and written to.',
      	format => '',
      	read_only => '',
      		},

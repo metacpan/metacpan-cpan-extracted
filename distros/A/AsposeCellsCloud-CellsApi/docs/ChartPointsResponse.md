@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ChartPointsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ChartPoints** | **ChartPoints** |  |
+**ChartPoints** | **ChartPoints** | This class has a property named `ChartPoints` of type `ChartPoints` that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'RadioButton',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'This class has a public property named "Shape" of type RadioButton with both getter and setter.',
      	format => '',
      	read_only => '',
      		},

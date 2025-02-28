@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::DataLabelsResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DataLabels** | **DataLabels** |  |
+**DataLabels** | **DataLabels** | This class has a property named DataLabels of type DataLabels that can be accessed and modified. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

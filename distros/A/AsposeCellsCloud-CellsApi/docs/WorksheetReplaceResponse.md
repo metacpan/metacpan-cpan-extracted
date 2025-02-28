@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::WorksheetReplaceResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Matches** | **int** |  |
+**Matches** | **int** | "An integer property named Matches decorated with the XmlElement attribute." |
 **Worksheet** | **LinkElement** |  |
 **Code** | **int** |  |
 **Status** | **string** |  |  

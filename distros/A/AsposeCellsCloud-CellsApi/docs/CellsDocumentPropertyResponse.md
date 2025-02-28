@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CellsDocumentPropertyResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DocumentProperty** | **CellsDocumentProperty** |  |
+**DocumentProperty** | **CellsDocumentProperty** | A property named DocumentProperty of type CellsDocumentProperty is defined with get and set accessors. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

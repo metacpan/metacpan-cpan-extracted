@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'applied_operate_type' => {
      	datatype => 'string',
      	base_name => 'AppliedOperateType',
-     	description => '',
+     	description => 'Property summary: Utilizes a custom JSON converter to serialize and deserialize an enum property.',
      	format => '',
      	read_only => '',
      		},    

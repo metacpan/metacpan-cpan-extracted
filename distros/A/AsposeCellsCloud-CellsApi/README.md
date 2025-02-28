@@ -19,12 +19,17 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version 25.1
+## Feature & Enhancements in Version 25.2
 
 Full list of issues covering all changes in this release:
 
-- Add the new API for splitting text in the cell.
-- Optimize pivot table filter-related APIs.
+- Support copying a range from one workbook to another workbook.
+- Add query parameters for image and print options to enhance the Get Worksheet API.
+- Added an API to count the number of Excel characters for cells cloud.
+- Added an API to count the number of Excel words for cells cloud.
+- Added an API to count the number of occurrences of a specified word in Excel for cells cloud.
+- Add a new feature to support converting range to images.
+- Add a new feature to support converting worksheets to images.
 
 ## Support file format
 

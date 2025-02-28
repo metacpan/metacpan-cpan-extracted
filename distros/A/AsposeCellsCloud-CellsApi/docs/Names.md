@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Names;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Count** | **int** |  |
+**Count** | **int** | This class property is tagged as an XML element named "count" and stores an integer value. |
 **NameList** | **ARRAY[LinkElement]** |  |
 **link** | **Link** |  |  
 

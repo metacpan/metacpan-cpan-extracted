@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'series' => {
      	datatype => 'Series',
      	base_name => 'Series',
-     	description => '',
+     	description => 'A public property named "Series" of type Series with both getter and setter methods.',
      	format => '',
      	read_only => '',
      		},

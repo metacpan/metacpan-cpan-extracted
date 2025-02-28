@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -579,7 +579,7 @@ sub _fmt_on_date {
     $on_date[2][27]  = "Aragorn reaches the west-cliff at sunrise, 1419.\n" .
 		       "Eomer sets out from Eastfold against Theoden's orders to pursue the Orcs, 1419.\n";
     $on_date[2][28]  = "Eomer overtakes the Orcs just outside of Fangorn Forest, 1419.\n";
-    $on_date[2][29]  = "Meriodoc and Pippin escape and meet Treebeard, 1419.\n" .
+    $on_date[2][29]  = "Meriadoc and Pippin escape and meet Treebeard, 1419.\n" .
 		       "The Rohirrim attack at sunrise and destroy the Orcs, 1419.\n" .
 		       "Frodo descends from the Emyn Muil and meets Gollum, 1419.\n" .
 		       "Faramir sees the funeral boat of Boromir, 1419.\n";
@@ -2000,7 +2000,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2021 by Thomas R. Wyant, III
+Copyright (C) 2017-2022, 2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

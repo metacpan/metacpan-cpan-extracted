@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'result' => {
      	datatype => 'string',
      	base_name => 'Result',
-     	description => '',
+     	description => 'A public property "Result" that can be accessed and modified with a string data type.',
      	format => '',
      	read_only => '',
      		},

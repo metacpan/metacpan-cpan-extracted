@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::ColorFilter;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **FilterByFillColor** | **boolean** | Whether filter by the cell's fill color.             |
-**Pattern** | **string** |  |
+**Pattern** | **string** | A property "Pattern" of type string with a getter and setter is defined. |
 **Color** | **CellsColor** |  |
 **ForegroundColorColor** | **CellsColor** |  |
 **BackgroundColor** | **CellsColor** |  |  

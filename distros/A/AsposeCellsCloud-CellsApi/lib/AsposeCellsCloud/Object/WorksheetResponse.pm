@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'worksheet' => {
      	datatype => 'Worksheet',
      	base_name => 'Worksheet',
-     	description => '',
+     	description => 'The class has a property called "Worksheet" of type "Worksheet" that can be accessed and modified.',
      	format => '',
      	read_only => '',
      		},

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::FloorResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Floor** | **Floor** |  |
+**Floor** | **Floor** | This class has a public property "Floor" of type "Floor" with both a getter and a setter. |
 **Code** | **int** |  |
 **Status** | **string** |  |  
 

@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'pictures' => {
      	datatype => 'Pictures',
      	base_name => 'Pictures',
-     	description => '',
+     	description => 'This class has a property called "Pictures" with the feature of being serialized as "pictures" in XML elements.',
      	format => '',
      	read_only => '',
      		},

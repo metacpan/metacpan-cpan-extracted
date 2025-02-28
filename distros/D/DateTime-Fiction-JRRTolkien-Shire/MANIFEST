@@ -1,5 +1,7 @@
 Changes
+CONTRIBUTING
 eg/date-convert
+eg/on-date
 eg/README
 lib/DateTime/Fiction/JRRTolkien/Shire.pm
 lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm
@@ -11,6 +13,7 @@ MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/00load.t
 t/01constructor.t
 t/01now.t

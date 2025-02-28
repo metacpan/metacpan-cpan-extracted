@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'matches' => {
      	datatype => 'int',
      	base_name => 'Matches',
-     	description => '',
+     	description => 'Property summary: An integer property named "Matches" with an XmlElement attribute.',
      	format => '',
      	read_only => '',
      		},

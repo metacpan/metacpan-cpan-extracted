@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'I`m happy to help! Please provide me with the features you would like me to summarize for the class.',
                                   class => 'CustomParserConfig',
                                   required => [], # TODO
 }                                 );
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'custom_style' => {
      	datatype => 'string',
      	base_name => 'CustomStyle',
-     	description => '',
+     	description => 'A property that allows storing and retrieving custom styling information for an object.',
      	format => '',
      	read_only => '',
      		},    

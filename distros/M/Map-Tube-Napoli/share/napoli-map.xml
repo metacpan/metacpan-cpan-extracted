@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Naples Metropolitan and Funicular Network">
+  <lines>
+    <line id="NAP_ARCOBA" name="Arcobaleno" color="#48A400"/>
+    <line id="NAP_CIRCFLE" name="Circumflegrea" color="#A498C6"/>
+    <line id="NAP_CIRCVES" name="Circumvesuviana" color="#F7B497"/>
+    <line id="NAP_CUMANA" name="Cumana" color="#8DD1AC"/>
+    <line id="NAP_FUNCEN" name="Funicolare Centrale" color="#F79323"/>
+    <line id="NAP_FUNCHI" name="Funicolare Chiaia" color="#F79323"/>
+    <line id="NAP_FUNMER" name="Funicolare Mergellina" color="#F79323"/>
+    <line id="NAP_FUNMON" name="Funicolare Montesanto" color="#F79323"/>
+    <line id="NAP_LINEA1" name="Linea 1" color="#F3D237"/>
+    <line id="NAP_LINEA2" name="Linea 2" color="#0161AD"/>
+    <line id="NAP_LINEA6" name="Linea 6" color="#90C4E7"/>
+    <line id="NAP_TRAM1" name="Tram 1" color="#50B848"/>
+    <line id="NAP_TRAM2" name="Tram 2" color="#0066B3"/>
+    <line id="NAP_TRAM4" name="Tram 4" color="#ED1C24"/>
+  </lines>
+  <stations>
+    <!-- Arcobaleno -->
+    <station id="nap_linea01" name="Piscinola-Scampia" line="NAP_ARCOBA:1,NAP_LINEA1:1" link="nap_arcoba02,nap_linea02"/>
+    <station id="nap_arcoba02" name="Mugnano" line="NAP_ARCOBA:2" link="nap_arcoba03,nap_linea01"/>
+    <station id="nap_arcoba03" name="Giugliano" line="NAP_ARCOBA:3" link="nap_arcoba02,nap_arcoba04"/>
+    <station id="nap_arcoba04" name="Aversa Ippodromo" line="NAP_ARCOBA:4" link="nap_arcoba03,nap_arcoba05"/>
+    <station id="nap_arcoba05" name="Aversa Centro" line="NAP_ARCOBA:5" link="nap_arcoba04"/>
+    <!-- Circumflegrea -->
+    <station id="nap_linea108" name="Montesanto" line="NAP_CIRCFLE:1,NAP_CUMANA:1,NAP_FUNMON:3,NAP_LINEA2:8" link="nap_circum02,nap_cumana02,nap_funico02,nap_linea107,nap_linea109"/>
+    <station id="nap_circum02" name="Piave" line="NAP_CIRCFLE:2" link="nap_circum03,nap_linea108"/>
+    <station id="nap_circum03" name="Soccavo" line="NAP_CIRCFLE:3" link="nap_circum02,nap_circum04"/>
+    <station id="nap_circum04" name="Traiano" line="NAP_CIRCFLE:4" link="nap_circum03,nap_circum05"/>
+    <station id="nap_circum05" name="La Trencia" line="NAP_CIRCFLE:5" link="nap_circum04,nap_circum06"/>
+    <station id="nap_circum06" name="Pianura" line="NAP_CIRCFLE:6" link="nap_circum05,nap_circum07"/>
+    <station id="nap_circum07" name="Pisani" line="NAP_CIRCFLE:7" link="nap_circum06,nap_circum08"/>
+    <station id="nap_circum08" name="Quarto Centro" line="NAP_CIRCFLE:8" link="nap_circum07,nap_circum09"/>
+    <station id="nap_circum09" name="Quarto" line="NAP_CIRCFLE:9" link="nap_circum08"/>
+    <!-- Circumvesuviana -->
+    <station id="nap_circum101" name="Porta Nolana" line="NAP_CIRCVES:1" link="nap_linea19" other_link="walk:nap_tram09"/>
+    <station id="nap_linea19" name="Piazza Garibaldi" line="NAP_CIRCVES:2,NAP_LINEA1:19,NAP_LINEA2:10" link="nap_circum101,nap_linea109,nap_linea111,nap_linea18" other_link="walk:nap_tram08"/>
+    <station id="nap_linea111" name="Via Gianturco" line="NAP_CIRCVES:3,NAP_LINEA2:11" link="nap_circum104,nap_linea112,nap_linea117,nap_linea19"/>
+    <station id="nap_circum104" name="San Giovanni a Teduccio" line="NAP_CIRCVES:4" link="nap_circum105,nap_linea111"/>
+    <station id="nap_circum105" name="Barra" line="NAP_CIRCVES:5" link="nap_circum104,nap_circum106"/>
+    <station id="nap_circum106" name="Santa Maria del Pozzo" line="NAP_CIRCVES:6" link="nap_circum105,nap_circum107"/>
+    <station id="nap_circum107" name="San Giorgio - Cavalli di Bronzo" line="NAP_CIRCVES:7" link="nap_circum106,nap_circum108"/>
+    <station id="nap_circum108" name="Portici Bellavista" line="NAP_CIRCVES:8" link="nap_circum107,nap_circum109"/>
+    <station id="nap_circum109" name="Portici Via Libertà" line="NAP_CIRCVES:9" link="nap_circum108,nap_circum110"/>
+    <station id="nap_circum110" name="Ercolano Scavi" line="NAP_CIRCVES:10" link="nap_circum109,nap_circum111"/>
+    <station id="nap_circum111" name="Ercolano - Miglio d'Oro" line="NAP_CIRCVES:11" link="nap_circum110,nap_circum112"/>
+    <station id="nap_circum112" name="Torre del Greco (B)" line="NAP_CIRCVES:12" link="nap_circum111,nap_circum113"/>
+    <station id="nap_circum113" name="Via Sant' Antonio" line="NAP_CIRCVES:13" link="nap_circum112,nap_circum114"/>
+    <station id="nap_circum114" name="Via del Monte" line="NAP_CIRCVES:14" link="nap_circum113,nap_circum115"/>
+    <station id="nap_circum115" name="Via dei Monaci" line="NAP_CIRCVES:15" link="nap_circum114,nap_circum116"/>
+    <station id="nap_circum116" name="Villa delle Ginestre" line="NAP_CIRCVES:16" link="nap_circum115,nap_circum117"/>
+    <station id="nap_circum117" name="Leopardi" line="NAP_CIRCVES:17" link="nap_circum116,nap_circum118"/>
+    <station id="nap_circum118" name="Via Viuli" line="NAP_CIRCVES:18" link="nap_circum117,nap_circum119"/>
+    <station id="nap_circum119" name="Trecase" line="NAP_CIRCVES:19" link="nap_circum118,nap_circum120"/>
+    <station id="nap_circum120" name="Torre Annunziata Oplonti" line="NAP_CIRCVES:20" link="nap_circum119,nap_circum121"/>
+    <station id="nap_circum121" name="Pompei Scavi - Villa Misteri" line="NAP_CIRCVES:21" link="nap_circum120,nap_circum122"/>
+    <station id="nap_circum122" name="Moregine" line="NAP_CIRCVES:22" link="nap_circum121,nap_circum123"/>
+    <station id="nap_circum123" name="Ponte Persica" line="NAP_CIRCVES:23" link="nap_circum122,nap_circum124"/>
+    <station id="nap_circum124" name="Pioppaino" line="NAP_CIRCVES:24" link="nap_circum123,nap_circum125"/>
+    <station id="nap_circum125" name="Via Nocera" line="NAP_CIRCVES:25" link="nap_circum124,nap_circum126"/>
+    <station id="nap_circum126" name="Castellammare di Stabia (B)" line="NAP_CIRCVES:26" link="nap_circum125,nap_circum127"/>
+    <station id="nap_circum127" name="Pozzano" line="NAP_CIRCVES:27" link="nap_circum126,nap_circum128"/>
+    <station id="nap_circum128" name="Scrajo" line="NAP_CIRCVES:28" link="nap_circum127,nap_circum129"/>
+    <station id="nap_circum129" name="Vico Equense" line="NAP_CIRCVES:29" link="nap_circum128,nap_circum130"/>
+    <station id="nap_circum130" name="Seiano" line="NAP_CIRCVES:30" link="nap_circum129,nap_circum131"/>
+    <station id="nap_circum131" name="Meta" line="NAP_CIRCVES:31" link="nap_circum130,nap_circum132"/>
+    <station id="nap_circum132" name="Piano" line="NAP_CIRCVES:32" link="nap_circum131,nap_circum133"/>
+    <station id="nap_circum133" name="San Agnello" line="NAP_CIRCVES:33" link="nap_circum132,nap_circum134"/>
+    <station id="nap_circum134" name="Sorrento" line="NAP_CIRCVES:34" link="nap_circum133"/>
+    <!-- Cumana -->
+    <station id="nap_cumana02" name="Corso Vittorio Emanuele (D)" line="NAP_CUMANA:2" link="nap_cumana03,nap_linea108"/>
+    <station id="nap_cumana03" name="Fuorigrotta" line="NAP_CUMANA:3" link="nap_cumana02,nap_linea208"/>
+    <station id="nap_linea208" name="Mostra" line="NAP_CUMANA:4,NAP_LINEA6:8" link="nap_cumana03,nap_cumana05,nap_linea207"/>
+    <station id="nap_cumana05" name="Edenlandia" line="NAP_CUMANA:5" link="nap_cumana06,nap_linea208" other_link="walk:nap_linea104"/>
+    <station id="nap_cumana06" name="Agnano" line="NAP_CUMANA:6" link="nap_cumana05,nap_cumana07"/>
+    <station id="nap_cumana07" name="Bagnoli" line="NAP_CUMANA:7" link="nap_cumana06,nap_cumana08"/>
+    <station id="nap_cumana08" name="Terme" line="NAP_CUMANA:8" link="nap_cumana07,nap_cumana09"/>
+    <station id="nap_cumana09" name="Gerolomini" line="NAP_CUMANA:9" link="nap_cumana08,nap_cumana10"/>
+    <station id="nap_cumana10" name="Cappuccini" line="NAP_CUMANA:10" link="nap_cumana09,nap_cumana11"/>
+    <station id="nap_cumana11" name="Pozzuoli (B)" line="NAP_CUMANA:11" link="nap_cumana10,nap_cumana12"/>
+    <station id="nap_cumana12" name="Cantieri" line="NAP_CUMANA:12" link="nap_cumana11,nap_cumana13"/>
+    <station id="nap_cumana13" name="Arco Felice" line="NAP_CUMANA:13" link="nap_cumana12,nap_cumana14"/>
+    <station id="nap_cumana14" name="Lucrino" line="NAP_CUMANA:14" link="nap_cumana13,nap_cumana15"/>
+    <station id="nap_cumana15" name="Baia" line="NAP_CUMANA:15" link="nap_cumana14,nap_cumana16"/>
+    <station id="nap_cumana16" name="Fusaro" line="NAP_CUMANA:16" link="nap_cumana15"/>
+    <!-- Funicolare Centrale -->
+    <station id="nap_funico101" name="Piazza Fuga" line="NAP_FUNCEN:1" link="nap_funico102" other_link="walk:nap_funico01,walk:nap_funico304,walk:nap_linea09"/>
+    <station id="nap_funico102" name="Petraio" line="NAP_FUNCEN:2" link="nap_funico101,nap_funico103"/>
+    <station id="nap_funico103" name="Corso Vittorio Emanuele (B)" line="NAP_FUNCEN:3" link="nap_funico102,nap_funico104"/>
+    <station id="nap_funico104" name="Augusteo" line="NAP_FUNCEN:4" link="nap_funico103"/>
+    <!-- Funicolare Chiaia -->
+    <station id="nap_funico301" name="Parco Margherita" line="NAP_FUNCHI:1" link="nap_funico302" other_link="walk:nap_linea107"/>
+    <station id="nap_funico302" name="Corso Vittorio Emanuele (C)" line="NAP_FUNCHI:2" link="nap_funico301,nap_funico303"/>
+    <station id="nap_funico303" name="Palazzolo" line="NAP_FUNCHI:3" link="nap_funico302,nap_funico304"/>
+    <station id="nap_funico304" name="Cimarosa" line="NAP_FUNCHI:4" link="nap_funico303" other_link="walk:nap_funico01,walk:nap_funico101,walk:nap_linea09"/>
+    <!-- Funicolare Mergellina -->
+    <station id="nap_funico201" name="Mergellina (C)" line="NAP_FUNMER:1" link="nap_funico202"/>
+    <station id="nap_funico202" name="San Antonio" line="NAP_FUNMER:2" link="nap_funico201,nap_funico203"/>
+    <station id="nap_funico203" name="San Gioacchino" line="NAP_FUNMER:3" link="nap_funico202,nap_funico204"/>
+    <station id="nap_funico204" name="Parco Angelina" line="NAP_FUNMER:4" link="nap_funico203,nap_funico205"/>
+    <station id="nap_funico205" name="Manzoni" line="NAP_FUNMER:5" link="nap_funico204"/>
+    <!-- Funicolare Montesanto -->
+    <station id="nap_funico01" name="Morghen" line="NAP_FUNMON:1" link="nap_funico02" other_link="walk:nap_funico101,walk:nap_funico304,walk:nap_linea09"/>
+    <station id="nap_funico02" name="Corso Vittorio Emanuele (A)" line="NAP_FUNMON:2" link="nap_funico01,nap_linea108"/>
+    <!-- Linea 1 -->
+    <station id="nap_linea02" name="Chiaiano" line="NAP_LINEA1:2" link="nap_linea01,nap_linea03"/>
+    <station id="nap_linea03" name="Frullone" line="NAP_LINEA1:3" link="nap_linea02,nap_linea04"/>
+    <station id="nap_linea04" name="Colli Aminei" line="NAP_LINEA1:4" link="nap_linea03,nap_linea05"/>
+    <station id="nap_linea05" name="Policlinico" line="NAP_LINEA1:5" link="nap_linea04,nap_linea06"/>
+    <station id="nap_linea06" name="Rione Alto" line="NAP_LINEA1:6" link="nap_linea05,nap_linea07"/>
+    <station id="nap_linea07" name="Montedonzelli" line="NAP_LINEA1:7" link="nap_linea06,nap_linea08"/>
+    <station id="nap_linea08" name="Medaglie d'Oro" line="NAP_LINEA1:8" link="nap_linea07,nap_linea09"/>
+    <station id="nap_linea09" name="Vanvitelli" line="NAP_LINEA1:9" link="nap_linea08,nap_linea10" other_link="walk:nap_funico01,walk:nap_funico101,walk:nap_funico304"/>
+    <station id="nap_linea10" name="Quattro Giornate" line="NAP_LINEA1:10" link="nap_linea09,nap_linea11"/>
+    <station id="nap_linea11" name="Salvator Rosa" line="NAP_LINEA1:11" link="nap_linea10,nap_linea12"/>
+    <station id="nap_linea12" name="Materdei" line="NAP_LINEA1:12" link="nap_linea11,nap_linea13"/>
+    <station id="nap_linea13" name="Museo" line="NAP_LINEA1:13" link="nap_linea12,nap_linea14" other_link="walk:nap_linea109"/>
+    <station id="nap_linea14" name="Dante" line="NAP_LINEA1:14" link="nap_linea13,nap_linea15"/>
+    <station id="nap_linea15" name="Toledo" line="NAP_LINEA1:15" link="nap_linea14,nap_linea16"/>
+    <station id="nap_linea16" name="Municipio" line="NAP_LINEA1:16,NAP_LINEA6:1" link="nap_linea15,nap_linea17,nap_linea202"/>
+    <station id="nap_linea17" name="Università" line="NAP_LINEA1:17" link="nap_linea16,nap_linea18"/>
+    <station id="nap_linea18" name="Duomo" line="NAP_LINEA1:18" link="nap_linea17,nap_linea19"/>
+    <!-- Linea 2 -->
+    <station id="nap_linea101" name="Pozzuoli Solfatara" line="NAP_LINEA2:1" link="nap_linea102"/>
+    <station id="nap_linea102" name="Bagnoli - Agnano Terme" line="NAP_LINEA2:2" link="nap_linea101,nap_linea103"/>
+    <station id="nap_linea103" name="Cavalleggeri d'Aosta" line="NAP_LINEA2:3" link="nap_linea102,nap_linea104"/>
+    <station id="nap_linea104" name="Campi Flegrei" line="NAP_LINEA2:4" link="nap_linea103,nap_linea105" other_link="walk:nap_cumana05"/>
+    <station id="nap_linea105" name="Piazza Leopardi" line="NAP_LINEA2:5" link="nap_linea104,nap_linea106"/>
+    <station id="nap_linea106" name="Mergellina (A)" line="NAP_LINEA2:6" link="nap_linea105,nap_linea107" other_link="walk:nap_linea205"/>
+    <station id="nap_linea107" name="Piazza Amedeo" line="NAP_LINEA2:7" link="nap_linea106,nap_linea108" other_link="walk:nap_funico301"/>
+    <station id="nap_linea109" name="Piazza Cavour" line="NAP_LINEA2:9" link="nap_linea108,nap_linea19" other_link="walk:nap_linea13"/>
+    <station id="nap_linea112" name="Casalnuovo" line="NAP_LINEA2:12" link="nap_linea111,nap_linea113"/>
+    <station id="nap_linea113" name="Acerra" line="NAP_LINEA2:13" link="nap_linea112,nap_linea114"/>
+    <station id="nap_linea114" name="Cancello" line="NAP_LINEA2:14" link="nap_linea113,nap_linea115"/>
+    <station id="nap_linea115" name="Maddaloni" line="NAP_LINEA2:15" link="nap_linea114,nap_linea116"/>
+    <station id="nap_linea116" name="Caserta" line="NAP_LINEA2:16" link="nap_linea115"/>
+    <station id="nap_linea117" name="San Giovanni-Barra" line="NAP_LINEA2:17" link="nap_linea111,nap_linea118"/>
+    <station id="nap_linea118" name="Pietrarsa - San Giorgio a Cremano" line="NAP_LINEA2:18" link="nap_linea117,nap_linea119"/>
+    <station id="nap_linea119" name="Portici - Ercolano" line="NAP_LINEA2:19" link="nap_linea118,nap_linea120"/>
+    <station id="nap_linea120" name="Torre del Greco (A)" line="NAP_LINEA2:20" link="nap_linea119,nap_linea121"/>
+    <station id="nap_linea121" name="Santa Maria la Bruna" line="NAP_LINEA2:21" link="nap_linea120,nap_linea122"/>
+    <station id="nap_linea122" name="Torre Annunziata Città" line="NAP_LINEA2:22" link="nap_linea121,nap_linea123"/>
+    <station id="nap_linea123" name="Torre Annunziata Centrale" line="NAP_LINEA2:23" link="nap_linea122,nap_linea124,nap_linea134"/>
+    <station id="nap_linea124" name="Pompei" line="NAP_LINEA2:24" link="nap_linea123,nap_linea125"/>
+    <station id="nap_linea125" name="Scafati" line="NAP_LINEA2:25" link="nap_linea124,nap_linea126"/>
+    <station id="nap_linea126" name="Angri" line="NAP_LINEA2:26" link="nap_linea125,nap_linea127"/>
+    <station id="nap_linea127" name="Pagani" line="NAP_LINEA2:27" link="nap_linea126,nap_linea128"/>
+    <station id="nap_linea128" name="Nocera Inferiore" line="NAP_LINEA2:28" link="nap_linea127,nap_linea129"/>
+    <station id="nap_linea129" name="Nocera Superiore" line="NAP_LINEA2:29" link="nap_linea128,nap_linea130"/>
+    <station id="nap_linea130" name="Cava dei Tirreni" line="NAP_LINEA2:30" link="nap_linea129,nap_linea131"/>
+    <station id="nap_linea131" name="Vietri sul Mare - Amalfi" line="NAP_LINEA2:31" link="nap_linea130,nap_linea132"/>
+    <station id="nap_linea132" name="Duoma - Via Vernieri" line="NAP_LINEA2:32" link="nap_linea131,nap_linea133"/>
+    <station id="nap_linea133" name="Salerno" line="NAP_LINEA2:33" link="nap_linea132"/>
+    <station id="nap_linea134" name="Rovigliano" line="NAP_LINEA2:34" link="nap_linea123,nap_linea135"/>
+    <station id="nap_linea135" name="Castellammare di Stabia (A)" line="NAP_LINEA2:35" link="nap_linea134"/>
+    <!-- Linea 6 -->
+    <station id="nap_linea202" name="Chiaia" line="NAP_LINEA6:2" link="nap_linea16,nap_linea203"/>
+    <station id="nap_linea203" name="San Pasquale" line="NAP_LINEA6:3" link="nap_linea202,nap_linea204"/>
+    <station id="nap_linea204" name="Arco Mirelli" line="NAP_LINEA6:4" link="nap_linea203,nap_linea205"/>
+    <station id="nap_linea205" name="Mergellina (B)" line="NAP_LINEA6:5" link="nap_linea204,nap_linea206" other_link="walk:nap_linea106"/>
+    <station id="nap_linea206" name="Lala" line="NAP_LINEA6:6" link="nap_linea205,nap_linea207"/>
+    <station id="nap_linea207" name="Augusto" line="NAP_LINEA6:7" link="nap_linea206,nap_linea208"/>
+    <!-- Tram 1 -->
+    <station id="nap_tram01" name="Poggioreale" line="NAP_TRAM1:1,NAP_TRAM2:1" link="nap_tram02"/>
+    <station id="nap_tram02" name="Nuova Poggioreale - Caramanico" line="NAP_TRAM1:2,NAP_TRAM2:2" link="nap_tram01,nap_tram03"/>
+    <station id="nap_tram03" name="Nuova Poggioreale" line="NAP_TRAM1:3,NAP_TRAM2:3" link="nap_tram02,nap_tram04"/>
+    <station id="nap_tram04" name="Nuova Poggioreale - Biscardi" line="NAP_TRAM1:4,NAP_TRAM2:4" link="nap_tram03,nap_tram05"/>
+    <station id="nap_tram05" name="Nuova Poggioreale - Malta" line="NAP_TRAM1:5,NAP_TRAM2:5" link="nap_tram04,nap_tram06"/>
+    <station id="nap_tram06" name="Piazza Nazionale" line="NAP_TRAM1:6,NAP_TRAM2:6" link="nap_tram05,nap_tram07"/>
+    <station id="nap_tram07" name="Garibaldi - Principe Umberto" line="NAP_TRAM1:7,NAP_TRAM2:7" link="nap_tram06,nap_tram08"/>
+    <station id="nap_tram08" name="Garibaldi - Umberto I" line="NAP_TRAM1:8,NAP_TRAM2:8" link="nap_tram07,nap_tram09" other_link="walk:nap_linea19"/>
+    <station id="nap_tram09" name="Garibaldi - Circumvesuviana" line="NAP_TRAM1:9,NAP_TRAM2:9" link="nap_tram08,nap_tram10,nap_tram110" other_link="walk:nap_circum101"/>
+    <station id="nap_tram10" name="Marina - Mercato" line="NAP_TRAM1:10" link="nap_tram09,nap_tram11"/>
+    <station id="nap_tram11" name="Marina - Duomo" line="NAP_TRAM1:11,NAP_TRAM4:4" link="nap_tram10,nap_tram12,nap_tram205"/>
+    <station id="nap_tram12" name="Marina - Orefici" line="NAP_TRAM1:12,NAP_TRAM4:3" link="nap_tram11,nap_tram13,nap_tram14"/>
+    <station id="nap_tram13" name="Marina - Porta di Massa" line="NAP_TRAM1:13" link="nap_tram12,nap_tram14"/>
+    <station id="nap_tram14" name="Colombo - De Gasperi" line="NAP_TRAM1:14,NAP_TRAM4:2" link="nap_tram12,nap_tram13,nap_tram15"/>
+    <station id="nap_tram15" name="Colombo - Porto" line="NAP_TRAM1:15,NAP_TRAM4:1" link="nap_tram14"/>
+    <!-- Tram 2 -->
+    <station id="nap_tram110" name="Vespucci - Garibaldi" line="NAP_TRAM2:10,NAP_TRAM4:6" link="nap_tram09,nap_tram111,nap_tram205"/>
+    <station id="nap_tram111" name="Vespucci - Ospedale Loreto Mare" line="NAP_TRAM2:11,NAP_TRAM4:7" link="nap_tram110,nap_tram112"/>
+    <station id="nap_tram112" name="Vespucci" line="NAP_TRAM2:12,NAP_TRAM4:8" link="nap_tram111,nap_tram113"/>
+    <station id="nap_tram113" name="Volta" line="NAP_TRAM2:13,NAP_TRAM4:9" link="nap_tram112,nap_tram114,nap_tram210"/>
+    <station id="nap_tram114" name="Volta - Brin" line="NAP_TRAM2:14,NAP_TRAM4:11" link="nap_tram113,nap_tram115,nap_tram210"/>
+    <station id="nap_tram115" name="Volta - San Erasmo" line="NAP_TRAM2:15,NAP_TRAM4:12" link="nap_tram114,nap_tram116"/>
+    <station id="nap_tram116" name="Reggia di Portici - Gianturco" line="NAP_TRAM2:16,NAP_TRAM4:13" link="nap_tram115,nap_tram117"/>
+    <station id="nap_tram117" name="Reggia di Portici - Ingr. Autostrada - Aciief Scuola Formazione" line="NAP_TRAM2:17,NAP_TRAM4:14" link="nap_tram116,nap_tram118"/>
+    <station id="nap_tram118" name="Ponte dei Granili - Sottopasso" line="NAP_TRAM2:18,NAP_TRAM4:15" link="nap_tram117,nap_tram119"/>
+    <station id="nap_tram119" name="Ponte dei Francesi" line="NAP_TRAM2:19,NAP_TRAM4:16" link="nap_tram118,nap_tram120"/>
+    <station id="nap_tram120" name="San Giovanno a Teduccio - Sperone" line="NAP_TRAM2:20,NAP_TRAM4:17" link="nap_tram119,nap_tram121"/>
+    <station id="nap_tram121" name="San Giovanno a Teduccio - Deposito A.N.M." line="NAP_TRAM2:21,NAP_TRAM4:18" link="nap_tram120"/>
+    <!-- Tram 4 -->
+    <station id="nap_tram205" name="Marina - Torre Aragonese" line="NAP_TRAM4:5" link="nap_tram11,nap_tram110"/>
+    <station id="nap_tram210" name="Volta - Lucci" line="NAP_TRAM4:10" link="nap_tram113,nap_tram114"/>
+  </stations>
+</tube>

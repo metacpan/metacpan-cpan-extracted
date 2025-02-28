@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'border_type' => {
      	datatype => 'string',
      	base_name => 'BorderType',
-     	description => '',
+     	description => 'This class has a property called "BorderType" of type string that can be both get and set.',
      	format => '',
      	read_only => '',
      		},
