@@ -1,4 +1,6 @@
 use 5.010000;
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -9,9 +11,9 @@ WriteMakefile(
     AUTHOR            => 'Alessandro Gorohovski <an.gorohovski@gmail.com>',
     LICENSE           => 'perl', #Value must be from legacy list of licenses here http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
     PREREQ_PM         => {
-		'Test::More'       => '0.98',
-		'Test::More::UTF8' => '0.05',
-		'Test::Pod'        => '1.52',
+		'Test::More'         => '0.98',
+		'Test::More::UTF8'   => '0.05',
+		'Test::Pod'          => '1.22',
     },
     dist => {
         COMPRESS => 'gzip -9f',

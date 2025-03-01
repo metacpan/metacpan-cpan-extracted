@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Term::TermKey;
 
@@ -19,7 +19,7 @@ ok( $key->type_is_unknown_csi,  '$key->type_is_unknown_csi after unrecognised CS
 my ( $cmd, @args ) = $tk->interpret_unknown_csi( $key );
 
 is( $cmd, ">v", '$cmd for unrecognised CSI > v' );
-is_deeply( \@args, [ 1, 2 ], '@args for unrecognised CSI > v' );
+is( \@args, [ 1, 2 ], '@args for unrecognised CSI > v' );
 
 $tk->push_bytes( "\e[?4; w" );
 
@@ -27,6 +27,6 @@ is( $tk->getkey( $key ), RES_KEY, 'getkey yields RES_KEY after unrecognised CSI 
 ( $cmd, @args ) = $tk->interpret_unknown_csi( $key );
 
 is( $cmd, "? w", '$cmd for unrecognised CSI ? Sp w' );
-is_deeply( \@args, [ 4 ], '@args for unrecognised CSI ? Sp w' );
+is( \@args, [ 4 ], '@args for unrecognised CSI ? Sp w' );
 
 done_testing;

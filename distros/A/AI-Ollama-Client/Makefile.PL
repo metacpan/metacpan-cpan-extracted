@@ -46,14 +46,16 @@ my %module = (
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
-        'strict'              => 0,
-        'ExtUtils::MakeMaker' => 0,
+        'strict'                  => 0,
+        'ExtUtils::MakeMaker'     => 0,
+        'File::ShareDir::Install' => 0,
     },
 
     PREREQ_PM => {
         'stable'              => '0.031',
         'experimental'        => '0.031',
         'Carp'                => 0,
+        'File::ShareDir'      => 0,
         'Future'              => 0,
         'Future::Mojo'        => 0,
         'Future::Utils'       => 0,
@@ -65,6 +67,8 @@ my %module = (
         'Mojo::UserAgent'     => 0,
         'OpenAPI::Modern'     => 0,
         'PerlX::Maybe'        => 0,
+        'Role::EventEmitter'  => 0,
+        'URI::Template'       => 0,
         'YAML::PP'            => 0,
     },
     TEST_REQUIRES => {
@@ -84,6 +88,15 @@ my %module = (
 sub get_module_info { %module }
 
 if( ! caller ) {
+    require File::ShareDir::Install;
+    File::ShareDir::Install::install_share( module => "$module\::Impl" => 'ollama');
+
+    {
+        package MY;
+        require File::ShareDir::Install;
+        File::ShareDir::Install->import( qw( postamble ));
+    }
+
     # I should maybe use something like Shipwright...
     my $mm = WriteMakefile1(get_module_info);
     my $version = $mm->parse_version($main_file);

@@ -12,7 +12,7 @@ App::Greple::xlate - tõlketoe moodul greple jaoks
 
 =head1 VERSION
 
-Version 0.9905
+Version 0.9906
 
 =head1 DESCRIPTION
 

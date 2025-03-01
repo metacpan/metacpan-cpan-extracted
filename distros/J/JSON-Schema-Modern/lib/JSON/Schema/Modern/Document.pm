@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.602';
+our $VERSION = '0.603';
 
 use 5.020;
 use Moo;
@@ -222,6 +222,9 @@ sub validate ($self) {
   return $js->evaluate($self->schema, $self->metaschema_uri);
 }
 
+# callback hook for Sereal::Encoder
+sub FREEZE ($self, $serializer) { +{ %$self } }
+
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
@@ -248,7 +251,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -353,7 +356,7 @@ errors halt the parsing process.) Documents with errors cannot be evaluated.
 
 =head1 METHODS
 
-=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD THAW traverse has_errors path_to_resource resource_pairs get_entity_at_location get_entity_locations
+=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD FREEZE THAW traverse has_errors path_to_resource resource_pairs get_entity_at_location get_entity_locations
 
 =head2 path_to_canonical_uri
 

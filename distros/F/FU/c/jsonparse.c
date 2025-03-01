@@ -30,26 +30,22 @@ static inline int fujson_parse_string_escape(pTHX_ fujson_parse_ctx *ctx, fustr 
         case 'r': *(r->cur++) = 0x0d; break;
         case 'u':
             /* (awful code adapted from ncdu) */
-#define INV (1<<16)
-#define hn(n) (n >= '0' && n <= '9' ? n-'0' : n >= 'A' && n <= 'F' ? n-'A'+10 : n >= 'a' && n <= 'f' ? n-'a'+10 : INV)
-#define h4(b) (hn((b)[0])<<12) + (hn((b)[1])<<8) + (hn((b)[2])<<4) + hn((b)[3])
+#define h4(b) (fu_hexdig((b)[0])<<12) + (fu_hexdig((b)[1])<<8) + (fu_hexdig((b)[2])<<4) + fu_hexdig((b)[3])
             if (ctx->end - ctx->buf < 4) return 1;
             n = h4(ctx->buf);
-            if (n >= INV || (n & 0xfc00) == 0xdc00) return 1;
+            if (n >= 0x10000 || (n & 0xfc00) == 0xdc00) return 1;
             ctx->buf += 4;
             if ((n & 0xfc00) == 0xd800) { /* high surrogate */
                 if (ctx->end - ctx->buf < 6) return 1;
                 if (ctx->buf[0] != '\\' || ctx->buf[1] != 'u') return 1;
                 s = h4(ctx->buf+2);
-                if (s >= INV || (s & 0xfc00) != 0xdc00) return 1;
+                if (s >= 0x10000 || (s & 0xfc00) != 0xdc00) return 1;
                 n = 0x10000 + (((n & 0x03ff) << 10) | (s & 0x03ff));
                 ctx->buf += 6;
             }
             r->cur = (char *)uvchr_to_utf8((U8 *)r->cur, n);
             if (n >= 0x80) r->setutf8 = 1;
             break;
-#undef INV
-#undef hn
 #undef h4
         default:
             return 1;

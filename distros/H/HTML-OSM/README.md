@@ -4,7 +4,7 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -112,7 +112,7 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
 
 - zoom
 
-    An optional zoom level for the map, with a default value of 17.
+    An optional zoom level for the map, with a default value of 12.
 
 ## add\_marker
 
@@ -160,7 +160,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 - [File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp)
 - `HTML::GoogleMaps::V3`
 
-    Much of the interface to `HTML::OSM` mimicks this for compatability.
+    Much of the interface to `HTML::OSM` mimicks this for compatibility.
 
 - [Leaflet](https://metacpan.org/pod/Leaflet)
 

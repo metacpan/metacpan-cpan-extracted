@@ -21,6 +21,10 @@
 #define BOOL_INTERNALS_sv_isbool_true(x) SvPVXtrue(x)
 #endif
 
+/* Disable key/value struct packing in khashl, so we can safely take a pointer
+ * to values inside the hash table. */
+#define kh_packed
+
 #include "c/khashl.h"
 #include "c/common.c"
 #include "c/jsonfmt.c"
@@ -229,6 +233,10 @@ void q(fupg_conn *c, SV *sv, ...)
     FUPG_CONN_COOKIE;
     ST(0) = fupg_q(aTHX_ c, c->stflags, SvPVutf8_nolen(sv), ax, items);
 
+void _set_type(fupg_conn *c, SV *name, SV *sendsv, SV *recvsv)
+  CODE:
+    fupg_set_type(aTHX_ c, name, sendsv, recvsv);
+    XSRETURN(1);
 
 
 MODULE = FU   PACKAGE = FU::Pg::txn
@@ -362,7 +370,7 @@ void nrows(fupg_st *st)
 
 void query(fupg_st *st)
   CODE:
-    ST(0) = newSVpvn_utf8(st->query, strlen(st->query), 1);
+    ST(0) = newSVpvn_flags(st->query, strlen(st->query), SVs_TEMP|SVf_UTF8);
 
 void exec_time(fupg_st *st)
   CODE:
@@ -373,16 +381,12 @@ void prepare_time(fupg_st *st)
     ST(0) = !st->prepared ? &PL_sv_undef : sv_2mortal(newSVnv(st->preptime));
 
 void get_cache(fupg_st *st)
+  ALIAS:
+    FU::Pg::st::get_text_params  = FUPG_TEXT_PARAMS
+    FU::Pg::st::get_text_results = FUPG_TEXT_RESULTS
   CODE:
-    ST(0) = st->stflags & FUPG_CACHE ? &PL_sv_yes : &PL_sv_no;
-
-void get_text_params(fupg_st *st)
-  CODE:
-    ST(0) = st->stflags & FUPG_TEXT_PARAMS ? &PL_sv_yes : &PL_sv_no;
-
-void get_text_results(fupg_st *st)
-  CODE:
-    ST(0) = st->stflags & FUPG_TEXT_RESULTS ? &PL_sv_yes : &PL_sv_no;
+    if (!ix) ix = FUPG_CACHE;
+    ST(0) = st->stflags & ix ? &PL_sv_yes : &PL_sv_no;
 
 void DESTROY(fupg_st *st)
   CODE:
@@ -398,7 +402,7 @@ void _new()
 
 void _done(fuxmlwr *wr)
   CODE:
-    ST(0) = fustr_done(&wr->out);
+    ST(0) = sv_2mortal(fustr_done(&wr->out));
     fustr_init(&wr->out, NULL, SIZE_MAX);
 
 void lit_(SV *sv)

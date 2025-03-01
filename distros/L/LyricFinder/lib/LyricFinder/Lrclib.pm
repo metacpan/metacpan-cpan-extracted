@@ -3,7 +3,6 @@ package LyricFinder::Lrclib;
 use strict;
 use warnings;
 use Carp;
-#x use HTML::Strip;
 use URI::Escape;
 use parent 'LyricFinder::_Class';
 
@@ -94,17 +93,29 @@ sub _parse {
 	my $self = shift;
 	my $html = shift;
 
+	#NOTE: -synced: 'YES'(synced|plain), 'NO'(plain|bust), 'ONLY'(synced|bust), or 'OK'|''(plain|synced)!
+	my $sync = (defined($self->{'-synced'}) && $self->{'-synced'}) ? $self->{'-synced'} : 'No';
+	$sync = 'yES'  unless ($sync =~ /^(?:y|n|only|ok)/i);
+	my $whichLyrics = ($sync !~ /^(?:NO|OK)/i) ? 'syncedLyrics' : 'plainLyrics';
 	$self->_debug("Lrclib::_parse()!");
-	my $lyrics = ($html =~ m/\,\"plainLyrics\"\:\"(.+)\"\,\"/) ? $1 : undef;
-	if (defined($lyrics) && length($lyrics) > 10)
-	{
-		my $text = '';
-		# convert literal "\" followed by "r" or "n", etc. to "\r" or "\n" characters respectively:
-		eval "\$text = \"$lyrics\";";
-		return $self->_normalize_lyric_text($self->_html2text($text));
-	} else {
-		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
-		return '';
+	my $lyrics;
+	$html =~ s/\\\"/\x02QUOTE\x02/gs;  #PROTECT ESCAPED QUOTES FROM NEXT REGEX!:
+	for my $i (0,1) {
+		$lyrics = ($html =~ m/\,\"$whichLyrics\"\:\"([^\"]+)\"(?:\,\"|\})/s) ? $1 : undef;
+		if (defined($lyrics) && length($lyrics) > 10)
+		{
+			my $text = '';
+			# convert literal "\" followed by "r" or "n", etc. to "\r" or "\n" characters respectively:
+			eval "\$text = \"$lyrics\";";
+			$text =~ s/\x02QUOTE\x02/\"/gs;
+			return $self->_normalize_lyric_text($self->_html2text($text));
+		} elsif ($i || $sync =~ /^(?:NO|ONLY)/i) {
+			carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
+			return '';
+		} else {
+			$whichLyrics = ($sync =~ /^YES/i)
+					? 'plainLyrics' : 'syncedLyrics';  #NO SYNCED LYRICS, TRY PLAIN-TEXT ONES:
+		}
 	}
 }   # end of sub parse
 
@@ -197,7 +208,7 @@ sites from being "scraped" by programs, such as this.
 
 Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
-NOTE:  This value will be overridden if $founder->agent("agent") is 
+NOTE:  This value will be overridden if $finder->agent("agent") is 
 called!
 
 =item B<-cache> => I<"directory">, and B<-debug> => I<integer>.
@@ -227,20 +238,34 @@ Directory must be a valid directory, but may be specified as either a path
 with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
 or may not have a trailing "/" (ie. "/home/user/lyrics/").
 
-NOTE:  This value will be overridden if $founder->cache("directory") is 
+NOTE:  This value will be overridden if $finder->cache("directory") is 
 called!
 
 =item B<-debug> => I<number>
 
 Specifies whether debug information will be displayed (0: no, >0: yes).
+
 Default I<0> (no).  I<1> will display debug info.  There is currently only 
 one level of debug verbosity.
 
+=item B<-synced> => I<"YES"> | I<"NO"> | I<"OK"> | I<"ONLY">
+
+lrclib.net can return either timestamp-synced ("synced") lyrics or a plain-text 
+version.  "YES" specifies:  First try synced, if none, then try plain-text.  
+"NO" specifies:  only try to return the plain-text vsn.  "ONLY" specifies:  
+only try to return the synced version, and "OK" specifies:  First try the 
+plain-text vsn. if none, then try the synced vsn.  Currently, only the 
+LyricFinder::Lrclab module supports returning timestamp-synced lyrics.  Other 
+modules currently ignore this option.
+
+Default I<""> (false), which is treated same as "NO" (plain-text only, 
+if available, otherwise no lyrics returned).
+
 =back 
 
-=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
+=item [ I<$current-agent-string> = ] $finder->B<agent>( [ I<user-agent-string> ] )
 
-Set the desired user-agent (ie. browser name) to pass to lrclib.net.  
+Get / Set the desired user-agent (ie. browser name) to pass to lrclib.net.  
 Some sites are pickey about receiving a user-agent 
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
@@ -299,6 +324,19 @@ This is the primary method call, and the only one required to be called
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.
+
+=item [ I<$lyrics-option-string> = ] $finder->B<fetch_synced_lyrics>( [ I<string> )
+
+Get / Set the desired synced-lyrics fetching option.  The valid string values 
+are / returned are:  I<"YES"> | I<"NO"> | I<"OK"> | I<"ONLY">.
+
+Some sites can return either timestamp-synced ("synced") lyrics or a plain-text 
+version.  "YES" specifies:  First try synced, if none, then try plain-text.  
+"NO" specifies:  only try to return the plain-text vsn.  "ONLY" specifies:  
+only try to return the synced version, and "OK" specifies:  First try the 
+plain-text vsn. if none, then try the synced vsn.  Currently, only the 
+LyricFinder::Lrclab module supports returning timestamp-synced lyrics.  Other 
+modules currently ignore this option.
 
 =item I<$scalar> = $finder->B<message>()
 
@@ -364,7 +402,7 @@ file fetched.
 
 =head1 DEPENDENCIES
 
-L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>
+L<HTTP::Request>, L<LWP::UserAgent>, L<URI::Escape>
 
 =head1 BUGS
 

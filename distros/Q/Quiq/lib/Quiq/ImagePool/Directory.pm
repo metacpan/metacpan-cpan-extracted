@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 use Quiq::TimeLapse::Directory;
 use Quiq::Option;
@@ -209,7 +209,7 @@ sub image {
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -217,7 +217,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

@@ -178,6 +178,11 @@ static double fu_timediff(const struct timespec *a, const struct timespec *b) {
 }
 
 
+static int fu_hexdig(char x) {
+    return x >= '0' && x <= '9' ? x-'0' : x >= 'A' && x <= 'F' ? x-'A'+10 : x >= 'a' && x <= 'f' ? x-'a'+10 : 0x10000;
+}
+
+
 
 /* -1 if arg is not a bool, 0 on false, 1 on true */
 static int fu_2bool(pTHX_ SV *val) {

@@ -15,6 +15,7 @@ COPYING
 FU.pm
 FU.xs
 FU/Benchmarks.pod
+FU/DebugImpl.pm
 FU/Log.pm
 FU/Pg.pm
 FU/SQL.pm

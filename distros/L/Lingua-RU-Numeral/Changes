@@ -1,9 +1,33 @@
 Revision history for Perl extension Lingua::RU::Numeral.
 
 0.03  Fri Nov 25 16:21:37 2022
-	- original version; created by h2xs 1.23 with options
-		-XAn Lingua::RU::Numeral
+    - original version; created by h2xs 1.23 with options
+    - XAn Lingua::RU::Numeral
 
 0.031 Mon Jan 23 08:22:15 2023
-    - add to Makefile.PL module Test::More::UTF8
-    - POD, README, and Makefile.PL revised
+    - add to Makefile.PL module Test::More::UTF8;
+    - POD, README, and Makefile.PL revised.
+
+0.05  Thu Feb 16 17:45:33 2023
+    - new 'prolog' cases were added;
+    - added mutual agreement of 'prolog' and 'epilog' cases;
+    - expanded 'epilog' for cases with multiple additions;
+    - added optimizations;
+    - added new tests;
+    - typos fixed;
+    - POD, README, and Makefile.PL revised.
+
+0.07  Mon Jun 9 21:21:21 2023
+    - added a new subroutines -- case_endings(), spelled_out_number();
+    - expanded call context (SCALAR, LIST or VOID) of num2cardinal();
+    - expanded 'epilog' option of num2cardinal();
+    - expanded 'alt' option of num2cardinal();
+    - added optimizations;
+    - added new tests and increased test coverage;
+    - typos fixed;
+    - POD, README, and Makefile.PL revised.
+
+0.071 Fri Feb 28 14:14:14 2025
+    - correсted use open qw(:std :utf8);
+    - typos fixed;
+    - POD, README, and Makefile.PL revised.

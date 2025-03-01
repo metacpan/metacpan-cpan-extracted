@@ -1,5 +1,8 @@
 Revision history for Pg-Explain
 
+2.8     2025/02/28
+        Handle fractional rowcounts, per change in PostgreSQL 18.
+
 2.7     2023/12/29
         Properly handle various I/O Timings formats
         per information from Michael Paquier

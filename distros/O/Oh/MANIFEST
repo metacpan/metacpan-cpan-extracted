@@ -5,6 +5,7 @@ README
 t/oh.t
 lib/Oh.pm
 lib/oh.pod
+lib/Oh/God.pod
 bin/oh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

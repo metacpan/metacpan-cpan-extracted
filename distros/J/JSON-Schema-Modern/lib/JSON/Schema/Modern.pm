@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.601-11-g72ea27d0
+package JSON::Schema::Modern; # git description: v0.602-13-gc790a6dc
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.602';
+our $VERSION = '0.603';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -154,10 +154,10 @@ sub add_schema {
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
   croak 'insufficient arguments' if not @_;
 
-  Carp::carp('use of deprecated form of add_schema with document')
-    if $_[0]->$_isa('JSON::Schema::Modern::Document');
-
-  return $self->add_document($uri, $_[0]) if $_[0]->$_isa('JSON::Schema::Modern::Document');
+  if ($_[0]->$_isa('JSON::Schema::Modern::Document')) {
+    Carp::carp('use of deprecated form of add_schema with document');
+    return $self->add_document($uri, $_[0]);
+  }
 
   # document BUILD will trigger $self->traverse($schema)
   # Note we do not pass the uri to the document constructor, so resources in that document may still
@@ -279,7 +279,8 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
   croak join(', ', sort keys %overrides), ' not supported as a config override in traverse'
     if keys %overrides;
 
-  # Note: the starting position is not guaranteed to be at the root of the $document.
+  # Note: the starting position is not guaranteed to be at the root of the $document,
+  # nor is the fragment portion of this uri necessarily empty
   my $initial_uri = Mojo::URL->new($config_override->{initial_schema_uri} // '');
   my $initial_path = $config_override->{traversed_schema_path} // '';
   my $spec_version = $config_override->{specification_version} // $self->specification_version // SPECIFICATION_VERSION_DEFAULT;
@@ -290,7 +291,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     croak 'initial_schema_uri fragment must be a json pointer' if $uri_path !~ m{^/};
 
     croak 'traversed_schema_path does not match initial_schema_uri path fragment'
-      if $initial_path !~ m{\Q$uri_path\E$};
+      if substr($initial_path, -length($uri_path)) ne $uri_path;
   }
 
   my $state = {
@@ -299,7 +300,6 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method or last $id
     traversed_schema_path => $initial_path, # the accumulated traversal path as of the start or last $id
     schema_path => '',                      # the rest of the path, since the start of this method or last $id
-    effective_base_uri => Mojo::URL->new(''),
     errors => [],
     identifiers => {},
     subschemas => [],
@@ -347,25 +347,27 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
 sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   croak 'evaluate called in void context' if not defined wantarray;
 
-  my $initial_path = $config_override->{traversed_schema_path} // '';
-  my $effective_base_uri = Mojo::URL->new($config_override->{effective_base_uri}//'');
+  my %overrides = %$config_override;
+  delete @overrides{qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict callbacks effective_base_uri data_path traversed_schema_path _strict_schema_data)};
+  croak join(', ', sort keys %overrides), ' not supported as a config override in evaluate'
+    if keys %overrides;
 
   my $state = {
     data_path => $config_override->{data_path} // '',
-    traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation or last $id or $ref
+    traversed_schema_path => $config_override->{traversed_schema_path} // '', # the accumulated path as of the start of evaluation or last $id or $ref
     initial_schema_uri => Mojo::URL->new,   # the canonical URI as of the start of evaluation or last $id or $ref
     schema_path => '',                  # the rest of the path, since the start of evaluation or last $id or $ref
-    effective_base_uri => $effective_base_uri, # resolve locations against this for errors and annotations
     errors => [],
     depth => 0,
     configs => {},
   };
 
-  # note this is not quite the same list as what we use when defining $state below
-  my %overrides = %$config_override;
-  delete @overrides{qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict callbacks initial_schema_uri effective_base_uri data_path traversed_schema_path _strict_schema_data)};
-  croak join(', ', sort keys %overrides), ' not supported as a config override in evaluate'
-    if keys %overrides;
+  # resolve locations against this for errors and annotations, if locations are not already absolute
+  if (length $config_override->{effective_base_uri}) {
+    $state->{effective_base_uri} = Mojo::URL->new($config_override->{effective_base_uri});
+    croak 'it is meaningless for effective_base_uri to have a fragment'
+      if defined $state->{effective_base_uri}->fragment;
+  }
 
   my $valid;
   try {
@@ -373,7 +375,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
     if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
       $schema_info = $self->_fetch_from_uri($schema_reference);
-      $state->{initial_schema_uri} = Mojo::URL->new($config_override->{initial_schema_uri} // '');
     }
     else {
       # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
@@ -1247,7 +1248,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -1560,10 +1561,6 @@ C<traversed_schema_path>: adjusts the accumulated path as of the start of evalua
 
 =item *
 
-C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
-
-=item *
-
 C<effective_base_uri>: locations in errors and annotations are resolved against this URI
 
 =back
@@ -1615,7 +1612,7 @@ C<traversed_schema_path>: adjusts the accumulated path as of the start of evalua
 
 =item *
 
-C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
+C<initial_schema_uri>: adjusts the absolute keyword location as of the start of evaluation
 
 =item *
 

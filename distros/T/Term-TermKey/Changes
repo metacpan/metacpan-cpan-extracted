@@ -1,5 +1,17 @@
 Revision history for Term-TermKey
 
+0.18    2025-02-28
+        [CHANGES]
+         * General module refresh
+            + Use perl v5.14
+            + Swap unit tests from Test::More to Test2::V0
+         * Use new `sv_regex_global_pos` API where available to avoid
+           depending on detailed inner workings of pos magic
+
+        [BUGFIXES]
+         * Skip flag-fetching tests on STDIN unless STDIN is actually a
+           terminal
+
 0.17    2019-02-20 22:13:39
         [CHANGES]
          * Switch build system to Module::Build::Using::PkgConfig

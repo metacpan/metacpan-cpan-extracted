@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 use 5.020;
 use Moo;
@@ -141,7 +141,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   {
     my $json_schema_dialect = $self->json_schema_dialect // $schema->{jsonSchemaDialect};
 
-    # "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for these Schema Objects."
+    # §4.8.24.5: "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for
+    # these Schema Objects."
     $json_schema_dialect //= DEFAULT_DIALECT;
 
     # traverse an empty schema with this metaschema uri to confirm it is valid
@@ -213,8 +214,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     return $state;
   }
 
-  # "Templated paths with the same hierarchy but different templated names MUST NOT exist as they
-  # are identical."
+  # §4.8.8.1: "Templated paths with the same hierarchy but different templated names MUST NOT exist
+  # as they are identical."
   my %seen_path;
   foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
     my %seen_names;
@@ -408,13 +409,18 @@ sub _traverse_schema ($self, $state) {
   }
 }
 
+# FREEZE is defined by parent class
+
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
+  my $self = bless($data, $class);
+
   foreach my $attr (qw(schema evaluator _entities)) {
     die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
-      if not exists $class->{$attr};
+      if not exists $self->{$attr};
   }
-  bless($data, $class);
+
+  return $self;
 }
 
 1;
@@ -431,7 +437,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.082
+version 0.083
 
 =head1 SYNOPSIS
 

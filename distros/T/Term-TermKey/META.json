@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -25,17 +25,21 @@
             "Module::Build::Using::PkgConfig" : "0"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000149"
          }
       }
    },
    "provides" : {
       "Term::TermKey" : {
          "file" : "lib/Term/TermKey.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -44,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -36,9 +36,8 @@ use base qw/Quiq::Object/;
 use v5.10;
 use strict;
 use warnings;
-use utf8;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 # -----------------------------------------------------------------------------
 
@@ -66,7 +65,7 @@ sub new {
 
     opendir my $dh,$dir or do {
         $class->throw(
-            'DIR-00001: Verzeichnis öffnen fehlgeschlagen',
+            'DIR-00001: Can\'t open directory',
             Dir => $dir,
             Error => "$!",
         );
@@ -96,7 +95,7 @@ sub close {
 
     closedir $self or do {
         $self->throw(
-            'DIR-00002: Dirhandle schließen fehlgeschlagen',
+            'DIR-00002: Failed to close dirhandle',
             Error => "$!",
         );
     };
@@ -134,7 +133,7 @@ sub next {
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -142,7 +141,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

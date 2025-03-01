@@ -44,7 +44,6 @@ define pod <<"=cut"
     Docker options
         -D * run xlate on the container with the same parameters
         -C * execute following command on the container, or run shell
-        -S * start the live container
         -L * use the live container
         N.B. These options terminate option handling
 
@@ -64,7 +63,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9905
+    Version 0.9906
 
 =cut
 
@@ -82,6 +81,10 @@ get_ip() {
     : get_ip
     local ip=$(ifconfig 2>/dev/null | awk '/inet /{print $2}' | tail -1)
     echo $ip
+}
+
+dist_dir() {
+    perl -MFile::Share=:all -E "say dist_dir '$1'"
 }
 
 warn() {
@@ -142,12 +145,16 @@ docker_find() {
     while getopts "s:" OPT
     do
 	case $OPT in
-	    s) status=$OPTARG ;;
+	    s) status+=($OPTARG) ;;
 	esac
     done
     shift $((OPTIND - 1))
-    id=$(docker ps -a -q ${status:+-f status=$status} -f name="^/$1\$")
+    id=$(docker ps -a -q ${status[@]/#/-f status=} -f name="^/$1\$")
     [[ $id ]] && echo $id || return 1
+}
+
+docker_status() {
+    docker inspect --format='{{.State.Status}}' $1
 }
 
 ##
@@ -190,43 +197,50 @@ do
 	    ;;
 
 	N) givenname="$OPTARG" ;;
-	K|S)
+	K)
 	    : ${container:=$(container_name)}
 	    if id=$(docker_find "$container")
 	    then
-		docker rm -f $container | sed -e 's/$/ is removed/'
+		docker rm -f "$container" | sed -e "s/\$/ ($id) is removed/"
 	    fi
-	    case $OPT in
-		K) [[ ${@:$OPTIND:1} =~ L ]] && (( OPTIND++ )) || exit ;;
-		S) ;;
-	    esac
+	    [[ ${@:$OPTIND:1} =~ L ]] && (( OPTIND++ )) || exit
 	    ;&
 	L)
 	    : ${container:=$(container_name)}
-	    if [[ $OPT =~ L ]]
+	    if id=$(docker_find "$container")
 	    then
-		if id=$(docker_find -s exited "$container")
-		then
-		    warn start and attach to the "$container ($id)"
-		    exec docker start -ia $id || exit 1
-		fi
-		if id=$(docker_find -s running "$container")
-		then
-		    shift $((OPTIND - 1))
-		    if [[ $# > 0 ]]
-		    then
-			declare -a dockopt=(--interactive)
-			[ -t 0 ] && dockopt+=(--tty)
-			export DOCKER_CLI_HINTS=false
-			exec docker exec ${dockopt[@]} $id "$@" || exit 1
-		    else
-			warn attach to the "$container ($id)"
-			exec docker attach $id || exit 1
-		    fi
-		    exit
-		fi
+		status=$(docker_status $id)
+		case $status in
+		    exited)
+			warn start the "$container ($id)"
+			id=$(docker start $id) || exit 1
+			;;
+		    paused)
+			warn unpause the "$container ($id)"
+			id=$(docker unpause $id) || exit 1
+			;;
+		    running)
+			;;
+		    *)
+			warn unknown status $status of "$container ($id)"
+			;;
+		esac
 	    fi
-	    : ${container:=$(container_name)}
+	    if id=$(docker_find -s running "$container")
+	    then
+		shift $((OPTIND - 1))
+		if [[ $# > 0 ]]
+		then
+		    declare -a dockopt=(--interactive)
+		    [ -t 0 ] && dockopt+=(--tty)
+		    export DOCKER_CLI_HINTS=false
+		    exec docker exec ${dockopt[@]} $id "$@" || exit 1
+		else
+		    warn attach to the "$container ($id)"
+		    exec docker attach $id || exit 1
+		fi
+		exit
+	    fi
 	    warn create live conainer \"$container\"
 	    remove=
 	    ;&
@@ -282,8 +296,7 @@ do
 done
 OPTIND=1
 
-mod="App-Greple-xlate"
-share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
+share=$(dist_dir App-Greple-xlate)
 
 declare -a pattern
 
@@ -346,7 +359,7 @@ then
     declare -a opt
     for m in "$@"
     do
-	if [ -f "$m" ]
+	if [[ -f $m ]]
 	then
 	    # GNU Make behaves differently in different versions with
 	    # respect to double-quoted strings and spaces within them.
@@ -690,7 +703,7 @@ Dry run.
 
 =head2 DOCKER OPTIONS
 
-Docker feature is invoked by the C<-D>, C<-C>, C<-S> or C<-L> option.
+Docker feature is invoked by the C<-D>, C<-C> or C<-L> option.
 Once any of these options appear, subsequent options are not
 interpreted, so it should always be the last of Docker related
 options.
@@ -706,11 +719,6 @@ parameters.
 
 Execute the following command on the Docker container, or run a shell
 if no command is provided.
-
-=item B<-S> [ I<command> ]
-
-Option C<-S> starts a new live container.  If the container exists, it
-is removed before starting.
 
 =item B<-L> [ I<command> ]
 

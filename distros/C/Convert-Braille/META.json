@@ -1,0 +1,59 @@
+{
+   "abstract" : "Conversion between Braille encodings.",
+   "author" : [
+      "Daniel Yacob <dyacob\\@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Convert-Braille",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::Number::Ethiopic" : "0.14",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Convert::Braille" : {
+         "file" : "lib/Convert/Braille.pm",
+         "version" : "0.06"
+      },
+      "Convert::Braille::English" : {
+         "file" : "lib/Convert/Braille/English.pm",
+         "version" : "0.06"
+      },
+      "Convert::Braille::Ethiopic" : {
+         "file" : "lib/Convert/Braille/Ethiopic.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dyacob/Convert-Braille/issues"
+      },
+      "homepage" : "https://github.com/dyacob/Convert-Braille",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dyacob/Convert-Braille.git"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:dyacob",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

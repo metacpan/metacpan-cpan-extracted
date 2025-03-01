@@ -53,7 +53,7 @@ sub load_pk($self, $table, $select, $primary_key_name, $primary_key) {
                 [$select],
                 {$primary_key_name => $primary_key}
         );
-        $result->{data};
+        $result->{data} = {};
         $result->{data} = $load->hash if $load and $load->rows > 0;
     };
     if($@) {
@@ -72,7 +72,7 @@ sub load_fkey($self, $table, $select, $foreign_key_name, $foreign_key) {
                 [$select],
             {$foreign_key_name => $foreign_key}
         );
-        $result->{data};
+        $result->{data} = {};
         $result->{data} = $load->hashes if $load and $load->rows > 0;
     };
     if($@) {
@@ -91,7 +91,7 @@ sub load_a_list($self, $table, $select, $key_value) {
                 [$select],
             {$key_value}
         );
-        $result->{data};
+        $result->{data} = {};
         $result->{data} = $load->hashes if $load and $load->rows > 0;
     };
      if($@) {
@@ -103,15 +103,23 @@ sub load_a_list($self, $table, $select, $key_value) {
     return $result;
 }
 
-sub insert($self, $table, $data) {
+sub insert($self, $table, $data, $primary_key_name) {
     my $result->{result} = 1;
     eval {
-        $self->db->insert($table, $data);
-    } ;
+        my $primary_key = $self->db->insert(
+            $table, %$data,
+                { returning => $primary_key_name }
+        );
+        $result->{data} = {};
+        $result->{data} = $primary_key->hashes
+            if $primary_key and $primary_key->rows > 0;
+    };
     if($@) {
         $result->{error} = $@;
         $result->{result} = 0;
+        $result->{data} = {};
     };
+
     return $result;
 }
 
@@ -127,7 +135,7 @@ sub update($self, $table, $data, $keys) {
     return $result;
 }
 
-};
+1;
 
 @@ interface
 package <<interface>><<classname>>;
@@ -175,13 +183,13 @@ sub load_list($self, $key_value) {
 
 @@ insert_data
 sub insert_<<table_name>>($self, $data) {
-    my $result = $self->insert($self->table_name, $data);
+    my $result = $self->insert($self->table_name, $data, $self->primary_key_name);
     return $result;
 }
 
 @@ update_data
 sub update_<<table_name>>($self, $data, $keys) {
-    my $result = $self->update($self->table_name, $data, $keys)
+    my $result = $self->update($self->table_name, $data, $keys);
     return $result;
 }
 

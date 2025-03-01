@@ -46,6 +46,7 @@ requires:
   JSON::MaybeXS: '0'
   List::Util: '1.33'
   Log::Any: '0'
+  Params::Validate::Strict: '0.02'
   Scalar::Util: '0'
   Socket: '0'
   String::Clean::XSS: '0'
@@ -57,5 +58,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '0.93'
+version: '0.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

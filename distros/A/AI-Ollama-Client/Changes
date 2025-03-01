@@ -1,3 +1,11 @@
+0.04 2025-02-28
+    * Regenerate with better OpenAPI converter
+    * Distribute our OpenAPI spec
+    * Request builders are now public
+    * HTTP events are emitted for easier tracing
+      - request
+      - response
+
 0.03 2024-04-08
     * Fix prerequisites
 

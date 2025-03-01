@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 =encoding utf8
 
@@ -13,7 +13,7 @@ Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
+Diese Klassenbibliothek enthält 244 anwendungsunabhängige Klassen,
 die ich in Projekten nutze. Die Klassen sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
@@ -912,6 +912,10 @@ L<Quiq::Test::Class::Method> - Testmethode
 
 =item *
 
+L<Quiq::Text::Generator> - Generiere Textfragmente
+
+=item *
+
 L<Quiq::Time> - Klasse zur Repräsentation von Datum und Uhrzeit
 
 =item *
@@ -948,7 +952,7 @@ L<Quiq::Trash> - Operationen auf dem Trash von XFCE
 
 =item *
 
-L<Quiq::Tree> - Operatonen auf Baumstrukturen
+L<Quiq::Tree> - Operatonen auf Perl-Baumstrukturen
 
 =item *
 
@@ -980,7 +984,7 @@ L<Quiq::XTerm> - XTerminal Fenster
 
 =item *
 
-L<Quiq::Xml> - Einfache XML-Operationen
+L<Quiq::Xml> - Allgemeine XML-Operationen
 
 =item *
 
@@ -990,6 +994,10 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 L<Quiq::Zugferd> - Generiere/Akzeptiere XML einer ZUGFeRD-Rechnung
 
+=item *
+
+L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
+
 =back
 
 =head1 INSTALLATION
@@ -998,7 +1006,7 @@ L<Quiq::Zugferd> - Generiere/Akzeptiere XML einer ZUGFeRD-Rechnung
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -1006,7 +1014,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

@@ -95,39 +95,36 @@ sub new {
     $obj;
 }
 
-sub attr :lvalue {
-    my $obj = shift;
-    my $key = shift;
-    $obj->{ATTR}->{$key};
-}
+sub text :lvalue { +shift->{TEXT} }
+sub attr :lvalue { +shift->{ATTR} }
 
 sub normalize {
     my $obj = shift;
-    my $paragraph = $obj->attr('paragraph');
+    my $paragraph = $obj->attr->{paragraph};
     local $_ = $obj->text;
-    if (not $paragraph) {
-	s{^.+}{
-	    ${^MATCH}
-		=~ s/\A\s+|\s+\z//gr
+    my $normalized = do {
+	if (not $paragraph) {
+	    s{^.+}{
+		local $_ = ${^MATCH};
+		s/\A(\h*)(.*?)(\h*?)\z/$2/;
+		$_;
 	    }pmger;
-    } else {
-	s{^.+(?:\n.+)*}{
-	    ${^MATCH}
+	} else {
+	    s{^.+(?:\n.+)*}{
+		local $_ = ${^MATCH};
 		# remove leading/trailing spaces
-		=~ s/\A\s+|\s+\z//gr
+		s/\A(\h*)(.*?)(\h*?)\z/$2/;
 		# remove newline after Japanese Punct char
-		=~ s/(?<=\p{InFullwidth})(?<=\pP)\n//gr
+		s/(?<=\p{InFullwidth})(?<=\pP)\n//g;
 		# join Japanese lines without space
-		=~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
+		s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
 		# join ASCII lines with single space
-		=~ s/\s+/ /gr
+		s/\s+/ /g;
+		$_;
 	    }pmger;
-    }
-}
-
-sub text :lvalue {
-    my $obj = shift;
-    $obj->{TEXT};
+	}
+    };
+    return $normalized;
 }
 
 sub normalized {
@@ -138,7 +135,7 @@ sub normalized {
 sub strip {
     my $obj = shift;
     my $text = $obj->text;
-    if ($obj->attr('paragraph')) {
+    if ($obj->attr->{paragraph}) {
 	return $obj->paragraph_strip;
     }
     my $line_re = qr/.*\n|.+\z/;

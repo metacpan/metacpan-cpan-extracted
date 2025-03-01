@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,13 +9,16 @@ my $build = Module::Build::Using::PkgConfig->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
    },
+   requires => {
+      'perl' => '5.014',
+   },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000149',
    },
    license => 'perl',
    create_license => 1,
    create_readme  => 1,
+   extra_compiler_flags => [qw( -Ihax )],
 );
 
 $build->use_pkgconfig( "termkey",

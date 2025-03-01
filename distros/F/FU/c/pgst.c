@@ -271,10 +271,13 @@ static void fupg_st_execute(pTHX_ fupg_st *st) {
      * results in a streaming fashion without breaking API compat. */
     if (st->result) fu_confess("Invalid attempt to execute statement multiple times");
 
-    /* TODO: prepare can be skipped when prepared statement caching is disabled and (text-format queries or no bind params) */
-    fupg_st_prepare(aTHX_ st);
-    if (PQnparams(st->describe) != st->nbind)
-        fu_confess("Statement expects %d bind parameters but %d were given", PQnparams(st->describe), st->nbind);
+    /* Whether we can do a direct call or need to prepare first */
+    int direct = !st->describe && (st->nbind == 0 || st->stflags & FUPG_TEXT_PARAMS) && !(st->stflags & FUPG_CACHE);
+    if (!direct) {
+        fupg_st_prepare(aTHX_ st);
+        if (PQnparams(st->describe) != st->nbind)
+            fu_confess("Statement expects %d bind parameters but %d were given", PQnparams(st->describe), st->nbind);
+    }
     int refresh_done = 0;
     fupg_params_setup(aTHX_ st, &refresh_done);
 
@@ -290,13 +293,17 @@ static void fupg_st_execute(pTHX_ fupg_st *st) {
      * improvement */
     struct timespec t_start;
     clock_gettime(CLOCK_MONOTONIC, &t_start);
-    PGresult *r = PQexecPrepared(st->conn->conn,
-            st->name,
-            st->nbind,
+    PGresult *r = direct ? PQexecParams(st->conn->conn,
+            st->query, st->nbind, NULL,
             (const char * const *)st->param_values,
-            st->param_lengths,
-            st->param_formats,
-            st->stflags & FUPG_TEXT_RESULTS ? 0 : 1);
+            st->param_lengths, st->param_formats,
+            st->stflags & FUPG_TEXT_RESULTS ? 0 : 1
+        ) : PQexecPrepared(st->conn->conn,
+            st->name, st->nbind,
+            (const char * const *)st->param_values,
+            st->param_lengths, st->param_formats,
+            st->stflags & FUPG_TEXT_RESULTS ? 0 : 1
+        );
     struct timespec t_end;
     clock_gettime(CLOCK_MONOTONIC, &t_end);
     st->exectime = fu_timediff(&t_end, &t_start);

@@ -1,7 +1,9 @@
-use 5.010_001;
 use strict;
 use warnings;
+use 5.010_001;
 
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 use Test::More;
 #
 # We use Test::More::UTF8 to enable UTF-8 on Test::Builder
@@ -13,9 +15,8 @@ use Test::More;
 #
 use Test::More::UTF8;
 
-BEGIN {
-    use_ok('DBIx::Squirrel') || print "Bail out!\n";
-}
+use_ok('DBIx::Squirrel')
+    or print "Bail out!\n";
 
 diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
 

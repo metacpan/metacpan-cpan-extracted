@@ -10,6 +10,8 @@
 
 #include <termkey.h>
 
+#include "sv_regex_global_pos.c.inc"
+
 /* Because of Perl's safe signal handling, we have to always enable the
  * TERMKEY_FLAG_EINTR flag, and implement retry logic ourselves in the
  * wrappings of termkey_waitkey and termkey_advisereadable
@@ -724,10 +726,9 @@ parse_key_at_pos(self, str, format)
 
     str_start = str_base = SvPV_nolen(str);
 
-    if(SvTYPE(str) >= SVt_PVMG && SvMAGIC(str))
-      posmg = mg_find(str, PERL_MAGIC_regex_global);
-    if(posmg)
-      str_start += posmg->mg_len; /* already in bytes */
+    STRLEN pos;
+    if(sv_regex_global_pos_get(str, &pos, SV_POSBYTES))
+      str_start += pos;
 
     RETVAL = newSV(0);
     key = get_keystruct_or_new(RETVAL, "Term::TermKey::parse_key_at_pos", ST(0));
@@ -739,11 +740,7 @@ parse_key_at_pos(self, str, format)
       XSRETURN_UNDEF;
     }
 
-    if(!posmg)
-      posmg = sv_magicext(str, NULL, PERL_MAGIC_regex_global, &PL_vtbl_mglob,
-                          NULL, 0);
-
-    posmg->mg_len = str_end - str_base; /* already in bytes */
+    sv_regex_global_pos_set(str, str_end - str_base, SV_POSBYTES);
   OUTPUT:
     RETVAL
 

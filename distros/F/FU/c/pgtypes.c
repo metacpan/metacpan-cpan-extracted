@@ -7,12 +7,16 @@ typedef void (*fupg_send_fn)(pTHX_ const fupg_tio *, SV *, fustr *);
 /* Receive function, takes a binary string and should return a Perl value. */
 typedef SV *(*fupg_recv_fn)(pTHX_ const fupg_tio *, const char *, int);
 
+typedef struct {
+    char n[64];
+} fupg_name;
+
 /* Record/composite type definition */
 typedef struct {
     int nattrs;
     struct {
         Oid oid;
-        char name[64];
+        fupg_name name;
     } attrs[];
 } fupg_record;
 
@@ -28,13 +32,14 @@ struct fupg_tio {
             const fupg_record *info;
             fupg_tio *tio;
         } record;
+        SV *cb;
     };
 };
 
 typedef struct {
     Oid oid;
     Oid elemoid; /* For arrays & domain types; relid for records */
-    char name[64];
+    fupg_name name;
     fupg_send_fn send;
     fupg_recv_fn recv;
 } fupg_type;
@@ -55,7 +60,7 @@ typedef struct {
     if (SvIOK(val)) iv = SvIV(val); \
     else if (SvNOK(val)) { \
         NV nv = SvNV(val); \
-        if (nv < IV_MIN || nv > IV_MAX || fabs(nv - floor(nv)) > 0.0000000001) SERR("expected integer");\
+        if (nv < IV_MIN || nv > IV_MAX || fabs((double)(nv - floor(nv))) > 0.0000000001) SERR("expected integer");\
         iv = SvIV(val); \
     } else if (SvPOK(val)) {\
         STRLEN sl; \
@@ -149,6 +154,33 @@ SENDFN(bytea) {
     STRLEN len;
     const char *buf = SvPVbyte(val, len);
     fustr_write(out, buf, len);
+}
+
+RECVFN(hex) {
+    SV *r = newSV(len ? len * 2 : 1);
+    SvPOK_only(r);
+    char *out = SvPVX(r);
+    const unsigned char *in = (const unsigned char *)buf;
+    int i;
+    for (i=0; i<len; i++) {
+        *out++ = PL_hexdigit[(in[i] >> 4) & 0x0f];
+        *out++ = PL_hexdigit[in[i] & 0x0f];
+    }
+    SvCUR_set(r, len * 2);
+    return r;
+}
+
+SENDFN(hex) {
+    STRLEN len;
+    const char *in = SvPV(val, len);
+    const char *end = in + len;
+    if (len % 2) SERR("Invalid hex string");
+    while (in < end) {
+        int v = (fu_hexdig(*in)<<4) + fu_hexdig(in[1]);
+        if (v > 0xff) SERR("Invalid hex string");
+        fustr_write_ch(out, v);
+        in += 2;
+    }
 }
 
 RECVFN(char) {
@@ -377,7 +409,7 @@ RECVFN(record) {
             r = ctx->record.tio[i].recv(aTHX_ ctx->record.tio+i, buf, vlen);
             buf += vlen; len -= vlen;
         }
-        hv_store(hv, ctx->record.info->attrs[i].name, -strlen(ctx->record.info->attrs[i].name), r, 0);
+        hv_store(hv, ctx->record.info->attrs[i].name.n, -strlen(ctx->record.info->attrs[i].name.n), r, 0);
     }
     return SvREFCNT_inc(sv);
 }
@@ -393,7 +425,7 @@ SENDFN(record) {
     I32 i;
     for (i=0; i<ctx->record.info->nattrs; i++) {
         fustr_writebeI(32, out, ctx->record.info->attrs[i].oid);
-        SV **rsv = hv_fetch(hv, ctx->record.info->attrs[i].name, -strlen(ctx->record.info->attrs[i].name), 0);
+        SV **rsv = hv_fetch(hv, ctx->record.info->attrs[i].name.n, -strlen(ctx->record.info->attrs[i].name.n), 0);
         if (!rsv || !*rsv) {
             fustr_writebeI(32, out, -1);
             continue;
@@ -409,6 +441,52 @@ SENDFN(record) {
         ctx->record.tio[i].send(aTHX_ ctx->record.tio+i, sv, out);
         fu_tobeU(32, fustr_start(out) + lenoff, fustr_len(out) - lenoff - 4);
     }
+}
+
+
+RECVFN(perlcb) {
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    mXPUSHs(newSVpvn(buf, len));
+    PUTBACK;
+    call_sv(ctx->cb, G_SCALAR);
+    SPAGAIN;
+
+    SV *ret = newSV(0);
+    sv_setsv(ret, POPs);
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+    return ret;
+}
+
+SENDFN(perlcb) {
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(val);
+
+    PUTBACK;
+    call_sv(ctx->cb, G_SCALAR);
+    SPAGAIN;
+
+    SV *ret = POPs;
+    PUTBACK;
+
+    STRLEN len;
+    const char *buf = SvPV(ret, len);
+    fustr_write(out, buf, len);
+
+    FREETMPS;
+    LEAVE;
 }
 
 
@@ -464,7 +542,7 @@ RECVFN(uuid) {
     RLEN(16);
     char tmp[64];
     char *out = tmp;
-    unsigned char *in = (unsigned char *)buf;
+    const unsigned char *in = (const unsigned char *)buf;
     int i;
     for (i=0; i<16; i++) {
         if (i == 4 || i == 6 || i == 8 || i == 10) *out++ = '-';
@@ -483,9 +561,8 @@ SENDFN(uuid) {
     for (; *in; in++) {
         if (*in == '}') break;
         if (dig == 0x10 && *in == '-') continue;
-        unsigned char x = *in;
-        x = x >= '0' && x <= '9' ? x-'0' : x >= 'A' && x <= 'F' ? x-'A'+10 : x >= 'a' && x <= 'f' ? x-'a'+10 : 0x10;
-        if (x == 0x10) SERR("invalid UUID");
+        int x = fu_hexdig(*in);
+        if (x > 0x10) SERR("invalid UUID");
         if (bytes >= 16) SERR("invalid UUID");
         if (dig == 0x10) dig = x;
         else {
@@ -502,17 +579,26 @@ SENDFN(uuid) {
 
 RECVFN(timestamp) {
     RLEN(8);
-    IV ts = fu_frombeI(64, buf);
-    return newSVnv(((double)ts / 1000000) + UNIX_PG_EPOCH);
+    return newSVnv(((NV)fu_frombeI(64, buf) / 1000000) + UNIX_PG_EPOCH);
 }
 
 SENDFN(timestamp) {
     if (!looks_like_number(val)) SERR("expected a number");
-    IV ts = (SvNV(val) - UNIX_PG_EPOCH) * 1000000;
+    I64 ts = (SvNV(val) - UNIX_PG_EPOCH) * 1000000;
     fustr_writebeI(64, out, ts);
 }
 
 RECVFN(date) {
+    RLEN(4);
+    return newSVuv(((UV)fu_frombeI(32, buf)) * 86400 + UNIX_PG_EPOCH);
+}
+
+SENDFN(date) {
+    if (!looks_like_number(val)) SERR("expected a number");
+    fustr_writebeI(32, out, (SvIV(val) - UNIX_PG_EPOCH) / 86400);
+}
+
+RECVFN(date_str) {
     RLEN(4);
     time_t ts = ((time_t)fu_frombeI(32, buf)) * 86400 + UNIX_PG_EPOCH;
     struct tm tm;
@@ -520,7 +606,7 @@ RECVFN(date) {
     return newSVpvf("%04d-%02d-%02d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
 }
 
-SENDFN(date) {
+SENDFN(date_str) {
     int year, month, day;
     if (sscanf(SvPV_nolen(val), "%4d-%2d-%2d", &year, &month, &day) != 3) SERR("invalid date format");
     /* Can't use mktime() hackery here because libc has no UTC variant. Code
@@ -541,6 +627,16 @@ SENDFN(date) {
 }
 
 #undef UNIX_PG_EPOCH
+
+RECVFN(time) {
+    RLEN(8);
+    return newSVnv(((NV)fu_frombeI(64, buf)) / 1000000);
+}
+
+SENDFN(time) {
+    if (!looks_like_number(val)) SERR("expected a number");
+    fustr_writebeI(64, out, SvNV(val) * 1000000);
+}
 
 #undef SIV
 #undef RLEN
@@ -645,7 +741,7 @@ SENDFN(date) {
     B( 1042, "bpchar",         text  )\
     B( 1043, "varchar",        text  )\
     B( 1082, "date",           date  )\
-    /* 1083  time        */\
+    B( 1083, "time",           time  )\
     B( 1114, "timestamp",      timestamp)\
     A( 1115, "_timestamp",     1114  )\
     A( 1182, "_date",          1082  )\
@@ -711,16 +807,33 @@ SENDFN(date) {
     B( 5069, "xid8",           uint8 )
 
 static const fupg_type fupg_builtin[] = {
-#define B(oid, name, fun) { oid, 0, name"\0", fupg_send_##fun, fupg_recv_##fun },
-#define A(oid, name, eoid) { oid, eoid, name"\0", fupg_send_array, fupg_recv_array },
+#define B(oid, name, fun) { oid, 0, {name"\0"}, fupg_send_##fun, fupg_recv_##fun },
+#define A(oid, name, eoid) { oid, eoid, {name"\0"}, fupg_send_array, fupg_recv_array },
     BUILTINS
 #undef B
 #undef A
 };
 
 #undef BUILTINS
-
 #define FUPG_BUILTIN (sizeof(fupg_builtin) / sizeof(fupg_type))
+
+
+/* List of special types for use with set_type() */
+#define SPECIALS\
+    T("$date_str",   date_str)\
+    T("$hex",        hex     )
+
+static const fupg_type fupg_specials[] = {
+#define T(name, fun) { 0, 0, {name"\0"}, fupg_send_##fun, fupg_recv_##fun },
+    SPECIALS
+#undef T
+};
+
+#undef SPECIALS
+#define FUPG_SPECIALS (sizeof(fupg_specials) / sizeof(fupg_type))
+
+
+static const fupg_type fupg_type_perlcb = { 0, 0, {"$perl_cb"}, fupg_send_perlcb, fupg_recv_perlcb };
 
 
 static const fupg_type *fupg_type_byoid(const fupg_type *list, int len, Oid oid) {
@@ -736,4 +849,18 @@ static const fupg_type *fupg_type_byoid(const fupg_type *list, int len, Oid oid)
 
 static const fupg_type *fupg_builtin_byoid(Oid oid) {
     return fupg_type_byoid(fupg_builtin, FUPG_BUILTIN, oid);
+}
+
+static const fupg_type *fupg_builtin_byname(const char *name) {
+    size_t i;
+    /* XXX: Can use binary search here if the list of specials grows.
+     * That list does not have to be ordered by oid. */
+    for (i=0; i<FUPG_SPECIALS; i++)
+        if (strcmp(fupg_specials[i].name.n, name) == 0)
+            return fupg_specials+i;
+
+    for (i=0; i<FUPG_BUILTIN; i++)
+        if (strcmp(fupg_builtin[i].name.n, name) == 0)
+            return fupg_builtin+i;
+    return NULL;
 }

@@ -1,2 +1,14 @@
+0.2 - 2025-02-28
+	- FU: Add debug_info web interface
+	- FU: Add fu->denied and fu->notfound methods
+	- FU: Support randomized --max-reqs
+	- FU: Drop Zstd output compression support
+	- FU::PG: Support custom type overrides with $conn->set_type()
+	- FU::PG: Change default format for the 'date' type
+	- FU::PG: Add support for 'time', '$date_str' and '$hex' types
+	- FU::PG: Skip query prepare step when possible
+	- Fix portability for older compilers & longdouble Perls
+	- Fix some memory leaks
+
 0.1 - 2025-02-25
 	- Initial release

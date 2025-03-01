@@ -1,3 +1,9 @@
+0.06 Fri Feb 28 Fri Feb 28 21:31:11 EST 2025
+	- Migration to a Build.PL & GitHub system.
+	- Functions renamed for clarity.
+	- The "Dots" term is renamed "DotNumbers" for clarity.
+	- examples/ethiopic.pl and examples/english added.
+
 0.05 Fri Jun 20 21:15:37 EDT 2003
 	- updated for Convert::Number::Ethiopic.
 	- documentation enhancements.

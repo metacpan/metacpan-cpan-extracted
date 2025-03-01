@@ -25,6 +25,16 @@ static void fupg_prep_destroy(fupg_prep *p) {
     safefree(p);
 }
 
+typedef struct {
+    const fupg_type *send, *recv;
+    SV *sendcb, *recvcb;
+} fupg_override;
+
+#define fupg_name_hash(v) kh_hash_str((v).n)
+#define fupg_name_eq(a,b) kh_eq_str((a).n, (b).n)
+KHASHL_MAP_INIT(KH_LOCAL, fupg_oid_overrides, fupg_oid_overrides, Oid, fupg_override, kh_hash_uint32, kh_eq_generic);
+KHASHL_MAP_INIT(KH_LOCAL, fupg_name_overrides, fupg_name_overrides, fupg_name, fupg_override, fupg_name_hash, fupg_name_eq);
+
 
 typedef struct {
     SV *self;
@@ -38,6 +48,8 @@ typedef struct {
     unsigned int prep_max;
     unsigned int prep_cur; /* Number of prepared statements not associated with an active $st object */
     fupg_type *types;
+    fupg_oid_overrides *oidtypes;
+    fupg_name_overrides *nametypes;
     fupg_records *records;
     fupg_prepared *prep_map;
     fupg_prep *prep_head, *prep_tail; /* Inserted into head, removed at tail */
@@ -166,6 +178,8 @@ static SV *fupg_connect(pTHX_ const char *str) {
     c->ntypes = 0;
     c->types = NULL;
     c->records = fupg_records_init();
+    c->oidtypes = fupg_oid_overrides_init();
+    c->nametypes = fupg_name_overrides_init();
     c->prep_cur = 0;
     c->prep_max = 256;
     c->prep_map = fupg_prepared_init();
@@ -197,10 +211,25 @@ static void fupg_conn_destroy(pTHX_ fupg_conn *c) {
     if (c->buf.sv) SvREFCNT_dec(c->buf.sv);
     safefree(c->types);
     khint_t k;
+
+    kh_foreach(c->oidtypes, k) {
+        SvREFCNT_dec(kh_val(c->oidtypes, k).sendcb);
+        SvREFCNT_dec(kh_val(c->oidtypes, k).recvcb);
+    }
+    fupg_oid_overrides_destroy(c->oidtypes);
+
+    kh_foreach(c->nametypes, k) {
+        SvREFCNT_dec(kh_val(c->nametypes, k).sendcb);
+        SvREFCNT_dec(kh_val(c->nametypes, k).recvcb);
+    }
+    fupg_name_overrides_destroy(c->nametypes);
+
     kh_foreach(c->records, k) safefree(kh_val(c->records, k));
     fupg_records_destroy(c->records);
+
     kh_foreach(c->prep_map, k) fupg_prep_destroy(kh_key(c->prep_map, k));
     fupg_prepared_destroy(c->prep_map);
+
     safefree(c);
 }
 
@@ -352,6 +381,63 @@ static void fupg_prepared_unref(fupg_conn *c, fupg_prep *p) {
 
 /* Type handling */
 
+static const fupg_type *fupg_resolve_builtin(pTHX_ SV *name, SV **cb) {
+    SvGETMAGIC(name);
+    *cb = NULL;
+    if (!SvOK(name)) return NULL;
+
+    if (SvROK(name)) {
+        SV *rv = SvRV(name);
+        if (SvTYPE(rv) == SVt_PVCV) {
+            *cb = SvREFCNT_inc(name);
+            return &fupg_type_perlcb;
+        }
+    }
+
+    UV uv;
+    const char *pv = SvPV_nomg_nolen(name);
+    const fupg_type *t = grok_atoUV(pv, &uv, NULL) && uv <= (UV)UINT_MAX
+        ? fupg_builtin_byoid((Oid)uv)
+        : fupg_builtin_byname(pv);
+    if (!t) fu_confess("No builtin type found with oid or name '%s'", pv);
+    return t;
+}
+
+static void fupg_set_type(pTHX_ fupg_conn *c, SV *name, SV *sendsv, SV *recvsv) {
+    fupg_override o;
+    o.send = fupg_resolve_builtin(aTHX_ sendsv, &o.sendcb);
+    o.recv = fupg_resolve_builtin(aTHX_ recvsv, &o.recvcb);
+    if ((o.send && o.send->send == fupg_send_array) || (o.recv && o.recv->recv == fupg_recv_array))
+        fu_confess("Cannot set a type to array, override the underlying element type instead");
+    /* Can't currently happen since we have no records in the builtin type
+     * list, but catch this just in case that changes. */
+    if ((o.send && o.send->send == fupg_send_record) || (o.recv && o.recv->recv == fupg_recv_record))
+        fu_confess("Cannot set a type to record");
+
+    UV uv;
+    STRLEN len;
+    const char *pv = SvPV(name, len);
+    int k, absent;
+    fupg_override *so = NULL;
+    if (grok_atoUV(pv, &uv, NULL) && uv <= (UV)UINT_MAX) {
+        k = fupg_oid_overrides_put(c->oidtypes, (Oid)uv, &absent);
+        so = &kh_val(c->oidtypes, k);
+    } else if (len < sizeof(fupg_name)) {
+        fupg_name n;
+        strcpy(n.n, pv);
+        k = fupg_name_overrides_put(c->nametypes, n, &absent);
+        so = &kh_val(c->nametypes, k);
+    } else {
+        fu_confess("Invalid type oid or name '%s'", pv);
+    }
+    if (!absent) {
+        SvREFCNT_dec(so->sendcb);
+        SvREFCNT_dec(so->recvcb);
+    }
+    *so = o;
+}
+
+
 /* XXX: It feels a bit wasteful to load *all* types; even on an empty database
  * that's ~55k of data, but it's easier and (potentially) faster than fetching
  * each type seperately as we encounter them.
@@ -382,7 +468,7 @@ static void fupg_refresh_types(pTHX_ fupg_conn *c) {
     for (i=0; i<c->ntypes; i++) {
         fupg_type *t = c->types + i;
         t->oid = fu_frombeU(32, PQgetvalue(r, i, 0));
-        snprintf(t->name, sizeof(t->name), "%s", PQgetvalue(r, i, 1));
+        snprintf(t->name.n, sizeof(t->name.n), "%s", PQgetvalue(r, i, 1));
         char typ = *PQgetvalue(r, i, 2);
         t->elemoid = fu_frombeU(32, PQgetvalue(r, i, 3));
 
@@ -448,7 +534,7 @@ static const fupg_record *fupg_lookup_record(fupg_conn *c, Oid oid) {
     int i;
     for (i=0; i<record->nattrs; i++) {
         record->attrs[i].oid = fu_frombeU(32, PQgetvalue(r, i, 0));
-        snprintf(record->attrs[i].name, sizeof(record->attrs->name), "%s", PQgetvalue(r, i, 1));
+        snprintf(record->attrs[i].name.n, sizeof(record->attrs->name.n), "%s", PQgetvalue(r, i, 1));
     }
     k = fupg_records_put(c->records, oid, &i);
     kh_val(c->records, k) = record;
@@ -461,6 +547,21 @@ static const fupg_record *fupg_lookup_record(fupg_conn *c, Oid oid) {
 #define FUPGT_SEND 2
 #define FUPGT_RECV 4
 
+static const fupg_type *fupg_override_get(fupg_conn *c, int flags, Oid oid, const fupg_name *name, SV **cb) {
+    khint_t k;
+    fupg_override *o;
+    if (name == NULL) {
+        k = fupg_oid_overrides_get(c->oidtypes, oid);
+        o = k == kh_end(c->oidtypes) ? NULL : &kh_val(c->oidtypes, k);
+    } else {
+        k = fupg_name_overrides_get(c->nametypes, *name);
+        o = k == kh_end(c->nametypes) ? NULL : &kh_val(c->nametypes, k);
+    }
+    if (!o) return NULL;
+    *cb = flags & FUPGT_SEND ? o->sendcb : o->recvcb;
+    return flags & FUPGT_SEND ? o->send : o->recv;
+}
+
 static void fupg_tio_setup(pTHX_ fupg_conn *conn, fupg_tio *tio, int flags, Oid oid, int *refresh_done) {
     tio->oid = oid;
     if (flags & FUPGT_TEXT) {
@@ -470,25 +571,42 @@ static void fupg_tio_setup(pTHX_ fupg_conn *conn, fupg_tio *tio, int flags, Oid 
         return;
     }
 
-    const fupg_type *e, *t = fupg_lookup_type(aTHX_ conn, refresh_done, oid);
+    /* Minor wart? When the type is overridden by oid, the name & oid in error
+     * messages will be that of the builtin type.  When overridden by name, the
+     * name will be correct but the oid is still of the builtin type.
+     * Some send/recv functions have slightly different behavior based on oid,
+     * in those cases this behavior is useful. */
+
+    SV *cb = NULL;
+    const fupg_type *e, *t;
+    e = t = fupg_override_get(conn, flags, oid, NULL, &cb);
+    if (!t) t = fupg_lookup_type(aTHX_ conn, refresh_done, oid);
     if (!t) fu_confess("No type found with oid %u", oid);
-    if (!t->send || !t->recv) fu_confess("Unable to send or receive type '%s' (oid %u)", t->name, oid);
-    tio->name = t->name;
+    tio->name = t->name.n;
+    if (!e && (e = fupg_override_get(conn, flags, 0, &t->name, &cb))) t = e;
+
+    if (flags & FUPGT_SEND && !t->send) fu_confess("Unable to send type '%s' (oid %u)", tio->name, oid);
+    if (flags & FUPGT_RECV && !t->recv) fu_confess("Unable to receive type '%s' (oid %u)", tio->name, oid);
 
     if (flags & FUPGT_SEND ? t->send == fupg_send_domain : t->recv == fupg_recv_domain) {
         e = fupg_lookup_type(aTHX_ conn, refresh_done, t->elemoid);
-        if (!e) fu_confess("Base type %u not found for domain '%s' (oid %u)", t->elemoid, t->name, t->oid);
+        if (!e) fu_confess("Base type %u not found for domain '%s' (oid %u)", t->elemoid, tio->name, t->oid);
         t = e;
     }
 
     tio->send = t->send;
     tio->recv = t->recv;
-    if (flags & FUPGT_SEND ? tio->send == fupg_send_array : tio->recv == fupg_recv_array) {
+
+    if (flags & FUPGT_SEND ? tio->send == fupg_send_perlcb : tio->recv == fupg_recv_perlcb) {
+        tio->cb = cb;
+
+    } else if (flags & FUPGT_SEND ? tio->send == fupg_send_array : tio->recv == fupg_recv_array) {
         tio->arrayelem = safecalloc(1, sizeof(*tio->arrayelem));
         fupg_tio_setup(aTHX_ conn, tio->arrayelem, flags, t->elemoid, refresh_done);
+
     } else if (flags & FUPGT_SEND ? tio->send == fupg_send_record : tio->recv == fupg_recv_record) {
         tio->record.info = fupg_lookup_record(conn, t->elemoid);
-        if (!tio->record.info) fu_confess("Unable to find attributes for record type '%s' (oid %u, relid %u)", t->name, t->oid, t->elemoid);
+        if (!tio->record.info) fu_confess("Unable to find attributes for record type '%s' (oid %u, relid %u)", tio->name, t->oid, t->elemoid);
         tio->record.tio = safecalloc(tio->record.info->nattrs, sizeof(*tio->record.tio));
         int i;
         for (i=0; i<tio->record.info->nattrs; i++)

@@ -73,10 +73,10 @@ subtest '$st prepare & exec', sub {
     is $conn->exec('SELECT 1 FROM pg_prepared_statements'), 0;
 
     ok !eval { $conn->q('SELECT 1', 1)->exec; 1 };
-    like $@, qr/Statement expects 0 bind parameters but 1 were given/;
+    like $@, qr/bind message supplies 1 parameters, but prepared statement/;
 
     ok !eval { $conn->q('SELECT $1')->exec; 1 };
-    like $@, qr/Statement expects 1 bind parameters but 0 were given/;
+    like $@, qr/bind message supplies 0 parameters, but prepared statement/;
 
     # prepare + describe won't let us detect empty queries, hmm...
     is_deeply $conn->q('')->param_types, [];
@@ -88,7 +88,7 @@ subtest '$st prepare & exec', sub {
     is $conn->q('SET client_encoding=utf8')->exec, undef;
 
     ok !eval { $conn->q('select 1; select 2')->exec; 1 };
-    okerr ERROR => prepare => qr/cannot insert multiple commands into a prepared statement/;
+    okerr ERROR => exec => qr/cannot insert multiple commands into a prepared statement/;
 
     # Interleaved
     {
@@ -400,7 +400,7 @@ subtest 'Tracing', sub {
     my @log;
     $conn->query_trace(sub($st) { push @log, $st });
 
-    is_deeply $conn->q('SELECT 1 AS a, $1 AS b', 123)->rowa, [ 1, 123 ];
+    is_deeply $conn->q('SELECT 1 AS a, $1 AS b', 123)->text_params(0)->rowa, [ 1, 123 ];
     is scalar @log, 1;
     my $st = shift @log;
     is ref $st, 'FU::Pg::st';
@@ -412,8 +412,8 @@ subtest 'Tracing', sub {
     ok $st->exec_time > 0 && $st->exec_time < 1;
     ok $st->prepare_time > 0 && $st->prepare_time < 1;
     ok !$st->get_cache;
-    ok $st->text_params;
-    ok $st->text_results;
+    ok !$st->get_text_params;
+    ok $st->get_text_results;
 
     $conn->exec('SET client_encoding=UTF8');
     is scalar @log, 1;
@@ -427,8 +427,8 @@ subtest 'Tracing', sub {
     ok $st->exec_time > 0 && $st->exec_time < 1;
     ok !defined $st->prepare_time;
     ok !$st->get_cache;
-    ok $st->text_params;
-    ok $st->text_results;
+    ok $st->get_text_params;
+    ok $st->get_text_results;
 
     $conn->query_trace(undef);
     $conn->exec('SELECT 1');

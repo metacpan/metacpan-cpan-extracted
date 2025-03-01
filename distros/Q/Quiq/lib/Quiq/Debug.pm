@@ -21,13 +21,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
 use Quiq::Path;
-use Quiq::Terminal;
 use Quiq::Shell;
+use Quiq::Terminal;
 
 # -----------------------------------------------------------------------------
 
@@ -189,7 +189,17 @@ sub findSubroutine {
 
 =head4 Synopsis
 
-  $str = $this->showDiff($file1,$file2);
+  $str = $this->showDiff($file1,$file2,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -verbose => $bool (Default: 0)
+
+Liefere in der ersten Zeile das Diff-Kommando.
+
+=back
 
 =head4 Description
 
@@ -205,12 +215,27 @@ Breite des Terminals eingestellt.
 # -----------------------------------------------------------------------------
 
 sub showDiff {
-    my ($this,$file1,$file2) = @_;
+    my ($this,$file1,$file2) = splice @_,0,3;
 
-    my $width = Quiq::Terminal->width;
+    # Optionen
+
+    my $verbose = 0;
+
+    $this->parameters(\@_,
+        -verbose => \$verbose,
+    );
+
+    # Operation ausführen
 
     my $sh = Quiq::Shell->new;
-    my $str = $sh->exec("diff -W $width -b -y $file1 $file2",
+
+    my $str = '';
+    my $width = Quiq::Terminal->width;
+    my $cmd = "diff -W $width -b -y $file1 $file2";
+    if ($verbose) {
+        $str = "*** $cmd ***\n";
+    }
+    $str .= $sh->exec($cmd,
         -sloppy => 1,
         -capture => 'stdout',
     );
@@ -222,7 +247,7 @@ sub showDiff {
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -230,7 +255,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

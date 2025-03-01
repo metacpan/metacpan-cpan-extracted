@@ -1,4 +1,4 @@
-package FU::SQL 0.1;
+package FU::SQL 0.2;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';

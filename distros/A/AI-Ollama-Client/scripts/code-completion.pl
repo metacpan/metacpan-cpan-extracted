@@ -23,12 +23,14 @@ my $tx = $ol->pullModel(
 my @prompts = @ARGV ? @ARGV : (qq{fetch an url and print its content with Mojolicious; write concise code <PRE> sub fetch {\n <SUF> } <MID>});
 
 for my $prompt (@prompts) {
-    my $responses = $ol->generateCompletion(
+    my $response = $ol->generateCompletion(
         model => $model,
         prompt => $prompt,
+        system => 'You are a helpful concise coding assistant',
     );
 
     my $code;
+    my $responses = $response->get;
     repeat {
         my ($res) = $responses->shift;
         my $info;

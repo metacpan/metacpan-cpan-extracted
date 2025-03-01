@@ -172,7 +172,7 @@ paths:
         '200':
           description: Successful operation.
           content:
-            application/json:
+            application/x-ndjson:
               schema:
                 $ref: '#/components/schemas/PullModelResponse'
   /push:

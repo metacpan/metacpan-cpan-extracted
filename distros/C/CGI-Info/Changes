@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+0.94	Fri Feb 28 12:24:30 EST 2025
+	number types can also have min and max values
+	Now logs all messages in the array messages.  The warnings array has been removed.
+	Use Params::Validate::Strict rather than built in code
+
 0.93	Wed Feb 26 09:47:02 EST 2025
 	Use facility local0
 	Improved upload filename generation to prevent overwriting

@@ -5,6 +5,7 @@ use Test::More;
 use Tie::Array;
 use Tie::Hash;
 use FU::Util 'json_format';
+use Config;
 
 
 sub MyToJSON::TO_JSON { [scalar @_, ref $_[0], ${$_[0]}] }
@@ -54,7 +55,7 @@ my @tests = (
     ''.$$, '"'.$$.'"',
     do { my $x = 12; utf8::decode($x); $x }, '"12"',
     do { no warnings 'numeric'; my $x = '19a'; $x += 0; $x }, '19',
-    1844674407370955161 / 10, '1.84467440737096e+17',
+    1844674407370955161 / 10, $Config{uselongdouble} ? 184467440737095516 : '1.84467440737096e+17',
 );
 
 my @errors = (

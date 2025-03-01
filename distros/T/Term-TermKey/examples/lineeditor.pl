@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_LONGMOD );

@@ -6,7 +6,7 @@ use Geo::Constants qw{PI};
 use Geo::Functions qw{rad_deg deg_rad};
 use Geo::Ellipsoids;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -15,10 +15,10 @@ Geo::Inverse - Calculate geographic distance from a latitude and longitude pair
 =head1 SYNOPSIS
 
   use Geo::Inverse;
-  my $obj                         = Geo::Inverse->new();                    #default "WGS84"
+  my $obj                         = Geo::Inverse->new();                       #default "WGS84"
   my ($lat1, $lon1, $lat2, $lon2) = (38.87, -77.05, 38.95, -77.23);
-  my ($faz, $baz, $dist)          = $obj->inverse($lat1,$lon1,$lat2,$lon2); #array context
-  my $dist=$obj->inverse($lat1, $lon1, $lat2, $lon2);                       #scalar context
+  my ($faz, $baz, $dist)          = $obj->inverse($lat1, $lon1, $lat2, $lon2); #array context
+  my $dist                        = $obj->inverse($lat1, $lon1, $lat2, $lon2); #scalar context
   print "Input Lat: $lat1 Lon: $lon1\n";
   print "Input Lat: $lat2 Lon: $lon2\n";
   print "Output Distance: $dist\n";
@@ -61,11 +61,10 @@ Method to set or retrieve the current ellipsoid object.  The ellipsoid is a Geo:
 =cut
 
 sub ellipsoid {
-  my $self = shift();
+  my $self = shift;
   if (@_) {
     my $param = shift();
-    my $obj   = Geo::Ellipsoids->new($param);
-    $self->{'ellipsoid'}=$obj;
+    $self->{'ellipsoid'} = Geo::Ellipsoids->new($param);
   }
   return $self->{'ellipsoid'};
 }
@@ -79,11 +78,15 @@ This method is the user frontend to the mathematics. This interface will not cha
 =cut
 
 sub inverse {
-  my $self               = shift();
-  my $lat1               = shift();      #degrees
-  my $lon1               = shift();      #degrees
-  my $lat2               = shift();      #degrees
-  my $lon2               = shift();      #degrees
+  my $self               = shift;
+  my $lat1               = shift;      #degrees
+  my $lon1               = shift;      #degrees
+  my $lat2               = shift;      #degrees
+  my $lon2               = shift;      #degrees
+  die('Syntax Error: function inverse lat1 not defined') unless defined $lat1;
+  die('Syntax Error: function inverse lon1 not defined') unless defined $lon1;
+  die('Syntax Error: function inverse lat2 not defined') unless defined $lat2;
+  die('Syntax Error: function inverse lon2 not defined') unless defined $lon2;
   my ($faz, $baz, $dist) = $self->_inverse(rad_deg($lat1), rad_deg($lon1),
                                            rad_deg($lat2), rad_deg($lon2));
   return wantarray ? (deg_rad($faz), deg_rad($baz), $dist) : $dist;
@@ -185,19 +188,16 @@ sub _inverse {
   return($faz, $baz, $s);
 }
 
-=head1 BUGS
-
-Please open an issue on GitHub
-
-=head1 LIMITS
+=head1 LIMITATIONS
 
 No guarantees that Perl handles all of the double precision calculations in the same manner as Fortran.
 
 =head1 LICENSE
 
-MIT License
+Copyright (c) 2025 Michael R. Davis
+Copyright (c) 2005-2006 Jim Gibson, all rights reserved.
 
-Copyright (c) 2022 Michael R. Davis
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

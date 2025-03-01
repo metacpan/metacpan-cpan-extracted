@@ -117,13 +117,20 @@ sub _parse {
 				unless ((defined($self->{'-noextra'}) && $self->{'-noextra'}) || $mm_status !~ /\S/);
 
 		#WHILE WE'RE AT IT, SEE IF WE HAVE A COVER IMAGE?!:
-		if ($html =~ m#\<div\s+class\=\"banner\-album\-image\"\>(.+?)\<\/div\>#s) {
+		my $imgurl = '';
+		if ($html =~ m#\"coverImageHD\"\:\"([^\"]+)\"#) {
+			$imgurl = $1;
+		} elsif ($html =~ m#\"coverImage\"\:\"([^\"]+)\"#) {
+			$imgurl = $1;
+#DEPRECIATED?!:
+		} elsif ($html =~ m#\<div\s+class\=\"banner\-album\-image\"\>(.+?)\<\/div\>#s) {
 			my $imgdiv = $1;
-			if ($imgdiv =~ m#\<img\s+src\=\"([^\"]+)#s) {
-				my $imgurl = $1;
-				$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^//#);
-				$self->{'image_url'} = $imgurl;
-			}
+			$imgurl = $1  if ($imgdiv =~ m#\<img\s+src\=\"([^\"]+)#s);
+		}
+
+		if ($imgurl) {
+			$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^//#);
+			$self->{'image_url'} = $imgurl;
 		}
 
 		return $self->_normalize_lyric_text($self->_html2text($text));
@@ -143,7 +150,7 @@ LyricFinder::Musixmatch - Fetch song lyrics from www.musixmatch.com.
 
 =head1 AUTHOR
 
-This module is Copyright (c) 2020 by
+This module is Copyright (c) 2020-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -233,7 +240,7 @@ sites from being "scraped" by programs, such as this.
 
 Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
-NOTE:  This value will be overridden if $founder->agent("agent") is 
+NOTE:  This value will be overridden if $finder->agent("agent") is 
 called!
 
 =item B<-cache> => I<"directory">, and B<-debug> => I<integer>.
@@ -263,7 +270,7 @@ Directory must be a valid directory, but may be specified as either a path
 with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
 or may not have a trailing "/" (ie. "/home/user/lyrics/").
 
-NOTE:  This value will be overridden if $founder->cache("directory") is 
+NOTE:  This value will be overridden if $finder->cache("directory") is 
 called!
 
 =item B<-debug> => I<number>
@@ -283,9 +290,9 @@ lyrics text and only the actual lyrics will be returned.  Default I<0> (false)
 
 =back 
 
-=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
+=item [ I<$current-agent-string> = ] $finder->B<agent>( [ I<user-agent-string> ] )
 
-Set / get the desired user-agent (ie. browser name) to pass to 
+Get / Set the desired user-agent (ie. browser name) to pass to 
 www.musixmatch.com.  Some sites are pickey about receiving a user-agent 
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
@@ -454,7 +461,7 @@ L<http://search.cpan.org/dist/LyricFinder-Musixmatch/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020 Jim Turner.
+Copyright (c) 2020-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 use 5.020;
 use Moo;
@@ -82,8 +82,8 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
     );
   }
   else {
-    # §4.8.25.4: If the discriminator value does not match an implicit or explicit mapping, no
-    # schema can be determined and validation SHOULD fail.
+    # §4.8.25.4: "If the discriminator value does not match an implicit or explicit mapping, no
+    # schema can be determined and validation SHOULD fail."
     return E({ %$state, data_path => jsonp($state->{data_path}, $discriminator_key) },
       'invalid %s: "%s"', $discriminator_key, $discriminator_value);
   }
@@ -119,7 +119,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.082
+version 0.083
 
 =head1 DESCRIPTION
 

@@ -19,11 +19,11 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ Width (in pixels or using your own unit), the default is 600px.
 
 =item * zoom
 
-An optional zoom level for the map, with a default value of 17.
+An optional zoom level for the map, with a default value of 12.
 
 =back
 
@@ -195,7 +195,7 @@ sub new
 		height => $args{'height'} || '400px',
 		host => $args{'host'} || 'nominatim.openstreetmap.org/search',
 		width => $args{'width'} || '600px',
-		zoom => $args{zoom} || 17,
+		zoom => $args{zoom} || 12,
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
 		%args
@@ -451,8 +451,16 @@ sub onload_render
 		$max_lon = $lon if $lon > $max_lon;
 	}
 
-	my $center_lat = ($min_lat + $max_lat) / 2;
-	my $center_lon = ($min_lon + $max_lon) / 2;
+	my $center_lat;
+	my $center_lon;
+
+	if($self->{'center'}) {
+		$center_lat = $self->{'center'}[0];
+		$center_lon = $self->{'center'}[1];
+	} else {
+		$center_lat = ($min_lat + $max_lat) / 2;
+		$center_lon = ($min_lon + $max_lon) / 2;
+	}
 
 	my $head = qq{
 			<link rel="stylesheet" href="https://unpkg.com/leaflet\@1.7.1/dist/leaflet.css" />
@@ -615,7 +623,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =item * C<HTML::GoogleMaps::V3>
 
-Much of the interface to C<HTML::OSM> mimicks this for compatability.
+Much of the interface to C<HTML::OSM> mimicks this for compatibility.
 
 =item * L<Leaflet>
 

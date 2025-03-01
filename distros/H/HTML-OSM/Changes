@@ -1,5 +1,9 @@
 Revision history for HTML-OSM
 
+0.07	Fri Feb 28 15:07:03 EST 2025
+	Center() was being ignored
+	Changed default zoom to 12
+
 0.06	Wed Feb 19 08:20:29 EST 2025
 	Remove unwanted <head> and <title> information
 

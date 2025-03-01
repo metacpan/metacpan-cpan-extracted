@@ -74,7 +74,7 @@ DESCRIPTION
 
     This module is derived from the (older) Lyrics::Fetcher collection of
     modules by (c) 2007-2020 David Precious, but currently supports more
-    lyric sites (6) and bundles all the supported site modules together here
+    lyric sites (7) and bundles all the supported site modules together here
     (simply install this one module). We have reworked the "Cache" module to
     cache lyrics files by artist and song title on disk in the user's
     desired location. LyricFinder is also truly object-oriented making
@@ -172,7 +172,7 @@ SUBROUTINES/METHODS
             Default: *"Mozilla/5.0 (X11; Linux x86_64; rv:112.0)
             Gecko/20100101 Firefox/112.0"*.
 
-            NOTE: This value will be overridden if $founder->agent("agent")
+            NOTE: This value will be overridden if $finder->agent("agent")
             is called! NOTE: See below how to specify a different agent for
             a specific site module.
 
@@ -206,7 +206,7 @@ SUBROUTINES/METHODS
             trailing "/" (ie. "/home/user/lyrics/").
 
             NOTE: This value will be overridden if
-            $founder->cache("directory") is called! NOTE: See below how to
+            $finder->cache("directory") is called! NOTE: See below how to
             specify a different agent for a specific site module.
 
         -debug => *number*
@@ -253,11 +253,30 @@ SUBROUTINES/METHODS
             the caching feature, so passing "-Cache => {-cache =>
             *directory*}" will NOT work (the way one might assume)!
 
-    [ *$current-agent string* = ] $finder->agent( [ *user-agent string* ] )
-        Set the desired user-agent (ie. browser name) to pass to the lyrics
-        sites. Some sites are pickey about receiving a user-agent string
-        that corresponds to a valid / supported web-browser to prevent their
-        sites from being "scraped" by programs, such as this.
+        -synced => *"YES"* | *"NO"* | *"OK"* | *"ONLY"*
+            Some sites can return either timestamp-synced ("synced") lyrics
+            or a plain-text version. "YES" specifies: First try synced, if
+            none, then try plain-text. "NO" specifies: only try to return
+            the plain-text vsn. "ONLY" specifies: only try to return the
+            synced version, and "OK" specifies: First try the plain-text
+            vsn. if none, then try the synced vsn.. Currently, only the
+            LyricFinder::Lrclab module supports returning timestamp-synced
+            lyrics. Other modules currently ignore this option.
+
+            Default *""* (false), which is treated same as "NO" (plain-text
+            only, if available, otherwise no lyrics returned).
+
+            Currently, the only known site offering "synced" lyrics is
+            LyricFinder::Lrclib, but will serve up "plain-text" lyrics, by
+            default, as the default is "NO" if this option false or not
+            specified (Except is *-synced* => *"ONLY"* is specified, in
+            which either timestamped lyrics or no lyrics will be returned).
+
+    [ *$current-agent-string* = ] $finder->agent( [ *user-agent-string* ] )
+        Get / Set the desired user-agent (ie. browser name) to pass to the
+        lyrics sites. Some sites are pickey about receiving a user-agent
+        string that corresponds to a valid / supported web-browser to
+        prevent their sites from being "scraped" by programs, such as this.
 
         Default: *"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101
         Firefox/112.0"*
@@ -313,36 +332,62 @@ SUBROUTINES/METHODS
         string, if none found. NOTE: The only site that supports this
         currently is AZLyrics.
 
-    *$string* = $finder->fetch(*$artist*, *$title* [, *$source* |
-    *\@sources* [, *$limit*]])
-        Attempt to fetch the lyrics for the given artist and title. A single
-        source site module can be specified as a string ($source) or
-        multiple source modules, ie. [module1, module2...], or "random" or
-        "Cache". Default: "random" (search all available sites in random
-        order until lyrics found or all available sites have been searched).
-        This is the primary method call, and the only one required (besides
-        new()) to be called to obtain lyrics. $limit (if specified) is an
-        integer number to limit the max. number of fetchers to try (normally
-        used with $source = "random") to limit the time needed to search for
-        lyrics (before giving up). If not specified, zero, or higher than
-        the number of installed fetchers, then all available (installed)
-        fetcher submodules (sites) will be tried (until one succefully finds
-        lyrics).
+    *$string* = $finder->fetch(*$artist*, *$title* [, *$source[.
+    source2...]* | *\@sources* [, *$limit*]])
+        Attempt to fetch the lyrics for the given artist and title. One or
+        more source site module names can be specified as either a comma-
+        separated string or in an array-reference, [module1, module2...], or
+        "Cache" (the Cache module), "All" or "Auto" specified alone. The
+        value "random" may appear either alone or in a list (string or
+        array-reference), which will cause any module(s) listed before it to
+        be searched first, any after it to be searched last, and all the
+        other ones available (but not in any *-omit* list (see further
+        above) to be searched in between (assuming lyrics are not found in
+        any modules listed preceeding it). "ALL" or "Auto" (synanyms) are
+        equivalent to the full list of modules in their fixed, alphabetical
+        order.
 
-        "Cache" is a special value that limits searching to a specified
+        Default: *"random"* (search all available sites in random order
+        until lyrics are found or all available sites have been searched).
+
+        fetch()() is the primary method call, and the only one required
+        (besides new()) to be called to obtain lyrics. $limit (if specified)
+        is an integer number to limit the max. number of fetchers to try
+        (normally used with $source = "random") to limit the time needed to
+        search for lyrics (before giving up). If not specified, zero, or
+        higher than the number of installed fetcher modules, then all
+        available (installed) fetcher submodules (sites) will be tried
+        (until one succefully finds lyrics).
+
+        "Cache" is a special module that limits searching to a specified
         lyrics directory on one's local hard drive. NOTE: It should NOT be
         included in a list, but used by itself. If a lyrics directory is
         specified, Cache will automatically be searched first!
 
-        If an array reference (a list) of modules are provided, they will be
-        searched in the order they appear in the list.
+        If a list of modules is provided, they will be searched in the order
+        they appear in the list.
 
         The currently-installed and supported modules are: ApiLyricsOvh,
-        AZLyrics, ChartLyrics, Genius, Letras, and Musixmatch (NOTE the "x"
-        in the spelling of "Musixmatch")!
+        AZLyrics, ChartLyrics, Genius, Letras, Lrclib, and Musixmatch (NOTE
+        the "x" in the spelling of "Musixmatch")!
 
-        Returns lyrics as a string (includes line-breaks appropriate for the
-        user's operating system), or an empty string, if no lyrics found.
+        fetch()() returns lyrics as a string (includes line-breaks
+        appropriate for the user's operating system), or an empty string, if
+        no lyrics found.
+
+    [ *$lyrics-option-string* = ] $finder->fetch_synced_lyrics( [ *string* )
+        Get / Set the desired synced-lyrics fetching option. The valid
+        string values are / returned are: *"YES"* | *"NO"* | *"OK"* |
+        *"ONLY"*.
+
+        Some sites can return either timestamp-synced ("synced") lyrics or a
+        plain-text version. "YES" specifies: First try synced, if none, then
+        try plain-text. "NO" specifies: only try to return the plain-text
+        vsn. "ONLY" specifies: only try to return the synced version, and
+        "OK" specifies: First try the plain-text vsn. if none, then try the
+        synced vsn. Currently, only the LyricFinder::Lrclab module supports
+        returning timestamp-synced lyrics. Other modules currently ignore
+        this option.
 
     *$scalar* = $finder->image_url()
         Returns a URL for a cover-art image, if one found on the lyrics

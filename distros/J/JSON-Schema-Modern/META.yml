@@ -51,52 +51,52 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.602'
+    version: '0.603'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.602'
+    version: '0.603'
 requires:
   B: '0'
   Carp: '0'
@@ -113,6 +113,7 @@ requires:
   Math::BigInt: '1.999701'
   Mojo::JSON: '0'
   Mojo::JSON::Pointer: '0'
+  Mojo::Message::Response: '0'
   Mojo::URL: '0'
   Mojolicious: '7.87'
   Moo: '0'
@@ -143,10 +144,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.602'
+version: '0.603'
 x_Dist_Zilla:
   perl:
-    version: '5.041007'
+    version: '5.041009'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -647,7 +648,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250120'
+          Module::CoreList: '5.20250220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -811,7 +812,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.602
+          tag: v0.603
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -944,14 +945,6 @@ x_Dist_Zilla:
       name: RuntimeSuggests
       version: '6.032'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: requires
-      name: DevelopRequires
-      version: '6.032'
-    -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
         Dist::Zilla::Plugin::Prereqs::Soften:
@@ -1039,7 +1032,7 @@ x_breaks:
   Mojolicious::Plugin::OpenAPI::Modern: '< 0.014'
   OpenAPI::Modern: '< 0.077'
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.41.7
+x_generated_by_perl: v5.41.9
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

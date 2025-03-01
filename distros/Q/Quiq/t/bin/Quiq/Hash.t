@@ -90,10 +90,10 @@ sub test_get : Test(5) {
 
 # -----------------------------------------------------------------------------
 
-sub test_getDeep : Test(4) {
+sub test_getDeep : Test(5) {
     my $self = shift;
 
-    my $h = Quiq::Hash->new({a=>{b=>{c=>3,d=>[],e=>{}}}});
+    my $h = Quiq::Hash->new({a=>{b=>{c=>3,d=>['x'],e=>{}}}});
 
     # Zugriff auf Skalaren Wert
 
@@ -104,6 +104,9 @@ sub test_getDeep : Test(4) {
 
     $val = $h->getDeep('a.b.d');
     $self->is(ref($val),'ARRAY');
+
+    $val = $h->getDeep('a.b.d.[0]');
+    $self->is($val,'x');
 
     # Zugriff auf Hash
 

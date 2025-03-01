@@ -31,6 +31,7 @@ static void fuxmlwr_escape(pTHX_ fuxmlwr *wr, SV *sv) {
     const unsigned char *str = (unsigned char *)SvPV_const(sv, len);
     const unsigned char *tmp, *end = str + len;
     unsigned char x = 0;
+    unsigned char *buf;
     int utf8 = SvUTF8(sv);
 
     while (str < end) {
@@ -55,7 +56,7 @@ static void fuxmlwr_escape(pTHX_ fuxmlwr *wr, SV *sv) {
             case '&': fustr_write(&wr->out, "&amp;", 5); break;
             case '"': fustr_write(&wr->out, "&quot;", 6); break;
             default:
-                unsigned char *buf = (unsigned char *)fustr_write_buf(&wr->out, 2);
+                buf = (unsigned char *)fustr_write_buf(&wr->out, 2);
                 buf[0] = 0xc0 | (x >> 6);
                 buf[1] = 0x80 | (x & 0x3f);
                 break;

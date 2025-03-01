@@ -502,6 +502,7 @@ t/82-io-timings-changed.d/18.plan
 t/82-io-timings-changed.d/18.timings
 t/82-io-timings-changed.d/18.txt
 t/82-io-timings-changed.t
+t/83-fractional-row-counts.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

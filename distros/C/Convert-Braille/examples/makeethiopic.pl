@@ -27,9 +27,9 @@ for (my $i = 0x1200; $i<=0x137c; $i+=0x10) {
     for (my $j=0; $j<=0xf; $j++) {
 		my $fidel = chr($i+$j);
 		if ( $fidel =~ /(\p{Ethiopic}|\p{P})/ ) {
-			my $uni   = ethiopicToBrailleUnicode ( $fidel );
-			my $ascii = ethiopicToBrailleAscii   ( $fidel );
-			my $dots  = ethiopicToBrailleDots    ( $fidel );
+			my $uni   = ethiopic_To_BrailleUnicode    ( $fidel );
+			my $ascii = ethiopic_To_BrailleAscii      ( $fidel );
+			my $dots  = ethiopic_To_BrailleDotNumbers ( $fidel );
 
 			print "    <td>$fidel<br>$uni<br>$ascii<br>$dots</td>\n";
 		}

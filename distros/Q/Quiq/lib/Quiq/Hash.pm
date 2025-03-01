@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -283,7 +283,7 @@ sub get {
 
 # -----------------------------------------------------------------------------
 
-=head3 getDeep() - Werte mit "tiefem Zugriff" abfragen
+=head3 getDeep() - Werte per "tiefem Zugriff" abfragen
 
 =head4 Synopsis
 
@@ -296,7 +296,8 @@ sub get {
 
 =item $key
 
-Zugriffspfad der Form "key1.key2..."
+Zugriffspfad der Form "key1.key2...". Als Schlüssel kann auch "[N]"
+angegeben werden, dann wird auf ein Array-Element zugegriffen.
 
 =item $sloppy
 
@@ -309,13 +310,25 @@ nicht existiert.
 
 Liefere den Wert zum angegebenen Schlüssel. Der Schlüssel ist eine
 mit Punkt (.) getrennte Kette von Einzelschlüsseln, so dass
-sich ein "tiefer Zugriff" kompakt formulieren lässt. Beispiel:
+sich ein "tiefer Zugriff" kompakt formulieren lässt.
+
+=head4 Example
+
+B<Folge von Hash-Zugriffen>
 
   $val = $h->getDeep('invoice.header.invoiceNumber');
 
 ist dasselbe wie
 
   $val = $h->{'invoice'}->{'header'}->{'invoiceNumber'};
+
+B<Zugriff über Array-Element>
+
+  $val = $h->getDeep('settlement.tradeTax.[0].type');
+
+ist dasselbe wie
+
+  $val = $h->{'sttlement'}->{'tradeTax'}->[0]->{'type'};
 
 =cut
 
@@ -326,20 +339,90 @@ sub getDeep {
 
     my $val = $self;
     for (split /\./,$key) {
-        if (!exists $val->{$_}) {
-            if (!$sloppy) {
-                $self->throw(
-                    'HASH-00099: Non-existent access path',
-                    Path => $key,
-                    Component => $_,
-                );
+        if (/\[(\d+)\]/) { # Array-Zugriff
+            if (!exists $val->[$1]) {
+                if (!$sloppy) {
+                    $self->throw(
+                        'HASH-00099: Non-existent access path',
+                        Path => $key,
+                    );
+                }
+                return undef;
             }
-            return undef;
+            $val = $val->[$1];
         }
-        $val = $val->{$_};
+        else { # Hash-Zugriff
+            if (!exists $val->{$_}) {
+                if (!$sloppy) {
+                    $self->throw(
+                        'HASH-00099: Non-existent access path',
+                        Path => $key,
+                    );
+                }
+                return undef;
+            }
+            $val = $val->{$_};
+        }
     }
 
     return $val;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 setDeep() - Wert per "tiefem Zugriff" setzen
+
+=head4 Synopsis
+
+  $h->setDeep($key,$val);
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Zugriffspfad der Form "key1.key2..."
+
+=item $val
+
+Wert, der gesetzt wird
+
+=back
+
+=head4 Description
+
+Setze den Wert zum angegebenen Schlüssel. Der Schlüssel ist eine
+mit Punkt (.) getrennte Kette von Einzelschlüsseln, so dass
+sich ein "tiefer Zugriff" kompakt formulieren lässt. Beispiel:
+
+  $h->setDeep('invoice.header.invoiceNumber',$val);
+
+ist dasselbe wie
+
+  $h->{'invoice'}->{'header'}->{'invoiceNumber'} = $val;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setDeep {
+    my ($self,$key,$val) = @_;
+
+    my $ref = $self;
+    my @keys = split /\./,$key;
+    for (my $i = 0; $i < $#keys; $i++) {
+        if (!exists $ref->{$keys[$i]}) {
+            $self->throw(
+                'HASH-00099: Non-existent access path',
+                Path => $key,
+            );
+        }
+        $ref = $ref->{$keys[$i]};
+    }
+    $ref->{$keys[-1]} = $val;
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -1652,7 +1735,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -1660,7 +1743,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

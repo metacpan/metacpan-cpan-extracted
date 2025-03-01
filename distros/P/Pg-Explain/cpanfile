@@ -11,6 +11,7 @@ requires 'HOP::Lexer';
 requires 'JSON::MaybeXS';
 requires 'List::Util', '>= 1.44';
 requires 'XML::Simple';
+requires 'XML::LibXML';
 requires 'YAML::XS', '>= 0.83';
 
 # To install develop dependencies, run:

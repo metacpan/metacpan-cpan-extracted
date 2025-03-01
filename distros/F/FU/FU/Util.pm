@@ -1,4 +1,4 @@
-package FU::Util 0.1;
+package FU::Util 0.2;
 
 use v5.36;
 use FU::XS;
@@ -366,7 +366,7 @@ here anyway because the L<FU> supervisor uses them:
 =item fdpass_send($send_fd, $pass_fd, $message)
 
 Send a message and a file descriptor (C<$pass_fd>) over the given socket
-(<$send_fd>). C<$message> must not be empty, even if you don't intend to do
+(C<$send_fd>). C<$message> must not be empty, even if you don't intend to do
 anything with it on receipt. Both C<$send_fd> and C<$pass_fd> must be numeric
 file descriptors, as obtained by C<fileno()>.
 

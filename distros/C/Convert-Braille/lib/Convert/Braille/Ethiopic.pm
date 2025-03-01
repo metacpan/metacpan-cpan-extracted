@@ -1,174 +1,176 @@
+package Convert::Braille;
 package Convert::Braille::Ethiopic;
 use utf8;
 
 BEGIN
 {
 require 5.006;
-
+use warnings;
 use base qw(Exporter);
 
 use strict;
 use vars qw( @EXPORT @EXPORT_OK $VERSION
-	 %EthiopicToBrailleUnicode %BrailleUnicodeToEthiopic
-	 %EthiopicNumeralsToBrailleUnicode %BrailleUnicodeToEthiopicNumerals
-	 %EthiopicPunctuationToBrailleUnicode %BrailleUnicodeToEthiopicPunctuation
+	 %Ethiopic_To_BrailleUnicode %BrailleUnicode_To_Ethiopic
+	 %EthiopicNumerals_To_BrailleUnicode %BrailleUnicode_To_EthiopicNumerals
+	 %EthiopicPunctuation_To_BrailleUnicode %BrailleUnicode_To_EthiopicPunctuation
 	 @EthiopicForms %EthiopicForms $n
 );
 use Convert::Braille qw(
-	%BrailleAsciiToUnicode
-	brailleAsciiToUnicode
-	brailleDotsToUnicode
-	brailleUnicodeToAscii
-	brailleUnicodeToDots
+	%BrailleAscii_To_Unicode
+	brailleAscii_To_Unicode
+	brailleDotNumbers_To_Unicode
+	brailleUnicode_To_Ascii
+	brailleUnicode_To_DotNumbers
 );
 
-$VERSION = 0.02;
+$VERSION = 0.06;
 
 @EXPORT = qw(
-	ethiopicToBrailleUnicode
-	ethiopicToBrailleAscii
-	ethiopicToBrailleDots
+	ethiopic_To_BrailleUnicode
+	ethiopic_To_BrailleAscii
+	ethiopic_To_BrailleDotNumbers
 
-	brailleAsciiToEthiopic
-	brailleDotsToEthiopic
-	brailleUnicodeToEthiopic
+	brailleAscii_To_Ethiopic
+	brailleDotNumbers_To_Ethiopic
+	brailleUnicode_To_Ethiopic
 );
 @EXPORT_OK = qw(
-	ethiopicToBrailleUnicode
-	ethiopicToBrailleAscii
-	ethiopicToBrailleDots
+	ethiopic_To_BrailleUnicode
+	ethiopic_To_BrailleAscii
+	ethiopic_To_BrailleDotNumbers
 
-	brailleAsciiToEthiopic
-	brailleDotsToEthiopic
-	brailleUnicodeToEthiopic
+	brailleAscii_To_Ethiopic
+	brailleDotNumbers_To_Ethiopic
+	brailleUnicode_To_Ethiopic
 
-	%EthiopicToBrailleUnicode %BrailleUnicodeToEthiopic
-	%EthiopicNumeralsToBrailleUnicode %BrailleUnicodeToEthiopicNumerals
-	%EthiopicPunctuationToBrailleUnicode %BrailleUnicodeToEthiopicPunctuation
+	%Ethiopic_To_BrailleUnicode %BrailleUnicode_To_Ethiopic
+	%EthiopicNumerals_To_BrailleUnicode %BrailleUnicode_To_EthiopicNumerals
+	%EthiopicPunctuation_To_BrailleUnicode %BrailleUnicode_To_EthiopicPunctuation
 	@EthiopicForms
 );
 
-%EthiopicToBrailleUnicode =(
-	ህ	=> $BrailleAsciiToUnicode{H},
-	ል	=> $BrailleAsciiToUnicode{L},
-	ሕ	=> $BrailleAsciiToUnicode{H},
-	ም	=> $BrailleAsciiToUnicode{M},
-	ሥ	=> $BrailleAsciiToUnicode{S},
-	ር	=> $BrailleAsciiToUnicode{R},
-	ስ	=> $BrailleAsciiToUnicode{S},
-	ሽ	=> $BrailleAsciiToUnicode{'%'},
-	ቅ	=> $BrailleAsciiToUnicode{Q},
-	ቍ	=> "$BrailleAsciiToUnicode{Q}$BrailleAsciiToUnicode{W}",
-	ቕ	=> $BrailleAsciiToUnicode{Q},
-	ቝ	=> "$BrailleAsciiToUnicode{Q}$BrailleAsciiToUnicode{W}",
-	ብ	=> $BrailleAsciiToUnicode{B},
-	ቭ	=> $BrailleAsciiToUnicode{V},
-	ት	=> $BrailleAsciiToUnicode{T},
-	ች	=> $BrailleAsciiToUnicode{'*'},
-	ኅ	=> $BrailleAsciiToUnicode{H},
-	ኍ	=> "$BrailleAsciiToUnicode{H}$BrailleAsciiToUnicode{W}",
-	ን	=> $BrailleAsciiToUnicode{N},
-	ኝ	=> $BrailleAsciiToUnicode{'+'},
-	እ	=> $BrailleAsciiToUnicode{'('},
-	ክ	=> $BrailleAsciiToUnicode{K},
-	ኵ	=> "$BrailleAsciiToUnicode{K}$BrailleAsciiToUnicode{W}",
-	ኽ	=> $BrailleAsciiToUnicode{8},
-	ዅ	=> "$BrailleAsciiToUnicode{8}$BrailleAsciiToUnicode{W}",
-	ው	=> $BrailleAsciiToUnicode{W},
-	ዕ	=> $BrailleAsciiToUnicode{'('},
-	ዝ	=> $BrailleAsciiToUnicode{Z},
-	ዥ	=> $BrailleAsciiToUnicode{0},
-	ይ	=> $BrailleAsciiToUnicode{Y},
-	ድ	=> $BrailleAsciiToUnicode{D},
-	ዽ	=> $BrailleAsciiToUnicode{D},
-	ጅ	=> $BrailleAsciiToUnicode{J},
-	ግ	=> $BrailleAsciiToUnicode{G},
-	ጕ	=> "$BrailleAsciiToUnicode{G}$BrailleAsciiToUnicode{W}",
-	ጝ	=> $BrailleAsciiToUnicode{G},
-	ጥ	=> $BrailleAsciiToUnicode{')'},
-	ጭ	=> $BrailleAsciiToUnicode{C},
-	ጵ	=> $BrailleAsciiToUnicode{6},
-	ጽ	=> $BrailleAsciiToUnicode{'&'},
-	ፅ	=> $BrailleAsciiToUnicode{'&'},
-	ፍ	=> $BrailleAsciiToUnicode{F},
-	ፕ	=> $BrailleAsciiToUnicode{P},
-	ፘ	=> "$BrailleAsciiToUnicode{R}$BrailleAsciiToUnicode{Y}$BrailleAsciiToUnicode{A}",
-	ፙ	=> "$BrailleAsciiToUnicode{M}$BrailleAsciiToUnicode{Y}$BrailleAsciiToUnicode{A}",
-	ፚ	=> "$BrailleAsciiToUnicode{F}$BrailleAsciiToUnicode{Y}$BrailleAsciiToUnicode{A}",
-	ኧ	=> "$BrailleAsciiToUnicode{'\"'}$BrailleAsciiToUnicode{'('}"
+%Ethiopic_To_BrailleUnicode =(
+	ህ	=> $BrailleAscii_To_Unicode{H},
+	ል	=> $BrailleAscii_To_Unicode{L},
+	ሕ	=> $BrailleAscii_To_Unicode{H},
+	ም	=> $BrailleAscii_To_Unicode{M},
+	ሥ	=> $BrailleAscii_To_Unicode{S},
+	ር	=> $BrailleAscii_To_Unicode{R},
+	ስ	=> $BrailleAscii_To_Unicode{S},
+	ሽ	=> $BrailleAscii_To_Unicode{'%'},
+	ቅ	=> $BrailleAscii_To_Unicode{Q},
+	ቍ	=> "$BrailleAscii_To_Unicode{Q}$BrailleAscii_To_Unicode{W}",
+	ቕ	=> $BrailleAscii_To_Unicode{Q},
+	ቝ	=> "$BrailleAscii_To_Unicode{Q}$BrailleAscii_To_Unicode{W}",
+	ብ	=> $BrailleAscii_To_Unicode{B},
+	ቭ	=> $BrailleAscii_To_Unicode{V},
+	ት	=> $BrailleAscii_To_Unicode{T},
+	ች	=> $BrailleAscii_To_Unicode{'*'},
+	ኅ	=> $BrailleAscii_To_Unicode{H},
+	ኍ	=> "$BrailleAscii_To_Unicode{H}$BrailleAscii_To_Unicode{W}",
+	ን	=> $BrailleAscii_To_Unicode{N},
+	ኝ	=> $BrailleAscii_To_Unicode{'+'},
+	እ	=> $BrailleAscii_To_Unicode{'('},
+	ክ	=> $BrailleAscii_To_Unicode{K},
+	ኵ	=> "$BrailleAscii_To_Unicode{K}$BrailleAscii_To_Unicode{W}",
+	ኽ	=> $BrailleAscii_To_Unicode{8},
+	ዅ	=> "$BrailleAscii_To_Unicode{8}$BrailleAscii_To_Unicode{W}",
+	ው	=> $BrailleAscii_To_Unicode{W},
+	ዕ	=> $BrailleAscii_To_Unicode{'('},
+	ዝ	=> $BrailleAscii_To_Unicode{Z},
+	ዥ	=> $BrailleAscii_To_Unicode{0},
+	ይ	=> $BrailleAscii_To_Unicode{Y},
+	ድ	=> $BrailleAscii_To_Unicode{D},
+	ዽ	=> $BrailleAscii_To_Unicode{D},
+	ጅ	=> $BrailleAscii_To_Unicode{J},
+	ግ	=> $BrailleAscii_To_Unicode{G},
+	ጕ	=> "$BrailleAscii_To_Unicode{G}$BrailleAscii_To_Unicode{W}",
+	ጝ	=> $BrailleAscii_To_Unicode{G},
+	ጥ	=> $BrailleAscii_To_Unicode{')'},
+	ጭ	=> $BrailleAscii_To_Unicode{C},
+	ጵ	=> $BrailleAscii_To_Unicode{6},
+	ጽ	=> $BrailleAscii_To_Unicode{'&'},
+	ፅ	=> $BrailleAscii_To_Unicode{'&'},
+	ፍ	=> $BrailleAscii_To_Unicode{F},
+	ፕ	=> $BrailleAscii_To_Unicode{P},
+	ፘ	=> "$BrailleAscii_To_Unicode{R}$BrailleAscii_To_Unicode{Y}$BrailleAscii_To_Unicode{A}",
+	ፙ	=> "$BrailleAscii_To_Unicode{M}$BrailleAscii_To_Unicode{Y}$BrailleAscii_To_Unicode{A}",
+	ፚ	=> "$BrailleAscii_To_Unicode{F}$BrailleAscii_To_Unicode{Y}$BrailleAscii_To_Unicode{A}",
+	ኧ	=> "$BrailleAscii_To_Unicode{'\"'}$BrailleAscii_To_Unicode{'('}"
 );
 
 
-foreach ( sort keys %EthiopicToBrailleUnicode ) {
-	next if ( exists($BrailleUnicodeToEthiopic{$EthiopicToBrailleUnicode{$_}}) );
-	$BrailleUnicodeToEthiopic{$EthiopicToBrailleUnicode{$_}} = $_;
+foreach ( sort keys %Ethiopic_To_BrailleUnicode ) {
+	next if ( exists($BrailleUnicode_To_Ethiopic{$Ethiopic_To_BrailleUnicode{$_}}) );
+	$BrailleUnicode_To_Ethiopic{$Ethiopic_To_BrailleUnicode{$_}} = $_;
 }
+$BrailleUnicode_To_Ethiopic{$BrailleAscii_To_Unicode{S}} = 'ስ';
 
 
 @EthiopicForms = ( 
-	$BrailleAsciiToUnicode{5},
-	$BrailleAsciiToUnicode{U},
-	$BrailleAsciiToUnicode{I},
-	$BrailleAsciiToUnicode{A},
-	$BrailleAsciiToUnicode{E},
+	$BrailleAscii_To_Unicode{5},
+	$BrailleAscii_To_Unicode{U},
+	$BrailleAscii_To_Unicode{I},
+	$BrailleAscii_To_Unicode{A},
+	$BrailleAscii_To_Unicode{E},
 	"",
-	$BrailleAsciiToUnicode{O},
-	"$BrailleAsciiToUnicode{W}$BrailleAsciiToUnicode{A}"
+	$BrailleAscii_To_Unicode{O},
+	"$BrailleAscii_To_Unicode{W}$BrailleAscii_To_Unicode{A}"
 );
 %EthiopicForms = ( 
-	$BrailleAsciiToUnicode{5} => -5,
-	$BrailleAsciiToUnicode{U} => -4,
-	$BrailleAsciiToUnicode{I} => -3,
-	$BrailleAsciiToUnicode{A} => -2,
-	$BrailleAsciiToUnicode{E} => -1,
-	$BrailleAsciiToUnicode{O} =>  1,
-	$BrailleAsciiToUnicode{W} =>  2
+	$BrailleAscii_To_Unicode{5} => -5,
+	$BrailleAscii_To_Unicode{U} => -4,
+	$BrailleAscii_To_Unicode{I} => -3,
+	$BrailleAscii_To_Unicode{A} => -2,
+	$BrailleAscii_To_Unicode{E} => -1,
+	$BrailleAscii_To_Unicode{O} =>  1,
+	$BrailleAscii_To_Unicode{W} =>  2
 );
 
-%EthiopicNumeralsToBrailleUnicode = (
-	'፩'	=> $BrailleAsciiToUnicode{1},
-	'፪'	=> $BrailleAsciiToUnicode{2},
-	'፫'	=> $BrailleAsciiToUnicode{3},
-	'፬'	=> $BrailleAsciiToUnicode{4},
-	'፭'	=> $BrailleAsciiToUnicode{5},
-	'፮'	=> $BrailleAsciiToUnicode{6},
-	'፯'	=> $BrailleAsciiToUnicode{7},
-	'፰'	=> $BrailleAsciiToUnicode{8},
-	'፱'	=> $BrailleAsciiToUnicode{9},
-	'፲'	=> "$BrailleAsciiToUnicode{1}$BrailleAsciiToUnicode{0}",
-	'፳'	=> "$BrailleAsciiToUnicode{2}$BrailleAsciiToUnicode{0}",
-	'፴'	=> "$BrailleAsciiToUnicode{3}$BrailleAsciiToUnicode{0}",
-	'፵'	=> "$BrailleAsciiToUnicode{4}$BrailleAsciiToUnicode{0}",
-	'፶'	=> "$BrailleAsciiToUnicode{5}$BrailleAsciiToUnicode{0}",
-	'፷'	=> "$BrailleAsciiToUnicode{6}$BrailleAsciiToUnicode{0}",
-	'፸'	=> "$BrailleAsciiToUnicode{7}$BrailleAsciiToUnicode{0}",
-	'፹'	=> "$BrailleAsciiToUnicode{8}$BrailleAsciiToUnicode{0}",
-	'፺'	=> "$BrailleAsciiToUnicode{9}$BrailleAsciiToUnicode{0}",
-	'፻'	=> "$BrailleAsciiToUnicode{1}$BrailleAsciiToUnicode{0}$BrailleAsciiToUnicode{0}",
-	'፼'	=> "$BrailleAsciiToUnicode{1}$BrailleAsciiToUnicode{0}$BrailleAsciiToUnicode{0}$BrailleAsciiToUnicode{0}$BrailleAsciiToUnicode{0}"
+%EthiopicNumerals_To_BrailleUnicode = (
+	'፩'	=> $BrailleAscii_To_Unicode{1},
+	'፪'	=> $BrailleAscii_To_Unicode{2},
+	'፫'	=> $BrailleAscii_To_Unicode{3},
+	'፬'	=> $BrailleAscii_To_Unicode{4},
+	'፭'	=> $BrailleAscii_To_Unicode{5},
+	'፮'	=> $BrailleAscii_To_Unicode{6},
+	'፯'	=> $BrailleAscii_To_Unicode{7},
+	'፰'	=> $BrailleAscii_To_Unicode{8},
+	'፱'	=> $BrailleAscii_To_Unicode{9},
+	'፲'	=> "$BrailleAscii_To_Unicode{1}$BrailleAscii_To_Unicode{0}",
+	'፳'	=> "$BrailleAscii_To_Unicode{2}$BrailleAscii_To_Unicode{0}",
+	'፴'	=> "$BrailleAscii_To_Unicode{3}$BrailleAscii_To_Unicode{0}",
+	'፵'	=> "$BrailleAscii_To_Unicode{4}$BrailleAscii_To_Unicode{0}",
+	'፶'	=> "$BrailleAscii_To_Unicode{5}$BrailleAscii_To_Unicode{0}",
+	'፷'	=> "$BrailleAscii_To_Unicode{6}$BrailleAscii_To_Unicode{0}",
+	'፸'	=> "$BrailleAscii_To_Unicode{7}$BrailleAscii_To_Unicode{0}",
+	'፹'	=> "$BrailleAscii_To_Unicode{8}$BrailleAscii_To_Unicode{0}",
+	'፺'	=> "$BrailleAscii_To_Unicode{9}$BrailleAscii_To_Unicode{0}",
+	'፻'	=> "$BrailleAscii_To_Unicode{1}$BrailleAscii_To_Unicode{0}$BrailleAscii_To_Unicode{0}",
+	'፼'	=> "$BrailleAscii_To_Unicode{1}$BrailleAscii_To_Unicode{0}$BrailleAscii_To_Unicode{0}$BrailleAscii_To_Unicode{0}$BrailleAscii_To_Unicode{0}"
 );
 
 
-foreach ( keys %EthiopicNumeralsToBrailleUnicode ) {
-	$BrailleUnicodeToEthiopicNumerals{$EthiopicNumeralsToBrailleUnicode{$_}} = $_;
+foreach ( keys %EthiopicNumerals_To_BrailleUnicode ) {
+	$BrailleUnicode_To_EthiopicNumerals{$EthiopicNumerals_To_BrailleUnicode{$_}} = $_;
 }
 
 
-%EthiopicPunctuationToBrailleUnicode = (
-	'፡'	=> $BrailleAsciiToUnicode{2},
-	'።'	=> $BrailleAsciiToUnicode{4},
-	'፣'	=> $BrailleAsciiToUnicode{1},
-	'፤'	=> $BrailleAsciiToUnicode{1},  # undefined in ethiopic
-	'፥'	=> $BrailleAsciiToUnicode{1},  # undefined in ethiopic
-	'፦'	=> $BrailleAsciiToUnicode{1},  # undefined in ethiopic
-	'፧'	=> $BrailleAsciiToUnicode{8},  # undefined in ethiopic
+%EthiopicPunctuation_To_BrailleUnicode = (
+	'፡'	=> $BrailleAscii_To_Unicode{2},
+	'።'	=> $BrailleAscii_To_Unicode{4},
+	'፣'	=> $BrailleAscii_To_Unicode{1},
+	'፤'	=> $BrailleAscii_To_Unicode{1},  # undefined in ethiopic
+	'፥'	=> $BrailleAscii_To_Unicode{1},  # undefined in ethiopic
+	'፦'	=> $BrailleAscii_To_Unicode{1},  # undefined in ethiopic
+	'፧'	=> $BrailleAscii_To_Unicode{8},  # undefined in ethiopic
 	'፨'	=> " ",
 );
 
 
-foreach ( keys %EthiopicPunctuationToBrailleUnicode ) {
-	next if ( exists($BrailleUnicodeToEthiopicPunctuation{$EthiopicPunctuationToBrailleUnicode{$_}}) );
-	$BrailleUnicodeToEthiopicPunctuation{$EthiopicPunctuationToBrailleUnicode{$_}} = $_;
+foreach ( keys %EthiopicPunctuation_To_BrailleUnicode ) {
+	next if ( exists($BrailleUnicode_To_EthiopicPunctuation{$EthiopicPunctuation_To_BrailleUnicode{$_}}) );
+	$BrailleUnicode_To_EthiopicPunctuation{$EthiopicPunctuation_To_BrailleUnicode{$_}} = $_;
 }
 
 
@@ -179,7 +181,7 @@ $n = new Convert::Number::Ethiopic;
 }
 
 
-sub	brailleUnicodeToEthiopic
+sub	brailleUnicode_To_Ethiopic
 {
 
 	return unless ( $_[0] );
@@ -190,10 +192,11 @@ sub	brailleUnicodeToEthiopic
 
 	foreach  ( @chars ) { # the ኧ problem forces shifting
 
-		if ( exists($BrailleUnicodeToEthiopic{$_}) ) {
+
+		if ( exists($BrailleUnicode_To_Ethiopic{$_}) ) {
 			if (
 			      $base && $base !~ /[እዕውይ]/ &&
-			      $BrailleUnicodeToEthiopic{$_} eq 'ው' 
+			      $BrailleUnicode_To_Ethiopic{$_} eq 'ው' 
 			   )
 			{
 				$base = 'ኅ' if ( $base eq 'ህ' );
@@ -209,7 +212,8 @@ sub	brailleUnicodeToEthiopic
 				$trans =~ s/⠐$/ኧ/;
 			}
 			else {
-				$base = $BrailleUnicodeToEthiopic{$_};
+				$trans .= $base if( $base );
+				$base = $BrailleUnicode_To_Ethiopic{$_};
 			}
 		}
 		elsif ( exists($EthiopicForms{$_}) ) {
@@ -222,11 +226,11 @@ sub	brailleUnicodeToEthiopic
 				$trans .= $base;
 				$base = undef;
 			}
-			if ( exists($BrailleUnicodeToEthiopicNumerals{$_}) ) {
-				$trans .= $base.$BrailleUnicodeToEthiopicNumerals{$_};
+			if ( exists($BrailleUnicode_To_EthiopicNumerals{$_}) ) {
+				$trans .= $base.$BrailleUnicode_To_EthiopicNumerals{$_};
 			}
-			elsif ( exists($BrailleUnicodeToEthiopicPunctuation{$_}) ) {
-				$trans .= $base.$BrailleUnicodeToEthiopicPunctuation{$_};
+			elsif ( exists($BrailleUnicode_To_EthiopicPunctuation{$_}) ) {
+				$trans .= $base.$BrailleUnicode_To_EthiopicPunctuation{$_};
 			}
 			else {
 				# something  rouge
@@ -240,7 +244,7 @@ sub	brailleUnicodeToEthiopic
 }
 
 
-sub	ethiopicToBrailleUnicode
+sub	ethiopic_To_BrailleUnicode
 {
 
 	return unless ( $_[0] );
@@ -250,12 +254,12 @@ sub	ethiopicToBrailleUnicode
 	my $trans;
 
 	#
-    # change to for loop
+	# change to for loop
 	#
 	while  ( $_ = shift @chars ) {
 
-		if ( exists($EthiopicToBrailleUnicode{$_}) ) {
-			$trans .= $EthiopicToBrailleUnicode{$_};
+		if ( exists($Ethiopic_To_BrailleUnicode{$_}) ) {
+			$trans .= $Ethiopic_To_BrailleUnicode{$_};
 		}
 		elsif ( /[ሀ-ፗ]/ ) {
 			my $uni  = $_;
@@ -266,11 +270,11 @@ sub	ethiopicToBrailleUnicode
 				my $addr = ord($uni);
 				my $form  = ord($uni)%8;
 				my $sadis = chr( ord($uni)-$form+5 );
-				$trans .= $EthiopicToBrailleUnicode{$sadis}.$EthiopicForms[$form];
+				$trans .= $Ethiopic_To_BrailleUnicode{$sadis}.$EthiopicForms[$form];
 			}
 		}
 		elsif ( /[፡-፨]/ ) {
-			$trans .= "$EthiopicPunctuationToBrailleUnicode{$_}";
+			$trans .= "$EthiopicPunctuation_To_BrailleUnicode{$_}";
 		}
 		elsif ( /[፩-፼]/ ) {
 			my $number = $_;
@@ -280,8 +284,8 @@ sub	ethiopicToBrailleUnicode
 			}
 			unshift ( @chars, $c ) if ( $c );  # might have end of string
 
-			my $result = brailleAsciiToUnicode ( $n->convert ( $number ) );
-			$trans .= "$BrailleAsciiToUnicode{'#'}$result";
+			my $result = brailleAscii_To_Unicode ( $n->convert ( $number ) );
+			$trans .= "$BrailleAscii_To_Unicode{'#'}$result";
 		}
 		else {
 			#	
@@ -296,27 +300,27 @@ sub	ethiopicToBrailleUnicode
 }
 
 
-sub	ethiopicToBrailleAscii
+sub	ethiopic_To_BrailleAscii
 {
-	brailleUnicodeToAscii ( ethiopicToBrailleUnicode ( @_ ) );
+	brailleUnicode_To_Ascii ( ethiopic_To_BrailleUnicode ( @_ ) );
 }
 
 
-sub	ethiopicToBrailleDots
+sub	ethiopic_To_BrailleDotNumbers
 {
-	brailleUnicodeToDots ( ethiopicToBrailleUnicode ( @_ ) );
+	brailleUnicode_To_DotNumbers ( ethiopic_To_BrailleUnicode ( @_ ) );
 }
 
 
-sub	brailleAsciiToEthiopic
+sub	brailleAscii_To_Ethiopic
 {
-	brailleUnicodeToEthiopic ( brailleAsciiToUnicode ( @_ ) );
+	brailleUnicode_To_Ethiopic ( brailleAscii_To_Unicode ( @_ ) );
 }
 
 
-sub	brailleDotsToEthiopic
+sub	brailleDotNumbers_To_Ethiopic
 {
-	brailleUnicodeToEthiopic ( brailleDotsToUnicode ( @_ ) );
+	brailleUnicode_To_Ethiopic ( brailleDotNumbers_To_Unicode ( @_ ) );
 }
 
 
@@ -328,7 +332,7 @@ sub	brailleDotsToEthiopic
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -338,29 +342,54 @@ __END__
 
  use Convert::Braille::Ethiopic;
 
- print brailleAsciiToEthiopic ( "S5LAM" ), "\n";
- print brailleDotsToEthiopic  ( "234261231134" ), "\n";
+ print ethiopic_To_BrailleUnicode ( "ሰላምታ" ), "\n";
+ print brailleDots_To_Ethiopic  ( "234261231134" ), "\n";
 
 
 =head1 REQUIRES
 
-perl5.6.0 or later, L<Convert::Number::Ethiopic>
+perl5.6.1 or later, L<Convert::Number::Ethiopic>
 
 =head1 EXPORTS
 
 =over 4
 
-=item ethiopicToBrailleUnicode
+=item brailleAscii_To_Ethiopic( $arg )
 
-=item ethiopicToBrailleAscii
+  Convert an Amharic-Braille-ASCII ([A-Z0-9]) $arg into Ethiopic. E.g.:
 
-=item ethiopicToBrailleDots
+  S5LAMTA => ሰላምታ
 
-=item brailleAsciiToEthiopic
+=item ethiopic_To_BrailleAscii( $arg )
 
-=item brailleDotsToEthiopic
+  Convert an Ethiopic $arg into an Amharic-ASCII string. E.g.:
 
-=item brailleUnicodeToEthiopic
+  ሰላምታ => S5LAMTA
+
+=item ethiopic_To_BrailleUnicode( $arg )
+
+  Convert a Ethiopic $arg into an Unicode Braille codes. E.g.:
+
+  ሰላምታ => ⠎⠢⠇⠁⠍⠞⠁
+
+=item brailleUnicode_To_Ethiopic( $arg )
+
+  Convert a Unicode Braille $arg into an Ethiopic. E.g.:
+
+  ⠎⠢⠇⠁⠍⠞⠁ => ሰላምታ
+
+=item ethiopic_To_BrailleDotNumberss( $arg )
+
+  Convert a Ethiopic $arg into a Braille "dot numbers". E.g.:
+
+  ሰላምታ => 234-26-123-1-134-2345-1
+
+=item brailleDotNumberss_To_Ethiopic( $arg )
+
+  Convert a Braille "dot numbers" $arg into Ethiopic. E.g.:
+
+  234-26-123-1-134-2345-1 => ሰላምታ
+
 
 =back
 
@@ -375,14 +404,15 @@ None presently known.
 
 =head1 AUTHOR
 
-Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+Daniel Yacob, L<dyacob@cpan.org|mailto:dyacob@cpan.org>
 
 =head1 SEE ALSO
 
-L<Convert::Braille>    L<Convert::Braille::English>
+L<Convert::Braille> , L<Convert::Braille::English>
 
 Included with this package:
 
-  examples/demo.pl    examples/makeethiopic.pl
+  examples/demo.pl        examples/makeethiopic.pl
+  examples/ethiopic.pl    examples/english.pl
 
 =cut

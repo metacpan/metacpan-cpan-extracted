@@ -123,7 +123,7 @@ LyricFinder::Genius - Fetch song lyrics from genius.com.
 
 =head1 AUTHOR
 
-This module is Copyright (c) 2020 by
+This module is Copyright (c) 2020-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -209,7 +209,7 @@ sites from being "scraped" by programs, such as this.
 
 Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
-NOTE:  This value will be overridden if $founder->agent("agent") is 
+NOTE:  This value will be overridden if $finder->agent("agent") is 
 called!
 
 =item B<-cache> => I<"directory">, and B<-debug> => I<integer>.
@@ -239,7 +239,7 @@ Directory must be a valid directory, but may be specified as either a path
 with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
 or may not have a trailing "/" (ie. "/home/user/lyrics/").
 
-NOTE:  This value will be overridden if $founder->cache("directory") is 
+NOTE:  This value will be overridden if $finder->cache("directory") is 
 called!
 
 =item B<-debug> => I<number>
@@ -250,9 +250,9 @@ one level of debug verbosity.
 
 =back 
 
-=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
+=item [ I<$current-agent-string> = ] $finder->B<agent>( [ I<user-agent-string> ] )
 
-Set the desired user-agent (ie. browser name) to pass to genius.com.  
+Get / Set the desired user-agent (ie. browser name) to pass to genius.com.  
 Some sites are pickey about receiving a user-agent 
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
@@ -421,7 +421,7 @@ L<http://search.cpan.org/dist/LyricFinder-Genius/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020 Jim Turner.
+Copyright (c) 2020-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

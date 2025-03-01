@@ -86,4 +86,4 @@ my $m2 = DBIx::Migration->new(
 
 dies_ok { $m2->migrate } 'second migration section is broken';
 is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
-  'check tables: creation of dbix_migartion table was rolled back too!';
+  'check tables: creation of dbix_migration table was rolled back too!';

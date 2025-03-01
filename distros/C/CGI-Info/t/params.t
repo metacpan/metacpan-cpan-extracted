@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 200;
+use Test::Most tests => 201;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -17,8 +17,8 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = 'foo=bar';
 
 	my $i = new_ok('CGI::Info');
-	ok(!defined($i->warnings()));
-	ok($i->warnings_as_string() eq '');
+	ok(!defined($i->messages()));
+	ok($i->messages_as_string() eq '');
 	my %p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
@@ -459,13 +459,14 @@ EOF
 	$i = new_ok('CGI::Info');
 	dies_ok { %p = %{$i->params()} };	# Warns because logger isn't set
 	like($@, qr/Blocked directory traversal attack/);
-	diag(Data::Dumper->new([$i->warnings()])->Dump()) if($ENV{'TEST_VERBOSE'});
+	diag(Data::Dumper->new([$i->messages()])->Dump()) if($ENV{'TEST_VERBOSE'});
 	like(
-		$i->warnings()->[0]->{'warning'},
+		$i->messages()->[1]->{'message'},
 		qr/^Blocked directory traversal attack for 'file'/,
 		'Warning generated for disallowed parameter'
 	);
-	like($i->warnings_as_string(), qr/^Blocked directory traversal attack/, 'warnings_as_string works');
+	cmp_ok($i->messages()->[1]->{'level'}, 'eq', 'warn');
+	like($i->messages_as_string(), qr/Blocked directory traversal attack/, 'messages_as_string works');
 
 	@ARGV= ('file=/etc/passwd%00');
 	$i = new_ok('CGI::Info');

@@ -1,0 +1,360 @@
+<rsm:CrossIndustryInvoice xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
+  <rsm:ExchangedDocumentContext>
+    <ram:BusinessProcessSpecifiedDocumentContextParameter>
+      <ram:ID schemeID=""></ram:ID>
+    </ram:BusinessProcessSpecifiedDocumentContextParameter>
+    <ram:GuidelineSpecifiedDocumentContextParameter>
+      <ram:ID schemeID=""></ram:ID>
+    </ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID schemeID=""></ram:ID>
+    <ram:TypeCode></ram:TypeCode>
+    <ram:IssueDateTime>
+      <udt:DateTimeString format=""></udt:DateTimeString>
+    </ram:IssueDateTime>
+    <ram:IncludedNote>
+      <ram:Content></ram:Content>
+      <ram:SubjectCode></ram:SubjectCode>
+    </ram:IncludedNote>
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>
+    <ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:IncludedNote>
+          <ram:Content></ram:Content>
+          <ram:SubjectCode></ram:SubjectCode>
+        </ram:IncludedNote>
+      </ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+      </ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement>
+        <ram:GrossPriceProductTradePrice>
+          <ram:ChargeAmount currencyID=""></ram:ChargeAmount>
+          <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+          <ram:AppliedTradeAllowanceCharge>
+            <ram:ChargeIndicator>
+              <udt:Indicator></udt:Indicator>
+            </ram:ChargeIndicator>
+            <ram:CalculationPercent></ram:CalculationPercent>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:ActualAmount currencyID=""></ram:ActualAmount>
+            <ram:ReasonCode></ram:ReasonCode>
+            <ram:Reason></ram:Reason>
+            <ram:CategoryTradeTax>
+              <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+              <ram:TypeCode></ram:TypeCode>
+              <ram:ExemptionReason></ram:ExemptionReason>
+              <ram:BasisAmount currencyID=""></ram:BasisAmount>
+              <ram:CategoryCode></ram:CategoryCode>
+              <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+              <ram:DueDateTypeCode></ram:DueDateTypeCode>
+              <ram:RateApplicablePercent></ram:RateApplicablePercent>
+            </ram:CategoryTradeTax>
+          </ram:AppliedTradeAllowanceCharge>
+        </ram:GrossPriceProductTradePrice>
+        <ram:NetPriceProductTradePrice>
+          <ram:ChargeAmount currencyID=""></ram:ChargeAmount>
+          <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+          <ram:AppliedTradeAllowanceCharge>
+            <ram:ChargeIndicator>
+              <udt:Indicator></udt:Indicator>
+            </ram:ChargeIndicator>
+            <ram:CalculationPercent></ram:CalculationPercent>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:ActualAmount currencyID=""></ram:ActualAmount>
+            <ram:ReasonCode></ram:ReasonCode>
+            <ram:Reason></ram:Reason>
+            <ram:CategoryTradeTax>
+              <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+              <ram:TypeCode></ram:TypeCode>
+              <ram:ExemptionReason></ram:ExemptionReason>
+              <ram:BasisAmount currencyID=""></ram:BasisAmount>
+              <ram:CategoryCode></ram:CategoryCode>
+              <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+              <ram:DueDateTypeCode></ram:DueDateTypeCode>
+              <ram:RateApplicablePercent></ram:RateApplicablePercent>
+            </ram:CategoryTradeTax>
+          </ram:AppliedTradeAllowanceCharge>
+        </ram:NetPriceProductTradePrice>
+      </ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery>
+        <ram:BilledQuantity unitCode=""></ram:BilledQuantity>
+      </ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <ram:ApplicableTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:ApplicableTradeTax>
+        <ram:BillingSpecifiedPeriod>
+          <ram:StartDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:StartDateTime>
+          <ram:EndDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:EndDateTime>
+        </ram:BillingSpecifiedPeriod>
+        <ram:SpecifiedTradeAllowanceCharge>
+          <ram:ChargeIndicator>
+            <udt:Indicator></udt:Indicator>
+          </ram:ChargeIndicator>
+          <ram:CalculationPercent></ram:CalculationPercent>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:ActualAmount currencyID=""></ram:ActualAmount>
+          <ram:ReasonCode></ram:ReasonCode>
+          <ram:Reason></ram:Reason>
+          <ram:CategoryTradeTax>
+            <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:ExemptionReason></ram:ExemptionReason>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:CategoryCode></ram:CategoryCode>
+            <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+            <ram:DueDateTypeCode></ram:DueDateTypeCode>
+            <ram:RateApplicablePercent></ram:RateApplicablePercent>
+          </ram:CategoryTradeTax>
+        </ram:SpecifiedTradeAllowanceCharge>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation>
+          <ram:LineTotalAmount currencyID=""></ram:LineTotalAmount>
+        </ram:SpecifiedTradeSettlementLineMonetarySummation>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>
+    <ram:ApplicableHeaderTradeAgreement>
+      <ram:BuyerReference></ram:BuyerReference>
+      <ram:SellerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTradeParty>
+      <ram:BuyerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:BuyerTradeParty>
+      <ram:SellerTaxRepresentativeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTaxRepresentativeTradeParty>
+      <ram:BuyerOrderReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:BuyerOrderReferencedDocument>
+      <ram:ContractReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:ContractReferencedDocument>
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery>
+      <ram:ShipToTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:ShipToTradeParty>
+      <ram:ActualDeliverySupplyChainEvent>
+        <ram:OccurrenceDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:OccurrenceDateTime>
+      </ram:ActualDeliverySupplyChainEvent>
+      <ram:DespatchAdviceReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:DespatchAdviceReferencedDocument>
+    </ram:ApplicableHeaderTradeDelivery>
+    <ram:ApplicableHeaderTradeSettlement>
+      <ram:CreditorReferenceID schemeID=""></ram:CreditorReferenceID>
+      <ram:PaymentReference></ram:PaymentReference>
+      <ram:TaxCurrencyCode></ram:TaxCurrencyCode>
+      <ram:InvoiceCurrencyCode></ram:InvoiceCurrencyCode>
+      <ram:PayeeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:PayeeTradeParty>
+      <ram:SpecifiedTradeSettlementPaymentMeans>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:PayerPartyDebtorFinancialAccount>
+          <ram:IBANID schemeID=""></ram:IBANID>
+        </ram:PayerPartyDebtorFinancialAccount>
+        <ram:PayeePartyCreditorFinancialAccount>
+          <ram:IBANID schemeID=""></ram:IBANID>
+          <ram:ProprietaryID schemeID=""></ram:ProprietaryID>
+        </ram:PayeePartyCreditorFinancialAccount>
+      </ram:SpecifiedTradeSettlementPaymentMeans>
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:ExemptionReason></ram:ExemptionReason>
+        <ram:BasisAmount currencyID=""></ram:BasisAmount>
+        <ram:CategoryCode></ram:CategoryCode>
+        <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+        <ram:DueDateTypeCode></ram:DueDateTypeCode>
+        <ram:RateApplicablePercent></ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      <ram:BillingSpecifiedPeriod>
+        <ram:StartDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:StartDateTime>
+        <ram:EndDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:EndDateTime>
+      </ram:BillingSpecifiedPeriod>
+      <ram:SpecifiedTradeAllowanceCharge>
+        <ram:ChargeIndicator>
+          <udt:Indicator></udt:Indicator>
+        </ram:ChargeIndicator>
+        <ram:CalculationPercent></ram:CalculationPercent>
+        <ram:BasisAmount currencyID=""></ram:BasisAmount>
+        <ram:ActualAmount currencyID=""></ram:ActualAmount>
+        <ram:ReasonCode></ram:ReasonCode>
+        <ram:Reason></ram:Reason>
+        <ram:CategoryTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode></ram:ExemptionReasonCode>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:CategoryTradeTax>
+      </ram:SpecifiedTradeAllowanceCharge>
+      <ram:SpecifiedTradePaymentTerms>
+        <ram:Description></ram:Description>
+        <ram:DueDateDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:DueDateDateTime>
+        <ram:DirectDebitMandateID schemeID=""></ram:DirectDebitMandateID>
+      </ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount currencyID=""></ram:LineTotalAmount>
+        <ram:ChargeTotalAmount currencyID=""></ram:ChargeTotalAmount>
+        <ram:AllowanceTotalAmount currencyID=""></ram:AllowanceTotalAmount>
+        <ram:TaxBasisTotalAmount currencyID=""></ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID=""></ram:TaxTotalAmount>
+        <ram:GrandTotalAmount currencyID=""></ram:GrandTotalAmount>
+        <ram:TotalPrepaidAmount currencyID=""></ram:TotalPrepaidAmount>
+        <ram:DuePayableAmount currencyID=""></ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+      <ram:InvoiceReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:InvoiceReferencedDocument>
+      <ram:ReceivableSpecifiedTradeAccountingAccount>
+        <ram:ID schemeID=""></ram:ID>
+      </ram:ReceivableSpecifiedTradeAccountingAccount>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>

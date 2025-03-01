@@ -54,7 +54,7 @@ subtest 'dialect, via metaschema_uri' => sub {
     schema => $schema,
   );
 
-  cmp_deeply(
+  cmp_result(
     ($doc->errors)[0]->TO_JSON,
     {
       instanceLocation => '/components/schemas/Foo/blah',
@@ -76,7 +76,7 @@ subtest 'dialect, via metaschema_uri and jsonSchemaDialect too' => sub {
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     ($doc->errors)[0]->TO_JSON,
     {
       instanceLocation => '/components/schemas/Foo/blah',

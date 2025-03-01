@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.93
+Version 0.94
 
 # SYNOPSIS
 
@@ -39,8 +39,17 @@ Whilst you shouldn't rely on it alone to provide security to your website,
 it is another layer and every little helps.
 
     use CGI::Info;
-    my $info = CGI::Info->new();
-    # ...
+
+    my $info = CGI::Info->new(allow => { id => qr/^\d+$/ });
+    my $params = $info->params();
+
+    if($info->is_mobile()) {
+        print "Mobile view\n";
+    } else {
+        print "Desktop view\n";
+    }
+
+    my $id = $info->param('id');        # Validated against allow schema
 
 # SUBROUTINES/METHODS
 
@@ -56,7 +65,7 @@ Takes an optional parameter syslog, to log messages to
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings
+Takes optional parameter logger, an object which is used for warnings.
 
 Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
@@ -167,7 +176,7 @@ Allow is a reference to a hash list of CGI parameters that you will allow.
 The value for each entry is either a permitted value,
 a regular expression of permitted values for
 the key,
-or a hash of rules rather like `Params::Validate` but much more comprehensive.
+or a hash of [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) rules.
 
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
@@ -360,8 +369,6 @@ and return 1.
 
 Is the visitor a search engine?
 
-    use CGI::Info;
-
     if(CGI::Info->new()->is_search_engine()) {
         # display generic information about yourself
     } else {
@@ -423,21 +430,21 @@ Sets or returns the status of the object,
 200 for OK,
 otherwise an HTTP error code
 
-## warnings
+## messages
 
-Returns the warnings that the object has generated as a ref to an array of hashes.
+Returns the messages that the object has generated as a ref to an array of hashes.
 
-    my @warnings;
-    if(my $w = $info->warnings()) {
-        @warnings = map { $_->{'warning'} } @{$w};
+    my @messages;
+    if(my $w = $info->messages()) {
+        @messages = map { $_->{'message'} } @{$w};
     } else {
-        @warnings = ();
+        @messages = ();
     }
-    print STDERR join(';', @warnings), "\n";
+    print STDERR join(';', @messages), "\n";
 
-## warnings\_as\_string
+## messages\_as\_string
 
-Returns the warnings that the object has generated as a string.
+Returns the messages of that the object has generated as a string.
 
 ## set\_logger
 

@@ -35,6 +35,7 @@ README
 README.mkdn
 scripts/code-completion.pl
 scripts/describe-image.pl
+scripts/music-genre-json.pl
 t/00-load.t
 t/generate.request
 t/testdata/objectdetection.jpg

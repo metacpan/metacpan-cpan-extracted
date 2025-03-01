@@ -5,7 +5,8 @@ MANIFEST
 README.md
 CONTRIBUTING.md
 lib/Geo/Inverse.pm
-t/base.t
+t/000_load.t
+t/001_qgis_compare.t
 doc/inverse.for
 doc/Makefile
 perl-Geo-Inverse.spec

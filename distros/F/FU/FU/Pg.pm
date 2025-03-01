@@ -1,4 +1,4 @@
-package FU::Pg 0.1;
+package FU::Pg 0.2;
 use v5.36;
 use FU::XS;
 
@@ -12,6 +12,13 @@ package FU::Pg::conn {
         my $s = shift;
         my($sql, $params) = FU::SQL::SQL(@_)->compile(placeholder_style => 'pg', in_style => 'pg');
         $s->q($sql, @$params);
+    }
+
+    sub set_type($s, $n, @arg) {
+        Carp::confess("Invalid number of arguments") if @arg == 0 || (@arg > 1 && @arg % 2);
+        return $s->_set_type($n, $arg[0], $arg[0]) if @arg == 1;
+        my %arg = @arg;
+        $s->_set_type($n, $arg{send}, $arg{recv});
     }
 };
 
@@ -364,7 +371,9 @@ parameter in the given C<$sql> string. Example:
   # $oids = []
 
 This method can be called before the query has been executed, but will then
-trigger a prepare operation.
+trigger a prepare operation. An empty array is also returned if the query has
+already been executed without a separate preparation step; this happens if
+prepared statement caching is disabled and C<text_params> is enabled.
 
 =item $st->columns
 
@@ -548,9 +557,55 @@ send and receive everything as text!"
 Instead, in the (default) C<binary> mode, the responsibility of converting
 Postgres data to and from Perl values lies with this module. This allows for a
 lot of type-specific conveniences, but has the downside of requiring special
-code for each supported PostgreSQL type. Most of the Postgres core types are
-supported by this module and convert in an intuitive way, but here's a few
-type-specific notes:
+code for every PostgreSQL type. Most of the core types are supported by this
+module and convert in an intuitive way, but you can also configure each type
+manually:
+
+=over
+
+=item $conn->set_type($target_type, $type)
+
+=item $conn->set_type($target_type, send => $type, recv => $type)
+
+Change how C<$target_type> is being converted when used as a bind parameter
+(I<send>) or when received from query results (I<recv>). The two-argument
+version is equivalent to setting I<send> and I<recv> to the same C<$type>.
+
+Types can be specified either by their numeric I<Oid> or by name. In the latter
+case, the name must exactly match the internal type name used by PostgreSQL.
+Note that this "internal type name" does not always match the names used in
+documentation. For example, I<smallint>, I<integer> and I<bigint> should be
+specified as I<int2>, I<int4> and I<int8>, respectively, and the I<char> type
+is internally called I<bpchar>. The full list of recognized types in your
+database can be queried with:
+
+  SELECT oid, typname FROM pg_type;
+
+The C<$target_type> does not have to exist in the database when this method is
+called. This method only stores the type in its internal configuration, which
+is consulted when executing a query that takes the type as bind parameter or
+returns a column of that type.
+
+The following arguments are supported for C<$type>:
+
+=over
+
+=item * I<undef>, to reset the conversion functions to their default.
+
+=item * The numeric I<Oid> or name of a built-in type supported by this module,
+to use those conversion functions.
+
+=item * A subroutine reference that is called to perform the conversion.  For
+I<send>, the subroutine is given a Perl value as argument and expected to
+return a binary string to be sent to Postgres. For I<recv>, the subroutine is
+given a binary string received from Postgres and expected to return a Perl
+value.
+
+=back
+
+=back
+
+Some built-in types deserve a few additional notes:
 
 =over
 
@@ -564,23 +619,57 @@ supported. C<undef> always converts to SQL C<NULL>.
 =item bytea
 
 The C<bytea> type represents arbitrary binary data and this module will pass
-that along as raw binary strings.
+that along as raw binary strings. If you prefer to work with hex strings
+instead, use:
+
+  $conn->set_type(bytea => '$hex');
+
+The I<bytea> and the I<$hex> (pseudo-)types can be applied to any other type to
+convert between the PostgreSQL binary wire format and Perl strings. For
+example, if you prefer to receive integers as big-endian hex strings, you can
+do that:
+
+  $conn->set_type(int4 => recv => '$hex');
+
+Or to treat UUIDs as 16-byte strings:
+
+  $conn->set_type(uuid => 'bytea');
 
 =item timestamp / timestamptz
 
 These are converted to and from seconds since the Unix epoch as a floating
-point value, similar to the C<time()> (or better: C<Time::HiRes::time()>)
-functions.
+point value, for easy comparison against C<time()> and related functions.
 
 The timestamp types in Postgres have microsecond accuracy. Floating point can
 represent that without loss for dates that are near enough to the epoch (still
 seems to be fine in 2025, at least), but this conversion may be lossy for dates
 far beyond or before the epoch.
 
+Postgres internally represents timestamps as microseconds since 2000-01-01
+stored in a 64-bit integer. If you prefer that, use:
+
+  $conn->set_type(timestamptz => 'int8');
+
 =item date
 
-Converted between strings in C<YYYY-MM-DD> format. Postgres accepts a bunch of
-alternative date formats, this module does not.
+Converted between seconds since Unix epoch as an integer, with the time fixed
+at C<00:00:00 UTC>. When used as bind parameter, the time part is truncated.
+This format makes for easy comparison with other timestamps, but if you prefer
+to work with strings in the C<YYYY-MM-DD> format instead, use:
+
+  $conn->set_type(date => '$date_str');
+
+Postgres accepts a bunch of alternative date formats for bind paramaters, this
+module does not.
+
+=item time
+
+Converted between floating point seconds since C<00:00:00>, supporting
+microsecond precision. This format allows for easy comparison against Unix
+timestamps (time of day = C<$timestamp % 86400>) and can be added to an integer
+date value to form a complete timestamp.
+
+(There's no support for the string format yet)
 
 =item json / jsonb
 
@@ -590,6 +679,13 @@ L<FU::Util>.
 While C<null> is a valid JSON value, there's currently no way to distinguish
 that from SQL C<NULL>. When sending C<undef> as bind parameter, it is sent as
 SQL C<NULL>.
+
+If you prefer to work with JSON are raw text values instead, use:
+
+  $conn->set_type(json => 'text');
+
+That doesn't I<quite> work for the C<jsonb> type. I mean, it works, but then
+there's a single C<"\1"> byte prefixed to the string.
 
 =item arrays
 
@@ -601,7 +697,19 @@ and all arrays sent to Postgres will use their default 1-based indexing.
 
 =item records / row types
 
-These are converted to and from hashrefs.
+Typed records are converted to and from hashrefs. Untyped records (i.e. values
+of the C<record> pseudo-type) are not supported.
+
+=item domain types
+
+These are recognized and automatically converted to and from their underlying
+type. It may be tempting to use C<set_type()> to configure special type
+conversions for domain types, but beware that PostgreSQL reports columns in the
+C<SELECT> clause of a query as being of the I<underlying> type rather than the
+domain type, so the conversions will not apply in that case. They do seem to
+apply when the domain type is used as bind parameter, array element or record
+field. This is an (intentional) limitation of PostgreSQL, sadly not something I
+can work around.
 
 =item geometric types
 
@@ -611,11 +719,13 @@ These are converted to and from hashrefs.
 
 =item money
 
-=item time / timetz
+=item timetz
 
 =item bit / varbit
 
 =item tsvector / tsquery
+
+=item range / multirange
 
 =item Extension types
 
@@ -623,13 +733,14 @@ These are not supported at the moment. Not that they're hard to implement (I
 think), I simply haven't looked into them yet. Open a bug report if you need
 any of these.
 
+As a workaround, you can always switch back to the text format or use
+C<set_type()> to configure appropriate conversions for these types.
+
 =back
 
 I<TODO:> Methods to convert between the various formats.
 
 I<TODO:> Methods to query type info.
-
-I<TODO:> Custom per-type configuration.
 
 =head2 Errors
 

@@ -11,32 +11,36 @@ if ( $] > 5.007 ) {
 
 my $ascii = "HELLO";
 
-print "[0/6] Testing Braill-ASCII : \"$ascii\"\n";
+print "[0/6] Testing Braille-ASCII       : \"$ascii\"\n";
 
-my $unicode = brailleAsciiToUnicode ( $ascii );
-print "[1/6] brailleAsciiToUnicode:  $ascii => $unicode  (has length: ", length($unicode), ")\n";
+my $unicode = brailleAscii_To_Unicode ( $ascii );
+print "[1/6] brailleAscii_To_Unicode     :  $ascii => $unicode  (has length: ", length($unicode), ")\n";
 
-my $dots = brailleAsciiToDots ( $ascii );
-print "[2/6] brailleAsciiToDots   :  $ascii => $dots\n";
+my $dots = brailleAscii_To_DotNumbers ( $ascii );
+print "[2/6] brailleAscii_To_DotNumbers  :  $ascii => $dots\n";
 
-$ascii = brailleDotsToAscii ( $dots );
-print "[3/6] brailleDotsToAscii   :  $dots => $ascii\n";
+$ascii = brailleDotNumbers_To_Ascii ( $dots );
+print "[3/6] brailleDotNumbers_To_Ascii  :  $dots => $ascii\n";
 
-$unicode = brailleDotsToUnicode ( $dots );
-print "[4/6] brailleDotsToUnicode :  $dots => $unicode  (has length: ", length($unicode), ")\n";
+$unicode = brailleDotNumbers_To_Unicode ( $dots );
+print "[4/6] brailleDotNumbers_To_Unicode:  $dots => $unicode  (has length: ", length($unicode), ")\n";
 
-$dots = brailleUnicodeToDots ( $unicode );
-print "[5/6] brailleUnicodeToDots :  $unicode => $dots\n";
+$Convert::Braille::dot_separator ="-";
 
-$ascii = brailleUnicodeToAscii ( $unicode );
-print "[6/6] brailleUnicodeToAscii:  $unicode => $ascii\n";
+$dots = brailleUnicode_To_DotNumbers ( $unicode );
+print "[5/6] brailleUnicode_To_DotNumbers:  $unicode => $dots\n";
+
+$Convert::Braille::dot_separator = undef;
+
+$ascii = brailleUnicode_To_Ascii ( $unicode );
+print "[6/6] brailleUnicode_To_Ascii     :  $unicode => $ascii\n";
 
 
 __END__
 
 =head1 NAME
 
-demo.pl - Unicode, ASCII, Dots, Conversion Demonstration of Braille.
+demo.pl - Unicode, ASCII, DotNumbers, Conversion Demonstration of Braille.
 
 =head1 SYNOPSIS
 

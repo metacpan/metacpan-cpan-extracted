@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.083     2025-02-28 23:48:29Z
+          - fix Sereal serialization and deserialization hooks
+          - operation_uri is now resolved against the document uri and request
+            uri, just like error locations are
+
 0.082     2025-02-11 02:51:02Z
           - bump a prereq to work around a mysterious XS bug (RT#159140)
 

@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
-use feature qw( say switch );
 
 use Term::TermKey;
 
@@ -14,28 +13,28 @@ open my $rc, "<", $path or die "Cannot read $path - $!";
 my @ifs;
 while( <$rc> ) {
    chomp;
-   given($_) {
-      when( m/^#/ or m/^\s*$/ ) {
+   for($_) {
+      if( m/^#/ or m/^\s*$/ ) {
          # comment or blank
          say $_
       }
-      when( m/^\$if ([^=]+)=(.*)$/ ) {
+      elsif( m/^\$if ([^=]+)=(.*)$/ ) {
          print "  " x @ifs;
          say "\$if $1=$2";
 
          push @ifs, "$1=$2";
       }
-      when( m/^\$endif$/ ) {
+      elsif( m/^\$endif$/ ) {
          pop @ifs;
 
          print "  " x @ifs;
          say "\$endif";
       }
-      when( m/^set (\S+)\s+(.*)$/ ) {
+      elsif( m/^set (\S+)\s+(.*)$/ ) {
          print "  " x @ifs;
          say "set $1 $2";
       }
-      when( m/"(.*)": (.*)$/ ) {
+      elsif( m/"(.*)": (.*)$/ ) {
          my ( $bytes, $binding ) = ( $1, $2 );
 
          # TODO: This probably needs a lot more work
@@ -51,7 +50,7 @@ while( <$rc> ) {
 
          say ": $binding";
       }
-      default {
+      else {
          die "Not sure how to parse line $_\n";
       }
    }

@@ -20,5 +20,5 @@ if ( $EVAL_ERROR ) {
 my $rcfile = File::Spec->catfile( 't', 'perltidyrc' );
 run_tests(
     perltidyrc => $rcfile,
-    exclude    => [ qr{\.t$}, qr{^blib/}, ],
+    exclude    => [ qr{\.t$}, qr{^blib/}, qr{^Build.PL} ],
 );

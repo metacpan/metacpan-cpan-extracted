@@ -16,9 +16,11 @@ t/eof.t
 t/eol.t
 t/limiting.t
 t/mock.t
+t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t
 t/pod-synopsis.t
+t/pod.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

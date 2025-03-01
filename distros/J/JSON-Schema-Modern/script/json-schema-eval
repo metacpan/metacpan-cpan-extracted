@@ -128,7 +128,7 @@ if ($opt->dump_identifiers) {
   say $encoder->encode(\%identifiers);
 }
 
-exit($result ? 0 : $result->exception ? 2 : 1);
+exit($result->valid ? 0 : $result->exception ? 2 : 1);
 
 __END__
 
@@ -142,7 +142,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 

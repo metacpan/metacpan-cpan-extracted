@@ -4,11 +4,20 @@
 
 =head1 NAME
 
-Quiq::Tree - Operatonen auf Baumstrukturen
+Quiq::Tree - Operatonen auf Perl-Baumstrukturen
 
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=head1 DESCRIPTION
+
+Diese Klasse stellt Methoden zur Verfügung, um auf beliebigen
+baumartigen Perl-Datenstrukturen operieren zu können. D.h. der
+Baum wird als Datenstruktur aus Hashes und Arrays angesehen - ohne dass
+die Knoten einer bestimmten Klasse angehören müssen. Die Klasse
+besitzt daher ausschließlich Klassenmethoden. Der erste Parameter jeder
+Klassenmethode ist eine Referenz auf den Wurzelknoten des Baums.
 
 =cut
 
@@ -21,15 +30,16 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
+use Quiq::AnsiColor;
 use Scalar::Util ();
 
 # -----------------------------------------------------------------------------
 
 =head1 METHODS
 
-=head2 Methoden
+=head2 Klassenmethoden
 
 =head3 leafPaths() - Liste der Pfade
 
@@ -43,19 +53,26 @@ use Scalar::Util ();
 
 =item $ref
 
-Referenz auf hierarchische Datenstruktur
+Referenz auf den Baum
 
 =back
 
+=head4 Returns
+
+(Array) Liste der Pfade. Im Skalarkontext wird eine Referenz auf die
+Liste geliefert.
+
 =head4 Description
 
-Liefere die Liste der Pfade zu den Blattknoten der Datenstruktur $ref.
-Diese Liste kann nützlich sein, um die Zugriffspfade zu den Blättern
-einer hierarchischen Datenstruktur zu ermitteln.
+Liefere die Liste der Pfade zu den Blattknoten des Baums $ref.
+Diese Liste ist nützlich, um die Zugriffspfade zu den Blattknoten
+zu ermitteln.
 
 =cut
 
 # -----------------------------------------------------------------------------
+
+my $a = Quiq::AnsiColor->new(1);
 
 sub leafPaths {
     my ($class,$ref,$path) = @_;
@@ -65,7 +82,9 @@ sub leafPaths {
 
     my $type = Scalar::Util::reftype($ref);
     if (!defined $type) {
-        return $path;
+        $ref //= '';
+        $ref =~ s/\n/\\n/g;
+        return "$path ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
     }
     elsif ($type eq 'HASH') {
         for my $key (keys %$ref) {
@@ -75,7 +94,8 @@ sub leafPaths {
     elsif ($type eq 'ARRAY') {
         my $i = 0;
         for my $e (@$ref) {
-            push @paths,$class->leafPaths($ref->[$i],"$path.[$i]");
+            push @paths,$class->leafPaths($ref->[$i],$path? "$path.[$i]": "[$i]");
+            $i++;
         }
     }
     else {
@@ -112,17 +132,69 @@ Referenz auf hierarchische Datenstruktur
 Durchlaufe die Datenstruktur $ref rekursiv und entferne alle leeren
 Knoten.
 
+=over 2
+
+=item *
+
 Ein Blattknoten ist leer, wenn wenn sein Wert C<undef> ist.
 
-Ein Hashknoten ist leer, wenn der Hash kein Element enthält.
+=item *
+
+Ein Hashknoten ist leer, wenn er kein Element enthält.
+
+=item *
 
 Ein Arrayknoten ist leer, wenn er kein Element enthält.
+
+=back
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub removeEmptyNodes {
+    my ($class,$ref) = @_;
+
+    # Durchlaufe den Baum so lange immmer wieder rekursiv,
+    # bis keine Knoten mehr entfernt werden
+
+    my $n = 0;
+    do {
+        $n = $class->removeEmptyNodesRecursive($ref);
+    } while $n;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 removeEmptyNodesRecursive() - Entferne leere Knoten
+
+=head4 Synopsis
+
+  $class->removeEmptyNodesRecursive($ref);
+
+=head4 Arguments
+
+=over 4
+
+=item $ref
+
+Referenz auf Baum
+
+=back
+
+=head4 Description
+
+Interne Methode, die den Baum rekursiv durchläuft und die leeren Knoten
+entfernt. Es sind i.d.R. mehrere Durchläufe nötig, um I<alle> leeren
+Knoten zu entfernen, siehe $class->removeEmptyNodes().
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub removeEmptyNodesRecursive {
     my $class = shift;
     my $ref = $_[0];
 
@@ -139,7 +211,7 @@ sub removeEmptyNodes {
                 }
             }
             else {
-                $n += $class->removeEmptyNodes($ref->{$key});
+                $n += $class->removeEmptyNodesRecursive($ref->{$key});
             }
         }
         if (!keys %$ref) {
@@ -156,7 +228,7 @@ sub removeEmptyNodes {
                 }
             }
             else {
-                $n += $class->removeEmptyNodes($ref->[$i]);
+                $n += $class->removeEmptyNodesRecursive($ref->[$i]);
             }
         }
         if (!@$ref) {
@@ -204,8 +276,8 @@ die Subroutine $sub mit dem aktuellen Wert des Knotens auf und setze
 auf dem Knoten den gelieferten Wert.
 
 Ein Blattknoten des Baums ist dadurch gekennzeichner, dass er einen
-"einfachen" skalaren Wert besitzt, also auf keine Substruktur verweist
-(Hash- oder Array-Referenz).
+"einfachen" skalaren Wert besitzt, also auf keine Substruktur
+(Hash- oder Array-Referenz) verweist.
 
 =cut
 
@@ -248,54 +320,9 @@ sub setLeafValue {
 
 # -----------------------------------------------------------------------------
 
-=head3 substitutePlaceholders() - Ersetze Platzhalter
-
-=head4 Synopsis
-
-  $class->substitutePlaceholders($ref,@keyVal);
-
-=head4 Arguments
-
-=over 4
-
-=item $ref
-
-Referenz auf hierarchische Datenstruktur
-
-=item @kayVal
-
-Liste der Platzhalter und ihrer Werte
-
-=back
-
-=head4 Description
-
-Durchlaufe die Datenstruktur $ref rekursiv und ersetze auf den Blattknoten
-die Platzhalter durch ihre Werte.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub substitutePlaceholders {
-    my $class = shift;
-    my $ref = shift;
-    # @_: @keyVal
-
-    my %map = @_;
-    $class->setLeafValue($ref,sub {
-        my $val = shift;
-        return defined $val? $map{$val} // $val: undef;
-    });
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -303,7 +330,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

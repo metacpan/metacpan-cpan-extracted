@@ -29,11 +29,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 2.7
+Version 2.8
 
 =cut
 
-our $VERSION = '2.7';
+our $VERSION = '2.8';
 
 =head1 SYNOPSIS
 
@@ -134,9 +134,9 @@ sub parse_source {
     my $costs_re   = qr{ \( cost=(?<estimated_startup_cost>\d+\.\d+)\.\.(?<estimated_total_cost>\d+\.\d+) \s+ rows=(?<estimated_rows>\d+) \s+ width=(?<estimated_row_width>\d+) \) }xms;
     my $analyze_re = qr{ \(
                             (?:
-                                actual \s time=(?<actual_time_first>\d+\.\d+)\.\.(?<actual_time_last>\d+\.\d+) \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
+                                actual \s time=(?<actual_time_first>\d+\.\d+)\.\.(?<actual_time_last>\d+\.\d+) \s rows=(?<actual_rows>\d+(?:\.\d+)?) \s loops=(?<actual_loops>\d+)
                                 |
-                                actual \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
+                                actual \s rows=(?<actual_rows>\d+(?:\.\d+)?) \s loops=(?<actual_loops>\d+)
                                 |
                                 (?<never_executed> never \s+ executed )
                             )

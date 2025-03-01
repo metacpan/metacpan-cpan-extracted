@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.602';
+our $VERSION = '0.603';
 
 use 5.020;
 use Moo;
@@ -134,6 +134,8 @@ sub _eval_keyword_oneOf ($class, $data, $schema, $state) {
 sub _traverse_keyword_not { shift->traverse_subschema(@_) }
 
 sub _eval_keyword_not ($class, $data, $schema, $state) {
+  return !$schema->{not} || E($state, 'subschema is true') if is_type('boolean', $schema->{not});
+
   return 1 if not $class->eval($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not',
       short_circuit_suggested => 1, # errors do not propagate upward from this subschema
@@ -158,6 +160,10 @@ sub _eval_keyword_if ($class, $data, $schema, $state) {
     ? 'then' : 'else';
 
   return 1 if not exists $schema->{$keyword};
+
+  return $schema->{$keyword} || E({ %$state, keyword => $keyword }, 'subschema is false')
+    if is_type('boolean', $schema->{$keyword});
+
   return 1 if $class->eval($data, $schema->{$keyword},
     +{ %$state, schema_path => $state->{schema_path}.'/'.$keyword });
   return E({ %$state, keyword => $keyword }, 'subschema is not valid');
@@ -558,7 +564,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 DESCRIPTION
 

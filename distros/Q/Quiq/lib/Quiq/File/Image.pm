@@ -21,13 +21,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 use Quiq::Hash;
 use Encode ();
 use Quiq::Path;
 use Quiq::Image;
 use Quiq::Array;
+use Image::ExifTool ();
 use Image::Size ();
 
 # -----------------------------------------------------------------------------
@@ -71,6 +72,7 @@ sub new {
         extension => undef,
         width => undef,
         height => undef,
+        created => undef,
         type => undef,
         # Properties
         propertyH => Quiq::Hash->new->unlockKeys,
@@ -273,6 +275,32 @@ sub height {
 
 # -----------------------------------------------------------------------------
 
+=head3 created() - Aufnahmezeitpunkt
+
+=head4 Synopsis
+
+  $created = $img->created;
+
+=head4 Description
+
+Liefere den Aufnahmezeitpunkt des Bildes, z.B. '2024-11-11 22:22:06'.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub created {
+    my $self = shift;
+
+    return $self->memoize('created',sub {
+        my ($self,$key) = @_;
+        $self->analyzeFile;
+        return $self->get($key);
+    });
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 size() - Breite und Höhe
 
 =head4 Synopsis
@@ -432,6 +460,8 @@ Eigenschaften an die Attribute des Objektes zu.
 
 # -----------------------------------------------------------------------------
 
+our $xft = Image::ExifTool->new; # nur einmal instantiieren
+
 sub analyzeFile {
     my $self = shift;
 
@@ -439,6 +469,13 @@ sub analyzeFile {
         my ($width,$height) = Image::Size::imgsize($self->path);
         $self->set(width=>$width);
         $self->set(height=>$height);
+        my $h = $xft->ImageInfo($self->path);
+        my $created = $h->{'CreateDate'} || $h->{'DateTimeOriginal'} || '';
+        if ($created) {
+            my @arr = split /[^\d]+/,$created;
+            $created = sprintf '%04d-%02d-%02d %02d:%02d:%02d',@arr;
+        }
+        $self->set(created=>$created);
     }
 
     return;
@@ -448,7 +485,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -456,7 +493,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

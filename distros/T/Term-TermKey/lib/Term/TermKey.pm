@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2025 -- leonerd@leonerd.org.uk
 
-package Term::TermKey;
+package Term::TermKey 0.18;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.17';
 
 use Exporter 'import';
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
@@ -21,15 +19,17 @@ C<Term::TermKey> - perl wrapper around C<libtermkey>
 
 =head1 SYNOPSIS
 
- use Term::TermKey;
+=for highlighter language=perl
 
- my $tk = Term::TermKey->new( \*STDIN );
+   use Term::TermKey;
 
- print "Press any key\n";
+   my $tk = Term::TermKey->new( \*STDIN );
 
- $tk->waitkey( my $key );
+   print "Press any key\n";
 
- print "You pressed: " . $tk->format_key( $key, 0 );
+   $tk->waitkey( my $key );
+
+   print "You pressed: " . $tk->format_key( $key, 0 );
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ character (U+FFFD) if it is incomplete after this time.
 
 =head2 new
 
-   $tk = Term::TermKey->new( $fh, $flags )
+   $tk = Term::TermKey->new( $fh, $flags );
 
 Construct a new C<Term::TermKey> object that wraps the given term handle.
 C<$fh> should be either an IO handle reference, an integer referring to a
@@ -86,7 +86,7 @@ default of 0 if not supplied. See the C<FLAG_*> constants.
 
 =head2 new_abstract
 
-   $tk = Term::TermKey->new_abstract( $termtype, $flags )
+   $tk = Term::TermKey->new_abstract( $termtype, $flags );
 
 Construct a new abstract C<Term::TermKey> object not associated with a
 filehandle. Input may be fed to it using the C<push_bytes()> method
@@ -106,9 +106,9 @@ should be given in the C<$termtype> string.
 
 =head2 stop
 
-   $success = $tk->start
+   $success = $tk->start;
 
-   $success = $tk->stop
+   $success = $tk->stop;
 
 Start or stop IO interactions from the instance. Starting will send the
 terminal initialisation sequence and set up C<termios(5)> settings, stopping
@@ -122,7 +122,7 @@ Returns false if it fails; C<$!> will contain an error code.
 
 =head2 is_started
 
-   $started = $tk->is_started
+   $started = $tk->is_started;
 
 Returns true if the instance has been started, or false if it is stopped.
 
@@ -130,9 +130,9 @@ Returns true if the instance has been started, or false if it is stopped.
 
 =head2 set_flags
 
-   $flags = $tk->get_flags
+   $flags = $tk->get_flags;
 
-   $tk->set_flags( $newflags )
+   $tk->set_flags( $newflags );
 
 Accessor and mutator for the flags. One of the C<FLAG_UTF8> or C<FLAG_RAW>
 flags will be set, even if neither was present in the constructor, as in this
@@ -145,9 +145,9 @@ or not.
 
 =head2 set_canonflags
 
-   $canonflags = $tk->get_canonflags
+   $canonflags = $tk->get_canonflags;
 
-   $tk->set_canonflags( $newcanonflags )
+   $tk->set_canonflags( $newcanonflags );
 
 Accessor and mutator for the canonicalisation flags.
 
@@ -157,9 +157,9 @@ Accessor and mutator for the canonicalisation flags.
 
 =head2 set_waittime
 
-   $msec = $tk->get_waittime
+   $msec = $tk->get_waittime;
 
-   $tk->set_waittime( $msec )
+   $tk->set_waittime( $msec );
 
 Accessor and mutator for the maximum wait time in miliseconds. The underlying
 C<libtermkey> library will have specified a default value when the object was
@@ -169,7 +169,7 @@ constructed.
 
 =head2 get_buffer_remaining
 
-   $bytes = $tk->get_buffer_remaining
+   $bytes = $tk->get_buffer_remaining;
 
 Accessor returning the number of bytes of buffer space remaining in the
 buffer; the space in which C<push_bytes> can write.
@@ -178,9 +178,9 @@ buffer; the space in which C<push_bytes> can write.
 
 =head2 set_buffer_size
 
-   $bytes = $tk->get_buffer_size
+   $bytes = $tk->get_buffer_size;
 
-   $tk->set_buffer_size( $size )
+   $tk->set_buffer_size( $size );
 
 Accessor and mutator to for the total buffer size to store pending bytes. If
 the underlying C<termkey_set_buffer_size(3)> call fails, the
@@ -190,7 +190,7 @@ C<set_buffer_size> method will throw an exception.
 
 =head2 getkey
 
-   $res = $tk->getkey( $key )
+   $res = $tk->getkey( $key );
 
 Attempt to retrieve a single keypress event from the buffer, and put it in
 C<$key>. If successful, will return C<RES_KEY> to indicate that the C<$key>
@@ -210,7 +210,7 @@ descriptor. For a normal blocking read, see C<waitkey()>.
 
 =head2 getkey_force
 
-   $res = $tk->getkey_force( $key )
+   $res = $tk->getkey_force( $key );
 
 Similar to C<getkey()>, but will not return C<RES_AGAIN> if a partial match
 was found. Instead, it will force an interpretation of the bytes, even if this
@@ -226,7 +226,7 @@ descriptor. For a normal blocking read, see C<waitkey()>.
 
 =head2 waitkey
 
-   $res = $tk->waitkey( $key )
+   $res = $tk->waitkey( $key );
 
 Attempt to retrieve a single keypress event from the buffer, or block until
 one is available. If successful, will return C<RES_KEY> to indicate that the
@@ -241,7 +241,7 @@ initialised to contain a new key structure.
 
 =head2 advisereadable
 
-   $res = $tk->advisereadable
+   $res = $tk->advisereadable;
 
 Inform the underlying library that new input may be available on the
 underlying file descriptor and so it should call C<read()> to obtain it.
@@ -256,7 +256,7 @@ gracefully handles an C<EAGAIN> error from the underlying C<read()> syscall.
 
 =head2 push_bytes
 
-   $len = $tk->push_bytes( $bytes )
+   $len = $tk->push_bytes( $bytes );
 
 Feed more bytes into the input buffer. This is primarily useful for feeding
 input into filehandle-less instances, constructed by passing C<undef> or C<-1>
@@ -267,7 +267,7 @@ will be available to read as keypresses by the C<getkey> method.
 
 =head2 get_keyname
 
-   $str = $tk->get_keyname( $sym )
+   $str = $tk->get_keyname( $sym );
 
 Returns the name of a key sym, such as returned by
 C<< Term::TermKey::Key->sym() >>.
@@ -276,7 +276,7 @@ C<< Term::TermKey::Key->sym() >>.
 
 =head2 keyname2sym
 
-   $sym = $tk->keyname2sym( $keyname )
+   $sym = $tk->keyname2sym( $keyname );
 
 Look up the sym for a named key. The result of this method call can be
 compared directly against the value returned by
@@ -288,7 +288,7 @@ initialisation, and the result stored for easier comparisons during runtime.
 
 =head2 interpret_unknown_csi
 
-   ( $cmd, @args ) = $tk->interpret_unknown_csi( $key )
+   ( $cmd, @args ) = $tk->interpret_unknown_csi( $key );
 
 If C<$key> contains an unknown CSI event then its command and arguments are
 returned in a list. C<$cmd> will be a string of 1 to 3 characters long,
@@ -307,7 +307,7 @@ overwrite that buffer.
 
 =head2 format_key
 
-   $str = $tk->format_key( $key, $format )
+   $str = $tk->format_key( $key, $format );
 
 Return a string representation of the keypress event in C<$key>, following the
 flags given. See the descriptions of the flags, below, for more detail.
@@ -319,7 +319,7 @@ a hash. See EXAMPLES section for more detail.
 
 =head2 parse_key
 
-   $key = $tk->parse_key( $str, $format )
+   $key = $tk->parse_key( $str, $format );
 
 Return a keypress event by parsing the string representation in C<$str>,
 following the flags given. This method is an inverse of C<format_key>.
@@ -330,7 +330,7 @@ This may be useful for parsing entries from a configuration file or similar.
 
 =head2 parse_key_at_pos
 
-   $key = $tk->parse_key_at_pos( $str, $format )
+   $key = $tk->parse_key_at_pos( $str, $format );
 
 Return a keypress event by parsing the string representation in a region of
 C<$str>, following the flags given.
@@ -349,7 +349,7 @@ of a larger string.
 
 =head2 keycmp
 
-   $cmp = $tk->keycmp( $key1, $key2 )
+   $cmp = $tk->keycmp( $key1, $key2 );
 
 Compares the two given keypress events, returning a number less than, equal
 to, or greater than zero, depending on the ordering. Keys are ordered first by
@@ -358,7 +358,7 @@ finally by modifier bits.
 
 This may be useful in C<sort> expressions:
 
- my @sorted_keys = sort { $tk->keycmp( $a, $b ) } @keys;
+   my @sorted_keys = sort { $tk->keycmp( $a, $b ) } @keys;
 
 =cut
 
@@ -376,44 +376,44 @@ keys.
 
 =head2 type
 
-   $key->type
+   $key->type;
 
 The type of event. One of C<TYPE_UNICODE>, C<TYPE_FUNCTION>, C<TYPE_KEYSYM>,
 C<TYPE_MOUSE>, C<TYPE_POSITION>, C<TYPE_MODEREPORT>, C<TYPE_UNKNOWN_CSI>.
 
 =head2 type_is_...
 
-   $key->type_is_unicode
+   $key->type_is_unicode;
 
-   $key->type_is_function
+   $key->type_is_function;
 
-   $key->type_is_keysym
+   $key->type_is_keysym;
 
-   $key->type_is_mouse
+   $key->type_is_mouse;
 
-   $key->type_is_position
+   $key->type_is_position;
 
-   $key->type_is_modereport
+   $key->type_is_modereport;
 
-   $key->type_is_unknown_csi
+   $key->type_is_unknown_csi;
 
 Shortcuts which return a boolean.
 
 =head2 codepoint
 
-   $key->codepoint
+   $key->codepoint;
 
 The Unicode codepoint number for C<TYPE_UNICODE>, or 0 otherwise.
 
 =head2 number
 
-   $key->number
+   $key->number;
 
 The function key number for C<TYPE_FUNCTION>, or 0 otherwise.
 
 =head2 sym
 
-   $key->sym
+   $key->sym;
 
 The key symbol number for C<TYPE_KEYSYM>, or 0 otherwise. This can be passed
 to C<< Term::TermKey->get_keyname() >>, or compared to a result earlier
@@ -421,23 +421,23 @@ obtained from C<< Term::TermKey->keyname2sym() >>.
 
 =head2 modifiers
 
-   $key->modifiers
+   $key->modifiers;
 
 The modifier bitmask. Can be compared against the C<KEYMOD_*> constants.
 
 =head2 modifier_...
 
-   $key->modifier_shift
+   $key->modifier_shift;
 
-   $key->modifier_alt
+   $key->modifier_alt;
 
-   $key->modifier_ctrl
+   $key->modifier_ctrl;
 
 Shortcuts which return a boolean if the appropriate modifier is present.
 
 =head2 utf8
 
-   $key->utf8
+   $key->utf8;
 
 A string representation of the given Unicode codepoint. If the underlying
 C<termkey> library is in UTF-8 mode then this will be a UTF-8 string. If it is
@@ -447,9 +447,9 @@ in raw mode, then this will be a single raw byte.
 
 =head2 button
 
-   $key->mouseev
+   $key->mouseev;
 
-   $key->button
+   $key->button;
 
 The details of a mouse event for C<TYPE_MOUSE>, or C<undef> for other types of
 event.
@@ -458,22 +458,22 @@ event.
 
 =head2 col
 
-   $key->line
+   $key->line;
 
-   $key->col
+   $key->col;
 
 The details of a mouse or position event, or C<undef> for other types of
 event.
 
 =head2 termkey
 
-   $key->termkey
+   $key->termkey;
 
 Return the underlying C<Term::TermKey> object this key was retrieved from.
 
 =head2 format
 
-   $str = $key->format( $format )
+   $str = $key->format( $format );
 
 Returns a string representation of the keypress event, identically to calling
 C<format_key> on the underlying C<Term::TermKey> object.
@@ -699,16 +699,16 @@ close to the format the F<vim> editor uses.
 
 This program just prints every keypress until the user presses C<Ctrl-C>.
 
- use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_VIM );
- 
- my $tk = Term::TermKey->new(\*STDIN);
- 
- # ensure perl and libtermkey agree on Unicode handling
- binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
- 
- while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
-    print "Got key: ".$tk->format_key( $key, FORMAT_VIM )."\n";
- }
+   use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_VIM );
+
+   my $tk = Term::TermKey->new(\*STDIN);
+
+   # ensure perl and libtermkey agree on Unicode handling
+   binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+
+   while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
+      print "Got key: ".$tk->format_key( $key, FORMAT_VIM )."\n";
+   }
 
 =head2 Configuration of custom keypresses
 
@@ -718,97 +718,97 @@ can be used as a hash key to look up a "handler" routine for the key.
 The following implements a simple line input program, though obviously lacking
 many features in a true line editor like F<readline>.
 
- use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_LONGMOD );
- 
- my $tk = Term::TermKey->new(\*STDIN);
- 
- # ensure perl and libtermkey agree on Unicode handling
- binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+   use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_LONGMOD );
 
- my $line = "";
+   my $tk = Term::TermKey->new(\*STDIN);
 
- $| = 1;
+   # ensure perl and libtermkey agree on Unicode handling
+   binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
 
- my %key_handlers = (
-    "Enter"  => sub { 
-       print "\nThe line is: $line\n";
-       $line = "";
-    },
+   my $line = "";
 
-    "Backspace" => sub {
-       return unless length $line;
-       substr( $line, -1, 1 ) = "";
-       print "\cH \cH"; # erase it
-    },
+   $| = 1;
 
-    # other handlers ...
- );
- 
- while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
-    my $handler = $key_handlers{ $tk->format_key( $key, FORMAT_LONGMOD ) };
-    if( $handler ) {
-       $handler->( $key );
-    }
-    elsif( $key->type_is_unicode and !$key->modifiers ) {
-       my $char = $key->utf8;
+   my %key_handlers = (
+      "Enter"  => sub { 
+         print "\nThe line is: $line\n";
+         $line = "";
+      },
 
-       $line .= $char;
-       print $char;
-    }
- }
+      "Backspace" => sub {
+         return unless length $line;
+         substr( $line, -1, 1 ) = "";
+         print "\cH \cH"; # erase it
+      },
+
+      # other handlers ...
+   );
+
+   while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
+      my $handler = $key_handlers{ $tk->format_key( $key, FORMAT_LONGMOD ) };
+      if( $handler ) {
+         $handler->( $key );
+      }
+      elsif( $key->type_is_unicode and !$key->modifiers ) {
+         my $char = $key->utf8;
+
+         $line .= $char;
+         print $char;
+      }
+   }
 
 =head2 Asynchronous operation
 
 Because the C<getkey()> method performs no IO itself, it can be combined with
 the C<advisereadable()> method in an asynchronous program.
 
- use IO::Select;
- use Term::TermKey qw(
-    FLAG_UTF8 RES_KEY RES_AGAIN RES_EOF FORMAT_VIM
- );
- 
- my $select = IO::Select->new();
- 
- my $tk = Term::TermKey->new(\*STDIN);
- $select->add(\*STDIN);
- 
- # ensure perl and libtermkey agree on Unicode handling
- binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
- 
- sub on_key
- {
-    my ( $tk, $key ) = @_;
- 
-    print "You pressed " . $tk->format_key( $key, FORMAT_VIM ) . "\n";
- }
- 
- my $again = 0;
- 
- while(1) {
-    my $timeout = $again ? $tk->get_waittime/1000 : undef;
-    my @ready = $select->can_read($timeout);
- 
-    if( !@ready ) {
-       my $ret;
-       while( ( $ret = $tk->getkey_force( my $key ) ) == RES_KEY ) {
-          on_key( $tk, $key );
-       }
-    }
- 
-    while( my $fh = shift @ready ) {
-       if( $fh == \*STDIN ) {
-          $tk->advisereadable;
-          my $ret;
-          while( ( $ret = $tk->getkey( my $key ) ) == RES_KEY ) {
-             on_key( $tk, $key );
-          }
- 
-          $again = ( $ret == RES_AGAIN );
-          exit if $ret == RES_EOF;
-       }
-       # Deal with other filehandles here
-    }
- }
+   use IO::Select;
+   use Term::TermKey qw(
+      FLAG_UTF8 RES_KEY RES_AGAIN RES_EOF FORMAT_VIM
+   );
+
+   my $select = IO::Select->new();
+
+   my $tk = Term::TermKey->new(\*STDIN);
+   $select->add(\*STDIN);
+
+   # ensure perl and libtermkey agree on Unicode handling
+   binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+
+   sub on_key
+   {
+      my ( $tk, $key ) = @_;
+
+      print "You pressed " . $tk->format_key( $key, FORMAT_VIM ) . "\n";
+   }
+
+   my $again = 0;
+
+   while(1) {
+      my $timeout = $again ? $tk->get_waittime/1000 : undef;
+      my @ready = $select->can_read($timeout);
+
+      if( !@ready ) {
+         my $ret;
+         while( ( $ret = $tk->getkey_force( my $key ) ) == RES_KEY ) {
+            on_key( $tk, $key );
+         }
+      }
+
+      while( my $fh = shift @ready ) {
+         if( $fh == \*STDIN ) {
+            $tk->advisereadable;
+            my $ret;
+            while( ( $ret = $tk->getkey( my $key ) ) == RES_KEY ) {
+               on_key( $tk, $key );
+            }
+
+            $again = ( $ret == RES_AGAIN );
+            exit if $ret == RES_EOF;
+         }
+         # Deal with other filehandles here
+      }
+   }
 
 There may also be more appropriate modules on CPAN for particular event
 frameworks; see the C<SEE ALSO> section below.

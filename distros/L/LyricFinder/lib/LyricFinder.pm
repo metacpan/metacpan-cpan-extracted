@@ -34,7 +34,7 @@ use parent 'LyricFinder::_Class';
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-our $VERSION = '1.40';
+our $VERSION = '1.50';
 our $DEBUG = 0;  # If you want debug messages, set debug to a true value
 
 my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics ChartLyrics Genius Letras Lrclib Musixmatch));
@@ -168,48 +168,66 @@ sub fetch {
 	$self->_debug("LyricFinder::fetch($artist, $title, $fetcherspec)!");
 	$self->{'Tried'} = '';
 
-	$fetcherspec = 'random'  unless (defined($fetcherspec) && $fetcherspec);
+	$fetcherspec = 'random'  unless (defined $fetcherspec);
+	unless (ref $fetcherspec)
+	{
+		$fetcherspec = 'random'  unless ($fetcherspec =~ /\w/);
+		$fetcherspec = [split /\s*\,\s*/, $fetcherspec],
+	}
+	$fetcherspec = ['random']  unless ($#{$fetcherspec} >= 0);
+	if ($#{$fetcherspec} > 0) {
+		my $specstring = join('|',@{$fetcherspec});
+		if ($specstring =~ /\b(Cache|auto|all)\b/i) {
+			carp("s:'$1' can only be used by itself, not in a list!");
+			return;
+		}
+	}
 	$self->{'Source'} = 'none';
-	if ( $fetcherspec && !ref $fetcherspec && $fetcherspec !~ m'^auto$'i) {
-		# we've been given a specific fetcher to use:
-		if (grep /$fetcherspec/, @{$self->{'_FETCHERS'}}) {
-			push @tryfetchers, $fetcherspec;
-		} elsif ($fetcherspec =~ m'^random$'i) {
+
+	# we've got an arrayref of fetchers to use:
+	my %usedSources = ();  #avoid including any module name more than once in the list.
+	for my $fetcher (@{$fetcherspec}) {
+		if (grep /$fetcher/, @{$self->{'_FETCHERS'}}) {  #VALID FETCHER(S) SPECIFIED:
+			push @tryfetchers, $fetcher;
+			$usedSources{$fetcher} = 1;
+		} elsif ($fetcher =~ m'^random$'i) {  #"random" SPECIFIED (CONVERTS TO A RANDOM LIST OF FETCHERS:
 			my $random_fetcher;
-			my %usedSources = ();
 			my $usedcnt = 0;
-			while ($usedcnt <= $#{$self->{'_FETCHERS'}}) {
+			foreach my $t (@tryfetchers) {
+				$usedSources{$t} = 1;
+				++$usedcnt;
+			}
+			my $fetchersCnt = scalar(@{$self->{'_FETCHERS'}});
+			my $maxcnt = ($fetchersCnt - $#{$fetcherspec}) + $usedcnt;
+			$maxcnt -= ($fetchersCnt - $limit)  if (defined($limit) && $limit > 0 && $fetchersCnt > $limit);
+				
+			#NOTE:  usedcnt = # OF ITEMS (IF ANY) SPECIFIED LEFT OF "random"!
+			while (scalar(@tryfetchers) < $maxcnt) {
 				$random_fetcher = int(rand(scalar @{$self->{'_FETCHERS'}}));
-				unless ($usedSources{${$self->{'_FETCHERS'}}[$random_fetcher]}) {
+				unless ($usedSources{${$self->{'_FETCHERS'}}[$random_fetcher]}
+						|| grep(/${$self->{'_FETCHERS'}}[$random_fetcher]/, @{$fetcherspec})) {
 					push @tryfetchers, ${$self->{'_FETCHERS'}}[$random_fetcher];
 					$usedSources{${$self->{'_FETCHERS'}}[$random_fetcher]} = 1;
 					$usedcnt++;
 				}
 			}
-		} elsif ($fetcherspec =~ m'^Cache$'i && $haveit{'Cache'}) {
+		} elsif ($fetcher =~ m'^Cache$'i && $haveit{'Cache'}) {  #The Cache MODULE SPECIFIED:
 			@tryfetchers = ('Cache');
-		} elsif ($fetcherspec =~ m'^All$'i) {
-			push @tryfetchers, @{$self->{'_FETCHERS'}};
-		} else { 
-			carp($self->{'Error'} = "s:Source (module) $fetcherspec isn't installed or is invalid!");
-			return;
+			last;  #these values can only be used once (first) & by itself!
+		} elsif ($fetcher =~ m'^A(?:uto|ll)$'i) {  #"auto" or "all" SPECIFIED (SYNONYMS):
+			@tryfetchers = @{$self->{'_FETCHERS'}};
+			last;
+		} else {   #INVALID MODULE-NAME OR VALUE SPECIFIED, SKIP:
+			carp("e:$fetcher isn't a valid fetcher, ignoring");
 		}
-	} elsif (ref $fetcherspec eq 'ARRAY') {
-		# we've got an arrayref of fetchers to use:
-		for my $fetcher (@$fetcherspec) {
-			if (grep /$fetcher/, @{$self->{'_FETCHERS'}}) {
-				push @tryfetchers, $fetcher;
-			} else {
-				carp("e:$fetcher isn't a valid fetcher, ignoring");
-			}
-		}
-	} else {  #really shouldn't end up here (since default=random now), but leaving in for now.
-		# OK, try all available fetchers.
-		push @tryfetchers, @{$self->{'_FETCHERS'}};
 	}
-	$self->{'Order'} = join(',', @tryfetchers);
-	$#tryfetchers = $limit - 1  if (defined($limit) && $limit > 0 && $limit < scalar(@tryfetchers));
+	$#tryfetchers = $limit - 1  if (defined($limit) && $limit > 0 && $limit <= $#tryfetchers);
+	unless ($#tryfetchers >= 0)	{  #NO VALID MODULE NAMES S SPECIFIED (PUNT)!:
+		carp("s:No valid fetchers specified!")  ;
+		return;
+	}
 
+	$self->{'Order'} = join(',', @tryfetchers);
 	return $self->_fetch($artist, $title, \@tryfetchers);
 }   # end of sub fetch.
 
@@ -298,7 +316,7 @@ lyrics (.lrc) files already stored locally, called L<LyricFinder::Cache>.
 
 This module is derived from the (older) L<Lyrics::Fetcher> collection of 
 modules by (c) 2007-2020 David Precious, but currently supports 
-more lyric sites (6) and bundles all the supported site modules together here 
+more lyric sites (7) and bundles all the supported site modules together here 
 (simply install this one module).  We have reworked the "Cache" module to 
 cache lyrics files by artist and song title on disk in the user's desired 
 location.  LyricFinder is also truly object-oriented making interaction with 
@@ -397,7 +415,7 @@ as this.
 
 Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
-NOTE:  This value will be overridden if $founder->agent("agent") is 
+NOTE:  This value will be overridden if $finder->agent("agent") is 
 called!  NOTE:  See below how to specify a different agent for a specific 
 site module.
 
@@ -428,7 +446,7 @@ Directory must be a valid directory, but may be specified as either a path
 with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
 or may not have a trailing "/" (ie. "/home/user/lyrics/").
 
-NOTE:  This value will be overridden if $founder->cache("directory") is 
+NOTE:  This value will be overridden if $finder->cache("directory") is 
 called!  NOTE:  See below how to specify a different agent for a specific 
 site module.
 
@@ -474,14 +492,33 @@ NOTE:  The "-cache" (cache-directory) option is needed by the main LyricFinder
 module and the site submodules in order to use the caching feature, so passing 
 "-Cache => {-cache => I<directory>}" will NOT work (the way one might assume)!
 
+=item B<-synced> => I<"YES"> | I<"NO"> | I<"OK"> | I<"ONLY">
+
+Some sites can return either timestamp-synced ("synced") lyrics or a plain-text 
+version.  "YES" specifies:  First try synced, if none, then try plain-text.  
+"NO" specifies:  only try to return the plain-text vsn.  "ONLY" specifies:  
+only try to return the synced version, and "OK" specifies:  First try the 
+plain-text vsn. if none, then try the synced vsn..  Currently, only the 
+LyricFinder::Lrclab module supports returning timestamp-synced lyrics.  Other 
+modules currently ignore this option.
+
+Default I<""> (false), which is treated same as "NO" (plain-text only, 
+if available, otherwise no lyrics returned).
+
+Currently, the only known site offering "synced" lyrics is 
+LyricFinder::Lrclib, but will serve up "plain-text" lyrics, by default, as the 
+default is "NO" if this option false or not specified 
+(Except is I<-synced> => I<"ONLY"> is specified, in which either timestamped 
+lyrics or no lyrics will be returned).
+
 =back 
 
-=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
+=item [ I<$current-agent-string> = ] $finder->B<agent>( [ I<user-agent-string> ] )
 
-Set the desired user-agent (ie. browser name) to pass to the lyrics sites.  
-Some sites are pickey about receiving a user-agent 
-string that corresponds to a valid / supported web-browser to prevent their 
-sites from being "scraped" by programs, such as this.  
+Get / Set the desired user-agent (ie. browser name) to pass to the lyrics sites.  
+Some sites are pickey about receiving a user-agent string that corresponds to 
+a valid / supported web-browser to prevent their sites from being "scraped" by 
+programs, such as this.  
 
 Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">
 
@@ -535,35 +572,58 @@ the site with posting the lyrics on the site (if any) or an empty
 string, if none found.  NOTE:  The only site that supports this currently 
 is B<AZLyrics>.
 
-=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title> [, I<$source> | I<\@sources> [, I<$limit>]])
+=item I<$string> = $finder->B<fetch>(I<$artist>, 
+I<$title> [, I<$source[. source2...]> | I<\@sources> [, I<$limit>]])
 
 Attempt to fetch the lyrics for the given artist and title.
-A single source site module can be specified as a string ($source) or multiple 
-source modules, ie. [module1, module2...], or "random" or "Cache".
-Default:  "random" (search all available sites in random order until lyrics 
-found or all available sites have been searched).  This is the primary 
-method call, and the only one required (besides B<new>()) to be called to 
-obtain lyrics.  $limit (if specified) is an integer number to limit the max. 
-number of fetchers to try (normally used with $source = "random") to limit 
-the time needed to search for lyrics (before giving up).  If not specified, 
-zero, or higher than the number of installed fetchers, then all available 
-(installed) fetcher submodules (sites) will be tried (until one succefully 
-finds lyrics).
+One or more source site module names can be specified as either a comma-
+separated string or in an array-reference, [module1, module2...], or "Cache" 
+(the Cache module), "All" or "Auto" specified alone.  The value "random" may 
+appear either alone or in a list (string or array-reference), which will 
+cause any module(s) listed before it to be searched first, any after it to 
+be searched last, and all the other ones available (but not in any I<-omit> 
+list (see further above) to be searched in between (assuming lyrics are not 
+found in any modules listed preceeding it).  "ALL" or "Auto" (synanyms) are 
+equivalent to the full list of modules in their fixed, alphabetical order.
 
-"Cache" is a special value that limits searching to a specified lyrics 
+Default:  I<"random"> (search all available sites in random order until lyrics 
+are found or all available sites have been searched).  
+
+B<fetch()>() is the primary method call, and the only one required 
+(besides B<new>()) to be called to obtain lyrics.  $limit (if specified) is an 
+integer number to limit the max. number of fetchers to try (normally used with 
+$source = "random") to limit the time needed to search for lyrics 
+(before giving up).  If not specified, zero, or higher than the number of 
+installed fetcher modules, then all available (installed) fetcher submodules 
+(sites) will be tried (until one succefully finds lyrics).
+
+"Cache" is a special module that limits searching to a specified lyrics 
 directory on one's local hard drive.  NOTE:  It should NOT be included in 
 a list, but used by itself.  If a lyrics directory is specified, Cache will 
 automatically be searched first!
 
-If an array reference (a list) of modules are provided, they will be searched 
-in the order they appear in the list.
+If a list of modules is provided, they will be searched in the order they 
+appear in the list.
 
 The currently-installed and supported modules are:  ApiLyricsOvh, AZLyrics, 
-ChartLyrics, Genius, Letras, and Musixmatch 
+ChartLyrics, Genius, Letras, Lrclib, and Musixmatch 
 (NOTE the "x" in the spelling of "Musixmatch")!
 
-Returns lyrics as a string (includes line-breaks appropriate for the user's 
-operating system), or an empty string, if no lyrics found.
+B<fetch()>() returns lyrics as a string (includes line-breaks appropriate for 
+the user's operating system), or an empty string, if no lyrics found.
+
+=item [ I<$lyrics-option-string> = ] $finder->B<fetch_synced_lyrics>( [ I<string> )
+
+Get / Set the desired synced-lyrics fetching option.  The valid string values 
+are / returned are:  I<"YES"> | I<"NO"> | I<"OK"> | I<"ONLY">.
+
+Some sites can return either timestamp-synced ("synced") lyrics or a plain-text 
+version.  "YES" specifies:  First try synced, if none, then try plain-text.  
+"NO" specifies:  only try to return the plain-text vsn.  "ONLY" specifies:  
+only try to return the synced version, and "OK" specifies:  First try the 
+plain-text vsn. if none, then try the synced vsn.  Currently, only the 
+LyricFinder::Lrclab module supports returning timestamp-synced lyrics.  Other 
+modules currently ignore this option.
 
 =item I<$scalar> = $finder->B<image_url>()
 

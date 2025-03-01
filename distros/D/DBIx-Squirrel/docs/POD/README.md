@@ -4,7 +4,7 @@ DBIx::Squirrel - The little Perl DBI extension that makes working with databases
 
 # VERSION
 
-Version 1.5.3
+Version 1.6.4
 
 # SYNOPSIS
 
@@ -640,7 +640,7 @@ Each stage of a transformation receives the latest version of the result via
 the argument-list (`$_[0]` to be precise). For the sake of convenience (and
 for convention), this result is also available as `$_`. If you prefer to
 rely on something like `$_`, but would like something much less ephemeral,
-just `use DBIx::Squirrel::Utils 'result'` and use the `result` function
+just `use DBIx::Squirrel::util 'result'` and use the `result` function
 inside your transformation stage.
 
 Handing off to the next stage, or the caller, is with an explicit `return`
@@ -870,16 +870,24 @@ the statement, as well as the statement handle:
     $sth = $dbh->prepare($statement)          or die $dbh->errstr;
     $sth = $dbh->prepare($statement, \%attr)  or die $dbh->errstr;
 
-The `prepare` method interface is identical in form to that provided by the
-`DBI`.
+The `prepare` method works just the same as it does in the `DBI`.
 
-`DBIx::Squirrel` permits the use of one of a number of valid placeholder
-styles (`:name`, `:number`, `$number`, `?number`, `?`) within the
-statement-string.
+The `$statement` argument must evauate to a string, and may be any of the
+following:
 
-Statement-strings will be "normalised" to use the legacy `?` style, before
-being handed-off to the `DBI` method of the same name. In spite of this,
-you should still use key-value bindings if you opted for named placeholders.
+- a simple string containing the SQL statement;
+- a reference to an array of simple strings that will be concantenated
+(separated by a space) to form a simple string containing the SQL
+statement;
+- a reference to a function returning a simple string or an array of simple
+strings that will be concantenated (separated by a space) to form a simple
+string containing the SQL statement;
+
+`DBIx::Squirrel` isn't too opinionated about the placeholder style used,
+and will accept `:name`, `:number`, `$number`, `?number` or `?`
+placeholders within the statement-string. You must use key-value bindings
+if you opted for named placeholders. All statements are normalised to use
+the legacy `?` style anyway.
 
 #### `prepare_cached` \*
 
@@ -887,18 +895,25 @@ you should still use key-value bindings if you opted for named placeholders.
     $sth = $dbh->prepare_cached($statement, \%attr)
     $sth = $dbh->prepare_cached($statement, \%attr, $if_active)
 
-The `prepare_cached` method interface is identical in form to that provided
-by the `DBI`.
+The `prepare` method works just the same as it does in the `DBI`.
 
-`DBIx::Squirrel` permits the use of one of a number of valid placeholder
-styles (`:name`, `:number`, `$number`, `?number`, `?`) within the
-statement-string.
+The `$statement` argument must evauate to a string, and may be any of the
+following:
 
-Statement-strings will be "normalised" to use the legacy `?` style, before
-being handed-off to the `DBI` method of the same name. In spite of this,
-you should still use key-value bindings if you opted for named placeholders.
+- a simple string containing the SQL statement;
+- a reference to an array of simple strings that will be concantenated
+(separated by a space) to form a simple string containing the SQL
+statement;
+- a reference to a function returning a simple string or an array of simple
+strings that will be concantenated (separated by a space) to form a simple
+string containing the SQL statement;
 
-It is the normalised form of the statement that is cached by the `DBI`.
+`DBIx::Squirrel` isn't too opinionated about the placeholder style used,
+and will accept `:name`, `:number`, `$number`, `?number` or `?`
+placeholders within the statement-string. You must use key-value bindings
+if you opted for named placeholders. All statements are normalised to use
+the legacy `?` style anyway, and it is this normalised statement that is
+cached by the `DBI`. 
 
 #### `results`
 
@@ -1060,8 +1075,8 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 #### `cache_size_slice`
 
@@ -1102,9 +1117,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 #### `count`
 
@@ -1287,7 +1302,7 @@ used to change the slicing strategy, a reference to the iterator is returned.
 
 The following package global defines the default setting:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
 
 #### `slice_buffer_size`
 
@@ -1332,9 +1347,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 #### `start`
 
@@ -1363,7 +1378,7 @@ Returns the iterator's underlying statement handle object.
 
 ### Iterator Exports
 
-The `DBIx::Squirrel::Iterator` package exports a number of subroutines that
+The `DBIx::Squirrel::it` package exports a number of subroutines that
 may be used within the stages of a transformation pipeline. These provide
 information about the current transformation context.
 
@@ -1442,7 +1457,7 @@ Returns a reference to the current iterator's statement handle object.
 
 # COPYRIGHT AND LICENSE
 
-The DBIx::Squirrel module is Copyright (c) 2020-2014 Iain Campbell.
+The DBIx::Squirrel module is Copyright (c) 2020-2025 Iain Campbell.
 All rights reserved.
 
 You may distribute under the terms of either the GNU General Public

@@ -2,6 +2,7 @@ use v5.36;
 use Test::More;
 no warnings 'experimental::builtin';
 use builtin qw/true false is_bool created_as_number/;
+use Config;
 
 plan skip_all => $@ if !eval { require FU::Pg; } && $@ =~ /Unable to load libpq/;
 die $@ if $@;
@@ -66,6 +67,13 @@ v bytea => 'hello', undef, '\x68656c6c6f';
 v bytea => "\xaf\x90", undef, '\xaf90';
 f bytea => "\x{1234}";
 
+$conn->set_type(bytea => '$hex');
+v bytea => '', undef, '\x';
+v bytea => '68656c6c6f', undef, '\x68656c6c6f';
+v bytea => "af90", undef, '\xaf90';
+f bytea => 'a';
+f bytea => 'a f';
+
 v '"char"' => $_ for (1, '1', 'a', 'A', '-');
 v '"char"' => "\x84", undef, '\204';
 f '"char"' => $_ for ('', 'ab', "\x{1234}");
@@ -115,6 +123,13 @@ v timestamptz => 1740133814.705915, undef, '2025-02-21 10:30:14.705915+00';
 v timestamp => 0, undef, '1970-01-01 00:00:00';
 v timestamp => 1740133814.705915, undef, '2025-02-21 10:30:14.705915';
 
+v date => 0, undef, '1970-01-01';
+v date => 915753600, undef, '1999-01-08';
+v date => 1740355200, undef, '2025-02-24';
+f date => '';
+f date => '1970-01-01';
+
+$conn->set_type(date => '$date_str');
 v date => '1970-01-01';
 v date => '1999-01-08';
 v date => '2025-02-24';
@@ -122,6 +137,13 @@ f date => '';
 f date => '2025-';
 f date => '2025-02-';
 f date => '1999-Jan-08';
+
+v time => 0, undef, '00:00:00';
+v time => 60.123456, undef, '00:01:00.123456';
+v time => 3600 * 13 + 43 * 60 + 19 + 0.987654, undef, '13:43:19.987654';
+f time => '';
+f time => -1;
+f time => 86400.1;
 
 v 'int[]', [], undef, '{}';
 v 'int[]', [1], undef, '{1}';

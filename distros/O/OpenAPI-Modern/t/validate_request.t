@@ -17,7 +17,8 @@ use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 use lib 't/lib';
 use Helper;
 
-my $doc_uri = Mojo::URL->new('http://example.com/api');
+my $doc_uri_rel = Mojo::URL->new('/api');
+my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 my $type_index = 0;
@@ -28,7 +29,7 @@ note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
 subtest $::TYPE.': missing or invalid arguments' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths: {}
 YAML
@@ -47,7 +48,7 @@ YAML
         {
           instanceLocation => '/request',
           keywordLocation => '',
-          absoluteKeywordLocation => '/api',
+          absoluteKeywordLocation => $doc_uri->to_string,
           error => 'Failed to parse request: unknown type Bespoke::Request',
         },
       ],
@@ -67,7 +68,7 @@ YAML
 
 subtest $::TYPE.': path lookup' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   pathItems:
@@ -245,7 +246,7 @@ YAML
 
 subtest $::TYPE.': validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -291,7 +292,7 @@ YAML
   );
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -322,7 +323,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -364,7 +365,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -413,7 +414,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}/bar/{bar_id}:
@@ -466,7 +467,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => do {
       $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
 paths:
@@ -495,7 +496,7 @@ YAML
 
 subtest $::TYPE.': validation errors in requests' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -510,7 +511,7 @@ YAML
   );
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -528,7 +529,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
         },
       ],
     },
@@ -537,7 +538,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -555,7 +556,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
         },
       ],
     },
@@ -564,7 +565,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -586,7 +587,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/foo/$ref')->to_string,
-          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
         },
       ],
     },
@@ -595,7 +596,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -626,7 +627,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -751,7 +752,7 @@ YAML
           instanceLocation => '/request/uri/query/delta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -769,7 +770,7 @@ YAML
           instanceLocation => '/request/uri/query/epsilon',
           keywordLocation => jsonp(qw(/paths /foo post parameters 5 content apPlicATion/jsON schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 5 content apPlicATion/jsON schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -788,7 +789,7 @@ YAML
           instanceLocation => '/request/uri/query/zeta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 6 content iMAgE/* schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 6 content iMAgE/* schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -818,7 +819,7 @@ YAML
           instanceLocation => '/request/uri/query/beta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -827,7 +828,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -899,7 +900,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -975,7 +976,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -993,7 +994,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo get requestBody $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
         },
       ],
     },
@@ -1002,7 +1003,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1144,7 +1145,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -1164,7 +1165,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -1185,7 +1186,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -1330,7 +1331,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1378,7 +1379,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1424,7 +1425,7 @@ YAML
 subtest $::TYPE.': document errors' => sub {
   my $request = request('GET', 'http://example.com/foo?alpha=1');
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -1458,7 +1459,7 @@ YAML
   );
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -1493,7 +1494,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1552,7 +1553,7 @@ YAML
 
 subtest $::TYPE.': type handling of values for evaluation' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -1652,7 +1653,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -1697,7 +1698,7 @@ YAML
   );
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -1751,7 +1752,7 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{path_plain}/bar/{path_encoded}:
@@ -1898,7 +1899,7 @@ YAML
 
 subtest $::TYPE.': parameter parsing' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -2065,13 +2066,13 @@ YAML
           instanceLocation => '/request/header/ArrayWithRefAndOtherKeywords',
           keywordLocation => jsonp(qw(/paths /foo get parameters 6 schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 6 schema not)))->to_string,
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
         {
           instanceLocation => '/request/header/ArrayWithBrokenRef',
           keywordLocation => jsonp(qw(/paths /foo get parameters 7 schema $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 7 schema $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "/api#/components/schemas/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/components/schemas/i_do_not_exist"',
         },
       ],
     },
@@ -2081,7 +2082,7 @@ YAML
 
 subtest $::TYPE.': max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15, validate_formats => 1),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
@@ -2117,7 +2118,7 @@ YAML
 
 subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
@@ -2159,7 +2160,7 @@ YAML
 
 subtest $::TYPE.': readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
@@ -2209,7 +2210,7 @@ YAML
 
 subtest $::TYPE.': no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
@@ -2276,7 +2277,7 @@ SKIP: {
 
 subtest $::TYPE.' custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
@@ -2333,6 +2334,52 @@ YAML
       ],
     },
     'custom error message when the entity is not permitted',
+  );
+};
+
+subtest $::TYPE.' multiple documents' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/{foo_id}:
+    get:
+      parameters:
+      - name: foo_id
+        in: path
+        required: true
+        schema:
+          minimum: 4
+          $ref: https://otherdoc.com#my_schema
+YAML
+
+  $openapi->evaluator->add_schema({
+    '$id' => 'https://otherdoc.com',
+    '$anchor' => 'my_schema',
+    minimum => 5,
+  });
+
+  cmp_result(
+    $openapi->validate_request(request('GET', 'http://mycorp.com/foo/1'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path/foo_id',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema $ref minimum)),
+          absoluteKeywordLocation => 'https://otherdoc.com#/minimum',
+          error => 'value is less than 5',
+        },
+        {
+          instanceLocation => '/request/uri/path/foo_id',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema minimum)),
+          absoluteKeywordLocation => Mojo::URL->new('http://mycorp.com/api')->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema minimum)))->to_string,
+          error => 'value is less than 4',
+        },
+      ],
+    },
+    'correct error location is used when $ref goes to another document',
   );
 };
 

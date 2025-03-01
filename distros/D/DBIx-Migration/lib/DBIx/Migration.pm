@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Moo;
 use MooX::SetOnce;
@@ -82,8 +82,8 @@ sub migrate {
   my $return_value = try {
     my $version = $self->version;
 
+    $self->{ _dbh } = $self->dbh->clone( { RaiseError => 1, PrintError => 0, AutoCommit => 1 } );
     # enable transaction turning AutoCommit off
-    $self->{ _dbh } = $self->dbh->clone( {} );
     $self->{ _dbh }->begin_work;
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
@@ -151,10 +151,11 @@ sub version {
   my $self = shift;
 
   my $dbh = $self->dbh;
-  eval {
+  local @{ $dbh }{ qw( RaiseError PrintError ) } = ( 1, 0 );
+  try {
     my $tracking_table = $self->tracking_table;
     $Logger->debugf( "Reading tracking table '%s'", $tracking_table );
-    my $sth = $dbh->prepare( <<"EOF");
+    my $sth = $dbh->prepare( <<"EOF" );
 SELECT value FROM $tracking_table WHERE name = ?;
 EOF
     $sth->execute( 'version' );
@@ -204,7 +205,7 @@ sub _create_tracking_table {
 
   my $tracking_table = $self->tracking_table;
   $Logger->debugf( "Creating tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF");
+  $self->{ _dbh }->do( <<"EOF" );
 CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
   $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );

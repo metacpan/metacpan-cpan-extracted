@@ -17,6 +17,10 @@ WriteMakefile(
         dynamic_config => 0,
         resources => {
             repository => 'https://code.blicky.net/yorhel/fu',
+            bugtracker => 'https://code.blicky.net/yorhel/fu/issues',
+        },
+        no_index => {
+            file => 'bench.PL',
         },
     },
     depend => { '$(OBJECT)', 'c/*.c' },

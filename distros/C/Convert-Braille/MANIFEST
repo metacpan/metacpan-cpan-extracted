@@ -1,10 +1,18 @@
+Build.PL
 Changes
+Changes.md
+CONTRIBUTING.md
+LICENSE
 MANIFEST
-Makefile.PL
-README
+README.md
+SECURITY.md
 examples/demo.pl
+examples/english.pl
+examples/ethiopic.pl
 examples/makeethiopic.pl
 lib/Convert/Braille.pm
 lib/Convert/Braille/English.pm
 lib/Convert/Braille/Ethiopic.pm
 t/braille.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

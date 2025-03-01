@@ -120,7 +120,7 @@ subtest 'Allow Parameters Rules' => sub {
 		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ },
 		age => { type => 'integer', min => 0, max => 150 },
 		bio => { type => 'string', optional => 1 },
-		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
+		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ },	# Basic IPv4 validation
 	};
 
 	my $info = CGI::Info->new(allow => $allowed);

@@ -3,6 +3,7 @@ use Test::More;
 use FU::Util 'json_parse';
 no warnings 'experimental::builtin';
 use builtin 'is_bool', 'created_as_number';
+use Config;
 
 my @error = (
     '',
@@ -96,8 +97,8 @@ num ' -0 ', 0;
 num '-9223372036854775808';
 num '9223372036854775807';
 num '18446744073709551615';
-num '-9223372036854775809', -9.22337203685478e+18;
-num '18446744073709551616', 1.84467440737096e+19;
+num '-9223372036854775809', $Config{uselongdouble} ? -9.22337203685477581e+18 : -9.22337203685478e+18;
+num '18446744073709551616', $Config{uselongdouble} ? 1.84467440737095516e+19 : 1.84467440737096e+19;
 num '1.234';
 num '1e5', 100000;
 num '1e+5', 100000;

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.081-3-g0dbcb92
+package OpenAPI::Modern; # git description: v0.082-14-gc3d980e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 use 5.020;
 use utf8;
@@ -160,16 +160,16 @@ sub validate_request ($self, $request, $options = {}) {
 
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
 
-    # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
-    # contains a Transfer-Encoding header field.
+    # RFC9112 §6.2-2: "A sender MUST NOT send a Content-Length header field in any message that
+    # contains a Transfer-Encoding header field."
     ()= E({ %$state, data_path => '/request/header/Content-Length', },
         'Content-Length cannot appear together with Transfer-Encoding')
       if defined $request->headers->content_length and $request->content->is_chunked;
 
-    # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
-    # either a valid Content-Length header field or use the chunked transfer coding.
+    # RFC9112 §6.3-7: "A user agent that sends a request that contains a message body MUST send
+    # either a valid Content-Length header field or use the chunked transfer coding."
     ()= E({ %$state, data_path => '/request/header',
-        recommended_response => [ 411, 'Length Required' ] }, 'missing header: Content-Length')
+        recommended_response => [ 411 ] }, 'missing header: Content-Length')
       if $request->body_size and not $request->headers->content_length
         and not $request->content->is_chunked;
 
@@ -242,23 +242,23 @@ sub validate_response ($self, $response, $options = {}) {
 
     if ($response->headers->header('Transfer-Encoding')) {
       ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
-        'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)')
+        'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)"')
         if $response->is_info or $response->code == 204;
 
       # connect method is not supported in openapi 3.1.1, but this may be possible in the future
       ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
-        'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request')
+        'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request"')
         if $response->is_success and $method eq 'connect';
     }
 
-    # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
-    # contains a Transfer-Encoding header field.
+    # RFC9112 §6.2-2: "A sender MUST NOT send a Content-Length header field in any message that
+    # contains a Transfer-Encoding header field."
     ()= E({ %$state, data_path => '/response/header/Content-Length' },
         'Content-Length cannot appear together with Transfer-Encoding')
       if defined $response->headers->content_length and $response->content->is_chunked;
 
-    # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
-    # either a valid Content-Length header field or use the chunked transfer coding.
+    # RFC9112 §6.3-7: "A user agent that sends a request that contains a message body MUST send
+    # either a valid Content-Length header field or use the chunked transfer coding."
     ()= E({ %$state, data_path => '/response/header' }, 'missing header: Content-Length')
       if $response->body_size and not $response->headers->content_length
         and not $response->content->is_chunked;
@@ -335,7 +335,7 @@ sub find_path ($self, $options, $state = {}) {
 
     # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
     if (my $error = $options->{request}->error) {
-      return E({ %$state, data_path => '/request' }, 'Failed to parse request: %s', $error->{message});
+      return E({ %$state, data_path => '/request', recommended_response => [ 500 ] }, 'Failed to parse request: %s', $error->{message});
     }
   }
 
@@ -344,7 +344,8 @@ sub find_path ($self, $options, $state = {}) {
   # method from options
   if (exists $options->{method}) {
     $method = lc $options->{method};
-    return E({ %$state, data_path => '/request/method' }, 'wrong HTTP method "%s"', $options->{request}->method)
+    return E({ %$state, data_path => '/request/method', recommended_response => [ 500 ] },
+        'wrong HTTP method "%s"', $options->{request}->method)
       if $options->{request} and lc $options->{request}->method ne $method;
   }
   elsif ($options->{request}) {
@@ -356,7 +357,7 @@ sub find_path ($self, $options, $state = {}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
     my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
-    return E($state, 'unknown operation_id "%s"', $options->{operation_id})
+    return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
     my @bits = unjsonp($operation_path);
@@ -374,7 +375,7 @@ sub find_path ($self, $options, $state = {}) {
     else {
       # the path_template need not be provided, but if it is, the operation must be located at the
       # path-item directly underneath that /paths/<path_template>.
-      return E({ %$state, schema_path => $path_item_path },
+      return E({ %$state, schema_path => $path_item_path, recommended_response => [ 500 ] },
           'operation at operation_id does not match provided path_template')
         if exists $options->{path_template} and $options->{path_template} ne $path_template;
     }
@@ -391,7 +392,7 @@ sub find_path ($self, $options, $state = {}) {
   # TODO: support passing $options->{operation_uri}
 
   # by now we will have extracted method from request or operation_id
-  return E({ %$state, data_path => '', exception => 1 }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
+  return E({ %$state, data_path => '', exception => 1, recommended_response => [ 500 ] }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
     if not $options->{request}
       and not ($options->{path_template} and $method)
       and not $options->{operation_id};
@@ -413,7 +414,7 @@ sub find_path ($self, $options, $state = {}) {
     $options->{_path_item} = $self->openapi_document->get($path_item_path);
 
     # FIXME: this is not accurate if the operation lives in another document
-    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
+    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->to_abs($state->{effective_base_uri})->fragment($path_item_path.'/'.$method);
     return 1;
   }
 
@@ -445,7 +446,7 @@ sub find_path ($self, $options, $state = {}) {
     if (not $capture_values) {
       delete $options->{operation_id};
       return E({ %$state, data_path => '/request/uri/path',
-          schema_path => jsonp('/paths', $path_template, exists $options->{path_template} ? () : $method) }, 'provided %s does not match request URI',
+          schema_path => jsonp('/paths', $path_template, exists $options->{path_template} ? () : $method), recommended_response => [ 500 ] }, 'provided %s does not match request URI',
         exists $options->{path_template} ? 'path_template' : 'operation_id');
     }
   }
@@ -465,22 +466,21 @@ sub find_path ($self, $options, $state = {}) {
 
   # this can only happen if we were not able to derive the path_template from the provided
   # operation_id earlier, but we still matched the request against some other path-item
-  return E($state, 'templated operation does not match provided operation_id')
+  return E({ %$state, recommended_response => [ 500 ] }, 'templated operation does not match provided operation_id')
     if $options->{operation_id} and ($path_item->{$method}{operationId}//'') ne $options->{operation_id};
 
-  return E({ %$state, data_path => '/request/method',
-      recommended_response => [ 405, 'Method Not Allowed' ] },
+  return E({ %$state, data_path => '/request/method', recommended_response => [ 405 ] },
       'missing operation for HTTP method "%s"', $method)
     if not exists $path_item->{$method};
 
   # FIXME: this is not accurate if the operation lives in another document
-  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
+  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->to_abs($state->{effective_base_uri})->fragment($path_item_path.'/'.$method);
   $options->{operation_id} = $path_item->{$method}{operationId} if exists $path_item->{$method}{operationId};
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
   my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
-  return E({ %$state, $options->{request} ? ( data_path => '/request/uri/path' ) : () }, 'provided path_captures names do not match path template "%s"', $path_template)
+  return E({ %$state, $options->{request} ? ( data_path => '/request/uri/path' ) : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $path_template)
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
 
@@ -489,7 +489,8 @@ sub find_path ($self, $options, $state = {}) {
   if (exists $options->{path_captures}) {
     # $equal_state will contain { path => '/0' } indicating the index of the mismatch
     if (not is_equal([ $options->{path_captures}->@{@capture_names} ], $capture_values, my $equal_state = { stringy_numbers => 1 })) {
-      return E({ %$state, data_path => '/request/uri/path' }, 'provided path_captures values do not match request URI (value for %s differs)', $capture_names[substr($equal_state->{path}, 1)]);
+      return E({ %$state, data_path => '/request/uri/path', recommended_response => [ 500 ]  },
+        'provided path_captures values do not match request URI (value for %s differs)', $capture_names[substr($equal_state->{path}, 1)]);
     }
   }
   else {
@@ -533,8 +534,8 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 sub _match_uri ($self, $uri, $path_template) {
   my $uri_path = $uri->path->to_string;
 
-  # RFC9112 §3.2.1-3: If the target URI's path component is empty, the client MUST send "/" as the
-  # path within the origin-form of request-target.
+  # RFC9112 §3.2.1-3: "If the target URI's path component is empty, the client MUST send "/" as the
+  # path within the origin-form of request-target."
   $uri_path = '/' if not length $uri_path;
 
   # §3.5: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
@@ -691,7 +692,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   my $media_type = (first { fc($content_type) eq fc } keys $content_obj->%*)
     // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
   $media_type //= '*/*' if exists $content_obj->{'*/*'};
-  return E({ %$state, keyword => 'content', recommended_response => [ 415, 'Unsupported Media Type' ] },
+  return E({ %$state, keyword => 'content', recommended_response => [ 415 ] },
       'incorrect Content-Type "%s"', $content_type)
     if not defined $media_type;
 
@@ -823,8 +824,13 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
 
   return 1 if !keys(%$schema);  # schema is {}
 
+  my $canonical_uri = canonical_uri($state);
+  croak 'schema_path does not match canonical uri path fragment'
+    if substr($canonical_uri->fragment, -length($state->{schema_path})) ne $state->{schema_path};
+
   my $result = $self->evaluator->evaluate(
-    $dataref->$*, canonical_uri($state),
+    $dataref->$*,
+    $canonical_uri,  # ensure the original document information is available to the evaluator
     {
       data_path => $state->{data_path},
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
@@ -904,13 +910,19 @@ sub _convert_response ($response) {
   return $res;
 }
 
+# callback hook for Sereal::Encoder
+sub FREEZE ($self, $serializer) { +{ %$self } }
+
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
+  my $self = bless($data, $class);
+
   foreach my $attr (qw(openapi_document evaluator)) {
     die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
-      if not exists $class->{$attr};
+      if not exists $self->{$attr};
   }
-  bless($data, $class);
+
+  return $self;
 }
 
 1;
@@ -927,7 +939,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.082
+version 0.083
 
 =head1 SYNOPSIS
 
@@ -1040,7 +1052,7 @@ your application. The JSON Schema evaluator is fully specification-compliant; th
 aims to be but some features are not yet available. My belief is that missing features are better
 than features that seem to work but actually cut corners for simplicity.
 
-=for Pod::Coverage BUILDARGS THAW
+=for Pod::Coverage BUILDARGS FREEZE THAW
 
 =for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId openapi Mojolicious
 
@@ -1078,7 +1090,9 @@ Ignored if L</openapi_document> is provided. Optional.
 
 =head2 openapi_uri
 
-The URI that identifies the OpenAPI document.
+The URI that identifies the OpenAPI document. This URI will be used to resolve relative URIs used in
+the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values, as well as used
+for locations in L<JSON::Schema::Modern::Result> objects (see below).
 
 =head2 openapi_schema
 
@@ -1101,7 +1115,7 @@ L</recursive_get>.
 
 =head2 evaluator
 
-The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema evaluation.
+The L<JSON::Schema::Modern> object to use for all URI retrieval and JSON Schema evaluation.
 
 =head2 validate_request
 
@@ -1181,7 +1195,7 @@ C<operation_id>: a string corresponding to the L<operationId|https://learn.opena
 
 =item *
 
-C<path_captures>: a hashref mapping placeholders in the path to their actual values in the request URI
+C<path_captures>: a hashref mapping placeholders in the path template to their actual values in the request URI
 
 =item *
 
@@ -1194,8 +1208,9 @@ request URI as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
 the request URI.
 
-When successful, the options hash will be populated with keys C<path_template>, C<path_captures>,
-C<method>, and C<operation_id>, and the return value is true.
+When successful, the options hash will be populated (or updated) with keys C<path_template>,
+C<path_captures>, C<method>, C<operation_id> and C<operation_uri> (see below), and the return value
+is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
 a L<JSON::Schema::Modern::Error> object, and the return value is false.
 

@@ -5,13 +5,13 @@ requires 'List::Util', '1.56';
 requires 'Hash::Util';
 requires 'Clipboard';
 requires 'File::Share';
-requires 'App::Greple', '9.15';
-requires 'App::Greple::msdoc', '1.05';
+requires 'App::Greple', '9.22';
+requires 'App::Greple::msdoc', '1.06';
 requires 'App::Greple::stripe';
 requires 'Getopt::EX::termcolor';
-requires 'App::optex::textconv', '1.04';
-requires 'App::sdif', '4.29';
-requires 'Text::ANSI::Fold', '2.2104';
+requires 'App::optex::textconv', '1.07';
+requires 'App::sdif', '4.41';
+requires 'Text::ANSI::Fold', '2.30';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
@@ -19,6 +19,6 @@ on 'test' => sub {
 
 on 'develop' => sub {
     recommends 'Pod::Markdown';
-    recommends 'App::Greple::xp', '0.04';
+    recommends 'App::Greple::xp', '1.00';
     recommends 'App::Greple::subst::desumasu';
 };

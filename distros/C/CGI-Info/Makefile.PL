@@ -54,11 +54,12 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'File::Spec' => 3.4,
+		'Params::Validate::Strict' => 0.02,
 		'Scalar::Util' => 0,
+		'Sys::Hostname' => 0,
 		'URI::Heuristic' => 0,
 		# 'Sub::Private' => 0,
-		'Sys::Hostname' => 0,
-		'File::Spec' => 3.4,
 		'Cwd' => 0,
 		'Socket' => 0,
 		'List::Util' => 1.33,

@@ -27,6 +27,7 @@ name: DBIx-Squirrel
 requires:
   Carp: '0'
   Compress::Bzip2: '0'
+  Const::Fast: '0'
   Crypt::CBC: '0'
   Crypt::Rijndael: '0'
   DBI: '0'
@@ -38,7 +39,6 @@ requires:
   Exporter: '0'
   JSON::Syck: '0'
   MIME::Base64::URLSafe: '0'
-  Memoize: '0'
   Scalar::Util: '0'
   Sub::Name: '0'
   Try::Tiny: '0'
@@ -46,10 +46,11 @@ requires:
   bytes: '0'
   constant: '0'
   namespace::clean: '0'
+  overload: '0'
   perl: 5.010_001
   strict: '0'
   warnings: '0'
-version: 1.5.3
+version: 1.6.4
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,4 +1,4 @@
-package FU 0.1;
+package FU 0.2;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -130,21 +130,27 @@ sub init_db($info) {
 }
 
 
-my @before_request;
-my @after_request;
-sub before_request :prototype(&) ($f) { push @before_request, $f }
-sub after_request :prototype(&) ($f) { unshift @after_request, $f }
+sub _caller_info {
+    my($i, @c, @x) = (1);
+    $x[0] !~ /^FU(?:$|::)/ && push @c, [ @x[0..3] ] while (@x = caller $i++);
+    \@c
+}
+
+our @before_request;
+our @after_request;
+sub before_request :prototype(&) ($f) { push @before_request, [ $f, _caller_info ] }
+sub after_request :prototype(&) ($f) { unshift @after_request, [ $f, _caller_info ] }
 
 
-my %path_routes;
-my %re_routes;
+our %path_routes;
+our %re_routes;
 
 sub _add_route($path, $sub, $method) {
     if (ref $path eq 'REGEXP' || ref $path eq 'Regexp') {
-        push $re_routes{$method}->@*, [ qr/^$path$/, $sub ];
+        push $re_routes{$method}->@*, [ qr/^$path$/, $sub, _caller_info ];
     } elsif (!ref $path) {
         confess("A route has already been registered for $method $path") if $path_routes{$method}{$path};
-        $path_routes{$method}{$path} = $sub;
+        $path_routes{$method}{$path} = [ $sub, _caller_info ];
     } else {
         confess('Path argument in route registration must be a string or regex');
     }
@@ -204,6 +210,12 @@ sub _monitor {
         }, $0, values %INC, @monitor_paths);
         0
     } // 1;
+}
+
+
+our $debug_info = [];
+sub debug_info($path, $storage=undef, $history=100) {
+    $debug_info = { path => $path, storage => $storage, history => $history }
 }
 
 
@@ -305,7 +317,7 @@ sub _log_err($e) {
 }
 
 sub _do_req($c) {
-    local $REQ = { hdr => {}, trace_start => time };
+    local $REQ = { hdr => {}, trace_start => time, trace_id => sprintf('%010x%08x%04x', int time, $$, int rand 1<<16) };
     local $fu = bless {}, 'FU::obj';
 
     $REQ->{ip} = $c->{client_sock} isa 'IO::Socket::INET' ? $c->{client_sock}->peerhost : '127.0.0.1';
@@ -315,29 +327,42 @@ sub _do_req($c) {
         _read_req $c;
         $REQ->{trace_start} = time;
 
-        for my $h (@before_request) { $h->() }
-
         my $path = fu->path;
         my $method = fu->method eq 'HEAD' ? 'GET' : fu->method;
+
+        # Intercept requests for debug_info, ensuring no website hooks get called.
+        if (debug && $method eq 'GET' && $debug_info->{path} && $path eq $debug_info->{path}) {
+            require FU::DebugImpl;
+            FU::DebugImpl::render();
+            fu->_flush($c->{fcgi_obj} || $c->{client_sock});
+            fu->error(-1);
+        }
+
+        for my $h (@before_request) { $h->[0]->() }
+
         my $r = $path_routes{$method}{$path};
-        if ($r) { $r->() }
-        else {
+        if ($r) {
+            $REQ->{trace_han} = [ $path, $r->[1] ];
+            $r->[0]->();
+        } else {
             for $r ($re_routes{ fu->method }->@*) {
                 if($path =~ $r->[0]) {
+                    $REQ->{trace_han} = [ $r->[0], $r->[2] ];
                     $r->[1]->(@{^CAPTURE});
                     fu->done;
                 }
             }
-            fu->error(404);
+            fu->notfound;
         }
         1;
     };
     return if !$ok && ref $@ eq 'FU::err' && $@->[0] == -1;
+    $REQ->{trace_exn} = $ok ? undef : $@;
     my $err = $ok || _is_done($@) ? undef : $@;
     _log_err $err;
 
     for my $h (@after_request) {
-        $ok = eval { $h->(); 1 };
+        $ok = eval { $h->[0]->(); 1 };
         _log_err $@ if !$ok;
         $err = $@ if !$err && !$ok && !_is_done($@);
     }
@@ -361,7 +386,12 @@ sub _do_req($c) {
     $REQ->{trace_end} = time;
     fu->_flush($c->{fcgi_obj} || $c->{client_sock});
 
-    my $proc_ms = (time - $REQ->{trace_start}) * 1000;
+    if (debug && $REQ->{trace_id} && $debug_info->{history} && $debug_info->{storage}) {
+        require FU::DebugImpl;
+        FU::DebugImpl::save();
+    }
+
+    my $proc_ms = ($REQ->{trace_end} - $REQ->{trace_start}) * 1000;
     log_write(sprintf "%.0fms%s %s-%s %s-%d\n", $proc_ms,
         $REQ->{trace_nsql} ?
             sprintf ' (sql %.0f+%.0fms, %d/%d/%d)',
@@ -507,7 +537,7 @@ sub _spawn {
             $c{proc} = $1 if /^--proc=([0-9]+)$/;
             $c{monitor} = 1 if /^--monitor$/;
             $c{monitor} = 0 if /^--no-monitor$/;
-            $c{max_reqs} = $1 if /^--max-reqs=([0-9]+)$/;
+            $c{max_reqs} = $1 if /^--max-reqs=([0-9]+(?::[0-9]+)?)$/;
             debug 1 if /^--debug$/;
             debug 0 if /^--no-debug$/;
             $ENV{FU_LOG_FILE} = $1 if /^--log-file=(.+)$/;
@@ -553,6 +583,7 @@ sub _spawn {
         _supervisor \%c;
     } else {
         $c{supervisor_sock}->syswrite('r'.pack 'V', $$) if $c{supervisor_sock};
+        $c{max_reqs} = $1 >= $2 ? $1 : $1 + int rand $2-$1 if $c{max_reqs} =~ /^([0-9]+):([0-9]+)$/;
         _run_loop \%c;
     }
 }
@@ -638,11 +669,17 @@ sub formdata {
 
 # Response generation methods
 
-sub done { die bless [200,'Done'], 'FU::err' }
-sub error($,$code,$msg=$code) { die bless [$code,$msg], 'FU::err' }
+sub done { die bless [200,'Done',FU::_caller_info], 'FU::err' }
+sub error($,$code,$msg=$code) { die bless [$code,$msg,FU::_caller_info], 'FU::err' }
+sub denied { fu->error(403) }
+sub notfound { fu->error(404) }
 
 sub status($, $code) { $FU::REQ->{status} = $code }
-sub set_body($, $data) { $FU::REQ->{resbody} = $data }
+sub set_body($, $data) {
+    confess "Invalid undef body" if !defined $data;
+    confess "Invalid attempt to set body to $data" if ref $data;
+    $FU::REQ->{resbody} = $data;
+}
 
 sub reset {
     fu->status(200);
@@ -739,7 +776,6 @@ sub _error_page($, $code, $title, $msg) {
 
 sub _finalize {
     state $haszlib = eval { require Compress::Raw::Zlib; 1 };
-    state $haszstd = eval { require Compress::Zstd; 1 };
     my $r = $FU::REQ;
 
     if ($r->{status} == 204 || $r->{status} == 304) {
@@ -749,17 +785,13 @@ sub _finalize {
         $r->{resbody} = '';
 
     } else {
-        if (($haszlib || $haszstd) && length($r->{resbody}) > 256
+        if ($haszlib && length($r->{resbody}) > 256
                 && !defined $r->{reshdr}{'content-encoding'} && FU::compress_mimes->{$r->{reshdr}{'content-type'}}) {
 
             $r->{reshdr}{'vary'} = ($r->{reshdr}{'vary'} ? $r->{reshdr}{'vary'}.', ' : '').'accept-encoding'
                 if ($r->{reshdr}{'vary'}||'') !~ /accept-encoding/i;
 
-            if ($haszstd && ($r->{hdr}{'accept-encoding'}||'') =~ /zstd/) {
-                $r->{resbody} = Compress::Zstd::compress($r->{resbody});
-                $r->{reshdr}{'content-encoding'} = 'zstd';
-
-            } elsif ($haszlib && ($r->{hdr}{'accept-encoding'}||'') =~ /gzip/) {
+            if ($haszlib && ($r->{hdr}{'accept-encoding'}||'') =~ /gzip/) {
                 # Use lower-level API because the higher-level Compress::Zlib loads a whole bunch of other modules.
                 my $z = Compress::Raw::Zlib::Deflate->new(-WindowBits => Compress::Raw::Zlib::WANT_GZIP(), -Level => 3, -AppendOutput => 1);
                 $z->deflate($r->{resbody}, my $buf);
@@ -884,9 +916,6 @@ is). There are a few additional optional dependencies:
 =item * C<libpq.so> - required for L<FU::Pg>, dynamically loaded through
 C<dlopen()>.
 
-=item * L<Compress::Zstd> - to support transparent HTTP compression through
-Zstandard.
-
 =back
 
 
@@ -957,9 +986,29 @@ handling and performance tracing.
 Enable or disable debug mode. Returns the current mode when no argument is
 given.
 
-Debug mode currently only enables more verbose logging, but it may influence
-other features in the future as well. You're of course free to use the debug
-setting to enable or disable debugging features in your own code.
+Debug mode currently enables more verbose logging and the C<debug_info>
+interface below. It may influence other features in the future as well. You're
+of course free to use the debug setting to enable or disable debugging features
+in your own code.
+
+=item FU::debug_info($path, $storage, $history)
+
+Enable the built-in web interface for inspecting debug info. The interface is
+accessible from your browser at the given C<$path>, which is matched against
+C<< fu->path >>.
+
+When the optional C<$storage> argument is given and set to an existing
+directory, detailed request data is logged and stored in that directory, which
+is then made available through the web interface. The C<$history> argument sets
+the number of requests to keep, which defaults to 100.
+
+Request logging and the web interface are only available when C<FU::debug> mode
+is enabled.
+
+B<WARNING:> This interface exposes internal and potentially sensitive
+information. When this option is configured, make sure to B<ABSOLUTELY NEVER>
+enable debug mode in production! Or at least set an absolutely impossible to
+guess C<$path>.
 
 =item FU::log_slow_reqs($ms)
 
@@ -1090,7 +1139,7 @@ the following is a valid approach to handle user authentication:
   };
 
   FU::get '/registered-users-only', sub {
-      fu->error(403) if !fu->{user};
+      fu->denied if !fu->{user};
   };
 
 In addition to the request information and response generation methods
@@ -1219,6 +1268,14 @@ elsewhere, this ends up in running the appropriate C<FU::on_error> handler.
 
 C<$message> is optional and currently only used for logging.
 
+=item fu->denied
+
+Alias for C<< fu->error(403) >>.
+
+=item fu->notfound
+
+Alias for C<< fu->error(404) >>.
+
 =item fu->reset
 
 Reset the response to an empty state, basically undoing all effects of the
@@ -1278,7 +1335,7 @@ though.
 
 This method loads the entire file contents in memory and does not support range
 requests, so DO NOT use it to send large files. Actual web servers are much
-more efficient at sending static files.
+more efficient at serving static files.
 
 The content-type header is determined from the file extension in C<$path>,
 using the configured C<FU::mime_types>. As fallback, files that look like they
@@ -1395,12 +1452,19 @@ significant cost in performance - better not enable this in production.
 
 =item FU_MAX_REQS=n
 
+=item FU_MAX_REQS=min:max
+
 =item --max-reqs=n
 
+=item --max-reqs=min:max
+
 Worker processes can automatically restart after handling a number of requests.
-Set to 0 (the default) to disable this feature. This option can be useful when
-your worker processes keep accumulating memory over time. A little pruning now
-and then can never hurt.
+Set to 0 (the default) to disable this feature. When set as C<min:max>, the
+number of requests is randomized in the given range, which is useful to avoid
+restarting all worker processes around the same time.
+
+This option can be useful when your worker processes keep accumulating memory
+over time. A little pruning now and then can never hurt.
 
 =item FU_DEBUG=0/1
 
@@ -1424,7 +1488,7 @@ external process manager.
 
 =back
 
-When C<--monitor> or C<--max-reqs> are set or C<<--proc>> is larger than 1, FU
+When C<--monitor> or C<--max-reqs> are set or C<--proc> is larger than 1, FU
 starts a supervisor process to ensure the requested number of worker processes
 are running and that they are restarted when necessary. When FU has been loaded
 with the C<-spawn> flag, this supervisor process runs directly from the context

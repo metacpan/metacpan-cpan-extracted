@@ -1,12 +1,13 @@
 use DBIx::Squirrel database_entities => [qw/db get_artist_id_by_name/];
-use DBIx::Squirrel::Iterator qw/iterator result result_offset/;
+use DBIx::Squirrel::it qw/iterator result result_offset/;
 
 db do {
     DBIx::Squirrel->connect(
         "dbi:SQLite:dbname=./t/data/chinook.db",
         "",
         "",
-        {   PrintError     => !!0,
+        {
+            PrintError     => !!0,
             RaiseError     => !!1,
             sqlite_unicode => !!1,
         },
@@ -20,12 +21,13 @@ get_artist_id_by_name do {
             print "----\n";
             print "Name: ", $artist->Name, "\n";
             return $artist;
-        } => sub {print result_offset, " ", iterator, "\n"; result} => sub {$_->ArtistId}
+            } => sub { print result_offset, " ", iterator, "\n"; result } =>
+            sub { $_->ArtistId },
     );
 };
 
-foreach my $name ("AC/DC", "Aerosmith", "Darling West", "Rush") {
-    if (get_artist_id_by_name($name)->single) {
+foreach my $name ( "AC/DC", "Aerosmith", "Darling West", "Rush" ) {
+    if ( get_artist_id_by_name($name)->single ) {
         print "ArtistId: $_\n";
     }
 }

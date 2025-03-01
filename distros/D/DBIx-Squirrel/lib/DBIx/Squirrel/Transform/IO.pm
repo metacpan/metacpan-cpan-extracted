@@ -3,7 +3,7 @@ package    # hide from PAUSE
 
 use strict;
 use warnings;
-use DBIx::Squirrel::Iterator qw/result/;
+use DBIx::Squirrel::it qw/result/;
 
 BEGIN {
     require DBIx::Squirrel unless keys(%DBIx::Squirrel::);

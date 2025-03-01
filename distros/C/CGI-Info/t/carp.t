@@ -40,7 +40,8 @@ CARP: {
 			is($p{'foo'}, 'bar', 'foo=bar');
 			close $fin;
 
-			my @warnings = map { $_->{'warning'} } @{$i->warnings()};
+			# Get the warnings that the object has generated
+			my @warnings = grep defined, map { ($_->{'level'} eq 'warn') ? $_->{'message'} : undef } @{$i->messages()};
 			cmp_ok(join(';', @warnings), 'eq', 'POST failed: something else may have read STDIN', 'warnings()');
 		},
 		qr/^POST failed: something else may have read STDIN/

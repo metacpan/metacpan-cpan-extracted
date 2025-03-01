@@ -1,5 +1,5 @@
 Name:           perl-Geo-Inverse
-Version:        0.07
+Version:        0.08
 Release:        1%{?dist}
 Summary:        Calculate geographic distance from a lat & lon pair
 License:        MIT
@@ -18,7 +18,6 @@ Requires:       perl(Geo::Constants) >= 0.04
 Requires:       perl(Geo::Ellipsoids) >= 0.09
 Requires:       perl(Geo::Functions) >= 0.03
 Requires:       perl(Package::New)
-Requires:       perl(Test::Simple) >= 0.44
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

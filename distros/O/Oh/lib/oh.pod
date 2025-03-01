@@ -46,15 +46,11 @@ Launch a REPL:
 
 =head1 DESCRIPTION
 
-This is a lisp interpreter written in perl trying to get the best of both worlds:
+A lisp interpreter written in perl trying to get the best of both worlds:
 
 From perl it inherits the portability, unix scripting features and the whole CPAN.
 
 Fron lisp inherits lisp evaluation rules, s-expressions and macros.
-
-I always thought of lisp as a black box with no access to the external world and always thought that perl could be the perfect slave for lisp, being lisp the mind and perl the body.
-
-I think that the best way to blend both is to make an interpreter in perl or a transpiler to perl (or any other language where we want to steal features from).
 
 The main concern is to interoperate with perl as much as possible while having proper lisp evaluation rules.
 
@@ -62,11 +58,8 @@ The current implementation is in a prototype state and everything is subject to 
 
 However you are encouraged to test this interpreter and push it to its limits in order to give constructive feedback and help with its improvement and evolution.
 
-The language has the following operators, macros and functions:
 
-set, setq, get, let, lambda, defun, define, fun, macro, defmacro, +, if, when, unless, perl-fun, perl-defun, print, car, cdr, funcall, eval, load, eval-string, try, anon, sub, quote, unquote, quasiquote, flatten...
-
-It has more, but it's lacking a lot of things a proper language should have.
+=head1 FUNCTIONS, MACROS AND OPERATORS
 
 =head2 defun
 
@@ -379,6 +372,519 @@ is equivalent to:
 
 It is taken from perl qw// and serves as an autoquote mechanism.
 
+=head1 PREDICATES
+
+=head2 eq
+
+The eq operator checks for identity. Will return true if to objects are the same object, if two strings have the same characters and if two numbers are the same. It is just a binding for perl's eq operator
+
+ (eq 1 1) 
+
+returns true
+
+ (eq '(1 2 3) '(1 2 3))
+
+returns false because they are not the same object
+
+ (setq oh '(1 2 3))
+ (eq oh oh)
+
+returns true since it's the same object
+
+=head2 equal
+
+The equal operator does not check for identity if the objects are lists or hash tables. It will iterate on all elements and check whether they are equal or not.
+
+ (equal '(1 2 3) '(1 2 3))
+
+Returns true
+
+ (equal (hash oh 3) (hash oh 3))
+
+Returns true
+
+The equal operator does not have any safeguard for comparing circular references. It cannot compare them and it will not trigger an error. It will recurse forever until it blows the perl return stack, which will blow after your memory is exhausted.
+
+I could add a safeguard, but at the end you are not supposed to compare circular references and the only reason to add a check and trigger an error would be to warn you when you do that inadvertently. Perl will warn you that the function compare and compare_lists or compare_hashes went into deep recursion.
+
+=head2 =
+
+The = operator is for comparing numbers, it is equivalent to perl's == operator, with the difference that it accepts more than two elements.
+
+ (= 1 1 1)
+
+Returns true
+
+ (= 1 1 2)
+
+Returns false
+
+=head2 <
+
+The < operator works similar to = by accepting several arguments
+
+ (< 1 2 3)
+
+Returns true
+
+ (< 1 2 2)
+
+Returns false
+
+=head2 >
+
+The > operator works the same as <
+
+ (> 3 2 1)
+
+Returns true
+
+=head2 =< =>
+
+They check if the elements are greater or equal and less or equal
+
+ (<= 1 2 2)
+
+Returns true
+
+=head2 null
+
+The null function returns true if the value is 0, an empty string, nil and an empty list.
+
+ (null '())
+ (null 0)
+ (null ())
+ (null nil)
+ (null "")
+
+Returns true in all those cases
+
+=head2 defined
+
+The defined function returns true if the element is not nil.
+
+ (defined '())
+
+Returns true, since an empty list is not really nil.
+
+ (defined ())
+
+Returns false, since the interpreter returns nil when evaluating an empty list.
+
+ (defined "")
+ (defined 0)
+
+Returns true
+
+=head2 not
+
+Negates a value. If it's false (empty string, 0 or nil) it returns true, returns false otherwise
+
+ (not nil)
+ (not "")
+ (not 0)
+ (not)
+
+Returns true
+
+=head2 listp
+
+Returns true if the argument is a list:
+
+ (listp '(1 2 3))
+
+
+=head1 LIST OPERATORS
+
+=head2 car and cdr
+
+car returns the first element of a list:
+
+ (car '(1 2 3))
+
+Returns 1
+
+It is equivalent to:
+
+ (get '(1 2 3) 0)
+
+cdr returns the list without the first element:
+
+ (cdr '(1 2 3))
+
+Returns (2 3)
+
+car and cdr can be combined:
+
+ (caaar x)
+
+Is equivalent to:
+
+ (car (car (car x)))
+
+cdr can be combined the same way
+
+ (cdddr x)
+
+Is equivalent to:
+
+ (cdr (cdr (cdr x)))
+
+They can both be mixed:
+
+ (cadr x)
+
+Is equivalent to:
+
+ (car (cdr x))
+
+They can be combined in any way:
+
+ (caddar x)
+ (caddr x)
+ (cdadr x)
+
+It does not have limit of nesting:
+
+ (caaaaar '(((((oh))))))
+
+Returns 'oh
+
+=head2 remove
+
+Remove will expect an element and a list and will remove the elements that are the same as that element.
+
+ (remove nil `(1 2 ,nil 3 4 ,nil))
+
+Returns (1 2 3 4)
+
+It uses 'equal' to test for equality, so it can compare lists or hash tables.
+
+ (remove '(1 2 3) '(1 (1 2 3) (1 2) (1 2 3) 3))
+
+Returns (1 (1 2) 3)
+
+=head2 mapcar
+
+Expects a function and one or more lists.
+Iterates the lists and gives the current elements to the function, returns a list of the values returned by the function.
+
+ (mapcar (lambda (x) (+ 1 x)) '(1 2 3))
+
+Returns (2 3 4)
+
+If mapcar receives more than one list, the function should also receive more than one element, equivalent to the number of lists.
+
+ (mapcar (lambda (x y) (+ x y)) '(1 2 3) '(4 5 6))
+
+Returns (5 7 9)
+
+The first time mapcar iterates will take the first element of both lists, in this case the 1 from the first list and the 4 from the second, then it will give that to the lambda which will sum them, returning 5. Then it will take the second element of both lists and do the same, until it reaches the limit of the shorter list.
+
+The interpreter has a special syntax to return a function.
+If a symbol is prefixed with a '#' symbol, the interpreter will return the function with that name or nil if does not find it.
+
+ #list
+
+This returns the function named 'list'.
+
+It is equivalent to:
+
+ (find-function 'list)
+
+It is a shorthand to use it in functions like mapcar. 
+
+Note that in common lisp it's #'list instead and '#' is actually a read character.
+
+I'm yet deciding if I want to make '#' a read character. Currently this is just a special case in the interpreter and it might change in the future.
+
+As an example it can be used with mapcar like this:
+
+ (mapcar #list '(1 2 3) '(4 5 6) '(7 8 9))
+
+Returns ((1 4 7) (2 5 8) (3 6 9))
+
+=head2 remove-if
+
+The function remove-if is similar to remove, but instead of an element it takes a function to use as predicate.
+
+ (remove-if (lambda (x) (equal 0 x)) '(0 1 2 0 3))
+
+Returns (1 2 3)
+
+In this case it was equivalent to:
+
+ (remove 0 '(0 1 2 0 3))
+
+But it used a predicate instead.
+
+=head2 remove-if-not
+
+It removes element if the predicate returns false instead of true.
+
+ (remove-if-not (lambda (x) (equal 0 x)) '(0 1 2 0 3))
+
+Returns (0 0)
+
+This case is equivalent to:
+
+ (remove-if (lambda (x) (not (equal 0 x))) '(0 1 2 0 3))
+
+=head1 CONDITIONALS
+
+=head2 if
+
+The if operator expects code to work as a predicate and code to evaluate if the condition is true and optionally code to evaluate if the condition is false
+
+ (if 1
+  (print "it's true")
+  (print "it's false"))
+
+This would print "it's true" on the terminal since 1 was evaluated and returned a true value.
+
+ (if 0
+  (print "it's true")
+  (print "it's false"))
+
+This would print "it's false" since 0 is a false value.
+
+If we wanted to perform more actions than just one, we can use progn.
+
+ (if 1
+  (progn (print "it's true") (print "yeah, it's true"))
+  (print "it's false"))
+
+
+=head2 when
+
+The when expects code to evaluate as a predicate and the rest of code will be evauated if the predicate returned a true value.
+
+when has an implicit progn, 
+
+ (when 1 (print "it's true") (print "yeah, it's true"))
+
+when does not evaluate anything if the condition is not true.
+
+=head2 unless
+
+unless is the reverse of when. it will evaluate the condition if it's not true, and do nothing if it's true.
+
+ (unless 0 (print "it's false") (print "yeah, it's false"))
+
+This same code would be equivalent:
+
+ (when (not 0) (print "it's false") (print "yeah, it's false"))
+
+
+=head2 cond
+
+cond takes pairs of tests and code, it will evaluate the code of the test, and if it returns true it will evaluate the code.
+
+ (cond
+  ((equal 'oh 'oh) (print "oh is oh"))
+  ((< 1 2) (print "one is less than two")))
+
+In this case, even if the two tests return true: (equal 'oh 'oh) and (< 1 2), only the first one will get executed, which will be the code for: (print "oh is oh"), cond will stop execution once it finds a match.
+
+To evaluate code when any of the conditions match, we use t or :otherwise to set the code to evaluate when any condition returns true.
+
+ (cond
+  ((equal 'oh 'meh) (print "that will never be true"))
+  (:otherwise (print "this will get executed")))
+
+In this case the :otherwise clause will be executed because the other clause will fail.
+
+Instead of :otherwise we can use t
+
+ 
+ (cond
+  ((equal 'oh 'meh) (print "that will never be true"))
+  (t (print "this will get executed")))
+
+It is equivalent to the previous one.
+
+One thing to note is that t and :otherwise are not required to be the last clause as in common lisp. And that common lisp accepts 'otherwise' as a symbol as well as a keyword, while this interpreter only accepts :otherwise as a keyword.
+
+=head2 case
+
+case is similar to cond, but does not take a test as code to evaluate. Instead it only compares symbols.
+
+ (setq x 'oh)
+
+ (case x 
+  (oh (print "The value of x is oh"))
+  (t (print "the value of x is not oh")))
+
+It will fail with strings or other objects, but accepts nil which will only be executed if the value is undefined, it will not trigger if the value is the other false values like 0 or ""
+
+ (setq x nil)
+
+ (case x
+  (nil (print "the value of x is undefined"))
+  (:otherwise (print "the value of x is not undefined")))
+
+case can also accept more than one symbol for the same clause.
+
+ (case x 
+  ((oh meh) (print "the value of x is oh or meh")))
+
+
+=head1 LOOPS
+
+=head2 dotimes
+
+Expects a list with the first element as the name for the symbol that will retain the current number of the iteration starting from 0 and the number of times you want to iterate.
+
+ (dotimes (i 3)
+  (print i))
+
+Will print on the screen:
+
+0
+1
+2
+
+=head2 dolist
+
+Iterates on a list.
+
+Expects a list with the first element as the name of the symbol that will retain the current element of the list.
+
+ (dolist (i '(1 2 3))
+  (print i))
+
+Will print on the screen:
+
+1
+2
+3
+
+=head2 while
+
+Expects a condition and evaluates the code as long as the condition is true.
+
+ (while 1
+  (print "this loops forever"))
+
+=head2 until
+
+Expects a condition and evaluates the code as long as the condition is false
+
+ (while (not 1)
+  (print "this loops forever"))
+
+
+=head1 LIST OPERATORS
+
+=head2 push
+
+push takes a list as first argument and pushes the rest of arguments into that list.
+
+ (setq oh '(1))
+
+ (push oh 2 3 4)
+
+Now oh is (1 2 3 4)
+
+=head2 pop
+
+pop removes and returns the last element of a list.
+
+ (setq oh '(1 2 3))
+
+ (pop oh)
+
+Returns 3, now oh is (1 2)
+
+=head2 shift
+
+shift removes and returns the first element of a list.
+
+ (setq oh '(1 2 3))
+
+ (shift oh)
+
+Returns 1, now oh is (2 3)
+
+=head2 unshift
+
+unshift takes a list as first argument and pushes the rest of arguments into that list.
+
+ (setq oh '(4))
+
+ (unshift oh 1 2 3)
+
+Now oh is (1 2 3 4)
+
+=head2 splice
+
+splice removes and returns several elements from a list
+
+The first element is the list, the second the starting point and the third the number of elements to remove:
+
+ (setq oh '(1 2 3 4 5 6 7))
+
+ (splice oh 0 2)
+
+It removes and returns the two first elements (1 2)
+
+It can also accept a negative number as the start position, then it will remove that number of elements starting from the end.
+
+ (setq oh '(1 2 3 4 5 6 7))
+
+ (splice oh -3)
+
+Returns and removes (5 6 7)
+
+=head1 HASH OPERATORS
+
+=head2 remove-key
+
+remove-key deletes an entry from a hash
+
+ (setq oh (hash one 1 two 2 three 3))
+
+ (remove-key oh 'three)
+
+=head2 remove-keys
+
+remove-keys deletes several entries from a hash
+
+ (setq oh (hash one 1 two 2 three 3 four 4))
+
+ (remove-keys oh (qw one two three))
+
+=head2 set-keys
+
+set-keys sets several key value pairs in a hash
+
+ (setq oh (hash))
+
+ (set-keys oh 'one 1 'two 2 'three 3)
+
+
+
+=head1 PREDEFINED SYMBOLS
+
+=over 2
+
+=item aeth
+
+ The galactic emperor
+
+=item nil
+
+ undef
+
+=item t
+
+ 1
+
+=item version
+
+ 1.00
+
+=back
 
 =head1 TODO
 

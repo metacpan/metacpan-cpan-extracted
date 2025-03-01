@@ -1,0 +1,1625 @@
+<rsm:CrossIndustryInvoice xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
+  <rsm:ExchangedDocumentContext>
+    <ram:TestIndicator>
+      <udt:Indicator></udt:Indicator>
+    </ram:TestIndicator>
+    <ram:BusinessProcessSpecifiedDocumentContextParameter>
+      <ram:ID schemeID=""></ram:ID>
+    </ram:BusinessProcessSpecifiedDocumentContextParameter>
+    <ram:GuidelineSpecifiedDocumentContextParameter>
+      <ram:ID schemeID=""></ram:ID>
+    </ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID schemeID=""></ram:ID>
+    <ram:Name></ram:Name>
+    <ram:TypeCode></ram:TypeCode>
+    <ram:IssueDateTime>
+      <udt:DateTimeString format=""></udt:DateTimeString>
+    </ram:IssueDateTime>
+    <ram:CopyIndicator>
+      <udt:Indicator></udt:Indicator>
+    </ram:CopyIndicator>
+    <ram:LanguageID schemeID=""></ram:LanguageID>
+    <ram:IncludedNote>
+      <ram:ContentCode listID="" listVersionID=""></ram:ContentCode>
+      <ram:Content></ram:Content>
+      <ram:SubjectCode listID="" listVersionID=""></ram:SubjectCode>
+    </ram:IncludedNote>
+    <ram:EffectiveSpecifiedPeriod>
+      <ram:Description></ram:Description>
+      <ram:StartDateTime>
+        <udt:DateTimeString format=""></udt:DateTimeString>
+      </ram:StartDateTime>
+      <ram:EndDateTime>
+        <udt:DateTimeString format=""></udt:DateTimeString>
+      </ram:EndDateTime>
+      <ram:CompleteDateTime>
+        <udt:DateTimeString format=""></udt:DateTimeString>
+      </ram:CompleteDateTime>
+    </ram:EffectiveSpecifiedPeriod>
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>
+    <ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:ParentLineID schemeID=""></ram:ParentLineID>
+        <ram:LineStatusCode></ram:LineStatusCode>
+        <ram:LineStatusReasonCode listID="" listVersionID=""></ram:LineStatusReasonCode>
+        <ram:IncludedNote>
+          <ram:ContentCode listID="" listVersionID=""></ram:ContentCode>
+          <ram:Content></ram:Content>
+          <ram:SubjectCode listID="" listVersionID=""></ram:SubjectCode>
+        </ram:IncludedNote>
+      </ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:SellerAssignedID schemeID=""></ram:SellerAssignedID>
+        <ram:BuyerAssignedID schemeID=""></ram:BuyerAssignedID>
+        <ram:IndustryAssignedID schemeID=""></ram:IndustryAssignedID>
+        <ram:ModelID schemeID=""></ram:ModelID>
+        <ram:Name></ram:Name>
+        <ram:Description></ram:Description>
+        <ram:BatchID schemeID=""></ram:BatchID>
+        <ram:BrandName></ram:BrandName>
+        <ram:ModelName></ram:ModelName>
+        <ram:ApplicableProductCharacteristic>
+          <ram:TypeCode listID="" listVersionID=""></ram:TypeCode>
+          <ram:Description></ram:Description>
+          <ram:ValueMeasure unitCode=""></ram:ValueMeasure>
+          <ram:Value></ram:Value>
+        </ram:ApplicableProductCharacteristic>
+        <ram:DesignatedProductClassification>
+          <ram:ClassCode listID="" listVersionID=""></ram:ClassCode>
+          <ram:ClassName></ram:ClassName>
+        </ram:DesignatedProductClassification>
+        <ram:IndividualTradeProductInstance>
+          <ram:BatchID schemeID=""></ram:BatchID>
+          <ram:SupplierAssignedSerialID schemeID=""></ram:SupplierAssignedSerialID>
+        </ram:IndividualTradeProductInstance>
+        <ram:OriginTradeCountry>
+          <ram:ID></ram:ID>
+        </ram:OriginTradeCountry>
+        <ram:IncludedReferencedProduct>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:GlobalID schemeID=""></ram:GlobalID>
+          <ram:SellerAssignedID schemeID=""></ram:SellerAssignedID>
+          <ram:BuyerAssignedID schemeID=""></ram:BuyerAssignedID>
+          <ram:IndustryAssignedID schemeID=""></ram:IndustryAssignedID>
+          <ram:Name></ram:Name>
+          <ram:Description></ram:Description>
+          <ram:UnitQuantity unitCode=""></ram:UnitQuantity>
+        </ram:IncludedReferencedProduct>
+      </ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement>
+        <ram:SellerOrderReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:SellerOrderReferencedDocument>
+        <ram:BuyerOrderReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:BuyerOrderReferencedDocument>
+        <ram:QuotationReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:QuotationReferencedDocument>
+        <ram:ContractReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:ContractReferencedDocument>
+        <ram:AdditionalReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:AdditionalReferencedDocument>
+        <ram:GrossPriceProductTradePrice>
+          <ram:ChargeAmount currencyID=""></ram:ChargeAmount>
+          <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+          <ram:AppliedTradeAllowanceCharge>
+            <ram:ChargeIndicator>
+              <udt:Indicator></udt:Indicator>
+            </ram:ChargeIndicator>
+            <ram:SequenceNumeric></ram:SequenceNumeric>
+            <ram:CalculationPercent></ram:CalculationPercent>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+            <ram:ActualAmount currencyID=""></ram:ActualAmount>
+            <ram:ReasonCode></ram:ReasonCode>
+            <ram:Reason></ram:Reason>
+            <ram:CategoryTradeTax>
+              <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+              <ram:TypeCode></ram:TypeCode>
+              <ram:ExemptionReason></ram:ExemptionReason>
+              <ram:BasisAmount currencyID=""></ram:BasisAmount>
+              <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+              <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+              <ram:CategoryCode></ram:CategoryCode>
+              <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+              <ram:TaxPointDate>
+                <udt:DateString format=""></udt:DateString>
+              </ram:TaxPointDate>
+              <ram:DueDateTypeCode></ram:DueDateTypeCode>
+              <ram:RateApplicablePercent></ram:RateApplicablePercent>
+            </ram:CategoryTradeTax>
+          </ram:AppliedTradeAllowanceCharge>
+          <ram:IncludedTradeTax>
+            <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:ExemptionReason></ram:ExemptionReason>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+            <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+            <ram:CategoryCode></ram:CategoryCode>
+            <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+            <ram:TaxPointDate>
+              <udt:DateString format=""></udt:DateString>
+            </ram:TaxPointDate>
+            <ram:DueDateTypeCode></ram:DueDateTypeCode>
+            <ram:RateApplicablePercent></ram:RateApplicablePercent>
+          </ram:IncludedTradeTax>
+        </ram:GrossPriceProductTradePrice>
+        <ram:NetPriceProductTradePrice>
+          <ram:ChargeAmount currencyID=""></ram:ChargeAmount>
+          <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+          <ram:AppliedTradeAllowanceCharge>
+            <ram:ChargeIndicator>
+              <udt:Indicator></udt:Indicator>
+            </ram:ChargeIndicator>
+            <ram:SequenceNumeric></ram:SequenceNumeric>
+            <ram:CalculationPercent></ram:CalculationPercent>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+            <ram:ActualAmount currencyID=""></ram:ActualAmount>
+            <ram:ReasonCode></ram:ReasonCode>
+            <ram:Reason></ram:Reason>
+            <ram:CategoryTradeTax>
+              <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+              <ram:TypeCode></ram:TypeCode>
+              <ram:ExemptionReason></ram:ExemptionReason>
+              <ram:BasisAmount currencyID=""></ram:BasisAmount>
+              <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+              <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+              <ram:CategoryCode></ram:CategoryCode>
+              <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+              <ram:TaxPointDate>
+                <udt:DateString format=""></udt:DateString>
+              </ram:TaxPointDate>
+              <ram:DueDateTypeCode></ram:DueDateTypeCode>
+              <ram:RateApplicablePercent></ram:RateApplicablePercent>
+            </ram:CategoryTradeTax>
+          </ram:AppliedTradeAllowanceCharge>
+          <ram:IncludedTradeTax>
+            <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:ExemptionReason></ram:ExemptionReason>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+            <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+            <ram:CategoryCode></ram:CategoryCode>
+            <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+            <ram:TaxPointDate>
+              <udt:DateString format=""></udt:DateString>
+            </ram:TaxPointDate>
+            <ram:DueDateTypeCode></ram:DueDateTypeCode>
+            <ram:RateApplicablePercent></ram:RateApplicablePercent>
+          </ram:IncludedTradeTax>
+        </ram:NetPriceProductTradePrice>
+        <ram:UltimateCustomerOrderReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:UltimateCustomerOrderReferencedDocument>
+      </ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery>
+        <ram:BilledQuantity unitCode=""></ram:BilledQuantity>
+        <ram:ChargeFreeQuantity unitCode=""></ram:ChargeFreeQuantity>
+        <ram:PackageQuantity unitCode=""></ram:PackageQuantity>
+        <ram:ShipToTradeParty>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:GlobalID schemeID=""></ram:GlobalID>
+          <ram:Name></ram:Name>
+          <ram:RoleCode></ram:RoleCode>
+          <ram:Description></ram:Description>
+          <ram:SpecifiedLegalOrganization>
+            <ram:ID schemeID=""></ram:ID>
+            <ram:TradingBusinessName></ram:TradingBusinessName>
+            <ram:PostalTradeAddress>
+              <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+              <ram:LineOne></ram:LineOne>
+              <ram:LineTwo></ram:LineTwo>
+              <ram:LineThree></ram:LineThree>
+              <ram:CityName></ram:CityName>
+              <ram:CountryID></ram:CountryID>
+              <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+            </ram:PostalTradeAddress>
+          </ram:SpecifiedLegalOrganization>
+          <ram:DefinedTradeContact>
+            <ram:PersonName></ram:PersonName>
+            <ram:DepartmentName></ram:DepartmentName>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:TelephoneUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:TelephoneUniversalCommunication>
+            <ram:FaxUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:FaxUniversalCommunication>
+            <ram:EmailURIUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:EmailURIUniversalCommunication>
+          </ram:DefinedTradeContact>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+          <ram:URIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:URIUniversalCommunication>
+          <ram:SpecifiedTaxRegistration>
+            <ram:ID schemeID=""></ram:ID>
+          </ram:SpecifiedTaxRegistration>
+        </ram:ShipToTradeParty>
+        <ram:UltimateShipToTradeParty>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:GlobalID schemeID=""></ram:GlobalID>
+          <ram:Name></ram:Name>
+          <ram:RoleCode></ram:RoleCode>
+          <ram:Description></ram:Description>
+          <ram:SpecifiedLegalOrganization>
+            <ram:ID schemeID=""></ram:ID>
+            <ram:TradingBusinessName></ram:TradingBusinessName>
+            <ram:PostalTradeAddress>
+              <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+              <ram:LineOne></ram:LineOne>
+              <ram:LineTwo></ram:LineTwo>
+              <ram:LineThree></ram:LineThree>
+              <ram:CityName></ram:CityName>
+              <ram:CountryID></ram:CountryID>
+              <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+            </ram:PostalTradeAddress>
+          </ram:SpecifiedLegalOrganization>
+          <ram:DefinedTradeContact>
+            <ram:PersonName></ram:PersonName>
+            <ram:DepartmentName></ram:DepartmentName>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:TelephoneUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:TelephoneUniversalCommunication>
+            <ram:FaxUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:FaxUniversalCommunication>
+            <ram:EmailURIUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:EmailURIUniversalCommunication>
+          </ram:DefinedTradeContact>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+          <ram:URIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:URIUniversalCommunication>
+          <ram:SpecifiedTaxRegistration>
+            <ram:ID schemeID=""></ram:ID>
+          </ram:SpecifiedTaxRegistration>
+        </ram:UltimateShipToTradeParty>
+        <ram:ActualDeliverySupplyChainEvent>
+          <ram:OccurrenceDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:OccurrenceDateTime>
+        </ram:ActualDeliverySupplyChainEvent>
+        <ram:DespatchAdviceReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:DespatchAdviceReferencedDocument>
+        <ram:ReceivingAdviceReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:ReceivingAdviceReferencedDocument>
+        <ram:DeliveryNoteReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:DeliveryNoteReferencedDocument>
+      </ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <ram:ApplicableTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+          <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+          <ram:TaxPointDate>
+            <udt:DateString format=""></udt:DateString>
+          </ram:TaxPointDate>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:ApplicableTradeTax>
+        <ram:BillingSpecifiedPeriod>
+          <ram:Description></ram:Description>
+          <ram:StartDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:StartDateTime>
+          <ram:EndDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:EndDateTime>
+          <ram:CompleteDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:CompleteDateTime>
+        </ram:BillingSpecifiedPeriod>
+        <ram:SpecifiedTradeAllowanceCharge>
+          <ram:ChargeIndicator>
+            <udt:Indicator></udt:Indicator>
+          </ram:ChargeIndicator>
+          <ram:SequenceNumeric></ram:SequenceNumeric>
+          <ram:CalculationPercent></ram:CalculationPercent>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+          <ram:ActualAmount currencyID=""></ram:ActualAmount>
+          <ram:ReasonCode></ram:ReasonCode>
+          <ram:Reason></ram:Reason>
+          <ram:CategoryTradeTax>
+            <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:ExemptionReason></ram:ExemptionReason>
+            <ram:BasisAmount currencyID=""></ram:BasisAmount>
+            <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+            <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+            <ram:CategoryCode></ram:CategoryCode>
+            <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+            <ram:TaxPointDate>
+              <udt:DateString format=""></udt:DateString>
+            </ram:TaxPointDate>
+            <ram:DueDateTypeCode></ram:DueDateTypeCode>
+            <ram:RateApplicablePercent></ram:RateApplicablePercent>
+          </ram:CategoryTradeTax>
+        </ram:SpecifiedTradeAllowanceCharge>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation>
+          <ram:LineTotalAmount currencyID=""></ram:LineTotalAmount>
+          <ram:ChargeTotalAmount currencyID=""></ram:ChargeTotalAmount>
+          <ram:AllowanceTotalAmount currencyID=""></ram:AllowanceTotalAmount>
+          <ram:TaxTotalAmount currencyID=""></ram:TaxTotalAmount>
+          <ram:GrandTotalAmount currencyID=""></ram:GrandTotalAmount>
+          <ram:TotalAllowanceChargeAmount currencyID=""></ram:TotalAllowanceChargeAmount>
+        </ram:SpecifiedTradeSettlementLineMonetarySummation>
+        <ram:InvoiceReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:InvoiceReferencedDocument>
+        <ram:AdditionalReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:AdditionalReferencedDocument>
+        <ram:ReceivableSpecifiedTradeAccountingAccount>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TypeCode></ram:TypeCode>
+        </ram:ReceivableSpecifiedTradeAccountingAccount>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>
+    <ram:ApplicableHeaderTradeAgreement>
+      <ram:BuyerReference></ram:BuyerReference>
+      <ram:SellerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTradeParty>
+      <ram:BuyerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:BuyerTradeParty>
+      <ram:SalesAgentTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SalesAgentTradeParty>
+      <ram:BuyerTaxRepresentativeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:BuyerTaxRepresentativeTradeParty>
+      <ram:SellerTaxRepresentativeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTaxRepresentativeTradeParty>
+      <ram:ProductEndUserTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:ProductEndUserTradeParty>
+      <ram:ApplicableTradeDeliveryTerms>
+        <ram:DeliveryTypeCode></ram:DeliveryTypeCode>
+      </ram:ApplicableTradeDeliveryTerms>
+      <ram:SellerOrderReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:SellerOrderReferencedDocument>
+      <ram:BuyerOrderReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:BuyerOrderReferencedDocument>
+      <ram:QuotationReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:QuotationReferencedDocument>
+      <ram:ContractReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:ContractReferencedDocument>
+      <ram:AdditionalReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:AdditionalReferencedDocument>
+      <ram:BuyerAgentTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:BuyerAgentTradeParty>
+      <ram:SpecifiedProcuringProject>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:Name></ram:Name>
+      </ram:SpecifiedProcuringProject>
+      <ram:UltimateCustomerOrderReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:UltimateCustomerOrderReferencedDocument>
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery>
+      <ram:RelatedSupplyChainConsignment>
+        <ram:SpecifiedLogisticsTransportMovement>
+          <ram:ModeCode></ram:ModeCode>
+        </ram:SpecifiedLogisticsTransportMovement>
+      </ram:RelatedSupplyChainConsignment>
+      <ram:ShipToTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:ShipToTradeParty>
+      <ram:UltimateShipToTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:UltimateShipToTradeParty>
+      <ram:ShipFromTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:ShipFromTradeParty>
+      <ram:ActualDeliverySupplyChainEvent>
+        <ram:OccurrenceDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:OccurrenceDateTime>
+      </ram:ActualDeliverySupplyChainEvent>
+      <ram:DespatchAdviceReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:DespatchAdviceReferencedDocument>
+      <ram:ReceivingAdviceReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:ReceivingAdviceReferencedDocument>
+      <ram:DeliveryNoteReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:DeliveryNoteReferencedDocument>
+    </ram:ApplicableHeaderTradeDelivery>
+    <ram:ApplicableHeaderTradeSettlement>
+      <ram:CreditorReferenceID schemeID=""></ram:CreditorReferenceID>
+      <ram:PaymentReference></ram:PaymentReference>
+      <ram:TaxCurrencyCode></ram:TaxCurrencyCode>
+      <ram:InvoiceCurrencyCode></ram:InvoiceCurrencyCode>
+      <ram:InvoiceIssuerReference></ram:InvoiceIssuerReference>
+      <ram:InvoicerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:InvoicerTradeParty>
+      <ram:InvoiceeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:InvoiceeTradeParty>
+      <ram:PayeeTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:PayeeTradeParty>
+      <ram:PayerTradeParty>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:GlobalID schemeID=""></ram:GlobalID>
+        <ram:Name></ram:Name>
+        <ram:RoleCode></ram:RoleCode>
+        <ram:Description></ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:TradingBusinessName></ram:TradingBusinessName>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <ram:PersonName></ram:PersonName>
+          <ram:DepartmentName></ram:DepartmentName>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:TelephoneUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:FaxUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:FaxUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:CompleteNumber></ram:CompleteNumber>
+        </ram:URIUniversalCommunication>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID=""></ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:PayerTradeParty>
+      <ram:TaxApplicableTradeCurrencyExchange>
+        <ram:SourceCurrencyCode></ram:SourceCurrencyCode>
+        <ram:TargetCurrencyCode></ram:TargetCurrencyCode>
+        <ram:ConversionRate></ram:ConversionRate>
+        <ram:ConversionRateDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:ConversionRateDateTime>
+      </ram:TaxApplicableTradeCurrencyExchange>
+      <ram:SpecifiedTradeSettlementPaymentMeans>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Information></ram:Information>
+        <ram:ApplicableTradeSettlementFinancialCard>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:CardholderName></ram:CardholderName>
+        </ram:ApplicableTradeSettlementFinancialCard>
+        <ram:PayerPartyDebtorFinancialAccount>
+          <ram:IBANID schemeID=""></ram:IBANID>
+        </ram:PayerPartyDebtorFinancialAccount>
+        <ram:PayeePartyCreditorFinancialAccount>
+          <ram:IBANID schemeID=""></ram:IBANID>
+          <ram:AccountName></ram:AccountName>
+          <ram:ProprietaryID schemeID=""></ram:ProprietaryID>
+        </ram:PayeePartyCreditorFinancialAccount>
+        <ram:PayeeSpecifiedCreditorFinancialInstitution>
+          <ram:BICID schemeID=""></ram:BICID>
+        </ram:PayeeSpecifiedCreditorFinancialInstitution>
+      </ram:SpecifiedTradeSettlementPaymentMeans>
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:ExemptionReason></ram:ExemptionReason>
+        <ram:BasisAmount currencyID=""></ram:BasisAmount>
+        <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+        <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+        <ram:CategoryCode></ram:CategoryCode>
+        <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+        <ram:TaxPointDate>
+          <udt:DateString format=""></udt:DateString>
+        </ram:TaxPointDate>
+        <ram:DueDateTypeCode></ram:DueDateTypeCode>
+        <ram:RateApplicablePercent></ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      <ram:BillingSpecifiedPeriod>
+        <ram:Description></ram:Description>
+        <ram:StartDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:StartDateTime>
+        <ram:EndDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:EndDateTime>
+        <ram:CompleteDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:CompleteDateTime>
+      </ram:BillingSpecifiedPeriod>
+      <ram:SpecifiedTradeAllowanceCharge>
+        <ram:ChargeIndicator>
+          <udt:Indicator></udt:Indicator>
+        </ram:ChargeIndicator>
+        <ram:SequenceNumeric></ram:SequenceNumeric>
+        <ram:CalculationPercent></ram:CalculationPercent>
+        <ram:BasisAmount currencyID=""></ram:BasisAmount>
+        <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
+        <ram:ActualAmount currencyID=""></ram:ActualAmount>
+        <ram:ReasonCode></ram:ReasonCode>
+        <ram:Reason></ram:Reason>
+        <ram:CategoryTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+          <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+          <ram:TaxPointDate>
+            <udt:DateString format=""></udt:DateString>
+          </ram:TaxPointDate>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:CategoryTradeTax>
+      </ram:SpecifiedTradeAllowanceCharge>
+      <ram:SpecifiedLogisticsServiceCharge>
+        <ram:Description></ram:Description>
+        <ram:AppliedAmount currencyID=""></ram:AppliedAmount>
+        <ram:AppliedTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+          <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+          <ram:TaxPointDate>
+            <udt:DateString format=""></udt:DateString>
+          </ram:TaxPointDate>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:AppliedTradeTax>
+      </ram:SpecifiedLogisticsServiceCharge>
+      <ram:SpecifiedTradePaymentTerms>
+        <ram:Description></ram:Description>
+        <ram:DueDateDateTime>
+          <udt:DateTimeString format=""></udt:DateTimeString>
+        </ram:DueDateDateTime>
+        <ram:DirectDebitMandateID schemeID=""></ram:DirectDebitMandateID>
+        <ram:PartialPaymentAmount currencyID=""></ram:PartialPaymentAmount>
+        <ram:ApplicableTradePaymentPenaltyTerms>
+          <ram:BasisDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:BasisDateTime>
+          <ram:BasisPeriodMeasure unitCode=""></ram:BasisPeriodMeasure>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:CalculationPercent></ram:CalculationPercent>
+          <ram:ActualPenaltyAmount currencyID=""></ram:ActualPenaltyAmount>
+        </ram:ApplicableTradePaymentPenaltyTerms>
+        <ram:ApplicableTradePaymentDiscountTerms>
+          <ram:BasisDateTime>
+            <udt:DateTimeString format=""></udt:DateTimeString>
+          </ram:BasisDateTime>
+          <ram:BasisPeriodMeasure unitCode=""></ram:BasisPeriodMeasure>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:CalculationPercent></ram:CalculationPercent>
+          <ram:ActualDiscountAmount currencyID=""></ram:ActualDiscountAmount>
+        </ram:ApplicableTradePaymentDiscountTerms>
+        <ram:PayeeTradeParty>
+          <ram:ID schemeID=""></ram:ID>
+          <ram:GlobalID schemeID=""></ram:GlobalID>
+          <ram:Name></ram:Name>
+          <ram:RoleCode></ram:RoleCode>
+          <ram:Description></ram:Description>
+          <ram:SpecifiedLegalOrganization>
+            <ram:ID schemeID=""></ram:ID>
+            <ram:TradingBusinessName></ram:TradingBusinessName>
+            <ram:PostalTradeAddress>
+              <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+              <ram:LineOne></ram:LineOne>
+              <ram:LineTwo></ram:LineTwo>
+              <ram:LineThree></ram:LineThree>
+              <ram:CityName></ram:CityName>
+              <ram:CountryID></ram:CountryID>
+              <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+            </ram:PostalTradeAddress>
+          </ram:SpecifiedLegalOrganization>
+          <ram:DefinedTradeContact>
+            <ram:PersonName></ram:PersonName>
+            <ram:DepartmentName></ram:DepartmentName>
+            <ram:TypeCode></ram:TypeCode>
+            <ram:TelephoneUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:TelephoneUniversalCommunication>
+            <ram:FaxUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:FaxUniversalCommunication>
+            <ram:EmailURIUniversalCommunication>
+              <ram:URIID schemeID=""></ram:URIID>
+              <ram:CompleteNumber></ram:CompleteNumber>
+            </ram:EmailURIUniversalCommunication>
+          </ram:DefinedTradeContact>
+          <ram:PostalTradeAddress>
+            <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+            <ram:LineOne></ram:LineOne>
+            <ram:LineTwo></ram:LineTwo>
+            <ram:LineThree></ram:LineThree>
+            <ram:CityName></ram:CityName>
+            <ram:CountryID></ram:CountryID>
+            <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
+          </ram:PostalTradeAddress>
+          <ram:URIUniversalCommunication>
+            <ram:URIID schemeID=""></ram:URIID>
+            <ram:CompleteNumber></ram:CompleteNumber>
+          </ram:URIUniversalCommunication>
+          <ram:SpecifiedTaxRegistration>
+            <ram:ID schemeID=""></ram:ID>
+          </ram:SpecifiedTaxRegistration>
+        </ram:PayeeTradeParty>
+      </ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount currencyID=""></ram:LineTotalAmount>
+        <ram:ChargeTotalAmount currencyID=""></ram:ChargeTotalAmount>
+        <ram:AllowanceTotalAmount currencyID=""></ram:AllowanceTotalAmount>
+        <ram:TaxBasisTotalAmount currencyID=""></ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID=""></ram:TaxTotalAmount>
+        <ram:RoundingAmount currencyID=""></ram:RoundingAmount>
+        <ram:GrandTotalAmount currencyID=""></ram:GrandTotalAmount>
+        <ram:TotalPrepaidAmount currencyID=""></ram:TotalPrepaidAmount>
+        <ram:DuePayableAmount currencyID=""></ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+      <ram:InvoiceReferencedDocument>
+        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:URIID schemeID=""></ram:URIID>
+        <ram:LineID schemeID=""></ram:LineID>
+        <ram:TypeCode></ram:TypeCode>
+        <ram:Name></ram:Name>
+        <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+        <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:InvoiceReferencedDocument>
+      <ram:ReceivableSpecifiedTradeAccountingAccount>
+        <ram:ID schemeID=""></ram:ID>
+        <ram:TypeCode></ram:TypeCode>
+      </ram:ReceivableSpecifiedTradeAccountingAccount>
+      <ram:SpecifiedAdvancePayment>
+        <ram:PaidAmount currencyID=""></ram:PaidAmount>
+        <ram:FormattedReceivedDateTime>
+          <qdt:DateTimeString format=""></qdt:DateTimeString>
+        </ram:FormattedReceivedDateTime>
+        <ram:IncludedTradeTax>
+          <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:ExemptionReason></ram:ExemptionReason>
+          <ram:BasisAmount currencyID=""></ram:BasisAmount>
+          <ram:LineTotalBasisAmount currencyID=""></ram:LineTotalBasisAmount>
+          <ram:AllowanceChargeBasisAmount currencyID=""></ram:AllowanceChargeBasisAmount>
+          <ram:CategoryCode></ram:CategoryCode>
+          <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
+          <ram:TaxPointDate>
+            <udt:DateString format=""></udt:DateString>
+          </ram:TaxPointDate>
+          <ram:DueDateTypeCode></ram:DueDateTypeCode>
+          <ram:RateApplicablePercent></ram:RateApplicablePercent>
+        </ram:IncludedTradeTax>
+        <ram:InvoiceSpecifiedReferencedDocument>
+          <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+          <ram:URIID schemeID=""></ram:URIID>
+          <ram:LineID schemeID=""></ram:LineID>
+          <ram:TypeCode></ram:TypeCode>
+          <ram:Name></ram:Name>
+          <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
+          <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
+          <ram:FormattedIssueDateTime>
+            <qdt:DateTimeString format=""></qdt:DateTimeString>
+          </ram:FormattedIssueDateTime>
+        </ram:InvoiceSpecifiedReferencedDocument>
+      </ram:SpecifiedAdvancePayment>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>

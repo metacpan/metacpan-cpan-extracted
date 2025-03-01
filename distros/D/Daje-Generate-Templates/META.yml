@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Generate::Templates:
     file: lib/Daje/Generate/Templates.pm
-    version: '0.11'
+    version: '1.02'
   Daje::Generate::Templates::Angular:
     file: lib/Daje/Generate/Templates/Angular.pm
     version: '0.01'
@@ -45,6 +45,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Generate-Templates/issues
   homepage: https://github.com/janeskil1525/Daje-Generate-Templates
   repository: https://github.com/janeskil1525/Daje-Generate-Templates.git
-version: '0.11'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,18 +1,43 @@
 Revision history for DBIx-Squirrel
 
-1.6.0 2024-09-?? ??:?? Next Stable Release
+1.6.4 2025-02-28 15:37
 
-1.5.4 2024-09-12 20:52 Developer Release (Work In Progress)
+-   Trying to get PAUSE to reindex the package again.
+-   Fix non-idiomatic version number.
+-   Clean-up and refactoring.
 
--   GOALS 1.5.4
-    -   F1 Allow database entity helpers to be assigned values more than
-        once.
-    -   T2 Increase DBIx::Squirrel::st test coverage appreciably from
-        63.3 pc.
+1.6.3 NOT RELEASED
+
+1.6.2 2025-02-27 22:00
+
+-   Trying to get PAUSE to reindex the package again.
+-   Clean-up and refactoring.
+
+1.6.1 2025-02-27 13:00
+
+-   Fixed a bug in DBIx::Squirrel::it::_fetch_result in which the
+    act of reading the final buffer of results turned off the underlying
+    statement handle's Active attribute. Since that was the only way
+    I was determing if the statement was done, it often meant that
+    final buffer's worth of results would not be returned when required.
+-   Some minor documentation updates and clean-up.
+
+1.6.0 2025-02-25 22:15 Next Stable Release
+
+1.5.5 2025-02-24 22:14 Developer Release (Work In Progress)
+
+-   1.5.5
+    -   Cleaning-up, refactoring, and working on tests.
+-   1.5.4
     -   D3 Improve the SYNOPSIS, which is too long and wastes far too
         much space covering activities that can be done with the DBI.
-    1.5.3
-    -   Added a new "slurp" exported function to DBIx::Squirrel::Utils
+    -   Increased DBIx::Squirrel::st test coverage.
+    -   Database entity helpers may now be assigned values more than
+        once.
+    -   A few improvements to the DBIx::Squirrel::Crypt::Fernet package
+        interface.
+-   1.5.3
+    -   Added a new "get_file_contents" exported function to DBIx::Squirrel::util
         to read binary files, decrypt them, uncompress them, and parse
         them as JSON data. This is used by the DBIx::Squirrel::db
         "load_tuples" method for bulk populating/depopulating tables
@@ -50,7 +75,7 @@ Revision history for DBIx-Squirrel
         to be consistent with the re-worked reset method.
     -   Non-breaking change to the reset method, which may now be used
         to change cache size and/oor slicing strategy.
-    -   The DBIx::Squirrel::Iterator package now has and exports new
+    -   The DBIx::Squirrel::it package now has and exports new
         functions that expose aspects of the iterator's current context
         to stages in a transformation pipeline.
 -   REFACTOR / FIX
@@ -83,7 +108,7 @@ Revision history for DBIx-Squirrel
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
     blib/lib/DBIx/Squirrel.pm      85.0   44.1   55.5  100.0    n/a   35.1   78.8
     ...DBIx/Squirrel/Iterator.pm   69.9   40.3   73.9   72.0    0.0    7.8   58.6
-    ...x/Squirrel/ResultClass.pm   65.8   23.5    n/a   81.8    0.0    0.7   56.3
+    ...x/Squirrel/rc.pm   65.8   23.5    n/a   81.8    0.0    0.7   56.3
     ...BIx/Squirrel/ResultSet.pm   67.0   20.0    n/a   81.8    0.0    1.4   61.1
     ...ib/DBIx/Squirrel/Utils.pm   97.7  100.0  100.0   91.6    0.0    7.5   92.6
     blib/lib/DBIx/Squirrel/db.pm   66.6   46.8   33.3   90.4    0.0    0.6   61.3
@@ -136,7 +161,7 @@ Revision history for DBIx-Squirrel
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
     blib/lib/DBIx/Squirrel.pm      91.3   55.5   66.6  100.0    n/a   40.3   85.3
     ...DBIx/Squirrel/Iterator.pm   72.5   43.9   73.9   76.7    0.0    6.0   61.7
-    ...x/Squirrel/ResultClass.pm   65.8   23.5    n/a   81.8    0.0    0.7   56.3
+    ...x/Squirrel/rc.pm   65.8   23.5    n/a   81.8    0.0    0.7   56.3
     ...BIx/Squirrel/ResultSet.pm   67.0   20.0    n/a   81.8    0.0    1.4   61.1
     ...ib/DBIx/Squirrel/Utils.pm   97.7  100.0  100.0   91.6    0.0    7.2   92.6
     blib/lib/DBIx/Squirrel/db.pm   53.7   25.0   33.3   85.7    0.0    0.6   47.1
@@ -215,7 +240,7 @@ Revision history for DBIx-Squirrel
 -   Added the “count_all” method back into the iterator class, as well
     as ensuring that “count” does not affect a future call to “next”.
 -   Addressed build failures revealed by the CPAN Testers Matrix:
-    -   Rewrote &DBIx::Squirrel::util::args_partition - failed on Perl
+    -   Rewrote &DBIx::Squirrel::util::isolate_callbacks - failed on Perl
         versions <= 5.18.4;
     -   Back to using “strict” and “warnings” - Modern::Perl having some
         issues with a bundle “all” in Perl versions <= 5.14.4.

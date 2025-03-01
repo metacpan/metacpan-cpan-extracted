@@ -87,6 +87,21 @@ Revision history for LyricFinder
         - LyricFinder::Genius - Add a note in the docs about potential spam 
         embedded in lyrics text returned.
 1.40    2025/02/26
-        - Added LyricFinder::Lrclib (lrclib.net) - a new free open-source site 
-        recently included by the fine folks at Audacious audio player in their 
-        latest development release of Audacious.
+        - Added  LyricFinder::Lrclib (lrclib.net) - a new free open-source site 
+        Audacious audio player had recently added support for this site in 
+        their latest development release.
+1.50    2025/03/01
+        - LyricFinder::Musixmatch - Fix failure to fetch cover-art images due 
+        to slight changes in their site.
+        - Added "-synced" option to allow for choosing between fetching 
+        timestamped (synced) lyrics or traditional plain-text ones.  Currently, 
+        only the new LyricFinder::Lrclib site supports returning synced lyrics. 
+        See the POD docs for details on this option.
+        - Modified the argument requirements for the fetch() method to: 
+        1) allow for specifying multiple site-modules in a string, in addition 
+        to the previous array-ref format.  2) allow the "random" choice to be 
+        included anywhere in a list of modules.  This can allow for forcing 
+        certain modules to be searched in order first, then including the 
+        others in random order, and even followed up by one to be searched last 
+        (without repeating a call to a previously-searched module.
+        - Misc. doc. touchups.

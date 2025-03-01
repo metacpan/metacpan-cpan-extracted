@@ -1,7 +1,9 @@
 Revision history for Perl module Geo-Inverse
 
+0.08 2025-02-28
+  - Added error check for undef
+
 0.07 2022-11-29
-  - Changed license from Perl to MIT
   - Added GitHub repository
 
 0.06 2011-10-31

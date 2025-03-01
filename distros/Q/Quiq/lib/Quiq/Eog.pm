@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.223';
+our $VERSION = '1.224';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -292,6 +292,16 @@ sub transferImages {
 
     # Operation ausführen
 
+    my $count = 0;
+    my $dh = Quiq::DirHandle->new($srcDir);
+    while (my $entry = $dh->next) {
+        if ($entry =~ /\.jpg$/) { # FIXME: Weitere Bildformate
+            $count++;
+        }
+    }
+    $dh->close;
+    say "$count Dateien";
+
     my $fileA = Quiq::Eog->pickImages($srcDir);
     for my $trashFile (@$fileA) {
         my @srcFiles = ($trashFile);
@@ -344,7 +354,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.223
+1.224
 
 =head1 AUTHOR
 
@@ -352,7 +362,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Frank Seitz
+Copyright (C) 2025 Frank Seitz
 
 =head1 LICENSE
 

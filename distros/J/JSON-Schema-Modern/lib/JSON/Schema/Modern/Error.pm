@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.602';
+our $VERSION = '0.603';
 
 use 5.020;
 use Moo;
@@ -21,6 +21,7 @@ use MooX::TypeTiny;
 use Types::Standard qw(Str Bool Enum Tuple);
 use Types::Common::Numeric qw(PositiveInt);
 use builtin::compat 'refaddr';
+use Mojo::Message::Response;
 use namespace::clean;
 
 use overload
@@ -57,6 +58,16 @@ sub stringify ($self) {
 
 sub __thing { 'error' }
 
+around BUILDARGS => sub ($orig, $class, @args) {
+  my $args = $class->$orig(@args);
+
+  $args->{recommended_response}[1] =
+      Mojo::Message::Response->default_message($args->{recommended_response}[0]) // 'Unknown Error'
+    if $args->{recommended_response} and $args->{recommended_response}->@* == 1;
+
+  return $args;
+};
+
 1;
 
 __END__
@@ -73,7 +84,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -132,6 +143,9 @@ A tuple, consisting of C<[ integer, string ]>, indicating the recommended HTTP r
 string to use for this error (if validating an HTTP request). This could exist for things like a
 failed authentication check in OpenAPI validation, in which case it would contain
 C<[ 401, 'Unauthorized' ]>.
+
+The string can be omitted at construction time, in which case it will be populated from the standard
+list of error strings corresponding to HTTP response codes (see RFC9110 §15).
 
 =head2 depth
 

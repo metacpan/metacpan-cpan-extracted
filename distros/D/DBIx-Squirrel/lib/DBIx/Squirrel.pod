@@ -1,3 +1,4 @@
+
 =pod
 
 =encoding UTF-8
@@ -8,7 +9,7 @@ DBIx::Squirrel - The little Perl DBI extension that makes working with databases
 
 =head1 VERSION
 
-Version 1.5.3
+Version 1.6.4
 
 =head1 SYNOPSIS
 
@@ -688,7 +689,7 @@ Each stage of a transformation receives the latest version of the result via
 the argument-list (C<$_[0]> to be precise). For the sake of convenience (and
 for convention), this result is also available as C<$_>. If you prefer to
 rely on something like C<$_>, but would like something much less ephemeral,
-just C<use DBIx::Squirrel::Utils 'result'> and use the C<result> function
+just C<use DBIx::Squirrel::util 'result'> and use the C<result> function
 inside your transformation stage.
 
 Handing off to the next stage, or the caller, is with an explicit C<return>
@@ -945,16 +946,37 @@ the statement, as well as the statement handle:
     $sth = $dbh->prepare($statement)          or die $dbh->errstr;
     $sth = $dbh->prepare($statement, \%attr)  or die $dbh->errstr;
 
-The C<prepare> method interface is identical in form to that provided by the
-C<DBI>.
+The C<prepare> method works just the same as it does in the C<DBI>.
 
-C<DBIx::Squirrel> permits the use of one of a number of valid placeholder
-styles (C<:name>, C<:number>, C<$number>, C<?number>, C<?>) within the
-statement-string.
+The C<$statement> argument must evauate to a string, and may be any of the
+following:
 
-Statement-strings will be "normalised" to use the legacy C<?> style, before
-being handed-off to the C<DBI> method of the same name. In spite of this,
-you should still use key-value bindings if you opted for named placeholders.
+=over
+
+=item *
+
+a simple string containing the SQL statement;
+
+=item *
+
+a reference to an array of simple strings that will be concantenated
+(separated by a space) to form a simple string containing the SQL
+statement;
+
+=item *
+
+a reference to a function returning a simple string or an array of simple
+strings that will be concantenated (separated by a space) to form a simple
+string containing the SQL statement;
+
+=back
+
+C<DBIx::Squirrel> isn't too opinionated about the placeholder style used,
+and will accept C<:name>, C<:number>, C<$number>, C<?number> or C<?>
+placeholders within the statement-string. You must use key-value bindings
+if you opted for named placeholders. All statements are normalised to use
+the legacy C<?> style anyway.
+
 
 =head4 C<prepare_cached> *
 
@@ -962,18 +984,37 @@ you should still use key-value bindings if you opted for named placeholders.
     $sth = $dbh->prepare_cached($statement, \%attr)
     $sth = $dbh->prepare_cached($statement, \%attr, $if_active)
 
-The C<prepare_cached> method interface is identical in form to that provided
-by the C<DBI>.
+The C<prepare> method works just the same as it does in the C<DBI>.
 
-C<DBIx::Squirrel> permits the use of one of a number of valid placeholder
-styles (C<:name>, C<:number>, C<$number>, C<?number>, C<?>) within the
-statement-string.
+The C<$statement> argument must evauate to a string, and may be any of the
+following:
 
-Statement-strings will be "normalised" to use the legacy C<?> style, before
-being handed-off to the C<DBI> method of the same name. In spite of this,
-you should still use key-value bindings if you opted for named placeholders.
+=over
 
-It is the normalised form of the statement that is cached by the C<DBI>.
+=item *
+
+a simple string containing the SQL statement;
+
+=item *
+
+a reference to an array of simple strings that will be concantenated
+(separated by a space) to form a simple string containing the SQL
+statement;
+
+=item *
+
+a reference to a function returning a simple string or an array of simple
+strings that will be concantenated (separated by a space) to form a simple
+string containing the SQL statement;
+
+=back
+
+C<DBIx::Squirrel> isn't too opinionated about the placeholder style used,
+and will accept C<:name>, C<:number>, C<$number>, C<?number> or C<?>
+placeholders within the statement-string. You must use key-value bindings
+if you opted for named placeholders. All statements are normalised to use
+the legacy C<?> style anyway, and it is this normalised statement that is
+cached by the C<DBI>. 
 
 =head4 C<results>
 
@@ -1135,8 +1176,8 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 =head4 C<cache_size_slice>
 
@@ -1181,9 +1222,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 =head4 C<count>
 
@@ -1375,7 +1416,7 @@ used to change the slicing strategy, a reference to the iterator is returned.
 
 The following package global defines the default setting:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
 
 =head4 C<slice_buffer_size>
 
@@ -1424,9 +1465,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 =head4 C<start>
 
@@ -1455,7 +1496,7 @@ Returns the iterator's underlying statement handle object.
 
 =head3 Iterator Exports
 
-The C<DBIx::Squirrel::Iterator> package exports a number of subroutines that
+The C<DBIx::Squirrel::it> package exports a number of subroutines that
 may be used within the stages of a transformation pipeline. These provide
 information about the current transformation context.
 
@@ -1543,7 +1584,7 @@ Returns a reference to the current iterator's statement handle object.
 
 =head1 COPYRIGHT AND LICENSE
 
-The DBIx::Squirrel module is Copyright (c) 2020-2014 Iain Campbell.
+The DBIx::Squirrel module is Copyright (c) 2020-2025 Iain Campbell.
 All rights reserved.
 
 You may distribute under the terms of either the GNU General Public

@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0",
             "strict" : "0"
          }
       },
@@ -34,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "File::ShareDir" : "0",
             "Future" : "0",
             "Future::Mojo" : "0",
             "Future::Queue" : "0",
@@ -45,6 +47,8 @@
             "Moo" : "2",
             "OpenAPI::Modern" : "0",
             "PerlX::Maybe" : "0",
+            "Role::EventEmitter" : "0",
+            "URI::Template" : "0",
             "YAML::PP" : "0",
             "experimental" : "0.031",
             "perl" : "5.020",
@@ -71,7 +75,7 @@
          "web" : "https://github.com/Corion/AI-Ollama-Client"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

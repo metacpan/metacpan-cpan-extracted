@@ -3,10 +3,13 @@ use warnings;
 
 package Oh;
 
-our $VERSION = 0.06;
+our $VERSION = '1.02';
 
-use subs qw/error env listp evaluate_element evaluate_list evaluate_function evaluate_builtin evaluate_macro evaluate_lambda find search progn read_element read_string read_list reft/;
+use subs qw/error env listp evaluate_element evaluate_list evaluate_function evaluate_builtin evaluate_macro evaluate_lambda find search progn read_element read_string read_list reft add_value lisp_args scheme_args/;
 
+our @EXPORT_OK = qw/error env listp evaluate_element evaluate_list evaluate_function evaluate_builtin evaluate_macro evaluate_lambda find search progn read_element read_string read_list reft add_value lisp_args scheme_args/;
+
+use Exporter qw/import/;
 use Term::ANSIColor 'colored';
 use Scalar::Util qw/reftype blessed/;
 use List::Util;
@@ -187,6 +190,10 @@ sub evaluate_element
     {
       $element;
     }
+    elsif ($element =~ /^#/)
+    {
+      find 'function', substr $element, 1;
+    }
     else
     {
       my $symbol = search 'symbol', $element;
@@ -278,6 +285,22 @@ sub evaluate_list
           {
             evaluate_function(get_sub($car), @list);
           }
+          elsif ($car =~ /^c([ad]+)r$/)
+          {
+            my $element = evaluate_element(shift @list);
+            for my $car (split //, $1)
+            {
+              if ($car eq 'a')
+              {
+                $element = $element->[0];
+              }
+              else
+              {
+                $element = [$element->[1 .. $#{$element}]];
+              }
+            } 
+            $element;
+          }
           else
           {
             my $obj = find 'symbol', $car;
@@ -358,14 +381,7 @@ sub convert_values
       }
       else
       {
-        if (/^:/)
-        {
-          substr $_, 1;
-        }
-        else
-        {
-          $_;
-        }
+        $_;
       }
     }
     else
@@ -534,7 +550,7 @@ sub set
 sub setq
 {
   my ($element, $value) = @_;
-  (search 'symbol', $element or $env)->{symbol}->{$element} = $value;
+  (search 'symbol', $element or $env)->{symbol}->{$element} = evaluate_element $value;
 }
 
 sub scheme_args
@@ -798,6 +814,142 @@ sub dumper
   join(' ', map { if (ref eq 'lambda' or ref eq 'macro') { '#lambda' } else { Dumper $_ } } @_);
 }
 
+sub add_value
+{
+  $env->{symbol}->{$_[0]} = $_[1];
+}
+
+sub funcall
+{
+  my $fun = shift;
+  my $type = ref $fun;
+  if ($type eq 'lambda' or $type eq 'macro')
+  {
+    evaluate_lambda $fun, @_;
+  }
+  elsif ($type eq 'CODE')
+  {
+    evaluate_builtin $fun, @_;
+  }
+  else
+  {
+    error 'funcall not called with a callable argument', $fun, $type;
+  }
+}
+
+sub shorter
+{
+  my $shorter = @{shift(@_)};
+  for my $list (@_)
+  {
+    my $len = @$list;
+    if ($shorter > $len)
+    {
+      $shorter = $list;
+    }
+  }
+  $shorter;
+}
+
+sub compare
+{
+  my ($one, $two) = @_;
+
+  if (defined $one)
+  {
+    if (defined $two)
+    {
+      my ($type1, $type2) = (ref $one, ref $two);
+      if ($type1)
+      {
+        if ($type1 eq $type2)
+        {
+          if (listp $type1)
+          {
+            return compare_lists($one, $two);
+          }
+          elsif ($type1 eq 'HASH')
+          {
+            return compare_hashes($one, $two);
+          }
+          else
+          {
+            return $one eq $two;
+          }
+        }
+        else
+        {
+          0;
+        }
+      }
+      else
+      {
+        if ($type2)
+        {
+          0;
+        }
+        else
+        {
+          return $one eq $two;
+        }
+      }
+    }
+    else
+    {
+      0;
+    }
+  }
+  {
+    not defined $two;
+  }
+}
+
+sub compare_lists
+{
+  my ($one, $two) = @_;
+
+  my @one = @$one;
+  my @two = @$two;
+
+  if (@one == @two)
+  {
+    for my $element (@one)
+    {
+      my $element2 = shift @two;
+      return 0 unless compare($element, $element2);
+    }
+    return 1;
+  }
+  else
+  {
+    0;
+  }
+}
+
+sub compare_hashes
+{
+  my ($one, $two) = @_;
+
+  my @keys1 = keys %$one;
+  my @keys2 = keys %$two;
+
+  if (@keys1 == @keys2)
+  {
+    for my $key (@keys1)
+    {
+      return 0 unless exists $two->{$key};
+      return 0 unless compare($one->{$key}, $two->{$key});
+    }
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+
+
 
 #sbs
 
@@ -960,17 +1112,189 @@ op
 } 'setq-current-env';
 
 
+op
+{
+  my $done;
+  my @else;
+  my $result;
+  for my $cond (@_)
+  {
+    my ($test, @code) = @$cond;
+    if ($test eq 't' or $test eq ':otherwise')
+    {
+      @else = @code;
+      next;
+    }
 
+    if (evaluate_element $test)
+    {
+      $result = progn @code;
+      $done = 1;
+      last;
+    }
+  }
+  
+  if (@else and not $done)
+  {
+    progn @else;
+  }
+  else
+  {
+    $result;
+  }
+} 'cond';
+
+op
+{
+  my $value = evaluate_element shift;
+
+  my @else;
+
+  for my $case (@_)
+  {
+    my ($test, @code) = @$case;
+    if ($test eq 't' or $test eq ':otherwise')
+    {
+      @else = @code;
+      next;
+    }
+
+    if (listp ref $test)
+    {
+      for my $test (@$test)
+      {
+        if (defined $value)
+        {
+          if ($test eq $value)
+          {
+            return progn @code;
+          }
+        }
+        elsif ($test eq 'nil')
+        {
+          return progn @code;
+        }
+      }
+    }
+    else
+    {
+      if (defined $value)
+      {
+        if ($test eq $value)
+        {
+          return progn @code;
+        }
+      } 
+      elsif ($test eq 'nil')
+      {
+        return progn @code;
+      }
+    }
+  }
+
+  if (@else)
+  {
+    progn @else;
+  }
+  else
+  {
+    undef;
+  }
+} 'case';
+
+op
+{
+  my $bind = shift;
+  my $e = env $env;
+  my ($name, $value) = @$bind;
+  $value = evaluate_element $value;
+  my @code = @_;
+  with_env
+  {
+    for my $element (@$value)
+    {
+      $e->{symbol}->{$name} = $element;
+      progn(@code);
+    }
+  } $e;
+} 'dolist';
+
+op
+{
+  my $bind = shift;
+  my $e = env $env;
+  my ($name, $value) = @$bind;
+  $value = evaluate_element $value;
+  my @code = @_;
+  with_env
+  {
+    for (my $i = 0; $i < $value; $i++)
+    {
+      $e->{symbol}->{$name} = $i;
+      progn(@code);
+    }
+  } $e;
+} 'dotimes';
+
+op
+{
+  my $test = shift;
+  while (evaluate_element $test)
+  {
+    progn(@_);
+  }
+} 'while';
+
+op
+{
+  my $test = shift;
+  while (not evaluate_element $test)
+  {
+    progn(@_);
+  }
+} 'until';
+
+
+op
+{
+  my $name = shift;
+  my $macro = find 'macro', $name;
+  if ($macro)
+  {
+    my $type = ref $macro;
+    if ($type eq 'CODE')
+    {
+      evaluate_builtin $macro, @_;
+    }
+    elsif ($type eq 'macro')
+    {
+      evaluate_lambda $macro, @_;
+    }
+    else
+    {
+      error 'wrong macro type', $macro, $type;
+    }
+  }
+  else
+  {
+    error 'macroexpand did not find a macro', $macro;
+  }
+
+} 'macroexpand';
 
 #funs
 
 &fun(\&List::Util::sum0, '+');
-&fun(\&evaluate_function, 'funcall');
+&fun(\&funcall, 'funcall');
 &fun(\&set, 'set');
 &fun(\&get, 'get');
 &fun(\&interpret_file, 'load');
 &fun(\&interpret_string, 'eval-string');
+&fun(\&shorter, 'shorter');
+&fun(\&compare, 'equal');
 
+fun { defined $_[0] } 'defined';
+fun { not $_[0] } 'not';
 fun { $@ } 'get-error';
 fun { die "@_\n" } 'error';
 fun { pr(dumper(@_),"\n") } 'dump';
@@ -1051,17 +1375,349 @@ fun
   {
     if (listp ref $name)
     {
-      print "binding $name\n";
       my ($lisp_name, $perl_name) = @$name;
       &fun(get_sub($package . '::' . $perl_name), $lisp_name);
     }
     else
     {
-      print "binding $name\n";
       &fun(get_sub($package . '::' . $name), $name);
     }
   }
 } 'bindings';
+
+fun
+{
+  find 'symbol', $_[0];
+} 'boundp';
+
+fun
+{
+  find 'function', $_[0];
+} 'find-function';
+
+fun
+{
+  find 'macro', $_[0];
+} 'find-macro';
+
+fun
+{
+  my $type = ref $_[0];
+  $type eq 'lambda' or $type eq 'CODE';
+} 'functionp';
+
+fun
+{
+  my $element = shift;
+  if ($element)
+  {
+    if (listp ref $element and not @$element)
+    {
+      1;
+    }
+    else
+    {
+      0;
+    }
+  }
+  else
+  {
+    1;
+  }
+} 'null';
+
+fun
+{
+  my ($fun, $list) = @_;
+  [grep { funcall($fun, $_) } @$list];
+} 'remove-if-not';
+
+fun
+{
+  my ($fun, $list) = @_;
+  [grep { not funcall($fun, $_) } @$list];
+} 'remove-if';
+
+fun
+{
+  my ($value, $list) = @_;
+  [grep { not compare($value, $_) } @$list]
+} 'remove';
+
+fun
+{
+  my $last = shift;
+  while (@_)
+  {
+    my $next = shift;
+    return 0 unless $last <= $next;
+    $last = $next;
+  }
+  1;
+} '<=';
+
+fun
+{
+  my $last = shift;
+  while (@_)
+  {
+    my $next = shift;
+    return 0 unless $last >= $next;
+    $last = $next;
+  }
+  1;
+} '>=';
+
+fun
+{
+  my $last = shift;
+  while (@_)
+  {
+    my $next = shift;
+    return 0 unless $last < $next;
+    $last = $next;
+  }
+  1;
+} '<';
+
+fun
+{
+  my $last = shift;
+  while (@_)
+  {
+    my $next = shift;
+    return 0 unless $last > $next;
+    $last = $next;
+  }
+  1;
+} '>';
+
+fun
+{
+  my $last = shift;
+  while (@_)
+  {
+    my $next = shift;
+    return 0 unless $last == $next;
+    $last = $next;
+  }
+  1;
+} '=';
+
+fun
+{
+  my $fun = shift;
+  if (@_ == 1)
+  {
+    [map { funcall $fun, $_ } @{$_[0]}];
+  }
+  else
+  {
+    my $len = shorter(@_);
+    my @result;
+    for (my $i = 0; $i < $len; $i++)
+    {
+      my @values;
+      for my $list (@_)
+      {
+        push @values, $list->[$i];
+      }
+      push @result, funcall $fun, @values;
+    }
+    \@result;
+  }
+} 'mapcar';
+
+fun
+{
+  my $fun = shift;
+  funcall $fun, map { if (listp ref) { @$_ } else { $_ } } @_;
+} 'apply';
+
+fun
+{
+  my $symbol = shift;
+  my $type = reft $symbol;
+  if ($type)
+  {
+    if ($type eq 'ARRAY')
+    {
+      my ($key, $value) = @_;
+      if ($value)
+      {
+        $symbol->[$key] += $value;
+      }
+      else
+      { 
+        ++$symbol->[$key]; 
+      }
+    }
+    elsif ($type eq 'HASH')
+    {
+      my ($key, $value) = @_;
+      if ($value)
+      {
+        $symbol->{$key} += $value;
+      }
+      else
+      { 
+        ++$symbol->{$key}; 
+      }
+    }
+    else
+    {
+      error 'cannot increment', $type;
+    }
+  }
+  else
+  {
+    my $e = search 'symbol', $symbol;
+    if ($e)
+    {
+      my $value = shift;
+      if ($value)
+      {
+        $e->{symbol}->{$symbol} += $value;
+      }
+      else
+      {
+        ++$e->{symbol}->{$symbol};
+      }
+    }
+    else
+    {
+      error 'incr did not find the symbol', $symbol;
+    }
+  }
+} 'incr';
+
+fun
+{
+  my $symbol = shift;
+  my $type = reft $symbol;
+  if ($type)
+  {
+    if ($type eq 'ARRAY')
+    {
+      my ($key, $value) = @_;
+      if (defined $value)
+      {
+        $symbol->[$key] -= $value;
+      }
+      else
+      { 
+        --$symbol->[$key]; 
+      }
+    }
+    elsif ($type eq 'HASH')
+    {
+      my ($key, $value) = @_;
+      if (defined $value)
+      {
+        $symbol->{$key} -= $value;
+      }
+      else
+      { 
+        --$symbol->{$key}; 
+      }
+    }
+    else
+    {
+      error 'cannot decrement', $type;
+    }
+  }
+  else
+  {
+    my $e = search 'symbol', $symbol;
+    if ($e)
+    {
+      my $value = shift;
+      if (defined $value)
+      {
+        $e->{symbol}->{$symbol} -= $value;
+      }
+      else
+      {
+        --$e->{symbol}->{$symbol};
+      }
+    }
+    else
+    {
+      error 'decr did not find the symbol', $symbol;
+    }
+  }
+} 'decr';
+       
+fun
+{
+  my $list = shift;
+  push @$list, @_;
+} 'push';
+
+fun
+{
+  my $list = shift;
+  unshift @$list, @_;
+} 'unshift';
+
+fun { shift @{shift()} } 'shift';
+fun { pop @{shift()} } 'pop';
+
+fun
+{
+  my ($list, $start, $end) = @_;
+  if ($end)
+  {
+    [splice @$list, $start, $end];
+  }
+  else
+  {
+    [splice @$list, $start];
+  }
+} 'splice';
+
+fun
+{
+  my ($hash, $key) = @_;
+  delete $hash->{$key};
+} 'remove-key';
+
+fun
+{
+  my $hash = shift;
+  for my $key (@_)
+  {
+    delete $hash->{$key};
+  }
+} 'remove-keys';
+
+fun
+{
+  my $hash = shift;
+  while (@_)
+  {
+    my ($key, $value) = splice @_, 0, 2;
+    $hash->{$key} = $value;
+  }
+} 'set-keys';
+
+fun
+{
+  my $str = '';
+  for my $string (@_)
+  {
+    $str .= $string;
+  }
+  bless \$str, 'string';
+} '.';
+
+#ets
+
+
+add_value('nil', undef);
+add_value('t', 1);
+add_value('version', $VERSION);
+add_value('aeth', 'the galactic emperor');
 
 interpret_string <<'oh';
 (macro fun (name args . code)
@@ -1083,6 +1739,12 @@ interpret_string <<'oh';
   (if (listp name)
    `(fun ,(car name) ,(cdr name) ,@value)
    `(setq-current-env ,name ,(car value))))
+
+
+;;; Pixel_Outlaw created this function:
+(defun lisp-print (str)
+  (print str)
+  str)
 
 oh
 

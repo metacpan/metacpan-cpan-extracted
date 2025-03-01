@@ -1,4 +1,4 @@
-package FU::XMLWriter 0.1;
+package FU::XMLWriter 0.2;
 use v5.36;
 use Carp 'confess';
 use Exporter 'import';
@@ -90,7 +90,7 @@ changes, see the main L<FU> module for details.
 
 =head1 SYNOPSIS
 
-  use FU::XMLWriter ':html5';
+  use FU::XMLWriter ':html5_';
 
   my $html_string = html_ sub {
     head_ sub {
@@ -108,7 +108,7 @@ changes, see the main L<FU> module for details.
 
   # Or XML:
 
-  use FU::XMLWriter ':xml';
+  use FU::XMLWriter ':xml_';
 
   my $xml_string = xml_ sub {
     tag_ feed => xmlns => 'http://www.w3.org/2005/Atom',
@@ -268,12 +268,12 @@ and C<"> are replaced with their XML entity.
 All of the functions mentioned in this document can be imported individually.
 There are also two import groups:
 
-  use FU::XMLWriter ':html';
+  use FU::XMLWriter ':html_';
 
 Exports C<tag_()>, C<html_()>, C<lit_()>, C<txt_()> and all of the C<<
 <html-tag>_ >> functions mentioned above.
 
-  use FU::XMLWriter ':xml';
+  use FU::XMLWriter ':xml_';
 
 Exports C<xml_()>, C<tag_()>, C<lit_()> and C<txt_()>.
 

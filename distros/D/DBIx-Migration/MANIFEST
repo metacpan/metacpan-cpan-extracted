@@ -17,6 +17,7 @@ t/04-sqlite.t
 t/05-postgres.t
 t/06-postgres-trigger.t
 t/07-cli.t
+t/08-sqlite-dbh.t
 t/lib/Test/PgTAP.pm
 t/sql/basic/2_up.sql
 t/sql/basic/schema_1_down.sql

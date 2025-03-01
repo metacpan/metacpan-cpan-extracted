@@ -4,15 +4,15 @@ NAME
 
 SYNOPSIS
 
-     use Term::TermKey;
+       use Term::TermKey;
     
-     my $tk = Term::TermKey->new( \*STDIN );
+       my $tk = Term::TermKey->new( \*STDIN );
     
-     print "Press any key\n";
+       print "Press any key\n";
     
-     $tk->waitkey( my $key );
+       $tk->waitkey( my $key );
     
-     print "You pressed: " . $tk->format_key( $key, 0 );
+       print "You pressed: " . $tk->format_key( $key, 0 );
 
 DESCRIPTION
 
@@ -54,7 +54,7 @@ CONSTRUCTOR
 
  new
 
-       $tk = Term::TermKey->new( $fh, $flags )
+       $tk = Term::TermKey->new( $fh, $flags );
 
     Construct a new Term::TermKey object that wraps the given term handle.
     $fh should be either an IO handle reference, an integer referring to a
@@ -64,7 +64,7 @@ CONSTRUCTOR
 
  new_abstract
 
-       $tk = Term::TermKey->new_abstract( $termtype, $flags )
+       $tk = Term::TermKey->new_abstract( $termtype, $flags );
 
     Construct a new abstract Term::TermKey object not associated with a
     filehandle. Input may be fed to it using the push_bytes() method rather
@@ -77,9 +77,9 @@ METHODS
 
  stop
 
-       $success = $tk->start
+       $success = $tk->start;
     
-       $success = $tk->stop
+       $success = $tk->stop;
 
     Start or stop IO interactions from the instance. Starting will send the
     terminal initialisation sequence and set up termios(5) settings,
@@ -93,7 +93,7 @@ METHODS
 
  is_started
 
-       $started = $tk->is_started
+       $started = $tk->is_started;
 
     Returns true if the instance has been started, or false if it is
     stopped.
@@ -102,9 +102,9 @@ METHODS
 
  set_flags
 
-       $flags = $tk->get_flags
+       $flags = $tk->get_flags;
     
-       $tk->set_flags( $newflags )
+       $tk->set_flags( $newflags );
 
     Accessor and mutator for the flags. One of the FLAG_UTF8 or FLAG_RAW
     flags will be set, even if neither was present in the constructor, as
@@ -115,9 +115,9 @@ METHODS
 
  set_canonflags
 
-       $canonflags = $tk->get_canonflags
+       $canonflags = $tk->get_canonflags;
     
-       $tk->set_canonflags( $newcanonflags )
+       $tk->set_canonflags( $newcanonflags );
 
     Accessor and mutator for the canonicalisation flags.
 
@@ -125,9 +125,9 @@ METHODS
 
  set_waittime
 
-       $msec = $tk->get_waittime
+       $msec = $tk->get_waittime;
     
-       $tk->set_waittime( $msec )
+       $tk->set_waittime( $msec );
 
     Accessor and mutator for the maximum wait time in miliseconds. The
     underlying libtermkey library will have specified a default value when
@@ -135,7 +135,7 @@ METHODS
 
  get_buffer_remaining
 
-       $bytes = $tk->get_buffer_remaining
+       $bytes = $tk->get_buffer_remaining;
 
     Accessor returning the number of bytes of buffer space remaining in the
     buffer; the space in which push_bytes can write.
@@ -144,9 +144,9 @@ METHODS
 
  set_buffer_size
 
-       $bytes = $tk->get_buffer_size
+       $bytes = $tk->get_buffer_size;
     
-       $tk->set_buffer_size( $size )
+       $tk->set_buffer_size( $size );
 
     Accessor and mutator to for the total buffer size to store pending
     bytes. If the underlying termkey_set_buffer_size(3) call fails, the
@@ -154,7 +154,7 @@ METHODS
 
  getkey
 
-       $res = $tk->getkey( $key )
+       $res = $tk->getkey( $key );
 
     Attempt to retrieve a single keypress event from the buffer, and put it
     in $key. If successful, will return RES_KEY to indicate that the $key
@@ -173,7 +173,7 @@ METHODS
 
  getkey_force
 
-       $res = $tk->getkey_force( $key )
+       $res = $tk->getkey_force( $key );
 
     Similar to getkey(), but will not return RES_AGAIN if a partial match
     was found. Instead, it will force an interpretation of the bytes, even
@@ -187,7 +187,7 @@ METHODS
 
  waitkey
 
-       $res = $tk->waitkey( $key )
+       $res = $tk->waitkey( $key );
 
     Attempt to retrieve a single keypress event from the buffer, or block
     until one is available. If successful, will return RES_KEY to indicate
@@ -200,7 +200,7 @@ METHODS
 
  advisereadable
 
-       $res = $tk->advisereadable
+       $res = $tk->advisereadable;
 
     Inform the underlying library that new input may be available on the
     underlying file descriptor and so it should call read() to obtain it.
@@ -213,7 +213,7 @@ METHODS
 
  push_bytes
 
-       $len = $tk->push_bytes( $bytes )
+       $len = $tk->push_bytes( $bytes );
 
     Feed more bytes into the input buffer. This is primarily useful for
     feeding input into filehandle-less instances, constructed by passing
@@ -223,14 +223,14 @@ METHODS
 
  get_keyname
 
-       $str = $tk->get_keyname( $sym )
+       $str = $tk->get_keyname( $sym );
 
     Returns the name of a key sym, such as returned by
     Term::TermKey::Key->sym().
 
  keyname2sym
 
-       $sym = $tk->keyname2sym( $keyname )
+       $sym = $tk->keyname2sym( $keyname );
 
     Look up the sym for a named key. The result of this method call can be
     compared directly against the value returned by
@@ -241,7 +241,7 @@ METHODS
 
  interpret_unknown_csi
 
-       ( $cmd, @args ) = $tk->interpret_unknown_csi( $key )
+       ( $cmd, @args ) = $tk->interpret_unknown_csi( $key );
 
     If $key contains an unknown CSI event then its command and arguments
     are returned in a list. $cmd will be a string of 1 to 3 characters
@@ -259,7 +259,7 @@ METHODS
 
  format_key
 
-       $str = $tk->format_key( $key, $format )
+       $str = $tk->format_key( $key, $format );
 
     Return a string representation of the keypress event in $key, following
     the flags given. See the descriptions of the flags, below, for more
@@ -270,7 +270,7 @@ METHODS
 
  parse_key
 
-       $key = $tk->parse_key( $str, $format )
+       $key = $tk->parse_key( $str, $format );
 
     Return a keypress event by parsing the string representation in $str,
     following the flags given. This method is an inverse of format_key.
@@ -280,7 +280,7 @@ METHODS
 
  parse_key_at_pos
 
-       $key = $tk->parse_key_at_pos( $str, $format )
+       $key = $tk->parse_key_at_pos( $str, $format );
 
     Return a keypress event by parsing the string representation in a
     region of $str, following the flags given.
@@ -298,7 +298,7 @@ METHODS
 
  keycmp
 
-       $cmp = $tk->keycmp( $key1, $key2 )
+       $cmp = $tk->keycmp( $key1, $key2 );
 
     Compares the two given keypress events, returning a number less than,
     equal to, or greater than zero, depending on the ordering. Keys are
@@ -307,7 +307,7 @@ METHODS
 
     This may be useful in sort expressions:
 
-     my @sorted_keys = sort { $tk->keycmp( $a, $b ) } @keys;
+       my @sorted_keys = sort { $tk->keycmp( $a, $b ) } @keys;
 
 KEY OBJECTS
 
@@ -323,44 +323,44 @@ KEY OBJECTS
 
  type
 
-       $key->type
+       $key->type;
 
     The type of event. One of TYPE_UNICODE, TYPE_FUNCTION, TYPE_KEYSYM,
     TYPE_MOUSE, TYPE_POSITION, TYPE_MODEREPORT, TYPE_UNKNOWN_CSI.
 
  type_is_...
 
-       $key->type_is_unicode
+       $key->type_is_unicode;
     
-       $key->type_is_function
+       $key->type_is_function;
     
-       $key->type_is_keysym
+       $key->type_is_keysym;
     
-       $key->type_is_mouse
+       $key->type_is_mouse;
     
-       $key->type_is_position
+       $key->type_is_position;
     
-       $key->type_is_modereport
+       $key->type_is_modereport;
     
-       $key->type_is_unknown_csi
+       $key->type_is_unknown_csi;
 
     Shortcuts which return a boolean.
 
  codepoint
 
-       $key->codepoint
+       $key->codepoint;
 
     The Unicode codepoint number for TYPE_UNICODE, or 0 otherwise.
 
  number
 
-       $key->number
+       $key->number;
 
     The function key number for TYPE_FUNCTION, or 0 otherwise.
 
  sym
 
-       $key->sym
+       $key->sym;
 
     The key symbol number for TYPE_KEYSYM, or 0 otherwise. This can be
     passed to Term::TermKey->get_keyname(), or compared to a result earlier
@@ -368,24 +368,24 @@ KEY OBJECTS
 
  modifiers
 
-       $key->modifiers
+       $key->modifiers;
 
     The modifier bitmask. Can be compared against the KEYMOD_* constants.
 
  modifier_...
 
-       $key->modifier_shift
+       $key->modifier_shift;
     
-       $key->modifier_alt
+       $key->modifier_alt;
     
-       $key->modifier_ctrl
+       $key->modifier_ctrl;
 
     Shortcuts which return a boolean if the appropriate modifier is
     present.
 
  utf8
 
-       $key->utf8
+       $key->utf8;
 
     A string representation of the given Unicode codepoint. If the
     underlying termkey library is in UTF-8 mode then this will be a UTF-8
@@ -395,9 +395,9 @@ KEY OBJECTS
 
  button
 
-       $key->mouseev
+       $key->mouseev;
     
-       $key->button
+       $key->button;
 
     The details of a mouse event for TYPE_MOUSE, or undef for other types
     of event.
@@ -406,22 +406,22 @@ KEY OBJECTS
 
  col
 
-       $key->line
+       $key->line;
     
-       $key->col
+       $key->col;
 
     The details of a mouse or position event, or undef for other types of
     event.
 
  termkey
 
-       $key->termkey
+       $key->termkey;
 
     Return the underlying Term::TermKey object this key was retrieved from.
 
  format
 
-       $str = $key->format( $format )
+       $str = $key->format( $format );
 
     Returns a string representation of the keypress event, identically to
     calling format_key on the underlying Term::TermKey object.
@@ -612,16 +612,16 @@ EXAMPLES
 
     This program just prints every keypress until the user presses Ctrl-C.
 
-     use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_VIM );
-     
-     my $tk = Term::TermKey->new(\*STDIN);
-     
-     # ensure perl and libtermkey agree on Unicode handling
-     binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
-     
-     while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
-        print "Got key: ".$tk->format_key( $key, FORMAT_VIM )."\n";
-     }
+       use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_VIM );
+    
+       my $tk = Term::TermKey->new(\*STDIN);
+    
+       # ensure perl and libtermkey agree on Unicode handling
+       binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+    
+       while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
+          print "Got key: ".$tk->format_key( $key, FORMAT_VIM )."\n";
+       }
 
  Configuration of custom keypresses
 
@@ -632,97 +632,97 @@ EXAMPLES
     The following implements a simple line input program, though obviously
     lacking many features in a true line editor like readline.
 
-     use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_LONGMOD );
-     
-     my $tk = Term::TermKey->new(\*STDIN);
-     
-     # ensure perl and libtermkey agree on Unicode handling
-     binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+       use Term::TermKey qw( FLAG_UTF8 RES_EOF FORMAT_LONGMOD );
     
-     my $line = "";
+       my $tk = Term::TermKey->new(\*STDIN);
     
-     $| = 1;
+       # ensure perl and libtermkey agree on Unicode handling
+       binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
     
-     my %key_handlers = (
-        "Enter"  => sub { 
-           print "\nThe line is: $line\n";
-           $line = "";
-        },
+       my $line = "";
     
-        "Backspace" => sub {
-           return unless length $line;
-           substr( $line, -1, 1 ) = "";
-           print "\cH \cH"; # erase it
-        },
+       $| = 1;
     
-        # other handlers ...
-     );
-     
-     while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
-        my $handler = $key_handlers{ $tk->format_key( $key, FORMAT_LONGMOD ) };
-        if( $handler ) {
-           $handler->( $key );
-        }
-        elsif( $key->type_is_unicode and !$key->modifiers ) {
-           my $char = $key->utf8;
+       my %key_handlers = (
+          "Enter"  => sub { 
+             print "\nThe line is: $line\n";
+             $line = "";
+          },
     
-           $line .= $char;
-           print $char;
-        }
-     }
+          "Backspace" => sub {
+             return unless length $line;
+             substr( $line, -1, 1 ) = "";
+             print "\cH \cH"; # erase it
+          },
+    
+          # other handlers ...
+       );
+    
+       while( ( my $ret = $tk->waitkey( my $key ) ) != RES_EOF ) {
+          my $handler = $key_handlers{ $tk->format_key( $key, FORMAT_LONGMOD ) };
+          if( $handler ) {
+             $handler->( $key );
+          }
+          elsif( $key->type_is_unicode and !$key->modifiers ) {
+             my $char = $key->utf8;
+    
+             $line .= $char;
+             print $char;
+          }
+       }
 
  Asynchronous operation
 
     Because the getkey() method performs no IO itself, it can be combined
     with the advisereadable() method in an asynchronous program.
 
-     use IO::Select;
-     use Term::TermKey qw(
-        FLAG_UTF8 RES_KEY RES_AGAIN RES_EOF FORMAT_VIM
-     );
-     
-     my $select = IO::Select->new();
-     
-     my $tk = Term::TermKey->new(\*STDIN);
-     $select->add(\*STDIN);
-     
-     # ensure perl and libtermkey agree on Unicode handling
-     binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
-     
-     sub on_key
-     {
-        my ( $tk, $key ) = @_;
-     
-        print "You pressed " . $tk->format_key( $key, FORMAT_VIM ) . "\n";
-     }
-     
-     my $again = 0;
-     
-     while(1) {
-        my $timeout = $again ? $tk->get_waittime/1000 : undef;
-        my @ready = $select->can_read($timeout);
-     
-        if( !@ready ) {
-           my $ret;
-           while( ( $ret = $tk->getkey_force( my $key ) ) == RES_KEY ) {
-              on_key( $tk, $key );
-           }
-        }
-     
-        while( my $fh = shift @ready ) {
-           if( $fh == \*STDIN ) {
-              $tk->advisereadable;
-              my $ret;
-              while( ( $ret = $tk->getkey( my $key ) ) == RES_KEY ) {
-                 on_key( $tk, $key );
-              }
-     
-              $again = ( $ret == RES_AGAIN );
-              exit if $ret == RES_EOF;
-           }
-           # Deal with other filehandles here
-        }
-     }
+       use IO::Select;
+       use Term::TermKey qw(
+          FLAG_UTF8 RES_KEY RES_AGAIN RES_EOF FORMAT_VIM
+       );
+    
+       my $select = IO::Select->new();
+    
+       my $tk = Term::TermKey->new(\*STDIN);
+       $select->add(\*STDIN);
+    
+       # ensure perl and libtermkey agree on Unicode handling
+       binmode( STDOUT, ":encoding(UTF-8)" ) if $tk->get_flags & FLAG_UTF8;
+    
+       sub on_key
+       {
+          my ( $tk, $key ) = @_;
+    
+          print "You pressed " . $tk->format_key( $key, FORMAT_VIM ) . "\n";
+       }
+    
+       my $again = 0;
+    
+       while(1) {
+          my $timeout = $again ? $tk->get_waittime/1000 : undef;
+          my @ready = $select->can_read($timeout);
+    
+          if( !@ready ) {
+             my $ret;
+             while( ( $ret = $tk->getkey_force( my $key ) ) == RES_KEY ) {
+                on_key( $tk, $key );
+             }
+          }
+    
+          while( my $fh = shift @ready ) {
+             if( $fh == \*STDIN ) {
+                $tk->advisereadable;
+                my $ret;
+                while( ( $ret = $tk->getkey( my $key ) ) == RES_KEY ) {
+                   on_key( $tk, $key );
+                }
+    
+                $again = ( $ret == RES_AGAIN );
+                exit if $ret == RES_EOF;
+             }
+             # Deal with other filehandles here
+          }
+       }
 
     There may also be more appropriate modules on CPAN for particular event
     frameworks; see the SEE ALSO section below.

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use LWP::UserAgent;
 use HTTP::Request;
-use HTML::Strip;
 use Carp;
 
 our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0";
@@ -21,6 +20,7 @@ sub new
 	$self->{'-debug'}  = $DEBUG;
 	$self->{'-agent'}  = $AGENT;
 	$self->{'-cache'}  = '';
+	$self->{'-synced'} = 'No';  #USER CHOICES ARE:  YES(synced|plain), NO(plain), ONLY(synced), or OK|''(plain|synced)!
 	$self->{'Error'}   = 'Ok';
 	$self->{'Source'}  = $source;
 	$self->{'Site'}    = '';
@@ -126,6 +126,15 @@ sub cache {
 
 sub image_url {
 	return shift->{'image_url'};
+}
+
+sub fetch_synced_lyrics {
+	my $self = shift;
+	if (defined $_[0]) {
+		$self->{'-synced'} = $_[0];
+	} else {
+		return $self->{'-synced'};
+	}
 }
 
 sub _check_inputs {
@@ -253,7 +262,7 @@ LyricFinder::_Class - Base module containing default methods common to all Lyric
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		

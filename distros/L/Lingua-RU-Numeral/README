@@ -1,4 +1,4 @@
-Lingua-RU-Numeral version 0.031
+Lingua-RU-Numeral version 0.071
 ===============================
 
 The module provides the necessary subroutines to generate 
@@ -14,6 +14,8 @@ To install this module type the following:
    make
    make test
    make install
+or
+   sudo make install
 
 If you have root on a Unix system it is enough to run this command:
 
@@ -31,7 +33,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2022-2023 by Alessandro Gorohovski
+Copyright (C) 2022-2025 by Alessandro Gorohovski
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

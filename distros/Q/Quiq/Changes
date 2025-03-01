@@ -1,3 +1,44 @@
+1.224 2025-02-28
+================
+
+[Quiq::Text::Generator]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd]
+* ZUGFeRD-Profile hinzugefügt
+
+[Quiq::Zugferd::Tree]
+* Klasse hinzugefügt
+
+[Quiq::Debug]
+* showDiff(): Gib optional das Diff-Kommando aus
+
+[Quiq::DirHandle]
+* Fehlermeldungen nun auf Englisch
+
+[Quiq::Dumper]
+* dump(): Globale Setzung NoClassNames hnzugefügt
+
+[Quiq::Eog]
+* transferImages(): Ausgabe Anzahl Bilder hinzugefügt
+
+[Quiq::Hash]
+* getDeep(): um Array-Zugriff erweitert
+* setDeep(): Methode hinzugefügt
+
+[Quiq::Path]
+* write(): um optionale Logausgabe erweitert
+* stat(): Prüfung auf Pfadexistenz verbessert
+
+[Quiq::Tree]
+* Klasse substantiell verbessert
+
+[Quiq::Xml]
+* xmlToTree(): hinzugefügt
+
+[Quiq::Zugferd]
+* Klasse substantiell erweitert
+
 1.223 2024-12-28
 ================
 

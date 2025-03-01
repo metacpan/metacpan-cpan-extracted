@@ -13,7 +13,7 @@ BEGIN
   $| = 1;
   unshift @INC,'../lib';
   chdir 't' if -d 't';
-  plan tests => 7;
+  plan tests => 8;
   }
 END 
   {
@@ -34,32 +34,37 @@ if ( $] > 5.007 ) {
 
 my ($try,$rc);
 
-$try = "brailleAsciiToUnicode('HELLO');";
+$try = "brailleAscii_To_Unicode('HELLO');";
 $rc = eval $try;
 print " # '$try' expected '⠓⠑⠇⠇⠕' but got '$rc'\n" 
 	unless ok ($rc,"⠓⠑⠇⠇⠕");
 
-$try = "brailleAsciiToDots('HELLO');";
+$try = "brailleAscii_To_Unicode('hello');";
+$rc = eval $try;
+print " # '$try' expected '⠓⠑⠇⠇⠕' but got '$rc'\n" 
+	unless ok ($rc,"⠓⠑⠇⠇⠕");
+
+$try = "brailleAscii_To_DotNumbers('HELLO');";
 $rc = eval $try;
 print " # '$try' expected '12515123123135' but got '$rc'\n" 
 	unless ok ($rc,"12515123123135");
 
-$try = "brailleDotsToAscii('12515123123135');";
+$try = "brailleDotNumbers_To_Ascii('12515123123135');";
 $rc = eval $try;
 print " # '$try' expected 'HELLO' but got '$rc'\n" 
 	unless ok ($rc,'HELLO');
 
-$try = "brailleDotsToUnicode('12515123123135');";
+$try = "brailleDotNumbers_To_Unicode('12515123123135');";
 $rc = eval $try;
 print " # '$try' expected '⠓⠑⠇⠇⠕' but got '$rc'\n" 
 	unless ok ($rc,'⠓⠑⠇⠇⠕');
 
-$try = "brailleUnicodeToDots('⠓⠑⠇⠇⠕');";
+$try = "brailleUnicode_To_DotNumbers('⠓⠑⠇⠇⠕');";
 $rc = eval $try;
 print " # '$try' expected '12515123123135' but got '$rc'\n" 
 	unless ok ($rc,"12515123123135");
 
-$try = "brailleUnicodeToAscii('⠓⠑⠇⠇⠕');";
+$try = "brailleUnicode_To_Ascii('⠓⠑⠇⠇⠕');";
 $rc = eval $try;
 print " # '$try' expected 'HELLO' but got '$rc'\n" 
 	unless ok ($rc,'HELLO');
