@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '4.01';
+$Map::Tube::VERSION   = '4.02';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 4.01
+Version 4.02
 
 =cut
 
@@ -1162,104 +1162,6 @@ sub _validate_map_structure {
         Map::Tube::Exception::InvalidStationStructure->throw({
             method      => __PACKAGE__."::_validate_map_structure",
             message     => "ERROR: Invalid station structure in map data.",
-            filename    => $caller->[1],
-            line_number => $caller->[2] });
-    }
-}
-
-sub _validate_map_data {
-    my ($self) = @_;
-
-    my @caller = caller(0);
-    @caller    = caller(2) if $caller[3] eq '(eval)';
-    my $nodes  = $self->{nodes};
-    my $seen   = {};
-
-    $self->_validate_lines(\@caller);
-
-    foreach my $id (keys %$nodes) {
-
-        Map::Tube::Exception::InvalidStationId->throw({
-            method      => __PACKAGE__."::_validate_map_data",
-            message     => "ERROR: Station ID can't have ',' character.",
-            filename    => $caller[1],
-            line_number => $caller[2] }) if ($id =~ /\,/);
-
-        my $node = $nodes->{$id};
-
-        $self->_validate_nodes(\@caller, $nodes, $node, $seen);
-        $self->_validate_self_linked_nodes(\@caller, $node, $id);
-        $self->_validate_multi_linked_nodes(\@caller, $node, $id);
-        $self->_validate_multi_lined_nodes(\@caller, $node, $id);
-    }
-}
-
-sub _validate_lines {
-    my ($self, $caller) = @_;
-
-    my $lines = $self->{lines};
-    foreach (@$lines) {
-        my $line_color = $_->{color};
-        if (defined $line_color && !(is_valid_color($line_color))) {
-            Map::Tube::Exception::InvalidLineColor->throw({
-                method      => __PACKAGE__."::_validate_map_data",
-                message     => "ERROR: Invalid Line Color [$line_color].",
-                filename    => $caller->[1],
-                line_number => $caller->[2] });
-        }
-    }
-}
-
-sub _validate_nodes {
-    my ($self, $caller, $nodes, $node, $seen) = @_;
-
-    foreach (split /\,/, $node->{link}) {
-        next if (exists $seen->{$_});
-        my $_node = $nodes->{$_};
-
-        Map::Tube::Exception::InvalidStationId->throw({
-            method      => __PACKAGE__."::_validate_map_data",
-            message     => "ERROR: Invalid Station ID [$_].",
-            filename    => $caller->[1],
-            line_number => $caller->[2] }) unless (defined $_node);
-
-        $seen->{$_} = 1;
-    }
-}
-
-sub _validate_self_linked_nodes {
-    my ($self, $caller, $node, $id) = @_;
-
-    if (grep { $_ eq $id } (split /\,/, $node->{link})) {
-        Map::Tube::Exception::FoundSelfLinkedStation->throw({
-            method      => __PACKAGE__."::_validate_map_data",
-            message     => sprintf("ERROR: %s is self linked,", $id),
-            filename    => $caller->[1],
-            line_number => $caller->[2] });
-    }
-}
-
-sub _validate_multi_linked_nodes {
-    my ($self, $caller, $node, $id) = @_;
-
-    my %links    = ();
-    my $max_link = 1;
-
-    foreach my $link (split( /\,/, $node->{link})) {
-        $links{$link}++;
-    }
-
-    foreach (keys %links) {
-        $max_link = $links{$_} if ($max_link < $links{$_});
-    }
-
-    if ($max_link > 1) {
-        my $message = sprintf("ERROR: %s linked to %s multiple times,",
-                              $id, join( ',', grep { $links{$_} > 1 } keys %links));
-
-        Map::Tube::Exception::FoundMultiLinkedStation->throw({
-            method      => __PACKAGE__."::_validate_map_data",
-            message     => $message,
             filename    => $caller->[1],
             line_number => $caller->[2] });
     }

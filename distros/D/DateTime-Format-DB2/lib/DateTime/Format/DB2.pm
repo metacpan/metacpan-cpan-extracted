@@ -4,7 +4,7 @@ use strict;
 
 use vars qw ($VERSION);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use DateTime;
 use DateTime::Format::Builder
@@ -52,7 +52,7 @@ sub _fix_nano
 {
     my %p = @_;
 
-    $p{parsed}{nanosecond} *= 10**9;
+    $p{parsed}{nanosecond} = int($p{parsed}{nanosecond} * 10**9);
 
     return 1;
 }

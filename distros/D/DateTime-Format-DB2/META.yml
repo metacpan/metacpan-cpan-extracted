@@ -1,12 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         DateTime-Format-DB2
-version:      0.05
-version_from: lib/DateTime/Format/DB2.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-DB2
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    DateTime:                      0
-    DateTime::Format::Builder:     0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  DateTime: '0'
+  DateTime::Format::Builder: '0'
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

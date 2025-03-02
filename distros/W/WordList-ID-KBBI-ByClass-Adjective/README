@@ -1,0 +1,99 @@
+NAME
+    WordList::ID::KBBI::ByClass::Adjective - Indonesian adjective words from
+    Kamus Besar Bahasa Indonesia (KBBI), 3e
+
+VERSION
+    This document describes version 0.001 of
+    WordList::ID::KBBI::ByClass::Adjective (from Perl distribution
+    WordList-ID-KBBI-ByClass-Adjective), released on 2024-11-19.
+
+SYNOPSIS
+     use WordList::ID::KBBI::ByClass::Adjective;
+
+     my $wl = WordList::ID::KBBI::ByClass::Adjective->new;
+
+     # Pick a (or several) random word(s) from the list
+     my ($word) = $wl->pick;
+     my ($word) = $wl->pick(1);  # ditto
+     my @words  = $wl->pick(3);  # no duplicates
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }  # case-sensitive
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words (beware, some wordlists are *huge*)
+     my @all_words = $wl->all_words;
+
+DESCRIPTION
+    This wordlist uses random-seek picking, which gives higher probability
+    for longer words. See File::RandomLine for more details.
+
+WORDLIST STATISTICS
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 7.56483367277665 |
+     | longest_word_len                 | 27               |
+     | num_words                        | 4419             |
+     | num_words_contain_nonword_chars  | 284              |
+     | num_words_contain_unicode        | 0                |
+     | num_words_contain_whitespace     | 49               |
+     | num_words_contains_nonword_chars | 284              |
+     | num_words_contains_unicode       | 0                |
+     | num_words_contains_whitespace    | 49               |
+     | shortest_word_len                | 3                |
+     +----------------------------------+------------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-ID-KBBI-ByClass-Adjective>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-ID-KBBI-ByClass-Adjective>.
+
+SEE ALSO
+    ArrayData::Lingua::Word::ID::KBBI::ByClass::Adjective contains the same
+    data.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-ID-KBBI-ByCl
+    ass-Adjective>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

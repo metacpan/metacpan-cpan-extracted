@@ -34,7 +34,8 @@ if($have_atonv) {
     print "ok 2\n"; # Original test removed
   }
 
-  elsif($Config::Config{nvtype} eq 'long double') {
+  elsif($Config::Config{nvtype} eq 'long double' && length(sqrt(2.1)) < 25) { # Exclude IEEE 754 long double
+                                                                              # from this branch.
     $nv1 = atonv('0b0.100001e-16445');
     $nv2 = atonv('3.6452e-4951');
     $nv3 = atonv('0x0.84p-16445');
@@ -74,9 +75,11 @@ if($have_atonv) {
     }
   }
 
-  elsif($Config::Config{nvtype} eq '__float128') {
-
-    if($mpfr_has_float128) {                # Don't assume mpfr supports libquadmath types
+  elsif($Config::Config{nvtype} eq '__float128' || $Config::Config{nvtype} eq 'long double') {
+    # If nvtype is "long double" it will be the IEEE 754 long double, as the other kinds of
+    # long double have already been tested in one of the preceding branches.
+    # For nvtype of "__float128" we also need to verify that $mpfr_has_float128 is TRUE.
+    if($mpfr_has_float128 || $Config::Config{nvtype} eq 'long double') {
       $nv1 = atonv('0b0.100001e-16494');
       $nv2 = atonv('6.5e-4966');
       $nv3 = atonv('0x0.84p-16494');
@@ -89,7 +92,7 @@ if($have_atonv) {
       print "ok 2\n"; # Original test removed
     }
 
-    else {
+    else { # The nvtype can be only "__float128".
       eval { $nv1 = atonv('0b0.100001e-16494') };
       if($@ =~ /^The atonv function is unavailable for this __float128 build/) {
         print "ok 1\n";

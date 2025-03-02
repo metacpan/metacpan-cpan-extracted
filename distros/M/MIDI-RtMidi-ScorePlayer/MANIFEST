@@ -23,6 +23,7 @@ eg/drummer.pl
 eg/gol.pl
 eg/readkey.pl
 eg/rpsls-game.pl
+eg/tester.pl
 eg/treble-bass.pl
 gol-state.dat
 lib/MIDI/RtMidi/ScorePlayer.pm

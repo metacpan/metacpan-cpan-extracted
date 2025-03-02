@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0206';
 
 use strict;
 use warnings;
@@ -37,14 +37,16 @@ sub new {
         die "Invalid path: $opts{path}\n" unless -d $opts{path};
     }
 
-    $opts{device} = RtMidiOut->new;
+    unless ($opts{device}) {
+        $opts{device} = RtMidiOut->new;
 
-    $opts{port} //= qr/wavetable|loopmidi|timidity|fluid|iac/i;
+        $opts{port} //= qr/wavetable|loopmidi|timidity|fluid|iac/i;
 
-    # For MacOS, DLSMusicDevice should receive input from this virtual port:
-    $opts{device}->open_virtual_port('dummy') if $^O eq 'darwin';
+        # For MacOS, DLSMusicDevice should receive input from this virtual port:
+        $opts{device}->open_virtual_port('dummy') if $^O eq 'darwin';
 
-    $opts{device}->open_port_by_name($opts{port});
+        $opts{device}->open_port_by_name($opts{port});
+    }
 
     bless \%opts, $class;
 }
@@ -156,7 +158,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0204
+version 0.0206
 
 =head1 SYNOPSIS
 
@@ -194,6 +196,10 @@ version 0.0204
       return $bass;
   }
 
+  # optional:
+  use MIDI::RtMidi::FFI::Device ();
+  my $midi_output = RtMidiOut->new;
+
   MIDI::RtMidi::ScorePlayer->new(
       score    => $score, # required MIDI score object
       parts    => [ \&bass, [ \&treble, \&bass ], \&bass ], # required part functions
@@ -206,6 +212,7 @@ version 0.0204
       verbose  => 0, # print out text events (default: 0)
       dump     => 0, # dump the score before each play (default: 0)
       port     => qr/iac/, # optional
+      device   => $midi_output, # optional
   )->play;
 
 =head1 DESCRIPTION

@@ -939,18 +939,21 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     and a negative value otherwise.
 
    q_add_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
-    Set $q1 to the exact rational value of $q2 + $op
+    Set $q1 to the exact rational value of $q2 + $op.
 
    q_sub_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
-    Set $q1 to the exact rational value of $q2 - $op
+    Set $q1 to the exact rational value of $q2 - $op.
 
    q_mul_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
-    Set $q1 to the exact rational value of $q2 * $op
+    Set $q1 to the exact rational value of $q2 * $op.
 
    q_div_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
-    Set $q1 to the exact rational value of $q2 / $op
+    Set $q1 to the exact rational value of $q2 % p.
 
-   $si = Rmpfr_sqr($rop, $op, $rnd);
+   q_fmod_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
+    Set $q1 to the exact rational value of fmod($q2,$op).
+
+   $inex = Rmpfr_sqr($rop, $op, $rnd);
     Set $rop to the square of $op, rounded in direction $rnd.
 
    $inex = Rmpfr_sqrt($rop, $op, $rnd);
@@ -1032,7 +1035,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to -$op rounded in the direction $rnd. Just
     changes the sign if $rop and $op are the same variable.
 
-   $si = Rmpfr_abs($rop, $op, $rnd);
+   $inex = Rmpfr_abs($rop, $op, $rnd);
     Set $rop to the absolute value of $op, rounded in the direction
     $rnd. Return 0 if the result is exact, a positive value if $rop
     is larger than the absolute value of $op, and a negative value
@@ -2468,78 +2471,53 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
 
     Some additional cross-class overloading is also allowed.
     Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
-    Math::GMPq, Math::GMPf or Math::GMP object. Then it is now
+    Math::GMPq, or Math::GMP object. Then it is now
     permissible to do:
 
      $M + $G;
      $M += $G;
-
      $M - $G;
      $M -= $G;
-
      $M * $G;
      $M *= $G;
-
      $M / $G;
      $M /= $G;
-
      $M % $G;  (Wraps the mpfr_fmod function)
      $M %= $G; (Wraps the mpfr_fmod function)
-
      $M ** $G;
      $M **= $G;
 
-    If you have version 0.35 (or later) of Math::GMPz, Math::GMPq
-    and Math::GMPf, it is also permissible to do:
+    YMMV if you use old versions of Math::GMPz and Math::GMPq,
+    but if you have Math-GMPz-0.63 (or later) and Math-GMPq-0.61
+    (or later), and $G is either a Math::GMPz or Math::GMPq
+    object, then it is also permissible to do:
 
      $G + $M;
-     $G - $M;
-     $G * $M;
-     $G / $M;
-     $G ** $M;
-
-    (But note that such operations involving Math::GMP will
-    silently fail or crash if used.)
-    Again, each of those operations returns a Math::MPFR object
-    containing the result of the operation.
-    Each operation is performed to "infinite: precision, and then
-    rounded to default precision using default Math::MPFR rounding.
-    The precision of the returned Math::MPFR object will therefore
-    differ from the precision of $M unless the precision of $M is
-    the default.
-
-    With Math::GMPz (0.63 or later) or Math::GMPq (0.58 or later)
-    it is also now permissible to do:
-
-    $G % $M:
-
-    NOTE: In overloading a ** (power) operation that involves a
-    Math::GMPq object, the value of the Math::GMPq object is
-    assigned to a Math::MPFR object. This assignment is done using
-    current default precision and current default rounding mode.
-
-    The following is allowed for Math::GMPq objects (if
-    $Math::GMPq::VERSION >= 0.54 && $Math::GMPq::RETYPE == 1) and
-    for Math::GMPz (if $Math::GMPz::VERSION >= 0.57 &&
-    $Math::GMPz::RETYPE == 1), but not for Math::GMPf or
-    Math::GMP :
-
      $G += $M;
+     $G - $M;
      $G -= $M;
+     $G * $M;
      $G *= $M;
+     $G / $M;
      $G /= $M;
-     $G %= $M; (Math::GMPz >= 0.63; Math::GMPq >= 0.58)
+     $G % $M;  (Wraps the mpfr_fmod function)
+     $G %= $M; (Wraps the mpfr_fmod function)
+     $G ** $M;
      $G **= $M;
 
-    When this usage is permitted, the result of the operation is
-    returned as a Math::MPFR object, calculated to "infinite"
-    precision and rounded to Math::MPFR default precision, using
-    Math::MPFR default rounding mode.
+    NOTE: In cross-class overloading a ** (power) or % (mpfr_fmod)
+    operation that involves a Math::GMPq object, the value of the
+    Math::GMPq object is assigned to a Math::MPFR object - using
+    current default precision and current default rounding mode.
+    Otherwise, the argument $G will be evaluated to "infinite"
+    precision.
+    The returned (Math::MPFR object) result will have been rounded
+    to default precision, using default rounding mode.
 
     To determine the type and value of the second argument received
-    by the overloading subroutine, it works through the following
-    steps (in order), using the first value it finds, or croaking if
-    it gets to step 6:
+    by the overloading subroutines, we work through the following
+    steps (in order), using the first value we find, or croaking if
+    we get to step 6:
 
     1. If the variable is a UV then that value is used. The variable
        is considered to be a UV if the IOK and IsUV flags are set.
@@ -2569,11 +2547,11 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
        what you want, and it's recommended not to pass such values
        to the overloaded operators.
 
-    5. If the variable is a Math::MPFR, Math::GMPz, Math::GMPf, or
-       Math::GMPq object then the value of that object is used.
-       If the particular operation does not accept a Math::GMP*
-       object, then the operation dies with an appropriate error
-       message if such an object is received.
+    5. If the variable is a Math::MPFR, Math::GMPz, or Math::GMPq,
+       or Math::GMP object then the value of that object is used.
+       If the particular operation does not accept the given type
+       of object, then the operation dies with an appropriate
+       error message if such an object is received.
 
     6. If none of the above is true, then the second variable is
        deemed to be of an invalid type. The operation croaks with

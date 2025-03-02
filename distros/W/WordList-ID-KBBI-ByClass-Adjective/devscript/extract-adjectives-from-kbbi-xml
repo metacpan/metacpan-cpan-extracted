@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use 5.014;
+use strict;
+use warnings;
+use Log::ger::Screen;
+use Log::ger;
+
+my $kbbi = do { local $/; scalar <> };
+log_info "KBBI is %d characters", length($kbbi);
+
+my @articles;
+while ($kbbi =~ m!<article>(.+?)</article>!sg) { push @articles, $1 }
+log_info "There are %d articles", scalar(@articles);
+
+for my $article (@articles) {
+    my ($key) = $article =~ m!<key>(.+?)</key>! or die "Can't extract key from article";
+    my ($def) = $article =~ m!<definition[^>]*>(.+)</definition>!s or die "Can't extract definition from article";
+    $def =~ s/\A\R*!\[CDATA\[(.*)\]\]>\R*\z/$1/;
+    $def =~ /^\[a( [^\]]+)?\]/m or next;
+    print "$key\n";
+}

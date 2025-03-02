@@ -1,5 +1,13 @@
 Revision history for Perl module Math::MPFR
 
+4.37
+
+4.36
+  - Fix bug in t/atonv.t - fixes https://rt.cpan.org/Ticket/Display.html?id=160048.
+    Thanks Slaven Rezic.
+  - Add new function q_fmod_fr()
+  - Simplify "OPERATOR OVERLOADING" in MPFR.pod
+
 4.35
   - Add Rmpfr_get_float16, Rmpfr_set_float16 and Rmpfr_buildopt_float16_p.
     All 3 are new in mpfr-4.3.0.

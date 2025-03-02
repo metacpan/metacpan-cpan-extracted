@@ -1,5 +1,10 @@
 Revision history for Term-TermKey
 
+0.19    2025-03-01
+        [BUGFIXES]
+         * Rebuild with fixed MANIFEST to include
+           hax/sv_regex_global_pos.c.inc
+
 0.18    2025-02-28
         [CHANGES]
          * General module refresh

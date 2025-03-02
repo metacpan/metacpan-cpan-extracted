@@ -1,5 +1,5 @@
 package Signal::Info;
-$Signal::Info::VERSION = '0.005';
+$Signal::Info::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Signal::Info - A wrapper around siginfo_t
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -172,9 +172,9 @@ The following constants are defined for the C<code> field, all having their L<PO
 
 =item * C<SI_TIMER>
 
-=item * C<SI_ASYNCIO>
+=item * C<SI_ASYNCIO> (conditionally defined)
 
-=item * C<SI_MESGQ>
+=item * C<SI_MESGQ> (conditionally defined)
 
 =back
 

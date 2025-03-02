@@ -1261,6 +1261,26 @@ void q_div_fr(mpq_t * a, mpq_t * b, mpfr_t * c) {
   mpq_clear(temp);
 }
 
+void q_fmod_fr(mpq_t * a, mpq_t * b, mpfr_t * c) {
+  mpq_t q;
+  mpz_t z;
+  mpq_init(q);
+  mpz_init(z);
+#if defined(MPFR_VERSION_MAJOR) && MPFR_VERSION_MAJOR >= 4
+  mpfr_get_q(q, *c);
+#else
+  Rmpfr_get_q(&q, c);
+#endif
+
+  mpq_div(*a, *b, q);
+  mpz_set_q(z, *a);
+  mpq_set_z(*a, z);
+  mpz_clear(z);
+  mpq_mul(*a, q, *a);
+  mpq_clear(q);
+  mpq_sub(*a, *b, *a);
+}
+
 SV * Rmpfr_ui_div(pTHX_ mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
   CHECK_ROUNDING_VALUE
   return newSViv(mpfr_ui_div(*a, (unsigned long)SvUV(b), *c, (mpfr_rnd_t)SvUV(round)));
@@ -10028,6 +10048,24 @@ q_div_fr (a, b, c)
         PPCODE:
         q_div_fr(a, b, c);
         XSRETURN_EMPTY; /* return empty stack */
+
+void
+q_fmod_fr (a, b, c)
+	mpq_t *	a
+	mpq_t *	b
+	mpfr_t *	c
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        q_fmod_fr(a, b, c);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return;
 
 SV *
 Rmpfr_ui_div (a, b, c, round)

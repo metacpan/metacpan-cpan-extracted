@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2025 -- leonerd@leonerd.org.uk
 
-package Term::TermKey 0.18;
+package Term::TermKey 0.19;
 
 use v5.14;
 use warnings;

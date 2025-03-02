@@ -1,4 +1,4 @@
-package AI::Ollama::Client 0.04;
+package AI::Ollama::Client 0.05;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';

@@ -44,6 +44,7 @@ t/bytes.t
 t/cmp_uj_sj.t
 t/compound.t
 t/constants.t
+t/cross_class_mpq.t
 t/D64_LD.t
 t/decimal64_conv.t
 t/decimal128_conv.t

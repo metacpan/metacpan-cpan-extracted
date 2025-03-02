@@ -3,7 +3,7 @@ package App::Greple::L;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ greple -ML
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,8 @@ regions which can be used in B<greple> options.
 
 If a line number argument immediately follows B<-ML> module option, it
 is recognized as a line number.  Note that, this format implicitly
-adds the C<--cm N> option to disable the coloring feature.
+adds the C<--cm N> option to disable the coloring feature.  Use the
+C<--cm @> option to cancel it.
 
 Next command will show 42nd line.
 
@@ -91,7 +92,7 @@ But this command produce nothing, because each line definitions are
 taken as a different pattern, and B<greple> prints lines only when all
 patterns matched.  You can relax the condition by C<--need 1> option
 in such case, then you will get expected result.  Next example will
-display 10th, 20th and 30th lines in different colors.
+display 42nd, 52nd and 62nd lines in different colors.
 
     greple -ML -L 42 -L 52 -L 62 --need 1
 
@@ -171,7 +172,7 @@ use Data::Dumper;
 use Exporter qw(import);
 our @EXPORT = qw(&line &offload);
 
-use List::Util qw(any pairmap);
+use List::Util qw(pairmap);
 use App::Greple::Common;
 use App::Greple::Regions qw(match_borders borders_to_regions);
 
@@ -179,41 +180,49 @@ my %param = (
     auto => 1,
 );
 
+sub is_number {
+    $_[0] =~ m{^
+	       (?<SPEC> (?: [-+]?\d+ | : )+ )
+	       (?: , (?&SPEC) )*
+	       $
+	  }x;
+}
+
 sub finalize {
     my($app, $argv) = @_;
     $param{auto} or return;
-    my $update = 0;
+    my $number = 0;
     for (my $i = 0; $i < @$argv; $i++) {
 	local $_ = $argv->[$i];
-	(/^-?[\d:,]+$/ and ! -f $_) or last;
-	splice(@$argv, $i, 1, '--le', sprintf("&line(%s)", $_));
-	$i++;
-	$update++;
+	(is_number($_) and ! -f $_) or last;
+	splice(@$argv, $i, 1,
+	       my @new = ('--le', sprintf("&line(%s)", $_)));
+	$i += @new - 1;
+	$number++;
     }
-    if ($update > 0) {
+    if ($number > 0) {
 	my @default = qw(--cm N);
-	push @default, qw(--need=1) if $update > 1;
+	push @default, qw(--need=1) if $number > 1;
 	$app->setopt(default => @default);
     }
 }
 
+use Getopt::EX::Numbers;
+
 sub line_to_region {
-    state $target = -1;
-    state @lines;
-    if ($target != \$_) {
-	@lines = ([0, 0], borders_to_regions match_borders qr/^/m);
+    state($target, @lines, $numbers);
+    if (not defined $target or $target != \$_) {
 	$target = \$_;
+	@lines = ([0, 0], borders_to_regions match_borders qr/^/m);
+	$numbers = Getopt::EX::Numbers->new(min => 1, max => $#lines);
     }
-    use Getopt::EX::Numbers;
-    my $numbers = Getopt::EX::Numbers->new(min => 1, max => $#lines);
-    my @result = do {
+    do {
 	map  { [ $lines[$_->[0]]->[0], $lines[$_->[1]]->[1] ] }
 	sort { $a->[0] <=> $b->[0] }
 	map  { $numbers->parse($_)->range }
 	map  { split /,+/ }
 	@_;
     };
-    @result;
 }
 
 sub line {

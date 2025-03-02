@@ -1,5 +1,8 @@
 Revision history for Signal-Info
 
+0.006     2025-03-02 03:24:54+01:00 Europe/Brussels
+          - Conditionally define SI_ASYNCIO and SI_MESGQ
+
 0.005     2025-02-21 19:01:00+01:00 Europe/Brussels
           - Fix band and fd fallback definitions
 

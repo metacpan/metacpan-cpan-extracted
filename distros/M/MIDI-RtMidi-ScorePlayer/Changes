@@ -1,8 +1,16 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0206 2025-03-01 18:22:40
+    - Remove debugging code.
+
+0.0205 2025-03-01 17:39:41
+    - Allow the MIDI output device to be specified in the constructor.
+
 0.0204 2025-01-24 10:14:25
     - Fix synopsis.
     - Add the Mac "IAC Driver" virtual port to the possibles.
+
+0.0203 - Whoops!
 
 0.0202 2024-08-10 23:42:44
     - Fix annoying typo.

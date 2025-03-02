@@ -45,10 +45,14 @@ my %module = (
     'LICENSE'=> 'artistic_2',
 
     PL_FILES            => {},
-    BUILD_REQUIRES => {
-        'strict'                  => 0,
+
+    CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
         'File::ShareDir::Install' => 0,
+    },
+
+    BUILD_REQUIRES => {
+        'strict'                  => 0,
     },
 
     PREREQ_PM => {
