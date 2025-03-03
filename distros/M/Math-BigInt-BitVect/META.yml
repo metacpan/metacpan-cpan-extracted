@@ -19,8 +19,8 @@ no_index:
     - inc
 requires:
   Bit::Vector: '0'
-  Math::BigInt: '2.003001'
+  Math::BigInt: '2.004001'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-BitVect.git
-version: '1.23'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

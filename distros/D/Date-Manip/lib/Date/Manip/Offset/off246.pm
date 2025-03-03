@@ -1,14 +1,14 @@
 package #
 Date::Manip::Offset::off246;
-# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2025 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Dec  4 14:48:50 EST 2024
-#    Data version: tzdata2024b
-#    Code version: tzcode2024b
+#    Generated on: Sun Mar  2 17:20:12 EST 2025
+#    Data version: tzdata2025a
+#    Code version: tzcode2025a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.96';
+$VERSION='6.97';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -53,6 +53,7 @@ $Offset        = '-03:00:00';
       'america/argentina/san_luis',
       'america/argentina/tucuman',
       'america/argentina/ushuaia',
+      'america/asuncion',
       'america/miquelon',
       'atlantic/stanley',
       'america/paramaribo',
@@ -65,7 +66,6 @@ $Offset        = '-03:00:00';
       'america/nuuk',
       'america/danmarkshavn',
       'america/guyana',
-      'america/asuncion',
       ],
    1 => [
       'america/halifax',
@@ -74,8 +74,8 @@ $Offset        = '-03:00:00';
       'atlantic/bermuda',
       'america/santiago',
       'america/goose_bay',
-      'america/asuncion',
       'america/thule',
+      'america/asuncion',
       'america/campo_grande',
       'america/cuiaba',
       'america/punta_arenas',

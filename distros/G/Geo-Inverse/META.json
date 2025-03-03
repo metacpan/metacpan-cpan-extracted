@@ -36,6 +36,7 @@
             "Geo::Ellipsoids" : "0.09",
             "Geo::Functions" : "0.03",
             "Package::New" : "0",
+            "Test::Number::Delta" : "0",
             "Test::Simple" : "0.44"
          }
       }
@@ -51,6 +52,6 @@
          "web" : "https://github.com/mrdvt92/perl-Geo-Inverse.git"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -58,17 +58,6 @@ sub _get_git_cache_option {
     }
 }
 
-sub _get_relocatable_option {
-    my $rakudo_dir = shift;
-    if ( _version_is_at_least('2019.07', $rakudo_dir) ) {
-        return "--relocatable";
-    }
-    say STDERR "The current rakubrew setup requires Rakudo to be relocated, but the";
-    say STDERR "Rakudo you selected to be built does not support the `--relocatable`";
-    say STDERR "option yet. Try building a newer Rakudo.";
-    exit 1;
-}
-
 sub available_rakudos {
     _check_git();
 
@@ -111,6 +100,13 @@ sub build_impl {
 
     $configure_opts .= ' ' . _get_git_cache_option(cwd());
     run $impls{$impl}{configure} . " $configure_opts";
+
+    if (is_version_broken($name)) {
+        say STDERR "ERROR: The build does not look usable. There is no raku executable to be";
+        say STDERR "found in $versions_dir/$name/bin";
+        say STDERR "or in $versions_dir/$name/install/bin";
+        exit 1;
+    }
 }
 
 sub determine_make {

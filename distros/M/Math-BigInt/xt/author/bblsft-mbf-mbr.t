@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 1553472;
 
 use Math::BigFloat;
 use Math::BigRat;
@@ -280,5 +280,3 @@ for my $upg (undef, "Math::BigRat") {
         }
     }
 }
-
-done_testing();

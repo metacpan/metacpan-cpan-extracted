@@ -1,5 +1,9 @@
 Revision history for Alien::raylib5
 
+0.03 2025-03-02
+
+    - Drop the minimum version of Perl to 5.36.3
+
 0.02 2024-11-23
 
     - Fix the distribution tarball

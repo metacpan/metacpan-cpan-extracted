@@ -1,5 +1,5 @@
 package Mooish::Base;
-$Mooish::Base::VERSION = '0.001';
+$Mooish::Base::VERSION = '0.002';
 use v5.14;
 use warnings;
 use Import::Into;
@@ -10,6 +10,8 @@ require namespace::autoclean;
 
 use constant FLAVOUR => $ENV{MOOISH_BASE_FLAVOUR} // 'Moo';
 use constant ROLE_FLAVOUR => $ENV{MOOISH_BASE_ROLE_FLAVOUR} // (FLAVOUR . '::Role');
+
+use constant HAS_HOOK_AFTERRUNTIME => eval { require Hook::AfterRuntime; 1 };
 
 BEGIN {
 	eval 'require ' . FLAVOUR or die $@;
@@ -30,6 +32,15 @@ sub import
 	Mooish::AttributeBuilder->import::into($pkg);
 	Types::Common->import::into($pkg, -types);
 	namespace::autoclean->import(-cleanee => $pkg);
+
+	if ($class_type eq 'Moose') {
+		if (HAS_HOOK_AFTERRUNTIME) {
+			Hook::AfterRuntime::after_runtime { $pkg->meta->make_immutable };
+		}
+		else {
+			warn "Mooish::Base can't make $pkg Moose class immutable - please install Hook::AfterRuntime module";
+		}
+	}
 }
 
 1;

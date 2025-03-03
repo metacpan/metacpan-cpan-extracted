@@ -170,7 +170,7 @@ ERRORS
                              Reference: %s
                      Parameter 'height' must a number.
                              Value: %s
-                     Parameter 'id' must a number.
+                     Parameter 'id' must be a natural number.
                              Value: %s
                      Parameter 'size' must a number.
                              Value: %s
@@ -240,10 +240,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2024 Michal Josef Špaček
+    © 2022-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

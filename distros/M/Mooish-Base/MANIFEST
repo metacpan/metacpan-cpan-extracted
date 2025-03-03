@@ -11,3 +11,4 @@ dist.ini
 lib/Mooish/Base.pm
 t/author-pod-syntax.t
 t/base.t
+t/moose.t

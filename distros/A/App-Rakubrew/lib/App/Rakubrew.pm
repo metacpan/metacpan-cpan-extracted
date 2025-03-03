@@ -2,9 +2,9 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '42';
+our $VERSION = '43';
 
-use Encode::Locale qw(env);
+use Encode::Locale;
 if (-t) {
     binmode(STDIN, ":encoding(console_in)");
     binmode(STDOUT, ":encoding(console_out)");
@@ -236,6 +236,13 @@ EOL
                 $configure_opts =~ s/^\-\-configure-opts=//;
                 $configure_opts =~ s/^'//;
                 $configure_opts =~ s/'$//;
+            }
+
+            if ($configure_opts =~ /--prefix/) {
+                say STDERR "Building Rakudo in a custom folder is not supported. If you need";
+                say STDERR "this it's recommended to build it manually and then use the";
+                say STDERR "`register` command to make that installation available in Rakubrew.";
+                exit 1;
             }
 
             my $name = "$impl-$ver";

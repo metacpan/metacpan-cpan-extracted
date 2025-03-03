@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2025 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -173,7 +173,7 @@ $def_off{0} = {
                '+07:43:24' => 'Australia/Perth',
                '+07:57:36' => 'Asia/Makassar',
                '+08:00:00' => 'Asia/Taipei',
-               '+08:04:00' => 'Asia/Manila',
+               '+08:03:52' => 'Asia/Manila',
                '+08:05:43' => 'Asia/Shanghai',
                '+08:06:00' => 'Asia/Taipei',
                '+08:22:20' => 'Asia/Dili',
@@ -427,7 +427,7 @@ $def_off{0} = {
                '-14:00:00' => 'Etc/GMT-14',
                '-14:21:00' => 'Pacific/Guam',
                '-15:02:04' => 'Pacific/Palau',
-               '-15:56:00' => 'Asia/Manila',
+               '-15:56:08' => 'Asia/Manila',
               };
 
 $def_off{1} = {

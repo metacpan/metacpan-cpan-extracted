@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.004';
+$Bitcoin::Secp256k1::VERSION = '0.005';
 use v5.10;
 use strict;
 use warnings;

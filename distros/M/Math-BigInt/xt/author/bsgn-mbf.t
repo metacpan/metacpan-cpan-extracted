@@ -55,8 +55,8 @@ note("bsgn() as an instance method");
 $x = Math::BigFloat -> new("-2.5"); $y = $x -> bsgn();
 subtest '$x = Math::BigFloat -> new("-2.5"); $y = $x -> bsgn();' => sub {
     plan tests => 4;
-    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
     is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
-    cmp_ok($x, "==", -2.5, '$x == -2.5');
+    cmp_ok($x, "==", -1, '$x == -1');
     cmp_ok($y, "==", -1, '$x == -1');
 };

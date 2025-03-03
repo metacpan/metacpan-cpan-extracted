@@ -7,6 +7,7 @@ use warnings;
 use strict;
 use Carp;
 use File::Spec;
+use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util;
 use Socket;	# For AF_INET
@@ -28,11 +29,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.94
+Version 0.95
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 =head1 SYNOPSIS
 
@@ -502,7 +503,7 @@ Warning - this is an extra layer, not a replacement for your other security laye
 sub params {
 	my $self = shift;
 
-	my $params = $self->_get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_);
 
 	if((defined($self->{paramref})) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
 		return $self->{paramref};
@@ -931,41 +932,6 @@ sub param {
 	return;
 }
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	my $self = shift;
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref($_[0]) eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar(@_);
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && defined($default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && defined($default)) {
-		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
-}
-
 sub _sanitise_input($) {
 	my $arg = shift;
 
@@ -1213,7 +1179,7 @@ sub as_string
 
 	# Retrieve object parameters
 	my $params = $self->params() || return '';
-	my $args = $self->_get_params(undef, @_);
+	my $args = Params::Get::get_params(undef, @_);
 	my $rc;
 
 	if($args->{'raw'}) {
@@ -1317,7 +1283,7 @@ sub tmpdir {
 	if(!ref($self)) {
 		$self = __PACKAGE__->new();
 	}
-	my $params = $self->_get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_);
 
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
 		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
@@ -1486,7 +1452,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|CriteoBot|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|CriteoBot|is_archiver|backstreet|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1546,11 +1512,9 @@ sub is_robot {
 		}
 	}
 
-	if($self->{cache}) {
-		if(defined($remote) && $self->{cache}) {
-			if(my $type = $self->{cache}->get("$remote/$agent")) {
-				return $self->{is_robot} = ($type eq 'robot');
-			}
+	if(defined($remote) && $self->{cache}) {
+		if(my $type = $self->{cache}->get("$remote/$agent")) {
+			return $self->{is_robot} = ($type eq 'robot');
 		}
 	}
 
@@ -1735,7 +1699,7 @@ Deprecated - use cookie() instead.
 
 sub get_cookie {
 	my $self = shift;
-	my $params = $self->_get_params('cookie_name', @_);
+	my $params = Params::Get::get_params('cookie_name', @_);
 
 	# Validate field argument
 	if(!defined($params->{'cookie_name'})) {
@@ -1867,7 +1831,7 @@ This function fixes the catch22 situation.
 
 sub set_logger {
 	my $self = shift;
-	my $params = $self->_get_params('logger', @_);
+	my $params = Params::Get::get_params('logger', @_);
 
 	$self->{logger} = $params->{'logger'};
 
@@ -1931,7 +1895,7 @@ sub _trace {
 sub _warn {
 	my $self = shift;
 
-	my $params = $self->_get_params('warning', @_);
+	my $params = Params::Get::get_params('warning', @_);
 
 	# Validate input parameters
 	return unless($params && (ref($params) eq 'HASH'));

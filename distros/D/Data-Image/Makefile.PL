@@ -19,7 +19,7 @@ perl_version 5.008;
 readme_from 'Image.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.14;
+requires 'Mo::utils' => 0.28;
 requires 'Mo::utils::URI' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Image/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Image';
@@ -30,7 +30,7 @@ test_requires 'File::Object' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

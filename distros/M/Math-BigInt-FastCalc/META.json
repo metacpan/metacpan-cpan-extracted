@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.22",
-            "Math::BigInt" : "2.003001",
+            "Math::BigInt" : "2.004001",
             "XSLoader" : "0",
             "perl" : "5.006001"
          }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-FastCalc"
       }
    },
-   "version" : "0.5018",
+   "version" : "0.5019",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

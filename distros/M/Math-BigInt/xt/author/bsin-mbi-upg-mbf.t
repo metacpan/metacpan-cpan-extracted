@@ -12,16 +12,17 @@ use Math::BigFloat;
 
 Math::BigInt -> upgrade("Math::BigFloat");
 
-my ($x, $y, $test);
+my $test;
 
 $test = '$x = Math::BigInt -> new(1); $x -> bsin(20);';
-
 note "\n", $test, "\n\n";
-$y = eval $test;
-die $@ if $@;
 
 subtest $test => sub {
     plan tests => 4;
+
+    my $x;
+    my $y = eval $test;
+    die $@ if $@;
 
     is(ref($x), "Math::BigFloat", 'class of $x');
     is($x, "0.84147098480789650665", 'value of $x');
@@ -30,13 +31,14 @@ subtest $test => sub {
 };
 
 $test = '$x = Math::BigInt -> new(1); $x -> bsin(undef, 1);';
-
 note "\n", $test, "\n\n";
-$y = eval $test;
-die $@ if $@;
 
 subtest $test => sub {
     plan tests => 4;
+
+    my $x;
+    my $y = eval $test;
+    die $@ if $@;
 
     is(ref($x), "Math::BigInt", 'class of $x');
     is($x, "1", 'value of $x');         # 0.84147... rounded to integer
@@ -45,13 +47,14 @@ subtest $test => sub {
 };
 
 $test = '$x = Math::BigInt -> new(1); $x -> accuracy(20); $x -> bsin()';
-
 note "\n", $test, "\n\n";
-$y = eval $test;
-die $@ if $@;
 
 subtest $test => sub {
     plan tests => 4;
+
+    my $x;
+    my $y = eval $test;
+    die $@ if $@;
 
     is(ref($x), "Math::BigFloat", 'class of $x');
     is($x, "0.84147098480789650665", 'value of $x');
@@ -60,13 +63,14 @@ subtest $test => sub {
 };
 
 $test = '$x = Math::BigInt -> new(1); $x -> precision(1); $x -> bsin();';
-
 note "\n", $test, "\n\n";
-$y = eval $test;
-die $@ if $@;
 
 subtest $test => sub {
     plan tests => 4;
+
+    my $x;
+    my $y = eval $test;
+    die $@ if $@;
 
     is(ref($x), "Math::BigInt", 'class of $x');
     is($x, "1", 'value of $x');         # 0.84147... rounded to integer

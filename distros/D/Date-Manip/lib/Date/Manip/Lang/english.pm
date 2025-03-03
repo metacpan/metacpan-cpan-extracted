@@ -1,5 +1,5 @@
 package Date::Manip::Lang::english;
-# Copyright (c) 1995-2024 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2025 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.96';
+$VERSION='6.97';
 
 
 our($Language,@Encodings,$LangName,$YearAdded);
@@ -152,7 +152,7 @@ $Language = {
   on => ['on'],
   times => { midnight => '00:00:00', noon => '12:00:00' },
   when => [
-    ['ago', 'past', 'in the past', 'earlier', 'before now'],
+    ['ago', 'past', 'in the past', 'earlier', 'before now', 'hence'],
     ['in', 'later', 'future', 'in the future', 'from now'],
   ],
 };

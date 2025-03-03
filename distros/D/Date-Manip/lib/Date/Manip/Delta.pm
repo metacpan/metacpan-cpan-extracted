@@ -1,5 +1,5 @@
 package Date::Manip::Delta;
-# Copyright (c) 1995-2024 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2025 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -26,7 +26,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.96';
+$VERSION='6.97';
 END { undef $VERSION; }
 
 ########################################################################
@@ -1114,7 +1114,7 @@ sub cmp {
       return undef;
    }
 
-   if (! ref($delta) eq 'Date::Manip::Delta') {
+   if (! (ref($delta) eq 'Date::Manip::Delta')) {
       carp "WARNING: [cmp] Argument must be a Date::Manip::Delta object";
       return undef;
    }

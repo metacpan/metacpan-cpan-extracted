@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_isa check_length check_number check_required);
+use Mo::utils 0.26 qw(check_isa check_length check_number check_required);
 
 extends 'Data::Image';
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has commons_name => (
 	is => 'ro',
@@ -380,12 +380,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2023 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

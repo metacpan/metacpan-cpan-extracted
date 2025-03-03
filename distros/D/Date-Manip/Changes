@@ -15,6 +15,20 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.97  2025-03-02
+  -  Fix to avoid warnings in perl 5.41.*
+         The newest development version of perl gives 'possible precedence
+         problem' warnings for a few lines. Those lines have been fixed by
+         adding some parentheses to avoid any precedence ambiguity.
+
+         Reported in GitHub #51
+
+  -  Added a requested alternative to 'ago'.
+         Requested in GitHub #50
+
+  -  Time zone fixes
+         Newest zoneinfo data (tzdata 2025a).
+
 6.96  2024-12-04
   -  Time zone fixes
          There were no new timezone fixes on 2024-06-01 or 2024-09-01, so no

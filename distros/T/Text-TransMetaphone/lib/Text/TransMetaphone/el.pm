@@ -1,12 +1,13 @@
 package Text::TransMetaphone::el;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InGreekAndCoptic}/;
 
@@ -101,10 +102,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::el - Transcribe Greek words into IPA symbols.
+Text::TransMetaphone::el – Transcribe Greek words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -115,7 +118,7 @@ directly.
 
 The Text::TransMetaphone::el module implements the TransMetaphone algorithm
 for Greek.  The module provides a C<trans_metaphone> function that accepts
-an Greek word as an argument and returns a list of keys transcribed into
+a Greek word as an argument and returns a list of keys transcribed into
 IPA symbols under Greek orthography rules.  The last key of the list is
 a regular expression that matching all previously returned keys.
 
@@ -128,16 +131,18 @@ The Greek module has limited awareness of Greek orthography, no alternative
 keys are generated at this time.   The module will be updated as more rules
 of Greek orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 
-The /i substitution switch isn't working for Greek in some cases.  Some vowels
-used in Greek also are not being stripped out.  Fixes will be provided in a
-future release.
+The /i regex substitution switch isn't working for Greek in some cases.
+Some vowels used in Greek also are not being stripped out.  Fixes will be
+provided in a future release.
 
 =head1 AUTHOR
 

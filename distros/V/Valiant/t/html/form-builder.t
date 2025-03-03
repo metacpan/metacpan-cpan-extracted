@@ -65,6 +65,7 @@ use Valiant::HTML::Util::Form;
   has profile => (is=>'ro');
   has credit_cards => (is=>'ro');
   has state_id =>(is=>'ro');
+  has state_id2 =>(is=>'ro');
   has state_ids =>(is=>'rw');
   has roles => (is=>'ro');
 
@@ -312,6 +313,15 @@ is $fb->collection_select('state_id', $states_collection, id=>'name', {class=>'f
 
 is $fb->collection_select('state_id', $states_collection, id=>'name', {selected=>[30], disabled=>[10]}),
   '<select id="person_state_id" name="person.state_id"><option disabled value="10">TX</option><option value="20">NY</option><option selected value="30">CA</option></select>';
+
+# default_selected doesn't override when there's a value
+is $fb->collection_select('state_id', $states_collection, id=>'name', {default_selected=>[30]}),
+  '<select id="person_state_id" name="person.state_id"><option selected value="10">TX</option><option value="20">NY</option><option value="30">CA</option></select>';
+
+is $fb->collection_select('state_id2', $states_collection, id=>'name', {default_selected=>[30]}),
+  '<select id="person_state_id2" name="person.state_id2"><option value="10">TX</option><option value="20">NY</option><option selected value="30">CA</option></select>';
+
+
 
 is $fb->collection_select({roles => 'id'}, $roles_collection, id=>'label'), 
   '<input id="person_roles_id_hidden" name="person.roles[0]._nop" type="hidden" value="1"/>'.

@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000055';
+our $VERSION = '0.000056';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -118,7 +118,7 @@ sub _build_args {
         [],
         [
             'config-file=s',
-            'Path to a perlimports config file. If this parameter is not supplied, we will look for a file called perlimports.toml or .perlimports.toml in the current directory and then look for a perlimports.toml in XDG_CONFIG_HOME (usually something like $HOME/perlimports/perlimports.toml). This behaviour can be disabled via --no-config-file'
+            'Path to a perlimports config file. If this parameter is not supplied, we will look for a file called perlimports.toml or .perlimports.toml in the current directory and then look for a perlimports.toml in XDG_CONFIG_HOME (usually something like $HOME/.config/perlimports/perlimports.toml). This behaviour can be disabled via --no-config-file'
         ],
         [],
         [
@@ -550,7 +550,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000055
+version 0.000056
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ use Geo::Constants qw{PI};
 use Geo::Functions qw{rad_deg deg_rad};
 use Geo::Ellipsoids;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 

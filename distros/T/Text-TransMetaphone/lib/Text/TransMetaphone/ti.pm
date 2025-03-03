@@ -1,12 +1,13 @@
 package Text::TransMetaphone::ti;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{Inxyz}/;
 
@@ -121,10 +122,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::ti - Transcribe Tigrinya words into IPA symbols.
+Text::TransMetaphone::ti – Transcribe Tigrinya words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -135,7 +138,7 @@ directly.
 
 The Text::TransMetaphone::ti module implements the TransMetaphone algorithm
 for Tigrinya.  The module provides a C<trans_metaphone> function that accepts
-an Tigrinya word as an argument and returns a list of keys transcribed into
+a Tigrinya word as an argument and returns a list of keys transcribed into
 IPA symbols under Tigrinya orthography rules.  The last key of the list is
 a regular expression that matching all previously returned keys.
 
@@ -148,10 +151,12 @@ The Tigrinya module has limited awareness of Tigrinya orthography, no alternativ
 keys are generated at this time.   The module will be updated as more rules
 of Tigrinya orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::amst_j00;
-# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2025 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Dec  4 14:48:46 EST 2024
-#    Data version: tzdata2024b
-#    Code version: tzcode2024b
+#    Generated on: Sun Mar  2 17:18:52 EST 2025
+#    Data version: tzdata2025a
+#    Code version: tzcode2025a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.96';
+$VERSION='6.97';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -1624,6 +1624,15 @@ END { undef $VERSION; }
         [ [2094,11,7,4,30,0],[2094,11,7,1,0,0],'-03:30:00',[-3,-30,0],
           'NST',0,[2095,3,13,5,29,59],[2095,3,13,1,59,59],
           '2094110704:30:00','2094110701:00:00','2095031305:29:59','2095031301:59:59' ],
+     ],
+   2095 =>
+     [
+        [ [2095,3,13,5,30,0],[2095,3,13,3,0,0],'-02:30:00',[-2,-30,0],
+          'NDT',1,[2095,11,6,4,29,59],[2095,11,6,1,59,59],
+          '2095031305:30:00','2095031303:00:00','2095110604:29:59','2095110601:59:59' ],
+        [ [2095,11,6,4,30,0],[2095,11,6,1,0,0],'-03:30:00',[-3,-30,0],
+          'NST',0,[2096,3,11,5,29,59],[2096,3,11,1,59,59],
+          '2095110604:30:00','2095110601:00:00','2096031105:29:59','2096031101:59:59' ],
      ],
 );
 

@@ -97,6 +97,7 @@ my @files = (
     't/symbol-in-export.t',
     't/test-builder.t',
     't/test-most.t',
+    't/tie.t',
     't/typeglob.t',
     't/unnest-quotes.t',
     't/use-and-require.t',

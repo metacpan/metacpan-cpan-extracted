@@ -107,6 +107,7 @@ t/symbol-as-method-call.t
 t/symbol-in-export.t
 t/test-builder.t
 t/test-most.t
+t/tie.t
 t/typeglob.t
 t/unnest-quotes.t
 t/use-and-require.t
@@ -221,6 +222,7 @@ test-data/symbol-in-signature.pl
 test-data/test-html-lint.t
 test-data/test-more.t
 test-data/test-most.t
+test-data/tie.pl
 test-data/typeglob.pl
 test-data/unnest-quotes.pl
 test-data/use-and-require.pl

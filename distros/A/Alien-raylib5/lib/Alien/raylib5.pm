@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::raylib5;
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 use parent 'Alien::Base';
 

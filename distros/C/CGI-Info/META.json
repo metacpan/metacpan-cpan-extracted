@@ -42,6 +42,7 @@
             "JSON::MaybeXS" : "0",
             "List::Util" : "1.33",
             "Log::Any" : "0",
+            "Params::Get" : "0",
             "Params::Validate::Strict" : "0.02",
             "Scalar::Util" : "0",
             "Socket" : "0",
@@ -90,6 +91,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.94",
+   "version" : "0.95",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

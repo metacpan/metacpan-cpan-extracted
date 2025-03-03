@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigInt" : "2.003001",
+            "Math::BigInt" : "2.004001",
             "Math::GMPz" : "0.36",
             "perl" : "5.006002"
          }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-GMPz"
       }
    },
-   "version" : "0.0016",
+   "version" : "0.0017",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

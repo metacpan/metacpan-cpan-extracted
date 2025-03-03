@@ -7,14 +7,14 @@ use vars qw( $VERSION $DEBUG @ISA @EXPORT_OK %EXPORT_TAGS );
 @ISA = qw( Exporter );
 
 BEGIN {
-    $VERSION = '2.05';
+    $VERSION = '2.06';
     $DEBUG   = 0;
 }
 
 # if use CSV_XS, requires version
 my $Module_XS  = 'Text::CSV_XS';
 my $Module_PP  = 'Text::CSV_PP';
-my $XS_Version = '1.59';
+my $XS_Version = '1.60';
 
 my $Is_Dynamic = 0;
 

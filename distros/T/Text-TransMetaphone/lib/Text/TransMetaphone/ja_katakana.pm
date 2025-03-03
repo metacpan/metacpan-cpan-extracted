@@ -1,12 +1,13 @@
 package Text::TransMetaphone::ja_katakana;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InKatakana}/;
 
@@ -91,10 +92,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::ja_katakana - Transcribe Katakana words into IPA symbols.
+Text::TransMetaphone::ja_katakana – Transcribe Katakana words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -105,7 +108,7 @@ directly.
 
 The Text::TransMetaphone::ja_katakana module implements the TransMetaphone algorithm
 for Katakana.  The module provides a C<trans_metaphone> function that accepts
-an Katakana word as an argument and returns a list of keys transcribed into
+a Katakana word as an argument and returns a list of keys transcribed into
 IPA symbols under Katakana orthography rules.  The last key of the list is
 a regular expression that matching all previously returned keys.
 
@@ -118,10 +121,12 @@ The Katakana module has limited awareness of Katakana orthography, no alternativ
 keys are generated at this time.   The module will be updated as more rules
 of Katakana orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

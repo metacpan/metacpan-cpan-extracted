@@ -1,9 +1,10 @@
-README
+Build.PL
+README.md
 Changes
+Changes.md
+CONTRIBUTING.md
 MANIFEST
-Makefile.PL
-c/Makefile.PL
-c/metaphone_util.c
+SECURITY.md
 doc/index.html
 doc/KeyTable.html
 doc/KeyTableExpanded.html
@@ -22,7 +23,5 @@ lib/Text/TransMetaphone/ja_katakana.pm
 lib/Text/TransMetaphone/ru.pm
 lib/Text/TransMetaphone/ti.pm
 t/01phones.t
-xs/Makefile.PL
-xs/en_US.xs
-xs/typemap
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module meta-data (added by MakeMaker)

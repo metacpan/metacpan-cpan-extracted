@@ -38,7 +38,7 @@ $class -> upgrade($upgrade);
 
 my $data =
   [
-   # input, output, 0=down/1=up
+   # input, output, upgrading or not
    [ $ninf,   0,    0, ],
    [ $nfour, -0.25, 1, ],
    [ $ntwo,  -0.5,  1, ],
@@ -55,16 +55,17 @@ for my $entry (@$data) {
     my ($x, $want, $up) = @$entry;
 
     my $test = qq|binv("$x")|;
+    $x = $x -> copy();
     my $y = $x -> binv();
 
     subtest $test => sub {
         plan tests => 3;
 
-        is(ref($x), $class, "\$x is still a $class");
-
         if ($up) {
+            is(ref($x), $upgrade, "\$x is a $upgrade due to upgrading");
             is(ref($y), $upgrade, "\$y is a $upgrade due to upgrading");
         } else {
+            is(ref($x), $class, "\$y is a $class");
             is(ref($y), $class, "\$y is a $class");
         }
 

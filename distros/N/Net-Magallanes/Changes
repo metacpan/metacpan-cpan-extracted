@@ -1,5 +1,12 @@
 Revision history for Net-Magallanes
 
+0.01  2021-08-24 10:36:23 -04
+        - Initial release
+
 0.02  2021-08-24 10:39:04 -04
         - Added timestamp of measurements in address and rcodes.
-        - Initial release
+
+0.03  2021-08-26 10:39:04 -04
+        - Added probe ID of measurements in address and rcodes.
+
+0.04  2025-03-02 16:32:43 -03

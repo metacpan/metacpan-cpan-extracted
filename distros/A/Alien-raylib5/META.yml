@@ -16,7 +16,7 @@ name: Alien-raylib5
 provides:
   Alien::raylib5:
     file: lib/Alien/raylib5.pm
-    version: '0.02'
-version: '0.02'
+    version: '0.03'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

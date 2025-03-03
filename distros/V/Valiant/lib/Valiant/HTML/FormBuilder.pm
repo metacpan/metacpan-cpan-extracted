@@ -816,6 +816,10 @@ sub select {
 
     my @disabled = ( @{delete($options->{disabled})||[]});
     @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
+
+    my @default_selected = @{ delete($options->{default_selected})||[]} if exists($options->{default_selected});
+    @selected = @default_selected if @default_selected && !@selected;
+
     $options_tags = $self->tag_helpers->options_for_select($option_tags_proto, +{
       selected => \@selected,
       disabled => \@disabled,
@@ -910,6 +914,10 @@ sub collection_select {
 
   my @disabled = ( @{delete($options->{disabled})||[]});
   @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
+
+  my @default_selected = @{ delete($options->{default_selected})||[]} if exists($options->{default_selected});
+  @selected = @default_selected if @default_selected && !@selected;
+
   my $select_tag = $self->tag_helpers->select_tag(
     $name,
     $self->tag_helpers->options_from_collection_for_select($collection, $value_method, $label_method, +{
@@ -2199,6 +2207,13 @@ special handling for \%options:
 Mark C\<option> tags as selected or disabled.   If you manual set selected then we ignore
 the value of $attribute (or @values when $attribute is a collection)
 
+=item default_selected
+
+Use this value to mark selected options ONLY if 'selected' above returns nothing AND the model does
+not have any values for the given attribute.  Useful shortcut to make things as selected for a create
+field.  However this can also be done with correct usage of prefetching into your 'empty' model for
+create.
+
 =item unselected_value
 
 The value to set the hidden 'unselected' field to. No default value.  See 'include_hidden' for details.
@@ -2343,6 +2358,8 @@ Please note when the $attribute is a collection value we add a hidden field to a
 to the form processor that this namespace contains no records.   Otherwise the form will just send 
 nothing.  If you have a custom way to handle this you can disable the behavior if you wish by explicitly
 setting include_hidden=>0
+
+\%options follows as from 'select' above.
 
 =head2 collection_checkbox
 

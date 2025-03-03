@@ -186,7 +186,7 @@ sub form_with {
     $url = $self->_polymorphic_path_for_model(
       $model_path, $scope, 
       $options->{controller}, $options->{new_url}, $options->{edit_url}
-    );
+    ) unless $options->{action};
   }
 
   $url ||= delete $options->{url} if exists $options->{url};

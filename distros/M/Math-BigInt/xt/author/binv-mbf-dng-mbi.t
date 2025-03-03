@@ -60,11 +60,11 @@ for my $entry (@$data) {
     subtest $test => sub {
         plan tests => 3;
 
-        is(ref($x), $class, "\$x is still a $class");
-
         if ($up) {
+            is(ref($x), $class, "\$x is a $class");
             is(ref($y), $class, "\$y is a $class");
         } else {
+            is(ref($x), $downgrade, "\$x is a $downgrade due to downgrading");
             is(ref($y), $downgrade, "\$y is a $downgrade due to downgrading");
         }
 

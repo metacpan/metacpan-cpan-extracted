@@ -168,6 +168,7 @@ xt/author/bmuladd-mbi.t
 xt/author/bnan-mbf.t
 xt/author/bnan-mbi.t
 xt/author/bneg-mbf.t
+xt/author/bneg-mbi-mbf.t
 xt/author/bneg-mbi.t
 xt/author/bnok-mbf.t
 xt/author/bnok-mbi.t
@@ -212,11 +213,19 @@ xt/author/fparts-mbr.t
 xt/author/from_base-mbi.t
 xt/author/from_base_num-mbi.t
 xt/author/from_bin-mbf.t
+xt/author/from_bin-mbi-mbf.t
+xt/author/from_bin-mbi-mbr.t
 xt/author/from_bin-mbi.t
+xt/author/from_dec-mbi-mbf.t
+xt/author/from_dec-mbi-mbr.t
 xt/author/from_hex-mbf.t
+xt/author/from_hex-mbi-mbf.t
+xt/author/from_hex-mbi-mbr.t
 xt/author/from_hex-mbi.t
 xt/author/from_ieee754-mbf.t
 xt/author/from_oct-mbf.t
+xt/author/from_oct-mbi-mbf.t
+xt/author/from_oct-mbi-mbr.t
 xt/author/from_oct-mbi.t
 xt/author/interop-mbf-mbi.t
 xt/author/interop-mbi-mbf.t

@@ -1,12 +1,13 @@
 package Text::TransMetaphone::he;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InHebrew}/;
 
@@ -146,10 +147,12 @@ sub trans_metaphone
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::he - Transcribe Hebrew words into IPA symbols.
+Text::TransMetaphone::he – Transcribe Hebrew words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -170,15 +173,17 @@ a regular expression that would phonological sequence under Hebrew orthography.
 =head1 STATUS
 
 The Hebrew module applies basic phonetic mappings to generate keys. 
-Presently one new key is created per substitution set.  However one key
+Presently one new key is created per substitution set.  However, one key
 *should* be created for each individual substitution.  This will be fixed
 in a future release.  The module will be updated as more rules of Hebrew
 orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

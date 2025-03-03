@@ -1,12 +1,13 @@
 package Text::TransMetaphone::gu;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InGujarti}/;
 
@@ -107,10 +108,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::gu - Transcribe Gujarti words into IPA symbols.
+Text::TransMetaphone::gu – Transcribe Gujarti words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -135,10 +138,12 @@ The Gujarti module applies basic phonetic mappings to generate keys.  No
 alternative keys are generated at this time.   The module will be updated as
 more rules of Gujarti orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

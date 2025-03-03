@@ -1,142 +1,263 @@
-#!/bin/perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
 use Scalar::Util 'refaddr';
-use Test::More tests => 72;
+use Test::More tests => 40;
 
 use Math::BigRat;
 
-note "Scalar context, no upgrading or downgrading";
+note "\nScalar context, no upgrading or downgrading\n\n";
 
 Math::BigInt -> upgrade(undef);
 Math::BigRat -> downgrade(undef);
 
-{
+subtest '$x = Math::BigInt -> new("9"); $q = $x -> bdiv("4");' => sub {
     # this must not upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("4");' => sub {
     # this must not downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-note "Scalar context, upgrading, but no downgrading";
+note "\nScalar context, upgrading, but no downgrading\n\n";
 
 Math::BigInt -> upgrade("Math::BigRat");
 Math::BigRat -> downgrade(undef);
 
-{
+subtest '$x = Math::BigInt -> new("9"); $q = $x -> bdiv("4");' => sub {
     # this must upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my $q = $x -> bdiv("4");
 
     is($x, "9/4", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-{
+subtest '$x = Math::BigInt -> new("8"); $q = $x -> bdiv("4");' => sub {
+    # this must not upgrade
+
+    my $x = Math::BigInt -> new("8");
+    my $q = $x -> bdiv("4");
+
+    is($x, "2", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("4");' => sub {
     # this must not downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-note "Scalar context, downgrading, but no upgrading";
+note "\nScalar context, downgrading, but no upgrading\n\n";
 
 Math::BigInt -> upgrade(undef);
 Math::BigRat -> downgrade("Math::BigInt");
 
-{
+subtest '$x = Math::BigInt -> new("9"); $q = $x -> bdiv("4");' => sub {
     # this must not upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("4");' => sub {
     # this must downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-note "Scalar context, upgrading and downgrading";
+subtest '$x = Math::BigRat -> new("7.5"); $q = $x -> bdiv("2.5");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("7.5");
+    my $q = $x -> bdiv("2.5");
+
+    is($x, "3", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("1");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("1");
+
+    is($x, "8", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("0");
+
+    is($x, "inf", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("0"); $q = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("0");
+    my $q = $x -> bdiv("0");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("NaN"); $q = $x -> bdiv("4");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("NaN");
+    my $q = $x -> bdiv("4");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+note "\nScalar context, upgrading and downgrading\n\n";
 
 Math::BigInt -> upgrade("Math::BigRat");
 Math::BigRat -> downgrade("Math::BigInt");
 
-{
+subtest '$x = Math::BigInt -> new("8"); $q = $x -> bdiv("4");' => sub {
+    # this must not upgrade
+
+    my $x = Math::BigInt -> new("8");
+    my $q = $x -> bdiv("4");
+
+    is($x, "2", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigInt -> new("9"); $q = $x -> bdiv("4");' => sub {
     # this must upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my $q = $x -> bdiv("4");
 
     is($x, "9/4", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("4");' => sub {
     # this must downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-{
-    # this must upgrade internally, then downgrade the result
+subtest '$x = Math::BigRat -> new("7.5"); $q = $x -> bdiv("2.5");' => sub {
+    # this must downgrade
 
-    my $x = Math::BigInt -> new(8);
-    my $q = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("7.5");
+    my $q = $x -> bdiv("2.5");
 
-    is($x, "2", "quotient value");
+    is($x, "3", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
-}
+};
 
-note "List context, no upgrading or downgrading";
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("1");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("1");
+
+    is($x, "8", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("8"); $q = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my $q = $x -> bdiv("0");
+
+    is($x, "inf", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("0"); $q = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("0");
+    my $q = $x -> bdiv("0");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+subtest '$x = Math::BigRat -> new("NaN"); $q = $x -> bdiv("4");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("NaN");
+    my $q = $x -> bdiv("4");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+};
+
+note "\nList context, no upgrading or downgrading\n\n";
 
 Math::BigInt -> upgrade(undef);
 Math::BigRat -> downgrade(undef);
 
-{
+subtest '$x = Math::BigInt -> new("9"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must not upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -144,13 +265,13 @@ Math::BigRat -> downgrade(undef);
 
     is($r, "1", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must not downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
@@ -158,20 +279,20 @@ Math::BigRat -> downgrade(undef);
 
     is($r, "0", "remainder value");
     is(ref($r), "Math::BigRat", "remainder class");
-}
+};
 
-note "List context, upgrading, but no downgrading";
+note "\nList context, upgrading, but no downgrading\n\n";
 
 Math::BigInt -> upgrade("Math::BigRat");
 Math::BigRat -> downgrade(undef);
 
-{
+subtest '$x = Math::BigInt -> new("9"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must not upgrade, because in list context, we want both the
     # quotient and the remainder, and when dividing two integers, we know
     # in advance that the quotient and remainder are integers
 
-    my $x = Math::BigInt -> new(9);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -179,13 +300,13 @@ Math::BigRat -> downgrade(undef);
 
     is($r, "1", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must not downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigRat", "quotient class");
@@ -193,18 +314,18 @@ Math::BigRat -> downgrade(undef);
 
     is($r, "0", "remainder value");
     is(ref($r), "Math::BigRat", "remainder class");
-}
+};
 
-note "List context, downgrading, but no upgrading";
+note "\nList context, downgrading, but no upgrading\n\n";
 
 Math::BigInt -> upgrade(undef);
 Math::BigRat -> downgrade("Math::BigInt");
 
-{
+subtest '$x = Math::BigInt -> new("9"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must not upgrade
 
-    my $x = Math::BigInt -> new(9);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -212,13 +333,13 @@ Math::BigRat -> downgrade("Math::BigInt");
 
     is($r, "1", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -226,18 +347,102 @@ Math::BigRat -> downgrade("Math::BigInt");
 
     is($r, "0", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-note "List context, upgrading and downgrading";
+subtest '$x = Math::BigRat -> new("7.5"); ($q, $r) = $x -> bdiv("2.5");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("7.5");
+    my ($q, $r) = $x -> bdiv("2.5");
+
+    is($x, "3", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "0", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("1");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("1");
+
+    is($x, "8", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "0", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("0");
+
+    is($x, "inf", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "8", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("0"); ($q, $r) = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("0");
+    my ($q, $r) = $x -> bdiv("0");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "0", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("NaN"); ($q, $r) = $x -> bdiv("4");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("NaN");
+    my ($q, $r) = $x -> bdiv("4");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "NaN", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("2.5");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("2.5");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "NaN", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+note "\nList context, upgrading and downgrading\n\n";
 
 Math::BigInt -> upgrade("Math::BigRat");
 Math::BigRat -> downgrade("Math::BigInt");
 
-{
+subtest '$x = Math::BigInt -> new("9"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must upgrade internally, then downgrade the results
 
-    my $x = Math::BigInt -> new(9);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigInt -> new("9");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -245,13 +450,13 @@ Math::BigRat -> downgrade("Math::BigInt");
 
     is($r, "1", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-{
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("4");' => sub {
     # this must downgrade
 
-    my $x = Math::BigRat -> new(8);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("4");
 
     is($x, "2", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
@@ -259,18 +464,88 @@ Math::BigRat -> downgrade("Math::BigInt");
 
     is($r, "0", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
 
-{
-    # this must upgrade internally, then downgrade the results
+subtest '$x = Math::BigRat -> new("7.5"); ($q, $r) = $x -> bdiv("2.5");' => sub {
+    # this must downgrade
 
-    my $x = Math::BigInt -> new(8);
-    my ($q, $r) = $x -> bdiv(4);
+    my $x = Math::BigRat -> new("7.5");
+    my ($q, $r) = $x -> bdiv("2.5");
 
-    is($x, "2", "quotient value");
+    is($x, "3", "quotient value");
     is(ref($x), "Math::BigInt", "quotient class");
     is(refaddr($x), refaddr($q), "quotient address");
 
     is($r, "0", "remainder value");
     is(ref($r), "Math::BigInt", "remainder class");
-}
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("1");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("1");
+
+    is($x, "8", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "0", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("0");
+
+    is($x, "inf", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "8", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("0"); ($q, $r) = $x -> bdiv("0");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("0");
+    my ($q, $r) = $x -> bdiv("0");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "0", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("NaN"); ($q, $r) = $x -> bdiv("4");' => sub {
+    # this must downgrade
+
+    my $x = Math::BigRat -> new("NaN");
+    my ($q, $r) = $x -> bdiv("4");
+
+    is($x, "NaN", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "NaN", "remainder value");
+    is(ref($r), "Math::BigInt", "remainder class");
+};
+
+subtest '$x = Math::BigRat -> new("8"); ($q, $r) = $x -> bdiv("2.5");' => sub {
+    # this must downgrade, but only the quotient, not the remainder
+
+    my $x = Math::BigRat -> new("8");
+    my ($q, $r) = $x -> bdiv("2.5");
+
+    is($x, "3", "quotient value");
+    is(ref($x), "Math::BigInt", "quotient class");
+    is(refaddr($x), refaddr($q), "quotient address");
+
+    is($r, "1/2", "remainder value");
+    is(ref($r), "Math::BigRat", "remainder class");
+};

@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.7001';
+our $VERSION = '1.7002';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;

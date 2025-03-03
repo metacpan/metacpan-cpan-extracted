@@ -1,3 +1,19 @@
+2.004001 2025-02-12
+
+* Improve upgrading and downgrading.
+
+  - Upgrading and downgrading is more consistent.
+
+  - Upgrading and downgrading now keeps the reference, so in the following
+    example, $x changes from being a Math::BigInt with a value of 2 to a
+    Math::BigFloat with the value 1.4142...
+
+      perl -Mbignum -le '$x = 2; $x -> bsqrt(); print $x'
+
+* Fix bug in Math::BigFloat->bdiv(): in list context, bdiv() would do floored
+  division, except when the denominator was 1. Now, bdiv() always does floored
+  division.
+
 2.003004 2025-01-23
 
 * Fix CPAN RT #150252 regarding bdiv() not modifying the invocand object when

@@ -797,7 +797,7 @@ _pubkey_combine(self)
 		int result = secp256k1_ec_pubkey_combine(
 			ctx->ctx,
 			result_pubkey,
-			ctx->pubkeys,
+			(const secp256k1_pubkey * const *) ctx->pubkeys,
 			ctx->pubkeys_count
 		);
 

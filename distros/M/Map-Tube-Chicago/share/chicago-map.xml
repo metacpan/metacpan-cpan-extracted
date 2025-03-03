@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Chicago L System">
+  <lines>
+    <line id="CHI_BLUE" name="Blue Line" color="#009DDC"/>
+    <line id="CHI_BROWN" name="Brown Line" color="#7B4B0D"/>
+    <line id="CHI_GREEN" name="Green Line" color="#00A950"/>
+    <line id="CHI_ORANGE" name="Orange Line" color="#F37736"/>
+    <line id="CHI_PINK" name="Pink Line" color="#F06DA9"/>
+    <line id="CHI_PURPLE" name="Purple Line" color="#8877A9"/>
+    <line id="CHI_PURPLE1" name="Purple Line Express" color="#6A5E84"/>
+    <line id="CHI_RED" name="Red Line" color="#E51937"/>
+    <!-- under construction (early 2025): 103rd -->
+    <!-- under construction (early 2025): 11th -->
+    <!-- under construction (early 2025): Michigan -->
+    <!-- under construction (early 2025): 130th -->
+    <line id="CHI_YELLOW" name="Yellow Line" color="#FFED00"/>
+  </lines>
+  <stations>
+    <!-- Blue Line -->
+    <station id="chi_blue01" name="O'Hare" line="CHI_BLUE:1" link="chi_blue02"/>
+    <station id="chi_blue02" name="Rosemont" line="CHI_BLUE:2" link="chi_blue01,chi_blue03"/>
+    <station id="chi_blue03" name="Cumberland" line="CHI_BLUE:3" link="chi_blue02,chi_blue04"/>
+    <station id="chi_blue04" name="Harlem (A)" line="CHI_BLUE:4" link="chi_blue03,chi_blue05"/>
+    <station id="chi_blue05" name="Jefferson Park" line="CHI_BLUE:5" link="chi_blue04,chi_blue06"/>
+    <station id="chi_blue06" name="Montrose (A)" line="CHI_BLUE:6" link="chi_blue05,chi_blue07"/>
+    <station id="chi_blue07" name="Irving Park (A)" line="CHI_BLUE:7" link="chi_blue06,chi_blue08"/>
+    <station id="chi_blue08" name="Addison (A)" line="CHI_BLUE:8" link="chi_blue07,chi_blue09"/>
+    <station id="chi_blue09" name="Belmont (A)" line="CHI_BLUE:9" link="chi_blue08,chi_blue10"/>
+    <station id="chi_blue10" name="Logan Square" line="CHI_BLUE:10" link="chi_blue09,chi_blue11"/>
+    <station id="chi_blue11" name="California (A)" line="CHI_BLUE:11" link="chi_blue10,chi_blue12"/>
+    <station id="chi_blue12" name="Western (A)" line="CHI_BLUE:12" link="chi_blue11,chi_blue13"/>
+    <station id="chi_blue13" name="Damen (A)" line="CHI_BLUE:13" link="chi_blue12,chi_blue14"/>
+    <station id="chi_blue14" name="Division" line="CHI_BLUE:14" link="chi_blue13,chi_blue15"/>
+    <station id="chi_blue15" name="Chicago (A)" line="CHI_BLUE:15" link="chi_blue14,chi_blue16"/>
+    <station id="chi_blue16" name="Grand (A)" line="CHI_BLUE:16" link="chi_blue15,chi_blue17"/>
+    <station id="chi_blue17" name="Clark/Lake" line="CHI_BLUE:17,CHI_GREEN:16,CHI_ORANGE:13,CHI_PINK:15,CHI_PURPLE1:11" link="chi_blue16,chi_blue18,chi_brown25,chi_green15"/>
+    <station id="chi_blue18" name="Washington" line="CHI_BLUE:18" link="chi_blue17,chi_blue19" other_link="walk:chi_red20"/>
+    <station id="chi_blue19" name="Monroe (A)" line="CHI_BLUE:19" link="chi_blue18,chi_blue20"/>
+    <station id="chi_blue20" name="Jackson" line="CHI_BLUE:20,CHI_RED:22" link="chi_blue19,chi_blue21,chi_red21,chi_red23" other_link="walk:chi_brown22"/>
+    <station id="chi_blue21" name="LaSalle" line="CHI_BLUE:21" link="chi_blue20,chi_blue22"/>
+    <station id="chi_blue22" name="Clinton (B)" line="CHI_BLUE:22" link="chi_blue21,chi_blue23"/>
+    <station id="chi_blue23" name="UIC-Halsted" line="CHI_BLUE:23" link="chi_blue22,chi_blue24"/>
+    <station id="chi_blue24" name="Racine" line="CHI_BLUE:24" link="chi_blue23,chi_blue25"/>
+    <station id="chi_blue25" name="Illinois Medical District" line="CHI_BLUE:25" link="chi_blue24,chi_blue26"/>
+    <station id="chi_blue26" name="Western (B)" line="CHI_BLUE:26" link="chi_blue25,chi_blue27"/>
+    <station id="chi_blue27" name="Kedzie-Homan (A)" line="CHI_BLUE:27" link="chi_blue26,chi_blue28"/>
+    <station id="chi_blue28" name="Pulaski (A)" line="CHI_BLUE:28" link="chi_blue27,chi_blue29"/>
+    <station id="chi_blue29" name="Cicero (A)" line="CHI_BLUE:29" link="chi_blue28,chi_blue30"/>
+    <station id="chi_blue30" name="Austin (A)" line="CHI_BLUE:30" link="chi_blue29,chi_blue31"/>
+    <station id="chi_blue31" name="Oak Park (A)" line="CHI_BLUE:31" link="chi_blue30,chi_blue32"/>
+    <station id="chi_blue32" name="Harlem (B)" line="CHI_BLUE:32" link="chi_blue31,chi_blue33"/>
+    <station id="chi_blue33" name="Forest Park" line="CHI_BLUE:33" link="chi_blue32"/>
+    <!-- Brown Line -->
+    <station id="chi_brown01" name="Kimball" line="CHI_BROWN:1" link="chi_brown02"/>
+    <station id="chi_brown02" name="Kedzie (A)" line="CHI_BROWN:2" link="chi_brown01,chi_brown03"/>
+    <station id="chi_brown03" name="Francisco" line="CHI_BROWN:3" link="chi_brown02,chi_brown04"/>
+    <station id="chi_brown04" name="Western (C)" line="CHI_BROWN:4" link="chi_brown03,chi_brown05"/>
+    <station id="chi_brown05" name="Damen (B)" line="CHI_BROWN:5" link="chi_brown04,chi_brown06"/>
+    <station id="chi_brown06" name="Montrose (B)" line="CHI_BROWN:6" link="chi_brown05,chi_brown07"/>
+    <station id="chi_brown07" name="Irving Park (B)" line="CHI_BROWN:7" link="chi_brown06,chi_brown08"/>
+    <station id="chi_brown08" name="Addison (B)" line="CHI_BROWN:8" link="chi_brown07,chi_brown09"/>
+    <station id="chi_brown09" name="Paulina" line="CHI_BROWN:9" link="chi_brown08,chi_brown10"/>
+    <station id="chi_brown10" name="Southport" line="CHI_BROWN:10" link="chi_brown09,chi_brown11"/>
+    <station id="chi_brown11" name="Belmont (B)" line="CHI_BROWN:11,CHI_PURPLE1:3,CHI_RED:14" link="chi_brown10,chi_brown12,chi_brown14,chi_purple102,chi_purple104,chi_red13"/>
+    <station id="chi_brown12" name="Wellington (A)" line="CHI_BROWN:12" link="chi_brown11,chi_brown13" other_link="walk:chi_purple104"/>
+    <station id="chi_brown13" name="Diversey (A)" line="CHI_BROWN:13" link="chi_brown12,chi_brown14" other_link="walk:chi_purple105"/>
+    <station id="chi_brown14" name="Fullerton" line="CHI_BROWN:14,CHI_PURPLE1:6,CHI_RED:15" link="chi_brown11,chi_brown13,chi_brown15,chi_purple105,chi_purple107,chi_red16"/>
+    <station id="chi_brown15" name="Armitage (A)" line="CHI_BROWN:15" link="chi_brown14,chi_brown16" other_link="walk:chi_purple107"/>
+    <station id="chi_brown16" name="Sedgwick (A)" line="CHI_BROWN:16" link="chi_brown15,chi_brown17" other_link="walk:chi_purple108"/>
+    <station id="chi_brown17" name="Chicago (B)" line="CHI_BROWN:17" link="chi_brown16,chi_brown18" other_link="walk:chi_purple109"/>
+    <station id="chi_brown18" name="Merch Mart" line="CHI_BROWN:18,CHI_PURPLE1:10" link="chi_blue17,chi_brown17,chi_brown19,chi_purple109"/>
+    <station id="chi_brown19" name="Washington/Wells" line="CHI_BROWN:19,CHI_ORANGE:12,CHI_PINK:22,CHI_PURPLE1:18" link="chi_blue17,chi_brown18,chi_brown20,chi_green15"/>
+    <station id="chi_brown20" name="Quincy (A)" line="CHI_BROWN:20" link="chi_brown21" other_link="walk:chi_orange11,walk:chi_pink21,walk:chi_purple117"/>
+    <station id="chi_brown21" name="LaSalle/Van Buren" line="CHI_BROWN:21,CHI_ORANGE:10,CHI_PINK:20,CHI_PURPLE1:16" link="chi_brown22,chi_orange11,chi_pink21,chi_purple117"/>
+    <station id="chi_brown22" name="Library" line="CHI_BROWN:22,CHI_ORANGE:9,CHI_PINK:19,CHI_PURPLE1:15" link="chi_brown21,chi_brown23" other_link="walk:chi_blue20"/>
+    <station id="chi_brown23" name="Adams/Wabash" line="CHI_BROWN:23,CHI_GREEN:19,CHI_ORANGE:16,CHI_PINK:18,CHI_PURPLE1:14" link="chi_brown22,chi_brown24,chi_green18,chi_green20"/>
+    <station id="chi_brown24" name="Washington/Wabash (A)" line="CHI_BROWN:24" link="chi_brown25" other_link="walk:chi_green18,walk:chi_orange15,walk:chi_pink17,walk:chi_purple113"/>
+    <station id="chi_brown25" name="State/Lake" line="CHI_BROWN:25,CHI_GREEN:17,CHI_ORANGE:14,CHI_PINK:16,CHI_PURPLE1:12" link="chi_blue17,chi_brown26,chi_green18,chi_orange15,chi_pink17,chi_purple113" other_link="walk:chi_red20"/>
+    <station id="chi_brown26" name="Clarke/Lake" line="CHI_BROWN:26" link="chi_brown18"/>
+    <!-- Green Line -->
+    <station id="chi_green01" name="Harlem/Lake" line="CHI_GREEN:1" link="chi_green02"/>
+    <station id="chi_green02" name="Oak Park (B)" line="CHI_GREEN:2" link="chi_green01,chi_green03"/>
+    <station id="chi_green03" name="Ridgeland" line="CHI_GREEN:3" link="chi_green02,chi_green04"/>
+    <station id="chi_green04" name="Austin (B)" line="CHI_GREEN:4" link="chi_green03,chi_green05"/>
+    <station id="chi_green05" name="Central (A)" line="CHI_GREEN:5" link="chi_green04,chi_green06"/>
+    <station id="chi_green06" name="Laramie" line="CHI_GREEN:6" link="chi_green05,chi_green07"/>
+    <station id="chi_green07" name="Cicero (B)" line="CHI_GREEN:7" link="chi_green06,chi_green08"/>
+    <station id="chi_green08" name="Pulaski (B)" line="CHI_GREEN:8" link="chi_green07,chi_green09"/>
+    <station id="chi_green09" name="Conservatory-Central Park Drive" line="CHI_GREEN:9" link="chi_green08,chi_green10"/>
+    <station id="chi_green10" name="Kedzie (B)" line="CHI_GREEN:10" link="chi_green09,chi_green11"/>
+    <station id="chi_green11" name="California (B)" line="CHI_GREEN:11" link="chi_green10,chi_green12"/>
+    <station id="chi_green12" name="Damen (C)" line="CHI_GREEN:12" link="chi_green11,chi_green13"/>
+    <station id="chi_green13" name="Ashland (A)" line="CHI_GREEN:13,CHI_PINK:12" link="chi_green12,chi_green14,chi_pink11,chi_pink13"/>
+    <station id="chi_green14" name="Morgan (A)" line="CHI_GREEN:14" link="chi_green13,chi_green15" other_link="walk:chi_pink13"/>
+    <station id="chi_green15" name="Clinton (A)" line="CHI_GREEN:15,CHI_PINK:14" link="chi_blue17,chi_green14,chi_pink13"/>
+    <station id="chi_green18" name="Washington/Wabash (B)" line="CHI_GREEN:18" link="chi_brown23,chi_brown25" other_link="walk:chi_brown24,walk:chi_orange15,walk:chi_pink17,walk:chi_purple113"/>
+    <station id="chi_green20" name="Roosevelt" line="CHI_GREEN:20,CHI_ORANGE:8,CHI_RED:24" link="chi_brown22,chi_brown23,chi_green21,chi_orange07,chi_red23,chi_red25"/>
+    <station id="chi_green21" name="Cermak/McCormick Place" line="CHI_GREEN:21" link="chi_green20,chi_green22"/>
+    <station id="chi_green22" name="35th-Bronzeville-IIT" line="CHI_GREEN:22" link="chi_green21,chi_green23"/>
+    <station id="chi_green23" name="Indiana" line="CHI_GREEN:23" link="chi_green22,chi_green24"/>
+    <station id="chi_green24" name="43rd" line="CHI_GREEN:24" link="chi_green23,chi_green25"/>
+    <station id="chi_green25" name="47th (A)" line="CHI_GREEN:25" link="chi_green24,chi_green26"/>
+    <station id="chi_green26" name="51st" line="CHI_GREEN:26" link="chi_green25,chi_green27"/>
+    <station id="chi_green27" name="Garfield (A)" line="CHI_GREEN:27" link="chi_green26,chi_green28,chi_green31"/>
+    <station id="chi_green28" name="Halsted (B)" line="CHI_GREEN:28" link="chi_green27,chi_green29"/>
+    <station id="chi_green29" name="Ashland/63rd" line="CHI_GREEN:29" link="chi_green28"/>
+    <station id="chi_green30" name="King Drive" line="CHI_GREEN:30" link="chi_green27"/>
+    <station id="chi_green31" name="Cottage Grove" line="CHI_GREEN:31" link="chi_green30"/>
+    <!-- Orange Line -->
+    <station id="chi_orange01" name="Midway" line="CHI_ORANGE:1" link="chi_orange02"/>
+    <station id="chi_orange02" name="Pulaski (D)" line="CHI_ORANGE:2" link="chi_orange01,chi_orange03"/>
+    <station id="chi_orange03" name="Kedzie (D)" line="CHI_ORANGE:3" link="chi_orange02,chi_orange04"/>
+    <station id="chi_orange04" name="Western (E)" line="CHI_ORANGE:4" link="chi_orange03,chi_orange05"/>
+    <station id="chi_orange05" name="35th/Archer" line="CHI_ORANGE:5" link="chi_orange04,chi_orange06"/>
+    <station id="chi_orange06" name="Ashland (B)" line="CHI_ORANGE:6" link="chi_orange05,chi_orange07"/>
+    <station id="chi_orange07" name="Halsted (A)" line="CHI_ORANGE:7" link="chi_green20,chi_orange06"/>
+    <station id="chi_orange11" name="Quincy (B)" line="CHI_ORANGE:11" link="chi_brown19" other_link="walk:chi_brown20,walk:chi_pink21,walk:chi_purple117"/>
+    <station id="chi_orange15" name="Washington/Wabash (C)" line="CHI_ORANGE:15" link="chi_brown23" other_link="walk:chi_brown24,walk:chi_green18,walk:chi_pink17,walk:chi_purple113"/>
+    <!-- Pink Line -->
+    <station id="chi_pink01" name="54th/Cermak" line="CHI_PINK:1" link="chi_pink02"/>
+    <station id="chi_pink02" name="Cicero (C)" line="CHI_PINK:2" link="chi_pink01,chi_pink03"/>
+    <station id="chi_pink03" name="Kostner" line="CHI_PINK:3" link="chi_pink02,chi_pink04"/>
+    <station id="chi_pink04" name="Pulaski (C)" line="CHI_PINK:4" link="chi_pink03,chi_pink05"/>
+    <station id="chi_pink05" name="Central Park" line="CHI_PINK:5" link="chi_pink04,chi_pink06"/>
+    <station id="chi_pink06" name="Kedzie (C)" line="CHI_PINK:6" link="chi_pink05,chi_pink07"/>
+    <station id="chi_pink07" name="California (C)" line="CHI_PINK:7" link="chi_pink06,chi_pink08"/>
+    <station id="chi_pink08" name="Western (D)" line="CHI_PINK:8" link="chi_pink07,chi_pink09"/>
+    <station id="chi_pink09" name="Damen (D)" line="CHI_PINK:9" link="chi_pink08,chi_pink10"/>
+    <station id="chi_pink10" name="18th" line="CHI_PINK:10" link="chi_pink09,chi_pink11"/>
+    <station id="chi_pink11" name="Polk" line="CHI_PINK:11" link="chi_green13,chi_pink10"/>
+    <station id="chi_pink13" name="Morgan (B)" line="CHI_PINK:13" link="chi_green13,chi_green15" other_link="walk:chi_green14"/>
+    <station id="chi_pink17" name="Washington/Wabash (D)" line="CHI_PINK:17" link="chi_brown23" other_link="walk:chi_brown24,walk:chi_green18,walk:chi_orange15,walk:chi_purple113"/>
+    <station id="chi_pink21" name="Quincy (C)" line="CHI_PINK:21" link="chi_brown19" other_link="walk:chi_brown20,walk:chi_orange11,walk:chi_purple117"/>
+    <!-- Purple Line -->
+    <station id="chi_purple01" name="Linden" line="CHI_PURPLE:1" link="chi_purple02"/>
+    <station id="chi_purple02" name="Central (B)" line="CHI_PURPLE:2" link="chi_purple01,chi_purple03"/>
+    <station id="chi_purple03" name="Noyes" line="CHI_PURPLE:3" link="chi_purple02,chi_purple04"/>
+    <station id="chi_purple04" name="Foster" line="CHI_PURPLE:4" link="chi_purple03,chi_purple05"/>
+    <station id="chi_purple05" name="Davis" line="CHI_PURPLE:5" link="chi_purple04,chi_purple06"/>
+    <station id="chi_purple06" name="Dempster" line="CHI_PURPLE:6" link="chi_purple05,chi_purple07"/>
+    <station id="chi_purple07" name="Main" line="CHI_PURPLE:7" link="chi_purple06,chi_purple08"/>
+    <station id="chi_purple08" name="South Blvd" line="CHI_PURPLE:8" link="chi_purple07,chi_purple09"/>
+    <station id="chi_purple09" name="Howard" line="CHI_PURPLE:9,CHI_PURPLE1:1,CHI_RED:1,CHI_YELLOW:3" link="chi_purple08,chi_purple102,chi_red02,chi_yellow02"/>
+    <!-- Purple Line Express -->
+    <station id="chi_purple102" name="Wilson" line="CHI_PURPLE1:2,CHI_RED:11" link="chi_brown11,chi_purple09,chi_red10,chi_red12"/>
+    <station id="chi_purple104" name="Wellington (B)" line="CHI_PURPLE1:4" link="chi_brown11,chi_purple105" other_link="walk:chi_brown12"/>
+    <station id="chi_purple105" name="Diversey (B)" line="CHI_PURPLE1:5" link="chi_brown14,chi_purple104" other_link="walk:chi_brown13"/>
+    <station id="chi_purple107" name="Armitage (B)" line="CHI_PURPLE1:7" link="chi_brown14,chi_purple108" other_link="walk:chi_brown15"/>
+    <station id="chi_purple108" name="Sedgwick (B)" line="CHI_PURPLE1:8" link="chi_purple107,chi_purple109" other_link="walk:chi_brown16"/>
+    <station id="chi_purple109" name="Chicago (C)" line="CHI_PURPLE1:9" link="chi_brown18,chi_purple108" other_link="walk:chi_brown17"/>
+    <station id="chi_purple113" name="Washington/Wabash (E)" line="CHI_PURPLE1:13" link="chi_brown23" other_link="walk:chi_brown24,walk:chi_green18,walk:chi_orange15,walk:chi_pink17"/>
+    <station id="chi_purple117" name="Quincy (D)" line="CHI_PURPLE1:17" link="chi_brown19" other_link="walk:chi_brown20,walk:chi_orange11,walk:chi_pink21"/>
+    <!-- Red Line -->
+    <station id="chi_red02" name="Jarvis" line="CHI_RED:2" link="chi_purple09,chi_red03"/>
+    <station id="chi_red03" name="Morse" line="CHI_RED:3" link="chi_red02,chi_red04"/>
+    <station id="chi_red04" name="Loyola" line="CHI_RED:4" link="chi_red03,chi_red05"/>
+    <station id="chi_red05" name="Granville" line="CHI_RED:5" link="chi_red04,chi_red06"/>
+    <station id="chi_red06" name="Thorndale" line="CHI_RED:6" link="chi_red05,chi_red07"/>
+    <station id="chi_red07" name="Bryn Mawr" line="CHI_RED:7" link="chi_red08"/>
+    <station id="chi_red08" name="Berwyn" line="CHI_RED:8" link="chi_red06,chi_red09"/>
+    <station id="chi_red09" name="Argyle" line="CHI_RED:9" link="chi_red08,chi_red10"/>
+    <station id="chi_red10" name="Lawrence" line="CHI_RED:10" link="chi_purple102,chi_red09"/>
+    <station id="chi_red12" name="Sheridan" line="CHI_RED:12" link="chi_purple102,chi_red13"/>
+    <station id="chi_red13" name="Addison (C)" line="CHI_RED:13" link="chi_brown11,chi_red12"/>
+    <station id="chi_red16" name="North/Clybourn" line="CHI_RED:16" link="chi_brown14,chi_red17"/>
+    <station id="chi_red17" name="Clark/Division" line="CHI_RED:17" link="chi_red16,chi_red18"/>
+    <station id="chi_red18" name="Chicago (D)" line="CHI_RED:18" link="chi_red17,chi_red19"/>
+    <station id="chi_red19" name="Grand (B)" line="CHI_RED:19" link="chi_red18,chi_red20"/>
+    <station id="chi_red20" name="Lake" line="CHI_RED:20" link="chi_red19,chi_red21" other_link="walk:chi_blue18,walk:chi_brown25"/>
+    <station id="chi_red21" name="Monroe (B)" line="CHI_RED:21" link="chi_blue20,chi_red20"/>
+    <station id="chi_red23" name="Harrison" line="CHI_RED:23" link="chi_blue20,chi_green20"/>
+    <station id="chi_red25" name="Cermak-Chinatown" line="CHI_RED:25" link="chi_green20,chi_red26"/>
+    <station id="chi_red26" name="Sox-35th" line="CHI_RED:26" link="chi_red25,chi_red27"/>
+    <station id="chi_red27" name="47th (B)" line="CHI_RED:27" link="chi_red26,chi_red28"/>
+    <station id="chi_red28" name="Garfield (B)" line="CHI_RED:28" link="chi_red27,chi_red29"/>
+    <station id="chi_red29" name="63rd" line="CHI_RED:29" link="chi_red28,chi_red30"/>
+    <station id="chi_red30" name="69th" line="CHI_RED:30" link="chi_red29,chi_red31"/>
+    <station id="chi_red31" name="79th" line="CHI_RED:31" link="chi_red30,chi_red32"/>
+    <station id="chi_red32" name="87th" line="CHI_RED:32" link="chi_red31,chi_red33"/>
+    <station id="chi_red33" name="95th/Dan Ryan" line="CHI_RED:33" link="chi_red32"/>
+    <!-- Yellow Line -->
+    <station id="chi_yellow01" name="Dempster-Skokie" line="CHI_YELLOW:1" link="chi_yellow02"/>
+    <station id="chi_yellow02" name="Oakton-Skokie" line="CHI_YELLOW:2" link="chi_purple09,chi_yellow01"/>
+  </stations>
+</tube>

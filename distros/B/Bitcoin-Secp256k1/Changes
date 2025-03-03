@@ -1,5 +1,8 @@
 Revision history for Bitcoin-Secp256k1
 
+0.005 - 2025-03-02
+	- Fixed compilation error on Fedora (gh#1)
+
 0.004 - 2025-02-06
 	[New interface]
 	- Added methods sign_message_schnorr, sign_digest_schnorr

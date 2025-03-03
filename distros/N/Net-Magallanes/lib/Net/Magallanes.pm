@@ -2,7 +2,7 @@ package Net::Magallanes;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use LWP::UserAgent;
 use JSON;
@@ -194,12 +194,14 @@ sub rcodes {
     %args = %{$args} if defined $args;
 
     my $istime = (defined($args{'TIMESTAMP'}) ? $args{'TIMESTAMP'} : 0);
+    my $isprbi = (defined($args{'PROBEID'}) ? $args{'PROBEID'} : 0);
 
     my $result = results($self, $msm_id);
 
     my @sal;
     foreach my $resdo (@{$result}) {
         my $timestamp = $resdo->{'timestamp'};
+        my $probe_id  = $resdo->{'prb_id'};
         if ($resdo->{'type'} eq 'dns') {
             my $res_set = $resdo->{'resultset'};
             if ($#{$res_set} < 0) {
@@ -212,8 +214,11 @@ sub rcodes {
                 if(defined $abuf && defined $dec_buff) {
                     my ($dns_pack)= new Net::DNS::Packet(\$dec_buff);
                     my $header = $dns_pack->header;
-                    if ($istime) {
-                        my @val = ($timestamp, $header->rcode);
+                    if ($istime or $isprbi) {
+                        my @val;
+                        push @val, $timestamp if $istime;
+                        push @val, $probe_id if $isprbi;
+                        push @val, $header->rcode;
                         push @sal, \@val;
                     }
                     else {
@@ -286,8 +291,8 @@ sub dns {
     my $json = encode_json \%ATLASCALL;
 
     my $res = $self->{'ua'}->post( $self->{'URL'} .
-        '/measurements/' .
-        '?key=' . $self->{'KEY'},
+        '/measurements/',
+        'Authorization' => 'Key ' . $self->{'KEY'},
         Content => $json
     );
 
@@ -432,6 +437,10 @@ Copyright 2021- Hugo Salgado
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to the Carabela for all the goals.
 
 =cut
 

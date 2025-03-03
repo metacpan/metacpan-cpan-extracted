@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-Solitaire-BlackHole-Solver",
-  "dist_version" => "0.16.0",
+  "dist_version" => "0.16.1",
   "license" => "mit",
   "module_name" => "Games::Solitaire::BlackHole::Solver",
   "recursive_test_files" => 1,
@@ -44,7 +44,8 @@ my %module_build_args = (
     "IPC::Open3" => 0,
     "Path::Tiny" => 0,
     "Test::Differences" => 0,
-    "Test::More" => "0.88"
+    "Test::More" => "0.88",
+    "lib" => 0
   }
 );
 
@@ -57,7 +58,8 @@ my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Path::Tiny" => 0,
   "Test::Differences" => 0,
-  "Test::More" => "0.88"
+  "Test::More" => "0.88",
+  "lib" => 0
 );
 
 

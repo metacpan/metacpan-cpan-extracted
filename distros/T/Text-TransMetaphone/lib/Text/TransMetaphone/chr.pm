@@ -1,12 +1,13 @@
 package Text::TransMetaphone::chr;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InCherokee}/;
 
@@ -85,10 +86,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::chr - Transcribe Cherokee words into IPA symbols.
+Text::TransMetaphone::chr – Transcribe Cherokee words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -99,7 +102,7 @@ directly.
 
 The Text::TransMetaphone::chr module implements the TransMetaphone algorithm
 for Cherokee.  The module provides a C<trans_metaphone> function that accepts
-an Cherokee word as an argument and returns a list of keys transcribed into
+a Cherokee word as an argument and returns a list of keys transcribed into
 IPA symbols under Cherokee orthography rules.  The last key of the list is
 a regular expression that matching all previously returned keys.
 
@@ -109,14 +112,16 @@ a regular expression that would phonological sequence under Cherokee orthography
 =head1 STATUS
 
 The Cherokee module applies basic phonetic mappings to generate keys.  Alternative
-keys substittue "g" with "k".  The module will be updated as more rules of
+keys substitute "g" with "k".  The module will be updated as more rules of
 Cherokee orthography are learnt.
 
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

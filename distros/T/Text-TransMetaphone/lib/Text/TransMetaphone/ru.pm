@@ -1,12 +1,13 @@
 package Text::TransMetaphone::ru;
-
 use utf8;
+
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.01';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/\p{InCyrillic}/;
 
@@ -115,10 +116,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::ru - Transcribe Russian words into IPA symbols.
+Text::TransMetaphone::ru – Transcribe Russian words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -129,7 +132,7 @@ directly.
 
 The Text::TransMetaphone::ru module implements the TransMetaphone algorithm
 for Russian.  The module provides a C<trans_metaphone> function that accepts
-an Russian word as an argument and returns a list of keys transcribed into
+a Russian word as an argument and returns a list of keys transcribed into
 IPA symbols under Russian orthography rules.  The last key of the list is
 a regular expression that matching all previously returned keys.
 
@@ -142,10 +145,12 @@ The Russian module has limited awareness of Russian orthography, no alternative
 keys are generated at this time.   The module will be updated as more rules
 of Russian orthography are learnt.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

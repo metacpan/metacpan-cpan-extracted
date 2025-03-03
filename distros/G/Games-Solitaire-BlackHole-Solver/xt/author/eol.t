@@ -25,7 +25,8 @@ my @files = (
     't/data/run-with-max-iters-2000/bh11.board',
     't/data/run-with-max-iters-2000/bh12.board',
     't/data/run-with-max-iters-2000/bh13.board',
-    't/data/run-with-max-iters-2000/bh25.board'
+    't/data/run-with-max-iters-2000/bh25.board',
+    't/lib/Games/Solitaire/BlackHole/Test.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

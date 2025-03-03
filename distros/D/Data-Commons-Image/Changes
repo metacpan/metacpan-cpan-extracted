@@ -1,3 +1,8 @@
+0.07 2025-03-03T08:43:44+01:00
+ - Fix minimal version of Mo::utils.
+ - Update copyright years.
+ - Update to Data::Image@0.05.
+
 0.06 2023-06-26T00:36:55+02:00
  - Add ERRORS section to doc.
  - Move dt_created() to Data::Image.

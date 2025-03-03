@@ -1,5 +1,5 @@
 package Date::Manip::Lang::dutch;
-# Copyright (c) 1998-2024 Sullivan Beck. All rights reserved.
+# Copyright (c) 1998-2025 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.96';
+$VERSION='6.97';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw();

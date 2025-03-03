@@ -1,8 +1,8 @@
 Name:           perl-Geo-Inverse
-Version:        0.08
+Version:        0.09
 Release:        1%{?dist}
 Summary:        Calculate geographic distance from a lat & lon pair
-License:        MIT
+License:        perl
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Geo-Inverse/
 Source0:        http://www.cpan.org/modules/by-module/Geo/Geo-Inverse-%{version}.tar.gz
@@ -14,6 +14,7 @@ BuildRequires:  perl(Geo::Ellipsoids) >= 0.09
 BuildRequires:  perl(Geo::Functions) >= 0.03
 BuildRequires:  perl(Package::New)
 BuildRequires:  perl(Test::Simple) >= 0.44
+BuildRequires:  perl(Test::Number::Delta)
 Requires:       perl(Geo::Constants) >= 0.04
 Requires:       perl(Geo::Ellipsoids) >= 0.09
 Requires:       perl(Geo::Functions) >= 0.03

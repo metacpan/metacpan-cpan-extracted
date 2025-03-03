@@ -27,7 +27,7 @@ no_index:
     - xt
 requires:
   Mo: 0
-  Mo::utils: 0.14
+  Mo::utils: 0.28
   Mo::utils::URI: 0
   perl: 5.8.0
 resources:
@@ -35,4 +35,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-Image
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Image
-version: '0.04'
+version: '0.05'

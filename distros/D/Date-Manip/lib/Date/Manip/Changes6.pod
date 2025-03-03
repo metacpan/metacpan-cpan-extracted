@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2024 Sullivan Beck. All rights reserved.
+# Copyright (c) 2009-2025 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -33,7 +33,28 @@ incompatible. These are marked with an exclamation mark (!).
 #    Remove Jan1Week1 variable
 #=head1 VERSION 6.99 (expected )
 #=head1 VERSION 6.98 (expected 2024-12-01)
-#=head1 VERSION 6.97 (expected 2024-09-01)
+
+=head1 VERSION 6.97 (2025-03-02)
+
+=over 5
+
+=item Fix to avoid warnings in perl 5.41.*
+
+The newest development version of perl gives 'possible precedence problem'
+warnings for a few lines.  Those lines have been fixed by adding some
+parentheses to avoid any precedence ambiguity.
+
+Reported in GitHub #51
+
+=item Added a requested alternative to 'ago'.
+
+Requested in GitHub #50
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2025a).
+
+=back
 
 =head1 VERSION 6.96 (2024-12-04)
 

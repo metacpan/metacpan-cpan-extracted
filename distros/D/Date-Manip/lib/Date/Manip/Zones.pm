@@ -1,13 +1,13 @@
 package Date::Manip::Zones;
-# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2025 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Dec  4 14:48:52 EST 2024
-#    Data version: tzdata2024b
-#    Code version: tzcode2024b
+#    Generated on: Sun Mar  2 17:20:37 EST 2025
+#    Data version: tzdata2025a
+#    Code version: tzcode2025a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.96';
+$VERSION='6.97';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,11 +37,11 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2024b';
-$TzcodeVersion = 'tzcode2024b';
+$TzdataVersion = 'tzdata2025a';
+$TzcodeVersion = 'tzcode2025a';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
-$LastYear      = '2094';
+$LastYear      = '2095';
 
 
 %Module = (
@@ -2484,10 +2484,10 @@ $LastYear      = '2094';
                      'america/dawson',
                      'america/whitehorse',
                      'america/fort_nelson',
+                     'asia/manila',
                      'america/juneau',
                      'america/metlakatla',
                      'america/sitka',
-                     'asia/manila',
                      'america/inuvik',
                      'america/dawson_creek',
                      'america/boise' ],
@@ -2763,7 +2763,7 @@ $LastYear      = '2094';
   '+07:43:24'  => 'off139',
   '+07:57:36'  => 'off140',
   '+08:00:00'  => 'off141',
-  '+08:04:00'  => 'off142',
+  '+08:03:52'  => 'off142',
   '+08:05:43'  => 'off143',
   '+08:06:00'  => 'off144',
   '+08:20:00'  => 'off145',
@@ -3027,7 +3027,7 @@ $LastYear      = '2094';
   '-14:00:00'  => 'off403',
   '-14:21:00'  => 'off404',
   '-15:02:04'  => 'off405',
-  '-15:56:00'  => 'off406',
+  '-15:56:08'  => 'off406',
 
 );
 

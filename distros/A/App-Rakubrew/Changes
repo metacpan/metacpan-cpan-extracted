@@ -216,3 +216,11 @@
     - Hopefully improve PowerShell detection.
     - In `init` tell users which shell was detected and how to correct it if it
       was detected wrongly.
+
+43
+    - Improve documentation of the `build` command.
+    - Guard against unsupported use of the `--prefix` build option.
+    - Warn appropriately when a `build` command did not result in a working
+      Rakudo installation.
+    - Be encoding aware when reading environment variables. This should
+      hopefully fix Rakubrew to mess up PATHs with non-ASCII chars in it.

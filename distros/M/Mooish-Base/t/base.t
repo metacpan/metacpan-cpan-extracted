@@ -1,7 +1,7 @@
 use Test2::V0;
 
 ################################################################################
-# This tests whether class and role improters work
+# This tests whether class and role importers work
 ################################################################################
 
 {

@@ -3,75 +3,251 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 72;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigInt;
 use Math::BigFloat;
+use Math::BigRat;
 
-my ($x, $y);
+my $cases =
+  [
+   [ "-9",   "9"   ],
+   [ "9",    "9"   ],
+   [ "0",    "0"   ],
+   [ "-inf", "inf" ],
+   [ "inf",  "inf" ],
+   [ "NaN",  "NaN" ],
+  ];
 
-note("Testing Math::BigInt->babs() without downgrading and upgrading");
-
-note("babs() as a class method");
-
-$x = Math::BigInt -> babs("-2");
-subtest '$x = Math::BigInt -> babs("-2");' => sub {
-    plan tests => 2;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
-
-note("babs() as an instance method");
-
-$x = Math::BigInt -> new("-2"); $y = $x -> babs();
-subtest '$x = Math::BigInt -> new("-2"); $y = $x -> babs();' => sub {
-    plan tests => 4;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
-    is(refaddr($x), refaddr($y), '$x and $y are the same object');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
-
-note("babs() as a function");
-
-$x = Math::BigInt::babs("-2");
-subtest '$x = Math::BigInt::babs("-2");' => sub {
-    plan tests => 2;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
-
-note("Testing Math::BigInt->babs() with downgrading and upgrading");
-
-Math::BigInt -> upgrade("Math::BigFloat");
-Math::BigFloat -> downgrade("Math::BigInt");
-
-note("babs() as a class method");
-
-$x = Math::BigInt -> babs("-2");
-subtest '$x = Math::BigInt -> babs("-2");' => sub {
-    plan tests => 2;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
+note("\nMath::BigInt->babs() without downgrading and upgrading\n\n");
 
 note("babs() as an instance method");
 
-$x = Math::BigInt -> new("-2"); $y = $x -> babs();
-subtest '$x = Math::BigInt -> new("-2"); $y = $x -> babs();' => sub {
-    plan tests => 4;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
-    is(refaddr($x), refaddr($y), '$x and $y are the same object');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $x = Math::BigInt -> new($in);
+    my $xa = refaddr($x);
+    my $y = $x -> babs();
+
+    subtest qq|\$x = Math::BigInt -> new("$in"); \$y = \$x -> babs();| =>
+      sub {
+          plan tests => 3;
+          is(ref($x), 'Math::BigInt', 'class');
+          is(refaddr($y), $xa, 'address');
+          is($x, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a scalar");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $y = Math::BigInt -> babs($in);
+
+    subtest qq|\$y = Math::BigInt -> babs("$in");| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigInt");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $x = Math::BigInt -> new($in);
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigInt -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigFloat");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $x = Math::BigFloat -> new($in);
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigFloat -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigRat");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $x = Math::BigRat -> new($in);
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigRat -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
 
 note("babs() as a function");
 
-$x = Math::BigInt::babs("-2");
-subtest '$x = Math::BigInt::babs("-2");' => sub {
-    plan tests => 2;
-    is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
-    cmp_ok($x, "==", 2, '$x == 2');
-};
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    my $y = Math::BigInt::babs($in);
+
+    subtest qq|\$y = Math::BigInt::babs("$in");| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("\nMath::BigInt->babs() with downgrading and upgrading\n\n");
+
+note("babs() as an instance method");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    Math::BigInt -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
+    my $x = Math::BigInt -> new($in);
+    my $xa = refaddr($x);
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = $x -> babs();
+
+    subtest qq|\$x = Math::BigInt -> new("$in"); \$y = \$x -> babs();| =>
+      sub {
+          plan tests => 3;
+          is(ref($x), 'Math::BigInt', 'class');
+          is(refaddr($y), $xa, 'address');
+          is($x, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method");
+
+note("babs() as a class method given a scalar");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = Math::BigInt -> babs($in);
+
+    subtest qq|\$y = Math::BigInt -> babs("$in");| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigInt");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    Math::BigInt -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
+    my $x = Math::BigInt -> new($in);
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigInt -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigFloat");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    Math::BigInt -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
+    my $x = Math::BigFloat -> new($in);
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigFloat -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+note("babs() as a class method given a Math::BigRat");
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    Math::BigInt -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
+    my $x = Math::BigRat -> new($in);
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = Math::BigInt -> babs($x);
+
+    subtest qq|\$x = Math::BigRat -> new("$in"); \$y = Math::BigInt -> babs(\$x);| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}
+
+for my $case (@$cases) {
+    my ($in, $wanted) = @$case;
+
+    note("babs() as a function");
+
+    Math::BigInt -> upgrade("Math::BigFloat");
+    Math::BigFloat -> downgrade("Math::BigInt");
+
+    my $y = Math::BigInt::babs($in);
+
+    subtest qq|\$y = Math::BigInt::babs("$in");| =>
+      sub {
+          plan tests => 2;
+          is(ref($y), 'Math::BigInt', 'class');
+          is($y, $wanted, 'value');
+      };
+}

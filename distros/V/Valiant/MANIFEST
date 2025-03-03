@@ -34,7 +34,6 @@ example/lib/Example/Model/Posts/CreateBody.pm
 example/lib/Example/Model/Posts/SearchQuery.pm
 example/lib/Example/Model/Public/Posts/Comments/CreateBody.pm
 example/lib/Example/Model/Public/Posts/SearchQuery.pm
-example/lib/Example/Model/Register/CreateBody.pm
 example/lib/Example/Model/Register/PrepareBuildQuery.pm
 example/lib/Example/Model/Schema.pm
 example/lib/Example/Model/Session.pm

@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_code check_isa check_length check_number check_required);
+use Mo::utils 0.28 qw(check_code check_isa check_length check_number check_number_id check_required);
 use Mo::utils::URI qw(check_location);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has author => (
 	is => 'ro',
@@ -61,7 +61,7 @@ sub BUILD {
 	check_number($self, 'height');
 
 	# Check id.
-	check_number($self, 'id');
+	check_number_id($self, 'id');
 
 	# Check size.
 	check_number($self, 'size');
@@ -277,7 +277,7 @@ Returns number.
                          Reference: %s
                  Parameter 'height' must a number.
                          Value: %s
-                 Parameter 'id' must a number.
+                 Parameter 'id' must be a natural number.
                          Value: %s
                  Parameter 'size' must a number.
                          Value: %s
@@ -362,12 +362,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

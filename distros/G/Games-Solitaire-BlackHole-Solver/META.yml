@@ -11,6 +11,7 @@ build_requires:
   Path::Tiny: '0'
   Test::Differences: '0'
   Test::More: '0.88'
+  lib: '0'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
@@ -41,22 +42,22 @@ name: Games-Solitaire-BlackHole-Solver
 provides:
   Games::Solitaire::BlackHole::Solver:
     file: lib/Games/Solitaire/BlackHole/Solver.pm
-    version: v0.16.0
+    version: v0.16.1
   Games::Solitaire::BlackHole::Solver::App:
     file: lib/Games/Solitaire/BlackHole/Solver/App.pm
-    version: v0.16.0
+    version: v0.16.1
   Games::Solitaire::BlackHole::Solver::App::Base:
     file: lib/Games/Solitaire/BlackHole/Solver/App/Base.pm
-    version: v0.16.0
+    version: v0.16.1
   Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem:
     file: lib/Games/Solitaire/BlackHole/Solver/App/Base.pm
-    version: v0.16.0
+    version: v0.16.1
   Games::Solitaire::BlackHole::Solver::App::Base::Task:
     file: lib/Games/Solitaire/BlackHole/Solver/App/Base.pm
-    version: v0.16.0
+    version: v0.16.1
   Games::Solitaire::BlackHole::Solver::Golf::App:
     file: lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm
-    version: v0.16.0
+    version: v0.16.1
 requires:
   Exporter: '0'
   Getopt::Long: '2.36'
@@ -71,7 +72,7 @@ resources:
   bugtracker: https://github.com/shlomif/black-hole-solitaire/issues
   homepage: https://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
   repository: https://github.com/shlomif/black-hole-solitaire
-version: 0.16.0
+version: 0.16.1
 x_Dist_Zilla:
   perl:
     version: '5.040001'

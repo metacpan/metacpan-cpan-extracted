@@ -9,9 +9,10 @@ use Regexp::Ethiopic::Amharic qw(:forms setForm overload);
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw( $VERSION $LocaleRange %IMExpected %IMError %plosives );
 
-	$VERSION = '0.02';
+	$VERSION = '0.08';
 
 	$LocaleRange = qr/[ሀ-ቍበ-ኾዐ-ዷጀ-ጕጠ-፼]/;
 
@@ -183,10 +184,12 @@ sub reverse_key
 __END__
 
 
+=encoding utf8
+
 
 =head1 NAME
 
-Text::TransMetaphone::am - Transcribe Amharic words into IPA symbols.
+Text::TransMetaphone::am – Transcribe Amharic words into IPA symbols.
 
 =head1 SYNOPSIS
 
@@ -207,17 +210,19 @@ a regular expression that would phonological sequence under Amharic orthography.
 =head1 STATUS
 
 The Amharic module is the most developed in the TransMetaphone package.
-It has awareness of common mispelling in Amharic, perhaps too much, the
+It has awareness of common misspelling in Amharic, perhaps too much, the
 module will produce a high number of keys.
 
 =head1 REQUIRES
 
 Regexp::Ethiopic.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 BUGS
 

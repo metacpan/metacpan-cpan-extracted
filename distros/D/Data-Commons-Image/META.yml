@@ -26,13 +26,13 @@ no_index:
     - t
     - xt
 requires:
-  Data::Image: 0.03
+  Data::Image: 0.05
   Mo: 0
-  Mo::utils: 0.05
+  Mo::utils: 0.26
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-Commons-Image/issues
   homepage: https://github.com/michal-josef-spacek/Data-Commons-Image
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Commons-Image
-version: '0.06'
+version: '0.07'
