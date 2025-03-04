@@ -130,7 +130,7 @@ CPU::x86_64::InstructionWriter::_int32 - Handle 64-bit integer operations on 32-
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

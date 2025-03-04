@@ -4,7 +4,7 @@ StreamFinder::SermonAudio - Fetch actual raw streamable URLs on sermonaudio.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021-2024 by
+This module is Copyright (C) 2021-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -328,7 +328,7 @@ L<http://search.cpan.org/dist/StreamFinder-SermonAudio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2024 Jim Turner.
+Copyright 2021-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -513,7 +513,8 @@ TRYIT:
 		$html =~ s/\\\"/\&quot\;/gs;
 		$self->{'title'} = $1  if ($html =~ m#\<title\>\s*([^\|\<]+)#si);
 		$self->{'title'} ||= $1  if ($html =~ m#\"(?:og|twitter)\:title\"\s+content\=\"([^\"]+)#s);
-		$self->{'description'}   = $1  if ($html =~ m#subtitle\:I\,moreInfoText\:\"([^\"]+)#s);
+		$self->{'description'} = $1  if ($html =~ m#subtitle\:\w\,moreInfoText\:\"([^\"]+)#s);
+		$self->{'description'} ||= $1  if ($html =~ m#\-\-md\-spacing\:1em\;\"\>\<p\>(.+?)\<\/p\>#is);
 		$self->{'description'} ||= $self->{'title'};
 		$self->{'genre'} = $1  if ($html =~ m#\>Category\<\/td\>\s*\<td[^\>]*\>(.+?)\<\/td\>#s);
 		$self->{'genre'} =~ s/^\s+//s;
@@ -533,9 +534,10 @@ TRYIT:
 			my $data = $1;
 			$self->{'imageurl'} = $1  if ($data =~ m#\"background\-image\:url\((http[^\)]+)#s);
 		}
-		$self->{'imageurl'} ||= $self->{'iconurl'};
 		$self->{'articonurl'} = $1  if ($html =~ m#\<span\s+class\=\"bg\-cover.+?style\=\"background\-image\:url\((http[^\)]+)#s);
+		$self->{'iconurl'} ||= $1  if ($html =~ s#\<img\s+src\=\"(http[^\"]+)##s);
 		$self->{'artimageurl'} = $1  if ($html =~ s#\<img\s+src\=\"(http[^\"]+)##s);
+		$self->{'imageurl'} ||= $self->{'iconurl'};
 		$self->{'artimageurl'} = 'https:' . $self->{'artimageurl'}  if ($self->{'artimageurl'} =~ m#^\/\/#);
 		$self->{'articonurl'} ||= $self->{'artimageurl'};
 		
@@ -553,9 +555,10 @@ TRYIT:
 			my ($one, $two) = ($1, $2);
 			$one = $baseURL . $one  if ($one =~ m#^\/speaker#);
 			$self->{'artist'} = $two;
-			if ($self->{'albumartist'} && $self->{'albumartist'} !~ m#$one#) {
-				$self->{'artist'} .= " - $one";
-			} else {
+#APPENDS SPEAKER'S URL TO ARTIST FIELD:			if ($self->{'albumartist'} && $self->{'albumartist'} !~ m#$one#) {
+#APPENDS SPEAKER'S URL TO ARTIST FIELD:				$self->{'artist'} .= " - $one";
+#APPENDS SPEAKER'S URL TO ARTIST FIELD:			} else {
+			unless ($self->{'albumartist'} && $self->{'albumartist'} !~ m#$one#) {
 				$self->{'albumartist'} ||= $one;
 			}
 		}

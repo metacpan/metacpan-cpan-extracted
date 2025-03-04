@@ -1,28 +1,38 @@
 package CPU::x86_64::InstructionWriter::RipRelative;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util 'weaken';
 
 # ABSTRACT: Object representing an offset to a label
 
 
-sub rip { @_ > 1 && carp "Read-only"; $_[0]{rip} }
-sub label { @_ > 1 && carp "Read-only"; $_[0]{label} }
-sub name  { 'rip-to-' . $_[0]{label}->name }
+sub instruction { weaken($_[0]{instruction}= $_[1]) if @_ > 1; $_[0]{instruction} }
+sub target { @_ > 1 && carp "Read-only"; $_[0]{target} }
+sub name  { 'rip-to-' . $_[0]{target}->name }
 sub value {
 	my $self= shift;
-	if (($self->rip->relative_to||0) == ($self->label->relative_to||0)) {
-		my $rip_ofs= $self->rip->offset;
-		my $label_ofs= $self->label->offset;
-		return defined $rip_ofs && defined $label_ofs? $label_ofs - $rip_ofs : undef;
+	if (($self->instruction->relative_to||0) == ($self->target->relative_to||0)) {
+		my $rip_ofs= $self->instruction->offset + $self->instruction->len;
+		my $label_ofs= $self->target->offset;
+		return defined $label_ofs? $label_ofs - $rip_ofs : undef;
 	} else {
-		my $rip_val= $self->rip->value;
-		my $label_val= $self->label->value;
-		return defined $rip_val && defined $label_val? ($label_val - $rip_val) : undef;
+		my $start= $self->instruction->relative_to->value;
+		my $ofs= $self->instruction->offset + $self->instruction->len;
+		my $label_val= $self->target->value;
+		return !(defined $start && defined $label_val)? undef
+			: $label_val - ($start + $ofs);
 	}
 }
 
+sub clone_into_writer {
+	my ($self, $writer, $offset, $label_map)= @_;
+	bless {
+		instruction => $self->instruction,
+		target      => $label_map->{$self->target}
+	}, ref $self;
+}
 
 1;
 
@@ -38,7 +48,7 @@ CPU::x86_64::InstructionWriter::RipRelative - Object representing an offset to a
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -47,17 +57,13 @@ When you need to resolve a relative offset to a label, use this object instead.
 
 =head1 ATTRIBUTES
 
-=head2 rip
+=head2 instruction
 
-A reference to the label marking the end of the RIP-relative instruction
+A reference to the 'unknown' entry for the instruction
 
 =head2 label
 
 The label the RIP-relative instruction should point to
-
-=head1 CONSTRUCTOR
-
-Use L<CPU::x86_64::InstructionWriter/get_label> to create labels.
 
 =head1 AUTHOR
 

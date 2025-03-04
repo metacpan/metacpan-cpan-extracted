@@ -8,14 +8,18 @@ README.md
 asm-test.pl
 dist.ini
 example/linux-hello-world.pl
+example/linux-xsub-hello-world.pl
 lib/CPU/x86_64/InstructionWriter.pm
 lib/CPU/x86_64/InstructionWriter/Label.pm
+lib/CPU/x86_64/InstructionWriter/LazyEncode.pm
 lib/CPU/x86_64/InstructionWriter/RipRelative.pm
 lib/CPU/x86_64/InstructionWriter/Unknown.pm
 lib/CPU/x86_64/InstructionWriter/_int32.pm
 t/005-data-align.t
+t/006-append.t
 t/010-mov.t
 t/011-jmp.t
+t/012-push-pop.t
 t/019-sub.t
 t/020-add.t
 t/021-cmp.t
@@ -30,6 +34,7 @@ t/029-test.t
 t/030-shift.t
 t/031-call-ret-enter-leave.t
 t/032-rep.t
+t/100-sse-mov.t
 t/author-pod-syntax.t
 t/lib/TestASM
 t/lib/TestASM.pm
@@ -127,6 +132,7 @@ t/nasm_cache/67e403473d96f27414d48e0f62255626
 t/nasm_cache/6868761ead8da773973ac66715b69e3e
 t/nasm_cache/699bb6c55970a82cffc4aff47df03c17
 t/nasm_cache/6af7b6d76b66f0cc5f5641fb64eefd04
+t/nasm_cache/6bab3789a3cf8938034eaad6972b5d1c
 t/nasm_cache/6c291b1d6d0b6344c684716e4031a594
 t/nasm_cache/6c374e70334072aeeb62ed46ea987838
 t/nasm_cache/6ca8f8bc5afac6de780cb5b212b0fb71
@@ -150,6 +156,7 @@ t/nasm_cache/827720a87ed34c38b207c7335a95ef89
 t/nasm_cache/82d985096cd1a4d45144141b3f17fb06
 t/nasm_cache/83e64498e29ea8225930545c6502c2b6
 t/nasm_cache/841fc203c6d9febe2b11795eeaecbb4f
+t/nasm_cache/84d19421e20166d204808f8936738a91
 t/nasm_cache/8572a49cbb38f31bffcb6510094ddab9
 t/nasm_cache/88f57f74c908d0d0d84803361c37e519
 t/nasm_cache/8ac63d96937a9840487c0adb20f85d23
@@ -177,8 +184,10 @@ t/nasm_cache/a6800d6cface9ade912709c8738bce27
 t/nasm_cache/a6b1e811f098f3a34aff83b74ae2ec74
 t/nasm_cache/a774f74d0475b16da4a968bdb3c6fe08
 t/nasm_cache/a78dc3c2b64772543738fe97b090b594
+t/nasm_cache/a8b004bce57b9d0e5547b441144ad467
 t/nasm_cache/a9a9801e3b57b9eb37b0477a741a80c7
 t/nasm_cache/aa3dd0b3b23899c6d325d1b5b1975972
+t/nasm_cache/aad2adc3e237b42484c4a7a991112807
 t/nasm_cache/af224a51204e56062f7b3ea92b7fec4e
 t/nasm_cache/af709517db1fb76becf3e1d21b229573
 t/nasm_cache/b02b79e8b5e9031234bfac7752eba3cc
@@ -237,6 +246,7 @@ t/nasm_cache/f01db6be7bdf24cacdeac170009d1a8e
 t/nasm_cache/f033d91e93e5ed4d8746557f8c961701
 t/nasm_cache/f0ee476e6131840cf84c3510399e8474
 t/nasm_cache/f10f02350c33e47fe33b0c8e081f8919
+t/nasm_cache/f2b92c0198da2a8d4ba60fdec43326f7
 t/nasm_cache/f52756cb7f59119f774671ddc4fcdd9f
 t/nasm_cache/f5417779281c7f2221a354808c645a03
 t/nasm_cache/f61c85c0a7aed1b7edeab61ff47b54b4

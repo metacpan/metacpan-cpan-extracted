@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,8 @@ requires:
   Class::Utils: 0
   Digest::MD5: 0
   File::Basename: 0
-  List::MoreUtils: 0
+  List::Util: 1.33
+  Mo::utils: 0.06
   Readonly: 0
   URI: 0
   Unicode::UTF8: 0
@@ -40,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Commons-Link
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Commons-Link
-version: '0.08'
+version: '0.09'

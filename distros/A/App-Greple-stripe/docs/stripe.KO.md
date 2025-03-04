@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 지브라 스트라이프 모듈
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -58,7 +58,7 @@ Version 1.00
 
 세 개 이상의 패턴에 서로 다른 색상 계열을 사용하려면 모듈을 호출할 때 `단계` 개수를 지정하세요. 계열 수는 최대 6까지 늘릴 수 있습니다.
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 <div>
     <p>
@@ -72,16 +72,16 @@ Version 1.00
 
 다음 두 명령은 정확히 같은 효과를 냅니다.
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
-- **-Mstripe::set**=**step**=_n_
+- **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
 
     걸음 수를 _n_으로 설정합니다.
 
-- **-Mstripe::set**=**darkmode**
+- **-Mstripe::config**=**darkmode**
 - **--darkmode**
 
     어두운 배경색을 사용합니다.
@@ -114,7 +114,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

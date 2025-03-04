@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker 6.64;
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -15,14 +15,14 @@ WriteMakefile(
 	NAME		=> 'Lingua::String',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/Lingua/String.pm',
-	ABSTRACT_FROM	   => 'lib/Lingua/String.pm',
+	ABSTRACT_FROM	 => 'lib/Lingua/String.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
-	'LIBS' => [''],   # e.g., '-lm'
-	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
-	'INC' => '',     # e.g., '-I/usr/include/other'
+	'LIBS' => [''],	# e.g., '-lm'
+	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
+	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'Test::Carp' => 0,
@@ -33,7 +33,9 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'HTML::Entities' => 0,
+		'Params::Get' => 0,
 		'Scalar::Util' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'Lingua-String-*' },

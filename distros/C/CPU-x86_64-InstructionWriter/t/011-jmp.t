@@ -6,8 +6,7 @@ use lib "$FindBin::Bin/lib";
 use TestASM qw( new_writer iterate_mem_addr_combos asm_ok @r64 @r32 @r16 @r8 @r8h @immed64 @immed32 @immed16 @immed8 );
 use Test::More;
 
-subtest forward => \&forward;
-sub forward {
+subtest forward => sub {
 	my (@asm, @out);
 	my $label= 0;
 	for my $op (qw( jmp je jne ja jae jb jbe jl jle jg jge js jns jo jno jpe jpo jrcxz loop loopz loopnz )) {
@@ -24,10 +23,9 @@ sub forward {
 	}
 	asm_ok( \@out, \@asm, 'conditional jump' );
 	done_testing;
-}
+};
 
-subtest backward => \&backward;
-sub backward {
+subtest backward => sub {
 	my (@asm, @out);
 	my $label= 0;
 	for my $op (qw( jmp je jne ja jae jb jbe jl jle jg jge js jns jo jno jpe jpo jrcxz loop loopz loopnz )) {
@@ -44,10 +42,9 @@ sub backward {
 	}
 	asm_ok( \@out, \@asm, 'conditional jump' );
 	done_testing;
-}
+};
 
-subtest jmp_abs_reg => \&jmp_abs_reg;
-sub jmp_abs_reg {
+subtest jmp_abs_reg => sub {
 	my (@asm, @out);
 	for my $reg (@r64) {
 		push @asm, "jmp $reg";
@@ -56,10 +53,9 @@ sub jmp_abs_reg {
 	asm_ok( \@out, \@asm, 'jmp REG' );
 	
 	done_testing;
-}
+};
 
-subtest jmp_abs_mem => \&jmp_abs_mem;
-sub jmp_abs_mem {
+subtest jmp_abs_mem => sub {
 	my (@asm, @out);
 	iterate_mem_addr_combos(
 		\@asm, sub { "jmp $_[0]" },
@@ -68,6 +64,6 @@ sub jmp_abs_mem {
 	asm_ok( \@out, \@asm, 'jmp [MEM...]' );
 	
 	done_testing;
-}
+};
 
 done_testing;

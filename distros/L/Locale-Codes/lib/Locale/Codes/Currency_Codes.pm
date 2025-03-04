@@ -3,7 +3,7 @@ Locale::Codes::Currency_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Mon Dec  2 10:25:25 EST 2024
+#    Generated on: Mon Mar  3 11:03:17 EST 2025
 
 use strict;
 require 5.006;
@@ -11,9 +11,9 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.81';
+$VERSION='3.82';
 
-$Locale::Codes::Data{'currency'}{'id'} = '0177';
+$Locale::Codes::Data{'currency'}{'id'} = '0176';
 
 $Locale::Codes::Data{'currency'}{'id2names'} = {
    q(0001) => [
@@ -155,400 +155,397 @@ $Locale::Codes::Data{'currency'}{'id2names'} = {
       q(Cuban Peso),
       ],
    q(0047) => [
-      q(Peso Convertible),
-      ],
-   q(0048) => [
       q(Netherlands Antillean Guilder),
       ],
-   q(0049) => [
+   q(0048) => [
       q(Czech Koruna),
       ],
-   q(0050) => [
+   q(0049) => [
       q(Danish Krone),
       ],
-   q(0051) => [
+   q(0050) => [
       q(Djibouti Franc),
       ],
-   q(0052) => [
+   q(0051) => [
       q(Dominican Peso),
       ],
-   q(0053) => [
+   q(0052) => [
       q(Egyptian Pound),
       ],
-   q(0054) => [
+   q(0053) => [
       q(El Salvador Colon),
       ],
-   q(0055) => [
+   q(0054) => [
       q(Nakfa),
       ],
-   q(0056) => [
+   q(0055) => [
       q(Lilangeni),
       ],
-   q(0057) => [
+   q(0056) => [
       q(Ethiopian Birr),
       ],
-   q(0058) => [
+   q(0057) => [
       q(Falkland Islands Pound),
       ],
-   q(0059) => [
+   q(0058) => [
       q(Fiji Dollar),
       ],
-   q(0060) => [
+   q(0059) => [
       q(CFP Franc),
       ],
-   q(0061) => [
+   q(0060) => [
       q(Dalasi),
       ],
-   q(0062) => [
+   q(0061) => [
       q(Lari),
       ],
-   q(0063) => [
+   q(0062) => [
       q(Ghana Cedi),
       ],
-   q(0064) => [
+   q(0063) => [
       q(Gibraltar Pound),
       ],
-   q(0065) => [
+   q(0064) => [
       q(Quetzal),
       ],
-   q(0066) => [
+   q(0065) => [
       q(Pound Sterling),
       ],
-   q(0067) => [
+   q(0066) => [
       q(Guinean Franc),
       ],
-   q(0068) => [
+   q(0067) => [
       q(Guyana Dollar),
       ],
-   q(0069) => [
+   q(0068) => [
       q(Gourde),
       ],
-   q(0070) => [
+   q(0069) => [
       q(Lempira),
       ],
-   q(0071) => [
+   q(0070) => [
       q(Hong Kong Dollar),
       ],
-   q(0072) => [
+   q(0071) => [
       q(Forint),
       ],
-   q(0073) => [
+   q(0072) => [
       q(Iceland Krona),
       ],
-   q(0074) => [
+   q(0073) => [
       q(Rupiah),
       ],
-   q(0075) => [
+   q(0074) => [
       q(SDR (Special Drawing Right)),
       ],
-   q(0076) => [
+   q(0075) => [
       q(Iranian Rial),
       ],
-   q(0077) => [
+   q(0076) => [
       q(Iraqi Dinar),
       ],
-   q(0078) => [
+   q(0077) => [
       q(New Israeli Sheqel),
       ],
-   q(0079) => [
+   q(0078) => [
       q(Jamaican Dollar),
       ],
-   q(0080) => [
+   q(0079) => [
       q(Yen),
       ],
-   q(0081) => [
+   q(0080) => [
       q(Jordanian Dinar),
       ],
-   q(0082) => [
+   q(0081) => [
       q(Tenge),
       ],
-   q(0083) => [
+   q(0082) => [
       q(Kenyan Shilling),
       ],
-   q(0084) => [
+   q(0083) => [
       q(North Korean Won),
       ],
-   q(0085) => [
+   q(0084) => [
       q(Won),
       ],
-   q(0086) => [
+   q(0085) => [
       q(Kuwaiti Dinar),
       ],
-   q(0087) => [
+   q(0086) => [
       q(Som),
       ],
-   q(0088) => [
+   q(0087) => [
       q(Lao Kip),
       ],
-   q(0089) => [
+   q(0088) => [
       q(Lebanese Pound),
       ],
-   q(0090) => [
+   q(0089) => [
       q(Loti),
       ],
-   q(0091) => [
+   q(0090) => [
       q(Rand),
       ],
-   q(0092) => [
+   q(0091) => [
       q(Liberian Dollar),
       ],
-   q(0093) => [
+   q(0092) => [
       q(Libyan Dinar),
       ],
-   q(0094) => [
+   q(0093) => [
       q(Swiss Franc),
       ],
-   q(0095) => [
+   q(0094) => [
       q(Pataca),
       ],
-   q(0096) => [
+   q(0095) => [
       q(Denar),
       ],
-   q(0097) => [
+   q(0096) => [
       q(Malagasy Ariary),
       ],
-   q(0098) => [
+   q(0097) => [
       q(Malawi Kwacha),
       ],
-   q(0099) => [
+   q(0098) => [
       q(Malaysian Ringgit),
       ],
-   q(0100) => [
+   q(0099) => [
       q(Rufiyaa),
       ],
-   q(0101) => [
+   q(0100) => [
       q(Ouguiya),
       ],
-   q(0102) => [
+   q(0101) => [
       q(Mauritius Rupee),
       ],
-   q(0103) => [
+   q(0102) => [
       q(ADB Unit of Account),
       ],
-   q(0104) => [
+   q(0103) => [
       q(Mexican Peso),
       ],
-   q(0105) => [
+   q(0104) => [
       q(Mexican Unidad de Inversion (UDI)),
       ],
-   q(0106) => [
+   q(0105) => [
       q(Moldovan Leu),
       ],
-   q(0107) => [
+   q(0106) => [
       q(Tugrik),
       ],
-   q(0108) => [
+   q(0107) => [
       q(Moroccan Dirham),
       ],
-   q(0109) => [
+   q(0108) => [
       q(Mozambique Metical),
       ],
-   q(0110) => [
+   q(0109) => [
       q(Kyat),
       ],
-   q(0111) => [
+   q(0110) => [
       q(Namibia Dollar),
       ],
-   q(0112) => [
+   q(0111) => [
       q(Nepalese Rupee),
       ],
-   q(0113) => [
+   q(0112) => [
       q(Cordoba Oro),
       ],
-   q(0114) => [
+   q(0113) => [
       q(Naira),
       ],
-   q(0115) => [
+   q(0114) => [
       q(Rial Omani),
       ],
-   q(0116) => [
+   q(0115) => [
       q(Pakistan Rupee),
       ],
-   q(0117) => [
+   q(0116) => [
       q(Balboa),
       ],
-   q(0118) => [
+   q(0117) => [
       q(Kina),
       ],
-   q(0119) => [
+   q(0118) => [
       q(Guarani),
       ],
-   q(0120) => [
+   q(0119) => [
       q(Sol),
       ],
-   q(0121) => [
+   q(0120) => [
       q(Philippine Peso),
       ],
-   q(0122) => [
+   q(0121) => [
       q(Zloty),
       ],
-   q(0123) => [
+   q(0122) => [
       q(Qatari Rial),
       ],
-   q(0124) => [
+   q(0123) => [
       q(Romanian Leu),
       ],
-   q(0125) => [
+   q(0124) => [
       q(Russian Ruble),
       ],
-   q(0126) => [
+   q(0125) => [
       q(Rwanda Franc),
       ],
-   q(0127) => [
+   q(0126) => [
       q(Saint Helena Pound),
       ],
-   q(0128) => [
+   q(0127) => [
       q(Tala),
       ],
-   q(0129) => [
+   q(0128) => [
       q(Dobra),
       ],
-   q(0130) => [
+   q(0129) => [
       q(Saudi Riyal),
       ],
-   q(0131) => [
+   q(0130) => [
       q(Serbian Dinar),
       ],
-   q(0132) => [
+   q(0131) => [
       q(Seychelles Rupee),
       ],
-   q(0133) => [
+   q(0132) => [
       q(Leone),
       ],
-   q(0134) => [
+   q(0133) => [
       q(Singapore Dollar),
       ],
-   q(0135) => [
+   q(0134) => [
       q(Sucre),
       ],
-   q(0136) => [
+   q(0135) => [
       q(Solomon Islands Dollar),
       ],
-   q(0137) => [
+   q(0136) => [
       q(Somali Shilling),
       ],
-   q(0138) => [
+   q(0137) => [
       q(South Sudanese Pound),
       ],
-   q(0139) => [
+   q(0138) => [
       q(Sri Lanka Rupee),
       ],
-   q(0140) => [
+   q(0139) => [
       q(Sudanese Pound),
       ],
-   q(0141) => [
+   q(0140) => [
       q(Surinam Dollar),
       ],
-   q(0142) => [
+   q(0141) => [
       q(Swedish Krona),
       ],
-   q(0143) => [
+   q(0142) => [
       q(WIR Euro),
       ],
-   q(0144) => [
+   q(0143) => [
       q(WIR Franc),
       ],
-   q(0145) => [
+   q(0144) => [
       q(Syrian Pound),
       ],
-   q(0146) => [
+   q(0145) => [
       q(New Taiwan Dollar),
       ],
-   q(0147) => [
+   q(0146) => [
       q(Somoni),
       ],
-   q(0148) => [
+   q(0147) => [
       q(Tanzanian Shilling),
       ],
-   q(0149) => [
+   q(0148) => [
       q(Baht),
       ],
-   q(0150) => [
+   q(0149) => [
       q(Pa'anga),
       ],
-   q(0151) => [
+   q(0150) => [
       q(Trinidad and Tobago Dollar),
       ],
-   q(0152) => [
+   q(0151) => [
       q(Tunisian Dinar),
       ],
-   q(0153) => [
+   q(0152) => [
       q(Turkish Lira),
       ],
-   q(0154) => [
+   q(0153) => [
       q(Turkmenistan New Manat),
       ],
-   q(0155) => [
+   q(0154) => [
       q(Uganda Shilling),
       ],
-   q(0156) => [
+   q(0155) => [
       q(Hryvnia),
       ],
-   q(0157) => [
+   q(0156) => [
       q(UAE Dirham),
       ],
-   q(0158) => [
+   q(0157) => [
       q(US Dollar (Next day)),
       ],
-   q(0159) => [
+   q(0158) => [
       q(Peso Uruguayo),
       ],
-   q(0160) => [
+   q(0159) => [
       q(Uruguay Peso en Unidades Indexadas (UI)),
       ],
-   q(0161) => [
+   q(0160) => [
       q(Unidad Previsional),
       ],
-   q(0162) => [
+   q(0161) => [
       q(Uzbekistan Sum),
       ],
-   q(0163) => [
+   q(0162) => [
       q(Vatu),
       ],
-   q(0164) => [
+   q(0163) => [
       q(Bolivar Soberano),
       ],
-   q(0165) => [
+   q(0164) => [
       q(Dong),
       ],
-   q(0166) => [
+   q(0165) => [
       q(Yemeni Rial),
       ],
-   q(0167) => [
+   q(0166) => [
       q(Zambian Kwacha),
       ],
-   q(0168) => [
+   q(0167) => [
       q(Zimbabwe Gold),
       ],
-   q(0169) => [
+   q(0168) => [
       q(Bond Markets Unit European Composite Unit (EURCO)),
       ],
-   q(0170) => [
+   q(0169) => [
       q(Bond Markets Unit European Monetary Unit (E.M.U.-6)),
       ],
-   q(0171) => [
+   q(0170) => [
       q(Bond Markets Unit European Unit of Account 9 (E.U.A.-9)),
       ],
-   q(0172) => [
+   q(0171) => [
       q(Bond Markets Unit European Unit of Account 17 (E.U.A.-17)),
       ],
-   q(0173) => [
+   q(0172) => [
       q(Gold),
       ],
-   q(0174) => [
+   q(0173) => [
       q(Palladium),
       ],
-   q(0175) => [
+   q(0174) => [
       q(Platinum),
       ],
-   q(0176) => [
+   q(0175) => [
       q(Silver),
       ],
 };
 
 $Locale::Codes::Data{'currency'}{'alias2id'} = {
    q(adb unit of account) => [
-      q(0103),
+      q(0102),
       q(0),
       ],
    q(afghani) => [
@@ -588,11 +585,11 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(baht) => [
-      q(0149),
+      q(0148),
       q(0),
       ],
    q(balboa) => [
-      q(0117),
+      q(0116),
       q(0),
       ],
    q(barbados dollar) => [
@@ -612,7 +609,7 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(bolivar soberano) => [
-      q(0164),
+      q(0163),
       q(0),
       ],
    q(boliviano) => [
@@ -620,19 +617,19 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(bond markets unit european composite unit (eurco)) => [
-      q(0169),
+      q(0168),
       q(0),
       ],
    q(bond markets unit european monetary unit (e.m.u.-6)) => [
-      q(0170),
+      q(0169),
       q(0),
       ],
    q(bond markets unit european unit of account 17 (e.u.a.-17)) => [
-      q(0172),
+      q(0171),
       q(0),
       ],
    q(bond markets unit european unit of account 9 (e.u.a.-9)) => [
-      q(0171),
+      q(0170),
       q(0),
       ],
    q(brazilian real) => [
@@ -672,7 +669,7 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(cfp franc) => [
-      q(0060),
+      q(0059),
       q(0),
       ],
    q(chilean peso) => [
@@ -696,7 +693,7 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(cordoba oro) => [
-      q(0113),
+      q(0112),
       q(0),
       ],
    q(costa rican colon) => [
@@ -708,35 +705,35 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(czech koruna) => [
-      q(0049),
+      q(0048),
       q(0),
       ],
    q(dalasi) => [
-      q(0061),
+      q(0060),
       q(0),
       ],
    q(danish krone) => [
-      q(0050),
+      q(0049),
       q(0),
       ],
    q(denar) => [
-      q(0096),
+      q(0095),
       q(0),
       ],
    q(djibouti franc) => [
-      q(0051),
+      q(0050),
       q(0),
       ],
    q(dobra) => [
-      q(0129),
+      q(0128),
       q(0),
       ],
    q(dominican peso) => [
-      q(0052),
+      q(0051),
       q(0),
       ],
    q(dong) => [
-      q(0165),
+      q(0164),
       q(0),
       ],
    q(east caribbean dollar) => [
@@ -744,15 +741,15 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(egyptian pound) => [
-      q(0053),
+      q(0052),
       q(0),
       ],
    q(el salvador colon) => [
-      q(0054),
+      q(0053),
       q(0),
       ],
    q(ethiopian birr) => [
-      q(0057),
+      q(0056),
       q(0),
       ],
    q(euro) => [
@@ -760,55 +757,55 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(falkland islands pound) => [
-      q(0058),
+      q(0057),
       q(0),
       ],
    q(fiji dollar) => [
-      q(0059),
+      q(0058),
       q(0),
       ],
    q(forint) => [
-      q(0072),
-      q(0),
-      ],
-   q(ghana cedi) => [
-      q(0063),
-      q(0),
-      ],
-   q(gibraltar pound) => [
-      q(0064),
-      q(0),
-      ],
-   q(gold) => [
-      q(0173),
-      q(0),
-      ],
-   q(gourde) => [
-      q(0069),
-      q(0),
-      ],
-   q(guarani) => [
-      q(0119),
-      q(0),
-      ],
-   q(guinean franc) => [
-      q(0067),
-      q(0),
-      ],
-   q(guyana dollar) => [
-      q(0068),
-      q(0),
-      ],
-   q(hong kong dollar) => [
       q(0071),
       q(0),
       ],
+   q(ghana cedi) => [
+      q(0062),
+      q(0),
+      ],
+   q(gibraltar pound) => [
+      q(0063),
+      q(0),
+      ],
+   q(gold) => [
+      q(0172),
+      q(0),
+      ],
+   q(gourde) => [
+      q(0068),
+      q(0),
+      ],
+   q(guarani) => [
+      q(0118),
+      q(0),
+      ],
+   q(guinean franc) => [
+      q(0066),
+      q(0),
+      ],
+   q(guyana dollar) => [
+      q(0067),
+      q(0),
+      ],
+   q(hong kong dollar) => [
+      q(0070),
+      q(0),
+      ],
    q(hryvnia) => [
-      q(0156),
+      q(0155),
       q(0),
       ],
    q(iceland krona) => [
-      q(0073),
+      q(0072),
       q(0),
       ],
    q(indian rupee) => [
@@ -816,31 +813,31 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(iranian rial) => [
-      q(0076),
+      q(0075),
       q(0),
       ],
    q(iraqi dinar) => [
-      q(0077),
+      q(0076),
       q(0),
       ],
    q(jamaican dollar) => [
-      q(0079),
+      q(0078),
       q(0),
       ],
    q(jordanian dinar) => [
-      q(0081),
+      q(0080),
       q(0),
       ],
    q(kenyan shilling) => [
-      q(0083),
+      q(0082),
       q(0),
       ],
    q(kina) => [
-      q(0118),
+      q(0117),
       q(0),
       ],
    q(kuwaiti dinar) => [
-      q(0086),
+      q(0085),
       q(0),
       ],
    q(kwanza) => [
@@ -848,19 +845,19 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(kyat) => [
-      q(0110),
+      q(0109),
       q(0),
       ],
    q(lao kip) => [
-      q(0088),
+      q(0087),
       q(0),
       ],
    q(lari) => [
-      q(0062),
+      q(0061),
       q(0),
       ],
    q(lebanese pound) => [
-      q(0089),
+      q(0088),
       q(0),
       ],
    q(lek) => [
@@ -868,63 +865,63 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(lempira) => [
-      q(0070),
+      q(0069),
       q(0),
       ],
    q(leone) => [
-      q(0133),
+      q(0132),
       q(0),
       ],
    q(liberian dollar) => [
-      q(0092),
+      q(0091),
       q(0),
       ],
    q(libyan dinar) => [
-      q(0093),
+      q(0092),
       q(0),
       ],
    q(lilangeni) => [
-      q(0056),
+      q(0055),
       q(0),
       ],
    q(loti) => [
-      q(0090),
+      q(0089),
       q(0),
       ],
    q(malagasy ariary) => [
-      q(0097),
+      q(0096),
       q(0),
       ],
    q(malawi kwacha) => [
-      q(0098),
+      q(0097),
       q(0),
       ],
    q(malaysian ringgit) => [
-      q(0099),
+      q(0098),
       q(0),
       ],
    q(mauritius rupee) => [
-      q(0102),
+      q(0101),
       q(0),
       ],
    q(mexican peso) => [
-      q(0104),
+      q(0103),
       q(0),
       ],
    q(mexican unidad de inversion (udi)) => [
-      q(0105),
+      q(0104),
       q(0),
       ],
    q(moldovan leu) => [
-      q(0106),
+      q(0105),
       q(0),
       ],
    q(moroccan dirham) => [
-      q(0108),
+      q(0107),
       q(0),
       ],
    q(mozambique metical) => [
-      q(0109),
+      q(0108),
       q(0),
       ],
    q(mvdol) => [
@@ -932,31 +929,31 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(naira) => [
-      q(0114),
+      q(0113),
       q(0),
       ],
    q(nakfa) => [
-      q(0055),
+      q(0054),
       q(0),
       ],
    q(namibia dollar) => [
-      q(0111),
+      q(0110),
       q(0),
       ],
    q(nepalese rupee) => [
-      q(0112),
+      q(0111),
       q(0),
       ],
    q(netherlands antillean guilder) => [
-      q(0048),
+      q(0047),
       q(0),
       ],
    q(new israeli sheqel) => [
-      q(0078),
+      q(0077),
       q(0),
       ],
    q(new taiwan dollar) => [
-      q(0146),
+      q(0145),
       q(0),
       ],
    q(new zealand dollar) => [
@@ -968,7 +965,7 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(north korean won) => [
-      q(0084),
+      q(0083),
       q(0),
       ],
    q(norwegian krone) => [
@@ -976,43 +973,39 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(ouguiya) => [
-      q(0101),
+      q(0100),
       q(0),
       ],
    q(pa'anga) => [
-      q(0150),
+      q(0149),
       q(0),
       ],
    q(pakistan rupee) => [
-      q(0116),
+      q(0115),
       q(0),
       ],
    q(palladium) => [
-      q(0174),
+      q(0173),
       q(0),
       ],
    q(pataca) => [
-      q(0095),
-      q(0),
-      ],
-   q(peso convertible) => [
-      q(0047),
+      q(0094),
       q(0),
       ],
    q(peso uruguayo) => [
-      q(0159),
+      q(0158),
       q(0),
       ],
    q(philippine peso) => [
-      q(0121),
+      q(0120),
       q(0),
       ],
    q(platinum) => [
-      q(0175),
+      q(0174),
       q(0),
       ],
    q(pound sterling) => [
-      q(0066),
+      q(0065),
       q(0),
       ],
    q(pula) => [
@@ -1020,19 +1013,19 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(qatari rial) => [
-      q(0123),
+      q(0122),
       q(0),
       ],
    q(quetzal) => [
-      q(0065),
+      q(0064),
       q(0),
       ],
    q(rand) => [
-      q(0091),
+      q(0090),
       q(0),
       ],
    q(rial omani) => [
-      q(0115),
+      q(0114),
       q(0),
       ],
    q(riel) => [
@@ -1040,103 +1033,103 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(romanian leu) => [
-      q(0124),
+      q(0123),
       q(0),
       ],
    q(rufiyaa) => [
-      q(0100),
+      q(0099),
       q(0),
       ],
    q(rupiah) => [
-      q(0074),
+      q(0073),
       q(0),
       ],
    q(russian ruble) => [
-      q(0125),
+      q(0124),
       q(0),
       ],
    q(rwanda franc) => [
-      q(0126),
+      q(0125),
       q(0),
       ],
    q(saint helena pound) => [
-      q(0127),
+      q(0126),
       q(0),
       ],
    q(saudi riyal) => [
-      q(0130),
+      q(0129),
       q(0),
       ],
    q(sdr (special drawing right)) => [
-      q(0075),
+      q(0074),
       q(0),
       ],
    q(serbian dinar) => [
-      q(0131),
+      q(0130),
       q(0),
       ],
    q(seychelles rupee) => [
-      q(0132),
+      q(0131),
       q(0),
       ],
    q(silver) => [
-      q(0176),
+      q(0175),
       q(0),
       ],
    q(singapore dollar) => [
-      q(0134),
+      q(0133),
       q(0),
       ],
    q(sol) => [
-      q(0120),
+      q(0119),
       q(0),
       ],
    q(solomon islands dollar) => [
-      q(0136),
-      q(0),
-      ],
-   q(som) => [
-      q(0087),
-      q(0),
-      ],
-   q(somali shilling) => [
-      q(0137),
-      q(0),
-      ],
-   q(somoni) => [
-      q(0147),
-      q(0),
-      ],
-   q(south sudanese pound) => [
-      q(0138),
-      q(0),
-      ],
-   q(sri lanka rupee) => [
-      q(0139),
-      q(0),
-      ],
-   q(sucre) => [
       q(0135),
       q(0),
       ],
+   q(som) => [
+      q(0086),
+      q(0),
+      ],
+   q(somali shilling) => [
+      q(0136),
+      q(0),
+      ],
+   q(somoni) => [
+      q(0146),
+      q(0),
+      ],
+   q(south sudanese pound) => [
+      q(0137),
+      q(0),
+      ],
+   q(sri lanka rupee) => [
+      q(0138),
+      q(0),
+      ],
+   q(sucre) => [
+      q(0134),
+      q(0),
+      ],
    q(sudanese pound) => [
-      q(0140),
+      q(0139),
       q(0),
       ],
    q(surinam dollar) => [
-      q(0141),
+      q(0140),
       q(0),
       ],
    q(swedish krona) => [
-      q(0142),
+      q(0141),
       q(0),
       ],
    q(swiss franc) => [
-      q(0094),
+      q(0093),
       q(0),
       ],
    q(syrian pound) => [
-      q(0145),
+      q(0144),
       q(0),
       ],
    q(taka) => [
@@ -1144,43 +1137,43 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(tala) => [
-      q(0128),
+      q(0127),
       q(0),
       ],
    q(tanzanian shilling) => [
-      q(0148),
+      q(0147),
       q(0),
       ],
    q(tenge) => [
-      q(0082),
+      q(0081),
       q(0),
       ],
    q(trinidad and tobago dollar) => [
-      q(0151),
+      q(0150),
       q(0),
       ],
    q(tugrik) => [
-      q(0107),
+      q(0106),
       q(0),
       ],
    q(tunisian dinar) => [
-      q(0152),
+      q(0151),
       q(0),
       ],
    q(turkish lira) => [
-      q(0153),
+      q(0152),
       q(0),
       ],
    q(turkmenistan new manat) => [
-      q(0154),
+      q(0153),
       q(0),
       ],
    q(uae dirham) => [
-      q(0157),
+      q(0156),
       q(0),
       ],
    q(uganda shilling) => [
-      q(0155),
+      q(0154),
       q(0),
       ],
    q(unidad de fomento) => [
@@ -1192,11 +1185,11 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(unidad previsional) => [
-      q(0161),
+      q(0160),
       q(0),
       ],
    q(uruguay peso en unidades indexadas (ui)) => [
-      q(0160),
+      q(0159),
       q(0),
       ],
    q(us dollar) => [
@@ -1204,35 +1197,35 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(us dollar (next day)) => [
-      q(0158),
+      q(0157),
       q(0),
       ],
    q(uzbekistan sum) => [
-      q(0162),
+      q(0161),
       q(0),
       ],
    q(vatu) => [
-      q(0163),
+      q(0162),
       q(0),
       ],
    q(wir euro) => [
-      q(0143),
+      q(0142),
       q(0),
       ],
    q(wir franc) => [
-      q(0144),
+      q(0143),
       q(0),
       ],
    q(won) => [
-      q(0085),
+      q(0084),
       q(0),
       ],
    q(yemeni rial) => [
-      q(0166),
+      q(0165),
       q(0),
       ],
    q(yen) => [
-      q(0080),
+      q(0079),
       q(0),
       ],
    q(yuan renminbi) => [
@@ -1240,15 +1233,15 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
       q(0),
       ],
    q(zambian kwacha) => [
-      q(0167),
+      q(0166),
       q(0),
       ],
    q(zimbabwe gold) => [
-      q(0168),
+      q(0167),
       q(0),
       ],
    q(zloty) => [
-      q(0122),
+      q(0121),
       q(0),
       ],
 };
@@ -1256,7 +1249,7 @@ $Locale::Codes::Data{'currency'}{'alias2id'} = {
 $Locale::Codes::Data{'currency'}{'code2id'} = {
    q(alpha) => {
       q(AED) => [
-         q(0157),
+         q(0156),
          q(0),
          ],
       q(AFN) => [
@@ -1272,7 +1265,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(ANG) => [
-         q(0048),
+         q(0047),
          q(0),
          ],
       q(AOA) => [
@@ -1368,15 +1361,15 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(CHE) => [
-         q(0143),
+         q(0142),
          q(0),
          ],
       q(CHF) => [
-         q(0094),
+         q(0093),
          q(0),
          ],
       q(CHW) => [
-         q(0144),
+         q(0143),
          q(0),
          ],
       q(CLF) => [
@@ -1403,10 +1396,6 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0045),
          q(0),
          ],
-      q(CUC) => [
-         q(0047),
-         q(0),
-         ],
       q(CUP) => [
          q(0046),
          q(0),
@@ -1416,19 +1405,19 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(CZK) => [
-         q(0049),
+         q(0048),
          q(0),
          ],
       q(DJF) => [
-         q(0051),
-         q(0),
-         ],
-      q(DKK) => [
          q(0050),
          q(0),
          ],
+      q(DKK) => [
+         q(0049),
+         q(0),
+         ],
       q(DOP) => [
-         q(0052),
+         q(0051),
          q(0),
          ],
       q(DZD) => [
@@ -1436,15 +1425,15 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(EGP) => [
-         q(0053),
+         q(0052),
          q(0),
          ],
       q(ERN) => [
-         q(0055),
+         q(0054),
          q(0),
          ],
       q(ETB) => [
-         q(0057),
+         q(0056),
          q(0),
          ],
       q(EUR) => [
@@ -1452,67 +1441,67 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(FJD) => [
-         q(0059),
-         q(0),
-         ],
-      q(FKP) => [
          q(0058),
          q(0),
          ],
+      q(FKP) => [
+         q(0057),
+         q(0),
+         ],
       q(GBP) => [
-         q(0066),
-         q(0),
-         ],
-      q(GEL) => [
-         q(0062),
-         q(0),
-         ],
-      q(GHS) => [
-         q(0063),
-         q(0),
-         ],
-      q(GIP) => [
-         q(0064),
-         q(0),
-         ],
-      q(GMD) => [
-         q(0061),
-         q(0),
-         ],
-      q(GNF) => [
-         q(0067),
-         q(0),
-         ],
-      q(GTQ) => [
          q(0065),
          q(0),
          ],
+      q(GEL) => [
+         q(0061),
+         q(0),
+         ],
+      q(GHS) => [
+         q(0062),
+         q(0),
+         ],
+      q(GIP) => [
+         q(0063),
+         q(0),
+         ],
+      q(GMD) => [
+         q(0060),
+         q(0),
+         ],
+      q(GNF) => [
+         q(0066),
+         q(0),
+         ],
+      q(GTQ) => [
+         q(0064),
+         q(0),
+         ],
       q(GYD) => [
-         q(0068),
+         q(0067),
          q(0),
          ],
       q(HKD) => [
-         q(0071),
-         q(0),
-         ],
-      q(HNL) => [
          q(0070),
          q(0),
          ],
-      q(HTG) => [
+      q(HNL) => [
          q(0069),
          q(0),
          ],
+      q(HTG) => [
+         q(0068),
+         q(0),
+         ],
       q(HUF) => [
-         q(0072),
+         q(0071),
          q(0),
          ],
       q(IDR) => [
-         q(0074),
+         q(0073),
          q(0),
          ],
       q(ILS) => [
-         q(0078),
+         q(0077),
          q(0),
          ],
       q(INR) => [
@@ -1520,35 +1509,35 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(IQD) => [
-         q(0077),
-         q(0),
-         ],
-      q(IRR) => [
          q(0076),
          q(0),
          ],
+      q(IRR) => [
+         q(0075),
+         q(0),
+         ],
       q(ISK) => [
-         q(0073),
+         q(0072),
          q(0),
          ],
       q(JMD) => [
-         q(0079),
+         q(0078),
          q(0),
          ],
       q(JOD) => [
-         q(0081),
-         q(0),
-         ],
-      q(JPY) => [
          q(0080),
          q(0),
          ],
+      q(JPY) => [
+         q(0079),
+         q(0),
+         ],
       q(KES) => [
-         q(0083),
+         q(0082),
          q(0),
          ],
       q(KGS) => [
-         q(0087),
+         q(0086),
          q(0),
          ],
       q(KHR) => [
@@ -1560,15 +1549,15 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(KPW) => [
-         q(0084),
+         q(0083),
          q(0),
          ],
       q(KRW) => [
-         q(0085),
+         q(0084),
          q(0),
          ],
       q(KWD) => [
-         q(0086),
+         q(0085),
          q(0),
          ],
       q(KYD) => [
@@ -1576,103 +1565,103 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(KZT) => [
-         q(0082),
+         q(0081),
          q(0),
          ],
       q(LAK) => [
-         q(0088),
+         q(0087),
          q(0),
          ],
       q(LBP) => [
-         q(0089),
+         q(0088),
          q(0),
          ],
       q(LKR) => [
-         q(0139),
+         q(0138),
          q(0),
          ],
       q(LRD) => [
-         q(0092),
+         q(0091),
          q(0),
          ],
       q(LSL) => [
-         q(0090),
+         q(0089),
          q(0),
          ],
       q(LYD) => [
-         q(0093),
+         q(0092),
          q(0),
          ],
       q(MAD) => [
-         q(0108),
-         q(0),
-         ],
-      q(MDL) => [
-         q(0106),
-         q(0),
-         ],
-      q(MGA) => [
-         q(0097),
-         q(0),
-         ],
-      q(MKD) => [
-         q(0096),
-         q(0),
-         ],
-      q(MMK) => [
-         q(0110),
-         q(0),
-         ],
-      q(MNT) => [
          q(0107),
          q(0),
          ],
-      q(MOP) => [
-         q(0095),
-         q(0),
-         ],
-      q(MRU) => [
-         q(0101),
-         q(0),
-         ],
-      q(MUR) => [
-         q(0102),
-         q(0),
-         ],
-      q(MVR) => [
-         q(0100),
-         q(0),
-         ],
-      q(MWK) => [
-         q(0098),
-         q(0),
-         ],
-      q(MXN) => [
-         q(0104),
-         q(0),
-         ],
-      q(MXV) => [
+      q(MDL) => [
          q(0105),
          q(0),
          ],
-      q(MYR) => [
-         q(0099),
+      q(MGA) => [
+         q(0096),
          q(0),
          ],
-      q(MZN) => [
+      q(MKD) => [
+         q(0095),
+         q(0),
+         ],
+      q(MMK) => [
          q(0109),
          q(0),
          ],
+      q(MNT) => [
+         q(0106),
+         q(0),
+         ],
+      q(MOP) => [
+         q(0094),
+         q(0),
+         ],
+      q(MRU) => [
+         q(0100),
+         q(0),
+         ],
+      q(MUR) => [
+         q(0101),
+         q(0),
+         ],
+      q(MVR) => [
+         q(0099),
+         q(0),
+         ],
+      q(MWK) => [
+         q(0097),
+         q(0),
+         ],
+      q(MXN) => [
+         q(0103),
+         q(0),
+         ],
+      q(MXV) => [
+         q(0104),
+         q(0),
+         ],
+      q(MYR) => [
+         q(0098),
+         q(0),
+         ],
+      q(MZN) => [
+         q(0108),
+         q(0),
+         ],
       q(NAD) => [
-         q(0111),
+         q(0110),
          q(0),
          ],
       q(NGN) => [
-         q(0114),
+         q(0113),
          q(0),
          ],
       q(NIO) => [
-         q(0113),
+         q(0112),
          q(0),
          ],
       q(NOK) => [
@@ -1680,7 +1669,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(NPR) => [
-         q(0112),
+         q(0111),
          q(0),
          ],
       q(NZD) => [
@@ -1688,159 +1677,159 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(OMR) => [
-         q(0115),
+         q(0114),
          q(0),
          ],
       q(PAB) => [
-         q(0117),
-         q(0),
-         ],
-      q(PEN) => [
-         q(0120),
-         q(0),
-         ],
-      q(PGK) => [
-         q(0118),
-         q(0),
-         ],
-      q(PHP) => [
-         q(0121),
-         q(0),
-         ],
-      q(PKR) => [
          q(0116),
          q(0),
          ],
-      q(PLN) => [
-         q(0122),
-         q(0),
-         ],
-      q(PYG) => [
+      q(PEN) => [
          q(0119),
          q(0),
          ],
+      q(PGK) => [
+         q(0117),
+         q(0),
+         ],
+      q(PHP) => [
+         q(0120),
+         q(0),
+         ],
+      q(PKR) => [
+         q(0115),
+         q(0),
+         ],
+      q(PLN) => [
+         q(0121),
+         q(0),
+         ],
+      q(PYG) => [
+         q(0118),
+         q(0),
+         ],
       q(QAR) => [
-         q(0123),
+         q(0122),
          q(0),
          ],
       q(RON) => [
-         q(0124),
+         q(0123),
          q(0),
          ],
       q(RSD) => [
-         q(0131),
-         q(0),
-         ],
-      q(RUB) => [
-         q(0125),
-         q(0),
-         ],
-      q(RWF) => [
-         q(0126),
-         q(0),
-         ],
-      q(SAR) => [
          q(0130),
          q(0),
          ],
-      q(SBD) => [
-         q(0136),
+      q(RUB) => [
+         q(0124),
          q(0),
          ],
-      q(SCR) => [
-         q(0132),
+      q(RWF) => [
+         q(0125),
          q(0),
          ],
-      q(SDG) => [
-         q(0140),
-         q(0),
-         ],
-      q(SEK) => [
-         q(0142),
-         q(0),
-         ],
-      q(SGD) => [
-         q(0134),
-         q(0),
-         ],
-      q(SHP) => [
-         q(0127),
-         q(0),
-         ],
-      q(SLE) => [
-         q(0133),
-         q(0),
-         ],
-      q(SOS) => [
-         q(0137),
-         q(0),
-         ],
-      q(SRD) => [
-         q(0141),
-         q(0),
-         ],
-      q(SSP) => [
-         q(0138),
-         q(0),
-         ],
-      q(STN) => [
+      q(SAR) => [
          q(0129),
          q(0),
          ],
+      q(SBD) => [
+         q(0135),
+         q(0),
+         ],
+      q(SCR) => [
+         q(0131),
+         q(0),
+         ],
+      q(SDG) => [
+         q(0139),
+         q(0),
+         ],
+      q(SEK) => [
+         q(0141),
+         q(0),
+         ],
+      q(SGD) => [
+         q(0133),
+         q(0),
+         ],
+      q(SHP) => [
+         q(0126),
+         q(0),
+         ],
+      q(SLE) => [
+         q(0132),
+         q(0),
+         ],
+      q(SOS) => [
+         q(0136),
+         q(0),
+         ],
+      q(SRD) => [
+         q(0140),
+         q(0),
+         ],
+      q(SSP) => [
+         q(0137),
+         q(0),
+         ],
+      q(STN) => [
+         q(0128),
+         q(0),
+         ],
       q(SVC) => [
-         q(0054),
+         q(0053),
          q(0),
          ],
       q(SYP) => [
-         q(0145),
+         q(0144),
          q(0),
          ],
       q(SZL) => [
-         q(0056),
+         q(0055),
          q(0),
          ],
       q(THB) => [
-         q(0149),
-         q(0),
-         ],
-      q(TJS) => [
-         q(0147),
-         q(0),
-         ],
-      q(TMT) => [
-         q(0154),
-         q(0),
-         ],
-      q(TND) => [
-         q(0152),
-         q(0),
-         ],
-      q(TOP) => [
-         q(0150),
-         q(0),
-         ],
-      q(TRY) => [
-         q(0153),
-         q(0),
-         ],
-      q(TTD) => [
-         q(0151),
-         q(0),
-         ],
-      q(TWD) => [
-         q(0146),
-         q(0),
-         ],
-      q(TZS) => [
          q(0148),
          q(0),
          ],
+      q(TJS) => [
+         q(0146),
+         q(0),
+         ],
+      q(TMT) => [
+         q(0153),
+         q(0),
+         ],
+      q(TND) => [
+         q(0151),
+         q(0),
+         ],
+      q(TOP) => [
+         q(0149),
+         q(0),
+         ],
+      q(TRY) => [
+         q(0152),
+         q(0),
+         ],
+      q(TTD) => [
+         q(0150),
+         q(0),
+         ],
+      q(TWD) => [
+         q(0145),
+         q(0),
+         ],
+      q(TZS) => [
+         q(0147),
+         q(0),
+         ],
       q(UAH) => [
-         q(0156),
+         q(0155),
          q(0),
          ],
       q(UGX) => [
-         q(0155),
+         q(0154),
          q(0),
          ],
       q(USD) => [
@@ -1848,43 +1837,43 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(USN) => [
-         q(0158),
+         q(0157),
          q(0),
          ],
       q(UYI) => [
-         q(0160),
-         q(0),
-         ],
-      q(UYU) => [
          q(0159),
          q(0),
          ],
+      q(UYU) => [
+         q(0158),
+         q(0),
+         ],
       q(UYW) => [
-         q(0161),
+         q(0160),
          q(0),
          ],
       q(UZS) => [
-         q(0162),
+         q(0161),
          q(0),
          ],
       q(VED) => [
-         q(0164),
-         q(0),
-         ],
-      q(VES) => [
-         q(0164),
-         q(0),
-         ],
-      q(VND) => [
-         q(0165),
-         q(0),
-         ],
-      q(VUV) => [
          q(0163),
          q(0),
          ],
+      q(VES) => [
+         q(0163),
+         q(0),
+         ],
+      q(VND) => [
+         q(0164),
+         q(0),
+         ],
+      q(VUV) => [
+         q(0162),
+         q(0),
+         ],
       q(WST) => [
-         q(0128),
+         q(0127),
          q(0),
          ],
       q(XAF) => [
@@ -1892,27 +1881,27 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(XAG) => [
-         q(0176),
+         q(0175),
          q(0),
          ],
       q(XAU) => [
-         q(0173),
+         q(0172),
          q(0),
          ],
       q(XBA) => [
-         q(0169),
+         q(0168),
          q(0),
          ],
       q(XBB) => [
-         q(0170),
+         q(0169),
          q(0),
          ],
       q(XBC) => [
-         q(0171),
+         q(0170),
          q(0),
          ],
       q(XBD) => [
-         q(0172),
+         q(0171),
          q(0),
          ],
       q(XCD) => [
@@ -1920,7 +1909,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(XDR) => [
-         q(0075),
+         q(0074),
          q(0),
          ],
       q(XOF) => [
@@ -1928,39 +1917,39 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(XPD) => [
-         q(0174),
+         q(0173),
          q(0),
          ],
       q(XPF) => [
-         q(0060),
+         q(0059),
          q(0),
          ],
       q(XPT) => [
-         q(0175),
+         q(0174),
          q(0),
          ],
       q(XSU) => [
-         q(0135),
+         q(0134),
          q(0),
          ],
       q(XUA) => [
-         q(0103),
+         q(0102),
          q(0),
          ],
       q(YER) => [
-         q(0166),
+         q(0165),
          q(0),
          ],
       q(ZAR) => [
-         q(0091),
+         q(0090),
          q(0),
          ],
       q(ZMW) => [
-         q(0167),
+         q(0166),
          q(0),
          ],
       q(ZWG) => [
-         q(0168),
+         q(0167),
          q(0),
          ],
       },
@@ -2022,7 +2011,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(090) => [
-         q(0136),
+         q(0135),
          q(0),
          ],
       q(096) => [
@@ -2030,7 +2019,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(104) => [
-         q(0110),
+         q(0109),
          q(0),
          ],
       q(108) => [
@@ -2054,7 +2043,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(144) => [
-         q(0139),
+         q(0138),
          q(0),
          ],
       q(152) => [
@@ -2082,79 +2071,79 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(203) => [
-         q(0049),
+         q(0048),
          q(0),
          ],
       q(208) => [
-         q(0050),
+         q(0049),
          q(0),
          ],
       q(214) => [
-         q(0052),
-         q(0),
-         ],
-      q(222) => [
-         q(0054),
-         q(0),
-         ],
-      q(230) => [
-         q(0057),
-         q(0),
-         ],
-      q(232) => [
-         q(0055),
-         q(0),
-         ],
-      q(238) => [
-         q(0058),
-         q(0),
-         ],
-      q(242) => [
-         q(0059),
-         q(0),
-         ],
-      q(262) => [
          q(0051),
          q(0),
          ],
+      q(222) => [
+         q(0053),
+         q(0),
+         ],
+      q(230) => [
+         q(0056),
+         q(0),
+         ],
+      q(232) => [
+         q(0054),
+         q(0),
+         ],
+      q(238) => [
+         q(0057),
+         q(0),
+         ],
+      q(242) => [
+         q(0058),
+         q(0),
+         ],
+      q(262) => [
+         q(0050),
+         q(0),
+         ],
       q(270) => [
-         q(0061),
+         q(0060),
          q(0),
          ],
       q(292) => [
-         q(0064),
+         q(0063),
          q(0),
          ],
       q(320) => [
-         q(0065),
+         q(0064),
          q(0),
          ],
       q(324) => [
-         q(0067),
+         q(0066),
          q(0),
          ],
       q(328) => [
-         q(0068),
+         q(0067),
          q(0),
          ],
       q(332) => [
-         q(0069),
+         q(0068),
          q(0),
          ],
       q(340) => [
-         q(0070),
+         q(0069),
          q(0),
          ],
       q(344) => [
-         q(0071),
+         q(0070),
          q(0),
          ],
       q(348) => [
-         q(0072),
+         q(0071),
          q(0),
          ],
       q(352) => [
-         q(0073),
+         q(0072),
          q(0),
          ],
       q(356) => [
@@ -2162,127 +2151,127 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(360) => [
-         q(0074),
+         q(0073),
          q(0),
          ],
       q(364) => [
-         q(0076),
+         q(0075),
          q(0),
          ],
       q(368) => [
-         q(0077),
+         q(0076),
          q(0),
          ],
       q(376) => [
-         q(0078),
+         q(0077),
          q(0),
          ],
       q(388) => [
-         q(0079),
+         q(0078),
          q(0),
          ],
       q(392) => [
-         q(0080),
+         q(0079),
          q(0),
          ],
       q(398) => [
-         q(0082),
-         q(0),
-         ],
-      q(400) => [
          q(0081),
          q(0),
          ],
+      q(400) => [
+         q(0080),
+         q(0),
+         ],
       q(404) => [
-         q(0083),
+         q(0082),
          q(0),
          ],
       q(408) => [
-         q(0084),
+         q(0083),
          q(0),
          ],
       q(410) => [
-         q(0085),
+         q(0084),
          q(0),
          ],
       q(414) => [
-         q(0086),
+         q(0085),
          q(0),
          ],
       q(417) => [
-         q(0087),
+         q(0086),
          q(0),
          ],
       q(418) => [
-         q(0088),
+         q(0087),
          q(0),
          ],
       q(422) => [
-         q(0089),
+         q(0088),
          q(0),
          ],
       q(426) => [
-         q(0090),
+         q(0089),
          q(0),
          ],
       q(430) => [
-         q(0092),
+         q(0091),
          q(0),
          ],
       q(434) => [
-         q(0093),
+         q(0092),
          q(0),
          ],
       q(446) => [
-         q(0095),
+         q(0094),
          q(0),
          ],
       q(454) => [
-         q(0098),
+         q(0097),
          q(0),
          ],
       q(458) => [
-         q(0099),
+         q(0098),
          q(0),
          ],
       q(462) => [
-         q(0100),
+         q(0099),
          q(0),
          ],
       q(480) => [
-         q(0102),
+         q(0101),
          q(0),
          ],
       q(484) => [
-         q(0104),
+         q(0103),
          q(0),
          ],
       q(496) => [
-         q(0107),
-         q(0),
-         ],
-      q(498) => [
          q(0106),
          q(0),
          ],
+      q(498) => [
+         q(0105),
+         q(0),
+         ],
       q(504) => [
-         q(0108),
+         q(0107),
          q(0),
          ],
       q(512) => [
-         q(0115),
+         q(0114),
          q(0),
          ],
       q(516) => [
-         q(0111),
+         q(0110),
          q(0),
          ],
       q(524) => [
-         q(0112),
+         q(0111),
          q(0),
          ],
       q(532) => [
-         q(0048),
+         q(0047),
          q(0),
          ],
       q(533) => [
@@ -2290,7 +2279,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(548) => [
-         q(0163),
+         q(0162),
          q(0),
          ],
       q(554) => [
@@ -2298,11 +2287,11 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(558) => [
-         q(0113),
+         q(0112),
          q(0),
          ],
       q(566) => [
-         q(0114),
+         q(0113),
          q(0),
          ],
       q(578) => [
@@ -2310,127 +2299,127 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(586) => [
-         q(0116),
+         q(0115),
          q(0),
          ],
       q(590) => [
-         q(0117),
+         q(0116),
          q(0),
          ],
       q(598) => [
-         q(0118),
+         q(0117),
          q(0),
          ],
       q(600) => [
-         q(0119),
+         q(0118),
          q(0),
          ],
       q(604) => [
-         q(0120),
+         q(0119),
          q(0),
          ],
       q(608) => [
-         q(0121),
+         q(0120),
          q(0),
          ],
       q(634) => [
-         q(0123),
+         q(0122),
          q(0),
          ],
       q(643) => [
-         q(0125),
+         q(0124),
          q(0),
          ],
       q(646) => [
-         q(0126),
+         q(0125),
          q(0),
          ],
       q(654) => [
-         q(0127),
+         q(0126),
          q(0),
          ],
       q(682) => [
-         q(0130),
+         q(0129),
          q(0),
          ],
       q(690) => [
-         q(0132),
+         q(0131),
          q(0),
          ],
       q(702) => [
-         q(0134),
+         q(0133),
          q(0),
          ],
       q(704) => [
-         q(0165),
+         q(0164),
          q(0),
          ],
       q(706) => [
-         q(0137),
+         q(0136),
          q(0),
          ],
       q(710) => [
-         q(0091),
+         q(0090),
          q(0),
          ],
       q(728) => [
-         q(0138),
+         q(0137),
          q(0),
          ],
       q(748) => [
-         q(0056),
+         q(0055),
          q(0),
          ],
       q(752) => [
-         q(0142),
+         q(0141),
          q(0),
          ],
       q(756) => [
-         q(0094),
+         q(0093),
          q(0),
          ],
       q(760) => [
-         q(0145),
+         q(0144),
          q(0),
          ],
       q(764) => [
-         q(0149),
+         q(0148),
          q(0),
          ],
       q(776) => [
-         q(0150),
+         q(0149),
          q(0),
          ],
       q(780) => [
-         q(0151),
+         q(0150),
          q(0),
          ],
       q(784) => [
-         q(0157),
+         q(0156),
          q(0),
          ],
       q(788) => [
-         q(0152),
+         q(0151),
          q(0),
          ],
       q(800) => [
-         q(0155),
+         q(0154),
          q(0),
          ],
       q(807) => [
-         q(0096),
+         q(0095),
          q(0),
          ],
       q(818) => [
-         q(0053),
+         q(0052),
          q(0),
          ],
       q(826) => [
-         q(0066),
+         q(0065),
          q(0),
          ],
       q(834) => [
-         q(0148),
+         q(0147),
          q(0),
          ],
       q(840) => [
@@ -2438,55 +2427,51 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(858) => [
-         q(0159),
+         q(0158),
          q(0),
          ],
       q(860) => [
-         q(0162),
-         q(0),
-         ],
-      q(882) => [
-         q(0128),
-         q(0),
-         ],
-      q(886) => [
-         q(0166),
-         q(0),
-         ],
-      q(901) => [
-         q(0146),
-         q(0),
-         ],
-      q(924) => [
-         q(0168),
-         q(0),
-         ],
-      q(925) => [
-         q(0133),
-         q(0),
-         ],
-      q(926) => [
-         q(0164),
-         q(0),
-         ],
-      q(927) => [
          q(0161),
          q(0),
          ],
+      q(882) => [
+         q(0127),
+         q(0),
+         ],
+      q(886) => [
+         q(0165),
+         q(0),
+         ],
+      q(901) => [
+         q(0145),
+         q(0),
+         ],
+      q(924) => [
+         q(0167),
+         q(0),
+         ],
+      q(925) => [
+         q(0132),
+         q(0),
+         ],
+      q(926) => [
+         q(0163),
+         q(0),
+         ],
+      q(927) => [
+         q(0160),
+         q(0),
+         ],
       q(928) => [
-         q(0164),
+         q(0163),
          q(0),
          ],
       q(929) => [
-         q(0101),
+         q(0100),
          q(0),
          ],
       q(930) => [
-         q(0129),
-         q(0),
-         ],
-      q(931) => [
-         q(0047),
+         q(0128),
          q(0),
          ],
       q(933) => [
@@ -2494,27 +2479,27 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(934) => [
-         q(0154),
+         q(0153),
          q(0),
          ],
       q(936) => [
-         q(0063),
+         q(0062),
          q(0),
          ],
       q(938) => [
-         q(0140),
+         q(0139),
          q(0),
          ],
       q(940) => [
-         q(0160),
+         q(0159),
          q(0),
          ],
       q(941) => [
-         q(0131),
+         q(0130),
          q(0),
          ],
       q(943) => [
-         q(0109),
+         q(0108),
          q(0),
          ],
       q(944) => [
@@ -2522,19 +2507,19 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(946) => [
-         q(0124),
+         q(0123),
          q(0),
          ],
       q(947) => [
-         q(0143),
+         q(0142),
          q(0),
          ],
       q(948) => [
-         q(0144),
+         q(0143),
          q(0),
          ],
       q(949) => [
-         q(0153),
+         q(0152),
          q(0),
          ],
       q(950) => [
@@ -2550,59 +2535,59 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(953) => [
-         q(0060),
+         q(0059),
          q(0),
          ],
       q(955) => [
-         q(0169),
+         q(0168),
          q(0),
          ],
       q(956) => [
-         q(0170),
+         q(0169),
          q(0),
          ],
       q(957) => [
-         q(0171),
+         q(0170),
          q(0),
          ],
       q(958) => [
-         q(0172),
+         q(0171),
          q(0),
          ],
       q(959) => [
-         q(0173),
+         q(0172),
          q(0),
          ],
       q(960) => [
-         q(0075),
+         q(0074),
          q(0),
          ],
       q(961) => [
-         q(0176),
-         q(0),
-         ],
-      q(962) => [
          q(0175),
          q(0),
          ],
-      q(964) => [
+      q(962) => [
          q(0174),
          q(0),
          ],
+      q(964) => [
+         q(0173),
+         q(0),
+         ],
       q(965) => [
-         q(0103),
+         q(0102),
          q(0),
          ],
       q(967) => [
-         q(0167),
+         q(0166),
          q(0),
          ],
       q(968) => [
-         q(0141),
+         q(0140),
          q(0),
          ],
       q(969) => [
-         q(0097),
+         q(0096),
          q(0),
          ],
       q(970) => [
@@ -2614,7 +2599,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(972) => [
-         q(0147),
+         q(0146),
          q(0),
          ],
       q(973) => [
@@ -2638,15 +2623,15 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(979) => [
-         q(0105),
+         q(0104),
          q(0),
          ],
       q(980) => [
-         q(0156),
+         q(0155),
          q(0),
          ],
       q(981) => [
-         q(0062),
+         q(0061),
          q(0),
          ],
       q(984) => [
@@ -2654,7 +2639,7 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(985) => [
-         q(0122),
+         q(0121),
          q(0),
          ],
       q(986) => [
@@ -2666,11 +2651,11 @@ $Locale::Codes::Data{'currency'}{'code2id'} = {
          q(0),
          ],
       q(994) => [
-         q(0135),
+         q(0134),
          q(0),
          ],
       q(997) => [
-         q(0158),
+         q(0157),
          q(0),
          ],
       },
@@ -2724,136 +2709,135 @@ $Locale::Codes::Data{'currency'}{'id2code'} = {
       q(0044) => q(NZD),
       q(0045) => q(CRC),
       q(0046) => q(CUP),
-      q(0047) => q(CUC),
-      q(0048) => q(ANG),
-      q(0049) => q(CZK),
-      q(0050) => q(DKK),
-      q(0051) => q(DJF),
-      q(0052) => q(DOP),
-      q(0053) => q(EGP),
-      q(0054) => q(SVC),
-      q(0055) => q(ERN),
-      q(0056) => q(SZL),
-      q(0057) => q(ETB),
-      q(0058) => q(FKP),
-      q(0059) => q(FJD),
-      q(0060) => q(XPF),
-      q(0061) => q(GMD),
-      q(0062) => q(GEL),
-      q(0063) => q(GHS),
-      q(0064) => q(GIP),
-      q(0065) => q(GTQ),
-      q(0066) => q(GBP),
-      q(0067) => q(GNF),
-      q(0068) => q(GYD),
-      q(0069) => q(HTG),
-      q(0070) => q(HNL),
-      q(0071) => q(HKD),
-      q(0072) => q(HUF),
-      q(0073) => q(ISK),
-      q(0074) => q(IDR),
-      q(0075) => q(XDR),
-      q(0076) => q(IRR),
-      q(0077) => q(IQD),
-      q(0078) => q(ILS),
-      q(0079) => q(JMD),
-      q(0080) => q(JPY),
-      q(0081) => q(JOD),
-      q(0082) => q(KZT),
-      q(0083) => q(KES),
-      q(0084) => q(KPW),
-      q(0085) => q(KRW),
-      q(0086) => q(KWD),
-      q(0087) => q(KGS),
-      q(0088) => q(LAK),
-      q(0089) => q(LBP),
-      q(0090) => q(LSL),
-      q(0091) => q(ZAR),
-      q(0092) => q(LRD),
-      q(0093) => q(LYD),
-      q(0094) => q(CHF),
-      q(0095) => q(MOP),
-      q(0096) => q(MKD),
-      q(0097) => q(MGA),
-      q(0098) => q(MWK),
-      q(0099) => q(MYR),
-      q(0100) => q(MVR),
-      q(0101) => q(MRU),
-      q(0102) => q(MUR),
-      q(0103) => q(XUA),
-      q(0104) => q(MXN),
-      q(0105) => q(MXV),
-      q(0106) => q(MDL),
-      q(0107) => q(MNT),
-      q(0108) => q(MAD),
-      q(0109) => q(MZN),
-      q(0110) => q(MMK),
-      q(0111) => q(NAD),
-      q(0112) => q(NPR),
-      q(0113) => q(NIO),
-      q(0114) => q(NGN),
-      q(0115) => q(OMR),
-      q(0116) => q(PKR),
-      q(0117) => q(PAB),
-      q(0118) => q(PGK),
-      q(0119) => q(PYG),
-      q(0120) => q(PEN),
-      q(0121) => q(PHP),
-      q(0122) => q(PLN),
-      q(0123) => q(QAR),
-      q(0124) => q(RON),
-      q(0125) => q(RUB),
-      q(0126) => q(RWF),
-      q(0127) => q(SHP),
-      q(0128) => q(WST),
-      q(0129) => q(STN),
-      q(0130) => q(SAR),
-      q(0131) => q(RSD),
-      q(0132) => q(SCR),
-      q(0133) => q(SLE),
-      q(0134) => q(SGD),
-      q(0135) => q(XSU),
-      q(0136) => q(SBD),
-      q(0137) => q(SOS),
-      q(0138) => q(SSP),
-      q(0139) => q(LKR),
-      q(0140) => q(SDG),
-      q(0141) => q(SRD),
-      q(0142) => q(SEK),
-      q(0143) => q(CHE),
-      q(0144) => q(CHW),
-      q(0145) => q(SYP),
-      q(0146) => q(TWD),
-      q(0147) => q(TJS),
-      q(0148) => q(TZS),
-      q(0149) => q(THB),
-      q(0150) => q(TOP),
-      q(0151) => q(TTD),
-      q(0152) => q(TND),
-      q(0153) => q(TRY),
-      q(0154) => q(TMT),
-      q(0155) => q(UGX),
-      q(0156) => q(UAH),
-      q(0157) => q(AED),
-      q(0158) => q(USN),
-      q(0159) => q(UYU),
-      q(0160) => q(UYI),
-      q(0161) => q(UYW),
-      q(0162) => q(UZS),
-      q(0163) => q(VUV),
-      q(0164) => q(VED),
-      q(0165) => q(VND),
-      q(0166) => q(YER),
-      q(0167) => q(ZMW),
-      q(0168) => q(ZWG),
-      q(0169) => q(XBA),
-      q(0170) => q(XBB),
-      q(0171) => q(XBC),
-      q(0172) => q(XBD),
-      q(0173) => q(XAU),
-      q(0174) => q(XPD),
-      q(0175) => q(XPT),
-      q(0176) => q(XAG),
+      q(0047) => q(ANG),
+      q(0048) => q(CZK),
+      q(0049) => q(DKK),
+      q(0050) => q(DJF),
+      q(0051) => q(DOP),
+      q(0052) => q(EGP),
+      q(0053) => q(SVC),
+      q(0054) => q(ERN),
+      q(0055) => q(SZL),
+      q(0056) => q(ETB),
+      q(0057) => q(FKP),
+      q(0058) => q(FJD),
+      q(0059) => q(XPF),
+      q(0060) => q(GMD),
+      q(0061) => q(GEL),
+      q(0062) => q(GHS),
+      q(0063) => q(GIP),
+      q(0064) => q(GTQ),
+      q(0065) => q(GBP),
+      q(0066) => q(GNF),
+      q(0067) => q(GYD),
+      q(0068) => q(HTG),
+      q(0069) => q(HNL),
+      q(0070) => q(HKD),
+      q(0071) => q(HUF),
+      q(0072) => q(ISK),
+      q(0073) => q(IDR),
+      q(0074) => q(XDR),
+      q(0075) => q(IRR),
+      q(0076) => q(IQD),
+      q(0077) => q(ILS),
+      q(0078) => q(JMD),
+      q(0079) => q(JPY),
+      q(0080) => q(JOD),
+      q(0081) => q(KZT),
+      q(0082) => q(KES),
+      q(0083) => q(KPW),
+      q(0084) => q(KRW),
+      q(0085) => q(KWD),
+      q(0086) => q(KGS),
+      q(0087) => q(LAK),
+      q(0088) => q(LBP),
+      q(0089) => q(LSL),
+      q(0090) => q(ZAR),
+      q(0091) => q(LRD),
+      q(0092) => q(LYD),
+      q(0093) => q(CHF),
+      q(0094) => q(MOP),
+      q(0095) => q(MKD),
+      q(0096) => q(MGA),
+      q(0097) => q(MWK),
+      q(0098) => q(MYR),
+      q(0099) => q(MVR),
+      q(0100) => q(MRU),
+      q(0101) => q(MUR),
+      q(0102) => q(XUA),
+      q(0103) => q(MXN),
+      q(0104) => q(MXV),
+      q(0105) => q(MDL),
+      q(0106) => q(MNT),
+      q(0107) => q(MAD),
+      q(0108) => q(MZN),
+      q(0109) => q(MMK),
+      q(0110) => q(NAD),
+      q(0111) => q(NPR),
+      q(0112) => q(NIO),
+      q(0113) => q(NGN),
+      q(0114) => q(OMR),
+      q(0115) => q(PKR),
+      q(0116) => q(PAB),
+      q(0117) => q(PGK),
+      q(0118) => q(PYG),
+      q(0119) => q(PEN),
+      q(0120) => q(PHP),
+      q(0121) => q(PLN),
+      q(0122) => q(QAR),
+      q(0123) => q(RON),
+      q(0124) => q(RUB),
+      q(0125) => q(RWF),
+      q(0126) => q(SHP),
+      q(0127) => q(WST),
+      q(0128) => q(STN),
+      q(0129) => q(SAR),
+      q(0130) => q(RSD),
+      q(0131) => q(SCR),
+      q(0132) => q(SLE),
+      q(0133) => q(SGD),
+      q(0134) => q(XSU),
+      q(0135) => q(SBD),
+      q(0136) => q(SOS),
+      q(0137) => q(SSP),
+      q(0138) => q(LKR),
+      q(0139) => q(SDG),
+      q(0140) => q(SRD),
+      q(0141) => q(SEK),
+      q(0142) => q(CHE),
+      q(0143) => q(CHW),
+      q(0144) => q(SYP),
+      q(0145) => q(TWD),
+      q(0146) => q(TJS),
+      q(0147) => q(TZS),
+      q(0148) => q(THB),
+      q(0149) => q(TOP),
+      q(0150) => q(TTD),
+      q(0151) => q(TND),
+      q(0152) => q(TRY),
+      q(0153) => q(TMT),
+      q(0154) => q(UGX),
+      q(0155) => q(UAH),
+      q(0156) => q(AED),
+      q(0157) => q(USN),
+      q(0158) => q(UYU),
+      q(0159) => q(UYI),
+      q(0160) => q(UYW),
+      q(0161) => q(UZS),
+      q(0162) => q(VUV),
+      q(0163) => q(VED),
+      q(0164) => q(VND),
+      q(0165) => q(YER),
+      q(0166) => q(ZMW),
+      q(0167) => q(ZWG),
+      q(0168) => q(XBA),
+      q(0169) => q(XBB),
+      q(0170) => q(XBC),
+      q(0171) => q(XBD),
+      q(0172) => q(XAU),
+      q(0173) => q(XPD),
+      q(0174) => q(XPT),
+      q(0175) => q(XAG),
       },
    q(num) => {
       q(0001) => q(971),
@@ -2902,136 +2886,135 @@ $Locale::Codes::Data{'currency'}{'id2code'} = {
       q(0044) => q(554),
       q(0045) => q(188),
       q(0046) => q(192),
-      q(0047) => q(931),
-      q(0048) => q(532),
-      q(0049) => q(203),
-      q(0050) => q(208),
-      q(0051) => q(262),
-      q(0052) => q(214),
-      q(0053) => q(818),
-      q(0054) => q(222),
-      q(0055) => q(232),
-      q(0056) => q(748),
-      q(0057) => q(230),
-      q(0058) => q(238),
-      q(0059) => q(242),
-      q(0060) => q(953),
-      q(0061) => q(270),
-      q(0062) => q(981),
-      q(0063) => q(936),
-      q(0064) => q(292),
-      q(0065) => q(320),
-      q(0066) => q(826),
-      q(0067) => q(324),
-      q(0068) => q(328),
-      q(0069) => q(332),
-      q(0070) => q(340),
-      q(0071) => q(344),
-      q(0072) => q(348),
-      q(0073) => q(352),
-      q(0074) => q(360),
-      q(0075) => q(960),
-      q(0076) => q(364),
-      q(0077) => q(368),
-      q(0078) => q(376),
-      q(0079) => q(388),
-      q(0080) => q(392),
-      q(0081) => q(400),
-      q(0082) => q(398),
-      q(0083) => q(404),
-      q(0084) => q(408),
-      q(0085) => q(410),
-      q(0086) => q(414),
-      q(0087) => q(417),
-      q(0088) => q(418),
-      q(0089) => q(422),
-      q(0090) => q(426),
-      q(0091) => q(710),
-      q(0092) => q(430),
-      q(0093) => q(434),
-      q(0094) => q(756),
-      q(0095) => q(446),
-      q(0096) => q(807),
-      q(0097) => q(969),
-      q(0098) => q(454),
-      q(0099) => q(458),
-      q(0100) => q(462),
-      q(0101) => q(929),
-      q(0102) => q(480),
-      q(0103) => q(965),
-      q(0104) => q(484),
-      q(0105) => q(979),
-      q(0106) => q(498),
-      q(0107) => q(496),
-      q(0108) => q(504),
-      q(0109) => q(943),
-      q(0110) => q(104),
-      q(0111) => q(516),
-      q(0112) => q(524),
-      q(0113) => q(558),
-      q(0114) => q(566),
-      q(0115) => q(512),
-      q(0116) => q(586),
-      q(0117) => q(590),
-      q(0118) => q(598),
-      q(0119) => q(600),
-      q(0120) => q(604),
-      q(0121) => q(608),
-      q(0122) => q(985),
-      q(0123) => q(634),
-      q(0124) => q(946),
-      q(0125) => q(643),
-      q(0126) => q(646),
-      q(0127) => q(654),
-      q(0128) => q(882),
-      q(0129) => q(930),
-      q(0130) => q(682),
-      q(0131) => q(941),
-      q(0132) => q(690),
-      q(0133) => q(925),
-      q(0134) => q(702),
-      q(0135) => q(994),
-      q(0136) => q(090),
-      q(0137) => q(706),
-      q(0138) => q(728),
-      q(0139) => q(144),
-      q(0140) => q(938),
-      q(0141) => q(968),
-      q(0142) => q(752),
-      q(0143) => q(947),
-      q(0144) => q(948),
-      q(0145) => q(760),
-      q(0146) => q(901),
-      q(0147) => q(972),
-      q(0148) => q(834),
-      q(0149) => q(764),
-      q(0150) => q(776),
-      q(0151) => q(780),
-      q(0152) => q(788),
-      q(0153) => q(949),
-      q(0154) => q(934),
-      q(0155) => q(800),
-      q(0156) => q(980),
-      q(0157) => q(784),
-      q(0158) => q(997),
-      q(0159) => q(858),
-      q(0160) => q(940),
-      q(0161) => q(927),
-      q(0162) => q(860),
-      q(0163) => q(548),
-      q(0164) => q(926),
-      q(0165) => q(704),
-      q(0166) => q(886),
-      q(0167) => q(967),
-      q(0168) => q(924),
-      q(0169) => q(955),
-      q(0170) => q(956),
-      q(0171) => q(957),
-      q(0172) => q(958),
-      q(0173) => q(959),
-      q(0174) => q(964),
-      q(0175) => q(962),
-      q(0176) => q(961),
+      q(0047) => q(532),
+      q(0048) => q(203),
+      q(0049) => q(208),
+      q(0050) => q(262),
+      q(0051) => q(214),
+      q(0052) => q(818),
+      q(0053) => q(222),
+      q(0054) => q(232),
+      q(0055) => q(748),
+      q(0056) => q(230),
+      q(0057) => q(238),
+      q(0058) => q(242),
+      q(0059) => q(953),
+      q(0060) => q(270),
+      q(0061) => q(981),
+      q(0062) => q(936),
+      q(0063) => q(292),
+      q(0064) => q(320),
+      q(0065) => q(826),
+      q(0066) => q(324),
+      q(0067) => q(328),
+      q(0068) => q(332),
+      q(0069) => q(340),
+      q(0070) => q(344),
+      q(0071) => q(348),
+      q(0072) => q(352),
+      q(0073) => q(360),
+      q(0074) => q(960),
+      q(0075) => q(364),
+      q(0076) => q(368),
+      q(0077) => q(376),
+      q(0078) => q(388),
+      q(0079) => q(392),
+      q(0080) => q(400),
+      q(0081) => q(398),
+      q(0082) => q(404),
+      q(0083) => q(408),
+      q(0084) => q(410),
+      q(0085) => q(414),
+      q(0086) => q(417),
+      q(0087) => q(418),
+      q(0088) => q(422),
+      q(0089) => q(426),
+      q(0090) => q(710),
+      q(0091) => q(430),
+      q(0092) => q(434),
+      q(0093) => q(756),
+      q(0094) => q(446),
+      q(0095) => q(807),
+      q(0096) => q(969),
+      q(0097) => q(454),
+      q(0098) => q(458),
+      q(0099) => q(462),
+      q(0100) => q(929),
+      q(0101) => q(480),
+      q(0102) => q(965),
+      q(0103) => q(484),
+      q(0104) => q(979),
+      q(0105) => q(498),
+      q(0106) => q(496),
+      q(0107) => q(504),
+      q(0108) => q(943),
+      q(0109) => q(104),
+      q(0110) => q(516),
+      q(0111) => q(524),
+      q(0112) => q(558),
+      q(0113) => q(566),
+      q(0114) => q(512),
+      q(0115) => q(586),
+      q(0116) => q(590),
+      q(0117) => q(598),
+      q(0118) => q(600),
+      q(0119) => q(604),
+      q(0120) => q(608),
+      q(0121) => q(985),
+      q(0122) => q(634),
+      q(0123) => q(946),
+      q(0124) => q(643),
+      q(0125) => q(646),
+      q(0126) => q(654),
+      q(0127) => q(882),
+      q(0128) => q(930),
+      q(0129) => q(682),
+      q(0130) => q(941),
+      q(0131) => q(690),
+      q(0132) => q(925),
+      q(0133) => q(702),
+      q(0134) => q(994),
+      q(0135) => q(090),
+      q(0136) => q(706),
+      q(0137) => q(728),
+      q(0138) => q(144),
+      q(0139) => q(938),
+      q(0140) => q(968),
+      q(0141) => q(752),
+      q(0142) => q(947),
+      q(0143) => q(948),
+      q(0144) => q(760),
+      q(0145) => q(901),
+      q(0146) => q(972),
+      q(0147) => q(834),
+      q(0148) => q(764),
+      q(0149) => q(776),
+      q(0150) => q(780),
+      q(0151) => q(788),
+      q(0152) => q(949),
+      q(0153) => q(934),
+      q(0154) => q(800),
+      q(0155) => q(980),
+      q(0156) => q(784),
+      q(0157) => q(997),
+      q(0158) => q(858),
+      q(0159) => q(940),
+      q(0160) => q(927),
+      q(0161) => q(860),
+      q(0162) => q(548),
+      q(0163) => q(926),
+      q(0164) => q(704),
+      q(0165) => q(886),
+      q(0166) => q(967),
+      q(0167) => q(924),
+      q(0168) => q(955),
+      q(0169) => q(956),
+      q(0170) => q(957),
+      q(0171) => q(958),
+      q(0172) => q(959),
+      q(0173) => q(964),
+      q(0174) => q(962),
+      q(0175) => q(961),
       },
 };
 

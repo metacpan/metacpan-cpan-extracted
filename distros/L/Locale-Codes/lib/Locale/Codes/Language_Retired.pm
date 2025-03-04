@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Dec  2 10:29:51 EST 2024
+#    Generated on: Mon Mar  3 11:04:05 EST 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.81';
+$VERSION='3.82';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -57,6 +57,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'code'} = {
    q(cum) => q(Cumeral),
    q(daf) => q(Dan),
    q(dap) => q(Nisi (India)),
+   q(dek) => q(Dek),
    q(dgu) => q(Degaru),
    q(dha) => q(Dhanwar (India)),
    q(dit) => q(Dirari),
@@ -145,6 +146,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'code'} = {
    q(nnx) => q(Ngong),
    q(nom) => q(Nocaman),
    q(noo) => q(Nootka),
+   q(nte) => q(Nathembo),
    q(nts) => q(Natagaimas),
    q(nxu) => q(Narau),
    q(ome) => q(Omejes),
@@ -341,6 +343,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(bhatola) => [ q(btl), q(Bhatola) ],
    q(bidyara) => [ q(bym), q(Bidyara) ],
    q(bikaru) => [ q(bic), q(Bikaru) ],
+   q(bilakura) => [ q(bql), q(Bilakura) ],
    q(blin) => [ q(byn), q(Blin) ],
    q(bolo) => [ q(blv), q(Bolo) ],
    q(bom) => [ q(bmf), q(Bom) ],
@@ -369,9 +372,11 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(cumeral) => [ q(cum), q(Cumeral) ],
    q(cung) => [ q(cug), q(Cung) ],
    q(dakaka) => [ q(bpa), q(Dakaka) ],
+   q(dao) => [ q(daz), q(Dao) ],
    q(darling) => [ q(drl), q(Darling) ],
    q(daza) => [ q(dzd), q(Daza) ],
    q(degaru) => [ q(dgu), q(Degaru) ],
+   q(dek) => [ q(dek), q(Dek) ],
    q(dhangu) => [ q(dhg), q(Dhangu) ],
    q(dhanwar (india)) => [ q(dha), q(Dhanwar (India)) ],
    q(dimir) => [ q(dmc), q(Dimir) ],
@@ -538,6 +543,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(mudbura) => [ q(mwd), q(Mudbura) ],
    q(muduapa) => [ q(wiv), q(Muduapa) ],
    q(mullukmulluk) => [ q(mpb), q(Mullukmulluk) ],
+   q(musar) => [ q(mmi), q(Musar) ],
    q(muya) => [ q(mvm), q(Muya) ],
    q(n/u) => [ q(ngh), q(N/u) ],
    q(nakama) => [ q(nib), q(Nakama) ],
@@ -550,6 +556,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(narrinyeri) => [ q(nay), q(Narrinyeri) ],
    q(natagaimas) => [ q(nts), q(Natagaimas) ],
    q(nataoran amis) => [ q(ais), q(Nataoran Amis) ],
+   q(nathembo) => [ q(nte), q(Nathembo) ],
    q(ndaktup) => [ q(ncp), q(Ndaktup) ],
    q(ndrag'ngith) => [ q(dgt), q(Ndrag'ngith) ],
    q(nepal bhasa) => [ q(new), q(Nepal Bhasa) ],

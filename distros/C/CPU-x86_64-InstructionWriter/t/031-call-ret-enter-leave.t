@@ -83,15 +83,15 @@ sub push_ {
 	
 	for my $reg (@r64) {
 		push @asm, "push $reg";
-		push @out, new_writer->push_reg($reg)->bytes;
+		push @out, new_writer->push64_reg($reg)->bytes;
 	}
 	for my $imm (@immed32) {
 		push @asm, "push qword $imm";
-		push @out, new_writer->push_imm($imm)->bytes;
+		push @out, new_writer->push64_imm($imm)->bytes;
 	}
 	iterate_mem_addr_combos(
 		\@asm, sub { "push qword $_[0]" },
-		\@out, sub { new_writer->push_mem([@_])->bytes }
+		\@out, sub { new_writer->push64_mem([@_])->bytes }
 	);
 	
 	asm_ok( \@out, \@asm, 'push' );
@@ -103,11 +103,11 @@ sub pop_ {
 	
 	for my $reg (@r64) {
 		push @asm, "pop $reg";
-		push @out, new_writer->pop_reg($reg)->bytes;
+		push @out, new_writer->pop64_reg($reg)->bytes;
 	}
 	iterate_mem_addr_combos(
 		\@asm, sub { "pop qword $_[0]" },
-		\@out, sub { new_writer->pop_mem([@_])->bytes }
+		\@out, sub { new_writer->pop64_mem([@_])->bytes }
 	);
 	
 	asm_ok( \@out, \@asm, 'push' );

@@ -1,4 +1,8 @@
 Revision history for Perl extension Map::Tube::Chicago
 
+0.1.1 2025-03-03
+  - Circumvent a problem with a test failing for Perl 5.18 (only).
+  - Downgraded required Map::Tube version to 4.01.
+
 0.1.0 2025-03-03
   - initial release

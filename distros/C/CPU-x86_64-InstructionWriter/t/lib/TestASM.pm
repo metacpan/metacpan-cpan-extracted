@@ -13,7 +13,7 @@ use CPU::x86_64::InstructionWriter::_int32 qw/ int64 pack /;
 
 our @EXPORT_OK= qw( int64 pack reference_assemble iterate_mem_addr_combos
 	hex_diff have_nasm asm_ok new_writer
-	@r64 @r32 @r16 @r8 @r8h @immed64 @immed32 @immed16 @immed8
+	@r128 @r64 @r32 @r16 @r8 @r8h @immed64 @immed32 @immed16 @immed8
 	unknown unknown8 unknown16 unknown32 unknown64 unknown7 unknown15 unknown31 unknown63
 	hex_dump hex_diff
 );
@@ -21,6 +21,8 @@ our @EXPORT_OK= qw( int64 pack reference_assemble iterate_mem_addr_combos
 my $do_all= $ENV{TEST_EXHAUSTIVE}
 	or note "Skipping exhaustive testing, set TEST_EXHAUSTIVE=1 to do a full test";
 
+our @r128= $do_all? (qw( xmm0 xmm1 xmm2 xmm3 xmm4 xmm5 xmm6 xmm7 xmm8 xmm9 xmm10 xmm11 xmm12 xmm13 xmm14 xmm15 ))
+	: (qw( xmm0 xmm4 xmm5 xmm8 xmm15 ));
 our @r64= $do_all? (qw( rax rcx rdx rbx rsp rbp rsi rdi r8 r9 r10 r11 r12 r13 r14 r15 ))
 	: (qw( rax rcx rbx rsp r11 r12 r13 ));
 our @r32= $do_all? (qw( eax ecx edx ebx esp ebp esi edi r8d r9d r10d r11d r12d r13d r14d r15d ))

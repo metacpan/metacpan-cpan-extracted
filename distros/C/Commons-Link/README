@@ -143,7 +143,8 @@ EXAMPLE3
      # Output thumbnail link: http://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Michal_from_Czechia.jpg/200px-Michal_from_Czechia.jpg
 
 DEPENDENCIES
-    Class::Utils, Digest::MD5, Readonly, Unicode::UTF8, URI.
+    Class::Utils, Digest::MD5, File::Basename, List::Util, Mo::utils,
+    Readonly, Unicode::UTF8, URI.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Commons-Link>
@@ -154,10 +155,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2022 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

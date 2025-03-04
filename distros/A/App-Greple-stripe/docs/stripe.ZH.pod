@@ -10,7 +10,7 @@ App::Greple::stripe - Greple 斑马纹模块
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ L<App::Greple::stripe> 是 L<greple|App::Greple> 的一个模块，用于以斑�
 
 如果要为三个或更多图案使用不同的颜色系列，请在调用模块时指定 C<step> 数量。系列数最多可以增加到 6 个。
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/step-3.png">
@@ -64,19 +64,19 @@ B<stripe> 模块有一些特定的选项。这些选项可以在模块声明时�
 
 以下两条命令具有完全相同的效果。
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
 =over 7
 
-=item B<-Mstripe::set>=B<step>=I<n>
+=item B<-Mstripe::config>=B<step>=I<n>
 
 =item B<--step>=I<n>
 
 将步数设置为 I<n>。
 
-=item B<-Mstripe::set>=B<darkmode>
+=item B<-Mstripe::config>=B<darkmode>
 
 =item B<--darkmode>
 
@@ -108,7 +108,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

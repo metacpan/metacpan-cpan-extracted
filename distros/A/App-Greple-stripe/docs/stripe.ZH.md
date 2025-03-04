@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 斑马纹模块
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -58,7 +58,7 @@ Version 1.00
 
 如果要为三个或更多图案使用不同的颜色系列，请在调用模块时指定 `step` 数量。系列数最多可以增加到 6 个。
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 <div>
     <p>
@@ -72,16 +72,16 @@ Version 1.00
 
 以下两条命令具有完全相同的效果。
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
-- **-Mstripe::set**=**step**=_n_
+- **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
 
     将步数设置为 _n_。
 
-- **-Mstripe::set**=**darkmode**
+- **-Mstripe::config**=**darkmode**
 - **--darkmode**
 
     使用深色背景
@@ -114,7 +114,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

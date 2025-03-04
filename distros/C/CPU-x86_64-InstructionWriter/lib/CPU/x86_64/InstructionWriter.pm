@@ -1,5 +1,5 @@
 package CPU::x86_64::InstructionWriter;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 use v5.10;
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use Encode;
 use CPU::x86_64::InstructionWriter::Unknown;
 use CPU::x86_64::InstructionWriter::Label;
 use CPU::x86_64::InstructionWriter::RipRelative;
+use CPU::x86_64::InstructionWriter::LazyEncode;
 use if !eval{ pack('Q<',1) }, 'CPU::x86_64::InstructionWriter::_int32', qw/pack/;
 
 # ABSTRACT: Assemble x86-64 instructions using a pure-perl API
@@ -20,7 +21,8 @@ my %byte_register_alias= ( map {; "R${_}L" => "R${_}B" } 8..15 );
 my @word_registers= qw( AX BX CX DX SI DI SP BP R8W R9W R10W R11W R12W R13W R14W R15W );
 my @long_registers= qw( EAX EBX ECX EDX ESI EDI ESP EBP R8D R9D R10D R11D R12D R13D R14D R15D );
 my @quad_registers= qw( RAX RBX RCX RDX RSI RDI RSP RBP R8 R9 R10 R11 R12 R13 R14 R15 RIP RFLAGS );
-my @registers= ( @byte_registers, @word_registers, @long_registers, @quad_registers );
+my @sse_registers= ( (map "XMM$_", 0..15), (map "YMM$_", 0..15), (map "ZMM$_", 0..31) );
+my @registers= ( @byte_registers, @word_registers, @long_registers, @quad_registers, @sse_registers );
 {
 	# Create a constant for each register name
 	no strict 'refs';
@@ -30,49 +32,51 @@ my @registers= ( @byte_registers, @word_registers, @long_registers, @quad_regist
 		for keys %byte_register_alias;
 }
 
-# Map 64-bit register names to the numeric register number
-my %regnum64= (
-	RAX => 0, RCX => 1, RDX => 2, RBX => 3,
-	rax => 0, rcx => 1, rdx => 2, rbx => 3,
-	RSP => 4, RBP => 5, RSI => 6, RDI => 7,
-	rsp => 4, rbp => 5, rsi => 6, rdi => 7,
-	RIP => 0x15, rip => 0x15,
-	map { $_ => $_, "R$_" => $_, "r$_" => $_ } 0..15
-);
+# Map register names to the numeric register number
+# Scheme:
+#  bits 0..3: register number for instruction encoding
+#  bits 4..7: "problem" registers: 1=high bytes, 2=extended low bytes, 4=RIP
+#  bits 8..15: size of register, in bytes: 1,2,4,8,16,32,64
 
-my %regnum32= (
-	EAX => 0, ECX => 1, EDX => 2, EBX => 3,
-	eax => 0, ecx => 1, edx => 2, ebx => 3,
-	ESP => 4, EBP => 5, ESI => 6, EDI => 7,
-	esp => 4, ebp => 5, esi => 6, edi => 7,
-	map { $_ => $_, "R${_}D" => $_, "r${_}d" => $_ } 0..15
+my %regnum8= (
+	# low byte of first 4 registers, usable everywhere
+	AL => 0x100, CL => 0x101, DL => 0x102, BL => 0x103,
+	# high byte of first 4 registers, only usable without REX prefix
+	AH => 0x114, CH => 0x115, DH => 0x116, BH => 0x117,
+	# low byte of remaining registers only available with REX prefix
+	SPL => 0x124, BPL => 0x125, SIL => 0x126, DIL => 0x127,
+	(map +( "R${_}B" => (0x100|$_), "R${_}L" => (0x100|$_) ), 0..3),
+	(map +( "R${_}B" => (0x120|$_), "R${_}L" => (0x120|$_) ), 4..15),
 );
 
 my %regnum16= (
-	AX => 0, CX => 1, DX => 2, BX => 3,
-	ax => 0, cx => 1, dx => 2, bx => 3,
-	SP => 4, BP => 5, SI => 6, DI => 7,
-	sp => 4, bp => 5, si => 6, di => 7,
-	map { $_ => $_, "R${_}W" => $_, "r${_}w" => $_ } 0..15
+	AX => 0x200, CX => 0x201, DX => 0x202, BX => 0x203,
+	SP => 0x204, BP => 0x205, SI => 0x206, DI => 0x207,
+	(map +( "R${_}W" => (0x200|$_) ), 0..15)
 );
 
-my %regnum8= (
-	AL => 0, CL => 1, DL => 2, BL => 3,
-	al => 0, cl => 1, dl => 2, bl => 3,
-	SPL => 4, BPL => 5, SIL => 6, DIL => 7,
-	spl => 4, bpl => 5, sil => 6, dil => 7,
-	map { $_ => $_, "R${_}B" => $_, "r${_}b" => $_, "R${_}L" => $_, "r${_}l" => $_ } 0..15
+my %regnum32= (
+	EAX => 0x400, ECX => 0x401, EDX => 0x402, EBX => 0x403,
+	ESP => 0x404, EBP => 0x405, ESI => 0x406, EDI => 0x407,
+	(map +( "R${_}D" => (0x400|$_) ), 0..15)
 );
-my %regnum8_high= (
-	AH => 4, CH => 5, DH => 6, BH => 7,
-	ah => 4, ch => 5, dh => 6, bh => 7,
+
+my %regnum64= (
+	RAX => 0x800, RCX => 0x801, RDX => 0x802, RBX => 0x803,
+	RSP => 0x804, RBP => 0x805, RSI => 0x806, RDI => 0x807,
+	RIP => 0x845,
+	(map +( "R$_" => (0x800|$_) ), 0..15)
 );
-my %register_bits= (
-	(map { $_ => 64 } keys %regnum64),
-	(map { $_ => 32 } keys %regnum32),
-	(map { $_ => 16 } keys %regnum16),
-	(map { $_ =>  8 } keys %regnum8),
+
+my %regnum128= (
+	(map +("XMM$_" => (0x1000|$_)), 0..15)
 );
+
+# also allow lowercase register names
+for my $regs (\%regnum8, \%regnum16, \%regnum32, \%regnum64, \%regnum128) {
+	$regs->{lc $_}= $regs->{$_} for keys %$regs;
+}
+my %regnum= ( %regnum8, %regnum16, %regnum32, %regnum64, %regnum128 );
 
 sub unknown   { CPU::x86_64::InstructionWriter::Unknown->new(name => $_[0]); }
 sub unknown8  { CPU::x86_64::InstructionWriter::Unknown->new(bits =>  8, name => $_[0]); }
@@ -97,11 +101,13 @@ sub new {
 		: !(@_ & 1)? @_
 		: croak "Expected hashref or even-length list of k,v pairs";
 	bless {
-		start_address => ($args{start_address} // unknown64()),
-		debuf => $args{debug},
+		start_address => ($args{start_address} // unknown64('start_address')),
+		debug => $args{debug},
 		_buf => '',
 		_unresolved => [],
 		labels => {},
+		scope => '',
+		_anon_label => 0,
 	}, $class;
 }
 
@@ -110,17 +116,25 @@ sub start_address { $_[0]{start_address}= $_[1] if @_ > 1; $_[0]{start_address} 
 sub debug         { $_[0]{debug}=         $_[1] if @_ > 1; $_[0]{debug} }
 sub _buf          { croak "read-only" if @_ > 1; $_[0]{_buf} }
 sub _unresolved   { croak "read-only" if @_ > 1; $_[0]{_unresolved} }
+sub _anon_label   { $_[0]{scope} . '.anon' . ++$_[0]{_anon_label} }
 
 
 sub labels        { croak "read-only" if @_ > 1; $_[0]{labels} }
+
+sub scope {
+	return $_[0]{scope} unless @_ > 1;
+	$_[0]{scope}= $_[1] // '';
+	$_[0]
+}
 
 
 sub get_label {
 	my ($self, $name)= @_;
 	my $labels= $self->labels;
+	$name= $self->{scope} . $name if defined $name && ord $name == ord '.';
 	unless (defined $name && defined $labels->{$name}) {
 		my $label= bless { relative_to => $self->start_address }, __PACKAGE__.'::Label';
-		$name= "$label" unless defined $name;
+		$name //= $self->_anon_label;
 		$label->{name}= $name;
 		$labels->{$name}= $label;
 	}
@@ -142,7 +156,7 @@ sub label {
 		unless ref $label;
 	
 	# A label can only exist once
-	defined $label->{offset} and croak "Can't mark label '$label->{name}' twice";
+	defined $label->offset and croak "Can't mark label '".$label->name."' twice";
 	
 	# Set the label's current location
 	$label->{offset}= length($self->{_buf});
@@ -161,6 +175,36 @@ sub bytes {
 }
 
 
+sub append {
+	my ($self, $peer, $scope)= @_;
+	$scope //= '';
+	my $ofs= length $self->{_buf};
+	$self->{_buf} .= $peer->{_buf};
+	my %label_map;
+	# Copy labels
+	for my $name (keys %{ $peer->{labels} }) {
+		my $peer_label= $peer->{labels}{$name};
+		my $local_name= ord $name == ord '.'? $scope . $name : $name;
+		my $self_label= $self->get_label($local_name);
+		$label_map{$peer_label}= $self_label;
+		# make sure the label doesn't disagree with the existing one
+		croak "Conflicting label '$local_name' is anchored in both writers"
+			if defined $self_label->offset && defined $peer_label->offset
+			&& $self_label->relative_to != $peer_label->relative_to;
+		$self_label->{offset}= $peer_label->{offset};
+		$self_label->{offset} += $ofs
+			if defined $self_label->offset && $peer_label->relative_to == $peer->start_address;
+	}
+	# Copy unresolved
+	push @{ $self->_unresolved }, map +(
+		exists $label_map{$_}? $label_map{$_}
+		: $_->can('clone_into_writer')? $_->clone_into_writer($self, $ofs, \%label_map)
+		: croak "Don't know how to copy $_"
+		), @{ $peer->{_unresolved} };
+	$self;
+}
+
+
 sub align { # ( self, bytes, fill_byte)
 	my ($self, $bytes, $fill)= @_;
 	($bytes & ($bytes-1))
@@ -173,7 +217,7 @@ sub _align {
 	length($fill) == 1 or croak "Fill byte must be 1 byte long";
 	$self->_mark_unresolved(
 		0,
-		encode => sub {
+		encoder => sub {
 			#warn "start=$_[1]{start}, mask=$mask, ~mask=${\~$mask} ".((($_[1]{start} + ~$mask) & $mask) - $_[1]{start})."\n";
 			$fill x ((($_[1]{offset} + ~$mask) & $mask) - $_[1]{offset})
 		}
@@ -191,7 +235,7 @@ sub data {
 		my $buf= '';
 		my $pos= length $self->{_buf};
 		for my $str (sort { length $b <=> length $a } keys %$set) {
-			my $label= $set->{$str} //= $self->get_label;
+			my $label= ($set->{$str} //= $self->get_label);
 			defined $label->{offset} and croak "Label for '$str' is already anchored";
 			# Scan buf for existing string
 			my $ofs= index $buf, $str;
@@ -242,40 +286,47 @@ sub data_str {
 }
 
 
-sub _autodetect_signature_dst_src {
-	my ($self, $opname, $dst, $src, $bits)= @_;
-	$bits ||= $register_bits{$dst} || $register_bits{$src}
-		or croak "Can't determine bit-width of ".uc($opname)." instruction. "
-		        ."Use ->$opname(\$dst, \$src, \$bits) to clarify, when there is no register";
-	my $dst_type= looks_like_number($dst)? 'imm'
-	            : ref $dst eq 'ARRAY'? 'mem'
-	            : ref $dst && ref($dst)->can('value')? 'imm'
-	            : $register_bits{$dst}? 'reg'
-	            : croak "Can't identify type of destination operand $dst";
-	my $src_type= looks_like_number($src)? 'imm'
-	            : ref $src eq 'ARRAY'? 'mem'
-	            : ref $src && ref($src)->can('value')? 'imm'
-	            : $register_bits{$src}? 'reg'
-	            : croak "Can't identify type of source operand $src";
-	my $method= "$opname${bits}_${dst_type}_${src_type}";
-	($self->can($method) || croak "No ".uc($opname)." variant $method available")
-		->($self, $dst, $src);
+sub _autodetect_signature_1 { $_[0]->_autodetect_signature($_[1], $_[3], $_[2]) }
+sub _autodetect_signature_2 { $_[0]->_autodetect_signature($_[1], $_[4], $_[2], $_[3]) }
+sub _autodetect_signature_3 { $_[0]->_autodetect_signature($_[1], $_[5], $_[2], $_[3], $_[4]) }
+
+sub _autodetect_signature {
+	my ($self, $opname, $bits, @ops)= @_;
+	my @signature;
+	for (@ops) {
+		my $reg;
+		push @signature,
+		   looks_like_number($_)? 'imm'
+		   : ref $_ eq 'ARRAY'? 'mem'
+		   : ref $_ && ref($_)->can('value')? 'imm'
+		   : defined($reg= $regnum{$_})? ($reg & 0x1000? 'xreg':'reg')
+		   : croak "Can't identify type of destination operand $_";
+		$bits //= ($reg & 0xFF00) >> 5 if defined $reg;
+	}
+	croak "Can't determine bit-width of ".uc($opname)." instruction. "
+	     ."Use ->$opname(..., \$bits) to clarify, when there is no register"
+		unless defined $bits;
+
+	my $method= join '_', $opname.$bits, @signature;
+	($self->can($method)
+		// $self->can(join '_', $opname, @signature)
+		// croak "No ".uc($opname)." variant $method available")
+		->($self, @ops);
 }
 
-sub _autodetect_signature_1op {
-	my ($self, $opname, $operand, $bits)= @_;
-	my $opr_type= $register_bits{$operand};
-	$bits ||= $opr_type
-		or croak "Can't determine bit-width of ".uc($opname)." instruction. "
-		        ."Use ->$opname(\$arg, \$bits) to clarify, when \$arg is not a register";
-	$opr_type= $opr_type? 'reg'
-	         : ref $operand eq 'ARRAY'? 'mem'
-	         : looks_like_number($operand)? 'imm'
-	         : croak "Can't identify type of operand $operand";
-	my $method= "$opname${bits}_${opr_type}";
-	($self->can($method) || croak "No ".uc($opname)." variant $method available")
-		->($self, $operand);
+
+sub cpuid {
+	$_[0]{_buf} .= "\x0F\xA2";
 }
+
+#=item cpuid_test_op_support(@op_names)
+#
+#  ->push(RBX)->cpuid_test_op_support("MOVQ")->pop(RBX)
+#
+#This is a macro that calls cpuid and sets RAX to a boolean indicating whether all of the
+#listed instructions are supported.  The other registers still get clobbered, so you need to
+#preserve those yourself.
+#
 
 
 sub nop {
@@ -299,13 +350,14 @@ sub call_label {
 		unless ref $label;
 	$self->_mark_unresolved(
 		5, # estimated length
-		encode => sub {
+		encoder => sub {
 			my ($self, $params)= @_;
-			defined $label->{offset} or croak "Label $label is not marked";
-			my $ofs= $label->{offset} - ($params->{offset}+$params->{len});
+			defined $params->{target}{offset} or croak "Label $params->{target} is not anchored";
+			my $ofs= $params->{target}{offset} - ($params->{offset}+$params->{len});
 			($ofs >> 31) == ($ofs >> 31 >> 1) or croak "Offset must be within 31 bits";
 			return pack('CV', 0xE8, $ofs);
-		}
+		},
+		target => $label
 	);
 	$self;
 }
@@ -313,27 +365,20 @@ sub call_label {
 sub call_rel {
 	my ($self, $immed)= @_;
 	$self->{_buf} .= pack('CV', 0xE8, ref $immed? 0 : $immed);
-	$self->_mark_unresolved(-4, encode => '_repack', bits => 32, value => $immed)
+	$self->_mark_unresolved(-4, encoder => '_repack', bits => 32, value => $immed)
 		if ref $immed;
 	$self;
 }
 
-sub call_abs_reg {
-	my ($self, $reg)= @_;
-	$self->{_buf} .= $self->_encode_op_reg_reg(0, 0xFF, 2,
-		$regnum64{$reg} // croak("$reg is not a 64-bit register"),
-	);
-	$self;
-}
-
-sub call_abs_mem { $_[0]->_append_op64_reg_mem(0, 0xFF, 2, $_[1]) }
+sub call_abs_reg { $_[0]->_append_op64_regnum_reg(0, 0xFF, 2, $_[1]) }
+sub call_abs_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xFF, 2, $_[1]) }
 
 
 sub ret {
 	my ($self, $pop_bytes)= @_;
 	if ($pop_bytes) {
 		$self->{_buf} .= pack('Cv', 0xC2, ref $pop_bytes? 0 : $pop_bytes);
-		$self->_mark_unresolved(-2, encode => '_repack', bits => 16, value => $pop_bytes)
+		$self->_mark_unresolved(-2, encoder => '_repack', bits => 16, value => $pop_bytes)
 			if ref $pop_bytes;
 	}
 	else {
@@ -343,115 +388,123 @@ sub ret {
 }
 
 
-sub jmp {
-	@_ == 2 or croak "Wrong arguments";
-	$_[1]= $_[0]->get_label
-		unless defined $_[1];
-	my ($self, $label)= @_;
+# _append_jmp_cond($cond_code, $label)
+#
+# Appends a conditional jump instruction, which is either the short 2-byte form for 8-bit offsets,
+# or 6 bytes for jumps of 32-bit offsets.  The implementation optimistically assumes the 2-byte
+# length until L<resolve> is called, when the actual length will be determined.
+sub _encode_jmp {
+	my ($self, $params)= @_;
+	defined $params->target->offset or croak "Label ".$params->target." is not anchored";
+	my $ofs= $params->target->offset - ($params->offset + $params->len);
 	use integer;
-	$label= $self->get_label($label)
-		unless ref $label;
+	my $short= (($ofs>>7) == ($ofs>>8));
+	return $short? $params->{short_op} . pack('c', $ofs)
+		: defined $params->{long_op}? $params->{long_op} . pack('V', $ofs)
+		: croak "Jump to label $params->{target}{name} is too far, can only short-jump".Data::Dumper::Dumper($params);
+}
+use Data::Dumper;
+sub _append_jmp {
+	@_ == 4 or croak "Missing label on jmp instruction";
+	my ($self, $short_op, $long_op, $label)= @_;
+	$_[3]= $self->get_label unless defined $_[3];
 	$self->_mark_unresolved(
 		2, # estimated length
-		encode => sub {
-			my ($self, $params)= @_;
-			defined $label->{offset} or croak "Label $label is not marked";
-			my $ofs= $label->{offset} - ($params->{offset}+$params->{len});
-			my $short= (($ofs>>7) == ($ofs>>8));
-			return $short?
-				pack('Cc', 0xEB, $ofs)
-				: pack('CV', 0xE9, $ofs);
-		}
+		encoder => \&_encode_jmp,
+		short_op => $short_op, long_op => $long_op,
+		target => ref $label? $label : $self->get_label($label),
 	);
-	$self;
+}	
+
+sub jmp {
+	@_ == 2 or croak "Wrong arguments";
+	splice @_, 1, 0, "\xEB", "\xE9";
+	&_append_jmp;
 }
 
 
-sub jmp_abs_reg {
-	my ($self, $reg)= @_;
-	$self->{_buf} .= $self->_encode_op_reg_reg(0, 0xFF, 4,
-		$regnum64{$reg} // croak("$reg is not a 64-bit register"),
-	);
-	$self;
+sub jmp_abs_reg { $_[0]->_append_op64_regnum_reg(0, 0xFF, 4, $_[1]) }
+
+
+sub jmp_abs_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xFF, 4, $_[1]) }
+
+
+sub _jmp_cond_ops {
+	my $cond= shift;
+	pack('C', 0x70 | $cond), pack('CC', 0x0F, 0x80 | $cond);
 }
 
-
-sub jmp_abs_mem {
-	$_[0]->_append_op64_reg_mem(0, 0xFF, 4, $_[1]);
-}
-
-
-sub jmp_if_eq { shift->_append_jmp_cond(4, shift) }
+sub jmp_if_eq { splice @_, 1, 0, _jmp_cond_ops(4); &_append_jmp }
 *jz= *jmp_if_eq;
 *je= *jmp_if_eq;
 
-sub jmp_if_ne { shift->_append_jmp_cond(5, shift) }
+sub jmp_if_ne { splice @_, 1, 0, _jmp_cond_ops(5); &_append_jmp }
 *jne= *jmp_if_ne;
 *jnz= *jmp_if_ne;
 
 
-sub jmp_if_unsigned_lt { shift->_append_jmp_cond(2, shift) }
+sub jmp_if_unsigned_lt { splice @_, 1, 0, _jmp_cond_ops(2); &_append_jmp }
 *jb= *jmp_if_unsigned_lt;
 *jc= *jmp_if_unsigned_lt;
 
-sub jmp_if_unsigned_gt { shift->_append_jmp_cond(7, shift) }
+sub jmp_if_unsigned_gt { splice @_, 1, 0, _jmp_cond_ops(7); &_append_jmp }
 *ja= *jmp_if_unsigned_gt;
 
-sub jmp_if_unsigned_le { shift->_append_jmp_cond(6, shift) }
+sub jmp_if_unsigned_le { splice @_, 1, 0, _jmp_cond_ops(6); &_append_jmp }
 *jbe= *jmp_if_unsigned_le;
 
-sub jmp_if_unsigned_ge { shift->_append_jmp_cond(3, shift) }
+sub jmp_if_unsigned_ge { splice @_, 1, 0, _jmp_cond_ops(3); &_append_jmp }
 *jae= *jmp_if_unsigned_ge;
 *jnc= *jmp_if_unsigned_ge;
 
 
-sub jmp_if_signed_lt { shift->_append_jmp_cond(12, shift) }
+sub jmp_if_signed_lt { splice @_, 1, 0, _jmp_cond_ops(12); &_append_jmp }
 *jl= *jmp_if_signed_lt;
 
-sub jmp_if_signed_gt { shift->_append_jmp_cond(15, shift) }
+sub jmp_if_signed_gt { splice @_, 1, 0, _jmp_cond_ops(15); &_append_jmp }
 *jg= *jmp_if_signed_gt;
 
-sub jmp_if_signed_le { shift->_append_jmp_cond(14, shift) }
+sub jmp_if_signed_le { splice @_, 1, 0, _jmp_cond_ops(14); &_append_jmp }
 *jle= *jmp_if_signed_le;
 
-sub jmp_if_signed_ge { shift->_append_jmp_cond(13, shift) }
+sub jmp_if_signed_ge { splice @_, 1, 0, _jmp_cond_ops(13); &_append_jmp }
 *jge= *jmp_if_signed_ge;
 
 
-sub jmp_if_sign         { shift->_append_jmp_cond(8, shift) }
+sub jmp_if_sign         { splice @_, 1, 0, _jmp_cond_ops(8); &_append_jmp }
 *js= *jmp_if_sign;
 
-sub jmp_unless_sign     { shift->_append_jmp_cond(9, shift) }
+sub jmp_unless_sign     { splice @_, 1, 0, _jmp_cond_ops(9); &_append_jmp }
 *jns= *jmp_unless_sign;
 
-sub jmp_if_overflow     { shift->_append_jmp_cond(0, shift) }
+sub jmp_if_overflow     { splice @_, 1, 0, _jmp_cond_ops(0); &_append_jmp }
 *jo= *jmp_if_overflow;
 
-sub jmp_unless_overflow { shift->_append_jmp_cond(1, shift) }
+sub jmp_unless_overflow { splice @_, 1, 0, _jmp_cond_ops(1); &_append_jmp }
 *jno= *jmp_unless_overflow;
 
-sub jmp_if_parity_even  { shift->_append_jmp_cond(10, shift) }
+sub jmp_if_parity_even  { splice @_, 1, 0, _jmp_cond_ops(10); &_append_jmp }
 *jpe= *jmp_if_parity_even;
 *jp= *jmp_if_parity_even;
 
-sub jmp_if_parity_odd   { shift->_append_jmp_cond(11, shift) }
+sub jmp_if_parity_odd   { splice @_, 1, 0, _jmp_cond_ops(11); &_append_jmp }
 *jpo= *jmp_if_parity_odd;
 *jnp= *jmp_if_parity_odd;
 
 
-sub jmp_cx_zero { shift->_append_jmp_cx(0xE3, shift) }
+sub jmp_cx_zero { splice @_, 1, 0, "\xE3", undef; &_append_jmp }
 *jrcxz= *jmp_cx_zero;
 
-sub loop        { shift->_append_jmp_cx(0xE2, shift) }
+sub loop        { splice @_, 1, 0, "\xE2", undef; &_append_jmp }
 
-sub loopz       { shift->_append_jmp_cx(0xE1, shift) }
+sub loopz       { splice @_, 1, 0, "\xE1", undef; &_append_jmp }
 *loope= *loopz;
 
-sub loopnz      { shift->_append_jmp_cx(0xE0, shift) }
+sub loopnz      { splice @_, 1, 0, "\xE0", undef; &_append_jmp }
 *loopne= *loopnz;
 
 
-sub mov { splice(@_,1,0,'mov'); &_autodetect_signature_dst_src }
+sub mov { splice(@_,1,0,'mov'); &_autodetect_signature_2 }
 
 
 sub mov64_reg_reg { shift->_append_op64_reg_reg(0x89, $_[1], $_[0]) }
@@ -483,7 +536,7 @@ sub _append_mov_reg_mem {
 			if (!defined $val) {
 				$self->_mark_unresolved(
 					10, # longest instruction possible, not the greatest guess.
-					encode => sub {
+					encoder => sub {
 						my $v= $disp->value;
 						defined $v or croak "Placeholder $disp has not been assigned";
 						return $v > 0x7FFFFFFF? $opstr . pack('Q<', $v)
@@ -516,23 +569,23 @@ sub _encode_mov64_imm {
 	use integer;
 	# If the number fits in 32-bits, encode as the classic instruction
 	if (($immed >> 31 >> 1) == 0) { # ">> 32" is a no-op on 32-bit perl
-		return $reg > 7? # need REX byte if extended register
-			pack('C C L<', 0x41, 0xB8 + ($reg&7), $immed)
-			: pack('C L<', 0xB8 + $reg, $immed);
+		return ($reg&8)? # need REX byte if extended register
+			pack('C C L<', 0x41, 0xB8 | ($reg&7), $immed)
+			: pack('C L<', 0xB8 | ($reg&7), $immed);
 	}
 	# If the number can sign-extend from 32-bits, encode as 32-bit sign-extend
 	elsif (($immed >> 31) == -1) {
-		return pack('C C C l<', 0x48 | (($reg & 8) >> 3), 0xC7, 0xC0 + ($reg & 7), $immed);
+		return pack('C C C l<', 0x48 | (($reg & 8) >> 3), 0xC7, 0xC0 | ($reg & 7), $immed);
 	}
 	# else encode as new 64-bit immediate
 	else {
-		return pack('C C Q<', 0x48 | (($reg & 8) >> 3), 0xB8 + ($reg & 7), $immed);
+		return pack('C C Q<', 0x48 | (($reg & 8) >> 3), 0xB8 | ($reg & 7), $immed);
 	}
 }
 sub mov32_reg_imm {
 	my ($self, $reg, $immed)= @_;
 	$reg= $regnum32{$reg} // croak("$reg is not a 32-bit register");
-	$self->{_buf} .= "\x41" if $reg > 7;
+	$self->{_buf} .= "\x41" if $reg & 8;
 	$self->{_buf} .= pack('C' , 0xB8 | ($reg & 7));
 	$self->_append_possible_unknown(sub { pack('V', $_[1]) }, [$immed], 0, 4);
 }
@@ -540,18 +593,16 @@ sub mov16_reg_imm {
 	my ($self, $reg, $immed)= @_;
 	$reg= $regnum16{$reg} // croak("$reg is not a 16-bit register");
 	$self->{_buf} .= "\x66";
-	$self->{_buf} .= "\x41" if $reg > 7;
+	$self->{_buf} .= "\x41" if $reg & 8;
 	$self->{_buf} .= pack('C', 0xB8 | ($reg & 7));
 	$self->_append_possible_unknown(sub { pack('v', $_[1]) }, [$immed], 0, 2);
 }
 sub mov8_reg_imm {
 	my ($self, $reg, $immed)= @_;
-	$reg= $regnum8{$reg};
-	# Special case for the high-byte registers available without the REX prefix
-	if (!defined $reg) {
-		$reg= $regnum8_high{$_[1]} // croak("$_[1] is not a 8-bit register");
-	} else {
-		$self->{_buf} .= pack('C', 0x40|(($reg&8)>>3)) if $reg > 3;
+	$reg= $regnum8{$reg} // croak("$_[1] is not a 8-bit register");
+	# Using 8-bit reg above AL-DL requirs REX prefix
+	if ($reg & 0x20) {
+		$self->{_buf} .= pack('C', 0x40|(($reg&8)>>3));
 	}
 	$self->{_buf} .= pack('C', 0xB0 | ($reg & 7));
 	$self->_append_possible_unknown(sub { pack('C', $_[1]&0xFF) }, [$immed], 0, 1);
@@ -564,7 +615,7 @@ sub mov16_mem_imm { $_[0]->_append_op16_const_to_mem(0xC7, 0, $_[2], $_[1]) }
 sub mov8_mem_imm  { $_[0]->_append_op8_const_to_mem (0xC6, 0, $_[2], $_[1]) }
 
 
-sub lea { splice(@_,1,0,'lea'); &_autodetect_signature_dst_src }
+sub lea { splice(@_,1,0,'lea'); &_autodetect_signature_2 }
 
 sub lea16_reg_reg { $_[0]->_append_op16_reg_reg(   0x8D, $_[1], $_[2]) }
 sub lea16_reg_mem { $_[0]->_append_op16_reg_mem(0, 0x8D, $_[1], $_[2]) }
@@ -574,7 +625,7 @@ sub lea64_reg_reg { $_[0]->_append_op64_reg_reg(   0x8D, $_[1], $_[2]) }
 sub lea64_reg_mem { $_[0]->_append_op64_reg_mem(8, 0x8D, $_[1], $_[2]) }
 
 
-sub add { splice(@_,1,0,'add'); &_autodetect_signature_dst_src }
+sub add { splice(@_,1,0,'add'); &_autodetect_signature_2 }
 
 sub add64_reg_reg { $_[0]->_append_op64_reg_reg(0x01, $_[2], $_[1]) }
 sub add32_reg_reg { $_[0]->_append_op32_reg_reg(0x01, $_[2], $_[1]) }
@@ -602,7 +653,7 @@ sub add16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 0, $_[2], $
 sub add8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 0, $_[2], $_[1]) }
 
 
-sub addcarry { splice(@_,1,0,'addcarry'); &_autodetect_signature_dst_src }
+sub addcarry { splice(@_,1,0,'addcarry'); &_autodetect_signature_2 }
 *adc= *addcarry;
 
 sub addcarry64_reg_reg { $_[0]->_append_op64_reg_reg(0x11, $_[2], $_[1]) }
@@ -631,7 +682,7 @@ sub addcarry16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 2, $_[
 sub addcarry8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 2, $_[2], $_[1]) }
 
 
-sub sub { splice(@_,1,0,'sub'); &_autodetect_signature_dst_src }
+sub sub { splice(@_,1,0,'sub'); &_autodetect_signature_2 }
 
 sub sub64_reg_reg { $_[0]->_append_op64_reg_reg(0x29, $_[2], $_[1]) }
 sub sub32_reg_reg { $_[0]->_append_op32_reg_reg(0x29, $_[2], $_[1]) }
@@ -659,7 +710,7 @@ sub sub16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 5, $_[2], $
 sub sub8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 5, $_[2], $_[1]) }
 
 
-sub and { splice(@_,1,0,'and'); &_autodetect_signature_dst_src }
+sub and { splice(@_,1,0,'and'); &_autodetect_signature_2 }
 
 sub and64_reg_reg { $_[0]->_append_op64_reg_reg(0x21, $_[2], $_[1]) }
 sub and32_reg_reg { $_[0]->_append_op32_reg_reg(0x21, $_[2], $_[1]) }
@@ -687,7 +738,7 @@ sub and16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 4, $_[2], $
 sub and8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 4, $_[2], $_[1]) }
 
 
-sub or { splice(@_,1,0,'or'); &_autodetect_signature_dst_src }
+sub or { splice(@_,1,0,'or'); &_autodetect_signature_2 }
 
 sub or64_reg_reg { $_[0]->_append_op64_reg_reg(0x09, $_[2], $_[1]) }
 sub or32_reg_reg { $_[0]->_append_op32_reg_reg(0x09, $_[2], $_[1]) }
@@ -715,7 +766,7 @@ sub or16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 1, $_[2], $_
 sub or8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 1, $_[2], $_[1]) }
 
 
-sub xor { splice(@_,1,0,'xor'); &_autodetect_signature_dst_src }
+sub xor { splice(@_,1,0,'xor'); &_autodetect_signature_2 }
 
 sub xor64_reg_reg { $_[0]->_append_op64_reg_reg(0x31, $_[2], $_[1]) }
 sub xor32_reg_reg { $_[0]->_append_op32_reg_reg(0x31, $_[2], $_[1]) }
@@ -743,76 +794,125 @@ sub xor16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 6, $_[2], $
 sub xor8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 6, $_[2], $_[1]) }
 
 
-sub shl { splice(@_,1,0,'shl'); &_autodetect_signature_dst_src }
+# _append_shiftop_reg_imm( $bitwidth, $opcode_1, $opcode_imm, $opreg, $reg, $immed )
+#
+# Shift instructions often have a special case for shifting by 1.  This utility method
+# selects that opcode if the immediate value is 1.
+#
+# It also allows the immediate to be an expression, though I doubt that will ever happen...
+# Immediate values are always a single byte, and the processor masks them to 0..63
+# so the upper bits are irrelevant.
+sub _append_shiftop_reg_imm {
+	my ($self, $bits, $opcode_sh1, $opcode_imm, $opreg, $reg, $immed)= @_;
+	
+	# Select appropriate opcode
+	my $op= $immed eq 1? $opcode_sh1 : $opcode_imm;
+	
+	$bits == 64?   $self->_append_op64_regnum_reg(8, $op, $opreg, $reg)
+	: $bits == 32? $self->_append_op32_regnum_reg($op, $opreg, $reg)
+	: $bits == 16? $self->_append_op16_regnum_reg($op, $opreg, $reg)
+	:              $self->_append_op8_regnum_reg($op, $opreg, $reg);
+	
+	# If not using the shift-one opcode, append an immediate byte.
+	unless ($immed eq 1) {
+		$self->{_buf} .= pack('C', ref $immed? 0 : $immed);
+		$self->_mark_unresolved(-1, encoder => '_repack', bits => 8, value => $immed)
+			if ref $immed;
+	}
+	
+	$self;
+}
+
+# _append_shiftop_mem_imm
+#
+# Same as above, for memory locations
+sub _append_shiftop_mem_imm {
+	my ($self, $bits, $opcode_sh1, $opcode_imm, $opreg, $mem, $immed)= @_;
+
+	# Select appropriate opcode
+	my $op= $immed eq 1? $opcode_sh1 : $opcode_imm;
+	$self->_append_op_reg_mem($bits == 16? "\x66" : undef, $bits == 64? 8 : 0, $op, $opreg, $mem);
+	
+	# If not using the shift-one opcode, append an immediate byte.
+	unless ($immed eq 1) {
+		$self->{_buf} .= pack('C', ref $immed? 0 : $immed);
+		$self->_mark_unresolved(-1, encoder => '_repack', bits => 8, value => $immed)
+			if ref $immed;
+	}
+	
+	$self;
+}
+
+sub shl { splice(@_,1,0,'shl'); &_autodetect_signature_2 }
 
 sub shl64_reg_imm { $_[0]->_append_shiftop_reg_imm(64, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl32_reg_imm { $_[0]->_append_shiftop_reg_imm(32, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl16_reg_imm { $_[0]->_append_shiftop_reg_imm(16, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl8_reg_imm  { $_[0]->_append_shiftop_reg_imm( 8, 0xD0, 0xC0, 4, $_[1], $_[2]) }
 
-sub shl64_reg_cl  { $_[0]->_append_op64_reg_reg(0xD3, 4, $_[1]) }
-sub shl32_reg_cl  { $_[0]->_append_op32_reg_reg(0xD3, 4, $_[1]) }
-sub shl16_reg_cl  { $_[0]->_append_op16_reg_reg(0xD3, 4, $_[1]) }
-sub shl8_reg_cl   { $_[0]->_append_op8_opreg_reg(0xD2, 4, $_[1]) }
-
 sub shl64_mem_imm { $_[0]->_append_shiftop_mem_imm(64, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl32_mem_imm { $_[0]->_append_shiftop_mem_imm(32, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl16_mem_imm { $_[0]->_append_shiftop_mem_imm(16, 0xD1, 0xC1, 4, $_[1], $_[2]) }
 sub shl8_mem_imm  { $_[0]->_append_shiftop_mem_imm( 8, 0xD0, 0xC0, 4, $_[1], $_[2]) }
 
-sub shl64_mem_cl  { $_[0]->_append_op64_reg_mem(8, 0xD3, 4, $_[1]) }
-sub shl32_mem_cl  { $_[0]->_append_op32_reg_mem(0, 0xD3, 4, $_[1]) }
-sub shl16_mem_cl  { $_[0]->_append_op16_reg_mem(0, 0xD3, 4, $_[1]) }
-sub shl8_mem_cl   { $_[0]->_append_op8_opreg_mem(0, 0xD2, 4, $_[1]) }
+sub shl64_reg_cl  { $_[0]->_append_op64_regnum_reg(8, 0xD3, 4, $_[1]) }
+sub shl32_reg_cl  { $_[0]->_append_op32_regnum_reg(0xD3, 4, $_[1]) }
+sub shl16_reg_cl  { $_[0]->_append_op16_regnum_reg(0xD3, 4, $_[1]) }
+sub shl8_reg_cl   { $_[0]->_append_op8_regnum_reg (0xD2, 4, $_[1]) }
+
+sub shl64_mem_cl  { $_[0]->_append_op_reg_mem(undef, 8, 0xD3, 4, $_[1]) }
+sub shl32_mem_cl  { $_[0]->_append_op_reg_mem(undef, 0, 0xD3, 4, $_[1]) }
+sub shl16_mem_cl  { $_[0]->_append_op_reg_mem("\x66",0, 0xD3, 4, $_[1]) }
+sub shl8_mem_cl   { $_[0]->_append_op_reg_mem(undef, 0, 0xD2, 4, $_[1]) }
 
 
-sub shr { splice(@_,1,0,'shr'); &_autodetect_signature_dst_src }
+sub shr { splice(@_,1,0,'shr'); &_autodetect_signature_2 }
 
 sub shr64_reg_imm { $_[0]->_append_shiftop_reg_imm(64, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr32_reg_imm { $_[0]->_append_shiftop_reg_imm(32, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr16_reg_imm { $_[0]->_append_shiftop_reg_imm(16, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr8_reg_imm  { $_[0]->_append_shiftop_reg_imm( 8, 0xD0, 0xC0, 5, $_[1], $_[2]) }
 
-sub shr64_reg_cl  { $_[0]->_append_op64_reg_reg(0xD3, 5, $_[1]) }
-sub shr32_reg_cl  { $_[0]->_append_op32_reg_reg(0xD3, 5, $_[1]) }
-sub shr16_reg_cl  { $_[0]->_append_op16_reg_reg(0xD3, 5, $_[1]) }
-sub shr8_reg_cl   { $_[0]->_append_op8_opreg_reg(0xD2, 5, $_[1]) }
+sub shr64_reg_cl  { $_[0]->_append_op64_regnum_reg(8, 0xD3, 5, $_[1]) }
+sub shr32_reg_cl  { $_[0]->_append_op32_regnum_reg(0xD3, 5, $_[1]) }
+sub shr16_reg_cl  { $_[0]->_append_op16_regnum_reg(0xD3, 5, $_[1]) }
+sub shr8_reg_cl   { $_[0]->_append_op8_regnum_reg (0xD2, 5, $_[1]) }
 
 sub shr64_mem_imm { $_[0]->_append_shiftop_mem_imm(64, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr32_mem_imm { $_[0]->_append_shiftop_mem_imm(32, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr16_mem_imm { $_[0]->_append_shiftop_mem_imm(16, 0xD1, 0xC1, 5, $_[1], $_[2]) }
 sub shr8_mem_imm  { $_[0]->_append_shiftop_mem_imm( 8, 0xD0, 0xC0, 5, $_[1], $_[2]) }
 
-sub shr64_mem_cl  { $_[0]->_append_op64_reg_mem(8, 0xD3, 5, $_[1]) }
-sub shr32_mem_cl  { $_[0]->_append_op32_reg_mem(0, 0xD3, 5, $_[1]) }
-sub shr16_mem_cl  { $_[0]->_append_op16_reg_mem(0, 0xD3, 5, $_[1]) }
-sub shr8_mem_cl   { $_[0]->_append_op8_opreg_mem(0, 0xD2, 5, $_[1]) }
+sub shr64_mem_cl  { $_[0]->_append_op_reg_mem(undef, 8, 0xD3, 5, $_[1]) }
+sub shr32_mem_cl  { $_[0]->_append_op_reg_mem(undef, 0, 0xD3, 5, $_[1]) }
+sub shr16_mem_cl  { $_[0]->_append_op_reg_mem("\x66",0, 0xD3, 5, $_[1]) }
+sub shr8_mem_cl   { $_[0]->_append_op_reg_mem(undef, 0, 0xD2, 5, $_[1]) }
 
 
-sub sar { splice(@_,1,0,'sar'); &_autodetect_signature_dst_src }
+sub sar { splice(@_,1,0,'sar'); &_autodetect_signature_2 }
 
 sub sar64_reg_imm { $_[0]->_append_shiftop_reg_imm(64, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar32_reg_imm { $_[0]->_append_shiftop_reg_imm(32, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar16_reg_imm { $_[0]->_append_shiftop_reg_imm(16, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar8_reg_imm  { $_[0]->_append_shiftop_reg_imm( 8, 0xD0, 0xC0, 7, $_[1], $_[2]) }
 
-sub sar64_reg_cl  { $_[0]->_append_op64_reg_reg(0xD3, 7, $_[1]) }
-sub sar32_reg_cl  { $_[0]->_append_op32_reg_reg(0xD3, 7, $_[1]) }
-sub sar16_reg_cl  { $_[0]->_append_op16_reg_reg(0xD3, 7, $_[1]) }
-sub sar8_reg_cl   { $_[0]->_append_op8_opreg_reg(0xD2, 7, $_[1]) }
+sub sar64_reg_cl  { $_[0]->_append_op64_regnum_reg(8, 0xD3, 7, $_[1]) }
+sub sar32_reg_cl  { $_[0]->_append_op32_regnum_reg(0xD3, 7, $_[1]) }
+sub sar16_reg_cl  { $_[0]->_append_op16_regnum_reg(0xD3, 7, $_[1]) }
+sub sar8_reg_cl   { $_[0]->_append_op8_regnum_reg (0xD2, 7, $_[1]) }
 
 sub sar64_mem_imm { $_[0]->_append_shiftop_mem_imm(64, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar32_mem_imm { $_[0]->_append_shiftop_mem_imm(32, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar16_mem_imm { $_[0]->_append_shiftop_mem_imm(16, 0xD1, 0xC1, 7, $_[1], $_[2]) }
 sub sar8_mem_imm  { $_[0]->_append_shiftop_mem_imm( 8, 0xD0, 0xC0, 7, $_[1], $_[2]) }
 
-sub sar64_mem_cl  { $_[0]->_append_op64_reg_mem(8, 0xD3, 7, $_[1]) }
-sub sar32_mem_cl  { $_[0]->_append_op32_reg_mem(0, 0xD3, 7, $_[1]) }
-sub sar16_mem_cl  { $_[0]->_append_op16_reg_mem(0, 0xD3, 7, $_[1]) }
-sub sar8_mem_cl   { $_[0]->_append_op8_opreg_mem(0, 0xD2, 7, $_[1]) }
+sub sar64_mem_cl  { $_[0]->_append_op_reg_mem(undef, 8, 0xD3, 7, $_[1]) }
+sub sar32_mem_cl  { $_[0]->_append_op_reg_mem(undef, 0, 0xD3, 7, $_[1]) }
+sub sar16_mem_cl  { $_[0]->_append_op_reg_mem("\x66",0, 0xD3, 7, $_[1]) }
+sub sar8_mem_cl   { $_[0]->_append_op_reg_mem(undef, 0, 0xD2, 7, $_[1]) }
 
 
-sub cmp { splice(@_,1,0,'cmp'); &_autodetect_signature_dst_src }
+sub cmp { splice(@_,1,0,'cmp'); &_autodetect_signature_2 }
 
 sub cmp64_reg_reg { $_[0]->_append_op64_reg_reg(0x39, $_[2], $_[1]) }
 sub cmp32_reg_reg { $_[0]->_append_op32_reg_reg(0x39, $_[2], $_[1]) }
@@ -840,7 +940,7 @@ sub cmp16_mem_imm { $_[0]->_append_mathop16_const_to_mem(0x83, 0x81, 7, $_[2], $
 sub cmp8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0x80, 7, $_[2], $_[1]) }
 
 
-sub test { splice(@_,1,0,'test'); &_autodetect_signature_dst_src }
+sub test { splice(@_,1,0,'test'); &_autodetect_signature_2 }
 
 sub test64_reg_reg { $_[0]->_append_op64_reg_reg(0x85, $_[2], $_[1]) }
 sub test32_reg_reg { $_[0]->_append_op32_reg_reg(0x85, $_[2], $_[1]) }
@@ -863,80 +963,80 @@ sub test16_mem_imm { $_[0]->_append_mathop16_const_to_mem(undef, 0xF7, 0, $_[2],
 sub test8_mem_imm  { $_[0]->_append_mathop8_const_to_mem (0xF6, 0, $_[2], $_[1]) }
 
 
-sub dec { splice(@_,1,0,'dec'); &_autodetect_signature_1op; }
+sub dec { splice(@_,1,0,'dec'); &_autodetect_signature_1; }
 
-sub dec64_reg { $_[0]->_append_op64_reg_reg(0xFF, 1, $_[1]) }
-sub dec32_reg { $_[0]->_append_op32_reg_reg(0xFF, 1, $_[1]) }
-sub dec16_reg { $_[0]->_append_op16_reg_reg(0xFF, 1, $_[1]) }
-sub dec8_reg  { $_[0]->_append_op8_reg_reg (0xFE, 1, $_[1]) }
+sub dec64_reg { $_[0]->_append_op64_regnum_reg(8, 0xFF, 1, $_[1]) }
+sub dec32_reg { $_[0]->_append_op32_regnum_reg(0xFF, 1, $_[1]) }
+sub dec16_reg { $_[0]->_append_op16_regnum_reg(0xFF, 1, $_[1]) }
+sub dec8_reg  { $_[0]->_append_op8_regnum_reg (0xFE, 1, $_[1]) }
 
-sub dec64_mem { $_[0]->_append_op64_reg_mem(8, 0xFF, 1, $_[1]) }
-sub dec32_mem { $_[0]->_append_op32_reg_mem(0, 0xFF, 1, $_[1]) }
-sub dec16_mem { $_[0]->_append_op16_reg_mem(0, 0xFF, 1, $_[1]) }
-sub dec8_mem  { $_[0]->_append_op8_reg_mem (0, 0xFE, 1, $_[1]) }
-
-
-sub inc { splice(@_,1,0,'inc'); &_autodetect_signature_1op; }
-
-sub inc64_reg { $_[0]->_append_op64_reg_reg(0xFF, 0, $_[1]) }
-sub inc32_reg { $_[0]->_append_op32_reg_reg(0xFF, 0, $_[1]) }
-sub inc16_reg { $_[0]->_append_op16_reg_reg(0xFF, 0, $_[1]) }
-sub inc8_reg  { $_[0]->_append_op8_reg_reg (0xFE, 0, $_[1]) }
-
-sub inc64_mem { $_[0]->_append_op64_reg_mem(8, 0xFF, 0, $_[1]) }
-sub inc32_mem { $_[0]->_append_op32_reg_mem(0, 0xFF, 0, $_[1]) }
-sub inc16_mem { $_[0]->_append_op16_reg_mem(0, 0xFF, 0, $_[1]) }
-sub inc8_mem  { $_[0]->_append_op8_reg_mem (0, 0xFE, 0, $_[1]) }
+sub dec64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xFF, 1, $_[1]) }
+sub dec32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xFF, 1, $_[1]) }
+sub dec16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xFF, 1, $_[1]) }
+sub dec8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xFE, 1, $_[1]) }
 
 
-sub not { splice(@_,1,0,'not'); &_autodetect_signature_1op; }
+sub inc { splice(@_,1,0,'inc'); &_autodetect_signature_1; }
 
-sub not64_reg { $_[0]->_append_op64_reg_reg(0xF7, 2, $_[1]) }
-sub not32_reg { $_[0]->_append_op32_reg_reg(0xF7, 2, $_[1]) }
-sub not16_reg { $_[0]->_append_op16_reg_reg(0xF7, 2, $_[1]) }
-sub not8_reg  { $_[0]->_append_op8_reg_reg (0xF6, 2, $_[1]) }
+sub inc64_reg { $_[0]->_append_op64_regnum_reg(8, 0xFF, 0, $_[1]) }
+sub inc32_reg { $_[0]->_append_op32_regnum_reg(0xFF, 0, $_[1]) }
+sub inc16_reg { $_[0]->_append_op16_regnum_reg(0xFF, 0, $_[1]) }
+sub inc8_reg  { $_[0]->_append_op8_regnum_reg (0xFE, 0, $_[1]) }
 
-sub not64_mem { $_[0]->_append_op64_reg_mem(8, 0xF7, 2, $_[1]) }
-sub not32_mem { $_[0]->_append_op32_reg_mem(0, 0xF7, 2, $_[1]) }
-sub not16_mem { $_[0]->_append_op16_reg_mem(0, 0xF7, 2, $_[1]) }
-sub not8_mem  { $_[0]->_append_op8_reg_mem (0, 0xF6, 2, $_[1]) }
-
-
-sub neg { splice(@_,1,0,'neg'); &_autodetect_signature_1op; }
-
-sub neg64_reg { $_[0]->_append_op64_reg_reg(0xF7, 3, $_[1]) }
-sub neg32_reg { $_[0]->_append_op32_reg_reg(0xF7, 3, $_[1]) }
-sub neg16_reg { $_[0]->_append_op16_reg_reg(0xF7, 3, $_[1]) }
-sub neg8_reg  { $_[0]->_append_op8_reg_reg (0xF6, 3, $_[1]) }
-
-sub neg64_mem { $_[0]->_append_op64_reg_mem(8, 0xF7, 3, $_[1]) }
-sub neg32_mem { $_[0]->_append_op32_reg_mem(0, 0xF7, 3, $_[1]) }
-sub neg16_mem { $_[0]->_append_op16_reg_mem(0, 0xF7, 3, $_[1]) }
-sub neg8_mem  { $_[0]->_append_op8_reg_mem (0, 0xF6, 3, $_[1]) }
+sub inc64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xFF, 0, $_[1]) }
+sub inc32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xFF, 0, $_[1]) }
+sub inc16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xFF, 0, $_[1]) }
+sub inc8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xFE, 0, $_[1]) }
 
 
-sub div  { splice(@_,1,0,'div' ); &_autodetect_signature_1op; }
-sub idiv { splice(@_,1,0,'idiv'); &_autodetect_signature_1op; }
+sub not { splice(@_,1,0,'not'); &_autodetect_signature_1; }
 
-sub div64_reg { $_[0]->_append_op64_reg_reg (0xF7, 6, $_[1]) }
-sub div32_reg { $_[0]->_append_op32_reg_reg (0xF7, 6, $_[1]) }
-sub div16_reg { $_[0]->_append_op16_reg_reg (0xF7, 6, $_[1]) }
-sub div8_reg  { $_[0]->_append_op8_opreg_reg(0xF6, 6, $_[1]) }
+sub not64_reg { $_[0]->_append_op64_regnum_reg(8, 0xF7, 2, $_[1]) }
+sub not32_reg { $_[0]->_append_op32_regnum_reg(0xF7, 2, $_[1]) }
+sub not16_reg { $_[0]->_append_op16_regnum_reg(0xF7, 2, $_[1]) }
+sub not8_reg  { $_[0]->_append_op8_regnum_reg (0xF6, 2, $_[1]) }
 
-sub div64_mem { $_[0]->_append_op64_reg_mem (8, 0xF7, 6, $_[1]) }
-sub div32_mem { $_[0]->_append_op32_reg_mem (0, 0xF7, 6, $_[1]) }
-sub div16_mem { $_[0]->_append_op16_reg_mem (0, 0xF7, 6, $_[1]) }
-sub div8_mem  { $_[0]->_append_op8_opreg_mem(0, 0xF6, 6, $_[1]) }
+sub not64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xF7, 2, $_[1]) }
+sub not32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xF7, 2, $_[1]) }
+sub not16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xF7, 2, $_[1]) }
+sub not8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xF6, 2, $_[1]) }
 
-sub idiv64_reg { $_[0]->_append_op64_reg_reg (0xF7, 7, $_[1]) }
-sub idiv32_reg { $_[0]->_append_op32_reg_reg (0xF7, 7, $_[1]) }
-sub idiv16_reg { $_[0]->_append_op16_reg_reg (0xF7, 7, $_[1]) }
-sub idiv8_reg  { $_[0]->_append_op8_opreg_reg(0xF6, 7, $_[1]) }
 
-sub idiv64_mem { $_[0]->_append_op64_reg_mem (8, 0xF7, 7, $_[1]) }
-sub idiv32_mem { $_[0]->_append_op32_reg_mem (0, 0xF7, 7, $_[1]) }
-sub idiv16_mem { $_[0]->_append_op16_reg_mem (0, 0xF7, 7, $_[1]) }
-sub idiv8_mem  { $_[0]->_append_op8_opreg_mem(0, 0xF6, 7, $_[1]) }
+sub neg { splice(@_,1,0,'neg'); &_autodetect_signature_1; }
+
+sub neg64_reg { $_[0]->_append_op64_regnum_reg(8,0xF7, 3, $_[1]) }
+sub neg32_reg { $_[0]->_append_op32_regnum_reg(0xF7, 3, $_[1]) }
+sub neg16_reg { $_[0]->_append_op16_regnum_reg(0xF7, 3, $_[1]) }
+sub neg8_reg  { $_[0]->_append_op8_regnum_reg (0xF6, 3, $_[1]) }
+
+sub neg64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xF7, 3, $_[1]) }
+sub neg32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xF7, 3, $_[1]) }
+sub neg16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xF7, 3, $_[1]) }
+sub neg8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xF6, 3, $_[1]) }
+
+
+sub div  { splice(@_,1,0,'div' ); &_autodetect_signature_1; }
+sub idiv { splice(@_,1,0,'idiv'); &_autodetect_signature_1; }
+
+sub div64_reg { $_[0]->_append_op64_regnum_reg(8, 0xF7, 6, $_[1]) }
+sub div32_reg { $_[0]->_append_op32_regnum_reg(0xF7, 6, $_[1]) }
+sub div16_reg { $_[0]->_append_op16_regnum_reg(0xF7, 6, $_[1]) }
+sub div8_reg  { $_[0]->_append_op8_regnum_reg (0xF6, 6, $_[1]) }
+
+sub div64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xF7, 6, $_[1]) }
+sub div32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xF7, 6, $_[1]) }
+sub div16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xF7, 6, $_[1]) }
+sub div8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xF6, 6, $_[1]) }
+
+sub idiv64_reg { $_[0]->_append_op64_regnum_reg(8,0xF7, 7, $_[1]) }
+sub idiv32_reg { $_[0]->_append_op32_regnum_reg(0xF7, 7, $_[1]) }
+sub idiv16_reg { $_[0]->_append_op16_regnum_reg(0xF7, 7, $_[1]) }
+sub idiv8_reg  { $_[0]->_append_op8_regnum_reg (0xF6, 7, $_[1]) }
+
+sub idiv64_mem { $_[0]->_append_op_reg_mem(undef, 8, 0xF7, 7, $_[1]) }
+sub idiv32_mem { $_[0]->_append_op_reg_mem(undef, 0, 0xF7, 7, $_[1]) }
+sub idiv16_mem { $_[0]->_append_op_reg_mem("\x66",0, 0xF7, 7, $_[1]) }
+sub idiv8_mem  { $_[0]->_append_op_reg_mem(undef, 0, 0xF6, 7, $_[1]) }
 
 
 #=item mul64_reg
@@ -963,10 +1063,10 @@ sub idiv8_mem  { $_[0]->_append_op8_opreg_mem(0, 0xF6, 7, $_[1]) }
 #
 #=item mul16_mem_imm
 
-sub mul64_dxax_reg { shift->_append_op64_reg_reg(8, 0xF7, 5, @_) }
-sub mul32_dxax_reg { shift->_append_op32_reg_reg(0, 0xF7, 5, @_) }
-sub mul16_dxax_reg { shift->_append_op16_reg_reg(0, 0xF7, 5, @_) }
-sub mul8_ax_reg    { shift->_append_op8_reg_reg (0, 0xF6, 5, @_) }
+sub mul64_dxax_reg { shift->_append_op64_regnum_reg(8, 0xF7, 5, @_) }
+sub mul32_dxax_reg { shift->_append_op32_regnum_reg(0, 0xF7, 5, @_) }
+sub mul16_dxax_reg { shift->_append_op16_regnum_reg(0, 0xF7, 5, @_) }
+sub mul8_ax_reg    { shift->_append_op8_regnum_reg (0, 0xF6, 5, @_) }
 
 #sub mul64s_reg { shift->_append_op64_reg_reg(8, 
 
@@ -998,39 +1098,39 @@ sub stc { $_[0]{_buf} .= "\xF9"; $_[0] }
 
 
 # wait til late in compilation to avoid name clash hassle
-END { eval q|sub push { splice(@_,1,0,'push' ); &_autodetect_signature_1op; }| };
+INIT { eval q|sub push { splice(@_,1,0,'push' ); &_autodetect_signature_1; }| };
 
-sub push_reg {
+sub push64_reg {
 	my ($self, $reg)= @_;
 	$reg= ($regnum64{$reg} // croak("$reg is not a 64-bit register"));
-	$self->{_buf} .= $reg > 7? pack('CC', 0x41, 0x50+($reg&7)) : pack('C', 0x50+($reg&7));
+	$self->{_buf} .= ($reg&8)? pack('CC', 0x41, 0x50+($reg&7)) : pack('C', 0x50+($reg&7));
 	$self;
 }
 
-sub push_imm {
+sub push64_imm {
 	my ($self, $imm)= @_;
 	use integer;
 	my $val= ref $imm? 0x7FFFFFFF : $imm;
 	$self->{_buf} .= (($val >> 7) == ($val >> 8))? pack('Cc', 0x6A, $val) : pack('CV', 0x68, $val);
-	$self->_mark_unresolved(-4, encode => '_repack', bits => 32, value => $imm)
+	$self->_mark_unresolved(-4, encoder => '_repack', bits => 32, value => $imm)
 		if ref $imm;
 	$self;
 }
 
-sub push_mem { shift->_append_op64_reg_mem(0, 0xFF, 6, shift) }
+sub push64_mem { shift->_append_op_reg_mem(undef, 0, 0xFF, 6, shift) }
 
 
 # wait til late in compilation to avoid name clash hassle
-END { eval q|sub pop { splice(@_,1,0,'pop' ); &_autodetect_signature_1op; }| };
+INIT { eval q|sub pop { splice(@_,1,0,'pop' ); &_autodetect_signature_1; }| };
 
-sub pop_reg {
+sub pop64_reg {
 	my ($self, $reg)= @_;
 	$reg= ($regnum64{$reg} // croak("$reg is not a 64-bit register"));
-	$self->{_buf} .= $reg > 7? pack('CC', 0x41, 0x58+($reg&7)) : pack('C', 0x58+($reg&7));
+	$self->{_buf} .= ($reg&8)? pack('CC', 0x41, 0x58+($reg&7)) : pack('C', 0x58+($reg&7));
 	$self;
 }
 
-sub pop_mem { shift->_append_op64_reg_mem(0, 0x8F, 0, shift) }
+sub pop64_mem { $_[0]->_append_op_reg_mem(undef, 0, 0x8F, 0, $_[1]) }
 
 
 sub enter {
@@ -1041,10 +1141,10 @@ sub enter {
 	}
 	else {
 		$self->{_buf} .= pack('Cv', 0xC8, ref $varspace? 0 : $varspace);
-		$self->_mark_unresolved(-2, encode => '_repack', bits => 16, value => $varspace)
+		$self->_mark_unresolved(-2, encoder => '_repack', bits => 16, value => $varspace)
 			if ref $varspace;
 		$self->{_buf} .= pack('C', ref $nesting? 0 : $nesting);
-		$self->_mark_unresolved(-1, encode => '_repack', bits => 8, value => $nesting)
+		$self->_mark_unresolved(-1, encoder => '_repack', bits => 8, value => $nesting)
 			if ref $nesting;
 	}
 	$self
@@ -1054,10 +1154,7 @@ sub enter {
 sub leave { $_[0]{_buf} .= "\xC9"; $_[0] }
 
 
-sub syscall {
-	$_[0]{_buf} .= "\x0F\x05";
-	$_[0];
-}
+sub syscall { $_[0]{_buf} .= "\x0F\x05"; $_[0] }
 
 
 sub rep { $_[0]{_buf} .= "\xF3"; $_[0] }
@@ -1077,7 +1174,7 @@ sub movs64 { $_[0]{_buf} .= "\x48\xA5"; $_[0] }
 *movsq= *movs64;
 
 sub movs32 { $_[0]{_buf} .= "\xA5"; $_[0] }
-*movsd= *movs32;
+# movsd below dis-ambiguates
 
 sub movs16 { $_[0]{_buf} .= "\x66\xA5"; $_[0] }
 *movsw= *movs16;
@@ -1125,10 +1222,39 @@ sub sfence {
 	$_[0];
 }
 
-#sub cache_flush {
-#	...;
-#}
-#*clflush= *cache_flush;
+
+sub movd { splice @_, 1, 0, 'movd'; &_autodetect_signature_2 }
+
+sub movd_xreg_reg { $_[0]->_append_op128_xreg_reg("\x66", 0, 0x0F6E, $_[1], $_[2]) }
+sub movd_xreg_mem { $_[0]->_append_op128_xreg_mem("\x66", 0, 0x0F6E, $_[1], $_[2]) }
+sub movd_reg_xreg { $_[0]->_append_op128_xreg_reg("\x66", 0, 0x0F7E, $_[2], $_[1]) }
+sub movd_mem_xreg { $_[0]->_append_op128_xreg_mem("\x66", 0, 0x0F7E, $_[2], $_[1]) }
+
+sub movq { splice @_, 1, 0, 'movq'; &_autodetect_signature_2 }
+
+sub movq_xreg_xreg { $_[0]->_append_op128_xreg_xreg("\xF3", 0, 0x0F7E, $_[1], $_[2]) }
+sub movq_xreg_mem  { $_[0]->_append_op128_xreg_mem("\xF3", 0, 0x0F7E, $_[1], $_[2]) }
+sub movq_mem_xreg  { $_[0]->_append_op128_xreg_mem("\x66", 0, 0x0FD6, $_[2], $_[1]) }
+# These are documented in AMD manual as movd with REX.W=1, but nasm doesn't allow movd
+# on qword operands, and does allow movq to move between xmm and normal registers.
+sub movq_xreg_reg  { $_[0]->_append_op128_xreg_reg("\x66", 8, 0x0F6E, $_[1], $_[2]) }
+sub movq_reg_xreg  { $_[0]->_append_op128_xreg_reg("\x66", 8, 0x0F7E, $_[2], $_[1]) }
+
+sub movss { splice @_, 1, 0, 'movss'; &_autodetect_signature_2 }
+
+sub movss_xreg_xreg { $_[0]->_append_op128_xreg_xreg("\xF3", 0, 0x0F10, $_[1], $_[2]) }
+sub movss_xreg_mem  { $_[0]->_append_op128_xreg_mem("\xF3", 0, 0x0F10, $_[1], $_[2]) }
+sub movss_mem_xreg  { $_[0]->_append_op128_xreg_mem("\xF3", 0, 0x0F11, $_[2], $_[1]) }
+
+sub movsd {
+	# Disambiguate "rep movsd" instruction
+	goto \&movs32 if @_ == 1;
+	splice @_, 1, 0, 'movsd'; &_autodetect_signature_2
+}
+
+sub movsd_xreg_xreg { $_[0]->_append_op128_xreg_xreg("\xF2", 0, 0x0F10, $_[1], $_[2]) }
+sub movsd_xreg_mem  { $_[0]->_append_op128_xreg_mem("\xF2", 0, 0x0F10, $_[1], $_[2]) }
+sub movsd_mem_xreg  { $_[0]->_append_op128_xreg_mem("\xF2", 0, 0x0F11, $_[2], $_[1]) }
 
 
 #=head2 _encode_op_reg_reg
@@ -1158,78 +1284,90 @@ sub _append_op64_reg_reg {
 	my ($self, $opcode, $reg1, $reg2)= @_;
 	$reg1= ($regnum64{$reg1} // croak("$reg1 is not a 64-bit register"));
 	$reg2= ($regnum64{$reg2} // croak("$reg2 is not a 64-bit register"));
-	use integer;
-	$self->{_buf} .= pack('CCC',
-		0x48 | (($reg1 & 8) >> 1) | (($reg2 & 8) >> 3),
-		$opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7));
+	$self->{_buf} .= $self->_encode_op_reg_reg(8, $opcode, $reg1, $reg2);
+	$self;
+}
+sub _append_op64_regnum_reg {
+	my ($self, $rex, $opcode, $regnum, $reg2)= @_;
+	$reg2= ($regnum64{$reg2} // croak("$reg2 is not a 64-bit register"));
+	$self->{_buf} .= $self->_encode_op_reg_reg($rex, $opcode, $regnum, $reg2);
 	$self;
 }
 sub _append_op32_reg_reg {
 	my ($self, $opcode, $reg1, $reg2)= @_;
 	$reg1= ($regnum32{$reg1} // croak("$reg1 is not a 32-bit register"));
 	$reg2= ($regnum32{$reg2} // croak("$reg2 is not a 32-bit register"));
-	use integer;
-	my $rex= (($reg1 & 8) >> 1) | (($reg2 & 8) >> 3);
-	$self->{_buf} .= $rex?
-		pack('CCC', 0x40|$rex, $opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7))
-		: pack('CC', $opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7));
+	$self->{_buf} .= $self->_encode_op_reg_reg(0, $opcode, $reg1, $reg2);
+	$self;
+}
+sub _append_op32_regnum_reg {
+	my ($self, $opcode, $regnum, $reg2)= @_;
+	$reg2= ($regnum32{$reg2} // croak("$reg2 is not a 32-bit register"));
+	$self->{_buf} .= $self->_encode_op_reg_reg(0, $opcode, $regnum, $reg2);
 	$self;
 }
 sub _append_op16_reg_reg {
 	my ($self, $opcode, $reg1, $reg2)= @_;
 	$reg1= ($regnum16{$reg1} // croak("$reg1 is not a 16-bit register"));
 	$reg2= ($regnum16{$reg2} // croak("$reg2 is not a 16-bit register"));
-	use integer;
-	my $rex= (($reg1 & 8) >> 1) | (($reg2 & 8) >> 3);
-	$self->{_buf} .= $rex?
-		pack('CCCC', 0x66, 0x40|$rex, $opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7))
-		: pack('CCC', 0x66, $opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7));
+	$self->{_buf} .= "\x66" . $self->_encode_op_reg_reg(0, $opcode, $reg1, $reg2);
 	$self;
 }
+sub _append_op16_regnum_reg {
+	my ($self, $opcode, $regnum, $reg2)= @_;
+	$reg2= ($regnum16{$reg2} // croak("$reg2 is not a 16-bit register"));
+	$self->{_buf} .= "\x66" . $self->_encode_op_reg_reg(0, $opcode, $regnum, $reg2);
+	$self;
+}
+sub _append_op8_regnum_reg {
+	_append_op8_reg_reg(@_, $_[2]);
+}
 sub _append_op8_reg_reg {
-	my ($self, $opcode, $reg1, $reg2)= @_;
-	use integer;
-	$reg1= $regnum8{$reg1};
-	$reg2= $regnum8{$reg2};
+	my ($self, $opcode, $reg1, $reg2, $reg1num)= @_;
+	$reg1num //= $regnum8{$reg1} // croak "$reg1 is not a valid 8-bit register";
+	my $reg2num= $regnum8{$reg2} // croak "$reg2 is not a valid 8-bit register";
 	# special case for the "high byte" registers.  They can't be used in an
 	# instruction that uses the REX prefix.
-	if (!defined $reg1 || !defined $reg2) {
-		my $old_reg1= $reg1;
-		my $old_reg2= $reg2;
-		$reg1= $regnum8_high{$_[2]} // croak "$_[2] is not a valid 8-bit register";
-		$reg2= $regnum8_high{$_[3]} // croak "$_[3] is not a valid 8-bit register";
-		if (($old_reg1 && $old_reg1 > 3) || ($old_reg2 && $old_reg2 > 3)) {
-			croak "Can't combine $_[2] with $_[3] in same instruction"; 
-		}
-		$self->{_buf} .= pack('CC', $opcode, 0xC0 | ($reg1 << 3) | $reg2);
-	}
-	else {
-		$self->{_buf} .= ($reg1 > 3 || $reg2 > 3)?
-			pack('CCC', 0x40|(($reg1 & 8) >> 1) | (($reg2 & 8) >> 3), $opcode, 0xC0 | (($reg1 & 7) << 3) | ($reg2 & 7))
-			: pack('CC', $opcode, 0xC0 | ($reg1 << 3) | $reg2);
+	my $uses_high_byte= ($reg1num|$reg2num)&0x10;
+	my $uses_extended_reg= ($reg1num|$reg2num)&0x20;
+	my $mod_rm= 0xC0 | (($reg1num & 7) << 3) | ($reg2num & 7);
+	if ($uses_extended_reg) {
+		croak "Can't combine $reg1 with $reg2 in same instruction"
+			if $uses_high_byte;
+		$self->{_buf} .= pack('CCC', 0x40|(($reg1num & 8) >> 1) | (($reg2num & 8) >> 3), $opcode, $mod_rm)
+	} else {
+		$self->{_buf} .= pack('CC', $opcode, $mod_rm);
 	}
 	$self;
 }
 
-# Like above, but the first register argument isn't really a register argument
-# and therefore doesn't require a 0x40 prefix for values > 3
-sub _append_op8_opreg_reg {
-	my ($self, $opcode, $opreg, $reg2)= @_;
-	use integer;
-	$reg2= $regnum8{$reg2};
-	# special case for the "high byte" registers.  They can't be used in an
-	# instruction that uses the REX prefix.
-	if (!defined $reg2) {
-		my $old_reg2= $reg2;
-		$reg2= $regnum8_high{$_[3]} // croak "$_[3] is not a valid 8-bit register";
-		$self->{_buf} .= pack('CC', $opcode, 0xC0 | ($opreg << 3) | $reg2);
+sub _append_op128_xreg_xreg {
+	my ($self, $prefix, $rex, $opcode, $xreg1, $xreg2)= @_;
+	$xreg1= $regnum128{$xreg1} // croak("$xreg1 is not a 128-bit register");
+	$xreg2= $regnum128{$xreg2} // croak("$xreg2 is not a 128-bit register");
+	$rex |= ($xreg1 & 8) >> 1 | ($xreg2 & 8) >> 3;
+	my $modrm= 0xC0 | ($xreg1 & 7) << 3 | ($xreg2 & 7);
+	$_[0]{_buf} .= !$rex? pack('a*CCC', $prefix, $opcode >> 8, $opcode & 0xFF, $modrm)
+		: pack('a*CCCC', $prefix, 0x40|$rex, $opcode >> 8, $opcode & 0xFF, $modrm);
+	$_[0]
+}
+
+sub _append_op128_xreg_reg {
+	my ($self, $prefix, $rex, $opcode, $xreg, $reg)= @_;
+	$xreg= $regnum128{$xreg} // croak("$xreg is not a 128-bit register");
+	if (defined(my $regid= $regnum64{$reg})) {
+		$rex |= 8;
+		$reg= $regid;
+	} elsif (defined($regid= $regnum32{$reg})) {
+		$reg= $regid;
+	} else {
+		croak("$reg is not a 32 or 64-bit register");
 	}
-	else {
-		$self->{_buf} .= ($reg2 > 3)?
-			pack('CCC', 0x40| (($reg2 & 8) >> 3), $opcode, 0xC0 | ($opreg << 3) | ($reg2 & 7))
-			: pack('CC', $opcode, 0xC0 | ($opreg << 3) | $reg2);
-	}
-	$self;
+	$rex |= ($xreg & 8) >> 1 | ($reg & 8) >> 3;
+	my $modrm= 0xC0 | ($xreg & 7) << 3 | ($reg & 7);
+	$_[0]{_buf} .= !$rex? pack('a*CCC', $prefix, $opcode >> 8, $opcode & 0xFF, $modrm)
+		: pack('a*CCCC', $prefix, 0x40|$rex, $opcode >> 8, $opcode & 0xFF, $modrm);
+	$_[0]
 }
 
 #=head2 _append_op##_reg_mem
@@ -1239,110 +1377,65 @@ sub _append_op8_opreg_reg {
 #
 #=cut
 
+sub _append_op128_xreg_mem {
+	my ($self, $prefix, $rex, $opcode, $reg, $mem)= @_;
+	$reg= $regnum128{$reg} // croak "$reg is not a valid 128-bit register";
+	$self->_append_op_reg_mem($prefix, $rex, $opcode, $reg, $mem);
+}
+
 sub _append_op64_reg_mem {
 	my ($self, $rex, $opcode, $reg, $mem)= @_;
-	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum64{$reg} // croak "$reg is not a valid 64-bit register"
 		if defined $reg;
-	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
-		if defined $index_reg;
-	my $rip;
-	if (defined $base_reg) {
-		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
-		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
-			$disp= defined $$disp? $self->get_label($$disp) : ($$disp= $self->get_label)
-				if ref $disp eq 'SCALAR';
-			$rip= $self->get_label;
-			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
-		}
-	}
-	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
-	$self->label($rip) if defined $rip;
-	$self;
+	$self->_append_op_reg_mem(undef, $rex, $opcode, $reg, $mem);
 }
 
 sub _append_op32_reg_mem {
 	my ($self, $rex, $opcode, $reg, $mem)= @_;
-	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum32{$reg} // croak "$reg is not a valid 32-bit register"
 		if defined $reg;
-	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
-		if defined $index_reg;
-	my $rip;
-	if (defined $base_reg) {
-		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
-		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
-			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
-			$rip= $self->get_label;
-			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
-		}
-	}
-	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
-	$self->label($rip) if defined $rip;
-	$self;
+	$self->_append_op_reg_mem(undef, $rex, $opcode, $reg, $mem);
 }
 
 sub _append_op16_reg_mem {
 	my ($self, $rex, $opcode, $reg, $mem)= @_;
-	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum16{$reg} // croak "$reg is not a valid 16-bit register"
 		if defined $reg;
-	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
-		if defined $index_reg;
-	my $rip;
-	if (defined $base_reg) {
-		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
-		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
-			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
-			$rip= $self->get_label;
-			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
-		}
-	}
-	$self->{_buf} .= "\x66";
-	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
-	$self->label($rip) if defined $rip;
-	$self;
+	$self->_append_op_reg_mem("\x66", $rex, $opcode, $reg, $mem);
 }
 
 sub _append_op8_reg_mem {
 	my ($self, $rex, $opcode, $reg, $mem)= @_;
+	my $regnum= $regnum8{$reg} // croak "$reg is not a valid 8-bit register";
+	# special case for needing REX byte for SPL, BPL, DIL, and SIL
+	$rex |= 0x40 if $regnum & 0x20;
+	# special case for the "high byte" registers
+	if ($regnum & 0x10) {
+		my ($base_reg, $disp, $index_reg, $scale)= @$mem;
+		croak "Cannot use $reg in instruction with REX prefix"
+			if $rex || (($regnum64{$base_reg//''}//0) & 8) || (($regnum64{$index_reg//''}//0) & 8);
+	}	
+	$self->_append_op_reg_mem(undef, $rex, $opcode, $regnum, $mem);
+}
+
+sub _append_op_reg_mem {
+	my ($self, $prefix, $rex, $opcode, $regnum, $mem)= @_;
 	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
 		if defined $index_reg;
-	$reg= $regnum8{$reg};
-	# special case for the "high byte" registers
-	if (!defined $reg) {
-		$reg= $regnum8_high{$_[3]} // croak "$_[3] is not a valid 8-bit register";
-		!$rex && ($base_reg//0) < 8 && ($index_reg//0) < 8
-			or croak "Cannot use $_[3] in instruction with REX prefix";
-	}
-	# special case for needing REX byte for SPL, BPL, DIL, and SIL
-	elsif ($reg > 3) {
-		$rex |= 0x40;
-	}
 	my $rip;
 	if (defined $base_reg) {
 		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
-		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
-			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
-			$rip= $self->get_label;
-			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
+		if (($base_reg & 0x40) && ref $disp) { # RIP-relative
+			$disp= defined $$disp? $self->get_label($$disp) : ($$disp= $self->get_label)
+				if ref $disp eq 'SCALAR';
+			$disp= bless { target => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
 		}
 	}
-	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
+	$self->{_buf} .= $prefix if defined $prefix;
+	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $regnum, $base_reg, $disp, $index_reg, $scale], 4, 7);
 	$self->label($rip) if defined $rip;
 	$self;
-}
-# Like above, but the first register is a constant and don't need to test it for
-# requiring a REX prefix if >3.
-sub _append_op8_opreg_mem {
-	my ($self, $rex, $opcode, $opreg, $mem)= @_;
-	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
-	$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register"
-		if defined $base_reg;
-	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
-		if defined $index_reg;
-	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $opreg, $base_reg, $disp, $index_reg, $scale], 4, 7);
 }
 
 #=head2 _append_op##_const_to_mem
@@ -1390,7 +1483,6 @@ sub _append_op64_const_to_mem {
 	$self->_append_possible_unknown('_encode_op_reg_mem', [ 8, $opcode, $opreg, $base_reg, $disp, $index_reg, $scale, 'V', $value ], ref $disp? 4 : 8, defined $disp? 16:12);
 }
 
-
 # scale values for the SIB byte
 my %SIB_scale= (
 	1 => 0x00,
@@ -1403,14 +1495,15 @@ sub _encode_op_reg_mem {
 	my ($self, $rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale, $immed_pack, $immed)= @_;
 	use integer;
 	$rex |= ($reg & 8) >> 1;
-	
+	# convert opcode number to byte string
+	$opcode= $opcode <= 0xFF? pack('C', $opcode) : pack('CC', $opcode >> 8, $opcode & 0xFF);
 	my $tail;
 	if (defined $base_reg) {
-		if ($base_reg == 0x15) {
+		if ($base_reg == 0x845) {
 			defined $disp or croak "RIP-relative address requires displacement";
 			defined $scale || defined $immed and croak "RIP-relative address cannot have scale or immediate-value";
-			return $rex? pack('CCCV', ($rex|0x40), $opcode, (($reg & 7) << 3)|5, $disp)
-				: pack('CCV', $opcode, (($reg & 7) << 3)|5, $disp);
+			return $rex? pack('Ca*CV', ($rex|0x40), $opcode, (($reg & 7) << 3)|5, $disp)
+				: pack('a*CV', $opcode, (($reg & 7) << 3)|5, $disp);
 		}
 		$rex |= ($base_reg & 8) >> 3;
 		
@@ -1424,15 +1517,15 @@ sub _encode_op_reg_mem {
 			my $scale= $SIB_scale{$scale // 1} // croak "invalid index multiplier $scale";
 			$index_reg != 4 or croak "RSP cannot be used as index register";
 			$rex |= ($index_reg & 8) >> 2;
-			$tail= pack('CC', $mod_rm | (($reg & 7) << 3) | 4, $scale | (($index_reg & 7) << 3) | ($base_reg & 7)) . $suffix;
+			$tail= pack('CCa*', $mod_rm | (($reg & 7) << 3) | 4, $scale | (($index_reg & 7) << 3) | ($base_reg & 7), $suffix);
 		}
 		# RSP,R12 always gets a SIB byte
 		elsif (($base_reg&7) == 4) {
-			$tail= pack('CC', $mod_rm | (($reg & 7) << 3) | 4, 0x24) . $suffix;
+			$tail= pack('CCa*', $mod_rm | (($reg & 7) << 3) | 4, 0x24, $suffix);
 		}
 		else {
 			# Null index register is encoded as RSP
-			$tail= pack('C', $mod_rm | (($reg & 7) << 3) | ($base_reg & 7)) . $suffix;
+			$tail= pack('Ca*', $mod_rm | (($reg & 7) << 3) | ($base_reg & 7), $suffix);
 		}
 	} else {
 		# Null base register is encoded as RBP + 32bit displacement
@@ -1442,7 +1535,8 @@ sub _encode_op_reg_mem {
 		
 		if (defined $index_reg) {
 			my $scale= $SIB_scale{$scale // 1} // croak "invalid index multiplier $scale";
-			$index_reg != 4 or croak "RSP cannot be used as index register";
+			croak "RSP cannot be used as index register"
+				if ($index_reg & 0xF) == 4;
 			$rex |= ($index_reg & 8) >> 2;
 			$tail= pack('CCV', (($reg & 7) << 3) | 4, $scale | (($index_reg & 7) << 3) | 5, $disp);
 		}
@@ -1455,8 +1549,8 @@ sub _encode_op_reg_mem {
 		if defined $immed;
 	
 	return $rex?
-		pack('CC', ($rex|0x40), $opcode) . $tail
-		: pack('C', $opcode) . $tail;
+		pack('Ca*a*', ($rex|0x40), $opcode, $tail)
+		: $opcode . $tail;
 }
 
 #=head2 _append_mathopNN_const
@@ -1494,8 +1588,8 @@ sub _encode_mathop64_imm {
 		pack('CCCc', $rex, $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
 	: (($value >> 31) == ($value >> 31 >> 1))? (
 		# Ops on AX get encoded as a special instruction
-		$reg? pack('CCCV', $rex, $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
-			: pack('CCV', $rex, $opcodeAX32, $value)
+		($reg&0xF)? pack('CCCV', $rex, $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
+			      : pack('CCV', $rex, $opcodeAX32, $value)
 	)
 	# 64-bit only supports 32-bit sign-extend immediate
 	: croak "$value is wider than 32-bit";
@@ -1521,7 +1615,7 @@ sub _encode_mathop32_imm {
 		: (($value >> 31 >> 1) == ($value >> 31 >> 2))? (
 			# Ops on AX get encoded as a special instruction
 			$rex? pack('CCCV', 0x40|$rex, $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
-			: $reg? pack('CCV', $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
+			: ($reg&0xF)? pack('CCV', $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
 			: pack('CV', $opcodeAX32, $value)
 		)
 		: croak "$value is wider than 32-bit";
@@ -1547,7 +1641,7 @@ sub _encode_mathop16_imm {
 		: (($value >> 16) == ($value >> 17))? (
 			# Ops on AX get encoded as a special instruction
 			$rex? pack('CCCCv', 0x66, 0x40|$rex, $opcode16, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFFFF)
-			: $reg? pack('CCCv', 0x66, $opcode16, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFFFF)
+			: ($reg&0xF)? pack('CCCv', 0x66, $opcode16, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFFFF)
 			: pack('CCv', 0x66, $opcodeAX16, $value)
 		)
 		: croak "$value is wider than 16-bit";
@@ -1568,20 +1662,19 @@ sub _encode_mathop16_imm {
 sub _append_mathop8_const {
 	my ($self, $opcodeAX8, $opcode8, $opcode_reg, $reg, $immed)= @_;
 	use integer;
-	$reg= $regnum8{$reg};
+	$reg= $regnum8{$reg} // croak("$reg is not a 8-bit register");
 	my $value= ref $immed? 0x00 : $immed;
 	(($value >> 8) == ($value >> 9)) or croak "$value is wider than 8 bits";
-	if (!defined $reg) {
-		$reg= $regnum8_high{$_[1]} // croak("$reg is not a 8-bit register");
+	if ($reg & 0x10) {
 		$self->{_buf} .= pack('CCC', $opcode8, 0xC0 | ($opcode_reg<<3) | ($reg & 7), $value&0xFF);
-	} elsif (!$reg) {
+	} elsif (!($reg&0xF)) {
 		$self->{_buf} .= pack('CC', $opcodeAX8, $value&0xFF);
-	} elsif ($reg > 3) {
+	} elsif ($reg & 0x20) {
 		$self->{_buf} .= pack('CCCC', 0x40|(($reg & 8)>>3), $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFF);
 	} else {
 		$self->{_buf} .= pack('CCC', $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFF);
 	}
-	$self->_mark_unresolved(-1, encode => '_repack', bits => 8, value => $immed)
+	$self->_mark_unresolved(-1, encoder => '_repack', bits => 8, value => $immed)
 		if ref $immed;
 	$self;
 }
@@ -1660,122 +1753,6 @@ sub _encode_mathop8_mem_immed {
 	$self->_encode_op_reg_mem(0, $opcode8, $opcode_reg, $base_reg, $disp, $index_reg, $scale).pack('C',$value&0xFF);
 }
 
-#=head2 C<_append_shiftop_reg_imm( $bitwidth, $opcode_1, $opcode_imm, $opreg, $reg, $immed )>
-#
-#Shift instructions often have a special case for shifting by 1.  This utility method
-#selects that opcode if the immediate value is 1.
-#
-#It also allows the immediate to be an expression, though I doubt that will ever happen...
-#Immediate values are always a single byte, and the processor masks them to 0..63
-#so the upper bits are irrelevant.
-#
-#=cut
-
-sub _append_shiftop_reg_imm {
-	my ($self, $bits, $opcode_sh1, $opcode_imm, $opreg, $reg, $immed)= @_;
-	
-	# Select appropriate opcode
-	my $op= $immed eq 1? $opcode_sh1 : $opcode_imm;
-	
-	$bits == 64?   $self->_append_op64_reg_reg($op, $opreg, $reg)
-	: $bits == 32? $self->_append_op32_reg_reg($op, $opreg, $reg)
-	: $bits == 16? $self->_append_op16_reg_reg($op, $opreg, $reg)
-	:              $self->_append_op8_opreg_reg($op, $opreg, $reg);
-	
-	# If not using the shift-one opcode, append an immediate byte.
-	unless ($immed eq 1) {
-		$self->{_buf} .= pack('C', ref $immed? 0 : $immed);
-		$self->_mark_unresolved(-1, encode => '_repack', bits => 8, value => $immed)
-			if ref $immed;
-	}
-	
-	$self;
-}
-
-#=head2 _append_shiftop_mem_imm
-#
-#Same as above, for memory locations
-#
-#=cut
-
-sub _append_shiftop_mem_imm {
-	my ($self, $bits, $opcode_sh1, $opcode_imm, $opreg, $mem, $immed)= @_;
-
-	# Select appropriate opcode
-	my $op= $immed eq 1? $opcode_sh1 : $opcode_imm;
-	
-	$bits == 64?   $self->_append_op64_reg_mem(8, $op, $opreg, $mem)
-	: $bits == 32? $self->_append_op32_reg_mem(0, $op, $opreg, $mem)
-	: $bits == 16? $self->_append_op16_reg_mem(0, $op, $opreg, $mem)
-	:              $self->_append_op8_opreg_mem(0, $op, $opreg, $mem);
-	
-	# If not using the shift-one opcode, append an immediate byte.
-	unless ($immed eq 1) {
-		$self->{_buf} .= pack('C', ref $immed? 0 : $immed);
-		$self->_mark_unresolved(-1, encode => '_repack', bits => 8, value => $immed)
-			if ref $immed;
-	}
-	
-	$self;
-}
-
-#=head2 C<_append_jmp_cond($cond_code, $label)>
-#
-#Appends a conditional jump instruction, which is either the short 2-byte form for 8-bit offsets,
-#or 6 bytes for jumps of 32-bit offsets.  The implementation optimistically assumes the 2-byte
-#length until L<resolve> is called, when the actual length will be determined.
-#
-#Returns $self, for chaining.
-#
-#=cut
-
-sub _append_jmp_cond {
-	$_[2]= $_[0]->get_label unless defined $_[2];
-	
-	my ($self, $cond, $label)= @_;
-	use integer;
-	$label= $self->get_label($label)
-		unless ref $label;
-	$self->_mark_unresolved(
-		2, # estimated length
-		encode => sub {
-			my ($self, $params)= @_;
-			defined $label->{offset} or croak "Label $label is not marked";
-			my $ofs= $label->{offset} - ($params->{offset}+$params->{len});
-			my $short= (($ofs>>7) == ($ofs>>8));
-			return $short?
-				pack('Cc', 0x70 + $cond, $ofs)
-				: pack('CCV', 0x0F, 0x80 + $cond, $ofs);
-		}
-	);
-	$self;
-}
-
-#=head2 C<_append_jmp_cx($opcode, $label)>
-#
-#Appends one of the special CX-related jumps (like L</loop>).  These can only have an 8-bit offset
-#and are fixed-length.
-#
-#=cut
-
-sub _append_jmp_cx {
-	my ($self, $op, $label)= @_;
-	use integer;
-	$label= $self->get_label($label)
-		unless ref $label;
-	$self->_mark_unresolved(
-		2, # estimated length
-		encode => sub {
-			my ($self, $params)= @_;
-			defined $label->{offset} or croak "Label $label is not marked";
-			my $ofs= $label->{offset} - ($params->{offset}+$params->{len});
-			(($ofs>>7) == ($ofs>>8)) or croak "Label too far, can only short-jump";
-			return pack('Cc', $op, $ofs);
-		}
-	);
-	return $self;
-}
-
 sub _append_possible_unknown {
 	my ($self, $encoder, $encoder_args, $unknown_pos, $estimated_length)= @_;
 	my $u= $encoder_args->[$unknown_pos];
@@ -1786,14 +1763,19 @@ sub _append_possible_unknown {
 			or croak "Expected object with '->value' method";
 		$self->_mark_unresolved(
 			$estimated_length,
-			encode => sub {
-				my $self= shift;
+			encoder => sub {
+				my ($self, $lazy_enc)= @_;
 				my @args= @$encoder_args;
-				$args[$unknown_pos]= $u->value
-					// croak "Value '$u->{name}' is still unresolved";
+				$args[$unknown_pos]= $lazy_enc->unknown->value
+					// croak "Value '".$lazy_enc->unknown->name."' is still unresolved";
 				$self->$encoder(@args);
 			},
+			unknown => $u,
 		);
+		# If the unknown is a rip-relative displacement, give it a reference to the
+		# instruction so it can calculate the offset
+		$u->instruction($self->_unresolved->[-1])
+			if $u->can('instruction');
 	}
 	else {
 		$self->{_buf} .= $self->$encoder(@$encoder_args);
@@ -1843,7 +1825,10 @@ sub _mark_unresolved {
 		push @_, caller => \@caller;
 	}
 	#print "Unresolved at $offset ($location)\n";
-	push @{ $self->_unresolved }, { offset => $offset, len => $location, @_ };
+	push @{ $self->_unresolved },
+		bless { relative_to => $self->start_address, offset => $offset, len => $location, @_ },
+			'CPU::x86_64::InstructionWriter::LazyEncode';
+	$self;
 }
 
 sub _repack {
@@ -1877,11 +1862,11 @@ sub _resolve {
 		# Track the amount we have shifted the current instruction in $ofs
 		my $ofs= 0;
 		for my $p (@{ $self->_unresolved }) {
-			#print "Shifting $p by $ofs\n" if $ofs;
+			#print "# Shifting $p by $ofs\n" if $ofs;
 			$p->{offset} += $ofs if $ofs;
 			
 			# Ignore things without an 'encode' callback (like labels)
-			my $fn= $p->{encode}
+			my $fn= $p->can('encoder') && $p->encoder
 				or next;
 			
 			# Get new encoding, then replace those bytes in the instruction string
@@ -1891,15 +1876,16 @@ sub _resolve {
 				
 				# If the length changed, update $ofs and current ->len
 				if (length($enc) != $p->{len}) {
-					#print "New size is ".length($enc)."\n";
+					#print "# New size is ".length($enc)."\n";
 					$changed_len= 1;
 					$ofs += (length($enc) - $p->{len});
 					$p->{len}= length($enc);
 				}
 				1
 			} or do {
-				if ($p->{caller}) {
-					croak "Failed to encode instruction $p->{caller}[3] from $p->{caller}[1] line $p->{caller}[2]:\n   $@";
+				if (my $caller= $p->caller) {
+					(my $op= $caller->[3]) =~ s/.*:://;
+					croak "Failed to encode instruction $op from $caller->[1] line $caller->[2]:\n   $@";
 				} else {
 					croak "Failed to encode instruction (enable diagnostics with ->debug(1) ): $@";
 				}
@@ -1922,7 +1908,7 @@ CPU::x86_64::InstructionWriter - Assemble x86-64 instructions using a pure-perl 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -1941,7 +1927,7 @@ version 0.004
     ->mov(RAX, 60)          # Linux 'exit' syscall
     ->mov(RDI, 0)           # success
     ->syscall
-    ->data_strtable(\%str)  # ought to be in a data segment
+    ->data_str(\%str)       # ought to be in a data segment
     ->bytes;
   
   # if (x == 1) { ++x } else { ++y }
@@ -1966,8 +1952,6 @@ This module consists of a bunch of chainable methods which build a string of mac
 you call them.  It supports lazy-resolved jump labels, lazy-resolved RIP-relative addresses,
 and lazy-bound constants which can be assigned a value after the instructions have been
 declared.
-
-B<Note:> This module currently requires a perl with 64-bit integers and C<pack('Q')> support.
 
 =head1 NOTATIONS
 
@@ -2056,6 +2040,10 @@ exception.
 This is a set of all labels currently relevant to this writer, indexed by name (so names must
 be unique).   You probably don't need to access this.  See L</get_label> and L</mark>.
 
+=head2 scope
+
+An automatic string prefix applied to any label you create whose name begins with ".".
+
 =head1 METHODS
 
 =head2 get_label
@@ -2064,6 +2052,7 @@ be unique).   You probably don't need to access this.  See L</get_label> and L</
   my $label= $writer->get_label();      # new anonymous label
 
 Return a label object for the given name, or if no name is given, return an anonymous label.
+Names beginning with period "." will be prefixed by the current value of L</scope>.
 
 The label objects returned can be assigned a location within the instruction stream using L</mark>
 and used as the target for C<JMP> and C<JMP>-like instructions.  A label can also be used as a
@@ -2086,6 +2075,15 @@ unknown, and shift automatically as the instructions are resolved.
 
 Return the assembled instructions as a string of bytes.  This will fail if any of the labels were
 left un-marked or if any expressions can't be evaluated.
+
+=head2 append
+
+Append all instructions, labels, and unknowns of another InstructionWriter to the instructions
+of this writer.  These are copied, and do not retain references to the original writer.
+Any label in the other writer which begins with '.' (meaning the other writer's L<scope> was
+the empty string) will be renamed into the current C<scope>.  Other label names are copied
+as-is.  Labels which are anchored to the L<start_address> of the previous writer get an offset
+applied to anchor them in terms of this writer's C<start_address>.
 
 =head1 DATA DECLARATION
 
@@ -2135,6 +2133,16 @@ UTF-8.  It also includes a trailing NUL character unless you override that optio
 
 The following methods append an instruction to the buffer, and return C<$self> so you can continue
 calling instructions in a chain.
+
+=head2 CPUID
+
+=over
+
+=item cpuid
+
+Uses EAX as a parameter, and clobbers EAX, EBX, ECX, and EDX with cpu information
+
+=back
 
 =head2 NOP, PAUSE
 
@@ -2694,9 +2702,9 @@ This only implements the 64-bit push instruction.
 
 =item C<pop($operand, $bits)>
 
-=item C<pop_reg>
+=item C<pop64_reg>
 
-=item C<pop_mem>
+=item C<pop64_mem>
 
 =back
 
@@ -2817,6 +2825,71 @@ TODO
 Parameterless instructions for memory access serialization.
 Forces memory operations before the fence to compete before memory operations after the fence.
 Lfence affects load operations, sfence affects store operations, and mfence affects both.
+
+=head1 SSE/AVX FLOATING POINT INSTRUCTIONS
+
+=head2 movd
+
+Copy 32-bit value to/from an xmm register; upper bits are cleared.  Cannot use xmm registers
+for both src and dst. (use movss instead)
+
+=over
+
+=item movd_xreg_reg
+
+=item movd_xreg_mem
+
+=item movd_reg_xreg
+
+=item movd_mem_xreg
+
+=back
+
+=head2 movq
+
+Copy a 64-bit value to/from an xmm register; upper bits are cleared.
+
+=over
+
+=item movq_xreg_xreg
+
+=item movq_xreg_mem
+
+=item movq_mem_xreg
+
+=item movq_xreg_reg
+
+=item movq_reg_xreg
+
+=back
+
+=head2 movss
+
+Copy a 32-bit value to/from an xmm register; upper bits are unaffected.
+
+=over
+
+=item movss_xreg_xreg
+
+=item movss_xreg_mem
+
+=item movss_mem_xreg
+
+=back
+
+=head2 movsd
+
+Copy a 64-bit value to/from an xmm register; upper bits are unaffected.
+
+=over
+
+=item movsd_xreg_xreg
+
+=item movsd_xreg_mem
+
+=item movsd_mem_xreg
+
+=back
 
 =head1 ENCODING x86_64 INSTRUCTIONS
 

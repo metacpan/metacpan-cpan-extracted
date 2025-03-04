@@ -18,12 +18,14 @@ my %WriteMakefileArgs = (
   "NAME" => "CPU::x86_64::InstructionWriter",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "Encode" => 0,
     "Exporter" => 0,
     "Math::BigInt" => 0,
     "Scalar::Util" => 0,
     "if" => 0,
     "integer" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -36,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +47,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "Digest::MD5" => 0,
   "Encode" => 0,
   "Exporter" => 0,
@@ -58,6 +61,7 @@ my %FallbackPrereqs = (
   "if" => 0,
   "integer" => 0,
   "lib" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

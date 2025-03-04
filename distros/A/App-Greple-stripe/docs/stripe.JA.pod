@@ -10,7 +10,7 @@ App::Greple::stripe - Greple ゼブラストライプモジュール
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ stripeモジュールを使うと、同じパターンにマッチしたブロ�
 
 3つ以上のパターンで異なる色系列を使いたい場合は、モジュールを呼び出すときに C<step> 回数を指定してください。シリーズ数は6まで増やせます。
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/step-3.png">
@@ -64,19 +64,19 @@ B<stripe>モジュール特有のオプションがあります。これらは�
 
 次の2つのコマンドは全く同じ効果を持ちます。
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
 =over 7
 
-=item B<-Mstripe::set>=B<step>=I<n>
+=item B<-Mstripe::config>=B<step>=I<n>
 
 =item B<--step>=I<n>
 
 ステップ数をI<n>に設定する。
 
-=item B<-Mstripe::set>=B<darkmode>
+=item B<-Mstripe::config>=B<darkmode>
 
 =item B<--darkmode>
 
@@ -108,7 +108,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -707,3 +707,7 @@ Revision history for StreamFinder
         allows for better control over selected streams within bandwidth limits 
         within Fauxdacious itself.  To function the old way, simply specify 
         an hls_bandwidth limit (in the config file) or "-noplaylists => 1".
+2.43    - Update copyright year to include 2025
+        - StreamFinder::SermonAudio - Fix failure to return description 
+        field and sometimes incorrect icon and image URLs due to slight changes 
+        to their site.  Also try harder to find description.

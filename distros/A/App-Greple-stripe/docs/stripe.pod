@@ -10,7 +10,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ If you want to use different color series for three or more patterns,
 specify C<step> count when calling the module.  The number of series
 can be increased up to 6.
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/step-3.png">
@@ -76,19 +76,19 @@ following the module declaration and ending with C<-->.
 
 The following two commands have exactly the same effect.
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
 =over 7
 
-=item B<-Mstripe::set>=B<step>=I<n>
+=item B<-Mstripe::config>=B<step>=I<n>
 
 =item B<--step>=I<n>
 
 Set the step count to I<n>.
 
-=item B<-Mstripe::set>=B<darkmode>
+=item B<-Mstripe::config>=B<darkmode>
 
 =item B<--darkmode>
 
@@ -122,7 +122,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

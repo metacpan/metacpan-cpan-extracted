@@ -6,7 +6,8 @@ use warnings;
 use Class::Utils qw(set_params);
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
-use List::MoreUtils qw(any);
+use List::Util 1.33 qw(any);
+use Mo::utils 0.06 qw(check_bool);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use URI;
@@ -16,7 +17,7 @@ Readonly::Scalar our $COMMONS_URI => q{https://commons.wikimedia.org};
 Readonly::Array our @UPLOAD_SEGS => qw(wikipedia commons);
 Readonly::Array our @COMMONS_SEGS => qw(wiki);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub new {
 	my ($class, @params) = @_;
@@ -29,6 +30,8 @@ sub new {
 
 	# Process parameters.
 	set_params($self, @params);
+
+	check_bool($self, 'utf-8');
 
 	return $self;
 }
@@ -310,6 +313,9 @@ Returns string with URL.
 
 L<Class::Utils>,
 L<Digest::MD5>,
+L<File::Basename>,
+L<List::Util>,
+L<Mo::utils>,
 L<Readonly>,
 L<Unicode::UTF8>,
 L<URI>.
@@ -326,12 +332,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

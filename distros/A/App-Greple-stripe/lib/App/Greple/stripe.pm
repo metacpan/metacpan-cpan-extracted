@@ -3,7 +3,7 @@ package App::Greple::stripe;
 use 5.024;
 use warnings;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 =encoding utf-8
 
@@ -17,7 +17,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ If you want to use different color series for three or more patterns,
 specify C<step> count when calling the module.  The number of series
 can be increased up to 6.
 
-    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+    greple -Mstripe::config=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/step-3.png">
@@ -83,19 +83,19 @@ following the module declaration and ending with C<-->.
 
 The following two commands have exactly the same effect.
 
-    greple -Mstripe=set=step=3
+    greple -Mstripe=config=step=3
 
     greple -Mstripe --step=3 --
 
 =over 7
 
-=item B<-Mstripe::set>=B<step>=I<n>
+=item B<-Mstripe::config>=B<step>=I<n>
 
 =item B<--step>=I<n>
 
 Set the step count to I<n>.
 
-=item B<-Mstripe::set>=B<darkmode>
+=item B<-Mstripe::config>=B<darkmode>
 
 =item B<--darkmode>
 
@@ -129,7 +129,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -142,28 +142,21 @@ use Scalar::Util;
 *is_number = \&Scalar::Util::looks_like_number;
 use Data::Dumper;
 
-our %opt = (
+use Getopt::EX::Config;
+
+my $config = Getopt::EX::Config->new(
     step     => 2,
     darkmode => undef,
 );
-lock_keys %opt;
-sub opt :lvalue { ${$opt{+shift}} }
+lock_keys %{$config};
 
-sub hash_to_spec {
-    pairmap {
-	my $key = "$a|${\(uc(substr($a, 0, 1)))}";
-	my $ref = ref $b;
-	if    (not defined $b)   { "$key!"  }
-	elsif ($ref eq 'SCALAR') { "$key!"  }
-	elsif (is_number($b))    { "$key=f" }
-	else                     { "$key=s" }
-    } shift->%*;
-}
+# for backward compatibility
+sub set { config @_ }
 
 my %series = (
     light => [
 	[ qw(/544 /533) ],
-	[ qw(/454 /252) ],
+	[ qw(/454 /353) ],
 	[ qw(/445 /335) ],
 	[ qw(/554 /553) ],
 	[ qw(/545 /535) ],
@@ -179,34 +172,17 @@ my %series = (
     ],
 );
 
-sub mod_argv {
-    my($mod, $argv) = @_;
-    my @my_argv;
-    if (@$argv and $argv->[0] !~ /^-M/ and
-	defined(my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
-	splice @$argv, $i, 1; # remove '--'
-	@my_argv = splice @$argv, 0, $i;
-    }
-    ($mod, \@my_argv, $argv);
-}
-
-sub getopt {
-    my($argv, $opt) = @_;
-    return if @{ $argv //= [] } == 0;
-    use Getopt::Long qw(GetOptionsFromArray);
-    Getopt::Long::Configure qw(bundling);
-    GetOptionsFromArray $argv, $opt, hash_to_spec $opt
-	or die "Option parse error.\n";
-}
-
 sub finalize {
-    our($mod, $my_argv, $argv) = mod_argv @_;
-    getopt $my_argv, \%opt;
+    our($mod, $argv) = @_;
+    $config->deal_with(
+	$argv,
+	map "$_:1", keys %{$config},
+    );
     my @default = qw(--stripe-postgrep);
     my @cm = qw(@);
-    my $map = $opt{darkmode} ? $series{dark} : $series{light};
+    my $map = $config->{darkmode} ? $series{dark} : $series{light};
     for my $i (0, 1) {
-	for my $s (0 .. $opt{step} - 1) {
+	for my $s (0 .. $config->{step} - 1) {
 	    push @cm, $map->[$s % @$map]->[$i];
 	}
     }
@@ -219,7 +195,7 @@ sub finalize {
 #
 sub stripe {
     my $grep = shift;
-    my $step = $opt{step};
+    my $step = $config->{step};
     if ($step == 0) {
 	$step = _max_index($grep) + 1;
     }
@@ -239,14 +215,6 @@ sub _max_index {
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	$max = max($max, map($_->[2], @match));
-    }
-}
-
-sub set {
-    while (my($key, $val) = splice @_, 0, 2) {
-	next if $key eq &::FILELABEL;
-	die "$key: Invalid option.\n" if not exists $opt{$key};
-	$opt{$key} = $val;
     }
 }
 

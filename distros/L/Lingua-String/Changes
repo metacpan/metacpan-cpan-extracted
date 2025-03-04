@@ -1,5 +1,10 @@
 Revision history for Lingua-String
 
+0.06	Mon Mar  3 15:52:19 EST 2025
+	Only decode if not already UTF-8
+	Added t/30-basics.t
+	Use Params::Get
+
 0.05	Sun Nov  3 22:40:01 EST 2024
 	Use Test::DescribeMe to simplify tests
 	Use gtar to create a distribution on Macs

@@ -20,10 +20,11 @@ no_index:
 provides:
   App::Greple::stripe:
     file: lib/App/Greple/stripe.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   App::Greple: '9.16'
   Getopt::EX: v2.2.1
+  Getopt::EX::Config: '0'
   Hash::Util: '0'
   List::Util: '1.56'
   Scalar::Util: '0'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-stripe/issues
   homepage: https://github.com/kaz-utashiro/greple-stripe
   repository: https://github.com/kaz-utashiro/greple-stripe.git
-version: '1.00'
+version: '1.01'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

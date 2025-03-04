@@ -1,0 +1,220 @@
+NAME
+    Plack::App::Restricted - Plack application for restricted state.
+
+SYNOPSIS
+     use Plack::App::Restricted;
+
+     my $obj = Plack::App::Restricted->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::Restricted->new(%parameters);
+
+    Constructor.
+
+    *       "author"
+
+            Author string to HTML head.
+
+            Default value is undef.
+
+    *       "content_type"
+
+            Content type for output.
+
+            Default value is 'text/html; charset=__ENCODING__'.
+
+    *       "css"
+
+            Instance of CSS::Struct::Output object.
+
+            Default value is CSS::Struct::Output::Raw instance.
+
+    *       "css_init"
+
+            Reference to array with CSS::Struct structure.
+
+            Default value is CSS initialization from Tags::HTML::Page::Begin
+            like
+
+             * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+             }
+
+    *       "encoding"
+
+            Set encoding for output.
+
+            Default value is 'utf-8'.
+
+    *       "favicon"
+
+            Link to favicon.
+
+            Default value is undef.
+
+    *       "flag_begin"
+
+            Flag that means begin of html writing via
+            Tags::HTML::Page::Begin.
+
+            Default value is 1.
+
+    *       "flag_end"
+
+            Flag that means end of html writing via Tags::HTML::Page::End.
+
+            Default value is 1.
+
+    *       "generator"
+
+            HTML generator string.
+
+            Default value is 'Plack::App::Register; Version: __VERSION__'.
+
+    *       "label"
+
+            Restricted label.
+
+            Default value is 'Restricted access'.
+
+    *       "psgi_app"
+
+            PSGI application to run instead of normal process. Intent of
+            this is change application in "_process_actions" method.
+
+            Default value is undef.
+
+    *       "script_js"
+
+            Reference to array with Javascript code strings.
+
+            Default value is [].
+
+    *       "script_js_src"
+
+            Reference to array with Javascript URLs.
+
+            Default value is [].
+
+    *       "status_code"
+
+            HTTP status code.
+
+            Default value is 200.
+
+    *       "tags"
+
+            Instance of Tags::Output object.
+
+            Default value is
+
+             Tags::Output::Raw->new(
+                     'xml' => 1,
+                     'no_simple' => ['script', 'textarea'],
+                     'preserved' => ['pre', 'style'],
+             );
+
+    *       "title"
+
+            Page title.
+
+            Default value is 'Register page'.
+
+    Returns instance of object.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of env dump.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Restricted;
+     use Plack::Runner;
+     use Tags::Output::Indent;
+
+     # Run application.
+     my $app = Plack::App::Restricted->new(
+             'css' => CSS::Struct::Output::Indent->new,
+             'tags' => Tags::Output::Indent->new(
+                     'preserved' => ['style'],
+             ),
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # <!DOCTYPE html>
+     # <html lang="en">
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+     #     </meta>
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     #     </meta>
+     #     <style type="text/css">
+     # .container {
+     #      position: fixed;
+     #      top: 50%;
+     #      left: 50%;
+     #      transform: translate(-50%, -50%);
+     # }
+     # .inner {
+     #      text-align: center;
+     # }
+     # .restricted {
+     #      color: red;
+     #      font-family: sans-serif;
+     #      font-size: 3em;
+     # }
+     # </style>
+     #   </head>
+     #   <body>
+     #     <div class="container">
+     #       <div class="inner">
+     #         <div class="restricted">
+     #           Restricted access
+     #         </div>
+     #       </div>
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Plack::Component::Tags::HTML, Plack::Util::Accessor,
+    Tags::HTML::Container.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Restricted>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

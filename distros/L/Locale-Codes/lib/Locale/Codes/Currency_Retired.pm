@@ -3,7 +3,7 @@ Locale::Codes::Currency_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Dec  2 10:29:51 EST 2024
+#    Generated on: Mon Mar  3 11:04:05 EST 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.81';
+$VERSION='3.82';
 
 $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ADP) => q(Andorran Peseta),
@@ -23,6 +23,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(BEF) => q(Belgian Franc),
    q(BGL) => q(Lev),
    q(BYB) => q(Belarussian Ruble),
+   q(CUC) => q(Peso Convertible),
    q(CYP) => q(Cyprus Pound),
    q(DEM) => q(German Mark),
    q(ECS) => q(Sucre),
@@ -80,6 +81,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'code'} = {
    q(478) => q(Ouguiya),
    q(654) => q(Saint Helena Pound),
    q(678) => q(Dobra),
+   q(931) => q(Peso Convertible),
    q(932) => q(Zimbabwe Dollar),
    q(937) => q(Bolivar),
    q(998) => q(US Dollar (Same day)),
@@ -147,6 +149,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'name'} = {
    q(new romanian leu) => [ q(RON), q(New Romanian Leu) ],
    q(new zaire) => [ q(ZRN), q(New Zaire) ],
    q(nuevo sol) => [ q(PEN), q(Nuevo Sol) ],
+   q(peso convertible) => [ q(CUC), q(Peso Convertible) ],
    q(philippine peso) => [ q(PHP), q(Philippine Peso) ],
    q(philippine piso) => [ q(PHP), q(Philippine Piso) ],
    q(portuguese escudo) => [ q(PTE), q(Portuguese Escudo) ],
@@ -193,6 +196,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'name'} = {
    q(new manat) => [ q(934), q(New Manat) ],
    q(new romanian leu) => [ q(946), q(New Romanian Leu) ],
    q(nuevo sol) => [ q(604), q(Nuevo Sol) ],
+   q(peso convertible) => [ q(931), q(Peso Convertible) ],
    q(philippine peso) => [ q(608), q(Philippine Peso) ],
    q(philippine piso) => [ q(608), q(Philippine Piso) ],
    q(saint helena pound) => [ q(654), q(Saint Helena Pound) ],

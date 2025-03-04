@@ -1,5 +1,5 @@
 package CPU::x86_64::InstructionWriter::Label;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -7,9 +7,10 @@ use Carp;
 # ABSTRACT: Object representing a jump target in the code
 
 
-sub relative_to { @_ > 1 && carp "Read-only"; $_[0]{relative_to} }
-sub name  { @_ > 1 && carp "Read-only"; $_[0]{name} }
-sub offset { @_ > 1 && carp "Read-only"; $_[0]{offset} }
+sub relative_to { @_ > 1 && croak "Read-only"; $_[0]{relative_to} }
+sub name        { @_ > 1 && croak "Read-only"; $_[0]{name} }
+sub offset      { @_ > 1 && croak "Read-only"; $_[0]{offset} }
+sub len         { @_ > 1 && croak "Read-only"; $_[0]{len}||0 }
 sub value {
 	my $offset= $_[0]{offset};
 	my $rel= !defined $_[0]{relative_to}? 0
@@ -18,6 +19,11 @@ sub value {
 	defined $offset && defined $rel? $offset + $rel : undef;
 }
 
+
+sub clone_into_writer {
+	my ($self, $writer, $offset, $label_map)= @_;
+	return $label_map->{$self};
+}
 
 1;
 
@@ -33,7 +39,7 @@ CPU::x86_64::InstructionWriter::Label - Object representing a jump target in the
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

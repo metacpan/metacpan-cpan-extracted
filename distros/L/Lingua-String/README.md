@@ -4,7 +4,7 @@ Lingua::String - Class to contain a string in many different languages
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -36,6 +36,10 @@ Create a Lingua::String object.
     use Lingua::String;
 
     my $str = Lingua::String->new({ 'en' => 'Here', 'fr' => 'Ici' });
+
+Accepts various input formats, e.g. HASH or reference to a HASH.
+Clones existing objects with or without modifications.
+Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
 ## set
 
@@ -105,7 +109,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2021-2024 Nigel Horne.
+Copyright 2021-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.

@@ -9575,7 +9575,6 @@ currency:
       COP: Colombian Peso
       COU: Unidad de Valor Real
       CRC: Costa Rican Colon
-      CUC: Peso Convertible
       CUP: Cuban Peso
       CVE: Cabo Verde Escudo
       CZK: Czech Koruna
@@ -10052,9 +10051,6 @@ currency:
       pataca: 
         - MOP
         - Pataca
-      peso convertible: 
-        - CUC
-        - Peso Convertible
       peso uruguayo: 
         - UYU
         - Peso Uruguayo
@@ -10376,7 +10372,6 @@ currency:
       928: Bolivar Soberano
       929: Ouguiya
       930: Dobra
-      931: Peso Convertible
       933: Belarusian Ruble
       934: Turkmenistan New Manat
       936: Ghana Cedi
@@ -10760,9 +10755,6 @@ currency:
       pataca: 
         - 446
         - Pataca
-      peso convertible: 
-        - 931
-        - Peso Convertible
       peso uruguayo: 
         - 858
         - Peso Uruguayo
@@ -11050,6 +11042,7 @@ langext:
       hds: Honduras Sign Language
       hji: Haji
       hks: Hong Kong Sign Language
+      hnm: Hainanese
       hos: Ho Chi Minh City Sign Language
       hps: Hawai'i Sign Language (HSL)
       hsh: Hungarian Sign Language
@@ -11095,6 +11088,7 @@ langext:
       lsw: Seychelles Sign Language
       lsy: Mauritian Sign Language
       ltg: Latgalian
+      luh: Leizhou Chinese
       lvs: Standard Latvian
       lws: Malawian Sign Language
       lzh: Literary Chinese
@@ -11153,6 +11147,7 @@ langext:
       sgg: Swiss-German Sign Language
       sgx: Sierra Leone Sign Language
       shu: Chadian Arabic
+      sjc: Shaojiang Chinese
       slf: Swiss-Italian Sign Language
       sls: Singapore Sign Language
       sqk: Albanian Sign Language
@@ -11429,6 +11424,9 @@ langext:
       hadrami arabic: 
         - ayh
         - Hadrami Arabic
+      hainanese: 
+        - hnm
+        - Hainanese
       haiphong sign language: 
         - haf
         - Haiphong Sign Language
@@ -11558,6 +11556,9 @@ langext:
       latvian sign language: 
         - lsl
         - Latvian Sign Language
+      leizhou chinese: 
+        - luh
+        - Leizhou Chinese
       levantine arabic: 
         - apc
         - Levantine Arabic
@@ -11789,6 +11790,9 @@ langext:
       seychelles sign language: 
         - lsw
         - Seychelles Sign Language
+      shaojiang chinese: 
+        - sjc
+        - Shaojiang Chinese
       shihhi arabic: 
         - ssh
         - Shihhi Arabic
@@ -13622,7 +13626,7 @@ language:
       bqi: Bakhtiari
       bqj: Bandial
       bqk: Banda-Mbres
-      bql: Bilakura
+      bql: Karian
       bqm: Wumboko
       bqn: Bulgarian Sign Language
       bqo: Balo
@@ -14223,7 +14227,7 @@ language:
       daw: Davawenyo
       dax: Dayi
       day: Land Dayak languages
-      daz: Dao
+      daz: Moi-Wadea
       dba: Bangime
       dbb: Deno
       dbd: Dadiya
@@ -14264,7 +14268,6 @@ language:
       deg: Degema
       deh: Dehwari
       dei: Demisa
-      dek: Dek
       del: Delaware
       dem: Dem
       den: Slave (Athapascan)
@@ -15184,6 +15187,7 @@ language:
       hnh: Ani
       hni: Hani
       hnj: Hmong Njua
+      hnm: Hainanese
       hnn: Hanunoo
       hno: Northern Hindko
       hns: Caribbean Hindustani
@@ -16542,6 +16546,7 @@ language:
       lue: Luvale
       luf: Laua
       lug: Ganda
+      luh: Leizhou Chinese
       lui: Luiseno
       luj: Luna
       luk: Lunanakha
@@ -16891,7 +16896,7 @@ language:
       mmf: Mundat
       mmg: North Ambrym
       mmh: Mehinaku
-      mmi: Musar
+      mmi: Hember Avu
       mmj: Majhwar
       mmk: Mukha-Dora
       mml: Man Met
@@ -17615,7 +17620,6 @@ language:
       nsy: Nasal
       nsz: Nisenan
       ntd: Northern Tidung
-      nte: Nathembo
       ntg: Ngantangarra
       nti: Natioro
       ntj: Ngaanyatjarra
@@ -18665,6 +18669,7 @@ language:
       siz: Siwi
       sja: Epena
       sjb: Sajau Basap
+      sjc: Shaojiang Chinese
       sjd: Kildin Sami
       sje: Pite Sami
       sjg: Assangori
@@ -20441,6 +20446,7 @@ language:
       ymx: Northern Muji
       ymz: Muzi
       yna: Aluo
+      ynb: Yamben
       ynd: Yandruwandha
       yne: Lang'e
       yng: Yango
@@ -23305,9 +23311,6 @@ language:
       bila: 
         - bip
         - Bila
-      bilakura: 
-        - bql
-        - Bilakura
       bilaspuri: 
         - kfs
         - Bilaspuri
@@ -25324,9 +25327,6 @@ language:
       danu: 
         - dnv
         - Danu
-      dao: 
-        - daz
-        - Dao
       daonda: 
         - dnd
         - Daonda
@@ -25432,9 +25432,6 @@ language:
       dehwari: 
         - deh
         - Dehwari
-      dek: 
-        - dek
-        - Dek
       dela-oenale: 
         - row
         - Dela-Oenale
@@ -27754,6 +27751,9 @@ language:
       haigwai: 
         - hgw
         - Haigwai
+      hainanese: 
+        - hnm
+        - Hainanese
       haiom: 
         - hgm
         - Haiom
@@ -27931,6 +27931,9 @@ language:
       hemba: 
         - hem
         - Hemba
+      hember avu: 
+        - mmi
+        - Hember Avu
       herde: 
         - hed
         - Herde
@@ -29797,6 +29800,9 @@ language:
       kari: 
         - kbj
         - Kari
+      karian: 
+        - bql
+        - Karian
       karingani: 
         - kgn
         - Karingani
@@ -31972,6 +31978,9 @@ language:
       leipon: 
         - lek
         - Leipon
+      leizhou chinese: 
+        - luh
+        - Leizhou Chinese
       lelak: 
         - llk
         - Lelak
@@ -34414,6 +34423,9 @@ language:
       moi (indonesia): 
         - mxn
         - Moi (Indonesia)
+      moi-wadea: 
+        - daz
+        - Moi-Wadea
       moikodi: 
         - mkp
         - Moikodi
@@ -34900,9 +34912,6 @@ language:
       musak: 
         - mmq
         - Musak
-      musar: 
-        - mmi
-        - Musar
       musasa: 
         - smm
         - Musasa
@@ -35233,9 +35242,6 @@ language:
       nateni: 
         - ntm
         - Nateni
-      nathembo: 
-        - nte
-        - Nathembo
       natioro: 
         - nti
         - Natioro
@@ -39523,6 +39529,9 @@ language:
       shanga: 
         - sho
         - Shanga
+      shaojiang chinese: 
+        - sjc
+        - Shaojiang Chinese
       sharanahua: 
         - mcd
         - Sharanahua
@@ -44128,6 +44137,9 @@ language:
       yamba: 
         - yam
         - Yamba
+      yamben: 
+        - ynb
+        - Yamben
       yambes: 
         - ymb
         - Yambes
@@ -46836,12 +46848,15 @@ langvar:
       kleinsch: Kleinschmidt orthography
       kociewie: The Kociewie dialect of Polish
       kscor: Standard Cornish orthography of Revived Cornish
+      leidentr: Ancient Egyptian in Leiden Unified Transliteration
       lemosin: Limousin
       lengadoc: Languedocien
       lipaw: The Lipovaz dialect of Resian
       ltg1929: The Latgalian language orthography codified in 1929
       ltg2007: The Latgalian language orthography codified in the language law in 2007
       luna1918: Post-1917 Russian orthography
+      mdcegyp: Ancient Egyptian hieroglyphs encoded in Manuel de Codage
+      mdctrans: Ancient Egyptian transliteration encoded in Manuel de Codage
       metelko: Slovene in Metelko alphabet
       monoton: Monotonic Greek
       ndyuka: Ndyuka dialect
@@ -46904,6 +46919,15 @@ langvar:
       aluku dialect: 
         - aluku
         - Aluku dialect
+      ancient egyptian hieroglyphs encoded in manuel de codage: 
+        - mdcegyp
+        - Ancient Egyptian hieroglyphs encoded in Manuel de Codage
+      ancient egyptian in leiden unified transliteration: 
+        - leidentr
+        - Ancient Egyptian in Leiden Unified Transliteration
+      ancient egyptian transliteration encoded in manuel de codage: 
+        - mdctrans
+        - Ancient Egyptian transliteration encoded in Manuel de Codage
       anpezo standard of ladin: 
         - anpezo
         - Anpezo standard of Ladin
@@ -47257,6 +47281,7 @@ script:
       Bass: Bassa Vah
       Batk: Batak
       Beng: Bengali
+      Berf: Beria Erfe
       Bhks: Bhaiksuki
       Blis: Blissymbols
       Bopo: Bopomofo
@@ -47503,6 +47528,9 @@ script:
       bengali: 
         - Beng
         - Bengali
+      beria erfe: 
+        - Berf
+        - Beria Erfe
       bhaiksuki: 
         - Bhks
         - Bhaiksuki
@@ -48205,6 +48233,7 @@ script:
       240: Georgian (Mkhedruli and Mtavruli)
       241: Khutsuri (Asomtavruli and Nuskhuri)
       250: Deseret (Mormon)
+      258: Beria Erfe
       259: Bassa Vah
       260: Osmanya
       261: Ol Chiki (Ol Cemet, Ol, Santali)
@@ -48386,6 +48415,9 @@ script:
       bengali (bangla): 
         - 325
         - Bengali (Bangla)
+      beria erfe: 
+        - 258
+        - Beria Erfe
       bhaiksuki: 
         - 334
         - Bhaiksuki

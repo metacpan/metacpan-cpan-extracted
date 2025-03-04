@@ -34,7 +34,9 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "HTML::Entities" : "0",
+            "Params::Get" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.006002"
          }
@@ -63,6 +65,6 @@
          "x_repository" : "https://github.com/nigelhorne/Lingua-String"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
