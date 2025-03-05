@@ -1,8 +1,10 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
+
+use Encode qw(from_to);
 
 use XML::LibXML;
 
@@ -12,6 +14,9 @@ use EBook::Ishmael::MobiHuff;
 
 # Many thanks to Tommy Persson, the original author of mobi2html, a script
 # which much of this code is based off of.
+
+# TODO: Implement AZW3 support
+# TODO: Implement AZW4 support
 
 my $TYPE    = 'BOOK';
 my $CREATOR = 'MOBI';
@@ -34,18 +39,13 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
 	return 0 unless -s $file >= 68;
-
-	open my $fh, '<', $file
-		or die "Failed to to open $file for reading: $!\n";
-	binmode $fh;
 
 	seek $fh, 32, 0;
 	read $fh, my ($null), 1;
 
-	# The PDB title must be null-padded, so the last byte should be a null
-	# byte
 	unless ($null eq "\0") {
 		return 0;
 	}
@@ -53,8 +53,6 @@ sub heuristic {
 	seek $fh, 60, 0;
 	read $fh, my ($type),    4;
 	read $fh, my ($creator), 4;
-
-	close $fh;
 
 	return $type eq $TYPE && $creator eq $CREATOR;
 
@@ -156,7 +154,7 @@ sub _read_exth {
 	my %special = (
 		201 => sub {
 			defined $self->{_imgrec}
-				? $self->{_coverrec} = $self->{_imgrec} + unpack "N", shift
+				? $self->{_coverrec} = $self->{_imgrec} + unpack "N", $_[0]
 				: undef
 		},
 	);
@@ -211,6 +209,7 @@ sub new {
 		_huff        => undef,
 		_imgrec      => undef,
 		_coverrec    => undef,
+		_lastcont    => undef,
 	};
 
 	bless $self, $class;
@@ -247,8 +246,6 @@ sub new {
 		die "Cannot read encrypted Mobi $self->{Source}\n";
 	}
 
-	my $mobihdr = substr $hdr, 16;
-
 	(
 		$self->{_doctype},
 		$self->{_length},
@@ -256,13 +253,31 @@ sub new {
 		$self->{_codepage},
 		$self->{_uid},
 		$self->{_version},
-	) = unpack "a4 N N N N N", $mobihdr;
+	) = unpack "a4 N N N N N", substr $hdr, 16, 4 * 6;
 
-	my ($toff, $tlen) = unpack "N N", substr $mobihdr, 0x54 - 16;
-	$self->{_imgrec} = unpack "N", substr $mobihdr, 0x6c - 16;
-	$self->{_exth_flag}  = unpack "N", substr $mobihdr, 0x70;
-	$self->{_extra_data} = unpack "n", substr $mobihdr, 0xf2 - 16;
-	my ($hoff, $hcount) = unpack "N N", substr $mobihdr, 0x70 - 16;
+	unless ($self->{_codepage} == 1252 or $self->{_codepage} == 65001) {
+		die "Mobi $self->{Source} uses an unsupported text encoding\n";
+	}
+
+	if ($self->{_version} >= 8) {
+		die "$self->{Source} uses an unsupported version of Mobi\n";
+	}
+
+	# Read some parts of the Mobi header that we care about.
+	my ($toff, $tlen)    = unpack "N N", substr $hdr, 0x54, 8;
+	$self->{_imgrec}     = unpack "N",   substr $hdr, 0x6c, 4;
+	my ($hoff, $hcount)  = unpack "N N", substr $hdr, 0x70, 8;
+	$self->{_exth_flag}  = unpack "N",   substr $hdr, 0x80, 4;
+	$self->{_lastcont}   = unpack "n",   substr $hdr, 0xc2, 2;
+	$self->{_extra_data} = unpack "n",   substr $hdr, 0xf2, 2;
+
+	if ($self->{_lastcont} > $self->{_pdb}->recnum - 1) {
+		$self->{_lastcont} = $self->{_pdb}->recnum - 1;
+	}
+
+	if ($self->{_imgrec} >= $self->{_lastcont}) {
+		undef $self->{_imgrec};
+	}
 
 	if ($self->{_compression} == 17480) {
 
@@ -278,14 +293,16 @@ sub new {
 	$self->{Metadata}->title([ substr $hdr, $toff, $tlen ]);
 
 	if ($self->{_exth_flag}) {
-		$self->_read_exth(substr $mobihdr, $self->{_length});
+		$self->_read_exth(substr $hdr, $self->{_length} + 16);
 	}
 
 	unless (@{ $self->{Metadata}->created }) {
 		$self->{Metadata}->created([ scalar gmtime $self->{_pdb}->cdate ]);
 	}
 
-	$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+	if ($self->{_pdb}->mdate) {
+		$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+	}
 
 	unless (@{ $self->{Metadata}->format }) {
 		$self->{Metadata}->format([ 'MOBI' ]);
@@ -306,6 +323,11 @@ sub html {
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 
 	my $cont = join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1);
+
+	if ($self->{_codepage} == 1252) {
+		from_to($cont, "cp1252", "utf-8")
+			or die "Failed to encode Mobi $self->{Source} text as utf-8\n";
+	}
 
 	_clean_html(\$cont);
 
@@ -378,6 +400,31 @@ sub cover {
 	close $fh;
 
 	return $out // $bin;
+
+}
+
+sub image_num {
+
+	my $self = shift;
+
+	return defined $self->{_imgrec}
+		? $self->{_lastcont} - ($self->{_imgrec} - 1)
+		: 0;
+
+}
+
+sub image {
+
+	my $self = shift;
+	my $n    = shift;
+
+	if ($n >= $self->image_num) {
+		return undef;
+	}
+
+	my $img = $self->{_pdb}->record($self->{_imgrec} + $n)->data;
+
+	return \$img;
 
 }
 

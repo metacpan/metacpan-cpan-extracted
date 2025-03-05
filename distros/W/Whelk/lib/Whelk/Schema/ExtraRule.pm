@@ -1,9 +1,9 @@
 package Whelk::Schema::ExtraRule;
-$Whelk::Schema::ExtraRule::VERSION = '1.01';
+$Whelk::Schema::ExtraRule::VERSION = '1.02';
 use Whelk::StrictBase;
 use Carp;
 
-our @CARP_NOT = qw(Whelk::Schema);
+our @CARP_NOT = qw(Whelk::Schema Kelp::Base);
 
 attr '?openapi' => sub { {} };
 attr '?hint' => sub { croak 'hint is required in rules' };

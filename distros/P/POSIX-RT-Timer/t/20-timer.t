@@ -41,7 +41,7 @@ use POSIX qw/SIGUSR1 pause/;
 	alarm 0;
 }
 
-my $hasmodules = eval { require POSIX::RT::Signal; require Signal::Mask; POSIX::RT::Signal->VERSION(0.009) };
+my $hasmodules = eval { require POSIX::RT::Signal; require Signal::Mask; POSIX::RT::Signal->VERSION(0.018) };
 
 {
 	alarm 2;
@@ -65,9 +65,9 @@ my $hasmodules = eval { require POSIX::RT::Signal; require Signal::Mask; POSIX::
 		local $Signal::Mask{USR1} = 1;
 		$expected += 3;
 		for (4..6) {
-			my $result = POSIX::RT::Signal::sigwaitinfo(SIGUSR1, 1);
+			my $result = POSIX::RT::Signal::sigtimedwait(SIGUSR1, 1);
 			is($counter++, $compare++, 'Counter equals compare');
-			is $result->{value}, 42, 'identifier is 42';
+			is $result->value, 42, 'identifier is 42';
 		}
 	}
 

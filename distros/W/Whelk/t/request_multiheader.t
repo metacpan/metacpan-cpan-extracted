@@ -17,11 +17,11 @@ my $t = Kelp::Test->new(app => $app);
 ################################################################################
 
 $t->request(GET '/multiheader')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Header parameters .+\[X-Test\]->required$})});
 
 $t->request(GET '/multiheader', 'X-Test' => 'str')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Header parameters .+->number})});
 
 $t->request(GET '/multiheader', 'X-Test' => 25)

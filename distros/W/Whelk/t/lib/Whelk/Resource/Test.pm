@@ -46,6 +46,16 @@ sub api
 	);
 
 	$self->add_endpoint(
+		[GET => '/code_201'] => sub {
+			return !!1;
+		},
+		response => {
+			type => 'boolean',
+		},
+		response_code => 201,
+	);
+
+	$self->add_endpoint(
 		[POST => '/err'] => {
 			to => 'test#error_action',
 		},

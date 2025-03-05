@@ -1,5 +1,5 @@
 package Whelk::Wrapper;
-$Whelk::Wrapper::VERSION = '1.01';
+$Whelk::Wrapper::VERSION = '1.02';
 use Kelp::Base;
 
 use Try::Tiny;
@@ -21,7 +21,7 @@ sub inhale_request
 		$params->path_schema->inhale_or_error(
 			$req->named,
 			sub {
-				Whelk::Exception->throw(400, hint => "Path parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Path parameters error at: $_[0]");
 			}
 		);
 	}
@@ -30,7 +30,7 @@ sub inhale_request
 		my $new_query = $params->query_schema->inhale_exhale(
 			$req->query_parameters->mixed,
 			sub {
-				Whelk::Exception->throw(400, hint => "Query parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Query parameters error at: $_[0]");
 			}
 		);
 
@@ -50,7 +50,7 @@ sub inhale_request
 		$params->header_schema->inhale_or_error(
 			\%headers,
 			sub {
-				Whelk::Exception->throw(400, hint => "Header parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Header parameters error at: $_[0]");
 			}
 		);
 	}
@@ -59,7 +59,7 @@ sub inhale_request
 		$params->cookie_schema->inhale_or_error(
 			$req->cookies,
 			sub {
-				Whelk::Exception->throw(400, hint => "Cookie parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Cookie parameters error at: $_[0]");
 			}
 		);
 	}
@@ -68,7 +68,7 @@ sub inhale_request
 		$req->stash->{request} = $endpoint->request->inhale_exhale(
 			$endpoint->formatter->get_request_body($app),
 			sub {
-				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Content error at: $_[0]");
 			}
 		);
 	}
@@ -81,8 +81,8 @@ sub exhale_response
 	my $schema = $self->map_code_to_schema($endpoint, $code);
 	my $path = $endpoint->path;
 
-	if ($schema->empty) {
-		if ($code != 200) {
+	if ($schema && $schema->empty) {
+		if ($self->_get_code_class($code) ne '2XX') {
 			die "gave up trying to find a non-empty schema for $path"
 				if $code == 500;
 
@@ -90,8 +90,6 @@ sub exhale_response
 			my $error = $self->on_error($app, "empty schema for non-success code in $path (code $code)");
 			return $self->exhale_response($app, $endpoint, $error);
 		}
-
-		$app->res->set_code(204);
 	}
 	else {
 		$response = $self->wrap_response($response, $code);
@@ -100,7 +98,7 @@ sub exhale_response
 	if (!$schema) {
 
 		# make sure not to loop if code is already 500
-		die "gave up trying to find a schema for $path"
+		Kelp::Exception->throw(508, body => "gave up trying to find a schema for $path")
 			if $code == 500;
 
 		$app->res->set_code(500);
@@ -155,7 +153,7 @@ sub prepare_response
 
 	# decide on the resulting code and data based on status
 	if ($success) {
-		$res->set_code(200) unless $res->code;
+		$res->set_code($endpoint->response_code) unless $res->code;
 	}
 	else {
 		if (blessed $data && $data->isa('Kelp::Exception')) {
@@ -176,24 +174,32 @@ sub prepare_response
 	return $self->exhale_response($app, $endpoint, $data);
 }
 
+sub _get_code_class
+{
+	my ($self, $code) = @_;
+
+	substr $code, 1, 2, 'XX';
+	return $code;
+}
+
 sub map_code_to_schema
 {
 	my ($self, $endpoint, $code) = @_;
 
-	my $code_class = int($code / 100) * 100;
-	return $endpoint->response_schemas->{$code_class};
+	my $schemas = $endpoint->response_schemas;
+	return $schemas->{$code} // $schemas->{$self->_get_code_class($code)};
 }
 
 sub wrap_response
 {
 	my ($self, $data, $code) = @_;
 	state $map = {
-		200 => 'success',
-		400 => 'client_error',
-		500 => 'server_error',
+		'2XX' => 'success',
+		'4XX' => 'client_error',
+		'5XX' => 'server_error',
 	};
 
-	my $code_class = int($code / 100) * 100;
+	my $code_class = $self->_get_code_class($code);
 	my $method = "wrap_$map->{$code_class}";
 
 	return $self->$method($data);
@@ -303,7 +309,7 @@ encoding requests and responses (for example with C<JSON>), that's a job for
 L<Whelk::Formatter>.
 
 In addition, wrapper decides how to treat failures. It defines schemas for
-errors with status classes 400 and 500 and uses those instead of response
+errors with status classes 4XX and 5XX and uses those instead of response
 schema defined for the endpoint in case an error occurs.
 
 Whelk implements two basic wrappers which can be used out of the box:
@@ -355,7 +361,7 @@ L<Whelk::Schema/build>. Regular success schema should nest the value of C<<
 $endpoint->response >> schema inside of it.
 
 The status codes need not to be exact. By default, only their class is
-important (C<200>, C<400> or C<500>). The exact semantics of that mapping is
+important (C<2XX>, C<4XX> or C<5XX>). The exact semantics of that mapping is
 defined in another method, L</map_code_to_schema>.
 
 If the schema from C<< $endpoint->response >> is empty via C<<

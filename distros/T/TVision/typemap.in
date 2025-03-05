@@ -1,0 +1,123 @@
+{{{
+# this file is for Text::Template with DELIMITERS=>['{{{','}}}'] option,
+# So it could be processed this way:
+# perl -MText::Template -we "Text::Template::fill_in_file('typemap.in', DELIMITERS=>['{{{','}}}'],OUTPUT => \*STDOUT)" > typemap
+# alternatively, this file could be transformed with vim-plugin vispen
+
+@tclasses = qw(
+    TVApp
+    TApplication
+    TProgram
+    TBackground
+    TDeskTop
+    TButton
+    TMenu
+    TGroup
+    TWindow
+    TFrame
+    TEditWindow
+    TView
+    TInputLine
+    TLabel
+    TStaticText
+    TStatusLine
+    TStatusDef
+    TStatusItem
+    TCheckBoxes
+    TRadioButtons
+    TScroller
+    TScrollBar
+    TIndicator
+    TEditor
+    TDialog
+    TScreen
+    TSItem
+    TMenuItem
+    TMenuBar
+    TSubMenu
+    TValidator
+    THistory
+);
+
+=comment
+
+    TEvent
+    TKeys
+    MsgBox
+    TObject
+    TRect
+
+O_TObject
+  $var= tvision_info_from_magic($arg, OR_DIE)->tobj;
+O_TButton
+  $var= dynamic_cast<TButton*>(tvision_info_from_magic($arg, OR_DIE)->tobj);
+  if (!$var) croak(\"Not an instance of TButton\");
+=cut
+''}}}
+TYPEMAP
+TRect O_TRect
+TPoint O_TPoint
+{{{
+join '', map {"$_*  O_$_\n"} @tclasses;
+}}}
+
+INPUT
+O_TRect
+    AV *_av = (AV*) SvRV($arg);
+    SV** _f0 = av_fetch(_av, 0, 0);
+    SV** _f1 = av_fetch(_av, 1, 0);
+    SV** _f2 = av_fetch(_av, 2, 0);
+    SV** _f3 = av_fetch(_av, 3, 0);
+    if (!_f0 || !_f1 || !_f2 || !_f3)
+	croak(\"self[0] does not contain tvision object\");
+    $var = TRect(SvIV(*_f0),SvIV(*_f1),SvIV(*_f2),SvIV(*_f3));
+O_TPoint
+    AV *_av = (AV*) SvRV($arg);
+    SV** _f0 = av_fetch(_av, 0, 0);
+    SV** _f1 = av_fetch(_av, 1, 0);
+    if (!_f0 || !_f1)
+	croak(\"self[0] does not contain tvision object\");
+    $var.x = SvIV(*_f0);
+    $var.y = SvIV(*_f1);
+{{{
+join '', map {<<"EOS"} @tclasses;
+O_$_
+  \$var = ($_*)sv2tv_a(\$arg);
+EOS
+}}}
+
+OUTPUT
+O_Xxxxx
+    // Look in TVision.cpp: var=$var arg=$arg type=$type Package=$Package
+    // they give us in $arg the RETVALSV = sv_newmortal();
+    // need to make rv out of it, pointing to new AV
+    // TODO: is it possible to upgrade provided SV rather than ignoring it?
+    // TODO: polish refcounts and other memory leaks here
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("$Package", GV_ADD));
+O_TRect
+    AV *_self = newAV();
+    av_store(_self, 0, newSViv($var.a.x));
+    av_store(_self, 1, newSViv($var.a.y));
+    av_store(_self, 2, newSViv($var.b.x));
+    av_store(_self, 3, newSViv($var.b.y));
+    $arg = newRV_inc((SV*) _self);
+    sv_bless($arg, gv_stashpv("TVision::TRect", GV_ADD));
+O_TPoint
+    AV *_self = newAV();
+    av_store(_self, 0, newSViv($var.x));
+    av_store(_self, 1, newSViv($var.y));
+    $arg = newRV_inc((SV*) _self);
+    sv_bless($arg, gv_stashpv("TVision::TPoint", GV_ADD));
+{{{
+join '', map {"O_$_\n" . <<'EOS' . ($_ eq 'TButton'?<<'EOS':'')} @tclasses;
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+EOS
+    av_store(self, 1, newSViv(cmd));  /*this cmd is very wrong here*/
+EOS
+}}}

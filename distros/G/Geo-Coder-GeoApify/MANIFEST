@@ -8,11 +8,16 @@ README.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t
+t/cache.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
 t/geoapify.t
+t/offline.t
+t/pod-cm.t
 t/pod-snippets.t
 t/pod-spelling.t
+t/pod.t
+t/port.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

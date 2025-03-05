@@ -1,7 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
-use Test::More tests => 4 + 1;
+use v5.14;
+use warnings;
+
+use Test2::V0;
 use Test::NoWarnings;
 
 BEGIN {
@@ -28,3 +30,6 @@ substr( $var, 9, 0 ) = "cruel ";
 is( $var,
     "Goodbye, cruel world",
     'substr manipulation by lvalue' );
+
+Test::NoWarnings::had_no_warnings;
+done_testing;

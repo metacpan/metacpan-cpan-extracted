@@ -25,6 +25,7 @@ if (my $result = rpsls($choice)) {
       common   => \%common,
       sleep    => 0,
       infinite => 0,
+      port     => qr/fluid/i,
     )->play;
 }
 

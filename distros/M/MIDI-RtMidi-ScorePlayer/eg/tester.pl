@@ -16,6 +16,7 @@ MIDI::RtMidi::ScorePlayer->new(
     common   => \%common,
     sleep    => 0,
     infinite => 1,
+    port     => qr/fluid/i,
 )->play;
 
 sub part {

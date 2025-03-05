@@ -7,6 +7,7 @@ use Test::More;
 use File::Spec;
 
 use EBook::Ishmael::EBook;
+use EBook::Ishmael::ImageID;
 
 my $FB = File::Spec->catfile(qw/t data gpl3.fb2/);
 
@@ -39,9 +40,17 @@ ok($ebook->html, "html ok");
 ok($ebook->has_cover, "has cover");
 
 is(
-	substr($ebook->cover, 0, 3),
-	pack("CCC", 0xff, 0xd8, 0xff),
-	"cover looks liek a jpeg"
+	image_id(\($ebook->cover)),
+	"jpg",
+	"cover looks like a jpeg"
+);
+
+is($ebook->image_num, 1, "image count ok");
+
+is(
+	image_id($ebook->image(0)),
+	"jpg",
+	"image #0 ok"
 );
 
 done_testing();

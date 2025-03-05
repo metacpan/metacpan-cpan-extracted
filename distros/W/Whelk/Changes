@@ -1,5 +1,14 @@
 Revision history for Whelk
 
+1.02 - 2025-03-04
+	- Added response_code to endpoint definition, which changes success code in generated OpenAPI
+	- Added 'schemas' method to resources as a special method executed before 'api' method is executed
+	- Not setting response in endpoint definition now assumes empty response (status 204)
+	- API Failures now use more specific HTTP response codes
+	- Changed how wrappers set their response schemas
+		- Status classes 4XX and 5XX are now used by built in wrappers
+		- Wrapper maps statuses to NXX, instead of N00 (for example 2XX instead of 200)
+
 1.01 - 2024-10-06
 	- Added nullable attribute to schemas
 	- Fixed object strictness check

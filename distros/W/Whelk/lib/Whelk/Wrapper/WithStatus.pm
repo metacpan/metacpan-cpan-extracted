@@ -1,5 +1,5 @@
 package Whelk::Wrapper::WithStatus;
-$Whelk::Wrapper::WithStatus::VERSION = '1.01';
+$Whelk::Wrapper::WithStatus::VERSION = '1.02';
 use Kelp::Base 'Whelk::Wrapper';
 
 use Whelk::Schema;
@@ -30,11 +30,11 @@ sub build_response_schemas
 	my $schema = $endpoint->response;
 	my $schemas = $endpoint->response_schemas;
 
-	if ($schema && $schema->empty) {
-		$schemas->{200} = $schema;
+	if ($schema->empty) {
+		$schemas->{$endpoint->response_code} = $schema;
 	}
 	elsif ($schema) {
-		$schemas->{200} = Whelk::Schema->build(
+		$schemas->{$endpoint->response_code} = Whelk::Schema->build(
 			{
 				type => 'object',
 				properties => {
@@ -48,7 +48,7 @@ sub build_response_schemas
 		);
 	}
 
-	$schemas->{500} = $schemas->{400} = Whelk::Schema->get_or_build(
+	$schemas->{'5XX'} = $schemas->{'4XX'} = Whelk::Schema->get_or_build(
 		api_error_with_status => {
 			type => 'object',
 			properties => {

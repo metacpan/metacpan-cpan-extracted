@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.1.8};
+our $VERSION = q{0.2.0};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -186,6 +186,28 @@ reference that's been populated via C<av_push>.
 
 =back
 
+=head1 PROVIDED PERL ARRAY COUNTING FUNCTIONS
+
+=over 4
+
+=item C<int PerlOMP_1D_Array_NUM_ELEMENTS (SV *AVref)>
+
+Returns the integer count of number of elements in the array reference. The 
+functino doesn't care what is in the elements.
+
+=item C<int PerlOMP_2D_AoA_NUM_ROWS(SV *AoAref)>
+
+Returns the integer count of number of rows in a 2D array reference. The
+fucntion doesn't care what the rows looks like or what is in them
+
+=item C<int PerlOMP_2D_AoA_NUM_COLS(SV *AoAref)>
+
+Returns the number of elements in the first row of the provided 2D array
+reference. It assumes all rows are the same. It doesn't verify the contents
+of each row.
+
+=back
+
 =head1 PROVIDED PERL TO C CONVERSION FUNCTIONS
 
 B<Note>: Work is currently focused on finding the true limits of the Perl C
@@ -195,13 +217,131 @@ structures into its pure C<C> equivalent.
 
 =over 4
 
-=item C<PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes)>
+=item C<PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY>
 
-Used to extract the contents of a 2D rectangular Perl array reference that
-has been used to represent a 2D matrix.
+  void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY(SV *AVref, int numElements, float retArray[numElements]);
 
-    float nodes[num_nodes][dims];
-    PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes);
+Converts a 1D Perl Array Reference (C<AV*>) into a 1D C array of floats. This function assumes the Perl array contains numeric floating point values.
+
+=item C<PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY_r>
+
+  void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY_r(SV *AVref, int numElements, float retArray[numElements]);
+
+The parallelized version of C<PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=item C<PerlOMP_1D_Array_TO_1D_INT_ARRAY>
+
+  void PerlOMP_1D_Array_TO_1D_INT_ARRAY(SV *AVref, int numElements, int retArray[numElements]);
+
+Converts a 1D Perl Array Reference (C<AV*>) into a 1D C array of integers. This function assumes the Perl array contains integer values.
+
+=item C<PerlOMP_1D_Array_TO_1D_INT_ARRAY_r>
+
+  void PerlOMP_1D_Array_TO_1D_INT_ARRAY_r(SV *AVref, int numElements, int retArray[numElements]);
+
+The parallelized version of C<PerlOMP_1D_Array_TO_1D_INT_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=item C<PerlOMP_1D_Array_TO_1D_STRING_ARRAY>
+
+  void PerlOMP_1D_Array_TO_1D_STRING_ARRAY(SV *AVref, int numElements, char *retArray[numElements]);
+
+Converts a 1D Perl Array Reference (C<AV*>) into a 1D C array of strings. The Perl array should contain string values.
+
+=item C<PerlOMP_1D_Array_TO_1D_STRING_ARRAY_r>
+
+  void PerlOMP_1D_Array_TO_1D_STRING_ARRAY_r(SV *AVref, int numElements, char *retArray[numElements]);
+
+The parallelized version of C<PerlOMP_1D_Array_TO_1D_STRING_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=item C<PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY>
+
+  void PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(SV *AoA, int numRows, int rowSize, float retArray[numRows][rowSize]);
+
+Converts a 2D Array of Arrays (AoA) in Perl into a 2D C array of floats. The Perl array should be an array of arrays, where each inner array contains floating point values.
+
+=item C<PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY_r>
+
+  void PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY_r(SV *AoA, int numRows, int rowSize, float retArray[numRows][rowSize]);
+
+The parallelized version of C<PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=item C<PerlOMP_2D_AoA_TO_2D_INT_ARRAY>
+
+  void PerlOMP_2D_AoA_TO_2D_INT_ARRAY(SV *AoA, int numRows, int rowSize, int retArray[numRows][rowSize]);
+
+Converts a 2D Array of Arrays (AoA) in Perl into a 2D C array of integers. The Perl array should be an array of arrays, where each inner array contains integer values.
+
+=item C<PerlOMP_2D_AoA_TO_2D_INT_ARRAY_r>
+
+  void PerlOMP_2D_AoA_TO_2D_INT_ARRAY_r(SV *AoA, int numRows, int rowSize, int retArray[numRows][rowSize]);
+
+The parallelized version of C<PerlOMP_2D_AoA_TO_2D_INT_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=item C<PerlOMP_2D_AoA_TO_2D_STRING_ARRAY>
+
+  void PerlOMP_2D_AoA_TO_2D_STRING_ARRAY(SV *AoA, int numRows, int rowSize, char *retArray[numRows][rowSize]);
+  
+Converts a 2D Array of Arrays (AoA) in Perl into a 2D C array of strings. The Perl array should be an array of arrays, where each inner array contains string values.
+
+=item C<PerlOMP_2D_AoA_TO_2D_STRING_ARRAY_r>
+
+  void PerlOMP_2D_AoA_TO_2D_STRING_ARRAY_r(SV *AoA, int numRows, int rowSize, char *retArray[numRows][rowSize]);
+  
+The parallelized version of C<PerlOMP_2D_AoA_TO_2D_STRING_ARRAY> using OpenMP. This function performs the same operation, but the array conversion is parallelized with OpenMP.
+
+=back
+
+=head1 PROVIDED ARRAY MEMBER VERIFICATION FUNCTIONS
+
+=over 4
+
+=item C<PerlOMP_VERIFY_1D_Array>
+
+  void PerlOMP_VERIFY_1D_Array(SV* array);
+
+Verifies that the given Perl variable is a valid 1D array reference.
+
+=item C<PerlOMP_VERIFY_1D_INT_ARRAY>
+
+  void PerlOMP_VERIFY_1D_INT_ARRAY(SV* array);
+
+Verifies that the given 1D array contains only integer values.
+
+=item C<PerlOMP_VERIFY_1D_FLOAT_ARRAY>
+
+  void PerlOMP_VERIFY_1D_FLOAT_ARRAY(SV* array);
+
+Verifies that the given 1D array contains only floating-point values.
+
+=item C<PerlOMP_VERIFY_1D_CHAR_ARRAY>
+
+  void PerlOMP_VERIFY_1D_CHAR_ARRAY(SV* array);
+
+Verifies that the given 1D array contains only string values.
+
+=item C<PerlOMP_VERIFY_2D_AoA>
+
+  void PerlOMP_VERIFY_2D_AoA(SV* array);
+
+Verifies that the given Perl variable is a valid 2D array of arrays (AoA) reference.
+
+=item C<PerlOMP_VERIFY_2D_INT_ARRAY>
+
+  void PerlOMP_VERIFY_2D_INT_ARRAY(SV* array);
+
+Verifies that the given 2D array contains only integer values.
+
+=item C<PerlOMP_VERIFY_2D_FLOAT_ARRAY>
+
+  void PerlOMP_VERIFY_2D_FLOAT_ARRAY(SV* array);
+
+Verifies that the given 2D array contains only floating-point values.
+
+=item C<PerlOMP_VERIFY_2D_STRING_ARRAY>
+
+  void PerlOMP_VERIFY_2D_STRING_ARRAY(SV* array);
+
+Verifies that the given 2D array contains only string values.
 
 =back
 
@@ -225,6 +365,13 @@ L<https://www.rperl.org>
 =head1 AUTHOR
 
 Brett Estrade L<< <oodler@cpan.org> >>
+
+=haed1 AI GENERATED CODE DISCLAIMER
+
+Please be advised, for full transparency (and to set a good precedence),
+one should not that the conversion functions, verification functions, their
+POD entries, and testing functions werge generated with great assistance
+using the "I<Perl Programming Expert By DRAKOPOULOS ANASTASIOS>" chatGPT.
 
 =head1 LICENSE & COPYRIGHT
 

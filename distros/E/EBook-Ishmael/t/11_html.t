@@ -31,4 +31,8 @@ ok(!$ebook->has_cover, "has no cover");
 
 ok(! defined $ebook->cover, "has no cover");
 
+is($ebook->image_num, 0, "image count ok");
+
+is($ebook->image(0), undef, "html has no images");
+
 done_testing();

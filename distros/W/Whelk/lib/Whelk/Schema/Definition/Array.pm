@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Array;
-$Whelk::Schema::Definition::Array::VERSION = '1.01';
+$Whelk::Schema::Definition::Array::VERSION = '1.02';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?items' => undef;

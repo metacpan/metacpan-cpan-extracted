@@ -1,11 +1,12 @@
 ---
-abstract: 'Convert ebook documents to plain text'
+abstract: 'EBook dumper'
 author:
   - 'Samuel Young <samyoung12788@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Path: '0'
   File::Spec: '0'
-  File::Which: '0'
+  File::Temp: '0.10'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -37,5 +38,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/ishmael/issues
   repository: https://codeberg.org/1-1sam/ishmael.git
-version: '0.07'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0206';
+our $VERSION = '0.0208';
 
 use strict;
 use warnings;
@@ -158,7 +158,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0206
+version 0.0208
 
 =head1 SYNOPSIS
 
@@ -211,8 +211,8 @@ version 0.0206
       deposit  => 'path/prefix-', # optionally make a file after each loop
       verbose  => 0, # print out text events (default: 0)
       dump     => 0, # dump the score before each play (default: 0)
-      port     => qr/iac/, # optional
-      device   => $midi_output, # optional
+      port     => qr/iac/i,     # optional non-existing device
+      device   => $midi_output, # optional existing object
   )->play;
 
 =head1 DESCRIPTION

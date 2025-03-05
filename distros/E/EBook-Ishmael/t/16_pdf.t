@@ -6,13 +6,11 @@ use Test::More;
 
 use File::Spec;
 
-use File::Which;
-
 use EBook::Ishmael::EBook;
+use EBook::Ishmael::EBook::PDF;
+use EBook::Ishmael::ImageID;
 
-my $TEST_PDF =
-	$ENV{TEST_PDF} //
-	(which('pdftohtml') and which('pdfinfo') and which('pdftopng'));
+my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
 
 unless ($TEST_PDF) {
 	plan skip_all => "TEST_PDF set to 0, or poppler utils are not installed";
@@ -46,9 +44,13 @@ ok($ebook->html, "html ok");
 ok($ebook->has_cover, "has cover");
 
 is(
-	substr($ebook->cover, 0, 8),
-	pack("CCCCCCCC", 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a),
+	image_id(\($ebook->cover)),
+	"png",
 	"cover looks like a png"
 );
+
+is($ebook->image_num, 0, "image count ok");
+
+is($ebook->image(0), undef, "image #0 ok");
 
 done_testing();

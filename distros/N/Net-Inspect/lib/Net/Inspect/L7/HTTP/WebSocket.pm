@@ -50,6 +50,7 @@ sub upgrade_websocket {
 
     my @sub;
     weaken($self);
+    weaken($conn);
     for my $dir (0,1) {
 	my $dir = $dir; # old $dir is only alias
 	my $rbuf = '';

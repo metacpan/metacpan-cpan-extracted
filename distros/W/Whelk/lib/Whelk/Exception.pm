@@ -1,5 +1,5 @@
 package Whelk::Exception;
-$Whelk::Exception::VERSION = '1.01';
+$Whelk::Exception::VERSION = '1.02';
 use Kelp::Base 'Kelp::Exception';
 
 # hint (string) to send to the user. App won't create a log if hint is present.

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# $Id: onyphe,v cfbea05b0bc4 2025/01/28 15:06:19 gomor $
+# $Id: onyphe,v f6e25824c774 2025/03/04 14:57:46 gomor $
 #
 use strict;
 use warnings;
@@ -16,6 +16,8 @@ my $opp = OPP->new;
 $opp->nested([ 'app.http.component', 'app.http.header', 'alert' ]);
 $opp->state(OPP::State->new->init);
 $opp->output(OPP::Output->new->init);
+
+$|++;
 
 # Default values
 my %lopts = (
@@ -37,7 +39,6 @@ GetOptions(
    "calculated=i" => \$lopts{calculated}, # -calculated 1
    "keepalive=i" => \$lopts{keepalive},   # -keepalive 1
    "key=s" => \$lopts{key},               # -key XXX
-   #"poll" => \$lopts{poll},               # -poll
    "maxscantime=i" => \$lopts{'maxscantime'}, # -maxscantime 120
    "aslines=i" => \$lopts{'aslines'}, # -aslines 1
    "aslink=i" => \$lopts{'aslink'}, # -aslink 1
@@ -52,9 +53,9 @@ GetOptions(
    "count" => \$lopts{'count'}, # -count
    "trusted=i" => \$lopts{'trusted'}, # -trusted 0
    "field=s" => \$lopts{'field'}, # -field subject.organization
-   "keyword=s" => \$lopts{'keyword'}, # -keyword exa1,exa2,...
-   "filter=s" => \$lopts{'filter'}, # -filter exa1,exa2,...
-   # APIs:
+   "includep=s" => \$lopts{'includep'}, # -includep exa1,exa2,...
+   "excludep=s" => \$lopts{'excludep'}, # -excludep exa1,exa2,...
+   # General APIs:
    "user" => \$lopts{user},                     # -user
    "summary=s" => \$lopts{summary},             # -summary ip|domain|hostname
    "simple=s" => \$lopts{simple},               # -simple synscan|datascan|vulnscan|...
@@ -73,27 +74,36 @@ GetOptions(
    "alert-name=s" => \$lopts{'alert-name'},            # -alert-name "New alert"
    "alert-email=s" => \$lopts{'alert-email'},          # -alert-email example@example.com
    "alert-threshold=s" => \$lopts{'alert-threshold'},  # -alert-threshold '>0'
-   "ondemand-scope-ip=s" => \$lopts{'ondemand-scope-ip'}, # -ondemand-scope-ip IP|CIDR
-   "ondemand-scope-ip-bulk=s" => \$lopts{'ondemand-scope-ip-bulk'}, # -ondemand-scope-ip-bulk INPUT.txt
-   "ondemand-scope-domain=s" => \$lopts{'ondemand-scope-domain'}, # -ondemand-scope-domain DOMAIN
-   "ondemand-scope-domain-bulk=s" => \$lopts{'ondemand-scope-domain-bulk'}, # -ondemand-scope-domain-bulk INPUT.txt
-   "ondemand-scope-hostname=s" => \$lopts{'ondemand-scope-hostname'}, # -ondemand-scope-hostname HOSTNAME
-   "ondemand-scope-hostname-bulk=s" => \$lopts{'ondemand-scope-hostname-bulk'}, # -ondemand-scope-hostname-bulk INPUT.txt
-   "ondemand-scope-port=s" => \$lopts{'ondemand-scope-port'}, # -ondemand-scope-port PORT
-   "ondemand-scope-result=s" => \$lopts{'ondemand-scope-result'}, # -ondemand-scope-result ID
-   "ondemand-resolver-domain=s" => \$lopts{'ondemand-resolver-domain'}, # -ondemand-resolver-domain DOMAIN
-   "ondemand-resolver-domain-bulk=s" => \$lopts{'ondemand-resolver-domain-bulk'}, # -ondemand-resolver-domain-bulk INPUT.txt
-   "ondemand-resolver-result=s" => \$lopts{'ondemand-resolver-result'}, # -ondemand-resolver-result ID
-   "asd-tld=s" => \$lopts{'asd-tld'},  # -asd-tld DOMAIN1,DOMAIN2 | input.txt
-   "asd-ns=s" => \$lopts{'asd-ns'},  # -asd-ns DOMAIN1,DOMAIN2 | input.txt
-   "asd-mx=s" => \$lopts{'asd-mx'},  # -asd-mx DOMAIN1,DOMAIN2 | input.txt
-   "asd-pivot=s" => \$lopts{'asd-pivot'},  # -asd-pivot QUERY -field FIELD
-   "asd-top=s" => \$lopts{'asd-top'},  # -asd-top QUERY -field FIELD
-   "asd-domain=s" => \$lopts{'asd-domain'},  # -asd-domain KEYWORD1,KEYWORD2 | keywords.txt
-   "asd-keyword=s" => \$lopts{'asd-keyword'},  # -asd-keyword KEYWORD1,KEYWORD2 | keywords.txt
-   "asd-domain2so=s" => \$lopts{'asd-domain2so'},  # -asd-domain2so DOMAIN1,DOMAIN2 | input.txt -keyword KEYWORD1,KEYWORD2 | keywords.txt
-   "asd-so2domain=s" => \$lopts{'asd-so2domain'},  # -asd-so2domain SUBJORG1,SUBJORG2 | subjorg.txt -keyword KEYWORD1,KEYWORD2 | keywords.txt
-   "asd-task=s" => \$lopts{'asd-task'},  # -asd-task TASKID
+   # Ondemand APIs:
+   "ondemand-scope-ip=s" => \$lopts{'ondemand-scope-ip'},
+   "ondemand-scope-ip-bulk=s" => \$lopts{'ondemand-scope-ip-bulk'},
+   "ondemand-scope-domain=s" => \$lopts{'ondemand-scope-domain'},
+   "ondemand-scope-domain-bulk=s" => \$lopts{'ondemand-scope-domain-bulk'},
+   "ondemand-scope-hostname=s" => \$lopts{'ondemand-scope-hostname'},
+   "ondemand-scope-hostname-bulk=s" => \$lopts{'ondemand-scope-hostname-bulk'},
+   "ondemand-scope-port=s" => \$lopts{'ondemand-scope-port'},
+   "ondemand-scope-result=s" => \$lopts{'ondemand-scope-result'},
+   "ondemand-resolver-domain=s" => \$lopts{'ondemand-resolver-domain'},
+   "ondemand-resolver-domain-bulk=s" => \$lopts{'ondemand-resolver-domain-bulk'},
+   "ondemand-resolver-result=s" => \$lopts{'ondemand-resolver-result'},
+   # ASD APIs:
+   "asd-pivot-query=s" => \$lopts{'asd-pivot-query'},
+   "asd-domain-tld=s" => \$lopts{'asd-domain-tld'},
+   "asd-domain-ns=s" => \$lopts{'asd-domain-ns'},
+   "asd-domain-mx=s" => \$lopts{'asd-domain-mx'},
+   "asd-domain-certso=s" => \$lopts{'asd-domain-certso'},
+   "asd-domain-wildcard=s" => \$lopts{'asd-domain-wildcard'},
+   "asd-domain-exist=s" => \$lopts{'asd-domain-exist'},
+   "asd-certso-domain=s" => \$lopts{'asd-certso-domain'},
+   "asd-certso-wildcard=s" => \$lopts{'asd-certso-wildcard'},
+   "asd-org-inventory=s" => \$lopts{'asd-org-inventory'},
+   "asd-ip-whois=s" => \$lopts{'asd-ip-whois'},
+   "asd-ip-inventory=s" => \$lopts{'asd-ip-inventory'},
+   "asd-vhost-inventory=s" => \$lopts{'asd-vhost-inventory'},
+   "asd-task-id=s" => \$lopts{'asd-task-id'},
+   "asd-task-poll=s" => \$lopts{'asd-task-poll'},
+   "asd-task-list" => \$lopts{'asd-task-list'},
+   "asd-task-kill=s" => \$lopts{'asd-task-kill'}
 ) or exit(0);
 
 if ($lopts{help}) {
@@ -123,6 +133,19 @@ $oa->config->{''}{api_keepalive} = $lopts{keepalive} if $lopts{keepalive};
 $oa->config->{''}{api_key} = $lopts{key} if $lopts{key};
 $oa->config->{''}{api_ondemand_key} = $lopts{key} if $lopts{key};
 
+my $asd_api_opt = undef;
+my $asd_api_func = undef;
+my $asd_api_value = undef;
+for my $opt (keys %lopts) {
+   if ($opt =~ m{^asd} && defined($lopts{$opt})) {
+      $asd_api_opt = $opt;
+      $asd_api_func = $asd_api_opt;
+      $asd_api_func =~ s{-}{_}g;
+      $asd_api_value = $lopts{$opt};
+      last;
+   }
+}
+
 if ($oa->verbose) {
    print STDERR "VERBOSE: api_size: ".$oa->config->{''}{api_size}."\n";
    print STDERR "VERBOSE: api_maxpage: ".$oa->config->{''}{api_maxpage}."\n";
@@ -131,6 +154,9 @@ if ($oa->verbose) {
    print STDERR "VERBOSE: api_keepalive: ".$oa->config->{''}{api_keepalive}."\n";
 }
 
+# Default result callback: don't touch results:
+my $result_cb = undef;
+
 my $opp_perl_cb = sub {
    my ($results, $opl) = @_;
    $opl ||= 'noop';
@@ -138,6 +164,9 @@ my $opp_perl_cb = sub {
    if (ref($results) eq 'ARRAY') {
       for (@$results) {
          next if defined($_->{'@category'}) && $_->{'@category'} eq 'none';
+         if (defined($result_cb)) {
+            next unless $result_cb->($_);
+         }
          push @results, $_;
       }
    }
@@ -154,6 +183,9 @@ my $opp_json_cb = sub {
    if (ref($results) eq 'ARRAY') {
       for (@$results) {
          next if m{.\@category.\s*:\s*.none.};
+         if (defined($result_cb)) {
+            next unless $result_cb->($_);
+         }
          push @results, $_;
       }
    }
@@ -276,23 +308,7 @@ elsif (defined($lopts{'ondemand-scope-ip'})) {
    $params->{asm} = $lopts{asm} if defined $lopts{asm};
    $params->{import} = $lopts{import} if defined $lopts{import};
    $params->{ports} = $lopts{ports} if defined $lopts{ports};
-   #my $scan_id;
-   #if ($lopts{poll}) {
-      #my $poll_opp_perl_cb = sub {
-         #my ($results, $opl) = @_;
-         #$scan_id = $results->{scan_id};
-         #return $opp_perl_cb->($results, $opl);
-      #};
-      #$oa->ondemand_scope_ip($v, $params, $poll_opp_perl_cb, $opl);
-      #print STDERR "VERBOSE: polling Scan ID: $scan_id\n" if $oa->verbose;
-      #while (1) {
-         #$oa->ondemand_scope_result($scan_id, undef, $opp_perl_cb, $opl);
-         #sleep 1;
-      #}
-   #}
-   #else {
-      $oa->ondemand_scope_ip($v, $params, $opp_perl_cb, $opl);
-   #}
+   $oa->ondemand_scope_ip($v, $params, $opp_perl_cb, $opl);
 }
 elsif (defined($lopts{'ondemand-scope-ip-bulk'})) {
    my $v = $lopts{'ondemand-scope-ip-bulk'};
@@ -378,70 +394,40 @@ elsif (defined($lopts{'ondemand-resolver-result'})) {
    $params->{full} = $lopts{full} if defined $lopts{full};
    $oa->ondemand_resolver_result($v, $params, $opp_cb, $opl);
 }
-elsif (defined($lopts{'asd-tld'})) {
-   my $v = $lopts{'asd-tld'};
+#
+# ASD APIs:
+#
+elsif (defined($asd_api_opt)) {
+   my $v = $lopts{$asd_api_opt};
+   # Shared with all ASD APIs:
    $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{trusted} = $lopts{trusted} if defined $lopts{trusted};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $oa->asd_tld($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-ns'})) {
-   my $v = $lopts{'asd-ns'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $oa->asd_ns($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-mx'})) {
-   my $v = $lopts{'asd-mx'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $oa->asd_mx($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-pivot'})) {
-   my $v = $lopts{'asd-pivot'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $params->{field} = $lopts{field} if defined $lopts{field};
-   $params->{filter} = $lopts{filter} if defined $lopts{filter};
-   $oa->asd_pivot($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-top'})) {
-   my $v = $lopts{'asd-top'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $params->{field} = $lopts{field} if defined $lopts{field};
-   $oa->asd_top($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-domain'})) {
-   my $v = $lopts{'asd-domain'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $oa->asd_domain($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-keyword'})) {
-   my $v = $lopts{'asd-keyword'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $oa->asd_keyword($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-domain2so'})) {
-   my $v = $lopts{'asd-domain2so'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $params->{filter} = $lopts{filter} if defined $lopts{filter};
-   $oa->asd_domain2so($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-so2domain'})) {
-   my $v = $lopts{'asd-so2domain'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $params->{astask} = $lopts{astask} if defined $lopts{astask};
-   $params->{filter} = $lopts{filter} if defined $lopts{filter};
-   $oa->asd_so2domain($v, $params, $opp_cb, $opl);
-}
-elsif (defined($lopts{'asd-task'})) {
-   my $v = $lopts{'asd-task'};
-   $params->{aslines} = $lopts{aslines} if defined $lopts{aslines};
-   $oa->asd_task($v, $params, $opp_cb, $opl);
+   # Most ASD APIs share the same HTTP parameters, except some:
+   if ($asd_api_opt =~ m{^asd-task-poll}) {
+      my $v = $lopts{$asd_api_opt};
+      $result_cb = sub {
+         my ($result) = @_;
+         # Don't display task in progress results/
+         if (ref($result) eq 'HASH') {
+            return $result->{error} == 1013 ? 0 : 1;
+         }
+         else {
+            return $result =~ m{"error":1013} ? 0 : 1;
+         }
+         return 1;
+      };
+      $oa->$asd_api_func($v, $params, $opp_cb, $opl);
+   }
+   elsif ($asd_api_opt =~ m{^asd-task}) {
+      my $v = $lopts{$asd_api_opt};
+      $oa->$asd_api_func($v, $params, $opp_cb, $opl);
+   }
+   else {
+      $params->{astask} = $lopts{astask} if defined $lopts{astask};
+      $params->{trusted} = $lopts{trusted} if defined $lopts{trusted};
+      $params->{includep} = $lopts{includep} if defined $lopts{includep};
+      $params->{excludep} = $lopts{excludep} if defined $lopts{excludep};
+      $oa->$asd_api_func($v, $params, $opp_cb, $opl);
+   }
 }
 else {
    usage();
@@ -463,6 +449,7 @@ General options:
    -verbose <0|1>                          verbosity level (default: 0)
 
 API options:
+
    -key <API_KEY>                          use given API key to override configuration
    -maxpage <MAXPAGE>                      max page to fetch with Search API (default: 1)
    -size <0|1|..|10000>                    fetch pages of size results (default: 10)
@@ -480,10 +467,10 @@ API options:
    -import <0|1>                           turn off/on import of results into ONYPHE
    -trusted <0|1>                          turn off/on trusted results from ONYPHE ASD APIs
    -field <FIELD>                          use given field to set field param on API call
-   -keyword <WORD1,WORD2,...,WORD3>        use given keywords on param API call
-   -filter <WORD1,WORD2,...,WORD3>         use given filters on param API call
+   -includep <WORD1,WORD2,...,WORD3>         use given inclusion patterns on param API call
+   -excludep <WORD1,WORD2,...,WORD3>         use given exclusion patterns on param API call
 
-APIs:
+General APIs:
 
    -user '| OPP'                                get information on your license
    -search 'OQL | OPP'                          use Search API for query
@@ -502,27 +489,40 @@ APIs:
    -alert-list                                           use Alert List API to list configured alerts
    -alert-del \$id                                        use Alert Del API to remove an alert
    -alert-add -alert-name NAME -alert-email EMAIL 'OQL'  use Alert Add API to create a new alert
-   -ondemand-scope-ip '<IP|CIDR>'              use Ondemand Scope IP API to launch a scan against IP or CIDR
-   -ondemand-scope-ip-bulk 'input.txt'         use Ondemand Scope Ip Bulk API to launch a scan against a given list of IPs from an input file
-   -ondemand-scope-domain 'DOMAIN'             use Ondemand Scope Domain API to launch a scan against given domain
-   -ondemand-scope-domain-bulk 'input.txt'     use Ondemand Scope Domain Bulk API to launch a scan against a given list of domain from an input file
-   -ondemand-scope-hostname 'HOSTNAME'         use Ondemand Scope Hostname API to launch a scan against given hostname
-   -ondemand-scope-hostname-bulk 'input.txt'   use Ondemand Scope Hostname Bulk API to launch a scan against a given list of hostname from an input file
-   -ondemand-scope-port PORT                   use Ondemand Scope Port API to launch a scan against a given port on full IPv4 address space
-   -ondemand-scope-result \$scan_id             use Ondemand Scope Result API with Scan ID
-   -ondemand-resolver-domain 'DOMAIN'          use Ondemand Resolver Domain API to launch a DNS enumeration and resolution against given domain
-   -ondemand-resolver-domain-bulk 'input.txt'  use Ondemand Resolver Domain Bulk API to launch a DNS enumeration and resolution against a given list of domain from an input file
-   -ondemand-resolver-result \$scan_id          use Ondemand Resolver Result API with Scan ID
-   -asd-tld DOMAIN1,DOMAIN2,...|input.txt   use ASD Tld API to find related domains by TLDs
-   -asd-ns DOMAIN1,DOMAIN2,...|input.txt    use ASD Ns API to find related domains by using nameservers
-   -asd-mx DOMAIN1,DOMAIN2,...|input.txt    use ASD Mx API to find related domains by using MX records
-   -asd-pivot OQL                           use ASD Pivot API to find unique values for a given field from an OQL query
-   -asd-task TASKID                         use ASD Task API to retrieve an ASD Task results
-   -asd-top QUERY -field FIELD              use ASD Top API to get top values for given field
-   -asd-domain DOMAIN1,DOMAIN2,...|input.txt  use ASD Domain API to get list of domains related to given keyword(s)
-   -asd-keyword KEYWORD1,KEYWORD2,...|input.txt  use ASD Keyword API to get list of keywords related to given keyword(s)
-   -asd-domain2so DOMAIN1,DOMAIN2,...|input.txt  use ASD Domain2so API to get list of subject organizations belonging to given list of domains
-   -asd-so2domain SO1,SO2,...|input.txt          use ASD So2domain API to get list of domains belonging to given list of subject orgnanizations
+
+Ondemand APIs:
+
+   -ondemand-scope-ip '<IP|CIDR>'              launch a scan against IP or CIDR
+   -ondemand-scope-ip-bulk 'input.txt'         launch a scan against a given list of IPs from an input file
+   -ondemand-scope-domain 'DOMAIN'             launch a scan against given domain
+   -ondemand-scope-domain-bulk 'input.txt'     launch a scan against a given list of domain from an input file
+   -ondemand-scope-hostname 'HOSTNAME'         launch a scan against given hostname
+   -ondemand-scope-hostname-bulk 'input.txt'   launch a scan against a given list of hostname from an input file
+   -ondemand-scope-port PORT                   launch a scan against a given port on full IPv4 address space
+   -ondemand-scope-result \$scan_id             retrieve a scope scan results given a scan ID
+   -ondemand-resolver-domain 'DOMAIN'          launch a DNS enumeration and resolution against given domain
+   -ondemand-resolver-domain-bulk 'input.txt'  launch a DNS enumeration and resolution against a given list of domain from an input file
+   -ondemand-resolver-result \$scan_id          retrieve a resolver scan results given a scan ID
+
+ASD APIs:
+
+   -asd-pivot-query OQL -field FIELD               search unique values for a given field from an OQL query
+   -asd-domain-tld DOMAIN1,DOMAIN2,...|input.txt   search related domains by TLDs
+   -asd-domain-ns DOMAIN1,DOMAIN2,...|input.txt    search related domains by using nameservers
+   -asd-domain-mx DOMAIN1,DOMAIN2,...|input.txt    search related domains by using MX records
+   -asd-domain-certso SO1,SO2,...|input.txt             search domain(s) belonging to given subject orgnanization(s)
+   -asd-domain-wildcard DOMAIN1,DOMAIN2,...|input.txt   search domain(s) matching given wildcard(s)
+   -asd-domain-exist DOMAIN1,DOMAIN2,...|input.txt      search existing domain(s)
+   -asd-certso-domain DOMAIN1,DOMAIN2,...|input.txt     search subject organization(s) belonging to given domain(s)
+   -asd-certso-wildcard SO1,SO2,...|input.txt           search subject organization(s) matching given wildcard(s)
+   -asd-org-inventory INVENTORY.txt      search hosting organization(s) for given inventory data
+   -asd-ip-whois INVENTORY.txt           search subnet(s) belonging to given inventory data
+   -asd-ip-inventory INVENTORY.txt       search ip value(s) for given inventory data
+   -asd-vhost-inventory INVENTORY.txt    search forward value(s) for given inventory data
+   -asd-task-id TASKID           retrieve an ASD Task results for given task ID
+   -asd-task-poll TASKID         retrieve an ASD Task results by polling given task ID
+   -asd-task-list                list all tasks, actually running or finished
+   -asd-task-kill                kill a given task ID
 
 EOF
 ;

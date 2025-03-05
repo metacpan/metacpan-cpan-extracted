@@ -84,6 +84,7 @@ MIDI::RtMidi::ScorePlayer->new(
     parts  => [ \@parts ],
     common => \%common,
     sleep  => 2,
+    port   => qr/fluid/i,
 )->play;
 
 sub part {

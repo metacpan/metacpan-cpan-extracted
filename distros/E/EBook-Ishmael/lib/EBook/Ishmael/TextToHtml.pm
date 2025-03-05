@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextToHtml;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 

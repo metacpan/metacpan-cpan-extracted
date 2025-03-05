@@ -10,12 +10,14 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_sv_2pv_flags
-#include "../../ppport.h"
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#if HAVE_PERL_VERSION(5,41,8)
+#  define HAVE_OP_SUBSTR_LEFT
+#endif
 
 static int init_done = 0;
-
-OP *(*real_pp_substr)(pTHX);
 
 typedef struct {
   GV *substr_method;
@@ -97,6 +99,14 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
   return 1;
 }
 
+static GV *get_substr_method(SV *sv)
+{
+  if(!sv_isobject(sv))
+    return NULL;
+
+  return gv_fetchmeth(SvSTASH(SvRV(sv)), "(substr", 7, 0);
+}
+
 static MGVTBL vtbl = {
   &magic_get,
   &magic_set,
@@ -105,6 +115,7 @@ static MGVTBL vtbl = {
   &magic_free,
 };
 
+static OP *(*real_pp_substr)(pTHX);
 PP(pp_overload_substr) {
   dSP; dTARG;
   const int num_args = PL_op->op_private & 7; /* Horrible; stolen from pp.c:pp_subst */
@@ -112,11 +123,7 @@ PP(pp_overload_substr) {
   GV *substr_method;
   SV *result;
 
-  if(!sv_isobject(self))
-    return (*real_pp_substr)(aTHX);
-
-  substr_method = gv_fetchmeth(SvSTASH(SvRV(self)), "(substr", 7, 0);
-
+  substr_method = get_substr_method(self);
   if(!substr_method)
     return (*real_pp_substr)(aTHX);
 
@@ -193,10 +200,63 @@ PP(pp_overload_substr) {
   RETURN;
 }
 
+#ifdef HAVE_OP_SUBSTR_LEFT
+static OP *(*real_pp_substr_left)(pTHX);
+PP(pp_overload_substr_left) {
+  dSP; dTARGET;
+  SV *self = SP[-1];
+  GV *substr_method;
+  SV *result;
+
+  substr_method = get_substr_method(self);
+  if(!substr_method)
+    return (*real_pp_substr_left)(aTHX);
+
+  /* OP_SUBSTR_LEFT does not have the OPpSUBSTR_REPL_FIRST bit */
+  assert(!(PL_op->op_flags & OPf_MOD));
+  assert(!LVRET);
+
+  bool rvalue = (GIMME_V != G_VOID) || (PL_op->op_private & OPpTARGET_MY);
+  SV *len = SP[0];
+
+  ENTER;
+  SAVETMPS;
+
+  EXTEND(SP, 3);
+  PUSHMARK(SP);
+  PUSHs(self);
+  mPUSHi(0); /* offset is always zero */
+  PUSHs(len);
+  /* no replacement */
+  PUTBACK;
+
+  call_sv((SV*)GvCV(substr_method), G_SCALAR);
+
+  SPAGAIN;
+  result = POPs;
+
+  SvREFCNT_inc(result);
+
+  FREETMPS;
+  LEAVE;
+
+  sv_setsv(TARG, result);
+
+  if(rvalue)
+    XPUSHs(result);
+
+  RETURN;
+}
+#endif
+
 MODULE = overload::substr       PACKAGE = overload::substr
 
 BOOT:
 if(!init_done++) {
   real_pp_substr = PL_ppaddr[OP_SUBSTR];
   PL_ppaddr[OP_SUBSTR] = &Perl_pp_overload_substr;
+#ifdef HAVE_OP_SUBSTR_LEFT
+  real_pp_substr_left = PL_ppaddr[OP_SUBSTR_LEFT];
+  PL_ppaddr[OP_SUBSTR_LEFT] = &Perl_pp_overload_substr_left;
+#endif
 }

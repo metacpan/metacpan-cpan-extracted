@@ -1,5 +1,5 @@
 package Whelk::Formatter;
-$Whelk::Formatter::VERSION = '1.01';
+$Whelk::Formatter::VERSION = '1.02';
 use Kelp::Base;
 use Carp;
 use Whelk::Exception;
@@ -48,7 +48,9 @@ sub match_format
 			if $app->req->content_type_is($formats->{$format});
 	}
 
-	Whelk::Exception->throw(400, hint => "Unsupported Content-Type");
+	# Unsupported Media Type
+	my @accepted = sort values %$formats;
+	Whelk::Exception->throw(415, hint => 'Supported Content-Types are ' . join(', ', @accepted));
 }
 
 sub get_request_body

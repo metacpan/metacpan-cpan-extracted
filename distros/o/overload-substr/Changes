@@ -1,5 +1,11 @@
 Revision history for overload-substr
 
+0.04    2025-03-04
+        [CHANGES]
+         * General module style refresh
+         * Swapped unit tests from `Test::More` to `Test2::V0`
+         * Support `OP_SUBSTR_LEFT` added in Perl 5.41.8
+
 0.03    CHANGES:
          * Fix for OPfSUBSTR_REPL_FIRST behaviour of perl 5.15.5 onwards
            (RT74888)

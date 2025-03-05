@@ -100,13 +100,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -149,13 +149,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -191,13 +191,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -233,13 +233,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -272,13 +272,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -311,13 +311,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -348,13 +348,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -390,13 +390,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -438,13 +438,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -469,13 +469,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -486,13 +486,15 @@ paths:
   /t/custom_err:
     post:
       responses:
-        '400':
+        '204':
+          description: Success (no content).
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -503,13 +505,46 @@ paths:
   /t/err:
     post:
       responses:
-        '400':
+        '204':
+          description: Success (no content).
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api_error_with_status'
+          description: Failure, server error.
+      tags:
+      - Test
+  /t/code_201:
+    get:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  data:
+                    type: boolean
+                required:
+                - data
+          description: Success.
+        '4XX':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api_error_with_status'
+          description: Failure, invalid request data.
+        '5XX':
           content:
             application/json:
               schema:
@@ -522,13 +557,13 @@ paths:
       responses:
         '204':
           description: Success (no content).
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:
@@ -561,13 +596,13 @@ paths:
                 - data
                 type: object
           description: Success.
-        '400':
+        '4XX':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/api_error_with_status'
           description: Failure, invalid request data.
-        '500':
+        '5XX':
           content:
             application/json:
               schema:

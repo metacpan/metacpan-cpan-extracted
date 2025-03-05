@@ -1,11 +1,11 @@
 #
-# $Id: Api.pm,v cfbea05b0bc4 2025/01/28 15:06:19 gomor $
+# $Id: Api.pm,v c3a004567be2 2025/03/04 14:13:57 gomor $
 #
 package Onyphe::Api;
 use strict;
 use warnings;
 
-our $VERSION = '4.17';
+our $VERSION = '4.18';
 
 use experimental qw(signatures);
 
@@ -910,7 +910,10 @@ sub asd ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef) {
       $post->{trusted} = $param->{trusted} ? 'true' : 'false' if defined $param->{trusted};
       $post->{field} = $param->{field} if defined $param->{field};
       $post->{query} = $param->{query} if defined $param->{query};
-      $post->{keyword} = $self->_load_file($param->{keyword}) if defined($param->{keyword});
+      $post->{includep} = $self->_load_file($param->{includep})
+         if defined($param->{includep});
+      $post->{excludep} = $self->_load_file($param->{excludep})
+         if defined($param->{excludep});
    }
 
    print STDERR "VERBOSE: Calling API: $path\n" if $self->verbose;
@@ -931,6 +934,9 @@ RETRY:
    };
    if ($@) {
       chomp($@);
+      if ($@ =~ m{Premature connection close}i) {
+         return 1;
+      }
       print STDERR "WARNING: ASD API call failed: [$@], retrying...\n" unless $self->silent;
       goto RETRY;
    }
@@ -985,51 +991,84 @@ sub _load_file ($self, $arg) {
    return $arg;
 }
 
-sub asd_tld ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_domain_tld ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/tld', $param, { domain => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/domain/tld', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_ns ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_domain_ns ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/ns', $param, { domain => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/domain/ns', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_mx ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_domain_mx ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/mx', $param, { domain => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/domain/mx', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_pivot ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('post', '/asd/pivot', $param, { query => $arg }, $cb, $cb_args);
+sub asd_pivot_query ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('post', '/asd/pivot/query', $param, { query => $arg }, $cb, $cb_args);
 }
 
-sub asd_top ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('post', '/asd/top', $param, { query => $arg }, $cb, $cb_args);
-}
-
-sub asd_domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_certso_domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain', $param, { keyword => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/certso/domain', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_keyword ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_certso_wildcard ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/keyword', $param, { keyword => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/certso/wildcard', $param, { certso => $arg }, $cb, $cb_args);
 }
 
-sub asd_domain2so ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_org_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain2so', $param, { domain => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/org/inventory', $param, { inventory => $arg }, $cb, $cb_args);
 }
 
-sub asd_so2domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_ip_whois ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/so2domain', $param, { subjorg => $arg }, $cb, $cb_args);
+   return $self->asd('post', '/asd/ip/whois', $param, { inventory => $arg }, $cb, $cb_args);
 }
 
-sub asd_task ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('get', '/asd/task/'.$taskid, $param, undef, $cb, $cb_args);
+sub asd_ip_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/ip/inventory', $param, { inventory => $arg }, $cb, $cb_args);
+}
+
+sub asd_vhost_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/vhost/inventory', $param, { inventory => $arg }, $cb, $cb_args);
+}
+
+sub asd_domain_certso ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/domain/certso', $param, { certso => $arg }, $cb, $cb_args);
+}
+
+sub asd_domain_wildcard ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/domain/wildcard', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_domain_exist ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/domain/exist', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_task_id ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('get', '/asd/task/id/'.$taskid, $param, undef, $cb, $cb_args);
+}
+
+sub asd_task_poll ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('get', '/asd/task/poll/'.$taskid, $param, undef, $cb, $cb_args);
+}
+
+sub asd_task_list ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('get', '/asd/task/list', $param, undef, $cb, $cb_args);
+}
+
+sub asd_task_kill ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('get', '/asd/task/kill/'.$taskid, $param, undef, $cb, $cb_args);
 }
 
 sub asd_load_input ($self, $input) {

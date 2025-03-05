@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.166   2025-03-04
+        - Refactoring.
+        - Bugfix progress bar.
+
 0.165   2025-02-24
         - Simplify the progress bar.
         - Make Term::TablePrint::ProgressBar visible.[GH #3 mrdvt92]

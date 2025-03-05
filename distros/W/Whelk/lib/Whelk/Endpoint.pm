@@ -1,11 +1,11 @@
 package Whelk::Endpoint;
-$Whelk::Endpoint::VERSION = '1.01';
+$Whelk::Endpoint::VERSION = '1.02';
 use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
 use Whelk::Endpoint::Parameters;
 
-our @CARP_NOT = qw(Whelk::Role::Resource);
+our @CARP_NOT = qw(Whelk::Role::Resource Kelp::Base);
 
 attr '?-id' => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr '?-summary' => undef;
@@ -18,6 +18,7 @@ attr code => undef;
 attr path => undef;
 attr '?request' => undef;
 attr '?response' => undef;
+attr '?response_code' => undef;
 attr '?parameters' => undef;
 
 # to be built in wrapers
@@ -30,7 +31,21 @@ sub new
 
 	# build request and response schemas
 	$self->request(Whelk::Schema->build_if_defined($self->request));
-	$self->response(Whelk::Schema->build_if_defined($self->response));
+	$self->response(Whelk::Schema->build($self->response // {type => 'empty'}));
+
+	if (!defined $self->response_code) {
+		$self->response_code($self->response->empty ? 204 : 200);
+	}
+	else {
+		croak 'invalid response code'
+			unless $self->response_code =~ /^2\d\d$/;
+
+		croak 'invalid non-204 code for empty response schema'
+			if $self->response->empty && $self->response_code != 204;
+
+		croak 'invalid 204 code for non-empty response schema'
+			if !$self->response->empty && $self->response_code == 204;
+	}
 
 	# initial build of the parameters
 	$self->parameters(Whelk::Endpoint::Parameters->new(%{$self->parameters // {}}));

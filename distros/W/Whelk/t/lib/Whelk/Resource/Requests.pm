@@ -4,15 +4,18 @@ use Kelp::Base 'Whelk::Resource';
 use Whelk::Exception;
 use Whelk::Schema;
 
-sub api
+sub schemas
 {
-	my ($self) = @_;
-
 	Whelk::Schema->build(
 		my_boolean => {
 			type => 'boolean',
 		},
 	);
+}
+
+sub api
+{
+	my ($self) = @_;
 
 	$self->add_endpoint(
 		[GET => '/path/:test1'] => sub {

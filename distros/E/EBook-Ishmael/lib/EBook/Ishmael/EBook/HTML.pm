@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -16,16 +16,14 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
 	return 1 if $file =~ /\.html?$/;
-	return 0 unless -T $file;
+	return 0 unless -T $fh;
 
-	open my $fh, '<', $file
-		or die "Failed to open $file for reading: $!\n";
 	read $fh, my ($head), 1024;
-	close $fh;
 
-	return 0 if $head =~ /<[^<>]+xmlns\s*=\s*"$XHTML_NS"[^<>]*>/;
+	return 0 if $head =~ /<[^<>]+xmlns\s*=\s*"\Q$XHTML_NS\E"[^<>]*>/;
 
 	return $head =~ /<\s*html[^<>]*>/;
 
@@ -65,6 +63,12 @@ sub _read_metadata {
 		$self->{Metadata}->title([ $str ]);
 	}
 
+	my ($desc) = $head->findnodes('./meta[@name="description"]/@content');
+
+	if (defined $desc) {
+		$self->{Metadata}->description([ $desc->textContent ]);
+	}
+
 	return 1;
 
 }
@@ -90,6 +94,10 @@ sub new {
 	);
 
 	$self->_read_metadata;
+
+	unless (@{ $self->{Metadata}->title }) {
+		$self->{Metadata}->title([ (fileparse($file, qr/\.[^.]*/))[0] ]);
+	}
 
 	return $self;
 
@@ -152,5 +160,9 @@ sub metadata {
 sub has_cover { 0 }
 
 sub cover { undef }
+
+sub image_num { 0 }
+
+sub image { undef }
 
 1;

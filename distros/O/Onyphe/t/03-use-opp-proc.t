@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan(tests => 26) }
+BEGIN { plan(tests => 27) }
 
 ok(mytest->('OPP::Proc::Uniq'), 1, $@);
 ok(mytest->('OPP::Proc::Dedup'), 1, $@);
@@ -27,6 +27,7 @@ ok(mytest->('OPP::Proc::Blocklist'), 1, $@);
 ok(mytest->('OPP::Proc::Allowlist'), 1, $@);
 ok(mytest->('OPP::Proc::Addfield'), 1, $@);
 ok(mytest->('OPP::Proc::Exists'), 1, $@);
+ok(mytest->('OPP::Proc::Rename'), 1, $@);
 
 sub mytest {
    my ($proc) = @_;

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -23,12 +23,9 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
 	return 0 unless -s $file >= 68;
-
-	open my $fh, '<', $file
-		or die "Failed to to open $file for reading: $!\n";
-	binmode $fh;
 
 	seek $fh, 32, 0;
 	read $fh, my ($null), 1;
@@ -40,8 +37,6 @@ sub heuristic {
 
 	seek $fh, 60, 0;
 	read $fh, my ($type), 4;
-
-	close $fh;
 
 	return $type eq $TYPE;
 
@@ -126,7 +121,8 @@ sub new {
 	) = unpack "n n N n n n n n C C N C4", $hdr;
 
 	if ($self->{_version} < $MINVER) {
-		die sprintf "%s zTXT is of an unsupported version, %d.%d (%d.%d and above are supported).\n",
+		die sprintf
+			"%s zTXT is of an unsupported version, %d.%d (%d.%d and above are supported).\n",
 			$self->{Source},
 			($self->{_version} >> 8) & 0xff, $self->{_version} & 0xff,
 			($MINVER           >> 8) & 0xff, $MINVER           & 0xff;
@@ -137,8 +133,13 @@ sub new {
 	}
 
 	$self->{Metadata}->title([ $self->{_pdb}->name ]);
-	$self->{Metadata}->created([ scalar gmtime $self->{_pdb}->cdate ]);
-	$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+
+	if ($self->{_pdb}->cdate) {
+		$self->{Metadata}->created([ scalar gmtime $self->{_pdb}->cdate ]);
+	}
+	if ($self->{_pdb}->mdate) {
+		$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+	}
 
 	$self->{Metadata}->format([
 		sprintf
@@ -198,5 +199,9 @@ sub metadata {
 sub has_cover { 0 }
 
 sub cover { undef }
+
+sub image_num { 0 }
+
+sub image { undef }
 
 1;

@@ -31,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtMidi-ScorePlayer
   repository: https://github.com/ology/MIDI-RtMidi-ScorePlayer.git
-version: '0.0206'
+version: '0.0208'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

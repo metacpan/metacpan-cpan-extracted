@@ -35,11 +35,12 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Inline::C" => 0,
     "OpenMP::Environment" => 0,
+    "Test::Deep" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.1.8",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Inline::C" => 0,
   "OpenMP::Environment" => 0,
+  "Test::Deep" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Util::H2O::More" => "0.3.4"

@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Object;
-$Whelk::Schema::Definition::Object::VERSION = '1.01';
+$Whelk::Schema::Definition::Object::VERSION = '1.02';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?properties' => undef;

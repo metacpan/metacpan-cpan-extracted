@@ -1,0 +1,109 @@
+NAME
+    Data::ExternalId - Data object for external identifier.
+
+DESCRIPTION
+    Data object for external identifier. It could be defined as identifier
+    key and value.
+
+SYNOPSIS
+     use Data::ExternalId;
+
+     my $obj = Data::ExternalId->new(%params);
+     my $id = $obj->id;
+     my $key = $obj->key;
+     my $value = $obj->value;
+
+METHODS
+  "new"
+     my $obj = Data::ExternalId->new(%params);
+
+    Constructor.
+
+    *       "id"
+
+            Unique identifier.
+
+            It's optional.
+
+    *       "key"
+
+            External identifier key.
+
+            It's required.
+
+    *       "value"
+
+            External identifier value.
+
+            It's required.
+
+    Returns instance of object.
+
+  "id"
+     my $id = $obj->id;
+
+    Get unique identifier.
+
+    Returns number.
+
+  "key"
+     my $key = $obj->key;
+
+    Get external identifier key.
+
+    Returns string.
+
+  "value"
+     my $value = $obj->value;
+
+    Get external identifier value.
+
+    Returns string.
+
+ERRORS
+     new():
+              From Mo::utils::check_number_id():
+                      Parameter 'id' must be a natural number.
+                             Value: %s
+              From Mo::utils::check_required():
+                      Parameter 'key' is required.
+                      Parameter 'value' is required.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::ExternalId;
+
+     my $obj = Data::ExternalId->new(
+             'key' => 'Wikidata',
+             'value' => 'Q27954834',
+     );
+
+     # Print out.
+     print "External id key: ".$obj->key."\n";
+     print "External id value: ".$obj->value."\n";
+
+     # Output:
+     # External id key: Wikidata
+     # External id value: Q27954834
+
+DEPENDENCIES
+    Mo, Mo::utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-ExternalId>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

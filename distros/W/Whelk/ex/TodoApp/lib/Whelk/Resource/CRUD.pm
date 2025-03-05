@@ -8,7 +8,7 @@ use TodoStorage;
 
 attr 'storage' => sub { TodoStorage->new };
 
-sub build_schemas
+sub schemas
 {
 	Whelk::Schema->build(
 		todo_id => {
@@ -41,7 +41,6 @@ sub build_schemas
 sub api
 {
 	my ($self) = @_;
-	$self->build_schemas;
 
 	$self->add_endpoint(
 		[GET => '/'] => 'action_list',

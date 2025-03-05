@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -110,7 +110,7 @@ sub browser_dump {
 	}
 
 	my $cmd = sprintf
-		"%s %s %d %s %s \"%s\"",
+		"%s %s %d %s %s '%s'",
 		$Browsers{ $browser }->{Bin},
 		$Browsers{ $browser }->{Width}, $width,
 		join(" ", @{ $Browsers{ $browser }->{Opts} }),

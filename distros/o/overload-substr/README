@@ -1,72 +1,77 @@
 NAME
-    `overload::substr' - overload Perl's `substr()' function
+
+    overload::substr - overload Perl's substr() function
 
 SYNOPSIS
-     package My::Stringlike::Object;
 
-     use overload::substr;
-
-     sub _substr
-     {
-        my $self = shift;
-        if( @_ > 2 ) {
-           $self->replace_substr( @_ );
-        }
-        else {
-           return $self->get_substr( @_ );
-        }
-     }
-
-     ...
+       package My::Stringlike::Object;
+    
+       use overload::substr;
+    
+       sub _substr
+       {
+          my $self = shift;
+          if( @_ > 2 ) {
+             $self->replace_substr( @_ );
+          }
+          else {
+             return $self->get_substr( @_ );
+          }
+       }
+    
+       ...
 
 DESCRIPTION
-    This module allows an object class to overload the `substr' core
-    function, which Perl's `overload' pragma does not allow by itself.
 
-    It is invoked similarly to the `overload' pragma, being passed a single
+    This module allows an object class to overload the substr core
+    function, which Perl's overload pragma does not allow by itself.
+
+    It is invoked similarly to the overload pragma, being passed a single
     named argument which should be a code reference or method name to
-    implement the `substr' function.
+    implement the substr function.
 
-     use overload::substr substr => \&SUBSTR;
+       use overload::substr substr => \&SUBSTR;
+    
+       use overload::substr substr => "SUBSTR";
 
-     use overload::substr substr => "SUBSTR";
-
-    The referred method will be invoked as per core's `substr'; namely, it
+    The referred method will be invoked as per core's substr; namely, it
     will take the string to be operated on (which will be an object in this
     case), an offset, optionally a length, and optionally a replacement.
 
-     $str->SUBSTR( $offset );
-     $str->SUBSTR( $offset, $length );
-     $str->SUBSTR( $offset, $length, $replacement );
+       $str->SUBSTR( $offset );
+       $str->SUBSTR( $offset, $length );
+       $str->SUBSTR( $offset, $length, $replacement );
 
     In each case, whatever it returns will be the return value of the
-    `substr' function that invoked it.
+    substr function that invoked it.
 
-    If the `substr' argument is not provided, it defaults to a method called
-    `_substr'.
+    If the substr argument is not provided, it defaults to a method called
+    _substr.
 
     It is not required that the return value be a plain string; any Perl
-    value may be returned unmodified from the `substr' method, or passed in
+    value may be returned unmodified from the substr method, or passed in
     as the value of the replacement. This allows objects to behave in
     whatever way is deemed most appropriate.
 
 TODO
-    *       More testing - edge cases, especially in LVALUE logic.
 
-    *       Test for memory leaks, especially in LVALUE logic.
+      * More testing - edge cases, especially in LVALUE logic.
 
-    *       Look into / implement fixup of substr() ops compiled before
-            module is loaded
+      * Test for memory leaks, especially in LVALUE logic.
 
-    *       Consider if implementations of split(), and `m//' and `s///'
-            regexps should be done that also uses the overloaded substr()
-            method.
+      * Look into / implement fixup of substr() ops compiled before module
+      is loaded
+
+      * Consider if implementations of split(), and m// and s/// regexps
+      should be done that also uses the overloaded substr() method.
 
 ACKNOWLEDGEMENTS
+
     With thanks to Matt S Trout <mst@shadowcat.co.uk> for suggesting the
-    possibility, and Joshua ben Jore <jjore@cpan.org> for the inspiration by
-    way of UNIVERSAL::ref.
+    possibility, and Joshua ben Jore <jjore@cpan.org> for the inspiration
+    by way of UNIVERSAL::ref.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

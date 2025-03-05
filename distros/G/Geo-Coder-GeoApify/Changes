@@ -1,4 +1,11 @@
 Revision history for Geo-Coder-GeoApify
 
+0.02	Tue Mar  4 08:34:49 EST 2025
+	Commented the code better
+	geocode(): croak when input is just a set of numbers
+	Added t/offline.t
+	Use Params::Get
+	Added support for rate throttling and caching
+
 0.01	Wed Oct 23 13:11:50 EDT 2024
         First draft

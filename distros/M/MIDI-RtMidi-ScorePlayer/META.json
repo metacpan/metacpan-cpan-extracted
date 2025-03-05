@@ -64,7 +64,7 @@
          "web" : "https://github.com/ology/MIDI-RtMidi-ScorePlayer"
       }
    },
-   "version" : "0.0206",
+   "version" : "0.0208",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

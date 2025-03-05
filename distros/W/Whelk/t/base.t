@@ -27,6 +27,10 @@ $t->request(GET '/test/nocontent')
 	->code_is(204)
 	->content_is('');
 
+$t->request(GET '/test/code_201')
+	->code_is(201)
+	->json_cmp({success => JSON::PP::true, data => JSON::PP::true});
+
 $t->request(POST '/test/err')
 	->code_is(418)
 	->json_cmp({success => JSON::PP::false, error => "I'm a teapot"});

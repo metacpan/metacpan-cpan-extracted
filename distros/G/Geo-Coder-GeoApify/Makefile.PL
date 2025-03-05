@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -23,9 +23,11 @@ if($ENV{'AUTHOR_TESTING'}) {
 
 my $test_requires = {
 	'Test::DescribeMe' => 0,
+	'Test::LWP::UserAgent' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
+	'Test::RequiresInternet' => 0
 };
 
 if($online_tests) {
@@ -49,7 +51,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
     NAME		=> 'Geo::Coder::GeoApify',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM	=> 'lib/Geo/Coder/GeoApify.pm',
     ABSTRACT_FROM       => 'lib/Geo/Coder/GeoApify.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -59,11 +61,15 @@ WriteMakefile(
     PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
+    	'CHI' => 0,
 	'Encode' => 0,
+	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'JSON::MaybeXS' => 0,
 	'HTTP::Request' => 0,
 	'LWP::UserAgent' => 0,
 	'LWP::Protocol::https' => 0,
+	'Params::Get' => 0,
+	'Time::HiRes' => 0,
 	'URI' => 0,
     }, dist => $dist,
     clean		=> { FILES => 'Geo-Coder-GeoApify-*' },

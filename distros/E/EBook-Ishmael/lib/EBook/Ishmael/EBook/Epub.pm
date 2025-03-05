@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -10,13 +10,15 @@ use File::Path;
 use File::Spec;
 use File::Temp qw(tempdir);
 
-use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use XML::LibXML;
 
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::Unzip;
 
 my $MAGIC = pack 'C4', ( 0x50, 0x4b, 0x03, 0x04 );
 my $CONTAINER = File::Spec->catfile(qw/META-INF container.xml/);
+
+my $DCNS = "http://purl.org/dc/elements/1.1/";
 
 # This module only supports EPUBs with a single rootfile. The standard states
 # there can be multiple rootfiles, but I have yet to encounter one that does.
@@ -26,12 +28,9 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
-	open my $fh, '<', $file
-		or die "Failed to open $file for reading: $!\n";
-	binmode $fh;
 	read $fh, my $mag, 4;
-	close $fh;
 
 	return $mag eq $MAGIC;
 }
@@ -116,6 +115,7 @@ sub _read_rootfile {
 
 	my $xpc = XML::LibXML::XPathContext->new($dom);
 	$xpc->registerNs('package', $ns);
+	$xpc->registerNs('dc', $DCNS);
 
 	my ($meta) = $xpc->findnodes(
 		'/package:package/package:metadata'
@@ -141,7 +141,7 @@ sub _read_rootfile {
 		die "EPUB $self->{Source} is missing spine in rootfile\n";
 	}
 
-	for my $dc ($meta->findnodes('./dc:*')) {
+	for my $dc ($xpc->findnodes('./dc:*', $meta)) {
 
 		my $name = $dc->nodeName =~ s/^dc://r;
 		my $text = $dc->textContent();
@@ -175,6 +175,18 @@ sub _read_rootfile {
 		next unless -f $href;
 
 		push @{ $self->{_spine} }, $href;
+
+	}
+
+	# Get list of images
+	for my $item ($xpc->findnodes('./package:item', $manif)) {
+
+		next unless ($item->getAttribute('media-type') // '') =~ /^image\//;
+
+		my $href = $item->getAttribute('href') or next;
+		$href = File::Spec->catfile($self->{_contdir}, $href);
+
+		push @{ $self->{_images} }, $href if -f $href;
 
 	}
 
@@ -219,11 +231,16 @@ sub new {
 		# List of content files in order specified by spine.
 		_spine     => [],
 		_cover     => undef,
+		_images    => [],
 	};
 
 	bless $self, $class;
 
 	$self->read($file);
+
+	unless (@{ $self->{Metadata}->title }) {
+		$self->{Metadata}->title([ (fileparse($file, qr/\.[^.]*/))[0] ]);
+	}
 
 	$self->{Metadata}->format([ 'EPUB' ]);
 
@@ -236,21 +253,9 @@ sub read {
 	my $self = shift;
 	my $src  = shift;
 
-	my $zip = Archive::Zip->new();
-
-	unless ($zip->read($src) == AZ_OK) {
-		die "Could not read $src as an EPUB zip archive\n";
-	}
-
-	foreach my $m ($zip->members()) {
-		$m->unixFileAttributes($m->isDirectory() ? 0755 : 0644);
-	}
-
 	my $tmpdir = _tmpdir;
 
-	unless ($zip->extractTree('', $tmpdir) == AZ_OK) {
-		die "Could not unzip $src to $tmpdir\n";
-	}
+	unzip($src, $tmpdir);
 
 	$self->{Source} = File::Spec->rel2abs($src);
 	$self->{_unzip} = $tmpdir;
@@ -375,6 +380,33 @@ sub cover {
 	close $wh;
 
 	return $out // $bin;
+
+}
+
+sub image_num {
+
+	my $self = shift;
+
+	return scalar @{ $self->{_images} };
+
+}
+
+sub image {
+
+	my $self = shift;
+	my $n    = shift;
+
+	if ($n >= $self->image_num) {
+		return undef;
+	}
+
+	open my $fh, '<', $self->{_images}[$n]
+		or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+	binmode $fh;
+	my $img = do { local $/ = undef; readline $fh };
+	close $fh;
+
+	return \$img;
 
 }
 

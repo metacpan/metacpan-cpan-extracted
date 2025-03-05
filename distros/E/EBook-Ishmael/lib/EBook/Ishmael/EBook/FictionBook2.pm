@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -153,14 +153,12 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
 	return 1 if $file =~ /\.fb2$/;
-	return 0 unless -T $file;
+	return 0 unless -T $fh;
 
-	open my $fh, '<', $file
-		or die "Failed to open $file for reading: $!\n";
 	read $fh, my ($head), 1024;
-	close $fh;
 
 	return $head =~ /<\s*FictionBook[^<>]+xmlns\s*=\s*"\Q$NS\E"[^<>]*>/;
 
@@ -208,6 +206,10 @@ sub _read_metadata {
 		}
 	}
 
+	@{ $self->{_images} } = grep {
+		($_->getAttribute('content-type') // '') =~ /^image\//
+	} $xpc->findnodes('/FictionBook:FictionBook/FictionBook:binary');
+
 	my ($covmeta) = $xpc->findnodes('./FictionBook:coverpage', $title);
 
 	# Put if code inside own block so we can easily last out of it.
@@ -240,6 +242,7 @@ sub new {
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
 		_dom     => undef,
 		_cover   => undef,
+		_images  => [],
 	};
 
 	bless $self, $class;
@@ -350,6 +353,29 @@ sub cover {
 	close $fh;
 
 	return $out // $bin;
+
+}
+
+sub image_num {
+
+	my $self = shift;
+
+	return scalar @{ $self->{_images} };
+
+}
+
+sub image {
+
+	my $self = shift;
+	my $n    = shift;
+
+	if ($n >= $self->image_num) {
+		return undef;
+	}
+
+	my $img = decode_base64($self->{_images}[$n]->textContent);
+
+	return \$img;
 
 }
 

@@ -42,6 +42,7 @@ lib/OPP/Proc/Output.pm
 lib/OPP/Proc/Pivots.pm
 lib/OPP/Proc.pm
 lib/OPP/Proc/Regex.pm
+lib/OPP/Proc/Rename.pm
 lib/OPP/Proc/Search.pm
 lib/OPP/Proc/Splitsubnet.pm
 lib/OPP/Proc/Top.pm

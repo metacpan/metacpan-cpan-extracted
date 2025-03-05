@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Boolean;
-$Whelk::Schema::Definition::Boolean::VERSION = '1.01';
+$Whelk::Schema::Definition::Boolean::VERSION = '1.02';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 use List::Util qw(none);
@@ -36,7 +36,7 @@ sub _inhale
 
 	if (ref $value) {
 		$inhaled = 'boolean'
-			if none { $value eq $_ } (JSON::PP::true, JSON::PP::false);
+			if none { $value == $_ } (JSON::PP::true, JSON::PP::false);
 	}
 	else {
 		$inhaled = 'boolean'

@@ -1,5 +1,57 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.00  Mar 05 2025
+  This is a major upgrade that introduces many changes that may be incompatible
+  with previous versions of ishmael. Pay special attention to the Added,
+  Changes, and Removed sections of this changelog if this concerns you.
+  Added:
+    - Added the -g/--image option: Dump all images present in a given ebook to a
+      specified directory.
+    - Added support for additional ebook formats.
+      - Microsoft Compiled HTML (CHM)
+      - Comic Book archives (cb7, cbr, cbz)
+      - These new formats have introduced some new optional dependencies; chmlib
+        for CHM, 7z for cb7, and unrar for cbr.
+    - New metadata dump formats: pretty xml, normal xml, and normal JSON. See
+      the changes section for information on how the new metadata dumping system
+      works.
+    - Added EXAMPLES section to manual.
+  Changes:
+    - Rebranding as a general ebook dumper as opposed to just a plain text
+      converter.
+    - The -m/--metadata option can now dump multiple different formats of
+      metadata; ishmael (the original), json, pjson (the original --meta-json),
+      xml, and pxml. These formats are specified by an optional argument to
+      --metadata (--metadata=<form>). This has removed the need for --meta-json
+      to be a seperate option.
+    - Changed default -c/--cover behavior. Output is now written to a file
+      rather than stdout by default ("pick the right default"). You can also add
+      a '.*' (dot asterisk) to the end of the output path name which ishmael
+      will substitute for the image's format suffix.
+    - The -c/--cover option no longer "dies" if a cover image is not present
+      in an ebook.
+  Removed:
+    - Removed the -o/--output option. The new way to specify output is via a
+      second command-line argument following the given ebook file.
+    - Removed the -j/--meta-json option. Please use --metadata=pjson instead.
+  Fixes:
+    - When executing system commands via qx, ishmael now quotes arguments using
+      single quotes instead of double quotes. This should mean that arguments
+      with shell metacharacters should not cause unwanted behavior.
+    - ishmael no longer relies on an EPUB's metadata file to specify the 'dc'
+      namespace, which should fix reading some unconventionally formatted
+      EPUBs.
+    - ishmael now converts CP1252-encoded Mobis to UTF-8.
+    - Unix time handling has been fixed for PDB-based formats (Mobi, AZW,
+      PalmDoc, zTXT).
+    - ishmael no longer recognizes unset creation/modification dates in
+      PDB-based formats.
+    - Fixed HTML/XHTML identification heuristics.
+    - Fix documentation typos.
+    - Fix test typos.
+  Improvements:
+    - Format identification heuristics have been optimized.
+
 0.07  Feb 25 2025
   - Added -r/--raw option: Dumps the raw, unformatted text contents of a given
     ebook.

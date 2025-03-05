@@ -1,5 +1,5 @@
 package Kelp::Module::Whelk;
-$Kelp::Module::Whelk::VERSION = '1.01';
+$Kelp::Module::Whelk::VERSION = '1.02';
 use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;
@@ -114,6 +114,8 @@ sub _initialize_resources
 				),
 		};
 
+		$controller->schemas
+			if $controller->can('schemas');
 		$controller->api;
 	}
 }

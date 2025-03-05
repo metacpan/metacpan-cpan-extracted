@@ -1,7 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
-use Test::More tests => 2 + 1;
+use v5.14;
+use warnings;
+
+use Test2::V0;
 use Test::NoWarnings;
 
 package SimpleString;
@@ -40,6 +42,9 @@ $substr_return = "Hello";
 $s = substr( $str, 0, 5 );
 is( $s, "Hello", 'substr extraction' );
 
-is_deeply( \@substr_args,
-           [ 0, 5 ],
-           '@args to substr extraction' );
+is( \@substr_args,
+    [ 0, 5 ],
+    '@args to substr extraction' );
+
+Test::NoWarnings::had_no_warnings;
+done_testing;

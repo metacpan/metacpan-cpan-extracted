@@ -15,8 +15,9 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'File::Path' => '0',
+        'File::Temp' => '0.10',
         'File::Spec' => '0',
-        'File::Which' => '0',
     },
     PREREQ_PM => {
         'Archive::Zip' => '0',

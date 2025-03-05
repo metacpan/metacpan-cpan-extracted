@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use File::Temp qw(tempdir);
 use File::Which;
 use XML::LibXML;
 
+use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
 
 # This module basically delegates the task of processing PDFs to some of
@@ -18,6 +19,14 @@ use EBook::Ishmael::EBook::Metadata;
 my $PDFTOHTML = which 'pdftohtml';
 my $PDFINFO   = which 'pdfinfo';
 my $PDFTOPNG  = which 'pdftopng';
+my $PDFIMAGES = which 'pdfimages';
+
+our $CAN_TEST = (
+	defined $PDFTOHTML and
+	defined $PDFINFO   and
+	defined $PDFTOPNG  and
+	defined $PDFIMAGES
+);
 
 my $MAGIC = '%PDF';
 
@@ -25,12 +34,9 @@ sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
+	my $fh    = shift;
 
-	open my $fh, '<', $file
-		or die "Failed to open $file for reading: $!\n";
-	binmode $fh;
 	read $fh, my ($mag), 4;
-	close $fh;
 
 	return $mag eq $MAGIC;
 
@@ -54,7 +60,7 @@ sub _get_metadata {
 		die "Cannot read PDF $self->{Source}: pdfinfo not installed\n";
 	}
 
-	my $info = qx/$PDFINFO "$self->{Source}"/;
+	my $info = qx/$PDFINFO '$self->{Source}'/;
 
 	unless ($? >> 8 == 0) {
 		die "Failed to run '$PDFINFO' on $self->{Source}\n";
@@ -78,6 +84,26 @@ sub _get_metadata {
 
 }
 
+sub _images {
+
+	my $self = shift;
+
+	$self->{_imgdir} = tempdir(CLEANUP => 1);
+
+	my $root = File::Spec->catfile($self->{_imgdir}, 'ishmael');
+
+	qx/$PDFIMAGES -png '$self->{Source}' '$root'/;
+
+	unless ($? >> 8 == 0) {
+		die "Failed to run '$PDFIMAGES' on $self->{Source}\n";
+	}
+
+	@{ $self->{_images} } = dir($self->{_imgdir});
+
+	return 1;
+
+}
+
 sub new {
 
 	my $class = shift;
@@ -86,6 +112,8 @@ sub new {
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		_imgdir  => undef,
+		_images  => [],
 	};
 
 	bless $self, $class;
@@ -117,7 +145,7 @@ sub html {
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 	binmode $fh, ':utf8';
 
-	my $raw = qx/$PDFTOHTML -i -s -stdout "$self->{Source}"/;
+	my $raw = qx/$PDFTOHTML -i -s -stdout '$self->{Source}'/;
 
 	unless ($? >> 8 == 0) {
 		die "Failed to run '$PDFTOHTML' on $self->{Source}\n";
@@ -152,7 +180,7 @@ sub raw {
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 	binmode $fh, ':utf8';
 
-	my $rawml = qx/$PDFTOHTML -i -s -stdout "$self->{Source}"/;
+	my $rawml = qx/$PDFTOHTML -i -s -stdout '$self->{Source}'/;
 
 	unless ($? >> 8 == 0) {
 		die "Failed to run '$PDFTOHTML' on $self->{Source}\n";
@@ -196,13 +224,13 @@ sub cover {
 	my $tmpdir = tempdir(CLEANUP => 1);
 	my $tmproot = File::Spec->catfile($tmpdir, 'tmp');
 
-	qx/$PDFTOPNG -f 1 -l 1 "$self->{Source}" "$tmproot"/;
+	qx/$PDFTOPNG -f 1 -l 1 '$self->{Source}' '$tmproot'/;
 
 	unless ($? >> 8 == 0) {
 		die "Failed to run '$PDFTOPNG' on $self->{Source}\n";
 	}
 
-	my ($png) = glob "$tmpdir/*";
+	my ($png) = dir($tmpdir);
 
 	unless (defined $png) {
 		die "'$PDFTOPNG' could not produce a cover image from $self->{Source}\n";
@@ -226,6 +254,37 @@ sub cover {
 	close $rh;
 
 	return $out // $bin;
+
+}
+
+sub image_num {
+
+	my $self = shift;
+
+	unless (defined $self->{_imgdir}) {
+		$self->_images;
+	}
+
+	return scalar @{ $self->{_images} };
+
+}
+
+sub image {
+
+	my $self = shift;
+	my $n    = shift;
+
+	if ($n >= $self->image_num) {
+		return undef;
+	}
+
+	open my $fh, '<', $self->{_images}[$n]
+		or die "Failed to open $self->{_images}[$n]: $!\n";
+	binmode $fh;
+	my $img = do { local $/ = undef; readline $fh };
+	close $fh;
+
+	return \$img;
 
 }
 

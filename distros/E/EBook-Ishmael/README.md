@@ -1,9 +1,14 @@
 # ishmael
-**ishmael** is a Perl program that reads given ebook documents and converts
-their contents to formatted plain text, which should be suitable for
-piping into other programs for further processing. It accomplishes this
-by converting the ebook contents to HTML and then formatting that HTML
-using the dump feature found in many text web browsers, like `lynx(1)`.
+**ishmael** is a Perl program that can read and dump the contents of various
+popular (and unpopular) ebook formats. It originally only dumped the formatted
+text contents of an ebook, but has since grown to be able to dump metadata,
+images, and more.
+
+**ishmael** formats the text of an ebook by converting it to HTML and running
+it through an HTML formatter, like `lynx(1)`. **ishmael** will print the output
+to *stdout* by default, making it suitable for piping the text into another
+program for further processing. For example, you can pipe it into a pager like
+`less(1)` for a sort of basic terminal e-reader.
 
 **ishmael** currently supports the following ebook formats:
 * EPUB
@@ -14,6 +19,8 @@ using the dump feature found in many text web browsers, like `lynx(1)`.
 * FictionBook2
 * PalmDoc
 * zTXT
+* Comic Book Archives (cbr, cbz, cb7)
+* Microsoft Compiled HTML Help (CHM)
 * Text
 
 ## Building
@@ -34,6 +41,9 @@ either CPAN or your system's package manager:
 system:
 * `perl` (>= `5.16`)
 * `poppler-utils` (optional; for PDF support)
+* `unrar` (optional; for CBR support)
+* `7z` (optional; for CB7 support)
+* `chmlib` (optional; for CHM support)
 
 The following text web browsers can be installed for **ishmael** to use for
 formatting HTML. If none are installed, **ishmael** will use its own HTML
@@ -56,7 +66,8 @@ configure the build process.
 
 ## Usage
 **ishmael**'s usage is pretty simple; you give it an ebook file as argument and
-it dumps its formatted text contents to *stdout*. For more comprehensive
+it dumps its formatted text contents to *stdout*. You can also dump other types
+of content through the use of command-line options. For more comprehensive
 documentation, one should consult **ishmael**'s manual.
 ```bash
 perldoc bin/ishmael
@@ -68,6 +79,22 @@ Written by Samuel Young, *\<samyoung12788 at gmail dot com\>*.
 This project's source can be found on its
 [Codeberg page](https://codeberg.org/1-1sam/ishmael). Comments and pull
 requests are welcome!
+
+## Thanks
+This project would not have been possible without the hard work and generosity
+of other free and open-source e-reading projects that I studied or used.
+Here I will try to list each project and what they helped with.
+* [Calibre](https://calibre-ebook.com/) - Mobi reader, Mobi Huff/CDIC decoder,
+some test ebook files.
+* [Mobiperl](https://www.mobileread.com/forums/showthread.php?t=17718) - Mobi
+reader.
+* [Weasel Reader](https://gutenpalm.sourceforge.net/about.php) - zTXT reader,
+zTXT test file.
+* [MobileRead](https://wiki.mobileread.com/wiki/Main_Page) - Mobi reader,
+PalmDoc reader.
+* [KindleUnpack](https://github.com/kevinhendricks/KindleUnpack) - Mobi
+reader, Mobi Huff/CDIC decoder.
+* [web2help](https://www.skeed.it/web2help) - CHM test file.
 
 ## History
 

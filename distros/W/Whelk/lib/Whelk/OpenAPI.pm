@@ -1,5 +1,5 @@
 package Whelk::OpenAPI;
-$Whelk::OpenAPI::VERSION = '1.01';
+$Whelk::OpenAPI::VERSION = '1.02';
 use Kelp::Base;
 use List::Util qw(uniq);
 
@@ -41,22 +41,16 @@ sub build_path
 	# bulid responses
 	foreach my $code (keys %{$endpoint->response_schemas}) {
 		my $schema = $endpoint->response_schemas->{$code};
-		my $success = int($code / 100) == 2;
+		my $success = $code =~ /2../;
 
-		if ($success && $schema->empty) {
+		$responses{$code} = {
+			description => $schema->description // $self->default_response_description($code),
+		};
 
-			# special case for no content response
-			$responses{204} = {
-				description => $schema->description // $self->default_response_description(204),
-			};
-		}
-		else {
-			$responses{$code} = {
-				description => $schema->description // $self->default_response_description($code),
-				content => {
-					$endpoint->formatter->full_response_format => {
-						schema => $schema->openapi_schema($self),
-					},
+		if (!$schema->empty) {
+			$responses{$code}{content} = {
+				$endpoint->formatter->full_response_format => {
+					schema => $schema->openapi_schema($self),
 				},
 			};
 		}

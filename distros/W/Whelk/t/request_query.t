@@ -16,15 +16,15 @@ my $t = Kelp::Test->new(app => $app);
 ################################################################################
 
 $t->request(GET '/query')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Query parameters .+->required})});
 
 $t->request(GET '/query?test1=25')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Query parameters .+\[test2\]->required})});
 
 $t->request(GET '/query?test1=25.5&test2=')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Query parameters .+\[test1\]->integer})});
 
 $t->request(GET '/query?test1=25&test2=')

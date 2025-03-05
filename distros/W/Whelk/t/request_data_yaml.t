@@ -18,14 +18,14 @@ my $t = Kelp::Test->new(app => $app);
 $t->request(
 	POST '/body',
 	)
-	->code_is(400)
-	->yaml_cmp({error => 'Unsupported Content-Type'});
+	->code_is(415)
+	->yaml_cmp({error => 'Supported Content-Types are application/json, text/yaml'});
 
 $t->request(
 	POST '/body',
 	Content_Type => 'text/yaml',
 	)
-	->code_is(400)
+	->code_is(422)
 	->yaml_cmp({error => 'Content error at: object'});
 
 $t->request(
@@ -33,7 +33,7 @@ $t->request(
 	Content_Type => 'text/yaml',
 	Content => '[]',
 	)
-	->code_is(400)
+	->code_is(422)
 	->yaml_cmp({error => 'Content error at: object'});
 
 $t->request(
@@ -41,7 +41,7 @@ $t->request(
 	Content_Type => 'text/yaml',
 	Content => '{}',
 	)
-	->code_is(400)
+	->code_is(422)
 	->yaml_cmp({error => 'Content error at: object[test]->required'});
 
 $t->request(
@@ -49,7 +49,7 @@ $t->request(
 	Content_Type => 'text/yaml',
 	Content => 'test: 25.5',
 	)
-	->code_is(400)
+	->code_is(422)
 	->yaml_cmp({error => 'Content error at: object[test]->integer'});
 
 $t->request(

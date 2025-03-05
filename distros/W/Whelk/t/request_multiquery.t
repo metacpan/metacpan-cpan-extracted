@@ -17,11 +17,11 @@ my $t = Kelp::Test->new(app => $app);
 ################################################################################
 
 $t->request(GET '/multiquery')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Query parameters .+\[test\]->required$})});
 
 $t->request(GET '/multiquery?test=str')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Query parameters .+->number})});
 
 $t->request(GET '/multiquery?test=25')

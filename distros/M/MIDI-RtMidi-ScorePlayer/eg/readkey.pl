@@ -24,6 +24,7 @@ my $tka  = Term::TermKey::Async->new(
       common   => \%common,
       sleep    => 0,
       infinite => 0,
+      port     => qr/fluid/i,
     )->play;
 
     $loop->loop_stop if $key->type_is_unicode and

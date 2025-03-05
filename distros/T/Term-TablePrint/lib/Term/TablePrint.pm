@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.165';
+our $VERSION = '0.166';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -28,7 +28,6 @@ BEGIN {
     }
 }
 
-my $save_memory = 0;
 
 sub new {
     my $class = shift;
@@ -126,6 +125,13 @@ sub __reset {
 }
 
 
+our $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR;
+my $last_write_table     = 0;
+my $window_width_changed = 1;
+my $enter_search_string  = 2;
+my $from_filtered_table  = 3;
+
+
 sub print_table {
     if ( ref $_[0] ne __PACKAGE__ ) {
         my $ob = __PACKAGE__->new();
@@ -180,31 +186,16 @@ sub print_table {
         $self->__reset();
         return;
     }
-    my $data_row_count = @$tbl_orig - 1; ##
-    my $info_row = '';
-    if ( $self->{max_rows} && $data_row_count > $self->{max_rows} ) {
-        $info_row = sprintf( 'Limited to %s rows', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
-        $info_row .= sprintf( ' (total %s)', insert_sep( $data_row_count, $self->{thsd_sep} ) );
-        $data_row_count = $self->{max_rows};
+    $self->{_last_index} = $#$tbl_orig; ##
+    if ( $self->{max_rows} && $self->{_last_index} > $self->{max_rows} ) {
+        $self->{_info_row} = sprintf( 'Limited to %s rows', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
+        $self->{_info_row} .= sprintf( ' (total %s)', insert_sep( $self->{_last_index}, $self->{thsd_sep} ) );
+        $self->{_last_index} = $self->{max_rows};
     }
-    my $const = {
-        extra_w        => $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR,
-        data_row_count => $data_row_count,
-        info_row       => $info_row,
-        regex_number   => "^([^.EeNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z",
-    };
-    my $search = {
-        filter => '',
-        map_indexes => [],
-    };
-    my $mr = {
-        last                         => 0,
-        window_width_changed         => 1,
-        enter_search_string          => 2,
-        returned_from_filtered_table => 3,
-    };
-
-    my ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig, $const );
+    $self->{_search_regex} = '';
+    $self->{_idx_search_matches} = [];
+    $self->{_regex_number} = "^([^.EeNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z";
+    my ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig );
     if ( ! defined $term_w ) {
         $self->__reset();
         return;
@@ -212,27 +203,27 @@ sub print_table {
 
     WRITE_TABLE: while ( 1 ) {
         my $next = $self->__write_table(
-            $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names, $const, $search, $mr
+            $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names
         );
         if ( ! defined $next ) {
             die;
         }
-        elsif ( $next == $mr->{last} ) {
+        elsif ( $next == $last_write_table ) {
             last WRITE_TABLE;
         }
-        elsif ( $next == $mr->{window_width_changed} ) {
-            ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig, $const );
+        elsif ( $next == $window_width_changed ) {
+            ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig );
             if ( ! defined $term_w ) {
                 last WRITE_TABLE;
             }
             next WRITE_TABLE;
         }
-        elsif ( $next == $mr->{enter_search_string} ) {
-            $self->__search( $tbl_orig, $const, $search );
+        elsif ( $next == $enter_search_string ) {
+            $self->__search( $tbl_orig );
             next WRITE_TABLE;
         }
-        elsif ( $next == $mr->{returned_from_filtered_table} ) {
-            $self->__reset_search( $search );
+        elsif ( $next == $from_filtered_table ) {
+            $self->__reset_search();
             next WRITE_TABLE;
         }
     }
@@ -242,21 +233,21 @@ sub print_table {
 
 
 sub __get_data {
-    my ( $self, $tbl_orig, $const ) = @_;
-    my $term_w = get_term_width() + $const->{extra_w};
-    my $items_count = $const->{data_row_count} * @{$tbl_orig->[0]}; ##
+    my ( $self, $tbl_orig ) = @_;
+    my $term_w = get_term_width() + $extra_w;
+    my $items_count = $self->{_last_index} * @{$tbl_orig->[0]}; ##
     my $progress = Term::TablePrint::ProgressBar->new( {
-        total => $const->{data_row_count} * 3 + 2, # +2: two of three loops include the header row
+        total => $self->{_last_index} * 3 + 2, # +2: two of three loops include the header row
         show_progress_bar => $self->{progress_bar} < $items_count,
     } );
     my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
-    my ( $w_col_names, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $const, $progress );
+    my ( $w_col_names, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $progress );
     my $w_cols_calc = $self->__calc_avail_col_width( $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract );
     if ( ! defined $w_cols_calc ) {
         return;
     }
     my $tbl_w = sum( @{$w_cols_calc}, $self->{tab_w} * $#{$w_cols_calc} );
-    my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $const, $progress );
+    my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress );
     my @tmp_header_rows;
     if ( length $self->{prompt} ) {
         push @tmp_header_rows, $self->{prompt};
@@ -267,12 +258,12 @@ sub __get_data {
     my $col_names = shift @{$tbl_print};
     push @tmp_header_rows, $col_names, $self->__header_sep( $w_cols_calc );
     my $header_rows = join "\n", @tmp_header_rows;
-    if ( $const->{info_row} ) {
-        if ( print_columns( $const->{info_row} ) > $tbl_w ) {
-            push @{$tbl_print}, cut_to_printwidth( $const->{info_row}, $tbl_w - 3 ) . '...';
+    if ( $self->{_info_row} ) {
+        if ( print_columns( $self->{_info_row} ) > $tbl_w ) {
+            push @{$tbl_print}, cut_to_printwidth( $self->{_info_row}, $tbl_w - 3 ) . '...';
         }
         else {
-            push @{$tbl_print}, $const->{info_row};
+            push @{$tbl_print}, $self->{_info_row};
         }
     }
     return $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names;
@@ -280,27 +271,27 @@ sub __get_data {
 
 
 sub __write_table {
-    my ( $self, $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names, $const, $search, $mr ) = @_;
+    my ( $self, $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = @_;
     my @idxs_tbl_print;
-    my $return = $mr->{last};
-    if ( $search->{filter} ) {
-        @idxs_tbl_print = map { $_ - 1 } @{$search->{map_indexes}}; # because of the removed tbl_print header row
-        $return = $mr->{returned_from_filtered_table};
+    my $return = $last_write_table;
+    if ( $self->{_search_regex} ) {
+        @idxs_tbl_print = map { $_ - 1 } @{$self->{_idx_search_matches}}; # because of the removed tbl_print header row
+        $return = $from_filtered_table;
     }
     my $footer;
     if ( $self->{footer} ) {
         $footer = $self->{footer};
-        if ( $search->{filter} ) {
-            $footer .= "[$search->{filter}]";
+        if ( $self->{_search_regex} ) {
+            $footer .= "[$self->{_search_regex}]";
         }
     }
-    my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $search->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
+    my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $self->{_search_regex} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
     my $auto_jumped_to_first_row = 2;
     my $row_is_expanded = 0;
 
     while ( 1 ) {
-        if ( $term_w != get_term_width() + $const->{extra_w} ) {
-            return $mr->{window_width_changed};
+        if ( $term_w != get_term_width() + $extra_w ) {
+            return $window_width_changed;
         }
         if ( ! @{$tbl_print} ) {
             push @{$tbl_print}, ''; # so that going back requires always the same amount of keystrokes
@@ -320,16 +311,16 @@ sub __write_table {
         }
         elsif ( $row < 0 ) {
             if ( $row == -1 ) { # with option `ll` set and changed window width `choose` returns -1;
-                return $mr->{window_width_changed};
+                return $window_width_changed;
             }
             elsif ( $row == -13 ) { # with option `ll` set `choose` returns -13 if `Ctrl-F` was pressed
-                if ( $search->{filter} ) {
-                    $self->__reset_search( $search );
+                if ( $self->{_search_regex} ) {
+                    $self->__reset_search();
                 }
-                return $mr->{enter_search_string};
+                return $enter_search_string;
             }
             else {
-                return $mr->{last};
+                return $last_write_table;
             }
         }
         if ( ! $self->{table_expand} ) {
@@ -363,17 +354,17 @@ sub __write_table {
             }
             $old_row = $row;
             $row_is_expanded = 1;
-            if ( $const->{info_row} && $row == $#{$tbl_print} ) {
+            if ( $self->{_info_row} && $row == $#{$tbl_print} ) {
                 # Choose
                 choose(
                     [ 'Close' ],
-                    { prompt => $const->{info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+                    { prompt => $self->{_info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
                 );
                 next;
             }
             my $orig_row;
-            if ( @{$search->{map_indexes}} ) {
-                $orig_row = $search->{map_indexes}[$row];
+            if ( @{$self->{_idx_search_matches}} ) {
+                $orig_row = $self->{_idx_search_matches}[$row];
             }
             else {
                 $orig_row = $row + 1; # because $tbl_print has no header row while $tbl_orig has a header row
@@ -389,12 +380,10 @@ sub __copy_table {
     my ( $self, $tbl_orig, $progress ) = @_;
     my $tbl_copy = [];
     $progress->set_progress_bar();
-    ROW: for my $row ( @$tbl_orig ) {
-        if ( $self->{max_rows} && @$tbl_copy > $self->{max_rows} ) { ##
-            last;
-        }
+
+    ROW: for my $i ( 0 .. $self->{_last_index} ) {
         my $tmp_row = [];
-        COL: for ( @$row ) {
+        COL: for ( @{$tbl_orig->[$i]} ) {
             my $str = $_; # this is where the copying happens
             $str = $self->{undef}            if ! defined $str;
             $str = _handle_reference( $str ) if ref $str;
@@ -432,7 +421,7 @@ sub __copy_table {
 
 
 sub __calc_col_width {
-    my ( $self, $tbl_copy, $const, $progress ) = @_;
+    my ( $self, $tbl_copy, $progress ) = @_;
     $progress->set_progress_bar();            #
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
     my $col_count = @col_idx;
@@ -440,7 +429,6 @@ sub __calc_col_width {
     my $w_cols = [ ( 1 ) x $col_count ];
     my $w_int   = [ ( 0 ) x $col_count ];
     my $w_fract = [ ( 0 ) x $col_count ];
-    my $regex_number = $const->{regex_number};
     my $col_names = shift @$tbl_copy;
     for my $col ( @col_idx ) {
         $w_col_names->[$col] = print_columns( $col_names->[$col] );
@@ -452,7 +440,7 @@ sub __calc_col_width {
                 # nothing to do
             }
             elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
-                if ( $tbl_copy->[$row][$col] =~ /$regex_number/ ) {
+                if ( $tbl_copy->[$row][$col] =~ /$self->{_regex_number}/ ) {
                     if ( ( length $1 // 0 ) > $w_int->[$col] ) {
                         $w_int->[$col] = length $1;
                     }
@@ -600,10 +588,9 @@ sub __calc_avail_col_width {
 }
 
 sub __cols_to_string {
-    my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $const, $progress ) = @_;
+    my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress ) = @_;
     $progress->set_progress_bar();
     my $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
-    my $regex_number = $const->{regex_number};
     my $one_precision_w = length sprintf "%.1e", 123;
 
     ROW: for my $row ( 0 .. $#{$tbl_copy} ) {
@@ -616,7 +603,7 @@ sub __cols_to_string {
                 my $number = '';
                 if ( $w_fract->[$col] ) {
                     my $fract = '';
-                    if ( $tbl_copy->[$row][$col] =~ /$regex_number/ ) {
+                    if ( $tbl_copy->[$row][$col] =~ /$self->{_regex_number}/ ) {
                         if ( length $2 ) {
                             if ( length $2 > $w_fract->[$col] ) {
                                 $fract = substr( $2, 0, $w_fract->[$col] );
@@ -714,7 +701,6 @@ sub __cols_to_string {
         }
     }
     if ( $progress->{show_progress_bar} ) {
-        #$progress->{count} = $progress->{total};
         $progress->update_progress_bar();
     }
     return $tbl_copy; # $tbl_copy is now $tbl_print
@@ -799,7 +785,7 @@ sub __print_single_row {
 
 
 sub __search {
-    my ( $self, $tbl_orig, $const, $search ) = @_;
+    my ( $self, $tbl_orig ) = @_;
     if ( ! $self->{search} ) {
         return;
     }
@@ -821,8 +807,8 @@ sub __search {
         }
         print "\r${prompt}${string}";
         if ( ! eval {
-            $search->{filter} = $self->{search} == 1 ? "(?i:$string)" : $string;
-            'Teststring' =~ $search->{filter};
+            $self->{_search_regex} = $self->{search} == 1 ? "(?i:$string)" : $string;
+            'Teststring' =~ $self->{_search_regex};
             1
         } ) {
             $default = $default eq $string ? '' : $string;
@@ -833,24 +819,23 @@ sub __search {
     }
     no warnings 'uninitialized';
     my @col_idx = ( 0 .. $#{$tbl_orig->[0]} );
-    # begin: "1" to skipp the header row
-    # end: "data_row_count" as it its because +1 for the header row and -1 to get the 0-based index ##
-    for my $idx_row ( 1 .. $const->{data_row_count} ) {
+    # skip the header row
+    for my $idx_row ( 1 .. $self->{_last_index} ) {
         for ( @col_idx ) {
-            if ( $tbl_orig->[$idx_row][$_] =~ /$search->{filter}/ ) {
-                push @{$search->{map_indexes}}, $idx_row;
+            if ( $tbl_orig->[$idx_row][$_] =~ /$self->{_search_regex}/ ) {
+                push @{$self->{_idx_search_matches}}, $idx_row;
                 last;
             }
         }
     }
-    if ( ! @{$search->{map_indexes}} ) {
-        my $message = '/' . $search->{filter} . '/: No matches found.';
+    if ( ! @{$self->{_idx_search_matches}} ) {
+        my $message = '/' . $self->{_search_regex} . '/: No matches found.';
         # Choose
         choose(
             [ 'Continue with ENTER' ],
             { prompt => $message, layout => 0, clear_screen => 1, hide_cursor => 0 }
         );
-        $search->{filter} = '';
+        $self->{_search_regex} = '';
         return;
     }
     return;
@@ -858,9 +843,9 @@ sub __search {
 
 
 sub __reset_search {
-    my ( $self, $search ) = @_;
-    $search->{map_indexes} = [];
-    $search->{filter} = '';
+    my ( $self ) = @_;
+    $self->{_idx_search_matches} = [];
+    $self->{_search_regex} = '';
 }
 
 
@@ -931,7 +916,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.165
+Version 0.166
 
 =cut
 

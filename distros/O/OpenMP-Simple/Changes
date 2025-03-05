@@ -70,3 +70,19 @@
 0.1.8  02/04/2025 01:08:00 AM MST
       - removed PerlOMP_GETENV_ALL due to failing test and dubious
         utility;
+
+0.1.9  02/15/2025 01:08:00 AM MST
+      - bad bump, see 0.2.0
+
+0.2.0  03/05/2025 01:08:00 AM MST
+      - moved a flapping test out of the for future work
+      - added counting functions::
+        - int PerlOMP_1D_Array_NUM_ELEMENTS (SV *AVref)
+        - int PerlOMP_2D_AoA_NUM_ROWS(SV *AoAref)
+        - int PerlOMP_2D_AoA_NUM_COLS(SV *AoAref)
+        - void PerlOMP_1D_Array_TO_1D_STRING_ARRAY(SV *AVref, int numElements, char *retArray[numElements])
+        - void PerlOMP_1D_Array_TO_1D_STRING_ARRAY_r(SV *AVref, int numElements, char *retArray[numElements])
+      - added Github initial CI testing
+      - updated documentation
+      - added Github initial CI testing for latest Ubuntu,
+      - added VERIFY C functions (see POD)

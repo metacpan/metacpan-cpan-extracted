@@ -1,26 +1,30 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
+use File::Basename;
+use File::Path qw(remove_tree);
 use File::Temp qw(tempfile);
 use Getopt::Long;
 use List::Util qw(max);
 
 use JSON;
+use XML::LibXML;
 
 use EBook::Ishmael::EBook;
+use EBook::Ishmael::ImageID;
 use EBook::Ishmael::TextBrowserDump;
 
 use constant {
 	MODE_TEXT      => 0,
 	MODE_META      => 1,
-	MODE_META_JSON => 2,
-	MODE_ID        => 3,
-	MODE_HTML      => 4,
-	MODE_RAW_TIME  => 5,
-	MODE_COVER     => 6,
+	MODE_ID        => 2,
+	MODE_HTML      => 3,
+	MODE_RAW_TIME  => 4,
+	MODE_COVER     => 5,
+	MODE_IMAGE     => 6,
 };
 
 my $PRGNAM = 'ishmael';
@@ -30,18 +34,17 @@ my $HELP = <<"HERE";
 $PRGNAM - $PRGVER
 
 Usage:
-  $0 [options] file
+  $0 [options] file [output]
 
 Options:
   -d|--dumper=<dumper>   Specify dumper to use for formatting text
   -f|--format=<format>   Specify ebook format
-  -o|--output=<file>     Write output to file
   -w|--width=<width>     Specify output line width
   -H|--html              Dump ebook HTML
   -c|--cover             Dump ebook cover image
+  -g|--image             Dump ebook images
   -i|--identify          Identify ebook format
-  -j|--meta-json         Print ebook metadata in JSON
-  -m|--metadata          Print ebook metadata
+  -m|--metadata[=<form>] Print ebook metadata
   -r|--raw               Dump the raw, unformatted ebook text
 
   -h|--help      Print help message
@@ -59,16 +62,22 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 HERE
 
+my $STDOUT = '-';
+
 my %FORMAT_ALTS = (
-	'fb2'   => 'fictionbook2',
-	'azw'   => 'mobi',
+	'fb2'       => 'fictionbook2',
+	'azw'       => 'mobi',
+);
+
+my %META_MODES = map { $_ => 1 } qw(
+	ishmael json pjson xml pxml
 );
 
 sub _get_out {
 
 	my $file = shift;
 
-	if (defined $file) {
+	if ($file ne $STDOUT) {
 		open my $fh, '>', $file
 			or die "Failed to open $file for writing: $!\n";
 		return $fh;
@@ -89,25 +98,45 @@ sub init {
 		Format => undef,
 		Output => undef,
 		Width  => 80,
+		Meta   => undef,
 	};
 
 	Getopt::Long::config('bundling');
 	GetOptions(
-		'dumper|d=s'  => \$self->{Dumper},
-		'format|f=s'  => \$self->{Format},
-		'output|o=s'  => \$self->{Output},
-		'width|w=i'   => \$self->{Width},
-		'html|H'      => sub { $self->{Mode} = MODE_HTML },
-		'cover|c'     => sub { $self->{Mode} = MODE_COVER },
-		'identify|i'  => sub { $self->{Mode} = MODE_ID },
-		'meta-json|j' => sub { $self->{Mode} = MODE_META_JSON },
-		'metadata|m'  => sub { $self->{Mode} = MODE_META },
-		'raw|r'       => sub { $self->{Mode} = MODE_RAW_TIME },
+		'dumper|d=s'   => \$self->{Dumper},
+		'format|f=s'   => \$self->{Format},
+		'width|w=i'    => \$self->{Width},
+		'html|H'       => sub { $self->{Mode} = MODE_HTML },
+		'cover|c'      => sub { $self->{Mode} = MODE_COVER },
+		'image|g'      => sub { $self->{Mode} = MODE_IMAGE },
+		'identify|i'   => sub { $self->{Mode} = MODE_ID },
+		'metadata|m:s' => sub {
+			# Some DWIMery that if the given argument is not a valid metadata
+			# format, assume the user meant for it be a file argument and put
+			# it back into @ARGV.
+			$self->{Mode} = MODE_META;
+			if (!$_[1] or exists $META_MODES{ lc $_[1] }) {
+				$self->{Meta} = lc $_[1] || 'ishmael';
+			} else {
+				$self->{Meta} = 'ishmael';
+				unshift @ARGV, $_[1];
+			}
+		},
+		'raw|r'        => sub { $self->{Mode} = MODE_RAW_TIME },
 		'help|h'    => sub { print $HELP;        exit 0; },
 		'version|v' => sub { print $VERSION_MSG; exit 0; },
 	) or die "Error in command line arguments\n$HELP";
 
 	$self->{Ebook} = shift @ARGV or die $HELP;
+	$self->{Output} = shift @ARGV;
+
+	if ($self->{Mode} == MODE_COVER) {
+		$self->{Output} //= (fileparse($self->{Ebook}, qr/\.[^.]*/))[0] . '.*';
+	} elsif ($self->{Mode} == MODE_IMAGE) {
+		$self->{Output} //= (fileparse($self->{Ebook}, qr/\.[^.]*/))[0];
+	} else {
+		$self->{Output} //= $STDOUT;
+	}
 
 	if (defined $self->{Format}) {
 
@@ -147,13 +176,35 @@ sub text {
 
 	print { $oh } browser_dump $tmp, { browser => $self->{Dumper}, width => $self->{Width} };
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
 
 	1;
 
 }
 
 sub meta {
+
+	my $self = shift;
+
+	if ($self->{Meta} eq 'ishmael') {
+		$self->meta_ishmael;
+	} elsif ($self->{Meta} eq 'json') {
+		$self->meta_json(0);
+	} elsif ($self->{Meta} eq 'pjson') {
+		$self->meta_json(1);
+	} elsif ($self->{Meta} eq 'xml') {
+		$self->meta_xml(0);
+	} elsif ($self->{Meta} eq 'pxml') {
+		$self->meta_xml(1);
+	} else {
+		die "'$self->{Meta}' is not a valid metadata format\n";
+	}
+
+	1;
+
+}
+
+sub meta_ishmael {
 
 	my $self = shift;
 
@@ -173,7 +224,7 @@ sub meta {
 		say { $oh } pack("A$klen", "$k:"), join(", ", @{ $meta{ $k } });
 	}
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
 
 	1;
 
@@ -181,7 +232,8 @@ sub meta {
 
 sub meta_json {
 
-	my $self = shift;
+	my $self   = shift;
+	my $pretty = shift // 0;
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
@@ -199,9 +251,59 @@ sub meta_json {
 		}
 	}
 
-	print { $oh } to_json($meta, { utf8 => 1, pretty => 1, canonical => 1 });
+	say { $oh } to_json($meta, { utf8 => 1, pretty => $pretty, canonical => 1 });
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
+
+	1;
+
+}
+
+sub meta_xml {
+
+	my $self   = shift;
+	my $pretty = shift // 0;
+
+	my $ebook = EBook::Ishmael::EBook->new(
+		$self->{Ebook},
+		$self->{Format},
+	);
+
+	my $meta = $ebook->metadata;
+
+	my $oh = _get_out($self->{Output});
+
+	my $dom = XML::LibXML::Document->new('1.0', 'UTF-8');
+	my $root = XML::LibXML::Element->new('ishmael');
+	$dom->setDocumentElement($root);
+	$root->setAttribute('version', $PRGVER);
+	my $metan = $root->appendChild(
+		XML::LibXML::Element->new('metadata')
+	);
+
+	for my $k (sort keys %{ $meta }) {
+
+		my $n = $metan->appendChild(
+			XML::LibXML::Element->new(lc $k)
+		);
+
+		for my $i (@{ $meta->{ $k } }) {
+
+			my $in = $n->appendChild(
+				XML::LibXML::Element->new('item')
+			);
+
+			$in->appendChild(
+				XML::LibXML::Text->new($i)
+			);
+
+		}
+
+	}
+
+	$dom->toFH($oh, $pretty);
+
+	close $oh unless $self->{Output} eq $STDOUT;
 
 	1;
 
@@ -232,7 +334,7 @@ sub html {
 
 	say { $oh } $ebook->html;
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
 
 	1;
 
@@ -251,7 +353,7 @@ sub raw {
 
 	say { $oh } $ebook->raw;
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
 
 	1;
 
@@ -267,15 +369,106 @@ sub cover {
 	);
 
 	unless ($ebook->has_cover) {
-		die "$self->{Ebook} does not have a cover\n";
+		say "$self->{Ebook} does not have a cover";
+		return;
 	}
+
+	my $cover = $ebook->cover;
+	my $fmt = image_id(\$cover);
+
+	unless (defined $fmt) {
+		die "Could not dump $self->{Ebook} cover; could not identify cover image format\n";
+	}
+
+	$self->{Output} =~ s/\.\*$/.$fmt/;
 
 	my $oh = _get_out($self->{Output});
 	binmode $oh;
 
 	print { $oh } $ebook->cover;
 
-	close $oh unless $oh eq *STDOUT;
+	close $oh unless $self->{Output} eq $STDOUT;
+
+	1;
+
+}
+
+sub image {
+
+	my $self = shift;
+
+	my $ebook = EBook::Ishmael::EBook->new(
+		$self->{Ebook},
+		$self->{Format}
+	);
+
+	my $num = $ebook->image_num;
+
+	unless ($num) {
+		say "$self->{Ebook} has no images";
+		return;
+	}
+
+	my $base = basename($self->{Output});
+	my $pad = length $num;
+
+	my $mkdir = 0;
+
+	unless (-d $self->{Output}) {
+		mkdir $self->{Output}
+			or die "Failed to mkdir $self->{Output}: $!\n";
+		$mkdir = 1;
+	}
+
+	my @created;
+
+	eval {
+		for my $i (0 .. $num - 1) {
+
+			my $ii = $i + 1;
+
+			my $img = $ebook->image($i);
+			my $id = image_id($img);
+
+			unless (defined $id) {
+				warn "Could not identify image #$ii\'s format, skipping\n";
+				next;
+			}
+
+			my $b = sprintf "%s-%0*d.%s", $base, $pad, $ii, $id;
+
+			my $p = File::Spec->catfile($self->{Output}, $b);
+
+			open my $fh, '>', $p
+				or die "Failed to open $p for writing: $!\n";
+			binmode $fh;
+			print { $fh } $$img;
+			close $fh;
+
+			push @created, $p;
+
+		}
+		1;
+	} or do {
+
+		for my $c (@created) {
+			unlink $c;
+		}
+
+		rmdir $self->{Output} if $mkdir;
+
+		die $@;
+	};
+
+	unless (@created) {
+		rmdir $self->{Output} if $mkdir;
+		die "Could not dump any images in $self->{Output}\n";
+	}
+
+	say $self->{Output};
+	for my $c (map { basename($_) } @created) {
+		say "  $c";
+	}
 
 	1;
 
@@ -289,8 +482,6 @@ sub run {
 		$self->text;
 	} elsif ($self->{Mode} == MODE_META) {
 		$self->meta;
-	} elsif ($self->{Mode} == MODE_META_JSON) {
-		$self->meta_json;
 	} elsif ($self->{Mode} == MODE_ID) {
 		$self->id;
 	} elsif ($self->{Mode} == MODE_HTML) {
@@ -299,6 +490,8 @@ sub run {
 		$self->raw;
 	} elsif ($self->{Mode} == MODE_COVER) {
 		$self->cover;
+	} elsif ($self->{Mode} == MODE_IMAGE) {
+		$self->image;
 	}
 
 	1;
@@ -310,7 +503,7 @@ sub run {
 
 =head1 NAME
 
-EBook::Ishmael - Convert ebook documents to plain text
+EBook::Ishmael - EBook dumper
 
 =head1 SYNOPSIS
 
@@ -340,9 +533,17 @@ Dumps ebook file to text, default run mode.
 
 Dumps ebook metadata, C<--metadata> mode.
 
-=head2 $i->meta_json()
+=head2 $i->meta_ishmael()
 
-Dumps ebook metadata in JSON form, C<--meta-json> mode.
+Dumps ebook metadata, C<--metadata=ishmael> mode.
+
+=head2 $i->meta_json($pretty)
+
+Dumps ebook metadata in JSON form, C<--metadata=p?json> mode.
+
+=head2 $i->meta_xml($pretty)
+
+Dumps ebook metadata in XML form, C<--metadata=p?xml> mode.
 
 =head2 $i->id()
 

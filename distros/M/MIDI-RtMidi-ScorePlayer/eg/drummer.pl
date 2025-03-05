@@ -77,6 +77,7 @@ warn __PACKAGE__,' L',__LINE__,' ',ref($by_name{$section}),"\n";
         parts    => $parts,
         sleep    => 0,
         infinite => 0,
+        port     => qr/fluid/i,
         # dump     => 1,
       )->play;
     }

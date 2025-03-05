@@ -144,6 +144,10 @@
          "file" : "lib/OPP/Proc/Regex.pm",
          "version" : "1.00"
       },
+      "OPP::Proc::Rename" : {
+         "file" : "lib/OPP/Proc/Rename.pm",
+         "version" : "1.00"
+      },
       "OPP::Proc::Search" : {
          "file" : "lib/OPP/Proc/Search.pm",
          "version" : "1.00"
@@ -174,11 +178,11 @@
       },
       "Onyphe" : {
          "file" : "lib/Onyphe.pm",
-         "version" : "4.17"
+         "version" : "4.18"
       },
       "Onyphe::Api" : {
          "file" : "lib/Onyphe/Api.pm",
-         "version" : "4.17"
+         "version" : "4.18"
       }
    },
    "release_status" : "stable",
@@ -187,6 +191,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "4.17",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "4.18",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

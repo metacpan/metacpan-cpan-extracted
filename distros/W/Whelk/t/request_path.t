@@ -30,11 +30,11 @@ $t->request(GET '/path/25/')
 	->json_cmp(JSON::PP::true);
 
 $t->request(GET '/path/2/5')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Path parameters .+\[test2\]->boolean})});
 
 $t->request(GET '/path/str/1')
-	->code_is(400)
+	->code_is(422)
 	->json_cmp({error => re(qr{Path parameters .+\[test1\]->number})});
 
 $t->request(GET '/path/25/0')

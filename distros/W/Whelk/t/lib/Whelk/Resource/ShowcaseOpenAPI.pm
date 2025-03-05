@@ -3,10 +3,8 @@ package Whelk::Resource::ShowcaseOpenAPI;
 use Kelp::Base 'Whelk::Resource';
 use Whelk::Schema;
 
-sub api
+sub schemas
 {
-	my ($self) = @_;
-
 	Whelk::Schema->build(
 		some_entity_id => {
 			type => 'integer',
@@ -42,6 +40,12 @@ sub api
 			}
 		}
 	);
+
+}
+
+sub api
+{
+	my ($self) = @_;
 
 	$self->add_endpoint(
 		[GET => '/item/:id'] => sub { },

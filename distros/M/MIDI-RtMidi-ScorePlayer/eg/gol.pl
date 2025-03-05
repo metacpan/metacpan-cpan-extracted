@@ -32,6 +32,7 @@ END {
       parts    => [ \&cleanup ],
       sleep    => 0,
       infinite => 0,
+      port     => qr/fluid/i,
     )->play;
 }
 

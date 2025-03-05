@@ -22,9 +22,9 @@ subtest "PDB data ok" => sub {
 	is($ebook->{_pdb}->name,          'gpl3',      "name ok");
 	is($ebook->{_pdb}->attributes,    0,           "attributes ok");
 	is($ebook->{_pdb}->version,       0,           "version ok");
-	is($ebook->{_pdb}->cdate,         -343968690,  "creation date ok");
-	is($ebook->{_pdb}->mdate,         -343968690,  "modification date ok");
-	is($ebook->{_pdb}->bdate,         -2082844800, "backup date ok");
+	is($ebook->{_pdb}->cdate,         1738876110,  "creation date ok");
+	is($ebook->{_pdb}->mdate,         1738876110,  "modification date ok");
+	is($ebook->{_pdb}->bdate,         0,           "backup date ok");
 	is($ebook->{_pdb}->modnum,        0,           "modification number ok");
 	is($ebook->{_pdb}->app_info,      0,           "app info ok");
 	is($ebook->{_pdb}->sort_info,     0,           "sort info ok");
@@ -70,5 +70,9 @@ ok($ebook->html, "html ok");
 ok(!$ebook->has_cover, "has no cover");
 
 ok(! defined $ebook->cover, "has no cover");
+
+is($ebook->image_num, 0, "image count ok");
+
+is($ebook->image(0), undef, "image #0 ok");
 
 done_testing();

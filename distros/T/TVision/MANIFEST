@@ -1,0 +1,15 @@
+demo/demo1.pl
+demo/forms.pl
+demo/menu.pl
+demo/tdialog.pl
+demo/tedit.pl
+t/f.t
+Makefile.PL
+TVision-methods.xs.in
+typemap.in
+TVision.xs
+TVision.pm
+README.md
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

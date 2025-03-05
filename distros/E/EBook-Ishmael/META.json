@@ -1,5 +1,5 @@
 {
-   "abstract" : "Convert ebook documents to plain text",
+   "abstract" : "EBook dumper",
    "author" : [
       "Samuel Young <samyoung12788@gmail.com>"
    ],
@@ -49,8 +49,9 @@
       },
       "test" : {
          "requires" : {
+            "File::Path" : "0",
             "File::Spec" : "0",
-            "File::Which" : "0",
+            "File::Temp" : "0.10",
             "Test::More" : "0"
          }
       }
@@ -66,6 +67,6 @@
          "web" : "https://codeberg.org/1-1sam/ishmael"
       }
    },
-   "version" : "0.07",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

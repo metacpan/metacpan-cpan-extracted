@@ -7,6 +7,7 @@ use Test::More;
 use File::Spec;
 
 use EBook::Ishmael::EBook;
+use EBook::Ishmael::ImageID;
 
 my $DOC = File::Spec->catfile(qw/t data gpl3.mobi/);
 
@@ -22,9 +23,9 @@ subtest "PDB data ok" => sub {
 	is($ebook->{_pdb}->name,          'gpl3',      "name ok");
 	is($ebook->{_pdb}->attributes,    0,           "attributes ok");
 	is($ebook->{_pdb}->version,       0,           "version ok");
-	is($ebook->{_pdb}->cdate,         -342345385,  "creation date ok");
-	is($ebook->{_pdb}->mdate,         -342345385,  "modification date ok");
-	is($ebook->{_pdb}->bdate,         -2082844800, "backup date ok");
+	is($ebook->{_pdb}->cdate,         1740499415,  "creation date ok");
+	is($ebook->{_pdb}->mdate,         1740499415,  "modification date ok");
+	is($ebook->{_pdb}->bdate,         0,           "backup date ok");
 	is($ebook->{_pdb}->modnum,        0,           "modification number ok");
 	is($ebook->{_pdb}->app_info,      0,           "app info ok");
 	is($ebook->{_pdb}->sort_info,     0,           "sort info ok");
@@ -94,9 +95,23 @@ ok($ebook->html, "html ok");
 ok($ebook->has_cover, "has cover");
 
 is(
-	substr($ebook->cover, 0, 3),
-	pack("CCC", 0xff, 0xd8, 0xff),
+	image_id(\($ebook->cover)),
+	"jpg",
 	"cover looks like a jpeg"
+);
+
+is($ebook->image_num, 2, "image count ok");
+
+is(
+	image_id($ebook->image(0)),
+	"jpg",
+	"image #0 ok"
+);
+
+is(
+	image_id($ebook->image(1)),
+	"jpg",
+	"image #1 ok"
 );
 
 done_testing();

@@ -1,5 +1,5 @@
 package Whelk;
-$Whelk::VERSION = '1.01';
+$Whelk::VERSION = '1.02';
 use Kelp::Base 'Kelp';
 
 attr 'config_module' => '+Whelk::Config';

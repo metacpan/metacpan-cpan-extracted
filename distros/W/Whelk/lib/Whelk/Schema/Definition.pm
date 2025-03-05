@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '1.01';
+$Whelk::Schema::Definition::VERSION = '1.02';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
@@ -266,6 +266,11 @@ OpenAPI description of this definition.
 =head2 rules
 
 An array reference of extra validation rules.
+
+=head2 code
+
+A status code number used in the response. Only used for response schema
+definitions.
 
 =head1 METHODS
 

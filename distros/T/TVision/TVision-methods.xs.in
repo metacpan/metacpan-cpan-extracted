@@ -1,0 +1,529 @@
+{{{
+# this file is for Text::Template with DELIMITERS=>['{{{','}}}'] option,
+# So it could be processed this way:
+# perl -MText::Template -we "Text::Template::fill_in_file('TVision-methods.xs.in', DELIMITERS=>['{{{','}}}'],OUTPUT => \*STDOUT)" > TVision-methods.xs
+# alternatively, this file could be transformed with vim-plugin vispen
+}}}
+#define Uses_TBackground
+#define Uses_TView
+#define Uses_TButton
+#define Uses_TRect
+#define Uses_TStatusLine
+#define Uses_TStaticText
+#define Uses_TLabel
+#define Uses_TStatusDef
+#define Uses_TStatusItem
+#define Uses_TCheckBoxes
+#define Uses_TRadioButtons
+#define Uses_TScroller
+#define Uses_TScrollBar
+#define Uses_TIndicator
+#define Uses_TInputLine
+#define Uses_TEditor
+#define Uses_TKeys
+#define Uses_MsgBox
+#define Uses_fpstream
+#define Uses_TEvent
+#define Uses_TDeskTop
+#define Uses_TApplication
+#define Uses_TWindow
+#define Uses_TEditWindow
+#define Uses_TDialog
+#define Uses_TScreen
+#define Uses_TSItem
+#define Uses_TMenu
+#define Uses_TMenuItem
+#define Uses_TMenuBar
+#define Uses_TSubMenu
+#define Uses_THistory
+
+#include <tvision/tv.h>
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#undef select
+
+#include "TVision.h"
+
+extern TStatusLine *default_TStatusLine;
+extern TMenuBar *default_TMenuBar;
+
+MODULE=TVision::TVApp PACKAGE=TVision::TVApp
+
+TVApp* new(TMenuBar *tmbr=0, TStatusLine *tsl=0)
+    CODE:
+        if (tmbr)
+	    default_TMenuBar = tmbr;
+	default_TStatusLine = tsl;
+        RETVAL = new TVApp();
+        // RETVAL = get_sv("TVision::TApplication::the_app", GV_ADD);
+	//do_sv_dump(0, PerlIO_stderr(), RETVAL, 0, 10, 0,0);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TApplication PACKAGE=TVision::TApplication
+
+TDeskTop* deskTop(TVApp *tapp)
+    CODE:
+        RETVAL = tapp->deskTop;
+    OUTPUT:
+	RETVAL
+
+{{{
+    #constructors:
+    use strict;
+    join '', map {
+        if (/^\s*#/) {()} # ignore comment
+	else {
+	    my ($fun, $args) = /^\s*(\S+)\s*\(\s*(.*?)\s*\)/;
+	    my $num = $fun=~s/(\d+)$// ? $1 : '';
+	    $args =~ s/TStringView/char */g;
+	    my $argv = $args =~ s/(\w+\s*\*|int|char|TRect|TPoint)//gr =~ s/=.*?(?=(?:,|(?:\s*$)))//gr;
+	    $argv =~ tr|&|*|;
+	    $args =~ tr|&||d;
+	    # TKey TODO:
+	    $args =~ s/TKey/int/g;
+	    $argv =~ s/TKey +(\w+)/TKey($1)/g;
+	    <<"EOS"
+MODULE=TVision::$fun PACKAGE=TVision::$fun
+$fun* new$num($args)
+    CODE:
+        RETVAL = new $fun($argv);
+    OUTPUT:
+	RETVAL
+
+EOS
+	}
+    } split '\n', <<'EOS';
+	TBackground(TRect r, char aPattern)
+	TDeskTop(TRect r)
+	TScroller(TRect r, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar)
+	TLabel(TRect r, TStringView aText, TView *aLink )
+	TButton(TRect r, char *title, int cmd, int flags)
+	TScrollBar(TRect r)
+	TIndicator(TRect r)
+	TInputLine(TRect r, int limit)
+	TMenuBar(TRect r, TSubMenu* &aMenu)
+	TMenuBar1(TRect r, TMenu *aMenu)
+	TMenu()
+	TMenu1( TMenuItem*& itemList )
+	TMenu2( TMenuItem*& itemList, TMenuItem*& TheDefault)
+	TMenuItem(TStringView aName, int aCommand, TKey aKey, int aHelpCtx=hcNoContext, TStringView p=0, TMenuItem *aNext=0)
+	TMenuItem1(TStringView aName, TKey aKey, TMenu *aSubMenu, int aHelpCtx=hcNoContext, TMenuItem *aNext=0)
+	TSubMenu( TStringView nm, TKey key, int helpCtx = hcNoContext )
+	TEditor(TRect r, TScrollBar *sb1=0, TScrollBar *sb2=0, TIndicator *ind=0, int n=1000)
+	TWindow(TRect r, char *title, int num)
+        TView(TRect r)
+	TDialog(TRect r, char *title)
+	TStaticText(TRect r, char *title)
+	THistory( TRect bounds, TInputLine *aLink, int aHistoryId )
+	TSItem( TStringView aValue, TSItem *aNext )
+EOS
+}}}
+{{{
+    # methods:
+    use strict;
+    my $pkg='';
+    my $first=1;
+    join '', (map {
+        if (/^\s*#/) {()} # ignore comment
+        elsif (/^\s*$/) {()} # ignore empty line
+        elsif (/^\s*(\S+):/) {$pkg=$1; $first=1;() }
+	else {
+	    my ($fun, $args, $body) = /^\s*([^(]+)\s*\(\s*(.*?)\s*\)\s*(.*)$/;
+	    my $output = $fun =~ /^void/ ? '' : "    OUTPUT:\n        RETVAL\n";;
+	    my $funa = $fun =~ s/^\S+\s*//r =~ tr/*//dr;
+	    $fun=~tr/_/ /;
+	    $args =~ s/TStringView/char */g;
+	    my $argv = $args =~ s/(\w+\s*\*|\bunsigned int|\bint|\bchar\b|\bshort\b|TRect|TPoint)//gr;
+	    my $comap =  $args =~ /^\s*$/ ? "" : ",";
+	    $args = "$pkg *self$comap$args";
+	    if ($body =~ /^\s*$/) { $body = ($output? "RETVAL = " : "") . "self->$funa($argv);"; }
+	    my $line0 = $first ? "MODULE=TVision::$pkg PACKAGE=TVision::$pkg" : "";
+	    $first=0;
+	<<"EOS"
+$line0
+$fun($args)
+    CODE:
+        $body
+$output
+EOS
+	}
+    } split '\n', <<'EOS');
+      TApplication:
+	void cascade()
+	void dosShell()
+	void tile()
+	void shutDown()
+
+      TProgram:
+	void run()
+	void idle()
+	void setScreenMode(int mode)
+	TView *validView(TView *p)
+
+      TView:
+	void locate(TRect r)
+	#friend - do not do it - void genRefs()
+	#enum phaseType { phFocused, phPreProcess, phPostProcess };
+	#enum selectMode{ normalSelect, enterSelect, leaveSelect };
+	TRect getBounds()
+	TRect getExtent()
+	TRect getClipRect()
+	int mouseInView( TPoint mouse )
+	#Boolean containsMouse( TEvent& event ) noexcept;
+	void growTo( short x, short y )
+	void moveTo( short x, short y )
+	void setBounds(TRect r)
+	void hide()
+	void show()
+	void drawView()
+	int exposed()
+	int focus()
+	void hideCursor()
+	void drawHide( TView *lastView )
+	void drawShow( TView *lastView )
+	void drawUnderRect(TRect r, TView *lastView ) self->drawUnderRect( r, lastView);
+	void drawUnderView( int doShadow, TView *lastView )
+	void blockCursor()
+	void normalCursor()
+	void setCursor( int x, int y )
+	void showCursor()
+	void drawCursor()
+	#void clearEvent( TEvent& event )
+	int eventAvail()
+	#static Boolean commandEnabled( ushort command ) noexcept;
+	#static void disableCommands( TCommandSet& commands ) noexcept;
+	#static void enableCommands( TCommandSet& commands ) noexcept;
+	#static void disableCommand( ushort command ) noexcept;
+	#static void enableCommand( ushort command ) noexcept;
+	#static void getCommands( TCommandSet& commands ) noexcept;
+	#static void setCommands( TCommandSet& commands ) noexcept;
+	#static void setCmdState( TCommandSet& commands, Boolean enable ) noexcept;
+	#TAttrPair getColor( ushort color ) noexcept;
+	int getState( int aState )
+	void select()
+	#void getEvent( TEvent& event, int timeoutMs )
+	#void keyEvent( TEvent& event );
+	#Boolean mouseEvent( TEvent& event, ushort mask );
+	#Boolean textEvent( TEvent &event, TSpan<char> dest, size_t &length );
+	TPoint makeGlobal( TPoint source )
+	TPoint makeLocal( TPoint source )
+	TView *nextView()
+	TView *prevView()
+	TView *prev()
+	void makeFirst()
+	void putInFrontOf( TView *Target )
+	TView *TopView()
+	#void writeBuf(  short x, short y, short w, short h, const void _FAR* b ) noexcept;
+	#void writeBuf(  short x, short y, short w, short h, const TDrawBuffer& b ) noexcept;
+	#void writeChar( short x, short y, char c, uchar color, short count ) noexcept;
+	#void writeLine( short x, short y, short w, short h, const TDrawBuffer& b ) noexcept;
+	#void writeLine( short x, short y, short w, short h, const void _FAR *b ) noexcept;
+	#void writeStr( short x, short y, const char *str, uchar color ) noexcept;
+	int getHelpCtx()
+	int valid( int command )
+	void draw()
+	int dataSize()
+	void getData( void *rec )
+	void setData( void *rec )
+	void awaken()
+	void resetCursor()
+	#void getEvent( TEvent& event )
+	#void handleEvent( TEvent& event )
+	#void putEvent( TEvent& event )
+	void endModal( int command )
+	int execute()
+	void setState( int aState, int enable )
+	# all below are - virtual
+	#virtual void sizeLimits( TPoint& min, TPoint& max );
+	#virtual void dragView( TEvent& event, uchar mode, TRect& limits, TPoint minSize, TPoint maxSize ); // temporary fix for Miller's stuff
+	#virtual void calcBounds( TRect& bounds, TPoint delta );
+	#virtual void changeBounds( const TRect& bounds );
+	#virtual TPalette& getPalette() const;
+	#virtual TColorAttr mapColor( uchar ) noexcept;
+	#virtual TTimerId setTimer( uint timeoutMs, int periodMs = -1 );
+	#virtual void killTimer( TTimerId id );
+
+      TScroller:
+        void scrollTo( int x, int y )
+        void setLimit( int x, int y )
+
+      TWindow:
+	TScrollBar *standardScrollBar( int aOptions )
+	void zoom()
+	void shutDown()
+
+      TEditor:
+	char bufChar( int a)
+	int bufPtr( int a)
+	#virtual void changeBounds( const TRect& );
+	#virtual void convertEvent( TEvent& );
+	int cursorVisible()
+	void deleteSelect()
+	#virtual void doneBuffer();
+	#virtual void draw();
+	#virtual TPalette& getPalette() const;
+	#virtual void handleEvent( TEvent& );
+	#virtual void initBuffer();
+	#virtual TMenuItem& initContextMenu( TPoint );
+	int insertMultilineText( char *a, int b)
+	#Boolean insertBuffer( const char *, uint, uint, Boolean, Boolean );
+	int insertEOL( int Boolean )
+	#virtual Boolean insertFrom( TEditor * );
+	#Boolean insertText( const void *, uint, Boolean );
+	void scrollTo( int x, int y)
+	#Boolean search( const char *, ushort );
+	#virtual Boolean setBufSize( uint );
+	void setCmdState( int ushort, int Boolean )
+	void setSelect( int a, int b, int Boolean)
+	#virtual void setState( ushort, Boolean );
+	void trackCursor( int Boolean )
+	void undo()
+	#virtual void updateCommands();
+	#virtual Boolean valid( ushort )
+	int charPos( int uint1, int uint2 )
+	int charPtr( int uint1, int a)
+	int clipCopy()
+	void clipCut()
+	void clipPaste()
+	void deleteRange( int uint1, int uint2, int Boolean )
+	void doUpdate()
+	void doSearchReplace()
+	void drawLines( int a, int b, int uint )
+	#void formatLine(TScreenCell *, uint, int, TAttrPair );
+	void find()
+	unsigned_int getMousePtr( TPoint p)
+	int hasSelection()
+	void hideSelect()
+	int isClipboard()
+	int lineEnd( int uint )
+	int lineMove( int uint, int i)
+	int lineStart( int uint )
+	int indentedLineStart( int uint )
+	void lock()
+	void newLine()
+	int nextChar( int uint )
+	int nextLine( int uint )
+	int nextWord( int uint )
+	int prevChar( int uint )
+	int prevLine( int uint )
+	int prevWord( int uint )
+	void replace()
+	void setBufLen( int uint )
+	void setCurPtr( int uint, int uchar )
+	void startSelect()
+	void toggleEncoding()
+	void toggleInsMode()
+	void unlock()
+	void update( int uchar )
+	#void checkScrollBar( const TEvent&, TScrollBar *, int& );
+	void detectEol()
+	#enum EolType { eolCrLf, eolLf, eolCr } eolType;
+	#enum Encoding { encDefault, encSingleByte } encoding;
+	#void nextChar( TStringView, uint &P, uint &width );
+	#Boolean formatCell( TSpan<TScreenCell>, uint&, TStringView, uint& , TColorAttr );
+	#TStringView bufChars( uint );
+	#TStringView prevBufChars( uint );
+
+      TMenuItem:
+        void append(TMenuItem *aNext)
+      TGroup:
+        void insert(TWindow *what)
+	void insertView(TView *p, TView *Target) /*???*/
+        void remove( TView *p )
+        void removeView( TView *p )
+        void resetCurrent()
+        #void setCurrent( TView *p, selectMode mode )
+        void selectNext( int forwards )
+        void redraw()
+      TInputLine:
+        void setData(char *data)
+      TButton:
+        void setTitle(char *title) delete self->title; self->title = new char[strlen(title)+1]; strcpy((char*)self->title,title); self->draw();
+EOS
+}}}
+{{{
+    # getters/setters:
+    use strict;
+    my $pkg='';
+    my $first=1;
+    join '', (map {
+        if (/^\s*#/) {()} # ignore comment
+        elsif (/^\s*$/) {()} # ignore empty line
+        elsif (/^\s*(\S+):/) {$pkg=$1; $first=1;() }
+	else {
+	    my ($type, $var) = /^\s*(.+)\s+(\S+)/;
+	    if ($var=~s/^\*//) {$type.='*'}
+	    my $line0 = $first ? "MODULE=TVision::$pkg PACKAGE=TVision::$pkg" : "";
+	    $first=0;
+	<<"EOS"
+$line0
+$type get_$var($pkg *self)
+    CODE:
+        RETVAL = self->$var;
+    OUTPUT:
+        RETVAL
+
+void set_$var($pkg *self, $type val)
+    CODE:
+        self->$var = val;
+
+EOS
+	}
+    } split '\n', <<'EOS');
+      TEditor:
+	TScrollBar *hScrollBar
+	TScrollBar *vScrollBar
+	TIndicator *indicator
+	#char *buffer;
+	int bufSize
+	int bufLen
+	int gapLen
+	int selStart
+	int selEnd
+	int curPtr
+	TPoint curPos
+	TPoint delta
+	TPoint limit
+	int drawLine
+	int drawPtr
+	int delCount
+	int insCount
+	int isValid
+	int canUndo
+	int modified
+	int selecting
+	int overwrite
+	int autoIndent
+	#static TEditorDialog _NEAR editorDialog;
+	#static ushort _NEAR editorFlags;
+	#static char _NEAR findStr[maxFindStrLen];
+	#static char _NEAR replaceStr[maxReplaceStrLen];
+	#static TEditor * _NEAR clipboard;
+	int lockCount
+	int updateFlags
+	int keyState
+      TWindow:
+	int flags
+	#TRect zoomRect;
+	int number
+	int palette
+	TFrame *frame
+	#const char *title;
+      TView:
+	TView *next
+        TPoint size
+        int options
+        int eventMask
+        int state
+        TPoint origin
+        TPoint cursor
+        int growMode
+        int dragMode
+        int helpCtx
+        TGroup *owner
+      TProgram:
+	TProgram *application
+	TStatusLine *statusLine
+	TMenuBar *menuBar
+	TDeskTop *deskTop
+	int appPalette
+	int eventTimeoutMs
+      TMenuItem:
+	TMenuItem *next
+	#const char *name
+	int command
+	int disabled
+	#TKey keyCode
+	int helpCtx
+EOS
+}}}
+
+MODULE=TVision::TButton PACKAGE=TVision::TButton
+SV* _new_h(int _ax, int ay, int bx, int by, char *title, int cmd, int flags)
+    CODE:
+	TButton *w = new TButton(TRect(_ax,ay,bx,by),title,cmd,flags);
+        HV *self = newHV();
+        hv_store(self, "num", 3, newSViv(cmd), 0);
+        hv_store(self, "obj", 3, newSVpvn((const char *)&w, sizeof(w)), 0);
+        RETVAL = newRV_inc((SV*) self);
+        sv_bless(RETVAL, gv_stashpv("TVision::TButton", GV_ADD));
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TInputLine PACKAGE=TVision::TInputLine
+
+char *getData(TInputLine *til)
+    CODE:
+	char data[2048]; // OMG2
+	til->getData(data);
+	RETVAL=data;
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TCheckBoxes PACKAGE=TVision::TCheckBoxes
+
+TCheckBoxes* new(TRect r,  AV *_items)
+    CODE:
+        int cnt = av_count(_items);
+	//printf("items=%d\n",cnt);
+        TSItem *tsit = 0;
+	for (int i=cnt-1; i>=0; i--) {
+	    SV **sv = av_fetch(_items, i, 0);
+	    //printf("i=%d s=%s\n", i, SvPV_nolen(*sv));
+	    TSItem *n = new TSItem(SvPV_nolen(*sv), tsit);
+	    tsit = n;
+	}
+        RETVAL = new TCheckBoxes(r, tsit);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TRadioButtons PACKAGE=TVision::TRadioButtons
+
+TRadioButtons* new(TRect r, AV *_items)
+    CODE:
+        int cnt = av_count(_items);
+	//printf("items=%d\n",cnt);
+        TSItem *tsit = 0;
+	for (int i=cnt-1; i>=0; i--) {
+	    SV **sv = av_fetch(_items, i, 0);
+	    //printf("i=%d s=%s\n", i, SvPV_nolen(*sv));
+	    TSItem *n = new TSItem(SvPV_nolen(*sv), tsit);
+	    tsit = n;
+	}
+        RETVAL = new TRadioButtons(r, tsit);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TEditor PACKAGE=TVision::TEditor
+
+TEditor* new_obsoleted(int _ax, int ay, int bx, int by, TScrollBar *sb1, TScrollBar *sb2, TIndicator *ind, int n)
+    CODE:
+	if (sb1==NULL){printf("ok got NULL\n");}
+        RETVAL = new TEditor(TRect(_ax,ay,bx,by),sb1,sb2,ind, n);
+    OUTPUT:
+	RETVAL
+
+#if 0
+MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
+TEditWindow* new(int _ax, int ay, int bx, int by, char *title, int num)
+    CODE:
+        RETVAL = new TEditWindow(TRect(_ax,ay,bx,by),title,num);
+    OUTPUT:
+	RETVAL
+#endif
+
+MODULE=TVision::TDeskTop PACKAGE=TVision::TDeskTop
+
+void insert_obsoleted(SV *self, SV *what)
+    CODE:
+	TDeskTop* td = sv2tv_s(self,TDeskTop);
+        SV *sv = SvRV(what);
+        TWindow* w = *((TWindow**) SvPV_nolen(sv));
+	td->insert(w);
+
+MODULE=TVision_more PACKAGE=TVision
+

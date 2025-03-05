@@ -1,6 +1,6 @@
 package EBook::Ishmael::PDB;
 use 5.016;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
@@ -75,6 +75,18 @@ sub new {
 		die "PDB $pdb has no records\n";
 	}
 
+	# If the epoch offset knocks the time below zero, then that probably means
+	# that the time was stored as a Unix time.
+	$self->{CDate} &&= $self->{CDate} + $EPOCH_OFFSET > 0
+		? $self->{CDate} + $EPOCH_OFFSET
+		: $self->{CDate};
+	$self->{MDate} &&= $self->{MDate} + $EPOCH_OFFSET > 0
+		? $self->{MDate} + $EPOCH_OFFSET
+		: $self->{MDate};
+	$self->{BDate} &&= $self->{BDate} + $EPOCH_OFFSET > 0
+		? $self->{BDate} + $EPOCH_OFFSET
+		: $self->{BDate};
+
 	my @recs;
 
 	for my $i (0 .. $self->{RecNum} - 1) {
@@ -146,7 +158,7 @@ sub cdate {
 
 	my $self = shift;
 
-	return $self->{CDate} + $EPOCH_OFFSET;
+	return $self->{CDate};
 
 }
 
@@ -154,7 +166,7 @@ sub mdate {
 
 	my $self = shift;
 
-	return $self->{MDate} + $EPOCH_OFFSET;
+	return $self->{MDate};
 
 }
 
@@ -162,7 +174,7 @@ sub bdate {
 
 	my $self = shift;
 
-	return $self->{BDate} + $EPOCH_OFFSET;
+	return $self->{BDate};
 
 }
 

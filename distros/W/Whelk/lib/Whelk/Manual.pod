@@ -40,10 +40,8 @@ Whelk::Manual - Reference to APIs with Whelk
 	use Kelp::Base 'Whelk::Resource';
 	use Whelk::Schema;
 
-	sub api
+	sub schemas
 	{
-		my ($self) = @_;
-
 		Whelk::Schema->build(
 			language => {
 				type => 'object',
@@ -57,6 +55,11 @@ Whelk::Manual - Reference to APIs with Whelk
 				},
 			}
 		);
+	}
+
+	sub api
+	{
+		my ($self) = @_;
 
 		$self->add_endpoint(
 			[GET => '/pangrams'] => 'action_list',
@@ -368,9 +371,15 @@ these keys:
 		description => 'Success?',
 	}
 
-A schema definition for the response. Not setting this will not raise an
-exception, but the application won't be able to correctly respond with success
-status.
+A schema definition for the response. Not setting this will cause the action to
+respond with C<204 No Content> (same as C<< type => 'empty' >>).
+
+=item * response_code
+
+	response_code => 201,
+
+A HTTP status success code for the response. If not set, either 200 or 204 will
+be used, depending on C<response>.
 
 =item * parameters
 
@@ -495,6 +504,24 @@ as optional (with a default), their values still have to be defined-or'ed in
 the code. This is not true for C<query> and C<request>, which are correctly
 adjusted to the default if not present. Make sure to take that into account if
 you're using defaults on C<header> or C<cookie>.
+
+=head2 Building schemas
+
+Schema building syntax is described in detail in L<Whelk::Schema>. In an
+overview, schemas allow you to store reusable data validation parts under a
+name, which will be visible in OpenAPI output. But where should they be build?
+
+Generally, there is no constraint on where C<< Whelk::Schema->build >> calls
+must be placed. You can put them in your C<api> method or even outside of your
+resource package. They are global and will be visible in all your resources
+anyway (as long as they are built before resources are built). You can use it
+to your advantage when you want global schemas, used by all your resources.
+
+For schemas which are specific to one resource, we recommend putting them in
+C<schemas> method in resource's package. This is a special method that is
+called when the resource object is built, just before calling the C<api>
+method. This allows to nicely separate endpoints from schemas and make the
+whole API code more readable.
 
 =head2 Advanced topics
 
