@@ -13,6 +13,7 @@ t/assert_aoh.t
 t/assert_arrayref.t
 t/assert_arrayref_all.t
 t/assert_arrayref_nonempty.t
+t/assert_arrayref_nonempty_of.t
 t/assert_arrayref_of.t
 t/assert_cmp.t
 t/assert_coderef.t

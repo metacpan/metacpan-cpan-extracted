@@ -10,14 +10,13 @@ use lib 'blib/lib';
 use Test::More;
 use Test2::Plugin::UTF8;
 
-use File::Temp;
 use Cwd;
 use FindBin;
 use File::Basename;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $curdir = Cwd::abs_path($FindBin::Bin);
 
@@ -38,7 +37,6 @@ ok(defined $aaFF, 'Automate::Animate::FFmpeg->new()'." : called and got defined 
 my $exe; if( !defined($exe=$aaFF->ffmpeg_executable()) || ($exe=~/^\s*$/) || (! -x $exe) ){
 	diag "There is no FFmpeg executable set in this module. No tests will be run.";
 	done_testing;
-	$File::Temp::KEEP_ALL = 0; File::Temp::cleanup();
 	exit(0);
 }
 

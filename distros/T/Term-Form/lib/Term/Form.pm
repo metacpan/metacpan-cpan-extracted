@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -559,10 +559,7 @@ sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
     if ( length $self->{i}{info_prompt} ) {
-        my $info_w = $term_w;
-        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-            $info_w += WIDTH_CURSOR;
-        }
+        my $info_w = $term_w + EXTRA_W;
         my @info_prompt = line_fold( $self->{i}{info_prompt}, $info_w, { color => $self->{color}, join => 0 } );
         $self->{i}{info_prompt_row_count} = @info_prompt;
         $self->{i}{info_prompt} = join "\n", @info_prompt;
@@ -822,7 +819,7 @@ sub fill_form {
         }
     }
     $self->__modify_fill_form_options();
-    if ( $^O eq "MSWin32" ) {
+    if ( $^O eq 'MSWin32' ) {
         print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     my @tmp;
@@ -1173,7 +1170,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.558
+Version 0.559
 
 =cut
 
@@ -1399,7 +1396,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2024 Matthäus Kiem.
+Copyright 2014-2025 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+###################################################################
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
+###################################################################
+
 use strict;
 use warnings;
 
@@ -10,7 +14,7 @@ use lib 'blib/lib';
 use Test::More;
 use Test2::Plugin::UTF8;
 use Test::Script;
-use File::Temp;
+use Test::TempDir::Tiny;
 use File::Spec;
 use FindBin;
 use Cwd;
@@ -20,7 +24,7 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $curdir = $FindBin::Bin;
 
@@ -32,11 +36,8 @@ my $exe; if( !defined($exe=$aaFF->ffmpeg_executable()) || ($exe=~/^\s*$/) || (! 
 	exit(0);
 }
 
-# use this for keeping all tempfiles while CLEANUP=>1
-# which is needed for deleting them all at the end
-$File::Temp::KEEP_ALL = 1;
-# if for debug you change this make sure that it has path in it e.g. ./abc
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1); # cleanup at the end
+# if for debug you change this make sure that it has path in it e.g. ./xyz
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
 ok(-d $tmpdir, "output dir exists");
 
 my $FAILURE_REGEX = qr/(?:\: error,)|(?:Usage)/;
@@ -123,8 +124,8 @@ for my $atest (@TESTS){
 	unlink($outfile); # just in case
 }
 
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
+
 # END
 done_testing();
 
-diag "temp dir: '$tmpdir' ...";
-#$File::Temp::KEEP_ALL = 0; File::Temp::cleanup();

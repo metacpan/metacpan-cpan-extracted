@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Terse' => '0.19',
+	'Template::Toolkit' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Terse-View-TT-*' },

@@ -1,5 +1,11 @@
 Revision history for Perl module DB::Object
 
+v1.6.0 2025-03-06T19:09:05+0900
+    - Added support for INSERT ... ON DUPLICATE KEY UPDATE for MySQL
+
+v1.5.0 2025-03-06T12:50:10+0900
+    - Added support for LIKE
+
 v1.4.6 2024-11-24T16:31:24+0900
     - Improved where clause to handle JSON->> fields
 

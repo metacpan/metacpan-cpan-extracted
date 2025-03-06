@@ -1,6 +1,9 @@
 # Version/Revision history
 
-0.05 Wed 21 Aug 2024 19:07:48
+0.06 Wed 05 Mar 2025 14:12:11 MSK
+    * Disabled strf test
+
+0.05 Wed 21 Aug 2024 19:07:48 MSK
     * The definition of the IS_TTY constant has been changed
     * Added the prompt util function
     * Modified 11-strf.t

@@ -13,116 +13,169 @@ WWW::Suffit::AuthDB - Suffit Authorization Database
     use WWW::Suffit::AuthDB;
 
     my $authdb = WWW::Suffit::AuthDB->new(
-            dsuri => "sqlite:///tmp/auth.db?sqlite_unicode=1"
-        );
+        ds => "sqlite:///tmp/auth.db?sqlite_unicode=1"
+    );
 
 =head1 DESCRIPTION
 
 Suffit Authorization Database
 
+=head1 ATTRIBUTES
+
+This class implements the following attributes
+
+=head2 cached
+
+    cached => 1
+    cached => 'yes'
+    cached => 'on'
+    cached => 'enable'
+
+This attribute performs enabling caching while establishing of connection with database
+
+    $authdb = $authdb->cached("On");
+    my $cached = $authdb->cached;
+
+Default: false (no caching connection)
+
+=head2 initialized
+
+    initialized => 1
+    initialized => 'yes'
+    initialized => 'on'
+    initialized => 'enable'
+
+This attribute marks the schema as initialized or performs read this status
+
+=head2 code
+
+    code => undef
+
+Read only attribute to get the HTTP code
+
+    my $code = $authdb->code; # 200
+
+=head2 data
+
+    data => undef
+
+Read only attribute to get the current data pool
+
+    my $data = $authdb->data;
+
+=head2 ds, dsuri
+
+    ds => "sqlite:///tmp/auth.db?sqlite_unicode=1"
+
+Data source URI. See L<WWW::Suffit::AuthDB::Model>
+
+    $authdb = $authdb->ds("sqlite:///tmp/auth.db?sqlite_unicode=1");
+    my $ds = $authdb->ds;
+
+Default: 'sponge://'
+
+=head2 error
+
+    error => undef
+
+Read only attribute to get the error message
+
+    my $error = $authdb->error;
+
+=head2 expiration
+
+    expiration => 300
+
+The expiration time
+
+    $authdb = $authdb->expiration(60*5);
+    my $expiration = $authdb->expiration;
+
+B<NOTE!> This attribute MUST be defined before first calling the cache method
+
+Default: 300 (5 min)
+
+=head2 max_keys
+
+    max_keys => 1024
+
+The maximum keys number in cache
+
+    $authdb = $authdb->max_keys(1024*10);
+    my $max_keys = $authdb->max_keys;
+
+B<NOTE!> This attribute MUST be defined before first calling the cache method
+
+Default: 1024*1024 (1`048`576 keys max)
+
+=head2 sourcefile
+
+    sourcefile => '/tmp/authdb.json'
+
+Path to the source file in JSON format
+
+    $authdb = $authdb->sourcefile("/tmp/authdb.json");
+    my $sourcefile = $authdb->sourcefile;
+
+Default: none
+
+=head1 METHODS
+
+This class inherits all methods from L<Mojo::Base> and implements the following new ones
+
 =head2 new
 
     my $authdb = WWW::Suffit::AuthDB->new(
-            dsuri => "sqlite:///tmp/auth.db?sqlite_unicode=1",
-            file => "/tmp/authdb.json"
+            ds => "sqlite:///tmp/auth.db?sqlite_unicode=1",
+            sourcefile => "/tmp/authdb.json"
         );
     die $authdb->error if $authdb->error;
 
 Create new AuthDB object
 
-=head2 access
-
-    $authdb->access(
-        controller  => $self, # The Mojo controller object
-        username    => $username,
-    ) or die "Access denied!";
-
-This method performs access control
-
-    $authdb->access(
-        controller  => $self, # The Mojo controller object
-        username    => "Bob",
-        method      => "GET",
-        base        => "https://www.example.com",
-        path        => "/foo/bar",
-        client_ip   => "192.168.0.123",
-        headers     => {
-            Accept      => "text/html,text/plain",
-            Connection  => "keep-alive",
-            Host        => "localhost:8695",
-        },
-    ) or die "Access denied!";
-
-This method performs access control for outer requests
-
-    $authdb->access(
-        controller  => $self, # The Mojo controller object
-        username    => "Bob",
-        routename   => "index", # or 'route'
-        base        => "https://www.example.com",
-        client_ip   => "192.168.0.123",
-        headers     => {
-            Accept      => "text/html,text/plain",
-            Connection  => "keep-alive",
-            Host        => "localhost:8695",
-        },
-    ) or die "Access denied!";
-
-... or by routename
-
-Examples:
-
-    <% if (has_access(path => url_for('settings')->to_string)) { %> ... <% } %>
-    <% if (has_access(route => 'settings') { %> ... <% } %>
-
-=head2 authen
-
-    $authdb->authen("username", "password") or die $authdb->error;
-
-Checks password by specified credential pair (username and password).
-This method returns the User object or false status of check
-
-=head2 authz
-
-    $authdb->authz("username") or die $authdb->error;
-    $authdb->authz("username", 1) or die $authdb->error;
-
-This method checks authorization status by specified username as first argument.
-
-The second argument defines a scope. This argument can be false or true.
-false - determines the fact that internal authorization is being performed
-(on Suffit system); true - determines the fact that external
-authorization is being performed (on another sites)
-
-The method returns the User object or false status of check
 
 =head2 cache
+
+    my $cache = $authdb->cache;
 
 Get cache instance
 
 =head2 cached_group
 
     my $group = $authdb->cached_group("manager");
+    my $group = $authdb->cached_group("manager", 'd1b919c1');
 
-This method returns data of specified groupname as WWW::Suffit::AuthDB::Group object
+This method returns cached data of specified groupname as L<WWW::Suffit::AuthDB::Group> object by cachekey
 
 =head2 cached_realm
 
     my $realm = $authdb->cached_realm("default");
+    my $realm = $authdb->cached_realm("default", 'd1b919c1');
 
-This method returns data of specified realm name as WWW::Suffit::AuthDB::Realm object
+This method returns cached data of specified realm name as L<WWW::Suffit::AuthDB::Realm> object by cachekey
+s
 
 =head2 cached_routes
 
     my $routes = $authdb->cached_routes("http://localhost/");
+    my $routes = $authdb->cached_routes("http://localhost/", 'd1b919c1');
 
-Returns hash of routes by base URL
+Returns cached hash of routes by base URL and cachekey optionaly
 
 =head2 cached_user
 
     my $user = $authdb->cached_user("alice");
+    my $user = $authdb->cached_user("alice", 'd1b919c1');
 
-This method returns data of specified username as WWW::Suffit::AuthDB::User object
+This method returns cached data of specified username as L<WWW::Suffit::AuthDB::User> object by cachekey
+
+=head2 checksum
+
+    my $digest = $authdb->checksum("string", "algorithm");
+
+This method generates checksum for string.
+Supported algorithms: MD5 (unsafe), SHA1 (unsafe), SHA224, SHA256, SHA384, SHA512
+Default algorithm: SHA256
 
 =head2 clean
 
@@ -130,97 +183,46 @@ This method returns data of specified username as WWW::Suffit::AuthDB::User obje
 
 Cleans state vars on the AuthDB object and returns it
 
+=head2 connect
+
+    $authdb->connect;
+    $authdb->connect('yes'); # cached connection
+
+This method performs regular or cached connection with database. See also L</cached> attribute
+
 =head2 dump
 
     print $authdb->dump;
 
 Returns JSON dump of loaded authentication database
 
-=head2 export_data
-
-Export data to JSON file
-
 =head2 group
 
     my $group = $authdb->group("manager");
 
-This method returns data of specified groupname as WWW::Suffit::AuthDB::Group object
+This method returns data of specified groupname as L<WWW::Suffit::AuthDB::Group> object
 
-=head2 group_del
+=head2 is_connected
 
-    $authdb->group_del( "wheel" ) or die $authdb->error;
+    $authdb->connect unless $authdb->is_connected
 
-Delete group by groupname
-
-=head2 group_enroll
-
-    $authdb->group_enroll(
-            groupname => "wheel",
-            username => "alice",
-        ) or die $authdb->error;
-
-Add user to group members
-
-=head2 group_get
-
-    my %data = $authdb->group_get( "wheel" );
-    my @groups = $authdb->group_get;
-
-This method returns group's data or returns all groups as array of hashes
-
-=head2 group_members
-
-    my @members = $authdb->group_members( "wheel" );
-
-This method returns group's members
-
-=head2 group_pure_set
-
-    $authdb->group_pure_set(
-            groupname => "wheel",
-            description => "Admin group",
-        ) or die $authdb->error;
-
-This method adds new group or doing update data of existing group in pure mode
-
-=head2 group_set
-
-    $authdb->group_set(
-            groupname => "wheel",
-            description => "Admin group",
-        ) or die $authdb->error;
-
-This method adds new group or doing update data of existing group
-
-=head2 import_data
-
-Import data from JSON file
+This method checks connection status
 
 =head2 load
 
     $authdb->load("/tmp/authdb.json");
     die $authdb->error if $authdb->error;
 
-This method performs loading specified filename.
-
-=head2 meta
-
-    $authdb->meta("my.key", "my value") or die $authdb->error;
-
-Sets meta-value by key
-
-    my $val = $authdb->meta("my.key"); # my value
+    $authdb->load(); # from `sourcefile`
     die $authdb->error if $authdb->error;
 
-Gets meta-value by key
-
-    $authdb->meta("my.key", undef) or die $authdb->error;
-
-Deletes meta-value by key
+This method performs loading file to C<data> pool
 
 =head2 model
 
-Get model instance
+    my $model = $authdb->model;
+
+Get model L<WWW::Suffit::AuthDB::Model> instance
 
 =head2 raise
 
@@ -229,247 +231,140 @@ Get model instance
     return $authdb->raise(200 => "Error string");
     return $authdb->raise(200 => "Error %s", "string");
 
-Sets error string and returns false status. Also this method can performs sets the HTTP status code
+Sets error string and returns false status (undef). Also this method can performs sets the HTTP status code
 
 =head2 realm
 
     my $realm = $authdb->realm("default");
 
-This method returns data of specified realm name as WWW::Suffit::AuthDB::Realm object
-
-=head2 realm_del
-
-    $authdb->realm_del( "default" ) or die $authdb->error;
-
-Delete realm by realmname
-
-=head2 realm_get
-
-    my %data = $authdb->realm_get( "default" );
-    my @realms = $authdb->realm_get;
-
-This method returns realm's data or returns all realms as array of hashes
-
-=head2 realm_pure_set
-
-    $authdb->realm_pure_set(
-            realmname => "default",
-            realm => "Strict Zone",
-            description => "Default realm",
-        ) or die $authdb->error;
-
-This method adds new realm or doing update data of existing realm in pure mode
-
-=head2 realm_requirements
-
-    my @requirements = $authdb->realm_requirements( "default" );
-
-This method returns list of realm's requirements
-
-=head2 realm_routes
-
-    my @routes = $authdb->realm_routes( "default" );
-
-This method returns list of realm's routes
-
-=head2 realm_set
-
-    $authdb->realm_set(
-            realmname => "default",
-            realm => "Strict Zone",
-            description => "Default realm",
-        ) or die $authdb->error;
-
-This method adds new realm or doing update data of existing realm
-
-=head2 route_del
-
-    $authdb->route_del( "index" ) or die $authdb->error;
-
-Delete route by routename
-
-=head2 route_get
-
-    my %data = $authdb->route_get( "index" );
-    my @routes = $authdb->route_get;
-
-This method returns route's data or returns all routes as array of hashes
-
-=head2 route_pure_set
-
-    $authdb->route_pure_set(
-            routename => "default",
-            route => "Strict Zone",
-            description => "Default route",
-        ) or die $authdb->error;
-
-This method adds new route or doing update data of existing route in pure mode
-
-=head2 route_search
-
-    my @routes = $authdb->route_search( $text );
-
-This method performs search route by name fragment
-
-=head2 route_set
-
-    $authdb->route_set(
-            routename => "default",
-            route => "Strict Zone",
-            description => "Default route",
-        ) or die $authdb->error;
-
-This method adds new route or doing update data of existing route
+This method returns data of specified realm name as L<WWW::Suffit::AuthDB::Realm> object
 
 =head2 save
 
-    $authdb->load();
+    $authdb->save(); # to `sourcefile`
     die $authdb->error if $authdb->error;
 
 Performs flush database to file that was specified in constructor
 
-    $authdb->load("/tmp/new-authdb.json");
+    $authdb->save("/tmp/new-authdb.json");
     die $authdb->error if $authdb->error;
 
 Performs flush database to file that specified directly
-
-=head2 token_check
-
-    $authdb->token_check($username, $jti)
-        or die "The token is revoked";
-
-This method checks status of the token in database
-
-=head2 token_del
-
-    $authdb->token_del($username, $jti)
-        or die $authdb->error;
-
-This method deletes token from database by username and token ID (jti)
-
-=head2 token_get
-
-    my @tokens = $authdb->token_get();
-    my %data = $authdb->token_get( 123 );
-    my %issued = $authdb->token_get($username, $jti);
-
-Returns the token's metadata by id or pair - username and jti
-By default (without specified arguments) this method returns list of all tokens
-
-=head2 token_set
-
-    $authdb->token_set(
-        type        => 'api',
-        jti         => $jti,
-        username    => $username,
-        clientid    => 'qwertyuiqwertyui',
-        iat         => time,
-        exp         => time + 3600,
-        address     => '127.0.0.1',
-    ) or die($authdb->error);
-
-Ads new token to database
-
-    $authdb->token_set(
-        id          => 123,
-        type        => 'api',
-        jti         => $jti,
-        username    => $username,
-        clientid    => 'qwertyuiqwertyui',
-        iat         => time,
-        exp         => time + 3600,
-        address     => '127.0.0.1',
-    ) or die($authdb->error);
-
-Performs modify token's data by id
 
 =head2 user
 
     my $user = $authdb->user("alice");
 
-This method returns data of specified username as WWW::Suffit::AuthDB::User object
+This method returns data of specified username as L<WWW::Suffit::AuthDB::User> object
 
-=head2 user_del
+=head2 META KEYS
 
-    $authdb->user_del( "admin" ) or die $authdb->error;
+Meta keys define the AuthDB setting parameters
 
-Delete user by username
+=over 4
 
-=head2 user_edit
+=item schema.version
 
-    $authdb->user_edit(
-        username    => $username,
-        comment     => $comment,
-        email       => $email,
-        name        => $name,
-        role        => $role,
-    ) or вшу($authdb->error);
+Version of the current schema
 
-Edit general user data
+=back
 
-=head2 user_get
+=head1 ERROR CODES
 
-    my %data = $authdb->user_get( "admin" );
-    my @users = $authdb->user_get;
+List of AuthDB Suffit API error codes
 
-This method returns user's data or returns all users as array of hashes
+    API   | HTTP  | DESCRIPTION
+   -------+-------+-------------------------------------------------
+    E1300   [500]   Can't load file. File not found
+    E1301   [500]   Can't load data pool from file
+    E1302   [500]   File did not return a JSON object
+    E1303   [500]   Can't serialize data pool to JSON
+    E1304   [500]   Can't save data pool to file
+    E1305   [500]   Can't connect to database (model)
+    E1306   [500]   Connection failed
+    E1307   [500]   The authorization database is not initialized
+    E1308   [---]   Reserved
+    E1309   [---]   Reserved
+    E1310   [ * ]   User not found
+    E1311   [ * ]   Incorrect username stored
+    E1312   [ * ]   Incorrect password stored
+    E1313   [ * ]   The user data is expired
+    E1314   [ * ]   Group not found
+    E1315   [ * ]   Incorrect groupname stored
+    E1316   [ * ]   The group data is expired
+    E1317   [403]   External requests is blocked
+    E1318   [403]   Internal requests is blocked
+    E1319   [403]   Access denied
+    E1320   [400]   No username specified
+    E1321   [413]   The username is too long (1-256 chars required)
+    E1322   [400]   No password specified
+    E1323   [413]   The password is too long (1-256 chars required)
+    E1324   [403]   Account frozen for 5 min
+    E1325   [501]   Incorrect digest algorithm
+    E1326   [401]   Incorrect username or password
+    E1327   [403]   User is disabled
+    E1328   [---]   Reserved
+    E1329   [500]   Database request error (meta_get)
+    E1330   [400]   No key specified
+    E1331   [500]   Database request error (meta_set)
+    E1332   [400]   Incorrect digest algorithm
+    E1333   [500]   Database request error (user_get)
+    E1334   [400]   User already exists
+    E1335   [500]   Database request error (user_add)
+    E1336   [400]   User not found
+    E1337   [500]   Database request error (user_edit)
+    E1338   [500]   Database request error (user_getall)
+    E1339   [500]   Database request error (meta_del)
+    E1340   [500]   Database request error (user_del)
+    E1341   [500]   Database request error (grpusr_del)
+    E1342   [500]   Database request error (user_search)
+    E1343   [500]   Database request error (user_groups)
+    E1344   [400]   No password specified
+    E1345   [500]   Database request error (user_passwd)
+    E1346   [500]   Database request error (user_setkeys)
+    E1347   [500]   Database request error (user_tokens)
+    E1348   [500]   Database request error (group_get)
+    E1349   [400]   Group already exists
+    E1350   [500]   Database request error (group_add)
+    E1351   [500]   Database request error (user_set)
+    E1352   [500]   Database request error (grpusr_add)
+    E1353   [500]   Database request error (group_set)
+    E1354   [---]   Reserved
+    E1355   [500]   Database request error (group_getall)
+    E1356   [500]   Database request error (group_del)
+    E1357   [500]   Database request error (grpusr_get)
+    E1358   [500]   Database request error (group_members)
+    E1359   [500]   Database request error (realm_get)
+    E1360   [400]   Realm already exists
+    E1361   [500]   Database request error (realm_add)
+    E1362   [500]   Database request error (route_release)
+    E1363   [500]   Database request error (route_assign)
+    E1364   [500]   Database request error (realm_requirement_del)
+    E1365   [500]   Database request error (realm_requirement_add)
+    E1366   [500]   Database request error (realm_set)
+    E1367   [500]   Database request error (realm_getall)
+    E1368   [500]   Database request error (realm_del)
+    E1369   [500]   Database request error (token_add)
+    E1370   [500]   Database request error (route_add)
+    E1371   [500]   Database request error (realm_requirements)
+    E1372   [500]   Database request error (realm_routes)
+    E1373   [500]   Database request error (route_get)
+    E1374   [400]   Route already exists
+    E1375   [500]   Database request error (route_set)
+    E1376   [500]   Database request error (route_getall)
+    E1377   [500]   Database request error (route_del)
+    E1378   [500]   Database request error (route_search)
+    E1379   [500]   Database request error (token_del)
+    E1380   [500]   Database request error (token_get)
+    E1381   [500]   Database request error (token_get_cond)
+    E1382   [500]   Database request error (token_set)
+    E1383   [500]   Database request error (token_getall)
+    E1384   [500]   Database request error (stat_get)
+    E1385   [500]   Database request error (stat_set)
 
-=head2 user_groups
+B<*> -- this code will be defined later on the interface side
 
-    my @groups = $authdb->user_groups( "admin" );
-
-This method returns all groups of the user
-
-=head2 user_passwd
-
-    $authdb->user_passwd(
-            username => "admin",
-            password => "password",
-        ) or die $authdb->error;
-
-This method sets password for user
-
-=head2 user_pure_set
-
-    $authdb->user_pure_set(
-            username => "admin",
-            name => "Test User",
-            # . . .
-        ) or die $authdb->error;
-
-This method adds new user or doing update data of existing user in pure mode
-
-=head2 user_search
-
-    my @users = $authdb->user_search( $text );
-
-This method performs search user by name fragment
-
-=head2 user_set
-
-    $authdb->user_set(
-            username => "admin",
-            name => "Test User",
-            # . . .
-        ) or die $authdb->error;
-
-This method adds new user or doing update data of existing user
-
-=head2 user_setkeys
-
-    $authdb->user_setkeys(
-            username => "admin",
-            public_key => $public_key,
-            private_key => $private_key,
-        ) or die $authdb->error;
-
-This method sets keys for user
-
-=head2 user_tokens
-
-    my @tokens = $authdb->user_tokens( $username );
-
-This method returns all tokens of specified user
+See also list of common Suffit API error codes in L<WWW::Suffit::API/"ERROR CODES">
 
 =head1 EXAMPLE
 
@@ -495,7 +390,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -506,22 +401,19 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
-
-use Carp; # $Carp::Verbose = 1;
+our $VERSION = '1.02';
 
 use Mojo::Base -base;
-use Mojo::Util qw/md5_sum decode encode secure_compare/;
+use Mojo::Util qw/md5_sum decode encode steady_time/;
 use Mojo::File qw/path/;
 use Mojo::JSON qw/from_json to_json/;
-use Mojo::Cache;
 use Mojo::URL;
-
-use Mojolicious::Routes::Pattern;
 
 use Digest::SHA qw/sha1_hex sha224_hex sha256_hex sha384_hex sha512_hex/;
 
-use WWW::Suffit::RefUtil qw/isnt_void is_integer is_array_ref is_hash_ref/;
+use Acrux::RefUtil qw/is_integer is_hash_ref is_true_flag/;
+
+use WWW::Suffit::Cache;
 
 use WWW::Suffit::AuthDB::Model;
 use WWW::Suffit::AuthDB::User;
@@ -529,54 +421,57 @@ use WWW::Suffit::AuthDB::Group;
 use WWW::Suffit::AuthDB::Realm;
 
 use constant {
-    MAX_CACHE_KEYS  => 1024,
-    CACHE_EXPIRES   => 60*5, # 5min
-    MAX_DISMISS     => 5,
-    AUTH_HOLD_TIME  => 60*5, # 5min
-    DEFAULT_URL     => 'http://localhost',
+    DEFAULT_URL         => 'http://localhost',
+    DEFAULT_ALGORITHM   => 'SHA256',
+    MAX_CACHE_KEYS      => 1024*1024, # 1`048`576 keys max
+    CACHE_EXPIRES       => 60*5, # 5min
 };
 
-has data    => '';
-has error   => '';
-has code    => 200;
-has file    => '';
-has ds      => ''; # Data Source
-has dsuri   => ''; # Data Source URI (= ds)
-has address => '127.0.0.1';
-has username=> '';
+has data        => '';
+has error       => '';
+has code        => 200;
+has sourcefile  => ''; # JSON source file
+has ds          => ''; # Data Source URI
+has dsuri       => ''; # Data Source URI (= ds)
+has max_keys    => MAX_CACHE_KEYS;
+has expiration  => CACHE_EXPIRES;
+has cached      => 0;
+has initialized => 0;
 
 sub raise {
     my $self = shift(@_);
-    return 0 unless scalar(@_);
-    if (@_ == 1) {
+    return undef unless scalar(@_);
+    if (@_ == 1) { # "message"
         $self->error(shift(@_));
-    } else {
-        my $code_or_format = shift @_;
-        if (is_integer($code_or_format)) {
+    } else { # ("code", "message") || ("code", "format", "message") || ("format", "message")
+        my $code_or_format = shift @_; # Get fisrt arg
+        if (is_integer($code_or_format)) { # first is "code"
             $self->code($code_or_format);
-            if (@_ == 1) {
+            if (@_ == 1) { # second is "message"
                 $self->error(shift(@_));
-            } else {
+            } else { # "format", "message", ...
                 $self->error(sprintf(shift(@_), @_));
             }
-        } else {
+        } else { # first is "format"
             $self->error(sprintf($code_or_format, @_));
         }
     }
-    return 0;
+    return undef;
 }
 sub clean {
     my $self = shift;
+
+    # Flush session variables
     $self->error('');
     $self->code(200);
-    $self->username('');
-    $self->address('127.0.0.1');
-    $self->{data} = '';
     return $self;
 }
 sub cache {
     my $self = shift;
-    $self->{cache} ||= Mojo::Cache->new(max_keys => MAX_CACHE_KEYS);
+    $self->{cache} ||= WWW::Suffit::Cache->new(
+            max_keys    => $self->max_keys,
+            expiration  => $self->expiration,
+        );
     return $self->{cache};
 }
 sub model {
@@ -591,25 +486,25 @@ sub dump {
 sub load {
     my $self = shift;
     my $file = shift;
-    $self->error(""); # Flush error
+    $self->clean; # Flush error first
     if ($file) {
-        $self->file($file);
+        $self->sourcefile($file) unless $self->sourcefile;
     } else {
-        $file = $self->file;
+        $file = $self->sourcefile;
     }
     return $self unless $file;
-    $self->error("E1300: Can't load file \"$file\". File not found") && return $self
+    $self->raise(500 => "E1300: Can't load file \"$file\". File not found") && return $self
         unless -e $file;
 
-    # Load data from file
+    # Load data pool from file
     my $file_path = path($file);
     my $cont = decode('UTF-8', $file_path->slurp) // '';
     if (length($cont)) {
         my $data = eval { from_json($cont) };
         if ($@) {
-            $self->error(sprintf("E1301: Can't load data from file \"%s\": %s", $file, $@));
+            $self->raise(500 => "E1301: Can't load data pool from file \"%s\": %s", $file, $@);
         } elsif (ref($data) ne 'HASH') {
-            $self->error(sprintf("E1302: File \"%s\" did not return a JSON object", $file));
+            $self->raise(500 => "E1302: File \"%s\" did not return a JSON object", $file);
         } else {
             $self->{data} = $data;
         }
@@ -619,621 +514,159 @@ sub load {
 }
 sub save {
     my $self = shift;
-    my $file = shift || $self->file;
+    my $file = shift || $self->sourcefile;
+    $self->clean; # Flush error first
     return $self unless $file;
 
-    # Save data to file
+    # Save data pool to file
     my $json = eval { to_json($self->{data}) };
     if ($@) {
-        $self->error(sprintf("E1303: Can't serialize data to JSON: %s", $@));
+        $self->raise(500 => "E1303: Can't serialize data pool to JSON: %s", $@);
         return $self;
     }
     path($file)->spew(encode('UTF-8', $json));
-    $self->error(sprintf("E1304: Can't save data to file \"%s\": %s", $file, ($! // 'unknown error'))) unless -e $file;
+    $self->raise(500 => "E1304: Can't save data pool to file \"%s\": %s", $file, ($! // 'unknown error')) unless -e $file;
 
     return $self;
 }
-sub import_data {
+sub connect {
     my $self = shift;
-    my $file = shift;
-    $self->error(""); # Flush error
-    my $data = $self->load($file)->{data}; # Perl struct expected!
-    return 0 if $self->error;
+    $self->clean; # Flush error first
+
+    # Connect
+    my $cached = is_true_flag(shift // $self->cached);
     my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-    my $now = time();
-
-    # Get users
-    my $users_array = $data->{"users"} // [];
-       $users_array = [] unless is_array_ref($users_array);
-    my %grpsusrs = ();
-    foreach my $user (@$users_array) {
-        next unless is_hash_ref($user);
-        my $username = $user->{"username"} // '';
-        next unless length($username);
-
-        # Add user to model
-        $self->user_pure_set(
-            username    => $username,
-            name        => $user->{"name"} // '',
-            email       => $user->{"email"} // '',
-            password    => $user->{"password"} // '',
-            algorithm   => $user->{"algorithm"} // '',
-            role        => $user->{"role"} // '',
-            flags       => $user->{"flags"} || 0,
-            created     => $now,
-            not_before  => $now,
-            not_after   => $user->{"disabled"} ? $now : undef,
-            public_key  => $user->{"public_key"} // '',
-            private_key => $user->{"private_key"} // '',
-            attributes  => $user->{"attributes"} // '',
-            comment     => $user->{"comment"} // '',
-        ) or return 0;
-
-        # Add groups to grpsusrs
-        my $groups = $user->{"groups"} || [];
-           $groups = [] unless is_array_ref($groups);
-        foreach my $g (@$groups) {
-            $grpsusrs{"$g:$username"} = {
-                groupname => $g,
-                username  => $username,
-            };
-        }
-    }
-
-    # Get groups
-    my $groups_array = $data->{"groups"} // [];
-       $groups_array = [] unless is_array_ref($groups_array);
-    foreach my $group (@$groups_array) {
-        next unless is_hash_ref($group);
-        my $groupname = $group->{"groupname"} // '';
-        next unless length($groupname);
-
-        # Add group to model
-        $self->group_pure_set(
-            groupname   => $groupname,
-            description => $group->{"description"} // '',
-        ) or return 0;
-
-        # Add users to grpsusrs
-        my $users = $group->{"users"} || [];
-           $users = [] unless is_array_ref($users);
-        foreach my $u (@$users) {
-            $grpsusrs{"$groupname:$u"} = {
-                groupname => $groupname,
-                username  => $u,
-            };
-        }
-    }
-
-    # Add members to group
-    foreach my $member (values %grpsusrs) {
-        my %gu = $model->grpusr_get(%$member);
-        return $self->raise($model->error) unless $model->status;
-        next if $gu{id}; # Exists
-        $model->grpusr_add(%$member);
-        return $self->raise($model->error) unless $model->status;
-    }
-
-    # Get realms
-    my $realms_array = $data->{"realms"} // [];
-       $realms_array = [] unless is_array_ref($realms_array);
-    foreach my $realm (@$realms_array) {
-        next unless is_hash_ref($realm);
-        my $realmname = $realm->{"realmname"} // '';
-        next unless length($realmname);
-
-        # Add realm to model
-        $self->realm_pure_set(
-            realmname   => $realmname,
-            realm       => $realm->{"realm"} // '',
-            satisfy     => $realm->{"satisfy"} // '',
-            description => $realm->{"description"} // '',
-        ) or return 0;
-
-        # Set requirements
-        unless ($model->realm_requirement_del($realmname)) {
-            return $self->raise($model->error) unless $model->status;
-        }
-        my $requirements = $realm->{"requirements"} || [];
-           $requirements = [] unless is_array_ref($requirements);
-        foreach my $r (@$requirements) {
-            $model->realm_requirement_add(
-                realmname   => $realmname,
-                provider    => $r->{"provider"} // '',
-                entity      => $r->{"entity"} // '',
-                op          => $r->{"op"} // '',
-                value       => $r->{"value"} // '',
-            );
-            return $self->raise($model->error) unless $model->status;
-        }
-
-        # Release all routes
-        unless ($model->route_release($realmname)) {
-            return $self->raise($model->error) unless $model->status;
-        }
-    }
-
-    # Get routes
-    my $routes_array = $data->{"routes"} // [];
-       $routes_array = [] unless is_array_ref($routes_array);
-    foreach my $route (@$routes_array) {
-        next unless is_hash_ref($route);
-        my $routename = $route->{"routename"} // '';
-        next unless length($routename);
-
-        # Add route to model
-        $self->route_pure_set(
-            routename   => $routename,
-            realmname   => $route->{"realmname"} // '',
-            method      => $route->{"method"} // '',
-            url         => $route->{"url"} // '',
-            base        => $route->{"base"} // '',
-            path        => $route->{"path"} // '',
-        ) or return 0;
-    }
-
-    # Get meta
-    my $meta_hash = $data->{"meta"} // {};
-       $meta_hash = {} unless is_hash_ref($meta_hash);
-    while (my ($k, $v) = each %$meta_hash) {
-        last unless (defined($k) && length($k));
-        $model->meta_set(key => $k, value => $v);
-        return $self->raise($model->error) unless $model->status;
-        delete $meta_hash->{$k}; # This is safe
-    }
-
-    # Fix to meta
-    $model->meta_set(
-        key     => "AuthDBSourceFile",
-        value   => $self->file,
-    );
-    return $self->raise($model->error) unless $model->status;
-
-    # Add inited key to meta
-    $model->meta_set(
-        key     => "meta.inited",
-        value   => $now,
-    );
-    return $self->raise($model->error) unless $model->status;
-
-    return 1;
-}
-sub export_data {
-    my $self = shift;
-    my $file = shift;
-    $self->error(""); # Flush error
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-    my $now = time();
-
-    # Get users
-    my @users = $self->user_get();
-    return 0 if $self->error;
-    foreach my $u (@users) {
-        my $not_after = $u->{not_after} || 0;
-        $u->{disabled} = ($not_after && $not_after < $now) ? \1 : \0;
-        delete($u->{$_}) for qw/created id not_before not_after/;
-    }
-
-    # Get groups
-    my @groups = $self->group_get();
-    return 0 if $self->error;
-    foreach my $g (@groups) {
-        my $groupname = $g->{groupname} // '';
-        next unless length $groupname;
-        delete($g->{id});
-
-        # Get members
-        my @members = $self->group_members($groupname);
-        return 0 if $self->error;
-        my @usr = ();
-        foreach my $m (@members) {
-            push @usr, $m->{username};
-        }
-        $g->{users} = [@usr];
-    }
-
-    # Get realms
-    my @realms = $self->realm_get();
-    return 0 if $self->error;
-    foreach my $r (@realms) {
-        my $realmname = $r->{realmname} // '';
-        next unless length $realmname;
-        delete($r->{id});
-
-        # Get requirements
-        my @requirements = $self->realm_requirements($realmname);
-        return 0 if $self->error;
-        my @reqs = ();
-        foreach my $q (@requirements) {
-            delete($q->{id});
-            delete($q->{realmname});
-            push @reqs, $q;
-        }
-        $r->{requirements} = [@reqs];
-    }
-
-    # Get routes
-    my @routes = $self->route_get();
-    return 0 if $self->error;
-    foreach my $r (@routes) {
-        delete($r->{id});
-    }
-
-    # Get meta
-    my @metas = $model->meta_get();
-    return $self->raise($model->error) unless $model->status;
-    my %meta = ();
-    foreach my $m (@metas) {
-        $meta{$m->{key}} = $m->{value};
-    }
-    #print Mojo::Util::dumper(\%meta);
-
-    # Return
-    $self->{data} = {
-        users   => \@users,
-        groups  => \@groups,
-        realms  => \@realms,
-        routes  => \@routes,
-        meta    => \%meta,
-    };
-    $self->save($file);
-    return 0 if $self->error;
-    return 1;
-}
-
-# Interface methods
-sub authen {
-    my $self = shift;
-    my $username = shift // '';
-    my $password = shift // '';
-    $self->error(""); # Flush error
-    $self->code(200); # HTTP_OK
-
-    # Validation username
-    return $self->raise(400 => "E1305: No username specified") unless length($username); # HTTP_BAD_REQUEST
-    return $self->raise(413 => "E1306: The username is too long (1-256 chars required)") unless length($username) <= 256; # HTTP_REQUEST_ENTITY_TOO_LARGE
-
-    # Validation password
-    return $self->raise(400 => "E1307: No password specified") unless length($password); # HTTP_BAD_REQUEST
-    return $self->raise(413 => "E1308: The password is too long (1-256 chars required)") unless length($password) <= 256; # HTTP_REQUEST_ENTITY_TOO_LARGE
-
-    # Get user data from AuthDB
-    my $user = $self->cached_user($username);
-    if ($self->error) {
-        $self->code(500); # HTTP_INTERNAL_SERVER_ERROR
-        return 0;
-    }
-
-    # Check consistency
-    return $self->raise(401 => $user->error) unless $user->is_valid; # HTTP_UNAUTHORIZED
-
-    # Get dismiss and updated by address and username
-    my $model = $self->model;
-    my %st = $model->stat_get($self->address, $username);
-    return $self->raise(500 => $model->error) unless $model->status; # HTTP_INTERNAL_SERVER_ERROR
-    my $dismiss = $st{dismiss} || 0;
-    my $updated = $st{updated} || 0;
-    if (($dismiss >= MAX_DISMISS) && (($updated + AUTH_HOLD_TIME) >= time)) {
-        return $self->raise(403 => "E1309: Account is hold on 5 min"); # HTTP_FORBIDDEN
-    }
-
-    # Success?
-    $password = encode('UTF-8', $password);
-    my $h;
-    if    ($user->algorithm eq 'MD5')    { $h = md5_sum($password)   }
-    elsif ($user->algorithm eq 'SHA1')   { $h = sha1_hex($password)   }
-    elsif ($user->algorithm eq 'SHA224') { $h = sha224_hex($password) }
-    elsif ($user->algorithm eq 'SHA256') { $h = sha256_hex($password) }
-    elsif ($user->algorithm eq 'SHA384') { $h = sha384_hex($password) }
-    elsif ($user->algorithm eq 'SHA512') { $h = sha512_hex($password) }
-    else {
-        return $self->raise(501 => "E1310: Incorrect digest algorithm"); # HTTP_NOT_IMPLEMENTED
-    }
-
-    # Check!
-    my $rslt = secure_compare($user->password, $h) ? 1 : 0;
-    if ($rslt) { # Ok
-        unless ($model->stat_set(address => $self->address, username => $username)) {
-            return $self->raise(500 => $model->error); # HTTP_INTERNAL_SERVER_ERROR
-        }
-        return $user;
-    }
-
-    # Error
-    unless ($model->stat_set(address => $self->address, username => $username, dismiss => ($dismiss + 1))) {
-        return $self->raise(500 => $model->error); # HTTP_INTERNAL_SERVER_ERROR
-    }
-
-    # Fail
-    return $self->raise(401 => "E1311: Wrong username or password"); # HTTP_UNAUTHORIZED
-}
-sub authz {
-    my $self = shift;
-    my $username = shift // $self->username // '';
-    my $scope = shift || 0;
-    $self->error(""); # Flush error
-    $self->code(200); # HTTP_OK
-
-    # Validation username
-    return $self->raise(400 => "E1312: No username specified") unless length($username); # HTTP_BAD_REQUEST
-    return $self->raise(413 => "E1313: The username is too long (1-256 chars required)") unless length($username) <= 256; # HTTP_REQUEST_ENTITY_TOO_LARGE
-
-    # Get user data from AuthDB
-    my $user = $self->cached_user($username);
-    if ($self->error) {
-        $self->code(500); # HTTP_INTERNAL_SERVER_ERROR
-        return 0;
-    }
-
-    # Check consistency
-    return $self->raise(401 => $user->error) unless $user->is_valid; # HTTP_UNAUTHORIZED
-
-    # Disabled/Banned
-    return $self->raise(403 => "E1314: User is disabled") unless $user->is_enabled; # HTTP_FORBIDDEN
-
-    # Internal or External
-    if ($scope) { # External
-        return $self->raise(403 => "E1339: External requests is blocked") unless $user->allow_ext; # HTTP_FORBIDDEN
-    } else { # Internal (default)
-        return $self->raise(403 => "E1340: Internal requests is blocked") unless $user->allow_int; # HTTP_FORBIDDEN
-    }
-
-    # Ok
-    $user->is_authorized(1); # Set flag 'authorized'
-    return $user;
-}
-sub access {
-    my $self = shift;
-    my $args = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
-    my $controller = $args->{controller} // $args->{c}; # Controller
-    croak "No controller specified" unless ref($controller);
-
-    my $url = $args->{url} ? Mojo::URL->new($args->{url}) : $controller->req->url;
-    my $username = $args->{username} // $args->{u} // $self->username // $url->to_abs->username // ''; # Username
-    my $routename = $args->{routename} // $args->{route} // $controller->current_route // ''; # $self->match->endpoint->name
-    my $method = $args->{method} // $controller->req->method // '';
-    my $url_path = $args->{path} // $url->path->to_string;
-    my $url_base = $args->{base} // $url->base->path_query('/')->to_string // '';
-       $url_base =~ s/\/+$//;
-    my $remote_ip = $args->{remote_ip} // $args->{client_ip} // $controller->remote_ip;
-    my $headers = $args->{headers};
-    $self->error(""); # Flush error
-    $self->code(200); # HTTP_OK
-    #$controller->log->warn($url_base);
-
-    # Get routes list for $url_base
-    my $routes = $self->cached_routes($url_base);
-    unless ($routes) {
-        $self->code(500); # HTTP_INTERNAL_SERVER_ERROR
-        return 0;
-    }
-    my %route = ();
-    if (exists($routes->{$routename})) { # By routename
-        my $r = $routes->{$routename};
-        %route = (%$r, rule => "by routename directly");
-    } else { # By method and path
-        foreach my $r (values %$routes) {
-            my $m = $r->{method};
-            next unless $m && (($m eq $method) || ($m eq 'ANY') || ($m eq '*'));
-            my $p = $r->{path};
-            next unless $p;
-
-            # Search directly (eq)
-            if ($p eq $url_path) {
-                %route = (%$r, rule => "by method and path ($m $p)");
-                last;
-            }
-
-            # Search by wildcard (*)
-            if ($p =~ s/\*+$//) {
-                if (index($url_path, $p) >= 0) {
-                    %route = (%$r, rule => "by method and part of path ($m $p)");
-                    last;
-                } else {
-                    next;
-                }
-            }
-
-            # Match routes (:foo)
-            for (qw/foo bar baz quz quux corge grault garply waldo fred plugh xyzzy thud/) {
-                $p =~ s/[~]+/(":$_")/e or last
-            }
-            if (defined(Mojolicious::Routes::Pattern->new($p)->match($url_path))) {
-                %route = (%$r, rule => "by method and pattern of path ($m $p)");
-                last;
-            }
-        }
-    }
-    return 1 unless $route{realmname};
-    $controller->log->debug(sprintf("[AuthDB::access] The route \"%s\" was detected %s", $route{routename} // '', $route{rule}));
-
-    # Get realm instance
-    my $realm = $self->cached_realm($route{realmname});
-    if ($self->error) {
-        $self->code(500); # HTTP_INTERNAL_SERVER_ERROR
-        return 0;
-    }
-    return 1 unless $realm->id; # No realm - no authorization :-)
-    $controller->log->debug(sprintf("[AuthDB::access] Use realm \"%s\"", $route{realmname})); # $controller->dumper($realm)
-
-    # Get user data
-    my $user = $self->cached_user($username);
-    if ($self->error) {
-        $self->code(500); # HTTP_INTERNAL_SERVER_ERROR
-        return 0;
-    }
-
-    # Result of checks
-    my @checks = ();
-
-    # Check by user or group
-    my @grants = ();
-    #$controller->log->debug(">>>> Username = $username");
-    #$controller->log->debug(sprintf(">>>> Groups   = %s", $controller->dumper($user->groups)));
-    #$controller->log->debug($controller->dumper($realm->requirements->{'User/Group'}));
-    #$self->requirements->{'User/Group'}
-    if (my $s = $realm->_check_by_usergroup($username, $user->groups)) {
-        if ($s == 1) {
-            push @checks, 1;
-            push @grants, sprintf("User/Group (username=%s)", $username);
-        }
-    } else { push @checks, 0 }
-    # Check by ip or host
-    if (my $s = $realm->_check_by_host($remote_ip)) {
-        if ($s == 1) {
-            push @checks, 1;
-            push @grants, sprintf("Host (ip=%s)", $remote_ip);
-        }
-    } else { push @checks, 0 }
-    # Check by ENV
-    if (my $s = $realm->_check_by_env()) {
-        if ($s == 1) {
-            push @checks, 1;
-            push @grants, "Env";
-        }
-    } else { push @checks, 0 }
-    # Check by Header
-    if (my $s = $realm->_check_by_header(sub {
-        my $_k = $_[0];
-        return $headers->{$_k} if defined($headers) && is_hash_ref($headers);
-        return $controller->req->headers->header($_k)
-    })) {
-        if ($s == 1) {
-            push @checks, 1;
-            push @grants, "Header";
-        }
-    } else { push @checks, 0 }
-
-    # Check default
-    my $default = $realm->_check_by_default();
-
-    # Result
-    my $status = 0; # False by default
-    my $sum = 0;
-    $sum += $_ for @checks;
-    my $satisfy_all = lc($realm->satisfy || "any") eq 'all' ? 1 : 0; # All -- true / Any -- 0 (default)
-    if ($satisfy_all) { # All
-        $status = 1 if ($sum > 0) && scalar(@checks) == $sum; # All tests is passed
-    } else { # Any
-        $status = 1 if $sum > 0; # One or more tests is passed
-    }
-
-    # Debug
-    if ($status) {
-        $controller->log->debug(sprintf('[AuthDB::access] Access allowed by %s rule(s). Satisfy=%s',
-            join(", ", @grants), $satisfy_all ? 'All' : 'Any'));
+    if ($cached) {
+        $model->connect_cached;
     } else {
-        $controller->log->debug(sprintf('[AuthDB::access] Access %s by default. Satisfy=%s',
-            $default ? 'allowed' : 'denied', $satisfy_all ? 'All' : 'Any'));
+        $model->connect unless $model->dbh && $model->ping;
+    }
+    if ($model->error) {
+        $self->raise(500 => "E1305: %s", $model->error);
+        return $self;
+    } elsif (!$model->ping) {
+        $self->raise(500 => "E1306: %s", "Connection failed");
+        return $self;
     }
 
-    # Summary
-    my $summary = $status ? 1 : $default; # True - allowed; False - denied
-    unless ($summary) { # HTTP_FORBIDDEN
-        $self->code(403);
-        return 0; # Access denied
+    # Check initialize status
+    unless (is_true_flag($self->initialized)) { # if NOT initialized
+        if ($model->is_initialized) {
+            $self->initialized(1); # On
+        } else {
+            # The authorization database is not inialized
+            $self->raise(500 => "E1307: %s", $model->error) if $model->error;
+        }
     }
 
-    # Ok
-    return 1;
+    return $self;
+}
+sub is_connected {
+    my $self = shift;
+    my $model = $self->model;
+    return 0 unless $model;
+    return 1 if $model->dbh;
+    return 0;
+}
+sub checksum {
+    my $self = shift;
+    my $str = shift // '';
+    my $alg = uc(shift // DEFAULT_ALGORITHM);
+    return '' unless length $str;
+    my $enc_str = encode('UTF-8', $str);
+    my $h = '';
+    if    ($alg eq 'MD5')    { $h = md5_sum($enc_str)    }
+    elsif ($alg eq 'SHA1')   { $h = sha1_hex($enc_str)   }
+    elsif ($alg eq 'SHA224') { $h = sha224_hex($enc_str) }
+    elsif ($alg eq 'SHA256') { $h = sha256_hex($enc_str) }
+    elsif ($alg eq 'SHA384') { $h = sha384_hex($enc_str) }
+    elsif ($alg eq 'SHA512') { $h = sha512_hex($enc_str) }
+    return $h;
 }
 
 # Methods that returns sub-objects
 sub user {
     my $self = shift;
     my $username = shift // '';
-    $self->error(""); # Flush error
+    $self->clean; # Flush error
 
     # Check username
     return WWW::Suffit::AuthDB::User->new() unless length($username); # No user specified
 
     # Get model
     my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return WWW::Suffit::AuthDB::User->new(error => $self->error);
-    }
 
     # Get data from model
     my %data = $model->user_get($username);
-    unless ($model->status) {
-        $self->error($model->error);
+    if ($model->error) {
+        $self->raise(500 => "E1333: %s", $model->error);
         return WWW::Suffit::AuthDB::User->new(error => $self->error);
     }
-    return WWW::Suffit::AuthDB::User->new() unless $data{id}; # No user found
+    return WWW::Suffit::AuthDB::User->new() unless $data{id}; # No user found - empty user data, no errors
 
     # Get groups list of user
     my @grpusr = $model->grpusr_get( username => $username );
-    unless ($model->status) {
-        $self->error($model->error);
+    #print STDERR Mojo::Util::dumper({ username => $username, groups => \@grpusr});
+    if ($model->error) {
+        $self->raise(500 => "E1357: %s", $model->error);
         return WWW::Suffit::AuthDB::User->new(error => $self->error);
     }
-    $data{groups} = [sort map {$_->[1]} @grpusr];
+    $data{groups} = [sort map {$_->{groupname}} @grpusr];
 
     return WWW::Suffit::AuthDB::User->new(%data);
 }
 sub group {
     my $self = shift;
     my $groupname = shift // '';
-    $self->error(""); # Flush error
+    $self->clean; # Flush error
 
     # Check username
     return WWW::Suffit::AuthDB::Group->new() unless length($groupname); # No user specified
 
     # Get model
     my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return WWW::Suffit::AuthDB::Group->new(error => $self->error);
-    }
 
     # Get data from model
     my %data = $model->group_get($groupname);
-    unless ($model->status) {
-        $self->error($model->error);
+    if ($model->error) {
+        $self->raise(500 => "E1348: %s", $model->error);
         return WWW::Suffit::AuthDB::Group->new(error => $self->error);
     }
-    return WWW::Suffit::AuthDB::Group->new() unless $data{id};
+    return WWW::Suffit::AuthDB::Group->new() unless $data{id}; # No group found - empty group data, no errors
 
     # Get users list of group
     my @grpusr = $model->grpusr_get( groupname => $groupname );
-    unless ($model->status) {
-        $self->error($model->error);
+    if ($model->error) {
+        $self->raise(500 => "E1357: %s", $model->error);
         return WWW::Suffit::AuthDB::Group->new(error => $self->error);
     }
-    $data{users} = [sort map {$_->[2]} @grpusr];
+    $data{users} = [sort map {$_->{username}} @grpusr];
 
     return WWW::Suffit::AuthDB::Group->new(%data);
 }
 sub realm {
     my $self = shift;
     my $realmname = shift // '';
-    $self->error(""); # Flush error
+    $self->clean; # Flush error
 
     # Check realmname
     return WWW::Suffit::AuthDB::Realm->new() unless length($realmname); # No realm specified
 
     # Get model
     my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
-    }
 
     # Get data from model
     my %data = $model->realm_get($realmname);
-    unless ($model->status) {
-        $self->error($model->error);
+    if ($model->error) {
+        $self->raise(500 => "E1359: %s", $model->error);
         return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
     }
-    return WWW::Suffit::AuthDB::Realm->new() unless $data{id}; # No realm found
+    return WWW::Suffit::AuthDB::Realm->new() unless $data{id}; # No realm found - empty group data, no errors
 
     # Get requirements
     my @requirements = $model->realm_requirements($realmname);
-    unless ($model->status) {
-        $self->error($model->error);
+    if ($model->error) {
+        $self->raise(500 => "E1371: %s", $model->error);
         return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
     }
 
@@ -1256,26 +689,116 @@ sub realm {
 }
 
 # Methods that returns cached sub-objects (cached methods)
+sub cached_user {
+    my $self = shift;
+    my $username = shift // '';
+    my $cachekey = shift // '';
+    my $now = time;
+
+    # Get user object from cache by key
+    $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $key = $cachekey
+        ? sprintf('user.%s.%s', $cachekey, $username || '__anonymous')
+        : sprintf('user.%s', $username // '__anonymous');
+    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    my $obj = $self->cache->get($key);
+    return $obj if $obj && $obj->is_valid; # Return user object from cache if exists
+
+    # Get real object (not cached) otherwise
+    $obj = $self->user($username);
+    return $obj if $self->error;
+
+    # Set expires time and marks object as cached
+    $obj->expires($now + $self->expiration)->mark(steady_time);
+    $obj->cachekey($cachekey) if $cachekey;
+    $self->cache->set($key, $obj) if $obj->is_valid;
+
+    # Return object
+    return $obj;
+}
+sub cached_group {
+    my $self = shift;
+    my $groupname = shift // '';
+    my $cachekey = shift // '';
+    my $now = time;
+
+    # Get group object from cache by key
+    $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $key = $cachekey
+        ? sprintf('group.%s.%s', $cachekey, $groupname // '__default')
+        : sprintf('group.%s', $groupname // '__default');
+    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    my $obj = $self->cache->get($key);
+    return $obj if $obj && $obj->is_valid; # Return group object from cache if exists
+
+    # Get real object (not cached) otherwise
+    $obj = $self->group($groupname);
+    return $obj if $self->error;
+
+    # Set expires time
+    $obj->expires($now + $self->expiration)->mark(steady_time);
+    $obj->cachekey($cachekey) if $cachekey;
+    $self->cache->set($key, $obj) if $obj->is_valid;
+
+    # Return object
+    return $obj;
+}
+sub cached_realm {
+    my $self = shift;
+    my $realmname = shift // '';
+    my $cachekey = shift // '';
+    my $now = time;
+
+    # Get realm object from cache by key
+    $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $key = $cachekey
+        ? sprintf('realm.%s.%s', $cachekey, $realmname // '__default')
+        : sprintf('realm.%s', $realmname // '__default');
+    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    my $obj = $self->cache->get($key);
+    return $obj if $obj && $obj->is_valid; # Return realm object from cache if exists
+
+    # Get real object (not cached) otherwise
+    $obj = $self->realm($realmname);
+    return $obj if $self->error;
+
+    # Set expires time
+    $obj->expires($now + $self->expiration)->mark(steady_time);
+    $obj->cachekey($cachekey) if $cachekey;
+    $self->cache->set($key, $obj) if $obj->is_valid;
+
+    # Return object
+    return $obj;
+}
 sub cached_routes {
     my $self = shift;
     my $url = _url_fix_localhost(shift(@_)); # Base URL (fixed!)
-    $self->error(""); # Flush error
+    my $cachekey = shift // '';
+    my $now = time;
+    $self->clean; # Flush error
 
     # Get from cache
-    my $key = sprintf('routes.%s', $url // '__default');
-    my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    my $val = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    return $val->{data} if $val && is_hash_ref($val) && $val->{exp} < time;
+    $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $key = $cachekey
+        ? sprintf('routes.%s.%s', $cachekey, $url // '__default')
+        : sprintf('routes.%s', $url // '__default');
+
+    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #my $val = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    my $val = $self->cache->get($key);
+    return $val->{data} if $val && is_hash_ref($val) && $val->{exp} < $now;
 
     # Get model
     my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
 
     # Get routes list
     my @routes = $model->route_getall;
-    return $self->raise($model->error) unless $model->status;
+    return $self->raise(500 => "E1376: %s", $model->error) if $model->error;
 
-    my $ret = {};
+    my $ret = {}; # `id`,`realmname`,`routename`,`method`,`url`,`base`,`path`
     foreach my $r (@routes) {
         my $base_url_fixed = _url_fix_localhost($r->{base});
         next unless $r->{realmname} && $base_url_fixed eq $url;
@@ -1287,923 +810,15 @@ sub cached_routes {
         };
     }
 
-    $self->cache->set($key, {data => $ret, exp => time + CACHE_EXPIRES});
-    return $ret;
-}
-sub cached_user {
-    my $self = shift;
-    my $username = shift // '';
-
-    # Get from cache
-    my $key = sprintf('user.%s', $username // '__anonymous');
-    my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    my $ret = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    return $ret if $ret && $ret->isa("WWW::Suffit::AuthDB::User") && $ret->is_valid && $ret->mark;
-
-    # Get real object
-    $ret = $self->user($username);
-    return $ret if $self->error;
-
-    # Set expires time
-    $ret->expires(time + CACHE_EXPIRES);
-    $self->cache->set($key, $ret) if $ret->is_valid;
-
-    # Return object
-    return $ret;
-}
-sub cached_group {
-    my $self = shift;
-    my $groupname = shift // '';
-
-    # Get from cache
-    my $key = sprintf('group.%s', $groupname // '__default');
-    my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    my $ret = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    return $ret if $ret && $ret->isa("WWW::Suffit::AuthDB::Group") && $ret->is_valid && $ret->mark;
-
-    # Get real object
-    $ret = $self->group($groupname);
-    return $ret if $self->error;
-
-    # Set expires time
-    $ret->expires(time + CACHE_EXPIRES);
-    $self->cache->set($key, $ret) if $ret->is_valid;
-
-    # Return object
-    return $ret;
-}
-sub cached_realm {
-    my $self = shift;
-    my $realmname = shift // '';
-
-    # Get from cache
-    my $key = sprintf('realm.%s', $realmname // '__default');
-    my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    my $ret = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    return $ret if $ret && $ret->isa("WWW::Suffit::AuthDB::Realm") && $ret->is_valid && $ret->mark;
-
-    # Get real object
-    $ret = $self->realm($realmname);
-    return $ret if $self->error;
-
-    # Set expires time
-    $ret->expires(time + CACHE_EXPIRES);
-    $self->cache->set($key, $ret) if $ret->is_valid;
-
-    # Return object
-    return $ret;
-}
-
-# Users CRUD
-sub user_search {
-    my $self = shift;
-    my $username = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get data from model
-    my @table = $model->user_search($username);
-    $self->error($model->error) unless $model->status;
-
-    return @table;
-}
-sub user_get {
-    my $self = shift;
-    my $username = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get all users
-    unless (length($username)) {
-        my @table = $model->user_getall;
-        $self->error($model->error) unless $model->status;
-        return @table;
-    }
-
-    # Get user data
-    my %data = $model->user_get($username);
-    $self->error($model->error) unless $model->status;
-    return %data;
-}
-sub user_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-    my $now = time();
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get password
-    if (my $password = $data{password}) {
-        $password = encode('UTF-8', $password);
-        my $alg = $data{algorithm} // '';
-        my $h = '';
-        if    ($alg eq 'MD5')    { $h = md5_sum($password)   }
-        elsif ($alg eq 'SHA1')   { $h = sha1_hex($password)   }
-        elsif ($alg eq 'SHA224') { $h = sha224_hex($password) }
-        elsif ($alg eq 'SHA256') { $h = sha256_hex($password) }
-        elsif ($alg eq 'SHA384') { $h = sha384_hex($password) }
-        elsif ($alg eq 'SHA512') { $h = sha512_hex($password) }
-        else {
-            return $self->raise("E1315: Incorrect digest algorithm");
-        }
-        $data{password} = $h;
-    }
-
-    # Get old data from model
-    my %old = $model->user_get($data{username});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add
-    $data{not_after} ||= 0;
-    if ($data{id}) { # Update (Set)
-        $data{password} ||= $old{password};
-        $model->user_set(%data);
-    } else { # Insert (Add)
-        if ($old{id}) {
-            $self->error("E1316: User already exists");
-            return 0;
-        }
-        $data{created} = $now;
-        $data{not_before} = $now;
-        $model->user_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $data{username}), $now);
-}
-sub user_pure_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get current data from model
-    my %cur = $model->user_get($data{username});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add
-    if ($cur{id}) { # Update (Set)
-        $model->user_set(%data);
-    } else { # Insert (Add)
-        $model->user_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $data{username}), time);
-}
-sub user_del {
-    my $self = shift;
-    my $username = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Delete user
-    unless ($model->user_del($username)) {
-        return $self->raise($model->error);
-    }
-
-    # Delete all group relations
-    unless ($model->grpusr_del(username => $username)) {
-        return $self->raise($model->error);
-    }
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $username), time);
-    return 1;
-}
-sub user_groups {
-    my $self = shift;
-    my $username = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get groups list of user
-    my @groups = $model->user_groups( $username );
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    return @groups;
-}
-sub user_passwd {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->user_get($data{username});
-    return $self->raise($model->error) unless $model->status;
-    return $self->raise("E1317: No user found") unless $old{id};
-
-    # Get password
-    if (my $password = $data{password}) {
-        $password = encode('UTF-8', $password);
-        my $alg = $old{algorithm} // '';
-        my $h = '';
-        if    ($alg eq 'MD5')    { $h = md5_sum($password)   }
-        elsif ($alg eq 'SHA1')   { $h = sha1_hex($password)   }
-        elsif ($alg eq 'SHA224') { $h = sha224_hex($password) }
-        elsif ($alg eq 'SHA256') { $h = sha256_hex($password) }
-        elsif ($alg eq 'SHA384') { $h = sha384_hex($password) }
-        elsif ($alg eq 'SHA512') { $h = sha512_hex($password) }
-        else {
-            return $self->raise("E1318: Incorrect digest algorithm");
-        }
-        $data{password} = $h;
-    } else {
-        return $self->raise("E1319: No password specified");
-    }
-
-    # Set new password
-    $model->user_passwd(%data);
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $data{username}), time);
-}
-sub user_edit {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->user_get($data{username});
-    return $self->raise($model->error) unless $model->status;
-    return $self->raise("E1320: No user found") unless $old{id};
-
-    # Set new data
-    $model->user_edit(%data, id => $old{id});
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $data{username}), time);
-}
-sub user_setkeys {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->user_get($data{username});
-    return $self->raise($model->error) unless $model->status;
-    return $self->raise("E1321: No user found") unless $old{id};
-
-    # Set new keys
-    $model->user_setkeys(%data, id => $old{id});
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("user.%s.updated", $data{username}), time);
-}
-sub user_tokens {
-    my $self = shift;
-    my $username = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get user tokens
-    my @table = $model->user_tokens($username);
-    $self->error($model->error) unless $model->status;
-
-    return @table;
-}
-
-# Groups CRUD
-sub group_get {
-    my $self = shift;
-    my $groupname = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get all groups
-    unless (length($groupname)) {
-        my @table = $model->group_getall;
-        $self->error($model->error) unless $model->status;
-        return @table;
-    }
-
-    # Get group data
-    my %data = $model->group_get($groupname);
-    $self->error($model->error) unless $model->status;
-
-    return %data;
-}
-sub group_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->group_get($data{groupname});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add group data
-    if ($data{id}) { # Update (Set)
-        $model->group_set(%data);
-    } else { # Insert (Add)
-        return $self->raise("E1322: Group already exists") if $old{id};
-        $model->group_add(%data);
-    }
-
-    # Set users
-    my $users = $data{users} || [];
-    unless ($model->grpusr_del( groupname => $data{groupname} )) {
-        return $self->raise($model->error);
-    }
-    foreach my $username (@$users) {
-        unless ($model->grpusr_add(groupname => $data{groupname}, username => $username)) {
-            return $self->raise($model->error);
-        }
-        $self->meta(sprintf("user.%s.updated", $username), time);
-    }
-    $model->group_set(%data);
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("group.%s.updated", $data{groupname}), time);
-}
-sub group_pure_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get current data from model
-    my %cur = $model->group_get($data{groupname});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add
-    if ($cur{id}) { # Update (Set)
-        $model->group_set(%data);
-    } else { # Insert (Add)
-        $model->group_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("group.%s.updated", $data{groupname}), time);
-}
-sub group_del {
-    my $self = shift;
-    my $groupname = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Delete group
-    unless ($model->group_del($groupname)) {
-        return $self->raise($model->error);
-    }
-
-    # Delete all user relations
-    unless ($model->grpusr_del(groupname => $groupname)) {
-        return $self->raise($model->error);
-    }
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("group.%s.updated", $groupname), time);
-}
-sub group_members {
-    my $self = shift;
-    my $groupname = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get users list of group
-    my @members = $model->group_members( $groupname );
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    return @members;
-}
-sub group_enroll {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get existed relation
-    my %old = $model->grpusr_get(%data);
-    return $self->raise($model->error) unless $model->status;
-    return 1 if $old{id};
-
-    # Enroll
-    unless ($model->grpusr_add(%data)) {
-        return $self->raise($model->error);
-    }
-
-    # Sets up the updated tag
-    $self->meta(sprintf("user.%s.updated", $data{username}), time);
-    return 0 unless $model->status;
-    $self->meta(sprintf("group.%s.updated", $data{groupname}), time);
-    return 0 unless $model->status;
-
-    return 1;
-}
-
-# Realms CRUD
-sub realm_get {
-    my $self = shift;
-    my $realmname = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get all realms
-    unless (length($realmname)) {
-        my @table = $model->realm_getall;
-        $self->error($model->error) unless $model->status;
-        return @table;
-    }
-
-    # Get realm data
-    my %data = $model->realm_get($realmname);
-    $self->error($model->error) unless $model->status;
-
-    return %data;
-}
-sub realm_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->realm_get($data{realmname});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add realm data
-    if ($data{id}) { # Update (Set)
-        $model->realm_set(%data);
-    } else { # Insert (Add)
-        return $self->raise("E1323: Realm already exists") if $old{id};
-        $model->realm_add(%data);
-    }
-
-    # Set routes
-    my $routes = $data{routes} || [];
-    unless ($model->route_release( $data{realmname} )) {
-        return $self->raise($model->error);
-    }
-    foreach my $routename (@$routes) {
-        unless ($model->route_assign(routename => $routename, realmname => $data{realmname})) {
-            return $self->raise($model->error);
-        }
-    }
-
-    # Set requirements
-    my $requirements = $data{requirements} || [];
-    unless ($model->realm_requirement_del( $data{realmname} )) {
-        return $self->raise($model->error);
-    }
-    foreach my $req (@$requirements) {
-        next unless is_hash_ref($req);
-        unless ($model->realm_requirement_add(%$req, realmname => $data{realmname})) {
-            return $self->raise($model->error);
-        }
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("realm.%s.updated", $data{realmname}), time);
-}
-sub realm_pure_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get current data from model
-    my %cur = $model->realm_get($data{realmname});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add
-    if ($cur{id}) { # Update (Set)
-        $model->realm_set(%data);
-    } else { # Insert (Add)
-        $model->realm_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("realm.%s.updated", $data{realmname}), time);
-}
-sub realm_del {
-    my $self = shift;
-    my $realmname = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Delete realm
-    unless ($model->realm_del($realmname)) {
-        return $self->raise($model->error);
-    }
-
-    # Delete realm's requirements
-    unless ($model->realm_requirement_del($realmname)) {
-        return $self->raise($model->error);
-    }
-
-    # Release all related routes
-    unless ($model->route_release($realmname)) {
-        return $self->raise($model->error);
-    }
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("realm.%s.updated", $realmname), time);
-}
-sub realm_requirements {
-    my $self = shift;
-    my $realmname = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get realm requirements
-    my @table = $model->realm_requirements($realmname);
-    $self->error($model->error) unless $model->status;
-
-    return @table;
-}
-sub realm_routes {
-    my $self = shift;
-    my $realmname = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get realm routes
-    my @table = $model->realm_routes($realmname);
-    $self->error($model->error) unless $model->status;
-
-    return @table;
-}
-
-# Routes CRUD
-sub route_get {
-    my $self = shift;
-    my $routename = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get all routes
-    unless (length($routename)) {
-        my @table = $model->route_getall();
-        $self->error($model->error) unless $model->status;
-        return @table;
-    }
-
-    # Get route data
-    my %data = $model->route_get($routename);
-    $self->error($model->error) unless $model->status;
-
-    return %data;
-}
-sub route_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get old data from model
-    my %old = $model->route_get($data{routename});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add route data
-    if ($data{id}) { # Update (Set)
-        $model->route_set(%data);
-    } else { # Insert (Add)
-        return $self->raise("E1324: Route already exists") if $old{id};
-        $model->route_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("routes.%s.updated", $data{base} // '__default'), time);
-}
-sub route_pure_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get current data from model
-    my %cur = $model->route_get($data{routename});
-    return $self->raise($model->error) unless $model->status;
-
-    # Set or add
-    if ($cur{id}) { # Update (Set)
-        $data{id} = $cur{id};
-        $model->route_set(%data);
-    } else { # Insert (Add)
-        $model->route_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Sets up the updated tag
-    return $self->meta(sprintf("routes.%s.updated", $data{base} // '__default'), time);
-}
-sub route_del {
-    my $self = shift;
-    my $routename = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Delete route
-    unless ($model->route_del($routename)) {
-        return $self->raise($model->error);
-    }
-}
-sub route_search {
-    my $self = shift;
-    my $text = shift;
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get data from model
-    my @table = $model->route_search($text);
-    $self->error($model->error) unless $model->status;
-
-    return @table;
-}
-
-# Tokens CRUD
-sub token_get {
-    my $self = shift;
-    my ($id, $username, $jti);
-    if (scalar(@_) == 1) { $id = shift }
-    elsif (scalar(@_) == 2) {($username, $jti) = @_}
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    unless ($model->status) {
-        $self->error($model->error);
-        return ();
-    }
-
-    # Get data from model
-    my @data = ();
-    if ($id) {
-        @data = $model->token_get($id); # hash returs
-    } elsif ($jti) {
-        @data = $model->token_get_cond('api', username => $username, jti => $jti); # hash returs
-    } else {
-        @data = $model->token_getall(); # table returs
-    }
-    $self->error($model->error) unless $model->status;
-
-    return @data;
-}
-sub token_set {
-    my $self = shift;
-    my %data = @_;
-    $self->error(""); # Flush error
-    $data{type} //= 'session';
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Delete expired tokens
-    return $self->raise($model->error) unless $model->token_del;
-
-    # Get old data from model
-    my %old;
-    if ($data{id}) {
-        %old = $model->token_get($data{id});
-        return $self->raise($model->error) unless $model->status;
-    } elsif ($data{type} eq 'session') {
-        %old = $model->token_get_cond('session', %data);
-        return $self->raise($model->error) unless $model->status;
-    }
-
-    # Set or add data
-    if ($old{id}) { # Update (Set)
-        $data{id} = $old{id};
-        $model->token_set(%data);
-    } else { # Insert (Add)
-        $model->token_add(%data);
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    return 1;
-}
-sub token_del {
-    my $self = shift;
-    my $username = shift // '';
-    my $jti = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get data from model
-    my %data = $model->token_get_cond('api', username => $username, jti => $jti);
-    return $self->raise($model->error) unless $model->status;
-    return 1 unless $data{id};
-
-    # Delete token
-    unless ($model->token_del($data{id})) {
-        return $self->raise($model->error);
-    }
-
-    return 1;
-}
-sub token_check {
-    my $self = shift;
-    my $username = shift // '';
-    my $jti = shift // '';
-    $self->error(""); # Flush error
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    # Get data from model
-    my %data = $model->token_get_cond('api', username => $username, jti => $jti);
-    return $self->raise($model->error) unless $model->status;
-
-    # Check
-    return 1 if $data{id};
-    return 0;
-}
-
-# Meta CRUD
-sub meta {
-    my $self = shift;
-    my $i = scalar(@_);
-    my $key = shift // '';
-    my $val = shift;
-    $self->error(""); # Flush error
-
-    # No key specified
-    return $self->raise("E1325: No key specified") unless length($key);
-
-    # Get model
-    my $model = $self->model;
-    return $self->raise($model->error) unless $model->status;
-
-    my $ret;
-    if ($i == 1) { # get
-        my %kv = $model->meta_get($key);
-        $ret = $kv{"value"};
-    } elsif ($i > 1) {
-        if (defined($val)) { # set
-            $ret = $model->meta_set(key => $key, value => $val);
-        } else { # del
-            $ret = $model->meta_del($key);
-        }
-    }
-
-    # Error
-    return $self->raise($model->error) unless $model->status;
-
-    # Ok
+    # Set cache record
+    $self->cache->set($key, {
+        data        => $ret,
+        exp         => $now + $self->expiration,
+        cached      => steady_time,
+        cachekey    => $cachekey,
+    });
+
+    # Return data only!
     return $ret;
 }
 

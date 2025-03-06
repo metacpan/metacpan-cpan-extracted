@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   PDL: '2.099'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.7106, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Stats/issues
   repository: git://github.com/PDLPorters/PDL-Stats.git
-version: '0.854'
+version: '0.855'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

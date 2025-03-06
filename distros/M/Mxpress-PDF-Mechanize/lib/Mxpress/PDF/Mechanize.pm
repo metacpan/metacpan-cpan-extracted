@@ -2,7 +2,7 @@ package Mxpress::PDF::Mechanize;
 use Zydeco prefix => 'Mxpress::PDF';
 class Mxpress::PDF::Mechanize {
 	BEGIN {
-		our $VERSION = '0.04';
+		our $VERSION = '0.05';
 		our $AUTHORITY = 'cpan:LNATION';
 	}
 	class Plugin::Mechanize::Screenshot extends Plugin::Image {
@@ -71,7 +71,7 @@ Mxpress::PDF::Mechanize - Take a screenshot and add it to the pdf
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -225,14 +225,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mxpress-PDF-Mechanize>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Mxpress-PDF-Mechanize>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Mxpress-PDF-Mechanize>
 
 =item * Search CPAN
 

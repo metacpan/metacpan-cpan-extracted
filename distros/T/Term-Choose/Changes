@@ -1,5 +1,7 @@
 Revision history for Term::Choose
 
+1.768   2025-03-05
+    - Refactoring.
 
 1.767   2024-10-28
     - Fixed spelling in pod.

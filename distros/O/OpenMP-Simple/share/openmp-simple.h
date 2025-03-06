@@ -478,7 +478,7 @@ void verify_1D_array_type(SV *array, bool (*type_check)(SV *), const char *type_
 void PerlOMP_VERIFY_1D_FLOAT_ARRAY(SV *array) { verify_1D_array_type(array, is_float, "float"); }
 void PerlOMP_VERIFY_1D_INT_ARRAY(SV *array) { verify_1D_array_type(array, is_int, "integer"); }
 void PerlOMP_VERIFY_1D_DOUBLE_ARRAY(SV *array) { verify_1D_array_type(array, is_float, "double"); }
-void PerlOMP_VERIFY_1D_CHAR_ARRAY(SV *array) { verify_1D_array_type(array, is_string, "string"); }
+void PerlOMP_VERIFY_1D_STRING_ARRAY(SV *array) { verify_1D_array_type(array, is_string, "string"); }
 
 /* Check for mixed types */
 void PerlOMP_VERIFY_1D_MIXED_ARRAY(SV *array) {

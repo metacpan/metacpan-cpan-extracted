@@ -3,7 +3,7 @@ package Terse::View::TT;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 use base qw/Terse::View/;
 
@@ -65,7 +65,7 @@ Terse::View::TT - Terse Template Toolkit View
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -140,11 +140,11 @@ Karaoke.psgi
 	);
 
 	sub {
-     		my ($env) = (shift);
-        	Terse->run(
-               		plack_env => $env,
-                	application => $app,
-        	);
+		my ($env) = (shift);
+		Terse->run(
+			plack_env => $env,
+			application => $app,
+		);
 	};
 
 ...
@@ -173,15 +173,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Terse-View-TT>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Terse-View-TT>
 
 =item * Search CPAN
 

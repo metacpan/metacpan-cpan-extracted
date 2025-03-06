@@ -16,63 +16,113 @@ WWW::Suffit::AuthDB::Realm - WWW::Suffit::AuthDB realm class
 
 This module provides AuthDB realm methods
 
-=head2 is_valid
-
-Check the realm object
-
-=head2 mark
-
-Marks object as cached
-
 =head1 ATTRIBUTES
 
-=over 8
+This class implements the following attributes
 
-=item is_allowed
+=head2 cached
 
-    $realm->is_allowed(
-        username => "admin",
-        groupname => ["wheel", "administrators"]
-    ) or die "Access denied";
+    $realm = $realm->cached( 12345.123456789 );
+    my $cached = $realm->cached;
 
-Returns true if specified username or groupname have access to the page by realm
+Sets or returns time of caching realm data
 
-=item description
+Default: 0
+
+=head2 cachekey
+
+    $realm = $realm->cachekey( 'abcdef1234567890' );
+    my $cachekey = $realm->cachekey;
+
+Sets or returns the cache key string
+
+=head2 description
 
     $realm->description('Root page');
     my $description = $realm->description;
 
 Sets and returns description of the realm
 
-=item is_valid
+=head2 error
 
-    $realm->is_valid or die "Incorrect realm";
+    $realm = $realm->error( 'Oops' );
+    my $error = $realm->error;
 
-Returns boolean status of realm's data
+Sets or returns error string
 
-=item realm
+=head2 expires
 
-    $realm->realm('root');
-    my $realm_name = $realm->realm;
+    $realm = $realm->expires( 300 );
+    my $expires = $realm->expires;
 
-Sets and returns realm value of the realm object
+Sets or returns cache/object expiration time in seconds
 
-=item requires
+Default: 300 (5 min)
 
-    $realm->requires(['@alice', '%wheel']);
-    my $requires = $relam->requires; # ['@alice', '%wheel']
+=head2 id
+
+    $realm = $realm->id( 2 );
+    my $id = $realm->id;
+
+Sets or returns id of realm
+
+Default: 0
+
+=head2 is_cached
+
+This attribute returns true if the realm data was cached
+
+Default: false
+
+=head2 realm
+
+    $realm->realm('string');
+    my $real_string = $realm->realm;
+
+Sets and returns realm string of the realm object
+
+=head2 realmname
+
+    $realm->realmname('root');
+    my $realmname = $realm->realmname;
+
+Sets and returns realmname of the realm object
+
+=head2 requirements
+
+    $realm->requirements(['@alice', '%wheel']);
+    my $requirements = $relam->requirements; # ['@alice', '%wheel']
 
 Sets and returns groups and users of realm (array of users and groups)
 
-Note! Usernames should be prefixed with "B<@>", group names should be prefixed with "B<%>"
+B<Note!> Usernames should be prefixed with "B<@>", group names should be prefixed with "B<%>"
 
-=item requires_users
+=head2 requires_users
 
     my $reqs = $relam->requires; # [ {user => 'alice'}, { group => 'wheel'} ]
 
 Returns list of requiremets (as array ref) that allows access to specified realm
 
-=back
+=head2 satisfy
+
+    $realm->satisfy('Any');
+    my $satisfy = $realm->satisfy;
+
+Sets and returns the satisfy policy (All, Any) of the realm object
+
+=head1 METHODS
+
+This class inherits all methods from L<Mojo::Base> and implements the following new ones
+
+=head2 is_valid
+
+    $realm->is_valid or die "Incorrect realm";
+
+Returns boolean status of realm's data
+
+=head2 mark
+
+Marks object as cached
 
 =head1 HISTORY
 
@@ -92,7 +142,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -103,11 +153,14 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
-
 use Mojo::Base -base;
+
+use Mojo::Util qw/steady_time/;
+
 use WWW::Suffit::RefUtil qw/is_integer/;
+
 use Net::IP qw//;
+
 use Socket qw/inet_aton AF_INET/;
 
 has description => '';
@@ -119,6 +172,8 @@ has realmname   => undef;
 has satisfy     => undef;
 has requirements=> sub { return {} }; # Segregated requirements
 has is_cached   => 0;
+has cached      => 0; # steady_time() of cached
+has cachekey    => '';
 
 sub is_valid {
     my $self = shift;
@@ -127,11 +182,11 @@ sub is_valid {
     return 1 unless $self->id;
 
     unless (defined($self->realmname) && length($self->realmname)) {
-        $self->error("E1337: Incorrect realmname");
+        $self->error("E1317: Incorrect realmname");
         return 0;
     }
     if ($self->expires && $self->expires < time) {
-        $self->error("E1338: The realm data is expired");
+        $self->error("E1318: The realm data is expired");
         return 0;
     }
 
@@ -139,7 +194,7 @@ sub is_valid {
 }
 sub mark {
     my $self = shift;
-    $self->is_cached(1);
+    return $self->is_cached(1)->cached(shift || steady_time);
 }
 
 sub _check_by_default {

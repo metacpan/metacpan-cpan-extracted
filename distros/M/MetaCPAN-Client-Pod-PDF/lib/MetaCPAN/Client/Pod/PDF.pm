@@ -8,7 +8,7 @@ use Moo;
 use Mxpress::PDF;
 use Pod::Simpler::Aoh;
 use JSON;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 extends 'MetaCPAN::Client';
 
@@ -140,7 +140,8 @@ sub dist_pdf {
 	my $release = $self->release($dist);
 	my $pdf = $self->_start_pdf($dist);
 	for my $module (@{$release->{data}{provides}}) {
-		my $pod = $self->pod($module)->x_pod;
+		my $pod = eval { $self->pod($module)->x_pod };
+		next unless $pod;
 		next if eval { JSON->new->decode($pod) };
 		$pod = Pod::Simpler::Aoh->new->parse_string_document(
 			$pod
@@ -209,7 +210,7 @@ MetaCPAN::Client::Pod::PDF - The great new MetaCPAN::Client::Pod::PDF!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -370,26 +371,17 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=MetaCPAN-Client-Pod-PDF>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MetaCPAN-Client-Pod-PDF>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/MetaCPAN-Client-Pod-PDF>
 
 =item * Search CPAN
 
 L<https://metacpan.org/release/MetaCPAN-Client-Pod-PDF>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

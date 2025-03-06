@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -105,10 +105,12 @@ WriteMakefile(
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
       : ()),
-    PL_FILES            => {},
-    TEST_REQUIRES => $test_requires,
+	PL_FILES	=> {}, CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+    }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
+	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
 	'Locale::Object' => 0.80,	# Fix for RT#131347
 	'I18N::AcceptLanguage' => 0,
@@ -119,6 +121,7 @@ WriteMakefile(
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,
+	'Params::Get' => 0,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD
 	'Sys::Syslog' => 0,

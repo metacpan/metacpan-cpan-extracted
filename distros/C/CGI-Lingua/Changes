@@ -1,5 +1,10 @@
 Revision history for CGI-Lingua
 
+0.68	Wed Mar  5 21:12:04 EST 2025
+	Use Get::Params
+	Use the logging system from CGI::Info
+	Change "$ip is not known by IP::Country" from warning to notice
+
 0.67	Fri Feb  7 07:52:22 EST 2025
 	Improved handling of IPv6
 	Allow the logger to be a ref to code

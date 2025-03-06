@@ -1,5 +1,15 @@
 Revision history for Perl extension Carp::Assert::More.
 
+2.9.0   Wed Mar  5 22:27:28 CST 2025
+
+        [ENHANCEMENTS]
+        assert_arrayref_of() no longer requires the array to have at
+        least one element.
+
+        New assert_arrayref_nonempty_of() has the same behavior as
+        assert_arrayref_of(), but requires at least one element.
+
+
 2.8.0   Fri Jan  3 12:03:58 CST 2025
         [ENHANCEMENTS]
         Added assert_regex().

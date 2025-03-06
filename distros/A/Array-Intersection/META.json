@@ -1,0 +1,54 @@
+{
+   "abstract" : "Calculates the intersection of two array references",
+   "author" : [
+      "Michael R. Davis <MRDVT>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-Intersection",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Array-Intersection/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Array-Intersection",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Array-Intersection.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

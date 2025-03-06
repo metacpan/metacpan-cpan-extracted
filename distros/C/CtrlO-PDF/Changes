@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.32 Wed Mar 3 2025
+
+    * Prevent infinite loop if unable to print text to PDF
+
 0.31 Wed Apr 5 2023
 
     * Start new page if not enough space for initial text

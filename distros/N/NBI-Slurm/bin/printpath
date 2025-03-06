@@ -1,0 +1,201 @@
+#!/usr/bin/env perl
+#ABSTRACT: check for binary in your $PATH variable an nicely print the results
+#PODNAME:printpah
+use v5.12;
+use warnings;
+use Term::ANSIColor;
+use Getopt::Long;
+use NBI::Slurm;
+# Define help function
+sub show_help {
+    print color('bold white');
+    print "Usage: $0 [options] [binary1 binary2 ...]\n\n";
+    print color('reset');
+    
+    print "Options:\n";
+    print "  -h, --help    Show this help message and exit\n\n";
+    
+    print "Description:\n";
+    print "  This script displays all directories in your \$PATH, one per line.\n";
+    print "  If binary names are provided as arguments, it checks each directory\n";
+    print "  for those binaries and indicates whether they are executable.\n";
+    print "  It also verifies if the binaries are regular executables or aliases/functions.\n\n";
+    
+    print "Examples:\n";
+    print "  $0                     # List all PATH directories\n";
+    print "  $0 ls python vim       # Check for these binaries in PATH\n";
+    
+    exit(0);
+}
+
+# Process command line options
+my $help = 0;
+GetOptions(
+    "help|h" => \$help,
+    'version'   => sub { say "printpath v", $NBI::Slurm::VERSION; exit }
+) or show_help();
+
+# Show help if requested
+show_help() if $help;
+
+# Get the directories from the PATH environment variable
+my @dirs = split /:/, $ENV{PATH};
+my @binaries = @ARGV;  # Get binary names from command-line arguments
+
+# Print header
+print color('bold cyan');
+print "=== PATH Directories ===\n";
+print color('reset');
+
+# Process each directory
+foreach my $dir (@dirs) {
+    # Print the directory name
+    print color('green');
+    print "$dir\n";
+    print color('reset');
+    
+    # Check for requested binaries in this directory
+    if (@binaries) {
+        foreach my $binary (@binaries) {
+            my $full_path = "$dir/$binary";
+            
+            if (-e $full_path) {
+                print "  ";
+                
+                # Check if the file is executable
+                if (-x $full_path) {
+                    print color('yellow');
+                    print "✓ ";
+                } else {
+                    print color('red');
+                    print "! ";
+                }
+                
+                print color('magenta');
+                print "$binary\n";
+                print color('reset');
+            }
+        }
+    }
+}
+
+# Check if the binaries might be aliases or something else
+if (@binaries) {
+    print "\n";
+    print color('bold cyan');
+    print "=== Command Verification ===\n";
+    print color('reset');
+    
+    foreach my $binary (@binaries) {
+        print color('blue');
+        print "$binary: ";
+        print color('reset');
+        
+        # Use command -v to check what the binary actually is
+        my $result = `command -v $binary 2>/dev/null`;
+        chomp($result);
+        
+        if ($result) {
+            # Check if it's in PATH or possibly an alias/function
+            my $in_path = 0;
+            foreach my $dir (@dirs) {
+                if ($result eq "$dir/$binary") {
+                    $in_path = 1;
+                    last;
+                }
+            }
+            
+            if ($in_path) {
+                print color('green');
+                print "found in PATH: $result\n";
+                print color('reset');
+            } else {
+                print color('yellow');
+                print "found as alias or function: $result\n";
+                print color('reset');
+            }
+        } else {
+            print color('red');
+            print "not found\n";
+            print color('reset');
+        }
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+printpah - check for binary in your $PATH variable an nicely print the results
+
+=head1 VERSION
+
+version 0.12.0
+
+=head1 SYNOPSIS
+
+    printpath [options] [binary1 binary2 ...]
+
+=head1 DESCRIPTION
+
+This script displays all directories in your $PATH, one per line.
+If you supply one or more binary names as arguments, it checks each directory
+for those binaries and indicates whether they are executable.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show this help message and exit.
+
+=back
+
+=head1 EXAMPLES
+
+  printpath rsync
+
+Will produce output like this:
+
+  === PATH Directories ===
+  /home/telatina/bin
+  /home/telatina/perl5/bin
+  /home/telatina/.local/bin
+  /home/telatina/perl5/bin
+  /home/telatina/micromamba/condabin
+  /opt/orbstack-guest/bin-hiprio
+  /usr/local/sbin
+  /usr/local/bin
+  /usr/sbin
+  /usr/bin
+    ✓ rsync
+  /sbin
+  /bin
+  ✓ rsync
+  /usr/games
+  /usr/local/games
+  /snap/bin
+  /opt/orbstack-guest/bin
+  /opt/orbstack-guest/data/bin/cmdlinks
+  
+  === Command Verification ===
+  rsync: found in PATH: /usr/bin/rsync
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

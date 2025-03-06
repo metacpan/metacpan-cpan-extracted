@@ -1,0 +1,393 @@
+#!/usr/bin/env perl
+#ABSTRACT: Remove a "package" in the NBI HPC that was installed using make_package
+#PODNAME: rm_package
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use File::Basename;
+use File::Path qw(remove_tree);
+use File::Spec;
+use Pod::Usage;
+use NBI::Slurm;
+use Term::ANSIColor qw(:constants);
+
+my $config    = NBI::Slurm::load_config("$ENV{USER}/.nbislurm.config");
+my $package   = undef;
+my $force     = 0;
+my $remove    = 0;  # New flag to actually perform removal
+my $packages_dir      = $config->{'packages_dir'} // '/nbi/software/testing/bin/';
+my $packages_basepath = $config->{'packages_basepath'} // '/nbi/software/testing/';
+my $opt_del_image = 0;
+my $opt_help;
+
+# Parse command line options
+GetOptions(
+    'f|force'     => \$force,
+    'r|remove'    => \$remove,  # New option to actually perform removal
+    'i|delete-image' => \$opt_del_image,
+    'help|h'      => \$opt_help,
+);
+
+# Get package name from command line argument
+$package = shift @ARGV if @ARGV;
+
+if ($opt_help) {
+    # Long manual with pod
+    pod2usage({-exitval => 0, -verbose => 2});
+} elsif (!defined $package) {
+    usage();
+    exit 1;
+}
+
+# Check if we're in the NBI HPC environment
+my $errors = check_environment($packages_dir, $packages_basepath);
+if ($errors > 0) {
+    exit 1;
+}
+
+# Validate package existence
+my $package_bin  = File::Spec->catfile($packages_dir, $package);
+my $package_path = File::Spec->catfile($packages_basepath, $package);
+
+my @files_to_delete;
+my @paths_to_delete = ();
+
+# Check package in /software/bin
+if (-e $package_bin) {
+    push @files_to_delete, $package_bin;
+    @paths_to_delete = getpaths($package_bin);
+    if (scalar @paths_to_delete > 0) {
+        say STDERR YELLOW, "INFO:", RESET, " The following paths will be removed from PATH: ", join(", ", @paths_to_delete);
+    } else {
+        say STDERR YELLOW, "INFO:", RESET, " No paths found in $package_bin, defaulting to $package_path";
+        @paths_to_delete = [$package_path];
+    }
+} else {
+    say STDERR timelog("rm_package"), RED, "WARNING:", RESET, " Package binary not found at $package_bin";
+}
+
+# remove duplicates from @paths_to_delete
+my %seen = ();
+@paths_to_delete = grep { !$seen{$_}++ } @paths_to_delete;  
+
+for my $package_path (sort @paths_to_delete) {
+    if (-d $package_path) {
+        my $all_files = `find $package_path -type f`;
+        my $all_dirs  = `find $package_path -depth -type d `;
+        push @files_to_delete, split /\n/, $all_files;
+        push @files_to_delete, split /\n/, $all_dirs;
+        push @files_to_delete, $package_path;
+    } else {
+        say STDERR timelog(), RED, "WARNING:", RESET, " Package path not found at $package_path";
+    }
+}
+if (@files_to_delete == 0) {
+    say "No files found for package '$package'. Nothing to delete.";
+    exit 0;
+}
+
+# Sort files_to_delete so that deeper paths come first
+@files_to_delete = sort { length($b) <=> length($a) } @files_to_delete;
+
+# Print files to be deleted
+say STDERR timelog("rm_package"), "The following files/directories will be deleted:";
+my @images = ();
+foreach my $file (@files_to_delete) {
+    say "$file";
+    push @images, getimage($file) if -f "$file";
+}
+foreach my $image (@images) {
+    say "$image";
+}
+
+# Check file ownership
+my $current_user = $ENV{USER};
+my $current_uid = getpwnam($current_user);
+my @unauthorized_files = ();
+
+foreach my $file (@files_to_delete) {
+    if (-e $file) {
+        my $file_uid = (stat($file))[4];
+        if ($file_uid != $current_uid) {
+            push @unauthorized_files, $file;
+        }
+    }
+}
+
+if (@unauthorized_files > 0) {
+    say STDERR RED, "ERROR:", RESET, " The following files/directories are not owned by $current_user:";
+    foreach my $file (@unauthorized_files) {
+        my $owner = getpwuid((stat($file))[4]) || "unknown";
+        say STDERR "  $file (owner: $owner)";
+    }
+    say STDERR RED, "ERROR:", RESET, " For security reasons, you can only delete files owned by your user.";
+    exit 1;
+}
+
+# In default mode (dry run), just exit unless --remove is specified
+if (!$remove) {
+    say STDERR timelog("rm_package"), "Dry run completed. No files were deleted.";
+    say STDERR YELLOW, "INFO:", RESET, " Use --remove to actually delete these files.";
+    exit 0;
+}
+
+# Ask for confirmation if not forced
+if (!$force) {
+    print STDERR BOLD, "Proceed with deletion? [y/N] ", RESET;
+    my $answer = <STDIN>;
+    chomp $answer;
+    if (lc($answer) ne 'y') {
+        say "Deletion cancelled.";
+        exit 0;
+    }
+}
+
+# Perform deletion
+my $success = 1;
+foreach my $file (@files_to_delete) {
+    if (-f $file) {
+        if (unlink $file) {
+            say STDERR "Deleted file: $file";
+        } else {
+            say STDERR "ERROR: Failed to delete file $file: $!";
+            $success = 0;
+        }
+    } elsif (-d $file) {
+        if (remove_tree($file, {verbose => 1, safe => 1})) {
+            say STDERR "Deleted directory: $file";
+        } else {
+            say STDERR "ERROR: Failed to delete directory $file: $!";
+            $success = 0;
+        }
+    }
+}
+
+if ($opt_del_image)  {
+    foreach my $image (@images) {
+        if (-f $image) {
+            # Check image ownership
+            my $image_uid = (stat($image))[4];
+            if ($image_uid != $current_uid) {
+                my $owner = getpwuid($image_uid) || "unknown";
+                say STDERR RED, "ERROR:", RESET, " Cannot delete image $image: owned by $owner, not $current_user";
+                $success = 0;
+                next;
+            }
+            
+            if (unlink $image) {
+                say STDERR "Deleted image: $image";
+            } else {
+                say STDERR "ERROR: Failed to delete image $image: $!";
+                $success = 0;
+            }
+        }
+    }
+}
+
+if ($success) {
+    say "Package '$package' successfully removed.";
+} else {
+    say STDERR "WARNING: Some errors occurred during removal.";
+    exit 1;
+}
+
+sub usage {
+    say STDERR <<END;
+rm_package PACKAGE_NAME [--remove] [--force]
+
+Type --help for more information.
+END
+}
+
+sub getpaths {
+    my $file = shift;
+    my @paths = ();
+    
+    # Check if file exists and is readable
+    unless (-e $file && -r $file) {
+        warn "Cannot read file: $file\n";
+        return @paths;
+    }
+    
+    # Open the file
+    open(my $fh, '<', $file) or do {
+        warn "Could not open file '$file': $!\n";
+        return @paths;
+    };
+    
+    # Read line by line
+    while (my $line = <$fh>) {
+        chomp $line;
+        
+        # Skip comments and empty lines
+        next if $line =~ /^\s*#/ or $line =~ /^\s*$/;
+        
+        # Look for export PATH= statements
+        if ($line =~ /^\s*export\s+PATH=([^:]+)(?::.*)?$/) {
+            push @paths, $1;
+        }
+        # Also match PATH=$PATH:new_path format
+        elsif ($line =~ /^\s*export\s+PATH=.*:([^:]+)(?::.*)?$/) {
+            push @paths, $1;
+        }
+    }
+    
+    close($fh);
+    return @paths;
+}
+
+sub check_environment {
+    my ($packages_dir, $packages_basepath) = @_;
+    my $errors = 0;
+
+    if (!-d $packages_dir) {
+        say STDERR "ERROR: Are you in the NBI HPC?";
+        say STDERR "  -> Directory $packages_dir does not exist\n";
+        $errors++;
+    }
+    
+    if (!-d $packages_basepath) {
+        say STDERR "ERROR: Are you in the NBI HPC?";
+        say STDERR "  -> Directory $packages_basepath does not exist\n";
+        $errors++;
+    }
+
+    return $errors;
+}
+
+sub getimage {
+    my $file = shift;
+    my @images = ();
+    
+    # Check if file exists and is readable
+    unless (-e $file && -r $file) {
+        warn "Cannot read file: $file\n";
+        return @images;
+    }
+    
+    # Open the file
+    open(my $fh, '<', $file) or do {
+        warn "Could not open file '$file': $!\n";
+        return @images;
+    };
+    
+    # Read line by line
+    while (my $line = <$fh>) {
+        chomp $line;
+        
+        # Skip comments and empty lines
+        next if $line =~ /^\s*#/ or $line =~ /^\s*$/;
+        
+        # Look for singularity commands with image paths
+        if ($line =~ /singularity\s+(?:exec|run|shell)\s+["']?([^"'\s]+\.s[a-z]*img)["']?/) {
+            push @images, $1;
+        }
+        # Also match singularity command with arbitrary flags before the image path
+        elsif ($line =~ /singularity\s+(?:exec|run|shell)\s+(?:(?:-{1,2}[a-zA-Z0-9_-]+(?:\s+[^-][^\s]*)?)\s+)*["']?([^"'\s]+\.s[a-z]*img)["']?/) {
+            push @images, $1;
+        }
+        # Match directly assigned SINGULARITY_IMAGE variable
+        elsif ($line =~ /SINGULARITY_IMAGE\s*=\s*["']?([^"'\s]+\.s[a-z]*img)["']?/) {
+            push @images, $1;
+        }
+    }
+    
+    close($fh);
+    return @images;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rm_package - Remove a "package" in the NBI HPC that was installed using make_package
+
+=head1 VERSION
+
+version 0.12.0
+
+=head1 SYNOPSIS
+
+  rm_package PACKAGE_NAME [--remove] [--force]
+
+=head1 DESCRIPTION
+
+This script safely removes packages that were previously installed using the make_package
+script in the NBI HPC environment. It will remove both the binary file in the bin directory
+and the package directory tree.
+
+By default, the script runs in dry-run mode, which just lists the files that would be deleted
+without performing any deletion. Use the --remove option to actually delete the files.
+
+The script will check that all files to be deleted belong to the current user and will
+not delete files owned by other users, even with --force.
+
+=head1 NAME
+
+rm_package - Remove packages installed with make_package
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<PACKAGE_NAME>
+
+The name of the package to remove. Required.
+
+=item B<--remove>, B<-r>
+
+Actually remove the files. Without this option, the script runs in dry-run mode.
+
+=item B<--force>, B<-f>
+
+Skip the confirmation prompt when removing files. Still requires --remove to actually
+delete files, and will still check file ownership.
+
+=item B<--delete-image>, B<-i>
+
+Also delete any Singularity image files referenced in the package.
+
+=item B<--help>, B<-h>
+
+Display this help message.
+
+=back
+
+=head1 EXAMPLES
+
+To see what would be deleted without actually removing anything (dry-run mode):
+
+  rm_package seqfu
+
+To remove a package named "seqfu" with confirmation prompt:
+
+  rm_package seqfu --remove
+
+To force removal without confirmation:
+
+  rm_package seqfu --remove --force
+
+=head1 SEE ALSO
+
+make_package - the script used to install these packages
+
+=cut
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

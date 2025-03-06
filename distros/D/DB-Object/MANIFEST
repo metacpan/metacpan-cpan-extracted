@@ -14,6 +14,7 @@ lib/DB/Object/Fields/Field.pm
 lib/DB/Object/Fields/Overloaded.pm
 lib/DB/Object/Fields/Unknown.pm
 lib/DB/Object/IN.pod
+lib/DB/Object/LIKE.pod
 lib/DB/Object/Mysql.pm
 lib/DB/Object/Mysql/Query.pm
 lib/DB/Object/Mysql/Statement.pm

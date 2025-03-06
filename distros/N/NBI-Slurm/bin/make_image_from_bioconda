@@ -269,7 +269,7 @@ make_image_from_bioconda - Create a Singularity/Apptainer image from micromamba
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 

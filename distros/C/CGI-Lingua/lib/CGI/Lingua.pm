@@ -2,11 +2,13 @@ package CGI::Lingua;
 
 use warnings;
 use strict;
+
+use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 =head1 NAME
 
@@ -14,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 =cut
 
@@ -24,10 +26,9 @@ CGI::Lingua is a powerful module for multilingual web applications
 offering extensive language/country detection strategies.
 
 No longer does your website need to be in English only.
-CGI::Lingua provides a simple basis to determine which language to display a
-website. The website tells CGI::Lingua which languages it supports. Based on
-that list CGI::Lingua tells the application which language the user would like
-to use.
+CGI::Lingua provides a simple basis to determine which language to display a website.
+The website tells CGI::Lingua which languages it supports.
+Based on that list CGI::Lingua tells the application which language the user would like to use.
 
     use CGI::Lingua;
     # ...
@@ -108,6 +109,7 @@ Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
 such as a L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
+a reference to an array,
 or a filename.
 
 Takes an optional parameter info, an object which can be used to see if a CGI
@@ -171,9 +173,9 @@ sub new {
 			# $self->debug("Looking in cache for $key");
 		}
 		if(my $rc = $cache->get($key)) {
-			if($logger) {
+			# if($logger) {
 				# $logger->debug('Found - thawing');
-			}
+			# }
 			$rc = Storable::thaw($rc);
 			$rc->{_logger} = $logger;
 			$rc->{_syslog} = $params{syslog};
@@ -738,20 +740,16 @@ sub _find_language
 						$self->_warn({
 							warning => "Couldn't determine closest language for $language_name in $self->{_supported}"
 						});
-					} elsif($self->{_logger}) {
-						$self->{_logger}->debug("language set to $self->{_slanguage}, code set to $code");
+					} else {
+						$self->_debug("language set to $self->{_slanguage}, code set to $code");
 					}
 				}
 			}
 			if(!defined($self->{_slanguage_code_alpha2})) {
-				if($self->{_logger}) {
-					$self->{_logger}->debug("Can't determine slanguage_code_alpha2");
-				}
+				$self->_debug("Can't determine slanguage_code_alpha2");
 			} elsif(!defined($from_cache) && $self->{_cache} &&
 			   defined($self->{_slanguage_code_alpha2})) {
-				if($self->{_logger}) {
-					$self->{_logger}->debug("Set $country to $language_name=$self->{_slanguage_code_alpha2}");
-				}
+				$self->_debug("Set $country to $language_name=$self->{_slanguage_code_alpha2}");
 				$self->{_cache}->set($country, "$language_name=$self->{_slanguage_code_alpha2}", '1 month');
 			}
 		} elsif(defined($ip)) {
@@ -847,17 +845,13 @@ caching capability of CGI::Lingua.
 sub country {
 	my $self = shift;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entered country');
-	}
+	$self->_trace('Entered country');
 
 	# FIXME: If previous calls to country() return undef, we'll
 	# waste time going through again and no doubt returning undef
 	# again.
 	if($self->{_country}) {
-		if($self->{_logger}) {
-			$self->{_logger}->trace('quick return: ', $self->{_country});
-		}
+		$self->_trace('quick return: ', $self->{_country});
 		return $self->{_country};
 	}
 
@@ -891,26 +885,20 @@ sub country {
 		}
 	}
 	if(is_private_ip($ip)) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("Can't determine country from LAN connection $ip");
-		}
+		$self->_debug("Can't determine country from LAN connection $ip");
 		return;
 	}
 	if(is_loopback_ip($ip)) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("Can't determine country from loopback connection $ip");
-		}
+		$self->_debug("Can't determine country from loopback connection $ip");
 		return;
 	}
 
 	if($self->{_cache}) {
 		$self->{_country} = $self->{_cache}->get($ip);
-		if($self->{_logger}) {
-			if(defined($self->{_country})) {
-				$self->{_logger}->debug("Get $ip from cache = $self->{_country}");
-			} else {
-				$self->{_logger}->debug("$ip isn't in the cache");
-			}
+		if(defined($self->{_country})) {
+			$self->_debug("Get $ip from cache = $self->{_country}");
+		} else {
+			$self->_debug("$ip isn't in the cache");
 		}
 		if(defined($self->{_country})) {
 			return $self->{_country};
@@ -926,9 +914,7 @@ sub country {
 			$self->{_have_ipcountry} = 0;
 		}
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->debug("have_ipcountry $self->{_have_ipcountry}");
-	}
+	$self->_debug("have_ipcountry $self->{_have_ipcountry}");
 
 	if($self->{_have_ipcountry}) {
 		$self->{_country} = $self->{_ipcountry}->inet_atocc($ip);
@@ -936,9 +922,7 @@ sub country {
 			$self->{_country} = lc($self->{_country});
 		} elsif(is_ipv4($ip)) {
 			# Although it doesn't say so, it looks like IP::Country is IPv4 only
-			$self->_warn({
-				warning => "$ip is not known by IP::Country"
-			});
+			$self->_notice("$ip is not known by IP::Country");
 		}
 	}
 	unless(defined($self->{_country})) {
@@ -973,9 +957,7 @@ sub country {
 	}
 	if((!$self->{_country}) &&
 	   (eval { require LWP::Simple::WithCache; require JSON::Parse } )) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("Look up $ip on geoplugin");
-		}
+		$self->_debug("Look up $ip on geoplugin");
 
 		LWP::Simple::WithCache->import();
 		JSON::Parse->import();
@@ -985,9 +967,8 @@ sub country {
 		}
 	}
 	unless($self->{_country}) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("Look up $ip on Whois");
-		}
+		$self->_debug("Look up $ip on Whois");
+
 		require Net::Whois::IP;
 		Net::Whois::IP->import();
 
@@ -1017,13 +998,9 @@ sub country {
 		}
 
 		if($self->{_country}) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("Found up $ip on Net::WhoisIP as ", $self->{_country});
-			}
+			$self->_debug("Found up $ip on Net::WhoisIP as ", $self->{_country});
 		} else {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("Look up $ip on IANA");
-			}
+			$self->_debug("Look up $ip on IANA");
 
 			require Net::Whois::IANA;
 			Net::Whois::IANA->import();
@@ -1034,9 +1011,7 @@ sub country {
 			};
 			unless ($@) {
 				$self->{_country} = $iana->country();
-				if($self->{_logger}) {
-					$self->{_logger}->debug("IANA reports $ip as ", $self->{_country});
-				}
+				$self->_debug("IANA reports $ip as ", $self->{_country});
 			}
 		}
 
@@ -1262,12 +1237,10 @@ sub _code2language
 	my ($self, $code) = @_;
 
 	return unless($code);
-	if($self->{_logger}) {
-		if(defined($self->{_country})) {
-			$self->_debug("_code2language $code, country ", $self->{_country});
-		} else {
-			$self->_debug("_code2language $code");
-		}
+	if(defined($self->{_country})) {
+		$self->_debug("_code2language $code, country ", $self->{_country});
+	} else {
+		$self->_debug("_code2language $code");
 	}
 	unless($self->{_cache}) {
 		return Locale::Language::code2language($code);
@@ -1330,6 +1303,11 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
+	# FIXME: add caller's function
+	# if(($level eq 'warn') || ($level eq 'notice')) {
+		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
+	# }
+
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
 			# Code reference
@@ -1340,6 +1318,8 @@ sub _log
 				level => $level,
 				message => \@messages
 			});
+		} elsif(ref($logger) eq 'ARRAY') {
+			push @{$logger}, { level => $level, message => join(' ', grep defined, @messages) };
 		} elsif(!ref($logger)) {
 			# File
 			if(open(my $fout, '>>', $logger)) {
@@ -1363,6 +1343,11 @@ sub _info {
 	$self->_log('info', @_);
 }
 
+sub _notice {
+	my $self = shift;
+	$self->_log('notice', @_);
+}
+
 sub _trace {
 	my $self = shift;
 	$self->_log('trace', @_);
@@ -1372,7 +1357,7 @@ sub _trace {
 sub _warn {
 	my $self = shift;
 
-	my $params = $self->_get_params('warning', @_);
+	my $params = Params::Get::get_params('warning', @_);
 
 	# Validate input parameters
 	return unless($params && (ref($params) eq 'HASH'));
@@ -1386,9 +1371,6 @@ sub _warn {
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
 
-	# FIXME: add caller's function
-	push @{$self->{'warnings'}}, { warning => $warning };
-
 	# Handle syslog-based logging
 	if($self->{syslog}) {
 		require Sys::Syslog;
@@ -1397,57 +1379,17 @@ sub _warn {
 		if(ref($self->{syslog} eq 'HASH')) {
 			Sys::Syslog::setlogsock($self->{syslog});
 		}
-		if(my $info = $self->{_info}) {
-			openlog($info->script_name(), 'cons,pid', 'user');
-		} else {
-			openlog(__PACKAGE__, 'cons,pid', 'user');
-		}
-		syslog('warning', $warning);
+		openlog($self->script_name(), 'cons,pid', 'user');
+		syslog('warning|local0', $warning);
 		closelog();
 	}
 
 	# Handle logger-based logging
-	if(my $logger = $self->{logger}) {
-		$self->_log('warn', $warning);
-	} elsif(!defined($self->{syslog})) {
-		# Fallback to Carp warnings
+	$self->_log('warn', $warning);
+	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
+		# Fallback to Carp
 		Carp::carp($warning);
 	}
-}
-
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
 }
 
 =head1 AUTHOR

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # TODO:
 #   When a named contentblock is in the
@@ -154,7 +154,7 @@ sub register {
 
           # Render callback
           elsif ($_->{cb}) {
-            $value = $_->($c) // '';
+            $value = $_->{cb}->($c) // '';
           };
 
           # There is a defined block

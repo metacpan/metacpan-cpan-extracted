@@ -59,7 +59,9 @@ pp_def('stdv',
       a2 += $a() * $a();
     %}
     if (N < 1) { $SETBAD(b()); continue; }
-    $b() = sqrt( (a2 - sa*sa/N) / N );
+    $GENERIC() var = a2 / N - (sa/N)*(sa/N);
+    if (var < 0) var = 0;
+    $b() = sqrt(var);
   ',
   Doc      => 'Sample standard deviation.',
 );
@@ -77,7 +79,9 @@ pp_def('stdv_unbiased',
       a2 += $a() * $a();
     %}
     if (N < 2) { $SETBAD(b()); continue; }
-    $b() = pow( (a2 - sa*sa/N) / (N-1), .5 );
+    $GENERIC() var = a2/(N-1) - sa*sa/(N*(N-1));
+    if (var < 0) var = 0;
+    $b() = sqrt(var);
   ',
   Doc      => 'Unbiased estimate of population standard deviation.',
 );
@@ -95,7 +99,7 @@ pp_def('var',
       a2 += $a() * $a();
     %}
     if (N < 1) { $SETBAD(b()); continue; }
-    $b() = (a2 - sa*sa/N) / N;
+    $b() = a2 / N - sa*sa/(N*N);
   ',
   Doc      => 'Sample variance.',
 );
@@ -130,8 +134,9 @@ pp_def('se',
       sa += $a();
       a2 += $a() * $a();
     %}
-    if (N < 2) { $SETBAD(b()); continue; }
-    $b() = sqrt( (a2 - sa*sa/N) / (N*(N-1)) );
+    $GENERIC() se2 = (a2 - sa*sa/N) / (N*(N-1));
+    if (se2 < 0) se2 = 0;
+    $b() = sqrt(se2);
   ',
   Doc      => '
 =for ref
@@ -275,7 +280,7 @@ pp_def('cov',
       sb += $b();
     %}
     if (N < 1) { $SETBAD(c()); continue; }
-    $c() = (ab - sa*sb/N) / N;
+    $c() = ab / N - (sa/N) * (sb/N);
   ',
   Doc      => 'Sample covariance. see B<corr> for ways to call',
 );

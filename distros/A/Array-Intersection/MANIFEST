@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/Array-Intersection.t
+lib/Array/Intersection.pm
+perl-Array-Intersection.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

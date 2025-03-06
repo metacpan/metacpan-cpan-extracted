@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.1.2
+## Version v1.2.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2024/09/04
+## Modified 2025/03/06
 ## All rights reserved
 ## 
 ## 
@@ -33,6 +33,7 @@ BEGIN
         '>'     => sub{ &_op_overload( @_, '>' ) },
         '<='    => sub{ &_op_overload( @_, '<=' ) },
         '>='    => sub{ &_op_overload( @_, '>=' ) },
+        # In most SQL driver, '<>' is more portable tan '!='
         '!='    => sub{ &_op_overload( @_, '<>' ) },
         '<<'    => sub{ &_op_overload( @_, '<<' ) },
         '>>'    => sub{ &_op_overload( @_, '>>' ) },
@@ -51,7 +52,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our $VERSION = 'v1.1.2';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -284,7 +285,7 @@ sub _find_siblings
 sub _op_overload
 {
     my( $self, $val, $swap, $op ) = @_;
-    if( $self->_is_a( $val => 'DB::Object::IN' ) )
+    if( $self->_is_a( $val => [qw( DB::Object::IN DB::Object::LIKE )] ) )
     {
         return( $val->_opt_overload( $self, 1, $op ) );
     }
@@ -464,7 +465,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.1.2
+    v1.2.0
 
 =head1 DESCRIPTION
 

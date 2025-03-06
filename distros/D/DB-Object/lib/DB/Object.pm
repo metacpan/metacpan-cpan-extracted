@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.4.6
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.6.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/11/24
+## Modified 2025/03/06
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.4.6';
+    our $VERSION = 'v1.6.0';
 };
 
 use strict;
@@ -740,6 +740,8 @@ sub last_insert_id
     return( $self->error( "Method \"last_insert_id\" has not been implemented by driver $self->{driver} (object = $self)." ) );
 }
 
+sub LIKE { return( shift->_operator_object_create( 'DB::Object::LIKE', @_ ) ); }
+
 sub lock
 {
     my $self = shift( @_ );
@@ -772,10 +774,10 @@ sub param
     return if( !@_ );
     my @supported = 
     qw( 
-    SQL_AUTO_IS_NULL AUTOCOMMIT SQL_BIG_TABLES SQL_BIG_SELECTS
-    SQL_BUFFER_RESULT SQL_LOW_PRIORITY_UPDATES SQL_MAX_JOIN_SIZE 
-    SQL_SAFE_MODE SQL_SELECT_LIMIT SQL_LOG_OFF SQL_LOG_UPDATE 
-    TIMESTAMP INSERT_ID LAST_INSERT_ID 
+        SQL_AUTO_IS_NULL AUTOCOMMIT SQL_BIG_TABLES SQL_BIG_SELECTS
+        SQL_BUFFER_RESULT SQL_LOW_PRIORITY_UPDATES SQL_MAX_JOIN_SIZE 
+        SQL_SAFE_MODE SQL_SELECT_LIMIT SQL_LOG_OFF SQL_LOG_UPDATE 
+        TIMESTAMP INSERT_ID LAST_INSERT_ID 
     );
     my $params = $self->{params} ||= {};
     if( @_ == 1 )
@@ -2399,10 +2401,16 @@ sub _opt_overload
     my( $self, $val, $swap, $op ) = @_;
     my $map =
     {
-    '!=' => '!= ',
-    '==' => '= ',
+        '!=' => '!= ',
+        '<>' => '!= ',
+        '==' => '= ',
     };
     my $not = $map->{ $op };
+    if( !defined( $not ) )
+    {
+        warn( "Unknown operator '${op}'. Falling back to '='." );
+        $not = $map->{ '==' };
+    }
     my $in = $self->as_string;
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
@@ -2480,10 +2488,15 @@ sub _opt_overload
     my( $self, $val, $swap, $op ) = @_;
     my $map =
     {
-    '!=' => '!= ',
-    '==' => '= ',
+        '!=' => '!= ',
+        '==' => '= ',
     };
     my $not = $map->{ $op };
+    if( !defined( $not ) )
+    {
+        warn( "Unknown operator '${op}'. Falling back to '='." );
+        $not = $map->{ '==' };
+    }
     my $in = $self->as_string;
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
@@ -2584,10 +2597,11 @@ sub _opt_overload
     my( $self, $val, $swap, $op ) = @_;
     my $map =
     {
-    '!=' => 'NOT ',
-    '==' => '',
+        '!=' => 'NOT ',
+        '<>' => 'NOT ',
+        '==' => '',
     };
-    my $not = $map->{ $op };
+    my $not  = $map->{ $op } // '';
     my $in = $self->as_string;
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
@@ -2597,6 +2611,67 @@ sub _opt_overload
             : qq{'${val}'};
     return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
 }
+
+# Ref:
+# <https://www.postgresql.org/docs/current/functions-matching.html>
+# <https://dev.mysql.com/doc/refman/8.4/en/pattern-matching.html>
+# <https://www.sqlite.org/lang_corefunc.html#like>
+# <https://www.sqlite.org/lang_expr.html#the_like_glob_regexp_match_and_extract_operators>
+# NOTE: package DB::Object::LIKE
+# TODO: Finish the class DB::Object::LIKE
+package DB::Object::LIKE;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( DB::Object::Operator );
+    use Scalar::Util ();
+    use overload (
+        '""'    => 'as_string',
+        'bool'  => sub{1},
+         '=='   => sub{ &_opt_overload( @_, '==' ) },
+        '!='    => sub{ &_opt_overload( @_, '!=' ) },
+       fallback => 1,
+    );
+};
+
+sub init
+{
+    my $self = shift( @_ );
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
+    # $self->_copy_binded_elements || return( $self->pass_error );
+    return( $self );
+}
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $vals = $self->value;
+    # Parameters can be given as an array for convenience, and they will concatenated
+    my $sql  = "LIKE '" . join( '', @$vals ) . "'";
+    return( $sql );
+}
+
+sub _opt_overload
+{
+    my( $self, $val, $swap, $op ) = @_;
+    my $map =
+    {
+        '!=' => 'NOT ',
+        '<>' => 'NOT ',
+        '==' => '',
+    };
+    my $not  = $map->{ $op } // '';
+    my $like = $self->as_string;
+    my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
+    my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
+        ? $val->name
+        : ( $val =~ /^$placeholder_re$/ || $self->_is_number( $val ) )
+            ? $val
+            : qq{'${val}'};
+    return( DB::Object::Expression->new( "${lval} ${not}${like}" ) );
+}
+
 
 # NOTE: package DB::Object::NOT
 package DB::Object::NOT;
@@ -2778,7 +2853,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.4.6
+    v1.6.0
 
 =head1 DESCRIPTION
 
@@ -3497,6 +3572,10 @@ See L<DB::Object::Tables/insert>
 =head2 last_insert_id
 
 Get the id of the primary key from the last insert.
+
+=head2 LIKE
+
+Returns a new L<DB::Object::LIKE> object, passing it whatever arguments were provided.
 
 =head2 limit
 

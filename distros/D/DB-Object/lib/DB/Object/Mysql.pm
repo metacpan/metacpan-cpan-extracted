@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.1.2
+## Version v1.2.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2025/03/06
 ## All rights reserved
 ## 
 ## 
@@ -262,7 +262,7 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.1.2';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -349,36 +349,36 @@ sub attribute($;$@)
     my %arg   = ( @_ );
     my %attr  = 
     (
-    'Warn'            => 1, 
-    'Active'        => 0, 
-    'Kids'            => 0, 
-    'ActiveKids'    => 0, 
-    'CachedKids'    => 0,
-    'InactiveDestroy'    => 1, 
-    'PrintError'    => 1, 
-    'RaiseError'    => 1, 
-    'ChopBlanks'    => 1, 
-    'LongReadLen'    => 1, 
-    'LongTruncOk'    => 1, 
-    'AutoCommit'    => 1, 
-    'Name'            => 0, 
-    'RowCacheSize'    => 0, 
-    'NUM_OF_FIELDS'    => 0, 
-    'NUM_OF_PARAMS'    => 0, 
-    'NAME'            => 0, 
-    'TYPE'            => 0, 
-    'PRECISION'        => 0, 
-    'SCALE'            => 0, 
-    'NULLABLE'        => 0, 
-    'CursorName'    => 0, 
-    'Statement'        => 0, 
-    'RowsInCache'    => 0 
+        Warn            => 1, 
+        Active          => 0, 
+        Kids            => 0, 
+        ActiveKids      => 0, 
+        CachedKids      => 0,
+        InactiveDestroy => 1, 
+        PrintError      => 1, 
+        RaiseError      => 1, 
+        ChopBlanks      => 1, 
+        LongReadLen     => 1, 
+        LongTruncOk     => 1, 
+        AutoCommit      => 1, 
+        Name            => 0, 
+        RowCacheSize    => 0, 
+        NUM_OF_FIELDS   => 0, 
+        NUM_OF_PARAMS   => 0, 
+        NAME            => 0, 
+        TYPE            => 0, 
+        PRECISION       => 0, 
+        SCALE           => 0, 
+        NULLABLE        => 0, 
+        CursorName      => 0, 
+        Statement       => 0, 
+        RowsInCache     => 0,
     );
     # Only those attribute exist
     # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
-        return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
+        return( $self->{dbh}->{ $name } ) if( exists( $attr{ $name } ) );
     }
     else
     {
@@ -391,7 +391,7 @@ sub attribute($;$@)
                 defined( $value ) && 
                 $attr{ $name } )
             {
-                $self->{ 'dbh' }->{ $name } = $value;
+                $self->{dbh}->{ $name } = $value;
             }
         }
     }
@@ -941,7 +941,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.1.2
+    v1.2.0
 
 =head1 DESCRIPTION
 

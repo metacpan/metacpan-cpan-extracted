@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use parent 'Exporter';
-use Scalar::Util qw( looks_like_number );;
+use Scalar::Util qw( looks_like_number );
 
 use vars qw( $VERSION @ISA @EXPORT );
 
@@ -15,11 +15,11 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.8.0
+Version 2.9.0
 
 =cut
 
-our $VERSION = '2.8.0';
+our $VERSION = '2.9.0';
 our @EXPORT = qw(
     assert
     assert_all_keys_in
@@ -27,6 +27,7 @@ our @EXPORT = qw(
     assert_aoh
     assert_arrayref
     assert_arrayref_nonempty
+    assert_arrayref_nonempty_of
     assert_arrayref_of
     assert_arrayref_all
     assert_cmp
@@ -1023,8 +1024,8 @@ sub assert_arrayref_nonempty($;$) {
 
 =head2 assert_arrayref_of( $ref, $type [, $name] )
 
-Asserts that I<$ref> is reference to an array that has at least one
-element in it, and every one of those elements is of type I<$type>.
+Asserts that I<$ref> is reference to an array, and any/all elements are
+of type I<$type>.
 
 For example:
 
@@ -1034,6 +1035,44 @@ For example:
 =cut
 
 sub assert_arrayref_of($$;$) {
+    my $ref  = shift;
+    my $type = shift;
+    my $name = shift;
+
+    my $ok;
+    my @why;
+
+    if ( ref($ref) eq 'ARRAY' || (Scalar::Util::blessed( $ref ) && $ref->isa( 'ARRAY' )) ) {
+        my $n = 0;
+        for my $i ( @{$ref} ) {
+            if ( !( ( Scalar::Util::blessed( $i ) && $i->isa( $type ) ) || (ref($i) eq $type) ) ) {
+                push @why, "Element #$n is not of type $type";
+            }
+            ++$n;
+        }
+        $ok = !@why;
+    }
+
+    if ( !$ok ) {
+        require Carp;
+        &Carp::confess( _failure_msg($name), @why );
+    }
+
+    return;
+}
+
+
+=head2 assert_arrayref_nonempty_of( $ref, $type [, $name] )
+
+Asserts that I<$ref> is reference to an array, that it has at least one
+element, and that all elements are of type I<$type>.
+
+This is the same function as C<assert_arrayref_of>, except that it also
+requires at least one element.
+
+=cut
+
+sub assert_arrayref_nonempty_of($$;$) {
     my $ref  = shift;
     my $type = shift;
     my $name = shift;

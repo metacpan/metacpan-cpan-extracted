@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.166';
+our $VERSION = '0.167';
 
-use Term::Choose::Constants qw( WIDTH_CURSOR );
+use Term::Choose::Constants qw( EXTRA_W );
 use Term::Choose::Screen    qw( clear_screen clear_to_end_of_line );
 use Term::Choose::Util      qw( get_term_width );
 
@@ -21,7 +21,7 @@ sub new {
 
 sub set_progress_bar {
     my ( $self ) = @_;
-    my $term_w = get_term_width() + $Term::TablePrint::extra_w;
+    my $term_w = get_term_width() + EXTRA_W;
     $self->{fmt} = "\rComputing: %3d%% [%s]";
     $self->{short_print} = $term_w < 25 ? 1 : 0;
     if ( $self->{short_print} ) {
@@ -68,7 +68,7 @@ Term::TablePrint::ProgressBar - Show a progress bar.
 
 =head1 VERSION
 
-Version 0.166
+Version 0.167
 
 =cut
 

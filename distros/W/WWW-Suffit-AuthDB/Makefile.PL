@@ -8,10 +8,13 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'CTK'                   => 2.09,    # Ubuntu = libctk-perl                  RHEL = perl-CTK
-        'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
-        'WWW::Suffit'           => 1.06,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
-        'Net::IP'               => 1.00,    # Ubuntu = libnet-ip-perl               RHEL = perl-Net-IP
+        'Acrux'                 => 0.06,    # Ubuntu = libacrux-perl        RHEL = perl-Acrux
+        'Acrux::DBI'            => 0.03,    # Ubuntu = libacrux-dbi-perl    RHEL = perl-Acrux-DBI
+        'DBD::SQLite'           => 0,       # Ubuntu = libdbd-sqlite-perl   RHEL = perl-DBD-SQLite
+        'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl  RHEL = perl-Mojolicious
+        'Role::Tiny'            => 2.00,    # Ubuntu = librole-tiny-perl    RHEL = perl-Role-Tiny
+        'WWW::Suffit'           => 1.06,    # Ubuntu = libwww-suffit-perl   RHEL = perl-WWW-Suffit
+        'Net::IP'               => 1.00,    # Ubuntu = libnet-ip-perl       RHEL = perl-Net-IP
     };
 
 WriteMakefile(
@@ -35,6 +38,9 @@ WriteMakefile(
                     web  => 'https://sourceforge.net/p/www-suffit-authdb/code/ci/master/tree/',
                   },
         },
+    },
+    clean => {
+        FILES => '*.db testauth.json',
     },
 );
 

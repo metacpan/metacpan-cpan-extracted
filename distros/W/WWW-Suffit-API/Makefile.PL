@@ -8,7 +8,9 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
+        'Acrux'                 => 0.05,    # Ubuntu = libacrux-perl                RHEL = perl-Acrux
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
+        'WWW::Suffit'           => 1.08,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
     };
 
 WriteMakefile(

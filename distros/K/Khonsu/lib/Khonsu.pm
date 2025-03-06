@@ -1,7 +1,7 @@
 package Khonsu;
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use PDF::API2;
 
 use base 'Khonsu::File';
@@ -28,7 +28,7 @@ Khonsu - PDF Generation!
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -852,10 +852,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Khonsu>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Khonsu>
 
 =item * Search CPAN
 

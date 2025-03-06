@@ -3,17 +3,16 @@ abstract: 'Create animation from a sequence of images using FFmpeg'
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
-  Cwd::utf8: '0'
+  Cwd: '0'
   Data::Roundtrip: '0'
   Encode: '0'
   File::Basename: '0'
   File::Spec: '0'
-  File::Temp: '0'
   FindBin: '0'
   Test2::Plugin::UTF8: '0'
   Test::More: '0'
   Test::Script: '0'
-  Unicode::Normalize: '0'
+  Test::TempDir::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Replace: '0'
@@ -35,12 +34,13 @@ requires:
   Encode: '0'
   File::Find::Rule: '0'
   File::Temp: '0'
+  Getopt::Long: '0'
   IPC::Run: '0'
   Text::ParseWords: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/hadjiprocopis/Automate-Animate-FFmpeg/issues
+  bugtracker: https://github.com/hadjiprocopis/perl-Automate-Animate-FFmpeg/issues
   homepage: https://metacpan.org/module/Automate::Animate::FFmpeg
-  repository: https://github.com/hadjiprocopis/Automate-Animate-FFmpeg
-version: '0.12'
+  repository: https://github.com/hadjiprocopis/perl-Automate-Animate-FFmpeg
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

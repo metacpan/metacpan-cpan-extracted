@@ -10,7 +10,7 @@ use parent 'Types::Standard';
 our @EXPORT_OK = ( Types::Standard->type_names );
 
 our $meta = __PACKAGE__->meta;
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 our (%entity, %recurse, %compare, $esc, $unesc, $path);
 BEGIN {
@@ -450,7 +450,7 @@ Coerce::Types::Standard - Coercing
 
 =head1 VERSION
 
-Version 0.000008
+Version 0.000009
 
 =cut
 
@@ -825,19 +825,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Coerce-Types-Standard>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Coerce-Types-Standard>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Coerce-Types-Standard>
 
 =item * Search CPAN
 

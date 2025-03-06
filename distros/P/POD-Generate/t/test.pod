@@ -93,10 +93,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Memory>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Test-Memory>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Test-Memory>

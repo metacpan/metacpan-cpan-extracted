@@ -1,0 +1,131 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "name": "Administrator",
+      "email": "root@localhost",
+      "algorithm": "SHA256",
+      "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+      "role": "System administrator",
+      "disabled": false,
+      "groups": [
+        "admin",
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "username": "test",
+      "name": "Test",
+      "email": "test@localhost",
+      "algorithm": "SHA256",
+      "password": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "role": "OWL tester",
+      "disabled": false,
+      "groups": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "username": "alice",
+      "name": "Alice Wall",
+      "email": "alice@example.com",
+      "algorithm": "SHA256",
+      "password": "2bd806c97f0e00af1a1fc3328fa763a9269723c8db8fac4f93af71db186d6e90",
+      "role": "OWL user",
+      "disabled": false,
+      "groups": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "username": "foo",
+      "name": "Fake user (Пример)",
+      "email": "foo@localhost",
+      "algorithm": "SHA256",
+      "password": "fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9",
+      "role": "Fake user",
+      "disabled": true
+    },
+    {
+      "username": "root",
+      "name": "Root user",
+      "email": "root@localhost",
+      "algorithm": "SHA256",
+      "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+      "role": "System administrator",
+      "disabled": false
+    },
+    {
+      "username": "user",
+      "name": "Regular user",
+      "email": "user@example.com",
+      "algorithm": "SHA256",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "role": "OWL user",
+      "disabled": false,
+      "groups": [
+        "user"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "groupname": "admin",
+      "description": "System Administrators",
+      "users": [
+        "root",
+        "admin",
+        "test"
+      ]
+    },
+    {
+      "groupname": "wheel",
+      "description": "OWL Administrators",
+      "users": [ "admin", "test" ]
+    },
+    {
+      "groupname": "manager",
+      "description": "Managers",
+      "users": [
+        "alice",
+        "bob"
+      ]
+    },
+    {
+      "groupname": "other",
+      "description": "Anybody",
+      "users": [
+        "alice"
+      ]
+    },
+    {
+      "groupname": "user",
+      "description": "Unprivileged users"
+    }
+  ],
+  "realms": [
+    {
+      "realmname": "Default",
+      "realm": "OWL default strict zone",
+      "satisfy": "Any",
+      "description": "Default restriction rules",
+      "requirements": [
+        {    
+          "provider": "User/Group",
+          "entity": "Group",
+          "op": "eq",
+          "value": "admin"
+        },
+        {    
+          "provider": "User/Group",
+          "entity": "Group",
+          "op": "eq",
+          "value": "wheel"
+        }
+      ]
+    }
+  ]
+}

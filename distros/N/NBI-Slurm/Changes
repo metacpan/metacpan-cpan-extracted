@@ -1,4 +1,13 @@
-0.10.0  2024-09-16
+0.12.0  2025-02-25
+
+* Added utilities `printslurm` and `printpath`
+* Added checks to `rm_package`
+
+0.11.0  2025-02-25
+
+* Added `rm_package` to remove a "legacy" package
+
+0.10.0  2024-02-16
 
 * Bugfix in `runjobs` to change the refresh rate, added timestamp
 

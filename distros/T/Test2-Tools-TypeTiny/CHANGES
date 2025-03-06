@@ -1,6 +1,13 @@
 Changelog for Test2-Tools-TypeTiny
 
-v0.90.0 2025-01-15T22:08:27
+v0.90.1 2025-03-06T00:25:43
+ - Pull request #2: Patch - SM-5283 a (Brendan Byrd)
+ - Discourage should_fail_initially usage in docs (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Don't use a hash to parse through non-string KV pairs in
+   should_coerce_into subtest (Brendan Byrd)
+
+v0.90.0 2025-01-15T22:07:54
  - Update LICENSE / README (Brendan Byrd)
  - Pull request #1: SM-5283 (Brendan Byrd)
  - Create Test2::Tools::TypeTiny (Brendan Byrd)

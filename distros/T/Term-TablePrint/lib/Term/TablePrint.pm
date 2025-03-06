@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.166';
+our $VERSION = '0.167';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -14,7 +14,7 @@ use List::Util   qw( sum max );
 use Scalar::Util qw( looks_like_number );
 
 use Term::Choose                  qw( choose );
-use Term::Choose::Constants       qw( WIDTH_CURSOR PH SGR_ES );
+use Term::Choose::Constants       qw( EXTRA_W PH SGR_ES );
 use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
 use Term::Choose::Screen          qw( hide_cursor show_cursor );
 use Term::Choose::ValidateOptions qw( validate_options );
@@ -125,7 +125,6 @@ sub __reset {
 }
 
 
-our $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR;
 my $last_write_table     = 0;
 my $window_width_changed = 1;
 my $enter_search_string  = 2;
@@ -234,7 +233,7 @@ sub print_table {
 
 sub __get_data {
     my ( $self, $tbl_orig ) = @_;
-    my $term_w = get_term_width() + $extra_w;
+    my $term_w = get_term_width() + EXTRA_W;
     my $items_count = $self->{_last_index} * @{$tbl_orig->[0]}; ##
     my $progress = Term::TablePrint::ProgressBar->new( {
         total => $self->{_last_index} * 3 + 2, # +2: two of three loops include the header row
@@ -290,7 +289,7 @@ sub __write_table {
     my $row_is_expanded = 0;
 
     while ( 1 ) {
-        if ( $term_w != get_term_width() + $extra_w ) {
+        if ( $term_w != get_term_width() + EXTRA_W ) {
             return $window_width_changed;
         }
         if ( ! @{$tbl_print} ) {
@@ -916,7 +915,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.166
+Version 0.167
 
 =cut
 
@@ -1314,7 +1313,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2024 Matthäus Kiem.
+Copyright 2013-2025 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

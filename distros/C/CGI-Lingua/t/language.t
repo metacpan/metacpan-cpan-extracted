@@ -9,13 +9,9 @@ use Test::Most;
 use lib 't/lib';
 use MyLogger;
 
+BEGIN { use_ok('CGI::Lingua') }
+
 if(-e 't/online.enabled') {
-	plan(tests => 154);
-
-	use_ok('CGI::Lingua');
-	require_ok('Test::NoWarnings');
-	Test::NoWarnings->import();
-
 	eval {
 		CGI::Lingua->new();
 	};
@@ -181,13 +177,12 @@ if(-e 't/online.enabled') {
 		skip 'IP::Country not installed', 2 if($@);
 
 		$ENV{'REMOTE_ADDR'} = '255.255.255.255';
+		my @messages;
 		$l = new_ok('CGI::Lingua' => [
-			supported => ['de', 'fr']
+			supported => ['de', 'fr'],
+			logger => \@messages
 		]);
-		eval {
-			ok($l->language() eq 'Unknown');
-		};
-		ok($@ =~ /not known by IP::Country/);
+		ok($l->language() eq 'Unknown');
 	}
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-US,en;q=0.8';
@@ -389,5 +384,7 @@ if(-e 't/online.enabled') {
 		}
 	};
 } else {
-	plan(skip_all => 'On-line tests disabled');
+	diag('On-line tests disabled');
 }
+
+done_testing();

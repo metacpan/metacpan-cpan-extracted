@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.3.9
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2025/03/06
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.9';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -102,6 +102,142 @@ sub limit
     }
     return( $limit );
 }
+
+# 4.1.0
+# $q->on_conflict({
+#     target => 'id',              # Optional: implies a specific key, but MySQL uses any duplicate key
+#     action => 'nothing',         # No-op (ignore conflict)
+#     action => 'update',          # Perform update on duplicate key
+#     fields => { a => 'some value', b => 'some other' }, # Fields to update
+# });
+sub on_conflict
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $self->{_on_conflict} = {} if( ref( $self->{_on_conflict} ) ne 'HASH' );
+    
+    if( @_ )
+    {
+        my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
+        # No version check needed—ON DUPLICATE KEY UPDATE is in MySQL since 4.1.0 (2004)
+        my $ver = $tbl_o->database_object->version;
+        if( version->parse( $ver ) < version->parse( '4.1.0' ) )
+        {
+            return( $self->error( "MySQL version is $ver, but version 4.1.0 or higher is required to use this on duplicate clause." ) );
+        }
+
+        $opts = $self->_get_args_as_hash( @_ );
+        my $hash = {};
+        my @comp = ('ON DUPLICATE KEY UPDATE');
+
+        # Target is optional in MySQL—implicitly uses any duplicate key (primary or unique)
+        if( $opts->{target} )
+        {
+            $hash->{target} = $opts->{target};
+            # MySQL doesn’t support explicit constraint targeting (unlike PostgreSQL/SQLite),
+            # so we store it for reference but don’t alter the query syntax.
+            warn( "MySQL does not support explicit constraint targeting, so the target specified '$opts->{target}' will not be applied." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+        }
+
+        # Action handling
+        if( $opts->{action} )
+        {
+            if( $opts->{action} eq 'update' )
+            {
+                $hash->{action} = $opts->{action};
+
+                # No fields provided—defer to callback using INSERT data
+                if( !$opts->{fields} )
+                {
+                    $self->{_on_conflict_callback} = sub
+                    {
+                        my $f_ref = $self->{_args};
+                        $self->is_upsert(1);
+                        # Assuming this returns a formatted SET clause
+                        my $elems = $self->format_update($f_ref);
+                        push( @comp, $elems->formats->join( ', ' ) );
+                        $hash->{query} = join(' ', @comp);
+                        $self->{_on_conflict} = $hash;
+                        $self->{on_conflict}  = join( ' ', @comp );
+                        $self->elements->push( $elems->elements->list ) if( $elems->elements );
+                        CORE::delete( $self->{_on_conflict_callback} );
+                    };
+                    # Empty string signals deferred processing
+                    return( '' );
+                }
+
+                # Validate fields
+                return( $self->error( "Fields property for on_conflict update must be a hash or array." ) )
+                    if( !$self->_is_hash( $opts->{fields} => 'strict' ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
+                if( $self->_is_hash( $opts->{fields} => 'strict' ) )
+                {
+                    return( $self->error( "Fields property for on_conflict update contains no fields!" ) )
+                        if( !scalar( keys( %{$opts->{fields}} ) ) );
+                }
+                elsif( $self->_is_array( $opts->{fields} ) )
+                {
+                    return( $self->error( "Fields property for on_conflict update contains no fields!" ) )
+                        if( !scalar( @{$opts->{fields}} ) );
+                }
+
+                # Convert array fields to hash with VALUES(column)
+                if( $self->_is_array( $opts->{fields} ) )
+                {
+                    $opts->{fields} = +{ map{ $_ => \"VALUES($_)" } @{$opts->{fields}} };
+                }
+                $hash->{fields} = $opts->{fields};
+
+                # Build the SET clause
+                my $q = [];
+                foreach my $k ( sort( keys( %{$opts->{fields}} ) ) )
+                {
+                    my $val = $opts->{fields}->{ $k };
+                    push( @$q, sprintf( '%s = %s', $k, ref( $val ) eq 'SCALAR' ? $$val : $tbl_o->database_object->quote( $val ) ) );
+                }
+                if( scalar( @$q ) )
+                {
+                    push( @comp, join( ', ', @$q ) );
+                }
+                else
+                {
+                    return( $self->error( "ON DUPLICATE KEY UPDATE specified, but no fields to update." ) );
+                }
+            }
+            elsif( $opts->{action} eq 'nothing' || 
+                   $opts->{action} eq 'ignore' )
+            {
+                # MySQL doesn’t have a native "do nothing" for ON DUPLICATE KEY UPDATE,
+                # so we set a no-op (e.g., id = id)
+                $hash->{action} = $opts->{action};
+                # Fallback to 'id' if no PK defined
+                my $pk = $tbl_o->primary_key || 'id';
+                push( @comp, "$pk = $pk" );
+            }
+            else
+            {
+                return( $self->error( "Unknown action '$opts->{action}' for on_conflict clause." ) );
+            }
+        }
+        else
+        {
+            return( $self->error( "No action specified for the on_conflict clause." ) );
+        }
+
+        $hash->{query} = join( ' ', @comp );
+        $self->{_on_conflict} = $hash;
+        $self->{on_conflict} = $self->new_clause({ value => join( ' ', @comp ) });
+    }
+
+    # Execute callback if called by _query_components
+    if( $self->{_on_conflict_callback} && !scalar( @_ ) )
+    {
+        $self->{_on_conflict_callback}->();
+    }
+    return $self->{on_conflict};
+}
+
+# I know I could alias one on the other, but I want it to show up in the stack trace, so ti can be corrected.
+sub on_update { return( shift->on_conflict( @_ ) ); }
 
 sub replace
 {
@@ -237,7 +373,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.3.9
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -264,6 +400,91 @@ Calls L<DB::Object::Query/_where_having> to build a C<having> clause.
 =head2 limit
 
 Build a new L<DB::Object::Query::Clause> clause object by calling L</_process_limit> and return it.
+
+=head2 on_conflict
+
+Provided with some options, this will build an C<ON DUPLICATE KEY UPDATE> clause (L<DB::Object::Query::Clause>) for MySQL. This feature is available in MySQL since version 4.1.0, making it compatible with virtually all modern installations.
+
+=over 4
+
+=item C<action>
+
+Valid values are C<nothing> (or C<ignore>) and C<update>.
+
+If set to C<nothing> or C<ignore>, the query will perform a no-op update (e.g., C<id = id>) to effectively ignore the conflict. Note that MySQL does not natively support a "do nothing" option for C<ON DUPLICATE KEY UPDATE>, so this is emulated by setting a primary key or a default field (C<id>) to its current value.
+
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE id = id;
+
+If set to C<update>, this will either use the provided C<fields> or set a callback routine to format an update statement using L<DB::Object::Query/format_update> based on the original C<INSERT> fields.
+
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE a = 'foo', b = 'bar';
+
+If the original C<insert> uses placeholders, the C<ON DUPLICATE KEY UPDATE> will reuse those placeholders, and the L<DB::Object::Statement> object will double the bind values to accommodate both the C<INSERT> and C<UPDATE> portions of the query. The callback is triggered by L<DB::Object::Query/insert>, as C<on_conflict> relies on the query columns being previously set.
+
+=item C<fields>
+
+An array (or array object) or hash of fields to use with C<action> set to C<update>.
+
+If an array is provided, each field is automatically mapped to C<VALUES(field)>, which references the proposed value from the C<INSERT>:
+
+    $q->on_conflict({
+        action => 'update',
+        fields => [qw(a b)],
+    });
+
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE a = VALUES(a), b = VALUES(b);
+
+If a hash is provided, the keys are the fields to update, and the values can be literal values or scalar references for raw expressions:
+
+    $q->on_conflict({
+        action => 'update',
+        fields => { a => 'new_val', b => \'b + 1' },
+    });
+
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE a = 'new_val', b = b + 1;
+
+If no C<fields> are provided with C<action => 'update'>, the fields from the original C<INSERT> will be used via a callback.
+
+=item C<target>
+
+An optional target specification, such as a column name or constraint. However, MySQL’s C<ON DUPLICATE KEY UPDATE> does not allow targeting a specific key constraint or column explicitly—it triggers on any duplicate key violation (primary key or unique index). The C<target> is stored for reference and logged, but it does not alter the query behavior.
+
+    $q->on_conflict({
+        target => 'id',
+        action => 'update',
+        fields => { a => 'new' },
+    });
+
+    # Logs: "Target 'id' specified, but MySQL will use any duplicate key constraint."
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE a = 'new';
+
+Value for C<target> can also be a scalar reference (used as-is in logging) or an array (joined with commas), though these have no effect on the MySQL query syntax.
+
+=item C<where>
+
+Unlike PostgreSQL and SQLite, MySQL’s C<ON DUPLICATE KEY UPDATE> does not support a C<WHERE> clause. If provided, it will be ignored and a debug message logged, but no error will be raised to maintain API consistency across drivers.
+
+    $q->on_conflict({
+        action => 'update',
+        fields => { a => 'new' },
+        where  => 'a > 0', # Ignored in MySQL
+    });
+
+    INSERT INTO mytable (id, a, b) VALUES (1, 'foo', 'bar')
+        ON DUPLICATE KEY UPDATE a = 'new';
+
+=back
+
+See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html>.
+
+=head2 on_update
+
+This is an alias for L<on_conflict|/on_conflict>
 
 =head2 replace
 

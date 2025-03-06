@@ -44,7 +44,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 

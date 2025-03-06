@@ -958,9 +958,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 653 "lib/PDL/Stats/Basic.pd"
+#line 658 "lib/PDL/Stats/Basic.pd"
 
-#line 654 "lib/PDL/Stats/Basic.pd"
+#line 659 "lib/PDL/Stats/Basic.pd"
 
 =head2 binomial_test
 

@@ -5,7 +5,7 @@ use lib 'lib';
 
 my $pg = POD::Generate->new();
 
-my $version = 'v0.01';
+my $version = 'v0.02';
 
 my $string = $pg->start('POD::Generate', 'programmatically generate plain old documentation')
 	->version($version)

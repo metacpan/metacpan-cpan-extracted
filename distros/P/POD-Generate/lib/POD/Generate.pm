@@ -1,5 +1,5 @@
 package POD::Generate;
-use 5.006; use strict; use warnings; our $VERSION = q|0.01|;
+use 5.006; use strict; use warnings; our $VERSION = q|0.02|;
 
 use overload 
 	q|${}| => sub { $_[0]->generate(q|string|) },
@@ -304,10 +304,6 @@ sub _default_support_items {
 		sprintf(q|L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=%s>|, $formatted_name)
 	];
 	push @items, [
-		q|* CPAN Ratings|,
-		sprintf(q|L<https://cpanratings.perl.org/d/%s>|, $formatted_name)
-	];
-	push @items, [
 		q|* Search CPAN|,
 		sprintf(q|L<https://metacpan.org/release/%s>|, $formatted_name)
 	];
@@ -420,7 +416,7 @@ POD::Generate - programmatically generate plain old documentation
 
 =head1 VERSION
 
-v0.01
+v0.02
 
 =cut
 
@@ -546,10 +542,6 @@ produces...
 	=item * RT: CPAN's request tracker (report bugs here)
 
 	L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Memory
-
-	=item * CPAN Ratings
-
-	L<https://cpanratings.perl.org/d/Test-Memory>
 
 	=item * Search CPAN
 
@@ -1016,10 +1008,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=POD-Generate>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/POD-Generate>
 
 =item * Search CPAN
 

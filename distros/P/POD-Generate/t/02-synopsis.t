@@ -26,6 +26,10 @@ my $data = $pg->start("Test::Memory")
 	)
 ->end("string");
 
+open my $oh, '>', 't/new.pod';
+print $oh $data;
+close $oh;
+
 open my $fh, "<", "t/test.pod";
 my $expected = do { local $/; <$fh> };
 close $fh;

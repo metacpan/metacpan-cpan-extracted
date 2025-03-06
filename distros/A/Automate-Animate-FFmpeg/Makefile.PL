@@ -38,13 +38,12 @@ my %WriteMakefileArgs = (
 	'Test2::Plugin::UTF8' => '0',
 	'Test::Script' => '0',
         'FindBin' => '0',
-        'File::Temp' => '0',
+        'Test::TempDir::Tiny' => '0',
         'File::Spec' => '0',
 	'Data::Roundtrip' => '0',
 	'Encode' => '0',
-	'Cwd::utf8' => '0',
+	'Cwd' => '0',
         'File::Basename' => '0',
-	'Unicode::Normalize' => '0',
     },
     PREREQ_PM => {
 	'File::Temp' => '0',
@@ -54,6 +53,7 @@ my %WriteMakefileArgs = (
 	'Data::Roundtrip' => '0',
 	'Text::ParseWords' => '0',
 	'Encode' => '0',
+	'Getopt::Long' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => [
@@ -73,12 +73,12 @@ my %WriteMakefileArgs = (
             license    => 'artistic_2',
 	    homepage   => 'https://metacpan.org/module/Automate::Animate::FFmpeg',
             repository => {
-                url  => 'https://github.com/hadjiprocopis/Automate-Animate-FFmpeg',
-                web  => 'https://github.com/hadjiprocopis/Automate-Animate-FFmpeg',
+                url  => 'https://github.com/hadjiprocopis/perl-Automate-Animate-FFmpeg',
+                web  => 'https://github.com/hadjiprocopis/perl-Automate-Animate-FFmpeg',
                 type => 'git',
             },
             bugtracker => {
-                web => 'https://github.com/hadjiprocopis/Automate-Animate-FFmpeg/issues',
+                web => 'https://github.com/hadjiprocopis/perl-Automate-Animate-FFmpeg/issues',
             }
         },
     },

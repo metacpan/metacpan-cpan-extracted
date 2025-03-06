@@ -9,12 +9,15 @@ MANIFEST                                This file
 README.md                               !!! README FIRST !!!
 TODO                                    TO DO
 
-# Libs
+# Libss
 lib/WWW/Suffit/AuthDB.pm                Main library
 lib/WWW/Suffit/AuthDB/Group.pm          Group class
 lib/WWW/Suffit/AuthDB/Model.pm          Model (store) class
 lib/WWW/Suffit/AuthDB/Realm.pm          Realm class
 lib/WWW/Suffit/AuthDB/User.pm           User class
+lib/WWW/Suffit/AuthDB/Role/AAA.pm       AAA role
+lib/WWW/Suffit/AuthDB/Role/CRUD.pm      CRUD role
+lib/WWW/Suffit/Plugin/AuthDB.pm         AuthDB plugin
 
 # Tests
 t/00-fixme.t                            FIXME/TODO/BUG warnings
@@ -22,5 +25,12 @@ t/00-pod-coverage.t                     POD::Coverage testing
 t/00-pod.t                              Checking all POD documents
 t/00-trailingspace.t                    Style test: TrailingSpace
 t/01-use.t                              Test script
+t/02-authdb.t                           AuthDB test
+t/03-model.t                            Model test
+t/04-aaa.t                              AAA test
+t/authdb-test.json                      Test authdb file
+
+# Misc
+src/authdb.json                         Default AuthDB file
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

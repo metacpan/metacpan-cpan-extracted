@@ -86,3 +86,8 @@
       - updated documentation
       - added Github initial CI testing for latest Ubuntu,
       - added VERIFY C functions (see POD)
+
+0.2.1  03/05/2025 11:08:00 PM MST
+      - updated POD
+      - renamed, "PerlOMP_VERIFY_1D_CHAR_ARRAY" to
+        "PerlOMP_VERIFY_1D_STRING_ARRAY" for consistency

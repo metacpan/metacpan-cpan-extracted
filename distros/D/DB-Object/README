@@ -127,8 +127,31 @@ SYNOPSIS
         my $order_ip_sth = $orders_tbl->select( 'id' ) || fail( "An error has occurred while trying to create a select by ip query for table orders: " . $orders_tbl->error );
         # SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
 
+    Be careful though, when using fields objects, not to do this:
+
+        my $tbl = $dbh->some_table;
+        $tbl->where( $tbl->fo->some_field => '?', $tbl->fo->other_field => '?' );
+        my $sth = $tbl->select || die( $tbl->error );
+
+    Because the fields objects are overloaded, instead do this:
+
+        my $tbl = $dbh->some_table;
+        $tbl->where( $tbl->fo->some_field == '?', $tbl->fo->other_field == '?' );
+        my $sth = $tbl->select || die( $tbl->error );
+
+    Accessing a property in a "JSON" or "JSONB" field:
+
+        my $tbl = $dbh->some_table;
+        $tbl->where( metadata => { is_system => 'true' } );
+        my $sth = $tbl->select;
+        say $sth->as_string;
+        # SELECT * FROM some_table WHERE metadata->>is_system = 'true';
+
+    In future release, other operators than "=" will be implemented for
+    "JSON" and "JSONB" fields.
+
 VERSION
-        v0.10.4
+        v1.5.0
 
 DESCRIPTION
     DB::Object is a SQL API much alike "DBI", but with the added benefits
@@ -189,7 +212,8 @@ CONSTRUCTOR
     Note that if you provide connection options that are not among the
     followings, this will return an error.
 
-    *cache_connections*
+    *   "cache_connections"
+
         Defaults to true.
 
         If true, this will instruct DBI to use "connect_cached" in DBI
@@ -213,22 +237,28 @@ CONSTRUCTOR
         More on this issue at DBI documentation
         <https://metacpan.org/pod/DBI#connect_cached>
 
-    *database* or *DB_NAME*
+    *   "database" or *DB_NAME*
+
         The database name you wish to connect to
 
-    *login* or *DB_LOGIN*
+    *   "login" or *DB_LOGIN*
+
         The login used to access that database
 
-    *passwd* or *DB_PASSWD*
+    *   "passwd" or *DB_PASSWD*
+
         The password that goes along
 
-    *host* or *DB_HOST*
+    *   "host" or *DB_HOST*
+
         The server, that is hostname of the machine serving a SQL server.
 
-    *port* or *DB_PORT*
+    *   "port" or *DB_PORT*
+
         The port to connect to
 
-    *driver* or *DB_DRIVER*
+    *   "driver" or *DB_DRIVER*
+
         The driver you want to use. It needs to be of the same type than the
         server you want to connect to. If you are connecting to a MySQL
         server, you would use "mysql", if you would connecto to an Oracle
@@ -245,15 +275,18 @@ CONSTRUCTOR
         which will provide you a special shell to install modules in a
         convenient way.
 
-    *schema* or *DB_SCHEMA*
+    *   "schema" or *DB_SCHEMA*
+
         The schema to use to access the tables. Currently only used by
         PostgreSQL
 
-    *opt*
+    *   "opt"
+
         This takes a hash reference and contains the standard "DBI" options
         such as *PrintError*, *RaiseError*, *AutoCommit*, etc
 
-    *conf_file* or *DB_CON_FILE*
+    *   "conf_file" or "DB_CON_FILE"
+
         This is used to specify a json connection configuration file. It can
         also provided via the environment variable *DB_CON_FILE*. It has the
         following structure:
@@ -307,7 +340,8 @@ CONSTRUCTOR
                 ]
             }
 
-    *uri* or *DB_CON_URI*
+    *   "uri" or *DB_CON_URI*
+
         This is used to specify an uri to contain all the connection
         parameters for one database connection. It can also provided via the
         environment variable *DB_CON_URI*. For example:
@@ -326,9 +360,13 @@ METHODS
     Sets/gets the boolean value for whether to allow unsafe bulk delete.
     This means query without any "where" clause.
 
+    Default is false.
+
   allow_bulk_update
     Sets/gets the boolean value for whether to allow unsafe bulk update.
     This means query without any "where" clause.
+
+    Default is false.
 
   AND
     Takes any arguments and wrap them into a "AND" clause.
@@ -343,9 +381,13 @@ METHODS
     automatically transcode datetime value into their equivalent DateTime
     object.
 
+    Default is false.
+
   auto_decode_json
     Sets or gets the boolean value. If true, then this api will
     automatically transcode json data into perl hash reference.
+
+    Default is true.
 
   avoid
     See "avoid" in DB::Object::Tables
@@ -556,6 +598,47 @@ METHODS
 
     It returns the statement object cached.
 
+  cache_table
+    Sets or gets a boolean value whether to cache the table fields object.
+
+    When this is enabled, the second time a database table is accessed, it
+    will retrieve its field objects from the cache rather than recreating
+    them after reading the structure from the database. This is much faster.
+
+    By default, this is set to false.
+
+    This can be specified in the configuration file passed when
+    instantiating a new "DB::Object" object with the property "cache_table"
+
+  cache_table_fields
+        my $all_dbs = $dbh->cache_table_fields;
+        my $all_tables = $dbh->cache_table_fields( database => $some_database );
+        my $all_fields = $dbh->cache_table_fields(
+            database => $some_database,
+            table => $some_table,
+        );
+        $dbh->cache_table_fields(
+            database => $some_database,
+            table => $some_table,
+            fields => $some_hash_reference,
+        );
+
+    Sets or gets the hash reference of database table field name to their
+    corresponding object.
+
+    If no parameter is provided, it will return the entire cache for all
+    databases for a given driver.
+
+    If only a database name is provided, it will return the cache hash
+    reference for all the tables in the given database.
+
+    If a database and a table name is provided, this will return an hash
+    reference of field name to their corresponding object.
+
+    If a database and a table name and an hash reference of field names to
+    their corresponding objects is provided, it will set this hash as the
+    cache for the given database and table.
+
   cache_tables
     Sets or gets the DB::Object::Cache::Tables object.
 
@@ -597,6 +680,9 @@ METHODS
   constant_queries_cache
     Returns the global value for $CONSTANT_QUERIES_CACHE
 
+    This is used by "constant_queries_cache_get" and
+    "constant_queries_cache_set"
+
   constant_queries_cache_get
     Provided with some hash reference with properties "pack", "file" and
     "line" that are together used as a key in the cache and this will use an
@@ -607,6 +693,15 @@ METHODS
     "line" that are together used as a key in the cache and "query_object"
     and this will set an entry in the cache. it returns the hash reference
     initially provided.
+
+  constant_to_datatype
+    Provided with a data type constant value and this returns its equivalent
+    data type as a string in upper case.
+
+    This constant is set by the driver, or by default by DBI. For example
+    "SQL_VARCHAR" is 12 and its data type is "VARCHAR"
+
+    See also "datatype_to_constant"
 
   copy
     Provided with either a reference to an hash or an hash of key => value
@@ -644,6 +739,49 @@ METHODS
     This returns the list of available databases.
 
     This is a method that must be implemented by the driver package.
+
+  datatype_dict
+    Returns an hash reference of each data type with their equivalent
+    "constant", regular expression ("re"), constant "name" and "type" name.
+
+    Each data type is an hash with the following properties for each type:
+    "constant", "name", "re", "type"
+
+    The data returned is dependent on each driver.
+
+  datatype_to_constant
+        my $type = $dbh->datatype_to_constant( 'varchar' ); # 12
+
+        # Below achieves the same result
+        use DBI ':sql_types';
+        say SQL_VARCHAR; # 12
+
+    Provided with a data type as a string and this returns its equivalent
+    driver value if any, or by default the one of set by DBI.
+
+    The data type provided is case insensitive.
+
+    If no matching data type exists, it returns "undef" in scalar context,
+    or an empty list in list context.
+
+    As pointed out by DBI documentation: "just because the DBI defines a
+    named constant for a given data type doesn't mean that drivers will
+    support that data type."
+
+    See also "constant_to_datatype"
+
+  datatypes
+        my $types = $dbh->datatypes;
+
+    Returns an hash reference of data types to their respective values.
+
+    If the driver has its own, it will return the driver's constants,
+    otherwise, this will return an hash reference of DBI data type
+    constants.
+
+    As pointed out by DBI documentation: "just because the DBI defines a
+    named constant for a given data type doesn't mean that drivers will
+    support that data type."
 
   delete
     See "delete" in DB::Object::Tables
@@ -722,6 +860,10 @@ METHODS
 
   last_insert_id
     Get the id of the primary key from the last insert.
+
+  LIKE
+    Returns a new DB::Object::LIKE object, passing it whatever arguments
+    were provided.
 
   limit
     See "limit" in DB::Object::Tables
@@ -829,6 +971,9 @@ METHODS
     and return "undef" in perlfunc upon error or the statement handler upon
     success.
 
+  query_object
+    Sets or gets the query object.
+
   quote
     This is used to properly format data by surrounding them with quotes or
     not.
@@ -892,6 +1037,9 @@ METHODS
   table_info
     This is a method that must be implemented by the driver package.
 
+    It returns an array reference of hash reference containing information
+    about each table column.
+
   table_push
     Add the given table name to the stack of cached table names.
 
@@ -931,6 +1079,7 @@ METHODS
   unix_timestamp
     See "unix_timestamp" in DB::Object::Tables
 
+  for POD::Coverage unknown_field
   unlock
     This is a convenient wrapper around "unlock" in DB::Object::Query
 
@@ -1118,6 +1267,20 @@ METHODS
     "_query_object_current"
 
 OPERATORS
+  ALL( VALUES )
+    This operator is used to query an array where all elements must match.
+
+        my $tbl = $dbh->hosts || die( "Uable to get table object 'hosts'." );
+        $tbl->where( $dbh->OR(
+            $tbl->fo->name == 'example.com',
+            'example.com' == $dbh->ALL( $tbl->fo->alias )
+        ));
+        my $sth = $tbl->select || die( "Failed to prepare query to get host information: ", $tbl->error );
+        my $ref = $sth->fetchrow_hashref;
+
+    See PostgreSQL documentation
+    <https://www.postgresql.org/docs/current/arrays.html>
+
   AND( VALUES )
     Given a value, this returns a DB::Object::AND object. You can retrieve
     the value with "value" in DB::Object::AND
@@ -1127,6 +1290,51 @@ OPERATORS
         my $op = $dbh->AND( login => 'joe', status => 'active' );
         # will produce:
         WHERE login = 'joe' AND status = 'active'
+
+  ANY( VALUES )
+    This operator is used to query an array where all elements must match.
+
+        my $tbl = $dbh->hosts || die( "Uable to get table object 'hosts'." );
+        $tbl->where( $dbh->OR(
+            $tbl->fo->name == 'example.com',
+            'example.com' == $dbh->ANY( $tbl->fo->alias )
+        ));
+        my $sth = $tbl->select || die( "Failed to prepare query to get host information: ", $tbl->error );
+        my $ref = $sth->fetchrow_hashref;
+
+    See PostgreSQL documentation
+    <https://www.postgresql.org/docs/current/arrays.html>
+
+  IN
+    For example:
+
+        SELECT
+            c.code, c.name, c.name_l10n, c.locale
+        FROM country_locale AS c
+        WHERE
+            c.locale = 'fr_FR' OR
+            ('fr_FR' NOT IN (SELECT DISTINCT l.locale FROM country_locale AS l ORDER BY l.locale) AND 
+            c.locale = 'en_GB')
+        ORDER BY c.code
+
+        my $tbl = $dbh->country_locale || die( $dbh->error );
+        my $tbl2 = $dbh->country_locale || die( $dbh->error );
+        $tbl2->as( 'l' );
+        $tbl2->order( 'locale' );
+        my $sth2 = $tbl2->select( 'DISTINCT locale' ) || die( $tbl2->error );
+
+        $tbl->as( 'c' );
+        $tbl->where( $dbh->OR(
+            $tbl->fo->locale == 'fr_FR',
+            $dbh->AND(
+                'fr_FR' != $dbh->IN( $sth2 ),
+                $tbl->fo->locale == 'en_GB'
+            )
+        ) );
+
+        $tbl->order( $tbl->fo->code );
+        my $sth = $tbl->select( qw( code name name_l10n locale ) ) || die( $tbl->error );
+        say $sth->as_string;
 
   NOT( VALUES )
     Given a value, this returns a DB::Object::NOT object. You can retrieve

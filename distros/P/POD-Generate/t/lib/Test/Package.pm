@@ -84,10 +84,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Package>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Test-Package>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Test-Package>

@@ -18,6 +18,14 @@ is_pdl $a->skew_unbiased, pdl( 0 ), "unbiased sample skewness of $a";
 is_pdl $a->kurt, pdl( -1.3 ), "sample kurtosis of $a";
 is_pdl $a->kurt_unbiased, pdl( -1.2 ), "unbiased sample kurtosis of $a";
 
+{
+my $x = pdl [(0.001) x 6];
+my $var = $x->var;
+ok $var >= 0, 'var >= 0' or diag "var = $var";
+my $stdv = $x->stdv;
+ok $stdv >= 0, 'stdv >= 0' or diag "stdv = $stdv";
+}
+
 is_pdl $_->ss, (($_ - $_->avg)**2)->sumover, "ss for $_" for
   pdl('[1 1 1 1 2 3 4 4 4 4 4 4]'),
   pdl('[1 2 2 2 3 3 3 3 4 4 5 5]'),

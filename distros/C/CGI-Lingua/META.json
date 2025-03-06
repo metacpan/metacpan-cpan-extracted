@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -37,6 +37,7 @@
             "Class::Load" : "0",
             "DBD::SQLite" : "0",
             "Data::Validate::IP" : "0.25",
+            "ExtUtils::MakeMaker" : "6.64",
             "HTTP::BrowserDetect" : "0",
             "I18N::AcceptLanguage" : "0",
             "I18N::LangTags::Detect" : "1.04",
@@ -48,6 +49,7 @@
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
             "NetAddr::IP" : "0",
+            "Params::Get" : "0",
             "Sys::Syslog" : "0",
             "perl" : "5.006002"
          }
@@ -82,6 +84,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.67",
+   "version" : "0.68",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

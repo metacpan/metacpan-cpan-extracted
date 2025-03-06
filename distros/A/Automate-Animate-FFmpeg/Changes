@@ -41,7 +41,11 @@ Revision history for Automate-Animate
         Changes in t/100-input-patterns.t to debug this.
 
 0.12    15-10-2024 17:00
-        The issue of v0.11 seems to have gone but keeping an eye on it.
+        The issue of v0.11 seems to have gone but an eye is kept on it.
         The detection of ffmpeg executable is done in Makefile.PL
         Now make exits(1) if no ffmpeg executable is found.
 
+0.13    05-03-2025 20:00
+        Switched to using Test::TempDir::Tiny in test files.
+	Fixed urls in Makefile.PL thanks to mohawk2's for spotting it.
+	Added https://metacpan.org/pod/PDL::IO::Pic#wmpeg to the SEE ALSO section (mohawk2's suggestion).

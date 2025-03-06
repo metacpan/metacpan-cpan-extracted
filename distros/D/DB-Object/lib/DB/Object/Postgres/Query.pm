@@ -819,7 +819,7 @@ Provided with some options and this will build a C<ON CONFLICT> clause (L<DB::Ob
 
 =over 4
 
-=item I<action>
+=item C<action>
 
 Valid value can be C<nothing> and in which case, nothing will be done by the database upon conflict.
 
@@ -839,7 +839,7 @@ If the original C<insert> or C<update> uses placeholders, then the C<DO UPDATE> 
 
 The callback will be called by L<DB::Object::Query/insert> or L<DB::Object::Query/update>, because the L</on_conflict> relies on query columns being previously set.
 
-=item I<fields>
+=item C<fields>
 
 An array (or array object) of fields to use with I<action> set to C<update>
 
@@ -855,7 +855,7 @@ This will turn the C<DO UPDATE> prepending each field with the special keyword C
         VALUES (5, 'Gizmo Transglobal'), (6, 'Associated Computing, Inc')
         ON CONFLICT (did) DO UPDATE SET dname = EXCLUDED.dname;
 
-=item I<target>
+=item C<target>
 
 Target can be a table column.
 
@@ -882,7 +882,7 @@ Value for I<target> can also be an array or array object (like L<Module::Generic
 
 If no I<target> argument was provided, then I<action> must be set to C<nothing> or this will return an error.
 
-=item I<where>
+=item C<where>
 
 You can also provide a C<WHERE> expression in the conflict and it will be added literally.
 

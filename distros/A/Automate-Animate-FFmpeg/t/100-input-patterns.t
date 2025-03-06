@@ -10,7 +10,6 @@ use lib 'blib/lib';
 use Test::More;
 use Test2::Plugin::UTF8;
 
-use File::Temp;
 use Cwd;
 use FindBin;
 use File::Basename;
@@ -19,7 +18,7 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $curdir = Cwd::abs_path($FindBin::Bin);
 

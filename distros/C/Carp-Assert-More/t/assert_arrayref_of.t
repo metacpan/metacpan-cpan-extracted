@@ -32,10 +32,10 @@ MAIN: {
     lives_ok( sub { assert_arrayref_of( [ Foo->new ], 'Foo' ) } );
 
     # [] is an empty arrayref.
-    throws_ok( sub { assert_arrayref_of( [], 'Foo' ) }, $FAILED );
+    lives_ok( sub { assert_arrayref_of( [], 'Foo' ) }, $FAILED );
 
-    my @empty_ary = ();
-    throws_ok( sub { assert_arrayref_of( \@empty_ary, 'Foo' ) }, $FAILED );
+    my @empty_ary;
+    lives_ok( sub { assert_arrayref_of( \@empty_ary, 'Foo' ) }, $FAILED );
 
     # A coderef is not an arrayref.
     my $coderef = sub {};

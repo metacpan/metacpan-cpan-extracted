@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.767';
+our $VERSION = '1.768';
 
 use Exporter qw( import );
 
@@ -206,13 +206,6 @@ sub line_fold {
         return @paragraphs;
     }
 }
-
-
-
-
-
-
-
 
 
 

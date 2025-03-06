@@ -11,6 +11,9 @@ bin/configuration
 bin/lsjobs
 bin/make_image_from_bioconda
 bin/make_package
+bin/printpath
+bin/printslurm
+bin/rm_package
 bin/runjob
 bin/session
 bin/shelf
@@ -44,6 +47,8 @@ t/10-hpc.t
 t/11-bins.t
 t/12-array.t
 t/20-intensive.t
+t/29-bins-pod.t
+t/30-misc.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

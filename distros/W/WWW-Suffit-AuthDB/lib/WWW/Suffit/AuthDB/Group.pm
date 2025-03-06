@@ -16,46 +16,91 @@ WWW::Suffit::AuthDB::Group - WWW::Suffit::AuthDB group class
 
 This module provides AuthDB group methods
 
-=head2 is_valid
-
-Check the group object
-
-=head2 mark
-
-Marks object as cached
-
 =head1 ATTRIBUTES
 
-=over 8
+This class implements the following attributes
 
-=item description
+=head2 cached
+
+    $group = $group->cached( 12345.123456789 );
+    my $cached = $group->cached;
+
+Sets or returns time of caching group data
+
+Default: 0
+
+=head2 cachekey
+
+    $group = $group->cachekey( 'abcdef1234567890' );
+    my $cachekey = $group->cachekey;
+
+Sets or returns the cache key string
+
+=head2 description
 
     $group->description('Root group');
     my $description = $group->description;
 
 Sets and returns description of the group
 
-=item groupname
+=head2 error
+
+    $group = $group->error( 'Oops' );
+    my $error = $group->error;
+
+Sets or returns error string
+
+=head2 expires
+
+    $group = $group->expires( 300 );
+    my $expires = $group->expires;
+
+Sets or returns cache/object expiration time in seconds
+
+Default: 300 (5 min)
+
+=head2 groupname
 
     $group->groupname('wheel');
     my $groupname = $group->groupname;
 
 Sets and returns groupname of the group
 
-=item is_valid
+=head2 id
 
-    $group->is_valid or die "Incorrect group";
+    $group = $group->id( 2 );
+    my $id = $group->id;
 
-Returns boolean status of group's data
+Sets or returns id of group
 
-=item users
+Default: 0
+
+=head2 is_cached
+
+This attribute returns true if the group data was cached
+
+Default: false
+
+=head2 users
 
     $group->users([qw/ alice bob /]);
     my $users = $group->users; # ['alice', 'bob']
 
 Sets and returns users of group (array of users)
 
-=back
+=head1 METHODS
+
+This class inherits all methods from L<Mojo::Base> and implements the following new ones
+
+=head2 is_valid
+
+    $group->is_valid or die "Incorrect group";
+
+Returns boolean status of group's data
+
+=head2 mark
+
+Marks object as cached
 
 =head1 HISTORY
 
@@ -75,7 +120,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -86,9 +131,9 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
-
 use Mojo::Base -base;
+
+use Mojo::Util qw/steady_time/;
 
 has description => '';
 has error       => '';
@@ -96,21 +141,23 @@ has expires     => 0;
 has groupname   => undef;
 has id          => 0;
 has users       => sub { return [] };
-has is_cached   => 0;
+has is_cached   => 0; # 0 or 1
+has cached      => 0; # steady_time() of cached
+has cachekey    => '';
 
 sub is_valid {
     my $self = shift;
 
     unless ($self->id) {
-        $self->error("E1334: Group not found");
+        $self->error("E1314: Group not found");
         return 0;
     }
     unless (defined($self->groupname) && length($self->groupname)) {
-        $self->error("E1335: Incorrect groupname stored");
+        $self->error("E1315: Incorrect groupname stored");
         return 0;
     }
     if ($self->expires && $self->expires < time) {
-        $self->error("E1336: The group data is expired");
+        $self->error("E1316: The group data is expired");
         return 0;
     }
 
@@ -119,7 +166,7 @@ sub is_valid {
 
 sub mark {
     my $self = shift;
-    $self->is_cached(1);
+    return $self->is_cached(1)->cached(shift || steady_time);
 }
 
 1;

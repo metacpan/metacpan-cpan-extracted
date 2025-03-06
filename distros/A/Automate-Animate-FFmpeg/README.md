@@ -4,7 +4,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -370,6 +370,10 @@ As an example,
 
 Unicode filenames are supported ... I think. Please report
 any problems.
+
+# SEE ALSO
+
+- [PDL::IO::Pic#wmpeg](https://metacpan.org/pod/PDL%3A%3AIO%3A%3APic%23wmpeg)
 
 # AUTHOR
 

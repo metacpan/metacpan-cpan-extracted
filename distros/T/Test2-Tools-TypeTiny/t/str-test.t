@@ -82,6 +82,10 @@ my $events = intercept {
 
         should_coerce_into(   # XXX: exact line number captured in tests below
             $type,
+            # NOTE: Bad coercions, but will produce known failures.  Also, undef/'' should be different to
+            # validate that the checks are not getting merged together (previous bug).
+            undef,  '',
+            '',     'blank',
             qw<
                 foo   FOO
                 f     FOO
@@ -164,7 +168,7 @@ subtest_buffered 'Failed Enum subtest' => sub {
             grep { $_->isa('Test2::Event::Ok') || $_->isa('Test2::Event::Fail') }
             @enum_subtest_events
         ],
-        [qw< 1 1 0 0 0 >],
+        [qw< 0 0 1 1 0 0 0 >],
         'Enum->should_coerce_into pass/fail order is correct',
     );
 

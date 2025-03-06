@@ -1,0 +1,10 @@
+Revision history for Perl extension Array::Intersection.
+
+0.03 2025-03-05
+  - Added Git repo information to Makefile.PL
+
+0.02 2024-11-21
+  - Added support for undef
+
+0.01 2024-11-20
+  - original version

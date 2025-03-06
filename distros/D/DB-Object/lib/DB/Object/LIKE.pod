@@ -1,0 +1,80 @@
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::LIKE - LIKE Operator Object
+
+=head1 SYNOPSIS
+
+    my $op = $dbh->LIKE( '%something%' );
+    # or, byt providing a list of arguments
+    my $op = $dbh->LIKE( '%', @something, '%' );
+    # will produce:
+    LIKE '%something%'
+
+    "'something'" == $dbh->LIKE( '%something%' );
+    # 'something' LIKE '%something%';
+    "something" != $dbh->LIKE( '%something%' );
+    # 'something' NOT LIKE '%something%';
+
+    my $tbl = $dbh->my_table || die( $dbh->error );
+    $tbl->as( 't' );
+    my $sql = $tbl->fo->somefield == $dbh->LIKE( '%something%' );
+    say $sql;
+    # t.somefield LIKE '%something%';
+
+=head1 DESCRIPTION
+
+This is the C<LIKE> object class inheriting from L<DB::Object::Operator>
+
+=head1 METHODS
+
+=head2 new
+
+Takes a list of values that are saved in the newly created object returned.
+
+=head2 as_string
+
+Returns a string representation of this operator.
+
+For example:
+
+    $dbh->LIKE( '%something%' );
+    # or
+    $dbh->LIKE( '%', @something, '%' );
+    # LIKE '%something%';
+
+=head2 operator
+
+Returns C<LIKE>
+
+=head2 value
+
+In list context, returns an array of those values passed to L</new> and in scalar context, it returns those value as array reference.
+
+=head1 OVERLOADING
+
+Objects for this class have their C<==> and C<!=> operators overloaded.
+
+When overloading is called, it returns a new L<DB::Object::Expression> that represents the formatted statement.
+
+=head1 SEE ALSO
+
+L<https://www.postgresql.org/docs/current/functions-matching.html>
+
+L<https://dev.mysql.com/doc/refman/8.4/en/pattern-matching.html>
+
+L<https://www.sqlite.org/lang_corefunc.html#like>, L<https://www.sqlite.org/lang_expr.html#the_like_glob_regexp_match_and_extract_operators>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2025 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

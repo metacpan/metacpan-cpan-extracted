@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.767';
+our $VERSION = '1.768';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -315,7 +315,7 @@ sub __choose {
     if ( $self->{mouse} ) {
         require Term::Choose::Opt::Mouse;
     }
-    if ( $^O eq "MSWin32" ) {
+    if ( $^O eq 'MSWin32' ) {
         print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     $self->__copy_orig_list( $orig_list_ref );
@@ -729,10 +729,7 @@ sub __beep {
 
 sub __prepare_info_and_prompt_lines {
     my ( $self ) = @_;
-    my $info_w = $self->{term_width};
-    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-        $info_w += WIDTH_CURSOR;
-    }
+    my $info_w = $self->{term_width} + EXTRA_W;
     if ( $self->{max_width} && $info_w > $self->{max_width} ) { ##
         $info_w = $self->{max_width};
     }
@@ -1059,11 +1056,12 @@ sub __avail_screen_size {
     if ( $self->{margin_right} ) {
         $self->{avail_width} -= $self->{margin_right};
     }
-    if ( $self->{margin_right} || ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) ) {
-        $self->{avail_width} += WIDTH_CURSOR;
-        # + WIDTH_CURSOR: use also the last terminal column if there is only one item-column;
-        #                 with only one item-column the output doesn't get messed up if an item
-        #                 reaches the right edge of the terminal on a non-MSWin32-OS
+
+    if ( $self->{margin_right} || ( $self->{col_width} > $self->{avail_width} ) ) {
+        $self->{avail_width} += EXTRA_W;
+        # + EXTRA_W: use also the last terminal column if there is only one item-column;
+        #            with only one item-column the output doesn't get messed up if an item
+        #            reaches the right edge of the terminal on a non-MSWin32-OS (EXTRA_W is 0 if OS is MSWin32)
     }
     if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
         $self->{avail_width} = $self->{max_width};
@@ -1280,7 +1278,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.767
+Version 1.768
 
 =cut
 
@@ -1965,7 +1963,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2024 Matthäus Kiem.
+Copyright (C) 2012-2025 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

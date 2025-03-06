@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,14 +19,17 @@ no_index:
     - t
     - inc
 requires:
-  CTK: '2.09'
+  Acrux: '0.06'
+  Acrux::DBI: '0.03'
+  DBD::SQLite: '0'
   Mojolicious: '7.94'
   Net::IP: '1'
+  Role::Tiny: '2'
   WWW::Suffit: '1.06'
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/www-suffit-authdb/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/www-suffit-authdb/code
-version: '1.00'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

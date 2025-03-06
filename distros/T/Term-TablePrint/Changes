@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.167   2025-03-05
+        - Refactoring.
+        - Term::Choose minimum version 1.768.
+
 0.166   2025-03-04
         - Refactoring.
         - Bugfix progress bar.

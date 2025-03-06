@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.66
+Version 0.68
 
 # SYNOPSIS
 
@@ -24,10 +24,9 @@ CGI::Lingua is a powerful module for multilingual web applications
 offering extensive language/country detection strategies.
 
 No longer does your website need to be in English only.
-CGI::Lingua provides a simple basis to determine which language to display a
-website. The website tells CGI::Lingua which languages it supports. Based on
-that list CGI::Lingua tells the application which language the user would like
-to use.
+CGI::Lingua provides a simple basis to determine which language to display a website.
+The website tells CGI::Lingua which languages it supports.
+Based on that list CGI::Lingua tells the application which language the user would like to use.
 
     use CGI::Lingua;
     # ...
@@ -108,9 +107,10 @@ Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
 such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
 a reference to code,
+a reference to an array,
 or a filename.
 
-Takes optional parameter info, an object which can be used to see if a CGI
+Takes an optional parameter info, an object which can be used to see if a CGI
 parameter is set, for example, an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
 
 Since emitting warnings from a CGI class can result in messages being lost (you

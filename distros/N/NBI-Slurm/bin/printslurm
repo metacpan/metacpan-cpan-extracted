@@ -1,0 +1,280 @@
+#!/usr/bin/env perl
+#PODNAME:printslurm
+#ABSTRACT:Utility to print info from Slurm
+use v5.12;
+use warnings;
+use Getopt::Long;
+use Term::ANSIColor;
+use NBI::Slurm;
+# Define command line options
+my $help = 0;
+my $node_info = 0;
+
+GetOptions(
+    "help|h"   => \$help,
+    "node|n"   => \$node_info,
+    "version"  => sub { say "printslurm v", $NBI::Slurm::VERSION; exit },
+) or show_help();
+
+# Show help if requested
+show_help() if $help;
+
+sub show_help {
+    print color('bold white');
+    print "Usage: $0 [options]\n\n";
+    print color('reset');
+    
+    print "Options:\n";
+    print "  -h, --help    Show this help message and exit\n";
+    print "  -n, --node    Display node-specific job information (when inside a Slurm job)\n\n";
+    
+    print "Description:\n";
+    print "  This script displays information about the Slurm environment,\n";
+    print "  including queues (partitions) and Slurm environment variables.\n";
+    print "  When run with the --node option, it displays detailed information\n";
+    print "  about the current job allocation.\n\n";
+    
+    exit(0);
+}
+
+# Function to run shell commands
+sub run_command {
+    my $cmd = shift;
+    my @output = `$cmd 2>/dev/null`;
+    chomp(@output);
+    return @output;
+}
+
+# Print a section header
+sub print_header {
+    my $text = shift;
+    print "\n", color('bold cyan'), "=== $text ===", color('reset'), "\n";
+}
+
+# Print a key-value pair
+sub print_key_value {
+    my ($key, $value, $color_name) = @_;
+    $color_name //= 'green';  # Default color
+    
+    print color('yellow'), "$key: ", color($color_name), "$value", color('reset'), "\n";
+}
+
+# Check if sinfo command exists (are we on a Slurm system?)
+my @check_slurm = run_command("command -v sinfo");
+if (!@check_slurm) {
+    print color('bold red'), "Error: Slurm commands not found. Are you on a Slurm cluster?", color('reset'), "\n";
+    exit(1);
+}
+
+# Display node-specific information if requested
+if ($node_info) {
+    print_header("Current Job Information");
+    
+    # Check if we're in a Slurm job
+    if (!defined $ENV{SLURM_JOB_ID}) {
+        print color('bold red'), "Error: Not running inside a Slurm job allocation.", color('reset'), "\n";
+        print "Run this script with the --node option only within a Slurm job.\n";
+        exit(1);
+    }
+    
+    # Display job information
+    print_key_value("Job ID", $ENV{SLURM_JOB_ID});
+    print_key_value("Job Name", $ENV{SLURM_JOB_NAME}) if defined $ENV{SLURM_JOB_NAME};
+    print_key_value("Queue/Partition", $ENV{SLURM_JOB_PARTITION}) if defined $ENV{SLURM_JOB_PARTITION};
+    
+    # Get more detailed job info using scontrol
+    my @job_info = run_command("scontrol show job $ENV{SLURM_JOB_ID}");
+    
+    # Extract and display specific job details
+    my ($time_limit) = grep { /TimeLimit=/ } @job_info;
+    my ($mem_per_node) = grep { /MinMemoryNode=/ } @job_info;
+    my ($num_nodes) = grep { /NumNodes=/ } @job_info;
+    my ($num_cpus) = grep { /NumCPUs=/ } @job_info;
+    
+    if ($time_limit) {
+        $time_limit =~ s/.*TimeLimit=(\S+).*/$1/;
+        print_key_value("Time Limit", $time_limit);
+    }
+    
+    if ($mem_per_node) {
+        $mem_per_node =~ s/.*MinMemoryNode=(\S+).*/$1/;
+        print_key_value("Memory Per Node", $mem_per_node);
+    }
+    
+    if ($num_nodes) {
+        $num_nodes =~ s/.*NumNodes=(\S+).*/$1/;
+        print_key_value("Number of Nodes", $num_nodes);
+    }
+    
+    if ($num_cpus) {
+        $num_cpus =~ s/.*NumCPUs=(\S+).*/$1/;
+        print_key_value("Number of CPUs", $num_cpus);
+    }
+    
+    # Node list
+    if (defined $ENV{SLURM_JOB_NODELIST}) {
+        print_key_value("Node List", $ENV{SLURM_JOB_NODELIST});
+        
+        # Expand the node list if it's compressed
+        if ($ENV{SLURM_JOB_NODELIST} =~ /\[/) {
+            my @expanded_nodes = run_command("scontrol show hostnames $ENV{SLURM_JOB_NODELIST}");
+            print "  ", color('magenta'), join(", ", @expanded_nodes), color('reset'), "\n" if @expanded_nodes;
+        }
+    }
+    
+    # Print current working directory
+    print_key_value("Working Directory", $ENV{PWD} || `pwd`);
+}
+# Default: display general Slurm information
+else {
+    # Display Slurm version
+    print_header("Slurm Version");
+    my @version = run_command("sinfo --version");
+    print color('green'), $version[0], color('reset'), "\n" if @version;
+    
+    # Display available partitions (queues)
+    print_header("Available Partitions (Queues)");
+    my @partitions = run_command("sinfo --format=\"%20P %10l %5D %8m %11T %N\"");
+    
+    if (@partitions) {
+        # Print header with bold
+        print color('bold'), $partitions[0], color('reset'), "\n";
+        
+        # Print remaining lines
+        foreach my $i (1..$#partitions) {
+            my @parts = split(/\s+/, $partitions[$i]);
+            # Color the partition name
+            print color('yellow'), sprintf("%-20s", $parts[0]), color('reset');
+            # Print the rest
+            print join(" ", @parts[1..$#parts]), "\n";
+        }
+    }
+    
+    # Display user's current jobs
+    print_header("Your Current Jobs");
+    my @jobs = run_command("squeue --user=\$USER --format=\"%12i %20j %10P %10T %10M %10l %6D %R\"");
+    
+    if (@jobs > 1) {  # More than just the header
+        # Print header with bold
+        print color('bold'), $jobs[0], color('reset'), "\n";
+        
+        # Print jobs with colors based on state
+        foreach my $i (1..$#jobs) {
+            my @parts = split(/\s+/, $jobs[$i], 8);  # Limit to 8 parts to keep the reason as one field
+            
+            # Color job ID
+            print color('cyan'), sprintf("%-12s", $parts[0]), color('reset');
+            
+            # Color job name
+            print color('green'), sprintf("%-20s", $parts[1]), color('reset');
+            
+            # Color partition
+            print color('yellow'), sprintf("%-10s", $parts[2]), color('reset');
+            
+            # Color state based on value
+            my $state_color = 'white';
+            if ($parts[3] eq 'RUNNING') {
+                $state_color = 'green';
+            } elsif ($parts[3] eq 'PENDING') {
+                $state_color = 'yellow';
+            } elsif ($parts[3] =~ /^(FAILED|CANCELLED|TIMEOUT)$/) {
+                $state_color = 'red';
+            }
+            print color($state_color), sprintf("%-10s", $parts[3]), color('reset');
+            
+            # Print the rest
+            print join(" ", @parts[4..$#parts]), "\n";
+        }
+    } else {
+        print color('yellow'), "No active jobs found for your user.\n", color('reset');
+    }
+    
+    # Display Slurm environment variables
+    print_header("Slurm Environment Variables");
+    my $found_vars = 0;
+    
+    foreach my $key (sort keys %ENV) {
+        if ($key =~ /^SLURM_/) {
+            print_key_value($key, $ENV{$key});
+            $found_vars = 1;
+        }
+    }
+    
+    if (!$found_vars) {
+        print color('yellow'), "No SLURM_* environment variables found.\n", color('reset');
+        print "This is normal when not inside a Slurm job allocation.\n";
+    }
+    
+    # Display system-wide Slurm configuration
+    print_header("Slurm Configuration");
+    my @config = run_command("scontrol show config | grep -v '^ '");
+    
+    if (@config) {
+        # Print only key configuration items
+        my @important_configs = grep { /^(ClusterName|DefMemPerNode|MaxJobCount|SchedulerType|SelectType)/ } @config;
+        
+        foreach my $line (@important_configs) {
+            my ($key, $value) = split(/\s*=\s*/, $line, 2);
+            print_key_value($key, $value, 'magenta');
+        }
+        
+        print color('yellow'), "...\n", color('reset');
+    }
+}
+
+exit(0);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+printslurm - Utility to print info from Slurm
+
+=head1 VERSION
+
+version 0.12.0
+
+=head1 SYNOPSIS
+
+    printslurm [options]
+
+=head1 DESCRIPTION
+
+This script displays information about the Slurm environment, including queues (partitions) and Slurm environment variables. 
+When run with the C<--node> option, it displays detailed information about the current job allocation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n, --node>
+
+Display node-specific job information (when inside a Slurm job).
+
+=item B<--version>
+
+Show the version of the script.
+
+=item B<-h, --help>
+
+Show this help message and exit.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

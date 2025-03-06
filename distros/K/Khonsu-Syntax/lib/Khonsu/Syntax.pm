@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Syntax::Kamelon;
 
@@ -127,7 +127,7 @@ Khonsu::Syntax - Khonsu PDF Generation Syntax Highlighting Plugin/Component
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -179,16 +179,11 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Khonsu-Syntax>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Khonsu-Syntax>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Khonsu-Syntax>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

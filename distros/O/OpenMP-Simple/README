@@ -1,5 +1,5 @@
 This archive contains the distribution OpenMP-Simple,
-version 0.2.0:
+version 0.2.1:
 
   Wrapper around C<Alien::OpenMP> that provides helpful C MACROs and runtime functions
 

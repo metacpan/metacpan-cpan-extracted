@@ -148,7 +148,7 @@ $khonsu->add_text(
 );
 
 
-for (0..5) {
+for (0..40) {
 	$khonsu->add_page();
 	$khonsu->add_h1(
 		text => 'This is a test',

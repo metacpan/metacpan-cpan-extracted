@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use utf8; # filenames can be in utf8
 
@@ -379,7 +379,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 
 =head1 SYNOPSIS
@@ -813,6 +813,13 @@ As an example,
 Unicode filenames are supported ... I think. Please report
 any problems.
 
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<PDL::IO::Pic#wmpeg>
+
+=back
 
 =head1 AUTHOR
 

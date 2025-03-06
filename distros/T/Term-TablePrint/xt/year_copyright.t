@@ -22,8 +22,8 @@ my $diag  = '';
 for my $file ( @files ) {
     open my $fh, '<', $file or die $!;
     while ( my $line = <$fh> ) {
-        if ( $line =~ /copyright \(c\) .*$author/i ) {
-            if ( $line !~ /copyright \(c\) 20\d\d-\Q$this_year\E /i && $line !~ /copyright \(c\) \Q$this_year\E /i ) {
+        if ( $line =~ /copyright(?: \(c\))? .*$author/i ) {
+            if ( $line !~ /copyright(?: \(c\))? 20\d\d-\Q$this_year\E /i && $line !~ /copyright(?: \(c\))? \Q$this_year\E /i ) {
                 $diag .= sprintf( "%15s - line %d: %s\n", $file, $., $line );
                 $error++;
             }

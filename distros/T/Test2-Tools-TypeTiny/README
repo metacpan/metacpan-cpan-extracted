@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.90.0
+    version v0.90.1
 
 SYNOPSIS
 
@@ -23,10 +23,6 @@ SYNOPSIS
                     www123.prod.some.domain.example.com
                     llanfairpwllgwyngllgogerychwyrndrobwllllantysiliogogogoch.co.uk
                 >,
-            );
-            should_fail_initially(
-                $type,
-                qw< www ftp001 ftp001-prod3 .com domains.t x.c >,
             );
             should_fail(
                 $type,
@@ -87,6 +83,11 @@ FUNCTIONS
 
     Creates a buffered subtest that confirms the type will fail with all of
     the given @values, without using any coercions.
+
+    This function is included for completeness. However, items in
+    should_fail_initially should realistically end up in either a
+    "should_fail" block (if it always fails, even with coercions) or a
+    "should_coerce_into" block (if it would pass after coercions).
 
   should_pass
 

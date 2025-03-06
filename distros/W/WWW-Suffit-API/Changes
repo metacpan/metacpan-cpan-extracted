@@ -1,5 +1,13 @@
 # Version/Revision history
 
+1.03 Wed 05 Mar 2025 10:58:43 MSK
+    * Added description field to `/api/user/token` API methods
+
+1.02 Wed 07 Aug 2024 20:43:59 MSK
+    * Added `API` plugins
+    * Added Suffit Server API route implementations
+    * Have been modified ERROR CODES for most API methods
+
 1.01 Sat 16 Dec 2023 21:00:36 MSK
     * Added `POST /authorize` method
 

@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.28';
+		our $VERSION = '0.29';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -1338,7 +1338,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
@@ -3337,14 +3337,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mxpress-PDF>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Mxpress-PDF>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Mxpress-PDF>
 
 =item * Search CPAN
 

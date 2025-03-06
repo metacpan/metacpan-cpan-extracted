@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.144   2025-03-05
+        - Term::Choose minimum version 1.768.
+
 0.143   2024-10-28
         - Term::Choose minimum version 1.767.
         - Fixed spelling in pod.

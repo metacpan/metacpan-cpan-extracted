@@ -1,4 +1,22 @@
 # Version/Revision history
 
+1.02 Thu 06 Mar 2025 10:30:25 MSK
+    * Documentation modified
+    * Was removed `WWW::Suffit::RefUtil` from all packages of this module
+
+1.01 Fri 19 Jul 2024 13:09:19 MSK
+    * Now this module based on Acrux::DBI
+    * Added PostgreSQL supported
+    * Added CRUD Role
+    * Added AAA Rule
+    * Method `user_pure_set` renamed to `user_pset`
+    * Method `group_pure_set` renamed to `group_pset`
+    * Method `realm_pure_set` renamed to `realm_pset`
+    * Method `route_pure_set` renamed to `route_pset`
+    * Added `checksum` method to fast checksums calculate
+    * Method `authen` deprecated! See now `authn`
+    * Added AuthDB plugin
+    * Added `is_connected` method
+
 1.00 Tue 12 Dec 2023 11:09:17 MSK
     * Initial release
