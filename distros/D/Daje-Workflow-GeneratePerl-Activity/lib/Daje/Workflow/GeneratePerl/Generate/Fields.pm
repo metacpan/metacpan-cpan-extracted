@@ -39,9 +39,9 @@ sub generate($self) {
         }
         if (defined($self->select) and length($self->select) > 0) {
             my $select = $self->select();
-            $self->select($select .= ", '" . @{$column_names}[$i]->{column_name} . "'");
+            $self->select($select .= ", " . @{$column_names}[$i]->{column_name});
         } else {
-            $self->select("'" . @{$column_names}[$i]->{column_name} . "'");
+            $self->select(@{$column_names}[$i]->{column_name});
         }
     }
     $self->foreign_keys(\@keys) if @keys and scalar(@keys) > 0;

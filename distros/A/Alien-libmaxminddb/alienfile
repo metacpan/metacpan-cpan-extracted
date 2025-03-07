@@ -1,6 +1,6 @@
 use alienfile;
 use Config;
-use Path::Tiny qw(path);
+use File::Spec::Functions qw(catfile);
 
 plugin 'PkgConfig' => 'libmaxminddb';
 
@@ -12,32 +12,46 @@ share {
   patch \&patch_build;
   build [
     '%{configure} --disable-binaries --disable-tests --disable-shared',
-    '%{make}',
-    '%{make} install',
+    '%{make} man1_MANS= man3_MANS=',
+    '%{make} install man1_MANS= man3_MANS=',
   ];
 };
+
+sub edit {
+  my ($filename, $cb) = @_;
+
+  if (open my $in, '<', $filename) {
+    local $_ = do { local $/; <$in> };
+    close $in;
+    $cb->();
+    if (open my $out, '>', $filename) {
+      print {$out} $_;
+      close $out;
+    }
+  }
+}
 
 sub patch_build {
   my $build = shift;
 
   my $extract = $build->install_prop->{extract};
-  my $configure = path($extract, 'configure');
-  my $pkgconfig = path($extract, 'src', 'libmaxminddb.pc.in');
+  my $configure = catfile($extract, 'configure');
+  my $pkgconfig = catfile($extract, 'src', 'libmaxminddb.pc.in');
 
   if ($^O eq 'MSWin32') {
     eval {
-      $pkgconfig->edit(sub {
+      edit($pkgconfig, sub {
         s{-lmaxminddb\b}{-lmaxminddb -lws2_32}g;
       });
     };
   }
   elsif ($^O eq 'openbsd') {
     eval {
-      $configure->edit(sub {
+      edit($configure, sub {
         s{(-fms-extensions.*?)^(EOF)}
         {$1#ifdef __clang__\n#error unsupported\n#endif\n$2}ms;
       });
-      $configure->chmod('a+x');
+      chmod 0755, $configure;
     };
   }
 

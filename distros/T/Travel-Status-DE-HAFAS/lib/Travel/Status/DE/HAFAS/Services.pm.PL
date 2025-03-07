@@ -17,12 +17,13 @@ sub load_instance {
 	my $data = $json->decode(
 		scalar read_file("ext/transport-apis/data/${path}-hafas-mgate.json") );
 	my %ret = (
-		name      => $data->{name} =~ s{ *[(][^)]+[)]}{}r,
-		homepage  => $data->{attribution}{homepage},
-		mgate     => $data->{options}{endpoint},
-		time_zone => $data->{timezone},
-		languages => $data->{supportedLanguages},
-		request   => {
+		name       => $data->{name} =~ s{ *[(][^)]+[)]}{}r,
+		homepage   => $data->{attribution}{homepage},
+		mgate      => $data->{options}{endpoint},
+		time_zone  => $data->{timezone},
+		languages  => $data->{supportedLanguages},
+		tls_verify => $opt{tls_verify} // 1,
+		request    => {
 			client => $data->{options}{client},
 			auth   => $data->{options}{auth},
 		},
@@ -30,11 +31,6 @@ sub load_instance {
 			area    => $data->{coverage}{realtimeCoverage}{area},
 			regions => $data->{coverage}{realtimeCoverage}{region} // []
 		},
-
-		#coverage => {
-		#	area => $data->{coverage}{realtimeCoverage}{area},
-		#	regions => $data->{coverage}{realtimeCoverage}{region},
-		#}
 	);
 
 	my %bitmask_to_product;
@@ -163,7 +159,7 @@ my %hafas_instance = (
 		salt   => 'i5s7m3q9z6b4k1c2',
 		micmac => 1,
 	},
-	KVB        => { load_instance( 'de/kvb',           lang => 'deu' ), },
+	KVB        => { load_instance( 'de/kvb', lang => 'deu' ), tls_verify => 0 },
 	mobiliteit => { load_instance( 'lu/mobiliteit-lu', lang => 'deu' ) },
 	NAHSH      => {
 		load_instance('de/nahsh'),
@@ -228,7 +224,6 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
 	},
-	VRN => { load_instance( 'de/vrn', lang => 'deu' ), },
 	ZVV => { load_instance( 'ch/zvv', lang => 'deu' ), },
 );
 
@@ -247,7 +242,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.18';
+our $VERSION = '6.19';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

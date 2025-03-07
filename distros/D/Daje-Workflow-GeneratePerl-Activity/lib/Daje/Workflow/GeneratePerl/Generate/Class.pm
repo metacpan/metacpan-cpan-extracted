@@ -41,6 +41,8 @@ sub generate($self) {
     my $insert = $self->methods->insert();
     my $update = $self->methods->update();
     my $select_method = $self->methods->select_method();
+    my $select_from_index = $self->methods->select_index_method();
+
     my $date = localtime();
 
     $tpl =~ s/<<date>>/$date/ig;
@@ -56,7 +58,7 @@ sub generate($self) {
     $tpl =~ s/<<update>>/$update/ig;
 
     $tpl =~ s/<<select>>/$select_method/ig;
-    $tpl =~ s/<<methods>>//ig;
+    $tpl =~ s/<<methods>>/$select_from_index/ig;
 
     return $tpl;
 }

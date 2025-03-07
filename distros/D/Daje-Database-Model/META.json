@@ -54,7 +54,7 @@
    "provides" : {
       "Daje::Database::Model" : {
          "file" : "lib/Daje/Database/Model.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Daje::Database::Model::Companies" : {
          "file" : "lib/Daje/Database/Model/Companies.pm"
@@ -84,7 +84,8 @@
          "file" : "lib/Daje/Database/Model/Super/Workflow.pm"
       },
       "Daje::Database::Model::Users" : {
-         "file" : "lib/Daje/Database/Model/Users.pm"
+         "file" : "lib/Daje/Database/Model/Users.pm",
+         "version" : "0.01"
       },
       "Daje::Database::View::Super::VCompaniesUsers" : {
          "file" : "lib/Daje/Database/View/Super/VCompaniesUsers.pm"
@@ -114,7 +115,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Database-Model"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

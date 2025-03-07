@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.38';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.40';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -56,7 +56,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ This role defines the interface for any target which L<App::SpreadRevolutionaryD
 
 Any consuming class can parameterize this role (through L<MooseX::Role::Parameterized>) with a C<worker> type set to the effective Perl module implementing any protocol needed by this target (eg. L<App::SpreadRevolutionaryDate::BlueskyLite>, L<Twitter::API>, L<Mastodon::Client>). Then, this role provides an C<obj> required attribute with type constraint defined by the C<worker> parameter. If no C<worker> parameter is given, the C<obj> type defaults to C<Any>. Constructors of consuming classes should instanciate C<obj> (with L<Moose> C<BUILDARGS> or C<BUILD>, see L<Moose::Manual::Construction>).
 
-Any class consuming this role is required to implement a C<spread> method, which is called with two parameters: C<msg>, the message as a string to be spread, and C<test>, an optional boolean which informs this method to actually spread the message if this parameter is C<false> (that should be the default), or to just test without spreading.
+Any class consuming this role is required to implement a C<spread> method, which is called with three parameters: C<msg>, the message as a string to be spread; C<test>, an optional boolean which informs this method to actually spread the message if this parameter is C<false> (that should be the default), or to just test without spreading; and C<img>, an optional hash reference with the following keys: C<path> valued by a path to an image file, and C<alt> an alternate text for this image.
 
 If the target needs authentication, it can be carried out in the constructor (with L<Moose> C<BUILDARGS> or C<BUILD>) or in the implementation of the C<spread> method, obviously before actually spreading the message.
 
@@ -114,6 +114,8 @@ There is a L<Bluesky|https://metacpan.org/pod/Bluesky> Perl module on CPAN that 
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
 =back
 
 =head1 AUTHOR
@@ -122,7 +124,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
 This is free software, licensed under:
 

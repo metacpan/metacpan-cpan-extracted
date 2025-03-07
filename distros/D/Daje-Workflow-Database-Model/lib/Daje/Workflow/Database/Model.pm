@@ -67,7 +67,7 @@ use Daje::Workflow::Database::Model::History;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 has 'db';               # Constructor
 has 'workflow_pkey';    # Constructor

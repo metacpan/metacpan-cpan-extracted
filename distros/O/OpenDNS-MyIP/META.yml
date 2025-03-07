@@ -4,24 +4,27 @@ author:
   - 'Petr Kletecka <pek@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: OpenDNS-MyIP
 requires:
-  AutoLoader: 0
-  Carp: 0
-  Exporter: 0
-  Net::DNS: 0
-  perl: 5.006
-  strict: 0
-  vars: 0
-  warnings: 0
+  AutoLoader: '0'
+  Carp: '0'
+  Exporter: '0'
+  Net::DNS: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/petrkle/opendns-myip/issues
   repository: git://github.com/petrkle/opendns-myip.git
-version: 1.152350
+version: '1.250650'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

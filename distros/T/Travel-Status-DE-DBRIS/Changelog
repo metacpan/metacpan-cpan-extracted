@@ -1,3 +1,9 @@
+Travel::Status::DE::DBRIS 0.06 - sat Mar 01 2025
+
+    * DBRIS: Fix new_p constructor
+    * JourneyAtStop->via: return list, not arrayref
+    * dbris-m: support raw station IDs as input
+
 Travel::Status::DE::DBRIS 0.05 - Mon Feb 03 2025
 
     * Journey, Location: Add missing conversions to TO_JSON

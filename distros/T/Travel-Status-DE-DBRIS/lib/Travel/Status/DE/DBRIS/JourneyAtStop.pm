@@ -6,10 +6,10 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Travel::Status::DE::DBRIS::JourneyAtStop->mk_ro_accessors(
-	qw(type dep sched_dep rt_dep delay is_cancelled line stop_eva id platform rt_platform destination via via_last
+	qw(type dep sched_dep rt_dep delay is_cancelled line stop_eva id platform rt_platform destination via_last
 	  train_short train_mid train_long train maybe_train_no maybe_line_no
 	)
 );
@@ -35,6 +35,10 @@ sub new {
 		via         => $json->{ueber},
 		via_last    => ( $json->{ueber} // [] )->[-1],
 	};
+
+	if ( $ref->{via} and @{ $ref->{via} } ) {
+		shift( @{ $ref->{via} } );
+	}
 
 	$ref->{maybe_train_no} = $ref->{train}     =~ s{^.* ++}{}r;
 	$ref->{maybe_line_no}  = $ref->{train_mid} =~ s{^.* ++}{}r;
@@ -68,6 +72,12 @@ sub messages {
 	my ($self) = @_;
 
 	return @{ $self->{messages} // [] };
+}
+
+sub via {
+	my ($self) = @_;
+
+	return @{ $self->{via} // [] };
 }
 
 sub TO_JSON {

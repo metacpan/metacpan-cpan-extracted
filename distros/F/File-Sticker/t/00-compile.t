@@ -6,25 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'File/Sticker.pm',
     'File/Sticker/Database.pm',
-    'File/Sticker/Reader.pm',
-    'File/Sticker/Reader/Exif.pm',
-    'File/Sticker/Reader/Gif.pm',
-    'File/Sticker/Reader/Mp3.pm',
-    'File/Sticker/Reader/Xattr.pm',
-    'File/Sticker/Reader/Yaml.pm',
-    'File/Sticker/Reader/YamlPrefix.pm',
-    'File/Sticker/Writer.pm',
-    'File/Sticker/Writer/Exif.pm',
-    'File/Sticker/Writer/Gif.pm',
-    'File/Sticker/Writer/Mp3.pm',
-    'File/Sticker/Writer/Xattr.pm',
-    'File/Sticker/Writer/Yaml.pm',
-    'File/Sticker/Writer/YamlPrefix.pm'
+    'File/Sticker/Scribe.pm',
+    'File/Sticker/Scribe/Exif.pm',
+    'File/Sticker/Scribe/Gif.pm',
+    'File/Sticker/Scribe/Mp3.pm',
+    'File/Sticker/Scribe/Xattr.pm',
+    'File/Sticker/Scribe/Yaml.pm',
+    'File/Sticker/Scribe/YamlPrefix.pm'
 );
 
 my @scripts = (

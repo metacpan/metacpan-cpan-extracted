@@ -59,6 +59,8 @@ sub _detect_cmd {
 
     if (! defined $cmd || $cmd eq 'auto') {
         return first { find_command($_) } @{$default};
+    } elsif ($cmd eq 'none') {
+        return;
     } else {
         return find_command($cmd);
     }
@@ -87,7 +89,9 @@ sub has_backend_cmd {
 sub has_verify_cmd {
     my $self = shift;
 
-    return defined $self->{cmd};
+    return 1 if @{$self->DEFAULT_CMDV()} && defined $self->{cmdv};
+    return 1 if defined $self->{cmd};
+    return 0;
 }
 
 sub has_keystore {

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -15,11 +15,18 @@ use 5.014;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Spread date and time from Revolutionary (Republican) Calendar on Bluesky, Twitter, Mastodon, Freenode and Liberachat.",
   "AUTHOR" => "G\x{e9}rald S\x{e9}drati <gibus\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "App-SpreadRevolutionaryDate",
   "EXE_FILES" => [
@@ -35,8 +42,11 @@ my %WriteMakefileArgs = (
     "DateTime" => 0,
     "DateTime::Calendar::FrenchRevolutionary" => 0,
     "Encode" => 0,
+    "File::Basename" => 0,
     "File::HomeDir" => 0,
+    "File::ShareDir" => 0,
     "File::Spec" => 0,
+    "File::Type" => 0,
     "Getopt::Long" => 0,
     "IO::Handle" => 0,
     "IO::Prompt::Hooked" => 0,
@@ -71,7 +81,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.38",
+  "VERSION" => "0.40",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -85,10 +95,13 @@ my %FallbackPrereqs = (
   "DateTime" => 0,
   "DateTime::Calendar::FrenchRevolutionary" => 0,
   "Encode" => 0,
+  "File::Basename" => 0,
   "File::Find" => 0,
   "File::HomeDir" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "File::Type" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
@@ -131,3 +144,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

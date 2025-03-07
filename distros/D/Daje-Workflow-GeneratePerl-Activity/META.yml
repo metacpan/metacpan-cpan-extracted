@@ -29,7 +29,7 @@ provides:
     version: '0.01'
   Daje::Workflow::GeneratePerl::Activity:
     file: lib/Daje/Workflow/GeneratePerl/Activity.pm
-    version: '0.11'
+    version: '0.12'
   Daje::Workflow::GeneratePerl::Base::Common:
     file: lib/Daje/Workflow/GeneratePerl/Base/Common.pm
   Daje::Workflow::GeneratePerl::Generate::BaseClass:
@@ -56,6 +56,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity
   repository: https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

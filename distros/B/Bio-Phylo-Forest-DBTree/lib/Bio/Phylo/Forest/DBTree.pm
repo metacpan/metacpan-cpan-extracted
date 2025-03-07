@@ -12,7 +12,7 @@ __PACKAGE__->load_namespaces;
 my $SINGLETON;
 my $DBH;
 my $fac = Bio::Phylo::Factory->new;
-use version 0.77; our $VERSION = qv("v0.1.2");
+use version 0.77; our $VERSION = qv("v0.2.0");
 
 =head1 NAME
 

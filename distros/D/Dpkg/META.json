@@ -384,7 +384,7 @@
       },
       "Dpkg::Substvars" : {
          "file" : "lib/Dpkg/Substvars.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Dpkg::Vendor" : {
          "file" : "lib/Dpkg/Vendor.pm",
@@ -429,6 +429,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.22.13",
+   "version" : "v1.22.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -27,6 +27,7 @@ lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/Telechat.pm
 lib/App/SpreadRevolutionaryDate/Target.pm
 lib/App/SpreadRevolutionaryDate/Target/Bluesky.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
@@ -40,6 +41,7 @@ lib/LocaleData/en/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/es/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/fr/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/it/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
+share/images/groucha.png
 t/00-compile.t
 t/bluesky.t
 t/command_line.t
@@ -49,6 +51,7 @@ t/mastodon.t
 t/new_target.t
 t/objects.t
 t/promptuser.t
+t/telechat.t
 t/twitter.t
 t/wikipedia.t
 xt/authentication.t

@@ -10,7 +10,7 @@ App::Greple::stripe - Greple 지브라 스트라이프 모듈
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,15 @@ L<App::Greple::stripe>는 일치하는 텍스트를 지브라 스트라이프 �
 
 B<스트라이프> 모듈에 특정한 옵션이 있습니다. 모듈을 선언할 때 지정하거나 모듈 선언 뒤에 C<-->로 끝나는 옵션으로 지정할 수 있습니다.
 
-다음 두 명령은 정확히 같은 효과를 냅니다.
+다음 세 가지 명령은 완전히 동일한 효과를 냅니다.
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+현재로서는 이전 버전과의 호환성을 위해 C<set> 함수를 C<config> 대신 사용할 수 있다는 점에 유의하세요.
 
 =over 7
 
@@ -101,6 +105,8 @@ B<스트라이프> 모듈에 특정한 옵션이 있습니다. 모듈을 선언�
 L<App::Greple>
 
 L<App::Greple::xlate>
+
+L<Getopt::EX::Config>
 
 =head1 AUTHOR
 

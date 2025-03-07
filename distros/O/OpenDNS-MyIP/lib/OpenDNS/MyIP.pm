@@ -1,6 +1,6 @@
 package OpenDNS::MyIP;
 # ABSTRACT: Get your public IP address
-$OpenDNS::MyIP::VERSION = '1.152350';
+$OpenDNS::MyIP::VERSION = '1.250650';
 use 5.006;
 use strict;
 use warnings;
@@ -17,22 +17,22 @@ our @ISA = qw(Exporter AutoLoader);
 our @EXPORT = qw(get_ip);
 
 sub get_ip{
-	my $resolver = new Net::DNS::Resolver(
-			nameservers => [ '208.67.220.220', '208.67.222.222' ],
-			recurse     => 0,
-			debug       => 0
-			);
+  my $resolver = new Net::DNS::Resolver(
+      nameservers => [ '208.67.220.220', '208.67.222.222' ],
+      recurse     => 0,
+      debug       => 0
+      );
 
-	my $query = $resolver->query( 'myip.opendns.com' );
+  my $query = $resolver->query( 'myip.opendns.com' );
 
-	if ($query) {
-		foreach my $rr ($query->answer) {
-			next unless $rr->type eq "A";
-			return $rr->rdatastr;
-		}
-	} else {
-		confess($resolver->errorstring);
-	}
+  if ($query) {
+    foreach my $rr ($query->answer) {
+      next unless $rr->type eq "A";
+      return $rr->rdstring();
+    }
+  } else {
+    confess($resolver->errorstring);
+  }
 }
 
 1;
@@ -47,13 +47,13 @@ OpenDNS::MyIP - Get your public IP address
 
 =head1 VERSION
 
-version 1.152350
+version 1.250650
 
 =head1 SYNOPSIS
 
-	use OpenDNS::MyIP qw(get_ip);
-	
-	my $ip = get_ip(); # 12.34.56.78
+  use OpenDNS::MyIP qw(get_ip);
+
+  my $ip = get_ip(); # 12.34.56.78
 
 =head1 METHODS
 
@@ -79,7 +79,7 @@ Petr Kletecka <pek@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Petr Kletecka.
+This software is copyright (c) 2015, 2025 by Petr Kletecka.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,5 @@
 bin/create_db.PL
+bin/extract
 bin/ml_from_cache
 Changes
 lib/Genealogy/ObituaryDailyTimes.pm

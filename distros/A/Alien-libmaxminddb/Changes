@@ -1,5 +1,14 @@
 Revision history for Alien::libmaxminddb
 
+1.018  2025-03-07 06:27:17 CET
+
+  - Don't modify files with Path::Tiny.  GitHub's Windows runner images
+    suffer from file locking issues, which are exposed by Path::Tiny.
+
+1.017  2025-03-06 17:43:56 CET
+
+  - Don't build and install the manual pages
+
 1.016  2025-01-10 19:14:08 CET
 
   - Download libmaxminddb version 1.12.2

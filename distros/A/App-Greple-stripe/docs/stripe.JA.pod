@@ -10,7 +10,7 @@ App::Greple::stripe - Greple ゼブラストライプモジュール
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,15 @@ stripeモジュールを使うと、同じパターンにマッチしたブロ�
 
 B<stripe>モジュール特有のオプションがあります。これらはモジュール宣言時に指定するか、モジュール宣言の後にC<-->で終わるオプションとして指定します。
 
-次の2つのコマンドは全く同じ効果を持ちます。
+以下の3つのコマンドは全く同じ効果をもたらします。
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+なお、現時点では下位互換性のためにC<config>の代わりにC<set>関数を使うことができます。
 
 =over 7
 
@@ -101,6 +105,8 @@ B<stripe>モジュール特有のオプションがあります。これらは�
 L<App::Greple>
 
 L<App::Greple::xlate>
+
+L<Getopt::EX::Config>
 
 =head1 AUTHOR
 

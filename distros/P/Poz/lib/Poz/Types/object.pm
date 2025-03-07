@@ -34,6 +34,18 @@ sub is {
     return $self;
 }
 
+sub constructor {
+    my ($self) = @_;
+    my $caller_class = caller();
+    no strict 'refs';
+    *{"$caller_class\::new"} = sub {
+        my ($class, %args) = @_;
+        return $self
+            ->as($caller_class)
+            ->parse({%args});
+    }
+}
+
 sub parse {
     my ($self, $data) = @_;
     my ($valid, $errors) = $self->safe_parse($data);
@@ -148,6 +160,21 @@ Poz::Types::object - A module for handling structured data with type validation
     my $parsed_data = $another_object->parse($other); # isa Another::Class
     my $someone_else = $another_object->parse($someone); # throws an exception, because not an instance of Another::Class
 
+    # or use Poz as your class constructor
+    {
+        package My::Class;
+        use Poz qw/z/;
+        z->object({
+            name => z->string,
+            age => z->number,
+        })->constructor;
+    }
+    my $instance = My::Class->new(
+        name => 'Alice',
+        age => 20,
+    );
+
+
 =head1 DESCRIPTION
 
 Poz::Types::object is a module for handling structured data with type validation. It allows you to define a structure with specific types and validate data against this structure.
@@ -165,6 +192,12 @@ Sets the class name to bless the parsed data into. The C<$typename> parameter sh
     $object->is($typename);
 
 Validates that the parsed data is an instance of the given class. The C<$typename> parameter should be a string representing the class name.
+
+=head2 constructor
+
+    $object->constructor;
+
+Creates a constructor method into your class.
 
 =head2 parse
 

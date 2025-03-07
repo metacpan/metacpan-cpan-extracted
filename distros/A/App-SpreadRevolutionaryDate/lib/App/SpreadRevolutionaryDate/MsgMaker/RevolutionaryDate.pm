@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.38';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.40';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with revolutionary date
 
 use Moose;
@@ -75,7 +75,7 @@ sub compute {
     $msg .= ' https://' . $self->locale . '.wikipedia.org/wiki/' . uri_escape_utf8($entry);
   }
 
-  return $msg
+  return ($msg, undef);
 }
 
 
@@ -101,7 +101,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate - MsgMaker class for L
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 METHODS
 
@@ -153,6 +153,8 @@ Computes revolutionary date. Takes no argument. Returns message as string, ready
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
 =back
 
 =head1 AUTHOR
@@ -161,7 +163,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
 This is free software, licensed under:
 

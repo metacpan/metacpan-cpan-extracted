@@ -9,7 +9,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -83,11 +83,16 @@ There are options specific to the **stripe** module.  They can be
 specified either at the time of module declaration or as options
 following the module declaration and ending with `--`.
 
-The following two commands have exactly the same effect.
+The following three commands have exactly the same effect.
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+Note that, `set` function can be used instead of `config` for
+backward compatibility, at this point.
 
 - **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
@@ -122,6 +127,8 @@ The following two commands have exactly the same effect.
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+[Getopt::EX::Config](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AConfig)
 
 # AUTHOR
 

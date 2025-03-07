@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -21,13 +21,13 @@ unless(   -f File::HomeDir->my_home . '/.config/spread-revolutionary-date/spread
 
 use App::SpreadRevolutionaryDate;
 
-@ARGV = ('--test', '--twitter_api=1');
+@ARGV = ('--test', '--twitter_api=1', '--targets=mastodon', '--targets=bluesky', '--targets=twitter');
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new;
+
+eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
+ok(!$@, 'Mastodon connection with actual credentials in user conf');
 
 ok($spread_revolutionary_date->targets->{bluesky}->obj->{did}, 'Bluesky connection with actual credentials in user conf');
 
 eval { $spread_revolutionary_date->targets->{twitter}->obj->verify_credentials };
 ok(!$@, 'Twitter connection with actual credentials in user conf');
-
-eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
-ok(!$@, 'Mastodon connection with actual credentials in user conf');

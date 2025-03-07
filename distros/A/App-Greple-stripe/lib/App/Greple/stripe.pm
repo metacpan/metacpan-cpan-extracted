@@ -3,7 +3,7 @@ package App::Greple::stripe;
 use 5.024;
 use warnings;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 =encoding utf-8
 
@@ -17,7 +17,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -81,11 +81,16 @@ There are options specific to the B<stripe> module.  They can be
 specified either at the time of module declaration or as options
 following the module declaration and ending with C<-->.
 
-The following two commands have exactly the same effect.
+The following three commands have exactly the same effect.
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+Note that, C<set> function can be used instead of C<config> for
+backward compatibility, at this point.
 
 =over 7
 
@@ -123,6 +128,8 @@ L<App::Greple>
 
 L<App::Greple::xlate>
 
+L<Getopt::EX::Config>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -142,23 +149,19 @@ use Scalar::Util;
 *is_number = \&Scalar::Util::looks_like_number;
 use Data::Dumper;
 
-use Getopt::EX::Config;
-
+use Getopt::EX::Config qw(config set);
 my $config = Getopt::EX::Config->new(
     step     => 2,
     darkmode => undef,
 );
 lock_keys %{$config};
 
-# for backward compatibility
-sub set { config @_ }
-
 my %series = (
     light => [
 	[ qw(/544 /533) ],
 	[ qw(/454 /353) ],
 	[ qw(/445 /335) ],
-	[ qw(/554 /553) ],
+	[ qw(/455 /355) ],
 	[ qw(/545 /535) ],
 	[ qw(/554 /553) ],
     ],
@@ -174,15 +177,15 @@ my %series = (
 
 sub finalize {
     our($mod, $argv) = @_;
-    $config->deal_with(
+    Getopt::EX::Config->deal_with(
 	$argv,
-	map "$_:1", keys %{$config},
+	map("$_:1", keys %{$config}),
     );
     my @default = qw(--stripe-postgrep);
     my @cm = qw(@);
-    my $map = $config->{darkmode} ? $series{dark} : $series{light};
+    my $map = config('darkmode') ? $series{dark} : $series{light};
     for my $i (0, 1) {
-	for my $s (0 .. $config->{step} - 1) {
+	for my $s (0 .. config('step') - 1) {
 	    push @cm, $map->[$s % @$map]->[$i];
 	}
     }
@@ -195,7 +198,7 @@ sub finalize {
 #
 sub stripe {
     my $grep = shift;
-    my $step = $config->{step};
+    my $step = config('step');
     if ($step == 0) {
 	$step = _max_index($grep) + 1;
     }
@@ -216,6 +219,7 @@ sub _max_index {
 	my($b, @match) = @$r;
 	$max = max($max, map($_->[2], @match));
     }
+    return $max;
 }
 
 1;

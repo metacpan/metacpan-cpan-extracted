@@ -44,7 +44,20 @@ Poz - A simple, composable, and extensible data validation library for Perl.
     my $book1 = $bookSchema->parse({title => "Perl Best Practices", author => "Damian Conway", published => "2005-07-01"});
     my $book2 = $bookSchema->parse({title => "Spidering Hacks", author => "Kevin Hemenway", published => "2003-10-01"});
     my $bookArray = $bookArraySchema->parse([$book1, $book2]);
-    
+
+    # or use Poz as class builder    
+    {
+        package My::Class;
+        use Poz qw/z/;
+        z->object({
+            name => z->string,
+            age => z->number,
+        })->constructor;
+    }
+    my $instance = My::Class->new(
+        name => 'Alice',
+        age => 20,
+    ); # bless({name => 'Alice', age => 20}, 'My::Class');
     
 
 # DESCRIPTION
@@ -98,6 +111,17 @@ Creates a new date schema object.
     my $schema = z->object($schema);
 
 Creates a new object schema object.
+
+## z->object(...)->constructor
+
+    package My::Class;
+    use Poz qw/z/;
+    z->object({
+        name => z->string,
+        age => z->number,
+    })->constructor;
+
+Creates a constructor method with Poz validation in your class.
 
 ## z->array
 

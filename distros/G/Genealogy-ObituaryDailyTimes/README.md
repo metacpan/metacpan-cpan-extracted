@@ -12,7 +12,7 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
-Version 0.13
+Version 0.15
 
 # SYNOPSIS
 
@@ -26,18 +26,33 @@ Version 0.13
 
 Creates a Genealogy::ObituaryDailyTimes object.
 
-Takes two optional arguments:
-	directory: that is the directory containing obituaries.sql
-	logger: an object to send log messages to
+    my $obits = Genealogy::ObituaryDailyTimes->new();
+
+Accepts the following optional arguments:
+
+- `cache` - Passed to [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
+- `directory` - The directory containing the file obituaries.sql
+- `logger` - Passed to [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
 
 ## search
 
-    my $obits = Genealogy::ObituaryDailyTimes->new();
+Searches the database.
 
     # Returns an array of hashrefs
     my @smiths = $obits->search(last => 'Smith');       # You must at least define the last name to search for
 
     print $smiths[0]->{'first'}, "\n";
+
+Supports two return modes:
+
+- `List context`
+
+    Returns an array of hash references.
+
+- `Scalar context`
+
+    Returns a single hash reference,
+    or `undef` if there is no match.
 
 # AUTHOR
 
@@ -46,14 +61,31 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 # BUGS
 
 Ancestry has removed the archives.
-The first 17 pages are on Wayback machine, but the rest is lost.
+The first 18 pages are on Wayback machine, but the rest is lost.
 
 # SEE ALSO
 
-The Obituary Daily Times, [https://sites.rootsweb.com/~obituary/](https://sites.rootsweb.com/~obituary/),
-Archived Rootsweb data, [https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit](https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit),
-Recent data [https://www.freelists.org/list/obitdailytimes](https://www.freelists.org/list/obitdailytimes),
-Older data [https://obituaries.rootsweb.com/obits/searchObits](https://obituaries.rootsweb.com/obits/searchObits).
+[Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
+
+- The Obituary Daily Times
+
+    [https://sites.rootsweb.com/~obituary/](https://sites.rootsweb.com/~obituary/)
+
+- Archived Rootsweb data
+
+    [https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit](https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit)
+
+- Funeral Notices
+
+    [https://www.funeral-notices.co.uk](https://www.funeral-notices.co.uk)
+
+- Recent data
+
+    [https://www.freelists.org/list/obitdailytimes](https://www.freelists.org/list/obitdailytimes)
+
+- Older data
+
+    [https://obituaries.rootsweb.com/obits/searchObits](https://obituaries.rootsweb.com/obits/searchObits)
 
 # SUPPORT
 
@@ -81,6 +113,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020-2024 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

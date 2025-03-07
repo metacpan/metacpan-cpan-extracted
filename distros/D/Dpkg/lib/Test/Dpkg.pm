@@ -47,7 +47,6 @@ our @EXPORT_OK = qw(
     test_needs_openpgp_backend
     test_needs_srcdir_switch
     test_neutralize_checksums
-    test_get_openpgp_backend
 );
 our %EXPORT_TAGS = (
     needs => [ qw(
@@ -198,47 +197,91 @@ sub test_needs_command
     }
 }
 
-my %openpgp_command = (
-    'gpg-sq' => {
+my @openpgp_backends = (
+    {
         backend => 'gpg',
+        cmd => 'gpg-sq',
+        cmdv => 'gpgv-sq',
     },
-    'gpg' => {
+    {
         backend => 'gpg',
+        cmd => 'gpg',
+        cmdv => 'gpgv',
     },
-    'sq' => {
+    {
         backend => 'sq',
+        cmd => 'sq',
+        cmdv => 'none',
     },
-    'sqop' => {
+    {
         backend => 'sop',
+        cmd => 'sop',
+        cmdv => 'sopv',
     },
-    'rsop' => {
+    {
         backend => 'sop',
+        cmd => 'sqop',
+        cmdv => 'sqopv',
     },
-    'gosop' => {
+    {
         backend => 'sop',
+        cmd => 'rsop',
+        cmdv => 'rsopv',
     },
-    'pgpainless-cli' => {
+    {
         backend => 'sop',
+        cmd => 'gosop',
+    },
+    {
+        backend => 'sop',
+        cmd => 'pgpainless-cli',
     },
 );
 
 sub test_needs_openpgp_backend
 {
-    my @cmds = sort keys %openpgp_command;
-    my @have_cmds = grep { can_run($_) } @cmds;
-    if (@have_cmds == 0) {
+    my @have_backends;
+    foreach my $backend (@openpgp_backends) {
+        my $name = $backend->{backend};
+        my $cmd = $backend->{cmd};
+        my $cmdv = $backend->{cmdv};
+
+        my $have_cmd = $cmd eq 'none' ? 0 : can_run($cmd);
+        my $have_cmdv = $cmdv // q() eq 'none' ? 0 : can_run($cmdv);
+
+        next unless ($have_cmd || $have_cmdv);
+
+        my $have_backend = {
+            backend => $name,
+        };
+        $have_backend->{cmd} = $cmd if $have_cmd;
+        $have_backend->{cmdv} = $cmdv if $have_cmdv;
+
+        push @have_backends, $have_backend;
+
+        if ($have_cmd && $have_cmdv) {
+            push @have_backends, {
+                backend => $name,
+                cmd => $cmd,
+                cmdv => 'none',
+            };
+            push @have_backends, {
+                backend => $name,
+                cmd => 'none',
+                cmdv => $cmdv,
+            };
+        }
+    }
+    if (@have_backends == 0) {
+        my @cmds = grep {
+            $_ ne 'none'
+        } map {
+            ( $_->{cmd}, $_->{cmdv} )
+        } @openpgp_backends;
         plan skip_all => "requires >= 1 openpgp command: @cmds";
     }
 
-    return @have_cmds;
-}
-
-sub test_get_openpgp_backend
-{
-    my $cmd = shift;
-
-    return 'auto' if $cmd eq 'auto';
-    return $openpgp_command{$cmd}{backend};
+    return @have_backends;
 }
 
 sub test_needs_srcdir_switch

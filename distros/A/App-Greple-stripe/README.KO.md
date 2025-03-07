@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 지브라 스트라이프 모듈
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -70,11 +70,15 @@ Version 1.01
 
 **스트라이프** 모듈에 특정한 옵션이 있습니다. 모듈을 선언할 때 지정하거나 모듈 선언 뒤에 `--`로 끝나는 옵션으로 지정할 수 있습니다.
 
-다음 두 명령은 정확히 같은 효과를 냅니다.
+다음 세 가지 명령은 완전히 동일한 효과를 냅니다.
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+현재로서는 이전 버전과의 호환성을 위해 `set` 함수를 `config` 대신 사용할 수 있다는 점에 유의하세요.
 
 - **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
@@ -107,6 +111,8 @@ Version 1.01
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+[Getopt::EX::Config](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AConfig)
 
 # AUTHOR
 

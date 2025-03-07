@@ -5,6 +5,7 @@ README.md
 cpanfile
 lib/Daje/Workflow.pm
 lib/Daje/Workflow/Activities.pm
+lib/Daje/Workflow/Activities/Closed.pm
 lib/Daje/Workflow/Checks.pm
 lib/Daje/Workflow/Checks/Mandatory.pm
 lib/Daje/Workflow/Create/State.pm

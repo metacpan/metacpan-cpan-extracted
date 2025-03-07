@@ -35,6 +35,11 @@ my $events = intercept {
         should_pass($type, @pass_list);
         should_fail($type, @fail_list);
 
+        should_sort_into(
+            $type,
+            [qw< aaa bbb qqq rrr sss ttt >],
+        );
+
         # Intentional failures
         should_pass($type, @fail_list);   # XXX: exact line number captured in tests below
         should_fail($type, @pass_list);
@@ -137,7 +142,7 @@ subtest_buffered 'Failed StrMatch subtest' => sub {
 
     is(
         [ map { $_->effective_pass } @strmatch_subtest_events ],
-        [qw< 1 1 1 1 0 0 >],
+        [qw< 1 1 1 1 1 0 0 >],
         'StrMatch pass/fail order is correct',
     );
 
@@ -149,7 +154,7 @@ subtest_buffered 'Failed StrMatch subtest' => sub {
         @{ $failed_strmatch_subtest->subevents }
     );
 
-    like $strmatch_diags, qr<at t/str-test.t line 39>,             'Failed test includes line numbers';
+    like $strmatch_diags, qr<at t/str-test.t line 44>,             'Failed test includes line numbers';
     like $strmatch_diags, qr<StrMatch\[.+\] constraint map:>,      'Failed test includes constraint map diag';
     like $strmatch_diags, qr<is defined as:>,                      'Constraint map diag includes type definitions';
     like $strmatch_diags, qr{\QStr->check("xyz km") ==> PASSED\E}, 'Constraint map diag passed Str check';
@@ -178,7 +183,7 @@ subtest_buffered 'Failed Enum subtest' => sub {
         @enum_subtest_events
     );
 
-    like $enum_diags, qr<at t/str-test.t line 83>,             'Failed test includes line numbers';
+    like $enum_diags, qr<at t/str-test.t line 88>,             'Failed test includes line numbers';
     like $enum_diags, qr<Enum\[.+\] constraint map:>,          'Failed test includes constraint map diag';
     like $enum_diags, qr<is defined as:>,                      'Constraint map diag includes type definitions';
     like $enum_diags, qr{\QStr->check("XYZ") ==> PASSED\E},    'Constraint map diag passed Str check';

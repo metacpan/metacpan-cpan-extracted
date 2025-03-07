@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.38';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.40';
 # ABSTRACT: Subclass overloading L<DateTime::Calendar::FrenchRevolutionary> to allow language extension
 
 use Moose;
@@ -70,7 +70,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar - Subclass o
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 METHODS
 
@@ -122,6 +122,8 @@ Overloads L<DateTime::Calendar::FrenchRevolutionary> to allow setting locale, ex
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
 =back
 
 =head1 AUTHOR
@@ -130,7 +132,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
 This is free software, licensed under:
 

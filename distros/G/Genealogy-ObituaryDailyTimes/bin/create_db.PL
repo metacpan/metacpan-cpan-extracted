@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
-# Create SQLite3 from https://sites.rootsweb.com/~obituary/ and
-#	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit
+# Create SQLite3 from https://sites.rootsweb.com/~obituary/,
+#	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit and
+#	https://www.funeral-notices.co.uk
 #
 # -f:	force a build, otherwise it won't build on CPAN smokers or if the
 #	database is less than a day old
@@ -10,6 +11,8 @@
 
 use strict;
 use warnings;
+
+# use Data::Dumper;
 use DBI;
 # use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::HomeDir;
@@ -99,7 +102,38 @@ $dbh->do('CREATE TABLE obituaries(first VARCHAR NOT NULL, middle VARCHAR, last V
 
 my @queue;
 
+# Entries on funeral-notices.co.uk
+
+my %notices;
+my $url = 'https://www.nigelhorne.com/downloads/obt.txt';
+my $response = $ua->get($url);
+my $data;
+if($response->is_success()) {
+	$data = $response->decoded_content();
+} else {
+	die "$url: ", $response->status_line();
+}
+
+# Parse the downloaded file
+$data =~ s/\r//g;
+foreach my $line (split/^/ms, $data) {
+	chomp $line;
+	if($line =~ /^'(.+)' => (\d+),$/) {
+		$notices{$1} = $2;
+	} else {
+		die "$url: can't parse $line";
+	}
+}
+
+while(my($last, $page) = each %notices) {
+	funeral_notices($last, $page);
+}
+
+# use Data::Dumper;
+# die Data::Dumper->new([\@queue])->Dump();
+
 data();
+flush($dbh);
 
 if($ENV{'MLARCHIVE_DIR'} || $ENV{'MLARCHIVEDIR'}) {
 	if(mlarchives($ua, 'other')) {
@@ -191,7 +225,8 @@ sub data
 		$parser->parse($_);
 		my ($first, $middle, $last, $maiden, $age, $place, $date, $url) = $parser->fields();
 		# printf "%-70s\r", $url;
-		queue($first, normalise_name($last), $maiden, $age, $place, $date, $url, 'L', $url);
+		# $first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page;
+		queue($first, normalise_name($last), $maiden, $age, $place, $date, 'L', 'L', $url);
 	}
 }
 
@@ -326,7 +361,6 @@ sub mlarchives($$) {
 
 		next if((!defined($tag)) || ($tag eq ''));
 
-		# use Data::Dumper;
 		# print __LINE__, ": $page: '$line' ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		next unless(defined($name));
 		my ($last, $first) = split(',\s', $name);
@@ -459,9 +493,84 @@ sub freelists($$) {
 	return 1;
 }
 
+# Entries on funeral-notices.co.uk
+sub funeral_notices
+{
+	my($last, $page) = @_;
+
+	# URL of the page to scrape
+	my $url = "https://funeral-notices.co.uk/notice/$last/$page";
+
+	my $real_last = $last;	# For scrape searching
+
+	# Fetch the webpage
+	my $response = $ua->get($url);
+	die "Failed to fetch the webpage: ", $response->status_line unless $response->is_success;
+	my $content = $response->decoded_content();
+
+	my $maiden;
+	if($last =~ /(.+)\+(.+)/) {
+		$last = $1;
+		$real_last = $last;
+		$maiden = normalise_name($2);
+		# print "$1 <=> $2 ($maiden/$last)\n";
+		if($maiden eq 'Dr') {
+			undef $maiden;
+		} elsif($last eq 'mc') {
+			$last = "Mc$maiden";
+			$real_last = "MC $maiden";
+			undef $maiden;
+		}
+		# print "$last\n";
+	}
+	if($content =~ /"Click here to view the tribute page for (.+?) $real_last.*?"/is) {
+		my $first = $1;
+		my ($place, $age, $newspaper, $date);
+		if($content =~ /aged (\d+) years/is) {
+			$age = $1;
+		} elsif($content =~ /aged (\d+)[\.\s]/is) {
+			$age = $1;
+		} elsif($content =~ /data-age="(\d+)"/is) {
+			$age = $1;
+		} else {
+			warn "Can't find age in $url";
+		}
+		if(($content =~ /passed away at (.+?)\s+on\s+\d/is) && ($1 ne 'home')) {
+			$place = $1;
+		} elsif($content =~ /<h2>(.+)<span><span class="age_container">/is) {
+			$place = $1;
+		} else {
+			die "Can't find location in $url";
+		}
+		$place .= ', United Kingdom';
+		if($content =~ /published in:<\/span> (.+)<\/h2>/is) {
+			if($1 =~ /funeral-notices.co.uk\./) {
+				$newspaper = $url;
+			} else {
+				$newspaper = $1;
+			}
+		} else {
+			die "Can't find publisher in $url";
+		}
+		$newspaper =~ s/\.$//;
+		if($content =~ /Published: <\/span><span>([\d\/]+)/s) {
+			$date = $1;
+		} else {
+			die "Can't find date in $url";
+		}
+		$last = normalise_name($last);
+		queue($first, $last, $maiden, $age, $place, $date, $newspaper, 'L', $url) if($last =~ /^[A-Z]/);
+		# print Data::Dumper->new([\@queue])->Dump();
+	} else {
+		die "Can't parse $url";
+	}
+}
+
 sub queue($$$$$$$$$)
 {
 	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page) = @_;
+
+	# print Data::Dumper->new([\@_])->Dump();
 
 	# Ensure source is valid and date is defined and starts with a digit
 	die $source unless $source =~ /^[MFL]$/;
@@ -551,7 +660,7 @@ sub flush($)
 		my %columns = %{$row};
 
 		if($columns{'first'}) {
-			if($columns{'first'} =~ /(.+)\s(.+)/) {
+			if($columns{'first'} =~ /(.+)\s+(.+)/) {
 				# Has a middle name
 				$query .= "'$1','$2',";
 			} else {
@@ -582,7 +691,8 @@ sub flush($)
 			$query .= 'NULL,';
 		}
 		my $source = $columns{'source'};
-		die $source if($source !~ /M|F|L/);
+		# Ensure source is valid
+		die $source unless $source =~ /^[MFL]$/;
 		$query .= "'" . $columns{'newspaper'} . "','" . $columns{'source'} . "','" . $columns{'page'} . "')";
 	}
 

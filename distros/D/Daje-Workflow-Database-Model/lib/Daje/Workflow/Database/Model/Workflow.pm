@@ -68,7 +68,8 @@ sub _load($self) {
 }
 
 sub save ($self, $data) {
-
+    my $workflow_pkey;
+    $data->{workflow_pkey} = 0 unless exists $data->{workflow_pkey};
     if ($data->{workflow_pkey} > 0) {
         $self->db->update(
             'workflow',
@@ -81,7 +82,7 @@ sub save ($self, $data) {
         )
     } else {
         delete %$data{workflow_pkey};
-        $data->{workflow_pkey} = $self->db->insert(
+        $workflow_pkey = $self->db->insert(
             'workflow',
                 {
                     %$data
@@ -92,7 +93,7 @@ sub save ($self, $data) {
         )->hash->{workflow_pkey}
     }
 
-    return $data->{workflow_pkey};
+    return $workflow_pkey;
 }
 1;
 

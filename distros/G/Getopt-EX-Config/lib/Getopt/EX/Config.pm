@@ -3,33 +3,46 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.9903';
+our $VERSION = '0.9904';
 
 use Data::Dumper;
 use Getopt::Long qw(GetOptionsFromArray);
 Getopt::Long::Configure qw(bundling);
 
 use List::Util qw(first);
+use Hash::Util qw(lock_keys);
 
 our %CONFIG;
 
 sub import {
     my $class = shift;
     my $caller = caller;
+    my @names = @_ ? @_ : 'config';
     no strict 'refs';
-    *{"$caller\::config"} = sub {
-	$CONFIG{$caller}->config(@_);
+    for my $name (@names) {
+	*{"$caller\::$name"} = sub {
+	    $CONFIG{$caller}->config(@_);
+	};
     };
 }
 
 sub new {
     my $class = shift;
     my $config = ref $_[0] eq 'HASH' ? shift : { @_ };
-    $CONFIG{+caller} = bless $config, $class;
+    my $caller = caller;
+    $CONFIG{$caller} = bless $config, $class;
+    $config;
+}
+
+sub object {
+    $CONFIG{+caller};
 }
 
 sub deal_with {
     my $obj = shift;
+    if ($obj eq __PACKAGE__) {
+	$obj = $CONFIG{+caller} // die;
+    }
     my($my_argv, $argv) = split_argv(shift);
     $obj->getopt($my_argv, @_) if @$my_argv;
     return $obj;
@@ -40,16 +53,16 @@ use Getopt::EX::Func;
 
 sub getopt {
     my $obj = shift;
-    my $argv = shift;
-    return if @{ $argv //= [] } == 0;
+    my $argv = shift // [];
+    return if @{ $argv } == 0;
     GetOptionsFromArray(
 	$argv,
 	$obj,
 	"config|C=s" => sub {
 	    $obj->config(arg2kvlist($_[1]));
 	},
-	@_ )
-	or die "Option parse error.\n";
+	@_
+    ) or die "Option parse error.\n";
 }
 
 sub config {
@@ -128,7 +141,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 0.9903
+Version 0.9904
 
 =head1 DESCRIPTION
 
@@ -215,6 +228,36 @@ for detail.
             "name=s" => \$config->{name},
         );
     }
+
+=head1 FUNCTIONS
+
+=over 7
+
+=item B<config>(I<key> => I<value>, ...)
+
+This module exports the function C<config> by default.  As explained
+above, this is why the C<config> function can be executed with module
+declaration.
+
+If you want to use a function with a different name, specify it
+explicitly.  In the following example, the function C<set> is defined
+and can be used in the same way as C<config>.
+
+    use Getopt::EX::Config qw(config set);
+
+=item B<config>(I<key>)
+
+The C<config> function may also be used to refer parameters in the
+program.  In this case, specify single argument.
+
+    my $width = config('width');
+
+Parameter value references can also be used as left-hand side values,
+so values can be assigned.
+
+    config('width') = 42;
+
+=back
 
 =head1 METHODS
 

@@ -19,7 +19,7 @@
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
-            "Path::Tiny" : "0.077"
+            "File::Spec::Functions" : "0"
          }
       },
       "configure" : {
@@ -62,7 +62,7 @@
    "provides" : {
       "Alien::libmaxminddb" : {
          "file" : "lib/Alien/libmaxminddb.pm",
-         "version" : "1.016"
+         "version" : "1.018"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/voegelas/Alien-libmaxminddb"
       }
    },
-   "version" : "1.016",
+   "version" : "1.018",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
       "requires" : {
@@ -94,7 +94,7 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.40.0",
+   "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

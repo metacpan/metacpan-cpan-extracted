@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Bluesky;
-$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.38';
+$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.40';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Bluesky.
 
 use Moose;
@@ -49,7 +49,7 @@ around BUILDARGS => sub {
 
 
 sub spread {
-  my ($self, $msg, $test) = @_;
+  my ($self, $msg, $test, $img) = @_;
   $test //= 0;
 
   # Multiline message
@@ -57,6 +57,10 @@ sub spread {
 
   if ($test) {
     $msg = __("Spread on Bluesky: ") . $msg;
+
+    if ($img) {
+      $msg .= " with image path: " . $img->{path} . " , alt: " . $img->{alt};
+    }
 
     use open qw(:std :encoding(UTF-8));
     use IO::Handle;
@@ -68,7 +72,7 @@ sub spread {
 
     $io->say($msg);
   } else {
-    $self->obj->create_post($msg);
+    $self->obj->create_post($msg, $img);
   }
 }
 
@@ -95,7 +99,7 @@ App::SpreadRevolutionaryDate::Target::Bluesky - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 METHODS
 
@@ -151,6 +155,8 @@ Spreads a message to Bluesky. Takes one mandatory argument: C<$msg> which should
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
 =back
 
 =head1 AUTHOR
@@ -159,7 +165,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
 This is free software, licensed under:
 

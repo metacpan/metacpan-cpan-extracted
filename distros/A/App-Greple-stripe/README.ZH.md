@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 斑马纹模块
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -70,11 +70,15 @@ Version 1.01
 
 **stripe** 模块有一些特定的选项。这些选项可以在模块声明时指定，也可以在模块声明后以 `--` 结尾作为选项指定。
 
-以下两条命令具有完全相同的效果。
+以下三条命令具有完全相同的效果。
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+请注意，此时可以使用 `set` 函数代替 `config`，以实现向后兼容。
 
 - **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
@@ -107,6 +111,8 @@ Version 1.01
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+[Getopt::EX::Config](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AConfig)
 
 # AUTHOR
 

@@ -20,6 +20,7 @@ my @files = (
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker/Telechat.pm',
     'lib/App/SpreadRevolutionaryDate/Target.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Bluesky.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Freenode.pm',
@@ -37,6 +38,7 @@ my @files = (
     't/new_target.t',
     't/objects.t',
     't/promptuser.t',
+    't/telechat.t',
     't/twitter.t',
     't/wikipedia.t'
 );

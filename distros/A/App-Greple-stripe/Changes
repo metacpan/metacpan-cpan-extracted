@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-stripe
 
+1.02 2025-03-07T04:15:32Z
+
+    - use Getopt::EX::Config@0.9904
+
 1.01 2025-03-04T10:13:08Z
 
     - use Getopt::EX::Configure module, and use config() to configure parameter

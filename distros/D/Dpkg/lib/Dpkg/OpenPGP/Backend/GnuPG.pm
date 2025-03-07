@@ -58,12 +58,6 @@ sub DEFAULT_CMD {
     return [ qw(gpg-sq gpg) ];
 }
 
-sub has_backend_cmd {
-    my $self = shift;
-
-    return defined $self->{cmd} && defined $self->{cmdstore};
-}
-
 sub has_keystore {
     my $self = shift;
 
@@ -78,12 +72,6 @@ sub can_use_key {
 
     # With gpg, a secret key always requires gpg-agent (the key store).
     return $self->has_keystore();
-}
-
-sub has_verify_cmd {
-    my $self = shift;
-
-    return defined $self->{cmdv} || defined $self->{cmd};
 }
 
 sub get_trusted_keyrings {
@@ -187,22 +175,38 @@ sub verify {
     return $self->_gpg_verify($data, $sig, undef, @certs);
 }
 
+sub _gpg_fixup_newline {
+    my $origfile = shift;
+
+    my $signdir = File::Temp->newdir('dpkg-sign.XXXXXXXX', TMPDIR => 1);
+    my $signfile = $signdir . q(/) . basename($origfile);
+
+    copy($origfile, $signfile);
+
+    # Make sure the file to sign ends with a newline, as GnuPG does not adhere
+    # to the OpenPGP specification (see <https://dev.gnupg.org/T7106>).
+    open my $signfh, '>>', $signfile
+        or syserr(g_('cannot open %s'), $signfile);
+    print { $signfh } "\n";
+    close $signfh
+        or syserr(g_('cannot close %s'), $signfile);
+
+    # Return the dir object so that it is kept in scope in the caller, and
+    # thus not cleaned up within this function.
+    return ($signdir, $signfile);
+}
+
 sub inline_sign {
     my ($self, $data, $inlinesigned, $key) = @_;
 
     return OPENPGP_MISSING_CMD if ! $self->has_backend_cmd();
 
-    my $file = basename($data);
-    my $signdir = File::Temp->newdir('dpkg-sign.XXXXXXXX', TMPDIR => 1);
-    my $signfile = "$signdir/$file";
-
-    # Make sure the file to sign ends with a newline, as GnuPG does not adhere
-    # to the OpenPGP specification (see <https://dev.gnupg.org/T7106>).
-    copy($data, $signfile);
-    open my $signfh, '>>', $signfile
-        or syserr(g_('cannot open %s'), $signfile);
-    print { $signfh } "\n";
-    close $signfh or syserr(g_('cannot close %s'), $signfile);
+    my ($signdir, $signfile);
+    if ($self->{cmd} !~ m{/gpg-sq$}) {
+        ($signdir, $signfile) = _gpg_fixup_newline($data);
+    } else {
+        $signfile = $data;
+    }
 
     my @exec = ($self->{cmd});
     push @exec, _gpg_options_weak_digests();
@@ -226,7 +230,7 @@ sub inline_sign {
     }
     push @exec, '--output', $inlinesigned;
 
-    my $rc = $self->_gpg_exec(@exec, '--clearsign', $data);
+    my $rc = $self->_gpg_exec(@exec, '--clearsign', $signfile);
     return OPENPGP_CMD_CANNOT_SIGN if $rc;
     return OPENPGP_OK;
 }

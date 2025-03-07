@@ -13,6 +13,7 @@ has 'insert' ;
 has 'update' ;
 has 'select_fields' ;
 has 'select_method' ;
+has 'select_index_method';
 
 sub generate($self) {
     $self->pkey($self->_get_from_pkey());
@@ -21,6 +22,28 @@ sub generate($self) {
     $self->update($self->_update_method());
     $self->select_fields($self->_select_fields());
     $self->select_method($self->_select_method());
+    $self->select_index_method($self->_select_index_method());
+}
+
+sub _select_index_method($self) {
+    my $sql = "";
+    my $tpl = $self->templates->get_data_section('select_from_index');
+    my $table_name = $self->json->{table_name};
+    my $indexes = $self->json->{indexes};
+    my $length = scalar @{$indexes};
+    if($length > 0 and ref @{$indexes}[0] eq 'HASH') {
+        for (my $i = 0; $i < $length; $i++) {
+            my $temp = $tpl;
+            my $method = $table_name . '_' . @{$indexes}[$i]->{column_name};
+            my $parameter = '$' . @{$indexes}[$i]->{column_name};
+            my $condition = "@{$indexes}[$i]->{column_name}  =>  $parameter";
+            $temp =~ s/<<method_name>>/$method/ig;
+            $temp =~ s/<<parameters>>/$parameter/ig;
+            $temp =~ s/<<condition>>/$condition/ig;
+            $sql .= $temp;
+        }
+    }
+    return $sql;
 }
 
 sub _select_method($self) {

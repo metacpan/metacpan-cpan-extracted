@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Config
 
+0.9904 2025-03-07T01:54:42Z
+
+    - import config() function as a different name
+
 0.9903 2025-02-24T02:37:28Z
 
     - call Getopt::Long library with hash object

@@ -8,7 +8,7 @@ use parent 'Class::Accessor';
 
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Travel::Status::DE::DBRIS::Journey->mk_ro_accessors(qw(day train is_cancelled));
 

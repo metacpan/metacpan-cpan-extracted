@@ -1,6 +1,24 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.38 2024-12-14T15:09:51
+0.40 2025-03-07T09:23:46
+ - Update copyright year
+ - Fix error when param is undef for Mastodon::Client::post_status()
+ - Set timezone when computing Telechat date
+
+0.39 2025-03-06T21:59:36Z
+ - Add documentaion for targets that can spread an image
+ - Add test for Telechat message maker
+ - Add image for Telechat message maker
+ - Add Telechat message maker
+ - Allow Mastodon/Bluesky targets to spread an image
+ - Define targets as arguments for testing authentication
+ - Allow message makers to return an image than can be passed to some
+   targets
+ - Fix file declarations
+ - Remove deprecated options from documentation
+ - Fix parameter name in documentation
+
+0.38 2024-12-14T15:09:51Z
  - Fix og:* detection for website cards
 
 0.37 2024-12-14T14:45:52Z

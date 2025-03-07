@@ -238,6 +238,32 @@ Returns the node's ancestors, if any, as an array ref.
 
 sub get_ancestors { [ shift->get_ancestors_rs->all ] }
 
+=head2 get_siblings_rs()
+
+Returns the node's siblings, if any, as a L<DBIx::Class> result set.
+
+=cut
+
+sub get_siblings_rs {
+	my $self = shift;
+	return $self->_schema->search(
+		{
+			'-and' => [
+				'parent' => { '==' => $self->parent },
+				'id'     => { '!=' => $self->id },
+			]
+		}
+	)
+}
+
+=head2 get_siblings()
+
+Returns the node's siblings, if any, as an array ref.
+
+=cut
+
+sub get_siblings { [ shift->get_siblings_rs->all ] }
+
 =head2 get_mrca()
 
 Given another node in the same tree, returns the most recent common ancestor of the two.

@@ -7,6 +7,7 @@ build_requires:
   IPC::System::Simple: '0'
   Test::Carp: '0'
   Test::DescribeMe: '0'
+  Test::HTTPStatus: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -44,6 +45,7 @@ requires:
   LWP::UserAgent::WithCache: '0'
   Lingua::EN::NameCase: '0'
   Module::Info: '0'
+  Params::Get: '0'
   Scalar::Util: '0'
   Text::CSV: '0'
   Try::Tiny: '0'
@@ -54,5 +56,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/issues
   homepage: https://sites.rootsweb.com/~obituary
   repository: git://github.com/nigelhorne/Genealogy-ObituaryDailyTimes.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

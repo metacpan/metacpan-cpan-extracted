@@ -27,5 +27,6 @@ t/15_enum.t
 t/16_union.t
 t/17_is.t
 t/21_complex.t
+t/22_constructor.t
 META.yml
 MANIFEST

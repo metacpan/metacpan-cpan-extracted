@@ -38,7 +38,6 @@ use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
 use Dpkg::Path qw(find_command);
 use Dpkg::BuildTypes;
-use Dpkg::BuildAPI qw(get_build_api);
 
 =head1 METHODS
 
@@ -136,7 +135,7 @@ sub _parse_rules_requires_root {
             if ($keyword =~ m{^dpkg/target/(.*)$}p and $target_official{$1}) {
                 error(g_('disallowed target in %s field keyword %s'),
                       'Rules-Requires-Root', $keyword);
-            } elsif ($keyword ne 'dpkg/target-subcommand') {
+            } elsif ($keyword =~ m{^dpkg/(.*)$} and $1 ne 'target-subcommand') {
                 error(g_('%s field keyword "%s" is unknown in dpkg namespace'),
                       'Rules-Requires-Root', $keyword);
             }

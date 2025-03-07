@@ -47,7 +47,7 @@
             "Daje::Workflow::Loader" : "0",
             "Mojo::Loader" : "0",
             "Mojo::Pg" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.040000"
          }
       },
       "test" : {
@@ -59,10 +59,13 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
+      },
+      "Daje::Workflow::Activities::Closed" : {
+         "file" : "lib/Daje/Workflow/Activities/Closed.pm"
       },
       "Daje::Workflow::Checks" : {
          "file" : "lib/Daje/Workflow/Checks.pm"
@@ -93,7 +96,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.05",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

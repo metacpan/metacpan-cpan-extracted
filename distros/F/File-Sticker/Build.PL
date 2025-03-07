@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kathryn Andersen <perlkat\@katspace.org>"
   ],
   "dist_name" => "File-Sticker",
-  "dist_version" => "3.0204",
+  "dist_version" => "4.00",
   "license" => "perl",
   "module_name" => "File::Sticker",
   "recursive_test_files" => 1,
@@ -34,6 +34,7 @@ my %module_build_args = (
     "Getopt::Long" => 0,
     "Hash::Merge" => 0,
     "Image::ExifTool" => 0,
+    "Image::ExifTool::XMP" => 0,
     "List::MoreUtils" => 0,
     "MP3::Tag" => 0,
     "Module::Pluggable" => 0,

@@ -1,6 +1,14 @@
 Changelog for Test2-Tools-TypeTiny
 
-v0.90.1 2025-03-06T00:25:43
+v0.91.0 2025-03-06T22:46:07
+ - Fix version on README.md (Brendan Byrd)
+ - Pull request #3: SM-5283 b (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Passively check get_message and validate_explain methods within the
+   loops (Brendan Byrd)
+ - Add should_sort_into function (Brendan Byrd)
+
+v0.90.1 2025-03-06T00:09:09
  - Pull request #2: Patch - SM-5283 a (Brendan Byrd)
  - Discourage should_fail_initially usage in docs (Brendan Byrd)
  - Update README (Brendan Byrd)

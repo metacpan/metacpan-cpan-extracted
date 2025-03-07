@@ -4,15 +4,16 @@ use Mojo::Base 'Daje::Workflow::Common::Checks::Base', -base, -signatures;
 
 sub check($self) {
     my $result = 1;
-    my @fields = split(',', $self->checks());
-    my $length = scalar @fields;
-    for(my $i = 0; $i < $length; $i++) {
-        if(!exists $self->context->{context}->{$fields[$i]}) {
-            $result = 0;
-            $self->error->add_error("Mandatory field '$fields[$i]' is missing")
+    if (length($self->checks()) > 0) {
+        my @fields = split(',', $self->checks());
+        my $length = scalar @fields;
+        for (my $i = 0; $i < $length; $i++) {
+            if (!exists $self->context->{context}->{$fields[$i]}) {
+                $result = 0;
+                $self->error->add_error("Mandatory field '$fields[$i]' is missing")
+            }
         }
     }
-
     return $result;
 }
 

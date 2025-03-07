@@ -1,5 +1,8 @@
 Revision history for Perl extension Poz
 
+0.16 2025-03-06T11:13:46Z
+    - add `constructor` feature.
+
 0.15 2025-01-06T14:11:40Z
 
     - update our website!

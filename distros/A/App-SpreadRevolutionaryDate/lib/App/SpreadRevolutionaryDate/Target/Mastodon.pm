@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.38';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.40';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
@@ -18,6 +18,7 @@ with 'App::SpreadRevolutionaryDate::Target'
   => {worker => 'Mastodon::Client'};
 
 use Mastodon::Client;
+use Encode qw(encode decode is_utf8);
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -63,7 +64,7 @@ around BUILDARGS => sub {
 
 
 sub spread {
-  my ($self, $msg, $test) = @_;
+  my ($self, $msg, $test, $img) = @_;
   $test //= 0;
 
   # Multiline message
@@ -72,17 +73,27 @@ sub spread {
   if ($test) {
     $msg = __("Spread on Mastodon: ") . $msg;
 
+    if ($img) {
+      $msg .= " with image path: " . $img->{path} . " , alt: " . $img->{alt};
+    }
+
     use open qw(:std :encoding(UTF-8));
     use IO::Handle;
     my $io = IO::Handle->new;
     $io->fdopen(fileno(STDOUT), "w");
 
-    use Encode qw(encode decode is_utf8);
     $msg = encode('UTF-8', $msg) if is_utf8($msg);
-
     $io->say($msg);
   } else {
-    $self->obj->post_status($msg);
+    my $params = {};
+    if ($img) {
+      $img = {path => $img} unless ref($img) && ref($img) eq 'HASH' && $img->{path};
+      my $img_alt = $img->{alt} // ucfirst(fileparse($img->{path}, qr/\.[^.]*/));
+      $img_alt = encode('UTF-8', $img_alt) if is_utf8($img_alt);
+      my $resp_img = $self->obj->upload_media($img->{path}, {description => $img_alt});
+      $params->{media_ids} = [$resp_img->{id}] if $resp_img->{id};
+    }
+    $self->obj->post_status($msg, $params);
   }
 }
 
@@ -109,7 +120,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 METHODS
 
@@ -165,6 +176,8 @@ Spreads a message to Mastodon. Takes one mandatory argument: C<$msg> which shoul
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
 =back
 
 =head1 AUTHOR
@@ -173,7 +186,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
 This is free software, licensed under:
 

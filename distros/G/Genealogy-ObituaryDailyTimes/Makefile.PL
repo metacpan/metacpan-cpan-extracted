@@ -42,6 +42,7 @@ my $prereqs = {
 	'File::Spec' => 0,
 	'File::Temp' => 0,
 	'Module::Info' => 0,
+	'Params::Get' => 0,
 	'Scalar::Util' => 0,
 	'Text::CSV' => 0
 };
@@ -86,6 +87,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Needs' => 0,
+		'Test::HTTPStatus' => 0,
 		# 'Test::Kwalitee' => 0,
 		'IPC::System::Simple' => 0,
 	}, PREREQ_PM => $prereqs,

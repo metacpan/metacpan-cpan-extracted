@@ -1,6 +1,30 @@
 Revision History for File-Sticker
 =================================
 
+v4.00 2025-03-07
+----------------
+
+* 2025-03-04 16:41:52 +1100
+  More refactoring and sanity checks
+* 2025-03-04 15:34:25 +1100
+  Using user-defined fields for EXIF files
+* 2025-03-04 11:41:20 +1100
+  more readonly fields stuff
+* 2025-03-04 11:14:11 +1100
+  Readonly fields and missing files
+* 2025-03-04 11:13:00 +1100
+  Reconciling differences in readonly_fields behaviour.
+* 2025-03-04 05:23:09 +1100
+  and no longer need Reader modules
+* 2025-03-04 05:21:48 +1100
+  Combining reading and writing
+
+v3.03 2024-06-25
+----------------
+
+* 2024-06-25 13:22:54 +1000
+  Added composer and performer to MP3 known fields.
+
 v3.0204 2024-06-21
 ------------------
 
@@ -14,22 +38,6 @@ v3.0204 2024-06-21
   trying some more
 * 2023-09-27 10:38:04 +1000
   derive date_added as file date
-
-v3.0101 2023-07-08
-------------------
-
-* 2023-07-08 16:35:52 +1000
-  Fixing MANIFEST.SKIP
-* 2023-07-08 16:32:34 +1000
-  Merge branch 'master' of github.com:rubykat/File-Sticker
-* 2023-07-08 16:24:47 +1000
-  Making AND OR NOT case-sensitive to remove ambiguity
-* 2023-07-08 15:14:21 +1000
-  Preserve tag order by using uniq to check for duplicates
-* 2023-05-23 02:10:27 +1000
-  updating MANIFEST.SKIP
-* 2023-05-23 02:06:18 +1000
-  adding MANIFEST.SKIP
 
 ===================================
 End of changes in the last 365 days

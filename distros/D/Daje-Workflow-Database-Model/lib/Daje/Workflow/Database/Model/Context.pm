@@ -1,5 +1,6 @@
 package Daje::Workflow::Database::Model::Context;
 use Mojo::Base -base, -signatures;
+use v5.40;
 
 use Mojo::JSON qw { to_json from_json };
 use DBD::Pg ':pg_types';
@@ -130,23 +131,45 @@ sub save($self, $context) {
 
     $context->{context_pkey} = 0 unless exists $context->{context_pkey};
     $context->{context} = to_json($context->{context});
+    my $context_pkey;
 
     if ($context->{context_pkey} > 0) {
-        $self->db->query("UPDATE context SET context = ? WHERE context_pkey = ?",
-            ("$context->{context}", "$context->{context_pkey}")
+        $self->db->update(
+            "context",
+            {
+                context => $context->{context}
+            },
+            {
+                context_pkey => $context->{context_pkey}
+            }
         );
-
     } else {
-        delete %$context{context_pkey};
-        $context->{workflow_fkey} = $self->workflow_pkey;
+        try {
+            delete %$context{context_pkey};
+            $context->{workflow_fkey} = $self->workflow_pkey;
 
-        $context->{context_pkey} = $self->db->query(
-            "INSERT INTO context (context, workflow_fkey) VALUES (?,?)  RETURNING context_pkey",
-            ("$context->{context}", "$context->{workflow_fkey}")
-        )->hash->{context_pkey};
+            $context_pkey = $self->db->insert(
+                "context",
+                {
+                    context       => $context->{context},
+                    workflow_fkey => $context->{workflow_fkey}
+                },
+                {
+                    returning => 'context_pkey'
+                }
+            )->hash->{context_pkey};
+        } catch ($e) {
+            my $test = $e;
+            say $e->to_string;
+            $e = $e;
+        }
+        # $context->{context_pkey} = $self->db->query(
+        #     "INSERT INTO context (context, workflow_fkey) VALUES (?,?)  RETURNING context_pkey",
+        #     ("$context->{context}", "$context->{workflow_fkey}")
+        # )->hash->{context_pkey};
     }
 
-    return $context->{context_pkey};
+    return $context_pkey;
 }
 
 1;

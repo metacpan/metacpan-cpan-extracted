@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+
+# Parse an e-mail alert from funeral-notices.co.uk to extract links
+
+use strict;
+use warnings;
+use URI::Find;
+use MIME::QuotedPrint;
+
+# Check if a filename was provided as an argument
+if(@ARGV != 1) {
+	die "Usage: $0 <filename>";
+}
+
+my $filename = $ARGV[0];
+
+# Open the file for reading
+open my $fh, '<', $filename or die "Could not open file '$filename': $!";
+
+# Read the entire file content
+my $encoded_content = do { local $/; <$fh> };
+
+# Close the file
+close $fh;
+
+# Decode quoted-printable content
+my $content = decode_qp($encoded_content);
+
+my @entries;
+
+# Create a URI::Find object to extract URLs
+my $finder = URI::Find->new(sub {
+	my $uri = shift;
+	if($uri =~ /funeral-notices\.co\.uk\/notice\/(.+)\/(.+)/) {
+		# print "Found URL: $uri\n";
+		# print "'$1' => $2,\n";	# How it will appear in bin/create_DB.pl
+		push @entries, { name => $1, id => $2 };
+	}
+});
+
+# Find and process URLs in the content
+$finder->find(\$content);
+
+# Sort by name order and print the URLs
+foreach my $entry (sort { $a->{'name'} cmp $b->{'name'} } @entries) {
+	print "'", $entry->{'name'}, "' => ", $entry->{'id'}, ",\n";
+}

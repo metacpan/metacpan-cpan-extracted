@@ -20,6 +20,10 @@ Daje::Workflow::Database::Model - is the data models used by Daje-Workflow
 
      $data->insert_history("History");
 
+     $data->save_context($context);
+
+     $data->save_workflow($workflow);
+
 # REQUIRES
 
 Mojo::Base

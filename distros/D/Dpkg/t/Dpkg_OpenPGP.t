@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Dpkg qw(:paths :needs test_get_openpgp_backend);
+use Test::Dpkg qw(:paths :needs);
 
 use File::Compare;
 
@@ -25,10 +25,14 @@ use Dpkg::ErrorHandling;
 use Dpkg::Path qw(find_command);
 use Dpkg::OpenPGP::KeyHandle;
 
-my @cmds = test_needs_openpgp_backend();
-unshift @cmds, 'auto';
+my @backends = test_needs_openpgp_backend();
+unshift @backends, {
+    backend => 'auto',
+    cmd => 'auto',
+    cmdv => 'auto',
+};
 
-plan tests => 2 + 15 * scalar @cmds;
+plan tests => 2 + 15 * scalar @backends;
 
 use_ok('Dpkg::OpenPGP');
 use_ok('Dpkg::OpenPGP::ErrorCodes');
@@ -46,22 +50,26 @@ sub test_diff
     ok($res == 0, "$desc ($exp_file vs $gen_file)");
 }
 
-foreach my $cmd (@cmds) {
+foreach my $backend_opts (@backends) {
     my $datadir = test_get_data_path();
     my $tempdir = test_get_temp_path();
 
-    my $backend = test_get_openpgp_backend($cmd);
-    my $openpgp = Dpkg::OpenPGP->new(
-        backend => $backend,
-        cmd => $cmd,
-    );
+    my $backend = $backend_opts->{backend};
+    my $cmd = $backend_opts->{cmd} || 'none';
+    my $cmdv = $backend_opts->{cmdv} || $cmd;
+    if ($cmd ne 'none' && $cmdv eq 'none') {
+        $cmdv = $cmd;
+    }
+    my $openpgp = Dpkg::OpenPGP->new(%{$backend_opts});
 
     my $certfile = "$datadir/dpkg-test-pub.asc";
     my $keyfile  = "$datadir/dpkg-test-sec.asc";
 
+    note("openpgp backend=$backend cmd=$cmd cmdv=$cmdv");
+
     SKIP: {
-        skip 'missing backend command', 13
-            unless $openpgp->{backend}->has_verify_cmd();
+        skip 'missing backend command', 9
+            unless $openpgp->{backend}->has_backend_cmd();
 
         ok($openpgp->dearmor('PUBLIC KEY BLOCK', $certfile, "$tempdir/dpkg-test-pub.pgp") == OPENPGP_OK(),
             "($backend:$cmd) dearmoring OpenPGP ASCII Armored certificate");
@@ -83,16 +91,21 @@ foreach my $cmd (@cmds) {
             "($backend:$cmd) dearmoring OpenPGP armored signature succeeded");
         test_diff("$datadir/sign-file.sig", "$tempdir/sign-file.sig",
             "($backend:$cmd) dearmored OpenPGP ASCII Armor signature matches");
+    };
+
+    SKIP: {
+        skip 'missing verify command', 4
+            unless $openpgp->{backend}->has_verify_cmd();
 
         ok($openpgp->inline_verify("$datadir/sign-file-inline.asc", undef, $certfile) == OPENPGP_OK(),
-            "($backend:$cmd) verify OpenPGP ASCII Armor inline signature");
+            "($backend:$cmdv) verify OpenPGP ASCII Armor inline signature");
         ok($openpgp->inline_verify("$datadir/sign-file-inline.sig", undef, $certfile) == OPENPGP_OK(),
-            "($backend:$cmd) verify OpenPGP binary inline signature");
+            "($backend:$cmdv) verify OpenPGP binary inline signature");
 
         ok($openpgp->verify("$datadir/sign-file", "$datadir/sign-file.asc", $certfile) == OPENPGP_OK(),
-        "($backend:$cmd) verify OpenPGP ASCII Armor detached signature");
+            "($backend:$cmdv) verify OpenPGP ASCII Armor detached signature");
         ok($openpgp->verify("$datadir/sign-file", "$datadir/sign-file.sig", $certfile) == OPENPGP_OK(),
-            "($backend:$cmd) verify OpenPGP binary detached signature");
+            "($backend:$cmdv) verify OpenPGP binary detached signature");
     };
 
     my $key = Dpkg::OpenPGP::KeyHandle->new(

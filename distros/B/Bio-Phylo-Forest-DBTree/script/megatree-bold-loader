@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Bio::Phylo::Util::Logger ':levels';
+use Bio::Phylo::Forest::DBTree;
+
+# process command line arguments
+my $verbosity = WARN;
+my ( $boldtsv, $dbfile );
+GetOptions(
+	'bold=s'   => \$boldtsv,
+	'dbfile=s' => \$dbfile,
+	'verbose+' => \$verbosity,
+	'help'     => sub { pod2usage() },
+	'man'      => sub { pod2usage(1) },
+);
+if ( not $boldtsv or not $dbfile ) {
+	pod2usage();
+}
+
+=head1 NAME
+
+megatree-bold-loader - Loads the processid taxonomy tree implied by a BOLD BCDM file into a database
+
+=head1 SYNOPSIS
+
+    megatree-bold-loader -bold <file> -d <file> [-vhm]
+
+=head1 OPTIONS
+
+=over
+
+=item B<< -b <file> >> or B<< -bold <file> >>
+
+Location of the TSV file from a BOLD BCDM dump, i.e. as contained in an archive
+such as located here as of 2023-03-06: L<https://bench.boldsystems.org/index.php/datapackages/Latest>
+
+=item B<< -d <file> >> or B<< -dbfile <file> >>
+
+Location of a database file, compatible with sqlite3, which will be produced. This file
+can not yet exist. If it does, an error message will be emitted and the program will quit.
+
+=item B<-v> or B<-verbose>
+
+Optional.
+
+With this option, more feedback messages are written during processing. This option can be
+used multiple times, which increases the verbosity further.
+
+=item B<-h> or B<-help>
+
+Optional.
+
+Prints help message / documentation.
+
+=item B<-m> or B<-man>
+
+Optional.
+
+Prints manual page. Additional information is available in the documentation, i.e.
+C<perldoc megatree-bold-loader>
+
+=back
+
+=head1 DESCRIPTION
+
+This program produces a database file from a BOLD BCDM dump. Such a database
+provides much quicker random access to the taxonomy tree then by processing the flat
+file. It can be accessed by an API that is compatible with L<Bio::Phylo>, but much more
+scalable. An example of such API usage is presented by the L<megatree-pruner> script.
+
+=cut
+
+# instantiate helper objects
+my $log = Bio::Phylo::Util::Logger->new(
+	'-level' => $verbosity,
+	'-style' => 'simple',
+	'-class' => [
+		'main',
+		'Bio::Phylo::Forest::DBTree::Result::Node'
+	]
+);
+my @LEVELS = qw(kingdom phylum class order family subfamily genus species subspecies processid);
+my $megatree = Bio::Phylo::Forest::DBTree->connect($dbfile);
+my $dbh = $megatree->dbh;
+my $sth = $dbh->prepare("insert into node(id,parent,name) values(?,?,?)");
+$dbh->{'AutoCommit'} = 1;
+$dbh->begin_work;
+
+{
+
+	# start primary key counter at 1, instantiate header list and taxon to ID map
+	my ( $id, @header, %id_map, %parent_map ) = 1;
+	my $line = 1;
+
+	# open the BOLD TSV file
+	open my $fh, '<', $boldtsv or die $!;
+	LINE: while(<$fh>) {
+		chomp;
+
+		# read the header and move to the next line
+		my @record = split /\t/, $_;
+		if ( not @header ) {
+			@header = @record;
+			next LINE;
+		}
+
+		# create a record hash
+		my %record = map { $header[$_] => $record[$_] } 0 .. $#header;
+
+		# iterate over the levels from kingdom to subspecies
+		LEVEL: for my $i ( 0 .. $#LEVELS ) {
+
+			# get the taxon name at the focal level
+			my $taxon = $record{ $LEVELS[$i] }; # skip if it is 'None' (e.g. subfamily)
+			next LEVEL if $taxon eq 'None' or not $taxon;
+			my $key = join '/', map { $record{$_} } @LEVELS[0..$i]; # path to the taxon, guaranteed unique
+			next LEVEL if $id_map{$key}; # skip if we've seen this taxon before
+
+			# get the parent ID, or 1 if this is the first level and the parent must be the root
+			my $parent_id = 1;
+			if ( $i > 0 ) {
+				for ( my $j = $i - 1; $j >= 0; $j-- ) {
+					if ( $record{ $LEVELS[$j] } and $record{ $LEVELS[$j] } ne 'None' ) {
+						my $parent_key = join '/', map { $record{$_} } @LEVELS[0..$j];
+						$parent_id = $id_map{$parent_key};
+						last;
+					}
+				}
+			}
+
+			# so insert the taxon, remember the ID and parent ID
+			$sth->execute( ++$id, $parent_id, $taxon );
+			$id_map{$key} = $id;
+			$parent_map{$key} = $parent_id;
+		}
+		$log->info("processed $line lines") unless $line++ % 100000;
+	}
+}
+
+# done
+$log->info("going to compute indexes");
+$megatree->get_root->_index;
+$dbh->commit;

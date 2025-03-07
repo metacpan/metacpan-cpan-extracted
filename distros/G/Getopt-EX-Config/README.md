@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 0.9903
+Version 0.9904
 
 # DESCRIPTION
 
@@ -101,6 +101,32 @@ for detail.
             "name=s" => \$config->{name},
         );
     }
+
+# FUNCTIONS
+
+- **config**(_key_ => _value_, ...)
+
+    This module exports the function `config` by default.  As explained
+    above, this is why the `config` function can be executed with module
+    declaration.
+
+    If you want to use a function with a different name, specify it
+    explicitly.  In the following example, the function `set` is defined
+    and can be used in the same way as `config`.
+
+        use Getopt::EX::Config qw(config set);
+
+- **config**(_key_)
+
+    The `config` function may also be used to refer parameters in the
+    program.  In this case, specify single argument.
+
+        my $width = config('width');
+
+    Parameter value references can also be used as left-hand side values,
+    so values can be assigned.
+
+        config('width') = 42;
 
 # METHODS
 

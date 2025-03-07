@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.38
+    version 0.40
 
 DESCRIPTION
 
@@ -83,14 +83,20 @@ USAGE
       # Prompt user for a message to spread to mastodon
       $ spread-revolutionary-date \
           --targets mastodon \
-          --msgwriter UserPrompt
+          --msgmaker UserPrompt
     
       # Spread message as command line parameter to
       # Bluesky, Twitter, Mastodon, Freenode and Liberachat
       $ spread-revolutionary-date \
-          --msgwriter UserPrompt \
+          --msgmaker UserPrompt \
           --promptuser_default \
             'This is my message to the world'
+    
+      # Spread Téléchat date of the day on Mastodon and BlueSky
+      $ spread-revolutionary-date \
+          --msgmaker Telechat \
+          --targets mastodon \
+          --targets bluesky \
 
 CONFIGURATION
 
@@ -135,9 +141,11 @@ CONFIGURATION
     App::SpreadRevolutionaryDate::MsgMaker::Value class consuming
     App::SpreadRevolutionaryDate::MsgMaker role. Message makers values
     pre-defined in this distribution are RevolutionaryDate, which spreads
-    the revolutionary date, and PromptUser, which prompts the user for the
-    message to be spread (with confirmation). See "EXTENDING TO NEW MESSAGE
-    MAKERS" for details on using a new value for this option.
+    the revolutionary date, PromptUser, which prompts the user for the
+    message to be spread (with confirmation), and Telechat, which spreads
+    the date of the day similar to the Belgian-French TV show 'Téléchat" on
+    the 1980's. See "EXTENDING TO NEW MESSAGE MAKERS" for details on using
+    a new value for this option.
 
   locale
 
@@ -155,52 +163,6 @@ CONFIGURATION
     on standard output for Bluesky, Twitter and Mastodon, and send it on
     configured test channels for Freenode and Liberachat (see
     "test_channels" below).
-
-  DEPRECATED acab
-
-    This option is deprecated starting from version 0.09 of this
-    distribution and may be removed in future release. Please use "acab"
-    option in [revolutionarydate] section, as described below.
-
-  DEPRECATED bluesky
-
-    This option is deprecated starting from version 0.07 of this
-    distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spreads on Bluesky explicitly. If none of
-    the bluesky, twitter, mastodon, freenode, liberachat option is set, the
-    revolutionary date is spread on all of these five targets.
-
-  DEPRECATED twitter
-
-    This option is deprecated starting from version 0.07 of this
-    distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spreads on Twitter explicitly. If none of
-    the bluesky, twitter, mastodon, freenode, liberachat option is set, the
-    revolutionary date is spread on all of these five targets.
-
-  DEPRECATED mastodon
-
-    This option is deprecated starting from version 0.07 of this
-    distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spreads on Mastodon explicitly. If none of
-    the bluesky, twitter, mastodon, freenode, liberachat option is set, the
-    revolutionary date is spread on all of these five targets.
-
-  DEPRECATED freenode
-
-    This option is deprecated starting from version 0.07 of this
-    distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spreads on Freenode explicitly. If none of
-    the twitter, mastodon, freenode, liberachat option is set, the
-    revolutionary date is spread on all of these five targets.
-
-  DEPRECATED liberachat
-
-    This option is deprecated starting from version 0.07 of this
-    distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spreads on Liberachat explicitly. If none
-    of the bluesky, twitter, mastodon, freenode, liberachat option is set,
-    the revolutionary date is spread on all of these five targets.
 
  Bluesky options
 
@@ -419,30 +381,6 @@ COMMAND LINE PARAMETERS
 
     Same as "test" configuration option above.
 
-  DEPRECATED --acab | -a
-
-    Same as "acab" configuration option above.
-
-  DEPRECATED --bluesky | -b
-
-    Same as "DEPRECATED bluesky" configuration option above.
-
-  DEPRECATED --twitter | -t
-
-    Same as "DEPRECATED twitter" configuration option above.
-
-  DEPRECATED --mastodon | -m
-
-    Same as "DEPRECATED mastodon" configuration option above.
-
-  DEPRECATED --freenode | -f
-
-    Same as "DEPRECATED freenode" configuration option above.
-
-  DEPRECATED --liberachat | -lt
-
-    Same as "DEPRECATED liberachat" configuration option above.
-
  Bluesky parameters
 
     These parameters specify credentials for spread-revolutionary-date to
@@ -619,6 +557,19 @@ EXTENDING TO NEW TARGETS
     the revolutionary date on the standard output using core module
     IO::Handle.
 
+    Starting from version 0.39, you may have noticed that Mastodon and
+    Bluesky targets can no spread not only a text message, but also an
+    image (with alternative text). This is only used for now by Telechat
+    message maker, to post an image of Groucha, the presenter of Téléchat.
+    But it can be used by other message makers in the future, including
+    PromptUser.
+
+    This feature is not available now for IRC targets, Liberachat and
+    Freenode, since this targets are mostly for text messages.
+
+    Also, we do not plan to extend this feature to Twitter target, since we
+    recommand to not use this social network for political reasons.
+
 EXTENDING TO NEW MESSAGE MAKERS
 
     It is even easier to spread whatever you want instead of the
@@ -652,9 +603,10 @@ EXTENDING TO NEW MESSAGE MAKERS
     command line parameters prefixed with the name of the message maker in
     lower case, followed by an underscore (--mytarget_myparam).
 
-    Have a look to the App::SpreadRevolutionaryDate::MsgMaker::PromptUser
-    class, it shows a simple example on how to extend
-    spread-revolutionary-date to a new message maker.
+    Have a look to App::SpreadRevolutionaryDate::MsgMaker::PromptUser or
+    App::SpreadRevolutionaryDate::MsgMaker::Telechat classes, it shows
+    simple examples on how to extend spread-revolutionary-date to a new
+    message maker.
 
 INTERNATIONALIZATION AND LOCALIZATION
 
@@ -825,7 +777,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019-2024 by Gérald Sédrati.
+    This software is Copyright (c) 2019-2025 by Gérald Sédrati.
 
     This is free software, licensed under:
 

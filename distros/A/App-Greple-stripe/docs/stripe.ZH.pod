@@ -10,7 +10,7 @@ App::Greple::stripe - Greple 斑马纹模块
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,15 @@ L<App::Greple::stripe> 是 L<greple|App::Greple> 的一个模块，用于以斑�
 
 B<stripe> 模块有一些特定的选项。这些选项可以在模块声明时指定，也可以在模块声明后以 C<--> 结尾作为选项指定。
 
-以下两条命令具有完全相同的效果。
+以下三条命令具有完全相同的效果。
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+请注意，此时可以使用 C<set> 函数代替 C<config>，以实现向后兼容。
 
 =over 7
 
@@ -101,6 +105,8 @@ B<stripe> 模块有一些特定的选项。这些选项可以在模块声明时�
 L<App::Greple>
 
 L<App::Greple::xlate>
+
+L<Getopt::EX::Config>
 
 =head1 AUTHOR
 

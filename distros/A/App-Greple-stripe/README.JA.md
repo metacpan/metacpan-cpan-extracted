@@ -8,7 +8,7 @@ App::Greple::stripe - Greple ゼブラストライプモジュール
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -70,11 +70,15 @@ stripeモジュールを使うと、同じパターンにマッチしたブロ�
 
 **stripe**モジュール特有のオプションがあります。これらはモジュール宣言時に指定するか、モジュール宣言の後に`--`で終わるオプションとして指定します。
 
-次の2つのコマンドは全く同じ効果を持ちます。
+以下の3つのコマンドは全く同じ効果をもたらします。
 
-    greple -Mstripe=config=step=3
+    greple -Mstripe::config=step=3
+
+    greple -Mstripe --config step=3 --
 
     greple -Mstripe --step=3 --
+
+なお、現時点では下位互換性のために`config`の代わりに`set`関数を使うことができます。
 
 - **-Mstripe::config**=**step**=_n_
 - **--step**=_n_
@@ -107,6 +111,8 @@ stripeモジュールを使うと、同じパターンにマッチしたブロ�
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+[Getopt::EX::Config](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AConfig)
 
 # AUTHOR
 
