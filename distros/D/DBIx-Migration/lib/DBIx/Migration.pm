@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Moo;
 use MooX::SetOnce;
@@ -14,10 +14,10 @@ use Types::Path::Tiny       qw( Dir );
 
 use namespace::clean -except => [ qw( before new ) ];
 
-has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
-has tracking_table                    => ( is => 'lazy', init_arg => undef );
-has dir                               => ( is => 'rw',   once     => 1, isa => Dir, coerce => 1 );
-has [ qw( password username ) ]       => ( is => 'ro' );
+has [ qw( dbh dsn ) ]           => ( is => 'lazy' );
+has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
+has [ qw( password username ) ] => ( is => 'ro' );
+has tracking_table              => ( is => 'ro', default => 'dbix_migration' );
 
 sub _build_dbh {
   my $self = shift;
@@ -40,25 +40,10 @@ sub _build_dsn {
   return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
 }
 
-sub _build_tracking_schema {
-  my $self = shift;
-
-  if ( my ( undef, $driver ) = DBI->parse_dsn( $self->dsn ) ) {
-    return 'public' if $driver eq 'Pg';
-  }
-  return;
-}
-
-sub _build_tracking_table {
-  my $self = shift;
-
-  my $tracking_schema = $self->tracking_schema;
-  return ( defined $tracking_schema ? "$tracking_schema." : '' ) . 'dbix_migration';
-}
-
 sub BUILD {
   my ( $self, $args ) = @_;
 
+  # new() is overloaded: check consistency of attributes
   if ( exists $args->{ dsn } ) {
     die 'dsn and dbh cannot be used at the same time'
       if exists $args->{ dbh };
@@ -70,6 +55,32 @@ sub BUILD {
   } else {
     die 'both dsn and dbh are not set';
   }
+
+  # driver should match subclass
+  my $class = ref $self;
+  if ( ( my @package = split( /::/, $class ) ) > 2 ) {
+    my $driver = $self->driver;
+    die "subclass $class cannot handle $driver driver"
+      unless $driver eq $package[ -1 ];
+  }
+}
+
+# overrideable
+sub apply_managed_schema { }
+
+# overrideable
+sub quoted_tracking_table {
+  my $self = shift;
+
+  return $self->dbh->quote_identifier( $self->tracking_table );
+}
+
+# can be used as an object method ($dsn not specified) and as a class method
+# ($dsn specified)
+sub driver {
+  my ( $self, $dsn ) = @_;
+
+  return ( DBI->parse_dsn( defined $dsn ? $dsn : $self->dsn ) )[ 1 ];
 }
 
 sub migrate {
@@ -82,11 +93,19 @@ sub migrate {
   my $return_value = try {
     my $version = $self->version;
 
-    $self->{ _dbh } = $self->dbh->clone( { RaiseError => 1, PrintError => 0, AutoCommit => 1 } );
+    $self->{ _dbh } = $self->dbh->clone(
+      {
+        RaiseError => 1,
+        PrintError => 0,
+        AutoCommit => 1,
+      }
+    );
     # enable transaction turning AutoCommit off
     $self->{ _dbh }->begin_work;
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
+
+    $self->apply_managed_schema;
 
     my @need;
     my $type;
@@ -153,7 +172,7 @@ sub version {
   my $dbh = $self->dbh;
   local @{ $dbh }{ qw( RaiseError PrintError ) } = ( 1, 0 );
   try {
-    my $tracking_table = $self->tracking_table;
+    my $tracking_table = $self->quoted_tracking_table;
     $Logger->debugf( "Reading tracking table '%s'", $tracking_table );
     my $sth = $dbh->prepare( <<"EOF" );
 SELECT value FROM $tracking_table WHERE name = ?;
@@ -203,7 +222,7 @@ sub _latest {
 sub _create_tracking_table {
   my $self = shift;
 
-  my $tracking_table = $self->tracking_table;
+  my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Creating tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF" );
 CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
@@ -216,7 +235,7 @@ EOF
 sub _update_tracking_table {
   my ( $self, $version ) = @_;
 
-  my $tracking_table = $self->tracking_table;
+  my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Updating tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
 UPDATE $tracking_table SET value = ? WHERE name = ?;

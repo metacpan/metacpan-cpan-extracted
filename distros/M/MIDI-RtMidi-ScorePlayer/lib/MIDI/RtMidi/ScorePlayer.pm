@@ -3,17 +3,19 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0208';
+our $VERSION = '0.0301';
 
 use strict;
 use warnings;
 
 use Data::Dumper::Compact qw(ddc);
 use File::Basename qw(fileparse);
+use Future::AsyncAwait;
+use Future::IO;
 use MIDI::RtMidi::FFI::Device ();
 use MIDI::Util qw(dura_size get_microseconds score2events set_chan_patch ticks);
 use Path::Tiny qw(path);
-use Time::HiRes qw(time usleep);
+use Time::HiRes qw(time);
 
 
 sub new {
@@ -55,14 +57,31 @@ sub new {
 sub play {
     my ($self) = @_;
     if ($self->{infinite}) {
-        while (1) { $self->_play }
+        while (1) { $self->_play->await }
     }
     else {
-        $self->_play for 1 .. $self->{loop};
+        for my $i (1 .. $self->{loop}) {
+            $self->_play->await;
+        }
     }
 }
 
-sub _play {
+
+
+# the Future-returning async method
+async sub play_async {
+    my ($self) = @_;
+    if ($self->{infinite}) {
+        while (1) { await $self->_play }
+    }
+    else {
+        for my $i ( 1 .. $self->{loop} ) {
+            await $self->_play;
+        }
+    }
+}
+
+async sub _play {
     my ($self) = @_;
     for my $n (1 .. $self->{repeats}) {
         for my $p (@{ $self->{parts} }) {
@@ -84,14 +103,14 @@ sub _play {
             next;
         }
         my $useconds = $micros * $event->[1];
-        usleep($useconds) if $useconds > 0 && $useconds < 1_000_000;
+        await Future::IO->sleep($useconds / 1_000_000) if $useconds > 0 && $useconds < 1_000_000;
         $self->{device}->send_event($event->[0] => @{ $event }[ 2 .. $#$event ]);
     }
     if ($self->{deposit}) {
         my $filename = path($self->{path}, $self->{prefix} . time() . '.midi');
         $self->{score}->write_score("$filename");
     }
-    sleep($self->{sleep});
+    await Future::IO->sleep($self->{sleep});
     $self->_reset_score;
 }
 
@@ -158,10 +177,11 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0208
+version 0.0301
 
 =head1 SYNOPSIS
 
+  use Future::IO::Impl::IOAsync; # for asynchronous playing
   use MIDI::RtMidi::ScorePlayer ();
   use MIDI::Util qw(setup_score);
 
@@ -200,7 +220,7 @@ version 0.0208
   use MIDI::RtMidi::FFI::Device ();
   my $midi_output = RtMidiOut->new;
 
-  MIDI::RtMidi::ScorePlayer->new(
+  my $sp = MIDI::RtMidi::ScorePlayer->new(
       score    => $score, # required MIDI score object
       parts    => [ \&bass, [ \&treble, \&bass ], \&bass ], # required part functions
       common   => \%common, # arguments given to the part functions
@@ -213,7 +233,11 @@ version 0.0208
       dump     => 0, # dump the score before each play (default: 0)
       port     => qr/iac/i,     # optional non-existing device
       device   => $midi_output, # optional existing object
-  )->play;
+  );
+
+  $sp->play; # blocking
+  # Or play asynchronously:
+  $sp->play_async->retain;
 
 =head1 DESCRIPTION
 
@@ -269,6 +293,10 @@ Instantiate a new C<MIDI::RtMidi::ScorePlayer> object.
 =head2 play
 
 Play a given MIDI score in real-time.
+
+=head2 play_async
+
+Play a given MIDI score asynchronously.
 
 =head1 SEE ALSO
 

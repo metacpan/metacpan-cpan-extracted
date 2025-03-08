@@ -1,5 +1,11 @@
 Revision history for CGI-Lingua
 
+0.69	Fri Mar  7 14:40:12 EST 2025
+	The US has no official language, but it's safe enough to fall back to en_US
+	Fix where to find the script name
+	Reduce "Can't determine language to IP" from warning to notice
+	Country = 1 should be 'us'
+
 0.68	Wed Mar  5 21:12:04 EST 2025
 	Use Get::Params
 	Use the logging system from CGI::Info

@@ -21,5 +21,11 @@ sub request {
     return $self->client->request($request_path, $args);
 }
 
+sub request_json {
+    my ($self, $path, $args) = @_;
+    my $request_path = sprintf '/%s.%s', $self->base_name, $path;
+    return $self->client->request_json($request_path, $args);
+}
+
 1;
 

@@ -21,16 +21,20 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
-note 'tracking schema: ', my $tracking_schema = 'public';
-note 'managed schema: ',  my $managed_schema  = 'myschema';
-note 'dsn: ',             my $dsn             = $pgsql->dsn . ";options=--search_path=$managed_schema";
-local $Test::PgTAP::Dbh = DBI->connect( $dsn );
+note 'managed schema: ', my $managed_schema = 'myschema';
+note 'dsn: ',            my $dsn            = $pgsql->dsn;
+local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
 plan tests => 9;
 
-require DBIx::Migration;
+require DBIx::Migration::Pg;
 
-my $m = DBIx::Migration->new( dsn => $dsn, dir => cwd->child( qw( t sql trigger ) ) );
+my $m = DBIx::Migration::Pg->new(
+  managed_schema => $managed_schema,
+  dsn            => $dsn,
+  dir            => cwd->child( qw( t sql trigger ) )
+);
+my $tracking_schema = $m->tracking_schema;
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -56,10 +60,10 @@ triggers_are 'products', [ "$managed_schema.price_changes" ];
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
 
-  my $sth = $m->dbh->prepare( "INSERT INTO $managed_schema.products (name, price) VALUES (?, ?);" );
+  my $sth = $Test::PgTAP::Dbh->prepare( "INSERT INTO $managed_schema.products (name, price) VALUES (?, ?);" );
   ok $sth->execute( 'Product 1', 10.0 ), 'insert a product';
 
-  $sth = $m->dbh->prepare( "UPDATE $managed_schema.products SET price = ? WHERE id = ?;" );
+  $sth = $Test::PgTAP::Dbh->prepare( "UPDATE $managed_schema.products SET price = ? WHERE id = ?;" );
   ok $sth->execute( 20.0, 1 ), 'update the previously inserted product';
 
   local $Test::DatabaseRow::dbh = $m->dbh;

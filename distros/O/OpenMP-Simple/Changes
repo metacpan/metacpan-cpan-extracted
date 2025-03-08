@@ -91,3 +91,15 @@
       - updated POD
       - renamed, "PerlOMP_VERIFY_1D_CHAR_ARRAY" to
         "PerlOMP_VERIFY_1D_STRING_ARRAY" for consistency
+
+0.2.2  03/07/2025 11:08:00 PM MST
+      - major POD update
+      - cleaned up some tests 
+
+0.2.3  03/07/2025 11:18:00 PM MST
+      - POD clean up
+
+0.2.4  03/08/2025 01:18:00 AM MST
+      - POD clean up
+      - renamed "contribute" to "CONTRIBUTING.md" to adhere to
+	metacpan's idiosyncratic "/contribute" endpoint

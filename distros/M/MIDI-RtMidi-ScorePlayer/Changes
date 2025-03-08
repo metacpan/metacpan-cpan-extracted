@@ -1,5 +1,11 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0301 2025-03-07 12:02:43
+    - Improve documentation.
+
+0.0300 2025-03-07 11:43:28
+    - Add asynchronous execution. fuzzix++
+
 0.0208 2025-03-04 15:17:13
     - Stuopid, misleading typo in the synopsis code. :(
 

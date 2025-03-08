@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Wrapper around C<Alien::OpenMP> that provides helpful C MACROs and runtime functions",
+  "ABSTRACT" => "Wrapper around C<Alien::OpenMP> that provides helpful C macros and runtime C functions",
   "AUTHOR" => "oodler <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.2.1",
+  "VERSION" => "0.2.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

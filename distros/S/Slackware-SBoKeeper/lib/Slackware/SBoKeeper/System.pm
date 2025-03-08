@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::System;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 use 5.016;
 use strict;
 use warnings;
@@ -48,6 +48,14 @@ if ($IS_SLACKWARE) {
 		: '/var/lib/pkgtools/packages'
 	;
 
+	__PACKAGE__->load;
+
+}
+
+sub load {
+
+	%PACKAGES = ();
+
 	foreach my $pkgf (glob "$PKGTOOL_LOGS/*") {
 		$pkgf = basename($pkgf);
 		# Copied this regex from sbopkg
@@ -59,6 +67,8 @@ if ($IS_SLACKWARE) {
 			Tag     => $5,
 		};
 	}
+
+	return 1;
 
 }
 
@@ -113,6 +123,12 @@ as methods of C<Slackware::SBoKeeper::System>.
 =head1 METHODS
 
 =over 4
+
+=item load()
+
+Loads the Slackware package database. Automatically called when the module is
+first loaded (if we're on a Slackware system). Can be be called again to reload
+the database.
 
 =item is_slackware()
 

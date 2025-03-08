@@ -1,0 +1,26 @@
+bin/ipinfo
+Changes
+INSTALL.SKIP
+lib/App/ipinfo.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+SECURITY.md
+t/compile.t
+t/default_template.t
+t/format.t
+t/get_info.t
+t/ipv6.t
+t/json.t
+t/lib/Local/ipinfo.pm
+t/live.t
+t/load.t
+t/looks_like_template.t
+t/pod.t
+t/pod_coverage.t
+t/run.t
+t/test_manifest
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

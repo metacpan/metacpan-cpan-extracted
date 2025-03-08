@@ -46,6 +46,7 @@ my %WriteMakefileArgs = (
     "File::HomeDir" => 0,
     "File::ShareDir" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "File::Type" => 0,
     "Getopt::Long" => 0,
     "IO::Handle" => 0,
@@ -72,7 +73,6 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Find" => 0,
-    "File::Temp" => 0,
     "FindBin" => 0,
     "Test::More" => 0,
     "Test::NoWarnings" => 0,
@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.40",
+  "VERSION" => "0.43",
   "test" => {
     "TESTS" => "t/*.t"
   }

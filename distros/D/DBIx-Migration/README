@@ -5,7 +5,8 @@ SYNOPSIS
       use DBIx::Migration ();
 
       my $m = DBIx::Migration->new(
-        dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
+        dsn            => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+        tracking_table => 'myapp_migration'
       );
 
       # Get current migration version from database
@@ -39,7 +40,10 @@ SYNOPSIS
       DROP TABLE bar;
 
 DESCRIPTION
-    This class provides seamless database schema up- and downgrades.
+    This class provides the basis for seamless database schema up- and
+    downgrades. It isn't abstract that means it can be used by its own.
+    Subclasses like for example DBIx::Migration::Pg offer driver specific
+    improvements.
 
   Migrations
     The implementation of this class is based on migrations. A migration is
@@ -50,6 +54,9 @@ DESCRIPTION
     are stored in a directory and are applied in order to a database.
     Usually the version number of the first migration is 1. The version
     numbers of the other migrations have to be ascending without gaps.
+
+    The migration object stores the current migration version in a tracking
+    table. Its default unqualified name is "dbix_migration".
 
   Processing
     During processing the content of each migration is read with the
@@ -70,24 +77,11 @@ DESCRIPTION
     to be a single printable ASCII character, excluding the space character.
     In the previous example it is the "/" (slash) character.
 
-  Managed schema vs tracking schema
-    The schema support of this implementation should be considered
-    experimental. For a PostgreSQL database you may set the managed schema
-    (the schema of your single-schema application) using the "search_path"
-    connect option:
-
-      my $m = DBIx::Migration->new(
-        dsn => 'dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema'
-      );
-
-    The migration object stores the current migration version in a tracking
-    table. Its default unqualified name is "dbix_migration". The table
-    belongs by default to the "public" tracking schema.
-
-METHODS
+LIFECYCLE METHODS
     $self->BUILD( $args )
         Validate object.
 
+ACCESSORS
     $self->dir( $dir )
         Get/set-once directory that contains migrations.
 
@@ -97,23 +91,31 @@ METHODS
     $self->dbh
         Get database handle.
 
+    $self->password
+        Get database password.
+
+    $self->tracking_table
+        Get tracking table.
+
+    $self->username
+        Get database username.
+
+METHODS
+    $self->apply_managed_schema
+        Drivers that support schemas like PostgreSQL should override this
+        method to set a managed schema before processing migrations.
+
+    $self->driver, $class->driver( $dsn )
+        Extracts and returns the driver name from the data source name.
+
     $self->migrate( $version )
         Migrate database to version. Returns true in case of success;
         otherwise false. If called without the version argument the latest
         migration version will be used.
 
-    $self->password
-        Get database password.
-
-    $self->tracking_schema
-        Get schema that the tracking table belongs to.
-
-    $self->tracking_table
-        Get tracking table. If the tracking schema is defined the tracking
-        table name is fully qualified.
-
-    $self->username
-        Get database username.
+    $self->quoted_tracking_table
+        Quotes and returns the tracking table using "quote_identifier" in
+        DBI. This method is overrideable in subclasses.
 
     $self->version
         Get migration version from database. Will be "undef" if no migration
@@ -129,11 +131,6 @@ LOGGING
 SEE ALSO
     *   Liquibase end delimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
-
-    *   Liquibase tracking schema
-        <https://docs.liquibase.com/parameters/liquibase-schema-name.html>
-
-    *   App::Sqitch
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

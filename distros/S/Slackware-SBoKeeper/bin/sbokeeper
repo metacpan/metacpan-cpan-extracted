@@ -40,8 +40,9 @@ follows this format:
 
 Blank lines and lines starting with a hash (#) are ignored.
 
-Unless the B<-c> option is used, B<sbokeeper> will search for a configuration
-file in the following paths in descending order:
+Unless the B<-c> option or C<SBOKEEPER_CONFIG> environment variable are
+set, B<sbokeeper> will search for a configuration file in the following
+paths in descending order:
 
 =over 4
 
@@ -50,6 +51,8 @@ file in the following paths in descending order:
 =item F<~/.sbokeeper.conf>
 
 =item F</etc/sbokeeper.conf>
+
+=item F</etc/sbokeeper/sbokeeper.conf>
 
 =back
 
@@ -101,7 +104,7 @@ of shell expansion are not performed.
 Can be overridden with the B<-s> option.
 
 The default value depends on what SlackBuild package management tools are
-installed on your system. If you are using one the following:
+installed on your system. If you are using one or more of the following:
 
 =over 4
 
@@ -119,10 +122,10 @@ installed on your system. If you are using one the following:
 
 =back
 
-then B<sbokeeper> will use the default repo location of the first package
-manager it finds installed on your system.
-If none can be found, B<sbokeeper> will croak and just tell you to set it
-manually.
+then B<sbokeeper> will use the most up-to-date default repo location of the
+installed package managers it finds on your system. If B<sbokeeper> cannot
+determine a default repo location, B<sbokeeper> will croak and tell you to set
+C<SBoPath> manually.
 
 =item B<Tag>
 
@@ -440,6 +443,16 @@ Print help message and exit.
 =item B<-v>, B<--version>
 
 Print version and copyright information, then exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item SBOKEEPER_CONFIG
+
+Path to B<sbokeeper> configuration file.
 
 =back
 

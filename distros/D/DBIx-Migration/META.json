@@ -26,12 +26,14 @@
          "recommends" : {
             "Test::Needs" : "0",
             "Test::Pod" : "1.26",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::Pod::Coverage" : "1.04",
+            "Text::Table::Tiny" : "1.02"
          },
          "requires" : {
             "DBI" : "1.33",
             "File::Spec" : "0",
             "Log::Any" : "1.044",
+            "Module::Load::Conditional" : "0.6",
             "Moo" : "0",
             "MooX::SetOnce" : "0",
             "MooX::StrictConstructor" : "0",
@@ -61,11 +63,13 @@
    "provides" : {
       "DBIx::Migration" : {
          "file" : "lib/DBIx/Migration.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "DBIx::Migration::CLI" : {
-         "file" : "lib/DBIx/Migration/CLI.pm",
-         "version" : "0.18"
+         "file" : "lib/DBIx/Migration/CLI.pm"
+      },
+      "DBIx::Migration::Pg" : {
+         "file" : "lib/DBIx/Migration/Pg.pm"
       }
    },
    "release_status" : "stable",
@@ -81,6 +85,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

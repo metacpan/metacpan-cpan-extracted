@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::BlueskyLite;
-$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.43';
 # ABSTRACT: Simple Class to post status to BlueSky.
 
 use LWP::UserAgent;
@@ -22,13 +22,6 @@ use File::Type;
 use File::Basename;
 
 use namespace::autoclean;
-
-BEGIN {
-  unless ($ENV{PERL_UNICODE} && $ENV{PERL_UNICODE} =~ /A/) {
-    use Encode qw(decode_utf8);
-    @ARGV = map { decode_utf8($_, 1) } @ARGV;
-  }
-}
 
 sub _fetch_embed_url_card {
   my $self = shift;
@@ -263,7 +256,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - Simple Class to post status to BlueS
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 Methods
 

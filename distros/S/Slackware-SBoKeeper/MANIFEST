@@ -1,5 +1,7 @@
 bin/sbokeeper
 Changes
+etc/sbokeeper.blacklist
+etc/sbokeeper.conf
 lib/Slackware/SBoKeeper.pm
 lib/Slackware/SBoKeeper/Config.pm
 lib/Slackware/SBoKeeper/Database.pm

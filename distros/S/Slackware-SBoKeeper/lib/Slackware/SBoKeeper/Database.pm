@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper::Database;
 use 5.016;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 use strict;
 use warnings;
 
@@ -11,7 +11,10 @@ sub write_data {
 	my $data = shift;
 	my $out  = shift;
 
-	open my $fh, '>', $out or die "Failed to open $out for writing: $!\n";
+	my $outstr = '';
+
+	open my $fh, '>', $out // \$outstr
+		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 
 	foreach my $p (sort keys %{$data}) {
 
@@ -23,6 +26,8 @@ sub write_data {
 	}
 
 	close $fh;
+
+	return $out // $outstr;
 
 }
 
@@ -108,7 +113,8 @@ sub add {
 	my $pkgs   = shift;
 	my $manual = shift;
 
-	my @added;
+	my %added;
+	my $n = 0;
 
 	foreach my $p (@{$pkgs}) {
 
@@ -131,12 +137,15 @@ sub add {
 
 		my @add = $self->add($self->{_data}->{$p}->{Deps}, 0);
 
-		push @added, @add;
-		push @added, $p;
+		for my $ad (@add) {
+			$added{$ad} = $n++ unless exists $added{$ad};
+		}
+
+		$added{$p} = $n++;
 
 	}
 
-	return sort @added;
+	return sort { $added{$a} <=> $added{$b} } keys %added;
 
 }
 
@@ -672,9 +681,10 @@ database.
 
 Unset $pkg as manually installed. Returns 1 if successful, 0 if not.
 
-=head2 write($path)
+=head2 write([$path])
 
-Write data file to $path.
+Writes data file to C<$path>, or returns string of would-be written data if
+C<$path> is omitted.
 
 =head1 DATA FILES
 

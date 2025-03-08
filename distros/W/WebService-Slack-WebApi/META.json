@@ -4,7 +4,7 @@
       "Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "mit"
    ],
@@ -68,7 +68,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -165,14 +165,17 @@
       },
       "homepage" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi",
       "repository" : {
-         "url" : "git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git",
+         "type" : "git",
+         "url" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git",
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Askar Timirgazin <anotheroneackap@gmail.com>",
       "Ivan Wills <Ivan.Wills2@optus.com.au>",
+      "James A. Pattie <james.pattie@gpsinsight.com>",
+      "James Pattie <pattieja1@yahoo.com>",
       "Matt Hallacy <mhallacy+github@haproxy.com>",
       "Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>",
       "Sterling Hanenkamp <sterling@hanenkamp.com>",
@@ -182,6 +185,6 @@
       "likkradyus <git@li.que.jp>",
       "sironekotoro <develop@sironekotoro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

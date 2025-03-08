@@ -5,7 +5,6 @@ use strict;
 
 use Test::More;
 use Test::Deep;
-use Util::H2O::More qw//;
 
 # build and load subroutines
 use OpenMP::Simple;
@@ -86,7 +85,7 @@ AV* omp_get_renew_aref(SV *ARRAY) {
   av_push(ret, newSViv(num_elements));
 
   /* get 1d array ref into a 1d C array */
-  int raw_array[num_elements];                                      // create native 2D array as target
+  int raw_array[num_elements];                                      // create native 1D array as target
   PerlOMP_1D_Array_TO_1D_INT_ARRAY(ARRAY, num_elements, raw_array); // call macro to put AoA into native "nodes" array
 
   int sum[num_elements];

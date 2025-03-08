@@ -1,5 +1,13 @@
 Revision history for sbokeeper.
 
+2.06 (3/7/2025):
+  * Added sample config files.
+  * Added SBOKEEPER_CONFIG environment variable: specify path to sbokeeper
+    config file without the -c option.
+  * dump command no longer dumps blacklisted packages.
+  * /etc/sbokeeper/sbokeeper.conf was added as another potential default config
+    path.
+
 2.05 (2/25/2025):
   * When determining the default SBo repo location to use, sbokeeper takes into
     account ChangeLog modification time. This means that, in theory, the repo

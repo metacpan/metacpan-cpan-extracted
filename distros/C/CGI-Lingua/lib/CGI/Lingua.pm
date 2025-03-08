@@ -7,8 +7,7 @@ use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-use vars qw($VERSION);
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 =head1 NAME
 
@@ -16,7 +15,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 =cut
 
@@ -753,9 +752,17 @@ sub _find_language
 				$self->{_cache}->set($country, "$language_name=$self->{_slanguage_code_alpha2}", '1 month');
 			}
 		} elsif(defined($ip)) {
-			$self->_warn({
-				warning => "Can't determine language from IP $ip, country $country"
-			});
+			if($country eq '1') {
+				# The US has no official language, but it's safe enough to fall back to en_US
+				$self->_debug("Can't determine language from IP $ip, country $country - forcing en_US for the US");
+
+				$self->{_slanguage} = 'English';
+				$self->{_slanguage_code_alpha2} = 'en';
+				$self->{_sublanguage} = 'United States';
+				$self->{_sublanguage_code_alpha2} = 'us';
+			} else {
+				$self->_notice("Can't determine language from IP $ip, country $country");
+			}
 		}
 	}
 }
@@ -896,13 +903,15 @@ sub country {
 	if($self->{_cache}) {
 		$self->{_country} = $self->{_cache}->get($ip);
 		if(defined($self->{_country})) {
-			$self->_debug("Get $ip from cache = $self->{_country}");
-		} else {
-			$self->_debug("$ip isn't in the cache");
+			if($self->{_country} !~ /\D/) {
+				$self->_warn('cache contains a numeric country');
+				delete $self->{_country};	# Seems to be a number
+			} else {
+				$self->_debug("Get $ip from cache = $self->{_country}");
+				return $self->{_country};
+			}
 		}
-		if(defined($self->{_country})) {
-			return $self->{_country};
-		}
+		$self->_debug("$ip isn't in the cache");
 	}
 
 	if($self->{_have_ipcountry} == -1) {
@@ -1027,30 +1036,36 @@ sub country {
 	}
 
 	if($self->{_country}) {
-		$self->{_country} = lc($self->{_country});
-		if($self->{_country} eq 'hk') {
-			# Hong Kong is no longer a country, but Whois thinks
-			# it is - try "whois 218.213.130.87"
-			$self->{_country} = 'cn';
-		} elsif($self->{_country} eq 'eu') {
-			require Net::Subnet;
-
-			# RT-86809, Baidu claims it's in EU not CN
-			Net::Subnet->import();
-			if(subnet_matcher('185.10.104.0/22')->($ip)) {
+		if($self->{_country} !~ /\D/) {
+			$self->_warn('IP matches to a numeric country');
+			delete $self->{_country};	# Seems to be a number
+		} else {
+			$self->{_country} = lc($self->{_country});
+			if($self->{_country} eq 'hk') {
+				# Hong Kong is no longer a country, but Whois thinks
+				# it is - try "whois 218.213.130.87"
 				$self->{_country} = 'cn';
-			} else {
-				# There is no country called 'eu'
-				$self->_warn({
-					warning => "$ip has country of eu"
-				});
-				$self->{_country} = 'Unknown';
-			}
-		}
-		if($self->{_cache}) {
-			$self->_debug("Set $ip to $self->{_country}");
+			} elsif($self->{_country} eq 'eu') {
+				require Net::Subnet;
 
-			$self->{_cache}->set($ip, $self->{_country}, '1 hour');
+				# RT-86809, Baidu claims it's in EU not CN
+				Net::Subnet->import();
+				if(subnet_matcher('185.10.104.0/22')->($ip)) {
+					$self->{_country} = 'cn';
+				} else {
+					# There is no country called 'eu'
+					$self->_warn({
+						warning => "$ip has country of eu"
+					});
+					$self->{_country} = 'Unknown';
+				}
+			}
+
+			if($self->{_cache}) {
+				$self->_debug("Set $ip to $self->{_country}");
+
+				$self->{_cache}->set($ip, $self->{_country}, '1 hour');
+			}
 		}
 	}
 
@@ -1169,7 +1184,7 @@ sub locale {
 			return $c;
 		}
 	}
-	return ();	# returns undef
+	return undef;
 }
 
 =head2 time_zone
@@ -1379,7 +1394,7 @@ sub _warn {
 		if(ref($self->{syslog} eq 'HASH')) {
 			Sys::Syslog::setlogsock($self->{syslog});
 		}
-		openlog($self->script_name(), 'cons,pid', 'user');
+		openlog($self->{'_info'}->script_name(), 'cons,pid', 'user');
 		syslog('warning|local0', $warning);
 		closelog();
 	}

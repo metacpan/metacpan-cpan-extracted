@@ -4,12 +4,15 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Geo::Location::Point: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
+  Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,6 +22,12 @@ no_index:
     - t
     - inc
 requires:
+  ExtUtils::MakeMaker: '6.64'
+  Math::Trig: '0'
   Statistics::Basic: '0'
-version: '0.01'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/Geo-AnomalyDetector/issues
+  repository: git://github.com/nigelhorne/Geo-AnomalyDetector.git
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

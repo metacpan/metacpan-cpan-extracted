@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.43';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -73,9 +73,13 @@ sub new {
                                       'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
                                       'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'},
                                       'liberachat' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'lt'});
-  $config_targets->parse_file($filename);
   # Rewind command line arguments and process them
   @ARGV = @orig_argv;
+  $config_targets->parse_file($filename);
+
+  # Record targets in configuration file to be bypassed if defined in command line arguments
+  my @config_file_targets =  @{$config_targets->targets};
+
   $config_targets->parse_command_line;
 
   # Add targets defined with targets option
@@ -100,6 +104,9 @@ sub new {
     $config_targets->mastodon(1);
     $config_targets->freenode(1);
     $config_targets->liberachat(1);
+  }
+  if (scalar @targets > scalar @config_file_targets) {
+    @targets = splice @targets, scalar @config_file_targets - scalar @targets, scalar @targets;
   }
 
   # Guess attributes for each target associated class
@@ -188,6 +195,9 @@ sub new {
     'liberachat_channels' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'lc'},
     'revolutionarydate_acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'ra'},
     'promptuser_default' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pud'},
+    'promptuser_img_path' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pui'},
+    'promptuser_img_alt' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pua'},
+    'promptuser_img_url' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'puu'},
   );
 
   # Rewind configuration file if needed and read it
@@ -359,6 +369,9 @@ Usage: $0 <OPTIONS>
     --liberachat_channels|-lc <channel_1>  [--liberachat_channels|-lc <channel_2> […--liberachat_channels|-lc <channel_n>]]: define Liberachat test channels
     --revolutionarydate_acab | -ra: pretend it is 01:31:20 (default: false)
     --promptuser_default|-pud <msg>: define default message when --msgmaker=PromptUser (default: 'Goodbye old world, hello revolutionary worlds')
+    --promptuser_img_path|-pui <path/to/image/file>: define image file path when --msgmaker=PromptUser
+    --promptuser_img_alt|-pui <alternative text>: define image alternative text when --msgmaker=PromptUser
+    --promptuser_img_url|-pui <img_url>: define image external url when --msgmaker=PromptUser
 USAGE
  exit 0;
 }
@@ -386,7 +399,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 METHODS
 

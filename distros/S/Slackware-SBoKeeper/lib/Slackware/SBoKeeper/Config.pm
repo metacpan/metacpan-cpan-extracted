@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::Config;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 use 5.016;
 use strict;
 use warnings;

@@ -1,6 +1,25 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.40 2025-03-07T09:23:46
+0.43 2025-03-08T08:57:25
+ - Fix test of Telechat msgmaker with feminine feasts
+ - Fix typos in Telechat feasts
+ - Fix Telechat feast indexed by month day, not the other way around
+
+0.42 2025-03-07T16:02:59Z
+ - Command line arguments for targets should override configuration
+   parameters for targets
+ - Remove encoding block raising errors ith UTF8 command line arguments
+
+0.41 2025-03-07T13:47:56Z
+ - Document options to PromptUser msgmaker to send image on local disk or
+   from the web
+ - Setup options to PromptUser msgmaker to send image on local disk or from
+   the web
+ - Add options to PromptUser msgmaker to send image on local disk or from
+   the web
+ - Specify long options with equal sign in documentation
+
+0.40 2025-03-07T09:23:46Z
  - Update copyright year
  - Fix error when param is undef for Mastodon::Client::post_status()
  - Set timezone when computing Telechat date

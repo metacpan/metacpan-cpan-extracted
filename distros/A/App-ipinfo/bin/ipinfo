@@ -1,0 +1,11 @@
+#!perl
+use v5.26;
+use strict;
+use open qw(:std :utf8);
+
+use App::ipinfo;
+
+my $opts = {};
+$opts->{template} = shift @ARGV if App::ipinfo->looks_like_template($ARGV[0]);
+
+App::ipinfo->run( $opts, @ARGV );

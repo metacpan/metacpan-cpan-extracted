@@ -1,0 +1,19 @@
+Revision history for MIDI-RtController
+
+0.0201 2025-03-07 22:55:41
+    - Improve the documentation.
+
+0.0200 2025-03-07 21:19:45
+    - Make the filters list of named coderefs, a public attribute.
+    - Add the add_filter() method to hold these.
+    - Improve the eg/ programs.
+
+0.0102 2025-03-07 13:40:47
+    - Fix-up the documentation a bit more.
+
+0.0101 2025-03-07 12:55:13
+    - Repair broken POD.
+
+0.0100 2025-03-07 12:48:11
+    - Mint with Dist::Zilla.
+    - Port from https://github.com/ology/Music/blob/master/rtmidi-fuzzix.pl

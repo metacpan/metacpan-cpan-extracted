@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.40
+    version 0.43
 
 DESCRIPTION
 
@@ -63,40 +63,64 @@ USAGE
     
       # Test spreading to Mastodon only:
       $ spread-revolutionary-date \
-          --targets mastodon --test
+          --targets=mastodon --test
     
       # Test spreading to Twitter only in English:
       $ spread-revolutionary-date \
-          --targets twitter \
+          --targets=twitter \
           --test \
           --locale en
     
       # Spread acab time to Twitter and Liberachat
       # explicit channels
       $ spread-revolutionary-date \
-          --targets twitter \
-          --targets liberachat \
-          --liberachat_channels '#revolution' \
-          --liberachat_channels '#acab' \
+          --targets=twitter \
+          --targets=liberachat \
+          --liberachat_channels='#revolution' \
+          --liberachat_channels='#acab' \
           --revolutionarydate_acab
     
       # Prompt user for a message to spread to mastodon
       $ spread-revolutionary-date \
-          --targets mastodon \
-          --msgmaker UserPrompt
+          --targets=mastodon \
+          --msgmaker=UserPrompt
     
       # Spread message as command line parameter to
       # Bluesky, Twitter, Mastodon, Freenode and Liberachat
       $ spread-revolutionary-date \
-          --msgmaker UserPrompt \
+          --msgmaker=UserPrompt \
+          --promptuser_default \
+    
+      # Spread message and image as command line parameter to
+      # Mastodon and Bluesky
+      $ spread-revolutionary-date \
+          --msgmaker=UserPrompt \
+          --targets=mastodon \
+          --targets=bluesky \
           --promptuser_default \
             'This is my message to the world'
+          --promptuser_img_path= \
+            /my/path/to/image.png
+          --promptuser_img_alt= \
+            'Alternative text for image'
+    
+      # Spread message and image form web as command line parameter to
+      # Mastodon and Bluesky
+      $ spread-revolutionary-date \
+          --msgmaker=UserPrompt \
+          --targets=mastodon \
+          --targets=bluesky \
+          --promptuser_default \
+            'This is my message to the world'
+          --promptuser_img_url= \
+            'https://example.com/imgs/my_image.jgp'
+          --promptuser_img_alt \
     
       # Spread Téléchat date of the day on Mastodon and BlueSky
       $ spread-revolutionary-date \
-          --msgmaker Telechat \
-          --targets mastodon \
-          --targets bluesky \
+          --msgmaker=Telechat \
+          --targets=mastodon \
+          --targets=bluesky \
 
 CONFIGURATION
 
@@ -342,6 +366,28 @@ CONFIGURATION
     the [promptuser] section of the configuration file. It is only used if
     "msgmaker" option is PromptUser.
 
+  img_path
+
+    This option can only be specified once, with a value as string valued
+    by a path to an image file on local disk. The img_path option should be
+    defined in the [promptuser] section of the configuration file. It is
+    only used if "msgmaker" option is PromptUser.
+
+  img_alt
+
+    This option can only be specified once, with a value as string valued
+    by an alternative text to an image file specified by img_path or
+    img_url options. The img_alt option should be defined in the
+    [promptuser] section of the configuration file. It is only used if
+    "msgmaker" option is PromptUser.
+
+  img_url
+
+    This option can only be specified once, with a value as string valued
+    by an external url to an image specified. The img_url option should be
+    defined in the [promptuser] section of the configuration file. It is
+    only used if "msgmaker" option is PromptUser.
+
 COMMAND LINE PARAMETERS
 
     Any command line parameter, other than the first three ones below,
@@ -350,7 +396,7 @@ COMMAND LINE PARAMETERS
 
  Command line only parameters
 
-  --conf | -c <file>
+  --conf=<file> | -c <file>
 
     Use <file> path as configuration file, instead of the default ones, see
     "CONFIGURATION" above.
@@ -365,15 +411,15 @@ COMMAND LINE PARAMETERS
 
  General parameters
 
-  --targets | -tg <target>
+  --targets=<target> | -tg <target>
 
     Same as "targets" configuration option above.
 
-  --msgmaker | -mm <MsgMakerClass>
+  --msgmaker=<MsgMakerClass> | -mm <MsgMakerClass>
 
     Same as "msgmaker" configuration option above.
 
-  --locale | -l <fr|en|it|es>
+  --locale=<fr|en|it|es> | -l <fr|en|it|es>
 
     Same as "locale" configuration option above.
 
@@ -387,11 +433,11 @@ COMMAND LINE PARAMETERS
     spread on a Bluesky account. You have to get them from your Bluesky
     account <https://bsky.app/>.
 
-  --bluesky_identifier | -bi <identifier>
+  --bluesky_identifier=<identifier> | -bi <identifier>
 
     Same as "identifier" configuration option above.
 
-  --bluesky_password | -bp <password>
+  --bluesky_password=<password> | -bp <password>
 
     Same as "password" configuration option above.
 
@@ -401,19 +447,19 @@ COMMAND LINE PARAMETERS
     spread on a Twitter account. You have to get them from your Twitter API
     account <https://apps.twitter.com/> with write access level.
 
-  --twitter_consumer_key | -tck <key>
+  --twitter_consumer_key=<key> | -tck <key>
 
     Same as "consumer_key" configuration option above.
 
-  --twitter_consumer_secret | -tcs <secret>
+  --twitter_consumer_secret=<secret> | -tcs <secret>
 
     Same as "consumer_secret" configuration option above.
 
-  --twitter_access_token | -tat <token>
+  --twitter_access_token=<token> | -tat <token>
 
     Same as "access_token" configuration option above.
 
-  --twitter_access_token_secret | -tats <token secret>
+  --twitter_access_token_secret=<token secret> | -tats <token secret>
 
     Same as "access_token_secret" configuration option above.
 
@@ -426,19 +472,19 @@ COMMAND LINE PARAMETERS
     multiple instances, the previous link is for mstdn.fr instance, please
     replace url with your preferred instance.
 
-  --mastodon_instance | -mi <instance>
+  --mastodon_instance=<instance> | -mi <instance>
 
     Same as "instance" configuration option above.
 
-  --mastodon_client_id | -mci <id>
+  --mastodon_client_id=<id> | -mci <id>
 
     Same as "client_id" configuration option above.
 
-  --mastodon_client_secret | -mcs <secret>
+  --mastodon_client_secret)<secret> | -mcs <secret>
 
     Same as "client_secret" configuration option above.
 
-  --mastodon_access_token | -mat <token>
+  --mastodon_access_token=<token> | -mat <token>
 
     Same as "access_token" configuration option above.
 
@@ -449,19 +495,19 @@ COMMAND LINE PARAMETERS
     https://freenode.net/kb/answer/registration to find out how to register
     an account on Freenode.
 
-  --freenode_nickname | -fn <nick>
+  --freenode_nickname=<nick> | -fn <nick>
 
     Same as "nickname" configuration option above.
 
-  --freenode_password | -fp <passwd>
+  --freenode_password=<passwd> | -fp <passwd>
 
     Same as "password" configuration option above.
 
-  --freenode_channels | -fc <channel>
+  --freenode_channels=<channel> | -fc <channel>
 
     Same as "channels" configuration option above.
 
-  --freenode_test_channels | -ftc <channel>
+  --freenode_test_channels=<channel> | -ftc <channel>
 
     Same as "test_channels" configuration option above.
 
@@ -472,19 +518,19 @@ COMMAND LINE PARAMETERS
     https://libera.chat/guides/registration to find out how to register an
     account on Liberachat.
 
-  --liberachat_nickname | -ln <nick>
+  --liberachat_nickname=<nick> | -ln <nick>
 
     Same as "nickname" configuration option above.
 
-  --liberachat_password | -lp <passwd>
+  --liberachat_password=<passwd> | -lp <passwd>
 
     Same as "password" configuration option above.
 
-  --liberachat_channels | -lc <channel>
+  --liberachat_channels=<channel> | -lc <channel>
 
     Same as "channels" configuration option above.
 
-  --liberachat_test_channels | -ltc <channel>
+  --liberachat_test_channels=<channel> | -ltc <channel>
 
     Same as "test_channels" configuration option above.
 
@@ -503,6 +549,18 @@ COMMAND LINE PARAMETERS
   --promptuser_default <msg> | -pud <msg>
 
     Same as "default" configuration option above.
+
+  --promptuser_img_path <path/to/image/file> | -pui </path/to/image/file>
+
+    Same as "img_path" configuration option above.
+
+  --promptuser_img_alt <alternative text> | -pud <alternative text>
+
+    Same as "img_alt" configuration option above.
+
+  --promptuser_default <img_url> | -pud <img_url>
+
+    Same as "img_url" configuration option above.
 
 EXTENDING TO NEW TARGETS
 
@@ -559,13 +617,13 @@ EXTENDING TO NEW TARGETS
 
     Starting from version 0.39, you may have noticed that Mastodon and
     Bluesky targets can no spread not only a text message, but also an
-    image (with alternative text). This is only used for now by Telechat
-    message maker, to post an image of Groucha, the presenter of Téléchat.
-    But it can be used by other message makers in the future, including
-    PromptUser.
+    image (with alternative text). This is used by Telechat message maker,
+    to post an image of Groucha, the presenter of Téléchat, and by
+    PromptUser to send either an image file on local disk or an external
+    image on the web.
 
     This feature is not available now for IRC targets, Liberachat and
-    Freenode, since this targets are mostly for text messages.
+    Freenode, since theses targets are mostly for text messages.
 
     Also, we do not plan to extend this feature to Twitter target, since we
     recommand to not use this social network for political reasons.

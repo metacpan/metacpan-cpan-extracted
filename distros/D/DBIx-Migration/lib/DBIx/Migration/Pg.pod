@@ -1,0 +1,80 @@
+=pod
+
+=head1 NAME
+
+DBIx::Migration::Pg - Seamless PostgreSQL database schema up- and downgrades
+
+=head1 SYNOPSIS
+
+  my $m = DBIx::Migration->new(
+    dsn            => 'dbi:Pg:dbname=myapp.db;host=localhost;port=5432;user=postgres',
+    managed_schema => 'myapp'
+  );
+
+=head1 DESCRIPTION
+
+PostgreSQL supports schemas.
+
+For a PostgreSQL database you may set a managed schema (the schema of your
+single-schema application). By default the managed schema is C<public>. This
+class overrides the C<apply_managed_schema()> method. The method assigns the
+managed schema to the PostgreSQL C<search_path> connect option.
+
+For a PostgreSQL database you may set a tracking schema (the schema of your
+tracking table) too. By default the tracking schema is C<public>.
+
+=head1 ACCESSORS
+
+=over
+
+=item $self->managed_schema
+
+Get schema that your single-schema application refers to.
+
+=item $self->tracking_schema
+
+Get schema that the tracking table belongs to.
+
+=back
+
+=head1 METHODS
+
+=over 
+
+=item $self->apply_managed_schema
+
+Check L<DBIx::Migration/$self-E<gt>apply_managed_schema>.
+
+=item $self->quoted_tracking_table
+
+Check L<DBIx::Migration/$self-E<gt>quoted_tracking_table>.
+
+=back
+
+=head1 COMPARISONS
+
+There are more PostgreSQL database migration libraries on the CPAN. This
+chapter tries to compare some of them. The content is work in progress.
+
+  |                         | DBIx::Migration                 | App::Sqitch            |
+  +-------------------------+---------------------------------+------------------------+
+  | change                  | migration                       | change                 |
+  | SQL script types        | up, down                        | deploy, revert, verify |
+  | tracking                | tracking table                  | registry tables        |
+  | dependency relationship | linear (numbered consecutively) | tree like (requires)   |
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<PostgreSQL schemas|https://www.postgresql.org/docs/current/ddl-schemas.html>
+
+=item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
+
+=item * L<App::Sqitch>
+
+=item * L<Mojo::Pg::Migrations>
+
+=back
+
+=cut

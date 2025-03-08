@@ -77,5 +77,40 @@ sub request {
     );
 }
 
+sub request_json {
+    my ($self, $path, $params) = @_;
+
+    my %headers = ( 'Content-Type' => 'application/json' );
+    if( $self->token && $params->{'http_auth'} ) {
+        my $msg = 'Illegal parameters. You have defined \'token\' but the '
+                . ' method you are using defines its own HTTP Authorization header.';
+        WebService::Slack::WebApi::Exception::IllegalParameters->throw(
+            message  => $msg,
+        );
+    }
+    if( $self->token ) {
+        $headers{ 'Authorization' } = 'Bearer ' . $self->token;
+    } elsif( $params->{'http_auth'} ) {
+        $headers{ 'Authorization' } = $params->{'http_auth'};
+        delete $params->{'http_auth'};  # slack will not allow this in the json body
+    }
+
+    # should really add error handling here.    
+    my $json_body = JSON->new->utf8(1)->pretty(0)->canonical->encode($params);
+    my %options = ( headers => \%headers, content => $json_body );
+    
+    my $response = $self->ua->request(
+        'POST',
+        $self->base_url . $path,
+        \%options,
+    );
+    return decode_json $response->{content} if $response->{success};
+
+    WebService::Slack::WebApi::Exception::FailureResponse->throw(
+        message  => 'request_json failed.',
+        response => $response,
+    );
+}
+
 1;
 

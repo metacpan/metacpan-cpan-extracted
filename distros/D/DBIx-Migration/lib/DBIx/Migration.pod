@@ -9,7 +9,8 @@ DBIx::Migration - Seamless database schema up- and downgrades
   use DBIx::Migration ();
 
   my $m = DBIx::Migration->new(
-    dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
+    dsn            => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+    tracking_table => 'myapp_migration'
   );
 
   # Get current migration version from database
@@ -44,7 +45,9 @@ DBIx::Migration - Seamless database schema up- and downgrades
 
 =head1 DESCRIPTION
 
-This class provides seamless database schema up- and downgrades.
+This class provides the basis for seamless database schema up- and downgrades.
+It isn't abstract that means it can be used by its own. Subclasses like for
+example L<DBIx::Migration::Pg> offer driver specific improvements.
 
 =head2 Migrations
 
@@ -56,6 +59,9 @@ migration type that is either C<up> or C<down>. Migrations are stored in a
 directory and are applied in order to a database. Usually the version number of
 the first migration is 1. The version numbers of the other migrations have to
 be ascending without gaps.
+
+The migration object stores the current migration version in a tracking table.
+Its default unqualified name is C<dbix_migration>.
 
 =head2 Processing
 
@@ -76,27 +82,19 @@ The annotation has to be specified in the first line. The delimiter has to be
 a single printable ASCII character, excluding the space character. In the
 previous example it is the C</> (slash) character.
 
-=head2 Managed schema vs tracking schema
-
-The schema support of this implementation should be considered B<experimental>.
-For a PostgreSQL database you may set the managed schema (the schema of your
-single-schema application) using the C<search_path> connect option:
-
-  my $m = DBIx::Migration->new(
-    dsn => 'dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema'
-  );
-
-The migration object stores the current migration version in a tracking table.
-Its default unqualified name is C<dbix_migration>. The table belongs by default
-to the C<public> tracking schema.
-
-=head1 METHODS
+=head1 LIFECYCLE METHODS
 
 =over
 
 =item $self->BUILD( $args )
 
 Validate object.
+
+=back
+
+=head1 ACCESSORS
+
+=over
 
 =item $self->dir( $dir )
 
@@ -110,28 +108,43 @@ Get data source name.
 
 Get database handle.
 
+=item $self->password
+
+Get database password.
+
+=item $self->tracking_table
+
+Get tracking table.
+
+=item $self->username
+
+Get database username.
+
+=back
+
+=head1 METHODS
+
+=over 
+
+=item $self->apply_managed_schema
+
+Drivers that support schemas like PostgreSQL should override this method to set
+a managed schema before processing migrations.
+
+=item $self->driver, $class->driver( $dsn )
+
+Extracts and returns the driver name from the data source name.
+
 =item $self->migrate( $version )
 
 Migrate database to version. Returns true in case of success; otherwise false.
 If called without the version argument the latest migration version will be
 used.
 
-=item $self->password
+=item $self->quoted_tracking_table
 
-Get database password.
-
-=item $self->tracking_schema
-
-Get schema that the tracking table belongs to.
-
-=item $self->tracking_table
-
-Get tracking table. If the tracking schema is defined the tracking table name
-is fully qualified.
-
-=item $self->username
-
-Get database username.
+Quotes and returns the tracking table using L<DBI/quote_identifier>. This
+method is overrideable in subclasses.
 
 =item $self->version
 
@@ -153,10 +166,6 @@ C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
 =over
 
 =item * L<Liquibase end delimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
-
-=item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
-
-=item * L<App::Sqitch>
 
 =back
 

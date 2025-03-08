@@ -1,0 +1,8 @@
+# Sample sbokeeper blacklist file. For more information on blacklisting
+# packages, please consult the sbokeeper(1) manual.
+
+# Each blacklisted package should go on its own line. For example, to blacklist
+# various JDKs, do something like this (without the #'s).
+# openjdk8
+# OpenJDK11
+# OpenJDK17

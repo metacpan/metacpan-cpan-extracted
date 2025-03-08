@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.43';
 # ABSTRACT: Spanish localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
@@ -494,7 +494,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es - Spanish 
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 DESCRIPTION
 

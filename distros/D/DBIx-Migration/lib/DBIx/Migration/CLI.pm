@@ -5,13 +5,15 @@ use warnings;
 
 package DBIx::Migration::CLI;
 
-our $VERSION = '0.18';
+our $VERSION = $DBIx::Migration::VERSION;
 
-use DBIx::Migration   ();
-use Getopt::Std       qw( getopts );
-use Log::Any::Adapter ();
-use POSIX             qw( EXIT_FAILURE EXIT_SUCCESS );
-use Try::Tiny         qw( catch try );
+use DBIx::Migration           ();
+use Getopt::Std               qw( getopts );
+use Log::Any                  ();
+use Log::Any::Adapter         ();
+use Module::Load::Conditional qw( can_load );
+use POSIX                     qw( EXIT_FAILURE EXIT_SUCCESS );
+use Try::Tiny                 qw( catch try );
 
 sub run {
   local @ARGV = @_;
@@ -24,7 +26,7 @@ sub run {
       chomp $warning;
       $exitval = _usage( -exitval => 2, -message => $warning );
     };
-    getopts( '-Vhp:s:u:v', $opts = {} );
+    getopts( '-Vhp:s:t:u:v', $opts = {} );
   }
   return $exitval if defined $exitval;
 
@@ -36,29 +38,29 @@ sub run {
 
   return _usage( -exitval => 2, -message => 'Missing mandatory arguments' ) unless @ARGV;
 
+  Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
+  my $Logger = Log::Any->get_logger( category => 'DBIx::Migration' );
   $exitval = try {
-    Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
-    my $dsn = shift @ARGV;
+    my $dsn    = shift @ARGV;
+    my $driver = DBIx::Migration->driver( $dsn );
+    my $class  = "DBIx::Migration::$driver";
+    $class = 'DBIx::Migration' unless can_load( modules => { $class => undef } );
+    $Logger->infof( "Will use '%s' class to process migrations", $class );
+    my $m = $class->new(
+      dsn      => $dsn,
+      password => $opts->{ p },
+      username => $opts->{ u },
+      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ s } ) : (),
+      ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
+    );
     if ( @ARGV ) {
-      my $dir = shift @ARGV;
-      my $m   = DBIx::Migration->new(
-        dsn      => $dsn,
-        dir      => $dir,
-        password => $opts->{ p },
-        username => $opts->{ u },
-        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
-      );
+      $m->dir( shift @ARGV );
 
       return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
-      my $m = DBIx::Migration->new(
-        dsn      => $dsn,
-        password => $opts->{ p },
-        username => $opts->{ u },
-        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
-      );
       my $version = $m->version;
       print STDOUT ( defined $version ? $version : '' ), "\n";
+
       return EXIT_SUCCESS;
     }
   } catch {

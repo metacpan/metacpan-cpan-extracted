@@ -5,7 +5,6 @@ use strict;
 
 use Test::More;
 use Test::Deep;
-use Util::H2O::More qw/ddd/;
 
 # build and load subroutines
 use OpenMP::Simple;

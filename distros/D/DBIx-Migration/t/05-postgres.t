@@ -21,9 +21,9 @@ local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
 
 plan tests => 14;
 
-require DBIx::Migration;
+require DBIx::Migration::Pg;
 
-my $m = DBIx::Migration->new( dsn => $pgsql->dsn );
+my $m = DBIx::Migration::Pg->new( dsn => $pgsql->dsn );
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
@@ -67,7 +67,7 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir );
+my $m1 = DBIx::Migration::Pg->new( dbh => $m->dbh, dir => $m->dir );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Telechat;
-$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.43';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Téléchat date
 
 use Moose;
@@ -71,7 +71,7 @@ sub compute {
     '0130' => ['pantouflette', 'pantouflettes', 'f'],
     '0131' => ['zinzin', 'zinzins', 'm'],
     '0201' => ['bibelot', 'bibelots', 'm'],
-    '0202' => ['ukulélé,ukulélés', 'm'],
+    '0202' => ['ukulélé', 'ukulélés', 'm'],
     '0203' => ['grigris', 'grigris', 'm'],
     '0204' => ['crinoline', 'crinolines', 'f'],
     '0205' => ['turlutaine', 'turlutaines', 'f'],
@@ -103,7 +103,7 @@ sub compute {
     '0302' => ['tournebille', 'tournebilles', 'f'],
     '0303' => ['gibelotte', 'gibelottes', 'f'],
     '0304' => ['cabestan', 'cabestans', 'm'],
-    '0305' => ['mélopée', 'mélodées', 'f'],
+    '0305' => ['mélopée', 'mélopées', 'f'],
     '0306' => ['galurin', 'galurins', 'm'],
     '0307' => ['joug', 'jougs', 'm'],
     '0308' => ['cabriole', 'cabrioles', 'f'],
@@ -133,7 +133,7 @@ sub compute {
     '0401' => ['microplastique', 'microplastiques', 'm'],
     '0402' => ['bougie', 'bougies', 'f'],
     '0403' => ['cabine téléphonique', 'cabines téléphoniques', 'f'],
-    '0404' => ['canapé,canapés', 'm'],
+    '0404' => ['canapé', 'canapés', 'm'],
     '0405' => ['carte postale', 'cartes postales', 'f'],
     '0406' => ['ceinture', 'ceintures', 'f'],
     '0407' => ['engrenage', 'engrenages', 'm'],
@@ -143,8 +143,8 @@ sub compute {
     '0411' => ['humus', 'humus', 'm'],
     '0412' => ['entroque', 'entroque', 'f'],
     '0413' => ['fourneau', 'fourneaux', 'm'],
-    '0414' => ['ampoule multiprise et rallonge', 'ampoules multiprises et rallonges', 'f'],
-    '0415' => ['alésoir à cliquet', 'Alésoirs à cliquets', 'm'],
+    '0414' => ['ampoule, multiprise et rallonge', 'ampoules, multiprises et rallonges', 'f'],
+    '0415' => ['alésoir à cliquet', 'alésoirs à cliquets', 'm'],
     '0416' => ['clapier', 'clapiers', 'm'],
     '0417' => ['taloche', 'taloches', 'f'],
     '0418' => ['occiput', 'occiputs', 'm'],
@@ -157,7 +157,7 @@ sub compute {
     '0425' => ['gymkhana', 'gymkhanas', 'm'],
     '0426' => ['dosimètre', 'dosimètres', 'm'],
     '0427' => ['queue-de-pie', 'queues-de-pie', 'f'],
-    '0428' => ['clé à pipe débouchée', 'Clés à pipe débouchées', 'f'],
+    '0428' => ['clé à pipe débouchée', 'clés à pipe débouchées', 'f'],
     '0429' => ['perruque', 'perruques', 'f'],
     '0430' => ['traille', 'trailles', 'f'],
     '0501' => ['tripalium', 'tripaliums', 'm'],
@@ -255,8 +255,8 @@ sub compute {
     '0801' => ['oreiller-à-musique', 'oreillers-à-musique', 'm'],
     '0802' => ['papier-peint interactif', 'papiers-peints interactifs', 'm'],
     '0803' => ['xylophone', 'xylophones', 'm'],
-    '0804' => ['guilloché,guillochés', 'm'],
-    '0805' => ['djembé,djembés', 'm'],
+    '0804' => ['guilloché', 'guillochés', 'm'],
+    '0805' => ['djembé', 'djembés', 'm'],
     '0806' => ['caipirinha', 'caipirinhas', 'f'],
     '0807' => ['tzatziki', 'tzatzikis', 'm'],
     '0808' => ['karaoke', 'karaokes', 'm'],
@@ -328,7 +328,7 @@ sub compute {
     '1013' => ['oscilloscope', 'oscilloscopes', 'm'],
     '1014' => ['fréquencemètre', 'fréquencemètres', 'm'],
     '1015' => ['analyseur de spectre', 'analyseurs de spectre', 'm'],
-    '1016' => ['circuit imprimé,circuits imprimés', 'm'],
+    '1016' => ['circuit imprimé' ,'circuits imprimés', 'm'],
     '1017' => ['disjoncteur', 'disjoncteurs', 'm'],
     '1018' => ['machine-à-faire-des-trous-dans-les-spaghetti', 'machines-à-faire-des-trous-dans-les-spaghetti', 'f'],
     '1019' => ['morceau de bois', 'morceaux de bois', 'm'],
@@ -361,7 +361,7 @@ sub compute {
     '1115' => ['baldaquin', 'baldaquins', 'm'],
     '1116' => ['anémoscope', 'anémoscopes', 'm'],
     '1117' => ['clavicythérium', 'clavicythériums', 'm'],
-    '1118' => ['certificat de conformité,certificats de conformité', 'm'],
+    '1118' => ['certificat de conformité' ,'certificats de conformité', 'm'],
     '1119' => ['bonnet de nuit', ' bonnets de nuit', 'm'],
     '1120' => ['atmomètre', 'atmomètres', 'm'],
     '1121' => ['pnéomètre', 'pnéomètres', 'm'],
@@ -410,7 +410,7 @@ sub compute {
 
   my $today = DateTime->now(time_zone => 'Europe/Paris');
   my $day_name = $telechat_days[$today->day_of_week_0];
-  my $feast = $telechat_calendar{sprintf("%02d", $today->day).sprintf("%02d", $today->month)};
+  my $feast = $telechat_calendar{sprintf("%02d", $today->month).sprintf("%02d", $today->day)};
   my $feast_gender = $feast->[2] eq 'm' ? 'Saint' : 'Sainte';
   my $feast_singular = $feast->[0];
   $feast_singular =~ s/\b(\w)/\U$1/g;
@@ -449,7 +449,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Telechat - MsgMaker class for L<App::Spr
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 METHODS
 

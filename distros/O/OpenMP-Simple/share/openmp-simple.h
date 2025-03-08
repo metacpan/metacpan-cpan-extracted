@@ -480,26 +480,6 @@ void PerlOMP_VERIFY_1D_INT_ARRAY(SV *array) { verify_1D_array_type(array, is_int
 void PerlOMP_VERIFY_1D_DOUBLE_ARRAY(SV *array) { verify_1D_array_type(array, is_float, "double"); }
 void PerlOMP_VERIFY_1D_STRING_ARRAY(SV *array) { verify_1D_array_type(array, is_string, "string"); }
 
-/* Check for mixed types */
-void PerlOMP_VERIFY_1D_MIXED_ARRAY(SV *array) {
-    if (!is_array_ref(array)) {
-        croak("Expected a 1D array reference");
-    }
-    AV *av = (AV *)SvRV(array);
-    I32 len = av_len(av) + 1;
-    bool found_int = false, found_float = false, found_string = false;
-    for (I32 i = 0; i < len; i++) {
-        SV **element = av_fetch(av, i, 0);
-        if (!element) continue;
-        found_int |= is_int(*element);
-        found_float |= is_float(*element);
-        found_string |= is_string(*element);
-    }
-    if (!(found_int + found_float + found_string > 1)) {
-        croak("Expected mixed types, but found only one type");
-    }
-}
-
 /* Generic function to verify a 2D array's element type */
 void verify_2D_array_type(SV *AoA, bool (*type_check)(SV *), const char *type_name) {
     PerlOMP_VERIFY_2D_AoA(AoA);
@@ -523,34 +503,4 @@ void PerlOMP_VERIFY_2D_FLOAT_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_float
 void PerlOMP_VERIFY_2D_INT_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_int, "integer"); }
 void PerlOMP_VERIFY_2D_DOUBLE_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_float, "double"); }
 void PerlOMP_VERIFY_2D_STRING_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_string, "string"); }
-
-/* Check for mixed types in a 2D array */
-void PerlOMP_VERIFY_2D_MIXED_ARRAY(SV *AoA) {
-    PerlOMP_VERIFY_2D_AoA(AoA);
-    AV *outer = (AV *)SvRV(AoA);
-    I32 rows = av_len(outer) + 1;
-    for (I32 i = 0; i < rows; i++) {
-        SV **inner_ref = av_fetch(outer, i, 0);
-        AV *inner = (AV *)SvRV(*inner_ref);
-        I32 cols = av_len(inner) + 1;
-        bool found_int = false, found_float = false, found_string = false;
-        for (I32 j = 0; j < cols; j++) {
-            SV **element = av_fetch(inner, j, 0);
-            if (!element) continue;
-            found_int |= is_int(*element);
-            found_float |= is_float(*element);
-            found_string |= is_string(*element);
-        }
-        if (!(found_int + found_float + found_string > 1)) {
-            croak("Expected mixed types in row %d, but found only one type", i);
-        }
-    }
-}
-
-/* TODO:
-  * add unit tests for conversion functions
-  * add some basic matrix operations (transpose for 2D, reverse for 1D)
-  * experiment with simple hash ref to C struct
- * ...
-*/
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.19 2025-03-08T08:20:04Z
+    - fix CI #58
+    - add support for Slacks new file upload implementation #57
+
 0.18 2021-02-06T13:56:26Z
     - add oauth.v2.access method (thx mikkoi)
     - pass token by HTTP header instead of POST body (thx mikkoi)

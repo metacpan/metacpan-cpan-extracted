@@ -2,6 +2,7 @@ COPYING
 lib/Bio/Phylo/Forest/DBTree.pm
 lib/Bio/Phylo/Forest/DBTree/Result/Node.pm
 LICENSE
+Makefile.PL
 MANIFEST			This list of files
 README.md
 script/megatree-bold-loader

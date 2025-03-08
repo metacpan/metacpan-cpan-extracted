@@ -5,8 +5,7 @@ use strict;
     
 use Test::More;
 use Test::Deep;
-use Util::H2O::More qw/ddd/;
-    
+
 # build and load subroutines
 use OpenMP::Simple;
 use OpenMP::Environment;
@@ -19,9 +18,32 @@ use Inline (
 my $env = OpenMP::Environment->new();
 
 my $aref_orig = [
-  [ "apple", "banana", "cherry" ],
-  [ "date", "elder", "fig" ],
-  [ "grape", "honey", "iris" ],
+    [ "apple",    "banana", "cherry",   "date",   "elder",    "fig",    "grape",    "honey",  "iris",     "jack" ],
+    [ "kite",     "lemon",  "mango",    "nectar", "olive",    "pear",   "quince",   "rose",   "straw",    "tulip" ],
+    [ "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana", "cherry",   "date" ],
+    [ "elder",    "fig",    "grape",    "honey",  "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar" ],
+    [ "olive",    "pear",   "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet", "water",    "xenon" ],
+    [ "yellow",   "zebra",  "apple",    "banana", "cherry",   "date",   "elder",    "fig",    "grape",    "honey" ],
+    [ "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar", "olive",    "pear",   "quince",   "rose" ],
+    [ "straw",    "tulip",  "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana" ],
+    [ "cherry",   "date",   "elder",    "fig",    "grape",    "honey",  "iris",     "jack",   "kite",     "lemon" ],
+    [ "mango",    "nectar", "olive",    "pear",   "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet" ],
+    [ "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana", "cherry",   "date",   "elder",    "fig" ],
+    [ "grape",    "honey",  "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar", "olive",    "pear" ],
+    [ "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra" ],
+    [ "apple",    "banana", "cherry",   "date",   "elder",    "fig",    "grape",    "honey",  "iris",     "jack" ],
+    [ "kite",     "lemon",  "mango",    "nectar", "olive",    "pear",   "quince",   "rose",   "straw",    "tulip" ],
+    [ "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana", "cherry",   "date" ],
+    [ "elder",    "fig",    "grape",    "honey",  "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar" ],
+    [ "olive",    "pear",   "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet", "water",    "xenon" ],
+    [ "yellow",   "zebra",  "apple",    "banana", "cherry",   "date",   "elder",    "fig",    "grape",    "honey" ],
+    [ "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar", "olive",    "pear",   "quince",   "rose" ],
+    [ "straw",    "tulip",  "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana" ],
+    [ "cherry",   "date",   "elder",    "fig",    "grape",    "honey",  "iris",     "jack",   "kite",     "lemon" ],
+    [ "mango",    "nectar", "olive",    "pear",   "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet" ],
+    [ "water",    "xenon",  "yellow",   "zebra",  "apple",    "banana", "cherry",   "date",   "elder",    "fig" ],
+    [ "grape",    "honey",  "iris",     "jack",   "kite",     "lemon",  "mango",    "nectar", "olive",    "pear" ],
+    [ "quince",   "rose",   "straw",    "tulip",  "umbrella", "violet", "water",    "xenon",  "yellow",   "zebra" ],
 ];
 
 foreach my $thread_count (qw/1 4 8/) {
@@ -47,8 +69,8 @@ AV* omp_get_renew_aref(SV *AoA) {
   PerlOMP_UPDATE_WITH_ENV__NUM_THREADS
   PerlOMP_RET_ARRAY_REF_ret
   
-  int numRows = 3;
-  int rowSize = 3;
+  int numRows = PerlOMP_1D_Array_NUM_ELEMENTS(AoA);
+  int rowSize = 10;
   av_push(ret, newSViv(numRows * rowSize));
   
   char *raw_array[numRows][rowSize];

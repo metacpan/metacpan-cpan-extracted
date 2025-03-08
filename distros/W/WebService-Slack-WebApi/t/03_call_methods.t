@@ -120,12 +120,12 @@ my %tests = (
             cursor           => 'dXNlcjpVMDYxTkZUVDI=',
             exclude_archived => 1,
             limit            => 20,
-            types            => 'public_channel,private_channel' 
+            types            => 'public_channel,private_channel'
         },
         members => {
             channel => 'hoge',
             cursor  => 'dXNlcjpVMDYxTkZUVDI=',
-            types   => 'public_channel,private_channel' 
+            types   => 'public_channel,private_channel'
         },
         open => {
             channel => 'hoge',
@@ -208,6 +208,17 @@ my %tests = (
             link_names  => 1,
             parse       => 'hoge',
         },
+        schedule_message => {
+            channel => 'hoge',
+            post_at => time() + 500,
+            text    => 'hoge',
+            as_user => 1,
+        },
+        delete_scheduled_message => {
+            channel              => 'hoge',
+            scheduled_message_id => '123456789',
+            as_user              => 1,
+        },
     },
     dialog => {
         open => {
@@ -242,6 +253,23 @@ my %tests = (
         shared_public_url => {
             file => 'file_id',
         },
+        get_upload_url_external => {
+            filename => 'hoge',
+            length   => 500,
+        },
+        # send_file_to_external_url() is tested implicitly by the upload_v2() method.
+        complete_upload_external => {
+            files           => [
+                {
+                    'hoge' => {
+                        id    => '1234567890',
+                        title => 'hoge',
+                    }
+                },
+            ],
+            channel_id      => 'hoge',
+            initial_comment => 'hoge',
+        },
         upload => {
             channels        => ['hoge', 'fuga'],
             content         => 'hoge content',
@@ -250,6 +278,18 @@ my %tests = (
             filetype        => 'type',
             initial_comment => 'initial hoge',
             title           => 'hoge title',
+        },
+        upload_v2 => {
+            channel           => 'hoge',
+            channel_id        => 'hoge',
+            file_contents     => 'hoge',
+            file_type         => 'hoge',
+            file_length       => 500,
+            filename          => 'hoge',
+            from              => 'hoge',
+            message           => 'hoge',
+            error_handler     => sub { return 0; },
+            channel_not_found => sub { return 0; },
         },
     },
     groups => {

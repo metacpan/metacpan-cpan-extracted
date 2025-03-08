@@ -1,0 +1,5 @@
+# Changes for App::ipinfo
+
+1.01 2025-03-08T09:41:46Z
+	* first release of a command-line tool for IPinfo.io
+

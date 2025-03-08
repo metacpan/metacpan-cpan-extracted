@@ -3,8 +3,6 @@
 use warnings;
 use strict;
 
-use Util::H2O::More qw//;
-
 use Test::More;
 use Test::Deep;
 

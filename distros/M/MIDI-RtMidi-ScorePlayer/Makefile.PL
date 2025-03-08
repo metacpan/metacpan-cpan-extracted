@@ -19,6 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dumper::Compact" => 0,
     "File::Basename" => 0,
+    "Future::AsyncAwait" => 0,
+    "Future::IO" => 0,
     "MIDI::RtMidi::FFI::Device" => 0,
     "MIDI::Util" => "0.1302",
     "Path::Tiny" => 0,
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.0208",
+  "VERSION" => "0.0301",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +45,8 @@ my %FallbackPrereqs = (
   "Data::Dumper::Compact" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,
+  "Future::AsyncAwait" => 0,
+  "Future::IO" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "MIDI::RtMidi::FFI::Device" => 0,

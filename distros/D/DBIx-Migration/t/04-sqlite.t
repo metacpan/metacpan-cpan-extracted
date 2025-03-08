@@ -27,22 +27,24 @@ subtest 'wrong dsn' => sub {
 };
 
 my $tempdir = tempdir( CLEANUP => 1 );
-my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ) );
+my $m       = DBIx::Migration->new( tracking_table => 'dbix-migration', dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ) );
 note 'dsn: ', $m->dsn;
 
-is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
+my $tracking_table = $m->tracking_table;
+is $m->version, undef, "\"$tracking_table\" table does not exist == migrate() not called yet";
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
 dies_ok { $m->migrate( 0 ) } '"dir" not set';
 $m->dir( cwd->child( qw( t sql basic ) ) );
 
-ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
+ok $m->migrate( 0 ),
+  "initially (if the \"$tracking_table\" table does not exist yet) a database is at version 0";
 
-subtest 'privious migrate() has triggered the "dbix_migration" table creation' => sub {
+subtest "privious migrate() has triggered the \"$tracking_table\" table creation" => sub {
   plan tests => 2;
 
   is $m->version, 0, 'check version';
-  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ '"main"."dbix_migration"' ], 'check tables';
+  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ], 'check tables';
 };
 
 sub migrate_to_version_assertion {
@@ -72,9 +74,9 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir );
+my $m1 = DBIx::Migration->new( tracking_table => $m->tracking_table, dbh => $m->dbh, dir => $m->dir );
 
-is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
+is $m1->version, 0, "\"$tracking_table\" table exists and its \"version\" value is 0";
 
 ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
 
@@ -84,6 +86,7 @@ my $m2 = DBIx::Migration->new(
   dir => cwd->child( qw( t sql rollback ) )
 );
 
+$tracking_table = $m2->tracking_table;
 dies_ok { $m2->migrate } 'second migration section is broken';
 is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
-  'check tables: creation of dbix_migration table was rolled back too!';
+  "check tables: creation of \"$tracking_table\" table was rolled back too!";

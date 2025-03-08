@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
 use Game::RockPaperScissorsLizardSpock qw(rpsls);
 use MIDI::RtMidi::ScorePlayer ();
 use MIDI::Util qw(setup_score set_chan_patch);

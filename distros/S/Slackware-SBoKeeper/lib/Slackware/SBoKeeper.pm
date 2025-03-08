@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 use strict;
 use warnings;
 
@@ -216,6 +216,7 @@ my @CONFIG_PATHS = (
 	"$HOME/.config/sbokeeper.conf",
 	"$HOME/.sbokeeper.conf",
 	"/etc/sbokeeper.conf",
+	"/etc/sbokeeper/sbokeeper.conf",
 );
 
 my $SLACKWARE_VERSION = Slackware::SBoKeeper::System->version();
@@ -1275,18 +1276,17 @@ sub rtree {
 
 }
 
-# TODO: Blacklisted packages might still show up in dump.
 sub dump {
 
 	my $self = shift;
 
-	open my $fh, '<', $self->{DataFile}
-		or die "Failed to open sbokeeper data file $self->{DataFile} for " .
-		       "reading: $!\n";
+	my $sbokeeper = Slackware::SBoKeeper::Database->new(
+		$self->{DataFile},
+		$self->{SBoPath},
+		$self->{Blacklist}
+	);
 
-	while (my $l = readline $fh) {
-		print $l;
-	}
+	print $sbokeeper->write;
 
 }
 
@@ -1341,6 +1341,10 @@ sub init {
 
 	unless (@ARGV) {
 		die $HELP_MSG;
+	}
+
+	if (!$self->{ConfigFile} and defined $ENV{SBOKEEPER_CONFIG}) {
+		$self->{ConfigFile} = $ENV{SBOKEEPER_CONFIG};
 	}
 
 	unless ($self->{ConfigFile}) {

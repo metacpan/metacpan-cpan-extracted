@@ -53,6 +53,6 @@
       },
       "x_MailingList" : "mailto:bio-phylo@googlegroups.com"
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

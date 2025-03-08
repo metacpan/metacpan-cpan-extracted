@@ -32,7 +32,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -61,40 +61,64 @@ The revolutionary date and time is computed thanks to the L<DateTime::Calendar::
 
   # Test spreading to Mastodon only:
   $ spread-revolutionary-date \
-      --targets mastodon --test
+      --targets=mastodon --test
 
   # Test spreading to Twitter only in English:
   $ spread-revolutionary-date \
-      --targets twitter \
+      --targets=twitter \
       --test \
       --locale en
 
   # Spread acab time to Twitter and Liberachat
   # explicit channels
   $ spread-revolutionary-date \
-      --targets twitter \
-      --targets liberachat \
-      --liberachat_channels '#revolution' \
-      --liberachat_channels '#acab' \
+      --targets=twitter \
+      --targets=liberachat \
+      --liberachat_channels='#revolution' \
+      --liberachat_channels='#acab' \
       --revolutionarydate_acab
 
   # Prompt user for a message to spread to mastodon
   $ spread-revolutionary-date \
-      --targets mastodon \
-      --msgmaker UserPrompt
+      --targets=mastodon \
+      --msgmaker=UserPrompt
 
   # Spread message as command line parameter to
   # Bluesky, Twitter, Mastodon, Freenode and Liberachat
   $ spread-revolutionary-date \
-      --msgmaker UserPrompt \
+      --msgmaker=UserPrompt \
+      --promptuser_default \
+
+  # Spread message and image as command line parameter to
+  # Mastodon and Bluesky
+  $ spread-revolutionary-date \
+      --msgmaker=UserPrompt \
+      --targets=mastodon \
+      --targets=bluesky \
       --promptuser_default \
         'This is my message to the world'
+      --promptuser_img_path= \
+        /my/path/to/image.png
+      --promptuser_img_alt= \
+        'Alternative text for image'
+
+  # Spread message and image form web as command line parameter to
+  # Mastodon and Bluesky
+  $ spread-revolutionary-date \
+      --msgmaker=UserPrompt \
+      --targets=mastodon \
+      --targets=bluesky \
+      --promptuser_default \
+        'This is my message to the world'
+      --promptuser_img_url= \
+        'https://example.com/imgs/my_image.jgp'
+      --promptuser_img_alt \
 
   # Spread Téléchat date of the day on Mastodon and BlueSky
   $ spread-revolutionary-date \
-      --msgmaker Telechat \
-      --targets mastodon \
-      --targets bluesky \
+      --msgmaker=Telechat \
+      --targets=mastodon \
+      --targets=bluesky \
 
 =head1 CONFIGURATION
 
@@ -236,13 +260,25 @@ If L</msgmaker> option is C<PromptUser>, instead of spreading the revolutionary 
 
 This option can only be specified once, with a value as string. If C<default> option is set, the user is not prompted and this default message is spread. If C<default> option is not defined, the default message is C<'Goodbye old world, hello revolutionary worlds'> if the user enters nothing when prompted. The C<default> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
 
+=head3 img_path
+
+This option can only be specified once, with a value as string valued by a path to an image file on local disk. The C<img_path> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+
+=head3 img_alt
+
+This option can only be specified once, with a value as string valued by an alternative text to an image file specified by C<img_path> or C<img_url> options. The C<img_alt> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+
+=head3 img_url
+
+This option can only be specified once, with a value as string valued by an external url to an image specified. The C<img_url> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+
 =head1 COMMAND LINE PARAMETERS
 
 Any command line parameter, other than the first three ones below, takes precedence on the corresponding option specified on the confiuration file, see L</CONFIGURATION> above.
 
 =head2 Command line only parameters
 
-=head3 --conf | -c <file>
+=head3 --conf=<file> | -c <file>
 
 Use C<E<lt>fileE<gt>> path as configuration file, instead of the default ones, see L</CONFIGURATION> above.
 
@@ -256,15 +292,15 @@ Prints out help with command line parameters.
 
 =head2 General parameters
 
-=head3 --targets | -tg <target>
+=head3 --targets=<target> | -tg <target>
 
 Same as L</targets> configuration option above.
 
-=head3 --msgmaker | -mm <MsgMakerClass>
+=head3 --msgmaker=<MsgMakerClass> | -mm <MsgMakerClass>
 
 Same as L</msgmaker> configuration option above.
 
-=head3 --locale | -l <fr|en|it|es>
+=head3 --locale=<fr|en|it|es> | -l <fr|en|it|es>
 
 Same as L</locale> configuration option above.
 
@@ -276,11 +312,11 @@ Same as L</test> configuration option above.
 
 These parameters specify credentials for C<spread-revolutionary-date> to spread on a Bluesky account. You have to get them from your L<Bluesky account|https://bsky.app/>.
 
-=head3 --bluesky_identifier | -bi <identifier>
+=head3 --bluesky_identifier=<identifier> | -bi <identifier>
 
 Same as L</identifier> configuration option above.
 
-=head3 --bluesky_password | -bp <password>
+=head3 --bluesky_password=<password> | -bp <password>
 
 Same as L</password> configuration option above.
 
@@ -288,19 +324,19 @@ Same as L</password> configuration option above.
 
 These parameters specify credentials for C<spread-revolutionary-date> to spread on a Twitter account. You have to get them from your L<Twitter API account|https://apps.twitter.com/> with C<write> access level.
 
-=head3 --twitter_consumer_key | -tck <key>
+=head3 --twitter_consumer_key=<key> | -tck <key>
 
 Same as L</consumer_key> configuration option above.
 
-=head3 --twitter_consumer_secret | -tcs <secret>
+=head3 --twitter_consumer_secret=<secret> | -tcs <secret>
 
 Same as L</consumer_secret> configuration option above.
 
-=head3 --twitter_access_token | -tat <token>
+=head3 --twitter_access_token=<token> | -tat <token>
 
 Same as L</access_token> configuration option above.
 
-=head3 --twitter_access_token_secret | -tats <token secret>
+=head3 --twitter_access_token_secret=<token secret> | -tats <token secret>
 
 Same as L</access_token_secret> configuration option above.
 
@@ -308,19 +344,19 @@ Same as L</access_token_secret> configuration option above.
 
 These parameters specify credentials for C<spread-revolutionary-date> to spread on a Mastodon account. You have to get them from your L<Mastodon instance API account|https://mstdn.fr/settings/applications> with C<write> scope. Note that Mastodon is a decentralized network with multiple instances, the previous link is for L<mstdn.fr|https://mstdn.fr> instance, please replace url with your preferred instance.
 
-=head3 --mastodon_instance | -mi <instance>
+=head3 --mastodon_instance=<instance> | -mi <instance>
 
 Same as L</instance> configuration option above.
 
-=head3 --mastodon_client_id | -mci <id>
+=head3 --mastodon_client_id=<id> | -mci <id>
 
 Same as L</client_id> configuration option above.
 
-=head3 --mastodon_client_secret | -mcs <secret>
+=head3 --mastodon_client_secret)<secret> | -mcs <secret>
 
 Same as L</client_secret> configuration option above.
 
-=head3 --mastodon_access_token | -mat <token>
+=head3 --mastodon_access_token=<token> | -mat <token>
 
 Same as L</access_token> configuration option above.
 
@@ -328,19 +364,19 @@ Same as L</access_token> configuration option above.
 
 The first two parameters are credentials for C<spread-revolutionary-date> to spread on a Freenode account. See L<https://freenode.net/kb/answer/registration> to find out how to register an account on Freenode.
 
-=head3 --freenode_nickname | -fn <nick>
+=head3 --freenode_nickname=<nick> | -fn <nick>
 
 Same as L</nickname> configuration option above.
 
-=head3 --freenode_password | -fp <passwd>
+=head3 --freenode_password=<passwd> | -fp <passwd>
 
 Same as L</password> configuration option above.
 
-=head3 --freenode_channels | -fc <channel>
+=head3 --freenode_channels=<channel> | -fc <channel>
 
 Same as L</channels> configuration option above.
 
-=head3 --freenode_test_channels | -ftc <channel>
+=head3 --freenode_test_channels=<channel> | -ftc <channel>
 
 Same as L</test_channels> configuration option above.
 
@@ -348,19 +384,19 @@ Same as L</test_channels> configuration option above.
 
 The first two parameters are credentials for C<spread-revolutionary-date> to spread on a Liberachat account. See L<https://libera.chat/guides/registration> to find out how to register an account on Liberachat.
 
-=head3 --liberachat_nickname | -ln <nick>
+=head3 --liberachat_nickname=<nick> | -ln <nick>
 
 Same as L</nickname> configuration option above.
 
-=head3 --liberachat_password | -lp <passwd>
+=head3 --liberachat_password=<passwd> | -lp <passwd>
 
 Same as L</password> configuration option above.
 
-=head3 --liberachat_channels | -lc <channel>
+=head3 --liberachat_channels=<channel> | -lc <channel>
 
 Same as L</channels> configuration option above.
 
-=head3 --liberachat_test_channels | -ltc <channel>
+=head3 --liberachat_test_channels=<channel> | -ltc <channel>
 
 Same as L</test_channels> configuration option above.
 
@@ -380,6 +416,18 @@ Same as L</wikipedia_link> configuration option above.
 
 Same as L</default> configuration option above.
 
+=head3 --promptuser_img_path <path/to/image/file> | -pui </path/to/image/file>
+
+Same as L</img_path> configuration option above.
+
+=head3 --promptuser_img_alt <alternative text> | -pud <alternative text>
+
+Same as L</img_alt> configuration option above.
+
+=head3 --promptuser_default <img_url> | -pud <img_url>
+
+Same as L</img_url> configuration option above.
+
 =head1 EXTENDING TO NEW TARGETS
 
 Starting from version 0.07, this distribution takes advantage of L<Moose>, the postmodern object system for Perl 5, allowing to easily extend C<spread-revolutionary-date> to other targets than the default ones (C<Bluesky>, C<Twitter>, C<Mastondon>, C<Freenode> and C<Liberachat>.
@@ -394,9 +442,9 @@ To perform authentication and to post a message, there is a strong likelihood th
 
 Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<App::SpreadRevolutionaryDate::BlueskyLite> C<worker>, L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. The last two are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
 
-Starting from version 0.39, you may have noticed that C<Mastodon> and C<Bluesky> targets can no spread not only a text message, but also an image (with alternative text). This is only used for now by C<Telechat> message maker, to post an image of Groucha, the presenter of Téléchat. But it can be used by other message makers in the future, including C<PromptUser>.
+Starting from version 0.39, you may have noticed that C<Mastodon> and C<Bluesky> targets can no spread not only a text message, but also an image (with alternative text). This is used by C<Telechat> message maker, to post an image of Groucha, the presenter of Téléchat, and by C<PromptUser> to send either an image file on local disk or an external image on the web.
 
-This feature is not available now for I<IRC> targets, C<Liberachat> and C<Freenode>, since this targets are mostly for text messages.
+This feature is not available now for I<IRC> targets, C<Liberachat> and C<Freenode>, since theses targets are mostly for text messages.
 
 Also, we do not plan to extend this feature to C<Twitter> target, since we recommand to not use this social network for political reasons.
 

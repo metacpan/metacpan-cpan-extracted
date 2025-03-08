@@ -6,7 +6,7 @@ DBIx::Migration::CLI - Seamless database up- and downgrades CLI
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ DBIx::Migration::CLI - Seamless database up- and downgrades CLI
 
 =item dbix-migration [ B<-V> | B<-h> ]
 
-=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] [ B<-s> I<schema> ] I<dsn> [ I<directory> [ I<version> ] ]
+=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] [ B<-s> I<schema> ] [ B<-t> I<schema> ] I<dsn> [ I<directory> [ I<version> ] ]
 
 =back
 
@@ -39,7 +39,9 @@ the I<version> is missing the latest migration version will be used.
 
 =item B<-p> I<password> Set database password.
 
-=item B<-s> I<schema> Set tracking schema.
+=item B<-s> I<schema> Set managed schema.
+
+=item B<-t> I<schema> Set tracking schema.
 
 =back
 
@@ -67,11 +69,12 @@ Executes this script and returns a proper C<exit()> argument value.
 
 =head1 EXAMPLES
 
-  dbix-migration -s dbixm 'dbi:Pg:service=myapp;options=--search_path=myschema' ~/Projects/myapp/db/migrations 2
+  dbix-migration -s myapp -t myapp_tracking ':dbi:Pg:service=myapp' ~/Projects/myapp/db/migrations 2
 
-initiates a migration to the target version 2. The tracking schema is "dbixm".
-The managed schema is "myschema". The connection details are configured in a
-service file and extracted from there using the service name "myapp".
+initiates a migration to the target version 2. The tracking schema is
+"myapp_tracking".  The managed schema is "myapp". The connection details are
+configured in a service file and extracted from there using the service name
+"myapp".
 
 =head1 SEE ALSO
 

@@ -81,5 +81,42 @@ sub update {
     return $self->request('update', {%$args, %extra});
 }
 
+sub schedule_message {
+    state $rule = Data::Validator->new(
+        channel         => 'Str',
+        post_at         => 'Int',
+        text            => { isa => 'Str',      optional => 1 },
+        as_user         => { isa => 'Bool',     optional => 1 },
+        attachments     => { isa => 'ArrayRef', optional => 1 },
+        blocks          => { isa => 'ArrayRef', optional => 1 },
+        icon_emoji      => { isa => 'Str',      optional => 1 },
+        icon_url        => { isa => 'Str',      optional => 1 },
+        link_names      => { isa => 'Bool',     optional => 1 },
+        markdown_text   => { isa => 'Str',      optional => 1 },
+        metadata        => { isa => 'Str',      optional => 1 },
+        parse           => { isa => 'Str',      optional => 1 },
+        reply_broadcast => { isa => 'Bool',     optional => 1 },
+        thread_ts       => { isa => 'Str',      optional => 1 },
+        unfurl_links    => { isa => 'Bool',     optional => 1 },
+        unfurl_media    => { isa => 'Bool',     optional => 1 },
+    )->with('Method', 'AllowExtra');
+    my ($self, $args, %extra) = $rule->validate(@_);
+
+    $args->{attachments} = encode_json $args->{attachments} if exists $args->{attachments};
+    $args->{blocks}      = encode_json $args->{blocks} if exists $args->{blocks};
+    return $self->request('scheduleMessage', {%$args, %extra});
+}
+
+sub delete_scheduled_message {
+    state $rule = Data::Validator->new(
+        channel              => 'Str',
+        scheduled_message_id => 'Str',
+        as_user              => { isa => 'Bool',     optional => 1 },
+    )->with('Method', 'AllowExtra');
+    my ($self, $args, %extra) = $rule->validate(@_);
+
+    return $self->request('deleteScheduledMessage', {%$args, %extra});
+}
+
 1;
 

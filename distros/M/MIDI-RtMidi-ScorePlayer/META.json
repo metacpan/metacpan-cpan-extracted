@@ -36,6 +36,8 @@
          "requires" : {
             "Data::Dumper::Compact" : "0",
             "File::Basename" : "0",
+            "Future::AsyncAwait" : "0",
+            "Future::IO" : "0",
             "MIDI::RtMidi::FFI::Device" : "0",
             "MIDI::Util" : "0.1302",
             "Path::Tiny" : "0",
@@ -64,7 +66,7 @@
          "web" : "https://github.com/ology/MIDI-RtMidi-ScorePlayer"
       }
    },
-   "version" : "0.0208",
+   "version" : "0.0301",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

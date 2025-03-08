@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Bluesky;
-$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.43';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Bluesky.
 
 use Moose;
@@ -18,6 +18,7 @@ with 'App::SpreadRevolutionaryDate::Target'
   => {worker => 'App::SpreadRevolutionaryDate::BlueskyLite'};
 
 use App::SpreadRevolutionaryDate::BlueskyLite;
+use Encode qw(encode decode is_utf8);
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -67,7 +68,6 @@ sub spread {
     my $io = IO::Handle->new;
     $io->fdopen(fileno(STDOUT), "w");
 
-    use Encode qw(encode decode is_utf8);
     $msg = encode('UTF-8', $msg) if is_utf8($msg);
 
     $io->say($msg);
@@ -99,7 +99,7 @@ App::SpreadRevolutionaryDate::Target::Bluesky - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 METHODS
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.40';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.43';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -19,6 +19,9 @@ with 'App::SpreadRevolutionaryDate::MsgMaker';
 use open qw(:std :encoding(UTF-8));
 use IO::Prompt::Hooked;
 use File::Spec;
+use File::Basename;
+use File::Temp qw/tempfile/;
+use LWP::UserAgent;
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -28,6 +31,24 @@ has 'default' => (
   isa => 'Str',
   required => 1,
   default => 'Goodbye old world, hello revolutionary worlds',
+);
+
+has 'img_path' => (
+  is => 'rw',
+  isa => 'Str',
+  default => '',
+);
+
+has 'img_alt' => (
+  is => 'rw',
+  isa => 'Str',
+  default => '',
+);
+
+has 'img_url' => (
+  is => 'rw',
+  isa => 'Str',
+  default => '',
 );
 
 around BUILDARGS => sub {
@@ -63,6 +84,14 @@ sub compute {
   my $confirm_error = __x("Input must be \"{confirm_ok}\" or \"{confirm_nok}\"\n", confirm_ok => $confirm_ok, confirm_nok => $confirm_nok);
   my $abort = __"OK not spreading";
 
+  if ($self->img_path) {
+    $self->img_alt(ucfirst(fileparse($self->img_path, qr/\.[^.]*/))) unless $self->img_alt;
+    $confirm_question =  __x("with image file"). ' ' . $self->{img_path} . ' (alt:' . $self->img_alt . '), ' . $confirm_question;
+  } elsif ($self->img_url) {
+    $self->img_alt(ucfirst(fileparse($self->img_url, qr/\.[^.]*/))) unless $self->img_alt;
+    $confirm_question =  __x("with image from url:"). ' ' . $self->{img_url} . ' (alt:' . $self->img_alt . '), ' . $confirm_question;
+  }
+
   my $confirm = $confirm_nok;
   my $msg;
   while (defined $confirm && $confirm !~ qr($confirm_ok)) {
@@ -77,7 +106,21 @@ sub compute {
     );
   }
   die "$abort\n" unless defined $confirm && $confirm =~ qr($confirm_ok);
-  return ($msg, undef);
+
+  if ($self->img_path) {
+    return ($msg, {path => $self->img_path, alt => $self->img_alt});
+  } elsif ($self->img_url) {
+    my $ua = LWP::UserAgent->new(env_proxy => 1, timeout => 10, agent =>'App::SpreadRevolutionaryDate bot');
+    my $response = $ua->get($self->img_url);
+    die "Cannot download image from " . $self->img_url . ": " . $response->status_line . "\n" unless $response->is_success;
+
+    my ($fh, $filename) = tempfile(UNLINK => 1);
+    print $fh $response->content;
+    close $fh;
+    return ($msg, {path => $filename, alt => $self->img_alt});
+  } else {
+    return ($msg, undef);
+  }
 }
 
 
@@ -103,7 +146,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.40
+version 0.43
 
 =head1 METHODS
 

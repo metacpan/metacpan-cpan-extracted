@@ -1,4 +1,8 @@
 Revision history for Geo-AnomalyDetector
 
+0.02	Fri Mar  7 08:18:25 EST 2025
+	Allow coordinates to be objects as well as two-element arrays
+	Use Math::Trig
+
 0.01	Mon Feb 24 13:46:31 EST 2025
         First draft
