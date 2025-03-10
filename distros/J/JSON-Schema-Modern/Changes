@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Modern
 
+0.605     2025-03-09 16:31:05Z
+          - update 'hostname' and 'idn-hostname' format validation to be more
+            lax with respect to domain names; fixes some acceptance tests
+
+0.604     2025-03-08 23:23:05Z
+          - mark some failing format tests as todo that will be added in
+            Test::JSON::Schema::Acceptance 1.028
+
 0.603     2025-02-28 23:35:43Z
           - fix Sereal serialization hooks
           - various performance improvements when dealing with base URIs

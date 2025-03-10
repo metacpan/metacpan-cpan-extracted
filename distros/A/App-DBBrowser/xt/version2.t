@@ -30,7 +30,7 @@ while ( my $line = <$fh1> ) {
     if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
         $v_lib = $1;
     }
-    if ( $line =~ /\A=pod/ .. $line =~ /\A=cut/ ) {
+    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
         if ( $line =~ /^\s*Version\s+(\S+)/ ) {
             $v_lib_pod = $1;
         }
@@ -52,7 +52,7 @@ while ( my $line = <$fh2> ) {
             $v_db = $1;
         }
     }
-    if ( $line =~ /^=pod/ .. $line =~ /\A=cut/ ) {
+    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
         if ( $line =~ /^\s*Version\s+(\S+)/ ) {
             $v_bin_pod = $1;
         }
@@ -67,7 +67,7 @@ while ( my $line = <$fh3> ) {
     if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
         $v_browser = $1;
     }
-    if ( $line =~ /^=pod/ .. $line =~ /\A=cut/ ) {
+    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
         if ( $line =~ /^\s*Version\s+(\S+)/ ) {
             $v_browser_pod = $1;
         }

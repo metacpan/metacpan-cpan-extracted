@@ -1,0 +1,822 @@
+Thu Feb 27 15:04:23 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.41]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- fix hang when no tests (.t) files found
+
+Sun Nov 24 07:41:58 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.40]:
+	* VERSION: bump
+	* bootstrap: command, not which
+	* README.md: generated
+	* README.md.in
+	- new from README.md
+	- TOC
+	- tweaks & updates
+	* Makefile.am
+	- build README.md from README.md.in
+	* build
+	- added some module dependencies
+	- use buildspec to build cpan distribution
+	- install Perl module dependencies from requires files
+	- install packages for debian, redhat
+	* configure.ac
+	- add cpan/Makefile to build
+	- removed File::Proces from list of required modules
+	- add Pod::Find, removed Log::Log4perl::Level
+	- add Text::CSV_XS
+	- add Markdown::Render
+	* cpan/.gitignore
+	- moved !Makefile
+	- + CPAN-Maker*
+	- removed File-Process*
+	* cpan/Makefile.am
+	- replaced Makefile w/better cpan maker
+	- cleanup directories w/find
+	* cpan/build-requires: new
+	* cpan/buildspec.yml
+	- add all files/modules not just File::Process
+	- add ChangeLog, README.md to distribution share directory
+	- add build-requires
+	* cpan/requires
+	- JSON, not JSON::PP
+	- +YAML::Tiny
+	- Log::Log4perl
+	- Text::CSV_XS
+	- Pod::Find
+	* cpan/test-requires: no version for Text::CSV_XS
+	* src/main/bash/bin/Makefile.am
+	- chmod +x
+	- don't exit if pod2man fails
+	* src/main/bash/bin/make-cpan-dist.in
+	- organize options
+	- new options -O, -C
+	- support for -S, -e as path or file
+	- find make-cpan-dist.pl instead of using @libexecdir@
+	- maybe no executable files?
+	- + -V (version from) option
+	- provide default description
+	- EXTRA_PATH, EXEC_PATH, SCRIPTS_PATH, TESTS_PATH, PATH_SPEC for creating buildspec
+	- create a default resources file
+	- PL_FILES is now a file list
+	(cleanup): remove resources temp file
+	(executables): don't remove files
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- likewise
+	- --no-pager, not --nopager
+	- move pod to CPAN::Maker
+	(parse_path): check paths
+	(check_path): new
+	(parse_buildspec)
+	- support scripts, exe_files
+	- support - or _ for min-perl-version, include-version, version-from
+	(create_temp_filelist): new
+	(main)
+	- organize options
+	- uncommented min-perl-version?
+	- add --version-from option
+	- don't add paths to executables, rely on $PATH
+	- add version-from to buildfile specification
+	(get_yaml_specfile): end on eof or =pod
+	(write_makefile)
+	- use uppercase names for values in Makefile.PL
+	- use new option 'version_from'
+	- create buildspec file
+	(write_buildspec_file): new
+	(get_buildspec):
+	- allow include-version or include_version
+	- allow min-perl-version or min_perl_version
+	(write_resources): pretty json
+	(write_pl_files)
+	- create temp file
+	(fetch_relative_filelist): new
+	(slurp_file): new
+	* src/main/perl/lib/CPAN/Maker.pm.in
+	- pod tweaks
+	* src/main/perl/lib/Makefile.am
+	- build README.md
+	- chmod +x
+	- added CPAN/Maker.pm to build
+	* src/main/perl/lib/README.md: new
+
+Fri Sep 27 15:03:00 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.39]:
+	* VERSION: bump
+	* build: remove JSON::PP
+	* configure.ac: likewise, add Pod::Checker
+	* cpan/Makefile
+	- lib/File/Process.pm should be target
+	- don't use symlink
+	- re-Make if Process.pm not found
+	* src/main/bash/bin/make-cpan-dist.in
+	- test for $module_file first
+	* src/main/perl/lib/File/Process.pm.in
+	- bump version
+	- use JSON, not JSON::PP
+	* src/main/perl/lib/t/02-process.t: likewise
+
+Thu Sep 19 16:16:25 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.38]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- needed $PROJEC_HOME prefix when checking for bin/scripts directories
+
+Wed Sep 18 14:27:20 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.37]:
+	* VERSION: bump
+	* build: new
+	* .github/workflows/build.yml: move steps to build
+	* src/main/bash/bin/make-cpan-dist.in
+	- only traverse git projects backwards looking for project home
+	- set perl5libdir to '.' if not an autoconfiscated project
+	- bug when checking/making directories
+	- only look in directories for executables
+	- only look for files when recursing directories
+	- test provides for blanks
+	- don't create t directory if exists
+	(module2path)
+	- use project home if not an autoconfiscated perl repo
+	(get_module_versions)
+	- quote $perl5libdir
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- pod tweaks, additions
+	* src/main/perl/lib/CPAN/Maker/Utils.pm.in: whitespace
+
+Tue Jun 25 15:00:06 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.36]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- try harder to find module path
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_file_list)
+	- enamed to fetch_file_list()
+	- added exclude arg
+	- do not recurse subdirectories
+	(write_extra_files)
+	- fetch a file or directory
+	- use fetch_file_list() for hash containing list of scalars
+
+Tue May 21 14:41:46 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.35]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- add -F postamble option
+	- add -y PL_FILES option
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- --pl-files option
+	(write_pl_files): new
+	(write_makefile)
+	- read pl-files and format PL_FILES section
+	- support custom postamble section
+	(parse_buildspec)
+	- create a pl_files file from buildspec
+	- set F option if postamble option
+
+Fri May 17 11:53:56 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.34]:
+	* VERSION: bump
+	* src/main/perl/lib/File/Process.pm.in: pod typo
+
+Fri Jan 26 17:06:45 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.33]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- make REQUIRE_VERSION default
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- minor refactor/whitespace
+
+Mon Nov 20 08:13:21 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.32]:
+	* .github/workflows/bulid.yml: new
+
+Sat Nov 18 18:30:09 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.31]:
+	* src/main/perl/lib/File/Process.pm.in: pod error
+
+Mon May 22 16:23:56 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.30]:
+	* src/main/perl/lib/CPAN/Maker/Constants.pm.in: pod
+	* src/main/perl/lib/CPAN/Maker/Utils.pm.in: likewise
+	* src/main/perl/lib/File/Process.pm.in: likewise
+	* src/main/perl/lib/File/Process/Utils.pm.in: likewise
+	* src/main/perl/lib/Makefile.am: podchecker
+
+Tue Jan 24 12:05:01 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.29]:
+	* src/main/bash/bin/make-cpan-dist.in
+	- -n option to not include "required" modules
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(parse_dependencies): likewise
+	* bootstrap: --with-perl5libdir
+
+Fri Jan 20 04:58:03 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.28]:
+	* VERSION: bump
+	* cpan/.gitignore: remove test-requires from ignore list
+	* cpan/Makefile
+	- add test-requires as a dependency
+	(clean): rm all .tar.gz
+	* cpan/buildspec.yml: add test-requires
+	* cpan/test-requires: new
+	* src/main/perl/lib/File/Process.pm.in: bump version only
+	* src/main/perl/lib/File/Process/Utils.pm.in: likewise
+
+Wed Jan 18 10:15:49 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.27]:
+	* VERSION: bump
+	* src/main/perl/lib/File/Process.pm.in
+	- moved constants to File/Process/Utils.pm.in
+	- export process_csv
+	- pod tweaks
+	(process_file): don't require return value from pre to be an array
+	(process_csv)
+	- new, pass thru to File::Process::Utils::process_csv()
+	* src/main/perl/lib/File/Process/Utils.pm.in
+	- moved constants from File/Process.pm to here
+	- added hooks
+	- autogeneration of column key names
+	- column_name array can be sent as column headings
+	- fixed bug when no header is specified
+	- added skip_list option for process_csv
+	- added max_rows limit
+	(process_csv)
+	- return values from process_file()
+	* src/main/perl/lib/Makefile.am
+	- File::Process depends on File::Process::Utils
+
+	[unit tests]:
+	* src/main/perl/lib/t/00-process.t: remove ReadonlyX
+	* src/main/perl/lib/t/01-process.t: likewise
+	* src/main/perl/lib/t/02-process.t: likewise
+	* src/main/perl/lib/t/03-process.t: likewise
+	* src/main/perl/lib/t/04-process.t
+	- unit tests for new features
+
+Tue Jan 17 20:53:03 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.26]:
+	* VERSION: bump
+	* src/main/perl/lib/File/Process/Utils.pm.in
+	(process_csv):
+	- send all options down the pike
+	- if no header, check for column names, else return array
+	* src/main/perl/lib/t/04-process.t
+	- unit tests to support no-headers situation
+
+Tue Jan 17 11:03:38 2023  Rob Lauer  <rlauer6@comast.net>
+
+	[1.5.25]:
+
+	* VERSION: bump
+	* cpan/requires: new
+	* cpan/buildspec.yml
+	- use local directories that are symlinks
+	- min-perl-version: 5.16
+	- requires: requires
+	* src/main/perl/lib/t/04-process.t: unit test for process_csv()
+	* src/main/perl/lib/File/Process/Utils.pm.in: new
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/bash/bin/make-cpan-dist.in
+	- follow symlinks when 'find'ing files
+	- write full name of test file to temp file
+	- no need to use PROJECT_HOME for test files (due to above)
+	- remove version when looking for provides
+	* src/main/perl/lib/File/Process.pm.in
+	- minor formatting changes
+	- ref to File::Process::Utils in pod
+	* src/main/perl/lib/CPAN/Maker/Utils.pm.in
+	(is_core)
+	- consider a module non-core if required version > that provided by CORE
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- follow symlinks
+	* Makefile: new
+	* .gitignore: new
+
+Wed Jan 11 08:56:41 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.24]:
+
+	[project-root]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(parse_buildspec)
+	- set -H if project-root in options
+	(parse_dependecies)
+	- set default for core_modules to 'no'
+	* src/main/bash/bin/make-cpan-dist.in
+	- -H project-root
+	- test for git if -g option
+	- set default for from git config if missing
+
+Sun Jan  8 11:07:57 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.23]:
+	* VERSION: bump
+	* configure.ac: output versiom
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_extra_files)
+	- don't overwrite extra-files
+	- set exta-files entry to empty list if undef
+
+Sun Jan  8 08:42:43 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.22]:
+	* README.md.in: minor changes
+	* VERSION: bump
+	* configure.ac: add required/optional Perl modules
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- --pager option
+	- pod tweaks
+	(help): use pager if available
+	(write_file_list):
+	- remove project root from file list when directory specified in extra-files
+
+Mon Dec  5 11:36:16 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.21]:
+
+	[min-perl-version]:
+	* src/main/bash/bin/make-cpan-dist.in
+	- add support for -M (min-perl-version)
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- add support for --min-perl-version
+
+Fri Sep  2 11:01:41 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.20 - scriptsdir]:
+	* src/main/perl/lib/make-cpan-dist.pl.in
+	- -p, --project-root
+	(_is_obj):new
+	(is_array): new
+	(is_scalar): new
+	(is_hash): new
+	(parse_buildspec)
+	- args
+	- project_root
+	(get_requires): if $$line &&
+	* src/main/bash/bin/make-cpan-dist.in
+	- -S script files
+	(find_git_home): assume cwd is project_home
+
+Tue Aug  2 07:50:29 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.19 - versions]:
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_makefile):
+	- == version, not @ version
+	- do not add a minium version of perl by default
+
+Thu Jul 28 15:00:15 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.18 - perl version]:
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(get_perl_version): new
+	(main): get perl version from requires
+
+Fri Jul 22 08:54:47 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.17 - ExtUtils::MakeMaker]:
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- specficy minimum version of ExtUtils::MakeMaker (6.64)
+	* VERSION: bump
+
+Wed Jul 13 16:14:24 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.16 - no-core]:
+	* src/main/bash/bin/make-cpan-dist.in
+	- don't overwrite requires
+	(scan)
+	- add --no-core option if ---no-core-modules
+	- just take modules, not version, version will be determined later
+
+Tue Jun 21 12:44:35 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.15 - module versions]:
+	* src/main/perl/bin/make-cpan-dist.in
+	- support requires files w/version numbers
+
+Tue Jun 21 07:37:36 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.14 - min-perl-version]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- use scandeps-static.pl
+	* configure.ac: test for scandeps-static.pl
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- use version
+	(write_makefile): MIN_PERL_VERSION
+	(main): --min-perl-version
+	* src/main/perl/lib/CPAN/Maker/Utils.pm.in
+	(get_requires): pass min version of perl
+	* src/main/perl/lib/CPAN/Maker/Constants.pm.in
+	- +$DEFAULT_PERL_VERSION, $NO_VERSION
+
+Fri Jun 17 08:31:32 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.13 - buildspec failure]:
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- removed elements in buildspec definition for extra-files
+
+Mon May  9 11:13:09 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.12 - bash script bug]:
+	* configure.ac: add dependencies :-)
+	* src/main/bash/bin/make-cpan-dist.in
+	- skip test-requires output if no tests
+	(perl_requires): cat requires file if provided
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_makefile): TESTREQUIRES = '{}' if no tests
+
+Wed Apr 27 14:45:52 2022  Rob Lauer  <rclauer@gmail.com>
+
+	[1.5.11 - validate arrays]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(validate_obj): validate arrays as arrays (no deep dive)
+
+Sun Apr 24 06:32:24 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.10 - wrong return value from write_makefile]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_makefile): return $SUCCESS
+	* src/main/bash/bin/make-cpan.dist.in: perltidy
+
+Sun Apr 24 05:25:42 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.9 - refactoring]:
+	* VERSION: bump
+	* configure.ac: don't treat warnings as errors
+	* .gitignore: +man pages, tar balls
+	* src/main/bash/bin/make-cpan-dist.in
+	- cp tests when there is a test dependency file
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- converted to module
+	- refactor utilities and constants to separate modules
+	(get_provides): refactor, use utils, perlcritic fixes
+	(write_makefile): likewise
+	(get_requires): likewise
+	* src/main/perl/lib/CPAN/Maker/Constants.pm.in: new
+	* src/main/perl/lib/CPAN/Maker/Utils.pm.in: new
+	* src/main/perl/lib/Makefile.am
+	- add above to build
+
+Mon Apr 18 14:28:38 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.8 - pod, perlcritic cleanup]:
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(get_yaml_specfile): don't return explicit undef
+	* src/main/perl/lib/File/Process.pm.in
+	- bump $VERSION
+	(pod)
+	- + EXPORTED METHODS section
+	- fix SYNOPSIS (no need to import process_file)
+
+Mon Apr 18 10:59:07 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.7 - build file validation]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- $FALSE = 0
+	(validate_object): new
+	(get_yaml_specfile): new
+	(parse_buildspec): validate yaml file
+
+Mon Apr 18 07:22:54 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.6 - dependency version]:
+	* VERSION: bump
+	* bootstrap: configure after bump
+	* src/main/perl/lib/make-cpan-dist.pl.in
+	- --require-versions instead of --noversion
+	- --version option should not take argument
+	- use help, not pod2usage
+	(parse_buildspec): require-versions, not noversion
+	(get_requires):
+	- version = 0 if undef or ''
+
+Mon Apr 18 04:33:45 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.5 - test_requires]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in:
+	(write_makefile):
+	- support build-requires
+	- add autogenerated message to Makefile.PL
+	(get_requires): version 0 if undef
+	(parse_dependencies):
+	- support test_requires in build file
+	- deprecate dependencies->path in build file - use requires
+	- support build-requires in build file
+	(write_extra_files): missing new line on last file
+	* src/main/perl/bin/make-cpan-dist.in
+	- support -B (build dependencies)
+	* src/main/perl/lib/File/Process.pm.in
+	- +export tag 'all'
+	- remove Carp::Always
+	- bump version
+	(pre): args is 2nd index, not 3rd
+
+Sun Apr 17 08:35:22 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.4 - core-modules]:
+	* VERSION: bump
+	* README: explain new options
+	* src/main/bash/bin/make-cpan-dist.in
+	- added -c option to indicate inclusion of core modules
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- import filter
+	(write_makefile)
+	- pass core-modules option to get_requires
+	(parse_dependencies)
+	- support core_modules option in yaml file
+	* src/main/perl/lib/File/Process.pm.in
+	(filter): new
+	(get_requires)
+	- call default filter() first
+	- skip core test if core modules enabled
+	- allow '+' to indicate keep core module
+
+Tue Mar 29 16:58:06 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.3 - typo, pod]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- $requires_file, not $requires_files
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(pod): better explanation for resolver section
+	* .gitignore: + src/main/bash/bin/upload2cpan
+
+Tue Mar 29 15:43:43 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.2 - add example, fix upload2cpan]:
+	* buildspec-example.yml: new
+	* src/main/bash/bin/upload2cpan.in
+	- test for existence of tarball first
+
+Tue Mar 29 11:44:29 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.1 - remove core files from requires]:
+	* VERSION: new
+	* configure.ac: use VERSION file
+	* src/main/bash/bin/Makefile.am: upload2cpan.in
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(get_requires): filter core modules
+	* src/main/perl/lib/File/Process.pm.in: bump version
+	* src/main/bash/bin/make-cpan-dist.in
+	- remove debug messages
+	- exit 1 on Makefile.PL failure
+	- exit 0 on success
+
+Mon Mar 28 17:14:10 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.1 - File::Process]:
+	* src/main/perl/lib/t/00-file-process.t: new
+	* src/main/perl/lib/t/01-filter.t: new
+	* src/main/perl/lib/t/02-process.t: new
+	* src/main/perl/lib/t/03-process-pre.t: new
+	* src/main/perl/lib/File/Process.pm.in
+	- bump version
+	- export all default processors (except process_file)
+	- move all in-line subs to subs
+	- added filter processor
+	- perlcritic updates
+	- croak on errors after call to process
+	(_filter): new
+	(_pre): new
+	(_post): new
+	(_process): new
+	(_next_line): new
+	* src/main/bash/bin/upload2cpan.in: new
+	* src/main/bash/bin/Makefile.am
+	- add above to build
+	* src/main/bash/bin/make-cpan-dist.in
+	- added log-level
+	- added logging functions
+	- scan to output file
+	- output module versions for test
+	- check success/failure of make-cpan-dist.pl
+	(get_module_versions): use eval to report version
+	(scan): add for output file
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- add log-level, work-dir options
+	- use Log::Log4perl
+	- add BUILD_REQUIRES
+	- add CONFIGURE_REQUIRES
+	- use pod2usage for help
+	- pod tweaks
+	(get_provides)
+	- add version from packaged file
+	(parse_buildspec): support --no-cleanup type options
+
+Wed Mar 23 09:43:31 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.0 - refactor]:
+	* configure.ac: bump version
+	* src/main/bash/bin/make-cpan-dist.in
+	- added DEBUG,INFO,WARN,ERROR,FATAL_ERROR logging
+	- output full path to $package_files
+	- output full path of main module to $package_files
+	(module2path): new
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- pod corrections
+	- replace YAM::Syck with YAML::Tiny
+	- use ExtUtils::MM for version detection
+	- perlcritic mitigations (major refactoring)
+	* src/main/perl/lib/File/Process.pm.in: new
+	* src/main/perl/lib/Makefile.am: add above to build
+
+Mon Feb 28 14:42:22 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.4.1]:
+	* README.md
+	* src/main/bash/bin/make-cpan-dist.in
+	(scan)
+	- MODULE, not module
+	- only want 1st arg of scandeps output
+	- extra-files format - source dest
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- pod
+	- scandeps|s
+	- allow directories in extra-files
+	- resources section
+	- install files to share directory
+
+Wed Jan 26 14:21:40 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.4.0]: MacOS
+	* src/main/bash/bin/make-cpan-dist.in
+	- -T option for test dependency file
+	- don't remov requires or provides
+	- echo errors to stderr
+	- while read -r a, not for a in
+	- support scandeps output
+	- use getopt since MacOS is allergic to getopts :-(
+	- if dependency file given, copy files to builddir
+	- sort -u provides
+	(cleanup)
+	- just remove .tmp files
+	* .gitignore
+	- + generated files
+	- man files
+	* autotools/install-sh: removed
+	* autotools/missing: removed
+	* configure.ac: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- croak, don't die
+	- case insensitive options
+	- use JSON::PP, not JSON
+	- some refactoring
+	- -A option (any version)
+	- -n, don't include versions
+	- -s use scandeps
+	- -D debug
+	- META_MERGE (provides)
+
+Tue Mar  5 15:09:25 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.3.0]: any version
+	* configure.ac: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- support for -A "any version will do" option
+	- output requires list if DEBUG
+	- apply recurse option to scripts too
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- disambiguate -v
+	- support include-version option in buildspec (any version)
+
+Sat Feb 23 16:33:01 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.2.1]: extra-files
+	* src/main/bash/bin/make-cpan-dist.in
+	- cp file to root of build direct, not path
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- modify path of extra-files to bin/
+
+Sat Feb 23 13:44:25 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.2.0]: support for -e, -z, -b
+	* src/main/bash/bin/make-cpan-dist.in
+	- added -e for exe-files support
+	- added -z dryrun option
+	- added -b buildspec option
+	(scan): new from scandeps section
+	* c/main/perl/bin/make-cpan-dist.pl.in
+	- no_ignore_case for options
+	- -A instead of -d for abstract (description in yaml file)
+	- exe-files option
+	- resolver, not resolvers
+	- set scandeps arg -s if resolver is 'scandeps'
+	- dryrun option
+	* configure.ac: bump
+	* README: updates for above
+
+Tue Jan 29 09:27:20 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.1.2]:
+	* configure.ac: bump minor version
+	* src/main/bash/bin/make-cpan-dist.in
+	- make sure target directory for extra file exists
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- check that extra-files is an array
+
+Sat Jan  5 08:28:09 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.1.1]: support for -D -s, -R
+
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- support for -R (recurse)
+	- support for -D (dependencies)
+	- support for -r (resolver)
+	- remove trailing newline from PREREQ_PM
+	- more pod on buidspec.yml
+	* src/main/bash/bin/make-cpan-dist.in
+	- added -D option (dependencies)
+	- added -s option (scandeps)
+	- only autoconf if configure.ac
+	- default provides is module name
+	- implent use of dependency file, scandeps.pl or custom resolver
+	* src/main/bash/bin/Makefile.am
+	- @SCANDEPS@
+	* configure.ac
+	- likewise
+	- warn if perl.req not found
+	* README.md: more docs
+
+Mon Dec 17 09:28:00 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.1.0]: support for -f, -P, -R
+
+	* bootstrap: new
+	* Makefile.am
+	- remove rpm packaging features
+	* README.md
+	* configure.ac
+	- bump
+	- perlenv, PERL_REQUIRES, ENV
+	- removed rpm packaging features
+	* src/main/bash/bin/Makefile.am
+	- make perlrun = perlenv
+	* src/main/perl/bin/Makefile.am
+	- likewise
+	- install scripts to bin_SCRIPTS
+	- remove rpm packaging features
+	* src/main/perl/lib/Makefile.am
+	- make perlrun = perlenv
+	- remove rpm packaging features
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- added support for including extra files
+	- added support for provides file
+	* src/main/bash/bin/make-cpan-dist.in
+	(usage)
+	- added -f (extra-files)
+	- added -P (provides)
+	- added -R (recurse directories for files)
+	(get_module_versions)
+	- assume verion 0 if can't get version
+	(main)
+	- do not include provided files in test requires list
+
+Thu Dec  6 21:15:56 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[first import]:
+	* .gitignore: new
+	* ChangeLog: new
+	* Makefile.am: new
+	* README.md: new
+	* autotools/ads_PERL_INCLUDES.m4: new
+	* autotools/ads_PERL_MODULE.m4: new
+	* autotools/ads_PROG_PERL.m4: new
+	* autotools/am_build_mode.m4: new
+	* autotools/ax_am_conditional_example.m4: new
+	* autotools/ax_deps_check.m4: new
+	* autotools/ax_distcheck_hack.m4: new
+	* autotools/install-sh: new
+	* autotools/missing: new
+	* configure.ac: new
+	* directories.inc: new
+	* make-cpan-dist.spec.in: new
+	* src/Makefile.am: new
+	* src/main/Makefile.am: new
+	* src/main/bash/Makefile.am: new
+	* src/main/bash/bin/Makefile.am: new
+	* src/main/bash/bin/make-cpan-dist.in: new
+	* src/main/perl/Makefile.am: new
+	* src/main/perl/bin/Makefile.am: new
+	* src/main/perl/bin/make-cpan-dist.pl.in: new
+	* src/main/perl/lib/Makefile.am: new

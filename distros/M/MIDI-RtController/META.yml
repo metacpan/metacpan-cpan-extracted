@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController
   repository: https://github.com/ology/MIDI-RtController.git
-version: '0.0201'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -216,7 +216,8 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
-            - foo
+            - JBARRETT
+            - fuzzix
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

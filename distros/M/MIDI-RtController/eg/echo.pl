@@ -11,6 +11,9 @@ my $out = $ARGV[1] || 'gs';
 
 my $rtc = MIDI::RtController->new( input => $in, output => $out );
 
-push @{ $rtc->filters->{note_on} }, sub { say join ', ', @{ $_[0] } };
+$rtc->add_filter(
+    'say',
+    note_on => sub { say "dt: $_[0], ev: ", join( ', ', @{ $_[1] } ) }
+);
 
 $rtc->run;

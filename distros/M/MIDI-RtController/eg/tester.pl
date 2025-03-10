@@ -23,9 +23,9 @@ my $filter_names = shift || '';         # delay,pedal,drums
 my @filter_names = split /\s*,\s*/, $filter_names;
 
 my %dispatch = (
-    pedal => sub { add_filters(\&pedal_tone) },
-    delay => sub { add_filters(\&delay_tone) },
-    drums => sub { add_filters(\&drums) },
+    pedal => sub { add_filters(pedal => \&pedal_tone) },
+    delay => sub { add_filters(delay => \&delay_tone) },
+    drums => sub { add_filters(drums => \&drums) },
 );
 
 $dispatch{$_}->() for @filter_names;
@@ -53,23 +53,24 @@ my $tka = Term::TermKey::Async->new(
         elsif ($pressed eq 'd') { $dispatch{delay}->() unless grep { 'delay' eq $_ } @filter_names }
         elsif ($pressed eq 'y') { $dispatch{drums}->() unless grep { 'drums' eq $_ } @filter_names }
         $rtc->loop->loop_stop if $key->type_is_unicode and
-                                  $key->utf8 eq 'C' and
-                                  $key->modifiers & KEYMOD_CTRL;
+                                 $key->utf8 eq 'C' and
+                                 $key->modifiers & KEYMOD_CTRL;
     },
 );
 $rtc->loop->add($tka);
 
 $rtc->run;
 
-sub add_filters ($coderef) {
-    $rtc->add_filter($_ => $coderef) for qw(note_on note_off);
+sub add_filters ($name, $coderef) {
+    $rtc->add_filter($name, $_, $coderef)
+        for qw(note_on note_off);
 }
 
 sub pedal_notes ($note) {
     return PEDAL, $note, $note + 7;
 }
-sub pedal_tone ($event) {
-    my ($ev, $channel, $note, $vel) = $event->@*;
+sub pedal_tone ($dt, $event) {
+    my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = pedal_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
@@ -82,8 +83,8 @@ sub pedal_tone ($event) {
 sub delay_notes ($note) {
     return ($note) x $feedback;
 }
-sub delay_tone ($event) {
-    my ($ev, $channel, $note, $vel) = $event->@*;
+sub delay_tone ($dt, $event) {
+    my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = delay_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
@@ -111,8 +112,8 @@ sub drum_parts ($note) {
     }
     return $part;
 }
-sub drums ($event) {
-    my ($ev, $channel, $note, $vel) = $event->@*;
+sub drums ($dt, $event) {
+    my ($ev, $chan, $note, $vel) = $event->@*;
     return 1 unless $ev eq 'note_on';
     my $part = drum_parts($note);
     my $d = MIDI::Drummer::Tiny->new(bpm => 100);

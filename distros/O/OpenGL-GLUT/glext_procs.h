@@ -1,3 +1,5 @@
+
+#ifndef HAVE_AGL_GLUT
 #ifndef __glext_procs_h_
 #define __glext_procs_h_
 
@@ -16244,3 +16246,5 @@ static PFNGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUNPROC glReplace
 #endif
 
 #endif
+
+#endif  /* HAVE_AGL_GLUT */

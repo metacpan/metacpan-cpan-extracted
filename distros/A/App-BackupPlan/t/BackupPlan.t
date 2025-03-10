@@ -27,7 +27,7 @@ my $configFile = 'TestData/testPlan.xml';
 my $logFile = 'TestData/log4perl.conf';
 my @planArgs = ($configFile, $logFile);
 my $plan = new_ok 'App::BackupPlan' => \@planArgs; #test2
-cmp_ok('0.0.9','eq',$App::BackupPlan::VERSION,'App::BackupPlan::VERSION'); #test 3
+cmp_ok('0.0.11','eq',$App::BackupPlan::VERSION,'App::BackupPlan::VERSION'); #test 3
 
 my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ($configFile) or die "Could not parse $configFile";

@@ -32,7 +32,7 @@ OpenGL::Tessellation - discussion of tessellation in POGL
 
 OpenGL rendering hardware typically does not have support for drawing
 concave polygons or drawing polygons with windows.  OpenGL provides
-glu extentions that allow for translating concave polygon vertices
+glu extensions that allow for translating concave polygon vertices
 into triangles that can be rendered quickly on GL hardware.  The
 OpenGL red book chapter 11 has the full discussion of Tessellators and
 the OpenGL functions (http://glprogramming.com/red/chapter11.html, or

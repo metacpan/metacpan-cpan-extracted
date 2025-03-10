@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/async.pl
 eg/dat/gol-12-blink.dat
 eg/dat/gol-12-blinks.dat
 eg/dat/gol-5-13x.dat
@@ -20,7 +21,6 @@ eg/dat/gol-7-3x.dat
 eg/dat/gol-7-glider.dat
 eg/drum-circle.pl
 eg/drummer.pl
-eg/fuzzix.pl
 eg/gol.pl
 eg/readkey.pl
 eg/rpsls-game.pl

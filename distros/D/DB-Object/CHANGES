@@ -1,5 +1,12 @@
 Revision history for Perl module DB::Object
 
+v1.7.0 2025-03-09T16:30:58+0900
+    - Improved support for field to datetime objects and decoding json
+    - Correcting an oversight in DB::Object::Query::format_statement when a value provided is a scalar reference.
+    - Added the on_conflict() method to DB::Object::Mysql::Tables
+    - Correcting incomplete implementation of Mysql INSERT ... ON DUPLICATE
+    - Added methods field_names, field_names_lc, field_names_uc, field_nullables, field_precisions, field_scales, field_types, number_of_fields, number_of_params, and statement in DB::Object::Statement
+
 v1.6.0 2025-03-06T19:09:05+0900
     - Added support for INSERT ... ON DUPLICATE KEY UPDATE for MySQL
 

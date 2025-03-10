@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Archive::Tar;
 use File::Find;
+use File::Copy;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.11';
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -127,10 +128,13 @@ sub info {
 sub tar {
 	my( $self, $ts, $hasExcludeTag ) = @_;
 	my $filename = sprintf("%s/%s_%s.tar.gz",$self->{targetDir},$self->{prefix},$ts);
+        #create a temp output file in case something goes wrong. Replace the temp with the target only at the end
+        my $tmpFileName = sprintf("%s/temp.tar.gz",$self->{targetDir});
 	my $option = '';
 	$option = '--exclude-tag-all=NOTAR' if $hasExcludeTag;
-	my $output = `tar cvzf $filename $option $self->{sourceDir} 2>&1 1>/dev/null`;
-	if (-e $filename) {
+	my $output = `tar cvzf $tmpFileName $option $self->{sourceDir} 2>&1 1>/dev/null`;
+	if (-e $tmpFileName) {
+                move($tmpFileName, $filename); #transactional: move the artifact into the target file at the end
 		my $stat = `ls -lh $filename`;
 		return "system tar: $stat";	
 	}	
@@ -139,13 +143,16 @@ sub tar {
 
 sub perlTar {
 	my( $self, $ts ) = @_;
-	my $filename = sprintf("%s/%s_%s.tar.gz",$self->{targetDir},$self->{prefix},$ts);	
+	my $filename = sprintf("%s/%s_%s.tar.gz",$self->{targetDir},$self->{prefix},$ts);
+        #create a temp output file in case something goes wrong. Replace the temp with the target only at the end
+        my $tmpFileName = sprintf("%s/temp.tar.gz",$self->{targetDir});
 	my $tar = new Archive::Tar;
 	our @files=();
 	find(sub {push(@files,$File::Find::name);},$self->{sourceDir});
 	$tar->add_files(@files);
-	$tar->write($filename,COMPRESS_GZIP);
-	if (-e $filename) {
+	$tar->write($tmpFileName,COMPRESS_GZIP);
+	if (-e $tmpFileName) {
+                move($tmpFileName, $filename); #transactional: move the artifact into the target file at the end
 		my $stat = `ls -lh $filename`;
 		return "perl tar: $stat";	
 	}	

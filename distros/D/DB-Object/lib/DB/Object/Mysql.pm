@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.2.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.3.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/06
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -261,8 +261,8 @@ BEGIN
         },
     };
     # DBI->trace(5);
-    our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.2.0';
+    our $PLACEHOLDER_REGEXP = qr/\?/;
+    our $VERSION = 'v1.3.0';
 };
 
 use strict;
@@ -639,11 +639,12 @@ SELECT
      table_schema AS "schema"
     ,table_name AS "name"
     ,table_type AS "type"
-FROM information_schema.tables WHERE table_name=?
+FROM information_schema.tables
+WHERE table_name=?
 EOT
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
-    $sth->execute( $table, ( $db ? $db : () ) ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
+    $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
     my $all = $sth->fetchall_arrayref( {} );
     $sth->finish;
     return( [] ) if( !scalar( @$all ) );
@@ -811,18 +812,19 @@ sub _dsn
 
 sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 
+# NOTE: DESTROY
 DESTROY
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    if( $self->{ 'sth' } )
+    if( $self->{sth} )
     {
         print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
-        $self->{ 'sth' }->finish();
+        $self->{sth}->finish();
     }
-    elsif( $self->{ 'dbh' } && $class eq 'DB::Object' )
+    elsif( $self->{dbh} && $class eq 'DB::Object' )
     {
-        local( $SIG{ '__WARN__' } ) = sub { };
+        local( $SIG{__WARN__} ) = sub { };
         # $self->{ 'dbh' }->disconnect();
         if( $DEBUG )
         {
@@ -832,7 +834,7 @@ DESTROY
         }
         $self->disconnect();
     }
-    my $locks = $self->{ '_locks' };
+    my $locks = $self->{_locks};
     if( $locks && $self->_is_array( $locks ) )
     {
         foreach my $name ( @$locks )
@@ -941,7 +943,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.2.0
+    v1.3.0
 
 =head1 DESCRIPTION
 

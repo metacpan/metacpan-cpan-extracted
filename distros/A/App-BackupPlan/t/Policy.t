@@ -4,7 +4,7 @@ use Test::More tests => 9;
 BEGIN 
 { use_ok('App::BackupPlan::Policy')}; #test 1
 
-cmp_ok('0.0.9','eq',$App::BackupPlan::Policy::VERSION,'App::BackupPlan::Policy::VERSION'); #test 2
+cmp_ok('0.0.11','eq',$App::BackupPlan::Policy::VERSION,'App::BackupPlan::Policy::VERSION'); #test 2
 
 my $p = new_ok 'App::BackupPlan::Policy'; #test 3
 isa_ok($p,'App::BackupPlan::Policy'); #test 4

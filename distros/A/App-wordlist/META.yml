@@ -19,7 +19,7 @@ name: App-wordlist
 provides:
   App::wordlist:
     file: lib/App/wordlist.pm
-    version: '0.294'
+    version: '0.295'
 recommends:
   App::lcpan::Call: '0.11'
   MetaCPAN::Client: '0'
@@ -33,7 +33,6 @@ requires:
   Module::Load::Util: '0.011'
   PERLANCAR::Module::List: '0.004004'
   Perinci::Sub::Property::cmdline: '0'
-  Perinci::Sub::Util: '0.472'
   Regexp::From::String: '0.005'
   Scalar::Util::Numeric: '0'
   String::Wildcard::Bash: '0.044'
@@ -45,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist
   homepage: https://metacpan.org/release/App-wordlist
   repository: git://github.com/perlancar/perl-App-wordlist.git
-version: '0.294'
+version: '0.295'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -53,10 +52,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript wordlist'
-      version: '0.425'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript wordlist-wordle'
       version: '0.425'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease

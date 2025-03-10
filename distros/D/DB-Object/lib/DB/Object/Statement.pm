@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.6.2
+## Version v0.7.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/11/23
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use Class::Struct qw( struct );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.6.2';
+    our $VERSION = 'v0.7.0';
 };
 
 use strict;
@@ -351,6 +351,7 @@ sub execute
     }
 
     # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
+    $self->messagec( 6, "There are {green}", scalar( @binded ), "{/} value(s) to bind for query: ", $self->{query} );
     for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
         next if( !defined( $binded[$i] ) );
@@ -438,11 +439,9 @@ sub execute
     }
     
     local $_;
-    my $rv = 
-    eval
+    my $rv = eval
     {
         local( $SIG{ALRM} ) = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
-        # print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
             # Stringify the binded value if it is a stringifyable object.
@@ -554,6 +553,14 @@ sub fetchall_arrayref($@)
     {
         $self->execute() || return;
     }
+    # Ensure we set the cache of field names and types. We will need them to post process the query results with _convert_datetime2object()
+# This is necessary for MySQL whose object lose that information, while the PostgreSQL or SQLite driver keep the information.
+    my $need_post_processing = ( ( $dbo->auto_decode_json || $dbo->auto_convert_datetime_to_object ) ? 1 : 0 );
+    if( $need_post_processing )
+    {
+        $self->_cache_field_names;
+        $self->_cache_field_types;
+    }
     # $self->_cleanup();
     my $mode  = ref( $slice );
     my @rows;
@@ -562,11 +569,11 @@ sub fetchall_arrayref($@)
     {
         if( @$slice )
         {
-            push( @rows, [ @{ $row }[ @{ $slice } ] ] ) while( $row = $self->{sth}->fetch() );
+            push( @rows, [ @{ $row }[ @{ $slice } ] ] ) while( $row = $sth->fetch() );
         }
         else
         {
-            push( @rows, [ @{ $row } ] ) while( $row = $self->{sth}->fetch );
+            push( @rows, [ @{ $row } ] ) while( $row = $sth->fetch );
         }
     }
     elsif( $mode eq 'HASH' )
@@ -574,18 +581,19 @@ sub fetchall_arrayref($@)
         my @o_keys = keys( %$slice );
         if( @o_keys )
         {
-            my %i_names = map{  ( lc( $_ ) => $_ ) } @{ $self->{sth}->FETCH( 'NAME' ) };
-            my @i_keys  = map{ $i_names{ lc( $_ ) } } @o_keys;
-            while( $row = $self->{sth}->fetchrow_hashref() )
+            # my %i_names = map{  ( lc( $_ ) => $_ ) } @{ $sth->FETCH( 'NAME' ) };
+            # my @i_keys  = map{ $i_names{ lc( $_ ) } } @o_keys;
+            my $i_keys  = $self->field_names_lc;
+            while( $row = $sth->fetchrow_hashref() )
             {
                 my %hash;
-                @hash{ @o_keys } = @{ $row }{ @i_keys };
+                @hash{ @o_keys } = @{ $row }{ @$i_keys };
                 push( @rows, \%hash );
             }
         }
         else
         {
-            push( @rows, $row ) while( $row = $self->{sth}->fetchrow_hashref() );
+            push( @rows, $row ) while( $row = $sth->fetchrow_hashref() );
         }
     }
     else
@@ -593,7 +601,7 @@ sub fetchall_arrayref($@)
         warn( "fetchall_arrayref($mode) invalid" );
     }
     # return( \@rows );
-    return( \@rows ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
+    return( \@rows ) if( !$need_post_processing );
     my $data = \@rows;
     $data = $self->_convert_json2hash({ statement => $sth, data => $data }) if( $dbo->auto_decode_json );
     $data = $self->_convert_datetime2object({ statement => $sth, data => $data }) if( $dbo->auto_convert_datetime_to_object );
@@ -624,16 +632,30 @@ sub fetchcol($;$)
 sub fetchhash(@)
 {
     my $self = shift( @_ );
+    my $dbo  = $self->database_object;
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
     }
+    # Ensure we set the cache of field names and types. We will need them to post process the query results with _convert_datetime2object()
+    # This is necessary for MySQL whose object lose that information, while the PostgreSQL or SQLite driver keep the information.
+    if( $dbo->auto_decode_json || $dbo->auto_convert_datetime_to_object )
+    {
+        $self->_cache_field_names;
+        $self->_cache_field_types;
+    }
     # $self->_cleanup();
     # %hash = $sth->fetchhash;
     # return( $h->fetchhash );
-    my $ref = $self->{sth}->fetchrow_hashref();
+    my $sth = $self->{sth} || die( "Unable to get the underlying statement handler!" );
+    my $ref = $sth->fetchrow_hashref();
     if( $ref ) 
     {
+        if( $dbo->auto_decode_json || $dbo->auto_convert_datetime_to_object )
+        {
+            $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
+            $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
+        }
         return( %$ref );
     }
     else
@@ -678,6 +700,13 @@ sub fetchrow_hashref
     {
         $self->execute() || return( $self->pass_error );
     }
+    # Ensure we set the cache of field names and types. We will need them to post process the query results with _convert_datetime2object()
+    # This is necessary for MySQL whose object lose that information, while the PostgreSQL or SQLite driver keep the information.
+    if( $dbo->auto_decode_json || $dbo->auto_convert_datetime_to_object )
+    {
+        $self->_cache_field_names;
+        $self->_cache_field_types;
+    }
     my $ref = $sth->fetchrow_hashref;
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
     $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
@@ -713,6 +742,34 @@ sub fetchrow_object
         return( () );
     }
 }
+
+# NOTE: field_names -> NAME
+# <https://metacpan.org/pod/DBI#NAME>
+sub field_names { return( shift->_get_statement_attribute( 'NAME' ) ); }
+
+# NOTE: field_names_lc -> NAME_lc
+# <https://metacpan.org/pod/DBI#NAME_lc>
+sub field_names_lc { return( shift->_get_statement_attribute( 'NAME_lc' ) ); }
+
+# NOTE: field_names_uc -> NAME_uc
+# <https://metacpan.org/pod/DBI#NAME_uc>
+sub field_names_uc { return( shift->_get_statement_attribute( 'NAME_uc' ) ); }
+
+# NOTE: field_nullables -> NULLABLE
+# <https://metacpan.org/pod/DBI#NULLABLE>
+sub field_nullables { return( shift->_get_statement_attribute( 'NULLABLE' ) ); }
+
+# NOTE: field_precisions -> PRECISION
+# <https://metacpan.org/pod/DBI#PRECISION>
+sub field_precisions { return( shift->_get_statement_attribute( 'PRECISION' ) ); }
+
+# NOTE: field_scales -> SCALE
+# <https://metacpan.org/pod/DBI#SCALE>
+sub field_scales { return( shift->_get_statement_attribute( 'SCALE' ) ); }
+
+# NOTE: field_types -> TYPE
+# <https://metacpan.org/pod/DBI#TYPE>
+sub field_types { return( shift->_get_statement_attribute( 'TYPE' ) ); }
 
 sub finish
 {
@@ -1060,6 +1117,14 @@ sub join
     return( $sth );
 }
 
+# NOTE: number_of_fields -> NUM_OF_FIELDS
+# <https://metacpan.org/pod/DBI#NUM_OF_FIELDS>
+sub number_of_fields { return( shift->_get_statement_attribute( 'NUM_OF_FIELDS' ) ); }
+
+# NOTE: number_of_params -> NUM_OF_PARAMS
+# <https://metacpan.org/pod/DBI#NUM_OF_PARAMS>
+sub number_of_params { return( shift->_get_statement_attribute( 'NUM_OF_PARAMS' ) ); }
+
 sub object
 {
     my $self = shift( @_ );
@@ -1163,6 +1228,10 @@ sub rows(@)
     }
 }
 
+# NOTE: statement -> Statement
+# <https://metacpan.org/pod/DBI#Statement>
+sub statement { return( shift->_get_statement_attribute( 'Statement' ) ); }
+
 # A DBI::sth object. This should rather be a _set_get_object helper method, but I am not 100% sure if this is really a DBI::sth
 sub sth { return( shift->_set_get_scalar( 'sth', @_ ) ); }
 
@@ -1177,10 +1246,140 @@ sub undo
 
 sub wait { return( shift->error( "Method wait() is not implemented by this driver." ) ); }
 
-sub _convert_datetime2object { return( shift->database_object->_convert_datetime2object( @_ ) ); }
+# Used to get the cached field names by _convert_datetime2object
+sub _cache_field_names
+{
+    my $self = shift( @_ );
+    my $names;
+    if( !( $names = $self->{_cache_field_names} ) )
+    {
+        $names = $self->{_cache_field_names} = $self->field_names;
+    }
+    return( $names );
+}
 
-sub _convert_json2hash { return( shift->database_object->_convert_json2hash( @_ ) ); }
+# Used to get the cached field names by _convert_datetime2object
+sub _cache_field_types
+{
+    my $self = shift( @_ );
+    my $types;
+    if( !( $types = $self->{_cache_field_types} ) )
+    {
+        $types = $self->{_cache_field_types} = $self->field_types;
+    }
+    return( $types );
+}
 
+# sub _convert_datetime2object { return( shift->database_object->_convert_datetime2object( @_ ) ); }
+# sub _convert_datetime2object
+# {
+#     my $self = shift( @_ );
+#     my $opts = $self->_get_args_as_hash( @_ );
+#     return( $opts->{data} );
+# }
+sub _convert_datetime2object
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
+    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    my $data  = $opts->{data};
+    # my $names = $sth->FETCH('NAME');
+    # my $types = $sth->FETCH('pg_type');
+    # Get the cached field names and types that we stored after executing the query, but before we finished reading the statement
+    my $names = $self->_cache_field_names;
+    my $types = $self->_cache_field_types;
+    my $mode = ref( $data );
+
+    for( my $i = 0; $i < scalar( @$names ); $i++ )
+    {
+        if( $types->[$i] eq DBI::SQL_DATE || 
+            $types->[$i] eq DBI::SQL_TIMESTAMP || 
+            $types->[$i] eq 'date' || 
+            $types->[$i] eq 'timestamp' )
+        {
+            if( $mode eq 'ARRAY' )
+            {
+                for( my $j = 0; $j < scalar( @$data ); $j++ )
+                {
+                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
+                    my $dt = $self->_convert_string2datetime( $data->[ $j ]->{ $names->[ $i ] } );
+                    if( !defined( $dt ) )
+                    {
+                        warn( $self->error );
+                    }
+                    $data->[ $j ]->{ $names->[ $i ] } = $dt;
+                }
+            }
+            elsif( $mode eq 'HASH' )
+            {
+                next if( !$data->{ $names->[ $i ] } );
+                my $dt = $self->_convert_string2datetime( $data->{ $names->[ $i ] } );
+                if( !defined( $dt ) )
+                {
+                    warn( $self->error );
+                }
+                $data->{ $names->[ $i ] } = $dt;
+            }
+        }
+    }
+    return( $data );
+}
+
+# sub _convert_json2hash { return( shift->database_object->_convert_json2hash( @_ ) ); }
+# Does nothing by default
+# Must be superseded by the subclasses because we use the data types like PG_JSON, PG_JSONB
+# and we don't have them at this top level
+sub _convert_json2hash 
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    return( $opts->{data} );
+}
+
+sub _convert_string2datetime
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ ) || return;
+    my $dt = $self->_parse_timestamp( $str );
+    if( !defined( $dt ) )
+    {
+        return( $self->pass_error );
+    }
+    # An empty string means it did not fail, but probably did not recognise the format
+    elsif( !$dt )
+    {
+        return( $str );
+    }
+    return( $dt );
+}
+
+sub _get_statement_attribute
+{
+    my $self = shift( @_ );
+    my $attr = shift( @_ );
+    if( !length( $attr // '' ) )
+    {
+        return( $self->error( "No statement attribute was provided to retrieve its value." ) );
+    }
+    my $sth = $self->{sth} || die( "Unable to get the underlying statement handler!" );
+    my $val;
+    # try-catch
+    local $@;
+    eval
+    {
+        # Ensure we stringify
+        $val = $sth->{ "$attr" };
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error retrieving value for '${attr}': $@" ) );
+    }
+    return( $val );
+}
+
+# NOTE: DESTROY
 DESTROY
 {
     # Do nothing but existing so it is handled by this package
@@ -1234,7 +1433,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.6.2
+v0.7.0
 
 =head1 DESCRIPTION
 
@@ -1362,6 +1561,71 @@ This will create dynamically a package named C<DB::Object::Postgres::Result::Som
 
 It returns the object thus created.
 
+=head2 field_names
+
+    my $array_ref = $sth->field_names;
+
+Returns an array reference of field names for the query.
+This must be called after executing the query, and before finishing retrieving all data from the database.
+
+See also L<https://metacpan.org/pod/DBI#NAME1>
+
+=head2 field_names_lc
+
+    my $array_ref = $sth->field_names_lc;
+
+Same as L<field_names|/field_names>, except this makes all the column names in lower case.
+
+See also L<https://metacpan.org/pod/DBI#NAME_lc>
+
+=head2 field_names_uc
+
+    my $array_ref = $sth->field_names_uc;
+
+Same as L<field_names|/field_names>, except this makes all the column names in lower case.
+
+See also L<https://metacpan.org/pod/DBI#NAME_uc>
+
+=head2 field_nullables
+
+    my $array_ref = $sth->field_nullables;
+
+Returns an array reference of value for each field indicating if they can be null or not.
+
+Possible values are: C<0> (or an empty string) = no, C<1> = yes, C<2> = unknown.
+
+See also L<https://metacpan.org/pod/DBI#NULLABLE>
+
+=head2 field_precisions
+
+    my $array_ref = $sth->field_precisions;
+
+Returns an array reference of integer value foe each field indicating their precision.
+
+As per DBI documentation: "For numeric columns, the value is the maximum number of digits (without considering a sign character or decimal point). Note that the "display size" for floating point types (REAL, FLOAT, DOUBLE) can be up to 7 characters greater than the precision (for the sign + decimal point + the letter E + a sign + 2 or 3 digits).
+
+For any character type column the value is the OCTET_LENGTH, in other words the number of bytes, not characters."
+
+See also L<https://metacpan.org/pod/DBI#PRECISION>
+
+=head2 field_scales
+
+    my $array_ref = $sth->field_scales;
+
+Returns an array reference of integer value foe each field. "C<NULL> (C<undef>) values indicate columns where scale is not applicable."
+
+See also L<https://metacpan.org/pod/DBI#SCALE>
+
+=head2 field_types
+
+    my $array_ref = $sth->field_types;
+
+Returns an array reference of integer value foe each field. "The value indicates the data type of the corresponding column."
+
+You can important those constant with C<use DBI ':sql_types'>
+
+See also L<https://metacpan.org/pod/DBI#TYPE>
+
 =head2 finish
 
 Calls L<DBI/finish> and return the returned value, or an error if an error occurred.
@@ -1441,6 +1705,24 @@ It returns the resulting statement handler.
 
 It returns the statement handler.
 
+=head2 number_of_fields
+
+    $sth->exec || die( $sth->error );
+    say "There are ", $sth->number_of_fields, " columns in this tuple.";
+
+Returns an integer representing the number of fields in the SQL query executed.
+
+See also L<https://metacpan.org/pod/DBI#NUM_OF_FIELDS>
+
+=head2 number_of_params
+
+    $sth->exec || die( $sth->error );
+    say "There are ", $sth->number_of_params, " placeholders for this query.";
+
+Returns the number of parameters (placeholders) in the prepared statement.
+
+See also L<https://metacpan.org/pod/DBI#NUM_OF_PARAMS>
+
 =head2 object
 
 Returns the statement object explicitly.
@@ -1496,6 +1778,12 @@ If there is a statement handler and the database parameter C<autocommit> is set 
 =head2 rows
 
 Returns the number of rows affected by the last query.
+
+=head2 statement
+
+Returns the SQL statement that was sent to the server to be prepared.
+
+This is different from L<as_string|/as_string> in that L<as_string|/as_string> returns the SQL query built by L<DB::Object>. Obviously, both should be the same, but they come from different sources.
 
 =head2 sth
 

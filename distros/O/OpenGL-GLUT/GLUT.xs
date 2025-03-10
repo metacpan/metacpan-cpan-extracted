@@ -484,10 +484,27 @@ static void generic_glut_Close_handler(void)
 	DO_perl_call_sv(handler, G_DISCARD);
 }
 
+/* glut_timer_handlers is an allocation buffer.
+   All unused elements are SVivs forming a linked-list,
+   starting at glut_timer_handlers_next_free.
+   The end of the list is marked by a -1.
+   If no element is free when one is needed, the buffer will grow.
+*/
+static AV * glut_timer_handlers = 0;
+static int glut_timer_handlers_next_free = -1;
+
 /* Callback for glutTimerFunc */
 static void generic_glut_timer_handler(int value)
 {
-	AV * handler_data = (AV*)value;
+	if (!glut_timer_handlers)
+		croak("Timer handler called, but no timers have ever been set up");
+	SV** h = av_fetch(glut_timer_handlers,value,FALSE);
+	if (!h || !SvOK(*h) || !SvROK(*h))
+		croak("Timer handler called for unregistered timer");
+	AV * handler_data = (AV*)SvRV(*h);
+	sv_setiv(*h,glut_timer_handlers_next_free);
+	glut_timer_handlers_next_free = value;
+
 	SV * handler;
 	int i;
 	dSP;
@@ -1081,7 +1098,24 @@ glutTimerFunc(msecs, handler=0, ...)
 
 			PackCallbackST(handler_data, 1);
 
-			glutTimerFunc(msecs, generic_glut_timer_handler, (int)handler_data);
+			SV * handler_data_sv = newRV_inc((SV*)handler_data);
+
+			if (!glut_timer_handlers)
+				glut_timer_handlers = newAV();
+
+			int handler_id = glut_timer_handlers_next_free;
+			if (handler_id == -1) {
+			  handler_id = ((int) av_len(glut_timer_handlers))+1;
+			  if (handler_id < 0)
+			    croak("Limit of concurrent timers reached (MAX_INT)");
+			  av_push(glut_timer_handlers, handler_data_sv);
+			} else {
+			  SV** entry = av_fetch(glut_timer_handlers,handler_id,FALSE);
+			  glut_timer_handlers_next_free = SvIV(*entry);
+			  sv_setsv(*entry,sv_2mortal(handler_data_sv));
+			}
+
+			glutTimerFunc(msecs, generic_glut_timer_handler, handler_id);
 		}
 	ENSURE_callback_thread;}
 

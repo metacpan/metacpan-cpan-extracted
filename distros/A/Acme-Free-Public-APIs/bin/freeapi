@@ -2,7 +2,6 @@
 
 use v5.10;
 use strict;
-use warnings;
 
 use Dispatch::Fu;
 use Acme::Free::Public::APIs qw//;

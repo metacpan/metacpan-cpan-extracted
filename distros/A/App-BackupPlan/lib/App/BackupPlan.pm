@@ -37,8 +37,8 @@ our @EXPORT = qw();
 
 
 BEGIN {
-	our $VERSION = '0.0.9';
-	print "App::BackupPlan by Gualtiero Chiaia, version $VERSION\n";	
+	our $VERSION = '0.0.11';
+	print "App::BackupPlan by codimoc, version $VERSION\n";	
 }
 
 # Preloaded methods go here.

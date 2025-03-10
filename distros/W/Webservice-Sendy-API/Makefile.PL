@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
   "TEST_REQUIRES" => {
     "Dispatch::Fu" => "1.06",
@@ -31,9 +31,9 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Test::More" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
-  "VERSION" => "0.7",
+  "VERSION" => "0.8",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "Test::More" => 0,
-  "Util::H2O::More" => "0.4.0"
+  "Util::H2O::More" => "0.4.2"
 );
 
 

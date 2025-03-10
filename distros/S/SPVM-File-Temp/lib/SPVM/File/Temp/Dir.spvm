@@ -8,19 +8,119 @@ class File::Temp::Dir {
   
   allow File::Temp;
   
+  # Fields
   has dirname : ro string;
   
+  has process_id : int;
+  
+  # Undocumented Fields
+  has DIR : string;
+  
+  has TMPDIR : byte;
+  
+  has TEMPLATE : string;
+  
+  has CLEANUP : byte;
+  
   # Class Methods
-  private static method new : File::Temp::Dir () {
+  static method new : File::Temp::Dir ($options : object[]) {
+    
     my $self = new File::Temp::Dir;
+    
+    Fn->check_option_names($options, $self->option_names);
+    
+    my $options_h = Hash->new($options);
+    
+    if ($options_h->exists("CLEANUP")) {
+      $self->{CLEANUP} = (byte)$options_h->get_int("CLEANUP");
+    }
+    else {
+      $self->{CLEANUP} = 1;
+    }
+    
+    $self->{DIR} = $options_h->get_or_default_string("DIR", undef);
+    
+    $self->{TMPDIR} = (byte)$options_h->get_or_default_int("TMPDIR", 0);
+    
+    $self->{TEMPLATE} = $options_h->get_or_default_string("TEMPLATE", undef);
+    
+    my $process_id = Sys->process_id;
+    
+    $self->{process_id} = $process_id;
+    
+    $self->_tempdir;
     
     return $self;
   }
-  private method DESTROY : void () {
-    my $dirname = $self->{dirname};
+  
+  # Instance Methods
+  protected method option_names : string[] () {
     
-    if ($dirname && Sys->d($dirname)) {
-      File::Path->rmtree($dirname);
-    }
+    my $options_names = ["DIR", "TMPDIR", "TEMPLATE", "CLEANUP"];
+    
+    return $options_names;
   }
+  
+  method DESTROY : void () {
+    
+    my $CLEANUP = $self->{CLEANUP};
+    if ($CLEANUP) {
+      my $was_created_by_proc = $self->{process_id} == Sys->process_id;
+      if ($was_created_by_proc) {
+        
+        my $dirname = $self->{dirname};
+        
+        unless ($dirname) {
+          die "[Unexpected Error]\$dirname must be defined.";
+        }
+        
+        eval { File::Path->rmtree($dirname); }
+        
+        if ($@) {
+          warn $@;
+        }
+        
+      }
+    }
+    
+  }
+  
+  # Private Class Methods
+  private method _tempdir : void () {
+    
+    my $DIR = $self->{DIR};
+    
+    my $TMPDIR = $self->{TMPDIR};
+    
+    my $TEMPLATE = $self->{TEMPLATE};
+    
+    my $SUFFIX = "";
+    
+    my $template = File::Temp->_make_template($TEMPLATE, $DIR, $TMPDIR, $SUFFIX);
+    
+    my $found_path = (string)undef;
+    my $max_try_count = 1000;
+    my $try_count = 0;
+    while ($try_count < $max_try_count) {
+      
+      my $path = File::Temp->_replace_XX($template);
+      
+      eval {
+        Sys::IO->mkdir($path, 0700);
+      }
+      
+      unless ($@) {
+        $self->{dirname} = $path;
+        last;
+      }
+      
+      $try_count++;
+    }
+    
+    if ($try_count == $max_try_count) {
+      die "tried to get a new temp name different to the previous value $max_try_count times.\nsomething wrong with template?? ($template)";
+    }
+    
+  }
+  
 }

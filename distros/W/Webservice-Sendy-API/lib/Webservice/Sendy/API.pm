@@ -2,13 +2,12 @@ package Webservice::Sendy::API;
 
 use v5.10;
 use strict;
-use warnings;
-
-our $VERSION = 0.7;
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
 use Util::H2O::More qw/baptise ddd HTTPTiny2h2o h2o ini2h2o o2d/;
+
+our $VERSION = '0.8';
 
 sub new {
     my $pkg = shift;

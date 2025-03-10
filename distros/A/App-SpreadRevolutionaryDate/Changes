@@ -1,9 +1,18 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.43 2025-03-08T08:57:25
- - Fix test of Telechat msgmaker with feminine feasts
- - Fix typos in Telechat feasts
- - Fix Telechat feast indexed by month day, not the other way around
+0.44 2025-03-08T13:22:15
+ - Document Telechat calendars
+ - Chose randomly between Telechat calendars
+ - Add two other Telechat calendar
+ - Update TODO with OpenAI::API
+ - Add tmp dir to gitignore
+
+0.43 2025-03-08T13:21:50Z
+ - Document Telechat calendars
+ - Chose randomly between Telechat calendars
+ - Add two other Telechat calendar
+ - Update TODO with OpenAI::API
+ - Add tmp dir to gitignore
 
 0.42 2025-03-07T16:02:59Z
  - Command line arguments for targets should override configuration

@@ -24,53 +24,23 @@ sub new {
 
 
 sub case {
-    my ( $sf, $sql, $clause, $qt_cols, $r_data, $opt ) = @_;
+    my ( $sf, $sql, $clause, $cols, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    if ( ! defined $r_data->{case} ) {
-        # reset recursion data other than case at the first call of case
-        # set 'case_info' only at the first call of case (don't reset it in recursive calls)
-        $r_data = {
-            case => [],
-            case_info => $opt->{info} // $ax->get_sql_info( $sql )
-        };
+    my $depth = 0;
+    for my $e ( reverse @$r_data ) {
+        last if $e->[0] ne 'case';
+        $depth++;
     }
-    my $tmp_sql = $ax->clone_data( $sql );
-    $tmp_sql->{case_stmt} = $r_data->{case}[-1] // '';
-    $tmp_sql->{case_info} = $r_data->{case_info};
-    my $in = ' ' x $sf->{o}{G}{base_indent};
-    my $count = @{$r_data->{case}};
-    if ( delete $tmp_sql->{when_stmt} ) {
-        # CASE in WHEN
-        $count++ ;
-    }
-    my $pad1;
-    my $pad2;
-    if ( ! $count ) {
-        $pad1 = '';
-        $pad2 = $in x 2;
-    }
-    else {
-        my $d = $count * 4;
-        $pad1 = $in x $d;
-        $pad2 = $in x ( $d + 2);
-    }
-    $pad1 .= $in;
-    $pad2 .= $in;
-    my $preceding_stmt = $tmp_sql->{case_stmt};
-    if ( $preceding_stmt ) {
-        $tmp_sql->{case_stmt} .= "\n${pad1}CASE";
-    }
-    else {
-        $tmp_sql->{case_stmt} .= "${pad1}CASE";
-    }
+    my $case_parts = [ "CASE" ];
+    push @$r_data, [ 'case', @$case_parts ];
     my @bu;
     my $else_on = 0;
 
     SUBSTMT: while ( 1 ) {
-        my ( $when, $else, $end ) = ( '  WHEN', '  ELSE', '  END' );
+        my ( $when, $else, $end ) = ( 'WHEN', 'ELSE', 'END' );
         my @pre = ( undef );
         my $menu;
         if ( $else_on ) {
@@ -79,73 +49,109 @@ sub case {
         else {
             $menu = [ @pre, $when, $else, $end ];
         }
-        my $info = $ax->get_sql_info( $tmp_sql );
+        my $info = $ax->get_sql_info( $sql ) . $ext->nested_func_info( $r_data );
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Your choice:', index => 1, undef => '  <=' } ##
+            { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Your choice:', index => 1, undef => '<=' }
         );
         $ax->print_sql_info( $info );
         if ( ! $idx ) {
             if ( @bu ) {
-                $tmp_sql->{case_stmt} = pop @bu;
+                $case_parts = pop @bu;
+                $r_data->[-1] = [ 'case', @$case_parts ];
                 $else_on = 0;
                 next SUBSTMT;
             }
-            delete $tmp_sql->{case_stmt};
+            pop @$r_data;
             return;
         }
-        push @bu, $tmp_sql->{case_stmt};
-        my $operator = '=';
         if ( $menu->[$idx] eq $end ) {
-            $tmp_sql->{case_stmt} .= "\n${pad1}END";
-            my $case_stmt = delete $tmp_sql->{case_stmt};
-            if ( $preceding_stmt ) {
-                $case_stmt =~ s/^\Q$preceding_stmt\E//;
-            }
-            else {
-                $case_stmt = "\n" . $case_stmt;
+            pop @$r_data;
+            push @$case_parts, "END";
+            my $case_stmt = $sf->format_case( $case_parts, $depth );
+            if ( ! $depth ) {
+#                $case_stmt = "\n" . $case_stmt; ##
+                $case_stmt =~ s/^\s+//;
+
             }
             return $case_stmt;
         }
-        elsif ( $menu->[$idx] eq $when ) {
-            my $clause_when = $clause . '_' . "${pad2}WHEN";
-            my $ret = $sb->add_condition( $tmp_sql, $clause_when, $qt_cols );
+        push @bu, [ @$case_parts ];
+        my $operator = '=';
+        if ( $menu->[$idx] eq $when ) {
+            push @$case_parts, "WHEN";
+            $r_data->[-1] = [ 'case', @$case_parts ];
+            my $clause_when = $clause . '_WHEN';
+            my $tmp_sql = $ax->clone_data( $sql );
+            my $ret = $sb->add_condition( $tmp_sql, $clause_when, $cols, $r_data );
             if ( ! defined $ret ) {
-                delete $tmp_sql->{when_stmt};
-                $tmp_sql->{case_stmt} = pop @bu;
+                $case_parts = pop @bu;
+                $r_data->[-1] = [ 'case', @$case_parts ];
                 next SUBSTMT;
             }
-            $tmp_sql->{case_stmt} .= "\n" . delete $tmp_sql->{when_stmt};
-            $tmp_sql->{case_stmt} .= " THEN";
-            push @{$r_data->{case}}, $tmp_sql->{case_stmt};
-            my $value = $ext->value( $tmp_sql, $clause, $r_data, $operator, { is_numeric => -1 } );
-            pop @{$r_data->{case}};
-            if ( ! defined $value ) { ##
-                $tmp_sql->{case_stmt} = pop @bu;
-                next SUBSTMT;
-            }
-            $tmp_sql->{case_stmt} .= ' ' . $value;
+            $case_parts->[-1] = $tmp_sql->{when_stmt} . " THEN";
         }
         elsif ( $menu->[$idx] eq $else ) {
-            $tmp_sql->{case_stmt} .= "\n${pad2}ELSE";
-            push @{$r_data->{case}}, $tmp_sql->{case_stmt};
-            my $value = $ext->value( $tmp_sql, $clause, $r_data, $operator, { is_numeric => -1 } );
-            pop @{$r_data->{case}};
-            if ( ! defined $value ) {
-                $tmp_sql->{case_stmt} = pop @bu;
-                next SUBSTMT;
-            }
-            $tmp_sql->{case_stmt} .= ' ' . $value;
             $else_on = 1;
-
+            push @$case_parts, "ELSE";
         }
+        $r_data->[-1] = [ 'case', @$case_parts ];
+        my $value = $ext->value( $sql, $clause, $r_data, $operator, { is_numeric => -1 } );
+        if ( ! defined $value ) {
+            $case_parts = pop @bu;
+            $r_data->[-1] = [ 'case', @$case_parts ];
+            next SUBSTMT;
+        }
+        $case_parts->[-1] .= ' ' . $value;
+        $r_data->[-1] = [ 'case', @$case_parts ];
     }
+}
+
+
+sub format_case {
+    my ( $sf, $case_parts, $depth ) = @_;
+    #return join ' ', @$case_parts; ##
+    $depth++;
+    my $in = ' ' x $sf->{o}{G}{base_indent};
+#    my $pad1 = $in x $depth;
+#    my $pad2 = $in x ( $depth + 1 );
+    my $pad1 = '';
+    my $pad2 = '';
+    if ( $depth == 1 ) {
+        $pad1 = '';
+        $pad2 = $in x 2;
+    }
+    else {
+        my $d = $depth * 2;
+        $pad1 = $in x $d;
+        $pad2 = $in x ( $d + 2);
+    }
+    $pad1 .= $in;
+    $pad2 .= $in;
+    my $CASE = shift @$case_parts;
+    my $END;
+    if ( @$case_parts && $case_parts->[-1] eq "END" ) {
+        $END = pop @$case_parts;
+    }
+    my $case_stmt;
+    if ( $depth > 1 ) {
+        $case_stmt .= "\n";
+    }
+    $case_stmt .= $pad1 . $CASE;
+    for my $part ( @$case_parts ) {
+        $case_stmt .= "\n" . $pad2 . $part;
+    }
+    if ( length $END ) {
+        $case_stmt .= "\n" . $pad1 . "END";
+    }
+    return $case_stmt;
 }
 
 
 
 
 
-1
+1;
+
 __END__

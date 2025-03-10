@@ -5,4 +5,6 @@
 
 * Add some new targets to spread to.
 
-* Add some new message writers.
+* Add some new message makers.
+
+* Add message maker from https://metacpan.org/pod/OpenAI::API

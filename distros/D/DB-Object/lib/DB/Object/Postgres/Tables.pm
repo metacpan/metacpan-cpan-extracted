@@ -531,24 +531,24 @@ EOT
         $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{data_type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
         my $def =
         {
-        name            => $ref->{field},
-        comment         => $ref->{comment},
-        default         => $ref->{default},
-        ( $ref->{check_name} ? ( check_name => $ref->{check_name} ) : () ),
-        ( $ref->{foreign_name} ? ( foreign_name => $ref->{foreign_name} ) : () ),
-        ( $ref->{index_name} ? ( index_name => $ref->{index_name} ) : () ),
-        is_array        => ( $ref->{is_array} ? 1 : 0 ),
-        is_check        => ( $ref->{is_check} ? 1 : 0 ),
-        is_foreign      => ( $ref->{is_foreign} ? 1 : 0 ),
-        is_nullable     => ( $ref->{is_nullable} ? 1 : 0 ),
-        is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
-        is_unique       => ( $ref->{is_unique} ? 1 : 0 ),
-        pos             => $ref->{field_num},
-        # query_object    => $q,
-        size            => $ref->{character_maximum_length},
-        # When the field is an array, the data type will start with an underscore
-        type            => ( substr( $ref->{data_type}, 0, 1 ) eq '_' ? substr( $ref->{data_type}, 1 ) : $ref->{data_type} ),
-        # table_object    => $self,
+            name            => $ref->{field},
+            comment         => $ref->{comment},
+            default         => $ref->{default},
+            ( $ref->{check_name} ? ( check_name => $ref->{check_name} ) : () ),
+            ( $ref->{foreign_name} ? ( foreign_name => $ref->{foreign_name} ) : () ),
+            ( $ref->{index_name} ? ( index_name => $ref->{index_name} ) : () ),
+            is_array        => ( $ref->{is_array} ? 1 : 0 ),
+            is_check        => ( $ref->{is_check} ? 1 : 0 ),
+            is_foreign      => ( $ref->{is_foreign} ? 1 : 0 ),
+            is_nullable     => ( $ref->{is_nullable} ? 1 : 0 ),
+            is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
+            is_unique       => ( $ref->{is_unique} ? 1 : 0 ),
+            pos             => $ref->{field_num},
+            # query_object    => $q,
+            size            => $ref->{character_maximum_length},
+            # When the field is an array, the data type will start with an underscore
+            type            => ( substr( $ref->{data_type}, 0, 1 ) eq '_' ? substr( $ref->{data_type}, 1 ) : $ref->{data_type} ),
+            # table_object    => $self,
         };
         $self->{type} = $ref->{table_type} if( !$self->{type} );
         $self->{schema} = $ref->{schema_name} if( !$self->{schema} );

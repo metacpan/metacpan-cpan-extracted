@@ -1,3 +1,11 @@
+0.024 2025-03-10
+  [New Features]
+    * Add File::Temp#new method.
+    * Add DIR, TMPDIR, TEMPLATE, CLEANUP options to File::Temp#newdir method.
+  [Bug Fix]
+    * Fix many bugs.
+  [Document Changes]
+    * Improve documents.
 0.023 2025-01-24
   [Requirement Changes]
     * Require SPVM 0.990042.

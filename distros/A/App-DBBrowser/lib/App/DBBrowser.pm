@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.423';
+our $VERSION = '2.424';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -426,9 +426,9 @@ sub run {
 
                     my ( $from_join, $from_union, $from_subquery, $from_cte ) = ( '  Join', '  Union', '  Subquery', '  Cte' ); ##
                     my $hidden = $db_string;
-                    my $table;
+                    my $table_key;
                     if ( $sf->{redo_table} ) {
-                        $table = delete $sf->{redo_table};
+                        $table_key = delete $sf->{redo_table};
                     }
                     else {
                         my @pre = ( $hidden, undef );
@@ -451,9 +451,9 @@ sub run {
                             { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
                         );
                         if ( defined $idx_tbl ) {
-                            $table = $menu_table->[$idx_tbl];
+                            $table_key = $menu_table->[$idx_tbl];
                         }
-                        if ( ! defined $table ) {
+                        if ( ! defined $table_key ) {
                             $sf->{d}{cte_history} = [];
                             next SCHEMA         if @schemas                > 1;
                             $dbh->disconnect();
@@ -469,7 +469,7 @@ sub run {
                             $old_idx_tbl = $idx_tbl;
                         }
                     }
-                    if ( $table eq $hidden ) {
+                    if ( $table_key eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         my $ret = $cda->create_drop_or_attach();
@@ -480,14 +480,14 @@ sub run {
                             # update the list of available tables
                             $sf->{redo_schema} = $schema;
                             $sf->{redo_is_system_schema} = $is_system_schema;
-                            $sf->{redo_table} = $table; # stay in the $hidden submenu
+                            $sf->{redo_table} = $table_key; # stay in the $hidden submenu
                             next SCHEMA;
                         }
                         elsif ( $ret == 2 ) {
                             # attached/dedached databases and therefore recall `get_schemas` to get the new schemas
                             $sf->{redo_db} = $db;
                             $sf->{redo_is_system_db} = $is_system_db;
-                            $sf->{redo_table} = $table; # stay in the $hidden submenu
+                            $sf->{redo_table} = $table_key; # stay in the $hidden submenu
                             next DATABASE;
                         }
                         elsif ( $ret == 3 ) {
@@ -496,7 +496,7 @@ sub run {
                             $sf->{redo_is_system_db} = $is_system_db;
                             $sf->{redo_schema} = $schema;
                             $sf->{redo_is_system_schema} = $is_system_schema;
-                            $sf->{redo_table} = $table; # stay in the $hidden submenu
+                            $sf->{redo_table} = $table_key; # stay in the $hidden submenu
                             $dbh->disconnect(); # reconnects
                             next DATABASE;
                         }
@@ -505,7 +505,7 @@ sub run {
                     $sf->{d}{table_aliases} = {};
                     require App::DBBrowser::From; ##
                     my $fr = App::DBBrowser::From->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                    my $sql = $fr->from_sql( $table =~ s/[-\ ]\ //r );
+                    my $sql = $fr->from_sql( $table_key =~ s/[-\ ]\ //r );
                     if ( ! defined $sql ) {
                         next TABLE;
                     }
@@ -537,7 +537,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.423
+Version 2.424
 
 =head1 DESCRIPTION
 

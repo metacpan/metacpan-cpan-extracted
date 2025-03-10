@@ -1,5 +1,5 @@
 Array.pod
-CHANGES
+Changes
 COPYRIGHT
 examples/clip.pl
 examples/cube.pl
@@ -88,7 +88,6 @@ pogl_matrix.xs
 pogl_rpn.xs
 ppport.h
 README
-Release_Notes
 SUPPORTS
 t/00_require.t
 t/01_use.t
@@ -104,6 +103,7 @@ utils/const.pl
 utils/exports.pl
 utils/exports.txt
 utils/glext_procs.pl
+utils/glversion
 utils/glversion.c
 utils/hdr_diff.pl
 utils/Makefile

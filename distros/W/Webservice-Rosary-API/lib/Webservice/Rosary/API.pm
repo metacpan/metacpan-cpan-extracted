@@ -6,7 +6,7 @@ use strict;
 use Util::H2O::More qw/baptise ddd HTTPTiny2h2o h2o o2d/;
 use HTTP::Tiny qw//;
 
-our $VERSION = "0.1.4";
+our $VERSION = "0.1.5";
 
 use constant {
   BASEURL  => "https://the-rosary-api.vercel.app/v1",

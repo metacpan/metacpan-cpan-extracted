@@ -7,3 +7,7 @@
 	- Maintenance release, updated dist.ini
 	- added some POD regarding the FreePublicPerlAPIs project
 	- https://github.com/oodler577/FreePublicPerlAPIs
+
+1.0.2   Sub Mar  9 06:50:00 PM UTC 2025
+	- trying to fix test failures by pinning versions of dependent
+          modules

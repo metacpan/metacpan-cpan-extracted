@@ -47,6 +47,7 @@ ok !$metastorage->readonly, 'readonly removed ok';
 ok !$storage->readonly, 'readonly removed from source ok';
 
 $storage->set_readonly(1);
+$metastorage->refresh;
 ok $metastorage->readonly, 'readonly added to source ok';
 
 my $composite_metastorage = Storage::Abstract->new(

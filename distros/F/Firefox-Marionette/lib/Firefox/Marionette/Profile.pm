@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -351,6 +351,8 @@ sub new {
         $profile->set_value( 'media.navigator.enabled',    'false', 0 );
         $profile->set_value( 'network.captive-portal-service.enabled',
             'false', 0 );
+        $profile->set_value( 'network.connectivity-service.enabled',
+            'false', 0 );
         $profile->set_value( 'network.cookie.lifetimePolicy',       '2',    0 );
         $profile->set_value( 'privacy.clearOnShutdown.downloads',   'true', 0 );
         $profile->set_value( 'privacy.clearOnShutdown.formdata',    'true', 0 );
@@ -530,7 +532,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.62
+Version 1.63
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ class TestCase::File::Temp {
   use List;
   use IO::File;
   
-  static method test : int () {
+  static method newdir : int () {
 
     # Basic
     {

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.6.0
+## Version v1.7.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/06
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -28,14 +28,18 @@ BEGIN
     );
     use Regexp::Common;
     use Scalar::Util qw( blessed );
+    use DateTime;
+    use DateTime::TimeZone;
+    use DateTime::Format::Strptime;
     use DB::Object::Cache::Tables;
     use DBI;
     use JSON;
     use Module::Generic::File qw( sys_tmpdir );
+    use Module::Generic::DateTime;
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.6.0';
+    our $VERSION = 'v1.7.0';
 };
 
 use strict;
@@ -321,9 +325,9 @@ sub connect
     my $param = $that->_connection_params2hash( $opts ) || return( $this->error( "No valid connection parameters found" ) );
     my $driver2pack = 
     {
-    mysql  => 'DB::Object::Mysql',
-    Pg     => 'DB::Object::Postgres',
-    SQLite => 'DB::Object::SQLite',
+        mysql  => 'DB::Object::Mysql',
+        Pg     => 'DB::Object::Postgres',
+        SQLite => 'DB::Object::SQLite',
     };
     return( $that->error( "No driver was provided." ) ) if( !exists( $param->{driver} ) );
     if( !exists( $driver2pack->{ $param->{driver} } ) )
@@ -437,11 +441,11 @@ sub connect
     $tables = $self->tables_info;
     my $cache = 
     {
-    host => $host,
-    driver => $driver,
-    port => $port,
-    database => $database,
-    tables => $tables,
+        host => $host,
+        driver => $driver,
+        port => $port,
+        database => $database,
+        tables => $tables,
     };
     if( !defined( $cache_tables->set( $cache ) ) )
     {
@@ -908,13 +912,13 @@ sub prepare($;$)
         }
         my $data = 
         {
-        sth             => $sth,
-        query           => $query,
-        # query_values    => $q->query_values,
-        # selected_fields => $q->selected_fields,
-        ( defined( $query_values ) ? ( query_values => $query_values ) : () ),
-        ( defined( $sel_fields ) ? ( selected_fields => $sel_fields ) : () ),
-        query_object    => $q,
+            sth             => $sth,
+            query           => $query,
+            # query_values    => $q->query_values,
+            # selected_fields => $q->selected_fields,
+            ( defined( $query_values ) ? ( query_values => $query_values ) : () ),
+            ( defined( $sel_fields ) ? ( selected_fields => $sel_fields ) : () ),
+            query_object    => $q,
         };
         return( $self->_make_sth( "${base_class}::Statement", $data ) );
     }
@@ -959,11 +963,11 @@ sub prepare_cached
         # my $data = { 'sth' => $sth, 'query' => $query };
         my $data = 
         {
-        sth             => $sth,
-        query           => $query,
-        query_values    => $self->{query_values},
-        selected_fields => $self->{selected_fields},
-        query_object    => $q,
+            sth             => $sth,
+            query           => $query,
+            query_values    => $self->{query_values},
+            selected_fields => $self->{selected_fields},
+            query_object    => $q,
         };
         # CORE::delete( $data->{ 'executed' } );
         # This is an inner package
@@ -1142,9 +1146,11 @@ sub table
             dbo => $self,
             debug => $self->debug,
         ) || return( $self->pass_error( $table_class->error ) );
+        $self->messagec( 6, "Object for table {green}${table}{/} created." );
         $tbl->reset;
         if( $self->cache_table )
         {
+            $self->messagec( 6, "Caching table {green}${table}{/}" );
             $self->_cache_table(
                 database => $self->database,
                 table => $tbl,
@@ -1154,6 +1160,7 @@ sub table
     $tbl->no_bind( $self->no_bind );
     # We set debug and again here in case it changed since the table object was instantiated
     $tbl->debug( $self->debug );
+    $self->messagec( 6, "Returning table {green}${table}{/} object." );
     return( $tbl );
 }
 
@@ -1454,7 +1461,7 @@ sub _cache_this
             }
         }
     }
-    my $sth = '';
+    my $sth;
     # We found a previous query exactly the same
     if( $cached_sth )
     {
@@ -1798,23 +1805,6 @@ sub _clean_statement
     my $query = ref( $data ) ? $data : \$data;
     $$query = CORE::join( "\n", map{ s/^\s+|\s+$//gs; $_ } split( /\n/, $$query ) );
     return( $$query ) if( !ref( $data ) );
-}
-
-sub _convert_datetime2object
-{
-    my $self = shift( @_ );
-    my $opts = $self->_get_args_as_hash( @_ );
-    return( $opts->{data} );
-}
-
-# Does nothing by default
-# Must be superseded by the subclasses because we use the data types like PG_JSON, PG_JSONB
-# and we don't have them at this top level
-sub _convert_json2hash 
-{
-    my $self = shift( @_ );
-    my $opts = $self->_get_args_as_hash( @_ );
-    return( $opts->{data} );
 }
 
 sub _dbi_connect
@@ -2853,7 +2843,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.6.0
+    v1.7.0
 
 =head1 DESCRIPTION
 

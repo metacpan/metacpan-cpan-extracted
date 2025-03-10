@@ -68,12 +68,14 @@ sub table_write_access {
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
-        if ( $stmt_type eq 'Insert' ) {
+        if ( $stmt_type eq 'Insert' || $sf->{i}{driver} eq 'SQLite' ) {
             #if ( $sf->{d}{table_origin} eq 'ordinary' ) {
-                # Insert: use tablename without alias:
+                # use tablename without alias:
                 my $table_key = $sf->{d}{table_key};
                 $sql->{table} = $ax->qq_table( $sf->{d}{tables_info}{$table_key} );
             #}
+        }
+        if ( $stmt_type eq 'Insert' ) {
             my $ok = $sf->__build_insert_stmt( $sql );
             if ( $ok ) {
                 $cs->commit_sql( $sql );
@@ -196,16 +198,24 @@ sub __first_column_is_autoincrement { ##
     my ( $sf, $sql ) = @_;
     my $dbh = $sf->{d}{dbh};
     my $schema = $sf->{d}{schema};
-    my $table = $sf->{d}{tables_info}{$sf->{d}{table_key}}[2];
+    my $nq_table = $sf->{d}{tables_info}{$sf->{d}{table_key}}[2];
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
+        if ( ! defined $schema ) {
+            # return if a table is from an attached database
+            my $main = 'main';
+            my $qt_main = $dbh->quote_identifier( $main );
+            if ( $sql->{table} !~ /^(?:$main|$qt_main)\./i ) {
+                return;
+            }
+        }
         my $stmt = "SELECT sql FROM sqlite_master WHERE name = ?";
-        my ( $row ) = $sf->{d}{dbh}->selectrow_array( $stmt, {}, $table );
-        my $qt_table = $sql->{table};
-        my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-        my $col = $sth->{NAME}[0];
-        my $qt_col = $dbh->quote_identifier( $col );
-        if ( $row =~ /^\s*CREATE\s+TABLE\s+(?:\Q$table\E|\Q$qt_table\E)\s+\(\s*(?:\Q$col\E|\Q$qt_col\E)\s+INTEGER\s+PRIMARY\s+KEY[^,]*,/i ) {
+        my ( $row ) = $sf->{d}{dbh}->selectrow_array( $stmt, {}, $nq_table );
+        my $sth = $dbh->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
+        my $nq_col = $sth->{NAME}[0];
+        my $col = $dbh->quote_identifier( $nq_col );
+        my $qt_table = $dbh->quote_identifier( $nq_table ); # quoted but not qualified
+        if ( $row =~ /^\s*CREATE\s+TABLE\s+(?:\Q$nq_table\E|\Q$qt_table\E)\s+\(\s*(?:\Q$nq_col\E|\Q$col\E)\s+INTEGER\s+PRIMARY\s+KEY[^,]*,/i ) {
             return 1;
         }
     }
@@ -218,7 +228,7 @@ sub __first_column_is_autoincrement { ##
                 AND COLUMN_DEFAULT IS NULL
                 AND IS_NULLABLE = 'NO'
                 AND EXTRA like '%auto_increment%'";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
     elsif ( $driver eq 'Pg' ) {
@@ -232,7 +242,7 @@ sub __first_column_is_autoincrement { ##
                        UPPER(column_default) LIKE 'NEXTVAL%'
                     OR UPPER(identity_generation) = 'BY DEFAULT'
                 )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
     elsif ( $driver eq 'Firebird' ) {
@@ -243,7 +253,7 @@ sub __first_column_is_autoincrement { ##
                    RDB\$IDENTITY_TYPE = 0
                 OR RDB\$IDENTITY_TYPE = 1
             )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $nq_table );
         return $first_col_is_autoincrement;
     }
     elsif ( $driver eq 'DB2' ) {
@@ -256,7 +266,7 @@ sub __first_column_is_autoincrement { ##
             AND KEYSEQ = 1
             AND GENERATED = 'A'
             AND IDENTITY = 'Y'";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
     elsif ( $driver eq 'Oracle' ) {
@@ -267,7 +277,7 @@ sub __first_column_is_autoincrement { ##
             AND NULLABLE = 'N'
             AND COLUMN_ID = 1
             AND IDENTITY_COLUMN = 'YES'";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
     return;

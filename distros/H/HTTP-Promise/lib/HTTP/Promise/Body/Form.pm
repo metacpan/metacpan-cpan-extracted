@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form.pm
-## Version v0.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/18
-## Modified 2024/02/06
+## Modified 2025/03/09
 ## All rights reserved.
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION );
     # use Nice::Try;
     use URL::Encode::XS ();
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -32,21 +32,31 @@ sub new
     my $this = shift( @_ );
     if( @_ )
     {
-        my $data = shift( @_ );
-        if( ref( $data ) eq 'HASH' )
+        if( scalar( @_ ) > 1 )
         {
-            return( $this->SUPER::new( $data, @_ ) );
-        }
-        elsif( !ref( $data ) || 
-               ( ref( $data ) ne 'HASH' && overload::Method( $data => '""' ) ) )
-        {
-            my $ref = $this->decode_to_hash( "${data}" ) ||
+            my $data = [@_];
+            my $ref = $this->decode_to_hash( $data ) ||
                 return( $this->pass_error );
-            return( $this->SUPER::new( $ref, @_ ) );
+            return( $this->SUPER::new( $ref ) );
         }
         else
         {
-            return( $this->error( "Unsupported data type '", ref( $data ), "'." ) );
+            my $data = shift( @_ );
+            if( ref( $data ) eq 'HASH' )
+            {
+                return( $this->SUPER::new( $data, @_ ) );
+            }
+            elsif( !ref( $data ) || 
+                   ( ref( $data ) ne 'HASH' && overload::Method( $data => '""' ) ) )
+            {
+                my $ref = $this->decode_to_hash( "${data}" ) ||
+                    return( $this->pass_error );
+                return( $this->SUPER::new( $ref, @_ ) );
+            }
+            else
+            {
+                return( $this->error( "Unsupported data type '", ref( $data ), "'." ) );
+            }
         }
     }
     else
@@ -145,7 +155,7 @@ sub as_string
                     {
                         $v2 = $v2->body->as_string( binmode => 'utf-8' );
                     }
-                    warn( "Found a value, within an array for item '$n', that is a reference, but does not stringify.\n" ) if( ref( $v2 ) && !overload::Method( $v2 => '""' ) && $self->_is_warnings_enabled );
+                    warn( "Found a value, within an array for item '$n', that is a reference (", overload::StrVal( $v2 ), "), but does not stringify.\n" ) if( ref( $v2 ) && !overload::Method( $v2 => '""' ) && $self->_is_warnings_enabled );
                     push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v2" ) ) );
                 }
             }
@@ -155,7 +165,7 @@ sub as_string
                 {
                     $v = $v->body->as_string( binmode => 'utf-8' );
                 }
-                warn( "Found a value, for form item '$n', that is a reference, but does not stringify.\n" ) if( ref( $v ) && !overload::Method( $v => '""' ) && $self->_is_warnings_enabled );
+                warn( "Found a value, for form item '$n', that is a reference (", overload::StrVal( $v ), "), but does not stringify.\n" ) if( ref( $v ) && !overload::Method( $v => '""' ) && $self->_is_warnings_enabled );
                 push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v" ) ) );
             }
         }
@@ -367,7 +377,7 @@ HTTP::Promise::Body::Form - x-www-form-urlencoded Data Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

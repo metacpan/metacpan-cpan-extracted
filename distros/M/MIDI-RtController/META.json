@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/MIDI-RtController"
       }
    },
-   "version" : "0.0201",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -298,7 +298,8 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
-                     "foo"
+                     "JBARRETT",
+                     "fuzzix"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

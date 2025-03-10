@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/DB-Object-v1.5.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/DB-Object-v1.6.0/README.md)
 
 ## Author
 

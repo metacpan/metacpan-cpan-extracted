@@ -24,7 +24,7 @@
             "Dispatch::Fu" : "1.06",
             "HTTP::Tiny" : "0",
             "JSON" : "0",
-            "Util::H2O::More" : "v0.4.0",
+            "Util::H2O::More" : "v0.4.2",
             "perl" : "5.010"
          }
       },
@@ -35,7 +35,8 @@
             "HTTP::Tiny" : "0",
             "JSON" : "0",
             "Test::More" : "0",
-            "Util::H2O::More" : "v0.4.0"
+            "Util::H2O::More" : "v0.4.2",
+            "perl" : "5.010"
          }
       }
    },
@@ -48,7 +49,7 @@
          "web" : "https://github.com/oodler577/p5-Webservice-Sendy-API"
       }
    },
-   "version" : "0.7",
+   "version" : "0.8",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

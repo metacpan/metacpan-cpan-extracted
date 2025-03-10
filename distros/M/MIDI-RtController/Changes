@@ -1,5 +1,23 @@
 Revision history for MIDI-RtController
 
+0.0400 2025-03-09 05:21:43
+    - Detect and pass the event delta-time to the filters.
+
+0.0301 2025-03-09 01:47:24
+    - Don't log events redundantly.
+    - Make tests and skip them.
+
+0.0300 2025-03-08 23:59:30
+    - Fix logging and verbose mode.
+    - Alter the add_filter() signature.
+
+0.0203 2025-03-08 14:12:06
+    - Improve the documentation.
+
+0.0202 2025-03-08 08:45:29
+    - Improve the documentation.
+    - Improve the eg/echo.pl program.
+
 0.0201 2025-03-07 22:55:41
     - Improve the documentation.
 

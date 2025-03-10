@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.084000';
+our $VERSION = '2.084001';
 use App::Netdisco::Configuration;
 
 =head1 NAME
@@ -125,28 +125,10 @@ application:
 
 You may wish to L<amend the PostgreSQL
 configuration|https://github.com/netdisco/netdisco/wiki/Install-Tips#enable-md5-authentication-to-postgresql>
-so that local connections are working.  The default PostgreSQL configuration
-can also use tuning for modern server hardware. We recommend that you use one of the following
-tools to tune your C<postgresql.conf> file:
+so that local connections are working.
 
-=over 4
-
-=item L<postgresqltuner|https://github.com/jfcoz/postgresqltuner>
-
-Script that will check your operating system resources and settings as well as your
-running PostgreSQL database and will make recommendations based on actual load. Works
-on new netdisco installs but will make the best suggestions once the database contains
-a bigger dataset.
-
-=item L<pgtune (fork)|https://pgtune.leopard.in.ua>
-
-A web based application which will recommend which parameters to change.
-
-=item L<pgtune|https://github.com/elitwin/pgtune>
-
-Program to auto-tune your C<postgresql.conf>, regretfully not updated in a while.
-
-=back
+The default PostgreSQL configuration isn't tuned for large installations
+on modern server hardware. We recommend L<https://pgtune.leopard.in.ua/>.
 
 =head1 Installation
 
@@ -252,7 +234,7 @@ L<Release Notes|https://github.com/netdisco/netdisco/wiki/Release-Notes>.
 
 =head1 Upgrading from 2.x
 
-Netdisco requires Perl (5.10+), Python (3.9+), and PostgreSQL (9.6+).
+Netdisco requires Perl (5.10+) and PostgreSQL (9.6+).
 
 Always review the latest L<Release Notes|https://github.com/netdisco/netdisco/wiki/Release-Notes>.
 Then the process below should be run for each installation:

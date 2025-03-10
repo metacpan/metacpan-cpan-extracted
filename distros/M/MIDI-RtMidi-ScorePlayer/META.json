@@ -66,7 +66,7 @@
          "web" : "https://github.com/ology/MIDI-RtMidi-ScorePlayer"
       }
    },
-   "version" : "0.0301",
+   "version" : "0.0303",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -300,9 +300,11 @@
                      "DLSMusicDevice",
                      "FluidSynth",
                      "Garageband",
+                     "JBARRETT",
                      "TBH",
                      "distro",
                      "durations",
+                     "fuzzix",
                      "soundfont",
                      "synch'd"
                   ],

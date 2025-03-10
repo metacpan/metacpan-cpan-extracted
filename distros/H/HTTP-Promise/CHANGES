@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Promise
 
+v0.5.3 2025-03-09T21:27:49+0900
+    - Corrected HTTP::Promise::Body::Form to better handle array provided to its instantiator.
+
 v0.5.2 2024-09-05T21:07:34+0900
     - Updated dependencies
 

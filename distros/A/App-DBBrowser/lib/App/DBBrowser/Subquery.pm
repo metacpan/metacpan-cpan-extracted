@@ -36,38 +36,40 @@ sub subquery_as_main_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
-    my $sql = { table => '()' };
+    #my $sql = { table => '()' };
+    my $sql = {}; ##
     $ax->reset_sql( $sql );
     $ax->print_sql_info( $ax->get_sql_info( $sql ) ); ##
     my $subquery = $sf->subquery( $sql );
     if ( ! defined $subquery ) {
         return;
     }
-    my $qt_table = $subquery;
     # Oracle: key word "AS" not supported in Table aliases
-    my $qt_alias = $ax->table_alias( $sql, 'derived_table', $qt_table );
-    $qt_table .= " " . $qt_alias;
-    return $qt_table;
+    my $alias = $ax->table_alias( $sql, 'derived_table', $subquery );
+    if ( length $alias ) {
+        $subquery .= " " . $alias;
+    }
+    return $subquery;
 }
 
 
 sub subquery {
-    my ( $sf, $sql ) = @_;
+    my ( $sf, $sql, $ext_info ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
 
     CHOOSE_QUERY: while ( 1 ) {
         $sf->{from_build_SQ} = 0;
-        my $selected_stmt = $sf->__choose_query( $sql, 'subquery' );
+        my $selected_stmt = $sf->__choose_query( $sql, 'subquery', $ext_info );
         if ( ! defined $selected_stmt ) {
             return;
         }
-        if ( $sf->{from_build_SQ} ) { ##
+        if ( $sf->{from_build_SQ} && ! $sf->{o}{G}{edit_sql_menu_sq} ) {
             $sf->{from_build_SQ} = 0;
             return "($selected_stmt)";
         }
         my $prompt = 'Query: ';
-        my $info = $ax->get_sql_info( $sql );
+        my $info = $ext_info || $ax->get_sql_info( $sql );
         # Readline
         my $stmt = $tr->readline(
             #'Query: ',
@@ -91,19 +93,19 @@ sub subquery {
 
 
 sub __choose_query {
-    my ( $sf, $sql, $caller ) = @_;
+    my ( $sf, $sql, $caller, $ext_info ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $saved_subqueries, $subquery_history, $print_history ) = $sf->__get_history();
     my $edit_sq_history_file = 'Choose:';
-    my ( $readline, $build_SQ ) = ( 'Readline', 'SQL Menu' ); ##
+    my ( $readline, $build_SQ ) = ( 'Readline', 'SQL Menu' );
     my @pre = ( $edit_sq_history_file, undef, $build_SQ, $readline );
     my $old_idx = 1;
 
     SUBQUERY: while ( 1 ) {
         my @queries = $sf->__get_queries( $saved_subqueries, $subquery_history, $print_history );
         my $menu = [ @pre, @queries ];
-        my $info = $ax->get_sql_info( $sql );
+        my $info = $ext_info || $ax->get_sql_info( $sql );
         # Choose
         my $idx = $tc->choose(
             $menu,
@@ -137,14 +139,7 @@ sub __choose_query {
             my $bu_stmt_types = [ @{$sf->{d}{stmt_types}} ];
             my $bu_table_origin = $sf->{d}{table_origin};
             my $bu_main_info = $sf->{d}{main_info};
-            if ( $caller eq 'cte' ) {
-                $sf->{d}{main_info} = '';
-                # Don't show ctes twice.
-                # is not nested
-            }
-            else {
-                $sf->{d}{main_info} = $ax->get_sql_info( $sql );
-            }
+            $sf->{d}{main_info} = $ext_info || $ax->get_sql_info( $sql );
             $sf->{d}{nested_subqueries}++;
             my $stmt = $sf->__build_SQ( $caller );
             $sf->{d}{nested_subqueries}--;
@@ -499,7 +494,7 @@ sub __build_SQ {
 
     TABLE: while ( 1 ) {
         my ( $from_join, $from_union, $from_subquery, $from_cte ) = ( '  Join', '  Union', '  Subquery', '  Cte' ); ##
-        my $table;
+        my $table_key;
         my @pre = ( undef );
         my $menu_table;
         if ( $sf->{o}{G}{metadata} ) {
@@ -521,9 +516,9 @@ sub __build_SQ {
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, index => 1, default => $old_idx_tbl, undef => '<=' }
         );
         if ( defined $idx_tbl ) {
-            $table = $menu_table->[$idx_tbl];
+            $table_key = $menu_table->[$idx_tbl];
         }
-        if ( ! defined $table ) {
+        if ( ! defined $table_key ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -535,7 +530,7 @@ sub __build_SQ {
         }
         require App::DBBrowser::From; ##
         my $fr = App::DBBrowser::From->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $sql = $fr->from_sql( $table =~ s/[-\ ]\ //r );
+        my $sql = $fr->from_sql( $table_key =~ s/[-\ ]\ //r );
         if ( ! defined $sql ) {
             next TABLE;
         }

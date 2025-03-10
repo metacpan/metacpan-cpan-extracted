@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Composite;
-$Storage::Abstract::Driver::Composite::VERSION = '0.006';
+$Storage::Abstract::Driver::Composite::VERSION = '0.007';
 use v5.14;
 use warnings;
 
@@ -14,15 +14,22 @@ extends 'Storage::Abstract::Driver';
 
 has field '_cache' => (
 	isa => HashRef,
-	clearer => -public,
+	clearer => 1,
 	lazy => sub { {} },
 );
 
-with 'Storage::Abstract::Role::Metadriver';
+with 'Storage::Abstract::Role::Driver::Meta';
 
 sub source_is_array
 {
 	return !!1;
+}
+
+sub refresh
+{
+	my ($self) = @_;
+
+	$self->_clear_cache;
 }
 
 sub _run_on_sources
@@ -66,7 +73,7 @@ sub store_impl
 		}
 	);
 
-	Storage::Abstract::X::StorageError->raise("None of the sources were able to store $name")
+	Storage::Abstract::X::StorageError->raise('could not store')
 		unless $stored;
 }
 
@@ -90,21 +97,26 @@ sub retrieve_impl
 {
 	my ($self, $name, $properties) = @_;
 
+	my $stored = !!0;
 	my $retrieved = $self->_run_on_sources(
 		$name,
 		sub {
 			my $source = shift;
 
 			if ($source->is_stored($name)) {
+				$stored = !!1;
 				return $source->retrieve($name, $properties);
 			}
 
-			return !!0;
+			return undef;
 		}
 	);
 
-	Storage::Abstract::X::StorageError->raise("Could not retrieve $name")
-		unless $retrieved;
+	Storage::Abstract::X::NotFound->raise('file was not found')
+		unless $stored;
+
+	Storage::Abstract::X::StorageError->raise('could not retrieve')
+		unless defined $retrieved;
 
 	return $retrieved;
 }
@@ -113,13 +125,16 @@ sub dispose_impl
 {
 	my ($self, $name) = @_;
 
+	my $stored = !!0;
 	my $disposed = $self->_run_on_sources(
 		$name,
 		sub {
 			my $source = shift;
-			return !!0 if $source->readonly;
 
 			if ($source->is_stored($name)) {
+				$stored = !!1;
+				return !!0 if $source->readonly;
+
 				$source->dispose($name);
 				return !!1;
 			}
@@ -128,7 +143,10 @@ sub dispose_impl
 		}
 	);
 
-	Storage::Abstract::X::StorageError->raise("Could not dispose $name")
+	Storage::Abstract::X::StorageError->raise('file was not found')
+		unless $stored;
+
+	Storage::Abstract::X::StorageError->raise('could not dispose')
 		unless $disposed;
 }
 
@@ -159,7 +177,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Composite - Aggregate metadriver
+Storage::Abstract::Driver::Composite - Aggregate meta driver
 
 =head1 SYNOPSIS
 
@@ -179,7 +197,7 @@ Storage::Abstract::Driver::Composite - Aggregate metadriver
 
 =head1 DESCRIPTION
 
-This metadriver can hold a number of drivers under itself (in sequence) and
+This meta driver can hold a number of drivers under itself (in sequence) and
 choose the first driver which holds a given file.
 
 =head2 Choosing the source
@@ -231,14 +249,11 @@ instance can be coerced from a hash reference, which will be used to call
 L<Storage::Abstract/new>. Their order is significant - they will be tried in
 sequence.
 
-=head2 Methods
-
-=head3 clear_cache
-
-This method will clear the internal cache of the driver.
-
 =head1 CAVEATS
 
 This driver does not allow using C<set_readonly> on it - trying to do so will
 always result in an exception (unblessed).
+
+This driver caches the readonly state of its subdrivers to avoid rechecking it
+on every call. You can call C<refresh> to make it recalculate the readonly state.
 

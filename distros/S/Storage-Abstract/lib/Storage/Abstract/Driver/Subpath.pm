@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Subpath;
-$Storage::Abstract::Driver::Subpath::VERSION = '0.006';
+$Storage::Abstract::Driver::Subpath::VERSION = '0.007';
 use v5.14;
 use warnings;
 
@@ -16,7 +16,7 @@ has param 'subpath' => (
 	writer => -hidden,
 );
 
-with 'Storage::Abstract::Role::Metadriver';
+with 'Storage::Abstract::Role::Driver::Meta';
 
 sub BUILD
 {
@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Subpath - Change root metadriver
+Storage::Abstract::Driver::Subpath - Change root meta driver
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Storage::Abstract::Driver::Subpath - Change root metadriver
 
 =head1 DESCRIPTION
 
-This metadriver can modify another driver to use a different path than root. It
+This meta driver can modify another driver to use a different path than root. It
 will work as if the root of the L</source> driver was changed to L</subpath>.
 It does the opposite of L<Storage::Abstract::Driver::Superpath>.
 
@@ -127,4 +127,10 @@ reference, which will be used to call L<Storage::Abstract/new>.
 =head3 subpath
 
 B<Required> - A path prefix for all paths passed to the L</source> driver.
+
+=head1 CAVEATS
+
+This driver caches the readonly state of its subdriver to make its behavior
+consistent with other meta drivers. You can call C<refresh> to make it
+recalculate the readonly state.
 

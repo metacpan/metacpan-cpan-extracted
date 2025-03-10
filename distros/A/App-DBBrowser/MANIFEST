@@ -40,8 +40,13 @@ lib/App/DBBrowser/Table/Extensions/ColAliases.pm
 lib/App/DBBrowser/Table/Extensions/Columns.pm
 lib/App/DBBrowser/Table/Extensions/Maths.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions.pm
-lib/App/DBBrowser/Table/Extensions/ScalarFunctions/EpochToDate.pm
-lib/App/DBBrowser/Table/Extensions/ScalarFunctions/SQL.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/Date.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/GetArguments.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/Numeric.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/Other.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/String.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/To.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/To/EpochTo.pm
 lib/App/DBBrowser/Table/Extensions/WindowFunctions.pm
 lib/App/DBBrowser/Table/InsertUpdateDelete.pm
 lib/App/DBBrowser/Table/Substatements.pm

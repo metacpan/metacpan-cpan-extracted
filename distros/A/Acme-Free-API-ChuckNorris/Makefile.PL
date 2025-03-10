@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -17,21 +17,22 @@ my %WriteMakefileArgs = (
     "bin/cnq"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Acme::Free::API::ChuckNorris",
   "PREREQ_PM" => {
     "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
   "TEST_REQUIRES" => {
     "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Test::More" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +44,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "Test::More" => 0,
-  "Util::H2O::More" => "0.4.0"
+  "Util::H2O::More" => "0.4.2"
 );
 
 

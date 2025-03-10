@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.603';
+our $VERSION = '0.605';
 
 use 5.020;
 use Moo;
@@ -45,7 +45,8 @@ sub keywords ($class, $spec_version) {
   my $is_hostname = sub { # hostname, idn-hostname
     # FIXME: draft7 hostname uses RFC1034, draft2019-09+ hostname uses RFC1123
     require Data::Validate::Domain;
-    Data::Validate::Domain::is_domain($_[0]);
+    Data::Validate::Domain::is_domain($_[0],
+      { domain_disable_tld_validation => 1, domain_allow_single_label => 1 });
   };
   my $idn_decode = sub {  # idn-hostname
     require Net::IDN::Encode;
@@ -259,7 +260,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.603
+version 0.605
 
 =head1 DESCRIPTION
 

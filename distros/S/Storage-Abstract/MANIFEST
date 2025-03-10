@@ -16,8 +16,9 @@ lib/Storage/Abstract/Driver/Memory.pm
 lib/Storage/Abstract/Driver/Null.pm
 lib/Storage/Abstract/Driver/Subpath.pm
 lib/Storage/Abstract/Driver/Superpath.pm
-lib/Storage/Abstract/Role/Driver.pm
-lib/Storage/Abstract/Role/Metadriver.pm
+lib/Storage/Abstract/Handle.pm
+lib/Storage/Abstract/Role/Driver/Basic.pm
+lib/Storage/Abstract/Role/Driver/Meta.pm
 lib/Storage/Abstract/X.pm
 t/author-pod-syntax.t
 t/constructor.t

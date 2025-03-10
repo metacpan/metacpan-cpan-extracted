@@ -2,10 +2,9 @@ package Webservice::KeyVal::API;
 
 use v5.10;
 use strict;
-use warnings;
 use URI::Escape qw/uri_escape/;
 
-our $VERSION = '0.9.9';
+our $VERSION = '0.9.10';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;

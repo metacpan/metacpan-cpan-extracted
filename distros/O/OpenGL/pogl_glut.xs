@@ -30,7 +30,6 @@
 static int _done_glutInit = 0;
 static int _done_glutCloseFunc_warn = 0;
 
-
 /* Macros for GLUT callback and handler declarations */
 #  define DO_perl_call_sv(handler, flag) perl_call_sv(handler, flag)
 #  define ENSURE_callback_thread
@@ -49,21 +48,21 @@ static void set_glut_win_handler(int win, int type, SV * data)
 {
 	SV ** h;
 	AV * a;
-	
+
 	if (!glut_handlers)
 		glut_handlers = newAV();
-	
+
 	h = av_fetch(glut_handlers, win, FALSE);
-	
+
 	if (!h) {
 		a = newAV();
 		av_store(glut_handlers, win, newRV_inc((SV*)a));
 		SvREFCNT_dec(a);
 	} else if (!SvOK(*h) || !SvROK(*h))
 		croak("Unable to establish glut handler");
-	else 
+	else
 		a = (AV*)SvRV(*h);
-	
+
 	av_store(a, type, newRV_inc(data));
 	SvREFCNT_dec(data);
 }
@@ -72,19 +71,19 @@ static void set_glut_win_handler(int win, int type, SV * data)
 static SV * get_glut_win_handler(int win, int type)
 {
 	SV ** h;
-	
+
 	if (!glut_handlers)
-		croak("Unable to locate glut handler");
-	
+		croak("Unable to locate glut handlers list");
+
 	h = av_fetch(glut_handlers, win, FALSE);
 
 	if (!h || !SvOK(*h) || !SvROK(*h))
-		croak("Unable to locate glut handler");
-	
+		croak("Unable to locate glut handler list for window %d", win);
+
 	h = av_fetch((AV*)SvRV(*h), type, FALSE);
-	
+
 	if (!h || !SvOK(*h) || !SvROK(*h))
-		croak("Unable to locate glut handler");
+		croak("Unable to locate glut handler type=%d for window %d", type, win);
 
 	return SvRV(*h);
 }
@@ -93,12 +92,11 @@ static SV * get_glut_win_handler(int win, int type)
 static void destroy_glut_win_handlers(int win)
 {
 	SV ** h;
-	
 	if (!glut_handlers)
 		return;
-	
+
 	h = av_fetch(glut_handlers, win, FALSE);
-	
+
 	if (!h || !SvOK(*h) || !SvROK(*h))
 		return;
 
@@ -110,17 +108,17 @@ static void destroy_glut_win_handler(int win, int type)
 {
 	SV ** h;
 	AV * a;
-	
+
 	if (!glut_handlers)
 		glut_handlers = newAV();
-	
+
 	h = av_fetch(glut_handlers, win, FALSE);
-	
+
 	if (!h || !SvOK(*h) || !SvROK(*h))
 		return;
 
 	a = (AV*)SvRV(*h);
-	
+
 	av_store(a, type, newSVsv(&PL_sv_undef));
 }
 
@@ -441,10 +439,27 @@ static void generic_glut_Close_handler(void)
 	DO_perl_call_sv(handler, G_DISCARD);
 }
 
+/* glut_timer_handlers is an allocation buffer.
+   All unused elements are SVivs forming a linked-list,
+   starting at glut_timer_handlers_next_free.
+   The end of the list is marked by a -1.
+   If no element is free when one is needed, the buffer will grow.
+*/
+static AV * glut_timer_handlers = 0;
+static int glut_timer_handlers_next_free = -1;
+
 /* Callback for glutTimerFunc */
 static void generic_glut_timer_handler(int value)
 {
-	AV * handler_data = (AV*)value;
+	if (!glut_timer_handlers)
+		croak("Timer handler called, but no timers have ever been set up");
+	SV** h = av_fetch(glut_timer_handlers,value,FALSE);
+	if (!h || !SvOK(*h) || !SvROK(*h))
+		croak("Timer handler called for unregistered timer");
+	AV * handler_data = (AV*)SvRV(*h);
+	sv_setiv(*h,glut_timer_handlers_next_free);
+	glut_timer_handlers_next_free = value;
+
 	SV * handler;
 	int i;
 	dSP;
@@ -458,7 +473,7 @@ static void generic_glut_timer_handler(int value)
 
 	PUTBACK;
 	DO_perl_call_sv(handler, G_DISCARD);
-	
+
 	SvREFCNT_dec(handler_data);
 }
 
@@ -472,11 +487,11 @@ static void generic_glut_menu_handler(int value)
 	SV ** h;
 	int i;
 	dSP;
-	
+
 	h = av_fetch(glut_menu_handlers, glutGetMenu(), FALSE);
 	if (!h || !SvOK(*h) || !SvROK(*h))
 		croak("Unable to locate menu handler");
-	
+
 	handler_data = (AV*)SvRV(*h);
 
 	handler = *av_fetch(handler_data, 0, 0);
@@ -526,7 +541,7 @@ glutInit()
 			argv  = 0;
 			ARGV = perl_get_av("ARGV", FALSE);
 			ARGV0 = perl_get_sv("0", FALSE);
-			
+
 			argc = av_len(ARGV)+2;
 			if (argc) {
 				argv = malloc(sizeof(char*)*argc);
@@ -534,7 +549,7 @@ glutInit()
 				for(i=0;i<=av_len(ARGV);i++)
 					argv[i+1] = SvPV(*av_fetch(ARGV, i, 0), PL_na);
 			}
-			
+
 			i = argc;
 			glutInit(&argc, argv);
 
@@ -542,7 +557,7 @@ glutInit()
 
 			while(argc<i--)
 				sv = av_shift(ARGV);
-			
+
 			if (argv)
 				free(argv);
 	}
@@ -686,7 +701,7 @@ glutSetCursor(cursor)
 
 #if GLUT_API_VERSION >= 3
 
-#//# glutEstablishOverlay(); 
+#//# glutEstablishOverlay();
 void
 glutEstablishOverlay()
 
@@ -725,18 +740,18 @@ glutCreateMenu(handler=0, ...)
 			croak("A handler must be specified");
 		} else {
 			AV * handler_data = newAV();
-		
+
 			PackCallbackST(handler_data, 0);
 
 			RETVAL = glutCreateMenu(generic_glut_menu_handler);
-			
+
 			if (!glut_menu_handlers)
 				glut_menu_handlers = newAV();
-			
+
 			av_store(glut_menu_handlers, RETVAL, newRV_inc((SV*)handler_data));
-			
+
 			SvREFCNT_dec(handler_data);
-			
+
 		}
 	}
 	OUTPUT:
@@ -1015,10 +1030,27 @@ glutTimerFunc(msecs, handler=0, ...)
 			croak("A handler must be specified");
 		} else {
 			AV * handler_data = newAV();
-		
+
 			PackCallbackST(handler_data, 1);
-			
-			glutTimerFunc(msecs, generic_glut_timer_handler, (int)handler_data);
+
+			SV * handler_data_sv = newRV_inc((SV*)handler_data);
+
+			if (!glut_timer_handlers)
+				glut_timer_handlers = newAV();
+
+			int handler_id = glut_timer_handlers_next_free;
+			if (handler_id == -1) {
+			  handler_id = ((int) av_len(glut_timer_handlers))+1;
+			  if (handler_id < 0)
+			    croak("Limit of concurrent timers reached (MAX_INT)");
+			  av_push(glut_timer_handlers, handler_data_sv);
+			} else {
+			  SV** entry = av_fetch(glut_timer_handlers,handler_id,FALSE);
+			  glut_timer_handlers_next_free = SvIV(*entry);
+			  sv_setsv(*entry,sv_2mortal(handler_data_sv));
+			}
+
+			glutTimerFunc(msecs, generic_glut_timer_handler, handler_id);
 		}
 	ENSURE_callback_thread;}
 
@@ -1490,9 +1522,15 @@ void
 glutCloseFunc(handler=0, ...)
 	SV *	handler
 	CODE:
-        {
-	    if (_done_glutCloseFunc_warn == 0) {
-	        warn("glutCloseFunc: not implemented\n");
-	        _done_glutCloseFunc_warn++;
-            }
-        }
+	{
+#ifdef HAVE_AGL_GLUT
+		decl_gwh_xs(WMClose)
+#elif defined HAVE_FREEGLUT
+		decl_gwh_xs(Close)
+#else
+		if (_done_glutCloseFunc_warn == 0) {
+			warn("glutCloseFunc: not implemented\n");
+			_done_glutCloseFunc_warn++;
+		}
+#endif
+	}

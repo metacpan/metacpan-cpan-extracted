@@ -10,3 +10,5 @@
         - cleaned up SYNOPSIS and client (don't need Util::H2O::More there)
 	- update dist.ini with required module versions
 
+1.0.2   Sun Mar 09 05:13:30 PM UTC 2025
+	- fixing test errors

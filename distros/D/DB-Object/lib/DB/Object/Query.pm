@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.7.2
+## Version v0.7.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/11/24
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -24,7 +24,7 @@ BEGIN
     use DB::Object::Query::Element;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.7.2';
+    our $VERSION = 'v0.7.3';
 };
 
 use strict;
@@ -334,10 +334,12 @@ sub format_statement
                 }
                 # $self->binded_types->push( '' );
             }
+            # A scalar reference implies this is used as-is
             elsif( ref( $value ) eq 'SCALAR' )
             {
                 # push( @format_values, $$value );
                 $elem->format( $$value );
+                $elem->as_is(1);
             }
             elsif( $value =~ /^($placeholder_re)$/ )
             {
@@ -1350,7 +1352,7 @@ sub select
     # STOP! No need to go further
     if( !defined( $sth ) )
     {
-        return( $self->error( "Error while preparing query to select on table '$self->{ 'table' }':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to select on table '", $tbl_o->name, "':\n$query", $self->errstr() ) );
     }
     # Routines such as as_string() expect an array on pupose so we do not have to commit the action
     # but rather get the statement string. At the end, we write:
@@ -2522,7 +2524,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.7.2
+    v0.7.3
 
 =head1 DESCRIPTION
 

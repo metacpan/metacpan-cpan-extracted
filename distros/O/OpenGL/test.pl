@@ -1178,6 +1178,7 @@ sub ourCleanup
   glutSpecialFunc();
   glutIdleFunc();
   glutReshapeFunc();
+  glutCloseFunc() if OpenGL::_have_freeglut();
 
   ReleaseResources();
 

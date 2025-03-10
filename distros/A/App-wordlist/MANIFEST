@@ -9,9 +9,7 @@ README
 dist.ini
 lib/App/wordlist.pm
 script/_wordlist
-script/_wordlist-wordle
 script/wordlist
-script/wordlist-wordle
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

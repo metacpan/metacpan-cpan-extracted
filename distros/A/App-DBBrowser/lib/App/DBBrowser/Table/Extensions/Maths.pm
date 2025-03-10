@@ -24,50 +24,47 @@ sub new {
 
 
 sub maths {
-    my ( $sf, $sql, $clause, $qt_cols, $opt ) = @_;
+    my ( $sf, $sql, $clause, $cols, $r_data ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $num, $op ) = ( '[num]', '[op]' );
     my @pre = ( undef, $sf->{i}{ok}, $sf->{i}{menu_addition}, $num, $op );
-    my $menu = [ @pre, @$qt_cols ];
-    my $info = $opt->{info} // $ax->get_sql_info( $sql );
+    my $menu = [ @pre, @$cols ];
+    my $info_sql = $ax->get_sql_info( $sql );
     my $items = [];
-    my $prompt = 'Math:';
+    push @$r_data, [ 'math' ];
     my @bu;
 
     CHOICE: while ( 1 ) {
-        my $fill_string = join( ' ', @$items, '?' );
-        $fill_string =~ s/\(\s/(/g;
-        $fill_string =~ s/\s\)/)/g;
-        my $tmp_info = $info . "\n" . ( length $opt->{prompt} ? $opt->{prompt} . "\n" : '' ) . $fill_string;
+        $r_data->[-1] = [ 'math', @$items ];
+        my $info = $info_sql . $ext->nested_func_info( $r_data );
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_h}}, info => $tmp_info, prompt => $prompt, index => 1 }
+            { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Math:', index => 1 }
         );
         if ( ! $idx ) {
             if ( @bu ) {
                 $items = pop @bu;
                 next CHOICE;
             }
+            pop @$r_data;
             return;
         }
         if ( $menu->[$idx] eq $sf->{i}{ok} ) {
+            pop @$r_data;
             if ( ! @$items ) {
                 return;
             }
-            my $result = join ' ', @$items;
+            my $result = join ' ', @$items; ##
             $result =~ s/\(\s/(/g;
             $result =~ s/\s\)/)/g;
             return '(' . $result . ')';
         }
         elsif ( $menu->[$idx] eq $sf->{i}{menu_addition} ) {
-            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_col = $ext->column(
-                $sql, $clause, {},
-                { from => 'maths', info => $tmp_info }
-            );
+            my $complex_col = $ext->column( $sql, $clause, $r_data );
             if ( ! defined $complex_col ) {
                 next CHOICE;
             }
@@ -78,18 +75,19 @@ sub maths {
             # Choose
             my $operator = $tc->choose(
                 [ undef, ' + ',   ' - ', ' * ', ' / ', ' % ', ' ( ', ' ) ' ],
-                { %{$sf->{i}{lyt_h}}, info => $tmp_info . "\n" . $prompt, prompt => '', undef => '<=' }
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Operator:', undef => '<=' }
             );
             if ( ! defined $operator ) {
                 next CHOICE;
             }
             push @bu, [ @$items ];
-            push @$items, $operator =~ s/^\s+|\s+\z//gr;
+            $operator =~ s/^\s+|\s+\z//g;
+            push @$items, $operator;
         }
         elsif ( $menu->[$idx] eq $num ) {
             my $number = $tr->readline(
                 'Number: ',
-                { info => $tmp_info . "\n" . $prompt }
+                { info => $info }
             );
             if ( ! length $number ) {
                 next CHOICE;
@@ -99,9 +97,14 @@ sub maths {
         }
         else {
             push @bu, [ @$items ];
-            if ( $sql->{aggregate_mode} && $clause =~ /^(?:having|order_by)\z/ ) {
+            if ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
                 my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                push @$items, $sb->get_prepared_aggr_func( $sql, $clause, $menu->[$idx] );
+                push @$r_data, [ 'aggr' ];
+                my $prep_aggr = $sb->get_prepared_aggr_func( $sql, $clause, $menu->[$idx], $r_data );
+                pop @$r_data;
+                if ( length $prep_aggr ) {
+                    push @$items, $prep_aggr;
+                }
             }
             else {
                 push @$items, $menu->[$idx];
@@ -112,8 +115,5 @@ sub maths {
 
 
 
-
 1;
-
-
 __END__

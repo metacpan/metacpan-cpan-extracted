@@ -1,3 +1,8 @@
+0.295   2025-03-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Split wordlist-wordle to its own distro.
+
+
 0.294   2025-01-18  Released-By: PERLANCAR; Urgency: medium
 
         - Merge 0.293 & 0.293.1.

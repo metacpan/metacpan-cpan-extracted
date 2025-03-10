@@ -1,5 +1,5 @@
 package Storage::Abstract::X;
-$Storage::Abstract::X::VERSION = '0.006';
+$Storage::Abstract::X::VERSION = '0.007';
 use v5.14;
 use warnings;
 
@@ -11,6 +11,10 @@ use namespace::autoclean;
 use overload
 	q{""} => "as_string",
 	fallback => 1;
+
+has param 'path' => (
+	isa => Maybe [Str],
+);
 
 has param 'message' => (
 	isa => Str,
@@ -28,12 +32,14 @@ has field 'caller' => (
 	},
 );
 
+our $path_context;
+
 sub raise
 {
 	my ($self, $error) = @_;
 
 	if (defined $error) {
-		$self = $self->new(message => $error);
+		$self = $self->new(message => $error, path => $path_context);
 	}
 
 	die $self;
@@ -45,6 +51,10 @@ sub as_string
 
 	my $raised = $self->message;
 	$raised =~ s/\s+\z//;
+
+	if (my $path = $self->path) {
+		$raised .= " for path '$path'";
+	}
 
 	if (my $caller = $self->caller) {
 		$raised .= ' (raised at ' . $caller->[1] . ', line ' . $caller->[2] . ')';
@@ -60,27 +70,27 @@ sub as_string
 ## SUBCLASSES
 
 package Storage::Abstract::X::NotFound {
-$Storage::Abstract::X::NotFound::VERSION = '0.006';
+$Storage::Abstract::X::NotFound::VERSION = '0.007';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::Readonly {
-$Storage::Abstract::X::Readonly::VERSION = '0.006';
+$Storage::Abstract::X::Readonly::VERSION = '0.007';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::PathError {
-$Storage::Abstract::X::PathError::VERSION = '0.006';
+$Storage::Abstract::X::PathError::VERSION = '0.007';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::HandleError {
-$Storage::Abstract::X::HandleError::VERSION = '0.006';
+$Storage::Abstract::X::HandleError::VERSION = '0.007';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::StorageError {
-$Storage::Abstract::X::StorageError::VERSION = '0.006';
+$Storage::Abstract::X::StorageError::VERSION = '0.007';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
@@ -129,6 +139,10 @@ This exception is raised when a problem occurs with the underlying file storage.
 =head1 INTERFACE
 
 =head2 Attributes
+
+=head3 path
+
+This is a path to a file which was being operated on when the problem occured.
 
 =head3 message
 

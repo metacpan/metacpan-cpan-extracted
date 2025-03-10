@@ -20,8 +20,9 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Boggs
 Gene
+JBARRETT
 MIDI
 RtController
-foo
+fuzzix
 gene
 lib

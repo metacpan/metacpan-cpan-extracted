@@ -56,13 +56,13 @@ is_deeply(
 	[
 		{
 			class => 'Log::YetAnother',
-		file => 't/30-basics.t',
+			file => 't/30-basics.t',
 			line => 50,  # Adjust line number if needed
 			level => 'debug',
 			message => ['Code debug message']
 		}, {
 			class => 'Log::YetAnother',
-		file => 't/30-basics.t',
+			file => 't/30-basics.t',
 			line => 51,  # Adjust line number if needed
 			level => 'info',
 			message => ['Code info message']
@@ -77,5 +77,23 @@ $logger = Log::YetAnother->new(syslog => { type => 'unix' }, script_name => 'tes
 $logger->warn({ warning => 'Syslog warning message' });
 
 # Note: Verifying syslog output requires checking the syslog file, not done here
+
+# Test logging an array
+@log_array = ();
+$logger = Log::YetAnother->new({ logger => \@log_array });
+$logger->debug('This', 'is', 'a', 'list');
+$logger->warn('This', 'is', 'another', 'list');
+$logger->warn(warning => ['This', 'is', 'a', 'ref', 'to', 'a', 'list']);
+
+diag(Data::Dumper->new([\@log_array])->Dump()) if($ENV{'TEST_VERBOSE'});
+is_deeply(
+	\@log_array,
+	[
+		{ level => 'debug', message => 'This is a list' },
+		{ level => 'warn', message => 'This is another list' },
+		{ level => 'warn', message => 'This is a ref to a list' },
+	],
+	'Logged list messages to array'
+);
 
 done_testing();

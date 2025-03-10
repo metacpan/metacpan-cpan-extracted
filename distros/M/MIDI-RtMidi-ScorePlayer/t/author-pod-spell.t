@@ -24,12 +24,14 @@ DLSMusicDevice
 FluidSynth
 Garageband
 Gene
+JBARRETT
 MIDI
 RtMidi
 ScorePlayer
 TBH
 distro
 durations
+fuzzix
 gene
 lib
 soundfont

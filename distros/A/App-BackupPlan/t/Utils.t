@@ -5,7 +5,7 @@ use Test::More tests => 16;
 BEGIN 
 { use_ok('App::BackupPlan::Utils', qw(fromISO2TS fromTS2ISO addSpan subSpan))}; #test 1
 
-cmp_ok('0.0.9','eq',$App::BackupPlan::Utils::VERSION,'App::BackupPlan::Utils::VERSION'); #test 2
+cmp_ok('0.0.11','eq',$App::BackupPlan::Utils::VERSION,'App::BackupPlan::Utils::VERSION'); #test 2
 
 #check conversion ISO date ->timestam -> ISO date
 my $iso = '20190415';

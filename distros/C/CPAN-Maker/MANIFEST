@@ -1,0 +1,20 @@
+bin/make-cpan-dist
+bin/make-cpan-dist.pl
+ChangeLog
+lib/CPAN/Maker.pm
+lib/CPAN/Maker/Constants.pm
+lib/CPAN/Maker/Utils.pm
+lib/File/Process.pm
+lib/File/Process/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+share/ChangeLog
+share/README.md
+t/00-file-process.t
+t/01-filter.t
+t/02-process.t
+t/03-process-pre.t
+t/04-process.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

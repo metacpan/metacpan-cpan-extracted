@@ -1,5 +1,5 @@
 ---
-abstract: 'Creating Temporary Files and Directories'
+abstract: 'Temporary Files and Directories'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
   SPVM::IO: '0.211002'
   SPVM::Sys: '0.513'
 resources: {}
-version: '0.023'
+version: '0.024'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

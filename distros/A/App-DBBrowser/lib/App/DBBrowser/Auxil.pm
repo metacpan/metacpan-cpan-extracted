@@ -8,10 +8,10 @@ use 5.014;
 use Scalar::Util qw( looks_like_number );
 
 use JSON::MaybeXS   qw( decode_json );
-use List::MoreUtils qw( none );
+use List::MoreUtils qw( none uniq );
 
 use Term::Choose            qw();
-use Term::Choose::Constants qw( WIDTH_CURSOR );
+use Term::Choose::Constants qw( EXTRA_W );
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Screen    qw( clear_screen );
 use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
@@ -39,7 +39,7 @@ sub reset_sql {
     # reset/initialize:
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
     my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
-    my @array  = qw( group_by_cols aggr_cols selected_cols set_args
+    my @array  = qw( group_by_cols selected_cols set_args order_by_cols
                      ct_column_definitions ct_table_constraints ct_table_options
                      insert_col_names insert_args );
     my @hash   = qw( alias );
@@ -55,10 +55,7 @@ sub reset_sql {
 sub __stmt_fold {
     my ( $sf, $used_for, $stmt, $indent ) = @_;
     if ( $used_for eq 'print' ) {
-        my $term_w = get_term_width();
-        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-            $term_w += WIDTH_CURSOR;
-        }
+        my $term_w = get_term_width() + EXTRA_W;
         my $in = ' ' x $sf->{o}{G}{base_indent};
         my %tabs = ( init_tab => $in x $indent, subseq_tab => $in x ( $indent + 1 ) );
         return line_fold( $stmt, $term_w, { %tabs, join => 0 } );
@@ -69,12 +66,45 @@ sub __stmt_fold {
 }
 
 
+sub __select_cols {
+    my ( $sf, $sql ) = @_;
+    my @cols;
+    if ( @{$sql->{selected_cols}} ) {
+        @cols = @{$sql->{selected_cols}};
+    }
+    elsif ( keys %{$sql->{alias}} && ! $sql->{aggregate_mode} ) {
+        @cols = @{$sql->{columns}};
+        # use column names and not * if columns have aliases
+        # unless aggregate_mode (columns are aggregate functions and group by columns)
+    }
+    if ( ! @cols ) {
+        return " *";
+    }
+    elsif ( ! keys %{$sql->{alias}} ) {
+        return ' ' . join ', ', @cols;
+    }
+    else {
+        my @cols_alias;
+        for ( @cols ) {
+            if ( length $sql->{alias}{$_} ) {
+                push @cols_alias, $_ . " AS " . $sql->{alias}{$_};
+            }
+            else {
+                push @cols_alias, $_;
+            }
+        }
+        return ' ' . join ', ', @cols_alias;
+    }
+}
+
+
 sub __cte_stmts {
     my ( $sf, $used_for, $indent1 ) = @_;
     if ( ! @{$sf->{d}{cte_history}//[]} ) {
         return;
     }
     if ( length( $sf->{d}{main_info} ) && $used_for eq 'print' ) {
+        # else the cte definitions would be printed twice if a cte is used inside a cte.
         return;
     }
     my $ctes = $sf->{d}{cte_history};
@@ -98,46 +128,38 @@ sub get_stmt {
     my $indent0 = 0;
     my $indent1 = 1;
     my $indent2 = 2;
-    my $qt_table = $sql->{table};
+    my $table = $sql->{table};
     my @tmp;
     my $ctes = $sf->__cte_stmts( $used_for, $indent1 );
     if ( defined $ctes ) {
         push @tmp, $ctes;
     }
-    if ( $sql->{case_stmt} ) {
-        @tmp = ();
-        # only for print info (it has to be here because 'when' uses the add_condition method).
-        # When the case expression is completed, it is appended to the corresponding substmt and these case keys are deleted.
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{case_info}, $indent0 ) if $sql->{case_info};
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{case_stmt}, $indent0 );
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{when_stmt}, $indent0 ) if $sql->{when_stmt};
-    }
-    elsif ( $stmt_type eq 'Drop_Table' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DROP TABLE $qt_table", $indent0 ) );
+    if ( $stmt_type eq 'Drop_Table' ) {
+        @tmp = ( $sf->__stmt_fold( $used_for, "DROP TABLE $table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Drop_View' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DROP VIEW $qt_table", $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $used_for, "DROP VIEW $table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_Table' ) {
-        my $stmt = sprintf "CREATE TABLE $qt_table (%s)", join ', ', @{$sql->{ct_column_definitions}}, @{$sql->{ct_table_constraints}};
+        my $stmt = sprintf "CREATE TABLE $table (%s)", join ', ', @{$sql->{ct_column_definitions}}, @{$sql->{ct_table_constraints}};
         if ( @{$sql->{ct_table_options}} ) {
             $stmt .= ' ' . join ', ', @{$sql->{ct_table_options}};
         }
         @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_View' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "CREATE VIEW $qt_table", $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $used_for, "CREATE VIEW $table", $indent0 ) );
         push @tmp, $sf->__stmt_fold( $used_for, "AS " . $sql->{view_select_stmt}, $indent1 );
     }
     elsif ( $stmt_type eq 'Select' ) {
         push @tmp, $sf->__stmt_fold( $used_for, "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $indent0 );
         #@tmp = ( $sf->__stmt_fold( $used_for, "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $indent0 ) );
-        push @tmp, $sf->__stmt_fold( $used_for, "FROM " . $qt_table,   $indent1 );
+        push @tmp, $sf->__stmt_fold( $used_for, "FROM " . $table,   $indent1 );
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt},    $indent2 ) if $sql->{where_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{group_by_stmt}, $indent2 ) if $sql->{group_by_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{having_stmt},   $indent2 ) if $sql->{having_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{order_by_stmt}, $indent2 ) if $sql->{order_by_stmt};
-        if ( $sql->{limit_stmt} =~ /^LIMIT\s/ ) {
+        if ( $sql->{limit_stmt} =~ /^LIMIT\b/ ) {
             push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 );
             push @tmp, $sf->__stmt_fold( $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
         }
@@ -147,11 +169,11 @@ sub get_stmt {
         }
     }
     elsif ( $stmt_type eq 'Delete' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DELETE FROM " . $qt_table, $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $used_for, "DELETE FROM " . $table, $indent0 ) );
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Update' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "UPDATE " . $qt_table, $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $used_for, "UPDATE " . $table, $indent0 ) );
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{set_stmt},   $indent1 ) if $sql->{set_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
@@ -230,12 +252,7 @@ sub get_stmt {
         if ( length $sf->{d}{main_info} ) {
             my $sq_indent = $in;
             $stmt =~ s/(^|\n)/$1$sq_indent/gs;
-            # if ( $sf->{d}{nested_subqueries} == 1 ) {
-            #     $stmt = $sf->{d}{main_info} . "\n\n" . $stmt;
-            # }
-            # else {
-                $stmt = $sf->{d}{main_info} . "\n" . $stmt;
-            #}
+            $stmt = $sf->{d}{main_info} . "\n" . $stmt;
         }
         $stmt .= "\n" ;
     }
@@ -246,10 +263,7 @@ sub get_stmt {
 sub info_format_insert_args {
     my ( $sf, $sql, $indent ) = @_;
     my $term_h = get_term_height();
-    my $term_w = get_term_width();
-    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-        $term_w += WIDTH_CURSOR;
-    }
+    my $term_w = get_term_width() + EXTRA_W;
     my $row_count = @{$sql->{insert_args}};
     if ( $row_count == 0 ) {
         return [];
@@ -314,40 +328,6 @@ sub __prepare_table_row {
 }
 
 
-sub __select_cols {
-    my ( $sf, $sql ) = @_;
-    my @cols;
-    if ( @{$sql->{selected_cols}} ) {
-        @cols = @{$sql->{selected_cols}};
-    }
-    elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
-        @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
-    }
-    elsif ( keys %{$sql->{alias}} ) {
-        @cols = @{$sql->{columns}};
-        # use column names and not * if columns have aliases
-    }
-    if ( ! @cols ) {
-        return " *";
-    }
-    elsif ( ! keys %{$sql->{alias}} ) {
-        return ' ' . join ', ', @cols;
-    }
-    else {
-        my @cols_alias;
-        for ( @cols ) {
-            if ( length $sql->{alias}{$_} ) {
-                push @cols_alias, $_ . " AS " . $sql->{alias}{$_};
-            }
-            else {
-                push @cols_alias, $_;
-            }
-        }
-        return ' ' . join ', ', @cols_alias;
-    }
-}
-
-
 sub print_sql_info {
     my ( $sf, $info, $waiting ) = @_;
     if ( ! defined $info ) {
@@ -386,7 +366,7 @@ sub sql_limit {
 
 
 sub column_names_and_types {
-    my ( $sf, $qt_table ) = @_;
+    my ( $sf, $table ) = @_;
     # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
     # no difference with SQLite, Firebird, DB2 and Informix
     my $column_names = [];
@@ -397,7 +377,13 @@ sub column_names_and_types {
         if ( defined $ctes ) {
             $stmt = $ctes;
         }
-        $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
+        if ( $sf->{o}{G}{limit_fetch_col_names} ) { ##
+            $stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
+        }
+        else {
+            $stmt .= "SELECT * FROM " . $table;
+        }
+        #$stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
         if ( $sf->{i}{driver} eq 'SQLite' ) {
             my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
@@ -414,14 +400,31 @@ sub column_names_and_types {
         $sf->print_error_message( $@ );
         return;
     }
+    $column_names = $sf->quote_cols( $column_names ); ##
     return $column_names, $column_types;
 }
 
 
+#sub avail_cols_aggregate_mode {
+#    my ( $sf, $sql, $clause, $in_extension ) = @_;
+#    my $cols = [ uniq( @{$sql->{selected_cols}}, @{$sql->{group_by_cols}} ) ];
+#    #if ( $clause eq 'having' ) {
+#    #    my $rx_groub_by_cols = join '|', map { quotemeta } @{$sql->{group_by_cols}};
+#    #    $cols = [ grep { $_ !~ /^(?:$rx_groub_by_cols)\z/ } @$cols ];
+#    #}
+#    if ( ! $in_extension && $sf->{o}{alias}{'use_in_' . $clause} ) {
+#        my $aliases = $sql->{alias};
+#        $cols = [ map { length $aliases->{$_} ? $aliases->{$_} : $_ } @$cols ];
+#    }
+#    $cols = [ grep( $_ ne 'COUNT(*)', @$cols ), @{$sf->{i}{avail_aggr}} ];
+#    return $cols;
+#}
+
+
 sub is_numeric_datatype {
-    my ( $sf, $sql, $qt_col ) = @_;
+    my ( $sf, $sql, $col ) = @_;
     my $is_numeric = 0;
-    if ( ! length $sql->{data_types}{$qt_col} || ( $sql->{data_types}{$qt_col} >= 2 && $sql->{data_types}{$qt_col} <= 8 ) ) {
+    if ( ! length $sql->{data_types}{$col} || ( $sql->{data_types}{$col} >= 2 && $sql->{data_types}{$col} <= 8 ) ) {
         $is_numeric = 1;
     }
     return $is_numeric;
@@ -429,21 +432,45 @@ sub is_numeric_datatype {
 
 
 sub is_char_datatype {
-    my ( $sf, $sql, $qt_col ) = @_;
-    my $is_char = 0;
-    if ( ! defined $sql->{data_types}{$qt_col} ) {
-        return;
+    my ( $sf, $sql, $col ) = @_;
+    my $is_char;
+    if ( ! defined $sql->{data_types}{$col} ) {
+        if ( looks_like_number $col ) { ##
+            $is_char = 0;
+        }
+        elsif ( $col =~ /^(?:AVG|COUNT|MAX|MIN|SUM)\(/ ) {
+            $is_char = 0;
+        }
     }
-    # 1 -> CHAR, 12 -> VARCHAR
-    if ( $sql->{data_types}{$qt_col} == 1 || $sql->{data_types}{$qt_col} == 12 ) {
-        $is_char = 1;
+    else {
+        # 1 CHAR, 12 VARCHAR
+        if ( $sql->{data_types}{$col} == 1 || $sql->{data_types}{$col} == 12 ) {
+            $is_char = 1;
+        }
+        else {
+            $is_char = 0;
+        }
     }
     return $is_char;
 }
 
 
+sub pg_column_to_text {
+    my ( $sf, $sql, $col ) = @_;
+    if ( ! $sf->{o}{G}{pg_autocast} ) {
+        return $col;
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $is_char_datatype = $ax->is_char_datatype( $sql, $col );
+    if ( defined $is_char_datatype && ! $is_char_datatype ) {
+        $col .= "::text";
+    }
+    return $col;
+}
+
+
 sub table_alias {
-    my ( $sf, $sql, $type, $qt_table, $default ) = @_;
+    my ( $sf, $sql, $type, $table, $default ) = @_;
     #
     # Aliases mandatory:
     # JOIN talbes
@@ -452,18 +479,18 @@ sub table_alias {
     my $bu_default_table_alias_count = $sf->{d}{default_table_alias_count};
     my $auto_default = 't' . ++$sf->{d}{default_table_alias_count};
     $default //= $auto_default;
-    my $qt_alias = $sf->alias( $sql, $type, $qt_table, $default );
-    if ( ! length $qt_alias ) {
+    my $alias = $sf->alias( $sql, $type, $table, $default );
+    if ( ! length $alias ) {
         $sf->{d}{default_table_alias_count} = $bu_default_table_alias_count;
         return;
     }
-    if ( $qt_alias ne $sf->quote_alias( $auto_default ) ) {
+    if ( $alias ne $sf->quote_alias( $auto_default ) ) {
         $sf->{d}{default_table_alias_count} = $bu_default_table_alias_count;
     }
-    if ( none { $_ eq $qt_alias } @{$sf->{d}{table_aliases}{$qt_table}} ) {
-        push @{$sf->{d}{table_aliases}{$qt_table}}, $qt_alias;
+    if ( none { $_ eq $alias } @{$sf->{d}{table_aliases}{$table}} ) {
+        push @{$sf->{d}{table_aliases}{$table}}, $alias;
     }
-    return $qt_alias;
+    return $alias;
 }
 
 
@@ -487,7 +514,8 @@ sub alias {
         # Readline
         $alias = $tr->readline(
             'as ',
-            { info => $info, history => [ 'a' .. 'z' ] }
+            #{ info => $info, history => [ 'a' .. 'z' ] }
+            { info => $info, history => [ 'a' .. 'z' ], default => $sql->{alias}{$identifier} } ##
         );
         $sf->print_sql_info( $info );
         if ( $sf->{o}{alias}{$type} == 3 && ! length $alias ) {
@@ -693,14 +721,25 @@ sub clone_data {
 }
 
 
+sub format_list {
+    my ( $sf, $list ) = @_;
+    return    if ! defined $list;
+    return '' if ! @$list;
+    my $sep = ', ';
+    my $formated_list = join( $sep, @$list );
+    $formated_list =~ s/$sep(?=$list->[-1]\z)/ or /;
+    return $formated_list;
+}
+
+
 sub print_error_message {
-    my ( $sf, $message ) = @_;
+    my ( $sf, $message, $info ) = @_;
     utf8::decode( $message );
     chomp( $message );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $tc->choose(
         [ 'Press ENTER to continue' ],
-        { prompt => $message }
+        { prompt => $message, info => $info }
     );
 }
 

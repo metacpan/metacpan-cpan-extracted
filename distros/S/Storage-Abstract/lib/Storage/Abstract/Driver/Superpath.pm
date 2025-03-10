@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Superpath;
-$Storage::Abstract::Driver::Superpath::VERSION = '0.006';
+$Storage::Abstract::Driver::Superpath::VERSION = '0.007';
 use v5.14;
 use warnings;
 
@@ -16,7 +16,7 @@ has param 'superpath' => (
 	writer => -hidden,
 );
 
-with 'Storage::Abstract::Role::Metadriver';
+with 'Storage::Abstract::Role::Driver::Meta';
 
 sub BUILD
 {
@@ -48,7 +48,7 @@ sub store_impl
 	my $new_path = $self->_adjust_path($path);
 
 	Storage::Abstract::X::Readonly->raise(
-		"file $path cannot be stored because it's outside of path " . $self->superpath
+		"file $path cannot be stored because it's outside of path '" . $self->superpath . "'"
 	) unless defined $new_path;
 
 	return $self->source->store($new_path, $handle);
@@ -101,7 +101,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Superpath - Mount under directory metadriver
+Storage::Abstract::Driver::Superpath - Mount under directory meta driver
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ Storage::Abstract::Driver::Superpath - Mount under directory metadriver
 
 =head1 DESCRIPTION
 
-This metadriver does the opposite of L<Storage::Abstract::Driver::Subpath> - it
+This meta driver does the opposite of L<Storage::Abstract::Driver::Subpath> - it
 mounts its source driver under a passed L</superpath> directory. It will work
 as if the entire filesystem was moved to that directory. Any file path must
 have L</superpath> prepended to it explicitly in order to successfully target a
@@ -151,4 +151,8 @@ most operations it just means it will act as if the file was not present, but
 for C<store> it will throw a C<Storage::Abstract::X::Readonly> instead (even
 though the storage may not report being readonly). For this reason, it works
 best when underlying storage is marked as C<readonly>.
+
+This driver caches the readonly state of its subdriver to make its behavior
+consistent with other meta drivers. You can call C<refresh> to make it
+recalculate the readonly state.
 

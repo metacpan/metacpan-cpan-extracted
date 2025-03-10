@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.423';
+our $VERSION = '2.424';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -17,7 +17,7 @@ binmode STDERR, ':encoding(console_out)';
 BEGIN {
     print hide_cursor();
     $ENV{TC_RESET_AUTO_UP} = 0;
-    if ( $^O eq "MSWin32" ) {
+    if ( $^O eq 'MSWin32' ) {
         require Win32::Console::ANSI;
         print "\e(U";
     }
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.423
+Version 2.424
 
 =head1 SYNOPSIS
 
@@ -354,8 +354,8 @@ Select I<Print TABLE> to show the result of the formed statement on the screen.
 In a SQL submenu (e.g., C<WHERE>), the back arrow resets the subquery step by step. With no items left, the SQL submenu
 is left when the back arrow is chosen.
 
-Adding AGGREGATE functions or GROUP BY columns enables the I<aggregate mode>. In I<aggregate mode>, the available
-columns in the SELECT substatement are the added aggregate functions and the group-by columns, not the table columns.
+To activate the aggregate mode, enter the GROUP BY submenu and press C<-OK-> (with or without selecting GROUP BY
+columns).
 
 See also L</Extensions> and L</Operators>
 
@@ -366,12 +366,8 @@ Choose the required columns for the C<SELECT> substatement.
 It is possible to add many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
 C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
 
-=head4 AGGREGATE
-
-C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM>
-
-If the user has selected columns in the SELECT submenu: While in this submenu, the available columns are displayed in
-the SELECT substatement instead of the selected columns.
+When aggregate mode is active, the user can select from the available aggregate functions C<AVG>, C<COUNT>, C<COUNT(*)>,
+C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM> and the added GROUP BY columns.
 
 =head4 DISTINCT
 
@@ -379,14 +375,15 @@ the SELECT substatement instead of the selected columns.
 
 =head4 GROUP BY
 
-If the user has selected columns in the SELECT submenu: While in this submenu, the available columns are displayed in
-the SELECT substatement instead of the selected columns.
+Selected GROUP BY columns are added automatically to the selected columns.
 
 =head4 HAVING
 
 =head4 ORDER BY
 
 =head4 LIMIT
+
+=head4 OFFSET
 
 =head3 Export
 
@@ -815,17 +812,17 @@ Enter a constant value.
 If the data type is numeric or unknown and the literal looks like a number, the literal is not enclosed in quotation
 marks. In all other cases, the entered literal is enclosed in quotation marks.
 
-=item Subqueries
+=item SQL
 
-Selecting C<SQ> opens the subqueries menu.
+Selecting C<SQL> opens the subqueries menu.
 
-See L<Subquery> for the different possibilities to enter a subquery.
+See L<Subquery> for the different possibilities to enter a subquery or any other SQL text.
 
 Entries beginning with SELECT or WITH followed by a space are automatically enclosed in parentheses.
 
 =item Scalar Functions
 
-Selecting C<func()> opens the menu, where the user can choose from a list of scalar functions.
+Selecting C<scalar()> opens the menu, where the user can choose from a list of scalar functions.
 
 Extended arguments for scalar functions can be temporarily enabled by selecting the prompt line (I<Scalar functions:>)
 of the scalar function menu.
@@ -864,9 +861,13 @@ Available after the C<SET> in an C<UPDATE> statement.
 
 Close the IN operator parentheses.
 
+=item mc
+
+C<WHERE>: Use more than one column on the left-hand side of the operator.
+
 =item skip
 
-C<WHERE>: skip the column and use the EXISTS or the NOT EXISTS operator.
+C<WHERE>: Skip the column and use the EXISTS or the NOT EXISTS operator.
 
 =item Parentheses
 
@@ -874,7 +875,7 @@ C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parenthese
 
 =item Column Aliases
 
-Selecting C<alias> allows one to add, change or remove aliases for the selected columns.
+Selecting C<alias> allows the user to add, change or remove aliases for the selected columns and the current table.
 
 =back
 
@@ -1047,6 +1048,25 @@ C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifi
 =head3 View Prefix
 
 Enter a string that should be automatically placed in front of all view names.
+
+=head3 Other
+
+=over
+
+=item
+
+Subqueries created with the 'SQL Menu': Allow editing.
+
+When enabled, subqueries created using the 'SQL Menu' can be edited before they are used.
+
+=item
+
+Pg: Convert to C<text> automatically when required.
+
+If the driver is C<Pg>: Convert columns in string functions automatically to C<text> if the datatype of the column is
+not a char like datatype. If the datatype is unknown and the value looks like a number, it is also converted to C<text>.
+
+=back
 
 =head2 Create-Table
 

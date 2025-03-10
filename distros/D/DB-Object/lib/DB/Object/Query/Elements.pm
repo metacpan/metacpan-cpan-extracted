@@ -313,7 +313,7 @@ Returns a newly instantiated object upon success, or sets an L<error|Module::Gen
 
 =head1 METHODS
 
-=head2 for Pod::Coverage autoload
+=for Pod::Coverage autoload
 
 =head2 elements
 

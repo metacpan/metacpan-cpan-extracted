@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/09/05
+## Modified 2025/03/09
 ## All rights reserved.
 ## 
 ## 
@@ -42,6 +42,7 @@ BEGIN
         ERROR_EINTR => ( abs( Errno::EINTR ) * -1 ),
         TYPE_URL_ENCODED => 'application/x-www-form-urlencoded',
     };
+    our @EXPORT = qw( async await );
     our @EXPORT_OK = qw( fetch );
     # "\r\n" is not portable
     our $CRLF = "\015\012";
@@ -59,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.5.2';
+    our $VERSION = 'v0.5.3';
 };
 
 use strict;
@@ -717,12 +718,13 @@ sub patch
 sub post
 {
     my $self = shift( @_ );
+    my @args = @_;
     if( $self->use_promise )
     {
         my $prom = Promise::Me->new(sub
         {
             my( $resolve, $reject ) = @$_;
-            my $req = $self->_make_request_data( POST => @_ ) ||
+            my $req = $self->_make_request_data( POST => @args ) ||
                 die( HTTP::Promise::Request->error );
             my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
             return( $resolve->( $resp ) );
@@ -737,7 +739,7 @@ sub post
     }
     else
     {
-        my $req = $self->_make_request_data( POST => @_ ) ||
+        my $req = $self->_make_request_data( POST => @args ) ||
             return( $self->pass_error( HTTP::Promise::Request->error ) );
         my $resp = $self->send( $req ) ||
             return( $self->pass_error );
@@ -980,7 +982,7 @@ sub send
     {
         $io = HTTP::Promise::IO->new( $sock, stop_if => $self->stop_if ) ||
             return( $self->pass_error( HTTP::Promise::IO->error ) );
-        if( $io->make_select( write => 0, timeout => 0 ) )
+        if( !$io->make_select( write => 0, timeout => 0 ) )
         {
             close( $sock );
             undef( $sock );
@@ -1601,6 +1603,8 @@ sub _make_request_data
     my $req = HTTP::Promise::Request->new( $meth => $uri, { debug => $self->debug } ) ||
         return( $self->pass_error( HTTP::Promise::Request->error ) );
     $self->prepare_headers( $req );
+    my @args = @_; # REMOVE ME
+    $self->message( 4, "Received arguments -> ", sub{ $self->dump( \@args ) } ); 
     # To set up a possible escaped query string for this POST/PUT request
     my $u = $req->uri || 
         return( $self->error( "No URL was provided for this HTTP query." ) );
@@ -1692,7 +1696,7 @@ sub _make_request_data
         return( $self->pass_error( $req->headers->error ) ) if( !defined( $obj ) );
         $type = $obj->type;
     }
-    
+
     # $content can be an array reference, hash reference, an HTTP::Promise::Body::Form object, or an HTTP::Promise::Body::Form::Data object
     if( ref( $content ) )
     {
@@ -2306,7 +2310,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 

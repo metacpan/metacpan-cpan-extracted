@@ -21,7 +21,7 @@ OpenGL - v0.70
     
     * OpenGL::Array - optimized data arrays via C pointers
     
-    * OpenGL::Image - direct C pointer acces to ImageMagick image cache
+    * OpenGL::Image - direct C pointer access to ImageMagick image cache
     
     * OpenGL::Shader - abstracted shader interface: ARB, GLSL and Cg
 

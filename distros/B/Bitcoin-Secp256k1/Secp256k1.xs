@@ -123,10 +123,7 @@ unsigned char* size_bytestr_from_sv(SV *perlval, size_t wanted_size, char *argna
 	unsigned char *bytestr = bytestr_from_sv(perlval, &size);
 
 	if (size != wanted_size) {
-		char error_message[100];
-		sprintf(error_message, "%s must be a bytestring of length %zu", argname, wanted_size);
-
-		croak(error_message);
+		croak("%s must be a bytestring of length %zu", argname, wanted_size);
 	}
 
 	return bytestr;
@@ -682,11 +679,15 @@ _pubkey_negate(self)
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
 
-		/* NOTE: result is always 1 */
 		int result = secp256k1_ec_pubkey_negate(
 			ctx->ctx,
 			ctx->pubkey
 		);
+
+		/* NOTE: result is always 1 */
+		if (!result) {
+			croak("something went wrong while negating a pubkey");
+		}
 
 # Adds a tweak to private key
 SV*

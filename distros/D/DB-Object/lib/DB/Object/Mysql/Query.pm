@@ -34,7 +34,7 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{binded_having} = [];
-    $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local order_by reverse sorted unix_timestamp where )];
+    $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
 }
 
@@ -66,7 +66,7 @@ sub format_to_epoch
     }
     else
     {
-        return( sprintf( "UNIX_TIMESTAMP('%s')", $opts->{quote} ? "'" . $opts->{value} . "'" : $opts->{value} ) );
+        return( sprintf( "UNIX_TIMESTAMP(%s)", $opts->{quote} ? "'" . $opts->{value} . "'" : $opts->{value} ) );
     }
 }
 
@@ -115,7 +115,7 @@ sub on_conflict
     my $self = shift( @_ );
     my $opts = {};
     $self->{_on_conflict} = {} if( ref( $self->{_on_conflict} ) ne 'HASH' );
-    
+
     if( @_ )
     {
         my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
@@ -299,7 +299,7 @@ sub reset
     my $self = shift( @_ );
     if( !$self->{query_reset} )
     {
-        my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local order_by reverse sorted unix_timestamp where )];
+        my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
         $self->{enhance} = 1;
@@ -327,32 +327,52 @@ sub reset_bind
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( 'You must specify a query type: select, insert, update or delete' ) );
+    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
     my $opts = $self->_get_args_as_hash( @_ );
-    my( $where, $group, $having, $sort, $order, $limit );
-    $where  = $self->where();
+    # ok options:
+    # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
+    $opts->{no_bind_copy} //= 0;
+    my( $where, $group, $having, $sort, $order, $limit, $on_conflict );
+    
+    $where = $self->where();
     if( $type eq 'select' )
     {
-        $group  = $self->group();
-        $having = $self->having();
-        $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
-        $order  = $self->order();
-        $limit  = $self->limit();
+        $group  = $self->group;
+        $having = $self->having;
+        $sort   = $self->reverse ? 'DESC' : $self->sort ? 'ASC' : '';
+        $order  = $self->order;
     }
-    elsif( $type eq 'update' || $type eq 'delete' )
-    {
-        my( @offset_limit ) = $self->limit;
-        ## https://dev.mysql.com/doc/refman/5.7/en/update.html
-        ## https://dev.mysql.com/doc/refman/5.7/en/delete.html
-        $limit = sprintf( 'LIMIT %d', $offset_limit[0] ) if( scalar( @offset_limit ) );
-    }
+    $limit = $self->limit;
+    $on_conflict = $self->on_conflict;
     my @query = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
+    if( $where && $where->types->length )
+    {
+        $self->elements->push( $where ) unless( $opts->{no_bind_copy} );
+    }
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
     push( @query, "HAVING $having" ) if( $having && $type eq 'select'  );
     push( @query, "ORDER BY $order" ) if( $order && $type eq 'select'  );
     push( @query, $sort ) if( $sort && $order && $type eq 'select'  );
-    push( @query, "$limit" ) if( $limit && $type eq 'select' );
+    if( $limit && $type eq 'select' )
+    {
+        push( @query, "$limit" );
+        if( $limit->elements->length )
+        {
+            $self->elements->push( $limit ) unless( $opts->{no_bind_copy} );
+        }
+    }
+    if( $on_conflict )
+    {
+        if( $type eq 'insert' )
+        {
+            push( @query, $on_conflict );
+        }
+        else
+        {
+            warn( "Warning only: the MySQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+        }
+    }
     return( \@query );
 }
 

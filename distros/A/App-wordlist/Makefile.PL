@@ -15,9 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-wordlist",
   "EXE_FILES" => [
     "script/_wordlist",
-    "script/_wordlist-wordle",
-    "script/wordlist",
-    "script/wordlist-wordle"
+    "script/wordlist"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -32,7 +30,6 @@ my %WriteMakefileArgs = (
     "Module::Load::Util" => "0.011",
     "PERLANCAR::Module::List" => "0.004004",
     "Perinci::Sub::Property::cmdline" => 0,
-    "Perinci::Sub::Util" => "0.472",
     "Regexp::From::String" => "0.005",
     "Scalar::Util::Numeric" => 0,
     "String::Wildcard::Bash" => "0.044",
@@ -46,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.294",
+  "VERSION" => "0.295",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,7 +63,6 @@ my %FallbackPrereqs = (
   "Module::Load::Util" => "0.011",
   "PERLANCAR::Module::List" => "0.004004",
   "Perinci::Sub::Property::cmdline" => 0,
-  "Perinci::Sub::Util" => "0.472",
   "Regexp::From::String" => "0.005",
   "Scalar::Util::Numeric" => 0,
   "String::Wildcard::Bash" => "0.044",

@@ -225,7 +225,7 @@ the stack (in reverse order).
 
     $array->calc($array2, $array3, $array4, @values);
 
-calc currently suports the following primitives:
+calc currently supports the following primitives:
 
 =over 4
 

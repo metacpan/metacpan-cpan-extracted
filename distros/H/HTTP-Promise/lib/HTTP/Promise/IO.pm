@@ -540,7 +540,7 @@ sub read
             # on EINTER/EAGAIN/EWOULDBLOCK
             my $rv = $self->make_select_timeout( write => 0 );
             return( $self->pass_error ) if( !defined( $rv ) );
-            return( $self->error( "Unable to select the filehandle." ) ) if( !$rv );
+            return( $self->error( "Timeout. Unable to select the filehandle." ) ) if( !$rv );
         }
     };
     

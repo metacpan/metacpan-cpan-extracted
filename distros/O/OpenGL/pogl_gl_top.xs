@@ -433,7 +433,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
     if (!dpy) {
         croak("ERROR: failed to get an X connection");
     } else if (debug) {
-        printf("Display open %x\n", dpy);
+        printf("Display open %p\n", dpy);
     }		
 
     /* get an appropriate visual */
@@ -453,7 +453,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
     if(!vi) {
         croak("ERROR: failed to get an X visual\n");
     } else if (debug) {
-        printf("Visual open %x\n", vi);
+        printf("Visual open %p\n", vi);
     }		
 
     /* A blank line here will confuse xsubpp ;-) */
@@ -463,7 +463,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
     if (!ctx) {
         croak("ERROR: failed to get an X Context");
     } else if (debug) {
-        printf("Context Created %x\n", ctx);
+        printf("Context Created %p\n", ctx);
     }
 
     /* create a color map */
@@ -478,7 +478,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
 
     if (!pwin) {
         pwin = RootWindow(dpy, vi->screen);
-        if (debug) printf("Using root as parent window 0x%x\n", pwin);
+        if (debug) printf("Using root as parent window 0x%lx\n", pwin);
     }
     if (steal) {
         win = nativeWindowId(dpy, pwin); /* What about depth/visual */
@@ -492,7 +492,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
     if (!win) {
         croak("No Window");
     } else {
-        if (debug) printf("win = 0x%x\n", win);
+        if (debug) printf("win = 0x%lx\n", win);
     }
     XMapWindow(dpy, win);
 #ifndef HAVE_GLX  /* For OS/2 GLX emulation stuff -chm 2009.09.14 */
@@ -514,7 +514,7 @@ glpcOpenWindow(x,y,w,h,pw,event_mask,steal, ...)
         croak("Non current");
 
     if (debug)
-        printf("Display=0x%x Window=0x%x Context=0x%x\n",dpy, win, ctx);
+        printf("Display=%p Window=0x%lx Context=%p\n",dpy, win, ctx);
 
     /* Create the GL object hash information */
     hv_store(RETVAL, "Display", strlen("Display"), newSViv(PTR2IV(dpy)), 0);
@@ -635,9 +635,8 @@ int
 XPending(d=dpy)
 	void *	d
 	CODE:
-	{
+		if (!d) croak("ERROR: called XPending with null X connection");
 		RETVAL = XPending(d);
-	}
 	OUTPUT:
 	RETVAL
 

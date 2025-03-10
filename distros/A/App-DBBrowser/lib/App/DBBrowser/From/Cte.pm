@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any firstidx );
+use List::MoreUtils qw( any );
 
 use Term::Choose         qw();
 use Term::Form::ReadLine qw();
@@ -28,15 +28,14 @@ sub cte_as_main_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
-    my $sql = { table => '()' };
+    my $sql = {};
     $ax->reset_sql( $sql );
     $ax->print_sql_info( $ax->get_sql_info( $sql ) ); ##
     my $cte = $sf->cte( $sql );
     if ( ! defined $cte ) {
         return;
     }
-    my $qt_table = $cte;
-    return $qt_table;
+    return $cte;
 }
 
 
@@ -118,23 +117,23 @@ sub __prepare_and_add_cte {
         my $count_query_loop;
 
         QUERY: while ( 1 ) {
-            my $info = $ax->get_sql_info( $sql );
+            my $info = $ax->get_sql_info( $sql ); ##
             # Readline
             my $query = $tr->readline(
-                'Cte stmt: ',
+                'Stmt: ',
                 { default => $selected_stmt, show_context => 1, info => $info }
             );
             $ax->print_sql_info( $info );
             if ( ! length $query ) {
                 next CHOOSE_QUERY;
             }
-            $info .= "\n". 'Cte stmt: ' . $query;
+            $info .= "\n". 'Stmt: ' . $query;
             my $default_name;
 
             NAME: while ( 1 ) {
                 # Readline
                 my $full_cte_name = $tr->readline(
-                    'Cte name: ',
+                    'Name: ',
                     { default => $default_name, show_context => 1, info => $info, history => [ 'cte1' .. 'cte9' ] }
                 );
                 $ax->print_sql_info( $info );
@@ -150,10 +149,10 @@ sub __prepare_and_add_cte {
                     name => $cte_name,
                 };
                 $default_name = length $default_name ? '' : $full_cte_name;
-                my @table_names = keys %{$sf->{d}{tables_info}};
+                my @table_keys = keys %{$sf->{d}{tables_info}};
                 my @cte_names = map { $_->{name} } @$ctes;
-                if ( any { $_ eq $cte_name } @table_names, @cte_names ) {
-                    my $type = ( firstidx { $_ eq $cte_name } @table_names ) > -1 ? 'table' : 'cte';
+                if ( any { $_ eq $cte_name } @table_keys, @cte_names ) {
+                    my $type = ( grep { $_ eq $cte_name } @table_keys ) ? 'table' : 'cte';
                     my $prompt = "A $type '$cte_name' already exists.";
                     # Choose
                     $tc->choose(

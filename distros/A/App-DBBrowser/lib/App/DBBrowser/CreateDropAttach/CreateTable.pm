@@ -161,7 +161,8 @@ sub create_table {
                     }
                     my @unquoted_ct_column_definitions = @{$sql->{ct_column_definitions}};
                     my @unquoted_insert_col_names = @{$sql->{insert_col_names}};
-                    my $column_names = []; # column_names memory
+                    #my $column_names = []; # column_names memory
+                    my $column_names = [ @{$sql->{ct_column_definitions}} ]; # column_names memory
 
                     EDIT_COLUMN_NAMES: while( 1 ) {
                         $column_names = $sf->__edit_column_names( $sql, $column_names );  # now quoted
@@ -178,6 +179,13 @@ sub create_table {
                             next EDIT_COLUMN_NAMES;
                         }
                         my @duplicates = duplicates map { lc } @{$sql->{ct_column_definitions}};
+                       # my @duplicates; ##
+                       # if ( $sf->{o}{G}{quote_columns} ) {
+                       #     @duplicates = duplicates @{$sql->{ct_column_definitions}};
+                       # }
+                       # else {
+                       #     @duplicates = duplicates map { lc } @{$sql->{ct_column_definitions}};
+                       # }
                         if ( @duplicates ) {
                             # Choose
                             $tc->choose(
@@ -397,13 +405,7 @@ sub __edit_column_names {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col_number = 0;
-    my $fields;
-    if ( @$column_names ) {
-        $fields = [ map { [ ++$col_number, $_ ] } @$column_names ];
-    }
-    else {
-        $fields = [ map { [ ++$col_number, $_ ] } @{$sql->{ct_column_definitions}} ];
-    }
+    my $fields = [ map { [ ++$col_number, $_ ] } @$column_names ];
     my $info = $ax->get_sql_info( $sql );
     # Fill_form
     my $form = $tf->fill_form(

@@ -5,13 +5,12 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any );
-
 use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::From::Cte;
 use App::DBBrowser::Subquery;
+use App::DBBrowser::Table;
 use App::DBBrowser::Table::Extensions;
 use App::DBBrowser::Table::Substatements;
 
@@ -31,12 +30,12 @@ sub union_tables {
     $sf->{d}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tables;
+    my $table_keys;
     if ( $sf->{o}{G}{metadata} ) {
-        $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     }
     else {
-        $tables = [ @{$sf->{d}{user_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}} ];
     }
     my $data = [];
     my $used_tables = [];
@@ -48,7 +47,7 @@ sub union_tables {
         my $enough_tables  = '  Enough TABLES';
         my $subquery_table = '  Subquery';
         my $cte_table      = '  Cte';
-        my $where          = '  Where';
+        my $where          = '  Modifiy';
         my $parentheses    = '  Parentheses';
         my @pre = ( undef, $enough_tables );
         my @post;
@@ -57,7 +56,7 @@ sub union_tables {
         push @post, $where         if $sf->{o}{enable}{u_where};
         push @post, $parentheses   if $sf->{o}{enable}{u_parentheses} && $sf->{i}{driver} !~ /^(?:SQLite|Firebird)\z/;
         my $prompt = 'Choose a table:';
-        my $menu  = [ @pre, map( '- ' . $_, @$tables ), @post ];
+        my $menu  = [ @pre, map( '- ' . $_, @$table_keys ), @post ];
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
         # Choose
@@ -82,51 +81,48 @@ sub union_tables {
             }
             $old_idx_tbl = $idx_tbl;
         }
-        my $table = $menu->[$idx_tbl];
-        my $qt_table;
-        if ( $table eq $enough_tables ) {
+        my $table_key = $menu->[$idx_tbl];
+        my $table;
+        if ( $table_key eq $enough_tables ) {
             if ( ! @$used_tables ) {
                 return;
             }
             last TABLE;
         }
-        elsif ( $table eq $where ) {
-            $sf->__where_conditions( $sql, $data );
+        elsif ( $table_key eq $where ) {
+            $sf->__edit_tables( $sql, $data );
             next TABLE;
         }
-        elsif ( $table eq $parentheses ) {
+        elsif ( $table_key eq $parentheses ) {
             $sf->__parentheses( $sql, $data );
             next TABLE;
         }
-
-        elsif ( $table eq $subquery_table ) {
+        elsif ( $table_key eq $subquery_table ) {
             my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
             $table = $sq->subquery( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }
-            $qt_table = $table;
             my $default_alias = 'p' . ( @$used_tables + 1 );
             my $bu_table_aliases = $ax->clone_data( $sf->{d}{table_aliases} ); ##
-            my $qt_alias = $ax->table_alias( $sql, 'derived_table', $qt_table, $default_alias );
+            my $alias = $ax->table_alias( $sql, 'derived_table', $table, $default_alias );
             $sf->{d}{table_aliases} = $bu_table_aliases;
-            if ( length $qt_alias ) {
-                $qt_table .= " " . $qt_alias;
+            if ( length $alias ) {
+                $table .= " " . $alias;
             }
         }
-        elsif ( $table eq $cte_table ) {
+        elsif ( $table_key eq $cte_table ) {
             my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
             $table = $sq->cte( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }
-            $qt_table = $table;
         }
         else {
-            $table =~ s/^-\s//;
-            $qt_table = $ax->qq_table( $sf->{d}{tables_info}{$table} );
+            $table_key =~ s/^-\s//;
+            $table = $ax->qq_table( $sf->{d}{tables_info}{$table_key} );
         }
         my $operator;
         if ( @$data ) {
@@ -135,18 +131,32 @@ sub union_tables {
                 next TABLE;
             }
         }
-        my $ok = $sf->__choose_table_columns( $sql, $data, $table, $qt_table, $operator ); ##
-        if ( ! $ok ) {
+        my ( $columns, $column_types ) = $ax->column_names_and_types( $table );
+        if ( ! defined $columns ) {
             next TABLE;
         }
-        push @$used_tables, $table;
+        my $data_types = {};
+        @{$data_types}{@$columns} = @$column_types; ##
+        my $table_sql = {};
+        $ax->reset_sql( $table_sql );
+        $table_sql->{table} = $table;
+        $table_sql->{columns} = $columns;
+        $table_sql->{data_types} = $data_types;
+        push @$data, { table_sql => $table_sql, table_key => $table_key, operator => $operator };
+        $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
+        my $ok = $sf->__edit_table_stmt( $sql, $data, $#$data );
+        if ( ! $ok ) {
+            pop @$data;
+            next TABLE;
+        }
+        push @$used_tables, $table_key;
     }
     $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
     my $union_derived_table = $ax->get_stmt( $sql, 'Union', 'prepare' );
     delete $sql->{subselect_stmts};
-    my $qt_union_alias = $ax->table_alias( $sql, 'derived_table', $union_derived_table );
-    if ( length $qt_union_alias ) {
-        $union_derived_table .= " " . $qt_union_alias;
+    my $union_alias = $ax->table_alias( $sql, 'derived_table', $union_derived_table );
+    if ( length $union_alias ) {
+        $union_derived_table .= " " . $union_alias;
     }
     return $union_derived_table;
 }
@@ -186,82 +196,6 @@ sub __set_operator {
 }
 
 
-sub __choose_table_columns {
-    my ( $sf, $sql, $data, $table, $qt_table, $operator ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $idx = @$data;
-    my @bu;
-    ( my $column_names, undef ) = $ax->column_names_and_types( $qt_table );
-    if ( ! defined $column_names ) {
-        return;
-    }
-    my $qt_columns = $ax->quote_cols( $column_names );
-    $data->[$idx] = {
-        qt_table => $qt_table, table => $table, qt_columns => $qt_columns, chosen_qt_cols => [], qt_alias => {}
-    };
-    if ( $operator ) {
-        $data->[$idx]{operator} = $operator;
-    }
-
-    COLUMNS: while ( 1 ) {
-        my @pre = ( undef, $sf->{i}{ok} );
-        push @pre, $sf->{i}{menu_addition} if $sf->{o}{enable}{extended_cols};
-        $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
-        my $info = $ax->get_sql_info( $sql );
-        # Choose
-        my @choices = $tc->choose(
-            [ @pre, @$qt_columns ],
-            { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Columns:', meta_items => [ 0 .. $#pre ],
-              include_highlighted => 2 }
-        );
-        $ax->print_sql_info( $info );
-        if ( ! defined $choices[0] ) {
-            if ( @bu ) {
-                $data->[$idx] = pop @bu;
-                next COLUMNS;
-            }
-            $#$data = $idx - 1;
-            return;
-        }
-        if ( $choices[0] eq $sf->{i}{ok} ) {
-            shift @choices;
-            push @{$data->[$idx]{chosen_qt_cols}}, @choices;
-            if ( ! @{$data->[$idx]{chosen_qt_cols}} ) {
-                $data->[$idx]{chosen_qt_cols} = $qt_columns;
-            }
-            return 1;
-        }
-        elsif ( $choices[0] eq $sf->{i}{menu_addition} ) {
-            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $bu_sql = $ax->clone_data( $sql );
-            $sql->{columns} = [ @$qt_columns  ];
-            $sql->{selected_cols} = [ @{$data->[$idx]{chosen_qt_cols}} ];
-            $sql->{alias} = $ax->clone_data( $data->[$idx]{qt_alias} );
-            my $complex_col = $ext->column( $sql, 'select' );
-            $sql = $bu_sql;
-            if ( ! defined $complex_col ) {
-                next COLUMNS;
-            }
-            elsif ( ref( $complex_col ) eq 'HASH' ) {
-                $data->[$idx]{qt_alias} = $complex_col;
-            }
-            else {
-                my $default = 'col_' . ( @{$data->[$idx]{chosen_qt_cols}} + 1 );
-                my $qt_alias = $ax->alias( $sql, 'complex_cols_select', $complex_col, $default );
-                push @bu, $ax->clone_data( $data->[$idx] );
-                push @{$data->[$idx]{chosen_qt_cols}}, $complex_col;
-                $data->[$idx]{qt_alias}{$complex_col} = $qt_alias;
-            }
-        }
-        else {
-            push @bu, $ax->clone_data( $data->[$idx] );
-            push @{$data->[$idx]{chosen_qt_cols}}, @choices;
-        }
-    }
-}
-
-
 sub __get_sub_select_stmts {
     my ( $sf, $data ) = @_;
     my $stmts = [];
@@ -272,20 +206,9 @@ sub __get_sub_select_stmts {
         if ( $d->{parentheses_open} ) {
             push @$stmts, ( "(" ) x $d->{parentheses_open};
         }
-
-        my $qt_columns = $d->{chosen_qt_cols};
-        if ( ! @$qt_columns ) {
-            $qt_columns = [ '*' ];
+        if ( $d->{stmt} ) {
+            push @$stmts, $d->{stmt};
         }
-        else {
-            # it is a scalar_functions or a subquery if it has an alias
-            $qt_columns = [ map { length $d->{qt_alias}{$_} ? $_ . ' AS ' . $d->{qt_alias}{$_} : $_ } @$qt_columns ];
-        }
-        my $select = "SELECT " . join( ', ', @$qt_columns ) . " FROM " . $d->{qt_table};
-        if ( length $d->{where_stmt} ) {
-            $select .= " " . $d->{where_stmt};
-        }
-        push @$stmts, $select;
         if ( $d->{parentheses_close} ) {
             push @$stmts, ( ")" ) x $d->{parentheses_close};
         }
@@ -294,17 +217,17 @@ sub __get_sub_select_stmts {
 }
 
 
-sub __where_conditions {
+sub __edit_tables {
     my ( $sf, $sql, $data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @idx_changed_tables;
     my $old_idx_tbl = 0;
+    my @bu;
 
     TABLE: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{confirm} );
-        my $menu = [ @pre, map { '- ' . $_->{table} } @$data ];
-        my $prompt = 'Where condition:';
+        my $menu = [ @pre, map { '- ' . $_->{table_key} } @$data ];
+        my $prompt = 'Table:';
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
         # Choose
@@ -315,9 +238,11 @@ sub __where_conditions {
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
-            if ( @idx_changed_tables ) {
-                my $idx = pop @idx_changed_tables;
-                delete $data->[$idx]{where_stmt};
+            if ( @bu ) {
+                my $bu_data = pop @bu;
+                for my $i ( 0 .. $#$bu_data ) {
+                    $data->[$i] = { %{$bu_data->[$i]} };
+                }
                 $old_idx_tbl = 0;
                 next TABLE;
             }
@@ -334,33 +259,35 @@ sub __where_conditions {
             return 1;
         }
         $idx_tbl -= @pre;
-        my $ok = $sf->__add_where_stmt( $data, $idx_tbl );
-        if ( $ok ) {
-            push @idx_changed_tables, $idx_tbl;
+        push @bu, $ax->clone_data( $data );
+        my $ok = $sf->__edit_table_stmt( $sql, $data, $idx_tbl );
+        if ( ! $ok ) {
+            my $bu_data = pop @bu;
+            for my $i ( 0 .. $#$bu_data ) {
+                $data->[$i] = { %{$bu_data->[$i]} };
+            }
         }
     }
 }
 
 
-sub __add_where_stmt {
-    my ( $sf, $data, $idx_tbl ) = @_;
+sub __edit_table_stmt {
+    my ( $sf, $sql, $data, $idx_tbl ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $table_sql = $data->[$idx_tbl]{table_sql};
     my $bu_stmt_types = [ @{$sf->{d}{stmt_types}} ];
-    $sf->{d}{stmt_types} = [ 'Select' ]; # to see what is happening
-    my $qt_table = $data->[$idx_tbl]{qt_table};
-    my $qt_columns = $data->[$idx_tbl]{qt_columns};
-    my $tmp_sql = {};
-    $ax->reset_sql( $tmp_sql );
-    $tmp_sql->{table} = $qt_table;
-    $tmp_sql->{columns} = $qt_columns;           # 'cols' required in WHERE
-    $tmp_sql->{selected_cols} = $qt_columns;  # 'selected_cols' required in SELECT
-    my $ret = $sb->where( $tmp_sql );
+    my $bu_main_info = $sf->{d}{main_info}; ##
+    $sf->{d}{main_info} = $ax->get_sql_info( $sql );
+    my $stmt =  $tbl->browse_the_table( $table_sql, 1 );
+    $sf->{d}{main_info} = $bu_main_info;
     $sf->{d}{stmt_types} = $bu_stmt_types;
-    if ( ! defined $ret ) {
+    if ( ! $stmt ) {
         return;
     }
-    $data->[$idx_tbl]{where_stmt} = delete $tmp_sql->{where_stmt};
+    $stmt = $ax->normalize_space_in_stmt( $stmt );
+    $data->[$idx_tbl]{stmt} = $stmt;
+    $data->[$idx_tbl]{sql} = $table_sql;
     return 1;
 }
 
@@ -375,7 +302,7 @@ sub __parentheses {
     TABLE: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{confirm} );
         my $reset_all = '  Reset all';
-        my $menu = [ @pre, map('- ' . $_->{table}, @$data ) , $reset_all ];
+        my $menu = [ @pre, map('- ' . $_->{table_key}, @$data ) , $reset_all ];
         my $prompt = 'Parentheses:';
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
@@ -416,7 +343,7 @@ sub __parentheses {
         }
         $idx_tbl -= @pre;
         $prompt = 'Parentheses' . "\n" . ( '(' x ( $data->[$idx_tbl]{parentheses_open} // 0 ) );
-        $prompt .= $data->[$idx_tbl]{table} . ( ')' x ( $data->[$idx_tbl]{parentheses_close} // 0 ) ) . ':';
+        $prompt .= $data->[$idx_tbl]{table_key} . ( ')' x ( $data->[$idx_tbl]{parentheses_close} // 0 ) ) . ':';
         my $open = '  + (';
         my $close = '  + )';
         my $reset = '  Reset';

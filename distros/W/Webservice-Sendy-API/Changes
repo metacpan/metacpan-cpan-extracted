@@ -41,3 +41,6 @@
 
 0.7	Fri Jan 24 10:00:00 PM UTC 2025
 	- fixed minor issue
+
+0.8	Fri Mar  9 10:00:00 PM UTC 2025
+	- pinned perl and module versions in dist.ini 

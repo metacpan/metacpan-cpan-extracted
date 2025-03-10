@@ -82,6 +82,7 @@ sub _options {
             { name => '_aliases_in_clauses', text => "- Alias use in clauses", section => 'alias'  },
             { name => '_sql_identifiers',    text => "- Identifiers",          section => 'G'      },
             { name => '_view_name_prefix',   text => "- View prefix",          section => 'create' }, ##
+            { name => '_other_sql_settings', text => "- Other",                section => 'G'      },
         ],
         group_create => [
             { name => '_enable_ct_opt',          text => "- Enable options",                     section => 'create' },
@@ -378,6 +379,15 @@ sub set_options {
                 ];
                 my $prompt = 'Set a view name prefix';
                 $sf->__group_readline( $section, $items, $prompt );
+            }
+            elsif ( $opt eq '_other_sql_settings' ) {
+                my $prompt = 'Your choice: ';
+                my $sub_menu = [
+                    #[ 'limit_fetch_col_names', "- Fetch column names with LIMIT 0", [ $no, $yes ] ], ##
+                    [ 'edit_sql_menu_sq',      "- Subqueries created with 'SQL Menu': Allow editing.", [ $no, $yes ] ],
+                    [ 'pg_autocast',           "- Pg: Convert to 'text' automatically when required.", [ $no, $yes ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             ##### Create table ####
             elsif ( $opt eq '_enable_ct_opt' ) {

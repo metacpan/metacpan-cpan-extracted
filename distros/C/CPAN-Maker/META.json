@@ -1,0 +1,91 @@
+{
+   "abstract" : "CPAN distribution maker",
+   "author" : [
+      "Rob Lauer <rlauer6@comcast.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Maker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Scalar" : "2.111",
+            "JSON" : "0",
+            "List::Util" : "1.33",
+            "Log::Log4perl" : "0",
+            "Pod::Find" : "0",
+            "ReadonlyX" : "1.04",
+            "Text::CSV_XS" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0",
+            "Text::CSV_XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Maker" : {
+         "file" : "lib/CPAN/Maker.pm",
+         "version" : "v1.5.41"
+      },
+      "CPAN::Maker::Constants" : {
+         "file" : "lib/CPAN/Maker/Constants.pm",
+         "version" : "v1.5.41"
+      },
+      "CPAN::Maker::Utils" : {
+         "file" : "lib/CPAN/Maker/Utils.pm",
+         "version" : "v1.5.41"
+      },
+      "File::Process" : {
+         "file" : "lib/File/Process.pm",
+         "version" : "0.15"
+      },
+      "File::Process::Utils" : {
+         "file" : "lib/File/Process/Utils.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/rlauer6/make-cpan-dist/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/make-cpan-dist",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/make-cpan-dist.git",
+         "web" : "http://github.com/rlauer6/make-cpan-dist"
+      }
+   },
+   "version" : "v1.5.41",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

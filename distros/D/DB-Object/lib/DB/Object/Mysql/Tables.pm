@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -29,47 +29,47 @@ BEGIN
     # but this does not provide a complete list of datatype
     our $TYPE_TO_CONSTANT =
     {
-    qr/^(bit)/                          => { constant => '', name => 'SQL_BIT', type => 'bit' },
-    qr/^(tinyint)/                      => { constant => '', name => 'SQL_TINYINT', type => 'tinyint' },
-    qr/^(smallint)/                     => { constant => '', name => 'SQL_SMALLINT', type => 'smallint' },
-    qr/^(mediumint)/                    => { constant => '', name => 'SQL_BIT', type => 'mediumint' },
-    qr/^(integer|int)/                  => { constant => '', name => 'SQL_INTEGER', type => 'int' },
-    qr/^(bigint)/                       => { constant => '', name => 'SQL_BIGINT', type => 'bigint' },
-    qr/^(dec|decimal)/                  => { constant => '', name => 'SQL_DECIMAL', type => 'decimal' },
-    qr/^(float)/                        => { constant => '', name => 'SQL_FLOAT', type => 'float' },
-    qr/^(double\s+precision|double)/    => { constant => '', name => 'SQL_DOUBLE', type => 'double' },
-    qr/^(date)\b/                       => { constant => '', name => 'SQL_DATE', type => 'date' },
-    qr/^(datetime)/                     => { constant => '', name => 'SQL_DATETIME', type => 'datetime' },
-    qr/^(timestamp)/                    => { constant => '', name => 'SQL_TIMESTAMP', type => 'timestamp' },
-    qr/^(year)/                         => { constant => '', name => 'SQL_INTERVAL_YEAR', type => 'year' },
-    qr/^(character|char)\b(?![[:blank:]]+varying)/ => { constant => '', name => 'SQL_VARCHAR', type => 'varchar' },
-    qr/^(character varying|varchar)/    => { constant => '', name => 'SQL_WVARCHAR', type => 'varchar' },
-    qr/^blob/                           => { constant => '', name => 'SQL_BLOB', type => 'blob' },
-    qr/^text/                           => { constant => '', name => 'SQL_LONGVARCHAR', type => 'text' },
-    qr/^binary/                         => { constant => '', name => 'SQL_BINARY', type => 'binary' },
-    qr/^varbinary/                      => { constant => '', name => 'SQL_VARBINARY', type => 'varbinary' },
-    qr/^(tinyblob)\b/                   => { constant => '', name => 'SQL_BLOB', type => 'tinyblob' },
-    qr/^(mediumblob)\b/                 => { constant => '', name => 'SQL_BLOB', type => 'mediumblob' },
-    qr/^(longlob)\b/                    => { constant => '', name => 'SQL_BLOB', type => 'longlob' },
-    qr/^(tinytext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'tinytext' },
-    qr/^(mediumtext)\b/                 => { constant => '', name => 'SQL_LONGVARCHAR', type => 'mediumtext' },
-    qr/^(longtext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'longtext' },
-    qr/^(enum)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'enum' },
-    qr/^(set)\b/                        => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'set' },
-    qr/^(geometry)\b/                   => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometry' },
-    qr/^(linestring)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'linestring' },
-    qr/^(point)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'point' },
-    qr/^(polygon)\b/                    => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'polygon' },
-    qr/^(curve)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'curve' },
-    qr/^(multipolygon)\b/               => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipolygon' },
-    qr/^(multilinestring)\b/            => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multilinestring' },
-    qr/^(multipoint)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipoint' },
-    qr/^(geometrycollection)\b/         => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometrycollection' },
-    qr/^(multicurve)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multicurve' },
-    qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
+        qr/^(bit)/                          => { constant => '', name => 'SQL_BIT', type => 'bit' },
+        qr/^(tinyint)/                      => { constant => '', name => 'SQL_TINYINT', type => 'tinyint' },
+        qr/^(smallint)/                     => { constant => '', name => 'SQL_SMALLINT', type => 'smallint' },
+        qr/^(mediumint)/                    => { constant => '', name => 'SQL_BIT', type => 'mediumint' },
+        qr/^(integer|int)/                  => { constant => '', name => 'SQL_INTEGER', type => 'int' },
+        qr/^(bigint)/                       => { constant => '', name => 'SQL_BIGINT', type => 'bigint' },
+        qr/^(dec|decimal)/                  => { constant => '', name => 'SQL_DECIMAL', type => 'decimal' },
+        qr/^(float)/                        => { constant => '', name => 'SQL_FLOAT', type => 'float' },
+        qr/^(double\s+precision|double)/    => { constant => '', name => 'SQL_DOUBLE', type => 'double' },
+        qr/^(date)\b/                       => { constant => '', name => 'SQL_DATE', type => 'date' },
+        qr/^(datetime)/                     => { constant => '', name => 'SQL_DATETIME', type => 'datetime' },
+        qr/^(timestamp)/                    => { constant => '', name => 'SQL_TIMESTAMP', type => 'timestamp' },
+        qr/^(year)/                         => { constant => '', name => 'SQL_INTERVAL_YEAR', type => 'year' },
+        qr/^(character|char)\b(?![[:blank:]]+varying)/ => { constant => '', name => 'SQL_VARCHAR', type => 'varchar' },
+        qr/^(character varying|varchar)/    => { constant => '', name => 'SQL_WVARCHAR', type => 'varchar' },
+        qr/^blob/                           => { constant => '', name => 'SQL_BLOB', type => 'blob' },
+        qr/^text/                           => { constant => '', name => 'SQL_LONGVARCHAR', type => 'text' },
+        qr/^binary/                         => { constant => '', name => 'SQL_BINARY', type => 'binary' },
+        qr/^varbinary/                      => { constant => '', name => 'SQL_VARBINARY', type => 'varbinary' },
+        qr/^(tinyblob)\b/                   => { constant => '', name => 'SQL_BLOB', type => 'tinyblob' },
+        qr/^(mediumblob)\b/                 => { constant => '', name => 'SQL_BLOB', type => 'mediumblob' },
+        qr/^(longlob)\b/                    => { constant => '', name => 'SQL_BLOB', type => 'longlob' },
+        qr/^(tinytext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'tinytext' },
+        qr/^(mediumtext)\b/                 => { constant => '', name => 'SQL_LONGVARCHAR', type => 'mediumtext' },
+        qr/^(longtext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'longtext' },
+        qr/^(enum)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'enum' },
+        qr/^(set)\b/                        => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'set' },
+        qr/^(geometry)\b/                   => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometry' },
+        qr/^(linestring)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'linestring' },
+        qr/^(point)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'point' },
+        qr/^(polygon)\b/                    => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'polygon' },
+        qr/^(curve)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'curve' },
+        qr/^(multipolygon)\b/               => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipolygon' },
+        qr/^(multilinestring)\b/            => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multilinestring' },
+        qr/^(multipoint)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipoint' },
+        qr/^(geometrycollection)\b/         => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometrycollection' },
+        qr/^(multicurve)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multicurve' },
+        qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.2';
+    our $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -357,6 +357,25 @@ sub lock
 # NOTE: sub null is inherited from DB::Object::Tables
 # sub null
 
+sub on_conflict
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # Void
+    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->on_conflict( @_ );
+        return( $self->pass_error( $q->error ) ) if( !defined( $val ) );
+        return( $val );
+    }
+}
+
 sub optimize
 {
     my $self  = shift( @_ );
@@ -466,8 +485,9 @@ sub structure
     my $q = $self->_reset_query;
     my $table   = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    my $sth1 = $self->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
-        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
+    my $dbh = $self->database_object->{dbh};
+    my $sth1 = $dbh->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
+        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $dbh->errstr() ) );
     $sth1->execute( $table ) ||
         return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
@@ -499,8 +519,8 @@ WHERE table_name = ?
 ORDER BY a.ordinal_position
 EOT
     $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
-    my $sth = $self->database_object->prepare_cached( $query ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
+    my $sth = $dbh->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $dbh->errstr() ) );
     $sth->execute( $table ) ||
         return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
 
@@ -518,18 +538,18 @@ EOT
         $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{type}, "{/}" );
         my $def =
         {
-        name            => $ref->{field},
-        ( CORE::length( $ref->{column_comment} // '' ) ? ( comment => $ref->{column_comment} ) : () ),
-        default         => $ref->{column_default},
-        # Damn MySQL not using boolean
-        is_nullable     => ( $ref->{is_nullable} eq 'YES' ? 1 : 0 ),
-        is_primary      => ( ( $ref->{column_key} // '' ) eq 'PRI' ? 1 : 0 ),
-        is_unique       => ( ( $ref->{column_key} // '' ) eq 'UNI' ? 1 : 0 ),
-        pos             => $ref->{field_num},
-        # query_object    => $q,
-        size            => $ref->{character_maximum_length},
-        type            => $ref->{data_type},
-        # table_object    => $self,
+            name            => $ref->{field},
+            ( CORE::length( $ref->{column_comment} // '' ) ? ( comment => $ref->{column_comment} ) : () ),
+            default         => $ref->{column_default},
+            # Damn MySQL not using boolean
+            is_nullable     => ( $ref->{is_nullable} eq 'YES' ? 1 : 0 ),
+            is_primary      => ( ( $ref->{column_key} // '' ) eq 'PRI' ? 1 : 0 ),
+            is_unique       => ( ( $ref->{column_key} // '' ) eq 'UNI' ? 1 : 0 ),
+            pos             => $ref->{field_num},
+            # query_object    => $q,
+            size            => $ref->{character_maximum_length},
+            type            => $ref->{data_type},
+            # table_object    => $self,
         };
 
         my( $const_def, $dict );
@@ -650,7 +670,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v1.0.2
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -774,6 +794,10 @@ The option can only be:
 This will prepare the query to lock the table or tables and return the statement handler. If it is called in void context, the statement handler returned is executed immediately.
 
 See L<MyQL documentation for more information|https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html>
+
+=head2 on_conflict
+
+A convenient wrapper to L<DB::Object::Mysql::Query/on_conflict>
 
 =head2 optimize
 

@@ -8,3 +8,7 @@
 	  dependency on Dispatch::Fu (jwrightecs)
 	- minor POD update, code clean up
 	- maintenance release (dist.ini)
+
+0.9.10  Sun Mar  9 05:39:16 PM UTC 2025
+	- pinning prereq and dendencies to specific versions in an
+	  attempt to fix unexpected testing errors

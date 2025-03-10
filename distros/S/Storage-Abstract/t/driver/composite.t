@@ -58,9 +58,5 @@ is $storage->list, bag {
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
 
-ok lives {
-	$storage->driver->clear_cache;
-};
-
 done_testing;
 

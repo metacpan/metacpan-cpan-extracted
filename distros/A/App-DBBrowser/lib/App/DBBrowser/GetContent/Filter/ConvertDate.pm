@@ -262,9 +262,11 @@ sub __pattern_history {
             '%d.%m.%Y %H:%M:%S',
             '%d/%m/%Y %H:%M:%S',
             '%m/%d/%Y %H:%M:%S',
-            '%y = two digit year (0-99);  %I = the hour on a 12-hour clock (01-12)',
-            '%z = timezone (eg. +2000);  %Z timezone name (eg. EST)',
+            '%y = two digit year (0-99)',
+            '%b = Sep; %B = September',
+            '%I = the hour on a 12-hour clock (01-12)',
             '%p = the equivalent of AM or PM according to the locale in use',
+            '%z = timezone (eg. +2000);  %Z timezone name (eg. EST)',
             '%u = weekday number (1-7) with Monday is 1;  %w = weekday number (0-6) with Sunday is 0',
         ];
         return $in;

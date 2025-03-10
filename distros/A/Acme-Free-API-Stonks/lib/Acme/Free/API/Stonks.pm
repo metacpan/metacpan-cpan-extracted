@@ -3,7 +3,7 @@ package Acme::Free::API::Stonks;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;

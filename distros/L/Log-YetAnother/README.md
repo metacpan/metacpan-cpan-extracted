@@ -4,7 +4,7 @@ Log::YetAnother - A flexible logging class for Perl
 
 # VERSION
 
-0.02
+0.03
 
 # SYNOPSIS
 
@@ -66,6 +66,7 @@ Logs a trace message.
 ## warn
 
     $logger->warn(@messages);
+    $logger->warn(warning => \@messages);
 
 Logs a warning message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,

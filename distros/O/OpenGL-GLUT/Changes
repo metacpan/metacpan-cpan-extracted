@@ -1,3 +1,7 @@
+0.7201 2025-03-10
+- fix header clash on MacOS (#11) - thanks @deriamis
+- apply Debian-provided fix for glutTimerFunc (#10) - thanks @kevinxie4c for report, Thomas Kremer for fix
+
 0.72 2022-01-09
 - re-enable glutCloseFunc
 - dep on OpenGL 0.70 for present time

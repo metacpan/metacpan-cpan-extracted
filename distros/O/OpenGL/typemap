@@ -19,7 +19,7 @@ GLboolean		T_BOOL
 GLenum			T_INT
 GLbitfield		T_INT
 GLcharARB		T_CHAR
-GLhandleARB		T_U_INT
+GLhandleARB		T_UV
 
 GLUnurbsObj *		T_PTROBJ
 GLUquadricObj *		T_PTROBJ

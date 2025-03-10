@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.018;
+our $VERSION = 1.019;
 
 use parent qw(Alien::Base);
 
@@ -21,7 +21,7 @@ Alien::libmaxminddb - Find or download and install libmaxminddb
 
 =head1 VERSION
 
-version 1.018
+version 1.019
 
 =head1 SYNOPSIS
 
@@ -78,14 +78,11 @@ None.
 
 If L<libmaxminddb|https://github.com/maxmind/libmaxminddb> and its development
 files aren't present, the library is fetched from GitHub and built with
-L<Alien::Build>, which requires the build tools from L<Alien::MSYS> on
-Windows.  If Alien::Build fails to build libmaxminddb, make sure that you have
-a clean build environment with nothing but Perl and the build tools in your
-path.
+L<Alien::Build>.  On Windows, L<Alien::MSYS> needs to be installed manually.
 
 =head1 SEE ALSO
 
-L<Alien::Base>, L<IP::Geolocation::MMDB>
+L<Alien::Base>, L<Geo::Location::IP>, L<IP::Geolocation::MMDB>
 
 =head1 ACKNOWLEDGEMENTS
 

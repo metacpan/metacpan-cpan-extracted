@@ -2,9 +2,8 @@ package Acme::Free::API::ChuckNorris;
 
 use v5.10;
 use strict;
-use warnings;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;

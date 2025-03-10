@@ -25,6 +25,8 @@ foreach my $line (<EXPS>)
 }
 close(EXPS);
 
+print EXTS "\n#ifndef HAVE_AGL_GLUT\n";
+
 # Header
 my $header = qq
 {#ifndef %s
@@ -187,6 +189,8 @@ while (<FILE>)
     print TYPE $line;
   }
 }
+
+print EXTS "\n#endif  /* HAVE_AGL_GLUT */\n";
 
 close(EXTS);
 close(FILE);

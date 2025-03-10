@@ -6,7 +6,7 @@ use URI::URL();
 
 use parent qw(Firefox::Marionette::Element);
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 sub new {
     my ( $class, $element ) = @_;
@@ -89,7 +89,7 @@ Firefox::Marionette::Image - Represents an image from the images method
 
 =head1 VERSION
 
-Version 1.62
+Version 1.63
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,7 @@ Version 1.62
 
 =head1 DESCRIPTION
 
-This module is a super class of L<Firefox::Marionette::Element|Firefox::Marionette::Element> designed to be compatible with L<WWW::Mechanize::Image|WWW::Mechanize::Image>.
+This module is a subclass of L<Firefox::Marionette::Element|Firefox::Marionette::Element> designed to be compatible with L<WWW::Mechanize::Image|WWW::Mechanize::Image>.
 
 =head1 SUBROUTINES/METHODS
 

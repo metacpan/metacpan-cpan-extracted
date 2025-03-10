@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0303';
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Data::Dumper::Compact qw(ddc);
 use File::Basename qw(fileparse);
 use Future::AsyncAwait;
-use Future::IO;
+use Future::IO ();
 use MIDI::RtMidi::FFI::Device ();
 use MIDI::Util qw(dura_size get_microseconds score2events set_chan_patch ticks);
 use Path::Tiny qw(path);
@@ -30,6 +30,7 @@ sub new {
     $opts{sleep}    //= 1;
     $opts{loop}     ||= 1;
     $opts{infinite} //= 1;
+    $opts{overlap}  //= 0;
     $opts{verbose}  //= 0;
     $opts{dump}     //= 0;
     $opts{deposit}  ||= '';
@@ -55,22 +56,22 @@ sub new {
 
 
 sub play {
-    my ($self) = @_;
-    if ($self->{infinite}) {
-        while (1) { $self->_play->await }
-    }
-    else {
-        for my $i (1 .. $self->{loop}) {
-            $self->_play->await;
-        }
-    }
+    shift->play_async->await;
 }
 
+# readonly status
+sub _is_playing {
+    !!shift->{playing};
+}
 
 
 # the Future-returning async method
 async sub play_async {
     my ($self) = @_;
+
+    return if $self->_is_playing && !$self->{overlap};
+    $self->{playing} = 1;
+
     if ($self->{infinite}) {
         while (1) { await $self->_play }
     }
@@ -79,6 +80,8 @@ async sub play_async {
             await $self->_play;
         }
     }
+
+    $self->{playing} = 0;
 }
 
 async sub _play {
@@ -177,7 +180,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0301
+version 0.0303
 
 =head1 SYNOPSIS
 
@@ -228,6 +231,7 @@ version 0.0301
       sleep    => 2, # number of seconds to sleep between loops (default: 1)
       loop     => 4, # loop limit if finite (default: 1)
       infinite => 0, # loop infinitely (default: 1)
+      overlap  => 0, # allow overlapping scores to be played
       deposit  => 'path/prefix-', # optionally make a file after each loop
       verbose  => 0, # print out text events (default: 0)
       dump     => 0, # dump the score before each play (default: 0)
@@ -298,11 +302,14 @@ Play a given MIDI score in real-time.
 
 Play a given MIDI score asynchronously.
 
+=head1 THANK YOU
+
+This code would not exist without the help of CPAN's JBARRETT (John
+Barrett AKA fuzzix).
+
 =head1 SEE ALSO
 
 Examples are the F<eg/*> files in this distribution.
-
-Also check out the F<t/01-methods.t> file for basic usage.
 
 L<MIDI::RtMidi::FFI::Device>
 

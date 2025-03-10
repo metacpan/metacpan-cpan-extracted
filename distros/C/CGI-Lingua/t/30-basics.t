@@ -48,7 +48,7 @@ subtest 'Country Resolution' => sub {
 	);
 
 	is($lingua->country(), 'us', 'Country code from mocked IP::Country');
-	ok($cache->get('123.45.67.89'), 'Country result cached');
+	ok($cache->get('CGI::Lingua:country:123.45.67.89'), 'Country result cached');
 };
 
 # Fallback to IP when no Accept-Language
@@ -160,7 +160,7 @@ subtest 'IPv6 Handling' => sub {
 		);
 
 		is($lingua->country, 'de', 'Country from IPv6 via IP::Country mock');
-		ok($cache->get($ipv6_public), 'IPv6 result cached');
+		ok($cache->get("CGI::Lingua:country:$ipv6_public"), 'IPv6 result cached');
 	};
 
 	subtest 'Private IPv6' => sub {

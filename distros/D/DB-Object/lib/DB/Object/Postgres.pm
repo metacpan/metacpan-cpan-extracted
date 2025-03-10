@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.2.2
+## Version v1.3.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/11/22
+## Modified 2025/03/09
 ## All rights reserved
 ## 
 ## 
@@ -32,9 +32,6 @@ BEGIN
         DBD::Pg->import( ':pg_types' );
     };
     die( $@ ) if( $@ );
-    use DateTime;
-    use DateTime::Format::Strptime;
-    use Module::Generic::DateTime;
     our $TABLE_CACHE = {};
     # the 'constant' property in the dictionary hash is added in structure()
     # <https://www.postgresql.org/docs/13/datatype.html>
@@ -464,7 +461,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.2.2';
+    our $VERSION = 'v1.3.0';
 };
 
 use strict;
@@ -1605,143 +1602,6 @@ sub _connection_parameters
     return( $core );
 }
 
-sub _convert_datetime2object
-{
-    my $self = shift( @_ );
-    my $opts = $self->_get_args_as_hash( @_ );
-    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
-    my $data = $opts->{data};
-    my $names = $sth->FETCH('NAME');
-    my $types = $sth->FETCH('pg_type');
-    my $pg_types = $sth->{pg_type};
-    my $mode = ref( $data );
-    my $tz;
-    # try-catch
-    local $@;
-    $tz = eval
-    {
-        DateTime::TimeZone->new( name => 'local' );
-    };
-    if( $@ )
-    {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
-    }
-    
-    my $convert = sub
-    {
-        my $str = shift( @_ ) || return;
-        if( $str =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:[[:blank:]]+(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2}))?/ )
-        {
-            my $pat = ['%Y-%m-%d'];
-            my $hash =
-            {
-                year => $+{year},
-                month => $+{month},
-                day => $+{day},
-            };
-            for( qw( hour minute second ) )
-            {
-                $hash->{ $_ } = int( $+{ $_ } ) if( defined( $+{ $_ } ) && length( $+{ $_ } ) );
-            }
-            $hash->{time_zone} = $tz->name;
-            if( $hash->{hour} ||
-                $hash->{minute} ||
-                $hash->{second} )
-            {
-                push( @$pat, '%H:%M:%S' );
-            }
-
-            # try-catch
-            local $@;
-            my $this = eval
-            {
-                my $dt = DateTime->new( %$hash );
-                my $fmt = DateTime::Format::Strptime->new(
-                    pattern => join( ' ', @$pat ),
-                    locale => 'en_GB',
-                    time_zone => $tz->name,
-                );
-                $dt->set_formatter( $fmt );
-                # To enable extra features
-                return( Module::Generic::DateTime->new( $dt ) );
-            };
-            if( $@ )
-            {
-                $self->error( "Error converting the date or timestamp \"", $str, "\" to a datetime object: $@" );
-            }
-            return( $this );
-        }
-        else
-        {
-            return( $str );
-        }
-    };
-    for( my $i = 0; $i < scalar( @$names ); $i++ )
-    {
-        if( $types->[$i] eq PG_DATE || 
-            $types->[$i] eq PG_TIMESTAMP || 
-            $types->[$i] eq 'date' || 
-            $types->[$i] eq 'timestamp' )
-        {
-            if( $mode eq 'ARRAY' )
-            {
-                for( my $j = 0; $j < scalar( @$data ); $j++ )
-                {
-                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
-                    $data->[ $j ]->{ $names->[ $i ] } = $convert->( $data->[ $j ]->{ $names->[ $i ] } );
-                }
-            }
-            elsif( $mode eq 'HASH' )
-            {
-                next if( !$data->{ $names->[ $i ] } );
-                $data->{ $names->[ $i ] } = $convert->( $data->{ $names->[ $i ] } );
-            }
-        }
-    }
-    return( $data );
-}
-
-sub _convert_json2hash
-{
-    my $self = shift( @_ );
-    my $opts = $self->_get_args_as_hash( @_ );
-#     $self->debug( 3 );
-#     my( $pack, $file, $line ) = caller( 1 );
-#     my $sub = ( caller( 2 ) )[3];
-    # $data can be either hash pr array
-    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
-    my $data = $opts->{data};
-    my $names = $sth->FETCH('NAME');
-    my $types = $sth->FETCH('pg_type');
-    my $pg_types = $sth->{pg_type};
-    my $mode = ref( $data );
-    for( my $i = 0; $i < scalar( @$names ); $i++ )
-    {
-        if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
-        {
-            if( $self->_is_array( $data ) )
-            {
-                for( my $j = 0; $j < scalar( @$data ); $j++ )
-                {
-                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
-                    my $ref = $self->_decode_json( $data->[ $j ]->{ $names->[ $i ] } );
-                    $data->[ $j ]->{ $names->[ $i ] } = $ref if( $ref );
-                }
-            }
-            elsif( $self->_is_hash( $data => 'strict' ) )
-            {
-                my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
-                $data->{ $names->[ $i ] } = $ref if( $ref );
-            }
-        }
-    }
-    return( $data );
-}
-
 sub _dsn
 {
     my $self = shift( @_ );
@@ -1942,7 +1802,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.2.2
+    v1.3.0
 
 =head1 DESCRIPTION
 
@@ -2449,7 +2309,7 @@ In list context, it returns an array of schema lines, and in scalar context, it 
 
 See L<DB::Object::Postgres::Tables/on_conflict>
 
-=head2 for Pod::Coverage pg_notifies
+=for Pod::Coverage pg_notifies
 
 =head2 pg_ping
 

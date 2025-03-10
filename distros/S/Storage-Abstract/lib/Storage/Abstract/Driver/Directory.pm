@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Directory;
-$Storage::Abstract::Driver::Directory::VERSION = '0.006';
+$Storage::Abstract::Driver::Directory::VERSION = '0.007';
 use v5.14;
 use warnings;
 
@@ -31,7 +31,7 @@ has param 'create_directory' => (
 	default => !!0,
 );
 
-with 'Storage::Abstract::Role::Driver';
+with 'Storage::Abstract::Role::Driver::Basic';
 
 sub BUILD
 {
@@ -89,7 +89,7 @@ sub store_impl
 	open my $fh, '>:raw', $name
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 
-	$self->copy_handle($handle, $fh);
+	tied(*$handle)->copy($fh);
 
 	close $fh
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
@@ -114,7 +114,7 @@ sub retrieve_impl
 		);
 	}
 
-	return $self->open_handle($name);
+	return Storage::Abstract::Handle->adapt($name);
 }
 
 sub dispose_impl

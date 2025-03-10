@@ -1,6 +1,18 @@
 Revision history for App-DBBrowser
 
 
+2.424  2025-03-09
+        - Update aggregate mode.
+        - Bugfix SQLite, first_column_is_autoincrement: tablenames in sqlite_master are not qualified.
+        - Refactored ScalarFunctions.
+        - Improved info nested functions.
+        - New date functions.
+        - Different bugfixes.
+        - New sql options.
+        - Don not restrict 'On clause' operators.
+        - Limit and offset: each has its own sql-menu entry.
+        - Term::Choose minimum version 1.768.
+
 2.423  2025-01-27
         - Bugfix undefined data type.
         - Bugfix where clause: reset and/or connector.

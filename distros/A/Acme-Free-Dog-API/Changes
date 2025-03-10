@@ -6,3 +6,7 @@
 	- Maintenance release, fixed dist.ini and generated files
 	  to include Dispatch::Fu needed for the "fletch" client
 	  (included).
+
+0.9.10  Sun Mar  9 05:39:16 PM UTC 2025
+	- pinning prereq and dendencies to specific versions in an
+	  attempt to fix unexpected testing errors

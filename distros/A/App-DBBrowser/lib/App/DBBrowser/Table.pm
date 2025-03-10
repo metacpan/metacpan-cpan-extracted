@@ -34,29 +34,29 @@ sub new {
 
 
 sub browse_the_table {
-    my ( $sf, $sql, $build_SQ ) = @_; ##
+    my ( $sf, $sql, $return ) = @_; ##
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
     my $changed = {};
     my $hidden = 'Customize:';
-    my ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export ) =
+    my ( $print_table, $select, $distinct, $where, $group_by, $having, $order_by, $limit, $offset, $export ) =
        ( 'Print TABLE',
          '- SELECT',
-         '- AGGREGATE',
          '- DISTINCT',
          '- WHERE',
          '- GROUP BY',
          '- HAVING',
          '- ORDER BY',
          '- LIMIT',
+         '- OFFSET',
          '  Export',
     );
-    my @choices = ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export );
+    my @choices = ( $print_table, $select, $distinct, $where, $group_by, $having, $order_by, $limit, $offset, $export );
     my @pre = ( $hidden, undef );
-    my ( $return_statement, $hidden_print ) = ( 'Return the subquery', 'Your choice:' );
-    if ( $build_SQ ) {
+    my ( $return_statement, $hidden_print ) = ( 'CONFIRM', 'Your choice:' ); ##
+    if ( $return ) {
         $choices[0] = $return_statement;
         @pre = ( $hidden_print, undef );
     }
@@ -99,10 +99,6 @@ sub browse_the_table {
             my $ret = $sb->distinct( $sql );
             $changed->{$sub_stmt} = $ret;
         }
-        elsif ( $sub_stmt eq $aggregate ) {
-            my $ret = $sb->aggregate( $sql );
-            $changed->{$sub_stmt} = $ret;
-        }
         elsif ( $sub_stmt eq $where ) {
             my $ret = $sb->where( $sql );
             $changed->{$sub_stmt} = $ret;
@@ -120,7 +116,11 @@ sub browse_the_table {
             $changed->{$sub_stmt} = $ret;
         }
         elsif ( $sub_stmt eq $limit ) {
-            my $ret = $sb->limit_offset( $sql );
+            my $ret = $sb->limit( $sql );
+            $changed->{$sub_stmt} = $ret;
+        }
+        elsif ( $sub_stmt eq $offset ) {
+            my $ret = $sb->offset( $sql );
             $changed->{$sub_stmt} = $ret;
         }
         elsif ( $sub_stmt eq $hidden ) {
@@ -129,7 +129,9 @@ sub browse_the_table {
                 my $write = App::DBBrowser::Table::InsertUpdateDelete->new( $sf->{i}, $sf->{o}, $sf->{d} );
                 my $backup_sql = $ax->clone_data( $sql );
                 $write->table_write_access( $sql );
-                $sql = $backup_sql;
+                for my $key ( keys %$backup_sql ) { ##
+                    $sql->{$key} = $backup_sql->{$key};
+                }
                 1 }
             ) {
                 $ax->print_error_message( $@ );

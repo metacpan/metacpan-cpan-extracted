@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -17,19 +17,20 @@ my %WriteMakefileArgs = (
     "bin/ye"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Acme::Free::API::Ye",
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
     "JSON" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
   "TEST_REQUIRES" => {
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Test::More" => 0,
-    "Util::H2O::More" => "0.4.0"
+    "Util::H2O::More" => "0.4.2"
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +41,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "Test::More" => 0,
-  "Util::H2O::More" => "0.4.0"
+  "Util::H2O::More" => "0.4.2"
 );
 
 

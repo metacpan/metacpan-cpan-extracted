@@ -4,13 +4,12 @@ package local::bin::sendy;
 
 use v5.10;
 use strict;
-use warnings;
 
 use Dispatch::Fu;
 use Webservice::Sendy::API qw//;
 use Util::H2O::More        qw/ddd Getopt2h2o ini2h2o o2d/;
 
-our $VERSION = 0.7;
+my $VERSION = '0.8';
 
 use constant {
   EXIT_SUCCESS => 0,

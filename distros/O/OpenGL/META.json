@@ -4,13 +4,13 @@
       "Chris Marshall <chm at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.7106, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGL",
    "no_index" : {
@@ -30,7 +30,7 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "runtime" : {
+      "test" : {
          "requires" : {
             "Test::More" : "0"
          }
@@ -39,12 +39,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://sourceforge.net/tracker/?group_id=562483&atid=2281758"
+         "web" : "https://github.com/Perl-GPU/pogl/issues"
       },
       "homepage" : "http://sourceforge.net/projects/pogl/",
       "repository" : {
-         "url" : "git://pogl.git.sourceforge.net/gitroot/pogl/pogl"
-      }
+         "type" : "git",
+         "url" : "git://github.com/Perl-GPU/pogl.git",
+         "web" : "https://github.com/Perl-GPU/pogl"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pogl"
    },
-   "version" : "0.70"
+   "version" : "0.7002",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

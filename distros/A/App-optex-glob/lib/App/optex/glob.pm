@@ -1,6 +1,6 @@
 package App::optex::glob;
 
-our $VERSION = '0.01';
+our $VERSION = '1.01';
 
 use v5.14;
 use warnings;
@@ -12,20 +12,21 @@ use Hash::Util qw(lock_keys);
 use Text::Glob qw(glob_to_regex);
 use File::Basename qw(basename);
 
-my %opt = (
+use Getopt::EX::Config qw(config);
+my $config = Getopt::EX::Config->new(
     regex   => undef,
     path    => undef,
-    include => [],
-    exclude => [],
+    include => \my @include,
+    exclude => \my @exclude,
     debug   => undef,
 );
-lock_keys %opt;
+lock_keys %$config;
 
 use List::Util qw(pairmap);
 
 sub hash_to_spec {
     pairmap {
-	$a = "$a|${\(uc(substr($a, 0, 1)))}";
+	$a = "$a|${\(uc(substr($a,0,1)))}";
 	if    (not defined $b) { "$a"   }
 	elsif ($b =~ /^\d+$/)  { "$a=i" }
 	else                   { "$a=s" }
@@ -34,23 +35,26 @@ sub hash_to_spec {
 
 sub finalize {
     my($mod, $argv) = @_;
-    my $i = (first { $argv->[$_] eq '--' } keys @$argv) // return;
-    splice @$argv, $i, 1; # remove '--'
-    local @ARGV = splice @$argv, 0, $i or return;
-
-    use Getopt::Long qw(GetOptionsFromArray);
-    Getopt::Long::Configure qw(bundling);
-    GetOptions \%opt, hash_to_spec \%opt or die "Option parse error.\n";
-
-    push @{$opt{include}}, splice @ARGV;
-    return if @{$opt{include}} + @{$opt{exclude}} == 0;
+    $config->deal_with(
+	$argv,
+	hash_to_spec($config),
+	'<>' => sub {
+		    my $pattern = shift;
+		    if ($pattern =~ s/^!//) {
+			push @exclude, $pattern;
+		    } else {
+			push @include, $pattern;
+		    }
+		},
+    );
+    return if @include + @exclude == 0;
 
     my(@include_re, @exclude_re);
-    for ( [ \@include_re, $opt{include} ] ,
-	  [ \@exclude_re, $opt{exclude} ] ) {
+    for ( [ \@include_re, \@include ] ,
+	  [ \@exclude_re, \@exclude ] ) {
 	my($a, $b) = @$_;
 	@$a = do {
-	    if ($opt{regex}) {
+	    if (config('regex')) {
 		map qr/$_/, @$b;
 	    } else {
 		map glob_to_regex($_), @$b;
@@ -61,10 +65,10 @@ sub finalize {
     my $test = sub {
 	local $_ = shift;
 	-e or return 1;
-	$_ = basename($_) if not $opt{path};
+	$_ = basename($_) if not config('path');
 	for my $re (@exclude_re) { /$re/ and return 0 }
 	for my $re (@include_re) { /$re/ and return 1 }
-	return @include_re > 0 ? 0 : 1;
+	return @include_re == 0;
     };
 
     @$argv = grep $test->($_), @$argv;
@@ -95,17 +99,24 @@ Only existing file names will be selected.  Any arguments that do not
 correspond to files will be passed through as is.  In this example,
 the command name and options remain as they are because no
 corresponding file exists.  Be aware that the existence of a
-corresponding file could lead to confusing results.
+corresponding file for unexpected parameter could lead to confusing
+results.
 
 There are several unique options that are valid only for this module.
 
 =over 7
+
+=item B<!>I<pattern>
 
 =item B<--exclude> I<pattern>
 
 Option C<--exclude> will mean the opposite.
 
     optex -Mglob --exclude '*.c' -- ls */*
+
+Preceding pattern with C<!> will also exclude the pattern.
+
+    optex -Mglob '!*.c' -- ls */*
 
 If the C<--exclude> option is used with positive patterns, the exclude
 pattern takes precedence.  The following command selects files
@@ -135,7 +146,7 @@ the filename.
 
 You should also consider using the extended globbing (extglob) feature
 of L<bash(1)> or similar. For example, you can use C<!(*.EN).md>,
-which would specify files matching *.md minus those matching
+which would specify files matching C<*.md> minus those matching
 C<*.EN.md>.
 
 =head1 AUTHOR
@@ -144,7 +155,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

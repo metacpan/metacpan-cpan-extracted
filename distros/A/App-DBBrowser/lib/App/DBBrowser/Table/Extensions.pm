@@ -7,7 +7,8 @@ use 5.014;
 
 use List::MoreUtils qw( uniq );
 
-use Term::Choose qw();
+use Term::Choose         qw();
+use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subquery;                            # required
@@ -18,9 +19,10 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::Table::Extensions::ScalarFunctions;  # required
 #use App::DBBrowser::Table::Extensions::WindowFunctions;  # required
 
+
 my $e_const = 'Value';
-my $e_subquery = 'SQ';
-my $e_scalar_func = 'func()';
+my $e_subquery = 'SQL';
+my $e_scalar_func = 'scalar()';
 my $e_window_func = 'win()';
 my $e_case = 'case';
 my $e_math = 'math';
@@ -31,7 +33,7 @@ my $e_par_open = '(';
 my $e_par_close = ')';
 my $e_col_aliases = 'alias';
 my $e_skip_col = ''; # no length
-my $e_multi_col = 'mc'; ##
+my $e_multi_col = 'mc';
 
 
 sub new {
@@ -47,11 +49,12 @@ sub new {
 
 sub column {
     my ( $sf, $sql, $clause, $r_data, $opt ) = @_;
+    $r_data //= [];
     my $extensions = [];
     if ( $clause =~ /^(?:select|order_by)\z/i ) {
         # Window functions are permitted only in SELECT and ORDER BY
         $extensions = [ $e_subquery, $e_scalar_func, $e_window_func, $e_case, $e_math ];
-        if ( $clause eq 'select' ) {
+        if ( $clause eq 'select' && ! @$r_data ) {
             push @$extensions, $e_col_aliases;
         }
     }
@@ -59,7 +62,7 @@ sub column {
         $extensions = [ $e_subquery, $e_scalar_func, $e_case, $e_math ];
     }
     if ( $clause =~ /^where\z/i ) {
-        push @$extensions, $e_multi_col, $e_skip_col; ##
+        push @$extensions, $e_skip_col, $e_multi_col; ##
     }
     if ( $opt->{add_parentheses} ) {
         push @$extensions, $e_par_open, $e_par_close;
@@ -67,19 +70,20 @@ sub column {
     }
     if ( length $opt->{from} ) {
         # no recursion:
-        if ( $opt->{from} eq 'maths' ) {
-            $extensions = [ grep { ! /^\Q$e_math\E\z/ } @$extensions ];
-        }
-        elsif ( $opt->{from} eq 'window_function' ) {
+        if ( $opt->{from} eq 'window_function' ) {
             $extensions = [ grep { ! /^\Q$e_window_func\E\z/ } @$extensions ];
         }
     }
-    return $sf->__choose_extension( $sql, $clause, $r_data, 'column', $extensions, $opt );
+    #my $last_idx = $#$r_data;
+    my $ext_column = $sf->__choose_extension( $sql, $clause, $r_data, 'column', $extensions, $opt );
+    #die if $#$r_data != $last_idx;
+    return $ext_column;
 }
 
 
 sub value {
     my ( $sf, $sql, $clause, $r_data, $operator, $opt ) = @_;
+    $r_data //= [];
     my $ext_express = $sf->{o}{enable}{extended_values};
     my $extensions = [];
     if ( $ext_express ) {
@@ -107,21 +111,28 @@ sub value {
             $extensions = [ $e_const ];
         }
     }
-    return $sf->__choose_extension( $sql, $clause, $r_data, 'value', $extensions, $opt );
+    #my $last_idx = $#$r_data;
+    my $ext_value = $sf->__choose_extension( $sql, $clause, $r_data, 'value', $extensions, $opt );
+    #die if $#$r_data != $last_idx;
+    return $ext_value;
 }
 
 
 sub argument {
-    my ( $sf, $sql, $clause, $opt ) = @_;
+    my ( $sf, $sql, $clause, $r_data, $opt ) = @_;
+    $r_data //= [];
     my $ext_express = $sf->{o}{enable}{extended_args};
     my $extensions = [];
     if ( $ext_express ) {
-        $extensions = [ $e_const, $e_subquery, $e_scalar_func, $e_case, $e_math, $e_col ]; ##
+        $extensions = [ $e_const, $e_subquery, $e_scalar_func, $e_case, $e_math, $e_col ];
     }
     else {
         $extensions = [ $e_const ];
     }
-    return $sf->__choose_extension( $sql, $clause, {}, 'argument', $extensions, $opt );
+    #my $last_idx = $#$r_data;
+    my $ext_argument = $sf->__choose_extension( $sql, $clause, $r_data, 'argument', $extensions, $opt );
+    #die if $#$r_data != $last_idx;
+    return $ext_argument;
 }
 
 
@@ -152,26 +163,21 @@ sub __choose_extension {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $qt_cols; # in functions cols are used without aliases
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $cols; # in functions cols are used without aliases
     if ( $clause eq 'on' ) {
-        $qt_cols = [ @{$sql->{cols_join_condition}} ];
+        $cols = [ @{$sql->{cols_join_condition}} ];
     }
-    elsif ( $sql->{aggregate_mode} && $clause eq 'select' ) {
-        $qt_cols = [ @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
-    }
-    elsif ( $sql->{aggregate_mode} && $clause eq 'having' ) {
-        $qt_cols = [ uniq @{$sql->{aggr_cols}}, @{$sf->{i}{avail_aggr}} ];
-    }
-    elsif ( $sql->{aggregate_mode} && $clause eq 'order_by' ) {
-        $qt_cols = [ uniq @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sf->{i}{avail_aggr}} ];
+    elsif ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
+        $cols = [ uniq @{$sql->{selected_cols}}, @{$sql->{group_by_cols}}, @{$sf->{i}{avail_aggr}} ];
     }
     else {
-        $qt_cols = [ @{$sql->{columns}} ];
+        $cols = [ @{$sql->{columns}} ];
     }
     my $old_idx = 0;
 
     EXTENSION: while ( 1 ) {
-        my $info = $opt->{info} || $ax->get_sql_info( $sql );
+        my $info = $ax->get_sql_info( $sql ) . $sf->nested_func_info( $r_data );
         my $extension;
         #if ( @$extensions == 1 ) { ##
         #    $extension = $extensions->[0];
@@ -226,7 +232,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_subquery ) {
             require App::DBBrowser::Subquery;
             my $new_sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $subq = $new_sq->subquery( $sql );
+            my $subq = $new_sq->subquery( $sql, $info );
             if ( ! defined $subq ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -236,7 +242,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_scalar_func ) {
             require App::DBBrowser::Table::Extensions::ScalarFunctions;
             my $new_func = App::DBBrowser::Table::Extensions::ScalarFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $scalar_func_stmt = $new_func->col_function( $sql, $clause, $qt_cols, $r_data, $opt ); # recursion yes
+            my $scalar_func_stmt = $new_func->scalar_function( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $scalar_func_stmt ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -246,7 +252,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_window_func ) {
             require App::DBBrowser::Table::Extensions::WindowFunctions;
             my $wf = App::DBBrowser::Table::Extensions::WindowFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $win_func_stmt = $wf->window_function( $sql, $clause, $qt_cols, $opt );
+            my $win_func_stmt = $wf->window_function( $sql, $clause, $cols, $r_data );
             if ( ! defined $win_func_stmt ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -256,7 +262,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_case  ) {
             require App::DBBrowser::Table::Extensions::Case;
             my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $case_stmt = $new_cs->case( $sql, $clause, $qt_cols, $r_data, $opt ); # recursion yes
+            my $case_stmt = $new_cs->case( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $case_stmt ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -266,7 +272,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_math  ) {
             require App::DBBrowser::Table::Extensions::Maths;
             my $new_math = App::DBBrowser::Table::Extensions::Maths->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $arith = $new_math->maths( $sql, $clause, $qt_cols, $opt );
+            my $arith = $new_math->maths( $sql, $clause, $cols, $r_data );
             if ( ! defined $arith ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -276,7 +282,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_col ) {
             require App::DBBrowser::Table::Extensions::Columns;
             my $new_col = App::DBBrowser::Table::Extensions::Columns->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $col = $new_col->columns( $sql, $qt_cols );
+            my $col = $new_col->columns( $sql, $cols, $info );
             if ( ! defined $col ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -301,35 +307,99 @@ sub __choose_extension {
         elsif ( $extension eq $e_col_aliases  ) {
             require App::DBBrowser::Table::Extensions::ColAliases;
             my $new_ca = App::DBBrowser::Table::Extensions::ColAliases->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $col_aliases = $new_ca->column_aliases( $sql, $qt_cols );
+            if ( $sql->{aggregate_mode} ) {
+                $cols = [ @{$sql->{group_by_cols}} ];
+            }
+            my $col_aliases = $new_ca->column_aliases( $sql, $cols );
             if ( ! defined $col_aliases ) {
                 return if @$extensions == 1;
                 next EXTENSION;
             }
             return $col_aliases;
         }
-        elsif ( $extension eq $e_multi_col ) { ##
-            my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+        elsif ( $extension eq $e_multi_col ) {
             # Choose
-            my $cols = $tu->choose_a_subset(
-                $qt_cols,
+            my $chosen_cols = $tu->choose_a_subset(
+                $cols,
                 { info => $info, prompt => '', layout => 1, index => 0, all_by_default => 0,
                   cs_label => 'Columns: ', cs_begin => '(', cs_separator => ',', cs_end => ')' }
             );
             $ax->print_sql_info( $info );
-            if ( ! defined $cols ) {
+            if ( ! defined $chosen_cols ) {
                 return if @$extensions == 1;
                 next EXTENSION;
             }
-            return "(" . join( ",", @$cols ) . ")";
+            return "(" . join( ",", @$chosen_cols ) . ")";
         }
     }
 }
 
 
+sub nested_func_info {
+    my ( $sf, $r_data ) = @_;
+    if ( ! @$r_data ) {
+        return '';
+    }
+    my @copy = map { [ @$_ ] } @$r_data;
+    my $count_close = @copy;
+    my ( $func, $win, $math, $aggr, $case ) = qw(func win math aggr case);
+    my $last_type = '';
+    my $case_count = 0;
+    my $info = "\n";
+    for my $i ( 0 .. $#copy ) {
+        my $func_info = $copy[$i];
+        if ( $last_type eq $case ) {
+            $info .= ' ' ;
+        }
+        my $type = shift @$func_info;
+        if ( $type eq $func ) {
+            my $func = shift @$func_info;
+            $info .= "$func(" . join ',', @$func_info;
+            if ( $func =~ /^(?:CONCAT|COALESCE)/i && $i != $#copy ) {
+                $info .= ',';
+            }
+        }
+        elsif ( $type eq $win ) {
+            $count_close--;
+            my $win_func_stmt = shift @$func_info;
+            if ( ! length $win_func_stmt ) {
+                $last_type = $type;
+                next;
+            }
+            $info .= $win_func_stmt;
+        }
+        elsif ( $type eq $math ) {
+            $info .= "(" . join '', @$func_info;
+        }
+        elsif ( $type eq $aggr ) {
+            my ( $aggr, $distinct ) = @$func_info;
+            if ( $aggr ) {
+                $info .= $aggr . ( $distinct ? ' ' . $distinct : '' );
+            }
+        }
+        elsif ( $type eq $case ) {
+            $count_close--;
+            require App::DBBrowser::Table::Extensions::Case;
+            my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $case_stmt = $new_cs->format_case( $func_info, $case_count );
+            if ( length $last_type && $last_type ne $case ) {
+                $case_stmt =~ s/^\s+//;
+            }
+            $info =~ s/\s\z// if $last_type eq $case;
+            $info .= $case_stmt;
+        }
+        $last_type = $type;
+        $case_count = $type eq $case ? ++$case_count : 0;
+    }
+    return '' if $info eq "\n";
+    $info .= ' ... ' if $last_type !~ /^(?:$win|$case)\z/;
+    $info .= ')' x $count_close;
+    $info .= "\n" if $last_type eq $case;
+    return $info;
+}
+
 
 
 1;
-
 
 __END__

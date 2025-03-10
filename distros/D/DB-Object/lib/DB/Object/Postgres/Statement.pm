@@ -23,6 +23,7 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Statement DB::Object::Postgres );
     use vars qw( $VERSION $DEBUG );
+    use DBD::Pg ':pg_types';
     our $DEBUG = 0;
     our $VERSION = 'v0.302.0';
 };
@@ -207,6 +208,10 @@ sub dump
 # NOTE: sub fetchrow is inherited from DB::Object::Statement
 # sub fetchrow(@)
 
+# NOTE: field_types -> TYPE
+# <https://metacpan.org/pod/DBI#TYPE>
+sub field_types { return( shift->_get_statement_attribute( 'pg_type' ) ); }
+
 # NOTE: sub finish is inherited from DB::Object::Statement
 # sub finish
 
@@ -305,6 +310,98 @@ sub wait
     return( shift( @_ ) );
 }
 
+sub _convert_datetime2object
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
+    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    return( $opts->{data} ) if( !$sth->rows );
+    my $data  = $opts->{data};
+    # my $names = $sth->FETCH('NAME');
+    # my $types = $sth->FETCH('pg_type');
+    # Get the cached field names and types that we stored after executing the query, but before we finished reading the statement
+    my $names = $self->_cache_field_names;
+    my $types = $self->_cache_field_types;
+    my $mode = ref( $data );
+
+    for( my $i = 0; $i < scalar( @$names ); $i++ )
+    {
+        if( $types->[$i] eq PG_DATE || 
+            $types->[$i] eq PG_TIMESTAMP || 
+            $types->[$i] eq 'date' || 
+            $types->[$i] eq 'timestamp' )
+        {
+            if( $mode eq 'ARRAY' )
+            {
+                for( my $j = 0; $j < scalar( @$data ); $j++ )
+                {
+                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
+                    my $dt = $self->_convert_string2datetime( $data->[ $j ]->{ $names->[ $i ] } );
+                    if( !defined( $dt ) )
+                    {
+                        warn( $self->error );
+                    }
+                    $data->[ $j ]->{ $names->[ $i ] } = $dt;
+                }
+            }
+            elsif( $mode eq 'HASH' )
+            {
+                next if( !$data->{ $names->[ $i ] } );
+                my $dt = $self->_convert_string2datetime( $data->{ $names->[ $i ] } );
+                if( !defined( $dt ) )
+                {
+                    warn( $self->error );
+                }
+                $data->{ $names->[ $i ] } = $dt;
+            }
+        }
+    }
+    return( $data );
+}
+
+sub _convert_json2hash
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+#     $self->debug( 3 );
+#     my( $pack, $file, $line ) = caller( 1 );
+#     my $sub = ( caller( 2 ) )[3];
+    # $data can be either hash pr array
+    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
+    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    my $data = $opts->{data};
+    # my $names = $sth->FETCH('NAME');
+    # my $types = $sth->FETCH('pg_type');
+    my $names = $self->_cache_field_names;
+    my $types = $self->_cache_field_types;
+    my $mode = ref( $data );
+    for( my $i = 0; $i < scalar( @$names ); $i++ )
+    {
+        if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
+        {
+            if( $self->_is_array( $data ) )
+            {
+                for( my $j = 0; $j < scalar( @$data ); $j++ )
+                {
+                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
+                    my $ref = $self->_decode_json( $data->[ $j ]->{ $names->[ $i ] } );
+                    $data->[ $j ]->{ $names->[ $i ] } = $ref if( $ref );
+                }
+            }
+            elsif( $self->_is_hash( $data => 'strict' ) )
+            {
+                my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
+                $data->{ $names->[ $i ] } = $ref if( $ref );
+            }
+        }
+    }
+    return( $data );
+}
+
+# NOTE: DESTROY
 DESTROY
 {
     # Do nothing but existing so it is handled by this package
@@ -400,6 +497,8 @@ This will dump the result of the query to STDOUT or to a file if I<file> argumen
 It takes also a I<vsep>, which defaults to a command and a I<hsep> which defaults to a new line.
 
 It returns the current object.
+
+=for Pod::Coverage field_types
 
 =head2 ignore
 

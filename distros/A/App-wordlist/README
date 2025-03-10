@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from (or test them against) WordList::*
 
 VERSION
-    This document describes version 0.294 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2025-01-18.
+    This document describes version 0.295 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2025-03-07.
 
 SYNOPSIS
     See the included script wordlist.
@@ -250,138 +250,6 @@ FUNCTIONS
         (Acme::CPANModules::WordListBundle::*) modules.
 
     *   wordlists => *array[str]*
-
-        Select one or more wordlist modules.
-
-    Returns an enveloped result (an array).
-
-    First element ($status_code) is an integer containing HTTP-like status
-    code (200 means OK, 4xx caller error, 5xx function error). Second
-    element ($reason) is a string containing error message, or something
-    like "OK" if status is 200. Third element ($payload) is the actual
-    result, but usually not present when enveloped result is an error
-    response ($status_code is not 2xx). Fourth element (%result_meta) is
-    called result metadata and is optional, a hash that contains extra
-    information, much like how HTTP response headers provide additional
-    metadata.
-
-    Return value: (any)
-
-  wordlist_wordle
-    Usage:
-
-     wordlist_wordle(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-    Help solve Wordle.
-
-    Examples:
-
-    *   One guess:
-
-         wordlist_wordle(arg => ["cR^eEk"]);
-
-    *   Five guesses:
-
-         wordlist_wordle(arg => ["A^R^isE^", "Pound", "might", "blA^ck", "PR^ivY^"]);
-
-    This is a wrapper to wordlist designed to be a convenient helper to
-    solve Wordle puzzle. By default it greps from the "EN::Wordle" wordlist.
-    It accepts a series of guesses in a format like the following:
-
-     A^R^isE^
-     Pound
-     might
-     blA^ck
-     PR^ivY^
-
-    where lowercase means wrong guess, uppercase means correct letter and
-    position, while (uppercase) letter followed by a caret ("^") means the
-    letter exists in another position. It will convert these guesses to
-    regex patterns and the "--chars-unordered" option and pass it to
-    "wordlist".
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   arg => *array[str]*
-
-        (No description)
-
-    *   color => *str* (default: "auto")
-
-        When to highlight search string/matching pattern with color.
-
-    *   detail => *bool*
-
-        Display more information when listing modules/result.
-
-        When listing installed modules ("-l"), this means also returning a
-        wordlist's language.
-
-        When returning grep result, this means also returning wordlist name.
-
-    *   exclude_dynamic_wordlists => *bool*
-
-        (No description)
-
-    *   exclude_wordlist_pattern => *re_from_str*
-
-        (No description)
-
-    *   exclude_wordlists => *array[str]*
-
-        Exclude wordlist modules.
-
-    *   ignore_case => *bool* (default: 1)
-
-        (No description)
-
-    *   langs => *array[str]*
-
-        Only include wordlists of certain language(s).
-
-        By convention, language code is the first subnamespace of a wordlist
-        module, e.g. WordList::EN::* for English, WordList::FR::* for
-        French, and so on. Wordlist modules which do not follow this
-        convention (e.g. WordList::Password::* or WordList::PersonName::*)
-        are not included.
-
-    *   len => *int* (default: 5)
-
-        (No description)
-
-    *   max_len => *int*
-
-        (No description)
-
-    *   min_len => *int*
-
-        (No description)
-
-    *   num => *int* (default: 0)
-
-        Return (at most) this number of words (0 = unlimited).
-
-    *   or => *bool*
-
-        Instead of printing words that must match all queries (the default),
-        print words that match any query.
-
-    *   random => *bool*
-
-        Pick random words.
-
-        If set to true, then streaming will be turned off. All words will be
-        gathered first, then words will be chosen randomly from the gathered
-        list.
-
-    *   wordlist_bundles => *array[str]*
-
-        Select one or more wordlist bundle
-        (Acme::CPANModules::WordListBundle::*) modules.
-
-    *   wordlists => *array[str]* (default: ["EN::Wordle"])
 
         Select one or more wordlist modules.
 

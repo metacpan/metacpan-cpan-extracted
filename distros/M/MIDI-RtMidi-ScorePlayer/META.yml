@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtMidi-ScorePlayer
   repository: https://github.com/ology/MIDI-RtMidi-ScorePlayer.git
-version: '0.0301'
+version: '0.0303'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -218,9 +218,11 @@ x_Dist_Zilla:
             - DLSMusicDevice
             - FluidSynth
             - Garageband
+            - JBARRETT
             - TBH
             - distro
             - durations
+            - fuzzix
             - soundfont
             - "synch'd"
           wordlist: Pod::Wordlist

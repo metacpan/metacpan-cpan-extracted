@@ -1029,7 +1029,7 @@ glGetAttachedObjectsARB_p(containerObj)
 
 		EXTEND(sp, count);
 		for(i=0;i<count;i++)
-			PUSHs(sv_2mortal(newSViv(obj[i])));
+			PUSHs(sv_2mortal(newSViv((IV)obj[i])));
 
 		free(obj);
 	}

@@ -8,12 +8,14 @@
 /* Include prototype flag */
 #if (defined(_WIN32) || defined(HAVE_W32API))
 #define GL_GLEXT_PROCS
-#else
+#elif !defined(HAVE_AGL_GLUT)
 #define GL_GLEXT_PROTOTYPES
 #endif
 
 /* Provide GL header files for Windows and Apple */
-#define INCLUDE_LOCAL_HEADER defined(HAVE_W32API) || defined(__APPLE__)
+#if defined(HAVE_W32API) || defined(__APPLE__)
+#define INCLUDE_LOCAL_HEADER 1
+#endif
 #if INCLUDE_LOCAL_HEADER
 #include "./include/GL/gl.h"
 #else

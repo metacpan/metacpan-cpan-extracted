@@ -21,18 +21,24 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            base_indent          => 1,
-            file_find_warnings   => 0,
-            warnings_table_print => 1,
-            menu_memory          => 1,
-            metadata             => 0,
-            operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
-            plugins              => [ 'SQLite' ],
-            qualified_table_name => 0,
-            quote_tables         => 1,
-            quote_columns        => 1,
-            quote_aliases        => 0,
-            db2_encoding         => 'utf8',
+            base_indent           => 1,
+            file_find_warnings    => 0,
+            warnings_table_print  => 1,
+            menu_memory           => 1,
+            metadata              => 0,
+            operators             => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
+            plugins               => [ 'SQLite' ],
+
+            qualified_table_name  => 0,
+            quote_tables          => 1,
+            quote_columns         => 1,
+            quote_aliases         => 0,
+
+            limit_fetch_col_names => 1, ##
+            edit_sql_menu_sq      => 0,
+            pg_autocast           => 1,
+
+            db2_encoding          => 'utf8',
         },
         alias => {
             complex_cols_select => 0,

@@ -20,15 +20,21 @@ Only existing file names will be selected.  Any arguments that do not
 correspond to files will be passed through as is.  In this example,
 the command name and options remain as they are because no
 corresponding file exists.  Be aware that the existence of a
-corresponding file could lead to confusing results.
+corresponding file for unexpected parameter could lead to confusing
+results.
 
 There are several unique options that are valid only for this module.
 
+- **!**_pattern_
 - **--exclude** _pattern_
 
     Option `--exclude` will mean the opposite.
 
         optex -Mglob --exclude '*.c' -- ls */*
+
+    Preceding pattern with `!` will also exclude the pattern.
+
+        optex -Mglob '!*.c' -- ls */*
 
     If the `--exclude` option is used with positive patterns, the exclude
     pattern takes precedence.  The following command selects files
@@ -56,7 +62,7 @@ There are several unique options that are valid only for this module.
 
 You should also consider using the extended globbing (extglob) feature
 of [bash(1)](http://man.he.net/man1/bash) or similar. For example, you can use `!(*.EN).md`,
-which would specify files matching \*.md minus those matching
+which would specify files matching `*.md` minus those matching
 `*.EN.md`.
 
 # AUTHOR
@@ -65,7 +71,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2024 Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

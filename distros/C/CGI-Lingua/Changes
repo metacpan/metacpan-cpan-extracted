@@ -1,5 +1,8 @@
 Revision history for CGI-Lingua
 
+0.70	Sat Mar  8 10:59:48 EST 2025
+	Better support for CHI::Driver::Memory global
+
 0.69	Fri Mar  7 14:40:12 EST 2025
 	The US has no official language, but it's safe enough to fall back to en_US
 	Fix where to find the script name

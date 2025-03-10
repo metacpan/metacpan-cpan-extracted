@@ -1,9 +1,13 @@
 Revision history for Alien::libmaxminddb
 
+1.019  2025-03-08 20:32:45 CET
+
+  - Don't use Alien::Build::Plugin::Build::Autoconf as Path::Tiny may fail on
+    GitHub's Windows runner images.
+
 1.018  2025-03-07 06:27:17 CET
 
-  - Don't modify files with Path::Tiny.  GitHub's Windows runner images
-    suffer from file locking issues, which are exposed by Path::Tiny.
+  - Don't modify files with Path::Tiny.
 
 1.017  2025-03-06 17:43:56 CET
 

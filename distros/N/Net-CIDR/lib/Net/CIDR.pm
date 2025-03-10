@@ -1,6 +1,6 @@
 # Net::CIDR
 #
-# Copyright 2001-2021 Sam Varshavchik.
+# Copyright 2001-2025 Sam Varshavchik.
 #
 # with contributions from David Cantrell.
 #
@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.21";
+$VERSION = "0.22";
 
 1;
 
@@ -872,7 +872,7 @@ sub cidr2octets {
 
 	$cidr =~ s/\s//g;
 
-	croak "CIDR doesn't look like a CIDR\n" unless ($cidr =~ /(.*)\/(.*)/);
+	croak "CIDR \"$cidr\" doesn't look like a CIDR\n" unless ($cidr =~ /(.*)\/(.*)/);
 
 	my ($ip, $pfix)=($1, $2);
 
@@ -1010,7 +1010,7 @@ sub cidradd {
     my @b;
 
     grep {
-	croak "This doesn't look like start-end\n" unless /(.*)-(.*)/;
+	croak "Range $_ doesn't look like start-end\n" unless /(.*)-(.*)/;
 	push @a, $1;
 	push @b, $2;
     } @cidr;
@@ -1178,7 +1178,7 @@ sub cidrlookup {
     my @b;
 
     grep {
-	croak "This doesn't look like start-end\n" unless /(.*)-(.*)/;
+	croak "Range $_ doesn't look like start-end\n" unless /(.*)-(.*)/;
 	push @a, $1;
 	push @b, $2;
     } @cidr;
@@ -1217,6 +1217,29 @@ A technically invalid CIDR, such as "192.168.0.1/24" fails validation, returning
 undef.
 
 =cut
+
+sub _compress_ipv6 {
+    # taken from IPv6::Address on CPAN
+    my $str = shift;
+    return '::' if($str eq '0:0:0:0:0:0:0:0');
+    for(my $i=7;$i>1;$i--) {
+            my $zerostr = join(':',split('','0'x$i));
+            ###print "DEBUG: $str $zerostr \n";
+            if($str =~ /:$zerostr$/) {
+                    $str =~ s/:$zerostr$/::/;
+                    return $str;
+            }
+            elsif ($str =~ /:$zerostr:/) {
+                    $str =~ s/:$zerostr:/::/;
+                    return $str;
+            }
+            elsif ($str =~ /^$zerostr:/) {
+                    $str =~ s/^$zerostr:/::/;
+                    return $str;
+            }
+    }
+    return $str;
+}
 
 sub cidrvalidate {
     my $v=shift;
@@ -1297,9 +1320,10 @@ sub cidrvalidate {
 
     $v =~ s/([0-9A-Fa-f]+)/_triml0($1)/ge;
 
+	my $compressed = _compress_ipv6($v);
     foreach (addr2cidr($v))
     {
-	return $_ if $_ eq "$v/$suffix";
+	return $_ if $_ eq "$compressed/$suffix";
     }
     return undef;
 }

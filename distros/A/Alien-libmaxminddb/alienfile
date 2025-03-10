@@ -8,12 +8,13 @@ share {
   start_url 'https://github.com/maxmind/libmaxminddb/releases/download/1.12.2/libmaxminddb-1.12.2.tar.gz';
   plugin 'Download';
   plugin 'Extract' => 'tar.gz';
-  plugin 'Build::Autoconf';
+  plugin 'Build::MSYS';
   patch \&patch_build;
   build [
-    '%{configure} --disable-binaries --disable-tests --disable-shared',
+    'sh ./configure --prefix=%{.runtime.prefix} --disable-dependency-tracking '
+    . '--with-pic --disable-binaries --disable-tests --disable-shared',
     '%{make} man1_MANS= man3_MANS=',
-    '%{make} install man1_MANS= man3_MANS=',
+    '%{make} install prefix=%{.install.prefix} man1_MANS= man3_MANS=',
   ];
 };
 

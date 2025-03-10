@@ -46,12 +46,12 @@ sub join_tables {
     $sf->{d}{stmt_types} = [ 'Join' ];
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tables;
+    my $table_keys;
     if ( $sf->{o}{G}{metadata} ) {
-        $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     }
     else {
-        $tables = [ @{$sf->{d}{user_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}} ];
     }
     my ( $sql, $data );
     my $old_idx_master = 0;
@@ -64,7 +64,7 @@ sub join_tables {
             aliases => [],
             default_alias => 'a',
         };
-        my @choices = map { "- $_" } @$tables;
+        my @choices = map { "- $_" } @$table_keys;
         push @choices, $subquery_table if $sf->{o}{enable}{j_derived};
         push @choices, $cte_table      if $sf->{o}{enable}{j_cte};
         push @choices, $join_info;
@@ -86,40 +86,38 @@ sub join_tables {
             }
             $old_idx_master = $idx_master;
         }
-        my $master = $menu->[$idx_master];
-        if ( $master eq $join_info ) {
+        my $master_key = $menu->[$idx_master]; # $master_key_k,
+        if ( $master_key eq $join_info ) {
             $sf->__get_join_info();
             $sf->__print_join_info();
             next MASTER;
         }
-        my $qt_master;
-        if ( $master eq $subquery_table ) {
+        my $master;
+        if ( $master_key eq $subquery_table ) {
             my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->subquery( $sql );
             if ( ! defined $master ) {
                 next MASTER;
             }
-            $qt_master = $master;
         }
-        elsif ( $master eq $cte_table ) {
+        elsif ( $master_key eq $cte_table ) {
             my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->cte( $sql );
             if ( ! defined $master ) {
                 next MASTER;
             }
-            $qt_master = $master;
         }
         else {
-            $master =~ s/^-\s//;
-            $qt_master = $ax->qq_table( $sf->{d}{tables_info}{$master} );
+            $master_key =~ s/^-\s//;
+            $master = $ax->qq_table( $sf->{d}{tables_info}{$master_key} );
         }
         push @{$data->{used_tables}}, $master;
         $data->{default_alias} = 'a';
         # Alias
-        my $qt_master_alias = $ax->table_alias( $sql, 'tables_in_join', $qt_master, $data->{default_alias} );
-        push @{$data->{aliases}}, [ $master, $ax->unquote_identifier( $qt_master_alias ) ];
-        push @{$sql->{join_data}}, { table => $qt_master . " " . $qt_master_alias };
-        ( $data->{col_names}{$master}, undef ) = $ax->column_names_and_types( $qt_master . " " . $qt_master_alias );
+        my $master_alias = $ax->table_alias( $sql, 'tables_in_join', $master, $data->{default_alias} );
+        push @{$data->{aliases}}, [ $master, $master_alias ];
+        push @{$sql->{join_data}}, { table => $master . " " . $master_alias };
+        ( $data->{col_names}{$master}, undef ) = $ax->column_names_and_types( $master . " " . $master_alias );
         if ( ! defined $data->{col_names}{$master} ) {
             next MASTER;
         }
@@ -162,7 +160,7 @@ sub join_tables {
             $join_type =~ s/^-\s//;
             push @bu, $ax->clone_data( $data );
             push @{$sql->{join_data}}, { join_type => $join_type };
-            my $ok = $sf->__add_slave_with_join_condition( $sql, $data, $tables );
+            my $ok = $sf->__add_slave_with_join_condition( $sql, $data, $table_keys );
             if ( ! $ok ) {
                 $data = pop @bu;
                 pop @{$sql->{join_data}}
@@ -188,35 +186,37 @@ sub join_tables {
             #}                                ##
         }
     }
-    my $qt_columns = [];
-    my $qt_aliases = {};
+    my $columns = [];
+    my $aliases = {};
     for my $table ( @{$data->{used_tables}} ) {
         for my $table_alias ( @{$aliases_hash->{$table}} ) {
             for my $col ( @{$data->{col_names}{$table}} ) {
-                my $col_qt = $ax->qualified_identifier( $ax->quote_alias( $table_alias ), $ax->quote_column( $col ) );
-                if ( any { $_ eq $col_qt } @$qt_columns ) {
+                my $qq_col = $ax->qualified_identifier( $table_alias, $col );
+                if ( any { $_ eq $qq_col } @$columns ) {
                     next;
                 }
                 if ( $sf->{o}{alias}{join_columns} && $col_names{lc $col} > 1 ) {
-                    my $qt_alias = $ax->alias( $sql, 'join_columns', $col_qt, $table_alias . '_' . $col );
-                    if ( length $qt_alias ) {
-                        $qt_aliases->{$col_qt} = $qt_alias;
+                    my $unquoted_table_alias = $ax->unquote_identifier( $table_alias );
+                    my $unquoted_col = $ax->unquote_identifier( $col );
+                    my $alias = $ax->alias( $sql, 'join_columns', $qq_col, $unquoted_table_alias . '_' . $unquoted_col );
+                    if ( length $alias ) {
+                        $aliases->{$qq_col} = $alias;
                     }
                 }
-                push @$qt_columns, $col_qt;
+                push @$columns, $qq_col;
             }
         }
     }
-    my $qt_table = $ax->get_stmt( $sql, 'Join', 'prepare' );
-    return $qt_table, $qt_columns, $qt_aliases;
+    my $table = $ax->get_stmt( $sql, 'Join', 'prepare' );
+    return $table, $columns, $aliases;
 }
 
 
 sub __add_slave_with_join_condition {
-    my ( $sf, $sql, $data, $tables ) = @_;
+    my ( $sf, $sql, $data, $table_keys ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @choices = map { '- '. $_ } @$tables;
+    my @choices = map { '- '. $_ } @$table_keys;
     push @choices, $subquery_table if $sf->{o}{enable}{j_derived};
     push @choices, $cte_table     if $sf->{o}{enable}{j_cte};
     push @choices, $join_info;
@@ -248,35 +248,33 @@ sub __add_slave_with_join_condition {
             $sf->__print_join_info();
             next SLAVE;
         }
-        my $slave = $menu->[$idx_slave];
+        my $slave_key = $menu->[$idx_slave]; # $slave_key_k
         my $bu_data = $ax->clone_data( $data );
-        my $qt_slave;
-        if ( $slave eq $subquery_table ) {
+        my $slave;
+        if ( $slave_key eq $subquery_table ) {
             my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->subquery( $sql );
             if ( ! defined $slave ) {
                 next SLAVE;
             }
-            $qt_slave = $slave;
         }
-        elsif ( $slave eq $cte_table ) {
+        elsif ( $slave_key eq $cte_table ) {
             my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->cte( $sql );
             if ( ! defined $slave ) {
                 next SLAVE;
             }
-            $qt_slave = $slave;
         }
         else {
-            $slave =~ s/^-\s//;
-            $qt_slave = $ax->qq_table( $sf->{d}{tables_info}{$slave} );
+            $slave_key =~ s/^-\s//;
+            $slave = $ax->qq_table( $sf->{d}{tables_info}{$slave_key} );
         }
-        push @{$data->{used_tables}}, $slave;
+        push @{$data->{used_tables}}, $slave; # $slave
         # Alias
-        my $qt_slave_alias = $ax->table_alias( $sql, 'tables_in_join', $qt_slave, ++$data->{default_alias} );
-        $sql->{join_data}[-1]{table} = $qt_slave . " " . $qt_slave_alias;
-        push @{$data->{aliases}}, [ $slave, $ax->unquote_identifier( $qt_slave_alias ) ];
-        ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $qt_slave . " " . $qt_slave_alias );
+        my $slave_alias = $ax->table_alias( $sql, 'tables_in_join', $slave, ++$data->{default_alias} );
+        $sql->{join_data}[-1]{table} = $slave . " " . $slave_alias;
+        push @{$data->{aliases}}, [ $slave, $slave_alias ];
+        ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $slave . " " . $slave_alias );
         if ( ! defined $data->{col_names}{$slave} ) {
             $sf->__reset_to_backuped_join_data( $sql, $data, $bu_data );
             next SLAVE;
@@ -317,10 +315,7 @@ sub __add_join_condition {
     for my $used_table ( uniq @{$data->{used_tables}} ) {           # self join: a table name is used more than once
         for my $table_alias ( @{$aliases_hash->{$used_table}} ) {   # self join: a table has more than one alias
             for my $col ( @{$data->{col_names}{$used_table}} ) {
-                push @$cols_join_condition, $ax->qualified_identifier(
-                    $ax->quote_alias( $table_alias ),
-                    $ax->quote_column( $col )
-                );
+                push @$cols_join_condition, $ax->qualified_identifier( $table_alias, $col );
             }
         }
     }
@@ -366,35 +361,35 @@ sub __get_join_info {
     my ( $sf ) = @_;
     return if $sf->{d}{pk_info};
     my $td = $sf->{d}{tables_info};
-    my $tables;
+    my $table_keys;
     if ( $sf->{o}{G}{metadata} ) {
-        $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     }
     else {
-        $tables = [ @{$sf->{d}{user_table_keys}} ];
+        $table_keys = [ @{$sf->{d}{user_table_keys}} ];
     }
     my $pk = {};
-    for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table}}[0..2] );
+    for my $table_key ( @$table_keys ) {
+        my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table_key}}[0..2] );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
-            #$pk->{$table}{TABLE_SCHEM} =        $ref->{TABLE_SCHEM};
-            $pk->{$table}{TABLE_NAME}  =        $ref->{TABLE_NAME};
-            push @{$pk->{$table}{COLUMN_NAME}}, $ref->{COLUMN_NAME};
-            #push @{$pk->{$table}{KEY_SEQ}},     $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
+            #$pk->{$table_key}{TABLE_SCHEM} =        $ref->{TABLE_SCHEM};
+            $pk->{$table_key}{TABLE_NAME}  =        $ref->{TABLE_NAME};
+            push @{$pk->{$table_key}{COLUMN_NAME}}, $ref->{COLUMN_NAME};
+            #push @{$pk->{$table_key}{KEY_SEQ}},     $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
         }
     }
     my $fk = {};
-    for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->foreign_key_info( @{$td->{$table}}[0..2], undef, undef, undef );
+    for my $table_key ( @$table_keys ) {
+        my $sth = $sf->{d}{dbh}->foreign_key_info( @{$td->{$table_key}}[0..2], undef, undef, undef );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
-            #$fk->{$table}{FKTABLE_SCHEM} =        $ref->{FKTABLE_SCHEM} // $ref->{FK_TABLE_SCHEM};
-            $fk->{$table}{FKTABLE_NAME}  =        $ref->{FKTABLE_NAME} // $ref->{FK_TABLE_NAME};
-            push @{$fk->{$table}{FKCOLUMN_NAME}}, $ref->{FKCOLUMN_NAME} // $ref->{FK_COLUMN_NAME};
-            #push @{$fk->{$table}{KEY_SEQ}},       $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
+            #$fk->{$table_key}{FKTABLE_SCHEM} =        $ref->{FKTABLE_SCHEM} // $ref->{FK_TABLE_SCHEM};
+            $fk->{$table_key}{FKTABLE_NAME}  =        $ref->{FKTABLE_NAME} // $ref->{FK_TABLE_NAME};
+            push @{$fk->{$table_key}{FKCOLUMN_NAME}}, $ref->{FKCOLUMN_NAME} // $ref->{FK_COLUMN_NAME};
+            #push @{$fk->{$table_key}{KEY_SEQ}},       $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
         }
     }
     $sf->{d}{pk_info} = $pk;

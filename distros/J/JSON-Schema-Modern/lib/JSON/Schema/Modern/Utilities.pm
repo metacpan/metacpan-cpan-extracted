@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.603';
+our $VERSION = '0.605';
 
 use 5.020;
 use strictures 2;
@@ -422,11 +422,11 @@ sub assert_uri_reference ($state, $schema) {
   return E($state, '%s value is not a valid URI reference', $state->{keyword})
     # see also uri-reference format sub
     if fc(Mojo::URL->new($string)->to_unsafe_string) ne fc($string)
-      or $string =~ /[^[:ascii:]]/
-      or $string =~ /#/
-        and $string !~ m{#$}                          # empty fragment
-        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
-        and $string !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
+      or $string =~ /[^[:ascii:]]/            # ascii characters only
+      or $string =~ /#/                       # no fragment, except...
+        and $string !~ m{#$}                          # allow empty fragment
+        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # allow plain-name fragment
+        and $string !~ m{#/(?:[^~]|~[01])*$};         # allow json pointer fragment
 
   return 1;
 }
@@ -478,7 +478,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.603
+version 0.605
 
 =head1 SYNOPSIS
 
