@@ -10,7 +10,7 @@ Image::Magick::Safer - Wrap Image::Magick Read method to check magic bytes
 
 =head1 VERSION
 
-0.07
+0.08
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,7 @@ The default MIME types considered unsafe are as follows:
 	application/x-rar
 	application/x-z
 	application/z
+    image/x-mvg
 
 Leading pipes are also considered unsafe, as well as any reference to files
 that cannot be found.
@@ -84,7 +85,7 @@ use warnings;
 use parent 'Image::Magick';
 use File::LibMagic;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # imagemagick can automatically uncompress archive files so there's another
 # attack vector in having an exploit image zipped up, so just checking for
@@ -101,6 +102,7 @@ $Image::Magick::Safer::Unsafe = {
 		'application/x-rar',
 		'application/x-z',
 		'application/z',
+		'image/x-mvg',
 };
 
 my $magic;

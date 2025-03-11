@@ -1,5 +1,19 @@
 Revision history for MIDI-RtController
 
+0.0404 2025-03-10 19:16:31
+    - Improve documentation yet again.
+
+0.0403 2025-03-10 18:43:09
+    - Improve documentation again.
+
+0.0402 2025-03-10 18:24:06
+    - Improve documentation.
+
+0.0401 2025-03-10 14:10:53
+    - JBARRETT implemented the "all" event type.
+    - Clean-up code a bit, too.
+    - Updated the eg/ code a bit too.
+
 0.0400 2025-03-09 05:21:43
     - Detect and pass the event delta-time to the filters.
 

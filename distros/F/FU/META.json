@@ -4,7 +4,7 @@
       "Yorhel <projects@yorhel.nl>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -17,9 +17,6 @@
       "directory" : [
          "t",
          "inc"
-      ],
-      "file" : [
-         "bench.PL"
       ]
    },
    "prereqs" : {
@@ -42,12 +39,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
+         "mailto" : "projects@yorhel.nl",
          "web" : "https://code.blicky.net/yorhel/fu/issues"
       },
       "repository" : {
-         "url" : "https://code.blicky.net/yorhel/fu"
+         "type" : "git",
+         "web" : "https://code.blicky.net/yorhel/fu"
       }
    },
-   "version" : "0.2",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

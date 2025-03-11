@@ -2,19 +2,17 @@
 
 =head1 NAME
 
-DBIx::Migration::CLI - Seamless database up- and downgrades CLI
+DBIx::Migration::CLI - Seamless database schema up- and downgrades CLI
 
 =head1 VERSION
 
-0.19
+0.20
 
 =head1 SYNOPSIS
 
 =over
 
-=item dbix-migration [ B<-V> | B<-h> ]
-
-=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] [ B<-s> I<schema> ] [ B<-t> I<schema> ] I<dsn> [ I<directory> [ I<version> ] ]
+=item dbix-migration [ I<OPTIONS> ] I<dsn> [ I<directory> [ I<version> ] ]
 
 =back
 
@@ -33,7 +31,7 @@ the I<version> is missing the latest migration version will be used.
 
 =item B<-h> Print long help message and exit.
 
-=item B<-v> Print verbose information.
+=item B<-v> Print verbose information to stderr.
 
 =item B<-u> I<username> Set database username.
 
@@ -42,6 +40,8 @@ the I<version> is missing the latest migration version will be used.
 =item B<-s> I<schema> Set managed schema.
 
 =item B<-t> I<schema> Set tracking schema.
+
+=item B<-T> I<table> Set tracking table.
 
 =back
 

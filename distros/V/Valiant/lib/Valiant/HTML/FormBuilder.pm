@@ -324,11 +324,7 @@ sub errors_for {
     $options->{always_array} = 1 unless exists($options->{always_array});
   }
 
-  return '' unless $self->model->can('errors');
-
   my @errors = $self->tag_errors_for_attribute($attribute);
-
-  #my @errors = $self->model->errors->full_messages_for($attribute);
   return '' if scalar(@errors) == 0 && !$show_empty;
   
   my $max_errors = exists($options->{max_errors}) ? delete($options->{max_errors}) : undef;
@@ -1412,6 +1408,10 @@ to control the behavior of what happens when you try to access a model attribute
 =head2 tag_errors_for_attribute
 
 Given an attribute return an array of error messages for that attribute if any.
+This calls C<field_errors> on the FormTags object.  For this to work you either
+need a model that responds to C<read_attribute_errors_for> (which tasks a single
+attribute name and returns an array of error messages) or the model has an 
+C<errors> method that returns a L<Valiant::Errors> object.
 
 =head2 tag_value_for_attribute
 
@@ -1657,6 +1657,11 @@ is too short", "First Name contains non alphabetic characters".
       join " | ", @errors;
     });
     # First Name is too short (minimum is 3 characters) | First Name contains non alphabetic characters
+
+B<NOTE>For this to work the model must either respond to C<read_attribute_errors_for> (which 
+tasks a single attribute name and returns an array of error messages) or the model has an
+C<errors> method that returns a L<Valiant::Errors> object.  If the model does neither then this
+will always return an empty string.
 
 =head2 input
 

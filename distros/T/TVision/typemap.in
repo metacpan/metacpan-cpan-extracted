@@ -17,6 +17,7 @@
     TFrame
     TEditWindow
     TView
+    TColorSelector
     TInputLine
     TLabel
     TStaticText
@@ -55,13 +56,17 @@ O_TButton
 =cut
 ''}}}
 TYPEMAP
+ColorSel ColorSel
 TRect O_TRect
 TPoint O_TPoint
+TKey O_TKey
 {{{
 join '', map {"$_*  O_$_\n"} @tclasses;
 }}}
 
 INPUT
+ColorSel
+    SvIV($arg) == 0 ? TColorSelector::csBackground : TColorSelector::csForeground;
 O_TRect
     AV *_av = (AV*) SvRV($arg);
     SV** _f0 = av_fetch(_av, 0, 0);
@@ -79,6 +84,17 @@ O_TPoint
 	croak(\"self[0] does not contain tvision object\");
     $var.x = SvIV(*_f0);
     $var.y = SvIV(*_f1);
+O_TKey
+    if (SvTYPE($arg) == SVt_IV)
+	$var = TKey(SvIV($arg));
+    else {
+	AV *_av = (AV*) SvRV($arg);
+	SV** _f0 = av_fetch(_av, 0, 0);
+	SV** _f1 = av_fetch(_av, 1, 0);
+	if (!_f0 || !_f1)
+	    croak(\"self[0] does not contain tvision object\");
+	$var = TKey(SvIV(*_f0), SvIV(*_f1));
+    }
 {{{
 join '', map {<<"EOS"} @tclasses;
 O_$_
@@ -111,6 +127,16 @@ O_TPoint
     av_store(_self, 1, newSViv($var.y));
     $arg = newRV_inc((SV*) _self);
     sv_bless($arg, gv_stashpv("TVision::TPoint", GV_ADD));
+O_TKey
+    if ($var.mods == 0) {
+	$arg = newSViv($var.code);
+    } else {
+	AV *_self = newAV();
+	av_store(_self, 0, newSViv($var.code));
+	av_store(_self, 1, newSViv($var.mods));
+	$arg = newRV_inc((SV*) _self);
+	sv_bless($arg, gv_stashpv("TVision::TKey", GV_ADD));
+    }
 {{{
 join '', map {"O_$_\n" . <<'EOS' . ($_ eq 'TButton'?<<'EOS':'')} @tclasses;
     AV *self = newAV();

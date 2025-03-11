@@ -17,6 +17,7 @@ FU.xs
 FU/Benchmarks.pod
 FU/DebugImpl.pm
 FU/Log.pm
+FU/MultipartFormData.pm
 FU/Pg.pm
 FU/SQL.pm
 FU/Util.pm
@@ -32,7 +33,9 @@ t/fdpass.t
 t/httpdate.t
 t/json_format.t
 t/json_parse.t
+t/multipart.t
 t/pgconnect.t
+t/pgcopy.t
 t/pgtypes-dynamic.t
 t/pgtypes.t
 t/query.t

@@ -1,3 +1,16 @@
+0.3 - 2025-03-10
+	- FU::Validate: Change API, ->validate() now returns data or throws error on failure
+	- FU::Validate: Rename 'rmwhitespace' to 'trim'
+	- FU::Validate: Support (more) human-readable error messages
+	- FU::Pg: Add support for COPY operations
+	- FU::Pg: Support types with dynamic OIDs
+	- FU: Add support for reading multipart/form-data
+	- FU: Add convenience methods for reading and writing JSON
+	- FU: Fix error in handling a 400
+	- FU::MultipartFormData: New helper module
+	- Fix some tests
+	- Some doc improvements
+
 0.2 - 2025-02-28
 	- FU: Add debug_info web interface
 	- FU: Add fu->denied and fu->notfound methods

@@ -1,8 +1,8 @@
-package FU::Validate 0.2;
+package FU::Validate 0.3;
 
 use v5.36;
 use experimental 'builtin', 'for_list';
-use builtin qw/true false blessed/;
+use builtin qw/true false blessed trim/;
 use Carp 'confess';
 use FU::Util 'to_bool';
 
@@ -12,7 +12,7 @@ my %builtin = map +($_,1), qw/
     type
     default
     onerror
-    rmwhitespace
+    trim
     values scalar sort unique
     keys unknown missing
     func
@@ -102,7 +102,7 @@ sub _compile($schema, $validations, $rec) {
     my @keys = keys $schema->{keys}->%* if $schema->{keys};
 
     for my($name, $val) (%$schema) {
-        if($builtin{$name}) {
+        if ($builtin{$name}) {
             $top{$name} = $schema->{$name};
             next;
         }
@@ -125,12 +125,12 @@ sub _compile($schema, $validations, $rec) {
 
     # Inherit some builtin options from validations
     for my $t (@val) {
-        if($top{type} && $t->{schema}{type} && $top{type} ne $t->{schema}{type}) {
+        if ($top{type} && $t->{schema}{type} && $top{type} ne $t->{schema}{type}) {
             confess "Incompatible types, the schema specifies '$top{type}' but validation '$t->{name}' requires '$t->{schema}{type}'" if $schema->{type};
             confess "Incompatible types, '$t->[0]' requires '$t->{schema}{type}', but another validation requires '$top{type}'";
         }
         exists $t->{schema}{$_} and !exists $top{$_} and $top{$_} = delete $t->{schema}{$_}
-            for qw/default onerror rmwhitespace type scalar unknown missing sort unique/;
+            for qw/default onerror trim type scalar unknown missing sort unique/;
 
         push @keys, keys %{ delete $t->{known_keys} };
         push @keys, keys %{ $t->{schema}{keys} } if $t->{schema}{keys};
@@ -155,7 +155,7 @@ sub compile($pkg, $schema, $validations={}) {
 
     $c->{schema}{type} //= 'scalar';
     $c->{schema}{missing} //= 'create';
-    $c->{schema}{rmwhitespace} //= 1 if $c->{schema}{type} eq 'scalar';
+    $c->{schema}{trim} //= 1 if $c->{schema}{type} eq 'scalar';
     $c->{schema}{unknown} //= 'remove' if $c->{schema}{type} eq 'hash';
 
     confess "Invalid value for 'type': $c->{schema}{type}" if !$type_vals{$c->{schema}{type}};
@@ -164,7 +164,7 @@ sub compile($pkg, $schema, $validations={}) {
 
     delete $c->{schema}{default} if ref $c->{schema}{default} eq 'SCALAR' && ${$c->{schema}{default}} eq 'required';
 
-    if(exists $c->{schema}{sort}) {
+    if (exists $c->{schema}{sort}) {
         my $s = $c->{schema}{sort};
         $c->{schema}{sort} =
             ref $s eq 'CODE' ? $s
@@ -178,186 +178,186 @@ sub compile($pkg, $schema, $validations={}) {
 }
 
 
-sub _validate_rec($c, $input) {
+sub _validate_rec {
+    my $c = $_[0];
+
     # hash keys
-    if($c->{schema}{keys}) {
+    if ($c->{schema}{keys}) {
         my @err;
         for my ($k, $s) ($c->{schema}{keys}->%*) {
-            if(!exists $input->{$k}) {
+            if (!exists $_[1]{$k}) {
                 next if $s->{schema}{missing} eq 'ignore';
-                return [$input, { validation => 'missing', key => $k }] if $s->{schema}{missing} eq 'reject';
-                $input->{$k} = ref $s->{schema}{default} eq 'CODE' ? $s->{schema}{default}->() : $s->{schema}{default} // undef;
+                return { validation => 'missing', key => $k } if $s->{schema}{missing} eq 'reject';
+                $_[1]{$k} = ref $s->{schema}{default} eq 'CODE' ? $s->{schema}{default}->() : $s->{schema}{default} // undef;
                 next if exists $s->{schema}{default};
             }
 
-            my $r = _validate($s, $input->{$k});
-            $input->{$k} = $r->[0];
-            if($r->[1]) {
-                $r->[1]{key} = $k;
-                push @err, $r->[1];
+            my $r = _validate($s, $_[1]{$k});
+            if ($r) {
+                $r->{key} = $k;
+                push @err, $r;
             }
         }
-        return [$input, { validation => 'keys', errors => \@err }] if @err;
+        return { validation => 'keys', errors => \@err } if @err;
     }
 
     # array values
-    if($c->{schema}{values}) {
+    if ($c->{schema}{values}) {
         my @err;
-        for my $i (0..$#$input) {
-            my $r = _validate($c->{schema}{values}, $input->[$i]);
-            $input->[$i] = $r->[0];
-            if($r->[1]) {
-                $r->[1]{index} = $i;
-                push @err, $r->[1];
+        for my $i (0..$#{$_[1]}) {
+            my $r = _validate($c->{schema}{values}, $_[1][$i]);
+            if ($r) {
+                $r->{index} = $i;
+                push @err, $r;
             }
         }
-        return [$input, { validation => 'values', errors => \@err }] if @err;
+        return { validation => 'values', errors => \@err } if @err;
     }
 
     # validations
     for ($c->{validations}->@*) {
-        my $r = _validate_rec($_, $input);
-        $input = $r->[0];
-
-        return [$input, {
+        my $r = _validate_rec($_, $_[1]);
+        return {
             # If the error was a custom 'func' object, then make that the primary cause.
             # This makes it possible for validations to provide their own error objects.
-            $r->[1]{validation} eq 'func' && (!exists $r->[1]{result} || keys $r->[1]->%* > 2) ? $r->[1]->%* : (error => $r->[1]),
+            $r->{validation} eq 'func' && (!exists $r->{result} || keys $r->%* > 2) ? $r->%* : (error => $r),
             validation => $_->{name},
-        }] if $r->[1];
+        } if $r;
     }
 
     # func
-    if($c->{schema}{func}) {
-        my $r = $c->{schema}{func}->($input);
-        return [$input, { %$r, validation => 'func' }] if ref $r eq 'HASH';
-        return [$input, { validation => 'func', result => $r }] if !$r;
+    if ($c->{schema}{func}) {
+        my $r = $c->{schema}{func}->($_[1]);
+        return { %$r, validation => 'func' } if ref $r eq 'HASH';
+        return { validation => 'func', result => $r } if !$r;
     }
-
-    return [$input]
 }
 
 
-sub _validate_array($c, $input) {
-    return [$input] if $c->{schema}{type} ne 'array';
+sub _validate_array {
+    my $c = $_[0];
+    return if $c->{schema}{type} ne 'array';
 
-    $input = [sort { $c->{schema}{sort}->($a, $b) } @$input ] if $c->{schema}{sort};
+    $_[1] = [sort { $c->{schema}{sort}->($a, $b) } $_[1]->@* ] if $c->{schema}{sort};
 
     # Key-based uniqueness
-    if($c->{schema}{unique} && ref $c->{schema}{unique} eq 'CODE') {
+    if ($c->{schema}{unique} && ref $c->{schema}{unique} eq 'CODE') {
         my %h;
-        for my $i (0..$#$input) {
-            my $k = $c->{schema}{unique}->($input->[$i]);
-            return [$input, { validation => 'unique', index_a => $h{$k}, value_a => $input->[$h{$k}], index_b => $i, value_b => $input->[$i], key => $k }] if exists $h{$k};
+        for my $i (0..$#{$_[1]}) {
+            my $k = $c->{schema}{unique}->($_[1][$i]);
+            return { validation => 'unique', index_a => $h{$k}, value_a => $_[1][$h{$k}], index_b => $i, value_b => $_[1][$i], key => $k } if exists $h{$k};
             $h{$k} = $i;
         }
 
     # Comparison-based uniqueness
-    } elsif($c->{schema}{unique}) {
-        for my $i (0..$#$input-1) {
-            return [$input, { validation => 'unique', index_a => $i, value_a => $input->[$i], index_b => $i+1, value_b => $input->[$i+1] }]
-                if $c->{schema}{sort}->($input->[$i], $input->[$i+1]) == 0
+    } elsif ($c->{schema}{unique}) {
+        for my $i (0..$#{$_[1]}-1) {
+            return { validation => 'unique', index_a => $i, value_a => $_[1][$i], index_b => $i+1, value_b => $_[1][$i+1] }
+                if $c->{schema}{sort}->($_[1][$i], $_[1][$i+1]) == 0
         }
     }
-
-    return [$input]
 }
 
 
-sub _validate_input($c, $input) {
-    # rmwhitespace (needs to be done before the 'default' test)
-    if(defined $input && !ref $input && $c->{schema}{type} eq 'scalar' && $c->{schema}{rmwhitespace}) {
-        $input =~ s/\r//g;
-        $input =~ s/^\s*//;
-        $input =~ s/\s*$//;
-    }
+sub _validate_input {
+    my $c = $_[0];
+
+    # trim (needs to be done before the 'default' test)
+    $_[1] = trim $_[1] =~ s/\r//rg if defined $_[1] && !ref $_[1] && $c->{schema}{type} eq 'scalar' && $c->{schema}{trim};
 
     # default
-    if(!defined $input || (!ref $input && $input eq '')) {
-        return [ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($input) : $c->{schema}{default}] if exists $c->{schema}{default};
-        return [$input, { validation => 'required' }];
+    if (!defined $_[1] || (!ref $_[1] && $_[1] eq '')) {
+        if (exists $c->{schema}{default}) {
+            $_[1] = ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($_[1]) : $c->{schema}{default};
+            return;
+        }
+        return { validation => 'required' };
     }
 
-    if($c->{schema}{type} eq 'scalar') {
-        return [$input, { validation => 'type', expected => 'scalar', got => lc ref $input }] if ref $input;
+    if ($c->{schema}{type} eq 'scalar') {
+        return { validation => 'type', expected => 'scalar', got => lc ref $_[1] } if ref $_[1];
 
-    } elsif($c->{schema}{type} eq 'hash') {
-        return [$input, { validation => 'type', expected => 'hash', got => lc ref $input || 'scalar' }] if ref $input ne 'HASH';
+    } elsif ($c->{schema}{type} eq 'hash') {
+        return { validation => 'type', expected => 'hash', got => lc ref $_[1] || 'scalar' } if ref $_[1] ne 'HASH';
 
         # Each branch below makes a shallow copy of the hash, so that further
         # validations can perform in-place modifications without affecting the
         # input.
-        if($c->{schema}{unknown} eq 'remove') {
-            $input = { map +($_, $input->{$_}), grep $c->{known_keys}{$_}, keys %$input };
-        } elsif($c->{schema}{unknown} eq 'reject') {
-            my @err = grep !$c->{known_keys}{$_}, keys %$input;
-            return [$input, { validation => 'unknown', keys => \@err, expected => [ sort keys %{$c->{known_keys}} ] }] if @err;
-            $input = { %$input };
+        if ($c->{schema}{unknown} eq 'remove') {
+            $_[1] = { map +($_, $_[1]{$_}), grep $c->{known_keys}{$_}, keys $_[1]->%* };
+        } elsif ($c->{schema}{unknown} eq 'reject') {
+            my @err = grep !$c->{known_keys}{$_}, keys $_[1]->%*;
+            return { validation => 'unknown', keys => \@err, expected => [ sort keys %{$c->{known_keys}} ] } if @err;
+            $_[1] = { $_[1]->%* };
         } else {
-            $input = { %$input };
+            $_[1] = { $_[1]->%* };
         }
 
-    } elsif($c->{schema}{type} eq 'array') {
-        $input = [$input] if $c->{schema}{scalar} && !ref $input;
-        return [$input, { validation => 'type', expected => $c->{schema}{scalar} ? 'array or scalar' : 'array', got => lc ref $input || 'scalar' }] if ref $input ne 'ARRAY';
-        $input = [@$input]; # Create a shallow copy to prevent in-place modification.
+    } elsif ($c->{schema}{type} eq 'array') {
+        $_[1] = [$_[1]] if $c->{schema}{scalar} && !ref $_[1];
+        return { validation => 'type', expected => $c->{schema}{scalar} ? 'array or scalar' : 'array', got => lc ref $_[1] || 'scalar' } if ref $_[1] ne 'ARRAY';
+        $_[1] = [$_[1]->@*]; # Create a shallow copy to prevent in-place modification.
 
-    } elsif($c->{schema}{type} eq 'any') {
+    } elsif ($c->{schema}{type} eq 'any') {
         # No need to do anything here.
 
     } else {
         confess "Unknown type '$c->{schema}{type}'"; # Already checked in compile(), but be extra safe
     }
 
-    my $r = _validate_rec($c, $input);
-    return $r if $r->[1];
-    $input = $r->[0];
-
-    _validate_array($c, $input);
+    &_validate_rec || &_validate_array;
 }
 
 
-sub _validate($c, $input) {
-    my $r = _validate_input($c, $input);
-    return $r if !$r->[1] || !exists $c->{schema}{onerror};
-    [ ref $c->{schema}{onerror} eq 'CODE' ? $c->{schema}{onerror}->(bless $r, 'FU::Validate::Result') : $c->{schema}{onerror} ]
+sub _validate {
+    my $c = $_[0];
+    my $r = &_validate_input;
+    ($r, $_[1]) = (undef, ref $c->{schema}{onerror} eq 'CODE' ? $c->{schema}{onerror}->($_[0], bless $r, 'FU::Validate::err') : $c->{schema}{onerror})
+        if $r && exists $c->{schema}{onerror};
+    $r
 }
 
 
 sub validate($c, $input) {
-    bless _validate($c, $input), 'FU::Validate::Result';
+    my $r = _validate($c, $input);
+    return $input if !$r;
+    $r = bless $r, 'FU::Validate::err';;
+    my @e = $r->errors;
+    $r->{longmess} = Carp::longmess(@e > 1 ? join("\n",@e)."\n" : $e[0]);
+    die $r;
 }
 
 
 
 
-package FU::Validate::Result;
-
+package FU::Validate::err;
 use v5.36;
-use Carp 'confess';
+use FU::Util;
 
-# A result object contains: [$data, $error]
+use overload '""' => sub { $_[0]{longmess} || join "\n", $_[0]->errors };
 
-# In boolean context, returns whether the validation succeeded.
-use overload bool => sub { !$_[0][1] };
-
-# Returns the validation errors, or undef if validation succeeded
-sub err { $_[0][1] }
-
-# Returns the validated and normalized input, dies if validation didn't succeed.
-sub data {
-    if($_[0][1]) {
-        require Data::Dumper;
-        my $s = Data::Dumper->new([$_[0][1]])->Terse(1)->Pair(':')->Indent(0)->Sortkeys(1)->Dump;
-        confess "Validation failed: $s";
-    }
-    $_[0][0]
+sub _fmtkey($k) {
+    $k =~ /^[a-zA-Z0-9_-]+$/ ? $k : FU::Util::json_format($k);
 }
 
-# Same as 'data', but returns partially validated and normalized data if validation failed.
-sub unsafe_data { $_[0][0] }
+sub _fmtval($v) {
+    eval { $v = FU::Util::json_format($v) }; "$v"
+}
 
-# TODO: Human-readable error message formatting
+sub errors($e, $prefix='') {
+    my $val = $e->{validation};
+    my $p = $prefix ? "$prefix: " : '';
+    $val eq 'keys'     ? map errors($_, $prefix.'.'._fmtkey($_->{key})), $e->{errors}->@* :
+    $val eq 'missing'  ? $prefix.'.'._fmtkey($e->{key}).': required key missing' :
+    $val eq 'values'   ? map errors($_, $prefix."[$_->{index}]"), $e->{errors}->@* :
+    $val eq 'unique'   ? $prefix."[$e->{index_b}] value '"._fmtval($e->{value_a})."' duplicated" :
+    $val eq 'required' ? "${p}required value missing" :
+    $val eq 'type'     ? "${p}invalid type, expected '$e->{expected}' but got '$e->{got}'" :
+    $val eq 'unknown'  ? ($e->{keys}->@* > 1 ? "${p}unknown keys: ".join(', ', _fmtkey($e->{keys})) : "${p}unknown key '"._fmtkey($e->{keys}[0])."'") :
+    $e->{error}        ? errors($e->{error}, "${p}validation '$val'") :
+                         "${p}failed validation '$val'";
+}
+
 
 1;
 __END__
@@ -402,67 +402,22 @@ follows:
 
 C<$schema> is the schema that describes the data to be validated (see L</SCHEMA
 DEFINITION> below) and C<$validations> is an optional hashref containing
-L<custom validations|/Custom validations> that C<$schema> can refer to.
+L<custom validations|/Custom validations> that C<$schema> can refer to.  An
+error is thrown if the C<$validations> or C<$schema> are invalid.
 
 To validate input, run:
 
-  my $result = $validator->validate($input);
+  my $validated_input = $validator->validate($input);
 
-C<$input> is the data to be validated, and the C<$result> object is L<described
-below|/Result object>.
+C<validate()> returns a validated and (depending on the schema) normalized copy
+of C<$input>. Great care is taken that C<$input> is not being modified
+in-place, even if data normalization is being performed.
 
-Both C<compile()> and C<validate()> may throw an error if the C<$validations>
-or C<$schema> are invalid. Errors in the C<$input> should never cause an error
-to be thrown, since these are always reported in the C<$result> object.
-
-This module takes great care that C<$input> is not being modified in place,
-even if data normalization is being performed. The normalized data can be read
-from the C<$result> object.
-
-=head2 Result object
-
-The C<$result> object returned by C<validate()> overloads boolean context, so
-you can check if the validation succeeded with a simple if statement:
-
-  my $result = $validator->validate(..);
-  if($result) {
-    # Success!
-    my $data = $result->data;
-  } else {
-    # Input failed to validate...
-    my $error = $result->err;
-  }
-
-In addition, the result object implements the following methods:
-
-=over
-
-=item data()
-
-Returns the validated and normalized data. This method throws an error if
-validation failed, so if you're lazy and don't want to bother too much with
-proper error reporting, you can safely I<validate-and-die> in a single step:
-
-  my $validated_data = $v->validate(..)->data;
-
-(Note regarding reference semantics: The returned data will usually be a
-(possibly modified) copy of C<$input>, but may in some cases still have nested
-references to data in C<$input> - so if you are working with nested hashrefs,
-arrayrefs or other objects and are going to make modifications to the values
-embedded within them, these changes may or may not also affect the values in
-the original C<$input>. Make a deep copy of the data if you're concerned about
-this).
-
-=item err()
-
-Returns I<undef> if validation succeeded, an error object otherwise.
-
-An error object is a hashref containing at least one key: I<validation>, which
-indicates the name of the validation that failed. Additional keys with more
-detailed information may be present, depending on the validation. These are
-documented in L</SCHEMA DEFINITION> below.
-
-=back
+An error is thrown if the input does not validate. The error object is a
+C<FU::Validate::err>-blessed hashref containing at least one key:
+I<validation>, which indicates the name of the validation that failed.
+Additional keys with more detailed information may be present, depending on the
+validation. These are documented in L</SCHEMA DEFINITION> below.
 
 
 =head1 SCHEMA DEFINITION
@@ -472,10 +427,10 @@ validation to be performed. None of the options or validations are required,
 but some built-ins have default values. This means that the empty schema C<{}>
 is actually equivalent to:
 
-  { type         => 'scalar',
-    rmwhitespace => 1,
-    default      => \'required',
-    missing      => 'create',
+  { type    => 'scalar',
+    trim    => 1,
+    default => \'required',
+    missing => 'create',
   }
 
 =head2 Built-in options
@@ -506,12 +461,11 @@ C<$val> is returned instead. If C<$val> is a CODE reference, the subroutine is
 called with the original value (which is either no argument, undef or an empty
 string) and the return value of the subroutine is used as value instead.
 
-The empty check is performed after I<rmwhitespace> and before any other
-validations. So a string containing only whitespace is considered an empty
-string and will be treated according to this I<default> option. As an
-additional side effect, other validations will never get to validate undef or
-an empty string, as these values are either rejected or substituted with a
-default.
+The empty check is performed after I<trim> and before any other validations. So
+a string containing only whitespace is considered an empty string and will be
+treated according to this I<default> option. As an additional side effect,
+other validations will never get to validate undef or an empty string, as these
+values are either rejected or substituted with a default.
 
 =item onerror => $val
 
@@ -519,15 +473,15 @@ Instead of reporting an error, return C<$val> if this input fails validation
 for whatever reason. Setting this option in the top-level schema ensures that
 the validation will always succeed regardless of the input.
 
-If C<$val> is a CODE reference, the subroutine is called with the result object
-for this validation as its first argument. The return value of the subroutine
-is then returned for this validation.
+If C<$val> is a CODE reference, the subroutine is called with the (partially
+normalized) input as first argument and error object as second argument. The
+return value of the subroutine is then returned for this validation.
 
-=item rmwhitespace => 0/1
+=item trim => 0/1
 
 By default, any whitespace around scalar-type input is removed before testing
-any other validations. Setting I<rmwhitespace> to a false value will disable
-this behavior.
+any other validations. Setting I<trim> to a false value will disable this
+behavior.
 
 =item keys => $hashref
 
@@ -856,11 +810,11 @@ Here's a simple example that defines and uses a custom validation named
 I<stringbool>, which accepts either the string I<true> or I<false>.
 
   my $validations = {
-    stringbool => { enum => ['true', 'false'] }
+      stringbool => { enum => ['true', 'false'] }
   };
   my $schema = { stringbool => 1 };
   my $result = FU::Validate->compile($schema, $validations)->validate('true');
-  # $result->data() eq 'true'
+  # $result eq 'true'
 
 A custom validation can also be defined as a subroutine, in which case it can
 accept options. Here is an example of a I<prefix> custom validation, which
@@ -868,9 +822,9 @@ requires that the string starts with the given prefix. The subroutine returns a
 schema that contains the I<func> built-in option to do the actual validation.
 
   my $validations = {
-    prefix => sub($prefix) {
-      return { func => sub { $_[0] =~ /^\Q$prefix/ } }
-    }
+      prefix => sub($prefix) {
+          return { func => sub { $_[0] =~ /^\Q$prefix/ } }
+      }
   };
   my $schema = { prefix => 'Hello, ' };
   my $result = FU::Validate->compile($schema, $validations)->validate('Hello, World!');
@@ -880,8 +834,8 @@ schema that contains the I<func> built-in option to do the actual validation.
 Custom validations can also set built-in options, but the semantics differ a
 little depending on the option. First, be aware that many of the built-in
 options apply to the whole schema and not just to the custom validation.  For
-example, if the top-level schema sets C<< rmwhitespace => 0 >>, then all
-validations used in that schema may get input with whitespace around it.
+example, if the top-level schema sets C<< trim => 0 >>, then all validations
+used in that schema may get input with whitespace around it.
 
 All validations used in a schema need to agree upon a single I<type> option.
 If a custom validation does not specify a I<type> option (and no type is
@@ -891,10 +845,10 @@ mixes validations of different types. For example, the following throws an
 error:
 
   FU::Validate->compile({
-    # top-level schema says we expect a hash
-    type => 'hash',
-    # but the 'int' validation implies that the type is a scalar
-    int => 1
+      # top-level schema says we expect a hash
+      type => 'hash',
+      # but the 'int' validation implies that the type is a scalar
+      int => 1
   });
 
 The I<keys>, I<values> and C<func> built-in options are validated separately

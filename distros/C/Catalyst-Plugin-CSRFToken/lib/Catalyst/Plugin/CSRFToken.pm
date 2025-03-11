@@ -1,399 +1,488 @@
 package Catalyst::Plugin::CSRFToken;
 
-use Moo::Role;
-use WWW::CSRF ();
-use Bytes::Random::Secure ();
+use strict;
+use warnings;
+use Moose::Role;
+use Digest::SHA qw(hmac_sha256_hex);
+use MIME::Base64 qw(encode_base64url decode_base64url);
+use Crypt::URandom qw(urandom);
 
+our $VERSION = '1.001';
 
-our $VERSION = '0.008';
- 
-has 'default_csrf_token_secret' => (is=>'ro', required=>1, builder=>'_build_default_csrf_token_secret');
- 
-  sub _build_default_csrf_token_secret {
-    if(my $config = shift->config->{'Plugin::CSRFToken'}) {
-      return $config->{default_secret} if exists $config->{default_secret};
-    }
-    return;
+requires 'session', 'stash', 'req', 'detach';
+
+has 'csrf_token_session_key' => (is => 'ro', required => 1, builder => '_build_csrf_token_session_key');
+
+sub _build_csrf_token_session_key {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{session_key} if exists $config->{session_key};
   }
-
-has 'default_csrf_token_max_age' => (is=>'ro', required=>1, builder=>'_build_default_csrf_token_max_age');
- 
-  sub _build_default_csrf_token_max_age {
-    if(my $config = shift->config->{'Plugin::CSRFToken'}) {
-      return $config->{max_age} if exists $config->{max_age};
-    }
-    return 60*60; # One hour in seconds
-  }
-
-has 'csrf_token_param_key' => (is=>'ro', required=>1, builder=>'_build_csrf_token_param_key');
- 
-  sub _build_csrf_token_param_key {
-    if(my $config = shift->config->{'Plugin::CSRFToken'}) {
-      return $config->{param_key} if exists $config->{param_key};
-    }
-    return 'csrf_token';
-  }
-
-has 'auto_check_csrf_token' => (is=>'ro', required=>1, builder=>'_build_auto_check_csrf_token');
- 
-  sub _build_auto_check_csrf_token {
-    if(my $config = shift->config->{'Plugin::CSRFToken'}) {
-      return $config->{auto_check} if exists $config->{auto_check};
-      return $config->{auto_check_csrf_token} if exists $config->{auto_check_csrf_token};
-    }
-    return 0;
-  }
-
-sub default_csrf_session_id {
-  my $self = shift;
-  $self->change_session_id unless $self->sessionid;
-  return $self->sessionid;
+  return '_csrf_token';
 }
 
-sub random_token {
-  my ($self, $length) = @_;
-  $length = 48 unless $length;
-  return Bytes::Random::Secure::random_bytes_base64($length,'');
-}
+has 'csrf_token_param_key' => (is => 'ro', required => 1, builder => '_build_csrf_token_param_key');
 
-sub single_use_csrf_token {
-  my ($self) = @_;
-  my $token = $self->random_token;
-  $self->session(current_csrf_token => $token);
-  return $token;
-}
-
-sub check_single_use_csrf_token {
-  my ($self, %args) = @_;
-  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
-  return 0 unless $token;
-  if(my $session_token = delete($self->session->{current_csrf_token})) {
-    return $session_token eq $token ? 1:0;
-  } else {
-    return 0;
+sub _build_csrf_token_param_key {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{param_key} if exists $config->{param_key};
+    return $config->{token_param_key} if exists $config->{token_param_key};
   }
+  return 'csrf_token';
 }
 
-sub csrf_token {
-  my ($self, %args) = @_;
-  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
-  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
+has 'csrf_max_age' => (is => 'ro', required => 1, builder => '_build_csrf_max_age');
 
-  return my $token = WWW::CSRF::generate_csrf_token($session, $token_secret);
+sub _build_csrf_max_age {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{max_age} if exists $config->{max_age}; # Backwards compatibility
+  }
+  return 3600;
+}
+
+has 'csrf_default_secret' => (
+  is => 'ro',
+  predicate => 'has_csrf_default_secret',
+  builder => '_build_csrf_default_secret',
+);
+
+sub _build_csrf_default_secret {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{default_secret} if exists $config->{default_secret};
+  }
+  return undef;
+}
+
+has 'auto_check_csrf_token' => ( is => 'ro', required => 1, builder => '_build_auto_check_csrf_token' );
+
+sub _build_auto_check_csrf_token {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{auto_check} if exists $config->{auto_check};
+    return $config->{auto_check_csrf_token} if exists $config->{auto_check_csrf_token};
+  }
+  return 0;
+}
+
+has 'single_use_csrf_token' => (is => 'ro', required => 1, builder => '_build_single_use_csrf_token');
+
+sub _build_single_use_csrf_token {
+  if(my $config = shift->config->{'Plugin::CSRFToken'}) {
+    return $config->{single_use_csrf_token} if exists $config->{single_use_csrf_token};
+    return $config->{single_use} if exists $config->{single_use};
+  }
+  return 0;
+}
+
+before 'dispatch' => sub {
+  my $c = shift;
+  $c->check_csrf_token 
+    if (
+      ($c->auto_check_csrf_token || $c->action->attributes->{EnableCSRF})
+      && $c->req->method =~ /^(POST|PUT|DELETE|PATCH)$/i
+    );
+};
+
+sub check_csrf_token {
+  my $c = shift;
+
+  $c->log->debug('Checking CSRF token') if $c->debug;
+
+  if ($c->action->attributes->{DisableCSRF}) {
+    $c->log->debug('Skipping CSRF check for action '.$c->action->reverse) if $c->debug;
+    return 1;
+  }
+
+  my $token   = $c->find_csrf_token_in_request
+    or return $c->delegate_failed_csrf_token_check;
+
+  $c->log->debug("Found CSRF token '$token' in request") if $c->debug;
+
+  # $form_id is extracted from $token, in the form of "form_id:token"
+  my $form_id = 'default';
+  if ($token =~ /^(.*?):(.*)$/) {
+    $form_id = $1;
+    $token   = $2;
+  }
+
+  my $session_key = join('_', $c->csrf_token_session_key, $form_id);
+  my $entry = $c->session->{$session_key};
+  unless ($entry) {
+    $c->log->debug('CSRF token not found in session') if $c->debug;
+    return $c->delegate_failed_csrf_token_check;
+  }
+
+  if($c->single_use_csrf_token || $c->action->attributes->{SingleUseCSRF}) {
+    $c->log->debug('Deleting single-use CSRF token from session') if $c->debug;
+    delete $c->session->{$session_key};
+  }
+
+  if ((time - $entry->{created}) > $c->csrf_max_age) {
+    $c->log->debug('CSRF token expired') if $c->debug;
+    return $c->delegate_failed_csrf_token_check;
+  }
+
+  my $expected_token = $entry->{value};
+  if ($c->has_csrf_default_secret) {
+    $expected_token = hmac_sha256_hex($expected_token, $c->csrf_default_secret);
+  }
+
+  $c->log->debug("Expected CSRF token from session: $expected_token") if $c->debug;
+
+  unless ($c->secure_compare($token, $expected_token)) {
+    $c->log->debug('CSRF token mismatch') if $c->debug;
+    return $c->delegate_failed_csrf_token_check;
+  }
+  $c->log->debug('CSRF token check passed') if $c->debug;
+
+  return 1;
 }
 
 sub find_csrf_token_in_request {
-  my $self = shift;
-  if(my $header_token = $self->request->header('X-CSRF-Token')) {
+  my $c = shift;
+  if(my $header_token = $c->request->header('X-CSRF-Token')) {
+    $c->log->debug('Found CSRF token in request header') if $c->debug;
     return $header_token;
   } else {
-    return $self->req->body_parameters->{$self->csrf_token_param_key}
-      if exists($self->req->body_parameters->{$self->csrf_token_param_key});
-    return $self->req->body_data->{$self->csrf_token_param_key}
-      if exists($self->req->body_data->{$self->csrf_token_param_key});      
+    return $c->req->body_parameters->{$c->csrf_token_param_key}
+      if exists($c->req->body_parameters->{$c->csrf_token_param_key});
+    return $c->req->body_data->{$c->csrf_token_param_key}
+      if exists($c->req->body_data->{$c->csrf_token_param_key});
+    $c->log->debug('No CSRF token found in request') if $c->debug;    
     return undef;
   }
 }
 
-sub is_csrf_token_expired {
-  my ($self, %args) = @_;
-  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
-  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
-  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
-  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
+sub csrf_token {
+  my ($c, %args) = @_;
 
-  return 0 unless $token;
-  return 1 if WWW::CSRF::check_csrf_token(
-    $session, 
-    $token_secret,
-    $token, 
-    +{ MaxAge=>$max_age }
-  ) == WWW::CSRF::CSRF_EXPIRED;
-  
-  return 0;
+  $c->log->warn("'session' argument is deprecated and will be removed in a future release")
+    if exists($args{session});
+  $c->log->warn("'token_secret' argument is deprecated and will be removed in a future release")
+    if exists($args{token_secret});
+
+  my $form_id = $args{form_id} || 'default';
+  my $session_key = join('_', $c->csrf_token_session_key, $form_id);
+  my $entry = $c->session->{$session_key};
+
+  if (!$entry || time - $entry->{created} > $c->csrf_max_age) {
+    $c->log->debug("Generating new CSRF token for form ID '$form_id'") if $c->debug;
+    $entry = {
+      value   => encode_base64url(urandom(32)),
+      created => time,
+    };
+    $c->session->{$session_key} = $entry;
+  } else {
+    $c->log->debug("Reusing existing CSRF token for form ID '$form_id'") if $c->debug;
+  }
+
+  my $token = $entry->{value};
+
+  if ($c->has_csrf_default_secret) {
+    $token = hmac_sha256_hex($token, $c->csrf_default_secret);
+  }
+
+  $token = "$form_id:$token";
+
+  $c->log->debug("Using CSRF token '$token'") if $c->debug;
+
+  return $token;
 }
 
-sub invalid_csrf_token {
-  return shift->(@_)->check_csrf_token ? 0:1;
+sub secure_compare {
+  my ($c, $a, $b) = @_;
+  return 0 unless defined $a && defined $b && length $a == length $b;
+
+  my $res = 0;
+  for (my $i = 0; $i < length($a); $i++) {
+    $res |= ord(substr($a, $i)) ^ ord(substr($b, $i));
+  }
+  return $res == 0;
 }
 
-sub check_csrf_token {
-  my ($self, %args) = @_;
-  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
-  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
-  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
-  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
- 
-  return 0 unless $token;
-
-  my $status = WWW::CSRF::check_csrf_token(
-    $session, 
-    $token_secret,
-    $token, 
-    +{ MaxAge=>$max_age }
-  );
-  $self->stash(_last_csrf_token_status => $status);
-
-  return 0 unless  $status == WWW::CSRF::CSRF_OK;
-  return 1;
-}
-
-sub last_checked_csrf_token_expired {
-  my ($self) = @_;
-  my $status = $self->stash->{_last_csrf_token_status};
-
-  return Catalyst::Exception->throw(message => 'csrf_token has not been checked yet') unless defined $status;
-  return $status == WWW::CSRF::CSRF_EXPIRED ? 1:0;
+sub random_token {
+  my ($c, $length) = @_;
+  $length ||= 48;
+  return encode_base64url(urandom($length));
 }
 
 sub delegate_failed_csrf_token_check {
-  my $self = shift;
-  return $self->controller->handle_failed_csrf_token_check($self) if $self->controller->can('handle_failed_csrf_token_check');
-  return $self->handle_failed_csrf_token_check if $self->can('handle_failed_csrf_token_check');
+  my $c = shift;
 
-  # If we get this far we need to create a rational default error response and die
-  $self->response->status(403);
-  $self->response->content_type('text/plain');
-  $self->response->body('Forbidden: Invalid CSRF token.');
-  $self->finalize;
+  # Allow controller to handle failed CSRF token check
+  return $c->controller->handle_failed_csrf_token_check($c)
+    if $c->controller->can('handle_failed_csrf_token_check');
+  return $c->handle_failed_csrf_token_check
+    if $c->can('handle_failed_csrf_token_check');
+
+  $c->response->status(403);
+  $c->response->content_type('text/plain');
+  $c->response->body('Forbidden: Invalid CSRF token.');
+  $c->finalize;
+
   Catalyst::Exception->throw(message => 'csrf_token failed validation');
 }
 
-sub validate_csrf_token_if_required {
-  my $self = shift;
-  return (
-    (
-      ($self->req->method eq 'POST') ||
-      ($self->req->method eq 'PUT') ||
-      ($self->req->method eq 'PATCH')
-    )
-      && 
-    (
-      !$self->check_csrf_token &&
-      !$self->check_single_use_csrf_token
-    )
-  );
-}
-
-sub process_csrf_token {
-  my $self = shift;
-  return 1 unless (
-    ($self->req->method eq 'POST') ||
-    ($self->req->method eq 'PUT') ||
-    ($self->req->method eq 'PATCH')
-  );
-
-  if($self->can('session') && $self->session->{current_csrf_token}) {
-    return $self->check_single_use_csrf_token;
-  } else {
-    return $self->check_csrf_token;
-  }
-}
-
-around 'dispatch', sub {
-  my ($orig, $self, @args) = @_;
-  if(
-    $self->auto_check_csrf_token
-      &&
-    $self->validate_csrf_token_if_required
-  ) {
-    return $self->delegate_failed_csrf_token_check;
-  }
-  return $self->$orig(@args);
-};
-
 1;
+
+__END__
 
 =head1 NAME
 
-Catalyst::Plugin::CSRFToken - Generate tokens to help prevent CSRF attacks
+Catalyst::Plugin::CSRFToken - Robust CSRF protection plugin for Catalyst
 
 =head1 SYNOPSIS
- 
+
     package MyApp;
+
     use Catalyst;
 
-    # The default functionality of this plugin expects a method 'sessionid' which
-    # is associated with the current user session.  This method is provided by the
-    # session plugin but you can provide your own or override 'default_csrf_session_id'
-    # if you know what you are doing!
-
-    MyApp->setup_plugins([qw/
+    # Enable CSRF protection; requires Session plugin
+    __PACKAGE__->setup(qw/
       Session
-      Session::State::Cookie
-      Session::Store::Cookie
-      CSRFToken
-    /]);
+      Session::Store::...     # your choice
+      Session::State::Cookie  # Only sane state option
+      CSRFToken               # Add this line
+    /);
 
-    MyApp->config(
-      'Plugin::CSRFToken' => { default_secret=>'changeme', auto_check_csrf_token => 1 }
+    # Configuration
+    __PACKAGE__->config(
+      'Plugin::CSRFToken' => {
+        'max_age' => 3600,              # Token lifespan in seconds
+        'default_secret' => '...',      # Optional, your default secret for HMAC signing
+        'param_key' => '...',           # Optional, default is 'csrf_token'
+        'single_use_csrf_token' => ..., # Optional, default is 0
+        'auto_check' => ...,            # Optional, default is 0
+      },
     );
-         
-    MyApp->setup;
- 
-    package MyApp::Controller::Root;
- 
-    use Moose;
-    use MooseX::MethodAttributes;
- 
-    extends 'Catalyst::Controller';
- 
-    sub login_form :Path(login_form) Args(0) {
+
+If not using 'auto_check' you can enable CSRF checks on a per-action basis:
+
+    sub some_action :Local EnableCSRF {
       my ($self, $c) = @_;
-
-      # A Basic manual check example if you leave 'auto_check_csrf_token' off (default)
-      if($c->req->method eq 'POST') {
-        Catalyst::Exception->throw(message => 'csrf_token failed validation')
-          unless $c->check_csrf_token;
-      }
-
-      $c->stash(csrf_token => $c->csrf_token);  # send a token to your view and make sure you
-                                                # add it to your form as a hidden field
+      # CSRF check is automatically performed
     }
- 
+
+Or manually check the token:
+
+    if($c->req->method eq 'POST') {
+      Catalyst::Exception->throw(message => 'csrf_token failed validation')
+        unless $c->check_csrf_token;
+    }
+
+In your templates, specify form IDs for multiple forms:
+
+    <form id="edit_profile" method="POST">
+        <input type="hidden" name="csrf_token" value="[% c.csrf_token(form_id=>'edit_profile') %]">
+        <!-- form fields here -->
+    </form>
+
+Tokens can also be provided via the 'X-CSRF-Token' HTTP request header (useful for AJAX requests):
+
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha384-..."
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    $.ajax({
+      url: '/some/endpoint',
+      type: 'POST',
+      headers: {
+        'X-CSRF-Token': '[% c.csrf_token(form_id=>"your_form_id") %]'
+      },
+      data: {
+        // form data here
+      },
+      success: function(response) {
+        // handle response
+      }
+    });
+  </script>
+
 =head1 DESCRIPTION
 
-This uses L<WWW::CSRF> to generate hard to guess tokens tied to a give web session.  You can
+This creates a cryptographical token tied to a given web session used for CSRF protection.  You can
 generate a token and pass it to your view layer where it should be added to the form you are
-trying to process, typically as a hidden field called 'csrf_token' (althought you can change
+trying to process, typically as a hidden field called 'csrf_token' (although you can change
 that in configuration if needed).
 
-Its probably best to enable 'auto_check_csrf_token' true since that will automatically check
-all POST, PUT and PATCH request (but of course if you do this you have to be sure to add the token
-to every single form.  If you need to just use this on a few forms (for example you have a 
-large legacy application and need to improve security in steps) you can roll your own handling
-via the C<check_csrf_token> method as in the example given above.
+All POST, PUT, and PATCH requests are automatically checked for a valid CSRF token when
+'auto_check_csrf_token' is enabled. If the check fails, a 403 Forbidden response is returned.  The
+response can be customized by overriding the 'csrf_failure_response' method or as otherwise
+documented below.
 
-=head1 METHODS
+If you leave this disabled, you will need to manually check the token using the 'check_csrf_token'
+method.  Example:
 
-This Plugin adds the following methods
+  if($c->req->method eq 'POST') {
+    Catalyst::Exception->throw(message => 'csrf_token failed validation')
+      unless $c->check_csrf_token;
+  }
 
-=head2 random_token
+Or you can enable CSRF checks on a per-action basis by adding the 'EnableCSRF' attribute to the
+action.  Example:
 
-This just returns base64 random string that is cryptographically secure and is generically
-useful for anytime you just need a random token.   Default length is 48 but please note 
-that the actual base64 length will be longer.  
+  sub some_action :Local EnableCSRF {
+    my ($self, $c) = @_;
+    # CSRF check is automatically performed
+  }
 
-=head2 csrf_token ($session, $token_secret)
+=head2 Version 1.001 Notes
 
-Generates a token for the current request path and user session and returns this string
-in a form suitable to put into an HTML form hidden field value.  Accepts the following 
-positional arguments:
+Older versions of this plugin contained security and related bugs stemming from a 
+mistake I made in the first release.   Over the years I've tried to tweak it to
+make it more secure and robust.  However, I've come to the conclusion that the
+best way to fix the issue required me to substantially rewrite the guts.  I did
+my best to maintain the public API and as much of the private API as I could, but
+its possible this version break compatibility with older versions.  Usually I
+try to avoid this, but in this case I felt it was necessary because I think the
+old versions are insecure and you should not use them in any case.  Hit me with a
+bug report if you find something that doesn't work as expected and I will try to
+fix it, if I can without reintroducing the security issues.
 
-=over 4
-
-=item $session
-
-This is a string of data which is somehow linked to the current user session.   The default
-is to call the method 'default_csrf_session_id' which currently just returns the value of
-'$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
-want a token that is scoped to both the current user id and a given URL path).
-
-=item $token_secret
-
-Default is whatever you set the configuration value 'default_secret' to.
-
-=back
-
-=head2 check_csrf_token
-
-Return true or false depending on if the current request has a token which is valid.  Accepts the
-following arguments in the form of a hash:
-
-=over 4
-
-=item csrf_token
-
-The token to check.   Default behavior is to invoke method C<find_csrf_token_in_request> which
-looks in the HTTP request header and body parameters for the token.  Set this to validate a
-specific token.
-
-=item session
-
-This is a string of data which is somehow linked to the current user session.   The default
-is to call the method 'default_csrf_session_id' which currently just returns the value of
-'$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
-want a token that is scoped to both the current user id and a given URL path).
-
-It should match whatever you passed to C<csrf_token> for the request token you are trying to validate.
-
-=item token_secret
-
-Default is whatever you set the configuration value 'default_secret' to.  Allows you to specify a
-custom secret (it should match whatever you passed to C<csrf_token>).
-
-=item max_age
-
-Defaults to whatever you set configuration value <max_age>.  A value in seconds that measures how
-long a token is considered 'not expired'.  I recommend setting this to as short a value as is 
-reasonable for your users to linger on a form page.
-
-=back
-
-Example:
-
-    $c->check_csrf_token(max_age=>(60*10)); # Don't accept a token that is older than 10 minutes.
-
-B<NOTE>: If the token 
-
-=head2 invalid_csrf_token
-
-Returns true if the token is invalid.  This is just the inverse of 'check_csrf_token' and
-it accepts the same arguments.
-
-=head2 last_checked_csrf_token_expired
-
-Return true if the last checked token was considered expired based on the arguments used to
-check it.  Useful if you are writing custom checking code that wants to return a different
-error if the token was well formed but just too old.   Throws an exception if you haven't
-actually checked a token.
-
-=head2 single_use_csrf_token
-
-Creates a token that is saved in the session.  Unlike 'csrf_token' this token is not crytographically
-signed so intead its saved in the user session and can only be used once.   You might prefer
-this approach for classic HTML forms while the other approach could be better for API applications
-where you don't want the overhead of a user session (or where you'd like the client to be able to
-open multiply connections at once.
-
-
-=head2 check_single_use_csrf_token
-
-Checks a single_use_csrf_token.   Accepts the token to check but defaults to getting it from
-the request if not provided.
+This version also adds more debugging log output when Catalyst is run in debug
+mode.  This should help you understand what is going on with the CSRF token
+generation and validation.   But the log is more noisy.
 
 =head1 CONFIGURATION
 
-This plugin permits the following configurations keys
+=head2 param_key
+=head2 token_param_key
 
-=head2 default_secret
-
-String that is used in part to generate the token to help ensure its hard to guess.
+Name of the request parameter used to carry the CSRF token. Defaults to 'csrf_token'.
 
 =head2 max_age
 
-Default to 3600 seconds (one hour).   This is the length of time before the generated token
-is considered expired.  One hour is probably too long. You should set it to the shortest
-time reasonable.
-
-=head2 param_key
-
-Defaults to 'csrf_token'.   The Body param key we look for the token.
+Lifespan of a CSRF token in seconds. Defaults to 3600 (1 hour).  After this time the token
+will be considered expired and a new one will be generated if requested, or will result
+in a 403 Forbidden response if the token is used in a request for validation.
 
 =head2 auto_check_csrf_token
 
-Defaults to false.   When set to true we automatically do a check for all POST, PATCH and
-PUT method requests and if the check fails we delegate handling in the following way:
+Boolean attribute controlling whether automatic CSRF checks on incoming requests are enabled. 
+Defaults to 0 (disabled).  Highly recommended to enable this feature.  If you leave it off
+you will need to manually check the token using the 'check_csrf_token' method or you can enable
+on a per action basis by adding the 'EnableCSRF' attribute to the action.  Examples:
 
-If the current controller does a method called 'handle_failed_csrf_token_check' we invoke that
-passing the current context.
+    sub some_action :Local EnableCSRF {
+      my ($self, $c) = @_;
+      # CSRF check is automatically performed
+    }
 
-Else if the application class does a method called 'handle_failed_csrf_token_check' we invoke
-that instead.
+    sub some_other_action :Local {
+      my ($self, $c) = @_;
+      Catalyst::Exception->throw(message => 'csrf_token failed validation')
+        unless $c->check_csrf_token;
+    }
 
-Failing either of those we just throw an exception and set a rational message body (403 Forbidden:
-Bad CSRF token).  In all cases if there's a CSRF error we skip the 'dispatch' phase so none of
- your actions will run, including any global 'end' actions.  
+=head2 default_secret
+
+Optional secret key to enhance security by hashing tokens with HMAC.  You can use this for
+example to force invalidation when restarting the service or just to add an extra layer of
+security.  If you don't provide a secret, the token is stored in the session as is.  If you
+provide a secret, the token is hashed with the secret before being stored in the session.
+
+Using a secret can improve the security of your tokens and reduce the risk of playback attacks.
+But you should have a key rotation policy for this to be effective.  If you don't provide a
+
+=head2 session_key
+
+Name of the session key used to store CSRF tokens. Defaults to '_csrf_token'.  You can change
+this if it conflicts with another session key you are using.
+
+=head2 single_use_csrf_token
+
+Boolean attribute controlling whether CSRF tokens are single-use. Defaults to 0 (disabled). If
+enabled, the token is deleted from the session after the first validation. If disabled, the
+token can be used multiple times until it expires.
+
+This is disabled by default because enabling it  can lead to some tricky UI experiences, like if the 
+user clicks the back button and resubmits the form, which then generated a CSRF token validation error.
+You can mitigate this issue and similar ones by setting you HTML form to not cache, or by using
+JavaScript to prevent the user from resubmitting, Example:
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+But this can be browser dependent and not always work as expected.  If you don't need the highest
+level of CSRF protection you can leave the default as zero, which will allow the token
+to be used multiple times until it expires.  That way you don't break the 'back' button and similar
+actions that might cause a token to be reused.   But this is less secure.
+
+Even if youi leave this as zero, you can selectivly enable single use tokens by setting the ':SingleUseCSRF'
+attribute on the action.  Example:
+
+    sub some_action :Local SingleUseCSRF {
+      my ($self, $c) = @_;
+      # CSRF check is automatically performed
+    }
+
+You may wish to do this for particularly sensitive actions, like changing a password or making a payment
+or logging in.
+
+=head1 METHODS
+
+=head2 csrf_token(form_id=>$form_id)
+
+Generates and returns a CSRF token for the given form ID. Defaults to 'default' if not provided.
+Calling this method will return a token you can embed in your form as a hidden field. If your
+webpage has multiple forms, you can generate a token for each form by providing a unique form ID.
+
+Token is stored in the session and used to perform CSRF checks on form submissions. Please keep
+in mind that this session key is deleted once the token is used, so you can't use the same token
+twice. You should also deal with 'back' buttons and similar actions that might cause a token to be
+reused and return an error. 
+
+=head2 check_csrf_token
+
+Checks the CSRF token in the request. If the token is missing, invalid, or expired, a 403 Forbidden
+response is returned. Returns 1 if the token is valid.
+
+=head2 random_token($length)
+
+Generates and returns a secure random token encoded in base64 format. Default length is 48 bytes.
+Useful when you just need a disposable token that is cryptographically secure.
+
+=head2 csrf_failure_response
+
+This is the method that is called when a CSRF token check fails.  It first checks if the controller
+has a 'handle_failed_csrf_token_check' method and calls that if it does.  If not it calls the
+'handle_failed_csrf_token_check' method on the context object if that exists.  If neither of those
+methods exist it creates a default response and finalizes it.
+
+Override this method if you want to provide a custom response when a CSRF token check fails or
+implement one of the other two methods mentioned above.
+
+=head1 SKIPPING AUTOMATIC CSRF CHECKS
+
+You can skip automatic CSRF checks (when using the 'auto_check' configuration option) for specific
+actions by adding the 'NoCSRF' attribute to the action:
+
+    sub skip :Path(skip) DisableCSRF Args(0) {
+      my ($self, $c) = @_;
+      $c->res->body('ok');
+    }
+
+=head1 CHAINING AND ACTION ATTRIBUTES
+
+If using chained actions in your Catalyst application, you can apply the 'EnableCSRF', 'DisableCSRF',
+and 'SingleUseCSRF' attributes to alter how the CSRF token is checked.  However you MUST apply the
+attribte to the final action in the chain for this to work.  Example:
+
+    sub base :Chained('/') PathPart('') CaptureArgs(0) {
+      my ($self, $c) = @_;
+    }
+
+    sub some_action :Chained('base') PathPart('some_action') Args(0)  {
+      my ($self, $c) = @_;
+    }
+
+    sub final_action :Chained('base') PathPart('final_action') Args(0) EnableCSRF SingleUseCSRF {
+      my ($self, $c) = @_;
+      # CSRF check is automatically performed and token is deleted after use
+    }
+
+If you don't place the attribute on the final action the plugin will not see it.
 
 =head1 AUTHOR
 
@@ -401,7 +490,7 @@ Bad CSRF token).  In all cases if there's a CSRF error we skip the 'dispatch' ph
  
 =head1 COPYRIGHT
  
-Copyright (c) 2023 the above named AUTHOR
+  Copyright (c) 2025 the above named AUTHOR
  
 =head1 LICENSE
  

@@ -23,7 +23,7 @@ class File::Temp::Dir {
   has CLEANUP : byte;
   
   # Class Methods
-  static method new : File::Temp::Dir ($options : object[]) {
+  static method new : File::Temp::Dir ($options : object[] = undef) {
     
     my $self = new File::Temp::Dir;
     
@@ -70,16 +70,13 @@ class File::Temp::Dir {
         
         my $dirname = $self->{dirname};
         
-        unless ($dirname) {
-          die "[Unexpected Error]\$dirname must be defined.";
+        if ($dirname) {
+          eval { File::Path->rmtree($dirname); }
+          
+          if ($@) {
+            warn $@;
+          }
         }
-        
-        eval { File::Path->rmtree($dirname); }
-        
-        if ($@) {
-          warn $@;
-        }
-        
       }
     }
     
@@ -96,14 +93,14 @@ class File::Temp::Dir {
     
     my $SUFFIX = "";
     
-    my $template = File::Temp->_make_template($TEMPLATE, $DIR, $TMPDIR, $SUFFIX);
+    my $template_path = File::Temp->_make_template_path($TEMPLATE, $DIR, $TMPDIR, $SUFFIX);
     
     my $found_path = (string)undef;
     my $max_try_count = 1000;
     my $try_count = 0;
     while ($try_count < $max_try_count) {
       
-      my $path = File::Temp->_replace_XX($template);
+      my $path = File::Temp->_replace_XX($template_path);
       
       eval {
         Sys::IO->mkdir($path, 0700);
@@ -118,7 +115,7 @@ class File::Temp::Dir {
     }
     
     if ($try_count == $max_try_count) {
-      die "tried to get a new temp name different to the previous value $max_try_count times.\nsomething wrong with template?? ($template)";
+      die "tried to get a new temp name different to the previous value $max_try_count times.\nsomething wrong with template?? ($template_path)";
     }
     
   }

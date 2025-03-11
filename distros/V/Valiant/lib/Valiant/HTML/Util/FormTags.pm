@@ -158,8 +158,12 @@ sub _process_method {
 sub _process_content {
   my ($self, $content, $attrs) = @_;
   return $content unless exists $attrs->{csrf_token};
+
   $attrs->{data}{csrf_token} = delete $attrs->{csrf_token};
-  return $self->_prepend_block($content, $self->hidden_tag('csrf_token', $attrs->{data}{csrf_token}));
+  return $self->_prepend_block(
+    $content,
+    $self->hidden_tag('csrf_token', $attrs->{data}{csrf_token}),
+  );
 }
 
 sub label_tag {
@@ -436,9 +440,12 @@ sub field_name {
 }
 
 sub field_errors {
-  my ($self, $model, $attribute) = @_;
+  my ($self, $model, $attribute, $strict) = @_;
   return $model->read_attribute_errors_for($attribute) if $model->can('read_attribute_errors_for');
-  return $model->errors->full_messages_for($attribute);
+  return $model->errors->full_messages_for($attribute) if $model->can('errors');
+  return $strict
+    ? croak "Model '@{[$model->model_name->human]}' has no attribute '$attribute'."
+    : ();
 }
 
 #sub field_label {
@@ -581,7 +588,12 @@ Similar to C<field_id> but for creating a unique form field name
 
 =head3 field_errors
 
-An array of error messages for a field.
+    my @errors = $tb->field_errors($model, $attribute, $strict);
+
+An array of error messages for a field. Requires the model to either respond to
+C<read_attribute_errors_for> or have an C<errors> method (which is a L<Valiant::Errors> object)
+for retrieving errors associated with the specified attribute.  If the model does neither, it will 
+always return an empty string unless C<$strict> is true in which case it will throw an exception.
 
 =head2 button_tag
 

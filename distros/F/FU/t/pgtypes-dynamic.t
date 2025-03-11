@@ -121,4 +121,26 @@ subtest 'custom types', sub {
     is $txn->q("SELECT dom FROM fupg_test_table")->val, 0x6262;
 };
 
+
+subtest 'vndbid', sub {
+    plan skip_all => 'type not loaded in the database' if !$conn->q("SELECT 1 FROM pg_type WHERE typname = 'vndbtag'")->val;
+
+    for my $t (qw/a zz xxx/) {
+        is $conn->q('SELECT $1::vndbtag', $t)->val, $t;
+        is $conn->q('SELECT $1::vndbtag', $t)->text_params->val, $t;
+        is $conn->q('SELECT $1::vndbtag', $t)->text_results->val, $t;
+    }
+    ok !eval { $conn->q('SELECT $1::vndbtag', '')->val };
+    ok !eval { $conn->q('SELECT $1::vndbtag', 'abcd')->val };
+
+    for my $t (qw/a123 zz992883231 xxx18388123/) {
+        is $conn->q('SELECT $1::vndbid', $t)->val, $t;
+        is $conn->q('SELECT $1::vndbid', $t)->text_params->val, $t;
+        is $conn->q('SELECT $1::vndbid', $t)->text_results->val, $t;
+    }
+    ok !eval { $conn->q('SELECT $1::vndbid', '')->val };
+    ok !eval { $conn->q('SELECT $1::vndbid', 'ab')->val };
+    ok !eval { $conn->q('SELECT $1::vndbid', 'ab1219229999999999')->val };
+};
+
 done_testing;

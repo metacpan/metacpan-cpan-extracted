@@ -503,3 +503,82 @@ static SV *fupg_st_kvh(pTHX_ fupg_st *st) {
     }
     return sv;
 }
+
+
+
+
+/* COPY support */
+
+typedef struct {
+    SV *self;
+    fupg_conn *conn;
+    char in;
+    char bin;
+    char rddone;
+    char closed;
+} fupg_copy;
+
+static SV *fupg_copy_exec(pTHX_ fupg_conn *c, const char *sql) {
+    PGresult *r = PQexec(c->conn, sql);
+
+    if (!r) fupg_conn_croak(c, "exec");
+    int s = PQresultStatus(r);
+    switch (s) {
+        case PGRES_COPY_OUT:
+        case PGRES_COPY_IN:
+            break;
+        default: fupg_result_croak(r, "exec", sql);
+    }
+
+    fupg_copy *copy = safecalloc(1, sizeof(fupg_copy));
+    copy->conn = c;
+    SvREFCNT_inc(c->self);
+    copy->bin = !!PQbinaryTuples(r);
+    copy->in = s == PGRES_COPY_IN;
+    PQclear(r);
+    return fu_selfobj(copy, "FU::Pg::copy");
+}
+
+static void fupg_copy_write(pTHX_ fupg_copy *c, SV *data) {
+    STRLEN len;
+    const char *buf = c->bin ? SvPVbyte(data, len) : SvPVutf8(data, len);
+    if (PQputCopyData(c->conn->conn, buf, len) < 0) fupg_conn_croak(c->conn, "copy");
+}
+
+static SV *fupg_copy_read(pTHX_ fupg_copy *c, int discard) {
+    char *buf = NULL;
+    int len = PQgetCopyData(c->conn->conn, &buf, 0);
+    if (len == -1) {
+        c->rddone = 1;
+        return &PL_sv_undef;
+    } else if (len < 0) {
+        if (discard) c->rddone = 1;
+        else fupg_conn_croak(c->conn, "copy");
+    }
+    SV *r = discard ? &PL_sv_undef : newSVpvn_flags(buf, len, SVs_TEMP | (c->bin ? 0 : SVf_UTF8));
+    PQfreemem(buf);
+    return r;
+}
+
+static void fupg_copy_close(pTHX_ fupg_copy *c, int ignerror) {
+    if (c->closed) return;
+    c->closed = 1; /* Mark as closed even on error, a second attempt won't help anyway */
+
+    if (c->in && PQputCopyEnd(c->conn->conn, NULL) < 0 && !ignerror)
+        fupg_conn_croak(c->conn, "copyEnd");
+
+    while (!c->in && !c->rddone) fupg_copy_read(aTHX_ c, 1);
+
+    PGresult *r = PQgetResult(c->conn->conn);
+    if (!ignerror && !r) fupg_conn_croak(c->conn, "copyEnd");
+    if (!ignerror && PQresultStatus(r) != PGRES_COMMAND_OK) fupg_result_croak(r, "copy", "");
+    PQclear(r);
+
+    while ((r = PQgetResult(c->conn->conn))) PQclear(r);
+}
+
+static void fupg_copy_destroy(pTHX_ fupg_copy *c) {
+    fupg_copy_close(aTHX_ c, 1);
+    SvREFCNT_dec(c->conn->self);
+    safefree(c);
+}

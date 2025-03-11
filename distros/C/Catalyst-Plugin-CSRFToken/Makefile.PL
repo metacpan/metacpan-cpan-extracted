@@ -18,15 +18,16 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Bytes::Random::Secure" => "0.29",
     "Catalyst" => "5.90060",
-    "Moo" => "2.005004",
-    "WWW::CSRF" => "1.00"
+    "Crypt::URandom" => 0,
+    "Digest::SHA" => 0,
+    "MIME::Base64" => 0
   },
   "TEST_REQUIRES" => {
     "Catalyst::Test" => 0,
     "HTTP::Request::Common" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,10 +38,11 @@ my %FallbackPrereqs = (
   "Bytes::Random::Secure" => "0.29",
   "Catalyst" => "5.90060",
   "Catalyst::Test" => 0,
+  "Crypt::URandom" => 0,
+  "Digest::SHA" => 0,
   "HTTP::Request::Common" => 0,
-  "Moo" => "2.005004",
-  "Test::Most" => 0,
-  "WWW::CSRF" => "1.00"
+  "MIME::Base64" => 0,
+  "Test::Most" => 0
 );
 
 

@@ -6,6 +6,317 @@ class TestCase::File::Temp {
   use List;
   use IO::File;
   
+  static method new : int () {
+    
+    # Basic
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new;
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename default]$filename";
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        my $buffer = (mutable string)new_string_len 128;
+        
+        $temp_file->read($buffer, length $buffer);
+        
+        $temp_file->print("Hello");
+        
+        $temp_file->close;
+        
+        my $fh = IO->open("<", $filename);
+        
+        my $content = $fh->getlines;
+        
+        # TODO: this is not needed ideally
+        $fh->close;
+        
+        unless ($content eq "Hello") {
+          return 0;
+        }
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    # TEMPLATE option
+    {
+      my $cwd = Cwd->getcwd;
+      Fn->defer([$cwd : string] method : void () {
+        Sys->chdir($cwd);
+      });
+      
+      my $filename = (string)undef;
+      {
+        Sys->chdir(File::Spec->tmpdir);
+        
+        my $temp_file = File::Temp->new({TEMPLATE => "my_XXXX"});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename my_XXXX TMPDIR]$filename";
+        
+        unless (Fn->contains($filename, "my_")) {
+          return 0;
+        }
+        
+        if (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        $temp_file->print("Hello");
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    # TEMPLATE, TMPDIR option
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new({TEMPLATE => "my_XXXX", TMPDIR => 1});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename myXXXX TMPDIR]$filename";
+        
+        unless (Fn->contains($filename, "my_")) {
+          return 0;
+        }
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        $temp_file->print("Hello");
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    # DIR option
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new({DIR => File::Spec->tmpdir});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][DIR]$filename";
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        $temp_file->print("Hello");
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    # DIR, TEMPLATE option
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new({TEMPLATE => "my_XXXX", DIR => File::Spec->tmpdir});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename TEMPLATE DIR]$filename";
+        
+        unless (Fn->contains($filename, "my_")) {
+          return 0;
+        }
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        $temp_file->print("Hello");
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    # Repeat
+    {
+      my $temp_files_list = List->new;
+      for (my $i = 0; $i < 100; $i++) {
+        my $temp_file = File::Temp->new({TEMPLATE => "XXXX", TMPDIR => 1});
+        $temp_files_list->push($temp_file);
+        my $filename = $temp_file->filename;
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      my $temp_files_list = List->new;
+      for (my $i = 0; $i < 100; $i++) {
+        my $temp_file = File::Temp->new({TEMPLATE => "XXXX", TMPDIR => 1});
+        $temp_files_list->push($temp_file);
+        my $filename = $temp_file->filename;
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+      }
+    }
+    
+    # UNLINK
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new({UNLINK => 0});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename UNLINK]$filename";
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        $temp_file->print("Hello");
+      }
+      
+      unless (Sys->f($filename)) {
+        return 0;
+      }
+      
+      File::Path->rmtree($filename);
+    }
+    
+    # SUFFIX option
+    {
+      my $filename = (string)undef;
+      {
+        my $temp_file = File::Temp->new({SUFFIX => ".dat"});
+        $filename = $temp_file->filename;
+        
+        warn "[Test Output][File::Temp#new][filename SUFFIX]$filename";
+        
+        unless (Fn->contains($filename, ".dat")) {
+          return 0;
+        }
+        
+        unless (File::Spec->file_name_is_absolute($filename)) {
+          return 0;
+        }
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($filename, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->f($filename)) {
+          return 0;
+        }
+        
+        unless (Sys->w($filename)) {
+          return 0;
+        }
+        
+        my $buffer = (mutable string)new_string_len 128;
+        
+        $temp_file->read($buffer, length $buffer);
+        
+        $temp_file->print("Hello");
+        
+        $temp_file->close;
+      }
+      
+      if (Sys->f($filename)) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   static method newdir : int () {
 
     # Basic
@@ -43,33 +354,7 @@ class TestCase::File::Temp {
       }
     }
     
-    # Repeat
-    {
-      my $temp_dirs_list = List->new;
-      for (my $i = 0; $i < 1000; $i++) {
-        my $temp_dir = File::Temp->newdir;
-        $temp_dirs_list->push($temp_dir);
-        my $dirname = $temp_dir->dirname;
-        
-        unless (Sys->d($dirname)) {
-          return 0;
-        }
-      }
-    }
-    
-    {
-      my $temp_dirs_list = List->new;
-      for (my $i = 0; $i < 1000; $i++) {
-        my $temp_dir = File::Temp->newdir;
-        $temp_dirs_list->push($temp_dir);
-        my $dirname = $temp_dir->dirname;
-        
-        unless (Sys->d($dirname)) {
-          return 0;
-        }
-      }
-    }
-    
     return 1;
   }
+  
 }

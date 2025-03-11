@@ -36,6 +36,7 @@ typedef enum { PQTRANS_IDLE, PQTRANS_ACTIVE, PQTRANS_INTRANS, PQTRANS_INERROR, P
 #define PG_DIAG_SOURCE_FUNCTION 'R'
 
 #define PG_FUNCS \
+    X(PQbinaryTuples, int, const PGresult *) \
     X(PQclear, void, PGresult *) \
     X(PQclosePrepared, PGresult *, PGconn *, const char *) \
     X(PQcmdTuples, char *, PGresult *) \
@@ -51,9 +52,10 @@ typedef enum { PQTRANS_IDLE, PQTRANS_ACTIVE, PQTRANS_INTRANS, PQTRANS_INERROR, P
     X(PQfname, char *, const PGresult *, int) \
     X(PQfreemem, void, void *) \
     X(PQftype, Oid, const PGresult *, int) \
+    X(PQgetCopyData, int, PGconn *, char **, int) \
+    X(PQgetResult, PGresult *, PGconn *) \
     X(PQgetisnull, int, const PGresult *, int, int) \
     X(PQgetlength, int, const PGresult *, int, int) \
-    X(PQgetResult, PGresult *, PGconn *) \
     X(PQgetvalue, char *, const PGresult *, int, int) \
     X(PQlibVersion, int, void) \
     X(PQnfields, int, const PGresult *) \
@@ -61,6 +63,8 @@ typedef enum { PQTRANS_IDLE, PQTRANS_ACTIVE, PQTRANS_INTRANS, PQTRANS_INERROR, P
     X(PQntuples, int, const PGresult *) \
     X(PQparamtype, Oid, const PGresult *, int) \
     X(PQpipelineSync, int, PGconn *) \
+    X(PQputCopyData, int, PGconn *, const char *, int) \
+    X(PQputCopyEnd, int, PGconn *, const char *) \
     X(PQresStatus, char *, ExecStatusType) \
     X(PQresultErrorField, char *, const PGresult *, int) \
     X(PQresultErrorMessage, char *, const PGresult *) \

@@ -27,7 +27,7 @@ name: DBIx-Migration
 provides:
   DBIx::Migration:
     file: lib/DBIx/Migration.pm
-    version: '0.19'
+    version: '0.20'
   DBIx::Migration::CLI:
     file: lib/DBIx/Migration/CLI.pm
   DBIx::Migration::Pg:
@@ -46,6 +46,7 @@ requires:
   MooX::SetOnce: '0'
   MooX::StrictConstructor: '0'
   Path::Tiny: '0.062'
+  PerlX::Maybe: '0'
   Pod::Find: '0'
   Pod::Usage: '1.64'
   Try::Tiny: '0'
@@ -56,5 +57,5 @@ resources:
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/XSven/perl-dbix-migration.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

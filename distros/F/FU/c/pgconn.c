@@ -471,6 +471,7 @@ static void fupg_refresh_types(pTHX_ fupg_conn *c) {
         snprintf(t->name.n, sizeof(t->name.n), "%s", PQgetvalue(r, i, 1));
         char typ = *PQgetvalue(r, i, 2);
         t->elemoid = fu_frombeU(32, PQgetvalue(r, i, 3));
+        const fupg_type *builtin;
 
         if (t->elemoid) {
             if (typ == 'd') { /* domain */
@@ -487,13 +488,14 @@ static void fupg_refresh_types(pTHX_ fupg_conn *c) {
             /* enum, can use text send/recv */
             t->send = fupg_send_text;
             t->recv = fupg_recv_text;
+        } else if ((builtin = fupg_builtin_byoid(t->oid))) {
+            t->send = builtin->send;
+            t->recv = builtin->recv;
+        } else if ((builtin = fupg_dynoid_byname(t->name.n))) {
+            t->send = builtin->send;
+            t->recv = builtin->recv;
         } else {
-            /* TODO: (multi)ranges, custom overrides, by-name lookup for dynamic-oid types */
-            const fupg_type *builtin = fupg_builtin_byoid(t->oid);
-            if (builtin) {
-                t->send = builtin->send;
-                t->recv = builtin->recv;
-            }
+            /* TODO: (multi)ranges */
         }
     }
     PQclear(r);
@@ -571,11 +573,8 @@ static void fupg_tio_setup(pTHX_ fupg_conn *conn, fupg_tio *tio, int flags, Oid 
         return;
     }
 
-    /* Minor wart? When the type is overridden by oid, the name & oid in error
-     * messages will be that of the builtin type.  When overridden by name, the
-     * name will be correct but the oid is still of the builtin type.
-     * Some send/recv functions have slightly different behavior based on oid,
-     * in those cases this behavior is useful. */
+    /* Minor wart? When the type is overridden by oid, its name in error
+     * messages will be that of the builtin type instead of the actual type. */
 
     SV *cb = NULL;
     const fupg_type *e, *t;

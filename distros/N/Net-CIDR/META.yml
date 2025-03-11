@@ -4,10 +4,13 @@ author:
   - 'Sam Varshavchik <sam@email-scan.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - network
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +22,9 @@ no_index:
     - inc
 requires:
   Carp: '0'
-version: '0.22'
+resources:
+  bugtracker: https://github.com/svarshavchik/Net-CIDR/issues
+  homepage: https://github.com/svarshavchik/Net-CIDR
+  repository: https://github.com/svarshavchik/Net-CIDR
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

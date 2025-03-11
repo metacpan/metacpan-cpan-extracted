@@ -2,8 +2,6 @@
 
 # PERL_FUTURE_DEBUG=1 perl eg/tester.pl
 
-use v5.36;
-
 use Future::IO::Impl::IOAsync;
 use MIDI::Drummer::Tiny ();
 use MIDI::RtController ();

@@ -48,6 +48,19 @@ WriteMakefile(
     VERSION_FROM  => 'TVision.pm', # finds $VERSION
     ABSTRACT_FROM => 'TVision.pm', # retrieve abstract from module
     AUTHOR        => 'Vadim Konovalov <vkon@cpan.org>',
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/vadrerko/perl-tvision/issues',
+            },
+            repository => {
+                type => 'git',
+                web => 'https://github.com/vadrerko/perl-tvision',
+                url => 'https://github.com/vadrerko/perl-tvision.git',
+            },
+        }
+    },
     LIBS          => ["$ldflags"],
     # DEFINE        => TODO
     INC           => "$cflags", # e.g., '-I. -I/usr/include/other'

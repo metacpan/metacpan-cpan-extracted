@@ -1,4 +1,4 @@
-package FU::SQL 0.2;
+package FU::SQL 0.3;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';
@@ -356,12 +356,12 @@ values. This function results in different SQL depending on the C<in_style>
 option given to C<compile()>. The default C<'dbi'> style passes each value as a
 bind parameter:
 
-  SQL 'WHERE id', IN([1, 2, 3, 4]);
+  SQL 'WHERE id', IN [1, 2, 3, 4];
   # 'WHERE id IN(?, ?, ?, ?)', parameters: 1, 2, 3, 4
 
 The C<'pg'> style passes the entire array as a single bind parameter instead:
 
-  SQL 'WHERE id', IN([1, 2, 3, 4]);
+  SQL 'WHERE id', IN [1, 2, 3, 4];
   # 'WHERE id = ANY(?)', parameter: [1, 2, 3, 4]
 
 The C<'pg'> style allows for more efficient re-use of cached prepared
@@ -372,7 +372,7 @@ with L<DBD::Pg> or L<Pg::PQ>.
 
 Can be used in the C<$hashref> versions of C<AND>, C<OR> and C<WHERE> as well:
 
-  WHERE { id => IN([1, 2]) }
+  WHERE { id => IN [1, 2] }
   # 'WHERE id IN(?, ?)'
 
 =back

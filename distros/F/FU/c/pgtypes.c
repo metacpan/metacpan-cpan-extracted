@@ -456,8 +456,8 @@ RECVFN(perlcb) {
     call_sv(ctx->cb, G_SCALAR);
     SPAGAIN;
 
-    SV *ret = newSV(0);
-    sv_setsv(ret, POPs);
+    SV *ret = POPs;
+    SvREFCNT_inc(ret);
     PUTBACK;
 
     FREETMPS;
@@ -637,6 +637,72 @@ SENDFN(time) {
     if (!looks_like_number(val)) SERR("expected a number");
     fustr_writebeI(64, out, SvNV(val) * 1000000);
 }
+
+
+
+/* VNDB types */
+
+const char vndbtag_alpha[] = "\0""abcdefghijklmnopqrstuvwxyz?????";
+
+static I16 vndbtag_parse(char **str) {
+    I16 tag = 0;
+    if (**str >= 'a' && **str <= 'z') {
+        tag = (**str - 'a' + 1) << 10;
+        (*str)++;
+        if (**str >= 'a' && **str <= 'z') {
+            tag |= (**str - 'a' + 1) << 5;
+            (*str)++;
+            if (**str >= 'a' && **str <= 'z') {
+                tag |= **str - 'a' + 1;
+                (*str)++;
+            }
+        }
+    }
+    return tag;
+}
+
+void vndbtag_fmt(I16 tag, char *out) {
+    out[0] = vndbtag_alpha[(tag >> 10) & 31];
+    out[1] = vndbtag_alpha[(tag >>  5) & 31];
+    out[2] = vndbtag_alpha[(tag >>  0) & 31];
+    out[3] = 0;
+}
+
+RECVFN(vndbtag) {
+    RLEN(2);
+    SV *r = newSV(4);
+    SvPOK_only(r);
+    vndbtag_fmt(fu_frombeI(16, buf), SvPVX(r));
+    SvCUR_set(r, strlen(SvPVX(r)));
+    return r;
+}
+
+SENDFN(vndbtag) {
+    char *t = SvPV_nolen(val);
+    I16 v = vndbtag_parse(&t);
+    if (*t) SERR("Invalid vndbtag: '%s'", SvPV_nolen(val));
+    fustr_writebeI(16, out, v);
+}
+
+
+#define VNDBID2_MAXNUM (((I64)1<<48)-1)
+
+RECVFN(vndbid) {
+    RLEN(8);
+    I64 v = fu_frombeI(64, buf);
+    char tbuf[4];
+    vndbtag_fmt(v >> 48, tbuf);
+    return newSVpvf("%s%"UVuf, tbuf, (UV)(v & VNDBID2_MAXNUM));
+}
+
+SENDFN(vndbid) {
+    char *ostr = SvPV_nolen(val), *str = ostr;
+    UV num;
+    I16 tag = vndbtag_parse(&str);
+    if (!grok_atoUV(str, &num, NULL) || num > VNDBID2_MAXNUM) SERR("invalid vndbid '%s'", ostr);
+    fustr_writebeI(64, out, ((I64)tag)<<48 | num);
+}
+
 
 #undef SIV
 #undef RLEN
@@ -818,7 +884,24 @@ static const fupg_type fupg_builtin[] = {
 #define FUPG_BUILTIN (sizeof(fupg_builtin) / sizeof(fupg_type))
 
 
+/* List of types identified by name */
+
+#define DYNOID\
+    T("vndbtag",   vndbtag)\
+    T("vndbid",    vndbid)
+
+static const fupg_type fupg_dynoid[] = {
+#define T(name, fun) { 0, 0, {name"\0"}, fupg_send_##fun, fupg_recv_##fun },
+    DYNOID
+#undef T
+};
+
+#undef DYNOID
+#define FUPG_DYNOID (sizeof(fupg_dynoid) / sizeof(fupg_type))
+
+
 /* List of special types for use with set_type() */
+
 #define SPECIALS\
     T("$date_str",   date_str)\
     T("$hex",        hex     )
@@ -851,8 +934,19 @@ static const fupg_type *fupg_builtin_byoid(Oid oid) {
     return fupg_type_byoid(fupg_builtin, FUPG_BUILTIN, oid);
 }
 
+static const fupg_type *fupg_dynoid_byname(const char *name) {
+    size_t i;
+    for (i=0; i<FUPG_DYNOID; i++)
+        if (strcmp(fupg_dynoid[i].name.n, name) == 0)
+            return fupg_dynoid+i;
+    return NULL;
+}
+
 static const fupg_type *fupg_builtin_byname(const char *name) {
     size_t i;
+    const fupg_type *r = fupg_dynoid_byname(name);
+    if (r) return r;
+
     /* XXX: Can use binary search here if the list of specials grows.
      * That list does not have to be ordered by oid. */
     for (i=0; i<FUPG_SPECIALS; i++)

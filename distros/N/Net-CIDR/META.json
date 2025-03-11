@@ -5,6 +5,9 @@
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "network"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -34,9 +37,25 @@
          "requires" : {
             "Carp" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.22",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/svarshavchik/Net-CIDR/issues"
+      },
+      "homepage" : "https://github.com/svarshavchik/Net-CIDR",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/svarshavchik/Net-CIDR",
+         "web" : "https://github.com/svarshavchik/Net-CIDR"
+      }
+   },
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

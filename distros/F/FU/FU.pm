@@ -1,4 +1,4 @@
-package FU 0.2;
+package FU 0.3;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -253,8 +253,9 @@ sub _read_req_http($sock, $req) {
 
     $req->{body} = '';
     while ($len > 0) {
-        my $r = $sock->read($req->{body}, $len, -1);
-        fu->error(400, 'Client disconnect before request was read') if !$r
+        my $r = $sock->read($req->{body}, $len, length $req->{body});
+        fu->error(400, 'Client disconnect before request was read') if !$r;
+        $len -= $r;
     }
 }
 
@@ -288,7 +289,7 @@ sub _read_req($c) {
 
     # The HTTP reader above and the FastCGI XS reader operate on bytes.
     # Decode these into Unicode strings and check for special characters.
-    eval { FU::Util::utf8_decode($_); 1} || fu->err(400, $@)
+    eval { FU::Util::utf8_decode($_); 1} || fu->error(400, $@)
         for ($REQ->{path}, $REQ->{qs}, values $REQ->{hdr}->%*);
 
     ($REQ->{path}, my $qs) = split /\?/, $REQ->{path}//'', 2;
@@ -636,12 +637,15 @@ sub headers { $FU::REQ->{hdr} }
 sub ip { $FU::REQ->{ip} }
 
 sub _getfield($data, @a) {
-    return $data->{$a[0]} if @a == 1 && !ref $a[0];
+    if (@a == 1 && !ref $a[0]) {
+        fu->error(400, "Expected top-level to be a hash") if ref $data ne 'HASH';
+        return $data->{$a[0]};
+    }
     require FU::Validate;
     my $schema = FU::Validate->compile(@a > 1 ? { keys => {@a} } : $a[0]);
-    my $res = $schema->validate($data);
-    fu->error(400, "Input validation failed") if !$res; # TODO: More detailed error message
-    return @a == 2 ? $res->data->{$a[0]} : $res->data;
+    my $res = eval { $schema->validate($data) };
+    fu->error(400, "Input validation failed: $@") if $@;
+    return @a == 2 ? $res->{$a[0]} : $res;
 }
 
 sub query {
@@ -651,16 +655,30 @@ sub query {
     _getfield $FU::REQ->{qs_parsed}, @_;
 }
 
+sub json {
+    shift;
+    $FU::REQ->{json} ||= eval {
+        FU::Util::json_parse($FU::REQ->{data}, utf8 => 1)
+    } || fu->error(400, "JSON parse error: $@");
+    return $FU::REQ->{json} if !@_;
+    _getfield $FU::REQ->{json}, @_;
+}
+
 sub formdata {
     shift;
     $FU::REQ->{formdata} ||= eval {
-        # TODO: Support multipart encoding
         confess "Invalid content type for form data"
             if (fu->header('content-type')||'') ne 'application/x-www-form-urlencoded';
         FU::Util::query_decode($FU::REQ->{data});
     } || fu->error(400, $@);
-    # TODO: Accept schema validation thing.
     _getfield $FU::REQ->{formdata}, @_;
+}
+
+sub multipart {
+    require FU::MultipartFormData;
+    $FU::REQ->{multipart} ||= eval {
+        FU::MultipartFormData->parse(fu->header('content-type')||'', $FU::REQ->{body})
+    } || fu->error(400, $@);
 }
 
 
@@ -707,6 +725,12 @@ sub add_header($, $hdr, $val) {
 sub set_header($, $hdr, $val=undef) {
     _validate_header($hdr, $val);
     $FU::REQ->{reshdr}{ lc $hdr } = $val;
+}
+
+sub send_json($, $data) {
+    fu->set_header('content-type', 'application/json');
+    fu->set_body(FU::Util::json_format($data, canonical => 1, utf8 => 1));
+    fu->done;
 }
 
 sub send_file($, $root, $path) {
@@ -1236,17 +1260,24 @@ Parse, validate and return multiple query parameters.
   # Or, more concisely:
   my $data = fu->query(a => {anybool => 1}, b => {});
 
-=item fu->formdata($name)
+=item fu->json(@args)
 
-=item fu->formdata($schema)
+Like C<< fu->query() >> but parses the request body as JSON. Returns the
+decoded JSON value if C<@args> is empty.
 
-Like C<< fu->query() >> but returns data from the POST request body.
+=item fu->formdata(@args)
+
+Like C<< fu->query() >> but returns data from the POST request body. This
+method only supports form data encoded as C<application/x-www-form-urlencoded>,
+which is the default for HTML C<< <form> >>s. To handle multipart form data,
+use C<< fu->multipart >> instead.
+
+=item fu->multipart
+
+Parse the request body as C<multipart/form-data> and return an array of field
+objects.  Refer to L<FU::MultipartFormData> for more information.
 
 =back
-
-I<TODO:> Support C<multipart/form-data> and file uploads.
-
-I<TODO:> Support JSON bodies.
 
 I<TODO:> Cookie parsing.
 
@@ -1309,6 +1340,14 @@ templating system or L<FU::XMLWriter>:
       };
   });
 
+=item fu->send_json($data)
+
+Encode C<$data> as JSON (using C<json_format> in L<FU::Util>), set an
+appropriate C<Content-Type> header and send it to the client. Calls C<<
+fu->done >>.
+
+I<TODO:> Support schema-based normalization.
+
 =item fu->send_file($root, $path)
 
 If a file identified by C<"$root/$path"> exists, set that as response and call
@@ -1361,8 +1400,6 @@ one of the following status codes or an alias:
 =back
 
 I<TODO:> Setting cookies.
-
-I<TODO:> JSON output.
 
 
 =head2 Running the Site

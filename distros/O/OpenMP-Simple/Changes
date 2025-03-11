@@ -103,3 +103,9 @@
       - POD clean up
       - renamed "contribute" to "CONTRIBUTING.md" to adhere to
 	metacpan's idiosyncratic "/contribute" endpoint
+
+0.2.5  03/10/2025 01:18:00 AM MST
+      - fixed issues related to VALIDATE functions discovered
+        for perls 5.12 and 5.14 via GH Actions CI testing
+      - added a secondary test that doesn't run `dzil test`
+        so we can test on perls <= 5.18 

@@ -1,0 +1,14 @@
+Revision history for Log-Abstraction
+
+0.04	Mon Mar 10 09:39:46 EDT 2025
+	Renamed from Log-YetAnother to Log-Abstraction
+	Added config_file argument to new()
+
+0.03	Sat Mar  8 08:40:00 EST 2025
+	Fix passing an array to warn()
+
+0.02	Thu Mar  6 17:09:32 EST 2025
+	Improved argument checking to new()
+
+0.01	Thu Mar  6 15:42:04 EST 2025
+        First draft

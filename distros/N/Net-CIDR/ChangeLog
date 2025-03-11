@@ -1,3 +1,9 @@
+0.23
+
+2025-03-09   brian d foy <briandfoy@pobox.com>
+
+	* Allow unabbreviated IPv6 addresses.
+
 0.22
 
 2025-03-09  Sam Varshavchik  <mrsam@courier-mta.com>

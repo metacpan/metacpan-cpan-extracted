@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use feature qw/ say /;
 
 use MIDI::RtController;
 
@@ -12,8 +11,13 @@ my $out = $ARGV[1] || 'gs';
 my $rtc = MIDI::RtController->new( input => $in, output => $out );
 
 $rtc->add_filter(
-    'say',
-    note_on => sub { say "dt: $_[0], ev: ", join( ', ', @{ $_[1] } ) }
+    'echo',
+    all => sub {
+        my ($dt, $event) = @_;
+        print "dt: $dt, ev: ", join( ', ', @$event ), "\n"
+            unless $event->[0] eq 'clock';
+        return 0;
+    }
 );
 
 $rtc->run;

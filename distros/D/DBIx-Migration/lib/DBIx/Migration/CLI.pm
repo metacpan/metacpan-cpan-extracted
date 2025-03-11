@@ -12,6 +12,7 @@ use Getopt::Std               qw( getopts );
 use Log::Any                  ();
 use Log::Any::Adapter         ();
 use Module::Load::Conditional qw( can_load );
+use PerlX::Maybe              qw( maybe );
 use POSIX                     qw( EXIT_FAILURE EXIT_SUCCESS );
 use Try::Tiny                 qw( catch try );
 
@@ -26,7 +27,7 @@ sub run {
       chomp $warning;
       $exitval = _usage( -exitval => 2, -message => $warning );
     };
-    getopts( '-Vhp:s:t:u:v', $opts = {} );
+    getopts( '-VT:hp:s:t:u:v', $opts = {} );
   }
   return $exitval if defined $exitval;
 
@@ -38,7 +39,8 @@ sub run {
 
   return _usage( -exitval => 2, -message => 'Missing mandatory arguments' ) unless @ARGV;
 
-  Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
+  my $log_any_adapter_entry;
+  $log_any_adapter_entry = Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
   my $Logger = Log::Any->get_logger( category => 'DBIx::Migration' );
   $exitval = try {
     my $dsn    = shift @ARGV;
@@ -50,8 +52,11 @@ sub run {
       dsn      => $dsn,
       password => $opts->{ p },
       username => $opts->{ u },
-      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ s } ) : (),
-      ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
+      maybe
+        managed_schema => $opts->{ s },
+      maybe
+        tracking_schema => $opts->{ t },
+      maybe tracking_table => $opts->{ T }
     );
     if ( @ARGV ) {
       $m->dir( shift @ARGV );
@@ -67,6 +72,7 @@ sub run {
     chomp;
     return _usage( -exitval => 2, -message => $_ );
   };
+  Log::Any::Adapter->remove( $log_any_adapter_entry ) if defined $log_any_adapter_entry;
 
   return $exitval;
 }

@@ -14,6 +14,7 @@
 #define Uses_TStatusDef
 #define Uses_TStatusItem
 #define Uses_TCheckBoxes
+#define Uses_TColorSelector
 #define Uses_TRadioButtons
 #define Uses_TScroller
 #define Uses_TScrollBar
@@ -80,12 +81,9 @@ TDeskTop* deskTop(TVApp *tapp)
 	    my ($fun, $args) = /^\s*(\S+)\s*\(\s*(.*?)\s*\)/;
 	    my $num = $fun=~s/(\d+)$// ? $1 : '';
 	    $args =~ s/TStringView/char */g;
-	    my $argv = $args =~ s/(\w+\s*\*|int|char|TRect|TPoint)//gr =~ s/=.*?(?=(?:,|(?:\s*$)))//gr;
+	    my $argv = $args =~ s/(\w+\s*\*|int|char|TRect|TPoint|TKey|ColorSel)//gr =~ s/=.*?(?=(?:,|(?:\s*$)))//gr;
 	    $argv =~ tr|&|*|;
 	    $args =~ tr|&||d;
-	    # TKey TODO:
-	    $args =~ s/TKey/int/g;
-	    $argv =~ s/TKey +(\w+)/TKey($1)/g;
 	    <<"EOS"
 MODULE=TVision::$fun PACKAGE=TVision::$fun
 $fun* new$num($args)
@@ -103,6 +101,7 @@ EOS
 	TLabel(TRect r, TStringView aText, TView *aLink )
 	TButton(TRect r, char *title, int cmd, int flags)
 	TScrollBar(TRect r)
+        TColorSelector(TRect Bounds, int ASelType)
 	TIndicator(TRect r)
 	TInputLine(TRect r, int limit)
 	TMenuBar(TRect r, TSubMenu* &aMenu)
@@ -137,7 +136,7 @@ EOS
 	    my $funa = $fun =~ s/^\S+\s*//r =~ tr/*//dr;
 	    $fun=~tr/_/ /;
 	    $args =~ s/TStringView/char */g;
-	    my $argv = $args =~ s/(\w+\s*\*|\bunsigned int|\bint|\bchar\b|\bshort\b|TRect|TPoint)//gr;
+	    my $argv = $args =~ s/(\w+\s*\*|\bunsigned int|\bint|\bchar\b|\bshort\b|TRect|TPoint|TKey)//gr;
 	    my $comap =  $args =~ /^\s*$/ ? "" : ",";
 	    $args = "$pkg *self$comap$args";
 	    if ($body =~ /^\s*$/) { $body = ($output? "RETVAL = " : "") . "self->$funa($argv);"; }
@@ -194,11 +193,11 @@ EOS
 	void drawCursor()
 	#void clearEvent( TEvent& event )
 	int eventAvail()
-	#static Boolean commandEnabled( ushort command ) noexcept;
+	int commandEnabled( int command )
 	#static void disableCommands( TCommandSet& commands ) noexcept;
 	#static void enableCommands( TCommandSet& commands ) noexcept;
-	#static void disableCommand( ushort command ) noexcept;
-	#static void enableCommand( ushort command ) noexcept;
+	void disableCommand( int command )
+	void enableCommand( int command )
 	#static void getCommands( TCommandSet& commands ) noexcept;
 	#static void setCommands( TCommandSet& commands ) noexcept;
 	#static void setCmdState( TCommandSet& commands, Boolean enable ) noexcept;
@@ -247,11 +246,21 @@ EOS
 	#virtual TTimerId setTimer( uint timeoutMs, int periodMs = -1 );
 	#virtual void killTimer( TTimerId id );
 
+      TScrollBar:
+	void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep )
+	void setRange( int aMin, int aMax )
+	void setStep( int aPgStep, int aArStep )
+	void setValue( int aValue )
+	void drawPos( int pos )
+	int getPos()
+	int getSize()
       TScroller:
         void scrollTo( int x, int y )
         void setLimit( int x, int y )
+        void checkDraw()
 
       TWindow:
+        TFrame *initFrame( TRect r)
 	TScrollBar *standardScrollBar( int aOptions )
 	void zoom()
 	void shutDown()
@@ -408,7 +417,7 @@ EOS
 	int keyState
       TWindow:
 	int flags
-	#TRect zoomRect;
+	TRect zoomRect
 	int number
 	int palette
 	TFrame *frame
@@ -424,7 +433,19 @@ EOS
         int growMode
         int dragMode
         int helpCtx
+        int commandSetChanged
         TGroup *owner
+        int showMarkers
+        int errorAttr
+      TScrollBar:
+        int value
+        #TScrollChars chars
+        int minVal
+        int maxVal
+        int pgStep
+        int arStep
+      TScroller:
+        TPoint delta
       TProgram:
 	TProgram *application
 	TStatusLine *statusLine
@@ -437,7 +458,7 @@ EOS
 	#const char *name
 	int command
 	int disabled
-	#TKey keyCode
+	TKey keyCode
 	int helpCtx
 EOS
 }}}

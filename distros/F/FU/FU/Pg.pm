@@ -1,4 +1,4 @@
-package FU::Pg 0.2;
+package FU::Pg 0.3;
 use v5.36;
 use FU::XS;
 
@@ -112,6 +112,11 @@ Inside a transaction that is in an error state. The transaction must be rolled
 back in order to recover to a usable state. This happens automatically when the
 transaction object goes out of scope.
 
+=item active
+
+Currently executing a query. This state can only be observed during a L<COPY
+operation|/"COPY support">.
+
 =item bad
 
 Connection is dead or otherwise unusable.
@@ -155,10 +160,11 @@ executing the query, but I<before> the query results have been returned.
 
 The subroutine is (currently) only called for queries executed through C<<
 $conn->exec >>, C<< $conn->q >>, C<< $conn->Q >> and their C<$txn> variants;
-internal queries performed by this module (such as for transaction management,
-querying type information, etc) do not trigger the callback. Statements that
-result in an error being thrown during or before execution are also not
-traceable this way. This behavior might change in the future.
+C<< $conn->copy >> statements and internal queries performed by this module
+(such as for transaction management, querying type information, etc) do not
+trigger the callback. Statements that result in an error being thrown during or
+before execution are also not traceable this way. This behavior might change in
+the future.
 
 =item $conn->disconnect
 
@@ -400,9 +406,7 @@ results into Perl values.
 
 Observed query preparation time, in seconds, including network round-trip.
 Returns 0 if a cached prepared statement was used or C<undef> if the query was
-executed without a separate preparation phase (currently only happens with C<<
-$conn->exec() >>, but support for direct query execution may be added for other
-queries in the future as well).
+executed without a separate preparation phase.
 
 =item $st->get_cache
 
@@ -520,6 +524,11 @@ current implementation does not track subtransactions that closely)
 =item txn_error
 
 A subtransaction is in error state and awaiting to be rolled back.
+
+=item active
+
+Currently executing a query. This state can only be observed during a L<COPY
+operation|/"COPY support">.
 
 =item bad
 
@@ -666,8 +675,8 @@ module does not.
 
 Converted between floating point seconds since C<00:00:00>, supporting
 microsecond precision. This format allows for easy comparison against Unix
-timestamps (time of day = C<$timestamp % 86400>) and can be added to an integer
-date value to form a complete timestamp.
+timestamps (time of day in UTC = C<$timestamp % 86400>) and can be added to an
+integer date value to form a complete timestamp.
 
 (There's no support for the string format yet)
 
@@ -741,6 +750,71 @@ C<set_type()> to configure appropriate conversions for these types.
 I<TODO:> Methods to convert between the various formats.
 
 I<TODO:> Methods to query type info.
+
+
+=head2 COPY support
+
+You can use L<COPY
+statements|https://www.postgresql.org/docs/current/sql-copy.html> for efficient
+bulk data transfers between your application and the PostgreSQL server:
+
+=over
+
+=item $copy = $conn->copy($statement)
+
+=item $copy = $txn->copy($statement)
+
+Execute C<$statement> and return a C<FU::Pg::copy> object that lets you
+transfer data to or from Postgres.
+
+It is not possible to execute any other queries on the same connection while a
+copy operation is in progress. When used on a transaction object, C<$txn> must
+be kept alive long enough to finish the copy operation.
+
+=back
+
+A C<$copy> object supports the following methods:
+
+=over
+
+=item $copy->is_binary
+
+Returns true if the transfer is performed in the binary format, false for text.
+
+=item $copy->write($data)
+
+Send C<$data> to the server. An error is thrown if this is not a C<COPY FROM
+STDIN> operation. An error may be thrown if C<$data> is not a valid format
+understood by Postgres, but such errors can also be deferred to C<close()>.
+
+C<$data> is interpreted as a Perl Unicode string for textual transfers and as a
+binary string for binary transfers.
+
+=item $copy->read
+
+Return the next row read from the Postgres server, or C<undef> if no more data
+is coming. In the text format, a single line - including trailing newline - is
+returned as a Perl Unicode string. In the binary format, a single row is
+returned as a byte string. An error is thrown if this is not a C<COPY TO
+STDOUT> operation.
+
+=item $copy->close
+
+Marks the end of the copy operation. Does not return anything but throws an
+error if something went wrong.
+
+It is possible to close a read-copy operation before all data has been
+consumed, but that causes all data to still be read and discarded during
+C<close()>. If you really want to interrupt a large read operation, a more
+efficient approach is to call C<< $conn->close >> and discard the entire
+connection.
+
+It is not I<necessary> to call this method, simply letting the C<$copy> object
+run out of scope will do the trick as well, but in that case errors are
+silently discarded. An explicit C<close()> is recommended to catch errors.
+
+=back
+
 
 =head2 Errors
 
@@ -825,32 +899,17 @@ to it after C<connect()> is always safe:
 
 =item * Only works with blocking (synchronous) calls, not very suitable for use
 in asynchronous frameworks unless you know your queries are fast and you have a
-low-latency connection with the Postgres server.
+low-latency connection with the Postgres server. This is unlikely to improve in
+future versions, Perl's async story is somewhat awkward in general, and fully
+supporting async operation might require a fundamental redesign of how this
+module works.
 
-=back
+=item * LISTEN support is still missing. May be added in a future version, as
+this seems doable without supporting full async.
 
-Missing features:
-
-=over
-
-=item COPY support
-
-I hope to implement this someday.
-
-=item LISTEN support
-
-Would be nice to have, most likely doable without going full async.
-
-=item Asynchronous calls
-
-Probably won't happen. Perl's async story is slightly awkward in general, and
-fully supporting async operation might require a fundamental redesign of how
-this module works. It certainly won't I<simplify> the implementation.
-
-=item Pipelining
-
-I have some ideas for an API, but doubt I'll ever implement it. Suffers from
-the same awkwardness and complexity as asynchronous calls.
+=item * Pipelining support is also missing. I have some ideas for an API, but
+doubt I'll ever implement it. Suffers from the same awkwardness and complexity
+as asynchronous calls.
 
 =back
 

@@ -1,9 +1,9 @@
 This archive contains the distribution Catalyst-Plugin-CSRFToken,
-version 0.008:
+version 1.001:
 
   Generate tokens to help prevent CSRF attacks.
 
-This software is copyright (c) 2024 by John Napiorkowski.
+This software is copyright (c) 2025 by John Napiorkowski.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

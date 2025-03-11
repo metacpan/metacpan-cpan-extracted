@@ -1,6 +1,6 @@
 package TVision;
-our $VERSION=0.16;
-
+our $VERSION=0.17;
+=encoding utf-8
 =head1 NAME
 
 TVision - Perl glue to the TurboVision library
@@ -31,6 +31,8 @@ Some widgets (TButton) has 'num' key, which is usually small integer for the
 onCommand event. If 0 - then next availlable is taken.
 
 TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
+TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
+TKey is array ref of 2 integers, which isn't always blessed to TVision::TKey.
 
 =cut
 
@@ -236,10 +238,78 @@ package TVision::TColorAttr;
 package TVision::TColorDialog;
 package TVision::TColorDisplay;
 package TVision::TColorGroup;
+#class TColorGroup {
+#public:
+#[ ]    TColorGroup( const char *nm, TColorItem *itm = 0, TColorGroup *nxt = 0 ) noexcept;
+#[ ]    virtual ~TColorGroup();
+#[ ]    const char *name;
+#[ ]    uchar index;
+#[ ]    TColorItem *items;
+#[ ]    TColorGroup *next;
+#[ ]    friend TColorGroup& operator + ( TColorGroup&, TColorItem& ) noexcept;
+#[ ]    friend TColorGroup& operator + ( TColorGroup& g1, TColorGroup& g2 ) noexcept;
+#};
 package TVision::TColorGroupList;
 package TVision::TColorItem;
+#class TColorItem {
+#public:
+#    TColorItem( const char *nm, uchar idx, TColorItem *nxt = 0 ) noexcept;
+#    virtual ~TColorItem();
+#    const char *name;
+#    uchar index;
+#    TColorItem *next;
+#    friend TColorGroup& operator + ( TColorGroup&, TColorItem& ) noexcept;
+#    friend TColorItem& operator + ( TColorItem& i1, TColorItem& i2 ) noexcept;
+#};
+# class TColorIndex {
+# public:
+#     uchar groupIndex;
+#     uchar colorSize;
+#     uchar colorIndex[256];
+# };
+
 package TVision::TColorItemList;
+#[ ]class TColorItemList : public TListViewer {
+#[ ]public:
+#[ ]    TColorItemList( const TRect& bounds, TScrollBar *aScrollBar, TColorItem *aItems) noexcept;
+#[ ]    virtual void focusItem( short item );
+#[ ]    virtual void getText( char *dest, short item, short maxLen );
+#[ ]    virtual void handleEvent( TEvent& event );
+#[ ]protected:
+#[ ]    TColorItem *items;
+#[ ]private:
+#[ ]    virtual const char *streamableName() const { return name; }
+#[ ]protected:
+#[ ]    TColorItemList( StreamableInit ) noexcept;
+#[ ]public:
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
+#[ ]};
+
 package TVision::TColorSelector;
+our @ISA = qw(TVision::TView);
+#[ ]class TColorSelector : public TView {
+#[ ]public:
+#[ ]    enum ColorSel { csBackground, csForeground };
+#[ ]    TColorSelector( const TRect& Bounds, ColorSel ASelType ) noexcept;
+#[ ]    virtual void draw();
+#[ ]    virtual void handleEvent( TEvent& event );
+#[ ]protected:
+#[ ]    uchar color;
+#[ ]    ColorSel selType;
+#[ ]private:
+#[ ]    void colorChanged();
+#[ ]    static const char _NEAR icon;
+#[ ]    virtual const char *streamableName() const { return name; }
+#[ ]protected:
+#[ ]    TColorSelector( StreamableInit ) noexcept;
+#[ ]    virtual void write( opstream& );
+#[ ]    virtual void *read( ipstream& );
+#[ ]public:
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
+#[ ]};
+
 package TVision::TCommandSet;
 package TVision::TDeskTop;
 our @ISA = qw(TVision::TGroup);
@@ -420,6 +490,7 @@ package TVision::TFileEditor;
 
 package TVision::EventCodes;
 package TVision::TEvent;
+# map it to [what, mouse1, mouse2, key1, key2, key3}
 #struct TEvent {
 #    ushort what;
 #    union {
@@ -445,6 +516,7 @@ package TVision::TEvent;
 #    TStringView getText() const;
 #    operator TKey() const;
 #};
+# const int maxCharSize = 4; // A UTF-8-encoded character is up to 4 bytes long.
 #inline TStringView KeyDownEvent::getText() const { return TStringView(text, textLength); }
 #inline KeyDownEvent::operator TKey() const { return TKey(keyCode, controlKeyState); }
 #struct MessageEvent {
@@ -684,7 +756,15 @@ package TVision::TIndicator;
 #    static const char * const _NEAR name;
 #    static TStreamable *build();
 #};
-package TVision::TKeys;
+package TVision::TKey;
+#class TKey {
+#public:
+#    constexpr TKey() noexcept;
+#    TKey(ushort keyCode, ushort shiftState = 0) noexcept;
+#    ushort code;
+#    ushort mods;
+#};
+
 package TVision::TLabel;
 our @ISA = qw(TVision::TStaticText);
 #class TLabel : public TStaticText {
@@ -752,20 +832,20 @@ package TVision::TMenuBox;
 package TVision::TMenuItem;
 #class TMenuItem { 
 #public:
-#    TMenuItem( TStringView aName, ushort aCommand, TKey aKey, ushort aHelpCtx = hcNoContext, TStringView p = 0, TMenuItem *aNext = 0) noexcept;
-#    TMenuItem( TStringView aName, TKey aKey, TMenu *aSubMenu, ushort aHelpCtx = hcNoContext, TMenuItem *aNext = 0) noexcept;
-#    ~TMenuItem();
-#    void append( TMenuItem *aNext ) noexcept;
-#    TMenuItem *next;
-#    const char *name;
-#    ushort command;
-#    Boolean disabled;
-#    TKey keyCode;
-#    ushort helpCtx;
-#    union {
-#        const char *param;
-#        TMenu *subMenu;
-#    };
+#[x]    TMenuItem( TStringView aName, ushort aCommand, TKey aKey, ushort aHelpCtx = hcNoContext, TStringView p = 0, TMenuItem *aNext = 0) noexcept;
+#[x]    TMenuItem( TStringView aName, TKey aKey, TMenu *aSubMenu, ushort aHelpCtx = hcNoContext, TMenuItem *aNext = 0) noexcept;
+#[ ]    ~TMenuItem();
+#[x]    void append( TMenuItem *aNext ) noexcept;
+#[x]    TMenuItem *next;
+#[ ]    const char *name;
+#[x]    ushort command;
+#[x]    Boolean disabled;
+#[x]    TKey keyCode;
+#[x]    ushort helpCtx;
+#[ ]    union {
+#[ ]        const char *param;
+#[ ]        TMenu *subMenu;
+#[ ]    };
 #};
 package TVision::TMenuPopup;
 #class TMenuPopup : public TMenuBox { 
@@ -873,27 +953,27 @@ package TVision::TScrollBar;
 #    cmScrollBarClicked  = 54,
 #class TScrollBar : public TView { 
 #public:
-#    TScrollBar( const TRect& bounds ) noexcept;
-#    virtual void draw();
-#    virtual TPalette& getPalette() const;
-#    virtual void handleEvent( TEvent& event );
-#    virtual void scrollDraw();
-#    virtual int scrollStep( int part );
-#    void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep ) noexcept;
-#    void setRange( int aMin, int aMax ) noexcept;
-#    void setStep( int aPgStep, int aArStep ) noexcept;
-#    void setValue( int aValue ) noexcept;
-#    void drawPos( int pos ) noexcept;
-#    int getPos() noexcept;
-#    int getSize() noexcept;
-#    int value;
-#    TScrollChars chars;
-#    int minVal;
-#    int maxVal;
-#    int pgStep;
-#    int arStep;
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[x]    TScrollBar( const TRect& bounds ) noexcept;
+#[ ]    virtual void draw();
+#[ ]    virtual TPalette& getPalette() const;
+#[ ]    virtual void handleEvent( TEvent& event );
+#[ ]    virtual void scrollDraw();
+#[ ]    virtual int scrollStep( int part );
+#[x]    void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep ) noexcept;
+#[x]    void setRange( int aMin, int aMax ) noexcept;
+#[x]    void setStep( int aPgStep, int aArStep ) noexcept;
+#[x]    void setValue( int aValue ) noexcept;
+#[x]    void drawPos( int pos ) noexcept;
+#[x]    int getPos() noexcept;
+#[x]    int getSize() noexcept;
+#[x]    int value;
+#[ ]    TScrollChars chars;
+#[x]    int minVal;
+#[x]    int maxVal;
+#[x]    int pgStep;
+#[x]    int arStep;
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
 package TVision::TScroller;
 our @ISA = qw(TVision::TView);
@@ -907,9 +987,9 @@ our @ISA = qw(TVision::TView);
 #[x]    void scrollTo( int x, int y ) noexcept;
 #[x]    void setLimit( int x, int y ) noexcept;
 #[ ]    virtual void setState( ushort aState, Boolean enable );
-#[ ]    void checkDraw() noexcept;
+#[x]    void checkDraw() noexcept;
 #[ ]    virtual void shutDown();
-#[ ]    TPoint delta;
+#[x]    TPoint delta;
 #[ ]protected:
 #[ ]    uchar drawLock;
 #[ ]    Boolean drawFlag;
@@ -973,10 +1053,7 @@ package TVision::TStreamableTypes;
 package TVision::TStringCollection;
 package TVision::TStringList;
 
-
-
 package TVision::TStringLookupValidator;
-
 
 #####IDK TODO
 #class TStringView { 
@@ -1033,29 +1110,29 @@ our @ISA = qw(TVision::TObject);
 #[ ]    virtual void sizeLimits( TPoint& min, TPoint& max );
 #[x]    TRect getBounds() const noexcept;
 #[x]    TRect getExtent() const noexcept;
-#[ ]    TRect getClipRect() const noexcept;
-#[ ]    Boolean mouseInView( TPoint mouse ) noexcept;
+#[x]    TRect getClipRect() const noexcept;
+#[x]    Boolean mouseInView( TPoint mouse ) noexcept;
 #[ ]    Boolean containsMouse( TEvent& event ) noexcept;
 #[x]    void locate( TRect& bounds );
 #[ ]    virtual void dragView( TEvent& event, uchar mode, TRect& limits, TPoint minSize, TPoint maxSize ); // temporary fix for Miller's stuff
 #[ ]    virtual void calcBounds( TRect& bounds, TPoint delta );
 #[ ]    virtual void changeBounds( const TRect& bounds );
-#[ ]    void growTo( short x, short y );
-#[ ]    void moveTo( short x, short y );
+#[x]    void growTo( short x, short y );
+#[x]    void moveTo( short x, short y );
 #[ ]    void setBounds( const TRect& bounds ) noexcept;
 #[ ]    virtual ushort getHelpCtx();
 #[ ]    virtual Boolean valid( ushort command );
-#[ ]    void hide();
-#[ ]    void show();
+#[x]    void hide();
+#[x]    void show();
 #[ ]    virtual void draw();
-#[ ]    void drawView() noexcept;
-#[ ]    Boolean exposed() noexcept;
+#[x]    void drawView() noexcept;
+#[x]    Boolean exposed() noexcept;
 #[x]    Boolean focus();
-#[ ]    void hideCursor();
-#[ ]    void drawHide( TView *lastView );
-#[ ]    void drawShow( TView *lastView );
-#[ ]    void drawUnderRect( TRect& r, TView *lastView );
-#[ ]    void drawUnderView( Boolean doShadow, TView *lastView );
+#[x]    void hideCursor();
+#[x]    void drawHide( TView *lastView );
+#[x]    void drawShow( TView *lastView );
+#[x]    void drawUnderRect( TRect& r, TView *lastView );
+#[x]    void drawUnderView( Boolean doShadow, TView *lastView );
 #[ ]    virtual ushort dataSize();
 #[ ]    virtual void getData( void *rec );
 #[ ]    virtual void setData( void *rec );
@@ -1071,21 +1148,21 @@ our @ISA = qw(TVision::TObject);
 #[ ]    virtual void getEvent( TEvent& event );
 #[ ]    virtual void handleEvent( TEvent& event );
 #[ ]    virtual void putEvent( TEvent& event );
-#[ ]    static Boolean commandEnabled( ushort command ) noexcept;
+#[x]    static Boolean commandEnabled( ushort command ) noexcept;
 #[ ]    static void disableCommands( TCommandSet& commands ) noexcept;
 #[ ]    static void enableCommands( TCommandSet& commands ) noexcept;
-#[ ]    static void disableCommand( ushort command ) noexcept;
-#[ ]    static void enableCommand( ushort command ) noexcept;
+#[x]    static void disableCommand( ushort command ) noexcept;
+#[x]    static void enableCommand( ushort command ) noexcept;
 #[ ]    static void getCommands( TCommandSet& commands ) noexcept;
 #[ ]    static void setCommands( TCommandSet& commands ) noexcept;
 #[ ]    static void setCmdState( TCommandSet& commands, Boolean enable ) noexcept;
-#[ ]    virtual void endModal( ushort command );
-#[ ]    virtual ushort execute();
+#[x]    virtual void endModal( ushort command );
+#[x]    virtual ushort execute();
 #[ ]    TAttrPair getColor( ushort color ) noexcept;
 #[ ]    virtual TPalette& getPalette() const;
 #[ ]    virtual TColorAttr mapColor( uchar ) noexcept;
-#[ ]    Boolean getState( ushort aState ) const noexcept;
-#[ ]    void select();
+#[x]    Boolean getState( ushort aState ) const noexcept;
+#[x]    void select();
 #[ ]    virtual void setState( ushort aState, Boolean enable );
 #[ ]    void getEvent( TEvent& event, int timeoutMs );
 #[ ]    void keyEvent( TEvent& event );
@@ -1093,34 +1170,34 @@ our @ISA = qw(TVision::TObject);
 #[ ]    Boolean textEvent( TEvent &event, TSpan<char> dest, size_t &length );
 #[ ]    virtual TTimerId setTimer( uint timeoutMs, int periodMs = -1 );
 #[ ]    virtual void killTimer( TTimerId id );
-#[ ]    TPoint makeGlobal( TPoint source ) noexcept;
-#[ ]    TPoint makeLocal( TPoint source ) noexcept;
-#[ ]    TView *nextView() noexcept;
-#[ ]    TView *prevView() noexcept;
-#[ ]    TView *prev() noexcept;
-#[ ]    TView *next;
-#[ ]    void makeFirst();
-#[ ]    void putInFrontOf( TView *Target );
-#[ ]    TView *TopView() noexcept;
+#[x]    TPoint makeGlobal( TPoint source ) noexcept;
+#[x]    TPoint makeLocal( TPoint source ) noexcept;
+#[x]    TView *nextView() noexcept;
+#[x]    TView *prevView() noexcept;
+#[x]    TView *prev() noexcept;
+#[x]    TView *next;
+#[x]    void makeFirst();
+#[x]    void putInFrontOf( TView *Target );
+#[x]    TView *TopView() noexcept;
 #[ ]    void writeBuf(  short x, short y, short w, short h, const void _FAR* b ) noexcept;
 #[ ]    void writeBuf(  short x, short y, short w, short h, const TDrawBuffer& b ) noexcept;
 #[ ]    void writeChar( short x, short y, char c, uchar color, short count ) noexcept;
 #[ ]    void writeLine( short x, short y, short w, short h, const TDrawBuffer& b ) noexcept;
 #[ ]    void writeLine( short x, short y, short w, short h, const void _FAR *b ) noexcept;
 #[ ]    void writeStr( short x, short y, const char *str, uchar color ) noexcept;
-#[ ]    TPoint size;
-#[ ]    ushort options;
-#[ ]    ushort eventMask;
-#[ ]    ushort state;
-#[ ]    TPoint origin;
-#[ ]    TPoint cursor;
-#[ ]    uchar growMode;
-#[ ]    uchar dragMode;
-#[ ]    ushort helpCtx;
-#[ ]    static Boolean _NEAR commandSetChanged;
-#[ ]    TGroup *owner;
-#[ ]    static Boolean _NEAR showMarkers;
-#[ ]    static uchar _NEAR errorAttr;
+#[x]    TPoint size;
+#[x]    ushort options;
+#[x]    ushort eventMask;
+#[x]    ushort state;
+#[x]    TPoint origin;
+#[x]    TPoint cursor;
+#[x]    uchar growMode;
+#[x]    uchar dragMode;
+#[x]    ushort helpCtx;
+#[x]    static Boolean _NEAR commandSetChanged;
+#[x]    TGroup *owner;
+#[x]    static Boolean _NEAR showMarkers;
+#[x]    static uchar _NEAR errorAttr;
 #[ ]    virtual void shutDown();
 #private:
 #    void moveGrow( TPoint p, TPoint s, TRect& limits, TPoint minSize, TPoint maxSize, uchar mode);
@@ -1143,28 +1220,27 @@ package TVision::TWindow;
 our @ISA = qw(TVision::TGroup);
 #class TWindow: public TGroup, public virtual TWindowInit { 
 #public:
-#    TWindow( const TRect& bounds, TStringView aTitle, short aNumber) noexcept;
-#    ~TWindow();
-#    virtual void close();
-#    virtual TPalette& getPalette() const;
-#    virtual const char *getTitle( short maxSize );
-#    virtual void handleEvent( TEvent& event );
-#    static TFrame *initFrame( TRect );
-#    virtual void setState( ushort aState, Boolean enable );
-#    virtual void sizeLimits( TPoint& min, TPoint& max );
-#    TScrollBar *standardScrollBar( ushort aOptions ) noexcept;
-#    virtual void zoom();
-#    virtual void shutDown();
-#    uchar flags;
-#    TRect zoomRect;
-#    short number;
-#    short palette;
-#    TFrame *frame;
-#    const char *title;
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[x]    TWindow( const TRect& bounds, TStringView aTitle, short aNumber) noexcept;
+#[ ]    ~TWindow();
+#[ ]    virtual void close();
+#[ ]    virtual TPalette& getPalette() const;
+#[ ]    virtual const char *getTitle( short maxSize );
+#[ ]    virtual void handleEvent( TEvent& event );
+#[x]    static TFrame *initFrame( TRect );
+#[ ]    virtual void setState( ushort aState, Boolean enable );
+#[ ]    virtual void sizeLimits( TPoint& min, TPoint& max );
+#[x]    TScrollBar *standardScrollBar( ushort aOptions ) noexcept;
+#[x]    virtual void zoom();
+#[x]    virtual void shutDown();
+#[x]    uchar flags;
+#[x]    TRect zoomRect;
+#[x]    short number;
+#[x]    short palette;
+#[x]    TFrame *frame;
+#[ ]    const char *title;
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
-package TVision::ViewCommands;
 package TVision::fpbase;
 package TVision::fpstream;
 package TVision::ifpstream;

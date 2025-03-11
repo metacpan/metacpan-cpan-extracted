@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::CSRFToken.
 
+1.001 - 2025-03-09
+  - Back compatibility warning: The previous version has been buggy
+    for quite a while due to errors I made in version 0.001 and I've
+    tried to fix these over the past few years with only part success.
+    Additionally some of its comparison code is not up to modern
+    cryptographic standards. As a result the guts are now substantially changed.
+    I did my best to be compatible in terms of the public API. This works
+    for all my existing code but please shout out if you run into issues.
+    FWIW I believe you should upgrade as I consider previous versions
+    insecure and I will be removing them from CPAN in the future.
+
 0.008 - 2024-10-27
   - Force session id to exist if one doesn't already.
 

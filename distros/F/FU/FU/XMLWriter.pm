@@ -1,4 +1,4 @@
-package FU::XMLWriter 0.2;
+package FU::XMLWriter 0.3;
 use v5.36;
 use Carp 'confess';
 use Exporter 'import';
@@ -146,7 +146,7 @@ These functions all return a byte string with (UTF-8) encoded XML.
 
 =item fragment($block)
 
-Executes C<$block> and captures the output of all I</"Output functions">
+Executes C<$block> and captures the output of all L</"Output functions">
 called within the same scope into a string. This function can be safely nested:
 
   my $string = fragment {

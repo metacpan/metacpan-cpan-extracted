@@ -1,11 +1,15 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002017 2025 March 10
+          - minor changes to the way we call 'csrf_token' to support per form tokens
+            when the underlying CSRF library supports that.
+
 0.002016 2025 January 02
           - FormBuilder: 'select' and 'collection_select' new option 'default_selected'
-          which sets selected options only when the underlying model has no value for
-          the selected field.
+            which sets selected options only when the underlying model has no value for
+            the selected field.
           - FormBuilder: the 'action' option now always overrides any discovered form
-          action urls via view or controller introspection.
+            action urls via view or controller introspection.
 
 0.002015 2025 January 02
           - Fixed goof in previous release

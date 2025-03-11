@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0404';
 
 use Moo;
 use strictures 2;
@@ -51,8 +51,6 @@ has filters => (
     default => sub { {} },
 );
 
-# Private attributes
-
 has _msg_channel => (
     is      => 'ro',
     default => sub { IO::Async::Channel->new },
@@ -84,7 +82,7 @@ sub BUILD {
         on_recv => sub ($channel, $event) {
             my $dt = shift @$event;
             $event = shift @$event;
-            print "Delta time: $dt, Event: @$event\n" if $self->verbose;
+            print "Delta time: $dt\n" if $self->verbose;
             $self->_filter_and_forward($dt, $event);
         }
     );
@@ -113,22 +111,36 @@ sub _open_port($device, $name) {
 sub _rtmidi_loop ($msg_ch, $midi_ch) {
     my $midi_in = MIDI::RtMidi::FFI::Device->new(type => 'in');
     _open_port($midi_in, ${ $msg_ch->recv });
-    $midi_in->set_callback_decoded(sub { $midi_ch->send([ @_[0, 2] ]) });
+    $midi_in->set_callback_decoded(sub { $midi_ch->send([ @_[0, 2] ]) }); # delta-time, event
     sleep;
 }
 
 sub _filter_and_forward ($self, $dt, $event) {
-    my $event_filters = $self->filters->{ $event->[0] } // [];
-    for my $filter ($event_filters->@*) {
+    my $event_filters = $self->filters->{all} // [];
+    push @$event_filters, @{ $self->filters->{ $event->[0] } // [] };
+
+    for my $filter (@$event_filters) {
         return if $filter->($dt, $event);
     }
+
     $self->send_it($event);
+}
+
+
+sub add_filter ($self, $name, $event_type, $action) {
+    if ( ref $event_type eq 'ARRAY' ) {
+        $self->add_filter( $name, $_, $action ) for @$event_type;
+        return;
+    }
+    _log("Add $name filter for $event_type")
+        if $self->verbose;
+    push @{ $self->filters->{$event_type} }, $action;
 }
 
 
 sub send_it ($self, $event) {
     _log("Event: @$event") if $self->verbose;
-    $self->_midi_out->send_event($event->@*);
+    $self->_midi_out->send_event(@$event);
 }
 
 
@@ -146,13 +158,6 @@ sub run ($self) {
     $self->loop->run;
 }
 
-
-sub add_filter ($self, $name, $event_type, $action) {
-    _log("Add $name filter for $event_type")
-        if $self->verbose;
-    push $self->filters->{$event_type}->@*, $action;
-}
-
 1;
 
 __END__
@@ -167,7 +172,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0400
+version 0.0404
 
 =head1 SYNOPSIS
 
@@ -190,8 +195,22 @@ version 0.0400
     return 0;
   }
 
-  $rtc->add_filter('filter_tone', $_ => \&filter_tone)
+  # respond to specific events:
+  $rtc->add_filter('filter_tone', $_, \&filter_tone)
     for qw(note_on note_off);
+  # Or:
+  $rtc->add_filter('filter_tone', [qw(note_on note_off)], \&filter_tone);
+
+  # respond to all events:
+  $rtc->add_filter(
+    'echo',
+    all => sub {
+      my ($dt, $event) = @_;
+      print "dt: $dt, ev: ", join( ', ', @$event ), "\n"
+        unless $event->[0] eq 'clock';
+      return 0;
+    }
+  );
 
   # add other stuff to the $rtc->loop...
 
@@ -238,36 +257,44 @@ Return or set the B<filters>.
 
 =head2 new
 
-  $rtc = MIDI::RtController->new(verbose => 1);
+  $rtc = MIDI::RtController->new(%attributes);
 
-Create a new C<MIDI::RtController> object.
+Create a new C<MIDI::RtController> object given the above attributes.
 
 =for Pod::Coverage BUILD
+
+=head2 add_filter
+
+  $rtc->add_filter($name, $event_type, $action);
+
+Add a named filter, defined by the CODE reference B<action> for an
+B<event_type> like C<note_on> or C<note_off>. An ARRAY reference
+of event types like: C<[qw(note_on note_off)]> may also be given.
+
+The special event type C<all> may also be used to refer to any
+controller event (e.g. C<note_on>, C<control_change>,
+C<pitch_wheel_change>, etc.).
 
 =head2 send_it
 
   $rtc->send_it($event);
 
-Send a MIDI B<event> to the output port.
+Send a MIDI B<event> to the output port, where the MIDI event is an
+ARRAY reference like, C<['note_on', 0, 40, 107]> or
+C<['control_change', 0, 1, 24]>, etc.
 
 =head2 delay_send
 
   $rtc->delay_send($delay_time, $event);
 
-Send a MIDI B<event> to the output port when the B<delay_time> expires.
+Send a MIDI B<event> to the output port when the B<delay_time> (in
+seconds) expires.
 
 =head2 run
 
   $rtc->run;
 
 Run the asynchronous B<loop>!
-
-=head2 add_filter
-
-  $rtc->add_filter($name, $event_type, $action);
-
-Add a named filter, defined by the CODE reference B<action>, for an
-B<event_type> like C<note_on> or C<note_off>.
 
 =head1 THANK YOU
 

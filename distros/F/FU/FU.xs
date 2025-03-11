@@ -68,6 +68,7 @@ fuxmlwr *     FUXMLWR
 fupg_conn *   FUPG_CONN
 fupg_txn *    FUPG_TXN
 fupg_st *     FUPG_ST
+fupg_copy *   FUPG_COPY
 
 INPUT
 FUFCGI
@@ -89,6 +90,10 @@ FUPG_TXN
 FUPG_ST
     if (sv_derived_from($arg, \"FU::Pg::st\")) $var = (fupg_st *)SvIVX(SvRV($arg));
     else fu_confess(\"invalid statement object\");
+
+FUPG_COPY
+    if (sv_derived_from($arg, \"FU::Pg::copy\")) $var = (fupg_copy *)SvIVX(SvRV($arg));
+    else fu_confess(\"invalid COPY object\");
 #"
 EOT
 
@@ -233,6 +238,11 @@ void q(fupg_conn *c, SV *sv, ...)
     FUPG_CONN_COOKIE;
     ST(0) = fupg_q(aTHX_ c, c->stflags, SvPVutf8_nolen(sv), ax, items);
 
+void copy(fupg_conn *c, SV *sv)
+  CODE:
+    FUPG_CONN_COOKIE;
+    ST(0) = fupg_copy_exec(aTHX_ c, SvPVutf8_nolen(sv));
+
 void _set_type(fupg_conn *c, SV *name, SV *sendsv, SV *recvsv)
   CODE:
     fupg_set_type(aTHX_ c, name, sendsv, recvsv);
@@ -281,6 +291,12 @@ void q(fupg_txn *t, SV *sv, ...)
   CODE:
     FUPG_TXN_COOKIE;
     ST(0) = fupg_q(aTHX_ t->conn, t->stflags, SvPVutf8_nolen(sv), ax, items);
+
+# XXX: The copy object should probably keep a ref on the transaction
+void copy(fupg_txn *t, SV *sv)
+  CODE:
+    FUPG_TXN_COOKIE;
+    ST(0) = fupg_copy_exec(aTHX_ t->conn, SvPVutf8_nolen(sv));
 
 
 
@@ -392,6 +408,28 @@ void DESTROY(fupg_st *st)
   CODE:
     fupg_st_destroy(aTHX_ st);
 
+
+MODULE = FU   PACKAGE = FU::Pg::copy
+
+void write(fupg_copy *c, SV *sv)
+  CODE:
+    fupg_copy_write(aTHX_ c, sv);
+
+void read(fupg_copy *c)
+  CODE:
+    ST(0) = fupg_copy_read(aTHX_ c, 0);
+
+void is_binary(fupg_copy *c)
+  CODE:
+    ST(0) = c->bin ? &PL_sv_yes : &PL_sv_no;
+
+void close(fupg_copy *c)
+  CODE:
+    fupg_copy_close(aTHX_ c, 0);
+
+void DESTROY(fupg_copy *c)
+  CODE:
+    fupg_copy_destroy(aTHX_ c);
 
 
 MODULE = FU   PACKAGE = FU::XMLWriter

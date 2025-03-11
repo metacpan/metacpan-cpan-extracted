@@ -454,22 +454,34 @@ void PerlOMP_VERIFY_2D_AoA(SV *AoA) {
     }
 }
 
-/* Helper function to verify element types */
-bool is_float(SV *sv) { return SvNOK(sv); }
-bool is_int(SV *sv) { return SvIOK(sv); }
-bool is_string(SV *sv) { return SvPOK(sv); }
+/* Checks if an SV is an integer, allowing for stored floats that are whole numbers */
+bool is_int(SV *sv) {
+    return SvIOK(sv) || (SvNOK(sv) && SvIV(sv) == SvNV(sv));
+}
 
-/* Generic function to verify a 1D array's element type */
+/* Checks if an SV is a float, including cases where Perl stores it as an integer */
+bool is_float(SV *sv) {
+    return SvNOK(sv) || (SvIOK(sv) && SvIV(sv) != SvNV(sv));
+}
+
+/* Checks if an SV is a string, ensuring it's not just a numeric representation */
+bool is_string(SV *sv) {
+    return SvPOK(sv) || (!SvNOK(sv) && !SvIOK(sv));
+}
+
 void verify_1D_array_type(SV *array, bool (*type_check)(SV *), const char *type_name) {
     if (!is_array_ref(array)) {
         croak("Expected a 1D array reference");
     }
     AV *av = (AV *)SvRV(array);
-    I32 len = av_len(av) + 1;
+    I32 len = av_len(av);
+    if (len == -1) return;  // Handle empty arrays safely
+    len++;  // Convert last index to total count
+
     for (I32 i = 0; i < len; i++) {
         SV **element = av_fetch(av, i, 0);
-        if (!element || !type_check(*element)) {
-            croak("Expected all elements to be %s at index %d", type_name, i);
+        if (!element || !*element || !type_check(*element)) {
+            croak("Expected all elements to be %s at index %" IVdf, type_name, (IV)i);
         }
     }
 }
@@ -477,22 +489,36 @@ void verify_1D_array_type(SV *array, bool (*type_check)(SV *), const char *type_
 /* Implement type-specific 1D array verifications */
 void PerlOMP_VERIFY_1D_FLOAT_ARRAY(SV *array) { verify_1D_array_type(array, is_float, "float"); }
 void PerlOMP_VERIFY_1D_INT_ARRAY(SV *array) { verify_1D_array_type(array, is_int, "integer"); }
-void PerlOMP_VERIFY_1D_DOUBLE_ARRAY(SV *array) { verify_1D_array_type(array, is_float, "double"); }
 void PerlOMP_VERIFY_1D_STRING_ARRAY(SV *array) { verify_1D_array_type(array, is_string, "string"); }
 
 /* Generic function to verify a 2D array's element type */
 void verify_2D_array_type(SV *AoA, bool (*type_check)(SV *), const char *type_name) {
-    PerlOMP_VERIFY_2D_AoA(AoA);
+    PerlOMP_VERIFY_2D_AoA(AoA);  // Assuming this macro validates AoA correctly
+
+    if (!is_array_ref(AoA)) {
+        croak("Expected a 2D array reference");
+    }
+
     AV *outer = (AV *)SvRV(AoA);
-    I32 rows = av_len(outer) + 1;
+    I32 rows = av_len(outer);
+    if (rows == -1) return;  // Handle empty outer array safely
+    rows++;  // Convert last index to total count
+
     for (I32 i = 0; i < rows; i++) {
         SV **inner_ref = av_fetch(outer, i, 0);
+        if (!inner_ref || !*inner_ref || !is_array_ref(*inner_ref)) {
+            croak("Expected an array reference at row %" IVdf, (IV)i);
+        }
+
         AV *inner = (AV *)SvRV(*inner_ref);
-        I32 cols = av_len(inner) + 1;
+        I32 cols = av_len(inner);
+        if (cols == -1) continue;  // Handle empty inner arrays safely
+        cols++;  // Convert last index to total count
+
         for (I32 j = 0; j < cols; j++) {
             SV **element = av_fetch(inner, j, 0);
-            if (!element || !type_check(*element)) {
-                croak("Expected all elements to be %s at [%d][%d]", type_name, i, j);
+            if (!element || !*element || !type_check(*element)) {
+                croak("Expected all elements to be %s at [%" IVdf "][%" IVdf "]", type_name, (IV)i, (IV)j);
             }
         }
     }
@@ -501,6 +527,5 @@ void verify_2D_array_type(SV *AoA, bool (*type_check)(SV *), const char *type_na
 /* Implement type-specific 2D array verifications */
 void PerlOMP_VERIFY_2D_FLOAT_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_float, "float"); }
 void PerlOMP_VERIFY_2D_INT_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_int, "integer"); }
-void PerlOMP_VERIFY_2D_DOUBLE_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_float, "double"); }
 void PerlOMP_VERIFY_2D_STRING_ARRAY(SV *AoA) { verify_2D_array_type(AoA, is_string, "string"); }
 

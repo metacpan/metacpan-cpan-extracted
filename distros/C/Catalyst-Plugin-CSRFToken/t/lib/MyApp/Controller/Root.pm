@@ -2,6 +2,7 @@ package MyApp::Controller::Root;
 
 use Moose;
 use MooseX::MethodAttributes;
+use Data::Dumper;
 
 extends 'Catalyst::Controller';
 
@@ -10,32 +11,25 @@ sub get :Path(get) Args(0) {
   $c->res->body($c->csrf_token);
 }
 
-sub test :Path(test) Args(0) {
+sub test :Path(test) SingleUseCSRF Args(0) {
   my ($self, $c) = @_;
   $c->res->body('ok');
 }
 
-sub in_session :Path(in_session) Args(0) {
+sub skip :Path(skip) DisableCSRF Args(0) {
   my ($self, $c) = @_;
-  $c->res->body($c->single_use_csrf_token);
+  $c->res->body('ok');
 }
 
+sub config_test :Path(config_test) Args(0) {
+  my ($self, $c) = @_;
+  $c->res->body(Dumper({
+    default_secret => $c->csrf_default_secret,
+    max_age => $c->csrf_max_age,
+    token_session_key => $c->csrf_token_session_key,
+    token_param_key => $c->csrf_token_param_key,
+  }));
+}
 
 __PACKAGE__->config(namespace=>'');
 __PACKAGE__->meta->make_immutable;
-
-__END__
-
-sub by_action :Path(by_action) Args() CheckCSRF() {
-  my ($self, $c) = @_;
-
-}
-
-  sub by_action_CSRF_EXPIRED {
-    my ($self, $c) = @_;
-  }
-
-  sub by_action_CSRF_INVALID {
-    my ($self, $c) = @_;
-  }
-

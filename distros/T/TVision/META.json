@@ -32,6 +32,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.16,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vadrerko/perl-tvision/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vadrerko/perl-tvision.git",
+         "web" : "https://github.com/vadrerko/perl-tvision"
+      }
+   },
+   "version" : 0.17,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Image-Magick-Safer
 
+0.08     2025-03-10
+        - [Fix] test failures due to new image/x-mvg MIME type (GH #3)
+
 0.07     2016-08-04
         - [Fix] test failures on BSD systems by skipping them, document
           this problem (GH #2)

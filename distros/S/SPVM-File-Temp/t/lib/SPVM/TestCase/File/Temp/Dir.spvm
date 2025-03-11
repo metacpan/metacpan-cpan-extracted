@@ -1,0 +1,267 @@
+class TestCase::File::Temp::Dir {
+  use File::Temp;
+  use File::Spec;
+  use File::Basename;
+  use Fn;
+  use List;
+  use IO::File;
+  use Cwd;
+  
+  static method new : int () {
+    
+    # Basic
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp::Dir->new;
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][dirname default]$dirname";
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # TEMPLATE option
+    {
+      my $cwd = Cwd->getcwd;
+      Fn->defer([$cwd : string] method : void () {
+        Sys->chdir($cwd);
+      });
+      
+      my $dirname = (string)undef;
+      {
+        Sys->chdir(File::Spec->tmpdir);
+        
+        my $temp_dir = File::Temp::Dir->new({TEMPLATE => "my_XXXX"});
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][dirname my_XXXX TMPDIR]$dirname";
+        
+        unless (Fn->contains($dirname, "my_")) {
+          return 0;
+        }
+        
+        if (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # TEMPLATE, TMPDIR option
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp::Dir->new({TEMPLATE => "my_XXXX", TMPDIR => 1});
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][dirname myXXXX TMPDIR]$dirname";
+        
+        unless (Fn->contains($dirname, "my_")) {
+          return 0;
+        }
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # DIR option
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp::Dir->new({DIR => File::Spec->tmpdir});
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][DIR]$dirname";
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # DIR, TEMPLATE option
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp::Dir->new({TEMPLATE => "my_XXXX", DIR => File::Spec->tmpdir});
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][dirname TEMPLATE DIR]$dirname";
+        
+        unless (Fn->contains($dirname, "my_")) {
+          return 0;
+        }
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # Repeat
+    {
+      my $temp_dirs_list = List->new;
+      for (my $i = 0; $i < 100; $i++) {
+        my $temp_dir = File::Temp::Dir->new({TEMPLATE => "XXXX", TMPDIR => 1});
+        $temp_dirs_list->push($temp_dir);
+        my $dirname = $temp_dir->dirname;
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      my $temp_dirs_list = List->new;
+      for (my $i = 0; $i < 100; $i++) {
+        my $temp_dir = File::Temp::Dir->new({TEMPLATE => "XXXX", TMPDIR => 1});
+        $temp_dirs_list->push($temp_dir);
+        my $dirname = $temp_dir->dirname;
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+      }
+    }
+    
+    # CLEANUP
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp::Dir->new({CLEANUP => 0});
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output][File::Temp::Dir#new][dirname CLENAUP]$dirname";
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys->d($dirname)) {
+          return 0;
+        }
+        
+        unless (Sys->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      unless (Sys->d($dirname)) {
+        return 0;
+      }
+      
+      File::Path->rmtree($dirname);
+    }
+    
+    return 1;
+  }
+}

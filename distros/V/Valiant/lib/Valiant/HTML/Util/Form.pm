@@ -318,8 +318,10 @@ sub _html_options_for_form_with {
   $self->_merge_attrs($html_options, $options, qw(action method data id csrf_token class style));
   $url = $url->($self, $model) if (ref($url)||'') eq 'CODE';
   $html_options->{action} ||= $url if $url;
-  $html_options->{csrf_token} ||= $self->view->csrf_token if $self->view->can('csrf_token');
-  $html_options->{csrf_token} ||= $self->context->csrf_token if $self->has_context && $self->context->can('csrf_token');
+
+  my %csrf_opts = (form_id => $options->{html}{id});
+  $html_options->{csrf_token} ||= $self->view->csrf_token(%csrf_opts) if $self->view->can('csrf_token');
+  $html_options->{csrf_token} ||= $self->context->csrf_token(%csrf_opts) if $self->has_context && $self->context->can('csrf_token');
   $html_options->{tunneled_method} = 1 unless exists $html_options->{tunneled_method};
   $html_options->{method} ||= $model && $self->model_persisted($model) ? 'patch' : 'post';
 

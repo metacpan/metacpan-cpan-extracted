@@ -39,6 +39,7 @@ my $build = Module::Build->new(
     'MooX::SetOnce'             => 0,
     'MooX::StrictConstructor'   => 0,
     'Path::Tiny'                => 0.062,
+    'PerlX::Maybe'              => 0,
     'Pod::Find'                 => 0,
     'Pod::Usage'                => 1.64,
     'Try::Tiny'                 => 0,
