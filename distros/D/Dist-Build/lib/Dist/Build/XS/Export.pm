@@ -1,5 +1,5 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.016';
+$Dist::Build::XS::Export::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -34,16 +34,19 @@ sub add_methods {
 		(my $module_dir = $module_name) =~ s/::/-/g;
 		croak 'No directory or file given to share' if not $args{dir} and not $args{file};
 
+		my $inner = $planner->new_scope;
+		$inner->load_module('Dist::Build::Core');
+
 		my @outputs;
 		find(sub {
 			return unless -f;
 			my $target = abs2rel($File::Find::name, $args{dir});
-			push @outputs, copy_header($planner, $module_dir, $File::Find::name, $target);
+			push @outputs, copy_header($inner, $module_dir, $File::Find::name, $target);
 		}, $args{dir}) if $args{dir};
 
 		my @files = ref $args{file} ? @{ $args{file} } : defined $args{file} ? $args{file} : ();
 		for my $file (@files) {
-			push @outputs, copy_header($planner, $module_dir, $file, $file);
+			push @outputs, copy_header($inner, $module_dir, $file, $file);
 		}
 
 		$planner->create_phony('code', @outputs);
@@ -57,7 +60,9 @@ sub add_methods {
 		(my $module_dir = $module_name) =~ s/::/-/g;
 		my $filename = catfile(qw/blib lib auto share module/, $module_dir, 'compile.json');
 
-		$planner->dump_json($filename, \%flags);
+		my $inner = $planner->new_scope;
+		$inner->load_module('Dist::Build::Core');
+		$inner->dump_json($filename, \%flags);
 
 		return $planner->create_phony('code', $filename);
 	});
@@ -79,7 +84,7 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

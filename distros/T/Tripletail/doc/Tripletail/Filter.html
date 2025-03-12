@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Filter - CGI出力加工</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Filter - CGI出力加工
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Filter - CGI出力加工
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  $TL-&gt;setContentFilter('Tripletail::Filter::HTML', charset =&gt; 'UTF-8');
+  
+  $TL-&gt;print(&quot;foo\n&quot;);</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#print">$TL-&gt;print</a> 、 <a href="http://search.cpan.org/perldoc/Tripletail::Template#flush">$template-&gt;flush</a>
+で出力されるデータを加工するクラス。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#print">$TL-&gt;print</a> 、 <a href="http://search.cpan.org/perldoc/Tripletail::Template#flush">$template-&gt;flush</a>
+によるコードからの出力は、 <a href=".././Tripletail.html#setContentFilter">$TL-&gt;setContentFilter</a>
+によって指定されたフィルタにより加工されてから出力される。
+
+</span>
+</p>
+
+<h2><a id="Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X__-_PCXe5X90X91Xe3X81X91HTMLXe5X87XbaXe5X8aX9b_(Xe3X83X87Xe3X83X95Xe3X82Xa9Xe3X83XabXe3X83X88)"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::HTML">Tripletail::Filter::HTML</a> - PC向けHTML出力 (デフォルト)
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__-_Xe6X90XbaXe5Xb8XafXe9X9bXbbXe8Xa9Xb1Xe5X90X91Xe3X81X91HTMLXe5X87XbaXe5X8aX9b"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::MobileHTML">Tripletail::Filter::MobileHTML</a> - 携帯電話向けHTML出力
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__-_CSVXe5X87XbaXe5X8aX9b"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::CSV">Tripletail::Filter::CSV</a> - CSV出力
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__-_TEXTXe5X87XbaXe5X8aX9b"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::TEXT">Tripletail::Filter::TEXT</a> - TEXT出力
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__-_Xe3X83X90Xe3X82Xa4Xe3X83X8aXe3X83XaaXe5X87XbaXe5X8aX9b"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::Binary">Tripletail::Filter::Binary</a> - バイナリ出力
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__-_SEOXe5X87XbaXe5X8aX9bXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter::SEO">Tripletail::Filter::SEO</a> - SEO出力フィルタ
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X_new"><span class="pod_lang"><code class="pod_iseq_C">_new</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filter = $TL-&gt;newFilter(%filteroption)</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::Filter オブジェクトを作成。
+フィルタの初期化を行う。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addHeader"><span class="pod_lang"><code class="pod_iseq_C">addHeader</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">各フィルターの動作による。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setHeader"><span class="pod_lang"><code class="pod_iseq_C">setHeader</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">各フィルターの動作による。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="print"><span class="pod_lang"><code class="pod_iseq_C">print</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $content = $filter-&gt;print($content)</code></pre>
+
+<p>
+<span class="pod_lang">出力すべき内容を受け取り、必要ならデータを加工し、出力すべき内容を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="flush"><span class="pod_lang"><code class="pod_iseq_C">flush</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $content = $filter-&gt;flush</code></pre>
+
+<p>
+<span class="pod_lang">全ての出力内容を出力し終えたときに呼び出される。フィルタ側でバッファしている
+内容があれば、その内容を返す。内容がなければ空文字列を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">但し、エラー時には呼び出されないこともある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">(0.44 以降、再初期化処理は <a href="#reset">&quot;reset&quot;</a> メソッドに分離)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="reset"><span class="pod_lang"><code class="pod_iseq_C">reset</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $content = $filter-&gt;reset</code></pre>
+
+<p>
+<span class="pod_lang">リクエスト処理の終了時に呼び出される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">FCGI使用時には、フィルタオブジェクトは各リクエストの間で使い回される為、
+このメソッドで必ず内部状態を初期化する必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">(0.44 以降, 0.43 までは <a href="#flush">&quot;flush&quot;</a> の一部でした。)
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter">Tripletail::InputFilter</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Filter - CGI出力加工
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__-_Xe3X83X90Xe3X82Xa4Xe3X83X8aXe3X83XaaXe5X87XbaXe5X8aX9b">Tripletail::Filter::Binary - バイナリ出力</a></li>
+<li><a href="#X__-_CSVXe5X87XbaXe5X8aX9b">Tripletail::Filter::CSV - CSV出力</a></li>
+<li><a href="#X__-_PCXe5X90X91Xe3X81X91HTMLXe5X87XbaXe5X8aX9b_(Xe3X83X87Xe3X83X95Xe3X82Xa9Xe3X83XabXe3X83X88)">Tripletail::Filter::HTML - PC向けHTML出力 (デフォルト)</a></li>
+<li><a href="#X__-_Xe6X90XbaXe5Xb8XafXe9X9bXbbXe8Xa9Xb1Xe5X90X91Xe3X81X91HTMLXe5X87XbaXe5X8aX9b">Tripletail::Filter::MobileHTML - 携帯電話向けHTML出力</a></li>
+<li><a href="#X__-_SEOXe5X87XbaXe5X8aX9bXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">Tripletail::Filter::SEO - SEO出力フィルタ</a></li>
+<li><a href="#X__-_TEXTXe5X87XbaXe5X8aX9b">Tripletail::Filter::TEXT - TEXT出力</a></li>
+<li><a href="#X__00">Tripletail::InputFilter</a></li>
+<li><a href="#X_new">_new</a></li>
+<li><a href="#addHeader">addHeader</a></li>
+<li><a href="#flush">flush</a></li>
+<li><a href="#print">print</a></li>
+<li><a href="#reset">reset</a></li>
+<li><a href="#setHeader">setHeader</a></li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">フィルタ一覧</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Filter - CGI出力加工
+
+
+</div>
+
+</body>
+</html>

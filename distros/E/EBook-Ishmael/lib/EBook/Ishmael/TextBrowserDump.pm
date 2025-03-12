@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -29,35 +29,36 @@ my %Browsers = (
 	'lynx' => {
 		Bins  => [ qw(lynx) ],
 		Bin   => undef,
-		Opts  => [ qw(-dump -force_html -nolist) ],
+		Opts  => [ qw(-dump -force_html -nolist -display_charset=utf8) ],
 		Width => '-width',
 		Xhtml => [ qw(-xhtml_parsing) ],
 	},
 	'links' => {
 		Bins  => [ qw(links links2) ],
 		Bin   => undef,
-		Opts  => [ qw(-dump -force-html) ],
+		Opts  => [ qw(-dump -force-htm -codepage utf8) ],
 		Width => '-width',
 		Xhtml => [],
 	},
 	'elinks' => {
 		Bins  => [ qw(elinks) ],
 		Bin   => undef,
-		Opts  => [ qw(-dump -force-html -no-home -no-references -no-numbering) ],
+		Opts  => [ qw(-dump -force-html -no-home -no-references -no-numbering
+		              -dump-charset utf8) ],
 		Width => '-dump-width',
 		Xhtml => [],
 	},
 	'w3m' => {
 		Bins  => [ qw(w3m) ],
 		Bin   => undef,
-		Opts  => [ qw(-dump -T text/html) ],
+		Opts  => [ qw(-dump -T text/html -O utf8) ],
 		Width => '-cols',
 		Xhtml => [],
 	},
 	'queequeg' => {
 		Bins  => [ qw(queequeg) ],
 		Bin   => undef,
-		Opts  => [],
+		Opts  => [ qw(-e utf8) ],
 		Width => '-w',
 		Xhtml => [],
 	},
@@ -189,6 +190,9 @@ Bool specifying whether the input file is XHTML or not. Defaults to C<0>.
 Specify the width of the formatted text. Defaults to C<80>.
 
 =back
+
+Dumped text is UTF8-encoded (or, more accurately, the dumper's notion of
+UTF8-encoded).
 
 =head1 GLOBAL VARIABLES
 

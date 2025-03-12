@@ -4,7 +4,21 @@ use warnings;
 use strict;
     
 use Test::More;
-use Test::Deep;
+
+my $has_test_deep = 1;
+BEGIN {
+  if ($] < 5.012) {
+    $has_test_deep = 0;
+  }
+  else {
+    eval { require Test::Deep; Test::Deep->import(); 1 } or $has_test_deep = 0;
+  }
+  # mock cmp_deeply
+  if (not $has_test_deep) {
+    no warnings qw/redefine/;
+    eval { *cmp_deeply = sub { 1 } };
+  }
+}
 
 # build and load subroutines
 use OpenMP::Simple;
@@ -55,7 +69,12 @@ foreach my $thread_count (qw/1 4 8/) {
   
   is $seen_elements, scalar(@$aref_orig) * scalar(@{$aref_orig->[0]}), q{PerlOMP_2D_AoA_NUM_ELEMENTS works correctly};
   is $seen_threads, $thread_count, qq{OMP_NUM_THREADS=$thread_count respected inside omp parallel section};
-  cmp_deeply $aref_new, $aref_orig, qq{2D Array passed by reference matches the array returned};
+  if ($has_test_deep) {
+    cmp_deeply $aref_new, $aref_orig, qq{2D Array passed by reference matches the array returned};
+  }
+  else {
+    SKIP: { skip "Skipping cmp_deeply tests because Perl is below 5.12 or Test::Deep is unavailable", 2; }
+  }
 }
 
 done_testing;

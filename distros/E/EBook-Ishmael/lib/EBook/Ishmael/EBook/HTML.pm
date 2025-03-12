@@ -1,9 +1,10 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
+use File::Basename;
 use File::Spec;
 
 use XML::LibXML;

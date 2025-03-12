@@ -18,7 +18,7 @@ use strict;
 
 { my $f;
 sub GetKeyboardState (;$) {	# Argument: nothing, undef (will auto-vivify) or 256-byte string (byte! use pack 'C', not chr)
-  require Win32::API;	# should be short!:
+  require Win32::API;	# should be BOOL!:
   $f ||= Win32::API->new(q(user32), qq[int GetKeyboardState(char *s)]) or die "Import failed: $!"; 
   my($s) = (@_ ? \shift : \my $tmp);
   defined $$s or $$s = ' ' x 256;
@@ -30,7 +30,7 @@ sub GetKeyboardState (;$) {	# Argument: nothing, undef (will auto-vivify) or 256
 { my $f;
 sub GetKeyState ($) {
   require Win32::API;
-  $f ||= Win32::API->new(q(user32), qq[int GetKeyState(int n)]) or die "Import failed: $!"; 
+  $f ||= Win32::API->new(q(user32), qq[int GetKeyState(int n)]) or die "Import failed: $!"; 	# should be SHORT!:
   my($k) = shift;
   $f->Call($k);	# or die "GetKeyState($k) failed: $^E";
 }}
@@ -43,7 +43,7 @@ my $HANDLE_p = $pointer_types{length pack 'p', ''} or die "Cannot work with this
 { my $f;
 sub GetKeyboardLayout (;$) {
   require Win32::API;
-  $f ||= Win32::API->new(q(user32), qq[$HANDLE_t GetKeyboardLayout(long tId)]) or die "Import failed: $!"; 
+  $f ||= Win32::API->new(q(user32), qq[$HANDLE_t GetKeyboardLayout(long tId)]) or die "Import failed: $!"; # Arg should be DWORD!:
   my $tId = (shift || 0);
   $f->Call($tId)
 }}
@@ -164,7 +164,7 @@ sub WriteConsole ($;$) {
   $fh = \*STDOUT unless defined $fh;
   ref $fh and ($fh = GetOsFHandle $fh or die "fh($fh) has no Win32 handle");
   my $o = q(1111);
-  $f->Call($fh, $s, $l, $o, 0) or die "WriteConsoleW() failed: $^E";
+  $f->Call($fh, $s, $l, $o, 0) or die "WriteConsoleW() failed (fh=$fh): $^E";
   $o = unpack 'l', $o;
   $o == $l or die "WriteConsoleW() wrote only $o chars out of $l";
   1

@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Wrapper around C<Alien::OpenMP> that provides helpful C macros and runtime C functions",
   "AUTHOR" => "oodler <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
+    "CPAN::Requirements::Dynamic" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
   },
@@ -35,12 +36,11 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Inline::C" => 0,
     "OpenMP::Environment" => 0,
-    "Test::Deep" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.2.5",
+  "VERSION" => "0.2.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,6 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Inline::C" => 0,
   "OpenMP::Environment" => 0,
-  "Test::Deep" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Util::H2O::More" => "0.3.4"

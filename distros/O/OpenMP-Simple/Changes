@@ -109,3 +109,9 @@
         for perls 5.12 and 5.14 via GH Actions CI testing
       - added a secondary test that doesn't run `dzil test`
         so we can test on perls <= 5.18 
+
+0.2.6  03/11/2025 01:18:00 AM MST
+      - update dist.ini to require Test::Deeply on if perl >= 5.12
+      - module is tested down to 5.10.1 (cpanm --notest), though some
+        prereqs may technically have higher perl requirments, please
+        let oodler@cpan.org know if this causes problems for you

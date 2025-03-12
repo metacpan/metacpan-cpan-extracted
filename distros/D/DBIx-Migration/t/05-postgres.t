@@ -16,14 +16,14 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
-note 'dsn: ', $pgsql->dsn;
-local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
+note 'dsn: ', my $dsn = $pgsql->dsn . ';options=--client_min_messages=WARNING';
+local $Test::PgTAP::Dbh = DBI->connect( $dsn );
 
 plan tests => 14;
 
 require DBIx::Migration::Pg;
 
-my $m = DBIx::Migration::Pg->new( dsn => $pgsql->dsn );
+my $m = DBIx::Migration::Pg->new( dsn => $dsn );
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';

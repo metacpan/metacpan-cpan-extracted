@@ -30,7 +30,7 @@ int test_conv(const char* text_utf8, uj_charcode_t ocode)
   }
 
   printf("sjis result: %s\n", obuf);
-  free(obuf);
+  uj_delete_buffer(uj, obuf);
   uj_delete(uj);
 
   return 0;

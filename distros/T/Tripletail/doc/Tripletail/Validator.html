@@ -1,0 +1,1481 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Validator - 値の検証の一括処理</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Validator - 値の検証の一括処理
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a>
+<ul>
+<li><a href="#Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcheckXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">
+<span class="pod_lang">組み込みcheckフィルタ
+
+</span></a>
+</li>
+<li><a href="#Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcorrectXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">
+<span class="pod_lang">組み込みcorrectフィルタ
+
+</span></a>
+</li>
+<li><a href="#Xe3X83Xa6Xe3X83XbcXe3X82Xb6Xe3X83XbcXe5XaeX9aXe7XbeXa9Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XabXe3X81Xa4Xe3X81X84Xe3X81Xa6">
+<span class="pod_lang">ユーザー定義フィルタについて
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe6Xa7X8bXe7XafX89">
+<span class="pod_lang">フィルタの構築
+
+</span></a>
+</li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81Xbf">
+<span class="pod_lang">フィルタの組み込み
+
+</span></a>
+</li>
+<li><a href="#Xe4XbeX8b">
+<span class="pod_lang">例
+
+</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Validator - 値の検証の一括処理
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $validator = $TL-&gt;newValidator;
+  $validator-&gt;addFilter(
+    {
+      name  =&gt; 'NotBlank',
+      email =&gt; 'Email',
+      optionemail =&gt; 'Blank;Email',  # 入力しなくてもOKとする
+      password =&gt; 'CharLen(4,8);Password',
+    }
+  );
+  my $error = $validator-&gt;check($form);</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Formオブジェクト値の検証の一括処理を行う。
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X$TL->newValidator"><span class="pod_lang">$TL-&gt;newValidator
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $validator = $TL-&gt;newValidator</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::Validator オブジェクトを作成。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addFilter"><span class="pod_lang">addFilter
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $validator-&gt;addFilter(
+    {
+      name  =&gt; 'NotBlank',
+      email =&gt; 'Email',
+      optionemail =&gt; 'Empty;Email',  # 入力しなくてもOKとする
+      password =&gt; 'CharLen(4,8);Password',
+    }
+  )</code></pre>
+
+<p>
+<span class="pod_lang">バリデータにフィルタを設定する。
+検証対象となるフォームのキーに対し、フィルタリストを指定する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">フィルタ指定形式としては、
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  FilterName(args)[message]</code></pre>
+
+<p>
+<span class="pod_lang">を、「;」区切りとする。
+「(args)」や、「[message]」は省略可能。
+「(args)」を省略した場合は、それぞれのフィルタによりデフォルトのチェックを行う。
+「[message]」を省略した場合は、checkの戻り時にフィルタ名を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="check"><span class="pod_lang">check
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $error = $validator-&gt;check($form)
+  $error = $validator-&gt;check($form, sub{...} )</code></pre>
+
+<p>
+<span class="pod_lang">設定したフィルタを利用して、フォームの値を検証する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">それぞれのフォームのキーに対してエラーがあれば、「[message]」、
+もしくは指定がない場合はフィルタ名を値としたハッシュリファレンスを返す。
+エラーがなければ、そのキーは含まれない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">２番目の引数に関数リファレンスを渡すと, エラー時にそれが呼ばれる。
+エラーがなかった場合には呼ばれない。
+引数として、１つめに check メソッドが返すのと同じハッシュを、
+２つめに文字列でのエラーメッセージを渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">変更用フィルタを使用しようとした場合はエラーを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="correct"><span class="pod_lang">correct
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $error = $validator-&gt;correct($form)
+  $error = $validator-&gt;correct($form, sub{...} )</code></pre>
+
+<p>
+<span class="pod_lang">設定したフィルタを利用して、フォームの値を検証する。
+また、変更用フィルタを使った場合はフォームの値を修正する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">それぞれのフォームのキーに対してエラーがあれば、「[message]」、
+もしくは指定がない場合はフィルタ名を値としたハッシュリファレンスを返す。
+エラーがなければ、そのキーは含まれない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">２番目の引数に関数リファレンスを渡すと, エラー時にそれが呼ばれる。
+エラーがなかった場合には呼ばれない。
+引数として、１つめに check メソッドが返すのと同じハッシュを、
+２つめに文字列でのエラーメッセージを渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$form に const メソッドが呼ばれた Form オブジェクトが渡された場合、
+エラーを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getKeys"><span class="pod_lang">getKeys
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  @keys = $validator-&gt;getKeys</code></pre>
+
+<p>
+<span class="pod_lang">現在設定されているフィルタのキー一覧を返す。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a></h2>
+
+<h3><a id="Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcheckXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">
+<span class="pod_lang">組み込みcheckフィルタ
+
+</span></a></h3>
+
+<dl>
+<dt><a id="Empty"><span class="pod_lang">Empty
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）であることをチェックし、そうであれば以降の判定を中止し、検証OKとする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Email等の形式である必要があるが、入力が任意であるような項目のチェックに使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="NotEmpty"><span class="pod_lang">NotEmpty
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）でないことをチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値の形式を問わないが、入力必須としたい場合に使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="NotWhitespace"><span class="pod_lang">NotWhitespace
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角/全角スペース、タブのみでないことをチェックする。
+値が空（存在しないか0文字）の場合は検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Blank"><span class="pod_lang">Blank
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）、半角/全角スペース、タブのみであることをチェックし、そうであれば以降の判定を中止し、検証OKとする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Email等の形式である必要があるが、入力が任意であるような項目のチェックに使用する。空白のみなら入力無しとみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="NotBlank"><span class="pod_lang">NotBlank
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）、半角/全角スペース、タブのみでないことをチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値の形式を問わないが、入力必須としたい場合に使用する。空白のみなら入力無しとみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="PrintableAscii"><span class="pod_lang">PrintableAscii
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">文字列が制御コードを除くASCII文字のみで構成されているかチェックする。
+値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Wide"><span class="pod_lang">Wide
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">文字列が全角文字のみで構成されているかチェックする。
+値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Password($spec)"><span class="pod_lang">Password($spec)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">文字列が$specに指定した要素をすべて最低1つずつ含んでいるかチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$specに指定できるのは<code class="pod_iseq_C">alpha</code>, <code class="pod_iseq_C">ALPHA</code>, <code class="pod_iseq_C">digit</code>, <code class="pod_iseq_C">symbol</code>をカンマ区切りで指定した文字列で、
+指定がない場合はすべて指定した場合と同様となる。
+また、指定された文字以外が入っていることに関しては考慮しない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Value#isPassword">&quot;isPassword&quot; in Tripletail::Value</a>
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ZipCode"><span class="pod_lang">ZipCode
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">7桁の郵便番号（XXX-XXXX形式）かチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">実在する郵便番号かどうかは確認しない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="TelNumber"><span class="pod_lang">TelNumber
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">電話番号（/^\d[\d-]+\d$/）かチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">数字で始まり、数字で終わり、その間が数字とハイフン(-)のみで構成されていれば電話番号とみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Email"><span class="pod_lang">Email
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">メールアドレスとして正しい形式かチェックする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="MobileEmail"><span class="pod_lang">MobileEmail
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">メールアドレスとして正しい形式かチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">但し携帯電話のメールアドレスでは、アカウント名の末尾にピリオドを含んでいる場合がある為、これも正しい形式であるとみなす。 
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">携帯電話キャリアのドメイン名を判別するわけではないため、通常のメールアドレスも正しい形式であるとみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Integer($min,$max)"><span class="pod_lang">Integer($min,$max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">整数で、かつ$min以上$max以下かチェックする。指定値は省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトでは、最大最小のチェックは行わなず整数であれば正しい形式であるとみなす。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Real($min,$max)"><span class="pod_lang">Real($min,$max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">整数もしくは小数で、かつ$min以上$max以下かチェックする。指定値は省略可能。 
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトでは、最大最小のチェックは行わなず、整数もしくは小数であれば正しい形式であるとみなす。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Hira"><span class="pod_lang">Hira
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">平仮名だけが含まれているかチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Kata"><span class="pod_lang">Kata
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">片仮名だけが含まれているかチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証NGとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ExistentDay"><span class="pod_lang">ExistentDay
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">YYYY-MM-DDで設定された日付が実在するかチェックする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Gif"><span class="pod_lang">Gif
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="Jpeg"><span class="pod_lang">Jpeg
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="Png"><span class="pod_lang">Png
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">それぞれの形式の画像かチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">画像として厳密に正しい形式であるかどうかは確認しない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="HttpUrl($mode)"><span class="pod_lang">HttpUrl($mode)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">&quot;http://&quot; で始まる文字列かチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$modeにs を指定した場合、&quot;https://&quot; で始まる文字列も正しい形式とみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="HttpsUrl"><span class="pod_lang">HttpsUrl
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">&quot;https://&quot; で始まる文字列かチェックする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Len($min,$max)"><span class="pod_lang">Len($min,$max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">バイト数の範囲が指定値以内かチェックする。 指定がない場合はチェックを行わない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="SjisLen($min,$max)"><span class="pod_lang">SjisLen($min,$max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">Shift-Jisでのバイト数の範囲が指定値以内かチェックする。指定がない場合はチェックを行わない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="CharLen($min,$max)"><span class="pod_lang">CharLen($min,$max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">文字数の範囲が指定値以内かチェックする。 指定値がない場合はチェックを行わない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Portable"><span class="pod_lang">Portable
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">機種依存文字を含んでいないかチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証OKとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="PcPortable"><span class="pod_lang">PcPortable
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">携帯絵文字を含んでいないかチェックする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が空（存在しないか0文字）なら検証OKとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="DomainName"><span class="pod_lang">DomainName
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ドメイン名として正当である事を確認する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="IpAddress"><span class="pod_lang">IpAddress
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  IpAddress($checkmask)</code></pre>
+
+<p>
+<span class="pod_lang">$checkmaskに対して、設定されたIPアドレスが一致すれば1。そうでなければundef。
+	
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$checkmaskは空白で区切って複数個指定する事が可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例：'10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1 fe80::/10 ::1'。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Enum($a,$b,$c)"><span class="pod_lang">Enum($a,$b,$c)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が指定値のいずれかであることをチェックする。指定値がない場合にはいずれにも該当しないとみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Or($filter1X7c$filter2X7c$filter3)"><span class="pod_lang">Or($filter1|$filter2|$filter3)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">指定のフィルタのいずれかに該当するかをチェックする。指定値がない場合にはいずれにも該当しないとみなす。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="RegExp($regexp)"><span class="pod_lang">RegExp($regexp)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">指定の正規表現に該当するかをチェックする。指定値がない場合には、エラー。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="SingleValue"><span class="pod_lang">SingleValue
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値がただ1つ存在することをチェックする拒否フィルタ。
+(0.44 以降)
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1つのみ存在すれば、次のフィルタに処理を渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">2つ以上存在する、若しくは1つも存在しない場合には、
+その時点で処理を中断し、エラーを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="MultiValues"><span class="pod_lang">MultiValues
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  MultiValues($min)
+  MultiValues($min,$max)</code></pre>
+
+<p>
+<span class="pod_lang">値が指定した <code class="pod_iseq_C">$min</code> 個以上, <code class="pod_iseq_C">$max</code> 個以下の範囲で
+存在することをチェックする拒否フィルタ。
+(0.44 以降)
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">個数が範囲内であれば、
+次のフィルタに処理を渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">個数が範囲外だった場合には、
+その時点で処理を中断し、エラーを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">$max</code> を省略した場合、上限個数の確認は行わない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値が0個で、それが範囲内のときのみ(<code class="pod_iseq_C">$min</code> が 0 の場合)、その場で受理される.
+(0.45以降)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="NoValues"><span class="pod_lang">NoValues
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値が存在しないことを受け付ける受理フィルタ。
+(0.44 以降)
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">値を全く持っていなければ、
+その時点で処理を中断し、成功を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">何らかの値が(空欄であったとしても)存在した場合には、
+次のフィルタに処理を渡す。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcorrectXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">
+<span class="pod_lang">組み込みcorrectフィルタ
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang"><a href="#correct">&quot;correct&quot;</a> で使用できる変更用フィルタ。
+<a href="#correct">&quot;correct&quot;</a> では check フィルタと correct フィルタの
+両方を利用できるが、<a href="#check">&quot;check&quot;</a> で correct フィルタを使用した場合には
+エラーとなる。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="ConvHira"><span class="pod_lang">ConvHira
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ひらがなに変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convHira">&quot;convHira&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvKata"><span class="pod_lang">ConvKata
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">カタカナに変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convKata">&quot;convKata&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvNumber"><span class="pod_lang">ConvNumber
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角数字に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convNumber">&quot;convNumber&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvNarrow"><span class="pod_lang">ConvNarrow
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">全角文字を半角に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convNarrow">&quot;convNarrow&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvWide"><span class="pod_lang">ConvWide
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角文字を全角に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convWide">&quot;convWide&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvKanaNarrow"><span class="pod_lang">ConvKanaNarrow
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">全角カタカナを半角に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convKanaNarrow">&quot;convKanaNarrow&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvKanaWide"><span class="pod_lang">ConvKanaWide
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角カタカナを全角に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convKanaWide">&quot;convKanaWide&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvComma"><span class="pod_lang">ConvComma
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角数字を3桁区切りのカンマ表記に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convComma">&quot;convComma&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvLF"><span class="pod_lang">ConvLF
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">改行コードを LF (\n) に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convLF">&quot;convLF&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ConvBR"><span class="pod_lang">ConvBR
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">改行コードを &lt;BR&gt;\n に変換する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#convBR">&quot;convBR&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceHira"><span class="pod_lang">ForceHira
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ひらがな以外の文字は削除。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceHira">&quot;forceHira&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceKata"><span class="pod_lang">ForceKata
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">カタカナ以外の文字は削除。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceKata">&quot;forceKata&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceNumber"><span class="pod_lang">ForceNumber
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角数字以外の文字は削除。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceNumber">&quot;forceNumber&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMin($max,$val)"><span class="pod_lang">ForceMin($max,$val)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角数字以外の文字を削除し、min未満なら$valをセットする。$val省略時はundefをセットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMin($max,$val)">&quot;forceMin($max,$val)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMax($max,$val)"><span class="pod_lang">ForceMax($max,$val)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">半角数字以外の文字を削除し、maxより大きければ$valをセットする。$val省略時はundefをセットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMax($max,$val)">&quot;forceMax($max,$val)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMaxLen($max)"><span class="pod_lang">ForceMaxLen($max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">最大バイト数を指定。超える場合はそのバイト数までカットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMaxLen($max)">&quot;forceMaxLen($max)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMaxUtf8Len($max)"><span class="pod_lang">ForceMaxUtf8Len($max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">UTF-8での最大バイト数を指定。
+超える場合はそのバイト数以下まで
+UTF-8の文字単位でカットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMaxUtf8Len($max)">&quot;forceMaxUtf8Len($max)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMaxSjisLen($max)"><span class="pod_lang">ForceMaxSjisLen($max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">SJISでの最大バイト数を指定。超える場合はそのバイト数以下まで
+SJISの文字単位でカットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMaxSjisLen($max)">&quot;forceMaxSjisLen($max)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForceMaxCharLen($max)"><span class="pod_lang">ForceMaxCharLen($max)
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">最大文字数を指定。超える場合はその文字数以下までカットする。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#forceMaxCharLen($max)">&quot;forceMaxCharLen($max)&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForcePortable"><span class="pod_lang">ForcePortable
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">機種依存文字以外を削除。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ForcePcPortable"><span class="pod_lang">ForcePcPortable
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">携帯絵文字以外を削除。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="TrimWhitespace"><span class="pod_lang">TrimWhitespace
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">値の前後に付いている半角/全角スペース、タブを削除する。
+<a href="http://search.cpan.org/perldoc/Tripletail::Value#trimWhitespace">&quot;trimWhitespace&quot; in Tripletail::Value</a>。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="Xe3X83Xa6Xe3X83XbcXe3X82Xb6Xe3X83XbcXe5XaeX9aXe7XbeXa9Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XabXe3X81Xa4Xe3X81X84Xe3X81Xa6">
+<span class="pod_lang">ユーザー定義フィルタについて
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang">組み込みフィルタに含まれないフィルタを、ユーザーで実装し、組み込むことができる。
+
+</span>
+</p>
+
+<h4><a id="Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe6Xa7X8bXe7XafX89">
+<span class="pod_lang">フィルタの構築
+
+</span></a></h4>
+
+<p>
+<span class="pod_lang">Tripletail::Validator::Filterクラスを継承し、doFilterメソッドをオーバーライドする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">doFilterメソッドに渡される引数は、以下の通り。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X$this"><span class="pod_lang">$this
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">フィルタオブジェクト自身
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$values"><span class="pod_lang">$values
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">チェック対象となる値の配列の参照。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$args"><span class="pod_lang">$args
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">フィルタに与えられる引数。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<p>
+<span class="pod_lang">doFilterメソッドの戻り値をスカラで評価し、その復帰値が真で且つ
+リファレンスでなければ検証NGと判断する。
+偽であれば、そのフィルタは通過して次のフィルタに。
+リファレンスであればそのキーは検証OKとして、そのキーの検証を終了する。
+
+</span>
+</p>
+
+<h4><a id="Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81Xbf">
+<span class="pod_lang">フィルタの組み込み
+
+</span></a></h4>
+
+<p>
+<span class="pod_lang">IniパラメータのValidatorグループに、
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  フィルタ名 = フィルタクラス名</code></pre>
+
+<p>
+<span class="pod_lang">として指定する。
+
+</span>
+</p>
+
+<h4><a id="Xe4XbeX8b">
+<span class="pod_lang">例
+
+</span></a></h4>
+
+<p>
+<span class="pod_lang">チェック対象となる値の配列に、'Test'以外の文字列が含まれていればエラー。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="TestFilter.pm"><span class="pod_lang">TestFilter.pm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  package TestFilter;
+  use Tripletail;
+  
+  use base qw{Tripletail::Validator::Filter};
+  
+  sub doFilter {
+    my $this   = shift;
+    my $values = shift;
+    my $args   = shift;
+    
+    return grep { $_ ne 'Test' } @$values &gt; 0;
+  }</code></pre>
+
+</dd>
+<dt><a id="IniXe3X83X95Xe3X82Xa1Xe3X82Xa4Xe3X83Xab"><span class="pod_lang">Iniファイル
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  [Validator]
+  Test = TestFilter</code></pre>
+
+</dd>
+<dt><a id="Xe4XbdXbfXe3X81X84Xe6X96Xb9"><span class="pod_lang">使い方
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $validator-&gt;addFilter(
+    {
+      test =&gt; 'Test',
+    }
+  )</code></pre>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Value">Tripletail::Value</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Validator - 値の検証の一括処理
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newValidator">$TL-&gt;newValidator</a></li>
+<li><a href="#X$args">$args</a></li>
+<li><a href="#X$this">$this</a></li>
+<li><a href="#X$values">$values</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#Blank">Blank</a></li>
+<li><a href="#CharLen($min,$max)">CharLen($min,$max)</a></li>
+<li><a href="#ConvBR">ConvBR</a></li>
+<li><a href="#ConvComma">ConvComma</a></li>
+<li><a href="#ConvHira">ConvHira</a></li>
+<li><a href="#ConvKanaNarrow">ConvKanaNarrow</a></li>
+<li><a href="#ConvKanaWide">ConvKanaWide</a></li>
+<li><a href="#ConvKata">ConvKata</a></li>
+<li><a href="#ConvLF">ConvLF</a></li>
+<li><a href="#ConvNarrow">ConvNarrow</a></li>
+<li><a href="#ConvNumber">ConvNumber</a></li>
+<li><a href="#ConvWide">ConvWide</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#DomainName">DomainName</a></li>
+<li><a href="#Email">Email</a></li>
+<li><a href="#Empty">Empty</a></li>
+<li><a href="#Enum($a,$b,$c)">Enum($a,$b,$c)</a></li>
+<li><a href="#ExistentDay">ExistentDay</a></li>
+<li><a href="#ForceHira">ForceHira</a></li>
+<li><a href="#ForceKata">ForceKata</a></li>
+<li><a href="#ForceMax($max,$val)">ForceMax($max,$val)</a></li>
+<li><a href="#ForceMaxCharLen($max)">ForceMaxCharLen($max)</a></li>
+<li><a href="#ForceMaxLen($max)">ForceMaxLen($max)</a></li>
+<li><a href="#ForceMaxSjisLen($max)">ForceMaxSjisLen($max)</a></li>
+<li><a href="#ForceMaxUtf8Len($max)">ForceMaxUtf8Len($max)</a></li>
+<li><a href="#ForceMin($max,$val)">ForceMin($max,$val)</a></li>
+<li><a href="#ForceNumber">ForceNumber</a></li>
+<li><a href="#ForcePcPortable">ForcePcPortable</a></li>
+<li><a href="#ForcePortable">ForcePortable</a></li>
+<li><a href="#Gif">Gif</a></li>
+<li><a href="#Hira">Hira</a></li>
+<li><a href="#HttpUrl($mode)">HttpUrl($mode)</a></li>
+<li><a href="#HttpsUrl">HttpsUrl</a></li>
+<li><a href="#IniXe3X83X95Xe3X82Xa1Xe3X82Xa4Xe3X83Xab">Iniファイル</a></li>
+<li><a href="#Integer($min,$max)">Integer($min,$max)</a></li>
+<li><a href="#IpAddress">IpAddress</a></li>
+<li><a href="#Jpeg">Jpeg</a></li>
+<li><a href="#Kata">Kata</a></li>
+<li><a href="#Len($min,$max)">Len($min,$max)</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#MobileEmail">MobileEmail</a></li>
+<li><a href="#MultiValues">MultiValues</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#NoValues">NoValues</a></li>
+<li><a href="#NotBlank">NotBlank</a></li>
+<li><a href="#NotEmpty">NotEmpty</a></li>
+<li><a href="#NotWhitespace">NotWhitespace</a></li>
+<li><a href="#Or($filter1X7c$filter2X7c$filter3)">Or($filter1|$filter2|$filter3)</a></li>
+<li><a href="#Password($spec)">Password($spec)</a></li>
+<li><a href="#PcPortable">PcPortable</a></li>
+<li><a href="#Png">Png</a></li>
+<li><a href="#Portable">Portable</a></li>
+<li><a href="#PrintableAscii">PrintableAscii</a></li>
+<li><a href="#Real($min,$max)">Real($min,$max)</a></li>
+<li><a href="#RegExp($regexp)">RegExp($regexp)</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#SingleValue">SingleValue</a></li>
+<li><a href="#SjisLen($min,$max)">SjisLen($min,$max)</a></li>
+<li><a href="#TelNumber">TelNumber</a></li>
+<li><a href="#TestFilter.pm">TestFilter.pm</a></li>
+<li><a href="#TrimWhitespace">TrimWhitespace</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__00">Tripletail::Value</a></li>
+<li><a href="#Wide">Wide</a></li>
+<li><a href="#ZipCode">ZipCode</a></li>
+<li><a href="#addFilter">addFilter</a></li>
+<li><a href="#check">check</a></li>
+<li><a href="#correct">correct</a></li>
+<li><a href="#getKeys">getKeys</a></li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe6Xa7X8bXe7XafX89">フィルタの構築</a></li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XaeXe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81Xbf">フィルタの組み込み</a></li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">フィルタ一覧</a></li>
+<li><a href="#Xe3X83Xa6Xe3X83XbcXe3X82Xb6Xe3X83XbcXe5XaeX9aXe7XbeXa9Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe3X81XabXe3X81Xa4Xe3X81X84Xe3X81Xa6">ユーザー定義フィルタについて</a></li>
+<li><a href="#Xe4XbdXbfXe3X81X84Xe6X96Xb9">使い方</a></li>
+<li><a href="#Xe4XbeX8b">例</a></li>
+<li><a href="#Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcheckXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">組み込みcheckフィルタ</a></li>
+<li><a href="#Xe7Xb5X84Xe3X81XbfXe8XbeXbcXe3X81XbfcorrectXe3X83X95Xe3X82Xa3Xe3X83XabXe3X82Xbf">組み込みcorrectフィルタ</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Validator - 値の検証の一括処理
+
+
+</div>
+
+</body>
+</html>

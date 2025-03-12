@@ -4,6 +4,9 @@
 #1 kblx.kblx6
 #2 kblx.kblx7
 #3 kblx.kblx8
+#4 git181.def
+#5 git181.git181
+#6 git32.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -21,7 +24,9 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
-        'kblx6' => <<'----------',
+        'def'    => "",
+        'git181' => "-nasc",
+        'kblx6'  => <<'----------',
 -nbbc
 -blbs=0
 -blbp=0
@@ -54,6 +59,24 @@ BEGIN {
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'git181' => <<'----------',
+on develop => sub {
+    requires 'Template'           => '0';
+    requires 'Test::Perl::Critic' => '0';
+    requires 'Test::Pod'          => '1.26'
+}
+
+# end
+----------
+
+        'git32' => <<'----------',
+use Foo qw(myfunction);
+sub run {
+    myfunction('x');
+    my $res = myfunction ? 'X' : 'Y';  print ' ?';
+}
+----------
 
         'kblx' => <<'----------',
 package A::B;
@@ -222,6 +245,48 @@ sub dump_verbatim {
 
 # comment after blank and comment
 #3...........
+        },
+
+        'git181.def' => {
+            source => "git181",
+            params => "def",
+            expect => <<'#4...........',
+on develop => sub {
+    requires 'Template'           => '0';
+    requires 'Test::Perl::Critic' => '0';
+    requires 'Test::Pod'          => '1.26';
+}
+
+# end
+#4...........
+        },
+
+        'git181.git181' => {
+            source => "git181",
+            params => "git181",
+            expect => <<'#5...........',
+on develop => sub {
+    requires 'Template'           => '0';
+    requires 'Test::Perl::Critic' => '0';
+    requires 'Test::Pod'          => '1.26'
+}
+
+# end
+#5...........
+        },
+
+        'git32.def' => {
+            source => "git32",
+            params => "def",
+            expect => <<'#6...........',
+use Foo qw(myfunction);
+
+sub run {
+    myfunction('x');
+    my $res = myfunction ? 'X' : 'Y';
+    print ' ?';
+}
+#6...........
         },
     };
 

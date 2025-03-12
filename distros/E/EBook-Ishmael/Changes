@@ -1,6 +1,15 @@
 Revision history for Perl module EBook::Ishmael.
 
-1.00  Mar 05 2025
+1.01  Mar 11 2025
+  - Force text browsers to dump output in UTF8.
+  - Fix dumping X?HTML files with no title.
+  - Add -e|--html-encoding option to queequeg: Force the use of a specified
+    encoding when reading HTML input.
+  - Remove unnecessary module loads.
+  - Use "remove_tree" instead of "rmtree".
+  - Fixed previous changelog date.
+
+1.00  Mar 04 2025
   This is a major upgrade that introduces many changes that may be incompatible
   with previous versions of ishmael. Pay special attention to the Added,
   Changes, and Removed sections of this changelog if this concerns you.

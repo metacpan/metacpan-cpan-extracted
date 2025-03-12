@@ -1,5 +1,5 @@
 package Net::Whois::IANA;
-$Net::Whois::IANA::VERSION = '0.49';
+$Net::Whois::IANA::VERSION = '0.50';
 use 5.006;
 
 use strict;
@@ -24,19 +24,11 @@ BEGIN {
     # populate the hash at compile time
 
     %IANA = (
-        apnic => [
-            [ 'whois.apnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&apnic_query ],
-        ],
-        ripe => [ [ 'whois.ripe.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&ripe_query ], ],
-        arin => [ [ 'whois.arin.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&arin_query ], ],
-        lacnic => [
-            [ 'whois.lacnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&lacnic_query ],
-        ],
-        afrinic => [
-            [
-                'whois.afrinic.net', $WHOIS_PORT,
-                $WHOIS_TIMEOUT,      \&afrinic_query
-            ],
+        apnic   => [ [ 'whois.apnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&apnic_query ], ],
+        ripe    => [ [ 'whois.ripe.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&ripe_query ], ],
+        arin    => [ [ 'whois.arin.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&arin_query ], ],
+        lacnic  => [ [ 'whois.lacnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&lacnic_query ], ],
+        afrinic => [ [ 'whois.afrinic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&afrinic_query ],
         ],
     );
 
@@ -45,7 +37,7 @@ BEGIN {
     # accessors
     # do not use AUTOLOAD - only accept lowercase function name
     # define accessors at compile time
-    my @accessors = qw{country netname descr status source server inetnum inet6num cidr};
+    my @accessors = qw{country netname descr status source server inetnum inet6num cidr abuse fullinfo};
 
     foreach my $accessor (@accessors) {
         no strict 'refs';
@@ -610,7 +602,7 @@ Net::Whois::IANA - Net::Whois::IANA - A universal WHOIS data extractor.
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 

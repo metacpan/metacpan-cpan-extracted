@@ -1,5 +1,31 @@
 # Perltidy Change Log
 
+## 2025 03 11
+
+    - The options --want-call-parens and --nowant-call-parens were accidentally
+      being skipped in version 20250214. This has been fixed.
+
+    - Fixed git #32, a tokenization error with message "hit EOF seeking end of
+      quote/pattern" for a function call without paren or arg before a
+      ternary operator.
+
+    - A new option --dump-similar-keys will dump hash keys which are
+      similar but slightly different to standard output and then exit.
+      A related option --warn-similar-keys will report keys with are similar
+      to the error output while formatting. Both of these can be controlled
+      by parameters which are described in the input manual.
+
+    - A new option --dump-hash-keys will dump all hash keys found by
+      perltidy to standard output.
+
+    - The output table for --dump-block-summary has an additional field.
+      It is an alternate McCabe complexity count which is the same as
+      the previous count except for subs. For subs, the complexity number
+      is reduced by the values for any contained anonymous subs.
+
+    - Fix git #181, remove continuation indentation from closing brace
+      of an anonymous sub which terminates an input stream.
+
 ## 2025 02 14
 
     - A new option --keep-old-blank-lines-exceptions=s, or --kblx=s,
@@ -14,14 +40,14 @@
       A related new parameter --warn-unused-keys-cutoff=N provides control
       over a filter which prevents warnings for keys which appear to be
       members of large hashes used to communicate with external packages.
-      The manual has details.  See git #177.
+      The manual has details.  See also git #177.
 
     - A new option --pack-opening-types='->' has been added to provide more
       control over breaks of method call chains.  It tells perltidy not to
       break at every method call when a chain of calls spans multiple lines.
       This was the behavior in versions prior to 20250105. The default
       starting with 20250105 is to break at each call of a method call chain
-      which spans multiple lines. See git #171.
+      which spans multiple lines. The manual has details. See also git #171.
 
 ## 2025 01 05
 

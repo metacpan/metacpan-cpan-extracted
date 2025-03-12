@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------
 
 DISTNAME=unijp
-VERSION=0.03
+VERSION=0.4.0.2
 DISTVERNAME=$(DISTNAME)-$(VERSION)
 
 PERLRUN=perl
@@ -25,7 +25,7 @@ INST_DIR=$(DESTDIR)$(ERL_LIB_DIR)/$(DISTVERNAME)
 ERLEVAL=$(ERL) -noshell -pa $(bdir) -run unijp start -eval
 ERL_INTERFACE_DIR=$(shell $(ERL) -noshell -eval 'io:format("~s~n", [code:lib_dir(erl_interface)]), init:stop()')
 
-OPTIMIZE=-g -O0
+OPTIMIZE=-g -O2
 CFLAGS= \
   -Wall $(OPTIMIZE) \
   -I$(ERL_DIR)/usr/include \
@@ -46,7 +46,8 @@ nil=
 BUILD_FILES=\
 	$(bdir)/src/unijp.erl \
 	$(bdir)/ebin/unijp.beam \
-	$(bdir)/priv/unijp_driver.so \
+	$(bdir)/ebin/unijp_nif.beam \
+	$(bdir)/priv/lib/unijp_nif.so \
 	$(nil)
 
 # -----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ install: all
 	cp -r $(bdir)/ebin $(bdir)/priv $(bdir)/src $(INST_DIR)/
 
 clean:
-	rm -rf *.so *.o unijp.beam ebin priv build
+	rm -rf *.so *.o unijp.beam unijp_nif.beam ebin priv build
 
 docs:
 	$(ERL) -noshell -run edoc_run files '["unijp.erl", "inc/test_more.erl"]' '[{dir,"html"}]'
@@ -69,8 +70,8 @@ test_lib: inc/test_more.beam inc/test_harness.beam
 inc/test_more.beam: inc/test_more.erl; $(ERLC) -o $(@D) inc/test_more.erl
 inc/test_harness.beam: inc/test_harness.erl; $(ERLC) -o $(@D) inc/test_harness.erl
 
-test: all
-	$(ERL) -noshell -pa $(bdir) -pa inc -pa t -run unijp test -run init stop
+test: check
+check: all
 	$(ERLC) test1.erl
 	$(ERL) -noshell -pa $(bdir) -pa inc -pa t -run test1 test -run init stop
 
@@ -89,18 +90,25 @@ $(bdir)/src/unijp.erl: $(bdir) unijp.erl
 $(bdir)/ebin/unijp.beam: $(bdir) unijp.beam
 	test -e $(bdir)/ebin || mkdir $(bdir)/ebin
 	cp -f unijp.beam $(bdir)/ebin/unijp.beam
-$(bdir)/priv/unijp_driver.so: $(bdir) unijp_driver.so
-	test -e $(bdir)/priv || mkdir $(bdir)/priv
-	cp -f unijp_driver.so $(bdir)/priv/unijp_driver.so
+$(bdir)/ebin/unijp_nif.beam: $(bdir) unijp_nif.beam
+	test -e $(bdir)/ebin || mkdir $(bdir)/ebin
+	cp -f unijp_nif.beam $(bdir)/ebin/unijp_nif.beam
+$(bdir)/priv/lib/unijp_nif.so: $(bdir) unijp_nif.so
+	test -e $(bdir)/priv     || mkdir $(bdir)/priv
+	test -e $(bdir)/priv/lib || mkdir $(bdir)/priv/lib
+	cp -f unijp_nif.so $(bdir)/priv/lib/unijp_nif.so
 
 # unijp.erl
 unijp.beam: unijp.erl
-	$(ERLC) unijp.erl
-unijp_driver.so: unijp_driver.c
-	$(DLLD) $(CFLAGS) $(LDFLAGS) unijp_driver.c -o $@ $(LDLIBS)
+	$(ERLC) +debug_info $<
+unijp_nif.beam: unijp_nif.erl
+	$(ERLC) +debug_info $<
+unijp_nif.so: unijp_nif.c
+	$(DLLD) $(CFLAGS) $(LDFLAGS) $< -o $@ $(LDLIBS)
 
 shell:
-	$(ERL) -pa $(bdir)
+	UNIJP_INPLACE_NIF_MODULE_DIR=$(bdir)/priv/lib \
+		$(ERL) -pa $(bdir)
 
 # -----------------------------------------------------------------------------
 # dist.

@@ -16,7 +16,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20250214';
+our $VERSION = '20250311';
 use Carp;
 
 use constant DEVEL_MODE   => 0;
@@ -219,7 +219,7 @@ sub setup_convergence_test {
         # reverse order so we can pop values as they arrive
         my @list = @{$rlist};
         if ( $list[0] < $list[-1] ) {
-            @list = reverse @list;
+            @list = reverse(@list);
         }
         $self->[_rK_checklist_] = \@list;
     }

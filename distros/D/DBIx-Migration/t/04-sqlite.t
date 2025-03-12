@@ -27,7 +27,10 @@ subtest 'wrong dsn' => sub {
 };
 
 my $tempdir = tempdir( CLEANUP => 1 );
-my $m       = DBIx::Migration->new( tracking_table => 'dbix-migration', dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ) );
+my $m       = DBIx::Migration->new(
+  tracking_table => 'dbix-tracking',
+  dsn            => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' )
+);
 note 'dsn: ', $m->dsn;
 
 my $tracking_table = $m->tracking_table;
@@ -37,8 +40,7 @@ ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 dies_ok { $m->migrate( 0 ) } '"dir" not set';
 $m->dir( cwd->child( qw( t sql basic ) ) );
 
-ok $m->migrate( 0 ),
-  "initially (if the \"$tracking_table\" table does not exist yet) a database is at version 0";
+ok $m->migrate( 0 ), "initially (if the \"$tracking_table\" table does not exist yet) a database is at version 0";
 
 subtest "privious migrate() has triggered the \"$tracking_table\" table creation" => sub {
   plan tests => 2;
@@ -88,5 +90,5 @@ my $m2 = DBIx::Migration->new(
 
 $tracking_table = $m2->tracking_table;
 dies_ok { $m2->migrate } 'second migration section is broken';
-is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
-  "check tables: creation of \"$tracking_table\" table was rolled back too!";
+is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ],
+  "check tables: creation of \"$tracking_table\" wasn't rolled back";

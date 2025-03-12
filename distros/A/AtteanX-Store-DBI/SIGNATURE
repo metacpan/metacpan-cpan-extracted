@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.89.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,47 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 25e4d6942df15b2bed4ad0a8ad7fd001ecdd4924 Changes
-SHA1 77dd35c1247483f080d885f9dab85436494709e4 MANIFEST
-SHA1 d86aa4c01b118c8f49456252b8619a1fd47865fc META.yml
-SHA1 7123645c1dc9aa69d0b8762ebc6e64f3f51afbc1 Makefile.PL
-SHA1 05411a9b4c484a973260a56aacdaad48e4be6914 README.md
-SHA1 0195dc3a3cae16a81231087f5e8b6e52364de6d5 bin/attean_dbi
-SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
-SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
-SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
-SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
-SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
-SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
-SHA1 a4ed3f5a3e2f117b8f453771b9e52e8c0f5fcfbc inc/Module/Install/Share.pm
-SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
-SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 60ea9dd220cc035417ab40f4f407aa5519d1a53c lib/AtteanX/Store/DBI.pm
-SHA1 19894ead40e6a0c6c527a133dacdeeac7d56f4af lib/Test/AtteanX/Store/DBI.pm
-SHA1 de7a9c395b6e24abb2f42f50ea1b3bc6538af23d meta/changes.ttl
-SHA1 d1003e1dc2641a248f2b923c19fd2925968e1f40 share/database-schema/mysql-create.sql
-SHA1 af09f59eb466d0f248d22c5536222d29279211f6 share/database-schema/mysql-drop.sql
-SHA1 b95f5a6d45b5cb15b667aee3d32d68fee33e4d80 share/database-schema/postgresql-create.sql
-SHA1 456f4864d61d51a7fe4fa507ce644d5404861949 share/database-schema/postgresql-drop.sql
-SHA1 313ad5717ff2de8118df7560789dbc803edd66d4 share/database-schema/sqlite-create.sql
-SHA1 af09f59eb466d0f248d22c5536222d29279211f6 share/database-schema/sqlite-drop.sql
-SHA1 316dba855401e75fb790031321c4637f1da37f8e t/store-dbi-mysql.t
-SHA1 924bbcf89dc2c1475e144a6686e6e5ace10364ca t/store-dbi-postgresql.t
-SHA1 b9c9e0a7cacd4fa6f6a11cfefd00c0b74e2cc17f t/store-dbi-sqlite.t
-SHA1 8260840c52125be2050b6993fd5d957acc1b18b7 xt/dawg11-mysql.t
-SHA1 6d7a1fee15d71e3e93fb8e873eb193e6f4bdb840 xt/dawg11-postgresql.t
-SHA1 dde9e19ac0a5c64168cbcc4ea03aa9ed0c7ba548 xt/dawg11-sqlite.t
-SHA1 61bf86179ce63f1148d1fb8c7a4c57bee395f7fc xt/pod-coverage.t
-SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+SHA256 231e365a175636d86b5fd3c221ab6ef7dd4f90221d882d2daa4feeca92288121 Changes
+SHA256 d11eeb015891675776020c76a0a1c86cae0bab64bdeadb7dfeba0447ebc0c623 MANIFEST
+SHA256 9348e6a18b008165a5a493bc27b8541e8950b0d1cc80d3693ae3e4aa55f415c7 META.yml
+SHA256 5f65e9f44871a5cc5f526e9340cdc02b54f3d73e5fce7eb4d94b555ecc208fb0 Makefile.PL
+SHA256 dafc4e443a6bd7fb7452fc631d486bf9b9362a9acc56b3a088435997d1359711 README.md
+SHA256 5c3a1aa3150c9b54ba92411d64b0024df0967e92dfc181f5c68f9e38631ac0db bin/attean_dbi
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 b986592700675e11c2c62cb41fa24d9f4d15e077a0d317f372efcaa78d68a1d9 inc/Module/Install/Share.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 a9503b6a76f33ba39f1f045d2705d5ed08536f8132b540d59777ac587f3a4151 lib/AtteanX/Store/DBI.pm
+SHA256 bfe7e8e7b04402a8b4701f7061b6bec75b7380c3bbc0ab200de167f4f6b5d74b lib/Test/AtteanX/Store/DBI.pm
+SHA256 3f2258c3a0dce58edc586bef7d112f8a264684ce8f522189cc2113992ed7f07c meta/changes.ttl
+SHA256 dd0b276f509f5c71d1031f4d27cd78f5d9a8d85f3afd8512c5e0e9b946bcce32 share/database-schema/mysql-create.sql
+SHA256 89f829942eb387bb8b569dd2d70412ca28a46c86a00b0b4350eb07d1de343e58 share/database-schema/mysql-drop.sql
+SHA256 820c4a16aef52754ed03d036615454ad8eabd09cc25d1ffa1648c679c4e0221e share/database-schema/postgresql-create.sql
+SHA256 2de18d403cfd956d62ea6135cd9f15d0507ffa86b1594e4edcd20f842b9f92a3 share/database-schema/postgresql-drop.sql
+SHA256 146fb0e54770a44b662808c1a31f6c33127c0aba927bb37c9b147907bf73e4d4 share/database-schema/sqlite-create.sql
+SHA256 89f829942eb387bb8b569dd2d70412ca28a46c86a00b0b4350eb07d1de343e58 share/database-schema/sqlite-drop.sql
+SHA256 25927a842ddbf2e42c50bc084f3dd407f70671a61f3ebf8a20c0bd378cb9ac93 t/store-dbi-mysql.t
+SHA256 d87fedd045ce2d8ab8dac05b2fdccf135cfa6ac082aafab531181431536e0d63 t/store-dbi-postgresql.t
+SHA256 4f14567e455b487ec9da1dec6735ec5b0b9099cb4a46f9fe590d466ca183ca16 t/store-dbi-sqlite.t
+SHA256 0efbd5cab373833735076832064c6c10f3f5c13216ac0e18347c48e3459223d9 xt/dawg11-mysql.t
+SHA256 a2f200695b73565e1e64451528e8005a44be4695e3fa875b6a90afb0e14c68b0 xt/dawg11-postgresql.t
+SHA256 1a2829c1f7c9e2c40880d3c2a671f1278d2e16a6edf30f46693852ece5c3c63a xt/dawg11-sqlite.t
+SHA256 81dae5e652e694c2acc7d105e32ba5f69edc343b22b2e1d47f95fdef8b441cd3 xt/pod-coverage.t
+SHA256 2b04b20ff767801fde2fb6435361dc8ca0a9b60dda6cb0bbd18dd52962e1c1a3 xt/pod.t
 -----BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl/VlWUACgkQhPK6VMqoyC1BBwCgpVDmj5LNLENpwrL7rYUTZ4qy
-+x8AoLRJmKQNvyqCTLKnvPUXT6fz3c79
-=TBgi
+iF0EAREDAB0WIQSC+8GhU5AgVmDLxA+E8rpUyqjILQUCZ9BjqgAKCRCE8rpUyqjI
+LaH7AKCBqPiyVlrjrIO5dtGut5QSyuJPvQCfZsBGY21mxwL8bax5MMr3XkZYYcM=
+=GeK4
 -----END PGP SIGNATURE-----

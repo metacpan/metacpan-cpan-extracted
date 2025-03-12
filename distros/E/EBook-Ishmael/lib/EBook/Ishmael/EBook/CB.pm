@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CB;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -12,8 +12,6 @@ use List::Util qw(max);
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::TextToHtml;
-use EBook::Ishmael::Unzip;
 
 # Not an ebook format itself, just a base class from which actual comic book
 # archives derive themselves.

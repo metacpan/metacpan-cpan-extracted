@@ -1,5 +1,5 @@
 package Dist::Build::ShareDir;
-$Dist::Build::ShareDir::VERSION = '0.016';
+$Dist::Build::ShareDir::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -15,11 +15,14 @@ sub add_methods {
 		my ($planner, $dir, $dist_name) = @_;
 		$dist_name //= $planner->distribution;
 
+		my $inner = $planner->new_scope;
+		$inner->load_module("Dist::Build::Core");
+
 		my @outputs;
 		find(sub {
 			return unless -f;
 			my $output = catfile(qw/blib lib auto share dist/, $dist_name, abs2rel($File::Find::name, $dir));
-			$planner->copy_file(abs2rel($File::Find::name), $output);
+			$inner->copy_file(abs2rel($File::Find::name), $output);
 			push @outputs, $output;
 		}, $dir);
 
@@ -31,11 +34,14 @@ sub add_methods {
 		$module_name //= $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
 
+		my $inner = $planner->new_scope;
+		$inner->load_module("Dist::Build::Core");
+
 		my @outputs;
 		find(sub {
 			return unless -f;
 			my $output = catfile(qw/blib lib auto share module/, $module_dir, abs2rel($File::Find::name, $dir));
-			$planner->copy_file(abs2rel($File::Find::name), $output);
+			$inner->copy_file(abs2rel($File::Find::name), $output);
 			push @outputs, $output;
 		}, $dir);
 
@@ -59,7 +65,7 @@ Dist::Build::ShareDir - Sharedir support for Dist::Build
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

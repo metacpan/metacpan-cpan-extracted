@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use Test::Deep;
 
 # build and load subroutines
 use OpenMP::Simple;

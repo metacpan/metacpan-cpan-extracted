@@ -29,8 +29,11 @@ typedef struct unijp_s unijp_t;
 
 /* ----------------------------------------------------------------------------
 : uj_new(str, bytes_len, icode).
+: uj_new_r(alloc, str, bytes_len, icode).
 +--------------------------------------------------------------------------- */
 extern unijp_t* uj_new(const uj_uint8* str, uj_size_t bytes, uj_charcode_t icode);
+extern unijp_t* uj_new_r(const uj_alloc_t* const alloc, const uj_uint8* str, uj_size_t bytes, uj_charcode_t icode);
+  
 
 /* ----------------------------------------------------------------------------
 : uj_delete(uj).
@@ -41,6 +44,12 @@ extern void uj_delete(unijp_t* uj);
 : uj_conv(uj, ocode, &len).
 +--------------------------------------------------------------------------- */
 extern uj_uint8* uj_conv(unijp_t* uj, uj_charcode_t ocode, uj_size_t* p_len);
+
+/* ----------------------------------------------------------------------------
+: uj_delete_buffer(uj, ptr).
+: release memory which returned from uj_conv.
++--------------------------------------------------------------------------- */
+extern void uj_delete_buffer(unijp_t* uj, uj_uint8* ptr);
 
 /* ----------------------------------------------------------------------------
 : str = uj_to_utf8(uj, &len).

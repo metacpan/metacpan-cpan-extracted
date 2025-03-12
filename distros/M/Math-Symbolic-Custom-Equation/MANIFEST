@@ -1,4 +1,6 @@
 Changes
+examples/boxes-gravity.pl
+examples/pod_example.pl
 ignore.txt
 lib/Math/Symbolic/Custom/Equation.pm
 Makefile.PL

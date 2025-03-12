@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -16,6 +16,8 @@ use XML::LibXML;
 use EBook::Ishmael::EBook;
 use EBook::Ishmael::ImageID;
 use EBook::Ishmael::TextBrowserDump;
+
+# TODO: Add an option to specify output encoding
 
 use constant {
 	MODE_TEXT      => 0,

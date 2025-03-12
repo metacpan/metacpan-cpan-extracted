@@ -1,7 +1,7 @@
 
 PERL=perl
 CC=gcc
-OPTIMIZE=-g
+OPTIMIZE=-g -O2
 CFLAGS=-I. $(OPTIMIZE) -Wall -Werror -fPIC
 AR=ar
 LDFLAGS=-L.

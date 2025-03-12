@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20250214';
+our $VERSION = '20250311';
 
 use Carp;
 
@@ -931,8 +931,8 @@ sub report_tokenization_errors {
 
     my $maxle = $rOpts_maximum_level_errors;
     my $maxue = $rOpts_maximum_unexpected_errors;
-    $maxle = 1 unless defined($maxle);
-    $maxue = 0 unless defined($maxue);
+    $maxle = 1 unless ( defined($maxle) );
+    $maxue = 0 unless ( defined($maxue) );
 
     my $level = get_indentation_level();
     if ( $level != $self->[_starting_level_] ) {
@@ -1139,11 +1139,23 @@ sub show_indentation_table {
         }
     }
 
-    # skip if the table does not have at least 2 points to pinpoint an error
+    # Skip if the table does not have at least 2 points to pinpoint an error
     return if ( $num_his <= 1 );
 
-    # skip if first point shows a level error - the analysis may not be valid
+    # Skip if first point shows a level error - the analysis may not be valid
     return if ( $rhistory_level_diff->[0] );
+
+    # Remove table points which return from negative to zero; they follow
+    # an error and may not be correct. c448.
+    my $min_lev = $rhistory_level_diff->[0];
+    foreach my $ii ( 1 .. $num_his - 1 ) {
+        my $lev = $rhistory_level_diff->[$ii];
+        if ( $lev < $min_lev ) { $min_lev = $lev; next }
+        if ( $min_lev < 0 && $lev >= 0 ) {
+            $num_his = $ii;
+            last;
+        }
+    }
 
     # Since the table could be arbitrarily large, we will limit the table to N
     # lines.  If there are more lines than that, we will show N-3 lines, then
@@ -1164,7 +1176,7 @@ sub show_indentation_table {
 
     my @output_lines;
     push @output_lines, <<EOM;
-Table of nesting level differences at closing braces.
+Table of initial nesting level differences at closing braces.
 This might help localize brace errors if the file was previously formatted.
 line: error=[new brace level]-[old indentation level]
 EOM
@@ -1886,11 +1898,11 @@ sub dump_functions {
 
         foreach my $sub ( keys %{ $ris_user_function->{$pkg} } ) {
             my $msg = EMPTY_STRING;
-            if ( $ris_block_list_function->{$pkg}{$sub} ) {
+            if ( $ris_block_list_function->{$pkg}->{$sub} ) {
                 $msg = 'block_list';
             }
 
-            if ( $ris_block_function->{$pkg}{$sub} ) {
+            if ( $ris_block_function->{$pkg}->{$sub} ) {
                 $msg = 'block';
             }
             $fh->print("$sub $msg\n");
@@ -3358,9 +3370,9 @@ EOM
             #
             #    for (sort {strcoll($a,$b);} keys %investments) {
 
-            if (   $brace_depth == $rdepth_array->[PAREN][BRACE][$paren_depth]
+            if ( $brace_depth == $rdepth_array->[PAREN]->[BRACE]->[$paren_depth]
                 && $square_bracket_depth ==
-                $rdepth_array->[PAREN][SQUARE_BRACKET][$paren_depth] )
+                $rdepth_array->[PAREN]->[SQUARE_BRACKET]->[$paren_depth] )
             {
 
                 $type = 'f';
@@ -4484,7 +4496,7 @@ EOM
             }
 
             else {
-                $ris_constant->{$current_package}{$next_nonblank_tok2} = 1;
+                $ris_constant->{$current_package}->{$next_nonblank_tok2} = 1;
             }
         }
         return;
@@ -4693,7 +4705,7 @@ EOM
                     if ( $tok !~ /::$/ ) {
                         $self->complain(<<EOM);
 Expecting operator after '$last_nonblank_token' but found bare word '$tok'
-       Maybe indirectet object notation?
+       Maybe indirect object notation?
 EOM
                     }
                 }
@@ -6079,7 +6091,7 @@ EOM
             my $code = $tokenization_code->{$tok};
             if ($code) {
                 $code->($self);
-                redo if $in_quote;
+                redo if ($in_quote);
             }
         }    ## End main tokenizer loop
 
@@ -6345,7 +6357,7 @@ EOM
                 # programming note: it seems most efficient to 'next' out of
                 # a critical loop like this as early as possible. So instead
                 # of 'if ( DEVEL_MODE && $numc < 0 )' we write:
-                next unless DEVEL_MODE;
+                next unless (DEVEL_MODE);
                 next if ( $numc > 0 );
 
                 # Should not happen unless @{$rtoken_map} is corrupted
@@ -6373,7 +6385,7 @@ EOM
 
                     # check '$rtoken_map' and '$routput_token_list'
                     $self->Fault(<<EOM);
-Reconstruted line difers from input; input_length=$len_input test_length=$len_test
+Reconstructed line difers from input; input_length=$len_input test_length=$len_test
 input:'$input_line'
 test :'$test_line'
 EOM
@@ -6788,6 +6800,10 @@ sub operator_expected {
     # Section 2E: bareword
     if ( $last_nonblank_type eq 'w' ) {
 
+        # It is safest to return UNKNOWN if a possible ? pattern delimiter may
+        # follow (git #32, c469) and let the guess algorithm handle it.
+        if ( $tok eq '?' ) { return UNKNOWN }
+
         # see if this has been seen in the role of a function taking args
         my $rinfo = $self->[_rbareword_info_]->{$current_package};
         if ($rinfo) {
@@ -7152,7 +7168,7 @@ sub decide_if_code_block {
         push @pre_types, '}';
 
         my $jbeg = 0;
-        $jbeg = 1 if $pre_types[0] eq 'b';
+        $jbeg = 1 if ( $pre_types[0] eq 'b' );
 
         # first look for one of these
         #  - bareword
@@ -7185,7 +7201,7 @@ sub decide_if_code_block {
         }
         if ( $j > $jbeg ) {
 
-            $j++ if $pre_types[$j] eq 'b';
+            $j++ if ( $pre_types[$j] eq 'b' );
 
             # Patched for RT #95708
             if (
@@ -7374,7 +7390,7 @@ sub increase_nesting_depth {
     # $rstarting_line_of_current_depth, $statement_type
     my $cd_aa = ++$rcurrent_depth->[$aa];
     $total_depth++;
-    $rtotal_depth->[$aa][$cd_aa] = $total_depth;
+    $rtotal_depth->[$aa]->[$cd_aa] = $total_depth;
     my $input_line_number = $self->[_last_line_number_];
     my $input_line        = $self->[_line_of_text_];
 
@@ -7385,14 +7401,14 @@ sub increase_nesting_depth {
     # make a new unique sequence number
     my $seqno = $next_sequence_number++;
 
-    $rcurrent_sequence_number->[$aa][$cd_aa] = $seqno;
+    $rcurrent_sequence_number->[$aa]->[$cd_aa] = $seqno;
 
-    $rstarting_line_of_current_depth->[$aa][$cd_aa] =
+    $rstarting_line_of_current_depth->[$aa]->[$cd_aa] =
       [ $input_line_number, $input_line, $pos ];
 
     for my $bb ( 0 .. @closing_brace_names - 1 ) {
         next if ( $bb == $aa );
-        $rdepth_array->[$aa][$bb][$cd_aa] = $rcurrent_depth->[$bb];
+        $rdepth_array->[$aa]->[$bb]->[$cd_aa] = $rcurrent_depth->[$bb];
     }
 
     # set a flag for indenting a nested ternary statement
@@ -7401,7 +7417,7 @@ sub increase_nesting_depth {
         $rnested_ternary_flag->[$cd_aa] = 0;
         if ( $cd_aa > 1 ) {
             if ( $rnested_ternary_flag->[ $cd_aa - 1 ] == 0 ) {
-                my $pdepth = $rtotal_depth->[$aa][ $cd_aa - 1 ];
+                my $pdepth = $rtotal_depth->[$aa]->[ $cd_aa - 1 ];
                 if ( $pdepth == $total_depth - 1 ) {
                     $indent = 1;
                     $rnested_ternary_flag->[ $cd_aa - 1 ] = -1;
@@ -7411,7 +7427,7 @@ sub increase_nesting_depth {
     }
 
     # Fix part #1 for git82: save last token type for propagation of type 'Z'
-    $rnested_statement_type->[$aa][$cd_aa] =
+    $rnested_statement_type->[$aa]->[$cd_aa] =
       [ $statement_type, $last_nonblank_type, $last_nonblank_token ];
     $statement_type = EMPTY_STRING;
     return ( $seqno, $indent );
@@ -7434,7 +7450,8 @@ sub is_balanced_closing_container {
     for my $bb ( 0 .. @closing_brace_names - 1 ) {
         next if ( $bb == $aa );
         return
-          if ( $rdepth_array->[$aa][$bb][$cd_aa] != $rcurrent_depth->[$bb] );
+          if (
+            $rdepth_array->[$aa]->[$bb]->[$cd_aa] != $rcurrent_depth->[$bb] );
     }
 
     # OK, everything will be balanced
@@ -7462,7 +7479,7 @@ sub decrease_nesting_depth {
     if ( $cd_aa > 0 ) {
 
         # set a flag for un-indenting after seeing a nested ternary statement
-        $seqno = $rcurrent_sequence_number->[$aa][$cd_aa];
+        $seqno = $rcurrent_sequence_number->[$aa]->[$cd_aa];
         if ( $aa == QUESTION_COLON ) {
             $outdent = $rnested_ternary_flag->[$cd_aa];
         }
@@ -7471,7 +7488,7 @@ sub decrease_nesting_depth {
         # through type L-R braces.  Perl seems to allow ${bareword}
         # as an indirect object, but nothing much more complex than that.
         ( $statement_type, my $saved_type, my $saved_token_uu ) =
-          @{ $rnested_statement_type->[$aa][ $rcurrent_depth->[$aa] ] };
+          @{ $rnested_statement_type->[$aa]->[ $rcurrent_depth->[$aa] ] };
         if (   $aa == BRACE
             && $saved_type eq 'Z'
             && $last_nonblank_type eq 'w'
@@ -7484,9 +7501,12 @@ sub decrease_nesting_depth {
         for my $bb ( 0 .. @closing_brace_names - 1 ) {
             next if ( $bb == $aa );
 
-            if ( $rdepth_array->[$aa][$bb][$cd_aa] != $rcurrent_depth->[$bb] ) {
+            if ( $rdepth_array->[$aa]->[$bb]->[$cd_aa] !=
+                $rcurrent_depth->[$bb] )
+            {
                 my $diff =
-                  $rcurrent_depth->[$bb] - $rdepth_array->[$aa][$bb][$cd_aa];
+                  $rcurrent_depth->[$bb] -
+                  $rdepth_array->[$aa]->[$bb]->[$cd_aa];
 
                 # don't whine too many times
                 my $saw_brace_error = $self->get_saw_brace_error();
@@ -7499,7 +7519,7 @@ sub decrease_nesting_depth {
                   )
                 {
                     $self->interrupt_logfile();
-                    my $rsl = $rstarting_line_of_current_depth->[$aa][$cd_aa];
+                    my $rsl = $rstarting_line_of_current_depth->[$aa]->[$cd_aa];
                     my $sl  = $rsl->[0];
                     my $rel = [ $input_line_number, $input_line, $pos ];
                     my $el  = $rel->[0];
@@ -7523,7 +7543,7 @@ EOM
                     if ( $diff > 0 ) {
                         my $rml =
                           $rstarting_line_of_current_depth->[$bb]
-                          [ $rcurrent_depth->[$bb] ];
+                          ->[ $rcurrent_depth->[$bb] ];
                         my $ml = $rml->[0];
                         $msg .=
 "    The most recent un-matched $bname is on line $ml\n";
@@ -7568,7 +7588,7 @@ sub check_final_nesting_depths {
 
         my $cd_aa = $rcurrent_depth->[$aa];
         if ($cd_aa) {
-            my $rsl = $rstarting_line_of_current_depth->[$aa][$cd_aa];
+            my $rsl = $rstarting_line_of_current_depth->[$aa]->[$cd_aa];
             my $sl  = $rsl->[0];
             my $msg = <<"EOM";
 Final nesting depth of $opening_brace_names[$aa]s is $cd_aa
@@ -7730,7 +7750,7 @@ sub guess_if_pattern_or_conditional {
     }
     if ( $s_quote % 2 || $d_quote % 2 || $colons ) {
         $is_pattern = 0;
-        $msg .= "found ending ? but unbalanced quote chars\n";
+        $msg .= "conditional: found ending ? but unbalanced quote chars\n";
         return ( $is_pattern, $msg );
     }
     if ( $self->pattern_expected( $i, $rtokens, $max_token_index ) >= 0 ) {
@@ -7738,7 +7758,13 @@ sub guess_if_pattern_or_conditional {
         $msg .= "pattern (found ending ? and pattern expected)\n";
         return ( $is_pattern, $msg );
     }
-    $msg .= "pattern (uncertain, but found ending ?)\n";
+
+    # NOTE: An ultimate decision could be made on version, since ? is a ternary
+    # after version 5.22. But we may be formatting an ancient script with a
+    # newer perl, and it might run on an older perl, so we cannot be certain.
+    # if ($] >=5.022)  {$is_pattern=0} else { ... not sure
+
+    $msg .= "conditional (but uncertain)\n";
     return ( $is_pattern, $msg );
 } ## end sub guess_if_pattern_or_conditional
 
@@ -7948,7 +7974,7 @@ sub guess_if_here_doc {
         }
         else {                          # still unsure..taking a wild guess
 
-            if ( !$ris_constant->{$current_package}{$next_token} ) {
+            if ( !$ris_constant->{$current_package}->{$next_token} ) {
                 $here_doc_expected = 1;
                 $msg .=
                   " -- guessing it's a here-doc ($next_token not a constant)\n";
@@ -8086,7 +8112,7 @@ sub scan_bare_identifier_do {
 
             # issue c382: this elsif statement moved from above because
             # previous check for type 'Z' after sort has priority.
-            elsif ( $ris_constant->{$package}{$sub_name} ) {
+            elsif ( $ris_constant->{$package}->{$sub_name} ) {
                 $type = 'C';
             }
 
@@ -8104,15 +8130,15 @@ sub scan_bare_identifier_do {
             #}
             # TODO: This could become a separate type to allow for different
             # future behavior:
-            elsif ( $ris_block_function->{$package}{$sub_name} ) {
+            elsif ( $ris_block_function->{$package}->{$sub_name} ) {
                 $type = 'G';
             }
-            elsif ( $ris_block_list_function->{$package}{$sub_name} ) {
+            elsif ( $ris_block_list_function->{$package}->{$sub_name} ) {
                 $type = 'G';
             }
-            elsif ( $ris_user_function->{$package}{$sub_name} ) {
+            elsif ( $ris_user_function->{$package}->{$sub_name} ) {
                 $type      = 'U';
-                $prototype = $ruser_function_prototype->{$package}{$sub_name};
+                $prototype = $ruser_function_prototype->{$package}->{$sub_name};
             }
 
             # check for indirect object
@@ -8359,8 +8385,8 @@ sub check_prototype {
         $proto =~ s/^\s*\(\s*//;
         $proto =~ s/\s*\)$//;
         if ($proto) {
-            $ris_user_function->{$package}{$subname}        = 1;
-            $ruser_function_prototype->{$package}{$subname} = "($proto)";
+            $ris_user_function->{$package}->{$subname}        = 1;
+            $ruser_function_prototype->{$package}->{$subname} = "($proto)";
 
             # prototypes containing '&' must be treated specially..
             if ( $proto =~ /\&/ ) {
@@ -8368,22 +8394,22 @@ sub check_prototype {
                 # right curly braces of prototypes ending in
                 # '&' may be followed by an operator
                 if ( $proto =~ /\&$/ ) {
-                    $ris_block_function->{$package}{$subname} = 1;
+                    $ris_block_function->{$package}->{$subname} = 1;
                 }
 
                 # right curly braces of prototypes NOT ending in
                 # '&' may NOT be followed by an operator
                 else {
-                    $ris_block_list_function->{$package}{$subname} = 1;
+                    $ris_block_list_function->{$package}->{$subname} = 1;
                 }
             }
         }
         else {
-            $ris_constant->{$package}{$subname} = 1;
+            $ris_constant->{$package}->{$subname} = 1;
         }
     }
     else {
-        $ris_user_function->{$package}{$subname} = 1;
+        $ris_user_function->{$package}->{$subname} = 1;
     }
     return;
 } ## end sub check_prototype
@@ -9507,7 +9533,7 @@ EOM
                 # lexical subs use the block sequence number as a package name
                 my $seqno =
                   $rcurrent_sequence_number->[BRACE]
-                  [ $rcurrent_depth->[BRACE] ];
+                  ->[ $rcurrent_depth->[BRACE] ];
                 $seqno   = 1 if ( !defined($seqno) );
                 $package = $seqno;
                 if ( $warn_if_lexical{$subname} ) {
@@ -9657,11 +9683,11 @@ EOM
                     # Check for multiple definitions of a sub, but
                     # it is ok to have multiple sub BEGIN, etc,
                     # so we do not complain if name is all caps
-                    if (   $rsaw_function_definition->{$subname}{$package}
+                    if (   $rsaw_function_definition->{$subname}->{$package}
                         && $subname !~ /^[A-Z]+$/ )
                     {
                         my $lno =
-                          $rsaw_function_definition->{$subname}{$package};
+                          $rsaw_function_definition->{$subname}->{$package};
                         if ( $package =~ /^\d/ ) {
                             $self->warning(
 "already saw definition of lexical 'sub $subname' at line $lno\n"
@@ -9676,7 +9702,7 @@ EOM
                             }
                         }
                     }
-                    $rsaw_function_definition->{$subname}{$package} =
+                    $rsaw_function_definition->{$subname}->{$package} =
                       $self->[_last_line_number_];
                 }
             }
@@ -9729,7 +9755,7 @@ EOM
                     #   warning and suggest turning off --use-feature=class
                 }
                 else {
-                    $subname = EMPTY_STRING unless defined($subname);
+                    $subname = EMPTY_STRING unless ( defined($subname) );
                     $self->warning(
 "expecting ':' or ';' or '{' after definition or declaration of sub '$subname' but saw '$next_nonblank_token'\n"
                     );
@@ -9802,7 +9828,7 @@ sub find_next_nonblank_token {
       )
     {
         $next_nonblank_token = $rtokens->[ ++$i ];
-        return ( SPACE, $i ) unless defined($next_nonblank_token);
+        return ( SPACE, $i ) unless ( defined($next_nonblank_token) );
     }
 
     # We should be at a nonblank now
@@ -10002,6 +10028,11 @@ sub find_angle_operator_termination {
     my $type = '<';
     pos($input_line) = 1 + $rtoken_map->[$i];
 
+    # The token sequence '><' implies a markup language
+    if ( $last_nonblank_token eq '>' ) {
+        $self->[_html_tag_count_]++;
+    }
+
     my $filter;
 
     my $expecting_TERM = $expecting == TERM;
@@ -10103,7 +10134,7 @@ unexpected error condition returned by inverse_pretoken_map
 EOM
                 }
                 $self->warning(
-                    "Possible tokinization error..please check this line\n");
+                    "Possible tokenization error..please check this line\n");
             }
 
             # Check for accidental formatting of a markup language doc...

@@ -11,11 +11,14 @@
   preview, geotag, geocode, Perl, library, module, RAW, NEF, CR2, MRW, JPEG, TIFF,
   ID3, Windows, OSX, Unix">
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48" >
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#b6ad56">
+<meta name="apple-mobile-web-app-title" content="ExifTool">
 <meta name="msapplication-TileColor" content="#ffc40d">
 <meta name="theme-color" content="#ffffff">
 <style type="text/css">
@@ -48,11 +51,12 @@ table.sticky td:first-child { border-left: 1px solid gray}
 table.sticky td.nb          { border-bottom: 0px }
 span.sup        { font-size: 0.8em; font-weight: normal; position: relative; top: -.4em }
 i.orng          { color: #c60 }
+img             { float: left }
 -->
 </style>
 </head>
 <body>
-<h1><a name="top">ExifTool by Phil Harvey</a></h1>
+<img src="ET-256.png" width="128" height="128" alt="ET"><h1><a name="top">ExifTool by Phil Harvey</a></h1>
 <h2 class='tight red'><b>Read</b>, <b>Write</b> and <b>Edit</b> Meta Information!</h2>
 <p><b>Also available</b> --> <a href="https://exiftool.org/fix_corrupted_nef.html">Utility to fix Nikon NEF images corrupted by Nikon software</a></p>
 <!--<p><i class=orng><b>Note:</b> If exiftool.org goes down, it is because of the crappy DreamHost
@@ -98,9 +102,9 @@ the distribution files or access web pages too quickly will be blocked.</i></p>
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-13.10.tar.gz">
-Download        Version 13.10</a> (7.2 MB) -
-<a href="history.html">Dec. 20, 2024</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-13.25.tar.gz">
+Download        Version 13.25</a> (7.3 MB) -
+<a href="history.html">Mar. 11, 2025</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -152,11 +156,11 @@ only, and do not include the HTML documentation or other files of the full
 distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td rowspan=2><b><a name="alone">Windows</a></b></td><td><b>
-32-bit: <a href="exiftool-13.10_32.zip">
-         exiftool-13.10_32.zip</a> (10.9 MB)</b></td></tr>
+32-bit: <a href="exiftool-13.25_32.zip">
+         exiftool-13.25_32.zip</a> (11.0 MB)</b></td></tr>
 <tr><td><b>64-bit:
-<a href="exiftool-13.10_64.zip">
-         exiftool-13.10_64.zip</a> (10.7 MB)</b></td></tr>
+<a href="exiftool-13.25_64.zip">
+         exiftool-13.25_64.zip</a> (10.8 MB)</b></td></tr>
          </table></blockquote>
 
 <p><b>The Windows executable</b> archives include Perl. Just download and un-zip
@@ -174,8 +178,8 @@ if you have any problems/comments with these versions.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-13.10.pkg">
-         ExifTool-13.10.pkg</a> (5.2 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-13.25.pkg">
+         ExifTool-13.25.pkg</a> (5.3 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -226,10 +230,10 @@ is <a href="geo.txt">here</a>.</li>
 <li>Numerous output formatting options (including tab-delimited, HTML, XML and JSON)</li>
 <li>Multi-lingual output (cs, de, en, en-ca, en-gb, es, fi, fr, it, ja, ko, nl, pl, ru, sk, sv, tr, zh-cn or zh-tw)</li>
 <li><a href="#diff">Compares two files for metadata differences</a></li>
+<li>Generates <a href="plot.html">SVG-format output plots</a> from file metadata</li>
 <li><a href="geotag.html">Geotags images</a> from GPS track log files (with time drift correction!)</li>
 <li><a href="geotag.html#Reverse">Generates track logs</a> from geotagged images</li>
-<li><a href="geolocation.html">Geolocation feature</a> identifies nearest city, state/province, county and country based on GPS position</li>
-<li><a href="geolocation.html">Reverse Geolocation</a> determines GPS position from city, state/province, country name, etc.</li>
+<li><a href="geolocation.html">Geolocation feature</a> identifies nearest city based on GPS position (and visa versa)</li>
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images</li>
 <li><a href="#filename">Renames files and organizes in directories</a> (by date
     or by any other meta information)</li>
@@ -255,10 +259,9 @@ is <a href="geo.txt">here</a>.</li>
 and combined between files</li>
 <li>Generates MD5/SHA256/SHA512 hashes of image data only for many file types (for comparison and validation
 of image data)</li>
-<li>Recognizes <a href="TagNames/index.html">thousands of different tags</a></li>
+<li>Recognizes <a href="TagNames/index.html">tens of thousands of different tags</a></li>
 <li>Tested with images from <a href="https://exiftool.org/models.html">thousands of different camera models</a></li>
-<li>Advanced <a href="verbose.html">verbose</a> and <a href="htmldump.html">HTML-based
-    hex dump</a> outputs</li>
+<li>Advanced <a href="verbose.html">verbose</a> and <a href="htmldump.html">HTML-based hex dump</a> outputs</li>
 </ul>
 
 <h2><a name="awk">A Note to Unix Power-Users</a></h2> <blockquote>If you feel
@@ -342,6 +345,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td><a href="TagNames/BMP.html">BMP, DIB</a></td><td>R</td><td>Windows BitMaP / Device Independent Bitmap</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/BMP.html">BMP</a></td></tr>
 <tr><td><a href="TagNames/BPG.html">BPG</a></td><td>R</td><td>Better Portable Graphics</td><td>R</td><td>-</td><td>R</td><td>R</td><td>-</td><td>R <a href="TagNames/BPG.html">BPG</a></td></tr>
 <tr><td><a href="TagNames/EXIF.html">BTF</a></td><td>R</td><td>BigTIFF (64-bit Tagged Image File Format)</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R</td><td>-</td></tr>
+<tr><td><a href="TagNames/PCAP.html">CAP</a></td><td>R</td><td>Microsoft Network Monitor Capture</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PCAP.html">PCAP</a></td></tr>
 <tr><td>C2PA, JUMBF</td><td>R</td><td>C2PA JPEG Universal Metadata Box Format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Jpeg2000.html">Jpeg2000</a></td></tr>
 <tr><td><a href="TagNames/EXE.html#CHM">CHM</a></td><td>R</td><td>Microsoft Compiled HTML format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/EXE.html#CHM">EXE</a></td></tr>
 <tr><td>COS</td><td>R</td><td>Capture One Settings (XML-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R XML</td></tr>
@@ -458,6 +462,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td><a href="TagNames/Font.html">OTF</a></td><td>R</td><td>Open Type Font</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td>PAC</td><td>R</td><td>Lossless Predictive Audio Compression (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td><a href="TagNames/iWork.html">PAGES</a></td><td>R</td><td>Apple iWork '09 Pages document</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/iWork.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
+<tr><td><a href="TagNames/PCAP.html">PCAP, PCAPNG</a></td><td>R</td><td>Packet Capture (Next Generation)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PCAP.html">PCAP</a></td></tr>
 <tr><td><a href="TagNames/PhotoCD.html">PCD</a></td><td>R</td><td>Kodak Photo CD Image Pac</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PhotoCD.html">PhotoCD</a></td></tr>
 <tr><td><a href="TagNames/PCX.html">PCX</a></td><td>R</td><td>PC Paintbrush</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PCX.html">PCX</a></td></tr>
 <tr><td><a href="TagNames/Palm.html">PDB, PRC</a></td><td>R</td><td>Palm Database</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Palm.html">Palm</a></td></tr>
@@ -568,6 +573,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP4 - <a href="TagNames/DJI.html#ThermalParams2">ThermalParams2</a></td><td>R</td><td>DJI thermal parameters type 2</td></tr>
 <tr><td>APP4 - <a href="TagNames/DJI.html#ThermalParams3">ThermalParams3</a></td><td>R</td><td>DJI thermal parameters type 3</td></tr>
 <tr><td>APP4 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready in non-standard location (multi-segment)</td></tr>
+<tr><td>APP4 - <a href="TagNames/Qualcomm.html#DualCamera">Qualcomm Dual</a></td><td>R</td><td>Qualcomm Dual Camera Attributes</td></tr>
 <tr><td>APP4 - <a href="TagNames/InfiRay.html#Factory">InfiRay Factory</a></td><td>R</td><td>InfiRay IJPEG Factory Temperature</td></tr>
 <tr><td>APP4 - PreviewImage</td><td>R</td><td>(continued from APP3)</td></tr>
 <tr><td>APP5 - <a href="TagNames/Ricoh.html#RMETA">Ricoh RMETA</a></td><td>R</td><td>Ricoh custom fields</td></tr>
@@ -612,13 +618,16 @@ of meta information in JPEG images:</p>
 <tr><td><a href="TagNames/PhotoMechanic.html">PhotoMechanic trailer</a></td><td>R/W</td><td>Camera Bits Photo Mechanic</td></tr>
 <tr><td><a href="TagNames/MIE.html">MIE trailer</a></td><td>R/W</td><td><a href="MIE1.1-20070121.pdf">Meta Information Encapsulation</a></td></tr>
 <tr><td><a href="TagNames/Samsung.html#Trailer">Samsung trailer</a></td><td>R</td><td>Samsung Galaxy trailer</td></tr>
+<tr><td><a href="TagNames/Trailer.html#Vivo">Vivo trailer</a></td><td>R</td><td>Trailer written by some Vivo phones</td></tr>
+<tr><td><a href="TagNames/Trailer.html#OnePlus">OnePlus trailer</a></td><td>R</td><td>Trailer written by some OnePlus phones</td></tr>
+<tr><td><a href="TagNames/Trailer.html#Google">Google trailer</a></td><td>R</td><td>Trailer written by some Google phones</td></tr>
 <tr><td>Insta360 trailer</td><td>R</td><td>Insta360 trailer found in INSP files</td></tr>
 <tr><td>NikonApp trailer</td><td>R</td><td>Nikon trailer added by NX Studio to NEF/NRW files</td></tr>
 <tr><td>Sony HiddenData trailer</td><td>R</td><td>Hidden data written by some Sony models</td></tr>
 <tr><td>PreviewImage trailer</td><td>R/W/C</td><td>(preview image written after JPEG EOI)</td></tr>
 <tr><td>EmbeddedVideo trailer</td><td>R</td><td>(extracted only with ExtractEmbedded option)</td></tr>
-</table><span class=sm><span class=sup>1</span> All trailers except Samsung, Insta360, PreviewImage and EmbeddedVideo also have
-R/W support in TIFF images, and the NikonApp trailer is used in NEF/NRW files.</span></blockquote>
+</table><span class=sm><span class=sup>1</span> Some of these trailers are also supported for
+TIFF-format and QuickTime-format files.</span></blockquote>
 
 <h2><a name="system">System Requirements</a></h2>
 
@@ -923,58 +932,61 @@ of the group names in each family:</p>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td class=sm>AAC, AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP2,
 APP3, APP4, APP5, APP6, APP7, APP8, APP9, ASF, Audible, Canon, CanonVRD,
-Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF, ExifTool, FITS, FLAC,
-FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GM, GeoTiff,
-GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, JSON,
-JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MISB, MNG, MOI, MPC,
-MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF, PICT,
-PLIST, PNG, PSP, Palm, PanasonicRaw, Parrot, PhotoCD, PhotoMechanic,
-Photoshop, PostScript, PrintIM, Protobuf, QuickTime, RAF, RIFF, RSRC, RTF,
-Radiance, Rawzor, Real, Red, SVG, SigmaRaw, Sony, Stim, Theora, Torrent,
-Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
+Composite, DICOM, DjVu, DNG, Ducky, DV, EXE, EXIF, ExifTool, File, FITS,
+FLAC, Flash, FlashPix, FLIR, Font, FotoStation, GeoTiff, GIF, GIMP, GM,
+GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, Jpeg2000,
+JSON, JUMBF, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska, Meta, MIE, MIFF,
+MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus, Palm, PanasonicRaw,
+Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT, PLIST, PNG,
+PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF, Rawzor, Real,
+Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora, Torrent, Trailer,
+VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td class=sm>AAC, AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple,
-Audible, CBOR, CIFF, CameraIFD, Canon, CanonCustom, CanonDR4, CanonRaw,
-CanonVRD, Casio, Chapter#, Composite, DICOM, DJI, DNG, DV, DjVu, DjVu-Meta,
-Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FITS, FLAC, FLIR, File, Flash,
-FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GM, GPS,
-GSpherical, Garmin, GeoTiff, GlobParamIFD, GoPro, GraphConv, H264, HP, HTC,
+<td class=sm>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP10, APP2, Apple,
+ASF, Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD,
+Canon, CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#,
+CIFF, Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE,
+EXIF, ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
+FotoStation, FujiFilm, FujiIFD, Garmin, GE, GeoTiff, GIF, GIMP,
+GlobParamIFD, GM, Google, GoPro, GPS, GraphConv, GSpherical, H264, HP, HTC,
 HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
 ICC-chrm, ICC-cicp, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view,
 ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4,
-IFD0, IFD1, IPTC, IPTC#, ISO, ITC, InfiRay, Insta360, InteropIFD, ItemList,
-JFIF, JFXX, JPEG, JPEG-HDR, JPS, JSON, JUMBF, JVC, Jpeg2000, KDC_IFD, Keys,
-Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LIGO, LNK,
-Leaf, LeafSubIFD, Leica, Lyrics3, Lytro, M-RAW, M2TS, MAC, MIE-Audio,
-MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MISB,
-MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS, MakerNotes,
-MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft, Minolta,
-MinoltaRaw, Motorola, NITF, Nextbase, Nikon, NikonCapture, NikonCustom,
-NikonScan, NikonSettings, NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR,
-Opus, PDF, PICT, PNG, PNG-cICP, PNG-pHYs, PSP, Palm, Panasonic,
-PanasonicRaw, Parrot, Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm,
-QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Reconyx, Red, Ricoh, SEAL, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Theora, Torrent, Track#, UserData, VCalendar, VCard, VNote,
-Version0, Vorbis, WTV, XML, XMP, XMP-DICOM, XMP-Device, XMP-GAudio,
-XMP-GCamera, XMP-GContainer, XMP-GCreations, XMP-GDepth, XMP-GFocus,
-XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage, XMP-MP, XMP-MP1,
-XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-acdsee-rs, XMP-album, XMP-apple-fi,
-XMP-ast, XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs,
-XMP-dc, XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et, XMP-exif,
-XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv, XMP-getty, XMP-hdr,
-XMP-hdrgm, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama,
-XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-pmi,
-XMP-prism, XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-swf, XMP-tiff,
+IFD0, IFD1, InfiRay, Insta360, InteropIFD, IPTC, IPTC#, ISO, ITC, ItemList,
+iTunes, JFIF, JFXX, JPEG, JPEG-HDR, Jpeg2000, JPS, JSON, JUMBF, JVC,
+KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
+KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW, M2TS, MAC,
+MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD,
+Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-GPS, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-UTM,
+MIE-Video, MIFF, Minolta, MinoltaRaw, MISB, MNG, MOBI, MOI, Motorola, MPC,
+MPEG, MPF0, MPImage, MS-DOC, MXF, Nextbase, Nikon, NikonCapture,
+NikonCustom, NikonScan, NikonSettings, NineEdits, Nintendo, NITF, Ocad, Ogg,
+Olympus, OnePlus, OpenEXR, Opus, Palm, Panasonic, PanasonicRaw, Parrot, PDF,
+Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop, PICT, PictureInfo, PNG,
+PNG-cICP, PNG-pHYs, PostScript, PreviewIFD, PrintIM, ProfileIFD, PSP,
+Qualcomm, QuickTime, Radiance, RAF, RAF2, Rawzor, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Red,
+Ricoh, RIFF, RMETA, RSRC, RTF, Samsung, Sanyo, Scalado, SEAL, Sigma,
+SigmaRaw, Sony, SonyIDC, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Stim,
+SubIFD, SVG, System, Theora, Torrent, Track#, Track#ItemList, Track#Keys,
+Track#UserData, UserData, VCalendar, VCard, Version0, VideoItemList,
+VideoKeys, VideoUserData, Vivo, VNote, Vorbis, WTV, XML, XMP, XMP-aas,
+XMP-acdsee, XMP-acdsee-rs, XMP-album, XMP-apdi, XMP-apple-fi, XMP-ast,
+XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs, XMP-dc,
+XMP-Device, XMP-dex, XMP-DICOM, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et,
+XMP-exif, XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv,
+XMP-GAudio, XMP-GCamera, XMP-GContainer, XMP-GCreations, XMP-GDepth,
+XMP-getty, XMP-GFocus, XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-hdr,
+XMP-HDRGainMap, XMP-hdrgm, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-LImage,
+XMP-lr, XMP-mediapro, XMP-microsoft, XMP-MP, XMP-MP1, XMP-mwg-coll,
+XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama, XMP-pdf, XMP-pdfx,
+XMP-photomech, XMP-photoshop, XMP-PixelLive, XMP-plus, XMP-pmi, XMP-prism,
+XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-seal, XMP-swf, XMP-tiff,
 XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpDSA, XMP-xmpMM, XMP-xmpNote,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP, iTunes
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Device, Document, ExifTool, Image, Location, Other,
@@ -1456,7 +1468,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://fhotolab.de/wp/?page_id=795">EXIFCopy</a>: Copy all EXIF information between files</li>
 <li><a href="http://www.abscreensavers.com/random-photo-screensaver/">Random Photo Screensaver</a>: Photo screensaver with metadata display</li>
 <li><a href="https://www.picageotag.com/en/">PicaGeoTag</a>: Geolocate your photos</li>
-<li><a href="https://onedrive.live.com/?authkey=%21ACLDz87Pi7VH%5FWA&amp;id=6266D5E1E0FBB1B8%2193728&amp;cid=6266D5E1E0FBB1B8">PictureTools</a>: Tools for viewing pictures and editing EXIF data or renaming files</li>
+<li><a href="https://1drv.ms/f/c/6266d5e1e0fbb1b8/Erix--Dh1WYggGIgbgEAAAAB_elzvUPLPb4apLn4JCaaqw?e=vDKf3q">PictureTools</a>: Tools to view and edit EXIF, screen saver and games (<a href="https://drive.google.com/drive/folders/1l19htceOmMjJvTWNyTA6E7DlFKnB_kUz?usp=sharing">alt link</a>)</li>
 <li><a href="https://nordlien.github.io/PhotoTags-Synchronizer/">PhotoTags-Synchronizer</a>: Windows GUI for tagging and synchronizing metadata</li>
 <li><a href="https://github.com/electro-logic/DngOpcodesEditor">DNG Opcodes Editor</a>: Change DNG opcodes and see the effect on the image in real-time</li>
 <li><a href="https://phototoolbox.fotoblog-reiseberichte.de/index.php/en/welcome-to-the-photography-toolbox-homepage/">Photography Toolbox</a>: Organize your digital photographs</li>
@@ -1530,6 +1542,12 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="https://github.com/JorgenMygindPilgaard/MemoryMate">MemoryMate</a>: Maintain photo and video metadata for family collections</li>
 <li><a href="https://blog.mapillary.com/update/2023/09/07/Mapillary-Desktop-Uploader-4.0.html">Mapillary Desktop Uploader</a>: Upload street-level imagery to an open platform database</li>
 <li><a href="https:/Digikam.org/">Digikam</a>: Open-source digital photo management</li>
+</ul>
+
+<p><b><a name="related_web">Web Browser</a></b></p>
+<ul>
+<li><a href="https://github.com/lucasgelfond/exiftool-web">ExifTool-web</a>: ExifTool implementation that runs in the client's web browser</li>
+<li><a href="https://github.com/uswriting/exiftool">@uswriting/exiftool</a>: WebAssembly-based API for running ExifTool in a web browser or Node.js</li>
 </ul>
 
 <p><b><a name="related_online">Online</a></b></p>
@@ -1627,6 +1645,7 @@ to the code:</p>
 <li>Jens Duttke for his suggestions, bug reports and help decoding new tags</li>
 <li>Dave Nicholson for decoding new tags in Pentax and Canon maker notes</li>
 <li>Bogdan Hrastnik for his feedback, decoding efforts, user support and ExifTool GUI</li>
+<li>Frank Bijnen for updating the ExifTool GUI, user support, and help with testing</li>
 <li>Igal Milchtaich for decoding many Sony A100 tags</li>
 <li>Laurent Cl&eacute;vy for his work analyzing Canon RAW images</li>
 <li>Warren Hatch for decoding many Nikon tags</li>
@@ -1674,7 +1693,7 @@ source-code and forum backups.)</i></p>
 from his position at Queen's University where he worked with the Nobel-prize-winning
 <a href="https://sno.phy.queensu.ca">Sudbury Neutrino Observatory</a> (SNO) team
 and other SNOLab experiments from 1990 to 2020.  For SNO he wrote the software
-to aquire, format, store and display all of the hundreds of terabytes of data
+to acquire, format, store and display all of the hundreds of terabytes of data
 generated by the detector; software that continues to be used by
 <a href="https://snoplus.phy.queensu.ca">SNO+</a> for their even greater data
 volume.</p>
@@ -1684,7 +1703,7 @@ images hosted on the SNO web site, but quickly expanded in scope as Phil got
 involved with digital photography beginning in 2001.  During retirement Phil
 continues to enjoy digital photography, a hobby which he now applies to bird
 watching. A selection of his birding pictures may be found in his recent
-<a href="https://www.blurb.ca/b/11481065-birds-of-kingston">Birds of Kingston</a>
+<a href="https://www.blurb.ca/b/12133429-birds-of-kingston">Birds of Kingston</a>
 book.</p>
 
 <h2><a name="contact">Contact Me</a></h2>

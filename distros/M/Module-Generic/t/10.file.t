@@ -521,6 +521,13 @@ my $f12 = $f9->parent;
 my $f13 = $f9->join( $f12, qw( in time ) );
 is( "$f13", File::Spec->catfile( $f9->volume, File::Spec->catdir( @{$f12->fragments}, 'in' ), 'time' ), 'join with object in array' );
 
+# Added on 2024-11-16
+my $fp = file( '/some/where/some/place/file.txt' );
+
+is( $fp->parent(3), '/some/where' );
+is( $fp->parent(1), '/some/where/some/place' );
+is( $fp->parent(0), '/some/where/some/place' );
+
 subtest 'mmap' => sub
 {
     SKIP:

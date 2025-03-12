@@ -103,6 +103,48 @@ unless($@) {
     cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '8: $mpq reference count as expected');
     cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '8: $op reference count as expected');
   }
+
+  my $mpq = Math::GMPq->new('5/4');
+
+  my $ok = 0;
+  $ok = 1 if !defined($mpq <=> Math::MPFR->new());
+  cmp_ok($ok, '==', 1, "GMPQ <==> MPFR(NaN) not defined");
+
+  $ok = 0;
+  $ok = 1 if !defined(Math::MPFR->new() <=> $mpq);
+  cmp_ok($ok, '==', 1, "MPFR(NaN) <==> GMPQ not defined");
+
+  $ok = 0;
+  my $res = ($mpq == Math::MPFR->new());
+  $ok = 1 if(defined($res) && $res == 0);
+  cmp_ok($ok, '==', 1, "GMPQ == MPFR(NaN) returns 0");
+
+  $ok = 0;
+  $res = (Math::MPFR->new() == $mpq);
+  $ok = 1 if(defined($res) && $res == 0);
+  cmp_ok($ok, '==', 1, "MPFR(NaN) == GMPQ returns 0");
+
+  $ok = 0;
+  $res = ($mpq != Math::MPFR->new());
+  $ok = 1 if(defined($res) && $res == 1);
+  cmp_ok($ok, '==', 1, "GMPQ != MPFR(NaN) returns 1");
+
+  $ok = 0;
+  $res = (Math::MPFR->new() != $mpq);
+  $ok = 1 if(defined($res) && $res == 1);
+  cmp_ok($ok, '==', 1, "MPFR(NaN) != GMPQ returns 1");
+
+  for my $mpfr(Math::MPFR->new(2.5), Math::MPFR->new(1.25), Math::MPFR->new(0.5)) {
+    cmp_ok(($mpq > $mpfr), '==',  ($mpfr < $mpq),  "$mpfr: '>'  ok");
+    cmp_ok(($mpq < $mpfr), '==' , ($mpfr > $mpq),  "$mpfr: '<'  ok");
+    cmp_ok(($mpq == $mpfr), '==', ($mpfr == $mpq), "$mpfr: '==' ok");
+    cmp_ok(($mpq != $mpfr), '==', ($mpfr != $mpq), "$mpfr: '!=' ok");
+    cmp_ok(($mpq >= $mpfr), '==', ($mpfr <= $mpq), "$mpfr: '>=' ok");
+    cmp_ok(($mpq <= $mpfr), '==', ($mpfr >= $mpq), "$mpfr: '<=' ok");
+
+    cmp_ok(($mpq <=> $mpfr), '==', ($mpfr <=> $mpq) * -1, "$mpfr: '<=>' ok");
+  }
+
 }
 else {
   warn "\nSkipping tests - no Math::MPFR\n";

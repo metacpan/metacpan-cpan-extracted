@@ -670,6 +670,19 @@ sub getForm {
 					|| $type eq 'password'
 					|| $type eq 'hidden'
 					|| $type eq 'submit'
+					|| $type eq 'search'
+					|| $type eq 'tel'
+					|| $type eq 'url'
+					|| $type eq 'email'
+					|| $type eq 'datetime'
+					|| $type eq 'date'
+					|| $type eq 'month'
+					|| $type eq 'week'
+					|| $type eq 'time'
+					|| $type eq 'datetime-local'
+					|| $type eq 'number'
+					|| $type eq 'range'
+					|| $type eq 'color'
 					) {
 						$form->add(
 							$TL->unescapeTag($name) => $TL->unescapeTag($value)
@@ -843,7 +856,21 @@ sub setForm {
 					|| $type eq 'text'
 					|| $type eq 'password'
 					|| $type eq 'hidden'
-					|| $type eq 'submit') {
+					|| $type eq 'submit'
+					|| $type eq 'search'
+					|| $type eq 'tel'
+					|| $type eq 'url'
+					|| $type eq 'email'
+					|| $type eq 'datetime'
+					|| $type eq 'date'
+					|| $type eq 'month'
+					|| $type eq 'week'
+					|| $type eq 'time'
+					|| $type eq 'datetime-local'
+					|| $type eq 'number'
+					|| $type eq 'range'
+					|| $type eq 'color'
+					) {
 						if($form->exists($name)) {
 							# valueを書換える
 							$elem->attr(

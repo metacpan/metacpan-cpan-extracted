@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::MemCached - キャッシュを扱う</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::MemCached - キャッシュを扱う
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::MemCached - キャッシュを扱う
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  #キャッシュにセット
+  $TL-&gt;newMemCached-&gt;set($key,$data);
+  
+  #キャッシュから取得
+  my $cachedata = $TL-&gt;newMemCached-&gt;get($key);
+  
+  #キャッシュから削除
+  $TL-&gt;newMemCached-&gt;delete($key);</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">memcachedを利用するためのクラスです。
+Cache::Memcached::XSを使用しています。
+Cache::Memcached::XSが利用不可能な場合、Cache::Memcachedを利用しようとします。（デフォルト設定の場合）
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newMemCached"><span class="pod_lang">$TL-&gt;newMemCached
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $memc = $TL-&gt;newMemCached;</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::MemCached オブジェクトを作成。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="set"><span class="pod_lang">set
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $memc-&gt;set($key, $data)
+  $memc-&gt;set($key, $data, $expires)</code></pre>
+
+<p>
+<span class="pod_lang">$keyをキーとして、$dataをメモリキャッシュに書き込む。
+$expiresがキャッシュの保持期限となる。
+	
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$expires が省略された場合は 60*60*24*30が使われる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">キャッシュに成功した場合1が、失敗した場合0が返る。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="get"><span class="pod_lang">get
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $cachedata = $memc-&gt;set($key)</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーにセットされているキャッシュを読み込む
+キャッシュが無かった場合、undefが返る。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="delete"><span class="pod_lang">delete
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $memc-&gt;delete($key)</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーにセットされているキャッシュを削除する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="disconnect_all"><span class="pod_lang">disconnect_all
+	
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $memc-&gt;disconnect_all</code></pre>
+
+<p>
+<span class="pod_lang">コネクションを解放する。forkした場合に利用する。
+親プロセスでコネクションすると、子プロセスでもそのキャッシュされたソケットを利用しようとするため。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="flush_all"><span class="pod_lang">flush_all
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $memc-&gt;flush_all</code></pre>
+
+<p>
+<span class="pod_lang">存在する全てのキャッシュを削除する。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">グループ名は &quot;MemCached&quot; でなければならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  [MemCached]
+  servers = localhost:11211
+  compress_threshold = 10000</code></pre>
+
+<dl>
+<dt><a id="servers"><span class="pod_lang">servers
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  servers = localhost:11211 10.0.0.17:11211,3</code></pre>
+
+<p>
+<span class="pod_lang">接続するMemCachedサーバを指定する。省略可能。
+スペース区切りで複数指定可能。,で重み付け可能。指定しない場合の重みは1。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは &quot;localhost:11211&quot; 。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="compress_threshold"><span class="pod_lang">compress_threshold
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  compress_threshold = 10000</code></pre>
+
+<p>
+<span class="pod_lang">指定された以上のbytesのデータの場合圧縮する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは &quot;10000&quot;。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="xs"><span class="pod_lang">xs
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  xs = 1</code></pre>
+
+<p>
+<span class="pod_lang">0の場合、Cache::Memcachedを利用する。
+1の場合、Cache::Memcached::XSを利用する。但し、Cache::Memcached::XSが利用不可能だった場合は、Cache::Memcachedの利用を試みる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは &quot;1&quot;。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::MemCached - キャッシュを扱う
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newMemCached">$TL-&gt;newMemCached</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#compress_threshold">compress_threshold</a></li>
+<li><a href="#delete">delete</a></li>
+<li><a href="#disconnect_all">disconnect_all</a></li>
+<li><a href="#flush_all">flush_all</a></li>
+<li><a href="#get">get</a></li>
+<li><a href="#servers">servers</a></li>
+<li><a href="#set">set</a></li>
+<li><a href="#xs">xs</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::MemCached - キャッシュを扱う
+
+
+</div>
+
+</body>
+</html>

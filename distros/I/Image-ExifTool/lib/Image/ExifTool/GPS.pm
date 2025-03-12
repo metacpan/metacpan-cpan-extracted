@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.57';
+$VERSION = '1.58';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -112,8 +112,8 @@ my %printConvLonRef = (
             },
             0 => 'Above Sea Level', # (ellipsoidal surface, Exif 3.0)
             1 => 'Below Sea Level', # (ellipsoidal surface, Exif 3.0)
-            # 2 => 'Above Sea Level', # (Exif 3.0)
-            # 3 => 'Below Sea Level', # (Exif 3.0)
+            2 => 'Positive Sea Level (sea-level ref)', # sea-level reference, Exif 3.0
+            3 => 'Negative Sea Level (sea-level ref)', # sea-level reference, Exif 3.0
         },
     },
     0x0006 => {
@@ -619,7 +619,7 @@ GPS (Global Positioning System) meta information in EXIF data.
 
 =head1 AUTHOR
 
-Copyright 2003-2024, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2025, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

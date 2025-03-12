@@ -44,7 +44,7 @@ extern uj_conv_t* _uj_xs_SV_Buf_getSv(const uj_conv_t* conv);
 #define SV_Buf uj_conv_t
 #define SV_Buf_init(p_var, len) (\
   (p_var)->alloc       = (sv_str)->alloc, \
-  (p_var)->buf         = _uj_alloc((sv_str)->alloc,len), \
+  (p_var)->buf         = ((len)>0?_uj_alloc((sv_str)->alloc,len):""), \
   (p_var)->buf_len     = 0, \
   (p_var)->buf_bufsize = (len) \
   )

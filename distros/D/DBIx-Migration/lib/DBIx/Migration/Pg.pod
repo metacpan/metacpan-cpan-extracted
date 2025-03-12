@@ -41,13 +41,13 @@ Get schema that the tracking table belongs to.
 
 =over 
 
-=item $self->apply_managed_schema
+=item $self->adjust_migrate
 
-Check L<DBIx::Migration/$self-E<gt>apply_managed_schema>.
+Lock tracking table and set managed schema.
 
 =item $self->quoted_tracking_table
 
-Check L<DBIx::Migration/$self-E<gt>quoted_tracking_table>.
+Quote tracking table taking the tracking schema into consideration.
 
 =back
 

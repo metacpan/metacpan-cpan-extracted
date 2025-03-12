@@ -3,8 +3,8 @@ package Test::AtteanX::Store::DBI;
 use utf8;
 use v5.14;
 use warnings;
+use Data::Dumper;
 use Test::Roo::Role;
-use Test::Modern;
 use Test::Moose;
 use Attean;
 use Attean::RDF;
@@ -104,6 +104,7 @@ test 'ISIRI type constraint SARG' => sub {
 };
 
 test 'STRSTARTS' => sub {
+	local($Data::Dumper::Indent) = 0;
 	my $self	= shift;
 	my $store	= $self->create_store(quads => $self->test_quads);
 	my $model	= Attean::QuadModel->new( store => $store );
@@ -130,7 +131,7 @@ test 'STRSTARTS' => sub {
 		isa_ok($plan, 'AtteanX::Store::DBI::Plan');
 		my $iter	= $plan->evaluate($model);
 		my @rows	= $iter->elements;
-		is(scalar(@rows), 2, 'result count');
+		is(scalar(@rows), 2, 'result count: ' . Dumper([$plan->sql]));
 		foreach my $r (@rows) {
 			like($r->value('o')->value, qr/^H/, 'literal value');
 		}

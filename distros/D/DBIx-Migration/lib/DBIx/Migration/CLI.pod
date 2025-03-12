@@ -6,7 +6,7 @@ DBIx::Migration::CLI - Seamless database schema up- and downgrades CLI
 
 =head1 VERSION
 
-0.20
+0.21
 
 =head1 SYNOPSIS
 

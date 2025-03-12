@@ -440,7 +440,7 @@ BOOT:
     seed_rng();
 
 Crypt_SMIME
-new(char* /*CLASS*/)
+new(class)
     CODE:
         RETVAL = safemalloc(sizeof(struct crypt_smime));
         if (RETVAL == NULL) {

@@ -7,6 +7,26 @@
 
 Revision history for Tripletail
 
+* RELEASED 0.68
+CLOSED: [2025-03-12 Wed 15:55]
+** TL::isDomainName
+ユーザーが指定出来るドメイン名としては253文字以下が正しい為、255文字以下から253文字以下に修正した。
+** =t/manifest.t=
+=mlpod2html= がインストールされていない環境で =make clean= 後に =make test=
+を実行すると =t/manifest.t= のテストに失敗する不具合を修正した:
+https://rt.cpan.org/Public/Bug/Display.html?id=144688
+
+* RELEASED 0.67
+** TL::Cookie, TL::RawCookie
+Ini 設定 sameSite が追加されました。
+
+* RELEASED 0.66
+CLOSED: [2023-05-22 Mon 13:32]
+** TL::Template
+Template::setForm、Template::getFormをHTML Living Standardで利用可能なtypeに対応した。
+** TL::DateTime
+DateTime::setの引数として空欄やリファレンスを渡した時にオブジェクトが壊れる不具合を修正した。
+
 * RELEASED 0.65
 CLOSED: [2021-10-19 Tue 12:18]
 ** TL::Pager

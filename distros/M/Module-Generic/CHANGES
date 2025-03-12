@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v0.38.0 2025-03-12T007:28:48+0900
+    - Improved method 'parent' in Module::Generic::File
+    - unload_json in Module::Generic::File has the option 'allow_tags' set to false now by default.
+
 v0.37.7 2024-11-01T17:34:35+0900
     - Silencing warnings in _set_get_scalar_as_object
 

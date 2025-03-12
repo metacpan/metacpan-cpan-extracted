@@ -1,5 +1,5 @@
 package Dist::Build::XS::WriteConstants;
-$Dist::Build::XS::WriteConstants::VERSION = '0.016';
+$Dist::Build::XS::WriteConstants::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Dist::Build::XS::WriteConstants - Dist::Build extension integrating ExtUtils::Co
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -72,9 +72,9 @@ version 0.016
 
  add_xs(
      module          => 'Foo::Bar',
-	 write_constants => {
-		NAMES => [ qw/FOO BAR BAZ/ ],
-	 },
+     write_constants => {
+         NAMES => [ qw/FOO BAR BAZ/ ],
+     },
  );
 
 =head1 DESCRIPTION
@@ -83,7 +83,7 @@ This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an add
 
   {
     NAME    => 'Foo::Bar',
-    NAMES   => [ 'FOO' ],
+    NAMES   => [ qw/FOO BAR BAZ/ ],
     C_FILE  => 'lib/Foo/const-c.inc',
     XS_FILE => 'lib/Foo/const-xs.inc',
   }

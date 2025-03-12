@@ -15,15 +15,15 @@ Math::Symbolic::Custom::Equation - Work with equations of Math::Symbolic express
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 our $EQ_PH = 'EQ';
 
-use Math::Symbolic qw(:all);
+use Math::Symbolic 0.613 qw(:all);
 use Math::Symbolic::Custom::Collect 0.32;
 use Math::Symbolic::Custom::Factor 0.13;
 
@@ -31,40 +31,60 @@ use Math::Symbolic::Custom::Factor 0.13;
 
 This class implements methods for equating two Math::Symbolic expressions, and performing various operations on that equation.
 
-Please note that the methods/interfaces documented below are subject to change in later versions.
-
-=head1 SYNOPSIS
+=head1 EXAMPLE
 
     use strict;
-    use Math::Symbolic qw(:all);
-    use Math::Symbolic::Custom::Equation;
+    use Math::Symbolic 0.613 qw(:all);
+    use Math::Symbolic::Custom::Equation 0.2;
+    use Math::Symbolic::Custom::Polynomial 0.3;
+    use Math::Symbolic::Custom::CollectSimplify 0.2;
+    Math::Symbolic::Custom::CollectSimplify->register();
 
-    # we have two symbolic expressions
-    my $expr1 = parse_from_string('a - n'); 
-    my $expr2 = parse_from_string('(a + 2) / n');
+    # Solve the simultaneous equations:-
+    # x - 2*y = 7
+    # x^2 + 4*y^2 = 37
+    my $eq1 = Math::Symbolic::Custom::Equation->new('x - 2*y = 7');
+    my $eq2 = Math::Symbolic::Custom::Equation->new('x^2 + 4*y^2 = 37');
 
-    # equate them
-    my $eq = Math::Symbolic::Custom::Equation->new($expr1, $expr2);
-    print $eq->to_string(), "\n"; # a - n = (a + 2) / n
+    print "Solve the simultaneous equations:-\n\n";
+    print "\t[1]\t", $eq1->to_string(), "\n";
+    print "\t[2]\t", $eq2->to_string(), "\n\n";
 
-    # We want an expression for a
-    my ($a_eq, $type) = $eq->isolate('a');
-    unless ( defined($a_eq) && ($type == 1) ) {
-        die "Could not isolate 'a'!\n";
+    # Make x the subject of eq. 1
+    my $eq1_x = $eq1->isolate('x');
+    die "Cannot isolate 'x' in " . $eq1->to_string() . "\n" unless defined $eq1_x;
+    print "Make x the subject of [1]: ", $eq1_x->to_string(), "\n\n";
+    my $x_expr = $eq1_x->RHS();
+
+    # Substitute into eq. 2, re-arrange to make RHS = 0, and simplify
+    my $eq3 = $eq2->implement('x' => $x_expr)->simplify();
+    print "Substitute into [2]: ", $eq3->to_string(), "\n\n";
+
+    # Re-arrange it to equal 0
+    my $eq3_2 = $eq3->to_zero()->simplify();
+    print "Rearrange to equal zero: ", $eq3_2->to_string(), "\n\n";
+
+    # we have an expression for y, solve it
+    my ($var, $coeffs, $disc, $roots) = $eq3_2->LHS()->test_polynomial();
+    die "Cannot solve quadratic!\n" unless defined($var) && ($var eq 'y');
+
+    my $y_1 = $roots->[0];
+    my $y_2 = $roots->[1];
+    print "The solutions for y are: ($y_1, $y_2)\n\n";
+
+    # put these solutions into the expression for x in terms of y to get x values
+    my $x_1 = $eq1_x->implement('y' => $y_1)->simplify()->RHS();
+    my $x_2 = $eq1_x->implement('y' => $y_2)->simplify()->RHS();
+    print "The solutions for x given y are: (x = $x_1 when y = $y_1) and (x = $x_2 when y = $y_2)\n\n";
+
+    # Check that these solutions hold for the original equations
+    print "Check: ";
+    if ( $eq1->holds({'x' => $x_1, 'y' => $y_1}) && $eq2->holds({'x' => $x_1, 'y' => $y_1}) ) {
+        print "Solution (x = $x_1, y = $y_1) holds for [1] and [2]\n";
     }
-    print $a_eq->to_string(), "\n"; # a = (2 + (n ^ 2)) / (n - 1)
-
-    # we want values of a for various values of n
-    my $expr3 = $a_eq->RHS();
-    foreach my $n (2..5) {
-        my $a_val = $expr3->value({'n' => $n});
-        # check these values on original equation
-        if ( $eq->holds({'a' => $a_val, 'n' => $n}) ) {
-            print "At n = $n, a = $a_val\n";
-        }
-        else {
-            print "Error for n = $n, a = $a_val\n";
-        }
+    print "Check: ";
+    if ( $eq1->holds({'x' => $x_2, 'y' => $y_2}) && $eq2->holds({'x' => $x_2, 'y' => $y_2}) ) {
+        print "Solution (x = $x_2, y = $y_2) holds for [1] and [2]\n";
     }
 
 =head1 METHODS
@@ -84,23 +104,28 @@ equation string, from which the left hand side and the right hand side of the eq
 =cut
 
 sub new {
-    my $proto = shift;
+    my ($proto, $LHS, $RHS) = @_;
     my $class = ref($proto) || $proto;
-        
-    my ($LHS, $RHS) = @_;
-    
-    # might have been passed an equation in string form
-    if ( !defined($RHS) && (ref($LHS) eq "") && ($LHS =~ /=/) ) {
-        ($LHS, $RHS) = split(/=/, $LHS);
+    my $self;
+
+    if ( ref($proto) && !defined($LHS) ) {
+        # copy constructor
+        $self->{LHS} = $proto->LHS()->new();
+        $self->{RHS} = $proto->RHS()->new();
+    }
+    else {
+        # might have been passed an equation in string form
+        if ( !defined($RHS) && (ref($LHS) eq "") && ($LHS =~ /=/) ) {
+            ($LHS, $RHS) = split(/=/, $LHS);
+        }
+
+        $LHS = Math::Symbolic::parse_from_string($LHS) if ref($LHS) !~ /^Math::Symbolic/;
+        $RHS = Math::Symbolic::parse_from_string($RHS) if ref($RHS) !~ /^Math::Symbolic/;
+
+        $self = { LHS => $LHS, RHS => $RHS };
     }
 
-    $LHS = Math::Symbolic::parse_from_string($LHS) if ref($LHS) !~ /^Math::Symbolic/;
-    $RHS = Math::Symbolic::parse_from_string($RHS) if ref($RHS) !~ /^Math::Symbolic/;
-
-    my $self = { LHS => $LHS, RHS => $RHS };
     bless $self, $class;
-
-    return $self;
 }
 
 =head2 Method LHS
@@ -156,8 +181,8 @@ Takes no parameter. Will return the equation in string form, e.g. "LHS = RHS".
 sub to_string {
     my $self = shift;
 
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS();
+    my $RHS = $self->RHS();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "display(): equation not properly set up, needs both sides.";
@@ -191,16 +216,30 @@ sub holds {
     my $epsilon = shift;
     $epsilon = 1e-11 unless defined $epsilon;
 
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS();
+    my $RHS = $self->RHS();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "holds(): equation not properly set up, needs both sides.";
         return undef;
     }
 
+    # try hard to force down to a number
     my $LHS_val = $LHS->value(%{$vals});
-    my $RHS_val = $RHS->value(%{$vals});
+    if ( ref($LHS_val) =~ /Math::Symbolic::Operator/ ) {
+        $LHS_val = $LHS_val->simplify();
+    }
+    if ( ref($LHS_val) =~ /Math::Symbolic::Constant/ ) {
+        $LHS_val = $LHS_val->value();
+    }
+
+    my $RHS_val = $RHS->value(%{$vals});   
+    if ( ref($RHS_val) =~ /Math::Symbolic::Operator/ ) {
+        $RHS_val = $RHS_val->simplify();
+    }
+    if ( ref($RHS_val) =~ /Math::Symbolic::Constant/ ) {
+        $RHS_val = $RHS_val->value();
+    }
 
     unless ( defined($LHS_val) && defined($RHS_val) ) {
         carp "holds(): some problem setting values for equation. Perhaps a variable is missing or there is a typo.";
@@ -212,34 +251,67 @@ sub holds {
 
 =head2 Method simplify
 
-Takes no parameters. Calls Math::Symbolic's simplify() on both sides of the equation (or whichever simplify() is currently 
-registered). Currently returns 0 on failure and 1 on success.
+Takes no parameters. Calls Math::Symbolic's simplify() (or whichever simplify() is currently 
+registered) on both sides of the equation. If successful returns a new (simplifed) equation object, otherwise undef.
 
 =cut
 
 sub simplify {
     my $self = shift;
     
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS()->new();
+    my $RHS = $self->RHS()->new();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "simplify(): equation not properly set up, needs both sides.";
-        return 0;
+        return undef;
     }
 
-    $self->{LHS} = $LHS->simplify();
-    $self->{RHS} = $RHS->simplify();
+    my $new_LHS = $LHS->simplify();
+    my $new_RHS = $RHS->simplify();
 
-    return 1;
+    if ( defined($new_LHS) && defined($new_RHS) ) {
+        return $self->new($new_LHS, $new_RHS);
+    }
+    
+    return undef; # simplify failed
+}
+
+=head2 Method implement
+
+Calls Math::Symbolic's implement() on both sides of the equation. This can be used to substitute a specified variable with another 
+Math::Symbolic expression (see the example above). If successful returns a new equation object, otherwise undef.
+
+=cut
+
+sub implement {
+    my $self = shift;
+    my %to_implement = @_;
+    
+    my $LHS = $self->LHS()->new();
+    my $RHS = $self->RHS()->new();
+
+    unless ( defined($LHS) && defined($RHS) ) {
+        carp "implement(): equation not properly set up, needs both sides.";
+        return undef;
+    }
+
+    my $new_LHS = $LHS->implement(%to_implement);
+    my $new_RHS = $RHS->implement(%to_implement);
+
+    if ( defined($new_LHS) && defined($new_RHS) ) {
+        return $self->new($new_LHS, $new_RHS);
+    }
+    
+    return undef;
 }
 
 sub _transform {
     my $self = shift;
     my $t1 = shift;
 
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS()->new();
+    my $RHS = $self->RHS()->new();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "transform(): equation not properly set up, needs both sides.";
@@ -261,18 +333,21 @@ sub _transform {
 
     my $t2 = $t1->new();
 
-    $self->{LHS} = $t1->implement($EQ_PH => $LHS);
-    $self->{RHS} = $t2->implement($EQ_PH => $RHS);
+    my $new_LHS = $t1->implement($EQ_PH => $LHS);
+    my $new_RHS = $t2->implement($EQ_PH => $RHS);
 
-    return 1;
+    if ( defined($new_LHS) && defined($new_RHS) ) {
+        return $self->new($new_LHS, $new_RHS);
+    }
+    
+    return undef;
 }
 
 =head2 Method add
 
-Takes one parameter, a Math::Symbolic expression or a text string which can parse to a Math::Symbolic
-expression. 
-
-Adds the passed expression to both sides of the equation.
+Takes one parameter, which can be another equation object, or a Math::Symbolic expression (or a text string which can parse to a 
+Math::Symbolic expression). If passed an equation then it will perform equation addition, or if passed an expression it will add 
+the passed expression to both sides of the equation. Returns a new equation object.
 
 =cut
 
@@ -280,11 +355,56 @@ sub add {
     my $self = shift;
     my $t = shift;
 
-    $t = Math::Symbolic::parse_from_string($t) if ref($t) !~ /^Math::Symbolic/;
+    if ( ref($t) eq ref($self) ) {
 
-    my $operation = Math::Symbolic::Operator->new('+', Math::Symbolic::Variable->new($EQ_PH), $t);
+        my $LHS1 = $self->LHS()->new();
+        my $RHS1 = $self->RHS()->new();
+        my $LHS2 = $t->LHS()->new();
+        my $RHS2 = $t->RHS()->new();
+        my $LHS3 = Math::Symbolic::Operator->new('+', $LHS1, $LHS2);
+        my $RHS3 = Math::Symbolic::Operator->new('+', $RHS1, $RHS2);
+        return $self->new($LHS3, $RHS3);
+    }
+    else {
 
-    return $self->_transform($operation);
+        $t = Math::Symbolic::parse_from_string($t) if ref($t) !~ /^Math::Symbolic/;
+
+        my $operation = Math::Symbolic::Operator->new('+', Math::Symbolic::Variable->new($EQ_PH), $t);
+
+        return $self->_transform($operation);
+    }
+}
+
+=head2 Method subtract
+
+Takes one parameter, which can be another equation object, or a Math::Symbolic expression (or a text string which can parse to a 
+Math::Symbolic expression). If passed an equation then it will perform equation subtraction, or if passed an expression it will subtract
+the passed expression to from sides of the equation. Returns a new equation object.
+
+=cut
+
+sub subtract {
+    my $self = shift;
+    my $t = shift;
+
+    if ( ref($t) eq ref($self) ) {
+
+        my $LHS1 = $self->LHS()->new();
+        my $RHS1 = $self->RHS()->new();
+        my $LHS2 = $t->LHS()->new();
+        my $RHS2 = $t->RHS()->new();
+        my $LHS3 = Math::Symbolic::Operator->new('-', $LHS1, $LHS2);
+        my $RHS3 = Math::Symbolic::Operator->new('-', $RHS1, $RHS2);
+        return $self->new($LHS3, $RHS3);
+    }
+    else {
+
+        $t = Math::Symbolic::parse_from_string($t) if ref($t) !~ /^Math::Symbolic/;
+
+        my $operation = Math::Symbolic::Operator->new('-', Math::Symbolic::Variable->new($EQ_PH), $t);
+
+        return $self->_transform($operation);
+    }
 }
 
 =head2 Method multiply
@@ -292,7 +412,7 @@ sub add {
 Takes one parameter, a Math::Symbolic expression or a text string which can parse to a Math::Symbolic
 expression. 
 
-Multiplies the passed expression with both sides of the equation.
+Multiplies the passed expression with both sides of the equation and returns a new equation object.
 
 =cut
 
@@ -312,7 +432,7 @@ sub multiply {
 Takes one parameter, a Math::Symbolic expression or a text string which can parse to a Math::Symbolic
 expression. 
 
-Divides both sides of the equation by the passed expression.
+Divides both sides of the equation by the passed expression and returns a new equation object.
 
 =cut
 
@@ -327,30 +447,10 @@ sub divide {
     return $self->_transform($operation);
 }
 
-=head2 Method subtract
-
-Takes one parameter, a Math::Symbolic expression or a text string which can parse to a Math::Symbolic
-expression. 
-
-Subtracts the passed expression from both sides of the equation.
-
-=cut
-
-sub subtract {
-    my $self = shift;
-    my $t = shift;
-
-    $t = Math::Symbolic::parse_from_string($t) if ref($t) !~ /^Math::Symbolic/;
-
-    my $operation = Math::Symbolic::Operator->new('-', Math::Symbolic::Variable->new($EQ_PH), $t);
-
-    return $self->_transform($operation);
-}
-
 =head2 Method to_zero
 
-Takes no parameters. Re-arranges the equation to equate to zero, by 
-subracting the right-hand side from both sides.
+Takes no parameters. Re-arranges the equation to equate to zero, by subracting the right-hand side from both sides.
+Returns a new equation object.
 
     my $eq = Math::Symbolic::Custom::Equation->new('3*x^3 - 2*x^2 + 5*x - 10 = 5*x + 8');
     $eq->to_zero();
@@ -361,19 +461,17 @@ subracting the right-hand side from both sides.
 sub to_zero {
     my $self = shift;
 
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS()->new();
+    my $RHS = $self->RHS()->new();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "transform(): equation not properly set up, needs both sides.";
         return;
     }
 
-    $LHS = Math::Symbolic::Operator->new('-', $self->{LHS}, $self->{RHS})->to_collected();
-    $self->LHS($LHS);
-    $self->RHS('0');
+    my $new_LHS = Math::Symbolic::Operator->new('-', $LHS, $RHS);
 
-    return;
+    return $self->new($new_LHS, '0');
 }
 
 =head2 Method explicit_signature
@@ -391,12 +489,12 @@ in the equation.
 sub explicit_signature {
     my $self = shift;
     
-    my $LHS = $self->{LHS};
-    my $RHS = $self->{RHS};
+    my $LHS = $self->LHS();
+    my $RHS = $self->RHS();
 
     unless ( defined($LHS) && defined($RHS) ) {
         carp "explicit_signature(): equation not properly set up, needs both sides.";
-        return 0;
+        return ();
     }
     
     my %vars;
@@ -411,78 +509,91 @@ sub explicit_signature {
 
 Takes a Math::Symbolic::Variable, or a string which parses to a Math::Symbolic::Variable, as a 
 parameter. This method attempts to re-arrange the equation to make that variable the subject of
-the equation. It will return undef if it doesn't succeed.
+the equation, returning new equation object(s). It will return undef if it doesn't succeed.
 
-Currently it returns a new Equation object containing the re-arranged equation, and a flag indicating 
-how well it managed to achieve its goal. If the flag is 1, then it successfully isolated the variable.
-If it is 2, then it managed to move all instances of the variable to the left-hand side. If it
-is 3, then there are instances of the variable on both sides of the equation. To illustrate:-
+When called in a scalar context, it will return the first (simplest) result it can find. When called
+in a list context it will return all the results it can find.
 
-    my ($new_eq, $type);
+    my $eq = Math::Symbolic::Custom::Equation->new('v^2 = u^2 + 2*a*s');
+    my $hit = $eq->isolate('u');
+    print "Result 1: ", $hit->to_string(), "\n\n";
+    # Result 1: u = ((v ^ 2) - ((2 * a) * s)) ^ (1 / 2)
 
-    my $eq1 = Math::Symbolic::Custom::Equation->new('y = 2*x + 4');
-    print "Original equation: '", $eq1->to_string(), "'\n"; 
-    # Original equation: 'y = (2 * x) + 4'
-    ($new_eq, $type) = $eq1->isolate('x');
-    print "Isolating 'x', got: '", $new_eq->to_string(), "' (flag = $type)\n"; 
-    # Isolating 'x', got: 'x = (y - 4) / 2' (flag = 1)
-
-    my $eq2 = Math::Symbolic::Custom::Equation->new('v^2 = u^2 + 2*a*s');
-    print "Original equation: '", $eq2->to_string(), "'\n"; 
-    # Original equation: 'v ^ 2 = (u ^ 2) + ((2 * a) * s)'
-    ($new_eq, $type) = $eq2->isolate('u');
-    print "Isolating 'u', got: '", $new_eq->to_string(), "' (flag = $type)\n"; 
-    # Isolating 'u', got: 'u ^ 2 = (v ^ 2) - ((2 * a) * s)' (flag = 2)
-
-    my $eq3 = Math::Symbolic::Custom::Equation->new('s = u*t + (1/2) * a * t^2');
-    print "Original equation: '", $eq3->to_string(), "'\n"; 
-    # Original equation: 's = (u * t) + (((1 / 2) * a) * (t ^ 2))'
-    ($new_eq, $type) = $eq3->isolate('t');
-    print "Isolating 't', got: '", $new_eq->to_string(), "' (flag = $type)\n"; 
-    # Isolating 't', got: 't = (2 * s) / ((2 * u) + (a * t))' (flag = 3)
-
-This interface and approach is likely to change significantly in later versions.
+    my @hits = $eq->isolate('u');
+    foreach my $hit (@hits) {
+        print "Result 2: ", $hit->to_string(), "\t";
+    }
+    # Result 2: u = ((v ^ 2) - ((2 * a) * s)) ^ (1 / 2)
+    # Result 2: u = -1 * (((v ^ 2) - ((2 * a) * s)) ^ (1 / 2))
+    
+Warning: this is very different to how it worked in the previous version of the module, and it probably
+has a way to go yet.
 
 =cut
 
 sub isolate {
     my ($self, $expr) = @_;
-    
+
+    my $autodetected = 0;
+
+    if ( not defined $expr ) {
+        # try to autodetect
+        my @v = $self->explicit_signature();
+        if (scalar(@v) == 1) {
+            $expr = $v[0];
+            $autodetected = 1;
+        }
+        else {
+            carp "isolate: not passed a variable and cannot autodetect. (Variables in equation: ['" . 
+                join("', '", @v) . "'])";
+            return wantarray ? () : undef;
+        }
+    }
+
     $expr = Math::Symbolic::parse_from_string($expr) 
         if ref($expr) !~ /^Math::Symbolic/;
         
     # ensure we've been passed a variable
     if ( ref($expr) ne 'Math::Symbolic::Variable' ) {
         carp "isolate: not passed a variable.";
-        return undef;
+        return wantarray ? () : undef;
+    }
+
+    if ( not $autodetected ) {
+        # ensure it's a var in the equation
+        my @v = $self->explicit_signature();
+        my @r = grep { $expr->{name} eq $_ } @v;
+        
+        if ( scalar(@r) == 0 ) {
+            carp "isolate: not passed a variable that is present in the equation. (Was passed: '" . 
+                    $expr->{name} . "'. Variables in equation: ['" . join("', '", @v) . "'])";
+            return wantarray ? () : undef;
+        }
     }
     
-    # ensure it's a var in the equation
-    my @v = $self->explicit_signature();
-    my @r = grep { $expr->{name} eq $_ } @v;
-    
-    if ( scalar(@r) == 0 ) {
-        carp "isolate: not passed a variable that is present in the equation. (Was passed: '" . 
-                $expr->{name} . "'. Variables in equation: ['" . join("', '", @v) . "'])";
-        return undef;
-    }
-    
+    my @matches;
+
     # is it already in the correct form? 
     if ( $expr->is_identical( $self->LHS() ) ) {
-        return (Math::Symbolic::Custom::Equation->new($self->LHS(), $self->RHS()), 1);
+        if ( wantarray ) {
+            push @matches, [$self->new($self->LHS(), $self->RHS()), 0];
+        }
+        else {    
+            return $self->new($self->LHS(), $self->RHS());
+        }
     }
     
     # init search
     my %nodes_todo;
     my %nodes_done;
     my $node_key = $self->to_string();
-    $nodes_todo{$node_key} = { LHS => $self->{LHS}, RHS => $self->{RHS} };   
-    
+    $nodes_todo{$node_key} = { LHS => $self->{LHS}, RHS => $self->{RHS}, level => 0, operation => 'None', previous => 'None', plevel => 'None' };   
+  
     # process the list
     # FIXME: must be a better way to limit the loop
-    NODE_LOOP: foreach my $i (0..100) {  
+    NODE_LOOP: foreach my $i (1..200) {  
             
-        my @todo = keys %nodes_todo;
+        my @todo = sort { $nodes_todo{$a}{level} <=> $nodes_todo{$b}{level} } keys %nodes_todo;
         last NODE_LOOP if scalar(@todo) == 0;
         my $next = $todo[0];    # get an unexpanded entry       
         
@@ -494,108 +605,70 @@ sub isolate {
         my %step2_nodes = _expand_factor($next, $nodes_todo{$next});
         
         # step 3: Unwind operator
-        my %step3_nodes = _expand_operator($next, $nodes_todo{$next});
+        my %step3_nodes = _expand_operator($next, $nodes_todo{$next});        
         
         foreach my $hash (\%step1_nodes, \%step2_nodes, \%step3_nodes) {
             foreach my $new_node (keys %{$hash}) {
                 
-                # check if we have sucessfully isolated
-                my ($subject, $object);
-                if ( $expr->is_identical($hash->{$new_node}{LHS}) ) {
-                    $subject = $hash->{$new_node}{LHS};
-                    $object = $hash->{$new_node}{RHS};
-                }
-                
-                if ( $expr->is_identical($hash->{$new_node}{RHS}) ) {
-                    $subject = $hash->{$new_node}{RHS};
-                    $object = $hash->{$new_node}{LHS};
-                }
-                
-                if ( defined $object ) {
-                    my @v = $object->explicit_signature();
-                    my @r = grep { $expr->{name} eq $_ } @v;
-                    if ( scalar(@r) == 0 ) {
-                        # succesfully isolated, return it
-                        return (Math::Symbolic::Custom::Equation->new($subject, $object), 1);
-                    }
-                }
-                    
-                # put new nodes on the todo pile if appropriate
+                $hash->{$new_node}{level} = $i;
+
                 if (    !exists($nodes_done{$new_node}) && 
                         !exists($nodes_todo{$new_node}) ) {
+
+                    if ( ($hash->{$new_node}{operation} !~ /Factor/) && ($hash->{$new_node}{operation} !~ /Collect/) ) {
+                        # check if we have sucessfully isolated
+                        my ($subject, $object);
+                        if ( $expr->is_identical($hash->{$new_node}{LHS}) ) {
+                            $subject = $hash->{$new_node}{LHS};
+                            $object = $hash->{$new_node}{RHS};
+                        }
+                        
+                        if ( $expr->is_identical($hash->{$new_node}{RHS}) ) {
+                            $subject = $hash->{$new_node}{RHS};
+                            $object = $hash->{$new_node}{LHS};
+                        }
+                        
+                        if ( defined $object ) {
+                            my @v = $object->explicit_signature();
+                            my @r = grep { $expr->{name} eq $_ } @v;
+                            if ( scalar(@r) == 0 ) {
+                                # succesfully isolated, add it to matches
+                                push @matches, [$self->new($subject, $object), $hash->{$new_node}{level}];
+                            }
+                        }
+                    }
+                    
                     $nodes_todo{$new_node} = $hash->{$new_node};
                 }
             }
         }
-        
+
+        unless ( wantarray ) {
+            if ( scalar(@matches) ) {                
+                # return least "complex"
+                my @sorted = sort { $a->_complexity() <=> $b->_complexity() } map { $_->[0] } @matches;
+                return $sorted[0];
+            }
+        }
+            
         # move this node to the done pile
         $nodes_done{$next} = $nodes_todo{$next};
         delete $nodes_todo{$next};
     }    
 
-    # At this point, we don't have a precise isolation of the variable.
-    # But perhaps we've managed to get it onto one side of the equation
-    my %nodes_2;
-    my %nodes_3;
-    while ( my ($node_eq, $node_d) = each %nodes_done ) {
+    if ( scalar(@matches) ) {
+        if ( wantarray ) {
 
-        my $LHS = $node_d->{LHS};
-        my $RHS = $node_d->{RHS};
-
-        my @RHS_v = $RHS->explicit_signature();
-        my @RHS_r = grep { $expr->{name} eq $_ } @RHS_v;
-        my @LHS_v = $LHS->explicit_signature();
-        my @LHS_r = grep { $expr->{name} eq $_ } @LHS_v;
-
-        if ( (scalar(@LHS_v) == 1) && (scalar(@LHS_r) == 1) ) {
-    
-            if ( scalar(@RHS_r) == 0 ) {
-                $nodes_2{$node_eq} = $node_d;
-            }
-            else {
-                $nodes_3{$node_eq} = $node_d;
-            }
+            my @reduced = sort { $a->_complexity() <=> $b->_complexity() } map { $_->[0] } @matches;
+            return @reduced;
         }
-        elsif ( (scalar(@RHS_v) == 1) && (scalar(@RHS_r) == 1) ) {      
+        else {           
+            my @sorted = sort { $a->_complexity() <=> $b->_complexity() } map { $_->[0] } @matches;
+            return $sorted[0];            
+        }
+    }    
 
-            if ( scalar(@LHS_r) == 0 ) {   
-                $nodes_2{"$RHS = $LHS"} = { LHS => $RHS, RHS => $LHS };
-            }
-            else {
-                $nodes_3{"$RHS = $LHS"} = { LHS => $RHS, RHS => $LHS };
-            }
-        }        
-    }
-    
-    if ( scalar(keys %nodes_2) ) {
-
-        my @sorted = 
-            map { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map { [ $_, length($nodes_2{$_}{LHS}->to_string()) ] }
-            keys %nodes_2;
-
-        my $LHS = $nodes_2{$sorted[0]}{LHS};
-        my $RHS = $nodes_2{$sorted[0]}{RHS};
-
-        return (Math::Symbolic::Custom::Equation->new($LHS, $RHS), 2);
-    }
-
-    if ( scalar(keys %nodes_3) ) {
-
-        my @sorted = 
-            map { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map { [ $_, length($_) ] }
-            keys %nodes_3;
-
-        my $LHS = $nodes_3{$sorted[0]}{LHS};
-        my $RHS = $nodes_3{$sorted[0]}{RHS};
-
-        return (Math::Symbolic::Custom::Equation->new($LHS, $RHS), 3);
-    }
-
-    return undef;
+    return wantarray ? () : undef;
 }
 
 sub _expand_collect {
@@ -608,18 +681,18 @@ sub _expand_collect {
     
     if ( $LHS->to_string() ne $node->{LHS}->to_string() ) {
         my $new_node = "$LHS = " . $node->{RHS};
-        $new_nodes{$new_node} = { LHS => $LHS, RHS => $node->{RHS} };
+        $new_nodes{$new_node} = { LHS => $LHS, RHS => $node->{RHS}, previous => $node_name, plevel => $node->{level}, operation => 'Collect LHS' };
     }
     
     if ( $RHS->to_string() ne $node->{RHS}->to_string() ) {
         my $new_node = $node->{LHS} . " = $RHS";
-        $new_nodes{$new_node} = { LHS => $node->{LHS}, RHS => $RHS };
+        $new_nodes{$new_node} = { LHS => $node->{LHS}, RHS => $RHS, previous => $node_name, plevel => $node->{level}, operation => 'Collect RHS' };
     }
     
     if ( ($LHS->to_string() ne $node->{LHS}->to_string()) &&
             ($RHS->to_string() ne $node->{RHS}->to_string()) ) {
         my $new_node = "$LHS = $RHS";
-        $new_nodes{$new_node} = { LHS => $LHS, RHS => $RHS };
+        $new_nodes{$new_node} = { LHS => $LHS, RHS => $RHS, previous => $node_name, plevel => $node->{level}, operation => 'Collect LHS & RHS' };
     }
 
     return %new_nodes;
@@ -635,18 +708,18 @@ sub _expand_factor {
     
     if ( $LHS->to_string() ne $node->{LHS}->to_string() ) {
         my $new_node = "$LHS = " . $node->{RHS};
-        $new_nodes{$new_node} = { LHS => $LHS, RHS => $node->{RHS} };
+        $new_nodes{$new_node} = { LHS => $LHS, RHS => $node->{RHS}, previous => $node_name, plevel => $node->{level}, operation => 'Factor LHS' };
     }
     
     if ( $RHS->to_string() ne $node->{RHS}->to_string() ) {
         my $new_node = $node->{LHS} . " = $RHS";
-        $new_nodes{$new_node} = { LHS => $node->{LHS}, RHS => $RHS };
+        $new_nodes{$new_node} = { LHS => $node->{LHS}, RHS => $RHS, previous => $node_name, plevel => $node->{level}, operation => 'Factor RHS' };
     }
     
     if ( ($LHS->to_string() ne $node->{LHS}->to_string()) &&
             ($RHS->to_string() ne $node->{RHS}->to_string()) ) {
         my $new_node = "$LHS = $RHS";
-        $new_nodes{$new_node} = { LHS => $LHS, RHS => $RHS };
+        $new_nodes{$new_node} = { LHS => $LHS, RHS => $RHS, previous => $node_name, plevel => $node->{level}, operation => 'Factor LHS & RHS' };
     }
 
     return %new_nodes;
@@ -664,10 +737,10 @@ sub _expand_operator {
 
         if ( $t->type() == B_DIVISION ) {    
             my $new_LHS = $t->op1();
-            my $new_RHS = Math::Symbolic::Operator->new('*', $t->op2(), $node->{RHS})->to_collected();
+            my $new_RHS = Math::Symbolic::Operator->new('*', $node->{RHS}, $t->op2() )->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind division' };
             } 
         }
         elsif ( $t->type() == B_DIFFERENCE ) {
@@ -675,7 +748,7 @@ sub _expand_operator {
             my $new_RHS = Math::Symbolic::Operator->new('+', $t->op2(), $node->{RHS})->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind subtraction' };
             }             
         }
         elsif ( $t->type() == B_PRODUCT ) {
@@ -684,7 +757,7 @@ sub _expand_operator {
                 my $new_RHS = Math::Symbolic::Operator->new('/', $node->{RHS}, $t->op2())->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind product op2' };
                 }            
             }
             unless ( ($t->op1()->term_type() == T_CONSTANT) && ($t->op1()->value() == 0) ) {                
@@ -692,7 +765,7 @@ sub _expand_operator {
                 my $new_RHS = Math::Symbolic::Operator->new('/', $node->{RHS}, $t->op1())->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind product op1' };
                 }
             }
         }
@@ -701,13 +774,13 @@ sub _expand_operator {
             my $new_RHS = Math::Symbolic::Operator->new('-', $node->{RHS}, $t->op2())->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind addition op2' };
             }            
             $new_LHS = $t->op2();
             $new_RHS = Math::Symbolic::Operator->new('-', $node->{RHS}, $t->op1())->to_collected();
             $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind addition op1' };
             }            
         }            
         elsif ( $t->type() == B_EXP ) {
@@ -718,7 +791,20 @@ sub _expand_operator {
                 my $new_RHS = Math::Symbolic::Operator->new('^', $node->{RHS}, Math::Symbolic::Constant->new(2))->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind sqrt' };
+                }  
+            }
+            elsif ( $t->op2()->to_string() eq '2' ) {
+                my $new_LHS = $t->op1();
+                my $new_RHS1 = Math::Symbolic::Operator->new('^', $node->{RHS}, Math::Symbolic::Constant->new(0.5))->to_collected();
+                my $eq_str1 = "$new_LHS = $new_RHS1";
+                if ( (!exists $new_nodes{$eq_str1}) ) {
+                    $new_nodes{$eq_str1} = { LHS => $new_LHS, RHS => $new_RHS1, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind sqr +ve' };
+                }  
+                my $new_RHS2 = Math::Symbolic::Operator->new('*', Math::Symbolic::Constant->new(-1), $new_RHS1)->to_collected();
+                my $eq_str2 = "$new_LHS = $new_RHS2";
+                if ( (!exists $new_nodes{$eq_str2}) ) {
+                    $new_nodes{$eq_str2} = { LHS => $new_LHS, RHS => $new_RHS2, previous => $node_name, plevel => $node->{level}, operation => 'LHS unwind sqr -ve' };
                 }  
             }
         } 
@@ -730,10 +816,10 @@ sub _expand_operator {
 
         if ( $t->type() == B_DIVISION ) {    
             my $new_RHS = $t->op1();
-            my $new_LHS = Math::Symbolic::Operator->new('*', $t->op2(), $node->{LHS})->to_collected();
+            my $new_LHS = Math::Symbolic::Operator->new('*', $node->{LHS}, $t->op2() )->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind division' };
             } 
         }
         elsif ( $t->type() == B_DIFFERENCE ) {
@@ -741,7 +827,7 @@ sub _expand_operator {
             my $new_LHS = Math::Symbolic::Operator->new('+', $t->op2(), $node->{LHS})->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind subtraction' };
             }             
         }
         elsif ( $t->type() == B_PRODUCT ) {
@@ -750,7 +836,7 @@ sub _expand_operator {
                 my $new_LHS = Math::Symbolic::Operator->new('/', $node->{LHS}, $t->op2())->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind product op2' };
                 }    
             }
             unless ( ($t->op1()->term_type() == T_CONSTANT) && ($t->op1()->value() == 0) ) {        
@@ -758,7 +844,7 @@ sub _expand_operator {
                 my $new_LHS = Math::Symbolic::Operator->new('/', $node->{LHS}, $t->op1())->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind product op1' };
                 }
             }
         }
@@ -767,13 +853,13 @@ sub _expand_operator {
             my $new_LHS = Math::Symbolic::Operator->new('-', $node->{LHS}, $t->op2())->to_collected();
             my $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind addition op2' };
             }            
             $new_RHS = $t->op2();
             $new_LHS = Math::Symbolic::Operator->new('-', $node->{LHS}, $t->op1())->to_collected();
             $eq_str = "$new_LHS = $new_RHS";
             if ( (!exists $new_nodes{$eq_str}) ) {
-                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind addition op1' };
             }            
         }          
         elsif ( $t->type() == B_EXP ) {
@@ -784,7 +870,20 @@ sub _expand_operator {
                 my $new_LHS = Math::Symbolic::Operator->new('^', $node->{LHS}, Math::Symbolic::Constant->new(2))->to_collected();
                 my $eq_str = "$new_LHS = $new_RHS";
                 if ( (!exists $new_nodes{$eq_str}) ) {
-                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS };
+                    $new_nodes{$eq_str} = { LHS => $new_LHS, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind sqrt' };
+                }  
+            }
+            elsif ( $t->op2()->to_string() eq '2' ) {
+                my $new_RHS = $t->op1();
+                my $new_LHS1 = Math::Symbolic::Operator->new('^', $node->{LHS}, Math::Symbolic::Constant->new(0.5))->to_collected();
+                my $eq_str1 = "$new_LHS1 = $new_RHS";
+                if ( (!exists $new_nodes{$eq_str1}) ) {
+                    $new_nodes{$eq_str1} = { LHS => $new_LHS1, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind sqr +ve' };
+                }  
+                my $new_LHS2 = Math::Symbolic::Operator->new('*', Math::Symbolic::Constant->new(-1), $new_LHS1)->to_collected();
+                my $eq_str2 = "$new_LHS2 = $new_RHS";
+                if ( (!exists $new_nodes{$eq_str2}) ) {
+                    $new_nodes{$eq_str2} = { LHS => $new_LHS2, RHS => $new_RHS, previous => $node_name, plevel => $node->{level}, operation => 'RHS unwind sqr -ve' };
                 }  
             }
         }       
@@ -792,6 +891,56 @@ sub _expand_operator {
     
     return %new_nodes;
 }
+
+
+sub _complexity {
+    my $self = shift;
+
+    my $LHS_score = _test_complexity($self->LHS());
+    my $RHS_score = _test_complexity($self->RHS());
+
+    return $LHS_score + $RHS_score;
+}
+
+# Try to achieve a measure of "complexity" of a Math::Symbolic expression.
+# The greater the score, the higher the "complexity".
+sub _test_complexity {
+    my ($tree) = @_;
+
+    # Look at:
+    # 1. the depth of the tree
+    # 2. the number of constants
+    # 3. the number of variable instances (e.g. x * x should count as 2 variables)
+    # 4. the number of operations
+    my %metrics = ( depth => 0, constants => 0, variables => 0, operations => 0 );
+    _walk($tree, 0, \%metrics);
+
+    my $score = 0;
+    # it should be possible to weight these metrics;
+    # for now all metrics are at weight 1.
+    $score += $_ for values %metrics;
+
+    return $score;
+}
+
+# helper routine to walk the Math::Symbolic expression tree and tot up the metrics.
+sub _walk {
+    my ($node, $depth, $hr) = @_;
+
+    $hr->{depth} = $depth if $depth > $hr->{depth};
+
+    if ($node->term_type() == T_CONSTANT) {
+        $hr->{constants}++;
+    } elsif ($node->term_type() == T_VARIABLE) {
+        $hr->{variables}++;
+    } else {
+        $hr->{operations}++;
+        foreach my $child (@{$node->{operands}}) {
+            _walk($child, $depth + 1, $hr);
+        }
+    }
+}
+
 
 =head1 SEE ALSO
 

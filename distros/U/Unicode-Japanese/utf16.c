@@ -22,7 +22,11 @@ xs_utf16_utf8(SV* sv_str)
   STRLEN len;
   SV_Buf result;
   const UJ_UINT8* src_end;
-  UJ_UINT8 buf[4];
+  union {
+    UJ_UINT32 u32_val;
+    UJ_UINT16 u16_val;
+    UJ_UINT8  u8_val[4];
+  } buf;
 
   if( sv_str==&PL_sv_undef )
   {
@@ -56,15 +60,15 @@ xs_utf16_utf8(SV* sv_str)
       SV_Buf_append_ch(&result,(UJ_UINT8)utf16);
     }else if( utf16<0x800 )
     {
-      buf[0] = 0xC0 | (utf16 >> 6);
-      buf[1] = 0x80 | (utf16 & 0x3F);
-      SV_Buf_append_ch2(&result, *(UJ_UINT16*)buf);
+      buf.u8_val[0] = 0xC0 | (utf16 >> 6);
+      buf.u8_val[1] = 0x80 | (utf16 & 0x3F);
+      SV_Buf_append_ch2(&result, buf.u16_val);
     }else if( !(0xd800 <= utf16 && utf16 <= 0xdfff) )
     { /* normal char (non surrogate pair) */
-      buf[0] = 0xE0 | (utf16 >> 12);
-      buf[1] = 0x80 | ((utf16 >> 6) & 0x3F);
-      buf[2] = 0x80 | (utf16 & 0x3F);
-      SV_Buf_append_ch3(&result,*(UJ_UINT32*)buf);
+      buf.u8_val[0] = 0xE0 | (utf16 >> 12);
+      buf.u8_val[1] = 0x80 | ((utf16 >> 6) & 0x3F);
+      buf.u8_val[2] = 0x80 | (utf16 & 0x3F);
+      SV_Buf_append_ch3(&result, buf.u32_val);
     }else
     { /* surrogate pair */
       if( src+2<src_end )
@@ -77,11 +81,11 @@ xs_utf16_utf8(SV* sv_str)
           src += 2;
           if( 0x010000<=ucs4 && ucs4<=0x10FFFF )
           {
-            buf[0] = 0xF0 | ((ucs4>>18) & 0x3F);
-            buf[1] = 0x80 | ((ucs4>>12) & 0x3F);
-            buf[2] = 0x80 | ((ucs4>>6) & 0x3F);
-            buf[3] = 0x80 | (ucs4 & 0x3F);
-            SV_Buf_append_ch4(&result,*(UJ_UINT32*)buf);
+            buf.u8_val[0] = 0xF0 | ((ucs4>>18) & 0x3F);
+            buf.u8_val[1] = 0x80 | ((ucs4>>12) & 0x3F);
+            buf.u8_val[2] = 0x80 | ((ucs4>>6) & 0x3F);
+            buf.u8_val[3] = 0x80 | (ucs4 & 0x3F);
+            SV_Buf_append_ch4(&result, buf.u32_val);
           }else
           {
             /* utf8 not support >= U+10FFFF */

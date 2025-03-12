@@ -33,9 +33,9 @@ class TestCase::File::Temp {
           return 0;
         }
         
-        my $buffer = (mutable string)new_string_len 128;
+        my $buffer = new_string_len 128;
         
-        $temp_file->read($buffer, length $buffer);
+        $temp_file->read($buffer);
         
         $temp_file->print("Hello");
         
@@ -44,9 +44,6 @@ class TestCase::File::Temp {
         my $fh = IO->open("<", $filename);
         
         my $content = $fh->getlines;
-        
-        # TODO: this is not needed ideally
-        $fh->close;
         
         unless ($content eq "Hello") {
           return 0;
@@ -300,9 +297,9 @@ class TestCase::File::Temp {
           return 0;
         }
         
-        my $buffer = (mutable string)new_string_len 128;
+        my $buffer = new_string_len 128;
         
-        $temp_file->read($buffer, length $buffer);
+        $temp_file->read($buffer);
         
         $temp_file->print("Hello");
         

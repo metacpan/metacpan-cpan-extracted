@@ -11,8 +11,9 @@ my $HELP = <<"HERE";
 Usage: $0 [options] [file ...]
 
 Options:
-  -w|--width=<width>   Max output line width
-  -h|--help            Print this help message
+  -e|--html-encoding=<enc>  Specify input HTML encoding
+  -w|--width=<width>        Max output line width
+  -h|--help                 Print this help message
 HERE
 
 my %INLINE = map { $_ => 1 } qw(
@@ -137,10 +138,12 @@ sub main {
 	my $param = {
 		Html  => undef,
 		Width => 80,
+		Enc   => undef,
 	};
 
 	Getopt::Long::config('bundling');
 	GetOptions(
+		'html-encoding|e=s' => \$param->{Enc},
 		'width|w=i' => \$param->{Width},
 		'help|h' => sub { print $HELP; exit 0 },
 	) or die "Error in command line arguments\n";
@@ -161,7 +164,7 @@ sub main {
 		my $dom = XML::LibXML->load_html(
 			IO => *STDIN,
 			recover => 2,
-			encoding => 'utf8',
+			encoding => $param->{Enc},
 		);
 
 		my ($body) = $dom->findnodes('/html/body');
@@ -176,7 +179,7 @@ sub main {
 			my $dom = XML::LibXML->load_html(
 				location => $_,
 				recover => 2,
-				encoding => 'utf8',
+				encoding => $param->{Enc},
 			);
 
 			my ($body) = $dom->findnodes('/html/body');
@@ -215,6 +218,10 @@ When ran with no arguments, reads HTML from F<stdin>.
 =head1 OPTIONS
 
 =over 4
+
+=item B<-e>|B<--html-encoding>=I<enc>
+
+Force B<queequeg> to use the specified encoding when reading HTML input.
 
 =item B<-w>|B<--width>=I<width>
 

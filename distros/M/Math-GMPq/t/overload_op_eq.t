@@ -1,13 +1,7 @@
-# Test cross class overloading of +=, *=, -=, /=, and
+# Test cross class overloading of +=, *=, -=, /=,
 # and **= for the cases where the second arg is a
 # Math::MPFR object.
-# In these cases the operation returns a Math::MPFR
-# object if and only if $Math::GMPq::RETYPE is set
-# to a true value.
-# A fatal error occurs if $Math::GMPq::RETYPE is
-# set to a false value. The initial value of
-# $Math::GMPq::RETYPE is now 1 (true), but was 0
-# in Math-GMPq-0.56 and earlier.
+# In these cases the operation returns a Math::MPFR object
 
 use strict;
 use warnings;
@@ -23,63 +17,18 @@ my $q  = Math::GMPq->new('1/11');
 my $fr = 0;
 $fr = Math::MPFR->new(17.1) if $have_mpfr;
 
-cmp_ok($Math::GMPq::RETYPE, '==', 1, "retyping allowed");
-
-$Math::GMPq::RETYPE = 0; # Disallow retyping
-
-eval {$q *= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPq::overload_mul_eq/, '$q *= $fr is illegal');
-}
-else {
-  cmp_ok($q, '==', 0, "multiplication by scalar ok");
-}
-
-eval {$q += $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPq::overload_add_eq/, '$q += $fr is illegal');
-}
-else {
-  cmp_ok($q, '==', 0, "addition of scalar ok");
-}
-
-eval {$q -= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPq::overload_sub_eq/, '$q -= $fr is illegal');
-}
-else {
-  cmp_ok($q, '==', 0, "subtraction of scalar ok");
-}
-
-eval {$q /= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPq::overload_div_eq/, '$q /= $fr is illegal');
-}
-else {
-  like($@, qr/^Division by 0 not allowed in Math::GMPq::overload_div_eq/, 'division by zero is illegal')
-}
-
-eval {$q **= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPq::overload_pow_eq/, '$q **= $fr is illegal');
-}
-else {
-  cmp_ok($q, '==', 1, "raising to power of 0 ok");
-}
-
-$Math::GMPq::RETYPE = 1;
-
 ############################################
 
 if($have_mpfr) {
 
   if($Math::MPFR::VERSION < 4.19) {
+    is(1,1);
     warn "\n  Skipping remaining tests -  Math::MPFR version 4.19 (or later)\n" .
           "  is needed. We have only version $Math::MPFR::VERSION\n";
+    done_testing();
+    exit 0;
   }
   else {
-
-    cmp_ok($Math::GMPq::RETYPE, '==', 1, "retyping allowed");
 
     $q = Math::GMPq->new('1/11');
     cmp_ok(ref($q), 'eq', 'Math::GMPq', '$q is a Math::GMPq object');
@@ -114,6 +63,10 @@ if($have_mpfr) {
     cmp_ok(ref($q), 'eq', 'Math::MPFR', '$q changes to a Math::MPFR object');
     cmp_ok($q, '==', Math::GMPq->new(2) ** Math::MPFR->new(0.5), '$q **= Math::MPFR->new(0.5) sets $z to 1.41421356237309504880168872420969798');
   }
+}
+else {
+  is(1,1);
+  warn "Skipping all tests - could not load Math::MPFR";
 }
 
 done_testing();

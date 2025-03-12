@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::InputFilter - CGIクエリパラメータを読み取る</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::InputFilter - CGIクエリパラメータを読み取る
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::InputFilter - CGIクエリパラメータを読み取る
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  $TL-&gt;setInputFilter('Tripletail::InputFilter::HTML');
+  
+  $TL-&gt;startCgi(
+      -main =&gt; \&amp;main,
+  );
+  
+  sub main {
+      if ($CGI-&gt;get('mode') eq 'Foo') {
+          ...
+      }
+  }</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">QUERY_STRING, PATH_INFO, stdin等からリクエストのパラメータを受け取り、
+<a href="http://search.cpan.org/perldoc/Tripletail::Form">Tripletail::Form</a> を生成する為のフィルタ。
+
+</span>
+</p>
+
+<h2><a id="Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">
+<span class="pod_lang">フィルタ一覧
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter::HTML">Tripletail::InputFilter::HTML</a>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">QUERY_STRING / stdinからリクエストを読む。
+<a href="http://search.cpan.org/perldoc/Tripletail::Session">セッション</a> は <a href="http://search.cpan.org/perldoc/Tripletail::Cookie">クッキー</a> から読む。(デフォルト)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter::MobileHTML">Tripletail::InputFilter::MobileHTML</a>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">QUERY_STRING / stdinからリクエストを読む。
+<a href="http://search.cpan.org/perldoc/Tripletail::Session">セッション</a> はFormから読む。文字コード変換には常にUniJPを使う。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X__01"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter::SEO">Tripletail::InputFilter::SEO</a>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">SEO入力フィルタ。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X__02"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter::Plain">Tripletail::InputFilter::Plain</a>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">何もしないフィルタ。
+	
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newInputFilter"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newInputFilter</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filter = $TL-&gt;newInputFilter</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::InputFilter オブジェクトを作成。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="decodeCgi"><span class="pod_lang"><code class="pod_iseq_C">decodeCgi</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filter-&gt;decodeCgi($form);</code></pre>
+
+<p>
+<span class="pod_lang">任意の場所からリクエストデータを読み、それを$formに追加する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="decodeURL"><span class="pod_lang"><code class="pod_iseq_C">decodeURL</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filter-&gt;decodeURL($form, $url, $fragment)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたURLから(可能なら)読めるデータを読み、それを$formに追加する。
+URLにフラグメント部分は含まれない。もしフラグメントが存在したなら、
+それは$fragmentに入る。フラグメントが無ければ$fragmentはundefになる。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<dl>
+<dt><a id="charset"><span class="pod_lang"><code class="pod_iseq_C">charset</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    charset = UTF-8</code></pre>
+
+<p>
+<span class="pod_lang">クエリの文字コードを指定する。ここで文字コードを指定した場合は文字コードの自動判別は行われない。
+<a href=".././Tripletail.html#charconv">$TL-&gt;charconv</a>で使用できる文字コードを指定可能。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X__03"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__04"><span class="pod_lang"><a href=".././Tripletail/Filter.html">Tripletail::Filter</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::InputFilter - CGIクエリパラメータを読み取る
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newInputFilter">$TL-&gt;newInputFilter</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X__03">Tripletail</a></li>
+<li><a href="#X__04">Tripletail::Filter</a></li>
+<li><a href="#X_">Tripletail::InputFilter::HTML</a></li>
+<li><a href="#X__00">Tripletail::InputFilter::MobileHTML</a></li>
+<li><a href="#X__02">Tripletail::InputFilter::Plain</a></li>
+<li><a href="#X__01">Tripletail::InputFilter::SEO</a></li>
+<li><a href="#charset">charset</a></li>
+<li><a href="#decodeCgi">decodeCgi</a></li>
+<li><a href="#decodeURL">decodeURL</a></li>
+<li><a href="#Xe3X83X95Xe3X82Xa3Xe3X83XabXe3X82XbfXe4Xb8X80Xe8Xa6Xa7">フィルタ一覧</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::InputFilter - CGIクエリパラメータを読み取る
+
+
+</div>
+
+</body>
+</html>

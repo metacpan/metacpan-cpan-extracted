@@ -1,3 +1,7 @@
+0.026 2025-03-12
+  [Requirement Changes]
+    * Require SPVM 0.990048.
+    * Require SPVM::IO 0.235.
 0.025 2025-03-11
   [Bug Fix]
     * Fix a bug that File::Temp::Dir#new method's arguments were not optional.

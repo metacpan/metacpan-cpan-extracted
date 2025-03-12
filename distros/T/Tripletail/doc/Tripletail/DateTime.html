@@ -1,0 +1,1572 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::DateTime - 日付と時刻</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::DateTime - 日付と時刻
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::DateTime - 日付と時刻
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $dt = $TL-&gt;newDateTime('2006-02-17 15:18:01');
+  $dt-&gt;addDay(1);
+  $dt-&gt;addSecond(-1);
+  print $dt-&gt;toStr('rfc822'); # Fri, 18 Feb 2006 15:18:00 JST</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">日付と時刻を扱うクラス。グレゴリオ歴にのみ対応している。精度は秒。
+うるう秒や夏時間を考慮しない。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newDateTime"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newDateTime</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt = $TL-&gt;newDateTime;         # 現在時刻
+  $dt = $TL-&gt;newDateTime($str);   # 文字列をパース</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::DateTime オブジェクトを生成。
+二番目の形式では、文字列から日付や時刻をパースする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">存在しない日付が指定された場合は、それが自動的に補正される。
+例えば次の 2 行は同じ結果になる。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $dt = $TL-&gt;newDateTime('2000-04-31');
+  $dt = $TL-&gt;newDateTime('2000-05-01');</code></pre>
+
+<p>
+<span class="pod_lang">但し、次の行はパースに失敗する。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $dt = $TL-&gt;newDateTime('2000-99-99'); # 正しい形式に沿っていない</code></pre>
+
+<p>
+<span class="pod_lang">パースに失敗した場合はdieする。時刻が与えられない場合は 0 時 0 分 0秒
+に設定され、タイムゾーンが与えらない場合は localtime と gmtime の差か
+ら求めた値が設定される。パースできる形式は次の通り。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="Xe4Xb8X80Xe8X88Xac"><span class="pod_lang"><strong class="pod_iseq_B">一般</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> YYYY-MM-DD
+ YYYY-MM-DD HH:MM
+ YYYY-MM-DD HH:MM:SS</code></pre>
+
+<p>
+<span class="pod_lang">ハイフンやコロンは別の記号であっても良く、何も無くても良い。
+例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> YYYY@MM@DD
+ YYYY/MM/DD HH.MM.SS
+ YYYYMMDD
+ YYYYMMDDHHMMSS</code></pre>
+
+<p>
+<span class="pod_lang">また、記号がある場合は次のように月、日、時、分、秒は一桁であっても良い。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> YYYY-M-D
+ YYYY/M/D H:M
+ YYYY/M/D H:M:S</code></pre>
+
+</dd>
+<dt><a id="date_Xe3X82Xb3Xe3X83X9eXe3X83Xb3Xe3X83X89"><span class="pod_lang"><strong class="pod_iseq_B">date コマンド</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> Wdy Mon DD HH:MM:SS TIMEZONE YYYY
+ (Fri Feb 17 11:24:41 JST 2006)</code></pre>
+
+</dd>
+<dt><a id="Apache_access_log"><span class="pod_lang"><strong class="pod_iseq_B">Apache access_log</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> DD/Mon/YYYY:HH:MM:SS +TTTT
+ (17/Feb/2006:11:24:41 +0900)</code></pre>
+
+</dd>
+<dt><a id="Apache_error_log"><span class="pod_lang"><strong class="pod_iseq_B">Apache error_log</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> Wdy Mon DD HH:MM:SS YYYY
+ (Fri Feb 17 11:24:41 2006)</code></pre>
+
+</dd>
+<dt><a id="Apache_directory_index"><span class="pod_lang"><strong class="pod_iseq_B">Apache directory index</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> DD-Mon-YYYY HH:MM:SS</code></pre>
+
+</dd>
+<dt><a id="RFC_822"><span class="pod_lang"><strong class="pod_iseq_B">RFC 822</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> Wdy, DD Mon YY HH:MM:SS TIMEZONE
+ (Fri, 17 Feb 06 11:24:41 +0900)
+
+ Wdy, DD Mon YYYY HH:MM:SS TIMEZONE
+ (Fri, 17 Feb 2006 11:24:41 +0900)</code></pre>
+
+</dd>
+<dt><a id="RFC_850"><span class="pod_lang"><strong class="pod_iseq_B">RFC 850</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> Wdy, DD-Mon-YY HH:MM:SS TIMEZONE
+ (Fri, 17-Feb-06 11:24:41 +0900)
+
+ Wdy, DD-Mon-YYYY HH:MM:SS TIMEZONE
+ (Fri, 17-Feb-2006 11:24:41 +0900)</code></pre>
+
+<p>
+<span class="pod_lang">RFC 850 で規定される形式は、実際には RFC 733 のものである。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="W3C_Date_and_Time"><span class="pod_lang"><strong class="pod_iseq_B">W3C Date and Time</strong>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code> YYYY
+ YYYY-MM
+ YYYY-MM-DD
+ YYYY-MM-DDTHH:MMTzd (2006-02-17T11:40+09:00)
+ YYYY-MM-DDTHH:MM:SSTzd (2006-02-17T11:40:10+09:00)
+ YYYY-MM-DDTHH:MM:SS.sTzd (2006-02-17T11:40:10.45+09:00)</code></pre>
+
+<p>
+<span class="pod_lang">ここで Tzd とはタイムゾーン指定であり、+hh:mm / -hh:mm / 'Z' の何れか
+の形式で表される。Z は UTC を表す。例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> 2006-02-17T11:40:10Z</code></pre>
+
+<p>
+<span class="pod_lang">最後の形式の .s は時刻の端数を表すものであるが、このクラスの精度は秒で
+あるので、端数はパース後に切り捨てられる。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt><a id="clone"><span class="pod_lang"><code class="pod_iseq_C">clone</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt2 = $dt-&gt;clone;</code></pre>
+
+<p>
+<span class="pod_lang">DateTimeオブジェクトを複製して返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="set"><span class="pod_lang"><code class="pod_iseq_C">set</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;set;
+  $dt-&gt;set($str);</code></pre>
+
+<p>
+<span class="pod_lang">引数はコンストラクタと同じ。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setEpoch"><span class="pod_lang"><code class="pod_iseq_C">setEpoch</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;setEpoch($epoch);</code></pre>
+
+<p>
+<span class="pod_lang">エポックからの秒数を設定する。このクラスでエポックとは gmtime(0) の返
+す日付と時刻を云う。負の値を与えた場合は、エポック以前の日付/時刻に設
+定される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setJulianDay"><span class="pod_lang"><code class="pod_iseq_C">setJulianDay</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;setJulianDay($julian);</code></pre>
+
+<p>
+<span class="pod_lang">ユリウス日を設定する。小数で指定された場合は、その値から時刻を求める。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setYear"><span class="pod_lang"><code class="pod_iseq_C">setYear</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;setYear(2006);</code></pre>
+
+<p>
+<span class="pod_lang">年を設定する。引数は、現在設定されているタイムゾーンでの値として解釈さ
+れる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setMonth"><span class="pod_lang"><code class="pod_iseq_C">setMonth</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;setMonth(1);</code></pre>
+
+<p>
+<span class="pod_lang">月を設定する。負の値 n を与えた場合は、最大値(setMonthの場合は12) + 1
++ n が与えられたものと見なす。例えば setMonth(-1) は setMonth(12) に等
+しい。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数が0または13以上である場合、及び-13以下である場合は die する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">また、月を変更する事により日が存在する範囲から外れた場合は、日が最終日
+に設定される。例えば1月31日で setMonth(4) すると4月30日になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setDay"><span class="pod_lang"><code class="pod_iseq_C">setDay</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="setHour"><span class="pod_lang"><code class="pod_iseq_C">setHour</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="setMinute"><span class="pod_lang"><code class="pod_iseq_C">setMinute</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="setSecond"><span class="pod_lang"><code class="pod_iseq_C">setSecond</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">setMonth と同様。負の値を与えた場合等の動作も setMonth に準じる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setTimeZone"><span class="pod_lang"><code class="pod_iseq_C">setTimeZone</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;setTimeZone();         # localtimeとgmtimeの差から計算
+  $dt-&gt;setTimeZone(9);        # +09:00 に設定
+  $dt-&gt;setTimeZone('+0900');  # +09:00 に設定 (RFC 822)
+  $dt-&gt;setTimeZone('+09:00'); # +09:00 に設定 (W3C)
+  $dt-&gt;setTimeZone('gmt');    # +00:00 に設定</code></pre>
+
+<p>
+<span class="pod_lang">タイムゾーンを設定する。タイムゾーンを変更すると、絶対時間であるエポッ
+ク秒やユリウス日は変化しないが、getSecond等で返される日付や時刻等が変
+化する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getEpoch"><span class="pod_lang"><code class="pod_iseq_C">getEpoch</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $epoch = $dt-&gt;getEpoch;</code></pre>
+
+<p>
+<span class="pod_lang">エポック秒を返す。エポック以前の日付と時刻では負の値が返る。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getJulianDay"><span class="pod_lang"><code class="pod_iseq_C">getJulianDay</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $julian = $dt-&gt;getJulianDay;</code></pre>
+
+<p>
+<span class="pod_lang">ユリウス日を小数で返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getYear"><span class="pod_lang"><code class="pod_iseq_C">getYear</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $year = $dt-&gt;getYear;</code></pre>
+
+<p>
+<span class="pod_lang">年を返す。現在設定されているタイムゾーンでの値が返される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getMonth"><span class="pod_lang"><code class="pod_iseq_C">getMonth</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $mon = $dt-&gt;getMonth;       # 数値 1-12 で返す。</code></pre>
+
+<p>
+<span class="pod_lang">月を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getDay"><span class="pod_lang"><code class="pod_iseq_C">getDay</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="getHour"><span class="pod_lang"><code class="pod_iseq_C">getHour</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="getMinute"><span class="pod_lang"><code class="pod_iseq_C">getMinute</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="getSecond"><span class="pod_lang"><code class="pod_iseq_C">getSecond</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">getYearと同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getWday"><span class="pod_lang"><code class="pod_iseq_C">getWday</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $wday = $dt-&gt;getWday;       # 数値 0-6 で返す。0が日曜、1が月曜である。</code></pre>
+
+<p>
+<span class="pod_lang">曜日を返す。数値 0-6 で返す。0が日曜、1が月曜である。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getTimeZone"><span class="pod_lang"><code class="pod_iseq_C">getTimeZone</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $tz = $dt-&gt;getTimeZone();         # 時間で返す</code></pre>
+
+<p>
+<span class="pod_lang">タイムゾーンを時間単位で返す。端数がある場合は小数で返る。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getAnimal"><span class="pod_lang"><code class="pod_iseq_C">getAnimal</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $animal = $dt-&gt;getAnimal;      # 数値 0-11 を返す</code></pre>
+
+<p>
+<span class="pod_lang">この年の十二支を返す。0: 子, 1: 丑, ... 11: 亥
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getAllHolidays"><span class="pod_lang"><code class="pod_iseq_C">getAllHolidays</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $hash = $dt-&gt;getAllHolidays;</code></pre>
+
+<p>
+<span class="pod_lang">この年にある日本の祝祭日を返す。返される値は、キーが MM-DD 形式の日付、
+値が祝祭日名のハッシュである。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isHoliday"><span class="pod_lang"><code class="pod_iseq_C">isHoliday</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $bool = $dt-&gt;isHoliday($type);</code></pre>
+
+<p>
+<span class="pod_lang">この日が特定の日であれば 1 を、そうでなければ undef を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">特定の日とは以下の通り。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが0の場合、土日及び日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが1の場合、日及び日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが2の場合、日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getHolidayName"><span class="pod_lang"><code class="pod_iseq_C">getHolidayName</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $str = $dt-&gt;getHolidayName;</code></pre>
+
+<p>
+<span class="pod_lang">この日が祝祭日であればその名前を、そうでなければ undef を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isLeapYear"><span class="pod_lang"><code class="pod_iseq_C">isLeapYear</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">この年がうるう年であれば 1 を、そうでなければ undef を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getCalendar"><span class="pod_lang"><code class="pod_iseq_C">getCalendar</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $array = $dt-&gt;getCalendar;</code></pre>
+
+<p>
+<span class="pod_lang">この月の日数分の DateTime オブジェクトが入った配列を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getCalendarMatrix"><span class="pod_lang"><code class="pod_iseq_C">getCalendarMatrix</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $matrix = $dt-&gt;getCalendarMatrix(\$option);</code></pre>
+
+<p>
+<span class="pod_lang">この月のカレンダーを二次元配列で返す。
+引数は次の通り:
+
+</span>
+</p>
+
+<dl>
+<dt><a id="type"><span class="pod_lang"><code class="pod_iseq_C">type</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">'normal' または 'fixed' の2種類。fixed にすると常に６週分を返す.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="begin"><span class="pod_lang"><code class="pod_iseq_C">begin</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">'sun' または 'mon' の2種類。sun なら週が日曜から始まり、mon なら月曜。
+デフォルトは sun 。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<p>
+<span class="pod_lang">戻り値はカレンダーの一行分の DateTime オブジェクトの配列を1ヶ月分格納した配列。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="spanSecond"><span class="pod_lang"><code class="pod_iseq_C">spanSecond</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $seconds = $dt-&gt;spanSecond($dt2);
+  $seconds = $dt-&gt;spanSecond($dt1,$dt2);</code></pre>
+
+<p>
+<span class="pod_lang">引数との秒数の差を計算し、結果を整数で返す。
+引数が2つ指定された場合は、引数同士の差を計算する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">spanは、実際の期間を、指定された単位で計算する。
+spanDay で1日が返った場合は、2つの日付の間に24時間の間隔があることを示す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">spanMonth / Year の場合、それ以下の日部分の大小や年部分の大小を比較して、マイナス１すべきか判断する。
+秒数を平均的な１月の長さや１年の長さで割って求めているわけではない。（年齢計算等に利用できる）
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例：spanMonthの場合（2006年1月1日00時00分00秒と2005年12月31日00時00分00秒の場合、0が返る）
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数が DateTime オブジェクトだった場合はそのオブジェクトと比較し、
+それ以外の場合は引数をそのまま $TL-&gt;newDateTime に渡して生成した
+オブジェクトと比較する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">返される値は ($dt) - ($dt2) もしくは、($dt1) - ($dt2)であり、引数が過去ならば結果は正になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="spanMinute"><span class="pod_lang"><code class="pod_iseq_C">spanMinute</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="spanHour"><span class="pod_lang"><code class="pod_iseq_C">spanHour</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="spanDay"><span class="pod_lang"><code class="pod_iseq_C">spanDay</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="spanMonth"><span class="pod_lang"><code class="pod_iseq_C">spanMonth</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="spanYear"><span class="pod_lang"><code class="pod_iseq_C">spanYear</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">spanSecond と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="minusSecond"><span class="pod_lang"><code class="pod_iseq_C">minusSecond</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $seconds = $dt-&gt;minusSecond($dt2);
+  $seconds = $dt-&gt;minusSecond($dt1,$dt2);</code></pre>
+
+<p>
+<span class="pod_lang">引数との秒数の差を計算し、結果を整数で返す。
+引数が2つ指定された場合は、引数同士の差を計算する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">minusは、指定された単位部分の差を計算する。
+minusDayであれば、時・分・秒の部分を無視し、
+年月日のみで差を計算し、その差が何日分かを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例：minusMonthの場合（2006年1月1日と2005年12月31日の場合、1が返る）
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数が DateTime オブジェク
+トだった場合はそのオブジェクトと比較し、それ以外の場合は引数をそのまま
+$TL-&gt;newDateTime に渡して生成したオブジェクトと比較する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">返される値は ($dt) - ($dt2) もしくは、($dt1) - ($dt2)であり、引数が過去ならば結果は負になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="minusMinute"><span class="pod_lang"><code class="pod_iseq_C">minusMinute</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="minusHour"><span class="pod_lang"><code class="pod_iseq_C">minusHour</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="minusDay"><span class="pod_lang"><code class="pod_iseq_C">minusDay</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="minusMonth"><span class="pod_lang"><code class="pod_iseq_C">minusMonth</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="minusYear"><span class="pod_lang"><code class="pod_iseq_C">minusYear</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">minusSecond と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addSecond"><span class="pod_lang"><code class="pod_iseq_C">addSecond</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;addSecond($sec);</code></pre>
+
+<p>
+<span class="pod_lang">$sec 秒後の時刻にする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addMinute"><span class="pod_lang"><code class="pod_iseq_C">addMinute</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="addHour"><span class="pod_lang"><code class="pod_iseq_C">addHour</code>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="addDay"><span class="pod_lang"><code class="pod_iseq_C">addDay</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">addSecond と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addMonth"><span class="pod_lang"><code class="pod_iseq_C">addMonth</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">addSecond と同様だが、もし変更前の日が変更後の年/月に存在しないもので
+あったら、日はその月の最後の日に変更される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addYear"><span class="pod_lang"><code class="pod_iseq_C">addYear</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">addMonth と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addBusinessDay"><span class="pod_lang"><code class="pod_iseq_C">addBusinessDay</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;addBusinessDay($day,$type);</code></pre>
+
+<p>
+<span class="pod_lang">$day 営業日後にする。
+お盆や年末年始などは考慮しない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例としては、12月31日で、$dayに1を指定した場合、翌年の1月2日になる。
+（2日が振替休日の場合、3日になる）
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">休業日は$typeで決定する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが0の場合、土日及び日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが1の場合、日及び日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$typeが2の場合、日本の祝祭日。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">を休業日として営業日を判定する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="nextDay"><span class="pod_lang"><code class="pod_iseq_C">nextDay</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">次の日にする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="prevDay"><span class="pod_lang"><code class="pod_iseq_C">prevDay</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">前の日にする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="firstDay"><span class="pod_lang"><code class="pod_iseq_C">firstDay</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">その月の最初の日にする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="lastDay"><span class="pod_lang"><code class="pod_iseq_C">lastDay</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">その月の最後の日にする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="toStr"><span class="pod_lang"><code class="pod_iseq_C">toStr</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $str = $dt-&gt;toStr('mysql');  # YYYY-MM-DD HH:MM:SS の形式で返す。
+  $str = $dt-&gt;toStr('rfc822'); # rfc822 形式で返す。
+  $str = $dt-&gt;toStr('rfc850'); # rfc850 形式で返す。
+  $str = $dt-&gt;toStr('w3c');    # W3c Date and Time の形式で返す。
+  $str = $dt-&gt;toStr;           # mysql と同じ。</code></pre>
+
+<p>
+<span class="pod_lang">文字列で表した日付と時刻を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="strFormat"><span class="pod_lang"><code class="pod_iseq_C">strFormat</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $str = $dt-&gt;strFormat('%Y 年 %m 月 %d 日 (%J) %H 時 %M 分');</code></pre>
+
+<p>
+<span class="pod_lang">指定されたフォーマットに従って文字列化したものを返す。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X%a"><span class="pod_lang"><code class="pod_iseq_C">%a</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">短縮された曜日の名前 (Sun - Sat)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%A"><span class="pod_lang"><code class="pod_iseq_C">%A</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">完全な曜日の名前 (Sunday - Saturday)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%J"><span class="pod_lang"><code class="pod_iseq_C">%J</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">日本語での曜日の名前 (日 - 土)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%b"><span class="pod_lang"><code class="pod_iseq_C">%b</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">短縮された月の名前 (Jan - Dec)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%B"><span class="pod_lang"><code class="pod_iseq_C">%B</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">完全な月の名前 (January - December)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_B"><span class="pod_lang"><code class="pod_iseq_C">%_B</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">日本語での月の名前 (睦月 - 師走)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%d"><span class="pod_lang"><code class="pod_iseq_C">%d</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">日を2桁で表現 (01 - 31)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_d"><span class="pod_lang"><code class="pod_iseq_C">%_d</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">日 (1 - 31)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%m"><span class="pod_lang"><code class="pod_iseq_C">%m</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">月を2桁で表現 (01-12)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_m"><span class="pod_lang"><code class="pod_iseq_C">%_m</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">月 (1-12)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%w"><span class="pod_lang"><code class="pod_iseq_C">%w</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">曜日を10進数で表現。0 - 6 で、日曜が 0 、月曜が 1 。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%y"><span class="pod_lang"><code class="pod_iseq_C">%y</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">年を下2桁で表現 (00 - 99)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%Y"><span class="pod_lang"><code class="pod_iseq_C">%Y</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">年を4桁で表現
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_Y"><span class="pod_lang"><code class="pod_iseq_C">%_Y</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">年を和暦で表現。 (平成11年 等)
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">和暦の定義されていない範囲では空文字列。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%H"><span class="pod_lang"><code class="pod_iseq_C">%H</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時を24時間表記で2桁で表現 (00-23)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_H"><span class="pod_lang"><code class="pod_iseq_C">%_H</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時を24時間表記で表現 (0-23)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%I"><span class="pod_lang"><code class="pod_iseq_C">%I</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時を12時間表記で2桁で表現 (00-11)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_I"><span class="pod_lang"><code class="pod_iseq_C">%_I</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時を12時間表記で表現 (0-11)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%P"><span class="pod_lang"><code class="pod_iseq_C">%P</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時刻が午前なら 'a.m.', 午後なら 'p.m.' に置換する。
+24時間表記での0時0分は午前とし、12時0分は午後とする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このパターンが parseFormat で使われる時は、大文字と小文字は無視され、
+ピリオドの有無も無視される。例えば 'AM', 'A.M.', 'a.M' はいずれも午前
+としてパースされる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_P"><span class="pod_lang"><code class="pod_iseq_C">%_P</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">時刻が午前なら '午前', 午後なら '午後' に置換する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%M"><span class="pod_lang"><code class="pod_iseq_C">%M</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">分を2桁で表現 (00-59)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_M"><span class="pod_lang"><code class="pod_iseq_C">%_M</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">分 (0-59)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%S"><span class="pod_lang"><code class="pod_iseq_C">%S</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">秒を2桁で表現 (00-59)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_S"><span class="pod_lang"><code class="pod_iseq_C">%_S</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">秒 (0-59)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%E"><span class="pod_lang"><code class="pod_iseq_C">%E</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">十二支を表す文字 (子 - 亥)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%z"><span class="pod_lang"><code class="pod_iseq_C">%z</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">RFC 822 形式に於けるタイムゾーン。JSTの場合は '+0900' になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%_z"><span class="pod_lang"><code class="pod_iseq_C">%_z</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">W3C Date and Time 形式に於けるタイムゾーン。JSTの場合は '+09:00' になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%Z"><span class="pod_lang"><code class="pod_iseq_C">%Z</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">タイムゾーンを表す名称。存在しない場合は空文字列になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%T"><span class="pod_lang"><code class="pod_iseq_C">%T</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">'%H:%M:%S' のフォーマットで返される文字列
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X%%"><span class="pod_lang"><code class="pod_iseq_C">%%</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">'%' という文字
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt><a id="parseFormat"><span class="pod_lang"><code class="pod_iseq_C">parseFormat</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dt-&gt;parseFormat('%Y %d %m', '2006 01 13');</code></pre>
+
+<p>
+<span class="pod_lang">指定されたフォーマットを用いて日付と時刻の文字列をパースする。フォーマッ
+ト文字は strFormat のものと同一。フォーマット文字列から年を得
+る事が出来ない場合や、パースに失敗した場合は、die する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">また、常に空白または0による桁揃えの有無、全角半角は無視して解析する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">12時間表記の時間である %I と %_I と、午前または午後を表す %P と %_P は、
+用いられる際には必ず両方用いられなければならない。いずれか片方だけでは
+正確な時刻が判らない為。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::DateTime - 日付と時刻
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newDateTime">$TL-&gt;newDateTime</a></li>
+<li><a href="#X%%">%%</a></li>
+<li><a href="#X%A">%A</a></li>
+<li><a href="#X%B">%B</a></li>
+<li><a href="#X%E">%E</a></li>
+<li><a href="#X%H">%H</a></li>
+<li><a href="#X%I">%I</a></li>
+<li><a href="#X%J">%J</a></li>
+<li><a href="#X%M">%M</a></li>
+<li><a href="#X%P">%P</a></li>
+<li><a href="#X%S">%S</a></li>
+<li><a href="#X%T">%T</a></li>
+<li><a href="#X%Y">%Y</a></li>
+<li><a href="#X%Z">%Z</a></li>
+<li><a href="#X%_B">%_B</a></li>
+<li><a href="#X%_H">%_H</a></li>
+<li><a href="#X%_I">%_I</a></li>
+<li><a href="#X%_M">%_M</a></li>
+<li><a href="#X%_P">%_P</a></li>
+<li><a href="#X%_S">%_S</a></li>
+<li><a href="#X%_Y">%_Y</a></li>
+<li><a href="#X%_d">%_d</a></li>
+<li><a href="#X%_m">%_m</a></li>
+<li><a href="#X%_z">%_z</a></li>
+<li><a href="#X%a">%a</a></li>
+<li><a href="#X%b">%b</a></li>
+<li><a href="#X%d">%d</a></li>
+<li><a href="#X%m">%m</a></li>
+<li><a href="#X%w">%w</a></li>
+<li><a href="#X%y">%y</a></li>
+<li><a href="#X%z">%z</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#Apache_access_log">Apache access_log</a></li>
+<li><a href="#Apache_directory_index">Apache directory index</a></li>
+<li><a href="#Apache_error_log">Apache error_log</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#RFC_822">RFC 822</a></li>
+<li><a href="#RFC_850">RFC 850</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#W3C_Date_and_Time">W3C Date and Time</a></li>
+<li><a href="#addBusinessDay">addBusinessDay</a></li>
+<li><a href="#addDay">addDay</a></li>
+<li><a href="#addHour">addHour</a></li>
+<li><a href="#addMinute">addMinute</a></li>
+<li><a href="#addMonth">addMonth</a></li>
+<li><a href="#addSecond">addSecond</a></li>
+<li><a href="#addYear">addYear</a></li>
+<li><a href="#begin">begin</a></li>
+<li><a href="#clone">clone</a></li>
+<li><a href="#date_Xe3X82Xb3Xe3X83X9eXe3X83Xb3Xe3X83X89">date コマンド</a></li>
+<li><a href="#firstDay">firstDay</a></li>
+<li><a href="#getAllHolidays">getAllHolidays</a></li>
+<li><a href="#getAnimal">getAnimal</a></li>
+<li><a href="#getCalendar">getCalendar</a></li>
+<li><a href="#getCalendarMatrix">getCalendarMatrix</a></li>
+<li><a href="#getDay">getDay</a></li>
+<li><a href="#getEpoch">getEpoch</a></li>
+<li><a href="#getHolidayName">getHolidayName</a></li>
+<li><a href="#getHour">getHour</a></li>
+<li><a href="#getJulianDay">getJulianDay</a></li>
+<li><a href="#getMinute">getMinute</a></li>
+<li><a href="#getMonth">getMonth</a></li>
+<li><a href="#getSecond">getSecond</a></li>
+<li><a href="#getTimeZone">getTimeZone</a></li>
+<li><a href="#getWday">getWday</a></li>
+<li><a href="#getYear">getYear</a></li>
+<li><a href="#isHoliday">isHoliday</a></li>
+<li><a href="#isLeapYear">isLeapYear</a></li>
+<li><a href="#lastDay">lastDay</a></li>
+<li><a href="#minusDay">minusDay</a></li>
+<li><a href="#minusHour">minusHour</a></li>
+<li><a href="#minusMinute">minusMinute</a></li>
+<li><a href="#minusMonth">minusMonth</a></li>
+<li><a href="#minusSecond">minusSecond</a></li>
+<li><a href="#minusYear">minusYear</a></li>
+<li><a href="#nextDay">nextDay</a></li>
+<li><a href="#parseFormat">parseFormat</a></li>
+<li><a href="#prevDay">prevDay</a></li>
+<li><a href="#set">set</a></li>
+<li><a href="#setDay">setDay</a></li>
+<li><a href="#setEpoch">setEpoch</a></li>
+<li><a href="#setHour">setHour</a></li>
+<li><a href="#setJulianDay">setJulianDay</a></li>
+<li><a href="#setMinute">setMinute</a></li>
+<li><a href="#setMonth">setMonth</a></li>
+<li><a href="#setSecond">setSecond</a></li>
+<li><a href="#setTimeZone">setTimeZone</a></li>
+<li><a href="#setYear">setYear</a></li>
+<li><a href="#spanDay">spanDay</a></li>
+<li><a href="#spanHour">spanHour</a></li>
+<li><a href="#spanMinute">spanMinute</a></li>
+<li><a href="#spanMonth">spanMonth</a></li>
+<li><a href="#spanSecond">spanSecond</a></li>
+<li><a href="#spanYear">spanYear</a></li>
+<li><a href="#strFormat">strFormat</a></li>
+<li><a href="#toStr">toStr</a></li>
+<li><a href="#type">type</a></li>
+<li><a href="#Xe4Xb8X80Xe8X88Xac">一般</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::DateTime - 日付と時刻
+
+
+</div>
+
+</body>
+</html>

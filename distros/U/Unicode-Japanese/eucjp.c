@@ -34,6 +34,10 @@ xs_sjis_eucjp(SV* sv_str)
   src = (unsigned char*)SvPV(sv_str, len);
   /*fprintf(stderr,"Unicode::Japanese::(xs)sjis_eucjp\n",len); */
   /*bin_dump("in ",src,len); */
+  if( len == 0 )
+  {
+    return newSVsv(&PL_sv_undef);
+  }
   SV_Buf_init(&result,len);
   src_end = src+len;
 
@@ -52,17 +56,20 @@ xs_sjis_eucjp(SV* sv_str)
       {
 	if( src+2-1<src_end && 0x40<=src[1] && src[1]<=0xfc && src[1]!=0x7f )
 	{
-	  unsigned char tmp[2];
+	  union {
+	    UJ_UINT16 u16_val;
+	    UJ_UINT8  u8_val[2];
+	  } tmp;
 	  if( 0x9f <= src[1] )
 	  {
-	    tmp[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe0 : 0x60);
-	    tmp[1] = src[1] + 2;
+	    tmp.u8_val[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe0 : 0x60);
+	    tmp.u8_val[1] = src[1] + 2;
 	  }else
 	  {
-	    tmp[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe1 : 0x61);
-	    tmp[1] = src[1] + 0x60 + (src[1] < 0x7f);
+	    tmp.u8_val[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe1 : 0x61);
+	    tmp.u8_val[1] = src[1] + 0x60 + (src[1] < 0x7f);
 	  }
-	  SV_Buf_append_ch2(&result,*(unsigned short*)tmp);
+	  SV_Buf_append_ch2(&result, tmp.u16_val);
 	  src += 2;
 	  continue;
 	}
@@ -70,9 +77,13 @@ xs_sjis_eucjp(SV* sv_str)
       }
     case CHK_SJIS_KANA:
       {
-	unsigned char tmp[2] = { 0x8e, 0x00, };
-	tmp[1] = src[0];
-	SV_Buf_append_ch2(&result,*(unsigned short*)tmp);
+	union {
+	  UJ_UINT16 u16_val;
+	  UJ_UINT8  u8_val[2];
+	} tmp;
+	tmp.u8_val[0] = 0x8e;
+	tmp.u8_val[1] = src[0];
+	SV_Buf_append_ch2(&result, tmp.u16_val);
 	++src;
 	continue;
       }
@@ -182,17 +193,20 @@ xs_eucjp_sjis(SV* sv_str)
       {
 	if( src+2-1<src_end && 0xa1<=src[1] && src[1]<=0xfe )
 	{
-	  unsigned char tmp[2];
+	  union {
+	    UJ_UINT16 u16_val;
+	    UJ_UINT8  u8_val[2];
+	  } tmp;
 	  if( src[0]%2 )
 	  {
-	    tmp[0] = (src[0]>>1) + (src[0] < 0xdf ? 0x31 : 0x71);
-	    tmp[1] = src[1] - ( 0x60 + (src[1] < 0xe0) );
+	    tmp.u8_val[0] = (src[0]>>1) + (src[0] < 0xdf ? 0x31 : 0x71);
+	    tmp.u8_val[1] = src[1] - ( 0x60 + (src[1] < 0xe0) );
 	  }else
 	  {
-	    tmp[0] = (src[0]>>1) + (src[0] < 0xdf ? 0x30 : 0x70);
-	    tmp[1] = src[1] - 2;
+	    tmp.u8_val[0] = (src[0]>>1) + (src[0] < 0xdf ? 0x30 : 0x70);
+	    tmp.u8_val[1] = src[1] - 2;
 	  }
-	  SV_Buf_append_ch2(&result,*(unsigned short*)tmp);
+	  SV_Buf_append_ch2(&result, tmp.u16_val);
 	  src += 2;
 	  continue;
 	}

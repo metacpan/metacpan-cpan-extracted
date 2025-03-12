@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.37.7
+## Version v0.38.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/11/01
+## Modified 2024/11/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.37.7';
+    our $VERSION     = 'v0.38.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1632,7 +1632,9 @@ sub new_json
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     $self->_load_class( 'JSON' ) || return( $self->pass_error );
+    # 'allow_tags' is a real trouble-maker
     my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
+    # my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->relaxed;
     # Same as in Module::Generic::File::unload_json()
     my $equi =
     {
@@ -9498,7 +9500,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.37.7
+    v0.38.0
 
 =head1 DESCRIPTION
 
@@ -12213,7 +12215,7 @@ When called in get mode, it will convert any value pre-set, if any, into a versi
     $o->_set_symbol(
         class => 'Foo::Bar',
         variable => '&some_sub_name',
-        value => $an_hash_reference,
+        value => $a_code_reference,
     );
     # or
     $o->_set_symbol(

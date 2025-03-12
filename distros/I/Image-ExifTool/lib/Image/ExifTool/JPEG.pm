@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 sub ProcessOcad($$$);
 sub ProcessJPEG_HDR($$$);
@@ -135,6 +135,10 @@ sub ProcessJPEG_HDR($$$);
         Condition => '$$valPt =~ /^FPXR\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::FlashPix::Main' },
       }, {
+        Name => 'QualcommDualCamera',
+        Condition => '$$valPt =~ /^Qualcomm Dual Camera Attributes/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Qualcomm::DualCamera' },
+      }, {
         Name => 'InfiRayFactory',
         Condition => '$$self{HasIJPEG}"',
         SubDirectory => { TagTable => 'Image::ExifTool::InfiRay::Factory' },
@@ -202,7 +206,7 @@ sub ProcessJPEG_HDR($$$);
         Groups => { 0 => 'APP6', 1 => 'DJI' },
         Notes => 'DJI Thermal Analysis Tool record',
         ValueConv => 'substr($val,7)',
-      # also seen Motorola APP6 "MMIMETA\0", with sub-types: AL3A,ALED,MMI0,MOTD,QC3A
+      # also seen Motorola APP6 "MMIMETA\0", with sub-types: AL3A,ALED,MMI0,MOTD,QC3A,LMB1
     }],
     APP7 => [{
         Name => 'Pentax',
@@ -347,6 +351,16 @@ sub ProcessJPEG_HDR($$$);
         Name => 'Samsung',
         Condition => '$$valPt =~ /QDIOBS$/',
         SubDirectory => { TagTable => 'Image::ExifTool::Samsung::Trailer' },
+      }, {
+        Name => 'Vivo',
+        Condition => '$$valPt =~ /^(streamdata|vivo\{")/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Trailer::Vivo' },
+      }, {
+        Name => 'OnePlus',
+        SubDirectory => { TagTable => 'Image::ExifTool::Trailer::OnePlus' },
+      }, {
+        Name => 'Google',
+        SubDirectory => { TagTable => 'Image::ExifTool::Trailer::Google' },
       }, {
         Name => 'EmbeddedVideo',
         Notes => 'extracted only when ExtractEmbedded option is used',
@@ -791,7 +805,7 @@ segments are included in the Image::ExifTool module itself.
 
 =head1 AUTHOR
 
-Copyright 2003-2024, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2025, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

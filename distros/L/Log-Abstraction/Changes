@@ -1,5 +1,8 @@
 Revision history for Log-Abstraction
 
+0.05
+	Handle being passed a reference to an array
+
 0.04	Mon Mar 10 09:39:46 EDT 2025
 	Renamed from Log-YetAnother to Log-Abstraction
 	Added config_file argument to new()

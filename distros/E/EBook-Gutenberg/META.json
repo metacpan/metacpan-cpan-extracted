@@ -1,0 +1,70 @@
+{
+   "abstract" : "Fetch ebooks from Project Gutenberg",
+   "author" : [
+      "Samuel Young <samyoung12788@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "EBook-Gutenberg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Fetch" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.10",
+            "Getopt::Long" : "0",
+            "JSON::PP" : "0",
+            "List::Util" : "0",
+            "Text::CSV_XS" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.10",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/1-1sam/gutenberg/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/1-1sam/gutenberg.git",
+         "web" : "https://codeberg.org/1-1sam/gutenberg"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

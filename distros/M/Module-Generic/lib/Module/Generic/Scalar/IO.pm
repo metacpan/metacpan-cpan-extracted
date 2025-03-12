@@ -300,9 +300,6 @@ sub truncate
     my $self = CORE::shift( @_ );
     return if( !$self->can_write );
     my $pos = $self->tell;
-    if( $self->debug )
-    {
-    }
     return( CORE::length( CORE::substr( ${*$self->{sr}}, $pos, CORE::length( ${*$self->{sr}} ) - $pos, '' ) ) );
 }
 

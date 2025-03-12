@@ -40,6 +40,7 @@ fmt_files/gpx.fmt
 fmt_files/gpx_wpt.fmt
 fmt_files/kml.fmt
 fmt_files/kml_track.fmt
+html/ET-256.png
 html/ExifTool.html
 html/MIE1.1-20070121.pdf
 html/Shift.html
@@ -136,6 +137,7 @@ html/TagNames/Olympus.html
 html/TagNames/OpenEXR.html
 html/TagNames/Opus.html
 html/TagNames/Other.html
+html/TagNames/PCAP.html
 html/TagNames/PCX.html
 html/TagNames/PDF.html
 html/TagNames/PGF.html
@@ -178,6 +180,7 @@ html/TagNames/Stim.html
 html/TagNames/Text.html
 html/TagNames/Theora.html
 html/TagNames/Torrent.html
+html/TagNames/Trailer.html
 html/TagNames/Unknown.html
 html/TagNames/VCard.html
 html/TagNames/Vorbis.html
@@ -206,9 +209,16 @@ html/htmldump.html
 html/idiosyncracies.html
 html/index.html
 html/install.html
+html/markers.svg
 html/metafiles.html
 html/mistakes.html
 html/overview.png
+html/plot.html
+html/plot1.svg
+html/plot2.svg
+html/plot3.svg
+html/plot4.svg
+html/plot5.svg
 html/standards.html
 html/struct.html
 html/style.css
@@ -345,6 +355,7 @@ lib/Image/ExifTool/Lang/tr.pm
 lib/Image/ExifTool/Lang/zh_cn.pm
 lib/Image/ExifTool/Lang/zh_tw.pm
 lib/Image/ExifTool/Leaf.pm
+lib/Image/ExifTool/LigoGPS.pm
 lib/Image/ExifTool/Lytro.pm
 lib/Image/ExifTool/M2TS.pm
 lib/Image/ExifTool/MIE.pm
@@ -377,6 +388,7 @@ lib/Image/ExifTool/Olympus.pm
 lib/Image/ExifTool/OpenEXR.pm
 lib/Image/ExifTool/Opus.pm
 lib/Image/ExifTool/Other.pm
+lib/Image/ExifTool/PCAP.pm
 lib/Image/ExifTool/PCX.pm
 lib/Image/ExifTool/PDF.pm
 lib/Image/ExifTool/PGF.pm
@@ -395,6 +407,7 @@ lib/Image/ExifTool/PhaseOne.pm
 lib/Image/ExifTool/PhotoCD.pm
 lib/Image/ExifTool/PhotoMechanic.pm
 lib/Image/ExifTool/Photoshop.pm
+lib/Image/ExifTool/Plot.pm
 lib/Image/ExifTool/PostScript.pm
 lib/Image/ExifTool/PrintIM.pm
 lib/Image/ExifTool/Protobuf.pm
@@ -427,6 +440,7 @@ lib/Image/ExifTool/TagNames.pod
 lib/Image/ExifTool/Text.pm
 lib/Image/ExifTool/Theora.pm
 lib/Image/ExifTool/Torrent.pm
+lib/Image/ExifTool/Trailer.pm
 lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/VCard.pm
 lib/Image/ExifTool/Validate.pm
@@ -746,6 +760,8 @@ t/OpenEXR.t
 t/OpenEXR_2.out
 t/Opus.t
 t/Opus_2.out
+t/PCAP.t
+t/PCAP_2.out
 t/PCX.t
 t/PCX_2.out
 t/PDF.t
@@ -825,7 +841,12 @@ t/QuickTime_14.out
 t/QuickTime_15.out
 t/QuickTime_16.out
 t/QuickTime_17.out
+t/QuickTime_18.out
+t/QuickTime_19.out
 t/QuickTime_2.out
+t/QuickTime_20.out
+t/QuickTime_21.out
+t/QuickTime_22.out
 t/QuickTime_3.out
 t/QuickTime_4.out
 t/QuickTime_5.out
@@ -1114,6 +1135,7 @@ t/images/OlympusE1.jpg
 t/images/OpenDoc.ods
 t/images/OpenEXR.exr
 t/images/Opus.opus
+t/images/PCAP.pcapng
 t/images/PCX.pcx
 t/images/PDF.pdf
 t/images/PDF2.pdf

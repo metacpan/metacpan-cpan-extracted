@@ -136,7 +136,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250214';
+    $VERSION = '20250311';
 } ## end BEGIN
 
 {
@@ -510,6 +510,45 @@ sub get_iteration_count {
     return $rstatus->{iteration_count};
 }
 
+my %is_known_markup_word;
+
+BEGIN {
+    my @q = qw( ?xml !doctype !-- html meta );
+    @is_known_markup_word{@q} = (1) x scalar(@q);
+}
+
+sub is_not_perl {
+
+    my ( $rinput_string, $input_file, $is_named_file ) = @_;
+
+    # Given:
+    #  $rinput_string = ref to the string of text being processed
+    #  $input_file    = the name of the input stream
+    #  $is_named_file = true if $input_file is a named file
+    # Return:
+    #  true if this is clearly not a perl script
+    #  false otherwise
+    # Note:
+    #  This sub is called when the first character of a file is '<' in order
+    #  to catch the obvious cases of some kind of markup language.
+    #  See also some related code in 'find_angle_operator_termination which
+    #  will catch some markup syntax which gets past this preliminary check.
+
+    my $text;
+    if ( ${$rinput_string} =~ m/\s*\<\s*([\?\!]?[\-\w]+)/ ) { $text = $1 }
+    else                                                    { return }
+
+    return 1 if ( $is_known_markup_word{ lc($text) } );
+
+    # require a named file with known extension for other markup words
+    return if ( !$is_named_file );
+
+    # check filename
+    return 1 if ( $input_file =~ /html?$/i );
+
+    return;
+} ## end sub is_not_perl
+
 BEGIN {
 
     # Array index names for $self.
@@ -565,7 +604,6 @@ sub perltidy {
         dump_options_type     => undef,
         dump_getopt_flags     => undef,
         dump_options_category => undef,
-        dump_options_range    => undef,
         dump_abbreviations    => undef,
         prefilter             => undef,
         postfilter            => undef,
@@ -750,7 +788,6 @@ EOM
     my $dump_getopt_flags     = $get_hash_ref->('dump_getopt_flags');
     my $dump_options_category = $get_hash_ref->('dump_options_category');
     my $dump_abbreviations    = $get_hash_ref->('dump_abbreviations');
-    my $dump_options_range    = $get_hash_ref->('dump_options_range');
 
     # validate dump_options_type
     if ( defined($dump_options) ) {
@@ -852,7 +889,7 @@ EOM
     # get command line options
     #-------------------------
     my ( $rOpts, $config_file, $rraw_options, $roption_string,
-        $rexpansion, $roption_category, $roption_range, $rinteger_option_range )
+        $rexpansion, $roption_category, $rinteger_option_range )
       = process_command_line(
         $perltidyrc_stream,  $is_Windows, $Windows_type,
         $rpending_complaint, $dump_options_type,
@@ -899,11 +936,6 @@ EOM
         %{$dump_options_category} = %{$roption_category};
     }
 
-    if ( defined($dump_options_range) ) {
-        $quit_now = 1;
-        %{$dump_options_range} = %{$roption_range};
-    }
-
     if ( defined($dump_abbreviations) ) {
         $quit_now = 1;
         %{$dump_abbreviations} = %{$rexpansion};
@@ -938,9 +970,12 @@ EOM
         dump-mismatched-args
         dump-mismatched-returns
         dump-unique-keys
+        dump-hash-keys
+        dump-similar-keys
         )
       )
     {
+
         if ( $rOpts->{$opt_name} ) {
             $self->[_dump_to_stdout_] = 1;
             if ( $num_files != 1 ) {
@@ -1079,7 +1114,7 @@ EOM
 
         # No special treatment for source stream which is a filename.
         # This will enable checks for binary files and other bad stuff.
-        $source_stream = undef unless ref($source_stream);
+        $source_stream = undef unless ( ref($source_stream) );
     }
 
     # use stdin by default if no source array and no args
@@ -1165,8 +1200,9 @@ EOM
     #--------------------------
     $self->process_all_files(
         {
-            rinput_hash => \%input_hash,
-            rfiles      => \@Arg_files,
+            rinput_hash        => \%input_hash,
+            rfiles             => \@Arg_files,
+            line_range_clipped => $line_range_clipped,
 
             # filename stuff...
             source_stream             => $source_stream,
@@ -1223,14 +1259,14 @@ sub make_file_extension {
     # Return:
     #  $extension = the actual file extension
 
-    $extension = EMPTY_STRING unless defined($extension);
+    $extension = EMPTY_STRING unless ( defined($extension) );
     $extension =~ s/^\s+//;
     $extension =~ s/\s+$//;
 
     # Use default extension if nothing remains of the first choice
     if ( length($extension) == 0 ) {
         $extension = $default;
-        $extension = EMPTY_STRING unless defined($extension);
+        $extension = EMPTY_STRING unless ( defined($extension) );
         $extension =~ s/^\s+//;
         $extension =~ s/\s+$//;
     }
@@ -1652,7 +1688,7 @@ sub set_output_file_permissions {
     if ( !chmod( $output_file_permissions, $output_file ) ) {
 
         # couldn't change file permissions
-        my $operm = sprintf "%04o", $output_file_permissions;
+        my $operm = sprintf( "%04o", $output_file_permissions );
         Warn(
 "Unable to set permissions for output file '$output_file' to $operm\n"
         );
@@ -1924,7 +1960,7 @@ sub get_line_separator_default {
             unix => $LF,
         );
 
-        $line_separator_default = $endings{ lc $ole };
+        $line_separator_default = $endings{ lc($ole) };
 
         if ( !$line_separator_default ) {
             my $str = join SPACE, keys %endings;
@@ -2051,6 +2087,7 @@ sub process_all_files {
 
     my $rinput_hash               = $rcall_hash->{rinput_hash};
     my $rfiles                    = $rcall_hash->{rfiles};
+    my $line_range_clipped        = $rcall_hash->{line_range_clipped};
     my $source_stream             = $rcall_hash->{source_stream};
     my $output_extension          = $rcall_hash->{output_extension};
     my $forbidden_file_extensions = $rcall_hash->{forbidden_file_extensions};
@@ -2218,9 +2255,23 @@ EOM
         # Skip this file on any error
         next if ( !defined($rinput_string) );
 
+        # If we are formatting a named file, skip if it looks like a markup
+        # language.  Do not do this for a non-named file (it could be a glob
+        # from an editor).
+        # Examples of valid perl starting text: '<<END' '<>' '<<>>'
+        if ( ${$rinput_string} =~ /^\s*<[^<>]/ ) {
+            my $is_named_file = $number_of_files > 0 && !$line_range_clipped;
+            if ( is_not_perl( $rinput_string, $input_file, $is_named_file ) ) {
+                Warn(
+                    "skipping file: $input_file: does not look like Perl code\n"
+                );
+                next;
+            }
+        }
+
         # Register this file name with the Diagnostics package, if any.
         $diagnostics_object->set_input_file($input_file)
-          if $diagnostics_object;
+          if ($diagnostics_object);
 
         # The (possibly decoded) input is now in string ref $rinput_string.
         # Now prepare the output stream and error logger.
@@ -2345,7 +2396,7 @@ EOM
         );
         $logger_object->write_logfile_entry($logfile_header);
         $logger_object->write_logfile_entry($encoding_log_message)
-          if $encoding_log_message;
+          if ($encoding_log_message);
 
         # Now we can add any pending messages to the log
         if ( ${$rpending_logfile_message} ) {
@@ -2393,7 +2444,7 @@ EOM
         }
 
         $logger_object->finish()
-          if $logger_object;
+          if ($logger_object);
     } ## end loop over files
 
     return;
@@ -2986,7 +3037,7 @@ EOM
                           && print {*STDERR} $convergence_log_message;
                         $diagnostics_object->write_diagnostics(
                             $convergence_log_message)
-                          if $diagnostics_object;
+                          if ($diagnostics_object);
 
 # Uncomment to search for blinking states
 # Warn( "$display_name: blinking; iter $iter same as for $saw_md5{$digest}\n" );
@@ -2998,7 +3049,7 @@ Converged.  Output for iteration $iter same as for iter $iterm.
 EOM
                         $diagnostics_object->write_diagnostics(
                             $convergence_log_message)
-                          if $diagnostics_object && $iterm > 2;
+                          if ( $diagnostics_object && $iterm > 2 );
                         $rstatus->{'converged'} = 1;
                     }
                 }
@@ -3024,7 +3075,8 @@ EOM
                         # was not detected by the Formatter.  This is not
                         # critical but should be investigated.  It happened
                         # once when a line break was placed before a phantom
-                        # comma under -qwaf, and has been fixed.
+                        # comma under -qwaf, and a semicolon under -nasc,
+                        # and has been fixed (search for 'STRANGE').
                         print {*STDERR}
 "STRANGE no conv in $display_name: stopping on it=$iter, but not converged in formatter\n";
                     }
@@ -3040,7 +3092,7 @@ EOM
     } ## end loop over iterations for one source file
 
     $debugger_object->close_debug_file()
-      if $debugger_object;
+      if ($debugger_object);
 
     if (   $fh_tee
         && $fh_tee->can('close')
@@ -3054,7 +3106,7 @@ EOM
     # leave logger object open for additional messages
     $logger_object = $logger_object_final;
     $logger_object->write_logfile_entry($convergence_log_message)
-      if $convergence_log_message;
+      if ($convergence_log_message);
 
     return $routput_string;
 
@@ -3411,7 +3463,7 @@ sub generate_options {
     #  @defaults - the list of default options
     #  %expansion - a hash showing how all abbreviations are expanded
     #  %category - a hash giving the general category of each option
-    #  %option_range - a hash giving the valid ranges of certain options
+    #  %integer_option_range - valid ranges of certain options
 
     # Note: a few options are not documented in the man page and usage
     # message. This is because these are deprecated, experimental or debug
@@ -3444,7 +3496,6 @@ sub generate_options {
     my @option_string   = ();
     my %expansion       = ();
     my %option_category = ();
-    my %option_range    = ();
     my %integer_option_range;
 
     # names of categories in manual
@@ -3836,6 +3887,7 @@ sub generate_options {
     $add_option->( 'warn-mismatched-returns',               'wmr',   '!' );
     $add_option->( 'warn-mismatched-return-types',          'wmrt',  '=s' );
     $add_option->( 'warn-mismatched-return-exclusion-list', 'wmrxl', '=s' );
+    $add_option->( 'warn-similar-keys',                     'wsk',   '!' );
 
     $add_option->( 'add-interbracket-arrows',       'aia', '!' );
     $add_option->( 'delete-interbracket-arrows',    'dia', '!' );
@@ -3852,6 +3904,7 @@ sub generate_options {
     $add_option->( 'dump-block-types',                'dbt',   '=s' );
     $add_option->( 'dump-cuddled-block-list',         'dcbl',  '!' );
     $add_option->( 'dump-defaults',                   'ddf',   '!' );
+    $add_option->( 'dump-hash-keys',                  'dhk',   '!' );
     $add_option->( 'dump-integer-option-range',       'dior',  '!' );
     $add_option->( 'dump-long-names',                 'dln',   '!' );
     $add_option->( 'dump-mismatched-args',            'dma',   '!' );
@@ -3860,6 +3913,7 @@ sub generate_options {
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
     $add_option->( 'dump-short-names',                'dsn',   '!' );
+    $add_option->( 'dump-similar-keys',               'dsk',   '!' );
     $add_option->( 'dump-token-types',                'dtt',   '!' );
     $add_option->( 'dump-unusual-variables',          'duv',   '!' );
     $add_option->( 'dump-unique-keys',                'duk',   '!' );
@@ -3877,6 +3931,10 @@ sub generate_options {
     $add_option->( 'maximum-level-errors',            'maxle', '=i' );
     $add_option->( 'maximum-unexpected-errors',       'maxue', '=i' );
     $add_option->( 'integer-range-check',             'irc',   '=i' );
+
+    $add_option->( 'similar-keys-maximum-difference', 'skmd', '=i' );
+    $add_option->( 'similar-keys-minimum-length',     'skml', '=i' );
+    $add_option->( 'similar-keys-maximum-pairs',      'skmp', '=i' );
 
     #---------------------------------------------------------------------
 
@@ -3905,11 +3963,14 @@ sub generate_options {
         }
     }
 
-    #------------------------------------------------------------------
-    # DEFAULTS: Assign default values to the above options here, except
-    # for 'outfile' and 'help'.
-    # These settings should approximate the perlstyle(1) suggestions.
-    #------------------------------------------------------------------
+    #----------------------------------------------------------------------
+    # NON-INTEGER DEFAULTS: Assign default values to the above options here
+    # except for integers, 'outfile' and 'help'
+    # NOTES:
+    # - Enter integer options in %integer_option_range, NOT HERE
+    # - 'keyword-group-blanks-size=5' is ok here: the arg is a string
+    # - These settings should approximate the perlstyle(1) suggestions.
+    #----------------------------------------------------------------------
     my @defaults = qw(
       add-lone-trailing-commas
       add-newlines
@@ -3918,51 +3979,23 @@ sub generate_options {
       add-whitespace
       blanks-before-blocks
       blanks-before-comments
-      blank-lines-before-subs=1
-      blank-lines-before-packages=1
 
       keyword-group-blanks-size=5
-      keyword-group-blanks-repeat-count=0
-      keyword-group-blanks-before=1
-      keyword-group-blanks-after=1
       nokeyword-group-blanks-inside
       nokeyword-group-blanks-delete
 
-      block-brace-tightness=0
-      block-brace-vertical-tightness=0
-      brace-follower-vertical-tightness=1
-      brace-tightness=1
-      brace-vertical-tightness-closing=0
-      brace-vertical-tightness=0
-      break-after-labels=0
       break-at-old-logical-breakpoints
       break-at-old-ternary-breakpoints
       break-at-old-attribute-breakpoints
       break-at-old-keyword-breakpoints
-      break-before-hash-brace=0
-      break-before-hash-brace-and-indent=0
-      break-before-square-bracket=0
-      break-before-square-bracket-and-indent=0
-      break-before-paren=0
-      break-before-paren-and-indent=0
-      comma-arrow-breakpoints=5
       nocheck-syntax
       character-encoding=guess
-      closing-side-comment-interval=6
-      closing-side-comment-maximum-text=20
-      closing-side-comment-else-flag=0
       closing-side-comments-balanced
-      closing-paren-indentation=0
-      closing-brace-indentation=0
-      closing-square-bracket-indentation=0
-      continuation-indentation=2
       noextended-continuation-indentation
-      cuddled-break-option=1
       delete-old-newlines
       delete-repeated-commas
       delete-lone-trailing-commas
       delete-semicolons
-      dump-block-minimum-lines=20
       dump-block-types=sub
       extended-syntax
       encode-output-strings
@@ -3971,28 +4004,11 @@ sub generate_options {
       fuzzy-line-length
       hanging-side-comments
       indent-block-comments
-      indent-columns=4
       indent-leading-semicolon
-      integer-range-check=2
-      interbracket-arrow-complexity=1
-      iterations=1
-      keep-old-blank-lines=1
-      keyword-paren-inner-tightness=1
       logical-padding
-      long-block-line-count=8
       look-for-autoloader
       look-for-selfloader
-      maximum-consecutive-blank-lines=1
-      maximum-fields-per-table=0
-      maximum-line-length=80
-      maximum-file-size-mb=10
-      maximum-level-errors=1
-      maximum-unexpected-errors=0
       memoize
-      minimum-space-to-comment=4
-      warn-mismatched-arg-undercount-cutoff=4
-      warn-mismatched-arg-overcount-cutoff=1
-      warn-unique-keys-cutoff=1
       nobrace-left-and-indent
       nocuddled-else
       nodelete-old-whitespace
@@ -4004,14 +4020,9 @@ sub generate_options {
       nostatic-side-comments
       notabs
       nowarning-output
-      one-line-block-semicolons=1
-      one-line-block-nesting=0
       outdent-labels
       outdent-long-quotes
       outdent-long-comments
-      paren-tightness=1
-      paren-vertical-tightness-closing=0
-      paren-vertical-tightness=0
       pass-version-line
       noweld-nested-containers
       recombine
@@ -4020,15 +4031,7 @@ sub generate_options {
       valign-block-comments
       valign-side-comments
       valign-signed-numbers
-      valign-signed-numbers-limit=20
-      short-concatenation-item-length=8
       space-for-semicolon
-      space-backslash-quote=1
-      space-prototype-paren=1
-      space-signature-paren=1
-      square-bracket-tightness=1
-      square-bracket-vertical-tightness-closing=0
-      square-bracket-vertical-tightness=0
       static-block-comments
       timestamp
       trim-qw
@@ -4037,172 +4040,100 @@ sub generate_options {
       backup-file-extension=bak
       code-skipping
       format-skipping
-      default-tabsize=8
-      timeout-in-seconds=10
-
-      whitespace-cycle=0
-      entab-leading-whitespace=0
-      blank-lines-before-closing-block=0
-      blank-lines-after-opening-block=0
 
       pod2html
       html-table-of-contents
       html-entities
     );
 
-    #---------------------------------------
-    # Assign valid ranges to certain options
-    #---------------------------------------
-    # In the future, these may be used to make preliminary checks
-    # hash keys are long names
-    # If key or value is undefined:
-    #   strings may have any value
-    #   integer ranges are >=0
-    # If value is defined:
-    #   value is [qw(any valid words)] for strings
-    #   value is [min, max] for integers
-    #   if min is undefined, there is no lower limit
-    #   if max is undefined, there is no upper limit
-    # Parameters not listed here have defaults
-    %option_range = (
-        'format'                        => [ 'tidy', 'html', 'user' ],
-        'output-line-ending'            => [ 'dos',  'win',  'mac', 'unix' ],
-        'space-backslash-quote'         => [ 0,      2 ],
-        'block-brace-tightness'         => [ 0,      2 ],
-        'keyword-paren-inner-tightness' => [ 0,      2 ],
-        'brace-tightness'               => [ 0,      2 ],
-        'paren-tightness'               => [ 0,      2 ],
-        'square-bracket-tightness'      => [ 0,      2 ],
+    # Ranges and defaults of all integer options (type '=i').
+    # NOTES:
+    # 1. All integer options must be in this table, not in @defaults
+    # 2. 'closing-token-indentation' (cti), 'vertical-tightness' (vt),
+    #   and 'vertical-tightness-closing' (vtc) are aliases which are included
+    #   to work around an old problem with msdos (see note in check_options).
+    # 3. Use -dior to dump this table.
 
-        'block-brace-vertical-tightness'            => [ 0, 2 ],
-        'brace-follower-vertical-tightness'         => [ 0, 2 ],
-        'brace-vertical-tightness'                  => [ 0, 2 ],
-        'brace-vertical-tightness-closing'          => [ 0, 3 ],
-        'paren-vertical-tightness'                  => [ 0, 2 ],
-        'paren-vertical-tightness-closing'          => [ 0, 3 ],
-        'square-bracket-vertical-tightness'         => [ 0, 2 ],
-        'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
-        'vertical-tightness'                        => [ 0, 2 ],
-        'vertical-tightness-closing'                => [ 0, 3 ],
-
-        'closing-brace-indentation'          => [ 0, 3 ],
-        'closing-paren-indentation'          => [ 0, 3 ],
-        'closing-square-bracket-indentation' => [ 0, 3 ],
-        'closing-token-indentation'          => [ 0, 3 ],
-
-        'closing-side-comment-else-flag' => [ 0, 2 ],
-        'comma-arrow-breakpoints'        => [ 0, 5 ],
-
-        'keyword-group-blanks-before' => [ 0, 2 ],
-        'keyword-group-blanks-after'  => [ 0, 2 ],
-
-        'space-prototype-paren' => [ 0, 2 ],
-        'space-signature-paren' => [ 0, 2 ],
-        'break-after-labels'    => [ 0, 2 ],
-    );
-
-    # Valid [min,max] ranges of all integer options (type '=i').  This hash is
-    # replacing %option_range, above, for use by sub 'check_options'
+    # 'option-name' => [min, max, default]
     %integer_option_range = (
-        'blank-lines-after-opening-block'           => [ 0, undef ],
-        'blank-lines-before-closing-block'          => [ 0, undef ],
-        'blank-lines-before-packages'               => [ 0, undef ],
-        'blank-lines-before-subs'                   => [ 0, undef ],
-        'block-brace-tightness'                     => [ 0, 2 ],
-        'block-brace-vertical-tightness'            => [ 0, 2 ],
-        'brace-follower-vertical-tightness'         => [ 0, 2 ],
-        'brace-tightness'                           => [ 0, 2 ],
-        'brace-vertical-tightness'                  => [ 0, 2 ],
-        'brace-vertical-tightness-closing'          => [ 0, 3 ],
-        'break-after-labels'                        => [ 0, 2 ],
-        'break-before-hash-brace'                   => [ 0, 3 ],
-        'break-before-hash-brace-and-indent'        => [ 0, 2 ],
-        'break-before-paren'                        => [ 0, 3 ],
-        'break-before-paren-and-indent'             => [ 0, 2 ],
-        'break-before-square-bracket'               => [ 0, 3 ],
-        'break-before-square-bracket-and-indent'    => [ 0, 2 ],
-        'closing-brace-indentation'                 => [ 0, 3 ],
-        'closing-paren-indentation'                 => [ 0, 3 ],
-        'closing-side-comment-else-flag'            => [ 0, 2 ],
-        'closing-side-comment-interval'             => [ 0, undef ],
-        'closing-side-comment-maximum-text'         => [ 0, undef ],
-        'closing-square-bracket-indentation'        => [ 0, 3 ],
-        'closing-token-indentation'                 => [ 0, 3 ],
-        'comma-arrow-breakpoints'                   => [ 0, 5 ],
-        'continuation-indentation'                  => [ 0, undef ],
-        'cuddled-break-option'                      => [ 0, 2 ],
-        'default-tabsize'                           => [ 0, undef ],
-        'dump-block-minimum-lines'                  => [ 0, undef ],
-        'entab-leading-whitespace'                  => [ 0, undef ],
-        'fixed-position-side-comment'               => [ 0, undef ],
-        'indent-columns'                            => [ 0, undef ],
-        'interbracket-arrow-complexity'             => [ 0, 2 ],
-        'integer-range-check'                       => [ 0, 3 ],
-        'iterations'                                => [ 0, undef ],
-        'keep-old-blank-lines'                      => [ 0, 2 ],
-        'keyword-group-blanks-after'                => [ 0, 2 ],
-        'keyword-group-blanks-before'               => [ 0, 2 ],
-        'keyword-group-blanks-repeat-count'         => [ 0, undef ],
-        'keyword-paren-inner-tightness'             => [ 0, 2 ],
-        'long-block-line-count'                     => [ 0, undef ],
-        'maximum-consecutive-blank-lines'           => [ 0, undef ],
-        'maximum-fields-per-table'                  => [ 0, undef ],
-        'maximum-file-size-mb'                      => [ 0, undef ],
-        'maximum-level-errors'                      => [ 0, undef ],
-        'maximum-line-length'                       => [ 0, undef ],
-        'maximum-unexpected-errors'                 => [ 0, undef ],
-        'minimum-space-to-comment'                  => [ 0, undef ],
-        'warn-mismatched-arg-undercount-cutoff'     => [ 0, undef ],
-        'warn-mismatched-arg-overcount-cutoff'      => [ 0, undef ],
-        'one-line-block-nesting'                    => [ 0, 1 ],
-        'one-line-block-semicolons'                 => [ 0, 2 ],
-        'paren-tightness'                           => [ 0, 2 ],
-        'paren-vertical-tightness'                  => [ 0, 2 ],
-        'paren-vertical-tightness-closing'          => [ 0, 3 ],
-        'short-concatenation-item-length'           => [ 0, undef ],
-        'space-backslash-quote'                     => [ 0, 2 ],
-        'space-prototype-paren'                     => [ 0, 2 ],
-        'space-signature-paren'                     => [ 0, 2 ],
-        'square-bracket-tightness'                  => [ 0, 2 ],
-        'square-bracket-vertical-tightness'         => [ 0, 2 ],
-        'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
-        'starting-indentation-level'                => [ 0, undef ],
-        'timeout-in-seconds'                        => [ 0, undef ],
-        'valign-signed-numbers-limit'               => [ 0, undef ],
-        'vertical-tightness'                        => [ 0, 2 ],
-        'vertical-tightness-closing'                => [ 0, 3 ],
-        'warn-unique-keys-cutoff'                   => [ 1, undef ],
-        'whitespace-cycle'                          => [ 0, undef ],
+        'blank-lines-after-opening-block'           => [ 0, undef, 0 ],
+        'blank-lines-before-closing-block'          => [ 0, undef, 0 ],
+        'blank-lines-before-packages'               => [ 0, undef, 1 ],
+        'blank-lines-before-subs'                   => [ 0, undef, 1 ],
+        'block-brace-tightness'                     => [ 0, 2,     0 ],
+        'block-brace-vertical-tightness'            => [ 0, 2,     0 ],
+        'brace-follower-vertical-tightness'         => [ 0, 2,     1 ],
+        'brace-tightness'                           => [ 0, 2,     1 ],
+        'brace-vertical-tightness'                  => [ 0, 2,     0 ],
+        'brace-vertical-tightness-closing'          => [ 0, 3,     0 ],
+        'break-after-labels'                        => [ 0, 2,     0 ],
+        'break-before-hash-brace'                   => [ 0, 3,     0 ],
+        'break-before-hash-brace-and-indent'        => [ 0, 2,     0 ],
+        'break-before-paren'                        => [ 0, 3,     0 ],
+        'break-before-paren-and-indent'             => [ 0, 2,     0 ],
+        'break-before-square-bracket'               => [ 0, 3,     0 ],
+        'break-before-square-bracket-and-indent'    => [ 0, 2,     0 ],
+        'closing-brace-indentation'                 => [ 0, 3,     0 ],
+        'closing-paren-indentation'                 => [ 0, 3,     0 ],
+        'closing-side-comment-else-flag'            => [ 0, 2,     0 ],
+        'closing-side-comment-interval'             => [ 0, undef, 6 ],
+        'closing-side-comment-maximum-text'         => [ 0, undef, 20 ],
+        'closing-square-bracket-indentation'        => [ 0, 3,     0 ],
+        'closing-token-indentation'                 => [ 0, 3,     undef ],
+        'comma-arrow-breakpoints'                   => [ 0, 5,     5 ],
+        'continuation-indentation'                  => [ 0, undef, 2 ],
+        'cuddled-break-option'                      => [ 0, 2,     1 ],
+        'default-tabsize'                           => [ 0, undef, 8 ],
+        'dump-block-minimum-lines'                  => [ 0, undef, 20 ],
+        'entab-leading-whitespace'                  => [ 0, undef, 0 ],
+        'fixed-position-side-comment'               => [ 0, undef, undef ],
+        'indent-columns'                            => [ 0, undef, 4 ],
+        'integer-range-check'                       => [ 0, 3,     2 ],
+        'interbracket-arrow-complexity'             => [ 0, 2,     1 ],
+        'iterations'                                => [ 0, undef, 1 ],
+        'keep-old-blank-lines'                      => [ 0, 2,     1 ],
+        'keyword-group-blanks-after'                => [ 0, 2,     1 ],
+        'keyword-group-blanks-before'               => [ 0, 2,     1 ],
+        'keyword-group-blanks-repeat-count'         => [ 0, undef, 0 ],
+        'keyword-paren-inner-tightness'             => [ 0, 2,     1 ],
+        'long-block-line-count'                     => [ 0, undef, 8 ],
+        'maximum-consecutive-blank-lines'           => [ 0, undef, 1 ],
+        'maximum-fields-per-table'                  => [ 0, undef, 0 ],
+        'maximum-file-size-mb'                      => [ 0, undef, 10 ],
+        'maximum-level-errors'                      => [ 0, undef, 1 ],
+        'maximum-line-length'                       => [ 0, undef, 80 ],
+        'maximum-unexpected-errors'                 => [ 0, undef, 0 ],
+        'minimum-space-to-comment'                  => [ 0, undef, 4 ],
+        'one-line-block-nesting'                    => [ 0, 1,     0 ],
+        'one-line-block-semicolons'                 => [ 0, 2,     1 ],
+        'paren-tightness'                           => [ 0, 2,     1 ],
+        'paren-vertical-tightness'                  => [ 0, 2,     0 ],
+        'paren-vertical-tightness-closing'          => [ 0, 3,     0 ],
+        'short-concatenation-item-length'           => [ 0, undef, 8 ],
+        'similar-keys-maximum-difference'           => [ 1, undef, 1 ],
+        'similar-keys-maximum-pairs'                => [ 1, undef, 25 ],
+        'similar-keys-minimum-length'               => [ 1, undef, 4 ],
+        'space-backslash-quote'                     => [ 0, 2,     1 ],
+        'space-prototype-paren'                     => [ 0, 2,     1 ],
+        'space-signature-paren'                     => [ 0, 2,     1 ],
+        'square-bracket-tightness'                  => [ 0, 2,     1 ],
+        'square-bracket-vertical-tightness'         => [ 0, 2,     0 ],
+        'square-bracket-vertical-tightness-closing' => [ 0, 3,     0 ],
+        'starting-indentation-level'                => [ 0, undef, undef ],
+        'timeout-in-seconds'                        => [ 0, undef, 10 ],
+        'valign-signed-numbers-limit'               => [ 0, undef, 20 ],
+        'vertical-tightness'                        => [ 0, 2,     undef ],
+        'vertical-tightness-closing'                => [ 0, 3,     undef ],
+        'warn-mismatched-arg-overcount-cutoff'      => [ 0, undef, 1 ],
+        'warn-mismatched-arg-undercount-cutoff'     => [ 0, undef, 4 ],
+        'warn-unique-keys-cutoff'                   => [ 1, undef, 1 ],
+        'whitespace-cycle'                          => [ 0, undef, 0 ],
     );
 
-    # Enter default values into the integer option range table
-    foreach my $opt (@defaults) {
-        if ( $opt =~ /^(.*)=(\d+)$/ ) {
-            my $key = $1;
-            my $def = $2;
-            if ( defined( $integer_option_range{$key} ) ) {
-                $integer_option_range{$key}->[2] = $def;
-            }
-        }
-    }
-
-    # Enter special values which have undef as the default.
-    # Note that cti, vt, and vtc are aliases which are included to work
-    # around an old problem with msdos (see note in check_options).
-    foreach my $key (
-        qw(
-        closing-token-indentation
-        vertical-tightness
-        vertical-tightness-closing
-        fixed-position-side-comment
-        starting-indentation-level
-        )
-      )
-    {
-        if ( defined( $integer_option_range{$key} )
-            && @{ $integer_option_range{$key} } < 3 )
-        {
-            $integer_option_range{$key}->[2] = undef;
+    foreach my $key ( keys %integer_option_range ) {
+        my $val = $integer_option_range{$key}->[2];
+        if ( defined($val) ) {
+            push @defaults, "$key=$val";
         }
     }
 
@@ -4481,7 +4412,7 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
     # Uncomment next line to dump all expansions for debugging:
     # dump_short_names(\%expansion);
     return ( \@option_string, \@defaults, \%expansion, \%option_category,
-        \%option_range, \%integer_option_range );
+        \%integer_option_range );
 
 } ## end sub generate_options
 
@@ -4515,7 +4446,7 @@ sub process_command_line {
         else {
             my @retvals = _process_command_line(@q);
             $process_command_line_cache{$cache_key} = [ \@ARGV, @retvals ]
-              if $retvals[0]->{'memoize'};
+              if ( $retvals[0]->{'memoize'} );
             return @retvals;
         }
     }
@@ -4551,7 +4482,7 @@ sub _process_command_line {
     else { $glc = undef }
 
     my ( $roption_string, $rdefaults, $rexpansion,
-        $roption_category, $roption_range, $rinteger_option_range )
+        $roption_category, $rinteger_option_range )
       = generate_options();
 
     #--------------------------------------------------------------
@@ -4606,7 +4537,7 @@ sub _process_command_line {
                 if ( my ( $start_dir, $search_file ) =
                     ( $config_file =~ m{^(.*)\.\.\./(.*)$} ) )
                 {
-                    $start_dir = '.' if !$start_dir;
+                    $start_dir = '.' if ( !$start_dir );
                     $start_dir = Cwd::realpath($start_dir);
                     my $found_file =
                       find_file_upwards( $start_dir, $search_file );
@@ -4850,8 +4781,7 @@ EOM
     }
 
     return ( \%Opts, $config_file, \@raw_options, $roption_string,
-        $rexpansion, $roption_category, $roption_range,
-        $rinteger_option_range );
+        $rexpansion, $roption_category, $rinteger_option_range );
 } ## end sub _process_command_line
 
 sub make_grep_alias_string {
@@ -5005,7 +4935,7 @@ EOM
         my $Error_message;
         foreach my $opt ( keys %{$rinteger_option_range} ) {
             my $range = $rinteger_option_range->{$opt};
-            next unless defined($range);
+            next unless ( defined($range) );
             my ( $min, $max, $default ) = @{$range};
 
             my $val = $rOpts->{$opt};
@@ -5331,7 +5261,7 @@ sub expand_command_abbreviations {
                     # stuff all of the words that it expands to into the
                     # new arg list for the next pass
                     foreach my $abbrev ( @{ $rexpansion->{$abr} } ) {
-                        next unless $abbrev;    # for safety; shouldn't happen
+                        next unless ($abbrev);    # for safety; shouldn't happen
                         push( @new_argv, '--' . $abbrev . $flags );
                     }
                 }
@@ -5421,7 +5351,7 @@ sub check_vms_filename {
     # remove explicit ; version
     $base =~ s/;-?\d*$//
 
-      # remove explicit . version ie two dots in filename NB ^ escapes a dot
+      # remove explicit . version, i.e. two dots in filename NB ^ escapes a dot
       or $base =~ s{(          # begin capture $1
                   (?:^|[^^])\. # match a dot not preceded by a caret
                   (?:          # followed by nothing
@@ -5478,9 +5408,9 @@ sub Win_OS_Type {
     #    Windows XP             2      5       1
     #    Windows Server 2003    2      5       2
 
-    return "win32s" unless $id;    # If id==0 then its a win32s box.
-    $os = {                        # Magic numbers from MSDN
-                                   # documentation of GetOSVersion
+    return "win32s" unless ($id);    # If id==0 then its a win32s box.
+    $os = {                          # Magic numbers from MSDN
+                                     # documentation of GetOSVersion
         1 => {
             0  => "95",
             10 => "98",
@@ -5520,7 +5450,7 @@ sub look_for_Windows {
     my $rpending_complaint = shift;
     my $is_Windows         = ( $OSNAME =~ /win32|dos/i );
     my $Windows_type;
-    $Windows_type = Win_OS_Type($rpending_complaint) if $is_Windows;
+    $Windows_type = Win_OS_Type($rpending_complaint) if ($is_Windows);
     return ( $is_Windows, $Windows_type );
 } ## end sub look_for_Windows
 
@@ -5543,7 +5473,7 @@ sub find_config_file {
     # sub to check file existence and record all tests
     my $exists_config_file = sub {
         my $config_file = shift;
-        return 0 unless defined($config_file);
+        return 0 unless ( defined($config_file) );
         ${$rconfig_file_chatter} .= "# Testing: $config_file\n";
         return -f $config_file;
     }; ## end $exists_config_file = sub
@@ -5559,7 +5489,7 @@ sub find_config_file {
             {
                 ${$rconfig_file_chatter} .=
                   "# Searching Upward: $config_file\n";
-                $start_dir = '.' if !$start_dir;
+                $start_dir = '.' if ( !$start_dir );
                 $start_dir = Cwd::realpath($start_dir);
                 my $found_file = find_file_upwards( $start_dir, $search_file );
                 if ( defined($found_file) ) {
@@ -5575,10 +5505,10 @@ sub find_config_file {
 
     # look in current directory first
     $config_file = ".perltidyrc";
-    return $config_file if $exists_config_file->($config_file);
+    return $config_file if ( $exists_config_file->($config_file) );
     if ($is_Windows) {
         $config_file = "perltidy.ini";
-        return $config_file if $exists_config_file->($config_file);
+        return $config_file if ( $exists_config_file->($config_file) );
     }
 
     # Default environment vars.
@@ -5586,7 +5516,7 @@ sub find_config_file {
 
     # Check the NT/2k/XP locations, first a local machine def, then a
     # network def
-    push @envs, qw( USERPROFILE HOMESHARE ) if $OSNAME =~ /win32/i;
+    push @envs, qw( USERPROFILE HOMESHARE ) if ( $OSNAME =~ /win32/i );
 
     # Now go through the environment ...
     foreach my $var (@envs) {
@@ -5598,19 +5528,19 @@ sub find_config_file {
             if ( $var eq 'PERLTIDY' ) {
                 $config_file = "$ENV{$var}";
                 $config_file = $resolve_config_file->($config_file);
-                return $config_file if $exists_config_file->($config_file);
+                return $config_file if ( $exists_config_file->($config_file) );
             }
 
             # test ENV as directory:
             $config_file = File::Spec->catfile( $ENV{$var}, ".perltidyrc" );
             $config_file = $resolve_config_file->($config_file);
-            return $config_file if $exists_config_file->($config_file);
+            return $config_file if ( $exists_config_file->($config_file) );
 
             if ($is_Windows) {
                 $config_file =
                   File::Spec->catfile( $ENV{$var}, "perltidy.ini" );
                 $config_file = $resolve_config_file->($config_file);
-                return $config_file if $exists_config_file->($config_file);
+                return $config_file if ( $exists_config_file->($config_file) );
             }
         }
         else {
@@ -5631,20 +5561,20 @@ sub find_config_file {
             if ($allusers) {
 
                 $config_file = File::Spec->catfile( $allusers, ".perltidyrc" );
-                return $config_file if $exists_config_file->($config_file);
+                return $config_file if ( $exists_config_file->($config_file) );
 
                 $config_file = File::Spec->catfile( $allusers, "perltidy.ini" );
-                return $config_file if $exists_config_file->($config_file);
+                return $config_file if ( $exists_config_file->($config_file) );
             }
 
             # Check system directory.
             # retain old code in case someone has been able to create
             # a file with a leading period.
             $config_file = File::Spec->catfile( $system, ".perltidyrc" );
-            return $config_file if $exists_config_file->($config_file);
+            return $config_file if ( $exists_config_file->($config_file) );
 
             $config_file = File::Spec->catfile( $system, "perltidy.ini" );
-            return $config_file if $exists_config_file->($config_file);
+            return $config_file if ( $exists_config_file->($config_file) );
         }
     }
 
@@ -5660,10 +5590,10 @@ sub find_config_file {
     else {
 
         $config_file = "/usr/local/etc/perltidyrc";
-        return $config_file if $exists_config_file->($config_file);
+        return $config_file if ( $exists_config_file->($config_file) );
 
         $config_file = "/etc/perltidyrc";
-        return $config_file if $exists_config_file->($config_file);
+        return $config_file if ( $exists_config_file->($config_file) );
     }
 
     # Couldn't find a config file
@@ -5680,7 +5610,7 @@ sub Win_Config_Locs {
     my ( $rpending_complaint, $os ) = @_;
     if ( !$os ) { $os = Win_OS_Type($rpending_complaint) }
 
-    return unless $os;
+    return unless ($os);
 
     my $system   = EMPTY_STRING;
     my $allusers = EMPTY_STRING;
@@ -5700,7 +5630,7 @@ sub Win_Config_Locs {
         # This currently would only happen on a win32s computer.  I don't have
         # one to test, so I am unsure how to proceed.  Suggestions welcome!
         ${$rpending_complaint} .=
-"I dont know a sensible place to look for config files on an $os system.\n";
+"I don't know a sensible place to look for config files on an $os system.\n";
         return;
     }
     return ( $os, $system, $allusers );
@@ -6130,7 +6060,7 @@ sub dump_integer_option_range {
     foreach my $key ( sort keys %{$rinteger_option_range} ) {
         my ( $min, $max, $default ) = @{ $rinteger_option_range->{$key} };
         foreach ( $min, $max, $default ) {
-            $_ = 'undef' unless defined($_);
+            $_ = 'undef' unless ( defined($_) );
         }
         print {*STDOUT} "$key, $min, $max, $default\n";
     }

@@ -1,0 +1,275 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use EBook::Gutenberg;
+
+my $gutenberg = EBook::Gutenberg->init;
+
+$gutenberg->run;
+
+1;
+
+=head1 NAME
+
+gutenberg - Fetch ebooks from Project Gutenberg
+
+=head1 SYMOPSIS
+
+  gutenberg [options] command [command options] [args]
+
+=head1 DESCRIPTION
+
+B<gutenberg> is a utility that provides a command-line interface for
+fetching ebook files from Project Gutenberg, a project dedicated to
+cataloging and archiving public-domain ebooks.
+
+B<gutenberg> performs operations by being given commands. A list of commands
+is documented in the L</COMMANDS> section of this manual.
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<update>
+
+Downloads a local copy of the Project Gutenberg catalog file, storing it as
+F<pg_catalog.csv> in B<gutenberg>'s data directory. A copy of the catalog file
+is required before B<gutenberg> can perform any other operation.
+
+This command should be ran periodically, so that B<gutenberg> can be informed of
+any new ebooks and modified ebook metadata.
+
+This command does not have any unique options.
+
+=item B<get> I<target>
+
+Downloads an ebook file that matches I<target>. I<target> can be one of the
+following:
+
+=over 4
+
+=item ID
+
+If I<target> is numerical, B<gutenberg> will interpret it as an ID and download
+the specific ebook that corresponds to that ID.
+
+=item title regex
+
+If I<target> starts and ends with a slash (C<'/'>) character, B<gutenberg> will
+interpret it as a Perl regex and present the user with a list of ebooks to
+download whose titles match the given regex (case-insensitive).
+
+=item title string
+
+If I<target> does not look like an ID or regex, B<gutenberg> will interpret it
+as just a string and present the user with a list of ebooks to download whose
+titles contain the given string (case-insensitive).
+
+=back
+
+When multiple ebooks match the given I<target>, B<gutenberg> will present the
+user with the list of matching ebooks and prompt them for which one to download.
+
+I<title> is optional when using one or more of the B<-a|--author>,
+B<-s|--subject>, B<-l|--language>, and B<-H|--shelf> options.
+
+B<get> has the following options:
+
+=over 4
+
+=item B<-t|--to>=I<path>
+
+Download ebook to I<path>. If I<path> ends with the C<'.*'> suffix, the C<'.*'>
+will be substituted with the file suffix used by the ebook's format. By
+default, B<gutenberg> will download the ebook to C<id.*>.
+
+=item B<-f|--format>=I<format>
+
+Specify what ebook format to download. I<format> can be one of the following
+(case does not matter):
+
+=over 4
+
+=item html
+
+Single HTML page.
+
+=item epub3
+
+Newer style EPUB. May not be compatible with older e-readers.
+
+=item epub
+
+Older stlye EPUB. Better compatibility with older e-readers.
+
+=item epub-noimages
+
+Same as C<epub> but with no images.
+
+=item kindle
+
+KF8 ebook, an Amazon-proprietary ebook format used by newer Kindle devices.
+
+=item mobi
+
+Ebook format commonly used by older Kindle devices.
+
+=item text
+
+Plain text file.
+
+=item zip
+
+Zip archive of HTML and images.
+
+=back
+
+B<get> uses C<epub3> by default.
+
+=item B<-a|--author>=I<author>
+
+Look for ebooks written by specified authors. How this option works is that
+B<gutenberg> will split the given I<author> string into a list of words and
+find ebooks that contain each word in their author entries. For example:
+
+  # gutenberg will search for ebooks whose author lists contain the names
+  # 'Herman' and 'Melville'
+  gutenberg get -a 'Herman Melville'
+
+This option can be used multiple times to specify multiple different authors.
+
+=item B<-s|--subject>=I<subject>
+
+Look for ebooks categorized under specified subjects. This option works
+similarly to the B<-a|--author> option.
+
+This option can be used multiple times to specify multiple different subjects.
+
+=item B<-l|--language>=I<lang>
+
+Look for ebooks under the language I<lang>. I<lang> must be a two-character
+language code.
+
+=item B<-H|--shelf>=I<shelf>
+
+Look for ebooks categorized under specified shelves. This option works
+similarly to the B<-a|--author> option.
+
+This option can be used multiple times to specify multiple different shelves.
+
+=back
+
+=item B<search> I<target>
+
+Searches for a list of ebooks that match I<target>. The same rules C<get> uses
+for interpretting I<target> are used by B<search>.
+
+B<search> has the following options:
+
+=over 4
+
+=item B<-a|--author>=I<author>
+
+=item B<-s|--subject>=I<subject>
+
+=item B<-l|--language>=I<lang>
+
+=item B<-H|--shelf>=I<shelf>
+
+These options work the same as their C<get> counterparts. When using one or
+more of these options, I<target> is optional.
+
+=back
+
+=item B<meta> I<id>
+
+Prints the metadata for the ebook corresponding to I<id>.
+
+B<meta> has the following options:
+
+=over 4
+
+=item B<-j|--json>
+
+Print ebook metadata in JSON.
+
+=back
+
+=back
+
+=head1 OPTIONS
+
+These options are applicable to every command.
+
+=over 4
+
+=item B<-d|--data>=I<dir>
+
+Specify directory to store B<gutenberg> data files in. Can also be configured
+via the C<GUTENBERG_DATA> environment variable. Defaults to C<~/.gutenberg>.
+
+=item B<-y|--no-prompt>
+
+Disable prompts for user input. Yes or no prompts are automatically answered
+yes to. Prompts asking for the user to select an item from a list will
+automatically be answered with the first item in the list. This option can be
+combined with the B<-q|--quiet> option to disable all non-essential output.
+
+=item B<-q|--quiet>
+
+Disbale informative output.
+
+=item B<-h|--help>
+
+Display B<gutenberg> manual.
+
+=item B<-v|--version>
+
+Print B<gutenberg> version/copyright information and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item GUTENBERG_DATA
+
+Directory to store B<gutenberg> data files in.
+
+=back
+
+=head1 CAVEATS
+
+This utility is B<NOT> designed for scraping or bulk downloading files from
+Project Gutenberg. Attempting to use this utility to do so may result in
+Project Gutenberg banning you from using their site. You have been warned.
+
+=head1 RESTRICTIONS
+
+This program does not currently support fetching non-text ebooks, like audio
+books. Support for non-text formats may be added in the future, if there is
+enough demand.
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg page|https://codeberg.org/1-1sam/gutenberg>. Comments and pull
+requests are welcome!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=cut
+
+# vim: expandtab shiftwidth=4

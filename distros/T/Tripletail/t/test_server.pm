@@ -513,6 +513,7 @@ sub _get_cipher
 		key    => $KEY,
 		cipher => 'Rijndael',
 		salt   => $salt,
+		pbkdf  => 'pbkdf2',
 	});
 	$cipher;
 }

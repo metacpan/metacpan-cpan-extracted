@@ -29,6 +29,7 @@ my %_INSTANCES; # group => Tripletail::RawCookie
 # cookie-av         = expires-av / max-age-av / domain-av /
 #                     path-av / secure-av / httponly-av /
 #                     extension-av
+#
 # expires-av        = "Expires=" sane-cookie-date
 # sane-cookie-date  = <rfc1123-date, defined in [RFC2616], Section 3.3.1>
 # max-age-av        = "Max-Age=" non-zero-digit *DIGIT
@@ -46,6 +47,14 @@ my %_INSTANCES; # group => Tripletail::RawCookie
 # secure-av         = "Secure"
 # httponly-av       = "HttpOnly"
 # extension-av      = <any CHAR except CTLs or ";">
+#
+# https://www.ietf.org/archive/id/draft-ietf-httpbis-rfc6265bis-14.html#name-syntax-2
+# cookie-av         = expires-av / max-age-av / domain-av /
+#                     path-av / secure-av / httponly-av /
+#                     samesite-av / extension-av
+# samesite-av       = "SameSite" BWS "=" BWS samesite-value
+# samesite-value    = "Strict" / "Lax" / "None"
+
 my $re_token        = qr/[^\x00-\x20()<>@,;:\\"\/[\]?={}]+/;
 my $re_cookie_octet = qr/[^\x00-\x20\",;\\]/;
 my $re_path_value   = qr/[^\x00-\x1F;]*/;
@@ -85,7 +94,7 @@ sub _getInstance {
 }
 
 use fields qw(group hasLoaded gotCookies setCookies
-              expires path domain secure httpOnly);
+              expires path domain secure httpOnly sameSite);
 sub __new {
     my Tripletail::RawCookie $this  = shift;
     my                       $group = shift;
@@ -103,6 +112,7 @@ sub __new {
     $this->{domain    } = $TL->INI->get($group => domain   => undef);
     $this->{secure    } = $TL->INI->get($group => secure   => undef);
     $this->{httpOnly  } = $TL->INI->get($group => httpOnly => undef);
+    $this->{sameSite  } = $TL->INI->get($group => sameSite => 'Strict');
 
     if (defined($this->{path})
           && $this->{path} !~ m/\A$re_path_value\z/) {
@@ -309,6 +319,9 @@ sub __makeSetCookie {
         if ($this->{httpOnly}) {
             push @parts, 'httponly';
         }
+        if ($this->{sameSite}) {
+            push @parts, "SameSite=$this->{sameSite}";
+        }
 
         my $line = join '; ', @parts;
         if (length($line) > 1024 * 4) {
@@ -425,13 +438,23 @@ RFC 6265 (L<http://tools.ietf.org/html/rfc6265#section-4.1.2>)
 に定義される C<Secure> 属性を与えるかどうか。C<1> または C<0>
 を指定する。デフォルトは C<0> である。
 
-=item httponly
+=item httpOnly
 
-  httponly = 1
+  httpOnly = 1
 
 RFC 6265 (L<http://tools.ietf.org/html/rfc6265#section-4.1.2>)
 に定義される C<HttpOnly> 属性を与えるかどうか。C<1> または C<0>
 を指定する。デフォルトは C<0> である。
+
+=item sameSite
+
+  sameSite = Strict
+
+C<SameSite> の指定。省略可能。
+C<None> 、 C<Lax> 、 C<Strict> のいずれかを指定する。
+デフォルトは C<Strict> 。
+
+関連: RFC 6265bis (L<https://www.ietf.org/archive/id/draft-ietf-httpbis-rfc6265bis-14.html>)
 
 =back
 

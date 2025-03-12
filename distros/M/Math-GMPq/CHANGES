@@ -1,11 +1,22 @@
 Revision history for Perl module Math::GMPq
 
+0.63
+ - Make correction to t/overload_op_eq.t.
+
+0.62
+ - Remove $Math::GMPq::RETYPE and all references to it. (The option to turn off
+   the cross-class operator overloading no longer exists.)
+ - Simplify "overloading" documentation.
+ - Allow Math::GMPq to overload cmp ops between Math::GMPq and Math::MPFR objects.
+   Previously this could be handled only by Math::MPFR overloading of the cmp ops.
+
 0.61
  - Fix typo in GMPq.xs that caused https://rt.cpan.org/Ticket/Display.html?id=160045.
    Affected old perls only - circa version 5.16.x (5.18?) and earlier.
 
 0.59
  - Rectify omission of Math::GMPz version check in t/overload_mod.t
+   Fixes https://rt.cpan.org/Ticket/Display.html?id=160044
 
 0.58
  - Add overloading of '%' and '%='.

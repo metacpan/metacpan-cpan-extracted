@@ -93,7 +93,7 @@ xs_utf8_ucs4(SV* sv_str)
   STRLEN len;
   SV_Buf result;
   const UJ_UINT8* src_end;
-  const UJ_UINT8 buf_failed[4] = { 0, 0, 0, '?' };
+  const char* buf_failed = "\0\0\0?";
 
   if( sv_str==&PL_sv_undef )
   {

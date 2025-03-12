@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::MongoDB - MongoDB との接続</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::MongoDB - MongoDB との接続
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+<ul>
+<li><a href="#CODE">
+<span class="pod_lang">CODE
+
+</span></a>
+</li>
+<li><a href="#INI">
+<span class="pod_lang">INI
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::MongoDB - MongoDB との接続
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<h2><a id="CODE">
+<span class="pod_lang">CODE
+
+</span></a></h2>
+
+<pre class="pod_verbatim"><code>  $TL-&gt;startCgi(
+      -MongoDB =&gt; 'MongoDB',
+      -main    =&gt; \&amp;main,
+  );
+
+  sub main {
+      $TL-&gt;getMongoDB-&gt;do(sub {
+          my $client = shift;
+          my $coll   = $client-&gt;get_collection('test.collection.foo');
+          my $doc    = $coll-&gt;find_one({a =&gt; 999});
+          $TL-&gt;print($doc-&gt;{b});
+      });
+  }</code></pre>
+
+<h2><a id="INI">
+<span class="pod_lang">INI
+
+</span></a></h2>
+
+<pre class="pod_verbatim"><code>  [MongoDB]
+  host_uri = mongodb://db1.example.com,db2.example.com,db3.example.com/?replicaSet=foo</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail/DB.html">Tripletail::DB</a> と同様の目的を持つモジュールだが、こちらは MongoDB
+(<a href="https://www.mongodb.com/">https://www.mongodb.com/</a>) を対象とする。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->getMongoDB"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;getMongoDB</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $DB = $TL-&gt;getMongoDB;
+  my $DB = $TL-&gt;getMongoDB($inigroup);</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">Tripletail::MongoDB</code> オブジェクトを取得する。
+引数には Ini で設定したグループ名を渡す。
+引数省略時は <code class="pod_iseq_C">MongoDB</code> グループが使用される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /
+<a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の <code class="pod_iseq_C">main</code>
+関数内で MongoDB オブジェクトを取得する場合に使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$TL->newMongoDB"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newMongoDB</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $DB = $TL-&gt;newMongoDB;
+  my $DB = $TL-&gt;newMongoDB($inigroup);</code></pre>
+
+<p>
+<span class="pod_lang">新しく Tripletail::MongoDB オブジェクトを作成する。
+引数には Ini で設定したグループ名を渡す。
+引数省略時は <code class="pod_iseq_C">MongoDB</code> グループが使用される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">動的にコネクションを作成したい場合などに使用する。
+この方法で Tripletail::MongoDB オブジェクトを取得した場合、<a href="#connect">&quot;connect&quot;</a> /
+<a href="#disconnect">&quot;disconnect&quot;</a> を呼び出し、接続の制御を行う必要がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="connect"><span class="pod_lang"><code class="pod_iseq_C">connect</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;connect;</code></pre>
+
+<p>
+<span class="pod_lang">MongoDB に接続する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /
+<a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の関数内で MongoDB
+オブジェクトを取得する場合には自動的に接続が管理されるため、このメソッドを呼び出してはならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="#X$TL-&gt;newMongoDB">$TL-&gt;MongoDB</a> で作成した Tripletail::MongoDB
+オブジェクトに関しては、このメソッドを呼び出し、MongoDB へ接続する必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::MongoClient">MongoDB::MongoClient</a> の <a href="http://search.cpan.org/perldoc/MongoDB::MongoClient#dt_type_(DEPRECATED_AND_READ-ONLY)">dt_type</a> は <a href="http://search.cpan.org/perldoc/Time::Moment">Time::Moment</a> に設定される。これは
+<a href="http://search.cpan.org/perldoc/DateTime">DateTime</a> モジュールの動作があまりに遅い為である。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="disconnect"><span class="pod_lang"><code class="pod_iseq_C">disconnect</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;disconnect;</code></pre>
+
+<p>
+<span class="pod_lang">MongoDB から切断する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /
+<a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の関数内で MongoDB
+オブジェクトを取得する場合には自動的に接続が管理されるため、このメソッドを呼び出してはならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="#X$TL-&gt;newMongoDB">$TL-&gt;MongoDB</a> で作成した Tripletail::MongoDB
+オブジェクトに関しては、このメソッドを呼び出し、MongoDB への接続を切断する必要がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getClient"><span class="pod_lang"><code class="pod_iseq_C">getClient</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $client = $DB-&gt;getClient;</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::MongoClient">MongoDB::MongoClient</a> オブジェクトを返す。このメソッドは後述の
+<a href="#do">&quot;do&quot;</a> を使わない場合にのみ必要となる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="do"><span class="pod_lang"><code class="pod_iseq_C">do</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $ret = $DB-&gt;do(sub {
+      my $client = shift;
+      # ...
+  });</code></pre>
+
+<p>
+<span class="pod_lang">与えられた関数に <a href="http://search.cpan.org/perldoc/MongoDB::MongoClient">MongoDB::MongoClient</a> オブジェクトを渡して実行する。
+実行中に特定の種類の例外が発生した場合には、少しの時間を置いてから既定の回数まで自動的に再試行する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">再試行回数の上限は <a href="#max_retries">&quot;max_retries&quot;</a>
+で指定され、もしこの回数に達しても依然として例外が発生したならば、最後に発生した例外が再送される。
+再試行時の遅延時間の最小と最大は <a href="#min_retry_interval">&quot;min_retry_interval&quot;</a> と <a href="#max_retry_interval">&quot;max_retry_interval&quot;</a>
+で指定されるが、実際の遅延時間は線型ではなく二次関数的に増加する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">現在のところ、再試行の対象となる例外は次の通りである。これ以外の例外が発生した際には再試行せずに即座にその例外を再送する:
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::Error#MongoDB::NetworkError">MongoDB::NetworkError</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::Error#MongoDB::NotMasterError">MongoDB::NotMasterError</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__01"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::Error#MongoDB::WriteConcernError">MongoDB::WriteConcernError</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__02"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::Error#MongoDB::SelectionError">MongoDB::SelectionError</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__03"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/MongoDB::Error#MongoDB::TimeoutError">MongoDB::TimeoutError</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<dl>
+<dt><a id="host_uri"><span class="pod_lang"><code class="pod_iseq_C">host_uri</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  host_uri = mongodb://db1.example.com,db2.example.com,db3.example.com/?replicaSet=foo</code></pre>
+
+<p>
+<span class="pod_lang">接続先サーバーまたはレプリカセットの URI を設定する。詳細は
+<a href="http://search.cpan.org/perldoc/MongoDB::MongoClient#CONNECTION_STRING_URI">&quot;CONNECTION STRING URI&quot; in MongoDB::MongoClient</a> を参照のこと。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="max_retries"><span class="pod_lang"><code class="pod_iseq_C">max_retries</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  max_retries = 10</code></pre>
+
+<p>
+<span class="pod_lang"><a href="#do">&quot;do&quot;</a> の最大再試行回数を設定する。デフォルトは 10.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="min_retry_interval"><span class="pod_lang"><code class="pod_iseq_C">min_retry_interval</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  min_retry_interval = 100</code></pre>
+
+<p>
+<span class="pod_lang"><a href="#do">&quot;do&quot;</a> の最小再試行遅延時間をミリ秒単位で設定する。デフォルトは 100.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="max_retry_interval"><span class="pod_lang"><code class="pod_iseq_C">max_retry_interval</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  max_retry_interval = 1000</code></pre>
+
+<p>
+<span class="pod_lang"><a href="#do">&quot;do&quot;</a> の最大再試行遅延時間をミリ秒単位で設定する。デフォルトは 1000.
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::MongoDB - MongoDB との接続
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->getMongoDB">$TL-&gt;getMongoDB</a></li>
+<li><a href="#X$TL->newMongoDB">$TL-&gt;newMongoDB</a></li>
+<li><a href="#CODE">CODE</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#INI">INI</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#X_">MongoDB::NetworkError</a></li>
+<li><a href="#X__00">MongoDB::NotMasterError</a></li>
+<li><a href="#X__02">MongoDB::SelectionError</a></li>
+<li><a href="#X__03">MongoDB::TimeoutError</a></li>
+<li><a href="#X__01">MongoDB::WriteConcernError</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#connect">connect</a></li>
+<li><a href="#disconnect">disconnect</a></li>
+<li><a href="#do">do</a></li>
+<li><a href="#getClient">getClient</a></li>
+<li><a href="#host_uri">host_uri</a></li>
+<li><a href="#max_retries">max_retries</a></li>
+<li><a href="#max_retry_interval">max_retry_interval</a></li>
+<li><a href="#min_retry_interval">min_retry_interval</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::MongoDB - MongoDB との接続
+
+
+</div>
+
+</body>
+</html>

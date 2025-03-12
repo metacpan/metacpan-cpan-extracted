@@ -120,7 +120,10 @@ xs_sjis_jis(SV* sv_str)
 	ECHO_S2J((stderr,"  (sjis:c)"));
 	do
 	{
-	  unsigned char tmp[2];
+	  union {
+	    UJ_UINT16 u16_val;
+	    UJ_UINT8  u8_val[2];
+	  } tmp;
 	  ECHO_S2J((stderr, "%c%c[%02x.%02x]",src[0],src[1],src[0],src[1]));
 	  if( src[1]<0x40 || 0xfc<src[1] || src[1]==0x7f )
 	  {
@@ -131,16 +134,16 @@ xs_sjis_jis(SV* sv_str)
 	  }
 	  if( 0x9f <= src[1] )
 	  {
-	    tmp[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe0 : 0x60);
-	    tmp[1] = src[1] + 2;
+	    tmp.u8_val[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe0 : 0x60);
+	    tmp.u8_val[1] = src[1] + 2;
 	  }else
 	  {
-	    tmp[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe1 : 0x61);
-	    tmp[1] = src[1] + 0x60 + (src[1] < 0x7f);
+	    tmp.u8_val[0] = src[0]*2 - (src[0]>=0xe0 ? 0xe1 : 0x61);
+	    tmp.u8_val[1] = src[1] + 0x60 + (src[1] < 0x7f);
 	  }
-	  tmp[0] &= 0x7f;
-	  tmp[1] &= 0x7f;
-	  SV_Buf_append_ch2(&result,*(UJ_UINT16*)tmp);
+	  tmp.u8_val[0] &= 0x7f;
+	  tmp.u8_val[1] &= 0x7f;
+	  SV_Buf_append_ch2(&result, tmp.u16_val);
 	  src += 2;
 	}while( src<src_end && chk_sjis[*src]==CHK_SJIS_C );
 	ECHO_S2J((stderr,"\n"));
@@ -275,7 +278,10 @@ xs_jis_sjis(SV* sv_str)
       src += src[1]!='&' ? 3 : 6;
       while( src<src_end )
       {
-	unsigned char tmp[2];
+	union {
+	  UJ_UINT16 u16_val;
+	  UJ_UINT8  u8_val[2];
+	} tmp;
 	if( *src=='\x1b' ) break;
 	ECHO_J2S((stderr," %02x",src[0]);fflush(stderr));
         if( *src>=0x21 && *src<0x7e )
@@ -290,18 +296,18 @@ xs_jis_sjis(SV* sv_str)
 	  break;
 	}
 	ECHO_J2S((stderr," %02x",src[0]);fflush(stderr));
-	tmp[0] = src[0] | 0x80;
-	tmp[1] = src[1] | 0x80;
+	tmp.u8_val[0] = src[0] | 0x80;
+	tmp.u8_val[1] = src[1] | 0x80;
 	if( src[0]%2 )
 	{
-	  tmp[0] = (tmp[0]>>1) + (tmp[0] < 0xdf ? 0x31 : 0x71);
-	  tmp[1] = tmp[1] - ( 0x60 + (tmp[1] < 0xe0) );
+	  tmp.u8_val[0] = (tmp.u8_val[0]>>1) + (tmp.u8_val[0] < 0xdf ? 0x31 : 0x71);
+	  tmp.u8_val[1] = tmp.u8_val[1] - ( 0x60 + (tmp.u8_val[1] < 0xe0) );
 	}else
 	{
-	  tmp[0] = (tmp[0]>>1) + (tmp[0] < 0xdf ? 0x30 : 0x70);
-	  tmp[1] = tmp[1] - 2;
+	  tmp.u8_val[0] = (tmp.u8_val[0]>>1) + (tmp.u8_val[0] < 0xdf ? 0x30 : 0x70);
+	  tmp.u8_val[1] = tmp.u8_val[1] - 2;
 	}
-	SV_Buf_append_ch2(&result,*(UJ_UINT16*)tmp);
+	SV_Buf_append_ch2(&result, tmp.u16_val);
 	src += 2;
       }
       ECHO_J2S((stderr,"\n"));

@@ -28,7 +28,9 @@ For each personality (unzip first, then in the corresponding directory):
 
     (Manual install is possible, but tricky.  See
       https://github.com/lelegard/winkbdlayouts#declaring-a-keyboard-layout-on-windows
-    )
+    The discussion is at
+      https://stackoverflow.com/questions/75932692/developed-a-windows-keyboard-layout-dll-but-not-loaded-no-error-message/76030384#76030384
+    .)
 
 After you install them, the Language Bar will have an entry (or
 entries) for this keyboard (look for a keyboard icon in the Windows

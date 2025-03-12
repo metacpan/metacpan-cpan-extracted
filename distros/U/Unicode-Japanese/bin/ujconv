@@ -1,4 +1,4 @@
-#!/usr/local/ymir/perl/bin/perl -w
+#! /usr/bin/perl -w
 ## ----------------------------------------------------------------------------
 #  ujconv
 # -----------------------------------------------------------------------------
@@ -99,11 +99,9 @@ sub do_work
     }
   }
   
-  local($/) = undef;
   if( !@files )
   {
-    my $text = <STDIN>;
-    print Unicode::Japanese->new($text,$from)->conv($to);
+    print Unicode::Japanese->new($_,$from)->conv($to) while(<STDIN>);
   }
   foreach my $file (@files)
   {
@@ -111,16 +109,16 @@ sub do_work
     if( ref($file) )
     {
       $text = $file->[1];
+      print Unicode::Japanese->new($text,$from)->conv($to);
     }elsif( $file eq '-' )
     {
-      $text = <STDIN>;
+      print Unicode::Japanese->new($_,$from)->conv($to) while(<STDIN>);
     }else
     {
-      open(FILE,$file) or die "could not open file [$file] : $!";
-      $text = <FILE>;
+      open(FILE, '<:mmap', $file) or die "could not open file [$file] : $!";
+      print Unicode::Japanese->new($_,$from)->conv($to) while(<FILE>);
       close(FILE);
     }
-    print Unicode::Japanese->new($text,$from)->conv($to);
   }
   1;
 }

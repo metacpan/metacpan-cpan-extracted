@@ -1,0 +1,1226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Template - テンプレート</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Template - テンプレート
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe6X9bXb8Xe5XbcX8f">
+<span class="pod_lang">テンプレート書式
+
+</span></a>
+</li>
+<li><a href="#Xe5X88Xa9Xe7X94Xa8Xe4Xb8X8aXe3X81XaeXe6Xb3Xa8Xe6X84X8f">
+<span class="pod_lang">利用上の注意
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+<li><a href="#flush_Xe3X82Xb5Xe3X83Xb3Xe3X83X97Xe3X83Xab">
+<span class="pod_lang">flush サンプル
+
+</span></a>
+<ul>
+<li><a href="#Xe3X82XbdXe3X83XbcXe3X82Xb9Xe3X82Xb3Xe3X83XbcXe3X83X89">
+<span class="pod_lang">ソースコード
+
+</span></a>
+</li>
+<li><a href="#Xe5XaeX9fXe8Xa1X8cXe7Xb5X90Xe6X9eX9c">
+<span class="pod_lang">実行結果
+
+</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Template - テンプレート
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $t = $TL-&gt;newTemplate
+    -&gt;setTemplate(qq{
+	&lt;html&gt;
+	  &lt;title&gt;&lt;&amp;TITLE&gt;&lt;/title&gt;
+	  
+	  &lt;!begin:LOOP&gt;
+	    &lt;&amp;LINE&gt;&lt;br&gt;
+	  &lt;!end:LOOP&gt;
+	&lt;/html&gt;
+      });
+
+  $t-&gt;expandAny(TITLE =&gt; 'Title');
+  
+  $t-&gt;node('LOOP')-&gt;add(LINE =&gt; 'line 1');
+  $t-&gt;node('LOOP')-&gt;add(LINE =&gt; 'line 2');
+  
+  my $str = $t-&gt;toStr;
+  
+  # $str:
+  # &lt;html&gt;
+  #   &lt;title&gt;Title&lt;/title&gt;
+  #
+  #
+  #     line 1&lt;br&gt;
+  #
+  #     line 2&lt;br&gt;
+  #
+  # &lt;/html&gt;</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">コードとデザインを分離するためのテンプレートを扱うクラスです。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HTMLやメールの原稿をテンプレートとしてプログラム外部に
+用意し、コードとデザインを分離するようにします。
+
+</span>
+</p>
+
+<h2><a id="Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe6X9bXb8Xe5XbcX8f">
+<span class="pod_lang">テンプレート書式
+
+</span></a></h2>
+
+<dl>
+<dt><a id="Xe3X83X96Xe3X83XadXe3X83X83Xe3X82XafXe3X82XbfXe3X82Xb0"><span class="pod_lang">ブロックタグ
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  &lt;!begin:????&gt; .... &lt;!end:????&gt;</code></pre>
+
+<p>
+<span class="pod_lang">beginとendで囲まれた部分をノードとします。
+???? 部分は、同じ階層のノードでユニークでなければなりません。
+また、begin/end が交差したり、対応が取れていないことが無いよ
+うに注意しなければなりません。 
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ノードとして指定されたブロックに対しては、node メソッドを使用
+してアクセスすることが出来ます。
+また、Template::Node クラスの add メソッドを呼ぶことで、ノード
+を繰り返して展開することが可能です。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe5Xb1X95Xe9X96X8bXe3X82XbfXe3X82Xb0"><span class="pod_lang">展開タグ
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  &lt;&amp;????&gt;</code></pre>
+
+<p>
+<span class="pod_lang">expand/add メソッドで、文字列を展開する場所を指定します。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="IncludeXe3X82XbfXe3X82Xb0"><span class="pod_lang">Includeタグ
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  &lt;!include:????&gt;</code></pre>
+
+<p>
+<span class="pod_lang">タグのある場所に、指定されたファイルを読み込み、展開します。
+ファイルは、最後に loadTemplate したファイル名のディレクトリ
+からの相対パスとして扱われます。
+loadTemplate が呼ばれていない場合は、カレントディレクトリから
+の相対パスとして扱われます。 
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Includeタグはネストして使用可能ですが、自分自身を読み込むと
+永久ループすることになるので使用には注意が必要です。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe3X82Xb3Xe3X83X94Xe3X83XbcXe3X82XbfXe3X82Xb0"><span class="pod_lang">コピータグ
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  &lt;!copy:????&gt;</code></pre>
+
+<p>
+<span class="pod_lang">????は既存のノード名を指します。
+&lt;!begin:????&gt; .... &lt;!end:????&gt; で囲まれた部分のコピーを別の
+場所に展開します。
+&lt;!copy:????&gt; タグは、&lt;!begin:????&gt; .... &lt;!end:????&gt; と同じ
+階層に存在し、かつコピー元のブロックより後ろに位置しなければ
+なりません。 
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ただし、&quot;flush&quot; を使用しない場合は、コピー元のブロックより
+手前にあっても問題ありません。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Xe5X88Xa9Xe7X94Xa8Xe4Xb8X8aXe3X81XaeXe6Xb3Xa8Xe6X84X8f">
+<span class="pod_lang">利用上の注意
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">テンプレートクラスには、単純に展開処理を行う系統のメソッドと、
+HTMLの内容を解釈して処理を行う系統のメソッドがあります。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">展開タグやブロックを扱う expand/add メソッドはどのような
+テキストデータに対しても処理を行うことができますので、
+これらのメソッドを呼び出すときに正しいHTML形式ではなくても
+動作します。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">たとえば、以下のようなHTMLに対し、expand/addメソッドは
+正常に利用できます。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> &lt;select name=&quot;type&quot;&gt;
+   &lt;!begin:item&gt;
+     &lt;option value=&quot;&lt;&amp;ID&gt;&quot; &lt;&amp;SELECTED&gt;&gt;&lt;&amp;NAME&gt;&lt;/option&gt;
+   &lt;!end:item&gt;
+ &lt;/select&gt;</code></pre>
+
+<p>
+<span class="pod_lang">expand/addメソッドを使って、上記のHTMLを正常な形に加工した後であれば、
+HTMLの内容を解釈して処理を行う系統のメソッド（setFormやaddHiddenFormなど）を利用できます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">たとえば、以下のようなHTMLに加工後に、setFormやaddHiddenFormを
+呼ぶことは問題がありません。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> &lt;select name=&quot;type&quot;&gt;
+     &lt;option value=&quot;1&quot; SELECTED&gt;いちご&lt;/option&gt;
+     &lt;option value=&quot;2&quot; &gt;もも&lt;/option&gt;
+     &lt;option value=&quot;3&quot; &gt;なし&lt;/option&gt;
+ &lt;/select&gt;</code></pre>
+
+<p>
+<span class="pod_lang">しかし、expand/addメソッドによる加工を行う前のHTMLに対して、
+setFormやaddHiddenFormなどを利用すると、正しいHTML形式ではないため、
+内容の解釈が正しく行えず、意図しない結果となることがあります。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newTemplate"><span class="pod_lang">$TL-&gt;newTemplate
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t = $TL-&gt;newTemplate
+  $t = $TL-&gt;newTemplate($filepath)
+  $t = $TL-&gt;newTemplate($filepath, $icode)</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::Template オブジェクトを作成。
+引数があれば、その引数で loadTemplate が実行される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="loadTemplate"><span class="pod_lang">loadTemplate
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;loadTemplate($filepath)
+  $t-&gt;loadTemplate($filepath, $icode)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたファイルをテンプレートとして読み込む。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$icode が省略された場合は 'auto' 文字コード自動判別となる。
+指定できる文字コードは、UTF-8，Shift_JIS，EUC-JP，ISO-2022-JP。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは文字コード自動判別となるが、テンプレートファイルに
+日本語がごく少量しか含まれない場合は、正しく判定できないことがある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">自動判別はUTF-8よりShift_JISを優先するので、テンプレートファイルは
+Shift_JISコードで作成することを推奨する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="existsFile"><span class="pod_lang">existsFile
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;existsFile($filepath)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたファイルが存在するなら1を、しないならundefを返す。
+loadTemplate に先立ってテンプレートファイルが存在するかどうか確認したい場合に使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setTemplate"><span class="pod_lang">setTemplate
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;setTemplate($str)</code></pre>
+
+<p>
+<span class="pod_lang">指定された文字列をテンプレートとしてセットする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="node"><span class="pod_lang">node
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $child = $t-&gt;node($nodename)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたノード名のノードオブジェクトを返す。
+存在しないノード名が要求されたらエラー。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">通常のTripletail::Templateオブジェクトとノードオブジェクトの違いは次の通り。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="loadTemplateXe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89Xe5X88Xa9Xe7X94Xa8Xe4Xb8X8dXe5X8fXafXe8X83Xbd"><span class="pod_lang">loadTemplateメソッド利用不可能
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="addXe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89Xe5X88Xa9Xe7X94Xa8Xe5X8fXafXe8X83Xbd"><span class="pod_lang">addメソッド利用可能
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+</dd>
+<dt><a id="exists"><span class="pod_lang">exists
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;exists($nodename)</code></pre>
+
+<p>
+<span class="pod_lang">指定された名前を持つノードが存在するなら1を、しないならundefを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setAttr"><span class="pod_lang">setAttr
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;setAttr(\%hash)
+  $t-&gt;setAttr(%hash)</code></pre>
+
+<p>
+<span class="pod_lang">expand/addメソッドで渡すデータの展開方法を指定する。
+指定がないものは plain 指定とみなす。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="plain_Xe3X81XbeXe3X81X9fXe3X81XafXe6X8cX87Xe5XaeX9aXe7X84Xa1Xe3X81X97"><span class="pod_lang">plain または指定無し
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#escapeTag">$TL-&gt;escapeTag</a> を適用後、出力する
+
+</span>
+</p>
+
+</dd>
+<dt><a id="br"><span class="pod_lang">br
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#escapeTag">$TL-&gt;escapeTag</a> を適用後、
+改行の前に &lt;br&gt; もしくは &lt;br /&gt; を挿入し、出力する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="raw"><span class="pod_lang">raw
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">そのまま出力する
+
+</span>
+</p>
+
+</dd>
+<dt><a id="js"><span class="pod_lang">js
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#escapeJs">$TL-&gt;escapeJs</a> を適用後、出力する
+
+</span>
+</p>
+
+</dd>
+<dt><a id="jsstring"><span class="pod_lang">jsstring
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#escapeJsString">$TL-&gt;escapeJsString</a> を適用後、出力する
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt><a id="expand"><span class="pod_lang">expand
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;expand(\%hash)
+  $t-&gt;expand(%hash)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたハッシュのデータを元に、展開タグを展開する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">渡されたハッシュのキーの中に、展開タグが存在しないものがあっても
+エラーにはならない。
+一回のexpandの呼び出しで未展開のタグが残った場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="expandAny"><span class="pod_lang">expandAny
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;expandAny(\%hash)
+  $t-&gt;expandAny(%hash)</code></pre>
+
+<p>
+<span class="pod_lang">expandと同様だが、テンプレートに未展開のタグがあってもエラーとしない。
+但し、toStrを行うまでには全てのタグを展開する必要性がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="add"><span class="pod_lang">add
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;node('foo')-&gt;add
+  $t-&gt;node('foo')-&gt;add(\%hash)
+  $t-&gt;node('foo')-&gt;add(%hash)</code></pre>
+
+<p>
+<span class="pod_lang">このメソッドはノードオブジェクトでのみ利用可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">子ノードを親ノードに挿入する。
+このメソッドが呼ばれた後は、子ノードは展開前の状態に戻る。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数が指定された場合は親ノードへの挿入前に expand される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getForm"><span class="pod_lang">getForm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form = $t-&gt;getForm($name)</code></pre>
+
+<p>
+<span class="pod_lang">HTMLテンプレート中のフォームを解析し、中にセットされている
+データを <a href=".././Tripletail/Form.html">Tripletail::Form</a> オブジェクトの形式で取り出す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数はフォームの name=&quot;...&quot; で指定される名前。
+省略された場合は、name属性の存在しないform要素が取り出される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">対象となるノードの HTML タグの内部に未置換のタグがあった場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setForm"><span class="pod_lang">setForm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;setForm($form)
+  $t-&gt;setForm($form, $name)
+  $t-&gt;setForm($hashref)
+  $t-&gt;setForm($hashref, $name)</code></pre>
+
+<p>
+<span class="pod_lang">渡された <a href=".././Tripletail/Form.html">Tripletail::Form</a> オブジェクトを、HTMLテンプレート中のフォームに
+展開する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a>オブジェクトの代わりにハッシュのリファレンスを渡すことも出来る。
+ハッシュのリファレンスを渡した場合は、$TL-&gt;newForm($hashref) した結果のフォームオブジェクトをセットする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第2引数はフォームの name=&quot;...&quot; で指定される名前。
+省略された場合は、name属性の存在しないform要素が対象となる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">テンプレートに存在し、フォームオブジェクトに存在しない
+キーがあったり、その逆の状態のキーが存在しても、
+エラー等は発生しない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">テンプレートに存在して、フォームオブジェクトに存在
+しないキーの関しては、テンプレートの元のデータが
+保存される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">対象となるノードの HTML タグの内部に未置換のタグがあった場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="extForm"><span class="pod_lang">extForm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;extForm
+  $t-&gt;extForm($name)</code></pre>
+
+<p>
+<span class="pod_lang">HTMLテンプレート中のフォームが外部アプリケーションに対するものであることを指定する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第1引数はフォームの name=&quot;...&quot; で指定される名前。
+省略された場合は、name属性の存在しないform要素が対象となる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">通常のフォームはTLフレームワークに対するものとして、いくつかの操作が行われるが、
+extForm を行った場合はそれらの操作を行わない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">対象となるノードの HTML タグの内部に未置換のタグがあった場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addHiddenForm"><span class="pod_lang">addHiddenForm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;addHiddenForm($form)
+  $t-&gt;addHiddenForm($form, $name)
+  $t-&gt;addHiddenForm($hashref)
+  $t-&gt;addHiddenForm($hashref, $name)</code></pre>
+
+<p>
+<span class="pod_lang">渡された <a href=".././Tripletail/Form.html">Tripletail::Form</a> オブジェクトを、HTMLテンプレート中のフォームに
+&lt;input type=&quot;hidden&quot;&gt; 要素として追加する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a>オブジェクトの代わりにハッシュのリファレンスを渡すことも出来る。
+ハッシュのリファレンスを渡した場合は、$TL-&gt;newForm($hashref) した結果のフォームオブジェクトを追加する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第2引数はフォームの name=&quot;...&quot; で指定される名前。
+省略された場合は、name属性の存在しないform要素が対象となる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">渡されたフォームデータの全てのキーがhiddenとして追加される。
+既存の値に上書きはされず、 単純に追加される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">対象となるノードの HTML タグの内部に未置換のタグがあった場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addSessionCheck"><span class="pod_lang">addSessionCheck
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;addSessionCheck($sessiongroup)
+  $t-&gt;addSessionCheck($sessiongroup, $name)
+  $t-&gt;addSessionCheck($sessiongroup, $name, $issecure)</code></pre>
+
+<p>
+<span class="pod_lang">指定したセッショングループのセッションIDを利用したキーをフォームに埋め込む。
+埋め込むフォームはPOSTメソッドでなければエラーとなる。
+また、事前にセッションIDを発行（SessionクラスのsetValue）してなければエラーとなる。
+$CGI-&gt;haveSessionCheck とペアで使用する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">指定したセッショングループのIniで設定するcsrfkeyを必要とする。未設定の場合エラーとなる。
+csrfkeyとセッションIDを利用してキーを作成する為、csrfkeyはサイト毎に違う値を用い、外部に漏れないようにする事。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第2引数はフォームの name=&quot;...&quot; で指定される名前。
+省略もしくはundefが指定された場合は、name属性の存在しないform要素が対象となる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">使用中のセッションの mode が 'double' の場合は、
+第3引数に 0 または 1 を指定すると、http側、https側を指定できる。
+省略した場合は、そのときの通信が http/https のどちらであるかによって選択される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">対象となるノードの HTML タグの内部に未置換のタグがあった場合はエラーとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getHtml"><span class="pod_lang">getHtml
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $html = $t-&gt;getHtml</code></pre>
+
+<p>
+<span class="pod_lang">特定のノードの現在の内容を返す。置換済みのタグは置換されており、未置換
+のタグは未置換のまま残っている。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setHtml"><span class="pod_lang">setHtml
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;setHtml($html)</code></pre>
+
+<p>
+<span class="pod_lang">特定のノードの現在の内容を変更する。<a href="#getHtml">&quot;getHtml&quot;</a> と逆の働きをする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="flush"><span class="pod_lang">flush
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;flush</code></pre>
+
+<p>
+<span class="pod_lang">ノードの場合、そのノードの終端までを <a href=".././Tripletail.html#print">出力</a> する。
+Templateの場合、全体を出力する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">テンプレートの最初から順にflushしていかないと、テンプレートの
+一部分が重複出力されるので注意が必要。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="trim"><span class="pod_lang">trim
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $t-&gt;trim()</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">&lt;!begin:????&gt;</code>, <code class="pod_iseq_C">&lt;!end:????&gt;</code> タグ前後の空白を削除する。
+ある行にタグのみが書かれていた場合に、行ごと取り除かれたようにみえる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="toStr"><span class="pod_lang">toStr
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $str = $t-&gt;toStr</code></pre>
+
+<p>
+<span class="pod_lang">テンプレート(展開結果)を文字列として返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isRoot"><span class="pod_lang">isRoot
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $is_root = $t-&gt;isRoot</code></pre>
+
+<p>
+<span class="pod_lang">ノードの場合は undef を返し、Template の場合は 1 を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isXHTML"><span class="pod_lang">isXHTML
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $is_xhtml = $t-&gt;isXHTML</code></pre>
+
+<p>
+<span class="pod_lang">テンプレートが XHTML のように見える場合は 1 を、そうでない場合は undef
+を返す。厳密なチェックは行わない。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">グループ名は &quot;Template&quot; でなければならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  [Template]
+  basepath = /home/www/template/</code></pre>
+
+<dl>
+<dt><a id="basepath"><span class="pod_lang">basepath
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  basepath = /home/www/template/</code></pre>
+
+<p>
+<span class="pod_lang">相対パス指定時に基準となるパス。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは &quot;.&quot; 。
+すなわちカレントディレクトリ。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="rootpath"><span class="pod_lang">rootpath
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  rootpath = /home/www/</code></pre>
+
+<p>
+<span class="pod_lang">特定のディレクトリ階層よりも下位にあるファイルのみ、
+アクセスを許可する場合に指定する。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは &quot;/&quot;。
+すなわち全ファイルをテンプレートとして使用許可。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="allow_unexpanded_tags"><span class="pod_lang">allow_unexpanded_tags
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  allow_unexpanded_tags = true</code></pre>
+
+<p>
+<span class="pod_lang">非推奨オプション。trueを指定した場合、
+getForm, setForm, extForm, addHiddenForm, addSessionCheckを
+実行する場合に、テンプレートに未置換の &lt;&amp;タグ&gt; が、
+&lt;foo &lt;&amp;tag&gt;&gt; のように HTML タグの内部に存在していても、
+エラーにならないようになる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このオプションを有効にした場合、&lt;foo &lt;&amp;tag&gt;&gt; のようなタグが
+テンプレート中に存在していた場合、タグが正常に展開されず、
+破壊される恐れがある為、使用する際は注意して下さい。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="flush_Xe3X82Xb5Xe3X83Xb3Xe3X83X97Xe3X83Xab">
+<span class="pod_lang">flush サンプル
+
+</span></a></h2>
+
+<h3><a id="Xe3X82XbdXe3X83XbcXe3X82Xb9Xe3X82Xb3Xe3X83XbcXe3X83X89">
+<span class="pod_lang">ソースコード
+
+</span></a></h3>
+
+<pre class="pod_verbatim"><code> $TL-&gt;setContentFilter('Tripletail::Filter::Binary');
+ 
+ my $t = $TL-&gt;newTemplate-&gt;setTemplate(
+ qq{This is a header.
+ 
+ &lt;!begin:AAA&gt;
+   node AAA begins...
+ 
+   &lt;!begin:BBB&gt;
+     node BBB begins...
+ 
+       &lt;!begin:CCC&gt;
+       value of node CCC: &lt;&amp;val&gt;
+       &lt;!end:CCC&gt;
+ 
+     node BBB ends...
+   &lt;!end:BBB&gt;
+ &lt;!end:AAA&gt;
+ 
+ This is a footer.
+ });
+ 
+ print &quot;\n#--- node('CCC')-&gt;add; (twice)\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;node('CCC')-&gt;add(
+     val =&gt; 100,
+    );
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;node('CCC')-&gt;add(
+     val =&gt; 200,
+    );
+ 
+ print &quot;\n#--- node('CCC')-&gt;flush;\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;node('CCC')-&gt;flush;
+ 
+ print &quot;\n#--- node('BBB')-&gt;add;\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;add;
+ 
+ print &quot;\n#--- node('CCC')-&gt;add;\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;node('CCC')-&gt;add(
+     val =&gt; 200,
+    );
+ 
+ print &quot;\n#--- node('CCC')-&gt;flush;\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;node('CCC')-&gt;flush;
+ 
+ print &quot;\n#--- node('BBB')-&gt;add;\n&quot;;
+ $t-&gt;node('AAA')-&gt;node('BBB')-&gt;add;
+ 
+ print &quot;\n#--- node('AAA')-&gt;add;\n&quot;;
+ $t-&gt;node('AAA')-&gt;add;
+ 
+ print &quot;\n#--- root-&gt;flush;\n&quot;;
+ $t-&gt;flush;</code></pre>
+
+<h3><a id="Xe5XaeX9fXe8Xa1X8cXe7Xb5X90Xe6X9eX9c">
+<span class="pod_lang">実行結果
+
+</span></a></h3>
+
+<pre class="pod_verbatim"><code> #--- node('CCC')-&gt;add; (twice)
+ 
+ #--- node('CCC')-&gt;flush;
+ Content-Type: application/octet-stream
+ 
+ This is a header.
+ 
+ 
+   node AAA begins...
+ 
+   
+     node BBB begins...
+ 
+       
+       value of node CCC: 100
+       
+       value of node CCC: 200
+       
+ #--- node('BBB')-&gt;add;
+ 
+ #--- node('CCC')-&gt;add;
+ 
+ #--- node('CCC')-&gt;flush;
+ 
+ 
+     node BBB ends...
+   
+     node BBB begins...
+ 
+       
+       value of node CCC: 200
+       
+ #--- node('BBB')-&gt;add;
+ 
+ #--- node('AAA')-&gt;add;
+ 
+ #--- root-&gt;flush;
+ 
+ 
+     node BBB ends...
+   
+ 
+ 
+ This is a footer.</code></pre>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Template - テンプレート
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newTemplate">$TL-&gt;newTemplate</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#IncludeXe3X82XbfXe3X82Xb0">Includeタグ</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#add">add</a></li>
+<li><a href="#addHiddenForm">addHiddenForm</a></li>
+<li><a href="#addSessionCheck">addSessionCheck</a></li>
+<li><a href="#addXe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89Xe5X88Xa9Xe7X94Xa8Xe5X8fXafXe8X83Xbd">addメソッド利用可能</a></li>
+<li><a href="#allow_unexpanded_tags">allow_unexpanded_tags</a></li>
+<li><a href="#basepath">basepath</a></li>
+<li><a href="#br">br</a></li>
+<li><a href="#exists">exists</a></li>
+<li><a href="#existsFile">existsFile</a></li>
+<li><a href="#expand">expand</a></li>
+<li><a href="#expandAny">expandAny</a></li>
+<li><a href="#extForm">extForm</a></li>
+<li><a href="#flush">flush</a></li>
+<li><a href="#flush_Xe3X82Xb5Xe3X83Xb3Xe3X83X97Xe3X83Xab">flush サンプル</a></li>
+<li><a href="#getForm">getForm</a></li>
+<li><a href="#getHtml">getHtml</a></li>
+<li><a href="#isRoot">isRoot</a></li>
+<li><a href="#isXHTML">isXHTML</a></li>
+<li><a href="#js">js</a></li>
+<li><a href="#jsstring">jsstring</a></li>
+<li><a href="#loadTemplate">loadTemplate</a></li>
+<li><a href="#loadTemplateXe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89Xe5X88Xa9Xe7X94Xa8Xe4Xb8X8dXe5X8fXafXe8X83Xbd">loadTemplateメソッド利用不可能</a></li>
+<li><a href="#node">node</a></li>
+<li><a href="#plain_Xe3X81XbeXe3X81X9fXe3X81XafXe6X8cX87Xe5XaeX9aXe7X84Xa1Xe3X81X97">plain または指定無し</a></li>
+<li><a href="#raw">raw</a></li>
+<li><a href="#rootpath">rootpath</a></li>
+<li><a href="#setAttr">setAttr</a></li>
+<li><a href="#setForm">setForm</a></li>
+<li><a href="#setHtml">setHtml</a></li>
+<li><a href="#setTemplate">setTemplate</a></li>
+<li><a href="#toStr">toStr</a></li>
+<li><a href="#trim">trim</a></li>
+<li><a href="#Xe3X82Xb3Xe3X83X94Xe3X83XbcXe3X82XbfXe3X82Xb0">コピータグ</a></li>
+<li><a href="#Xe3X82XbdXe3X83XbcXe3X82Xb9Xe3X82Xb3Xe3X83XbcXe3X83X89">ソースコード</a></li>
+<li><a href="#Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe6X9bXb8Xe5XbcX8f">テンプレート書式</a></li>
+<li><a href="#Xe3X83X96Xe3X83XadXe3X83X83Xe3X82XafXe3X82XbfXe3X82Xb0">ブロックタグ</a></li>
+<li><a href="#Xe5X88Xa9Xe7X94Xa8Xe4Xb8X8aXe3X81XaeXe6Xb3Xa8Xe6X84X8f">利用上の注意</a></li>
+<li><a href="#Xe5XaeX9fXe8Xa1X8cXe7Xb5X90Xe6X9eX9c">実行結果</a></li>
+<li><a href="#Xe5Xb1X95Xe9X96X8bXe3X82XbfXe3X82Xb0">展開タグ</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Template - テンプレート
+
+
+</div>
+
+</body>
+</html>

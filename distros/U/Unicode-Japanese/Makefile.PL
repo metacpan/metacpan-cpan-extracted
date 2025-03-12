@@ -11,6 +11,7 @@ use strict;
 use ExtUtils::Manifest;
 use ExtUtils::MakeMaker;
 #use File::Spec; # not included in perl-5.004.
+use lib '.';
 use inc::ExtUtils::MY_Metafile qw(my_metafile);
 
 my $MANIFEST_bak = $ExtUtils::Manifest::MANIFEST;

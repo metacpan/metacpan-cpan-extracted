@@ -77,7 +77,7 @@ This module has mapping tables for emoji (graphic characters) defined by various
 japanese mobile phones; DoCoMo i-mode, ASTEL dot-i and J-PHONE J-Sky. Those
 letters are mapped on Unicode Private Use Area so unicode strings it outputs are
 still valid even if they contain emoji, and you can safely pass them to other
-softwares that can handle Unicode.
+software that can handle Unicode.
 J<< ja;
 携帯電話 (DoCoMo i-mode，KDDI AU, Softbank Mobile, ASTEL dot-i) の絵文字を
 Unicode 私用領域にマッピングすることで，DB 等で安全に扱うことができます．

@@ -175,8 +175,6 @@
 
 <p>Options may not be bundled together. In other words, options <b>-q</b> and <b>-g</b> may NOT be entered as <b>-qg</b>.</p>
 
-<p>Option names may be terminated early as long as they are uniquely identified. For example, instead of <b>--dump-token-types</b>, it would be sufficient to enter <b>--dump-tok</b>, or even <b>--dump-t</b>, to uniquely identify this command.</p>
-
 <h2 id="I-O-Control">I/O Control</h2>
 
 <p>The following parameters concern the files which are read and written.</p>
@@ -1020,7 +1018,7 @@
 
 <p>To review, the tightness controls described in the previous section have three possible integer values: 0, 1, and 2, where <b>n=0</b> always adds a space, and <b>n=2</b> never adds a space.</p>
 
-<p>The default value <b>n=1</b> adds space only if the container holds multiple tokens. Some perltidy tokens may be rather long, and it can be preferable to space some of them as if they were multple tokens. This can be done with this paramter.</p>
+<p>The default value <b>n=1</b> adds space only if the container holds multiple tokens. Some perltidy tokens may be rather long, and it can be preferable to space some of them as if they were multiple tokens. This can be done with this parameter.</p>
 
 <p>For example, in the following expression the <code>qw</code> list is a single token and therefore there the default formatting does not put spaces within the square brackets:</p>
 
@@ -3687,7 +3685,7 @@
 
 <h2 id="Controlling-Breaks-at-Certain-Chain-Operators">Controlling Breaks at Certain Chain Operators</h2>
 
-<p>For a statment which consists of a chain of certain binary operators, the default line break logic is: (1) if a statement fits on one line, then it is formatted as one line, or (2) if the statement requires multiple lines, then a break is made at all of the chain operators. Additional rules apply, but this is the basic one.</p>
+<p>For a statement which consists of a chain of certain binary operators, the default line break logic is: (1) if a statement fits on one line, then it is formatted as one line, or (2) if the statement requires multiple lines, then a break is made at all of the chain operators. Additional rules apply, but this is the basic one.</p>
 
 <p>The parameter <b>--pack-operator-types=s</b>, or <b>-pot=s</b>, can be used to change this for certain operators which may be specified with the string <b>s</b>. These are the concatenation operator <b>s=&#39;.&#39;</b> and the method call arrow <b>s=&#39;-&gt;&#39;</b>. When this parameter is selected for an operator, no special breaks are made, so there will be a minimal number of line breaks. For example, here is the default formatting for a method call chain:</p>
 
@@ -4060,7 +4058,7 @@
 
 <pre><code> n=0 ignore all old blank lines
  n=1 stable: keep old blanks, but limited by the B&lt;-mbl=n&gt; flag, but
-     remove existing blanks matching the B&lt;--kblx=s&gt; flag (next section)
+     remove existing blanks matching the B&lt;--kblx=s&gt; flag (see below)
  n=2 keep all old blank lines, regardless of the B&lt;-mbl=n&gt; flag</code></pre>
 
 <p>The default and recommended setting is <b>n=1</b>. With this option, you may selectively filter out selected blank lines from the input stream before formatting begins using the parameter described in the next section.</p>
@@ -4844,21 +4842,20 @@
 
 <p>For a specific example, the following definition</p>
 
-<pre><code>  oneliner {
-    --maximum-line-length=0
-    --noadd-newlines
-    --noadd-terminal-newline
+<pre><code>  debug {
+     --warn-similar-keys
+     --warn-unique-keys
   }</code></pre>
 
 <p>or equivalently, with abbreviations,</p>
 
-<pre><code>  oneliner { -l=0 -nanl -natnl }</code></pre>
+<pre><code>  debug { -wsk -wuk }</code></pre>
 
-<p>could be placed in a <i>.perltidyrc</i> file to temporarily override the maximum line length with a large value, to temporarily prevent new line breaks from being added, and to prevent an extra newline character from being added the file. All other settings in the <i>.perltidyrc</i> file still apply. Thus it provides a way to format a long &#39;one liner&#39; when perltidy is invoked with</p>
+<p>could be placed in a <i>.perltidyrc</i> file. The new name, in this case <b>debug</b>, is arbitrary provided that it does not conflict with an existing parameter. The extra warning checks defined with this new parameter will be ignored unless the new parameter <b>-debug</b> is added to the command line. All other settings in the <i>.perltidyrc</i> file still apply. Thus it provides a way to do some extra checking when perltidy is invoked with</p>
 
-<pre><code>        perltidy --oneliner ...</code></pre>
+<pre><code>        perltidy -debug ...</code></pre>
 
-<p>(Either <code>-oneliner</code> or <code>--oneliner</code> may be used).</p>
+<p>(Either <b>-debug</b> or <b>--debug</b> may be used).</p>
 
 </dd>
 <dt id="Skipping-leading-non-perl-commands-with--x-or---look-for-hash-bang">Skipping leading non-perl commands with <b>-x</b> or <b>--look-for-hash-bang</b></dt>
@@ -4982,7 +4979,7 @@
 <dt id="Use---dump-block-summary-to-make-a-table-of-information-on-code-blocks"><b>Use --dump-block-summary to make a table of information on code blocks</b></dt>
 <dd>
 
-<p>A table listing information about the blocks of code in a file can be made with <b>--dump-block-summary</b>, or <b>-dbs</b>. This causes perltidy to read and parse the file, write a table of comma-separated values for selected code blocks to the standard output, and then exit. This parameter must be on the command line, not in a <i>.perlticyrc</i> file, and it requires a single file name on the command line. For example</p>
+<p>A table listing information about the blocks of code in a file can be made with <b>--dump-block-summary</b>, or <b>-dbs</b>. This causes perltidy to read and parse the file, write a table of comma-separated values for selected code blocks to the standard output, and then exit. This parameter must be on the command line, not in a <i>.perltidyrc</i> file, and it requires a single file name on the command line. For example</p>
 
 <pre><code>   perltidy -dbs somefile.pl &gt;blocks.csv</code></pre>
 
@@ -4997,9 +4994,12 @@
   depth        - nesting depth of the opening block brace
   max_change   - change in depth to the most deeply nested code block
   block_count  - total number of code blocks nested in this block
-  mccabe_count - McCabe complexity measure of this code block</code></pre>
+  mccabe1      - McCabe complexity measure of this code block
+  mccabe2      - modified: subs have anonymous sub complexity removed</code></pre>
 
-<p>This feature was developed to help identify complex sections of code as an aid in refactoring. The McCabe complexity measure follows the definition used by Perl::Critic. By default the table contains these values for subroutines, but the user may request them for any or all blocks of code or packages. For blocks which are loops nested within loops, a postfix &#39;+&#39; to the <code>type</code> is added to indicate possible code complexity. Although the table does not otherwise indicate which blocks are nested in other blocks, this can be determined by computing and comparing the block ending line numbers.</p>
+<p>This feature was developed to help identify complex sections of code as an aid in refactoring. The McCabe complexity measure, &#39;mccabe1&#39;, matches the definition used by Perl::Critic. The alternate complexity value, &#39;mccabe2&#39;, is the same except that for subroutines, the complexity of any contained anonymous subs is removed and shown separately. This alternate value can be more representative of the actual complexity, and sometimes much lower. For example, in one of the subs in perltidy the two values are 77 and 6. The difference is shared by the anonymous subs which it contains, of which the maximum is 36.</p>
+
+<p>By default the table contains these values for subroutines, but the user may request them for any or all blocks of code or packages. For blocks which are loops nested within loops, a postfix &#39;+&#39; to the <code>type</code> is added to indicate possible code complexity. Although the table does not otherwise indicate which blocks are nested in other blocks, this can be determined by computing and comparing the block ending line numbers.</p>
 
 <p>For subroutines, the number of call arguments (args) is listed in parentheses in the <code>type</code> column. For example, <code>sub(9)</code> indicates a sub with 9 args. Subroutines whose arg count cannot easily be determined are indicated as <code>sub(*)</code>. The count includes any leading object passed in a method call (such as <b>$self</b>).</p>
 
@@ -5050,7 +5050,7 @@
 </li>
 <li><p>This selects every <code>while</code> block with 6 or more code lines</p>
 
-<pre><code>    perltidy -dbs -dbt=while -dbl=6 somfile.pl &gt;while.csv</code></pre>
+<pre><code>    perltidy -dbs -dbt=while -dbl=6 somefile.pl &gt;while.csv</code></pre>
 
 </li>
 </ul>
@@ -5202,6 +5202,97 @@
 <p>The parameter <b>--warn-unique-keys</b>, or <b>-wuk</b>, can be used to produce a warning of a possible misspelled hash key during normal processing. It works like the previous <b>-dump</b> version but writes to the standard error output if unique keys are found during normal formatting.</p>
 
 <p>For some scripts, this will produce unwanted warnings for a few keys, even though the filter described above attempts to avoid this. A way to avoid warnings for specific keys is to list them somewhere in the program in a <b>qw</b> list. This will be seen during the key scan, and the then keys will not be considered unique.</p>
+
+</dd>
+<dt id="Use---dump-similar-keys-to-help-locate-misspelled-hash-keys"><b>Use --dump-similar-keys</b> to help locate misspelled hash keys</dt>
+<dd>
+
+<p>The parameter <b>--dump-similar-keys</b>, or <b>-dsk</b>, provides another way to help locate errors in hash keys. It dumps a list of hash keys which are very similar but different. For example:</p>
+
+<pre><code>   perltidy -dsk File.pm &gt;output.txt</code></pre>
+
+<p>The lines in the output file contain pairs of similar keys, and the number of times each was found in the file. For example, the following line is from an actual script:</p>
+
+<pre><code>   recieve,receive,2,6</code></pre>
+
+<p>This tells us that the key <code>recieve</code> (a spelling error) occurs 2 times and the correct key <code>receive</code> occurs 6 times:</p>
+
+<p>Note that if this error had occurred just once then it could have also been found with <b>--dump-unique-keys</b> or <b>--warn-unique-keys</b>. But since it occurs more than once, the <b>--dump-similar-keys</b> option or its <b>--warn-</b> version is needed to locate it.</p>
+
+</dd>
+<dt id="Use---warn-similar-keys-or--wsk-to-warn-of-hash-keys-which-are-similar-but-different"><b>Use --warn-similar-keys</b>, or <b>-wsk</b>, to warn of hash keys which are similar but different.</dt>
+<dd>
+
+<p>This is the like the <b>--dump-similar-keys</b> option but writes to the error output file during normal formatting.</p>
+
+<p>In most cases, the warnings will be for perfectly valid hash keys. So this parameter is probably most useful for occasional debugging. See <a href="#Creating-a-new-abbreviation">&quot;Creating a new abbreviation&quot;</a> for a convenient way to include it in a <i>.perltidyrc</i>.</p>
+
+</dd>
+<dt id="Controls-for---dump-similar-keys-and---warn-similar-keys"><b>Controls for --dump-similar keys and --warn-similar-keys</b></dt>
+<dd>
+
+<p>The default parameters which control the search for similar keys should be normally be adequate, but they can be modified if necessary. They are as follows:</p>
+
+<dl>
+
+<dt id="similar-keys-maximum-difference-n-or--skmd-n-specifies-the-maximum-difference-between-two-keys-for-similarity"><b>--similar-keys-maximum-difference=n</b>, or <b>-skmd=n</b>, specifies the maximum difference between two keys for similarity.</dt>
+<dd>
+
+<p>The integer <b>n</b> gives the maximum number of differences to use when checking for hash key similarity. The default is <b>n=1</b>. The basic rules are that one difference is counted for each of the following conditions:</p>
+
+<ul>
+
+<li><p>a change in case of a letter, any number of times, such as <code>LENGTH, length</code>. This is implemented by making comparisons with lower case copies of the strings if any case change is detected.</p>
+
+</li>
+<li><p>one or more same-character changes, such as <code>number-of-lines, number_of_lines</code>. This is implemented by remembering any change such as <b>-</b> to <b>_</b> in this example, and counting it just once.</p>
+
+</li>
+<li><p>transposed characters, such as <code>recieve, receive</code></p>
+
+</li>
+<li><p>a missing or extra character, such as <code>color, colour</code> or <code>color, _color</code></p>
+
+</li>
+<li><p>any other character difference, such as <code>transparent, transparant</code></p>
+
+</li>
+</ul>
+
+<p>To help filter out unwanted matches, an additional rule is that one extra difference is counted if the <b>leading</b> letters are different when we ignore their case.</p>
+
+<p>For example, <code>_xmin, _Xmin</code> has a difference of one because of the case change, but the first letter is the same except for the case change. So the difference is one and this pair will be reported with the default setting <b>n=1</b>.</p>
+
+<p>On the other hand, the pair <code>_xmin, _ymin</code> has a different first letter which is not due to a case change, so the total difference score is 2, and it will not be reported with the default setting <b>n=1</b>. And this type of difference is unlikely to be an error.</p>
+
+<p>So the default value <b>-skmd=1</b> will catch most common errors without producing excessive output, but for a more thorough check it can be increased to <b>n=2</b>.</p>
+
+<p>Values greater than 2 can produce a large amount output, so rather than use higher values, it might be better to dump all of the keys and examine them with the <b>--dump-hash-keys</b> parameter described below.</p>
+
+</dd>
+<dt id="similar-keys-minimum-length-n-or--skml-n-defines-a-minimum-hash-key-length"><b>--similar-keys-minimum-length=n</b>, or <b>-skml=n</b>, defines a minimum hash key length.</dt>
+<dd>
+
+<p>Hash keys with fewer than <b>n</b> characters will be ignored when checking for similar keys. The default is <b>n=4</b>.</p>
+
+</dd>
+<dt id="similar-keys-maximum-pairs-n-or--skmp-n-defines-the-maximum-number-of-similar-pairs-to-display"><b>--similar-keys-maximum-pairs=n</b>, or <b>-skmp=n</b>, defines the maximum number of similar pairs to display</dt>
+<dd>
+
+<p>Each similar pair found is displayed on one line of output, so this is equivalent to the maximum number of output lines. The default is 25.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="Use---dump-hash-keys-to-dump-a-list-of-hash-keys"><b>Use --dump-hash-keys</b> to dump a list of hash keys</dt>
+<dd>
+
+<p>The parameter <b>--dump-hash-keys</b>, or <b>-dhk</b>, dumps a list of all hash keys found by perltidy to the standard output and exits. It can produce a lot of output, but it might be useful as a last resort when searching for a hash key problem. For example:</p>
+
+<pre><code>   perltidy -dhk File.pm &gt;output.txt</code></pre>
+
+<p>The lines in the output file list the keys and number of occurrences.</p>
 
 </dd>
 <dt id="Use---dump-mixed-call-parens-to-find-functions-called-both-with-and-without-parens"><b>Use --dump-mixed-call-parens to find functions called both with and without parens</b></dt>
@@ -5692,22 +5783,23 @@
  atnl   aws    b      baa    baao   bar    bbao   bbb    bbc    bbs
  bl     bli    boa    boc    bok    bol    bom    bos    bot    cblx
  ce     conv   cpb    cs     csc    cscb   cscw   dac    dbc    dbs
- dcbl   dcsc   ddf    dia    dior   dln    dltc   dma    dmcp   dmr
- dnl    dop    dp     dpro   drc    dsc    dsm    dsn    dtc    dtco
- dtt    duk    duv    dwic   dwls   dwrs   dws    eos    f      fpva
- frm    fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi
- hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc
- hbv    hbw    hent   hic    hicm   hico   hih    hihh   hii    hij
- hik    him    hin    hip    hipd   hipu   hiq    his    hisc   hiv
- hiw    hsc    html   ibc    icb    icp    ils    iob    ipc    isbc
- iscl   kgb    kgbd   kgbi   kis    lal    log    lop    lp     lsl
- mci    mem    nib    ohbr   okw    ola    olc    oll    olq    opr
- opt    osbc   osbr   otr    ple    pod    pvl    q      qwaf   sac
- sbc    sbl    scbb   schb   scp    scsb   sct    se     sfp    sfs
- skp    sob    sobb   sohb   sop    sosb   sot    ssc    st     sts
- t      tac    tbc    toc    tp     tqw    trp    ts     tsc    tso
- vbc    vc     viu    vmll   vsc    vsn    vwe    w      wfc    wia
- wma    wme    wmr    wn     wuk    x      xbt    xci    xlp    xs</code></pre>
+ dcbl   dcsc   ddf    dhk    dia    dior   dln    dltc   dma    dmcp
+ dmr    dnl    dop    dp     dpro   drc    dsc    dsk    dsm    dsn
+ dtc    dtco   dtt    duk    duv    dwic   dwls   dwrs   dws    eos
+ f      fpva   frm    fs     fso    gcs    hbc    hbcm   hbco   hbh
+ hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq
+ hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih    hihh
+ hii    hij    hik    him    hin    hip    hipd   hipu   hiq    his
+ hisc   hiv    hiw    hsc    html   ibc    icb    icp    ils    iob
+ ipc    isbc   iscl   kgb    kgbd   kgbi   kis    lal    log    lop
+ lp     lsl    mci    mem    nib    ohbr   okw    ola    olc    oll
+ olq    opr    opt    osbc   osbr   otr    ple    pod    pvl    q
+ qwaf   sac    sbc    sbl    scbb   schb   scp    scsb   sct    se
+ sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot    ssc
+ st     sts    t      tac    tbc    toc    tp     tqw    trp    ts
+ tsc    tso    vbc    vc     viu    vmll   vsc    vsn    vwe    w
+ wfc    wia    wma    wme    wmr    wn     wsk    wuk    x      xbt
+ xci    xlp    xs</code></pre>
 
 <p>Equivalently, the prefix &#39;no&#39; or &#39;no-&#39; on the corresponding long names may be used.</p>
 
@@ -5785,7 +5877,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This man page documents perltidy version 20250105.04</p>
+<p>This man page documents perltidy version 20250311</p>
 
 <h1 id="BUG-REPORTS">BUG REPORTS</h1>
 

@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Debug - TL デバッグ用クラス</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Debug - TL デバッグ用クラス
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Debug - TL デバッグ用クラス
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">このクラスは <code class="pod_iseq_C">use Tripletail</code> 時に自動的に読み込まれる．
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Ini">ini</a> で <a href="#enable_debug">&quot;enable_debug&quot;</a> を0以外にセットすると、
+以後デバッグ機能が有効になる。
+<a href="http://search.cpan.org/perldoc/Tripletail::Ini">ini</a> グループ名は &quot;Debug&quot; でなければならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">公開されているメソッドは存在しない。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="flush"><span class="pod_lang"><code class="pod_iseq_C">flush</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">内部メソッド
+
+</span>
+</p>
+
+</dd>
+<dt><a id="print"><span class="pod_lang"><code class="pod_iseq_C">print</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">内部メソッド
+
+</span>
+</p>
+
+</dd>
+<dt><a id="reset"><span class="pod_lang"><code class="pod_iseq_C">reset</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">内部メソッド
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<dl>
+<dt><a id="enable_debug"><span class="pod_lang">enable_debug
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  enable_debug = 1</code></pre>
+
+<p>
+<span class="pod_lang">デバッグ機能を使用するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、有効。
+0の場合、無効。
+デフォルトは0。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">無効にした場合、全てのデバッグオプションの設定は無効となる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="popup_type"><span class="pod_lang">popup_type
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  popup_style = single</code></pre>
+
+<p>
+<span class="pod_lang">デバッグ情報のポップアップ表示の機能選択。可能な値は <code class="pod_iseq_C">'none'</code>, <code class="pod_iseq_C">'single'</code>, <code class="pod_iseq_C">'multiple'</code> 。省略可能。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="none"><span class="pod_lang">none
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">　ポップアップ表示しない（デフォルト）
+　noneに設定した場合、xxxxxx_popupでポップアップを指定しても無視される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="single"><span class="pod_lang">single
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">一つのウインドウに全情報を表示
+
+</span>
+</p>
+
+</dd>
+<dt><a id="multiple"><span class="pod_lang">multiple
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">表示する情報の個数分のウインドウを表示
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt><a id="warn_logging"><span class="pod_lang">warn_logging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  warn_logging = 1</code></pre>
+
+<p>
+<span class="pod_lang">warnメッセージをログに残すか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、残す。
+0の場合、残さない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="warn_popup"><span class="pod_lang">warn_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  warn_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang">warnメッセージをポップアップ表示するように出力を加工するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="log_popup"><span class="pod_lang">log_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  log_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#log">$TL-&gt;log</a> されたログをポップアップ表示するように出力を加工するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="request_logging"><span class="pod_lang">request_logging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  request_logging = 1</code></pre>
+
+<p>
+<span class="pod_lang">受け取ったリクエストデータの内容と、$CGI への変更履歴をログに残すか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、残す。
+0の場合、残さない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="request_logging_max"><span class="pod_lang">request_logging_max
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  request_logging_max = 100K</code></pre>
+
+<p>
+<span class="pod_lang">１回に出力するログの最大サイズの指定。0で無制限。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="request_popup"><span class="pod_lang">request_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  request_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang">受け取ったリクエストデータの内容と、$CGI への変更履歴を別ウィンドウでポップアップするように、出力を加工するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="content_logging"><span class="pod_lang">content_logging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  content_logging = 1</code></pre>
+
+<p>
+<span class="pod_lang">応答コンテンツをログに残すか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、残す。
+0の場合、残さない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="content_logging_max"><span class="pod_lang">content_logging_max
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  content_logging_max = 100K</code></pre>
+
+<p>
+<span class="pod_lang">１回のログの最大サイズ。0で無制限。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="content_popup"><span class="pod_lang">content_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  content_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang">応答コンテンツを別ウィンドウでポップアップするように出力を加工するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="content_popup_max"><span class="pod_lang">content_popup_max
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  content_logging_max = 100K</code></pre>
+
+<p>
+<span class="pod_lang">１回のポップアップで表示する最大サイズ。0で無制限。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトは0
+
+</span>
+</p>
+
+</dd>
+<dt><a id="template_logging"><span class="pod_lang">template_logging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  template_logging = 1</code></pre>
+
+<p>
+<span class="pod_lang">使用した <a href="http://search.cpan.org/perldoc/Tripletail::Template">テンプレート</a> ファイル名と、展開の内容をログに残すか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、残す。
+0の場合、残さない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="template_popup"><span class="pod_lang">template_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  template_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang">使用した <a href="http://search.cpan.org/perldoc/Tripletail::Template">テンプレート</a>ァイル名と、展開の内容を、別ウィンドウでポップアップするように出力を加工するか否か省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ポップアップで表示するためには、出力するコンテンツに &lt;/head&gt; を含む HTML が存在しなければならない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="db_logging"><span class="pod_lang">db_logging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  db_logging = 1</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">DB</a> へのクエリをログに残すか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、残す。
+0の場合、残さない。
+デフォルトは1。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">db_logging_level及びdb_profileにて残すログの内容を設定可能。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="db_popup"><span class="pod_lang">db_popup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  db_popup = 1</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">DB</a> へのクエリログをポップアップ表示するように出力を加工するか否か。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、加工する。
+0の場合、加工しない。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="db_logging_level"><span class="pod_lang">db_logging_level
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  db_logging_level = 2</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">DB</a> へのクエリをログに残す際、応答内容をどの程度残すかを設定する。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、DBへ発行したクエリ文と実行時間を残す。
+2の場合、DBへ発行されたクエリ文と実行時間に加え、応答内容を残す。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="db_profile"><span class="pod_lang">db_profile
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  db_profile = 1</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">DB</a> へのクエリをログに残す際、実行計画をどこまで残すかを設定する。省略可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、DBへ発行したクエリ文と実行時間を残す。
+2の場合、DBへ発行されたクエリ文と実行時間に加え、実行計画を残す。
+デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="location_debug"><span class="pod_lang">location_debug
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  location_debug = 1</code></pre>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#location">$TL-&gt;location</a> でリダイレクトする際に、Locationヘッダの代わりに、HTML画面を表示する。
+利用しない場合、すぐにリダイレクトするため、デバッグ情報を確認する時間が取れない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">1の場合、HTML画面を表示する。
+0の場合、HTML画面を表示せず、Locationヘッダを出力する。
+デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe8Xa8XadXe5XaeX9aXe4XbeX8b"><span class="pod_lang">設定例
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  [Debug]
+  enable_debug=1
+  popup_type=single
+  warn_logging=1
+  warn_popup=1
+  log_popup=1
+  request_logging=0
+  request_logging_max=0
+  request_popup=1
+  content_logging=0
+  content_logging_max=0
+  content_popup=1
+  content_popup_max=0
+  template_logging=0
+  template_popup=0
+  db_logging=1
+  db_popup=1
+  db_logging_level=1
+  db_profile=1
+  location_debug=1</code></pre>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">Tripletail::DB</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__01"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Filter">Tripletail::Filter</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__02"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter">Tripletail::InputFilter</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__03"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Template">Tripletail::Template</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Debug - TL デバッグ用クラス
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__00">Tripletail::DB</a></li>
+<li><a href="#X__01">Tripletail::Filter</a></li>
+<li><a href="#X__02">Tripletail::InputFilter</a></li>
+<li><a href="#X__03">Tripletail::Template</a></li>
+<li><a href="#content_logging">content_logging</a></li>
+<li><a href="#content_logging_max">content_logging_max</a></li>
+<li><a href="#content_popup">content_popup</a></li>
+<li><a href="#content_popup_max">content_popup_max</a></li>
+<li><a href="#db_logging">db_logging</a></li>
+<li><a href="#db_logging_level">db_logging_level</a></li>
+<li><a href="#db_popup">db_popup</a></li>
+<li><a href="#db_profile">db_profile</a></li>
+<li><a href="#enable_debug">enable_debug</a></li>
+<li><a href="#flush">flush</a></li>
+<li><a href="#location_debug">location_debug</a></li>
+<li><a href="#log_popup">log_popup</a></li>
+<li><a href="#multiple">multiple</a></li>
+<li><a href="#none">none</a></li>
+<li><a href="#popup_type">popup_type</a></li>
+<li><a href="#print">print</a></li>
+<li><a href="#request_logging">request_logging</a></li>
+<li><a href="#request_logging_max">request_logging_max</a></li>
+<li><a href="#request_popup">request_popup</a></li>
+<li><a href="#reset">reset</a></li>
+<li><a href="#single">single</a></li>
+<li><a href="#template_logging">template_logging</a></li>
+<li><a href="#template_popup">template_popup</a></li>
+<li><a href="#warn_logging">warn_logging</a></li>
+<li><a href="#warn_popup">warn_popup</a></li>
+<li><a href="#Xe8Xa8XadXe5XaeX9aXe4XbeX8b">設定例</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Debug - TL デバッグ用クラス
+
+
+</div>
+
+</body>
+</html>

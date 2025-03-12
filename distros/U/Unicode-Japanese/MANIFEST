@@ -33,6 +33,8 @@ c_lib/t/07_utf16.c
 c_lib/t/07_utf16.t
 c_lib/t/08_ucs4.c
 c_lib/t/08_ucs4.t
+c_lib/t/09_empty.c
+c_lib/t/09_empty.t
 c_lib/t/Makefile
 c_lib/table_ea2u1.c
 c_lib/table_ea2u1s.c
@@ -72,11 +74,12 @@ Changes
 conv.c				sjis<=>utf8 変換コード
 erlang/Changes
 erlang/Makefile
-erlang/decode_term.c
+erlang/minitest.c
 erlang/test1.erl
 erlang/unijp.erl
 erlang/unijp.pod
-erlang/unijp_driver.c
+erlang/unijp_nif.c
+erlang/unijp_nif.erl
 eucjp.c				sjis<=>eucjp 変換コード
 getcode.c			getcode
 getcode.h
@@ -137,6 +140,7 @@ t/random_redo.pl
 t/sjis_extras.t
 t/toutf8.t
 t/ucs2_utf8.pl
+t/ujconv.t
 t/utf16.t
 t/utf8flag.t
 t/util.t
@@ -146,8 +150,8 @@ t/v041_sjisau.t
 t/v045_getcode_doti.t
 t/v045_imodexs.t
 t/v046_earlycall.t
-t/verify_sjis_ucs2.pl
 t/v048_xs_internal.t
+t/verify_sjis_ucs2.pl
 t/wavedash.t
 t/z2h.t
 ucs2_utf8.c

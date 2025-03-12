@@ -123,7 +123,7 @@ unsigned char* size_bytestr_from_sv(SV *perlval, size_t wanted_size, char *argna
 	unsigned char *bytestr = bytestr_from_sv(perlval, &size);
 
 	if (size != wanted_size) {
-		croak("%s must be a bytestring of length %zu", argname, wanted_size);
+		croak("%s must be a bytestring of length %lu", argname, (unsigned long) wanted_size);
 	}
 
 	return bytestr;

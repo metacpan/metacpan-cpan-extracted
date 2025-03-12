@@ -139,7 +139,7 @@ __END__
 =for stopwords
 	Ini
 	YMIRLINK
-	httponly
+	httpOnly
 	ini
 
 =head1 NAME
@@ -258,15 +258,23 @@ C<secure>フラグの有無。省略可能。
 0の場合、C<secure>フラグを付けない。
 デフォルトは0。
 
-=item httponly
+=item httpOnly
 
-  httponly = 1
+  httpOnly = 1
 
-C<httponly>フラグの有無。省略可能。
-1の場合、C<httponly>フラグを付ける。
-0の場合、C<httponly>フラグを付けない。
+C<httpOnly>フラグの有無。省略可能。
+1の場合、C<httpOnly>フラグを付ける。
+0の場合、C<httpOnly>フラグを付けない。
 デフォルトは0。
 現状では IE でしか意味が無い。
+
+=item sameSite
+
+  sameSite = Strict
+
+C<SameSite>の指定。省略可能。
+None、Lax、Strict のいずれかを指定する。
+デフォルトはStrict。
 
 =back
 

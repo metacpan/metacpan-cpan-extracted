@@ -110,9 +110,7 @@ int main(int argc, const char* argv[])
   {
     char* buf;
     int buf_size;
-    int buf_len;
 
-    buf_len = 0;
     buf_size = 1024;
     buf = malloc(buf_size);
     if( buf==NULL )
@@ -164,7 +162,7 @@ int main(int argc, const char* argv[])
           fprintf(stderr, "fwrite: %s: %s\n", files[i], strerror(errno));
           return 1;
         }
-        free(obuf);
+        uj_delete_buffer(uj, obuf);
         uj_delete(uj);
       }
       if( ferror(fp) )

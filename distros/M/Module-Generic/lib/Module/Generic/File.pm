@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.8.4
+## Version v0.9.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/06/27
+## Modified 2024/11/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.8.4';
+    our $VERSION = 'v0.9.0';
 };
 
 use strict;
@@ -2672,6 +2672,21 @@ sub os { return( shift->_set_get_scalar( 'os', @_ ) ); }
 sub parent
 {
     my $self = shift( @_ );
+    # The user is providing a digit indicating the number of hops he wants to go up
+    if( @_ && defined( $_[0] ) && $_[0] =~ /^\d+$/ )
+    {
+        my $n = shift( @_ );
+        my $me = $self;
+        my $parent = $me->parent;
+        my $i = 0;
+        while( $parent && ++$i < $n )
+        {
+            my $p = $parent->parent;
+            last if( $p eq $parent );
+            $parent = $p;
+        }
+        return( $parent );
+    }
     # No need to compute this twice, send what we have cached
     return( $self->{parent} ) if( $self->{parent} );
     # I deliberately did not do split( '/', $path, -1 ) so that if there is a trailing '/', it will not be counted
@@ -3518,7 +3533,7 @@ sub unload_json
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     # my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
-    my $j = $self->new_json || return( $self->pass_error );
+    my $j = $self->new_json->allow_tags(0) || return( $self->pass_error );
     my $equi =
     {
         order => 'canonical',
@@ -4638,7 +4653,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.8.4
+    v0.9.0
 
 =head1 DESCRIPTION
 
@@ -5857,7 +5872,20 @@ L<Module::Generic/new_null> will return a sensitive null based on the caller's e
 
 =head2 parent
 
-Returns the parent element of the current object.
+    use Module::Generic::File qw( file );
+    my $file = file( '/some/where/some/place/file.txt' );
+    my $parent = $file->parent; # /some/where/some/place
+    $file->parent(3); # /some/where
+    $file->parent(1); # /some/where/some/place
+    $file->parent(0); # /some/where/some/place
+    # Digits exceeds the number of possible parents
+    $file->parent(12); # /
+
+Returns the parent element of the current object, as an C<Module::Generic::File> object.
+
+If you provide a digit, it will return the parent in the hierarchy at the desired offset (starting from 1.
+
+If the digit provided, exceeds the number of possible parents, the root file object will be returned.
 
 =head2 print
 
@@ -6294,7 +6322,9 @@ Provided some perl data and an optional hash or hash reference of options and th
 
 If the L<JSON> module is not installed or an error occurs during JSON encoding, this sets an L<error|Module::Generic/error> and returns undef.
 
-The L<JSON> object provided by L<Module::Generic/new_json> already has the following options enabled: C<allow_nonref>, C<allow_blessed>, C<convert_blessed>, C<allow_tags> and C<relaxed>
+The L<JSON> object provided by L<Module::Generic/new_json> already has the following options enabled: C<allow_nonref>, C<allow_blessed>, C<convert_blessed>, and C<relaxed>.
+
+As of version v0.0.9 of this module, the option C<allow_tags> is not enabled by default anymore, mainly, because JSON requires the tagged package to be loaded at the time of the parsing, and there is no callback mechanism to do so dynamically, and it would fail.
 
 Supported options are as follows, including any of the L<JSON> supported options:
 

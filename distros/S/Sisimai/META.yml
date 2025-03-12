@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.2.0
+    version: v5.2.1
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -229,6 +229,8 @@ provides:
     file: lib/Sisimai/Rhost/Aol.pm
   Sisimai::Rhost::Apple:
     file: lib/Sisimai/Rhost/Apple.pm
+  Sisimai::Rhost::Cloudflare:
+    file: lib/Sisimai/Rhost/Cloudflare.pm
   Sisimai::Rhost::Cox:
     file: lib/Sisimai/Rhost/Cox.pm
   Sisimai::Rhost::Facebook:
@@ -290,7 +292,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-sisimai.git
-version: v5.2.0
+version: v5.2.1
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

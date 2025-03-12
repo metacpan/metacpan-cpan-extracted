@@ -1990,6 +1990,8 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	Correct 1 POD syntax error.
 		   Need to emphasize in the documentation that key releases of HEX-digit keys are important for input-by-numbers!
 	Clarify ALTNUMPAD_BIT and OEM codepage.
+	Clarify that there may be up to 255 UTF-16 codepoints delivered per keypress.  Clarify how overhanging records behave.
+	Clarify that without “combining bitmaps”, rCtrl-rAlt may depend on the order of pressing.
 
 	examples/HOWTO-install-deinstall-and-tables.txt		New file (from ilyaz.org)
 
@@ -2016,3 +2018,86 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 
 	examples/dumper-msg.c
 		Now almost works.  (Only the detection of lCtrl when rAlt is down is processed in a brain-damaged way.)
+
+0.7901	Reference to “Caveat in bullet-proof method” was not updated.
+	Put a “Beware” in the docs about: That flag sadly doesn't affect the kernel's Alt-Numpad buffer. – 
+		On 0x04 in ToUnicode().
+	Replace finite automaton to finite state machine in the docs.
+	Fix one more place mentioning 8-bit bitmasks.
+	Add a link to history of the Alt-Numpad input.
+	Document junk-returned-as-state after non-first prefix key in a sequence.  (ligatures-resulting in a dead-key too)
+	The documentation of the ultra-simple approach did not mention prefix keys.
+	Document that Ctrl-2 produces U+0000 in console only — due to a bug.
+	Correct grep⸣s misparsed with Perl⸣s before 5.14.
+	In the docs, change “mask” to “bitmap”.
+	In the docs, it completely slipped through the cracks that “KBDALT stripping” does not happen on key-up events.
+		Mention related still-unresolved challenges for writing “a perfect handler”.
+	Add references to standards on tensors.
+	Document one layers’ assignment using lCtrl+AltGr flavors (28 of 27+1 layers for 4 personalities×2, 18 math + super/sub).
+	Start inserting cross-references to “robust_input”.
+
+	examples/dumper-msg.c		renamed to examples/robust_input/robust_input_front.c 
+		Attempt of a comment on treating sent messages.
+		Many bug fixes.
+		Add code for checking self-consistency of different approaches to “detection”.
+		A few minutes of crazy typing on the modifiers did not lead to any detected inconsistencies.
+		So now we can detect “real” keypresses of lCtrl, and detect KLLF_ALTGR (almost always on time).
+		Finite state mechine for Alt-NUMPAD entering.
+		Document 16 possible types of key input.
+		Implement Alt-Numpad input.  (Extensions: the extra digit — decimal or hex — determines: odd: cp1252, even: unicode symbols for controls+space, 0x2400 etc)
+		Implement detection of extra-effort lCtrl and lCtrl-lAlt with the same-effect-as-AltGr.
+		Start implementing detection of passive and active modifier keys.
+			(Unclear what to do with no-KBDALT-stripping — e.g., when KBDKANA is latinized on Cyr…)
+		Try to catch menu-related messages which MAY indicate that we lost focus without getting KILLFOCUS.
+		A few of 16 cases still unsupported.
+		Our detection of “real” lCtrl is still flaky: https://stackoverflow.com/questions/78224966/detection-of-focus-change-events-when-wm-killfocus-and-wm-setfocus-do-not-ar
+		Allow to preceed a legacy 8-bit character code in Alt-NUMPAD input by a codepage, or a shortcut for a codepage.
+		Implement such shortcuts 6/7/9 for Webding/Wingdings1–3/Symbol encodings (Wingdings2–3 unaccessible yet).
+		Allow the Alt-NUMPAD unicode input made by several UTF-8 and surrogate UTF-16 codepoints: if 2 bytes, follow by 00
+		Detect maybe-tapAlt.
+			(Not yet correctly acted upon.  Usually see the up-of-keytap-terminating-focus-on-menu-or-icon.)
+			Is lCtrl_first a good choice???
+		GetKeyState() was parsed as a BYTE.
+		Fix all detected discrepancies (e.g., MessageBox was done before processing key-down, so sanity check in key-down was too late.)
+		Clarify many “???”.
+		New case lCtrl_dn_unknown.
+		Cyrillic codepages in 40⸣s.
+		Implement cp872 = cp855+€; cp802 = cp866+€; likewise for 848, 849.
+		Alias 878 for KOI-8r=20866, 1168 for KOI-8u=21866.
+		Implement patching codepages to support Ukr/Bel/Lit flavors.
+		Un-deHex() cp=0x25.  More selective handling of deHex of other “real” codepages.
+		Mirror web/ding-bats to prefix=20–23 too (in addition to 6 and 7).
+		Our “reserved” did not include KF_MENUMODE;  Use the macro KF_ALTDOWN.
+				F10, Esc, Alt-going-up should be in the Ctrl function!!!! ???
+				Alt-tap can be detected by SYS on the Alt-keyup message.
+				SYS is disabled on VK_JUNJA.
+		On “interrupt” messages, just set an “interrupted” flag, do not reset.  Reset on the following keyboard event.
+			This is similar to how it is done in https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/System/Windows/Interop/HwndKeyboardInputProvider.cs,246
+		Separate tracking of lCtrl and KLLFA into subroutines.
+		Make the preceding call conditional on a flag f_noLCtrlKLLFA.
+		Move all MessageBox()es to the end of the pump cycle.
+		New subclassing for the duration of the check for KLLF_ALTGR.
+			The branch in old subclassing may be removed now.
+		Do not try to detect KLLF_ALTGR in thread messages.
+		Trigger lCtrl-lAlt actions only if KLLFA is known (it seems to be safer to insert a character…).
+		New flags to control lCtrl-lAlt.
+		Allow other handness than lCtrl-lAlt (any but lCtrl-rAlt).
+		Separate HEX alt-Numpad input into 17th case.
+		Control this case by a separate flag.
+		Add recognition of ctrl-stripping and report of stripped modifiers and the base.
+		Document (in comments) Alt-Numpad6 as an extra case of input (now 18).
+		Reset count of active modifiers on languague change.
+			(Cannot test due to our “custom” VK-code…)
+		Emit reports on all bindable keys.
+		React on WM_EXITSIZEMOVE too (as https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/System/Windows/Interop/HwndKeyboardInputProvider.cs,337).
+		Use Ctrl_state() instead of (wrong) Ctrl_state_withAlt when only the Alt-state “before” is known.
+		Convert ctrl-string to a message ourselves.
+		Two new options pTMf_deliverCtrlCh, pTMf_eatCtrlCh.
+		3-level detection of ctrl-string: at start, the first seen, the last seen.
+			(E.g., if Alt-Ctrl-Backspace deliver ⌫, then these would be 0, ^? and ^H.
+				Not yet merged:  ∅
+
+				Copy of the executable at  http://ilyaz.org/software/tmp/robust_input_front-0_7901.zip 
+
+	examples/Keyboard_API.pm
+		Minor change to error message in WriteConsole().

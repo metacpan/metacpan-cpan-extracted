@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.016';
+$Dist::Build::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -64,19 +64,12 @@ sub Build_PL {
 	my %options = get_config($meta->name, [ @{$args} ], [ @env ]);
 
 	my $planner = ExtUtils::Builder::Planner->new;
-	$planner->load_module('Dist::Build::Core');
 
-	my @blibs = map { catfile('blib', $_) } qw/lib arch bindoc libdoc script bin/;
-	$planner->mkdir($_) for @blibs;
-	$planner->create_phony('config', @blibs);
 	$planner->create_phony('code', 'config');
 	$planner->create_phony('manify', 'config');
 	$planner->create_phony('dynamic');
 	$planner->create_phony('pure_all', 'code', 'manify', 'dynamic');
 	$planner->create_phony('build', 'pure_all');
-
-	$planner->tap_harness('test', dependencies => [ 'pure_all' ], test_dir => 't');
-	$planner->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	$planner->add_delegate('meta', sub { $meta });
 	$planner->add_delegate('distribution', sub { $meta->name });
@@ -102,8 +95,17 @@ sub Build_PL {
 		push @meta_fragments, @fragments;
 	});
 
-	$planner->lib_dir('lib');
-	$planner->script_dir('script');
+	my $core = $planner->new_scope;
+	$core->load_module('Dist::Build::Core');
+
+	my @blibs = map { catfile('blib', $_) } qw/lib arch bindoc libdoc script bin/;
+	$core->mkdir($_) for @blibs;
+	$core->create_phony('config', @blibs);
+	$core->lib_dir('lib');
+	$core->script_dir('script');
+
+	$core->tap_harness('test', dependencies => [ 'pure_all' ], test_dir => 't');
+	$core->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	for my $file (glob 'planner/*.pl') {
 		my $inner = $planner->new_scope;
@@ -112,7 +114,7 @@ sub Build_PL {
 		$inner->run_dsl($file);
 	}
 
-	$planner->autoclean;
+	$core->autoclean;
 
 	my $plan = $planner->materialize;
 
@@ -168,12 +170,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.016
-
-=head1 SYNOPSIS
-
- use Dist::Build;
- Build_PL(\@ARGV, \%ENV);
+version 0.017
 
 =head1 DESCRIPTION
 
@@ -183,10 +180,117 @@ C<Dist::Build> is a Build.PL implementation. Unlike L<Module::Build::Tiny> it is
  dist_sharedir('share', 'Foo-Bar');
  
  load_module("Dist::Build::XS");
+ load_module("Dist::Build::XS::Alien");
  add_xs(
-   libraries     => [ 'foo' ],
+   alien         => 'foo',
    extra_sources => [ glob 'src/*.c' ],
  );
+
+=head1 PLUGINS
+
+=over 4
+
+=item * L<Dist::Build::XS>
+
+This plugin enables one to compile XS modules. It has a range of options, and a series of extensions that add to its capabilities.
+
+=over 4
+
+=item * L<Dist::Build::XS::Alien>
+
+This is used to link to an L<Alien|Alien::Base> library.
+
+=item * L<Dist::Build::XS::Conf>
+
+This wraps L<ExtUtils::Builder::Conf|ExtUtils::Builder::Conf> to detect headers, libraries and features.
+
+=item * L<Dist::Build::XS::Import>
+
+This can be used to import headers and flags as exported by L<Dist::Build::XS::Export|Dist::Build::XS::Export>.
+
+=item * L<Dist::Build::XS::PkgConfig>
+
+This adds flags for a given library as configured in its pkgconfig file.
+
+=item * L<Dist::Build::XS::WriteConstants>
+
+This integrates L<ExtUtils::Constant|ExtUtils::Constant> into the C<add_xs> command.
+
+=back
+
+=item * L<Dist::Build::ShareDir>
+
+This allows one to install sharedirs
+
+=item * L<Dist::Build::XS::Export>
+
+This allows one to export headers and flags, to be imported by L<Dist::Build::XS::Import|Dist::Build::XS::Import>
+
+=item * L<Dist::Build::DynamicPrereqs>
+
+This allows one to dynamically evaluate dependencies.
+
+=item * L<Dist::Build::Core>
+
+This module contains all commands used for the base actions of the module.
+
+=back
+
+=head1 DELEGATES
+
+By default, the following delegates are defined on your L<planner|ExtUtils::Builder::Planner>:
+
+=over 4
+
+=item * meta
+
+A L<CPAN::Meta|CPAN::Meta> object representing the C<META.json> file.
+
+=item * distribution
+
+The name of the distribution
+
+=item * distribution_version
+
+The version of the distribution
+
+=item * main_module
+
+The main module of the distribution.
+
+=item * release_status
+
+The release status of the distribution (e.g. C<'stable'>).
+
+=item * perl_path
+
+The path to the perl executable.
+
+=item * config
+
+The L<ExtUtils::Config|ExtUtils::Config> object for this build
+
+=item * install_paths
+
+The L<ExtUtils::InstallPaths|ExtUtils::InstallPaths> object for this build.
+
+=item * verbose
+
+The value of the C<verbose> command line argument.
+
+=item * uninst
+
+The value of the C<uninst> command line argument.
+
+=item * jobs
+
+The value of the C<jobs> command line argument.
+
+=item * pureperl_only
+
+The value of the C<pureperl_only> command line argument.
+
+=back
 
 =head1 AUTHOR
 

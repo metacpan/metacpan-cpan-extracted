@@ -1,12 +1,12 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
 use Cwd;
 use File::Basename;
-use File::Path;
+use File::Path qw(remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir);
 
@@ -414,7 +414,7 @@ DESTROY {
 
 	my $self = shift;
 
-	rmtree($self->{_unzip}, { safe => 1 }) if defined $self->{_unzip};
+	remove_tree($self->{_unzip}, { safe => 1 }) if -d $self->{_unzip};
 
 }
 

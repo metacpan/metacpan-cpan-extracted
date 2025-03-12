@@ -4,7 +4,7 @@ AtteanX::Store::DBI - Database quad-store
 
 =head1 VERSION
 
-This document describes AtteanX::Store::DBI version 0.002
+This document describes AtteanX::Store::DBI version 0.003
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ use v5.14;
 use warnings;
 
 package AtteanX::Store::DBI {
-	our $VERSION	= '0.002';
+	our $VERSION	= '0.003';
 	use Moo;
 	use DBI;
 	use Attean 0.013;

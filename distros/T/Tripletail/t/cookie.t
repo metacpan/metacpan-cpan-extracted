@@ -35,7 +35,7 @@ $TL->startCgi(
 
         my @set = $c->_makeSetCookies;
         is($set[0],
-           'foo=h616161r79333333333333333333333333',
+           'foo=h616161r79333333333333333333333333; SameSite=Strict',
            '_makeSetCookies');
 
         ok($c = $TL->getCookie, 'getCookie');

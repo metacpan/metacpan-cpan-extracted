@@ -13,10 +13,10 @@ J<< ja; Unicode::Japanese::JA - 日本語文字コード変換 >>
  uj_uint8* sjis  = uj_to_sjis(uj);
  uj_uint8* eucjp = uj_to_eucjp(uj);
  uj_uint8* jis   = uj_to_jis(uj);
- free(utf8);
- free(sjis);
- free(eucjp);
- free(jis);
+ uj_delete_buffer(uj, utf8);
+ uj_delete_buffer(uj, sjis);
+ uj_delete_buffer(uj, eucjp);
+ uj_delete_buffer(uj, jis);
  uj_delete(uj);
 
  uj_charcode_t code = uj_getcode(str, str_len);

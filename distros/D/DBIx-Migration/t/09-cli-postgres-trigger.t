@@ -22,7 +22,7 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
 note 'managed schema: ',  my $managed_schema  = 'myschema';
 note 'tracking schema: ', my $tracking_schema = 'public';
 note 'tracking table',    my $tracking_table  = 'migrations';
-note 'dsn: ',             my $dsn             = $pgsql->dsn;
+note 'dsn: ',             my $dsn             = $pgsql->dsn . ';options=--client_min_messages=WARNING';
 local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
 plan tests => 8;

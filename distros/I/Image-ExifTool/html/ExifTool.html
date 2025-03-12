@@ -8,6 +8,7 @@
 <!--
 pre  { padding: 0; margin: 0px 2px }
 ul   { margin-top: 0 }
+table.top td { vertical-align: top }
 -->
 </style>
 </head>
@@ -765,9 +766,15 @@ effect as a value of 0 for options with numerical values.</p>
     with optional group prefix followed by '+' or '-' then shift string.  eg)<br>
     <code>'createdate-1:0:0&nbsp;0:0:0'</code> - shift back by the length of the year
     before the CreateDate value<br><code>'xmp:createdate+0:2:0&nbsp;0'</code> -
-    shift forward by the length of the 2 months after XMP:CreateDate
-</td>
+    shift forward by the length of the 2 months after XMP:CreateDate</td>
     <td align=center>undef</td></tr>
+<tr id="GPSQuadrant"><td>GPSQuadrant</td>
+    <td>This option is used to specify the GPS quadrant in the case where a
+    warning was issued because the GPS quadrant couldn't be determined.</td>
+    <td>2-character quadrant code where the first character is 'N' or
+    'S' and the second is 'E' or 'W' (case insensitive).  If this option is not
+    set and the quadrant is unknown, a warning is issued and the quadrant is
+    assumed to be 'NE'.</td><td align=center>undef</td></tr>
 <tr id="GroupNum"><td>Group#</td><td>Extract tags only for specified groups in family #
     (Group0 assumed if # not given).</td>
     <td>Group name or reference to list of group names.
@@ -795,7 +802,7 @@ effect as a value of 0 for options with numerical values.</p>
     <tr><td valign=top align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr id="IgnoreGroups"><td>IgnoreGroups</td><td>List of group names to ignore when reading.
-    The group names are case insensitive and may be preceeded by a family number.</td>
+    The group names are case insensitive and may be preceded by a family number.</td>
     <td>List reference, delimited string of names (any delimiter is allowed), or undef to
     clear the previous IgnoreGroups list.</td>
     <td align=center>undef</td></tr>
@@ -820,6 +827,9 @@ effect as a value of 0 for options with numerical values.</p>
 <tr id="ImageHashType"><td>ImageHashType</td><td>Sets type of hash
     algorithm used for the ImageDataHash tag calculation.</td>
     <td align=center>'MD5', 'SHA256' or 'SHA512'</td><td align=center>'MD5'</td></tr>
+<tr id="KeepUTCTime"><td>KeepUTCTime</td><td>Flag to keep UTC times in Zulu
+    time zone instead of converting to local time.</td>
+    <td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="Lang"><td>Lang</td><td>Localized language for ExifTool tag descriptions, etc.  If the
     specified language isn't available, the option is not changed.  May be set to
     undef to select the built-in default language.</td>
@@ -829,7 +839,7 @@ effect as a value of 0 for options with numerical values.</p>
     are supported on this system.  If not set, processing is aborted if a chunk
     larger than 2 GB is encountered.  Set to 1 to process large chunks, or 2
     to process with a warning.</td>
-    <td align=center>0, 1 or 2</td><td align=center>2</td></tr>
+    <td align=center>0, 1 or 2</td><td align=center>1</td></tr>
 <tr id="LimitLongValues"><td>LimitLongValues</td><td>When extracting some values for
     some specific tags (usually Unknown tags), the PrintConv values are length-limited
     and the value is truncated with an ellipsis ("[...]") if it exceeds a specified
@@ -897,6 +907,36 @@ effect as a value of 0 for options with numerical values.</p>
     password-protected PDF documents. Ignored if a password is not required. Character encoding of
     the password is determined by the value of the Charset option at processing time.</td>
     <td align=center>Any string</td><td align=center>undef</td></tr>
+<tr id="Plot"><td>Plot</td><td>Settings for SVG plot feature as a comma-delimited
+    string.  Commas in the values must be escaped as "&amp;#44;". Valid settings and their default values are:
+    <table class="clear top">
+    <tr><td>"Type=Line"</td><td>-</td><td>type of plot (Line, Scatter or Histogram)</td></tr>
+    <tr><td>"Style=Line"</td><td>-</td><td>data style (Line, Marker and/or Fill)</td></tr>
+    <tr><td>"NBins=20"</td><td>-</td><td>number of histogram bins</td></tr>
+    <tr><td>"Size=800 600"</td><td>-</td><td>width,height of output image</td></tr>
+    <tr><td>"Margin=60&nbsp;15&nbsp;15&nbsp;30"</td><td>-</td><td>left,top,right,bottom margins around plot area</td></tr>
+    <tr><td>"Legend=0 0"</td><td>-</td><td>x,y offset to shift plot legend</td></tr>
+    <tr><td>"TxtPad=10 10"</td><td>-</td><td>padding between text and x,y scale</td></tr>
+    <tr><td>"LineSpacing=20"</td><td>-</td><td>spacing between text lines</td></tr>
+    <tr><td>"Stroke=1"</td><td>-</td><td>plot stroke width and marker-size scaling</td></tr>
+    <tr><td>Title, XLabel, YLabel</td><td>-</td><td>plot title and x/y axis labels (no default)</td></tr>
+    <tr><td>XMin, XMax</td><td>-</td><td>x axis minimum/maximum (auto scaling if not set)</td></tr>
+    <tr><td>YMin, YMax</td><td>-</td><td>y axis minimum/maximum</td></tr>
+    <tr><td>"Multi="</td><td>-</td><td>flag to draw multiple plots, one for each dataset</td></tr>
+    <tr><td>"Split="</td><td>-</td><td>flag to split strings of numbers into lists
+    (&gt;1 to split into lists of N items)</td></tr>
+    <tr><td>"Grid=darkgray"</td><td>-</td><td>grid color</td></tr>
+    <tr><td>"Text=black"</td><td>-</td><td>text and border color</td></tr>
+    <tr><td>"Bkg="</td><td>-</td><td>background color (default transparent)</td></tr>
+    <tr><td colspan=3>"Cols=red green blue black orange gray fuchsia brown turquoise gold"
+    - colors for plot data</td></tr>
+    <tr><td colspan=3>"Marks=circle square triangle diamond star plus pentagon left down right"
+    - marker-shape names for each dataset</td></tr>
+    </table></td>
+    <td>Comma-delimited string of settings to override default values, or
+    undef to revert to default settings.  Settings are accumulated if this option
+    is set multiple times.<br><br>See <a href="plot.html">The ExifTool Plot Feature</a>
+    for more details and examples.</td><td align=center>undef</td></tr>
 <tr id="PrintConv"><td>PrintConv</td><td>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align=center>0 or 1</td><td align=center>1</td></tr>
 <tr id="PrintCSV"><td>PrintCSV</td><td>Flag to directly print CSV-format output rather
@@ -927,7 +967,7 @@ effect as a value of 0 for options with numerical values.</p>
     specification date/time values should be UTC, but many digital cameras store
     local time instead (presumably because they don't know the time zone), so
     the default is to not convert these times (except for Canon CR3 files, which
-    always use UTC times).  This option also disables the autodetection of
+    always use UTC times).  This option also disables the auto-detection of
     incorrect time-zero offsets in QuickTime date/time values, and enforces a
     time zero of 1904 as per the QuickTime specification.</td>
     <td align=center>0 or 1</td>
@@ -962,21 +1002,21 @@ effect as a value of 0 for options with numerical values.</p>
     the FastScan option, only unrecognized file types are scanned for XMP.  
     </td><td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="Sort"><td>Sort</td><td>Specifies order to sort tags in the returned tag list.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=right><b>Input</b>&nbsp;=</td><td>Sort in same order as input tag arguments</td></tr>
-    <tr><td valign=top align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
-    <tr><td valign=top align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
-    <tr><td valign=top align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
-    <tr valign=top><td valign=top align=right><b>Group#</b>&nbsp;=</td><td>Sort by tag group,
+    <td><table class="clear top">
+    <tr><td align=right><b>Input</b>&nbsp;=</td><td>Sort in same order as input tag arguments</td></tr>
+    <tr><td align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
+    <tr><td align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
+    <tr><td align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
+    <tr><td align=right><b>Group#</b>&nbsp;=</td><td>Sort by tag group,
         where # is zero or more family numbers separated by colons. If # is not specified,
         Group0 is assumed.  See <a href="#GetGroup">GetGroup</a> for a description of group
         families.</td></tr>
     </table></td><td align=center>'Input'</td></tr>
 <tr id="Sort2"><td>Sort2</td><td>Secondary sort order used for tags within each group when Sort is 'Group'.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
-    <tr><td valign=top align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
-    <tr><td valign=top align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
+    <td><table class="clear top">
+    <tr><td align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
+    <tr><td align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
+    <tr><td align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
     </table></td><td align=center>'File'</td></tr>
 <tr id="StrictDate"><td>StrictDate</td><td>Flag to return undefined value for
     any date which can't be converted when the DateFormat option is used.  When
@@ -987,10 +1027,10 @@ effect as a value of 0 for options with numerical values.</p>
     reformatted according to PNG 1.2 recommendation (RFC-1123) when writing, and
     a warning to be issued for any non-standard value when reading (but note
     that Windows may not recognize PNG date/time values in standard format).</td>
-    <td><table class=clear>
-    <tr><td valign=top align=right><b>undef</b>&nbsp;=</td><td>Same as 0 for reading/writing or 1 for copying</td></tr>
-    <tr><td valign=top align=right><b>0</b>&nbsp;=</td><td>Return bad date/time values unchanged</td></tr>
-    <tr><td valign=top align=right><b>1</b>&nbsp;=</td><td>Return undef if date/time value can't be converted</td></tr>
+    <td><table class="clear top">
+    <tr><td align=right><b>undef</b>&nbsp;=</td><td>Same as 0 for reading/writing or 1 for copying</td></tr>
+    <tr><td align=right><b>0</b>&nbsp;=</td><td>Return bad date/time values unchanged</td></tr>
+    <tr><td align=right><b>1</b>&nbsp;=</td><td>Return undef if date/time value can't be converted</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr id="Struct"><td>Struct</td><td>Flag to return XMP structures as HASH references
     instead of flattening into individual tags.  This setting has no effect
@@ -999,21 +1039,21 @@ effect as a value of 0 for options with numerical values.</p>
     more details about structured information.  A special "_ordered_keys_" element
     containing a list of ordered keys may exist if the structure elements are ordered
     (see the <a href="#OrderedKeys">OrderedKeys</a> method).</td>
-    <td><table class=clear>
-    <tr><td valign=top align=right><b>undef</b>&nbsp;=</td><td>Same as 0 for reading and 2 for copying</td></tr>
-    <tr><td valign=top align=right><b>0</b>&nbsp;=</td><td>Read/copy flattened tags</td></tr>
-    <tr><td valign=top align=right><b>1</b>&nbsp;=</td><td>Read/copy structures</td></tr>
-    <tr><td valign=top align=right><b>2</b>&nbsp;=</td><td>Read/copy both flattened and structured tags,
+    <td><table class="clear top">
+    <tr><td align=right><b>undef</b>&nbsp;=</td><td>Same as 0 for reading and 2 for copying</td></tr>
+    <tr><td align=right><b>0</b>&nbsp;=</td><td>Read/copy flattened tags</td></tr>
+    <tr><td align=right><b>1</b>&nbsp;=</td><td>Read/copy structures</td></tr>
+    <tr><td align=right><b>2</b>&nbsp;=</td><td>Read/copy both flattened and structured tags,
     but flag flattened tags as "unsafe" for copying</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr id="StructFormat"><td>StructFormat</td><td>Format for serialized structures when reading/writing.
     <a href="struct.html">Read here</a> for more details about structured information.
     Note that the JSONQ setting causes all values in the exiftool application -json
     output to be quoted, regardless of whether or not they are in a structure.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=right><b>undef</b>&nbsp;=</td><td>ExifTool format</td></tr>
-    <tr><td valign=top align=right><b>JSON</b>&nbsp;=</td><td>JSON format</td></tr>
-    <tr><td valign=top align=right><b>JSONQ</b>&nbsp;=</td><td>JSON with quoted numbers</td></tr>
+    <td><table class="clear top">
+    <tr><td align=right><b>undef</b>&nbsp;=</td><td>ExifTool format</td></tr>
+    <tr><td align=right><b>JSON</b>&nbsp;=</td><td>JSON format</td></tr>
+    <tr><td align=right><b>JSONQ</b>&nbsp;=</td><td>JSON with quoted numbers</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr id="SystemTags"><td>SystemTags</td><td>Flag to extract the
     following additional File System tags:  FileAttributes, FileDeviceNumber,
@@ -1029,11 +1069,11 @@ effect as a value of 0 for options with numerical values.</p>
     Requires Time::Piece on Windows, or POSIX::tzset on other systems.</td>
     <td>Time zone offset or ID, or undef to use the system time zone</td><td align=center>undef</td></tr>
 <tr id="Unknown"><td>Unknown</td><td>Control extraction of unknown tags.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
-    <tr><td valign=top align=center><b>1</b>&nbsp;=</td><td>Unknown tags are extracted from EXIF
+    <td><table class="clear top">
+    <tr><td align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
+    <tr><td align=center><b>1</b>&nbsp;=</td><td>Unknown tags are extracted from EXIF
         (and other tagged-format) directories</td></tr>
-    <tr><td valign=top align=center><b>2</b>&nbsp;=</td><td>Unknown tags also extracted from binary data blocks</td></tr>
+    <tr><td align=center><b>2</b>&nbsp;=</td><td>Unknown tags also extracted from binary data blocks</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr id="UserParam"><td>UserParam</td><td>Special option to set/get user-defined parameters.
     Useful to allow external input into tag name expressions and ValueConv logic.
@@ -1045,15 +1085,15 @@ effect as a value of 0 for options with numerical values.</p>
     additional arguments, <code>Options('UserParam')</code> returns a reference to the
     hash of all user parameters (with lower-case names).
 </td>
-    <td><table class=clear>
-    <tr><td valign=top><i>PARAM</i></td><td valign=top>-</td><td>Get parameter</td></tr>
-    <tr><td valign=top><i>PARAM=</i></td><td valign=top>-</td><td>Clear parameter</td></tr>
-    <tr><td valign=top><i>PARAM^=</i></td><td valign=top>-</td><td>Set parameter to empty string</td></tr></table>
+    <td><table class="clear top">
+    <tr><td><i>PARAM</i></td><td>-</td><td>Get parameter</td></tr>
+    <tr><td><i>PARAM=</i></td><td>-</td><td>Clear parameter</td></tr>
+    <tr><td><i>PARAM^=</i></td><td>-</td><td>Set parameter to empty string</td></tr></table>
     <table class=clear>
-    <tr><td valign=top><i>PARAM=VALUE</i></td><td valign=top>-</td><td>Set parameter</td></tr>
+    <tr><td><i>PARAM=VALUE</i></td><td>-</td><td>Set parameter</td></tr>
     </table><table class=clear>
-    <tr><td valign=top><i>hash&nbsp;ref</i></td><td valign=top>-</td><td>Set UserParam hash</td></tr>
-    <tr><td valign=top><b>undef</b></td><td valign=top>-</td><td>Clear UserParam hash</td></tr>
+    <tr><td><i>hash&nbsp;ref</i></td><td>-</td><td>Set UserParam hash</td></tr>
+    <tr><td><b>undef</b></td><td>-</td><td>Clear UserParam hash</td></tr>
     </table>
     </td><td align=center>{ }</td></tr>
 <tr id="Validate"><td>Validate</td><td>Flag to perform extra metadata validation checks
@@ -1061,13 +1101,13 @@ effect as a value of 0 for options with numerical values.</p>
     <td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="Verbose"><td>Verbose</td><td>Print verbose messages to file specified by TextOut option.
     <a href="verbose.html">Click here</a> for example outputs.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=center><b>0</b>&nbsp;=</td><td>No verbose messages</td></tr>
-    <tr><td valign=top align=center><b>1</b>&nbsp;=</td><td>Print tag names and raw values</td></tr>
-    <tr><td valign=top align=center><b>2</b>&nbsp;=</td><td>Add additional tag details</td></tr>
-    <tr><td valign=top align=center><b>3</b>&nbsp;=</td><td>Add hex dump of tag data (with length limits)</td></tr>
-    <tr><td valign=top align=center><b>4</b>&nbsp;=</td><td>Remove length limit on dump of tag values</td></tr>
-    <tr><td valign=top align=center><b>5</b>&nbsp;=</td><td>Remove length limit on dump of JPEG segments</td></tr>
+    <td><table class="clear top">
+    <tr><td align=center><b>0</b>&nbsp;=</td><td>No verbose messages</td></tr>
+    <tr><td align=center><b>1</b>&nbsp;=</td><td>Print tag names and raw values</td></tr>
+    <tr><td align=center><b>2</b>&nbsp;=</td><td>Add additional tag details</td></tr>
+    <tr><td align=center><b>3</b>&nbsp;=</td><td>Add hex dump of tag data (with length limits)</td></tr>
+    <tr><td align=center><b>4</b>&nbsp;=</td><td>Remove length limit on dump of tag values</td></tr>
+    <tr><td align=center><b>5</b>&nbsp;=</td><td>Remove length limit on dump of JPEG segments</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr id="WindowsLongPath"><td>WindowsLongPath</td><td>Support long path names in Windows.
     Enabling this option automatically enables the WindowsWideFile feature.</td>
@@ -1082,10 +1122,10 @@ effect as a value of 0 for options with numerical values.</p>
     (the family 0 group), but for EXIF this is the individual IFD (the family 1 group).
     The 'w' and 'c' modes are tested only when <a href="#SetNewValue">SetNewValue</a>
     is called, but the 'g' mode is also tested in <a href="#WriteInfo">WriteInfo</a>.</td>
-    <td>A string with one or more of these characters:<table class=clear>
-    <tr><td valign=top align=center><b>w</b>&nbsp;=</td><td><b>W</b>rite existing tags</td></tr>
-    <tr><td valign=top align=center><b>c</b>&nbsp;=</td><td><b>C</b>reate new tags</td></tr>
-    <tr><td valign=top align=center><b>g</b>&nbsp;=</td><td>Create new <b>g</b>roups <sup>&dagger;</sup></td></tr>
+    <td>A string with one or more of these characters:<table class="clear top">
+    <tr><td align=center><b>w</b>&nbsp;=</td><td><b>W</b>rite existing tags</td></tr>
+    <tr><td align=center><b>c</b>&nbsp;=</td><td><b>C</b>reate new tags</td></tr>
+    <tr><td align=center><b>g</b>&nbsp;=</td><td>Create new <b>g</b>roups <sup>&dagger;</sup></td></tr>
     </table></td><td align=center>'wcg'</td></tr>
 <tr id="XAttrTags"><td>XAttrTags</td><td>Flag to extract the OS X
     extended attribute tags (see the "xattr" man page and the
@@ -1167,17 +1207,6 @@ the .ExifTool_config file if it exists.</p>
 <blockquote><table class='box'><tr><td><pre>
 $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 </pre></td></tr></table></blockquote>
-<p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
-<blockquote>
-Binary, Charset, CharsetEXIF, CharsetFileName, CharsetID3, CharsetIPTC,
-CharsetPhotoshop, CharsetQuickTime, CharsetRIFF, Composite, ExtendedXMP,
-ExtractEmbedded, FastScan, FixBase, HtmlDump, HtmlDumpBase, IgnoreGroups,
-IgnoreMinorErrors, IgnoreTags, Lang, LargeFileSupport, MakerNotes,
-MDItemTags, NoPDFList, Password, QuickTimeUTC (enforced 1904 time zero),
-RequestAll, RequestTags, SaveBin, SaveFormat, SavePath, ScanForXMP, Struct,
-TextOut, Unknown, Verbose, WindowsLongPath, WindowsWideFile, XAttrTags and
-XMPAutoConv.
-</blockquote>
 
 <hr><h2><a name="GetInfo">GetInfo</a></h2>
 <p><a href="#GetInfo">GetInfo</a> is called to return meta information
@@ -1214,12 +1243,6 @@ $info = $exifTool-&gt;<b>GetInfo</b>(\@ioTagList);
 <span class=com># get all information in Author or Location groups</span>
 $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
-<p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
-<blockquote>
-Charset, CoordFormat, DateFormat, Duplicates, Escape, Exclude, Filter, Group#,
-GlobalTimeShift, Lang, ListItem, ListJoin, PrintConv, QuickTimeUTC (conversion
-to local time), Sort (if a tag list reference is given) and StrictDate.
-</blockquote>
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
 <p>Write meta information to a file.  The specified source file is rewritten to
@@ -1302,14 +1325,6 @@ $warningMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Warning');
 be called to obtain the error description.  A Warning tag may be set even if
 this routine is successful.  Calling WriteInfo clears any pre-existing Error
 and Warning tags.</p>
-<p>The following ExifTool options are effective in the call to
-<a href="#WriteInfo">WriteInfo</a>:</p>
-<blockquote>
-ByteOrder, Charset, CharsetEXIF, CharsetFileName, CharsetIPTC, Compact,
-Compress, FixBase, IgnoreMinorErrors, NoMultiExif, NoPDFList, Password,
-QuickTimeHandler, QuickTimePad, Verbose, WindowsLongPath, WindowsWideFile
-and WriteMode.
-</blockquote>
 
 <hr><h2><a name="GetTagList">GetTagList</a></h2>
 <p>Get a sorted list of tags from the specified information hash or tag list.</p>
@@ -1445,13 +1460,6 @@ if (ref $val eq 'ARRAY') {
 <span class=com># list example</span>
 my @keywords = $exifTool-&gt;<b>GetValue</b>('Keywords', 'ValueConv');
 </pre></td></tr></table></blockquote>
-<p>The following options are in effect when <a href="#GetValue">GetValue</a> is
-called:</p>
-<blockquote>
-Charset, CoordFormat, DateFormat, Escape, Filter, GlobalTimeShift, Lang,
-ListItem, ListJoin, PrintConv, QuickTimeUTC (conversion to local time),
-StrictDate and TimeZone.
-</blockquote>
 
 <hr><h2><a name="SetNewValue">SetNewValue</a></h2>
 <p>Set the new value for a tag.  The routine may be called multiple times to set
@@ -1498,10 +1506,10 @@ errors are printed to STDERR.
 <tr><th>Option</th><th>Description</th><th width='30%'>Values</th><th>Default</th></tr>
 <tr><td>AddValue</td><td>Add value to existing list <b>in a file</b> rather than
     overwriting the existing values</td>
-    <td><table class=clear>
-    <tr><td valign=top align=center><b>0</b>&nbsp;=</td><td>Overwrite existing value(s)</td></tr>
-    <tr><td valign=top align=center><b>1</b>&nbsp;=</td><td>Add to existing list, or warn for non-list tags</td></tr>
-    <tr><td valign=top align=center><b>2</b>&nbsp;=</td><td>Add to existing list, or overwrite non-list tags</td></tr>
+    <td><table class="clear top">
+    <tr><td align=center><b>0</b>&nbsp;=</td><td>Overwrite existing value(s)</td></tr>
+    <tr><td align=center><b>1</b>&nbsp;=</td><td>Add to existing list, or warn for non-list tags</td></tr>
+    <tr><td align=center><b>2</b>&nbsp;=</td><td>Add to existing list, or overwrite non-list tags</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>DelValue</td><td>Delete existing tag from a file if it has the specified
     value.  For list-type tags this deletes a specified item from the list.  For
@@ -1527,11 +1535,11 @@ errors are printed to STDERR.
     shortcuts if not found otherwise.</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Protected</td><td>Allow unsafe and protected tags to be written</td>
     <td>Bitmask of tag protection levels to write:
-    <table class=clear>
-    <tr><td valign=top align=center><b>0x01</b>&nbsp;=</td>
+    <table class="clear top">
+    <tr><td align=center><b>0x01</b>&nbsp;=</td>
     <td>Write '<a href="TagNames/index.html">unsafe</a>' tags (ie. tags not copied
         automatically via <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>)</td></tr>
-    <tr><td valign=top align=center><b>0x02</b>&nbsp;=</td>
+    <tr><td align=center><b>0x02</b>&nbsp;=</td>
     <td>Write '<a href="TagNames/index.html">protected</a>' tags (internal use only)</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>ProtectSaved</td><td>Avoid setting new values which were saved after the Nth
@@ -1540,22 +1548,22 @@ errors are printed to STDERR.
 <tr><td>Replace</td><td>Replace previous new values for this tag (ie. replace the values
     set in previous calls to <a href="#SetNewValue">SetNewValue</a>). This option
     is most commonly used to replace previously-set new values for list-type tags.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=center><b>0</b>&nbsp;=</td><td>Set new value normally (adds to new values for list-type tags)</td></tr>
-    <tr><td valign=top align=center><b>1</b>&nbsp;=</td><td>Reset any previous new values before setting new value</td></tr>
-    <tr><td valign=top align=center><b>2</b>&nbsp;=</td><td>Reset previous new values only (new value argument is ignored)</td></tr>
+    <td><table class="clear top">
+    <tr><td align=center><b>0</b>&nbsp;=</td><td>Set new value normally (adds to new values for list-type tags)</td></tr>
+    <tr><td align=center><b>1</b>&nbsp;=</td><td>Reset any previous new values before setting new value</td></tr>
+    <tr><td align=center><b>2</b>&nbsp;=</td><td>Reset previous new values only (new value argument is ignored)</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>Shift</td><td>Shift the tag by the specified value.  Currently only date/time tags
     and tags with numerical values may be shifted.  Value is added if Shift is 1, or subtracted
     if Shift is -1.  See <a href="Shift.html">Image::ExifTool::Shift.pl</a> for details time shift formats.</td>
-    <td><table class=clear>
-    <tr><td valign=top align=left colspan=2><b>undef</b>&nbsp;= No shift</td></tr>
-    <tr><td valign=top align=right><b>0</b>&nbsp;=</td><td>Shift if shiftable:<br>
+    <td><table class="clear top">
+    <tr><td align=left colspan=2><b>undef</b>&nbsp;= No shift</td></tr>
+    <tr><td align=right><b>0</b>&nbsp;=</td><td>Shift if shiftable:<br>
     Positive if AddValue set, or<br>
     Negative if DelValue set and<br>
     tag is date/time</td></tr>
-    <tr><td valign=top align=right><b>1</b>&nbsp;=</td><td>Positive shift</td></tr>
-    <tr><td valign=top align=right><b>-1</b>&nbsp;=</td><td>Negative shift</td></tr>
+    <tr><td align=right><b>1</b>&nbsp;=</td><td>Positive shift</td></tr>
+    <tr><td align=right><b>-1</b>&nbsp;=</td><td>Negative shift</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr><td>Type</td><td>The type of value being set</td>
     <td>PrintConv, ValueConv or Raw (default depends on <a href="#PrintConv">PrintConv</a> Option)</td>
@@ -1661,12 +1669,6 @@ of individual tags after deleting a group.</p>
 not deleted by default because doing so may affect the appearance of the image.
 However, this information may be deleted by specifying it explicitly, either by
 group (with '<code>Adobe:*</code>') or as a block (with '<code>Adobe</code>').</p>
-<p>The following ExifTool options are effective in the call to
-<a href="#SetNewValue">SetNewValue</a>:</p>
-<blockquote>
-Charset, DateFormat, Escape, IgnoreMinorErrors, Lang, ListJoin, ListSplit,
-PrintConv, QuickTimeUTC, StrictDate, TimeZone, Verbose and WriteMode.
-</blockquote>
 
 <hr><h2><a name="GetNewValue">GetNewValue</a><a name="GetNewValues"></a></h2>
 <p>Get the new Raw value for a tag.  This is the value set by
@@ -2310,58 +2312,61 @@ the specific IFD).
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td>AAC, AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP2,
 APP3, APP4, APP5, APP6, APP7, APP8, APP9, ASF, Audible, Canon, CanonVRD,
-Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF, ExifTool, FITS, FLAC,
-FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GM, GeoTiff,
-GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, JSON,
-JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MISB, MNG, MOI, MPC,
-MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF, PICT,
-PLIST, PNG, PSP, Palm, PanasonicRaw, Parrot, PhotoCD, PhotoMechanic,
-Photoshop, PostScript, PrintIM, Protobuf, QuickTime, RAF, RIFF, RSRC, RTF,
-Radiance, Rawzor, Real, Red, SVG, SigmaRaw, Sony, Stim, Theora, Torrent,
-Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
+Composite, DICOM, DjVu, DNG, Ducky, DV, EXE, EXIF, ExifTool, File, FITS,
+FLAC, Flash, FlashPix, FLIR, Font, FotoStation, GeoTiff, GIF, GIMP, GM,
+GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, Jpeg2000,
+JSON, JUMBF, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska, Meta, MIE, MIFF,
+MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus, Palm, PanasonicRaw,
+Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT, PLIST, PNG,
+PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF, Rawzor, Real,
+Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora, Torrent, Trailer,
+VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AAC, AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple,
-Audible, CBOR, CIFF, CameraIFD, Canon, CanonCustom, CanonDR4, CanonRaw,
-CanonVRD, Casio, Chapter#, Composite, DICOM, DJI, DNG, DV, DjVu, DjVu-Meta,
-Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FITS, FLAC, FLIR, File, Flash,
-FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GM, GPS,
-GSpherical, Garmin, GeoTiff, GlobParamIFD, GoPro, GraphConv, H264, HP, HTC,
+<td>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP10, APP2, Apple,
+ASF, Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD,
+Canon, CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#,
+CIFF, Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE,
+EXIF, ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
+FotoStation, FujiFilm, FujiIFD, Garmin, GE, GeoTiff, GIF, GIMP,
+GlobParamIFD, GM, Google, GoPro, GPS, GraphConv, GSpherical, H264, HP, HTC,
 HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
 ICC-chrm, ICC-cicp, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view,
 ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4,
-IFD0, IFD1, IPTC, IPTC#, ISO, ITC, InfiRay, Insta360, InteropIFD, ItemList,
-JFIF, JFXX, JPEG, JPEG-HDR, JPS, JSON, JUMBF, JVC, Jpeg2000, KDC_IFD, Keys,
-Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LIGO, LNK,
-Leaf, LeafSubIFD, Leica, Lyrics3, Lytro, M-RAW, M2TS, MAC, MIE-Audio,
-MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MISB,
-MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS, MakerNotes,
-MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft, Minolta,
-MinoltaRaw, Motorola, NITF, Nextbase, Nikon, NikonCapture, NikonCustom,
-NikonScan, NikonSettings, NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR,
-Opus, PDF, PICT, PNG, PNG-cICP, PNG-pHYs, PSP, Palm, Panasonic,
-PanasonicRaw, Parrot, Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm,
-QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Reconyx, Red, Ricoh, SEAL, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Theora, Torrent, Track#, UserData, VCalendar, VCard, VNote,
-Version0, Vorbis, WTV, XML, XMP, XMP-DICOM, XMP-Device, XMP-GAudio,
-XMP-GCamera, XMP-GContainer, XMP-GCreations, XMP-GDepth, XMP-GFocus,
-XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage, XMP-MP, XMP-MP1,
-XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-acdsee-rs, XMP-album, XMP-apple-fi,
-XMP-ast, XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs,
-XMP-dc, XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et, XMP-exif,
-XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv, XMP-getty, XMP-hdr,
-XMP-hdrgm, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama,
-XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-pmi,
-XMP-prism, XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-swf, XMP-tiff,
+IFD0, IFD1, InfiRay, Insta360, InteropIFD, IPTC, IPTC#, ISO, ITC, ItemList,
+iTunes, JFIF, JFXX, JPEG, JPEG-HDR, Jpeg2000, JPS, JSON, JUMBF, JVC,
+KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
+KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW, M2TS, MAC,
+MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD,
+Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-GPS, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-UTM,
+MIE-Video, MIFF, Minolta, MinoltaRaw, MISB, MNG, MOBI, MOI, Motorola, MPC,
+MPEG, MPF0, MPImage, MS-DOC, MXF, Nextbase, Nikon, NikonCapture,
+NikonCustom, NikonScan, NikonSettings, NineEdits, Nintendo, NITF, Ocad, Ogg,
+Olympus, OnePlus, OpenEXR, Opus, Palm, Panasonic, PanasonicRaw, Parrot, PDF,
+Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop, PICT, PictureInfo, PNG,
+PNG-cICP, PNG-pHYs, PostScript, PreviewIFD, PrintIM, ProfileIFD, PSP,
+Qualcomm, QuickTime, Radiance, RAF, RAF2, Rawzor, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Red,
+Ricoh, RIFF, RMETA, RSRC, RTF, Samsung, Sanyo, Scalado, SEAL, Sigma,
+SigmaRaw, Sony, SonyIDC, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Stim,
+SubIFD, SVG, System, Theora, Torrent, Track#, Track#ItemList, Track#Keys,
+Track#UserData, UserData, VCalendar, VCard, Version0, VideoItemList,
+VideoKeys, VideoUserData, Vivo, VNote, Vorbis, WTV, XML, XMP, XMP-aas,
+XMP-acdsee, XMP-acdsee-rs, XMP-album, XMP-apdi, XMP-apple-fi, XMP-ast,
+XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs, XMP-dc,
+XMP-Device, XMP-dex, XMP-DICOM, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et,
+XMP-exif, XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv,
+XMP-GAudio, XMP-GCamera, XMP-GContainer, XMP-GCreations, XMP-GDepth,
+XMP-getty, XMP-GFocus, XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-hdr,
+XMP-HDRGainMap, XMP-hdrgm, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-LImage,
+XMP-lr, XMP-mediapro, XMP-microsoft, XMP-MP, XMP-MP1, XMP-mwg-coll,
+XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama, XMP-pdf, XMP-pdfx,
+XMP-photomech, XMP-photoshop, XMP-PixelLive, XMP-plus, XMP-pmi, XMP-prism,
+XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-seal, XMP-swf, XMP-tiff,
 XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpDSA, XMP-xmpMM, XMP-xmpNote,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP, iTunes
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Device, Document, ExifTool, Image, Location, Other,

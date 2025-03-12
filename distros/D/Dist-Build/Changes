@@ -1,5 +1,9 @@
 Revision history for Dist-Build
 
+0.017     2025-03-11 21:53:17+01:00 Europe/Brussels
+          - Don't expose Dist::Build::Core to main planner
+          - Document core delegates and known plugins
+
 0.016     2024-10-06 18:04:02+02:00 Europe/Brussels
           - Add Dist::Build::DynamicPrereqs
           - Rename main_module_name to main_module

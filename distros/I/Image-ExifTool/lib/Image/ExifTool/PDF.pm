@@ -21,7 +21,7 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.60';
+$VERSION = '1.61';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -136,6 +136,15 @@ my %supportedFilter = (
         Name => 'ModifyDate',
         Writable => 'date',
         PDF2 => 1,  # not deprecated in PDF 2.0
+        Groups => { 2 => 'Time' },
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
+    },
+    SourceModified => {
+        Name => 'SourceModified',
+        Writable => 'date',
+        PDF2 => 1,
         Groups => { 2 => 'Time' },
         Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -2497,7 +2506,7 @@ and AESV3 (AES-256).
 
 =head1 AUTHOR
 
-Copyright 2003-2024, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2025, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -81,6 +81,7 @@ examples/izKeys-front-base.html
 examples/HOWTO-release-version
 examples/HOWTO-install-deinstall-and-tables.txt
 examples/klc-layout2human.pl
-examples/dumper-msg.c
+examples/robust_input/robust_input_front.c
+examples/robust_input/TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

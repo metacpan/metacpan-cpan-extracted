@@ -101,9 +101,9 @@ ACCESSORS
         Get database username.
 
 METHODS
-    $self->apply_managed_schema
-        Drivers that support schemas like PostgreSQL should override this
-        method to set a managed schema before processing migrations.
+    $self->adjust_migrate
+        Driver specific subclasses like for example DBIx::Migration::Pg may
+        override this method.
 
     $self->driver, $class->driver( $dsn )
         Extracts and returns the driver name from the data source name.

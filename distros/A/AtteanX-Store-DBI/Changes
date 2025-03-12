@@ -5,6 +5,10 @@ Created:      2016-03-14
 Home page:    <https://metacpan.org/release/AtteanX-Store-DBI/>
 Bug tracker:  <https://github.com/kasei/atteanx-store-dbi/issues>
 
+0.003  2025-03-11
+
+ - (Update) Fix developer tests to silence warnings.
+
 0.002  2020-12-12
 
  - (Update) Add DBD::SQLite as a test prereq (#6).

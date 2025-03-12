@@ -1,5 +1,4 @@
 use Test::Roo;
-use Test::Modern;
 use Test::Exception;
 use List::MoreUtils qw(all);
 

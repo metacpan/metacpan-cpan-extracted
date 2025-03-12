@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Temp extends IO::File {
-  version "0.025";
+  version "0.026";
   
   allow File::Temp::Dir;
   
@@ -79,10 +79,7 @@ class File::Temp extends IO::File {
   
   method DESTROY : void () {
     
-    # TODO: $self->SUPER::DESTROY;
-    if ($self->opened) {
-      $self->close;
-    }
+    $self->SUPER::DESTROY;
     
     my $UNLINK = $self->{UNLINK};
     if ($UNLINK) {

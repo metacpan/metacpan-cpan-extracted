@@ -1,0 +1,95 @@
+﻿Reminder: rCtrl-AltGr cannot trigger KLLF_ALTGR recognition.
+	This case should be targeted in testing.
+
+Reminder:	Rich Edit relies on WM_CHAR⸣s with Ctrl payload!
+
+Try to remove some of stripped modifiers (in the same order).
+
+Try to reconstruct the keyname by the control-char it delivers.  Inspect ctrlCh.
+			DONE (Need a way to return this info; better detect two ctrl keys: first seen, last seen.)
+
+All combinations of Ctrl+Alt (except lCtrl+rAlt) should be compared to AltGr.
+			DONE (Should not this be controlled by a flag???)
+
+With KLLFA, postpone stripping lCtrl, rAlt for as late as possible.  (Currently we do not strip lCtrl at all if rAlt is present.)
+
+Current stripping algorithm is linear in the number of keys.  Make it O(255) — unless vkStrt > 1.
+
+Should not we inspect the “synthesized” unmatched-by-real-ones VK_SHIFT etc.?
+
+When one removes modifiers, one needs to consider what to do in each of the cases of a 3×3 matrix of changes:
+  (ctrl,defined,undefined) → itself.    Seems that it is enough to trace undef → ctrl → ctrl₂ → string ???  Keeps mark of cntStrip?
+
+How can the message pump find “a smart window” which is ready to treat our fake accelerator?
+Subclass specially for the duration of detection of KLLF_ALTGR only.  (Check for NULL hwnd.)
+		DONE (by subclassing)
+
+Use hooks to monitor keyboard input in menus/dialogues?  (How to connect a hook to a thread?)
+
+Use SendInput() with a “fake” key event to synchronize thread/layout change???
+
+On language change, should reset the list of “extra” midifiers.
+				DONE
+
+Need to recommend stripping SYS if passing to TranslateUnicode to generate ≥1 chars.
+
+Do we need to design specially the order of removing modifiers for KBDALT-etc-stripping???
+
+“Real” scancode makes sense only on shift/alt/ctrl (and maybe — with some intelligence added — for numpad) due to NLS etc.
+
+On Alt-Numpad with-codepage-input, if no character found, emit “¿?”.
+Resolve lCtrl_unknown and rCtrl_unknown from -/A state of context.
+				DONE
+Detect KLLF_ALTGR also when lAlt or rCtrl go up.
+When resetting flags, try to get info via GetKeyState() — separate into a subroutine.
+				DONE
+	Should this affect tapAlt detection???
+				OBSOLETE
+	Let rCtrl affect lCtrl_dn_unknown on reset.
+Special-case switching focus to the same thread.
+Keep fetched info for a few languages.
+Greek codepages in shortcuts.  (Checkmarks for those with M$ codepages)	https://www2.dmst.aueb.gr/dds/sw/greek/grconv/grconv.html
+	13589:  ✔Mac=10006  ✔MS737  ✔MS1253  ✔IBM869  ✔ISO-8859-7=28597  MISS:  IBM851 iso-ir-18 19 150  ISO_5428:1980=iso-ir-55
+  Hebrew only on 1,5,8,9;  Arabic also in 7** range: 708 (ISO+box draw), 709✘ (7bit+french/German), 720 (DOS) & 710✘ (Arabic--, box-drawing++); ✘=no-WikiPedia-page
+About 4 cases of input remain uncovered,
+Intelligent report of possible triggered-binding.  Should we strip “faked lCtrl” when combined with “for-bindings” modifiers?
+Allow Alt-tap Alt-down -and-quickly-77 to enter chr(77).  (Currently only works with long-Alt-down, reacting on its key-repeat.)
+		Can one do this without explicit tap-recognition, only detection of de-focus???
+   Apparently, Alt-tap is not triggered immediately after lonely Alt-up (e.g., one after Alt-tap, or after getting focus by Alt-Tab).
+   	Not always reproducible…
+Remove Alt-tap and replace by watching WM_MENUSELECT and WM_EXITMENULOOP on top-level (or all) windows (not in the pump!)???
+   Likewise, for modal dialogues watch WM_CANCELMODE, WM_ENABLE.
+   In fact, Alt-tap can be detected by SYS flag on Alt-keyup .
+There is a trickery with F10: it is SYS⸣ified, so Ctrl-Alt-F10 triggers misdiagnozed Ctrl.
+		Same with Ctrl-Alt-Esc.
+				DONE
+Flag to strip fake SYS from f10?  (In Rich Edit, SYSCHAR⸣s do not insert.)
+
+      What to do to handle non-modal dialogues with their own message pumps stealing continuity without reporting this???
+         Flag presence of calls to GetMessage (by a hook?) inside a call to DispatchMessage()???
+
+         On UI modality vs code modality: https://stackoverflow.com/questions/26741841/how-does-a-modal-dialogs-message-pump-interact-with-the-main-application-messag#comment108773721_26742606
+         About: why non-modal dialogue (if were like MessageBox?) can ruin the program (the window of “calling” routine may close before MessageBox() returns).
+         	https://devblogs.microsoft.com/oldnewthing/20050223-00/?p=36383
+         		Modality, part 4: The importance of setting the correct owner for modal UI
+         How a modal dialogue can be made from modeless one:  https://devblogs.microsoft.com/oldnewthing/20050401-00/?p=35993
+         
+
+Write a POD file with docs (when code is separated into subroutines).
+
+  See also places marked with “???” in the sources.
+
+====================================
+
+It seems that in reset_KBD_state() we use Alt_state('before') when we require 'after'.
+			DONE
+
+Should we fix
+   Alt going UP is often SYS
+or is it a false negative???  It seems to be SYS after tap, and in the presence of Ctrl (i.e., “opposite to the usual”).
+			DONE (in fact, the code was already unreachable!)
+
+Cyrillic codepages in shortcuts.
+				DONE (maybe also for hex in 0xA..0xF — for 0xE for EBCDIC??)
+Reset Alt-NUMPAD state too on reset.
+				DONE

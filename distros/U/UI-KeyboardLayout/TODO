@@ -50,15 +50,53 @@ called again — but it is???
 
 Add combination with Ctrl on AltGr — but this defeats the “bullet-proof” method!
 
+    https://stackoverflow.com/questions/2604541/how-can-i-use-tounicode-without-breaking-dead-key-support/78173637#comment134382035_2605828
+That flag sadly doesn't affect the kernel's Alt-Numpad buffer. – 
+	On 0x04 in ToUnicode().
+
+For Compose² m a p the dumper shows the deadkeys-after-the-first as 0x0000.  Moreover, with non-destructive ToUnicode() in between,
+the non-destructive code shows them as 0x0000, but the message comes with some junk in…
+
+  See D:\tmp\kbd\try-message-dumper\out-map	(without non-destructive ToUnicode() one gets 0s)
+
+The window procedure should translate focus/language messages to custom messages, so that the pump can process them after the
+keyboard messages which are already in the queue.
+
+Store hkl at start, and change it on arrival of posted language change messages.  Update this correspondingly:
+	https://stackoverflow.com/questions/78171026/the-switch-of-keyboard-layout-on-windows-synchronization-with-the-multistage-pr/78189774#78189774
+
+For focus, query the necessary info about the other window ASAP — when it still has chance to exist.  Put the info (like: the thread
+id is mine?) into the posted message.
+
+Checking for KLLF_ALTGR should be startable also on rCtrl and on lAlt down (if lCtrl+rAlt are up).
+
+Make an extra state “very-probable-KLLF_ALTGR”.
+
+With Alt-down, triple-tap of Space may allow entering Hex/Decimal Oem/Unicode input on the main keyboard.
+
+Observed problems: rAlt-down lAlt-down rAlt-up lAlt-up f: the last Alt-up is not reported, as well as the f-down.
+
 ============================================ Pre-v0.77 or generic
 
+On key-up there is no KBDALT stripping in ToUnicode[Ex]!!!  ???
+
+Interesting idea seen in example №4 ToUnicodeEx() code: combine the unsuccessful-prefix-combination like ´p to the decomposed form
+of ṕ.  Compose is possible???          FoldStringW()   use-and-fold, use-if-foldable???
+
+When a window has a layout L, and in another window we switch TO the layout L, this resets the state of FSM in the first window
+too.  (This does not happen when one switches FROM the layout L.)
+
+Do we really want to trigger the action for Shift-Space; or should the application be smart enough anyway to deal with it???
+
 The “consumption” of the bitmap of lCtrl into rAlt leads to complications in the new “bullet-proof method”.  Avoid!
-					DONE
+					DONE (then undone)
 
 In two windows with Latin layouts (here Compose Compose m a p produces ↦) do (1st row, then the 2nd row):
   W1: Compose Compose m   switch-to-ru    д AltGr-' ф		gives дғ
   W2: a p							gives ↦
 This cannot be combined: if one does it in one window (switching back to LA) then the result is "ap"!
+
+  Document as new Windows GOTCHA!
 
 Customize stripping common-with-lC bits from rA: allow forcing a particular flag.
 

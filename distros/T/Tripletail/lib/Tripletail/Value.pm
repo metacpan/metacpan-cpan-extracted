@@ -780,7 +780,7 @@ sub isDomainName {
 
     if (defined $this->{value}) {
         return
-          length($this->{value}) <= 255 &&
+          length($this->{value}) <= 253 &&
           $this->{value} =~ m/$re_domain/o;
     }
     else {

@@ -8,11 +8,11 @@ unijp - Unicode::Japanese for erlang
 =head1 SYNOPSIS
 
  1> unijp:start().
- #Port<0.99>
- 2> unijp:conv(utf8, ucs4, "text").
- [0,0,0,116,0,0,0,101,0,0,0,120,0,0,0,116]
- 3> unijp:conv(ucs4, utf8, [0,0,0,116,0,0,0,101,0,0,0,120,0,0,0,116]).
- "text"
+ <0.34.0>
+ 2> unijp:conv_binary(utf8, ucs4, <<"text">>).
+ <<0,0,0,116,0,0,0,101,0,0,0,120,0,0,0,116>>
+ 3> unijp:conv_binary(ucs4, utf8, <<0,0,0,116,0,0,0,101,0,0,0,120,0,0,0,116>>).
+ <<"text">>
 
 
 =head1 DESCRIPTION
@@ -23,7 +23,30 @@ UniJPのc言語バインディングであるlibunijpを利用.
 
 =head1 FUNCTIONS
 
+=head2 conv_binary/3
+
+ conv_binary(InCode, OutCode, Text) -> Result
+ InCode  = atom()
+ OutCode = atom()
+ Text    = binary()
+ Result  = binary()
+
+=head2 version_string/0
+
+=head2 version_tuple/0
+
+ version_string() -> string()
+ version_tuple() -> {Major, Minor, Devel}
+ Major = int()
+ Minor = int()
+ Devel = int()
+
+
 =head2 conv/3
+
+deprecated at 0.0.50.
+
+use conv_binary/3 instead.
 
  conv(InCode, OutCode, Text) -> Result
  InCode  = atom() | string()
@@ -33,13 +56,9 @@ UniJPのc言語バインディングであるlibunijpを利用.
 
 =head2 version_str/0
 
-=head2 version_tuple/0
+deprecated at 0.0.50.
 
- version_str() -> string()
- version_str() -> {Major, Minor, Devel}
- Major = int()
- Minor = int()
- Devel = int()
+use version_string/0 instead.
 
 =cut
 

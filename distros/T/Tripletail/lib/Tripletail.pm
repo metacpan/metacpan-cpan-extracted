@@ -14,7 +14,7 @@ use POSIX qw(:errno_h);
 use Scalar::Util qw(blessed);
 use Cwd ();
 
-our $VERSION = '0.65';
+our $VERSION = '0.68';
 our $XS_VERSION = $VERSION;
 $VERSION = CORE::eval $VERSION;
 
@@ -3625,7 +3625,7 @@ C<$coding> が省略された場合、 UTF-8 として扱う。
   $TL->dump(DATA => \$data, $level);
 
 第2引数に変数へのリファレンスを渡すと，その内容を Data::Dumper でダンプし、
-第1引数のグループ名で $TL->log を呼び出す。
+第1引数のグループ名で C<< $TL->log >> を呼び出す。
 
 第1引数のグループ名は省略可能。
 
@@ -3643,7 +3643,7 @@ L</printCacheUnlessModified> と L</setCache> を利用する際に使用する�
 第1引数で渡された L<Tripletail::Form> オブジェクトのキーが出力文字列中に存在している場合、値に置換する。
 
 L<Tripletail::Form>オブジェクトの代わりにハッシュのリファレンスを渡すことも出来る。
-ハッシュのリファレンスを渡した場合は、$TL->newForm($hashref) した結果のフォームオブジェクトを追加する。
+ハッシュのリファレンスを渡した場合は、 C<< $TL->newForm($hashref) >> した結果のフォームオブジェクトを追加する。
 
 第2引数は、第1引数で指定した文字列を UTF-8 から変換する際の文字コードを指定する。
 省略可能。
@@ -3966,7 +3966,7 @@ L<Tripletail::Filter::MobileHTML> を利用した場合、C<outputbuffering> は
 
 非推奨. 互換のためのパラメータ. (0.40以降)
 
-C<$TL->CGI> で返される CGI 入力値を保持しているオブジェクトの
+C<< $TL->CGI >> で返される CGI 入力値を保持しているオブジェクトの
 const 化を行わないようにする.
 
 =item C<compat_no_trap_for_cgi_internal_error>
@@ -3983,12 +3983,12 @@ CGI モード動作時の startCgi 外のエラーに対する
 
 互換のためのパラメータ. (0.45以降)
 
-1 (真)を設定することで L<$form->getFileName|Tripletail::Form/getFileName> が
+1 (真)を設定することで L<< $form->getFileName|Tripletail::Form/getFileName >> が
 フルパスを返す振る舞いに戻す。
 デフォルト値は偽で, getFileName はベース名部分のみを返す.
 
 新しいコードではフルパスが欲しいときには
-L<$form->getFullFileName|Tripletail::Form/getFullFileName> を推奨。
+L<< $form->getFullFileName|Tripletail::Form/getFullFileName >> を推奨。
 
 =item C<command_add_processname>
 
@@ -4003,7 +4003,7 @@ FastCGI で処理する際に、プロセス名に各種情報を表示するか
 1 にすると「perl リクエスト処理回数 (処理内容) スクリプト名」となります。
 
 処理内容には、FastCGI 時に fcgi run、fcgi wait が表示されます。
-また、C<$TL->dispatch> を使用した際は、分岐先のコマンドが追加されます。
+また、C<< $TL->dispatch >> を使用した際は、分岐先のコマンドが追加されます。
 
 プロセス名は、起動時のプロセス名の長さより長くすることが出来ないため、
 起動時の状況によっては全て表示されないことがあります。

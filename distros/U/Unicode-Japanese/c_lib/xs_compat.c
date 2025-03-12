@@ -51,7 +51,7 @@ uj_conv_t* _uj_conv_clone(const uj_conv_t* conv)
     clone = _uj_conv_new_strn(conv->alloc, (char*)conv->buf, conv->buf_len);
   }else
   {
-    abort();
+    clone = _uj_conv_new_strn(conv->alloc, "", 0);
   }
   return clone;
 }

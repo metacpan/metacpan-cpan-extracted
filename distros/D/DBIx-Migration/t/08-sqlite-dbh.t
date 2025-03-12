@@ -16,7 +16,8 @@ my $tempdir = tempdir( CLEANUP => 1 );
 my $dsn     = 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' );
 note 'dsn: ', $dsn;
 
-my $m = DBIx::Migration->new( dbh => DBI->connect( $dsn ) );
+my $m              = DBIx::Migration->new( dbh => DBI->connect( $dsn ) );
+my $tracking_table = $m->tracking_table;
 
 sub default_dbh_attribute_assertion {
   my ( $dbh ) = @_;
@@ -42,7 +43,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
   plan tests => 2;
 
   is $m->version, 0, 'check version';
-  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ '"main"."dbix_migration"' ], 'check tables';
+  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ], 'check tables';
 };
 
 sub migrate_to_version_assertion {
@@ -83,5 +84,5 @@ my $m1 = DBIx::Migration->new(
 subtest 'default "dbh" attributes' => \&default_dbh_attribute_assertion, $m->dbh;
 
 dies_ok { $m1->migrate } 'second migration section is broken';
-is_deeply [ $m1->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
-  'check tables: creation of dbix_migration table was rolled back too!';
+is_deeply [ $m1->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ],
+  "check tables: creation of \"$tracking_table\" wasn't rolled back";

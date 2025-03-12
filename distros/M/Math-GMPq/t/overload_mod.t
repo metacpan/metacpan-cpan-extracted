@@ -41,6 +41,13 @@ if(!$@) {
     cmp_ok($num % 15, '==', $num % Math::GMPz->new(15), "Math::GMPz object correctly evaluated");
     cmp_ok(ref(Math::GMPz->new(2500) % $num), 'eq', 'Math::GMPq', "Math::GMPz object (switched): returns a Math::GMPq object");
     cmp_ok(2500 % $num, '==', Math::GMPz->new(2500) % $num, "Math::GMPz object (switched): Math::GMPz object correctly evaluated");
+
+    for my $n(123456, -123456) {
+      for my $q('13/58', '-13/58', '127/9', '127/-9', '-127/-9') {
+        cmp_ok(Math::GMPz->new($n) % Math::GMPq->new($q), '==', Math::GMPq->new($n) % Math::GMPq->new($q), "$n % $q is consistent");
+        cmp_ok(Math::GMPq->new($q) % Math::GMPz->new($n), '==', Math::GMPq->new($q) % Math::GMPq->new($n), "$q % $n is consistent");
+      }
+    }
   }
   else {
   warn "Skipped Math::GMPz tests - have Math-GMPz-$Math::GMPz::VERSION; need at least version 0.63";

@@ -36,7 +36,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %stdCase);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.70';
+$VERSION = '1.71';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -371,6 +371,12 @@ my %noLeapFrog = ( SAVE => 1, SEEK => 1, IHDR => 1, JHDR => 1, IEND => 1, MEND =
             IgnoreProp => { meta => 1 }, # ignore 'meta' container
         },
     },
+    gdAT => {
+        Name => 'GainMapImage',
+        Groups => { 2 => 'Preview' },
+        Binary => 1,
+    },
+    # gmAP  - https://github.com/w3c/png/issues/380 does't correspond to my only sample
     seAl => {
         Name => 'SEAL',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::SEAL' },
@@ -1698,7 +1704,7 @@ and JNG (JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2024, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2025, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

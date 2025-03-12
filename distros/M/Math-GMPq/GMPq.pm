@@ -94,7 +94,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.61';
+    our $VERSION = '0.63';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -102,15 +102,6 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     %Math::GMPq::EXPORT_TAGS =(mpq => \@tagged);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
-
-    $Math::GMPq::RETYPE = 1; # This variable used to be initially set to 0, but
-                             # this has changed, beginning with Math::GMPq-0.57.
-                             # This enables a Math::GMPq object to be coerced to
-                             # a Math::MPFR object in certain overloaded operations.
-                             # (See the 'OPERATOR OVERLOADING' section of the POD
-                             # documentation for details.)
-                             # Setting this variable to 0 will cause these "certain
-                             # overloaded operations" to throw a fatal error.
 
 sub new {
 
@@ -423,30 +414,42 @@ sub overload_pow_eq {
 ##### overloaded comparisons #####
 
 sub overload_gt {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_gt($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) <  0;
+    return 0;
   }
-  else {
-    _overload_gt($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_gt($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_gt($_[0], $_[1], $_[2]);
 }
 
 sub overload_gte {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_gte($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) <=  0;
+    return 0;
   }
-  else {
-    _overload_gte($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_gte($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_gte($_[0], $_[1], $_[2]);
 }
 
 sub overload_lt {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_lt($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) >  0;
+    return 0;
   }
-  else {
-    _overload_lt($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_lt($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_lt($_[0], $_[1], $_[2]);
 }
 
 sub overload_and {
@@ -468,7 +471,7 @@ sub overload_ior {
     Rmpq_ior($ret, $_[0], $_[1]);
     return $ret;
   }
-  my $arg1 = _to_mpq($itsa, $_[1], '&');
+  my $arg1 = _to_mpq($itsa, $_[1], '|');
   return Rmpq_ior($ret,$_[0], $arg1);
   return $ret;
 }
@@ -480,7 +483,7 @@ sub overload_xor {
     Rmpq_xor($ret, $_[0], $_[1]);
     return $ret;
   }
-  my $arg1 = _to_mpq($itsa, $_[1], '&');
+  my $arg1 = _to_mpq($itsa, $_[1], '^');
   return Rmpq_xor($ret,$_[0], $arg1);
   return $ret;
 }
@@ -504,39 +507,54 @@ sub _to_mpq {
 }
 
 sub overload_lte {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_lte($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) >=  0;
+    return 0;
   }
-  else {
-    _overload_lte($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_lte($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_lte($_[0], $_[1], $_[2]);
 }
 
 sub overload_spaceship {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_spaceship($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return undef if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) * -1;
   }
-  else {
-    _overload_spaceship($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_spaceship($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_spaceship($_[0], $_[1], $_[2]);
 }
 
 sub overload_equiv {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_equiv($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) ==  0;
+    return 0;
   }
-  else {
-    _overload_equiv($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_equiv($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_equiv($_[0], $_[1], $_[2]);
 }
 
 sub overload_not_equiv {
-  if( _itsa($_[1]) == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
-    _overload_not_equiv($_[0], _reformatted($_[1]), $_[2]);
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 5 ) { # Math::MPFR object
+    return 1 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]) !=  0;
+    return 0;
   }
-  else {
-    _overload_not_equiv($_[0], $_[1], $_[2]);
+  if( $itsa == 4 && _looks_like_number($_[1]) && $_[1] !~ /inf|nan/i ) {
+    return _overload_not_equiv($_[0], _reformatted($_[1]), $_[2]);
   }
+  return _overload_not_equiv($_[0], $_[1], $_[2]);
 }
 
 sub overload_lshift {

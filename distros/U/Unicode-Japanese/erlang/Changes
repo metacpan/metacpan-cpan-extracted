@@ -1,4 +1,12 @@
 Revision history for Erlang unijp module.
 
+* RELEASED 0.4.0.2
+CLOSED: [2012-11-20 Tue 17:30 +0900]
+- libunijp update(0.49_03), no erlang code changes.
+
+* RELEASED 0.4.0.1
+CLOSED: [2012-08-28 Tue 21:25 +0900]
+- libunijp update, no erlang code changes.
+
 0.03 Tue Nov 16 15:52:55 JST 2010
     - libunijp update, no erlang code changes.

@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::PLIST;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ConvertPLIST($$);
 
@@ -307,7 +307,17 @@ sub ConvertPLIST($$);
         Name => 'Apple_0x004f',
         Unknown => 1,
         ValueConv => \&ConvertPLIST,
-    }
+    },
+    0x0054 => {
+        Name => 'Apple_0x0054',
+        Unknown => 1,
+        ValueConv => \&ConvertPLIST,
+    },
+    0x005a => {
+        Name => 'Apple_0x005a',
+        Unknown => 1,
+        ValueConv => \&ConvertPLIST,
+    },
 );
 
 # PLIST-format CMTime structure (ref PH)
@@ -390,7 +400,7 @@ Apple maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2024, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2025, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

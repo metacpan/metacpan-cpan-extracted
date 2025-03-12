@@ -14,11 +14,11 @@ Log::Abstraction - Logging abstraction layer
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 =head1 SYNOPSIS
 
@@ -107,12 +107,18 @@ sub new {
 
 # Internal method to log messages. This method is called by other logging methods.
 # $logger->_log($level, @messages);
+# $logger->_log($level, \@messages);
 
 sub _log {
 	my ($self, $level, @messages) = @_;
 
 	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
-		Carp::croak('Illegal Operation: This method can only be called by a subclass');
+		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
+	}
+
+	if((scalar(@messages) == 1) && (ref($messages[0]) eq 'ARRAY')) {
+		# Passed a reference to an array
+		@messages = @{$messages[0]};
 	}
 
 	# Push the message to the internal messages array
@@ -124,7 +130,7 @@ sub _log {
 			$logger->({
 				class => blessed($self) || __PACKAGE__,
 				file => (caller(1))[1],
-		# function => (caller(1))[3],
+				# function => (caller(1))[3],
 				line => (caller(1))[2],
 				level => $level,
 				message => \@messages,
@@ -200,6 +206,7 @@ sub trace {
 =head2 warn
 
   $logger->warn(@messages);
+  $logger->warn(\@messages);
   $logger->warn(warning => \@messages);
 
 Logs a warning message. This method also supports logging to syslog if configured.

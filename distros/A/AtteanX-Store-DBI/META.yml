@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -49,4 +49,4 @@ resources:
   homepage: https://metacpan.org/release/AtteanX-Store-DBI/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/atteanx-store-dbi/
-version: '0.002'
+version: '0.003'

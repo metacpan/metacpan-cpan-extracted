@@ -1,4 +1,48 @@
+# -*- org -*-
+#+STARTUP: indent
+#+STARTUP: fnprompt
+#+STARTUP: logdone
+#+OPTIONS: ^:nil
+#+TODO: UNRELEASED(u) | RELEASED(r)
+
 Revision history for Perl extension Unicode::Japanese.
+
+* RELEASED 0.50
+CLOSED: [2025-03-12 Wed 17:48]
+- Bumped the version.
+
+* RELEASED 0.49_07
+CLOSED: [2022-04-21 Thu 16:10]
+- bin/ujconv now converts one line of text at a time. Prior to this
+  change it would first load up the entire input in memory and could
+  die from OOM.
+- Add a new test case t/ujconv.t (requires Test::Script 1.09)
+
+* RELEASED 0.49_06
+CLOSED: [2020-06-18 Thu 15:01]
+- Fix build on recent versions of Perl.
+
+* RELEASED 0.49_05
+CLOSED: [2016-04-03 Mon 17:05]
+- Remove an unused variable in c_lib/ujconv.
+
+* RELEASED 0.49_04
+CLOSED: [2015-05-13 Wed 18:40]
+- Fix broken t/pod-coverage.t
+
+* RELEASED 0.49_03
+CLOSED: [2012-11-20 Tue 17:30 +0900]
+- libunijp: fix converting empty string into euc-jp does not work.
+
+* RELEASED 0.49_02
+CLOSED: [2012-08-28 Tue 21:25 +0900]
+- libunijp: fix memory leak on convertion of empty string.
+- libunijp: fix uj_new_r did not follow allocator.
+
+* RELEASED 0.49_01
+CLOSED: [2012-07-09 Mon 18:23 +0900]
+- libunijp: add uj_new_r, uj_delete_buffer API.
+- erlang: reimplemented with nif.
 
 0.49 Mon Feb 27 00:04:59 JST 2012
     - fix, libunijp sometimes got broken result on realloc.
@@ -169,4 +213,3 @@ Revision history for Perl extension Unicode::Japanese.
 
 0.01  Fri Jul 27 20:51:44 JST 2001
 	- BETA Release.
-

@@ -95,8 +95,8 @@ $TL->startCgi(
             };
 
             is scalar(@set), 2;
-            like $set[0], qr{\Afoo=[A-Za-z0-9+/!=]+\z};
-            like $set[1], qr{\Abar=[A-Za-z0-9+/!=]+\z};
+            like $set[0], qr{\Afoo=[A-Za-z0-9+/!=]+; SameSite=Strict\z};
+            like $set[1], qr{\Abar=[A-Za-z0-9+/!=]+; SameSite=Strict\z};
 
             my $modern = $TL->newSerializer
                             ->setCryptoKey(sha256(CORRECT_CRYPTO_KEY));

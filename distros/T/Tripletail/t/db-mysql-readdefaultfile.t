@@ -15,6 +15,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
+use Data::Dumper;
 use File::Spec;
 
 our %DBINFO;
@@ -92,10 +93,12 @@ if( $mysql_version < 5.001 )
 # -----------------------------------------------------------------------------
 # test spec.
 # -----------------------------------------------------------------------------
-plan tests => 2+9;
+plan tests => 2 + 2 + 10;
 
-&test_connect; #2.
-&test_utf8_kanji;  #9.
+test_connect();  #2.
+test_charset();  #2.
+test_utf8_kanji();  #10.
+
 
 # -----------------------------------------------------------------------------
 # get mysql version.
@@ -152,12 +155,65 @@ sub test_connect
 	} '[setup] connect ok';
 }
 
+sub test_charset
+{
+	# test whether character set setting is effective.
+	my $has_fail;
+
+	# test whether it can switch to 'utf8mb3'
+	createTestConfigFile($ENV{MYSQL_HOST} || 'localhost', 'utf8mb3');
+	$TL->trapError(
+		-DB => 'DB',
+		-main => sub{
+			my $DB = $TL->getDB();
+			isa_ok($TL->getDB(), 'Tripletail::DB', '[test_charset/utf8mb3] getDB');
+			my $ret = $DB->selectRowArray(q{
+				SHOW VARIABLES LIKE 'character_set_client'
+			});
+			# $ret[0] = ('Variable_name') 'character_set_client'
+			# $ret[1] = ('Value') 'utf8mb3'
+			if( $ret->[1] ne 'utf8mb3' )
+			{
+				diag("[test_charset/utf8mb3] client charset could be utf8mb3 but got '$ret->[1]'");
+				$has_fail = 1;
+			}
+		},
+	);
+
+	# test whether it can also switch to 'latin1'
+	createTestConfigFile($ENV{MYSQL_HOST} || 'localhost', 'latin1');
+	$TL->trapError(
+		-DB => 'DB',
+		-main => sub{
+			my $DB = $TL->getDB();
+			isa_ok($TL->getDB(), 'Tripletail::DB', '[test_charset/latin1] getDB');
+			my $ret = $DB->selectRowArray(q{
+				SHOW VARIABLES LIKE 'character_set_client'
+			});
+			# $ret[0] = ('Variable_name') 'character_set_client'
+			# $ret[1] = ('Value') 'latin1'
+			if( $ret->[1] ne 'latin1' )
+			{
+				diag("[test_charset/latin1] client charset could be latin1 but got '$ret->[1]'");
+				$has_fail = 1;
+			}
+		},
+	);
+
+	if( $has_fail )
+	{
+		diag('[test_charset] see also: skip-character-set-client-handshake');
+	}
+}
+
 # -----------------------------------------------------------------------------
 # test : 'host' is selected by config file.
 # -----------------------------------------------------------------------------
 sub test_utf8_kanji
 {
+	# 'kan ji no ka ra mu mei'.
 	my $kanji_column_name = "\xe6\xbc\xa2\xe5\xad\x97\xe3\x81\xae\xe3\x82\xab\xe3\x83\xa9\xe3\x83\xa0\xe5\x90\x8d";
+	# 'kan ji no de - ta'.
 	my $kanji_data = "\xe6\xbc\xa2\xe5\xad\x97\xe3\x81\xae\xe3\x83\x87\xe3\x83\xbc\xe3\x82\xbf";
 
 	createTestConfigFile($ENV{MYSQL_HOST} || 'localhost', 'utf8');
@@ -167,6 +223,10 @@ sub test_utf8_kanji
 		-main => sub{
 			my $DB = $TL->getDB();
 			isa_ok($TL->getDB(), 'Tripletail::DB', '[utf8_kanji] getDB');
+			# 'default-character-set' has no effects if
+			# 'skip-character-set-client-handshake' is enabled.
+			$DB->execute('SET NAMES utf8mb3');
+
 			# create table with kanji column name
 			$DB->execute( q{DROP TABLE IF EXISTS tripletail_test;});
 			$DB->execute( qq{
@@ -177,8 +237,8 @@ sub test_utf8_kanji
 				) CHARACTER SET utf8;
 			});
 			pass("[utf8_kanji] create table");
-			
-			# insert kanji values
+
+			# insert a kanji value
 			$DB->execute( qq{
 				INSERT
 				  INTO tripletail_test (`$kanji_column_name`)
@@ -204,6 +264,9 @@ sub test_utf8_kanji
 		-main => sub{
 			my $DB = $TL->getDB();
 			isa_ok($TL->getDB(), 'Tripletail::DB', '[utf8_kanji] getDB');
+			# 'default-character-set' has no effects if
+			# 'skip-character-set-client-handshake' is enabled.
+			$DB->execute('SET NAMES latin1');
 
 			# select kanji values
 			my $hasharr;
@@ -212,15 +275,16 @@ sub test_utf8_kanji
 					SELECT `$kanji_column_name`
 					  FROM tripletail_test
 				});
-				#print Dumper($hasharr);use Data::Dumper;
-			} '[utf8_kanji] selecting kanji named column under latin1 setting failed.';
+			} '[utf8_kanji] selecting kanji named column under latin1 setting failed.'
+				or diag("got: ".Data::Dumper->new([$hasharr])->Terse(1)->Dump());
 
 			$hasharr = $DB->selectAllArray( qq{
-				SELECT * 
+				SELECT *
 				  FROM tripletail_test
 			});
 			is($hasharr->[0]->[0], 1, "[utf8_kanji] fetch ok");
-			isnt($hasharr->[0]->[1], $kanji_data, "[utf8_kanji] fetching kanji data under latin1 setting get garbled");
+			isnt($hasharr->[0]->[1], $kanji_data, "[utf8_kanji] fetching kanji data under latin1 setting get garbled (1)");
+			is($hasharr->[0]->[1], '??????', "[utf8_kanji] fetching kanji data under latin1 setting get garbled (2)");
 
 			$DB->execute( q{DROP TABLE IF EXISTS tripletail_test;});
 		},

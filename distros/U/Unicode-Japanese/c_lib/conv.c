@@ -44,7 +44,7 @@ uj_uint8* _uj_conv_own_string(uj_conv_t* conv)
 
 void _uj_conv_move_owner(uj_conv_t* dst, uj_conv_t* src)
 {
-  if( dst->buf_bufsize==0 && src->buf_bufsize!=0 )
+  if( dst->buf_bufsize != 0 && dst->buf_bufsize==0 && src->buf_bufsize!=0 )
   {
     dst->buf_bufsize = src->buf_bufsize;
     src->buf_bufsize = 0;

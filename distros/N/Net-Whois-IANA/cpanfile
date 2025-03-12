@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 requires "IO::Socket" => 0;
-requires "Net::CIDR"  => 0;
+requires "Net::CIDR"  => '0.22';
 
 on "test" => sub {
         requires "File::Slurper"             => 0;

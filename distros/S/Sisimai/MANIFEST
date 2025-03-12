@@ -114,6 +114,7 @@ lib/Sisimai/Reason/VirusDetected.pm
 lib/Sisimai/Rhost.pm
 lib/Sisimai/Rhost/Aol.pm
 lib/Sisimai/Rhost/Apple.pm
+lib/Sisimai/Rhost/Cloudflare.pm
 lib/Sisimai/Rhost/Cox.pm
 lib/Sisimai/Rhost/Facebook.pm
 lib/Sisimai/Rhost/FrancePTT.pm
@@ -681,6 +682,7 @@ set-of-emails/maildir/bsd/rhost-apple-01.eml
 set-of-emails/maildir/bsd/rhost-apple-02.eml
 set-of-emails/maildir/bsd/rhost-apple-03.eml
 set-of-emails/maildir/bsd/rhost-apple-04.eml
+set-of-emails/maildir/bsd/rhost-cloudflare-01.eml
 set-of-emails/maildir/bsd/rhost-cox-01.eml
 set-of-emails/maildir/bsd/rhost-facebook-03.eml
 set-of-emails/maildir/bsd/rhost-facebook-04.eml
@@ -979,6 +981,7 @@ t/315-rhost-facebook.t
 t/317-rhost-messagelabs.t
 t/318-rhost-outlook.t
 t/319-rhost-gsuite.t
+t/320-rhost-cloudflare.t
 t/400-callback-base64.t
 t/500-fact.t
 t/600-lhost-code

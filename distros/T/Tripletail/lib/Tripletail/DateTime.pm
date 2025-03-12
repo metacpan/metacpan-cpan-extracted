@@ -90,10 +90,12 @@ sub set {
         $this->{localDay    } = $day;
         $this->{localDayTime} = timeOfDayToTime(@tod);
         $this->{timeZone    } = $tz;
+        return $this;
     }
     elsif (ref $val) {
         if (UNIVERSAL::isa($val, __PACKAGE__)) {
             %$this = %$val;
+            return $this;
         }
         else {
             die __PACKAGE__."#set: arg[1] is a reference. (第1引数がリファレンスです)\n";

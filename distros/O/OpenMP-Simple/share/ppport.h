@@ -17935,7 +17935,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
     else {
         assert(0);  /* Modern perls die under this circumstance */
         curlen = 0;
-        if (! do_warnings) {    /* Handle empty here if no warnings needed */
+        if (! do_warnings) {    /* Handle empty here if no warningsings needed */
             if (retlen) *retlen = 0;
             return UNICODE_REPLACEMENT;
         }

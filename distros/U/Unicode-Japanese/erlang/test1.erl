@@ -16,12 +16,12 @@ test_1_sub(Name,Fun) ->
 
 test_1() ->
   io:format("test_1: ...~n"),
-  test_1_sub(start, fun()-> unijp:start() end),
-  test_1_sub(version_str,   fun()-> unijp:version_str()                end),
-  test_1_sub(version_tuple, fun()-> unijp:version_tuple()              end),
-  test_1_sub(conv,          fun()-> unijp:conv("utf8", "utf8", "text") end),
-  test_1_sub(conv,          fun()-> unijp:conv("utf8", "ucs4", "ts") end),
-  test_1_sub(conv,          fun()-> unijp:conv("utf8", "ucs4", "text") end),
+  test_1_sub(start,         fun()-> unijp:start() end),
+  test_1_sub(version_str,   fun()-> unijp:version_string() end),
+  test_1_sub(version_tuple, fun()-> unijp:version_tuple()  end),
+  test_1_sub(conv_binary,   fun()-> unijp:conv_binary(utf8, utf8, <<"text">>) end),
+  test_1_sub(conv_binary,   fun()-> unijp:conv_binary(utf8, ucs4, <<"ts">>) end),
+  test_1_sub(conv_binary,   fun()-> unijp:conv_binary(utf8, ucs4, <<"text">>) end),
   io:format("- ok.~n~n"),
   ok.
 
@@ -29,7 +29,7 @@ test(FromCode, ToCode) ->
   FromText = get(FromCode),
   ToText   = get(ToCode),
   io:format("~p -> ~p ...", [FromCode, ToCode]),
-  Ret = unijp:conv(FromCode, ToCode, FromText),
+  Ret = unijp:conv_binary(FromCode, ToCode, FromText),
   case Ret of
   ToText -> io:format(" ok # ~p:~w -> ~p:~w~n", [FromCode, FromText, ToCode, Ret]);
   _      -> io:format(" not ok ~p~n", [Ret])
@@ -38,12 +38,12 @@ test(FromCode, ToCode) ->
 test_char() ->
   io:format("test_char: ...~n"),
   % U+611B, kanji, ai (love).
-  put(utf8,  [16#e6, 16#84, 16#9b]),
-  put(sjis,  [16#88, 16#a4]),
-  put(eucjp, [16#b0, 16#a6]),
-  put(jis,   "\e$B0&\e(B"),
-  put(ucs2,  [16#61, 16#1b]),
-  put(ucs4,  [0, 0, 16#61, 16#1b]),
+  put(utf8,  <<16#e6, 16#84, 16#9b>>),
+  put(sjis,  <<16#88, 16#a4>>),
+  put(eucjp, <<16#b0, 16#a6>>),
+  put(jis,   <<"\e$B0&\e(B">>),
+  put(ucs2,  <<16#61, 16#1b>>),
+  put(ucs4,  <<0, 0, 16#61, 16#1b>>),
 
   unijp:start(),
 

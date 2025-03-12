@@ -18,7 +18,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'IO::Socket' => '0',
-                                      'Net::CIDR' => '0',
+                                      'Net::CIDR' => '0.22',
                                       'perl' => '5.008'
                                     }
                     },

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.2.5};
+our $VERSION = q{0.2.6};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C macros for reading

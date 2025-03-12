@@ -1,17 +1,26 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.21 Tue Mar 11 08:25:59 CET 2025
+        - Improve logging
+        - Rename apply_managed_schema() method to adjust_migrate()
+        - Unconditionally (IF NOT EXISTS) create tracking table outside of a
+          transaction
+        - Lock tracking table before processing migrations in PostgreSQL driver
+          specific subclass
+        - Separate creation and initialization of tracking table
+
 0.20 Mon Mar 10 12:48:38 CET 2025
         - Fix documentation
         - Properly remove Log::Any::Adapter entry
-        - Add tracking_table command-line option -T
+        - Add tracking table command-line option -T
 
 0.19 Fri Mar  7 14:05:58 CET 2025
         - Add COMPARISONS chapter
-        - Rename tracking_schema command-line option from -s to -t
+        - Rename tracking schema command-line option from -s to -t
         - Add managed_schema attribute
         - Add PostgreSQL driver specific subclass
         - CLI sub module will use driver specific subclass
-        - Add managed_schema command-line option -s
+        - Add managed schema command-line option -s
 
 0.18 Fri Feb 28 14:48:50 CET 2025
         - Consistently work with dbh attributes

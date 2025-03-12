@@ -126,10 +126,10 @@ Get database username.
 
 =over 
 
-=item $self->apply_managed_schema
+=item $self->adjust_migrate
 
-Drivers that support schemas like PostgreSQL should override this method to set
-a managed schema before processing migrations.
+Driver specific subclasses like for example L<DBIx::Migration::Pg> may override
+this method.
 
 =item $self->driver, $class->driver( $dsn )
 

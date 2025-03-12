@@ -655,6 +655,10 @@ This method is called by perl when you call L<perlfunc/die> with no parameters a
 
 This returns a new exception object that perl will use to replace the value in C<$@>
 
+=head2 reset
+
+The stringification of the exception is cached. This method C<reset>, resets that cache so the exception can be stringified again.
+
 =head2 rethrow
 
 This rethrow (i.e. L<perlfunc/"die">) the original error. It must be called with the exception object or else it will return undef.

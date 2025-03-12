@@ -22,7 +22,7 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   plan skip_all => $Test::PostgreSQL::errstr;
 };
 note 'managed schema: ', my $managed_schema = 'myschema';
-note 'dsn: ',            my $dsn            = $pgsql->dsn;
+note 'dsn: ',            my $dsn            = $pgsql->dsn . ';options=--client_min_messages=WARNING';
 local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
 plan tests => 9;

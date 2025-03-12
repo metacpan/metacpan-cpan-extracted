@@ -2,6 +2,12 @@
 
 use Test::More;
 eval "use Test::Pod::Coverage 1.04";
-plan skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage" if $@;
+if ($@) {
+    plan skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage";
+}
+else {
+    plan tests => 1;
+}
+
 my $trustme = { trustme => ['^(?:load_xs)$'] };
-all_pod_coverage_ok($trustme);
+pod_coverage_ok('Unicode::Japanese', $trustme);

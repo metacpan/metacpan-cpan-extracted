@@ -1,0 +1,1698 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::DB - DBI のラッパ</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::DB - DBI のラッパ
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#DBI_Xe3X81X8bXe3X82X89Xe3X81XaeXe7Xa7XbbXe8Xa1X8c">
+<span class="pod_lang">DBI からの移行
+
+</span></a>
+</li>
+<li><a href="#Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe8Xa9Xb3Xe7Xb4Xb0">
+<span class="pod_lang">拡張プレースホルダ詳細
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+<ul>
+<li><a href="#Tripletail::DB_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">
+<span class="pod_lang"><code class="pod_iseq_C">Tripletail::DB</code> メソッド
+
+</span></a>
+</li>
+<li><a href="#Tripletail::DB::Sth_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">
+<span class="pod_lang"><code class="pod_iseq_C">Tripletail::DB::Sth</code> メソッド
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+<ul>
+<li><a href="#DBXe3X82XbbXe3X83X83Xe3X83X88Xe3X83XbbDBXe3X82Xb3Xe3X83X8dXe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3">
+<span class="pod_lang">DBセット・DBコネクション
+
+</span></a>
+</li>
+<li><a href="#DBXe5XaeX9aXe7XbeXa9">
+<span class="pod_lang">DB定義
+
+</span></a>
+</li>
+<li><a href="#SQL_Server_Xe8Xa8XadXe5XaeX9a">
+<span class="pod_lang">SQL Server 設定
+
+</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::DB - DBI のラッパ
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  $TL-&gt;startCgi(
+      -DB      =&gt; 'DB',
+      -main        =&gt; \&amp;main,
+  );
+  
+  sub main {
+    my $DB = $TL-&gt;getDB('DB');
+    
+    $DB-&gt;setDefaultSet('R_Trans');
+    $DB-&gt;tx(sub{
+      my $sth = $DB-&gt;execute(q{SELECT a, b FROM foo WHERE a = ?}, 999);
+      while (my $hash = $sth-&gt;fetchHash) {
+        $TL-&gt;print($hash-&gt;{a});
+      }
+      # commit is done implicitly.
+    });
+    
+    $DB-&gt;tx('W_Trans' =&gt; sub{
+      $DB-&gt;execute(q{UPDATE counter SET counter = counter + 1 WHERE id = ?}, 1);
+      $DB-&gt;commit; # can commit explicitly.
+    }
+  }</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<dl>
+<dt><a id="Xe6X8eXa5Xe7Xb6X9a/Xe5X88X87Xe6X96XadXe3X81XafXe8X87XaaXe5X8bX95Xe3X81Xa7Xe8Xa1X8cXe3X82X8fXe3X82X8cXe3X82X8bXe3X80X82"><span class="pod_lang">接続/切断は自動で行われる。
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">手動で接続/切断する場合は、connect/disconnectを使うこともできるが、なるべく使用しないことを推奨。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe5XaeX9fXe8Xa1X8cXe3X82XafXe3X82Xa8Xe3X83XaaXe3X81XaeXe5X87Xa6Xe7X90X86Xe6X99X82Xe9X96X93Xe3X83XbbXe5XaeX9fXe8Xa1X8cXe8Xa8X88Xe7X94XbbXe3X83XbbXe7Xb5X90Xe6X9eX9cXe3X82X92Xe8Xa8X98Xe9X8cXb2Xe3X81X99Xe3X82X8bXe3X83X87Xe3X83X90Xe3X83X83Xe3X82Xb0Xe3X83Xa2Xe3X83XbcXe3X83X89Xe3X80X82"><span class="pod_lang">実行クエリの処理時間・実行計画・結果を記録するデバッグモード。
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="prepare/executeXe3X82X92Xe5X88X86Xe3X81X91Xe3X81XaaXe3X81X84Xe3X80X82fetchXe3X81XafXe5X88X86Xe3X81X91Xe3X82X8bXe3X81X93Xe3X81Xa8Xe3X82X82Xe3X81Xa7Xe3X81X8dXe3X82X8bXe3X80X82"><span class="pod_lang">prepare/executeを分けない。fetchは分けることもできる。
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe6Xa9X9fXe8X83Xbd"><span class="pod_lang">拡張プレースホルダ機能
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $db-&gt;execute(q{select * from a where mode in (??)}, ['a', 'b'])</code></pre>
+
+<p>
+<span class="pod_lang">と記述すると、
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $db-&gt;execute(q{select * from a where mode in (?, ?)}, 'a', 'b')</code></pre>
+
+<p>
+<span class="pod_lang">のように解釈される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe3X81XaeXe5X80Xa4Xe6Xb8Xa1Xe3X81X97Xe3X81XaeXe9X9aX9bXe3X81XabXe5X9eX8bXe6X8cX87Xe5XaeX9aXe3X81X8cXe5X8fXafXe8X83Xbd"><span class="pod_lang">プレースホルダの値渡しの際に型指定が可能
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $db-&gt;execute(q{select * from a limit ??}, [10, \'SQL_INTEGER'])</code></pre>
+
+<p>
+<span class="pod_lang">型指定ができるのは拡張プレースホルダのみです.
+通常の <code class="pod_iseq_C">?</code> によるプレースホルダではエラーとなります.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe3X83XaaXe3X82XafXe3X82Xa8Xe3X82Xb9Xe3X83X88Xe5X87Xa6Xe7X90X86Xe5XaeX8cXe4XbaX86Xe5XbeX8cXe3X81XaeXe3X83X88Xe3X83Xa9Xe3X83Xb3Xe3X82Xb6Xe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe6X9cXaaXe5XaeX8cXe4XbaX86Xe3X82X84unlockXe6X9cXaaXe5XaeX8cXe4XbaX86Xe3X82X92Xe8X87XaaXe5X8bX95Xe6Xa4X9cXe5X87Xba"><span class="pod_lang">リクエスト処理完了後のトランザクション未完了やunlock未完了を自動検出
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="DBXe3X82Xb0Xe3X83XabXe3X83XbcXe3X83X97Xe3X83XbbDBXe3X82XbbXe3X83X83Xe3X83X88Xe3X83XbbDBXe3X82Xb3Xe3X83X8dXe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3"><span class="pod_lang">DBグループ・DBセット・DBコネクション
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">Tripletail::DBでは、レプリケーションを利用してロードバランスすることを支援するため、
+１つのDBグループの中に、複数のDBセットを定義することが可能となっている。
+DBセットの中には、複数のDBコネクションを定義できる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">更新用DBセット、参照用DBセット、などの形で定義しておき、プログラム中で
+トランザクション単位でどのDBセットを使用するか指定することで、
+更新用クエリはマスタDB、参照用クエリはスレーブDB、といった
+使い分けをすることが可能となる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">DBセットには複数のDBコネクションを定義でき、複数定義した場合は
+プロセス単位でプロセスIDを元に1つのコネクションが選択される。
+（プロセスIDを定義数で割り、その余りを使用して決定する。）
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">同じDBグループの中の複数のDBセットで同じDBコネクション名が使用された場合は、
+実際にDBに接続されるコネクション数は1つとなる。
+このため、縮退運転時に参照用DBセットのDBコネクションを更新用の
+ものに差し替えたり、予め将来を想定して多くのDBセットに分散
+させておくことが可能となっている。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">DBセットの名称はSET_XXXX(XXXXは任意の文字列)でなければならない。 
+DBコネクションの名称はCON_XXXX(XXXXは任意の文字列)でなければならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">いずれのDBコネクションも利用可能である必要があり、
+接続できなかった場合はエラーとなる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">DBのフェイルオーバーには（現時点では）対応していない。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="DBI_Xe3X81X8bXe3X82X89Xe3X81XaeXe7Xa7XbbXe8Xa1X8c">
+<span class="pod_lang">DBI からの移行
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">Tripletail の DB クラスは DBI に対するラッパの形となっており、多くのインタフェースは DBI のものとは異なる。
+ただし、いつでも <code class="pod_iseq_C">$DB-&gt;getDbh()</code> メソッドにより元の DBI オブジェクトを取得できるので、 DBI のインタフェースで利用することも可能となっている。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">DBI のインタフェースは以下のようなケースで利用できる。
+ただし、 DBI を直接利用する場合は、TLの拡張プレースホルダやデバッグ機能、トランザクション整合性の管理などの機能は利用できない。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="Xe3X83Xa9Xe3X83X83Xe3X83X91Xe3X81XabXe5X90X8cXe7XadX89Xe3X81XaeXe6Xa9X9fXe8X83XbdXe3X81X8cXe7X94Xa8Xe6X84X8fXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X81XaaXe3X81X84Xe5Xa0Xb4Xe5X90X88Xe3X80X82"><span class="pod_lang">ラッパに同等の機能が用意されていない場合。
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="Xe9XabX98Xe9X80X9fXe3X81XaaXe5X87Xa6Xe7X90X86Xe3X81X8cXe5XbfX85Xe8Xa6X81Xe3X81Xa7Xe3X80X81Xe3X83Xa9Xe3X83X83Xe3X83X91Xe3X81XaeXe3X82XaaXe3X83XbcXe3X83X90Xe3X83X98Xe3X83X83Xe3X83X89Xe3X82X92Xe5X9bX9eXe9X81XbfXe3X81X97Xe3X81X9fXe3X81X84Xe5Xa0Xb4Xe5X90X88Xe3X80X82"><span class="pod_lang">高速な処理が必要で、ラッパのオーバヘッドを回避したい場合。
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">DBI に対するラッパであるため、大量の SQL を実行する場合などはパフォーマンス上のデメリットがある。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<p>
+<span class="pod_lang">DBI での SELECT は、以下のように置き換えられる。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $sth = $DB-&gt;prepare(q{SELECT * FROM test WHERE id = ?});
+ $sth-&gt;execute($id);
+ while(my $data = $sth-&gt;fetchrow_hashref) {
+ }
+ # TL
+ my $sth = $DB-&gt;execute(q{SELECT * FROM test WHERE id = ?}, $id);
+ while(my $data = $sth-&gt;fetchHash) {
+ }</code></pre>
+
+<p>
+<span class="pod_lang">TL では prepare/execute は一括で行い、 prepared statement は利用できない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">INSERT</code>・<code class="pod_iseq_C">UPDATE</code>は、以下のように置き換えられる。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $sth = $DB-&gt;prepare(q{INSERT INTO test VALUES (?, ?)});
+ my $ret = $sth-&gt;execute($id, $data);
+ # TL
+ my $sth = $DB-&gt;execute(q{INSERT INTO test VALUES (?, ?)}, $id, $data);
+ my $ret = $sth-&gt;ret;</code></pre>
+
+<p>
+<span class="pod_lang">prepare/execute を一括で行うのは同様であるが、 execute の戻り値は<code class="pod_iseq_C">$sth</code>オブジェクトであり、影響した行数を取得するためには <code class="pod_iseq_C">$sth-&gt;ret</code> メソッドを呼ぶ必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">プレースホルダの型指定は以下のように行う。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $sth = $DB-&gt;prepare(q{SELECT * FROM test LIMIT ?});
+ $sth-&gt;bind_param(1, $limit, { TYPE =&gt; SQL_INTEGER });
+ $sth-&gt;execute;
+ # TL
+ my $sth = $DB-&gt;execute(q{SELECT * FROM test LIMIT ??}, [$limit, \'SQL_INTEGER']);</code></pre>
+
+<p>
+<span class="pod_lang">TLの拡張プレースホルダ（??で表記される）を利用し、配列のリファレンスの最後に型をスカラのリファレンスの形で渡す。
+拡張プレースホルダでは、複数の値を渡すことも可能である。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $sth = $DB-&gt;prepare(q{SELECT * FROM test LIMIT ?, ?});
+ $sth-&gt;bind_param(1, $limit, { TYPE =&gt; SQL_INTEGER });
+ $sth-&gt;bind_param(2, $offset, { TYPE =&gt; SQL_INTEGER });
+ $sth-&gt;execute;
+ # TL
+ my $sth = $DB-&gt;execute(q{SELECT * FROM test LIMIT ??}, [$limit, $offset, \'SQL_INTEGER']);</code></pre>
+
+<p>
+<span class="pod_lang">INSERTした行のAUTO_INCREMENT値の取得は、getLastInsertId で行える。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $id = $DB-&gt;{mysql_insertid};
+ # TL
+ my $id = $DB-&gt;getLastInsertId;</code></pre>
+
+<p>
+<span class="pod_lang">拡張ラッパでは制御できない機能にアクセスする場合などは、 DBI のハンドラを直接利用する。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ my $id = $DB-&gt;{RowCacheSize};
+ # TL
+ my $id = $DB-&gt;getDbh()-&gt;{RowCacheSize};</code></pre>
+
+<p>
+<span class="pod_lang">トランザクションには <code class="pod_iseq_C">$DB-&gt;tx(sub{...})</code> メソッドを用いる。
+DBセットを指定する時には <code class="pod_iseq_C">$DB-&gt;tx(dbset_name=&gt;sub{...})</code> となる。
+渡したコードをトランザクション内で実行する。 
+die なしにコードを抜けた時に自動的にコミットされる。 
+途中で die した場合にはトランザクションはロールバックされる。 
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # DBI
+ $DB-&gt;do(q{BEGIN WORK});
+ #   do something.
+ $DB-&gt;commit;
+ 
+ # TL
+ $DB-&gt;tx(sub{
+   # do something.
+ });</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">begin()</code> メソッドも実装はされているがその使用は非推奨である。 
+また、 <code class="pod_iseq_C">$DB-&gt;execute(q{BEGIN WORK});</code> として利用することはできない。 
+
+</span>
+</p>
+
+<h2><a id="Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe8Xa9Xb3Xe7Xb4Xb0">
+<span class="pod_lang">拡張プレースホルダ詳細
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang"><a href="#execute">&quot;execute&quot;</a> に渡される SQL 文には、通常のプレースホルダの他に、
+拡張プレースホルダ &quot;??&quot; を埋め込む事が出来る。
+拡張プレースホルダの置かれた場所には、パラメータとして通常のスカラー値でなく、
+配列へのリファレンスを与えなければならない。配列が複数の値を持っている場合には、
+それらが通常のプレースホルダをカンマで繋げたものに展開される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例: 以下の二文は等価
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $DB-&gt;execute(
+      q{SELECT * FROM a WHERE a IN (??) AND b = ?},
+      ['AAA', 'BBB', 'CCC'], 800);
+  
+  $DB-&gt;execute(
+      q{SELECT * FROM a WHERE a IN (?, ?, ?) AND b = ?},
+      'AAA', 'BBB', 'CCC', 800);</code></pre>
+
+<p>
+<span class="pod_lang">パラメータとしての配列の最後の項目が文字列へのリファレンスである時、その文字列は
+SQL 型名として扱われる。配列が複数の値を持つ時には、その全ての要素に対して
+型指定が適用される。型名は<em class="pod_iseq_F">DBI.pm</em>で定義される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $DB-&gt;execute(q{SELECT * FROM a LIMIT ??}, [20, \'SQL_INTEGER']);
+  ==&gt; SELECT * FROM a LIMIT 20
+  
+  $DB-&gt;execute(q{SELECT * FROM a LIMIT ??}, [20, 5, \'SQL_INTEGER']);
+  ==&gt; SELECT * FROM a LIMIT 20, 5</code></pre>
+
+<p>
+<span class="pod_lang">配列内の要素を更に2要素の配列とし、二番目の要素を文字列へのリファレンスと
+する事で、要素の型を個別に指定出来る。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $DB-&gt;execute(
+      q{SELECT * FROM a WHERE a IN (??) AND b = ?},
+      [[100, \'SQL_INTEGER'], 'foo', \'SQL_VARCHAR'], 800);
+  ==&gt; SELECT * FROM a WHERE a IN (100, 'foo') AND b = '800'</code></pre>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<h3><a id="Tripletail::DB_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">
+<span class="pod_lang"><code class="pod_iseq_C">Tripletail::DB</code> メソッド
+
+</span></a></h3>
+
+<dl>
+<dt><a id="X$TL->getDB"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;getDB</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>   $DB = $TL-&gt;getDB
+   $DB = $TL-&gt;getDB($inigroup)</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::DB オブジェクトを取得。
+引数には Ini で設定したグループ名を渡す。
+引数省略時は 'DB' グループが使用される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /  <a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の関数内でDBオブジェクトを取得する場合に使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$TL->newDB"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newDB</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>   $DB = $TL-&gt;newDB
+   $DB = $TL-&gt;newDB($inigroup)</code></pre>
+
+<p>
+<span class="pod_lang">新しく Tripletail::DB オブジェクト作成。
+引数には Ini で設定したグループ名を渡す。
+引数省略時は 'DB' グループが使用される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">動的にコネクションを作成したい場合などに使用する。
+この方法で Tripletail::DB オブジェクトを取得した場合、<a href="#connect">&quot;connect&quot;</a> / <a href="#disconnect">&quot;disconnect&quot;</a> を呼び出し、接続の制御を行う必要がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="connect"><span class="pod_lang"><code class="pod_iseq_C">connect</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">DBに接続する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /  <a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の関数内でDBオブジェクトを取得する場合には自動的に接続が管理されるため、このメソッドを呼び出してはならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="#X$TL-&gt;newDB">$TL-&gt;newDB</a> で作成した Tripletail::DB オブジェクトに関しては、このメソッドを呼び出し、DBへ接続する必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">connect</code>時には、<code class="pod_iseq_C">AutoCommit</code> 及び <code class="pod_iseq_C">RaiseError</code> オプションは 1 が指定され、<code class="pod_iseq_C">PrintError</code> オプションは 0 が指定される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="disconnect"><span class="pod_lang"><code class="pod_iseq_C">disconnect</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">DBから切断する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html#startCgi">$TL-&gt;startCgi</a> /  <a href=".././Tripletail.html#trapError">$TL-&gt;trapError</a> の関数内でDBオブジェクトを取得する場合には自動的に接続が管理されるため、このメソッドを呼び出してはならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="#X$TL-&gt;newDB">$TL-&gt;newDB</a> で作成した Tripletail::DB オブジェクトに関しては、このメソッドを呼び出し、DBへの接続を切断する必要がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="tx"><span class="pod_lang"><code class="pod_iseq_C">tx</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;tx(sub{...})
+  $DB-&gt;tx('SET_W_Trans' =&gt; sub{...})</code></pre>
+
+<p>
+<span class="pod_lang">指定されたDBセット名でトランザクションを開始し、その中でコードを
+実行する。トランザクション名(DBセット名) は ini で定義されていな
+ければならない。名前を省略した場合は、デフォルトのDBセットが使われるが、
+setDefaultSetによってデフォルトが選ばれていない場合には例外を発生させる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">コードを die なしに終了した時にトランザクションは暗黙にコミットされる。
+die した場合にはロールバックされる。
+コードの中で明示的にコミット若しくはロールバックを行うこともできる。
+明示的にコミット若しくはロールバックをした後は、 <code class="pod_iseq_C">tx</code> を抜けるまで
+DB 操作は禁止される。 この間の DB 操作は例外を発生させる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="rollback"><span class="pod_lang"><code class="pod_iseq_C">rollback</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;rollback</code></pre>
+
+<p>
+<span class="pod_lang">現在実行中のトランザクションを取り消す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="commit"><span class="pod_lang"><code class="pod_iseq_C">commit</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;commit</code></pre>
+
+<p>
+<span class="pod_lang">現在実行中のトランザクションを確定する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="inTx"><span class="pod_lang"><code class="pod_iseq_C">inTx</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;inTx() and die &quot;double transaction&quot;;
+  $DB-&gt;inTx('SET_W_Trans') or die &quot;transaction required&quot;;</code></pre>
+
+<p>
+<span class="pod_lang">既にトランザクション中であるかを確認する。 
+既にトランザクション中であれば真を、 
+他にトランザクションが走っていなければ偽を返す。 
+トランザクションの指定も可能。 
+異なるDBセット名のトランザクションが実行中だった場合には
+例外を発生させる。 
+
+</span>
+</p>
+
+</dd>
+<dt><a id="begin"><span class="pod_lang"><code class="pod_iseq_C">begin</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;begin
+  $DB-&gt;begin('SET_W_Trans')</code></pre>
+
+<p>
+<span class="pod_lang">非推奨。<a href="#tx">&quot;tx&quot;</a> を使用のこと。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">指定されたDBセット名でトランザクションを開始する。トランザクション名
+(DBセット名) は ini で定義されていなければならない。
+名前を省略した場合は、デフォルトのDBセットが使われるが、
+setDefaultSetによってデフォルトが選ばれていない場合には例外を発生させる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">CGIの中でトランザクションを開始し、終了せずに Main 関数を抜けた場合は、自動的に
+<code class="pod_iseq_C">rollback</code>される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">トランザクション実行中にこのメソッドを呼んだ場合には、例外を発生させる。
+1度に開始出来るトランザクションは、1つのDBグループにつき1つだけとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setDefaultSet"><span class="pod_lang"><code class="pod_iseq_C">setDefaultSet</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;setDefaultSet('SET_W_Trans')</code></pre>
+
+<p>
+<span class="pod_lang">デフォルトのDBセットを選択する。ここで設定されたDBセットは、引数無しのbegin()
+や、beginせずに行ったexecuteの際に使われる。このメソッドは
+<a href=".././Tripletail.html#Main_Xe9X96Xa2Xe6X95Xb0">Main 関数</a> の先頭で呼ばれる事を想定している。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="execute"><span class="pod_lang"><code class="pod_iseq_C">execute</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;execute($sql, $param...)
+  $DB-&gt;execute(\'SET_W_Trans' =&gt; $sql, $param...)</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">SELECT</code>/<code class="pod_iseq_C">UPDATE</code>/<code class="pod_iseq_C">DELETE</code>などの SQL 文を実行する。
+第1引数に SQL 、第2引数以降にプレースホルダの引数を渡す。
+ただし、第1引数にリファレンスでDBセットを渡すことにより、
+トランザクション外での実行時にDBセットを指定することが可能。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第2引数以降の引数では、拡張プレースホルダが使用できる。
+<a href="#Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe8Xa9Xb3Xe7Xb4Xb0">&quot;拡張プレースホルダ詳細&quot;</a> を参照。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">既にトランザクションが実行されていれば、そのトランザクションの
+DBセットで SQL が実行される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">トランザクションが開始されておらず、かつ <a href="#lock">&quot;lock&quot;</a> により
+テーブルがロックされていれば、ロックをかけているDBセットで SQL が実行される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">いずれの場合でもない場合は、<a href="#setDefaultSet">&quot;setDefaultSet&quot;</a> で指定された
+トランザクションが使用される。
+<a href="#setDefaultSet">&quot;setDefaultSet&quot;</a> による設定がされていない場合は、例外を発生させる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このメソッドを使用して、<code class="pod_iseq_C">LOCK</code>/<code class="pod_iseq_C">UNLOCK</code>/<code class="pod_iseq_C">BEGIN</code>/<code class="pod_iseq_C">COMMIT</code>といった SQL 文を
+実行してはならない。実行しようとした場合は例外を発生させる。
+代わりに専用のメソッドを使用する事。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="selectAllHash"><span class="pod_lang"><code class="pod_iseq_C">selectAllHash</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;selectAllHash($sql, $param...)
+  $DB-&gt;selectAllHash(\'SET_W_Trans' =&gt; $sql, $param...)</code></pre>
+
+<p>
+<span class="pod_lang">SELECT結果をハッシュの配列へのリファレンスで返す。
+データがない場合は [] が返る。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  my $arrayofhash = $DB-&gt;selectAllHash($sql, $param...);
+  foreach my $hash (@$arrayofhash){
+     $TL-&gt;log(DBDATA =&gt; &quot;name of id $hash-&gt;{id} is $hash-&gt;{name}&quot;);
+  }</code></pre>
+
+</dd>
+<dt><a id="selectAllArray"><span class="pod_lang"><code class="pod_iseq_C">selectAllArray</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;selectAllArray($sql, $param...)
+  $DB-&gt;selectAllArray(\'SET_W_Trans' =&gt; $sql, $param...)</code></pre>
+
+<p>
+<span class="pod_lang">SELECT結果を配列の配列へのリファレンスで返す。
+データがない場合は [] が返る。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  my $arrayofarray = $DB-&gt;selectAllArray($sql, $param...);
+  foreach my $array (@$arrayofarray){
+     $TL-&gt;log(DBDATA =&gt; $array-&gt;[0]);
+  }</code></pre>
+
+</dd>
+<dt><a id="selectRowHash"><span class="pod_lang"><code class="pod_iseq_C">selectRowHash</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;selectRowHash($sql, $param...)
+  $DB-&gt;selectRowHash(\'SET_W_Trans' =&gt; $sql, $param...)</code></pre>
+
+<p>
+<span class="pod_lang">SELECT結果の最初の１行をハッシュへのリファレンスで返す。
+実行後、内部で<code class="pod_iseq_C">finish</code>する。
+データがない場合は undef が返る。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  my $hash = $DB-&gt;selectRowHash($sql, $param...);
+  $TL-&gt;log(DBDATA =&gt; &quot;name of id $hash-&gt;{id} is $hash-&gt;{name}&quot;);</code></pre>
+
+</dd>
+<dt><a id="selectRowArray"><span class="pod_lang"><code class="pod_iseq_C">selectRowArray</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;selectRowArray($sql, $param...)
+  $DB-&gt;selectRowArray(\'SET_W_Trans' =&gt; $sql, $param...)</code></pre>
+
+<p>
+<span class="pod_lang">SELECT結果の最初の１行を配列へのリファレンスで返す。
+実行後、内部で<code class="pod_iseq_C">finish</code>する。
+データがない場合は undef が返る。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  my $array = $DB-&gt;selectRowArray($sql, $param...);
+  $TL-&gt;log(DBDATA =&gt; $array-&gt;[0]);</code></pre>
+
+</dd>
+<dt><a id="upsert"><span class="pod_lang"><code class="pod_iseq_C">upsert</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;upsert(
+      'table1',
+      {key1 =&gt; 'val1', key2 =&gt; 'val2'},  # $keys
+      {val3 =&gt; 'val3', val4 =&gt; 'val4'}); # $values
+
+  $DB-&gt;upsert(
+      'schema1', # スキーマ名
+      'table1',
+      {key1 =&gt; 'val1', key2 =&gt; 'val2'},  # $keys
+      {val3 =&gt; 'val3', val4 =&gt; 'val4'}); # $values
+
+  $DB-&gt;upsert(
+      \'SET_W_Trans',
+      'table1',
+      {key1 =&gt; 'val1', key2 =&gt; 'val2'},  # $keys
+      {val3 =&gt; 'val3', val4 =&gt; 'val4'}); # $values</code></pre>
+
+<p>
+<span class="pod_lang">テーブルの特定の一行に対して UPDATE を実行し、もし該当行が存在しなければ
+INSERT を実行するという処理を、たとえトランザクションの外で行われた場合であってもアトミックに行う。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">与えられたテーブル名やスキーマ名は、内部で自動的に <a href="http://search.cpan.org/perldoc/symquote">symquote</a> した上で SQL 文に埋め込まれる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">$keys</code> はテーブルの一意キー（通常は主キー）からその値へのハッシュテーブル。
+その内容はテーブルの一意キーが渡っているカラムと一致していなければならない。
+つまりこのキー集合によってテーブル上のカラムを常に一意に特定する事ができなければならない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">$values</code> はそれ以外のカラム名からその値へのハッシュテーブルであり、省略も可能。
+上記の例に挙げたコードは、まず次のような UPDATE 文を実行し、
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  UPDATE table1
+     SET val3 = 'val3', val4 = 'val4'
+   WHERE key1 = 'val1', key2 = 'val2'</code></pre>
+
+<p>
+<span class="pod_lang">該当する行が存在しなければ次のような INSERT 文を実行する。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  INSERT INTO table1
+              ( key1 ,  key2 ,  val3 ,  val4 )
+       VALUES ('val1', 'val2', 'val3', 'val4')</code></pre>
+
+<p>
+<span class="pod_lang">現在 pgsql のみで利用可能。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="findTables"><span class="pod_lang"><code class="pod_iseq_C">findTables</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $sth = $DB-&gt;findTables({
+                set    =&gt; 'SET_W_Trans', # 省略可能
+                schema =&gt; 'schema',      # 省略可能
+                table  =&gt; 'table\\_%'    # 省略可能
+              });
+  while (my $row = $sth-&gt;fetchHash) {
+      print $row-&gt;{TABLE_NAME}, &quot;\n&quot;;
+  }</code></pre>
+
+<p>
+<span class="pod_lang">データベース内に存在するテーブルの一覧を得るための <code class="pod_iseq_C">Tripletail::DB::Sth</code> オブジェクトを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">スキーマ名やテーブル名に <code class="pod_iseq_C">_</code> または <code class="pod_iseq_C">%</code> 記号が含まれていた場合は、その文字列は
+LIKE 演算子のワイルドカードと見倣される。省略も可能であり、その場合は全てのスキーマ名または全てのテーブル名にマッチする
+<code class="pod_iseq_C">'%'</code> が指定された場合と同様の結果になる。<code class="pod_iseq_C">undef</code> の場合も同様。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このメソッドにより得られた <code class="pod_iseq_C">Tripletail::DB::Sth</code> オブジェクトの返す各行は
+<code class="pod_iseq_C">DBI-&gt;table_info()</code> と同等である。詳しくは
+<a href="http://search.cpan.org/dist/DBI/DBI.pm#table_info">http://search.cpan.org/dist/DBI/DBI.pm#table_info</a> を参照。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getTableColumns"><span class="pod_lang"><code class="pod_iseq_C">getTableColumns</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $columns_ref = $DB-&gt;getTableColumns(\'SET_W_Trans', 'schema', 'table');
+  my $columns_ref = $DB-&gt;getTableColumns(\'SET_W_Trans', 'table');
+  my $columns_ref = $DB-&gt;getTableColumns('schema', 'table');
+  my $columns_ref = $DB-&gt;getTableColumns('table');
+
+  if ($columns_ref) {
+      foreach my $column_ref (@$columns_ref) {
+          printf(
+              &quot;%s :: %s\n&quot;,
+              $column_ref-&gt;{ COLUMN_NAME },
+              $column_ref-&gt;{ TYPE_NAME   });
+      }
+  }
+  else {
+      print &quot;table not found\n&quot;;
+  }</code></pre>
+
+<p>
+<span class="pod_lang">テーブルの持つカラムの一覧を、ハッシュリファレンスを要素とする配列リファレンスで返す。
+その要素であるカラム情報は <code class="pod_iseq_C">DBI-&gt;column_info()</code> から得られるものと同等である。
+詳しくは <a href="http://search.cpan.org/dist/DBI/DBI.pm#column_info">http://search.cpan.org/dist/DBI/DBI.pm#column_info</a> を参照。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">指定されたテーブルが存在しない場合、このメソッドは <code class="pod_iseq_C">undef</code> を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="lock"><span class="pod_lang"><code class="pod_iseq_C">lock</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;lock(set =&gt; 'SET_W_Trans', read =&gt; ['A', 'B'], write =&gt; 'C')</code></pre>
+
+<p>
+<span class="pod_lang">指定されたDBセットに対して<code class="pod_iseq_C">LOCK TABLES</code>を実行する。<code class="pod_iseq_C">set</code>が省略された場合はデフォルト
+のDBセットが選ばれる。 CGI の中でロックした場合は、 <a href=".././Tripletail.html#Main_Xe9X96Xa2Xe6X95Xb0">Main 関数</a>
+を抜けた時点で自動的に unlock される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ロック実行中にこのメソッドを呼んだ場合には、例外を発生させる。
+1度に開始出来るロックは、1つのDBグループにつき1つだけとなる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">現在 mysql でのみ使用可能.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">mysql ではロック中にテーブルのエイリアスを使用する場合、エイリアスに対してもロックを指定する必要がある。これを行うには、テーブル名の文字列の替わりにハッシュのリファレンス {'テーブル名' =&gt; 'エイリアス'} を指定する。次に、テーブル sample とそのエイリアス A, B をロックする例を示す。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $DB-&gt;lock(read =&gt; ['sample', {'sample' =&gt; 'A'}, {'sample' =&gt; 'B'}]);
+  $DB-&gt;execute(q{
+    SELECT sample.nval, A.nval as A, B.nval as B 
+    FROM sample, sample AS A, sample AS B 
+    WHERE sample.nval + 1 = A.nval AND A.nval + 1 = B.nval
+  });
+  $DB-&gt;unlock;</code></pre>
+
+</dd>
+<dt><a id="unlock"><span class="pod_lang"><code class="pod_iseq_C">unlock</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;unlock</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">UNLOCK TABLES</code> を実行する。
+ロックがかかっていない場合は例外を発生させる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">現在 mysql でのみ使用可能.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setBufferSize"><span class="pod_lang"><code class="pod_iseq_C">setBufferSize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;setBufferSize($kbytes)</code></pre>
+
+<p>
+<span class="pod_lang">バッファサイズをKB単位でセットする。行を１行読み込んだ結果
+このサイズを上回る場合、<code class="pod_iseq_C">die</code>する。
+<code class="pod_iseq_C">0</code> または <code class="pod_iseq_C">undef</code> をセットすると、制限が解除される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="quote"><span class="pod_lang"><code class="pod_iseq_C">quote</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;quote($literal)</code></pre>
+
+<p>
+<span class="pod_lang">文字列をリテラルとしてクォートする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">通常 <code class="pod_iseq_C">'a b c'</code> のようにシングルクオートで文字列が囲まれる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="symquote"><span class="pod_lang"><code class="pod_iseq_C">symquote</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;symquote($sym)</code></pre>
+
+<p>
+<span class="pod_lang">文字列を識別子としてクォートする。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">mysql の場合は <code class="pod_iseq_C">`a b c`</code> となり、それ以外の場合は <code class="pod_iseq_C">&quot;a b c&quot;</code> となる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="escapeLike"><span class="pod_lang"><code class="pod_iseq_C">escapeLike</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;escapeLike($pattern)</code></pre>
+
+<p>
+<span class="pod_lang">与えられた文字列を LIKE 演算子のパターンと見倣して、そのワイルドカード記号をエスケープする。
+エスケープの方法は各データベースエンジンによって異なるが、多くの場合は次の式が成立する。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $DB-&gt;escapeLike('foo') eq 'foo'
+  $DB-&gt;escapeLike('f_o') eq 'f\\_o'
+  $DB-&gt;escapeLike('f%o') eq 'f\\%o'
+  $DB-&gt;escapeLike('f\\') eq 'f\\\\'</code></pre>
+
+</dd>
+<dt><a id="getType"><span class="pod_lang"><code class="pod_iseq_C">getType</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $DB-&gt;getType;</code></pre>
+
+<p>
+<span class="pod_lang">DBのタイプを返す。<code class="pod_iseq_C">(mysql, pgsql, ...)</code>
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getDbh"><span class="pod_lang"><code class="pod_iseq_C">getDbh</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $dbh = $DB-&gt;getDbh
+  $dbh = $DB-&gt;getDbh('SET_W_Trans')</code></pre>
+
+<p>
+<span class="pod_lang">DBセット内のDBハンドルを返す。
+返されるオブジェクトは <a href="http://search.cpan.org/perldoc/DBI">DBI</a> ネイティブの<code class="pod_iseq_C">dbh</code>である。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ネイティブのDBハンドルを使用してクエリを発行した場合、デバッグ機能（プロファイリング等）の機能は使用できません。
+また、トランザクションやロック状態の管理もフレームワークで行えなくなるため、注意して使用する必要があります。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getLastInsertId"><span class="pod_lang"><code class="pod_iseq_C">getLastInsertId</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $id = $DB-&gt;getLastInsertId()</code></pre>
+
+<p>
+<span class="pod_lang">セッション内の最後の自動採番の値を取得. 
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="Tripletail::DB::Sth_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">
+<span class="pod_lang"><code class="pod_iseq_C">Tripletail::DB::Sth</code> メソッド
+
+</span></a></h3>
+
+<dl>
+<dt><a id="fetchHash"><span class="pod_lang"><code class="pod_iseq_C">fetchHash</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;fetchHash</code></pre>
+
+<p>
+<span class="pod_lang">ハッシュへのリファレンスで１行取り出す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="fetchArray"><span class="pod_lang"><code class="pod_iseq_C">fetchArray</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;fetchArray</code></pre>
+
+<p>
+<span class="pod_lang">配列へのリファレンスで１行取り出す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="ret"><span class="pod_lang"><code class="pod_iseq_C">ret</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;ret</code></pre>
+
+<p>
+<span class="pod_lang">最後に実行した execute の戻り値を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="rows"><span class="pod_lang"><code class="pod_iseq_C">rows</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;rows</code></pre>
+
+<p>
+<span class="pod_lang">DBI と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="finish"><span class="pod_lang"><code class="pod_iseq_C">finish</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;finish</code></pre>
+
+<p>
+<span class="pod_lang">DBI と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="nameArray"><span class="pod_lang"><code class="pod_iseq_C">nameArray</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;nameArray</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">$sth-&gt;{NAME_lc}</code> を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="nameHash"><span class="pod_lang"><code class="pod_iseq_C">nameHash</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $sth-&gt;nameHash</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">$sth-&gt;{NAME_lc_hash}</code> を返す。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<h3><a id="DBXe3X82XbbXe3X83X83Xe3X83X88Xe3X83XbbDBXe3X82Xb3Xe3X83X8dXe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3">
+<span class="pod_lang">DBセット・DBコネクション
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang">DBグループのパラメータのうち、半角小文字英数字のみで構成された
+パラメータは予約済みで、DBグループの動作設定に使用する。
+DBセットは、予約済みではない名前であれば任意の名称が使用でき、
+値としてDBコネクションのINIグループ名をカンマ区切りで指定する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  [DB]
+  namequery=1
+  autoretry=1
+  type=mysql
+  defaultset=SET_R_Trans
+  SET_W_Trans=CON_DBW1
+  SET_R_Trans=CON_DBR1,CON_DBR2
+  
+  [CON_DBW1]
+  dbname=test
+  user=daemon
+  host=192.168.0.100
+  
+  [CON_DBR1]
+  dbname=test
+  user=daemon
+  host=192.168.0.110
+  
+  [CON_DBR2]
+  dbname=test
+  user=daemon
+  host=192.168.0.111</code></pre>
+
+<p>
+<span class="pod_lang">以下は特別なパラメータ:
+
+</span>
+</p>
+
+<dl>
+<dt><a id="namequery"><span class="pod_lang"><code class="pod_iseq_C">namequery</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  namequery = 1</code></pre>
+
+<p>
+<span class="pod_lang">これを1にすると、実行しようとしたクエリのコマンド名の直後に
+<code class="pod_iseq_C">/* foo.pl:111 [DB.R_Transaction1.DBR1] */</code> のようなコメントを挿入する。
+デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="autoretry"><span class="pod_lang"><code class="pod_iseq_C">autoretry</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  autoretry = 1</code></pre>
+
+<p>
+<span class="pod_lang">これを 1 にすると <a href="#tx">&quot;tx&quot;</a> を用いて実行されたトランザクションがデッドロックにより失敗した場合に自動的にトランザクションを再実行する。
+データベースがデッドロック検出機構を持っていない場合には再実行は行われない。デフォルトは 0。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">なお単体の <a href="#execute">&quot;execute&quot;</a> がデッドロックを起こした場合には、この設定とは無関係に必ず再実行される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="type"><span class="pod_lang"><code class="pod_iseq_C">type</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  type = mysql</code></pre>
+
+<p>
+<span class="pod_lang">DBの種類を選択する。
+mysql, pgsql, oracle, interbase, sqlite, mssql が使用可能。
+必須項目。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="defaultset"><span class="pod_lang"><code class="pod_iseq_C">defaultset</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  defaultset = SET_W_Trans</code></pre>
+
+<p>
+<span class="pod_lang">デフォルトのDBセットを設定する。
+ここで設定されたDBセットは、引数無しのbegin()や、beginせずに行ったexecuteの際に使われる。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="DBXe5XaeX9aXe7XbeXa9">
+<span class="pod_lang">DB定義
+
+</span></a></h3>
+
+<dl>
+<dt><a id="dbname"><span class="pod_lang"><code class="pod_iseq_C">dbname</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  dbname = test</code></pre>
+
+<p>
+<span class="pod_lang">DB名を設定する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="host"><span class="pod_lang"><code class="pod_iseq_C">host</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  host = localhost</code></pre>
+
+<p>
+<span class="pod_lang">DBのアドレスを設定する。
+デフォルトは<code class="pod_iseq_C">localhost</code>。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="user"><span class="pod_lang"><code class="pod_iseq_C">user</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  user = www</code></pre>
+
+<p>
+<span class="pod_lang">DBに接続する際のユーザー名を設定する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="password"><span class="pod_lang"><code class="pod_iseq_C">password</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  password = PASS</code></pre>
+
+<p>
+<span class="pod_lang">DBに接続する際のパスワードを設定する。
+省略可能。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="mysql_read_default_file"><span class="pod_lang"><code class="pod_iseq_C">mysql_read_default_file</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  mysql_read_default_file = .../tl_mysql.cnf</code></pre>
+
+<p>
+<span class="pod_lang">mysql クライアントライブラリが使用する設定ファイル my.cnf のパスを指定する。
+パスの指定を .../ で始めることで、 ini ファイルからの相対パスとして指定する事も可能。
+設定ファイルを使用する事で、 default-character-set 等の Tripletail::DB や DBD::mysql からは設定できない項目が設定できる。
+また、設定ファイルで user, password, host 等の値を指定する場合は、 Ini パラメータ のDBコネクションの値を省略する事ができる。(dbname だけは省略できない)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="mysql_read_default_group"><span class="pod_lang"><code class="pod_iseq_C">mysql_read_default_group</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  mysql_read_default_group = tripletail</code></pre>
+
+<p>
+<span class="pod_lang">mysql_read_default_file 指定時に、設定ファイル中のどのグループを使用するかを指定する。
+グループを指定した場合は、 [client] グループの設定と指定したグループの設定の両方が有効になる。
+グループを指定しない場合、 [client] グループの設定のみが有効となる。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="SQL_Server_Xe8Xa8XadXe5XaeX9a">
+<span class="pod_lang">SQL Server 設定
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang">試験的に SQL Server との接続が実装されています.
+DBD::ODBC と, Linux であれば unixODBC + freetds で, Windows であれば
+組み込みの ODBC マネージャで動作します.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">設定例:
+ 
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> # &lt;tl.ini&gt;
+ [DB]
+ type=mssql
+ defaultset=SET_W_Trans
+ SET_W_Trans=CON_RW
+ [CON_RW]
+ # dbname に ODBC-dsn を設定.
+ dbname=test
+ user=test
+ password=test
+ # freetds経由の時は, そちらのServernameも指定.
+ tdsname=tds_test</code></pre>
+
+<p>
+<span class="pod_lang">freetds での接続文字コードの設定は <em class="pod_iseq_F">freetds.conf</em> で
+設定します. 
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code> ;; &lt;freetds.conf&gt;
+ [tds_test]
+ host = 10.0.0.1
+ ;;port = 1433
+ tds version = 7.0
+ client charset = UTF-8</code></pre>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::DB - DBI のラッパ
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->getDB">$TL-&gt;getDB</a></li>
+<li><a href="#X$TL->newDB">$TL-&gt;newDB</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DBI_Xe3X81X8bXe3X82X89Xe3X81XaeXe7Xa7XbbXe8Xa1X8c">DBI からの移行</a></li>
+<li><a href="#DBXe3X82Xb0Xe3X83XabXe3X83XbcXe3X83X97Xe3X83XbbDBXe3X82XbbXe3X83X83Xe3X83X88Xe3X83XbbDBXe3X82Xb3Xe3X83X8dXe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3">DBグループ・DBセット・DBコネクション</a></li>
+<li><a href="#DBXe3X82XbbXe3X83X83Xe3X83X88Xe3X83XbbDBXe3X82Xb3Xe3X83X8dXe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3">DBセット・DBコネクション</a></li>
+<li><a href="#DBXe5XaeX9aXe7XbeXa9">DB定義</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SQL_Server_Xe8Xa8XadXe5XaeX9a">SQL Server 設定</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#Tripletail::DB_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">Tripletail::DB メソッド</a></li>
+<li><a href="#Tripletail::DB::Sth_Xe3X83Xa1Xe3X82XbdXe3X83X83Xe3X83X89">Tripletail::DB::Sth メソッド</a></li>
+<li><a href="#autoretry">autoretry</a></li>
+<li><a href="#begin">begin</a></li>
+<li><a href="#commit">commit</a></li>
+<li><a href="#connect">connect</a></li>
+<li><a href="#dbname">dbname</a></li>
+<li><a href="#defaultset">defaultset</a></li>
+<li><a href="#disconnect">disconnect</a></li>
+<li><a href="#escapeLike">escapeLike</a></li>
+<li><a href="#execute">execute</a></li>
+<li><a href="#fetchArray">fetchArray</a></li>
+<li><a href="#fetchHash">fetchHash</a></li>
+<li><a href="#findTables">findTables</a></li>
+<li><a href="#finish">finish</a></li>
+<li><a href="#getDbh">getDbh</a></li>
+<li><a href="#getLastInsertId">getLastInsertId</a></li>
+<li><a href="#getTableColumns">getTableColumns</a></li>
+<li><a href="#getType">getType</a></li>
+<li><a href="#host">host</a></li>
+<li><a href="#inTx">inTx</a></li>
+<li><a href="#lock">lock</a></li>
+<li><a href="#mysql_read_default_file">mysql_read_default_file</a></li>
+<li><a href="#mysql_read_default_group">mysql_read_default_group</a></li>
+<li><a href="#nameArray">nameArray</a></li>
+<li><a href="#nameHash">nameHash</a></li>
+<li><a href="#namequery">namequery</a></li>
+<li><a href="#password">password</a></li>
+<li><a href="#prepare/executeXe3X82X92Xe5X88X86Xe3X81X91Xe3X81XaaXe3X81X84Xe3X80X82fetchXe3X81XafXe5X88X86Xe3X81X91Xe3X82X8bXe3X81X93Xe3X81Xa8Xe3X82X82Xe3X81Xa7Xe3X81X8dXe3X82X8bXe3X80X82">prepare/executeを分けない。fetchは分けることもできる。</a></li>
+<li><a href="#quote">quote</a></li>
+<li><a href="#ret">ret</a></li>
+<li><a href="#rollback">rollback</a></li>
+<li><a href="#rows">rows</a></li>
+<li><a href="#selectAllArray">selectAllArray</a></li>
+<li><a href="#selectAllHash">selectAllHash</a></li>
+<li><a href="#selectRowArray">selectRowArray</a></li>
+<li><a href="#selectRowHash">selectRowHash</a></li>
+<li><a href="#setBufferSize">setBufferSize</a></li>
+<li><a href="#setDefaultSet">setDefaultSet</a></li>
+<li><a href="#symquote">symquote</a></li>
+<li><a href="#tx">tx</a></li>
+<li><a href="#type">type</a></li>
+<li><a href="#unlock">unlock</a></li>
+<li><a href="#upsert">upsert</a></li>
+<li><a href="#user">user</a></li>
+<li><a href="#Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe3X81XaeXe5X80Xa4Xe6Xb8Xa1Xe3X81X97Xe3X81XaeXe9X9aX9bXe3X81XabXe5X9eX8bXe6X8cX87Xe5XaeX9aXe3X81X8cXe5X8fXafXe8X83Xbd">プレースホルダの値渡しの際に型指定が可能</a></li>
+<li><a href="#Xe3X83Xa9Xe3X83X83Xe3X83X91Xe3X81XabXe5X90X8cXe7XadX89Xe3X81XaeXe6Xa9X9fXe8X83XbdXe3X81X8cXe7X94Xa8Xe6X84X8fXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X81XaaXe3X81X84Xe5Xa0Xb4Xe5X90X88Xe3X80X82">ラッパに同等の機能が用意されていない場合。</a></li>
+<li><a href="#Xe3X83XaaXe3X82XafXe3X82Xa8Xe3X82Xb9Xe3X83X88Xe5X87Xa6Xe7X90X86Xe5XaeX8cXe4XbaX86Xe5XbeX8cXe3X81XaeXe3X83X88Xe3X83Xa9Xe3X83Xb3Xe3X82Xb6Xe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe6X9cXaaXe5XaeX8cXe4XbaX86Xe3X82X84unlockXe6X9cXaaXe5XaeX8cXe4XbaX86Xe3X82X92Xe8X87XaaXe5X8bX95Xe6Xa4X9cXe5X87Xba">リクエスト処理完了後のトランザクション未完了やunlock未完了を自動検出</a></li>
+<li><a href="#Xe5XaeX9fXe8Xa1X8cXe3X82XafXe3X82Xa8Xe3X83XaaXe3X81XaeXe5X87Xa6Xe7X90X86Xe6X99X82Xe9X96X93Xe3X83XbbXe5XaeX9fXe8Xa1X8cXe8Xa8X88Xe7X94XbbXe3X83XbbXe7Xb5X90Xe6X9eX9cXe3X82X92Xe8Xa8X98Xe9X8cXb2Xe3X81X99Xe3X82X8bXe3X83X87Xe3X83X90Xe3X83X83Xe3X82Xb0Xe3X83Xa2Xe3X83XbcXe3X83X89Xe3X80X82">実行クエリの処理時間・実行計画・結果を記録するデバッグモード。</a></li>
+<li><a href="#Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe6Xa9X9fXe8X83Xbd">拡張プレースホルダ機能</a></li>
+<li><a href="#Xe6X8bXa1Xe5XbcXb5Xe3X83X97Xe3X83XacXe3X83XbcXe3X82Xb9Xe3X83X9bXe3X83XabXe3X83X80Xe8Xa9Xb3Xe7Xb4Xb0">拡張プレースホルダ詳細</a></li>
+<li><a href="#Xe6X8eXa5Xe7Xb6X9a/Xe5X88X87Xe6X96XadXe3X81XafXe8X87XaaXe5X8bX95Xe3X81Xa7Xe8Xa1X8cXe3X82X8fXe3X82X8cXe3X82X8bXe3X80X82">接続/切断は自動で行われる。</a></li>
+<li><a href="#Xe9XabX98Xe9X80X9fXe3X81XaaXe5X87Xa6Xe7X90X86Xe3X81X8cXe5XbfX85Xe8Xa6X81Xe3X81Xa7Xe3X80X81Xe3X83Xa9Xe3X83X83Xe3X83X91Xe3X81XaeXe3X82XaaXe3X83XbcXe3X83X90Xe3X83X98Xe3X83X83Xe3X83X89Xe3X82X92Xe5X9bX9eXe9X81XbfXe3X81X97Xe3X81X9fXe3X81X84Xe5Xa0Xb4Xe5X90X88Xe3X80X82">高速な処理が必要で、ラッパのオーバヘッドを回避したい場合。</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::DB - DBI のラッパ
+
+
+</div>
+
+</body>
+</html>
