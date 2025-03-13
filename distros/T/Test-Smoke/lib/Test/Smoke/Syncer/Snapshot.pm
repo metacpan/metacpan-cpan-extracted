@@ -8,7 +8,7 @@ use base 'Test::Smoke::Syncer::Base';
 
 =head1 Test::Smoke::Syncer::Snapshot
 
-This handles syncing from a snapshot with the B<Net::FTP> module.
+This handles syncing from an HTTP snapshot (Porting/make_snapshot.pl)
 It should only be visible from the "parent-package" so no direct
 user-calls on this.
 
@@ -22,21 +22,17 @@ use Test::Smoke::Util qw( whereis clean_filename );
 
 This crates the new object. Keys for C<%args>:
 
-  * ddir:    destination directory ( ./perl-current )
-  * server:  the server to get the snapshot from ( public.activestate.com )
-  * sdir:    server directory ( /pub/apc/perl-current-snap )
-  * snapext: the extension used for snapdhots ( tgz )
-  * tar:     howto untar ( Archive::Tar or 'gzip -d -c %s | tar x -' )
-  * v:       verbose
+  * ddir:      destination directory ( ./perl-current )
+  * snapurl:   the server to get the download from
+  * snaptar:   howto untar ( Archive::Tar or 'gzip -d -c %s | tar x -' )
+  * v:         verbose
 
 =cut
 
 =head2 $syncer->sync( )
 
-Make a connection to the ftp server, change to the {sdir} directory.
-Get the list of snapshots (C<< /^perl@\d+\.tgz$/ >>) and determin the
-highest patchlevel. Fetch this file.  Remove the current source-tree
-and extract the snapshot.
+Fetch the file. Remove the current source-tree
+and extract the tarball or zip.
 
 =cut
 
@@ -47,176 +43,84 @@ sub sync {
     # we need to have {ddir} before we can save the snapshot
     -d $self->{ddir} or mkpath( $self->{ddir} );
 
-    $self->{snapshot} = $self->_fetch_snapshot or return undef;
+    $self->{archive} = $self->_fetch_archive or return undef;
 
     $self->_clear_source_tree;
 
-    $self->_extract_snapshot;
+    $self->_extract_archive;
 
-    $self->patch_a_snapshot if $self->{patchup};
 
-    my $plevel = $self->check_dot_patch;
+    my $plevel = $self->check_dot_git_patch;
+
+    if (not defined $plevel) {
+        $self->check_dot_patch;
+    }
+
     $self->post_sync;
     return $plevel;
 }
 
-=head2 $syncer->_fetch_snapshot( )
+=head2 $syncer->_fetch_archive( )
 
-C<_fetch_snapshot()> checks to see if
-C<< S<< $self->{server} =~ m|^https?://| >> && $self->{sfile} >>.
-If so let B<LWP::Simple> do the fetching else do the FTP thing.
+C<_fetch_archive()> downloads the archive
 
 =cut
 
-sub _fetch_snapshot {
-    my $self = shift;
-
-    return $self->_fetch_snapshot_HTTP if $self->{server} =~ m|^https?://|i;
-
-    require Net::FTP;
-    my $ftp = Net::FTP->new($self->{server}, Debug => 0, Passive => 1) or do {
-        require Carp;
-        Carp::carp( "[Net::FTP] Can't open $self->{server}: $@" );
-        return undef;
-    };
-
-    my @login = ( $self->{ftpusr}, $self->{ftppwd} );
-    $ftp->login( @login ) or do {
-        require Carp;
-        Carp::carp( "[Net:FTP] Can't login( @login )" );
-        return undef;
-    };
-
-    $self->{v} and print "Connected to $self->{server}\n";
-    $ftp->cwd( $self->{sdir} ) or do {
-        require Carp;
-        Carp::carp( "[Net::FTP] Can't chdir '$self->{sdir}'" );
-        return undef;
-    };
-
-    my $snap_name = $self->{sfile} ||
-                    __find_snap_name( $ftp, $self->{snapext}, $self->{v} );
-
-    unless ( $snap_name ) {
-        require Carp;
-        Carp::carp("Couldn't find a snapshot at $self->{server}$self->{sdir}");
-        return undef;
-    }
-
-    $ftp->binary(); # before you ask for size!
-    my $snap_size = $ftp->size( $snap_name );
-    my $ddir_var = $self->{vms_ddir} ? 'vms_ddir' : 'ddir';
-    my $local_snap = File::Spec->catfile( $self->{ $ddir_var },
-                                          File::Spec->updir,
-                                          clean_filename( $snap_name ) );
-    $local_snap = File::Spec->canonpath( $local_snap );
-
-    if ( -f $local_snap && $snap_size == -s $local_snap ) {
-        $self->{v} and print "Skipping download of '$snap_name'\n";
-    } else {
-        $self->{v} and print "get ftp://$self->{server}$self->{sdir}/" .
-                             "$snap_name\n as $local_snap ";
-        my $l_file = $ftp->get( $snap_name, $local_snap );
-        my $ok = $l_file eq $local_snap && $snap_size == -s $local_snap;
-        $ok or printf "Error in get(%s) [%d]\n", $l_file || "",
-                                                 (-s $local_snap);
-        $ok && $self->{v} and print "[$snap_size] OK\n";
-    }
-    $ftp->quit;
-
-    return $local_snap;
-}
-
-=head2 $syncer->_fetch_snapshot_HTTP( )
-
-C<_fetch_snapshot_HTTP()> simply invokes C<< LWP::Simple::mirror() >>.
-
-=cut
-
-sub _fetch_snapshot_HTTP {
+sub _fetch_archive {
     my $self = shift;
 
     require LWP::Simple;
-    my $snap_name = $self->{server} eq 'http://github.com/Perl'
-        ? 'perl-current.tar.gz'
-        : $self->{sfile};
 
-    print "$self->{server}/$self->{sdir} => $snap_name\n" if $self->{v} > 1;
-    unless ( $snap_name ) {
+    unless ( $self->{snapurl} ) {
         require Carp;
-        Carp::carp( "No snapshot specified for $self->{server}$self->{sdir}" );
+        Carp::carp( "No URL specified for $self->{snapurl}" );
         return undef;
     }
 
-    my $local_snap = File::Spec->catfile( $self->{ddir},
-                                          File::Spec->updir, $snap_name );
-    $local_snap = File::Spec->canonpath( $local_snap );
+    my @pieces = split "/", $self->{snapurl};
+    my $snapfile = pop @pieces;
 
-    my $remote_snap = "$self->{server}$self->{sdir}/$self->{sfile}";
 
-    $self->{v} and print "LWP::Simple::mirror($remote_snap)";
-    my $result = LWP::Simple::mirror( $remote_snap, $local_snap );
+    my $local_archive = File::Spec->catfile( $self->{ddir}, File::Spec->updir, $snapfile );
+    $local_archive = File::Spec->canonpath( $local_archive );
+
+    my $remote_archive = "$self->{snapurl}";
+
+    $self->{v} and print "LWP::Simple::mirror($remote_archive)";
+    my $result = LWP::Simple::mirror( $remote_archive, $local_archive );
     if ( LWP::Simple::is_success( $result ) ) {
         $self->{v} and print " OK\n";
-        return $local_snap;
+        return $local_archive;
     } elsif ( LWP::Simple::is_error( $result ) ) {
         $self->{v} and print " not OK\n";
         return undef;
     } else {
         $self->{v} and print " skipped\n";
-        return $local_snap;
+        return $local_archive;
     }
 }
 
-=head2 __find_snap_name( $ftp, $snapext[, $verbose] )
 
-[Not a method!]
+=head2 $syncer->_extract_archive( )
 
-Get a list with all the B<perl@\d+> files, use an ST to sort these and
-return the one with the highes number.
-
-=cut
-
-sub __find_snap_name {
-    my( $ftp, $snapext, $verbose ) = @_;
-    $snapext ||= 'tgz';
-    $verbose ||= 0;
-    $verbose > 1 and print "Looking for /$snapext\$/\n";
-
-    my @list = $ftp->ls();
-
-    my $snap_name = ( map $_->[0], sort { $a->[1] <=> $b->[1] } map {
-        my( $p_level ) = /^perl[@#_](\d+)/;
-        $verbose > 1 and print "Kept: $_ ($p_level)\n";
-        [ $_, $p_level ]
-    } grep {
-    	/^perl[@#_]\d+/ &&
-    	/$snapext$/
-    } map { $verbose > 1 and print "Found snapname: $_\n"; $_ } @list )[-1];
-
-    return $snap_name;
-}
-
-=head2 $syncer->_extract_snapshot( )
-
-C<_extract_snapshot()> checks the B<tar> attribute to find out how to
-extract the snapshot. This could be an external command or the
+C<_extract_archive()> checks the B<tar> attribute to find out how to
+extract the archive. This could be an external command or the
 B<Archive::Tar>/B<Comperss::Zlib> modules.
 
 =cut
 
-sub _extract_snapshot {
+sub _extract_archive {
     my $self = shift;
 
-    unless ( $self->{snapshot} && -f $self->{snapshot} ) {
+    unless ( $self->{archive} && -f $self->{archive} ) {
         require Carp;
-        Carp::carp( "No snapshot to be extracted!" );
+        Carp::carp( "No archive to be extracted!" );
         return undef;
     }
 
     my $cwd = cwd();
 
-    # Files in the snapshot are relative to the 'perl/' directory,
+    # Files in the archive are relative to the 'perl/' directory,
     # they may need to be moved and that is not easy when you've
     # extracted them in the target directory! so we go updir()
     my $ddir = $^O eq 'VMS' ? $self->{vms_ddir} : $self->{ddir};
@@ -226,35 +130,33 @@ sub _extract_snapshot {
         Carp::croak( "Can't chdir '$extract_base': $!" );
     };
 
-    my $snap_base;
+    my $archive_base;
     EXTRACT: {
-        local $_ = $self->{tar} || 'Archive::Tar';
+        local $_ = $self->{snaptar} || 'Archive::Tar';
 
         /^Archive::Tar$/ && do {
-            $snap_base = $self->_extract_with_Archive_Tar;
+            $archive_base = $self->_extract_with_Archive_Tar;
             last EXTRACT;
         };
 
         # assume a commandline template for $self->{tar}
-        $snap_base = $self->_extract_with_external;
+        $archive_base = $self->_extract_with_external;
     }
 
-    $self->_relocate_tree( $snap_base );
+    $self->_relocate_tree( $archive_base );
 
     chdir $cwd or do {
         require Carp;
         Carp::croak( "Can't chdir($extract_base) back: $!" );
     };
 
-    if ( $self->{cleanup} & 1 ) {
-        1 while unlink $self->{snapshot};
-    }
+    1 while unlink $self->{archive};
 }
 
 =head2 $syncer->_extract_with_Archive_Tar( )
 
 C<_extract_with_Archive_Tar()> uses the B<Archive::Tar> and
-B<Compress::Zlib> modules to extract the snapshot.
+B<Compress::Zlib> modules to extract the archive.
 (This tested verry slow on my Linux box!)
 
 =cut
@@ -270,11 +172,11 @@ sub _extract_with_Archive_Tar {
         return undef;
     };
 
-    $self->{v} and printf "Extracting '$self->{snapshot}' (%s) ", cwd();
-    $archive->read( $self->{snapshot}, 1 );
+    $self->{v} and printf "Extracting '$self->{archive}' (%s) ", cwd();
+    $archive->read( $self->{archive}, 1 );
     $Archive::Tar::error and do {
         require Carp;
-        Carp::carp("Error reading '$self->{snapshot}': ".$Archive::Tar::error);
+        Carp::carp("Error reading '$self->{archive}': ".$Archive::Tar::error);
         return undef;
     };
     my @files = $archive->list_files;
@@ -283,13 +185,13 @@ sub _extract_with_Archive_Tar {
 
     ( my $prefix = $files[0] ) =~ s|^([^/]+).+$|$1|;
     my $base_dir = File::Spec->canonpath(File::Spec->catdir( cwd(), $prefix ));
-    $self->{v} and print "Snapshot prefix: '$base_dir'\n";
+    $self->{v} and print "Archive prefix: '$base_dir'\n";
     return $base_dir;
 }
 
 =head2 $syncer->_extract_with_external( )
 
-C<_extract_with_external()> uses C<< $self->{tar} >> as a sprintf()
+C<_extract_with_external()> uses C<< $self->{snaptar} >> as a sprintf()
 template to build a command. Yes that might be dangerous!
 
 =cut
@@ -300,8 +202,8 @@ sub _extract_with_external {
     my @dirs_pre = __get_directory_names();
 
     if ( $^O ne 'VMS' ) {
-        my $command = sprintf $self->{tar}, $self->{snapshot};
-        $command .= " $self->{snapshot}" if $command eq $self->{tar};
+        my $command = sprintf $self->{snaptar}, $self->{archive};
+        $command .= " $self->{archive}" if $command eq $self->{snaptar};
 
         $self->{v} and print "$command ";
         if ( system $command ) {
@@ -312,7 +214,7 @@ sub _extract_with_external {
         };
         $self->{v} and print "OK\n";
     } else {
-        __vms_untargz( $self->{tar}, $self->{snapshot}, $self->{v} );
+        __vms_untargz( $self->{snaptar}, $self->{archive}, $self->{v} );
     }
 
     # Yes another process can also create directories here!
@@ -326,9 +228,32 @@ sub _extract_with_external {
     $prefix ||= File::Spec->abs2rel( $ddir, cwd() );
 
     my $base_dir = File::Spec->canonpath(File::Spec->catdir( cwd(), $prefix ));
-    $self->{v} and print "Snapshot prefix: '$base_dir'\n";
+    $self->{v} and print "Archive prefix: '$base_dir'\n";
     return $base_dir;
 }
+
+=head2 __get_directory_names( [$dir] )
+
+[This is B<not> a method]
+
+C<__get_directory_names()> retruns all directory names from
+C<< $dir || cwd() >>. It does not look at symlinks (there should
+not be any in the perl source-tree).
+
+=cut
+
+sub __get_directory_names {
+    my $dir = shift || cwd();
+
+    local *DIR;
+    opendir DIR, $dir or return ();
+    my @dirs = grep -d File::Spec->catfile( $dir, $_ ) => readdir DIR;
+    closedir DIR;
+
+    return @dirs;
+}
+
+
 
 =head2 __vms_untargz( $untargz, $tgzfile, $verbose )
 
@@ -360,234 +285,6 @@ EO_UNTGZ
     1 while unlink "TS-UNTGZ.COM";
 
     return ! $ret;
-}
-
-=head2 $syncer->patch_a_snapshot( $patch_number )
-
-C<patch_a_snapshot()> tries to fetch all the patches between
-C<$patch_number> and C<perl-current> and apply them.
-This requires a working B<patch> program.
-
-You should pass this extra information to
-C<< Test::Smoke::Syncer::Snapshot->new() >>:
-
-  * patchup:  should we do this? ( 0 )
-  * pserver:  which FTP server? ( public.activestate.com )
-  * pdir:     directory ( /pub/apc/perl-current-diffs )
-  * unzip:    ( gzip ) [ Compress::Zlib ]
-  * patchbin: ( patch )
-  * cleanup:  remove patches after applied? ( 1 )
-
-=cut
-
-sub patch_a_snapshot {
-    my( $self, $patch_number ) = @_;
-
-    $patch_number ||= $self->check_dot_patch;
-
-    my @patches = $self->_get_patches( $patch_number );
-
-    $self->_apply_patches( @patches );
-
-    return $self->check_dot_patch;
-}
-
-=head2 $syncer->_get_patches( [$patch_number] )
-
-C<_get_patches()> sets up the FTP connection and gets all patches
-beyond C<$patch_number>. Remember that patch numbers  do not have to be
-consecutive.
-
-=cut
-
-sub _get_patches {
-    my( $self, $patch_number ) = @_;
-
-    my $ftp = Net::FTP->new($self->{pserver}, Debug => 0, Passive => 1) or do {
-        require Carp;
-        Carp::carp( "[Net::FTP] Can't open '$self->{pserver}': $@" );
-        return undef;
-    };
-
-    my @user_info = ( $self->{ftpusr}, $self->{ftppwd} );
-    $ftp->login( @user_info ) or do {
-        require Carp;
-        Carp::carp( "[Net::FTP] Can't login( @user_info )" );
-        return undef;
-    };
-
-    $ftp->cwd( $self->{pdir} ) or do {
-        require Carp;
-        Carp::carp( "[Net::FTP] Can't cd '$self->{pdir}'" );
-        return undef;
-    };
-
-    $self->{v} and print "Connected to $self->{pserver}\n";
-    my @patch_list;
-
-    $ftp->binary;
-    foreach my $entry ( $ftp->ls ) {
-        next unless $entry =~ /^(\d+)\.gz$/;
-        my $patch_num = $1;
-        next unless $patch_num > $patch_number;
-
-        my $local_patch = File::Spec->catfile( $self->{ddir},
-					       File::Spec->updir, $entry );
-        my $patch_size = $ftp->size( $entry );
-        my $l_file;
-        if ( -f $local_patch && -s $local_patch == $patch_size ) {
-            $self->{v} and print "Skip $entry $patch_size\n";
-            $l_file = $local_patch;
-        } else {
-            $self->{v} and print "get $entry ";
-            $l_file = $ftp->get( $entry, $local_patch );
-            $self->{v} and printf "%d OK\n", -s $local_patch;
-        }
-        push @patch_list, $local_patch if $l_file;
-    }
-    $ftp->quit;
-
-    @patch_list = map $_->[0] => sort { $a->[1] <=> $b->[1] } map {
-        my( $patch_num ) = /(\d+).gz$/;
-        [ $_, $patch_num ];
-    } @patch_list;
-
-    return @patch_list;
-}
-
-=head2 $syncer->_apply_patches( @patch_list )
-
-C<_apply_patches()> calls the B<patch> program to apply the patch
-and updates B<.patch> accordingly.
-
-C<@patch_list> is a list of filenames of these patches.
-
-Checks the B<unzip> attribute to find out how to unzip the patch and
-uses the B<Test::Smoke::Patcher> module to apply the patch.
-
-=cut
-
-sub _apply_patches {
-    my( $self, @patch_list ) = @_;
-
-    my $cwd = cwd();
-    chdir $self->{ddir} or do {
-        require Carp;
-        Carp::croak( "Cannot chdir($self->{ddir}): $!" );
-    };
-
-    require Test::Smoke::Patcher;
-    foreach my $file ( @patch_list ) {
-
-        my $patch = $self->_read_patch( $file ) or next;
-
-        my $patcher = Test::Smoke::Patcher->new( single => {
-            ddir     => $self->{ddir},
-            patchbin => $self->{patchbin},
-            pfile    => \$patch,
-            v        => $self->{v},
-        });
-        eval { $patcher->patch };
-        if ( $@ ) {
-             require Carp;
-	     Carp::carp( "Error while patching:\n\t$@" );
-             next;
-        }
-
-        $self->_fix_dot_patch( $1 ) if $file =~ /(\d+)\.gz$/;
-
-        if ( $self->{cleanup} & 2 ) {
-            1 while unlink $file;
-        }
-    }
-    chdir $cwd or do {
-        require Carp;
-        Carp::croak( "Cannot chdir($cwd) back: $!" );
-    };
-}
-
-=head2 $syncer->_read_patch( $file )
-
-C<_read_patch()> unzips the patch and returns the contents.
-
-=cut
-
-sub _read_patch {
-    my( $self, $file ) = @_;
-
-    return undef unless -f $file;
-
-    my $content;
-    if ( $self->{unzip} eq 'Compress::Zlib' ) {
-        require Compress::Zlib;
-        my $unzip = Compress::Zlib::gzopen( $file, 'rb' ) or do {
-            require Carp;
-            Carp::carp( "Can't open '$file': $Compress::Zlib::gzerrno" );
-            return undef;
-        };
-
-        my $buffer;
-        $content .= $buffer while $unzip->gzread( $buffer ) > 0;
-
-        unless ( $Compress::Zlib::gzerrno == Compress::Zlib::Z_STREAM_END() ) {
-            require Carp;
-            Carp::carp( "Error reading '$file': $Compress::Zlib::gzerrno" );
-        }
-
-        $unzip->gzclose;
-    } else {
-
-        # this calls out for `$self->{unzip} $file`
-        # {unzip} could be like 'zcat', 'gunzip -c', 'gzip -dc'
-
-        $content = `$self->{unzip} $file`;
-    }
-
-    return $content;
-}
-
-=head2 $syncer->_fix_dot_patch( $new_level );
-
-C<_fix_dot_patch()> updates the B<.patch> file with the new patch level.
-
-=cut
-
-sub _fix_dot_patch {
-    my( $self, $new_level ) = @_;
-
-    return $self->check_dot_patch
-        unless defined $new_level && $new_level =~ /^\d+$/;
-
-    my $dot_patch = File::Spec->catfile( $self->{ddir}, '.patch' );
-
-    local *DOTPATCH;
-    if ( open DOTPATCH, "> $dot_patch" ) {
-        print DOTPATCH "$new_level\n";
-        return close DOTPATCH ? $new_level : $self->check_dot_patch;
-    }
-
-    return $self->check_dot_patch;
-}
-
-=head2 __get_directory_names( [$dir] )
-
-[This is B<not> a method]
-
-C<__get_directory_names()> retruns all directory names from
-C<< $dir || cwd() >>. It does not look at symlinks (there should
-not be any in the perl source-tree).
-
-=cut
-
-sub __get_directory_names {
-    my $dir = shift || cwd();
-
-    local *DIR;
-    opendir DIR, $dir or return ();
-    my @dirs = grep -d File::Spec->catfile( $dir, $_ ) => readdir DIR;
-    closedir DIR;
-
-    return @dirs;
 }
 
 1;

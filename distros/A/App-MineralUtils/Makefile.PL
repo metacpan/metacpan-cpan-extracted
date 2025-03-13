@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
     "script/convert-iron-unit",
     "script/convert-magnesium-unit",
     "script/convert-potassium-unit",
-    "script/convert-sodium-unit"
+    "script/convert-sodium-unit",
+    "script/convert-zinc-unit"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }

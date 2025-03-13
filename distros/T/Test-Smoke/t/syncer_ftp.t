@@ -8,9 +8,6 @@ use strict;
 # and provide a fake FTP mechanism through them
 # For this there is the 't/ftppub' directory with:
 #     't/ftppub/snap' contains two fake snapshots (with files)
-#     't/ftppub/perl-current-diffs' contains a few fake diffs
-# Now that we have controlable FTP (if you have Net::FTP),
-# we can concentrate on doing the untargz and patch stuff
 #
 #####
 my $findbin;
@@ -28,7 +25,7 @@ BEGIN {
     $@ and plan( skip_all => "No 'Net::FTP' found!\n" .
                              "!!!You will not be able to smoke from " .
                              "snapshots without it!!!" );
-    plan tests => 7;
+    plan tests => 3;
 }
 
 my $verbose = $ENV{SMOKE_VERBOSE} || 0;
@@ -114,13 +111,6 @@ SKIP: { # Here we try for 'Archive::Tar'/'Compress::Zlib'
 
     my $plevel  = $syncer->sync;
 
-    is( $plevel, 20000, "Patchlevel $plevel by $syncer->{tar}" );
-
-    skip "Cannot find a 'patch' program", 1 unless $patch;
-    my $plevel2 = $syncer->patch_a_snapshot( $plevel );
-
-    is( $plevel2, 20005, "A patched snapshot $plevel2 by $syncer->{unzip}" );
-
 }
 
 SKIP: { # Here we try for gzip/tar
@@ -153,13 +143,7 @@ SKIP: { # Here we try for gzip/tar
 
     my $plevel  = $syncer->sync;
 
-    is( $plevel, 20000, "Patchlevel $plevel by $syncer->{tar}" );
-
     skip "Can't seem to find 'gzip/gunzip/zcat'", 1 unless $gzip;
     skip "Cannot find a 'patch' program", 1 unless $patch;
-
-    my $plevel2 = $syncer->patch_a_snapshot( $plevel );
-
-    is( $plevel2, 20005, "A patched snapshot $plevel2 by $syncer->{unzip}" );
 
 }

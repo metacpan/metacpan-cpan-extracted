@@ -1,9 +1,9 @@
 {
-   "abstract" : "Find or download and install libmaxminddb",
+   "abstract" : "Find or install libmaxminddb",
    "author" : [
       "Andreas V\u00f6gele <voegelas@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -16,23 +16,20 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
-            "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52",
-            "File::Spec::Functions" : "0"
+            "ExtUtils::CBuilder" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "2.07",
+            "File::Temp" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.19",
-            "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::AlienBuild" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
             "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.26",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
@@ -45,16 +42,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
-            "parent" : "0",
-            "perl" : "5.016",
+            "File::Spec" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.014",
             "utf8" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Alien" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0"
          }
       }
@@ -62,7 +60,7 @@
    "provides" : {
       "Alien::libmaxminddb" : {
          "file" : "lib/Alien/libmaxminddb.pm",
-         "version" : "1.019"
+         "version" : "2.000"
       }
    },
    "release_status" : "stable",
@@ -77,23 +75,7 @@
          "web" : "https://github.com/voegelas/Alien-libmaxminddb"
       }
    },
-   "version" : "1.019",
-   "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
-      "requires" : {
-         "share" : {
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
-            "IO::Zlib" : "0",
-            "Mozilla::CA" : "0",
-            "Net::SSLeay" : "1.49",
-            "URI" : "0"
-         },
-         "system" : {}
-      }
-   },
+   "version" : "2.000",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

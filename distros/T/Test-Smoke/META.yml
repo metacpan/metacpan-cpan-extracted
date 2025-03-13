@@ -7,6 +7,7 @@ build_requires:
   HTTP::Daemon: '0'
   HTTP::Message: '0'
   JSON: '4.1'
+  Path::Tiny: '0'
   Test::Fatal: '0'
   Test::More: '0.88'
   Test::NoWarnings: '0'
@@ -41,5 +42,5 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/Test-Smoke/issues
   homepage: http://perl5.test-smoke.org/
   repository: https://github.com/Perl-Toolchain-Gang/Test-Smoke.git
-version: '1.83'
+version: '1.84'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -34,33 +34,6 @@ my %CONFIG = (
         class    => 'Test::Smoke::Syncer::Rsync',
     },
 
-# these settings have to do with synctype==snapshot
-    df_ftp      => 'Net::FTP',
-    df_server   => 'github.com/Perl',
-    df_sdir     => '/pub/apc/perl-current-snap',
-    df_sfile    => '',
-    df_snapext  => 'tar.gz',
-
-    df_tar      => ( $^O eq 'MSWin32' ?
-        'Archive::Tar' : 'gzip -d -c %s | tar xf -' ),
-
-    df_patchup  => 0,
-    df_pserver  => 'github.com/Perl',
-    df_pdir     => '/pub/apc/perl-current-diffs',
-    df_ftpusr   => 'anonymous',
-    df_ftppwd   => 'smokers@perl.org',
-    df_unzip    => $^O eq 'MSWin32' ? 'Compress::Zlib' : 'gzip -dc',
-    df_patchbin => 'patch',
-    df_cleanup  => 1,
-    snapshot => {
-        allowed => [
-            qw( ftp server sdir sfile snapext tar ftpusr ftppwd
-                patchup pserver pdir unzip patchbin cleanup )
-        ],
-        required => [],
-        class    => 'Test::Smoke::Syncer::Snapshot',
-    },
-
 # these settings have to do with synctype==copy
     df_cdir    => undef,
 
@@ -92,26 +65,37 @@ my %CONFIG = (
     },
 
 # these settings have to do with synctype==ftp
-    df_ftphost => 'public.activestate.com',
-    df_ftpsdir => '/pub/apc/perl-current',
-    df_ftpcdir => '/pub/apc/perl-current-diffs',
+    df_ftphost => 'ftp.example.com',
+    df_ftpport => 21,
+    df_ftpsdir => '/',
     df_ftype   => undef,
 
     ftp        => {
-        allowed  => [qw(ftphost ftpusr ftppwd ftpsdir ftpcdir ftype)],
+        allowed  => [qw(ftphost ftpport ftpusr ftppwd ftpsdir ftype)],
         required => [qw()],
         class    => 'Test::Smoke::Syncer::FTP',
+    },
+
+# these settings have to do with synctype==snapshot
+    df_snapurl => 'https://github.com/Perl/perl5/archive/refs/heads/blead.tar.gz',
+    df_snaptar => '',
+
+    snapshot   => {
+        allowed  => [qw(snapurl snaptar)],
+        required => [qw()],
+        class    => 'Test::Smoke::Syncer::Snapshot',
     },
 
 # synctype: git
     df_gitbin        => 'git',
     df_gitorigin     => 'https://github.com/Perl/perl5.git',
     df_gitdir        => undef,
+    df_gitbare        => 0,
     df_gitdfbranch   => 'blead',
     df_gitbranchfile => undef,
 
     git => {
-        allowed  => [qw(gitbin gitorigin gitdir gitdfbranch gitbranchfile)],
+        allowed  => [qw(gitbin gitorigin gitdir gitbare gitdfbranch gitbranchfile)],
         required => [qw(gitbin gitorigin gitdir)],
         class    => 'Test::Smoke::Syncer::Git',
     },

@@ -7,6 +7,13 @@
 
 Revision history for Tripletail
 
+* RELEASED 0.69
+CLOSED: [2025-03-13 Thu 11:39]
+** =t/0.prereq.t=
+=PadWalker= がインストールされていない環境で =make test= を実行すると
+=t/0.prereq.t= のテストに失敗する不具合を修正した:
+https://rt.cpan.org/Public/Bug/Display.html?id=162743
+
 * RELEASED 0.68
 CLOSED: [2025-03-12 Wed 15:55]
 ** TL::isDomainName

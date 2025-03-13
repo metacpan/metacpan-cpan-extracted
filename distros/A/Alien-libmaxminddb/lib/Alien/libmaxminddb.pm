@@ -2,13 +2,102 @@ package Alien::libmaxminddb;
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-use 5.016;
+use 5.014;
 use warnings;
 use utf8;
 
-our $VERSION = 1.019;
+our $VERSION = 2.000;
 
-use parent qw(Alien::Base);
+use File::Spec qw();
+use JSON::PP   qw();
+
+sub dist_dir {
+    my $class = shift;
+
+    my $dist = $class;
+    $dist =~ s/::/-/g;
+
+    my $sub_dir = File::Spec->catdir(qw(auto share dist), $dist);
+    for my $inc (@INC) {
+        my $dir = File::Spec->catdir($inc, $sub_dir);
+        if (-d $dir) {
+            return $dir;
+        }
+    }
+    die "unable to find dist share directory for $dist";
+}
+
+sub cflags {
+    my $class = shift;
+
+    return $class->config->{cflags};
+}
+
+sub libs {
+    my $class = shift;
+
+    return $class->config->{libs};
+}
+
+sub version {
+    my $class = shift;
+
+    return $class->config->{version};
+}
+
+sub install_type {
+    my $class = shift;
+
+    return $class->config->{install_type};
+}
+
+sub config {
+    my $class = shift;
+
+    state $config = $class->_config;
+    return $config;
+}
+
+sub dynamic_libs {
+    my $class = shift;
+
+    return;
+}
+
+sub bin_dir {
+    my $class = shift;
+
+    return;
+}
+
+sub _config {
+    my $class = shift;
+
+    my $dist_dir = $class->dist_dir;
+
+    my $json_file = File::Spec->catfile($dist_dir, '_alien', 'alien.json');
+    open my $in, '<', $json_file
+        or die "Cannot read $json_file";
+    my $json = do { local $/; <$in> };
+    close $in;
+
+    my $config = JSON::PP::decode_json($json);
+
+    $config->{distdir} = $dist_dir;
+
+    if ($config->{install_type} eq 'share') {
+        my $inc_dir = File::Spec->catdir($dist_dir, 'include');
+        if (-d $inc_dir) {
+            $config->{cflags} = join ' ', "-I$inc_dir", $config->{cflags};
+        }
+        my $lib_dir = File::Spec->catdir($dist_dir, 'lib');
+        if (-d $lib_dir) {
+            $config->{libs} = join ' ', "-L$lib_dir", $config->{libs};
+        }
+    }
+
+    return $config;
+}
 
 1;
 __END__
@@ -17,11 +106,11 @@ __END__
 
 =head1 NAME
 
-Alien::libmaxminddb - Find or download and install libmaxminddb
+Alien::libmaxminddb - Find or install libmaxminddb
 
 =head1 VERSION
 
-version 1.019
+version 2.000
 
 =head1 SYNOPSIS
 
@@ -47,12 +136,39 @@ Add the library to your F<dist.ini> if you use Dist::Zilla.
 =head1 DESCRIPTION
 
 MaxMind and DP-IP.com provide geolocation databases in the MaxMind DB file
-format format.  This Perl module finds or downloads and installs the C library
-libmaxminddb, which can read MaxMind DB files.
+format format.  This Perl module finds or installs the C library libmaxminddb,
+which can read MaxMind DB files.
 
 =head1 SUBROUTINES/METHODS
 
-All methods are inherited from L<Alien::Base>.
+=head2 cflags
+
+  my $cflags = Alien::libmaxminddb->cflags;
+
+Returns the C compiler flags necessary to compile an XS module that uses
+libmaxminddb.
+
+=head2 libs
+
+  my $libs = Alien::libmaxminddb->libs;
+
+Returns the library linker flags necessary to link an XS module against
+libmaxminddb.
+
+=head2 version
+
+  my $version = Alien::libmaxminddb->version;
+
+Returns the libmaxminddb version.
+
+=head2 install_type
+
+  my $install_type = Alien::libmaxminddb->install_type;
+
+Returns "system" if the library is provided by the operating system or "share"
+if the bundled library is used.
+
+=for Pod::Coverage dist_dir config dynamic_libs bin_dir
 
 =head1 DIAGNOSTICS
 
@@ -64,11 +180,8 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires L<Alien::Build> from CPAN.  On Windows, L<Alien::MSYS> needs to be
-installed manually.
-
-Install the package C<libmaxminddb-devel> or C<libmaxminddb-dev> if you would
-like to use your operating system's libmaxminddb library.
+Install C<pkg-config> and C<libmaxminddb-devel> or C<libmaxminddb-dev> if you
+would like to use your operating system's libmaxminddb library.
 
 =head1 INCOMPATIBILITIES
 
@@ -76,13 +189,11 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-If L<libmaxminddb|https://github.com/maxmind/libmaxminddb> and its development
-files aren't present, the library is fetched from GitHub and built with
-L<Alien::Build>.  On Windows, L<Alien::MSYS> needs to be installed manually.
+None known.
 
 =head1 SEE ALSO
 
-L<Alien::Base>, L<Geo::Location::IP>, L<IP::Geolocation::MMDB>
+L<Geo::Location::IP>, L<IP::Geolocation::MMDB>
 
 =head1 ACKNOWLEDGEMENTS
 

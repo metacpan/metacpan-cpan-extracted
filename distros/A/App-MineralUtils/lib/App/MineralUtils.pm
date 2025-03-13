@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-04'; # DATE
+our $DATE = '2025-03-11'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -908,7 +908,136 @@ sub convert_calcium_unit {
     }
 }
 
-# --- TODO: zinc
+# --- zinc
+
+
+our @zinc_forms = (
+    # source: chatgpt
+    {
+        name => 'mg-zn-elem',
+        zinc_ratio => 1,
+        summary => 'Elemental zinc, in milligrams',
+    },
+    # also has anhydrous, dihydrate, trihydrate
+    {
+        name => 'mg-zn-lactate-monohydrate',
+        zinc_ratio => 65.38 / 243.5, # 26.9%
+        summary => 'Zinc lactate monohydrate (Zn(C3H5O3)2.H2O), in milligrams',
+    },
+    {
+        name => 'mg-zn-picolinate',
+        zinc_ratio => 65.38 / 298.6, # 21.9%
+        summary => 'Zinc picolinate (Zn(C6H4NO2)2), in milligrams',
+    },
+    # also has monohydrate, dihydrate
+    {
+        name => 'mg-zn-gluconate-anhydrous',
+        zinc_ratio => 65.38 / 455.7, # 14.4%
+        summary => 'Zinc gluconate anhydrous (Zn(C6H11O7)2), in milligrams',
+    },
+    {
+        name => 'mg-zn-citrate',
+        zinc_ratio => 3*65.38 / 574.3, # 31.1%
+        summary => 'Zinc citrate (Zn3(C6H5O7)2, trizinc dicitrate), in milligrams',
+    },
+    {
+        name => 'mg-zn-oxide',
+        zinc_ratio => 65.38 / 81.38, # 80.3%
+        summary => 'Zinc oxide (ZnO), in milligrams',
+    },
+    # there are also monohydrate, heptahydrate
+    {
+        name => 'mg-zn-sulfate-anhydrous',
+        zinc_ratio =>  65.38 / 161.5, # 36.6%
+        summary => 'Zinc sulfate (ZnSO4), in milligrams',
+    },
+);
+
+our %argspecs_zinc = (
+    quantity => {
+        # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
+        schema => 'str*',
+        default => '1 mg',
+        req => 0,
+        pos => 0,
+        completion => sub {
+            require Complete::Sequence;
+
+            my %args = @_;
+            Complete::Sequence::complete_sequence(
+                word => $args{word},
+                sequence => [
+                    # TEMP
+                    #sub {
+                    #    require Complete::Number;
+                    #    my $stash = shift;
+                    #    Complete::Number::complete_int(word => $stash->{cur_word});
+                    #},
+                    #' ',
+                    {alternative=>[map {$_->{name}} @zinc_forms]},
+                ],
+            );
+        },
+    },
+    to_unit => {
+        # schema => 'physical::unit', # IU hasn't been added
+        schema => ['str*', in=>['mg', map {$_->{name}} @zinc_forms]],
+        pos => 1,
+    },
+);
+
+$SPEC{convert_zinc_unit} = {
+    v => 1.1,
+    summary => 'Convert a zinc quantity from one unit to another',
+    description => <<'MARKDOWN',
+
+If target unit is not specified, will show all known conversions.
+
+MARKDOWN
+    args => {
+        %argspecs_zinc,
+    },
+    examples => [
+        {
+            args=>{},
+            summary=>'Show all possible conversions',
+        },
+    ],
+};
+sub convert_zinc_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        map {([$_->{name}], sprintf("%.3f mg", $_->{zinc_ratio}*($_->{purity}//1)))}
+        @zinc_forms,
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            @zinc_forms,
+        ) {
+            push @rows, {
+                amount => $quantity->convert($u->{name}),
+                unit => $u->{name},
+                summary => $u->{summary},
+                pct_zn => $u->{zinc_ratio} * 100,
+            };
+        }
+        [200, "OK", \@rows, {
+            'table.fields' => [qw/amount pct_zn unit summary/],
+            'table.field_formats'=>[[number=>{thousands_sep=>'', precision=>3}], [number=>{thousands_sep=>'', precision=>3}], undef, undef],
+            'table.field_aligns' => [qw/number number left left/],
+        }];
+    }
+}
 
 1;
 # ABSTRACT: Utilities related to mineral supplements
@@ -925,7 +1054,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.020 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-12-04.
+This document describes version 0.021 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2025-03-11.
 
 =head1 DESCRIPTION
 
@@ -942,6 +1071,8 @@ This distributions provides the following command-line utilities:
 =item * L<convert-potassium-unit>
 
 =item * L<convert-sodium-unit>
+
+=item * L<convert-zinc-unit>
 
 =back
 
@@ -1026,14 +1157,14 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
      "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
    },
  ]
 
@@ -1143,14 +1274,14 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "number", "left", "left"],
-     "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1428,13 +1559,13 @@ Result:
      },
    ],
    {
+     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.fields"        => ["amount", "pct_mg", "unit", "summary"],
    },
  ]
@@ -1700,7 +1831,7 @@ Result:
      "table.fields"        => ["amount", "pct_na", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
@@ -1714,6 +1845,117 @@ Result:
 Result:
 
  [200, "OK", 2544.52926208651, {}]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity> => I<str> (default: "1 mg")
+
+(No description)
+
+=item * B<to_unit> => I<str>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_zinc_unit
+
+Usage:
+
+ convert_zinc_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert a zinc quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_zinc_unit();
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       amount  => 1,
+       pct_zn  => 100,
+       unit    => "mg-zn-elem",
+       summary => "Elemental zinc, in milligrams",
+     },
+     {
+       amount  => 3.71747211895911,
+       pct_zn  => 26.8501026694045,
+       unit    => "mg-zn-lactate-monohydrate",
+       summary => "Zinc lactate monohydrate (Zn(C3H5O3)2.H2O), in milligrams",
+     },
+     {
+       amount  => 4.5662100456621,
+       pct_zn  => 21.8955123911587,
+       unit    => "mg-zn-picolinate",
+       summary => "Zinc picolinate (Zn(C6H4NO2)2), in milligrams",
+     },
+     {
+       amount  => 6.99300699300699,
+       pct_zn  => 14.347158218126,
+       unit    => "mg-zn-gluconate-anhydrous",
+       summary => "Zinc gluconate anhydrous (Zn(C6H11O7)2), in milligrams",
+     },
+     {
+       amount  => 2.92397660818713,
+       pct_zn  => 34.1528817691102,
+       unit    => "mg-zn-citrate",
+       summary => "Zinc citrate (Zn3(C6H5O7)2, trizinc dicitrate), in milligrams",
+     },
+     {
+       amount  => 1.2453300124533,
+       pct_zn  => 80.3391496682232,
+       unit    => "mg-zn-oxide",
+       summary => "Zinc oxide (ZnO), in milligrams",
+     },
+     {
+       amount  => 2.46913580246914,
+       pct_zn  => 40.4829721362229,
+       unit    => "mg-zn-sulfate-anhydrous",
+       summary => "Zinc sulfate (ZnSO4), in milligrams",
+     },
+   ],
+   {
+     "table.field_formats" => [
+                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
+                                undef,
+                                undef,
+                              ],
+     "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
+   },
+ ]
 
 =back
 
@@ -1785,7 +2027,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025, 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

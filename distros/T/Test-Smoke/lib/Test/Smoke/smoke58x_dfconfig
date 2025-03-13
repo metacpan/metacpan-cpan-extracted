@@ -1,3 +1,0 @@
-$conf = {
-          'perl_version' => '5.8.x',
-        };

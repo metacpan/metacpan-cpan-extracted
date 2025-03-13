@@ -15,3 +15,5 @@ t/op/skip.t
 t/op/test.t
 win32/Makefile
 win32/makefile.mk
+Porting/GitUtils.pm
+Porting/make_dot_patch.pl

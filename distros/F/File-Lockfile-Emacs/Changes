@@ -1,3 +1,10 @@
+0.002   2025-03-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add short alias -f for --force.
+
+        - Document race conditions.
+
+
 0.001   2025-03-11  Released-By: PERLANCAR
 
         - First release, incomplete test suite.

@@ -873,7 +873,7 @@ EOOUT
     } );
     isa_ok $syncer, 'Test::Smoke::Syncer::Copy';
     my $patch = $syncer->sync;
-    is $patch, '20000', "Patchlevel: $patch";
+    is $patch, '37800ef622734ef3d18eddf53581505ff036f4b6', "Patchlevel: $patch";
 
     my $skip_tests = catfile 't', 'MANIFEST.NOTEST';
     my %config = (

@@ -82,9 +82,8 @@ SKIP: {
 SKIP: {
     my $pl = 'blead 2008-12-20.10:38:02 ' .
              '2af192eebde5f7a93e229dfc3196f62ee4cbcd2e ' .
-             'GitLive-blead-45-g2af192ee';
+             'blead-45-g2af192ee';
     my ($branch, $date, $patch, $descr) = split ' ',  $pl;
-    $descr =~ s/^GitLive-//;
     local *PL;
     open( PL, '> .patch') or skip "Couldn't create .patch: $!", 1;
     print PL $pl;

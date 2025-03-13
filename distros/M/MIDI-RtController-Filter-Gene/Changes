@@ -1,0 +1,8 @@
+Revision history for MIDI-RtController-Filter-Gene
+
+0.0101 2025-03-12 18:39:54
+  - More filters: Arp and Walk.
+
+0.0100 2025-03-12 16:13:04
+  - Mint with Dist::Zilla.
+  - Begin porting from https://github.com/ology/Music/blob/master/rtmidi-callback.pl

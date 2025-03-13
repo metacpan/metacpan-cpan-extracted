@@ -1,3 +1,23 @@
+1.84 2025-??-??
+ - Remove deprecated files:
+   - bin/configsmoke.pl
+   - bin/chkbcfg.pl
+   - bin/sysinfo.pl
+   - bin/remoske.pl
+   - bin/patchtree.pl
+   - bin/smokestatus.pl
+   - bin/sprove.pl
+ - Use bare repository - Thanks to Andrew Hewus Fresh
+ - More Win32 changes - Thanks to Christian Walde
+ - Entire content is written to logs - Thanks to James E Keenan
+ - Make snapshot syncer compatible with git archive (e.g. GitHub tarballs)
+ - Syncer copy: Make .patch if not already there
+ - Explicit rsync protocol for default rsync URL
+ - Convert APC (deprecated) FTP to general purpose FTP sync:
+   - Make FTP Host and FTP Port configurable
+   - Do not sync symlinks (was breaking permissions)
+ - Remove xt/sysinfo/sysinfo_macos.t that was moved to System::Info 
+
 1.83 2024-12-07
  - "Hello World!" from tib
  - Maintenance release: cleaning, moving some files in distribution/repository

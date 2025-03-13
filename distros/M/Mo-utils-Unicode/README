@@ -1,0 +1,195 @@
+NAME
+    Mo::utils::Unicode - Mo utilities for Unicode.
+
+SYNOPSIS
+     use Mo::utils::Unicode qw(check_array_unicode_block check_unicode_block check_unicode_script);
+
+     check_array_unicode_block($self, $key);
+     check_unicode_block($self, $key);
+     check_unicode_script($self, $key);
+
+DESCRIPTION
+    Mo utilities for Unicode checking of data objects.
+
+SUBROUTINES
+  "check_array_unicode_block"
+     check_array_unicode_block($self, $key);
+
+    Check parameter defined by $key which is valid array with Unicode block
+    names.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_unicode_block"
+     check_unicode_block($self, $key);
+
+    Check parameter defined by $key which is valid Unicode block name.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_unicode_script"
+     check_unicode_script($self, $key);
+
+    Check parameter defined by $key which is valid Unicode script name.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_array_unicode_block():
+             From Mo::utils::check_array():
+                     Parameter '%s' must be a array.
+                             Value: %s
+                             Reference: %s
+             Parameter '%s' contains invalid Unicode block.
+                     Value: %s
+     check_unicode_block():
+             Parameter '%s' contains invalid Unicode block.
+                     Value: %s
+     check_unicode_script():
+             Parameter '%s' contains invalid Unicode script.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Unicode qw(check_array_unicode_block);
+
+     my $self = {
+             'key' => [
+                     'Latin Extended-A',
+                     'Latin Extended-B',
+             ],
+     };
+     check_array_unicode_block($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Unicode qw(check_array_unicode_block);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => [
+                    'Bad Unicode block',
+              ],
+     };
+     check_array_unicode_block($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' contains invalid Unicode block.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Unicode qw(check_unicode_block);
+
+     my $self = {
+             'key' => 'Latin Extended-A',
+     };
+     check_unicode_block($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Unicode qw(check_unicode_block);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'Bad Unicode block',
+     };
+     check_unicode_block($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' contains invalid Unicode block.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils::Unicode qw(check_unicode_script);
+
+     my $self = {
+             'key' => 'Thai',
+     };
+     check_unicode_script($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Unicode qw(check_unicode_script);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad_script',
+     };
+     check_unicode_script($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' contains invalid Unicode script.
+
+DEPENDENCIES
+    Error::Pure, Exporter, List::Util, Mo::utils Readonly, Unicode::UCD.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Unicode>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

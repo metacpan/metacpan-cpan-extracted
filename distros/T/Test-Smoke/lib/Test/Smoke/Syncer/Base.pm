@@ -121,6 +121,43 @@ sub _relocate_tree {
     $self->{v} and print "OK\n";
 }
 
+=head2 $syncer->check_dot_git_patch( )
+
+[ Method | Public ]
+
+C<check_dot_git_patch()> checks if there is a '.git_patch' file in the source-tree.
+
+It returns the patchlevel found or C<undef>.
+
+=cut
+
+sub check_dot_git_patch {
+    my $self = shift;
+
+    my $dot_git_patch = File::Spec->catfile( $self->{ddir}, '.git_patch' );
+
+    local *DOTGITPATCH;
+    my $patch_level = '?????';
+    if ( open DOTGITPATCH, "< $dot_git_patch" ) {
+        chomp( $patch_level = <DOTGITPATCH> );
+        close DOTGITPATCH;
+
+	if ( $patch_level ) {
+
+	    return undef if ( $patch_level =~ /^\$Format/ ); # Not expanded
+
+            my @dot_git_patch = split '\|', $patch_level;
+
+            # As we do not use time information, we can just pick the first and
+            # the last two elements
+            my ($sha, $describe, $names) = @dot_git_patch[0, -2, -1];
+
+            return $sha;
+        }
+    }
+    return undef;
+}
+
 =head2 $syncer->check_dot_patch( )
 
 [ Method | Public ]
@@ -209,7 +246,7 @@ sub version_from_patchlevel_h {
     my $self = shift;
 
     require Test::Smoke::Util;
-    return Test::Smoke::Util::version_from_patchelevel( $self->{ddir} );
+    return Test::Smoke::Util::version_from_patchlevel_h( $self->{ddir} );
 }
 
 =head2 is_git_dir()

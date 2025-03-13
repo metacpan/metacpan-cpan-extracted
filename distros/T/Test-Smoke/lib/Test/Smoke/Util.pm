@@ -864,13 +864,59 @@ sub get_patch {
         if ( $patch_level ) {
             if ($patch_level =~ /\s/) {
                 my ($branch, $sha, $describe) = (split ' ', $patch_level)[0, -2, -1];
-                (my $short_describe = $describe) =~ s/^GitLive-//;
-                return [$sha, $short_describe, $branch];
+                return [$sha, $describe, $branch];
             }
             return [$patch_level];
         }
         return [ '' ];
     }
+
+    my $dot_git_patch = File::Spec->catfile( $ddir, '.git_patch' );
+
+    local *DOTGITPATCH;
+    if ( open DOTGITPATCH, "< $dot_git_patch" ) {
+        chomp( $patch_level = <DOTGITPATCH> );
+        close DOTGITPATCH;
+        if ( $patch_level ) {
+
+            return undef if ( $patch_level =~ /^\$Format/ ); # Not expanded
+
+            my @dot_git_patch = split '\|', $patch_level;
+
+            # As we do not use time information, we can just pick the first and
+            # the last two elements
+            my ($sha, $describe, $names) = @dot_git_patch[0, -2, -1];
+            my @names = split /,\s*/, $names;
+
+            my $branch = undef; # or blead?
+
+            my ($first, $last) = @names[0, -1];
+            if ($first =~ /^HEAD -> (.*)/ ) {
+                # HEAD -> my_branch
+                # https://github.com/Perl/perl5/archive/refs/heads/blead.tar.gz
+                $branch = $1;
+            } elsif ( $first =~ /^tag: .*/ ) {
+                # tag: v5.41.6
+                # https://github.com/Perl/perl5/archive/refs/tags/v5.41.6.tar.gz
+                $branch = $1;
+            } elsif ( $first ne $last ) {
+                # Pull request with source branch in Perl/perl5 repo
+                # https://github.com/Perl/perl5/archive/refs/pull/22991/head.tar.gz
+                # OR
+                # branch pushed on Perl/perl5
+                # https://github.com/Perl/perl5/archive/refs/heads/yves/handle_weird_preprocessor_stmt_in_HeaderParser_pm.tar.gz
+                $branch = $last;
+            } else { #( $first eq $last ) {
+                # Pull request with source branch in fork
+                # https://github.com/Perl/perl5/archive/refs/pull/22989/head.tar.gz
+                $last =~ /^ref\/pull\/(.*)\/head/;
+                $branch = $1;
+            }
+
+            return [$sha, $describe, $branch];
+        }
+    }
+
 
     # There does not seem to be a '.patch', try 'git_version.h'
     # We are looking for the line: #define PERL_PATCHNUM "v5.21.6-224-g6324db4"

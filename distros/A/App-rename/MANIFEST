@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+bin/rename.PL
+lib/App/rename.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

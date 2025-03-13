@@ -6,6 +6,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/10-compile.t
 t/30-basics.t
 t/eof.t
 t/eol.t

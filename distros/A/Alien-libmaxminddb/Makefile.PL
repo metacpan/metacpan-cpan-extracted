@@ -5,61 +5,59 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Find or download and install libmaxminddb",
+  "ABSTRACT" => "Find or install libmaxminddb",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::Build" => "0.32",
-    "Alien::Build::MM" => "0.32",
-    "ExtUtils::MakeMaker" => "6.52",
-    "File::Spec::Functions" => 0
+    "ExtUtils::CBuilder" => 0,
+    "File::Copy" => 0,
+    "File::Path" => "2.07",
+    "File::Temp" => 0
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "1.19",
-    "Alien::Build::MM" => "0.32",
-    "ExtUtils::MakeMaker" => "6.52"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Alien-libmaxminddb",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Alien::libmaxminddb",
   "PREREQ_PM" => {
-    "Alien::Base" => 0,
-    "parent" => 0,
+    "File::Spec" => 0,
+    "JSON::PP" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Alien" => 0,
+    "ExtUtils::CBuilder" => 0,
+    "File::Temp" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.019",
+  "VERSION" => "2.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
+%WriteMakefileArgs = (
+    %WriteMakefileArgs,
+    PL_FILES => {'libmaxminddb.PL' => 'done.txt'},
+    clean => {FILES => 'config.h done.txt'},
+);
+
 my %FallbackPrereqs = (
-  "Alien::Base" => 0,
-  "Alien::Build" => "0.32",
-  "Alien::Build::MM" => "0.32",
-  "ExtUtils::MakeMaker" => "6.52",
-  "File::Spec::Functions" => 0,
-  "Test::Alien" => 0,
+  "ExtUtils::CBuilder" => 0,
+  "File::Copy" => 0,
+  "File::Path" => "2.07",
+  "File::Spec" => 0,
+  "File::Temp" => 0,
+  "JSON::PP" => 0,
   "Test::More" => 0,
-  "parent" => 0,
   "utf8" => 0,
   "warnings" => 0
 );
-
-# BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
-use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new;
-%WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
-# END code inserted by Dist::Zilla::Plugin::AlienBuild
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
@@ -71,24 +69,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-# Alien::Build adds Alien::MSYS as a dynamic dependency, but there are CPAN
-# smokers that don't install Alien::MSYS.
-if ($^O eq 'MSWin32' && !eval { require Alien::MSYS }) {
-  warn "Error: Alien::MSYS is not installed.\n";
-  die "OS unsupported\n";
-}
-
-# BEGIN postamble code inserted by Dist::Zilla::Plugin::AlienBuild
-{ package
-    MY;
-  sub postamble {
-    $abmm->mm_postamble(@_);
-  }
-  sub install {
-    $abmm->can('mm_install')
-      ? $abmm->mm_install(@_)
-      : shift->SUPER::install(@_);
-  }
-}
-# END postamble code inserted by Dist::Zilla::Plugin::AlienBuild

@@ -167,6 +167,7 @@ sub get_enum_item {
     );
 }
 
+#@override
 sub as_out {
     my $self = shift;
     my @arguments = @_;
@@ -186,6 +187,7 @@ sub as_out {
     );
 }
 
+#@override
 sub as_ref {
     my $self = shift;
     my @arguments = @_;
@@ -206,6 +208,25 @@ sub as_ref {
 }
 
 #@override
+sub invoke_global_function {
+    my $self = shift;
+    my @arguments = @_;
+
+    my $command = PerlCommand->new(
+        runtime => $self->{runtime_name},
+        command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('InvokeGlobalFunction'),
+        payload => \@arguments
+    );
+
+    return Javonet::Sdk::Internal::InvocationContext->new(
+        $self->{runtime_name},
+        $self->{connection_type},
+        $self->{tcp_address},
+        $self->build_command($command),
+        0
+    );
+}
+
 sub build_command {
     my ($self, $command) = @_;
     my $payload_length = @{$command->{payload}};
@@ -218,15 +239,25 @@ sub build_command {
 sub encapsulate_payload_item {
     my ($self, $payload_item) = @_;
 
-    if(!defined $payload_item) {
+    if (!defined $payload_item) {
         return PerlCommand->new(
-            runtime => $self->{runtime_name},
+            runtime      => $self->{runtime_name},
             command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Value'),
-            payload => []
+            payload      => []
         );
     }
-
-    if ($payload_item->isa('Command')) {
+    if (ref($payload_item) eq 'ARRAY') {
+        my $payload_length = @$payload_item;
+        for (my $i = 0; $i < $payload_length; $i++) {
+            $payload_item->[$i] = $self->encapsulate_payload_item($payload_item->[$i]);
+        }
+        return PerlCommand->new(
+            runtime      => $self->{runtime_name},
+            command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Array'),
+            payload      => $payload_item
+        );
+    }
+    elsif ($payload_item->isa('Command')) {
         my $payload_length = @{$payload_item->{payload}};
         for (my $i = 0; $i < $payload_length; $i++) {
             $payload_item->{payload}[$i] = $self->encapsulate_payload_item($payload_item->{payload}[$i]);
@@ -236,22 +267,11 @@ sub encapsulate_payload_item {
     elsif ($payload_item->isa('Javonet::Sdk::Internal::InvocationContext')) {
         return $payload_item->get_current_command();
     }
-    elsif (ref($payload_item) eq 'ARRAY') {
-        my $payload_length = @$payload_item;
-        for (my $i = 0; $i < $payload_length; $i++) {
-            $payload_item->[$i] = $self->encapsulate_payload_item($payload_item->[$i]);
-        }
-        return PerlCommand->new(
-            runtime => $self->{runtime_name},
-            command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Array'),
-            payload => $payload_item
-        );
-    }
     else {
         return PerlCommand->new(
-            runtime => $self->{runtime_name},
+            runtime      => $self->{runtime_name},
             command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Value'),
-            payload => [$payload_item]
+            payload      => [ $payload_item ]
         );
     }
 }

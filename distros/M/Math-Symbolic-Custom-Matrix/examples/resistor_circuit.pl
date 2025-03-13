@@ -1,14 +1,14 @@
 #!/usr/bin/perl
-#
 
 use strict;
 use warnings;
-use Math::Symbolic qw(:all);
-use Math::Symbolic::Custom::Matrix;
-use Math::Symbolic::Custom::Collect;
-use Math::Symbolic::Custom::CollectSimplify;
+use Math::Symbolic 0.613 qw(:all);
+use Math::Symbolic::Custom::Matrix 0.2;
+use Math::Symbolic::Custom::Collect 0.32;
+use Math::Symbolic::Custom::CollectSimplify 0.2;
 Math::Symbolic::Custom::CollectSimplify->register();
-use Math::Symbolic::Custom::ToShorterString;
+use Math::Symbolic::Custom::ToShorterString 0.1;
+use Math::Symbolic::Custom::Equation 0.2;
 
 use Test::Simple tests => 2;
 
@@ -18,7 +18,7 @@ my $show_working = 1;
 # internal nodes.
 # This is a potential divider, three series resistors of equal value and
 # 9V across them. We expect the voltage at V_1 to be 3V and the voltage at
-# V_2 to be 6V. 
+# V_2 to be 6V. Show that through analysis.
 my $netlist =<<END;
 R_1		N0	N1	1000
 R_2		N1	N2	1000
@@ -27,8 +27,8 @@ V_S		N3	N0	9
 END
 
 if ( $show_working ) {
-	print "Netlist is:-\n";
-	print $netlist, "\n";
+	print "Netlist is:-\n\n";
+	print "\t", join("\n\t", (split(/\n/, $netlist))), "\n\n";
 }
 
 # 2. Read in the netlist
@@ -83,17 +83,17 @@ foreach my $line (split(/\n/, $netlist)) {
 $G_adjacency = simplify_matrix($G_adjacency);
 
 if ( $show_working ) {
-	print "Conductance adjacency:-\n";
+	print "Conductance adjacency:-\n\n\t";
 	foreach my $i (0..$num_nodes-1) {
 		foreach my $j (0..$num_nodes-1) {
 			print $G_adjacency->[$i][$j], ";\t";
 		}
-		print "\n";
+		print "\n\t";
 	}
 	print "\n";
-	print "Known voltages at nodes:-\n";
+	print "Known voltages at nodes:-\n\n";
 	foreach my $voltage (sort keys %voltages) {
-		print "$voltage = $voltages{$voltage} V\n";
+		print "\t$voltage = $voltages{$voltage} V\n";
 	}
 	print "\n";
 }
@@ -128,12 +128,12 @@ $G = simplify_matrix($G);
 
 if ( $show_working ) {
 	# TODO: Find some good module for displaying matrices in the terminal.
-	print "Matrix G:-\n";
+	print "Matrix G:-\n\n\t";
 	foreach my $i (0..$num_nodes-1) {
 		foreach my $j (0..$num_nodes-1) {
 			print $G->[$i][$j], ";\t";
 		}
-		print "\n";
+		print "\n\t";
 	}
 	print "\n";
 }
@@ -148,9 +148,9 @@ my $V = make_symbolic_matrix(\@voltages);
 my $I = multiply_matrix($G, $V);
 
 if ( $show_working ) {
-	print "Expressions for each internal node:-\n";
+	print "Expressions for each internal node:-\n\n";
 	for (1..$num_nodes-2) {
-		print "At node $_:\t$I->[$_][0]\n";
+		print "\tAt node $_:\t$I->[$_][0]\n";
 	}
 	print "\n";
 }
@@ -158,24 +158,45 @@ if ( $show_working ) {
 # 6. Substitute known values into these expressions
 my $I_v = simplify_matrix(implement_matrix($I, { %voltages, %resistors }));
 
-# 7. Extract the expressions for each node and display them
-my %Currents;
-$Currents{"Node $_"} = $I_v->[$_][0] for (1..$num_nodes-2);
+# 7. Extract the expressions for each node and put them into Equation objects 
+my %Equations;
+foreach my $node_num (1..$num_nodes-2) {
+    $Equations{"Node $node_num"} = Math::Symbolic::Custom::Equation->new($I_v->[$node_num][0], '0');
+}
 
 if ( $show_working ) {
-	print "Putting in known values and equating:-\n";
-	foreach my $node (sort keys %Currents) {
-		print $node, ":\t", $Currents{$node}->to_shorter_infix_string(), " = 0\n";
+	print "Putting in known values and equating:-\n\n";
+	foreach my $node (sort keys %Equations) {
+		print "\t", $node, ":\t", $Equations{$node}->to_string(), "\n";
 	}
 	print "\n";
 }
 
-# 8. Check our expected solutions
-my $I_1 = $Currents{"Node 1"}->value( {'V_1' => 3, 'V_2' => 6} );
-my $I_2 = $Currents{"Node 2"}->value( {'V_1' => 3, 'V_2' => 6} );
+# 8. Solve the simultaneous equations. Work with Node 1 and Node 2
+# Make V_1 the subject of Equation 1
+my $V_1_eq1 = $Equations{"Node 1"}->isolate('V_1');  
+if ( $show_working ) {
+    print "Make V_1 subject of equation for Node 1:-\n\n\t", $V_1_eq1->to_string(), "\n\n";
+}
+# Substitute this expression for V_1 into Equation 2 and make V_2 the subject
+my $V_2_eq1 = $Equations{"Node 2"}->implement('V_1' => $V_1_eq1->RHS());
+if ( $show_working ) {
+    print "Substitute expression for V_1 into equation for Node 2:-\n\n\t", $V_2_eq1->to_string(), "\n\n";
+}
+# Isolate V_2 in that new equation and simplify down:
+my $V_2_eq2 = $V_2_eq1->isolate('V_2')->simplify(); 
+if ( $show_working ) {
+    print "Make V_2 the subject of that equation and simplify down:-\n\n\t", $V_2_eq2->to_string(), "\n\n";
+}
+# V_2 should have resolved. Plug it into the expression for V_1
+my $V_1_eq2 = $V_1_eq1->implement('V_2' => $V_2_eq2->RHS())->simplify();
+if ( $show_working ) {
+    print "Substitute V_2 back into equation for V_1 and simplify down:-\n\n\t", $V_1_eq2->to_string(), "\n\n";
+}
 
-ok( $I_1 == 0, "Net current at Node 1 is 0 when V_1 = 3 and V_2 = 6" );
-ok( $I_2 == 0, "Net current at Node 2 is 0 when V_1 = 3 and V_2 = 6" );
+# 9. Check the solutions are as expected
+ok( $V_1_eq2->RHS()->value() == 3, "Voltage V_1 is 3" );
+ok( $V_2_eq2->RHS()->value() == 6, "Voltage V_2 is 6" );
 
-exit;
+exit 0;
 

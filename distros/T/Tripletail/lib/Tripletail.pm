@@ -14,7 +14,7 @@ use POSIX qw(:errno_h);
 use Scalar::Util qw(blessed);
 use Cwd ();
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 our $XS_VERSION = $VERSION;
 $VERSION = CORE::eval $VERSION;
 

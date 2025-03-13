@@ -144,7 +144,7 @@ Reading build configurations from internal content
 Reading 'Policy.sh' from default content (v=1)
 Locally applied patches from '$plh'
 Patches: 'DEVEL19999'
-Adding 'SMOKE20000' to the registered patches.
+Adding 'SMOKE37800ef622734ef3d18eddf53581505ff036f4b6' to the registered patches.
     EOL
 }
 

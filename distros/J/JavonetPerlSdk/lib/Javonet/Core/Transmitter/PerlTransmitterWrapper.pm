@@ -6,6 +6,7 @@ use FFI::Platypus;
 use Path::Tiny;
 use File::Spec;
 use Config;
+use Cwd;
 use POSIX qw(uname);
 
 my $ffi;
@@ -23,7 +24,7 @@ sub initialize {
         $ffi = FFI::Platypus->new(api => 1);
         use FFI::Platypus::DL qw(dlopen dlerror RTLD_PLATYPUS_DEFAULT);
         my $dir = File::Spec->rel2abs(__FILE__);
-        my $current_dir = path($dir)->parent(3);
+        my $current_dir = getcwd();
         my $perl_native_lib;
 
         my $arch = do {
@@ -48,7 +49,14 @@ sub initialize {
         else {
             $perl_native_lib = "Binaries/Native/Windows/$arch/JavonetPerlRuntimeNative.dll";
         }
-        $ffi->lib("$current_dir/$perl_native_lib");
+        
+        my $full_native_lib_path = "$current_dir/$perl_native_lib";
+        my $error_message = "Native library not found at $full_native_lib_path\n" .
+            "Please Download and unzip Binaries at $current_dir directory folder using this link: https://download.javonet.com/binaries/Binaries.zip\n" .
+            "For more info please visit: https://www.javonet.com/guides/v2/getting-started/getting-started-perl";
+        die $error_message unless -e $full_native_lib_path;
+        $ffi->lib($full_native_lib_path);
+
         $send_command_native = $ffi->function('SendCommand' => [ 'uchar[]', 'int' ] => 'int');
         $read_response_native = $ffi->function('ReadResponse' => [ 'uchar[]', 'int' ] => 'int');
         $activate_native = $ffi->function('Activate' => ['string'] => 'int');

@@ -41,7 +41,7 @@ B<Test::Smoke> uses two types of configuration files:
 =item B<smoke-configuration-file>
 
 This is a file that uses a B<_config> suffix and contains settings for
-the F<smokeperl.pl> program and is created by F<configsmoke.pl>.
+the F<tssmokeperl.pl> program and is created by F<tsconfigsmoke.pl>.
 
 This is basically a Data::Dumper::Dump() of a hash.
 
@@ -67,7 +67,7 @@ file F<perlcurrent.cfg> consist of four (4) sections:
 
 =back
 
-This file wil yield 1 * 2 * 7 * 2 = 28 configurations. B<Test::Smoke>
+This file will yield 1 * 2 * 7 * 2 = 28 configurations. B<Test::Smoke>
 will build perl in all of these 28 configurations and run the core
 test suite one (1), two (2) or three (3) times for each of those
 perls:
@@ -93,21 +93,16 @@ configuration. This can be useful to set an alternate compiler
 
 =head2 How do I create different smoke-configurations?
 
-By specifying a diffent prefix to F<configsmoke.pl>:
+By specifying a diffent prefix to F<tsconfigsmoke.pl>:
 
-    $ perl configsmoke.pl -p mysmoke
+    $ perl tsconfigsmoke.pl -c mysmoke
 
 This will create the smokeconfiguration F<mysmoke_config> and a small
 shellscript F<mysmoke.sh> (or F<mysmoke.cmd> if you are on Windows).
 
-There are three (3) special prefixes: B<smoke55x>, B<smoke562> and
-B<smoke58x>. These will set the default answers for F<configsmoke.pl>
-to be appropriate for smoking the maintenance branches for these
-versions of perl.
-
 =head2 How do I include I<copy-on-write> testing in my smokes?
 
-TIMTOWTDO :-)
+TIMTOWTDI :-)
 
 Most of this works for flags that need to be added to C<ccflags> in
 general.
@@ -157,42 +152,42 @@ above, to your buildconfiguration file.
 
 =over 4
 
-=item B<smokeperl.pl>
+=item B<tssmokeperl.pl>
 
 This is a wrapper script that goes through all the steps in the smoke
 process.
 
-=item B<synctree.pl>
+=item B<tssynctree.pl>
 
 Small wrapper around B<Test::Smoke::Syncer> that can use the settings
 from the smoke-configuration file. It will bring the source-tree in
 sync.
 
-=item B<patchtree.pl>
+=item B<tspatchtree.pl>
 
 Small wrapper around B<Test::Smoke::Patcher> that can use the settings
 from the smoke-configuration file. It will apply the patches that are
 specified in the patches-to-be-applied file.
 
-=item B<runsmoke.pl>
+=item B<tsrunsmoke.pl>
 
 Small wrapper around B<Test::Smoke::run_smoke()> that can use the
 settings from the smoke-configuration file. It runs the smoke cycle
 for all configurations and is a replacement for the now removed
 B<mktest.pl>.
 
-=item B<mailrpt.pl>
+=item B<tssendrpt.pl>
 
 Small wrapper around B<Test::Smoke::Mailer> that can use the settings
 from the smoke-configuration file. It will check if the report is
 already generated and do so if not. This is the replacement for the
 now removed B<mkovz.pl>.
 
-=item B<archiverpt.pl>
+=item B<tsarchiverpt.pl>
 
 This script copies the report and the logfile to a configurable place.
 
-=item B<smokestatus.pl>
+=item B<tssmokestatus.pl>
 
 This script prints a little status report for a smoke configuration:
 
@@ -216,9 +211,9 @@ a unixy way.
 
 =back
 
-=head2 How can I skip a step in smokeperl.pl?
+=head2 How can I skip a step in tssmokeperl.pl?
 
-F<smokeperl.pl> takes arguments to skip some of the steps it takes:
+F<tssmokeperl.pl> takes arguments to skip some of the steps it takes:
 
 =over 4
 
@@ -232,13 +227,13 @@ F<smokeperl.pl> takes arguments to skip some of the steps it takes:
 
 =back
 
-F<smokeperl.pl> will always do the equivalent of F<runsmoke.pl> and
+F<tssmokeperl.pl> will always do the equivalent of F<tsrunsmoke.pl> and
 generate the report.
 
-After running F<configsmoke.pl> you should have a small
+After running F<tsconfigsmoke.pl> you should have a small
 wrapper-script, that sets up the environment and calls
-F<smokeperl.pl>. All arguments passed to this script will be passed to
-F<smokeperl.pl>! Please see L<smokeperl.pl> for details.
+F<tssmokeperl.pl>. All arguments passed to this script will be passed to
+F<tssmokeperl.pl>! Please see L<smokeperl.pl> for details.
 
 =head2 How do I smoke my patch?
 
@@ -259,12 +254,12 @@ In this configs directory you then create a build-configurations
 file. This is usually done from one of default F<*.cfg> files in the
 Test::Smoke distribution.
 
-=item Configure Test::Smoke with F<configsmoke.pl>
+=item Configure Test::Smoke with F<tsconfigsmoke.pl>
 
-Now you need to configure Test::Smoke by running F<configsmoke.pl> in
+Now you need to configure Test::Smoke by running F<tsconfigsmoke.pl> in
 your configs directory (optionally specifying a prefix).
 
-    $ ../smoke/configsmoke.pl -p testpatch
+    $ perl bin/configsmoke.pl -c testpatch
 
 You should be careful with the e-mail options and make sure you
 do not send the results to either <smokers-reports@perl.org> or
@@ -301,14 +296,14 @@ As of version 1.17.02 you can specify a timeout (if you have alarm())
 
 Yes, but some information might be missing (the compiler info).
 
-    $ perl mailrpt.pl -c [configname]
+    $ perl tssendrpt.pl -c [configname]
 
 =head2 How can I run continuous smokes?
 
 On a unixy system you can try this shellscript if you adjust the
 C<basedir> variable (thank you Johan Vromans for helping with this).
 
-    #! /bin/sh
+    #!/bin/sh
     
     basedir=$HOME/Test-Smoke/smoke
     cd "$basedir"
@@ -352,7 +347,7 @@ same directory.
 
 =head2 Where do the reports go?
 
-To the address configured in F<configsmoke.pl>. The default is
+To the address configured in F<tsconfigsmoke.pl>. The default is
 <smokers-reports@perl.org>.
 
 There are several ways to monitor the reports send in:
@@ -460,10 +455,6 @@ disagree (it was all before my time).
 
 The case is now that the official name for the mailinglist is
 B<daily-build-reports> and there is an alias to B<smokers-reports>.
-
-=head1 REVISION
-
-$Id$
 
 =head1 COPYRIGHT
 

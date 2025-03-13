@@ -14,11 +14,11 @@ Log::Abstraction - Logging abstraction layer
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,7 @@ sub _log {
 	}
 
 	# Push the message to the internal messages array
-	push @{$self->{messages}}, { level => $level, message => join(' ', grep defined, @messages) };
+	push @{$self->{messages}}, { level => $level, message => join('', grep defined, @messages) };
 
 	if(my $logger = $self->{logger}) {
 		if(ref($logger) eq 'CODE') {
@@ -137,11 +137,11 @@ sub _log {
 			});
 		} elsif(ref($logger) eq 'ARRAY') {
 			# If logger is an array reference, push the log message to the array
-			push @{$logger}, { level => $level, message => join(' ', grep defined, @messages) };
+			push @{$logger}, { level => $level, message => join('', grep defined, @messages) };
 		} elsif(!ref($logger)) {
 			# If logger is a file path, append the log message to the file
 			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join(' ', @messages), "\n";
+				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n";
 				close $fout;
 			}
 		} else {
@@ -225,14 +225,14 @@ sub warn {
 	if(!defined($warning)) {
 		if(scalar(@_) && !ref($_[0])) {
 			# Given an array
-			$warning = join(' ', @_);
+			$warning = join('', @_);
 		} else {
 			return;
 		}
 	}
 	if(ref($warning) eq 'ARRAY') {
 		# Given "message => [ ref to array ]"
-		$warning = join(' ', @{$warning});
+		$warning = join('', @{$warning});
 	}
 
 	if($self eq __PACKAGE__) {

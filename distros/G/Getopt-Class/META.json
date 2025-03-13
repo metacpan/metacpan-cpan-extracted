@@ -64,6 +64,6 @@
          "web" : "https://gitlab.com/jackdeguest/Getopt-Class"
       }
    },
-   "version" : "v1.1.3",
+   "version" : "v1.1.4",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

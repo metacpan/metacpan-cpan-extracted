@@ -142,7 +142,7 @@ SKIP: {
     );
     isa_ok($rsync, 'Test::Smoke::Syncer::Rsync');
     my $result = $rsync->sync;
-    is($result, 20000, "->sync returned a patchlevel");
+    is($result, '37800ef622734ef3d18eddf53581505ff036f4b6', "->sync returned a patchlevel");
     require Test::Smoke::SourceTree;
     my $st = Test::Smoke::SourceTree->new($ddir, $verbose);
     my $check = $st->check_MANIFEST;

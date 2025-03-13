@@ -66,7 +66,7 @@ SKIP: {
     my $syncer = Test::Smoke::Syncer->new( forest => %config );
     ok my $pl = $syncer->sync, "Forest planted" or
         skip "No source forest ($tmpdir)", $to_skip -= 4;
-    is $pl, '20000', "patchlevel $pl";
+    is $pl, '37800ef622734ef3d18eddf53581505ff036f4b6', "patchlevel $pl";
     $has_forest = 1;
 
     local *PINFO;

@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1f9164ffe7b307a427d2c7d9a03e492f047df3d7900f7dbcd24e911a6c773154 Changes
+SHA256 553db1b292757f331d25abe52bd1b57c9deb4e4e9e2512fa4e9972c7b0f6a85f LICENSE
+SHA256 b578d7f255bc29c3ed0306342fe18708b10fd57e0cc9b2563d24d7a69d904ca7 MANIFEST
+SHA256 d8dac7404b9e2d7fb5afaaeb5abade1b90c70cd2041f2661a231771ec0e17691 META.yml
+SHA256 0e12e639cb11f958ea265a942f8c1492f0139c982af86bee7995b0675ca90f5c Makefile.PL
+SHA256 bb878d23bc123436414e26cb7d328f0321d5e69adc832f9644adf74370355237 README
+SHA256 3a4ef886bdd80bb96f49bd89fd61f548d2d107feb906d34278576343e65628ad Unicode.pm
+SHA256 20070431d9c36ced9b09ca75a15bb1f54852fb855265dd02a2cd074ea0fe8db5 examples/check_array_unicode_block_fail.pl
+SHA256 f21fc4261055413d88d7801551ff88f8c89ebb4e12f656acbd15b3d1fa339c8b examples/check_array_unicode_block_ok.pl
+SHA256 856202713def5fbae221d9e35028e1d2c17be9af573568b61b51238853b9a289 examples/check_unicode_block_fail.pl
+SHA256 79f63918923f42feb87502f25e5ff0a54ab643493b829e02efea2c583208fe82 examples/check_unicode_block_ok.pl
+SHA256 6f65e0c8c147e88b35fb945eacf18effe52be389785cb139b672c46d0199e851 examples/check_unicode_script_fail.pl
+SHA256 e8b205be607cd4daf3c41c71aacc4a0983e5904a6766b76a42bae27afc487c1c examples/check_unicode_script_ok.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 f4f21dcca2f0f0ba7aef7b959638cf5f0eed4687fcbe1b12931b3f92396bd420 t/Mo-utils-Unicode/01-use.t
+SHA256 99351988d1e996418b79b7e769b5ddc107df495e0ce03e8336ca166cb58c1755 t/Mo-utils-Unicode/02-version.t
+SHA256 12840ca8d4ec2567a3f742853dcce5ea3f1114e625d0461c3e1df3ad78bf6b51 t/Mo-utils-Unicode/03-check_array_unicode_block.t
+SHA256 62d3415403cdb8e1744053e2679c5cd59e7fede93ec882b386cad5774f16a13a t/Mo-utils-Unicode/04-check_unicode_block.t
+SHA256 0216300268522c8e86a0208f6fcdc61fb2268f593216770dc6b186d734437e93 t/Mo-utils-Unicode/05-check_unicode_script.t
+SHA256 28c8235a0e91305c41c5357975766e7e987d0e71c9f21c47e1cc9ff992e91572 xt/Mo-utils-Unicode/01-pod_coverage.t
+SHA256 80fea9c82ad7d2ab6b0f9343cac2f7c7190e5223b38f28e092c0a6e73ceef12b xt/Mo-utils-Unicode/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmfSlu4ACgkQonze/HtI
+OPBIqwv/YmAzoa3vb3A18J2RDb//2PJpZOV9ue9SgSQ076GpA9S40qHpqNCtDPhJ
+DARletUS+5HcX8OKWoy10TMrJNS2UzWo0yISTqLKmiTMOzNLL8JgqtuwQzW+qbMP
+3vD6uosIb53/cFXLlincQT/lSI8W/9pDSdcqD2hEeb+G3iEcpA+RqhmKX3Y4NAZ4
+rC3AX4W1IsezI2fYa04Q9xp1qfuUDRiGa/ROjbiKJDXgxex+XzTtPgCU+T5BMOeS
+Cjt4WhFWHZRvg7BzvYNsqXJoU09TqOBE3nwxwExjkSpqiwaub8awP/Af3OZfrlGL
+hMc/+av4UHjcu/peioPjAuRj2GCnp5bi3HmdqGA0xwTnuX3D/9SkEeML3AVL8a7L
+xtyn76UWVrC9Ns+QCPhB17zrOKYLrke0iL0lPzwEc36hTppfa9KkW1ESjG6fb9eI
+whZ7w9ETrd1yCCcn2m3LaO9Ip/6H/aoMr1B4a0qGiHWbJcnP36OCJH2kfLaHowvb
+3THu8OD2
+=phNA
+-----END PGP SIGNATURE-----

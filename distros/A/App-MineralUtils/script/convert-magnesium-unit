@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-04'; # DATE
+our $DATE = '2025-03-11'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_magnesium_unit",
@@ -39,7 +39,7 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.020 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2024-12-04.
+This document describes version 0.021 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2025-03-11.
 
 =head1 SYNOPSIS
 
@@ -316,7 +316,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025, 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

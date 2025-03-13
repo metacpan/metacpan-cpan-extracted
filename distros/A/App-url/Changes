@@ -1,5 +1,8 @@
 # Changes for App::url
 
+1.012 2025-03-13T05:49:53Z
+	* handle Windows codepages that are just numbers
+
 1.011 2025-01-04T16:07:38Z
 	* refresh distro and move to BRIANDFOY
 

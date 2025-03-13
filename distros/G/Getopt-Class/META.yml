@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Getopt-Class/issues
   repository: https://gitlab.com/jackdeguest/Getopt-Class
-version: v1.1.3
+version: v1.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

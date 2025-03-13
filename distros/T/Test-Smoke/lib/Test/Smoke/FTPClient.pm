@@ -10,14 +10,15 @@ use Test::Smoke::Util qw( clean_filename time_in_hhmm );
 our $VERSION = '0.011';
 
 my %CONFIG = (
-    df_fserver  => undef,
+    df_fhost    => undef,
+    df_fport    => 21,
     df_fuser    => 'anonymous',
-    df_fpasswd  => 'smokers@perl.org',
-    df_v        => 0,
+    df_fpasswd  => '',
+    df_v        => 1,
     df_fpassive => 1,
     df_ftype    => undef,
 
-    valid      => [qw( fuser fpasswd fpassive ftype )],
+    valid      => [qw( fport fuser fpasswd fpassive ftype )],
 );
 my @sn = qw( B KB MB GB TB );
 
@@ -31,10 +32,10 @@ Test::Smoke::FTPClient - Implement a mirror like object
 
     use Test::Smoke::FTPClient;
 
-    my $server = 'ftp.linux.activestate.com';
+    my $server = 'ftp.example.com';
     my $fc = Test::Smoke::FTPClient->new( $server );
 
-    my $sdir = '/pub/staff/gsar/APC/perl-current';
+    my $sdir = '/';
     my $ddir = '~/perlsmoke/perl-current';
     my $cleanup = 1; # like --delete for rsync
 
@@ -44,11 +45,6 @@ Test::Smoke::FTPClient - Implement a mirror like object
     $fc->bye;
 
 =head1 DESCRIPTION
-
-This module was written specifically to fetch a perl source-tree
-from the APC. It will not suffice as a general purpose mirror module!
-It only distinguishes between files and directories and relies on the
-output of the C<< Net::FTP->dir >> method.
 
 This solution is B<slow>, you'd better use B<rsync>!
 
@@ -70,11 +66,17 @@ sub  new {
     my $class = shift;
 
     my $server = shift;
+    my $port = shift;
 
     unless ( $server ) {
         require Carp;
-        Carp::croak( "Usage: Test::Smoke::FTPClient->new( \$server )" );
+        Carp::croak( "Usage: Test::Smoke::FTPClient->new( \$server, \$port )" );
     };
+    unless ( $port ) {
+        require Carp;
+        Carp::croak( "Usage: Test::Smoke::FTPClient->new( \$server, \$port )" );
+    };
+
 
     my %args_raw = @_ ? UNIVERSAL::isa( $_[0], 'HASH' ) ? %{ $_[0] } : @_ : ();
 
@@ -87,7 +89,8 @@ sub  new {
         my $value = exists $args{$_} ? $args{ $_ } : $CONFIG{ "df_$_" };
         ( $_ => $value )
     } ( v => @{ $CONFIG{ valid } } );
-    $fields{fserver} = $server;
+    $fields{fhost} = $server;
+    $fields{fport} = $port;
     $fields{v} ||= 0;
 
     return bless \%fields, $class;
@@ -103,8 +106,9 @@ Returns true for success after connecting and login.
 sub connect {
     my $self = shift;
 
-    $self->{v} and print "Connecting to '$self->{fserver}' ";
-    $self->{client} = Net::FTP->new( $self->{fserver},
+    $self->{v} and print "Connecting to '$self->{fhost}' with port '$self->{fport}' ";
+    $self->{client} = Net::FTP->new( $self->{fhost},
+        Port    => $self->{fport},
         Passive => $self->{fpassive},
         Debug   => ( $self->{v} > 2 ),
     );
@@ -118,7 +122,7 @@ sub connect {
     $self->{v} and print "Authenticating ";
     unless ( $self->{client}->login( $self->{fuser}, $self->{fpasswd} ) ) {
         $self->{error} = $@ ||
-            "Could not login($self->{fuser}) on $self->{fserver}";
+            "Could not login($self->{fuser}) on $self->{fhost}";
         $self->{v} and print "NOT OK ($self->{error})\n";
         return;
     }
@@ -231,7 +235,8 @@ sub __do_mirror {
     foreach my $entry ( sort { $a->{type} cmp $b->{type} ||
                                $a->{name} cmp $b->{name} } @list ) {
 
-        if ( $entry->{type} eq 'd' ) {
+        if ( $entry->{type} eq 'l' ) {
+        } elsif ( $entry->{type} eq 'd' ) {
             $entry->{name} =~ m/^\.\.?$/ and next;
             my $new_locald = File::Spec->catdir( $localdir, $entry->{name} );
             unless ( -d $new_locald ) {

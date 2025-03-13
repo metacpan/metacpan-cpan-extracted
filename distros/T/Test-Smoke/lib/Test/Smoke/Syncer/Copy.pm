@@ -1,6 +1,7 @@
 package Test::Smoke::Syncer::Copy;
 use warnings;
 use strict;
+use Cwd;
 
 our $VERSION = '0.029';
 
@@ -43,6 +44,17 @@ sub sync {
 
     $self->pre_sync;
     require Test::Smoke::SourceTree;
+    my $cwd = getcwd;
+    if (! chdir $self->{cdir}) {
+        require Carp;
+        Carp::croak( "[copy] Cannot chdir($self->{cdir}): $!" );
+    };
+    $self->make_dot_patch if (! -e ".patch");
+
+    if (! chdir $cwd) {
+        require Carp;
+        Carp::croak( "[copy] Cannot chdir($cwd): $!" );
+    };
 
     my $tree = Test::Smoke::SourceTree->new($self->{cdir}, $self->verbose);
     $tree->copy_from_MANIFEST($self->{ddir});
@@ -51,6 +63,7 @@ sub sync {
     $tree->clean_from_MANIFEST( 'MANIFEST.SKIP' );
 
     my $plevel = $self->check_dot_patch;
+
     $self->post_sync;
     return $plevel;
 }

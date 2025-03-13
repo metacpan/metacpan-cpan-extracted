@@ -14,7 +14,7 @@ Math::Symbolic::Custom::Matrix - Matrix routines for Math::Symbolic
 
 =head1 VERSION
 
-Version 0.2
+Version 0.21
 
 =cut
 
@@ -45,7 +45,7 @@ our @EXPORT = qw(
     is_skew_symmetric_matrix
 );
 
-our $VERSION = '0.2';
+our $VERSION = '0.21';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::MiscAlgebra qw/:all/;
@@ -61,10 +61,10 @@ converted to Math::Symbolic objects.
 =head1 EXAMPLE
 
     use strict;
-    use Math::Symbolic qw/:all/;
+    use Math::Symbolic 0.613 qw/:all/;
     use Math::Symbolic::MiscAlgebra qw/:all/;
     use Math::Symbolic::Custom::Matrix 0.2;
-    use Math::Symbolic::Custom::Polynomial 0.11;
+    use Math::Symbolic::Custom::Polynomial 0.3;
     use Math::Symbolic::Custom::CollectSimplify 0.2;
     Math::Symbolic::Custom::CollectSimplify->register();
 

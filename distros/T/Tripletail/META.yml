@@ -46,5 +46,5 @@ requires:
   Unicode::Japanese: '0.43'
   perl: '5.008001'
   version: '0.77'
-version: '0.68'
+version: '0.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

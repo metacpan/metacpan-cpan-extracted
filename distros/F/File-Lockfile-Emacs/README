@@ -2,8 +2,8 @@ NAME
     File::Lockfile::Emacs - Create/check/delete Emacs-style lockfiles
 
 VERSION
-    This document describes version 0.001 of File::Lockfile::Emacs (from
-    Perl distribution File-Lockfile-Emacs), released on 2025-03-11.
+    This document describes version 0.002 of File::Lockfile::Emacs (from
+    Perl distribution File-Lockfile-Emacs), released on 2025-03-13.
 
 SYNOPSIS
      use File::Lockfile::Emacs qw(
@@ -106,7 +106,10 @@ FUNCTIONS
 
     Will return 409 if target file is already locked using Emacs-style
     lockfile by another process (unless when "force" option is set to true,
-    in which case will take over the lock).
+    in which case will take over the lock). Note that there are race
+    conditions when using the "force" option (between checking that the
+    lockfile, unlinking it, and creating our own). It is not recommended to
+    use the "force" option.
 
     Will return 500 if there's an error in reading the lockfile.
 
@@ -185,6 +188,9 @@ FUNCTIONS
      emacs_lockfile_unlock(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Unlock a file locked with Emacs-style lockfile.
+
+    Note that there is a race condition between reading the lockfile and
+    unlinking it.
 
     Will return 412 if target file does not exist (unless "force" option is
     set to true, in which case we proceed to unlocking anyway).

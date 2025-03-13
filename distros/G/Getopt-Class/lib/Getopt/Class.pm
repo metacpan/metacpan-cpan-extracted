@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v1.1.3
+## Version v1.1.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2024/11/01
+## Modified 2025/03/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
     use Scalar::Util;
-    our $VERSION = 'v1.1.3';
+    our $VERSION = 'v1.1.4';
 };
 
 use strict;
@@ -1086,7 +1086,6 @@ sub STORE
     my $aliases = $self->{aliases};
     my( $pack, $file, $line ) = caller;
     my( $key, $val ) = @_;
-    $self->message_colour( 3, "Called from line $line in file \"$file\" for property \"<green>$key</>\" with reference (<black on white>", ref( $val ), "</>) and value \"<red>" . ( $val // 'undef' ) . "</>\">" );
     my $dict = $self->{dict};
     my $enabled = $self->{enable};
     my $fallback = sub
@@ -1118,13 +1117,11 @@ sub STORE
             CORE::warn( "Alias property is not an array reference. This should not happen.\n" ) if( $self->{warnings} );
             return( $fallback->( $key, $val ) );
         }
-        $self->message_colour( 3, "Setting primary property \"<green>${key}</>\" to value \"<black on white>" . ( $val // '' ) . "</>\"." );
         $data->{ $key } = $val;
         foreach my $a ( @$alias )
         {
             next if( $a eq $key );
             # We do not set the value, if for some reason, the user would have removed this key
-            $self->message_colour( 3, "Setting alias \"<green>${a}</>\" to value \"<val black on white>", ( $val // '' ), "</>\" (ref=", ref( $val // '' ), ")." );
             # $data->{ $a } = $val if( CORE::exists( $data->{ $a } ) );
             $data->{ $a } = $val;
         }
@@ -1222,7 +1219,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.1.3
+    v1.1.4
 
 =head1 DESCRIPTION
 
@@ -1282,7 +1279,7 @@ would not produce an array with C<en>, C<fr> and C<ja> entries, but an array suc
 
     ['en', 'en', 'fr', 'ja' ]
 
-because the initial default value is not replaced when one is provided. This is a design from L<Getopt::Long> and although I could circumvent this, I a not sure I should.
+because the initial default value is not replaced when one is provided. This is a design from L<Getopt::Long> and although I could circumvent this, I ma not sure I should.
 
 =item * C<error>
 

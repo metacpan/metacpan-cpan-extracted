@@ -1,8 +1,8 @@
 use strict;
-use Math::Symbolic qw/:all/;
+use Math::Symbolic 0.613 qw/:all/;
 use Math::Symbolic::MiscAlgebra qw/:all/;
 use Math::Symbolic::Custom::Matrix 0.2;
-use Math::Symbolic::Custom::Polynomial 0.11;
+use Math::Symbolic::Custom::Polynomial 0.3;
 use Math::Symbolic::Custom::CollectSimplify 0.2;
 Math::Symbolic::Custom::CollectSimplify->register();
 

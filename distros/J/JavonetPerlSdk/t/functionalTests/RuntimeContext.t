@@ -4,10 +4,12 @@ use lib 'lib';
 use threads;
 use aliased 'Javonet::Javonet' => 'Javonet', qw(in_memory tcp);
 
-use File::Spec; 
+use File::Spec;
+use File::Basename;
 use Test::More qw(no_plan);
 
-
+my $this_file_path = dirname(__FILE__);
+my $config_path = "${this_file_path}/../../../../testResources/configuration-file/functional-tests-config.json";
 
 sub test_invoke_multiple_runtime_contexts_are_equal {
     my $runtime_ctx1 = Javonet->in_memory()->nodejs();
@@ -22,12 +24,9 @@ sub test_invoke_multiple_runtime_contexts_are_equal2 {
 }
 
 sub test_invoke_multiple_runtime_contexts_are_equal3 {
-    open my $config_file, '>', 'javonet.config';
-    close $config_file;
-    my $runtime_ctx1 = Javonet->with_config("javonet.config")->jvm();
-    my $runtime_ctx2 = Javonet->with_config("javonet.config")->jvm();
+    my $runtime_ctx1 = Javonet->with_config($config_path)->jvm();
+    my $runtime_ctx2 = Javonet->with_config($config_path)->jvm();
     is($runtime_ctx1, $runtime_ctx2, 'Invoking multiple runtime contexts with config are equal');
-    unlink 'javonet.config';
 }
 
 sub test_invoke_multiple_runtime_contexts_are_different {
@@ -49,51 +48,43 @@ sub test_invoke_multiple_runtime_contexts_are_different3 {
 }
 
 sub test_invoke_multiple_runtime_contexts_are_different4 {
-    open my $config_file, '>', 'javonet.config';
-    close $config_file;
-    my $runtime_ctx1 = Javonet->with_config("javonet.config")->nodejs();
-    my $runtime_ctx2 = Javonet->with_config("javonet.config")->jvm();
+    my $runtime_ctx1 = Javonet->with_config($config_path)->nodejs();
+    my $runtime_ctx2 = Javonet->with_config($config_path)->jvm();
     isnt($runtime_ctx1, $runtime_ctx2, 'Invoking multiple runtime contexts with different languages but same config are different');
-    unlink 'javonet.config';
 }
 
 sub test_invoke_multiple_runtime_contexts_are_different5 {
-    open my $config_file, '>', 'javonet.config';
-    close $config_file;
     my $runtime_ctx1 = Javonet->in_memory()->jvm();
-    my $runtime_ctx2 = Javonet->with_config("javonet.config")->jvm();
+    my $runtime_ctx2 = Javonet->with_config($config_path)->jvm();
     isnt($runtime_ctx1, $runtime_ctx2, 'Invoking multiple runtime contexts with and without config are different');
-    unlink 'javonet.config';
-}
-
-sub test_invoke_multiple_runtime_contexts_are_different6 {
-    open my $config_file1, '>', 'javonet.config';
-    close $config_file1;
-    open my $config_file2, '>', 'javonet2.config';
-    close $config_file2;
-    my $runtime_ctx1 = Javonet->with_config("javonet.config")->nodejs();
-    my $runtime_ctx2 = Javonet->with_config("javonet2.config")->nodejs();
-    isnt($runtime_ctx1, $runtime_ctx2, 'Invoking multiple runtime contexts with different configs are different');
-    unlink 'javonet.config';
-    unlink 'javonet2.config';
 }
 
 sub test_create_runtime_context_with_config_path_which_exists {
-    open my $config_file, '>', 'javonet.config';
-    close $config_file;
-    my $runtime_ctx1 = Javonet->with_config("javonet.config")->jvm();
+    my $runtime_ctx1 = Javonet->with_config($config_path)->jvm();
     ok(defined $runtime_ctx1, 'Runtime context with existing config path is created');
-    unlink 'javonet.config';
 }
 
-sub test_create_runtime_context_with_config_path_which_not_exists {
+sub test_create_runtime_context_with_config_path_which_does_not_exist {
+    my $config_path2 = "./javonet2config";
     eval {
-        my $runtime_ctx1 = Javonet->with_config("javonet2.config")->jvm();
+        my $runtime_ctx = Javonet->with_config($config_path2)->ruby();
+        fail("Expected exception was not raised");
     };
     if ($@) {
-        like($@, qr/Javonet set config source result: -6. Native error message: Configuration file javonet2.config not found/, 'Exception is thrown when config path does not exist');
-    } else {
-        fail('Exception was not thrown when config path does not exist');
+        my $expected_message = "Configuration source is not a valid JSON. Check your configuration:\n$config_path2";
+        like($@, qr/\Q$expected_message\E/, 'Exception message matches expected pattern');
+    }
+}
+
+sub test_create_runtime_context_with_config_source_invalid {
+    my $config_source = "invalid content";
+    eval {
+        my $runtime_ctx = Javonet->with_config($config_source)->nodejs();
+        fail("Expected exception was not raised");
+    };
+    if ($@) {
+        my $expected_message = "Configuration source is not a valid JSON. Check your configuration:\n$config_source";
+        like($@, qr/\Q$expected_message\E/, 'Exception message matches expected pattern');
     }
 }
 
@@ -107,9 +98,8 @@ test_invoke_multiple_runtime_contexts_are_different2();
 test_invoke_multiple_runtime_contexts_are_different3();
 test_invoke_multiple_runtime_contexts_are_different4();
 test_invoke_multiple_runtime_contexts_are_different5();
-test_invoke_multiple_runtime_contexts_are_different6();
-test_create_runtime_context_with_config_path_which_exists();
-#test_create_runtime_context_with_config_path_which_not_exists();
+test_create_runtime_context_with_config_path_which_does_not_exist();
+test_create_runtime_context_with_config_source_invalid();
 
 done_testing();
 1

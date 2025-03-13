@@ -75,10 +75,13 @@ You can use this code under the terms of the Artistic License 2.
 use Encode qw(decode encode);
 use I18N::Langinfo qw(langinfo CODESET);
 
-@ARGV = map { decode( langinfo(CODESET), $_ ) } @ARGV;
+my $langinfo = langinfo(CODESET);
+$langinfo = "cp-$langinfo" if( $^O eq 'MSWin32' and $langinfo =~ /\A\d+\z/a );
+
+@ARGV = map { decode( $langinfo, $_ ) } @ARGV;
 
 my $results = App::url->run( @ARGV );
 exit if $results->@* == 0;
 
 binmode STDOUT, ':raw';
-say join "\n", map { encode( langinfo(CODESET), $_ ) } $results->@*;
+say join "\n", map { encode( $langinfo, $_ ) } $results->@*;

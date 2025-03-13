@@ -1,5 +1,8 @@
 Revision history for Perl module Getopt::Class
 
+v1.1.4 2025-03-13T06:16:27+0900
+    - Minor maintenance update
+
 v1.1.3 2024-11-01T04:05:56+0900
     - Minor improvement to the documentation for object instantiation. (Thanks to Ron Savage for pointing that out)
 

@@ -20,7 +20,7 @@ my %command_type = (
     'GetInstanceField'          => 13,
     'Optimize'                  => 14,
     'GenerateLib'               => 15,
-    'InvokeGlobalMethod'        => 16,
+    'InvokeGlobalFunction'      => 16,
     'DestructReference'         => 17,
     'Array'                     => 18,
     'ArrayGetItem'              => 19,
@@ -41,6 +41,11 @@ my %command_type = (
     'EnableNamespace'           => 34,
     'EnableType'                => 35,
     'CreateNull'                => 36,
+    'GetStaticMethodAsDelegate' => 37,
+    'GetInstanceMethodAsDelegate' => 38,
+    'PassDelegate'              => 39,
+    'InvokeDelegate'            => 40,
+    'ConvertType'               => 41,
 );
 
 sub get_command_type {

@@ -13,6 +13,13 @@ my $this_file_path = dirname(__FILE__);
 my $test_file_path = "${this_file_path}/../../../../testResources/perl-package/TestClass.pm";
 my $class_name = 'TestClass::TestClass';
 
+sub Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11 {
+    my $perl_type = Javonet->in_memory()->perl()->get_type('CORE')->execute();
+    my $response = $perl_type->invoke_static_method('abs', -11)->execute();
+    my $result = $response->get_value();
+    is($result, 11, "Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11");
+}
+
 sub Test_Perl_TestResources_LoadLibrary_LibraryPath_NoException {
     Javonet->in_memory()->perl()->load_library($test_file_path);
     is(0, 0, "Test_Perl_TestResources_LoadLibrary_LibraryPath_NoException");
@@ -124,13 +131,6 @@ sub Test_Perl_TestResources_Exceptions_InvokeStaticMethod_DivideBy_0_ThrowsExcep
         like($exception, qr/Illegal division by zero/, "Test_Perl_TestResources_Exceptions_InvokeStaticMethod_DivideBy_0_ThrowsException");
 }
 
-sub Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11 {
-    my $perl_type = Javonet->in_memory()->perl()->get_type('CORE')->execute();
-    my $response = $perl_type->invoke_static_method('abs', -11)->execute();
-    my $result = $response->get_value();
-    is($result, 11, "Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11");
-}
-
 sub Test_Perl_TestResources_PassingNull_AsOnlyArg {
     my $called_runtime = Javonet->in_memory()->perl();
     $called_runtime->load_library($test_file_path);
@@ -158,7 +158,15 @@ sub Test_Perl_TestResources_ReturningNull {
     is($result, undef, "Test_Perl_TestResources_ReturningNull");
 }
 
+sub Test_Perl_TestResources_InvokeGlobalFunction {
+    my $called_runtime = Javonet->in_memory()->perl();
+    $called_runtime->load_library($test_file_path);
+    my $response = $called_runtime->invoke_global_function("TestClass::TestClass::welcome", "John")->execute();
+    my $result = $response->get_value();
+    is($result, "Hello John!", "Test_Perl_TestResources_InvokeFunction");
+}
 
+Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11();
 Test_Perl_TestResources_LoadLibrary_LibraryPath_NoException();
 Test_Perl_TestResources_InvokeStaticMethod_MultiplyByTwo_25_50();
 Test_Perl_TestResources_GetStaticField_StaticValue_3();
@@ -170,9 +178,10 @@ Test_Perl_TestResources_1DArray_GetIndex_2_StringThree();
 Test_Perl_TestResources_1DArray_GetSize_5();
 Test_Perl_TestResources_1DArray_SetIndex_4_StringSeven();
 Test_Perl_TestResources_Exceptions_InvokeStaticMethod_DivideBy_0_ThrowsException();
-Test_Perl_StandardLibrary_InvokeStaticMethod_CORE_Abs_minus11_11();
 Test_Perl_TestResources_PassingNull_AsOnlyArg();
 Test_Perl_TestResources_PassingNull_AsSecondArg();
 Test_Perl_TestResources_ReturningNull();
+Test_Perl_TestResources_InvokeGlobalFunction();
+
 
 done_testing();

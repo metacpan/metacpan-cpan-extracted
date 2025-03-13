@@ -104,9 +104,9 @@ sub archive_files {
     $self->{_patchlevel} = $patch_level;
 
     my @archived;
-    for my $filetype (qw/rpt out jsn log/) {
+    for my $filetype (qw/rpt out jsn/) {
         my $to_archive = "archive_$filetype";
-        my $filename = $filetype eq 'log' ? 'lfile' : "${filetype}file";
+        my $filename = "${filetype}file";
         push @archived, $self->$filename if $self->$to_archive;
     }
     return \@archived;

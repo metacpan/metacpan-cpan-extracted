@@ -22,7 +22,7 @@ Test::Smoke::Policy - OO interface to handle the Policy.sh stuff.
 
 =head1 DESCRIPTION
 
-I wish I understood what Merijn is doeing in the original code.
+I wish I understood what Merijn is doing in the original code.
 
 =head1 METHODS
 

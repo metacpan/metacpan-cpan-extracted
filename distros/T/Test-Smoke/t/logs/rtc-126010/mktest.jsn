@@ -1,0 +1,171 @@
+{
+   "jsnfile" : "mktest.jsn",
+   "un_file" : "/home/username/p5smoke/smokecurrent.usernote",
+   "is56x" : "0",
+   "harness3opts" : "",
+   "compiler_msgs" : [],
+   "out_file" : null,
+   "defaultenv" : "0",
+   "summary" : "PASS",
+   "skip_tests" : "/home/username/p5smoke/smokecurrent.skiptests",
+   "manifest_msgs" : [],
+   "cfg" : "/home/username/p5smoke/perlcurrent.cfg",
+   "showcfg" : 0,
+   "un_position" : "bottom",
+   "outfile" : "mktest.out",
+   "nonfatal_msgs" : [],
+   "hostname" : null,
+   "sysinfo" : {
+      "smoke_branch" : "smoke-me/jkeenan/133382-Test-Simple-trial",
+      "git_describe" : "v5.29.1-87-g22449cb",
+      "hostname" : "li796-253",
+      "reporter" : "",
+      "smoke_date" : "2018-08-13 08:08:21 -0400",
+      "lc_all" : null,
+      "username" : "jkeenan",
+      "lang" : "en_US.UTF-8",
+      "test_jobs" : "8",
+      "cpu_description" : "Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz (GenuineIntel 2500MHz)",
+      "git_id" : "22449cbbe7072a962ee1b533b65d93cec20f7cca",
+      "architecture" : "x86_64",
+      "osversion" : "4.15.13-x86_64-linode106 [Debian GNU/Linux 8.10 (jessie)]",
+      "user_note" : "",
+      "perl_id" : "5.29.2",
+      "smoke_version" : "1.72_001",
+      "smoke_perl" : "5.20.2",
+      "smoke_revision" : "1.72_001",
+      "osname" : "linux",
+      "reporter_version" : "0.054",
+      "smoker_version" : "0.046",
+      "cpu_count" : "2",
+      "config_count" : 4,
+      "duration" : 4547
+   },
+   "log_file" : null,
+   "harness_only" : "1",
+   "rptfile" : "mktest.rpt",
+   "applied_patches" : [
+      "SMOKE22449cbbe7072a962ee1b533b65d93cec20f7cca"
+   ],
+   "skipped_tests" : [
+      "    # One test name on a line"
+   ],
+   "locale" : "",
+   "configs" : [
+      {
+         "results" : [
+            {
+               "locale" : null,
+               "stat_tests" : "1171974",
+               "summary" : "O",
+               "failures" : [],
+               "stat_cpu_time" : "750.22",
+               "io_env" : "stdio",
+               "statistics" : "Files=2660, Tests=1171974, 384 wallclock secs (105.25 usr 10.34 sys + 593.39 cusr 41.24 csys = 750.22 CPU"
+            },
+            {
+               "locale" : null,
+               "summary" : "O",
+               "stat_tests" : "1171974",
+               "failures" : [],
+               "stat_cpu_time" : "745.98",
+               "io_env" : "perlio",
+               "statistics" : "Files=2660, Tests=1171974, 380 wallclock secs (117.26 usr 11.81 sys + 576.05 cusr 40.86 csys = 745.98 CPU"
+            }
+         ],
+         "ccversion" : "4.9.2",
+         "arguments" : "",
+         "cc" : "cc",
+         "duration" : 1132,
+         "debugging" : "D",
+         "started" : "2018-08-13 08:08:21 -0400"
+      },
+      {
+         "duration" : 949,
+         "debugging" : "N",
+         "started" : "2018-08-13 08:27:13 -0400",
+         "results" : [
+            {
+               "io_env" : "stdio",
+               "failures" : [],
+               "stat_cpu_time" : "647.51",
+               "statistics" : "Files=2660, Tests=1171912, 332 wallclock secs (89.59 usr  9.81 sys + 510.18 cusr 37.93 csys = 647.51 CPU",
+               "locale" : null,
+               "stat_tests" : "1171912",
+               "summary" : "O"
+            },
+            {
+               "locale" : null,
+               "stat_tests" : "1172007",
+               "summary" : "O",
+               "stat_cpu_time" : "628.14",
+               "failures" : [],
+               "io_env" : "perlio",
+               "statistics" : "Files=2660, Tests=1172007, 320 wallclock secs (96.70 usr 11.13 sys + 483.39 cusr 36.92 csys = 628.14 CPU"
+            }
+         ],
+         "arguments" : "",
+         "ccversion" : "4.9.2",
+         "cc" : "cc"
+      },
+      {
+         "results" : [
+            {
+               "locale" : null,
+               "stat_tests" : "1183350",
+               "summary" : "O",
+               "io_env" : "stdio",
+               "failures" : [],
+               "stat_cpu_time" : "950.15",
+               "statistics" : "Files=2660, Tests=1183350, 482 wallclock secs (117.77 usr 11.75 sys + 768.60 cusr 52.03 csys = 950.15 CPU"
+            },
+            {
+               "failures" : [],
+               "io_env" : "perlio",
+               "stat_cpu_time" : "900.53",
+               "statistics" : "Files=2660, Tests=1183302, 457 wallclock secs (126.63 usr 12.46 sys + 714.72 cusr 46.72 csys = 900.53 CPU",
+               "locale" : null,
+               "stat_tests" : "1183302",
+               "summary" : "O"
+            }
+         ],
+         "cc" : "cc",
+         "ccversion" : "4.9.2",
+         "arguments" : "-Duseithreads",
+         "debugging" : "D",
+         "duration" : 1371,
+         "started" : "2018-08-13 08:43:02 -0400"
+      },
+      {
+         "started" : "2018-08-13 09:05:53 -0400",
+         "duration" : 1095,
+         "debugging" : "N",
+         "cc" : "cc",
+         "ccversion" : "4.9.2",
+         "arguments" : "-Duseithreads",
+         "results" : [
+            {
+               "failures" : [],
+               "io_env" : "stdio",
+               "stat_cpu_time" : "778.24",
+               "statistics" : "Files=2660, Tests=1183284, 399 wallclock secs (95.57 usr 10.37 sys + 629.24 cusr 43.06 csys = 778.24 CPU",
+               "locale" : null,
+               "summary" : "O",
+               "stat_tests" : "1183284"
+            },
+            {
+               "failures" : [],
+               "io_env" : "perlio",
+               "stat_cpu_time" : "728.74",
+               "statistics" : "Files=2660, Tests=1183271, 368 wallclock secs (99.83 usr 11.19 sys + 577.79 cusr 39.93 csys = 728.74 CPU",
+               "locale" : null,
+               "summary" : "O",
+               "stat_tests" : "1183271"
+            }
+         ]
+      }
+   ],
+   "ddir" : "/home/username/p5smoke/perl-current",
+   "lfile" : "/home/username/p5smoke/smokecurrent.log",
+   "v" : "2"
+}

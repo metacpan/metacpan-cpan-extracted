@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-03-11'; # DATE
+our $DATE = '2025-03-13'; # DATE
 our $DIST = 'File-Lockfile-Emacs'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        emacs_lockfile_get
@@ -31,7 +31,10 @@ our %argspec0_target_file = (
 );
 
 our %argspecopt_force = (
-    force => { schema => 'bool*' },
+    force => {
+        schema => 'bool*',
+        cmdline_aliases => {f=>{}},
+    },
 );
 
 sub _lockfile_path {
@@ -114,7 +117,9 @@ the same process as us.
 
 Will return 409 if target file is already locked using Emacs-style lockfile by
 another process (unless when `force` option is set to true, in which case will
-take over the lock).
+take over the lock). Note that there are race conditions when using the `force`
+option (between checking that the lockfile, unlinking it, and creating our own).
+It is not recommended to use the `force` option.
 
 Will return 500 if there's an error in reading the lockfile.
 
@@ -160,6 +165,10 @@ sub emacs_lockfile_lock {
 
     if ($new_lockinfo->{pid} != $old_lockinfo->{pid}) {
         if ($force) {
+            # note that there are race conditions between checking existing lock
+            # above, unlinking it, and creating the new lock. Thus it's not
+            # really recommended to use the `force` option.
+
             # unlock this old lockfile
             unlink $lockfile_path or return [500, "Can't remove old lockfile '$lockfile_path': $!"];
             goto L1;
@@ -202,6 +211,9 @@ $SPEC{emacs_lockfile_unlock} = {
         %argspecopt_force,
     },
     description => <<'MARKDOWN',
+
+Note that there is a race condition between reading the lockfile and unlinking
+it.
 
 Will return 412 if target file does not exist (unless `force` option is set to
 true, in which case we proceed to unlocking anyway).
@@ -256,7 +268,7 @@ File::Lockfile::Emacs - Create/check/delete Emacs-style lockfiles
 
 =head1 VERSION
 
-This document describes version 0.001 of File::Lockfile::Emacs (from Perl distribution File-Lockfile-Emacs), released on 2025-03-11.
+This document describes version 0.002 of File::Lockfile::Emacs (from Perl distribution File-Lockfile-Emacs), released on 2025-03-13.
 
 =head1 SYNOPSIS
 
@@ -369,7 +381,9 @@ the same process as us.
 
 Will return 409 if target file is already locked using Emacs-style lockfile by
 another process (unless when C<force> option is set to true, in which case will
-take over the lock).
+take over the lock). Note that there are race conditions when using the C<force>
+option (between checking that the lockfile, unlinking it, and creating our own).
+It is not recommended to use the C<force> option.
 
 Will return 500 if there's an error in reading the lockfile.
 
@@ -455,6 +469,9 @@ Usage:
  emacs_lockfile_unlock(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Unlock a file locked with Emacs-style lockfile.
+
+Note that there is a race condition between reading the lockfile and unlinking
+it.
 
 Will return 412 if target file does not exist (unless C<force> option is set to
 true, in which case we proceed to unlocking anyway).

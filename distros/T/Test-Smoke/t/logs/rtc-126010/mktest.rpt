@@ -1,0 +1,41 @@
+Automated smoke report for branch smoke-me/jkeenan/133382-Test-Simple-trial 5.29.2 patch 22449cbbe7072a962ee1b533b65d93cec20f7cca v5.29.1-87-g22449cb
+li796-253: Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz (GenuineIntel 2500MHz) (x86_64/2 cpu)
+    on        linux - 4.15.13-x86_64-linode106 [Debian GNU/Linux 8.10 (jessie)]
+    using     cc version 4.9.2
+    smoketime 1 hour 15 minutes (average 18 minutes 57 seconds)
+
+Summary: PASS
+
+O = OK  F = Failure(s), extended report at the bottom
+X = Failure(s) under TEST but not under harness
+? = still running or test results not (yet) available
+Build failures during:       - = unknown or N/A
+c = Configure, m = make, M = make (after miniperl), t = make test-prep
+
+v5.29.1-87-g22449cb  Configuration (common) none
+----------- ---------------------------------------------------------
+O O O O     
+O O O O     -Duseithreads
+| | | +----- PERLIO = perlio -DDEBUGGING
+| | +------- PERLIO = stdio  -DDEBUGGING
+| +--------- PERLIO = perlio
++----------- PERLIO = stdio
+
+
+Locally applied patches:
+    SMOKE22449cbbe7072a962ee1b533b65d93cec20f7cca
+
+Testsuite was run only with 'harness'
+
+Tests skipped on user request:
+    # One test name on a line
+Compiler messages(gcc):
+
+
+Non-Fatal messages(gcc):
+
+
+
+-- 
+Report by Test::Smoke v1.72_001 running on perl 5.20.2
+(Reporter v0.054 / Smoker v0.046)

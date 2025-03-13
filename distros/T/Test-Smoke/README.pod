@@ -100,7 +100,7 @@ stable and as thoroughly tested as possible.
 
 =back
 
-=head1 Note to MSWin32 users
+=head1 NOTES TO MSWIN32 USERS
 
 To make it clear, the perl core test smoke suite treats B<cygwin> and
 B<DJGPP> as unixy platforms and not as true MSWin32.
@@ -129,7 +129,7 @@ user input. You can disable this by starting F<drwtsn32.exe> and un-check the
 B<Visual Notification> and B<Sound Notification> check-boxes and press B<OK>.
 
 
-=head1 Slow Systems
+=head1 SLOW SYSTEMS
 
 It can happen that your system is not able to pursue all the tests, either
 because it is too slow or because some of the configurations are not
@@ -141,7 +141,7 @@ your system,  you can create your own copy of smoke.cfg where you either
 add new combinations and/or test levels, or delete lines to speed up the
 run time of Test::Smoke.
 
-=head1 Availability and references
+=head1 AVAILABILITY AND REFERENCES
 
 =over 4
 
@@ -161,13 +161,6 @@ run time of Test::Smoke.
         [subscribe: <daily-build-reports-subscribe@perl.org>]
     http://www.nntp.perl.org/group/perl.daily-build.reports
     news:nntp.perl.org/perl.daily-build.reports
-
-=item B<Smokers>
-
-    <daily-build@perl.org>
-        [subscribe: <daily-build-subscribe@perl.org>]
-    http://www.nntp.perl.org/group/perl.daily-build
-    news:nntp.perl.org/perl.daily-build
 
 =item B<Others>
 
@@ -241,6 +234,8 @@ Contributors and/or co-authors:
                         Allen Smith
                         David Woolger
                         Campo Wijerman
+    Other               James E Keenan
+                        Andrew Hewus Fresh
 
 and all the people having useful suggestions and nits, starting at
 YAPC::Europe-2.0.01, where Michael talked Merijn into simplifying his own

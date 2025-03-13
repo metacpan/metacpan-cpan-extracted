@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/MineralUtils.pm'
@@ -17,7 +17,8 @@ my @scripts = (
     'script/convert-iron-unit',
     'script/convert-magnesium-unit',
     'script/convert-potassium-unit',
-    'script/convert-sodium-unit'
+    'script/convert-sodium-unit',
+    'script/convert-zinc-unit'
 );
 
 # no fake home requested

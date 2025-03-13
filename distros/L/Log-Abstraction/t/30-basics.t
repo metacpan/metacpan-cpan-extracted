@@ -81,9 +81,9 @@ $logger->warn({ warning => 'Syslog warning message' });
 # Test logging an array
 @log_array = ();
 $logger = Log::Abstraction->new({ logger => \@log_array });
-$logger->debug('This', 'is', 'a', 'list');
-$logger->warn('This', 'is', 'another', 'list');
-$logger->warn(warning => ['This', 'is', 'a', 'ref', 'to', 'a', 'list']);
+$logger->debug('This ', 'is ', 'a ', 'list');
+$logger->warn('This ', 'is ', 'another ', 'list');
+$logger->warn(warning => ['This ', 'is ', 'a ', 'ref ', 'to ', 'a ', 'list']);
 
 diag(Data::Dumper->new([\@log_array])->Dump()) if($ENV{'TEST_VERBOSE'});
 is_deeply(

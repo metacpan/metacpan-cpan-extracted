@@ -1,9 +1,8 @@
-use Test::Exception tests => 4;
+use Test::Exception tests => 3;
 
 for my $info(
 [ 'Unicode::Japanese', '0.43'  ],
 [ 'MIME::Tools',       '5.411' ],
-[ 'PadWalker',         '1.0'   ],
 [ 'IO::ScalarArray',   '2.110' ],
 )
 {

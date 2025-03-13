@@ -3,14 +3,12 @@ Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
-HOWTO.md
 cpanfile
 README.pod
-bin/chkbcfg.pl
-bin/patchtree.pl
-bin/smokestatus.pl
-bin/sysinfo.pl
+bin/tssmokestatus.pl
+bin/tssysinfo.pl
 bin/tsarchive.pl
+bin/tsarchivelog.pl
 bin/tshandlequeue.pl
 bin/tsreport.pl
 bin/tsrepostjsn.pl
@@ -18,6 +16,7 @@ bin/tsrunsmoke.pl
 bin/tssendrpt.pl
 bin/tssmokeperl.pl
 bin/tssynctree.pl
+Changes
 bin/tsconfigsmoke.pl
 bin/tsw32configure.pl
 lib/configsmoke.pod
@@ -56,13 +55,14 @@ lib/Test/Smoke/FTPClient.pm
 lib/Test/Smoke/LogMixin.pm
 lib/Test/Smoke/Mailer.pm
 lib/Test/Smoke/Mailer/Base.pm
-lib/Test/Smoke/Mailer/MIME_Lite.pm
 lib/Test/Smoke/Mailer/Mail_Sendmail.pm
 lib/Test/Smoke/Mailer/Mail_X.pm
+lib/Test/Smoke/Mailer/MIME_Lite.pm
 lib/Test/Smoke/Mailer/SendEmail.pm
 lib/Test/Smoke/Mailer/Sendmail.pm
 lib/Test/Smoke/ObjectBase.pm
 lib/Test/Smoke/Patcher.pm
+lib/Test/Smoke/perlcurrent.cfg
 lib/Test/Smoke/Policy.pm
 lib/Test/Smoke/Poster.pm
 lib/Test/Smoke/Poster/Base.pm
@@ -76,8 +76,8 @@ lib/Test/Smoke/SourceTree.pm
 lib/Test/Smoke/Syncer.pm
 lib/Test/Smoke/Syncer/Base.pm
 lib/Test/Smoke/Syncer/Copy.pm
-lib/Test/Smoke/Syncer/FTP.pm
 lib/Test/Smoke/Syncer/Forest.pm
+lib/Test/Smoke/Syncer/FTP.pm
 lib/Test/Smoke/Syncer/Git.pm
 lib/Test/Smoke/Syncer/Hardlink.pm
 lib/Test/Smoke/Syncer/Rsync.pm
@@ -88,13 +88,13 @@ lib/Test/Smoke/Util/FindHelpers.pm
 lib/Test/Smoke/Util/LoadAJSON.pm
 lib/Test/Smoke/Util/Serialise.pm
 lib/Test/Smoke/Util/Win32ErrorMode.pm
-lib/Test/Smoke/maint_dfconfig
-lib/Test/Smoke/perl58x.cfg
-lib/Test/Smoke/perlcurrent.cfg
-lib/Test/Smoke/perlmaint.cfg
-lib/Test/Smoke/smoke58x_dfconfig
 lib/Test/Smoke/vmsperl.cfg
 lib/Test/Smoke/w32current.cfg
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/15-factory-json.t
+t/20-logger.t
 t/15-factory-json.t
 t/20-logger.t
 t/25-util-serialise.t
@@ -104,6 +104,7 @@ t/app/010-appoptions.t
 t/app/020-appoptioncollection.t
 t/app/030-app-base.t
 t/app/100-archiver.t
+t/app/101-archiver.t
 t/app/110-runsmoke.t
 t/app/120-sendreport.t
 t/app/130-smokeperl.t
@@ -123,10 +124,9 @@ t/ftppub/perl-current-diffs/20001.gz
 t/ftppub/perl-current-diffs/20003.gz
 t/ftppub/perl-current-diffs/20004.gz
 t/ftppub/perl-current-diffs/20005.gz
-t/ftppub/perl-current/MANIFEST
-t/ftppub/perl-current/cpan/Test-Harness/lib/Test/Harness.pm
 t/ftppub/perl-current/cpan/t/skip.t
 t/ftppub/perl-current/cpan/t/test.t
+t/ftppub/perl-current/cpan/Test-Harness/lib/Test/Harness.pm
 t/ftppub/perl-current/dist/t/skip.t
 t/ftppub/perl-current/dist/t/test.t
 t/ftppub/perl-current/ext/t/skip.t
@@ -134,12 +134,14 @@ t/ftppub/perl-current/ext/t/test.t
 t/ftppub/perl-current/git_version.h
 t/ftppub/perl-current/lib/t/skip.t
 t/ftppub/perl-current/lib/t/test.t
+t/ftppub/perl-current/MANIFEST
 t/ftppub/perl-current/patchlevel.h
 t/ftppub/perl-current/patchme.txt
 t/ftppub/perl-current/t/op/skip.t
 t/ftppub/perl-current/t/op/test.t
 t/ftppub/perl-current/win32/Makefile
 t/ftppub/perl-current/win32/makefile.mk
+t/ftppub/perl-current/.patch
 t/ftppub/pl_with_pn.h
 t/ftppub/snap/perl@19000.tgz
 t/ftppub/snap/perl@20000.tgz
@@ -156,6 +158,11 @@ t/logs/hpux1111.log
 t/logs/icc102.log
 t/logs/linux3710g.log
 t/logs/mingw.log
+t/logs/rtc-126010/.patch
+t/logs/rtc-126010/mktest.jsn
+t/logs/rtc-126010/mktest.out
+t/logs/rtc-126010/mktest.rpt
+t/logs/rtc-126010/smokecurrent.log
 t/logs/solaris.log
 t/logs/w32bcc32.log
 t/lpatches.t
@@ -184,6 +191,7 @@ t/syncer_git.t
 t/syncer_link.t
 t/syncer_rsync.t
 t/syncer_snap.t
+t/TestLib.pm
 t/tree.t
 t/ts_config.t
 t/util-execute.t
@@ -192,5 +200,9 @@ t/vms_rl.t
 t/win32/Makefile
 t/win32/GNUmakefile
 t/win32_error_mode.t
+t/ftppub/perl-current/Porting/GitUtils.pm
+t/ftppub/perl-current/Porting/make_dot_patch.pl
+t/syncer_ftp.t
+t/syncer_ftpclient.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

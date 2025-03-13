@@ -23,7 +23,7 @@ name: File-Lockfile-Emacs
 provides:
   File::Lockfile::Emacs:
     file: lib/File/Lockfile/Emacs.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   Log::ger: '0.038'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Lockfile-Emacs
   homepage: https://metacpan.org/release/File-Lockfile-Emacs
   repository: git://github.com/perlancar/perl-File-Lockfile-Emacs.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

@@ -28,6 +28,7 @@ sub synctree_config { # synctree.pl
                 gitbin(),
                 gitorigin(),
                 gitdir(),
+                gitbare(),
                 gitdfbranch(),
                 gitbranchfile(),
             ],
@@ -41,6 +42,14 @@ sub synctree_config { # synctree.pl
             ],
             fsync => [
                 fdir(),
+            ],
+            ftp  => [
+                ftphost(),
+                ftpport(),
+            ],
+            snapshot  => [
+                snapurl(),
+                snaptar(),
             ],
         },
     );
@@ -523,6 +532,58 @@ sub force_c_locale {
     );
 }
 
+sub ftphost {
+    return $opt->new(
+        name       => 'ftphost',
+        option     => '=s',
+        default    => 'ftp.example.com',
+        helptext   => "The FTP server",
+        configtext => "What is the URL of your FTP server?",
+        configalt  => sub { [] },
+        configord  => 1,
+    );
+}
+
+sub ftpport {
+    return $opt->new(
+        name       => 'ftpport',
+        option     => '=i',
+        default    => 21,
+        helptext   => "The FTP port",
+        configtext => "What is the port of your FTP server?",
+        configalt  => sub { [] },
+        configord  => 2,
+    );
+}
+
+sub snapurl {
+    my $blead = "https://github.com/Perl/perl5/archive/refs/heads/blead.tar.gz";
+    #my $tag = "https://github.com/Perl/perl5/archive/refs/tags/v5.41.6.tar.gz";
+    #my $pr_domestic = "https://github.com/Perl/perl5/archive/refs/pull/22991/head.tar.gz";
+    #my $pr_from_fork = "https://github.com/Perl/perl5/archive/refs/pull/22981/head.tar.gz";
+    return $opt->new(
+        name       => 'snapurl',
+        option     => '=s',
+        default    => "$blead",
+        helptext   => "The URL with path",
+        configtext => "What is the URL of the delivery?",
+        configalt  => sub { [] },
+        configord  => 1,
+    );
+}
+
+sub snaptar {
+    return $opt->new(
+        name       => 'snaptar',
+        option     => '=s',
+        default    => '',
+        helptext   => "The tar/zip command to unarchive",
+        configtext => "What is the tar/zip command to use to unarchive the delivery?",
+        configalt  => sub { [] },
+        configord  => 1,
+    );
+}
+
 sub gitbin {
     return $opt->new(
         name       => 'gitbin',
@@ -568,6 +629,21 @@ sub gitdir {
     );
 }
 
+sub gitbare {
+    return $opt->new(
+        name       => 'gitbare',
+        option     => '!',
+        default    => 0,
+        helptext   => "Clone as a bare repository",
+        configtext => "Clone bare git repository?",
+        configtype => 'prompt_yn',
+        configalt  => sub { [qw/ y N /] },
+        configdft  => sub {'n'},
+    );
+}
+
+
+
 sub gitdfbranch {
     return $opt->new(
         name       => 'gitdfbranch',
@@ -612,7 +688,7 @@ sub harness3opts {
         default    => '',
         helptext   => "Extra options to pass to harness v3+.",
         configtext => "Extra options for Test::Harness 3
-\tFor parellel testing use; 'j5'",
+\tFor parallel testing use; 'j5'",
         configdft  => sub {''},
     );
 }
@@ -1019,7 +1095,7 @@ sub rsyncsource {
     return $opt->new(
         name       => 'source',
         option     => '=s',
-        default    => 'dromedary.p5h.org:5872::perl-current',
+        default    => 'rsync://dromedary.p5h.org:5872/perl-current/',
         helptext   => "The remote location of the rsync archive.",
         configtext => "Where would you like to rsync from?",
         configtype => 'prompt',
@@ -1165,7 +1241,7 @@ sub sync_type {
     return $opt->new(
         name       => 'sync_type',
         option     => '=s',
-        allow      => [qw/git rsync copy/],
+        allow      => [qw/git rsync copy ftp snapshot/],
         default    => 'git',
         helptext   => 'The source tree sync method.',
         configtext => 'How would you like to sync the perl-source?',

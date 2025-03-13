@@ -526,7 +526,7 @@ sub _sort_configkeys {
         # Sync related
         qw( sync_type fsync rsync opts source tar server sdir sfile
             unzip patchbin cleanup cdir hdir pfile
-            gitbin gitdir gitorigin gitdfbranch gitbranchfile ),
+            gitbin gitdir gitorigin gitdfbranch gitbare gitbranchfile ),
 
         # OS specific make related
         qw( w32cc w32make w32args ),
