@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::Unixy;
-$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.022';
+$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -7,10 +7,10 @@ use parent 'ExtUtils::Builder::Compiler';
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{cc} ||= ['cc'];
+	$args{cc} //= ['cc'];
 	$self->SUPER::_init(%args);
 	$self->{cccdlflags} = $args{cccdlflags};
-	$self->{pic} = $args{pic} || ($self->type eq 'shared-library' || $self->type eq 'loadable-object') && @{ $self->{cccdlflags} };
+	$self->{pic} = $args{pic} // ($self->type eq 'shared-library' || $self->type eq 'loadable-object') && @{ $self->{cccdlflags} };
 	return;
 }
 
@@ -44,7 +44,7 @@ ExtUtils::Builder::Compiler::Unixy - Class for compiling with a unix compiler
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

@@ -1,9 +1,15 @@
 Tk::CodeText module changes log
 
+0.66 13 Mar 2025
+	- Tag sel is also the last to be raised instead of first in method spacesLine.
+	- Tag sel is raised when a Find tag is added.
+	- Tag Find is removed when find popup closes.
+	- Added option -autobrackets.
+
 0.65 26 Feb 2025
 	- Fixed missing prereq Tk::YADialog.
 	- Tag sel is the last to be raised instead of first.
-	
+
 0.64 25 Feb 2025
 	- Corrected bug in method FindandReplace.
 	- Added routines for showing spaces and tabs.
@@ -16,9 +22,6 @@ Tk::CodeText module changes log
 	- Line numbers font changes with the widget font.
 
 0.62 19 Jan 2025
-	- Removed unneccessary print statements.
-	- Added events <<LowerCase>> and <<UpperCase>>, their key bindings and method caseChange.
-	- Fixed method replace. Wrong undo recording of editModified.
 
 0.61 05 Jan 2025
 	- Auto complete pops list down on focus out and on no matching words.
@@ -88,7 +91,7 @@ Tk::CodeText module changes log
 	changed background color of TagsEditor
 	copy and cut no longer puts an empty string to the clipboard
 	mouse button release now causes match
-	
+
 01 apr 2024
 	Update to version 0.47
 	Revised TagsEditor
@@ -118,14 +121,14 @@ Tk::CodeText module changes log
 	Added -position option
 	Focus now returns to text widget when search and replace window closes
 	Method themeUpdate now calls highlightPurge at the end
-	
+
 04 june 2023
-	Update to version 0.42. 
+	Update to version 0.42.
 	Fixed documentation typos and errors.
 	Fixed testing.
 
 01 june 2023
-	Update to version 0.41. 
+	Update to version 0.41.
 	Moved internal MyKamelon to it's own pm, so metacpan does not have problems with it.
 
 01 june 2023
@@ -147,7 +150,7 @@ Tk::CodeText module changes log
 	Tk::CodeText::Template also don't need to specify a 'syntax' method any more.
 	Rewrote the rules editor, put it in a separate module.
 	Numerous small changes and additions
-	
+
 22 April 2003
 	Update to version 0.3.1
 	Added slant option to rules editor.
@@ -161,7 +164,7 @@ Tk::CodeText module changes log
 	Modified highlighting algorithm
 	Added '-updatecall' option.
 	Fixed bug in rules editor.
-	
+
 03 March 2003
 	Update to version 0.2.0.
 	Updated documentation.

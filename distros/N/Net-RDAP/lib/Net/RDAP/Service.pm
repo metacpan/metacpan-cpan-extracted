@@ -12,6 +12,20 @@ sub new {
     }, $package);
 }
 
+sub new_for_tld {
+    my ($package, $tld) = @_;
+
+    foreach my $service (Net::RDAP::Registry->load_registry(Net::RDAP::Registry::DNS_URL)->services) {
+        foreach my $zone ($service->registries) {
+            if (lc($zone) eq lc($tld)) {
+                return $package->new(Net::RDAP::Registry->get_best_url($service->urls));
+            }
+        }
+    }
+
+    return undef;
+}
+
 sub fetch {
     my ($self, $type, $segments, %params) = @_;
 
@@ -31,17 +45,17 @@ sub fetch {
     return $self->client->fetch($uri, %opt);
 }
 
-sub base        { $_[0]->{'base'}   }
-sub client      { $_[0]->{'client'} }
-sub help        { $_[0]->fetch('help'                               ) }
-sub domain      { $_[0]->fetch('domain',        $_[1]->name         ) }
-sub ip          { $_[0]->fetch('ip',            $_[1]->prefix       ) }
-sub autnum      { $_[0]->fetch('autnum',        $_[1]->toasplain    ) }
-sub entity      { $_[0]->fetch('entity',        $_[1]->handle       ) }
-sub nameserver  { $_[0]->fetch('nameserver',    $_[1]->name         ) }
-sub domains     { $_[0]->fetch('domains',       undef, $_[1] => $_[2]) }
-sub nameservers { $_[0]->fetch('nameservers',   undef, $_[1] => $_[2]) }
-sub entities    { $_[0]->fetch('entities',      undef, $_[1] => $_[2]) }
+sub base        { shift->{'base'}                                     }
+sub client      { shift->{'client'}                                   }
+sub help        { shift->fetch('help'                               ) }
+sub domain      { shift->fetch('domain',        pop->name           ) }
+sub ip          { shift->fetch('ip',            pop->prefix         ) }
+sub autnum      { shift->fetch('autnum',        pop->toasplain      ) }
+sub entity      { shift->fetch('entity',        pop->handle         ) }
+sub nameserver  { shift->fetch('nameserver',    pop->name           ) }
+sub domains     { shift->fetch('domains',       [], @_              ) }
+sub nameservers { shift->fetch('nameservers',   [], @_              ) }
+sub entities    { shift->fetch('entities',      [], @_              ) }
 
 1;
 
@@ -103,6 +117,13 @@ L<URI> object representing the base URL of the service.
 You can also provide a second argument which should be an existing
 L<Net::RDAP> instance. This is used when fetching resources from the
 server.
+
+=head3 TLD Service Constructor
+
+    my $svc = Net::RDAP::Service->new_for_tld($tld);
+
+This method searches the IANA registry for an entry for the TLD in C<$tld> and
+returns the corresponding L<Net::RDAP::Service> object.
 
 =head2 Lookup Methods
 

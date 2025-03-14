@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.89;
 
 use Config;
+plan(skip_all => 'No dynamic linking') if not $Config{usedl};
 use ExtUtils::Builder::Planner 0.007;
 use File::Basename qw/basename dirname/;
 use File::Spec::Functions qw/catfile/;

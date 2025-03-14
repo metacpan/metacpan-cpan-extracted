@@ -140,7 +140,10 @@ unless (-e $configfolder) {
 my $settingsfile = "$configfolder/settingsrc";
 
 #load user settings
-my @usersettings = ('-acpopsize', 'acscansize', '-activedelay', '-autocomplete', '-autoindent', '-indentstyle', '-match', '-showfolds', '-shownumbers', '-showstatus', '-tabs', '-wrap');
+my @usersettings = ('-acpopsize', 'acscansize', '-activedelay', '-autobrackets',
+	'-autocomplete', '-autoindent', '-indentstyle', '-match', '-showfolds',
+	'-shownumbers', '-showstatus', '-tabs', '-wrap'
+);
 &loadSettings if -e $settingsfile;
 
 $options{'-autoindent'} = $autoindent if defined $autoindent;

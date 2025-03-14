@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -147,6 +147,14 @@ The minimal length of a word to be included in the autocomplete word database. D
 =item Switch: B<-activedelay>
 
 The waiting time in miliseconds before an autocomplete pop up can occur. Default value 300.
+
+=item Name: B<autoBrackets>
+
+=item Class: B<AutoBrackets>
+
+=item Switch: B<-autobrackets>
+
+Boolean. Default value I<false>. Enables or disables autocomplete.
 
 =item Name: B<autoComplete>
 
@@ -576,7 +584,7 @@ sub Populate {
 		-bookmarkcolor => [qw/PASSIVE bookmarkColor BookmarkColor/, '#71D0CC'],
 		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
-		-font => [qw/METHOD font Font/, 'Courier 10'],
+		-font => [qw/METHOD font Font/, 'Monospace 10'],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
 		-linespercycle => [qw/METHOD linesPerCycle LinesPerCycle/, 10],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
@@ -920,6 +928,7 @@ sub FindClose {
 	$self->FindClear;
 	$self->Subwidget('XText')->focus;
 	$self->Subwidget('SandR')->packForget;
+	$self->tagRemove('Find', '1.0', 'end');
 }
 
 =item B<fixIndent>
@@ -1699,6 +1708,8 @@ sub spacesLine {
 	}
 	$self->tagRaise('Space');
 	$self->tagRaise('Tab');
+	$self->tagRaise('Find');
+	$self->tagRaise('sel');
 }
 
 sub spacesLoop {
@@ -1942,6 +1953,8 @@ sub ViewMenuItems {
 
 	my $a;
 	tie $a, 'Tk::Configure', $self, '-autoindent';
+	my $b;
+	tie $b, 'Tk::Configure', $self, '-autobrackets';
 	my $c;
 	tie $c, 'Tk::Configure', $self, '-autocomplete';
 	my $d;
@@ -1978,6 +1991,7 @@ sub ViewMenuItems {
 	);
 	my @items = ( 
 		[checkbutton => '~Auto indent', @values, -variable => \$a],
+		[checkbutton => '~Auto brackets', @values, -variable => \$b],
 		[checkbutton => 'A~uto complete', @values, -variable => \$c],
 		[checkbutton => '~Show spaces and tabs', @values, -variable => \$d],
 		['cascade'=> '~Wrap', -tearoff => 0, -menuitems => [

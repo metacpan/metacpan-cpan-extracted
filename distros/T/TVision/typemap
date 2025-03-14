@@ -1,0 +1,342 @@
+
+TYPEMAP
+ColorSel ColorSel
+TRect O_TRect
+TPoint O_TPoint
+TKey O_TKey
+TVApp*  O_TVApp
+TApplication*  O_TApplication
+TProgram*  O_TProgram
+TBackground*  O_TBackground
+TDeskTop*  O_TDeskTop
+TButton*  O_TButton
+TMenu*  O_TMenu
+TGroup*  O_TGroup
+TWindow*  O_TWindow
+TFrame*  O_TFrame
+TEditWindow*  O_TEditWindow
+TView*  O_TView
+TColorSelector*  O_TColorSelector
+TInputLine*  O_TInputLine
+TLabel*  O_TLabel
+TStaticText*  O_TStaticText
+TStatusLine*  O_TStatusLine
+TStatusDef*  O_TStatusDef
+TStatusItem*  O_TStatusItem
+TCheckBoxes*  O_TCheckBoxes
+TRadioButtons*  O_TRadioButtons
+TScroller*  O_TScroller
+TScrollBar*  O_TScrollBar
+TIndicator*  O_TIndicator
+TEditor*  O_TEditor
+TDialog*  O_TDialog
+TScreen*  O_TScreen
+TSItem*  O_TSItem
+TMenuItem*  O_TMenuItem
+TMenuBar*  O_TMenuBar
+TSubMenu*  O_TSubMenu
+TValidator*  O_TValidator
+THistory*  O_THistory
+
+
+INPUT
+ColorSel
+    SvIV($arg) == 0 ? TColorSelector::csBackground : TColorSelector::csForeground;
+O_TRect
+    AV *_av = (AV*) SvRV($arg);
+    SV** _f0 = av_fetch(_av, 0, 0);
+    SV** _f1 = av_fetch(_av, 1, 0);
+    SV** _f2 = av_fetch(_av, 2, 0);
+    SV** _f3 = av_fetch(_av, 3, 0);
+    if (!_f0 || !_f1 || !_f2 || !_f3)
+	croak(\"self[0] does not contain tvision object\");
+    $var = TRect(SvIV(*_f0),SvIV(*_f1),SvIV(*_f2),SvIV(*_f3));
+O_TPoint
+    AV *_av = (AV*) SvRV($arg);
+    SV** _f0 = av_fetch(_av, 0, 0);
+    SV** _f1 = av_fetch(_av, 1, 0);
+    if (!_f0 || !_f1)
+	croak(\"self[0] does not contain tvision object\");
+    $var.x = SvIV(*_f0);
+    $var.y = SvIV(*_f1);
+O_TKey
+    if (SvTYPE($arg) == SVt_IV)
+	$var = TKey(SvIV($arg));
+    else {
+	AV *_av = (AV*) SvRV($arg);
+	SV** _f0 = av_fetch(_av, 0, 0);
+	SV** _f1 = av_fetch(_av, 1, 0);
+	if (!_f0 || !_f1)
+	    croak(\"self[0] does not contain tvision object\");
+	$var = TKey(SvIV(*_f0), SvIV(*_f1));
+    }
+O_TVApp
+  $var = (TVApp*)sv2tv_a($arg);
+O_TApplication
+  $var = (TApplication*)sv2tv_a($arg);
+O_TProgram
+  $var = (TProgram*)sv2tv_a($arg);
+O_TBackground
+  $var = (TBackground*)sv2tv_a($arg);
+O_TDeskTop
+  $var = (TDeskTop*)sv2tv_a($arg);
+O_TButton
+  $var = (TButton*)sv2tv_a($arg);
+O_TMenu
+  $var = (TMenu*)sv2tv_a($arg);
+O_TGroup
+  $var = (TGroup*)sv2tv_a($arg);
+O_TWindow
+  $var = (TWindow*)sv2tv_a($arg);
+O_TFrame
+  $var = (TFrame*)sv2tv_a($arg);
+O_TEditWindow
+  $var = (TEditWindow*)sv2tv_a($arg);
+O_TView
+  $var = (TView*)sv2tv_a($arg);
+O_TColorSelector
+  $var = (TColorSelector*)sv2tv_a($arg);
+O_TInputLine
+  $var = (TInputLine*)sv2tv_a($arg);
+O_TLabel
+  $var = (TLabel*)sv2tv_a($arg);
+O_TStaticText
+  $var = (TStaticText*)sv2tv_a($arg);
+O_TStatusLine
+  $var = (TStatusLine*)sv2tv_a($arg);
+O_TStatusDef
+  $var = (TStatusDef*)sv2tv_a($arg);
+O_TStatusItem
+  $var = (TStatusItem*)sv2tv_a($arg);
+O_TCheckBoxes
+  $var = (TCheckBoxes*)sv2tv_a($arg);
+O_TRadioButtons
+  $var = (TRadioButtons*)sv2tv_a($arg);
+O_TScroller
+  $var = (TScroller*)sv2tv_a($arg);
+O_TScrollBar
+  $var = (TScrollBar*)sv2tv_a($arg);
+O_TIndicator
+  $var = (TIndicator*)sv2tv_a($arg);
+O_TEditor
+  $var = (TEditor*)sv2tv_a($arg);
+O_TDialog
+  $var = (TDialog*)sv2tv_a($arg);
+O_TScreen
+  $var = (TScreen*)sv2tv_a($arg);
+O_TSItem
+  $var = (TSItem*)sv2tv_a($arg);
+O_TMenuItem
+  $var = (TMenuItem*)sv2tv_a($arg);
+O_TMenuBar
+  $var = (TMenuBar*)sv2tv_a($arg);
+O_TSubMenu
+  $var = (TSubMenu*)sv2tv_a($arg);
+O_TValidator
+  $var = (TValidator*)sv2tv_a($arg);
+O_THistory
+  $var = (THistory*)sv2tv_a($arg);
+
+
+OUTPUT
+O_Xxxxx
+    // Look in TVision.cpp: var=$var arg=$arg type=$type Package=$Package
+    // they give us in $arg the RETVALSV = sv_newmortal();
+    // need to make rv out of it, pointing to new AV
+    // TODO: is it possible to upgrade provided SV rather than ignoring it?
+    // TODO: polish refcounts and other memory leaks here
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("$Package", GV_ADD));
+O_TRect
+    AV *_self = newAV();
+    av_store(_self, 0, newSViv($var.a.x));
+    av_store(_self, 1, newSViv($var.a.y));
+    av_store(_self, 2, newSViv($var.b.x));
+    av_store(_self, 3, newSViv($var.b.y));
+    $arg = newRV_inc((SV*) _self);
+    sv_bless($arg, gv_stashpv("TVision::TRect", GV_ADD));
+O_TPoint
+    AV *_self = newAV();
+    av_store(_self, 0, newSViv($var.x));
+    av_store(_self, 1, newSViv($var.y));
+    $arg = newRV_inc((SV*) _self);
+    sv_bless($arg, gv_stashpv("TVision::TPoint", GV_ADD));
+O_TKey
+    if ($var.mods == 0) {
+	$arg = newSViv($var.code);
+    } else {
+	AV *_self = newAV();
+	av_store(_self, 0, newSViv($var.code));
+	av_store(_self, 1, newSViv($var.mods));
+	$arg = newRV_inc((SV*) _self);
+	sv_bless($arg, gv_stashpv("TVision::TKey", GV_ADD));
+    }
+O_TVApp
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TApplication
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TProgram
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TBackground
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TDeskTop
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TButton
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+    av_store(self, 1, newSViv(cmd));  /*this cmd is very wrong here*/
+O_TMenu
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TGroup
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TWindow
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TFrame
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TEditWindow
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TView
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TColorSelector
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TInputLine
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TLabel
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TStaticText
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TStatusLine
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TStatusDef
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TStatusItem
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TCheckBoxes
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TRadioButtons
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TScroller
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TScrollBar
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TIndicator
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TEditor
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TDialog
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TScreen
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TSItem
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TMenuItem
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TMenuBar
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TSubMenu
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TValidator
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_THistory
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+

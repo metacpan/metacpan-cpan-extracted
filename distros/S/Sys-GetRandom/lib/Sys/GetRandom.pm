@@ -7,7 +7,7 @@ use Carp qw(croak);
 
 use XSLoader;
 BEGIN {
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -122,3 +122,7 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<https://dev.perl.org/licenses/> for more information.
+
+=head1 SEE ALSO
+
+L<Crypt::SysRandom::XS>, L<Sys::GetRandom::PP>

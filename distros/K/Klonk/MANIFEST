@@ -1,0 +1,16 @@
+Changes
+lib/Klonk.pm
+lib/Klonk/Env.pm
+lib/Klonk/Handle.pm
+lib/Klonk/pragma.pm
+lib/Klonk/Routes.pm
+Makefile.PL
+Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01-load.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Klonk POD (added by maint/eumm-fixup.pl)

@@ -6,7 +6,7 @@ use Net::ASN;
 use Net::DNS::Domain;
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
-use Net::RDAP 0.26;
+use Net::RDAP 0.34;
 use Pod::Usage;
 use Term::ANSIColor;
 use Term::Size;
@@ -25,14 +25,14 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.06';
+$VERSION = '1.09';
 
 #
 # global arg variables (note: nopager is now ignored)
 #
 my (
     $type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $both,
-    $registrar, $nocolor, $reverse, $version, $search
+    $registrar, $nocolor, $reverse, $version, $search, $debug, $registry
 );
 
 #
@@ -49,10 +49,12 @@ my %opts = (
     'raw'           => \$raw,
     'both'          => \$both,
     'registrar'     => \$registrar,
+    'registry'      => \$registry,
     'nocolor'       => \$nocolor,
     'reverse'       => \$reverse,
     'version'       => \$version,
     'search'        => \$search,
+    'debug'         => \$debug,
     'autnum'        => sub { $type = 'autnum' },
     'domain'        => sub { $type = 'domain' },
     'entity'        => sub { $type = 'entity' },
@@ -61,14 +63,14 @@ my %opts = (
     'url'           => sub { $type = 'url' },
 );
 
-my %funcs = (
-    'ip network' => sub { App::rdapper->print_ip(@_) },
-    'autnum'     => sub { App::rdapper->print_asn(@_) },
-    'domain'     => sub { App::rdapper->print_domain(@_) },
-    'entity'     => sub { App::rdapper->print_entity(@_) },
-    'nameserver' => sub { App::rdapper->print_nameserver(@_) },
+my $funcs = {
+    'ip network' => sub { __PACKAGE__->print_ip(@_) },
+    'autnum'     => sub { __PACKAGE__->print_asn(@_) },
+    'domain'     => sub { __PACKAGE__->print_domain(@_) },
+    'entity'     => sub { __PACKAGE__->print_entity(@_) },
+    'nameserver' => sub { __PACKAGE__->print_nameserver(@_) },
     'help'       => sub { 1 }, # help only contains generic properties
-);
+};
 
 my @ROLE_DISPLAY_NAMES_ORDER = qw(registrant administrative technical billing
     abuse registrar reseller sponsor proxy notifications noc);
@@ -135,12 +137,22 @@ sub main {
 
     GetOptionsFromArray(\@_, %opts) || $package->show_usage;
 
+    $ENV{NET_RDAP_UA_DEBUG} = 1 if ($debug);
+
     $rdap = Net::RDAP->new(
         'use_cache' => !$bypass,
         'cache_ttl' => 300,
     );
 
     $package->show_version if ($version);
+
+    if ($registry && $registrar) {
+        $package->error("Cannot specify both --registry and --registrar, use one or the other.");
+
+    } elsif ($registry && $both) {
+        $package->error("Cannot specify both --registry and --both, use one or the other.");
+
+    }
 
     $registrar ||= $both;
 
@@ -164,10 +176,17 @@ sub main {
 
     if ($search) {
         $package->search($rdap, $object, $type, %args);
-        return;
+
+    } else {
+        $package->lookup($rdap, $object, $type, %args);
     }
+}
+
+sub lookup {
+    my ($package, $rdap, $object, $type, %args) = @_;
 
     my $response;
+
     if ('ip' eq $type) {
         my $ip = Net::IP->new($object);
 
@@ -334,50 +353,51 @@ sub display {
 
         }
 
-        return undef;
-    }
-
-    if ($registrar) {
-        # avoid recursing infinitely
-        $registrar = undef;
-
+    } else {
         my $link = (grep { 'related' eq $_->rel && $_->is_rdap } $object->links)[0];
 
-        if (!$link) {
-            $package->warning('No registrar link found, displaying the registry record...');
-            return $package->display($object, $indent);
+        if ($registrar) {
+            # avoid recursing infinitely
+            $registrar = undef;
+
+            if (!$link) {
+                $package->warning('No registrar link found, displaying the registry record...');
+                return $package->display($object, $indent);
+            }
+
+            my $result = $rdap->fetch($link);
+
+            if ($result->isa('Net::RDAP::Error')) {
+                return $package->display($result, $indent, 1);
+
+                $package->warning('Unable to retrieve registrar record, displaying the registry record...');
+                return $package->display($object, $indent);
+            }
+
+            $package->display($object, $indent, 1) if ($both);
+
+            $package->display($result, $indent);
+
+        } else {
+            if ($raw) {
+                $out->print($json->encode($object));
+
+            } elsif ($object->isa('Net::RDAP::SearchResult')) {
+                $package->display_search($object);
+
+            } else {
+                $package->display_object($object, $indent);
+
+            }
         }
-
-        my $result = $rdap->fetch($link);
-
-        if ($result->isa('Net::RDAP::Error')) {
-            return $package->display($result, $indent, 1);
-
-            $package->warning('Unable to retrieve registrar record, displaying the registry record...');
-            return $package->display($object, $indent);
-        }
-
-        if ($both) {
-            $package->display($object, $indent, 1);
-        }
-
-        return $package->display($result, $indent);
     }
+}
 
-    if ($raw) {
-        $out->print($json->encode($object));
-
-        return 1;
-    }
-
-    if ($object->isa('Net::RDAP::SearchResult')) {
-        $package->display_search($object);
-
-        return 1;
-    }
+sub display_object {
+    my ($package, $object, $indent) = @_;
 
     $package->error("JSON response does not include the 'objectClassName' properties") unless ($object->class);
-    $package->error(sprintf("Unknown object type '%s'", $object->class)) unless ($funcs{$object->class});
+    $package->error(sprintf("Unknown object type '%s'", $object->class)) unless ($funcs->{$object->class});
 
     #
     # generic properties
@@ -413,7 +433,7 @@ sub display {
     #
     # object-specific properties
     #
-    &{$funcs{$object->class}}($object, $indent);
+    $funcs->{$object->class}->($object, $indent);
 
     #
     # more generic properties
@@ -453,8 +473,6 @@ sub display {
     }
 
     $out->print("\n") if ($indent < 1);
-
-    return 1;
 }
 
 sub print_ip {
@@ -727,6 +745,20 @@ sub print_kv {
     ));
 }
 
+sub debug {
+    my ($package, $fmt, @params) = @_;
+    if ($debug) {
+        my $str = sprintf("Debug: $fmt", @params);
+        $err->say(colourise([qw(magenta)], $str));
+    }
+}
+
+sub info {
+    my ($package, $fmt, @params) = @_;
+    my $str = sprintf("Info: $fmt", @params);
+    $err->say(colourise([qw(cyan)], $str));
+}
+
 sub warning {
     my ($package, $fmt, @params) = @_;
     my $str = sprintf("Warning: $fmt", @params);
@@ -773,10 +805,11 @@ To install, run:
 
 =head1 RUNNING VIA DOCKER
 
-The L<git repository|https://github.com/gbxyz/rdapper> contains a C<Dockerfile>
-that can be used to build an image on your local system.
+The L<git repository|https://github.com/gbxyz/rdapper> contains a
+C<Dockerfile> that can be used to build an image on your local system.
 
-Alternatively, you can pull the L<image from Docker Hub|https://hub.docker.com/r/gbxyz/rdapper>:
+Alternatively, you can pull the L<image from Docker
+Hub|https://hub.docker.com/r/gbxyz/rdapper>:
 
     $ docker pull gbxyz/rdapper
 
@@ -829,22 +862,25 @@ C<https://example.com/rdap/domain/example.com>.
 
 =item * the "tagged" handle of an entity, such as an LIR, registrar, or domain
 admin/tech contact. Because these handles are difficult to distinguish from
-domain names, you must use the C<--type> argument to explicitly tell C<rdapper>
-that you want to perform an entity query, .e.g C<rdapper --type=entity
-ABC123-EXAMPLE>.
+domain names, you must use the C<--type> argument to explicitly tell
+C<rdapper> that you want to perform an entity query, .e.g C<rdapper
+--type=entity ABC123-EXAMPLE>.
 
 =back
 
-C<rdapper> also implements limited support for in-bailiwick nameservers, but you
-must use the C<--nameserver> argument to disambiguate from domain names. The
-RDAP server of the parent domain's registry will be queried.
+C<rdapper> also implements limited support for in-bailiwick nameservers, but
+you must use the C<--nameserver> argument to disambiguate from domain names.
+The RDAP server of the parent domain's registry will be queried.
 
 =head2 ARGUMENTS
 
 =over
 
-=item * C<--registrar> - follow referral to the registrar's RDAP record (if any)
-which will be displayed instead of the registry record.
+=item * C<--registry> - display the registry record only (the default).
+
+=item * C<--registrar> - follow referral to the registrar's RDAP record (if
+any) which will be displayed instead of the registry record. Cannot be used with
+C<--registry>.
 
 =item * C<--both> - display both the registry and (if any) registrar RDAP
 records (implies C<--registrar>).
@@ -853,25 +889,28 @@ records (implies C<--registrar>).
 option causes C<rdapper> to display the record of the corresponding
 C<in-addr.arpa> or C<ip6.arpa> domain.
 
-=item * C<--type=TYPE> - explicitly set the object type. C<rdapper> will guess
-the type by pattern matching the value of C<OBJECT> but you can override this by
-explicitly setting the C<--type> argument to one of : C<ip>, C<autnum>,
-C<domain>, C<nameserver>, C<entity> or C<url>.
+=item * C<--type=TYPE> - explicitly set the object type. C<rdapper> will
+guess the type by pattern matching the value of C<OBJECT> but you can override
+this by explicitly setting the C<--type> argument to one of : C<ip>,
+C<autnum>, C<domain>, C<nameserver>, C<entity> or C<url>.
 
 =over
 
-=item * If C<--type=url> is used, C<rdapper> will directly fetch the specified
-URL and attempt to process it as an RDAP response. If the URL path ends with
-C</help> then the response will be treated as a "help" query response (if you
-want to see the record for the .help TLD, use C<--type=tld help>).
+=item * If C<--type=url> is used, C<rdapper> will directly fetch the
+specified URL and attempt to process it as an RDAP response. If the URL path
+ends with C</help> then the response will be treated as a "help" query response
+(if you want to see the record for the .help TLD, use C<--type=tld help>).
 
-=item * If C<--type=entity> is used, C<OBJECT> must be a a string containing a
-"tagged" handle, such as C<ABC123-EXAMPLE>, as per L<RFC
+=item * If C<--type=entity> is used, C<OBJECT> must be a a string containing
+a "tagged" handle, such as C<ABC123-EXAMPLE>, as per L<RFC
 8521|https://datatracker.ietf.org/doc/html/rfc8521>.
 
 =back
 
-=item * C<--$TYPE> - alias for C<--type=$TYPE>. eg C<--domain>, C<--autnum>, etc.
+=item * C<--$TYPE> - alias for C<--type=$TYPE>. eg C<--domain>,
+C<--autnum>, etc.
+
+=item * C<--search> - perform a search.
 
 =item * C<--help> - display help message.
 
@@ -890,7 +929,7 @@ you aren't expecting them to.
 
 =item * C<--nocolor> - disable ANSI colors in the formatted output.
 
-=item * C<--search> - perform a search.
+=item * C<--debug> -run in debugging mode.
 
 =back
 
@@ -899,11 +938,11 @@ you aren't expecting them to.
 Some RDAP servers support the ability to perform simple substring searches.
 You can use the C<--search> option to enable this functionality.
 
-When the C<--search> option is used, C<OBJECT> will be used as a search term. If
-it contains no dots (e.g. C<exampl*>), then C<rdapper> will send a search query
-for C<exampl*> to I<all> known RDAP servers. If it contains one or more dots
-(e.g. C<exampl*.com>), it will send the search query to the RDAP server for the
-specified TLD (if any).
+When the C<--search> option is used, C<OBJECT> will be used as a search term.
+If it contains no dots (e.g. C<exampl*>), then C<rdapper> will send a search
+query for C<exampl*> to I<all> known RDAP servers. If it contains one or more
+dots (e.g. C<exampl*.com>), it will send the search query to the RDAP server
+for the specified TLD (if any).
 
 Any errors observed will be printed to C<STDERR>; any search results will be
 printed to C<STDOUT>.

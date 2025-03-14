@@ -34,8 +34,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Array::Circular" : "0",
             "List::SomeUtils" : "0",
             "List::Util" : "0",
+            "MIDI::RtMidi::ScorePlayer" : "0",
             "Moo" : "2",
             "Music::Chord::Note" : "0",
             "Music::Note" : "0",
@@ -69,7 +71,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-Gene"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0105",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -336,9 +338,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [
-                     "\\.png"
-                  ],
+                  "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",

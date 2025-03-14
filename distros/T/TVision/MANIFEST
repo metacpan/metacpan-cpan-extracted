@@ -5,7 +5,9 @@ demo/tdialog.pl
 demo/tedit.pl
 t/f.t
 Makefile.PL
+TVision-methods.xs
 TVision-methods.xs.in
+typemap
 typemap.in
 TVision.xs
 TVision.pm

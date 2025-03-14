@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/MIDI/RtController/Filter/Gene.pm',
+    'lib/MIDI/RtController/Filter/Math.pm',
     't/00-compile.t',
     't/01-functions.t'
 );

@@ -1,0 +1,78 @@
+{
+   "abstract" : "ad-hoc, informally-specified, bug-ridden, slow implementation of half of a web framework",
+   "author" : [
+      "Lukas Mai <l.mai@web.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Klonk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "3.005",
+            "Pod::Markdown::Githubert" : "0",
+            "Pod::Text" : "4.09",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Function::Parameters" : "2",
+            "HTML::Blitz" : "0",
+            "IO::Handle" : "0",
+            "Unicode::UTF8" : "0",
+            "constant" : "0",
+            "feature" : "0",
+            "parent" : "0",
+            "perl" : "5.036000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Klonk/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/mauke/Klonk.git",
+         "web" : "https://codeberg.org/mauke/Klonk"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

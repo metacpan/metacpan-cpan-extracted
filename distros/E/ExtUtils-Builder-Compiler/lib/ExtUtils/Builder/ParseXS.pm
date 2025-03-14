@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.022';
+$ExtUtils::Builder::ParseXS::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -8,10 +8,12 @@ use parent 'ExtUtils::Builder::Planner::Extension';
 use File::Basename qw/basename dirname/;
 use File::Spec::Functions qw/curdir catfile catdir splitdir/;
 
+use ExtUtils::Builder::Util 'function';
+
 sub add_methods {
 	my ($self, $planner, %options) = @_;
 
-	my $config = $options{config} || ($planner->can('config') ? $planner->config : ExtUtils::Config->new);
+	my $config = $options{config} // ($planner->can('config') ? $planner->config : ExtUtils::Config->new);
 
 	$planner->add_delegate('parse_xs', sub {
 		my (undef, $source, $destination, %options) = @_;
@@ -19,7 +21,7 @@ sub add_methods {
 		my @actions;
 		if ($options{mkdir}) {
 			my $dirname = dirname($destination);
-			push @actions, ExtUtils::Builder::Action::Function->new(
+			push @actions, function(
 				module    => 'File::Path',
 				function  => 'make_path',
 				arguments => [ $dirname ],
@@ -35,15 +37,15 @@ sub add_methods {
 		);
 		$args{$_} = $options{$_} for grep { defined $options{$_} } qw/typemap hiertype versioncheck linenumbers optimize prototypes/;
 
-		push @actions, ExtUtils::Builder::Action::Function->new(
+		push @actions, function(
 			module    => 'ExtUtils::ParseXS',
 			function  => 'process_file',
 			arguments => [ %args ],
 			message   => "parse-xs $source",
 		);
 
-		my @dependencies = @{ $options{dependencies} || [] };
-		$args{typemap} ||= 'typemap' if -f 'typemap';
+		my @dependencies = @{ $options{dependencies} // [] };
+		$args{typemap} //= 'typemap' if -f 'typemap';
 		push @dependencies, $args{typemap} if $args{typemap};
 
 		$planner->create_node(
@@ -55,9 +57,16 @@ sub add_methods {
 
 	$planner->add_delegate('c_file_for_xs', sub {
 		my (undef, $source, $outdir) = @_;
-		$outdir ||= dirname($source);
+		$outdir //= dirname($source);
 		my $file_base = basename($source, '.xs');
 		return catfile($outdir, "$file_base.c");
+	});
+
+	$planner->add_delegate('module_for_xs', sub {
+		my (undef, $source, $relative) = @_;
+		my @parts = splitdir(dirname(abs2rel($source, $relative)));
+		push @parts, basename($source, '.xs');
+		return join '::', @parts;
 	});
 
 	require DynaLoader;
@@ -90,7 +99,7 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

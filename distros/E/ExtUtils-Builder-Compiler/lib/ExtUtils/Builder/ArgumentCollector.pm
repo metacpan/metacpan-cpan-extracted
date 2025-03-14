@@ -1,11 +1,11 @@
 package ExtUtils::Builder::ArgumentCollector;
-$ExtUtils::Builder::ArgumentCollector::VERSION = '0.022';
+$ExtUtils::Builder::ArgumentCollector::VERSION = '0.023';
 use strict;
 use warnings;
 
 sub _init {
 	my ($self, %args) = @_;
-	$self->{arguments} = $args{arguments} || [];
+	$self->{arguments} = $args{arguments} // [];
 	return;
 }
 
@@ -18,7 +18,7 @@ sub add_argument {
 
 sub new_argument {
 	my ($self, %args) = @_;
-	return [ $args{ranking} || 50, $args{value} ];
+	return [ $args{ranking} // 50, $args{value} ];
 }
 
 sub collect_arguments {
@@ -50,7 +50,7 @@ ExtUtils::Builder::ArgumentCollector - Helper role for argument collecting class
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.022';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -9,10 +9,10 @@ use parent 'ExtUtils::Builder::Linker';
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{ld} ||= ['ar'];
-	$args{export} ||= 'all';
+	$args{ld} //= ['ar'];
+	$args{export} //= 'all';
 	$self->SUPER::_init(%args);
-	$self->{static_args} = $args{static_args} || ['cr'];
+	$self->{static_args} = $args{static_args} // ['cr'];
 	return;
 }
 
@@ -45,7 +45,7 @@ ExtUtils::Builder::Linker::Ar
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

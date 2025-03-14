@@ -17,8 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.036000",
   "NAME" => "MIDI::RtController::Filter::Gene",
   "PREREQ_PM" => {
+    "Array::Circular" => 0,
     "List::SomeUtils" => 0,
     "List::Util" => 0,
+    "MIDI::RtMidi::ScorePlayer" => 0,
     "Moo" => 2,
     "Music::Chord::Note" => 0,
     "Music::Note" => 0,
@@ -37,7 +39,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0101",
+  "VERSION" => "0.0105",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,11 +47,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Array::Circular" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::SomeUtils" => 0,
   "List::Util" => 0,
+  "MIDI::RtMidi::ScorePlayer" => 0,
   "Moo" => 2,
   "Music::Chord::Note" => 0,
   "Music::Note" => 0,

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::Any;
-$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.022';
+$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -7,8 +7,8 @@ use parent 'ExtUtils::Builder::Linker::Unixy';
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{ld} ||= ['cc'];
-	$args{export} ||= $args{type} eq 'executable' ? 'none' : 'all';
+	$args{ld} //= ['cc'];
+	$args{export} //= $args{type} eq 'executable' ? 'none' : 'all';
 	$self->SUPER::_init(%args);
 	$self->{ccdlflags} = defined $args{ccdlflags} ? $args{ccdlflags} : Carp::croak('');
 	$self->{lddlflags} = defined $args{lddlflags} ? $args{lddlflags} : Carp::croak('');
@@ -46,7 +46,7 @@ ExtUtils::Builder::Linker::ELF::Any
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

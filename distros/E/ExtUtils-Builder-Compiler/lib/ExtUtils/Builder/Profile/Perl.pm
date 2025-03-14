@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.022';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -8,12 +8,12 @@ use File::Spec::Functions qw/catdir/;
 
 sub _get_var {
 	my ($config, $opts, $key) = @_;
-	return delete $opts->{$key} || $config->get($key);
+	return delete $opts->{$key} // $config->get($key);
 }
 
 sub _split_var {
 	my ($config, $opts, $key) = @_;
-	return delete $opts->{$key} || [ split_like_shell($config->get($key)) ];
+	return delete $opts->{$key} // [ split_like_shell($config->get($key)) ];
 }
 
 sub process_compiler {
@@ -44,7 +44,7 @@ sub process_linker {
 	if ($linker->export eq 'some') {
 		$linker->add_option_filter(sub {
 			my ($self, $from, $to, %opts) = @_;
-			$opts{dl_name} ||= $opts{module_name} if $opts{module_name};
+			$opts{dl_name} //= $opts{module_name} if $opts{module_name};
 			return ($from, $to, %opts);
 		});
 	}
@@ -59,7 +59,7 @@ sub process_linker {
 		$linker->add_argument(ranking => 80, value => _split_var($config, $opts, 'perllibs'));
 	}
 	if ($linker->type eq 'executable') {
-		my $rpath = $opts->{rpath} || [ split_like_shell($config->get('ccdlflags') =~ $rpath_regex) ];
+		my $rpath = $opts->{rpath} // [ split_like_shell($config->get('ccdlflags') =~ $rpath_regex) ];
 		$linker->add_argument(ranking => 40, value => $rpath) if @{$rpath};
 	}
 	return;
@@ -81,7 +81,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.91.0
+    version v0.92.0
 
 SYNOPSIS
 
@@ -74,6 +74,23 @@ FUNCTIONS
     passed as the only parameter. Using a generic $type variable makes it
     much easier to copy and paste test code from other type tests without
     accidentally forgetting to change your custom type within the code.
+
+    If the type can be inlined, this will also run two separate subtests
+    (within the main type subtest) to check both the inlined constraint and
+    the slower coderef constraint. The second subtest will have a
+    inline-less type, cloned from the original type. This is done by
+    stripping out the inlined constraint (or generator) in the clone.
+
+    The tester sub will be used in both subtests. If you need the inlined
+    constraint for certain tests, you can use the $type->can_be_inlined
+    method to check which version of the test its running. However, inlined
+    checks should do the exact same thing as coderef checks, so keep these
+    kind of exceptions to a minimum.
+
+    Note that it doesn't do anything to the parent types. If your type
+    check is solely relying on parent checks, this will only run the one
+    subtest. If the parent checks are part of your package, you should
+    check those separately.
 
  Testers
 

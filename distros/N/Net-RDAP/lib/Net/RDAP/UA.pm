@@ -1,8 +1,9 @@
 package Net::RDAP::UA;
 use base qw(LWP::UserAgent);
-use Carp;
 use File::stat;
+use File::Slurp;
 use HTTP::Date;
+use HTTP::Request::Common;
 use Mozilla::CA;
 use constant DEFAULT_CACHE_TTL => 300;
 use strict;
@@ -23,50 +24,64 @@ sub new {
     return bless($package->SUPER::new(%options), $package);
 }
 
+sub send_request {
+    my ($self, $req) = @_;
+
+    print STDERR $req->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
+
+    my $res = $self->SUPER::send_request($req);
+
+    print STDERR $res->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
+
+    return $res;
+}
+
 #
 # usage: $ua->mirror($url, $file, $ttl);
 #
-# this overrides the parent mirror() method to avoid a network roundtrip if a
-# locally-cached copy of the resource is less than $ttl seconds old. If not
-# provided, the default value for $ttl is 300 seconds.
+# this re-implements the parent mirror() method to avoid a network roundtrip if
+# a locally-cached copy of the resource is less than $ttl seconds old.
 #
 sub mirror {
     my ($self, $url, $file, $ttl) = @_;
 
-    if (-e $file) {
-        my $expires = stat($file)->mtime + ($ttl || DEFAULT_CACHE_TTL);
-        return HTTP::Response->new(304) unless (time() > $expires);
-    }
-
     my $response;
 
-    eval {
-        $response = $self->SUPER::mirror($url, $file);
-    };
+    my $request = GET($url);
 
-    if ($@) {
-        chomp($@);
-        carp($@);
-        return HTTP::Response->new(500, $@);
-    }
+    if (-e $file && time() < stat($file)->mtime + (defined($ttl) ? $ttl : DEFAULT_CACHE_TTL)) {
+        print STDERR $request->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
 
-    carp($response->status_line) unless ($response->is_success || 304 == $response->code);
+        $response = HTTP::Response->new(304);
+        $response->header(q{X-Internally-Generated} => q{true});
 
-    if (-e $file) {
-        my $mtime = time();
+        print STDERR $response->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
 
-        foreach my $header (qw(expires date)) {
-            if ($response->header($header)) {
-                my $time = HTTP::Date->str2time($response->header($header));
-                if (defined($time)) {
-                    $mtime = $time;
-                    last;
+    } else {
+        $request->header(q{If-Modified-Since} => HTTP::Date::time2str(stat($file)->mtime)) if (-e $file && $ttl > 0);
+
+        $response = $self->request($request);
+
+        if (200 == $response->code) {
+            write_file($file, $response->decoded_content);
+            chmod(0600, $file);
+
+        } elsif (304 == $response->code) {
+            my $mtime = time();
+
+            foreach my $header (qw(expires date)) {
+                if ($response->header($header)) {
+                    my $time = HTTP::Date::str2time($response->header($header));
+                    if (defined($time)) {
+                        $mtime = $time;
+                        last;
+                    }
                 }
             }
-        }
 
-        utime($mtime, $mtime, $file);
-        chmod(0600, $file);
+            utime($mtime, $mtime, $file);
+            chmod(0600, $file);
+        }
     }
 
     return $response;

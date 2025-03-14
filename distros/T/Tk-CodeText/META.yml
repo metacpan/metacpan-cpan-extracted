@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-CodeText/issues
   repository: git://github.com/haje61/Tk-CodeText.git
-version: '0.65'
+version: '0.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

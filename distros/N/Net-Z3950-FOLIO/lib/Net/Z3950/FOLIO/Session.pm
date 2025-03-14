@@ -107,8 +107,7 @@ sub _isoStringToEpoch {
 sub maybeRefreshToken {
     my $this = shift();
 
-    my $ua = $this->{ua};
-    my $cj = $ua->cookie_jar();
+    my $cj = $this->{ua}->cookie_jar();
     if ($cj->as_string()) {
 	my $accessToken = $cj->as_string();
 	$accessToken =~ s/.*folioAccessToken=(.*?);.*/$1/s;

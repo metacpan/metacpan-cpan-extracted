@@ -1,0 +1,41 @@
+---
+abstract: 'ad-hoc, informally-specified, bug-ridden, slow implementation of half of a web framework'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.0'
+  File::Find: '0'
+  File::Spec: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Klonk
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  Carp: '0'
+  Function::Parameters: '2'
+  HTML::Blitz: '0'
+  IO::Handle: '0'
+  Unicode::UTF8: '0'
+  constant: '0'
+  feature: '0'
+  parent: '0'
+  perl: '5.036000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://codeberg.org/mauke/Klonk/issues
+  repository: https://codeberg.org/mauke/Klonk.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for perl module Net::RDAP:
 
+0.34 - 2025-03-13
+  - resolve issues with caching.
+  - Net::RDAP::JCard->nodes() now emits a deprecation notice.
+  - add Net::RDAP::Service->new_for_tld()
+
 0.33 - 2024-10-16
   - use LWP::Online to skip tests that require an internet connection when
     offline (thanks Petr Pisar)

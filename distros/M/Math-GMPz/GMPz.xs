@@ -2124,7 +2124,7 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
 
   if(object) {
 
-    if(strEQ(h, "Math::GMPz")) {
+    if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
       mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
       return obj_ref;
     }
@@ -2223,7 +2223,7 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(object) {
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -2337,7 +2337,7 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(object) {
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_sub(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -2467,7 +2467,7 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(object) {
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          Rmpz_tdiv_q(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return obj_ref;
        }
@@ -2569,7 +2569,7 @@ SV * overload_mod (pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_mod(*mpz_t_obj, *INT2PTR(mpz_t *, SvIVX(SvRV(a))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -2688,15 +2688,13 @@ SV * _overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      return obj_ref;
 }
 
-SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
+SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
      unsigned long int ui = 0;
      const char *h;
+     size_t len = 0;
      int object = 0;
-
-     if(mpz_fits_uint_p(*(INT2PTR(mpz_t *, SvIVX(SvRV(a))))))
-       ui = mpz_get_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
 
      if(sv_isobject(b)) {
        object = 1;
@@ -2705,6 +2703,12 @@ SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        if(strEQ(h, "Math::MPFR")) { /* will return if called */
          _overload_callback("Math::MPFR::overload_pow", "Math::GMPz:overload_pow", &PL_sv_yes);
        }
+     }
+
+     if(SWITCH_ARGS) { /* Math::GMPz object a needs to fit into unsigned long */
+       if(mpz_fits_uint_p(*(INT2PTR(mpz_t *, SvIVX(SvRV(a))))))
+         ui = mpz_get_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
+      else croak("Exponent does not fit into unsigned long int");
      }
 
      /* Having got to here, we need to prepare a new object to return */
@@ -2719,39 +2723,74 @@ SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
          if(SWITCH_ARGS) {
-           if(ui && SvUVX(b) <= (UV)ULONG_MAX) {
+           /* ui has been assigned the value of a */
+#if IVSIZE > LONGSIZE
+           if(SvUVX(b) <= ULONG_MAX) {
+#endif
+             mpz_ui_pow_ui(*mpz_t_obj, (unsigned long)SvUVX(b), ui);
+             return obj_ref;
+#if IVSIZE > LONGSIZE
+           }
+#endif
+           /* else: */
+           mpz_set_str(*mpz_t_obj, SvPV(b, len), 10);
+           mpz_pow_ui(*mpz_t_obj, *mpz_t_obj, ui);
+           return obj_ref;
+         }
+         /* else: */
+#if IVSIZE > LONGSIZE
+         if(SvUVX(b) > ULONG_MAX) {
+           croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
+         }
+#endif
+         mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))) , (unsigned long)SvUVX(b));
+         return obj_ref;
+       } /* close SvUOK */
+
+       if(SWITCH_ARGS) {
+         /* ui has been assigned the value of a */
+#if IVSIZE > LONGSIZE
+         if(SvIVX(b) <= ULONG_MAX) {
+#endif
+           if(SvIVX(b) <= ULONG_MAX && SvIVX(b) >= 0) {
              mpz_ui_pow_ui(*mpz_t_obj, (unsigned long)SvUVX(b), ui);
              return obj_ref;
            }
-           croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
+#if IVSIZE > LONGSIZE
          }
-         mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))) , (unsigned long)SvUVX(b));
-         return obj_ref;
+#endif
+         /* else: */
+         mpz_set_str(*mpz_t_obj, SvPV(b, len), 10);
+         mpz_pow_ui(*mpz_t_obj, *mpz_t_obj, ui);
        }
-
-       if(SvIVX(b) < 0) croak("Negative argument supplied to Math::GMPz::overload_pow");
-       if(SWITCH_ARGS) {
-         if(ui) {
-           mpz_ui_pow_ui(*mpz_t_obj, (unsigned long)SvUVX(b), ui);
-           return obj_ref;
-         }
+       /* else: */
+#if IVSIZE > LONGSIZE
+       if(SvIVX(b) > ULONG_MAX) {
          croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
        }
+#endif
+       if(SvIVX(b) < 0) {
+         croak("Negative argument supplied to Math::GMPz::overload_pow");
+       }
+
        mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (unsigned long)SvUVX(b));
        return obj_ref;
-     }
+     } /* close SvIOK */
 
      if(object) {
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          if(mpz_fits_uint_p(*(INT2PTR(mpz_t *, SvIVX(SvRV(b)))))) {
            ui = mpz_get_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
            mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), ui);
            return obj_ref;
          }
+         /* else: */
+         croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
        }
      }
 
      croak("Invalid argument supplied to Math::GMPz::overload_pow. Exponent must fit into unsigned long (or be a Math::MPFR object)");
+
 }
 
 SV * overload_sqrt(pTHX_ mpz_t * p, SV * second, SV * third) {
@@ -2828,7 +2867,7 @@ SV * overload_and(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_and(*mpz_t_obj, *a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -2915,7 +2954,7 @@ SV * overload_ior(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_ior(*mpz_t_obj, *a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -3002,7 +3041,7 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_xor(*mpz_t_obj, *a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
@@ -3061,7 +3100,7 @@ int my_cmp_z(mpq_t * p, mpz_t *z) {
     return ret;
 }
 
-SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3106,7 +3145,7 @@ SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret > 0) return newSViv(1);
          return newSViv(0);
@@ -3156,7 +3195,7 @@ SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_gt");
 }
 
-SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3200,7 +3239,7 @@ SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret >= 0) return newSViv(1);
          return newSViv(0);
@@ -3250,7 +3289,7 @@ SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_gte");
 }
 
-SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3294,7 +3333,7 @@ SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret < 0) return newSViv(1);
          return newSViv(0);
@@ -3344,7 +3383,7 @@ SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_lt");
 }
 
-SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3388,7 +3427,7 @@ SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret <= 0) return newSViv(1);
          return newSViv(0);
@@ -3438,7 +3477,7 @@ SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_lte");
 }
 
-SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3476,7 +3515,7 @@ SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return newSViv(ret);
        }
@@ -3520,7 +3559,7 @@ SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_spaceship");
 }
 
-SV * overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret = 0;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3557,7 +3596,7 @@ SV * overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret == 0) return newSViv(1);
          return newSViv(0);
@@ -3606,7 +3645,7 @@ SV * overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_equiv");
 }
 
-SV * overload_not_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
+SV * _overload_not_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
      int ret = 0;
      mpz_t t;
      MBI_DECLARATIONS
@@ -3643,7 +3682,7 @@ SV * overload_not_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          if(ret != 0) return newSViv(1);
          return newSViv(0);
@@ -3761,7 +3800,7 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
@@ -3857,7 +3896,7 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
@@ -3953,7 +3992,7 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
@@ -3989,12 +4028,18 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::GMPz::overload_and_eq");
 }
 
-SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
-     PERL_UNUSED_ARG(third);
+SV * _overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
      SvREFCNT_inc(a);
 
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
+#if IVSIZE > LONGSIZE
+         if(SvUVX(b) > ULONG_MAX) {
+           SvREFCNT_dec(a);
+           croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow_eq");
+         }
+#endif
          mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (unsigned long)SvUVX(b));
          return a;
        }
@@ -4003,13 +4048,19 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
          SvREFCNT_dec(a);
          croak("Negative argument supplied to Math::GMPz::overload_pow_eq");
        }
+#if IVSIZE > LONGSIZE
+       if(SvIVX(b) > ULONG_MAX) {
+         SvREFCNT_dec(a);
+         croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow_eq");
+       }
+#endif
        mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (unsigned long)SvUVX(b));
        return a;
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          if(mpz_fits_uint_p(*(INT2PTR(mpz_t *, SvIVX(SvRV(b)))))) {
            mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))),
                       *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))),
@@ -4019,10 +4070,7 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_pow", "Math::GMPz:overload_pow", &PL_sv_yes);
-         }
-         else warn("This operation (**=) requires that $Math::GMPz::RETYPE is TRUE\n");
+          _overload_callback("Math::MPFR::overload_pow", "Math::GMPz:overload_pow", &PL_sv_yes);
        }
      }
 
@@ -4122,25 +4170,19 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_mod(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
-           return a;
-         }
-         else warn("This operation (%%=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::MPFR::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+         return a;
        }
 
        if(strEQ(h, "Math::GMPq")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::GMPq::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
-           return a;
-         }
-         else warn("This operation (%%=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::GMPq::overload_fmod", "Math::GMPz::overload_mod", &PL_sv_yes);
+         return a;
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -4246,24 +4288,18 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          /* mpz_tdiv_q(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b))))); */
          Rmpz_tdiv_q(INT2PTR(mpz_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
 
        if(strEQ(h, "Math::GMPq")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::GMPq::overload_div", "Math::GMPz::overload_div", &PL_sv_yes);
-         }
-         else warn("This operation (/=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::GMPq::overload_div", "Math::GMPz::overload_div", &PL_sv_yes);
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_div", "Math::GMPz::overload_div", &PL_sv_yes);
-         }
-         else warn("This operation (/=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::MPFR::overload_div", "Math::GMPz::overload_div", &PL_sv_yes);
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -4354,23 +4390,17 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_sub(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
 
        if(strEQ(h, "Math::GMPq")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::GMPq::overload_sub", "Math::GMPz::overload_sub", &PL_sv_yes);
-         }
-         else warn("This operation (-=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::GMPq::overload_sub", "Math::GMPz::overload_sub", &PL_sv_yes);
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_sub", "Math::GMPz::overload_sub", &PL_sv_yes);
-         }
-         else warn("This operation (-=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::MPFR::overload_sub", "Math::GMPz::overload_sub", &PL_sv_yes);
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -4464,23 +4494,17 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_add(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
 
        if(strEQ(h, "Math::GMPq")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::GMPq::overload_add", "Math::GMPz::overload_add", newSViv(0));
-         }
-         else warn("This operation (+=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::GMPq::overload_add", "Math::GMPz::overload_add", newSViv(0));
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_add", "Math::GMPz::overload_add", newSViv(0));
-         }
-         else warn("This operation (+=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::MPFR::overload_add", "Math::GMPz::overload_add", newSViv(0));
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -4569,23 +4593,17 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
-       if(strEQ(h, "Math::GMPz")) {
+       if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          mpz_mul(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
          return a;
        }
 
        if(strEQ(h, "Math::GMPq")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::GMPq::overload_mul", "Math::GMPz::overload_mul", newSViv(0));
-         }
-         else warn("This operation (*=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::GMPq::overload_mul", "Math::GMPz::overload_mul", newSViv(0));
        }
 
        if(strEQ(h, "Math::MPFR")) {
-         if(SvIV(get_sv("Math::GMPz::RETYPE", 0))) {
-           _overload_callback("Math::MPFR::overload_mul", "Math::GMPz::overload_mul", newSViv(0));
-         }
-         else warn("This operation (*=) requires that $Math::GMPz::RETYPE is TRUE\n");
+         _overload_callback("Math::MPFR::overload_mul", "Math::GMPz::overload_mul", newSViv(0));
        }
 
        if(strEQ(h, "Math::BigInt")) {
@@ -4949,6 +4967,8 @@ SV * _itsa(pTHX_ SV * a) {
      if(SV_IS_NOK(a)) return newSViv(3);
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
+       if(strEQ(h, "Math::MPFR")) return newSVuv(5);
+       if(strEQ(h, "Math::GMPf")) return newSVuv(6);
        if(strEQ(h, "Math::GMPz"))        return newSViv(8);
        if(strEQ(h, "Math::GMP"))         return newSViv(9);
        if(strEQ(h, "Math::BigInt"))      return newSViv(-1);
@@ -7266,12 +7286,12 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
-overload_pow (a, b, third)
+_overload_pow (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_pow (aTHX_ a, b, third);
+  RETVAL = _overload_pow (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
@@ -7325,66 +7345,66 @@ my_cmp_z (p, z)
 	mpz_t *	z
 
 SV *
-overload_gt (a, b, third)
+_overload_gt (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_gt (aTHX_ a, b, third);
+  RETVAL = _overload_gt (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_gte (a, b, third)
+_overload_gte (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_gte (aTHX_ a, b, third);
+  RETVAL = _overload_gte (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_lt (a, b, third)
+_overload_lt (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_lt (aTHX_ a, b, third);
+  RETVAL = _overload_lt (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_lte (a, b, third)
+_overload_lte (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_lte (aTHX_ a, b, third);
+  RETVAL = _overload_lte (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_spaceship (a, b, third)
+_overload_spaceship (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_spaceship (aTHX_ a, b, third);
+  RETVAL = _overload_spaceship (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_equiv (a, b, third)
+_overload_equiv (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_equiv (aTHX_ a, b, third);
+  RETVAL = _overload_equiv (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
-overload_not_equiv (a, b, third)
+_overload_not_equiv (a, b, third)
 	mpz_t *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_not_equiv (aTHX_ a, b, third);
+  RETVAL = _overload_not_equiv (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *
@@ -7424,12 +7444,12 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
-overload_pow_eq (a, b, third)
+_overload_pow_eq (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
 CODE:
-  RETVAL = overload_pow_eq (aTHX_ a, b, third);
+  RETVAL = _overload_pow_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *

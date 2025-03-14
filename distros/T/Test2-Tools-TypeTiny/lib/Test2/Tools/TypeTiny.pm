@@ -2,7 +2,7 @@ package Test2::Tools::TypeTiny;
 
 # ABSTRACT: Test2 tools for checking Type::Tiny types
 use version;
-our $VERSION = 'v0.91.0'; # VERSION
+our $VERSION = 'v0.92.0'; # VERSION
 
 use v5.18;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use parent 'Exporter';
 
 use List::Util v1.29 qw< uniq shuffle pairmap pairs >;
-use Scalar::Util     qw< refaddr >;
+use Scalar::Util     qw< blessed refaddr >;
 
 use Test2::API            qw< context run_subtest >;
 use Test2::Tools::Basic;
@@ -102,21 +102,89 @@ our @EXPORT = @EXPORT_OK;
 #pod and paste test code from other type tests without accidentally forgetting to change your custom
 #pod type within the code.
 #pod
+#pod If the type can be inlined, this will also run two separate subtests (within the main type subtest)
+#pod to check both the inlined constraint and the slower coderef constraint.  The second subtest will
+#pod have a inline-less type, cloned from the original type.  This is done by stripping out the inlined
+#pod constraint (or generator) in the clone.
+#pod
+#pod The tester sub will be used in both subtests.  If you need the inlined constraint for certain
+#pod tests, you can use the C<< $type->can_be_inlined >> method to check which version of the test its
+#pod running.  However, inlined checks should do the exact same thing as coderef checks, so keep these
+#pod kind of exceptions to a minimum.
+#pod
+#pod Note that it doesn't do anything to the parent types.  If your type check is solely relying on
+#pod parent checks, this will only run the one subtest.  If the parent checks are part of your package,
+#pod you should check those separately.
+#pod
 #pod =cut
 
 sub type_subtest ($&) {
-    my ($type, $subtest) = @_;
+    my ($type, $tester_coderef) = @_;
 
-    my $ctx  = context();
-    my $pass = run_subtest(
-        "Type Test: ".$type->display_name,
-        $subtest,
-        { buffered => 1 },
-        $type,
-    );
+    my $ctx = context();
+    my $pass;
+
+    # XXX: Private method abuse
+    if (!$type->_is_null_constraint && $type->has_inlined) {
+        $pass = run_subtest(
+            "Type Test: ".$type->display_name,
+            \&_multi_type_split_subtest,
+            { buffered => 1, inherit_trace => 1 },
+            $type, $tester_coderef,
+        );
+    }
+    else {
+        $pass = run_subtest(
+            "Type Test: ".$type->display_name,
+            $tester_coderef,
+            { buffered => 1 },
+            $type,
+        );
+    }
+
     $ctx->release;
 
     return $pass;
+}
+
+sub _multi_type_split_subtest {
+    my ($type, $tester_coderef) = @_;
+    my $ctx = context();
+
+    plan 2;
+
+    my $orig_result = run_subtest(
+        'original type',
+        $tester_coderef,
+        { buffered => 1 },
+        $type,
+    );
+
+    ### XXX: There is some internal mechanics abuse to try to get this type, because Type::Tiny
+    ### doesn't really have a $type->create_inlineless_type method, and methods like _clone and
+    ### create_child_type don't cleanly do what we want.  (We don't want a child type that
+    ### would be impacted by parental inlined constraints.)
+
+    # Create the inline-less type
+    my %inlineless_opts = %$type;
+    delete $inlineless_opts{$_} for qw<
+        compiled_type_constraint uniq tmp
+        inlined inline_generator
+        _overload_coderef _overload_coderef_no_rebuild
+    >;
+    $inlineless_opts{display_name} .= ' (inline-less)';
+
+    my $inlineless_type = blessed($type)->new(%inlineless_opts);
+
+    my $inlineless_result = run_subtest(
+        'inline-less type',
+        $tester_coderef,
+        { buffered => 1 },
+        $inlineless_type,
+    );
+
+    $ctx->release;
+    return $orig_result && $inlineless_result;
 }
 
 #pod =head2 Testers
@@ -615,7 +683,7 @@ Test2::Tools::TypeTiny - Test2 tools for checking Type::Tiny types
 
 =head1 VERSION
 
-version v0.91.0
+version v0.92.0
 
 =head1 SYNOPSIS
 
@@ -685,6 +753,20 @@ Creates a L<buffered subtest|Test2::Tools::Subtest/BUFFERED> with the given type
 and passed as the only parameter.  Using a generic C<$type> variable makes it much easier to copy
 and paste test code from other type tests without accidentally forgetting to change your custom
 type within the code.
+
+If the type can be inlined, this will also run two separate subtests (within the main type subtest)
+to check both the inlined constraint and the slower coderef constraint.  The second subtest will
+have a inline-less type, cloned from the original type.  This is done by stripping out the inlined
+constraint (or generator) in the clone.
+
+The tester sub will be used in both subtests.  If you need the inlined constraint for certain
+tests, you can use the C<< $type->can_be_inlined >> method to check which version of the test its
+running.  However, inlined checks should do the exact same thing as coderef checks, so keep these
+kind of exceptions to a minimum.
+
+Note that it doesn't do anything to the parent types.  If your type check is solely relying on
+parent checks, this will only run the one subtest.  If the parent checks are part of your package,
+you should check those separately.
 
 =head2 Testers
 

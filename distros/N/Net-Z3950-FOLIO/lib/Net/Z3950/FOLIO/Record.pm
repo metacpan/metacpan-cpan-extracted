@@ -88,7 +88,7 @@ sub marcRecord {
 	}
 
 	$marc = $this->{marc};
-	Net::Z3950::FOLIO::_throw(1, "missing MARC record") if !defined $marc;
+	Net::Z3950::FOLIO::_throw(1, "missing MARC record", undef, 1) if !defined $marc;
     }
 
     if (!$this->{processed}) {

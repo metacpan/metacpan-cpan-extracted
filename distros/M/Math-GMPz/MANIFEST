@@ -64,7 +64,10 @@ t/NV_overloading.t
 t/out_str.t
 t/overload.t
 t/overload_cross_class.t
+t/overload_cross_class_mod.t
+t/overload_cross_class_mpfr.t
 t/overload_op_eq.t
+t/overload_power.t
 t/overload_shift.t
 t/overload_switch.t
 t/printf.t

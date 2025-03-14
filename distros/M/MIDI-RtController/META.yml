@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController
   repository: https://github.com/ology/MIDI-RtController.git
-version: '0.0404'
+version: '0.0405'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -242,8 +242,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match:
-            - \.png
+          exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

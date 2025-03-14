@@ -1,13 +1,12 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.022';
+$ExtUtils::Builder::Linker::VERSION = '0.023';
 use strict;
 use warnings;
 
 use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
-use ExtUtils::Builder::Action::Command;
-use ExtUtils::Builder::Action::Function;
 use ExtUtils::Builder::Node;
+use ExtUtils::Builder::Util qw/command function/;
 
 use Carp ();
 use File::Basename 'dirname';
@@ -95,7 +94,7 @@ sub pre_action  {
 	my @result;
 	if ($self->export eq 'some') {
 		my %args = map { $key_for{$_} => $opts{$_} } grep { exists $key_for{$_} } keys %opts;
-		push @result, ExtUtils::Builder::Action::Function->new(
+		push @result, function(
 			module    => 'ExtUtils::Mksymlists',
 			function  => 'Mksymlists',
 			message   => join(' ', 'prelink', $to, %args),
@@ -105,7 +104,7 @@ sub pre_action  {
 	}
 	if ($opts{mkdir}) {
 		my $dirname = File::Basename::dirname($to);
-		push @result, ExtUtils::Builder::Action::Function->new(
+		push @result, function(
 			module    => 'File::Path',
 			function  => 'make_path',
 			exports   => 'explicit',
@@ -122,9 +121,9 @@ sub link {
 	@args = $self->$_(@args) for @{ $self->{option_filters} };
 	my ($from, $to, %opts) = @args;
 	my @argv    = $self->arguments(@args);
-	my $main    = ExtUtils::Builder::Action::Command->new(command => [ $self->ld, @argv ]);
+	my $main    = command($self->ld, @argv);
 	my @actions = ($self->pre_action(@args), $main, $self->post_action(@args));
-	my $deps    = [ @{$from}, @{ $opts{dependencies} || [] } ];
+	my $deps    = [ @{$from}, @{ $opts{dependencies} // [] } ];
 	return ExtUtils::Builder::Node->new(target => $to, dependencies => $deps, actions => \@actions);
 }
 
@@ -142,7 +141,7 @@ ExtUtils::Builder::Linker
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 METHODS
 

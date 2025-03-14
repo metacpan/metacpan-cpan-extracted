@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::Cpp;
-$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.022';
+$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -7,14 +7,14 @@ use parent 'ExtUtils::Builder::AutoDetect::C';
 
 sub _get_compiler {
 	my ($self, $opts) = @_;
-	my $os = $opts->{osname} || $^O;
+	my $os = $opts->{osname} // $^O;
 	my $cc = $self->_get_opt($opts, 'cc');
 	return $self->_is_gcc($cc, $opts) ? $self->SUPER::_get_compiler({ cc => 'g++', %{$opts} }) : is_os_type('Windows', $os) ? $self->SUPER::_get_compiler({ language => 'C++', %{$opts} }) : Carp::croak('Your platform is not supported yet');
 }
 
 sub _get_linker {
 	my ($self, $opts) = @_;
-	my $os = $opts->{osname} || $^O;
+	my $os = $opts->{osname} // $^O;
 	my $cc = $self->_get_opt($opts, 'cc');
 	return $self->_is_gcc($cc, $opts) ? $self->SUPER::_get_linker({ cc => 'g++', %{$opts} }) : is_os_type('Windows', $os) ? $self->SUPER::_get_linker({ language => 'C++', %{$opts} }) : Carp::croak('Your platform is not supported yet');
 	return;
@@ -34,7 +34,7 @@ ExtUtils::Builder::AutoDetect::Cpp
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

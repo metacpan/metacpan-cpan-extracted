@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use LWP::Online qw(:skip_all);
 use Test::More;
 use URI;

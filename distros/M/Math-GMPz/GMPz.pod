@@ -1079,18 +1079,30 @@
 
    OPERATOR OVERLOADING
 
-    Overloading works with numbers, strings, Math::GMPz objects,
-    Math::BigInt objects and, to a limited extent, Math::GMPq objects
-    (iff the gmp library is version 6.1.0 or later) and Math::MPFR
-    objects (iff version 3.13 or later of Math::MPFR has been
-    installed).
+    Overloading works with numbers, strings (integer only), Math::GMPz
+    objects, and Math::BigInt objects. Non-integer NV values will be
+    truncated (ie rounded towards zero) to an integer value.
+
+    I believe (not rigorously tested) that wherever the Math::GMPz
+    operator overloading accepts a Math::GMPz object as the second arg,
+    it will alternatively accept (and understand) a Math::GMP object as
+    that second arg. Indications are that Math::GMP reciprocates.
+    See also "INTEROPERABILITY WITH GMP", below.
+
+    YMMV if you use old versions of Math::GMPq and Math::MPFR, but if you
+    have Math-GMPq-0.61 (or later) and Math-MPFR-4.37 (or later) then, apart
+    from the exceptions noted below, you will be able to use Math::GMPq and
+    Math::MPFR with the overloaded Math::GMPz operations. Such operations
+    return Math::MPFR objects calculated in accordance with Math::MPFR
+    default precision & default rounding, and (respectively) Math::GMPq
+    objects.
 
    The following operators are overloaded:
-    + - * / % **
-    += -= *= /= %= **=
+    + - * / % **           # '**'  not usable with Math::GMPq objects
+    += -= *= /= %= **=     # '**=' not usable with Math::GMPq objects
     << >> <<= >>=
-    & | ^ ~
-    &= |= ^=
+    & | ^ ~       # Not usable with Math::GMPq and Math::MPFR objects
+    &= |= ^=      # Not usable with Math::GMPq and Math::MPFR objects
     < <= > >= == != <=>
     ! abs
     =
@@ -1100,11 +1112,6 @@
           read it thoroughly, including the documentation regarding
           'copy constructors'.
 
-    The "power" operators ('**' and '**=') do not accept perl scalars
-    that are either NVs (floating point types) or -ve IVs (integers).
-    Values that are too large to fit into a C 'unsigned long int'
-    will be silently truncated.
-
     Division uses 'tdiv' (see 'Integer Division', above).
     Check that '~', '%', and '%=' are working as you expect
     (especially in relation to negative values).
@@ -1112,32 +1119,6 @@
     Attempting to use the overloaded operators with objects that have
     been blessed into some package other than 'Math::BigInt', 'Math::GMP',
    'Math::GMPz', 'Math::GMPq', or 'Math::MPFR' will not work.
-
-    Math::MPFR objects can be provided as the second arg  with '+',
-    '-', '*', '/' and '**' operators - in which case the operation will
-    return a Math::MPFR object (calculated using default Math::MPFR
-    precision and default Math::MPFR rounding mode).
-    For comparisons (==, !=, <, <=, >, >=, <=>) between Math::MPFR and
-    Math::GMPz objects, you need to invoke the Math::MPFR overloading
-    as the Math::GMPz overloading does not accommodate such comparisons.
-    eg - do ($mpfr_obj > $mpz_obj), not ($mpz_obj < $mpfr_obj).
-
-    If $Math::GMPz:RETYPE is set to 1, then Math::MPFR objects can also
-    be provided as the second arg with '+=', '*=', '-=', '/=' and '**='
-    operators. In such instances, the Math::GMPz object becomes
-    (is "retyped" to) a Math::MPFR object that contains the result of
-    the operation, using default Math::MPFR precision and default
-    Math::MPFR rounding mode.
-    $Math::GMPz::RETYPE is initially set to 1.
-
-    Math::GMPq objects can be provided as the second arg with the
-    comparison operators ( == != < <= > >= <=> ) and also, iff
-    Math-GMPq-0.43 or later is installed, with '+', '-', '/', and '*'
-    operators (in which case a Math::GMPq object is returned).
-    If $Math::GMPz::RETYPE is set to 1, then Math::GMPq objects can
-    also be used with '+=', '*=', '-=', and '/=' and operators.
-    In such instances, the Math::GMPz object becomes (is "retyped" to)
-    a Math::GMPq object containing the exact result of the operation.
 
     To determine the type and value of the second argument the subroutine
     works through the following steps (in order), using the first value
@@ -1271,8 +1252,17 @@
     for you. ie the following will work:
      Rmpz_snprintf($buffer, 6 "hello world", 12);
 
-   ###################
-   ###################
+   ###############################
+
+   INTEROPERABILITY WITH MATH::GMP
+
+    In addition to Math::GMPz's overloaded operators accepting both
+    Math::GMP and Math::GMPz objects (see "OPERATOR OVERLOADING"),
+    Math::GMPz function calls seem to also accept Math::GMP and
+    Math::GMPz objects interchangeably. (Not rigorously tested.)
+
+   ###############################
+   ###############################
 
 =head1 BUGS
 

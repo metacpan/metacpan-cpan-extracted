@@ -1,0 +1,34 @@
+NAME
+
+    Klonk - ad-hoc, informally-specified, bug-ridden, slow implementation of
+    half of a web framework
+
+INSTALLATION
+
+    To download and install this module, use your favorite CPAN client, e.g.
+    "cpan":
+
+        cpan Klonk
+
+    Or "cpanm":
+
+        cpanm Klonk
+
+    To do it manually, run the following commands (after downloading and
+    unpacking the tarball):
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+COPYRIGHT & LICENSE
+
+    Copyright 2025 Lukas Mai.
+
+    This module is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License
+    <https://www.gnu.org/licenses/gpl-3.0.html> as published by the Free
+    Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+

@@ -21,8 +21,10 @@ meta-spec:
   version: '1.4'
 name: MIDI-RtController-Filter-Gene
 requires:
+  Array::Circular: '0'
   List::SomeUtils: '0'
   List::Util: '0'
+  MIDI::RtMidi::ScorePlayer: '0'
   Moo: '2'
   Music::Chord::Note: '0'
   Music::Note: '0'
@@ -36,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-Gene
   repository: https://github.com/ology/MIDI-RtController-Filter-Gene.git
-version: '0.0101'
+version: '0.0105'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -244,8 +246,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match:
-            - \.png
+          exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

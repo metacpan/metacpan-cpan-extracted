@@ -66,6 +66,7 @@ lib/Net/Z3950/FOLIO/RPN.pm
 lib/Net/Z3950/FOLIO/Record.pm
 lib/Net/Z3950/FOLIO/ResultSet.pm
 lib/Net/Z3950/FOLIO/Session.pm
+lib/Net/Z3950/FOLIO/SurrogateDiagnostic.pm
 lib/Net/Z3950/FOLIO/lodashGet.pm
 t/01-pqf-to-cql.t
 t/02-sortspec.t

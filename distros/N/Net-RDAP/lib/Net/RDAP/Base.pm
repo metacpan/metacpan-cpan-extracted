@@ -152,10 +152,11 @@ sub top {
     @chain = $object->chain;
 
 Returns an array containing the hierarchy of objects that enclose this object.
-So for example, the registrar entity of host object of a domain name will have a
-chain that looks like C<[Net::RDAP::Object::Entity,
-Net::RDAP::Object::Nameserver, Net::RDAP::Object::Domain]>. If the object is the
-topmost object of the RDAP response, the array will be empty.
+So for example, the registrar entity of a nameserver object of a domain name
+will have a chain that looks like
+C<[Net::RDAP::Object::Entity, Net::RDAP::Object::Nameserver, Net::RDAP::Object::Domain]>.
+If the object is the topmost object of the RDAP response, the array will only
+contain that object.
 
 =cut
 

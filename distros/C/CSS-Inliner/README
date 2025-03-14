@@ -40,6 +40,12 @@ METHODS
     relaxed - (optional) Relaxed HTML parsing which will attempt to
     interpret non-HTML4 documents.
 
+    encode_entities - (optional) Encode generated inline-styles (in case
+    they contain HTML meta characters)
+
+    ignore_style_type_attr - (optional) Ignore the deprecated type attribute
+    of "style" tag
+
     NOTE: This argument is not compatible with passing an html_tree.
 
     agent - (optional) Pass in a string containing a preferred user-agent,

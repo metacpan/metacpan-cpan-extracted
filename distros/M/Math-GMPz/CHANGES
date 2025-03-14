@@ -1,5 +1,13 @@
 Revision history for Perl module Math::GMPz
 
+0.64
+ - Remove $Math::GMPz::RETYPE and all references to it. (The option to turn off
+   the cross-class operator overloading no longer exists.)
+ - Allow strings and NVs with the overloaded pow operators (**' and '**=').
+ - Simplify "overloading" documentation.
+ - Allow Math::GMPz to overload cmp ops between Math::GMPz and Math::MPFR objects.
+   Previously such comparisons could be handled only by the Math::MPFR overloading.
+
 0.63
  - Corrections to overloading of '>>', '>>=', '<<' and '<<=' operators.
  - Allow '%' and '%=' overloading with  Math::GMPq and Math::MPFR objects.

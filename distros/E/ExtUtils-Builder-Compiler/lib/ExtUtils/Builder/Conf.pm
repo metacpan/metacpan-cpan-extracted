@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.022';
+$ExtUtils::Builder::Conf::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ sub add_methods {
 	for my $name (qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags/) {
 		$planner->add_delegate($name, sub {
 			my $self = shift;
-			return @{ $self->{$name} || [] };
+			return @{ $self->{$name} // [] };
 		});
 		$planner->add_delegate("push_$name", sub {
 			my ($self, @args) = @_;
@@ -38,7 +38,7 @@ sub add_methods {
 
 	$planner->add_delegate(defines => sub {
 		my $self = shift;
-		return %{ $self->{defines} || {} };
+		return %{ $self->{defines} // {} };
 	});
 
 	$planner->add_delegate(write_defines => sub {
@@ -74,8 +74,8 @@ sub add_methods {
 		my $inner = $self->new_planner;
 		$inner->load_module('ExtUtils::Builder::AutoDetect::C', 0.015);
 
-		my @include_dirs         = (@{ $args{include_dirs} || [] }, @{ $self->{include_dirs} || [] });
-		my @extra_compiler_flags = (@{ $args{extra_compiler_flags} || [] }, @{ $self->{extra_compiler_flags} || [] });
+		my @include_dirs         = (@{ $args{include_dirs} // [] }, @{ $self->{include_dirs} // [] });
+		my @extra_compiler_flags = (@{ $args{extra_compiler_flags} // [] }, @{ $self->{extra_compiler_flags} // [] });
 
 		my %compile_args = (
 			extra_args   => \@extra_compiler_flags,
@@ -86,9 +86,9 @@ sub add_methods {
 		my $o_file = $inner->obj_file($basename, $dir);
 		$inner->compile($c_file, $o_file, %compile_args);
 
-		my @libraries          = (@{ $args{libraries} || [] },          @{ $self->{libraries} || [] });
-		my @library_dirs       = (@{ $args{library_dirs} || [] },       @{ $self->{library_dirs} || [] });
-		my @extra_linker_flags = (@{ $args{extra_linker_flags} || [] }, @{ $self->{extra_linker_flags} || [] });
+		my @libraries          = (@{ $args{libraries} // [] },          @{ $self->{libraries} // [] });
+		my @library_dirs       = (@{ $args{library_dirs} // [] },       @{ $self->{library_dirs} // [] });
+		my @extra_linker_flags = (@{ $args{extra_linker_flags} // [] }, @{ $self->{extra_linker_flags} // [] });
 
 		my %link_args = (
 			libraries    => \@libraries,
@@ -223,7 +223,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.022';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -53,16 +53,23 @@ sub require_module {
 
 sub add_compiler {
 	my ($self, $planner, %opts) = @_;
-	my $as = $opts{as} || 'compile';
+	my $as = $opts{as} // 'compile';
 	return $planner->add_delegate($as, sub {
 		my ($planner, $from, $to, %extra) = @_;
 		my %args = (%opts, %extra);
 		my $compiler = $self->_make_command($self->_get_compiler(\%args));
-		if (my $profile = $args{profile}) {
-			$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
-			require_module($profile);
-			$profile->process_compiler($compiler, \%args);
+
+		$args{profiles} = [ delete $args{profile} ] if $args{profile} and not $args{profiles};
+		if (my $profiles = $args{profiles}) {
+			for my $profile (@$profiles) {
+				if (not ref($profile)) {
+					$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
+					require_module($profile);
+				}
+				$profile->process_compiler($compiler, \%args);
+			}
 		}
+
 		if (my $include_dirs = $args{include_dirs}) {
 			$compiler->add_include_dirs($include_dirs);
 		}
@@ -72,6 +79,7 @@ sub add_compiler {
 		if (my $extra = $args{extra_args}) {
 			$compiler->add_argument(value => $extra);
 		}
+
 		my $node = $compiler->compile($from, $to, %args);
 		$planner->add_node($node);
 	});
@@ -95,13 +103,14 @@ sub _get_linker {
 	my %args = _filter_args($opts, qw/type export language/);
 	my $cc = $opts->{config}->get('cc');
 	my $ld = $opts->{config}->get('ld');
+	my $eff_ld = $args{type} eq 'executable' ? $cc : $ld;
 	my ($module, $link, %opts) =
 		$args{type} eq 'static-library' ? ('Ar', $opts->{config}->get('ar')) :
-		$os eq 'darwin' ? ('Mach::GCC', $ld) :
+		$os eq 'darwin' ? ('Mach::GCC', $eff_ld) :
 		_is_gcc($opts->{config}, $ld, $opts) ?
-		$os eq 'MSWin32' ? ('PE::GCC', $cc) : ('ELF::GCC', $ld) :
+		$os eq 'MSWin32' ? ('PE::GCC', $cc) : ('ELF::GCC', $eff_ld) :
 		$os eq 'aix' ? ('XCOFF', $cc) :
-		is_os_type('Unix', $os) ? ('ELF', $ld, $self->_unix_flags($opts)) :
+		is_os_type('Unix', $os) ? ('ELF', $eff_ld, $self->_unix_flags($opts)) :
 		$os eq 'MSWin32' ? ('PE::MSVC', $ld) :
 		croak 'Linking is not supported yet on your platform';
 	return ("Linker::$module", ld => $link, %opts, %args);
@@ -109,16 +118,25 @@ sub _get_linker {
 
 sub add_linker {
 	my ($self, $planner, %opts) = @_;
-	my $as = $opts{as} || 'link';
+	my $as = $opts{as} // 'link';
 	return $planner->add_delegate($as, sub {
 		my ($planner, $from, $to, %extra) = @_;
 		my %args = (%opts, %extra);
 		my $linker = $self->_make_command($self->_get_linker(\%args));
-		if (my $profile = $args{profile}) {
-			$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
-			require_module($profile);
-			$profile->process_linker($linker, \%args);
+
+		$args{profiles} = [ delete $args{profile} ] if $args{profile} and not $args{profiles};
+		if (my $profiles = $args{profiles}) {
+			for my $profile (@$profiles) {
+				if (ref($profile)) {
+
+				} else {
+					$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
+					require_module($profile);
+					$profile->process_linker($linker, \%args);
+				}
+			}
 		}
+
 		if (my $library_dirs = $args{library_dirs}) {
 			$linker->add_library_dirs($library_dirs);
 		}
@@ -128,6 +146,7 @@ sub add_linker {
 		if (my $extra_args = $args{extra_args}) {
 			$linker->add_argument(ranking => 85, value => [ @{$extra_args} ]);
 		}
+
 		my $node = $linker->link($from, $to, %args);
 		$planner->add_node($node);
 	});
@@ -136,8 +155,8 @@ sub add_linker {
 sub add_methods {
 	my ($class, $planner, %opts) = @_;
 
-	$opts{config} ||= $planner->can('config') ? $planner->config : ExtUtils::Config->new;
-	$opts{type} ||= 'executable';
+	$opts{config} //= $planner->can('config') ? $planner->config : ExtUtils::Config->new;
+	$opts{type} //= 'executable';
 
 	my $as_compiler = delete $opts{as_compiler};
 	$class->add_compiler($planner, %opts, as => $as_compiler);
@@ -193,14 +212,14 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
  my $planner = ExtUtils::Builder::Planner->new;
  $planner->load_module('ExtUtils::Builder::AutoDetect::C', '0.001',
-	profile => '@Perl',
-	type    => 'loadable-object',
+	profiles => ['@Perl'],
+	type     => 'loadable-object',
  );
  $planner->compile('foo.c', 'foo.o', include_dirs => ['.']);
  $planner->link([ 'foo.o' ], 'foo.so', libraries => ['foo']);
@@ -287,9 +306,9 @@ A loadable extension. On most platforms this is the same as a dynamic library, b
 
 A Perl configuration to take hints from, must be an C<ExtUtils::Config> compatible object.
 
-=item profile
+=item profiles
 
-A profile to be used when compiling and linking. One profile comes with this distribution: C<'@Perl'>, which sets up the appropriate things to compile/link with C<libperl>.
+A list of profile that can be used when compiling and linking. One profile comes with this distribution: C<'@Perl'>, which sets up the appropriate things to compile/link with C<libperl>.
 
 =item include_dirs
 

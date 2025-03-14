@@ -8,7 +8,10 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/math.pl
+eg/tester.pl
 lib/MIDI/RtController/Filter/Gene.pm
+lib/MIDI/RtController/Filter/Math.pm
 t/00-compile.t
 t/01-functions.t
 t/author-eol.t

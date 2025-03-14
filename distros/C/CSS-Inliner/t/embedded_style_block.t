@@ -23,8 +23,23 @@ eval {
 };
 
 ## conditional test plan based on whether or not the endpoint can be reached - frequently can't by cpan testers
-plan $@ ? (skip_all => 'Connectivity for endpoint required for test cannot be established') : (tests => 1);
+plan $@ ? (skip_all => 'Connectivity for endpoint required for test cannot be established') : (tests => 2);
 
 my $inlined = $inliner->inlinify();
+
+ok($inlined eq $correct_result, 'result was correct');
+
+$result_file = $html_path . 'embedded_style_result_encoded.html';
+
+open( $fh, $result_file ) or die "can't open $result_file: $!!\n";
+$correct_result = do { local( $/ ) ; <$fh> } ;
+
+$inliner = CSS::Inliner->new({encode_entities => 1});
+
+eval {
+  $inliner->fetch_file({ url => $test_url });
+};
+
+$inlined = $inliner->inlinify();
 
 ok($inlined eq $correct_result, 'result was correct');

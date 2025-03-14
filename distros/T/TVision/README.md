@@ -24,7 +24,9 @@ code exists here in this glue module.
 
 For strawberry perl users, you can build tvision using the mingw which comes with
 perl. This goes well with recent perl 5.38. However mingw/gcc with older perl unable
-to build tvision.
+to build tvision. Probably it is possible to build turbovision library with some
+recent gcc/mingw/msys and then use it to build the module with older perl, but
+this terra is incognita. Please let me know on your findongs with issue report.
 
 # TODO
 

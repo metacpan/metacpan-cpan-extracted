@@ -38,7 +38,7 @@ the search parameters.
 
     $result->entities;
 
-Returns an array of L<Net::RDAP::Object::Entities> objects which matched
+Returns an array of L<Net::RDAP::Object::Entity> objects which matched
 the search parameters.
 
 =head1 COPYRIGHT

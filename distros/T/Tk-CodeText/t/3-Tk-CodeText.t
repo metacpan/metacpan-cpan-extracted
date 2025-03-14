@@ -14,6 +14,7 @@ if (defined $app) {
 	$text = $app->CodeText(
 		-autoindent => 1,
 		-autocomplete => 1,
+#		-autobrackets => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
 		-indentstyle => 3,

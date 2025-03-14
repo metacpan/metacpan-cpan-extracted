@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Mach::GCC;
-$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.022';
+$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -7,8 +7,8 @@ use parent 'ExtUtils::Builder::Linker::Unixy';
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{ld} ||= [qw/env MACOSX_DEPLOYMENT_TARGET=10.3 cc/];
-	$args{export} ||= 'all';
+	$args{ld} //= [qw/env MACOSX_DEPLOYMENT_TARGET=10.3 cc/];
+	$args{export} //= 'all';
 	$self->SUPER::_init(%args);
 	return;
 }
@@ -45,7 +45,7 @@ ExtUtils::Builder::Linker::Mach::GCC
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

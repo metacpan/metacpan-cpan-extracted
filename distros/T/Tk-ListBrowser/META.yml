@@ -1,0 +1,28 @@
+---
+abstract: 'Tk::IconList like mega widget.'
+author:
+  - 'Hans Jeuken <hanje at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-ListBrowser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Round: '0.08'
+  Test::Tk: '3.04'
+  Tk: '804.033'
+resources:
+  bugtracker: https://github.com/haje61/Tk-ListBrowser/issues
+  repository: git://github.com/haje61/Tk-ListBrowser.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

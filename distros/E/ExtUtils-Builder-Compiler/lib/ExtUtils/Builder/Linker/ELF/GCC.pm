@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::GCC;
-$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.022';
+$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -7,9 +7,9 @@ use parent 'ExtUtils::Builder::Linker::ELF::Any';
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{ld} ||= 'gcc';
-	$args{ccdlflags} ||= ['-Wl,-E'];
-	$args{lddlflags} ||= ['-shared'];
+	$args{ld} //= 'gcc';
+	$args{ccdlflags} //= ['-Wl,-E'];
+	$args{lddlflags} //= ['-shared'];
 	$self->SUPER::_init(%args);
 	return;
 }
@@ -34,7 +34,7 @@ ExtUtils::Builder::Linker::ELF::GCC
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

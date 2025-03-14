@@ -124,7 +124,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.63';
+    our $VERSION = '0.64';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -136,15 +136,6 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     $Math::GMPz::utf8_no_croak     = 0; # croak if utf8::downgrade fails in Rmpz_import.
     $Math::GMPz::utf8_no_fail      = 0; # warn  if $Math::GMPz::utf8_no_croak is true &&
                                         #          utf8::downgrade fails in Rmpz_import.
-
-    $Math::GMPz::RETYPE = 1; # This variable used to be initially set to 0, but
-                             # this has changed, beginning with Math::GMPz-0.62.
-                             # This enables a Math::GMPz object to be coerced to
-                             # a Math::GMPq or Math::MPFR object in certain overloaded
-                             # operations. (See the 'OPERATOR OVERLOADING' section of
-                             # the POD documentation for details.)
-                             # Setting this variable to 0 will cause these "certain
-                             # overloaded operations" to throw a fatal error.
 
     %Math::GMPz::EXPORT_TAGS =(mpz => \@tagged);
 
@@ -555,6 +546,101 @@ sub overload_rshift_eq {
   return _overload_lshift_eq($_[0], -$_[1], $_[2]);
 }
 
+sub overload_gt {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) <  0;
+    return 0;
+  }
+  return _overload_gt(@_);
+}
+
+sub overload_gte {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) <=  0;
+    return 0;
+  }
+  return _overload_gte(@_);
+}
+
+sub overload_lt {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) >  0;
+    return 0;
+  }
+  return _overload_lt(@_);
+}
+
+sub overload_lte {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) >=  0;
+    return 0;
+  }
+  return _overload_lte(@_);
+}
+
+sub overload_spaceship {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return undef if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) * -1;
+  }
+  return _overload_spaceship(@_);
+}
+
+sub overload_equiv {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 0 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) ==  0;
+    return 0;
+  }
+  return _overload_equiv(@_);
+}
+
+sub overload_not_equiv {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    return 1 if Math::MPFR::Rmpfr_nan_p($_[1]);
+    return 1 if Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]) !=  0;
+    return 0;
+  }
+  return _overload_not_equiv(@_);
+}
+
+sub overload_pow  {
+  my $itsa = _itsa($_[1]);
+  if($itsa == 4 && _looks_like_number($_[1])) { # PV
+    # Check that it's an integer string
+    die "Non-integer string value ($_[1]) passed to overload_pow()"
+      if int("$_[1]") != "$_[1]" + 0;
+    my $z = Math::GMPz->new("$_[1]");
+    return _overload_pow($z, $_[0], 0) if $_[2];
+    return _overload_pow($_[0], $z, 0);
+  }
+  if($itsa == 3) { # NV
+    my $z = Math::GMPz->new($_[1]);
+    return _overload_pow($z, $_[0], 0) if $_[2];
+    return _overload_pow($_[0], $z, 0);
+  }
+  return _overload_pow(@_);
+}
+
+sub overload_pow_eq {
+  my $itsa = _itsa($_[1]);
+  if($itsa == 4 && _looks_like_number($_[1])) { # PV
+    # Check that it's an integer string
+    die "Non-integer string value ($_[1]) passed to overload_pow()"
+      if int("$_[1]") != "$_[1]" + 0;
+    my $z = Math::GMPz->new("$_[1]");
+    return _overload_pow_eq($_[0], $z, 0);
+  }
+  if($itsa == 3) { # NV
+    my $z = Math::GMPz->new($_[1]);
+    return _overload_pow_eq($_[0], $z, 0);
+  }
+  return _overload_pow_eq(@_);
+}
 
 sub __GNU_MP_VERSION            () {return ___GNU_MP_VERSION()}
 sub __GNU_MP_VERSION_MINOR      () {return ___GNU_MP_VERSION_MINOR()}

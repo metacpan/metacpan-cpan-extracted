@@ -16,4 +16,6 @@ t/00-report-prereqs.t
 t/author-has-version.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/lib/StrTest.pm
 t/str-test.t
+t/subtest-events.t

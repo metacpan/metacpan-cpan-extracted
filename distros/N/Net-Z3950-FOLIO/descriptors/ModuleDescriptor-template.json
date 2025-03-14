@@ -16,12 +16,12 @@
   ],
   "requires": [
     {
-      "id": "graphql",
-      "version": "1.4"
+      "id": "login",
+      "version": "7.3"
     },
     {
-      "id": "search",
-      "version": "0.7 0.8 0.9 1.0"
+      "id": "graphql",
+      "version": "1.4"
     },
     {
       "id": "source-storage-source-records",

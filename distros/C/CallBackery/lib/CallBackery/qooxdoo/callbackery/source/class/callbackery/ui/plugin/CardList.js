@@ -26,22 +26,51 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             }
         }, this);
     },
+    properties: {
+        info: {
+            init: {},
+            nullable: true,
+            event: 'changeInfo',
+            apply: '_applyInfo'
+        }
+    },
     members: {
         __cards    : null,
         __cardList : null,
+        __info      : null,
 
+        // no validation here
         _addValidation : function() {
         },
-        
+
+        _createInfo() {
+            this.__info = new qx.ui.basic.Atom().set({
+                padding: [5, 0, 5, 0],
+                visibility: 'excluded',
+            });
+            return this.__info;
+        },
+
+        _applyInfo(info, old) {
+            if (info && info.label) {
+                this.__info.setVisibility('visible');
+            }
+            else {
+                this.__info.setVisibility('excluded');
+            }
+            this.__info.set(info);
+        },
+
         _createTable : function() {
             this.__cardList = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
-            this.__cards    = {};
-            var scroll      = new qx.ui.container.Scroll().set({scrollbarX: 'off'});
+            this.__cards = {};
+            let vbox = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
+            vbox.add(this._createInfo());
+            let scroll = new qx.ui.container.Scroll().set({scrollbarX: 'off'});
             scroll.add(this.__cardList);
-
+            vbox.add(scroll, {flex: 1});
             this._form.addListener('changeData', this._loadData, this);
-
-            return scroll;
+            return vbox;
         },
 
         // called from form appear listener
@@ -54,7 +83,23 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             this._loading++;
             rpc.callAsync(function(data,exc){
                 if (!exc){
-                    that.setData(data,true);
+                    if (Array.isArray(data)){
+                        // the data is an array of card data
+                        that.setData(data,true);
+                        that.setInfo(null);
+                    }
+                    else {
+                        // the data is an object with card data and info
+                        that.setData(data.data,true);
+                        if (data.info) {
+                            // label is the translation key
+                            data.info.label = that.xtr(data.info.label);
+                            that.setInfo(data.info);
+                        }
+                        else {
+                            that.setInfo(null);
+                        }
+                    }
                     if (that._hasTrigger) {
                         that._reconfForm();
                     }
@@ -67,6 +112,11 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
                 busy.vanish();
                 that._loading--;
             }, 'getPluginData', this._cfg.name, 'allCardData', currentFormData);
+        },
+
+        // now special handling here
+        _loadDataReadOnly: function(){
+            this._loadData();
         },
 
         setData : function (data) {

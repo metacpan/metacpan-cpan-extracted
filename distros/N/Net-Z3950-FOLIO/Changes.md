@@ -1,5 +1,10 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## 4.1.0 (Thu 13 Mar 2025 13:59:46 GMT)
+
+* Update module descriptor to depend on `login` interface (and not to depend on `search`). Fixes ZF-98.
+* When a MARC record cannot be obtained from SRS, provide a surrogate diagnostic rather than failing the entire request. Fixes ZF-65.
+
 ## 4.0.1 (Thu  5 Dec 2024 17:06:48 GMT)
 
 * Side-loading mod-graphql now works under RTR. Fixes ZF-108.

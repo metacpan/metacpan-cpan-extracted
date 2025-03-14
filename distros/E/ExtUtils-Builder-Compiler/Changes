@@ -1,5 +1,12 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.023     2025-03-13 16:34:20+01:00 Europe/Brussels
+          - Restore module_for_xs delegate
+          - Make module work on static perls
+          - Allow for multiple profiles in compilation
+          - Fix libpath argument in MSVC linker
+          - Ignore manifest files on MSVC for now
+
 0.022     2024-09-13 14:11:23+02:00 Europe/Brussels
           - Fix quiet argument of try_compile_run
 

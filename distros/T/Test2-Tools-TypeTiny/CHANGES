@@ -1,6 +1,12 @@
 Changelog for Test2-Tools-TypeTiny
 
-v0.91.0 2025-03-06T22:46:07
+v0.92.0 2025-03-13T13:48:31
+ - Pull request #4: SM-5283 c (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Add separate inlined/coderef subtests within type_subtest (Brendan Byrd)
+ - Re-arrange unit tests (Brendan Byrd)
+
+v0.91.0 2025-03-06T22:45:50
  - Fix version on README.md (Brendan Byrd)
  - Pull request #3: SM-5283 b (Brendan Byrd)
  - Update README (Brendan Byrd)

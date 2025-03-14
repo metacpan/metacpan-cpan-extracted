@@ -161,7 +161,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                 setColumnResizeBehavior();
             });
 
-            table.addListener('columnVisibilityChanged', () => {
+            table.getTableColumnModel().addListener('visibilityChanged', () => {
                 setColumnResizeBehavior();
             });
 

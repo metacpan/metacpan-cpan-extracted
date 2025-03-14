@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::XCOFF;
-$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.022';
+$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use File::Basename ();
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{ld} ||= ['ld'];
+	$args{ld} //= ['ld'];
 	$self->ExtUtils::Builder::Linker::Unixy::_init(%args);
 	$self->ExtUtils::Builder::Linker::COFF::_init(%args);
 	return;
@@ -23,7 +23,7 @@ sub linker_flags {
 	my $type = $self->type;
 	if ($type eq 'shared-library' or $type eq 'loadable-object') {
 		if ($self->export eq 'some') {
-			my $basename = $opts{basename} || File::Basename::basename($to);
+			my $basename = $opts{basename} // File::Basename::basename($to);
 			push @ret, $self->new_arguments(ranking => 20, value => ["-bE:$basename.exp"]);
 		}
 		elsif ($self->export eq 'all') {
@@ -47,7 +47,7 @@ ExtUtils::Builder::Linker::XCOFF
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

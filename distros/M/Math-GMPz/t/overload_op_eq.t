@@ -2,12 +2,7 @@
 # for the cases where the second arg is either a
 # a Math::GMPq object or a Math::MPFR object.
 # In these cases the operation returns a Math::GMPq
-# or (respectively) a Math::MPFR object if and only
-# if $Math::GMPz::RETYPE is set to a true value.
-# Else a fatal error occurs if $Math::GMPz::RETYPE
-# is set to a false value. The initial value of
-# $Math::GMPz::RETYPE is now 1, but was 0 in
-# Math-GMPz-0.61 and earlier.
+# or (respectively) a Math::MPFR object.
 
 use strict;
 use warnings;
@@ -34,91 +29,6 @@ $fr = Math::MPFR->new(17.1) if $have_mpfr;
 eval {$z1 /= 0;};
 like($@, qr/^Division by 0 not allowed/, 'division by 0 is illegal');
 
-cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
-
-$Math::GMPz::RETYPE = 0;
-
-eval {$z1 *= $q;};
-if(ref($q)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_mul_eq/, '$z1 *= $q is illegal');
-}
-else {
-  cmp_ok($z1, '==', 0, "1: multiplication by scalar ok");
-}
-eval {$z2 *= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_mul_eq/, '$z2 *= $fr is illegal');
-}
-else {
-  cmp_ok($z2, '==', 0, "2: multiplication by scalar ok");
-}
-
-eval {$z1 += $q;};
-if(ref($q)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_add_eq/, '$z1 += $q is illegal');
-}
-else {
-  cmp_ok($z1, '==', 0, "1: addition of scalar ok");
-}
-
-eval {$z2 += $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_add_eq/, '$z2 += $fr is illegal');
-}
-else {
-  cmp_ok($z2, '==', 0, "2: addition of scalar ok");
-}
-
-eval {$z1 -= $q;};
-if(ref($q)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_sub_eq/, '$z1 -= $q is illegal');
-}
-else {
-  cmp_ok($z1, '==', 0, "1: subtraction of scalar ok");
-}
-
-eval {$z2 -= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_sub_eq/, '$z2 -= $fr is illegal');
-}
-else {
-  cmp_ok($z2, '==', 0, "2: subtraction of scalar ok");
-}
-
-eval {$z1 /= $q;};
-if(ref($q)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_div_eq/, '$z1 /= $q is illegal');
-}
-else {
-  like($@, qr/^Division by 0 not allowed/, ' 1: division by 0 is illegal');
-}
-
-eval {$z2 /= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_div_eq/, '$z2 /= $fr is illegal');
-}
-else {
-  like($@, qr/^Division by 0 not allowed/, ' 2: division by 0 is illegal');
-}
-
-eval {$z1 **= $q;};
-if(ref($q)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_pow_eq/, '$z1 /= $q is illegal');
-}
-else {
-  cmp_ok($z1, '==', 1, "1: raising to power of 0 ok");
-}
-
-eval {$z2 **= $fr;};
-if(ref($fr)) {
-  like($@, qr/^Invalid argument supplied to Math::GMPz::overload_pow_eq/, '$z2 /= $fr is illegal');
-}
-else {
-  cmp_ok($z2, '==', 1, "2: raising to power of 0 ok");
-}
-
-$Math::GMPz::RETYPE = 1;
-
 if($have_gmpq) {
   if($Math::GMPq::VERSION < 0.43) {
     warn "\n  Skipping Math::GMPq tests -  Math::GMPq version 0.35(or later)\n" .
@@ -126,7 +36,6 @@ if($have_gmpq) {
   }
   else {
     my $z = Math::GMPz->new(123);
-    cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
     $z *= $q;
     cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
     cmp_ok($z, '==', $q * Math::GMPz->new(123), '$z *= $q sets $z to 123/11');
@@ -157,7 +66,6 @@ if($have_mpfr) {
           "  is needed. We have only version $Math::MPFR::VERSION\n";
   }
   else {
-    cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
     my $z = Math::GMPz->new(123);
     cmp_ok(ref($z), 'eq', 'Math::GMPz', '$z has been reverted to a Math::GMPz object');
     $z *= $fr;

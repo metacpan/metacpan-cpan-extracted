@@ -5,12 +5,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0105';
 
 use Moo;
 use strictures 2;
+use Array::Circular ();
 use List::SomeUtils qw(first_index);
 use List::Util qw(shuffle uniq);
+use MIDI::RtMidi::ScorePlayer ();
 use Music::Scales qw(get_scale_MIDI get_scale_notes);
 use Music::Chord::Note ();
 use Music::Note ();
@@ -100,8 +102,8 @@ has arp => (
 
 has arp_types => (
     is  => 'rw',
-    isa => ArrayRef[Str],
-    default => sub { [] },
+    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'Array::Circular' },
+    default => sub { Array::Circular->new(qw(up down random)) },
 );
 
 
@@ -248,10 +250,12 @@ MIDI::RtController::Filter::Gene - Gene's RtController filters
 
 =head1 VERSION
 
-version 0.0101
+version 0.0105
 
 =head1 SYNOPSIS
 
+  use curry;
+  use Future::IO::Impl::IOAsync;
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Gene ();
 
@@ -259,7 +263,7 @@ version 0.0101
 
   my $rtf = MIDI::RtController::Filter::Gene->new(rtc => $rtc);
 
-  $rtc->add_filter('foo', note_on => $rtf->can('foo'));
+  $rtc->add_filter('pedal', note_on => $rtf->curry::pedal_tone);
 
   $rtc->run;
 
@@ -320,7 +324,7 @@ Default: C<10>
   $feedback = $rtf->feedback;
   $rtf->feedback($number);
 
-The feedback (0-127).
+The feedback.
 
 Default: C<1>
 
@@ -338,7 +342,7 @@ Default: C<-12>
   $key = $rtf->key;
   $rtf->key($number);
 
-The MIDI number of the musical key.
+The musical key (C<C-B>).
 
 =head2 scale
 
@@ -367,7 +371,8 @@ The list of MIDI numbered pitches used by the C<arp_tone> filter.
   $arp_types = $rtf->arp_types;
   $rtf->arp_types(\@strings);
 
-A list of known arpeggiation types.
+A list of known arpeggiation types. This is an L<Array::Circular>
+instance.
 
 Default: C<[up, down, random]>
 
@@ -408,8 +413,8 @@ B<scale> attributes.
 
 =head2 delay_tone
 
-Play a delayed note, or series of notes, based on the given event note
-and B<delay> attribute.
+Play a delayed note, or series of notes, based on the given event
+note, and the B<delay> and B<feedback> attributes.
 
 =head2 offset_tone
 
@@ -427,9 +432,15 @@ setting.
 
 =head1 SEE ALSO
 
-L<Moo>
+The F<eg/*.pl> program(s)
 
 L<List::SomeUtils>
+
+L<List::Util>
+
+L<MIDI::RtMidi::ScorePlayer>
+
+L<Moo>
 
 L<Music::Scales>
 
@@ -440,6 +451,8 @@ L<Music::Note>
 L<Music::ToRoman>
 
 L<Music::VoiceGen>
+
+L<Types::Standard>
 
 =head1 AUTHOR
 

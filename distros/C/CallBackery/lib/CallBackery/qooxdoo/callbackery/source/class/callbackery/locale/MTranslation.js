@@ -12,10 +12,10 @@ qx.Mixin.define("callbackery.locale.MTranslation", {
 
     members: {
         /**
-         * override the regular tr with this magic version which is able to
-         * data coming in from the backend. This is for backward compatibility
-         * better use the xtr call as this will not trigger the translation
-         * string extraction
+         * override the regular tr with this magic version which is able to handle
+         * data coming in from the backend. This is for backward compatibility.
+         * Better use the xtr call as this will not trigger the translation
+         * string extraction.
          */
         tr: function() {
             return this.xtr.apply(this,arguments);

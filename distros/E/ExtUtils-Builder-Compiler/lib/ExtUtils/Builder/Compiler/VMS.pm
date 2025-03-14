@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::VMS;
-$ExtUtils::Builder::Compiler::VMS::VERSION = '0.022';
+$ExtUtils::Builder::Compiler::VMS::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Carp ();
 
 sub _init {
 	my ($self, %args) = @_;
-	$args{cc} ||= ['CC/DECC'];
+	$args{cc} //= ['CC/DECC'];
 	$self->SUPER::_init(%args);
 	return;
 }
@@ -63,7 +63,7 @@ ExtUtils::Builder::Compiler::VMS - Class for compiling with a VMS compiler
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 AUTHOR
 

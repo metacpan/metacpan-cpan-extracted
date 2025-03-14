@@ -20,12 +20,13 @@ use Net::RDAP::SearchResult;
 use Net::RDAP::Service;
 use Net::RDAP::Values;
 use Net::RDAP::JCard;
+use POSIX qw(getpwuid);
 use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 use warnings;
 
-$VERSION = '0.33';
+$VERSION = '0.34';
 
 =pod
 
@@ -399,51 +400,40 @@ sub _get {
     # this is how long we allow things to be cached before checking
     # if they have been updated:
     #
-    my $ttl = $self->{'cache_ttl'} || DEFAULT_CACHE_TTL;
+    my $ttl = $self->{'use_cache'} ? ($self->{'cache_ttl'} || DEFAULT_CACHE_TTL) : 0;
 
     #
     # path to local copy of the remote resource
     #
-    my $file = sprintf(
-        '%s/Net-RDAP-%s.json',
+    my $file = File::Spec->catfile(
         File::Spec->tmpdir,
-        sha256_hex($url->as_string),
+        sprintf(
+            '%s-%s.json',
+            ref($self),
+            sha256_hex(join(chr(0), (
+                $VERSION,
+                $url->as_string,
+                getpwuid($<)
+            )))
+        )
     );
 
-    my ($response, $data);
-    if (!$self->{'use_cache'}) {
-        $response = $self->ua->request(GET($url));
-        eval { $data = decode_json($response->decoded_content) };
+    my $response = $self->ua->mirror($url, $file, $ttl);
 
-    } else {
-        $response = $self->ua->mirror($url, $file, $ttl);
-        eval { $data = decode_json(scalar(read_file($file))) };
+    my $data = eval { decode_json(scalar(read_file($file))) };
 
-    }
-
-    return $self->rdap_from_response($url, $response, $data, %args);
-}
-
-sub error_from_response {
-    my ($self, $url, $response, $data) = @_;
-
-    if ($self->is_rdap($response) && defined($data->{'errorCode'})) {
-        #
-        # we got an RDAP response from the server which looks like
-        # it's an error, so convert it and return:
-        #
-        return Net::RDAP::Error->new($data, $url);
-
-    } else {
-        #
-        # build our own error
-        #
+    if ($@) {
+        chomp($@);
         return $self->error(
-            'url'           => $url,
-            'errorCode'     => $response->code,
-            'title'         => $response->status_line,
-            'description'   => [$response->status_line],
+            url         => $url,
+            errorCode   => 500,
+            title       => 'JSON parse error',
+            description => [ $@ ],
         );
+
+    } else {
+        return $self->rdap_from_response($url, $response, $data, %args);
+
     }
 }
 
@@ -453,18 +443,7 @@ sub rdap_from_response {
     if ($response->is_error) {
         return $self->error_from_response($url, $response, $data);
 
-    } elsif (!$self->is_rdap($response)) {
-        #
-        # we got something that isn't a valid RDAP response:
-        #
-        return $self->error(
-            'url'           => $url,
-            'errorCode'     => 500,
-            'title'         => 'Invalid Content-Type',
-            'description'   => [ sprintf("The Content-Type of the header is '%s', should be 'application/rdap+json'", $response->header('Content-Type')) ],
-        );
-
-    } elsif (!defined($data) || 'HASH' ne ref($data)) {
+    } elsif ('HASH' ne ref($data)) {
         #
         # response was not parseable as JSON:
         #
@@ -495,6 +474,29 @@ sub rdap_from_response {
             #
             return $self->object_from_response($data, $url);
         }
+    }
+}
+
+sub error_from_response {
+    my ($self, $url, $response, $data) = @_;
+
+    if ($self->is_rdap($response) && defined($data->{'errorCode'})) {
+        #
+        # we got an RDAP response from the server which looks like
+        # it's an error, so convert it and return:
+        #
+        return Net::RDAP::Error->new($data, $url);
+
+    } else {
+        #
+        # build our own error
+        #
+        return $self->error(
+            'url'           => $url,
+            'errorCode'     => $response->code,
+            'title'         => $response->status_line,
+            'description'   => [$response->status_line],
+        );
     }
 }
 

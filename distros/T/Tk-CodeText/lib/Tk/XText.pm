@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.64';
+$VERSION = '0.66';
 use strict;
 use warnings;
 use Carp;
@@ -23,8 +23,9 @@ use base qw(Tk::Derived Tk::Text);
 Construct Tk::Widget 'XText';
 
 #boilerplating for auto complete facilities
-my %delimhash = (	'.',	1, '(', 1, ')',	1, ':',	1, '!',	1, '+',	1, ',',	1, '-',	1, '<',	1, '=',	1, '>',	1, '%',	1, '&',	1, '*', 1, '"', 1, '\'', 1,
-	'/',	1, ';',	1, '?',	1, '[',	1, ']',	1, '^',	1, '{',	1, '|',	1, '}',	1, '~',	1, '\\', 1, '$', 1, '@', 1, '#', 1, '`', 1, ' ', 1, "\t", 1
+my %delimhash = (	'.',	1, '(', 1, ')',	1, ':',	1, '!',	1, '+',	1, ',',	1, '-',	1, '<',	1, '=',
+	1, '>',	1, '%',	1, '&',	1, '*', 1, '"', 1, '\'', 1,	'/',	1, ';',	1, '?',	1, '[',	1, ']',	1,
+	'^',	1, '{',	1, '|',	1, '}',	1, '~',	1, '\\', 1, '$', 1, '@', 1, '#', 1, '`', 1, ' ', 1, "\t", 1
 );
 
 =head1 SYNOPSIS
@@ -69,6 +70,14 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =item Class: B<ActiveDelay>
 
 =item Switch: B<-activedelay>
+
+.
+
+=item Name: B<autoBrackets>
+
+=item Class: B<AutoBrackets>
+
+=item Switch: B<-autobrackets>
 
 .
 
@@ -242,6 +251,7 @@ sub Populate {
 		-activedelay => ['PASSIVE', 'activeDelay', 'ActiveDelay', 300],
 		-acpopsize => ['PASSIVE', 'acPopSize', 'AcPopSize', 5],
 		-acscansize => ['PASSIVE', 'acScanSize', 'AcScanSize', 5],
+		-autobrackets => ['PASSIVE', 'autoBrackets', 'AutoBrackets', ''],
 		-autocomplete => ['PASSIVE', 'autoComplete', 'AutoComplete', ''],
 		-autoindent => ['PASSIVE', 'autoIndent', 'AutoIndent', 0],
 		-contextmenu => ['PASSIVE'],
@@ -1034,6 +1044,7 @@ sub FindAll {
 			my ($begin, $end) = @$_;
 			$self->tagAdd('Find', $begin, $end);
 			$self->tagRaise('Find');
+			$self->tagRaise('sel');
 		}
 	}
 	return @all
@@ -1163,7 +1174,7 @@ sub FindNext {
 				}
 			}
 		}
-		$self->markSet('insert', '1.0') if $first; 
+		$self->markSet('insert', '1.0') if $first;
 		
 	} else {
 		for (reverse ('1.0' .. $self->linenumber($pos))) {
@@ -1208,6 +1219,7 @@ sub FindTag {
 	my ($begin, $end) = @$hit;
 	$self->tagAdd('Find', $begin, $end);
 	$self->tagRaise('Find');
+	$self->tagRaise('sel');
 }
 
 sub FindValidateReg {
@@ -1393,11 +1405,25 @@ sub Insert {
 	$self->SUPER::Insert($string);
 }
 
+my %brackets = (
+	'(' => ')',
+	'{' => '}',
+	'[' => ']',
+	'"' => '"',
+	"'" => "'",
+);
+
 sub InsertKeypress {
 	my ($self, $char) = @_;
 	return unless length($char);
 	return if $self->cget('-readonly');
 	my $index = $self->index('insert');
+
+	my $ab = $self->cget('-autobrackets');
+	my $ex = exists $brackets{$char};
+	my $dobrackets = ((exists $brackets{$char}) and ($self->cget('-autobrackets')));
+	$char = $char . $brackets{$char} if $dobrackets;
+
 	if ($self->OverstrikeMode) {
 		my $current = $self->get('insert');
 		$current = '' if $current eq "\n";
@@ -1408,6 +1434,7 @@ sub InsertKeypress {
 	} else {
 		$self->Insert($char);
 	}
+	$self->goTo($self->index('insert - 1c')) if $dobrackets;
 }
 
 sub insertTab {

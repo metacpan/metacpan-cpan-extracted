@@ -26,5 +26,6 @@ return {
         Makefile => '$(VERSION_FROM)',
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ codeberg => 'mauke' ],
+    BUGTRACKER => 'https://codeberg.org/mauke/Sys-GetRandom/issues',
 };
