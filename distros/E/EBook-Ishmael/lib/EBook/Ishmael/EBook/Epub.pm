@@ -1,19 +1,17 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
-use Cwd;
 use File::Basename;
 use File::Path qw(remove_tree);
 use File::Spec;
-use File::Temp qw(tempdir);
 
 use XML::LibXML;
 
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::Unzip;
+use EBook::Ishmael::Unzip qw(unzip safe_tmp_unzip);
 
 my $MAGIC = pack 'C4', ( 0x50, 0x4b, 0x03, 0x04 );
 my $CONTAINER = File::Spec->catfile(qw/META-INF container.xml/);
@@ -33,32 +31,6 @@ sub heuristic {
 	read $fh, my $mag, 4;
 
 	return $mag eq $MAGIC;
-}
-
-# Archive::Zip does not support unzipping files to symlinked directories for
-# security reasons. This poses a problem on some platforms such as Darwin, as
-# their temporary directory is symlinked. This sub tries to find a suitable
-# directory for unzipping.
-sub _tmpdir {
-
-	if (not -l File::Spec->tmpdir) {
-		return tempdir(CLEANUP => 1);
-	# If tmpdir is not available, try working directory.
-	} elsif (! -l cwd and -w cwd) {
-		return tempdir(DIR => cwd, CLEANUP => 1);
-	# Try HOME environment variable...
-	} elsif (
-		exists $ENV{HOME} and
-		-d $ENV{HOME}     and
-		! -l $ENV{HOME}   and
-		-w $ENV{HOME}
-	) {
-		return tempdir(DIR => $ENV{HOME}, CLEANUP => 1);
-	# Can't think of anything else :-/
-	} else {
-		die "Could not find a suitable extract directory for EPUB\n";
-	}
-
 }
 
 # Set _rootfile based on container.xml's rootfile@full-path attribute.
@@ -253,7 +225,7 @@ sub read {
 	my $self = shift;
 	my $src  = shift;
 
-	my $tmpdir = _tmpdir;
+	my $tmpdir = safe_tmp_unzip;
 
 	unzip($src, $tmpdir);
 
@@ -263,7 +235,7 @@ sub read {
 	$self->{_container} = File::Spec->catfile($self->{_unzip}, $CONTAINER);
 
 	unless (-f $self->{_container}) {
-		die "$src is not an EPUB file: does not have a META-INF/container.xml\n";
+		die "$src is an invalid EPUB file: does not have a META-INF/container.xml\n";
 	}
 
 	$self->_get_rootfile();

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CB7;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use File::Which;
 
 my $MAGIC = pack "C*", 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c;
 
-my $SZIP = which '7z' // which '7za';
+my $SZIP = which('7z') // which('7za');
 
 our $CAN_TEST = defined $SZIP;
 

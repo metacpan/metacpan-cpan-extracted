@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# $Id: onyphe,v f6e25824c774 2025/03/04 14:57:46 gomor $
+# $Id: onyphe,v 6200d9520468 2025/03/14 14:28:43 gomor $
 #
 use strict;
 use warnings;
@@ -89,17 +89,19 @@ GetOptions(
    # ASD APIs:
    "asd-pivot-query=s" => \$lopts{'asd-pivot-query'},
    "asd-domain-tld=s" => \$lopts{'asd-domain-tld'},
-   "asd-domain-ns=s" => \$lopts{'asd-domain-ns'},
-   "asd-domain-mx=s" => \$lopts{'asd-domain-mx'},
    "asd-domain-certso=s" => \$lopts{'asd-domain-certso'},
    "asd-domain-wildcard=s" => \$lopts{'asd-domain-wildcard'},
-   "asd-domain-exist=s" => \$lopts{'asd-domain-exist'},
    "asd-certso-domain=s" => \$lopts{'asd-certso-domain'},
    "asd-certso-wildcard=s" => \$lopts{'asd-certso-wildcard'},
    "asd-org-inventory=s" => \$lopts{'asd-org-inventory'},
-   "asd-ip-whois=s" => \$lopts{'asd-ip-whois'},
    "asd-ip-inventory=s" => \$lopts{'asd-ip-inventory'},
+   "asd-subnet-inventory=s" => \$lopts{'asd-subnet-inventory'},
    "asd-vhost-inventory=s" => \$lopts{'asd-vhost-inventory'},
+   "asd-score-inventory=s" => \$lopts{'asd-score-inventory'},
+   "asd-dns-domain-ns=s" => \$lopts{'asd-dns-domain-ns'},
+   "asd-dns-domain-mx=s" => \$lopts{'asd-dns-domain-mx'},
+   "asd-dns-domain-soa=s" => \$lopts{'asd-dns-domain-soa'},
+   "asd-dns-domain-exist=s" => \$lopts{'asd-dns-domain-exist'},
    "asd-task-id=s" => \$lopts{'asd-task-id'},
    "asd-task-poll=s" => \$lopts{'asd-task-poll'},
    "asd-task-list" => \$lopts{'asd-task-list'},
@@ -195,8 +197,14 @@ my $opp_json_cb = sub {
    $opp->process_as_json(\@results, $opl);
 };
 
-# Set default values for arguments:
-$lopts{aslines} = 1 unless defined($lopts{aslines});
+# Exception for ASD Score Inventory API:
+if (defined($lopts{'asd-score-inventory'}) && !defined($lopts{aslines})) {
+   $lopts{aslines} = 0;
+}
+else {
+   # Set default values for arguments:
+   $lopts{aslines} = 1 unless defined($lopts{aslines});
+}
 
 my $opp_cb = $lopts{aslines} ? $opp_json_cb : $opp_perl_cb;
 
@@ -421,6 +429,14 @@ elsif (defined($asd_api_opt)) {
       my $v = $lopts{$asd_api_opt};
       $oa->$asd_api_func($v, $params, $opp_cb, $opl);
    }
+   elsif ($asd_api_opt =~ m{^asd-pivot}) {
+      my $v = $lopts{$asd_api_opt};
+      $params->{field} = $lopts{field} if defined $lopts{field};
+      $params->{astask} = $lopts{astask} if defined $lopts{astask};
+      $params->{includep} = $lopts{includep} if defined $lopts{includep};
+      $params->{excludep} = $lopts{excludep} if defined $lopts{excludep};
+      $oa->$asd_api_func($v, $params, $opp_cb, $opl);
+   }
    else {
       $params->{astask} = $lopts{astask} if defined $lopts{astask};
       $params->{trusted} = $lopts{trusted} if defined $lopts{trusted};
@@ -467,8 +483,8 @@ API options:
    -import <0|1>                           turn off/on import of results into ONYPHE
    -trusted <0|1>                          turn off/on trusted results from ONYPHE ASD APIs
    -field <FIELD>                          use given field to set field param on API call
-   -includep <WORD1,WORD2,...,WORD3>         use given inclusion patterns on param API call
-   -excludep <WORD1,WORD2,...,WORD3>         use given exclusion patterns on param API call
+   -includep <WORD1,WORD2,...,WORD3>       use given inclusion patterns on param API call
+   -excludep <WORD1,WORD2,...,WORD3>       use given exclusion patterns on param API call
 
 General APIs:
 
@@ -499,30 +515,35 @@ Ondemand APIs:
    -ondemand-scope-hostname 'HOSTNAME'         launch a scan against given hostname
    -ondemand-scope-hostname-bulk 'input.txt'   launch a scan against a given list of hostname from an input file
    -ondemand-scope-port PORT                   launch a scan against a given port on full IPv4 address space
-   -ondemand-scope-result \$scan_id             retrieve a scope scan results given a scan ID
+   -ondemand-scope-result SCAN_ID              retrieve a scope scan results given a scan ID
    -ondemand-resolver-domain 'DOMAIN'          launch a DNS enumeration and resolution against given domain
    -ondemand-resolver-domain-bulk 'input.txt'  launch a DNS enumeration and resolution against a given list of domain from an input file
-   -ondemand-resolver-result \$scan_id          retrieve a resolver scan results given a scan ID
+   -ondemand-resolver-result SCAN_ID           retrieve a resolver scan results given a scan ID
 
 ASD APIs:
 
-   -asd-pivot-query OQL -field FIELD               search unique values for a given field from an OQL query
-   -asd-domain-tld DOMAIN1,DOMAIN2,...|input.txt   search related domains by TLDs
-   -asd-domain-ns DOMAIN1,DOMAIN2,...|input.txt    search related domains by using nameservers
-   -asd-domain-mx DOMAIN1,DOMAIN2,...|input.txt    search related domains by using MX records
+   -asd-pivot-query OQL -field FIELD               search unique value(s) for a given field from an OQL query
+   -asd-domain-tld DOMAIN1,DOMAIN2,...|input.txt   search related domain(s) by TLDs
    -asd-domain-certso SO1,SO2,...|input.txt             search domain(s) belonging to given subject orgnanization(s)
    -asd-domain-wildcard DOMAIN1,DOMAIN2,...|input.txt   search domain(s) matching given wildcard(s)
-   -asd-domain-exist DOMAIN1,DOMAIN2,...|input.txt      search existing domain(s)
    -asd-certso-domain DOMAIN1,DOMAIN2,...|input.txt     search subject organization(s) belonging to given domain(s)
    -asd-certso-wildcard SO1,SO2,...|input.txt           search subject organization(s) matching given wildcard(s)
-   -asd-org-inventory INVENTORY.txt      search hosting organization(s) for given inventory data
-   -asd-ip-whois INVENTORY.txt           search subnet(s) belonging to given inventory data
-   -asd-ip-inventory INVENTORY.txt       search ip value(s) for given inventory data
-   -asd-vhost-inventory INVENTORY.txt    search forward value(s) for given inventory data
-   -asd-task-id TASKID           retrieve an ASD Task results for given task ID
-   -asd-task-poll TASKID         retrieve an ASD Task results by polling given task ID
+   -asd-org-inventory INVENTORY.txt                     search hosting organization(s) for given inventory data
+   -asd-ip-inventory INVENTORY.txt                      search ip(s) for given inventory data
+   -asd-subnet-inventory INVENTORY.txt                  search subnet(s) belonging to given inventory data
+   -asd-vhost-inventory INVENTORY.txt                   search forward(s) for given inventory data
+   -asd-score-inventory INVENTORY.txt                   search risks for given inventory, compute a score and returns data
+   -asd-task-id TASK_ID          retrieve an ASD Task results for given task ID
+   -asd-task-poll TASK_ID        retrieve an ASD Task results by polling given task ID
    -asd-task-list                list all tasks, actually running or finished
-   -asd-task-kill                kill a given task ID
+   -asd-task-kill TASK_ID        kill a given task ID
+
+   WARNING: the following APIs will execute DNS requests:
+
+   -asd-dns-domain-ns DOMAIN1,DOMAIN2,...|input.txt     search related domain(s) by using nameservers
+   -asd-dns-domain-mx DOMAIN1,DOMAIN2,...|input.txt     search related domain(s) by using MX records
+   -asd-dns-domain-soa DOMAIN1,DOMAIN2,...|input.txt    search related domain(s) by using SOA records
+   -asd-dns-domain-exist DOMAIN1,DOMAIN2,...|input.txt  search existing domain(s)
 
 EOF
 ;

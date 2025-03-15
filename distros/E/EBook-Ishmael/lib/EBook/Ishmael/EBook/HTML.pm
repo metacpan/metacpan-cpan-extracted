@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -12,6 +12,17 @@ use XML::LibXML;
 use EBook::Ishmael::EBook::Metadata;
 
 my $XHTML_NS = 'http://www.w3.org/1999/xhtml';
+
+my %META_ITEMS = (
+	'dc.title'         => 'title',
+	'dc.language'      => 'language',
+	'dcterms.modified' => 'modified',
+	'dc.creator'       => 'author',
+	'dc.subject'       => 'genre',
+	'dcterms.created'  => 'created',
+	'generator'        => 'software',
+	'description'      => 'description',
+);
 
 sub heuristic {
 
@@ -30,9 +41,6 @@ sub heuristic {
 
 }
 
-# Check to see if the html page has any of the following:
-# * title
-# * lang
 sub _read_metadata {
 
 	my $self = shift;
@@ -44,13 +52,6 @@ sub _read_metadata {
 	} else {
 		$self->{Metadata}->format([ 'HTML' ]);
 	}
-
-	my ($lang) = $self->{_dom}->findnodes('/html/@lang');
-
-	if (defined $lang) {
-		$self->{Metadata}->language([ $lang->value ]);
-	}
-
 	my ($head) = $self->{_dom}->findnodes('/html/head');
 
 	unless (defined $head) {
@@ -64,11 +65,24 @@ sub _read_metadata {
 		$self->{Metadata}->title([ $str ]);
 	}
 
-	my ($desc) = $head->findnodes('./meta[@name="description"]/@content');
+	for my $n ($head->findnodes('./meta')) {
 
-	if (defined $desc) {
-		$self->{Metadata}->description([ $desc->textContent ]);
+		my $name = $n->getAttribute('name') // '';
+		next unless exists $META_ITEMS{ $name };
+		my $cont = $n->getAttribute('content') or next;
+
+		my $method = $META_ITEMS{ $name };
+
+		push @{ $self->{Metadata}->$method }, $cont;
+
 	}
+
+	my ($lang) = $self->{_dom}->findnodes('/html/@lang');
+
+	if (defined $lang and !@{ $self->{Metadata}->language }) {
+		$self->{Metadata}->language([ $lang->value ]);
+	}
+
 
 	return 1;
 

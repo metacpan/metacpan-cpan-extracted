@@ -21,6 +21,7 @@ is_deeply(
 		Language => [ 'en' ],
 		Title => [ 'GNU General Public License v3.0 - GNU Project - Free Software Foundation (FSF)' ],
 		Format => [ 'HTML' ],
+		Software => [ 'HTML Tidy for HTML5 for Linux version 5.8.0' ],
 	},
 	"metadata ok"
 );

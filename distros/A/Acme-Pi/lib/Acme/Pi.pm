@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Acme::Pi; # git description: v3.141592-16-gb99df53
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Acme::Pi; # git description: v3.1415926-16-g35c9c3f
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mmm, pie
 # KEYWORDS: pi π
 
@@ -11,9 +11,13 @@ my $version = atan2(1,1) * 4; $Acme::Pi::VERSION = substr("$version", 0, 16);
 
 use Exporter 5.57 'import';
 our @EXPORT = ('$π', '$𝝿', 'π', '𝝿');
-our $π = our $𝝿 = atan2(1,1) * 4;
-use constant π => atan2(1,1) * 4;
-use constant 𝝿 => π;
+
+use Math::BigFloat;
+
+sub π () { Math::BigFloat->new(1)->batan2(1) * 4 }
+sub 𝝿 () { π }
+
+our $π = our $𝝿 = π;
 
 1;
 
@@ -39,6 +43,8 @@ version 3.14159265358979
     my $volume = 4 * π / 3 * $radius**3;
 
 =head1 DESCRIPTION
+
+=for Pod::Coverage 𝝿 π
 
 This distribution was created to celebrate L<Pi Day|http://www.piday.org/> 2014,
 as well as to demonstrate yet another example of a pathological C<$VERSION>.
@@ -93,6 +99,14 @@ the number L<π|http://en.wikipedia.org/wiki/Pi>.
 
 =item *
 
+L<bignum/PI>
+
+=item *
+
+LMath::BigFloat/bpi>
+
+=item *
+
 L<David Golden: Real $VERSIONs on CPAN|http://www.dagolden.com/index.php/2191/real-versions-on-cpan/>
 
 =item *
@@ -118,7 +132,7 @@ L<lambda/λ>
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-Pi>
 (or L<bug-Acme-Pi@rt.cpan.org|mailto:bug-Acme-Pi@rt.cpan.org>).
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

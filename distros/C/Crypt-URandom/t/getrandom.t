@@ -1,6 +1,7 @@
 use Test::More;
 use FileHandle();
 use POSIX();
+use Encode();
 use Config;
 use strict;
 use warnings;
@@ -16,7 +17,12 @@ if ($^O eq 'MSWin32') {
 
 SKIP: {
 	if ($^O eq 'linux') { # LD_PRELOAD trick works here
-		if (($optional{DEFINE}) && ($optional{DEFINE} eq '-DHAVE_CRYPT_URANDOM_NATIVE_GETRANDOM')) {
+		require Crypt::URandom;
+		my $can_load_getrandom = !!(eval 'defined Crypt::URandom::getrandom(1)');
+		if (!$can_load_getrandom) {
+			chomp $@;
+			skip("Cannot load getrandom in $^O':$@", 1);
+		} elsif (($optional{DEFINE}) && ($optional{DEFINE} eq '-DHAVE_CRYPT_URANDOM_NATIVE_GETRANDOM')) {
 			my $is_covering = !!(eval 'Devel::Cover::get_coverage()');
 			my @extra_args = $is_covering ? ('-MDevel::Cover') : ();
 			my $correct_length = 27;
@@ -90,18 +96,17 @@ _OUT_
 				my $result = $handle->read(my $line, 4000);
 				chomp $line;
 				my ($actual_error, $entire_message) = split /\t/smx, $line;
+				chomp $entire_message;
 				$! = POSIX::EAGAIN();
 				my $correct_error = "$!";
 				ok($actual_error eq $correct_error, "Correct error caught:'$actual_error' vs '$correct_error'");
-				my $correct_message = "Failed to getrandom:$actual_error";
-				my $quoted_correct_message = quotemeta $correct_message;
-				ok($entire_message =~ /^$quoted_correct_message/smx, "Error message is correct:$entire_message");
+				diag("EAGAIN looks like '$entire_message'");
 				waitpid $pid, 0;
 				ok($? == 0, "Successfully caught exception for broken getrandom:$?");
 			} elsif (defined $pid) {
 				local $ENV{LD_PRELOAD} = $binary_path;
 				eval {
-					exec { $^X } $^X, (map { "-I$_" } @INC), @extra_args, '-MCrypt::URandom', '-e', 'eval { Crypt::URandom::getrandom(28); } or do { print "$!\t$@\n"; exit 0 }; exit 1;' or die "Failed to exec $^X:$!";
+					exec { $^X } $^X, (map { "-I$_" } @INC), @extra_args, '-MEncode', '-MCrypt::URandom', '-e', 'eval { Crypt::URandom::getrandom(28); } or do { print Encode::encode("UTF-8", "$!\t$@\n"); exit 0 }; exit 1;' or die "Failed to exec $^X:$!";
 				} or do {
 					warn "$@";
 				};

@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.165';
+our $VERSION = '0.166';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -172,7 +172,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.165
+version 0.166
 
 =head1 SYNOPSIS
 
@@ -193,6 +193,8 @@ It is also used automatically when your F<dist.ini> contains:
 =head1 DESCRIPTION
 
 =for stopwords optimizations
+
+=for Pod::Coverage configure mvp_bundle_config
 
 This is a L<Pod::Weaver> plugin bundle. It is I<approximately> equal to the
 following F<weaver.ini>, minus some optimizations:

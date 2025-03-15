@@ -1,11 +1,11 @@
 #
-# $Id: Api.pm,v c3a004567be2 2025/03/04 14:13:57 gomor $
+# $Id: Api.pm,v 184b7baee9fd 2025/03/14 14:27:03 gomor $
 #
 package Onyphe::Api;
 use strict;
 use warnings;
 
-our $VERSION = '4.18';
+our $VERSION = '4.19.0';
 
 use experimental qw(signatures);
 
@@ -128,6 +128,9 @@ sub request ($self, $api, $input = undef, $page = undef, $maxpage = undef, $para
       || $self->endpoint;
    my $apikey = $global->{api_key} || $self->apikey;
 
+   die("FATAL: api_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
+
    # Use default callback when none given:
    $cb ||= $self->_cb_request;
 
@@ -234,6 +237,9 @@ sub post_request ($self, $api, $input = undef, $page = undef, $maxpage = undef, 
    my $endpoint = $global->{api_unrated_endpoint} || $global->{api_endpoint}
       || $self->endpoint;
    my $apikey = $global->{api_key} || $self->apikey;
+
+   die("FATAL: api_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
 
    # Use default callback when none given:
    $cb ||= $self->_cb_request;
@@ -402,6 +408,9 @@ sub stream ($self, $method, $api, $input, $params = undef, $cb = undef, $cb_args
       || $self->endpoint;
    my $apikey = $global->{api_key} || $self->apikey;
 
+   die("FATAL: api_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
+
    # Use default callback when none given:
    $cb ||= $self->_cb_stream;
 
@@ -461,6 +470,9 @@ sub post_stream ($self, $method, $api, $input, $params = undef, $cb = undef, $cb
    my $endpoint = $global->{api_unrated_endpoint} || $global->{api_endpoint}
       || $self->endpoint;
    my $apikey = $global->{api_key} || $self->apikey;
+
+   die("FATAL: api_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
 
    # Use default callback when none given:
    $cb ||= $self->_cb_stream;
@@ -588,6 +600,9 @@ sub alert ($self, $method, $api, $name, $oql, $email, $threshold = 0, $cb = unde
       || $self->endpoint;
    my $apikey = $global->{api_key} || $self->apikey;
 
+   die("FATAL: api_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
+
    # Use default callback when none given:
    $cb ||= $self->_cb_alert;
 
@@ -688,6 +703,9 @@ sub ondemand ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef
    my $global = $self->config->{''};
    my $endpoint = $global->{api_ondemand_endpoint} || $self->endpoint;
    my $apikey = $global->{api_ondemand_key} || $self->apikey;
+
+   die("FATAL: api_ondemand_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_ondemand_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
 
    # Use default callback when none given:
    $cb ||= $self->_cb_ondemand;
@@ -892,6 +910,9 @@ sub asd ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef) {
    my $endpoint = $global->{api_asd_endpoint} || $self->endpoint;
    my $apikey = $global->{api_asd_key} || $self->apikey;
 
+   die("FATAL: api_asd_key not configured in ~/.onyphe.ini\n") unless defined($apikey);
+   die("FATAL: api_asd_endpoint not configured in ~/.onyphe.ini\n") unless defined($endpoint);
+
    # Use default callback when none given:
    $cb ||= $self->_cb_asd;
 
@@ -977,12 +998,12 @@ RETRY:
 
 sub _load_file ($self, $arg) {
    if (-f $arg) {  # If its a file, we create the list of values to push
-      my $list = $self->asd_load_input($arg);
-      unless (defined($list) && @$list) {
+      my $docs = $self->asd_load_input($arg);
+      unless (defined($docs) && @$docs) {
          print STDERR "VERBOSE: asd_load_input: failed from bad content or empty content\n";
          return;
       }
-      $arg = $list;
+      $arg = $docs;
    }
    else {
       $arg = [ split(',', $arg) ];
@@ -991,68 +1012,114 @@ sub _load_file ($self, $arg) {
    return $arg;
 }
 
-sub asd_domain_tld ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain/tld', $param, { domain => $arg }, $cb, $cb_args);
-}
-
-sub asd_domain_ns ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain/ns', $param, { domain => $arg }, $cb, $cb_args);
-}
-
-sub asd_domain_mx ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain/mx', $param, { domain => $arg }, $cb, $cb_args);
+sub _arg_from_field ($self, $arg, $field) {
+   return $arg if ref($arg) eq 'ARRAY' && !ref($arg->[0]);
+   my $values = [];
+   for (@$arg) {
+      next unless defined($_->{$field});
+      push @$values, $_->{$field};
+   }
+   return $values;
 }
 
 sub asd_pivot_query ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    return $self->asd('post', '/asd/pivot/query', $param, { query => $arg }, $cb, $cb_args);
 }
 
+sub asd_domain_tld ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
+   return $self->asd('post', '/asd/domain/tld', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_dns_domain_ns ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
+   return $self->asd('post', '/asd/dns/domain/ns', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_dns_domain_mx ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
+   return $self->asd('post', '/asd/dns/domain/mx', $param, { domain => $arg }, $cb, $cb_args);
+}
+
 sub asd_certso_domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
    return $self->asd('post', '/asd/certso/domain', $param, { domain => $arg }, $cb, $cb_args);
 }
 
 sub asd_certso_wildcard ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'subject.organization');
    return $self->asd('post', '/asd/certso/wildcard', $param, { certso => $arg }, $cb, $cb_args);
+}
+
+sub _arg_from_inventory ($self, $arg, $default) {
+   return { $default => $arg } if ref($arg) eq 'ARRAY' && !ref($arg->[0]);
+   my $values = {};
+   for my $doc (@$arg) {
+      for my $field (keys %$doc) {
+         next unless defined($doc->{$field});
+         push @{$values->{$field}}, $doc->{$field};
+      }
+   }
+   return $values;
 }
 
 sub asd_org_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_inventory($arg, 'domain');
    return $self->asd('post', '/asd/org/inventory', $param, { inventory => $arg }, $cb, $cb_args);
-}
-
-sub asd_ip_whois ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
-   $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/ip/whois', $param, { inventory => $arg }, $cb, $cb_args);
 }
 
 sub asd_ip_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_inventory($arg, 'domain');
    return $self->asd('post', '/asd/ip/inventory', $param, { inventory => $arg }, $cb, $cb_args);
+}
+
+sub asd_subnet_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_inventory($arg, 'domain');
+   return $self->asd('post', '/asd/subnet/inventory', $param, { inventory => $arg }, $cb, $cb_args);
 }
 
 sub asd_vhost_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_inventory($arg, 'domain');
    return $self->asd('post', '/asd/vhost/inventory', $param, { inventory => $arg }, $cb, $cb_args);
 }
 
-sub asd_domain_certso ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_score_inventory ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain/certso', $param, { certso => $arg }, $cb, $cb_args);
+   $arg = $self->_arg_from_inventory($arg, 'domain');
+   return $self->asd('post', '/asd/score/inventory', $param, { inventory => $arg }, $cb, $cb_args);
+}
+
+sub asd_dns_domain_soa ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
+   return $self->asd('post', '/asd/dns/domain/soa', $param, { domain => $arg }, $cb, $cb_args);
 }
 
 sub asd_domain_wildcard ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
    return $self->asd('post', '/asd/domain/wildcard', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_domain_exist ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+sub asd_domain_certso ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
    $arg = $self->_load_file($arg);
-   return $self->asd('post', '/asd/domain/exist', $param, { domain => $arg }, $cb, $cb_args);
+   $arg = $self->_arg_from_field($arg, 'subject.organization');
+   return $self->asd('post', '/asd/domain/certso', $param, { certso => $arg }, $cb, $cb_args);
+}
+
+sub asd_dns_domain_exist ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   $arg = $self->_arg_from_field($arg, 'domain');
+   return $self->asd('post', '/asd/dns/domain/exist', $param, { domain => $arg }, $cb, $cb_args);
 }
 
 sub asd_task_id ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
@@ -1068,7 +1135,7 @@ sub asd_task_list ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef
 }
 
 sub asd_task_kill ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('get', '/asd/task/kill/'.$taskid, $param, undef, $cb, $cb_args);
+   return $self->asd('delete', '/asd/task/kill/'.$taskid, $param, undef, $cb, $cb_args);
 }
 
 sub asd_load_input ($self, $input) {
@@ -1085,7 +1152,7 @@ sub asd_load_input ($self, $input) {
       my ($k, $v) = split(/\s*[=:]\s*/, $_, 2);
       next unless (defined($k) && defined($v));
       $v =~ s{(?:^["']|["']$)}{}g;
-      push @$docs, $v;
+      push @$docs, { $k => $v };
    }
 
    print STDERR "VERBOSE: loaded ASD file: $input: ".Data::Dumper::Dumper($docs)."\n"

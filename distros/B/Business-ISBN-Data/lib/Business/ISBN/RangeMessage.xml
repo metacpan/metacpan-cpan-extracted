@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>9ae64119-84ad-4dc1-a0b1-59b6fed2f857</MessageSerialNumber>
-  <MessageDate>Sun, 9 Mar 2025 03:41:06 GMT</MessageDate>
+  <MessageSerialNumber>06f663db-e3e2-4012-bc89-f28eeca22e5e</MessageSerialNumber>
+  <MessageDate>Sat, 15 Mar 2025 03:44:38 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8566,6 +8566,32 @@
         </Rule>
         <Rule>
           <Range>9750000-9999999</Range>
+          <Length>3</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-99996</Prefix>
+      <Agency>Macau</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-1999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>2000000-3999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>4000000-5999999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>6000000-8999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9000000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

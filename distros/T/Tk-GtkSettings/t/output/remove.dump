@@ -46,23 +46,26 @@ Tk-GtkSettings*NoteBook.borderWidth: 1
 
 
 ! Tk::GtkSettings section
-*activeBackground: #C0AB8B
+*activeBackground: #d2be98
 *activeForeground: #000000
-*backPageColor: #C0AB8B
+*backPageColor: #e2d6b7
 *background: #dec9a9
-*disabledBackground: #C0AB8B
-*disabledForeground: #5A5A5A
+*disabledBackground: #e2d6b7
+*disabledForeground: #938b77
+*errorColor: #d7c0c0
 *font: {Noto Sans} 10 
 *foreground: #000000
+*headerBackground: #bca880
 *highlightBackground: #dec9a9
 *highlightColor: #8f6b32
 *iconTheme: oxygen
-*inactiveBackground: #C0AB8B
+*inactiveBackground: #e2d6b7
 *insertBackground: #000000
 *linkColor: #296fbe
 *selectBackground: #8f6b32
 *selectForeground: #ffffff
-*troughColor: #C0AB8B
+*troughColor: #dec9a9
+*warningColor: #e9ddb7
 *Member1.background: #fffbe2
 *Member2.background: #fffbe2
 *Dirlist.background: #fffbe2
@@ -77,6 +80,8 @@ Tk-GtkSettings*NoteBook.borderWidth: 1
 *IconList.highlightThickness: 1
 *Listbox.background: #fffbe2
 *Listbox.highlightThickness: 1
+*ListBrowser.background: #fffbe2
+*ListBrowser.highlightThickness: 1
 *Tlist.background: #fffbe2
 *Tlist.highlightThickness: 1
 *Tree.background: #fffbe2

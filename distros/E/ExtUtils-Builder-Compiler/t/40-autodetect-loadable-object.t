@@ -63,7 +63,7 @@ my $object_file = catfile(dirname($source_file), basename($source_file, '.c') . 
 $planner->compile($source_file, $object_file);
 
 my $lib_file = catfile(dirname($source_file), basename($object_file, $Config{obj_ext}) . ".$Config{dlext}");
-$planner->link([$object_file], $lib_file);
+$planner->link([$object_file], $lib_file, dl_name => 'compilet');
 
 my $plan = $planner->materialize;
 ok $plan;
@@ -79,8 +79,8 @@ ok($libref, 'libref is defined');
 my $symref = DynaLoader::dl_find_symbol($libref, "boot_compilet");
 ok($symref, 'symref is defined');
 
-my $compilet = DynaLoader::dl_install_xsub("compilet", $symref, $source_file);
-is(eval { compilet(); 1 }, 1, 'compilet lives');
+my $boot_compilet = DynaLoader::dl_install_xsub("boot_compilet", $symref, $source_file);
+is(eval { boot_compilet(); 1 }, 1, 'compilet lives');
 
 is(eval { exported() }, 42, 'exported returns 42');
 

@@ -7,7 +7,7 @@ use Test::DZil;
 
 BEGIN {
   plan skip_all => '$cwd needs to be $zilla->root for these tests (requires Dist::Zilla 6.003)'
-    if not eval { Dist::Zilla->VERSION('6.003') };
+    if not eval { +require Dist::Zilla; Dist::Zilla->VERSION('6.003') };
 }
 
 use Test::Deep;

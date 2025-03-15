@@ -35,7 +35,7 @@ sub wrap {
 	return $str
 		# Hyphenate long words
 		=~ s/(\S{$cm1})(\S{2,})/$1- $2/gr
-		=~ s/(.{,$Columns})(\s|$)/$1\n/gr;
+		=~ s/(.{0,$Columns})(\s|$)/$1\n/gr;
 
 }
 

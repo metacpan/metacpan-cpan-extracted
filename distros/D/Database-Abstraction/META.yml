@@ -32,6 +32,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Config::Auto: '0'
   DBD::SQLite::Constants: '0'
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '6.64'
@@ -39,13 +40,16 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   File::pfopen: '0.03'
+  Log::Abstraction: '0.05'
+  Params::Get: '0'
   Scalar::Util: '0'
   autodie: '0'
+  boolean: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/nigelhorne/Database-Abstraction/issues
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

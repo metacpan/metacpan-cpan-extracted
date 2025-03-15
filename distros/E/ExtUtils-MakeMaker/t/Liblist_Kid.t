@@ -1,12 +1,13 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
 use Cwd;
 use File::Temp qw[tempdir];
 
-use lib 't/lib';
+use ExtUtils::MakeMaker;
 use MakeMaker::Test::Utils;
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
@@ -42,10 +43,9 @@ test_kid_win32() if $OS eq 'win32';
 # system configuration does not affect the test results.
 
 sub conf_reset {
-    my @save_keys = qw{ so dlsrc osname };
+    my @save_keys = qw{ so dlsrc osname make };
     my %save_config;
     @save_config{ @save_keys } = @Config{ @save_keys };
-    delete $Config{$_} for keys %Config;
     %Config = %save_config;
     # The following are all used and always are defined in the real world.
     # Define them to something here to avoid spewing uninitialized value warnings.
@@ -130,22 +130,41 @@ sub test_kid_unix_os2 {
     my @out = _ext( '-L. -lfoo' );
     my $qlibre = qr/-L[^"]+\s+-lfoo/;
     like( $out[0], $qlibre, 'existing file results in quoted extralibs' );
-    like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
+    like( $out[2], $qlibre, 'existing file results in quoted ldloadlibs' );
     ok $out[3], 'existing file results in true LD_RUN_PATH';
     is_deeply [ _ext( '-L. -lnotthere' ) ], [ ('') x 4 ], 'non-present lib = empty';
     my $curr_dirspace = File::Spec->rel2abs( 'di r' );
     my $cmd_frag = '-L'.quote($curr_dirspace) . ' -ldir_test';
     is_deeply [ _ext( '-L"di r" -ldir_test' ) ], [ $cmd_frag, '', $cmd_frag, $curr_dirspace ], '-L directories with spaces work';
+    {
+      local $Config{libpth} = 'di r';
+      my @got = _ext( '-ldir_test' );
+      is_deeply \@got, [ '-ldir_test', '', '-ldir_test', 'di r' ], 'Config.libpth directories with spaces work' or diag explain \@got;
+    }
+    my $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION    => '1.00',
+        LIBS => ['-L. -lfoo'],
+    );
+    like $mm->{LDLOADLIBS}, $qlibre, 'single LIBS works';
+    $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION    => '1.00',
+        LIBS => ['-L. -lnotthere', '-L. -lfoo'],
+    );
+    like $mm->{LDLOADLIBS}, $qlibre, 'two LIBS correctly gets second';
 }
 
 sub test_kid_win32 {
     my $warnings = "";
     local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
+    my @got32 = _ext( 'kernel32' );
+    like $got32[0], qr/kernel32/, 'found Win32 system library' or diag 'got: ', explain \@got32;
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.lib'), '') ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
     is_deeply( [ _ext( 'c_test' ) ], [ double(quote('lib\CORE\c_test.lib'), '') ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
     is_deeply( [ _ext( 'double' ) ], [ double(quote('double.lib'), '') ], 'once an instance of a lib is found, the search stops' );
     is_deeply( [ _ext( 'test.lib' ) ], [ double(quote('test.lib'), '') ], 'the extension is not tacked on twice' );
-    is_deeply( [ _ext( 'test.a' ) ], [ double(quote('test.a.lib'), '') ], 'but it will be tacked onto filenamess with other kinds of library extension' );
+    is_deeply( [ _ext( 'test.a' ) ], [ double(quote('test.a.lib'), '') ], 'but it will be tacked onto filenames with other kinds of library extension' );
     is_deeply( [ _ext( 'test test2' ) ], [ double(quote(qw(test.lib test2.lib)), '') ], 'multiple existing files end up separated by spaces' );
     is_deeply( [ _ext( 'test test2 unreal_test' ) ], [ double(quote(qw(test.lib test2.lib)),  '') ], "some existing files don't cause false positives" );
     is_deeply( [ _ext( '-l_test' ) ], [ double(quote('lib_test.lib'), '') ], 'prefixing a lib with -l triggers a second search with prefix "lib" when gcc is not in use' );
@@ -172,14 +191,32 @@ sub test_kid_win32 {
     is_deeply( [ _ext( qq{"-Ldir" dir_test} ) ], [ double(quote("$curr\\dir\\dir_test.lib"), '') ], 'relative -L directories work' );
     is_deeply( [ _ext( '-L"di r" dir_test' ) ], [ double(quote($curr . '\di r\dir_test.lib'), '') ], '-L directories with spaces work' );
 
-    $Config{perllibs} = 'pl';
-    is_deeply( [ _ext( 'unreal_test' ) ], [ double(quote('pl.lib'), '') ], '$Config{perllibs} adds extra libs to be searched' );
-    is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
-    delete $Config{perllibs};
+    {
+      local $Config{perllibs} = 'pl';
+      is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], '_ext not add $Config{perllibs}' );
+      is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
+      my $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+          LIBS => ['-l_test'],
+      );
+      my $exp = '"lib_test.lib" "pl.lib"';
+      is $mm->{LDLOADLIBS}, $exp, 'single LIBS works';
+      $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+          LIBS => ['-L. -lnotthere', '-l_test'],
+      );
+      is $mm->{LDLOADLIBS}, $exp, 'two LIBS correctly gets second';
+    }
 
-    $Config{libpth} = 'libpath';
-    is_deeply( [ _ext( 'lp_test' ) ], [ double(quote('libpath\lp_test.lib'), '') ], '$Config{libpth} adds extra search paths' );
-    delete $Config{libpth};
+    {
+      local $Config{libpth} = 'libpath';
+      is_deeply( [ _ext( 'lp_test' ) ], [ double(quote('libpath\lp_test.lib'), '') ], '$Config{libpth} adds extra search paths' );
+      $Config{libpth} = 'di r';
+      my @got = _ext( '-ldir_test' );
+      is_deeply \@got, [double('"di r\\dir_test.lib"', '')], 'Config.libpth directories with spaces work' or diag explain \@got;
+    }
 
     $Config{lib_ext} = '.meep';
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.meep'), '') ], '$Config{lib_ext} changes the lib extension to be searched for' );
@@ -209,6 +246,4 @@ sub test_kid_win32 {
 
     $ENV{LIB} = 'vc';
     is_deeply( [ _ext( 'vctest.lib' ) ], [ double(quote('vc\vctest.lib'), '') ], '[vc] $ENV{LIB} adds search paths' );
-
-    return;
 }

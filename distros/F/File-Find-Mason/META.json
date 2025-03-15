@@ -1,0 +1,23 @@
+{
+	"version" : "0.0.2",
+	"name"    : "File Find Mason",
+	"author"  : "Brian Blackmore",
+	"abstract": "Quickly identify Mason files in Perl repositories",
+	"license" : "perl",
+	"prereqs" : {
+		"runtime": {
+			"requires": {
+				"perl": "5.20.0",
+				"File::Find": "1.20"
+			}
+		},
+		"build": {
+			"requires": {
+				"Cwd": "3.40",
+				"File::Find": "1.20",
+				"File::Temp": "0.2301",
+				"Test::More": "1.302209"
+			}
+		}
+	}
+}

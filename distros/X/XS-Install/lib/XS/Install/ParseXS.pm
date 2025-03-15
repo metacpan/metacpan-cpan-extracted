@@ -23,6 +23,7 @@ my $re_ignored = qr/(?:$re_quot|$re_comment_single|$re_comment_multi)/ms;
 my $re_braces = qr#(?<braces>\{(?>[^/"'{}]+|$re_ignored|(?&braces)|/)*\})#ms;
 our $re_xsub = qr/(XS_EUPXS\(XS_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms;
 our $re_boot = qr/(XS_EXTERNAL\(boot_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms; 
+my $new_parsexs = $ExtUtils::ParseXS::VERSION >= 3.53;
 
 sub add_pre_callback        { push @pre_callbacks, shift; }
 sub add_post_callback       { push @CatchEnd::post_callbacks, shift; }
@@ -74,10 +75,20 @@ sub insert_code_bottom {
     splice(@$linno, $idx, 0, $linno->[$idx] // $linno->[-1]);
 }
 
+my $orig_new = \&ExtUtils::ParseXS::new;
+*ExtUtils::ParseXS::new = sub {
+    my $self = $orig_new->(@_);
+    if ($new_parsexs) {
+        Hash::Util::unlock_keys(%$self);
+    };
+    return $self;
+};
+
 my $orig_pmxl = \&ExtUtils::ParseXS::_process_module_xs_line;
 *ExtUtils::ParseXS::_process_module_xs_line = sub {
     my ($self, $module, $pkg, $prefix) = @_;
 	$orig_pmxl->(@_);
+    $self->{xsi}{package} = $pkg;
 	$self->{xsi}{module} = $module;
 	$self->{xsi}{inline_mode} = 0;
 };
@@ -91,6 +102,7 @@ sub get_mode {
 my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
 *ExtUtils::ParseXS::fetch_para = sub {
     my $self = shift;
+    $DB::single=1;
     my $ret = $orig_fetch_para->($self, @_);
     my $lines = $self->{line};
     my $linno = $self->{line_no};
@@ -202,7 +214,7 @@ my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
     }
     
     map {
-        s/\b__PACKAGE__\b/"$self->{Package}"/g;
+        s/\b__PACKAGE__\b/"$self->{xsi}{package}"/g;
         s/\b__MODULE__\b/"$self->{xsi}{module}"/g;
     } @$lines;
     
@@ -221,17 +233,22 @@ my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
     for my $str (split /\s*,\s*/, $args_str) {
     	my %info;
     	$info{default} = $1 if $str =~ s/\s*=\s*(.+)$//;
-        $info{name}    = '';
     	$info{name}    = $1 if $str =~ s/([a-zA-Z0-9_\$]+)\s*$//;
-        $info{type}    = $str;
+        $str =~ s/^\s+//g; $str =~ s/\s+$//g;
+        $info{type} = $str;
     	if ($str eq '...') {
     		$variadic = 1;
     		next;
     	}
-    	if (!$info{type}) { # arg with no name
-            $info{type} = $info{name};
-    		$info{name} = '';
-    	}
+        elsif (!$info{type} && !$info{name}) {
+            
+        }
+        elsif (!$info{type} || !$info{name}) { # arg with no name (unused arg)
+            $info{type} ||= $info{name}; # (for signatures like "string, " name will consume type)
+            die "bad argument: '$sig', at $self->{filepathname}, function $self->{pname}" unless $info{type};
+            state $unused_no = 1;
+            $info{name} = $new_parsexs ? '_____unused'.($unused_no++) : '';
+        }
     	
     	map { s/^\s+//; s/\s+$// } values %info;
     	push @args, \%info;
@@ -300,6 +317,15 @@ my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
     
     return $ret;
 };
+
+if ($new_parsexs) {
+    my $orig_node_param_as_code = \&ExtUtils::ParseXS::Node::Param::as_code;
+    *ExtUtils::ParseXS::Node::Param::as_code = sub {
+        my ExtUtils::ParseXS::Node::Param $self = shift;
+        return '' if $self->{var} =~ /^_____unused/;
+        return $orig_node_param_as_code->($self, @_);
+    };
+}
 
 sub default_constructor {
 	my ($ret_type, $args) = @_;

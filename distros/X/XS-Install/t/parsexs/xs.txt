@@ -253,11 +253,17 @@ void method (SV* proto, ...) {
     _TRYNEXT({ sub = xs::next::method(proto_stash(proto)); });
     if (!sub) XSRETURN_EMPTY;
     
+    dummy(__PACKAGE__, __MODULE__);
+    
     ENTER;
     PUSHMARK(SP);
     call_sv((SV*)sub, GIMME_V);
     LEAVE;
     return;
+}
+
+SV* check_unnamed_args (SV*, AV*, SV* named) {
+    RETVAL = named;
 }
 
 BOOT {

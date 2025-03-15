@@ -1,13 +1,10 @@
 use strict;
 use warnings;
 
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.88;
 use utf8;
 use Acme::Pi;
-
-binmode $_, ':encoding(UTF-8)' foreach map { Test::Builder->new->$_ } qw(output failure_output todo_output);
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDERR, ':encoding(UTF-8)';
 
 ok(defined($π), 'we have a defined $π');
 ok(defined($𝝿), 'we have a defined $𝝿');

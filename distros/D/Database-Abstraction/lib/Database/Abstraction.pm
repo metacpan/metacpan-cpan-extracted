@@ -1,6 +1,6 @@
 package Database::Abstraction;
 
-# Author Nigel Horne: njh@bandsman.co.uk
+# Author Nigel Horne: njh@nigelhorne.com
 # Copyright (C) 2015-2025, Nigel Horne
 
 # Usage is subject to licence terms.
@@ -27,14 +27,18 @@ package Database::Abstraction;
 use warnings;
 use strict;
 
+use boolean;
+use Carp;
+use Config::Auto;
 use Data::Dumper;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::Basename;
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
+use Log::Abstraction;
+use Params::Get;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
-use Carp;
 use Scalar::Util;
 
 our %defaults;
@@ -46,11 +50,23 @@ Database::Abstraction - read-only database abstraction layer (ORM)
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
+
+=head1 DESCRIPTION
+
+C<Database::Abstraction> is a read-only database abstraction layer (ORM) for Perl,
+designed to provide a simple interface for accessing and querying various types of databases such as CSV, XML, and SQLite without the need to write SQL queries.
+It promotes code maintainability by abstracting database access logic into a single interface,
+allowing users to switch between different storage formats seamlessly.
+The module supports caching for performance optimization,
+flexible logging for debugging and monitoring,
+and includes features like the AUTOLOAD method for convenient access to database columns.
+By handling numerous database and file formats,
+C<Database::Abstraction> adds versatility and simplifies the management of read-intensive applications.
 
 =head1 SYNOPSIS
 
@@ -192,6 +208,11 @@ Takes different argument formats (hash or positional)
 
 =over 4
 
+=item * C<auto_load>
+
+Enable/disable the AUTOLOAD feature.
+The default is to have it enabled.
+
 =item * C<cache>
 
 Place to store results
@@ -199,6 +220,12 @@ Place to store results
 =item * C<cache_duration>
 
 How long to store results in the cache (default is 1 hour).
+
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
 
 =item * C<expires_in>
 
@@ -264,6 +291,13 @@ sub new {
 		$args{'directory'} = shift;
 	}
 
+	# Load the configuration from a config file, if provided
+	if(exists($args{'config_file'})) {
+		my $config = Config::Auto::parse($args{'config_file'});
+		# my $config = YAML::XS::LoadFile($args{'config_file'});
+		%args = (%{$config}, %args);
+	}
+
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using Database::Abstraction->new(), not Database::Abstraction::new()
@@ -282,6 +316,7 @@ sub new {
 	croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
 
 	croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
+
 	# init(\%args);
 
 	# return bless {
@@ -293,6 +328,15 @@ sub new {
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
 
+	my $logger;
+	if($logger = $args{'logger'}) {
+		if(!Scalar::Util::blessed($logger)) {
+			$logger = Log::Abstraction->new($logger);
+		}
+	} else {
+		$logger = Log::Abstraction->new();
+	}
+
 	# Re-seen keys take precedence, so defaults come first
 	return bless {
 		no_entry => 0,
@@ -300,7 +344,8 @@ sub new {
 		cache_duration => '1 hour',
 		max_slurp_size => DEFAULT_MAX_SLURP_SIZE,
 		%defaults,
-		%args
+		%args,
+		logger => $logger
 	}, $class;
 }
 
@@ -313,10 +358,18 @@ Sets the class, code reference, or file that will be used for logging.
 sub set_logger
 {
 	my $self = shift;
-	my $args = $self->_get_params('logger', @_);
+	my $params = Params::Get::get_params('logger', @_);
 
-	if(defined($args->{'logger'})) {
-		$self->{'logger'} = $args->{'logger'};
+	if(defined($params->{'logger'})) {
+		if(my $logger = $params->{'logger'}) {
+			if(Scalar::Util::blessed($logger)) {
+				$self->{'logger'} = $logger;
+			} else {
+				$self->{'logger'} = Log::Abstraction->new($logger);
+			}
+		} else {
+			$self->{'logger'} = Log::Abstraction->new();
+		}
 		return $self;
 	}
 	Carp::croak('Usage: set_logger(logger => $logger)')
@@ -326,7 +379,12 @@ sub set_logger
 # Read the data into memory or establish a connection to the database file.
 # column_names allows the column names to be overridden on CSV files
 
-sub _open {
+sub _open
+{
+	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+		Carp::croak('Illegal Operation: This method can only be called by a subclass');
+	}
+
 	my $self = shift;
 	my $sep_char = ($self->{'sep_char'} ? $self->{'sep_char'} : '!');
 	my %args = (
@@ -337,7 +395,7 @@ sub _open {
 	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_trace("_open $table");
+	$self->_trace(ref($self), ": _open $table");
 
 	return if($self->{$table});
 
@@ -466,7 +524,7 @@ sub _open {
 					require Text::xSV::Slurp;
 					Text::xSV::Slurp->import();
 
-					$self->_trace('slurp in');
+					$self->_debug('slurp in');
 
 					my @data = @{xsv_slurp(
 						shape => 'aoh',
@@ -579,7 +637,7 @@ Similar to selectall_hashref but returns an array of hash references.
 sub selectall_hash
 {
 	my $self = shift;
-	my $params = $self->_get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_);
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
@@ -712,12 +770,15 @@ When no_entry is not set allow just one argument to be given: the entry value.
 
 sub fetchrow_hashref {
 	my $self = shift;
+
+	$self->_trace('Entering fetchrow_hashref');
+
 	my $params;
 
 	if(!$self->{'no_entry'}) {
-		$params = $self->_get_params('entry', @_);
+		$params = Params::Get::get_params('entry', @_);
 	} else {
-		$params = $self->_get_params(undef, @_);
+		$params = Params::Get::get_params(undef, @_);
 	}
 
 	my $table = $params->{'table'} || $self->{'table'} || ref($self);
@@ -837,7 +898,7 @@ this will still work by accessing that actual database.
 sub execute
 {
 	my $self = shift;
-	my $args = $self->_get_params('query', @_);
+	my $args = Params::Get::get_params('query', @_);
 
 	# Ensure the 'query' parameter is provided
 	Carp::croak(__PACKAGE__, ': Usage: execute(query => $query)')
@@ -916,6 +977,11 @@ sub AUTOLOAD {
 	return if($column eq 'DESTROY');
 
 	my $self = shift or return;
+
+	Carp::croak(__PACKAGE__, ": Unknown table $self") if(!ref($self));
+
+	# Allow the AUTOLOAD feature to be disabled
+	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
@@ -1114,42 +1180,19 @@ sub DESTROY {
 	}
 }
 
-# Helper routines for logger()
+# Log and remember a message
 sub _log
 {
 	my ($self, $level, @messages) = @_;
 
+	# FIXME: add caller's function
+	# if(($level eq 'warn') || ($level eq 'notice')) {
+		push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
+	# }
+
 	if(my $logger = $self->{'logger'}) {
-		if(ref($logger) eq 'CODE') {
-			# Code reference
-			$logger->({
-				class => ref($self) // __PACKAGE__,
-				function => (caller(2))[3],
-				line => (caller(1))[2],
-				level => $level,
-				message => \@messages
-			});
-		} elsif(!ref($logger)) {
-			# File
-			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
-				close $fout;
-			}
-		} else {
-			# Object
-			$logger->$level(@messages);
-		}
+		$self->{'logger'}->$level(\@messages);
 	}
-}
-
-sub _fatal {
-	my $self = shift;
-	$self->_log('fatal', @_);
-}
-
-sub _trace {
-	my $self = shift;
-	$self->_log('trace', @_);
 }
 
 sub _debug {
@@ -1157,44 +1200,32 @@ sub _debug {
 	$self->_log('debug', @_);
 }
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
+sub _info {
+	my $self = shift;
+	$self->_log('info', @_);
+}
 
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
+sub _notice {
+	my $self = shift;
+	$self->_log('notice', @_);
+}
 
-	my %rc;
-	my $num_args = scalar @_;
+sub _trace {
+	my $self = shift;
+	$self->_log('trace', @_);
+}
 
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
+# Emit a warning message somewhere
+sub _warn {
+	my $self = shift;
+	my $params = Params::Get::get_params('warning', @_);
 
-	return \%rc;
+	$self->_log('warn', $params->{'warning'});
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 

@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.53
+This document describes Crypt::URandom version 0.54
 
 # SYNOPSIS
 

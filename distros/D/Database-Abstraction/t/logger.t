@@ -6,7 +6,7 @@ use strict;
 use FindBin qw($Bin);
 
 use File::Temp;
-use Test::Most tests => 33;
+use Test::Most tests => 35;
 
 use lib 't/lib';
 
@@ -34,7 +34,8 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 	my $logger = new_ok('MyLogger');
 	my $result = $test2->set_logger(logger => $logger);
 	is($result, $test2, 'set_logger returns $self when logger is set');
-	is($test2->{'logger'}, $logger, 'Logger is set correctly');
+	is($test2->{'logger'}, $logger, 'sets the logger correctly');
+	# can_ok($test2->{'logger'}, 'debug', 'trace', 'warn', 'notice');
 }
 
 # set_logger without a logger argument, should croak
@@ -47,13 +48,16 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 
 # set_logger with subroutine ref
 {
+	my $code_called;
 	my $logger = sub {
 		unlike($_[0]->{'line'}, qr/\D/, 'Line numbers are valid');
 		diag($_[0]->{'level'}, ': ', @{$_[0]->{'message'}}) if($ENV{'TEST_VERBOSE'});
+		$code_called++;
 		# diag(Data::Dumper->new([\@_])->Dump());
 	};
 	my $test4 = new_ok('Database::test4' => [{ directory => "$Bin/../data", logger => $logger }] );
 	ok(!defined($test4->ordinal(cardinal => 'four')), 'CSV AUTOLOAD works');
+	cmp_ok($code_called, '==', 9, 'Setting the logger as a ref to code works');
 }
 
 # set_logger with file
@@ -65,7 +69,7 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 	my $test1 = new_ok('Database::test1' => [{ directory => "$Bin/../data", logger => $filename }] );
 
 	# Get some data
-	cmp_ok($test1->number('two'), '==', 2, 'CSV AUTOLOAD works found');
+	cmp_ok($test1->number('two'), '==', 2, 'CSV AUTOLOAD works');
 
 	# Verify the contents of the file
 	open(my $fin, '<', $filename) or die "$filename: Cannot open file: $!";
@@ -78,4 +82,20 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 	unlike($content, qr/^FOO: /sm, 'Sanity check for the regex, that it is actually searching for something');
 
 	diag($content) if($ENV{'TEST_VERBOSE'});
+}
+
+# set_logger with array
+subtest 'Logger with Array' => sub {
+	my @messages;
+
+	my $test1 = new_ok('Database::test1' => [{ directory => "$Bin/../data", logger => \@messages }] );
+
+	cmp_ok($test1->entry(number => 2), 'eq', 'two', 'CSV AUTOLOAD works');
+	diag(Data::Dumper->new([\@messages])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+	is_deeply($messages[0], {
+			'level' => 'trace',
+			'message' => 'Database::test1: _open test1'
+		}
+	);
 }

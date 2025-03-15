@@ -60,6 +60,6 @@
          "web" : "https://github.com/david-dick/crypt-urandom"
       }
    },
-   "version" : "0.53",
+   "version" : "0.54",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

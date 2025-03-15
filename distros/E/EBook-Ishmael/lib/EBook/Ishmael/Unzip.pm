@@ -1,13 +1,41 @@
 package EBook::Ishmael::Unzip;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT = qw(unzip);
+our @EXPORT_OK = qw(safe_tmp_unzip unzip);
+
+use Cwd;
+use File::Spec;
+use File::Temp qw(tempdir);
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
+
+sub safe_tmp_unzip {
+
+	# Archive::Zip does not support unzipping to symlinked directory. This is a
+	# problem on platforms like Darwin, as /tmp is symlinked.
+	if (not -l File::Spec->tmpdir) {
+		return tempdir(CLEANUP => 1);
+	# Try working directory...
+	} elsif (! -l cwd and -w cwd) {
+		return tempdir(DIR => cwd, CLEANUP => 1);
+	# Try HOME...
+	} elsif (
+		exists $ENV{HOME} and
+		-d $ENV{HOME}     and
+		! -l $ENV{HOME}   and
+		-w $ENV{HOME}
+	) {
+		return tempdir(DIR => $ENV{HOME}, CLEANUP => 1);
+	# Give up and die :-(
+	} else {
+		die "Could not find a suitable unzip directory\n";
+	}
+
+}
 
 sub unzip {
 
@@ -40,7 +68,7 @@ EBook::Ishmael::Unzip - Unzip Zip archives
 
 =head1 SYNOPSIS
 
-  use EBook::Ishmael::Unzip;
+  use EBook::Ishmael::Unzip qw(unzip);
 
   unzip($zip, $out);
 
@@ -53,6 +81,13 @@ documentation, for L<ishmael> user documentation you should consult its manual.
 =head1 SUBROUTINES
 
 =over 4
+
+=item $tmpdir = safe_tmp_unzip()
+
+Creates and returns a suitable temporary unzip directory. This function exists
+because Archive::Zip cannot unzip to some kinds of directories, like symlinked
+ones, which can be problematic on platforms such as Darwin where their F</tmp>
+directory is symlinked by default.
 
 =item unzip($zip, $out)
 

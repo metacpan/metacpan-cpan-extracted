@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::GtkSettings.
 
+0.10  Mar 14 2025
+	- Added class ListBrowser to group list.
+	- Changed various option settings to conform more with the desktop theme.
+
 0.09  Jan 19 2025
 	- Removed class PodText from group content.
 	- Added options disabledBackground and disabledForeground to main group.

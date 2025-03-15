@@ -1,0 +1,27 @@
+Revision history for MIDI-RtController-Filter-Tonal
+
+0.0200 2025-03-14 08:53:24
+  - Rename module from *::Gene to *::Tonal.
+
+0.0105 2025-03-13 21:15:35
+  - Improve the eg/*.pl programs.
+
+0.0104 2025-03-13 20:32:17
+  - Actually import Array::Circular. Thanks.
+  - Add the M::R::F::Math illustration package.
+  - Improve documentation.
+
+0.0103 2025-03-13 15:04:15
+  - Use Array::Circular.
+  - Fix documentation.
+
+0.0102 2025-03-13 10:27:34
+  - Add the eg/tester.pl program.
+  - Fix imports and SEE ALSO.
+
+0.0101 2025-03-12 18:39:54
+  - More filters: Arp and Walk.
+
+0.0100 2025-03-12 16:13:04
+  - Mint with Dist::Zilla.
+  - Begin porting from https://github.com/ology/Music/blob/master/rtmidi-callback.pl

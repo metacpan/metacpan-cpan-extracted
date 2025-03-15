@@ -20,7 +20,7 @@ sub run {
     open(CMAKELISTS, '>', "$props_dir/CMakeLists.txt") or die $!;
 
     print CMAKELISTS <<'EOS';
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(GetProps)
 
 macro(find_package)

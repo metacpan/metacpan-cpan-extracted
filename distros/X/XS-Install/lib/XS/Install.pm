@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.3.5';
+our $VERSION = '1.4.0';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -449,8 +449,9 @@ sub process_CLIB {
 
         my $build_cmd = $info->{BUILD_CMD};
         my $clean_cmd = $info->{CLEAN_CMD};
+        my $build_dep = $info->{BUILD_DEP};
 
-        unless ($build_cmd) {
+        if (!$build_cmd and !$build_dep) {
             my $make = '$(MAKE)';
             $make = 'gmake' if $info->{GMAKE} and $native_bsd_make;
             $info->{TARGET} ||= '';
@@ -469,9 +470,15 @@ sub process_CLIB {
         $clibs .= $path;
 
         my $force = $info->{FORCE_TRACKING} ? 'FORCE' : '';
-
-        push @{$params->{postamble}}, "$path : $force; cd $info->{DIR} && $build_cmd\n";
+        
+        if ($build_dep) {
+            push @{$params->{postamble}}, "$path : $force $build_dep;";
+        } else {
+            push @{$params->{postamble}}, "$path : $force; cd $info->{DIR} && $build_cmd\n";
+        }
+        
         push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
+        
         if ($static) {
             push @{$params->{MODULE_INFO}{STATIC_LIBS}}, "$wa_open $path $wa_close";
         } else {

@@ -1,12 +1,12 @@
 package EBook::Ishmael::EBook::CBZ;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
 use parent 'EBook::Ishmael::EBook::CB';
 
-use EBook::Ishmael::Unzip;
+use EBook::Ishmael::Unzip qw(unzip);
 
 my $MAGIC = pack "C*", 0x50, 0x4b, 0x03, 0x04;
 

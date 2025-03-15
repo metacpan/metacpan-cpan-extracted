@@ -6,7 +6,7 @@ use warnings;
 use File::Temp qw(tempdir);
 use File::Spec;
 use FindBin qw($Bin);
-use Test::Most tests => 19;
+use Test::Most tests => 20;
 
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
@@ -77,4 +77,14 @@ use_ok('Database::test1');
 	is($obj->{no_entry}, 0, 'Default no_entry is set');
 	is($obj->{cache_duration}, '5 days', 'cache_duration is set');
 	is($obj->{max_slurp_size}, DEFAULT_MAX_SLURP_SIZE, 'Default max_slurp_size is set');
+}
+
+
+# Test loading configuration from a file
+{
+	my $config_file = File::Spec->catfile($Bin, File::Spec->updir(), 'config.yaml');
+
+	my $obj = Database::test1->new(config_file => $config_file);
+
+	cmp_ok($obj->{'directory'}, 'eq', '/', 'Can read configuration in from a file');
 }

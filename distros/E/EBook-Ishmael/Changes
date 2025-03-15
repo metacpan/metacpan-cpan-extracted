@@ -1,5 +1,16 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.02  Mar 14 2025
+  - Do not try to unzip CBZ archives to symlinked temporary directories.
+    Primarily an issue with Darwin platforms.
+  - Ishmael-formatted metadata (--metadata=ishmael) is now dumped in UTF8.
+  - Recognize DC metadata in X?HTML files.
+  - Recognize "generator" metadata in X?HTML files as software metadata.
+  - Removed dump tests.
+  - Improved Mobi encoding handling.
+  - ishmael dies if comic book archive does not have any images.
+  - Fixed unescaped left brace error in queequeg regex.
+
 1.01  Mar 11 2025
   - Force text browsers to dump output in UTF8.
   - Fix dumping X?HTML files with no title.

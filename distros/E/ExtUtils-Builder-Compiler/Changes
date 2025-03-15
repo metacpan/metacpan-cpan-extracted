@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.024     2025-03-14 16:57:33+01:00 Europe/Brussels
+          - Pass module name to prelink for loadable object
+
 0.023     2025-03-13 16:34:20+01:00 Europe/Brussels
           - Restore module_for_xs delegate
           - Make module work on static perls

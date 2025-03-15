@@ -1,5 +1,21 @@
 Revision history for Perl extension Onyphe.
 
+4.19.0 Fri 14 Mar 16:23:17 CET 2025
+  - WARNING: ASD APIs are still BETA and interface may be subject to change
+  - Bugfix: onyphe: -asd-pivot-query needs -field param
+  - Bugfix: Onyphe::Api: check api keys & endpoints are configured from .onyphe.ini or dies
+  - New: onyphe: -asd-score-inventory API
+  - New: onyphe: -asd-domain-soa API
+  - Update: onyphe: review of usage information
+  - Update: onyphe: -aslines set to 0 by default for -asd-score-inventory API,
+                    and to 1 for others APIs
+  - Rename: onyphe: -asd-ip-whois to -asd-subnet-inventory
+  - Rename: onyphe: -asd-domain-exist to -asd-dns-domain-exist
+  - Rename: onyphe: -asd-domain-ns to -asd-dns-domain-ns
+  - Rename: onyphe: -asd-domain-mx to -asd-dns-domain-mx
+  - Rename: onyphe: -asd-domain-soa to -asd-dns-domain-soa
+  - Rename: onyphe: -asd-domain-ns to -asd-dns-domain-ns
+
 4.18 Tue  4 Mar 16:02:41 CET 2025
   - WARNING: ASD APIs are still BETA and interface may be subject to change
   - New: OPP Proc: rename to rename fields

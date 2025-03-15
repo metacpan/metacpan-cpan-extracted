@@ -1,17 +1,17 @@
 package EBook::Ishmael::EBook::CB;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
 use File::Basename;
 use File::Spec;
-use File::Temp qw(tempdir);
 use File::Which;
 use List::Util qw(max);
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::Unzip qw(safe_tmp_unzip);
 
 # Not an ebook format itself, just a base class from which actual comic book
 # archives derive themselves.
@@ -57,10 +57,14 @@ sub new {
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_tmpdir} = tempdir(CLEANUP => 1);
+	$self->{_tmpdir} = safe_tmp_unzip;
 	$self->extract($self->{_tmpdir});
 
 	@{ $self->{_images} } = _images($self->{_tmpdir});
+
+	unless (@{ $self->{_images} }) {
+		die "$self->{Source}: Found no images in comic book archive\n";
+	}
 
 	$self->{Metadata}->title([ $title ]);
 	$self->{Metadata}->modified([ scalar gmtime((stat $self->{Source})[9]) ]);

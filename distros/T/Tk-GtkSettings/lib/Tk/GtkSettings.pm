@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -172,6 +172,7 @@ my @listwidgets = qw(
 	ITree
 	IconList
 	Listbox
+	ListBrowser
 	Tlist
 	Tree
 );
@@ -180,19 +181,22 @@ my %mainoptions = qw(
 	background           theme_bg_color
 	foreground           theme_fg_color
 	font                 gtk-font-name
-	activeBackground     tk-active-background
+	activeBackground     theme_button_decoration_focus
 	activeForeground     theme_fg_color
-	disabledBackground   tk-disabled-bg
-	disabledForeground   tk-disabled-fg
-	backPageColor        tk-through-color
+	disabledBackground   theme_button_background_insensitive
+	disabledForeground   theme_button_foreground_insensitive
+	backPageColor        theme_button_background_backdrop
+	headerBackground     theme_button_decoration_hover
 	highlightBackground  theme_bg_color
 	highlightColor			    theme_selected_bg_color
-	inactiveBackground   tk-through-color
+	inactiveBackground   theme_button_background_backdrop
 	insertBackground     theme_fg_color
+	errorColor           error_color
+	warningColor         warning_color
 	linkColor            link_color
 	selectBackground     theme_selected_bg_color
 	selectForeground     theme_selected_fg_color
-	troughColor          tk-through-color
+	troughColor          insensitive_bg_color
 );
 
 my %contentoptions = qw(
@@ -767,10 +771,6 @@ sub initDefaults {
 	return unless platformPermitted;
 	resetAll;
 	loadGtkInfo;
-	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
-	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
-	gtkKey('tk-disabled-bg', alterColor(gtkKey('theme_bg_color'), 30));
-	gtkKey('tk-disabled-fg', alterColor(gtkKey('theme_fg_color'), 90));
 
 	for (keys %mainoptions) {
 		groupOption('main', $_, $mainoptions{$_})

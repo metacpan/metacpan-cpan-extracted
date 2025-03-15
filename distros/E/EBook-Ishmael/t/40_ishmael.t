@@ -52,19 +52,19 @@ for my $f (@FILES) { SKIP: {
 	my ($file) = $f =~ /\.(.+)$/;
 
 	if (!$TEST_PDF and $file eq 'pdf') {
-		skip "TEST_PDF set to 0 or poppler utils not installed", 9;
+		skip "TEST_PDF set to 0 or poppler utils not installed", 8;
 	}
 
 	if (!$EBook::Ishmael::EBook::CBR::CAN_TEST and $file eq 'cbr') {
-		skip "unrar not installed", 9;
+		skip "unrar not installed", 8;
 	}
 
 	if (!$EBook::Ishmael::EBook::CB7::CAN_TEST and $file eq 'cb7') {
-		skip "7z not installed", 9;
+		skip "7z not installed", 8;
 	}
 
 	if (!$EBook::ishmael::EBook::CHM::CAN_TEST and $file eq 'chm') {
-		skip "chmlib not installed", 9;
+		skip "chmlib not installed", 8;
 	}
 
 	@ARGV = ('-H', $f);
@@ -128,19 +128,6 @@ for my $f (@FILES) { SKIP: {
 	);
 
 	remove_tree($tmp, { safe => 1 });
-
-	SKIP: {
-
-		unless ($EBook::Ishmael::TextBrowserDump::CAN_DUMP) {
-			skip 'no valid text browser installed', 1;
-		}
-
-		@ARGV = ($f);
-		$ishmael = EBook::Ishmael->init();
-
-		ok($ishmael->run, "text dump w/ $file ok");
-
-	}
 
 }}
 

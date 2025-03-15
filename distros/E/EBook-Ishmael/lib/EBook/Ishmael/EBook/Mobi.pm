@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -312,6 +312,30 @@ sub new {
 
 }
 
+sub rawml {
+
+	my $self  = shift;
+	my %param = %_;
+
+	my $decode = $param{decode} // 0;
+	my $clean  = $param{clean}  // 0;
+
+	my $cont =
+		join '',
+		map { $self->_decode_record($_) }
+		0 .. $self->{_recnum} - 1;
+
+	_clean_html(\$cont);
+
+	if ($decode and $self->{_codepage} == 1252) {
+		from_to($cont, "cp1252", "utf-8")
+			or die "Failed to encode Mobi $self->{Source} text as utf-8\n";
+	}
+
+	return $cont;
+
+}
+
 sub html {
 
 	my $self = shift;
@@ -322,16 +346,7 @@ sub html {
 	open my $fh, '>', $out // \$html
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 
-	my $cont = join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1);
-
-	if ($self->{_codepage} == 1252) {
-		from_to($cont, "cp1252", "utf-8")
-			or die "Failed to encode Mobi $self->{Source} text as utf-8\n";
-	}
-
-	_clean_html(\$cont);
-
-	print { $fh } $cont;
+	print { $fh } $self->rawml(decode => 1, clean => 1);
 
 	close $fh;
 
@@ -348,13 +363,15 @@ sub raw {
 
 	open my $fh, '>', $out // \$raw
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
+	binmode $fh, ':utf8';
 
-	my $cont = join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1);
+	my $rawml = $self->rawml(clean => 1);
 
-	_clean_html(\$cont);
+	my $enc = $self->{_codepage} == 1252 ? "cp1252" : "utf-8";
 
 	my $dom = XML::LibXML->load_html(
-		string => $cont,
+		string => $rawml,
+		encoding => $enc,
 		recover => 2
 	);
 

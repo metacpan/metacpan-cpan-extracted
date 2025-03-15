@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.165'
+    version: '0.166'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.165'
+    version: '0.166'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.165'
+    version: '0.166'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -71,7 +71,6 @@ recommends:
   Dist::Zilla::Plugin::ModuleBuildTiny::Fallback: '0.018'
   Dist::Zilla::Plugin::SurgicalPodWeaver: '0'
   Dist::Zilla::Plugin::VerifyPhases: '0.015'
-  Pod::Coverage::TrustPod: '0'
   Pod::Wordlist: '1.09'
   Test::CPAN::Changes: '0'
   Test::CPAN::Meta: '0'
@@ -80,7 +79,7 @@ recommends:
   Test::Mojibake: '0'
   Test::NoTabs: '0'
   Test::Pod: '1.41'
-  Test::Pod::Coverage: '1.08'
+  Test::Pod::Coverage::TrustMe: '0'
   Test::Spelling: '0.19'
 requires:
   CPAN::Changes: '0.23'
@@ -136,7 +135,6 @@ requires:
   Dist::Zilla::Plugin::ModuleBuildTiny: '0.012'
   Dist::Zilla::Plugin::ModuleBuildTiny::Fallback: '0.018'
   Dist::Zilla::Plugin::MojibakeTests: '0.8'
-  Dist::Zilla::Plugin::PodCoverageTests: '5.040'
   Dist::Zilla::Plugin::PodSyntaxTests: '5.040'
   Dist::Zilla::Plugin::PodWeaver: '4.008'
   Dist::Zilla::Plugin::Prereqs: '0'
@@ -160,6 +158,7 @@ requires:
   Dist::Zilla::Plugin::Test::Kwalitee: '2.10'
   Dist::Zilla::Plugin::Test::MinimumVersion: '2.000010'
   Dist::Zilla::Plugin::Test::NoTabs: '0.08'
+  Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe: '0'
   Dist::Zilla::Plugin::Test::Pod::No404s: '1.003'
   Dist::Zilla::Plugin::Test::PodSpelling: '2.006003'
   Dist::Zilla::Plugin::Test::Portability: '2.000007'
@@ -210,10 +209,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.165'
+version: '0.166'
 x_Dist_Zilla:
   perl:
-    version: '5.041008'
+    version: '5.041009'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -332,6 +331,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: 'default minting profile'
       version: '2.051'
+    -
+      class: Dist::Zilla::Plugin::FileFinder::Filter
+      name: skip_auto_share
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -492,6 +495,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
       version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe
+      config:
+        Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe:
+          finder:
+            - skip_auto_share
+      name: '@Author::ETHER/Test::Pod::Coverage::TrustMe'
+      version: v1.0.0
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -801,7 +812,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250120'
+          Module::CoreList: '5.20250220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -965,7 +976,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.165
+          tag: v0.166
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1155,7 +1166,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.41.8
+x_generated_by_perl: v5.41.9
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

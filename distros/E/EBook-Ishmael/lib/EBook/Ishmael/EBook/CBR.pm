@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CBR;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use File::Which;
 
 my $MAGIC = pack "C*", 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07;
 
-my $UNRAR = which 'unrar' // which 'UnRAR';
+my $UNRAR = which('unrar') // which('UnRAR');
 
 our $CAN_TEST = defined $UNRAR;
 

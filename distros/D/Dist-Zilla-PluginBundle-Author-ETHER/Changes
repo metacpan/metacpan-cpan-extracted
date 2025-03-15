@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.166     2025-03-14 19:34:58Z
+          - switched from [PodCoverageTests] to [Test::Pod::Coverage::TrustMe]
+
 0.165     2025-01-31 23:32:25Z
           - fixed PAUSE download URI to use https
 

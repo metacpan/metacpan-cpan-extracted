@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::COFF;
-$ExtUtils::Builder::Linker::COFF::VERSION = '0.023';
+$ExtUtils::Builder::Linker::COFF::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -26,30 +26,3 @@ sub autoimport {
 }
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-ExtUtils::Builder::Linker::COFF
-
-=head1 VERSION
-
-version 0.023
-
-=head1 AUTHOR
-
-Leon Timmermans <fawaka@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Leon Timmermans.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

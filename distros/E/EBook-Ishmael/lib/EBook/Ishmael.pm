@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -218,12 +218,11 @@ sub meta_ishmael {
 	my %meta = %{ $ebook->metadata };
 
 	my $oh = _get_out($self->{Output});
+	binmode $oh, ':utf8';
 
-	# Make room for colon and extra space
-	my $klen = max map { length($_) + 2 } keys %meta;
-
+	my $klen = max(map { length } keys %meta) + 1;
 	for my $k (sort keys %meta) {
-		say { $oh } pack("A$klen", "$k:"), join(", ", @{ $meta{ $k } });
+		printf { $oh } "%-*s %s\n", $klen, "$k:", join ", ", @{ $meta{ $k } };
 	}
 
 	close $oh unless $self->{Output} eq $STDOUT;
@@ -253,7 +252,7 @@ sub meta_json {
 		}
 	}
 
-	say { $oh } to_json($meta, { utf8 => 1, pretty => $pretty, canonical => 1 });
+	say { $oh } to_json($meta, { utf8 => 1,  pretty => $pretty, canonical => 1 });
 
 	close $oh unless $self->{Output} eq $STDOUT;
 

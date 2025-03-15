@@ -1,5 +1,9 @@
 Revision history for Acme-Pi
 
+3.14159265  2025-03-14 19:37:40Z
+          - Happy Pi Day 2025!
+          - now using Math::BigFloat, for even more precision
+
 3.1415926  2018-07-02 17:03:09Z
           - added new export, a constant sub named π
           - re-introduce all uses of PPI, now that encoding issues are fixed
