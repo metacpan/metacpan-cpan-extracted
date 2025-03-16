@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.9906";
+our $VERSION = "0.9907";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9906
+Version 0.9907
 
 =head1 DESCRIPTION
 
@@ -839,9 +839,9 @@ option --ifdef-color --re '^#ifdef(?s:.*?)^#endif.*\n'
 
 option --xlate-stripe --xlate-stripe-auto
 option --xlate-stripe-light -Mstripe
-option --xlate-stripe-dark  -Mstripe::set=darkmode
+option --xlate-stripe-dark  -Mstripe::config=darkmode
 option --xlate-stripe-auto \
-	-Mtermcolor::bg(light=-Mstripe,dark=-Mstripe::set=darkmode)
+	-Mtermcolor::bg(light=-Mstripe,dark=-Mstripe::config=darkmode)
 
 #  LocalWords:  deepl ifdef unifdef Greple greple perl DeepL ChatGPT
 #  LocalWords:  gpt html img src xlabor

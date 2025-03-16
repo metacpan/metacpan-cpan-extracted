@@ -7,7 +7,7 @@ requires 'Clipboard';
 requires 'File::Share';
 requires 'App::Greple', '9.22';
 requires 'App::Greple::msdoc', '1.06';
-requires 'App::Greple::stripe';
+requires 'App::Greple::stripe', '1.02';
 requires 'Getopt::EX::termcolor';
 requires 'App::optex::textconv', '1.07';
 requires 'App::sdif', '4.41';

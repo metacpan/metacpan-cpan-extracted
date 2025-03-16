@@ -39,15 +39,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/gisle/tcl.pm/issues"
+         "web" : "https://github.com/vadrerko/tcl.pm/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/gisle/tcl.pm.git",
-         "web" : "https://github.com/gisle/tcl.pm"
+         "url" : "https://github.com/vadrerko/tcl.pm.git",
+         "web" : "https://github.com/vadrerko/tcl.pm"
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

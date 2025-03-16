@@ -403,10 +403,6 @@ MODULE = IP::Geolocation::MMDB PACKAGE = IP::Geolocation::MMDB
 
 PROTOTYPES: DISABLE
 
-TYPEMAP: <<HERE
-IP::Geolocation::MMDB T_PTROBJ
-HERE
-
 SV *
 new(klass, ...)
     SV *klass

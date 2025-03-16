@@ -11,6 +11,7 @@ use Koha::Contrib::Tamil::Biblio::Dumper;
 
 my $verbose  = 0;
 my $help     = 0;
+my $decode   = 0;
 my $formater = 'iso2709';
 my @branches;
 my $query    = '';
@@ -19,6 +20,7 @@ GetOptions(
     'branch|b=s'   => \@branches,
     'query|q=s'    => \$query,
     'formater|f=s' => \$formater,
+    'decode|d'     => \$decode,
     'help|h'       => \$help,
 );
 
@@ -39,6 +41,7 @@ my $dumper = Koha::Contrib::Tamil::Biblio::Dumper->new(
     branches => \@branches,
     query    => $query,
     formater => $formater,
+    decode   => $decode,
 );
 $dumper->run();
 
@@ -54,7 +57,7 @@ koha-dump-biblio - Dump a Koha Catalog
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 DESCRIPTION
 
@@ -89,6 +92,7 @@ koha-dump-biblio - Dump a Koha Catalog
 
  koha-dump-biblio
  koha-dump-biblio --branch MAIN
+ koha-dump-biblio --branch MAIN --decode
  koha-dump-biblio --branch MAIN --branch EAST catalog.mrc
  koha-dump-biblio --branch MAIN --formater marcxml catalog.xml
  koha-dump-biblio --branch MAIN --query "SELECT biblionumber FROM items WHERE barcode LIKE 'X%' --formater marcxml catalog.xml
@@ -130,6 +134,10 @@ For example:
 
 =back
 
+=item B<--decode|-d
+
+Decode encoded values, by authorized_values list, or by branches/itemtypes.
+
 =item B<--verbose|-v>
 
 Display a progress status of the export process.
@@ -155,7 +163,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Fréderic Démians.
+This software is Copyright (c) 2025 by Fréderic Démians.
 
 This is free software, licensed under:
 

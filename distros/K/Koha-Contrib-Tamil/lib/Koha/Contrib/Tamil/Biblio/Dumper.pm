@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Biblio::Dumper;
 # ABSTRACT: Class dumping a Koha Catalog
-$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.073';
+$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.074';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -12,7 +12,8 @@ use MARC::Moose::Record;
 use MARC::Moose::Writer;
 use MARC::Moose::Formater::Iso2709;
 use C4::Biblio;
-use C4::Items qw/ Item2Marc /;
+use C4::Items qw/ Item2Marc PrepareItemrecordDisplay /;
+use Koha::Items;
 use Locale::TextDomain 'Koha-Contrib-Tamil';
 
 
@@ -46,6 +47,8 @@ has koha => (
     required => 0,
 );
 
+has decode => ( is => 'rw', isa => 'Bool', default => 0 );
+
 has verbose => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has sth => ( is => 'rw' );
@@ -54,7 +57,7 @@ has sth_item => ( is => 'rw' );
 
 has writer => ( is => 'rw', isa => 'MARC::Moose::Writer' );
 
-
+has code_to_value => ( is => 'rw', isa => 'HashRef' );
 
 before 'run' => sub {
     my $self = shift;
@@ -86,6 +89,35 @@ before 'run' => sub {
     $query .= " AND $where" if $where;
     #say $query;
     $self->sth_item( $self->koha->dbh->prepare($query));
+
+    # Récupération des décodages
+    if ($self->decode) {
+        my $av;
+        my $decode;
+        $query = "SELECT category, authorised_value, lib FROM authorised_values";
+        for (@{$self->koha->dbh->selectall_arrayref($query)}) {
+            my ($category, $code, $decode) = @$_;
+            $av->{$category}->{$code} = $decode;
+        }
+        $query = "SELECT branchcode, branchname FROM branches";
+        for (@{$self->koha->dbh->selectall_arrayref($query)}) {
+            my ($code, $decode) = @$_;
+            $av->{branches}->{$code} = $decode;
+        }
+        $query = "SELECT itemtype, description FROM itemtypes";
+        for (@{$self->koha->dbh->selectall_arrayref($query)}) {
+            my ($code, $decode) = @$_;
+            $av->{itemtypes}->{$code} = $decode;
+        }
+        $query = "SELECT tagfield, tagsubfield, authorised_value
+                 FROM marc_subfield_structure
+                 WHERE frameworkcode='' AND authorised_value<>''";
+        for (@{$self->koha->dbh->selectall_arrayref($query)}) {
+            my ($tag, $letter, $category) = @$_;
+            $decode->{$tag}->{$letter} = $av->{$category};
+        }
+        $self->code_to_value($decode);
+    }
 
     my $fh = new IO::File '> ' . $self->file;
     binmode($fh, ':encoding(utf8)');
@@ -122,6 +154,23 @@ override 'process' => sub {
             tag => $field->tag,
             subf => [ $field->subfields ]);
         $record->append($f);
+    }
+
+    if ($self->decode) {
+        my $decode = $self->code_to_value;
+        for my $field (@{$record->fields}) {
+            my $dec_tag = $decode->{$field->tag};
+            next unless $dec_tag;
+            for (@{$field->subf}) {
+                my ($letter, $value) = @$_;
+                my $dec_letter = $dec_tag->{$letter};
+                next unless $dec_letter;
+                my $decode = $dec_letter->{$value};
+                next unless defined $decode;
+                $_->[1] = $decode;
+
+            }
+        }
     }
 
     # Specific conversion
@@ -170,7 +219,7 @@ Koha::Contrib::Tamil::Biblio::Dumper - Class dumping a Koha Catalog
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 SYNOPSIS
 
@@ -213,6 +262,10 @@ Type of formater used to write in L<file> file. Default value is C<marcxml>.
 Available values are: C<iso2709>, C<marcxml>, C<text>, C<json>, C<yaml>,
 C<json>.
 
+=head2 decode
+
+Decode encoded values
+
 =head2 verbose
 
 Verbosity. By default 0 (false).
@@ -223,7 +276,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Fréderic Démians.
+This software is Copyright (c) 2025 by Fréderic Démians.
 
 This is free software, licensed under:
 

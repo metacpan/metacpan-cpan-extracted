@@ -1,8 +1,13 @@
 Revision history for IP::Geolocation::MMDB
 
+1.013  2025-03-13 08:23:04 CET
+
+  - Amend the library search path on old versions of Strawberry Perl
+  - Support Perl 5.14
+
 1.012  2025-02-20 09:00:30 CET
 
-  - Use pkgconf if Alien::libmaxminddb is unavailable
+  - Use pkg-config if Alien::libmaxminddb is unavailable
 
 1.011  2025-01-22 09:09:04 CET
 

@@ -21,7 +21,7 @@ requires:
   perl: '5.006'
 resources:
   MailingList: mailto:tcltk@perl.org
-  bugtracker: https://github.com/gisle/tcl.pm/issues
-  repository: https://github.com/gisle/tcl.pm.git
-version: '1.51'
+  bugtracker: https://github.com/vadrerko/tcl.pm/issues
+  repository: https://github.com/vadrerko/tcl.pm.git
+version: '1.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

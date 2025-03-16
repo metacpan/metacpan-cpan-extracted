@@ -18,3 +18,4 @@ t/author-pod-syntax.t
 t/data/Test-City.mmdb
 t/mmdb.t
 t/release-kwalitee.t
+typemap

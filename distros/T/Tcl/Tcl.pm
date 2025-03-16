@@ -1,6 +1,6 @@
 package Tcl;
 
-$Tcl::VERSION = '1.51';
+$Tcl::VERSION = '1.52';
 
 =head1 NAME
 
@@ -789,7 +789,7 @@ sub _code_dispose {
       my $atclarray = $anon_refs{$k};
       $ret = $atclarray->[0][0];  # eh, return the first one, prob discarded anyway
       delete $anon_refs{$k}; # bunch of Tcl::Code
-      }
+    }
     return $$ret;  # original delete_ref result, prob just discarded
 }
 
@@ -806,7 +806,7 @@ sub delete_ref {
       delete $anon_refs{$name};
       untie $$iam;
       return $iam;
-      }
+    }
 }
 
 sub return_ref {
@@ -819,26 +819,6 @@ sub return_ref {
     elsif ($ref eq 'Tcl::Cmdbase'){ return ${$iam->[0][0]};}
     return $anon_refs{$name};
 }
-
-sub _code_clear {
-  # for testing
-  my $debug = shift;
-  print "_code_clear ARRAY\n"          if ($debug);
-  for my $kk (keys %anon_refs) {
-    if (ref($anon_refs{$kk}) eq 'ARRAY'){ print "ARRAY $kk\n"        if ($debug); delete $anon_refs{$kk};}
-    }
-
-  print "_code_clear Tcl::Code list\n" if ($debug);
-  for my $kk (keys %anon_refs) {
-    if (ref($anon_refs{$kk}) eq 'Tcl::Code'){ print "Code $kk\n"     if ($debug); delete $anon_refs{$kk};}
-    }
-
-  print "_code_clear Tcl::Cmdbase\n"   if ($debug);
-  for my $kk (keys %anon_refs) {
-    if (ref($anon_refs{$kk}) eq 'Tcl::Cmdbase'){ print "Code $kk\n"  if ($debug); delete $anon_refs{$kk};}
-    }
-}
-
 
 sub Ev {
     my @events = @_;

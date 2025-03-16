@@ -20,6 +20,9 @@ Requires a database in the MaxMind DB file format from
 Alien::libmaxminddb from CPAN is a build dependency.  The built module does
 only depend on modules that are distributed with Perl.
 
+Install pkg-config and libmaxminddb-devel or libmaxminddb-dev if you would
+like to use your operating system's libmaxminddb library.
+
 ## INSTALLATION
 
 Run the following commands to install the software:

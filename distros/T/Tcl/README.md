@@ -8,13 +8,15 @@ The Tcl extension provides a small but complete interface into `libtcl` and
 any other Tcl-based library. It lets you create Tcl interpreters as perl5
 objects, execute Tcl code in those interpreters and so on. There is a `Tcl::Tk`
 extension (not to be confused with "native" perl5 Perl/Tk extension)
-distributed separately which provides a raw but complete interface to the
-whole of libtk via this Tcl extension.
+distributed separately which provides complete interface to the whole of Tk
+via this Tcl extension, also providing full perl/Tk syntax. Another extension
+to note is `Tcl::pTk`, which does the same but claims to have full perl/Tk
+compatibility.
 
 Using "tcl stubs", module could be built even without tcl-dev package
 installed on system. Still, tcl (or tcl/tk) must be installed during module
-build. `--nousestubs` also supported. Tcl versions 8.4, 8.5, 8.6 and above are
-supported.
+build. `--nousestubs` also supported. Tcl versions 9.0, 8.6, 8.4 are actively
+used and supported, 8.0 also worked well in the past.
 
 # Install
 

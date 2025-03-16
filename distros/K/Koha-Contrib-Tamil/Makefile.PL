@@ -30,7 +30,8 @@ my %WriteMakefileArgs = (
     "bin/koha-index",
     "bin/koha-index-daemon",
     "bin/koha-overdue",
-    "bin/koha-rebuild-editors"
+    "bin/koha-rebuild-editors",
+    "bin/koha-unimarc-4xx"
   ],
   "LICENSE" => "gpl",
   "MIN_PERL_VERSION" => "5.010",
@@ -94,7 +95,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.073",
+  "VERSION" => "0.074",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -2,11 +2,11 @@ package IP::Geolocation::MMDB;
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-use 5.016;
+use 5.014;
 use warnings;
 use utf8;
 
-our $VERSION = 1.012;
+our $VERSION = 1.013;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -57,7 +57,7 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 SYNOPSIS
 
@@ -225,6 +225,9 @@ L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
 Alien::libmaxminddb from CPAN is a build dependency.  The built module does
 only depend on modules that are distributed with Perl.
 
+Install C<pkg-config> and C<libmaxminddb-devel> or C<libmaxminddb-dev> if you
+would like to use your operating system's libmaxminddb library.
+
 =head1 INCOMPATIBILITIES
 
 None.
@@ -250,6 +253,13 @@ The classes aren't Moo classes.
 There is no replacement for MaxMind::DB::Reader::Decoder.
 
 =back
+
+Create the file F<MaxMind/DB/Reader.pm> in your C<@INC> path if you want to
+try IP::Geolocation::MMDB as a replacement for MaxMind::DB::Reader:
+
+  use IP::Geolocation::MMDB;
+  @MaxMind::DB::Reader::ISA = qw(IP::Geolocation::MMDB);
+  1;
 
 =head1 SEE ALSO
 

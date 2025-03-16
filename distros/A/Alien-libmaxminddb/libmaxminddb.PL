@@ -43,7 +43,7 @@ sub pkgconf {
 
     my $pkgconf = $self->{pkgconf};
     if (defined $pkgconf) {
-        my $cmd    = $pkgconf . ' ' . join(' ', @options) . ' ' . $module;
+        my $cmd    = $pkgconf . q{ } . join(q{ }, @options) . q{ } . $module;
         my $output = `$cmd 2>$devnull`;
         if ($? == 0) {
             chomp $output;
@@ -134,10 +134,8 @@ sub new {
     return $self;
 }
 
-sub can_compile {
-    my ($self, $cflags, $code) = @_;
-
-    my $ok = 0;
+sub compile {
+    my ($self, $cflags_ref, $code) = @_;
 
     my ($out, $src_file) = File::Temp::tempfile('testXXXX', SUFFIX => '.c')
         or die 'Cannot create temporary source code file';
@@ -148,31 +146,78 @@ sub can_compile {
     my $obj_file = eval {
         $self->{builder}->compile(
             source               => $src_file,
-            extra_compiler_flags => $cflags,
+            extra_compiler_flags => $cflags_ref,
         );
     };
-    if (defined $obj_file) {
-        $ok = 1;
-        unlink $obj_file;
-    }
 
     unlink $src_file;
+
+    return $obj_file;
+}
+
+sub can_compile {
+    my ($self, $cflags_ref, $code) = @_;
+
+    my $ok = 0;
+
+    my $obj_file = $self->compile($cflags_ref, $code);
+    if (defined $obj_file) {
+        unlink $obj_file;
+        $ok = 1;
+    }
 
     return $ok;
 }
 
-sub requires_flag {
-    my ($self, $cflags, $flag, $code) = @_;
+sub can_link {
+    my ($self, $cflags_ref, $libs_ref, $code) = @_;
 
-    my @flags = (!$self->can_compile($cflags, $code)
-            && $self->can_compile([@{$cflags}, $flag], $code)) ? $flag : ();
-    return @flags;
+    my $ok = 0;
+
+    my $obj_file = $self->compile($cflags_ref, $code);
+    if (defined $obj_file) {
+        my $exe_file = eval {
+            $self->{builder}->link_executable(
+                objects            => $obj_file,
+                extra_linker_flags => $libs_ref,
+            );
+        };
+        if (defined $exe_file) {
+            unlink $exe_file;
+            $ok = 1;
+        }
+        unlink $obj_file;
+    }
+
+    return $ok;
 }
 
-sub std_c99 {
-    my ($self, $cflags) = @_;
+sub check_cflags {
+    my ($self, $cflags_ref, $other_cflags_ref, $code) = @_;
 
-    my @flags = $self->requires_flag($cflags, q{-std=c99}, <<'CODE');
+    my $new_cflags_ref = [@{$cflags_ref}, @{$other_cflags_ref}];
+    if (  !$self->can_compile($cflags_ref, $code)
+        && $self->can_compile($new_cflags_ref, $code)) {
+        return $new_cflags_ref;
+    }
+    return $cflags_ref;
+}
+
+sub check_libs {
+    my ($self, $cflags_ref, $libs_ref, $other_libs_ref, $code) = @_;
+
+    my $new_libs_ref = [@{$libs_ref}, @{$other_libs_ref}];
+    if (  !$self->can_link($cflags_ref, $libs_ref, $code)
+        && $self->can_link($cflags_ref, $new_libs_ref, $code)) {
+        return $new_libs_ref;
+    }
+    return $libs_ref;
+}
+
+sub check_std_c99 {
+    my ($self, $cflags_ref) = @_;
+
+    return $self->check_cflags($cflags_ref, ['-std=c99'], <<'CODE');
 struct point {
     int x;
     int y;
@@ -185,13 +230,12 @@ int main(void) {
     return p.x;
 }
 CODE
-    return @flags;
 }
 
-sub ms_extensions {
-    my ($self, $cflags) = @_;
+sub check_ms_extensions {
+    my ($self, $cflags_ref) = @_;
 
-    my @flags = $self->requires_flag($cflags, q{-fms-extensions}, <<'CODE');
+    return $self->check_cflags($cflags_ref, ['-fms-extensions'], <<'CODE');
 struct anonymous {
     union {
         float x;
@@ -204,35 +248,69 @@ int main(void) {
     return a.n;
 }
 CODE
-    return @flags;
 }
 
 sub has_unsigned_int128 {
-    my ($self, $cflags) = @_;
+    my ($self, $cflags_ref) = @_;
 
-    my $ok = $self->can_compile($cflags, <<'CODE');
+    return $self->can_compile($cflags_ref, <<'CODE');
 int main(void) {
     unsigned __int128 u = 0;
     return (int) u;
 }
 CODE
-    return $ok;
 }
 
 sub has_unsigned_int128_mode {
-    my ($self, $cflags) = @_;
+    my ($self, $cflags_ref) = @_;
 
-    my $ok = $self->can_compile($cflags, <<'CODE');
+    return $self->can_compile($cflags_ref, <<'CODE');
 int main(void) {
     unsigned int __attribute__((mode(TI))) u = 0;
     return (int) u;
 }
 CODE
-    return $ok;
+}
+
+sub check_libm {
+    my ($self, $cflags_ref, $libs_ref) = @_;
+
+    return $self->check_libs($cflags_ref, $libs_ref, ['-lm'], <<'CODE');
+#include <math.h>
+
+int main(void) {
+    (void) fabs(0.0);
+    (void) fabsf(0.0);
+    return 0;
+}
+CODE
+}
+
+sub check_libsocket {
+    my ($self, $cflags_ref, $libs_ref) = @_;
+
+    if ($^O eq 'MSWin32') {
+        return ['-lws2_32'];
+    }
+
+    return $self->check_libs($cflags_ref, $libs_ref, ['-lsocket'], <<'CODE');
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <stddef.h>
+
+int main(void) {
+    struct addrinfo *ai = NULL;
+    if (getaddrinfo("localhost", NULL, NULL, &ai) == 0) {
+        freeaddrinfo(ai);
+    }
+    return 0;
+}
+CODE
 }
 
 sub create_config_h {
-    my ($self, $filename, $cflags) = @_;
+    my ($self, $filename, $cflags_ref) = @_;
 
     my $little_endian = $self->{is_little_endian} ? 1 : 0;
 
@@ -246,17 +324,17 @@ sub create_config_h {
 }
 
 sub create_maxminddb_config_h {
-    my ($self, $filename, $cflags) = @_;
+    my ($self, $filename, $cflags_ref) = @_;
 
     open my $out, '>', $filename
         or die "Cannot create $filename";
     print {$out} qq{#ifndef MAXMINDDB_CONFIG_H\n};
     print {$out} qq{#define MAXMINDDB_CONFIG_H\n};
-    if ($self->has_unsigned_int128) {
+    if ($self->has_unsigned_int128($cflags_ref)) {
         print {$out} qq{#define MMDB_UINT128_USING_MODE 0\n};
         print {$out} qq{#undef MMDB_UINT128_IS_BYTE_ARRAY\n};
     }
-    elsif ($self->has_unsigned_int128_mode) {
+    elsif ($self->has_unsigned_int128_mode($cflags_ref)) {
         print {$out} qq{#define MMDB_UINT128_USING_MODE 1\n};
         print {$out} qq{#undef MMDB_UINT128_IS_BYTE_ARRAY\n};
     }
@@ -310,9 +388,13 @@ sub install {
 sub build {
     my ($self) = @_;
 
-    my @cflags;
-    push @cflags, $self->std_c99(\@cflags);
-    push @cflags, $self->ms_extensions(\@cflags);
+    my $cflags_ref = $self->check_ms_extensions($self->check_std_c99([]));
+
+    my $libs_ref = [
+        '-lmaxminddb',
+        @{$self->check_libm($cflags_ref, [])},
+        @{$self->check_libsocket($cflags_ref, [])},
+    ];
 
     my @src_files = map { File::Spec->catfile(qw(maxminddb src), $_) }
         qw(maxminddb.c data-pool.c);
@@ -322,10 +404,10 @@ sub build {
     File::Copy::copy($hdr_file, 'maxminddb.h')
         or die "Cannot copy $hdr_file";
 
-    $self->create_config_h('config.h', \@cflags)
+    $self->create_config_h('config.h', $cflags_ref)
         or die 'Cannot create config.h';
 
-    $self->create_maxminddb_config_h('maxminddb_config.h', \@cflags)
+    $self->create_maxminddb_config_h('maxminddb_config.h', $cflags_ref)
         or die 'Cannot create maxminddb_config.h';
 
     my @inc_dirs = File::Spec->curdir();
@@ -334,7 +416,7 @@ sub build {
         $self->{builder}->compile(
             source               => $_,
             include_dirs         => \@inc_dirs,
-            extra_compiler_flags => [@cflags, '-DHAVE_CONFIG_H=1'],
+            extra_compiler_flags => [@{$cflags_ref}, '-DHAVE_CONFIG_H=1'],
         ) or die "Cannot compile $_";
     } @src_files;
 
@@ -345,15 +427,10 @@ sub build {
     $self->{hdr_files} = [qw(maxminddb.h maxminddb_config.h)];
     $self->{lib_files} = [$lib_file];
 
-    my @libs = '-lmaxminddb';
-    if ($^O eq 'MSWin32') {
-        push @libs, '-lws2_32';
-    }
-
     $self->{config} = {
-        cflags       => join(q{ }, @cflags),
+        cflags       => join(q{ }, @{$cflags_ref}),
         install_type => 'share',
-        libs         => join(q{ }, @libs),
+        libs         => join(q{ }, @{$libs_ref}),
         version      => $BUNDLED_VERSION,
     };
 
@@ -399,6 +476,7 @@ sub install {
 sub done {
     open my $out, '>', 'done.txt';
     close $out;
+    return;
 }
 
 package main;

@@ -212,12 +212,12 @@ my $mm = WriteMakefile(
         "meta-spec" => { version => 2 },
         resources => {
             bugtracker => {
-                web => 'https://github.com/gisle/tcl.pm/issues',
+                web => 'https://github.com/vadrerko/tcl.pm/issues',
             },
             repository => {
                 type => 'git',
-                web => 'https://github.com/gisle/tcl.pm',
-                url => 'https://github.com/gisle/tcl.pm.git',
+                web => 'https://github.com/vadrerko/tcl.pm',
+                url => 'https://github.com/vadrerko/tcl.pm.git',
             },
             MailingList => 'mailto:tcltk@perl.org',
         }

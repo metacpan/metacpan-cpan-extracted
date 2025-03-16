@@ -63,7 +63,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9906
+    Version 0.9907
 
 =cut
 
@@ -92,8 +92,10 @@ warn() {
     echo ${1+"$@"} >&2
 }
 
+topdir=$(git_topdir)
 pwd=$(pwd)
 owner=tecolicom
+image=
 repository=$owner/$myname
 hostname=
 mount=yes
@@ -157,10 +159,23 @@ docker_status() {
     docker inspect --format='{{.State.Status}}' $1
 }
 
+
+##
+## read .xlaterc
+##
+for dir in $topdir .
+do
+    rc="$dir/.xlaterc"
+    [[ -r $rc ]] || continue
+    mapfile -t OPTS < <(grep -v ^# "$rc")
+    warn "$myname: ${OPTS[@]}"
+    set -- ${OPTS[@]} ${1+"$@"}
+done
+
 ##
 ## Docker
 ##
-if [[ ${topdir:=$(git_topdir)} && $topdir != $pwd ]]
+if [[ $topdir && $topdir != $pwd ]]
 then
     volume="$topdir"
 fi
@@ -602,6 +617,22 @@ Selects the translation engine for a specific file
 
 For more detailed information on the make functionality and available
 rules, refer to the F<XLATE.mk> file in the xlate library directory.
+
+=head2 XLATERC File
+
+The F<.xlaterc> file allows you to set default options for the
+C<xlate> command.  This file is searched in the Git top directory and
+the current directory.  If found, its contents are applied before any
+command-line options.
+
+Each line in the C<.xlaterc> file should contain a valid C<xlate>
+command option.  Lines starting with C<#> are treated as comments and
+ignored.
+
+For example, if the following line is set in F<.xlaterc>, C<xlate>
+will use the specified container image when docker is run.
+
+    -I tecolicom/texlive-groff-ja:v1.35
 
 =head1 OPTIONS
 

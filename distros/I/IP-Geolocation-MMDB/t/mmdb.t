@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-use 5.016;
+use 5.014;
 use warnings;
 use utf8;
 
@@ -14,15 +14,9 @@ use Math::BigInt 1.999806;
 
 my $version = IP::Geolocation::MMDB::libmaxminddb_version;
 
-my $expected_version = eval {
-    require Alien::libmaxminddb;
-    Alien::libmaxminddb->version;
-};
-
 # Check if the module was linked against the wrong library version.
-if (defined $expected_version && $version ne $expected_version) {
-    plan skip_all => "Error: wrong libmaxminddb version, got $version, "
-        . "expected $expected_version";
+if ($version =~ m{^(0|1\.[01])\.}) {
+    plan skip_all => "libmaxminddb $version is too old";
 }
 
 diag 'libmaxminddb version is ' . $version;

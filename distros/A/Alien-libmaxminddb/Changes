@@ -1,5 +1,9 @@
 Revision history for Alien::libmaxminddb
 
+2.001  2025-03-15 20:41:39 CET
+
+  - Check for -lm and -lsocket
+
 2.000  2025-03-12 19:09:03 CET
 
   - Get rid of Alien::Build and Alien::MSYS

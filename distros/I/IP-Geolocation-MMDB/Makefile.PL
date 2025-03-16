@@ -5,14 +5,16 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.014;
 use ExtUtils::MakeMaker;
 
 use Config;
+use File::Spec::Functions qw(devnull);
+use Math::BigInt;
 my @defines;
 my $byteorder = $Config{byteorder};
 if (!defined $byteorder) {
- warn "\$Config{byteorder} is undefined.\n";
+ warn "\$Config{byteorder} is undefined";
  die "OS unsupported\n";
 }
 if ($byteorder == 4321 || $byteorder == 87654321) {
@@ -22,21 +24,45 @@ elsif (!($byteorder == 1234 || $byteorder == 12345678)) {
  warn "Unknown byte order: $byteorder\n";
  die "OS unsupported\n";
 }
-my ($ccflags, $libs, $version);
+my $ccflags = '';
+my $libs = '';
+my $version;
 if (eval { require Alien::libmaxminddb }) {
  $ccflags = Alien::libmaxminddb->cflags;
  $libs = Alien::libmaxminddb->libs;
  $version = Alien::libmaxminddb->version;
 }
 else {
- chomp($ccflags = `pkgconf --cflags libmaxminddb` // q{});
- chomp($libs = `pkgconf --libs libmaxminddb` // '-lmaxminddb');
- chomp($version = `pkgconf --modversion libmaxminddb` // q{});
+ my $devnull = devnull();
+ for my $pkgconf (qw(pkgconf pkg-config)) {
+  my $output = `$pkgconf --version 2>$devnull`;
+  if ($? == 0) {
+   $ccflags = `$pkgconf --cflags libmaxminddb 2>$devnull`;
+   last if $? != 0;
+   $libs = `$pkgconf --libs libmaxminddb 2>$devnull`;
+   last if $? != 0;
+   $version = `$pkgconf --modversion libmaxminddb 2>$devnull`;
+   last if $? != 0;
+   chomp($ccflags, $libs, $version);
+   last;
+  }
+ }
+}
+if ($^O eq 'MSWin32' && $^V < 5.034) {
+ # Amend the library search path
+ my $libdir = 'C:\strawberry\c\x86_64-w64-mingw32\lib';
+ if (-d $libdir) {
+  $libs = "-L$libdir $libs";
+ }
 }
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Read MaxMind DB files",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Alien::libmaxminddb" => 0,
+    "Math::BigInt" => "1.999806"
+  },
   "CONFIGURE_REQUIRES" => {
     "Alien::libmaxminddb" => 0,
     "ExtUtils::MakeMaker" => 0,
@@ -44,7 +70,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "IP-Geolocation-MMDB",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "IP::Geolocation::MMDB",
   "PREREQ_PM" => {
     "Math::BigInt" => "1.999806",
@@ -53,11 +79,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Alien::libmaxminddb" => 0,
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.012",
+  "VERSION" => "1.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -91,13 +116,63 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-if (defined $version && $version =~ m{^(0|1\.[01])\.}) {
-  warn "Error: libmaxminddb $version is too old.\n";
-  die "OS unsupported\n";
+package MY;
+# Bail out if something is wrong
+sub post_initialize {
+ my $text = '';
+ if (!defined $version) {
+  $text = <<'TEXT';
+.PHONY: die
+die :
+	$(NOECHO) $(ECHO) "Error: libmaxminddb not found"
+	$(NOECHO) $(ECHO) "OS unsupported"
+	$(FALSE)
+TEXT
+ }
+ elsif ($version =~ m{^(0|1\.[01])\.}) {
+  $text = <<'TEXT';
+.PHONY: die
+die :
+	$(NOECHO) $(ECHO) "Error: libmaxminddb is too old"
+	$(NOECHO) $(ECHO) "OS unsupported"
+	$(FALSE)
+TEXT
+ }
+ elsif (!eval { Math::BigInt->from_bytes(pack 'C6', 0xff, 0xff, 0xb0, 0x09, 0x00, 0x00)->as_hex eq '0xffffb0090000' }) {
+  # Some Math::BigInt versions fail on i386 if Perl is built with -Dusequadmath.
+  $text = <<'TEXT';
+.PHONY: die
+die :
+	$(NOECHO) $(ECHO) "Error: Math::BigInt is too old or broken"
+	$(NOECHO) $(ECHO) "OS unsupported"
+	$(FALSE)
+TEXT
+ }
+ return $text;
 }
-# Some Math::BigInt versions fail on i386 if Perl is built with -Dusequadmath.
-use Math::BigInt;
-if (!eval { Math::BigInt->from_bytes(pack 'C6', 0xff, 0xff, 0xb0, 0x09, 0x00, 0x00)->as_hex eq '0xffffb0090000' }) {
-  warn "Error: Math::BigInt is too old or broken.\n";
-  die "OS unsupported\n";
+sub const_loadlibs {
+ my $text = shift->SUPER::const_loadlibs(@_);
+ if ($^O eq 'MSWin32' && $^V < 5.034) {
+  # Ignore unneeded libraries, which may contain invalid symbols
+  my $filter = sub {
+   my $list = shift;
+   my $pattern = $list =~ m{"} ? qr{(?<=")\h+(?=")} : qr{\h+};
+   join q{ }, grep { m{ maxminddb | ws2_32 }x } split $pattern, $list;
+  };
+  $text =~ s{
+   ^ ( (?: EXTRA | LDLOAD ) LIBS ) \h* = \h* (.*?) \h* $
+  }
+  {sprintf '%s = %s', $1, $filter->($2)}egxm;
+ }
+ return $text;
+}
+sub const_config {
+ my $text = shift->SUPER::const_config(@_);
+ # Some BSDs prepend -L/usr/local/lib, which may contain an old library
+ # version, to the library search path
+ $text =~ s{
+  ^ ( LD(?:DL)?FLAGS \h* = .*? ) -L/usr/local/lib ( $ | \h+ (.*) $ )
+ }
+ {$1$2}gxm;
+ return $text;
 }

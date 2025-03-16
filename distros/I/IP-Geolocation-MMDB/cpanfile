@@ -3,12 +3,16 @@
 
 requires "Math::BigInt" => "1.999806";
 requires "XSLoader" => "0";
-requires "perl" => "5.016";
+requires "perl" => "5.014";
 requires "utf8" => "0";
 requires "warnings" => "0";
 
-on 'test' => sub {
+on 'build' => sub {
   requires "Alien::libmaxminddb" => "0";
+  requires "Math::BigInt" => "1.999806";
+};
+
+on 'test' => sub {
   requires "File::Spec::Functions" => "0";
   requires "Test::More" => "0";
 };

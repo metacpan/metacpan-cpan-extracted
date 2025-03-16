@@ -17,6 +17,7 @@ bin/koha-index
 bin/koha-index-daemon
 bin/koha-overdue
 bin/koha-rebuild-editors
+bin/koha-unimarc-4xx
 dist.ini
 lib/Koha/Contrib/Tamil.pm
 lib/Koha/Contrib/Tamil/AuthoritiesLoader.pm
@@ -37,6 +38,7 @@ lib/Koha/Contrib/Tamil/Overdue.pm
 lib/Koha/Contrib/Tamil/RecordReader.pm
 lib/Koha/Contrib/Tamil/RecordWriter/File/Iso2709.pm
 lib/Koha/Contrib/Tamil/RecordWriter/File/Marcxml.pm
+lib/Koha/Contrib/Tamil/Unimarc4xx/Fix.pm
 lib/Koha/Contrib/Tamil/Zebra/Clouder.pm
 lib/LocaleData/de/LC_MESSAGES/Koha-Contrib-Tamil.mo
 lib/LocaleData/fr/LC_MESSAGES/Koha-Contrib-Tamil.mo
