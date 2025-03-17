@@ -1,6 +1,11 @@
 Revision history for Perl extension Tk::PopList.
 
-0.10 Date
+0.11 Sun Mar 16 2025
+	- Option -motionselect is available after create time.
+	- No selection is initiated at popup.
+	- Changed bug tracker.
+
+0.10 Sat Feb 08 2025
 	- Added option -nofocus to Tk::PopList.
 	- Using Tk::HList instead of Tk::Listbox.
 

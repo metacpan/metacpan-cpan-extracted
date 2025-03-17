@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9908 2025-03-17T00:40:36Z
+
+    - install App::Greple::L
+    - read ~/.xlaterc
+    - introduce -B option for batch mode
+
 0.9907 2025-03-16T09:02:13Z
 
     - trial implementation of reading .xlaterc

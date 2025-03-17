@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.007';
+$Bitcoin::Secp256k1::VERSION = '0.008';
 use v5.10;
 use strict;
 use warnings;
@@ -56,6 +56,19 @@ sub verify_private_key
 	my ($self, $private_key) = @_;
 
 	return $self->_verify_privkey($private_key);
+}
+
+sub verify_public_key
+{
+	my ($self, $public_key) = @_;
+	local $@;
+
+	my $success = eval {
+		$self->_pubkey($public_key);
+		1;
+	};
+
+	return !!$success;
 }
 
 sub create_public_key
@@ -288,6 +301,13 @@ interpreted as a big-endian integer).
 
 Some methods in this module may die if their private key is not valid, but a
 chance of picking an invalid 32-byte private key at random are extremely slim.
+
+=head3 verify_public_key
+
+	$valid = $secp256k1->verify_public_key($public_key)
+
+Checks whether bytestring C<$public_key> is a valid public key. Some methods in
+this module may die if their public key is not valid.
 
 =head3 create_public_key
 

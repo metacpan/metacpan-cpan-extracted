@@ -110,6 +110,8 @@ S_mySvPVutf8(pTHX_ SV *sv, STRLEN *const len) {
 
 typedef IV MyInt;
 
+#if defined PERL_VERSION_GT
+#if PERL_VERSION_GT(5,36,'*')
 /* lifted from Perl core and simplified [rt.cpan.org #148421] */
 STATIC UV
 my_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
@@ -152,6 +154,10 @@ my_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
     retnum = (s[uoffset] >> bitoffs) & nBIT_MASK(size);
     return retnum;
 }
+#endif
+#else
+#define my_do_vecget	Perl_do_vecget
+#endif
 
 static void
 populateStat(pTHX_ HV** hashptr, int res, MDB_stat *stat)

@@ -16,7 +16,7 @@ use Try::Tiny;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::ConnectingCommand';
 
-our $VERSION = 'v1.5.0'; # VERSION
+our $VERSION = 'v1.5.1'; # VERSION
 
 my %FORMATS;
 $FORMATS{raw} = <<EOF;

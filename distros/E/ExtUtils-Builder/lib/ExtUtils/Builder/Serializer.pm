@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Serializer;
-$ExtUtils::Builder::Serializer::VERSION = '0.014';
+$ExtUtils::Builder::Serializer::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -106,7 +106,7 @@ ExtUtils::Builder::Serializer -
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Bitcoin-Secp256k1
 
+0.008 - 2025-03-16
+	- Added method verify_public_key
+
 0.007 - 2025-03-11
 	- Fixed XS croak format error on older perls
 

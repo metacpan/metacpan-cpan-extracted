@@ -23,5 +23,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/salortiz/LMDB_File.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

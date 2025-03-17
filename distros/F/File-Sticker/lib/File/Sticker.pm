@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '4.00';
+$File::Sticker::VERSION = '4.01';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 4.00
+version 4.01
 
 =head1 SYNOPSIS
 

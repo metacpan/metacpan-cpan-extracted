@@ -15,7 +15,13 @@ my %t = Secp256k1Test->test_data;
 subtest 'should verify a private key' => sub {
 	ok $secp->verify_private_key("\x12" x 32), 'verification ok';
 	ok !$secp->verify_private_key("\xff" x 32), 'larger than curve order ok';
-	ok !$secp->verify_private_key("\xff" x 31), 'not 32 bytes ok';
+	ok !$secp->verify_private_key("\x12" x 31), 'not 32 bytes ok';
+};
+
+subtest 'should verify a public key' => sub {
+	ok $secp->verify_public_key("\x02" . ("\x12" x 32)), 'verification ok';
+	ok !$secp->verify_public_key("\x02" . ("\xff" x 32)), 'larger than curve order ok';
+	ok !$secp->verify_public_key("\x02" . ("\x12" x 30)), 'bad length ok';
 };
 
 subtest 'should derive a public key' => sub {

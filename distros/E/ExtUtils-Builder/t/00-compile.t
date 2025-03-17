@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ExtUtils/Builder.pm',
@@ -17,6 +17,10 @@ my @module_files = (
     'ExtUtils/Builder/Action/Function.pm',
     'ExtUtils/Builder/Action/Perl.pm',
     'ExtUtils/Builder/Action/Primitive.pm',
+    'ExtUtils/Builder/FileSet.pm',
+    'ExtUtils/Builder/FileSet/Filter.pm',
+    'ExtUtils/Builder/FileSet/Free.pm',
+    'ExtUtils/Builder/FileSet/Subst.pm',
     'ExtUtils/Builder/MakeMaker.pm',
     'ExtUtils/Builder/Node.pm',
     'ExtUtils/Builder/Plan.pm',

@@ -71,7 +71,7 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::xlate::Cache" : {
          "file" : "lib/App/Greple/xlate/Cache.pm"
@@ -87,23 +87,23 @@
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::xlate::gpt3" : {
          "file" : "lib/App/Greple/xlate/gpt3.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::xlate::gpt4" : {
          "file" : "lib/App/Greple/xlate/gpt4.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::xlate::gpt4o" : {
          "file" : "lib/App/Greple/xlate/gpt4o.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       },
       "App::Greple::xlate::null" : {
          "file" : "lib/App/Greple/xlate/null.pm",
-         "version" : "0.9907"
+         "version" : "0.9908"
       }
    },
    "release_status" : "stable",
@@ -118,7 +118,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.9907",
+   "version" : "0.9908",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

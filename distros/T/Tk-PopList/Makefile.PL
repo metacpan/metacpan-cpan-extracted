@@ -4,7 +4,7 @@ WriteMakefile(
 	NAME => 'Tk::PopList',
 	VERSION_FROM => 'lib/Tk/PopList.pm',
 	PREREQ_PM => {
-		'Tk' => 0,
+		'Tk' => '804.033',
 		'Test::Tk' => '3.02',
 	},
 	ABSTRACT_FROM => 'lib/Tk/PopList.pm',
@@ -18,6 +18,9 @@ WriteMakefile(
 				type => 'git',
 				url  => 'git://github.com/haje61/Tk-PopList.git',
 				web  => 'https://github.com/haje61/Tk-PopList',
+			},
+			bugtracker => {
+				web  => "https://github.com/haje61/Tk-PopList/issues",
 			},
 		}}) : ()
 	),

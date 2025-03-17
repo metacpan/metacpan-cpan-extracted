@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $DEBUG = 0;
 
 our @ISA = qw(Exporter);

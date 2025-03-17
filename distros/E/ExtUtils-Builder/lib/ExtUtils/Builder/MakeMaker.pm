@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.014';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -8,6 +8,7 @@ our @ISA;
 use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
+use ExtUtils::Manifest ();
 
 sub import {
 	my ($class, @args) = @_;
@@ -57,6 +58,8 @@ sub postamble {
 		return $inner;
 	});
 
+	$planner->add_seen($_) for sort keys %{ ExtUtils::Manifest::maniread() };
+
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
 		my $inner = $planner->new_scope;
@@ -92,7 +95,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

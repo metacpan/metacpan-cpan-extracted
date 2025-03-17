@@ -1,5 +1,10 @@
 Revision history for ExtUtils-Builder
 
+0.015     2025-03-16 22:03:54+01:00 Europe/Brussels
+          - Add create_filter, create_pattern, create_subst and add_seen to Planner
+          - Rename add_plan to merge_plan
+          - Add unix_to_native_path and native_to_unix functions to EU::B::Util
+
 0.014     2025-01-15 18:47:22+01:00 Europe/Brussels
           - Use absolute paths inside run_dsl
           - Remove tempdir in t/40-eumm-plan.t

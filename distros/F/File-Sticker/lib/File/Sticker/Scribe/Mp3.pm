@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Mp3;
-$File::Sticker::Scribe::Mp3::VERSION = '4.00';
+$File::Sticker::Scribe::Mp3::VERSION = '4.01';
 =head1 NAME
 
 File::Sticker::Scribe::Mp3 - read, write and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 4.00
+version 4.01
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ my %module_build_args = (
     "\"iovation Inc., David E. Wheeler\""
   ],
   "dist_name" => "App-Sqitch",
-  "dist_version" => "v1.5.0",
+  "dist_version" => "v1.5.1",
   "license" => "mit",
   "module_name" => "App::Sqitch",
   "recommends" => {

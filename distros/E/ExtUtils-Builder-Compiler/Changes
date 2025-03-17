@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.025     2025-03-16 23:03:34+01:00 Europe/Brussels
+          - Add missing abs2rel import for module_for_xs delegate
+
 0.024     2025-03-14 16:57:33+01:00 Europe/Brussels
           - Pass module name to prelink for loadable object
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.024';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.025';
 use strict;
 use warnings;
 

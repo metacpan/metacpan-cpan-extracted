@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -94,9 +94,6 @@ List of possible values.
 sub Populate {
 	my ($self,$args) = @_;
 	
-	my $motionselect = delete $args->{'-motionselect'};
-	$motionselect = 1 unless defined $motionselect;
-
 	$self->SUPER::Populate($args);
 
 	$self->{FE} = undef;
@@ -115,14 +112,15 @@ sub Populate {
 	$list->bind('<Home>', [$self, 'NavFirst']);
 	$list->bind('<Up>', [$self, 'NavUp']);
 	$list->bind('<Escape>', [$self, 'popDown']);
+	$list->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]);
 	
 	$self->Advertise(List => $list);
-	$list->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDATNS'],
 		-filter => ['PASSIVE', undef, undef, 0],
 		-maxheight => ['PASSIVE', undef, undef, 10],
+		-motionselect => ['PASSIVE', undef, undef, 1],
 		-nofocus => ['PASSIVE', undef, undef, 0],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
 		-values => ['METHOD', undef, undef, []],
@@ -167,6 +165,7 @@ sub filter {
 
 sub MotionSelect {
 	my ($self, $x, $y) = @_;
+	return unless $self->cget('-motionselect');
 	my $list = $self->Subwidget('List');
 	$list->selectionClear;
 	my $i = $list->nearest($y);
@@ -176,6 +175,7 @@ sub MotionSelect {
 
 sub NavDown {
 	my $self = shift;
+	return unless $self->cget('motionselect');
 	my $l = $self->Subwidget('List');
 	my ($sel) = $l->infoSelection;
 	my $val = $self->cget('-values');
@@ -266,7 +266,7 @@ sub popUp {
 
 	my $lb = $self->Subwidget('List');
 	$lb->selectionClear;
-	$lb->selectionSet(0) if $lb->infoExists(0);
+#	$lb->selectionSet(0) if $lb->infoExists(0);
 	$lb->focus unless $self->cget('-nofocus');
 
 	my @filterpack = ();
@@ -344,6 +344,3 @@ Unknown. If you find any, please contact the author.
 
 1;
 __END__
-
-
-

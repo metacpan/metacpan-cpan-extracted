@@ -150,7 +150,7 @@ resources:
   bugtracker: https://github.com/sqitchers/sqitch/issues/
   homepage: https://sqitch.org/
   repository: https://github.com/sqitchers/sqitch/
-version: v1.5.0
-x_generated_by_perl: v5.40.0
+version: v1.5.1
+x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

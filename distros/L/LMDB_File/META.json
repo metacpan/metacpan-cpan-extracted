@@ -50,6 +50,6 @@
          "web" : "https://github.com/salortiz/LMDB_File"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

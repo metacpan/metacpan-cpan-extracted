@@ -1,4 +1,8 @@
 Revision history for Perl extension LMDB_File.
+0.14 Wed Jan 24 2024
+    - Conditional compile my_do_vecget to avoid recent core changes
+    Attempt to fix rt.cpan,org 151188
+
 0.13 Sat Sep 02 2023
     - Fix for hidden Perl_do_vecget in 5.38
     Thanks to Niko Tyni <ntyni@debian.org> for the patch

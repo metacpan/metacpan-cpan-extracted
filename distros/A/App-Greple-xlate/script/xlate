@@ -52,8 +52,10 @@ define pod <<"=cut"
         -V # specify mount directory
         -U   do not mount
         -R   mount read-only
+        -B   run container in batch mode
+        -N   specify the name of live container
         -K   kill and remove live container
-        -E # specify environment variable to be inherited
+        -E # specify an environment variable to be inherited
         -I # docker image or version (default: tecolicom/xlate:version)
 
     Control Files:
@@ -63,7 +65,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9907
+    Version 0.9908
 
 =cut
 
@@ -100,6 +102,7 @@ repository=$owner/$myname
 hostname=
 mount=yes
 remove=yes
+interactive=yes
 container=
 version=
 workdir=/work
@@ -163,7 +166,9 @@ docker_status() {
 ##
 ## read .xlaterc
 ##
-for dir in $topdir .
+declare -a rcpath=($HOME)
+[[ $topdir && $topdir != $pwd ]] && rcpath+=($topdir)
+for dir in ${rcpath[@]}
 do
     rc="$dir/.xlaterc"
     [[ -r $rc ]] || continue
@@ -179,7 +184,7 @@ if [[ $topdir && $topdir != $pwd ]]
 then
     volume="$topdir"
 fi
-while getopts :dq${DOCKER_OPT:=dURAI:E:WHP:O:V:GN:KSALCD} OPT
+while getopts :dq${DOCKER_OPT:=dURAI:E:WHP:O:BV:GN:KSALCD} OPT
 do
     [[ $XLATE_RUNNING_ON_DOCKER ]] && break
     case $OPT in
@@ -196,6 +201,7 @@ do
 	E) ENV+=("$OPTARG") ;;
 	P) ports+=("$OPTARG") ;;
 	O) others+=($OPTARG) ;;
+	B) interactive= ;;
 
 	# mount related options
 	U) mount= ;;
@@ -244,10 +250,11 @@ do
 	    if id=$(docker_find -s running "$container")
 	    then
 		shift $((OPTIND - 1))
-		if [[ $# > 0 ]]
+		if (( $# > 0 ))
 		then
-		    declare -a dockopt=(--interactive)
-		    [ -t 0 ] && dockopt+=(--tty)
+		    declare -a dockopt
+		    [ $interactive ] && dockopt+=(--interactive)
+		    [ $interactive ] && [ -t 0 ] && dockopt+=(--tty)
 		    export DOCKER_CLI_HINTS=false
 		    exec docker exec ${dockopt[@]} $id "$@" || exit 1
 		else
@@ -284,11 +291,11 @@ do
 	    declare -a dockopt=(
 		-e XLATE_RUNNING_ON_DOCKER=1
 		--init
-		--interactive
 	    )
+	    [[ $interactive ]]  && dockopt+=(--interactive)
+	    [[ $interactive ]]  && [[ -t 0 ]] && dockopt+=(--tty)
 	    [[ $remove ]]       && dockopt+=(--rm)
 	    [[ $remove ]]       || dockopt+=(${container:+--name "$container"})
-	    [[ -t 0 ]]          && dockopt+=(--tty)
 	    [[ -e $localtime ]] && dockopt+=(-v $localtime:$localtime:ro)
 	    [[ $mount ]]        && dockopt+=(
 		    -v "${volume:-$pwd}:${workdir}:${mount_mode}" 
@@ -830,16 +837,10 @@ Repeatable.
 Specify Docker image name.  If it begins with a colon (C<:>), it is
 treated as a version of the default image.
 
-=begin comment
+=item B<-B>
 
-=item B<-L>
-
-Keep containers alive after execution.  By default, container is
-automatically removed upon exit (C<--rm>).  This option disables that
-automatic deletion.  This option works like option C<-A>, but does not
-involve the container name.
-
-=end comment
+Run the container in batch mode.  Specifically, run C<docker> command
+without the C<--interactive> and C<--tty> options.
 
 =item B<-N>
 
@@ -855,7 +856,7 @@ removed.
 
 =begin comment
 
-If specified as C<-KA>, then a new container is launched after the
+If specified as C<-KL>, then a new container is launched after the
 existing container is removed.
 
 =end comment

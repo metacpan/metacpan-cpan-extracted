@@ -1,8 +1,8 @@
 Revision history for Perl extension Tcl.
 
-1.52	2025-03-16
+1.53	2025-03-16
 	- no actual code change, only removed unused sub _code_clear in Tcl.pm
-	- repository changed to https://github.com/gisle/tcl.pm
+	- repository changed to https://github.com/vadrerko/tcl.pm
 
 1.51	2025-01-26
 	- tcl version/patchlevel seen on test matrix

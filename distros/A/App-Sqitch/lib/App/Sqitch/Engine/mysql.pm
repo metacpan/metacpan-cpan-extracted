@@ -16,7 +16,7 @@ use List::MoreUtils qw(firstidx);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.5.0'; # VERSION
+our $VERSION = 'v1.5.1'; # VERSION
 
 has uri => (
     is       => 'ro',
@@ -65,7 +65,7 @@ sub _def_user { $_[0]->_mycnf->{user} || $_[0]->sqitch->sysuser }
 sub _def_pass { $ENV{MYSQL_PWD} || shift->_mycnf->{password} }
 
 sub _dsn {
-    (my $dsn = shift->uri->dbi_dsn) =~ s/\Adbi:mysql/dbi:MariaDB/;
+    (my $dsn = shift->registry_uri->dbi_dsn) =~ s/\Adbi:mysql/dbi:MariaDB/;
     return $dsn;
 }
 

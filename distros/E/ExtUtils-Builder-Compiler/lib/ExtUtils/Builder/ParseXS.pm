@@ -1,12 +1,12 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.024';
+$ExtUtils::Builder::ParseXS::VERSION = '0.025';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
 use File::Basename qw/basename dirname/;
-use File::Spec::Functions qw/curdir catfile catdir splitdir/;
+use File::Spec::Functions qw/abs2rel curdir catfile catdir splitdir/;
 
 use ExtUtils::Builder::Util 'function';
 
@@ -99,7 +99,7 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

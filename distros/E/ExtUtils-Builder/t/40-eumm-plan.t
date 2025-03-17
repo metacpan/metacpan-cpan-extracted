@@ -9,6 +9,7 @@ use Config;
 use Cwd qw/getcwd/;
 use File::Temp qw/tempdir/;
 use ExtUtils::Builder::Util 'get_perl';
+use ExtUtils::Manifest 'mkmanifest';
 
 my $tempdir = tempdir(CLEANUP => 1, TEMPLATE => 'ExtUtilsBuilderXXXX');
 
@@ -44,6 +45,11 @@ sub MY::make_plans {
 END
 
 close $mfpl;
+
+{
+	local $ExtUtils::Manifest::Verbose = 0;
+	mkmanifest;
+}
 
 system get_perl(), 'Makefile.PL';
 

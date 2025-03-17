@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MultiLingual;
-$ExtUtils::Builder::MultiLingual::VERSION = '0.024';
+$ExtUtils::Builder::MultiLingual::VERSION = '0.025';
 use strict;
 use warnings;
 

@@ -16,6 +16,10 @@ lib/ExtUtils/Builder/Action/Composite.pm
 lib/ExtUtils/Builder/Action/Function.pm
 lib/ExtUtils/Builder/Action/Perl.pm
 lib/ExtUtils/Builder/Action/Primitive.pm
+lib/ExtUtils/Builder/FileSet.pm
+lib/ExtUtils/Builder/FileSet/Filter.pm
+lib/ExtUtils/Builder/FileSet/Free.pm
+lib/ExtUtils/Builder/FileSet/Subst.pm
 lib/ExtUtils/Builder/MakeMaker.pm
 lib/ExtUtils/Builder/Node.pm
 lib/ExtUtils/Builder/Plan.pm
@@ -32,6 +36,7 @@ t/30-plan.t
 t/35-planner.t
 t/35-serializer.t
 t/36-dsl.t
+t/37-fileset.t
 t/40-eumm-plan.t
 t/dsl.pl
 t/lib/Callback.pm

@@ -33,18 +33,21 @@
       "runtime" : {
          "requires" : {
             "Test::Tk" : "3.02",
-            "Tk" : "0"
+            "Tk" : "804.033"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haje61/Tk-PopList/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/haje61/Tk-PopList.git",
          "web" : "https://github.com/haje61/Tk-PopList"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
