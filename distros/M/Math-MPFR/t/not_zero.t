@@ -140,7 +140,7 @@ if(Math::MPFR::_has_longdouble()) {
   Rmpfr_set_ld($mpfr1, (~0 - 1) / -2, GMP_RNDN);
 }
 elsif(Math::MPFR::_has_longlong()){
-  if(Math::MPFR::_has_inttypes()) {
+  if(Math::MPFR::_has_longlong()) {
     Rmpfr_set_sj($mpfr1, (~0 - 1) / -2, GMP_RNDN);
   }
   else {Rmpfr_set_str($mpfr1, (~0 - 1) / -2, 10, GMP_RNDN)}

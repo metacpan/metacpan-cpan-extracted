@@ -65,7 +65,7 @@ method print_env
 
     $self->render(
         Minima::View::PlainText->new,
-        map {
+        join '', map {
             sprintf "%*s => %s\n", -$max, $_, $env->{$_}
         } sort keys %$env
     );

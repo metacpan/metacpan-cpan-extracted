@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostAnalyzeExcelRequest.analyzeExcelRequest :    
+# PostAnalyzeExcelRequest.analyzeExcelRequest : Excel files and analysis output requirements   
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_analyze_excel' } = { 
-    	summary => '',
+    	summary => 'Perform business analysis of data in Excel files.',
         params => $params,
         returns => 'ARRAY[AnalyzedResult]',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'analyze_excel_request' => {
      	datatype => 'AnalyzeExcelRequest',
      	base_name => 'analyzeExcelRequest',
-     	description => '',
+     	description => 'Excel files and analysis output requirements',
      	format => '',
      	read_only => '',
      		},    

@@ -1,5 +1,11 @@
 Revision history for Dist-Build
 
+0.018     2025-03-17 11:58:21+01:00 Europe/Brussels
+          - Add auto_xs to Dist::Build::XS
+          - Use filesets to find files
+          - Make various delegates return their target
+          - Allow double copy
+
 0.017     2025-03-11 21:53:17+01:00 Europe/Brussels
           - Don't expose Dist::Build::Core to main planner
           - Document core delegates and known plugins

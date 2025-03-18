@@ -1,0 +1,13 @@
+prefix=cmake_prefix
+exec_prefix=${prefix}
+libdir=cmake_prefix/lib
+includedir=cmake_prefix/include
+LIBUV_STATIC=-L${libdir} -l:libuv.a -lpthread -ldl -lrt
+
+Name: libuv
+Version: 1.49.2
+Description: multi-platform support library with a focus on asynchronous I/O.
+URL: http://libuv.org/
+
+Libs: -L${libdir} -luv -lpthread -ldl -lrt
+Cflags: -I${includedir}

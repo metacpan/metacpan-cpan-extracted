@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'ShapeList',
-     	description => '',
+     	description => 'A public property named "ShapeList" of type List LinkElement for storing a collection of link elements.',
      	format => '',
      	read_only => '',
      		},

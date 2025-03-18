@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.2",
+	"version" : "0.0.3",
 	"name"    : "File Find Mason",
 	"author"  : "Brian Blackmore",
 	"abstract": "Quickly identify Mason files in Perl repositories",
@@ -9,6 +9,11 @@
 			"requires": {
 				"perl": "5.20.0",
 				"File::Find": "1.20"
+			}
+		},
+		"configure": {
+			"requires": {
+				"Module::Build::Tiny": "0.044"
 			}
 		},
 		"build": {

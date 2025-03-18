@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.017';
+$Dist::Build::Core::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ our @EXPORT_OK = qw/copy make_executable manify tap_harness install dump_binary 
 use Carp qw/croak/;
 use ExtUtils::Helpers 0.028 qw/make_executable man1_pagename man3_pagename/;
 use ExtUtils::Install ();
-use File::Basename qw/dirname/;
+use File::Basename qw/basename dirname/;
 use File::Copy ();
 use File::Find ();
 use File::Path qw/make_path remove_tree/;
@@ -40,6 +40,7 @@ sub find {
 
 sub contains_pod {
 	my ($file) = @_;
+	return 0 if not -f $file;
 	open my $fh, '<:utf8', $file;
 	my $content = do { local $/; <$fh> };
 	return $content =~ /^\=(?:head|pod|item)/m;
@@ -56,6 +57,7 @@ sub add_methods {
 			dependencies => [ $source ],
 			actions      => [ $copy ],
 		);
+		return $destination;
 	});
 
 	$planner->add_delegate('copy_executable', sub {
@@ -67,6 +69,7 @@ sub add_methods {
 			dependencies => [ $source ],
 			actions      => [ $copy, $make_executable ],
 		);
+		return $destination;
 	});
 
 	$planner->add_delegate('manify', sub {
@@ -78,6 +81,7 @@ sub add_methods {
 			dependencies => [ $source, $dirname ],
 			actions      => [ $manify ],
 		);
+		return $destination;
 	});
 
 	$planner->add_delegate('mkdir', sub {
@@ -93,6 +97,7 @@ sub add_methods {
 			target  => $target,
 			actions => [ $action ],
 		);
+		return $target;
 	});
 
 	$planner->add_delegate('tap_harness', sub {
@@ -105,6 +110,7 @@ sub add_methods {
 				new_action('tap_harness', test_dir => $options{test_dir} ),
 			],
 		);
+		return $target;
 	});
 
 	$planner->add_delegate('install', sub {
@@ -117,6 +123,7 @@ sub add_methods {
 				new_action('install', install_map => $options{install_map}),
 			]
 		);
+		return $target;
 	});
 
 	$planner->add_delegate('dump_binary', sub {
@@ -152,69 +159,101 @@ sub add_methods {
 		);
 	});
 
-	$planner->add_delegate('script_files', sub {
-		my ($planner, @files) = @_;
-		my %scripts = map { $_ => catfile('blib', $_) } @files;
-		my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
-
-		for my $source (keys %sdocs) {
-			$planner->copy_file($source, $scripts{$source});
-		}
-
-		for my $source (keys %scripts) {
-			$planner->copy_executable($source, $scripts{$source});
-		}
-
-		my (%man1);
-		if ($planner->install_paths->is_default_installable('bindoc')) {
-			my $section1 = $planner->config->get('man1ext');
-			my @files = keys %scripts, keys %sdocs;
-			for my $source (@files) {
-				next unless contains_pod($source);
-				my $destination = catfile('blib', 'bindoc', man1_pagename($source, $section1));
-				$planner->manify($source, $destination, $section1);
-				$man1{$source} = $destination;
-			}
-		}
-
-		$planner->create_phony('code', values %scripts);
-		$planner->create_phony('manify', values %man1);
-	});
-
 	$planner->add_delegate('script_dir', sub {
-		my ($planner, $dir) = @_;
+		my ($planner, $base) = @_;
+		(my $prefix = $base) =~ s/\W/-/g;
 
-		my @files = find(qr/(?!\.)/, 'script');
-		$planner->script_files(@files);
-	});
+		my $script_files = $planner->create_pattern(
+			dir  => $base,
+		);
+		my $script_pod_files = $planner->create_pattern(
+			name => "$prefix-pod-files",
+			on   => $script_files,
+			file => '*.pod',
+		);
+		my $script_script_files = $planner->create_pattern(
+			name   => "$prefix-script-files",
+			on     => $script_files,
+			file   => '*.pod',
+			negate => 1,
+		);
 
-	$planner->add_delegate('lib_files', sub {
-		my ($planner, %args) = @_;
-		my $base    = $args{base} // 'lib';
-		my %modules = map { $_ => catfile('blib', 'lib', abs2rel($_, $base)) } @{ $args{files} };
+		$planner->create_subst(
+			on     => $script_script_files,
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $destination = catfile('blib', 'script', abs2rel($source, $base));
+				return $planner->copy_executable($source, $destination);
+			},
+		);
 
-		for my $source (keys %modules) {
-			$planner->copy_file($source, $modules{$source});
-		}
+		$planner->create_subst(
+			on     => $script_pod_files,
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $destination = catfile('blib', 'script', basename($source));
+				return $planner->copy_file($source, $destination);
+			},
+		);
 
-		my %man3;
-		if ($planner->install_paths->is_default_installable('libdoc')) {
-			my $section3 = $planner->config->get('man3ext');
-			my @files = grep { contains_pod($_) } keys %modules;
-			for my $source (@files) {
-				my $destination = catfile('blib', 'libdoc', man3_pagename($source, $base, $section3));
-				$planner->manify($source, $destination, $section3);
-				$man3{$source} = $destination;
-			}
-		}
-		$planner->create_phony('code', 'config', values %modules);
-		$planner->create_phony('manify', 'config', values %man3);
+		my $script_doc_files = $planner->create_filter(on => $script_script_files, condition => \&contains_pod);
+
+		my $section1 = $planner->config->get('man1ext');
+		my $blib_doc_files = $planner->create_subst(
+			on     => [ $script_pod_files, $script_doc_files ],
+			add_to => 'manify',
+			subst  => sub {
+				my ($source) = @_;
+				my $destination = catfile('blib', 'bindoc', man1_pagename($source, $section1));
+				return $planner->manify($source, $destination, $section1);
+			},
+		);
 	});
 
 	$planner->add_delegate('lib_dir', sub {
 		my ($planner, $base) = @_;
-		my @files = find(qr/\.p(?:m|od)$/, $base);
-		$planner->lib_files(base => $base, files => \@files);
+		(my $prefix = $base) =~ s/\W/-/g;
+
+		my $files = $planner->create_pattern(
+			dir  => $base,
+		);
+		my $pm_files = $planner->create_pattern(
+			name => "${prefix}-pm-files",
+			on   => $files,
+			file => '*.pm',
+		);
+		my $pod_files = $planner->create_pattern(
+			name => "{$prefix}-pod-files",
+			on   => $files,
+			file => '*.pod',
+		);
+
+		my $blib_files = $planner->create_subst(
+			on     => [ $pm_files, $pod_files ],
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $destination = catfile('blib', 'lib', abs2rel($source, $base));
+				return $planner->copy_file($source, $destination);
+			},
+		);
+
+		my $pm_doc_files = $planner->create_filter(
+			on        => $pm_files,
+			condition => \&contains_pod,
+		);
+		my $section3 = $planner->config->get('man3ext');
+		my $blib_doc_files = $planner->create_subst(
+			on     => [ $pm_doc_files, $pod_files ],
+			add_to => 'manify',
+			subst  => sub {
+				my ($source) = @_;
+				my $destination = catfile('blib', 'libdoc', man3_pagename($source, $base, $section3));
+				return $planner->manify($source, $destination, $section3);
+			}
+		);
 	});
 
 	$planner->add_delegate('autoclean', sub {
@@ -255,6 +294,7 @@ sub copy {
 	my ($source, $target, %options) = @_;
 
 	make_path(dirname($target));
+	unlink $target if -f $target;
 	File::Copy::copy($source, $target) or croak "Could not copy: $!";
 
 	my ($atime, $mtime) = (stat $source)[8,9];
@@ -338,7 +378,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 DESCRIPTION
 

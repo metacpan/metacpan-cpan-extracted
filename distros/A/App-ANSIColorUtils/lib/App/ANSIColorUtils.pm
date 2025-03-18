@@ -1,13 +1,13 @@
 package App::ANSIColorUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
-our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-03-18'; # DATE
+our $DIST = 'App-ANSIColorUtils'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -133,6 +133,9 @@ $SPEC{show_colors_from_theme} = {
             pos => 0,
         },
     },
+    links => [
+        {url=>'prog:show-color-theme-swatch'},
+    ],
 };
 sub show_colors_from_theme {
     require Module::Load::Util;
@@ -226,6 +229,7 @@ $SPEC{show_rand_rgb_colors} = {
     },
 };
 sub show_rand_rgb_colors {
+    require Color::ANSI::Util;
     require Color::RGB::Util;
 
     my %args = @_;
@@ -325,7 +329,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.010 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
+This document describes version 0.011 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2025-03-18.
 
 =head1 DESCRIPTION
 
@@ -333,43 +337,43 @@ This distributions provides the following command-line utilities:
 
 =over
 
-=item * L<ansi16-to-rgb>
+=item 1. L<ansi16-to-rgb>
 
-=item * L<ansi256-to-rgb>
+=item 2. L<ansi256-to-rgb>
 
-=item * L<rgb-to-ansi-bg-code>
+=item 3. L<rgb-to-ansi-bg-code>
 
-=item * L<rgb-to-ansi-fg-code>
+=item 4. L<rgb-to-ansi-fg-code>
 
-=item * L<rgb-to-ansi16>
+=item 5. L<rgb-to-ansi16>
 
-=item * L<rgb-to-ansi16-bg-code>
+=item 6. L<rgb-to-ansi16-bg-code>
 
-=item * L<rgb-to-ansi16-fg-code>
+=item 7. L<rgb-to-ansi16-fg-code>
 
-=item * L<rgb-to-ansi24b-bg-code>
+=item 8. L<rgb-to-ansi24b-bg-code>
 
-=item * L<rgb-to-ansi24b-fg-code>
+=item 9. L<rgb-to-ansi24b-fg-code>
 
-=item * L<rgb-to-ansi256>
+=item 10. L<rgb-to-ansi256>
 
-=item * L<rgb-to-ansi256-bg-code>
+=item 11. L<rgb-to-ansi256-bg-code>
 
-=item * L<rgb-to-ansi256-fg-code>
+=item 12. L<rgb-to-ansi256-fg-code>
 
-=item * L<show-ansi-color-table>
+=item 13. L<show-ansi-color-table>
 
-=item * L<show-assigned-rgb-colors>
+=item 14. L<show-assigned-rgb-colors>
 
-=item * L<show-colors>
+=item 15. L<show-colors>
 
-=item * L<show-colors-from-scheme>
+=item 16. L<show-colors-from-scheme>
 
-=item * L<show-colors-from-theme>
+=item 17. L<show-colors-from-theme>
 
-=item * L<show-rand-rgb-colors>
+=item 18. L<show-rand-rgb-colors>
 
-=item * L<show-text-using-color-gradation>
+=item 19. L<show-text-using-color-gradation>
 
 =back
 
@@ -380,7 +384,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- show_ansi_color_table(%args) -> [status, msg, payload, meta]
+ show_ansi_color_table(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show a table of ANSI codes & colors.
 
@@ -392,17 +396,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<width> => I<str> (default: 8)
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -412,7 +418,7 @@ Return value:  (any)
 
 Usage:
 
- show_assigned_rgb_colors(%args) -> [status, msg, payload, meta]
+ show_assigned_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Take arguments, pass them through assign_rgb_color(), show the results.
 
@@ -427,19 +433,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<strings>* => I<array[str]>
 
+(No description)
+
 =item * B<tone> => I<str>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -449,7 +459,7 @@ Return value:  (any)
 
 Usage:
 
- show_colors(%args) -> [status, msg, payload, meta]
+ show_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show colors specified in argument as text with ANSI colors.
 
@@ -461,17 +471,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<colors>* => I<array[str]>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -481,7 +493,7 @@ Return value:  (any)
 
 Usage:
 
- show_colors_from_scheme(%args) -> [status, msg, payload, meta]
+ show_colors_from_scheme(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show colors from a Graphics::ColorNames scheme.
 
@@ -493,17 +505,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<scheme>* => I<perl::colorscheme::modname>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -513,7 +527,7 @@ Return value:  (any)
 
 Usage:
 
- show_colors_from_theme(%args) -> [status, msg, payload, meta]
+ show_colors_from_theme(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show colors from a ColorTheme scheme.
 
@@ -525,17 +539,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<theme>* => I<perl::colortheme::modname_with_optional_args>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -545,7 +561,7 @@ Return value:  (any)
 
 Usage:
 
- show_rand_rgb_colors(%args) -> [status, msg, payload, meta]
+ show_rand_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Produce N random RGB colors using rand_rgb_colors() and show the results.
 
@@ -557,19 +573,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<light_color> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<n>* => I<posint>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -579,7 +599,7 @@ Return value:  (any)
 
 Usage:
 
- show_text_using_color_gradation(%args) -> [status, msg, payload, meta]
+ show_text_using_color_gradation(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Print text using gradation between two colors.
 
@@ -593,7 +613,7 @@ Examples:
 
 Result:
 
- [undef, "0000ff", undef, {}]
+ [200, undef, undef, {}]
 
 =back
 
@@ -607,7 +627,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<color1> => I<color::rgb24> (default: "ffff00")
 
+(No description)
+
 =item * B<color2> => I<color::rgb24> (default: "0000ff")
+
+(No description)
 
 =item * B<text> => I<str>
 
@@ -618,12 +642,12 @@ If unspecified, will show a bar of '=' across the terminal.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -635,25 +659,49 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ANSICo
 
 Source repository is at L<https://github.com/perlancar/perl-App-ANSIColorUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
+
+L<App::RGBColorUtils>
+
+L<App::GraphicsColorNamesUtils>
+
+L<App::ColorThemeUtils>
 
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

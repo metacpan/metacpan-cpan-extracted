@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.017';
+$Dist::Build::XS::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -24,6 +24,13 @@ sub add_methods {
 		my $pureperl_only = $args{pureperl_only} // $planner->pureperl_only;
 		die "Can't build xs files under --pureperl-only\n" if $pureperl_only;
 
+		$planner = $planner->new_scope;
+
+		my $config = $args{config} // $planner->config;
+
+		$planner->load_module('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
+		$planner->load_module('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
+
 		my $xs_base = $args{xs_base} // 'lib';
 		my ($module_name, $xs_file);
 		if (defined $args{module}) {
@@ -37,13 +44,6 @@ sub add_methods {
 			$xs_file = catfile($xs_base, split /::/, $module_name) . '.xs';
 		}
 		my $module_version = $args{version} // $planner->distribution_version;
-
-		$planner = $planner->new_scope;
-
-		my $config = $args{config} // $planner->config;
-
-		$planner->load_module('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
-		$planner->load_module('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
 
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
@@ -103,6 +103,31 @@ sub add_methods {
 		);
 
 		$planner->create_phony('dynamic', $lib_file);
+
+		return $lib_file;
+	});
+
+	$planner->add_delegate('auto_xs', sub {
+		my ($planner, %args) = @_;
+
+		my $dir = delete $args{dir} // 'lib';
+		my $xs_files = $planner->create_pattern(
+			dir  => $dir,
+			file => '*.xs'
+		);
+		my $so_files = $planner->create_subst(
+			on => $xs_files,
+			subst => sub {
+				my ($source) = @_;
+				$planner->add_xs(
+					%args,
+					xs_base => $dir,
+					module  => undef,
+					file    => $source,
+				);
+			},
+		);
+		return;
 	});
 }
 
@@ -122,7 +147,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -220,6 +245,10 @@ Libraries to link to.
 Additional flags to feed to the compiler. This can either be an array or a (shell-quoted) string.
 
 =back
+
+=head2 auto_xs
+
+This method is like C<add_xs>, except that instead of taking C<module> or C<file> named arguments, it takes a C<dir> argument (defaulting to C<'lib'>). It will search that directory for all XS files, and build them with the other arguments passed to this function.
 
 =head1 EXTENSIONS
 

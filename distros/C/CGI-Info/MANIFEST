@@ -40,6 +40,7 @@ t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
 t/logdir.t
+t/logger.t
 t/manifest.t
 t/metrics.t
 t/minimum.t

@@ -5,8 +5,11 @@ package CGI::Info;
 
 use warnings;
 use strict;
+
+use boolean;
 use Carp;
 use File::Spec;
+use Log::Abstraction;
 use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util;
@@ -29,16 +32,15 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 =cut
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
-The C<CGI::Info> module,
-is a Perl library designed to provide information about the environment in which a CGI script operates.
+The C<CGI::Info> module is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
@@ -46,7 +48,7 @@ Additionally, it offers a simple web application firewall to add a layer of secu
 All too often Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -77,19 +79,33 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
+It takes other optional parameters:
+
+=over 4
+
+=item * C<auto_load>
+
+Enable/disable the AUTOLOAD feature.
+The default is to have it enabled.
+
+=item * C<syslog>
+
 Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings.
+=item * C<cache>
 
-Takes optional parameter cache, an object which is used to cache IP lookups.
+An object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-Takes optional parameter max_upload, which is the maximum file size you can upload
-(-1 for no limit), the default is 512MB.
+=item * C<max_upload>
+
+The maximum file size you can upload (-1 for no limit), the default is 512MB.
+
+=back
 
 =cut
 
@@ -137,6 +153,14 @@ sub new
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	if(my $logger = $args{'logger'}) {
+		if(!Scalar::Util::blessed($logger)) {
+			$args{'logger'} = Log::Abstraction->new($logger);
+		}
+	} else {
+		$args{'logger'} = Log::Abstraction->new();
+	}
+
 	# Return the blessed object
 	return bless {
 		max_upload_size => 512 * 1024,
@@ -173,6 +197,8 @@ sub script_name
 
 sub _find_paths {
 	my $self = shift;
+
+	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
 	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
 
@@ -434,6 +460,7 @@ Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
 such as a L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
+a reference to an array,
 or a filename.
 
 The allow, logger and upload_dir arguments can also be passed to the
@@ -523,8 +550,8 @@ sub params {
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
-	if(defined($params->{logger})) {
-		$self->{logger} = $params->{logger};
+	if(defined($params->{'logger'})) {
+		$self->set_logger($params->{'logger'});
 	}
 	$self->_trace('Entering params');
 
@@ -876,7 +903,7 @@ sub params {
 		return;
 	}
 
-	if($self->{logger}) {
+	if($self->{'logger'}) {
 		while(my ($key,$value) = each %FORM) {
 			$self->_debug("$key=$value");
 		}
@@ -1040,6 +1067,8 @@ sub _multipart_data {
 		close $fout;
 	}
 
+	$self->_trace('Leaving _multipart_data');
+
 	return @pairs;
 }
 
@@ -1072,7 +1101,7 @@ sub _untaint_filename {
 =head2 is_mobile
 
 Returns a boolean if the website is being viewed on a mobile
-device such as a smart-phone.
+device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
 =cut
@@ -1822,52 +1851,45 @@ sub messages_as_string
 
 =head2 set_logger
 
-Sets the class, code reference, or file that will be used for logging.
+Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
-This function fixes the catch22 situation.
+This function fixes the catch-22 situation.
 
 =cut
 
-sub set_logger {
+sub set_logger
+{
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	$self->{logger} = $params->{'logger'};
-
-	return $self;
+	if(defined($params->{'logger'})) {
+		if(my $logger = $params->{'logger'}) {
+			if(Scalar::Util::blessed($logger)) {
+				$self->{'logger'} = $logger;
+			} else {
+				$self->{'logger'} = Log::Abstraction->new($logger);
+			}
+		} else {
+			$self->{'logger'} = Log::Abstraction->new();
+		}
+		return $self;
+	}
+	Carp::croak('Usage: set_logger(logger => $logger)')
 }
 
-# Helper routines for logger()
+# Log and remember a message
 sub _log
 {
 	my ($self, $level, @messages) = @_;
 
 	# FIXME: add caller's function
 	# if(($level eq 'warn') || ($level eq 'notice')) {
-		push @{$self->{'messages'}}, { level => $level, message => join(' ', @messages) };
+		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		if(ref($logger) eq 'CODE') {
-			# Code reference
-			$logger->({
-				class => ref($self) // __PACKAGE__,
-				function => (caller(2))[3],
-				line => (caller(1))[2],
-				level => $level,
-				message => \@messages
-			});
-		} elsif(!ref($logger)) {
-			# File
-			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
-				close $fout;
-			}
-		} else {
-			# Object
-			$logger->$level(@messages);
-		}
+		$self->{'logger'}->$level(\@messages);
 	}
 }
 
@@ -1894,40 +1916,9 @@ sub _trace {
 # Emit a warning message somewhere
 sub _warn {
 	my $self = shift;
-
 	my $params = Params::Get::get_params('warning', @_);
 
-	# Validate input parameters
-	return unless($params && (ref($params) eq 'HASH'));
-	my $warning = $params->{'warning'};
-	return unless($warning);
-
-	if($self eq __PACKAGE__) {
-		# Called from class method
-		Carp::carp($warning);
-		return;
-	}
-	# return if($self eq __PACKAGE__);  # Called from class method
-
-	# Handle syslog-based logging
-	if($self->{syslog}) {
-		require Sys::Syslog;
-
-		Sys::Syslog->import();
-		if(ref($self->{syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{syslog});
-		}
-		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning|local0', $warning);
-		closelog();
-	}
-
-	# Handle logger-based logging
-	$self->_log('warn', $warning);
-	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
-		# Fallback to Carp
-		Carp::carp($warning);
-	}
+	$self->_log('warn', $params->{'warning'});
 }
 
 # Ensure all environment variables are sanitized and validated before use.
@@ -1969,7 +1960,13 @@ sub reset {
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
+
 	my $self = shift or return;
+
+	Carp::croak(__PACKAGE__, ": Unknown method $self") if(!ref($self));
+
+	# Allow the AUTOLOAD feature to be disabled
+	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
 
 	# Extract the method name from the AUTOLOAD variable
 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
@@ -1991,7 +1988,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 =head1 BUGS
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
-don't differ between tablets and smart-phones.
+don't differ between tablets and smartphones.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.

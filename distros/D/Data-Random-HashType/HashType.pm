@@ -15,7 +15,7 @@ Readonly::Array our @OBSOLETE_HASH_TYPES => qw(MD4 MD5 SHA1);
 Readonly::Array our @DEFAULT_HASH_TYPES => qw(SHA-256 SHA-384 SHA-512);
 Readonly::Array our @ALL_HASH_TYPES => (@OBSOLETE_HASH_TYPES, @DEFAULT_HASH_TYPES);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
 	my ($class, @params) = @_;
@@ -75,8 +75,8 @@ sub random {
 
 		my @list = @{$self->{'possible_hash_types'}};
 		foreach my $id (1 .. $self->{'num_generated'}) {
-			my $rand = int(rand(scalar @list - 1));
-			my $hash_type = splice @list, $rand, 1;
+			my $rand_index = int(rand(scalar @list));
+			my $hash_type = splice @list, $rand_index, 1;
 			push @ret, Data::HashType->new(
 				$self->{'mode_id'} ? (
 					'id' => $self->{'cb_id'}->($self),
@@ -272,12 +272,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

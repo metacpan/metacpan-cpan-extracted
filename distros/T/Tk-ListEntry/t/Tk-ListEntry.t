@@ -15,6 +15,7 @@ my $le;
 if (defined $app) {
 	$le = $app->ListEntry(
 		-filter => 1,
+		-motionselect => 0,
 		-command => sub { my $v = shift; print "selected: $v\n" },
 		-values => [qw/Red Green Blue Cyan Magenta Yellow Black White Pink Purple Brown Beige Orange/],
 	)->pack(-fill => 'x');

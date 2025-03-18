@@ -62,6 +62,20 @@ sub hashtests {
 
     is_deeply ($hash{deep}, \%deep,			"Content");
 
+    is ((tied %hash)->readonly (), 0,			"RW");
+    is ((tied %hash)->readonly (1), 1,			"RO 1");
+    my @w;
+    eval { $SIG{__WARN__} = sub { push @w => @_; }; $hash{foo} = 42; };
+    is ($hash{foo}, undef,				"FAIL");
+    like ($w[0], qr{cannot store},			"Error message");
+    is ((tied %hash)->readonly (2), 2,			"RO 2");
+    eval { $hash{foo} = 42; };
+    like ($@, qr{cannot store},				"Error message");
+    is ($hash{foo}, undef,				"FAIL");
+    is ((tied %hash)->readonly (0), 0,			"RW again");
+    eval { $hash{foo} = 42; };
+    is ($hash{foo}, 42,					"PASS");
+
     # clear
     %hash = ();
     $DBD eq "CSV" && $SQL::Statement::VERSION =~ m/^1.(2[0-9]|30)$/ or

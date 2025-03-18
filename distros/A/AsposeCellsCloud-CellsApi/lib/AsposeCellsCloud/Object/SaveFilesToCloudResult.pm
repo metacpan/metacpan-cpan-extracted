@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'saved_files' => {
      	datatype => 'ARRAY[Link]',
      	base_name => 'SavedFiles',
-     	description => '',
+     	description => 'This class has a property named SavedFiles of type List Link.',
      	format => '',
      	read_only => '',
      		},

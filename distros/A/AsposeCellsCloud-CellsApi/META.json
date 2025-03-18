@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "25.2"
+         "version" : "25.3"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -827,6 +827,9 @@
       "AsposeCellsCloud::Object::StyleResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/StyleResponse.pm"
       },
+      "AsposeCellsCloud::Object::StylesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/StylesResponse.pm"
+      },
       "AsposeCellsCloud::Object::TaskRunResultResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/TaskRunResultResponse.pm"
       },
@@ -1037,6 +1040,9 @@
       "AsposeCellsCloud::Object::ConvertTextOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/ConvertTextOptions.pm"
       },
+      "AsposeCellsCloud::Object::ConvertWorkbookOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertWorkbookOptions.pm"
+      },
       "AsposeCellsCloud::Object::ConvertWorksheetOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetOptions.pm"
       },
@@ -1066,6 +1072,9 @@
       },
       "AsposeCellsCloud::Object::ScopeOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/ScopeOptions.pm"
+      },
+      "AsposeCellsCloud::Object::SpecifyCellsObject" : {
+         "file" : "lib/AsposeCellsCloud/Object/SpecifyCellsObject.pm"
       },
       "AsposeCellsCloud::Object::SpecifyWordsCountOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/SpecifyWordsCountOptions.pm"
@@ -1700,6 +1709,9 @@
       "AsposeCellsCloud::Request::PostConvertWorksheetToImageRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostConvertWorksheetToImageRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostConvertWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookRequest.pm"
+      },
       "AsposeCellsCloud::Request::PostExportRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostExportRequest.pm"
       },
@@ -1924,6 +1936,9 @@
       },
       "AsposeCellsCloud::Request::PutWorksheetAddPictureRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PutWorksheetAddPictureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::AddPictureInCellRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/AddPictureInCellRequest.pm"
       },
       "AsposeCellsCloud::Request::PostWorksheetPictureRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetPictureRequest.pm"
@@ -2234,6 +2249,9 @@
       "AsposeCellsCloud::Request::GetPageCountRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetPageCountRequest.pm"
       },
+      "AsposeCellsCloud::Request::GetAllStylesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetAllStylesRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorksheetsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorksheetsRequest.pm"
       },
@@ -2419,6 +2437,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "25.2",
+   "version" : "25.3",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

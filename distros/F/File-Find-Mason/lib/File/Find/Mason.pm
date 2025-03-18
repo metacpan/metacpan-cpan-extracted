@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Find qw//;
 
-our $VERSION='0.0.2';
+our $VERSION='0.0.3';
 
 my %default=(
 	verbose    =>0,
@@ -57,7 +57,10 @@ sub wanted {
 	if(!open($fh,'<',$fn)) { if($opt{verbose}) { print STDERR "Unable to read:  $fn\n" }; return }
 	{local($/); $txt=<$fh>}
 	close($fh);
-	if(!$txt) { print STDERR "No content for $fn\n" }
+	if(!$txt) {
+		if($opt{verbose}) { print STDERR "No content for $fn\n" }
+		return 0;
+	}
 	foreach my $k (grep {$opt{$_}&&$pattern{$_}} keys(%default)) {
 		if($k eq 'shebang') { if($txt=~$pattern{$k}) { return 0 } }
 		if($txt=~$pattern{$k}) {
@@ -80,7 +83,7 @@ File::Find::Mason - Find files that contain Mason components
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.3
 
 =head1 SYNOPSIS
 

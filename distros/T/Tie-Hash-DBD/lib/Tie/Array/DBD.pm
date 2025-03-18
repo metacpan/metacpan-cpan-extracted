@@ -1,6 +1,6 @@
 package Tie::Array::DBD;
 
-our $VERSION = "0.24";
+our $VERSION = "0.25";
 
 use strict;
 use warnings;
@@ -68,6 +68,12 @@ my %DB = (
 	},
     );
 
+sub _ro_fail {
+    my ($self, $action) = @_;
+    my $error = "You cannot $action when in read-only mode";
+    $self->{ro} == 1 ? warn $error : die $error;
+    } # ro_fail
+
 sub _create_table {
     my ($cnf, $tmp) = @_;
     $cnf->{tmp} = $tmp;
@@ -85,6 +91,7 @@ sub _create_table {
 	};
     $exists and return;	# Table already exists
 
+    $cnf->{ro} and return _ro_fail ($cnf, "create tables");
     my $temp = $DB{$dbt}{temp};
     $cnf->{tmp} or $temp = "";
     local $dbh->{AutoCommit} = 1 unless $dbt eq "CSV" || $dbt eq "Unify";
@@ -128,6 +135,7 @@ sub TIEARRAY {
 	tmp => $tmp,
 	ktp => $cnf->{t_key},
 	vtp => $cnf->{t_val},
+	ro  => 0,
 
 	_en => undef,
 	_de => undef,
@@ -140,6 +148,8 @@ sub TIEARRAY {
 	$opt->{fld} and $f_v      = $opt->{fld};
 	$opt->{tbl} and $h->{tbl} = $opt->{tbl};
 	$opt->{vtp} and $h->{vtp} = $opt->{vtp};
+
+	exists $opt->{ro} and $h->{ro} = $opt->{ro};
 
 	if (my $str = $opt->{str}) {
 	    if ($str eq "Sereal") {
@@ -166,10 +176,28 @@ sub TIEARRAY {
 		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
 		$h->{_de} = sub {       $j->decode ($_[0]) };
 		}
+	    elsif ($str eq "JSON::MaybeXS") {
+		require JSON::MaybeXS;
+		my $j = JSON::MaybeXS->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
+		}
+	    elsif ($str eq "JSON::SIMD") {
+		require JSON::SIMD;
+		my $j = JSON::SIMD->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
+		}
 	    elsif ($str eq "JSON::Syck") {
 		require JSON::Syck;
 		$h->{_en} = sub { JSON::Syck::Dump ($_[0]) };
 		$h->{_de} = sub { JSON::Syck::Load ($_[0]) };
+		}
+	    elsif ($str eq "JSON::XS") {
+		require JSON::XS;
+		my $j = JSON::XS->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
 		}
 	    elsif ($str eq "YAML") {
 		require YAML;
@@ -215,13 +243,13 @@ sub TIEARRAY {
 
     my $tbl = $h->{tbl};
 
-    $h->{ins} = $dbh->prepare ("insert into $tbl ($f_k, $f_v) values (?, ?)");
-    $h->{del} = $dbh->prepare ("delete from $tbl where $f_k = ?");
-    $h->{upd} = $dbh->prepare ("update $tbl set $f_v = ? where $f_k = ?");
+    $h->{ins} = $dbh->prepare ("insert into $tbl ($f_k, $f_v) values (?, ?)") unless $h->{ro};
+    $h->{del} = $dbh->prepare ("delete from $tbl where $f_k = ?")             unless $h->{ro};
+    $h->{upd} = $dbh->prepare ("update $tbl set $f_v = ? where $f_k = ?")     unless $h->{ro};
     $h->{sel} = $dbh->prepare ("select $f_v from $tbl where $f_k = ?");
     $h->{cnt} = $dbh->prepare ("select count(*) from $tbl");
     $h->{ctv} = $dbh->prepare ("select count(*) from $tbl where $f_k = ?");
-    $h->{uky} = $dbh->prepare ("update $tbl set $f_k = ? where $f_k = ?");
+    $h->{uky} = $dbh->prepare ("update $tbl set $f_k = ? where $f_k = ?")     unless $h->{ro};
 
     unless (exists $cnf->{pbind} && !$cnf->{pbind}) {
 	my $sth = $dbh->prepare ("select $f_k, $f_v from $tbl where 0 = 1");
@@ -273,6 +301,7 @@ sub _setmax {
 
 sub STORE {
     my ($self, $key, $value) = @_;
+    $self->{ro} and return _ro_fail ($self, "store entries");
     my $v = $self->_stream ($value);
     $self->EXISTS ($key)
 	? $self->{upd}->execute ($v, $key)
@@ -282,6 +311,7 @@ sub STORE {
 
 sub DELETE {
     my ($self, $key) = @_;
+    $self->{ro} and return _ro_fail ($self, "delete entries");
     $self->{sel}->execute ($key);
     my $r = $self->{sel}->fetch or return;
     $self->{del}->execute ($key);
@@ -291,6 +321,7 @@ sub DELETE {
 
 sub STORESIZE {
     my ($self, $size) = @_; # $size = $# + 1
+    $self->{ro} and return _ro_fail ($self, "resize an array");
     $size--;
     $self->{dbh}->do ("delete from $self->{tbl} where $self->{f_k} > $size");
     $self->{max} = $size;
@@ -298,6 +329,7 @@ sub STORESIZE {
 
 sub CLEAR {
     my $self = shift;
+    $self->{ro} and return _ro_fail ($self, "clear an array");
     $self->{dbh}->do ("$DB{$self->{dbt}}{clear} $self->{tbl}");
     $self->{max} = -1;
     } # CLEAR
@@ -319,20 +351,21 @@ sub FETCH {
 
 sub PUSH {
     my ($self, @val) = @_;
-    for (@val) {
-	$self->STORE (++$self->{max}, $_);
-	}
+    $self->{ro} and return _ro_fail ($self, "push entries");
+    $self->STORE (++$self->{max}, $_) for @val;
     return $self->FETCHSIZE;
     } # PUSH
 
 sub POP {
     my $self = shift;
+    $self->{ro} and return _ro_fail ($self, "pop entries");
     $self->{max} >= 0 or return;
     $self->DELETE ($self->{max});
     } # POP
 
 sub SHIFT {
     my $self = shift;
+    $self->{ro} and return _ro_fail ($self, "shift entries");
     my $val  = $self->DELETE (0);
     $self->{uky}->execute ($_ - 1, $_) for 1 .. $self->{max};
     $self->{max}--;
@@ -342,6 +375,7 @@ sub SHIFT {
 sub UNSHIFT {
     my ($self, @val) = @_;
     @val or return;
+    $self->{ro} and return _ro_fail ($self, "unshift entries");
     my $incr = scalar @val;
     $self->{uky}->execute ($_ + $incr, $_) for reverse 0 .. $self->{max};
     $self->{max} += $incr;
@@ -375,6 +409,7 @@ sub SPLICE {
     my $nargs = $#_;
     my ($self, $off, $len, @new, @val) = @_;
 
+    $self->{ro} and return _ro_fail ($self, "splice entries");
     # splice @array;
     if ($nargs == 0) {
 	if (wantarray) {
@@ -455,6 +490,12 @@ sub drop {
     $self->{tmp} = 1;
     } # drop
 
+sub readonly {
+    my $self = shift;
+    @_ and $self->{ro} = shift;
+    return $self->{ro};
+    } # readonly
+
 sub _dump_table {
     my $self = shift;
     my $sth = $self->{dbh}->prepare ("select $self->{f_k}, $self->{f_v} from $self->{tbl} order by $self->{f_k}");
@@ -477,6 +518,7 @@ sub DESTROY {
     delete $self->{$_} for qw( _de _en );
     if ($self->{tmp}) {
 	$dbh->{AutoCommit} or $dbh->rollback;
+	$self->{ro} and return _ro_fail ($self, "drop tables");
 	$dbh->do ("drop table ".$self->{tbl});
 	}
     $dbh->{AutoCommit} or $dbh->commit;
@@ -507,6 +549,7 @@ Tie::Array::DBD - tie a plain array to a database table
       key => "h_key",
       fld => "h_value",
       str => "Storable",
+      ro  => 0,
       };
 
   $array[42] = $value;  # INSERT
@@ -524,6 +567,10 @@ Tie::Array::DBD - tie a plain array to a database table
   @a = splice @array, 2, -2, 5..9;
   @k = keys   @array;   # $] >= 5.011
   @v = values @array;   # $] >= 5.011
+
+  my $readonly = tied (@array)->readonly ();
+  tied (@array)->readonly (1);
+  $array[4] = 42; # FAIL
 
 =head1 DESCRIPTION
 
@@ -601,11 +648,19 @@ is C<h_value>.
 Defines the type of the fld field in the database table.  The default is
 depending on the underlying database and most likely some kind of BLOB.
 
+=item ro
+
+Set handle to read-only for this tie. Useful when using existing tables or
+views than cannot be updated.
+
+When attempting to alter data (add, delete, change) a warning is issued
+and the action is ignored.
+
 =item str
 
 Defines the required persistence module.   Currently supports the use of
-C<Storable>, C<Sereal>,  C<JSON>, C<JSON::Syck>,  C<YAML>, C<YAML::Syck>
-and C<XML::Dumper>.
+C<Storable>, C<Sereal>, C<JSON>, C<JSON::MaybeXS>, C<JSON::SIMD>,
+C<JSON::Syck>, C<JSON::XS>, C<YAML>, C<YAML::Syck> and C<XML::Dumper>.
 
 The default is undefined.
 
@@ -639,7 +694,10 @@ Here is a table of supported data types given a data structure like this:
  Storable      x   x   x   x   x   x   x   x   x   x   -   -   -   -   -
  Sereal        x   x   x   x   x   x   x   x   x   x   x   x   -   -   -
  JSON          x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
+ JSON::MaybeXS x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
+ JSON::SIMD    x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
  JSON::Syck    x   x   x   x   -   x   -   x   x   x   -   x   -   -   -
+ JSON::XS      x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
  YAML          x   x   x   x   -   x   x   x   x   x   x   x   -   -   -
  YAML::Syck    x   x   x   x   -   x   x   x   x   x   -   x   -   -   -
  XML::Dumper   x   x   x   x   x   x   x   x   x   x   -   x   -   -   -
@@ -668,7 +726,7 @@ about the data is also lost, which includes the C<UTF8> flag.
 If you want to preserve the C<UTF8> flag you will need to store internal
 flags and use the streamer option:
 
-  tie my @array, "Tie::Array::DBD", { str => "Storable" };
+  tie my @array, "Tie::Array::DBD", "dbi:Pg:", { str => "Storable" };
 
 If you do not want the performance impact of Storable just to be able to
 store and retrieve UTF-8 values, there are two ways to do so:
@@ -693,7 +751,7 @@ C<Tie::Array::DBD> stores values as binary data. This means that
 all structure is lost when the data is stored and not available when the
 data is restored. To maintain deep structures, use the streamer option:
 
-  tie my @array, "Tie::Array::DBD", { str => "Storable" };
+  tie my @array, "Tie::Array::DBD", "dbi:Pg:", { str => "Storable" };
 
 Note that changes inside deep structures do not work. See L</TODO>.
 
@@ -705,7 +763,33 @@ If a table was used with persistence, the table will not be dropped when
 the C<untie> is called.  Dropping can be forced using the C<drop> method
 at any moment while the array is tied:
 
-  (tied @array)->drop;
+  tied (@array)->drop;
+
+=head2 readonly
+
+You can inquire or set the readonly status of the bound array. Note that
+setting read-only also forbids to delete generated temporary table.
+
+  my $readonly = tied (@array)->readonly ();
+  tied (@array)->readonly (1);
+
+Setting read-only accepts 3 states:
+
+=over 2
+
+=item false (C<undef>, C<"">, C<0>)
+
+This will (re)set the array to read-write.
+
+=item C<1>
+
+This will set read-only. When attempting to make changes, a warning is given.
+
+=item C<2>
+
+This will set read-only. When attempting to make changes, the process will die.
+
+=back
 
 =head1 PREREQUISITES
 
@@ -780,7 +864,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 H.Merijn Brand
+Copyright (C) 2010-2024 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
@@ -788,7 +872,8 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 DBI, Tie::DBI, Tie::Array, Tie::Hash::DBD, DBM::Deep, Storable, Sereal,
-JSON, JSON::Syck, YAML, YAML::Syck, XML::Dumper, Bencode, FreezeThaw
+JSON, JSON::MaybeXS, JSON::SIMD, JSON::Syck, JSON::XS, YAML, YAML::Syck,
+XML::Dumper, Bencode, FreezeThaw
 
 =cut
 

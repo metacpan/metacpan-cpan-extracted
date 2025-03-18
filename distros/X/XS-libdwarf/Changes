@@ -1,3 +1,5 @@
+20241226.0   xx.xx.2024
+    - libdwarf updated to 0.11.1
 20230906.0   31.01.2024
     - libdwarf version bump
     - improved cmake support

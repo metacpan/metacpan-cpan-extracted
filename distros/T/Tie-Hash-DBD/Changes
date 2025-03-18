@@ -1,3 +1,11 @@
+0.25	- 17 Mar 2025, H.Merijn Brand
+    * Add ro option (ReadOnly)
+    * Add support for serializers JSON::MaybeXS, JSON::XS & JSON::SIMD
+    * Doc fixes for groff-1.24
+    * It's 2024
+    * Fix parallel testing for SQLite
+    * Tested with perl-5.40
+
 0.24	- 06 Jan 2023, H.Merijn Brand
     * It's 2022
     * It's 2023

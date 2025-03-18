@@ -1,0 +1,32 @@
+---
+abstract: 'an interface to the ICANN gTLD database.'
+author:
+  - 'Gavin Brown <gavin.brown@icann.org>'
+build_requires:
+  Carp::Always: '0'
+  LWP::Online: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ICANN-gTLD
+requires:
+  Carp: '0'
+  Data::Mirror: '0'
+  DateTime::Format::ISO8601: '0'
+  Net::DNS::Domain: '0'
+  Net::RDAP: '0.34'
+  Net::RDAP::Registry: '0'
+  URI: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.001'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

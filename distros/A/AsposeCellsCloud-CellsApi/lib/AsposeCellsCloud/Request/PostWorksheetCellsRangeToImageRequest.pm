@@ -76,7 +76,7 @@ sub new {
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_to_image' } = { 
     	summary => '',
         params => $params,
-        returns => 'CellsCloudResponse',
+        returns => 'string',
     };
 }
 

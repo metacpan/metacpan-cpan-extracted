@@ -4,7 +4,7 @@ package Test::CVE;
 
 =head1 NAME
 
- Test::CVE - Test against known CVE's
+Test::CVE - Test against known CVE's
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,11 @@ package Test::CVE;
     make_pl  => "Makefile.PL",
     build_pl => "Build.PL",     # NYI
     want     => [],
+    skip     => "CVE.SKIP",
     );
+
+ $cve->skip ("CVE.SKIP");
+ $cve->skip ([qw( CVE-2011-0123 CVE-2020-1234 )]);
 
  $cve->want ("Foo::Bar", "4.321");
  $cve->want ("ExtUtils-MakeMaker");
@@ -37,13 +41,14 @@ package Test::CVE;
 use 5.014000;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use version;
 use Carp;
 use HTTP::Tiny;
-use Text::Wrap;
 use JSON::MaybeXS;
+use Module::CoreList;
+use Text::Wrap;
 use YAML::PP ();
 use List::Util qw( first );
 
@@ -61,7 +66,7 @@ sub new {
     my $class = shift;
     @_ % 2 and croak "Uneven number of arguments";
     my %self  = @_;
-    $self{cpansa}   ||= "https://perl-toolchain-gang.github.io/cpansa-feed/cpansa.json";
+    $self{cpansa}   ||= "https://cpan-security.github.io/cpansa-feed/cpansa.json";
     $self{deps}     //= 1;
     $self{perl}     //= 1;
     $self{core}     //= 1;
@@ -75,8 +80,46 @@ sub new {
     $self{make_pl}  ||= "Makefile.PL";
     $self{build_pl} ||= "Build.PL";
     $self{CVE}        = {};
-    bless \%self => $class;
+    my $obj = bless \%self => $class;
+    $obj->skip ($self{skip} // "CVE.SKIP");
+    return $obj;
     } # new
+
+sub skip {
+    my $self = shift;
+    if (@_) {
+	if (my $skip = shift) {
+	    if (ref $skip eq "HASH") {
+		$self->{skip} = $skip;
+		}
+	    elsif (ref $skip eq "ARRAY") {
+		$self->{skip} = { map { $_ => 1 } @$skip };
+		}
+	    elsif ($skip =~ m/^\x20-\xff]+$/ and open my $fh, "<", $skip) {
+		my %s;
+		while (<$fh>) {
+		    s/[\s\r\n]+\z//;
+		    m/^\s*(\w[-\w]+)(?:\s+(.*))?$/ or next;
+		    $s{$1} = $2 // "";
+		    }
+		close $fh;
+		$self->{skip} = { %s };
+		}
+	    else {
+		$self->{skip} = {
+		    map  { $_ => 1 }
+		    grep { m/^\w[-\w]+$/ }
+		    $skip, @_
+		    };
+		}
+	    }
+	else {
+	    $self->{skip} = undef;
+	    }
+	}
+    $self->{skip} ||= {};
+    return [ sort keys %{$self->{skip}} ];
+    } # skip
 
 sub _read_cpansa {
     my $self = shift;
@@ -141,7 +184,7 @@ sub _read_MakefilePL {
     foreach my $mfx (grep { m/=>/ }
 		     map  { split m/\s*[;(){}]\s*/ }
 		     map  { split m/\s*,(?!\s*=>)/ }
-			    split m/[,;]\s*\r*\n/ => $mfc) {
+			    split m/[,;]\s*(?:#.*)?\r*\n/ => $mfc) {
 	$mfx =~ s/[\s\r\n]+/ /g;
 	$mfx =~ s/^\s+//;
 	$mfx =~ s/^(['"])(.*?)\1/$2/;	# Unquote key
@@ -166,6 +209,7 @@ sub _read_MakefilePL {
     $release //= $nm =~ s{-}{::}gr;
     $release eq "." && $nm and $release = $nm =~ s{::}{-}gr;
     if (!$v && $vf and open $fh, "<", $vf) {
+	warn "Trying to fetch VERSION from $vf ...\n" if $self->{verbose};
 	while (<$fh>) {
 	    m/\b VERSION \s* = \s* ["']? ([^;'"\s]+) /x or next;
 	    $v = $1;
@@ -198,7 +242,7 @@ sub _read_cpanfile {
 	my ($t, $m, $v) = m{ \b
 	  ( requires | recommends | suggest ) \s+
 	  ["'] (\S+) ['"]
-	  (?: \s*=>\s* ["'] (\S+) ['"])?
+	  (?: \s*(?:=>|,)\s* ["'] (\S+) ['"])?
 	  }x or next;
 	$m =~ s/::/-/g;
 	$self->{prereq}{$m}{v}{$v // ""} = $t;
@@ -346,7 +390,7 @@ sub test {
 	foreach my $c (@{$self->{j}{db}{$m}}) {
 	    # Ignored: references
 	    my $cid = $c->{cpansa_id};
-	    my @cve = @{$c->{cves} || []};
+	    my @cve = grep { !exists $self->{skip}{$_} } @{$c->{cves} || []};
 	    my $dte = $c->{reported};
 	    my $sev = $c->{severity};
 	    my $dsc = $c->{description};
@@ -473,10 +517,11 @@ It enables checking the current release only or include its prereqs too.
     verbose  => 0,
     deps     => 1,
     minimum  => 0,
-    cpansa   => "https://perl-toolchain-gang.github.io/cpansa-feed/cpansa.json",
+    cpansa   => "https://cpan-security.github.io/cpansa-feed/cpansa.json",
     make_pl  => "Makefile.PL",
     cpanfile => "cpanfile",
     want     => [],
+    skip     => "CVE.SKIP",
     );
 
 =head4 verbose
@@ -530,6 +575,10 @@ A list of extra prereqs. When you know in advance, pass the list in this
 attribute. You can also add them to the object with the method later. This
 attribute does not support versions, the method does.
 
+=head4 skip
+
+An optional specification of CVE's to skip/ignore. See L</skip>.
+
 =head3 require
 
  my $cve = Test::CVE->new ();
@@ -545,6 +594,37 @@ Add a dependency to the list. Only adds the dependency if known CVE's exist.
 
 Force set distribution information, preventing reading C<Makefile.PL> and/or
 C<cpanfile>.
+
+=head3 skip
+X<skip>
+
+ my @skip = $cve->skip;
+ $cve->skip (undef);
+ $cve->skip ("CVE.SKIP");
+ $cve->skip ("CVE-2011-0123", "CVE-2022-1234");
+ $cve->skip ([qw( CVE-2011-0123 CVE-2020-1234 )]);
+ $cve->skip ({ "CVE-2013-2222" => "We do not use this" });
+
+By default all CVE's listed in file C<CVE.SKIP> will be ignored in the reports.
+
+When no argument is given, the current list of ignored CVE's is returned as
+an array-ref.
+
+When the only argument is the name of a readable file, the file is expected to
+have one tag per line of a CVE to be ignored, optionally followed by space and
+a reason:
+
+  CVE-2011-0123   We are not using this feature
+  CVE-2020-1234
+
+When the only argument is an array-ref, all entries are ignored.
+
+When the only argument is a hash-ref, all keys are ignored.
+
+Otherwise, all arguments are ignored.
+
+Future extensions might read L<VEX|https://github.com/openvex/spec>
+specifications (too).
 
 =head3 test
 
@@ -623,6 +703,10 @@ Severity. Most entries doe not have a severity
 
 Support L<SLSA|https://slsa.dev/spec/v0.1/> documents
 
+=item
+
+Support L<VEX|https://github.com/openvex/spec> documents
+
 =back
 
 =head1 AUTHOR
@@ -635,7 +719,7 @@ L<Net::CVE>, L<Net::NVD>, L<Net::OSV>
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2023-2024 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2023-2025 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

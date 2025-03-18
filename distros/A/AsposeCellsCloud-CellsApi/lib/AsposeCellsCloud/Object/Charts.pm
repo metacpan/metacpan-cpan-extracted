@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'chart_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'ChartList',
-     	description => '',
+     	description => 'A property named ChartList of type List LinkElement  that is publicly accessible with both read and write capabilities.',
      	format => '',
      	read_only => '',
      		},

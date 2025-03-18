@@ -1,6 +1,6 @@
 package App::ReslirpTunnel;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use strict;
 use warnings;
@@ -213,6 +213,7 @@ sub _init_ssh {
     $self->{remote_shell} = $self->{args}{remote_shell} // $self->_autodetect_remote_shell //
         $self->_die("No remote shell specified and unable to autodetect it");
 
+    $self->{quoting_backend} = (($self->{remote_shell} eq 'windows') ? 'MSWin' : 'ksh');
     my $ssh_master_pid = $self->{ssh}->get_master_pid;
     $self->_log(debug => "SSH master PID", $ssh_master_pid);
     $self->{ssh_master_pid} = $ssh_master_pid;
@@ -278,7 +279,9 @@ sub _init_reslirp {
     $self->_log(info => "Starting remote reSLIRP process");
     $self->_log(debug => "Remote command: $cmd @args");
     my ($socket, undef, $stderr, $pid) = $ssh->open_ex({stderr_pipe => 1,
-                                                        stdinout_socket => 1},
+                                                        stdinout_socket => 1,
+                                                        quote_args => 1,
+                                                        remote_shell => $self->{quoting_backend}},
                                                        $cmd, @args);
     $self->{reslirp_socket} = $socket;
     $self->{reslirp_stderr} = $stderr;

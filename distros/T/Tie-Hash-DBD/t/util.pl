@@ -132,8 +132,6 @@ sub cleanup {
 	    unlink $tempdb;
 	    return;
 	    }
-	my @db = sort glob "db*.3*" or return;
-	unlink $_ for @db;
 	return;
 	}
 
@@ -170,7 +168,7 @@ sub cleanup {
 sub supported_serializers {
     qw( Storable
 	Sereal
-	JSON JSON::Syck
+	JSON JSON::Syck JSON::XS JSON::MaybeXS JSON::SIMD
 	YAML YAML::Syck
 	XML::Dumper
 	Bencode
@@ -180,7 +178,10 @@ sub supported_serializers {
     } # supported_serializers
 
 # Choose a value that works for plain, uselongdouble, and usequadmath
-sub PI { 3.1415926535897931 }
+# CentOS 7 perl-5.32.1-x86_64-linux-thread-multi-ld requires an
+#  additional 2 at the end for DBD::Oracle-1.83 on Oracle 19.3.0.0
+#  and OCI 19.16. Other connections are ok
+sub PI { 3.14159265358979312 }
 
 sub deep {
     my ($DBD, $str) = (@_, "");
@@ -203,16 +204,19 @@ sub deep {
 	IO  => *{$::{STDERR}}{IO},
 	);
 
-    $str eq ""            and delete @deep{qw( IO GLB CR RX FMT            )};
-    $str eq "Storable"    and delete @deep{qw( IO GLB CR RX FMT            )};
-    $str eq "Sereal"      and delete @deep{qw( IO GLB CR                   )};
-    $str eq "JSON"        and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
-    $str eq "JSON::Syck"  and delete @deep{qw( IO GLB CR RX     RV     PV8 )};
-    $str eq "YAML"        and delete @deep{qw( IO GLB CR               PV8 )};
-    $str eq "YAML::Syck"  and delete @deep{qw( IO GLB CR RX            PV8 )};
-    $str eq "XML::Dumper" and delete @deep{qw( IO GLB CR RX                )};
-    $str eq "FreezeThaw"  and delete @deep{qw( IO     CR RX            PV8 )};
-    $str eq "Bencode"     and delete @deep{qw( IO UND CR RX FMT RV OBJ PV8 )};
+    $str eq ""              and delete @deep{qw( IO GLB CR RX FMT            )};
+    $str eq "Storable"      and delete @deep{qw( IO GLB CR RX FMT            )};
+    $str eq "Sereal"        and delete @deep{qw( IO GLB CR                   )};
+    $str eq "JSON"          and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
+    $str eq "JSON::MaybeXS" and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
+#   $str eq "JSON::SIMD"    and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
+    $str eq "JSON::Syck"    and delete @deep{qw( IO GLB CR RX     RV     PV8 )};
+    $str eq "JSON::XS"      and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
+    $str eq "YAML"          and delete @deep{qw( IO GLB CR               PV8 )};
+    $str eq "YAML::Syck"    and delete @deep{qw( IO GLB CR RX            PV8 )};
+    $str eq "XML::Dumper"   and delete @deep{qw( IO GLB CR RX                )};
+    $str eq "FreezeThaw"    and delete @deep{qw( IO     CR RX            PV8 )};
+    $str eq "Bencode"       and delete @deep{qw( IO UND CR RX FMT RV OBJ PV8 )};
 
     $str =~ m/^[JYX]/ && $DBD =~ m/^(?: Pg | MariaDB )$/x and delete $deep{PV8};
 

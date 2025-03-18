@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ANSIColorUtils/show_assigned_rgb_colors
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
-our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Classic;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-03-18'; # DATE
+our $DIST = 'App-ANSIColorUtils'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Classic->new(
     url => "/App/ANSIColorUtils/show_assigned_rgb_colors",
@@ -39,14 +39,15 @@ show-assigned-rgb-colors - Take arguments, pass them through assign_rgb_color(),
 
 =head1 VERSION
 
-This document describes version 0.010 of show-assigned-rgb-colors (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
+This document describes version 0.011 of show-assigned-rgb-colors (from Perl distribution App-ANSIColorUtils), released on 2025-03-18.
 
 =head1 SYNOPSIS
 
-Usage:
+B<show-assigned-rgb-colors> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % show-assigned-rgb-colors [--dark] [--format-options=s] [--format=name]
-     [--json] [--light] [--(no)naked-res] [--tone=s] <strings> ...
+B<show-assigned-rgb-colors> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<show-assigned-rgb-colors> [B<L<--format-options|/"--format-options=s">>=I<s>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--tone|/"--tone=s">>=I<str>|B<L<--dark|/"--tone=s">>|B<L<--light|/"--tone=s">>] -- E<lt>I<L<strings|/"--strings=s@*">>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -77,7 +78,14 @@ See C<--tone>.
 
 See C<--strings>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--strings>=I<s@>*
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -105,6 +113,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Equivalent to --format=json-pretty.
@@ -119,15 +133,15 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =back
@@ -188,23 +202,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ANSICo
 
 Source repository is at L<https://github.com/perlancar/perl-App-ANSIColorUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

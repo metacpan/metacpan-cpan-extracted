@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02230nam a2200469 aa4500</leader>
+  <controlfield tag="001">nkc20102031137</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20200610095522.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">100128m18691873xr af  e      000 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb002031137</subfield>
+    <subfield code="z">cnb001268082</subfield>
+    <subfield code="z">cnb001268083</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Brož.)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85699136</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85699139</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="a">ger</subfield>
+    <subfield code="a">fre</subfield>
+    <subfield code="h">cze</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">003</subfield>
+    <subfield code="x">Systémy psaní a písma. Sémiotika (obecně)</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">11</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">003.077</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">091"04/14"</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">091.31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(437.3)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(084.11)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Scheiwl, Josef,</subfield>
+    <subfield code="d">1833-1912</subfield>
+    <subfield code="7">jk01110882</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Památky krasopisné, vyňaté z rukopisů knihoven českých /</subfield>
+    <subfield code="c">vydal F. Skrejšovský ; kreslil Jos. Scheiwl ; text od J. Er. Wocela = Kalligraphische Denkmale, entnommen aus Handschriften böhmischer Bibliotheken / herausgegeben von F. Skrejšovský ; gezeichnet von Jos. Scheiwl ; Text von J. Er. Wocel = Monuments calligraphiques, tirés des manuscrits des bibliotheques de la Bohême / publiés par F. Skrejšovský ; dessinés par Jos. Scheiwl ; text de J. Er. Wocel</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="1">
+    <subfield code="a">Kalligraphische Denkmale, entnommen aus Handschriften böhmischer Bibliotheken</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="1">
+    <subfield code="a">Monuments calligraphiques, tirés des manuscrits des bibliotheques de la Bohême</subfield>
+  </datafield>
+  <datafield tag="246" ind1="1" ind2="4">
+    <subfield code="a">Památky krasopisné</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Tiskem F. Skrejšovského,</subfield>
+    <subfield code="c">1869-1873</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">2 sv. (19 s., [xii] l. barev. obr. příl.) :</subfield>
+    <subfield code="b">il. ;</subfield>
+    <subfield code="c">27 x 34 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Text pouze ve sv. I</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Souběžný německý a francouzský text a tit. s.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">kaligrafie</subfield>
+    <subfield code="7">ph121398</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">středověké rukopisy</subfield>
+    <subfield code="7">ph116322</subfield>
+    <subfield code="z">Česko</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">iluminované rukopisy</subfield>
+    <subfield code="7">ph114754</subfield>
+    <subfield code="z">Česko</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">obrazové publikace</subfield>
+    <subfield code="7">fd132947</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Vocel, Jan Erazim,</subfield>
+    <subfield code="d">1802-1871</subfield>
+    <subfield code="7">jk01150204</subfield>
+    <subfield code="4">aui</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Skrejšovský, František,</subfield>
+    <subfield code="d">1837-1902</subfield>
+    <subfield code="7">jk01111615</subfield>
+    <subfield code="4">pbl</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://kramerius5.nkp.cz/uuid/uuid:34cb4e10-6705-11de-96e8-000d606f5dc6</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="s">Díl 1-2</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">F. Skrejšovský</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">002031137</subfield>
+  </datafield>
+</record>
+
+</collection>

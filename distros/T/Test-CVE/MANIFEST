@@ -5,6 +5,7 @@ META.json		META
 META.yml		META
 cpanfile		Dependency list for cpan/cpanm
 CONTRIBUTING.md		Guide in how to contribute
+SECURITY.md		Guide for reporting security issues
 lib/Test/CVE.pm		Test CVE functionality
 Makefile.PL		Makefile generator
 t/10_base.t		Base tests (combine and parse only)

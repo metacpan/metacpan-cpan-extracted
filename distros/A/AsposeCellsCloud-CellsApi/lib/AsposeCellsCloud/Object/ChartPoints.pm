@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'chart_point_list' => {
      	datatype => 'ARRAY[ChartPoint]',
      	base_name => 'ChartPointList',
-     	description => '',
+     	description => 'This class has a property named ChartPointList of type List ChartPoint  with an XmlElement attribute "ChartPoint".',
      	format => '',
      	read_only => '',
      		},

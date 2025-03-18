@@ -142,6 +142,20 @@ sub arraytests {
     is_deeply ([splice @array, 4, -2, 25], [ 4..7 ],	"splice \@array, off, -len");
     is_deeply (\@array,		[ 0,1,3,2,25,8,9 ],	".. leftover");
 
+    is ((tied @array)->readonly (), 0,			"RW");
+    is ((tied @array)->readonly (1), 1,			"RO 1");
+    my @w;
+    eval { $SIG{__WARN__} = sub { push @w => @_; }; $array[42] = 42; };
+    is ($array[42], undef,				"FAIL");
+    like ($w[0], qr{cannot store},			"Error message");
+    is ((tied @array)->readonly (2), 2,			"RO 2");
+    eval { $array[42] = 42; };
+    like ($@, qr{cannot store},				"Error message");
+    is ($array[42], undef,				"FAIL");
+    is ((tied @array)->readonly (0), 0,			"RW again");
+    eval { $array[42] = 42; };
+    is ($array[42], 42,					"PASS");
+
     untie @array;
     cleanup ($DBD);
     } # arraytest

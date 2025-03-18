@@ -1,0 +1,62 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Getopt::Std ; getopts 'd:f' , \my %o  ; 
+use FindBin qw[ $Script ] ; 
+use utf8 ; 
+use Scalar::Util qw[ looks_like_number ] ; 
+ 
+$ARGV[0] //= 20 ;
+$o{d} //= 1 ;
+my $bk = ( $o{f} ? '　' :' ' ) x $o{d} ; # 空白文字を $o{d}個連結する。 全角空白と半角空白を左に書いた。
+my ($n1,$n2) = $ARGV[0] =~ m/(\d+)-(\d+)/ ? ($1,$2) : exists $ARGV[1] ? @ARGV : (1,$ARGV[0]) ; 
+exit if map {say "'$_' seems not a number."} grep { ! looks_like_number $_ } ($n1,$n2) ;
+
+my $out = '' ; 
+for ( $n1 .. $n2 ) { 
+  my $c = s/0{$o{d},}$//ro =~ s/^$/0/ro ; # 文末の1個以上の0を除去して、もしも全部消えたら0にする。
+  $c = substr $bk . $c , -$o{d} , $o{d} ; 
+  $c =~ y/0123456789 /０１２３４５６７８９　/ if $o{f} ; 
+  $out .= $c ; 
+}
+
+binmode STDOUT, ":utf8" ; 
+say $out ;
+exit ; 
+
+no utf8 ; 
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1 1234567891 
+
+ 1234567891 N2 
+ 1234567891 N1 N2  
+
+   N2 までに相当する数を生成して、隙間なく1桁ずつ並べる。下位の文字が0なら0でない最も右の数を取り出す。
+   N1 と N2 は、最初の数値 と 最後の数値である。負の数を与えても良い(オプション指定と見なされない工夫が必要)。
+
+使用例 : 
+  1234567891 15    # "123456789112345" を出力。
+  1234567891 -d 4  # "   1   2   3   4   5   6   7   8   9  10" を出力。
+  1234567891 ' -12' 12  # "2119876543210123456789112" ; マイナス記号は、オプションと認識されない工夫を要する。
+
+オプション :
+ -d N   : 未指定だと1と見なす。N桁ずつ並べる。(N桁未満の数は右寄せ) digits 
+ -f     : 全角文字(fullwidth)の数字を出力する。
+ --help : このオンラインヘルプの文面を表示する。
+
+=cut

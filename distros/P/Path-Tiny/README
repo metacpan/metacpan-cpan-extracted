@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.146
+    version 0.148
 
 SYNOPSIS
       use Path::Tiny;
@@ -66,7 +66,7 @@ DESCRIPTION
     the ":crlf" IO layer. Installing Unicode::UTF8 0.58 or later will speed
     up *_utf8 situations in many cases and is highly recommended.
     Alternatively, installing PerlIO::utf8_strict 0.003 or later will be
-    used in place of the default ":encoding(UTF-8)".
+    used in place of the default :encoding(UTF-8).
 
     This module depends heavily on PerlIO layers for correct operation and
     thus requires Perl 5.008001 or later.
@@ -88,14 +88,14 @@ CONSTRUCTORS
 
     DEPRECATED: If and only if the first character of the first argument to
     "path" is a tilde ('~'), then tilde replacement will be applied to the
-    first path segment. A single tilde will be replaced with "glob('~')" and
-    a tilde followed by a username will be replaced with output of
-    "glob('~username')". No other method does tilde expansion on its
+    first path segment. A single tilde will be replaced with glob('~') and a
+    tilde followed by a username will be replaced with output of
+    glob('~username'). No other method does tilde expansion on its
     arguments. See "Tilde expansion (deprecated)" for more.
 
     On Windows, if the path consists of a drive identifier without a path
     component ("C:" or "D:"), it will be expanded to the absolute path of
-    the current directory on that volume using "Cwd::getdcwd()".
+    the current directory on that volume using Cwd::getdcwd().
 
     If called with a single "Path::Tiny" argument, the original is returned
     unless the original is holding a temporary file or directory reference
@@ -137,7 +137,7 @@ CONSTRUCTORS
         $path = rootdir;             # optional export
 
     Gives you "File::Spec->rootdir" as a "Path::Tiny" object if you're too
-    picky for "path("/")".
+    picky for path("/").
 
     "rootdir" may be exported on request and used as a function instead of
     as a method.
@@ -245,7 +245,7 @@ METHODS
     and closed afterwards. An optional hash reference may be used to pass
     options. Valid options are:
 
-    *   "binmode": passed to "binmode()" on the handle used for writing.
+    *   "binmode": passed to binmode() on the handle used for writing.
 
     *   "truncate": truncates the file after locking and before appending
 
@@ -257,10 +257,9 @@ METHODS
     unbuffered, raw write.
 
     "append_utf8" is like "append" with an unbuffered "binmode"
-    ":unix:encoding(UTF-8)" (or ":unix:utf8_strict" with
-    PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is installed, an
-    unbuffered, raw append will be done instead on the data encoded with
-    "Unicode::UTF8".
+    :unix:encoding(UTF-8) (or ":unix:utf8_strict" with PerlIO::utf8_strict).
+    If Unicode::UTF8 0.58+ is installed, an unbuffered, raw append will be
+    done instead on the data encoded with "Unicode::UTF8".
 
     Current API available since 0.060.
 
@@ -439,7 +438,7 @@ METHODS
     ":raw".
 
     "edit_lines_utf8" is like "edit_lines" with a buffered "binmode"
-    ":raw:encoding(UTF-8)" (or ":raw:utf8_strict" with PerlIO::utf8_strict).
+    :raw:encoding(UTF-8) (or ":raw:utf8_strict" with PerlIO::utf8_strict).
 
     Current API available since 0.077.
 
@@ -571,8 +570,8 @@ METHODS
 
     If a positive "count" is provided, that many lines will be returned from
     the start of the file. If a negative "count" is provided, the entire
-    file will be read, but only "abs(count)" will be kept and returned. If
-    "abs(count)" exceeds the number of lines in the file, all lines will be
+    file will be read, but only abs(count) will be kept and returned. If
+    abs(count) exceeds the number of lines in the file, all lines will be
     returned.
 
     If "chomp" is set, any end-of-line character sequences ("CR", "CRLF", or
@@ -586,12 +585,14 @@ METHODS
     "lines_raw" is like "lines" with a "binmode" of ":raw". We use ":raw"
     instead of ":unix" so PerlIO buffering can manage reading by line.
 
-    "lines_utf8" is like "lines" with a "binmode" of ":raw:encoding(UTF-8)"
+    "lines_utf8" is like "lines" with a "binmode" of :raw:encoding(UTF-8)
     (or ":raw:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8 0.58+
     is installed, a raw, unbuffered UTF-8 slurp will be done and then the
     lines will be split. This is actually faster than relying on IO layers,
     though a bit memory intensive. If memory use is a concern, consider
     "openr_utf8" and iterating directly on the handle.
+
+    See also "slurp" if you want to load a file as a whole chunk.
 
     Current API available since 0.065.
 
@@ -607,11 +608,17 @@ METHODS
     similar to the Unix "mkdir -p" command. It will not error if applied to
     an existing directory.
 
+    Passing a defined argument *other* than a hash reference is an error,
+    and an exception will be thrown.
+
     Current API available since 0.125.
 
   mkpath (deprecated)
     Like calling "mkdir", but returns the list of directories created or an
     empty list if the directories already exist, just like "make_path".
+
+    Passing a defined argument *other* than a hash reference is an error,
+    and an exception will be thrown.
 
     Deprecated in 0.125.
 
@@ -654,7 +661,7 @@ METHODS
     Returns a file handle opened in the specified mode. The "openr" style
     methods take a single "binmode" argument. All of the "open*" methods
     have "open*_raw" and "open*_utf8" equivalents that use buffered I/O
-    layers ":raw" and ":raw:encoding(UTF-8)" (or ":raw:utf8_strict" with
+    layers ":raw" and :raw:encoding(UTF-8) (or ":raw:utf8_strict" with
     PerlIO::utf8_strict).
 
     An optional hash reference may be used to pass options. The only option
@@ -777,6 +784,9 @@ METHODS
 
     Current API available since 0.013.
 
+    Passing a defined argument *other* than a hash reference is an error,
+    and an exception will be thrown.
+
   sibling
         $foo = path("/tmp/foo.txt");
         $sib = $foo->sibling("bar.txt");        # /tmp/bar.txt
@@ -822,17 +832,16 @@ METHODS
 
     Reads file contents into a scalar. Takes an optional hash reference
     which may be used to pass options. The only available option is
-    "binmode", which is passed to "binmode()" on the handle used for
-    reading.
+    "binmode", which is passed to binmode() on the handle used for reading.
 
     "slurp_raw" is like "slurp" with a "binmode" of ":unix" for a fast,
     unbuffered, raw read.
 
-    "slurp_utf8" is like "slurp" with a "binmode" of ":unix:encoding(UTF-8)"
+    "slurp_utf8" is like "slurp" with a "binmode" of :unix:encoding(UTF-8)
     (or ":unix:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8
     0.58+ is installed, a unbuffered, raw slurp will be done instead and the
     result decoded with "Unicode::UTF8". This is just as strict and is
-    roughly an order of magnitude faster than using ":encoding(UTF-8)".
+    roughly an order of magnitude faster than using :encoding(UTF-8).
 
     Note: "slurp" and friends lock the filehandle before slurping. If you
     plan to slurp from a file created with File::Temp, be sure to close
@@ -840,6 +849,8 @@ METHODS
 
         my $tempfile = File::Temp->new(EXLOCK => 0);
         my $guts = path($tempfile)->slurp;
+
+    See also "lines" if you want to slurp a file into a line array.
 
     Current API available since 0.004.
 
@@ -853,16 +864,15 @@ METHODS
     Writes data to a file atomically. The file is written to a temporary
     file in the same directory, then renamed over the original. An optional
     hash reference may be used to pass options. The only option is
-    "binmode", which is passed to "binmode()" on the handle used for
-    writing.
+    "binmode", which is passed to binmode() on the handle used for writing.
 
     "spew_raw" is like "spew" with a "binmode" of ":unix" for a fast,
     unbuffered, raw write.
 
-    "spew_utf8" is like "spew" with a "binmode" of ":unix:encoding(UTF-8)"
-    (or ":unix:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8
-    0.58+ is installed, a raw, unbuffered spew will be done instead on the
-    data encoded with "Unicode::UTF8".
+    "spew_utf8" is like "spew" with a "binmode" of :unix:encoding(UTF-8) (or
+    ":unix:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is
+    installed, a raw, unbuffered spew will be done instead on the data
+    encoded with "Unicode::UTF8".
 
     NOTE: because the file is written to a temporary file and then renamed,
     the new file will wind up with permissions based on your current umask.
@@ -1005,14 +1015,14 @@ EXCEPTION HANDLING
     A "Path::Tiny::Error" object will be a hash reference with the following
     fields:
 
-    *   "op" — a description of the operation, usually function call and any
+    *   "op" â a description of the operation, usually function call and any
         extra info
 
-    *   "file" — the file or directory relating to the error
+    *   "file" â the file or directory relating to the error
 
-    *   "err" — hold $! at the time the error was thrown
+    *   "err" â hold $! at the time the error was thrown
 
-    *   "msg" — a string combining the above data and a Carp-like short
+    *   "msg" â a string combining the above data and a Carp-like short
         stack trace
 
     Exception objects will stringify as the "msg" field.
@@ -1042,8 +1052,8 @@ CAVEATS
 
         path( "~/foo.txt" )->copy( path( "~/bar.txt" ) );
 
-    If you need a literal leading tilde, use "path("./~whatever")" so that
-    the argument to "path" doesn't start with a tilde, but the path still
+    If you need a literal leading tilde, use path("./~whatever") so that the
+    argument to "path" doesn't start with a tilde, but the path still
     resolves to the current directory.
 
     Behaviour of tilde expansion with a username for non-existent users
@@ -1079,22 +1089,22 @@ CAVEATS
     permission, no lock will be used.
 
   utf8 vs UTF-8
-    All the *_utf8 methods by default use ":encoding(UTF-8)" -- either as
-    ":unix:encoding(UTF-8)" (unbuffered, for whole file operations) or
-    ":raw:encoding(UTF-8)" (buffered, for line-by-line operations). These
-    are strict against the Unicode spec and disallows illegal Unicode
-    codepoints or UTF-8 sequences.
+    All the *_utf8 methods by default use :encoding(UTF-8) -- either as
+    :unix:encoding(UTF-8) (unbuffered, for whole file operations) or
+    :raw:encoding(UTF-8) (buffered, for line-by-line operations). These are
+    strict against the Unicode spec and disallows illegal Unicode codepoints
+    or UTF-8 sequences.
 
-    Unfortunately, ":encoding(UTF-8)" is very, very slow. If you install
+    Unfortunately, :encoding(UTF-8) is very, very slow. If you install
     Unicode::UTF8 0.58 or later, that module will be used by some *_utf8
     methods to encode or decode data after a raw, binary input/output
     operation, which is much faster. Alternatively, if you install
-    PerlIO::utf8_strict, that will be used instead of ":encoding(UTF-8)" and
+    PerlIO::utf8_strict, that will be used instead of :encoding(UTF-8) and
     is also very fast.
 
     If you need the performance and can accept the security risk,
     "slurp({binmode => ":unix:utf8"})" will be faster than
-    ":unix:encoding(UTF-8)" (but not as fast as "Unicode::UTF8").
+    :unix:encoding(UTF-8) (but not as fast as "Unicode::UTF8").
 
     Note that the *_utf8 methods read in raw mode. There is no CRLF
     translation on Windows. If you must have CRLF translation, use the
@@ -1205,9 +1215,13 @@ CONTRIBUTORS
 
     *   Martin Kjeldsen <mk@bluepipe.dk>
 
+    *   Martin Sluka <martin@sluka.de>
+
     *   Mary Ehlers <regina.verb.ae@gmail.com>
 
     *   Michael G. Schwern <mschwern@cpan.org>
+
+    *   NATARAJ (Nikolay Shaplov) <dhyan@nataraj.su>
 
     *   Nicolas R <nicolas@atoomic.org>
 
@@ -1218,6 +1232,8 @@ CONTRIBUTORS
     *   Philippe Bruhat (BooK) <book@cpan.org>
 
     *   regina-verbae <regina-verbae@users.noreply.github.com>
+
+    *   Ricardo Signes <rjbs@semiotic.systems>
 
     *   Roy Ivy III <rivy@cpan.org>
 
@@ -1231,7 +1247,9 @@ CONTRIBUTORS
 
     *   Yanick Champoux <yanick@babyl.dyndns.org>
 
-    *   김도형 - Keedi Kim <keedi@cpan.org>
+    *   yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>
+
+    *   ê¹ëí - Keedi Kim <keedi@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2014 by David Golden.

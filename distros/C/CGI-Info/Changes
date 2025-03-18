@@ -1,5 +1,9 @@
 Revision history for CGI-Info
 
+0.96	Mon Mar 17 08:11:48 EDT 2025
+	Use Log::Abstraction
+	Added the auto_load parameter to disable AUTOLOAD
+
 0.95	Sun Mar  2 19:52:56 EST 2025
 	Use Params::Get
 

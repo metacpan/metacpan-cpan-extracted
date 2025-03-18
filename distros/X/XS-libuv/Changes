@@ -1,4 +1,6 @@
-1.41.0.1 xx.xx.2022
+1.49.2.0 xx.xx.2024
+         - update libuv to 1.49.2
+1.41.0.1 03.10.2022
          - fix removing signals in non mainloops (unofficial fix)
 1.41.0.0 08.04.2021
          - update libuv to 1.41.0

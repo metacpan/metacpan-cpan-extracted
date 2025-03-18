@@ -70,7 +70,7 @@ ERRORS
                              Value: %s
                      Parameter 'num_generated' must be greater than %s.
                              Value: %s
-             Parameter 'num_generated' is required.
+                     Parameter 'num_generated' is required.
              Parameter 'possible_hash_types' must be a reference to array.
              Parameter 'possible_hash_types' must contain at least one hash type name.
 
@@ -138,10 +138,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

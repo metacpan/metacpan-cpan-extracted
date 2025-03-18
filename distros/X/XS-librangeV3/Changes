@@ -1,4 +1,6 @@
-1.11.0  XX.XX.2021
+1.12.0  xx.xx.2024
+         - version update to 0.12.0
+1.11.0  10.02.2022
          - version update to current master (0.11.0 with changes)
 1.0.2   08.04.2021
          - fix MANIFEST.SKIP

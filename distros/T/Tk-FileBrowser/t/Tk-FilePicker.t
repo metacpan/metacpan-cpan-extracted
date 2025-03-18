@@ -46,6 +46,7 @@ if (defined $app) {
 		-text => 'Pick open',
 		-command => sub {
 			my @sel = $fp->pickFileOpenMulti(
+				-initialdir => 't',
 			);
 			$mt->delete('0.0', 'end');
 			for (@sel) {

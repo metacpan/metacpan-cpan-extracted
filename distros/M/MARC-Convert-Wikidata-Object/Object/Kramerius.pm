@@ -5,7 +5,7 @@ use warnings;
 
 use Mo qw(is);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has kramerius_id => (
 	is => 'ro',
@@ -159,12 +159,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2024
+© Michal Josef Špaček 2021-2025
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

@@ -198,12 +198,14 @@
    Rmpz_set_f($rop, $f); # $f is a Math::GMPf or GMP::Mpf object
     Assign $f to $rop. (Truncate to an integer if necessary.)
 
-   Rmpz_set_str($rop, $str, $base);
+   Rmpz_set_str       ($rop, $str, $base);
     Set $rop to the base $base value of $str. $base may vary from
     2 to 62.  If $base is 0, the actual base is determined from the
     leading characters: if the first two characters are "0x" or "0X",
     hexadecimal is assumed, otherwise if the first character is "0",
     octal is assumed, otherwise decimal is assumed.
+    If the string is deemed to be a non-valid base $base number, then
+    the function croaks with an appropriate error message.
 
    Rmpz_set_IV($rop, $iv); # $iv is a perl integer value (IV)
     Set $rop to the value of $iv. (If $iv is an unsigned integer
@@ -240,14 +242,22 @@
    $rop = Math::GMPz::new($arg);
    $rop = new Math::GMPz($arg);
     Returns a Math::GMPz object with the value of $arg.
-    $arg can be either a Math::GMPz object, a Math::BigInt object, a
-    number (signed integer, unsigned integer, signed fraction or
-    unsigned fraction) or a string that represents a numeric value. If
-    $arg is a string, an optional additional argument that specifies
+    $arg can be either a Math::GMPz object, a Math::GMP object, a
+    Math::GMPq object, a Math::MPFR object, a Math::BigInt object,
+    a number (IV, UV or NV) or a string that represents an integer value.
+    Strings that are written in scientific notation (eg '1e200' or
+    '0x9p+40') are not currently accepted. Such arguments could, eg,
+    be made "acceptable" if rewritten as '1'.('0'x200) or,
+    respectively, '0b1001'.('0'x40).
+    If $arg is a string, an optional additional argument that specifies
     the base of the number can be supplied to new(). If base is 0 (or
     not supplied) then the leading characters of the string are used:
     0x or 0X for hex, 0b or 0B for binary, 0 for octal, or decimal
     otherwise. Legal values for the base are 0 and 2..62 .
+    For any non-string argument that represents a non-integral value
+    (ie NV, Math::GMPq object, or Math::MPFR object), the value is
+    first rounded towards zero to an integral value, before being
+    assigned to the Math::GMPz object.
 
    $rop = Rmpz_init_set($op);
    $rop = Rmpz_init_set_nobless($op);

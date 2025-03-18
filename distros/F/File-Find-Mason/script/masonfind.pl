@@ -6,7 +6,7 @@ use File::Find::Mason;
 use Getopt::Long;
 
 sub Help {
-	print STDERR "Usage:  $0 [--] file... [--help]\n";
+	print STDERR "Usage:  $0 [--help] [--verbose] [--] file...\n";
 }
 
 my %opt=(

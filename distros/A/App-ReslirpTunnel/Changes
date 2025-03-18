@@ -1,5 +1,8 @@
 Revision history for Perl extension App::ReslirpTunnel.
 
+0.06  Mar 17, 2025
+      - Use correct shell quoter when remote system is Windows.
+
 0.05  Feb 20, 2025
       - Use JSON::PP from core instead of JSON (bug report and
         solution by Slaven Rezić).

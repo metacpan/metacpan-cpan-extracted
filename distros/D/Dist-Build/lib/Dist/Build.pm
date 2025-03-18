@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.017';
+$Dist::Build::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -10,14 +10,14 @@ use Carp qw/croak/;
 use CPAN::Meta;
 use ExtUtils::Config;
 use ExtUtils::Helpers 0.007 qw/split_like_shell detildefy make_executable/;
+use ExtUtils::Manifest 'maniread';
 use ExtUtils::InstallPaths;
-use File::Find ();
 use File::Spec::Functions qw/catfile catdir abs2rel /;
 use Getopt::Long 2.36 qw/GetOptionsFromArray/;
 use Parse::CPAN::Meta;
 
-use ExtUtils::Builder::Planner 0.008;
-use ExtUtils::Builder::Util 'get_perl';
+use ExtUtils::Builder::Planner 0.015;
+use ExtUtils::Builder::Util qw/get_perl unix_to_native_path/;
 use Dist::Build::Serializer;
 
 my $json_backend = Parse::CPAN::Meta->json_backend;
@@ -103,6 +103,7 @@ sub Build_PL {
 	$core->create_phony('config', @blibs);
 	$core->lib_dir('lib');
 	$core->script_dir('script');
+	$core->add_seen(unix_to_native_path($_)) for sort keys %{ maniread() };
 
 	$core->tap_harness('test', dependencies => [ 'pure_all' ], test_dir => 't');
 	$core->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
@@ -170,7 +171,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 DESCRIPTION
 

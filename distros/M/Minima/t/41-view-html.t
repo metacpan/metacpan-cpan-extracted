@@ -4,6 +4,9 @@ use Test2::V0;
 use Minima::App;
 use Minima::View::HTML;
 
+my $dir = Path::Tiny->tempdir;
+chdir $dir;
+
 $ENV{PLACK_ENV} = 'development';
 my $config = {};
 my $app = Minima::App->new(
@@ -11,8 +14,6 @@ my $app = Minima::App->new(
 );
 my $view = Minima::View::HTML->new(app => $app);
 
-my $dir = Path::Tiny->tempdir;
-chdir $dir;
 my $t_home = $dir->child('home.ht');
 $t_home->spew('h');
 my $t_about = $dir->child('about.tt');

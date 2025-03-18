@@ -4,7 +4,7 @@ package Spreadsheet::Read;
 
 =head1 NAME
 
- Spreadsheet::Read - Read the data from a spreadsheet
+Spreadsheet::Read - Read the data from a spreadsheet
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.91";
+our $VERSION = "0.93";
 sub  Version { $VERSION }
 
 use Carp;
@@ -48,6 +48,7 @@ our @EXPORT    = qw( ReadData cell2cr cr2cell );
 our @EXPORT_OK = qw( parses rows cellrow row add );
 
 use Encode       qw( decode );
+use List::Util   qw( min max );
 use File::Temp   qw( );
 use Data::Dumper;
 
@@ -623,6 +624,15 @@ sub ReadData {
 	    $in = $txt;	# Now pray ...
 	    }
 	$debug > 1 and print STDERR "CSV sep_char '$sep', quote_char '$quo'\n";
+	if (!exists $parser_opts{strict_eol} and
+	     my $ka = $data[0]{parser}->can ("known_attributes")) {
+	    if (grep m/^strict_eol$/ => $ka->()) {
+		#use DP;::diag DDumper \@data;
+		unless ($data[0]{parser} =~ m/CSV_PP$/ && $data[0]{version} le "2.06") {
+		    $parser_opts{strict_eol} = 1;
+		    }
+		}
+	    }
 	my $csv = $can{csv}->new ({
 	    %parser_opts,
 
@@ -646,6 +656,7 @@ sub ReadData {
 		$opt{attr}  and $data[1]{attr}[$c + 1][$r] = { @def_attr };
 		}
 	    }
+	$parser_opts{strict_eol} and $data[1]{eolt} = $csv->eol_type;
 	$csv->eof () or $data[0]{error} = [ $csv->error_diag ];
 	close $in;
 
@@ -1483,6 +1494,8 @@ sub AUTOLOAD {
 
 package Spreadsheet::Read::Sheet;
 
+use List::Util qw( min max );
+
 sub cell {
     my ($sheet, @id) = @_;
     @id == 2 && $id[0] =~ m/^[0-9]+$/ && $id[1] =~ m/^[0-9]+$/ and
@@ -1574,6 +1587,81 @@ sub column {
     map { $sheet->{$sheet->cr2cell ($col, $_)} } 1..$sheet->{maxrow};
     } # column
 
+# my $arrayref = $sheet->cellrange ("B3:D5");
+# my $arrayref = $sheet->cellrange (2, 3, 4, 5);
+sub cellrange {
+    my ($sheet, @r) = @_;
+    my $s = $sheet->{cell};
+    if (@r == 1 && $r[0] =~ m/^([A-Za-z]+[0-9]+):([A-Za-z]+[0-9]+)$/) {
+	my ($cl, $rt) = cell2cr (uc $1);
+	my ($cr, $rb) = cell2cr (uc $2);
+	$cl = min ($sheet->{maxcol}, max (1, $cl));
+	$rt = min ($sheet->{maxrow}, max (1, $rt));
+	$cr = min ($sheet->{maxcol}, max (1, $cr));
+	$rb = min ($sheet->{maxrow}, max (1, $rb));
+	my @R;
+	foreach my $c ($cl .. $cr) {
+	    push @R => [ map { $s->[$c][$_] } $rt .. $rb ];
+	    }
+	return \@R;
+	}
+    if (@r == 4 and $r[0] =~ m/^-?[0-9]+/ && $r[1] =~ m/^-?[0-9]+/
+		 && $r[2] =~ m/^-?[0-9]+/ && $r[3] =~ m/^-?[0-9]+/) {
+	$r[0] < 0 and $r[0] = $sheet->{maxcol} + 1 + $r[0];
+	$r[1] < 0 and $r[1] = $sheet->{maxrow} + 1 + $r[1];
+	$r[2] < 0 and $r[2] = $sheet->{maxcol} + 1 + $r[2];
+	$r[3] < 0 and $r[3] = $sheet->{maxrow} + 1 + $r[3];
+	$r[0] = min ($sheet->{maxcol}, max (1, $r[0]));
+	$r[1] = min ($sheet->{maxrow}, max (1, $r[1]));
+	$r[2] = min ($sheet->{maxcol}, max (1, $r[2]));
+	$r[3] = min ($sheet->{maxrow}, max (1, $r[3]));
+	my @R;
+	foreach my $c ($r[0] .. $r[2]) {
+	    push @R => [ map { $s->[$c][$_] } $r[1] .. $r[3] ];
+	    }
+	return \@R;
+	}
+    } # cellrange
+
+# my $hashref = $sheet->range ("A3:D7")
+# my $hashref = $sheet->range (1, 3, 4, 7)
+sub range {
+    my ($sheet, @r, $R) = @_;
+    if (@r == 1 && $r[0] =~ m/^([A-Za-z]+[0-9]+):([A-Za-z]+[0-9]+)$/) {
+	my ($cl, $rt) = cell2cr (uc $1);
+	my ($cr, $rb) = cell2cr (uc $2);
+	$cl = min ($sheet->{maxcol}, max (1, $cl));
+	$rt = min ($sheet->{maxrow}, max (1, $rt));
+	$cr = min ($sheet->{maxcol}, max (1, $cr));
+	$rb = min ($sheet->{maxrow}, max (1, $rb));
+	foreach my $c ($cl .. $cr) {
+	    foreach my $r ($rt .. $rb) {
+		my $C = $sheet->cr2cell ($c, $r);
+		$R->{$C} = $sheet->{$C};
+		}
+	    }
+	return $R;
+	}
+    if (@r == 4 and $r[0] =~ m/^-?[0-9]+/ && $r[1] =~ m/^-?[0-9]+/
+		 && $r[2] =~ m/^-?[0-9]+/ && $r[3] =~ m/^-?[0-9]+/) {
+	$r[0] < 0 and $r[0] = $sheet->{maxcol} + 1 + $r[0];
+	$r[1] < 0 and $r[1] = $sheet->{maxrow} + 1 + $r[1];
+	$r[2] < 0 and $r[2] = $sheet->{maxcol} + 1 + $r[2];
+	$r[3] < 0 and $r[3] = $sheet->{maxrow} + 1 + $r[3];
+	$r[0] = min ($sheet->{maxcol}, max (1, $r[0]));
+	$r[1] = min ($sheet->{maxrow}, max (1, $r[1]));
+	$r[2] = min ($sheet->{maxcol}, max (1, $r[2]));
+	$r[3] = min ($sheet->{maxrow}, max (1, $r[3]));
+	foreach my $c ($r[0] .. $r[2]) {
+	    foreach my $r ($r[1] .. $r[3]) {
+		my $C = $sheet->cr2cell ($c, $r);
+		$R->{$C} = $sheet->{$C};
+		}
+	    }
+	return $R;
+	}
+    } # range
+
 # Convert {cell}'s [column][row] to a [row][column] list
 # my @rows = $sheet->rows ();
 sub rows {
@@ -1629,6 +1717,8 @@ return its content in a universal manner independent of the parsing
 module that does the actual spreadsheet scanning.
 
 The parser has to be available and is not provided by this module.
+
+=head2 Supported spreadsheets
 
 =head3 OpenOffice and LibreOffice (C<ODS> and C<SXC>)
 
@@ -2213,6 +2303,27 @@ Get full row of unformatted values (like C<< $sheet->{cell}[1][3] .. $sheet->{ce
 
 Note that the indexes in the returned list are 0-based.
 
+=head3 cellrange
+
+ my $arrayref = $sheet->cellrange ("B3:D5");
+ my $arrayref = $sheet->cellrange (2, 3, 4, 5);
+ my $arrayref = $sheet->cellrange (-4, -5, -1, -1);
+
+Return an arrayref with the selected cells from C<< $sheet->{cell} >>.
+When the range is given as (top-left, bottom-right) numeric CR pairs, negative
+values are allowed (count from rigth/bottom) and automatically clipped to be
+inside the existing data set.
+
+=head3 range
+
+ my $hashref = $sheet->range ("B3:D5");
+ my $hashref = $sheet->range (2, 3, 4, 5);
+ my $hashref = $sheet->range (-4, -5, -1, -1);
+
+Return a hashref with all the fields in the given range. When the range is given
+as (top-left, bottom-right) numeric CR pairs, negative values are allowed (count
+from rigth/bottom) and automatically clipped to be inside the existing data set.
+
 =head3 rows
 
  my @rows = $sheet->rows ();
@@ -2557,7 +2668,7 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
                     #n   - order on column # numeric ascending
                     #r   - order on column # lexical descending
                     #rn  - order on column # numeric descending
- 
+
  Examples:
      xlscat   -i foo.xls
      xlscat   --in-sep=: --sort=3n -L /etc/passwd
@@ -2631,7 +2742,7 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
                     #n   - order on column # numeric ascending
                     #r   - order on column # lexical descending
                     #rn  - order on column # numeric descending
- 
+
  Examples:
      xlscat   -i foo.xls
      xlscat   --in-sep=: --sort=3n -L /etc/passwd
@@ -2682,6 +2793,8 @@ As this is just a wrapper over the actual parsers, it cannot vouch for
 vulnerabilities in these parsers.  We try to keep up with the CVE's as
 published, and check for weaknesses. For a more thorough report see
 L<this security-posting|https://security.metacpan.org/2024/02/10/vulnerable-spreadsheet-parsing-modules.html>.
+
+For vulnerabilities in this module, please read F<SECURITY.md>.
 
 =head1 TODO
 
@@ -2858,7 +2971,7 @@ H.Merijn Brand <perl5@tux.freedom.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2024 H.Merijn Brand
+Copyright (C) 2005-2025 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

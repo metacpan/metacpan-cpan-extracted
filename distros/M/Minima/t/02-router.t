@@ -28,6 +28,31 @@ $routes->spew(<<~EOF
 $r->read_file($routes);
 is( $r->match('/'), undef, 'ignores comments and blank lines' );
 
+
+# Prefix
+$routes->spew(<<~EOF
+    * / :C A
+    EOF
+);
+$r->clear_routes;
+$r->read_file($routes);
+my $prefix_match = $r->match('/');
+is(
+    $prefix_match->{controller},
+    'Controller::C',
+    'adds default prefix'
+);
+
+$r->set_prefix('SecretPrefix');
+$r->clear_routes;
+$r->read_file($routes);
+$prefix_match = $r->match('/');
+is(
+    $prefix_match->{controller},
+    'SecretPrefix::C',
+    'adds custom prefix'
+);
+
 # Specials
 is( $r->error_route, undef,
     'returns undef for no error route registered' );

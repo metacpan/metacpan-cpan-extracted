@@ -8,7 +8,6 @@ my($rop, $op, $op_pow, $mpz, $ok);
 
 eval {require Math::MPFR;};
 
-
 unless($@) {
   if($Math::MPFR::VERSION < 4.19) {
     warn "\n  Skipping remaining tests -  Math::MPFR version 4.19 (or later)\n" .

@@ -40,6 +40,7 @@ t/data/cnb001002340.mrc
 t/data/cnb001042253.mrc
 t/data/cnb001657758.mrc
 t/data/cnb001756719.xml
+t/data/cnb002031137.xml
 t/data/cnb002181872.mrc
 t/data/cnb002276974.mrc
 t/data/cnb002341867.mrc
@@ -76,8 +77,9 @@ t/MARC-Convert-Wikidata-Transform/07-object-cnb000576456.t
 t/MARC-Convert-Wikidata-Transform/08-object-cnb000750997.t
 t/MARC-Convert-Wikidata-Transform/09-object-cnb001042253.t
 t/MARC-Convert-Wikidata-Transform/10-object-cnb001756719.t
-t/MARC-Convert-Wikidata-Transform/11-object-cnb002662450.t
-t/MARC-Convert-Wikidata-Transform/12-object-cnb003565872.t
+t/MARC-Convert-Wikidata-Transform/11-object-cnb002031137.t
+t/MARC-Convert-Wikidata-Transform/12-object-cnb002662450.t
+t/MARC-Convert-Wikidata-Transform/13-object-cnb003565872.t
 t/MARC-Convert-Wikidata-Utils/01-use.t
 t/MARC-Convert-Wikidata-Utils/02-version.t
 t/MARC-Convert-Wikidata-Utils/03-clean_cover.t

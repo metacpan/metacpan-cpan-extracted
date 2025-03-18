@@ -5,7 +5,7 @@ use Env qw/@PATH/;
 use XS::Install;
 use Alien::cmake3;
 
-my $src_dir = "libdwarf";
+my $src_dir = "libdwarf-code-0.11.1";
 my $bdir    = "$src_dir/build";
 
 unshift @PATH, Alien::cmake3->bin_dir;
@@ -20,11 +20,11 @@ my %params = (
         FILE      => 'src/lib/libdwarf/libdwarf.a',
         BUILD_CMD => '$(MAKE)',
     }],
-    LINK      => '-lz',
+    LINK      => '-lz -lzstd',
     BIN_SHARE => {
         INCLUDE  => {
-            "$src_dir/src/lib/libdwarf/libdwarf.h"       => '/libdwarf.h',
-            "$src_dir/src/lib/libdwarf/dwarf.h"       => '/dwarf.h',
+            "$src_dir/src/lib/libdwarf/libdwarf.h" => '/libdwarf.h',
+            "$src_dir/src/lib/libdwarf/dwarf.h"    => '/dwarf.h',
         },
     },
     CONFIGURE_REQUIRES => {"Alien::cmake3" => '0.04'},

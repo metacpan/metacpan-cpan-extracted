@@ -125,6 +125,20 @@ __PACKAGE__->class_documentation({description => 'Represents the options of savi
 
 
 __PACKAGE__->method_documentation({
+     'export_all_column_indexes' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportAllColumnIndexes',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'compression_type' => {
+     	datatype => 'string',
+     	base_name => 'CompressionType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
@@ -180,10 +194,47 @@ __PACKAGE__->method_documentation({
      	description => '',
      	format => '',
      	read_only => '',
+     		},
+     'merge_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'MergeAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_external_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortExternalNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_excel_restriction' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckExcelRestriction',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'update_smart_art' => {
+     	datatype => 'boolean',
+     	base_name => 'UpdateSmartArt',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'encrypt_document_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'EncryptDocumentProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'export_all_column_indexes' => 'boolean',
+    'compression_type' => 'string',
     'save_format' => 'string',
     'cached_file_folder' => 'string',
     'clear_data' => 'boolean',
@@ -191,10 +242,17 @@ __PACKAGE__->swagger_types( {
     'enable_http_compression' => 'boolean',
     'refresh_chart_cache' => 'boolean',
     'sort_names' => 'boolean',
-    'validate_merged_areas' => 'boolean' 
+    'validate_merged_areas' => 'boolean',
+    'merge_areas' => 'boolean',
+    'sort_external_names' => 'boolean',
+    'check_excel_restriction' => 'boolean',
+    'update_smart_art' => 'boolean',
+    'encrypt_document_properties' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'export_all_column_indexes' => 'ExportAllColumnIndexes',
+    'compression_type' => 'CompressionType',
     'save_format' => 'SaveFormat',
     'cached_file_folder' => 'CachedFileFolder',
     'clear_data' => 'ClearData',
@@ -202,7 +260,12 @@ __PACKAGE__->attribute_map( {
     'enable_http_compression' => 'EnableHTTPCompression',
     'refresh_chart_cache' => 'RefreshChartCache',
     'sort_names' => 'SortNames',
-    'validate_merged_areas' => 'ValidateMergedAreas' 
+    'validate_merged_areas' => 'ValidateMergedAreas',
+    'merge_areas' => 'MergeAreas',
+    'sort_external_names' => 'SortExternalNames',
+    'check_excel_restriction' => 'CheckExcelRestriction',
+    'update_smart_art' => 'UpdateSmartArt',
+    'encrypt_document_properties' => 'EncryptDocumentProperties' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

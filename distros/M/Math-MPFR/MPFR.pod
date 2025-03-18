@@ -747,10 +747,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $str will be set to "231".
     $str will be set to 'Nan', '-Inf' or 'Inf' whenever $op is
     (respectively) a NaN, a negative infinity or a positive infinity.
-    (This function is mainly to provide a simple means of getting 'sj'
-    and 'uj' values on a 64-bit perl where the MPFR library does not
-    support mpfr_get_uj and mpfr_get_sj functions - which may happen,
-    for example, with libraries built with Microsoft Compilers.)
 
    $bool = Rmpfr_fits_ushort_p($op, $rnd);  # fits in unsigned short
    $bool = Rmpfr_fits_sshort_p($op, $rnd);  # fits in signed short
@@ -766,8 +762,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $ui = Rmpfr_get_ui($op, $rnd);
    $si = Rmpfr_get_si($op, $rnd);
-   $sj = Rmpfr_get_sj($op, $rnd);
-   $uj = Rmpfr_get_uj($op, $rnd);
+   $sj = Rmpfr_get_sj($op, $rnd); # Available only when ivtype is 'long long'.
+   $uj = Rmpfr_get_uj($op, $rnd); # Available only when ivtype is 'long long'.
    $IV = Rmpfr_get_IV($op, $rnd); # $IV is $Config{ivtype}
     Convert $op to an 'unsigned long long', a 'signed long', a
     'signed long long', an 'unsigned long long' or an 'IV' - after

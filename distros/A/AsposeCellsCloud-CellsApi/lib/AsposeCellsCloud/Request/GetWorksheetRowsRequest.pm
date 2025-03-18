@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetRowsRequest.name :   ,
-# GetWorksheetRowsRequest.sheetName :   ,
-# GetWorksheetRowsRequest.offset :   ,
-# GetWorksheetRowsRequest.count :   ,
-# GetWorksheetRowsRequest.folder :   ,
-# GetWorksheetRowsRequest.storageName :    
+# GetWorksheetRowsRequest.name : The file name.  ,
+# GetWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetRowsRequest.offset : Row offset.  ,
+# GetWorksheetRowsRequest.count : Display rows number.  ,
+# GetWorksheetRowsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetRowsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of rows in the worksheet.',
         params => $params,
         returns => 'RowsResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => '',
+     	description => 'Row offset.',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => '',
+     	description => 'Display rows number.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

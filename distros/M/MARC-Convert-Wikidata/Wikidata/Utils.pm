@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_issn clean_edi
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -870,6 +870,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut

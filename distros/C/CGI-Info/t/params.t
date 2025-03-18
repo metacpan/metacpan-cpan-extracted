@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 201;
+use Test::Most tests => 202;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -272,10 +272,11 @@ EOF
 	$i = new_ok('CGI::Info' => [
 		upload_dir => $tmpdir
 	]);
-	eval { %p = $i->params() };
-	ok($@ =~ /Disallowing invalid filename/);
+	eval { %p = %{$i->params()} };
+	ok(defined($@));
+	like($@, qr/Disallowing invalid filename/);
 	ok(defined($p{country}));
-	ok($p{country} eq '44');
+	ok($p{country} == 44);
 	ok($p{datafile} =~ /^hello.txt_.+/);
 	$filename = File::Spec->catfile($tmpdir, $p{datafile});
 	ok(!-e $filename);
@@ -304,10 +305,10 @@ EOF
 	$i = new_ok('CGI::Info' => [
 		upload_dir => '/does_not_exist11',
 	]);
-	eval { %p = $i->params() };
+	eval { %p = %{$i->params()} };
 	ok($@ =~ /isn't a directory/);
 	ok(defined($p{country}));
-	ok($p{country} eq '44');
+	ok($p{country} == 44);
 	ok($p{datafile} =~ /^hello.txt_.+/);
 	$filename = File::Spec->catfile($tmpdir, $p{datafile});
 	ok(!-e $filename);
@@ -528,7 +529,7 @@ EOF
 
 			sub new { bless { }, shift }
 			sub trace { }
-			sub warn { shift; $mess = join(' ' , @_) }
+			sub warn { shift; $mess = (ref($_[0]) eq 'ARRAY') ? join(' ', @{$_[0]}) : join(' ' , @_) }
 		}
 
 		my $info = new_ok('CGI::Info');

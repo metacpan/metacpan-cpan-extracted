@@ -16,12 +16,11 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.95
+Version 0.96
 
 # SYNOPSIS
 
-The `CGI::Info` module,
-is a Perl library designed to provide information about the environment in which a CGI script operates.
+The `CGI::Info` module is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
@@ -29,7 +28,7 @@ Additionally, it offers a simple web application firewall to add a layer of secu
 All too often Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -60,19 +59,29 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload\_dir,
 which are documented in the params() method.
 
-Takes an optional parameter syslog, to log messages to
-[Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
-It can be a boolean to enable/disable logging to syslog, or a reference
-to a hash to be given to Sys::Syslog::setlogsock.
+It takes other optional parameters:
 
-Takes optional parameter logger, an object which is used for warnings.
+- `auto_load`
 
-Takes optional parameter cache, an object which is used to cache IP lookups.
-This cache object is an object that understands get() and set() messages,
-such as a [CHI](https://metacpan.org/pod/CHI) object.
+    Enable/disable the AUTOLOAD feature.
+    The default is to have it enabled.
 
-Takes optional parameter max\_upload, which is the maximum file size you can upload
-(-1 for no limit), the default is 512MB.
+- `syslog`
+
+    Takes an optional parameter syslog, to log messages to
+    [Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
+    It can be a boolean to enable/disable logging to syslog, or a reference
+    to a hash to be given to Sys::Syslog::setlogsock.
+
+- `cache`
+
+    An object which is used to cache IP lookups.
+    This cache object is an object that understands get() and set() messages,
+    such as a [CHI](https://metacpan.org/pod/CHI) object.
+
+- `max_upload`
+
+    The maximum file size you can upload (-1 for no limit), the default is 512MB.
 
 ## script\_name
 
@@ -190,6 +199,7 @@ Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
 such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
 a reference to code,
+a reference to an array,
 or a filename.
 
 The allow, logger and upload\_dir arguments can also be passed to the
@@ -280,7 +290,7 @@ Returns undef if the requested parameter was not given
 ## is\_mobile
 
 Returns a boolean if the website is being viewed on a mobile
-device such as a smart-phone.
+device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
 ## is\_tablet
@@ -448,10 +458,10 @@ Returns the messages of that the object has generated as a string.
 
 ## set\_logger
 
-Sets the class, code reference, or file that will be used for logging.
+Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
-This function fixes the catch22 situation.
+This function fixes the catch-22 situation.
 
 ## reset
 
@@ -466,7 +476,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 # BUGS
 
 is\_tablet() only currently detects the iPad and Windows PCs. Android strings
-don't differ between tablets and smart-phones.
+don't differ between tablets and smartphones.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.

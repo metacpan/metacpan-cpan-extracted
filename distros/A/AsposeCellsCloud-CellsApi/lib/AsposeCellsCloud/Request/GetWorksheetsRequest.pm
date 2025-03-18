@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetsRequest.name :   ,
-# GetWorksheetsRequest.folder :   ,
-# GetWorksheetsRequest.storageName :    
+# GetWorksheetsRequest.name : The file name.  ,
+# GetWorksheetsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheets' } = { 
-    	summary => '',
+    	summary => 'Retrieve the description of worksheets from a workbook.',
         params => $params,
         returns => 'WorksheetsResponse',
     };
@@ -123,21 +123,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.146';
+our $VERSION = '0.148';
 
 # Dependencies
 use Config;
@@ -508,7 +508,7 @@ sub _resolve_symlinks {
     return $new;
 }
 
-sub _replacment_path {
+sub _replacement_path {
     my ($self) = @_;
 
     my $unique_suffix = $$ . int( rand( 2**31 ) );
@@ -619,7 +619,7 @@ sub append {
     $binmode = ( ( caller(0) )[10] || {} )->{'open>'} unless defined $binmode;
     my $mode = $args->{truncate} ? ">" : ">>";
     my $fh = $self->filehandle( { locked => 1 }, $mode, $binmode );
-    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data ) or self->_throw('print');
+    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data ) or $self->_throw('print');
     close $fh or $self->_throw('close');
 }
 
@@ -1022,7 +1022,7 @@ sub edit_lines {
     # writing needs to follow the link and create the tempfile in the same
     # dir for later atomic rename
     my $resolved_path = $self->_resolve_symlinks;
-    my $temp          = $resolved_path->_replacment_path;
+    my $temp          = $resolved_path->_replacement_path;
 
     my $temp_fh = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode );
     my $in_fh = $self->filehandle( { locked => 1 }, '<', $binmode );
@@ -1031,7 +1031,7 @@ sub edit_lines {
     while (! eof($in_fh) ) {
         defined( $_ = readline($in_fh) ) or $self->_throw('readline');
         $cb->();
-        $temp_fh->print($_) or self->_throw('print', $temp);
+        $temp_fh->print($_) or $self->_throw('print', $temp);
     }
 
     close $temp_fh or $self->_throw( 'close', $temp );
@@ -1385,6 +1385,8 @@ sub iterator {
 #pod IO layers, though a bit memory intensive.  If memory use is a
 #pod concern, consider C<openr_utf8> and iterating directly on the handle.
 #pod
+#pod See also L</slurp> if you want to load a file as a whole chunk.
+#pod
 #pod Current API available since 0.065.
 #pod
 #pod =cut
@@ -1484,14 +1486,23 @@ sub lines_utf8 {
 #pod similar to the Unix C<mkdir -p> command.  It will not error if applied to an
 #pod existing directory.
 #pod
+#pod Passing a defined argument I<other> than a hash reference is an error, and an
+#pod exception will be thrown.
+#pod
 #pod Current API available since 0.125.
 #pod
 #pod =cut
 
 sub mkdir {
-    my ( $self, $args ) = @_;
-    $args = {} unless ref $args eq 'HASH';
+    my ( $self, $args, @rest ) = @_;
+
+    $args = {} unless defined $args;
+    if (@rest || (defined $args && ref $args ne 'HASH')) {
+        $self->_throw('mkdir', undef, "method argument was given, but was not a hash reference");
+    }
+
     my $err;
+
     $args->{error} = \$err unless defined $args->{error};
     require File::Path;
     my @dirs;
@@ -1514,13 +1525,21 @@ sub mkdir {
 #pod Like calling C<mkdir>, but returns the list of directories created or an empty list if
 #pod the directories already exist, just like C<make_path>.
 #pod
+#pod Passing a defined argument I<other> than a hash reference is an error, and an
+#pod exception will be thrown.
+#pod
 #pod Deprecated in 0.125.
 #pod
 #pod =cut
 
 sub mkpath {
-    my ( $self, $args ) = @_;
-    $args = {} unless ref $args eq 'HASH';
+    my ( $self, $args, @rest ) = @_;
+
+    $args = {} unless defined $args;
+    if (@rest || (defined $args && ref $args ne 'HASH')) {
+        $self->_throw('mkdir', undef, "method argument was given, but was not a hash reference");
+    }
+
     my $err;
     $args->{error} = \$err unless defined $args->{error};
     require File::Path;
@@ -1920,12 +1939,21 @@ sub remove {
 #pod
 #pod Current API available since 0.013.
 #pod
+#pod Passing a defined argument I<other> than a hash reference is an error, and an
+#pod exception will be thrown.
+#pod
 #pod =cut
 
 sub remove_tree {
-    my ( $self, $args ) = @_;
+    my ( $self, $args, @rest ) = @_;
+
+    $args = {} unless defined $args;
+    if (@rest || (defined $args && ref $args ne 'HASH')) {
+        $self->_throw('mkdir', undef, "method argument was given, but was not a hash reference");
+    }
+
     return 0 if !-e $self->[PATH] && !-l $self->[PATH];
-    $args = {} unless ref $args eq 'HASH';
+
     my $err;
     $args->{error} = \$err unless defined $args->{error};
     $args->{safe}  = 1     unless defined $args->{safe};
@@ -2054,6 +2082,8 @@ sub _human_size {
 #pod     my $tempfile = File::Temp->new(EXLOCK => 0);
 #pod     my $guts = path($tempfile)->slurp;
 #pod
+#pod See also L</lines> if you want to slurp a file into a line array.
+#pod
 #pod Current API available since 0.004.
 #pod
 #pod =cut
@@ -2138,7 +2168,7 @@ sub spew {
     # writing needs to follow the link and create the tempfile in the same
     # dir for later atomic rename
     my $resolved_path = $self->_resolve_symlinks;
-    my $temp          = $resolved_path->_replacment_path;
+    my $temp          = $resolved_path->_replacement_path;
 
     my $fh;
     my $ok = eval { $fh = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode ); 1 };
@@ -2148,7 +2178,7 @@ sub spew {
             : "error opening temp file for atomic write: $@";
         $self->_throw('spew', $self->[PATH], $msg);
     }
-    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data) or self->_throw('print', $temp->[PATH]);
+    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data) or $self->_throw('print', $temp->[PATH]);
     close $fh or $self->_throw( 'close', $temp->[PATH] );
 
     return $temp->move($resolved_path);
@@ -2445,7 +2475,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.146
+version 0.148
 
 =head1 SYNOPSIS
 
@@ -3069,6 +3099,8 @@ lines will be split.  This is actually faster than relying on
 IO layers, though a bit memory intensive.  If memory use is a
 concern, consider C<openr_utf8> and iterating directly on the handle.
 
+See also L</slurp> if you want to load a file as a whole chunk.
+
 Current API available since 0.065.
 
 =head2 mkdir
@@ -3084,12 +3116,18 @@ B<NOTE>: unlike Perl's builtin C<mkdir>, this will create intermediate paths
 similar to the Unix C<mkdir -p> command.  It will not error if applied to an
 existing directory.
 
+Passing a defined argument I<other> than a hash reference is an error, and an
+exception will be thrown.
+
 Current API available since 0.125.
 
 =head2 mkpath (deprecated)
 
 Like calling C<mkdir>, but returns the list of directories created or an empty list if
 the directories already exist, just like C<make_path>.
+
+Passing a defined argument I<other> than a hash reference is an error, and an
+exception will be thrown.
 
 Deprecated in 0.125.
 
@@ -3275,6 +3313,9 @@ C<rmdir> function instead.
 
 Current API available since 0.013.
 
+Passing a defined argument I<other> than a hash reference is an error, and an
+exception will be thrown.
+
 =head2 sibling
 
     $foo = path("/tmp/foo.txt");
@@ -3348,6 +3389,8 @@ close other handles or open without locking to avoid a deadlock:
 
     my $tempfile = File::Temp->new(EXLOCK => 0);
     my $guts = path($tempfile)->slurp;
+
+See also L</lines> if you want to slurp a file into a line array.
 
 Current API available since 0.004.
 
@@ -3722,7 +3765,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Elvin Aslanov Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Mary Ehlers Michael G. Schwern Nicolas R Rochelemagne Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Elvin Aslanov Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Mary Ehlers Michael G. Schwern NATARAJ (Nikolay Shaplov) Nicolas R Rochelemagne Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Ricardo Signes Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux yoshikazusawa 김도형 - Keedi Kim
 
 =over 4
 
@@ -3820,11 +3863,19 @@ Martin Kjeldsen <mk@bluepipe.dk>
 
 =item *
 
+Martin Sluka <martin@sluka.de>
+
+=item *
+
 Mary Ehlers <regina.verb.ae@gmail.com>
 
 =item *
 
 Michael G. Schwern <mschwern@cpan.org>
+
+=item *
+
+NATARAJ (Nikolay Shaplov) <dhyan@nataraj.su>
 
 =item *
 
@@ -3845,6 +3896,10 @@ Philippe Bruhat (BooK) <book@cpan.org>
 =item *
 
 regina-verbae <regina-verbae@users.noreply.github.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
@@ -3869,6 +3924,10 @@ Toby Inkster <tobyink@cpan.org>
 =item *
 
 Yanick Champoux <yanick@babyl.dyndns.org>
+
+=item *
+
+yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>
 
 =item *
 

@@ -1,6 +1,14 @@
 Revision history for Perl module Math::MPFR
 
+4.38
+  - Enable the Rmpf_*_uj and Rmpfr_*_sj functions (except for Rmpfr_get_uj and
+    Rmpfr_get_sj) for all perl configurations. Also enable Rmpfr_pown.
+  - Relocate math_mpfr_include.h conditional defining of "mpfr_exp_t" to below
+    the #inclusion of mpfr.h.
+
 4.37
+  - Fix bug in t/cross_class_mpq.t that caused failures like:
+    http://www.cpantesters.org/cpan/report/cfa1541e-f6d4-11ef-a0db-2a526e8775ea
 
 4.36
   - Fix bug in t/atonv.t - fixes https://rt.cpan.org/Ticket/Display.html?id=160048.

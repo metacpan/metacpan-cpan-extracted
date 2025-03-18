@@ -5,7 +5,9 @@ class Minima::App;
 
 use Carp;
 use Minima::Router;
+use Path::Tiny ();
 use Plack::Util;
+use FindBin;
 
 use constant DEFAULT_VERSION => 'prototype';
 
@@ -26,6 +28,11 @@ method development
     return 1 if not defined $ENV{PLACK_ENV};
 
     $ENV{PLACK_ENV} eq 'development'
+}
+
+method path ($p)
+{
+    Path::Tiny::path($p)->absolute($config->{base_dir})->stringify;
 }
 
 method run
@@ -110,6 +117,10 @@ method _load_class ($class)
 
 method _read_config
 {
+    # Ensure base_dir is set and absolute
+    my $base = $config->{base_dir} // '.';
+    $config->{base_dir} = Path::Tiny::path($base)->absolute;
+
     $self->_load_routes;
     $self->_set_version;
 }
@@ -121,7 +132,7 @@ method _load_routes
     my $file = $config->{routes};
     unless (defined $file) {
         # No file passed. Attempt the default route.
-        $file = './etc/routes.map';
+        $file = $self->path('etc/routes.map');
         # If it does not exist, setup a basic route
         # for the default controller only.
         unless (-e $file) {
@@ -135,6 +146,13 @@ method _load_routes
             return;
         }
     }
+
+    # Controller prefix
+    my $prefix = $config->{controller_prefix};
+    $router->set_prefix($prefix) if defined $prefix;
+
+    # Read routes
+    $file = $self->path($file);
     $router->read_file($file);
 }
 
@@ -218,12 +236,29 @@ Automatically remove the response body for HEAD requests. Defaults to
 true. See also: L<"Routes File" in Minima::Router|Minima::Router/"ROUTES
 FILE">.
 
+=item C<base_dir>
+
+The base directory of the application. If not specified, it defaults to
+the current directory (F<.>). This is used to resolve relative paths to
+absolute paths when needed.
+
+Note that in a typical case, L<Minima::Setup> sets C<base_dir> before
+Minima::App runs, defaulting to the directory of the main F<.psgi> file
+unless it is explicitly set in the configuration.
+
+=item C<controller_prefix>
+
+The default prefix prepended to controller names in the routes file when
+using the C<:> shortcut. See also: L<"Controller" in
+Minima::Router|Minima::Router/Controller>.
+
 =item C<routes>
 
 The location of the routes file. If not specified, it defaults to
-F<etc/routes.map>. If no file is found at that location and this key
-isn't provided, the app will load a blank state, where it returns a 200
-response for the root path and a 404 for any other route.
+F<etc/routes.map> relative to the C<base_dir>. If no file is found at
+that location and this key isn't provided, the app will load a blank
+state, where it returns a 200 response for the root path and a 404 for
+any other route.
 
 =item C<VERSION>
 
@@ -273,6 +308,14 @@ to be handled by any other middleware.
 
 Utility method that returns true if C<$ENV{PLACK_ENV}> is set to
 C<development> or if it is unset. Returns false otherwise.
+
+=head2 path
+
+    method path ($path)
+
+Utility method that resolves a relative path against the application's
+base directory. If the provided path is already absolute, it returns the
+path unchanged.
 
 =head1 ATTRIBUTES
 

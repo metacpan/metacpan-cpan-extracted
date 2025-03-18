@@ -1,4 +1,5 @@
-use lib 'lib';
+use FindBin '$Dir';
+use lib "$Dir/lib";
 @@ IF static
 use Plack::Builder;
 @@ END
@@ -10,7 +11,7 @@ my $env = $ENV{PLACK_ENV} // 'unknown';
 builder {
     enable_if { $env eq 'development' } "Static",
         path => sub { 1 },
-        root => 'static/',
+        root => "$Dir/static/",
         pass_through => 1,
         ;
     \&Minima::Setup::init;

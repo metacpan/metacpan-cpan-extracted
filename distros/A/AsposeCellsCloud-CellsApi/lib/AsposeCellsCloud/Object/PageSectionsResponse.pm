@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'page_sections' => {
      	datatype => 'ARRAY[PageSection]',
      	base_name => 'PageSections',
-     	description => '',
+     	description => 'A property named PageSections of type List PageSection  to store a collection of PageSection objects.',
      	format => '',
      	read_only => '',
      		},

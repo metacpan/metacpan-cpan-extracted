@@ -9,8 +9,8 @@ my %params = (
     NAME => 'XS::libuv',
     CLIB => {
         CMAKE_TARGET => 'uv_a',
-        FILE         => 'libuv_a.a',
-        DIR          => 'libuv'
+        FILE         => 'libuv.a',
+        DIR          => 'libuv-1.49.2'
     },
     LINK               => $libs{$^O},
     CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},

@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetVerticalPageBreaksRequest.name :   ,
-# GetVerticalPageBreaksRequest.sheetName :   ,
-# GetVerticalPageBreaksRequest.folder :   ,
-# GetVerticalPageBreaksRequest.storageName :    
+# GetVerticalPageBreaksRequest.name : The workbook name.  ,
+# GetVerticalPageBreaksRequest.sheetName : The worksheet name.  ,
+# GetVerticalPageBreaksRequest.folder : The folder where the file is situated.  ,
+# GetVerticalPageBreaksRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_vertical_page_breaks' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of vertical page breaks in the worksheet.',
         params => $params,
         returns => 'VerticalPageBreaksResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

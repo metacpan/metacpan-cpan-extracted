@@ -63,7 +63,10 @@ if($_64) {
 #  }
 
   if($ok eq 'abcde') {print "ok 1\n"}
-  else {print "not ok 1 $ok\n"}
+  else {
+    warn "\$ok: $ok\n";
+    print "not ok 1 $ok\n";
+  }
 }
 
 
@@ -233,39 +236,40 @@ $ok = '';
 if(!$_64) {
   my $int1 = Math::MPFR->new();
 
-  eval{Rmpfr_set_uj_2exp($int1, 2 ** 23, 2, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
-  else {print $@, "\n"}
+  Rmpfr_set_uj_2exp($int1, 2 ** 23, 2, GMP_RNDN);
+  if($int1 == 33554432) {$ok .= 'a'}
 
-  eval{Rmpfr_set_sj_2exp($int1, 2 ** 23, 2, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
-  else {print $@, "\n"}
+  Rmpfr_set_sj_2exp($int1, 2 ** 23, 2, GMP_RNDN);
+  if($int1 == 33554432) {$ok .= 'b'}
 
   if($ok eq 'ab') {print "ok 1\n"}
-  else {print "not ok 1 $ok\n"}
+  else {
+    warn "\$ok: $ok\n";
+    print "not ok 1 $ok\n";
+  }
 
   $ok = '';
 
+  # Rmpfr_get_sj and Rmpfr_get_uj are still not ipmlemented
+  # for these perls as they are unable to recieve such values.
   eval{Rmpfr_get_sj($int1, GMP_RNDN);};
   if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
-  else {print $@, "\n"}
+  else {warn $@, "\n"}
 
   eval{Rmpfr_get_uj($int1, GMP_RNDN);};
   if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
-  else {print $@, "\n"}
+  else {warn $@, "\n"}
 
   if($ok eq 'ab') {print "ok 2\n"}
   else {print "not ok 2 $ok\n"}
 
   $ok = '';
 
-  eval{Rmpfr_set_sj($int1, 42, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
-  else {print $@, "\n"}
+  Rmpfr_set_sj($int1, 42, GMP_RNDN);
+  if($int1 == 42) {$ok .= 'a'}
 
-  eval{Rmpfr_set_uj($int1, 42, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
-  else {print $@, "\n"}
+  Rmpfr_set_uj($int1, 43, GMP_RNDN);
+  if($int1 == 43) {$ok .= 'b'}
 
   if($ok eq 'ab') {print "ok 3\n"}
   else {print "not ok 3 $ok\n"}

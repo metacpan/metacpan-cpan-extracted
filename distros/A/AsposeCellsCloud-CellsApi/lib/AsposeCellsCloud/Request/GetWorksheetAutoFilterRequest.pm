@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetAutoFilterRequest.name :   ,
-# GetWorksheetAutoFilterRequest.sheetName :   ,
-# GetWorksheetAutoFilterRequest.folder :   ,
-# GetWorksheetAutoFilterRequest.storageName :    
+# GetWorksheetAutoFilterRequest.name : The workbook name.  ,
+# GetWorksheetAutoFilterRequest.sheetName : The worksheet name.  ,
+# GetWorksheetAutoFilterRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetAutoFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_auto_filter' } = { 
-    	summary => '',
+    	summary => 'Retrieve the description of auto filters from a worksheet.',
         params => $params,
         returns => 'AutoFilterResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

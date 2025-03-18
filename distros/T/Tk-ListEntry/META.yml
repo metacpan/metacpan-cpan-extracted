@@ -20,8 +20,9 @@ no_index:
 requires:
   Test::Tk: '3.02'
   Tk: '804.033'
-  Tk::PopList: '0.10'
+  Tk::PopList: '0.13'
 resources:
+  bugtracker: https://github.com/haje61/Tk-ListEntry/issues
   repository: git://github.com/haje61/Tk-ListEntry.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

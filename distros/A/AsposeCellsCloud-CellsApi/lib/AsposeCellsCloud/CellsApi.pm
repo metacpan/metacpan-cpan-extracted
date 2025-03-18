@@ -61,9 +61,9 @@ sub new {
 #
 # PostAnalyzeExcelRequest
 #
+# Perform business analysis of data in Excel files.
 # 
-# 
-# @analyzeExcelRequest  AnalyzeExcelRequest (required)     
+# @analyzeExcelRequest  AnalyzeExcelRequest (required)  Excel files and analysis output requirements   
 #
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_analyze_excel' } = { 
-    	summary => '',
+    	summary => 'Perform business analysis of data in Excel files.',
         params => $params,
         returns => 'ARRAY[AnalyzedResult]',
     };
@@ -96,12 +96,12 @@ sub post_analyze_excel{
 #
 # GetWorksheetAutoFilterRequest
 #
+# Retrieve the description of auto filters from a worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The workbook name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -112,7 +112,7 @@ sub post_analyze_excel{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_auto_filter' } = { 
-    	summary => '',
+    	summary => 'Retrieve the description of auto filters from a worksheet.',
         params => $params,
         returns => 'AutoFilterResponse',
     };
@@ -650,12 +650,12 @@ sub delete_worksheet_filter{
 #
 # GetWorksheetAutoshapesRequest
 #
+# Get autoshapes description in worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The workbook name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   Document`s folder.  
+# @storageName  string   Storage name.   
 #
 {
     my $params = {
@@ -666,7 +666,7 @@ sub delete_worksheet_filter{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_autoshapes' } = { 
-    	summary => '',
+    	summary => 'Get autoshapes description in worksheet.',
         params => $params,
         returns => 'AutoShapesResponse',
     };
@@ -728,9 +728,9 @@ sub get_worksheet_autoshape_with_format{
 #
 # PostBatchConvertRequest
 #
+# Batch converting files that meet specific matching conditions.
 # 
-# 
-# @batchConvertRequest  BatchConvertRequest (required)     
+# @batchConvertRequest  BatchConvertRequest (required)  BatchConvertRequest Batch conversion file request.    
 #
 {
     my $params = {
@@ -741,7 +741,7 @@ sub get_worksheet_autoshape_with_format{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_convert' } = { 
-    	summary => '',
+    	summary => 'Batch converting files that meet specific matching conditions.',
         params => $params,
         returns => 'string',
     };
@@ -938,17 +938,17 @@ sub post_access_token{
 #
 # PostClearContentsRequest
 #
+# Clear cell area contents in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @range  string     
-# @startRow  int     
-# @startColumn  int     
-# @endRow  int     
-# @endColumn  int     
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @range  string   Represents the range to which the specified cells applies.  
+# @startRow  int   The start row index.  
+# @startColumn  int   The start column index.  
+# @endRow  int   The end row index.  
+# @endColumn  int   The end column index.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -959,7 +959,7 @@ sub post_access_token{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_clear_contents' } = { 
-    	summary => '',
+    	summary => 'Clear cell area contents in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -1590,14 +1590,14 @@ sub post_cell_characters{
 #
 # GetWorksheetColumnsRequest
 #
+# Retrieve descriptions of worksheet columns.
 # 
-# 
-# @name  string     
-# @sheetName  string     
-# @offset  int     
+# @name  string   The file name.  
+# @sheetName  string   The worksheet name.  
+# @offset  int   The workdook folder.  
 # @count  int     
-# @folder  string     
-# @storageName  string      
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -1608,7 +1608,7 @@ sub post_cell_characters{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of worksheet columns.',
         params => $params,
         returns => 'ColumnsResponse',
     };
@@ -2036,14 +2036,14 @@ sub post_column_style{
 #
 # GetWorksheetRowsRequest
 #
+# Retrieve descriptions of rows in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @offset  int     
-# @count  int     
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @offset  int   Row offset.  
+# @count  int   Display rows number.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -2054,7 +2054,7 @@ sub post_column_style{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of rows in the worksheet.',
         params => $params,
         returns => 'RowsResponse',
     };
@@ -2631,13 +2631,13 @@ sub get_cells_cloud_service_status{
 #
 # GetChartAreaRequest
 #
+# Retrieve chart area description in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @chartIndex  int (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @chartIndex  int (required)  The chart index.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -2648,7 +2648,7 @@ sub get_cells_cloud_service_status{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_chart_area' } = { 
-    	summary => '',
+    	summary => 'Retrieve chart area description in the worksheet.',
         params => $params,
         returns => 'ChartAreaResponse',
     };
@@ -2748,12 +2748,12 @@ sub get_chart_area_border{
 #
 # GetWorksheetChartsRequest
 #
+# Retrieve descriptions of charts in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -2764,7 +2764,7 @@ sub get_chart_area_border{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_charts' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of charts in the worksheet.',
         params => $params,
         returns => 'ChartsResponse',
     };
@@ -3705,12 +3705,12 @@ sub post_chart_second_value_axis{
 #
 # GetWorksheetConditionalFormattingsRequest
 #
+# Retrieve descriptions of conditional formattings in a worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -3721,7 +3721,7 @@ sub post_chart_second_value_axis{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_conditional_formattings' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of conditional formattings in a worksheet.',
         params => $params,
         returns => 'ConditionalFormattingsResponse',
     };
@@ -4068,21 +4068,21 @@ sub delete_worksheet_conditional_formatting_area{
 #
 # GetWorkbookRequest
 #
+# Retrieve workbooks in various formats.
 # 
-# 
-# @name  string (required)    
-# @format  string     
-# @password  string     
-# @isAutoFit  boolean     
-# @onlySaveTable  boolean     
-# @folder  string     
-# @outPath  string     
-# @storageName  string     
-# @outStorageName  string     
-# @checkExcelRestriction  boolean     
-# @region  string     
-# @pageWideFitOnPerSheet  boolean     
-# @pageTallFitOnPerSheet  boolean      
+# @name  string (required)  The file name.  
+# @format  string   The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  
+# @password  string   The password needed to open an Excel file.  
+# @isAutoFit  boolean   Specifies whether set workbook rows to be autofit.  
+# @onlySaveTable  boolean   Specifies whether only save table data.Only use pdf to excel.  
+# @folder  string   The folder where the file is situated.  
+# @outPath  string   Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  
+# @storageName  string   The storage name where the file is situated.  
+# @outStorageName  string   The storage name where the output file is situated.  
+# @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
+# @region  string   The regional settings for workbook.  
+# @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
+# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.   
 #
 {
     my $params = {
@@ -4093,7 +4093,7 @@ sub delete_worksheet_conditional_formatting_area{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook' } = { 
-    	summary => '',
+    	summary => 'Retrieve workbooks in various formats.',
         params => $params,
         returns => 'string',
     };
@@ -4582,16 +4582,51 @@ sub post_convert_worksheet_to_image{
 }
 
 #
-# PostExportRequest
+# PostConvertWorkbookRequest
 #
 # 
 # 
+# @convertWorkbookOptions  ConvertWorkbookOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostConvertWorkbookRequest',
+            description => 'PostConvertWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_convert_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostExportRequest
+#
+# Export Excel internal elements or the workbook itself to various format files.
+# 
 # @File  string (required)  File to upload  
-# @objectType  string     
-# @format  string     
-# @password  string     
-# @checkExcelRestriction  boolean     
-# @region  string      
+# @objectType  string   Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.  
+# @format  string   The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  
+# @password  string   The password needed to open an Excel file.  
+# @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
+# @region  string   The regional settings for workbook.   
 #
 {
     my $params = {
@@ -4602,7 +4637,7 @@ sub post_convert_worksheet_to_image{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
-    	summary => '',
+    	summary => 'Export Excel internal elements or the workbook itself to various format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -5089,12 +5124,12 @@ sub post_data_transformation{
 #
 # GetWorksheetHyperlinksRequest
 #
+# Retrieve descriptions of hyperlinks in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -5105,7 +5140,7 @@ sub post_data_transformation{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_hyperlinks' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of hyperlinks in the worksheet.',
         params => $params,
         returns => 'HyperlinksResponse',
     };
@@ -5326,14 +5361,14 @@ sub delete_worksheet_hyperlinks{
 #
 # PostAssembleRequest
 #
-# 
+# Assemble data files with template files to generate files in various formats.
 # 
 # @File  string (required)  File to upload  
 # @datasource  string (required)    
-# @outFormat  string     
-# @password  string     
-# @checkExcelRestriction  boolean     
-# @region  string      
+# @outFormat  string   The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  
+# @password  string   The password needed to open an Excel file.  
+# @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
+# @region  string   The regional settings for workbook.   
 #
 {
     my $params = {
@@ -5344,7 +5379,7 @@ sub delete_worksheet_hyperlinks{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
-    	summary => '',
+    	summary => 'Assemble data files with template files to generate files in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -5918,12 +5953,12 @@ sub delete_metadata{
 #
 # GetWorksheetListObjectsRequest
 #
+# Retrieve descriptions of ListObjects in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -5934,7 +5969,7 @@ sub delete_metadata{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_list_objects' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of ListObjects in the worksheet.',
         params => $params,
         returns => 'ListObjectsResponse',
     };
@@ -6439,12 +6474,12 @@ sub post_worksheet_list_columns_total{
 #
 # GetWorksheetOleObjectsRequest
 #
+# Retrieve descriptions of OLE objects in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -6455,7 +6490,7 @@ sub post_worksheet_list_columns_total{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_ole_objects' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of OLE objects in the worksheet.',
         params => $params,
         returns => 'OleObjectsResponse',
     };
@@ -6678,12 +6713,12 @@ sub put_worksheet_ole_object{
 #
 # GetVerticalPageBreaksRequest
 #
+# Retrieve descriptions of vertical page breaks in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The workbook name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -6694,7 +6729,7 @@ sub put_worksheet_ole_object{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_vertical_page_breaks' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of vertical page breaks in the worksheet.',
         params => $params,
         returns => 'VerticalPageBreaksResponse',
     };
@@ -7074,12 +7109,12 @@ sub delete_horizontal_page_break{
 #
 # GetPageSetupRequest
 #
+# Retrieve page setup description in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -7090,7 +7125,7 @@ sub delete_horizontal_page_break{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_page_setup' } = { 
-    	summary => '',
+    	summary => 'Retrieve page setup description in the worksheet.',
         params => $params,
         returns => 'PageSetupResponse',
     };
@@ -7423,12 +7458,12 @@ sub post_fit_tall_to_pages{
 #
 # GetWorksheetPicturesRequest
 #
+# Retrieve descriptions of pictures in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -7439,7 +7474,7 @@ sub post_fit_tall_to_pages{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pictures' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of pictures in the worksheet.',
         params => $params,
         returns => 'PicturesResponse',
     };
@@ -7532,6 +7567,46 @@ sub get_worksheet_picture_with_format{
 # @return CellsCloudResponse
 #
 sub put_worksheet_add_picture{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# AddPictureInCellRequest
+#
+# add new picture in the cells.
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @picturePath  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'AddPictureInCellRequest',
+            description => 'AddPictureInCell Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'add_picture_in_cell' } = { 
+    	summary => 'add new picture in the cells.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub add_picture_in_cell{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -7662,12 +7737,12 @@ sub delete_worksheet_pictures{
 #
 # GetWorksheetPivotTablesRequest
 #
+# Retrieve descriptions of pivottables  in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -7678,7 +7753,7 @@ sub delete_worksheet_pictures{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_tables' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of pivottables  in the worksheet.',
         params => $params,
         returns => 'PivotTablesResponse',
     };
@@ -8519,12 +8594,12 @@ sub delete_worksheet_pivot_table_filter{
 #
 # GetDocumentPropertiesRequest
 #
+# Retrieve descriptions of Excel file properties.
 # 
-# 
-# @name  string (required)    
-# @type  string     
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The workbook name.  
+# @type  string   Excel property type.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -8535,7 +8610,7 @@ sub delete_worksheet_pivot_table_filter{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_document_properties' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of Excel file properties.',
         params => $params,
         returns => 'CellsDocumentPropertiesResponse',
     };
@@ -8709,13 +8784,13 @@ sub delete_document_properties{
 #
 # PostDigitalSignatureRequest
 #
+# Excel file digital signature.
 # 
-# 
-# @name  string (required)    
-# @digitalsignaturefile  string (required)    
-# @password  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @digitalsignaturefile  string (required)  The digital signature file path should include both the folder and the file name, along with the extension.  
+# @password  string (required)  The password needed to open an Excel file.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -8726,7 +8801,7 @@ sub delete_document_properties{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_digital_signature' } = { 
-    	summary => '',
+    	summary => 'Excel file digital signature.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -9084,13 +9159,13 @@ sub post_protect{
 #
 # PostWorksheetCellsRangesCopyRequest
 #
+# Copy content from the source range to the destination range in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @rangeOperate  RangeCopyRequest (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @rangeOperate  RangeCopyRequest (required)  RangeCopyRequestcopydata,copystyle,copyto,copyvalue  
+# @folder  string   Original workbook folder.  
+# @storageName  string   Storage name.   
 #
 {
     my $params = {
@@ -9101,7 +9176,7 @@ sub post_protect{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_ranges_copy' } = { 
-    	summary => '',
+    	summary => 'Copy content from the source range to the destination range in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -9543,11 +9618,11 @@ sub post_worksheet_cells_range_row_height{
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_to_image' } = { 
     	summary => '',
         params => $params,
-        returns => 'CellsCloudResponse',
+        returns => 'string',
     };
 }
 #
-# @return CellsCloudResponse
+# @return string
 #
 sub post_worksheet_cells_range_to_image{
     my ($self, %args) = @_;
@@ -9556,7 +9631,7 @@ sub post_worksheet_cells_range_to_image{
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
 }
 
@@ -9643,12 +9718,12 @@ sub delete_worksheet_cells_range{
 #
 # GetWorksheetShapesRequest
 #
+# Retrieve descriptions of shapes in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -9659,7 +9734,7 @@ sub delete_worksheet_cells_range{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_shapes' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of shapes in the worksheet.',
         params => $params,
         returns => 'ShapesResponse',
     };
@@ -9961,12 +10036,12 @@ sub post_worksheet_ungroup_shape{
 #
 # GetWorksheetSparklineGroupsRequest
 #
+# Retrieve descriptions of sparkline groups in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -9977,7 +10052,7 @@ sub post_worksheet_ungroup_shape{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_sparkline_groups' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of sparkline groups in the worksheet.',
         params => $params,
         returns => 'SparklineGroupsResponse',
     };
@@ -10617,11 +10692,11 @@ sub post_split_text{
 #
 # GetWorkbookDefaultStyleRequest
 #
+# Retrieve the description of the default style for the workbook .
 # 
-# 
-# @name  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The file name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -10632,7 +10707,7 @@ sub post_split_text{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_default_style' } = { 
-    	summary => '',
+    	summary => 'Retrieve the description of the default style for the workbook .',
         params => $params,
         returns => 'StyleResponse',
     };
@@ -11541,13 +11616,50 @@ sub get_page_count{
 }
 
 #
-# GetWorksheetsRequest
+# GetAllStylesRequest
 #
-# 
+# Get all style in the workbook.
 # 
 # @name  string (required)    
 # @folder  string     
 # @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetAllStylesRequest',
+            description => 'GetAllStyles Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_all_styles' } = { 
+    	summary => 'Get all style in the workbook.',
+        params => $params,
+        returns => 'StylesResponse',
+    };
+}
+#
+# @return StylesResponse
+#
+sub get_all_styles{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('StylesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetsRequest
+#
+# Retrieve the description of worksheets from a workbook.
+# 
+# @name  string (required)  The file name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -11558,7 +11670,7 @@ sub get_page_count{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheets' } = { 
-    	summary => '',
+    	summary => 'Retrieve the description of worksheets from a workbook.',
         params => $params,
         returns => 'WorksheetsResponse',
     };
@@ -13080,12 +13192,12 @@ sub get_worksheet_page_count{
 #
 # GetWorksheetValidationsRequest
 #
+# Retrieve descriptions of validations in the worksheet.
 # 
-# 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @folder  string     
-# @storageName  string      
+# @name  string (required)  The workbook name.  
+# @sheetName  string (required)  The worksheet name.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.   
 #
 {
     my $params = {
@@ -13096,7 +13208,7 @@ sub get_worksheet_page_count{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_validations' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of validations in the worksheet.',
         params => $params,
         returns => 'ValidationsResponse',
     };

@@ -34,7 +34,7 @@
    "provides" : {
       "Alien::libtickit" : {
          "file" : "lib/Alien/libtickit.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -125,6 +125,27 @@ __PACKAGE__->class_documentation({description => 'Represents options of saving .
 
 
 __PACKAGE__->method_documentation({
+     'generator_type' => {
+     	datatype => 'string',
+     	base_name => 'GeneratorType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'odf_strict_version' => {
+     	datatype => 'string',
+     	base_name => 'OdfStrictVersion',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'ignore_pivot_tables' => {
+     	datatype => 'boolean',
+     	base_name => 'IgnorePivotTables',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
@@ -180,10 +201,48 @@ __PACKAGE__->method_documentation({
      	description => '',
      	format => '',
      	read_only => '',
+     		},
+     'merge_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'MergeAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_external_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortExternalNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_excel_restriction' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckExcelRestriction',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'update_smart_art' => {
+     	datatype => 'boolean',
+     	base_name => 'UpdateSmartArt',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'encrypt_document_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'EncryptDocumentProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'generator_type' => 'string',
+    'odf_strict_version' => 'string',
+    'ignore_pivot_tables' => 'boolean',
     'save_format' => 'string',
     'cached_file_folder' => 'string',
     'clear_data' => 'boolean',
@@ -191,10 +250,18 @@ __PACKAGE__->swagger_types( {
     'enable_http_compression' => 'boolean',
     'refresh_chart_cache' => 'boolean',
     'sort_names' => 'boolean',
-    'validate_merged_areas' => 'boolean' 
+    'validate_merged_areas' => 'boolean',
+    'merge_areas' => 'boolean',
+    'sort_external_names' => 'boolean',
+    'check_excel_restriction' => 'boolean',
+    'update_smart_art' => 'boolean',
+    'encrypt_document_properties' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'generator_type' => 'GeneratorType',
+    'odf_strict_version' => 'OdfStrictVersion',
+    'ignore_pivot_tables' => 'IgnorePivotTables',
     'save_format' => 'SaveFormat',
     'cached_file_folder' => 'CachedFileFolder',
     'clear_data' => 'ClearData',
@@ -202,7 +269,12 @@ __PACKAGE__->attribute_map( {
     'enable_http_compression' => 'EnableHTTPCompression',
     'refresh_chart_cache' => 'RefreshChartCache',
     'sort_names' => 'SortNames',
-    'validate_merged_areas' => 'ValidateMergedAreas' 
+    'validate_merged_areas' => 'ValidateMergedAreas',
+    'merge_areas' => 'MergeAreas',
+    'sort_external_names' => 'SortExternalNames',
+    'check_excel_restriction' => 'CheckExcelRestriction',
+    'update_smart_art' => 'UpdateSmartArt',
+    'encrypt_document_properties' => 'EncryptDocumentProperties' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,3 +1,18 @@
+v0.5.0  2025-03-17
+
+        [Changes]
+        - Add base directory detection and path resolution.
+        - Detect application root from .psgi file location.
+        - Paths are now resolved relative to the application
+          base directory.
+        - New path method in Minima::App for path resolution.
+        - Add ability to customize controller prefixes with
+          set_prefix method.
+        - Add configuration key for controller prefixes.
+
+        [Fixes]
+        - Fix outdated and broken rendering in print_env method.
+
 v0.4.1  2024-11-21
 
         [Fixes]

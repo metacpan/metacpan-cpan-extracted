@@ -134,17 +134,18 @@ unless($@) {
   $ok = 1 if(defined($res) && $res == 1);
   cmp_ok($ok, '==', 1, "MPFR(NaN) != GMPQ returns 1");
 
-  for my $mpfr(Math::MPFR->new(2.5), Math::MPFR->new(1.25), Math::MPFR->new(0.5)) {
-    cmp_ok(($mpq > $mpfr), '==',  ($mpfr < $mpq),  "$mpfr: '>'  ok");
-    cmp_ok(($mpq < $mpfr), '==' , ($mpfr > $mpq),  "$mpfr: '<'  ok");
-    cmp_ok(($mpq == $mpfr), '==', ($mpfr == $mpq), "$mpfr: '==' ok");
-    cmp_ok(($mpq != $mpfr), '==', ($mpfr != $mpq), "$mpfr: '!=' ok");
-    cmp_ok(($mpq >= $mpfr), '==', ($mpfr <= $mpq), "$mpfr: '>=' ok");
-    cmp_ok(($mpq <= $mpfr), '==', ($mpfr >= $mpq), "$mpfr: '<=' ok");
+  if($Math::MPFR::VERSION >= 4.19) {
+    for my $mpfr(Math::MPFR->new(2.5), Math::MPFR->new(1.25), Math::MPFR->new(0.5)) {
+      cmp_ok(($mpq > $mpfr), '==',  ($mpfr < $mpq),  "$mpfr: '>'  ok");
+      cmp_ok(($mpq < $mpfr), '==' , ($mpfr > $mpq),  "$mpfr: '<'  ok");
+      cmp_ok(($mpq == $mpfr), '==', ($mpfr == $mpq), "$mpfr: '==' ok");
+      cmp_ok(($mpq != $mpfr), '==', ($mpfr != $mpq), "$mpfr: '!=' ok");
+      cmp_ok(($mpq >= $mpfr), '==', ($mpfr <= $mpq), "$mpfr: '>=' ok");
+      cmp_ok(($mpq <= $mpfr), '==', ($mpfr >= $mpq), "$mpfr: '<=' ok");
 
-    cmp_ok(($mpq <=> $mpfr), '==', ($mpfr <=> $mpq) * -1, "$mpfr: '<=>' ok");
+      cmp_ok(($mpq <=> $mpfr), '==', ($mpfr <=> $mpq) * -1, "$mpfr: '<=>' ok");
+    }
   }
-
 }
 else {
   warn "\nSkipping tests - no Math::MPFR\n";

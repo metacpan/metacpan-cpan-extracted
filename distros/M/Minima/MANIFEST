@@ -50,4 +50,5 @@ t/42-view-json.t
 t/43-view-plaintext.t
 t/50-live.t
 t/51-stream.t
+t/52-setup-from-psgi.t
 t/90-project.t

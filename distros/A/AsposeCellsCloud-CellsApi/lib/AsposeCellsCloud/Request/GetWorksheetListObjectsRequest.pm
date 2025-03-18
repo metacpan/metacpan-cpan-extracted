@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetListObjectsRequest.name :   ,
-# GetWorksheetListObjectsRequest.sheetName :   ,
-# GetWorksheetListObjectsRequest.folder :   ,
-# GetWorksheetListObjectsRequest.storageName :    
+# GetWorksheetListObjectsRequest.name : The file name.  ,
+# GetWorksheetListObjectsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetListObjectsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetListObjectsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_list_objects' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of ListObjects in the worksheet.',
         params => $params,
         returns => 'ListObjectsResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

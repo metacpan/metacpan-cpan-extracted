@@ -1,10 +1,11 @@
 package Dist::Build::ShareDir;
-$Dist::Build::ShareDir::VERSION = '0.017';
+$Dist::Build::ShareDir::VERSION = '0.018';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
+use ExtUtils::Builder::Util qw/unix_to_native_path/;
 use File::Find 'find';
 use File::Spec::Functions qw/abs2rel catfile/;
 
@@ -14,38 +15,40 @@ sub add_methods {
 	$planner->add_delegate('dist_sharedir', sub {
 		my ($planner, $dir, $dist_name) = @_;
 		$dist_name //= $planner->distribution;
+		$dir = unix_to_native_path($dir);
 
 		my $inner = $planner->new_scope;
 		$inner->load_module("Dist::Build::Core");
 
-		my @outputs;
-		find(sub {
-			return unless -f;
-			my $output = catfile(qw/blib lib auto share dist/, $dist_name, abs2rel($File::Find::name, $dir));
-			$inner->copy_file(abs2rel($File::Find::name), $output);
-			push @outputs, $output;
-		}, $dir);
-
-		$planner->create_phony('code', @outputs);
+		my $outputs = $inner->create_subst(
+			on     => $inner->create_pattern(dir => $dir),
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $output = catfile(qw/blib lib auto share dist/, $dist_name, abs2rel($source, $dir));
+				$inner->copy_file(abs2rel($source), $output);
+			},
+		);
 	});
 
 	$planner->add_delegate('module_sharedir', sub {
 		my ($planner, $dir, $module_name) = @_;
 		$module_name //= $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
+		$dir = unix_to_native_path($dir);
 
 		my $inner = $planner->new_scope;
 		$inner->load_module("Dist::Build::Core");
 
-		my @outputs;
-		find(sub {
-			return unless -f;
-			my $output = catfile(qw/blib lib auto share module/, $module_dir, abs2rel($File::Find::name, $dir));
-			$inner->copy_file(abs2rel($File::Find::name), $output);
-			push @outputs, $output;
-		}, $dir);
-
-		$planner->create_phony('code', @outputs);
+		my $outputs = $inner->create_subst(
+			on     => $inner->create_pattern(dir => $dir),
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $output = catfile(qw/blib lib auto share module/, $module_dir, abs2rel($source, $dir));
+				$inner->copy_file(abs2rel($source), $output);
+			},
+		);
 	});
 }
 
@@ -65,7 +68,7 @@ Dist::Build::ShareDir - Sharedir support for Dist::Build
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

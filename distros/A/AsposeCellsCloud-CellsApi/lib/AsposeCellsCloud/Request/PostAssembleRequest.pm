@@ -61,10 +61,10 @@ sub new {
 # Run Operation Request
 # PostAssembleRequest.File : File to upload  ,
 # PostAssembleRequest.datasource :   ,
-# PostAssembleRequest.outFormat :   ,
-# PostAssembleRequest.password :   ,
-# PostAssembleRequest.checkExcelRestriction :   ,
-# PostAssembleRequest.region :    
+# PostAssembleRequest.outFormat : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostAssembleRequest.password : The password needed to open an Excel file.  ,
+# PostAssembleRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostAssembleRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
-    	summary => '',
+    	summary => 'Assemble data files with template files to generate files in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -157,28 +157,28 @@ __PACKAGE__->method_documentation({
      'out_format' => {
      	datatype => 'string',
      	base_name => 'outFormat',
-     	description => '',
+     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'region',
-     	description => '',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    

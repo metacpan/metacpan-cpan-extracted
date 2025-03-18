@@ -235,6 +235,38 @@ my $env = { PATH_INFO => '/' };
     );
 }
 
+# Routes with custom controller prefixes
+{
+    my $routes = $dir->child('etc/routes.map');
+    my $app;
+
+    $routes->spew(<<~EOF
+        * / :X a
+        EOF
+    );
+
+    # Standard prefix
+    $app = Minima::App->new(
+        environment => $env,
+    );
+    like(
+        dies { $app->run },
+        qr/Controller::X/,
+        'adds default controller prefix'
+    );
+
+    # Custom prefix
+    $app = Minima::App->new(
+        environment => $env,
+        configuration => { controller_prefix => 'SecretPrefix' }
+    );
+    like(
+        dies { $app->run },
+        qr/SecretPrefix::X/,
+        'adds custom controller prefix'
+    );
+}
+
 chdir;
 
 done_testing;

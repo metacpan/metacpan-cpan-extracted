@@ -159,14 +159,7 @@ FALLBACK_NOTIFY          : If defined, $Math::MPFR::doubletoa_fallback
 *************************************************/
 
 #include <stdio.h>
-
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
 #include <inttypes.h>
-#endif
-
-#if MPFR_VERSION_MAJOR < 3
-#define mpfr_exp_t mp_exp_t
-#endif
 
 /*
  * In mpfr-4.1.0, the _Float128 type is exposed in mpfr.h if MPFR_WANT_FLOAT128 is defined.
@@ -180,6 +173,10 @@ FALLBACK_NOTIFY          : If defined, $Math::MPFR::doubletoa_fallback
 #include <gmp.h>
 #include <mpfr.h>
 #include <float.h>
+
+#if MPFR_VERSION_MAJOR < 3
+#define mpfr_exp_t mp_exp_t
+#endif
 
 #if defined(MPFR_WANT_FLOAT128) || defined(USE_QUADMATH)
 #include <quadmath.h>

@@ -136,7 +136,7 @@ __PACKAGE__->method_documentation({
      'links' => {
      	datatype => 'ARRAY[Link]',
      	base_name => 'Links',
-     	description => '',
+     	description => 'A property of type List Link  named Links is specified to be serialized as an XmlElement with the tag "link".',
      	format => '',
      	read_only => '',
      		},

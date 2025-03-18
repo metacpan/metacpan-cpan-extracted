@@ -48,28 +48,16 @@ if($has_420) {
   Rmpfr_exp10m1 ($rop1, Math::MPFR->new(5), MPFR_RNDN);
   cmp_ok( abs($rop_check - $rop1), '==', 0, "Rmpfr_exp10m1 is in range ($rop1 | $rop_check)" );
 
-  if($iv_is_longlong) {
-    my $rop_check = $op ** 7;
-    Rmpfr_pow_uj($rop1, $op, 7, MPFR_RNDN);
-    cmp_ok($rop_check, '==', $rop1, 'Rmpfr_pow_uj is ok');
+  $rop_check = $op ** 7;
+  Rmpfr_pow_uj($rop1, $op, 7, MPFR_RNDN);
+  cmp_ok($rop_check, '==', $rop1, 'Rmpfr_pow_uj is ok');
 
-    $rop_check = $op ** -7;
-    Rmpfr_pow_sj($rop1, $op, -7, MPFR_RNDN);
-    cmp_ok($rop_check, '==', $rop1, 'Rmpfr_pow_sj is ok');
+  $rop_check = $op ** -7;
+  Rmpfr_pow_sj($rop1, $op, -7, MPFR_RNDN);
+  cmp_ok($rop_check, '==', $rop1, 'Rmpfr_pow_sj is ok');
 
-    Rmpfr_pown($rop2, $op, -7, MPFR_RNDN);
-    cmp_ok($rop2, '==', $rop1, 'Rmpfr_pown is ok');
-  }
-  else {
-    eval { Rmpfr_pow_uj($rop1, $op, 7, MPFR_RNDN);  };
-    like ( $@, qr/^Rmpfr_pow_uj not implemented for this build/, 'Rmpfr_pow_uj not implemented' );
-
-    eval { Rmpfr_pow_sj($rop1, $op, -7, MPFR_RNDN); };
-    like ( $@, qr/^Rmpfr_pow_sj not implemented for this build/, 'Rmpfr_pow_sj not implemented' );
-
-    eval { Rmpfr_pown($rop2, $op, -7, MPFR_RNDN);   };
-    like ( $@, qr/^Rmpfr_pown not implemented for this build/,   'Rmpfr_pown not implemented'   );
-  }
+  Rmpfr_pown($rop2, $op, -7, MPFR_RNDN);
+  cmp_ok($rop2, '==', $rop1, 'Rmpfr_pown is ok');
 }
 else {
 

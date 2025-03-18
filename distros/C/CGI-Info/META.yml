@@ -25,7 +25,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,7 +37,6 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Class::Autouse: '0'
   Cwd: '0'
   ExtUtils::MakeMaker: '6.64'
   File::Basename: '0'
@@ -45,6 +44,7 @@ requires:
   HTTP::BrowserDetect: '3.1'
   JSON::MaybeXS: '0'
   List::Util: '1.33'
+  Log::Abstraction: '0.05'
   Log::Any: '0'
   Params::Get: '0'
   Params::Validate::Strict: '0.02'
@@ -54,10 +54,11 @@ requires:
   Sys::Hostname: '0'
   Sys::Path: '0'
   URI::Heuristic: '0'
+  boolean: '0'
   namespace::clean: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '0.95'
+version: '0.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

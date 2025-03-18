@@ -36,7 +36,8 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::Style; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -127,7 +128,7 @@ __PACKAGE__->class_documentation({description => 'Represents data style collecti
 
 __PACKAGE__->method_documentation({
      'style_list' => {
-     	datatype => 'ARRAY[LinkElement]',
+     	datatype => 'ARRAY[Style]',
      	base_name => 'StyleList',
      	description => 'This property contains a list of elements with the tag "style".',
      	format => '',
@@ -143,7 +144,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'style_list' => 'ARRAY[LinkElement]',
+    'style_list' => 'ARRAY[Style]',
     'link' => 'Link' 
 } );
 

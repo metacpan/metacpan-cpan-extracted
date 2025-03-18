@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 174830f084cb69321d5ff82cab3d2df015d79487cc62956bd2b510fca435dda3 Changes
+SHA256 b26feb77e4acff3f34af4821bf3dd81ab0f00533f9a13adfa805b035f77b45ac MANIFEST
+SHA256 e4eb6331e2d3014233048858b1360067d76d7a60bf947afa4b429fa644cbb5ad MANIFEST.SKIP
+SHA256 7ed8b6b4894674c43cfd0e1bae414a2392f11de34bb9b64d7f935d75bfccb33b META.json
+SHA256 d8cbc51134efa4dc141e08b1a2a115587081018fe22c1ded8a8669c12539aea0 META.yml
+SHA256 3db2214e6ee058081357fa03e958068bf070c2d9c62cc2ec660cbd80cdf1c635 Makefile.PL
+SHA256 2c526dab0f791b99a53f6a4959289b08901acd3b2e788ad88e9b80636846839a README
+SHA256 11589da9b95cbae9a6cbd782c9ccb6451e2ff5428341c3ad6a24222437839469 lib/Map/Tube/Brussels.pm
+SHA256 b5384604b3fb75579b639cb92cddf4aaa74575988083a06c1baf92b071b34b4f share/brussels-map.xml
+SHA256 0e2000e34107be2198680bae8ad6669c046013b7ffd62d00a25c3c1dcb4f03c4 t/00-load.t
+SHA256 fc5fece59224a365eb6ba4775f80f3ff5e56260fce372d72ebf4fc6fb1c37bbc t/01-map-data-alt.t
+SHA256 5773ef50400c74a0298154aca9fa7a2b590baba18e4e1944483aae3fcfc4494f t/01-map-data.t
+SHA256 c1d5b9a3dcdad54e70e58fa0db7bbb118f284e5d0ead3dbecba168f76ca189ca t/02-map-alt.t
+SHA256 e46f531532e6ec0f03f80d17ddd8fa86b351a2ab5a9c34cf68d2f975b933c670 t/02-map.t
+SHA256 51206ec5bf5fac7ba220bb994004f3e8d1e03c590bfff872ab00c9f10743c76e t/03-nodes-alt.t
+SHA256 8c431c0f4e3de4a81ac4e3ba03c2e554a264905fcaa3955b53214c6abe44d5ac t/03-nodes.t
+SHA256 19737c7df0bac41f79b67d5c0e0b9d61317f14d5addfdd1185ae3dee2a840edb t/04-lines.t
+SHA256 4fe80bd72e1f2d2e5f8ea51635cba73df25b92b57841706f7be816bbab23b45d t/10-manifest.t
+SHA256 60236030e556a9276b3d83570c298fa4425417fd15d4fc830ca3844d88141add t/11-meta-json.t
+SHA256 cb38212568ff22e44b2256eb9b345b96544219a3caf3acd9d69085792df7a0f8 t/12-meta-yml.t
+SHA256 17999ffa87bae787883ab1bfb806b466636e49fe19cc5395b99fa9e24ab240ac t/13-version.t
+SHA256 6f404f5c7ce704128637ac1fbf3d33e4885dcb28d481ca21b84bd15ecb1bc024 t/14-signature.t
+SHA256 37f4b4e1776e545f7e99e5accdc0d3b888c4d5b7b795d005cae0866904702558 t/20-pod.t
+SHA256 8266a8278479bf0923efaa38d78012aaba6d328f7d4af3707b58502d96710a89 t/21-pod-coverage.t
+SHA256 fe6b6272f36d22d99d5054410ad44e2cf430ba14af7912a52d48c6d9ed81095b t/22-changes.t
+SHA256 eccb3de3a65118ea78fa7940bfe446a009b9abcf073361eebaae22e03f529fdf t/23-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iIMEAREIACsWIQSIQcHJHJMgzzzXOfVjfZJS13FbSQUCZ9i5Ag0cZ3dzQGNwYW4u
+b3JnAAoJEGN9klLXcVtJQMUBAJKuStmEgF8cS88pm4o+kKh9WxfIiVK77Gp4+z6J
+l6ndAP4im72VqUpX7YVzIqW3oq8aJFPVSLi6XsDe/io+lC+osA==
+=CjSH
+-----END PGP SIGNATURE-----

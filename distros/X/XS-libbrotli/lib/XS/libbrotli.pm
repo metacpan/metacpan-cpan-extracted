@@ -1,7 +1,7 @@
 package XS::libbrotli;
 use 5.012;
 
-our $VERSION = "1.0.7.9";
+our $VERSION = "1.1.0.0";
 
 use XS::Loader;
 

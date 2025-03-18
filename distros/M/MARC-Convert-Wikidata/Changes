@@ -1,3 +1,7 @@
+0.24 2025-03-17T17:49:03+01:00
+ - Add support for multiple subfields.
+ - Fix multiple identical covers.
+
 0.23 2025-01-29T13:35:17+01:00
  - Fix MANIFEST file.
  - Fix test with Krakatit book edition and Krameriuses.

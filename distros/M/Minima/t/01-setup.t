@@ -21,7 +21,7 @@ like(
 # Passed a good file
 my $config = $dir->child('config.pl');
 $config->spew('{}');
-ok( lives { Minima::Setup->import }, 'loads passed config' )
+ok( lives { Minima::Setup->import('config.pl') }, 'loads passed config' )
     or note($@);
 
 # Passed a problematic file
@@ -72,6 +72,25 @@ like(
     dies { Minima::Setup->import },
     qr/not a hash reference/,
     'dies for empty default config',
+);
+
+# Respects base_dir
+my $base_config = $dir->child('base.pl');
+$base_config->spew('{}');
+
+Minima::Setup->import('base.pl');
+like(
+    $Minima::Setup::config->{base_dir},
+    path('.')->absolute,
+    'sets default base_dir'
+);
+
+$base_config->spew('{ base_dir => "/secret" }');
+Minima::Setup->import('base.pl');
+like(
+    $Minima::Setup::config->{base_dir},
+    '/secret',
+    'respects existing base_dir'
 );
 
 chdir;

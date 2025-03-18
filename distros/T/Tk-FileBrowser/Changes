@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.10  Mon Mar 17 2025
+	- Fixed annoyance with the ListEntry widget.
+
 0.09  Fri Jan 17 2025
 	- Made 'Ok' button default button in file delete dialog.
 	- pick method of Tk::FilePicker saves default settings.

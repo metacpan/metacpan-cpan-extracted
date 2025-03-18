@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetAutoshapesRequest.name :   ,
-# GetWorksheetAutoshapesRequest.sheetName :   ,
-# GetWorksheetAutoshapesRequest.folder :   ,
-# GetWorksheetAutoshapesRequest.storageName :    
+# GetWorksheetAutoshapesRequest.name : The workbook name.  ,
+# GetWorksheetAutoshapesRequest.sheetName : The worksheet name.  ,
+# GetWorksheetAutoshapesRequest.folder : Document`s folder.  ,
+# GetWorksheetAutoshapesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_autoshapes' } = { 
-    	summary => '',
+    	summary => 'Get autoshapes description in worksheet.',
         params => $params,
         returns => 'AutoShapesResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Document`s folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

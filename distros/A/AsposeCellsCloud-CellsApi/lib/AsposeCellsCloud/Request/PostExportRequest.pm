@@ -60,11 +60,11 @@ sub new {
 
 # Run Operation Request
 # PostExportRequest.File : File to upload  ,
-# PostExportRequest.objectType :   ,
-# PostExportRequest.format :   ,
-# PostExportRequest.password :   ,
-# PostExportRequest.checkExcelRestriction :   ,
-# PostExportRequest.region :    
+# PostExportRequest.objectType : Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.  ,
+# PostExportRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# PostExportRequest.password : The password needed to open an Excel file.  ,
+# PostExportRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostExportRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
-    	summary => '',
+    	summary => 'Export Excel internal elements or the workbook itself to various format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -150,35 +150,35 @@ __PACKAGE__->method_documentation({
      'object_type' => {
      	datatype => 'string',
      	base_name => 'objectType',
-     	description => '',
+     	description => 'Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'region',
-     	description => '',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    

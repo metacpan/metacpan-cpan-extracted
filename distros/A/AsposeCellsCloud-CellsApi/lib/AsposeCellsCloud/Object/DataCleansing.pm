@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'ranges' => {
      	datatype => 'ARRAY[Range]',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'A property named "Ranges" of type IList Range with a default value of an empty List of Range objects.',
      	format => '',
      	read_only => '',
      		},

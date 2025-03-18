@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '2.14';
+our $VERSION = '2.15';
 
 our $SMOOTHING_DELTA_DEFAULT = '0.1';
 our %ATTRS =  (
@@ -111,7 +111,7 @@ sub report
   my $f  = "n/a";
   my $p  = 0;
   my $ps = "n/a";
-  my $s  = "n/a";
+  my $s  = 0;
 
   if ( (($min <= $cur and $cur <= $max) or ($min >= $cur and $cur >= $max)) )
     {
@@ -146,6 +146,8 @@ sub report
     $self->{ 'min_speed' } = $s if $p > 1 and $s > 0 and ( $self->{ 'min_speed' } eq 'n' or $self->{ 'min_speed' } > $s );
     $self->{ 'max_speed' } = $s if $p > 1 and $s > 0 and ( $self->{ 'max_speed' } eq 'a' or $self->{ 'max_speed' } < $s );
     }
+
+  $s = 'n/a' unless $s > 0;
 
   $format =~ s/%(\d*)l/$self->sp_format( $l, $1 )/ge;
   $format =~ s/%(\d*)L/$self->sp_format( $L, $1 )/ge;

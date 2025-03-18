@@ -8,7 +8,7 @@ requires   "List::Util";
 
 recommends "Data::Dumper"             => "2.184";
 recommends "Data::Peek"               => "0.52";
-recommends "Encode"                   => "3.19";
+recommends "Encode"                   ,  "3.19";  # Test , instead of =>
 recommends "File::Temp"               => "0.2311";
 recommends "IO::Scalar";
 

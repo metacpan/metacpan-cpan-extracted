@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_isa check_required);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has issn => (
 	is => 'ro',
@@ -189,12 +189,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2024
+© Michal Josef Špaček 2021-2025
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

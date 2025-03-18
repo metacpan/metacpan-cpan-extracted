@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
 package Alien::libtickit;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,7 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<libtickit> version 0.4.4.
+This module bundles F<libtickit> version 0.4.5.
 
 =head1 METHODS
 

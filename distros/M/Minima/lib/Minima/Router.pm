@@ -9,6 +9,7 @@ use Router::Simple;
 
 field $router = Router::Simple->new;
 field %special;
+field $prefix = 'Controller';
 
 method match ($env)
 {
@@ -30,7 +31,7 @@ method read_file ($file)
         my ($method, $pattern, $controller, $action) = split;
 
         # Fix controller prefix
-        $controller =~ s/^:+/Controller::/;
+        $controller =~ s/^:+/${prefix}::/;
 
         # Build destination and options
         my %dest = ( controller => $controller, action => $action );
@@ -70,6 +71,11 @@ method clear_routes
 {
     $router  = Router::Simple->new;
     %special = ( );
+}
+
+method set_prefix ($new)
+{
+    $prefix = $new;
 }
 
 __END__
@@ -174,8 +180,9 @@ exception. If desired, the method can utilize this argument.
 
 The name of the controller that will respond to this match, returned in
 the match hash reference with the key C<controller>. If the controller
-name starts with C<:>, then C<Controller:> will be automatically
-prepended.
+name starts with C<:>, a prefix (defaulting to C<Controller:>) is
+automatically prepended. This prefix can be customized using
+L<C<set_prefix>|/set_prefix>.
 
 This may be left blank only if the next column is also blank, which will
 be translated as C<undef> in the match hash.
@@ -249,6 +256,13 @@ that in order to perform the intended action.
 Parses the routes file given as an argument and registers the routes.
 This method can be called multiple times on the same instance to process
 more than one file.
+
+=head2 set_prefix
+
+    method set_prefix ($prefix)
+
+Sets the prefix for completing controller names when using the C<:>
+notation. Defaults to C<Controller>. See L</Controller> for details.
 
 =head1 SEE ALSO
 

@@ -27,5 +27,5 @@ requires:
   Path::Tiny: '0.146'
   Socket::MsgHdr: '0.05'
   YAML: '1.31'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

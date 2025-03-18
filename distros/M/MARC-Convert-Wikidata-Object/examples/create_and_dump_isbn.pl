@@ -31,9 +31,10 @@ p $obj;
 #             Readonly
 #     private methods (0)
 #     internals: {
-#         _isbn        978-80-00-05046-1 (Business::ISBN13),
 #         collective   0,
+#         _isbn        978-80-00-05046-1 (Business::ISBN13),
 #         isbn         "978-80-00-05046-1" (dualvar: 978),
-#         publisher    MARC::Convert::Wikidata::Object::Publisher
+#         publisher    MARC::Convert::Wikidata::Object::Publisher,
+#         valid        1
 #     }
 # }

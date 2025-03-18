@@ -1,0 +1,17 @@
+Determining if the include file stdafx.h exists failed with the following output:
+Change Dir: /home/syber/meia/plus/XS-libdwarf/libdwarf-code-0.11.1/build/CMakeFiles/CMakeScratch/TryCompile-lyL4P9
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5620a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5620a.dir/build.make CMakeFiles/cmTC_5620a.dir/build
+gmake[1]: Entering directory '/home/syber/meia/plus/XS-libdwarf/libdwarf-code-0.11.1/build/CMakeFiles/CMakeScratch/TryCompile-lyL4P9'
+Building C object CMakeFiles/cmTC_5620a.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -O2 -fPIC  -o CMakeFiles/cmTC_5620a.dir/CheckIncludeFile.c.o -c /home/syber/meia/plus/XS-libdwarf/libdwarf-code-0.11.1/build/CMakeFiles/CMakeScratch/TryCompile-lyL4P9/CheckIncludeFile.c
+/home/syber/meia/plus/XS-libdwarf/libdwarf-code-0.11.1/build/CMakeFiles/CMakeScratch/TryCompile-lyL4P9/CheckIncludeFile.c:1:10: fatal error: stdafx.h: No such file or directory
+    1 | #include <stdafx.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_5620a.dir/build.make:78: CMakeFiles/cmTC_5620a.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory '/home/syber/meia/plus/XS-libdwarf/libdwarf-code-0.11.1/build/CMakeFiles/CMakeScratch/TryCompile-lyL4P9'
+gmake: *** [Makefile:127: cmTC_5620a/fast] Error 2
+
+
+

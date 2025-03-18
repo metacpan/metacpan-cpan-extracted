@@ -1,6 +1,6 @@
 package Tie::Hash::DBD;
 
-our $VERSION = "0.24";
+our $VERSION = "0.25";
 
 use strict;
 use warnings;
@@ -74,6 +74,12 @@ my %DB = (
 	},
     );
 
+sub _ro_fail {
+    my ($self, $action) = @_;
+    my $error = "You cannot $action when in read-only mode";
+    $self->{ro} == 1 ? warn $error : die $error;
+    } # ro_fail
+
 sub _create_table {
     my ($cnf, $tmp) = @_;
     $cnf->{tmp} = $tmp;
@@ -91,6 +97,7 @@ sub _create_table {
 	};
     $exists and return;	# Table already exists
 
+    $cnf->{ro} and return _ro_fail ($cnf, "create tables");
     my $temp = $DB{$dbt}{temp};
     $cnf->{tmp} or $temp = "";
     local $dbh->{AutoCommit} = 1 unless $dbt eq "CSV" || $dbt eq "Unify";
@@ -136,6 +143,7 @@ sub TIEHASH {
 	trh => 0,
 	ktp => $cnf->{t_key},
 	vtp => $cnf->{t_val},
+	ro  => 0,
 
 	_en => undef,
 	_de => undef,
@@ -150,6 +158,8 @@ sub TIEHASH {
 	$opt->{trh} and $h->{trh} = $opt->{trh};
 	$opt->{ktp} and $h->{ktp} = $opt->{ktp};
 	$opt->{vtp} and $h->{vtp} = $opt->{vtp};
+
+	exists $opt->{ro} and $h->{ro} = $opt->{ro};
 
 	if (my $str = $opt->{str}) {
 	    if ($str eq "Sereal") {
@@ -176,10 +186,28 @@ sub TIEHASH {
 		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
 		$h->{_de} = sub {       $j->decode ($_[0]) };
 		}
+	    elsif ($str eq "JSON::MaybeXS") {
+		require JSON::MaybeXS;
+		my $j = JSON::MaybeXS->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
+		}
+	    elsif ($str eq "JSON::SIMD") {
+		require JSON::SIMD;
+		my $j = JSON::SIMD->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
+		}
 	    elsif ($str eq "JSON::Syck") {
 		require JSON::Syck;
 		$h->{_en} = sub { JSON::Syck::Dump ($_[0]) };
 		$h->{_de} = sub { JSON::Syck::Load ($_[0]) };
+		}
+	    elsif ($str eq "JSON::XS") {
+		require JSON::XS;
+		my $j = JSON::XS->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
 		}
 	    elsif ($str eq "YAML") {
 		require YAML;
@@ -228,9 +256,9 @@ sub TIEHASH {
 
     my $tbl = $h->{tbl};
 
-    $h->{ins} = $dbh->prepare ("insert into $tbl ($f_k, $f_v) values (?, ?)");
-    $h->{del} = $dbh->prepare ("delete from $tbl where $f_k = ?");
-    $h->{upd} = $dbh->prepare ("update $tbl set $f_v = ? where $f_k = ?");
+    $h->{ins} = $dbh->prepare ("insert into $tbl ($f_k, $f_v) values (?, ?)") unless $h->{ro};
+    $h->{del} = $dbh->prepare ("delete from $tbl where $f_k = ?")             unless $h->{ro};
+    $h->{upd} = $dbh->prepare ("update $tbl set $f_v = ? where $f_k = ?")     unless $h->{ro};
     $h->{sel} = $dbh->prepare ("select $f_v from $tbl where $f_k = ?");
     $h->{cnt} = $dbh->prepare ("select count(*) from $tbl");
     $h->{ctv} = $dbh->prepare ("select count(*) from $tbl where $f_k = ?");
@@ -270,6 +298,7 @@ sub _unstream {
 
 sub STORE {
     my ($self, $key, $value) = @_;
+    $self->{ro} and return _ro_fail ($self, "store entries");
     my $k = $self->{asc} ? unpack "H*", $key : $key;
     my $v = $self->_stream ($value);
     $self->{trh} and $self->{dbh}->begin_work unless $self->{dbt} eq "SQLite";
@@ -282,6 +311,7 @@ sub STORE {
 
 sub DELETE {
     my ($self, $key) = @_;
+    $self->{ro} and return _ro_fail ($self, "delete entries");
     $self->{asc} and $key = unpack "H*", $key;
     $self->{trh} and $self->{dbh}->begin_work unless $self->{dbt} eq "SQLite";
     $self->{sel}->execute ($key);
@@ -298,6 +328,7 @@ sub DELETE {
 
 sub CLEAR {
     my $self = shift;
+    $self->{ro} and return _ro_fail ($self, "clear entries");
     $self->{dbh}->do ("$DB{$self->{dbt}}{clear} $self->{tbl}");
     } # CLEAR
 
@@ -352,6 +383,12 @@ sub drop {
     $self->{tmp} = 1;
     } # drop
 
+sub readonly {
+    my $self = shift;
+    @_ and $self->{ro} = shift;
+    return $self->{ro};
+    } # readonly
+
 sub DESTROY {
     my $self = shift;
     my $dbh = $self->{dbh} or return;
@@ -364,6 +401,7 @@ sub DESTROY {
     delete $self->{$_} for qw( _de _en );
     if ($self->{tmp}) {
 	$dbh->{AutoCommit} or $dbh->rollback;
+	$self->{ro} and return _ro_fail ($self, "drop tables");
 	$dbh->do ("drop table ".$self->{tbl});
 	}
     $dbh->{AutoCommit} or $dbh->commit;
@@ -395,6 +433,7 @@ Tie::Hash::DBD - tie a plain hash to a database table
       fld => "h_value",
       str => "Storable",
       trh => 0,
+      ro  => 0,
       };
 
   $hash{key} = $value;  # INSERT
@@ -402,6 +441,10 @@ Tie::Hash::DBD - tie a plain hash to a database table
   delete $hash{key};    # DELETE
   $value = $hash{key};  # SELECT
   %hash = ();           # CLEAR
+
+  my $readonly = tied (%hash)->readonly ();
+  tied (%hash)->readonly (1);
+  $hash{foo} = 42; # FAIL
 
 =head1 DESCRIPTION
 
@@ -501,11 +544,19 @@ is C<h_value>.
 Defines the type of the fld field in the database table.  The default is
 depending on the underlying database and most likely some kind of BLOB.
 
+=item ro
+
+Set handle to read-only for this tie. Useful when using existing tables or
+views than cannot be updated.
+
+When attempting to alter data (add, delete, change) a warning is issued
+and the action is ignored.
+
 =item str
 
 Defines the required persistence module.   Currently supports the use of
-C<Storable>, C<Sereal>,  C<JSON>, C<JSON::Syck>,  C<YAML>, C<YAML::Syck>
-and C<XML::Dumper>.
+C<Storable>, C<Sereal>, C<JSON>, C<JSON::MaybeXS>, C<JSON::SIMD>, C<JSON::Syck>,
+C<JSON::XS>, C<YAML>, C<YAML::Syck> and C<XML::Dumper>.
 
 The default is undefined.
 
@@ -539,7 +590,10 @@ Here is a table of supported data types given a data structure like this:
  Storable      x   x   x   x   x   x   x   x   x   x   -   -   -   -   -
  Sereal        x   x   x   x   x   x   x   x   x   x   x   x   -   -   -
  JSON          x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
- JSON::Syck    x   x   x   x   x   -   -   x   x   x   -   x   -   -   -
+ JSON::MaybeXS x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
+ JSON::SIMD    x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
+ JSON::Syck    x   x   x   x   -   x   -   x   x   x   -   x   -   -   -
+ JSON::XS      x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
  YAML          x   x   x   x   x   -   x   x   x   x   x   x   -   -   -
  YAML::Syck    x   x   x   x   x   -   x   x   x   x   -   x   -   -   -
  XML::Dumper   x   x   x   x   x   x   x   x   x   x   -   x   -   -   -
@@ -575,7 +629,7 @@ about the data is also lost, which includes the C<UTF8> flag.
 If you want to preserve the C<UTF8> flag you will need to store internal
 flags and use the streamer option:
 
-  tie my %hash, "Tie::Hash::DBD", { str => "Storable" };
+  tie my %hash, "Tie::Hash::DBD", "dbi:Pg:", { str => "Storable" };
 
 If you do not want the performance impact of Storable just to be able to
 store and retrieve UTF-8 values, there are two ways to do so:
@@ -600,7 +654,7 @@ C<Tie::Hash::DBD> stores keys and values as binary data. This means that
 all structure is lost when the data is stored and not available when the
 data is restored. To maintain deep structures, use the streamer option:
 
-  tie my %hash, "Tie::Hash::DBD", { str => "Storable" };
+  tie my %hash, "Tie::Hash::DBD", "dbi:Pg:", { str => "Storable" };
 
 Note that changes inside deep structures do not work. See L</TODO>.
 
@@ -612,7 +666,33 @@ If a table was used with persistence, the table will not be dropped when
 the C<untie> is called.  Dropping can be forced using the C<drop> method
 at any moment while the hash is tied:
 
-  (tied %hash)->drop;
+  tied (%hash)->drop;
+
+=head2 readonly
+
+You can inquire or set the readonly status of the bound hash. Note that
+setting read-only also forbids to delete generated temporary table.
+
+  my $readonly = tied (%hash)->readonly ();
+  tied (%hash)->readonly (1);
+
+Setting read-only accepts 3 states:
+
+=over 2
+
+=item false (C<undef>, C<"">, C<0>)
+
+This will (re)set the hash to read-write.
+
+=item C<1>
+
+This will set read-only. When attempting to make changes, a warning is given.
+
+=item C<2>
+
+This will set read-only. When attempting to make changes, the process will die.
+
+=back
 
 =head1 PREREQUISITES
 
@@ -695,7 +775,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 H.Merijn Brand
+Copyright (C) 2010-2024 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
@@ -703,8 +783,8 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 DBI, Tie::DBI, Tie::Hash, Tie::Array::DBD, Tie::Hash::RedisDB, Redis::Hash,
-DBM::Deep, Storable, Sereal, JSON, JSON::Syck, YAML, YAML::Syck, XML::Dumper,
-Bencode, FreezeThaw
+DBM::Deep, Storable, Sereal, JSON, JSON::MaybeXS, JSON::SIMD, JSON::Syck,
+YAML, YAML::Syck, XML::Dumper, Bencode, FreezeThaw
 
 =cut
 

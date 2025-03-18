@@ -7,10 +7,10 @@ requires   "YAML::PP";
 requires   "version";
 
 recommends "HTTP::Tiny"               => "0.083";
-recommends "IO::Socket::SSL"          => "1.35";
+recommends "IO::Socket::SSL"          => "1.36";
 
 suggests   "HTTP::Tiny"               => "0.088";
-suggests   "IO::Socket::SSL"          => "2.084";
+suggests   "IO::Socket::SSL"          => "2.089";
 suggests   "JSON::MaybeXS"            => "1.004005";
 suggests   "Module::CoreList"         => "5.20240320";
 suggests   "Perl::Tidy"               => "20230912";
@@ -28,5 +28,5 @@ on "configure" => sub {
 on "test" => sub {
     requires   "Test::More";
 
-    suggests   "Test::More"               => "1.302198";
+    suggests   "Test::More"               => "1.302207";
     };

@@ -252,6 +252,7 @@ docs/SparklineGroupsResponse.md
 docs/SpinnerResponse.md
 docs/SplitResultResponse.md
 docs/StyleResponse.md
+docs/StylesResponse.md
 docs/TaskRunResultResponse.md
 docs/TextBoxResponse.md
 docs/TextItemResponse.md
@@ -322,6 +323,7 @@ docs/BaseOperateOptions.md
 docs/CharacterCountOptions.md
 docs/CombinationSourceData.md
 docs/ConvertTextOptions.md
+docs/ConvertWorkbookOptions.md
 docs/ConvertWorksheetOptions.md
 docs/DataOutputLocation.md
 docs/ExtractTextOptions.md
@@ -332,6 +334,7 @@ docs/RemoveCharactersOptions.md
 docs/RemoveDuplicatesOptions.md
 docs/ScopeItem.md
 docs/ScopeOptions.md
+docs/SpecifyCellsObject.md
 docs/SpecifyWordsCountOptions.md
 docs/SplitTextOptions.md
 docs/TablePositionInfo.md
@@ -543,6 +546,7 @@ docs/PostConvertWorkbookToJsonRequest.md
 docs/PostConvertWorkbookToSQLRequest.md
 docs/PostConvertWorkbookToCSVRequest.md
 docs/PostConvertWorksheetToImageRequest.md
+docs/PostConvertWorkbookRequest.md
 docs/PostExportRequest.md
 docs/PostWorkbookExportXMLRequest.md
 docs/PostWorkbookImportJsonRequest.md
@@ -618,6 +622,7 @@ docs/PostFitTallToPagesRequest.md
 docs/GetWorksheetPicturesRequest.md
 docs/GetWorksheetPictureWithFormatRequest.md
 docs/PutWorksheetAddPictureRequest.md
+docs/AddPictureInCellRequest.md
 docs/PostWorksheetPictureRequest.md
 docs/DeleteWorksheetPictureRequest.md
 docs/DeleteWorksheetPicturesRequest.md
@@ -721,6 +726,7 @@ docs/PutWorkbookBackgroundRequest.md
 docs/DeleteWorkbookBackgroundRequest.md
 docs/PutWorkbookWaterMarkerRequest.md
 docs/GetPageCountRequest.md
+docs/GetAllStylesRequest.md
 docs/GetWorksheetsRequest.md
 docs/GetWorksheetWithFormatRequest.md
 docs/PutChangeVisibilityWorksheetRequest.md
@@ -1037,6 +1043,7 @@ lib/AsposeCellsCloud/Object/SparklineGroupsResponse.pm
 lib/AsposeCellsCloud/Object/SpinnerResponse.pm
 lib/AsposeCellsCloud/Object/SplitResultResponse.pm
 lib/AsposeCellsCloud/Object/StyleResponse.pm
+lib/AsposeCellsCloud/Object/StylesResponse.pm
 lib/AsposeCellsCloud/Object/TaskRunResultResponse.pm
 lib/AsposeCellsCloud/Object/TextBoxResponse.pm
 lib/AsposeCellsCloud/Object/TextItemResponse.pm
@@ -1107,6 +1114,7 @@ lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
 lib/AsposeCellsCloud/Object/CharacterCountOptions.pm
 lib/AsposeCellsCloud/Object/CombinationSourceData.pm
 lib/AsposeCellsCloud/Object/ConvertTextOptions.pm
+lib/AsposeCellsCloud/Object/ConvertWorkbookOptions.pm
 lib/AsposeCellsCloud/Object/ConvertWorksheetOptions.pm
 lib/AsposeCellsCloud/Object/DataOutputLocation.pm
 lib/AsposeCellsCloud/Object/ExtractTextOptions.pm
@@ -1117,6 +1125,7 @@ lib/AsposeCellsCloud/Object/RemoveCharactersOptions.pm
 lib/AsposeCellsCloud/Object/RemoveDuplicatesOptions.pm
 lib/AsposeCellsCloud/Object/ScopeItem.pm
 lib/AsposeCellsCloud/Object/ScopeOptions.pm
+lib/AsposeCellsCloud/Object/SpecifyCellsObject.pm
 lib/AsposeCellsCloud/Object/SpecifyWordsCountOptions.pm
 lib/AsposeCellsCloud/Object/SplitTextOptions.pm
 lib/AsposeCellsCloud/Object/TablePositionInfo.pm
@@ -1328,6 +1337,7 @@ lib/AsposeCellsCloud/Request/PostConvertWorkbookToJsonRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorkbookToSQLRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorksheetToImageRequest.pm
+lib/AsposeCellsCloud/Request/PostConvertWorkbookRequest.pm
 lib/AsposeCellsCloud/Request/PostExportRequest.pm
 lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm
 lib/AsposeCellsCloud/Request/PostWorkbookImportJsonRequest.pm
@@ -1403,6 +1413,7 @@ lib/AsposeCellsCloud/Request/PostFitTallToPagesRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetPicturesRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetPictureWithFormatRequest.pm
 lib/AsposeCellsCloud/Request/PutWorksheetAddPictureRequest.pm
+lib/AsposeCellsCloud/Request/AddPictureInCellRequest.pm
 lib/AsposeCellsCloud/Request/PostWorksheetPictureRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorksheetPictureRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorksheetPicturesRequest.pm
@@ -1506,6 +1517,7 @@ lib/AsposeCellsCloud/Request/PutWorkbookBackgroundRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorkbookBackgroundRequest.pm
 lib/AsposeCellsCloud/Request/PutWorkbookWaterMarkerRequest.pm
 lib/AsposeCellsCloud/Request/GetPageCountRequest.pm
+lib/AsposeCellsCloud/Request/GetAllStylesRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetsRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetWithFormatRequest.pm
 lib/AsposeCellsCloud/Request/PutChangeVisibilityWorksheetRequest.pm

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright Toolchain Gang / CPAN Security group (c) 2023-2024 H.Merijn Brand
+# Copyright Toolchain Gang / CPAN Security group (c) 2023-2025 H.Merijn Brand
 
 require 5.014000;
 use strict;
@@ -84,7 +84,7 @@ package MY;
 
 sub postamble {
     my $make_sep = $^O eq "VMS" ? "," : "";
-    my $min_vsn  = (-d "xt" && -d "tmp" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
+    my $min_vsn  = (-d "xt" && -d "sandbox" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
 	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
@@ -110,15 +110,10 @@ sub postamble {
 	'test_used:	test',
 	'	prove -vwb sandbox/used-by.pl',
 	'',
-	'doc docs:		doc/CVE.md doc/CVE.html doc/CVE.man',
-	'doc/CVE.md:		lib/Test/CVE.pm',
-	'	pod2markdown  < $? > $@',
-	'doc/CVE.html:		lib/Test/CVE.pm',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/CVE.3:		lib/Test/CVE.pm',
-	'	pod2man       < $? > $@',
-	'doc/CVE.man:		doc/CVE.3',
-	'	nroff2man     < $? > $@',
+	'.PHONY:	doc',
+	'doc docs::	doc/Test-CVE.md',
+	'doc/Test-CVE.md:	lib/Test/CVE.pm',
+	'	perl doc/make-doc.pl',
 	'',
 	$min_vsn;
     } # postamble

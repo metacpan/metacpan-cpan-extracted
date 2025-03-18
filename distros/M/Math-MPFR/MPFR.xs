@@ -25,15 +25,6 @@ int nnum = 0; /* flag that is incremented whenever a string containing
 int nok_pok = 0; /* flag that is incremented whenever a scalar that is both
                  NOK and POK is passed to new or an overloaded operator */
 
-/* Has inttypes.h been included ? */
-int _has_inttypes(void) {
-#if defined MATH_MPFR_NEED_LONG_LONG_INT
-  return 1;
-#else
-  return 0;
-#endif
-}
-
 int NNW_val(pTHX) {
   /* return the numeric value of $Math::MPFR::NNW - ie the no. of non-numeric instances encountered */
   return (int)SvIV(get_sv("Math::MPFR::NNW", 0));
@@ -712,20 +703,12 @@ SV * Rmpfr_set_si(pTHX_ mpfr_t * p, SV * q, SV * round) {
 
 SV * Rmpfr_set_uj(pTHX_ mpfr_t * p, SV * q, SV * round) {
   CHECK_ROUNDING_VALUE
-#ifdef MATH_MPFR_NEED_LONG_LONG_INT
-  return newSViv(mpfr_set_uj(*p, SvUV(q), (mpfr_rnd_t)SvUV(round)));
-#else
-  croak("Rmpfr_set_uj not implemented on this build of perl");
-#endif
+  return newSViv(mpfr_set_uj(*p, (uintmax_t)SvUV(q), (mpfr_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_sj(pTHX_ mpfr_t * p, SV * q, SV * round) {
   CHECK_ROUNDING_VALUE
-#ifdef MATH_MPFR_NEED_LONG_LONG_INT
-  return newSViv(mpfr_set_sj(*p, SvIV(q), (mpfr_rnd_t)SvUV(round)));
-#else
-  croak("Rmpfr_set_sj not implemented on this build of perl");
-#endif
+  return newSViv(mpfr_set_sj(*p, (intmax_t)SvIV(q), (mpfr_rnd_t)SvUV(round)));
 }
 
 int Rmpfr_set_NV(pTHX_ mpfr_t * p, SV * q, unsigned int round) {
@@ -1317,13 +1300,8 @@ SV * Rmpfr_pow_ui(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_pow_uj(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-#if MPFR_VERSION >= 262656
-#  ifdef MATH_MPFR_NEED_LONG_LONG_INT
-    return newSViv(mpfr_pow_uj(*a, *b, (uintmax_t)SvUV(c), (mpfr_rnd_t)SvUV(round)));
-#  else
-    PERL_UNUSED_ARG4(a, b, c, round);
-    croak("Rmpfr_pow_uj not implemented for this build of perl");
-#  endif
+#if MPFR_VERSION >= 262656 /* 4.2.0 */
+  return newSViv(mpfr_pow_uj(*a, *b, (uintmax_t)SvUV(c), (mpfr_rnd_t)SvUV(round)));
 #else
   PERL_UNUSED_ARG4(a, b, c, round);
   croak("Rmpfr_pow_uj function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
@@ -1379,13 +1357,8 @@ SV * Rmpfr_pow_si(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_pow_sj(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-#if MPFR_VERSION >= 262656
-#  ifdef MATH_MPFR_NEED_LONG_LONG_INT
+#if MPFR_VERSION >= 262656   /* 4.2.0 */
     return newSViv(mpfr_pow_sj(*a, *b, (intmax_t)SvIV(c), (mpfr_rnd_t)SvUV(round)));
-#  else
-    PERL_UNUSED_ARG4(a, b, c, round);
-    croak("Rmpfr_pow_sj not implemented for this build of perl");
-#  endif
 #else
   PERL_UNUSED_ARG4(a, b, c, round);
   croak("Rmpfr_pow_sj function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
@@ -1398,7 +1371,7 @@ SV * Rmpfr_pow(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
 }
 
 SV * Rmpfr_powr(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-#if MPFR_VERSION >= 262656
+#if MPFR_VERSION >= 262656 /* 4.2.0 */
   return newSViv(mpfr_powr(*a, *b, *c, (mpfr_rnd_t)SvUV(round)));
 #else
   croak("Rmpfr_powr function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
@@ -1406,13 +1379,8 @@ SV * Rmpfr_powr(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
 }
 
 SV * Rmpfr_pown(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-#if MPFR_VERSION >= 262656
-#  ifdef MATH_MPFR_NEED_LONG_LONG_INT
-    return newSViv(mpfr_pown(*a, *b, (intmax_t)SvIV(c), (mpfr_rnd_t)SvUV(round)));
-#  else
-    PERL_UNUSED_ARG4(a, b, c, round);
-    croak("Rmpfr_pown not implemented for this build of perl");
-#  endif
+#if MPFR_VERSION >= 262656 /* 4.2.0 */
+  return newSViv(mpfr_pown(*a, *b, (intmax_t)SvIV(c), (mpfr_rnd_t)SvUV(round)));
 #else
   PERL_UNUSED_ARG4(a, b, c, round);
   croak("Rmpfr_pown function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
@@ -1420,7 +1388,7 @@ SV * Rmpfr_pown(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_compound_si(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-#if MPFR_VERSION >= 262656
+#if MPFR_VERSION >= 262656 /* 4.2.0 */
   return newSViv(mpfr_compound_si(*a, *b, (long)SvIV(c), (mpfr_rnd_t)SvUV(round)));
 #else
   PERL_UNUSED_ARG4(a, b, c, round);
@@ -1429,7 +1397,7 @@ SV * Rmpfr_compound_si(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_compound(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-#if MPFR_VERSION >= 262912
+#if MPFR_VERSION >= 262912 /* 4.3.0 */
   return newSViv(mpfr_compound(*a, *b, *c, (mpfr_rnd_t)SvUV(round)));
 #else
   PERL_UNUSED_ARG4(a, b, c, round);
@@ -1530,35 +1498,25 @@ int Rmpfr_cmp_si(mpfr_t * a, long b) {
 }
 
 int Rmpfr_cmp_uj(pTHX_ mpfr_t * a, UV b) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
   int ret;
   mpfr_t temp;
   mpfr_init2(temp, 64);
 
-  mpfr_set_uj(temp, b, GMP_RNDN);
+  mpfr_set_uj(temp, (uintmax_t)b, GMP_RNDN);
   ret = mpfr_cmp(*a, temp);
   mpfr_clear(temp);
   return ret;
-#else
-  PERL_UNUSED_ARG2(a, b);
-  croak("Rmpfr_cmp_uj is unavailable because MATH_MPFR_NEED_LONG_LONG_INT is not defined");
-#endif
 }
 
 int Rmpfr_cmp_sj(pTHX_ mpfr_t * a, IV b) {
-#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
   int ret;
   mpfr_t temp;
   mpfr_init2(temp, 64);
 
-  mpfr_set_sj(temp, b, GMP_RNDN);
+  mpfr_set_sj(temp, (intmax_t)b, GMP_RNDN);
   ret = mpfr_cmp(*a, temp);
   mpfr_clear(temp);
   return ret;
-#else
-  PERL_UNUSED_ARG2(a, b);
-  croak("Rmpfr_cmp_sj is unavailable because MATH_MPFR_NEED_LONG_LONG_INT is not defined");
-#endif
 }
 
 int Rmpfr_cmp_IV(pTHX_ mpfr_t *a, SV * b) {
@@ -2380,22 +2338,12 @@ SV * Rmpfr_set_si_2exp(pTHX_ mpfr_t * a, SV * b, SV * c, SV * round) {
 
 SV * Rmpfr_set_uj_2exp(pTHX_ mpfr_t * a, SV * b, SV * c, SV * round) {
   CHECK_ROUNDING_VALUE
-#ifdef MATH_MPFR_NEED_LONG_LONG_INT
-  return newSViv(mpfr_set_uj_2exp(*a, SvUV(b), SvIV(c), (mpfr_rnd_t)SvUV(round)));
-#else
-  PERL_UNUSED_ARG4(a, b, c, round);
-  croak ("Rmpfr_set_uj_2exp not implemented on this build of perl");
-#endif
+  return newSViv(mpfr_set_uj_2exp(*a, (uintmax_t)SvUV(b), (uintmax_t)SvIV(c), (mpfr_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_sj_2exp(pTHX_ mpfr_t * a, SV * b, SV * c, SV * round) {
   CHECK_ROUNDING_VALUE
-#ifdef MATH_MPFR_NEED_LONG_LONG_INT
-  return newSViv(mpfr_set_sj_2exp(*a, SvIV(b), SvIV(c), (mpfr_rnd_t)SvUV(round)));
-#else
-  PERL_UNUSED_ARG4(a, b, c, round);
-  croak ("Rmpfr_set_sj_2exp not implemented on this build of perl");
-#endif
+  return newSViv(mpfr_set_sj_2exp(*a, (intmax_t)SvIV(b), (intmax_t)SvIV(c), (mpfr_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_z(pTHX_ mpz_t * a, mpfr_t * b, SV * round) {
@@ -2552,6 +2500,7 @@ SV * Rmpfr_get_si(pTHX_ mpfr_t * a, SV * round) {
   return newSViv(mpfr_get_si(*a, (mpfr_rnd_t)SvUV(round)));
 }
 
+/* NOT to be made available if MATH_MPFR_NEED_LONG_LONG_INT is defined */
 SV * Rmpfr_get_uj(pTHX_ mpfr_t * a, SV * round) {
   CHECK_ROUNDING_VALUE
 #ifdef MATH_MPFR_NEED_LONG_LONG_INT
@@ -2562,6 +2511,7 @@ SV * Rmpfr_get_uj(pTHX_ mpfr_t * a, SV * round) {
 #endif
 }
 
+/* NOT to be made available if MATH_MPFR_NEED_LONG_LONG_INT is defined */
 SV * Rmpfr_get_sj(pTHX_ mpfr_t * a, SV * round) {
   CHECK_ROUNDING_VALUE
 #ifdef MATH_MPFR_NEED_LONG_LONG_INT
@@ -9215,10 +9165,6 @@ SV * _overload_fmod_eq (pTHX_ SV * a, mpfr_t *b, SV * third) {
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
 
 PROTOTYPES: DISABLE
-
-
-int
-_has_inttypes ()
 
 
 int

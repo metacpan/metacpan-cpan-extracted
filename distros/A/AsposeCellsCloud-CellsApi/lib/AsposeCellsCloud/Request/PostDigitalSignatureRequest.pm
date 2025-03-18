@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostDigitalSignatureRequest.name :   ,
-# PostDigitalSignatureRequest.digitalsignaturefile :   ,
-# PostDigitalSignatureRequest.password :   ,
-# PostDigitalSignatureRequest.folder :   ,
-# PostDigitalSignatureRequest.storageName :    
+# PostDigitalSignatureRequest.name : The file name.  ,
+# PostDigitalSignatureRequest.digitalsignaturefile : The digital signature file path should include both the folder and the file name, along with the extension.  ,
+# PostDigitalSignatureRequest.password : The password needed to open an Excel file.  ,
+# PostDigitalSignatureRequest.folder : The folder where the file is situated.  ,
+# PostDigitalSignatureRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_digital_signature' } = { 
-    	summary => '',
+    	summary => 'Excel file digital signature.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -133,35 +133,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'digitalsignaturefile' => {
      	datatype => 'string',
      	base_name => 'digitalsignaturefile',
-     	description => '',
+     	description => 'The digital signature file path should include both the folder and the file name, along with the extension.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

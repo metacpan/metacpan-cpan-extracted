@@ -4,7 +4,8 @@ use Math::MPFR qw(:mpfr);
 use Config;
 use Test::More;
 
-if(Math::MPFR::_has_longlong()) {
+if(Math::MPFR::_has_longlong()) { # MATH_MPFR_NEED_LONG_LONG_INT is defined
+  # Note: The Math::MPFR objects have 54-bit precision.
   my $fr1 = Math::MPFR->new(2 ** 64);
   my $fr2 = Math::MPFR->new(2 ** 63);
   my $uv  = Math::MPFR->new(~0);
@@ -22,11 +23,11 @@ if(Math::MPFR::_has_longlong()) {
 }
 else {
 
-  eval { Rmpfr_cmp_uj(Math::MPFR->new(0), 0); };
-  like($@, qr/^Rmpfr_cmp_uj is unavailable because/, '$@ set as expected for Rmpfr_cmp_uj');
-
-  eval { Rmpfr_cmp_sj(Math::MPFR->new(0), 0); };
-  like($@, qr/^Rmpfr_cmp_sj is unavailable because/, '$@ set as expected for Rmpfr_cmp_sj');
+  cmp_ok( Rmpfr_cmp_uj(Math::MPFR->new(~0), ~0), '==', Rmpfr_cmp_ui(Math::MPFR->new(~0), ~0), "Rmpfr_cmp_uj and Rmpfr_cmp_ui agree" );
+  my $s_max = (~0) >> 1;
+  $s_max *= -1;
+  print "\$s_max: $s_max\n";
+  cmp_ok( Rmpfr_cmp_sj(Math::MPFR->new($s_max), $s_max), '==', Rmpfr_cmp_si(Math::MPFR->new($s_max), $s_max), "Rmpfr_cmp_sj and Rmpfr_cmp_si agree" );
 
   if($Config{ivsize} == 8) {
     my $fr1 = Math::MPFR->new(2 ** 64);

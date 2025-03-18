@@ -1,5 +1,19 @@
 Revision history for Path-Tiny
 
+0.148     2025-03-17 07:18:28-04:00 America/New_York
+
+    [Bug fixes]
+    - Fixed problems with exceptions.
+
+    [Documentation]
+    - Cross-referenced slurp and lines.
+
+0.147     2025-03-10 22:11:06-04:00 America/New_York (TRIAL RELEASE)
+
+    [Changes]
+
+    - Invalid arguments when hash references are expected throw exceptions.
+
 0.146     2024-05-08 08:27:52-04:00 America/New_York
 
     - No changes from 0.145-TRIAL
@@ -328,7 +342,7 @@ Revision history for Path-Tiny
     - The 'absolute' method now always returns an absolute path, even if a
       user provided a relative path for the base path.  The old, odd
       behavior was documented, but people often don't read docs.  The new
-      behavior avoids suprises.
+      behavior avoids surprises.
 
     [Additions]
 
@@ -1072,7 +1086,7 @@ Revision history for Path-Tiny
 
     [CHANGED]
 
-    - slurp/spew/etc and openr/openw/etc now repect default layers
+    - slurp/spew/etc and openr/openw/etc now respect default layers
       set by -C or the open pragma
 
     - spew and append can now be given array references to output

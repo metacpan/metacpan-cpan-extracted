@@ -124,7 +124,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.64';
+    our $VERSION = '0.65';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -202,9 +202,26 @@ sub new {
 
     }
 
+    if($type == _MATH_GMPq_T) {
+      if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+      my $ret = Rmpz_init();
+      Rmpz_set_q($ret, $arg1);
+      return $ret;
+    }
+
     if($type == _MATH_GMPz_T || $type == _MATH_GMP_T) { # Math::GMPz or Math::GMP object
       if(@_) {die "Too many arguments supplied to new() - expected only one"}
       return Rmpz_init_set($arg1);
+    }
+
+    if($type == _MATH_MPFR_T) {
+      if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+      die "Cannot assign Inf or NaN to a Math::GMPz object"
+        if(Math::MPFR::Rmpfr_nan_p($arg1) || Math::MPFR::Rmpfr_inf_p($arg1));
+      my $ret = Rmpz_init();
+      Math::MPFR::Rmpfr_get_z($ret, $arg1, 1); # truncate Math::MPFR object $arg1 to an
+                                               # integer value, and copy that value to $ret.
+      return $ret;
     }
 
     if($type == -1) { # Math::BigInt

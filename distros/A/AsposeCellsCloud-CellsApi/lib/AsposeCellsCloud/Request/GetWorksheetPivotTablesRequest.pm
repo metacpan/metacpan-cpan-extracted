@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPivotTablesRequest.name :   ,
-# GetWorksheetPivotTablesRequest.sheetName :   ,
-# GetWorksheetPivotTablesRequest.folder :   ,
-# GetWorksheetPivotTablesRequest.storageName :    
+# GetWorksheetPivotTablesRequest.name : The file name.  ,
+# GetWorksheetPivotTablesRequest.sheetName : The worksheet name.  ,
+# GetWorksheetPivotTablesRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetPivotTablesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_tables' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of pivottables  in the worksheet.',
         params => $params,
         returns => 'PivotTablesResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

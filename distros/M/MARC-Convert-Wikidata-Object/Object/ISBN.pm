@@ -12,7 +12,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has collective => (
 	is => 'ro',
@@ -27,6 +27,10 @@ has isbn => (
 );
 
 has publisher => (
+	is => 'ro',
+);
+
+has valid => (
 	is => 'ro',
 );
 
@@ -63,6 +67,12 @@ sub BUILD {
 		}
 	}
 
+	# Check valid.
+	if (! defined $self->{'valid'}) {
+		$self->{'valid'} = 1;
+	}
+	check_bool($self, 'valid');
+
 	return;
 }
 
@@ -88,6 +98,7 @@ MARC::Convert::Wikidata::Object::ISBN - Bibliographic Wikidata object for ISBN n
  my $isbn = $obj->isbn;
  my $publisher = $obj->publisher;
  my $type = $obj->type;
+ my $valid = $obj->valid;
 
 =head1 METHODS
 
@@ -134,6 +145,12 @@ Instance of MARC::Convert::Wikidata::Object::Publisher.
 
 Default value is undef.
 
+=item * C<valid>
+
+Flag if ISBN is valid or not.
+
+Default value is 1 (valid),
+
 =back
 
 =head2 C<collective>
@@ -176,6 +193,14 @@ Get type of ISBN number (10 or 13 character length)
 
 Returns number (10 or 13).
 
+=head2 C<valid>
+
+ my $valid = $obj->valid;
+
+Get valid flag.
+
+Returns boolean (0/1).
+
 =head1 ERRORS
 
  new():
@@ -185,6 +210,9 @@ Returns number (10 or 13).
          ISBN cover '%s' isn't valid.
          From check_isa():
                  Parameter 'publisher' must be a 'MARC::Convert::Wikidata::Object::Publisher' object.
+         From check_bool():
+                 Parameter '%s' must be a bool (0/1).
+                         Value: %s       
 
 =head1 EXAMPLE1
 
@@ -221,10 +249,11 @@ Returns number (10 or 13).
  #             Readonly
  #     private methods (0)
  #     internals: {
- #         _isbn        978-80-00-05046-1 (Business::ISBN13),
  #         collective   0,
+ #         _isbn        978-80-00-05046-1 (Business::ISBN13),
  #         isbn         "978-80-00-05046-1" (dualvar: 978),
- #         publisher    MARC::Convert::Wikidata::Object::Publisher
+ #         publisher    MARC::Convert::Wikidata::Object::Publisher,
+ #         valid        1
  #     }
  # }
 
@@ -259,12 +288,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2024
+© Michal Josef Špaček 2021-2025
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

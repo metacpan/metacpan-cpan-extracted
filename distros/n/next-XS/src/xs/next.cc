@@ -82,13 +82,12 @@ static FORCEINLINE SV* _make_shared_fqn (pTHX_ GV* gv) {
     HV* stash = GvSTASH(gv);
     STRLEN pkglen = HvNAMELEN(stash);
     STRLEN fqnlen = pkglen + GvNAMELEN(gv) + 2;
-    char fqn[fqnlen+1];
-    memcpy(fqn, HvNAME(stash), pkglen);
-    fqn[pkglen] = ':';
-    fqn[pkglen+1] = ':';
-    memcpy(fqn + pkglen + 2, GvNAME(gv), GvNAMELEN(gv));
-    fqn[fqnlen] = 0;
-    return newSVpvn_share(fqn, (HvNAMEUTF8(stash) || GvNAMEUTF8(gv)) ? -(I32)fqnlen : (I32)fqnlen, 0);
+    std::string fqn;
+    fqn.reserve(fqnlen+1);
+    fqn.append(HvNAME(stash), pkglen);
+    fqn += "::";
+    fqn.append(GvNAME(gv), GvNAMELEN(gv));
+    return newSVpvn_share(fqn.c_str(), (HvNAMEUTF8(stash) || GvNAMEUTF8(gv)) ? -(I32)fqnlen : (I32)fqnlen, 0);
 }
 
 static FORCEINLINE void _throw_no_next_method (HV* selfstash, GV* context) {

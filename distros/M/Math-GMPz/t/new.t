@@ -4,7 +4,7 @@ use Math::GMPz qw(:mpz);
 use Math::BigFloat;
 use Config;
 
-print "1..4\n";
+print "1..6\n";
 
 print "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
 
@@ -181,4 +181,51 @@ if($@ =~ /is not a valid base 10 integer/) {$ok .= 'm'}
 
 if($ok eq 'abcdefghijklm') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
+
+$ok = '';
+
+# Test 5 tests new behaviour added in Math-GMPz-0.65.
+
+eval { require Math::GMP;};
+unless($@) {
+  my $gmp = Math::GMP->new(12345);
+  my $z = Math::GMPz->new($gmp);
+  $ok .= 'a' if $z == 12345;
+}
+else {
+  warn "Could not load Math::GMP";
+  $ok .= 'a';
+}
+
+eval { require Math::GMPq;};
+unless($@) {
+  my $mpq = Math::GMPq->new(12345.987);
+  my $z = Math::GMPz->new($mpq);
+  $ok .= 'b' if $z == 12345;
+}
+else {
+  warn "Could not load Math::GMPq";
+  $ok .= 'b';
+}
+
+eval { require Math::MPFR;};
+unless($@) {
+  my $fr = Math::MPFR->new(1234.5987);
+  my $z = Math::GMPz->new($fr);
+  $ok .= 'c' if $z == 1234;
+}
+else {
+  warn "Could not load Math::MPFR";
+  $ok .= 'c';
+}
+
+if($ok eq 'abc') {print "ok 5\n"}
+else {print "not ok 5 $ok\n"}
+
+# The GMP documentation says that the following should succeed:
+my $z = Math::GMPz->new("1234  \n 56 \t 78");
+if($z == 12345678) { print "ok 6\n" }
+else {print "not ok 6 $z\n" }
+
+
 

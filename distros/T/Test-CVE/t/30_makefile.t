@@ -62,6 +62,12 @@ WriteMakeFile (
     "VERSION"	,=> "1.23",
     );
 ##
+require 5.014;
+WriteMakeFile (
+    "NAME"	,=> "Foo", # Comment
+    "VERSION"	,=> "1.23",
+    );
+##
 use v5.14.1;
 WriteMakeFile ( NAME	=> 
 "Foo"

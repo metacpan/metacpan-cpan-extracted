@@ -9,7 +9,7 @@ Tk::ListEntry - BrowseEntry like widget without button
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.05';
 
 use Tk;
 require Tk::PopList;
@@ -43,7 +43,9 @@ By default set to false. If you set it you can use the entry widget to filter th
 
 =item Switch: B<-motionselect>
 
-See L<Tk::PopList>.
+Default value 1
+
+Selects list item when set hoovering over it.
 
 =item Switch: B<-popdirection>
 
@@ -80,6 +82,7 @@ sub Populate {
 		-selectcall => ['EntrySelect', $self],
 		-widget => $entry,
 	);
+	$list->bind('<Button-1>',[$self, 'ListClick', Ev('y')]);
 	$self->Advertise(Entry => $entry);
 	$self->Advertise(List => $list);
 	$list->Subwidget('List')->bind('<Button-1>', [$list, 'Select']);
@@ -87,6 +90,7 @@ sub Populate {
 	$entry->bind('<Down>', [$self, 'keyDown']);
 	$entry->bind('<End>', [$self, 'keyEnd']);
 	$entry->bind('<Home>', [$self, 'keyHome']);
+	$entry->bind('<Escape>', [$list, 'popDown']);
 	$entry->bind('<FocusOut>', [$list, 'popDown']);
 	$entry->bind('<KeyRelease>', [$self, 'filter']);
 	$entry->bind('<Return>', [$self, 'keyReturn']);
@@ -116,10 +120,8 @@ sub Populate {
 
 sub EntrySelect {
 	my ($self, $select) = @_;
-#	print "EntrySelect\n";
 	my $entry = $self->Subwidget('Entry');
 	if (defined $select) {
-#		print "selected $select\n";
 		$entry->delete(0, 'end');
 		$entry->insert('end', $select);
 	}
@@ -137,9 +139,17 @@ sub filter {
 sub keyDown {
 	my $self = shift;
 	my $l = $self->Subwidget('List');
+	my $hl = $l->Subwidget('List');
+	my ($sel) = $hl->selectionGet;
 	if ($l->ismapped) {
-		$l->NavDown
+		unless (defined $sel) {
+			$hl->selectionSet(0) unless defined $sel;
+			$hl->anchorSet(0) unless defined $sel;
+		} else {
+			$l->NavDown
+		}
 	} else {
+		$hl->anchorClear;
 		$l->popUp
 	}
 }
@@ -169,7 +179,8 @@ sub keyHome {
 sub keyReturn {
 	my $self = shift;
 	my $l = $self->Subwidget('List');
-	if ($l->ismapped) {
+	my @sel = $l->Subwidget('List')->selectionGet;
+	if (($l->ismapped) and (@sel)) {
 		$l->Select
 	} else {
 		my $e = $self->Subwidget('Entry');
@@ -184,6 +195,20 @@ sub keyUp {;
 	if ($l->ismapped) {
 		$l->NavUp
 	} 
+}
+
+#This method is a hack to make the ListEntry
+#also work with -motionselect disabled
+
+sub ListClick {
+	my ($self, $y) = @_;
+	my $list = $self->Subwidget('List')->Subwidget('List');
+	my $near = $list->nearest($y);
+	if ((defined $near) and (! $self->cget('-motionselect'))) {
+		$list->selectionSet($near);
+		my $call = $list->cget('-browsecmd');
+		$call->Call;
+	}
 }
 
 =item B<validate>

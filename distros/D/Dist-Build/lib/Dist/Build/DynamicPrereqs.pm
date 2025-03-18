@@ -1,5 +1,5 @@
 package Dist::Build::DynamicPrereqs;
-$Dist::Build::DynamicPrereqs::VERSION = '0.017';
+$Dist::Build::DynamicPrereqs::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ Dist::Build::DynamicPrereqs - Support dynamic prerequisites in Dist::Build
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

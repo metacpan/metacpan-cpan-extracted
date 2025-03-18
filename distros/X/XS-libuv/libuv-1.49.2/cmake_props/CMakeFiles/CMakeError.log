@@ -1,0 +1,234 @@
+Performing C SOURCE FILE Test UV_LINT_W4 failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-gZPOfB
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_53a11/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_53a11.dir/build.make CMakeFiles/cmTC_53a11.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-gZPOfB'
+Building C object CMakeFiles/cmTC_53a11.dir/src.c.o
+/usr/bin/cc -DUV_LINT_W4  /W4 -std=gnu90 -o CMakeFiles/cmTC_53a11.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-gZPOfB/src.c
+cc: warning: /W4: linker input file unused because linking not done
+cc: error: /W4: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_53a11.dir/build.make:78: CMakeFiles/cmTC_53a11.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_53a11.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-gZPOfB'
+gmake: *** [Makefile:127: cmTC_53a11/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_UNUSED_PARAMETER_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-zzF2vE
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_30f35/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_30f35.dir/build.make CMakeFiles/cmTC_30f35.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-zzF2vE'
+Building C object CMakeFiles/cmTC_30f35.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_UNUSED_PARAMETER_MSVC  /wd4100 -std=gnu90 -o CMakeFiles/cmTC_30f35.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-zzF2vE/src.c
+cc: warning: /wd4100: linker input file unused because linking not done
+cc: error: /wd4100: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_30f35.dir/build.make:78: CMakeFiles/cmTC_30f35.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_30f35.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-zzF2vE'
+gmake: *** [Makefile:127: cmTC_30f35/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_CONDITIONAL_CONSTANT_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lm9swY
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3e0bb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3e0bb.dir/build.make CMakeFiles/cmTC_3e0bb.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lm9swY'
+Building C object CMakeFiles/cmTC_3e0bb.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_CONDITIONAL_CONSTANT_MSVC  /wd4127 -std=gnu90 -o CMakeFiles/cmTC_3e0bb.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lm9swY/src.c
+cc: warning: /wd4127: linker input file unused because linking not done
+cc: error: /wd4127: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_3e0bb.dir/build.make:78: CMakeFiles/cmTC_3e0bb.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_3e0bb.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lm9swY'
+gmake: *** [Makefile:127: cmTC_3e0bb/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_NONSTANDARD_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-8HYVTe
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_9100e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_9100e.dir/build.make CMakeFiles/cmTC_9100e.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-8HYVTe'
+Building C object CMakeFiles/cmTC_9100e.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_NONSTANDARD_MSVC  /wd4201 -std=gnu90 -o CMakeFiles/cmTC_9100e.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-8HYVTe/src.c
+cc: warning: /wd4201: linker input file unused because linking not done
+cc: error: /wd4201: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_9100e.dir/build.make:78: CMakeFiles/cmTC_9100e.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_9100e.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-8HYVTe'
+gmake: *** [Makefile:127: cmTC_9100e/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_NONSTANDARD_EMPTY_TU_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Ug6M8V
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a7559/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a7559.dir/build.make CMakeFiles/cmTC_a7559.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Ug6M8V'
+Building C object CMakeFiles/cmTC_a7559.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_NONSTANDARD_EMPTY_TU_MSVC  /wd4206 -std=gnu90 -o CMakeFiles/cmTC_a7559.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Ug6M8V/src.c
+cc: warning: /wd4206: linker input file unused because linking not done
+cc: error: /wd4206: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_a7559.dir/build.make:78: CMakeFiles/cmTC_a7559.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_a7559.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Ug6M8V'
+gmake: *** [Makefile:127: cmTC_a7559/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_NONSTANDARD_FILE_SCOPE_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-43Ux0B
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d8403/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d8403.dir/build.make CMakeFiles/cmTC_d8403.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-43Ux0B'
+Building C object CMakeFiles/cmTC_d8403.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_NONSTANDARD_FILE_SCOPE_MSVC  /wd4210 -std=gnu90 -o CMakeFiles/cmTC_d8403.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-43Ux0B/src.c
+cc: warning: /wd4210: linker input file unused because linking not done
+cc: error: /wd4210: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_d8403.dir/build.make:78: CMakeFiles/cmTC_d8403.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_d8403.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-43Ux0B'
+gmake: *** [Makefile:127: cmTC_d8403/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_NONSTANDARD_NONSTATIC_DLIMPORT_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-oXj9va
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c9bd1/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c9bd1.dir/build.make CMakeFiles/cmTC_c9bd1.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-oXj9va'
+Building C object CMakeFiles/cmTC_c9bd1.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_NONSTANDARD_NONSTATIC_DLIMPORT_MSVC  /wd4232 -std=gnu90 -o CMakeFiles/cmTC_c9bd1.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-oXj9va/src.c
+cc: warning: /wd4232: linker input file unused because linking not done
+cc: error: /wd4232: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_c9bd1.dir/build.make:78: CMakeFiles/cmTC_c9bd1.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_c9bd1.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-oXj9va'
+gmake: *** [Makefile:127: cmTC_c9bd1/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_HIDES_LOCAL failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-yZnj9i
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_53e56/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_53e56.dir/build.make CMakeFiles/cmTC_53e56.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-yZnj9i'
+Building C object CMakeFiles/cmTC_53e56.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_HIDES_LOCAL  /wd4456 -std=gnu90 -o CMakeFiles/cmTC_53e56.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-yZnj9i/src.c
+cc: warning: /wd4456: linker input file unused because linking not done
+cc: error: /wd4456: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_53e56.dir/build.make:78: CMakeFiles/cmTC_53e56.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_53e56.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-yZnj9i'
+gmake: *** [Makefile:127: cmTC_53e56/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_HIDES_PARAM failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-arGsJO
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1bcdf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1bcdf.dir/build.make CMakeFiles/cmTC_1bcdf.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-arGsJO'
+Building C object CMakeFiles/cmTC_1bcdf.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_HIDES_PARAM  /wd4457 -std=gnu90 -o CMakeFiles/cmTC_1bcdf.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-arGsJO/src.c
+cc: warning: /wd4457: linker input file unused because linking not done
+cc: error: /wd4457: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_1bcdf.dir/build.make:78: CMakeFiles/cmTC_1bcdf.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_1bcdf.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-arGsJO'
+gmake: *** [Makefile:127: cmTC_1bcdf/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_HIDES_GLOBAL failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-64WZ7a
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5d114/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5d114.dir/build.make CMakeFiles/cmTC_5d114.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-64WZ7a'
+Building C object CMakeFiles/cmTC_5d114.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_HIDES_GLOBAL  /wd4459 -std=gnu90 -o CMakeFiles/cmTC_5d114.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-64WZ7a/src.c
+cc: warning: /wd4459: linker input file unused because linking not done
+cc: error: /wd4459: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_5d114.dir/build.make:78: CMakeFiles/cmTC_5d114.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_5d114.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-64WZ7a'
+gmake: *** [Makefile:127: cmTC_5d114/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_CONDITIONAL_ASSIGNMENT_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-y6Da9i
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6010d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6010d.dir/build.make CMakeFiles/cmTC_6010d.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-y6Da9i'
+Building C object CMakeFiles/cmTC_6010d.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_CONDITIONAL_ASSIGNMENT_MSVC  /wd4706 -std=gnu90 -o CMakeFiles/cmTC_6010d.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-y6Da9i/src.c
+cc: warning: /wd4706: linker input file unused because linking not done
+cc: error: /wd4706: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_6010d.dir/build.make:78: CMakeFiles/cmTC_6010d.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_6010d.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-y6Da9i'
+gmake: *** [Makefile:127: cmTC_6010d/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_NO_UNSAFE_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7ubuzi
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_be31e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_be31e.dir/build.make CMakeFiles/cmTC_be31e.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7ubuzi'
+Building C object CMakeFiles/cmTC_be31e.dir/src.c.o
+/usr/bin/cc -DUV_LINT_NO_UNSAFE_MSVC  /wd4996 -std=gnu90 -o CMakeFiles/cmTC_be31e.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7ubuzi/src.c
+cc: warning: /wd4996: linker input file unused because linking not done
+cc: error: /wd4996: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_be31e.dir/build.make:78: CMakeFiles/cmTC_be31e.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_be31e.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7ubuzi'
+gmake: *** [Makefile:127: cmTC_be31e/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test UV_LINT_UTF8_MSVC failed with the following output:
+Change Dir: /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Aer7rl
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_831f8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_831f8.dir/build.make CMakeFiles/cmTC_831f8.dir/build
+gmake[1]: Entering directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Aer7rl'
+Building C object CMakeFiles/cmTC_831f8.dir/src.c.o
+/usr/bin/cc -DUV_LINT_UTF8_MSVC  /utf-8 -std=gnu90 -o CMakeFiles/cmTC_831f8.dir/src.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Aer7rl/src.c
+cc: warning: /utf-8: linker input file unused because linking not done
+cc: error: /utf-8: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_831f8.dir/build.make:78: CMakeFiles/cmTC_831f8.dir/src.c.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_831f8.dir/src.c.o'
+gmake[1]: Leaving directory '/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Aer7rl'
+gmake: *** [Makefile:127: cmTC_831f8/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+

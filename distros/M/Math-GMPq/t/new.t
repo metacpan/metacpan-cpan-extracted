@@ -4,7 +4,7 @@ use Math::GMPq qw(:mpq);
 use Math::BigInt;
 use Config;
 
-print "1..4\n";
+print "1..8\n";
 
 print "# Using gmp version ", Math::GMPq::gmp_v(), "\n";
 
@@ -168,4 +168,67 @@ if($@ =~ /Invalid value for base/) {$ok .= 'i'}
 
 if($ok eq 'abcdefghi') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
+
+eval { require Math::MPFR;};
+unless($@) {
+  my $fr = Math::MPFR::Rmpfr_init2(113);
+  Math::MPFR::Rmpfr_set_str($fr, "1.3", 10, 0);
+  Math::MPFR::Rmpfr_div_ui($fr, $fr, 10,  0);
+  my $q1 = Math::GMPq->new($fr);
+  my $q2 = Math::GMPq->new(Math::MPFR::decimalize($fr));
+
+  if($q1 == $q2) { print "ok 5\n" }
+  else {
+    warn "$q1\n$q2\n";
+    print "not ok 5\n";
+  }
+}
+else {
+  warn "Could not load Math::MPFR";
+  print "ok 5\n";
+}
+
+eval { require Math::GMP;};
+unless($@) {
+  my $gmp = Math::GMP->new(12345678);
+  my $q1 = Math::GMPq->new($gmp);
+  my $q2 = Math::GMPq->new('12345678');
+
+  if($q1 == $q2) { print "ok 6\n" }
+  else {
+    warn "$q1\n$q2\n";
+    print "not ok 6\n";
+  }
+}
+else {
+  warn "Could not load Math::GMP";
+  print "ok 6\n";
+}
+
+eval { require Math::GMPz;};
+unless($@) {
+  my $mpz = Math::GMPz->new(12345678);
+  my $q1 = Math::GMPq->new($mpz);
+  my $q2 = Math::GMPq->new('12345678');
+
+  if($q1 == $q2) { print "ok 7\n" }
+  else {
+    warn "$q1\n$q2\n";
+    print "not ok 7\n";
+  }
+}
+else {
+  warn "Could not load Math::GMPz";
+  print "ok 7\n";
+}
+
+# Check that whitespace is ignored in new().
+my $q1 = Math::GMPq->new('213/5');
+my $q2 = Math::GMPq->new("21 \n  3 \t\n / 5");
+
+if($q1 == $q2) { print "ok 8\n" }
+else {
+  warn "$q1\n$q2\n";
+  print "not ok 8\n";
+}
 

@@ -1,11 +1,12 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.017';
+$Dist::Build::XS::Export::VERSION = '0.018';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
+use ExtUtils::Builder::Util qw/unix_to_native_path/;
 use File::Find 'find';
 use File::Spec::Functions qw/abs2rel catfile/;
 use Parse::CPAN::Meta;
@@ -20,9 +21,7 @@ sub copy_header {
 	my ($planner, $module_dir, $filename, $target) = @_;
 
 	my $output = catfile(qw/blib lib auto share module/, $module_dir, 'include', $target);
-	$planner->copy_file(abs2rel($filename), $output);
-
-	return $output;
+	return $planner->copy_file(abs2rel($filename), $output);
 }
 
 sub add_methods {
@@ -33,23 +32,25 @@ sub add_methods {
 		my $module_name = $args{module} // $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
 		croak 'No directory or file given to share' if not $args{dir} and not $args{file};
+		my $dir = unix_to_native_path($args{dir});
 
 		my $inner = $planner->new_scope;
 		$inner->load_module('Dist::Build::Core');
 
-		my @outputs;
-		find(sub {
-			return unless -f;
-			my $target = abs2rel($File::Find::name, $args{dir});
-			push @outputs, copy_header($inner, $module_dir, $File::Find::name, $target);
-		}, $args{dir}) if $args{dir};
+		$inner->create_subst(
+			on     => $inner->create_pattern(dir => $dir),
+			add_to => 'code',
+			subst  => sub {
+				my ($source) = @_;
+				my $target = abs2rel($source, $dir);
+				return copy_header($inner, $module_dir, $source, $target);
+			},
+		);
 
 		my @files = ref $args{file} ? @{ $args{file} } : defined $args{file} ? $args{file} : ();
 		for my $file (@files) {
-			push @outputs, copy_header($inner, $module_dir, $file, $file);
+			$planner->create_phony('code', copy_header($inner, $module_dir, $file, $file));
 		}
-
-		$planner->create_phony('code', @outputs);
 	});
 
 	$planner->add_delegate('export_flags', sub {
@@ -84,7 +85,7 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

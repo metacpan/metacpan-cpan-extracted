@@ -1,3 +1,12 @@
+0.93	- 17 Mar 2025, H.Merijn Brand
+    * Add ranges and cellranges
+
+0.92	- 06 Jan 2025, H.Merijn Brand
+    * Make strict_eol default to 1 for CSV when supported
+    * Show detected EOL for CSV in xlscat when known
+    * Add SECURITY.md
+    * It's 2025
+
 0.91	- 27 Aug 2024, H.Merijn Brand
     * Exclude OLE::Storage_Lite-0.21
     * xlscat --head[=10], --tail[=10], --first=C

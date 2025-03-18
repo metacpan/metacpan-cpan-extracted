@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangesCopyRequest.name :   ,
-# PostWorksheetCellsRangesCopyRequest.sheetName :   ,
-# PostWorksheetCellsRangesCopyRequest.rangeOperate :   ,
-# PostWorksheetCellsRangesCopyRequest.folder :   ,
-# PostWorksheetCellsRangesCopyRequest.storageName :    
+# PostWorksheetCellsRangesCopyRequest.name : The file name.  ,
+# PostWorksheetCellsRangesCopyRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangesCopyRequest.rangeOperate : RangeCopyRequestcopydata,copystyle,copyto,copyvalue  ,
+# PostWorksheetCellsRangesCopyRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangesCopyRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_ranges_copy' } = { 
-    	summary => '',
+    	summary => 'Copy content from the source range to the destination range in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range_operate' => {
      	datatype => 'RangeCopyRequest',
      	base_name => 'rangeOperate',
-     	description => '',
+     	description => 'RangeCopyRequestcopydata,copystyle,copyto,copyvalue',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2010-2023 H.Merijn Brand
+# Copyright 2010-2024 H.Merijn Brand
 
 require 5.008003;
 use strict;
@@ -84,10 +84,10 @@ sub postamble {
 	'	pod2man       < $? > $@',
 	'doc/Tie-Array-DBD.3:		lib/Tie/Array/DBD.pm',
 	'	pod2man       < $? > $@',
-	'doc/Tie-Hash-DBD.man:	doc/Tie-Hash-DBD.3',
-	'	nroff -mandoc < $? > $@',
-	'doc/Tie-Array-DBD.man:	doc/Tie-Array-DBD.3',
-	'	nroff -mandoc < $? > $@',
+	'doc/Tie-Hash-DBD.man:		doc/Tie-Hash-DBD.3',
+	'	nroff2man     < $? > $@',
+	'doc/Tie-Array-DBD.man:		doc/Tie-Array-DBD.3',
+	'	nroff2man     < $? > $@',
 	'',
 	$min_vsn;
     } # postamble

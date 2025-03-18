@@ -1,0 +1,352 @@
+[
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/fs-poll.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/fs-poll.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/fs-poll.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/idna.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/idna.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/idna.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/inet.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/inet.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/inet.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/random.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/random.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/random.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/strscpy.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strscpy.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strscpy.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/strtok.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strtok.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strtok.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/thread-common.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/thread-common.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/thread-common.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/threadpool.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/threadpool.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/threadpool.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/timer.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/timer.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/timer.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/uv-common.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-common.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-common.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/uv-data-getter-setters.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-data-getter-setters.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-data-getter-setters.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/version.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/version.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/version.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/async.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/async.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/async.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/core.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/core.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/core.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/dl.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/dl.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/dl.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/fs.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/fs.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/fs.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/getaddrinfo.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getaddrinfo.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getaddrinfo.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/getnameinfo.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getnameinfo.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getnameinfo.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/loop-watcher.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop-watcher.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop-watcher.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/loop.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/pipe.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/pipe.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/pipe.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/poll.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/poll.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/poll.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/process.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/process.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/process.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/random-devurandom.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-devurandom.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-devurandom.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/signal.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/signal.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/signal.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/stream.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/stream.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/stream.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/tcp.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tcp.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tcp.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/thread.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/thread.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/thread.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/tty.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tty.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tty.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/udp.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/udp.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/udp.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/proctitle.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/proctitle.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/proctitle.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/linux.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/linux.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/linux.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/procfs-exepath.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/procfs-exepath.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/procfs-exepath.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/random-getrandom.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-getrandom.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-getrandom.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -DBUILDING_UV_SHARED=1 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -Duv_EXPORTS -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fPIC -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -std=gnu90 -o CMakeFiles/uv.dir/src/unix/random-sysctl-linux.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-sysctl-linux.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-sysctl-linux.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/fs-poll.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/fs-poll.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/fs-poll.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/idna.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/idna.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/idna.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/inet.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/inet.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/inet.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/random.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/random.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/random.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/strscpy.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strscpy.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strscpy.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/strtok.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strtok.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/strtok.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/thread-common.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/thread-common.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/thread-common.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/threadpool.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/threadpool.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/threadpool.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/timer.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/timer.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/timer.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/uv-common.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-common.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-common.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/uv-data-getter-setters.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-data-getter-setters.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/uv-data-getter-setters.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/version.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/version.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/version.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/async.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/async.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/async.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/core.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/core.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/core.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/dl.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/dl.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/dl.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/fs.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/fs.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/fs.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/getaddrinfo.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getaddrinfo.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getaddrinfo.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/getnameinfo.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getnameinfo.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/getnameinfo.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/loop-watcher.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop-watcher.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop-watcher.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/loop.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/loop.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/pipe.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/pipe.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/pipe.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/poll.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/poll.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/poll.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/process.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/process.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/process.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/random-devurandom.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-devurandom.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-devurandom.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/signal.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/signal.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/signal.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/stream.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/stream.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/stream.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/tcp.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tcp.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tcp.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/thread.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/thread.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/thread.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/tty.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tty.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/tty.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/udp.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/udp.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/udp.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/proctitle.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/proctitle.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/proctitle.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/linux.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/linux.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/linux.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/procfs-exepath.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/procfs-exepath.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/procfs-exepath.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/random-getrandom.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-getrandom.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-getrandom.c"
+},
+{
+  "directory": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/build",
+  "command": "/usr/bin/cc -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/include -I/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src -fvisibility=hidden -Wstrict-prototypes -Wextra -Wall -Wno-unused-parameter -fno-strict-aliasing -fPIC -I/home/syber/meia/var/lib/XS/Install.x/i -ggdb3 -fwrapv -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -g -O2 -std=gnu90 -o CMakeFiles/uv_a.dir/src/unix/random-sysctl-linux.c.o -c /tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-sysctl-linux.c",
+  "file": "/tmp/XS-libuv-bzoz_WzO4Tww/libuv-1.49.2/src/unix/random-sysctl-linux.c"
+}
+]

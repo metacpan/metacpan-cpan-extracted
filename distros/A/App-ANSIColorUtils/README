@@ -2,55 +2,37 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.010 of App::ANSIColorUtils (from Perl
-    distribution App-ANSIColorUtils), released on 2021-01-20.
+    This document describes version 0.011 of App::ANSIColorUtils (from Perl
+    distribution App-ANSIColorUtils), released on 2025-03-18.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
-    *   ansi16-to-rgb
-
-    *   ansi256-to-rgb
-
-    *   rgb-to-ansi-bg-code
-
-    *   rgb-to-ansi-fg-code
-
-    *   rgb-to-ansi16
-
-    *   rgb-to-ansi16-bg-code
-
-    *   rgb-to-ansi16-fg-code
-
-    *   rgb-to-ansi24b-bg-code
-
-    *   rgb-to-ansi24b-fg-code
-
-    *   rgb-to-ansi256
-
-    *   rgb-to-ansi256-bg-code
-
-    *   rgb-to-ansi256-fg-code
-
-    *   show-ansi-color-table
-
-    *   show-assigned-rgb-colors
-
-    *   show-colors
-
-    *   show-colors-from-scheme
-
-    *   show-colors-from-theme
-
-    *   show-rand-rgb-colors
-
-    *   show-text-using-color-gradation
+    1. ansi16-to-rgb
+    2. ansi256-to-rgb
+    3. rgb-to-ansi-bg-code
+    4. rgb-to-ansi-fg-code
+    5. rgb-to-ansi16
+    6. rgb-to-ansi16-bg-code
+    7. rgb-to-ansi16-fg-code
+    8. rgb-to-ansi24b-bg-code
+    9. rgb-to-ansi24b-fg-code
+    10. rgb-to-ansi256
+    11. rgb-to-ansi256-bg-code
+    12. rgb-to-ansi256-fg-code
+    13. show-ansi-color-table
+    14. show-assigned-rgb-colors
+    15. show-colors
+    16. show-colors-from-scheme
+    17. show-colors-from-theme
+    18. show-rand-rgb-colors
+    19. show-text-using-color-gradation
 
 FUNCTIONS
   show_ansi_color_table
     Usage:
 
-     show_ansi_color_table(%args) -> [status, msg, payload, meta]
+     show_ansi_color_table(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show a table of ANSI codes & colors.
 
@@ -60,25 +42,30 @@ FUNCTIONS
 
     *   width => *str* (default: 8)
 
+        (No description)
+
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_assigned_rgb_colors
     Usage:
 
-     show_assigned_rgb_colors(%args) -> [status, msg, payload, meta]
+     show_assigned_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Take arguments, pass them through assign_rgb_color(), show the results.
 
-    "assign_rgb_color()" from Color::RGB::Util takes a string, produce SHA1
+    assign_rgb_color() from Color::RGB::Util takes a string, produce SHA1
     digest from it, then take 24bit from the digest as the assigned color.
 
     This function is not exported.
@@ -87,23 +74,30 @@ FUNCTIONS
 
     *   strings* => *array[str]*
 
+        (No description)
+
     *   tone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_colors
     Usage:
 
-     show_colors(%args) -> [status, msg, payload, meta]
+     show_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show colors specified in argument as text with ANSI colors.
 
@@ -113,21 +107,26 @@ FUNCTIONS
 
     *   colors* => *array[str]*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_colors_from_scheme
     Usage:
 
-     show_colors_from_scheme(%args) -> [status, msg, payload, meta]
+     show_colors_from_scheme(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show colors from a Graphics::ColorNames scheme.
 
@@ -137,21 +136,26 @@ FUNCTIONS
 
     *   scheme* => *perl::colorscheme::modname*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_colors_from_theme
     Usage:
 
-     show_colors_from_theme(%args) -> [status, msg, payload, meta]
+     show_colors_from_theme(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show colors from a ColorTheme scheme.
 
@@ -161,21 +165,26 @@ FUNCTIONS
 
     *   theme* => *perl::colortheme::modname_with_optional_args*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_rand_rgb_colors
     Usage:
 
-     show_rand_rgb_colors(%args) -> [status, msg, payload, meta]
+     show_rand_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Produce N random RGB colors using rand_rgb_colors() and show the
     results.
@@ -186,23 +195,30 @@ FUNCTIONS
 
     *   light_color => *bool* (default: 1)
 
+        (No description)
+
     *   n* => *posint*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_text_using_color_gradation
     Usage:
 
-     show_text_using_color_gradation(%args) -> [status, msg, payload, meta]
+     show_text_using_color_gradation(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Print text using gradation between two colors.
 
@@ -214,7 +230,7 @@ FUNCTIONS
 
         Result:
 
-         [undef, "0000ff", undef, {}]
+         [200, undef, undef, {}]
 
     This can be used to demonstrate 24bit color support in terminal
     emulators.
@@ -225,7 +241,11 @@ FUNCTIONS
 
     *   color1 => *color::rgb24* (default: "ffff00")
 
+        (No description)
+
     *   color2 => *color::rgb24* (default: "0000ff")
+
+        (No description)
 
     *   text => *str*
 
@@ -233,12 +253,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -250,21 +273,42 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-ANSIColorUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
+    App::RGBColorUtils
+
+    App::GraphicsColorNamesUtils
+
+    App::ColorThemeUtils
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

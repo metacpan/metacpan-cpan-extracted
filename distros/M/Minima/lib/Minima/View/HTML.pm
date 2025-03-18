@@ -10,7 +10,7 @@ use Template::Constants qw/ :debug /;
 use utf8;
 
 field $app                  :param;
-field $directory            = 'templates';
+field $directory;
 field $template;
 field $default_data         = {};
 
@@ -39,6 +39,8 @@ ADJUST {
     $content{title} = $config->{default_title} // '';
     $settings{block_indexing} = $config->{block_indexing} // 1;
     $settings{theme_color} = $config->{theme_color} // '';
+
+    $self->set_directory('templates');
 }
 
 method set_title ($t, $d = undef)
@@ -57,7 +59,7 @@ method set_compound_title ($t, $d = undef)
 
 method set_directory ($d)
 {
-    $directory = path($d)->absolute
+    $directory = $app->path($d);
 }
 
 method set_template ($t)
@@ -67,7 +69,7 @@ method set_template ($t)
 
 method add_include_path ($d)
 {
-    push @{ $settings{include_extra} }, path($d)->absolute;
+    push @{ $settings{include_extra} }, $app->path($d);
 }
 
 method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }

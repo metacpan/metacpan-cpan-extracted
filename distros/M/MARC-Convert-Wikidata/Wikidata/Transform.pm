@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Data::Kramerius;
 use Error::Pure qw(err);
-use List::Util qw(any);
+use List::Util qw(any none);
 use MARC::Convert::Wikidata::Object 0.08;
 use MARC::Convert::Wikidata::Object::ExternalId 0.05;
 use MARC::Convert::Wikidata::Object::ISBN;
@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 # Constructor.
 sub new {
@@ -151,7 +151,9 @@ sub _cover {
 			next;
 		}
 		if ($cover eq 'hardback' || $cover eq 'paperback') {
-			push @ret_cover, $cover;
+			if (none { $_ eq $cover } @ret_cover) {
+				push @ret_cover, $cover;
+			}
 		} elsif ($cover eq 'collective') {
 			# nothing
 		} else {
@@ -566,8 +568,8 @@ sub _subfield {
 
 	my @field_values = $self->{'marc_record'}->field($field);
 	foreach my $field_value (@field_values) {
-		my $subfield_value = $field_value->subfield($subfield);
-		if (defined $subfield_value) {
+		my @subfield_values = $field_value->subfield($subfield);
+		foreach my $subfield_value (@subfield_values) {
 			push @ret, $subfield_value;
 		}
 	}

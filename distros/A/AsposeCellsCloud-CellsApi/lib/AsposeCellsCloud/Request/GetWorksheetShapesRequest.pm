@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetShapesRequest.name :   ,
-# GetWorksheetShapesRequest.sheetName :   ,
-# GetWorksheetShapesRequest.folder :   ,
-# GetWorksheetShapesRequest.storageName :    
+# GetWorksheetShapesRequest.name : The file name.  ,
+# GetWorksheetShapesRequest.sheetName : The worksheet name.  ,
+# GetWorksheetShapesRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetShapesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_shapes' } = { 
-    	summary => '',
+    	summary => 'Retrieve descriptions of shapes in the worksheet.',
         params => $params,
         returns => 'ShapesResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

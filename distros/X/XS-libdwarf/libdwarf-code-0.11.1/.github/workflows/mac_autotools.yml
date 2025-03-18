@@ -1,0 +1,25 @@
+name: macautotool
+
+on: 
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+ macos_autotools:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: tools
+      run:  brew install automake libtool
+    - name: aclocal
+      run: aclocal
+    - name: autoreconf
+      run: autoreconf --warnings=all  -vif
+    - name: config
+      run: ./configure --enable-dwarfexample --enable-wall
+    - name: make
+      run:  |
+        make
+        make check
+

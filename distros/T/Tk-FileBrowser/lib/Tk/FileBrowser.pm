@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.09;
+$VERSION = '0.10';
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -360,6 +360,7 @@ sub Populate {
 
 	my $entry = $lframe->ListEntry(
 		-command => ['EditSelect', $self],
+		-motionselect => 0,
 		-textvariable => \$basetxt,
 	)->pack(@pack, -expand => 1, -fill => 'x');
 	$self->Advertise('Entry', $entry);
@@ -905,10 +906,11 @@ sub DefaultLinkIcon {
 sub EditSelect {
 	my $self = shift;
 	my $e = $self->Subwidget('Entry');
+	$e->Subwidget('List')->popDown;
 	my $folder = $e->get;
+	print "folder $folder\n";
 	my $home = $ENV{HOME};
 	$folder =~ s/^~/$home/;
-	$e->Subwidget('List')->popDown;
 	$self->load($folder) if (-e $folder) and (-d $folder);
 }
 
@@ -1159,8 +1161,12 @@ sub load {
 
 	###################################################################
 	#configure the list entry
-	my $basetxt = $self->{BASETXT};
-	$$basetxt = $folder;
+#	my $basetxt = $self->{BASETXT};
+#	$$basetxt = $folder;
+	my $e = $self->Subwidget('Entry');
+	$e->delete(0, 'end');
+	$e->insert('end', $folder);
+
 	my @folders = ();
 	my $pfolder = $folder;
 	$self->{BASE} = $folder;

@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'files' => {
      	datatype => 'ARRAY[FileInfo]',
      	base_name => 'Files',
-     	description => '',
+     	description => 'A property named **Files** of type **IList FileInfo ** containing a collection of file information objects.',
      	format => '',
      	read_only => '',
      		},    

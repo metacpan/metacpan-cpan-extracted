@@ -9,16 +9,27 @@ use Plack::Test;
 
 our $config = {};
 our $app;
+our $base;
 
 sub import
 {
     shift; # discard package name
+
+    # If we were called from a .psgi, save
+    # its parent as the base directory
+    my $caller = path( (caller)[1] );
+    if ($caller->basename =~ /\.psgi$/) {
+        $base = $caller->absolute->parent;
+    } else {
+        $base = path('.')->absolute;
+    }
+
     prepare(@_);
 }
 
 sub prepare ($file = undef)
 {
-    my $default_config = './etc/config.pl';
+    my $default_config = $base->child('etc/config.pl');
 
     if ($file) {
         my $file_abs = path($file)->absolute;
@@ -37,7 +48,12 @@ sub prepare ($file = undef)
     croak "Config is not a hash reference.\n"
         unless ref $config eq ref {};
 
-    # initialize app
+    # If the loaded config does not set base_dir,
+    # set it to the saved .psgi directory
+    $config->{base_dir} = $base->stringify
+        unless defined $config->{base_dir};
+
+    # Initialize app
     $app = Minima::App->new(
         configuration => $config,
     );
@@ -76,6 +92,12 @@ runs the app and can be passed (as a reference) as the starting
 subroutine of a PSGI application. Additionally, it includes
 L<C<prepare>|/prepare>, responsible for loading the configuration file
 and preparing the main objects.
+
+During its import, Minima::Setup also captures the path of the caller
+file. If this file has a F<.psgi> extension, its directory will be used
+as the default base for the application. Otherwise, the current
+directory will be used, unless the configuration explicitly sets
+C<base_dir>.
 
 =head1 CONFIG FILE
 
@@ -119,7 +141,7 @@ Minima::App. See L<Minima::Manual::Testing> for more on testing.
 
 For testing purposes, you may want to have Minima::Setup load the
 configuration and create a L<Minima::App>. You can access a reference to
-the created app (after importing the module) with C<Minima::Setup::app>.
+the created app (after importing the module) with C<$Minima::Setup::app>.
 
 =head1 SEE ALSO
 

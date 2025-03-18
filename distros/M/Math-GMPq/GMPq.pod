@@ -219,13 +219,15 @@
    $rop = new Math::GMPq($arg);
     Returns a Math::GMPq object with the value of $arg.
     $arg can be either an integer (signed integer, unsigned
-    integer) or a string that represents a numeric value. If $arg is a
-    string, an optional additional argument that specifies the base of
-    the number can be supplied to new(). If base is 0 (or not supplied)
-    then the leading characters of the string are used: 0x or 0X for
-    hex, 0b or 0B for binary, 0 for octal, or decimal otherwise. Note
-    that this is done separately for the numerator and denominator, so
-    for instance 0xEF/100 is 239/100, whereas 0xEF/0x100 is 239/256.
+    integer) or an NV or a string that represents a numeric value, or
+    a Math::GMPz object, or a Math::GMP object, or a Math::GMPq object,
+    or a Math::MPFR object.
+    If $arg is a string, an optional additional argument that specifies
+    the base of the number can be supplied to new(). If base is 0 (or not
+    supplied) then the leading characters of the string are used: 0x or
+    0X for hex, 0b or 0B for binary, 0 for octal, or decimal otherwise.
+    Note that this is done separately for the numerator and denominator,
+    so, for instance 0xEF/100 is 239/100, whereas 0xEF/0x100 is 239/256.
     Legal values for the base are 0 and 2..62.
 
    ####################
@@ -530,7 +532,7 @@
           read it thoroughly, including the documentation regarding
           'copy constructors'.
 
-    For general compatibility with perl in general and Math::BigRat in
+    For compatibility with perl in general and Math::BigRat in
     particular, overloading of the '&', '|', '^', '~', '%', '>>' and
    '<<' operators has now been added.
 

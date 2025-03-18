@@ -1,7 +1,13 @@
 Revision history for Perl module Math::GMPq
 
+0.64
+ - Allow new() to accept a Math::MPFR object as its argument.
+ - Make correction to t/overload_cross_class.t.
+   Fixes (eg) http://www.cpantesters.org/cpan/report/4f91f402-ff5f-11ef-a428-86166e8775ea.
+
 0.63
  - Make correction to t/overload_op_eq.t.
+   Fixes (eg) http://www.cpantesters.org/cpan/report/4879e26c-fec7-11ef-9b7a-29fb6d8775ea.
 
 0.62
  - Remove $Math::GMPq::RETYPE and all references to it. (The option to turn off

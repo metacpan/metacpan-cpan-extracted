@@ -59,9 +59,9 @@ SV * Rmpz_init_set_str_nobless(pTHX_ SV * num, SV * base) {
      if(b == 1 || b > 62) croak("Second argument supplied to Rmpz_init_set_str_nobless is not in acceptable range");
 
      New(1, mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_create function");
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_str_nobless function");
      if(mpz_init_set_str (*mpz_t_obj, SvPV_nolen(num), b))
-        croak("First argument supplied to Rmpz_create_init_nobless is not a valid base %u integer", b);
+        croak("First argument supplied to Rmpz_init_set_str_nobless is not a valid base %u integer", b);
 
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -70,6 +70,7 @@ SV * Rmpz_init_set_str_nobless(pTHX_ SV * num, SV * base) {
      return obj_ref;
 
 }
+
 
 SV * Rmpz_init2_nobless(pTHX_ SV * bits) {
      mpz_t * mpz_t_obj;
@@ -4969,6 +4970,7 @@ SV * _itsa(pTHX_ SV * a) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::MPFR")) return newSVuv(5);
        if(strEQ(h, "Math::GMPf")) return newSVuv(6);
+       if(strEQ(h, "Math::GMPq")) return newSVuv(7);
        if(strEQ(h, "Math::GMPz"))        return newSViv(8);
        if(strEQ(h, "Math::GMP"))         return newSViv(9);
        if(strEQ(h, "Math::BigInt"))      return newSViv(-1);

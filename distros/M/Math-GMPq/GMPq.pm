@@ -94,7 +94,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.63';
+    our $VERSION = '0.64';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -175,6 +175,12 @@ sub new {
     if($type == _MATH_GMPz_T || $type == _MATH_GMP_T) { # Math::GMPz or Math::GMP object
       if(@_) {die "Too many arguments supplied to new() - expected only one"}
       Rmpq_set_z($ret, $arg1);
+      return $ret;
+    }
+
+    if($type == _MATH_MPFR_T) {
+      if(@_) {die "Too many arguments supplied to new() - expected only one"}
+      Math::MPFR::Rmpfr_get_q($ret, $arg1);
       return $ret;
     }
 

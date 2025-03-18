@@ -22,6 +22,7 @@ ok( length($res->content), 'respects config for auto HEAD' );
 # Move to the complex example in eg/
 {
     chdir 'eg';
+    $Minima::Setup::config->{base_dir} .= '/eg';
     $test = Plack::Test->create(Minima::init);
 
     local @INC = ( 'lib', @INC );

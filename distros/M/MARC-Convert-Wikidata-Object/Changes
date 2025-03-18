@@ -1,3 +1,7 @@
+0.10 2025-03-17T18:19:08+01:00
+ - Add 'valid' parameter to ISBN object.
+ - Update copyright years.
+
 0.09 2024-11-25T17:22:53+01:00
  - API change: Add 'issn' parameter to Series.
  - Regen README file.

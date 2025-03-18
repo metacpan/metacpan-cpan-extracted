@@ -1,5 +1,8 @@
 Revision history for Perl module Math::GMPz
 
+0.65
+ - Allow new() to accept Math::GMPq objects and Math::MPFR objects.
+
 0.64
  - Remove $Math::GMPz::RETYPE and all references to it. (The option to turn off
    the cross-class operator overloading no longer exists.)

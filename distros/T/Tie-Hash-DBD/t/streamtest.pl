@@ -25,4 +25,30 @@ sub streamtests {
     cleanup ($DBD);
     } # streamtests
 
+unless (caller) {
+    foreach my $str (supported_serializers ()) {
+	my $v = eval "require $str; \$${str}::VERSION";
+	if ($@) {
+	    ok (1, "$str not available");
+	    next;
+	    }
+	ok (1, "$str $v");
+	my %deep = deep ("dbi:CSV:", $str);
+
+	my %h;
+	eval {
+	    tie %h, "Tie::Hash::DBD", "dbi:CSV:", { str => $str };
+	    $h{deep} = \%deep;
+	    };
+	my $deep = $h{deep};
+	if ($deep) {
+	    is_deeply ($h{deep}, \%deep, "Data ok");
+	    }
+	else {
+	    ok (1, "$str: FAIL $@");
+	    }
+	}
+    done_testing;
+    }
+
 1;
