@@ -88,7 +88,7 @@ void Resolver::Worker::on_sockstate (sock_t sock, int read, int write) {
 void Resolver::Worker::handle_poll (int events, const std::error_code& err) {
     panda_log_debug(logmod, this << " Worker::handle_poll events:" << events << " err:" << err);
     auto sz = polls.size();
-    sock_t socks[sz];
+    auto socks = (sock_t*)alloca(sizeof(sock_t)*sz);
     size_t i = 0;
     for (const auto& row : polls) socks[i++] = row.first;
     for (i = 0; i < sz; ++i) {
@@ -129,12 +129,21 @@ void Resolver::Worker::resolve (const RequestSP& req) {
 
 void Resolver::Worker::on_resolve (int status, int, ares_addrinfo* ai) {
     panda_log_info(logmod, this << " Resolver::Worker done req:" << request.get() << " status:" << ares_strerror(status) << " async:" << ares_async << " ai:" << ai);
+    
+    if (status == ARES_SUCCESS && ai && !ai->nodes) { // workaround c-ares bug (appeared in 1.22)
+        panda_log_info(logmod, this << " Resolver::Worker c-ares bug detected (empty nodes), changing status to ENOTFOUND");
+        // c-ares bug: it may return status=success and nullptr in nodes
+        status = ARES_ENOTFOUND;
+        ares_freeaddrinfo(ai);
+        ai = nullptr;
+    }
+    
     AddrInfo addr;
     if (ai) addr = AddrInfo(ai);
     if (!request) return; // canceled
 
     std::error_code err;
-    if (status != ARES_SUCCESS) err  = ares2stderr(status);
+    if (status != ARES_SUCCESS) err = ares2stderr(status);
 
     if (ares_async) {
         try {

@@ -15,6 +15,10 @@ using xs::my_perl;
 template <class T, class R = T> using enable_if_sv_t    = std::enable_if_t<panda::is_one_of<T,Sv,Scalar,Ref,Simple,Object,Sub,Hash,Array,Glob,Stash,List,Io>::value, R>;
 template <class T, class R = T> using enable_if_rawsv_t = std::enable_if_t<panda::is_one_of<T,SV,AV,HV,CV,GV,IO>::value, R>;
 
+inline bool sv_defined (SV* sv) { SvGETMAGIC(sv); return SvOK(sv); }
+
+Sv eval (const panda::string& code);
+
 struct Sv {
     static const bool INCREMENT = true;
     static const bool NONE      = false;
@@ -85,7 +89,7 @@ struct Sv {
 
     SV* operator-> () const { return sv; }
 
-    bool   defined        () const { return sv && SvOK(sv); }
+    bool   defined        () const { return sv && sv_defined(sv); }
     bool   is_true        () const { return SvTRUE(sv); }
     svtype type           () const { return SvTYPE(sv); }
     bool   readonly       () const { return SvREADONLY(sv); }
@@ -195,7 +199,5 @@ struct PerlRuntimeException : std::exception {
         return SvPV_nolen(sv);
     }
 };
-
-Sv eval (const panda::string& code);
 
 }

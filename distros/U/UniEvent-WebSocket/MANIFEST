@@ -37,7 +37,6 @@ lib/UniEvent/WebSocket/Server.pod
 lib/UniEvent/WebSocket/ServerConnection.pm
 lib/UniEvent/WebSocket/ServerConnection.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/echo.pl

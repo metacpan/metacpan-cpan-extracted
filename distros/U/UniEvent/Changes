@@ -1,3 +1,9 @@
+1.2.14    xx.xx.2024
+           - use sv_defined()
+           - fix warnings
+           - c-ares 1.22+ localhost IPv6 bug workaround
+           - libuv 1.49 pipe sockname bug workaround
+           - fix compilation for clang18+
 1.2.13    31.01.2024
            - decrease default resolver cache time 20 min -> 10 min
            - improve tests

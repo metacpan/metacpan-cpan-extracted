@@ -1,4 +1,4 @@
-# Install script for directory: /home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace
+# Install script for directory: /tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,18 +43,18 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/include/" FILES_MATCHING REGEX "/[^/]*\\.h$")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/include/" FILES_MATCHING REGEX "/[^/]*\\.h$")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/libpanda-backtrace.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/libpanda-backtrace.a")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace/panda-backtrace-config.cmake")
     file(DIFFERENT _cmake_export_file_changed FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace/panda-backtrace-config.cmake"
-         "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config.cmake")
+         "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config.cmake")
     if(_cmake_export_file_changed)
       file(GLOB _cmake_old_config_files "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace/panda-backtrace-config-*.cmake")
       if(_cmake_old_config_files)
@@ -67,9 +67,9 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
     endif()
     unset(_cmake_export_file_changed)
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace" TYPE FILE FILES "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace" TYPE FILE FILES "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config.cmake")
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^()$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace" TYPE FILE FILES "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config-noconfig.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/panda-backtrace" TYPE FILE FILES "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config-noconfig.cmake")
   endif()
 endif()
 

@@ -87,7 +87,6 @@ clib/src/ragel/xmlcodegen.h
 clib/src/ska/flat_hash_map.hpp
 clib/tests/asterisk.cc
 clib/tests/captures.cc
-clib/tests/main.cc
 clib/tests/methods.cc
 clib/tests/regex.cc
 clib/tests/static.cc

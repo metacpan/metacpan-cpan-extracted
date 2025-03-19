@@ -2,7 +2,7 @@ package URI::XS;
 use 5.012;
 use XS::Framework;
 
-our $VERSION = '2.1.6';
+our $VERSION = '2.1.7';
 
 XS::Loader::bootstrap();
 

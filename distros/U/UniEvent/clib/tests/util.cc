@@ -41,7 +41,7 @@ static string phys_to_str (const char (&a)[N]) {
     for (size_t i = 0; i < N; ++i) {
         if (i) ret += ':';
         char part[3];
-        sprintf(part, "%02X", (unsigned char)a[i]);
+        snprintf(part, 3, "%02X", (unsigned char)a[i]);
         ret += part;
     }
     return ret;
@@ -92,12 +92,12 @@ TEST("socketpair") {
     t2->open(fds.second);
 
     t1->write("hello");
-    t2->read_event.add([&](auto...){
+    t2->read_event.add([&](auto, auto, auto){
         test.happens();
         t2->write("world");
     });
 
-    t1->read_event.add([&](auto...){
+    t1->read_event.add([&](auto, auto, auto){
         test.happens();
         t1->reset();
         t2->reset();
@@ -120,7 +120,7 @@ TEST("pipe pair") {
     writer->open(fds.second, Pipe::Mode::writable);
 
     writer->write("hello");
-    reader->read_event.add([&](auto...){
+    reader->read_event.add([&](auto, auto, auto){
         test.happens();
         reader->reset();
         writer->reset();

@@ -251,9 +251,10 @@ static TimezoneSP _tzget_abbr (const string_view& target_abbr) {
         if (sign == '-') offset *= -1;
         auto h = offset / 3600;
         auto m = (offset % 3600) / 60;
-        char buff[64];
+        static const int BUFF_SIZE = 64;
+        char buff[BUFF_SIZE];
 
-        auto count = sprintf(buff, "<%c%02d:%02d>%c%02d:%02d", sign,h,m,rev_sign, h, m);
+        auto count = snprintf(buff, BUFF_SIZE, "<%c%02d:%02d>%c%02d:%02d", sign,h,m,rev_sign, h, m);
         return _tzget(string_view(buff, count));
     }
 

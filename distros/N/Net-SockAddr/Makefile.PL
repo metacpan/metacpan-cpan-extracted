@@ -24,6 +24,7 @@ my %params = (
         CLIB => {
             DIR          => 'clib',
             CMAKE_TARGET => $cmake_tests,
+            CMAKE_OPTIONS => qq{-DNET_SOCKADDR_TESTS=ON},
             FILE         => "lib${cmake_tests}.a",
         },
     },

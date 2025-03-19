@@ -38,7 +38,8 @@ extern bool secure;
 
 string active_scheme();
 
-static auto fail_cb = [](auto...){ FAIL(); };
+static auto fail_cb  = [](auto){ FAIL(); };
+static auto fail_cb2 = [](auto, auto){ FAIL(); };
 
 int64_t get_time     ();
 void    time_mark    ();

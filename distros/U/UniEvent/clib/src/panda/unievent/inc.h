@@ -9,9 +9,9 @@
     #include <winsock2.h>
 #endif
 
-#define UE_NULL_TERMINATE(what, to)         \
-    char to[what.length()+1];               \
-    memcpy(to, what.data(), what.length()); \
+#define UE_NULL_TERMINATE(what, to)                          \
+    auto to = (char*)alloca(sizeof(char)*(what.length()+1)); \
+    memcpy(to, what.data(), what.length());                  \
     to[what.length()] = 0;
 
 namespace panda { namespace unievent {

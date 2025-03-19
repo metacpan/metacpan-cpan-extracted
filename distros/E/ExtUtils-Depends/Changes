@@ -1,5 +1,10 @@
 Revision history for Perl extension ExtUtils::Depends.
 
+0.8002
+    - fix UNC path bug - https://rt.cpan.org/Ticket/Display.html?id=102436
+    - fix get_makefile_vars losing path components if space-quoted and >1 dep,
+      which was breaking CPAN module "true" which depends on two modules
+
 0.8001
     - Remove hack (cf https://rt.cpan.org/Ticket/Display.html?id=45224)
       The hijacking of EUMM's `static_lib` method is now obsolete, as well as

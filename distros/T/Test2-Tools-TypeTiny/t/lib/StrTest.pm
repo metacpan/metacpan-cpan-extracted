@@ -8,7 +8,7 @@ use Test2::Tools::Basic;
 use Test2::Tools::Compare qw< is like >;
 use Test2::Tools::Subtest qw< subtest_buffered >;
 
-use Types::Standard qw< StrMatch Num Enum Tuple >;
+use Types::Standard qw< StrMatch Num Enum Tuple Ref >;
 
 use List::Util   qw< first >;
 use Scalar::Util qw< blessed >;
@@ -110,6 +110,34 @@ sub string_test {
                     f     FOO
                 >,
             )
+        );
+    };
+
+    # Unparameterized tests
+    type_subtest Ref, sub {
+        my $type = shift;
+
+        parameters_should_create_type(
+            $type,
+            map { [$_] } qw< SCALAR ARRAY HASH CODE REF GLOB LVALUE FORMAT IO VSTRING REGEXP Regexp >,
+        );
+        parameters_should_die_as(
+            $type,
+            [{}],    qr<Parameter to Ref\[\`a\] expected to be a Perl ref type; got HASH>,
+            ['FOO'], qr<Parameter to Ref\[\`a\] expected to be a Perl ref type; got FOO>,
+        );
+
+        message_should_report_as(
+            $type,
+            undef, qr<Undef did not pass type constraint "Ref">,
+        );
+        explanation_should_report_as(
+            $type,
+            undef, [
+                qr<^"Ref.*" is a subtype of "Defined">,
+                qr<^Undef did not pass type constraint "Defined">,
+                qr<^"Defined" is defined as:>,
+            ],
         );
     };
 

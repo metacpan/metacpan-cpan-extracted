@@ -1,0 +1,157 @@
+#!perl
+
+=head1 NAME
+
+check_supervisorctl - Check supervisorctl for the status of running items as well as configs.
+
+=head1 SYNOPSIS
+
+check_supervisorctl [B<-f> <config_dir>] [B<-c>] [B<-d> <ignore_config>]  [B<-i> <ignore>] [B<-s> <status mapping>]
+
+check_supervisorctl -h/--help
+
+check_supervisorctl -v/--version
+
+=head1 DESCRIPTION
+
+Calls 'supervisorctl status' and by default alerts for anything not starting or running.
+
+Optionally then checks under the conf.d dir for supervisor and to check to see what is there
+matches what is running, wanting each item running to have it's own config and ensure everything
+present is running, ensure that the config and current status is in sync. This operates under
+the assumption that each item has it's own config and the name of the two matches post removing 
+/\.conf$/ from the name of the file.
+
+=head1 FLAGS
+
+=head2 -c
+
+Check configs as well.
+
+=head2 -f <config_dir>
+
+The directory to look for configs under if -c is set.
+
+Only items matching /\.conf$/ are checked.
+
+Default: /usr/local/etc/supervisor/conf.d
+
+Linux: /etc/supervisor/conf.d
+
+=head2 -d <ignore_config>
+
+A config entry to ignore.
+
+May be used more than once.
+
+=head2 -i <ignore>
+
+A item from status to ignore.
+
+May be used more than once.
+
+=head2 -s <status=mapping>
+
+Maps a status to to a exit value.
+
+May be used more than once to define more than one mapping.
+
+For supervisorctl it is as below.
+
+    stopped  = 2
+    starting = 0
+    running  = 0
+    backoff  = 2
+    stopping = 2
+    exited   = 2
+    fatal    = 2
+    unknown  = 2
+
+For config checking it is as below.
+
+    config_missing         = 2
+    config_dir_missing     = 3
+    config_dir_nonreadable = 3
+
+=cut
+
+use warnings;
+use strict;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Check::supervisorctl;
+
+sub version {
+	print 'check_supervisorctl v. ' . $Check::supervisorctl::VERSION . "\n";
+}
+
+sub help {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
+}
+
+my $help;
+my $version;
+my $config_dir;
+my $check_config;
+my @config_ignore;
+my @ignore;
+my @status;
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'f=s'     => \$config_dir,
+	'c'       => \$check_config,
+	'd'       => \@config_ignore,
+	'i=s'     => \@ignore,
+	's=s'     => @status,
+);
+
+if ($help) {
+	&help;
+	exit 255;
+}
+if ($version) {
+	&version;
+	exit 255;
+}
+
+my %status_mappings;
+my $not_in_that_hash = {
+	'not_running'            => 1,
+	'config_missing'         => 1,
+	'config_dir_missing'     => 1,
+	'config_dir_nonreadable' => 1,
+
+};
+my %not_in_hash_hash;
+foreach my $status_mapping (@status) {
+	$status_mapping =~ s/[\ \t]+//g;
+	my ( $status, $mapping ) = split( /\=/, $status_mapping );
+	if ( defined($status) && defined($mapping) ) {
+		if ( !$not_in_that_hash->{$status} ) {
+			$status_mappings{$status} = $mapping;
+		} else {
+			$not_in_hash_hash{$status} = $mapping;
+		}
+
+	}
+} ## end foreach my $status_mapping (@status)
+
+my $checker = Check::supervisorctl->new(
+	config_check               => $check_config,
+	config_ignore              => \@config_ignore,
+	ignore                     => \@ignore,
+	status_mapping             => \%status_mappings,
+	not_running_val            => $not_in_hash_hash{not_running},
+	config_missing_val         => $not_in_hash_hash{config_missing},
+	config_dir_missing_val     => $not_in_hash_hash{config_dir_missing},
+	config_dir_nonreadable_val => $not_in_hash_hash{config_dir_nonreadable},
+);
+
+my $results = $checker->run;
+
+print join( "\n", @{ $results->{results} } ) . "\n";
+
+exit( $results->{exit} );

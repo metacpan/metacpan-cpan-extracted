@@ -13,8 +13,8 @@ my %params = (
     CLIB => {
         CMAKE_TARGET => 'c-ares',
         CMAKE_OPTIONS => qq{-DCARES_STATIC=ON -DCARES_STATIC_PIC=ON -DCARES_SHARED=OFF -DCARES_BUILD_TOOLS=OFF -DCMAKE_C_FLAGS="$cmake_c_flags" -DCMAKE_INSTALL_LIBDIR=lib},
-        DIR       => 'clib',
-        FILE      => 'lib/libcares.a',
+        DIR       => 'c-ares-1.34.3',
+        FILE      => 'src/lib/libcares.a',
     },
 );
 

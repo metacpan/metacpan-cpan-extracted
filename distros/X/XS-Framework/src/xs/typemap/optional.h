@@ -7,7 +7,7 @@ namespace xs {
 // typemap for optional<T>
 template <class TYPE> struct Typemap<panda::optional<TYPE>> : Typemap<TYPE> {
     static panda::optional<TYPE> in (SV* arg) {
-        if (!SvOK(arg)) return {};
+        if (!sv_defined(arg)) return {};
         return Typemap<TYPE>::in(arg);
     }
     static Sv out (const panda::optional<TYPE>& var, const Sv& = {}) {

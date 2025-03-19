@@ -16,7 +16,7 @@ TEST("same server") {
         }
     });
 
-    p.client->connect_event.add([&](auto...){ test.happens("connect"); });
+    p.client->connect_event.add([&](auto, auto, auto){ test.happens("connect"); });
 
     auto req = Request::Builder().method(Request::Method::Post).uri("/")
             .header("h", "v").header("Authorization", "secret")
@@ -57,7 +57,7 @@ TEST("different server") {
         req->redirect(uri);
     });
 
-    p.client->connect_event.add([&](auto...){ test.happens("connect"); });
+    p.client->connect_event.add([&](auto, auto, auto){ test.happens("connect"); });
 
     auto req = Request::Builder().uri("/").header("h", "v").body("b").build();
     req->redirect_event.add([&](auto req, auto res, auto&) {
@@ -103,7 +103,7 @@ TEST("redirection limit") {
     client->sa = backends.back()->sockaddr().value();
 
     int rcnt = 0;
-    req->redirect_event.add([&](auto...){ rcnt++; });
+    req->redirect_event.add([&](auto, auto, auto){ rcnt++; });
 
     if (req->redirection_limit == count) {
         auto res = client->get_response(req);
@@ -184,10 +184,10 @@ TEST("redirect with connection close") {
         }
     });
 
-    p.client->connect_event.add([&](auto...){ test.happens("connect"); });
+    p.client->connect_event.add([&](auto, auto, auto){ test.happens("connect"); });
 
     auto req = Request::Builder().uri("/").build();
-    req->redirect_event.add([&](auto...) {
+    req->redirect_event.add([&](auto, auto, auto) {
         test.happens("redirect");
     });
 

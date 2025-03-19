@@ -35,20 +35,21 @@ XS::Install::ParseXS::add_pre_callback(sub {
     my $fa    = $args->[0];
     
     my $is_empty = XS::Install::ParseXS::is_empty($lines);
+    my $to = $parser->{typemap} || $parser->{typemaps_object}; # old/new ParseXS
     
     if ($func eq 'DESTROY' and $fa and $fa->{name} eq 'THIS') {
-        my $in_tmap = $parser->{typemap}->get_inputmap(ctype => $fa->{type});
+        my $in_tmap = $to->get_inputmap(ctype => $fa->{type});
         XS::Install::ParseXS::insert_code_bottom($parser, "        xs::Typemap<$fa->{type}>().destroy($fa->{name}, SvRV(ST(0)));")
            if $in_tmap && $in_tmap->xstype eq $tm_cast;
     }
     
     my $ret = $ctx->{ret};
     if ($ret !~ /^(void|SV\s*\*|bool)/) {{
-        my $out_tmap = $parser->{typemap}->get_outputmap(ctype => $ret);
+        my $out_tmap = $to->get_outputmap(ctype => $ret);
         last unless $out_tmap and $out_tmap->xstype eq $tm_cast;
 
 	    if ($func eq 'new') {
-	        XS::Install::ParseXS::insert_code_top($parser, "    PROTO = $fa->{name};") if $fa->{name};
+	        XS::Install::ParseXS::insert_code_top($parser, "    PROTO = $fa->{name};") if $fa->{name} and $fa->{name} !~ /_____unused/;
             XS::Install::ParseXS::insert_code_bottom($parser, "    RETVAL = ".XS::Install::ParseXS::default_constructor($ret, $args).';') if $is_empty;
 	    }
 

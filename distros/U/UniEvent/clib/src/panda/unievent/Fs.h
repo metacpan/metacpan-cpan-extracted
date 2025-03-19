@@ -179,8 +179,8 @@ struct Fs {
     template <class It>
     static ex<void> write (fd_t fd, It begin, It end, int64_t offset = -1) {
         size_t nbufs = end - begin;
-        _buf_t bufs[nbufs];
-        _buf_t* ptr = bufs;
+        auto bufs = (_buf_t*)alloca(sizeof(_buf_t)*nbufs);
+        auto ptr = bufs;
         for (; begin != end; ++begin) {
             auto& s = *begin;
             ptr->base = s.data();

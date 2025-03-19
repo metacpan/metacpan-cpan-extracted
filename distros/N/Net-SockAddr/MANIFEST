@@ -1,6 +1,8 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
 clib/panda-net-sockaddr-config.cmake
+clib/README.md
 clib/src/panda/net/pton.impl
 clib/src/panda/net/sockaddr.cc
 clib/src/panda/net/sockaddr.h

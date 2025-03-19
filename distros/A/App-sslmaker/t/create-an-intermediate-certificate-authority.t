@@ -9,7 +9,6 @@ my $asset;
 my $intermediate_home = Path::Tiny->new('local/tmp/step-2-intermediate/intermediate');
 my $ca_home           = Path::Tiny->new('local/tmp/step-2-intermediate/ca');
 my $ca_args           = {
-  bits       => 1024,                                    # really bad bits
   cert       => $ca_home->child('certs/ca.cert.pem'),
   days       => 20,
   home       => $ca_home,
@@ -37,7 +36,6 @@ subtest 'make intermediate' => sub {
   my $intermediate_args = {
     home       => $intermediate_home,
     key        => $intermediate_home->child('private/intermediate.key.pem'),
-    bits       => 1024,                                                        # really bad bits
     passphrase => $intermediate_home->child('private/passphrase'),
     csr        => $intermediate_home->child('certs/intermediate.csr.pem'),
     days       => 20,
@@ -52,8 +50,8 @@ subtest 'make intermediate' => sub {
 
   $asset = $sslmaker->with_config(make_csr => $intermediate_args);
   ok -e $asset, 'intermediate csr created';
-  is $asset, $intermediate_args->{csr}, 'correct asset location';
-  is + (stat $asset)[2] & 0777, 0400, 'csr mode 400';
+  is $asset,                   $intermediate_args->{csr}, 'correct asset location';
+  is +(stat $asset)[2] & 0777, 0400,                      'csr mode 400';
 
   $asset = $sslmaker->with_config(
     sign_csr => {
@@ -73,9 +71,8 @@ subtest 'make intermediate' => sub {
   undef $asset;
   ok -e $cert, 'intermediate cert was moved from temp location';
 
-  like $ca_home->child('index.txt')->slurp, qr{CN=test\.example\.com},
-    'cert was added to index.txt';
-  like $ca_home->child('serial')->slurp, qr{^1001$}m, 'serial was modified';
+  like $ca_home->child('index.txt')->slurp, qr{CN=test\.example\.com}, 'cert was added to index.txt';
+  like $ca_home->child('serial')->slurp,    qr{^1001$}m,               'serial was modified';
 };
 
 $ca_home->remove_tree({safe => 0});

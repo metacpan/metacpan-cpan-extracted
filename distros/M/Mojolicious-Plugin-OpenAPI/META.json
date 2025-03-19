@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jan.henning@thorsen.pm>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -67,7 +67,7 @@
          "web" : "https://web.libera.chat/#perl-openapi"
       }
    },
-   "version" : "5.09",
+   "version" : "5.11",
    "x_contributors" : [
       "Bernhard Graf <augensalat@gmail.com>",
       "Doug Bell <doug@preaction.me>",
@@ -92,5 +92,5 @@
       "Stephan Hradek <github@hradek.net>",
       "Stephan Hradek <stephan.hradek@eco.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -22,7 +22,7 @@ name: Test2-Tools-TypeTiny
 provides:
   Test2::Tools::TypeTiny:
     file: lib/Test2/Tools/TypeTiny.pm
-    version: v0.92.0
+    version: v0.93.0
 requires:
   Data::Dumper: '0'
   List::Util: v1.29.0
@@ -36,7 +36,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/Test2-Tools-TypeTiny/issues
   repository: git://github.com/GrantStreetGroup/Test2-Tools-TypeTiny.git
-version: v0.92.0
+version: v0.93.0
 x_generated_by_perl: v5.36.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

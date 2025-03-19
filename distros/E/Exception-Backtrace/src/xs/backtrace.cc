@@ -121,8 +121,10 @@ int payload_backtrace_c_free(pTHX_ SV*, MAGIC* mg) {
 }
 
 static string _get_backtrace_string(Ref except, bool include_c_trace) {
-    string result;
     auto it = except.value();
+    if (!it) return "no trace found";
+
+    string result;
     if (include_c_trace) {
         string c_trace;
         if (it.payload_exists(&backtrace_c_marker)) {
@@ -155,7 +157,10 @@ string get_backtrace_string_pp(Ref except) { return _get_backtrace_string(except
 
 panda::iptr<DualTrace> get_backtrace(Ref except) {
     panda::iptr<DualTrace> r;
+
     auto it = except.value();
+    if (!it) return r;
+
     if (it.payload_exists(&backtrace_perl_marker)) {
         r = new DualTrace();
         auto payload = it.payload(&backtrace_perl_marker);
@@ -214,7 +219,7 @@ Ref _is_safe_to_wrap(Sv& ex, bool add_frame_info) {
 
 bool has_backtraces(const Ref& except) {
     auto it = except.value();
-    return it.payload_exists(&backtrace_c_marker) && it.payload_exists(&backtrace_perl_marker);
+    return it && it.payload_exists(&backtrace_c_marker) && it.payload_exists(&backtrace_perl_marker);
 }
 
 void attach_backtraces(Ref except, const PerlTraceInfoSP& perl_trace) {

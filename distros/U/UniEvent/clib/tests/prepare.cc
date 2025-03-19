@@ -77,6 +77,6 @@ TEST("event listener") {
 
 TEST("static ctor") {
     AsyncTest test(1000, 1);
-    auto h = Prepare::create([&](auto...){ test.happens(); }, test.loop);
+    auto h = Prepare::create([&](auto){ test.happens(); }, test.loop);
     test.loop->run_nowait();
 }

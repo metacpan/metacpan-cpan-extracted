@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -26,33 +26,33 @@
       "configure" : {
          "requires" : {
             "Alien::cmake3" : "0",
-            "Test::Catch" : "v2.0.1",
-            "XS::Install" : "v1.3.5",
-            "XS::libcatch" : "v3.0.1",
-            "XS::libdwarf" : "20230906.0",
-            "XS::libpanda" : "v1.5.10"
+            "Test::Catch" : "v2.0.2",
+            "XS::Install" : "v1.4.0",
+            "XS::libcatch" : "v3.7.1",
+            "XS::libdwarf" : "20241226.0",
+            "XS::libpanda" : "v1.5.11"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.3.5",
-            "XS::libdwarf" : "20230906.0",
-            "XS::libpanda" : "v1.5.10"
+            "XS::Install" : "v1.4.0",
+            "XS::libdwarf" : "20241226.0",
+            "XS::libpanda" : "v1.5.11"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Catch" : "v2.0.1",
+            "Test::Catch" : "v2.0.2",
             "Test::Deep" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::libcatch" : "v3.0.1",
-            "XS::libdwarf" : "20230906.0",
-            "XS::libpanda" : "v1.5.10"
+            "XS::libcatch" : "v3.7.1",
+            "XS::libdwarf" : "20241226.0",
+            "XS::libpanda" : "v1.5.11"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.0",
+   "version" : "v1.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

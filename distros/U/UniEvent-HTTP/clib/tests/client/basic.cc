@@ -217,7 +217,7 @@ TEST("request via proxy") {
     p.server->enable_echo();
 
 
-    p.proxy.server->connection_event.add([&](auto...){ test.happens("proxy-1"); });
+    p.proxy.server->connection_event.add([&](auto, auto, auto){ test.happens("proxy-1"); });
     auto req1 = Request::Builder().method(Request::Method::Get).uri("/").proxy(p.proxy.url).build();
     auto res1 = p.client->get_response(req1);
 
@@ -225,7 +225,7 @@ TEST("request via proxy") {
     CHECK(res1->http_version == 11);
 
     auto proxy2 = new_proxy(test.loop);
-    proxy2.server->connection_event.add([&](auto...){ test.happens("proxy-2"); });
+    proxy2.server->connection_event.add([&](auto, auto, auto){ test.happens("proxy-2"); });
     auto req2 = Request::Builder().method(Request::Method::Get).uri("/").proxy(proxy2.url).build();
     auto res2 = p.client->get_response(req2);
 

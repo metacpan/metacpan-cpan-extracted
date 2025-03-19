@@ -7,7 +7,7 @@ static inline Sv get_send_message_params (Parser::MessageBuilder& builder, SV** 
         if (!name.length()) continue;
         auto val = args[i+1];
         switch (name[0]) {
-            case 'd': if (name == "deflate" && SvOK(val)) builder.deflate(SvTRUE(val)); break;
+            case 'd': if (name == "deflate" && sv_defined(val)) builder.deflate(SvTRUE(val)); break;
             case 'o': if (name == "opcode")  builder.opcode((Opcode)SvIV(val)); break;
             case 'p': if (name == "payload") payload_sv = val; break;
         }

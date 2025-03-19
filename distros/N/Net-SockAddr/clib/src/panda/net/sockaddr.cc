@@ -11,7 +11,7 @@
 #include <system_error>
 
 #define _NULL_TERMINATE(what, to)                \
-    char to[what.length()+1];                    \
+    auto to = (char*)alloca(what.length()+1);    \
     std::memcpy(to, what.data(), what.length()); \
     to[what.length()] = 0;
 

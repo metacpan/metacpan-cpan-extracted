@@ -9,6 +9,7 @@ static const int UV__INET6_ADDRSTRLEN = panda::net::SockAddr::IP6_MAX_ADDRSTRLEN
 static const int UV_EAFNOSUPPORT      = (int)errc::address_family_not_supported;
 static const int UV_ENOSPC            = (int)errc::no_space_on_device;
 static const int UV_EINVAL            = (int)errc::invalid_argument;
+static const int INET6_MAX_GROUP_LEN = 4;
 
 // Copied from libuv
 
@@ -97,7 +98,7 @@ static int inet_ntop6(const unsigned char *src, char *dst, size_t size) {
       tp += strlen(tp);
       break;
     }
-    tp += sprintf(tp, "%x", words[i]);
+    tp += snprintf(tp, INET6_MAX_GROUP_LEN+1, "%x", words[i]);
   }
   /* Was it a trailing run of 0x00's? */
   if (best.base != -1 && (best.base + best.len) == ARRAY_SIZE(words))

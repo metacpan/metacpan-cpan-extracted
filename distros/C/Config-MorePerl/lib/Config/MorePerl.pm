@@ -3,7 +3,7 @@ use 5.012;
 use Path::Class;
 use Data::Recursive(); # XS code needs xs::merge
 
-our $VERSION = '1.2.3';
+our $VERSION = '1.2.4';
 
 XS::Loader::load();
 
@@ -100,6 +100,7 @@ sub _process_directive {
 sub _INCLUDE {
     my ($dir, $curpkg, $file) = @_;
     $dir = $dir && Path::Class::Dir->new($dir);
+    $file =~ s/^~\//$ENV{HOME}\//;
     $file = Path::Class::File->new($file);
     my $ns = '';
     if ($curpkg ne 'NS') {

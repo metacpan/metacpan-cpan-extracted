@@ -37,7 +37,7 @@ size_t Sub::_call (CV* cv, I32 flags, const CallArgs& args, SV** ret, size_t max
 
     auto errsv = GvSV(PL_errgv);
     if (SvTRUE(errsv)) {
-        while (count > 0) { POPs; --count; }
+        while (count > 0) { (void)POPs; --count; }
         PUTBACK; FREETMPS; LEAVE;
         auto exc = Sv::noinc(errsv);
         GvSV(PL_errgv) = newSVpvs("");
@@ -47,7 +47,7 @@ size_t Sub::_call (CV* cv, I32 flags, const CallArgs& args, SV** ret, size_t max
     auto nret = count > maxret ? maxret : count;
 
     if (!avr) {
-        while (count > maxret) { POPs; --count; }
+        while (count > maxret) { (void)POPs; --count; }
         while (count > 0) ret[--count] = SvREFCNT_inc_NN(POPs);
     }
     else if (count) {

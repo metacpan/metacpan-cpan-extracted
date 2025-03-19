@@ -107,7 +107,7 @@ TEST("idle timeout before ssl established") {
         REQUIRE(!err);
         test.happens();
     });
-    client->eof_event.add([&](auto...){
+    client->eof_event.add([&](auto){
         test.happens();
         test.loop->stop();
     });

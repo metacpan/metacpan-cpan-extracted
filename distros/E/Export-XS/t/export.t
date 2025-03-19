@@ -45,4 +45,11 @@ subtest 'no function error' => sub {
     dies_ok { Ex->import('nonexistent') };
 };
 
+subtest 'no stash error' => sub {
+    dies_ok { Export::XS::constants_list('NonExistent') };
+    dies_ok { Export::XS::export_constants('NonExistentFrom', 'Ex') };
+    dies_ok { Export::XS::export_constants('Ex', 'NonExistentTo') };
+    dies_ok { Export::XS::export_constants('NonExistentFrom', 'NonExistentTo') };
+};
+
 done_testing();

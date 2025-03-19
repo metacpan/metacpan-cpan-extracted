@@ -29,13 +29,18 @@ DESCRIPTION
     that a perl extension is treated like a shared library that provides
     also a C and an XS interface besides the perl one.
 
-    This works as long as the base extension is loaded with the RTLD_GLOBAL
-    flag (usually done with a
+    This works as long as the base (or "producing") extension is loaded with
+    the "RTLD_GLOBAL" flag (usually done with a
 
             sub dl_load_flags {0x01}
 
     in the main .pm file) if you need to use functions defined in the
-    module.
+    module. That "producing" extension will also need to tell
+    ExtUtils::MakeMaker the specific functions to export, with arguments to
+    "WriteMakefile" like:
+
+      FUNCLIST => [qw(function_name)],
+      DL_FUNCS => { 'Extension::Name' => [] },
 
     The basic scheme of operation is to collect information about a module
     in the instance, and then store that data in the Perl library where it
@@ -210,18 +215,20 @@ SUPPORT
         (requires PAUSE ID or Bitcard), or by sending an e-mail to
         "bug-ExtUtils-Depends at rt.cpan.org".
 
-    Gnome.org Bugzilla
-        Report bugs/feature requests to the 'gnome-perl' product (requires
-        login) <http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-perl>
+    Gnome.org Bugtracker
+        Report bugs/feature requests to 'perl-extutils-depends' (requires
+        login)
+        <https://gitlab.gnome.org/GNOME/perl-extutils-depends/-/issues/>
 
     Patches that implement new features with test cases, and/or test cases
     that exercise existing bugs are always welcome.
 
-    The Gtk-Perl mailing list is at "gtk-perl-list at gnome dot org".
+    The Gtk-Perl support forum is at
+    <https://discourse.gnome.org/tags/c/platform/language-bindings/11/perl>
 
   Source Code
     The source code to ExtUtils::Depends is available at the Gnome.org Git
-    repo (<https://git.gnome.org/browse/perl-ExtUtils-Depends/>). Create
+    repo (<https://gitlab.gnome.org/GNOME/perl-extutils-depends>). Create
     your own copy of the Git repo with:
 
       git clone git://git.gnome.org/perl-ExtUtils-Depends (Git protocol)

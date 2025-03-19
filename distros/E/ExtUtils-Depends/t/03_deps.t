@@ -1,8 +1,7 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -32,3 +31,5 @@ $info->load_deps;
 ok (exists $deps{DepTest});
 
 # --------------------------------------------------------------------------- #
+
+done_testing;

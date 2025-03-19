@@ -3,6 +3,7 @@
 #include <deque>
 #include "ServerRequest.h"
 #include "panda/error.h"
+#include "panda/refcnt.h"
 #include "panda/unievent/forward.h"
 #include <panda/unievent/Stream.h>
 #include <panda/protocol/http/RequestParser.h>
@@ -39,12 +40,17 @@ struct ServerConnection : Refcnt, private IStreamSelfListener, private protocol:
 
     excepted<net::SockAddr, ErrorCode> sockaddr () const { return stream->sockaddr(); }
     excepted<net::SockAddr, ErrorCode> peeraddr () const { return stream->peeraddr(); }
-    
+
     uint64_t establish_time() const { return _establish_time; }
+
+    void user_data(const iptr<Refcnt>& data) { stream->user_data = data; }
+
+    template<typename T>
+    const iptr<T>& user_data() const { return dynamic_pointer_cast<T>(stream->user_data); }
 
 private:
     friend ServerRequest; friend ServerResponse;
-    
+
     enum class State { Running, Closing, ShuttingDown };
 
     using RequestParser = protocol::http::RequestParser;
@@ -83,7 +89,7 @@ private:
     void cleanup_request    ();
     void drop_requests      (const ErrorCode&);
     void check_if_idle      ();
-    
+
     void do_close(const ErrorCode&, bool soft);
 
     StreamSP upgrade(const ServerRequest*);

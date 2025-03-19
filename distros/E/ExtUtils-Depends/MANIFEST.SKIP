@@ -6,3 +6,4 @@
 \.doap$
 ^MANIFEST\.bak$
 ^MYMETA.*
+\.sw.$

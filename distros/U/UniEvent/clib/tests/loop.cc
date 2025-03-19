@@ -125,7 +125,7 @@ TEST("loop doesn't leak when it has internal prepare and resolver") {
     dcnt = ccnt = 0;
     LoopSP loop = new MyLoop();
     loop->delay([]{});
-    loop->resolver()->resolve("localhost", [](auto...){});
+    loop->resolver()->resolve("localhost", [](auto, auto, auto){});
     loop->run();
     loop = nullptr;
     CHECK(dcnt == 1);
@@ -241,14 +241,14 @@ TEST_HIDDEN("bench_realtime") {
             TcpP2P p = common_pairs.back();
 
             p.sconn->write("1");
-            p.sconn->read_event.add([&](auto...) {
+            p.sconn->read_event.add([&](auto, auto, auto) {
                 counter++;
                 if (counter == size) {
                     loop->stop();
                 }
             });
 
-            p.client->read_event.add([](auto s, auto buf, auto...) {
+            p.client->read_event.add([](auto s, auto buf, auto) {
                 s->write(buf);
             });
         }

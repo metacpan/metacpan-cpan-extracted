@@ -11,7 +11,7 @@ namespace {
     struct MyListener : Catch::EventListenerBase {
         using EventListenerBase::EventListenerBase;
 
-        void sectionEnded( Catch::SectionStats const& sectionStats ) override {
+        void sectionEnded( Catch::SectionStats const& /*sectionStats*/ ) override {
             Tracer::reset();
             on_delete_calls = 0;
         }
@@ -605,7 +605,7 @@ TEST("compiles") {
 TEST_CASE("refcnt synopsis", "[.]") {
     auto pass_somewhere = [](iptr<Refcnt>) {};
 
-    class MyType : public Refcnt {
+    struct MyType : public Refcnt {
         double my_data;
     };
 

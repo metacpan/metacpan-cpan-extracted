@@ -6,16 +6,19 @@ namespace panda { namespace unievent { namespace backend { namespace uv {
 
 template <class Func>
 static inline expected<string, std::error_code> uvx_sockname (const uv_pipe_t* uvhp, Func&& f) {
-    size_t len = 0;
-    int err = f(uvhp, nullptr, &len);
-    if (err && err != UV_ENOBUFS) return make_unexpected(uvx_error(err));
-
-    panda::string ret(len);
-    ret[0] = 0; /* prevent valgrind complains */
-    err = f(uvhp, ret.buf(), &len);
-
+    // libuv doesn't allow to pass null buffer for len discover, we have to pass something
+    panda::string ret(1); // there is a bug as per libuv 1.41.2: it may access first byte of buf even if we pass len=0
+    ret[0] = 0; // prevent valgrind complains
+    
+    size_t len = ret.capacity(); // will be SSO size
+    int err = f(uvhp, ret.buf(), &len);
+    if (err == UV_ENOBUFS) {
+        ret.reserve(len);
+        len = ret.capacity();
+        err = f(uvhp, ret.buf(), &len);
+    }
     if (err) return make_unexpected(uvx_error(err));
-
+    
     ret.length(len);
     return ret;
 }

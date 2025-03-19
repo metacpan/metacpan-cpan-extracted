@@ -116,4 +116,23 @@ while ( my ($t, $d) = each %tests_4 ) {
     ok( $v == $d->{Ans}, $t );    
 }
 
+# rationalizing the denominator
+my %tests_5 = (
+    "complex test 30"           =>      { Expr => '(2-7*i)/(1+2*i)', },
+    "complex test 31"           =>      { Expr => '(1+2*i)/(3-i)', },
+    "complex test 32"           =>      { Expr => '(1+2*i)/(3+4*i)', },
+    "complex test 33"           =>      { Expr => '1/(1+2*i)', },
+    "complex test 34"           =>      { Expr => '(2+3*i)/(2-3*i)', },
+    "complex test 35"           =>      { Expr => '(5+i)/(i-3)', },
+    "complex test 36"           =>      { Expr => '6/(4*i - 3)', },
+    "complex test 37"           =>      { Expr => '1/((i+2)*(1-2*i))', },
+);
+
+while ( my ($t, $d) = each %tests_5 ) {
+    my $e = parse_from_string($d->{Expr});
+    my $tc = $e->to_collected(); 
+    my $v1 = $e->value( 'i' => i );
+    my $v2 = $tc->value( 'i' => i );
+    ok( $v1 == $v2, $t ); 
+}
 

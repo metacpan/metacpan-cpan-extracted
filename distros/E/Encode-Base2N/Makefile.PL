@@ -21,6 +21,7 @@ write_makefile(
         CLIB     => {
             DIR          => 'clib',
             CMAKE_TARGET => "${cmake_tests}",
+            CMAKE_OPTIONS => qq{-DENCODE_BASE2N_TESTS=ON},
             FILE         => "lib${cmake_tests}.a",
         },
     },

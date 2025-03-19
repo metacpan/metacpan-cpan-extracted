@@ -3,7 +3,7 @@ use 5.012;
 use UniEvent;
 use Protocol::WebSocket::Fast;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 XS::Loader::load();
 

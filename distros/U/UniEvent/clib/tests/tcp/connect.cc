@@ -113,7 +113,7 @@ TEST("connect timeout with real canceled connection") {
     auto sa = server->sockaddr().value();
     auto ip = sa.ip();
     auto port = sa.port();
-    server->connection_event.add([](auto...) {});
+    server->connection_event.add([](auto, auto, auto) {});
 
     std::vector<TcpSP> clients(tries);
     std::vector<decltype(clients[0]->connect_event)*> disps;

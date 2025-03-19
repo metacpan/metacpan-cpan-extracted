@@ -5,13 +5,14 @@
 namespace panda {
 
 inline string varint_encode(uint32_t i) {
-    string res;
+    char c[8];
+    int idx = 0;
     while (i > 127) {
-        res += 0x80 | uint8_t(i & 0x7F);
+        c[idx++] = 0x80 | uint8_t(i & 0x7F);
         i >>= 7;
     }
-    res += uint8_t(i);
-    return res;
+    c[idx++] = uint8_t(i);
+    return string(c, idx);
 }
 
 inline uint32_t _varint_decode(const char*& ptr, const char* end) {
@@ -33,8 +34,10 @@ inline uint32_t varint_decode(const string& str, size_t start = 0) {
 }
 
 inline string varint_encode_s(int32_t i) {
-    //ZigZag encoding, x86 (both 32,64) only, uses signed bit shift
-    return varint_encode((i << 1) ^ (i >> 31));
+    ////ZigZag encoding, x86 (both 32,64) only, uses signed bit shift
+    //return varint_encode((i << 1) ^ (i >> 31));
+    // make sanitizer happy with less efficient code. TODO: use some lib for that
+    return varint_encode(i >= 0 ? (uint32_t)(i * 2) : ((uint32_t)(-i)*2 - 1));
 }
 
 inline int32_t _varint_decode_s(const char*& ptr, const char* end) {

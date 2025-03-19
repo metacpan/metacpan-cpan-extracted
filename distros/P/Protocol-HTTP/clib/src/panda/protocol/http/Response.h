@@ -9,7 +9,7 @@ namespace panda { namespace protocol { namespace http {
 
 struct Request;
 
-extern panda::time::TimezoneSP gmtz;
+panda::time::TimezoneSP gmtz();
 
 struct Response : Message, AllocatedObject<Response> {
     using Date = panda::date::Date;
@@ -45,7 +45,7 @@ struct Response : Message, AllocatedObject<Response> {
 
         Cookie& expires (const Date& _d) {
             auto d = _d;
-            d.to_timezone(gmtz);
+            d.to_timezone(gmtz());
             _expires = d.to_string(Date::Format::rfc1123);
             _max_age = 0;
             return *this;

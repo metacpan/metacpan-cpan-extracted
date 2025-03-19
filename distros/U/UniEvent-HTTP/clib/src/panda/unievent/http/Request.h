@@ -60,6 +60,7 @@ struct Request : protocol::http::Request, private ITimerListener {
     CallbackDispatcher<continue_fptr> continue_event;
     SslContext                        ssl_ctx           = nullptr;
     URISP                             proxy;
+    bool                              proxy_resolve     = true;
     AddrInfoHints                     tcp_hints         = Tcp::defhints;
     Form                              form;
     bool                              ssl_check_cert    = default_ssl_verify;
@@ -96,22 +97,22 @@ private:
         if (!uri) throw HttpError("request must have uri");
         if (!uri->host()) throw HttpError("uri must have host");
     }
-    
+
     void ensure_timer_active(const LoopSP& loop) {
         if (!timeout) return;
         if (!_timer) _timer = new Timer(loop);
         if (!_timer->active()) _timer->once(timeout); // if active it may be redirected request
         _timer->event_listener(this);
     }
-    
+
     void on_timer(const TimerSP&) override;
-    
+
     void cleanup_after_redirect() {
         _client = nullptr;
         _transfer_completed = false;
         if (_timer) _timer->event_listener(nullptr);
     }
-    
+
     void finish_and_notify(ResponseSP, const ErrorCode&);
 };
 

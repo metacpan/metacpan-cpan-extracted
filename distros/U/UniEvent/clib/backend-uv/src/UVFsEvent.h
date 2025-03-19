@@ -13,7 +13,7 @@ struct UVFsEvent : UVHandle<FsEventImpl, uv_fs_event_t> {
         unsigned uv_flags = 0;
         if (flags & Flags::RECURSIVE) uv_flags |= UV_FS_EVENT_RECURSIVE;
         UE_NULL_TERMINATE(path, path_str);
-        return uvx_ce(uv_fs_event_start(&uvh, on_fs_event, path_str, flags));
+        return uvx_ce(uv_fs_event_start(&uvh, on_fs_event, path_str, uv_flags));
     }
 
     std::error_code stop () override {

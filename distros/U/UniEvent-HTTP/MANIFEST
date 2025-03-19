@@ -1,5 +1,7 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
+clib/README.md
 clib/src/panda/unievent/http.h
 clib/src/panda/unievent/http.icc
 clib/src/panda/unievent/http/Client.cc
@@ -37,6 +39,7 @@ clib/tests/cert/ca2.key
 clib/tests/cert/ca2.pem
 clib/tests/cert/keys-gen.txt
 clib/tests/client/basic.cc
+clib/tests/client/docs.cc
 clib/tests/client/form.cc
 clib/tests/client/keep-alive.cc
 clib/tests/client/live.cc
@@ -49,6 +52,7 @@ clib/tests/client/user-agent.cc
 clib/tests/lib/test.cc
 clib/tests/lib/test.h
 clib/tests/server/basic.cc
+clib/tests/server/docs.cc
 clib/tests/server/keep-alive.cc
 clib/tests/server/misc.cc
 clib/tests/server/partial.cc
@@ -56,6 +60,10 @@ clib/tests/server/pipeline.cc
 clib/tests/server/upgrade.cc
 clib/tests/server/version.cc
 clib/unievent-http-config.cmake
+doc/client.md
+doc/pool.md
+doc/server.md
+doc/useragent.md
 INSTALL.SKIP
 lib/Plack/Handler/UniEvent/HTTP/Simple.pm
 lib/Plack/Handler/UniEvent/HTTP/Simple.pod
@@ -96,6 +104,8 @@ src/xs/unievent/http.cc
 src/xs/unievent/http.h
 src/xs/unievent/http/Plack.cc
 src/xs/unievent/http/Plack.h
+t/cert/01-alice-127.key
+t/cert/01-alice-127.pem
 t/cert/01-alice.csr
 t/cert/01-alice.key
 t/cert/01-alice.pem
@@ -104,6 +114,8 @@ t/cert/02-bob.key
 t/cert/02-bob.pem
 t/cert/ca.key
 t/cert/ca.pem
+t/cert/ca127.key
+t/cert/ca127.pem
 t/cert/ca2.key
 t/cert/ca2.pem
 t/cert/keys-gen.txt

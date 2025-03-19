@@ -1,0 +1,1295 @@
+Performing C SOURCE FILE Test HAVE__Werror_partial_availability failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GtPMbs
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f5979/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f5979.dir/build.make CMakeFiles/cmTC_f5979.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GtPMbs'
+Building C object CMakeFiles/cmTC_f5979.dir/src.c.o
+/usr/bin/cc -DHAVE__Werror_partial_availability  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration    -Werror=partial-availability -o CMakeFiles/cmTC_f5979.dir/src.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GtPMbs/src.c
+cc1: error: '-Werror=partial-availability': no option '-Wpartial-availability'
+gmake[1]: *** [CMakeFiles/cmTC_f5979.dir/build.make:78: CMakeFiles/cmTC_f5979.dir/src.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GtPMbs'
+gmake: *** [Makefile:127: cmTC_f5979/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test HAVE__Qunused_arguments failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-FcEGCa
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ddfdc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ddfdc.dir/build.make CMakeFiles/cmTC_ddfdc.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-FcEGCa'
+Building C object CMakeFiles/cmTC_ddfdc.dir/src.c.o
+/usr/bin/cc -DHAVE__Qunused_arguments  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration    -Qunused-arguments -o CMakeFiles/cmTC_ddfdc.dir/src.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-FcEGCa/src.c
+cc: error: unrecognized command-line option '-Qunused-arguments'
+gmake[1]: *** [CMakeFiles/cmTC_ddfdc.dir/build.make:78: CMakeFiles/cmTC_ddfdc.dir/src.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-FcEGCa'
+gmake: *** [Makefile:127: cmTC_ddfdc/fast] Error 2
+
+
+Source file was:
+int main(void) { return 0; }
+
+Performing C++ SOURCE FILE Test HAVE__Qunused_arguments_CXX failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-KUsO5f
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6f973/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6f973.dir/build.make CMakeFiles/cmTC_6f973.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-KUsO5f'
+Building CXX object CMakeFiles/cmTC_6f973.dir/src.cxx.o
+/usr/bin/c++ -DHAVE__Qunused_arguments_CXX  -Wall -Wextra -Wcast-align -Wformat-security -Wmissing-declarations -Wmissing-format-attribute -Wpacked-bitfield-compat -Wredundant-decls -Wvla -Wno-unused-parameter    -Qunused-arguments -o CMakeFiles/cmTC_6f973.dir/src.cxx.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-KUsO5f/src.cxx
+c++: error: unrecognized command-line option '-Qunused-arguments'
+gmake[1]: *** [CMakeFiles/cmTC_6f973.dir/build.make:78: CMakeFiles/cmTC_6f973.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-KUsO5f'
+gmake: *** [Makefile:127: cmTC_6f973/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+
+Determining if the function res_servicename exists failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WtmF2w
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_7668b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7668b.dir/build.make CMakeFiles/cmTC_7668b.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WtmF2w'
+Building C object CMakeFiles/cmTC_7668b.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=res_servicename -o CMakeFiles/cmTC_7668b.dir/CheckFunctionExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WtmF2w/CheckFunctionExists.c
+Linking C executable cmTC_7668b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7668b.dir/link.txt --verbose=1
+/usr/bin/cc -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=res_servicename CMakeFiles/cmTC_7668b.dir/CheckFunctionExists.c.o -o cmTC_7668b 
+/usr/bin/ld: CMakeFiles/cmTC_7668b.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `res_servicename'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_7668b.dir/build.make:99: cmTC_7668b] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WtmF2w'
+gmake: *** [Makefile:127: cmTC_7668b/fast] Error 2
+
+
+
+Determining if the function res_servicename exists in the resolv failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-o1IhLj
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b5dd8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b5dd8.dir/build.make CMakeFiles/cmTC_b5dd8.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-o1IhLj'
+Building C object CMakeFiles/cmTC_b5dd8.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=res_servicename -o CMakeFiles/cmTC_b5dd8.dir/CheckFunctionExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-o1IhLj/CheckFunctionExists.c
+Linking C executable cmTC_b5dd8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b5dd8.dir/link.txt --verbose=1
+/usr/bin/cc -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=res_servicename CMakeFiles/cmTC_b5dd8.dir/CheckFunctionExists.c.o -o cmTC_b5dd8  -lresolv 
+/usr/bin/ld: CMakeFiles/cmTC_b5dd8.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `res_servicename'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_b5dd8.dir/build.make:99: cmTC_b5dd8] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-o1IhLj'
+gmake: *** [Makefile:127: cmTC_b5dd8/fast] Error 2
+
+
+
+Determining if files AvailabilityMacros.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-jqfX4Q
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_dc546/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_dc546.dir/build.make CMakeFiles/cmTC_dc546.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-jqfX4Q'
+Building C object CMakeFiles/cmTC_dc546.dir/HAVE_AVAILABILITYMACROS_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_dc546.dir/HAVE_AVAILABILITYMACROS_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-jqfX4Q/HAVE_AVAILABILITYMACROS_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-jqfX4Q/HAVE_AVAILABILITYMACROS_H.c:2:10: fatal error: AvailabilityMacros.h: No such file or directory
+    2 | #include <AvailabilityMacros.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_dc546.dir/build.make:78: CMakeFiles/cmTC_dc546.dir/HAVE_AVAILABILITYMACROS_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-jqfX4Q'
+gmake: *** [Makefile:127: cmTC_dc546/fast] Error 2
+
+
+Source:
+/* */
+#include <AvailabilityMacros.h>
+
+
+int main(void){return 0;}
+
+Determining if files sys/sockio.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-EE3YNV
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2986c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2986c.dir/build.make CMakeFiles/cmTC_2986c.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-EE3YNV'
+Building C object CMakeFiles/cmTC_2986c.dir/HAVE_SYS_SOCKIO_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_2986c.dir/HAVE_SYS_SOCKIO_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-EE3YNV/HAVE_SYS_SOCKIO_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-EE3YNV/HAVE_SYS_SOCKIO_H.c:2:10: fatal error: sys/sockio.h: No such file or directory
+    2 | #include <sys/sockio.h>
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_2986c.dir/build.make:78: CMakeFiles/cmTC_2986c.dir/HAVE_SYS_SOCKIO_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-EE3YNV'
+gmake: *** [Makefile:127: cmTC_2986c/fast] Error 2
+
+
+Source:
+/* */
+#include <sys/sockio.h>
+
+
+int main(void){return 0;}
+
+Determining if files netinet6/in6.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7qX9kt
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_09e49/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_09e49.dir/build.make CMakeFiles/cmTC_09e49.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7qX9kt'
+Building C object CMakeFiles/cmTC_09e49.dir/HAVE_NETINET6_IN6_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_09e49.dir/HAVE_NETINET6_IN6_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7qX9kt/HAVE_NETINET6_IN6_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7qX9kt/HAVE_NETINET6_IN6_H.c:2:10: fatal error: netinet6/in6.h: No such file or directory
+    2 | #include <netinet6/in6.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_09e49.dir/build.make:78: CMakeFiles/cmTC_09e49.dir/HAVE_NETINET6_IN6_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7qX9kt'
+gmake: *** [Makefile:127: cmTC_09e49/fast] Error 2
+
+
+Source:
+/* */
+#include <netinet6/in6.h>
+
+
+int main(void){return 0;}
+
+Determining if files socket.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-4o7YLW
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2ed65/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2ed65.dir/build.make CMakeFiles/cmTC_2ed65.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-4o7YLW'
+Building C object CMakeFiles/cmTC_2ed65.dir/HAVE_SOCKET_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_2ed65.dir/HAVE_SOCKET_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-4o7YLW/HAVE_SOCKET_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-4o7YLW/HAVE_SOCKET_H.c:2:10: fatal error: socket.h: No such file or directory
+    2 | #include <socket.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_2ed65.dir/build.make:78: CMakeFiles/cmTC_2ed65.dir/HAVE_SOCKET_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-4o7YLW'
+gmake: *** [Makefile:127: cmTC_2ed65/fast] Error 2
+
+
+Source:
+/* */
+#include <socket.h>
+
+
+int main(void){return 0;}
+
+Determining if files stropts.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-HCypRY
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d7feb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d7feb.dir/build.make CMakeFiles/cmTC_d7feb.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-HCypRY'
+Building C object CMakeFiles/cmTC_d7feb.dir/HAVE_STROPTS_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_d7feb.dir/HAVE_STROPTS_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-HCypRY/HAVE_STROPTS_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-HCypRY/HAVE_STROPTS_H.c:2:10: fatal error: stropts.h: No such file or directory
+    2 | #include <stropts.h>
+      |          ^~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_d7feb.dir/build.make:78: CMakeFiles/cmTC_d7feb.dir/HAVE_STROPTS_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-HCypRY'
+gmake: *** [Makefile:127: cmTC_d7feb/fast] Error 2
+
+
+Source:
+/* */
+#include <stropts.h>
+
+
+int main(void){return 0;}
+
+Determining if files sys/event.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-j6VmNH
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e7dba/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e7dba.dir/build.make CMakeFiles/cmTC_e7dba.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-j6VmNH'
+Building C object CMakeFiles/cmTC_e7dba.dir/HAVE_SYS_EVENT_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_e7dba.dir/HAVE_SYS_EVENT_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-j6VmNH/HAVE_SYS_EVENT_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-j6VmNH/HAVE_SYS_EVENT_H.c:2:10: fatal error: sys/event.h: No such file or directory
+    2 | #include <sys/event.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_e7dba.dir/build.make:78: CMakeFiles/cmTC_e7dba.dir/HAVE_SYS_EVENT_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-j6VmNH'
+gmake: *** [Makefile:127: cmTC_e7dba/fast] Error 2
+
+
+Source:
+/* */
+#include <sys/event.h>
+
+
+int main(void){return 0;}
+
+Performing C SOURCE FILE Test HAVE_TYPE_SOCKET failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_38cb9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_38cb9.dir/build.make CMakeFiles/cmTC_38cb9.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9'
+Building C object CMakeFiles/cmTC_38cb9.dir/src.c.o
+/usr/bin/cc -DHAVE_TYPE_SOCKET -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_38cb9.dir/src.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9/src.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9/src.c:30:21: warning: function declaration isn’t a prototype [-Wstrict-prototypes]
+   30 |                 int main() {
+      |                     ^~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9/src.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9/src.c:30:21: warning: old-style function definition [-Wold-style-definition]
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9/src.c:31:25: error: unknown type name ‘SOCKET’
+   31 |                         SOCKET var_exists;
+      |                         ^~~~~~
+gmake[1]: *** [CMakeFiles/cmTC_38cb9.dir/build.make:78: CMakeFiles/cmTC_38cb9.dir/src.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-weA5s9'
+gmake: *** [Makefile:127: cmTC_38cb9/fast] Error 2
+
+
+Source file was:
+
+		#include <stdio.h>
+		#include <stdlib.h>
+	
+		#include <stdbool.h>
+		#include <sys/types.h>
+		#include <arpa/inet.h>
+		#include <arpa/nameser.h>
+		#include <netdb.h>
+		#include <net/if.h>
+		#include <ifaddrs.h>
+		#include <netinet/in.h>
+		#include <netinet/tcp.h>
+		#include <signal.h>
+		#include <stdlib.h>
+		#include <string.h>
+		#include <strings.h>
+		#include <sys/ioctl.h>
+		#include <sys/random.h>
+		#include <sys/select.h>
+		#include <sys/socket.h>
+		#include <sys/time.h>
+		#include <sys/stat.h>
+		#include <sys/uio.h>
+		#include <sys/epoll.h>
+		#include <time.h>
+		#include <poll.h>
+		#include <fcntl.h>
+		#include <unistd.h>
+		int main() {
+			SOCKET var_exists;
+			(void)var_exists;
+			return 0;
+		}
+	
+
+Determining if the SO_NONBLOCK exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d30b8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d30b8.dir/build.make CMakeFiles/cmTC_d30b8.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV'
+Building C object CMakeFiles/cmTC_d30b8.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_d30b8.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV/CheckSymbolExists.c:32:19: error: ‘SO_NONBLOCK’ undeclared (first use in this function); did you mean ‘O_NONBLOCK’?
+   32 |   return ((int*)(&SO_NONBLOCK))[argc];
+      |                   ^~~~~~~~~~~
+      |                   O_NONBLOCK
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_d30b8.dir/build.make:78: CMakeFiles/cmTC_d30b8.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-MhUWzV'
+gmake: *** [Makefile:127: cmTC_d30b8/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef SO_NONBLOCK
+  return ((int*)(&SO_NONBLOCK))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the closesocket exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f9492/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f9492.dir/build.make CMakeFiles/cmTC_f9492.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q'
+Building C object CMakeFiles/cmTC_f9492.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_f9492.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q/CheckSymbolExists.c:32:19: error: ‘closesocket’ undeclared (first use in this function)
+   32 |   return ((int*)(&closesocket))[argc];
+      |                   ^~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_f9492.dir/build.make:78: CMakeFiles/cmTC_f9492.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-nBH75Q'
+gmake: *** [Makefile:127: cmTC_f9492/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef closesocket
+  return ((int*)(&closesocket))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the CloseSocket exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_0319e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0319e.dir/build.make CMakeFiles/cmTC_0319e.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP'
+Building C object CMakeFiles/cmTC_0319e.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_0319e.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP/CheckSymbolExists.c:32:19: error: ‘CloseSocket’ undeclared (first use in this function)
+   32 |   return ((int*)(&CloseSocket))[argc];
+      |                   ^~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_0319e.dir/build.make:78: CMakeFiles/cmTC_0319e.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-fvqjFP'
+gmake: *** [Makefile:127: cmTC_0319e/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef CloseSocket
+  return ((int*)(&CloseSocket))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the connectx exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_0b239/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0b239.dir/build.make CMakeFiles/cmTC_0b239.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A'
+Building C object CMakeFiles/cmTC_0b239.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_0b239.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A/CheckSymbolExists.c:32:19: error: ‘connectx’ undeclared (first use in this function); did you mean ‘connect’?
+   32 |   return ((int*)(&connectx))[argc];
+      |                   ^~~~~~~~
+      |                   connect
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_0b239.dir/build.make:78: CMakeFiles/cmTC_0b239.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Lmj66A'
+gmake: *** [Makefile:127: cmTC_0b239/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef connectx
+  return ((int*)(&connectx))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the ConvertInterfaceIndexToLuid exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_87ac8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_87ac8.dir/build.make CMakeFiles/cmTC_87ac8.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5'
+Building C object CMakeFiles/cmTC_87ac8.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_87ac8.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5/CheckSymbolExists.c:32:19: error: ‘ConvertInterfaceIndexToLuid’ undeclared (first use in this function)
+   32 |   return ((int*)(&ConvertInterfaceIndexToLuid))[argc];
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_87ac8.dir/build.make:78: CMakeFiles/cmTC_87ac8.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Nxrnj5'
+gmake: *** [Makefile:127: cmTC_87ac8/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef ConvertInterfaceIndexToLuid
+  return ((int*)(&ConvertInterfaceIndexToLuid))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the ConvertInterfaceLuidToNameA exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4137f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4137f.dir/build.make CMakeFiles/cmTC_4137f.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ'
+Building C object CMakeFiles/cmTC_4137f.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_4137f.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ/CheckSymbolExists.c:32:19: error: ‘ConvertInterfaceLuidToNameA’ undeclared (first use in this function)
+   32 |   return ((int*)(&ConvertInterfaceLuidToNameA))[argc];
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_4137f.dir/build.make:78: CMakeFiles/cmTC_4137f.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-7Y3rPJ'
+gmake: *** [Makefile:127: cmTC_4137f/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef ConvertInterfaceLuidToNameA
+  return ((int*)(&ConvertInterfaceLuidToNameA))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the NotifyIpInterfaceChange exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_0975a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0975a.dir/build.make CMakeFiles/cmTC_0975a.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6'
+Building C object CMakeFiles/cmTC_0975a.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_0975a.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6/CheckSymbolExists.c:32:19: error: ‘NotifyIpInterfaceChange’ undeclared (first use in this function)
+   32 |   return ((int*)(&NotifyIpInterfaceChange))[argc];
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_0975a.dir/build.make:78: CMakeFiles/cmTC_0975a.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-Bn5FR6'
+gmake: *** [Makefile:127: cmTC_0975a/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef NotifyIpInterfaceChange
+  return ((int*)(&NotifyIpInterfaceChange))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the RegisterWaitForSingleObject exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_64958/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_64958.dir/build.make CMakeFiles/cmTC_64958.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt'
+Building C object CMakeFiles/cmTC_64958.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_64958.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt/CheckSymbolExists.c:32:19: error: ‘RegisterWaitForSingleObject’ undeclared (first use in this function)
+   32 |   return ((int*)(&RegisterWaitForSingleObject))[argc];
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_64958.dir/build.make:78: CMakeFiles/cmTC_64958.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-9dF2Wt'
+gmake: *** [Makefile:127: cmTC_64958/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef RegisterWaitForSingleObject
+  return ((int*)(&RegisterWaitForSingleObject))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the inet_net_pton exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_38d2a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_38d2a.dir/build.make CMakeFiles/cmTC_38d2a.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum'
+Building C object CMakeFiles/cmTC_38d2a.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_38d2a.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum/CheckSymbolExists.c:32:11: warning: ISO C forbids conversion of function pointer to object pointer type [-Wpedantic]
+   32 |   return ((int*)(&inet_net_pton))[argc];
+      |           ^
+Linking C executable cmTC_38d2a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_38d2a.dir/link.txt --verbose=1
+/usr/bin/cc -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  CMakeFiles/cmTC_38d2a.dir/CheckSymbolExists.c.o -o cmTC_38d2a 
+/usr/bin/ld: CMakeFiles/cmTC_38d2a.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `inet_net_pton'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_38d2a.dir/build.make:99: cmTC_38d2a] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-syVPum'
+gmake: *** [Makefile:127: cmTC_38d2a/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef inet_net_pton
+  return ((int*)(&inet_net_pton))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the ioctlsocket exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c7751/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c7751.dir/build.make CMakeFiles/cmTC_c7751.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf'
+Building C object CMakeFiles/cmTC_c7751.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_c7751.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf/CheckSymbolExists.c:32:19: error: ‘ioctlsocket’ undeclared (first use in this function)
+   32 |   return ((int*)(&ioctlsocket))[argc];
+      |                   ^~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_c7751.dir/build.make:78: CMakeFiles/cmTC_c7751.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-lLhEJf'
+gmake: *** [Makefile:127: cmTC_c7751/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef ioctlsocket
+  return ((int*)(&ioctlsocket))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the IoctlSocket exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_8608c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_8608c.dir/build.make CMakeFiles/cmTC_8608c.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX'
+Building C object CMakeFiles/cmTC_8608c.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_8608c.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX/CheckSymbolExists.c:32:19: error: ‘IoctlSocket’ undeclared (first use in this function)
+   32 |   return ((int*)(&IoctlSocket))[argc];
+      |                   ^~~~~~~~~~~
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_8608c.dir/build.make:78: CMakeFiles/cmTC_8608c.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-ZlJptX'
+gmake: *** [Makefile:127: cmTC_8608c/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef IoctlSocket
+  return ((int*)(&IoctlSocket))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the strcmpi exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_55ad9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_55ad9.dir/build.make CMakeFiles/cmTC_55ad9.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk'
+Building C object CMakeFiles/cmTC_55ad9.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_55ad9.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk/CheckSymbolExists.c:32:19: error: ‘strcmpi’ undeclared (first use in this function); did you mean ‘strcmp’?
+   32 |   return ((int*)(&strcmpi))[argc];
+      |                   ^~~~~~~
+      |                   strcmp
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_55ad9.dir/build.make:78: CMakeFiles/cmTC_55ad9.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-OzcHXk'
+gmake: *** [Makefile:127: cmTC_55ad9/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef strcmpi
+  return ((int*)(&strcmpi))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the stricmp exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_00407/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_00407.dir/build.make CMakeFiles/cmTC_00407.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz'
+Building C object CMakeFiles/cmTC_00407.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_00407.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz/CheckSymbolExists.c:32:19: error: ‘stricmp’ undeclared (first use in this function); did you mean ‘strncmp’?
+   32 |   return ((int*)(&stricmp))[argc];
+      |                   ^~~~~~~
+      |                   strncmp
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_00407.dir/build.make:78: CMakeFiles/cmTC_00407.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-DkoEPz'
+gmake: *** [Makefile:127: cmTC_00407/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef stricmp
+  return ((int*)(&stricmp))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the strncmpi exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_bf271/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bf271.dir/build.make CMakeFiles/cmTC_bf271.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL'
+Building C object CMakeFiles/cmTC_bf271.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_bf271.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL/CheckSymbolExists.c:32:19: error: ‘strncmpi’ undeclared (first use in this function); did you mean ‘strncmp’?
+   32 |   return ((int*)(&strncmpi))[argc];
+      |                   ^~~~~~~~
+      |                   strncmp
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_bf271.dir/build.make:78: CMakeFiles/cmTC_bf271.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-cLm1tL'
+gmake: *** [Makefile:127: cmTC_bf271/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef strncmpi
+  return ((int*)(&strncmpi))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the strnicmp exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6be5b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6be5b.dir/build.make CMakeFiles/cmTC_6be5b.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL'
+Building C object CMakeFiles/cmTC_6be5b.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_6be5b.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL/CheckSymbolExists.c:32:19: error: ‘strnicmp’ undeclared (first use in this function); did you mean ‘strncmp’?
+   32 |   return ((int*)(&strnicmp))[argc];
+      |                   ^~~~~~~~
+      |                   strncmp
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_6be5b.dir/build.make:78: CMakeFiles/cmTC_6be5b.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-G0anpL'
+gmake: *** [Makefile:127: cmTC_6be5b/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef strnicmp
+  return ((int*)(&strnicmp))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the kqueue exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e8737/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e8737.dir/build.make CMakeFiles/cmTC_e8737.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT'
+Building C object CMakeFiles/cmTC_e8737.dir/CheckSymbolExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_e8737.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT/CheckSymbolExists.c:32:19: error: ‘kqueue’ undeclared (first use in this function); did you mean ‘sigqueue’?
+   32 |   return ((int*)(&kqueue))[argc];
+      |                   ^~~~~~
+      |                   sigqueue
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT/CheckSymbolExists.c:32:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT/CheckSymbolExists.c:28:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+   28 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_e8737.dir/build.make:78: CMakeFiles/cmTC_e8737.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-WY2zzT'
+gmake: *** [Makefile:127: cmTC_e8737/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/ioctl.h>
+#include <sys/random.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <sys/epoll.h>
+#include <time.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef kqueue
+  return ((int*)(&kqueue))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the function __system_property_get exists failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GTaL0u
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ec067/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ec067.dir/build.make CMakeFiles/cmTC_ec067.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GTaL0u'
+Building C object CMakeFiles/cmTC_ec067.dir/CheckFunctionExists.c.o
+/usr/bin/cc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700  -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=__system_property_get -o CMakeFiles/cmTC_ec067.dir/CheckFunctionExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GTaL0u/CheckFunctionExists.c
+Linking C executable cmTC_ec067
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec067.dir/link.txt --verbose=1
+/usr/bin/cc -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long -DCHECK_FUNCTION_EXISTS=__system_property_get CMakeFiles/cmTC_ec067.dir/CheckFunctionExists.c.o -o cmTC_ec067 
+/usr/bin/ld: CMakeFiles/cmTC_ec067.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `__system_property_get'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_ec067.dir/build.make:99: cmTC_ec067] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-GTaL0u'
+gmake: *** [Makefile:127: cmTC_ec067/fast] Error 2
+
+
+
+Determining if files pthread_np.h exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-duhCWd
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_356b0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_356b0.dir/build.make CMakeFiles/cmTC_356b0.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-duhCWd'
+Building C object CMakeFiles/cmTC_356b0.dir/HAVE_PTHREAD_NP_H.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3 -Werror=implicit-int -Werror=implicit-function-declaration -Wno-long-long  -o CMakeFiles/cmTC_356b0.dir/HAVE_PTHREAD_NP_H.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-duhCWd/HAVE_PTHREAD_NP_H.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-duhCWd/HAVE_PTHREAD_NP_H.c:2:10: fatal error: pthread_np.h: No such file or directory
+    2 | #include <pthread_np.h>
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_356b0.dir/build.make:78: CMakeFiles/cmTC_356b0.dir/HAVE_PTHREAD_NP_H.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-duhCWd'
+gmake: *** [Makefile:127: cmTC_356b0/fast] Error 2
+
+
+Source:
+/* */
+#include <pthread_np.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_init exist failed with the following output:
+Change Dir: /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3115a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3115a.dir/build.make CMakeFiles/cmTC_3115a.dir/build
+gmake[1]: Entering directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ'
+Building C object CMakeFiles/cmTC_3115a.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion -Wdeclaration-after-statement -Wdouble-promotion -Wfloat-equal -Wformat-security -Winit-self -Wjump-misses-init -Wlogical-op -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-prototypes -Wnested-externs -Wno-coverage-mismatch -Wold-style-definition -Wpacked -Wpedantic -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow -Wstrict-prototypes -Wtrampolines -Wundef -Wunreachable-code -Wunused -Wvariadic-macros -Wvla -Wwrite-strings -Wimplicit-fallthrough=3  -Wno-long-long  -o CMakeFiles/cmTC_3115a.dir/CheckSymbolExists.c.o -c /tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ/CheckSymbolExists.c
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ/CheckSymbolExists.c: In function ‘main’:
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ/CheckSymbolExists.c:8:19: error: ‘pthread_init’ undeclared (first use in this function); did you mean ‘pthread_exit’?
+    8 |   return ((int*)(&pthread_init))[argc];
+      |                   ^~~~~~~~~~~~
+      |                   pthread_exit
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ/CheckSymbolExists.c:4:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+    4 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_3115a.dir/build.make:78: CMakeFiles/cmTC_3115a.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/tmp/XS-libcares-zd3VoinAWPGm/c-ares-1.34.3/cmake_props/CMakeFiles/CMakeScratch/TryCompile-e715dQ'
+gmake: *** [Makefile:127: cmTC_3115a/fast] Error 2
+
+
+File CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_init
+  return ((int*)(&pthread_init))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}

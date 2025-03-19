@@ -17,7 +17,7 @@ struct TestInput : Streamer::IInput {
         //printf("start\n");
         timer = new Timer(loop);
         timer->start(1);
-        timer->event.add([this](auto...){
+        timer->event.add([this](auto){
             //printf("on read\n");
             if (!size) {
                 this->handle_eof();
@@ -60,7 +60,7 @@ struct TestOutput : Streamer::IOutput {
     ErrorCode start (const LoopSP& loop) override {
         //printf("writer start\n");
         timer = new Timer(loop);
-        timer->event.add([this](auto...){
+        timer->event.add([this](auto){
             bufs.pop_front();
             //printf("on write que left %d\n", write_queue_size());
             this->handle_write({});

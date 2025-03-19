@@ -189,19 +189,11 @@ ex<Fs::DirEntries> Fs::scandir (string_view path) {
 }
 
 static inline ex<void> _rmtree (string_view path) {
-    auto plen = path.length();
     return Fs::scandir(path).and_then([&](const Fs::DirEntries& entries) {
         for (const auto& entry : entries) {
-            auto elen = entry.name().length();
-            auto fnlen = plen + elen + 1;
-            char _fn[fnlen];
-            char* ptr = _fn;
-            memcpy(ptr, path.data(), plen);
-            ptr += plen;
-            *ptr++ = UE_SLASH;
-            memcpy(ptr, entry.name().data(), elen);
-
-            string_view fname(_fn, fnlen);
+            auto fname = string(path);
+            fname += UE_SLASH;
+            fname += entry.name();
             if (entry.type() == Fs::FileType::DIR) {
                 auto ret = _rmtree(fname);
                 if (!ret) return ret;
@@ -438,7 +430,7 @@ ex<string> Fs::read (fd_t fd, size_t length, int64_t offset) {
 }
 
 ex<void> Fs::_write (fd_t fd, _buf_t* bufs, size_t nbufs, int64_t offset) {
-    uv_buf_t uvbufs[nbufs];
+    auto uvbufs = (uv_buf_t*)alloca(sizeof(uv_buf_t)*nbufs);
     for (size_t i = 0; i < nbufs; ++i) {
         uvbufs[i].base = const_cast<char*>(bufs[i].base); // libuv read-only access
         uvbufs[i].len  = bufs[i].len;
@@ -667,7 +659,7 @@ void Fs::Request::read     (size_t size, int64_t off, const string_fn& cb)      
 void Fs::Request::_write   (std::vector<string>&& v, int64_t off, const fn& cb)                {
     UEFS_ASYNC_RAW({
         auto nbufs = v.size();
-        _buf_t bufs[nbufs];
+        auto bufs = (_buf_t*)alloca(sizeof(_buf_t)*nbufs);
         _buf_t* ptr = bufs;
         for (const auto& s : v) {
             ptr->base = s.data();

@@ -1,4 +1,5 @@
 #include "../lib/test.h"
+#include "catch2/catch_test_macros.hpp"
 #include <openssl/err.h>
 #include <openssl/dh.h>
 #include <openssl/ssl.h>
@@ -21,7 +22,7 @@ TEST("ssl client cert, server validates client, client validates server") {
     int connect_events = 0;
 
     TClientSP client = new TClient(test.loop);
-    client->connect_event.add([&](auto...){ ++connect_events; });
+    client->connect_event.add([&](auto, auto, auto){ ++connect_events; });
 
     client->sa = server->sockaddr().value();
 
@@ -56,7 +57,7 @@ TEST("client uses 2 different valid certificates => 2 different connections are 
     int connect_events = 0;
 
     TClientSP client = new TClient(test.loop);
-    client->connect_event.add([&](auto...){ ++connect_events; });
+    client->connect_event.add([&](auto, auto, auto){ ++connect_events; });
     client->sa = server->sockaddr().value();
 
     server->request_event.add([&](auto&){
@@ -80,5 +81,28 @@ TEST("client uses 2 different valid certificates => 2 different connections are 
     CHECK(res->code == 200);
     CHECK(res->http_version == 11);
     CHECK(connect_events == 2);
+    secure = false;
+}
+
+TEST("ssl verify server cert fail") {
+    secure = true;
+    AsyncTest test(5000);
+
+    auto server = create_server(test.loop);
+
+    TClientSP client = new TClient(test.loop);
+
+    client->sa = server->sockaddr().value();
+
+    server->request_event.add([&](auto&){
+        FAIL("client should reject this server");
+    });
+
+    auto req = Request::Builder().method(Request::Method::Get).uri("/")
+            .ssl_check_cert(true)
+            .build();
+
+    CHECK_THROWS(client->get_response(req));
+
     secure = false;
 }

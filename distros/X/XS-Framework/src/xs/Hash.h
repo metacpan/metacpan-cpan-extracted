@@ -120,7 +120,7 @@ struct Hash : Sv {
 
         const_iterator () : arr(NULL), end(NULL), cur(HashEntry()) {}
 
-        const_iterator (HV* hv) : arr(HvARRAY(hv)), end(arr + HvMAX(hv) + 1), cur(HashEntry()) {
+        const_iterator (HV* hv) : arr(HvARRAY(hv)), end(arr ? arr + HvMAX(hv) + 1 : nullptr), cur(HashEntry()) {
             if (HvUSEDKEYS(hv)) operator++();
         }
 
@@ -199,12 +199,3 @@ private:
 
 }
 
-// DEPRECATED, will be removed, use Hash.begin()/end() instead
-#define XS_HV_ITER(hv,code) {                                                       \
-    STRLEN hvmax = HvMAX(hv);                                                       \
-    HE** hvarr = HvARRAY(hv);                                                       \
-    if (HvUSEDKEYS(hv))                                                             \
-        for (STRLEN bucket_num = 0; bucket_num <= hvmax; ++bucket_num)              \
-            for (const HE* he = hvarr[bucket_num]; he; he = HeNEXT(he)) { code }    \
-}
-#define XS_HV_ITER_NU(hv,code) XS_HV_ITER(hv,{if(!SvOK(HeVAL(he))) continue; code})

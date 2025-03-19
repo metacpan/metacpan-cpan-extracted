@@ -25,7 +25,7 @@ void FileInput::do_read () {
 void FileInput::stop () {
     if (fsreq) fsreq->cancel();
     fsreq = nullptr;
-    if (opened) Fs::close(fd, [](auto...){}, loop);
+    if (opened) Fs::close(fd, [](auto, auto){}, loop);
     opened = false;
 }
 
@@ -71,7 +71,7 @@ void FileOutput::do_write () {
 void FileOutput::stop () {
     if (fsreq) fsreq->cancel();
     fsreq = nullptr;
-    if (opened) Fs::close(fd, [](auto...){}, loop);
+    if (opened) Fs::close(fd, [](auto, auto){}, loop);
     opened = false;
 }
 

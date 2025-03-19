@@ -1,5 +1,6 @@
 #include "logtest.h"
 #include <regex>
+#include <sstream>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
 #define TEST(name) TEST_CASE("log-formatter: " name, "[log-formatter]")
@@ -80,7 +81,7 @@ TEST("set formatter string") {
     SECTION("line") {
         set_formatter("LINE=%l");
         panda_log_alert();
-        CHECK(c.fstr == "LINE=82");
+        CHECK(c.fstr == "LINE=83");
     }
 
     SECTION("message") {

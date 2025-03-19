@@ -151,7 +151,7 @@ TEST("request connection close waits until all previous requests are done") {
 
     bool chunked1 = GENERATE(false, true);
     bool chunked2 = GENERATE(false, true);
-    SECTION(string("chunked first-second response: ") + char(chunked1 + '0') + '-' + char(chunked2 + '0')){}
+    SECTION(std::string("chunked first-second response: ") + char(chunked1 + '0') + '-' + char(chunked2 + '0')){}
 
     ServerRequestSP req1;
 
@@ -213,7 +213,7 @@ TEST("all requests after one with connection=close are ignored") {
         p.server->request_event.remove_all();
         p.server->request_event.add(fail_cb);
     });
-    p.server->error_event.add(fail_cb);
+    p.server->error_event.add(fail_cb2);
 
     p.conn->write(
         "GET /a HTTP/1.0\r\n\r\n"
@@ -251,7 +251,7 @@ TEST("response connection=close cancels all further requests") {
             reqs[0]->respond(new ServerResponse(200, Headers().connection("close"), Body("hello")));
         });
     });
-    p.server->error_event.add(fail_cb);
+    p.server->error_event.add(fail_cb2);
 
     p.conn->write(
         "GET /a HTTP/1.1\r\n\r\n"

@@ -22,7 +22,7 @@ namespace {
         auto p = make_p2p(loop);
         size_t cnt = 0;
         TimerSP t = new Timer(loop);
-        t->event.add([=](auto...) mutable {
+        t->event.add([=](auto) mutable {
             p.client->write(string(amount, 'x'));
             if (++cnt == count) {
                 t.reset();
@@ -91,7 +91,7 @@ TEST("normal output") {
     p2.client->read_event.add([&](auto&, const string& data, auto...) {
         res += data;
     });
-    p2.client->eof_event.add([&](auto...){
+    p2.client->eof_event.add([&](auto){
         test.happens();
         test.loop->stop();
     });

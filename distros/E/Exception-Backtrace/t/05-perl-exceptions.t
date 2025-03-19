@@ -20,7 +20,7 @@ sub check_c_trace {
 }
 
 subtest "primitive is thrown" => sub {
-    my $ok = eval { 
+    my $ok = eval {
         die("abc"); 1;
     };
     ok !$ok;
@@ -39,6 +39,10 @@ subtest "primitive is thrown" => sub {
         isnt index($bt, $bt2), -1, "pure perl trace is contained in full trace already";
     };
 };
+
+SKIP: {
+
+skip "test takes too long under sanitizer", 1 if $ENV{ASAN_OPTIONS};
 
 subtest "just die is thrown" => sub {
     my $ok = eval { die(); 1; };
@@ -144,5 +148,7 @@ subtest "rethrow (ref)" => sub {
     ok $e1 == $e2;
     is "$e1", "$e2";
 };
+
+}
 
 done_testing;

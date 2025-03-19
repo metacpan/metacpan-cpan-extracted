@@ -10,7 +10,7 @@ use List::Util   qw(first);
 
 use constant DEBUG => $ENV{GETOPT_APP_DEBUG} || 0;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our ($DEPTH, $OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (-1, qr{\s+\#\s+});
 

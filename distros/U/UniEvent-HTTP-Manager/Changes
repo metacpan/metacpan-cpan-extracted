@@ -1,4 +1,6 @@
-1.1.2    xx.xx.2022
+1.1.3    xx.xx.2024
+           - fix warnings
+1.1.2    10.02.2022
            - fix 'no_signals' plack behaviour
            - docs for logging
            - fix test

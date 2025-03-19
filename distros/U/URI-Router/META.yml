@@ -3,25 +3,25 @@ abstract: 'highest performance powerful URI router (URI path to value lookup) fo
 author:
   - unknown
 build_requires:
-  Export::XS: v3.0.5
-  Test::Catch: v1.0.16
+  Export::XS: v3.0.8
+  Test::Catch: v2.0.2
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::Framework: v1.5.1
-  XS::libcatch: v2.13.4.2
-  XS::libpanda: v1.5.7
-  next::XS: v1.0.7
+  XS::Framework: v1.6.0
+  XS::libcatch: v3.7.1
+  XS::libpanda: v1.5.11
+  next::XS: v1.0.8
 configure_requires:
-  Export::XS: v3.0.5
-  Test::Catch: v1.0.16
-  XS::Framework: v1.5.1
-  XS::Install: v1.3.5
-  XS::libcatch: v2.13.4.2
-  XS::libpanda: v1.5.7
-  next::XS: v1.0.7
+  Export::XS: v3.0.8
+  Test::Catch: v2.0.2
+  XS::Framework: v1.6.0
+  XS::Install: v1.4.0
+  XS::libcatch: v3.7.1
+  XS::libpanda: v1.5.11
+  next::XS: v1.0.8
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ no_index:
     - t
     - inc
 requires:
-  Export::XS: v3.0.5
-  XS::Framework: v1.5.1
-  XS::Install: v1.3.5
-  XS::libpanda: v1.5.7
-  next::XS: v1.0.7
-version: v0.1.3
+  Export::XS: v3.0.8
+  XS::Framework: v1.6.0
+  XS::Install: v1.4.0
+  XS::libpanda: v1.5.11
+  next::XS: v1.0.8
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

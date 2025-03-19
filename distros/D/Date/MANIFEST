@@ -1296,7 +1296,6 @@ lib/Date/TimeImpl.pod
 lib/Date/Timezone.pm
 lib/Date/Timezone.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/bugtest.plx

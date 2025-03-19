@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 fd0f2c901a7088fcf57f2bd0dc5e0d34069ebd71980a2c2ca69e74922b6dc215 Changes
+SHA256 a1b698241badb60519da016243165d54b4fa99fde1a966f63d12c93f9d7939fe MANIFEST
+SHA256 b88ff08be80c96faeac6a987438f8be02b5785b9bb7921342d842cd8814a47a1 MANIFEST.SKIP
+SHA256 e8067a9f5a01bc0a2f306701a8fecae5b84c8f269c3d348773a11beea8335a5e META.json
+SHA256 0e6025d5b45cf13a4a9aed6f7fc553acec9219353f4cc2cd2d4a28a33b5fd7e5 META.yml
+SHA256 5ee14ab53eb2d85e3203fbb69f12472d57b533fbe98e998f87356917f6cd9afb Makefile.PL
+SHA256 2c526dab0f791b99a53f6a4959289b08901acd3b2e788ad88e9b80636846839a README
+SHA256 ada0f951936a0f75b6796a667f59b648d021bf0586ebd7877f5a420156d6fd38 lib/Map/Tube/Stuttgart.pm
+SHA256 3603b8ed885af70c30ae49676aad02b7dbce695cad0e404cad940f19cbbd9a5a share/stuttgart-map.xml
+SHA256 6e043fa836a4ba0e316e0280ebf3a9807f4d6f52c99d141868af67b75ba44509 t/00-load.t
+SHA256 fd669d8e0c545210bac0560d2ba5a2b7a6160274912c58dd68fa273f1d4006e6 t/01-map-data.t
+SHA256 651baaa63ee803c536187b623b1ba217959377049deac9eab5e5f21fc29a7d73 t/02-map.t
+SHA256 13dd231a1457e3105aedf77dcff78ea231eaa878d7d138f1a0f2b3fde377cdbf t/03-nodes.t
+SHA256 4af882894cb686e9e0d07c2a2f9ef04a6c682944b823ffac9d845b7014c042c4 t/04-lines.t
+SHA256 4fe80bd72e1f2d2e5f8ea51635cba73df25b92b57841706f7be816bbab23b45d t/10-manifest.t
+SHA256 f8d5d08bbdd6c7c8d196fc568f34c70556a8a956c09d99b1124cef8e9edc3344 t/11-meta-json.t
+SHA256 a57b2175d9270b4a4601fdafde348d8e31d64259b209e43530b1252bd92831b8 t/12-meta-yml.t
+SHA256 17999ffa87bae787883ab1bfb806b466636e49fe19cc5395b99fa9e24ab240ac t/13-version.t
+SHA256 6f404f5c7ce704128637ac1fbf3d33e4885dcb28d481ca21b84bd15ecb1bc024 t/14-signature.t
+SHA256 37f4b4e1776e545f7e99e5accdc0d3b888c4d5b7b795d005cae0866904702558 t/20-pod.t
+SHA256 8266a8278479bf0923efaa38d78012aaba6d328f7d4af3707b58502d96710a89 t/21-pod-coverage.t
+SHA256 fe6b6272f36d22d99d5054410ad44e2cf430ba14af7912a52d48c6d9ed81095b t/22-changes.t
+SHA256 eccb3de3a65118ea78fa7940bfe446a009b9abcf073361eebaae22e03f529fdf t/23-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iIMEAREIACsWIQSIQcHJHJMgzzzXOfVjfZJS13FbSQUCZ9oAlA0cZ3dzQGNwYW4u
+b3JnAAoJEGN9klLXcVtJmloA/R0tsrVlQ5D9wbGfs9Y+lX/LrTF8i9J85uatgwU+
+74MkAQCRIovxsWHLsB10BJms9W+F/iJW8DAcm4QePSRK0K31CQ==
+=HBf1
+-----END PGP SIGNATURE-----

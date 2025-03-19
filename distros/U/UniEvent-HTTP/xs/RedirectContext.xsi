@@ -19,7 +19,7 @@ Hash RedirectContext::removed_headers () {
     RETVAL = Hash::create(headers.size());
     for (const auto& elem : headers.fields) {
         auto len = elem.name.length();
-        char key[len];
+        auto key = (char*)alloca(sizeof(char)*len);
         std::transform(elem.name.data(), elem.name.data() + len, key, ::tolower);
         RETVAL.store(string_view(key, len), xs::out(elem.value));
     }

@@ -1,13 +1,27 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+if (NOT DEFINED ${PROJECT_NAME})
+    set(NOT_SUBPROJECT ON)
+else()
+    set(NOT_SUBPROJECT OFF)
+endif()
+
 PROJECT(unievent-http LANGUAGES CXX)
 
 set(LIB_TYPE CACHE STRING STATIC)
 set(CMAKE_CXX_EXTENSIONS OFF)
-option(UNIEVENT_HTTP_BUILD_TESTS OFF)
-if (${UNIEVENT_HTTP_BUILD_TESTS})
+
+option(UNIEVENT_HTTP_TESTS OFF)
+option(UNIEVENT_HTTP_TESTS_IN_ALL ${NOT_SUBPROJECT})
+
+if (${UNIEVENT_HTTP_TESTS_IN_ALL})
     set(EXCLUDE_TEST)
 else()
     set(EXCLUDE_TEST EXCLUDE_FROM_ALL)
+endif()
+
+if (${UNIEVENT_HTTP_FETCH_DEPS})
+    include(FetchDeps.cmake)
 endif()
 
 file(GLOB_RECURSE libSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/panda/*.cc")
@@ -20,33 +34,38 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
-find_package(panda-protocol-http REQUIRED)
-find_package(unievent REQUIRED)
-find_package(unievent-socks REQUIRED)
+if (NOT TARGET panda-protocol-http)
+    find_package(panda-protocol-http REQUIRED)
+endif()
+if (NOT TARGET unievent)
+    find_package(unievent REQUIRED)
+endif()
+if (NOT TARGET unievent-socks)
+    find_package(unievent-socks REQUIRED)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC panda-protocol-http unievent unievent-socks)
 
 #tests
+if (${UNIEVENT_HTTP_TESTS})
+
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
 
 add_library(unievent-http-tests STATIC EXCLUDE_FROM_ALL ${testSource})
 target_link_libraries(unievent-http-tests PUBLIC ${PROJECT_NAME})
 
-find_package(Catch2)
+if (NOT TARGET Catch2::Catch2)
+    find_package(Catch2)
+endif()
 target_link_libraries(unievent-http-tests PUBLIC Catch2::Catch2)
 
 #ctest
 enable_testing()
-add_library(${PROJECT_NAME}-test-lib STATIC EXCLUDE_FROM_ALL tests/lib/test.cc)
-target_compile_definitions(${PROJECT_NAME}-test-lib PRIVATE CATCH_CONFIG_MAIN)
-target_link_libraries(${PROJECT_NAME}-test-lib Catch2::Catch2 ${PROJECT_NAME})
-list(FILTER testSource EXCLUDE REGEX "lib")
-#foreach(tobj ${testSource})
-#    get_filename_component(tname ${tobj} NAME_WE)
-#    add_executable(t_${tname} ${EXCLUDE_TEST} ${tobj})
-#    target_link_libraries(t_${tname} test-lib)
-#    add_test(NAME ${tobj} COMMAND t_${tname} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-#endforeach()
+add_executable(${PROJECT_NAME}-runtests EXCLUDE_FROM_ALL ${testSource})
+target_link_libraries(${PROJECT_NAME}-runtests Catch2::Catch2WithMain ${PROJECT_NAME})
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME}-runtests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+endif() #if (${UNIEVENT_HTTP_TESTS})
 
 #install
 install(DIRECTORY src/ DESTINATION include FILES_MATCHING PATTERN "*.h")

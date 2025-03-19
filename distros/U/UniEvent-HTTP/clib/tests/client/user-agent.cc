@@ -29,7 +29,7 @@ TEST("simple + identity") {
     ua->cookie_jar()->add("coo", coo, uri);
 
     auto req = Request::Builder().uri(uri).build();
-    ua->request(req)->connect_event.add([&](auto...){ test.happens("connect"); });
+    ua->request(req)->connect_event.add([&](auto, auto, auto){ test.happens("connect"); });
     auto res = await_response(req, test.loop);
 
     CHECK(res->code == 200);
@@ -124,7 +124,7 @@ TEST("proxy injection") {
     UserAgentSP ua(new UserAgent(test.loop, "", cfg));
     auto req = Request::Builder().method(Request::Method::Get).uri(uri).build();
 
-    p.proxy.server->connection_event.add([&](auto...){ test.happens("proxy"); });
+    p.proxy.server->connection_event.add([&](auto, auto, auto){ test.happens("proxy"); });
     p.server->enable_echo();
 
     ua->request(req);

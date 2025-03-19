@@ -1,4 +1,7 @@
-1.2.2    xx.xx.2022
+1.2.3    xx.xx.2024
+           - fix warnings
+           - fix compilation for clang16+
+1.2.2    03.10.2022
            - fix test for latest clang
 1.2.1    22.06.2022
            - bugfix with client's queued requests & timeout

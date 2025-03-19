@@ -16,11 +16,8 @@ static bool tz_from_env (char* lzname, const char* envar) {
 }
 
 static string readfile (const string_view& path) {
-    char spath[path.length()+1]; // need to make path null-terminated
-    std::memcpy(spath, path.data(), path.length());
-    spath[path.length()] = 0;
-
-    FILE* fh = fopen(spath, "rb");
+    auto spath = string(path); // need to make path null-terminated
+    FILE* fh = fopen(spath.c_str(), "rb");
     if (fh == NULL) return string();
 
     if (fseek(fh, 0, SEEK_END) != 0) {

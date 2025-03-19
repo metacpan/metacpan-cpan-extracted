@@ -1,5 +1,10 @@
 Revision history for perl distribution App-sslmaker
 
+0.21 2025-03-18T21:48:00
+ - Fix tests in github workflows
+ - Fix "openssl req" does not take -days
+ - Fix "Ignoring malformed pax extended attribute" in .tar.gz
+
 0.20 2024-02-16T15:20:40
  - Add support for --help in all sub commands
 

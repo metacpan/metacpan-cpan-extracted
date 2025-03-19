@@ -46,7 +46,6 @@ lib/URI/XS/telnet.pm
 lib/URI/XS/ws.pm
 lib/URI/XS/wss.pm
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/mytest.plx

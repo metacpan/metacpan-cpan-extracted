@@ -24,7 +24,7 @@ Array Array::create (size_t size, SV** content, create_type_t type) {
 }
 
 Array::Array (const std::initializer_list<Scalar>& l, create_type_t type) {
-    SV* svs[l.size()];
+    SV** svs = (SV**)alloca(sizeof(SV*)*l.size());
     const Scalar* from = l.begin();
     for (size_t i = 0; i < l.size(); ++i) svs[i] = (*from++).get();
     auto tmp = create(l.size(), svs, type);

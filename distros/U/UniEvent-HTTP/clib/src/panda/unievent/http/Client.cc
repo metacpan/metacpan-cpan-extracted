@@ -1,5 +1,6 @@
 #include "Pool.h"
 #include "Client.h"
+#include "panda/unievent/SslContext.h"
 #include <ostream>
 #include <panda/log.h>
 #include <panda/unievent/socks.h>
@@ -56,27 +57,23 @@ void Client::request (const RequestSP& request) {
         if (request->uri->secure()) {
             SslContext ctx = request->ssl_ctx;
             if (!ctx) {
-                ctx = SslContext::attach(SSL_CTX_new(TLS_client_method()));
-                bool ok = SSL_CTX_set_default_verify_paths(ctx);
-                if (!ok) {
-                    throw HttpError("can not set ssl certificate default verify paths");
-                }
-                if (request->ssl_check_cert) {
-                    string host = request->uri->host();
-                    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, nullptr);
-                    auto param = SSL_CTX_get0_param(ctx);
-                    X509_VERIFY_PARAM_set1_host(param, host.c_str(), host.size());
-                }
+                ctx = get_default_ssl_context(request->ssl_check_cert);
             }
             Tcp::use_ssl(ctx);
             auto ssl = Tcp::get_ssl();
             SSL_set_tlsext_host_name(ssl, request->uri->host().c_str());
+            if (request->ssl_check_cert) {
+                string host = request->uri->host();
+                auto param = SSL_get0_param(ssl);
+                X509_VERIFY_PARAM_set1_host(param, host.data(), host.size());
+            }
         }
 
         if (request->proxy) {
             auto uri = request->proxy;
             if (uri->scheme() == "socks5") {
                 SocksSP socks = new Socks(uri->host(), uri->port(), uri->user(), uri->password());
+                socks->socks_resolve = request->proxy_resolve;
                 use_socks(this, socks);
             }
             else if (uri->scheme() == "http") {
@@ -346,6 +343,31 @@ void Client::form_file_complete(const ErrorCode& ec)  {
 
     ++_form_field;
     send_form();
+}
+
+static SslContext& _default_ssl_context()
+{
+    thread_local SslContext instance = SslContext::attach(SSL_CTX_new(TLS_client_method()));
+    return instance;
+}
+
+
+static SslContext& _verify_ssl_context()
+{
+    thread_local SslContext instance;
+    if (!instance) {
+        instance = SslContext::attach(SSL_CTX_new(TLS_client_method()));
+        bool ok = SSL_CTX_set_default_verify_paths(instance);
+        if (!ok) {
+            throw HttpError("can not set ssl certificate default verify paths");
+        }
+        SSL_CTX_set_verify(instance, SSL_VERIFY_PEER, nullptr);
+    }
+    return instance;
+}
+
+SslContext Client::get_default_ssl_context(bool verify) {
+    return verify ? _verify_ssl_context() : _default_ssl_context();
 }
 
 

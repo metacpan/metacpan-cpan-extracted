@@ -7,7 +7,7 @@ use Net::SSLeay;
 variate_catch('[client-redirect]', 'ssl');
 
 subtest "redirect with SSL" => sub {
-    my $SERVER_CERT = "t/cert/ca.pem";
+    my $SERVER_CERT = "t/cert/ca127.pem";
 
     my $serv_ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::SSLv23_server_method()) or sslerr();
     Net::SSLeay::CTX_use_certificate_file($serv_ctx, $SERVER_CERT, &Net::SSLeay::FILETYPE_PEM) or sslerr();
@@ -19,13 +19,13 @@ subtest "redirect with SSL" => sub {
 
     my $client_ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::SSLv23_client_method()) or sslerr();
     Net::SSLeay::CTX_load_verify_locations($client_ctx, $SERVER_CERT, undef) or sslerr();
-    Net::SSLeay::CTX_use_certificate_file($client_ctx, 't/cert/01-alice.pem', &Net::SSLeay::FILETYPE_PEM) or sslerr();
-    Net::SSLeay::CTX_use_PrivateKey_file($client_ctx, 't/cert/01-alice.key', &Net::SSLeay::FILETYPE_PEM) or sslerr();
+    Net::SSLeay::CTX_use_certificate_file($client_ctx, 't/cert/01-alice-127.pem', &Net::SSLeay::FILETYPE_PEM) or sslerr();
+    Net::SSLeay::CTX_use_PrivateKey_file($client_ctx, 't/cert/01-alice-127.key', &Net::SSLeay::FILETYPE_PEM) or sslerr();
     Net::SSLeay::CTX_check_private_key($client_ctx) or sslerr();
     Net::SSLeay::CTX_set_verify($client_ctx, &Net::SSLeay::VERIFY_PEER);
     Net::SSLeay::CTX_set_verify_depth($client_ctx, 4);
 
-    my $server_cfg = { locations => [{host => "127.0.0.1",  ssl_ctx => $serv_ctx}]};
+    my $server_cfg = { locations => [{host => "localhost",  ssl_ctx => $serv_ctx}]};
 
     my $test   = UE::Test::Async->new(["connect", "redirect"]);
     my $server = MyTest::make_server($test->loop, $server_cfg);
@@ -45,7 +45,7 @@ subtest "redirect with SSL" => sub {
     });
 
     $client->connect_callback(sub { $test->happens("connect"); });
-    
+
     my $req = new UE::HTTP::Request({
         uri     => "/",
         headers => {h => 'v'},

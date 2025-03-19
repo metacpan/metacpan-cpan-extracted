@@ -53,7 +53,7 @@ TEST("MEIACORE-734 ssl server backref") {
         return sconn;
     };
 
-    server->connection_event.add([&](auto...) {
+    server->connection_event.add([&](auto, auto, auto) {
         FAIL("should not be called");
     });
 
@@ -76,7 +76,7 @@ TEST("MEIACORE-751 callback recursion") {
     TcpSP client = new Tcp(test.loop);
 
     size_t counter = 0;
-    client->connect_event.add([&](auto...) {
+    client->connect_event.add([&](auto, auto, auto) {
         if (++counter < 5) {
             client->connect()->to(addr.ip(), addr.port())->run();
             client->write("123");

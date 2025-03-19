@@ -173,7 +173,7 @@ void bench_parse_query (string str) {
 
 uint64_t bench_encode_uri_component (string_view str) {
     RETVAL = 0;
-    char dest[str.length() * 3];
+    auto dest = (char*)alloca(str.length() * 3);
     for (int i = 0; i < 1000; ++i) {
         encode_uri_component(str, dest);
     }
@@ -181,7 +181,7 @@ uint64_t bench_encode_uri_component (string_view str) {
 
 uint64_t bench_decode_uri_component (string_view str) {
     RETVAL = 0;
-    char dest[str.length()];
+    auto dest = (char*)alloca(str.length());
     for (int i = 0; i < 1000; ++i) {
         decode_uri_component(str, dest);
     }

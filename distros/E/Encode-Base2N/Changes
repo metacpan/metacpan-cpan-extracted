@@ -1,4 +1,6 @@
-1.0.5    xx.xx.2021
+1.0.6    xx.xx.2024
+          - fix warnings
+1.0.5    26.11.2021
           - upgrade tests for catch-v3
 1.0.4    19.04.2021
           - add MANIFEST.SKIP

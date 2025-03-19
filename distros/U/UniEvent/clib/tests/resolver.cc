@@ -14,7 +14,7 @@ namespace {
         std::vector<AddrInfo> res;
         Resolver::resolve_fn  success_cb;
         Resolver::resolve_fn  canceled_cb;
-        Resolver::resolve_fn  noop_cb = [](auto...) {};
+        Resolver::resolve_fn  noop_cb = [](auto, auto, auto) {};
 
         Vars (unsigned expected_cnt) : test(2000, expected_cnt) {
             ccnt = dcnt = 0;
@@ -188,7 +188,7 @@ TEST("ares query timeout") {
     cfg.query_timeout = 1;
     ResolverSP resolver = new Resolver(v.test.loop, cfg);
 
-    for (int i = 0; i < 10; ++i) resolver->resolve("ya.ru", [&](auto...) {
+    for (int i = 0; i < 10; ++i) resolver->resolve("ya.ru", [&](auto, auto, auto) {
         v.test.happens();
     }, 1000);
 
@@ -352,7 +352,7 @@ TEST("exception safety") {
     Vars v(2);
 
     for (int i = 0; i < 2; ++i) {
-        v.test.loop->resolver()->resolve("localhost", [&](auto...) {
+        v.test.loop->resolver()->resolve("localhost", [&](auto, auto, auto) {
             v.test.happens();
             throw "epta";
         });
@@ -405,5 +405,22 @@ TEST("resolver does not crash the loop resolver is held and the loop is gone") {
     LoopSP loop = new Loop();
     ResolverSP resolver = loop->resolver();
     loop.reset();
-    CHECK_THROWS_AS(resolver->resolve("localhost", [&](auto...) {}), Error);
+    CHECK_THROWS_AS(resolver->resolve("localhost", [&](auto, auto, auto) {}), Error);
+}
+
+TEST("IPv6 localhost resolve") {
+    Vars v(1);
+    
+   auto req = v.resolver->resolve()->node("localhost")->hints(AF_INET6)->on_resolve([&](auto& ai, auto& err, auto&) {
+        if (err) { // IPv6 localhost address may be disabled in /etc/hosts
+            REQUIRE(err == resolve_errc::host_not_found);
+        } else {
+            CHECK(ai.addr().ip() == "::1");
+        }
+        v.test.happens();
+    });
+    req->run();
+    
+    v.test.run();
+    CHECK(1);
 }

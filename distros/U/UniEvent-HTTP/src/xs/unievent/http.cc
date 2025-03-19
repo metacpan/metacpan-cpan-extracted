@@ -29,6 +29,7 @@ void fill (Request* req, const Hash& h) {
             case 'p':
                 if      (key == "partial_callback") req->partial_event.add(xs::in<Request::partial_fn>(v));
                 else if (key == "proxy")            req->proxy = xs::in<URISP>(v);
+                else if (key == "proxy_resolve")    req->proxy_resolve = v.is_true();
                 break;
             case'f':
                 if (key == "form") fill_form(req, v);

@@ -1,3 +1,7 @@
+2.1.7    xx.xx.2024
+           - use sv_defined() instead of SvOK()
+           - fix cmake warning
+           - fix compilation warnings
 2.1.6    20.07.2023
            - upgrade tests for catch-v3
 2.1.5    26.11.2021

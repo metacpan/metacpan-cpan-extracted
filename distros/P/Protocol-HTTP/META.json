@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,52 +25,52 @@
       },
       "configure" : {
          "requires" : {
-            "Date" : "v5.2.10",
-            "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v2.0.0",
-            "URI::XS" : "v2.1.5",
-            "XS::Framework" : "v1.5.2",
-            "XS::Install" : "v1.3.5",
-            "XS::libboost::mini" : "v1.76.0.0",
-            "XS::libcatch" : "v3.0.0.3",
-            "XS::libpanda" : "v1.5.8",
-            "XS::librangeV3" : "v1.0.2",
-            "next::XS" : "v1.0.7"
+            "Date" : "v5.2.14",
+            "Export::XS" : "v3.0.8",
+            "Test::Catch" : "v2.0.2",
+            "URI::XS" : "v2.1.7",
+            "XS::Framework" : "v1.6.0",
+            "XS::Install" : "v1.4.0",
+            "XS::libboost::mini" : "v1.87.0.0",
+            "XS::libcatch" : "v3.7.1",
+            "XS::libpanda" : "v1.5.11",
+            "XS::librangeV3" : "v1.12.0",
+            "next::XS" : "v1.0.8"
          }
       },
       "runtime" : {
          "requires" : {
-            "Date" : "v5.2.10",
-            "Export::XS" : "v3.0.5",
-            "URI::XS" : "v2.1.5",
-            "XS::Framework" : "v1.5.2",
-            "XS::Install" : "v1.3.5",
-            "XS::libboost::mini" : "v1.76.0.0",
-            "XS::libpanda" : "v1.5.8",
-            "XS::librangeV3" : "v1.0.2",
-            "next::XS" : "v1.0.7"
+            "Date" : "v5.2.14",
+            "Export::XS" : "v3.0.8",
+            "URI::XS" : "v2.1.7",
+            "XS::Framework" : "v1.6.0",
+            "XS::Install" : "v1.4.0",
+            "XS::libboost::mini" : "v1.87.0.0",
+            "XS::libpanda" : "v1.5.11",
+            "XS::librangeV3" : "v1.12.0",
+            "next::XS" : "v1.0.8"
          }
       },
       "test" : {
          "requires" : {
-            "Date" : "v5.2.10",
-            "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v2.0.0",
+            "Date" : "v5.2.14",
+            "Export::XS" : "v3.0.8",
+            "Test::Catch" : "v2.0.2",
             "Test::Deep" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "URI::XS" : "v2.1.5",
-            "XS::Framework" : "v1.5.2",
-            "XS::libboost::mini" : "v1.76.0.0",
-            "XS::libcatch" : "v3.0.0.3",
-            "XS::libpanda" : "v1.5.8",
-            "XS::librangeV3" : "v1.0.2",
-            "next::XS" : "v1.0.7"
+            "URI::XS" : "v2.1.7",
+            "XS::Framework" : "v1.6.0",
+            "XS::libboost::mini" : "v1.87.0.0",
+            "XS::libcatch" : "v3.7.1",
+            "XS::libpanda" : "v1.5.11",
+            "XS::librangeV3" : "v1.12.0",
+            "next::XS" : "v1.0.8"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.5",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.1.6",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

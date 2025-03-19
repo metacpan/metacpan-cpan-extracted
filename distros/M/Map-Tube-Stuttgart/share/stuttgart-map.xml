@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Stuttgart Stadt- and S-Bahn">
+  <lines>
+    <!-- S-Bahn -->
+    <line id="STU_S1" name="S1" color="#59AF41"/>
+    <!-- Metro -->
+    <line id="STU_S11" name="S11" color="#59AF41"/>
+    <!-- Metro -->
+    <line id="STU_S2" name="S2" color="#ED1D2A"/>
+    <!-- Metro -->
+    <line id="STU_S3" name="S3" color="#F36F33"/>
+    <!-- Metro -->
+    <line id="STU_S4" name="S4" color="#0166B3"/>
+    <!-- Metro -->
+    <line id="STU_S5" name="S5" color="#00ACDB"/>
+    <!-- Metro -->
+    <line id="STU_S6" name="S6" color="#844C00"/>
+    <!-- Metro -->
+    <line id="STU_S60" name="S60" color="#8B8E09"/>
+    <!-- Metro -->
+    <line id="STU_S62" name="S62" color="#C4792F"/>
+    <!-- Funicular -->
+    <line id="STU_SEILBA" name="Seilbahn" color="#FD8812"/>
+    <!-- Metro -->
+    <line id="STU_U1" name="U1" color="#CD9C72"/>
+    <!-- Metro -->
+    <line id="STU_U11" name="U11" color="#949599"/>
+    <!-- Metro -->
+    <line id="STU_U12" name="U12" color="#85BBE5"/>
+    <!-- Metro -->
+    <line id="STU_U13" name="U13" color="#F69EB3"/>
+    <!-- Metro -->
+    <line id="STU_U14" name="U14" color="#69BD52"/>
+    <!-- Metro -->
+    <line id="STU_U15" name="U15" color="#015BAA"/>
+    <!-- Metro -->
+    <line id="STU_U16" name="U16" color="#C4C030"/>
+    <!-- Metro -->
+    <line id="STU_U19" name="U19" color="#FDB812"/>
+    <!-- Metro -->
+    <line id="STU_U2" name="U2" color="#F36F33"/>
+    <!-- Metro -->
+    <line id="STU_U3" name="U3" color="#946342"/>
+    <!-- Metro -->
+    <line id="STU_U4" name="U4" color="#7A67AE"/>
+    <!-- Metro -->
+    <line id="STU_U5" name="U5" color="#00B9F1"/>
+    <!-- Metro -->
+    <line id="STU_U6" name="U6" color="#EC028D"/>
+    <!-- Metro -->
+    <line id="STU_U7" name="U7" color="#0EB48D"/>
+    <!-- Metro -->
+    <line id="STU_U8" name="U8" color="#BFB778"/>
+    <!-- Metro -->
+    <line id="STU_U9" name="U9" color="#FFD303"/>
+    <!-- Rack railway -->
+    <line id="STU_ZACKE" name="Zacke" color="#FD8812"/>
+  </lines>
+  <stations>
+    <!-- S1 -->
+    <station id="stu_s101" name="Herrenberg" line="STU_S1:1,STU_S11:1" link="stu_s102"/>
+    <station id="stu_s102" name="Nufringen" line="STU_S1:2,STU_S11:2" link="stu_s101,stu_s103"/>
+    <station id="stu_s103" name="Gärtringen" line="STU_S1:3,STU_S11:3" link="stu_s102,stu_s104"/>
+    <station id="stu_s104" name="Ehningen" line="STU_S1:4,STU_S11:4" link="stu_s103,stu_s105"/>
+    <station id="stu_s105" name="Hulb" line="STU_S1:5,STU_S11:5" link="stu_s104,stu_s106"/>
+    <station id="stu_s106" name="Böblingen" line="STU_S1:6,STU_S11:6,STU_S60:1" link="stu_s105,stu_s107,stu_s6002"/>
+    <station id="stu_s107" name="Goldberg" line="STU_S1:7,STU_S11:7" link="stu_s106,stu_s108"/>
+    <station id="stu_s108" name="Rohr" line="STU_S1:8,STU_S11:8,STU_S2:22,STU_S3:19" link="stu_s107,stu_s223,stu_u301"/>
+    <station id="stu_u301" name="Vaihingen Bahnhof" line="STU_S1:9,STU_S11:9,STU_S2:21,STU_S3:18,STU_U14:33,STU_U3:1,STU_U8:1" link="stu_s108,stu_s110,stu_u1432,stu_u302"/>
+    <station id="stu_s110" name="Österfeld" line="STU_S1:10,STU_S11:10,STU_S2:20,STU_S3:17" link="stu_s111,stu_u301"/>
+    <station id="stu_s111" name="Universität" line="STU_S1:11,STU_S11:11,STU_S2:19,STU_S3:16" link="stu_s110,stu_s112"/>
+    <station id="stu_s112" name="Schwabstr." line="STU_S1:12,STU_S11:12,STU_S2:18,STU_S3:15" link="stu_s111,stu_s113"/>
+    <station id="stu_s113" name="Feuersee" line="STU_S1:13,STU_S11:13,STU_S2:17,STU_S3:14,STU_S4:16,STU_S5:11,STU_S6:16,STU_S60:20" link="stu_s112,stu_s114,stu_s417"/>
+    <station id="stu_s114" name="Stadtmitte" line="STU_S1:14,STU_S11:14,STU_S2:16,STU_S3:13,STU_S4:15,STU_S5:10,STU_S6:15,STU_S60:19" link="stu_s113,stu_u110"/>
+    <station id="stu_u110" name="Hauptbahnhof" line="STU_S1:15,STU_S11:15,STU_S2:15,STU_S3:12,STU_S4:14,STU_S5:9,STU_S6:14,STU_S60:18,STU_U1:10,STU_U11:9,STU_U12:19,STU_U15:16,STU_U5:4,STU_U6:21,STU_U7:17,STU_U9:13" link="stu_s114,stu_u109,stu_u111,stu_u117,stu_u1215,stu_u1218,stu_u503,stu_u505"/>
+    <station id="stu_u117" name="Bad Cannstatt Wilhelmsplatz" line="STU_S1:16,STU_S11:16,STU_S2:14,STU_S3:11,STU_U1:17,STU_U13:14,STU_U16:21,STU_U19:3,STU_U2:21" link="stu_s117,stu_u110,stu_u1102,stu_u116,stu_u118,stu_u120,stu_u222"/>
+    <station id="stu_s117" name="Neckarpark" line="STU_S1:17,STU_S11:17" link="stu_u117,stu_u421"/>
+    <station id="stu_u421" name="Untertürkheim Bahnhof" line="STU_S1:18,STU_U13:21,STU_U4:21" link="stu_s117,stu_s119,stu_u1320,stu_u420"/>
+    <station id="stu_s119" name="Obertürkheim" line="STU_S1:19" link="stu_s120,stu_u421"/>
+    <station id="stu_s120" name="Mettingen" line="STU_S1:20" link="stu_s119,stu_s121"/>
+    <station id="stu_s121" name="Esslingen" line="STU_S1:21" link="stu_s120,stu_s122"/>
+    <station id="stu_s122" name="Oberesslingen" line="STU_S1:22" link="stu_s121,stu_s123"/>
+    <station id="stu_s123" name="Zell" line="STU_S1:23" link="stu_s122,stu_s124"/>
+    <station id="stu_s124" name="Altbach" line="STU_S1:24" link="stu_s123,stu_s125"/>
+    <station id="stu_s125" name="Plochingen" line="STU_S1:25" link="stu_s124,stu_s126"/>
+    <station id="stu_s126" name="Wernau" line="STU_S1:26" link="stu_s125,stu_s127"/>
+    <station id="stu_s127" name="Wendlingen" line="STU_S1:27" link="stu_s126,stu_s128"/>
+    <station id="stu_s128" name="Ötlingen" line="STU_S1:28" link="stu_s127,stu_s129"/>
+    <station id="stu_s129" name="Kirchheim" line="STU_S1:29" link="stu_s128"/>
+    <!-- S11 -->
+    <!-- S2 -->
+    <station id="stu_s201" name="Schorndorf" line="STU_S2:1" link="stu_s202"/>
+    <station id="stu_s202" name="Weiler" line="STU_S2:2" link="stu_s201,stu_s203"/>
+    <station id="stu_s203" name="Winterbach" line="STU_S2:3" link="stu_s202,stu_s204"/>
+    <station id="stu_s204" name="Geradstetten" line="STU_S2:4" link="stu_s203,stu_s205"/>
+    <station id="stu_s205" name="Grunbach" line="STU_S2:5" link="stu_s204,stu_s206"/>
+    <station id="stu_s206" name="Beutelsbach" line="STU_S2:6" link="stu_s205,stu_s207"/>
+    <station id="stu_s207" name="Endersbach" line="STU_S2:7" link="stu_s206,stu_s208"/>
+    <station id="stu_s208" name="Stetten-Beinstein" line="STU_S2:8" link="stu_s207,stu_s209"/>
+    <station id="stu_s209" name="Rommelshausen" line="STU_S2:9" link="stu_s208,stu_s210"/>
+    <station id="stu_s210" name="Waiblingen" line="STU_S2:10,STU_S3:7" link="stu_s209,stu_s211,stu_s306"/>
+    <station id="stu_s211" name="Fellbach" line="STU_S2:11,STU_S3:8" link="stu_s210,stu_s212"/>
+    <station id="stu_s212" name="Sommerrain" line="STU_S2:12,STU_S3:9" link="stu_s211,stu_u120"/>
+    <station id="stu_u120" name="Nürnberger Str." line="STU_S2:13,STU_S3:10,STU_U1:20,STU_U16:24" link="stu_s212,stu_u117,stu_u119,stu_u121"/>
+    <station id="stu_s223" name="Oberaichen" line="STU_S2:23,STU_S3:20" link="stu_s108,stu_u522"/>
+    <station id="stu_u522" name="Leinfelden Bahnhof" line="STU_S2:24,STU_S3:21,STU_U5:22" link="stu_s223,stu_s225,stu_u521,stu_u523"/>
+    <station id="stu_s225" name="Echterdingen" line="STU_S2:25,STU_S3:22" link="stu_u522,stu_u643"/>
+    <station id="stu_u643" name="Flughafen/Messe" line="STU_S2:26,STU_S3:23,STU_U6:43" link="stu_s225,stu_s227,stu_u642"/>
+    <station id="stu_s227" name="Filderstadt" line="STU_S2:27" link="stu_u643"/>
+    <!-- S3 -->
+    <station id="stu_s301" name="Backnang" line="STU_S3:1,STU_S4:1" link="stu_s302,stu_s402"/>
+    <station id="stu_s302" name="Maubach" line="STU_S3:2" link="stu_s301,stu_s303"/>
+    <station id="stu_s303" name="Nellmersbach" line="STU_S3:3" link="stu_s302,stu_s304"/>
+    <station id="stu_s304" name="Winnenden" line="STU_S3:4" link="stu_s303,stu_s305"/>
+    <station id="stu_s305" name="Schwaikheim" line="STU_S3:5" link="stu_s304,stu_s306"/>
+    <station id="stu_s306" name="Neustadt-Hohenacker" line="STU_S3:6" link="stu_s210,stu_s305"/>
+    <!-- S4 -->
+    <station id="stu_s402" name="Burgstall" line="STU_S4:2" link="stu_s301,stu_s403"/>
+    <station id="stu_s403" name="Kirchberg" line="STU_S4:3" link="stu_s402,stu_s404"/>
+    <station id="stu_s404" name="Erdmannhausen" line="STU_S4:4" link="stu_s403,stu_s405"/>
+    <station id="stu_s405" name="Marbach" line="STU_S4:5" link="stu_s404,stu_s406"/>
+    <station id="stu_s406" name="Benningen" line="STU_S4:6" link="stu_s405,stu_u702"/>
+    <station id="stu_u702" name="Freiberg" line="STU_S4:7,STU_U7:2" link="stu_s406,stu_s408,stu_u701,stu_u703"/>
+    <station id="stu_s408" name="Favoritepark" line="STU_S4:8" link="stu_s409,stu_u702"/>
+    <station id="stu_s409" name="Ludwigsburg" line="STU_S4:9,STU_S5:4" link="stu_s408,stu_s410,stu_s503"/>
+    <station id="stu_s410" name="Kornwestheim" line="STU_S4:10,STU_S5:5" link="stu_s409,stu_s411"/>
+    <station id="stu_s411" name="Zuffenhausen" line="STU_S4:11,STU_S5:6,STU_S6:11,STU_S60:15,STU_S62:11" link="stu_s410,stu_s610,stu_u615"/>
+    <station id="stu_u615" name="Feuerbach Bahnhof" line="STU_S4:12,STU_S5:7,STU_S6:12,STU_S60:16,STU_U13:5,STU_U16:12,STU_U6:15" link="stu_s411,stu_u1215,stu_u614,stu_u616"/>
+    <station id="stu_u1215" name="Nordbahnhof" line="STU_S4:13,STU_S5:8,STU_S6:13,STU_S60:17,STU_U12:15" link="stu_u110,stu_u1214,stu_u1216,stu_u615"/>
+    <station id="stu_s417" name="Schwabstraße" line="STU_S4:17,STU_S5:12,STU_S6:17,STU_S60:21" link="stu_s113"/>
+    <!-- S5 -->
+    <station id="stu_s501" name="Bietigheim-Bissingen" line="STU_S5:1" link="stu_s502"/>
+    <station id="stu_s502" name="Tamm" line="STU_S5:2" link="stu_s501,stu_s503"/>
+    <station id="stu_s503" name="Asperg" line="STU_S5:3" link="stu_s409,stu_s502"/>
+    <!-- S6 -->
+    <station id="stu_s601" name="Weil der Stadt" line="STU_S6:1,STU_S62:1" link="stu_s602"/>
+    <station id="stu_s602" name="Malmsheim" line="STU_S6:2,STU_S62:2" link="stu_s601,stu_s603"/>
+    <station id="stu_s603" name="Renningen" line="STU_S6:3,STU_S60:7,STU_S62:3" link="stu_s6006,stu_s602,stu_s604"/>
+    <station id="stu_s604" name="Rutesheim" line="STU_S6:4,STU_S60:8,STU_S62:4" link="stu_s603,stu_s605"/>
+    <station id="stu_s605" name="Leonberg" line="STU_S6:5,STU_S60:9,STU_S62:5" link="stu_s604,stu_s606"/>
+    <station id="stu_s606" name="Höfingen" line="STU_S6:6,STU_S60:10,STU_S62:6" link="stu_s605,stu_s607"/>
+    <station id="stu_s607" name="Ditzingen" line="STU_S6:7,STU_S60:11,STU_S62:7" link="stu_s606,stu_s608"/>
+    <station id="stu_s608" name="Weilimdorf" line="STU_S6:8,STU_S60:12,STU_S62:8" link="stu_s607,stu_s609"/>
+    <station id="stu_s609" name="Korntal" line="STU_S6:9,STU_S60:13,STU_S62:9" link="stu_s608,stu_s610"/>
+    <station id="stu_s610" name="Neuwirtshaus" line="STU_S6:10,STU_S60:14,STU_S62:10" link="stu_s411,stu_s609"/>
+    <!-- S60 -->
+    <station id="stu_s6002" name="Sindelfingen" line="STU_S60:2" link="stu_s106,stu_s6003"/>
+    <station id="stu_s6003" name="Maichingen" line="STU_S60:3" link="stu_s6002,stu_s6004"/>
+    <station id="stu_s6004" name="Maichingen Nord" line="STU_S60:4" link="stu_s6003,stu_s6005"/>
+    <station id="stu_s6005" name="Magstadt" line="STU_S60:5" link="stu_s6004,stu_s6006"/>
+    <station id="stu_s6006" name="Renningen Süd" line="STU_S60:6" link="stu_s6005,stu_s603"/>
+    <!-- S62 -->
+    <!-- Seilbahn -->
+    <station id="stu_seilba01" name="Südheimer Platz" line="STU_SEILBA:1,STU_U1:2,STU_U14:25" link="stu_seilba02,stu_u101,stu_u103"/>
+    <station id="stu_seilba02" name="Waldfriedhof" line="STU_SEILBA:2" link="stu_seilba01"/>
+    <!-- U1 -->
+    <station id="stu_u101" name="Heslach Vogelrain" line="STU_U1:1,STU_U14:26" link="stu_seilba01,stu_u1427"/>
+    <station id="stu_u103" name="Bihlplatz" line="STU_U1:3,STU_U14:24" link="stu_seilba01,stu_u104"/>
+    <station id="stu_u104" name="Erwin-Schoettle-Platz" line="STU_U1:4,STU_U14:23" link="stu_u103,stu_zacke01"/>
+    <station id="stu_zacke01" name="Marienplatz" line="STU_U1:5,STU_U14:22,STU_ZACKE:1" link="stu_u104,stu_u106,stu_zacke02"/>
+    <station id="stu_u106" name="Österreichischer Platz" line="STU_U1:6,STU_U14:21" link="stu_u107,stu_u213,stu_zacke01"/>
+    <station id="stu_u107" name="Rotebühlplatz" line="STU_U1:7,STU_U11:12,STU_U2:12,STU_U4:5" link="stu_u106,stu_u108,stu_u213"/>
+    <station id="stu_u108" name="Berliner Platz" line="STU_U1:8,STU_U11:11,STU_U2:11,STU_U4:4,STU_U9:11" link="stu_u107,stu_u109,stu_u210,stu_u403"/>
+    <station id="stu_u109" name="Börsenplatz" line="STU_U1:9,STU_U11:10,STU_U9:12" link="stu_u108,stu_u110"/>
+    <station id="stu_u111" name="Staatsgalerie" line="STU_U1:11,STU_U11:8,STU_U14:18,STU_U2:15,STU_U4:8,STU_U9:14" link="stu_u110,stu_u112,stu_u214"/>
+    <station id="stu_u112" name="Neckartor" line="STU_U1:12,STU_U11:7,STU_U14:17,STU_U2:16,STU_U4:9,STU_U9:15" link="stu_u111,stu_u113"/>
+    <station id="stu_u113" name="Stöckach" line="STU_U1:13,STU_U11:6,STU_U14:16,STU_U2:17,STU_U4:10,STU_U9:16" link="stu_u112,stu_u114,stu_u411"/>
+    <station id="stu_u114" name="Metzstr." line="STU_U1:14,STU_U11:5,STU_U14:15,STU_U2:18" link="stu_u113,stu_u115"/>
+    <station id="stu_u115" name="Mineralbäder" line="STU_U1:15,STU_U11:4,STU_U14:14,STU_U2:19" link="stu_u114,stu_u116,stu_u1312"/>
+    <station id="stu_u116" name="Mercedesstr." line="STU_U1:16,STU_U11:3,STU_U13:13,STU_U16:20,STU_U2:20" link="stu_u1102,stu_u115,stu_u117,stu_u1312"/>
+    <station id="stu_u118" name="Uff-Kirchhof" line="STU_U1:18,STU_U13:15,STU_U16:22" link="stu_u117,stu_u119,stu_u1316"/>
+    <station id="stu_u119" name="Augsburger Platz" line="STU_U1:19,STU_U16:23" link="stu_u118,stu_u120"/>
+    <station id="stu_u121" name="Antwerpener Str." line="STU_U1:21,STU_U16:25" link="stu_u120,stu_u122"/>
+    <station id="stu_u122" name="Beskidenstr." line="STU_U1:22,STU_U16:26" link="stu_u121,stu_u123"/>
+    <station id="stu_u123" name="Höhenstr." line="STU_U1:23,STU_U16:27" link="stu_u122,stu_u124"/>
+    <station id="stu_u124" name="Esslinger Str." line="STU_U1:24,STU_U16:28" link="stu_u123,stu_u125"/>
+    <station id="stu_u125" name="Schwabenlandhalle" line="STU_U1:25,STU_U16:29" link="stu_u124,stu_u126"/>
+    <station id="stu_u126" name="Fellbach Lutherkirche" line="STU_U1:26,STU_U16:30" link="stu_u125"/>
+    <!-- U11 -->
+    <station id="stu_u1101" name="Neckarpark Stadion" line="STU_U11:1,STU_U19:1" link="stu_u1102"/>
+    <station id="stu_u1102" name="Cannstatter Wasen" line="STU_U11:2,STU_U19:2" link="stu_u1101,stu_u116,stu_u117"/>
+    <station id="stu_u213" name="Rathaus" line="STU_U11:13,STU_U14:20,STU_U2:13,STU_U4:6" link="stu_u106,stu_u107,stu_u214"/>
+    <station id="stu_u214" name="Charlottenplatz" line="STU_U11:14,STU_U12:21,STU_U14:19,STU_U15:18,STU_U2:14,STU_U4:7,STU_U5:6,STU_U6:23,STU_U7:19" link="stu_u111,stu_u213,stu_u505,stu_u507"/>
+    <!-- U12 -->
+    <station id="stu_u1201" name="Neckargröningen Remseck" line="STU_U12:1" link="stu_u1202"/>
+    <station id="stu_u1202" name="Brückenstr." line="STU_U12:2" link="stu_u1201,stu_u1203"/>
+    <station id="stu_u1203" name="Mühle" line="STU_U12:3" link="stu_u1202,stu_u1204"/>
+    <station id="stu_u1204" name="Hornbach" line="STU_U12:4" link="stu_u1203,stu_u1205"/>
+    <station id="stu_u1205" name="Mühlhausen" line="STU_U12:5,STU_U14:1" link="stu_u1204,stu_u1206"/>
+    <station id="stu_u1206" name="Auwiesen" line="STU_U12:6,STU_U14:2" link="stu_u1205,stu_u1207"/>
+    <station id="stu_u1207" name="Hofen" line="STU_U12:7,STU_U14:3" link="stu_u1206,stu_u1208"/>
+    <station id="stu_u1208" name="Max-Eyth-See" line="STU_U12:8,STU_U14:4" link="stu_u1207,stu_u1209"/>
+    <station id="stu_u1209" name="Wagrainäcker" line="STU_U12:9,STU_U14:5" link="stu_u1208,stu_u1210,stu_u1406"/>
+    <station id="stu_u1210" name="Bottroper Str." line="STU_U12:10" link="stu_u1209,stu_u1211"/>
+    <station id="stu_u1211" name="Hallschlag" line="STU_U12:11" link="stu_u1210,stu_u1212"/>
+    <station id="stu_u1212" name="Riethmüllerhaus" line="STU_U12:12" link="stu_u1211,stu_u1213"/>
+    <station id="stu_u1213" name="Züricher Str." line="STU_U12:13" link="stu_u1212,stu_u1214"/>
+    <station id="stu_u1214" name="Löwentor" line="STU_U12:14,STU_U13:8,STU_U16:15" link="stu_u1213,stu_u1215,stu_u1309,stu_u617"/>
+    <station id="stu_u1216" name="Mittnachtstr." line="STU_U12:16" link="stu_u1215,stu_u1217"/>
+    <station id="stu_u1217" name="Milchhof" line="STU_U12:17" link="stu_u1216,stu_u1218"/>
+    <station id="stu_u1218" name="Budapester Platz" line="STU_U12:18" link="stu_u110,stu_u1217"/>
+    <station id="stu_u505" name="Schlossplatz" line="STU_U12:20,STU_U15:17,STU_U5:5,STU_U6:22,STU_U7:18" link="stu_u110,stu_u214"/>
+    <station id="stu_u507" name="Olgaeck" line="STU_U12:22,STU_U15:19,STU_U5:7,STU_U6:24,STU_U7:20" link="stu_u1520,stu_u214,stu_u508"/>
+    <station id="stu_u508" name="Dobelstr." line="STU_U12:23,STU_U5:8,STU_U6:25,STU_U7:21" link="stu_u507,stu_u509"/>
+    <station id="stu_u509" name="Bopser" line="STU_U12:24,STU_U5:9,STU_U6:26,STU_U7:22" link="stu_u508,stu_u510,stu_u723"/>
+    <station id="stu_u510" name="Weinsteige" line="STU_U12:25,STU_U5:10,STU_U6:27,STU_U8:12" link="stu_u509,stu_u723,stu_zacke08"/>
+    <station id="stu_zacke08" name="Degerloch" line="STU_U12:26,STU_U5:11,STU_U6:28,STU_U8:11,STU_ZACKE:8" link="stu_u510,stu_u512,stu_zacke07"/>
+    <station id="stu_u512" name="Degerloch Albstr." line="STU_U12:27,STU_U5:12,STU_U6:29,STU_U8:10" link="stu_u513,stu_zacke08"/>
+    <station id="stu_u513" name="Peregrinastr." line="STU_U12:28,STU_U5:13,STU_U6:30,STU_U8:9" link="stu_u512,stu_u514"/>
+    <station id="stu_u514" name="Sonnenberg" line="STU_U12:29,STU_U5:14,STU_U6:31,STU_U8:8" link="stu_u513,stu_u515"/>
+    <station id="stu_u515" name="Riedsee" line="STU_U12:30,STU_U5:15,STU_U6:32,STU_U8:7" link="stu_u306,stu_u514"/>
+    <station id="stu_u306" name="Möhringen Bahnhof" line="STU_U12:31,STU_U3:6,STU_U5:16,STU_U6:33,STU_U8:6" link="stu_u305,stu_u307,stu_u515"/>
+    <station id="stu_u305" name="Vaihinger Str." line="STU_U12:32,STU_U3:5,STU_U5:17,STU_U6:34,STU_U8:5" link="stu_u304,stu_u306,stu_u518"/>
+    <station id="stu_u304" name="SSB-Zentrum" line="STU_U12:33,STU_U3:4,STU_U8:4" link="stu_u303,stu_u305"/>
+    <station id="stu_u303" name="Wallgraben" line="STU_U12:34,STU_U3:3,STU_U8:3" link="stu_u1235,stu_u302,stu_u304"/>
+    <station id="stu_u1235" name="Lapp Kabel" line="STU_U12:35" link="stu_u1236,stu_u303"/>
+    <station id="stu_u1236" name="Dürrlewang" line="STU_U12:36" link="stu_u1235"/>
+    <!-- U13 -->
+    <station id="stu_u611" name="Feuerbach Pfostenwäldle" line="STU_U13:1,STU_U16:8,STU_U6:11" link="stu_u610,stu_u612"/>
+    <station id="stu_u612" name="Sportpark Feuerbach" line="STU_U13:2,STU_U16:9,STU_U6:12" link="stu_u611,stu_u613"/>
+    <station id="stu_u613" name="Föhrich" line="STU_U13:3,STU_U16:10,STU_U6:13" link="stu_u612,stu_u614"/>
+    <station id="stu_u614" name="Wilhelm-Geiger-Platz" line="STU_U13:4,STU_U16:11,STU_U6:14" link="stu_u613,stu_u615"/>
+    <station id="stu_u616" name="Maybachstr." line="STU_U13:6,STU_U16:13,STU_U6:16" link="stu_u615,stu_u617"/>
+    <station id="stu_u617" name="Pragsattel" line="STU_U13:7,STU_U15:12,STU_U16:14,STU_U6:17,STU_U7:13" link="stu_u1214,stu_u616,stu_u618,stu_u712"/>
+    <station id="stu_u1309" name="Rosensteinpark" line="STU_U13:9,STU_U16:16" link="stu_u1214,stu_u1310"/>
+    <station id="stu_u1310" name="Glockenstr." line="STU_U13:10,STU_U16:17" link="stu_u1309,stu_u1311"/>
+    <station id="stu_u1311" name="Rosensteinbrücke" line="STU_U13:11,STU_U14:12,STU_U16:18" link="stu_u1310,stu_u1312,stu_u1411"/>
+    <station id="stu_u1312" name="Wilhelma" line="STU_U13:12,STU_U14:13,STU_U16:19" link="stu_u115,stu_u116,stu_u1311"/>
+    <station id="stu_u1316" name="Ebitzweg" line="STU_U13:16" link="stu_u118,stu_u1317"/>
+    <station id="stu_u1317" name="Kienbachstr." line="STU_U13:17" link="stu_u1316,stu_u1318"/>
+    <station id="stu_u1318" name="Blick" line="STU_U13:18" link="stu_u1317,stu_u1319"/>
+    <station id="stu_u1319" name="Eszet" line="STU_U13:19" link="stu_u1318,stu_u1320"/>
+    <station id="stu_u1320" name="Schlotterbeckstr." line="STU_U13:20" link="stu_u1319,stu_u421"/>
+    <station id="stu_u420" name="Wasenstr." line="STU_U13:22,STU_U4:20,STU_U9:25" link="stu_u419,stu_u421,stu_u926"/>
+    <station id="stu_u926" name="Wangen Marktplatz" line="STU_U13:23,STU_U9:26" link="stu_u420,stu_u927"/>
+    <station id="stu_u927" name="Stadtwerke Stuttgart" line="STU_U13:24,STU_U9:27" link="stu_u926,stu_u928"/>
+    <station id="stu_u928" name="Hedelfingen" line="STU_U13:25,STU_U9:28" link="stu_u927"/>
+    <!-- U14 -->
+    <station id="stu_u1406" name="Elbestr." line="STU_U14:6" link="stu_u1209,stu_u1407"/>
+    <station id="stu_u1407" name="Freibergstr." line="STU_U14:7" link="stu_u1406,stu_u1408"/>
+    <station id="stu_u1408" name="Münster Rathaus" line="STU_U14:8" link="stu_u1407,stu_u1409"/>
+    <station id="stu_u1409" name="Münster Viadukt" line="STU_U14:9" link="stu_u1408,stu_u1410"/>
+    <station id="stu_u1410" name="Kraftwerk Münster" line="STU_U14:10" link="stu_u1409,stu_u1411"/>
+    <station id="stu_u1411" name="Mühlsteg" line="STU_U14:11" link="stu_u1311,stu_u1410"/>
+    <station id="stu_u1427" name="Waldeck" line="STU_U14:27" link="stu_u101,stu_u1428"/>
+    <station id="stu_u1428" name="Kaltental" line="STU_U14:28" link="stu_u1427,stu_u1429"/>
+    <station id="stu_u1429" name="Engelboldstr." line="STU_U14:29" link="stu_u1428,stu_u1430"/>
+    <station id="stu_u1430" name="Vaihingen Viadukt" line="STU_U14:30" link="stu_u1429,stu_u1431"/>
+    <station id="stu_u1431" name="Fauststr." line="STU_U14:31" link="stu_u1430,stu_u1432"/>
+    <station id="stu_u1432" name="Vaihingen Schillerplatz" line="STU_U14:32" link="stu_u1431,stu_u301"/>
+    <!-- U15 -->
+    <station id="stu_u1501" name="Stammheim" line="STU_U15:1" link="stu_u1502"/>
+    <station id="stu_u1502" name="Korntaler Str." line="STU_U15:2" link="stu_u1501,stu_u1503"/>
+    <station id="stu_u1503" name="Heutingsheimer Str." line="STU_U15:3" link="stu_u1502,stu_u1504"/>
+    <station id="stu_u1504" name="Wimpfener Str." line="STU_U15:4" link="stu_u1503,stu_u1505"/>
+    <station id="stu_u1505" name="Salzwiesenstr." line="STU_U15:5" link="stu_u1504,stu_u1506"/>
+    <station id="stu_u1506" name="Kirchtalstr." line="STU_U15:6" link="stu_u1505,stu_u1507"/>
+    <station id="stu_u1507" name="Zuffenhausen Rathaus" line="STU_U15:7" link="stu_u1506,stu_u709"/>
+    <station id="stu_u709" name="Hohensteinstr." line="STU_U15:8,STU_U7:9" link="stu_u1507,stu_u708,stu_u710"/>
+    <station id="stu_u710" name="Friedrichswahl" line="STU_U15:9,STU_U7:10" link="stu_u709,stu_u711"/>
+    <station id="stu_u711" name="Borsigstr." line="STU_U15:10,STU_U7:11" link="stu_u710,stu_u712"/>
+    <station id="stu_u712" name="Sieglestr." line="STU_U15:11,STU_U7:12" link="stu_u617,stu_u711"/>
+    <station id="stu_u618" name="Löwentorbrücke" line="STU_U15:13,STU_U6:18,STU_U7:14" link="stu_u502,stu_u617"/>
+    <station id="stu_u502" name="Pragfriedhof" line="STU_U15:14,STU_U5:2,STU_U6:19,STU_U7:15" link="stu_u501,stu_u503,stu_u618"/>
+    <station id="stu_u503" name="Stadtbibliothek" line="STU_U15:15,STU_U5:3,STU_U6:20,STU_U7:16" link="stu_u110,stu_u502"/>
+    <station id="stu_u1520" name="Eugensplatz" line="STU_U15:20" link="stu_u1521,stu_u507"/>
+    <station id="stu_u1521" name="Heidehofstr." line="STU_U15:21" link="stu_u1520,stu_u1522"/>
+    <station id="stu_u1522" name="Stafflenbergstr." line="STU_U15:22" link="stu_u1521,stu_u1523"/>
+    <station id="stu_u1523" name="Bubenbad" line="STU_U15:23" link="stu_u1522,stu_u1524"/>
+    <station id="stu_u1524" name="Payerstr." line="STU_U15:24" link="stu_u1523,stu_u1525"/>
+    <station id="stu_u1525" name="Geroksruhe" line="STU_U15:25" link="stu_u1524,stu_u1526"/>
+    <station id="stu_u1526" name="Stelle" line="STU_U15:26" link="stu_u1525,stu_u724"/>
+    <station id="stu_u724" name="Ruhbank" line="STU_U15:27,STU_U7:24,STU_U8:14" link="stu_u1526,stu_u723,stu_u725"/>
+    <station id="stu_u725" name="Silberwald" line="STU_U15:28,STU_U7:25,STU_U8:15" link="stu_u724,stu_u726"/>
+    <station id="stu_u726" name="Sillenbuch" line="STU_U15:29,STU_U7:26,STU_U8:16" link="stu_u725,stu_u727"/>
+    <station id="stu_u727" name="Schemppstr." line="STU_U15:30,STU_U7:27,STU_U8:17" link="stu_u726,stu_u728"/>
+    <station id="stu_u728" name="Bockelstr." line="STU_U15:31,STU_U7:28,STU_U8:18" link="stu_u727,stu_u729"/>
+    <station id="stu_u729" name="Heumaden" line="STU_U15:32,STU_U7:29,STU_U8:19" link="stu_u728,stu_u730"/>
+    <!-- U16 -->
+    <station id="stu_u604" name="Giebel" line="STU_U16:1,STU_U6:4" link="stu_u603,stu_u605"/>
+    <station id="stu_u605" name="Salamanderweg" line="STU_U16:2,STU_U6:5" link="stu_u604,stu_u606"/>
+    <station id="stu_u606" name="Bergheimer Hof" line="STU_U16:3,STU_U6:6" link="stu_u605,stu_u607"/>
+    <station id="stu_u607" name="Wolfbusch" line="STU_U16:4,STU_U6:7" link="stu_u606,stu_u608"/>
+    <station id="stu_u608" name="Rastatter Str." line="STU_U16:5,STU_U6:8" link="stu_u607,stu_u609"/>
+    <station id="stu_u609" name="Weilimdorf Löwen-Markt" line="STU_U16:6,STU_U6:9" link="stu_u608,stu_u610"/>
+    <station id="stu_u610" name="Landauer Str." line="STU_U16:7,STU_U6:10" link="stu_u609,stu_u611"/>
+    <!-- U19 -->
+    <station id="stu_u222" name="Daimlerplatz" line="STU_U19:4,STU_U2:22" link="stu_u117,stu_u223"/>
+    <station id="stu_u223" name="Kursaal" line="STU_U19:5,STU_U2:23" link="stu_u222,stu_u224"/>
+    <station id="stu_u224" name="Gnesener Str." line="STU_U19:6,STU_U2:24" link="stu_u223,stu_u225"/>
+    <station id="stu_u225" name="Obere Ziegelei" line="STU_U19:7,STU_U2:25" link="stu_u224,stu_u226"/>
+    <station id="stu_u226" name="Hauptfriedhof" line="STU_U19:8,STU_U2:26" link="stu_u225,stu_u227"/>
+    <station id="stu_u227" name="Steinhaldenfeld" line="STU_U19:9,STU_U2:27" link="stu_u226,stu_u228"/>
+    <station id="stu_u228" name="Neugereut" line="STU_U19:10,STU_U2:28" link="stu_u227"/>
+    <!-- U2 -->
+    <station id="stu_u201" name="Botnang" line="STU_U2:1,STU_U9:1" link="stu_u202"/>
+    <station id="stu_u202" name="Eltinger Str." line="STU_U2:2,STU_U9:2" link="stu_u201,stu_u203"/>
+    <station id="stu_u203" name="Millöckerstr." line="STU_U2:3,STU_U9:3" link="stu_u202,stu_u204"/>
+    <station id="stu_u204" name="Beethovenstr." line="STU_U2:4,STU_U9:4" link="stu_u203,stu_u205"/>
+    <station id="stu_u205" name="Lindpaintnerstr." line="STU_U2:5,STU_U9:5" link="stu_u204,stu_u206"/>
+    <station id="stu_u206" name="Herderplatz" line="STU_U2:6,STU_U9:6" link="stu_u205,stu_u207"/>
+    <station id="stu_u207" name="Vogelsang" line="STU_U2:7,STU_U9:7" link="stu_u206,stu_u208"/>
+    <station id="stu_u208" name="Arndt-/Spittastr." line="STU_U2:8,STU_U9:8" link="stu_u207,stu_u209"/>
+    <station id="stu_u209" name="Schwab-/Bebelstr." line="STU_U2:9,STU_U9:9" link="stu_u208,stu_u210"/>
+    <station id="stu_u210" name="Schloss-/Johannesstr." line="STU_U2:10,STU_U9:10" link="stu_u108,stu_u209"/>
+    <!-- U3 -->
+    <station id="stu_u302" name="Jurastr." line="STU_U3:2,STU_U8:2" link="stu_u301,stu_u303"/>
+    <station id="stu_u307" name="Sigmaringer Str." line="STU_U3:7" link="stu_u306,stu_u308"/>
+    <station id="stu_u308" name="Plieninger Str." line="STU_U3:8" link="stu_u307,stu_u309"/>
+    <station id="stu_u309" name="Salzäcker" line="STU_U3:9" link="stu_u308,stu_u310"/>
+    <station id="stu_u310" name="Landhaus" line="STU_U3:10" link="stu_u309,stu_u311"/>
+    <station id="stu_u311" name="Plieningen" line="STU_U3:11" link="stu_u310"/>
+    <!-- U4 -->
+    <station id="stu_u401" name="Hölderlinplatz" line="STU_U4:1" link="stu_u402"/>
+    <station id="stu_u402" name="Russische Kirche" line="STU_U4:2" link="stu_u401,stu_u403"/>
+    <station id="stu_u403" name="Rosenberg-/Seidenstr." line="STU_U4:3" link="stu_u108,stu_u402"/>
+    <station id="stu_u411" name="Karl-Olga-Krankenhaus" line="STU_U4:11,STU_U9:17" link="stu_u113,stu_u412"/>
+    <station id="stu_u412" name="Bergfriedhof" line="STU_U4:12,STU_U9:18" link="stu_u411,stu_u413,stu_u919"/>
+    <station id="stu_u413" name="Ostendplatz" line="STU_U4:13" link="stu_u412,stu_u414"/>
+    <station id="stu_u414" name="Ostheim Leo-Vetter-Bad" line="STU_U4:14" link="stu_u413,stu_u415"/>
+    <station id="stu_u415" name="Gaisburg" line="STU_U4:15" link="stu_u414,stu_u416"/>
+    <station id="stu_u416" name="Wangener-/Landhausstr." line="STU_U4:16,STU_U9:21" link="stu_u415,stu_u417,stu_u920"/>
+    <station id="stu_u417" name="Brendle" line="STU_U4:17,STU_U9:22" link="stu_u416,stu_u418"/>
+    <station id="stu_u418" name="Im Degen" line="STU_U4:18,STU_U9:23" link="stu_u417,stu_u419"/>
+    <station id="stu_u419" name="Inselstr." line="STU_U4:19,STU_U9:24" link="stu_u418,stu_u420"/>
+    <!-- U5 -->
+    <station id="stu_u501" name="Killesberg" line="STU_U5:1" link="stu_u502"/>
+    <station id="stu_u518" name="Rohrer Weg" line="STU_U5:18,STU_U6:35" link="stu_u305,stu_u519"/>
+    <station id="stu_u519" name="Möhringen Freibad" line="STU_U5:19,STU_U6:36" link="stu_u518,stu_u520,stu_u637"/>
+    <station id="stu_u520" name="Leinfelden Frank" line="STU_U5:20" link="stu_u519,stu_u521"/>
+    <station id="stu_u521" name="Unteraichen" line="STU_U5:21" link="stu_u520,stu_u522"/>
+    <station id="stu_u523" name="Leinfelden Neuer Markt" line="STU_U5:23" link="stu_u522"/>
+    <!-- U6 -->
+    <station id="stu_u601" name="Gerlingen" line="STU_U6:1" link="stu_u602"/>
+    <station id="stu_u602" name="Siedlung" line="STU_U6:2" link="stu_u601,stu_u603"/>
+    <station id="stu_u603" name="Breitwiesen" line="STU_U6:3" link="stu_u602,stu_u604"/>
+    <station id="stu_u637" name="Fasanenhof" line="STU_U6:37" link="stu_u519,stu_u638"/>
+    <station id="stu_u638" name="Europaplatz" line="STU_U6:38" link="stu_u637,stu_u639"/>
+    <station id="stu_u639" name="EnBW City" line="STU_U6:39" link="stu_u638,stu_u640"/>
+    <station id="stu_u640" name="Schelmenwasen" line="STU_U6:40" link="stu_u639,stu_u641"/>
+    <station id="stu_u641" name="Stadionstr." line="STU_U6:41" link="stu_u640,stu_u642"/>
+    <station id="stu_u642" name="Messe West" line="STU_U6:42" link="stu_u641,stu_u643"/>
+    <!-- U7 -->
+    <station id="stu_u701" name="Mönchfeld" line="STU_U7:1" link="stu_u702"/>
+    <station id="stu_u703" name="Suttnerstr." line="STU_U7:3" link="stu_u702,stu_u704"/>
+    <station id="stu_u704" name="Himmelsleiter" line="STU_U7:4" link="stu_u703,stu_u705"/>
+    <station id="stu_u705" name="Tapachstr." line="STU_U7:5" link="stu_u704,stu_u706"/>
+    <station id="stu_u706" name="Fürfelder Str." line="STU_U7:6" link="stu_u705,stu_u707"/>
+    <station id="stu_u707" name="Schozacher Str." line="STU_U7:7" link="stu_u706,stu_u708"/>
+    <station id="stu_u708" name="Zuffenhausen Kelterplatz" line="STU_U7:8" link="stu_u707,stu_u709"/>
+    <station id="stu_u723" name="Waldau" line="STU_U7:23,STU_U8:13" link="stu_u509,stu_u510,stu_u724"/>
+    <station id="stu_u730" name="Ruit" line="STU_U7:30,STU_U8:20" link="stu_u729,stu_u731"/>
+    <station id="stu_u731" name="Zinsholz" line="STU_U7:31,STU_U8:21" link="stu_u730,stu_u732"/>
+    <station id="stu_u732" name="Parksiedlung" line="STU_U7:32,STU_U8:22" link="stu_u731,stu_u733"/>
+    <station id="stu_u733" name="Scharnhauser Park" line="STU_U7:33,STU_U8:23" link="stu_u732,stu_u734"/>
+    <station id="stu_u734" name="Kreuzbrunnen" line="STU_U7:34,STU_U8:24" link="stu_u733,stu_u735"/>
+    <station id="stu_u735" name="Technische Akademie" line="STU_U7:35,STU_U8:25" link="stu_u734,stu_u736"/>
+    <station id="stu_u736" name="Nellingen Ostfildern" line="STU_U7:36,STU_U8:26" link="stu_u735"/>
+    <!-- U8 -->
+    <!-- U9 -->
+    <station id="stu_u919" name="Raitelsberg" line="STU_U9:19" link="stu_u412,stu_u920"/>
+    <station id="stu_u920" name="Schlachthof" line="STU_U9:20" link="stu_u416,stu_u919"/>
+    <!-- Zacke -->
+    <station id="stu_zacke02" name="Liststr." line="STU_ZACKE:2" link="stu_zacke01,stu_zacke03"/>
+    <station id="stu_zacke03" name="Pfaffenweg" line="STU_ZACKE:3" link="stu_zacke02,stu_zacke04"/>
+    <station id="stu_zacke04" name="Wielandshöhe" line="STU_ZACKE:4" link="stu_zacke03,stu_zacke05"/>
+    <station id="stu_zacke05" name="Haigst" line="STU_ZACKE:5" link="stu_zacke04,stu_zacke06"/>
+    <station id="stu_zacke06" name="Nägelestr." line="STU_ZACKE:6" link="stu_zacke05,stu_zacke07"/>
+    <station id="stu_zacke07" name="Zahnradbahnhof" line="STU_ZACKE:7" link="stu_zacke06,stu_zacke08"/>
+  </stations>
+</tube>

@@ -28,7 +28,7 @@ URI* new (SV* CLASS, string url = string(), int flags = 0) {
 
 string URI::url (SV* newval = NULL, int flags = 0) {
     if (newval) {
-        THIS->assign(SvOK(newval) ? xs::in<string>(newval) : "", flags);
+        THIS->assign(sv_defined(newval) ? xs::in<string>(newval) : "", flags);
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->to_string();
@@ -36,7 +36,7 @@ string URI::url (SV* newval = NULL, int flags = 0) {
             
 string URI::scheme (SV* newval = NULL) : ALIAS(proto=1, protocol=2) {
     if (newval) {
-        THIS->scheme(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->scheme(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->scheme();
@@ -45,7 +45,7 @@ string URI::scheme (SV* newval = NULL) : ALIAS(proto=1, protocol=2) {
 
 string URI::user_info (SV* newval = NULL) {
     if (newval) {
-        THIS->user_info(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->user_info(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->user_info();
@@ -53,7 +53,7 @@ string URI::user_info (SV* newval = NULL) {
     
 string URI::host (SV* newval = NULL) {
     if (newval) {
-        THIS->host(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->host(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->host();
@@ -69,7 +69,7 @@ int URI::port (SV* newval = NULL) {
     
 string URI::path (SV* newval = NULL) {
     if (newval) {
-        THIS->path(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->path(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->path();
@@ -79,7 +79,7 @@ string URI::path_info ()
     
 string URI::query_string (SV* newval = NULL) {
     if (newval) {
-        THIS->query_string(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->query_string(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->query_string();
@@ -87,7 +87,7 @@ string URI::query_string (SV* newval = NULL) {
     
 string URI::raw_query (SV* newval = NULL) {
     if (newval) {
-        THIS->raw_query(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->raw_query(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->raw_query();
@@ -143,7 +143,7 @@ size_t URI::remove_param (string name) {
     
 string URI::fragment (SV* newval = NULL) : ALIAS(hash=1) {
     if (newval) {
-        THIS->fragment(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->fragment(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->fragment();
@@ -152,7 +152,7 @@ string URI::fragment (SV* newval = NULL) : ALIAS(hash=1) {
     
 string URI::location (SV* newval = NULL) {
     if (newval) {
-        THIS->location(SvOK(newval) ? xs::in<string>(newval) : "");
+        THIS->location(sv_defined(newval) ? xs::in<string>(newval) : "");
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->location();

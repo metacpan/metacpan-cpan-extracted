@@ -46,13 +46,13 @@ static inline string uvx_detach_buf (const uv_buf_t* uvbuf) {
     return ret;
 }
 
-#define UVX_FILL_BUFS(bufs, uvbufs)     \
-    uv_buf_t uvbufs[bufs.size()];       \
-    uv_buf_t* ptr = uvbufs;             \
-    for (const auto& str : bufs) {      \
-        ptr->base = (char*)str.data();  \
-        ptr->len  = str.length();       \
-        ++ptr;                          \
+#define UVX_FILL_BUFS(bufs, uvbufs)                                \
+    auto uvbufs = (uv_buf_t*)alloca(sizeof(uv_buf_t)*bufs.size()); \
+    uv_buf_t* ptr = uvbufs;                                        \
+    for (const auto& str : bufs) {                                 \
+        ptr->base = (char*)str.data();                             \
+        ptr->len  = str.length();                                  \
+        ++ptr;                                                     \
     }
 
 template <class Handle, class Func>

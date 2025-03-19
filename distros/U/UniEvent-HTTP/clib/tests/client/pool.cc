@@ -25,7 +25,7 @@ TEST("reusing connection") {
     CHECK(p.size() == 1);
     CHECK(p.nbusy() == 1);
 
-    c->connect_event.add([&](auto...){ test.happens(); }); // should connect only once
+    c->connect_event.add([&](auto, auto, auto){ test.happens(); }); // should connect only once
 
     auto res = await_response(req, test.loop);
     CHECK(res->code == 200);
@@ -55,7 +55,7 @@ TEST("reusing connection after c=close") {
     auto c = p.request(req);
     REQUIRE(c);
 
-    c->connect_event.add([&](auto...){ test.happens(); }); // should connect twice
+    c->connect_event.add([&](auto, auto, auto){ test.happens(); }); // should connect twice
 
     auto res = await_response(req, test.loop);
     CHECK(res->code == 200);
@@ -87,7 +87,7 @@ TEST("different servers") {
     auto req1 = Request::Builder().method(Request::Method::Get).uri(uri1).build();
     auto c = p.request(req1);
     REQUIRE(c);
-    c->connect_event.add([&](auto...){ test.happens(); });
+    c->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     auto res = await_response(req1, test.loop);
     CHECK(res->code == 200);
@@ -99,7 +99,7 @@ TEST("different servers") {
     auto req2 = Request::Builder().method(Request::Method::Get).uri(uri2).build();
     auto c2 = p.request(req2);
     REQUIRE(c2);
-    c2->connect_event.add([&](auto...){ test.happens(); });
+    c2->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     CHECK(p.size() == 2);
     CHECK(p.nbusy() == 1);
@@ -124,12 +124,12 @@ TEST("several requests to the same server at once") {
     auto r1 = Request::Builder().method(Request::Method::Get).uri(uri).build();
     auto c1 = p.request(r1);
     REQUIRE(c1);
-    c1->connect_event.add([&](auto...){ test.happens(); });
+    c1->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     auto r2 = Request::Builder().method(Request::Method::Get).uri(uri).build();
     auto c2 = p.request(r2);
     REQUIRE(c2);
-    c2->connect_event.add([&](auto...){ test.happens(); });
+    c2->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     CHECK(c1 != c2);
     CHECK(p.size() == 2);
@@ -190,7 +190,7 @@ TEST("idle timeout") {
     auto req1 = Request::Builder().method(Request::Method::Get).uri(uri).build();
     auto c = p->request(req1);
     REQUIRE(c);
-    c->connect_event.add([&](auto...){ test.happens(); });
+    c->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     test.wait(15); // more than idle_timeout
     // client is busy and not affected by idle timeout
@@ -207,7 +207,7 @@ TEST("idle timeout") {
     auto req2 = Request::Builder().method(Request::Method::Get).uri(uri).build();
     c = p->request(req2);
     REQUIRE(c);
-    c->connect_event.add([&](auto...){ test.happens(); });
+    c->connect_event.add([&](auto, auto, auto){ test.happens(); });
     CHECK(p->size() == 1);
     CHECK(p->nbusy() == 1);
 
@@ -267,7 +267,7 @@ TEST("SSL certificate nuances") {
     {
         c1 = p.request(req1);
         REQUIRE(c1);
-        c1->connect_event.add([&](auto...){ test.happens(); });
+        c1->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req1, test.loop);
 
@@ -282,7 +282,7 @@ TEST("SSL certificate nuances") {
         c2 = p.request(req2);
         REQUIRE(c2);
         REQUIRE(c1 != c2);
-        c2->connect_event.add([&](auto...){ test.happens(); });
+        c2->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req2, test.loop);
 
@@ -298,7 +298,7 @@ TEST("SSL certificate nuances") {
         REQUIRE(c3);
         REQUIRE(c3 != c2);
         REQUIRE(c3 != c1);
-        c3->connect_event.add([&](auto...){ test.happens(); });
+        c3->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req3, test.loop);
 
@@ -396,7 +396,7 @@ TEST("proxies using") {
         c1 = p.request(req1);
         REQUIRE(c1);
 
-        c1->connect_event.add([&](auto...){ test.happens(); });
+        c1->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req1, test.loop);
 
@@ -411,7 +411,7 @@ TEST("proxies using") {
         c2 = p.request(req2);
         REQUIRE(c2);
         REQUIRE(c1 != c2);
-        c2->connect_event.add([&](auto...){ test.happens(); });
+        c2->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req2, test.loop);
 
@@ -427,7 +427,7 @@ TEST("proxies using") {
         REQUIRE(c3);
         REQUIRE(c3 != c2);
         REQUIRE(c3 != c1);
-        c3->connect_event.add([&](auto...){ test.happens(); });
+        c3->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
         auto res = await_response(req3, test.loop);
 
@@ -444,7 +444,7 @@ TEST("proxies using") {
 }
 
 TEST("ssl_cert_check") {
-    AsyncTest test(1000, {"res", "res"});
+    AsyncTest test(5000, {"res", "res"});
     TPool p(test.loop);
     auto srv = make_server(test.loop);
     srv->autorespond(new ServerResponse(200));
@@ -485,10 +485,10 @@ TEST("request timeout applied when not yet executing (queued)") {
     auto c2 = p.request(req2);
     REQUIRE_FALSE(c2);
 
-    req1->response_event.add([&](auto...) {
+    req1->response_event.add([&](auto, auto, auto) {
         FAIL("should not happen");
     });
-    
+
     req2->response_event.add([&](auto, auto, auto& err) {
         test.happens("r2");
         CHECK(err & std::errc::timed_out);
@@ -496,7 +496,7 @@ TEST("request timeout applied when not yet executing (queued)") {
     });
 
     test.run();
-    
+
     req1->response_event.remove_all();
     req1->cancel();
 }
@@ -510,13 +510,13 @@ TEST("request timeout applied when not yet executing (queued) after redirect") {
     auto srv2 = make_server(test.loop);
     auto uri1 = active_scheme() +  "://" + srv1->location() + "/";
     auto uri2 = active_scheme() +  "://" + srv2->location() + "/";
-    
+
     srv1->request_event.add([&](const ServerRequestSP& req) {
         if (req->uri->path() == "/r1") test.happens("srv1-r1");
         else                           test.happens("srv1-r2");
         req->respond(new ServerResponse(302, Headers().location(uri2)));
     });
-    
+
     srv2->request_event.add([&](const ServerRequestSP& req) {
         REQUIRE_FALSE(req->uri->path() == "/r2");
     });
@@ -527,8 +527,8 @@ TEST("request timeout applied when not yet executing (queued) after redirect") {
     REQUIRE(c1);
     auto c2 = p.request(req2);
     REQUIRE_FALSE(c2);
-    
-    req1->response_event.add([&](auto...) {
+
+    req1->response_event.add([&](auto, auto, auto) {
         FAIL("should not happen");
     });
 
@@ -537,9 +537,9 @@ TEST("request timeout applied when not yet executing (queued) after redirect") {
         CHECK(err & std::errc::timed_out);
         test.loop->stop();
     });
-    
+
     test.run();
-    
+
     req1->response_event.remove_all();
     req1->cancel();
 }

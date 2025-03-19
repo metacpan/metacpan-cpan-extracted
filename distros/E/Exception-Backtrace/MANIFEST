@@ -15,7 +15,6 @@ lib/Exception/Backtrace/Stackframe.pm
 lib/Exception/Backtrace/Stackframe.pod
 lib/Exception/Backtrace/Wrapper.pm
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl
@@ -33,6 +32,7 @@ t/07-api.t
 t/08-subname.t
 t/09-global-destruction.t
 t/10-args-decorator.t
+t/11-safe-ref-usage.t
 t/MyTest.pm
 t/MyTest.xs
 xs/BacktraceInfo.xsi

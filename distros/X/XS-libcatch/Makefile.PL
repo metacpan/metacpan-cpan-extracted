@@ -7,9 +7,10 @@ my %params = (
     BIN_SHARE          => {CPLUS => 14},
     OPTIMIZE           => '-g0',
     CLIB => {
-        CMAKE_TARGET => 'Catch2',
-        DIR          => 'clib',
-        FILE         => 'src/libCatch2.a',
+        CMAKE_TARGET  => 'Catch2',
+        CMAKE_OPTIONS => "-DPROJECT_NAME=dummy",
+        DIR           => 'Catch2-3.7.1',
+        FILE          => 'src/libCatch2.a',
     },
 );
 

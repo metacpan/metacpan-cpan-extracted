@@ -186,7 +186,8 @@ static ParseResult tzparse_rule_switch (const char*& str, Timezone::Rule::Zone::
 }
 
 bool tzparse_rule (const string_view& sv, Timezone::Rule* rule) {
-    char buf[sv.length()+1]; // null-terminate
+    if (sv.length() > 1000) return false;
+    auto buf = (char*)alloca(sizeof(char)*(sv.length()+1)); // null-terminate
     std::memcpy(buf, sv.data(), sv.length());
     buf[sv.length()] = 0;
     const char* rulestr = buf;

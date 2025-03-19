@@ -4,7 +4,6 @@ INSTALL.SKIP
 lib/Test/Catch.pm
 lib/Test/Catch.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 t/bench.cc
 t/bench.t

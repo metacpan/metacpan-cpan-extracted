@@ -16,7 +16,7 @@ static const int regexp_parser_en_group_regexp = 12;
 static const int regexp_parser_en_main = 35;
 
 
-#line 117 "src/panda/uri/router/RegexpParse.rl"
+#line 116 "src/panda/uri/router/RegexpParse.rl"
 
 
 static void assign_literal (string& dst, const char* p, const char* pe) {
@@ -85,7 +85,6 @@ static bool symclass_from_escaped (char c, Regexp::Symclass& s) {
 }
 
 static void parse_symclass (string_view str, Regexp::Symclass& s) {
-    //printf("parse symclass: %s\n", string(str).c_str());
     auto p = str.data();
     auto pe = p + str.length();
     
@@ -147,7 +146,7 @@ RegexpPtr Regexp::parse (string_view str) {
     };
     
     
-#line 151 "src/panda/uri/router/RegexpParse.cc"
+#line 150 "src/panda/uri/router/RegexpParse.cc"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -283,9 +282,9 @@ tr153:
     }
 	goto st36;
 tr163:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -331,9 +330,9 @@ tr169:
     }
 	goto st36;
 tr179:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -376,9 +375,9 @@ tr185:
     }
 	goto st36;
 tr195:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -399,9 +398,9 @@ tr195:
     }
 	goto st36;
 tr201:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -422,7 +421,7 @@ tr201:
     }
 	goto st36;
 tr207:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -443,9 +442,9 @@ tr207:
     }
 	goto st36;
 tr213:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -466,9 +465,9 @@ tr213:
     }
 	goto st36;
 tr219:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -492,7 +491,7 @@ st36:
 	if ( ++p == pe )
 		goto _test_eof36;
 case 36:
-#line 496 "src/panda/uri/router/RegexpParse.cc"
+#line 495 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr144;
 		case 41: goto st0;
@@ -537,7 +536,7 @@ tr9:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
@@ -568,7 +567,7 @@ tr144:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
@@ -594,14 +593,14 @@ tr154:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr164:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -627,7 +626,7 @@ tr164:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
@@ -662,14 +661,14 @@ tr170:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr180:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -695,7 +694,7 @@ tr180:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
@@ -727,14 +726,14 @@ tr186:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr196:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -760,14 +759,14 @@ tr196:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr202:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -793,12 +792,12 @@ tr202:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr208:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -824,14 +823,14 @@ tr208:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr214:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -857,14 +856,14 @@ tr214:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
 tr220:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -890,7 +889,7 @@ tr220:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 37;goto st12;}
     }
 	goto st37;
@@ -898,7 +897,7 @@ st37:
 	if ( ++p == pe )
 		goto _test_eof37;
 case 37:
-#line 902 "src/panda/uri/router/RegexpParse.cc"
+#line 901 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr154;
 		case 41: goto st0;
@@ -947,7 +946,7 @@ st38:
 	if ( ++p == pe )
 		goto _test_eof38;
 case 38:
-#line 951 "src/panda/uri/router/RegexpParse.cc"
+#line 950 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr164;
 		case 46: goto tr165;
@@ -1005,9 +1004,9 @@ tr157:
     }
 	goto st39;
 tr165:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1045,9 +1044,9 @@ tr173:
     }
 	goto st39;
 tr181:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1082,9 +1081,9 @@ tr189:
     }
 	goto st39;
 tr197:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1101,9 +1100,9 @@ tr197:
     }
 	goto st39;
 tr203:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1120,7 +1119,7 @@ tr203:
     }
 	goto st39;
 tr209:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1137,9 +1136,9 @@ tr209:
     }
 	goto st39;
 tr215:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1156,9 +1155,9 @@ tr215:
     }
 	goto st39;
 tr221:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1178,7 +1177,7 @@ st39:
 	if ( ++p == pe )
 		goto _test_eof39;
 case 39:
-#line 1182 "src/panda/uri/router/RegexpParse.cc"
+#line 1181 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr170;
 		case 41: goto st0;
@@ -1224,7 +1223,7 @@ st40:
 	if ( ++p == pe )
 		goto _test_eof40;
 case 40:
-#line 1228 "src/panda/uri/router/RegexpParse.cc"
+#line 1227 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr180;
 		case 46: goto tr181;
@@ -1282,9 +1281,9 @@ tr159:
     }
 	goto st1;
 tr166:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1322,9 +1321,9 @@ tr175:
     }
 	goto st1;
 tr182:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1359,9 +1358,9 @@ tr191:
     }
 	goto st1;
 tr198:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1378,9 +1377,9 @@ tr198:
     }
 	goto st1;
 tr204:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1397,7 +1396,7 @@ tr204:
     }
 	goto st1;
 tr210:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1414,9 +1413,9 @@ tr210:
     }
 	goto st1;
 tr216:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1433,9 +1432,9 @@ tr216:
     }
 	goto st1;
 tr222:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1455,7 +1454,7 @@ st1:
 	if ( ++p == pe )
 		goto _test_eof1;
 case 1:
-#line 1459 "src/panda/uri/router/RegexpParse.cc"
+#line 1458 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 92: goto tr1;
 		case 93: goto st0;
@@ -1471,7 +1470,7 @@ st2:
 	if ( ++p == pe )
 		goto _test_eof2;
 case 2:
-#line 1475 "src/panda/uri/router/RegexpParse.cc"
+#line 1474 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 92: goto st3;
 		case 93: goto tr5;
@@ -1487,7 +1486,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 1491 "src/panda/uri/router/RegexpParse.cc"
+#line 1490 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 120 )
 		goto st0;
 	goto st2;
@@ -1545,9 +1544,9 @@ tr160:
     }
 	goto st4;
 tr167:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1593,9 +1592,9 @@ tr176:
     }
 	goto st4;
 tr183:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1638,9 +1637,9 @@ tr192:
     }
 	goto st4;
 tr199:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1661,9 +1660,9 @@ tr199:
     }
 	goto st4;
 tr205:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1684,7 +1683,7 @@ tr205:
     }
 	goto st4;
 tr211:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1705,9 +1704,9 @@ tr211:
     }
 	goto st4;
 tr217:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1728,9 +1727,9 @@ tr217:
     }
 	goto st4;
 tr223:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1754,7 +1753,7 @@ st4:
 	if ( ++p == pe )
 		goto _test_eof4;
 case 4:
-#line 1758 "src/panda/uri/router/RegexpParse.cc"
+#line 1757 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 68: goto st41;
 		case 83: goto st41;
@@ -1816,7 +1815,7 @@ st42:
 	if ( ++p == pe )
 		goto _test_eof42;
 case 42:
-#line 1820 "src/panda/uri/router/RegexpParse.cc"
+#line 1819 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr196;
 		case 46: goto tr197;
@@ -1860,9 +1859,9 @@ tr162:
     }
 	goto st5;
 tr168:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1898,9 +1897,9 @@ tr178:
     }
 	goto st5;
 tr184:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1933,9 +1932,9 @@ tr194:
     }
 	goto st5;
 tr200:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1951,9 +1950,9 @@ tr200:
     }
 	goto st5;
 tr206:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1969,7 +1968,7 @@ tr206:
     }
 	goto st5;
 tr212:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -1985,9 +1984,9 @@ tr212:
     }
 	goto st5;
 tr218:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2003,9 +2002,9 @@ tr218:
     }
 	goto st5;
 tr224:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2024,7 +2023,7 @@ st5:
 	if ( ++p == pe )
 		goto _test_eof5;
 case 5:
-#line 2028 "src/panda/uri/router/RegexpParse.cc"
+#line 2027 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr9;
 		case 46: goto tr10;
@@ -2069,7 +2068,7 @@ st6:
 	if ( ++p == pe )
 		goto _test_eof6;
 case 6:
-#line 2073 "src/panda/uri/router/RegexpParse.cc"
+#line 2072 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 44 )
 		goto st7;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2092,21 +2091,21 @@ st8:
 	if ( ++p == pe )
 		goto _test_eof8;
 case 8:
-#line 2096 "src/panda/uri/router/RegexpParse.cc"
+#line 2095 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto tr17;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st8;
 	goto st0;
 tr17:
-#line 94 "src/panda/uri/router/RegexpParse.rl"
+#line 93 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[1]); }
 	goto st43;
 st43:
 	if ( ++p == pe )
 		goto _test_eof43;
 case 43:
-#line 2110 "src/panda/uri/router/RegexpParse.cc"
+#line 2109 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr202;
 		case 46: goto tr203;
@@ -2132,7 +2131,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 2136 "src/panda/uri/router/RegexpParse.cc"
+#line 2135 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 44: goto tr18;
 		case 125: goto tr20;
@@ -2141,14 +2140,14 @@ case 9:
 		goto st9;
 	goto st0;
 tr18:
-#line 93 "src/panda/uri/router/RegexpParse.rl"
+#line 92 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[0]); }
 	goto st10;
 st10:
 	if ( ++p == pe )
 		goto _test_eof10;
 case 10:
-#line 2152 "src/panda/uri/router/RegexpParse.cc"
+#line 2151 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto st45;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2164,21 +2163,21 @@ st11:
 	if ( ++p == pe )
 		goto _test_eof11;
 case 11:
-#line 2168 "src/panda/uri/router/RegexpParse.cc"
+#line 2167 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto tr24;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st11;
 	goto st0;
 tr24:
-#line 94 "src/panda/uri/router/RegexpParse.rl"
+#line 93 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[1]); }
 	goto st44;
 st44:
 	if ( ++p == pe )
 		goto _test_eof44;
 case 44:
-#line 2182 "src/panda/uri/router/RegexpParse.cc"
+#line 2181 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr208;
 		case 46: goto tr209;
@@ -2214,14 +2213,14 @@ case 45:
 		goto st0;
 	goto tr213;
 tr20:
-#line 93 "src/panda/uri/router/RegexpParse.rl"
+#line 92 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[0]); }
 	goto st46;
 st46:
 	if ( ++p == pe )
 		goto _test_eof46;
 case 46:
-#line 2225 "src/panda/uri/router/RegexpParse.cc"
+#line 2224 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr220;
 		case 46: goto tr221;
@@ -2310,9 +2309,9 @@ tr42:
     }
 	goto st13;
 tr53:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2358,9 +2357,9 @@ tr60:
     }
 	goto st13;
 tr71:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2403,9 +2402,9 @@ tr85:
     }
 	goto st13;
 tr96:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2426,9 +2425,9 @@ tr96:
     }
 	goto st13;
 tr108:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2449,7 +2448,7 @@ tr108:
     }
 	goto st13;
 tr122:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2470,9 +2469,9 @@ tr122:
     }
 	goto st13;
 tr129:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2493,9 +2492,9 @@ tr129:
     }
 	goto st13;
 tr136:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2519,7 +2518,7 @@ st13:
 	if ( ++p == pe )
 		goto _test_eof13;
 case 13:
-#line 2523 "src/panda/uri/router/RegexpParse.cc"
+#line 2522 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr32;
 		case 41: goto tr33;
@@ -2564,7 +2563,7 @@ tr26:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
@@ -2595,7 +2594,7 @@ tr32:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
@@ -2621,14 +2620,14 @@ tr43:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr54:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2654,7 +2653,7 @@ tr54:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
@@ -2689,14 +2688,14 @@ tr61:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr72:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2722,7 +2721,7 @@ tr72:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
@@ -2754,14 +2753,14 @@ tr86:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr97:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2787,14 +2786,14 @@ tr97:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr109:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2820,12 +2819,12 @@ tr109:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr123:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2851,14 +2850,14 @@ tr123:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr130:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2884,14 +2883,14 @@ tr130:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
 tr137:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -2917,7 +2916,7 @@ tr137:
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         {stack[top++] = 14;goto st12;}
     }
 	goto st14;
@@ -2925,7 +2924,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 2929 "src/panda/uri/router/RegexpParse.cc"
+#line 2928 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr43;
 		case 41: goto tr44;
@@ -2946,7 +2945,6 @@ tr27:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
@@ -2969,7 +2967,6 @@ tr33:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
@@ -2987,14 +2984,13 @@ tr44:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr55:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3012,7 +3008,6 @@ tr55:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
@@ -3039,14 +3034,13 @@ tr62:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr73:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3064,7 +3058,6 @@ tr73:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
@@ -3088,14 +3081,13 @@ tr87:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr98:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3113,14 +3105,13 @@ tr98:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr110:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3138,12 +3129,11 @@ tr110:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr124:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3161,14 +3151,13 @@ tr124:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr131:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3186,14 +3175,13 @@ tr131:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
 tr138:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3211,7 +3199,6 @@ tr138:
 	{
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         {cs = stack[--top];goto _again;}
     }
 	goto st47;
@@ -3219,7 +3206,7 @@ st47:
 	if ( ++p == pe )
 		goto _test_eof47;
 case 47:
-#line 3223 "src/panda/uri/router/RegexpParse.cc"
+#line 3210 "src/panda/uri/router/RegexpParse.cc"
 	goto st0;
 tr34:
 #line 33 "src/panda/uri/router/RegexpParse.rl"
@@ -3251,7 +3238,7 @@ st15:
 	if ( ++p == pe )
 		goto _test_eof15;
 case 15:
-#line 3255 "src/panda/uri/router/RegexpParse.cc"
+#line 3242 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr54;
 		case 41: goto tr55;
@@ -3310,9 +3297,9 @@ tr47:
     }
 	goto st16;
 tr56:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3350,9 +3337,9 @@ tr65:
     }
 	goto st16;
 tr74:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3387,9 +3374,9 @@ tr90:
     }
 	goto st16;
 tr99:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3406,9 +3393,9 @@ tr99:
     }
 	goto st16;
 tr111:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3425,7 +3412,7 @@ tr111:
     }
 	goto st16;
 tr125:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3442,9 +3429,9 @@ tr125:
     }
 	goto st16;
 tr132:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3461,9 +3448,9 @@ tr132:
     }
 	goto st16;
 tr139:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3483,7 +3470,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 3487 "src/panda/uri/router/RegexpParse.cc"
+#line 3474 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr61;
 		case 41: goto tr62;
@@ -3529,7 +3516,7 @@ st17:
 	if ( ++p == pe )
 		goto _test_eof17;
 case 17:
-#line 3533 "src/panda/uri/router/RegexpParse.cc"
+#line 3520 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr72;
 		case 41: goto tr73;
@@ -3588,9 +3575,9 @@ tr49:
     }
 	goto st18;
 tr57:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3628,9 +3615,9 @@ tr67:
     }
 	goto st18;
 tr75:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3665,9 +3652,9 @@ tr92:
     }
 	goto st18;
 tr100:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3684,9 +3671,9 @@ tr100:
     }
 	goto st18;
 tr112:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3703,7 +3690,7 @@ tr112:
     }
 	goto st18;
 tr126:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3720,9 +3707,9 @@ tr126:
     }
 	goto st18;
 tr133:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3739,9 +3726,9 @@ tr133:
     }
 	goto st18;
 tr140:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3761,7 +3748,7 @@ st18:
 	if ( ++p == pe )
 		goto _test_eof18;
 case 18:
-#line 3765 "src/panda/uri/router/RegexpParse.cc"
+#line 3752 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 92: goto tr79;
 		case 93: goto st0;
@@ -3777,7 +3764,7 @@ st19:
 	if ( ++p == pe )
 		goto _test_eof19;
 case 19:
-#line 3781 "src/panda/uri/router/RegexpParse.cc"
+#line 3768 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 92: goto st20;
 		case 93: goto tr82;
@@ -3793,7 +3780,7 @@ st20:
 	if ( ++p == pe )
 		goto _test_eof20;
 case 20:
-#line 3797 "src/panda/uri/router/RegexpParse.cc"
+#line 3784 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 120 )
 		goto st0;
 	goto st19;
@@ -3851,9 +3838,9 @@ tr50:
     }
 	goto st21;
 tr58:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3899,9 +3886,9 @@ tr68:
     }
 	goto st21;
 tr76:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3944,9 +3931,9 @@ tr93:
     }
 	goto st21;
 tr101:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3967,9 +3954,9 @@ tr101:
     }
 	goto st21;
 tr113:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -3990,7 +3977,7 @@ tr113:
     }
 	goto st21;
 tr127:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4011,9 +3998,9 @@ tr127:
     }
 	goto st21;
 tr134:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4034,9 +4021,9 @@ tr134:
     }
 	goto st21;
 tr141:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4060,7 +4047,7 @@ st21:
 	if ( ++p == pe )
 		goto _test_eof21;
 case 21:
-#line 4064 "src/panda/uri/router/RegexpParse.cc"
+#line 4051 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 68: goto st22;
 		case 83: goto st22;
@@ -4122,7 +4109,7 @@ st23:
 	if ( ++p == pe )
 		goto _test_eof23;
 case 23:
-#line 4126 "src/panda/uri/router/RegexpParse.cc"
+#line 4113 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr97;
 		case 41: goto tr98;
@@ -4167,9 +4154,9 @@ tr52:
     }
 	goto st24;
 tr59:
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4205,9 +4192,9 @@ tr70:
     }
 	goto st24;
 tr77:
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4240,9 +4227,9 @@ tr95:
     }
 	goto st24;
 tr102:
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4258,9 +4245,9 @@ tr102:
     }
 	goto st24;
 tr114:
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4276,7 +4263,7 @@ tr114:
     }
 	goto st24;
 tr128:
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4292,9 +4279,9 @@ tr128:
     }
 	goto st24;
 tr135:
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4310,9 +4297,9 @@ tr135:
     }
 	goto st24;
 tr142:
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4331,7 +4318,7 @@ st24:
 	if ( ++p == pe )
 		goto _test_eof24;
 case 24:
-#line 4335 "src/panda/uri/router/RegexpParse.cc"
+#line 4322 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr26;
 		case 46: goto tr28;
@@ -4376,7 +4363,7 @@ st25:
 	if ( ++p == pe )
 		goto _test_eof25;
 case 25:
-#line 4380 "src/panda/uri/router/RegexpParse.cc"
+#line 4367 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 44 )
 		goto st26;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -4399,21 +4386,21 @@ st27:
 	if ( ++p == pe )
 		goto _test_eof27;
 case 27:
-#line 4403 "src/panda/uri/router/RegexpParse.cc"
+#line 4390 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto tr107;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st27;
 	goto st0;
 tr107:
-#line 94 "src/panda/uri/router/RegexpParse.rl"
+#line 93 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[1]); }
 	goto st28;
 st28:
 	if ( ++p == pe )
 		goto _test_eof28;
 case 28:
-#line 4417 "src/panda/uri/router/RegexpParse.cc"
+#line 4404 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr109;
 		case 41: goto tr110;
@@ -4440,7 +4427,7 @@ st29:
 	if ( ++p == pe )
 		goto _test_eof29;
 case 29:
-#line 4444 "src/panda/uri/router/RegexpParse.cc"
+#line 4431 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 44: goto tr115;
 		case 125: goto tr117;
@@ -4449,14 +4436,14 @@ case 29:
 		goto st29;
 	goto st0;
 tr115:
-#line 93 "src/panda/uri/router/RegexpParse.rl"
+#line 92 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[0]); }
 	goto st30;
 st30:
 	if ( ++p == pe )
 		goto _test_eof30;
 case 30:
-#line 4460 "src/panda/uri/router/RegexpParse.cc"
+#line 4447 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto st33;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -4472,21 +4459,21 @@ st31:
 	if ( ++p == pe )
 		goto _test_eof31;
 case 31:
-#line 4476 "src/panda/uri/router/RegexpParse.cc"
+#line 4463 "src/panda/uri/router/RegexpParse.cc"
 	if ( (*p) == 125 )
 		goto tr121;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st31;
 	goto st0;
 tr121:
-#line 94 "src/panda/uri/router/RegexpParse.rl"
+#line 93 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[1]); }
 	goto st32;
 st32:
 	if ( ++p == pe )
 		goto _test_eof32;
 case 32:
-#line 4490 "src/panda/uri/router/RegexpParse.cc"
+#line 4477 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr123;
 		case 41: goto tr124;
@@ -4524,14 +4511,14 @@ case 33:
 		goto st0;
 	goto tr129;
 tr117:
-#line 93 "src/panda/uri/router/RegexpParse.rl"
+#line 92 "src/panda/uri/router/RegexpParse.rl"
 	{ nsave(num[0]); }
 	goto st34;
 st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-#line 4535 "src/panda/uri/router/RegexpParse.cc"
+#line 4522 "src/panda/uri/router/RegexpParse.cc"
 	switch( (*p) ) {
 		case 40: goto tr137;
 		case 41: goto tr138;
@@ -4666,7 +4653,7 @@ case 34:
     }
 	break;
 	case 44: 
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4682,9 +4669,9 @@ case 34:
     }
 	break;
 	case 42: 
-#line 90 "src/panda/uri/router/RegexpParse.rl"
+#line 89 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = 1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4700,9 +4687,9 @@ case 34:
     }
 	break;
 	case 38: 
-#line 91 "src/panda/uri/router/RegexpParse.rl"
+#line 90 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4718,9 +4705,9 @@ case 34:
     }
 	break;
 	case 40: 
-#line 92 "src/panda/uri/router/RegexpParse.rl"
+#line 91 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 1; num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4736,9 +4723,9 @@ case 34:
     }
 	break;
 	case 46: 
-#line 95 "src/panda/uri/router/RegexpParse.rl"
+#line 94 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = num[0]; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4754,9 +4741,9 @@ case 34:
     }
 	break;
 	case 43: 
-#line 96 "src/panda/uri/router/RegexpParse.rl"
+#line 95 "src/panda/uri/router/RegexpParse.rl"
 	{ num[0] = 0; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4772,9 +4759,9 @@ case 34:
     }
 	break;
 	case 45: 
-#line 97 "src/panda/uri/router/RegexpParse.rl"
+#line 96 "src/panda/uri/router/RegexpParse.rl"
 	{ num[1] = -1; }
-#line 79 "src/panda/uri/router/RegexpParse.rl"
+#line 78 "src/panda/uri/router/RegexpParse.rl"
 	{
         data->element->quant.min = num[0];
         data->element->quant.max = num[1];
@@ -4789,14 +4776,14 @@ case 34:
         data->expression = nullptr;
     }
 	break;
-#line 4793 "src/panda/uri/router/RegexpParse.cc"
+#line 4780 "src/panda/uri/router/RegexpParse.cc"
 	}
 	}
 
 	_out: {}
 	}
 
-#line 247 "src/panda/uri/router/RegexpParse.rl"
+#line 245 "src/panda/uri/router/RegexpParse.rl"
     
     if (cs < regexp_parser_first_final) {
         throw std::logic_error("bad regexp");

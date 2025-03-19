@@ -113,11 +113,11 @@ TEST("client disconnects or request error while in partial mode") {
     SECTION("partial response") { partial_response = true; }
     SECTION("parsing error") { send_junk = true; }
 
-    p.server->error_event.add(fail_cb);
+    p.server->error_event.add(fail_cb2);
 
     p.server->route_event.add([&](auto& req) {
         req->enable_partial();
-        req->drop_event.add(fail_cb);
+        req->drop_event.add(fail_cb2);
         req->partial_event.add([&](auto& req, auto& err) {
             test.happens();
             CHECK(!err);
@@ -154,11 +154,11 @@ TEST("client disconnects when partial mode is finished") {
     AsyncTest test(1000, 3);
     ServerPair p(test.loop);
 
-    p.server->error_event.add(fail_cb);
+    p.server->error_event.add(fail_cb2);
 
     p.server->route_event.add([&](auto& req) {
         req->enable_partial();
-        req->drop_event.add([&](auto...){
+        req->drop_event.add([&](auto, auto){
             test.happens();
             test.loop->stop();
         });
@@ -173,7 +173,7 @@ TEST("client disconnects when partial mode is finished") {
                 CHECK(!err);
                 CHECK(req->is_done());
                 req->partial_event.remove_all();
-                req->partial_event.add(fail_cb);
+                req->partial_event.add(fail_cb2);
                 p.conn->disconnect();
             });
         });
@@ -197,7 +197,7 @@ TEST("response is complete before request fully received") {
 
     bool chunked = GENERATE(false, true);
     int closed   = GENERATE(0, 1, 2); // 1 - closed by request, 2 - closed by response
-    SECTION(string(chunked ? "chunked" : "non-chunked") + ' ' + (closed ? (closed == 1 ? "request-close" : "response-close") : "keep-alive")) {}
+    SECTION(std::string(chunked ? "chunked" : "non-chunked") + ' ' + (closed ? (closed == 1 ? "request-close" : "response-close") : "keep-alive")) {}
 
     p.server->route_event.add([&](auto& req) {
         req->enable_partial();

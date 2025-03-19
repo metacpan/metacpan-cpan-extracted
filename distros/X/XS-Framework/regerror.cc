@@ -120,7 +120,7 @@ void register_error_constants () {
         #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETXTBSY)
         {"text_file_busy",                      "ETXTBSY",          std::errc::text_file_busy},
         #endif
-        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETIMEDOUT)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETIMEDOUT) || defined(__NetBSD__)
         {"timed_out",                           "ETIMEDOUT",        std::errc::timed_out},
         #endif
         {"too_many_files_open_in_system",       "ENFILE",           std::errc::too_many_files_open_in_system},

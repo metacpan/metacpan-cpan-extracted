@@ -1,5 +1,8 @@
 Revision history for perl distribution Getopt-App
 
+1.01 2025-03-18T23:07:14
+ - Fix invalid .tar.gz
+
 1.00 2023-10-18T15:27:14
  - Add support for $Getopt::App::DEPTH
  - Add support for GETOPT_APP_DEBUG=1

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <panda/string.h>
+#include <cstdint>
 
 namespace panda { namespace protocol { namespace websocket {
 

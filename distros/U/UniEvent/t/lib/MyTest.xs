@@ -38,7 +38,7 @@ void _benchmark_simple_resolver () {
     
     for (auto i = 0; i < 1000; i++) {
         bool called = false;
-        resolver->resolve()->node("localhost")->use_cache(false)->on_resolve([&](auto...) {
+        resolver->resolve()->node("localhost")->use_cache(false)->on_resolve([&](auto, auto, auto) {
             called = true;
         })->run();
     }
@@ -52,7 +52,7 @@ void _benchmark_cached_resolver () {
    
     // put it into cache first 
     bool called = false;                                                          
-    resolver->resolve("localhost", [&](auto...) {
+    resolver->resolve("localhost", [&](auto, auto, auto) {
         called = true;
     });
     
@@ -62,7 +62,7 @@ void _benchmark_cached_resolver () {
     // resolve gets address from cache 
     for (auto i = 0; i < 99999; i++) {
         bool called = false;                                                          
-        resolver->resolve("localhost", [&](auto...) {
+        resolver->resolve("localhost", [&](auto, auto, auto) {
             called = true;
         });
     }

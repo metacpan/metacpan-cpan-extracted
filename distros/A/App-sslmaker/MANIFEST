@@ -1,4 +1,5 @@
-.github/workflows/ci.yml
+.github/workflows/release.yml
+.github/workflows/test.yml
 .perltidyrc
 Changes
 lib/App/sslmaker.pm

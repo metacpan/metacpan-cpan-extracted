@@ -1,4 +1,6 @@
-1.2.3    xx.xx.2022
+1.2.4    xx.xx.xxxx
+          - allow to include paths with leading tilde
+1.2.3    10.02.2022
           - do not include processed log files to NYTProf output unless MP_WRITE_NYTPROF is set
 1.2.2    10.04.2021
           - fix missing dependency

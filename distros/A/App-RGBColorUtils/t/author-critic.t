@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/RGBColorUtils.pm','script/mix-2-rgb-colors','script/mix-rgb-colors','script/rgb-is-dark','script/rgb-is-light'];
+my $filenames = ['lib/App/RGBColorUtils.pm','script/mix-2-rgb-colors','script/mix-rgb-colors','script/rand-rgb-color','script/rand-rgb-colors','script/rgb-is-dark','script/rgb-is-light'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

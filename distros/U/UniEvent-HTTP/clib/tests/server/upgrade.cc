@@ -139,7 +139,7 @@ TEST("upgrade after disconnect") {
     REQUIRE(req);
     CHECK(req->headers.connection() == "upgrade");
 
-    req->drop_event.add([&](auto...) {
+    req->drop_event.add([&](auto, auto) {
         test.happens("drop");
         test.loop->stop();
     });

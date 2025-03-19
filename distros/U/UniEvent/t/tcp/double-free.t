@@ -8,7 +8,7 @@ alarm(10);
 my $loop = UE::Loop->default_loop;
 my $srv = UE::Tcp->new($loop);
 $srv->bind("localhost", 0);
-$srv->listen(128);
+$srv->listen(2000);
 
 my $cnt = 1000;
 my @d;
@@ -30,6 +30,7 @@ $t->start(sub {
         $cl->write('GET /gcm/send HTTP/1.0\r\n\r\n', sub { $_[0]->disconnect; });
     });
     $t->stop if ++$d[0] == $cnt;
+    select (undef, undef, undef, 0.01) if $^O eq 'darwin' and $d[0] % 100 == 0;
 });
 
 $loop->run;

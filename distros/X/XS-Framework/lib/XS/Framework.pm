@@ -7,7 +7,7 @@ use XS::ErrorCode();
 use XS::STL::ErrorCode();
 use XS::STL::ErrorCategory();
 
-our $VERSION = '1.5.6';
+our $VERSION = '1.6.0';
 
 # threads::shared doesn't respect the fact that PL_destroyhook might be in use by other modules and doesn't proxy call to next hook
 # so that we must hook after threads::shared

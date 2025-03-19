@@ -25,7 +25,6 @@ subtest 'make_directories' => sub {
 
 subtest 'make_key + make_cert' => sub {
   my $args = {
-    bits       => 1024,
     cert       => $home->child('certs/ca.cert.pem'),
     days       => 365 * 20,
     home       => $home,
@@ -36,14 +35,14 @@ subtest 'make_key + make_cert' => sub {
   $asset = $sslmaker->with_config(make_key => $args);
 
   ok -e $asset, 'key created';
-  is $asset, $args->{key}, 'asset is not remporary';
-  is -s $args->{passphrase}, 64, 'passphrase has correct length';
-  is + (stat $args->{passphrase})[2] & 0777, 0400, 'passphrase mode 400';
-  is + (stat $asset)[2] & 0777, 0400, 'key mode 400';
+  is $asset,                                $args->{key}, 'asset is not remporary';
+  is -s $args->{passphrase},                64,           'passphrase has correct length';
+  is +(stat $args->{passphrase})[2] & 0777, 0400,         'passphrase mode 400';
+  is +(stat $asset)[2] & 0777,              0400,         'key mode 400';
 
   $asset = $sslmaker->with_config(make_cert => $args);
   ok -e $asset, 'cert created';
-  is + (stat $asset)[2] & 0777, 0444, 'cert mode 444';
+  is +(stat $asset)[2] & 0777, 0444, 'cert mode 444';
 };
 
 $home->remove_tree({safe => 0});

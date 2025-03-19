@@ -5,14 +5,14 @@ author:
   - 'Gtk2-Perl Team <gtk-perl-list at gnome dot org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '7.44'
   File::Spec: '0'
   IO::File: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.7106, CPAN::Meta::Converter version 2.150010'
 keywords:
   - XS
   - 'XS extensions'
@@ -26,8 +26,6 @@ no_index:
   directory:
     - t
     - inc
-  package:
-    - ExtUtils::MM
 requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '7.44'
@@ -40,5 +38,5 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://dev.perl.org/licenses/
   repository: git://git.gnome.org/perl-ExtUtils-Depends
-version: '0.8001'
+version: '0.8002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

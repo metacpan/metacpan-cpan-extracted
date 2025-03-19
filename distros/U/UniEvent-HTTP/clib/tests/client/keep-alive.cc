@@ -16,7 +16,7 @@ TEST("closes") {
         p.server->autorespond(new ServerResponse(200, Headers().connection("close")));
     }
 
-    p.client->connect_event.add([&](auto...){ test.happens(); }); // main test is here - check for two connections
+    p.client->connect_event.add([&](auto, auto, auto){ test.happens(); }); // main test is here - check for two connections
 
     auto res = p.client->get_response(req);
     CHECK(res->code == 200);
@@ -30,7 +30,7 @@ TEST("persists") {
     AsyncTest test(1000, 1);
     ClientPair p(test.loop);
 
-    p.client->connect_event.add([&](auto...){ test.happens(); });
+    p.client->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     for (int i = 0; i < 5; ++i) {
         p.server->autorespond(new ServerResponse(200));
@@ -47,7 +47,7 @@ TEST("n+n") {
 
     TClientSP client = new TClient(test.loop);
 
-    client->connect_event.add([&](auto...){ test.happens(); });
+    client->connect_event.add([&](auto, auto, auto){ test.happens(); });
 
     for (int j = 0; j < srv_cnt; ++j) {
         auto srv = make_server(test.loop);

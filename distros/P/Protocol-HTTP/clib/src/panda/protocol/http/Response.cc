@@ -4,7 +4,10 @@
 
 namespace panda { namespace protocol { namespace http {
 
-panda::time::TimezoneSP gmtz = panda::time::tzget("GMT");
+panda::time::TimezoneSP gmtz() {
+    static panda::time::TimezoneSP inst = panda::time::tzget("GMT");
+    return inst;
+}
 
 int64_t Response::Cookie::max_age_any () const {
     if (_max_age || !_expires) return _max_age;

@@ -1,3 +1,10 @@
+1.6.0  xx.xx.2024
+           - add sv_defined() function to replace perl's SvOK() which doesn't work properly with magical variables ($1, etc)
+           - remove legacy code
+           - adopt for ExtUtils::ParseXS >= 3.53 (perl 5.41)
+           - remove usage of variable length arrays in C++ code
+           - fix compiler warnings
+           - fix UBs
 1.5.6  31.01.2024
            - fix svt_(copy|dup|local) access, must be guarded by flags
            - fix PERL_STACK_OFFSET_SSIZET builds

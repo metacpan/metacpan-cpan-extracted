@@ -63,9 +63,12 @@ namespace xs { namespace callback_dispatcher {
 
         struct EventOut {
             using type = Event&;
-            XSCallbackDispatcherImpl& xsd;
+            RetConv ret_conv;
+            Tuple   arg_convs;
 
-            EventOut (XSCallbackDispatcherImpl& d) : xsd(d) {}
+            // we can't store XSCallbackDispatcher reference in EventOut object, because XSCallbackDispatcher is a temporary wrapper
+            // and may no longer exists when EventOut is called
+            EventOut (XSCallbackDispatcherImpl& d) : ret_conv(d.ret_conv), arg_convs(d.arg_convs) {}
 
             Sv out (Event& e) { return _out(e, Indices{}); }
 
@@ -74,7 +77,7 @@ namespace xs { namespace callback_dispatcher {
                 Event* ep = &e;
                 auto ret = function2sub_with_convs([ep](typename Convs::first_type::type...args) -> OptRet {
                     return ep->next(args...);
-                }, xsd.ret_conv.first, std::get<I>(xsd.arg_convs).second...);
+                }, ret_conv.first, std::get<I>(arg_convs).second...);
                 return Ref::create(ret);
             }
         };

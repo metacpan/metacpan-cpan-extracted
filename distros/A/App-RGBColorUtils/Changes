@@ -1,3 +1,8 @@
+0.005   2025-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: rand-rgb-color, rand-rgb-colors.
+
+
 0.004   2023-12-16  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

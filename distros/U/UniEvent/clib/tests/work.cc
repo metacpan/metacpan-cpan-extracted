@@ -28,7 +28,7 @@ TEST("cancel") {
     AsyncTest test(10000);
     WorkSP w = new Work(test.loop);
     w->work_cb       = [&](Work*) { FAIL(); };
-    w->after_work_cb = [&](auto...) { FAIL(); };
+    w->after_work_cb = [&](auto, auto) { FAIL(); };
     w->cancel();
     test.run(); // noop
     // can't test active work because it starts executing immediately if there are free workers and thus

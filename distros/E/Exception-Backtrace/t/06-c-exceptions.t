@@ -9,6 +9,7 @@ use MyTest;
 
 my $default_depth = MyTest::default_trace_depth();
 plan skip_all => 'does not work reliable for your platform' unless $default_depth;
+plan skip_all => 'test takes too long with sanitizer' if $ENV{ASAN_OPTIONS};
 
 Exception::Backtrace::install();
 

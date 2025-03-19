@@ -1,0 +1,39 @@
+name: test
+on:
+  pull_request:
+  push:
+    branches: ["*", "!release"]
+jobs:
+  test:
+    name: "Perl ${{ matrix.perl }} on ${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        perl: ["5.40", "5.36", "5.26"]
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "${{ matrix.perl }}"
+      - name: Display environment
+        run: |
+          set -x;
+          which -a perl;
+          which -a openssl;
+          perl -V;
+          openssl version -a;
+          perl_version="$(perl -e'print $^V=~s/^v//r')";
+          [ -e "/opt/hostedtoolcache/perl/$perl_version/x64/openssl.cnf" ] \
+            || cp /etc/ssl/openssl.cnf "/opt/hostedtoolcache/perl/$perl_version/x64/openssl.cnf";
+      - name: Fix ExtUtils::MakeMaker for Perl 5.16
+        run: cpanm -n App::cpanminus ExtUtils::MakeMaker
+      - name: Install dependencies
+        run: |
+          cpanm -n Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::Spelling
+          cpanm -n --installdeps .
+      - name: Run tests
+        run: prove -l t/*.t
+        env:
+          HARNESS_OPTIONS: j4
+          SSLMAKER_DEBUG: 1

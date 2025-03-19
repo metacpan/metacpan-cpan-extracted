@@ -107,7 +107,6 @@ INSTALL.SKIP
 lib/XS/libpanda.pm
 lib/XS/libpanda.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/trun.plx
@@ -136,6 +135,5 @@ t/to_chars.t
 t/traits.t
 t/valgrind.t
 t/varint.t
-XS-libpanda-1.5.9.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

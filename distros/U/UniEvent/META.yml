@@ -3,36 +3,36 @@ abstract: 'Object-oriented, fast and extendable event loop abstraction framework
 author:
   - unknown
 build_requires:
-  Export::XS: v3.0.7
+  Export::XS: v3.0.8
   Net::SSLeay: '0'
-  Net::SockAddr: v1.1.3
-  Test::Catch: v2.0.1
+  Net::SockAddr: v1.1.4
+  Test::Catch: v2.0.2
   Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
   XLog: v1.1.3
-  XS::Framework: v1.5.6
-  XS::libcares: v1.17.1.2
-  XS::libcatch: v3.0.1
-  XS::libpanda: v1.5.10
-  XS::libuv: v1.41.0.1
-  next::XS: v1.0.7
+  XS::Framework: v1.6.0
+  XS::libcares: v1.34.3.0
+  XS::libcatch: v3.7.1
+  XS::libpanda: v1.5.11
+  XS::libuv: v1.49.2.0
+  next::XS: v1.0.8
 configure_requires:
   Alien::cmake3: '0'
-  Export::XS: v3.0.7
-  Net::SockAddr: v1.1.3
-  Test::Catch: v2.0.1
+  Export::XS: v3.0.8
+  Net::SockAddr: v1.1.4
+  Test::Catch: v2.0.2
   XLog: v1.1.3
-  XS::Framework: v1.5.6
-  XS::Install: v1.3.5
-  XS::libcares: v1.17.1.2
-  XS::libcatch: v3.0.1
-  XS::libpanda: v1.5.10
-  XS::libuv: v1.41.0.1
-  next::XS: v1.0.7
+  XS::Framework: v1.6.0
+  XS::Install: v1.4.0
+  XS::libcares: v1.34.3.0
+  XS::libcatch: v3.7.1
+  XS::libpanda: v1.5.11
+  XS::libuv: v1.49.2.0
+  next::XS: v1.0.8
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,14 +43,14 @@ no_index:
     - t
     - inc
 requires:
-  Export::XS: v3.0.7
-  Net::SockAddr: v1.1.3
+  Export::XS: v3.0.8
+  Net::SockAddr: v1.1.4
   XLog: v1.1.3
-  XS::Framework: v1.5.6
-  XS::Install: v1.3.5
-  XS::libcares: v1.17.1.2
-  XS::libpanda: v1.5.10
-  XS::libuv: v1.41.0.1
-  next::XS: v1.0.7
-version: v1.2.13
+  XS::Framework: v1.6.0
+  XS::Install: v1.4.0
+  XS::libcares: v1.34.3.0
+  XS::libpanda: v1.5.11
+  XS::libuv: v1.49.2.0
+  next::XS: v1.0.8
+version: v1.2.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

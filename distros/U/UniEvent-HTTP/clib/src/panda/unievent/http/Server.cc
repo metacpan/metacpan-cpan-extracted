@@ -167,6 +167,7 @@ void Server::on_establish(const StreamSP&, const StreamSP& stream, const ErrorCo
     ServerConnection::Config cfg {_conf.idle_timeout, _conf.max_keepalive_requests, _conf.max_headers_size, _conf.max_body_size, _factory};
     auto connection = new_connection(++lastid, cfg, stream);
     _connections[connection->id()] = connection;
+    connect_event(connection);
     panda_log_info([&]{
         log << "client connected to ";
         if (stream->type() == Pipe::TYPE) {

@@ -80,7 +80,7 @@ namespace xs {
 static inline void throw_bad_hints () { throw "argument is not a valid AddrInfoHints"; }
 
 AddrInfoHints Typemap<AddrInfoHints>::in (SV* arg) {
-    if (!SvOK(arg)) return AddrInfoHints();
+    if (!sv_defined(arg)) return AddrInfoHints();
 
     if (SvPOK(arg)) {
         if (SvCUR(arg) < sizeof(AddrInfoHints)) throw_bad_hints();

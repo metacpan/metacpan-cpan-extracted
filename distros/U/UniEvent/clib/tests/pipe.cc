@@ -16,7 +16,7 @@ TEST("pair") {
         CHECK(panda::dyn_cast<MyPipe*>(p.second.get()));
     }
 
-    p.first->read_event.add([&](auto...){
+    p.first->read_event.add([&](auto, auto, auto){
         test.happens();
         p.first->reset();
         p.second->reset();

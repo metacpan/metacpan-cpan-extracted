@@ -54,6 +54,6 @@
          "web" : "https://github.com/mjohnson108/p5-msc-collect"
       }
    },
-   "version" : "0.32",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

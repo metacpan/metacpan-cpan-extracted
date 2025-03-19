@@ -9,7 +9,7 @@ use File::Spec::Functions 'catdir', 'catfile';
 
 use base 'Exporter';
 
-our @EXPORT = ('temp_inc', 'catfile');
+our @EXPORT = qw(temp_inc catfile catdir);
 
 sub temp_inc {
     my $tmpinc = tempdir(CLEANUP => 1);

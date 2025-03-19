@@ -1,4 +1,4 @@
-# Install script for directory: /home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/cmake_props
+# Install script for directory: /tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/cmake_props
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/cmake_install.cmake")
+  include("/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/cmake_props/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/cmake_props/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -18,8 +18,7 @@ delete $ENV{OPENSSL_CONF};
 subtest 'silent' => sub {
   local @ARGV = qw(--silent);
   do './script/sslmaker' or plan skip_all => $@;
-  $script           = App::sslmaker::script->new;
-  $script->{bits}   = 1024;                         # speed up testing
+  $script = App::sslmaker::script->new;
   $script->{silent} = 1;
   $home->remove_tree({safe => 0});
   $home->mkpath;
@@ -57,8 +56,8 @@ subtest 'sslmaker intermediate' => sub {
 };
 
 subtest 'sslmaker generate example.com' => sub {
-  is eval { $script->subcommand_generate('client1.example.com') }, 0, 'ran' or diag $@;
-  is eval { $script->subcommand_generate('client2.example.com') }, 0, 'ran' or diag $@;
+  is eval { $script->subcommand_generate('client1.example.com') }, 0, 'client1.example.com' or diag $@;
+  is eval { $script->subcommand_generate('client2.example.com') }, 0, 'client2.example.com' or diag $@;
   ok -e 'client1.example.com.key.pem',   'client1.example.com.key.pem';
   ok -e 'client1.example.com.csr.pem',   'client1.example.com.csr.pem';
   ok !-e 'client1.example.com.cert.pem', 'client1.example.com.cert.pem need to be created from intermediate';

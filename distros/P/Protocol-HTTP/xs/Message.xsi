@@ -24,7 +24,7 @@ Hash Message::headers (Hash new_headers = Hash()) {
     RETVAL = Hash::create(THIS->headers.size());
     for (const auto& elem : THIS->headers.fields) {
         auto len = elem.name.length();
-        char key[len];
+        auto key = (char*)alloca(sizeof(char)*len);
         std::transform(elem.name.data(), elem.name.data() + len, key, ::tolower);
         RETVAL.store(string_view(key, len), xs::out(elem.value));
     }
@@ -32,8 +32,8 @@ Hash Message::headers (Hash new_headers = Hash()) {
 
 string Message::header (string_view name, SV* val = nullptr) {
     if (val) {
-        if (!SvOK(val)) THIS->headers.remove(name);
-        else            THIS->headers.set(string(name), xs::in<string>(val));
+        if (!sv_defined(val)) THIS->headers.remove(name);
+        else                  THIS->headers.set(string(name), xs::in<string>(val));
         XSRETURN_UNDEF;
     }
 
@@ -47,7 +47,7 @@ void Message::multiheader (string_view name, ...) {
         auto key = string(name);
         for (auto i = 2; i < items; ++i) {
             auto val = ST(i);
-            if (SvOK(val)) THIS->headers.add(key, xs::in<string>(val));
+            if (sv_defined(val)) THIS->headers.add(key, xs::in<string>(val));
         }
         XSRETURN_EMPTY;
     }

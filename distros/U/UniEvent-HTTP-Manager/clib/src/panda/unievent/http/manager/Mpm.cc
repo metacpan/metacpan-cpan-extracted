@@ -215,7 +215,7 @@ void Mpm::kill_not_responding () {
     auto now = std::time(NULL);
     for (auto w : get_workers(Worker::State::running)) {
         if (now - w->activity_time < config.activity_timeout) continue;
-        panda_log_info("killing not responding worker id=" << w->id);
+        panda_log_alert("killing not responding worker id=" << w->id);
         kill_worker(w);
     }
 }

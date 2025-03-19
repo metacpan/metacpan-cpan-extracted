@@ -293,12 +293,3 @@ struct List : public Array {
 
 }
 
-// DEPRECATED, will be removed, use Array.begin()/end() instead
-#define XS_AV_ITER(av,code) {                                           \
-    SV** list = AvARRAY(av);                                            \
-    SSize_t fillp = AvFILLp(av);                                        \
-    for (SSize_t i = 0; i <= fillp; ++i) { SV* elem = *list++; code }   \
-}
-#define XS_AV_ITER_NE(av,code) XS_AV_ITER(av,{if(!elem) continue; code})
-#define XS_AV_ITER_NU(av,code) XS_AV_ITER(av,{if(!elem || !SvOK(elem)) continue; code})
-

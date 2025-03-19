@@ -72,7 +72,6 @@ libpanda-backtrace/tests/fn01.cc
 libpanda-backtrace/tests/fn02.cc
 libpanda-backtrace/tests/fn03.cc
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 t/bt.t
 t/lib/MyTest.pm

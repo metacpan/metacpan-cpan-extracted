@@ -65,14 +65,13 @@ namespace panda { namespace uri { namespace router {
         data->element->token.regexp = std::make_unique<Regexp>();
         data_stack.push_back({data->element->token.regexp.get()});
         data = &data_stack.back();
-        stack.resize(top+1);
+        stack.resize(top+2);
         fcall group_regexp;
     }
     
     action group_end {
         data_stack.pop_back();
         data = &data_stack.back();
-        stack.pop_back();
         fret;
     }
     
@@ -182,7 +181,6 @@ static bool symclass_from_escaped (char c, Regexp::Symclass& s) {
 }
 
 static void parse_symclass (string_view str, Regexp::Symclass& s) {
-    //printf("parse symclass: %s\n", string(str).c_str());
     auto p = str.data();
     auto pe = p + str.length();
     

@@ -4,7 +4,7 @@ use Date::Rel;
 use XS::Framework;
 use XS::Install::Payload;
 
-our $VERSION = '5.2.13';
+our $VERSION = '5.2.14';
 
 XS::Loader::bootstrap();
 

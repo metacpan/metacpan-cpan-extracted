@@ -11,7 +11,7 @@ use constant DEBUG        => $ENV{SSLMAKER_DEBUG} || 0;
 use constant DEFAULT_BITS => $ENV{SSLMAKER_BITS}  || 4096;
 use constant DEFAULT_DAYS => $ENV{SSLMAKER_DAYS}  || 365;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our $OPENSSL = $ENV{SSLMAKER_OPENSSL} || 'openssl';
 
 my @CONFIG_TEMPLATE_KEYS = qw(bits cert crl_days days home key);
@@ -91,7 +91,6 @@ sub make_csr {
   openssl qw(req -new -sha256), $args->{passphrase} ? (-passin => $self->_passphrase($args->{passphrase})) : (),
     (map { (-addext => $_) } grep {length} @{$args->{ext} || []}),
     -key  => $args->{key},
-    -days => $args->{days} || DEFAULT_DAYS,
     -out  => $asset->path,
     -subj => $subject;
 
@@ -303,10 +302,6 @@ sub _render_template {
 
 App::sslmaker - Be your own SSL certificate authority
 
-=head1 VERSION
-
-0.16
-
 =head1 DESCRIPTION
 
 L<App::sslmaker> is a module that provide methods for acting as your own
@@ -498,7 +493,6 @@ See also L</revoke_cert>.
               key        => "/path/to/private/input.key.pem",
               passphrase => "/path/to/passphrase.txt",
               subject    => '/C=NO/ST=Oslo',
-              days       => $number_of_days, # default: 365
               ext        => ["subjectAltName=DNS:example.com"], # optional
             });
 

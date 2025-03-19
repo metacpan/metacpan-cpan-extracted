@@ -1,0 +1,109 @@
+# Copyright (C) The c-ares project and its contributors
+# SPDX-License-Identifier: MIT
+name: MSYS2 (Windows)
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.ref }}-msys2
+  cancel-in-progress: true
+
+env:
+  TEST_FILTER: "-4 --gtest_filter=-*LiveSearchTXT*:*LiveSearchANY*:*LiveSearchNS*:*LiveGetLocalhostByAddr*"
+  CMAKE_FLAGS: "-DCMAKE_BUILD_TYPE=DEBUG -DCARES_STATIC=ON -DCMAKE_INSTALL_PREFIX=C:/projects/build-cares/test_install -DCARES_STATIC_PIC=ON -G Ninja"
+  CONFIG_OPTS: "--disable-shared"
+  MAKE: make
+  DIST: Windows
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 2
+      matrix:
+        include:
+          - { msystem: CLANG64, env: clang-x86_64, extra_packages: "mingw-w64-clang-x86_64-clang mingw-w64-clang-x86_64-clang-analyzer" }
+          - { msystem: MINGW64, env: x86_64,       extra_packages: "mingw-w64-x86_64-gcc"                                               }
+          - { msystem: MINGW32, env: i686,         extra_packages: "mingw-w64-i686-gcc"                                                 }
+          # No need to test UCRT64 since clang64 uses UCRT
+          # - { msystem: UCRT64,  env: ucrt-x86_64  }
+    defaults:
+      run:
+        shell: msys2 {0}
+    name: ${{ matrix.msystem }}
+    steps:
+      - name: Install MSYS2 and base packages
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: >-
+            autoconf
+            autoconf-archive
+            automake
+            libtool
+            make
+            mingw-w64-${{ matrix.env }}-cmake
+            mingw-w64-${{ matrix.env }}-ninja
+            mingw-w64-${{ matrix.env }}-gtest
+            mingw-w64-${{ matrix.env }}-lldb
+            mingw-w64-${{ matrix.env }}-gdb
+            ${{ matrix.extra_packages }}
+      - name: Checkout c-ares
+        uses: actions/checkout@v4
+      - name: "CMake: build and test c-ares"
+        env:
+          BUILD_TYPE: CMAKE
+          CMAKE_TEST_FLAGS: "-DCARES_BUILD_TESTS=ON"
+          TEST_DEBUGGER: ${{ ( matrix.msystem == 'CLANG32' || matrix.msystem == 'CLANG64' ) && 'lldb' || 'gdb' }}
+        run: |
+          ./ci/build.sh
+          ./ci/test.sh
+      - name: "Autotools: build and test c-ares"
+        env:
+          BUILD_TYPE: autotools
+          TEST_DEBUGGER: ${{ ( matrix.msystem == 'CLANG32' || matrix.msystem == 'CLANG64' ) && 'lldb' || 'gdb' }}
+        run: |
+          ./ci/build.sh
+          ./ci/test.sh
+      - name: "CMake: UBSAN: build and test c-ares"
+        # Bogus alignment errors on i686, so lets not run UBSAN on i686.
+        if: ${{ matrix.msystem == 'CLANG64' }}
+        env:
+          BUILD_TYPE: "ubsan"
+          CMAKE_TEST_FLAGS: "-DCARES_BUILD_TESTS=ON"
+          CFLAGS: "-fsanitize=undefined -fno-sanitize-recover"
+          CXXFLAGS: "-fsanitize=undefined -fno-sanitize-recover"
+          LDFLAGS: "-fsanitize=undefined"
+          TEST_DEBUGGER: "none"
+        run: |
+          ./ci/build.sh
+          ./ci/test.sh
+      - name: "CMake: ASAN: build and test c-ares"
+        # Bogus alignment errors on i686, so lets not run UBSAN on i686.
+        if: ${{ matrix.msystem == 'CLANG64' || matrix.msystem == 'CLANG32' }}
+        env:
+          BUILD_TYPE: "asan"
+          CMAKE_TEST_FLAGS: "-DCARES_BUILD_TESTS=ON"
+          CFLAGS: "-fsanitize=address"
+          CXXFLAGS: "-fsanitize=address"
+          LDFLAGS: "-fsanitize=address"
+          TEST_DEBUGGER: "none"
+        run: |
+          ./ci/build.sh
+          ./ci/test.sh
+      - name: "Autotools: Static Analyzer: build c-ares"
+        if: ${{ matrix.msystem == 'CLANG64' || matrix.msystem == 'CLANG32' }}
+        # Cmake won't work because it somehow mangles linker args and it can't find core windows libraries
+        # Must build static only with autotools otherwise libtool creates a wrapper with reportable issues
+        # That means we can't use './ci/build.sh' since it uses CMake
+        run: |
+          autoreconf -fi
+          mkdir build_analyze
+          cd build_analyze
+          scan-build --use-cc=clang --use-c++=clang++ -v ../configure --enable-static --disable-shared --disable-tests
+          scan-build --use-cc=clang --use-c++=clang++ -v make -j3
+          ./src/tools/adig.exe www.google.com
+          ./src/tools/ahost.exe www.google.com

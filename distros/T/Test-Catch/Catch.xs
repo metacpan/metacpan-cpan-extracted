@@ -22,6 +22,7 @@ struct Printer {
 
         switch (result.getResultType()) {
             case ResultWas::Ok:
+            case ResultWas::ExplicitSkip:
                 printOriginalExpression();
                 printReconstructedExpression();
                 printRemainingMessages();
@@ -363,6 +364,7 @@ bool _run (SV* count, SV* failed, int depth, ...) {
 
         for (int i = 3; i < items; ++i) {
             SV* arg = ST(i);
+            SvGETMAGIC(arg);
             if (!SvOK(arg)) continue;
             argv.push_back(SvPV_nolen(arg));
         }

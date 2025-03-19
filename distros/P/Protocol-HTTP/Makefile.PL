@@ -16,7 +16,7 @@ my %params = (
         DIR          => 'clib',
         CMAKE_TARGET => $cmake_project,
         FILE         => "lib${cmake_project}.a",
-    },    
+    },
     BIN_SHARE     => {INCLUDE  => {'src' => '/'}},
     CCFLAGS       => '-Wall -Wextra',
     test          => {
@@ -26,8 +26,9 @@ my %params = (
         CLIB                 => {
             DIR          => 'clib',
             CMAKE_TARGET => $cmake_tests,
+            CMAKE_OPTIONS => qq{-DPROTOCOL_HTTP_TESTS=ON},
             FILE         => "lib${cmake_tests}.a",
-        },  
+        },
     },
 );
 

@@ -4,7 +4,7 @@ use Test::More();
 use XS::libcatch();
 use Test::Builder();
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.2';
 
 XS::Loader::load();
 

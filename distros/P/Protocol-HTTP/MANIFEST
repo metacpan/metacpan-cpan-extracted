@@ -1,6 +1,8 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
 clib/panda-protocol-http-config.cmake
+clib/README.md
 clib/src/panda/protocol/http.h
 clib/src/panda/protocol/http/Body.cc
 clib/src/panda/protocol/http/Body.h

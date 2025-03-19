@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-16'; # DATE
+our $DATE = '2025-03-19'; # DATE
 our $DIST = 'App-RGBColorUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -37,6 +37,58 @@ my %argopt_quiet = (
         cmdline_aliases => {q=>{}},
     },
 );
+
+$SPEC{mix_2_rgb_colors} = {
+    v => 1.1,
+    summary => 'Mix two RGB colors',
+    args => {
+        color1 => {
+            schema => 'color::rgb24*',
+            req => 1,
+            pos => 0,
+        },
+        color2 => {
+            schema => 'color::rgb24*',
+            req => 1,
+            pos => 1,
+        },
+    },
+    examples => [
+        {args=>{color1=>'000000', color2=>'ffffff'}},
+        {args=>{color1=>'ff0000', color2=>'00ff99'}},
+    ],
+};
+sub mix_2_rgb_colors {
+    require Color::RGB::Util;
+
+    my %args = @_;
+    [200, "OK", Color::RGB::Util::mix_2_rgb_colors($args{color1}, $args{color2})];
+}
+
+$SPEC{mix_rgb_colors} = {
+    v => 1.1,
+    summary => 'Mix several RGB colors together',
+    args => {
+        colors => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'color',
+            schema => ['array*', of=>'color::rgb24*'],
+            req => 1,
+            pos => 0,
+            slurpy => 1,
+        },
+    },
+    examples => [
+        {args=>{colors=>['000000','ffffff','99cc00']}},
+    ],
+};
+sub mix_rgb_colors {
+    require Color::RGB::Util;
+
+    my %args = @_;
+    # XXX allow proportions
+    [200, "OK", Color::RGB::Util::mix_rgb_colors(map { $_ => 1 } @{ $args{colors} })];
+}
 
 $SPEC{rgb_is_dark} = {
     v => 1.1,
@@ -94,56 +146,46 @@ sub rgb_is_light {
     ];
 }
 
-$SPEC{mix_2_rgb_colors} = {
+$SPEC{rand_rgb_colors} = {
     v => 1.1,
-    summary => 'Mix two RGB colors',
+    summary => 'Generate some random RGB color values',
     args => {
-        color1 => {
-            schema => 'color::rgb24*',
-            req => 1,
+        n => {
+            schema => 'posint*',
             pos => 0,
+            default => 1,
         },
-        color2 => {
-            schema => 'color::rgb24*',
-            req => 1,
-            pos => 1,
+        light_color => {
+            schema => 'bool*',
         },
-    },
-    examples => [
-        {args=>{color1=>'000000', color2=>'ffffff'}},
-        {args=>{color1=>'ff0000', color2=>'00ff99'}},
-    ],
-};
-sub mix_2_rgb_colors {
-    require Color::RGB::Util;
-
-    my %args = @_;
-    [200, "OK", Color::RGB::Util::mix_2_rgb_colors($args{color1}, $args{color2})];
-}
-
-$SPEC{mix_rgb_colors} = {
-    v => 1.1,
-    summary => 'Mix several RGB colors together',
-    args => {
-        colors => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'color',
+        avoid_colors => {
             schema => ['array*', of=>'color::rgb24*'],
-            req => 1,
-            pos => 0,
-            slurpy => 1,
+        },
+        hash_prefix => {
+            schema => 'bool*',
+        },
+        from_color => {
+            schema => 'color::rgb24*',
+        },
+        to_color => {
+            schema => 'color::rgb24*',
         },
     },
-    examples => [
-        {args=>{colors=>['000000','ffffff','99cc00']}},
-    ],
 };
-sub mix_rgb_colors {
+sub rand_rgb_colors {
     require Color::RGB::Util;
 
     my %args = @_;
-    # XXX allow proportions
-    [200, "OK", Color::RGB::Util::mix_rgb_colors(map { $_ => 1 } @{ $args{colors} })];
+    my @colors = Color::RGB::Util::rand_rgb_colors(
+        {
+            light_color  => $args{light_color},
+            avoid_colors => $args{avoid_colors},
+            hash_prefix  => $args{hash_prefix},
+            from_color   => $args{from_color},
+            to_color     => $args{to_color},
+        },
+        $args{n} // 1);
+    [200, "OK", \@colors];
 }
 
 1;
@@ -161,7 +203,7 @@ App::RGBColorUtils - CLI utilities related to RGB color
 
 =head1 VERSION
 
-This document describes version 0.004 of App::RGBColorUtils (from Perl distribution App-RGBColorUtils), released on 2023-12-16.
+This document describes version 0.005 of App::RGBColorUtils (from Perl distribution App-RGBColorUtils), released on 2025-03-19.
 
 =head1 DESCRIPTION
 
@@ -172,6 +214,10 @@ This distributions provides the following command-line utilities:
 =item * L<mix-2-rgb-colors>
 
 =item * L<mix-rgb-colors>
+
+=item * L<rand-rgb-color>
+
+=item * L<rand-rgb-colors>
 
 =item * L<rgb-is-dark>
 
@@ -259,6 +305,60 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<colors>* => I<array[color::rgb24]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 rand_rgb_colors
+
+Usage:
+
+ rand_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Generate some random RGB color values.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<avoid_colors> => I<array[color::rgb24]>
+
+(No description)
+
+=item * B<from_color> => I<color::rgb24>
+
+(No description)
+
+=item * B<hash_prefix> => I<bool>
+
+(No description)
+
+=item * B<light_color> => I<bool>
+
+(No description)
+
+=item * B<n> => I<posint> (default: 1)
+
+(No description)
+
+=item * B<to_color> => I<color::rgb24>
 
 (No description)
 
@@ -464,7 +564,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

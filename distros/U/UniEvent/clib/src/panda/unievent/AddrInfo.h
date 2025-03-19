@@ -15,6 +15,7 @@ struct AddrInfoHints {
         family(family), socktype(socktype), protocol(proto), flags(flags) {}
 
     AddrInfoHints (const AddrInfoHints& oth) = default;
+    AddrInfoHints& operator= (const AddrInfoHints& oth) = default;
 
     bool operator== (const AddrInfoHints& oth) const {
         return family == oth.family && socktype == oth.socktype && protocol == oth.protocol && flags == oth.flags;

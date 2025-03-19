@@ -367,7 +367,7 @@ TEST("stop") {
     SECTION("empty") {
         test.expected = {"stop"};
         auto srv = make_server(test.loop);
-        auto t = Timer::create(1, [&](auto...){ srv->stop(); }, test.loop);
+        auto t = Timer::create(1, [&](auto){ srv->stop(); }, test.loop);
         t->weak(true);
         srv->stop_event.add([&]{
             test.happens("stop");
@@ -379,7 +379,7 @@ TEST("stop") {
         test.expected = {"drop", "stop"};
         ServerPair p(test.loop);
         p.server->request_event.add([&](auto req) {
-            req->drop_event.add([&](auto...){
+            req->drop_event.add([&](auto, auto){
                 test.happens("drop");
             });
             p.server->stop();
@@ -401,7 +401,7 @@ TEST("stop") {
         test.expected = {"stop"};
         ServerPair p(test.loop);
         p.server->request_event.add([&](auto req) {
-            req->drop_event.add([&](auto...){
+            req->drop_event.add([&](auto, auto){
                 FAIL("drop should not be called");
             });
             req->respond(new ServerResponse(200));
@@ -427,7 +427,7 @@ TEST("graceful stop") {
     SECTION("empty") {
         test.expected = {"stop"};
         auto srv = make_server(test.loop);
-        auto t = Timer::create(1, [&](auto...){ srv->graceful_stop(); }, test.loop);
+        auto t = Timer::create(1, [&](auto){ srv->graceful_stop(); }, test.loop);
         t->weak(true);
         srv->stop_event.add([&]{
             test.happens("stop");
@@ -439,7 +439,7 @@ TEST("graceful stop") {
         test.expected = {"stop"};
         ServerPair p(test.loop);
         p.server->request_event.add([&](auto req) {
-            req->drop_event.add([&](auto...){
+            req->drop_event.add([&](auto, auto){
                 test.happens("drop");
             });
             p.server->graceful_stop();
@@ -466,7 +466,7 @@ TEST("graceful stop") {
         test.expected = {"stop"};
         ServerPair p(test.loop);
         p.server->request_event.add([&](auto req) {
-            req->drop_event.add([&](auto...){
+            req->drop_event.add([&](auto, auto){
                 FAIL("drop should not be called");
             });
             req->respond(new ServerResponse(200));

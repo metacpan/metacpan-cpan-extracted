@@ -2,8 +2,8 @@ NAME
     App::RGBColorUtils - CLI utilities related to RGB color
 
 VERSION
-    This document describes version 0.004 of App::RGBColorUtils (from Perl
-    distribution App-RGBColorUtils), released on 2023-12-16.
+    This document describes version 0.005 of App::RGBColorUtils (from Perl
+    distribution App-RGBColorUtils), released on 2025-03-19.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -11,6 +11,10 @@ DESCRIPTION
     *   mix-2-rgb-colors
 
     *   mix-rgb-colors
+
+    *   rand-rgb-color
+
+    *   rand-rgb-colors
 
     *   rgb-is-dark
 
@@ -78,6 +82,55 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   colors* => *array[color::rgb24]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  rand_rgb_colors
+    Usage:
+
+     rand_rgb_colors(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Generate some random RGB color values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   avoid_colors => *array[color::rgb24]*
+
+        (No description)
+
+    *   from_color => *color::rgb24*
+
+        (No description)
+
+    *   hash_prefix => *bool*
+
+        (No description)
+
+    *   light_color => *bool*
+
+        (No description)
+
+    *   n => *posint* (default: 1)
+
+        (No description)
+
+    *   to_color => *color::rgb24*
 
         (No description)
 
@@ -260,8 +313,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2021, 2019 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

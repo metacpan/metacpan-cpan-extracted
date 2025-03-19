@@ -1,5 +1,6 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
 clib/src/panda/unievent/socks.cc
 clib/src/panda/unievent/socks.h
 clib/src/panda/unievent/socks/error.cc

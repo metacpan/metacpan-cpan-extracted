@@ -7,7 +7,7 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/CMakeLists.txt"
+  "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/CMakeLists.txt"
   "CMakeFiles/3.25.1/CMakeCCompiler.cmake"
   "CMakeFiles/3.25.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.25.1/CMakeSystem.cmake"
@@ -40,12 +40,12 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
-  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/DependInfo.cmake"
-  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/DependInfo.cmake"
-  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/MyTest.dir/DependInfo.cmake"
+  "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/DependInfo.cmake"
+  "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/DependInfo.cmake"
+  "/tmp/XS-libpanda-backtrace-8R453HvyZrkN/libpanda-backtrace/build/CMakeFiles/MyTest.dir/DependInfo.cmake"
   )

@@ -8,7 +8,7 @@ use File::Find;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.8001';
+our $VERSION = '0.8002';
 
 sub import {
 	my $class = shift;
@@ -44,8 +44,7 @@ sub new {
 sub add_deps {
 	my $self = shift;
 	foreach my $d (@_) {
-		$self->{deps}{$d} = undef
-			unless $self->{deps}{$d};
+		$self->{deps}{$d} ||= undef;
 	}
 }
 
@@ -179,9 +178,8 @@ sub load {
 	#print Dumper(\%INC);
 
 	# effectively $instpath = dirname($INC{$relpath})
-	@pieces = File::Spec->splitdir ($INC{$relpath});
-	pop @pieces;
-	my $instpath = File::Spec->catdir (@pieces);
+	my ($vol,$dirs,$file) = File::Spec->splitpath($INC{$relpath});
+	my $instpath = File::Spec->catpath($vol,$dirs,'');
 
 	no strict;
 
@@ -192,14 +190,13 @@ sub load {
 		$instpath = File::Spec->rel2abs ($instpath);
 	}
 
-	my (@typemaps, $inc, $libs, @deps);
-
 	# this will not exist when loading files from old versions
 	# of ExtUtils::Depends.
-	@deps = eval { $depinstallfiles->deps };
+	my @deps = eval { $depinstallfiles->deps };
 	@deps = @{"$depinstallfiles\::deps"}
 		if $@ and exists ${"$depinstallfiles\::"}{deps};
 
+	my (@typemaps, $inc, $libs);
 	my $inline = eval { $depinstallfiles->Inline('C') };
 	if (!$@) {
 		$inc = $inline->{INC} || '';
@@ -227,7 +224,8 @@ sub load_deps {
 	my $self = shift;
 	my @load = grep !$self->{deps}{$_}, keys %{ $self->{deps} };
 	my %in_load; @in_load{@load} = ();
-	foreach my $d (@load) {
+	while (@load) {
+		my $d = shift @load;
 		$self->{deps}{$d} = my $dep = load($d);
 		my @new_deps = grep !($self->{deps}{$_} || exists $in_load{$_}),
 			@{ $dep->{deps} || [] };
@@ -248,16 +246,14 @@ sub get_makefile_vars {
 	# first, ensure they are completely loaded.
 	$self->load_deps;
 
-	##my @defbits = map { split } @{ $self->{defines} };
-	my @incbits = map { split } @{ $self->{inc} };
-	my @libsbits = split /\s+/, $self->{libs};
+	my @incbits = @{ $self->{inc} };
+	my @libsbits = $self->{libs};
 	my @typemaps = @{ $self->{typemaps} };
 	foreach my $d (sort keys %{ $self->{deps} }) {
 		my $dep = $self->{deps}{$d};
-		#push @defbits, @{ $dep->{defines} };
 		push @incbits, @{ $dep->{defines} } if $dep->{defines};
-		push @incbits, split /\s+/, $dep->{inc} if $dep->{inc};
-		push @libsbits, split /\s+/, $dep->{libs} if $dep->{libs};
+		push @incbits, $dep->{inc} if $dep->{inc};
+		push @libsbits, $dep->{libs} if $dep->{libs};
 		push @typemaps, @{ $dep->{typemaps} } if $dep->{typemaps};
 	}
 
@@ -284,11 +280,10 @@ sub get_makefile_vars {
 
 	my %vars = (
 		INC => join (' ', uniquify @incbits),
-		LIBS => join (' ', uniquify $self->find_extra_libs, @libsbits),
-		TYPEMAPS => [@typemaps],
+		LIBS => join (' ', uniquify @libsbits),
+		LDFROM => join (' ', '$(OBJECT)', map _quote_if_space($_), find_extra_libs($self->{deps}, \@INC)),
+		TYPEMAPS => \@typemaps,
 	);
-
-	$self->build_dll_lib(\%vars) if $^O =~ /MSWin32/;
 
 	# we don't want to provide these if there is no data in them;
 	# that way, the caller can still get default behavior out of
@@ -305,68 +300,37 @@ sub get_makefile_vars {
 	%vars;
 }
 
-sub build_dll_lib {
-	my ($self, $vars) = @_;
-	$vars->{macro} ||= {};
-	$vars->{macro}{'INST_DYNAMIC_LIB'} =
-		'$(INST_ARCHAUTODIR)/$(DLBASE)$(LIB_EXT)';
-}
-
 # Search for extra library files to link against on Windows (either native
 # Windows library # files, or Cygwin library files)
 # NOTE: not meant to be called publicly, so no POD documentation
+# see https://rt.cpan.org/Ticket/Display.html?id=45224 for discussion
+my %exts; BEGIN { %exts = (
+  MSWin32 => [ ".lib", ".$Config{dlext}", $Config{_a} ],
+  cygwin => [ '.dll' ],
+  android => [ ".$Config{dlext}" ],
+); }
 sub find_extra_libs {
-	my $self = shift;
-
-	my %mappers = (
-		MSWin32 => sub { $_[0] . '\.(?:lib|a)' },
-		cygwin	=> sub { $_[0] . '\.dll'},
-		android => sub { $_[0] . '\.' . $Config{dlext} },
-	);
-	my $mapper = $mappers{$^O};
-	return () unless defined $mapper;
-
-	my @found_libs = ();
-	foreach my $name (keys %{ $self->{deps} }) {
-		(my $stem = $name) =~ s/^.*:://;
-		if ( defined &DynaLoader::mod2fname ) {
-			 my @parts = split /::/, $name;
-			 $stem = DynaLoader::mod2fname([@parts]);
-		}
-		my $lib = $mapper->($stem);
-		my $pattern = qr/$lib$/;
-
-		my $matching_dir;
-		my $matching_file;
-		find (sub {
-			if ((not $matching_file) && /$pattern/) {;
-				$matching_dir = $File::Find::dir;
-				$matching_file = $File::Find::name;
-			}
-		}, map { -d $_ ? ($_) : () } @INC); # only extant dirs
-
-		if ($matching_file && -f $matching_file) {
-			push @found_libs,
-				'-L' . _quote_if_space($matching_dir),
-				'-l' . $stem;
-			# Android's linker ignores the RTLD_GLOBAL flag
-			# and loads everything as if under RTLD_LOCAL.
-			# What this means in practice is that modules need
-			# to explicitly link to their dependencies,
-			# because otherwise they won't be able to locate any
-			# functions they define.
-			# We use the -l:foo.so flag to indicate that the
-			# actual library name to look for is foo.so, not
-			# libfoo.so
-			if ( $^O eq 'android' ) {
-				$found_libs[-1] = "-l:$stem.$Config{dlext}";
-			}
-			next;
-		}
-	}
-
-	return @found_libs;
+  my ($deps, $search) = @_;
+  return () if !keys %$deps;
+  return () unless my $exts = $exts{$^O};
+  require File::Spec::Functions;
+  my @found_libs = ();
+  DEP: foreach my $name (keys %$deps) {
+    my @parts = ('auto', split /::/, $name);
+    my $stem = defined &DynaLoader::mod2fname
+      ? DynaLoader::mod2fname(\@parts) : $parts[-1];
+    my @bases = map $stem.$_, @$exts;
+    for my $dir (grep -d, @$search) { # only extant dirs
+      my ($found) = grep -f, map File::Spec::Functions::catfile($dir, @parts, $_), @bases;
+      next if !defined $found;
+      push @found_libs, $found;
+      next DEP;
+    }
+  }
+  @found_libs;
 }
+
+1;
 
 __END__
 
@@ -403,12 +367,17 @@ functions and typemaps provided by other perl extensions. This means
 that a perl extension is treated like a shared library that provides
 also a C and an XS interface besides the perl one.
 
-This works as long as the base extension is loaded with the RTLD_GLOBAL
-flag (usually done with a
+This works as long as the base (or "producing") extension is loaded with
+the C<RTLD_GLOBAL> flag (usually done with a
 
 	sub dl_load_flags {0x01}
 
-in the main .pm file) if you need to use functions defined in the module.
+in the main F<.pm> file) if you need to use functions defined in the module.
+That "producing" extension will also need to tell L<ExtUtils::MakeMaker>
+the specific functions to export, with arguments to C<WriteMakefile> like:
+
+  FUNCLIST => [qw(function_name)],
+  DL_FUNCS => { 'Extension::Name' => [] },
 
 The basic scheme of operation is to collect information about a module
 in the instance, and then store that data in the Perl library where it
@@ -616,22 +585,23 @@ L<https://rt.cpan.org/Public/Bug/Report.html?Queue=ExtUtils-Depends> (requires
 PAUSE ID or Bitcard), or by sending an e-mail to
 L<bug-ExtUtils-Depends at rt.cpan.org>.
 
-=item Gnome.org Bugzilla
+=item Gnome.org Bugtracker
 
-Report bugs/feature requests to the 'gnome-perl' product (requires login)
-L<http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-perl>
+Report bugs/feature requests to 'perl-extutils-depends' (requires login)
+L<https://gitlab.gnome.org/GNOME/perl-extutils-depends/-/issues/>
 
 =back
 
 Patches that implement new features with test cases, and/or test cases that
 exercise existing bugs are always welcome.
 
-The Gtk-Perl mailing list is at L<gtk-perl-list at gnome dot org>.
+The Gtk-Perl support forum is at
+L<https://discourse.gnome.org/tags/c/platform/language-bindings/11/perl>
 
 =head2 Source Code
 
 The source code to L<ExtUtils::Depends> is available at the Gnome.org Git repo
-(L<https://git.gnome.org/browse/perl-ExtUtils-Depends/>).  Create your own
+(L<https://gitlab.gnome.org/GNOME/perl-extutils-depends>).  Create your own
 copy of the Git repo with:
 
   git clone git://git.gnome.org/perl-ExtUtils-Depends (Git protocol)

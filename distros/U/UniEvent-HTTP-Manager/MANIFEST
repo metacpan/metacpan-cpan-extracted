@@ -1,5 +1,6 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
 clib/src/panda/unievent/http/manager.h
 clib/src/panda/unievent/http/manager/Child.cc
 clib/src/panda/unievent/http/manager/Child.h

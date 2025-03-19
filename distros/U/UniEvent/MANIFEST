@@ -264,12 +264,12 @@ lib/UniEvent/Udp.pm
 lib/UniEvent/Udp.pod
 lib/UniEvent/Work.pm
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/bench_delay.plx
 misc/bench_tcp.plx
 misc/find_leaks.sh
+misc/ipv6res.plx
 misc/jopa.pl
 misc/jopa2.pl
 misc/leaks.sh
@@ -386,6 +386,7 @@ t/tty.t
 t/udp/simple.t
 t/udp/udp.t
 t/util.t
+t/var/streamer/fout.txt
 t/work.t
 xs/Backend.xsi
 xs/Check.xs

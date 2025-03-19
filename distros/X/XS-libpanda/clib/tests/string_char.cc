@@ -6,7 +6,7 @@ void test_compilation_warnings () {
         struct {
             uint64_t a;
             uint64_t b;
-        } abc;
+        } abc = {};
         auto data = string("\x05\x01\x00\x01") + string((char*)&abc, 16) + string((char*)&abc, 2);
     }
 

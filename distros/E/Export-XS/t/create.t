@@ -22,4 +22,8 @@ subtest 'bad const names' => sub {
     dies_ok { Export::XS->import(\1, 1) };
 };
 
+subtest 'bad stash' => sub {
+    dies_ok { Export::XS::import('Non::Existent', 1, 1) };
+};
+
 done_testing();

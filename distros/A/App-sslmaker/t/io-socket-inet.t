@@ -4,8 +4,7 @@ use Time::HiRes 'usleep';
 use Test::More;
 use App::sslmaker;
 
-$ENV{SSLMAKER_SUBJECT}
-  = '/C=NO/ST=Oslo/L=Oslo/O=Example/OU=Prime/CN=example.com/emailAddress=admin@example.com';
+$ENV{SSLMAKER_SUBJECT} = '/C=NO/ST=Oslo/L=Oslo/O=Example/OU=Prime/CN=example.com/emailAddress=admin@example.com';
 
 =commands
 
@@ -21,7 +20,7 @@ openssl x509 -noout -text -in local/tmp/real/server.cert.pem | grep 'Issuer\|Sub
 =cut
 
 plan skip_all => "$^O is not supported" if $^O eq 'MSWin32';
-plan skip_all => 'IO::Socket::IP 0.20 required' unless eval 'use IO::Socket::IP 0.20; 1';
+plan skip_all => 'IO::Socket::IP 0.20 required'  unless eval 'use IO::Socket::IP 0.20; 1';
 plan skip_all => 'IO::Socket::SSL 1.84 required' unless eval 'use IO::Socket::SSL 1.84; 1';
 
 my $home = Path::Tiny->new('local/tmp/real');
@@ -67,7 +66,6 @@ done_testing;
 sub create_root_ca {
   my $sslmaker = App::sslmaker->new;
   my $args     = {
-    bits       => 1024,                                    # really bad bits
     cert       => $home->child('ca/certs/ca.cert.pem'),
     key        => $home->child('ca/private/ca.key.pem'),
     passphrase => $home->child('ca/private/passphrase'),
@@ -83,7 +81,6 @@ sub create_root_ca {
 sub create_intermediate_ca {
   my $sslmaker = App::sslmaker->new;
   my $args     = {
-    bits       => 1024,                                                        # really bad bits
     csr        => $home->child('intermediate/certs/intermediate.csr.pem'),
     key        => $home->child('intermediate/private/intermediate.key.pem'),
     passphrase => $home->child('intermediate/private/passphrase'),
@@ -115,12 +112,8 @@ sub create_intermediate_ca {
 sub create_cert {
   my $type     = shift;
   my $sslmaker = App::sslmaker->new;
-  my $args     = {
-    bits    => 1024,                            # really bad bits
-    csr     => $home->child("$type.csr.pem"),
-    key     => $home->child("$type.key.pem"),
-    subject => "/CN=$type.example.com",
-  };
+  my $args
+    = {csr => $home->child("$type.csr.pem"), key => $home->child("$type.key.pem"), subject => "/CN=$type.example.com",};
 
   $sslmaker->with_config(make_key => $args);
   $sslmaker->with_config(make_csr => $args);
@@ -148,13 +141,11 @@ sub run_echo_server {
     SSL_verify_mode        => 1,
   );
 
-  my $s = IO::Socket::SSL->new(%args)
-    or die "[SERVER] Failed to listen: $! ($IO::Socket::SSL::SSL_ERROR)";
+  my $s = IO::Socket::SSL->new(%args) or die "[SERVER] Failed to listen: $! ($IO::Socket::SSL::SSL_ERROR)";
 
   while (1) {
     note "Waiting for client to connect";
-    my $client = $s->accept
-      or die "[SERVER] Failed to accept or ssl handshake: $! ($IO::Socket::SSL::SSL_ERROR)";
+    my $client  = $s->accept or die "[SERVER] Failed to accept or ssl handshake: $! ($IO::Socket::SSL::SSL_ERROR)";
     my $buf     = $client->readline;
     my $subject = $client->peer_certificate('subject');
     note $subject;

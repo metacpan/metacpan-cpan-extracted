@@ -2,6 +2,7 @@
 #include "error.h"
 #include "Request.h"
 #include "Form.h"
+#include "panda/unievent/SslContext.h"
 #include <panda/unievent/Tcp.h>
 #include <panda/protocol/http/ResponseParser.h>
 
@@ -26,6 +27,8 @@ struct Client : Tcp, private ITcpSelfListener {
 
     bool uncompress_response () const { return _parser.uncompress_content; }
     void uncompress_response (bool v) { _parser.uncompress_content = v; }
+
+    static SslContext get_default_ssl_context(bool verify);
 
 protected:
     Client (Pool*);

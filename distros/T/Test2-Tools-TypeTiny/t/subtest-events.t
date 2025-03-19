@@ -23,11 +23,11 @@ my $events = intercept { StrTest::string_test(1); };
 is(
     $events->state,
     {
-        count      => 3,
+        count      => 4,
         failed     => 2,
         is_passing => 0,
 
-        plan         => 3,
+        plan         => 4,
         follows_plan => 1,
 
         bailed_out  => undef,
@@ -42,7 +42,7 @@ is(
         map { blessed $_ }
         $events->event_list
     ],
-    [qw< Subtest Diag Subtest Subtest Diag Plan >],
+    [qw< Subtest Diag Subtest Subtest Diag Subtest Plan >],
     'Order of events are correct',
 );
 

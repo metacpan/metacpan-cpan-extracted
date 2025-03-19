@@ -90,7 +90,7 @@ bool Parser::_parse_frame (Frame& frame) {
             if (_deflate_ext) _flags.set(RECV_INFLATE);
             else return _seterr(errc::unexpected_rsv);
         }
-        if (frame.rsv2() | frame.rsv3()) return _seterr(errc::unexpected_rsv);
+        if (frame.rsv2() || frame.rsv3()) return _seterr(errc::unexpected_rsv);
     }
     else {
         if (frame.opcode() != Opcode::CONTINUE) return _seterr(errc::fragment_no_continue);

@@ -85,10 +85,10 @@ TEST("correct callback order") {
     SockAddr addr = server->sockaddr().value();
 
     TcpSP client = new Tcp(test.loop);
-    client->connect()->to(addr.ip(), addr.port())->on_connect([&](auto...) {
+    client->connect()->to(addr.ip(), addr.port())->on_connect([&](auto, auto, auto) {
         test.happens("connect");
     })->run();
-    client->write("123", [&](auto...) {
+    client->write("123", [&](auto, auto, auto) {
         test.happens("write");
     });
     client->reset();
@@ -180,21 +180,21 @@ TEST("run in order") {
     auto sa = server->sockaddr().value();
 
     h->connect(sa);
-    h->connect_event.add([&](auto...){
+    h->connect_event.add([&](auto, auto, auto){
         CHECK(s == "1");
     });
 
     h->run_in_order([&](auto&){ s +=  "2"; });
 
     h->write("123");
-    h->write_event.add([&](auto...){
+    h->write_event.add([&](auto, auto, auto){
         CHECK(s == "12");
     });
 
     h->run_in_order([&](auto&){ s +=  "3"; });
 
     h->shutdown();
-    h->shutdown_event.add([&](auto...){
+    h->shutdown_event.add([&](auto, auto, auto){
         CHECK(s == "123");
         test.loop->stop();
     });
@@ -336,12 +336,12 @@ TEST("pair") {
     }
 
     p.first->write("hello");
-    p.second->read_event.add([&](auto...){
+    p.second->read_event.add([&](auto, auto, auto){
         test.happens();
         p.second->write("world");
     });
 
-    p.first->read_event.add([&](auto...){
+    p.first->read_event.add([&](auto, auto, auto){
         test.happens();
         p.first->reset();
         p.second->reset();

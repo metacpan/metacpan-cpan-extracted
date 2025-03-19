@@ -33,12 +33,12 @@ struct Server : Refcnt, private IStreamListener {
         SslContext       ssl_ctx     = nullptr;         // if set, will use SSL
         optional<sock_t> sock        = {};              // if supplied, uses this socket and ignores host, port, path, reuse_port, backlog, domain
                                                         // socket must be bound but NOT LISTENING!
-                                                       
+
         Location () {}
-        
+
         Location (const string& host, uint16_t port, int backlog = DEFAULT_BACKLOG, const SslContext& ssl_ctx = {})
             : host(host), port(port), backlog(backlog), ssl_ctx(ssl_ctx) {}
-            
+
         Location& set_host       (const string& val)     { host = val; return *this; }
         Location& set_port       (uint16_t val)          { port = val; return *this; }
         Location& set_path       (const string& val)     { path = val; return *this; }
@@ -48,7 +48,7 @@ struct Server : Refcnt, private IStreamListener {
         Location& set_ssl_ctx    (const SslContext& val) { ssl_ctx = val; return *this; }
         Location& set_sock       (sock_t val)            { sock = val; return *this; }
         Location& set_tcp_nodelay(bool val)              { tcp_nodelay = val; return *this; }
-                                                       
+
         bool operator== (const Location&) const;
         bool operator!= (const Location& oth) const { return !operator==(oth); }
     };
@@ -72,11 +72,14 @@ struct Server : Refcnt, private IStreamListener {
     using request_fptr = ServerRequest::receive_fptr;
     using error_fptr   = void(const ServerRequestSP&, const ErrorCode&);
     using stop_fptr    = void();
+    using connect_fptr = void(const ServerConnectionSP&);
+
     using run_fn       = function<run_fptr>;
     using route_fn     = function<route_fptr>;
     using request_fn   = ServerRequest::receive_fn;
     using error_fn     = function<error_fptr>;
     using stop_fn      = function<stop_fptr>;
+    using connect_fn   = function<connect_fptr>;
     using IFactory     = ServerConnection::IFactory;
 
     CallbackDispatcher<run_fptr>     run_event;
@@ -84,6 +87,7 @@ struct Server : Refcnt, private IStreamListener {
     CallbackDispatcher<request_fptr> request_event;
     CallbackDispatcher<error_fptr>   error_event;
     CallbackDispatcher<stop_fptr>    stop_event;
+    CallbackDispatcher<connect_fptr> connect_event;
 
     Server (const LoopSP& loop = Loop::default_loop(), IFactory* = nullptr);
     Server (const Config& config, const LoopSP& loop = Loop::default_loop(), IFactory* = nullptr);

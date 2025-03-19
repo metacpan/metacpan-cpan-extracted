@@ -44,7 +44,7 @@ TEST("server establish") {
     });
     server->event_listener(&lst);
     server->add_filter(new Efilter(test, server));
-    server->connection_event.add([&](auto...) {
+    server->connection_event.add([&](auto, auto, auto) {
         test.happens("connection");
         test.loop->stop();
     });
@@ -72,7 +72,7 @@ TEST("client establish") {
     TcpSP client = new Tcp(test.loop);
     client->event_listener(&lst);
     client->add_filter(new Efilter(test, client));
-    client->connect_event.add([&](auto...) {
+    client->connect_event.add([&](auto, auto, auto) {
         test.happens("connect");
         test.loop->stop();
     });

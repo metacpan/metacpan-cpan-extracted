@@ -102,7 +102,7 @@ Sv Plack::make_env (const ServerRequestSP& request) {
         auto len = elem.name.length();
         auto ptr = elem.name.data();
 
-        char key[len+5];
+        auto key = (char*)alloca(sizeof(char)*(len+5));
         key[0] = 'H'; key[1] = 'T'; key[2] = 'T'; key[3] = 'P'; key[4] = '_';
         for (size_t i = 0; i < len; ++i) key[i+5] = ptr[i] == '-' ? '_' : ::toupper(ptr[i]);
 

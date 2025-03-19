@@ -2,7 +2,7 @@ package Export::XS;
 use 5.012;
 use XS::Loader;
 
-our $VERSION = '3.0.7';
+our $VERSION = '3.0.8';
 
 XS::Loader::load();
 

@@ -9,13 +9,13 @@ static PERL_ITHREADS_LOCAL HV* s2 = gv_stashpvs("Net::SockAddr::Inet6", GV_ADD);
 static PERL_ITHREADS_LOCAL HV* s3 = gv_stashpvs("Net::SockAddr::Unix", GV_ADD);
 
 SockAddr* _in_sockaddr_ptr (SV* arg) {
-    if (!SvOK(arg)) return nullptr;
+    if (!sv_defined(arg)) return nullptr;
     if (!Sv(arg).is_object_ref()) throw "invalid sockaddr";
     return (panda::net::SockAddr*)SvPVX(SvRV(arg));
 }
 
 SockAddr _in_sockaddr (SV* arg) {
-    if (!SvOK(arg)) return {};
+    if (!sv_defined(arg)) return {};
     if (Sv(arg).is_object_ref()) return *_in_sockaddr_ptr(arg);
     if (!SvPOK(arg) || SvCUR(arg) < sizeof(panda::net::sa_family_t)) throw "invalid sockaddr";
 

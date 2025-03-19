@@ -90,7 +90,7 @@ TEST("immediate disconnect") {
     });
 
     size_t callback_count = 0;
-    client->write_event.add([&](auto...){
+    client->write_event.add([&](auto, auto, auto){
         callback_count++;
         if (callback_count == write_count) {
             test.loop->stop();
@@ -249,7 +249,7 @@ TEST("request holds") {
     server->connection_event.add([&](const StreamSP&, const StreamSP& conn, const ErrorCode& err) {
         CHECK_FALSE(err);
         sconn = conn;
-        sconn->eof_event.add([&](auto...){
+        sconn->eof_event.add([&](auto){
             test.loop->stop();
         });
     });
@@ -277,7 +277,7 @@ TEST("bad example") {
     server->connection_event.add([&](const StreamSP&, const StreamSP& conn, const ErrorCode& err) {
         CHECK_FALSE(err);
         sconn = conn;
-        sconn->eof_event.add([&](auto...){
+        sconn->eof_event.add([&](auto){
             test.loop->stop();
         });
     });
