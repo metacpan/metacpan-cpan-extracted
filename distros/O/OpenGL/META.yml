@@ -4,7 +4,7 @@ author:
   - 'Chris Marshall <chm at cpan dot org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/Perl-GPU/pogl/issues
   homepage: http://sourceforge.net/projects/pogl/
   repository: git://github.com/Perl-GPU/pogl.git
-version: '0.7002'
+version: '0.7004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

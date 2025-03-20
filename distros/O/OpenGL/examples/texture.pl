@@ -1,15 +1,9 @@
-#!/usr/local/bin/perl
-#
 #          texture
 #
 #  This program demonstrates texture mapping  
 #  An image file (wolf.ppm) is read in as the texture
 #  then packed into a C array format and given to glTexImage2D 
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
  
 $spin=0.0;

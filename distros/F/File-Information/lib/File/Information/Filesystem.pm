@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my @_copy_properties = (
     qw(dos_device dos_path),
@@ -95,7 +95,7 @@ File::Information::Filesystem - generic module for extracting information from f
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,16 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.02  Wed Mar 19 2025
+	- Deactivated experiment in test file.
+
+0.02  Wed Mar 19 2025
+	- Corrected pod.
+	- Added option -filterfield.
+	- Fixed mouse wheel scrolling.
+	- Fixed keyboard navigation when hidden entries exist.
+	- Added methods infoFirstVisible, infoLastVisible, infoNextVisible and infoPreVisible.
+	- Changed the dash pattern for the anchor.
+
 0.01  Thu Mar 13 2025
 	- original version; created on Tue Feb 25 19:15:13 2025 by h2xs 1.23 with options
 		-X Tk::ListBrowser

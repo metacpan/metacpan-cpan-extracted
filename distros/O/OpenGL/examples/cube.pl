@@ -1,16 +1,10 @@
-#!/usr/local/bin/perl
-#
 #       cube
 #
 #  Draws a 3-D cube, viewed with perspective, stretched 
 #  along the y-axis.
 #  Adapted from "cube.c", chapter 3, listing 3-1,
 #  page 70, OpenGL Programming Guide 
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib");  } # 5.002 gamma needs this
 use OpenGL;
  
 sub wirecube{

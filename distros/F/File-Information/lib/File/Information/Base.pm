@@ -12,6 +12,9 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util qw(blessed);
+
+use Data::Identifier v0.08;
 
 use constant { # Taken from Data::Identifier
     RE_UUID     => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -22,7 +25,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -89,6 +92,8 @@ our %_mediatypes = ( # Copied from tags-universal
     'video/webm'                                                => '0ee63dad-e52f-5c62-9c32-e6b872b828c7',
 );
 
+my %_inverse_mediatypes = map {$_mediatypes{$_} => $_} keys %_mediatypes;
+
 my %_ise_re = (
     uuid => RE_UUID,
     oid  => RE_OID,
@@ -112,13 +117,14 @@ my %_properties = (
     inodeise    => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag xattr_utag_ise db_inode_tag)], rawtype => 'ise'},
     contentise  => {loader => \&_load_aggregate, sources => [qw(::Inode content_sha_1_160_sha_3_512_uuid content_sha_3_512_uuid)], rawtype => 'ise'},
 
-    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size xattr_utag_final_file_hash_size st_size)]},
-    title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption)]},
+    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size xattr_utag_final_file_hash_size st_size ::Base data_tagdb_size)]},
+    title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption ::Deep pdf_info_title odf_info_title audio_scan_title)]},
     comment     => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
     description => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
     displayname => {loader => \&_load_aggregate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name data_uriid_attr_displayname)]},
-    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype ::Base data_uriid_attr_media_subtype)], rawtype => 'mediatype'},
+    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype ::Base data_uriid_attr_media_subtype data_tagdb_encoding)], rawtype => 'mediatype'},
     writemode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode)], rawtype => 'ise'},
+    pages       => {loader => \&_load_aggregate, sources => [qw(::Deep pdf_pages odf_stats_meta_page_count)]},
 
     thumbnail   => {loader => \&_load_aggregate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
     finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
@@ -129,6 +135,12 @@ my %_properties = (
     fetchurl    => {loader => \&_load_aggregate, sources => [qw(:self tagpool_file_original_url xattr_xdg_origin_url zonetransfer_hosturl)]},
 
     # TODO: displaycolour icontext charset (hash) (mediatype / encoding)
+
+    data_tagdb_size         => {loader => \&_load_data_tagdb},
+    data_tagdb_displayname  => {loader => \&_load_data_tagdb},
+    data_tagdb_fetch_uri    => {loader => \&_load_data_tagdb, rawtype => 'uri'},
+    data_tagdb_encoding     => {loader => \&_load_data_tagdb, rawtype => 'Data::TagDB::Tag'},
+    data_tagdb_charset      => {loader => \&_load_data_tagdb, rawtype => 'Data::TagDB::Tag'},
 );
 
 my @_digest_preload_properties = qw(xattr_utag_final_file_hash xattr_utag_final_file_size tagpool_file_size);
@@ -148,6 +160,7 @@ sub _new {
 sub get {
     my ($self, $key, %opts) = @_;
     my $info = $self->{properties}{$key} // $_properties{$key};
+    my $rawtype = $info->{rawtype};
     my $pv = $self->{properties_values} //= {};
     my $v;
     my $res;
@@ -215,11 +228,14 @@ sub get {
         $v = {}; # handle like an empty entry.
     }
 
+    # Update rawtype as needed:
+    $rawtype = $v->{rawtype} // $rawtype;
+
     # Try: Check if we have what we want.
     $res = $v->{$as};
 
     # Try: Check if we can convert (rawtype, raw) to what we want.
-    if (!defined($res) && defined(my $rawtype = $info->{rawtype}) && defined(my $raw = $v->{raw})) {
+    if (!defined($res) && defined($rawtype) && defined(my $raw = $v->{raw})) {
         if ($rawtype eq $as) {
             $res = $raw;
         } elsif ($rawtype eq 'unixts' && $as eq 'DateTime') {
@@ -228,7 +244,6 @@ sub get {
         } elsif ($rawtype eq 'ise' && defined(my $re = $_ise_re{$as})) {
             $res = $raw if $raw =~ $re;
         } elsif ($_data_identifier_keys{$rawtype} && $as eq 'Data::Identifier') {
-            require Data::Identifier;
             $res = Data::Identifier->new($rawtype => $raw);
         } elsif ($_ise_keys{$rawtype} && $as eq 'Data::URIID::Result') {
             $res = $self->instance->extractor->lookup(ise => $raw);
@@ -244,22 +259,26 @@ sub get {
         $v->{$as} = $res if defined($res) && $as !~ /^IO::/; # Cache unless it is a file handle.
     }
 
+    if (!defined($res) && blessed($v->{raw})) {
+        $res = eval {$v->{raw}->Data::Identifier::as($as, db => $self->db, extractor => $self->extractor)};
+    }
+
     # Try: Check if we have a Data::Identifier and want a sid.
     if (!defined($res) && $as eq 'sid' && defined(my $identifier = $v->{'Data::Identifier'})) {
         $v->{sid} = $res if defined($res = eval {$identifier->sid});
     }
 
     # Try: Check if we can manage to get hold of a ISE in some way.
-    if (!defined($res) && !defined($v->{ise}) && defined($info->{rawtype}) && $info->{rawtype} eq 'ise') {
+    if (!defined($res) && !defined($v->{ise}) && defined($rawtype) && $rawtype eq 'ise') {
         $v->{ise} = $v->{raw};
     }
     if (!defined($res) && !defined($v->{ise})) {
         foreach my $key (keys %_ise_re) {
             last if defined($v->{ise} = $v->{$key});
-            last if defined($info->{rawtype}) && $info->{rawtype} eq $key && defined($v->{ise} = $v->{raw});
+            last if defined($rawtype) && $rawtype eq $key && defined($v->{ise} = $v->{raw});
         }
     }
-    if (!defined($res) && !defined($v->{ise}) && ($info->{rawtype} // '') eq 'mediatype') {
+    if (!defined($res) && !defined($v->{ise}) && ($rawtype // '') eq 'mediatype') {
         $v->{ise} = $_mediatypes{$v->{raw} // ''};
     }
     if (!defined($res) && !defined($v->{ise})) {
@@ -267,7 +286,7 @@ sub get {
             if (defined(my $obj = $v->{$source_type})) {
                 last if defined($v->{ise} = eval {$obj->ise});
             }
-            if (defined($info->{rawtype}) && $info->{rawtype} eq $source_type && defined(my $obj = $v->{raw})) {
+            if (defined($rawtype) && $rawtype eq $source_type && defined(my $obj = $v->{raw})) {
                 last if defined($v->{ise} = eval {$obj->ise});
             }
         }
@@ -278,7 +297,6 @@ sub get {
     # Try: Check if we have an ISE and can convert that to what we want.
     if (!defined($res) && defined(my $ise = $v->{ise})) {
         if ($as eq 'Data::Identifier') {
-            require Data::Identifier;
             $res = Data::Identifier->new(ise => $ise);
         } elsif ($as eq 'Data::URIID::Result') {
             $res = $self->instance->extractor->lookup(ise => $ise);
@@ -291,9 +309,10 @@ sub get {
         } elsif (defined(my $re = $_ise_re{$as})) {
             $res = $ise if $ise =~ $re;
         } elsif ($as eq 'sid') {
-            require Data::Identifier;
             my $identifier = $v->{'Data::Identifier'} = Data::Identifier->new(ise => $ise);
             $res = eval {$identifier->sid};
+        } elsif ($as eq 'mediatype') {
+            $res = $_inverse_mediatypes{$ise};
         }
 
         $v->{$as} = $res if defined($res) && $as !~ /^IO::/; # Cache unless it is a file handle.
@@ -473,7 +492,43 @@ sub digest_info {
     return $self->instance->digest_info(@args);
 }
 
+#@returns File::Information::Editor
+sub editor {
+    my ($self) = @_;
+    require File::Information::Editor;
+    return File::Information::Editor->_new(parent => $self);
+}
+
 # ----------------
+sub _set_digest_utag {
+    my ($self, $lifecycle, $v, $given_size) = @_;
+    my %digest;
+
+    eval {
+        while ($v =~ s/^(v0m?) ([a-z]+)-([0-9]+)-([0-9]+) bytes 0-([0-9]+)\/([0-9]+) ([0-9a-f]+)( |$)//) {
+            my ($type, $name, $version, $bits, $end, $size, $hash, $mark) = ($1, $2, $3, $4, $5, $6, $7, $8);
+            next if $end != ($size - 1);
+            die if (length($hash) * 4) != $bits;
+            die if $type eq 'v0' && length($mark);
+
+            $given_size //= $size;
+            die unless $given_size == $size;
+            $digest{join('-', $name, $version, $bits)} = $hash;
+        }
+    };
+
+    $self->{digest} //= {};
+
+    {
+        my $digests = $self->{digest}{$lifecycle} //= {};
+        foreach my $algo (keys %digest) {
+            $digests->{$algo} //= $digest{$algo};
+        }
+    }
+
+    return $given_size;
+}
+
 sub _load_aggregate {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{$opts{lifecycle}} //= {};
@@ -494,6 +549,8 @@ sub _load_aggregate {
                 $current = eval{$self->inode};
             } elsif ($source eq '::Filesystem') {
                 $current = eval{$self->filesystem};
+            } elsif ($source eq '::Deep') {
+                $current = eval{$self->deep(no_defaults => 1, default => undef)};
             }
         } elsif (!defined $current) {
             next;
@@ -562,6 +619,89 @@ sub _load_readonly {
     $pv->{$key} = {raw => $v};
 }
 
+sub _load_data_tagdb {
+    my ($self) = @_;
+    my $pv_current  = ($self->{properties_values} //= {})->{current} //= {};
+    my $pv_final    = ($self->{properties_values} //= {})->{final} //= {};
+
+    return if $self->{_loaded_data_tagdb};
+    $self->{_loaded_data_tagdb} = 1;
+
+    if (defined(my $db = eval {$self->db})) {
+        my $wk = $db->wk;
+        my %tags;
+        my %final_metadata = (
+            data_tagdb_size         => $wk->final_file_size,
+            data_tagdb_fetch_uri    => $db->tag_by_id(uuid => '96674c6c-cf5e-40cd-af1e-63b86e741f4f'),
+        );
+        my %final_relation = (
+            data_tagdb_encoding     => $wk->final_file_encoding,
+            data_tagdb_charset      => $db->tag_by_id(uuid => '99437f71-f1b5-4a50-8ecf-882b61b86b1e'),
+        );
+
+        foreach my $key (qw(data_uriid_result contentise inodeise ise)) {
+            my $tag = $self->get($key, as => 'Data::TagDB::Tag', default => undef) // next;
+            $tags{$tag->dbid} = $tag;
+        }
+
+        foreach my $tag (values %tags) {
+            my $given_size;
+
+            if (defined(my $displayname = $tag->displayname(default => undef, no_defaults => 1))) {
+                my $l = $pv_current->{data_tagdb_displayname} //= [];
+                push(@{$l}, {raw => $displayname});
+            }
+
+            foreach my $key (keys %final_metadata) {
+                my $relation = $final_metadata{$key} // next;
+                $db->metadata(tag => $tag, relation => $relation)->foreach(sub {
+                        my ($entry) = @_;
+                        my $l = $pv_final->{$key} //= [];
+                        push(@{$l}, {raw => $entry->data_raw});
+                    });
+            }
+
+            foreach my $key (keys %final_relation) {
+                my $relation = $final_relation{$key} // next;
+                $db->relation(tag => $tag, relation => $relation)->foreach(sub {
+                        my ($entry) = @_;
+                        my $l = $pv_final->{$key} //= [];
+                        push(@{$l}, {raw => $entry->related, rawtype => 'Data::TagDB::Tag'});
+                    });
+            }
+
+            if (defined(my $relation = $wk->final_file_hash)) {
+                $db->metadata(tag => $tag, relation => $relation)->foreach(sub {
+                        my ($entry) = @_;
+                        $given_size = $self->_set_digest_utag(final => $entry->data_raw, $given_size);
+                    });
+            }
+
+            push(@{$pv_final->{data_tagdb_size} //= []}, {raw => $given_size}) if defined $given_size;
+
+            {
+                my @size_values = map {int($_->{raw})} @{$pv_final->{data_tagdb_size}};
+                if (scalar @size_values) {
+                    $given_size //= $size_values[0];
+                    foreach my $size (@size_values) {
+                        if ($given_size != $size) {
+                            $given_size = undef;
+                            last;
+                        }
+                    }
+                    $pv_final->{data_tagdb_size} = defined($given_size) ? {raw => $given_size} : undef;
+                }
+            }
+
+            foreach my $key (keys(%final_metadata), keys(%final_relation)) {
+                if (ref($pv_final->{$key}) eq 'ARRAY' && scalar(@{$pv_final->{$key}}) == 1) {
+                    $pv_final->{$key} = $pv_final->{$key}->[0];
+                }
+            }
+        }
+    }
+}
+
 1;
 
 __END__
@@ -576,7 +716,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -697,7 +837,11 @@ The media type of the document.
 
 =item C<oid>
 
-The POD of the document.
+The OID of the document.
+
+=item C<pages>
+
+The number of pages in the document.
 
 =item C<readonly>
 
@@ -759,7 +903,7 @@ The return value is a hashref or an array of hashrefs which contain the followin
 
 =item C<name>
 
-The name of the digest in universal tag format (the format used in this module).
+The name of the property in universal tag format (the format used in this module).
 
 =back
 

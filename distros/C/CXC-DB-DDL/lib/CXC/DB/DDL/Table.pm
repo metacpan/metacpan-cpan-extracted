@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use List::Util qw( any );
 use Ref::Util  qw( is_ref is_arrayref is_coderef);
@@ -24,6 +24,9 @@ use experimental 'signatures', 'postderef', 'declared_refs';
 use namespace::clean -except => 'has';
 
 with 'CXC::DB::DDL::CloneClear';
+
+# use after namespace::clean to avoid cleaning out important bits.
+use MooX::StrictConstructor;
 
 my sub croak {
     require Carp;
@@ -421,7 +424,7 @@ CXC::DB::DDL::Table - CXC::DB::DDL Table class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 OBJECT ATTRIBUTES
 

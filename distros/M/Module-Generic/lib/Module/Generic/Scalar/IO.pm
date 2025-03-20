@@ -244,25 +244,37 @@ sub open
         $pl_mode .= ':scalar';
     }
     no warnings 'uninitialized';
-    open( $self, $pl_mode, $ref ) ||
+    local $@;
+    my $rv = eval
+    {
+        open( $self, $pl_mode, $ref );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to open( $self, $pl_mode, ", overload::StrVal( $ref ), " ) scalar reference: $@" ) );
+    }
+    elsif( !$rv )
+    {
         return( $self->error( "Unable to open( $self, $pl_mode, ", overload::StrVal( $ref ), " ) scalar reference: $!" ) );
+    }
+
     my $bit;
     my $bitmap = 
     {
-    '<'     => O_RDONLY,
-    # Incorrect, but let's catch it anyway
-    '<+'    => O_RDWR,
-    '+<'    => O_RDWR,
-    '>'     => ( O_CREAT | O_WRONLY ),
-    '+>'    => ( O_CREAT | O_RDWR ),
-    '>>'    => O_APPEND,
-    '+>>'   => ( O_RDWR | O_APPEND ),
-    'r'     => O_RDONLY,
-    'r+'    => O_RDWR,
-    'w'     => ( O_CREAT | O_WRONLY ),
-    'w+'    => ( O_CREAT | O_RDWR ),
-    'a'     => O_APPEND,
-    'a+'    => ( O_RDWR | O_APPEND ),
+        '<'     => O_RDONLY,
+        # Incorrect, but let's catch it anyway
+        '<+'    => O_RDWR,
+        '+<'    => O_RDWR,
+        '>'     => ( O_CREAT | O_WRONLY ),
+        '+>'    => ( O_CREAT | O_RDWR ),
+        '>>'    => O_APPEND,
+        '+>>'   => ( O_RDWR | O_APPEND ),
+        'r'     => O_RDONLY,
+        'r+'    => O_RDWR,
+        'w'     => ( O_CREAT | O_WRONLY ),
+        'w+'    => ( O_CREAT | O_RDWR ),
+        'a'     => O_APPEND,
+        'a+'    => ( O_RDWR | O_APPEND ),
     };
     
     # We set the bit for this glob, so fcntl works.

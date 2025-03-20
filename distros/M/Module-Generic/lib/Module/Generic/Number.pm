@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.1.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v2.2.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2024/05/05
+## Modified 2025/03/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -104,7 +104,7 @@ BEGIN
     # double floats.  To be safe, we cap at 2**53; use Math::BigFloat
     # instead for larger numbers.
     use constant MAX_INT => 2**53;
-    our( $VERSION ) = 'v2.1.1';
+    our( $VERSION ) = 'v2.2.0';
 };
 
 # use strict;
@@ -1487,6 +1487,8 @@ sub precede_pos { return( shift->_set_get_prop( 'precede', @_ ) ); }
 sub precision { return( shift->_set_get_prop( 'precision', @_ ) ); }
 
 sub rand { return( shift->_func( 'rand' ) ); }
+
+sub real { return( shift->{_number} ); }
 
 # sub round { return( $_[0]->clone( CORE::sprintf( '%.*f', CORE::int( CORE::length( $_[1] ) ? $_[1] : 0 ), $_[0]->{_number} ) ) ); }
 sub round

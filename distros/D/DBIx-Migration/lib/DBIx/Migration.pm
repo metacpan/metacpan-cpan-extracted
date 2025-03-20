@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Moo;
 use MooX::SetOnce;
@@ -11,13 +11,20 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
 use Try::Tiny               qw( catch try );
 use Types::Path::Tiny       qw( Dir );
+use Types::Standard         qw( ArrayRef Str );
 
 use namespace::clean -except => [ qw( before new ) ];
 
-has [ qw( dbh dsn ) ]           => ( is => 'lazy' );
-has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
-has [ qw( password username ) ] => ( is => 'ro' );
-has tracking_table              => ( is => 'ro', default => 'dbix_migration' );
+# 1st alternative set of constructor attributes
+has dsn                         => ( is => 'lazy', isa => Str );
+has [ qw( password username ) ] => ( is => 'ro',   isa => Str );
+# 2nd alternative set of constructor attributes
+has dbh => ( is => 'lazy' );
+
+has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
+has do_before      => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
+has do_while       => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
+has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
 
 sub _build_dbh {
   my $self = shift;
@@ -66,9 +73,6 @@ sub BUILD {
 }
 
 # overrideable
-sub adjust_migrate { }
-
-# overrideable
 sub quoted_tracking_table {
   my $self = shift;
 
@@ -104,10 +108,14 @@ sub migrate {
       }
     );
 
+    $Logger->debugf( "Execute 'before' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+      foreach @{ $self->do_before };
+
     $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;
 
-    $self->adjust_migrate;
+    $Logger->debugf( "Execute 'while' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+      foreach @{ $self->do_while };
 
     my $version = $self->version;
     $self->_initialize_tracking_table, $version = 0 unless defined $version;

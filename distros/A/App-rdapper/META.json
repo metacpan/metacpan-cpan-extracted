@@ -4,7 +4,7 @@
       "Gavin Brown <gavin.brown@fastmail.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
             "Net::ASN" : "0",
             "Net::DNS::Domain" : "0",
             "Net::IP" : "0",
-            "Net::RDAP" : "0.34",
+            "Net::RDAP" : "0.35",
             "Pod::Usage" : "0",
             "Term::ANSIColor" : "0",
             "Term::Size" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/gbxyz/rdapper"
       }
    },
-   "version" : "1.09",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

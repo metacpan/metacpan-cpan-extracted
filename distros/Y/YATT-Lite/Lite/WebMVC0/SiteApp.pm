@@ -513,7 +513,7 @@ sub trim_site_prefix {
 sub set_yatt_script_name {
   (my MY $self, my Env $env) = @_;
 
-  $env->{'yatt.script_name'} = do {
+  my $script_name = $env->{'yatt.script_name'} = do {
     if (not $self->{cf_no_trim_script_name}
         and $env->{REDIRECT_HANDLER}
         and ($env->{REDIRECT_STATUS} // 0) == 200
@@ -531,6 +531,11 @@ sub set_yatt_script_name {
       $env->{SCRIPT_NAME};
     }
   };
+
+  # script_dir = script_name + /
+  ($env->{'yatt.script_dir'} = $script_name // '') =~ s,/*\z,/,;
+
+  $script_name
 }
 
 sub split_path_info {
@@ -963,6 +968,11 @@ Entity script_name => sub {
   $env->{'yatt.script_name'};
 };
 
+Entity script_dir => sub {
+  my ($this) = @_;
+  my Env $env = $CON->env;
+  $env->{'yatt.script_dir'};
+};
 
 # GH-205
 # &yatt:SCRIPT_URI(); is original $env->{SCRIPT_URI}

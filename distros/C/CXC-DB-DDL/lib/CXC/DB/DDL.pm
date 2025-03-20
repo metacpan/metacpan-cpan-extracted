@@ -4,7 +4,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # ABSTRACT: DDL for table creation, based on SQL::Translator::Schema
 
@@ -16,7 +16,7 @@ use SQL::Translator::Schema;
 use SQL::Translator::Schema::Table;
 
 use Ref::Util qw( is_hashref is_arrayref );
-use CXC::DB::DDL::Util 'sqlt_producer_map';
+use CXC::DB::DDL::Util 'sqlt_entity_map', 'db_version';
 use CXC::DB::DDL::Failure;
 use CXC::DB::DDL::Table;
 use CXC::DB::DDL::Constants '-all';
@@ -233,9 +233,6 @@ sub sql ( $self, $dbh, $opt ) {
     );
     my $schema = $tr->schema;
 
-    my $db_version_arg = lc $dbh->{Driver}->{Name} . '_version';
-    my $db_version     = $dbh->get_info( $GetInfoType{SQL_DBMS_VER} );
-
     # create entire schema, as this ensures that all foreign key
     # dependencies are met
     $_->add_to_schema( $dbh, $schema ) for @tables;
@@ -244,18 +241,23 @@ sub sql ( $self, $dbh, $opt ) {
     # schema, so the DDL for them isn't created.
     $schema->drop_table( $_->name ) for $create == CREATE_ALWAYS ? () : @existing;
 
-    $tr->producer_args( {
-        $db_version_arg => $db_version,
-        no_transaction  => 1,             # we handle this ourselves.
-    } );
+    my $dbd      = $dbh->{Driver}->{Name};
+    my $guard    = wrap_producers( $dbd );                ## no critic(Variables::ProhibitUnusedVarsStricter)
+    my $producer = sqlt_entity_map( $dbd, 'producer' );
+
+    my %producer_args = (
+        no_transaction => 1,                              # we handle this ourselves.
+    );
+
+    if ( defined( my $db_version_arg = sqlt_entity_map( $dbd, 'db_version' ) ) ) {
+        $producer_args{$db_version_arg} = db_version( $dbh );
+    }
+
+    $tr->producer_args( \%producer_args );
 
     # SQL::Translator::translate() is calling context aware, so we need to
     # do the same.
     ## no critic (Community::Wantarray)
-
-    my $dbd      = $dbh->{Driver}->{Name};
-    my $guard    = wrap_producers( $dbd );                        ## no critic(Variables::ProhibitUnusedVarsStricter)
-    my $producer = sqlt_producer_map( $dbh->{Driver}->{Name} );
 
     if ( wantarray ) {
         my @res = $tr->translate( to => $producer );
@@ -293,7 +295,7 @@ signature_for create => (
 
 sub create ( $self, $dbh, $opt ) {
 
-    my @sql = $self->sql( $dbh, $opt );
+    my @sql = $self->sql( $dbh, $opt->%* );
     return unless @sql;
 
     my $in_txn = !$dbh->{AutoCommit};
@@ -401,7 +403,7 @@ CXC::DB::DDL - DDL for table creation, based on SQL::Translator::Schema
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -67,6 +67,6 @@
          "x_repository" : "https://github.com/nigelhorne/File-Open-NoCache-ReadOnly"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

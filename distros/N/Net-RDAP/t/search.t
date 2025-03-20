@@ -28,4 +28,19 @@ foreach my $object (@objects) {
     isa_ok($object, $base.'::Object::Nameserver');
 }
 
+$server = $class->new_for_tld(q{foo});
+
+isa_ok($server, $class);
+
+$result = $server->domains(name => q{nic.*});
+
+isa_ok($result, $base.'::SearchResult');
+
+my @objects = $result->domains;
+cmp_ok(scalar(@objects), '>=', 0);
+
+foreach my $object (@objects) {
+    isa_ok($object, $base.'::Object::Domain');
+}
+
 done_testing;

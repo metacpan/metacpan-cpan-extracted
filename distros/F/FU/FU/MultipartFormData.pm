@@ -1,4 +1,4 @@
-package FU::MultipartFormData 0.3;
+package FU::MultipartFormData 0.4;
 use v5.36;
 use Carp 'confess';
 use FU::Util 'utf8_decode';
@@ -123,7 +123,9 @@ module makes an attempt to avoid any further copies of data values.
 
 =head2 Parsing
 
-=over FU::MultipartFormData->parse($header, $body)
+=over
+
+=item FU::MultipartFormData->parse($header, $body)
 
 Returns an array of field objects from the given C<$header>, which must be a
 valid value for the C<Content-Type> request header, and the given C<$body>,

@@ -110,6 +110,7 @@ is json_format(
 }
 _
 
+is json_format('<hello & world>', html_safe => 1), '"\u003chello \u0026 world\u003e"';
 
 eval { json_format [[]], max_depth => 2 };
 like $@, qr/max_depth exceeded while formatting JSON/;

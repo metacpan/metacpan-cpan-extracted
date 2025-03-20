@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -18,12 +18,14 @@ use Fcntl qw(O_RDONLY O_NOFOLLOW SEEK_SET);
 use File::Spec;
 use File::Basename ();
 
+use Data::Identifier v0.08;
+use Data::Identifier::Generate v0.08;
+
 use File::Information::Inode;
+use File::Information::Deep;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
-my $HAVE_DATA_IDENTIFIER_GENERATE = eval {require Data::Identifier::Generate; 1};
-my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
 my $HAVE_DIGEST = eval {require Digest; 1;};
@@ -52,7 +54,7 @@ if ($HAVE_URI_FILE && $HAVE_DIGEST) {
     $_properties{link_thumbnail} = {loader => \&_load_thumbnail, rawtype => 'filename'};
 }
 
-if ($HAVE_DATA_IDENTIFIER) {
+{
     while (my ($key, $value) = each %_dot_comments_rating) {
         Data::Identifier->new(uuid => $value, displayname => $key)->register;
     }
@@ -68,7 +70,7 @@ sub _new {
 }
 
 
-#@returns File::Information::Inode;
+#@returns File::Information::Inode
 sub inode {
     my ($self) = @_;
 
@@ -88,6 +90,15 @@ sub inode {
     }
 
     return $self->{inode} // croak 'No Inode';
+}
+
+
+#@returns File::Information::Deep
+sub deep {
+    my ($self, %opts) = @_;
+    return $self->{deep} if defined $self->{deep};
+    return $opts{default} if exists $opts{no_defaults};
+    return $self->{deep} = File::Information::Deep->_new(instance => $self->instance, path => $self->{path}, parent => $self);
 }
 
 
@@ -187,15 +198,13 @@ sub _load_dotcomments {
                 push(@list, map {{raw => $_}} grep {length} split(/\s*,\s*/, $pv->{dotcomments_keywords}{raw}));
             }
 
-            if ($HAVE_DATA_IDENTIFIER_GENERATE) {
-                foreach my $entry (@list) {
-                    $entry->{'Data::Identifier'} = Data::Identifier::Generate->generic(
-                        displayname => $entry->{raw},
-                        request => $entry->{raw},
-                        style => 'name-based',
-                        namespace => 'eb239013-7556-4091-959f-4d78ca826757',
-                    );
-                }
+            foreach my $entry (@list) {
+                $entry->{'Data::Identifier'} = Data::Identifier::Generate->generic(
+                    displayname => $entry->{raw},
+                    request => $entry->{raw},
+                    style => 'name-based',
+                    namespace => 'eb239013-7556-4091-959f-4d78ca826757',
+                );
             }
 
             $pv->{dotcomments_categories} = \@list;
@@ -257,7 +266,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -280,6 +289,15 @@ See also L<File::Information::Inode>.
     my File::Information::Inode $inode = $link->inode;
 
 Provide the inode object for the current link.
+
+=head2 deep
+
+    my File::Information::Deep $deep = $link->deep;
+
+Provides a deep inspection object. This allows access to data internal to the file.
+
+See also
+L<File::Information::Deep>.
 
 =head2 filesystem
 

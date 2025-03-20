@@ -4,7 +4,7 @@
       "Gavin Brown <gavin.brown@fastmail.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Format::ISO8601" : "0",
+            "DateTime::Tiny" : "0",
             "Digest::SHA" : "0",
             "File::Basename" : "0",
             "File::Slurp" : "0",
@@ -54,8 +54,7 @@
             "Net::IP" : "0",
             "Test::More" : "0",
             "URI" : "0",
-            "XML::LibXML" : "0",
-            "vCard" : "0"
+            "XML::LibXML" : "0"
          }
       }
    },
@@ -70,6 +69,6 @@
          "web" : "https://github.com/gbxyz/perl-Net-RDAP"
       }
    },
-   "version" : "0.34",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

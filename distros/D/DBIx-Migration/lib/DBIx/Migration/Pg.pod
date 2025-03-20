@@ -6,30 +6,59 @@ DBIx::Migration::Pg - Seamless PostgreSQL database schema up- and downgrades
 
 =head1 SYNOPSIS
 
-  my $m = DBIx::Migration->new(
+  use DBIx::Migration::Pg ();
+
+  # Create Pg migration object
+  my $m = DBIx::Migration::Pg->new(
     dsn            => 'dbi:Pg:dbname=myapp.db;host=localhost;port=5432;user=postgres',
+    tracking_table => 'myapp_migration',
     managed_schema => 'myapp'
   );
 
 =head1 DESCRIPTION
 
-PostgreSQL supports schemas.
+PostgreSQL databases support
+L<schemas|https://www.postgresql.org/docs/current/ddl-schemas.html>. A schema
+can contain different kind of named objects like for example tables, data
+types, functions, and so on.
 
-For a PostgreSQL database you may set a managed schema (the schema of your
-single-schema application). By default the managed schema is C<public>. This
-class overrides the C<apply_managed_schema()> method. The method assigns the
-managed schema to the PostgreSQL C<search_path> connect option.
+An application that wants to use a PostgreSQL database can reserve one or more
+schemas for use. From the perspective of a migration framework these schemas
+are called managed schemas. The C<DBIx::Migration::Pg> class can cope with
+single managed schema applications.  The default managed schema is the
+C<public> schema. This schema usually exists. Considering the use case that
+more than one application uses the same PostgreSQL database, the default value
+should be changed for each application. At creation time of a
+C<DBIx::Migration::Pg> object you may use the C<managed_schema> attribute to
+overwrite the default managed schema.
 
 For a PostgreSQL database you may set a tracking schema (the schema of your
-tracking table) too. By default the tracking schema is C<public>.
+tracking table) too. By default the tracking schema is the C<public> schema.
+If you neither change this default nor the default of the tracking table a
+clash will occur if more than one application uses the same PostgreSQL
+database. At creation time of a C<DBIx::Migration::Pg> object you should either
+overwrite the C<tracking_table> attribute and/or the C<tracking_schema>
+attribute.
 
 =head1 ACCESSORS
 
 =over
 
+=item $self->do_before
+
+Get PostgreSQL database specific default list of SQL statements that are
+executed before the migration transaction begins.  The default list contains a
+single statement that assigns the managed schema to the C<search_path> option.
+
+=item $self->do_before
+
+Get PostgreSQL database specific default list of SQL statements that are
+executed immediately after the migration transaction was enabled.  The default
+list contains a single statement that locks the tracking table.
+
 =item $self->managed_schema
 
-Get schema that your single-schema application refers to.
+Get schema that your application refers to.
 
 =item $self->tracking_schema
 
@@ -40,10 +69,6 @@ Get schema that the tracking table belongs to.
 =head1 METHODS
 
 =over 
-
-=item $self->adjust_migrate
-
-Lock tracking table and set managed schema.
 
 =item $self->quoted_tracking_table
 
@@ -67,11 +92,7 @@ chapter tries to compare some of them. The content is work in progress.
 
 =over
 
-=item * L<PostgreSQL schemas|https://www.postgresql.org/docs/current/ddl-schemas.html>
-
-=item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
-
-=item * L<App::Sqitch>
+=item * L<Liquibase managed schema and tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
 =item * L<Mojo::Pg::Migrations>
 

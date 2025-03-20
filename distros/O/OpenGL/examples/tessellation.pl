@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 =head1 NAME
 
 tessellation.pl - Show workings of perl based tessellation

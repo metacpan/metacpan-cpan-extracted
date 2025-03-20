@@ -6,8 +6,11 @@ use HTTP::Date;
 use HTTP::Request::Common;
 use Mozilla::CA;
 use constant DEFAULT_CACHE_TTL => 300;
+use vars qw($DEBUG);
 use strict;
 use warnings;
+
+$DEBUG = exists($ENV{'NET_RDAP_UA_DEBUG'});
 
 #
 # create a new object, which is just an LWP::UserAgent with
@@ -24,16 +27,16 @@ sub new {
     return bless($package->SUPER::new(%options), $package);
 }
 
-sub send_request {
-    my ($self, $req) = @_;
+sub request {
+    my $self = shift;
 
-    print STDERR $req->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
+    print STDERR $_[0]->as_string if ($DEBUG);
 
-    my $res = $self->SUPER::send_request($req);
+    my $response = $self->SUPER::request(@_);
 
-    print STDERR $res->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));
+    print STDERR $response->as_string."\n" if ($DEBUG);
 
-    return $res;
+    return $response;
 }
 
 #
@@ -104,9 +107,16 @@ This module extends L<LWP::UserAgent> in order to inject various
 RDAP-related configuration settings and HTTP request headers. Nothing
 should ever need to use it.
 
+=head1 DEBUGGING HTTP TRANSACTIONS
+
+If you ever want to see what L<Net::RDAP::UA> sends and receives, set the
+L<Net::RDAP::UA::DEBUG> variable to a true value, or set the
+C<NET_RDAP_UA_DEBUG> environment variable. This will cause all HTTP requests
+and responses to be printed to C<STDERR>.
+
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

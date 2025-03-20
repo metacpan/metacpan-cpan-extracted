@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 # Constructor.
 sub new {
@@ -258,7 +258,38 @@ sub wikidata_isbn_10 {
 
 		my $publisher = $self->_isbn_publisher($isbn);
 		my $cover_qid = $self->_isbn_cover($isbn);
+		my @property_snaks;
+		if ($isbn->valid == 0) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => 'Q21441764',
+				),
+				'property' => 'P2241',
+			);
+		}
+		if (defined $publisher) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => $publisher->[0],
+				),
+				'property' => 'P123',
+			);
+		}
+		if (defined $cover_qid) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => $cover_qid,
+				),
+				'property' => 'P437',
+			);
+		}
 		push @ret, Wikibase::Datatype::Statement->new(
+			$isbn->valid == 0 ? (
+				'rank' => 'deprecated',
+			) : (),
 			'references' => [$self->wikidata_reference],
 			'snak' => Wikibase::Datatype::Snak->new(
 				'datatype' => 'external-id',
@@ -267,27 +298,8 @@ sub wikidata_isbn_10 {
 				),
 				'property' => 'P957',
 			),
-			defined $publisher ? (
-				'property_snaks' => [
-					Wikibase::Datatype::Snak->new(
-						'datatype' => 'wikibase-item',
-						'datavalue' => Wikibase::Datatype::Value::Item->new(
-							'value' => $publisher->[0],
-						),
-						'property' => 'P123',
-					),
-				],
-			) : (),
-			defined $cover_qid ? (
-				'property_snaks' => [
-					Wikibase::Datatype::Snak->new(
-						'datatype' => 'wikibase-item',
-						'datavalue' => Wikibase::Datatype::Value::Item->new(
-							'value' => $cover_qid,
-						),
-						'property' => 'P437',
-					),
-				],
+			@property_snaks ? (
+				'property_snaks' => \@property_snaks,
 			) : (),
 		);
 	}
@@ -315,7 +327,38 @@ sub wikidata_isbn_13 {
 
 		my $publisher = $self->_isbn_publisher($isbn);
 		my $cover_qid = $self->_isbn_cover($isbn);
+		my @property_snaks;
+		if ($isbn->valid == 0) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => 'Q21441764',
+				),
+				'property' => 'P2241',
+			);
+		}
+		if (defined $publisher) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => $publisher->[0],
+				),
+				'property' => 'P123',
+			);
+		}
+		if (defined $cover_qid) {
+			push @property_snaks, Wikibase::Datatype::Snak->new(
+				'datatype' => 'wikibase-item',
+				'datavalue' => Wikibase::Datatype::Value::Item->new(
+					'value' => $cover_qid,
+				),
+				'property' => 'P437',
+			);
+		}
 		push @ret, Wikibase::Datatype::Statement->new(
+			$isbn->valid == 0 ? (
+				'rank' => 'deprecated',
+			) : (),
 			'references' => [$self->wikidata_reference],
 			'snak' => Wikibase::Datatype::Snak->new(
 				'datatype' => 'external-id',
@@ -324,27 +367,8 @@ sub wikidata_isbn_13 {
 				),
 				'property' => 'P212',
 			),
-			defined $publisher ? (
-				'property_snaks' => [
-					Wikibase::Datatype::Snak->new(
-						'datatype' => 'wikibase-item',
-						'datavalue' => Wikibase::Datatype::Value::Item->new(
-							'value' => $publisher->[0],
-						),
-						'property' => 'P123',
-					),
-				],
-			) : (),
-			defined $cover_qid ? (
-				'property_snaks' => [
-					Wikibase::Datatype::Snak->new(
-						'datatype' => 'wikibase-item',
-						'datavalue' => Wikibase::Datatype::Value::Item->new(
-							'value' => $cover_qid,
-						),
-						'property' => 'P437',
-					),
-				],
+			@property_snaks ? (
+				'property_snaks' => \@property_snaks,
 			) : (),
 		);
 	}

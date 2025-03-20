@@ -1,0 +1,23 @@
+// input vertex
+struct VertIn
+{
+  float4 pos   : POSITION;
+  float4 color : COLOR0;
+};
+ 
+// output vertex
+struct VertOut
+{
+  float4 pos   : POSITION;
+  float4 color : COLOR0;
+};
+ 
+// vertex shader main entry
+VertOut main(VertIn IN)
+{
+  VertOut OUT;
+  OUT.pos     = IN.pos;
+  OUT.color   = IN.color;
+  OUT.color.z = 1.0f;
+  return OUT;
+}

@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 sub new {
@@ -64,7 +64,7 @@ File::Information::Lock - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

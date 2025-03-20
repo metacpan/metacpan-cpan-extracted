@@ -68,7 +68,6 @@ foreach my $test (@tests) {
             cmp_ok(scalar($entity->roles), '>', 0);
 
             isa_ok($entity->jcard, $class.q{::JCard});
-            isa_ok($entity->vcard, q{vCard});
         }
 
         foreach my $link ($object->links) {

@@ -19,12 +19,6 @@ my $hasShader = !$@;
 eval 'use Image::Magick';
 my $hasIM = !$@;
 
-# This does not seem to be needed and it adds an extra, unneeded
-# dependency to the build process.  Leaving this in as a comment
-# just in case it is being used somewhere here
-#
-# use Math::Trig;
-
 eval 'use Time::HiRes qw( gettimeofday )';
 my $hasHires = !$@;
 $|++;
@@ -86,7 +80,6 @@ my $key_mods =
 };
 
 # Some global variables.
-my $useMipMap = 1;
 my $hasFBO = 0;
 my $hasVBO = 0;
 my $hasFragProg = 0;
@@ -103,8 +96,7 @@ my $Inset_Width = 90;
 my $Inset_Height = 90;
 my $Window_State;
 
-# Texture dimanesions
-#my $Tex_File = 'test.jpg';
+# Texture dimensions
 my $Tex_File = 'test.tga';
 my $Tex_Width = 128;
 my $Tex_Height = 128;
@@ -149,9 +141,11 @@ my @Light_Ambient  = ( 0.1, 0.1, 0.1, 1.0 );
 my @Light_Diffuse  = ( 1.2, 1.2, 1.2, 1.0 );
 my @Light_Position = ( 2.0, 2.0, 0.0, 1.0 );
 
-# Model/Projection/Viewport Matrices
+# Model/Projection/Texture/Colour Matrices, Viewport vector
 my $mm = OpenGL::Array->new(16,GL_DOUBLE);
 my $pm = OpenGL::Array->new(16,GL_DOUBLE);
+my $tm = OpenGL::Array->new(16,GL_DOUBLE);
+my $cm = OpenGL::Array->new(16,GL_DOUBLE);
 my $vp = OpenGL::Array->new(4,GL_INT);
 
 # Vertex Buffer Object data
@@ -162,32 +156,44 @@ my @verts =
   -1.0, -1.3, -1.0,
   1.0, -1.3, -1.0,
   1.0, -1.3,  1.0,
+  1.0, -1.3,  1.0,
   -1.0, -1.3,  1.0,
+  -1.0, -1.3, -1.0,
 
   -1.0,  1.3, -1.0,
   -1.0,  1.3,  1.0,
   1.0,  1.3,  1.0,
+  1.0,  1.3,  1.0,
   1.0,  1.3, -1.0,
+  -1.0,  1.3, -1.0,
 
   -1.0, -1.0, -1.3,
   -1.0,  1.0, -1.3,
   1.0,  1.0, -1.3,
+  1.0,  1.0, -1.3,
   1.0, -1.0, -1.3,
+  -1.0, -1.0, -1.3,
 
   1.3, -1.0, -1.0,
   1.3,  1.0, -1.0,
   1.3,  1.0,  1.0,
+  1.3,  1.0,  1.0,
   1.3, -1.0,  1.0,
+  1.3, -1.0, -1.0,
 
   -1.0, -1.0,  1.3,
   1.0, -1.0,  1.3,
   1.0,  1.0,  1.3,
+  1.0,  1.0,  1.3,
   -1.0,  1.0,  1.3,
+  -1.0, -1.0,  1.3,
 
   -1.3, -1.0, -1.0,
   -1.3, -1.0,  1.0,
   -1.3,  1.0,  1.0,
-  -1.3,  1.0, -1.0
+  -1.3,  1.0,  1.0,
+  -1.3,  1.0, -1.0,
+  -1.3, -1.0, -1.0,
 );
 my $verts = OpenGL::Array->new_list(GL_FLOAT,@verts);
 
@@ -195,11 +201,17 @@ my $verts = OpenGL::Array->new_list(GL_FLOAT,@verts);
 my @norms =
 (
   0.0, -1.0, 0.0,
+  0.0, -1.0, 0.0,
+  0.0, 1.0, 0.0,
   0.0, 1.0, 0.0,
   0.0, 0.0,-1.0,
+  0.0, 0.0,-1.0,
+  1.0, 0.0, 0.0,
   1.0, 0.0, 0.0,
   0.0, 0.0, 1.0,
-  -1.0, 0.0, 0.0
+  0.0, 0.0, 1.0,
+  -1.0, 0.0, 0.0,
+  -1.0, 0.0, 0.0,
 );
 my $norms = OpenGL::Array->new_list(GL_FLOAT,@norms);
 
@@ -209,17 +221,25 @@ my @colors =
   0.9,0.2,0.2,.75,
   0.9,0.2,0.2,.75,
   0.9,0.2,0.2,.75,
+  0.9,0.2,0.2,.75,
+  0.9,0.2,0.2,.75,
 
   0.5,0.5,0.5,.5,
   0.5,0.5,0.5,.5,
   0.5,0.5,0.5,.5,
   0.5,0.5,0.5,.5,
+  0.5,0.5,0.5,.5,
+  0.5,0.5,0.5,.5,
 
   0.2,0.9,0.2,.5,
   0.2,0.9,0.2,.5,
   0.2,0.9,0.2,.5,
   0.2,0.9,0.2,.5,
+  0.2,0.9,0.2,.5,
+  0.2,0.9,0.2,.5,
 
+  0.2,0.2,0.9,.25,
+  0.2,0.2,0.9,.25,
   0.2,0.2,0.9,.25,
   0.2,0.2,0.9,.25,
   0.2,0.2,0.9,.25,
@@ -228,12 +248,16 @@ my @colors =
   0.9, 0.2, 0.2, 0.5,
   0.2, 0.9, 0.2, 0.5,
   0.2, 0.2, 0.9, 0.5,
+  0.2, 0.2, 0.9, 0.5,
   0.1, 0.1, 0.1, 0.5,
+  0.9, 0.2, 0.2, 0.5,
 
   0.9,0.9,0.2,0.0,
   0.9,0.9,0.2,0.66,
   0.9,0.9,0.2,1.0,
-  0.9,0.9,0.2,0.33
+  0.9,0.9,0.2,1.0,
+  0.9,0.9,0.2,0.33,
+  0.9,0.9,0.2,0.0,
 );
 my $colors = OpenGL::Array->new_list(GL_FLOAT,@colors);
 
@@ -242,11 +266,12 @@ my @rainbow =
   0.9, 0.2, 0.2, 0.5,
   0.2, 0.9, 0.2, 0.5,
   0.2, 0.2, 0.9, 0.5,
-  0.1, 0.1, 0.1, 0.5
+  0.2, 0.2, 0.9, 0.5,
+  0.1, 0.1, 0.1, 0.5,
+  0.9, 0.2, 0.2, 0.5,
 );
-
 my $rainbow = OpenGL::Array->new_list(GL_FLOAT,@rainbow);
-my $rainbow_offset = 64;
+my $rainbow_offset = 96;
 my @rainbow_inc;
 
 my @texcoords =
@@ -254,36 +279,48 @@ my @texcoords =
   0.800, 0.800,
   0.200, 0.800,
   0.200, 0.200,
+  0.200, 0.200,
   0.800, 0.200,
+  0.800, 0.800,
 
   0.005, 1.995,
   0.005, 0.005,
   1.995, 0.005,
+  1.995, 0.005,
   1.995, 1.995,
+  0.005, 1.995,
 
   0.995, 0.005,
   2.995, 2.995,
   0.005, 0.995,
+  0.005, 0.995,
   -1.995, -1.995,
+  0.995, 0.005,
 
   0.995, 0.005,
   0.995, 0.995,
   0.005, 0.995,
+  0.005, 0.995,
   0.005, 0.005,
+  0.995, 0.005,
 
   -0.5, -0.5,
   1.5, -0.5,
   1.5, 1.5,
+  1.5, 1.5,
   -0.5, 1.5,
+  -0.5, -0.5,
 
   0.005, 0.005,
   0.995, 0.005,
   0.995, 0.995,
-  0.005, 0.995
+  0.995, 0.995,
+  0.005, 0.995,
+  0.005, 0.005,
 );
 my $texcoords = OpenGL::Array->new_list(GL_FLOAT,@texcoords);
 
-my @indices = (0..23);
+my @indices = (0..35);
 my $indices = OpenGL::Array->new_list(GL_UNSIGNED_INT,@indices);
 
 my @xform =
@@ -291,10 +328,18 @@ my @xform =
   1.0, 0.0, 0.0, 0.0,
   0.0, 1.0, 0.0, 0.0,
   0.0, 0.0, 1.0, 0.0,
-  0.0, 0.0, 0.0, 1.0
+  0.0, 0.0, 0.0, 1.0,
 );
 my $xform = OpenGL::Array->new_list(GL_FLOAT,@xform);
 
+my @fpsbox_coords = (
+    0.0, -2.0, 0.0,
+    0.0, 12.0, 0.0,
+  140.0, 12.0, 0.0,
+  140.0, 12.0, 0.0,
+  140.0, -2.0, 0.0,
+    0.0, -2.0, 0.0,
+);
 
 # ------
 # Frames per second (FPS) statistic variables and routine.
@@ -341,11 +386,12 @@ sub ourPrintString
 sub ourInitVertexBuffers
 {
   # Set initial colors for rainbow face
-  for (my $i=0; $i<16; $i++)
-  {
-    $rainbow[$i] = rand(1.0);
-    $rainbow_inc[$i] = 0.01 - rand(0.02);
-  }
+  @rainbow = map [map rand(1.0), 0..3], 0..3;
+  @rainbow = @rainbow[0,1,2,2,3,0];
+  @rainbow = map @$_, @rainbow;
+  @rainbow_inc = map [map 0.01 - rand(0.02), 0..3], 0..3;
+  @rainbow_inc = @rainbow_inc[0,1,2,2,3,0];
+  @rainbow_inc = map @$_, @rainbow_inc;
 
   # Initialize VBOs if supported
   if ($hasVBO)
@@ -355,7 +401,6 @@ sub ourInitVertexBuffers
     ($VertexObjID,$NormalObjID,$ColorObjID,$TexCoordObjID,$IndexObjID) =
       glGenBuffersARB_p(5);
 
-    #glBindBufferARB(GL_ARRAY_BUFFER_ARB, $VertexObjID);
     $verts->bind($VertexObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $verts, GL_STATIC_DRAW_ARB);
     glVertexPointer_c(3, GL_FLOAT, 0, 0);
@@ -376,24 +421,20 @@ sub ourInitVertexBuffers
       print "  glGetBufferSubDataARB_p: $ords\n";
     }
 
-    #glBindBufferARB(GL_ARRAY_BUFFER_ARB, $NormalObjID);
     $norms->bind($NormalObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $norms, GL_STATIC_DRAW_ARB);
     glNormalPointer_c(GL_FLOAT, 0, 0);
 
-    #glBindBufferARB(GL_ARRAY_BUFFER_ARB, $ColorObjID);
     $colors->bind($ColorObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $colors, GL_DYNAMIC_DRAW_ARB);
     $rainbow->assign(0,@rainbow);
     glBufferSubDataARB_p(GL_ARRAY_BUFFER_ARB, $rainbow_offset, $rainbow);
     glColorPointer_c(4, GL_FLOAT, 0, 0);
 
-    #glBindBufferARB(GL_ARRAY_BUFFER_ARB, $TexCoordObjID);
     $texcoords->bind($TexCoordObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $texcoords, GL_STATIC_DRAW_ARB);
     glTexCoordPointer_c(2, GL_FLOAT, 0, 0);
 
-    #glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $IndexObjID);
     $indices->bind($IndexObjID);
     glBufferDataARB_p(GL_ELEMENT_ARRAY_BUFFER_ARB, $indices, GL_STATIC_DRAW_ARB);
   }
@@ -416,7 +457,6 @@ sub ourInit
   printf("\nUsing POGL v$OpenGL::VERSION\n");
 
   # Build texture.
-  ($TextureID_image,$TextureID_FBO) = glGenTextures_p(2);
   ourBuildTextures();
   glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
 
@@ -493,7 +533,12 @@ sub ourBuildTextures
   # Build texture from scratch if OpenGL::Image not available
   else
   {
-    my $hole_size = 3300; # ~ == 57.45 ^ 2.
+    my $hole_size = int(($Tex_Width / 2.2) ** 2);
+    my $hole_border = int($hole_size/30);
+    my $w_2 = $Tex_Width/2;
+    my $w_4 = $Tex_Width/4;
+    my $w_16 = $Tex_Width/16;
+    my $w_32 = $Tex_Width/32;
     # Iterate across the texture array.
     for(my $y=0; $y<$Tex_Height; $y++)
     {
@@ -501,7 +546,7 @@ sub ourBuildTextures
       {
         # A simple repeating squares pattern.
         # Dark blue on white.
-        if ( ( ($x+4)%32 < 8 ) && ( ($y+4)%32 < 8))
+        if ( ( ($x+$w_32)%$w_4 < $w_16 ) && ( ($y+$w_32)%$w_4 < $w_16))
         {
           $tex .= pack "C3", 0,0,120;       # Dark blue
         }
@@ -512,13 +557,13 @@ sub ourBuildTextures
 
         # Make a round dot in the texture's alpha-channel.
         # Calculate distance to center (squared).
-        my $t = ($x-64)*($x-64) + ($y-64)*($y-64);
+        my $t = ($x-$w_2)*($x-$w_2) + ($y-$w_2)*($y-$w_2);
 
         if ( $t < $hole_size)
         {
           $tex .= pack "C", 255;  # The dot itself is opaque.
         }
-        elsif ($t < $hole_size + 100)
+        elsif ($t < $hole_size + $hole_border)
         {
           $tex .= pack "C", 128;  # Give our dot an anti-aliased edge.
         }
@@ -538,32 +583,17 @@ sub ourBuildTextures
   glBindTexture(GL_TEXTURE_2D, $TextureID_image);
 
   # Use MipMap
-  if ($useMipMap)
+  print "Using Mipmap\n";
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    GL_NEAREST_MIPMAP_LINEAR);
+  # The GLU library helps us build MipMaps for our texture.
+  if (($gluerr = gluBuild2DMipmaps_c(GL_TEXTURE_2D, $Tex_Type,
+    $Tex_Width, $Tex_Height, $Tex_Format, $Tex_Size,
+    $Tex_Pixels->ptr())))
   {
-    print "Using Mipmap\n";
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-      GL_NEAREST_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      GL_NEAREST_MIPMAP_LINEAR);
-
-    # The GLU library helps us build MipMaps for our texture.
-    if (($gluerr = gluBuild2DMipmaps_c(GL_TEXTURE_2D, $Tex_Type,
-      $Tex_Width, $Tex_Height, $Tex_Format, $Tex_Size,
-      $Tex_Pixels->ptr())))
-    {
-      printf STDERR "GLULib%s\n", gluErrorString($gluerr);
-      exit(-1);
-    }
-  }
-  # Use normal texture - Note: dimensions must be power of 2
-  else
-  {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    glTexImage2D_c(GL_TEXTURE_2D, 0, $Tex_Type, $Tex_Width, $Tex_Height,
-      0, $Tex_Format, $Tex_Size, $Tex_Pixels->ptr());
+    die sprintf "GLULib%s\n", gluErrorString($gluerr);
   }
 
   # Benchmarks for Image Loading
@@ -629,16 +659,16 @@ sub ourBuildTextures
     ($FrameBufferID) = glGenFramebuffersEXT_p(1);
     ($RenderBufferID) = glGenRenderbuffersEXT_p(1);
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, $FrameBufferID);
-    glBindTexture(GL_TEXTURE_2D, $TextureID_FBO);
-
     # Initiate texture
+    glBindTexture(GL_TEXTURE_2D, $TextureID_FBO);
     glTexImage2D_c(GL_TEXTURE_2D, 0, $Tex_Type, $Tex_Width, $Tex_Height,
       0, $Tex_Format, $Tex_Size, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glGenerateMipmapEXT(GL_TEXTURE_2D);
 
     # Bind texture/frame/render buffers
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, $FrameBufferID);
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
       GL_TEXTURE_2D, $TextureID_FBO, 0);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, $RenderBufferID);
@@ -648,11 +678,9 @@ sub ourBuildTextures
       GL_RENDERBUFFER_EXT, $RenderBufferID);
 
     # Test status
-    if (DO_TESTS)
-    {
-      my $stat = glCheckFramebufferStatusEXT(GL_RENDERBUFFER_EXT);
-      printf("FBO Status: %04X\n",$stat);
-    }
+    my $stat = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    die "FBO Status error: " . gluErrorString(glGetError()) if !$stat;
+    die sprintf "FBO Status: %04X", $stat if $stat != GL_FRAMEBUFFER_COMPLETE_EXT;
   }
 
   # Select active texture
@@ -709,32 +737,25 @@ sub ourInitShaders
 
     # NOP Vertex shader
     my $VertexProg = qq
-    {!!ARBvp1.0
-      PARAM center = program.local[0];
-      PARAM xform[4] = {program.local[1..4]};
-      TEMP vertexClip;
-
-      # ModelView projection
-      DP4 vertexClip.x, state.matrix.mvp.row[0], vertex.position;
-      DP4 vertexClip.y, state.matrix.mvp.row[1], vertex.position;
-      DP4 vertexClip.z, state.matrix.mvp.row[2], vertex.position;
-      DP4 vertexClip.w, state.matrix.mvp.row[3], vertex.position;
-
-      # Additional transform, via matrix variable
-      DP4 vertexClip.x, vertexClip, xform[0];
-      DP4 vertexClip.y, vertexClip, xform[1];
-      DP4 vertexClip.z, vertexClip, xform[2];
-      DP4 vertexClip.w, vertexClip, xform[3];
-
-      #SUB result.position, vertexClip, center;
-      MOV result.position, vertexClip;
-
-      # Pass through color
-      MOV result.color, vertex.color;
-
-      # Pass through texcoords
-      SUB result.texcoord[0], vertex.texcoord, center;
-      END
+      {uniform vec4 center;
+      uniform mat4 xform;
+      void main(void)
+      {
+        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+        gl_Position *= xform;
+        // Calc texcoord values
+        vec4 pos = gl_Vertex;
+        float d = sqrt(pos.x * pos.x + pos.y * pos.y);
+        float a = atan(pos.x/pos.y) / 3.1415;
+        if (a < 0.0) a += 1.0;
+        a *= 2.0;
+        a -= float(int(a));
+        pos -= center;
+        float h = pos.z;
+        h = abs(2.0 * atan(h/d) / 3.1415);
+        gl_TexCoord[0].x = a;
+        gl_TexCoord[0].y = h;
+      }
     };
 
     glBindProgramARB(GL_VERTEX_PROGRAM_ARB, $VertexProgID);
@@ -758,19 +779,15 @@ sub ourInitShaders
       print "Vertex Prog: $vprog\n";
     }
 
-    # Lazy Metalic Fragment shader
+    # Lazy Metallic Fragment shader
     my $FragProg = qq
-    {!!ARBfp1.0
-      PARAM surfacecolor = program.local[5];
-      TEMP color;
-      MUL color, fragment.texcoord[0].y, 2.0;
-      ADD color, 1.0, -color;
-      ABS color, color;
-      ADD color, 1.01, -color;  #Some cards have a rounding error
-      MOV color.a, 1.0;
-      MUL color, color, surfacecolor;
-      MOV result.color, color;
-      END
+      {uniform vec4 surfacecolor;
+      void main (void)
+      {
+         float v = 2.0 * gl_TexCoord[0].y;
+         v = 1.01 - abs(1.0 - v);  // Some cards have a rounding error
+         gl_FragColor = vec4(v,v,v, 1.0) * surfacecolor;
+      }
     };
 
     glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, $FragProgID);
@@ -807,8 +824,9 @@ sub cbRenderScene
   {
     $FBO_rendered = 1;
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, $FrameBufferID);
+    glViewport(0, 0, $Tex_Width, $Tex_Height);
     glPushMatrix();
-    glTranslatef(-0.35, -0.48, -1.5);
+    glTranslatef(0, 0, -1.5);
     glRotatef($Teapot_Rot--, 0.0, 1.0, 0.0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -842,9 +860,11 @@ sub cbRenderScene
     }
 
     glColor3f(1.0, 1.0, 1.0);
-    #glutSolidTeapot(0.125);
-    glutWireTeapot(0.125);
+    #glutSolidTeapot(0.25);
+    glutWireTeapot(0.25);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindTexture(GL_TEXTURE_2D, $TextureID_FBO);
+    glGenerateMipmapEXT(GL_TEXTURE_2D);
 
     if ($Shader)
     {
@@ -888,7 +908,7 @@ sub cbRenderScene
   {
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   }
-  # If we're blending, we don'$t want z-buffering.
+  # If we're blending, we don't want z-buffering.
   if ($Blend_On)
   {
     glDisable(GL_DEPTH_TEST);
@@ -952,14 +972,15 @@ sub cbRenderScene
 
 
   # Render cube
+  glViewport(0, 0, $Window_Width, $Window_Height);
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  for (my $i=0; $i<scalar(@indices); $i+=4)
+  for (my $i=0; $i<scalar(@indices); $i+=3)
   {
-    glDrawArrays(GL_QUADS, $i, 4);
+    glDrawArrays(GL_TRIANGLES, $i, 3);
   }
 
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -985,7 +1006,7 @@ sub cbRenderScene
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_LIGHTING);
 
-  # We don'$t want depth-testing either.
+  # We don't want depth-testing either.
   glDisable(GL_DEPTH_TEST);
 
   # But, for fun, let's make the text partially transparent too.
@@ -1017,7 +1038,7 @@ sub cbRenderScene
   $buf = sprintf "Inset: %d", $Inset_On;
   glRasterPos2i(2,74); ourPrintString(GLUT_BITMAP_HELVETICA_12,$buf);
 
-  # Now we want to render the calulated FPS at the top.
+  # Now we want to render the calculated FPS at the top.
   # To ease, simply translate up.  Note we're working in screen
   # pixels in this projection.
   glTranslatef(6.0,$Window_Height - 14,0.0);
@@ -1025,12 +1046,10 @@ sub cbRenderScene
   # Make sure we can read the FPS section by first placing a
   # dark, mostly opaque backdrop rectangle.
   glColor4f(0.2,0.2,0.2,0.75);
-
-  glBegin(GL_QUADS);
-  glVertex3f(  0.0, -2.0, 0.0);
-  glVertex3f(  0.0, 12.0, 0.0);
-  glVertex3f(140.0, 12.0, 0.0);
-  glVertex3f(140.0, -2.0, 0.0);
+  glBegin(GL_TRIANGLES);
+  for (my $i=0; $i<scalar(@fpsbox_coords); $i+=3) {
+    glVertex3f(@fpsbox_coords[$i..$i+2]);
+  }
   glEnd();
 
   glColor4f(0.9,0.2,0.2,.75);
@@ -1323,6 +1342,14 @@ sub cbKeyPressed
   {
     Capture(Save=>'capture.tga');
   }
+  elsif ($c eq 'W')
+  {
+    $Z_Off += 0.5;
+  }
+  elsif ($c eq 'X')
+  {
+    $Z_Off -= 0.5;
+  }
   else
   {
     printf "KP: No action for %d.\n", $key;
@@ -1435,45 +1462,45 @@ sub cbMouseClick
   # Example of using GLU to determine 3D click points
   if ($state == GLUT_UP)
   {
-    print "\n";
-
-    glGetDoublev_c(GL_MODELVIEW_MATRIX,$mm->ptr());
-    my @model = $mm->retrieve(0,16);
-
-    glGetDoublev_c(GL_PROJECTION_MATRIX,$pm->ptr());
-    my @projection = $pm->retrieve(0,16);
-
-    glGetIntegerv_c(GL_VIEWPORT,$vp->ptr());
-    my @viewport = $vp->retrieve(0,4);
-
-    print "Model Matrix:      $model[0], $model[1], $model[2], $model[3]\n";
-    print "                   $model[4], $model[5], $model[6], $model[7]\n";
-    print "                   $model[8], $model[9], $model[10], $model[11]\n";
-    print "                   $model[12], $model[13], $model[14], $model[15]\n";
-
-    print "Projection Matrix: $projection[0], $projection[1], $projection[2], $projection[3]\n";
-    print "                   $projection[4], $projection[5], $projection[6], $projection[7]\n";
-    print "                   $projection[8], $projection[9], $projection[10], $projection[11]\n";
-    print "                   $projection[12], $projection[13], $projection[14], $projection[15]\n";
-
-    print "Viewport: $viewport[0], $viewport[1], $viewport[2], $viewport[3]\n";
-    print "\n";
-
+    my ($model, $projection, $viewport) = dumpMatrices();
     my @point = gluUnProject_p($x,$y,0,	# Cursor point
-      @model,				# Model Matrix
-      @projection,			# Projection Matrix
-      @viewport);			# Viewport
+      @$model,				# Model Matrix
+      @$projection,			# Projection Matrix
+      @$viewport);			# Viewport
     print "Model point: $point[0], $point[1], $point[2]\n";
-
-#    @point = gluProject_p(@point,	# Model point
-#      @model,				# Model Matrix
-#      @projection,			# Projection Matrix
-#      @viewport);			# Viewport
-#    print "Window point: $point[0], $point[1], $point[2]\n";
+#      @point = gluProject_p(@point,	# Model point
+#        @model,				# Model Matrix
+#        @projection,			# Projection Matrix
+#        @viewport);			# Viewport
+#      print "Window point: $point[0], $point[1], $point[2]\n";
     print "\n";
   }
 
   $idleTime = $hasHires ? gettimeofday() : time();
+}
+
+sub dumpMatrices
+{
+  print "\n";
+  glGetDoublev_c(GL_MODELVIEW_MATRIX,$mm->ptr());
+  my @model = $mm->retrieve(0,16);
+  glGetDoublev_c(GL_PROJECTION_MATRIX,$pm->ptr());
+  my @projection = $pm->retrieve(0,16);
+  glGetDoublev_c(GL_PROJECTION_MATRIX,$tm->ptr());
+  my @texture = $tm->retrieve(0,16);
+  glGetDoublev_c(GL_PROJECTION_MATRIX,$cm->ptr());
+  my @colours = $cm->retrieve(0,16);
+  for (['Model',\@model], ['Projection',\@projection], ['Texture',\@texture], ['Colour',\@colours]) {
+    printf "%-19s$_->[1][0], $_->[1][1], $_->[1][2], $_->[1][3]\n", "$_->[0] Matrix:";
+    print "                   $_->[1][4], $_->[1][5], $_->[1][6], $_->[1][7]\n";
+    print "                   $_->[1][8], $_->[1][9], $_->[1][10], $_->[1][11]\n";
+    print "                   $_->[1][12], $_->[1][13], $_->[1][14], $_->[1][15]\n";
+  }
+  glGetIntegerv_c(GL_VIEWPORT,$vp->ptr());
+  my @viewport = $vp->retrieve(0,4);
+  print "Viewport: $viewport[0], $viewport[1], $viewport[2], $viewport[3]\n";
+  print "\n";
+  (\@model, \@projection, \@viewport);
 }
 
 sub GetKeyModifier
@@ -1612,7 +1639,6 @@ foreach my $ext (sort @extensions)
 
 if (!OpenGL::glpCheckExtension('GL_ARB_vertex_buffer_object'))
 {
-  #$hasVBO = 1;
   # Perl 5.10 crashes on VBOs!
   $hasVBO = ($PERL_VERSION !~ m|^5\.10\.|);
 }
@@ -1682,5 +1708,12 @@ glutMainLoop();
 print "Returned from glutMainLoop\n";
 
 print "Exiting in main thread\n";
+if ($^O ne 'MSWin32') {
+  my $errors = '';
+  while((my $err = glGetError()) != 0) {
+    $errors .= "glError: " . gluErrorString($err) . "\n";
+  }
+  die $errors if $errors;
+}
 
 __END__

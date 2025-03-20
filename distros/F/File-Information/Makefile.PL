@@ -18,7 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "File::Information",
   "PREREQ_PM" => {
     "Carp" => "1.35",
+    "Data::Identifier" => "0.8.0",
     "File::Spec" => "3.84",
+    "Scalar::Util" => "1.62",
     "Sys::Hostname" => "1.20"
   },
   "TEST_REQUIRES" => {
@@ -26,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.05",
+  "VERSION" => "v0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +37,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
+  "Data::Identifier" => "0.8.0",
   "File::Spec" => "3.84",
+  "Scalar::Util" => "1.62",
   "Sys::Hostname" => "1.20",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",

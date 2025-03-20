@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.7
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.8
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2024/09/05
+## Modified 2025/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,9 @@ BEGIN
     use Data::UUID;
     use Module::Generic::File qw( file sys_tmpdir );
     # use Nice::Try;
-    use JSON 4.03 qw( -convert_blessed_universally );
+    # This is disruptive for everybody. Bad idea.
+    # use JSON 4.03 qw( -convert_blessed_universally );
+    use JSON 4.03;
     use Scalar::Util ();
     # use Storable 3.25 ();
     use Storable::Improved v0.1.3;
@@ -28,7 +30,7 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.7';
+    our $VERSION = 'v0.2.8';
 };
 
 use strict;
@@ -911,7 +913,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.7
+    v0.2.8
 
 =head1 DESCRIPTION
 

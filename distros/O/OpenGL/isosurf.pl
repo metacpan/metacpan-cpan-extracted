@@ -294,13 +294,6 @@ my $WindowId;
       exit(0);
    }
 
-#   /* Make sure server supports the vertex array extension */
-#    $extensions = glGetString( GL_EXTENSIONS );
-#    if ($extensions !~ /\bGL_EXT_vertex_array\b/
-# 	or OpenGL::_have_glp and not OpenGL::_have_glx and 0) { # OS/2 reports wrong
-#       $use_vertex_arrays = GL_FALSE;
-#    }
-#    print "Extensions: '$extensions'.\n";
    if (defined &OpenGL::glVertexPointerEXT_c) {
      print "Using Vertex Array...\n";
    } else {
@@ -316,12 +309,4 @@ my $WindowId;
    glutDisplayFunc(\&Draw);
    glutMainLoop();
 
-# This leaves GLUT running (at least under OS/2...).
-
-#sub MyExit {
-#  exit shift if $WindowId <= 0;
-#  glutDestroyWindow($WindowId);
-#  warn "Exiting...\n";
-#}
-
-sub MyExit { exit }		# Segfaults under OS/2...
+sub MyExit { exit }

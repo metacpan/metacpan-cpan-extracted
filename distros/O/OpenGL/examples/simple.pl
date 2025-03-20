@@ -1,11 +1,5 @@
-#!/usr/local/bin/perl
-#
 # simple example taken from listing 1-1 (or 1-2) from OpenGL book
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
 
 glpOpenWindow;

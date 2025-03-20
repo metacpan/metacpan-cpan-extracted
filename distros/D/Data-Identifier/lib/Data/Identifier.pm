@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -199,6 +199,25 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
     }
 }
 
+{
+    # ISE -> namespace
+    my %namespaces_uint = (
+        '2bffc55d-7380-454e-bd53-c5acd525d692' => '744eaf4e-ae93-44d8-9ab5-744105222da6', # roaraudio-error-number: roaraudio-error-namespace
+        '4a7fc2e2-854b-42ec-b24f-c7fece371865' => 'ac59062c-6ba2-44de-9f54-09e28f2c0b5c', # e621-post-identifier: e621-post-namespace
+        'a0a4fae2-be6f-4a51-8326-6110ba845a16' => '69b7ff38-ca78-43a8-b9ea-66cb02312eef', # e621-pool-identifier: e621-pool-namespace
+    );
+
+    foreach my $ise (keys %namespaces_uint) {
+        my $identifier = __PACKAGE__->new(ise => $ise);
+        $identifier->{namespace}    //= __PACKAGE__->new(ise => $namespaces_uint{$ise});
+        $identifier->{validate}     //= RE_UINT;
+        $identifier->{generate}     //= 'id-based';
+        $identifier->register; # re-register
+    }
+
+    # validate => RE_QID, namespace => NS_FC, generate => 'id-based'
+}
+
 # Call this after after we loaded all our stuff and before anyone else will register stuff:
 __PACKAGE__->_known_provider('wellknown');
 
@@ -219,15 +238,15 @@ sub new {
                 }
             } elsif ($id->isa('URI')) {
                 $type = 'uri';
+            } elsif ($id->isa('Data::URIID::Result')) {
+                $opts{displayname} //= sub { return $from->attribute('displayname', default => undef) };
+                $type = $id->id_type;
+                $id   = $id->id;
             } elsif ($id->isa('Data::URIID::Base') || $id->isa('Data::URIID::Colour') || $id->isa('Data::URIID::Service')) {
                 #$opts{displayname} //= $id->name if $id->isa('Data::URIID::Service');
                 $opts{displayname} //= $id->displayname(default => undef, no_defaults => 1);
                 $type = 'ise';
                 $id   = $id->ise;
-            } elsif ($id->isa('Data::URIID::Result')) {
-                $opts{displayname} //= sub { return $from->attribute('displayname', default => undef) };
-                $type = $id->id_type;
-                $id   = $id->id;
             } elsif ($id->isa('Data::TagDB::Tag')) {
                 $opts{displayname} //= sub { $from->displayname };
                 $type = 'ise';
@@ -351,6 +370,7 @@ sub new {
 }
 
 
+#@returns __PACKAGE__
 sub random {
     my ($pkg, %opts) = @_;
     my $type = $opts{type} // 'uuid';
@@ -379,6 +399,7 @@ sub wellknown {
 }
 
 
+#@returns __PACKAGE__
 sub type {
     my ($self) = @_;
     return $self->{type};
@@ -604,6 +625,7 @@ sub cmp {
 }
 
 
+#@returns __PACKAGE__
 sub namespace {
     my ($self) = @_;
     return $self->{namespace} // croak 'No namespace';
@@ -734,7 +756,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

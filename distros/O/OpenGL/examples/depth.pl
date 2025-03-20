@@ -1,14 +1,8 @@
-#!/usr/local/bin/perl
-#
 #         depth
 #
 # Simple demo showing effect of Z (depth) buffering.
 # I saw a similar demo in the MESA distribution.
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib");  } # 5.002 gamma needs this
 use OpenGL;
 
 # if you dont ask for a visual with a depth buffer you might not get one

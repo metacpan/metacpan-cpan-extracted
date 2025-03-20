@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_issn clean_edi
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -433,6 +433,8 @@ sub clean_publisher_place {
 		decode_utf8('Třebíč na Moravě') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči na Moravě') => decode_utf8('Třebíč'),
+		decode_utf8('Vyškově') => decode_utf8('Vyškov'),
+		decode_utf8('Zlíně') => decode_utf8('Zlín'),
 		# No place.
 		'S.l.' => 'sine loco',
 	};
@@ -446,7 +448,7 @@ sub clean_publisher_place {
 	# [V Praze]
 	$ret_publisher_place =~ s/^\[(.*?)\]?$/$1/ms;
 
-	$ret_publisher_place =~ s/^[VW]e?\s+//ms;
+	$ret_publisher_place =~ s/^[vVW]e?\s+//ms;
 
 	foreach my $origin (keys %{$dict_hr}) {
 		$ret_publisher_place =~ s/^$origin$/$dict_hr->{$origin}/ms;
@@ -870,6 +872,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

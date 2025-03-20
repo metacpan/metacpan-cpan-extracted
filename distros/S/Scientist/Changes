@@ -1,3 +1,8 @@
+0.014 2025-03-19
+    - Fix error in Synopsis code (Manwar)
+    - Remove Dist::Zilla [PrereqsClean] as it is broken.
+0.013 2020-10-15
+    - Update Dist::Zilla configuration
 0.012 2018-02-11
     - Never deploy late at night, this version fixes up the last of my mistakes(hopefully).
 0.011 2018-02-10

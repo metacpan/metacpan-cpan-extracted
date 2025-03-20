@@ -1,6 +1,5 @@
 package Net::RDAP::Object::Entity;
 use base qw(Net::RDAP::Object);
-use vCard;
 use strict;
 use warnings;
 
@@ -52,65 +51,13 @@ sub jcard {
 
 =pod
 
-    $vcard = $entity->vcard;
+=head2 vCard support
 
-Returns a L<vCard> object for the entity. Only the C<fn>, C<org>, C<email>,
-C<tel> and C<adr> property types (structured addresses only) are supported. This
-method is B<DEPRECATED>.
-
-=cut
-
-sub vcard {
-    my $self = shift;
-
-    return undef unless ($self->{'vcardArray'});
-
-    my @emails;
-    my @phones;
-    my @addresses;
-
-    my $card = vCard->new;
-
-    foreach my $nref (@{$self->{'vcardArray'}->[1]}) {
-        my ($type, $params, $vtype, $value) = @{$nref};
-
-        if ('fn' eq $type) {
-            $card->full_name($value);
-
-        } elsif ('org' eq $type) {
-            $card->organization($value);
-
-        } elsif ('email' eq $type) {
-            push(@emails, $value);
-
-        } elsif ('tel' eq $type) {
-            push(@phones, {
-                'type'      => [$params->{'type'}],
-                'number'    => $value
-            });
-
-        } elsif ('adr' eq $type) {
-            $value->[6] = $value->[6] || $params->{'cc'},
-
-            push(@addresses, {
-                'type'      => [$params->{'type'}],
-                'address'   => $value
-            });
-        }
-    }
-
-    $card->email_addresses([ map { { 'address' => $_ } } @emails ]);
-    $card->phones(\@phones);
-    $card->addresses(\@addresses);
-
-    return $card;
-}
-
-=pod
+Suport for the L<vCard> module (via the C<vcard()> method) was removed in v0.35.
 
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

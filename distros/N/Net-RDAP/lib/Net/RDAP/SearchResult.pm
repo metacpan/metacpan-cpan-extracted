@@ -3,9 +3,11 @@ use base qw(Net::RDAP::Object);
 use strict;
 use warnings;
 
-sub domains     { $_[0]->objects('Net::RDAP::Object::Domain',        $_[0]->{'domainSearchResults'})        }
-sub nameservers { $_[0]->objects('Net::RDAP::Object::Nameserver',    $_[0]->{'nameserverSearchResults'})    }
-sub entities    { $_[0]->objects('Net::RDAP::Object::Entity',        $_[0]->{'entitySearchResults'})        }
+sub domains     { $_[0]->objects('Net::RDAP::Object::Domain',       $_[0]->{'domainSearchResults'})     }
+sub nameservers { $_[0]->objects('Net::RDAP::Object::Nameserver',   $_[0]->{'nameserverSearchResults'}) }
+sub entities    { $_[0]->objects('Net::RDAP::Object::Entity',       $_[0]->{'entitySearchResults'})     }
+sub ips         { $_[0]->objects('Net::RDAP::Object::IPNetwork',    $_[0]->{'ipSearchResults'})         }
+sub autnums     { $_[0]->objects('Net::RDAP::Object::Autnum',       $_[0]->{'autnumSearchResults'})     }
 
 1;
 
@@ -41,9 +43,19 @@ the search parameters.
 Returns an array of L<Net::RDAP::Object::Entity> objects which matched
 the search parameters.
 
+    $result->ips;
+
+Returns an array of L<Net::RDAP::Object::IPNetwork> objects which matched
+the search parameters.
+
+    $result->autnums;
+
+Returns an array of L<Net::RDAP::Object::Autnum> objects which matched
+the search parameters.
+
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

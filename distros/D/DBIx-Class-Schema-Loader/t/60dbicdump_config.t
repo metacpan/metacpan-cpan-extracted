@@ -31,6 +31,9 @@ lib t/lib
 
 <connect_info>
     dsn $make_dbictest_db::dsn
+    <options>
+        on_connect_do select 1
+    </options>
 </connect_info>
 
 <loader_options>

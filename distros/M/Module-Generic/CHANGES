@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.39.0 2025-03-20T17:12:08+0900
+    - Corrected an issue with the serialisation of JSON
+    - Added method real() to Module::Generic::Number
+    - Added methods load_csv() and unload_csv()
+
 v0.38.0 2025-03-12T007:28:48+0900
     - Improved method 'parent' in Module::Generic::File
     - unload_json in Module::Generic::File has the option 'allow_tags' set to false now by default.

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01492cam a2200373 i 4500</leader>
+  <controlfield tag="001">cpk20243633764</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20241106093456.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">230613s2015    xr     g      000 f cze c</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003633764</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="z">978-80-7217-383-9</subfield>
+    <subfield code="q">(brožováno)</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">KVG001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">eng</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.111(73)-3</subfield>
+    <subfield code="x">Americká próza</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.111(73)-31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-311.5)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Payne, C. D.</subfield>
+    <subfield code="q">(C. Douglas),</subfield>
+    <subfield code="d">1949-</subfield>
+    <subfield code="7">jn20001005609</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Frisco pigeon mambo.</subfield>
+    <subfield code="l">Česky</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Holubí mambo /</subfield>
+    <subfield code="c">C.D. Payne ; z anglického originálu ... přeložila Tamara Váňová</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">Dotisk druhého vydání</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">V Brně :</subfield>
+    <subfield code="b">Jota,</subfield>
+    <subfield code="c">2015</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">220 stran ;</subfield>
+    <subfield code="c">22 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Údaj o vydání je chybný, správně má být: Třetí vydání</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">americké romány</subfield>
+    <subfield code="7">fd131796</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">humoristické romány</subfield>
+    <subfield code="7">fd132431</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">American fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">humorous novels</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Váňová, Tamara,</subfield>
+    <subfield code="d">1954-</subfield>
+    <subfield code="7">jn20001005610</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="a">ISBN 978-80-7217-383-9</subfield>
+    <subfield code="f">2. vydání - dotisk [i.e. 3. vydání]</subfield>
+    <subfield code="g">ISBN zkontrolováno pouze podle báze CNB</subfield>
+    <subfield code="g">ISBN neplatné - duplicitní; platné ISBN náleží 2. vydání</subfield>
+    <subfield code="g">Správné ISBN v publikaci není uvedeno</subfield>
+    <subfield code="o">20241106</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003633764</subfield>
+  </datafield>
+</record>
+
+</collection>

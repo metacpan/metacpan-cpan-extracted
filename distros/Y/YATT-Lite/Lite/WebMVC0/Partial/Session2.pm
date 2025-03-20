@@ -39,10 +39,10 @@ use YATT::Lite::Partial
 #========================================
 
 Entity psgix_session => sub {
-  my ($this) = @_;
+  my ($this, @opts) = @_;
   my Env $env = $CON->env;
   unless ($env->{'psgix.session.options'}) {
-    $CON->cget('system')->session_start($CON);
+    $CON->cget('system')->session_start($CON, @opts);
   }
   $env->{'psgix.session'};
 };
@@ -184,7 +184,7 @@ sub session_expire {
 }
 
 sub session_init_env {
-  (my MY $self, my Env $env, my ($session, $id, @opts)) = @_;
+  (my MY $self, my Env $env, my ($session, $id, %opts)) = @_;
 
   my $mw = $self->{_session_middleware} or do {
     Carp::croak("Session middleware is not initialized!");
@@ -197,7 +197,9 @@ sub session_init_env {
     $env->{'psgix.session'} = {};
   }
 
-  $env->{'psgix.session.options'} = { id => $id, @opts };
+  $opts{path} //= $env->{'yatt.script_dir'};
+
+  $env->{'psgix.session.options'} = { id => $id, %opts };
 
   if ($env->{HTTPS}) {
     $env->{'psgix.session.options'}{secure} //= 1;

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use List::Util      qw( pairs first );
 use Sub::Util       qw( set_subname );
@@ -20,6 +20,7 @@ use Ref::Util  ();
 use Hash::Util ();
 
 use DBI ();
+use DBI::Const::GetInfoType;
 
 use CXC::DB::DDL::Constants -all;
 
@@ -32,7 +33,7 @@ use constant DEFAULT_FIELD_CLASS => 'CXC::DB::DDL::Field';
 
 our %EXPORT_TAGS = (
     schema_funcs => [qw( xFIELDS xCHECK xTYPE  )],
-    misc         => [ 'SQL_TYPE_NAMES', 'SQL_TYPE_VALUES', 'sqlt_producer_map' ],
+    misc         => [ 'SQL_TYPE_NAMES', 'SQL_TYPE_VALUES', 'sqlt_entity_map', 'db_version' ],
 );
 
 our @EXPORT_OK = ( map { Ref::Util::is_arrayref( $_ ) ? $_->@* : () } values %EXPORT_TAGS );
@@ -439,6 +440,7 @@ sub _exporter_expand_sub ( $class, $name, $value, $globals, $permitted ) {
 
 
 
+
 sub xFIELDS ( @fields ) {
     return fields => [ map { $_->value->( $_->key ) } pairs( @fields ) ];
 }
@@ -480,11 +482,61 @@ sub xCHECK ( $field, @values ) {
 
 
 
-sub sqlt_producer_map ( $dbd ) {
-    state $map = { +( DBD_POSTGRESQL ) => 'PostgreSQL' };
-    return $map->{$dbd} // $dbd;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub sqlt_entity_map ( $dbd, $entity ) {
+    state $map = {
+        +( DBD_POSTGRESQL ) => {
+            producer   => 'PostgreSQL',
+            db_version => 'postgres_version',
+        },
+        +( DBD_SYBASE ) => {
+            producer   => 'Sybase',
+            db_version => undef,
+        },
+        +( DBD_SQLITE ) => {
+            producer   => 'SQLite',
+            db_version => 'sqlite_version',
+        },
+
+    };
+
+    my $entity_map = $map->{$dbd} // return undef;
+    return exists $entity_map->{$entity}
+      ? $entity_map->{$entity}
+      : croak( "unkown entity: $entity" );
 }
 
+
+
+
+
+
+
+
+
+
+sub db_version( $dbh ) {
+
+    my $dbd = $dbh->{Driver}->{Name};
+
+    return $dbd eq DBD_POSTGRESQL
+      ? $dbh->{pg_server_version}
+      : $dbh->get_info( $GetInfoType{SQL_DBMS_VER} );
+}
 
 1;
 
@@ -503,7 +555,7 @@ __END__
 =pod
 
 =for :stopwords Diab Jerius Smithsonian Astrophysical Observatory TYPENAME VARCHAR xCHECK
-xFIELDS xTYPE DBD dbd
+xFIELDS xTYPE SQLT DBD dbd
 
 =head1 NAME
 
@@ -511,7 +563,7 @@ CXC::DB::DDL::Util - CXC::DB::DDL utilities
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -708,13 +760,35 @@ generates a check constraint as a string which looks like
 
   $field in ( $value[0], $value[1], ...  )
 
-=head2 sqlt_producer_map
+=head2 sqlt_entity_map
 
-  $sqlt_producer = sqlt_producer_map( $dbd );
+  $sqlt_producer = sqlt_entity_map( $dbd, $entity );
 
-Map C<$dbd> (typically from C<$dbh->{Driver}{NAME}>) to what
-L<SQL::Translator> wants.  Actually, this just checks for known (to
-me) deviations; everything else is returned as is.
+Produce a producer specific entity given a C<$dbd> (typically from
+C<$dbh->{Driver}{NAME}>) and an entity name to what L<SQL::Translator>
+wants.  Returns B<undef> if the entity is not recognized or not supported.
+
+Entities include
+
+=over
+
+=item B<producer>
+
+The name of the SQLT Producer class.  Check for this first; if it
+returns B<undef>, C<$dbd> isn't supported.
+
+=item B<db_version>
+
+The name of the parameter passed to the SQLT Producer class for the database version.
+
+=back
+
+=head2 db_version
+
+  $version = db_version( $dbh )
+
+Return the database server version for the passed handle.  The value
+is meant to be passed to the SQLT producer.
 
 =head1 SUPPORT
 

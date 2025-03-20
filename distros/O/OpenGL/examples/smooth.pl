@@ -1,15 +1,9 @@
-#!/usr/local/bin/perl
-#
 #            smooth
 #
 # This program demonstrates smooth shading.
 # A smooth shaded polygon is drawn in a 2-D projection.
 # This example adapted from smooth.c from "OpenGL Programming Guide" 
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
 
 sub triangle{

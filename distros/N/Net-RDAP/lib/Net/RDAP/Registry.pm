@@ -373,7 +373,7 @@ sub get_best_url {
 sub assemble_url {
     my ($package, $url, @segments) = @_;
 
-    $url->path_segments(grep { length > 0 } ($url->path_segments, @segments));
+    $url->path_segments(grep { defined && length > 0 } ($url->path_segments, @segments));
 
     return $url;
 }
@@ -386,7 +386,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

@@ -3,6 +3,7 @@ lib/Tk/ListBrowser.pm
 lib/Tk/ListBrowser/Bar.pm
 lib/Tk/ListBrowser/Column.pm
 lib/Tk/ListBrowser/Item.pm
+lib/Tk/ListBrowser/LBCanvas.pm
 lib/Tk/ListBrowser/List.pm
 lib/Tk/ListBrowser/Row.pm
 LICENSE

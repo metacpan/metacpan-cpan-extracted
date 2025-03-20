@@ -1,5 +1,20 @@
 Revision history for CXC-DB-DDL
 
+0.19      2025-03-19 18:48:51-04:00 America/New_York
+
+  [API CHANGE]
+
+   * CXC::DB::DDL::Util: sqlt_producer_map has been replaced with sqlt_entities_map.
+
+  [BUG FIX]
+
+   * The SQLT PostgreSQL producer wasn't properly fed the version of PostgreSQL.
+
+   * options passed to the CXC::DB::DDL create method were ignored.
+
+   * the CXC::DB::DDL::Table constructor didn't validate its input properly, so
+     could be passed extra arguments.
+
 0.18      2024-10-27 15:02:46-04:00 America/New_York
 
   [BUG FIX]

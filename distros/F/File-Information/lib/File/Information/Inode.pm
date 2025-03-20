@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,12 +17,13 @@ use Carp;
 use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
-our $VERSION = v0.05;
+use Data::Identifier v0.08;
+
+our $VERSION = v0.06;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
-my $HAVE_DATA_IDENTIFIER    = eval {require Data::Identifier; 1;};
 my $HAVE_CONFIG_INI_READER  = eval {require Config::INI::Reader; 1;};
 
 my %_ntfs_attributes = (
@@ -182,7 +183,7 @@ if ($HAVE_FILE_VALUEFILE) {
     }
 }
 
-if ($HAVE_DATA_IDENTIFIER) {
+{
     my %_wk = (
         # tagpool-sysfile-type:
         'e6d6bb07-1a6a-46f6-8c18-5aa6ea24d7cb' => {displayname => 'regular'},
@@ -502,6 +503,7 @@ sub _load_xattr {
                 $out->{$parts->[$i]} = $values[$i];
             }
         }
+        $out->{rawtype} = 'multipart';
     }
 
     if (defined(my $parsing = $info->{parsing})) {
@@ -510,20 +512,7 @@ sub _load_xattr {
             my %digest;
             my $given_size;
 
-            eval {
-                while ($v =~ s/^(v0m?) ([a-z]+)-([0-9]+)-([0-9]+) bytes 0-([0-9]+)\/([0-9]+) ([0-9a-f]+)( |$)//) {
-                    my ($type, $name, $version, $bits, $end, $size, $hash, $mark) = ($1, $2, $3, $4, $5, $6, $7, $8);
-                    next if $end != ($size - 1);
-                    die if (length($hash) * 4) != $bits;
-                    die if $type eq 'v0' && length($mark);
-
-                    $given_size //= $size;
-                    die unless $given_size == $size;
-                    $digest{join('-', $name, $version, $bits)} = $hash;
-
-                    #warn sprintf('<%s> | <%s> <%s> <%u> | <%u> <%u> | <%s> | <%s>', $type, $name, $version, $bits, $end, $size, $hash, $mark);
-                }
-            };
+            $given_size = $self->_set_digest_utag($lifecycle => $v, $given_size);
 
             $pv->{xattr_utag_final_file_hash_size} = {raw => $given_size} if defined $given_size;
             $self->{digest} //= {};
@@ -930,7 +919,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,8 @@
-#!/usr/local/bin/perl
-#
 #       glu_test
 #
 #  same as cube but uses a glu function to test
 #  that glu stuff is working
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib");  } # 5.002 gamma needs this
 use OpenGL;
  
 sub wirecube{

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -20,6 +20,7 @@ use Math::Round;
 use Tie::Watch;
 use Tk;
 require Tk::ListBrowser::Item;
+require Tk::ListBrowser::LBCanvas;
 
 #used in formatText
 my $dlmreg = qr/\.|\(|\)|\:|\!|\+|\,|\-|\<|\=|\>|\%|\&|\*|\"|\'|\/|\;|\?|\[|\]|\^|\{|\||\}|\~|\\|\$|\@|\#|\`|\s/;
@@ -102,6 +103,11 @@ Default value 300 miliseconds. When the filter bar is active this is the wait ti
 between a keystroke and a corresponding filter action. If a key is pressed before
 time out, the timer is reset.
 
+=item Switch B<-filterfield>
+
+Default value I<name>. Possible values are I<name>, I<text> and I<data>.
+Specifies on what data the filter should work.
+
 =item Switch B<-filteron>
 
 Default value I<false>. If set the filter entry will allways be visible.
@@ -177,7 +183,8 @@ sub Populate {
 	
 	$self->SUPER::Populate($args);
 	
-	my $canv = $self->Scrolled('Canvas',
+	my $canv = $self->Scrolled('LBCanvas',
+		-keycall => ['KeyPress', $self],
 		-scrollbars => 'osoe',
 	)->pack(-expand => 1, -fill => 'both');
 	my $c = $canv->Subwidget('scrolled');
@@ -196,16 +203,6 @@ sub Populate {
 	$c->Tk::bind('<ButtonRelease-2>', [ $self, 'Button2Release', Ev('x'), Ev('y') ]);
 	$c->Tk::bind('<Motion>', [ $self, 'Motion', Ev('x'), Ev('y') ]);
 
-	$c->bindtags([$c, $c->toplevel, 'all']);
-	#keyboard bindings
-	for (qw/Down End Escape Home Left Return Right space Up/) {
-		my $bnd = $_;
-		$c->Tk::bind("<$bnd>", [$self, 'KeyPress', $bnd]);
-		$c->Tk::bind("<Shift-$bnd>", [$self, 'KeyPress', "Shift-$bnd"]);
-		$c->Tk::bind("<Control-$bnd>", [$self, 'KeyPress', "Control-$bnd"]);
-		$c->Tk::bind("<Control-Shift-$bnd>", [$self, 'KeyPress', "Control-Shift-$bnd"]);
-	};
-
 	#setting up the filter
 	unless ($nofilter) {
 		my $filter = '';
@@ -222,8 +219,6 @@ sub Populate {
 		$fentry->bind('<KeyRelease>', [$self, 'filterActivate']);
 	}
 
-
-	$self->{ANCHOR} = undef;
 	$self->{ARRANGE} = undef;
 	$self->{HANDLER} = undef;
 	$self->{POOL} = [];
@@ -236,6 +231,7 @@ sub Populate {
 		-browsecmd => ['CALLBACK'],
 		-command => ['CALLBACK'],
 		-filterdelay => ['PASSIVE', 'filterDelay', 'FilterDelay', 300],
+		-filterfield => ['PASSIVE', undef, undef, 'name'],
 		-filteron => ['PASSIVE', undef, undef, ''],
 		-font => ['PASSIVE', 'font', 'Font', 'Monotype 10'],
 		-foreground => ['PASSIVE', 'foreground', 'foreground', '#3C3C3C'],
@@ -264,7 +260,7 @@ sub Populate {
 		DEFAULT => $self,
 	);
 	$self->after(10, sub { $self->filterFlip if $self->cget('-filteron') });
-	$c->CanvasFocus
+#	$c->CanvasFocus
 }
 
 sub _handler { return $_[0]->{HANDLER} }
@@ -371,18 +367,12 @@ sub anchorInitialize {
 	my $self = shift;
 	my $i = $self->anchorGet;
 	unless (defined $i) {
-		my $name = $self->pool->[0]->name;
+		my $name = $self->infoFirstVisible;
 		$self->anchorSet($name) unless defined $self->anchorGet;
 		$self->see($name);
 		return 1
 	}
 	return ''
-}
-
-sub anchor {
-	my $self = shift;
-	$self->{ANCHOR} = shift if @_;
-	return $self->{ANCHOR}
 }
 
 =item B<anchorSet>I<($name)>
@@ -394,10 +384,10 @@ Sets the keyboard anchor to I<$name>
 sub anchorSet {
 	my ($self, $name) = @_;
 	my $item = $self->get($name);
-	if (defined $item) {
+	if ((defined $item) and (not $item->hidden)) {
 		$self->anchorClear;
 		$item->anchor(1);
-		$self->anchor($item);
+#		$self->anchor($item);
 		return 1
 	}
 	return ''
@@ -707,8 +697,9 @@ sub filterRefresh {
 	my $self = shift;
 	my $pool = $self->pool;
 	my $filter = $self->Subwidget('FilterEntry')->get;
+	my $filterfield = $self->cget('-filterfield');
 	for (@$pool) {
-		if ($self->filter($filter, $_->text)) {
+		if ($self->filter($filter, $_->$filterfield)) {
 			$_->hidden('')
 		} else {
 			$_->hidden(1)
@@ -722,7 +713,7 @@ sub focus { $_[0]->CanvasFocus }
 
 =item B<get>I<(?$name?)>
 
-Returns a reference to the L<Tk::FileBrowser::Icon> object of I<$name>.
+Returns a reference to the L<Tk::ListBrowser::Icon> object of I<$name>.
 
 =cut
 
@@ -735,7 +726,7 @@ sub get {
 
 =item B<get>I<(?$name?)>
 
-Returns a list of all L<Tk::FileBrowser::Icon> objects.
+Returns a list of all L<Tk::ListBrowser::Icon> objects.
 
 =cut
 
@@ -747,20 +738,20 @@ sub getAll {
 
 =item B<getColumn>I<($column)>
 
-Returns a list of referencec to all L<Tk::FileBrowser::Icon> objects in column I<$column>.
+Returns a list of referencec to all L<Tk::ListBrowser::Icon> objects in column I<$column>.
 
 =cut
 
 sub getColumn {
 	my ($self, $col) = @_;
 	my $pool = $self->pool;
-	my @hits = grep { $_->column eq $col } @$pool;
+	my @hits = grep { (defined $_->column) and ($_->column eq $col) } @$pool;
 	return @hits
 }
 
 =item B<getIndex>I<($index)>
 
-Returns a reference to the L<Tk::FileBrowser::Icon> object at index I<$index>
+Returns a reference to the L<Tk::ListBrowser::Icon> object at index I<$index>
 
 =cut
 
@@ -777,14 +768,14 @@ sub getIndex {
 
 =item B<getRow>I<($row)>
 
-Returns a list of referencec to all L<Tk::FileBrowser::Icon> objects in row I<$row>.
+Returns a list of referencec to all L<Tk::ListBrowser::Icon> objects in row I<$row>.
 
 =cut
 
 sub getRow {
 	my ($self, $row) = @_;
 	my $pool = $self->pool;
-	my @hits = grep { $_->row eq $row } @$pool;
+	my @hits = grep { (defined $_->row ) and ($_->row eq $row) } @$pool;
 	return @hits
 }
 
@@ -822,7 +813,12 @@ Returns the numerical index of the entry at I<$column>, I<$row>.
 sub indexColumnRow {
 	my ($self, $column, $row) = @_;
 	my $pool = $self->pool;
-	my ($index) = grep { ($pool->[$_]->column eq $column) and  ($pool->[$_]->row eq $row) } 0 .. @$pool - 1;
+	my ($index) = grep {
+		(defined $pool->[$_]->column) and
+		(defined $pool->[$_]->row) and
+		($pool->[$_]->column eq $column) and
+		($pool->[$_]->row eq $row)
+	} 0 .. @$pool - 1;
 	return $index
 }
 
@@ -892,6 +888,20 @@ sub infoFirst {
 	return $pool->[0]->name
 }
 
+=item B<infoFirstVisible>
+
+Returns the name of the first entry in the list that is not hidden.
+
+=cut
+
+sub infoFirstVisible {
+	my $self = shift;
+	my $pool = $self->pool;
+	for (@$pool) {
+		return $_->name unless $_->hidden
+	}
+}
+
 =item B<infoHidden>I<($name)>
 
 Returns the boolean hidden state of entry I<$name>.
@@ -921,6 +931,20 @@ sub infoLast {
 	my $pool = $self->pool;
 	return undef unless @$pool;
 	return $pool->[@$pool - 1]->name
+}
+
+=item B<infoLastVisible>
+
+Returns the name of the last entry in the list that is not hidden.
+
+=cut
+
+sub infoLastVisible {
+	my $self = shift;
+	my $pool = $self->pool;
+	for (reverse @$pool) {
+		return $_->name unless $_->hidden
+	}
 }
 
 =item B<infoList>
@@ -956,6 +980,26 @@ sub infoNext {
 	return $pool->[$a + 1]->name;
 }
 
+=item B<infoNextVisible>I<($name)>
+
+Returns the name of the first next entry of I<$name> that is not hidden.
+Returns undef if I<$name> is the last entry in the list.
+
+=cut
+
+sub infoNextVisible {
+	my ($self, $name) = @_;
+	my $pool = $self->pool;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return
+	}
+	for ($a .. @$pool - 1) {
+		return $pool->[$_]->name unless $pool->[$_]->hidden
+	}
+}
+
 =item B<infoPev>I<($name)>
 
 Returns the name of the previous entry of I<$name>.
@@ -973,6 +1017,26 @@ sub infoPrev {
 	}
 	return undef if $a eq 0;
 	return $pool->[$a - 1]->name;
+}
+
+=item B<infoPrevVisible>I<($name)>
+
+Returns the name of the first previous entry of I<$name> that is not hidden.
+Returns undef if I<$name> is the first entry in the list.
+
+=cut
+
+sub infoPrevVisible {
+	my ($self, $name) = @_;
+	my $pool = $self->pool;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return
+	}
+	for (reverse 0 .. $a) {
+		return $pool->[$_]->name unless $pool->[$_]->hidden
+	}
 }
 
 =item B<infoSelection>
@@ -999,12 +1063,37 @@ sub initem {
 
 sub KeyArrowNavig {
 	my ($self, $dcol, $drow) = @_;
-	my $h = $self->_handler;
-	my $i = $h->KeyArrowNavig($dcol, $drow);
-	if (defined $i) {
-		my $name = $i->name;
-		$self->see($name);
+	return undef if $self->anchorInitialize;
+	my $pool = $self->pool;
+	my $i = $self->anchorGet;
+	my $target;
+	if ($drow eq 0) { #horizontal move
+		my $rown = $i->row;
+		my @row = $self->getRow($rown);
+		if (($dcol > 0) and ($i->column >= @row - 1)) {
+			$target = $self->moveRow(1);
+		} elsif (($dcol < 0) and ($i->column <= 0)) {
+			$target = $self->moveRow(-1);
+		} else {
+			my $ti = $self->indexColumnRow($i->column + $dcol, $rown);
+			$target = $self->getIndex($ti)  if defined $ti;
+		}
+	} else { #vertical move
+		my $coln = $i->column;
+		my @column = $self->getColumn($coln);
+		if (($drow > 0) and ($i->row >= @column - 1)) {
+			$target = $self->moveColumn(1);
+		} elsif (($drow < 0) and ($i->row <= 0)) {
+			$target = $self->moveColumn(-1);
+		} else {
+			my $ti = $self->indexColumnRow($coln, $i->row + $drow);
+			$target = $self->getIndex($ti)  if defined $ti;
+		}
+	}
+	if (defined $target) {
+		my $name = $target->name;
 		$self->anchorSet($name);
+		$self->see($name);
 		return 1
 	}
 	return ''
@@ -1077,7 +1166,7 @@ sub KeyPress {
 		return
 	}
 	if ($key eq 'Control-End') {
-		my $name = $pool->[@$pool - 1]->name;
+		my $name = $self->infoLastVisible;
 		$self->see($name);
 		$self->after(50, sub { $self->anchorSet($name) });
 		return
@@ -1093,7 +1182,7 @@ sub KeyPress {
 		return
 	}
 	if ($key eq 'Control-Home') {
-		my $name = $pool->[0]->name;
+		my $name = $self->infoFirstVisible;
 		$self->anchorSet($name);
 		$self->see($name);
 		return
@@ -1140,7 +1229,7 @@ sub KeyPress {
 	if ($key eq 'Control-Shift-End') {
 		return if $self->anchorInitialize;
 		my $begin = $self->anchorGet;
-		my $name = $pool->[@$pool - 1]->name;
+		my $name = $self->infoLastVisible;
 		if ($self->anchorSet($name)) {
 			my $end = $self->anchorGet;
 			if ($begin->selected) {
@@ -1169,7 +1258,7 @@ sub KeyPress {
 	if ($key eq 'Control-Shift-Home') {
 		return if $self->anchorInitialize;
 		my $begin = $self->anchorGet;
-		if ($self->anchorSet($pool->[0]->name)) {
+		if ($self->anchorSet($self->infoFirstVisible)) {
 			my $end = $self->anchorGet;
 			if ($begin->selected) {
 				$self->selectionSet($begin->name, $end->name);
@@ -1226,6 +1315,50 @@ sub Motion {
 	}
 }
 
+sub moveColumn {
+	my ($self, $delta) = @_;
+	my $i = $self->anchorGet;
+	my $column = $i->column;
+	my $row = $i->row;
+	my @c = $self->getColumn($column);
+	my $lastrow = @c - 1;
+	$row = $row + $delta;
+	if ($row >= $lastrow) {
+		$column ++;
+		$row = 0;
+	} elsif ($column <= 0) {
+		$column --;
+		my @nc = $self->getColumn($column);
+		$row = @nc - 1;
+	}
+	my $target;
+	my $index = $self->indexColumnRow($column, $row);
+	$target = $self->getIndex($index) if defined $index;
+	return $target;
+}
+
+sub moveRow {
+	my ($self, $delta) = @_;
+	my $i = $self->anchorGet;
+	my $column = $i->column;
+	my $row = $i->row;
+	my @r = $self->getRow($row);
+	my $lastcolumn = @r - 1;
+	$column = $column + $delta;
+	if ($column >= $lastcolumn) {
+		$column = 0;
+		$row ++;
+	} elsif ($column <= 0) {
+		$row --;
+		my @nr = $self->getRow($row);
+		$column = @nr - 1;
+	}
+	my $target;
+	my $index = $self->indexColumnRow($column, $row);
+	$target = $self->getIndex($index) if defined $index;
+	return $target;
+}
+
 sub pool { return $_[0]->{POOL} }
 
 sub refreshTimer {
@@ -1272,24 +1405,29 @@ sub see {
 	my ($cwidth, $cheight) = $self->canvasSize;
 	my ($ix1, $iy1, $ix2, $iy2) = $i->region;
 
+	my $h = $self->_handler;
 	#horizontal
-	my ($vl, $vr) = $self->xview;
-	my $div = $cx2 - $cx1;
-	if (($div > 0) and ($ix1/$div < $vl)) { #going to the left
-		$self->xview(moveto => $ix1/$div);
-	} elsif (($div > 0) and ($ix2/$div > $vr)) {	#going to the right.
-		my $mr = ($ix2 - $cwidth + 2)/$div;
-		$self->xview(moveto => $mr);
+	if ($h->scroll eq 'horizontal') {
+		my ($vl, $vr) = $self->xview;
+		my $div = $cx2 - $cx1;
+		if (($div > 0) and ($ix1/$div < $vl)) { #going to the left
+			$self->xview(moveto => $ix1/$div);
+		} elsif (($div > 0) and ($ix2/$div > $vr)) {	#going to the right.
+			my $mr = ($ix2 - $cwidth + 2)/$div;
+			$self->xview(moveto => $mr);
+		}
 	}
 	
 	#vertical
-	my ($vt, $vb) = $self->yview;
-	$div = $cy2 - $cy1;
-	if (($div > 0) and ($iy1/$div < $vt)) { #going up
-		$self->yview(moveto => $iy1/$div);
-	} elsif (($div > 0) and ($iy2/$div > $vb)){	#going down.
-		my $mr = ($iy2 - $cheight + 2)/$div;
-		$self->yview(moveto => $mr);
+	if ($h->scroll eq 'vertical') {
+		my ($vt, $vb) = $self->yview;
+		my $div = $cy2 - $cy1;
+		if (($div > 0) and ($iy1/$div < $vt)) { #going up
+			$self->yview(moveto => $iy1/$div);
+		} elsif (($div > 0) and ($iy2/$div > $vb)){	#going down.
+			my $mr = ($iy2 - $cheight + 2)/$div;
+			$self->yview(moveto => $mr);
+		}
 	}
 }
 
@@ -1374,8 +1512,10 @@ sub selectionSet {
 	my $pool = $self->pool;
 	for ($begin .. $end) {
 		my $i = $pool->[$_];
-		$self->selectionClear if $self->cget('-selectmode') eq 'single';
-		$i->select #unless $i->selected;
+		unless ($i->hidden) {
+			$self->selectionClear if $self->cget('-selectmode') eq 'single';
+			$i->select #unless $i->selected;
+		}
 	}
 }
 
@@ -1393,7 +1533,7 @@ sub selectionUnSet {
 	my $pool = $self->pool;
 	for ($begin .. $end) {
 		my $i = $pool->[$_];
-		$i->select(0) #if $i->selected;
+		$i->select(0) unless $i->hidden;
 	}
 }
 

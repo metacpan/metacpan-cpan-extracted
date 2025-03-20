@@ -1,3 +1,9 @@
+v0.09  2025-03-19Z
+    - Fixed handling of Data::URIID::Base objects in as()
+    - Added additional small-identifier values
+    - Added missing #@returns
+    - Added more identifier validation
+
 v0.08  2025-01-09Z
     - Added more well known tags
     - Added generator for colours

@@ -9,6 +9,7 @@ lib/Net/RDAP/ID.pm
 lib/Net/RDAP/JCard.pm
 lib/Net/RDAP/JCard/Address.pm
 lib/Net/RDAP/JCard/Property.pm
+lib/Net/RDAP/JSON.pm
 lib/Net/RDAP/Link.pm
 lib/Net/RDAP/Notice.pm
 lib/Net/RDAP/Object.pm
@@ -35,11 +36,14 @@ README.md
 t/00.use.t
 t/chain.t
 t/document_url.t
+t/implements.t
 t/jcard.json
 t/jcard.t
+t/json.t
 t/objects.t
 t/redacted.json
 t/redaction.t
+t/reverse_search.t
 t/search.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

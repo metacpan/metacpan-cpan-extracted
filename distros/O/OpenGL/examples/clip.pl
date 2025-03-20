@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl
-#
 #     clip
 #
 # This program demonstrates arbitrary clipping planes.
@@ -21,20 +19,8 @@
 # 
 # note:  the statement f(@a) is equivalent to f($a[0],$a[1], ... $a[n])
 #        i.e. elements of a list are put on the call stack
-# 
 
-
-# The following "BEGIN" line is needed so that "use" is 
-# able to find the built OpenGL module (the one created by doing
-# a "make" in the above directory).
-# Comment it out if you are using/testing the "installed" module.
-# i.e. if you did a "make install" then you dont need to look in ../blib
-#
-BEGIN{ unshift(@INC,"../blib"); }
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib");  } # 5.002 gamma needs this
 use OpenGL;
-
 
 sub tacky_cube {
     local($s) = @_;

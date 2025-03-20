@@ -1,4 +1,4 @@
-package FU::Util 0.3;
+package FU::Util 0.4;
 
 use v5.36;
 use FU::XS;
@@ -13,6 +13,7 @@ our @EXPORT_OK = qw/
     utf8_decode uri_escape uri_unescape
     query_decode query_encode
     httpdate_format httpdate_parse
+    gzip_lib gzip_compress brotli_compress
     fdpass_send fdpass_recv
 /;
 
@@ -32,6 +33,7 @@ sub uri_escape :prototype($) ($s) {
 sub uri_unescape :prototype($) ($s) {
     return if !defined $s;
     utf8::encode($s);
+    $s =~ tr/+/ /;
     $s =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     utf8_decode $s;
 }
@@ -212,13 +214,6 @@ roughly similar to:
 
   JSON::PP->new->allow_nonref->core_bools->convert_blessed->encode($scalar);
 
-Some modules escape the slash character in encoded strings to prevent a
-potential XSS vulnerability when embedding JSON inside C<< <script> ..
-</script> >> tags.  This function does I<not> do that because it might not even
-be sufficient. The following is probably an improvement:
-
-  json_format($data) =~ s{</}{<\\/}rg =~ s/<!--/<\\u0021--/rg;
-
 This function generates invalid JSON if you pass it a string with invalid
 Unicode characters; I don't see how you'd ever accidentally end up with such a
 string, anyway.
@@ -243,6 +238,26 @@ versions.
 =item utf8
 
 Boolean, returns a UTF-8 encoded byte string instead of a Perl Unicode string.
+
+=item html_safe
+
+Boolean. When set, the encoded JSON is safe for (unescaped) inclusion into HTML
+or XML content. This encodes C<< < >>, C<< > >> and C<< & >> as Unicode escapes.
+Commonly used to embed data inside a HTML page:
+
+  $html = '<script id="site_data" type="application/json">'
+        . json_format($data, html_safe => 1)
+        . '</script>';
+
+This option does NOT make it safe to include the encoded JSON as an attribute
+value. There is no way to do that without violating JSON specs, so you should
+use entity escaping instead.
+
+Some JSON modules escape the forward slash (C</>) character instead, but that
+is, at best, B<only> sufficient for embedding inside a C<< <script> >> tag (I'm
+not sure how C<< <!-- >> and C<< <![CDATA[ >> are treated in that context). In
+any other context, you'll need the more thourough escaping provided by this
+C<html_safe> option.
 
 =item max_size
 
@@ -349,6 +364,66 @@ what every sensible implementation written in the past decade uses.
 This function plays fast and loose with timezone conversions, the parsed
 timestamp I<might> be off by an hour or so for a few hours around a DST change.
 This will not happen if your local timezone is UTC.
+
+=back
+
+
+=head2 Gzip Compression
+
+Gzip compression can be done with a few different libraries. The canonical one
+is I<zlib>, which is old and not well optimized for modern systems. There's
+also I<zlib-ng>, a (much) more performant reimplementation that remains
+API-compatible with I<zlib>. And there's I<libdeflate>, which offers a
+different API that does not support streaming compression but is, in exchange,
+even faster than I<zlib-ng>.
+
+There are more implementations, of course, but this module only supports those
+three and (attempts to) pick the best one that's available on your system.
+
+=over
+
+=item gzip_lib()
+
+Returns an empty string if no supported gzip library was found on your system
+(unlikely but possible), otherwise returns the selected implementation: either
+C<"libdeflate">, C<"zlib-ng"> or C<"zlib">.
+
+This function does not try very hard to differentiate between I<zlib> and
+I<zlib-ng>, so it may report that I<zlib> is being used on systems where
+C<libz.so> is, in fact, I<zlib-ng>.
+
+=item gzip_compress($level, $data)
+
+Returns a byte string with the gzip-compressed version of C<$data> at the given
+gzip C<$level>, which is a number between 0 (no compression) and 12 (strongest
+compression). Only I<libdeflate> supports levels higher than 9, for
+I<zlib(-ng)> the level is capped at 9. 6 is typically used as a default.
+
+Throws an error if no suitable library was found.
+
+This function is B<NOT> safe to use from multiple threads!
+
+=back
+
+This module does not currently implement decompression. If you need that, or
+streaming, or other functionality not provided here, there's
+L<Compress::Raw::Zlib> and L<Compress::Zlib> in the core Perl distribution and
+L<Gzip::Deflate> on CPAN.
+
+
+=head2 Brotli Compression
+
+Just a small wrapper around C<libbrotlienc.so>'s one-shot compression
+interface.
+
+=over
+
+=item brotli_compress($level, $data)
+
+Returns a byte string with the brotli-compressed version of C<$data> at the
+given quality C<$level> (between 0 and 11).
+
+Throws an error if C<libbrotlienc.so> could not be found or loaded.
 
 =back
 

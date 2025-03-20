@@ -21,18 +21,32 @@ File::Open::NoCache::ReadOnly - Open a file and flush from memory on closing
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+
+=head1 DESCRIPTION
+
+The C<File::Open::NoCache::ReadOnly> module is designed to open files for sequential,
+read-only access while optimizing memory usage by minimizing filesystem caching.
+This is particularly useful for processing large data files that only need to be read once,
+such as during database population or bulk data imports.
+The C<new> method facilitates opening files with options to specify file paths directly or via a parameter hash,
+and it can enforce fatal errors on failure if desired.
+The module uses L<IO::AIO::fadvise> to signal the operating system to avoid retaining file data in cache,
+improving memory efficiency.
+The module provides a C<fd> method to retrieve the file descriptor and a C<close> method for explicit resource cleanup.
+The destructor also ensures file closure when the object is destroyed,
+with safeguards to prevent redundant closure attempts.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
 Open a file that will be read once sequentially and not again,
-optimising the cache accordingly.
+optimising the filesystem cache accordingly.
 One use case is building a large database from smaller files that are
 only read in once,
 once the file has been used it's a waste of RAM to keep it in cache.
@@ -48,21 +62,26 @@ sub new {
 
 	# Handle hash or hashref arguments
 	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
+	if(@_ == 1) {
+		if(ref($_[0]) eq 'HASH') {
+			# If the first argument is a hash reference, dereference it
+			%params = %{$_[0]};
+		} else {
+			$params{'filename'} = shift;
+		}
+	} elsif((scalar(@_) % 2) == 0) {
+		%params = @_;
 	} elsif(ref($_[0]) || !defined($_[0])) {
 		Carp::carp('Usage: ', __PACKAGE__, '->new(%params)');
 		return;
-	} elsif((scalar(@_) % 2) == 0) {
-		%params = @_;
-	} else {
-		$params{'filename'} = shift;
 	}
 
 	if(!defined($class)) {
-		# Using CGI::Info->new(), not CGI::Info::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if((scalar keys %params) > 0) {
+			# Using File::Open::NoCache::ReadOnly:new(), not File::Open::NoCache::ReadOnly->new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
@@ -131,7 +150,7 @@ sub DESTROY {
 	}
 	my $self = shift;
 
-	if(my $fd = delete $self->{'fd'}) {
+	if($self->{'fd'}) {
 		$self->close();
 	}
 }
@@ -140,16 +159,16 @@ sub DESTROY {
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
-=head1 BUGS
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 Please report any bugs or feature requests to
 C<bug-file-Open-NoCache-ReadOnly at rt.cpan.org>,
 or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Open-NoCache-ReadOnly>.
 I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
+automatically be notified of the progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
@@ -171,16 +190,21 @@ L<http://search.cpan.org/dist/File-Open-NoCache-ReadOnly/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2024 Nigel Horne.
+Copyright 2019-2025 Nigel Horne.
 
 Usage is subject to licence terms.
 
 The licence terms of this software are as follows:
 
-* Personal single user, single computer use: GPL2
-* All other users (including Commercial, Charity, Educational, Government)
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
   must apply in writing for a licence for use from Nigel Horne at the
   above e-mail.
+
+=back
 
 =cut
 

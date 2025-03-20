@@ -1,5 +1,5 @@
 package Net::RDAP::Registry::IANARegistry;
-use DateTime::Format::ISO8601;
+use DateTime::Tiny;
 use Net::RDAP::Registry::IANARegistry::Service;
 use strict;
 use warnings;
@@ -49,8 +49,13 @@ Returns a string containing the version of the registry.
 
     $date = $registry->publication;
 
-Returns a L<DateTime> object corresponding to the date and time
-that the registry was last updated.
+Returns a L<DateTime::Tiny> object corresponding to the date and time
+that the registry was last updated. The C<publication_tz()> method returns the
+time zone portion of the publication date.
+
+Prior to Net::RDAP v0.35, this method returned a L<DateTime>, but this was
+switched to L<DateTime::Tiny> for performance reasons. If you need a
+L<DateTime>, use C<$event-E<gt>date-E<gt>DateTime>.
 
     @services = $registry->services;
 
@@ -60,9 +65,15 @@ registry.
 
 =cut
 
-sub description { $_[0]->{'description'} }
-sub version     { $_[0]->{'version'} }
-sub publication { DateTime::Format::ISO8601->parse_datetime($_[0]->{'publication'}) }
+sub description     { $_[0]->{'description'} }
+sub version         { $_[0]->{'version'} }
+sub publication     { DateTime::Tiny->from_string(substr($_[0]->{'publication'}, 0, 19)) }
+
+sub publication_tz  {
+    my $str = substr(shift->{publication}, 19);
+    $str =~ s/^\.\d+//g;
+    return $str;
+}
 
 sub services {
     my $self = shift;
@@ -79,7 +90,7 @@ sub services {
 
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

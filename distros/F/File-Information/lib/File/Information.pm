@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -505,7 +505,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -537,9 +537,6 @@ See L<File::Information::Base/verify> for that.
 
 A noteable difference of this module to other similar modules is the use of lifecycles.
 See L</lifecycles> for more information on that.
-
-B<Note:>
-Future versions of this module will depend on L<Data::Identifier>.
 
 =head1 METHODS
 
@@ -662,7 +659,7 @@ Other types may or may not be supported.
 
 =head2 tagpool
 
-    my @tagpool = $inode->tagpool;
+    my @tagpool = $instance->tagpool;
 
 Returns the list of found tagpools if any (See L<File::Information::Tagpool>).
 

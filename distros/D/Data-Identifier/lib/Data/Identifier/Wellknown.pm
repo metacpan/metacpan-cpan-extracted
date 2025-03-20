@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -225,7 +225,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -484,6 +484,28 @@ $type uuid
 .   84c0547d-4cce-4ece-8d47-57ca8b3a7763    ascii-decimal-integer-encoding
 
 
+$class direction
+$type uuid
+
+.   4e855294-4b4f-443e-b67b-8cb9d733a889    backwards                   sid=43
+.   6ad2c921-7a3e-4859-ae02-98e42522e2f8    forwards                    sid=44
+
+.   5cbdbe1c-e8b6-4cac-b274-b066a7f86b28    left                        sid=192
+.   3b1858a9-996b-4831-b600-eb55ab7bb0d1    right                       sid=193
+.   f158e457-9a75-42ac-b864-914b34e813c7    up                          sid=194
+.   4c834505-8e77-4da6-b725-e11b6572d979    down                        sid=195
+
+.   fd324dee-4bc7-4716-bf0c-6d50a69961b7    north                       sid=208
+.   8685e1d8-f313-403a-9f4d-48fce22f9312    east                        sid=209
+.   c65c5baf-630e-4a28-ace5-1082b032dd07    south                       sid=210
+.   7ed25dc4-5afc-4b39-8446-4df7748040a4    west                        sid=211
+
+.   7ce365d8-71d2-4bd6-95c9-888a8f1d834c    northeast                   sid=212
+.   39be7db6-1dc7-41c3-acd2-de19ad17a97f    northwest                   sid=213
+.   33233365-20ec-4073-9962-0cb4b1b1e48d    southeast                   sid=214
+.   b47ecfde-02b1-4790-85dd-c2e848c89d2e    southwest                   sid=215
+
+
 $class tagpool
 $type uuid
 
@@ -727,8 +749,8 @@ $type uuid
 $class gender-or-sex
 $type uuid
 
-.   d642eff3-bee6-5d09-aea9-7c47b181dd83    male
-.   db9b0db1-a451-59e8-aa3b-9994e683ded3    female
+.   d642eff3-bee6-5d09-aea9-7c47b181dd83    male                        sid=75
+.   db9b0db1-a451-59e8-aa3b-9994e683ded3    female                      sid=76
 
 
 $class flag
@@ -1302,7 +1324,8 @@ $type uuid
 % Handled above: 37
 % Unassigned: 38 - 40
 % Handled above: 41
-% Unassigned: 42 - 44
+% Unassigned: 42
+% Handled above: 43-44
 % Reserved: 45 - 47
 % Handled above: 48 - 50
 % Unassigned: 51
@@ -1341,8 +1364,10 @@ $type uuid
 % Reserved: 178
 % Unassigned: 179 - 188
 .   8a1cb2d6-df2f-46db-89c3-a75168adebf6    generator                   sid=189
-% Handled above: 190 - 191
-% Unassigned: 192 - 254
+% Handled above: 190 - 195
+% Unassigned: 196 - 207
+% Handled above: 208 - 215
+% Unassigned: 216 - 254
 % Reserved: 255
 
 $end

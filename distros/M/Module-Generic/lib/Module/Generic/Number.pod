@@ -100,9 +100,12 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->thousand # ,
     $n->unformat( "€ 1,024.00" ) # 1024
 
+    # Return the raw, underlying non-object real number
+    my $num = $n->real;
+
 =head1 VERSION
 
-    v2.1.1
+    v2.2.0
 
 =head1 DESCRIPTION
 
@@ -687,6 +690,10 @@ Sets or gets the floating precision of the number.
 
 Returns a random fractional number greater than or equal to 0 and less than the value of the number object.
 See L<perlfunc/"rand"> for more information.
+
+=head2 real
+
+Read-only. This returns the real underlying number used by this class.
 
 =head2 round
 

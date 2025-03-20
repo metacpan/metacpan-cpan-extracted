@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader
 
+0.07053 - 2025-03-19
+        - fix: properly pass connect_info.options to make_schema_at (gh#59 - thanks @XSven)
+        - docs: fix tpyo (gh#26 - thanks @onefloid)
+
 0.07052 - 2024-01-06
         - fix: don't load Test::More in ::Utils
 

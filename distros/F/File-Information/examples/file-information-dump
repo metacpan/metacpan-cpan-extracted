@@ -40,8 +40,11 @@ foreach my $filename (@ARGV) {
     say $filename;
     say '-' x length($filename);
 
+    eval {$link->deep};
+
     dump_base($link);
     dump_base(scalar eval {$link->inode});
+    dump_base(scalar eval {$link->deep});
     dump_base(scalar eval {$link->filesystem});
     dump_base($_) foreach eval {$link->tagpool};
 }

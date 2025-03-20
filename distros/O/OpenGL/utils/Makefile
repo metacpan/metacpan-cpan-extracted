@@ -2,7 +2,7 @@
 
 # Default values for this Makefile
 GLUT_DEF=HAVE_FREEGLUT
-GLUT_LIB=glut
+GLUT_LIB=-lglut
 
 # Key OpenGL compile/link locations
 INC=-I/usr/include -I/usr/X11R6/include -I/usr/local/include -I/usr/openwin/include
@@ -14,7 +14,7 @@ CCFLAGS=${INC} -D${GLUT_DEF}
 
 # Link command
 LINK=cc
-LDFLAGS=${LIBS} -lGL -l${GLUT_LIB}
+LDFLAGS=${LIBS} -lGL ${GLUT_LIB}
 EXTRALIBS=-lGLU -lXi -lXmu -lXext -lX11 -lm
 
 

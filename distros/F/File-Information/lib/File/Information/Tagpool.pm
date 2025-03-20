@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 
 use File::Information::Lock;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; require File::ValueFile::Simple::Writer; 1;};
 my $HAVE_UUID_TINY = eval {require UUID::Tiny; 1;};
@@ -369,11 +369,19 @@ File::Information::Tagpool - generic module for extracting information from file
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
     use File::Information;
+
+    my @tagpool = $instance->tagpool;
+
+    my @tagpool = $inode->tagpool;
+
+    my File::Information::Tagpool $tagpool = ...;
+
+This module represents an instance of a tagpool.
 
 B<Note:> This package inherits from L<File::Information::Base>.
 

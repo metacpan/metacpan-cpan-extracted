@@ -6,7 +6,7 @@ DBIx::Migration::CLI - Seamless database schema up- and downgrades CLI
 
 =head1 VERSION
 
-0.21
+0.22
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ the I<version> is missing the latest migration version will be used.
 
 =item run()
 
-Executes this script and returns a proper C<exit()> argument value.
+Execute this script and return a proper C<exit()> argument value.
 
 =back
 

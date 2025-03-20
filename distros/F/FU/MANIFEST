@@ -1,5 +1,6 @@
 bench.PL
 c/common.c
+c/compress.c
 c/fcgi.c
 c/fdpass.c
 c/jsonfmt.c
@@ -28,6 +29,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/compress.t
 t/fcgi.t
 t/fdpass.t
 t/httpdate.t

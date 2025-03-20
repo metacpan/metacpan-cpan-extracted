@@ -1,0 +1,17 @@
+File::FStore
+-----------------
+
+This module provides support for a digest based/final state file store in Fellig format.
+
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

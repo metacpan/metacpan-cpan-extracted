@@ -158,7 +158,7 @@ if (@ARGV == 1) {
     make_schema_at(
         $c->{schema_class},
         $c->{loader_options} || {},
-        [ $dsn, $user, $pass, %{$options} ],
+        [ $dsn, $user, $pass, $options ],
     );
 }
 else {

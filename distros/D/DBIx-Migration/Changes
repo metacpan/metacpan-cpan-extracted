@@ -1,5 +1,12 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.22 Wed Mar 19 12:57:53 CET 2025
+        - Fix and improve documentation
+        - Add type constraints
+        - Add do_before attribute
+        - Replace adjust_migrate() method with new do_while attribute
+        - Add SQLite foreign key constraint test
+
 0.21 Tue Mar 11 08:25:59 CET 2025
         - Improve logging
         - Rename apply_managed_schema() method to adjust_migrate()

@@ -11,6 +11,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
                                       'Dist::Zilla::Plugin::CheckMetaResources' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
+                                      'Dist::Zilla::Plugin::Encoding' => '0',
                                       'Dist::Zilla::Plugin::EnsureChangesHasContent' => '0',
                                       'Dist::Zilla::Plugin::EnsurePrereqsInstalled' => '0',
                                       'Dist::Zilla::Plugin::GatherDir' => '0',

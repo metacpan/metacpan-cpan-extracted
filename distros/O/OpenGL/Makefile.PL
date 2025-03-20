@@ -2,14 +2,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Liblist;
-use Data::Dumper;
 use Config;
-
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-
-# Ensure deterministic output
-$Data::Dumper::Sortkeys = 1;
+use File::Spec::Functions;
 
 # Supported windowing interfaces
 our $is_valid_interface =
@@ -69,7 +63,8 @@ our $IS_MINGW = 0;
 our $IS_STRAWBERRY = 0;
 our $IS_CYGWIN;
 our $IS_W32API;
-my $INCS;
+our $INCS = '';
+our $NO_LGCC = grep /^NO_LGCC$/, @ARGV; @ARGV = grep !/^NO_LGCC$/, @ARGV;
 
 my $prepare_success = eval {
 
@@ -124,8 +119,6 @@ if ($IS_MINGW)
 # Look for available libs
 our @libdirs = qw
 {
-  -L/usr/lib
-  -L/usr/lib/i386-linux-gnu
   -L/usr/X11R6/lib
   -L/opt/X11/lib
   -L/usr/local/lib
@@ -370,20 +363,6 @@ elsif($IS_CYGWIN)
   delete($found_libs->{'OPENGL32'});
 }
 
-if (0) { # May be not necessary now, see if removing makes a difference
-   if (!$found_libs->{'GL'})
-   {
-      if ($found_libs->{'GLX'})
-      {
-         $found_libs->{'GL'} = $found_libs->{'GLX'};
-      }
-      elsif ($found_libs->{'MESA'})
-      {
-         $found_libs->{'GL'} = $found_libs->{'MESA'};
-      }
-   }
-}
-
 print "resulting libs:\n" if ($verbose);
 foreach my $key (sort keys %$found_libs)
 {
@@ -393,9 +372,8 @@ foreach my $key (sort keys %$found_libs)
 }
 
 # Configure MakeMaker
-my($LIBS,$OPTS,$CLEAN,$LDFROM);
-my $EXES = [];
-my $DYNS = {};
+my ($LIBS,$OPTS,$CLEAN);
+my $DYNS;
 if ($IS_W32API || (($^O eq 'MSWin32') && !$IS_CYGWIN))		# Win32
 {
   my $glut_lib = '-lopengl32 -lglu32 ';
@@ -412,34 +390,23 @@ if ($IS_W32API || (($^O eq 'MSWin32') && !$IS_CYGWIN))		# Win32
     $glut_lib .= '-LFreeGLUT -lfreeglut';
   }
 
-  if ($IS_MINGW)	# MINGW
+  $LIBS = $glut_lib;
+  if ($IS_W32API)	# CYGWIN W32API
   {
-    $LDFROM = $glut_lib;
-  }
-  elsif ($IS_W32API)	# CYGWIN W32API
-  {
-     my $glut = ($found_libs->{FREEGLUT32}) ? $found_libs->{FREEGLUT32} : $found_libs->{GLUT32};
+    my $glut = ($found_libs->{FREEGLUT32}) ? $found_libs->{FREEGLUT32} : $found_libs->{GLUT32};
+    $glut =~ s/^-l//;
 
-    $LIBS = "-L/usr/lib/w32api $glut_lib";
-    $LDFROM = $glut_lib;
+    $LIBS = "-L/usr/lib/w32api $LIBS";
     ### $INCS = '-I/usr/include/w32api';
     $INCS = '-I/usr/include/opengl';
     $DEFS .= " -DHAVE_W32API";
     $DYNS = { OTHERLDFLAGS => '-Wl,--exclude-symbols,'."\x7F".$glut.'_NULL_THUNK_DATA' };
   }
-  else			# Windows VC6
+  elsif (!$IS_MINGW) # Windows VC6
   {
-    $LIBS = $glut_lib;
     $OPTS = "/ogity /GDs";
   }
 
-  # Using a dll as EXES is incorrect for EU::MM, since the EXES here mean
-  # perl scripts and not windows binaries or DLLs.  This puts the DLL in
-  # blib/bin from whence it should be installed correctly.  It is not
-  # clear that this step is even needed since the freeglut.dll is installed
-  # by this Makefile.PL if no FreeGLUT is found.
-  #
-  ## $EXES = ['FreeGLUT/freeglut.dll'];
   {
      system $^X , qw[-MExtUtils::Command -e mkpath --], qw[blib/arch/auto/OpenGL];
      system $^X , qw[-MExtUtils::Command -e cp --], qw[FreeGLUT/freeglut.dll blib/arch/auto/OpenGL/freeglut.dll];
@@ -457,7 +424,7 @@ elsif ($interface_lib eq 'AGL')					# Mac OS X
 {
   $INCS = ""; # no include flags required: Apple gcc will automatically pick up the system frameworks
   $DEFS .= " -DHAVE_AGL_GLUT -Wno-deprecated-declarations ";  # So we know we have glutWMCloseFunc() and glutCheckLoop()
-  $DYNS = { OTHERLDFLAGS => "-framework OpenGL -framework GLUT" };
+  $LIBS = "-framework OpenGL -framework GLUT -lm";
 }
 else # Everyone else
 {
@@ -474,7 +441,6 @@ else # Everyone else
   };
   $INCS = "@includes";
 
-
   # Test for obfuscated GLX
   # quite often GLX is in -lGL...  Test for GL/glx.h instead...
   my $out = cfile_text('GL/glx.h');
@@ -485,7 +451,6 @@ else # Everyone else
 
   if ($has_glx)
   {
-    #delete($found_libs->{GLX});
     $DEFS .= " -DHAVE_GLX";
   }
   elsif (!$found_libs->{GLX} && $verbose)
@@ -503,33 +468,21 @@ else # Everyone else
 
   if ($has_freeglut)
   {
-    #delete($found_libs->{GLX});
     $DEFS .= " -DHAVE_FREEGLUT -DHAVE_FREEGLUT_H";
-    $found_libs->{FREEGLUT}="glut";
   }
 
   # Marshall libs
-  my $libs = ' -l'.join(' -l',sort values(%$found_libs));
+  my $libs = join '', map " $_", sort values %$found_libs;
   my @more_libs = qw
   {
-    -lXext
-    -lXmu
-    -lXi
-    -lICE
-    -lX11
-    -lstdc++
     -lm
   };
-  #-lXIE
   $LIBS = "@libdirs $libs @more_libs";
   $DEFS .= " -DGL_GLEXT_LEGACY";
 
-
   # Handle obfuscated gcc
-  my $no_lgcc = (grep /^NO_LGCC$/, @ARGV);
-  @ARGV = grep !/^NO_LGCC$/, @ARGV;
 
-  if (!$no_lgcc)
+  if (!$NO_LGCC)
   {
     # This may be a gcc compiler in disguise.
     # Should check for gccversion as well.
@@ -555,42 +508,38 @@ else # Everyone else
   }
 }
 
-# Check for gcc version 3.2.3 and turn off OPTIMIZE to work
-# around compiler bug reported via cpan testers reports
-if ( defined( $Config{gccversion} )  and $Config{gccversion} =~ /^3\.2\.3 / ) {
-   $OPTS = '-O0';       # turn off optimization for gcc 3.2.3
-}
-
 clean_incs( $INCS );
-
-clean_libs( $LIBS );
 
 # This is the final build configuration
 my $build_config =
 {
-  'NAME'	=> 'OpenGL',
-  'VERSION_FROM'=> 'OpenGL.pm',
-  'PM' 		=>
-  {
-    'OpenGL.pm' => '$(INST_LIBDIR)/OpenGL.pm',
-    'OpenGL.pod'=> '$(INST_LIBDIR)/OpenGL.pod',
-    'Array.pod'=> '$(INST_LIBDIR)/OpenGL/Array.pod',
-    'Tessellation.pod'=> '$(INST_LIBDIR)/OpenGL/Tessellation.pod',
-    'Config.pm' => '$(INST_LIBDIR)/OpenGL/Config.pm'
-  },
+  DEFINE => $DEFS,
+  INC => $INCS,
+  LIBS => $LIBS,
+  !defined($DYNS) ? () : (dynamic_lib => $DYNS),
+  !defined($OPTS) ? () : (OPTIMIZE => $OPTS),
+};
+
+print "\nMakeMaker configuration:\n" if $verbose;
+
+close(CONF) if (open(CONF,">", "lib/OpenGL/Config.pm")); # empty Config.pm
+WriteMakefile(
+  NAME	=> 'OpenGL',
+  VERSION_FROM=> 'lib/OpenGL.pm',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0
   },
-  TEST_REQUIRES => { 'Test::More' => 0 },
-  'AUTHOR'	=> "Chris Marshall ".'<chm at cpan dot org>',
-  'OBJECT' 	=> '$(BASEEXT)$(OBJ_EXT) gl_util$(OBJ_EXT) pogl_const$(OBJ_EXT) pogl_gl_top$(OBJ_EXT) pogl_glu$(OBJ_EXT) pogl_rpn$(OBJ_EXT) pogl_matrix$(OBJ_EXT) pogl_glut$(OBJ_EXT) pogl_gl_Accu_GetM$(OBJ_EXT) pogl_gl_GetP_Pass$(OBJ_EXT) pogl_gl_Mult_Prog$(OBJ_EXT) pogl_gl_Pixe_Ver2$(OBJ_EXT) pogl_gl_Prog_Clam$(OBJ_EXT) pogl_gl_Tex2_Draw$(OBJ_EXT) pogl_gl_Ver3_Tex1$(OBJ_EXT) pogl_gl_Vert_Multi$(OBJ_EXT)',
-  'XSPROTOARG'	=> '-noprototypes',
-  'DEFINE'	=> $DEFS,
-  'INC'		=> $INCS,
-  'LIBS' 	=> $LIBS,
-  'dynamic_lib'	=> $DYNS,
-  'LDFROM'      => '$(OBJECT) '.(defined($LDFROM)?$LDFROM:''),
-  'META_MERGE' => {
+  TEST_REQUIRES => { 'Test::More' => '0.88' },
+  AUTHOR	=> "Chris Marshall ".'<chm at cpan dot org>',
+  XSMULTI => 1,
+  XSBUILD => {
+    xs => {
+      map +($_ => {OBJECT => "$_\$(OBJ_EXT) gl_util\$(OBJ_EXT)"}),
+        map "lib/OpenGL/$_", qw(V1 V2 V3 Array Matrix Const GLX GLU GLUT),
+    },
+  },
+  XSPROTOARG	=> '-noprototypes',
+  META_MERGE => {
      "meta-spec" => { version => 2 },
      abstract  => 'Perl bindings to the OpenGL API, GLU, and GLUT/FreeGLUT',
      resources => {
@@ -604,23 +553,17 @@ my $build_config =
         x_IRC => 'irc://irc.perl.org/#pogl',
      },
   },
-  'EXE_FILES'	=> $EXES,
-  'OPTIMIZE'	=> $OPTS,
-  'clean'       =>
-  {
+  clean       => {
     FILES =>
-      "Config.pm ".
+      "lib/OpenGL/Config.pm ".
       "gl_exclude.h ".
       "utils/glversion.txt ".
       "utils/glversion$Config{exe_ext} ".
       "utils/glversion$Config{obj_ext}"
-  }
-};
-
-print "\nMakeMaker configuration:\n" if $verbose;
-
-close(CONF) if (open(CONF,">Config.pm"));	# Generate place-holder Config.pm
-WriteMakefile( %$build_config );       		# Generate the Makefile
+  },
+  %$build_config,
+  INC => $INCS . ' -I'.curdir(),
+);       		# Generate the Makefile
 WriteConfigPM( $build_config );			# Regenerate final Config.pm
 
 if ($found_libs->{GLX} && $ENV{TERM} ne 'xterm')
@@ -665,15 +608,15 @@ sub get_libs
   # Mac OS X
   if ($^O eq 'darwin' && -d '/System/Library/Frameworks/OpenGL.framework')
   {
-    $found->{GL} = 'OpenGL.framework';
-    $found->{GLU} = 'AGL.framework';
+    $found->{GL} = '-framework OpenGL';
+    $found->{GLU} = '-framework AGL';
     if (-e '/opt/X11/lib/libglut.3.dylib')
     {
-      $found->{FREEGLUT} = 'glut';
+      $found->{FREEGLUT} = '-lglut';
     }
     else
     {
-      $found->{GLUT} = 'GLUT.framework';
+      $found->{GLUT} = '-framework GLUT';
     }
     return $found;
   }
@@ -682,9 +625,9 @@ sub get_libs
   if ($IS_STRAWBERRY)
   {
      # libs for strawberry perl go here
-     $found->{FREEGLUT} = 'glut';
-     $found->{OPENGL32} = 'opengl32';
-     $found->{GLU32} = 'glu32';
+     $found->{FREEGLUT} = '-lglut';
+     $found->{OPENGL32} = '-lopengl32';
+     $found->{GLU32} = '-lglu32';
   }
   elsif (($^O eq 'MSWin32') || $IS_W32API)
   {
@@ -693,8 +636,7 @@ sub get_libs
     my $sep = $IS_W32API ? ':' : ';';
     my @paths = split($sep.'\s*',$paths);
 
-    my $sysroot = $ENV{'SYSTEMROOT'};
-    @paths = ("$sysroot/system32",@paths) if ($sysroot);
+    unshift @paths, "$ENV{SYSTEMROOT}/system32" if $ENV{SYSTEMROOT};
 
     $libs = {OPENGL32=>'opengl32.dll',GLU32=>'glu32.dll',GLUT32=>'glut32.dll',FREEGLUT32=>'freeglut.dll'};
     foreach my $key (sort keys %$libs)
@@ -710,7 +652,7 @@ sub get_libs
           next if $path eq join "/", @p or $path eq join "\\", @p;
         }
         # print "  $key: $lib\n";
-        $found->{$key} = $lib;
+        $found->{$key} = "-l$lib";
         last;
       }
     }
@@ -744,7 +686,7 @@ sub get_libs
       if (-e "$dll_dir/freeglut.dll")
       {
         print "Installed freeglut.dll at $dll_dir\n";
-        $found->{FREEGLUT32} = 'freeglut'
+        $found->{FREEGLUT32} = '-lfreeglut'
       }
       else
       {
@@ -775,28 +717,28 @@ sub get_libs
 
     if ($lib =~ m|([\w]*freeglut[\w]*)|i)
     {
-      $found->{FREEGLUT} = $1;
+      $found->{FREEGLUT} = "-l$1";
     }
     elsif ($lib =~ m|([\w]*glut[\w]*)$|i)
     {
-      $found->{GLUT} = $1;
+      $found->{GLUT} = "-l$1";
     }
     elsif ($lib =~ m|([\w]*glu[\w]*)$|i)
     {
-      $found->{GLU} = $1;
+      $found->{GLU} = "-l$1";
     }
     elsif ($lib =~ m|([\w-]*glx)$|i)
     {
-      $found->{GLX} = $1;
+      $found->{GLX} = "-l$1";
     }
     elsif ($lib =~ m|([\w]*gl)$|i)
     {
-      $found->{GL} = $1;
+      $found->{GL} = "-l$1";
     }
 
     if ($lib =~ m|([\w]*mesa(gl)?.*)|i)
     {
-      $found->{MESA} = $1;
+      $found->{MESA} = "-l$1";
     }
   }
 
@@ -858,7 +800,7 @@ sub get_extensions
   }
   elsif ($^O eq 'darwin')
   {
-    $make_ver = ";make -f Makefile.macosx " .  (length($lib) ? "GLUT_LIB=$lib " : "") . (length($def) ? "GLUT_DEF=$def " : "");
+    $make_ver = ";make -f Makefile.macosx " .  (length($lib) ? "GLUT_LIB='$lib' " : "") . (length($def) ? "GLUT_DEF=$def " : "");
     print "MacOSX glversion: '$make_ver'\n" if $verbose>1;
   }
   else
@@ -1015,38 +957,17 @@ sub clean_incs {
    $_[0] = $outincs;
 }
 
-# Takes as input a LIBS string ready for MakeMaker and cleans out
-# non-existant directories and libraries to produce a better,
-# minimal configuration value
-sub clean_libs {
-   my $inlibs = $_[0];
-   return unless defined $inlibs;
-   print "clean_libs: got input LIBS='$inlibs'\n" if $verbose>1;
-
-   my @inlibs = split ' ', $inlibs;
-
-   # clean out -L args with non-existent directories
-   print "clean_libs: removing bad directories\n" if $verbose>1;
-   my @outlibs = grep { my $tmp = $_; /^-l/ or $tmp =~ s/^-L// and ( -d $tmp or -l $tmp) } @inlibs;
-
-
-   my $outlibs = join ' ', @outlibs;
-
-   print "clean_libs: returning LIBS='$outlibs'\n" if $verbose>1;
-   $_[0] = $outlibs;
-}
-
 # Dump Config.pm
 sub WriteConfigPM
 {
   my($config) = @_;
 
-  die "Unable to write to Config.pm\n" if (!open(CONFIGPM, ">Config.pm"));
+  die "Unable to write to Config.pm\n" if (!open(CONFIGPM, ">", "lib/OpenGL/Config.pm"));
 
   print CONFIGPM q
 {
 # This is the Perl OpenGL build configuration file.
-# It contains the final OpenGL build arguements from
+# It contains the final OpenGL build arguments from
 # the configuration process.  Access the values by
 # use OpenGL::Config which defines the variable
 # $OpenGL::Config containing the hash arguments from
@@ -1054,6 +975,9 @@ sub WriteConfigPM
 #
 };
 
+  require Data::Dumper;
+  # Ensure deterministic output
+  { no warnings; $Data::Dumper::Sortkeys = 1; }
   print CONFIGPM Data::Dumper->Dump( [$config], [qw(OpenGL::Config)] );
 
   print CONFIGPM qq
@@ -1063,4 +987,4 @@ __END__
 };
 
   close(CONFIGPM);
-};
+}

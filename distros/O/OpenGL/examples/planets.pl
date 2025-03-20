@@ -1,5 +1,3 @@
-#!/usr/bin/perl -w
-
 use strict;
 use Time::HiRes qw(sleep);
 use OpenGL ':old', ':glutfunctions', ':glutconstants';

@@ -23,7 +23,7 @@ requires 'Data::Kramerius' => 0;
 requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
-requires 'MARC::Convert::Wikidata::Object' => 0.08;
+requires 'MARC::Convert::Wikidata::Object' => 0.10;
 requires 'MARC::Convert::Wikidata::Object::ExternalId' => 0;
 requires 'MARC::Convert::Wikidata::Object::ISBN' => 0.07;
 requires 'MARC::Convert::Wikidata::Object::Kramerius' => 0;
@@ -44,12 +44,13 @@ test_requires 'File::Object' => 0;
 test_requires 'MARC::Record' => 0;
 test_requires 'MARC::File::XML' => 0;
 test_requires 'Perl6::Slurp' => 0;
+test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.24';
+version '0.25';
 
 # Run.
 WriteAll();

@@ -1,7 +1,9 @@
 package Net::RDAP::JCard::Property;
-use List::Util qw(pairmap);
+use List::Util qw(any);
 use strict;
 use warnings;
+
+my @URI_TYPES = qw(source logo member related sound uid uri caladruri caluri contact-uri socialprofile impp url email);
 
 =pod
 
@@ -118,7 +120,14 @@ Returns a string containing the property value type. See the L<vCard Value Data
 Types|https://www.iana.org/assignments/vcard-elements/vcard-elements.xhtml#value-data-types>
 IANA registry for a list of possible values.
 
-This method will always return the value type in UPPERCASE.
+This method will always return the value type in lowercase.
+
+=head2 URIness
+
+Some properties may be URIs, depending on the property type and value type. The
+C<may_be_uri()> method will return a true value if the property value may be a
+URI (either because of the specification of its type, or the value of its
+C<value_type()>.
 
 =head2 PROPERTY VALUE
 
@@ -156,11 +165,24 @@ sub TO_JSON {
     ];
 }
 
+sub may_be_uri {
+    my $self = shift;
+    if (q{uri} eq $self->value_type) {
+        return 1;
+
+    } elsif (any { $_ eq $self->type } @URI_TYPES) {
+        return 1;
+
+    }
+
+    return undef;
+}
+
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

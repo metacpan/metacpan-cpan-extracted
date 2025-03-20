@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl
-#
 #          texhack
 #
 #  This program demonstrates texture mapping  
@@ -11,11 +9,7 @@
 #  thing of bytes.
 #  The file format must be full color ascii ppm like
 #  what is outputted from the image program xv.
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
  
 $spin=0.0;

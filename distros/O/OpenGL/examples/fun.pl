@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl 
-#
 #       object oriented programming example
 #
 # Example developed entirely by Stan Melax (stan@arc.ab.ca).
@@ -10,11 +8,7 @@
 # years ago in grad school for a VR assignment.  When Randy Pausch
 # (a VR God from U of Virginia) visited the U of Alberta, he was
 # impressed and took a copy of the algorithm.  
-#
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
 
 sub abs{

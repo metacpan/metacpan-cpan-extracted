@@ -17,9 +17,10 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
+#@returns Data::Identifier
 sub integer {
     my ($pkg, $request, %opts) = @_;
     $opts{request}      = $request;
@@ -62,6 +63,7 @@ sub unicode_character {
 }
 
 
+#@returns Data::Identifier
 sub colour {
     my ($pkg, $colour, %opts) = @_;
     $opts{request}      = $colour;
@@ -71,6 +73,7 @@ sub colour {
 }
 
 
+#@returns Data::Identifier
 sub date {
     my ($pkg, $request, %opts) = @_;
     my ($year, $month, $day);
@@ -135,6 +138,7 @@ sub date {
 }
 
 
+#@returns Data::Identifier
 sub generic {
     my ($pkg, %opts) = @_;
 
@@ -316,7 +320,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

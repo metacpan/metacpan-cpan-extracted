@@ -13,7 +13,7 @@ my $build = Module::Build->new(
     'JSON::PP'              => 4.16
   },
   test_requires => {
-    'DBD::SQLite'       => 0,
+    'DBD::SQLite'       => 1.27,        # Supports foreign key constraints
     'DBD::Mock'         => 0,
     'Test::API'         => 0,
     'Test::DatabaseRow' => 0,

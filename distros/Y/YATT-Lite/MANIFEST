@@ -661,6 +661,7 @@ t/error.t
 t/factory.t
 t/factory_crossbase.t
 t/factory_invoke_sub.t
+t/inspector.t
 t/instpkg.t
 t/lib/.symlinks
 t/lineno.t

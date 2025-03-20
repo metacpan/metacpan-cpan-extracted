@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl 
-#
 # This is an example of combining the tk module and opengl
 # You have to have TK installed for this to work.
 # this program opens a window and when you hit a key in
@@ -8,9 +6,7 @@
 # Yes, this is a totally lame program, but its a proof
 # of concept sort of thing.
 # We'll get something better next time :-)
-#
 
-use lib ('blib');
 use strict;
 use Tk;
 use OpenGL;

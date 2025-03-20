@@ -23,6 +23,12 @@ t/07-cli-sqlite.t
 t/08-sqlite-dbh.t
 t/09-cli-postgres-trigger.t
 t/lib/Test/PgTAP.pm
+t/sql/advanced/2_up.sql
+t/sql/advanced/data_3_down.sql
+t/sql/advanced/data_3_up.sql
+t/sql/advanced/schema_1_down.sql
+t/sql/advanced/schema_1_up.sql
+t/sql/advanced/schema_2_down.sql
 t/sql/basic/2_up.sql
 t/sql/basic/schema_1_down.sql
 t/sql/basic/schema_1_up.sql

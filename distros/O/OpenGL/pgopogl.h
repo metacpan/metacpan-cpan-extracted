@@ -27,22 +27,10 @@
  * miscellaneous
  */
 
-/* never use this function directly.  use PGOPOGL_CALL_BOOT. */
-void _pgopogl_call_XS (pTHX_ void (*subaddr) (pTHX_ CV *), CV * cv, SV ** mark);
-
-/*
- * call the boot code of a module by symbol rather than by name.
- *
- * in a perl extension which uses several xs files but only one pm, you
- * need to bootstrap the other xs files in order to get their functions
- * exported to perl.  if the file has MODULE = Foo::Bar, the boot symbol
- * would be boot_Foo__Bar.
- */
-#define PGOPOGL_CALL_BOOT(name)	\
-	{						\
-		extern XS(name);			\
-		_pgopogl_call_XS (aTHX_ name, cv, mark);	\
-	}
+/* These macros used in BOOT */
+#define OGL_CONST_i(test) newCONSTSUB(stash, #test, newSViv((int)test));
+#define OGL_CONST_f(test) newCONSTSUB(stash, #test, newSVnv((double)test));
+#define OGL_CONST_p(test) newCONSTSUB(stash, #test, newSViv(PTR2IV(test)));
 
 #define PackCallbackST(av,first)					\
 	if (SvROK(ST(first)) && (SvTYPE(SvRV(ST(first))) == SVt_PVAV)){	\

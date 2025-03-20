@@ -1,5 +1,8 @@
 Revision history for File-Open-NoCache-ReadOnly
 
+0.05	Wed Mar 19 13:23:57 EDT 2025
+	Fix "Attempt to close object twice"
+
 0.04	Tue Dec  3 14:35:40 EST 2024
 	Use Test::DescribeMe to simplify tests
 	Added t/30-basics.t

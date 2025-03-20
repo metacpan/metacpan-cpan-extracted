@@ -1,4 +1,4 @@
-package FU 0.3;
+package FU 0.4;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -6,6 +6,7 @@ use POSIX ();
 use Time::HiRes 'time';
 use FU::Log 'log_write';
 use FU::Util;
+use FU::Validate;
 
 
 sub import($pkg, @opt) {
@@ -393,13 +394,13 @@ sub _do_req($c) {
     }
 
     my $proc_ms = ($REQ->{trace_end} - $REQ->{trace_start}) * 1000;
-    log_write(sprintf "%.0fms%s %s-%s %s-%d\n", $proc_ms,
+    log_write(sprintf "%.0fms%s %s-%s %d-%s\n", $proc_ms,
         $REQ->{trace_nsql} ?
             sprintf ' (sql %.0f+%.0fms, %d/%d/%d)',
             ($REQ->{trace_sqlexec}||0)*1000, ($REQ->{trace_sqlprep}||0)*1000,
             $REQ->{trace_nsqldirect}||0, $REQ->{trace_nsqlprep}||0, $REQ->{trace_nsql} : '',
         $REQ->{status}, ($REQ->{reshdr}{'content-type'}//'-') =~ s/;.+$//r,
-        $REQ->{reshdr}{'content-encoding'}//'bytes', length($REQ->{resbody}),
+        length($REQ->{resbody}), substr($REQ->{reshdr}{'content-encoding'}//'r', 0, 1)
     ) if FU::debug || $proc_ms > (FU::log_slow_reqs||1e10);
 }
 
@@ -641,7 +642,6 @@ sub _getfield($data, @a) {
         fu->error(400, "Expected top-level to be a hash") if ref $data ne 'HASH';
         return $data->{$a[0]};
     }
-    require FU::Validate;
     my $schema = FU::Validate->compile(@a > 1 ? { keys => {@a} } : $a[0]);
     my $res = eval { $schema->validate($data) };
     fu->error(400, "Input validation failed: $@") if $@;
@@ -655,10 +655,28 @@ sub query {
     _getfield $FU::REQ->{qs_parsed}, @_;
 }
 
+sub cookie {
+    shift;
+    return fu->header('cookie') if !@_;
+    $FU::REQ->{cookie} ||= do {
+        my %c;
+        for my $c (split /; /, fu->header('cookie')||'') {
+            my($n, $v) = split /=/, $c, 2;
+            if (!exists $c{$n}) { $c{$n} = $v }
+            elsif (ref $c{$n}) { push $c{$n}->@*, $v }
+            else { $c{$n} = [ $c{$n}, $v ] }
+        }
+        \%c
+    };
+    _getfield $FU::REQ->{cookie}, @_;
+}
+
 sub json {
     shift;
+    fu->error(400, "Invalid content type for json") if (fu->header('content-type')||'') ne 'application/json';
+    return FU::Util::utf8_decode(my $x = $FU::REQ->{body}) if !@_;
     $FU::REQ->{json} ||= eval {
-        FU::Util::json_parse($FU::REQ->{data}, utf8 => 1)
+        FU::Util::json_parse($FU::REQ->{body}, utf8 => 1)
     } || fu->error(400, "JSON parse error: $@");
     return $FU::REQ->{json} if !@_;
     _getfield $FU::REQ->{json}, @_;
@@ -666,10 +684,10 @@ sub json {
 
 sub formdata {
     shift;
+    fu->error(400, "Invalid content type for form data") if (fu->header('content-type')||'') ne 'application/x-www-form-urlencoded';
+    return FU::Util::utf8_decode(my $x = $FU::REQ->{body}) if !@_;
     $FU::REQ->{formdata} ||= eval {
-        confess "Invalid content type for form data"
-            if (fu->header('content-type')||'') ne 'application/x-www-form-urlencoded';
-        FU::Util::query_decode($FU::REQ->{data});
+        FU::Util::query_decode($FU::REQ->{body});
     } || fu->error(400, $@);
     _getfield $FU::REQ->{formdata}, @_;
 }
@@ -725,6 +743,39 @@ sub add_header($, $hdr, $val) {
 sub set_header($, $hdr, $val=undef) {
     _validate_header($hdr, $val);
     $FU::REQ->{reshdr}{ lc $hdr } = $val;
+}
+
+sub set_cookie($, $name, $val=undef, %opt) {
+    confess "Invalid cookie name '$name'" if $name !~ /^$FU::hdrname_re$/;
+    return delete $FU::REQ->{rescookie}{$name} if !defined $val;
+    confess "Invalid cookie value: $val" if $val =~ /[\0-\x1f\x7f-\x{10ffff}\s\r\n\t",;\\]/;
+    my $c = "$name=$val";
+    for my ($k,$v) (%opt) {
+        $k = lc $k; # attributes are case-insensitive
+        if ($k eq 'domain') {
+            confess "Invalid cookie domain: $v" if $v !~ $FU::Validate::re_domain;
+        } elsif ($k eq 'expires') {
+            confess "Cookie 'Expires' attribute should be a UNIX timestamp" if defined $v && $v !~ /^[0-9]+$/;
+            $v = FU::Util::httpdate_format($v || 0);
+        } elsif ($k eq 'httponly') {
+            $c .= "; $k" if $v;
+            next;
+        } elsif ($k eq 'max-age') {
+            confess "Invalid 'Max-Age' cookie attribute: $v" if $v !~ /^[0-9]+$/;
+        } elsif ($k eq 'partitioned') {
+            $c .= "; $k" if $v;
+            next;
+        } elsif ($k eq 'path') {
+            confess "Invalid 'Path' cookie attribute: $v" if $v =~ /[\0-\x1f\x7f-\x{10ffff}\s\r\n\t",;\\]/;
+        } elsif ($k eq 'secure') {
+            $c .= "; $k" if $v;
+            next;
+        } elsif ($k eq 'samesite') {
+            confess "Invalid 'SameSite' cookie attribute: $v" if $v !~ /^(?:Strict|Lax|None)$/;
+        }
+        $c .= "; $k=$v";
+    }
+    $FU::REQ->{rescookie}{$name} = $c;
 }
 
 sub send_json($, $data) {
@@ -799,8 +850,11 @@ sub _error_page($, $code, $title, $msg) {
 }
 
 sub _finalize {
-    state $haszlib = eval { require Compress::Raw::Zlib; 1 };
+    state $hasgzip = FU::Util::gzip_lib();
+    state $hasbrotli = eval { FU::Util::brotli_compress(6, ''); 1 };
     my $r = $FU::REQ;
+
+    fu->add_header('set-cookie', $_) for $r->{rescookie} ? sort values $r->{rescookie}->%* : ();
 
     if ($r->{status} == 204 || $r->{status} == 304) {
         delete $r->{reshdr}{'content-length'};
@@ -809,18 +863,20 @@ sub _finalize {
         $r->{resbody} = '';
 
     } else {
-        if ($haszlib && length($r->{resbody}) > 256
-                && !defined $r->{reshdr}{'content-encoding'} && FU::compress_mimes->{$r->{reshdr}{'content-type'}}) {
+        if (($hasgzip || $hasbrotli) && length($r->{resbody}) > 256
+                && !defined $r->{reshdr}{'content-encoding'}
+                && FU::compress_mimes->{$r->{reshdr}{'content-type'}}
+        ) {
 
             $r->{reshdr}{'vary'} = ($r->{reshdr}{'vary'} ? $r->{reshdr}{'vary'}.', ' : '').'accept-encoding'
                 if ($r->{reshdr}{'vary'}||'') !~ /accept-encoding/i;
 
-            if ($haszlib && ($r->{hdr}{'accept-encoding'}||'') =~ /gzip/) {
-                # Use lower-level API because the higher-level Compress::Zlib loads a whole bunch of other modules.
-                my $z = Compress::Raw::Zlib::Deflate->new(-WindowBits => Compress::Raw::Zlib::WANT_GZIP(), -Level => 3, -AppendOutput => 1);
-                $z->deflate($r->{resbody}, my $buf);
-                $z->flush($buf);
-                $r->{resbody} = $buf;
+            if ($hasbrotli && ($r->{hdr}{'accept-encoding'}||'') =~ /\bbr\b/) {
+                $r->{resbody} = FU::Util::brotli_compress(6, $r->{resbody});
+                $r->{reshdr}{'content-encoding'} = 'br';
+
+            } elsif ($hasgzip && ($r->{hdr}{'accept-encoding'}||'') =~ /\bgzip\b/) {
+                $r->{resbody} = FU::Util::gzip_compress(6, $r->{resbody});
                 $r->{reshdr}{'content-encoding'} = 'gzip';
             }
         }
@@ -939,6 +995,12 @@ is). There are a few additional optional dependencies:
 
 =item * C<libpq.so> - required for L<FU::Pg>, dynamically loaded through
 C<dlopen()>.
+
+=item * C<libdeflate.so> or C<libz-ng.so> or C<libz.so> - required for
+C<gzip_compress()> in L<FU::Util> and used for HTTP output compression.
+
+=item * C<libbrotlienc.so> - required for C<brotli_compress()> in L<FU::Util>
+and used for HTTP output compression.
 
 =back
 
@@ -1235,9 +1297,9 @@ C<https://example.com/some/path?query> this returns C<query>.
 =item fu->query($name)
 
 Parses the raw query string with C<query_decode> in L<FU::Util> and returns the
-value with the given $name. Beware: multiple values are returned as an array.
-Prefer to use the C<$schema>-based validation methods below to reliably handle
-all sorts of query strings.
+value with the given $name. Beware: an array is returned if the given key is
+repeated in the query string.  Prefer to use the C<$schema>-based validation
+methods below to reliably handle all sorts of query strings.
 
 =item fu->query($name => $schema)
 
@@ -1260,12 +1322,35 @@ Parse, validate and return multiple query parameters.
   # Or, more concisely:
   my $data = fu->query(a => {anybool => 1}, b => {});
 
-=item fu->json(@args)
+To fetch all query paramaters as decoded by C<query_decode()>, use:
 
-Like C<< fu->query() >> but parses the request body as JSON. Returns the
-decoded JSON value if C<@args> is empty.
+  my $data = fu->query({type=>'any'});
 
-=item fu->formdata(@args)
+To fetch a query parameter that may have multiple values, use:
+
+  my $arrayref = fu->query(q => {accept_scalar => 1});
+
+  # OR:
+  my $first_value = fu->query(q => {accept_array => 'first'});
+
+  # OR:
+  my $last_value = fu->query(q => {accept_array => 'last'});
+
+=item fu->cookie(...)
+
+Like C<< fu->query() >> but parses the C<Cookie> request header. Beware that,
+exactly like with query parameters, it's possible for a cookie to have multiple
+values and thus get represented as an array.
+
+=item fu->json(...)
+
+Like C<< fu->query() >> but parses the request body as JSON. Returns the raw
+(unvalidated!) JSON Unicode string if no arguments are given. To retrieve the
+decoded JSON data without performing further validation, use:
+
+  my $data = fu->json({type=>'any'});
+
+=item fu->formdata(...)
 
 Like C<< fu->query() >> but returns data from the POST request body. This
 method only supports form data encoded as C<application/x-www-form-urlencoded>,
@@ -1278,8 +1363,6 @@ Parse the request body as C<multipart/form-data> and return an array of field
 objects.  Refer to L<FU::MultipartFormData> for more information.
 
 =back
-
-I<TODO:> Cookie parsing.
 
 
 =head2 Generating Responses
@@ -1325,6 +1408,31 @@ Add a response header, can be used to add multiple headers with the same name.
 
 Add a response header or overwrite the header with a new value if it already
 exists. Set C<$value> to undef to remove a previously set header.
+
+=item fu->set_cookie($name, $value, %attributes)
+
+Set or overwrite a cookie. Set C<$value> to undef to remove a previously set
+cookie. To fully remove a cookie from the user's browser, set the cookie with
+an empty value and zero C<Max-Age>:
+
+  fu->set_cookie(my_cookie => '', 'Max-Age' => 0);
+
+C<%attributes> can be any of the supported L<cookie
+attributes|https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie>.
+The C<Expires> attribute, when given, must be a UNIX timestamp. Boolean
+attributes are interpreted according to Perl's idea of truthiness. For example:
+
+  fu->set_cookie(auth => $auth_token,
+      Expires => time()+30*24*3600,
+      Domain => 'example.com',
+      Secure => 1,
+      SameSite => 'Lax'
+  );
+
+This method does not encode or escape the cookie value in any way. If you want
+to set a non-ASCII value or a value containing characters that are not
+permitted in the C<Set-Cookie> header, use C<uri_escape()> in L<FU::Util> or
+your favorite alternative cookie-safe encoding.
 
 =item fu->set_body($data)
 
@@ -1399,7 +1507,6 @@ one of the following status codes or an alias:
 
 =back
 
-I<TODO:> Setting cookies.
 
 
 =head2 Running the Site

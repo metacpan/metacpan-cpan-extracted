@@ -154,34 +154,20 @@ sub cellWidth {
 	return $self->{CELLWIDTH}
 }
 
-sub KeyArrowNavig {
-	my ($self, $dcol, $drow) = @_;
-	return undef if $self->anchorInitialize;
+sub maxXY {
+	my $self = shift;
+	my $maxc = 0;
+	my $maxr = 0;
 	my $pool = $self->pool;
-	my $i = $self->anchorGet;
-	if ($drow eq 0) { #horizontal move
-		my $index = $self->index($i->name);
-		$index = $index + $dcol;
-		return $self->getIndex($index);
-	} else { #vertical move
-		my $col = $i->column;
-		my $row = $i->row;
-		my $max = $self->lastRowInColumn($col);
-		if ($drow > 0) { #one row down
-			if ($row eq $max) {
-				$col ++;
-				$row = -1
-			}
-		} else { #going up
-			if ($row eq 0) {
-				$col --;
-				$row = $self->lastRowInColumn($col) + 1;
-			}
-		}
-		my $nrow = $row + $drow;
-		my $index = $self->indexColumnRow($col, $nrow);
-		return $self->getIndex($index);
+	for (@$pool) {
+		my $c = $_->column;
+		$maxc = $c if ((defined $c) and ($c > $maxc));
+		my $r = $_->row;
+		$maxr = $r if ((defined $r) and ($r > $maxr));
 	}
+	my $maxx = ($maxc + 1) * ($self->cellWidth + 1);
+	my $maxy = ($maxr + 1) * ($self->cellHeight + 1);
+	return ($maxx, $maxy);
 }
 
 sub nextPosition {
@@ -343,7 +329,8 @@ sub refresh {
 		$maxx = $x if $x > $maxx;
 		$maxy = $y if $y > $maxy;
 	}
-	$self->configure(-scrollregion => [0, 0, $maxx + $cellwidth + 2, $maxy + $cellheight + 2]);
+	$self->configure(-scrollregion => [0, 0, $self->maxXY]);
+#	$self->configure(-scrollregion => [0, 0, $maxx + $cellwidth + 2, $maxy + $cellheight + 2]);
 }
 
 sub scroll {

@@ -130,7 +130,7 @@ subtest 'create always' => sub {
     };
 
     subtest 'second creation' => sub {
-        my $ddl = CXC::DB::DDL->new( \%main );
+        $ddl = CXC::DB::DDL->new( \%main );
 
         ok( lives { $ddl->create( $dbh, create => CREATE_ALWAYS ) }, 'create' )
           or bail_out $@;
@@ -189,7 +189,7 @@ subtest 'temporary table' => sub {
     my $dbh = $db->{dbh};
 
     my $ddl = CXC::DB::DDL->new( \%temporary );
-    ok( lives { $ddl->create( $dbh ), create => CREATE_ONCE }, 'create' )
+    ok( lives { $ddl->create( $dbh, create => CREATE_ONCE ) }, 'create' )
       or bail_out $@;
 
     my $sth = $dbh->table_info( undef, q{%}, $temporary{name}, 'LOCAL TEMPORARY' );

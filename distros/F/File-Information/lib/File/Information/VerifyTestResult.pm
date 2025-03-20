@@ -15,7 +15,7 @@ use parent 'File::Information::VerifyBase';
 
 use Carp;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use constant {
     CLASS_METADATA  => 'meatdata',
@@ -84,10 +84,19 @@ sub _class {
 
 sub _test_get {
     my ($self, $test) = @_;
-    my $from = $self->base_from->get($test->{key}, lifecycle => $self->{lifecycle_from}, default => undef, as => 'raw');
-    my $to   = $self->base_to->get($test->{key}, lifecycle => $self->{lifecycle_to},   default => undef, as => 'raw');
+    my $key  = $test->{key};
+    my $from = $self->base_from->get($key, lifecycle => $self->{lifecycle_from}, default => undef, as => 'Data::Identifier');
+    my $to   = $self->base_to->get($key, lifecycle => $self->{lifecycle_to},   default => undef, as => 'Data::Identifier');
 
-    #warn sprintf('key=<%s>, %s -> %s: from=<%s>, to=<%s>', $test->{key}, $self->{lifecycle_from}, $self->{lifecycle_to}, $from // '', $to // '');
+    if (defined($from) && defined($to)) {
+        #warn sprintf('key=<%s>, %s -> %s: from=<%s>, to=<%s>', $test->{key}, $self->{lifecycle_from}, $self->{lifecycle_to}, $from // '', $to // '') if $key eq 'mediatype';
+        return $self->STATUS_PASSED if $from->eq($to);
+    }
+
+    $from = $self->base_from->get($key, lifecycle => $self->{lifecycle_from}, default => undef, as => 'raw');
+    $to   = $self->base_to->get($key, lifecycle => $self->{lifecycle_to},   default => undef, as => 'raw');
+
+    #warn sprintf('key=<%s>, %s -> %s: from=<%s>, to=<%s>', $test->{key}, $self->{lifecycle_from}, $self->{lifecycle_to}, $from // '', $to // '') if $key eq 'mediatype';
 
     return $self->STATUS_NO_DATA unless defined($from) && defined($to);
     return $from eq $to ? $self->STATUS_PASSED : $self->STATUS_FAILED;
@@ -132,7 +141,7 @@ File::Information::VerifyTestResult - generic module for extracting information 
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

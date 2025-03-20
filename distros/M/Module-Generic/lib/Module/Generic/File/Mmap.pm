@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Mmap.pm
-## Version v0.1.3
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.4
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/07/26
-## Modified 2024/09/05
+## Modified 2025/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,11 +18,13 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $HAS_CACHE_MMAP $HAS_B64 );
     use Data::UUID;
-    use JSON 4.03 qw( -convert_blessed_universally );
+    # This is disruptive for everybody. Bad idea.
+    # use JSON 4.03 qw( -convert_blessed_universally );
+    use JSON 4.03;
     use Module::Generic::File qw( file sys_tmpdir );
     # use Nice::Try;
     our $HAS_CACHE_MMAP = 0;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -804,7 +806,7 @@ Module::Generic::File::Mmap - MMap File Class
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 L<Module::Generic::File::Mmap> implements a Mmap cache mechanism using L<Cache::FastMmap>, which is an XS module. The api is very similar to its counterpart with L<Module::Generic::File::Cache> and L<Module::Generic::SharedMem>, but has the advantage of sharing data over a file like L<Module::Generic::File::Cache>, but using Mmap and being very fast.
 

@@ -1,3 +1,15 @@
+v0.06  2025-03-19Z
+    - Made Data::Identifier a requirement
+    - Improved documentation
+    - Improved support for Data::TagDB and Data::URIID
+    - Added support to get a mediasubtype from an ISE
+    - Added support to use Data::Identifier->as() as a backend for $base->get()
+    - Added stub for editor
+    - Added basic deep inspection support
+    - Corrected error in $base->verify()'s mediasubtype check
+    - Fixed handling of aggregated properties with multipart source properties
+    - Added property "pages"
+
 v0.05  2025-01-11Z
     - Added option mountinfo_path (Linux only)
     - Added *experimental* list support for properties

@@ -3,6 +3,7 @@ typedef struct {
     UV depth;
     int canon;
     int pretty; /* <0 when disabled, current nesting level otherwise */
+    int htmlsafe;
 } fujson_fmt_ctx;
 
 static void fujson_fmt(pTHX_ fujson_fmt_ctx *, SV *);
@@ -27,21 +28,22 @@ static void fujson_fmt_str(pTHX_ fujson_fmt_ctx *ctx, const char *stri, size_t l
     while (off < len) {
         /* Fast path: no escaping needed */
         loff = off;
+
+#define SKIPUNTIL(cond) \
+                while (off < len) { \
+                    x = str[off]; \
+                    if (x <= 0x1f || x == '"' || x == '\\' || cond) break; \
+                    off++;\
+                }
         if (utf8) {
-            /* assume >=0x80 is valid utf8 */
-            while (off < len) {
-                x = str[off];
-                if (x <= 0x1f || x == '"' || x == '\\' || x == 0x7f) break;
-                off++;
-            }
+            if (!ctx->htmlsafe) { SKIPUNTIL(x == 0x7f) }
+            else                { SKIPUNTIL(x == 0x7f || x == '<' || x == '>' || x == '&') }
         } else {
-            /* binary strings need special handling for >=0x80 */
-            while (off < len) {
-                x = str[off];
-                if (x <= 0x1f || x == '"' || x == '\\' || x >= 0x7f) break;
-                off++;
-            }
+            if (!ctx->htmlsafe) { SKIPUNTIL(x >= 0x7f) }
+            else                { SKIPUNTIL(x >= 0x7f || x == '<' || x == '>' || x == '&') }
         }
+#undef SKIPUNTIL
+
         fustr_write(ctx->out, (char *)str+loff, off-loff);
 
         if (off < len) { /* early break, which means current byte needs special processing */
@@ -279,7 +281,7 @@ static SV *fujson_fmt_xs(pTHX_ I32 ax, I32 argc, SV *val) {
     ctx.out = &out;
     ctx.depth = 0;
     ctx.pretty = INT_MIN;
-    ctx.canon = 0;
+    ctx.canon = ctx.htmlsafe = 0;
     while (i < argc) {
         arg = SvPV_nolen(ST(i));
         i++;
@@ -289,6 +291,7 @@ static SV *fujson_fmt_xs(pTHX_ I32 ax, I32 argc, SV *val) {
 
         if (strcmp(arg, "canonical") == 0) ctx.canon = SvPVXtrue(r);
         else if (strcmp(arg, "pretty") == 0) ctx.pretty = SvPVXtrue(r) ? 0 : INT_MIN;
+        else if (strcmp(arg, "html_safe") == 0) ctx.htmlsafe = !!SvPVXtrue(r);
         else if (strcmp(arg, "utf8") == 0) encutf8 = SvPVXtrue(r);
         else if (strcmp(arg, "max_size") == 0) out.maxlen = SvUV(r);
         else if (strcmp(arg, "max_depth") == 0) ctx.depth = SvUV(r);

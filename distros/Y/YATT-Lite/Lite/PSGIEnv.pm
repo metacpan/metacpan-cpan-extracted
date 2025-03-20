@@ -64,6 +64,7 @@ BEGIN {
 	  psgix.logger
 
           yatt.script_name
+          yatt.script_dir
        /;
   our %FIELDS = map {$_ => ''} @PSGI_FIELDS;
 }

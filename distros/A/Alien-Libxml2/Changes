@@ -1,6 +1,10 @@
 Revision history for Alien-Libxml2
 
+0.20      2025-03-19 07:43:21 -0600
+  - Blacklisted older versions of libxml2 with CVEs (gh#43, gh#45)
+
 0.19      2022-09-25 08:54:48 -0600
+  - Production release identical to 0.18_01
 
 0.18_01   2022-09-23 21:05:53 -0600
   - Use Download::GitLab plugin to fetch recent version of

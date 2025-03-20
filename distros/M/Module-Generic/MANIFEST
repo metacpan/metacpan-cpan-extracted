@@ -1,6 +1,7 @@
 CHANGES
 CONTRIBUTING.md
 lib/Module/Generic.pm
+lib/Module/Generic/#File.pm#
 lib/Module/Generic/Array.pm
 lib/Module/Generic/Array.pod
 lib/Module/Generic/Boolean.pm
@@ -68,9 +69,17 @@ t/20.mmap.t
 t/21.serialise_cbor_free.t
 t/22.parse_timestamp.t
 t/23.tiehash.t
+t/24.exception.t
+t/25.file_csv.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t
 t/test.bat
 t/test.pl
+t/test_in.csv
+t/test_in_utf-16be.csv
+t/test_in_utf-16le.csv
+t/test_in_utf-32be.csv
+t/test_in_utf-32le.csv
+t/test_in_utf16le.csv
 META.json                                Module JSON meta-data (added by MakeMaker)

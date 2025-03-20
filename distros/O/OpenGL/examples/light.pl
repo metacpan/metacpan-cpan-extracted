@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl
-#
 #          light
 #
 #  This program demonstrates the use of the OpenGL lighting model.  
@@ -7,9 +5,6 @@
 #  A single light source illuminates the object.
 #  Example adapted from light.c.
 
-BEGIN{ unshift(@INC,"../blib"); }  # in case OpenGL is built but not installed
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib");  } # 5.002 gamma needs this
 use OpenGL;
 
 $use_lighting=1;

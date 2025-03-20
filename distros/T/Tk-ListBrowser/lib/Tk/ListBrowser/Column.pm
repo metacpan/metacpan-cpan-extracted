@@ -36,37 +36,6 @@ sub new {
 	return $self
 }
 
-sub KeyArrowNavig {
-	my ($self, $dcol, $drow) = @_;
-	return undef if $self->anchorInitialize;
-	my $pool = $self->pool;
-	my $i = $self->anchorGet;
-	if ($drow eq 0) { #horizontal move
-		my $col = $i->column;
-		my $row = $i->row;
-		if ($dcol > 0) { #to the right
-			my $max = $self->lastColumnInRow($row);
-			if ($col eq $max) {
-				$col = -1;
-				$row ++
-			}
-		} else { #to the left
-			if ($col eq 0) {
-				$row --;
-				$col = $self->lastColumnInRow($row) + 1;
-			}
-		}
-		my $ncol = $col + $dcol;
-		my $index = $self->indexColumnRow($ncol, $row);
-		return $self->getIndex($index);
-	} else { #vertical move
-		my $index = $self->index($i->name);
-		my $pool = $self->pool;
-		$index = $index + $drow;
-		return $self->getIndex($index);
-	}
-}
-
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
 	my $cellheight = $self->cellHeight;

@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.01;
+$VERSION =  0.02;
 
 use base qw(Tk::ListBrowser::Row);
 
@@ -34,37 +34,6 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 	return $self
-}
-
-sub KeyArrowNavig {
-	my ($self, $dcol, $drow) = @_;
-	return undef if $self->anchorInitialize;
-	my $pool = $self->pool;
-	my $i = $self->anchorGet;
-	if ($drow eq 0) { #horizontal move
-		my $col = $i->column;
-		my $row = $i->row;
-		if ($dcol > 0) { #to the right
-			my $max = $self->lastColumnInRow($row);
-			if ($col eq $max) {
-				$col = -1;
-				$row ++
-			}
-		} else { #to the left
-			if ($col eq 0) {
-				$row --;
-				$col = $self->lastColumnInRow($row) + 1;
-			}
-		}
-		my $ncol = $col + $dcol;
-		my $index = $self->indexColumnRow($ncol, $row);
-		return $self->getIndex($index);
-	} else { #vertical move
-		my $index = $self->index($i->name);
-		my $pool = $self->pool;
-		$index = $index + $drow;
-		return $self->getIndex($index);
-	}
 }
 
 sub nextPosition {
@@ -81,7 +50,7 @@ sub scroll {
 }
 
 sub type {
-	return 'column'
+	return 'bar'
 }
 
 =back

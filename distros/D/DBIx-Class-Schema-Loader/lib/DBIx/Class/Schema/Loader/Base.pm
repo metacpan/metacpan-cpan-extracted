@@ -31,7 +31,7 @@ use File::Temp 'tempfile';
 use curry;
 use namespace::clean;
 
-our $VERSION = '0.07052';
+our $VERSION = '0.07053';
 
 __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 schema
@@ -444,7 +444,7 @@ For example:
         if ($p{local_table} eq 'dogs' && @{$p{local_cols}} == 1 && $p{local_cols}[0] eq 'name') {
             $p{attrs}{could_be_snoopy} = 1;
 
-            reutrn $p{attrs};
+            return $p{attrs};
         }
     },
 

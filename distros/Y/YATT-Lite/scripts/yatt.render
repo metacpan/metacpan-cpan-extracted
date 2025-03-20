@@ -87,12 +87,18 @@ foreach my $cmd (@command) {
   local $YATT = $dirhandler;
   local $dirhandler->{cf_at_done} = sub {};
   # $dirhandler->fconfigure_encoding(\*STDOUT, \*STDERR);
+  local $ENV{REQUEST_URI} = $ENV{REQUEST_URI} // $file;
+  local $ENV{SCRIPT_NAME} = $ENV{SCRIPT_NAME} // $file;
+  local $ENV{PATH_INFO} = $ENV{PATH_INFO} // '/';
+  my $env = +{%ENV};
   local $CON = $dispatcher->make_connection
     (\*STDOUT
      , parameters => $parameters
      , file => $file, noheader => 1
-     , env => \%ENV
+     , env => $env
      , system => $SYS, yatt => $YATT);
+
+  $dispatcher->set_yatt_script_name($env);
 
   my ($part, $sub, $this, $args)
     = $dirhandler->prepare_part_handler($CON, File::Basename::basename($file));

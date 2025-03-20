@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 sub known {
@@ -62,7 +62,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

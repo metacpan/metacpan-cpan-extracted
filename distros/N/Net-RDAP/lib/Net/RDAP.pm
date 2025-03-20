@@ -26,7 +26,7 @@ use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 use warnings;
 
-$VERSION = '0.34';
+$VERSION = '0.36';
 
 =pod
 
@@ -91,19 +91,21 @@ is an RDAP HTTP user agent), and parsing the response
 returned by the server). As such, it provides a single unified
 interface to information about all unique Internet identifiers.
 
+If you want a command-line RDAP client, see L<App::rdapper>.
+
 =head1 METHODS
 
 =head2 Constructor
 
     $rdap = Net::RDAP->new(%OPTIONS);
 
-Constructor method, returns a new object. %OPTIONS is optional, but
+Constructor method, returns a new object. C<%OPTIONS> is optional, but
 may contain any of the following options:
 
 =over
 
-=item * C<use_cache> - if true, copies of RDAP responses are stored on
-disk, and are updated if the copy on the server is more up-to-date.
+=item * C<use_cache> - if set to a true value, copies of RDAP responses are
+stored on disk, and are updated if the copy on the server is more up-to-date.
 This behaviour is disabled by default and must be explicitly enabled.
 B<Note:> this setting controls whether L<Net::RDAP> caches RDAP records;
 it doesn't control caching of IANA registries by L<Net::RDAP::Registry>
@@ -149,7 +151,7 @@ perform this encoding:
 
     my $name = "espécime.com";
 
-    my $domain = $rdap->domain->(idn_to_ascii($name, 'UTF-8'));
+    my $domain = $rdap->domain(idn_to_ascii($name, 'UTF-8'));
 
 =cut
 
@@ -459,7 +461,8 @@ sub rdap_from_response {
 
         if (!defined($data->{'objectClassName'}) && scalar(grep { /^(domain|nameserver|entity)SearchResults$/ } keys(%{$data})) < 1) {
             #
-            # response is missing the objectClassName property and is not a search result:
+            # response is missing the objectClassName property and is not a
+            # search result:
             #
             return $self->error(
                 'url'           => $url,
@@ -527,9 +530,11 @@ sub object_from_response {
     #
     # search results
     #
-    elsif (exists($data->{'domainSearchResults'}))     { return Net::RDAP::SearchResult->new($data, $url) }
-    elsif (exists($data->{'nameserverSearchResults'})) { return Net::RDAP::SearchResult->new($data, $url) }
-    elsif (exists($data->{'entitySearchResults'}))     { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (exists($data->{'domainSearchResults'}))      { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (exists($data->{'nameserverSearchResults'}))  { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (exists($data->{'entitySearchResults'}))      { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (exists($data->{'ipSearchResults'}))          { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (exists($data->{'autnumSearchResults'}))      { return Net::RDAP::SearchResult->new($data, $url) }
 
     #
     # unprocessable response
@@ -764,7 +769,7 @@ Registration Data Access Protocol (RDAP) Response
 
 =head1 COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
 please see the C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

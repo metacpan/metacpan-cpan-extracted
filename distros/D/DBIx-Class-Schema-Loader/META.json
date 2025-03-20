@@ -4,7 +4,7 @@
       "Caelum: Rafael Kitover <rkitover@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -106,6 +106,6 @@
       "x_IRC" : "irc://irc.perl.org/#dbix-class",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class"
    },
-   "version" : "0.07052",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07053",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

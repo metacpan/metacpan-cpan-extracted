@@ -87,14 +87,14 @@ sub anchor {
 		my $fg = $c->cget('-foreground');
 		$p->itemconfigure($r,
 			-outline => $fg, # TODO should not be a hard coded color.
-			-outlinestipple => 'gray75',
+			-dash => [3, 2],
 		);
 	} else {
 		my $outline;
 		$outline = $c->cget('-selectbackground') if $self->selected;
 		$p->itemconfigure($r,
 			-outline => $outline,
-			-outlinestipple => undef,
+			-dash => undef,
 		);
 	}
 }
@@ -130,6 +130,8 @@ sub clear {
 	$self->cimage(undef);
 	$self->ctext(undef);
 	$self->crect(undef);
+	$self->column(undef);
+	$self->row(undef);
 	$self->region(0, 0, 0, 0);
 }
 

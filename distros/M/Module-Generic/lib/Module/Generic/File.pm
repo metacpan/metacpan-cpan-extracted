@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.9.0
+## Version v0.10.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/11/16
+## Modified 2025/03/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.10.0';
 };
 
 use strict;
@@ -2017,6 +2017,332 @@ sub load
     }
 }
 
+sub load_csv
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    return( $self ) if( $self->is_dir );
+    my $file = $self->filepath;
+    if( !$self->exists )
+    {
+        return( $self->error( "CSV file $file does not exist." ) );
+    }
+    # No need to go further
+    elsif( $self->is_empty )
+    {
+        return( [] );
+    }
+    elsif( !$self->_load_class( 'Text::CSV' ) )
+    {
+        return( $self->error( "Text::CSV does not seem to be installed." ) );
+    }
+
+    # Used for opening the file, or setting the perl layer encoding.
+    $opts->{binmode} //= 'utf-8';
+    $opts->{binmode} = lc( $opts->{binmode} ) if( $opts->{binmode} );
+    $opts->{detect_bom} //= 1;
+    my $sep  = $opts->{sep_char} || $opts->{separator} || $opts->{sep} || ',';
+    $opts->{sep_char} //= $sep;
+    my $defaults =
+    {
+        binary      => 1,
+        quote_char  => '"',
+        escape_char => '"',
+        sep_char    => ',',
+        skip_empty_rows => sub{ [] },
+    };
+    foreach my $k ( keys( %$defaults ) )
+    {
+        next if( exists( $opts->{ $k } ) );
+        $opts->{ $k } = $defaults->{ $k };
+    }
+
+    my @core_options = qw(
+        accessors allow_loose_escapes allow_loose_quotes always_quote
+        allow_unquoted_escape allow_whitespace auto_diag binary blank_is_undef callbacks
+        comment_str decode_utf8 diag_verbose eol empty_is_undef escape_char escape_null
+        formula formula_handling keep_meta_info quote quote_binary quote_char quote_empty
+        quote_space sep sep_char skip_empty_rows strict types undef_str verbatim
+    );
+    # my @text_csv_opts = grep{ exists( $opts->{ $_ } ) } @core_options;
+    my $args = {};
+    foreach my $k ( @core_options )
+    {
+        if( exists( $opts->{ $k } ) )
+        {
+            # We remove the options from $opts, so we can pass the remaining options to our 'open' method.
+            # We could do without, but it is cleaner this way.
+            $args->{ $k } = delete( $opts->{ $k } );
+        }
+    }
+
+    my $csv;
+    # try-catch
+    local $@;
+    eval
+    {
+        $csv = Text::CSV->new( $args );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error instantiating a new Text::CSV object: $@" ) );
+    }
+
+    my $headers = $opts->{headers} || [];
+    my $io;
+    my $opened = $io = $self->opened;
+    my( $enc, $first_row );
+    if( $opts->{detect_bom} )
+    {
+        if( $opened )
+        {
+            $self->close;
+        }
+        $opened = $io = $self->open( '<', { binmode => 'raw' } ) || return( $self->pass_error );
+        my $buffer = $self->getline;
+        defined( $buffer ) or return( $self->pass_error );
+        # See perlunicode
+        my $re2enc = [
+            # Big endian: 0x00 0x00 0xFE 0xFF
+            qr/\x00\x00\xfe\xff/    => 'utf-32be',
+            # Little endian: 0xFF 0xFE 0x00 0x00
+            qr/\xff\xfe\x00\x00/    => 'utf-32le',
+            qr/\xef\xbb\xbf/        => 'utf-8',
+            # Big endian: 0xFE 0xFF
+            qr/\xfe\xff/            => 'utf-16be',
+            # Little endian: 0xFF 0xFE
+            qr/\xff\xfe/            => 'utf-16le',
+            qr/\xf7\x64\x4c/        => 'utf-1',
+            qr/\xdd\x73\x66\x73/    => 'utf-ebcdic',
+            qr/\x0e\xfe\xff/        => 'scsu',
+            qr/\xfb\xee\x28/        => 'bocu-1',
+            qr/\x84\x31\x95\x33/    => 'gb-18030',
+            qr/\x{feff}/            => '',
+        ];
+        my $seek_offset = 0;
+        for( my $i = 0; $i < scalar( @$re2enc ); $i += 2 )
+        {
+            my $re = $re2enc->[$i];
+            my $e  = $re2enc->[$i+1];
+            if( $buffer =~ s/^($re)// )
+            {
+                $seek_offset = CORE::length($1);
+                $enc = $e;
+                last;
+            }
+        }
+
+        if( !CORE::length( $buffer ) )
+        {
+            return( $self->error( "This file ${file} is an empty CSV file with a BOM nonetheless." ) );
+        }
+
+        if( defined( $enc ) )
+        {
+            $enc = '' if( $enc eq 'utf-ebcdic' );
+        }
+
+        $io->seek( $seek_offset, SEEK_SET ) ||
+            return( $self->error( "Unable to seek in file ${file}: $!" ) );
+        if( CORE::length( $enc // '' ) )
+        {
+            # Mark the file handle with the right perl IO layer.
+            $io->binmode( ":encoding($enc)" );
+        }
+        # Default to $opts->{encoding} if it was provided, and we have no encoding found from the BOM.
+        elsif( CORE::length( $opts->{binmode} // '' ) )
+        {
+            $io->binmode( ":encoding($opts->{binmode})" );
+        }
+
+        eval
+        {
+            $first_row = $csv->getline($io);
+        };
+        if( $@ )
+        {
+            return( $self->error( "Unable to parse CSV header line: $@" ) );
+        }
+        elsif( !$first_row )
+        {
+            # Make sure error_diag() is called in scalar context.
+            return( $self->error( "Unable to parse CSV header line in file ${file}: ", scalar( $csv->error_diag ) ) );
+        }
+    }
+
+    # If we detected the BOM, we will have an $opened (i,e, $io) value set.
+    if( !$opened )
+    {
+        $io = $self->open( '<', $opts ) || return( $self->pass_error );
+    }
+    elsif( !$self->can_read )
+    {
+        return( $self->error( "CSV file \"${file}\" is opened, but not in read mode. Cannot load data from it." ) );
+    }
+
+    my $cols = $opts->{cols} // $opts->{columns};
+    my $process_headers;
+    if( !defined( $cols ) || Scalar::Util::reftype( $cols // '' ) ne 'ARRAY' )
+    {
+        if( $headers eq 'auto' || 
+            $headers eq 'uc' || 
+            $headers eq 'lc' || 
+            ref( $headers ) eq 'CODE' || 
+            ref( $headers ) eq 'HASH' )
+        {
+            local $@;
+            eval
+            {
+                my $row = $first_row ? $first_row : $csv->getline( $io );
+                undef( $first_row );
+                if( $headers eq 'uc' )
+                {
+                    my @new = map( uc( $_ ), @$row );
+                    $headers = \@new;
+                }
+                elsif( $headers eq 'lc' )
+                {
+                    my @new = map( lc( $_ ), @$row );
+                    $headers = \@new;
+                }
+                elsif( ref( $headers ) eq 'CODE' )
+                {
+                    local $@;
+                    my $new = eval{ $headers->( $row ); };
+                    if( $@ )
+                    {
+                        return( $self->error( "Callback returned an error: $@" ) );
+                    }
+                    if( defined( $new ) )
+                    {
+                        if( Scalar::Util::reftype( $new ) ne 'ARRAY' )
+                        {
+                            warn( "Value returned by the callback is not an array reference or an array object." ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                            $headers = [];
+                        }
+                        else
+                        {
+                            $headers = $new;
+                        }
+                    }
+                }
+                elsif( ref( $headers ) eq 'HASH' )
+                {
+                    my $new = [map{ CORE::length( $headers->{ $_ } // '' ) ? $headers->{ $_ } : $_ } @$row];
+                    $headers = $new;
+                }
+                else
+                {
+                    $headers = $row;
+                }
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error trying to fetch the first line of the CSV file to find the headers: $@" ) );
+            }
+        }
+        # User wants to skip the headers. So no columns provided, and no headers: we will return an array reference of array references (1 per line of CSV data).
+        elsif( $headers eq 'skip' || $headers eq 'discard' )
+        {
+            $process_headers = $headers;
+            eval
+            {
+                # We just fetch it, and discard it. We make sure to do this in scalar context.
+                my $row = $first_row ? $first_row : $csv->getline( $io );
+                undef( $first_row );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error trying to fetch the first line (headers) of the CSV file: $@" ) );
+            }
+            $headers = [];
+        }
+        $cols = ( defined( $headers ) && scalar( @$headers ) ) ? $headers : [];
+    }
+    # The user has provided explicit column names to use, but still want to discard the headers
+    elsif( $headers eq 'skip' || $headers eq 'discard' )
+    {
+        $process_headers = $headers;
+        eval
+        {
+            # We just fetch it, and discard it. We make sure to do this in scalar context.
+            my $row = $first_row ? $first_row : $csv->getline( $io );
+            undef( $first_row );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to fetch the first line (headers) of the CSV file: $@" ) );
+        }
+        $headers = [];
+    }
+
+
+    # Does the user have any expectation of the kind of data he wants in return? array or hash reference ?
+    my $expects;
+    if( exists( $opts->{expects} ) && defined( $opts->{expects} ) )
+    {
+        if( $opts->{expects} ne 'array' &&
+            $opts->{expects} ne 'hash' )
+        {
+            return( $self->error( "Invalid value. You can only expect an 'array', or an 'hash'." ) );
+        }
+        $expects = $opts->{expects};
+    }
+    
+    my $has_cols = scalar( @$cols );
+    # Start the line counter
+    my $n = $first_row ? 1 : 0;
+    my $no_cols = $has_cols ? scalar( @$cols ) : 0;
+    my $is_warnings_enabled = $self->_is_warnings_enabled( 'Module::Generic' );
+    # If there are too many warnings, we will just stop warnings about it.
+    my $too_many_warnings = 0;
+    my $all = [];
+    my $process = sub
+    {
+        my $row = shift( @_ );
+        if( $has_cols && !( defined( $expects ) && $expects eq 'array' ) )
+        {
+            my $row_no_cols = scalar( @$row );
+            # If the number of columns at this line does not match the number of headers columns, and the warnings is enabled, we warn about it.
+            if( $has_cols && 
+                $row_no_cols != $no_cols && 
+                $is_warnings_enabled &&
+                ++$too_many_warnings <= 10 )
+            {
+                warn( "Number of columns (${row_no_cols}) at line $n does not match the number of columns we have (${no_cols}) in CSV file ${file}" );
+            }
+            my $ref = {};
+            @$ref{ @$cols } = @$row;
+            push( @$all, $ref );
+        }
+        else
+        {
+            push( @$all, $row );
+        }
+    };
+
+    # If we have a initial first raw from our detect BOM operation earlier, then we use that line of data now.
+    $process->( $first_row ) if( $first_row );
+
+    eval
+    {
+        # Read each line of CSV data until the end.
+        my $row;
+        # while( my $row = $csv->getline( $io ) )
+        while( $io->opened && ( $row = $csv->getline( $io ) ) )
+        {
+            $n++;
+            $process->( $row );
+        }
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error trying to load data from CSV file $file: $@" ) );
+    }
+    # Return a Module::Generic::Array object.
+    return( $self->new_array( $all ) );
+}
+
 sub load_json
 {
     my $self = shift( @_ );
@@ -3527,6 +3853,160 @@ sub unload
     return( $self );
 }
 
+sub unload_csv
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    return( $self ) if( $self->is_dir );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{binmode} //= 'utf-8';
+    my $sep  = $opts->{sep_char} || $opts->{separator} || $opts->{sep} || ',';
+    $opts->{sep_char} //= $sep;
+    $opts->{quote_char} //= '"';
+    $opts->{escape_char} //= '"';
+    $opts->{binary} //= 1;
+    $opts->{autoflush} //= 1;
+    my @core_options = qw(
+        accessors allow_loose_escapes allow_loose_quotes always_quote
+        allow_unquoted_escape allow_whitespace auto_diag binary blank_is_undef callbacks
+        comment_str decode_utf8 diag_verbose eol empty_is_undef escape_char escape_null
+        formula formula_handling keep_meta_info quote quote_binary quote_char quote_empty
+        quote_space sep sep_char skip_empty_rows strict types undef_str verbatim
+    );
+    # my @text_csv_opts = grep{ exists( $opts->{ $_ } ) } @core_options;
+    my $args = {};
+    foreach my $k ( @core_options )
+    {
+        if( exists( $opts->{ $k } ) )
+        {
+            # We remove the options from $opts, so we can pass the remaining options to our 'open' method.
+            # We could do without, but it is cleaner this way.
+            $args->{ $k } = delete( $opts->{ $k } );
+        }
+    }
+
+    my $headers  = $opts->{headers} || [];
+
+    if( Scalar::Util::reftype( $data // '' ) ne 'ARRAY' )
+    {
+        return( $self->error( "Data provided is not an array reference." ) );
+    }
+    elsif( !$self->_load_class( 'Text::CSV' ) )
+    {
+        return( $self->error( "Text::CSV does not seem to ne installed." ) );
+    }
+
+    $opts->{lock} //= 0;
+    my $file = $self->filepath;
+    my $io;
+    my $opened = $io = $self->opened;
+    if( !$opened )
+    {
+        if( $opts->{append} )
+        {
+            $io = $self->open( '>>', $opts ) || return( $self->pass_error );
+        }
+        else
+        {
+            $io = $self->open( '>', $opts ) || return( $self->pass_error );
+        }
+    }
+    elsif( !$self->can_write )
+    {
+        return( $self->error( "File \"$file\" is opened, but not in write mode. Cannot unload data into it." ) );
+    }
+    $self->lock if( $opts->{lock} );
+    if( scalar( @$data ) )
+    {
+        my $is_array = Scalar::Util::reftype( $data->[0] // '' ) eq 'ARRAY';
+        my $is_hash  = ref( $data->[0] // '' ) eq 'HASH';
+        if( !$is_array && !$is_hash )
+        {
+            return( $self->error( "Data provided is neither an array reference nor an hash reference." ) );
+        }
+        elsif( $headers eq 'auto' )
+        {
+            if( !$is_hash )
+            {
+                warn( "You can only set the option 'headers' to 'auto' when you provide an array reference of hash reference." ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                $headers = [];
+            }
+            else
+            {
+                # We sort it to make it predictable
+                $headers = [sort( keys( %{$data->[0]} ) )];
+            }
+        }
+        elsif( Scalar::Util::reftype( $headers ) ne 'ARRAY' )
+        {
+            return( $self->error( "Invalid value provided for 'headers'. It can only be an array reference of headers or 'auto' (if the data is an array of hash reference)." ) );
+        } 
+
+        my $csv;
+        # try-catch
+        local $@;
+        eval
+        {
+            $csv = Text::CSV->new( $args );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error instantiating a new Text::CSV object: $@" ) );
+        }
+
+        if( defined( $headers ) && scalar( @$headers ) )
+        {
+            eval
+            {
+                $csv->say( $io => $headers );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error writing the CSV headers to the file ${file}: $@" ) );
+            }
+        }
+        if( $is_array )
+        {
+            for( my $i = 0; $i < scalar( @$data ); $i++ )
+            {
+                eval
+                {
+                    $csv->say( $io => $data->[$i] );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error writing the CSV data at offset $i to the file ${file}: $@" ) );
+                }
+            }
+        }
+        elsif( $is_hash )
+        {
+            my $cols = $opts->{cols} // $opts->{columns};
+            unless( defined( $cols ) && Scalar::Util::reftype( $cols // '' ) eq 'ARRAY' )
+            {
+                $cols = ( defined( $headers ) && scalar( @$headers ) ) ? $headers : [sort( keys( %{$data->[0]} ) )];
+            }
+            for( my $i = 0; $i < scalar( @$data ); $i++ )
+            {
+                my $ref = $data->[$i];
+                my $vals = [@$ref{ @$cols }];
+                eval
+                {
+                    $csv->say( $io => $vals );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error writing the CSV data at offset $i to the file ${file}: $@" ) );
+                }
+            }
+        }
+    }
+    $self->unlock if( $opts->{lock} );
+    # close it if it were close before we opened it
+    $io->close if( !$opened );
+    return( $self );
+}
+
 sub unload_json
 {
     my $self = shift( @_ );
@@ -4651,9 +5131,31 @@ Module::Generic::File - File Object Abstraction Class
     my $new_object = $file->realpath;
     my $new_object = Module::Generic::File->realpath( "/some/where/file.txt" );
 
+    my $file = Module::Generic::File->new("data.csv");
+
+    # Load CSV data
+    my $data = $file->load_csv(
+        headers => 'auto',
+        binmode => 'utf-8',
+        expects => 'array',
+        # Passing along a Text::CSV option
+        sep_char   => ',',
+        quote_char => '"',
+    ) || die( $file->error );
+    
+    # Unload CSV data
+    $file->unload_csv(
+        $data,
+        headers      => 'auto',
+        # Passing along a Text::CSV option
+        sep_char     => ',',
+        binmode      => 'utf-8',
+        always_quote => 1,
+    ) || die( $file->error );
+
 =head1 VERSION
 
-    v0.9.0
+    v0.10.0
 
 =head1 DESCRIPTION
 
@@ -5564,6 +6066,190 @@ If the C<binmode> used on the file is C<:unix>, then this will call L<perlfunc/r
 
 If this method is called on a directory object, it will return undef.
 
+=head2 load_csv
+
+    my $array_object = $file->load_csv( %options ) ||
+        die( $file->error );
+    # Passing the options as an hash reference
+    my $array_object = $file->load_csv( $options ) ||
+        die( $file->error );
+
+This takes an optional hash or hash reference of options, loads the CSV file data, and returns them an L<array object|Module::Generic::Array> of rows. Each row can be either an array reference or a hash reference, depending on the options provided.
+
+If an empty row is found in the CSV, an equally empty row of hash reference, or array reference will be added to the result set. This behavior can be modified with the C<skip_empty_rows> option passed to L<Text::CSV> (default is to return an empty array reference).
+
+This method requires L<Text::CSV> to work, and it will attempt to load it dynamically.
+
+If an error occurs, it will set an L<error object|Module::Generic::Exception>, and returns an empty list in list context, or C<undef> in scalar context.
+
+Below are the supported options. Any other options will be passed directly to L<Text::CSV> upon object instantiation.
+
+=over 4
+
+=item * C<binmode>
+
+Optional. Specifies the encoding to apply when reading the file. This defaults to C<utf-8>
+
+=item * C<columns> or C<cols>
+
+Optional. Specifies the exact column names to be returned in the final dataset.
+
+For example:
+
+    my $array_object = $file->load_csv(
+        cols => [qw( name age locale zipcode )],
+    ) || die( $file->error );
+
+Note that you could also achieve the same result with the C<headers> option.
+
+=item * C<detect_bom>
+
+Optional. Defaults to true.
+
+If set to a true value, this will check the CSV file for a C<BOM> (Byte-order mark), remove it by seeking past it, and use it to determine the necessary underlying encoding of the file to read the rest of the data. The encoding is then applied to the filehandle with L<binmode|perlfunc/binmode>.
+
+Using the C<BOM> detection, it recognises C<bocu-1>, C<gb-18030>, C<utf-ebcdic>, C<utf-1>, C<utf-8>, C<utf-16be>, C<utf-16le>, C<utf-32be>, C<utf-32le>, C<scsu>
+
+=item * C<expects>
+
+Optional. Determines the expected return format.
+
+If not specified, defaults to hash references if C<cols> (or C<columns>) or C<headers> option value provides column names, otherwise array references.
+
+=over 8
+
+=item * C<array>
+
+Returns an L<array object|Module::Generic::Array> of array references.
+
+=item * C<hash>
+
+Returns an L<array object|Module::Generic::Array> of hash references.
+
+=back
+
+For example:
+
+    my $array_object = $file->load_csv(
+        headers => [qw( name age locale zipcode )],
+        expects => 'array'
+    ) || die( $file->error );
+
+This would return an L<array object|Module::Generic::Array> of array references, even though we provided headers names.
+
+However
+
+    my $array_object = $file->load_csv(
+        headers => [qw( name age locale zipcode )],
+    ) || die( $file->error );
+
+would return an L<array object|Module::Generic::Array> of hash references.
+
+=item * C<headers>
+
+Optional. Defines how the first row of the CSV should be treated. This is only used if the option C<cols> or C<columns> is not used.
+
+Depending on the value, it affects the return value.
+
+It can take the following values:
+
+=over 8
+
+=item * C<auto>
+
+Uses the first row as headers, and returns an L<array object|Module::Generic::Array> of hash references.
+
+=item * C<discard> or C<skip>
+
+Skips the first row, and returns an L<array object|Module::Generic::Array> of array reference, one for each row of CSV data.
+
+=item * C<lc>
+
+Converts headers to lowercase, and returns an L<array object|Module::Generic::Array> of hash references, with all keys thus set to lowercase.
+
+=item * C<uc>
+
+Converts headers to uppercase, and returns an L<array object|Module::Generic::Array> of hash references, with all keys thus set to uppercase.
+
+=item * an hash reference
+
+Provides a mapping of headers. The keys being the original headers values, and the hash reference values being the replacement header value.
+
+For example, assuming a CSV with the headers: C<name>, C<date>, C<locale>
+
+    my $array_object = $file->load_csv(
+        headers => 
+        {
+            name => 'customer_name',
+            date => 'transaction_date',
+        }
+    ) || die( $file->error );
+
+This will return an L<array object|Module::Generic::Array> of hash references, with the keys: C<customer_name>, C<transaction_date>, and C<locale>
+
+=item * an array reference
+
+This is equivalent to using the option C<cols> or C<columns>, since it sets an arbitrary set of headers notwithstanding whatever headers may exist.
+
+The difference with C<cols> or C<columns> is that it will replace the headers, whereas with C<cols> or C<columns>, it just specified column names, but does not replace the headers, so you would need to do something like:
+
+    my $array_object = $file->load_csv(
+        cols => [qw( customer_name transaction_date locale )],
+        headers => 'discard',
+    ) || die( $file->error );
+
+So, you are better off simply doing:
+
+    my $array_object = $file->load_csv(
+        headers => [qw( customer_name transaction_date locale )],
+    ) || die( $file->error );
+
+If the number of headers provided is lower than the actual number of columns in the CSV data, only the data for the given headers will be returned. Conversely, if the headers provided exceeds the number of columns found, those extra headers values will be C<undef>
+
+For example, let's imagine we have a CSV with the headers: C<name>, C<date>, C<locale>, C<zipcode>, but we provide only the headers C<name>, C<date>, C<locale>, such as:
+
+    use Data::Pretty qw( dump );
+    my $array_object = $file->load_csv(
+        headers => [qw( name date locale )],
+    ) || die( $file->error );
+    say dump( $array_object );
+
+would produce something like:
+
+    {
+        name => 'John Doe',
+        date => '2025-03-18',
+        locale => 'ja_JP',
+    }
+
+even though the data also included a C<zipcode> column, but since we only provided 3 headers, the resulting array object contains only 3 headers.
+
+If you provide more headers than there are columns of data, the extra headers will have their value for each row set to C<undef>, since there are no corresponding data.
+
+=item * an anonymous subroutine, or a subroutine reference (C<CODE>)
+
+This callback will be called once, and the current array reference of headers will be passed as its sole argument.
+
+It expects an array reference of headers as a replacement.
+
+If the callback dies, the error will be caught, and an error will be returned.
+
+If the callback returns a false value, it will be ignored, and if the value returned is no an array reference, a warning will be emitted if the C<use warnings> pragma is enabled, and the value will be ignored.
+
+=back
+
+=item * C<sep_char> or C<separator> or C<sep>
+
+Optional. Defines the column separator used in the CSV file. This defaults to the comma, i.e. C<,>
+
+=item * Any additional options
+
+Any extra options provided will be passed directly to L<Text::CSV> during object instantiation. Examples include C<quote_char>, C<escape_char>, C<always_quote>, etc.
+
+See the L<Text::CSV> documentation for more information.
+
+=back
+
 =head2 load_json
 
 This will load the file data, which is assumed to be json in utf8, then decode it using L<JSON> and return the resulting perl data.
@@ -6315,6 +7001,74 @@ If true, L</unload> will perform a lock after opening the file and unlock it bef
 Other options are the same as the ones used in L</open>
 
 It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 unload_csv
+
+    $file->unload_csv( $data, %options ) ||
+        die( $file->error );
+    # or, passing the options as an hash reference
+    $file->unload_csv( $data, $options ) ||
+        die( $file->error );
+
+This takes an array reference (which can be an array object, such as L<Module::Generic::Array>), and either an hash or hash reference of options, and writes the given data to the underlying file as CSV data using L<Text::CSV>. So, you need L<Text::CSV> to be installed in order to use this method.
+
+The data provided must be an array reference of either array reference or a hash reference.
+
+When writing data to the file, it uses the L<say method|Text::CSV/say> that uses the value of C<$\> to write the new line delimiter.
+
+If an error occurs, it will set an L<error object|Module::Generic::Exception>, and returns an empty list in list context, or C<undef> in scalar context.
+
+Below are the supported options. Any other options will be passed directly to L<Text::CSV> upon object instantiation.
+
+=over 4
+
+=item * C<append>
+
+Optional. Defaults to false.
+
+If set to true, appends data to an existing CSV file instead of overwriting it.
+
+=item * C<binmode>
+
+Optional. Defaults to C<utf-8>.
+
+Specifies the encoding to apply when writing the file.
+
+=item * C<headers>
+
+Optional Defines how headers should be handled:
+
+=over 8
+
+=item * C<auto>
+
+Uses the keys of the first hash reference as headers.
+
+=item * C<ARRAY>
+
+An array reference (or, an array object, such as L<Module::Generic::Array>) that specifies custom set of headers.
+
+=back
+
+=item * C<lock>
+
+Optional. Defaults to false.
+ 
+If set to true, applies a lock to the file during writing to prevent concurrent modifications.
+
+=item * C<sep_char> or C<separator> or C<sep>
+
+Optional. Default to C<,>
+
+Defines the column separator to use in the output CSV file.
+
+=item * Any additional options
+
+Any extra options provided will be passed directly to L<Text::CSV> during object instantiation. Examples include C<quote_char>, C<escape_char>, C<always_quote>, etc.
+
+=back
+
+Returns the file object upon success or an L<error object|Module::Generic::Exception> if an error occurred.
 
 =head2 unload_json
 

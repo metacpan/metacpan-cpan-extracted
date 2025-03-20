@@ -1,5 +1,10 @@
 Revision history for YATT::Lite
 
+0.122 2025-03-20
+    * GH-228 - LanguageServer fails to apply didChange correctly
+    * GH-227 - yatt render should not use %main::ENV for PSGI env
+    * GH-226 - Session2 - set cookie path from script_name by default
+
 0.121 2024-12-10
     * GH-223 - Fix another `yatt*` scripts failure
     * GH-222 - Set app_root to $FindBin::Bin by default

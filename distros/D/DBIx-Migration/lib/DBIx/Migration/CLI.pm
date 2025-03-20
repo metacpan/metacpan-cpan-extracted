@@ -49,9 +49,11 @@ sub run {
     $class = 'DBIx::Migration' unless can_load( modules => { $class => undef } );
     $Logger->infof( "Will use '%s' class to process migrations", $class );
     my $m = $class->new(
-      dsn      => $dsn,
-      password => $opts->{ p },
-      username => $opts->{ u },
+      dsn => $dsn,
+      maybe
+        password => $opts->{ p },
+      maybe
+        username => $opts->{ u },
       maybe
         managed_schema => $opts->{ s },
       maybe

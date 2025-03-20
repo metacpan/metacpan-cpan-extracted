@@ -35,7 +35,7 @@ is $m->version, undef, '"dbix_migration" table does not exist == migrate() not c
 subtest 'default "dbh" attributes after version() call' => \&default_dbh_attribute_assertion, $m->dbh;
 
 dies_ok { $m->migrate( 0 ) } '"dir" not set';
-$m->dir( cwd->child( qw( t sql basic ) ) );
+$m->dir( cwd->child( qw( t sql advanced ) ) );
 
 ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
 
@@ -66,7 +66,7 @@ subtest "migrate to version $target_version" => \&migrate_to_version_assertion, 
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$target_version = 2;
+$target_version = 3;
 ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 

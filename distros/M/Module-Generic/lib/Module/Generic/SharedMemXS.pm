@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.2.3
+## Version v0.2.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2024/09/05
+## Modified 2025/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,9 @@ BEGIN
     use File::Spec ();
     # use Nice::Try;
     use Scalar::Util ();
-    use JSON 4.03 qw( -convert_blessed_universally );
+    # This is disruptive for everybody. Bad idea.
+    # use JSON 4.03 qw( -convert_blessed_universally );
+    use JSON 4.03;
     use Storable::Improved ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
@@ -109,7 +111,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.4';
 };
 
 use strict;
@@ -1448,7 +1450,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.2.3
+    v0.2.4
 
 =head1 DESCRIPTION
 

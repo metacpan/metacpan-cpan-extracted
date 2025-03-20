@@ -6,7 +6,7 @@ use Net::ASN;
 use Net::DNS::Domain;
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
-use Net::RDAP 0.34;
+use Net::RDAP 0.35;
 use Pod::Usage;
 use Term::ANSIColor;
 use Term::Size;
@@ -25,7 +25,7 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 #
 # global arg variables (note: nopager is now ignored)
@@ -592,7 +592,7 @@ sub print_jcard_property {
 
         $package->print_kv(
             $label,
-            'uri' eq $property->value_type ? u($property->value) : $property->value,
+            $property->may_be_uri ? u($property->value) : $property->value,
             $indent
         );
     }
@@ -649,7 +649,7 @@ sub print_events {
             $package->print_kv(ucfirst($event->action), sprintf('%s (by %s)', scalar($event->date), $event->actor), $indent);
 
         } else {
-            $package->print_kv(ucfirst($event->action), scalar($event->date), $indent);
+            $package->print_kv(ucfirst($event->action), scalar($event->date).$event->date_tz, $indent);
 
         }
     }

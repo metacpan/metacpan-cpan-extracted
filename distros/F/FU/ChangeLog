@@ -1,3 +1,18 @@
+0.4 - 2025-03-19
+	- FU::Validate: Support arrayref schemas
+	- FU::Validate: Rename 'values' option to 'elems'
+	- FU::Validate: Repurpose 'values' option to validate hash values
+	- FU::Validate: Merge nested 'elems', 'keys' and 'values' schemas during compile()
+	- FU::Validate: Rename 'scalar' to 'accept_scalar'
+	- FU::Validate: Add 'accept_array' option
+	- FU::Util: Add 'html_safe' option to json_format()
+	- FU::Util: Add gzip_compress() wrapper for libdeflate.so, zlib-ng.so or zlib.so
+	- FU::Util: Add brotli_compress() wrapper for libbrotlienc.so
+	- FU: Consistency fixes for fu->json() and fu->formdata()
+	- FU: Add fu->cookie() and fu->set_cookie()
+	- FU: Add support for brotli output compression
+	- FU: Use gzip_compress() for faster gzip output compression
+
 0.3 - 2025-03-10
 	- FU::Validate: Change API, ->validate() now returns data or throws error on failure
 	- FU::Validate: Rename 'rmwhitespace' to 'trim'

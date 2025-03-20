@@ -1,12 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 50;
+use Test::More tests => 51;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
+#use Tk::DynaMouseWheelBind;
 use Tk::PNG;
 
 BEGIN {
+	use_ok('Tk::ListBrowser::LBCanvas');
 	use_ok('Tk::ListBrowser::Bar');
 	use_ok('Tk::ListBrowser::Column');
 	use_ok('Tk::ListBrowser::Item');
@@ -34,6 +36,7 @@ my $item;
 my $image;
 my $handler;
 if (defined $app) {
+#	$app->DynaMouseWheelBind('Tk::ListBrowser::LBCanvas');
 	$image = $app->Photo(
 		-file => "t/icons/edit-cut.png",
 		-format => 'png',

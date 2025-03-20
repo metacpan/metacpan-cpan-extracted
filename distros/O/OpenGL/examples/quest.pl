@@ -1,11 +1,5 @@
-#!/usr/local/bin/perl 
-
 # simple maze thingy
 
-# in case module not "installed" :
-BEGIN{ unshift(@INC,"./blib"); unshift(@INC,"../blib"); }
-BEGIN{ unshift(@INC,"../blib/arch"); } # 5.002 gamma needs this
-BEGIN{ unshift(@INC,"../blib/lib"); } # 5.002 gamma needs this
 use OpenGL;
 
 @walldata = (

@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %_properties = (
     data_uriid_attr_displayname     => {loader => \&_load_data_uriid},
@@ -24,6 +24,7 @@ my %_properties = (
     data_uriid_id                   => {loader => \&_load_data_uriid},
     data_uriid_ise                  => {loader => \&_load_data_uriid, rawtype => 'ise'},
     data_uriid_type                 => {loader => \&_load_data_uriid, rawtype => 'ise'},
+    data_uriid_result               => {loader => \&_load_data_uriid, rawtype => 'Data::URIID::Result'},
 );
 
 # ----------------
@@ -46,6 +47,7 @@ sub _load_data_uriid {
     eval {$pv->{data_uriid_ise}  = {raw => $result->ise}};
     eval {$pv->{data_uriid_id}   = {raw => $result->id}};
     eval {$pv->{data_uriid_type} = {raw => $result->id_type(as => 'ise')}};
+    $pv->{data_uriid_result} = {raw => $result};
 
     foreach my $digest ($result->available_keys('digest')) {
         my $value = $result->digest($digest, as => 'hex', default => undef) // next;
@@ -73,7 +75,7 @@ File::Information::Remote - generic module for extracting information from files
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

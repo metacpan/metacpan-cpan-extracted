@@ -2,14 +2,17 @@ use strict;
 use Getopt::Long;
 use ExtUtils::MakeMaker;
 
-# path to turbovision headers, libs
+#use Devel::CheckLib;
+#check_lib_or_exit( lib => 'tvision', header => 'tvision/tv.h' );
 
+# path to turbovision headers, libs
 #for example:
 # perl Makefile.PL "--ldflags=-LC:\vad\tv\tvision.git\_build-2 -ltvision" --cflags=-IC:\vad\tv\tvision.git\include
 
 GetOptions(
    "ldflags=s",   \ my $ldflags,
    "cflags=s",    \ my $cflags,
+   "skip!",       \ my $skip,
    "help!",       \ my $help,
 ) || usage();
 usage() if $help;
@@ -28,8 +31,8 @@ Most common usage:
 
 Customised usage:
  perl Makefile.PL      \
-  [--library=...]      \ # Use this specific library
-  [--include=...]      \ # Use this specific include path
+  [--ldflags=...]      \ # Use this specific library
+  [--cflags=...]      \ # Use this specific include path
   [--define=...]       \ # Use this specific set of defines
   [--help]             \ # --help
   [<makemaker opts>]     # e.g. LINKTYPE=STATIC
@@ -41,7 +44,58 @@ For compilation against tvision at given specific location
 EOT
 }
 
-#?? -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32
+$|=1;
+if (!$ldflags and !$cflags) {
+    # user haven't specified where include and libraries.
+    # This means OS has these include and libs.
+    # Do we beleive system has it? NO.
+    # therefore build the one provided with us.
+    if ($^O eq 'MSWin32') {
+	# assume strawberry perl with cmake/gmake
+	mkdir 'tv-build';
+	chdir 'tv-build';
+	if (`gcc --version` =~ /^\S+ +\(.*?\) +(\d+)\.(\d+)\.(\d+)$/m) {
+	    my $gccver = sprintf "%02d.%03d%03d", $1, $2, $3;
+	    if ($gccver>11) {
+		print "GCC version $gccver OK, do cmake\n";
+		`cmake -S ../tvision.git -B . -G "MinGW Makefiles"
+		    2>&1 > cmake-out.txt`;
+		print "do gmake\n";
+		`gmake 2>&1 > gmake-out.txt`;
+		$cflags = "-Itvision.git/include";
+		$ldflags = "-ltv-build/libtvision.a";
+	    } else {
+		print "warning: your GCC version $gccver is <10. continue, but...\n";
+	    }
+	} else {
+	    print "warning: can't see version of your gcc. continue, but...\n" . ("it is ".`gcc --version`);
+	}
+	chdir '..';
+    }
+    elsif ($skip) {
+    } elsif ($^O eq 'linux' or $^O eq 'cygwin') {
+	# assume normal gcc/cmake/make
+	mkdir 'tv-build';
+	chdir 'tv-build';
+	if (`gcc --version` =~ /^\S+ +\(.*?\) +(\d+)\.(\d+)\.(\d+)$/m) {
+	    my $gccver = sprintf "%02d.%03d%03d", $1, $2, $3;
+	    if ($gccver>11) {
+		print "GCC version $gccver OK, do cmake\n";
+		`cmake -S ../tvision.git -B . -G "MinGW Makefiles"
+		    2>&1 > cmake-out.txt`;
+		print "do make\n";
+		`make 2>&1 > make-out.txt`;
+		$cflags = "-Itvision.git/include";
+		$ldflags = "-ltv-build/libtvision.a";
+	    } else {
+		print "warning: your GCC version $gccver is <10. continue, but...\n";
+	    }
+	} else {
+	    print "warning: can't see version of your gcc. continue, but...\n" . ("it is ".`gcc --version`);
+	}
+	chdir '..';
+    }
+}
 
 WriteMakefile(
     NAME          => 'TVision',

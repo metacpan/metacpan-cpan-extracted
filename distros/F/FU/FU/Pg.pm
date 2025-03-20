@@ -1,4 +1,4 @@
-package FU::Pg 0.3;
+package FU::Pg 0.4;
 use v5.36;
 use FU::XS;
 
@@ -806,7 +806,7 @@ error if something went wrong.
 It is possible to close a read-copy operation before all data has been
 consumed, but that causes all data to still be read and discarded during
 C<close()>. If you really want to interrupt a large read operation, a more
-efficient approach is to call C<< $conn->close >> and discard the entire
+efficient approach is to call C<< $conn->disconnect >> and discard the entire
 connection.
 
 It is not I<necessary> to call this method, simply letting the C<$copy> object

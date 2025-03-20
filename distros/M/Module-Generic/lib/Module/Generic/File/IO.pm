@@ -295,6 +295,14 @@ sub _filehandle_method
     my @rv = ();
     my $ref = IO::File->can( $what ) ||
         return( $self->error( "Method '$what' is unsupported." ) );
+    # Check if it is opened.
+    # return( $self->error( "Calling ${what} on a closed filehandle." ) );
+    # return if( !defined( CORE::fileno( $self ) ) );
+    # if( !defined( CORE::fileno( $self ) ) )
+    # {
+    #     warn( "Calling ${what} on a closed filehandle: ", $self->_get_stack_trace );
+    #     return;
+    # }
     no warnings 'uninitialized';
     if( wantarray() )
     {

@@ -3,10 +3,11 @@ package Scientist;
 
 use Moo;
 use Test2::Compare v0.0.121 qw/compare strict_convert/;
+use Test2::Compare::Delta;
 use Time::HiRes qw/time/;
 use Types::Standard qw/Bool Str CodeRef HashRef/;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 # ABSTRACT: Perl module inspired by https://github.com/github/scientist
 # https://github.com/lancew/Scientist

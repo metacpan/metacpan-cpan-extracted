@@ -153,7 +153,6 @@ if (!strncmp(name, "GL_", 3)) {
 	i(GL_DST_ALPHA)
 	i(GL_ONE_MINUS_DST_ALPHA)
 	i(GL_SRC_ALPHA_SATURATE)
-		/* OS/2 PM implementation does not have these constants... */
 #if !defined(GL_SRC_ALPHA_SATURATE) || defined(GL_CONSTANT_COLOR)
 	i(GL_CONSTANT_COLOR)
 	i(GL_ONE_MINUS_CONSTANT_COLOR)

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.4.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2024/09/05
+## Modified 2025/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,9 @@ BEGIN
     use File::Spec ();
     # use Nice::Try;
     use Scalar::Util ();
-    use JSON 4.03 qw( -convert_blessed_universally );
+    # This is disruptive for everybody. Bad idea.
+    # use JSON 4.03 qw( -convert_blessed_universally );
+    use JSON 4.03;
     use Storable::Improved ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
@@ -117,7 +119,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
 };
 
 # use strict;

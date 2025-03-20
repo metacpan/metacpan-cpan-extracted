@@ -17,8 +17,9 @@ my %validations = (
     onerrorsub => { onerror => sub { ref $_[1] } },
     collapsews => { trim => 0, func => sub { $_[0] =~ s/\s+/ /g; 1 } },
     neverfails => { onerror => 'err' },
+    doublefunc => [ func => sub { $_[0] == 0 }, func => sub { $_[0] = 2; 1; } ],
     revnum => { type => 'array', sort => sub($x,$y) { $y <=> $x } },
-    uniquelength => { type => 'array', values => { type => 'array' }, unique => sub { scalar @{$_[0]} } },
+    uniquelength => { elems => { type => 'array' }, unique => sub { scalar @{$_[0]} } },
     person => {
         type => 'hash',
         unknown => 'pass',
@@ -37,8 +38,8 @@ sub t($schema, $input, $output) {
     my $schema_copy = dclone([$schema])->[0];
     my $input_copy = dclone([$input])->[0];
 
+    #diag explain FU::Validate->compile($schema, \%validations) if $line == 95;
     my $res = FU::Validate->compile($schema, \%validations)->validate($input);
-    #diag explain FU::Validate->compile($schema, \%validations) if $line == 139;
     is_deeply $schema, $schema_copy, "schema modification $line";
     is_deeply $input,  $input_copy,  "input modification $line";
     is_deeply $res, $output, "data ok $line";
@@ -50,6 +51,7 @@ sub f($schema, $input, $error, @msg) {
     my $schema_copy = dclone([$schema])->[0];
     my $input_copy = dclone([$input])->[0];
 
+    #diag explain FU::Validate->compile($schema, \%validations) if $line == 176;
     ok !eval { FU::Validate->compile($schema, \%validations)->validate($input); 1 }, "eval $line";
     is_deeply $schema, $schema_copy, "schema modification $line";
     is_deeply $input,  $input_copy,  "input modification $line";
@@ -65,6 +67,7 @@ f {}, '', { validation => 'required' }, 'required value missing';
 f {}, undef, { validation => 'required' }, 'required value missing';
 t { default => undef }, undef, undef;
 t { default => undef }, '', undef;
+f { default => \'required' }, '', { validation => 'required' }, 'required value missing';
 t { defaultsub1 => 1 }, undef, 2;
 t { defaultsub2 => 1 }, undef, '';
 t { defaultsub2 => 1 }, '', 1;
@@ -76,14 +79,22 @@ t { trim => 0 }, " Va\rl id \n ", " Va\rl id \n ";
 f {}, '  ', { validation => 'required' }, 'required value missing';
 t { trim => 0 }, '  ', '  ';
 
+# accept_array
+t { default => undef, accept_array => 'first' }, [], undef;
+t { default => undef, accept_array => 'first' }, [' x '], 'x';
+t { accept_array => 'first' }, [1,2,3], 1;
+t { accept_array => 'last' }, [1,2,3], 3;
+f { accept_array => 'first' }, ['  ', 1], { validation => 'required' }, 'required value missing';
+f { accept_array => 'first' }, [], { validation => 'required' }, 'required value missing';
+
 # arrays
 f {}, [], { validation => 'type', expected => 'scalar', got => 'array' }, "invalid type, expected 'scalar' but got 'array'";
 f { type => 'array' }, 1, { validation => 'type', expected => 'array', got => 'scalar' }, "invalid type, expected 'array' but got 'scalar'";
 t { type => 'array' }, [], [];
 t { type => 'array' }, [undef,1,2,{}], [undef,1,2,{}];
-t { type => 'array', scalar => 1 }, 1, [1];
-f { type => 'array', values => {} }, [undef], { validation => 'values', errors => [{ index => 0, validation => 'required' }] }, "[0]: required value missing";
-t { type => 'array', values => {} }, [' a '], ['a'];
+t { type => 'array', accept_scalar => 1 }, 1, [1];
+f { type => 'array', elems => {} }, [undef], { validation => 'elems', errors => [{ index => 0, validation => 'required' }] }, "[0]: required value missing";
+t { type => 'array', elems => {} }, [' a '], ['a'];
 t { type => 'array', sort => 'str' }, [qw/20 100 3/], [qw/100 20 3/];
 t { type => 'array', sort => 'num' }, [qw/20 100 3/], [qw/3 20 100/];
 t { revnum => 1 },                    [qw/20 100 3/], [qw/100 20 3/];
@@ -94,12 +105,12 @@ f { type => 'array', unique => 1 }, [qw/3 1 3/], { validation => 'unique', index
 t { uniquelength => 1 }, [[],[1],[1,2]], [[],[1],[1,2]];
 f { uniquelength => 1 }, [[],[1],[2]], { validation => 'unique', index_a => 1, value_a => [1], index_b => 2, value_b => [2], key => 1 }, q{[2] value '[1]' duplicated};
 t { type => 'array', setundef => 1 }, [], undef;
-t { type => 'array', values => { type => 'any', setundef => 1 } }, [[]], [undef];
+t { type => 'array', elems => { type => 'any', setundef => 1 } }, [[]], [undef];
 
 # hashes
 f { type => 'hash' }, [], { validation => 'type', expected => 'hash', got => 'array' }, "invalid type, expected 'hash' but got 'array'";
 f { type => 'hash' }, 'a', { validation => 'type', expected => 'hash', got => 'scalar' }, "invalid type, expected 'hash' but got 'scalar'";
-t { type => 'hash' }, {a=>[],b=>undef,c=>{}}, {};
+t { type => 'hash' }, {a=>[],b=>undef,c=>{}}, {a=>[],b=>undef,c=>{}};
 f { type => 'hash', keys => { a=>{} } }, {}, { validation => 'keys', errors => [{ key => 'a', validation => 'required' }] }, '.a: required value missing';
 t { type => 'hash', keys => { a=>{missing=>'ignore'} } }, {}, {};
 t { type => 'hash', keys => { a=>{default=>undef} } }, {}, {a=>undef};
@@ -112,6 +123,13 @@ f { type => 'hash', keys => { a=>{} }, unknown => 'reject' }, { a=>1,b=>1 }, { v
 t { type => 'hash', keys => { a=>{} }, unknown => 'pass' }, { a=>1,b=>1 }, { a=>1,b=>1 };
 t { type => 'hash', setundef => 1 }, {}, undef;
 t { type => 'hash', unknown => 'reject', keys => { a=>{ type => 'any', setundef => 1}} }, {a=>[]}, {a=>undef};
+
+t [ keys => { a => {} }, keys => { b => {} } ], {a=>1, b=>2}, {a=>1, b=>2};
+f [ keys => { a => {} }, keys => { b => {} } ], {a=>1}, { validation => 'keys', errors => [{ key => 'b', validation => 'required' }] }, '.b: required value missing';
+f [ keys => { a => {} }, keys => { a => { int => 1 } } ], {a=>'abc'}, { validation => 'keys', errors => [{ key => 'a', validation => 'int', got => 'abc' }] }, ".a: failed validation 'int'";
+
+t { values => { int => 1 } }, { a => -1, b => 1 }, { a => -1, b => 1 };
+f { values => { int => 1 } }, { a => undef }, { validation => 'values', errors => [{ key => 'a', validation => 'required' }] }, '.a: required value missing';
 
 # default validations
 f { minlength => 3 }, 'ab', { validation => 'minlength', expected => 3, got => 2 }, "failed validation 'minlength'";
@@ -131,6 +149,9 @@ f { type => 'hash', length => 1, unknown => 'pass' }, {qw/1 a 2 b/}, { validatio
 t { type => 'hash', length => 1, keys => {a => {missing=>'ignore'}, b => {missing=>'ignore'}} }, {a=>1}, {a=>1};
 t { regex => '^a' }, 'abc', 'abc';  # XXX: Can't use qr// here because t() does dclone(). The 'hex' test covers that case anyway.
 f { regex => '^a' }, 'cba', { validation => 'regex', regex => '^a', got => 'cba' }, "failed validation 'regex'";
+t [ regex => '^a', regex => 'z$' ], 'abcxyz', 'abcxyz';
+f [ regex => '^a', regex => 'z$' ], 'bcxyz', { validation => 'regex', regex => '^a', got => 'bcxyz' }, "failed validation 'regex'";
+f [ regex => '^a', regex => 'z$' ], 'abcxy', { validation => 'regex', regex => 'z$', got => 'abcxy' }, "failed validation 'regex'";
 t { enum => [1,2] }, 1, 1;
 t { enum => [1,2] }, 2, 2;
 f { enum => [1,2] }, 3, { validation => 'enum', expected => [1,2], got => 3 }, "failed validation 'enum'";
@@ -166,9 +187,9 @@ t { collapsews => 1 }, '   x  ', ' x ';
 t { collapsews => 1, trim => 1 }, '   x  ', 'x';
 f { person => 1 }, 1, { validation => 'type', expected => 'hash', got => 'scalar' }, "invalid type, expected 'hash' but got 'scalar'";
 t { person => 1, default => 1 }, undef, 1;
-f { person => 1 }, { sex => 1 }, { validation => 'person', error => { validation => 'keys', errors => [{ key => 'name', validation => 'required' }] } }, "validation 'person'.name: required value missing";
+f { person => 1 }, { sex => 1 }, { validation => 'keys', errors => [{ key => 'name', validation => 'required' }] }, ".name: required value missing";
 t { person => 1 }, { sex => undef, name => 'y' }, { sex => 1, name => 'y' };
-f { person => 1, keys => {age => {default => \'required'}} }, {name => 'x', sex => 'y'}, { validation => 'keys', errors => [{ key => 'age', validation => 'required' }] }, '.age: required value missing';
+f { person => 1, keys => {age => {missing => 'reject'}} }, {name => 'x', sex => 'y'}, { key => 'age', validation => 'missing' }, '.age: required key missing';
 t { person => 1, keys => {extra => {}} }, {name => 'x', sex => 'y', extra => 1},  { name => 'x', sex => 'y', extra => 1 };
 f { person => 1, keys => {extra => {}} }, {name => 'x', sex => 'y', extra => ''}, { validation => 'keys', errors => [{ key => 'extra', validation => 'required' }] }, '.extra: required value missing';
 t { person => 1 }, {name => 'x', sex => 'y', extra => 1}, {name => 'x', sex => 'y', extra => 1};
@@ -176,6 +197,8 @@ t { person => 1, unknown => 'remove' }, {name => 'x', sex => 'y', extra => 1}, {
 t { neverfails => 1, int => 1 }, undef, 'err';
 t { neverfails => 1, int => 1 }, 'x', 'err';
 t { neverfails => 1, int => 1, onerror => undef }, 'x', undef; # XXX: no way to 'unset' an inherited onerror clause, hmm.
+t { doublefunc => 1 }, 0, 2;
+f { doublefunc => 1 }, 1, { validation => 'doublefunc', error => { validation => 'func', result => '' } }, "validation 'doublefunc': failed validation 'func'";
 
 # numbers
 sub nerr { ({ validation => 'num', got => $_[0] }, "failed validation 'num'") }
@@ -205,7 +228,7 @@ t { range => [1,2] }, 1, 1;
 t { range => [1,2] }, 2, 2;
 f { range => [1,2] }, 0.9, { validation => 'range', error => { validation => 'min', expected => 1, got => 0.9 } }, "validation 'range': failed validation 'min'";
 f { range => [1,2] }, 2.1, { validation => 'range', error => { validation => 'max', expected => 2, got => 2.1 } }, "validation 'range': failed validation 'max'";
-#t { range => [1,2] }, 'a', 'a', { validation => 'range', error => { validation => 'max', error => nerr 'a' } }; # XXX: Error validation type depends on evaluation order
+f { range => [1,2] }, 'a', { validation => 'range', error => { validation => 'min', error => (nerr 'a')[0] } }, "validation 'range': validation 'min': failed validation 'num'";
 
 # email template
 use utf8;
@@ -252,6 +275,14 @@ t { weburl => 1}, $_, $_ for (
   'https://blicky.net/?#Who\'d%20ever%22makeaurl_like-this/!idont.know',
 );
 
+# Merging nested schemas
+my $pa = FU::Validate->compile({ regex => '^a' });
+my $pz = FU::Validate->compile({ regex => 'z$' });
+my $com = FU::Validate->compile([ elems => $pa, elems => $pz ]);
+is_deeply $com->validate(['axz']), ['axz'];
+ok !eval { $com->validate(['bz', 'axz', 'ax']) };
+is [$@->errors]->[0], "[0]: failed validation 'regex'";
+is [$@->errors]->[1], "[2]: failed validation 'regex'";
 
 # Things that should fail
 ok !eval { FU::Validate->compile({ recursive => 1 }, { recursive => { recursive => 1 } }); 1 }, 'recursive';

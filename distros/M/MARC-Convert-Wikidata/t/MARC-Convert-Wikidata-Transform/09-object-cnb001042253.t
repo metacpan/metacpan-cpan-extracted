@@ -18,7 +18,7 @@ my $obj = MARC::Convert::Wikidata::Transform->new(
 );
 my $ret = $obj->object;
 my $external_ids_ar = $ret->external_ids;
-is(@{$external_ids_ar}, 4, 'Sněženka: Get external ids count (3).');
+is(@{$external_ids_ar}, 4, 'Sněženka: Get external ids count (4).');
 is($external_ids_ar->[0]->name, 'cnb', 'Sněženka: Get external value name (cnb).');
 is($external_ids_ar->[0]->value, 'cnb001042253', 'Sněženka: Get ČČNB number (cnb001042253).');
 is($external_ids_ar->[1]->name, 'cnb', 'Sněženka: Get external value name (cnb).');

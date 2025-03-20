@@ -27,10 +27,12 @@
 
 #include "c/khashl.h"
 #include "c/common.c"
+
+#include "c/compress.c"
+#include "c/fcgi.c"
+#include "c/fdpass.c"
 #include "c/jsonfmt.c"
 #include "c/jsonparse.c"
-#include "c/fdpass.c"
-#include "c/fcgi.c"
 #include "c/xmlwr.c"
 
 #include "c/libpq.h"
@@ -114,6 +116,19 @@ void json_format(SV *val, ...)
 void json_parse(SV *val, ...)
   CODE:
     ST(0) = fujson_parse_xs(aTHX_ ax, items, val);
+
+void gzip_lib()
+  PROTOTYPE:
+  CODE:
+    ST(0) = sv_2mortal(newSVpv(fugz_lib(), 0));
+
+void gzip_compress(IV level, SV *in)
+  CODE:
+    ST(0) = fugz_compress(aTHX_ level, in);
+
+void brotli_compress(IV level, SV *in)
+  CODE:
+    ST(0) = fubr_compress(aTHX_ level, in);
 
 void fdpass_send(int socket, int fd, SV *data)
   CODE:

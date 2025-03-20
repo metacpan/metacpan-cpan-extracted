@@ -1,4 +1,4 @@
-package FU::Validate 0.3;
+package FU::Validate 0.4;
 
 use v5.36;
 use experimental 'builtin', 'for_list';
@@ -13,20 +13,30 @@ my %builtin = map +($_,1), qw/
     default
     onerror
     trim
-    values scalar sort unique
-    keys unknown missing
+    elems sort unique
+    accept_scalar accept_array
+    keys values unknown missing
     func
 /;
 
 my %type_vals = map +($_,1), qw/scalar hash array any/;
 my %unknown_vals = map +($_,1), qw/remove reject pass/;
 my %missing_vals = map +($_,1), qw/create reject ignore/;
+my %implied_type = qw/
+    accept_array scalar
+    keys hash values hash unknown hash
+    elems array sort array unique array accept_scalar array
+/;
+my %sort_vals = (
+    str => sub($x,$y) { $x cmp $y },
+    num => sub($x,$y) { $x <=> $y },
+);
 
 sub _length($exp, $min, $max) {
-    +{ func => sub($v) {
+    [ func => sub($v) {
         my $got = ref $v eq 'HASH' ? keys %$v : ref $v eq 'ARRAY' ? @$v : length $v;
         (!defined $min || $got >= $min) && (!defined $max || $got <= $max) ? 1 : { expected => $exp, got => $got };
-    }}
+    }]
 }
 
 # Basically the same as ( regex => $arg ), but hides the regex error
@@ -76,7 +86,7 @@ our %default_validations = (
     uint  => { _reg $re_uint }, # implies num
     min   => sub($min) { +{ num => 1, func => sub { $_[0] >= $min ? 1 : { expected => $min, got => $_[0] } } } },
     max   => sub($max) { +{ num => 1, func => sub { $_[0] <= $max ? 1 : { expected => $max, got => $_[0] } } } },
-    range => sub { +{ min => $_[0][0], max => $_[0][1] } },
+    range => sub { [ min => $_[0][0], max => $_[0][1] ] },
 
     ascii  => { _reg qr/^[\x20-\x7E]*$/ },
     sl     => { _reg qr/^[^\t\r\n]+$/ },
@@ -89,107 +99,104 @@ our %default_validations = (
 );
 
 
-# Loads a hashref of validations and a schema definition, and converts it into
-# an object with:
-#
-#   name        => $name_or_undef,
-#   validations => [ $recursive_compiled_object, .. ],
-#   schema      => $builtin_validations,
-#   known_keys  => { $key => 1, .. }  # Extracted from 'keys', Used for the 'unknown' validation
-#
-sub _compile($schema, $validations, $rec) {
-    my(%top, @val);
-    my @keys = keys $schema->{keys}->%* if $schema->{keys};
+sub _new { bless { validations => [], @_ }, __PACKAGE__ }
 
-    for my($name, $val) (%$schema) {
-        if ($builtin{$name}) {
-            $top{$name} = $schema->{$name};
+
+sub _compile($schema, $custom, $rec, $top, $validations=$top->{validations}) {
+    my $iscompiled = $schema isa __PACKAGE__;
+
+    # For hashref schemas, builtins always override other validations
+    $schema = [
+        map +($_, $schema->{$_}),
+            (grep !$builtin{$_}, keys %$schema),
+            (grep $builtin{$_}, keys %$schema),
+    ] if ref $schema ne 'ARRAY';
+
+    for my($name, $val) (@$schema) {
+        if ($name eq 'type') {
+            confess "Invalid value for 'type': $val" if $name eq 'type' && !$type_vals{$val};
+            confess "Incompatible types, the schema specifies '$val', but another validation requires '$top->{type}'" if $top->{type} && $top->{type} ne $val;;
+            $top->{type} = $val;
             next;
         }
 
-        my $t = $validations->{$name} || $default_validations{$name};
+        my $type = $implied_type{$name};
+        if ($type) {
+            confess "Incompatible types, the schema specifies '$top->{type}' but the '$name' validation implies '$type'" if $top->{type} && $top->{type} ne $type;
+            $top->{type} = $type;
+        }
+
+        if ($name eq 'elems' || $name eq 'values') {
+            $top->{$name} ||= _new;
+            _compile($val, $custom, $rec-1, $top->{$name});
+            next;
+        }
+
+        if ($name eq 'keys') {
+            $top->{keys} ||= {};
+            for my($n,$v) (%$val) {
+                $top->{keys}{$n} ||= _new;
+                _compile($v, $custom, $rec-1, $top->{keys}{$n});
+            }
+            next;
+        }
+
+        if ($name eq 'func') {
+            push @$validations, $val;
+            next;
+        }
+
+        if ($name eq 'default') {
+            $top->{default} = $val;
+            delete $top->{default} if ref $val eq 'SCALAR' && $$val eq 'required';
+            next;
+        }
+
+        if ($builtin{$name}) {
+            confess "Invalid value for 'missing': $val" if $name eq 'missing' && !$missing_vals{$val};
+            confess "Invalid value for 'unknown': $val" if $name eq 'unknown' && !$unknown_vals{$val};
+            confess "Invalid value for 'accept_array': $val" if $name eq 'accept_array' && $val && $val ne 'first' && $val ne 'last';
+            $val = $sort_vals{$val} || confess "Unknown value for 'sort': $val" if $name eq 'sort' && ref $val ne 'CODE';
+            $top->{$name} = $val;
+            next;
+        }
+
+        if ($iscompiled && $name eq 'validations') {
+            push @$validations, @$val;
+            next;
+        }
+
+        my $t = $custom->{$name} || $default_validations{$name};
         confess "Unknown validation: $name" if !$t;
         confess "Recursion limit exceeded while resolving validation '$name'" if $rec < 1;
-        $t = ref $t eq 'HASH' ? $t : $t->($val);
+        $t = ref $t eq 'CODE' ? $t->($val) : $t;
 
-        my $v = _compile($t, $validations, $rec-1);
-        $v->{name} = $name;
-        push @val, $v;
+        my $v = _new name => $name;
+        _compile($t, $custom, $rec-1, $top, $v->{validations});
+        push @$validations, $v if $v->{validations}->@*;
     }
-
-    for my ($n,$t) (qw/keys hash unknown hash  values array sort array unique array/) {
-        next if !exists $top{$n};
-        confess "Incompatible types, the schema specifies '$top{type}' but the '$n' validation implies '$t'" if $top{type} && $top{type} ne $t;
-        $top{type} = $t;
-    }
-
-    # Inherit some builtin options from validations
-    for my $t (@val) {
-        if ($top{type} && $t->{schema}{type} && $top{type} ne $t->{schema}{type}) {
-            confess "Incompatible types, the schema specifies '$top{type}' but validation '$t->{name}' requires '$t->{schema}{type}'" if $schema->{type};
-            confess "Incompatible types, '$t->[0]' requires '$t->{schema}{type}', but another validation requires '$top{type}'";
-        }
-        exists $t->{schema}{$_} and !exists $top{$_} and $top{$_} = delete $t->{schema}{$_}
-            for qw/default onerror trim type scalar unknown missing sort unique/;
-
-        push @keys, keys %{ delete $t->{known_keys} };
-        push @keys, keys %{ $t->{schema}{keys} } if $t->{schema}{keys};
-    }
-
-    # Compile sub-schemas
-    $top{keys} = { map +($_, __PACKAGE__->compile($top{keys}{$_}, $validations)), keys $top{keys}->%* } if $top{keys};
-    $top{values} = __PACKAGE__->compile($top{values}, $validations) if $top{values};
-
-    return {
-        validations => \@val,
-        schema      => \%top,
-        known_keys  => { map +($_,1), @keys },
-    };
 }
 
 
-sub compile($pkg, $schema, $validations={}) {
+sub compile($pkg, $schema, $custom={}) {
     return $schema if $schema isa __PACKAGE__;
-
-    my $c = _compile $schema, $validations, 64;
-
-    $c->{schema}{type} //= 'scalar';
-    $c->{schema}{missing} //= 'create';
-    $c->{schema}{trim} //= 1 if $c->{schema}{type} eq 'scalar';
-    $c->{schema}{unknown} //= 'remove' if $c->{schema}{type} eq 'hash';
-
-    confess "Invalid value for 'type': $c->{schema}{type}" if !$type_vals{$c->{schema}{type}};
-    confess "Invalid value for 'missing': $c->{schema}{missing}" if !$missing_vals{$c->{schema}{missing}};
-    confess "Invalid value for 'unknown': $c->{schema}{unknown}" if exists $c->{schema}{unknown} && !$unknown_vals{$c->{schema}{unknown}};
-
-    delete $c->{schema}{default} if ref $c->{schema}{default} eq 'SCALAR' && ${$c->{schema}{default}} eq 'required';
-
-    if (exists $c->{schema}{sort}) {
-        my $s = $c->{schema}{sort};
-        $c->{schema}{sort} =
-            ref $s eq 'CODE' ? $s
-            :    $s eq 'str' ? sub($x,$y) { $x cmp $y }
-            :    $s eq 'num' ? sub($x,$y) { $x <=> $y }
-            : confess "Unknown value for 'sort': $c->{schema}{sort}";
-    }
-    $c->{schema}{unique} = sub { $_[0] } if $c->{schema}{unique} && !ref $c->{schema}{unique} && !$c->{schema}{sort};
-
-    bless $c, $pkg;
+    my $c = _new;
+    _compile $schema, $custom, 64, $c;
+    $c
 }
 
 
-sub _validate_rec {
+sub _validate_hash {
     my $c = $_[0];
 
-    # hash keys
-    if ($c->{schema}{keys}) {
+    if ($c->{keys}) {
         my @err;
-        for my ($k, $s) ($c->{schema}{keys}->%*) {
+        for my ($k, $s) ($c->{keys}->%*) {
             if (!exists $_[1]{$k}) {
-                next if $s->{schema}{missing} eq 'ignore';
-                return { validation => 'missing', key => $k } if $s->{schema}{missing} eq 'reject';
-                $_[1]{$k} = ref $s->{schema}{default} eq 'CODE' ? $s->{schema}{default}->() : $s->{schema}{default} // undef;
-                next if exists $s->{schema}{default};
+                next if $s->{missing} && $s->{missing} eq 'ignore';
+                return { validation => 'missing', key => $k } if $s->{missing} && $s->{missing} eq 'reject';
+                $_[1]{$k} = ref $s->{default} eq 'CODE' ? $s->{default}->() : $s->{default} // undef;
+                next if exists $s->{default};
             }
 
             my $r = _validate($s, $_[1]{$k});
@@ -198,62 +205,74 @@ sub _validate_rec {
                 push @err, $r;
             }
         }
-        return { validation => 'keys', errors => \@err } if @err;
+        return { validation => 'keys', errors => [ sort { $a->{key} cmp $b->{key} } @err ] } if @err;
     }
 
-    # array values
-    if ($c->{schema}{values}) {
+    if ($c->{values}) {
         my @err;
-        for my $i (0..$#{$_[1]}) {
-            my $r = _validate($c->{schema}{values}, $_[1][$i]);
+        for my ($k, $v) ($_[1]->%*) {
+            my $r = _validate($c->{values}, $v);
             if ($r) {
-                $r->{index} = $i;
+                $r->{key} = $k;
                 push @err, $r;
             }
         }
-        return { validation => 'values', errors => \@err } if @err;
+        return { validation => 'values', errors => [ sort { $a->{key} cmp $b->{key} } @err ] } if @err;
     }
+}
 
-    # validations
-    for ($c->{validations}->@*) {
-        my $r = _validate_rec($_, $_[1]);
-        return {
-            # If the error was a custom 'func' object, then make that the primary cause.
-            # This makes it possible for validations to provide their own error objects.
-            $r->{validation} eq 'func' && (!exists $r->{result} || keys $r->%* > 2) ? $r->%* : (error => $r),
-            validation => $_->{name},
-        } if $r;
+sub _validate_elems {
+    my @err;
+    for my $i (0..$#{$_[1]}) {
+        my $r = _validate($_[0]{elems}, $_[1][$i]);
+        if ($r) {
+            $r->{index} = $i;
+            push @err, $r;
+        }
     }
+    return { validation => 'elems', errors => \@err } if @err;
+}
 
-    # func
-    if ($c->{schema}{func}) {
-        my $r = $c->{schema}{func}->($_[1]);
-        return { %$r, validation => 'func' } if ref $r eq 'HASH';
-        return { validation => 'func', result => $r } if !$r;
+
+sub _validate_rec {
+    my $c = $_[0];
+    for my $v ($c->{validations}->@*) {
+        if (ref $v eq 'CODE') {
+            my $r = $v->($_[1]);
+            return { %$r, validation => 'func' } if ref $r eq 'HASH';
+            return { validation => 'func', result => $r } if !$r;
+        } else {
+            my $r = _validate_rec($v, $_[1]);
+            return {
+                # If the error was a custom 'func' object, then make that the primary cause.
+                # This makes it possible for validations to provide their own error objects.
+                $r->{validation} eq 'func' && (!exists $r->{result} || keys $r->%* > 2) ? $r->%* : (error => $r),
+                validation => $v->{name},
+            } if $r;
+        }
     }
 }
 
 
 sub _validate_array {
     my $c = $_[0];
-    return if $c->{schema}{type} ne 'array';
 
-    $_[1] = [sort { $c->{schema}{sort}->($a, $b) } $_[1]->@* ] if $c->{schema}{sort};
+    $_[1] = [sort { $c->{sort}->($a, $b) } $_[1]->@* ] if $c->{sort};
 
     # Key-based uniqueness
-    if ($c->{schema}{unique} && ref $c->{schema}{unique} eq 'CODE') {
+    if ($c->{unique} && (!$c->{sort} || ref $c->{unique} eq 'CODE')) {
         my %h;
         for my $i (0..$#{$_[1]}) {
-            my $k = $c->{schema}{unique}->($_[1][$i]);
+            my $k = ref $c->{unique} eq 'CODE' ? $c->{unique}->($_[1][$i]) : $_[1][$i];
             return { validation => 'unique', index_a => $h{$k}, value_a => $_[1][$h{$k}], index_b => $i, value_b => $_[1][$i], key => $k } if exists $h{$k};
             $h{$k} = $i;
         }
 
     # Comparison-based uniqueness
-    } elsif ($c->{schema}{unique}) {
+    } elsif ($c->{unique}) {
         for my $i (0..$#{$_[1]}-1) {
             return { validation => 'unique', index_a => $i, value_a => $_[1][$i], index_b => $i+1, value_b => $_[1][$i+1] }
-                if $c->{schema}{sort}->($_[1][$i], $_[1][$i+1]) == 0
+                if $c->{sort}->($_[1][$i], $_[1][$i+1]) == 0
         }
     }
 }
@@ -262,58 +281,64 @@ sub _validate_array {
 sub _validate_input {
     my $c = $_[0];
 
+    my $type = $c->{type} // 'scalar';
+
+    # accept_array (needs to be done before 'trim')
+    $_[1] = $_[1]->@* == 0 ? undef : $c->{accept_array} eq 'first' ? $_[1][0] : $_[1][ $#{$_[1]} ]
+        if $c->{accept_array} && ref $_[1] eq 'ARRAY';
+
     # trim (needs to be done before the 'default' test)
-    $_[1] = trim $_[1] =~ s/\r//rg if defined $_[1] && !ref $_[1] && $c->{schema}{type} eq 'scalar' && $c->{schema}{trim};
+    $_[1] = trim $_[1] =~ s/\r//rg if defined $_[1] && !ref $_[1] && $type eq 'scalar' && (!exists $c->{trim} || $c->{trim});
 
     # default
     if (!defined $_[1] || (!ref $_[1] && $_[1] eq '')) {
-        if (exists $c->{schema}{default}) {
-            $_[1] = ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($_[1]) : $c->{schema}{default};
+        if (exists $c->{default}) {
+            $_[1] = ref $c->{default} eq 'CODE' ? $c->{default}->($_[1]) : $c->{default};
             return;
         }
         return { validation => 'required' };
     }
 
-    if ($c->{schema}{type} eq 'scalar') {
+    if ($type eq 'scalar') {
         return { validation => 'type', expected => 'scalar', got => lc ref $_[1] } if ref $_[1];
 
-    } elsif ($c->{schema}{type} eq 'hash') {
+    } elsif ($type eq 'hash') {
         return { validation => 'type', expected => 'hash', got => lc ref $_[1] || 'scalar' } if ref $_[1] ne 'HASH';
 
         # Each branch below makes a shallow copy of the hash, so that further
         # validations can perform in-place modifications without affecting the
         # input.
-        if ($c->{schema}{unknown} eq 'remove') {
-            $_[1] = { map +($_, $_[1]{$_}), grep $c->{known_keys}{$_}, keys $_[1]->%* };
-        } elsif ($c->{schema}{unknown} eq 'reject') {
-            my @err = grep !$c->{known_keys}{$_}, keys $_[1]->%*;
-            return { validation => 'unknown', keys => \@err, expected => [ sort keys %{$c->{known_keys}} ] } if @err;
+        if (!$c->{keys} || ($c->{unknown} && $c->{unknown} eq 'pass')) {
             $_[1] = { $_[1]->%* };
+        } elsif (!$c->{unknown} || $c->{unknown} eq 'remove') {
+            $_[1] = { map +($_, $_[1]{$_}), grep $c->{keys}{$_}, keys $_[1]->%* };
         } else {
+            my @err = grep !$c->{keys}{$_}, keys $_[1]->%*;
+            return { validation => 'unknown', keys => \@err, expected => [ sort keys $c->{keys}->%* ] } if @err;
             $_[1] = { $_[1]->%* };
         }
 
-    } elsif ($c->{schema}{type} eq 'array') {
-        $_[1] = [$_[1]] if $c->{schema}{scalar} && !ref $_[1];
-        return { validation => 'type', expected => $c->{schema}{scalar} ? 'array or scalar' : 'array', got => lc ref $_[1] || 'scalar' } if ref $_[1] ne 'ARRAY';
+    } elsif ($type eq 'array') {
+        $_[1] = [$_[1]] if $c->{accept_scalar} && !ref $_[1];
+        return { validation => 'type', expected => $c->{accept_scalar} ? 'array or scalar' : 'array', got => lc ref $_[1] || 'scalar' } if ref $_[1] ne 'ARRAY';
         $_[1] = [$_[1]->@*]; # Create a shallow copy to prevent in-place modification.
 
-    } elsif ($c->{schema}{type} eq 'any') {
+    } elsif ($type eq 'any') {
         # No need to do anything here.
-
-    } else {
-        confess "Unknown type '$c->{schema}{type}'"; # Already checked in compile(), but be extra safe
     }
 
-    &_validate_rec || &_validate_array;
+    ($type eq 'hash' && &_validate_hash) ||
+    ($c->{elems} && &_validate_elems) ||
+    &_validate_rec ||
+    ($type eq 'array' && &_validate_array)
 }
 
 
 sub _validate {
     my $c = $_[0];
     my $r = &_validate_input;
-    ($r, $_[1]) = (undef, ref $c->{schema}{onerror} eq 'CODE' ? $c->{schema}{onerror}->($_[0], bless $r, 'FU::Validate::err') : $c->{schema}{onerror})
-        if $r && exists $c->{schema}{onerror};
+    ($r, $_[1]) = (undef, ref $c->{onerror} eq 'CODE' ? $c->{onerror}->($_[0], bless $r, 'FU::Validate::err') : $c->{onerror})
+        if $r && exists $c->{onerror};
     $r
 }
 
@@ -348,8 +373,9 @@ sub errors($e, $prefix='') {
     my $val = $e->{validation};
     my $p = $prefix ? "$prefix: " : '';
     $val eq 'keys'     ? map errors($_, $prefix.'.'._fmtkey($_->{key})), $e->{errors}->@* :
+    $val eq 'values'   ? map errors($_, $prefix.'.'._fmtkey($_->{key})), $e->{errors}->@* :
     $val eq 'missing'  ? $prefix.'.'._fmtkey($e->{key}).': required key missing' :
-    $val eq 'values'   ? map errors($_, $prefix."[$_->{index}]"), $e->{errors}->@* :
+    $val eq 'elems'    ? map errors($_, $prefix."[$_->{index}]"), $e->{errors}->@* :
     $val eq 'unique'   ? $prefix."[$e->{index_b}] value '"._fmtval($e->{value_a})."' duplicated" :
     $val eq 'required' ? "${p}required value missing" :
     $val eq 'type'     ? "${p}invalid type, expected '$e->{expected}' but got '$e->{got}'" :
@@ -382,10 +408,10 @@ validate the format and the structure of the data, but it does not support
 validations that depend on other input values. For example, it is not possible
 to specify that the contents of a I<password> field must be equivalent to that
 of a I<confirm_password> field, but you can specify that both fields need to be
-filled out. Recursive data structures are not supported. There is also no
-built-in support for validating hashes with dynamic keys or arrays where not
-all elements conform to the same schema. These could technically still be
-validated with custom validations, but it won't be as convenient.
+filled out. Recursive data structures are not supported. There is also no good
+support for validating hashes with dynamic keys or arrays where not all
+elements conform to the same schema. These could technically still be validated
+with custom validations, but it won't be as convenient.
 
 This module is designed to validate any kind of program input after it has been
 parsed into a Perl data structure. It should not be used to validate function
@@ -422,16 +448,30 @@ validation. These are documented in L</SCHEMA DEFINITION> below.
 
 =head1 SCHEMA DEFINITION
 
-A schema is a hashref, each key is the name of a built-in option or of a
-validation to be performed. None of the options or validations are required,
-but some built-ins have default values. This means that the empty schema C<{}>
-is actually equivalent to:
+A schema is an arrayref or hashref, where each key is the name of a built-in
+option or of a validation to be performed and the values are the arguments to
+those validations. None of the options or validations are required, but some
+built-ins have default values. This means that the empty schema C<{}> is
+actually equivalent to:
 
   { type    => 'scalar',
     trim    => 1,
     default => \'required',
     missing => 'create',
   }
+
+Built-in options are always validated in a fixed order, but the order in which
+standard and custom validations are performed is random when the schema is
+given as a hashref. This is rarely a problem, but it can in some cases affect
+the returned error message or whether a later validation will receive data
+normalized by a previous validation. An arrayref can be used to enforce a
+validation order:
+
+  [ enum => [1, 2, 'a'], int => 1 ]
+
+Or to use the same validation multiple times:
+
+  [ regex => qr/^a/, regex => qr/z$/ ]
 
 =head2 Built-in options
 
@@ -515,14 +555,22 @@ like:
     ]
   }
 
+=item values => $schema
+
+Implies C<< type => 'hash' >>, set a schema that is used to validate every hash
+value. Can be used together with I<keys>, in which case values must validate
+both this C<$schema> and the schema corresponding to the key.
+
 =item unknown => $option
 
 Implies C<< type => 'hash' >>, this option specifies what to do with keys in
 the input data that have not been defined in the I<keys> option. Possible
 values are I<remove> to remove unknown keys from the output data (this is the
 default), I<reject> to return an error if there are unknown keys in the input,
-or I<pass> to pass through any unknown keys to the output data. Note that the
-values for passed-through keys are not validated against any schema!
+or I<pass> to pass through any unknown keys to the output data. Values for
+passed-through keys are only validated when the I<values> option is set,
+otherwise they are passed through as-is. This option has no effect when the
+I<keys> option is never set, in that case all values are always passed through.
 
 In the case of I<reject>, the error object will look like:
 
@@ -543,7 +591,8 @@ undef), I<reject> to return an error if the option is missing or I<ignore> to
 leave the key out of the returned data.
 
 The default is I<create>, but if no I<default> option is set for this key then
-that is effectively the same as I<reject>.
+that is effectively the same as I<reject>. Values created through I<create> are
+still validated through I<values> if that has been set.
 
 In the case of I<reject>, the error object will look like:
 
@@ -551,24 +600,24 @@ In the case of I<reject>, the error object will look like:
     key        => 'field'
   }
 
-=item values => $schema
+=item elems => $schema
 
 Implies C<< type => 'array' >>, this defines the schema that is applied to
-every item in the array.  The schema definition may be a bare hashref or a
+every element in the array.  The schema definition may be a bare hashref or a
 validator returned by C<compile()>.
 
 Failure is reported in a similar fashion to I<keys>:
 
-  { validation => 'values',
+  { validation => 'elems',
     errors => [
       { index => 1, validation => 'required' }
     ]
   }
 
-=item scalar => 0/1
+=item accept_scalar => 0/1
 
 Implies C<< type => 'array' >>, this option will also permit the input to be a
-scalar. In this case, the input is interpreted and returned as an array with
+scalar. In that case, the input is interpreted and returned as an array with
 only one element. This option exists to make it easy to validate multi-value
 form inputs. For example, consider C<query_decode()> in L<FU::Util>: a
 parameter in a query string is decoded into an array if it is listed multiple
@@ -578,15 +627,23 @@ times, a scalar if it only occcurs once. So we could either end up with:
   # OR:
   { a => [1, 3], b => 1 }
 
-With the I<scalar> option, we can accept both forms for C<a> and normalize into
-an array. The following schema definition can validate the above examples:
+With the I<accept_scalar> option, we can accept both forms for C<a> and
+normalize into an array. The following schema definition can validate the above
+examples:
 
   { type => 'hash',
     keys => {
-      a => { type => 'array', scalar => 1 },
+      a => { type => 'array', accept_scalar => 1 },
       b => { }
     }
   }
+
+=item accept_array => false/'first'/'last'
+
+Implies C<< type => 'scalar' >>. Similar to I<accept_scalar> but normalizes in
+the other direction: when the input is an array, only the first or last item is
+extracted and the other elements are ignored. If the input is an empty array,
+the value is taken to be C<undef>.
 
 =item sort => $option
 
@@ -620,8 +677,7 @@ All of that may sound complicated, but it's quite easy to use. Here's a few
 examples:
 
   # This describes an array of hashes with keys 'id' and 'name'.
-  { values => {
-      type => 'hash',
+  { elems => {
       keys => {
         id   => { uint => 1 },
         name => {}
@@ -635,7 +691,7 @@ examples:
 
   # Contrived example: An array of strings, and we want
   # each string to start with a different character.
-  { values => { minlength => 1 },
+  { elems => { minlength => 1 },
     unique => sub { substr $_[0], 0, 1 }
   }
 
@@ -657,10 +713,10 @@ assumes the first schema from the previous example.
 =item func => $sub
 
 Run the input through a subroutine to perform additional validation or
-normalization. The subroutine is only called after all other validations have
-succeeded. The subroutine is called with the input as its only argument.
-Normalization of the input can be done by assigning to the first argument or
-modifying its value in-place.
+normalization. When the schema is a hashref, the subroutine is only called
+after all other validations have succeeded. The subroutine is called with the
+input as its only argument.  Normalization of the input can be done by
+assigning to the first argument or modifying its value in-place.
 
 On success, the subroutine should return a true value. On failure, it should
 return either a false value or a hashref. The hashref will have the
@@ -839,7 +895,7 @@ used in that schema may get input with whitespace around it.
 
 All validations used in a schema need to agree upon a single I<type> option.
 If a custom validation does not specify a I<type> option (and no type is
-implied by another validation such as I<keys> or I<values>), then the
+implied by another validation such as I<keys> or I<elems>), then the
 validation should work with every type. It is an error to define a schema that
 mixes validations of different types. For example, the following throws an
 error:
@@ -851,19 +907,21 @@ error:
       int => 1
   });
 
-The I<keys>, I<values> and C<func> built-in options are validated separately
-for each custom validation. So if you have multiple custom validations that set
-the I<values> option, then the array elements must validate all the listed
-schemas. The same applies to I<keys>: If the same key is listed in multiple
-custom validations, then the key must conform to all schemas. With respect to
-the I<unknown> option, a key that is mentioned in any of the I<keys> options is
-considered "known".
+The I<func> option is validated separately for each custom validation.
+
+Multiple I<keys> and I<elems> validations are merged into a single validation.
+So if you have multiple custom validations that set the I<elems> option, a
+single combined schema is created that validates all array elements. The same
+applies to I<keys>: if the same key is listed in multiple custom validations,
+then the key must conform to all schemas. With respect to the I<unknown>
+option, a key that is mentioned in any of the I<keys> options is considered
+"known".
 
 All other built-in options follow inheritance semantics: These options can be
 set in a custom validation, and they are inherited by the top-level schema.  If
-the same option is set in multiple validations a random one will be inherited,
-so that's not a good idea. The top-level schema can always override options set
-by custom validations.
+the same option is set in multiple validations, the final one will be
+inherited. The top-level schema can always override options set by custom
+validations.
 
 
 =head3 Global custom validations

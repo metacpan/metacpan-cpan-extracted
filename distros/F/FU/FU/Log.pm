@@ -1,4 +1,4 @@
-package FU::Log 0.3;
+package FU::Log 0.4;
 use v5.36;
 use Exporter 'import';
 use POSIX 'strftime';

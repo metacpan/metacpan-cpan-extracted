@@ -1,5 +1,5 @@
 package TVision;
-our $VERSION=0.18;
+our $VERSION=0.19;
 =encoding utf-8
 =head1 NAME
 
@@ -32,7 +32,7 @@ onCommand event. If 0 - then next availlable is taken.
 
 TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
 TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
-TKey is array ref of 2 integers, which isn't always blessed to TVision::TKey.
+TKey is array ref of 2 integers or just integer.
 
 =cut
 
@@ -250,6 +250,22 @@ package TVision::TColorGroup;
 #[ ]    friend TColorGroup& operator + ( TColorGroup& g1, TColorGroup& g2 ) noexcept;
 #};
 package TVision::TColorGroupList;
+our @ISA = qw(TVision::TListViewer);
+#class TColorGroupList : public TListViewer {
+#public:
+#[ ]    TColorGroupList( const TRect& bounds, TScrollBar *aScrollBar, TColorGroup *aGroups) noexcept;
+#[ ]    virtual ~TColorGroupList();
+#[ ]    virtual void focusItem( short item );
+#[ ]    virtual void getText( char *dest, short item, short maxLen );
+#[ ]    virtual void handleEvent(TEvent&);
+#[ ]    void setGroupIndex(uchar groupNum, uchar itemNum);
+#[ ]    TColorGroup* getGroup(uchar groupNum);
+#[ ]    uchar getGroupIndex(uchar groupNum);
+#[ ]    uchar getNumGroups();
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
+#};
+
 package TVision::TColorItem;
 #class TColorItem {
 #public:
@@ -269,22 +285,15 @@ package TVision::TColorItem;
 # };
 
 package TVision::TColorItemList;
-#[ ]class TColorItemList : public TListViewer {
-#[ ]public:
+#class TColorItemList : public TListViewer {
+#public:
 #[ ]    TColorItemList( const TRect& bounds, TScrollBar *aScrollBar, TColorItem *aItems) noexcept;
 #[ ]    virtual void focusItem( short item );
 #[ ]    virtual void getText( char *dest, short item, short maxLen );
 #[ ]    virtual void handleEvent( TEvent& event );
-#[ ]protected:
-#[ ]    TColorItem *items;
-#[ ]private:
-#[ ]    virtual const char *streamableName() const { return name; }
-#[ ]protected:
-#[ ]    TColorItemList( StreamableInit ) noexcept;
-#[ ]public:
 #[ ]    static const char * const _NEAR name;
 #[ ]    static TStreamable *build();
-#[ ]};
+#};
 
 package TVision::TColorSelector;
 our @ISA = qw(TVision::TView);
@@ -744,6 +753,15 @@ our @ISA = qw(TVision::TView);
 #    static TStreamable *build();
 #};
 package TVision::THistoryViewer;
+our @ISA = qw(TVision::TListViewer);
+#class THistoryViewer : public TListViewer {
+#public:
+#[ ]    THistoryViewer( const TRect& bounds, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar, ushort aHistoryId)
+#[ ]    virtual TPalette& getPalette() const;
+#[ ]    virtual void getText( char *dest, short item, short maxLen );
+#[ ]    virtual void handleEvent( TEvent& event );
+#[ ]    int historyWidth() noexcept;
+#};
 package TVision::THistoryWindow;
 package TVision::TIndicator;
 #class TIndicator : public TView { 
@@ -779,21 +797,55 @@ our @ISA = qw(TVision::TStaticText);
 #};
 
 package TVision::TListBox;
+our @ISA = qw(TVision::TListViewer);
 #class TListBox : public TListViewer {
 #public:
-#    TListBox( const TRect& bounds, ushort aNumCols, TScrollBar *aScrollBar ) noexcept;
-#    ~TListBox();
-#    virtual ushort dataSize();
-#    virtual void getData( void *rec );
-#    virtual void getText( char *dest, short item, short maxLen );
-#    virtual void newList( TCollection *aList );
-#    virtual void setData( void *rec );
-#    TCollection *list();
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[ ]    TListBox( const TRect& bounds, ushort aNumCols, TScrollBar *aScrollBar ) noexcept;
+#[ ]    ~TListBox();
+#[ ]    virtual ushort dataSize();
+#[ ]    virtual void getData( void *rec );
+#[ ]    virtual void getText( char *dest, short item, short maxLen );
+#[ ]    virtual void newList( TCollection *aList );
+#[ ]    virtual void setData( void *rec );
+#[ ]    TCollection *list();
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
 
 package TVision::TListViewer;
+our @ISA = qw(TVision::TView);
+#class TListViewer : public TView {
+#    static const char * _NEAR emptyText;
+#public:
+#    TListViewer( const TRect& bounds, ushort aNumCols, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar) noexcept;
+#    virtual void changeBounds( const TRect& bounds );
+#    virtual void draw();
+#    virtual void focusItem( short item );
+#    virtual TPalette& getPalette() const;
+#    virtual void getText( char *dest, short item, short maxLen );
+#    virtual Boolean isSelected( short item );
+#    virtual void handleEvent( TEvent& event );
+#    virtual void selectItem( short item );
+#    void setRange( short aRange );
+#    virtual void setState( ushort aState, Boolean enable );
+#    virtual void focusItemNum( short item );
+#    virtual void shutDown();
+#    TScrollBar *hScrollBar;
+#    TScrollBar *vScrollBar;
+#    short numCols;
+#    short topItem;
+#    short focused;
+#    short range;
+#private:
+#    virtual const char *streamableName() const { return name; }
+#protected:
+#    TListViewer( StreamableInit ) noexcept;
+#    virtual void write( opstream& );
+#    virtual void *read( ipstream& );
+#public:
+#    static const char * const _NEAR name;
+#    static TStreamable *build();
+#};
 package TVision::TLookupValidator;
 
 package TVision::TMenu;

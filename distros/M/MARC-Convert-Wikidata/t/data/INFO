@@ -1,7 +1,6 @@
 INFO
 ====
 cnb000024035.xml - Author of introduction without NKCR AUT ID (700 field).
-cnb000036403.mrc - Edition number (250 field).
 cnb000040543.mrc - Multiple people roles (700 field).
 cnb000080974.xml - Book series with ISSN (490 field).
 cnb000087983.mrc - Translator (700 field).
@@ -14,7 +13,7 @@ cnb000641953.mrc - Special format of series ordinal (490 field).
 cnb000750997.mrc
 cnb000754547.mrc
 cnb000974260.mrc - Has sine loco as publication place.
-cnb001002340.mrc - Bad ISBN.
+cnb001002340.mrc - Right and bad ISBNs.
 cnb001042253.mrc - Publication date in format [19--].
 cnb001657758.mrc - Two series (490 field).
 cnb002031137.xml - Has three languages (041 field).
@@ -31,3 +30,4 @@ cnb003059138.mrc - Has 2x OCoLC (035 field).
 cnb003238343.mrc - Date of birth before Krist (100 field).
 cnb003369415.mrc - Has weird format of number of pages (300 field).
 cnb003565872.xml - Has cycle (787 field).
+cnb003633764.xml - Bad ISBN only.

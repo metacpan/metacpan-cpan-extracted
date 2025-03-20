@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.38.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.39.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/11/16
+## Modified 2025/03/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.38.0';
+    our $VERSION     = 'v0.39.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -8918,36 +8918,36 @@ sub UNIVERSAL::create_class
     }
     my $map =
     {
-    array               => '_set_get_array',
-    # Alias for 'array_as_object'
-    array_object        => '_set_get_array_as_object',
-    array_as_object     => '_set_get_array_as_object',
-    boolean             => '_set_get_boolean',
-    class               => '_set_get_class',
-    class_array         => '_set_get_class_array',
-    class_array_object  => '_set_get_class_array_object',
-    code                => '_set_get_code',
-    datetime            => '_set_get_datetime',
-    decimal             => '_set_get_number',
-    file                => '_set_get_file',
-    float               => '_set_get_number',
-    glob                => '_set_get_glob',
-    hash                => '_set_get_hash',
-    hash_as_object      => '_set_get_hash_as_mix_object',
-    integer             => '_set_get_number',
-    ip                  => '_set_get_ip',
-    long                => '_set_get_number',
-    number              => '_set_get_number',
-    object              => '_set_get_object',
-    object_no_init      => '_set_get_object_without_init',
-    object_array        => '_set_get_object_array',
-    object_array_object => '_set_get_object_array_object',
-    scalar              => '_set_get_scalar',
-    scalar_as_object    => '_set_get_scalar_as_object',
-    scalar_or_object    => '_set_get_scalar_or_object',
-    uri                 => '_set_get_uri',
-    uuid                => '_set_get_uuid',
-    version             => '_set_get_version',
+        array               => '_set_get_array',
+        # Alias for 'array_as_object'
+        array_object        => '_set_get_array_as_object',
+        array_as_object     => '_set_get_array_as_object',
+        boolean             => '_set_get_boolean',
+        class               => '_set_get_class',
+        class_array         => '_set_get_class_array',
+        class_array_object  => '_set_get_class_array_object',
+        code                => '_set_get_code',
+        datetime            => '_set_get_datetime',
+        decimal             => '_set_get_number',
+        file                => '_set_get_file',
+        float               => '_set_get_number',
+        glob                => '_set_get_glob',
+        hash                => '_set_get_hash',
+        hash_as_object      => '_set_get_hash_as_mix_object',
+        integer             => '_set_get_number',
+        ip                  => '_set_get_ip',
+        long                => '_set_get_number',
+        number              => '_set_get_number',
+        object              => '_set_get_object',
+        object_no_init      => '_set_get_object_without_init',
+        object_array        => '_set_get_object_array',
+        object_array_object => '_set_get_object_array_object',
+        scalar              => '_set_get_scalar',
+        scalar_as_object    => '_set_get_scalar_as_object',
+        scalar_or_object    => '_set_get_scalar_or_object',
+        uri                 => '_set_get_uri',
+        uuid                => '_set_get_uuid',
+        version             => '_set_get_version',
     };
     my $prefix_class = '';
     local $" = ' ';
@@ -9500,7 +9500,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.38.0
+    v0.39.0
 
 =head1 DESCRIPTION
 
