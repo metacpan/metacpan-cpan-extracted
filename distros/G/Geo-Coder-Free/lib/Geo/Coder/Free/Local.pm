@@ -24,11 +24,11 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
@@ -315,6 +315,13 @@ sub geocode {
 
 			# Decide if it's worth continuing to search
 			my $found = 0;
+			if(!defined($addr{'country'})) {
+				if($l =~ /(United States|USA|US)$/i) {
+					$addr{'country'} = 'US';
+				} else {
+					die "TODO: extract country from $l";
+				}
+			}
 			foreach my $row(@{$self->{'data'}}) {
 				if((uc($row->{'state'}) eq uc($addr{'state'})) &&
 				   (uc($row->{'country'}) eq uc($addr{'country'}))) {

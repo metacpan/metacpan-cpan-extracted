@@ -13,7 +13,7 @@ like($@, qr/\QMap::Tube::get_line_by_name(): ERROR: Invalid Line Name [XYZ]\E/, 
 {
   my $ret = $map->get_line_by_name('U42');
   isa_ok( $ret,       'Map::Tube::Line' );
-  is( $ret->id( ),    'vrr_U42', 'Line id not correct for line named U42' );
+  is( $ret->id( ),    'VRR_U42', 'Line id not correct for line named U42' );
   is( $ret->name( ),  'U42',     'Node name not correct for line named U42' );
   is( $ret->color( ), '#FBBA00', 'Color not correct for line named U42' );
   my $stationref = $ret->get_stations( );
@@ -25,10 +25,10 @@ like($@, qr/\QMap::Tube::get_line_by_name(): ERROR: Invalid Line Name [XYZ]\E/, 
 }
 
 {
-  my $ret = $map->get_line_by_id('vrr_U42');
+  my $ret = $map->get_line_by_id('VRR_U42');
   isa_ok( $ret,      'Map::Tube::Line' );
-  is( $ret->id( ),   'vrr_U42', 'Line id not correct for line id vrr_U42' );
-  is( $ret->name( ), 'U42',     'Line name not correct for line id vrr_U42' );
+  is( $ret->id( ),   'VRR_U42', 'Line id not correct for line id VRR_U42' );
+  is( $ret->name( ), 'U42',     'Line name not correct for line id VRR_U42' );
 }
 
 {

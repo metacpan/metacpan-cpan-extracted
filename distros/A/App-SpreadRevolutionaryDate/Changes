@@ -1,6 +1,39 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.44 2025-03-08T13:22:15
+0.47 2025-03-21T08:29:17
+ - Do not bother with accent in text new target
+ - Configuration file should be opened in UTF-8, pass filehandle to
+   AppConfig
+
+0.46 2025-03-20T23:48:51Z
+ - Improve splitting of messages according to max_length
+ - Fix missing used module
+ - Add some images to use with Gemini
+
+0.45 2025-03-20T21:08:22Z
+ - Add documentation for Gemini
+ - Use locale attribute to build DateTime
+ - Add Gemini options in help message
+ - Fix PromptUser options in help message
+ - Missing mandatory parameters that have a default value should not
+   trigger an error
+ - Add missing config option for Gemini msgmaker
+ - Add configuration sample for Gemini msgmaker config options
+ - Use Camel case for configuration section, like msgmaker module name
+ - Add tests for Gemini msgmaker config options
+ - Add config options for Gemini msgmaker
+ - Add Gemini msgmaker
+ - Upgrade Dist::Zilla
+ - Fix Wikipedia link for Sylvie
+ - Fix Telechat test, deleting extra comma in day names
+ - Done Mastodon/Bluesky max_length variable
+ - Fix config test by reinitializing command line options
+ - Update Telechat test to split longer message
+ - Define max_length for BlueSky and split longer messages
+ - Define max_length for Mastodon and split longer messages
+ - Update TODO
+
+0.44 2025-03-08T13:22:15Z
  - Document Telechat calendars
  - Chose randomly between Telechat calendars
  - Add two other Telechat calendar

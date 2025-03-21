@@ -9,11 +9,7 @@ Tk::Poplevel - Popping a toplevel without decoration relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.13';
-
-use Config;
-my $mswin = $Config{'osname'} eq 'MSWin32';
-print "mswin $mswin\n";
+$VERSION = '0.14';
 
 use base qw(Tk::Derived Tk::Toplevel);
 
@@ -93,7 +89,6 @@ sub Populate {
 	} else {
 		$parent->bind('<Button-1>',  [$self, 'popDown'] );
 	}
-	$self->bind('<Configure>', [$self, 'ConfigureSizeAndPos']) unless $mswin;
 	
 	$self->ConfigSpecs(
 		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],

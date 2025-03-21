@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::PopList.
 
+0.14 Fri Mar 21 3035
+	- Removed annoying print statement
+	- Removed obsolete code.
+
 0.13 Mon Mar 17 2025
 	- Fixed freeze on Windows systems.
 

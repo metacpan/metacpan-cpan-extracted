@@ -32,17 +32,17 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 DESCRIPTION
 
-C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in the L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Bluesky|https://bsky.app/>, L<Twitter|https://twitter.com/>, L<Mastodon|https://mastodon.social/>, the L<Freenode|https://freenode.net/> and L<Liberachat|https://libera.chat/> Internet Relay Chat networks.
+C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in the L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Mastodon|https://mastodon.social/>, L<Bluesky|https://bsky.app/>, L<Twitter|https://twitter.com/>, the L<Liberachat|https://libera.chat/> and L<Freenode|https://freenode.net/> Internet Relay Chat networks.
 
 Moreover, you can easily extend these defaults targets with any desired one, see L</"EXTENDING TO NEW TARGETS">, and even spread something else than the revolutionary date, see L</msgmaker> option and L</"EXTENDING TO NEW MESSAGE MAKERS">.
 
 The French Revolutionary calendar, also called Republican calendar, was introduced during the L<French Revolution|https://en.wikipedia.org/wiki/French_Revolution>, and used from late 1793 to 1805, and also during the L<Paris Commune|https://en.wikipedia.org/wiki/Paris_Commune> in 1871. This was an attempt to get rid of religious and royalist references found in Gregorian calendar when naming measures of Time. Months were given new names based on nature, each day of the year, instead of being named after an associated saint, had a unique name associated with the rural economy: agricultural tools, common animals, grains, pastures, trees, roots, flowers, fruits, plants, and minerals. But this was also an attempt to give more rational in measuring Time, basing measures on decimal system. Instead of weeks, each month was divided into exactly 3 I<décades>, that is ten days; days were divided into ten hours; hours into 100 minutes; and minutes into 100 seconds.
 
-You B<must> have a registered account on each of the targets you want to spread the revolutionary date. And you must get credentials for C<spread-revolutionary-date> to post on Bluesky, Twitter and Mastodon. Finally, you have to configure C<spread-revolutionary-date> to use these credentials, see L</CONFIGURATION> and L</"COMMAND LINE PARAMETERS"> below.
+You B<must> have a registered account on each of the targets you want to spread the revolutionary date. And you must get credentials for C<spread-revolutionary-date> to post on C<Mastodon>, C<Bluesky> and C<Twitter>, and also for IA generated messages with I<Gemini> message maker. Finally, you have to configure C<spread-revolutionary-date> to use these credentials, see L</CONFIGURATION> and L</"COMMAND LINE PARAMETERS"> below.
 
 The revolutionary date and time is computed thanks to the L<DateTime::Calendar::FrenchRevolutionary> Perl module, by Jean Forget.
 
@@ -61,40 +61,40 @@ The revolutionary date and time is computed thanks to the L<DateTime::Calendar::
 
   # Test spreading to Mastodon only:
   $ spread-revolutionary-date \
-      --targets=mastodon --test
+      --targets=Mastodon --test
 
   # Test spreading to Twitter only in English:
   $ spread-revolutionary-date \
-      --targets=twitter \
+      --targets=Twitter \
       --test \
       --locale en
 
   # Spread acab time to Twitter and Liberachat
   # explicit channels
   $ spread-revolutionary-date \
-      --targets=twitter \
-      --targets=liberachat \
+      --targets=Twitter \
+      --targets=Liberachat \
       --liberachat_channels='#revolution' \
       --liberachat_channels='#acab' \
       --revolutionarydate_acab
 
-  # Prompt user for a message to spread to mastodon
+  # Prompt user for a message to spread to Mastodon
   $ spread-revolutionary-date \
-      --targets=mastodon \
+      --targets=Mastodon \
       --msgmaker=UserPrompt
 
   # Spread message as command line parameter to
-  # Bluesky, Twitter, Mastodon, Freenode and Liberachat
+  # Mastodon, Bluesky, Twitter, Liberachat and Freenode
   $ spread-revolutionary-date \
       --msgmaker=UserPrompt \
-      --promptuser_default \
+      --promptuser_default
 
   # Spread message and image as command line parameter to
   # Mastodon and Bluesky
   $ spread-revolutionary-date \
       --msgmaker=UserPrompt \
-      --targets=mastodon \
-      --targets=bluesky \
+      --targets=Mastodon \
+      --targets=Bluesky \
       --promptuser_default \
         'This is my message to the world'
       --promptuser_img_path= \
@@ -106,23 +106,74 @@ The revolutionary date and time is computed thanks to the L<DateTime::Calendar::
   # Mastodon and Bluesky
   $ spread-revolutionary-date \
       --msgmaker=UserPrompt \
-      --targets=mastodon \
-      --targets=bluesky \
+      --targets=Mastodon \
+      --targets=Bluesky \
       --promptuser_default \
         'This is my message to the world'
       --promptuser_img_url= \
         'https://example.com/imgs/my_image.jgp'
-      --promptuser_img_alt \
+      --promptuser_img_alt
 
   # Spread Téléchat date of the day on Mastodon and BlueSky
   $ spread-revolutionary-date \
       --msgmaker=Telechat \
-      --targets=mastodon \
-      --targets=bluesky \
+      --targets=Mastodon \
+      --targets=Bluesky
+
+  # Spread Gemini generating an illustrated joke on Mastodon
+  # NB: usually prompts are defined in configuration file along
+  # with api_key, while --gemini-process is passed on command line
+  # to choose which prompt to process
+  $ spread-revolutionary-date \
+      --targets=Mastodon \
+      --msgmaker=Gemini \
+      --gemini_api_key=ApiKey \
+      --gemini_process=MacronJokeColuche \
+      --gemini_prompt 'MacronJokeColuche=Invente-moi une blague \
+        dans le style de Coluche sur Emmanuel Macron. Pas besoin \
+        de dire "D\'accord, voici une blague" ou "Bien sûr, \
+        voici une blague dans le style de Coluche sur Emmanuel \
+        Macron" avant la blague.' \
+      --gemini_img_path "MacronJokeColuche='/my/path/to/image.png'" \
+      --gemini_img_alt "MacronJokeColuche='Caricature de Coluche \
+        disant : « C’est l’histoire d’un mec… » avec une caricature \
+        de macron'" \
+
+  # Spread Gemini searching for real time weather on Mastodon
+  # NB: usually prompts are defined in configuration file along
+  # with api_key, while --gemini-process is passed on command line
+  # to choose which prompt to process
+  $ spread-revolutionary-date \
+      --targets=Mastodon \
+      --msgmaker=Gemini \
+      --gemini_api_key=ApiKey \
+      --gemini_process=MeteoParis \
+      --gemini_prompt 'MeteoParis=Quelle est la météo aujourd\'hui \
+        à Paris, avec la température, selon meteo-paris.com, ne devine \
+        pas, va chercher l\'information.' \
+      --gemini_search "MeteoParis=1"
+
+  # Spread Gemini generating a list of celebrities with an url
+  # prepended by an introdution on Mastodon
+  # NB: usually prompts are defined in configuration file along
+  # with api_key, while --gemini-process is passed on command line
+  # to choose which prompt to process
+  $ spread-revolutionary-date \
+      --targets=Mastodon \
+      --msgmaker=Gemini \
+      --gemini_api_key=ApiKey \
+      --gemini_process=FamousBirthday \
+      --gemini_prompt 'FamousBirthday=Which famous people \
+        have their birthday on $month_name $day? Give a list of up \
+        to 6 people, then after the list give the unformatted URL of \
+        the Wikipedia page of only one of them, no comments and no need \
+        for an introduction like "Here are some famous people".' \
+      --gemini_intro 'FamousBirthday=Famous people born on $month_name \
+        $day for better or for worse:'
 
 =head1 CONFIGURATION
 
-Once again: you B<have to> configure C<spread-revolutionary-date> with credentials for registered account on each of the desired targets, so it can spread the revolutionary date on behalf of these accounts.
+Once again: you B<have to> configure C<spread-revolutionary-date> with credentials for registered account on each of the desired targets and also for I<Gemini> message maker, so it can spread the revolutionary date or an IA generated message on behalf of these accounts.
 
 Configuration options may also be specified as command line parameters, see L</"COMMAND LINE PARAMETERS"> below, which take precedence on options of the configuration file.
 
@@ -134,19 +185,39 @@ These options should appear outside of any section of the configuration file.
 
 =head3 targets
 
-This option can be specified multiple times, with values as strings. It explicitly defines targets where the revolutionary date should be spread to. Any value set for this option should be a valid target: any of the five default targets (C<Bluesky>, C<twitter>, C<mastodon>, C<freenode>, or C<liberachat>) or some new target if you have extended this application (see L</"EXTENDING TO NEW TARGETS">). If this option is not defined, the revolutionary date is spread on all five default targets: C<Bluesky>, C<twitter>, C<mastodon>, C<freenode> and C<liberachat>.
+This option can be specified multiple times, with values as strings. It explicitly defines targets where the revolutionary date should be spread to. Any value set for this option should be a valid target: any of the five default targets (C<Mastodon>, C<Bluesky>, C<Twitter>, C<Liberachat>, or C<Freenode>) or some new target if you have extended this application (see L</"EXTENDING TO NEW TARGETS">). If this option is not defined, the revolutionary date is spread on all five default targets: C<Mastodon>, C<Bluesky>, C<Twitter>, C<Liberachat>, or C<Freenode>.
 
 =head3 msgmaker
 
-This option can only be specified once, with a value as string. Spreads a message computed by the class defined by the value of this option, defaults to C<RevolutionaryDate>. The C<Value> (case sensitive) of this option should correspond to an existing C<App::SpreadRevolutionaryDate::MsgMaker::Value> class consuming L<App::SpreadRevolutionaryDate::MsgMaker> role. Message makers values pre-defined in this distribution are C<RevolutionaryDate>, which spreads the revolutionary date, C<PromptUser>, which prompts the user for the message to be spread (with confirmation), and C<Telechat>, which spreads the date of the day similar to the Belgian-French TV show 'Téléchat" on the 1980's. See L</"EXTENDING TO NEW MESSAGE MAKERS"> for details on using a new value for this option.
+This option can only be specified once, with a value as string. Spreads a message computed by the class defined by the value of this option, defaults to C<RevolutionaryDate>. The C<Value> (case sensitive) of this option should correspond to an existing C<App::SpreadRevolutionaryDate::MsgMaker::Value> class consuming L<App::SpreadRevolutionaryDate::MsgMaker> role. Message makers values pre-defined in this distribution are C<RevolutionaryDate>, which spreads the revolutionary date; C<PromptUser>, which prompts the user for the message to be spread (with confirmation); C<Telechat>, which spreads the date of the day similar to the Belgian-French TV show 'Téléchat" on the 1980's; and C<Gemini> which prompts I<Gemini> AI to generate a message. See L</"EXTENDING TO NEW MESSAGE MAKERS"> for details on using a new value for this option.
 
 =head3 locale
 
-This option can only be specified once, with a value as string. Spreads with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'> otherwise. Defaults to C<'fr'> for C<RevolutionaryDate> and C<'en'> otherwise. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
+This option can only be specified once, with a value as string. Spreads with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'> otherwise. Defaults to C<'fr'> for C<RevolutionaryDate> and C<Gemini>, and to C<'en'> for <PromptUser>. Locale is forced to 'fr' for C<Telechat> since only french-spokers can understand the TV show. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
 
 =head3 test
 
-This boolean option takes no value, either it is defined or not. If defined, do not actually spread the revolutionary date, just print it on standard output for Bluesky, Twitter and Mastodon, and send it on configured test channels for Freenode and Liberachat (see L</"test_channels"> below).
+This boolean option takes no value, either it is defined or not. If defined, do not actually spread the revolutionary date, just print it on standard output for C<Mastodon>, C<Bluesky> and C<Twitter>, and send it on configured test channels for C<Liberachat> and C<Freenode> (see L</"test_channels"> below).
+
+=head2 Mastodon options
+
+These options are credentials for C<spread-revolutionary-date> to spread on a Mastodon account. You have to get them from your L<Mastodon instance API account|https://mstdn.fr/settings/applications> with C<write> scope. Note that Mastodon is a decentralized network with multiple instances, the previous link is for L<mstdn.fr|https://mstdn.fr> instance, please replace url with your preferred instance. They should be defined in the C<[mastodon]> section of the configuration file.
+
+=head3 instance
+
+This option can only be specified once, with a value as string: the domain name of your instance, eg: C<mastodon.social>, C<mstdn.fr>, etc.
+
+=head3 client_id
+
+This option can only be specified once, with a value as string: your Mastodon Client key for this application.
+
+=head3 client_secret
+
+This option can only be specified once, with a value as string: your Mastodon Client secret for this application.
+
+=head3 access_token
+
+This option can only be specified once, with a value as string: your Mastodon Access token for this application.
 
 =head2 Bluesky options
 
@@ -180,25 +251,25 @@ This option can only be specified once, with a value as string: your Twitter Acc
 
 This option can only be specified once, with a value as string: your Twitter Access token secret for this application.
 
-=head2 Mastodon options
+=head2 Liberachat options
 
-These options are credentials for C<spread-revolutionary-date> to spread on a Mastodon account. You have to get them from your L<Mastodon instance API account|https://mstdn.fr/settings/applications> with C<write> scope. Note that Mastodon is a decentralized network with multiple instances, the previous link is for L<mstdn.fr|https://mstdn.fr> instance, please replace url with your preferred instance. They should be defined in the C<[mastodon]> section of the configuration file.
+The first two options are credentials for C<spread-revolutionary-date> to spread on a Liberachat account. See L<https://libera.chat/guides/registration> to find out how to register an account on Liberachat. They should be defined in the C<[liberachat]> section of the configuration file.
 
-=head3 instance
+=head3 nickname
 
-This option can only be specified once, with a value as string: the domain name of your instance, eg: C<mastodon.social>, C<mstdn.fr>, etc.
+This option can only be specified once, with a value as string: your Liberachat nickname.
 
-=head3 client_id
+=head3 password
 
-This option can only be specified once, with a value as string: your Mastodon Client key for this application.
+This option can only be specified once, with a value as string: your Liberachat password.
 
-=head3 client_secret
+=head3 channels
 
-This option can only be specified once, with a value as string: your Mastodon Client secret for this application.
+This option can be specified multiple times, with values as strings. C<spread-revolutionary-date> will spread on every channel specified with this option. This option should be specified at least one time if L</test> option is not set. It is ignored if L</test> option is set.
 
-=head3 access_token
+=head3 test_channels
 
-This option can only be specified once, with a value as string: your Mastodon Access token for this application.
+This option can be specified multiple times, with values as strings. C<spread-revolutionary-date> will spread on every channel specified with this option. This option should be specified at least one time if L</test> option is set. It is ignored if L</test> option is not set.
 
 =head2 Freenode options
 
@@ -220,26 +291,6 @@ This option can be specified multiple times, with values as strings. C<spread-re
 
 This option can be specified multiple times, with values as strings. C<spread-revolutionary-date> will spread on every channel specified with this option. This option should be specified at least one time if L</test> option is set. It is ignored if L</test> option is not set.
 
-=head2 Liberachat options
-
-The first two options are credentials for C<spread-revolutionary-date> to spread on a Liberachat account. See L<https://libera.chat/guides/registration> to find out how to register an account on Liberachat. They should be defined in the C<[liberachat]> section of the configuration file.
-
-=head3 nickname
-
-This option can only be specified once, with a value as string: your Liberachat nickname.
-
-=head3 password
-
-This option can only be specified once, with a value as string: your Liberachat password.
-
-=head3 channels
-
-This option can be specified multiple times, with values as strings. C<spread-revolutionary-date> will spread on every channel specified with this option. This option should be specified at least one time if L</test> option is not set. It is ignored if L</test> option is set.
-
-=head3 test_channels
-
-This option can be specified multiple times, with values as strings. C<spread-revolutionary-date> will spread on every channel specified with this option. This option should be specified at least one time if L</test> option is set. It is ignored if L</test> option is not set.
-
 =head2 RevolutionaryDate options
 
 These options change the way revolutionary date is computed when  L</msgmaker> option is C<RevolutionaryDate>. They should be defined in the C<[revolutionarydate]> section of the configuration file.
@@ -252,25 +303,61 @@ This boolean option takes no value, either it is defined or not, defaults to C<f
 
 This boolean option takes no value, either it is defined or not, defaults to C<true>. If defined, a link to the wikipedia page, in language defined by the L<locale> option, corresponding to the feast of the day, is added to the date to be spread.
 
-=head2 PromptUser option
+=head2 PromptUser options
 
 If L</msgmaker> option is C<PromptUser>, instead of spreading the revolutionary date, prompts the user (with confirmation) for the message to be spread, with a default value (if user enters nothing when prompted).
 
 =head3 default
 
-This option can only be specified once, with a value as string. If C<default> option is set, the user is not prompted and this default message is spread. If C<default> option is not defined, the default message is C<'Goodbye old world, hello revolutionary worlds'> if the user enters nothing when prompted. The C<default> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+This option can only be specified once, with a value as string. If C<default> option is set, the user is not prompted and this default message is spread. If C<default> option is not defined, the default message is C<'Goodbye old world, hello revolutionary worlds'> if the user enters nothing when prompted. The C<default> option should be defined in the C<[PromptUser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
 
-=head3 img_path
+=head3 img_path (for PromptUser)
 
-This option can only be specified once, with a value as string valued by a path to an image file on local disk. The C<img_path> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+This option can only be specified once, with a value as string valued by a path to an image file on local disk. The C<img_path> option should be defined in the C<[PromptUser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
 
-=head3 img_alt
+=head3 img_alt (for PromptUser)
 
-This option can only be specified once, with a value as string valued by an alternative text to an image file specified by C<img_path> or C<img_url> options. The C<img_alt> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+This option can only be specified once, with a value as string valued by an alternative text to an image file specified by C<img_path> or C<img_url> options. The C<img_alt> option should be defined in the C<[PromptUser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
 
-=head3 img_url
+=head3 img_url (for PromptUser)
 
-This option can only be specified once, with a value as string valued by an external url to an image specified. The C<img_url> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+This option can only be specified once, with a value as string valued by an external url to a remote image. The C<img_url> option should be defined in the C<[PromptUser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+
+=head2 Gemini options
+
+If L</msgmaker> option is C<Gemini>, instead of spreading the revolutionary date, requests I<Gemini> AI to generate a text from a prompt.
+
+=head3 api_key
+
+This option can only be specified once, with a value as string: your I<Gemini> API key. You have to get it following instructions on L<https://ai.google.dev/gemini-api/docs/api-key>. The C<api_key> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 process
+
+This option can only be specified once, with a value as string, telling which L</prompt> and other options below should be send to I<Gemini> AI. The C<process> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 prompt
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a value as string valued by the prompt to send to I<Gemini> AI. The C<prompt> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 intro
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a value as string to prepend to I<Gemini> answer. The C<intro> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 search
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a true value, telling I<Gemini> AI to use grounded sources (inline supporting links) and I<Google Search> suggestions. The C<search> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 img_path (for Gemini)
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a value as string valued by a path to an image file on local disk. The C<img_path> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 img_alt (for Gemini)
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a value as string valued by an alternative text to an image file specified by C<img_path> or C<img_url> options. The C<img_alt> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
+
+=head3 img_url (for Gemini)
+
+This option can be specified for several prompts, each one with a key as a string, valued by the string configured for L</process> options above, and a value as string valued by an external url to a remote image. The C<img_url> option should be defined in the C<[Gemini]> section of the configuration file. It is only used if L</msgmaker> option is C<Gemini>.
 
 =head1 COMMAND LINE PARAMETERS
 
@@ -308,6 +395,26 @@ Same as L</locale> configuration option above.
 
 Same as L</test> configuration option above.
 
+=head2 Mastodon parameters
+
+These parameters specify credentials for C<spread-revolutionary-date> to spread on a Mastodon account. You have to get them from your L<Mastodon instance API account|https://mstdn.fr/settings/applications> with C<write> scope. Note that Mastodon is a decentralized network with multiple instances, the previous link is for L<mstdn.fr|https://mstdn.fr> instance, please replace url with your preferred instance.
+
+=head3 --mastodon_instance=<instance> | -mi <instance>
+
+Same as L</instance> configuration option above.
+
+=head3 --mastodon_client_id=<id> | -mci <id>
+
+Same as L</client_id> configuration option above.
+
+=head3 --mastodon_client_secret)<secret> | -mcs <secret>
+
+Same as L</client_secret> configuration option above.
+
+=head3 --mastodon_access_token=<token> | -mat <token>
+
+Same as L</access_token> configuration option above.
+
 =head2 Bluesky parameters
 
 These parameters specify credentials for C<spread-revolutionary-date> to spread on a Bluesky account. You have to get them from your L<Bluesky account|https://bsky.app/>.
@@ -340,25 +447,25 @@ Same as L</access_token> configuration option above.
 
 Same as L</access_token_secret> configuration option above.
 
-=head2 Mastodon parameters
+=head2 Liberachat parameters
 
-These parameters specify credentials for C<spread-revolutionary-date> to spread on a Mastodon account. You have to get them from your L<Mastodon instance API account|https://mstdn.fr/settings/applications> with C<write> scope. Note that Mastodon is a decentralized network with multiple instances, the previous link is for L<mstdn.fr|https://mstdn.fr> instance, please replace url with your preferred instance.
+The first two parameters are credentials for C<spread-revolutionary-date> to spread on a Liberachat account. See L<https://libera.chat/guides/registration> to find out how to register an account on Liberachat.
 
-=head3 --mastodon_instance=<instance> | -mi <instance>
+=head3 --liberachat_nickname=<nick> | -ln <nick>
 
-Same as L</instance> configuration option above.
+Same as L</nickname> configuration option above.
 
-=head3 --mastodon_client_id=<id> | -mci <id>
+=head3 --liberachat_password=<passwd> | -lp <passwd>
 
-Same as L</client_id> configuration option above.
+Same as L</password> configuration option above.
 
-=head3 --mastodon_client_secret)<secret> | -mcs <secret>
+=head3 --liberachat_channels=<channel> | -lc <channel>
 
-Same as L</client_secret> configuration option above.
+Same as L</channels> configuration option above.
 
-=head3 --mastodon_access_token=<token> | -mat <token>
+=head3 --liberachat_test_channels=<channel> | -ltc <channel>
 
-Same as L</access_token> configuration option above.
+Same as L</test_channels> configuration option above.
 
 =head2 Freenode parameters
 
@@ -380,26 +487,6 @@ Same as L</channels> configuration option above.
 
 Same as L</test_channels> configuration option above.
 
-=head2 Liberachat parameters
-
-The first two parameters are credentials for C<spread-revolutionary-date> to spread on a Liberachat account. See L<https://libera.chat/guides/registration> to find out how to register an account on Liberachat.
-
-=head3 --liberachat_nickname=<nick> | -ln <nick>
-
-Same as L</nickname> configuration option above.
-
-=head3 --liberachat_password=<passwd> | -lp <passwd>
-
-Same as L</password> configuration option above.
-
-=head3 --liberachat_channels=<channel> | -lc <channel>
-
-Same as L</channels> configuration option above.
-
-=head3 --liberachat_test_channels=<channel> | -ltc <channel>
-
-Same as L</test_channels> configuration option above.
-
 =head2 RevolutionaryDate parameters
 
 =head3 --revolutionarydate_acab | -ra
@@ -410,7 +497,7 @@ Same as L</acab> configuration option above.
 
 Same as L</wikipedia_link> configuration option above.
 
-=head2 PromptUser parameter
+=head2 PromptUser parameters
 
 =head3 --promptuser_default <msg> | -pud <msg>
 
@@ -418,47 +505,187 @@ Same as L</default> configuration option above.
 
 =head3 --promptuser_img_path <path/to/image/file> | -pui </path/to/image/file>
 
-Same as L</img_path> configuration option above.
+Same as L</img_path (for PromptUser)> configuration option above.
 
-=head3 --promptuser_img_alt <alternative text> | -pud <alternative text>
+=head3 --promptuser_img_alt <alternative text> | -pua <alternative text>
 
-Same as L</img_alt> configuration option above.
+Same as L</img_alt (for PromptUser)> configuration option above.
 
-=head3 --promptuser_default <img_url> | -pud <img_url>
+=head3 --promptuser_img_url <img_url> | -puu <img_url>
 
-Same as L</img_url> configuration option above.
+Same as L</img_url> (for PromptUser) configuration option above.
+
+=head2 Gemini parameters
+
+=head3 --gemini_api_key <api key> | -ga <api key>
+
+Same as L</api_key> configuration option above.
+
+=head3 --gemini_process <SomePrompt> | -g <SomePrompt>
+
+Same as L</process> configuration option above.
+
+=head3 --gemini_prompt "<SomePrompt>=<my prompt string>" | -gp "<SomePrompt>=<my prompt string>"
+
+Same as L</process> configuration option above.
+
+=head3 --gemini_intro "<SomePrompt>=<intro msg>" | -gi "<SomePrompt>=<intro msg>"
+
+Same as L</process> configuration option above.
+
+=head3 --gemini_search "<SomePrompt>=1" | -gs "<SomePrompt>=1"
+
+Same as L</process> configuration option above.
+
+=head3 --gemini_img_path "<SomePrompt>=<path/to/image/file>" | -gip "<SomePrompt>=</path/to/image/file>"
+
+Same as L</img_path (for Gemini)> configuration option above.
+
+=head3 --gemini_img_alt "<SomePrompt>=<alternative text>" | -gia "<SomePrompt>=<alternative text>"
+
+Same as L</img_alt (for Gemini)> configuration option above.
+
+=head3 --gemini_img_url "<SomePrompt>=<img_url>" | -giu "<SomePrompt>=<img_url>"
+
+Same as L</img_url (for Gemini)> configuration option above.
 
 =head1 EXTENDING TO NEW TARGETS
 
-Starting from version 0.07, this distribution takes advantage of L<Moose>, the postmodern object system for Perl 5, allowing to easily extend C<spread-revolutionary-date> to other targets than the default ones (C<Bluesky>, C<Twitter>, C<Mastondon>, C<Freenode> and C<Liberachat>.
+Starting from version 0.07, this distribution takes advantage of L<Moose>, the postmodern object system for Perl 5, allowing to easily extend C<spread-revolutionary-date> to other targets than the default ones (C<Mastondon>, C<Bluesky>, C<Twitter>, C<Liberachat> and C<Freenode>.
 
 To add a new target, you should write a new class in the C<App::SpreadRevolutionaryDate::Target::> namespace (that is: the class should be C<App::SpreadRevolutionaryDate::Target::Mytarget> for a new C<Mytarget> target), that consumes the L<App::SpreadRevolutionaryDate::Target> role. See L<App::SpreadRevolutionaryDate::Target/DESCRIPTION> for a comprehensive description of this role.
 
-The name of the target should be added as a value of the L</targets> option in lower case.
+The name of the target should be added as a value of the L</targets> option.
 
-Such a target class is actually just a wrapper. Usually a target has to use an existing specific module (which can be a C<Moose> class or not) to perform the actual work of posting a message according the specific target protocol, after having complied with any potential required authentication. Such authentication should be carried on by the constructor or, along with posting, by the required C<spread> method of the target class.
+Such a target class is actually just a wrapper. Usually a target has to use an existing specific  C<worker> module (which can be a C<Moose> class or not) to perform the actual work of posting a message according the specific target protocol, after having complied with any potential required authentication. Such authentication should be carried on by the constructor or, along with posting, by the required C<spread> method of the target class.
 
 To perform authentication and to post a message, there is a strong likelihood that the new target requires specific parameters (e.g.: tokens, keys, account name, password, channels, etc.). These parameters should be defined as required attributes of the target class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the target in lower case (C<[mytarget]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the target in lower case, followed by an underscore (C<--mytarget_myparam>).
 
-Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<App::SpreadRevolutionaryDate::BlueskyLite> C<worker>, L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. The last two are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
+Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>, L<App::SpreadRevolutionaryDate::BlueskyLite> C<worker>, and L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>. C<Mastodon> and C<Twitter> are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The other default targets, <App::SpreadRevolutionaryDate::Target::Liberachat> and C<App::SpreadRevolutionaryDate::Target::Freenode>, use a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> and L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>, subclassing L<Bot::BasicBot> C<worker>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
 
-Starting from version 0.39, you may have noticed that C<Mastodon> and C<Bluesky> targets can no spread not only a text message, but also an image (with alternative text). This is used by C<Telechat> message maker, to post an image of Groucha, the presenter of Téléchat, and by C<PromptUser> to send either an image file on local disk or an external image on the web.
+Starting from version 0.39, you may have noticed that C<Mastodon> and C<Bluesky> targets can now spread not only a text message, but also an image, with an alternative text for accessibily purpose. If the alternative text is not provided, it is set with the name of the image file. This is used by C<Telechat> message maker, to post an image of Groucha, the presenter of Téléchat, and by C<PromptUser> and C<Gemini> to send either an image file on local disk or an external image on the web.
 
 This feature is not available now for I<IRC> targets, C<Liberachat> and C<Freenode>, since theses targets are mostly for text messages.
 
 Also, we do not plan to extend this feature to C<Twitter> target, since we recommand to not use this social network for political reasons.
 
+Starting from version 0.45, C<Mastodon> and C<Bluesky> classes have a C<max_lenght> attribute (set to 300 for C<Mastodon> and set to 250 for C<Bluesky>), which is used to split a longer message into a thread of multiple posts. Again, we do not plan to extend this feature to C<Twitter> target, since we recommand to not use this social network for political reasons.
+
 =head1 EXTENDING TO NEW MESSAGE MAKERS
 
 It is even easier to spread whatever you want instead of the revolutionary date. You should write a new class in the C<App::SpreadRevolutionaryDate::MsgMaker::> namespace (that is: the class should be C<App::SpreadRevolutionaryDate::MsgMaker::MyMsgMaker> for a new C<MyMsgMaker> message maker), that consumes the L<App::SpreadRevolutionaryDate::MsgMaker> role. See L<App::SpreadRevolutionaryDate::MsgMaker/DESCRIPTION> for a comprehensive description of this role.
 
-The name of the message maker should be set as a value of the L</msgmaker> option in lower case.
+The name of the message maker should be set as a value of the L</msgmaker> option.
 
-Such a message maker class is actually just a wrapper. Usually a message maker has to use an existing specific module (which can be a C<Moose> class or not) to craft the message. L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate> uses L<DateTime::Calendar::FrenchRevolutionary>, while L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser> is based on L<IO::Prompt::Hooked>. You may need for example L<LWP> to extract the message from a fetched web page or service, or L<XML::Feed> to build it from a L<RSS|https://en.wikipedia.org/wiki/RSS> feed, or L<DBI> to retrieve it from a database, or nothing at all to spread a fixed message, etc.
+Such a message maker class is actually just a wrapper. Usually a message maker has to use an existing specific module (which can be a C<Moose> class or not) to craft the message. L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate> uses L<DateTime::Calendar::FrenchRevolutionary>, while L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser> is based on L<IO::Prompt::Hooked> and L<App::SpreadRevolutionaryDate::MsgMaker::Gemini> just uses L<LWP> to request I<Gemini> server. You may need for example L<LWP> to extract the message from a fetched web page or service, or L<XML::Feed> to build it from a L<RSS|https://en.wikipedia.org/wiki/RSS> feed, or L<DBI> to retrieve it from a database, or nothing at all to spread a fixed message, etc.
 
-If your new message maker class needs specific parameters (other than C<locale>, which comes with  L<App::SpreadRevolutionaryDate::MsgMaker> role), they should be defined as attributes of this class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the message maker in lower case (C<[mymsgmaker]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the message maker in lower case, followed by an underscore (C<--mytarget_myparam>).
+If your new message maker class needs specific parameters (other than C<locale>, which comes with  L<App::SpreadRevolutionaryDate::MsgMaker> role), they should be defined as attributes of this class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the message maker in lower case (C<[mymsgmaker]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the message maker in lower case, followed by an underscore (C<--mymsgmaker_myparam>).
 
-Have a look to L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser> or L<App::SpreadRevolutionaryDate::MsgMaker::Telechat> classes, it shows simple examples on how to extend C<spread-revolutionary-date> to a new message maker.
+Have a look to L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser> or L<App::SpreadRevolutionaryDate::MsgMaker::Telechat> classes, they show simple examples on how to extend C<spread-revolutionary-date> to a new message maker.
+
+=head2 Gemini message maker
+
+From version 0.45, a new message maker is included which requests I<Gemini> AI. This allows to extend C<spread-revolutionary-date> just by configuring a few options. The most practical way to configure these options is to prepare everything by setting all L</Gemini options> in the configuration file, except L</process> to pickup the prompt at execution time by using the C<< --gemini_process <ThisPrompt> >> command line parameter.
+
+This way, you can setup different prompts in your configuration file. Here is an example with 4 different prompts configured:
+
+  [Gemini]
+  # See https://ai.google.dev/gemini-api/docs/api-key
+  api_key                      = 'GEMINI_API_KEY'
+  prompt   FamousBirthday      = 'Which famous people have their birthday on $month_name $day? Give a list of up to 6 people, then after the list give the unformatted URL of the Wikipedia page of only one of them, no comments and no need for an introduction like "Here are some famous people".'
+  intro    FamousBirthday      = 'FamousBirthday=Famous people born on $month_name $day for better or for worse:'
+
+  prompt   MacronJokeColuche   = 'Invente-moi une blague dans le style de Coluche sur Emmanuel Macron. Pas besoin de dire "D\'accord, voici une blague" ou "Bien sûr, voici une blague dans le style de Coluche sur Emmanuel Macron" avant la blague.'
+  img_path MacronJokeColuche   = '/usr/local/share/perl/5.32.1/auto/share/dist/App-SpreadRevolutionaryDate/images/coluche_macron.png'
+  img_alt  MacronJokeColuche   = 'Caricature de Coluche disant : « C’est l’histoire d’un mec… » avec une caricature de macron'
+
+  prompt   BlanquiRevival      = 'Invente-moi un dicton révolutionnaire dans le style d\'Auguste Blanqui. Ne fais pas d\'introduction.'
+  img_url  BlanquiRevival      = 'https://example.com/imgs/my_image.jgp'
+
+  prompt   MeteoParis          = 'Quelle est la météo aujourd\'hui à Paris, avec la température, selon meteo-paris.com, ne devine pas, va chercher l\'information.'
+  search   MeteoParis          =  1
+
+and, then choose the prompt to use at execution time, like:
+
+  $ spread-revolutionary-date --msgmaker=Gemini --gemini_process=FamousBirthday --locale=en
+  $ spread-revolutionary-date --msgmaker=Gemini --gemini_process=MacronJokeColuche
+  $ spread-revolutionary-date --msgmaker=Gemini --gemini_process=BlanquiRevival
+  $ spread-revolutionary-date --msgmaker=Gemini --gemini_process=MeteoParis
+
+These examples show how you can tweak your message to be spread. Let's review all these options:
+
+First, you have to define credentials to use the I<Gemini API>, by defining the L</api_key> option. For this you need to get a I<Gemini API key>, by following instructions on L<https://ai.google.dev/gemini-api/docs/api-key>.
+
+Then for each prompt, you have to choose an identifier, which is one word in camel case, like C<FamousBirthday>, C<MacronJokeColuche>, C<BlanquiRevival> or C<MeteoParis>. This prompt identifier should be the value of the C<< --gemini_process <ThisPrompt> >> command line parameter.
+
+All other options are relative to one particular prompt, and therefore prefixed with the corresponding identifier. Under the hood, these options are hashes keyed with prompt identifiers:
+
+=over
+
+=item L</prompt>
+
+This is the option where you can define your prompt. It is advised to test this prompt to have I<Gemini> answer as you wish. For instance, I<Gemini> often start its answers to your prompt by: “Sure, here is ‘what you've asked for’, and you wouldn't want to spread this introduction in your message. In this case, you should write your prompt instructing I<Gemini> to not include any introduction.
+
+You can test your prompt with interactive form to I<Gemini> at L<https://gemini.google.com/app> or with C<spread-revolutionary-date> with options C<--test> and C<--targets=Mastodon> for example.
+
+The spread message will be I<Gemini> answer, optionally prepended with a configured introduction (see bellow), and ending with hashtags C<#IAGenerated> C<#PromptIdentifier>.
+
+Prompts often need to mention informations relative to today, such as the C<FamousBirthday> example below, or it could be that you wanna ask I<Gemni> for today's weather, or traffic jams occuring the same day of the week as today, etc. As a syntactic sugar, you can insert in L</prompt> option, any variable prefixed with a dollar sign ($) which correspond to a method of L<DateTime> module applied to C<DateTime->now()> object, and it will be replaced by the result of this method in the prompt sent to I<Gemini>. For example, in the C<FamousBirthday> example below, if run on June 21st, the prompt sent to I<Gemini> would be:
+
+  'Which famous people have their birthday on June 21? Give a list of up to 6 people, then after the list give the unformatted URL of the Wikipedia page of only one of them, no comments and no need for an introduction like "Here are some famous people".'
+
+You should be careful that such variables are not interpreted by the C<Shell> before calling C<spread-revolutionary-date>, specially if specified as command line parameters. You can prevent such intepretation by the C<Shell> by enclosing the option in single quotes, like the examples above.
+
+=item L</intro>
+
+You may want that the spread message to start with your own introducing words before displaying I<Gemini> answer. You can specify this with the L</intro> option.
+
+Likewise, this option use the same syntactic sugar relative to methods of L<DateTime> module. For example, the message spread on June 21st by the C<FamousBirthday> example bellow, would be something like
+
+  Famous people born on June 21 for better or for worse:
+  First Name
+  Second Name
+  Third Name
+  Fourth Name
+  Fifth Name
+  Sixth Name
+
+  https://en.wikipedia.org/wiki/Third_Name
+  #IAGenerated #FamousBirthday
+
+=item L</search>
+
+I<Gemini> answer is based on data that have been used to train the AI. But sometimes you want accurate answers grounded on some real time searches. In this case, you should specify the L</search> option with a true value, and I<Gemini> answers will be grounded on grounded sources (inline supporting links) and I<Google Search> suggestions.
+
+This is used in the C<MeteoParis> example bellow, to have I<Gemini> search for today's weather in Paris from C<meteo-paris.com> website.
+
+=item L</img_path>
+
+This option allows to add a local image on the spread message.
+
+=item L</img_alt>
+
+This option specifies an alternative text to an image added on the spread message. If unset, the alternative text will be the name of the file specified in L</img_path> or L</img_url> options.
+
+=item L</img_url>
+
+This option allows to add a remote image on the spread message.
+
+=back
+
+Finally, one word of localization: you don't need it, since I<Gemini> will answer in the language you've used in your prompt. Or you can ask in your prompt to be answered in another language, like:
+
+  prompt   FamousBirthday      = 'Which famous people have their birthday on $month_name $day? Give a list of up to 6 people, then after the list give the unformatted URL of the Wikipedia page of only one of them, no comments and no need for an introduction like "Here are some famous people" or "Hier sind 6 berühmte Persönlichkeiten,". Answer in German, please!.'
+
+The only place where you should be concerned by localization is when you define an introduction to be prepended to I<Gemini> answer. Since it is a configured static string, it should be written in the desired language, like:
+
+  intro    FamousBirthday      = 'FamousBirthday=Berühmte Personen, die am $day $month_name geboren wurden, im Guten wie im Schlechten:'
+
+Also, if you use some syntactic sugars relative to methods of L<DateTime> module that are localizable, like C<month_name>, you should use the L</locale> option to have it translated in the desired language.
+
+And now you are ready to spread whatever your like, with just some configuration tweaks!
+
+Be aware that I<Gemini>, like any other AI, has no concept of truth. It can only give formally probable answers, based on its training data. So do not ask somehing where truth matters… Also, all data you're sending to I<Gemini> are assumed to not be private anymore and could be used by I<Google> for any purpose! And finally, keep in mind that each request to Gemini AI consumes a huge amount of resources, which is detrimental to the environment.
 
 =head1 INTERNATIONALIZATION AND LOCALIZATION
 

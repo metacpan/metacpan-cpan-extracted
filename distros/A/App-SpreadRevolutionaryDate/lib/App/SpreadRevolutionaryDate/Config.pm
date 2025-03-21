@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.47';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -198,6 +198,14 @@ sub new {
     'promptuser_img_path' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pui'},
     'promptuser_img_alt' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pua'},
     'promptuser_img_url' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'puu'},
+    'gemini_api_key' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'ga'},
+    'gemini_process' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'g'},
+    'gemini_prompt' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gp'},
+    'gemini_intro' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gi'},
+    'gemini_search' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gs'},
+    'gemini_img_path' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gip'},
+    'gemini_img_alt' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gia'},
+    'gemini_img_url' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'giu'},
   );
 
   # Rewind configuration file if needed and read it
@@ -266,7 +274,13 @@ sub parse_file {
                 File::HomeDir->my_home . '/.spread-revolutionary-date.conf') {
     $filename = $default_path if (!$filename && -f $default_path)
   }
-  $self->file($filename);
+  if ($filename && !ref($filename)) {
+      my $fh;
+      open($fh, '<:encoding(UTF-8)', $filename);
+      $self->file($fh);
+  } else {
+      $self->file($filename);
+  }
 }
 
 
@@ -290,6 +304,7 @@ sub check_target_mandatory_options {
   foreach my $target_meta_attribute ($target_meta->get_all_attributes) {
     next if $target_meta_attribute->name eq 'obj';
     next unless $target_meta_attribute->is_required;
+    next if $target_meta_attribute->{default};
     my $target_mandatory_option = $target . '_' . $target_meta_attribute->name;
     die "Cannot spread to $target, mandatory configuraton parameter "
         . $target_meta_attribute->name . " missing\n"
@@ -345,33 +360,41 @@ Usage: $0 <OPTIONS>
     --conf|-c <file>: path to configuration file (default: ~/.config/spread-revolutionary-date/spread-revolutionary-date.conf or ~/.spread-revolutionary-date.conf)'
     --version|-v': print out version
     --help|-h|-?': print out this help
-    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: bluesky, twitter, mastodon, freenode, liberachat)
+    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: mastodon, bluesky, twitter, liberachat, freenode)
     --msgmaker|-mm <MsgMakerClass>: define message maker (default: RevolutionaryDate)
     --locale|-l <fr|en|it|es>: define locale (default: fr for msgmaker=RevolutionaryDate, en otherwise)
     --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode or Liberachat
+    --mastodon_instance|-mi <instance>: define Mastodon instance
+    --mastodon_client_id|-mci <id>: define Mastodon client id
+    --mastodon_client_secret|-mcs <secret>: define Mastodon client secret
+    --mastodon_access_token|-mat <token>: define Mastodon access token
     --bluesky_identifier|-bi <key>: define Bluesky identifier
     --bluesky_password|-bp <key>: define Bluesky password
     --twitter_consumer_key|-tck <key>: define Twitter consumer key
     --twitter_consumer_secret|-tcs <secret>: define Twitter consumer secret
     --twitter_access_token|-tat <token>: define Twitter access token
     --twitter_access_token_secret|tats <token_secret>: define Twitter access token secret
-    --mastodon_instance|-mi <instance>: define Mastodon instance
-    --mastodon_client_id|-mci <id>: define Mastodon client id
-    --mastodon_client_secret|-mcs <secret>: define Mastodon client secret
-    --mastodon_access_token|-mat <token>: define Mastodon access token
-    --freenode_nickname|-fn <nick>: define Freenode nickname
-    --freenode_password|-fp <passwd>: define Freenode password
-    --freenode_test_channels|-ftc <channel_1>  [--freenode_test_channels|-ftc <channel_2> […--freenode_test_channels|-ftc <channel_n>]]: define Freenode channels
-    --freenode_channels|-fc <channel_1>  [--freenode_channels|-fc <channel_2> […--freenode_channels|-fc <channel_n>]]: define Freenode test channels
     --liberachat_nickname|-ln <nick>: define Liberachat nickname
     --liberachat_password|-lp <passwd>: define Liberachat password
     --liberachat_test_channels|-ltc <channel_1>  [--liberachat_test_channels|-ltc <channel_2> […--liberachat_test_channels|-ltc <channel_n>]]: define Liberachat channels
     --liberachat_channels|-lc <channel_1>  [--liberachat_channels|-lc <channel_2> […--liberachat_channels|-lc <channel_n>]]: define Liberachat test channels
+    --freenode_nickname|-fn <nick>: define Freenode nickname
+    --freenode_password|-fp <passwd>: define Freenode password
+    --freenode_test_channels|-ftc <channel_1>  [--freenode_test_channels|-ftc <channel_2> […--freenode_test_channels|-ftc <channel_n>]]: define Freenode channels
+    --freenode_channels|-fc <channel_1>  [--freenode_channels|-fc <channel_2> […--freenode_channels|-fc <channel_n>]]: define Freenode test channels
     --revolutionarydate_acab | -ra: pretend it is 01:31:20 (default: false)
     --promptuser_default|-pud <msg>: define default message when --msgmaker=PromptUser (default: 'Goodbye old world, hello revolutionary worlds')
     --promptuser_img_path|-pui <path/to/image/file>: define image file path when --msgmaker=PromptUser
-    --promptuser_img_alt|-pui <alternative text>: define image alternative text when --msgmaker=PromptUser
-    --promptuser_img_url|-pui <img_url>: define image external url when --msgmaker=PromptUser
+    --promptuser_img_alt|-pua <alternative text>: define image alternative text when --msgmaker=PromptUser
+    --promptuser_img_url|-puu <https://example.com/imgs/my_image.jgp>: define image external url when --msgmaker=PromptUser
+    --gemini_api_key|-ga <msg>: define default message when --msgmaker=PromptUser (default: 'Goodbye old world, hello revolutionary worlds')
+    --gemini_process|-g <SomePrompt>: tell which prompt to process --msgmaker=Gemini
+    --gemini_prompt|-gp "<SomePrompt>=<my prompt string>": define prompt to request for when --msgmaker=Gemini
+    --gemini_intro|-gi "<SomePrompt>=<intro msg>": define introduction message to preprend to response when --msgmaker=Gemini
+    --gemini_search|-gs "<SomePrompt>=1": use grounding search results when --msgmaker=Gemini
+    --gemini_img_path|-gip "<SomePrompt>=<path/to/image/file>": define image file path when --msgmaker=Gemini
+    --gemini_img_alt|-gia "<SomePrompt>=<alternative text>": define image alternative text when --msgmaker=Gemini
+    --gemini_img_url|-giu "<SomePrompt>=<https://example.com/imgs/my_image.jgp>": define image external url when --msgmaker=Gemini
 USAGE
  exit 0;
 }
@@ -399,7 +422,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 METHODS
 
@@ -476,6 +499,8 @@ Prints usage with command line parameters and exits.
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

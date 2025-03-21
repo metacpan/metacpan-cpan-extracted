@@ -32,7 +32,7 @@ if (defined $app) {
 	my $b = $app->Button(
 		-command => sub  { 
 			$poplist->popUp;
-		},
+	},
 		-text => 'Pop list',
 	)->pack(-fill => 'x');
 	$poplist = $app->PopList(

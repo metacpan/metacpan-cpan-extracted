@@ -15,7 +15,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( unstorable );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ###############################################
 sub unstorable
@@ -112,8 +112,28 @@ Devel::Walk::Unstorable - Find locations in complex structures that can't be ser
 
 =head1 DESCRIPTION
 
-This module uses Devel::Walk to find all the locations of objects that can't
+This module uses L<Devel::Walk> to find all the locations of objects that can't
 be stored with L<Storable/freeze>.
+
+If you are like me, you regularly try to serialize large objects and save
+them in a session file for your web application.  Storable's freeze is ideal
+for this, except when it isn't.  You forgot to close a DBI handle somewhere
+deep in your object.  Storable just reports this as a CODE reference, but
+doesn't tell you what part of your structure is holding that reference.  You
+can use C<unstorable> to walk your object structure to find the location.
+
+
+It is highly recomended to only do this in a development environment, and only
+if freeze has failed.
+
+    my $data = eval { freeze( $obj ) };
+    if( $@ ) {
+        warn $@;
+        my @list = unstorable( $obj, '$obj' );
+        die "Unstorable reference at ", join "\n", @list;
+    }
+
+    # now you can write $data to you session DB.
 
 =head2 unstorable
 

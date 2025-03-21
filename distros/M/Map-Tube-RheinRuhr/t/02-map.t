@@ -17,5 +17,5 @@ my @routes = <DATA>;
 ok_map_routes( $map, \@routes );
 
 __DATA__
-Route 1|Westentor|Saarlandstr.|Westentor, Kampstr. (Dortmund), Stadtgarten, Saarlandstr.
-Route 2|westentor|SAARLANDSTR.|Westentor, Kampstr. (Dortmund), Stadtgarten, Saarlandstr.
+Route 1|Westentor|Saarlandstr.|Westentor, Kampstr. (Dortmund), Stadtgarten Dortmund, Saarlandstr.
+Route 2|westentor|SAARLANDSTR.|Westentor, Kampstr. (Dortmund), Stadtgarten Dortmund, Saarlandstr.

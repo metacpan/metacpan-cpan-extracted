@@ -57,8 +57,8 @@ my $credit = <<EOT;
           Locale::Unicode::Data database builder v.$VERSION
                Jacques Deguest <jack\@deguest.jp>
          
-         Copyright(c) 2024 DEGUEST Pte. Ltd..
-         This program is free software; you can redistribute  it  and/or  modify  it
+         Copyright(c) 2024-2025 DEGUEST Pte. Ltd..
+         This program is free software; you can redistribute it and/or modify it
          under the same terms as Perl itself.
 EOT
 

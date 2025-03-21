@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Bluesky;
-$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.47';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Bluesky.
 
 use Moose;
@@ -33,6 +33,13 @@ has 'password' => (
   is  => 'ro',
   isa => 'Str',
   required => 1,
+);
+
+has 'max_lenght' => (
+  is  => 'ro',
+  isa => 'Int',
+  required => 1,
+  default => 250,
 );
 
 
@@ -68,11 +75,44 @@ sub spread {
     my $io = IO::Handle->new;
     $io->fdopen(fileno(STDOUT), "w");
 
-    $msg = encode('UTF-8', $msg) if is_utf8($msg);
+    my @msgs = $self->_split_msg($msg, $self->max_lenght);
 
-    $io->say($msg);
+    for (my $i = 0; $i < scalar @msgs; $i++) {
+      my $msg = "Message " . ($i+1) . ": " . $msgs[$i];
+      $msg = encode('UTF-8', $msg) if is_utf8($msg);
+      $io->say($msg);
+    }
   } else {
-    $self->obj->create_post($msg, $img);
+    my @msgs = $self->_split_msg($msg, $self->max_lenght);
+    my $last_status;
+
+    foreach my $msg (@msgs) {
+      if (!$last_status) {
+        # First post
+        my $status = $self->obj->create_post($msg, $img);
+        if ($status && ref($status) eq 'HASH' && $status->{uri} && $status->{cid}) {
+          $last_status = {
+            root => {
+              uri => $status->{uri},
+              cid => $status->{cid},
+            },
+            parent => {
+              uri => $status->{uri},
+              cid => $status->{cid},
+            }
+          };
+        }
+      } else {
+        # Next posts with reply_to
+        my $status = $self->obj->create_post($msg, undef, $last_status);
+        if ($status && ref($status) eq 'HASH' && $status->{uri} && $status->{cid}) {
+          $last_status->{parent} = {
+            uri => $status->{uri},
+            cid => $status->{cid},
+          };
+        }
+      }
+    }
   }
 }
 
@@ -99,7 +139,7 @@ App::SpreadRevolutionaryDate::Target::Bluesky - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 METHODS
 
@@ -156,6 +196,8 @@ Spreads a message to Bluesky. Takes one mandatory argument: C<$msg> which should
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

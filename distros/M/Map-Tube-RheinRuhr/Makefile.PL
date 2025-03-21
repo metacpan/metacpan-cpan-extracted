@@ -30,7 +30,7 @@ WriteMakefile(
                             'Moo'              => 0,
                             'namespace::clean' => 0,
                             'File::Share'      => 0,
-							'Map::Tube'        => 3.94,
+							'Map::Tube'        => 4.02,
                           },
 	( MM->can('signature_target') ? ( SIGN => 1 ) : ( ) ),
     dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat;
-$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.47';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Liberachat.
 
 use Moose;
@@ -111,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat - Target class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 METHODS
 
@@ -168,6 +168,8 @@ Spreads a message to Liberachat channels configured with the multivalued option 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

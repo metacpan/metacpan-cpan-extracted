@@ -1,5 +1,5 @@
 package TVision;
-our $VERSION=0.19;
+our $VERSION="0.20";
 =encoding utf-8
 =head1 NAME
 

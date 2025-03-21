@@ -52,8 +52,8 @@ use App::SpreadRevolutionaryDate;
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 is_deeply($spread_revolutionary_date->config->targets, ['ezln'], 'EZLN target option set');
 is($spread_revolutionary_date->config->ezln_land, 'Chiapas', 'EZLN land value');
-is_deeply($spread_revolutionary_date->config->ezln_subcomandantes, ['Marcos', 'Moisés', 'Galeano'], 'EZLN subcomandantes values');
-stdout_like {$spread_revolutionary_date->spread } qr/^From Chiapas\nWe are .+\nSubcomandantes Marcos, Moisés, Galeano\n$/u, 'Spread to Ezln';
+is_deeply($spread_revolutionary_date->config->ezln_subcomandantes, ['Marcos', 'Moises', 'Galeano'], 'EZLN subcomandantes values');
+stdout_like {$spread_revolutionary_date->spread } qr/^From Chiapas\nWe are .+\nSubcomandantes Marcos, Moises, Galeano\n$/u, 'Spread to Ezln';
 
 __DATA__
 targets = 'ezln'
@@ -61,6 +61,6 @@ locale = 'en'
 
 [ezln]
 subcomandantes = 'Marcos'
-subcomandantes = 'Moisés'
+subcomandantes = 'Moises'
 subcomandantes = 'Galeano'
 land = 'Chiapas'

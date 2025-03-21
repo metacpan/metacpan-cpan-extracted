@@ -1,10 +1,19 @@
 Revision history for Geo-Coder-Free
 
+0.39	Thu Mar 20 12:40:51 EDT 2025
+	Use Geo::Hash to store in the database
+	Improve US address parser to include NW as in "Pennsylvania Ave. NW"
+	Handle arrays that are only one element in size
+	Refactor scantext, using a complex regex and other technologies
+	Latest upstream changes from VWF
+	Use Geo::Hash, reduces SQLite file size by over 10%
+	Makefile.PL: Download the files in parallel
+
 0.38	Wed Jan 22 08:37:22 EST 2025
 	Latest as_string return code and Utils.pm from VWF
 	Added t/30-basics, t/config.t, t/utils.t and t/display.t
 	geocode(): croak when input is just a set of numbers
-	Local: Replace linear search wish a hash search
+	Local: Replace linear search with a hash search
 	Local: Create a cache
 	Maxmind: Create a cache
 	scantext: set the location field to the string that was matched

@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.4.0 2025-03-21T12:14:09+0900
+    - Release for Unicode CLDR version 47
+      See CLDR release notes for details: <https://cldr.unicode.org/downloads/cldr-47>
+
 v1.3.2 2025-01-05T11:58:23+0900
     - Removed the INIT block not working well under modperl
 

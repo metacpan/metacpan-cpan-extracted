@@ -7,6 +7,7 @@ use Test::More ( tests => 6 );
 
 use Devel::Walk;
 use Storable qw( freeze );
+use IO::File;
 
 my $bottom;
 

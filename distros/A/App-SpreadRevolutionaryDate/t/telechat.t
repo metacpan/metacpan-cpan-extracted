@@ -30,7 +30,7 @@ my $data_start = tell DATA;
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 
 # Default message
-stdout_like { $spread_revolutionary_date->spread } qr/^Diffusé sur Mastodon : (Chalut ! Aujourd'hui, (?:Lourdi|Pardi|Morquidi|Jourdi|Dendrevi|Sordi|Mitanche') \d+, c'est la Sainte?-[^.]+\.)\n(Bonne fête à tou(?:te)?s les .+ !) with image path: .+groucha\.png , alt: Grouchat de Téléchat : « \1 \2 »$/, 'Spread default on Mastodon';
+stdout_like { $spread_revolutionary_date->spread } qr/^(?:Message 1: )?Diffusé sur Mastodon : Chalut ! Aujourd'hui, (?:Lourdi|Pardi|Morquidi|Jourdi|Dendrevi|Sordi|Mitanche) \d+, c'est la Sainte?-[^.]+\..+Bonne.+fête.+à.+tou(?:te)?s.+les.+ !.+with.+image.+path:.+groucha\.png.+,.+alt:.+Grouchat.+de.+Téléchat.+:.+«[^«]+»$/s, 'Spread default on Mastodon';
 
 __DATA__
 

@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -908,7 +908,6 @@ sub EditSelect {
 	my $e = $self->Subwidget('Entry');
 	$e->Subwidget('List')->popDown;
 	my $folder = $e->get;
-	print "folder $folder\n";
 	my $home = $ENV{HOME};
 	$folder =~ s/^~/$home/;
 	$self->load($folder) if (-e $folder) and (-d $folder);

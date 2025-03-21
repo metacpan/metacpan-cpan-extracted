@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.47';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -36,6 +36,27 @@ role {
   requires 'spread';
 };
 
+sub _split_msg {
+  my ($self, $text, $max_len) = @_;
+  my @msgs;
+  while ($text) {
+    if (length $text <= $max_len) {
+      push @msgs, $text;
+      last;
+    }
+    my $prefix = substr $text, 0, $max_len;
+    my $loc = rindex $prefix, ' ';
+
+    if ($loc == -1) {
+      die "We found a word which is longer than $max_len\n";
+    }
+    my $str = substr $text, 0, $loc, '';
+    push @msgs, $str;
+    substr $text, 0, 1, '';
+  }
+  return @msgs;
+}
+
 
 # A module must return a true value. Traditionally, a module returns 1.
 # But this module is a revolutionary one, so it discards all old traditions.
@@ -56,7 +77,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -115,6 +136,8 @@ There is a L<Bluesky|https://metacpan.org/pod/Bluesky> Perl module on CPAN that 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

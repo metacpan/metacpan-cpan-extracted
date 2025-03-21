@@ -20,7 +20,7 @@ BEGIN
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
-    our $CLDR_VERSION = '46.1';
+    our $CLDR_VERSION = '47';
 };
 
 BEGIN

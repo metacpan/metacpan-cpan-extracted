@@ -5,11 +5,9 @@ plugin 'PkgConfig' => 'libsecp256k1';
 share {
 	my $run_tests = $ENV{ALIEN_LIBSECP256K1_RUN_TESTS};
 
-	start_url 'https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.5.1.tar.gz';
-	plugin Download => (
-		version => qr/v([0-9\.]+)\.tar/,
-	);
-	plugin Extract => 'tar.gz';
+	start_url 'libsecp256k1';
+	plugin 'Fetch::LocalDir';
+	plugin 'Extract::Directory';
 
 	plugin 'Build::CMake';
 	plugin 'Gather::IsolateDynamic';

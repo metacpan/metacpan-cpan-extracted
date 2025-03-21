@@ -44,7 +44,7 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]), 'Map::Tube::Node' );
-  is( scalar(@stations), 969, 'Number of stations incorrect for map' );
+  is( scalar(@stations), 994, 'Number of stations incorrect for map' );
   like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Aachener Platz.*ckendorfer Platz$), 'Stations not correct for map' );
 }
 
@@ -64,7 +64,7 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
   isa_ok( $stations[0], 'Map::Tube::Node' );
   is( scalar(@stations), 4, 'Number of neighbouring stations incorrect for station named Kampstr. (Dortmund)' );
   is( join( ', ', sort map { $_->name( ) } @stations ),
-      'Dortmund Hbf, Reinoldikirche, Stadtgarten, Westentor',
+      'Dortmund Hbf, Reinoldikirche, Stadtgarten Dortmund, Westentor',
       'Neighbouring stations not correct for station named Kampstr. (Dortmund)'
     );
 }

@@ -7,4 +7,6 @@
 
 * Add some new message makers.
 
-* Add message maker from https://metacpan.org/pod/OpenAI::API
+* Add message maker from Gemini
+
+* Allow to configure hash variable to select which prompt to use for Gemini message maker

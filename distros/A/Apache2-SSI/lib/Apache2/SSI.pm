@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.10
+## Version v0.2.11
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2024/09/05
+## Modified 2025/03/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     use Scalar::Util ();
     use URI;
     use version;
-    our $VERSION = 'v0.2.10';
+    our $VERSION = 'v0.2.11';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     # As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -2041,6 +2041,23 @@ sub parse_expr
     return( join( ' ', @$res ) );
 }
 
+sub parse_expr_args
+{
+    my $self = shift( @_ );
+    my $args = shift( @_ );
+    return( $self->error( "I was expecting an array reference, but instead got '$args'." ) ) if( !$self->_is_array( $args ) );
+    my $buff = [];
+    my $prev_regexp_capture = $self->{_regexp_capture};
+    my $r = $self->apache_request;
+    my $env = $self->env;
+    foreach my $this ( @$args )
+    {
+        my $res = $self->ap2perl_expr( $this, [] );
+        push( @$buff, @$res ) if( $res );
+    }
+    return( join( ', ', @$buff ) );
+}
+
 sub parse_flastmod
 {
     my( $self, $args ) = @_;
@@ -2609,23 +2626,6 @@ sub timefmt { return( shift->_set_get_scalar( 'timefmt', @_ ) ); }
 sub trunk { return( shift->_set_get_boolean( 'trunk', @_ ) ); }
 
 sub uri { return( shift->_set_get_object( 'uri', 'Apache2::SSI::URI', @_ ) ); }
-
-sub parse_expr_args
-{
-    my $self = shift( @_ );
-    my $args = shift( @_ );
-    return( $self->error( "I was expecting an array reference, but instead got '$args'." ) ) if( !$self->_is_array( $args ) );
-    my $buff = [];
-    my $prev_regexp_capture = $self->{_regexp_capture};
-    my $r = $self->apache_request;
-    my $env = $self->env;
-    foreach my $this ( @$args )
-    {
-        my $res = $self->ap2perl_expr( $this, [] );
-        push( @$buff, @$res ) if( $res );
-    }
-    return( join( ', ', @$buff ) );
-}
 
 sub _format_time
 {

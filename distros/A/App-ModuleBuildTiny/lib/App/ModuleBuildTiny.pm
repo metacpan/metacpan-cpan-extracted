@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -169,9 +169,9 @@ my @config_items = (
 	[ 'email'        , 'What is the author\'s email?', 'open',  ],
 	[ 'license'      , 'What license do you want to use?', 'open', 'Perl_5' ],
 
-	[ 'write_build'  , 'Do you want to write your build files to your repository?', 'yn', !!1],
-	[ 'write_license', 'Do you want to write your LICENSE file to your repository?', 'yn', !!1],
-	[ 'write_readme' , 'Do you want to write your README file to your repository?', 'yn', !!1],
+	[ 'write_build'  , 'Do you want to write your build files to your filesystem?', 'yn', !!1],
+	[ 'write_license', 'Do you want to write your LICENSE file to your filesystem?', 'yn', !!1],
+	[ 'write_readme' , 'Do you want to write your README file to your filesystem?', 'yn', !!1],
 
 	[ 'auto_git'     , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
 	[ 'auto_bump'    , 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
@@ -193,10 +193,9 @@ sub ask {
 	}
 }
 
-sub list_item {
+sub show_item {
 	my ($config, $key, $type) = @_;
-	my $value = defined $config->{$key} ? $type eq 'open' ? $config->{$key} : $config->{$key} ? 'true' : 'false' : '(undefined)';
-	say "\u$key: $value";
+	return defined $config->{$key} ? $type eq 'open' ? $config->{$key} : $config->{$key} ? 'true' : 'false' : '(undefined)';
 }
 
 sub get_settings_file {
@@ -261,6 +260,11 @@ sub regenerate_files {
 	push @result, 'README'     if $config->{write_readme}  // 1;
 	return @result;
 }
+
+my %boolean = (
+	true  => !!1,
+	false => !!0,
+);
 
 my %actions = (
 	dist => sub {
@@ -416,12 +420,23 @@ my %actions = (
 		my $config_file = get_settings_file();
 		my $config = -f $config_file ? read_json($config_file) : {};
 
-		my $mode = @arguments ? $arguments[0] : 'upgrade';
+		my $mode = @arguments ? shift @arguments : 'upgrade';
 
 		if ($mode eq 'upgrade') {
 			for my $item (@config_items) {
 				next if defined $config->{ $item->[0] };
 				ask($config, $item);
+			}
+			write_json($config_file, $config);
+		}
+		elsif ($mode eq 'minimal') {
+			for my $item (@config_items) {
+				next if defined $config->{ $item->[0] };
+				if (defined $item->[3]) {
+					$config->{ $item->[0] } = $item->[3];
+				} else {
+					ask($config, $item);
+				}
 			}
 			write_json($config_file, $config);
 		}
@@ -431,10 +446,28 @@ my %actions = (
 			}
 			write_json($config_file, $config);
 		}
+		elsif ($mode eq 'get') {
+			my ($key, $value) = @arguments;
+			my ($item) = grep { $_->[0] eq $key } @config_items;
+			die "No such known key $key" if not $item;
+			my (undef, $description, $type, $default) = @{$item};
+			say show_item($config, $key, $type);
+		}
+		elsif ($mode eq 'set') {
+			my ($key, $value) = @arguments;
+			my $item = grep { $_->[0] eq $key } @config_items;
+			die "No such known key $key" if not $item;
+			if ($item->[2] eq 'yn') {
+				$config->{$key} = $boolean{$value} // die "Unknown boolean value '$value'\n";
+			} else {
+				$config->{$key} = $value;
+			}
+			write_json($config_file, $config);
+		}
 		elsif ($mode eq 'list') {
 			for my $item (@config_items) {
 				my ($key, $description, $type, $default) = @{$item};
-				list_item($config, $key, $type);
+				say "\u$key: " . show_item($config, $key, $type);
 			}
 		}
 		elsif ($mode eq 'reset') {
@@ -447,7 +480,7 @@ my %actions = (
 		my $settings = get_settings;
 		my $config = get_config;
 
-		my $mode = @arguments ? $arguments[0] : 'upgrade';
+		my $mode = @arguments ? shift @arguments : 'upgrade';
 
 		my @items = grep { $_->[2] ne 'open' } @config_items;
 		if ($mode eq 'upgrade') {
@@ -471,10 +504,24 @@ my %actions = (
 			}
 			write_json($config_file, $config);
 		}
+		elsif ($mode eq 'get') {
+			my ($key, $value) = @arguments;
+			my ($item) = grep { $_->[0] eq $key } @config_items;
+			die "No such known key $key" if not $item;
+			my (undef, $description, $type, $default) = @{$item};
+			say show_item($config, $key, $type);
+		}
+		elsif ($mode eq 'set') {
+			my ($key, $value) = @arguments;
+			my $item = grep { $_->[0] eq $key } @config_items;
+			die "No such known key $key" if not $item;
+			$config->{$key} = $boolean{$value} // die "Unknown boolean value '$value'\n";
+			write_json($config_file, $config);
+		}
 		elsif ($mode eq 'list') {
 			for my $item (@items) {
 				my ($key, $description, $type, $default) = @{$item};
-				list_item($config, $key, $type);
+				say "\u$key: " . show_item($config, $key, $type);
 			}
 		}
 		elsif ($mode eq 'reset') {

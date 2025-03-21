@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.2.0');
+our $VERSION = version->declare('v0.2.1');
 
 =encoding utf8
 
@@ -52,14 +52,14 @@ All interesting methods are provided by the role L<Map::Tube>.
 =head2 CONSTRUCTOR
 
 	use Map::Tube::RheinRuhr;
-	my $tube = Map::Tube::RheinRuhr->new();
+	my $tube = Map::Tube::RheinRuhr->new( );
 
 The only argument, C<xml>, is optional; if specified, it should be a code ref
 to a function that returns either the path the XML map file, or a string
 containing this XML content. The default is the path to F<rheinruhr-map.xml>
 that is a part of this distribution. For further information see L<Map::Tube>.
 
-=head2 xml()
+=head2 xml( )
 
 This read-only accessor returns whatever was specified as the XML source at
 construction.

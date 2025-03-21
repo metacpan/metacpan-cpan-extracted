@@ -19,11 +19,20 @@ class HTTP::Tiny::Asset::Memory extends HTTP::Tiny::Asset {
   has frozen : byte;
   
   # Class Methods
-  static method new : HTTP::Tiny::Asset::Memory ($options : object[]) {
-    
-    my $options_h = Hash->new($options);
+  static method new : HTTP::Tiny::Asset::Memory ($options : object[] = undef) {
     
     my $self = new HTTP::Tiny::Asset::Memory;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
+    my $options_h = Hash->new($options);
     
     $self->{auto_upgrade} = (byte)$options_h->get_or_default_int("auto_upgrade", 0);
     
@@ -33,7 +42,6 @@ class HTTP::Tiny::Asset::Memory extends HTTP::Tiny::Asset {
     
     $self->{content_buffer} = StringBuffer->new;
     
-    return $self;
   }
   
   method add_chunk : HTTP::Tiny::Asset ($chunk : string) {

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.47';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
@@ -19,6 +19,7 @@ with 'App::SpreadRevolutionaryDate::Target'
 
 use Mastodon::Client;
 use Encode qw(encode decode is_utf8);
+use File::Basename;
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -46,6 +47,14 @@ has 'access_token' => (
   isa => 'Str',
   required => 1,
 );
+
+has 'max_lenght' => (
+  is  => 'ro',
+  isa => 'Int',
+  required => 1,
+  default => 300,
+);
+
 
 
 around BUILDARGS => sub {
@@ -82,18 +91,39 @@ sub spread {
     my $io = IO::Handle->new;
     $io->fdopen(fileno(STDOUT), "w");
 
-    $msg = encode('UTF-8', $msg) if is_utf8($msg);
-    $io->say($msg);
-  } else {
-    my $params = {};
-    if ($img) {
-      $img = {path => $img} unless ref($img) && ref($img) eq 'HASH' && $img->{path};
-      my $img_alt = $img->{alt} // ucfirst(fileparse($img->{path}, qr/\.[^.]*/));
-      $img_alt = encode('UTF-8', $img_alt) if is_utf8($img_alt);
-      my $resp_img = $self->obj->upload_media($img->{path}, {description => $img_alt});
-      $params->{media_ids} = [$resp_img->{id}] if $resp_img->{id};
+    my @msgs = $self->_split_msg($msg, $self->max_lenght);
+
+    for (my $i = 0; $i < scalar @msgs; $i++) {
+      my $msg = "Message " . ($i+1) . ": " . $msgs[$i];
+      $msg = encode('UTF-8', $msg) if is_utf8($msg);
+      $io->say($msg);
     }
-    $self->obj->post_status($msg, $params);
+  } else {
+    my @msgs = $self->_split_msg($msg, $self->max_lenght);
+    my $last_status_id;
+
+    foreach my $msg (@msgs) {
+      my $params = {};
+
+      if (!$last_status_id) {
+        # First post
+        if ($img) {
+          $img = {path => $img} unless ref($img) && ref($img) eq 'HASH' && $img->{path};
+          my $img_alt = $img->{alt} // ucfirst(fileparse($img->{path}, qr/\.[^.]*/));
+          $img_alt = encode('UTF-8', $img_alt) if is_utf8($img_alt);
+          my $resp_img = $self->obj->upload_media($img->{path}, {description => $img_alt});
+          $params->{media_ids} = [$resp_img->{id}] if $resp_img->{id};
+        }
+
+        my $status = $self->obj->post_status($msg, $params);
+        $last_status_id = $status->{id} if ($status && ref($status) eq 'HASH' && $status->{id});
+      } else {
+        # Next posts with reply_to
+        $params->{in_reply_to_id} = $last_status_id;
+        my $status = $self->obj->post_status($msg, $params);
+        $last_status_id = $status->{id} if ($status && ref($status) eq 'HASH' && $status->{id});
+      }
+    }
   }
 }
 
@@ -120,7 +150,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 METHODS
 
@@ -177,6 +207,8 @@ Spreads a message to Mastodon. Takes one mandatory argument: C<$msg> which shoul
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

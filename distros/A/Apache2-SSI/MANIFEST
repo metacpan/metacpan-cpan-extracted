@@ -16,9 +16,11 @@ lib/Apache2/SSI/URI.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 scripts/startup.pl
+SIGNATURE
 t/00.load.t
 t/02.pod.t
 t/20.collapse-dots.t
@@ -41,7 +43,9 @@ t/70.file.t
 t/71.file_type.t
 t/80.notes.t
 t/80.sharedmem.pl
+t/90.coverage.t
 t/90.manifest.t
+t/91.signature.t
 t/99.kwalitee.t
 t/conf/extra.conf.in
 t/functions.pl
@@ -112,4 +116,3 @@ t/SSITest.pm
 t/TEST.PL
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-SIGNATURE                                Public-key signature (added by MakeMaker)

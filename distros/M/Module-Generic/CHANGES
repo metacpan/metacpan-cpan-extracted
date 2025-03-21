@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.39.1 2025-03-21T06:26:47+0900
+    - Correcting unit tests
+
 v0.39.0 2025-03-20T17:12:08+0900
     - Corrected an issue with the serialisation of JSON
     - Added method real() to Module::Generic::Number

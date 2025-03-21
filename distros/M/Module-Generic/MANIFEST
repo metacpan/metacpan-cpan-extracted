@@ -1,7 +1,6 @@
 CHANGES
 CONTRIBUTING.md
 lib/Module/Generic.pm
-lib/Module/Generic/#File.pm#
 lib/Module/Generic/Array.pm
 lib/Module/Generic/Array.pod
 lib/Module/Generic/Boolean.pm

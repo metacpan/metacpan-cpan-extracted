@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Telechat;
-$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.47';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Téléchat date
 
 use Moose;
@@ -1027,7 +1027,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Telechat - MsgMaker class for L<App::Spr
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 METHODS
 
@@ -1086,6 +1086,8 @@ We have found three sources for calendar names: what has actually been broadcast
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

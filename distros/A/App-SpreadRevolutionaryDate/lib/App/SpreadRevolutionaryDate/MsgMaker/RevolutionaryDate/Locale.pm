@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.47';
 # ABSTRACT: Role providing interface for localization of revolutionary date built by L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>.
 
 use Moose::Role;
@@ -116,7 +116,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale - Role providi
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -278,6 +278,8 @@ Returns the wikipedia entry (the end of the wikipedia url) corresponding to the 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

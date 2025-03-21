@@ -13,7 +13,7 @@ if ( Test::Map::Tube->can('ok_links_bidirectional') ) {
   plan tests => 1;
 
   ok_map( Map::Tube::RheinRuhr->new( ), {
-              ok_links_bidirectional     => { exclude => [ qw( vrr_101_106 vrr_705 vrr_706 vrr_709 vrr_H_BAHN vrr_U73 vrr_U78 vrr_U83 ) ] },
+              ok_links_bidirectional     => { exclude => [ qw( VRR_101_10 VRR_705 VRR_706 VRR_707 VRR_U73 VRR_U78 ) ] },
               ok_station_names_different => { dist_limit => 1, max_allowed => 4 },
               ok_map_connected           => { max_allowed => 4 },
           } );

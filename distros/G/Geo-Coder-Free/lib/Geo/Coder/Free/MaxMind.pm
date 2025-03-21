@@ -46,11 +46,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -208,6 +208,7 @@ sub geocode {
 		return Geo::Location::Point->new({
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
+			'lon' => $rc->{'longitude'},
 			'lng' => $rc->{'longitude'},
 			'location' => $location,
 			'database' => 'MaxMind'
@@ -562,6 +563,7 @@ sub geocode {
 				# push @locations, Geo::Location::Point->new({
 					# 'lat' => $l->{'latitude'},
 					# 'long' => $l->{'longitude'},
+					# 'lon' => $l->{'longitude'},
 					# 'location' => $location,
 					# 'database' => 'MaxMind',
 					# 'maxmind' => $l,

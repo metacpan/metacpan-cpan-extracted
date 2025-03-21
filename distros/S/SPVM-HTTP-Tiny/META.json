@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "SPVM" : "0.990045",
-            "SPVM::File::Temp" : "0.021",
+            "SPVM::File::Copy" : "0.022",
+            "SPVM::File::Temp" : "0.026",
             "SPVM::IO" : "0.211",
             "SPVM::Mozilla::CA" : "0.001",
             "SPVM::Regex" : "0.246",
@@ -50,6 +51,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

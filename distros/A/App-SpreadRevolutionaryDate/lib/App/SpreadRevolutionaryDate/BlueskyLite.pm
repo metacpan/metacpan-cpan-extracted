@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::BlueskyLite;
-$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.47';
 # ABSTRACT: Simple Class to post status to BlueSky.
 
 use LWP::UserAgent;
@@ -171,10 +171,10 @@ sub new {
 
 
 sub create_post {
-  my ($self, $text, $img) = @_;
+  my ($self, $text, $img, $reply) = @_;
 
   my ($facets, $embed) = $self->_generate_facets($text);
-  my $json = encode_json({
+  my $payload = {
     repo => $self->{did},
     collection => 'app.bsky.feed.post',
     record => {
@@ -186,7 +186,7 @@ sub create_post {
       ),
       createdAt => DateTime->now->iso8601 . 'Z',
     },
-  });
+  };
 
   if ($img) {
     $img = {path => $img} unless ref($img) && ref($img) eq 'HASH' && $img->{path};
@@ -210,30 +210,31 @@ sub create_post {
     return unless $blob_response->is_success;
 
     my $blob_content = decode_json($blob_response->decoded_content);
-    $json = encode_json({
-      repo => $self->{did},
-      collection => 'app.bsky.feed.post',
-      record => {
-        text => $text,
-        embed => {
-          '$type'    => 'app.bsky.embed.images',
-          images => [
+    $payload->{record}->{embed} = {
+        '$type'    => 'app.bsky.embed.images',
+        images => [
             {
-              alt => $img_alt,
-              image => $blob_content->{blob},
+                alt => $img_alt,
+                image => $blob_content->{blob},
             },
-          ],
-        },
-        createdAt => DateTime->now->iso8601 . 'Z',
-      },
-    });
+        ],
+    };
   }
 
+  if ($reply) {
+      $payload->{record}->{reply} = $reply;
+  }
+
+  my $json = encode_json($payload);
   my $req = HTTP::Request->new('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord');
   $req->header('Content-Type' => 'application/json');
   $req->content($json);
   my $response = $self->{ua}->request($req);
-  return $response;
+  if ($response->is_success) {
+      return decode_json($response->decoded_content);
+  } else {
+      return $response;
+  }
 }
 
 
@@ -256,7 +257,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - Simple Class to post status to BlueS
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 Methods
 
@@ -311,6 +312,8 @@ Creates a Bluesky post.
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

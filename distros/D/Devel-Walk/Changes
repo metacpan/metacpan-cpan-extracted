@@ -1,5 +1,11 @@
 Revision history for Perl extension Devel::Walk.
 
+0.02  Mar 20 14:37 2025
+    - More doco
+    - Tweak Makefile.PL
+    - subversion tweaks
+    - Forgot IO::File
+
 0.01  Mon Mar 17 15:15:23 2025
 	- original version; created by h2xs 1.23 with options
 		-b5.10.0 -AXc --use-new-tests --skip-autoloader Devel::Walk

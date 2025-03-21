@@ -10,6 +10,7 @@ TVision-methods.xs.in
 typemap
 typemap.in
 TVision.xs
+TVision.h
 TVision.pm
 README.md
 MANIFEST

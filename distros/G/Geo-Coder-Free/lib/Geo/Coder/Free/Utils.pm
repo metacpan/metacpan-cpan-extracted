@@ -1,24 +1,33 @@
-package main;
+package Geo::Coder::Free::Utils;
 
 # VWF is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
+=head1 NAME
+
+Geo::Coder::Free::Utils - Random subroutines for Geo::Coder::Free
+
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use strict;
 use warnings;
+
+use Exporter qw(import);
+
+our @EXPORT = qw(create_disc_cache create_memory_cache distance);
 
 use CHI;
 use Data::Dumper;
 use DBI;
 use Error;
 use Log::Any::Adapter;
+use Params::Get;
 
 BEGIN {
 	Log::Any::Adapter->set('Log4perl');
@@ -34,7 +43,7 @@ Supports multiple cache drivers, including BerkeleyDB, DBI, and Redis.
 =cut
 
 sub create_disc_cache {
-	my $args = get_params(undef, @_);
+	my $args = Params::Get::get_params(undef, @_);
 
 	my $config = $args->{'config'};
 	throw Error::Simple('config is not optional') unless($config);
@@ -46,8 +55,8 @@ sub create_disc_cache {
 		throw Error::Simple('root_dir is not optional') unless($root_dir);
 
 		if($logger) {
-			$logger->warn(Data::Dumper->new([$config])->Dump());
-			$logger->warn('disc_cache not defined in ', $config->{'config_path'}, ' falling back to BerkeleyDB');
+			$logger->debug(Data::Dumper->new([$config])->Dump());
+			$logger->info('disc_cache not defined in ', $config->{'config_path'}, ' falling back to BerkeleyDB');
 		}
 		return CHI->new(driver => 'BerkeleyDB', root_dir => $root_dir, namespace => $args->{'namespace'});
 	}
@@ -119,21 +128,23 @@ Supports multiple cache drivers, including SharedMem, Memory, and Redis.
 =cut
 
 sub create_memory_cache {
-	my $args = get_params(undef, @_);
+	my $args = Params::Get::get_params(undef, @_);
 
 	my $config = $args->{'config'};
 	throw Error::Simple('config is not optional') unless($config);
 
 	my $logger = $args->{'logger'};
-	my $driver = $config->{memory_cache}->{driver};
+	my $driver = $config->{'memory_cache'}->{driver};
 	unless(defined($driver)) {
 		if($logger) {
-			$logger->warn('memory_cache not defined in ', $config->{'config_path'}, ' falling back to sharedmem');
+			$logger->debug(Data::Dumper->new([$config])->Dump());
+			$logger->info('memory_cache not defined in ', $config->{'config_path'}, ' falling back to memory');
 		}
 		# return CHI->new(driver => 'Memcached', servers => [ '127.0.0.1:11211' ], namespace => $args->{'namespace'});
 		# return CHI->new(driver => 'File', root_dir => '/tmp/cache', namespace => $args->{'namespace'});
-		return CHI->new(driver => 'SharedMem', max_size => 1024, shm_size => 16 * 1024, shm_key => 98766789, namespace => $args->{'namespace'});
-}
+		# return CHI->new(driver => 'SharedMem', max_size => 1024, shm_size => 16 * 1024, shm_key => 98766789, namespace => $args->{'namespace'});
+		return CHI->new(driver => 'Memory', global => 1);
+	}
 	if($logger) {
 		$logger->debug('memory cache via ', $config->{memory_cache}->{driver}, ', namespace: ', $args->{'namespace'});
 	}
@@ -175,7 +186,9 @@ sub create_memory_cache {
 		if(my $max_size = ($args->{'max_size'} || $config->{'memory_cache'}->{'max_size'})) {
 			$chi_args{'max_size'} = $max_size;
 		}
-	} elsif(($driver ne 'Null') && ($driver ne 'Memory')) {
+	} elsif($driver eq 'Memory') {
+		$chi_args{'global'} = $config->{'memory_cache'}->{'global'} || 0;
+	} elsif($driver ne 'Null') {
 		$chi_args{'root_dir'} = $ENV{'root_dir'} || $args->{'root_dir'} || $config->{memory_cache}->{root_dir} || $config->{'root_dir'};
 		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
 		if($logger) {
@@ -189,39 +202,6 @@ sub create_memory_cache {
 		$chi_args{'redis_options'} = \%redis_options;
 	}
 	return CHI->new(%chi_args);
-}
-
-=head2	get_params
-
-Parse the arguments given to a function,
-allowing the caller to call the function in anyway that they want e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' })
-all mean the same when called _get_params('arg', @_);
-
-=cut
-
-sub get_params
-{
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if ref $_[0] eq 'HASH';
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		throw Error::Simple('Usage: ' . __PACKAGE__ . '->' . (caller(1))[3] . '()');
-	} elsif($num_args == 0 && defined $default) {
-		throw Error::Simple('Usage: ' . __PACKAGE__ . '->' . (caller(1))[3] . '($default => \$val)');
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	}
-
-	return \%rc;
 }
 
 =head2 distance

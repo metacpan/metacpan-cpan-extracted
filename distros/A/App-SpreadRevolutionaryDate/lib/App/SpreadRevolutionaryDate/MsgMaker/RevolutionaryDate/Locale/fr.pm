@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.47';
 # ABSTRACT: French localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
@@ -269,6 +269,7 @@ has '+wikipedia_entries' => (
       'épinards'    => 'Épinard',
       'mouron'      => 'Mouron_(flore)',
       'cochléaria'  => 'Cochlearia',
+      'sylvie'      => 'Anémone_sylvie',
       'capillaire'  => 'Capillaire_de_montpellier',
     },
     7 => {
@@ -395,7 +396,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr - French l
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -470,6 +471,8 @@ Sources have slight differences between them. All of them obviously include some
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

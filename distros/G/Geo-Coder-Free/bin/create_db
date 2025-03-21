@@ -7,6 +7,8 @@ export OPENADDR_HOME="${OPENADDR_HOME:-~/etc/openaddr}"
 
 cd ~/src/njh/Geo-Coder-Free
 git pull
-mv $OPENADDR_HOME/*.sql $OPENADDR_HOME/openaddresses.sql.keep
-chmod 444 $OPENADDR_HOME/openaddresses.sql.keep
-REDIS_SERVER= make
+if [[ -f $OPENADDR_HOME/openaddresses.sql ]]; then
+	mv $OPENADDR_HOME/openaddresses.sql $OPENADDR_HOME/openaddresses.sql.keep
+	chmod 444 $OPENADDR_HOME/openaddresses.sql.keep
+fi
+REDIS_SERVER= make 2>&1 | tee /tmp/create_db.out.$$

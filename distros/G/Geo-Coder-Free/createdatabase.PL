@@ -43,7 +43,7 @@
 #	cd $OSM_HOME && /usr/bin/wget https://download.geofabrik.de/europe-latest.osm.bz2
 # Note that this can take a day to load in just AU, CA, GB, US
 
-# You can look up a WOF place by https://spelunker.whosonfirst.org/id/$locality_id
+# You can look up a WOF place at https://spelunker.whosonfirst.org/id/$locality_id
 #
 # Try:
 #	sqlite3 whosonfirst-data-latest.db
@@ -70,7 +70,9 @@ use DBI;
 use File::Copy;
 use File::Slurp;
 use Geo::Coder::Abbreviations;
+use Geo::Hash;
 use JSON::MaybeXS;
+use LWP::ConnCache;
 use LWP::UserAgent::Throttled;
 use Locale::AU;	# TODO: use Locale::Geocode
 use Locale::CA;
@@ -1284,10 +1286,12 @@ if($dbh) {
 	# $dbh->do('CREATE TABLE cities(sequence INTEGER, city VARCHAR, county VARCHAR, state VARCHAR NOT NULL, country CHAR(2) NOT NULL)');
 	# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
 	if(MAX_INSERT_COUNT == 1) {
-		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL)');
+		# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL)');
+		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, geohash VARCHAR(10))');
 	} else {
 		# Add the keys later for performance
-		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL)');
+		# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL)');
+		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), geohash VARCHAR(10))');
 	}
 	# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
 	# $dbh->prepare('CREATE TABLE tree(lat DECIMAL, lon DECIMAL, md5 CHAR(16) NOT NULL, parent CHAR(16))')->execute();
@@ -1407,7 +1411,9 @@ if((!(DEBUG&(DEBUG_KNOWN_PLACES|DEBUG_WOF|DEBUG_OSM))) && (-r $filename)) {
 my $current_state;
 my $current_country;
 # my %whosonfirst;
+
 my $ua = LWP::UserAgent::Throttled->new(keep_alive => 1);
+$ua->conn_cache(LWP::ConnCache->new());
 $ua->throttle({ 'api.zippopotam.us' => 1 });
 $ua->env_proxy(1);
 
@@ -1419,7 +1425,7 @@ if((!(DEBUG&DEBUG_KNOWN_PLACES)) && (-r $filename) &&
    # open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
    # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
    (my $all_countries = File::Open::NoCache::ReadOnly->new($filename)) &&
-   (!(DEBUG&(DEBUG_OSM|DEBUG_WOF))) &&
+   (!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF))) &&
    (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin1.db')) &&
    (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
 	my $fin = $all_countries->fd();
@@ -1575,7 +1581,7 @@ foreach my $csv_file (create_tree($oa, 1)) {
 	# next unless($csv_file =~ /us\/ne\/dawes/);
 	# next unless($csv_file =~ /us\/in\//);
 
-	next if(DEBUG&(DEBUG_OSM|DEBUG_WOF));
+	next if(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF));
 
 	# Handle https://github.com/openaddresses/openaddresses/issues/3928
 	# TODO: It would be better to merge airdrie.csv and city_of_airdrie.csv
@@ -1765,7 +1771,14 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		# Don't combine these statements - it creates CPANEL usage errors
 		# which I need to investigate
 		my $data = File::Slurp::read_file($geojson_file);
-		my $properties = $j->decode($data)->{'properties'};
+		my $properties;
+		eval {
+			$properties = $j->decode($data)->{'properties'};
+		};
+		if($@ || !defined($properties)) {
+			warn "$geojson_file: $@";
+			next;
+		}
 		# print 'processing ', $properties->{'wof:id'}, "\n";
 
 		next if(exists($properties->{'wof:superseded_by'}) && scalar(@{$properties->{'wof:superseded_by'}}));
@@ -2049,7 +2062,7 @@ if($dbh) {
 	$dbh->commit();
 }
 
-if(!(DEBUG&(DEBUG_OSM|DEBUG_WOF))) {
+if(!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF))) {
 	foreach my $country(@whosonfirst_only_countries) {
 		# Import this country's hand curated data
 
@@ -3389,6 +3402,7 @@ sub flush_queue
 	# my @columns = ('LAT','LON','NAME','NUMBER','STREET');
 
 	my $query;
+	my $geo_hash = Geo::Hash->new();
 
 	while(my($md5, $row) = each(%queued_commits)) {
 	# foreach my $md5(keys %queued_commits) {
@@ -3447,14 +3461,16 @@ sub flush_queue
 					# # GRANT DELETE ON geo_coder_free.openaddresses TO 'njh'@'localhost';
 					# $query = 'REPLACE INTO openaddresses(LAT, LON, MD5) VALUES (';
 				# } else {
-					$query = 'INSERT INTO openaddresses(LAT, LON, MD5) VALUES (';
+					# $query = 'INSERT INTO openaddresses(LAT, LON, MD5) VALUES (';
+					$query = 'INSERT INTO openaddresses(geohash, md5) VALUES (';
 				# }
 			} else {
 				$query .= ',(';
 			}
 
 			$md5 =~ s/'/''/g;
-			$query .= $row->{'LAT'} . ',' . $row->{'LON'} . ",'$md5')";
+			# $query .= $row->{'LAT'} . ',' . $row->{'LON'} . ",'$md5')";
+			$query .= "'" . $geo_hash->encode($row->{'LAT'}, $row->{'LON'}, 10) . "','$md5')";
 		}
 
 		# my $key = city_key($row->{'CITY'}, $row->{'COUNTY'}, $state, $country);
@@ -3743,15 +3759,33 @@ sub get_wof {
 	} else {
 		$repo = '*';
 	}
+	print "Repo = $repo\n" if(DEBUG&DEBUG_GET_WOF);
 	if($id =~ /(\d{3})(\d{3})(\d{3})(\d+)/) {
 		$filename = $ENV{'WHOSONFIRST_HOME'} . "/$repo/data/$1/$2/$3/$4/$id.geojson";
+		if(($repo ne '*') && (!-e $filename)) {
+			print "Forcing glob to a different repo\n" if(DEBUG&DEBUG_GET_WOF);
+			$repo = '*';
+			$filename = $ENV{'WHOSONFIRST_HOME'} . "/*/data/$1/$2/$3/$4/$id.geojson";
+		}
 	} elsif($id =~ /(\d{3})(\d{3})(\d+)/) {
 		$filename = $ENV{'WHOSONFIRST_HOME'} . "/$repo/data/$1/$2/$3/$id.geojson";
+		if(($repo ne '*') && (!-e $filename)) {
+			print "Forcing glob to a different repo\n" if(DEBUG&DEBUG_GET_WOF);
+			$repo = '*';
+			$filename = $ENV{'WHOSONFIRST_HOME'} . "/*/data/$1/$2/$3/$id.geojson";
+		}
 	} else {
 		die "Can't parse $id";
 	}
-	my @filelist = <"$filename">;
-	$filename = $filelist[0];
+
+	if($repo eq '*') {
+		# Do a glob expansion on the string, useful if it's something like
+		#	$ENV{'WHOSONFIRST_HOME'} . "/*/data/286/455/973/286455973.geojson"
+		# Because of the layout of WOF (lots of small directories), this can be slow on EXT4, would be nice to find a better way
+		print "Glob expand $filename\n" if(DEBUG&DEBUG_GET_WOF);
+		my @filelist = <"$filename">;
+		$filename = $filelist[0];
+	}
 	if((!$filename) || (! -r $filename)) {
 		# Probably shouldn't die here
 		if(DEBUG&DEBUG_GET_WOF) {
@@ -3762,9 +3796,13 @@ sub get_wof {
 			my @call_details = caller(0);
 			print STDERR "\tcalled from line ",
 				$call_details[2], "\n\t";
-			# die "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, "\n"
+			die "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, "\n"
 		}
-		print STDERR "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, "\n";
+		if($filename) {
+			print STDERR "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, ": $filename: $!\n";
+		} else {
+			print STDERR "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, "\n";
+		}
 		return
 	}
 	print "get_wof: look at $filename\n" if(DEBUG&DEBUG_GET_WOF);
@@ -3808,9 +3846,7 @@ sub extract_osm_home
 	$is_in =~ s/Yorkshire, UK/Yorkshire, GB/;
 	$is_in =~ s/\.UK$/, GB/;
 	$is_in =~ s/, Europe$//;
-	$is_in =~ s/United States of America.*/US/;
-	$is_in =~ s/United States$/US/;
-	$is_in =~ s/USA$/US/;
+	$is_in =~ s/United States of America.*|United States$|USA$/US/;
 	$is_in =~ s/(\w)? USA$/$1, US/;
 	$is_in =~ s/(.+),\sOntario Canada$/$1, Ontario, Canada/;	# name/place/is_in = Brookville/undef/Halton, Ontario Canada
 
@@ -3844,7 +3880,7 @@ sub extract_osm_home
 
 	if(DEBUG&DEBUG_OSM) {
 		if($name) {
-			print "$name";
+			print $name;
 		}
 		if($place) {
 			print "/$place/$is_in";
@@ -4779,10 +4815,10 @@ sub country
 	return 'Australia' if $file =~ /australia/;
 
 	# Ensure the state argument is provided if needed
-	die "State argument is missing" if not defined $state;
+	die 'State argument is missing' if(!defined($state));
 
 	# Handle European cases with specific state codes
-	if ($file =~ /europe/) {
+	if($file =~ /europe/) {
 		my %valid_states = map { $_ => 1 } ('Georgia', 'GA', 'DE', 'VI');
 		return $state if $valid_states{$state} || $valid_states{uc($state)};
 	}

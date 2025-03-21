@@ -67,7 +67,7 @@ subtest 'Scantext edge cases' => sub {
 	lives_ok {
 		$result = $geo_coder->geocode(scantext => 'No locations here');
 	} 'No crash with text without locations';
-	is($result, '', 'Returns empty text for text without locations');
+	is($result, undef, 'Returns undefined for text without locations');
 };
 
 subtest 'Environment variable configuration' => sub {

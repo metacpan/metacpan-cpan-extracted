@@ -26,6 +26,7 @@ BEGIN {
 		if($reporter =~ /smoker/i) {
 			warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 			$ENV{'AUTOMATED_TESTING'} = 1;
+			$ENV{'NO_NETWORK_TESTING'} = 1;
 		}
 	}
 
@@ -47,6 +48,7 @@ if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'
 	# Prevent downloading and installing stuff
 	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
 }
 
 foreach my $module(@needfull) {
@@ -145,6 +147,14 @@ if(!$ENV{'NO_NETWORK_TESTING'}) {
 	}
 }
 
+my $pm;
+if(scalar(keys(%urls)) > 1) {
+	require Parallel::ForkManager;
+	Parallel::ForkManager->import();
+
+	$pm = Parallel::ForkManager->new(10);
+}
+
 foreach my $url(keys %urls) {
 	my $file = $urls{$url};
 	my $use_mirror = 0;
@@ -159,6 +169,8 @@ foreach my $url(keys %urls) {
 			$use_mirror = 1;
 		}
 	}
+
+	$pm->start() and next if($pm);
 
 	if($use_mirror) {
 		print "Downloading $url to $file if a newer version is available\n";
@@ -194,9 +206,12 @@ foreach my $url(keys %urls) {
 		}
 	}
 	die $file if(!-r $file);
+	$pm->finish() if($pm);
 }
 
 my $zip = 'downloads/allCountries.zip';
+
+$pm->wait_all_children() if($pm);
 
 if((!(-r 'downloads/allCountries.txt')) && (-r $zip)) {
 	print "Inflating $zip\n";
@@ -246,7 +261,6 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 # For bin/create_sqlite
 my $build_requires = {
 	'App::csv2sqlite' => 0,
-	'Array::Iterator' => 0,
 	'CHI' => 0,
 	'CHI::Driver::RawMemory' => 0,
 	'Cwd' => 0,
@@ -262,6 +276,7 @@ my $build_requires = {
 	'Geo::Location::Point' => 0.02,
 	'IPC::System::Simple' => 0,
 	'JSON::MaybeXS' => 0,
+	'LWP::ConnCache' => 0,
 	'LWP::UserAgent::Throttled' => 0,
 	'LWP::Protocol::https' => 0,
 	'Scalar::Util' => 0,
@@ -342,13 +357,13 @@ WriteMakefile(
 		'DBD::CSV' => 0,
 		'DBD::SQLite' => 0,
 		'Encode' => 0,
-		'List::MoreUtils' => 0,
 		'Locale::Country' => 0,
 		'Locale::AU' => 0,
 		'Locale::CA' => 0,
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
 		'Lingua::EN::AddressParse' => 0,
+		'Geo::Hash' => 0,
 		'Geo::StreetAddress::US' => 0,
 		'Gzip::Faster' => 0,
 		'File::Temp' => 0,

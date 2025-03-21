@@ -6,13 +6,17 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG );
     use open ':std' => ':utf8';
-    use Test::More qw( no_plan );
+    use Test::More;
     use_ok( 'Module::Generic::File', ('file') ) || BAIL_OUT( "Unable to load Module::Generic::File" );
     local $@;
     eval( 'require Text::CSV' );
     if( $@ )
     {
         plan(skip_all => 'These tests require Text::CSV to be installed.');
+    }
+    else
+    {
+        plan();
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };

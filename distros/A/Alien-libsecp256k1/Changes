@@ -1,5 +1,9 @@
 Revision history for Alien-libsecp256k1
 
+0.060000 - 2025-03-20
+	- libsecp256k1 is now bundled together with the module (instead of being downloaded from github)
+	- libsecp256k1 version is now v0.6.0
+
 0.050103 - 2024-09-20
 	- The module now tries to build static libsecp256k1 on windows with proper define
 

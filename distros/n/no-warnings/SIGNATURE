@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b41bcca01c3a36ab8546c97a96fb79a656926fb8a0bfaaab3fc1ad657f137bd7 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 21c1d232f604991acfd402cfdf80aa997c14e44ccdfd7f511421813986c72bc0 Changes
+SHA256 25adb2fba7d7998a6198dd97b54e53116f64151f3d329700758927ce36ab86a5 INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 46e3ffd3fdfe0af330de31d0daa868cb880af72fa04e2700c7a785a7f17f7ef1 MANIFEST
+SHA256 17d8fb8ceec7168ca4bad8041e13c4a25200efe6ad753511387e03e81c2daecc META.json
+SHA256 0735c67896747b71e645016d72efe12581c4fc1b562523283303f3c43ea3e277 META.yml
+SHA256 0d6e8faf3ae91487efb725facff4cd2e7ff21dbffa9c2d391950b73b84fccdb1 Makefile.PL
+SHA256 a71228ea7005599eb4f7d2ec9ce1308e3279e5308df2b881fb7dbfdd433634cf README
+SHA256 697eb9c6c7401892dde4c1956e07a5de67a57af5d6d97c6e6946481b09d39591 dist.ini
+SHA256 e4575d4908e8401d34579729e5a1b15d583adfeb6d326a0fa58da47c76dbec96 doap.ttl
+SHA256 b82b4e523b0ba7b996c83b4f4a88c26cf36b52a2a5c821f6e613783a6f057f82 lib/no/warnings.pm
+SHA256 f66b59bb8ffa525b374bc6a573cf9f56416aa14cbe22863c35fc5dccfdca8602 t/00start.t
+SHA256 0e80dabe6084d0e084d9858fc42336ba83f4684a18f954901e1faec5e5fdb74f t/01basic.t
+SHA256 241f8516d04def191cd3a351b44795955242a7702f96f245444d368cf4c4a2e7 t/unit/no/warnings.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCZ9xAKwAKCRDOv4Eoaip9
+OeQ5AKCR/32I8ecNuaug91Beva4T2/8h1gCgnlC6eyQelnn7FJpcaPSo+4iVJ2M=
+=FmNu
+-----END PGP SIGNATURE-----

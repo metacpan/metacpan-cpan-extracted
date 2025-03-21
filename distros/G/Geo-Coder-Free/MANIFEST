@@ -23,8 +23,10 @@ lib/Geo/Coder/Free/DB/MaxMind/admin2.pm
 lib/Geo/Coder/Free/DB/MaxMind/cities.pm
 lib/Geo/Coder/Free/DB/OpenAddr.pm
 lib/Geo/Coder/Free/DB/openaddresses.pm
+lib/Geo/Coder/Free/DB/vwf_log.pm
 lib/Geo/Coder/Free/Display.pm
 lib/Geo/Coder/Free/Display/index.pm
+lib/Geo/Coder/Free/Display/meta_data.pm
 lib/Geo/Coder/Free/Display/query.pm
 lib/Geo/Coder/Free/Local.pm
 lib/Geo/Coder/Free/MaxMind.pm
@@ -80,6 +82,7 @@ t/vars.t
 t/version.t
 t/whosonfirst.t
 templates/default/Geo/Coder/Free/Display/index.tmpl
+templates/default/Geo/Coder/Free/Display/meta_data.tmpl
 templates/default/Geo/Coder/Free/Display/query.txt
 templates/fr/Geo/Coder/Free/Display/index.tmpl
 typhoon/openaddresses.ddl

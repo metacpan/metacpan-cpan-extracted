@@ -12,6 +12,7 @@ my @files = (
     'lib/App/SpreadRevolutionaryDate/BlueskyLite.pm',
     'lib/App/SpreadRevolutionaryDate/Config.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker/Gemini.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm',

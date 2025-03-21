@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat::Bot;
-$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.47';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Liberachat channels
 
 use Moose;
@@ -121,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat::Bot - Subclass overloading L<B
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 SEE ALSO
 
@@ -168,6 +168,8 @@ version 0.44
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

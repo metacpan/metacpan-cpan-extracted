@@ -37,10 +37,15 @@ App::Greple::charcode - greple module to annotate unicode character data
           --width[=#]  display width
            --utf8[=#]  display UTF-8 encoding
           --utf16[=#]  display UTF-16 encoding
-           --code[=#]  display unicode code point
+           --code[=#]  display Unicode code point
            --name[=#]  display character name
+            --nfd[=#]  display Unicode Normalization Form D
+            --nfc[=#]  display Unicode Normalization Form C
+           --nfkd[=#]  display Unicode Normalization Form KD
+           --nfkc[=#]  display Unicode Normalization Form KC
           --split[=#]  put annotattion for each character
         --alignto[=#]  align annotation to #
+
 
         --config KEY[=VALUE],...
 
@@ -50,7 +55,7 @@ App::Greple::charcode - greple module to annotate unicode character data
 
 # VERSION
 
-Version 0.9908
+Version 0.9909
 
 # DESCRIPTION
 
@@ -239,6 +244,12 @@ section for more information.
 
     Show the character code point in hex.
     Default `1`.
+
+- **nfd**, **nfc**, **nfkd**, **nfkc**
+- **--nfd**\[=_#_\], **--nfc**\[=_#_\], **--nfkd**\[=_#_\], **--nfkc**\[=_#_\]
+
+    Show the Unicode Normalization Form D, C, KD and KC.
+    See [Unicode::Normalize](https://metacpan.org/pod/Unicode%3A%3ANormalize).
 
 - **name**
 - **--name**\[=_#_\]

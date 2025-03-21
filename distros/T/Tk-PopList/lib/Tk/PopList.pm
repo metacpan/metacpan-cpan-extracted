@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -97,8 +97,6 @@ sub Populate {
 	$self->SUPER::Populate($args);
 
 	$self->{FE} = undef;
-	$self->{LIST} = [];
-	$self->{VALUES} = [];
 	
 	my $list = $self->Scrolled('HList',
 		-browsecmd => ['Select', $self],
@@ -242,12 +240,6 @@ sub popUp {
 
 	return if $self->ismapped;
 
-	my $values = $self->{VALUES};
-	my $list = $self->{LIST};
-	#this is a hack. doing it the crude way somehow gives crashes
-	while (@$list) { pop @$list }
-	push @$list, @$values;
-	
 	my $e;
 	if ($self->cget('-filter')) {
 		my $var = 'Filter';

@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '4.01';
+$File::Sticker::VERSION = '4.0101';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 4.01
+version 4.0101
 
 =head1 SYNOPSIS
 
@@ -300,7 +300,7 @@ sub delete_field_from_file {
     if (defined $scribe)
     {
         # Never delete readonly fields.
-        my $readonly_fields = $self->readonly_fields();
+        my $readonly_fields = $scribe->readonly_fields();
         if (exists $readonly_fields->{$field}
                 or defined $readonly_fields->{$field})
         {

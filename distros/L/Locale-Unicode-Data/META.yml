@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode-Data/issues
   repository: https://gitlab.com/jackdeguest/Locale-Unicode-Data
-version: v1.3.2
+version: v1.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

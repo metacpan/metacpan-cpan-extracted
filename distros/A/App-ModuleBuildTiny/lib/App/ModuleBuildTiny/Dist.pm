@@ -2,7 +2,7 @@ package App::ModuleBuildTiny::Dist;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 use CPAN::Meta;
 use Config;
@@ -19,7 +19,7 @@ use Module::Metadata 1.000037;
 use Pod::Escapes qw/e2char/;
 use Pod::Simple::Text 3.23;
 use POSIX 'strftime';
-
+use Text::ParseWords 'shellwords';
 
 use Env qw/@PERL5LIB @PATH/;
 
@@ -33,7 +33,7 @@ sub find {
 }
 
 sub mbt_version {
-	return '0.039';
+	return -f 'dynamic-prereqs.yml' ? '0.048' : '0.039';
 }
 
 sub prereqs_for {
@@ -276,6 +276,20 @@ sub new {
 			(resources      => \%resources) x!! %resources,
 			x_spdx_expression => $license->spdx_expression,
 		};
+
+		if (-e 'dynamic-prereqs.yml') {
+			$metahash->{prereqs}{configure}{requires}{'CPAN::Requirements::Dynamic'} //= '0.001';
+			my $dynamic_prereqs = load_jsonyaml('dynamic-prereqs.yml');
+			for my $expression (@{ $dynamic_prereqs->{expressions}}) {
+				$expression->{condition} = [ shellwords($expression->{condition}) ] unless ref $expression->{condition};
+				if (not ref $expression->{prereqs}) {
+					my ($module, $version) = shellwords($expression->{prereqs});
+					$version //= '0';
+					$expression->{prereqs} = { $module => $version };
+				}
+			}
+			$metahash->{x_dynamic_prereqs} = $dynamic_prereqs;
+		}
 		if (%{$mergedata}) {
 			require CPAN::Meta::Merge;
 			$metahash = CPAN::Meta::Merge->new(default_version => '2')->merge($metahash, $mergedata);

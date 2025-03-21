@@ -1,5 +1,5 @@
 # Alien::libsecp256k1
-A Perl interface to libsecp256k1.
+Perl builder for libsecp256k1.
 
 ## Code and documentation
 [Alien::libsecp256k1 on CPAN](https://metacpan.org/release/Alien-libsecp256k1)

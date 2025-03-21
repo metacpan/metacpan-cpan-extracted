@@ -1,5 +1,5 @@
 {
-   "abstract" : "Interface to libsecp256k1",
+   "abstract" : "Perl builder for libsecp256k1",
    "author" : [
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
@@ -13,6 +13,11 @@
       "version" : 2
    },
    "name" : "Alien-libsecp256k1",
+   "no_index" : {
+      "directory" : [
+         "libsecp256k1"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -26,6 +31,7 @@
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::Build::Plugin::Fetch::LocalDir" : "0.72",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -57,25 +63,14 @@
          "web" : "https://github.com/Perl-Bitcoin/Alien-libsecp256k1"
       }
    },
-   "version" : "0.050103",
+   "version" : "0.060000",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::cmake3" : "0.02",
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
-            "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
-            "Mozilla::CA" : "0",
-            "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "Config" : "0"
          },
          "system" : {}
       }

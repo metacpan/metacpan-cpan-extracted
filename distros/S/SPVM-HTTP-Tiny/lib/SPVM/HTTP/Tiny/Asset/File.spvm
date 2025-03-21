@@ -4,49 +4,229 @@
 class HTTP::Tiny::Asset::File extends HTTP::Tiny::Asset {
   version_from HTTP::Tiny;
   
+  use Sys::IO::Constant as IOC;
+  use File::Spec;
+  use File::Temp;
+  use File::Copy;
+  use Sys;
+  
   # Fields
-  has cleanup : byte;
+  has cleanup : ro byte;
   
-  has path : rw string;
+  has path : ro string;
   
-  has handle : IO::File;
+  has handle : ro IO::File;
+  
+  has tmpdir : string;
   
   # Class Methods
-  static method new : HTTP::Tiny::Asset::File () {
+  static method new : HTTP::Tiny::Asset::File ($options : object[] = undef) {
     
     my $self = new HTTP::Tiny::Asset::File;
+    
+    $self->init($options);
     
     return $self;
   }
   
-  use Sys::IO::Constant as IOC;
-  use File::Spec;
-  
   # Instance Methods
-  method handle : IO::File () {
-  
+  method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
+    my $options_h = Hash->new($options);
+    
+    if ($options_h->exists("cleanup")) {
+      $self->{cleanup} = (byte)$options_h->get_int("cleanup");
+    }
+    else {
+      $self->{cleanup} = 1;
+    }
+    
+    my $path = $options_h->get_or_default_string("path", undef);
+    my $handle = (IO::File)undef;
+    if ($path) {
+      if (Sys->e($path)) {
+        $handle = IO->open("<", $path);
+      }
+      else {
+        $handle = IO->open("+>>", $path);
+      }
+      
+      $self->{path} = $path;
+    }
+    else {
+      $self->{tmpdir} = File::Spec->tmpdir;
+      
+      my $tmp_file = File::Temp->new({DIR => $self->{tmpdir}, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
+      
+      $self->{path} = $tmp_file->filename;
+      
+      $handle = $tmp_file;
+      
+      $handle->open($self->{path}, "+>>");
+    }
+    
+    $self->{handle} = $handle;
+    
   }
   
-  method add_chunk : HTTP::Tiny::Asset ($chunk : string) {
+  method add_chunk : HTTP::Tiny::Asset::File ($chunk : string) {
+    
+    my $handle = $self->{handle};
+    
+    $handle->write($chunk);
+    
+    return $self;
   }
   
   method contains : int ($string : string) {
+    
+    my $handle = $self->{handle};
+    
+    my $start_range = $self->{start_range};
+    
+    if ($start_range < 0) {
+      $start_range = 0;
+    }
+    
+    $handle->seek($start_range, IOC->SEEK_SET);
+    
+    my $end = 0;
+    my $end_range = $self->{end_range};
+    if ($end_range < 0) {
+      $end_range = $self->size;
+    }
+    
+    my $len  = length $string;
+    my $size = 131072;
+    if ($len > $size) {
+      $size = $len;
+    }
+    
+    if ($size > $end_range - $start_range) {
+      $size = (int)($end_range - $start_range);
+    }
+    
+    my $offset = 0;
+    my $window_len = $len * 2;
+    my $window = new_string_len $window_len;
+    my $start_read_length = $handle->read($window, $len);
+    my $tmp_buffer = new_string_len $size;
+    my $window_string_length = $start_read_length;
+    while ($offset < $end_range) {
+      
+      my $diff = (int)($end_range - ($start_read_length + $offset));
+      unless ($diff < $size) {
+        $diff = $size;
+      }
+      
+      my $read_length = $handle->read($tmp_buffer, $diff);
+      $window_string_length += $read_length;
+      Fn->memcpy($tmp_buffer, 0, $window, $window_string_length, $read_length);
+      
+      # Search window
+      my $pos = Fn->index($window, $string, 0, $window_string_length);
+      
+      if ($pos >= 0) {
+        return $offset + $pos;
+      }
+      
+      if ($read_length == 0 || ($offset += $read_length) == $end_range) {
+        return -1;
+      }
+      
+      Fn->memmove($window, $offset, $window, 0, $read_length);
+    }
+    
+    return -1;
   }
   
   method get_chunk : string ($offset : long, $max : int = 131072) {
+    
+    my $start_range = $self->{start_range};
+    
+    if ($start_range >= 0) {
+      $offset += $start_range;
+    }
+    
+    my $handle = $self->{handle};
+    
+    $handle->seek($offset, IOC->SEEK_SET);
+    
+    my $buffer = new_string_len $max;
+    
+    my $end = $self->end_range;
+    
+    if ($end >= 0) {
+      
+      my $chunk_size = (int)($end + 1 - $offset);
+      
+      if ($chunk_size <= 0) {
+        $buffer = new_string_len 0;
+      }
+      else {
+        if ($chunk_size <= $max) {
+          $max = $chunk_size;
+        }
+        
+        my $read_length = $handle->read($buffer, $max);
+        Fn->shorten($buffer, $read_length);
+      }
+    }
+    else {
+      my $read_length = $handle->read($buffer, $max);
+      Fn->shorten($buffer, $read_length);
+    }
+    
+    return $buffer;
+  }
+  
+  method is_file : int () {
+    return 1;
   }
   
   method move_to : void ($file : string) {
+    
+    my $handle = $self->{handle};
+    
+    $handle->close;
+    $self->{handle} = undef;
+    
+    my $path = $self->{path};
+    
+    File::Copy->move($path, $file);
+    
+    $self->init({path => $file, cleanup => 0});
   }
   
   method size : long () {
+    
+    my $handle = $self->{handle};
+    
+    my $fd = $handle->fileno;
+    
+    my $stat = Sys->fstat($fd);
+    
+    my $size = $stat->st_size;
+    
+    return $size;
   }
   
   method slurp : string () {
+    
+    my $handle = $self->{handle};
+    
+    $handle->seek(0, IOC->SEEK_SET);
+    
+    my $content = $handle->getlines;
+    
+    return $content;
   }
   
   method to_file : HTTP::Tiny::Asset::File () {
-  
+    
+    return $self;
   }
   
 }

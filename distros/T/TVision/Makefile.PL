@@ -81,8 +81,7 @@ if (!$ldflags and !$cflags) {
 	    my $gccver = sprintf "%02d.%03d%03d", $1, $2, $3;
 	    if ($gccver>11) {
 		print "GCC version $gccver OK, do cmake\n";
-		`cmake -S ../tvision.git -B . -G "MinGW Makefiles"
-		    2>&1 > cmake-out.txt`;
+		`cmake -S ../tvision.git -B .  2>&1 > cmake-out.txt`;
 		print "do make\n";
 		`make 2>&1 > make-out.txt`;
 		$cflags = "-Itvision.git/include";

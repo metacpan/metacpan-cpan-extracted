@@ -3893,7 +3893,7 @@ sub unload_csv
     }
     elsif( !$self->_load_class( 'Text::CSV' ) )
     {
-        return( $self->error( "Text::CSV does not seem to ne installed." ) );
+        return( $self->error( "Text::CSV does not seem to be installed." ) );
     }
 
     $opts->{lock} //= 0;
@@ -7034,6 +7034,10 @@ Optional. Defaults to C<utf-8>.
 
 Specifies the encoding to apply when writing the file.
 
+=item * C<cols> or C<columns>
+
+Optional. An array reference specifying the order of columns for hash reference data. Defaults to sorted keys from the first row if C<headers> is not set.
+
 =item * C<headers>
 
 Optional Defines how headers should be handled:
@@ -7042,7 +7046,7 @@ Optional Defines how headers should be handled:
 
 =item * C<auto>
 
-Uses the keys of the first hash reference as headers.
+Uses the sorted keys of the first hash reference as headers.
 
 =item * C<ARRAY>
 

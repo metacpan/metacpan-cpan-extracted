@@ -31,7 +31,7 @@ subtest 'Object creation' => sub {
 # Test AUTOLOAD functionality
 subtest 'AUTOLOAD method' => sub {
 	my $config_obj = Geo::Coder::Free::Config->new(config => { test_key => 'test_value' });
-	
+
 	is($config_obj->test_key(), 'test_value', 'AUTOLOAD correctly retrieves a key-value pair');
 
 	is($config_obj->nonexistent_key(), undef, 'AUTOLOAD returns undef for non-existent keys');

@@ -5,7 +5,7 @@ use warnings;
 use App::ModuleBuildTiny;
 use File::Basename 'basename';
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 print_help() if ($ARGV[0] // 'help') eq 'help';
 
@@ -251,7 +251,43 @@ Initialize a git repository on minting.
 
 =head2 setup <type>
 
-Create or update your configuration file (at F<~/.mbtiny/config>). Takes one optional positional argument that can take any of the following values:
+Create or update your global configuration file (at F<~/.mbtiny/config>). Takes one optional positional argument that can take any of the following values:
+
+=over 4
+
+=item * update
+
+Ask about all configuration items that are currently empty. This is the default.
+
+=item * minimal
+
+Like update, but only asks questions that do not have a default (The author's name and email address).
+
+=item * all
+
+Ask about all configuration items, even if they currently have a value.
+
+=item * get <config_key>
+
+This shows the value of the given key.
+
+=item * set <config_key> <config_value>
+
+This sets the given key to the specified value.
+
+=item * list
+
+List your current configuration.
+
+=item * reset
+
+Remove the current configuration file.
+
+=back
+
+=head2 config <type>
+
+Update your distribution's configuration file. Takes one optional positional argument that can take any of the following values:
 
 =over 4
 
@@ -262,6 +298,18 @@ Ask about all configuration items that are currently empty. This is the default.
 =item * all
 
 Ask about all configuration items, even if they currently have a value.
+
+=item * get <config_key>
+
+This shows the value of the given key.
+
+=item * set <config_key> <config_value>
+
+This sets the given key to the specified value.
+
+=item * copy
+
+This copies the values from the global configuration into the distribution's configuration.
 
 =item * list
 

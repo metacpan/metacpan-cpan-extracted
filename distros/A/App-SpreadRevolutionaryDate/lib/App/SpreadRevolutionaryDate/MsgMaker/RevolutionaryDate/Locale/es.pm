@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.44';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.47';
 # ABSTRACT: Spanish localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
@@ -494,7 +494,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es - Spanish 
 
 =head1 VERSION
 
-version 0.44
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -545,6 +545,8 @@ This modules adds Spanish translations to L<DateTime::Calendar::FrenchRevolution
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::Telechat>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::Gemini>
 
 =back
 

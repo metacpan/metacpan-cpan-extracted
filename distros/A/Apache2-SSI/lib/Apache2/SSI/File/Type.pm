@@ -906,13 +906,13 @@ sub _magic_match
     # $io is the file handle of the file being inspected
     my( $item, $p_desc, $io ) = @_;
     
+    # $item could be undef if we ran into troubles while reading the entry.
+    return unless( defined( $item ) && ref( $item // '' ) eq 'ARRAY' );
+    
     # Delayed evaluation. If this is our first time considering this item, then parse out 
     # its structure. @$item is just the raw string, line number, and subtests until we 
     # need the real info. This saves time otherwise wasted parsing unused subtests.
     $item = $self->parse_magic_line( @$item ) if( @$item == 3 );
-    
-    # $item could be undef if we ran into troubles while reading the entry.
-    return unless( defined( $item ) );
     
     # $io is not defined if -c. That way we always return false for every item which 
     # allows reading/checking the entire magic file.

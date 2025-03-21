@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9909 2025-03-21T04:48:41Z
+
+    - add Unicode Normalization option (nfd, nfc, nfkd, nfdc)
+
 0.9908 2025-02-26T08:29:02Z
 
     - introduce --align-field option (using ansicolumn)

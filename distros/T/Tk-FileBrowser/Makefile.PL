@@ -13,7 +13,7 @@ WriteMakefile(
 		'Test::Tk' => '3.02',
 		'Tk' => '804.032',
 		'Tk::ITree' => '0.03',
-		'Tk::ListEntry' => '0.02',
+		'Tk::ListEntry' => '0.05',
 		'Tk::YADialog' => '0.05',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",

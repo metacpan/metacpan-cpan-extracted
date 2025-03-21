@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.3.2
+## Version v1.4.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2025/01/05
+## Modified 2025/03/21
 ## All rights reserved
 ## 
 ## 
@@ -36,10 +36,10 @@ BEGIN
         HAS_CONSTANTS => ( version->parse( $DBD::SQLite::VERSION ) >= 1.48 ? 1 : 0 ),
         MISSING_AUTO_UTF8_DECODING => ( version->parse( $DBD::SQLite::VERSION ) < 1.68 ? 1 : 0 ),
     };
-    our $CLDR_VERSION = '45.0';
+    our $CLDR_VERSION = '47.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.3.2';
+    our $VERSION = 'v1.4.0';
 };
 
 use strict;
@@ -4905,7 +4905,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.3.2
+    v1.4.0
 
 =head1 DESCRIPTION
 

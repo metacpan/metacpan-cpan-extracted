@@ -14,7 +14,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( walk );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $TOP = 1;
 our %SEEN;

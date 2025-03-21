@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9908";
+our $VERSION = "0.9909";
 
 =encoding utf-8
 
@@ -44,10 +44,15 @@ App::Greple::charcode - greple module to annotate unicode character data
         --width[=#]  display width
          --utf8[=#]  display UTF-8 encoding
         --utf16[=#]  display UTF-16 encoding
-         --code[=#]  display unicode code point
+         --code[=#]  display Unicode code point
          --name[=#]  display character name
+          --nfd[=#]  display Unicode Normalization Form D
+          --nfc[=#]  display Unicode Normalization Form C
+         --nfkd[=#]  display Unicode Normalization Form KD
+         --nfkc[=#]  display Unicode Normalization Form KC
         --split[=#]  put annotattion for each character
       --alignto[=#]  align annotation to #
+
 
       --config KEY[=VALUE],...
 
@@ -57,7 +62,7 @@ App::Greple::charcode - greple module to annotate unicode character data
 
 =head1 VERSION
 
-Version 0.9908
+Version 0.9909
 
 =head1 DESCRIPTION
 
@@ -260,6 +265,13 @@ Default C<0>.
 Show the character code point in hex.
 Default C<1>.
 
+=item B<nfd>, B<nfc>, B<nfkd>, B<nfkc>
+
+=item B<--nfd>[=I<#>], B<--nfc>[=I<#>], B<--nfkd>[=I<#>], B<--nfkc>[=I<#>]
+
+Show the Unicode Normalization Form D, C, KD and KC.
+See L<Unicode::Normalize>.
+
 =item B<name>
 
 =item B<--name>[=I<#>]
@@ -386,6 +398,10 @@ our $config = Getopt::EX::Config->new(
     width   => 0,
     utf8    => 0,
     utf16   => 0,
+    nfd     => 0,
+    nfc     => 0,
+    nfkd    => 0,
+    nfkc    => 0,
     code    => 0,
     name    => 1,
     split   => \$App::Greple::annotate::config->{split},
@@ -414,6 +430,7 @@ sub finalize {
 }
 
 use Unicode::UCD qw(charinfo);
+use Unicode::Normalize;
 
 sub charname {
     local $_ = @_ ? shift : $_;
@@ -441,6 +458,16 @@ sub encode {
     local *_ = @_ ? \$_[0] : \$_;
     Encode::encode($code, $_) =~ s/(.)/code($1)/ger;
 }
+
+sub normalize {
+    my $sub = shift;
+    local *_ = @_ ? \$_[0] : \$_;
+    $sub->($_);
+}
+sub nfd  { charcode normalize \&NFD  => @_ }
+sub nfc  { charcode normalize \&NFC  => @_ }
+sub nfkd { charcode normalize \&NFKD => @_ }
+sub nfkc { charcode normalize \&NFKC => @_ }
 
 sub code {
     state $format = [ qw(\x{%02x} \x{%04x}) ];
@@ -484,14 +511,18 @@ sub width {
 sub describe {
     (my $column, local $_) = { @_ }->@{ qw(column match) };
     my @s;
-    push @s, sprintf        '%3d' , $column  if $config->{column};
-    push @s, sprintf        '%s'  , visible  if $config->{visible};
-    push @s, sprintf  'char="%s"' , $_       if $config->{char};
-    push @s, sprintf     'w=%d'   , width    if $config->{width};
-    push @s, sprintf  'utf8=%s'   , utf8     if $config->{utf8};
-    push @s, sprintf 'utf16=%s'   , utf16    if $config->{utf16};
-    push @s, sprintf  'code=%s'   , charcode if $config->{code};
-    push @s, sprintf  'name=%s'   , charname if $config->{name};
+    push @s, sprintf qw'       %3d ' , $column  if $config->{column};
+    push @s, sprintf qw'       %s  ' , visible  if $config->{visible};
+    push @s, sprintf qw' char="%s" ' , $_       if $config->{char};
+    push @s, sprintf qw'     w=%d  ' , width    if $config->{width};
+    push @s, sprintf qw'  utf8=%s  ' , utf8     if $config->{utf8};
+    push @s, sprintf qw' utf16=%s  ' , utf16    if $config->{utf16};
+    push @s, sprintf qw'   nfd=%s  ' , nfd      if $config->{nfd};
+    push @s, sprintf qw'   nfc=%s  ' , nfc      if $config->{nfc};
+    push @s, sprintf qw'  nfkd=%s  ' , nfkd     if $config->{nfkd};
+    push @s, sprintf qw'  nfkc=%s  ' , nfkc     if $config->{nfkc};
+    push @s, sprintf qw'  code=%s  ' , charcode if $config->{code};
+    push @s, sprintf qw'  name=%s  ' , charname if $config->{name};
     join "\N{NBSP}", @s;
 }
 

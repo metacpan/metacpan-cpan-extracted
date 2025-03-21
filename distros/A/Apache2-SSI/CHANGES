@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::SSI
 
+v0.2.11 2025-03-21T09:51:38+0900
+    - Missing distribution signature
+
 v0.2.10 2024-09-05T14:03:06+0900
     - Removed overlooked dependency
 

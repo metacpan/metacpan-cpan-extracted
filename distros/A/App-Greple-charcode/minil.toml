@@ -10,3 +10,6 @@ branch = "main"
 os = [
     "MSWin32",
 ]
+
+[FileGatherer]
+exclude_match = [ '^images/.*' ]

@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9908";
+our $VERSION = "0.9909";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ B<greple> B<-Mannotate> [ I<module option> ] -- [ I<command option> ] ...
 
 =head1 VERSION
 
-Version 0.9908
+Version 0.9909
 
 =head1 DESCRIPTION
 
@@ -342,22 +342,21 @@ sub _prepare {
 			substr($indent, $start) = '';
 		    }
 		}
+		my $marker = sub {
+		    my($head, $match) = @_;
+		    sprintf("%s%s%s\N{NBSP}%s",
+			    $indent, $head, '─',
+			    $ANNOTATE->(column => $start, match => $match));
+		};
 		$current->push( do {
-		    my $maker = sub {
-			my($head, $match) = @_;
-			sprintf("%s%s%s\N{NBSP}%s",
-				$indent, $head, '─',
-				$ANNOTATE->(column => $start, match => $match));
-		    };
 		    if ($config->{split}) {
 			map {
-			    my $out = $maker->($head, $_);
+			    my $out = $marker->($head, $_);
 			    $head = '├';
 			    Local::Annon->new($start, $end, $out);
-			}
-			$slice =~ /./sg;
+			} $slice =~ /./sg;
 		    } else {
-			Local::Annon->new($start, $end, $maker->($head, $slice));
+			Local::Annon->new($start, $end, $marker->($head, $slice));
 		    }
 		} );
 	    }

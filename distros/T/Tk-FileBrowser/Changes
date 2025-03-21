@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.11  Fri Mar 21 2025
+	- Removed annoying print statement.
+
 0.10  Mon Mar 17 2025
 	- Fixed annoyance with the ListEntry widget.
 

@@ -8,6 +8,7 @@ use warnings;
 use Geo::Coder::Free;	# for _abbreviate
 use Geo::Coder::Free::DB::OpenAddr;	# SQLite database
 use Geo::Coder::Free::DB::openaddresses;	# The original CSV files
+use Geo::Hash;
 use Geo::Location::Point;
 use Module::Info;
 use Carp;
@@ -47,11 +48,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -958,6 +959,10 @@ sub _get {
 		);
 	$self->{openaddr_db} = $openaddr_db;
 	my $rc = $openaddr_db->fetchrow_hashref(md5 => $digest);
+	if($rc && defined($rc->{'geohash'})) {
+		$self->{'geo_hash'} ||= Geo::Hash->new();
+		($rc->{'latitude'}, $rc->{'longitude'}) = $self->{'geo_hash'}->decode($rc->{'geohash'});
+	}
 	if($rc && defined($rc->{'lat'})) {
 		$rc->{'latitude'} = delete $rc->{'lat'};
 		$rc->{'longitude'} = delete $rc->{'lon'};

@@ -1,9 +1,11 @@
 Revision History for File-Sticker
 =================================
 
-v4.01 2025-03-17
-----------------
+v4.0101 2025-03-21
+------------------
 
+* 2025-03-21 08:22:31 +1100
+  fixed bug with field deletion
 * 2025-03-17 06:46:16 +1100
   Fixing a bug with Exif
 

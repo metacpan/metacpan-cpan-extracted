@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Interface to libsecp256k1",
+  "ABSTRACT" => "Perl builder for libsecp256k1",
   "AUTHOR" => "Bartosz Jarzyna <bbrtj.pro\@gmail.com>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "Alien::Build" => "1.19",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::CMake" => "0.99",
+    "Alien::Build::Plugin::Fetch::LocalDir" => "0.72",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-libsecp256k1",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.050103",
+  "VERSION" => "0.060000",
   "test" => {
     "TESTS" => "t/*.t"
   }
