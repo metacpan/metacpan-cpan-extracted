@@ -20,7 +20,7 @@ my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
 
 my @FILES = map { File::Spec->catfile(qw(t data), $_) } qw(
 	gpl3.epub gpl3.fb2 gpl3.html gpl3.mobi gpl3.pdb gpl3.txt gpl3.xhtml
-	gpl3.ztxt gpl3.pdf gpl3.cbr  gpl3.cbz  gpl3.cb7 web2help.chm
+	gpl3.ztxt gpl3.pdf gpl3.cbr  gpl3.cbz  gpl3.cb7 web2help.chm gpl3.azw3
 );
 
 my %IMAGES = (
@@ -37,6 +37,7 @@ my %IMAGES = (
 	cbz   => 28,
 	cb7   => 28,
 	chm   => 2,
+	azw3  => 2,
 );
 
 my $tmpimg = do {

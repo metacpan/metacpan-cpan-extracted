@@ -64,17 +64,11 @@ subtest "Mobi header data ok" => sub {
 
 };
 
-TODO: {
-
-	local $TODO = 'Mobi text decode length does not agree with PalmDoc header text length';
-
-	is(
-		length(join('', map { $ebook->_decode_record($_) } 0 .. $ebook->{_recnum} - 1)),
-		$ebook->{_textlen},
+is(
+	length(join('', map { $ebook->_decode_record($_) } 0 .. $ebook->{_recnum} - 1)),
+	$ebook->{_textlen},
 		"text decoding ok"
-	);
-
-}
+);
 
 is_deeply(
 	$ebook->metadata,

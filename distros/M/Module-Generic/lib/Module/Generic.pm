@@ -1,7 +1,7 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.39.1
+## Version v0.40.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.39.1';
+    our $VERSION     = 'v0.40.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -9500,7 +9500,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.39.1
+    v0.40.0
 
 =head1 DESCRIPTION
 

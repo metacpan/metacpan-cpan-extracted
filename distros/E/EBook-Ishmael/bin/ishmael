@@ -39,6 +39,8 @@ B<ishmael> currently supports the following ebook formats:
 
 =item MOBI
 
+=item AZW3/KF8
+
 =item AZW
 
 =item HTML/XHTML
@@ -108,6 +110,8 @@ heuristics, manually specify the format. The following are valid options
 
 =item mobi
 
+=item kf8 (or azw3)
+
 =item azw
 
 =item palmdoc
@@ -144,7 +148,7 @@ can get put a C<.*> (dot asterisk) at the end of the path name, which B<ishmael>
 will substitute for the the image's format suffix.
 
   # Could create foo.jpg, foo.png, foo.gif, etc.
-  ishmael -c ebook.epub foo.*
+  ishmael -c ebook.epub 'foo.*'
 
 =item B<-g>|B<--image>
 
@@ -177,9 +181,6 @@ to use for the dumped metadata. The following are valid I<form>s.
 =back
 
 The default I<form> is C<ishmael>.
-
-Something important to note about the metadata dump is that no field is
-guaranteed to have a consistent format across different ebook formats.
 
 =item B<-r>|B<--raw>
 
@@ -214,6 +215,13 @@ L<grep(1)> for a specific pattern in an ebook.
 Name of dumper program to use by default.
 
 =back
+
+=head1 CAVEATS
+
+When dumping ebook metadata, the format of a given field can differ between
+different ebook formats. For example, the C<Created> field could potentially be
+in the C<YYYY-MM-DD> format, C<DD.MM.YYYY> format, etc. Special care should be
+taken if you intend to process these fields across different formats.
 
 =head1 RESTRICTIONS
 

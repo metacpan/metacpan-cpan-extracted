@@ -8,13 +8,9 @@ use Devel::Walk ();
 require Exporter;
 
 our @ISA = qw(Exporter);
-
-our %EXPORT_TAGS = ( 'all' => [ qw( check ) ] );
-
+our %EXPORT_TAGS = ( 'all' => [ qw( unstorable ) ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
 our @EXPORT = qw( unstorable );
-
 our $VERSION = '0.02';
 
 ###############################################

@@ -258,7 +258,7 @@ sub _make_abs
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -306,7 +306,7 @@ This instantiates an object that is used to access other key methods. It takes t
 
 =over 4
 
-=item I<apache_request>
+=item C<apache_request>
 
 This is the L<Apache2::RequestRec> object that is provided if running under mod_perl.
 
@@ -339,6 +339,10 @@ Sets or gets the base directory to be used as a reference to the files provided 
     # This would now be /home/joe/www/index.html
     $f->filename;
 
+=head2 base_file
+
+Returns the base file for this file object.
+
 =head2 clone
 
 Create a clone of the object and return it.
@@ -366,6 +370,10 @@ If a new file name is provided, under Apache/mod_perl2, this will perform a quer
 
 Any filename provided will be resolved with its dots flattened and transformed into an absolute system file path if it is not already.
 
+=head2 filepath
+
+Returns the file path for this file object.
+
 =head2 finfo
 
 Returns a L<Apache2::SSI::Finfo> object. This provides access to L<perlfunc/stat> information as methods, taking advantage of L<APR::Finfo> when running under Apache, and an identical interface otherwise. See L<Apache2::SSI::Finfo> for more information.
@@ -385,7 +393,7 @@ it takes an hash reference of parameters:
 
 =over 4
 
-=item I<binmode>
+=item C<binmode>
 
     my $content = $uri->slurp({ binmode => ':utf-8' });
 

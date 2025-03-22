@@ -7,7 +7,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = 'v0.10.0'; # VERSION
+our $VERSION = 'v0.11.0'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -757,6 +757,12 @@ sub _fix_indent($self, $node, $fix, $offset) {
         }
         else {
             unless ($line =~ tr/ //c) {
+                next;
+            }
+            my $offset1 = $offset - 1;
+            # lines with comments should only be indented if the comment starts
+            # at the original offset or after
+            if ($offset > 0 and $line =~ m/^ {0,$offset1}\#/) {
                 next;
             }
             substr($line, $offset, 0, ' ' x $fix);

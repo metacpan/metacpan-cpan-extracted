@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.0.0
+#                   and LibVirt version v11.1.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Domain v0.0.16;
+package Sys::Async::Virt::Domain v0.0.17;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.16;
+use Protocol::Sys::Virt::Remote::XDR v0.0.17;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -178,6 +178,7 @@ use constant {
     MIGRATE_PARAM_PERSIST_XML                 => "persistent_xml",
     MIGRATE_PARAM_BANDWIDTH                   => "bandwidth",
     MIGRATE_PARAM_BANDWIDTH_POSTCOPY          => "bandwidth.postcopy",
+    MIGRATE_PARAM_BANDWIDTH_AVAIL_SWITCHOVER  => "bandwidth.avail.switchover",
     MIGRATE_PARAM_GRAPHICS_URI                => "graphics_uri",
     MIGRATE_PARAM_LISTEN_ADDRESS              => "listen_address",
     MIGRATE_PARAM_MIGRATE_DISKS               => "migrate_disks",
@@ -671,6 +672,7 @@ use constant {
     AUTHORIZED_SSH_KEYS_SET_REMOVE            => (1 << 1),
     MESSAGE_DEPRECATION                       => (1 << 0),
     MESSAGE_TAINTING                          => (1 << 1),
+    MESSAGE_IOERRORS                          => (1 << 2),
     DIRTYRATE_UNSTARTED                       => 0,
     DIRTYRATE_MEASURING                       => 1,
     DIRTYRATE_MEASURED                        => 2,
@@ -1736,7 +1738,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.0.16
+v0.0.17
 
 =head1 SYNOPSIS
 
@@ -3266,6 +3268,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item MIGRATE_PARAM_BANDWIDTH_POSTCOPY
 
+=item MIGRATE_PARAM_BANDWIDTH_AVAIL_SWITCHOVER
+
 =item MIGRATE_PARAM_GRAPHICS_URI
 
 =item MIGRATE_PARAM_LISTEN_ADDRESS
@@ -4251,6 +4255,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item MESSAGE_DEPRECATION
 
 =item MESSAGE_TAINTING
+
+=item MESSAGE_IOERRORS
 
 =item DIRTYRATE_UNSTARTED
 

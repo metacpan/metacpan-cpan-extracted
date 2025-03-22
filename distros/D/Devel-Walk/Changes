@@ -1,5 +1,9 @@
 Revision history for Perl extension Devel::Walk.
 
+0.03  Mar 21 14:14 2025
+    - Detect circular references in a structure thanks to Scalar::Util::refaddr
+        - Thank you Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
 0.02  Mar 20 14:37 2025
     - More doco
     - Tweak Makefile.PL

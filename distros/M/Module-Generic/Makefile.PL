@@ -93,7 +93,7 @@ WriteMakefile(
     MIN_PERL_VERSION    => 'v5.28.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
-    clean               => { FILES => 'Module-Generic-*' },
+    clean               => { FILES => 't/test_empty.csv t/test_out.csv' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,

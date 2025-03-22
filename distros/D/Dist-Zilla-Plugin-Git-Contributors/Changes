@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Git-Contributors
 
+0.038     2025-03-22 02:43:40Z
+          - fix an incorrect use of Path::Tiny in a test
+
 0.037     2024-02-18 23:50:16Z
           - also check for duplicate names; print the duplicate emails or
             names found

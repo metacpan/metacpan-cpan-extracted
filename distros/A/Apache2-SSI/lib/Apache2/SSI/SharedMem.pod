@@ -129,23 +129,23 @@ This instantiates a shared memory object. It takes the following parameters:
 
 =over 4
 
-=item I<debug>
+=item C<debug>
 
 A debug value will enable debugging output (equal or above 3 actually)
 
-=item I<create>
+=item C<create>
 
 A boolean value to indicate whether the shared memory block should be created if it does not exist. Default to false.
 
-=item I<destroy>
+=item C<destroy>
 
 A boolean value to indicate if the shared memory block should be removed when the object is destroyed. See L<perlmod> for more about object destruction.
 
-=item I<exclusive>
+=item C<exclusive>
 
 A boolean value to set the shared memory as exclusive. This will affect the flags set by L</flags> which are used by L</open>.
 
-=item I<key>
+=item C<key>
 
 The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE>
 
@@ -157,7 +157,7 @@ Otherwise, if you provide a key as string, the characters in the string will be 
 
 Either way, the resulting value is used to create a shared memory segment and a semaphore by L</open>.
 
-=item I<mode>
+=item C<mode>
 
 The octal mode value to use when opening the shared memory block.
 
@@ -165,7 +165,7 @@ Shared memory are owned by system users and access to shared memory segment is r
 
 If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
 
-=item I<size>
+=item C<size>
 
 The size in byte of the shared memory.
 
@@ -217,7 +217,7 @@ Set or get the boolean value to affect the open flags in exclusive mode.
 
 =head2 exists
 
-Checks if the shared memory identified with I<key> exists.
+Checks if the shared memory identified with C<key> exists.
 
 It takes the same arguments as L</open> and returns 1 if the shared memory exists or 0 otherwise.
 
@@ -360,7 +360,7 @@ Return the L<semaphore|https://en.wikipedia.org/wiki/Semaphore_(programming)> id
 
 Returns the serial number used to create or access the shared memory segment.
 
-This serial is created based on the I<key> parameter provided either upon object instantiation or upon using the L</open> method.
+This serial is created based on the C<key> parameter provided either upon object instantiation or upon using the L</open> method.
 
 The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
 

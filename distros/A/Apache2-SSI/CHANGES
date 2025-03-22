@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::SSI
 
+v0.2.12 2025-03-21T22:41:42+0900
+    - Correcting infinite recursion
+
 v0.2.11 2025-03-21T09:51:38+0900
     - Missing distribution signature
 

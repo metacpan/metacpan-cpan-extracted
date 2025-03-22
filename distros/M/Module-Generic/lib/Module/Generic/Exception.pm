@@ -426,10 +426,10 @@ Module::Generic::Exception - Generic Module Exception Class
         subroutine => 'customer_info',
         # Some optional discretionary metadata hash reference
         cause =>
-            {
+        {
             object => $some_object,
             payload => $raw_data,
-            },
+        },
     });
 
 or, providing a list of string that will be concatenated:

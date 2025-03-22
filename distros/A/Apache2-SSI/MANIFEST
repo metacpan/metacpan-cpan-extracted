@@ -16,7 +16,6 @@ lib/Apache2/SSI/URI.pm
 LICENSE
 Makefile.PL
 MANIFEST
-MANIFEST.SKIP
 README
 README.md
 scripts/startup.pl

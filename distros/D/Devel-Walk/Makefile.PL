@@ -8,6 +8,7 @@ WriteMakefile(
     PREREQ_PM         => {
                 Storable => 3,
                 IO::File => 1,
+                Scalar::Util => 1,
             },
     ABSTRACT_FROM     => 'lib/Devel/Walk.pm', # retrieve abstract from module
     AUTHOR            => 'Philip Gwyn <perl -at- pied.nu>',

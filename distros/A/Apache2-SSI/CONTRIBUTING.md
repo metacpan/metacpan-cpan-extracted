@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Apache2-SSI) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://gitlab.com/jackdeguest/Apache2-SSI/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Apache2-SSI)
+Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackdeguest/Apache2-SSI/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-Expression-v0.1.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-Expression-v0.1.0/README.md)
 
 ## Author
 

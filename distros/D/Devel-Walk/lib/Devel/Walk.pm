@@ -4,17 +4,16 @@ use 5.010000;
 use strict;
 use warnings;
 
+use Scalar::Util qw( refaddr );
+
 require Exporter;
 
 our @ISA = qw(Exporter);
-
 our %EXPORT_TAGS = ( 'all' => [ qw( walk unstorable ) ] );
-
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
 our @EXPORT = qw( walk );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $TOP = 1;
 our %SEEN;
@@ -22,34 +21,40 @@ our %SEEN;
 sub walk
 {
     my( $obj, $sub, $loc ) = @_;
+    # Thank you for pointing out tobyink@cpan.org
+    my $addr = refaddr( $obj );
+
     $loc ||= '$o';
     return unless $sub->($loc, $obj);
-    # return if defined $obj and $SEEN{ $obj };
 
     my $r = ref $obj;
     return unless $r;
-    $loc .= "->" if $TOP;
+    return if $SEEN{$addr};
+
+    # warn "$loc is $r";
+
+    my $was_top = $TOP;
     local $TOP = 0;
-    # 2025-03 - It would be tempting to do this.  The problem is that
-    # $SEEN{$obj} will stringify $obj, which could be overloaded.  Same applies
-    # to $SEEN{0+$obj}
-    # local $SEEN{ $obj } = 1;
     if( 'HASH' eq $r ) {
+        local $SEEN{ $addr } = 1;
+        $loc .= "->" if $was_top;
         foreach my $key ( keys %$obj ) {
             walk( $obj->{$key}, $sub, $loc."{$key}" );
         }
     }
     elsif( 'ARRAY' eq $r ) {
+        local $SEEN{ $addr } = 1;
+        $loc .= "->" if $was_top;
         for( my $q=0; $q<=$#$obj; $q++ ) {
             walk( $obj->[$q], $sub, $loc."[$q]" );
         }
     }
     elsif( 'REF' eq $r or 'SCALAR' eq $r ) {
+        local $SEEN{ $addr } = 1;
         walk( $$obj, $sub, "\$\${$loc}" );
     }
-}
 
-# use v5.16;
+}
 
 
 1;
@@ -110,14 +115,22 @@ current context.
 Example : "$o->{top}{second}[3]"
 
 If C<$sub> returns true, recursion will happen on that reference.  If
-C<$sub> returns false, recursion ends.  This is the only way to break
-recursion if your structure contains circular references.
+C<$sub> returns false, recursion ends.  
 
-For example, the following will never exit:
+Devel::Walk will stop recursing when it detects circular references in your
+data structure.  For example, in the following code, C<$foo> will be seen
+first, so we don't walk through C<$foo->{foo}>.
 
-    my $foo = {};
+    my $foo = {biff=>1};
     $foo->{foo} = $foo;
     walk( $foo, sub { print "$_[0]\n"; 1 }, '$foo' );
+
+Will only output:
+
+    $foo
+    $foo->{foo}
+    $foo->{biff}
+
 
 =head1 SEE ALSO
 

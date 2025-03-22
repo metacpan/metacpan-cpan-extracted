@@ -29,11 +29,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -651,8 +651,9 @@ sub DESTROY {
 							$self->{logger}->debug("Create paths to $sdir");
 						}
 						File::Path::make_path($sdir);
-						my $file = $self->{info}->as_string();
+						my $file = $self->{'info'}->as_string();
 						$file =~ tr/\//_/;
+						$file =~ s/\s//g;
 						my $path = File::Spec->catfile($sdir, "$file.html");
 						if($path =~ /^(.+)$/) {
 							$path = $1;	# Untaint
@@ -1446,7 +1447,7 @@ sub _should_gzip {
 		}
 		my $accept = lc($ENV{'HTTP_ACCEPT_ENCODING'} ? $ENV{'HTTP_ACCEPT_ENCODING'} : $ENV{'HTTP_TE'});
 		foreach my $method(split(/,\s?/, $accept)) {
-			if(($method eq 'gzip') || ($method eq 'x-gzip') || ($method eq 'br')) {
+			if(($method eq 'gzip') || ($method eq 'x-gzip') || ($method eq 'br') || ($method eq 'zstd')) {
 				return $method;
 			}
 		}
@@ -1498,6 +1499,25 @@ sub _compress()
 			}
 			unless(grep(/^Vary: Accept-Encoding/, @{$self->{o}})) {
 				push @{$self->{o}}, 'Vary: Accept-Encoding';
+			}
+		}
+	} elsif($encoding eq 'zstd') {
+		# Facebook
+		if(eval { require Compress::Zstd; 1 }) {
+			my $compressed_body = Compress::Zstd::compress(\Encode::_encode_utf8($self->{'body'}));
+			if(length($compressed_body) < length($self->{'body'})) {
+				$self->{'body'} = $compressed_body;
+				unless(grep(/^Content-Encoding: zstd/, @{$self->{o}})) {
+					push @{$self->{o}}, 'Content-Encoding: zstd';
+				}
+				unless(grep(/^Vary: Accept-Encoding/, @{$self->{o}})) {
+					push @{$self->{o}}, 'Vary: Accept-Encoding';
+				}
+			}
+		} else {
+			$self->{status} = 406;
+			if($self->{'info'}) {
+				$self->{'info'}->status(406);
 			}
 		}
 	} elsif($encoding eq 'br') {
@@ -1800,7 +1820,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2024 Nigel Horne,
+The rest of the program is Copyright 2015-2025 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

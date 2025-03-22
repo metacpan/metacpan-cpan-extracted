@@ -19,7 +19,7 @@ use Devel::PDB::Source;
 
 use vars qw(*dbline $usercontext $db_stop $ini_warn);
 
-our $VERSION = '1.6';
+our $VERSION = '1.7';
 
 our $single;
 our $sub;
@@ -2058,8 +2058,9 @@ sub DB {
 
         for (my ($i, $j) = (0, 0); $i < $count; $i++) {
             my $sv = $names[$i];
-            next if class($sv) eq 'SPECIAL';
+            next if class($sv) eq 'SPECIAL' || class($vals[$i]) eq "SPECIAL";
             my $name = $sv->PVX;
+            next unless length($name);
             $Data::Dumper::Indent   = 0;
             $Data::Dumper::Maxdepth = 2;
             my $val = Dumper $vals[$i]->object_2svref;

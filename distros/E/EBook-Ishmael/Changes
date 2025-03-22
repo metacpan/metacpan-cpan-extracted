@@ -1,5 +1,12 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.03  Mar 21 2025
+  - Add support for the KF8/AZW3 ebook format.
+  - Fix raw text dumping in Mobis.
+  - Fix Mobi HTML cleanup.
+  - ishmael verifies Mobi image records actually contain image data.
+  - Fix PalmDoc decoding errors.
+
 1.02  Mar 14 2025
   - Do not try to unzip CBZ archives to symlinked temporary directories.
     Primarily an issue with Darwin platforms.

@@ -225,7 +225,7 @@ sub slurp_utf8
 
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8

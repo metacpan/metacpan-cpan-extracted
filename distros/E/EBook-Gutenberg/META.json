@@ -39,7 +39,7 @@
             "File::Temp" : "0.10",
             "Getopt::Long" : "0",
             "JSON::PP" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "Text::CSV_XS" : "0",
             "perl" : "5.016"
          }
@@ -65,6 +65,6 @@
          "web" : "https://codeberg.org/1-1sam/gutenberg"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

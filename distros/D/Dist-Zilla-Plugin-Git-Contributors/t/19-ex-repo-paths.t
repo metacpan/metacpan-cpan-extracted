@@ -23,9 +23,8 @@ use GitSetup;
 #          -> lib
 #             -> Foo.pm
 
-my $tempdir = no_git_tempdir();
-$tempdir->mkpath('repo_root');
-my $repo_root = $tempdir->child('repo_root');
+my $repo_root = no_git_tempdir()->child('repo_root');
+$repo_root->mkpath;
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {

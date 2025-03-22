@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
         'File::Spec' => '0',
         'File::Temp' => '0.10',
         'JSON::PP' => '0',
-        'List::Util' => '0',
+        'List::Util' => '1.33',
         'Text::CSV_XS' => '0',
     },
     EXE_FILES => [

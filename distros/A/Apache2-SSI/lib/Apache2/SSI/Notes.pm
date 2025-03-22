@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Notes.pm
-## Version v0.1.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2024/09/04
+## Modified 2025/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     # 512Kb
     use constant MAX_SIZE => 524288;
     use Apache2::SSI::SharedMem ':all';
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -186,7 +186,7 @@ sub write_mem
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -235,7 +235,7 @@ Apache2::SSI::Notes - Apache2 Server Side Include Notes
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -265,11 +265,11 @@ This instantiates a notes object. It takes the following parameters:
 
 =over 4
 
-=item I<debug>
+=item C<debug>
 
 A debug value will enable debugging output (equal or above 3 actually)
 
-=item I<size>
+=item C<size>
 
 The fixed size of the memory allocation. It defaults to 524,288 bytes which is 512 Kb, which should be ample enough.
 
@@ -318,6 +318,10 @@ Or maybe
 
     print( "API id is ", $notes->get->{api}, "\n" );
 
+=head2 key
+
+Set or get the shared memory key value.
+
 =head2 read_mem
 
 Access the shared memory and return the hash reference stored.
@@ -327,6 +331,10 @@ If an error occurred, C<undef()> is returned and an L<Module::Generic/error> is 
     die( $notes->error );
 
 Be careful however, that L</get> may return C<undef()> not because an error would have occurred, but because this is the value you would have previously set.
+
+=head2 remove
+
+Removes the shared memory for this note.
 
 =head2 set
 
@@ -351,6 +359,10 @@ This should really not be changed. If you do want to change it, you first need t
     $notes->shem->remove;
 
 And then create a new L<Apache2::SSI::Notes> object with a different size parameter value.
+
+=head2 supported
+
+Returns true if shared memory is supported, or false otherwise.
 
 =head2 unset
 

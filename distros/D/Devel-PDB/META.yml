@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Devel-PDB
-version:      1.6
+version:      1.7
 version_from: lib/Devel/PDB.pm
 installdirs:  site
 requires:

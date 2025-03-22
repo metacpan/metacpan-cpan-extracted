@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.11
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.2.12
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
 ## Modified 2025/03/21
@@ -66,7 +66,7 @@ BEGIN
     use Scalar::Util ();
     use URI;
     use version;
-    our $VERSION = 'v0.2.11';
+    our $VERSION = 'v0.2.12';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     # As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -207,15 +207,7 @@ sub ap2perl_expr
     my $ref  = shift( @_ );
     my $buf  = shift( @_ );
     return( [] ) if( ref( $ref ) ne 'HASH' );
-    my $opts = {};
-    if( @_ )
-    {
-        $opts = ref( $_[0] ) eq 'HASH'
-            ? shift( @_ )
-            : !( @_ % 2 )
-                ? { @_ }
-                : {};
-    }
+    my $opts = $self->_get_args_as_hash( @_ );
     $opts->{skip} = [] if( !exists( $opts->{skip} ) );
     $opts->{top} = 0 if( !exists( $opts->{top} ) );
     $opts->{embedded} = 0 if( !exists( $opts->{embedded} ) );
@@ -230,23 +222,23 @@ sub ap2perl_expr
 
     my $map_binary =
     {
-    '='     => 'eq',
-    '=='    => 'eq',
-    '!='    => 'ne',
-    '<'     => 'lt',
-    '<='    => 'le',
-    '>'     => 'gt',
-    '>='    => 'ge',
+        '='     => 'eq',
+        '=='    => 'eq',
+        '!='    => 'ne',
+        '<'     => 'lt',
+        '<='    => 'le',
+        '>'     => 'gt',
+        '>='    => 'ge',
     };
     # In perl, this is inverted, operators used for integers are used for strings and vice versa
     my $map_integer =
     {
-    'eq'    => '==',
-    'ne'    => '!=',
-    'lt'    => '<',
-    'le'    => '<=',
-    'gt'    => '>',
-    'ge'    => '>=',
+        'eq'    => '==',
+        'ne'    => '!=',
+        'lt'    => '<',
+        'le'    => '<=',
+        'gt'    => '>',
+        'ge'    => '>=',
     };
     
     # String and integer comparison are dealt with separately below
@@ -257,8 +249,8 @@ sub ap2perl_expr
         # ==, =, !=, <, <=, >, >=, -ipmatch, -strmatch, -strcmatch, -fnmatch
         if( $stype eq 'binary' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [] );
-            my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [], $opts );
+            my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [], $opts );
             push( @$buf, '!' ) if( $ref->{is_negative} );
             # "IP address matches address/netmask"
             if( $op eq 'ipmatch' )
@@ -283,7 +275,7 @@ sub ap2perl_expr
         # 192.168.1.10 in split( /\,/, $ip_list )
         elsif( $stype eq 'function' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             my $func  = $ref->{function_def}->[0];
             my $func_name = $func->{name};
             my $argv = $self->parse_expr_args( $func->{args_def} );
@@ -292,14 +284,14 @@ sub ap2perl_expr
         # e.g.: %{SOME_VALUE} in {"John", "Peter", "Paul"}
         elsif( $stype eq 'list' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             my $list  = $self->parse_expr_args( $ref->{list_def} );
             push( @$buf, sprintf( "scalar( grep( %s eq \$_, (%s) ) )", $this1->[0], $list ) );
         }
         elsif( $stype eq 'regexp' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
-            my $this2 = $self->ap2perl_expr( $ref->{regexp_def}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
+            my $this2 = $self->ap2perl_expr( $ref->{regexp_def}->[0], [], $opts );
             my $map = 
             {
             '='     => '=~',
@@ -312,7 +304,7 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'unary' )
         {
-            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             my $word = join( '', @$this );
             # check if the uri is accessible to all
             if( $op eq 'A' || $op eq 'U' )
@@ -403,8 +395,8 @@ sub ap2perl_expr
     {
         if( $stype eq 'and' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{and_def_expr2}->[0], [] );
-            my $this2 = $self->ap2perl_expr( $ref->{and_def_expr2}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{and_def_expr2}->[0], [], $opts );
+            my $this2 = $self->ap2perl_expr( $ref->{and_def_expr2}->[0], [], $opts );
             push( @$buf, @$this1, '&&', @$this2 );
         }
         elsif( $stype eq 'boolean' )
@@ -413,28 +405,28 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'or' )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{or_def_expr1}->[0], [] );
-            my $this2 = $self->ap2perl_expr( $ref->{or_def_expr2}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{or_def_expr1}->[0], [], $opts );
+            my $this2 = $self->ap2perl_expr( $ref->{or_def_expr2}->[0], [], $opts );
             push( @$buf, @$this1, '||', @$this2 );
         }
         elsif( $stype eq 'comp' )
         {
-            my $this = $self->ap2perl_expr( $ref->{elements}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{elements}->[0], [], $opts );
             push( @$buf, @$this );
         }
         elsif( $stype eq 'negative' )
         {
-            my $this = $self->ap2perl_expr( $ref->{negative_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{negative_def}->[0], [], $opts );
             push( @$buf, '!(', @$this, ')' );
         }
         elsif( $stype eq 'parenthesis' )
         {
-            my $this = $self->ap2perl_expr( $ref->{parenthesis_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{parenthesis_def}->[0], [], $opts );
             push( @$buf, '(', @$this, ')' );
         }
         elsif( $stype eq 'variable' )
         {
-            my $this = $self->ap2perl_expr( $ref->{variable_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{variable_def}->[0], [], $opts );
             push( @$buf, @$this );
         }
     }
@@ -475,8 +467,8 @@ sub ap2perl_expr
         {
             $op_actual = $map_integer->{ $op };
         }
-        my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [] );
-        my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [] );
+        my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [], $opts );
+        my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [], $opts );
         push( @$buf, @$this1, $op_actual, @$this2 );
     }
     elsif( $type eq 'join' )
@@ -484,7 +476,7 @@ sub ap2perl_expr
         my $argv = $self->parse_expr_args( $ref->{list_def} );
         if( $ref->{word_def} )
         {
-            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             push( @$buf, 'join(', @$this1, ',', $argv, ')' );
         }
         else
@@ -526,11 +518,11 @@ sub ap2perl_expr
         my $this;
         if( $ref->{word_def} )
         {
-            $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            $this = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
         }
         elsif( $ref->{list_def} )
         {
-            $this = $self->ap2perl_expr( $ref->{list_def}->[0], [] );
+            $this = $self->ap2perl_expr( $ref->{list_def}->[0], [], $opts );
         }
         push( @$buf, 'split(', $regex, ',', @$this, ')' );
     }
@@ -546,7 +538,8 @@ sub ap2perl_expr
         }
         {
             my $var = $+{variable};
-            my $res = $self->parse_expr( $var, { embedded => 1 } );
+            # Merge and propagate opts safely
+            my $res = $self->parse_expr( $var, { %$opts, embedded => 1 } );
             $res //= '';
             $res;
         }gexis;
@@ -572,13 +565,13 @@ sub ap2perl_expr
         {
             $op_actual = $map_binary->{ $op };
         }
-        my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [] );
-        my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [] );
+        my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [], $opts );
+        my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [], $opts );
         push( @$buf, @$this1, $op_actual, @$this2 );
     }
     elsif( $type eq 'sub' )
     {
-        my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+        my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
         push( @$buf, @$this, '=~', $ref->{regsub} );
     }
     elsif( $type eq 'variable' )
@@ -588,7 +581,7 @@ sub ap2perl_expr
         {
             # push( @$buf, $ref->{name} . '(' . $self->parse_expr_args( $ref->{args_def} ) . ')' );
             $ref->{type} = 'function';
-            my $this = $self->ap2perl_expr( $ref, [] );
+            my $this = $self->ap2perl_expr( $ref, [], $opts );
             push( @$buf, @$this );
         }
         elsif( $stype eq 'rebackref' )
@@ -652,12 +645,12 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'join' )
         {
-            my $this = $self->ap2perl_expr( $ref->{join_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{join_def}->[0], [], $opts );
             push( @$buf, @$this );
         }
         elsif( $stype eq 'parens' )
         {
-            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             push( @$buf, '(' . $this->[0] . ')' );
         }
         elsif( $stype eq 'quote' )
@@ -675,12 +668,12 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'sub' )
         {
-            my $this = $self->ap2perl_expr( $ref->{sub_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{sub_def}->[0], [], $opts );
             push( @$buf, @$this );
         }
         elsif( $stype eq 'variable' )
         {
-            my $this = $self->ap2perl_expr( $ref->{variable_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{variable_def}->[0], [], $opts );
             push( @$buf, @$this );
         }
     }
@@ -697,20 +690,20 @@ sub ap2perl_expr
                 foreach my $that ( @{$ref->{words_def}} )
                 {
                     $all_string = 0 unless( $that->{type} eq 'string' || $that->{type} eq 'word' || $that->{type} eq 'variable' );
-                    my $this = $self->ap2perl_expr( $that, [] );
+                    my $this = $self->ap2perl_expr( $that, [], $opts );
                     push( @$tmp, @$this );
                 }
                 push( @$buf, $all_string ? 'q{' . $ref->{list} . '}' : join( ',', @$tmp ) );
             }
             else
             {
-                my $this = $self->ap2perl_expr( $ref->{list_def}->[0], [] );
+                my $this = $self->ap2perl_expr( $ref->{list_def}->[0], [], $opts );
                 push( @$buf, @$this );
             }
         }
         else
         {
-            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
+            my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [], $opts );
             push( @$buf, @$this );
         }
     }
@@ -1511,10 +1504,10 @@ sub new_uri
     return( $self->error( "No uri provided to create an Apache2::SSI::URI object." ) ) if( !defined( $uri ) || !length( $uri ) );
     my $p =
     {
-    document_uri => $uri,
-    document_root => $self->document_root,
-    base_uri => $self->uri,
-    debug => $self->debug,
+        document_uri => $uri,
+        document_root => $self->document_root,
+        base_uri => $self->uri,
+        debug => $self->debug,
     };
     $p->{apache_request} = $self->apache_request if( $self->apache_request );
     my $o = Apache2::SSI::URI->new( $p ) ||
@@ -1998,16 +1991,14 @@ sub parse_expr
 {
     my $self = shift( @_ );
     my $text = shift( @_ );
-    my $opts = {};
-    if( @_ )
-    {
-        $opts = ref( $_[0] ) eq 'HASH'
-            ? shift( @_ )
-            : !( @_ % 2 )
-                ? { @_ }
-                : {};
-    }
+    my $opts = $self->_get_args_as_hash( @_ );
     $opts->{embedded} = 0 if( !exists( $opts->{embedded} ) );
+    $opts->{_depth} = ( $opts->{_depth} || 0 ) + 1;
+    return( $self->error( "Too deep recursion in parse_expr( '$text' )" ) ) if( $opts->{_depth} > 20 );
+
+    $opts->{_seen} ||= {};
+    return( $text ) if( ++$opts->{_seen}->{ $text } > 1 );
+
     my $r = $self->apache_request;
     my $env = $self->env;
     my $prev_regexp_capture = $self->{_regexp_capture};
@@ -2033,6 +2024,7 @@ sub parse_expr
     }
     my $res = [];
     $opts->{top} = 1;
+    $opts->{_seen} = {} if( $opts->{top} );
     foreach my $this ( @{$hash->{elements}} )
     {
         my $res2 = $self->ap2perl_expr( $this, [], $opts );
@@ -3027,7 +3019,7 @@ sub _time_args
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -3195,11 +3187,11 @@ This instantiate an object that is used to access other key methods. It takes th
 
 =over 4
 
-=item I<apache_filter>
+=item C<apache_filter>
 
 This is the L<Apache2::Filter> object object that is provided if running under mod_perl.
 
-=item I<apache_request>
+=item C<apache_request>
 
 This is the L<Apache2::RequestRec> object that is provided if running under mod_perl.
 
@@ -3212,29 +3204,29 @@ Note that there is a main request object and subprocess request object, so to fi
     use Apache2::RequestUtil (); # extends Apache2::RequestRec objects
     my $r = $r->is_initial_req ? $r : $r->main;
 
-=item I<debug>
+=item C<debug>
 
 Sets the debug level. Starting from 3, this will output on the STDERR or in Apache error log a lot of debugging output.
 
-=item I<document_root>
+=item C<document_root>
 
 This is only necessary to be provided if this is not running under Apache mod_perl. Without this value, L<Apache2::SSI> has no way to guess the document root and will not be able to function properly and will return an L</error>.
 
-=item I<document_uri>
+=item C<document_uri>
 
 This is only necessary to be provided if this is not running under Apache mod_perl. This must be the uri of the document being served, such as C</my/path/index.html>. So, if you are using this outside of the rim of Apache mod_perl and your file resides, for example, at C</home/john/www/my/path/index.html> and your document root is C</home/john/www>, then the document uri would be C</my/path/index.html>
 
-=item I<errmsg>
+=item C<errmsg>
 
 The error message to be returned when a ssi directive fails. By default, it is C<[an error occurred while processing this directive]>
 
-=item I<html>
+=item C<html>
 
 The html data to be parsed. You do not have to provide that value now. You can provide it to L</parse> as its first argument when you call it.
 
-=item I<legacy>
+=item C<legacy>
 
-Takes a boolean value suchas C<1> or C<0> to indicate whether the Apache2 expression supported accepts legacy style.
+Takes a boolean value such as C<1> or C<0> to indicate whether the Apache2 expression supported accepts legacy style.
 
 Legacy Apache expression typically allows for perl style variable C<${REQUEST_URI}> versus the modern style of C<%{REQUEST_URI}> and just an equal sign to imply a regular expression such as:
 
@@ -3246,9 +3238,9 @@ Modern expression equivalent would be:
 
 See L<Regexp::Common::Apache2> for more information.
 
-See also the property I<trunk> to enable experimental expressions.
+See also the property C<trunk> to enable experimental expressions.
 
-=item I<remote_ip>
+=item C<remote_ip>
 
 This is used when you want to artificially set the remote ip address, i.e. the address of the visitor accessing the page. This is used essentially by the SSI directive:
 
@@ -3261,25 +3253,25 @@ This is used when you want to artificially set the remote ip address, i.e. the a
     Go away!
     <!--#endif -->
 
-=item I<sizefmt>
+=item C<sizefmt>
 
 The default way to format a file size. By default, this is C<abbrev>, which means a human readable format such as C<2.5M> for 2.5 megabytes. Other possible value is C<bytes> which would have the C<fsize> ssi directive return the size in bytes.
 
 See L<Apache2 documentation|https://httpd.apache.org/docs/current/en/howto/ssi.html> for more information on this.
 
-=item I<timefmt>
+=item C<timefmt>
 
-The default way to format a date time. By default, this uses the display according to your locale, such as C<ja_JP> (for Japan) or C<en_GB> for the United Kingdoms. The time zone can be specified in the format, or it will be set to the local time zone, whatever it is.
+The default way to format a date time. By default, this uses the display according to your locale, such as C<ja_JP> (for Japan) or C<en_GB> for the United Kingdom. The time zone can be specified in the format, or it will be set to the local time zone, whatever it is.
 
 See L<Apache2 documentation|https://httpd.apache.org/docs/current/en/howto/ssi.html> for more information on this.
 
-=item I<trunk>
+=item C<trunk>
 
 This takes a boolean value such as C<0> or C<1> and when enabled this allows the support for Apache2 experimental expressions.
 
 See L<Regexp::Common::Apache2> for more information.
 
-Also, see the property I<legacy> to enable legacy Apache2 expressions.
+Also, see the property C<legacy> to enable legacy Apache2 expressions.
 
 =back
 
@@ -3295,7 +3287,7 @@ It takes an hash reference provided by L<Apache2::Expression/parse>, an array re
 
 It parse recursively the structure provided in the hash reference to provide the perl equivalent for each Apache2 expression component.
 
-It returns the array reference provided used as the content buffer. This array is used by L</parse_expr> and then joined using a single space to form a string of perl expression to be eval'ed.
+It returns the array reference provided as the content buffer. This array is used by L</parse_expr> and then joined using a single space to form a string of perl expression to be eval'ed.
 
 =head2 apache_filter
 
@@ -3331,7 +3323,7 @@ Create a clone of the object and return it.
 
 Decode base64 data provided. When running under Apache mod_perl, this uses L<APR::Base64/decode> module, otherwise it uses L<MIME::Base64/decode>
 
-If the decoded data contain utf8 data, this will decoded the utf8 data using L<Encode/decode>
+If the decoded data contain utf8 data, this will decode the utf8 data using L<Encode/decode>
 
 If an error occurred during decoding, it will return undef and set an L</error> object accordingly.
 
@@ -3388,7 +3380,7 @@ Sets or gets the document root.
 
 Wen running under Apache mod_perl, this value will be available automatically, using L<Apache2::RequestRec/document_root> method.
 
-If it runs outside of Apache, this will use the value provided upon instantiating the object and passing the I<document_root> parameter. If this is not set, it will return the value of the environment variable C<DOCUMENT_ROOT>.
+If it runs outside of Apache, this will use the value provided upon instantiating the object and passing the C<document_root> parameter. If this is not set, it will return the value of the environment variable C<DOCUMENT_ROOT>.
 
 =head2 document_uri
 
@@ -3440,6 +3432,10 @@ Example:
     $ssi->encode_entities( 'Tous les êtres humains naissent libres et égaux en dignité et en droits.' );
     # Tous les &Atilde;&ordf;tres humains naissent libres et &Atilde;&copy;gaux en dignit&Atilde;&copy; et en droits.
 
+=head2 encode_md5
+
+Encode data provided into md5. This uses L<Digest::MD5> which it will attempt to load.
+
 =head2 encode_uri
 
 Encode uri data. This uses L<URI::Escape::XS/uri_escape>.
@@ -3472,7 +3468,7 @@ Note that the environment variable hash is unique for each new object, so it wor
 
 When a value is set for an environment variable that has an equivalent name, it will call the method as well with the new value provided. This is done to ensure data consistency and also additional processing if necessary.
 
-For example, let assume you set the environment variable C<REQUEST_URI> or C<DOCUMENT_URI> like this:
+For example, let's assume you set the environment variable C<REQUEST_URI> or C<DOCUMENT_URI> like this:
 
     $ssi->env( REQUEST_URI => '/some/path/to/file.html?q=something&l=ja_JP' );
 
@@ -3507,7 +3503,7 @@ This is an alias for L<Apache2::SSI::URI/filename>
 
 =head2 find_file
 
-Provided with a file path, and this will resolve any variable used and attempt to look it up as a file if the argument I<file> is provided with a file path as a value, or as a URI if the argument C<virtual> is provided as an argument.
+Provided with a file path, and this will resolve any variable used and attempt to look it up as a file if the argument C<file> is provided with a file path as a value, or as a URI if the argument C<virtual> is provided as an argument.
 
 This will call L</lookup_file> or L</lookup_uri> depending on whether it is dealing with a file or an uri.
 
@@ -3543,11 +3539,25 @@ It returns a L<Apache2::SSI::URI> object.
 
 Returns true when running under mod_perl, false otherwise.
 
+=head2 new_uri
+
+Creates and returns a new L<Apache2::SSI::URI> object based on the parameters provided.
+
+=head2 notes
+
+Sets or gets arbitrary notes using Apache mod_perl C<pnotes>. This allows the sharing of information among requests. A value provided can be any kind of data, array reference, hash reference, or just string.
+
+See L<Apache2::ConnectionUtil|/pnotes>
+
 =head2 parse
 
 Provided with html data and if none is provided will use the data specified with the method L</html>, this method will parse the html and process the ssi directives.
 
 It returns the html string with the ssi result.
+
+=head2 parse_comment
+
+Provided with an Apache SSI comment, such as C<< <!--#comment Something --> >>, and it returns an empty string, because comments are simply removed from the result.
 
 =head2 parse_config
 
@@ -3555,25 +3565,25 @@ Provided with an hash reference of parameters and this sets three of the object 
 
 =over 4
 
-=item I<echomsg>
+=item C<echomsg>
 
 The value is a message that is sent back to the client if the echo element attempts to echo an undefined variable.
 
-This overrides any default value set for the parameter I<echomsg> upon object instantiation.
+This overrides any default value set for the parameter C<echomsg> upon object instantiation.
 
-=item I<errmsg>
+=item C<errmsg>
 
 This is the default error message to be used as the result for a faulty ssi directive.
 
 See the L</echomsg> method.
 
-=item I<sizefmt>
+=item C<sizefmt>
 
 This is the format to be used to format the files size. Value can be either C<bytes> or C<abbrev>
 
 See also the L</sizefmt> method.
 
-=item I<timefmt>
+=item C<timefmt>
 
 This is the format to be used to format the dates and times. The value is a date formatting based on L<POSIX/strftime>
 
@@ -3590,6 +3600,8 @@ For example:
     Query string passed: <!--#echo var="QUERY_STRING" -->
 
 There are a number of standard environment variable accessible under SSI on top of other environment variables set. See L<SSI Directives> section below.
+
+=for Pod::Coverage parse_echo_query_string
 
 =head2 parse_echo_date_gmt
 
@@ -3634,6 +3646,8 @@ Outside of Apache, the similar result is achieved by returning the value of the 
 Example:
 
     <!--#echo var="LAST_MODIFIED" -->
+
+=for Pod::Coverage parse_expr_args
 
 =head2 parse_eval_expr
 
@@ -4018,19 +4032,19 @@ Possible parameters are:
 
 =over 4
 
-=item I<decoding>
+=item C<decoding>
 
 The decoding of the variable before it is set. This can be C<none>, C<url>, C<urlencoded>, C<base64> or C<entity>
 
-=item I<encoding>
+=item C<encoding>
 
 This instruct to encode the variable value before display. It can the same possible value as for decoding.
 
-=item I<value>
+=item C<value>
 
 The string value for the variable to be set.
 
-=item I<var>
+=item C<var>
 
 The variable name
 
@@ -4214,41 +4228,41 @@ You can also refer to the methods C<parse_func_*> documented above, which implem
 
 =over 4
 
-=item I<base64>
+=item C<base64>
 
-=item I<env>
+=item C<env>
 
-=item I<escape>
+=item C<escape>
 
-=item I<http>
+=item C<http>
 
-=item I<ldap>
+=item C<ldap>
 
-=item I<md5>
+=item C<md5>
 
-=item I<note>
+=item C<note>
 
-=item I<osenv>
+=item C<osenv>
 
-=item I<replace>
+=item C<replace>
 
-=item I<req>
+=item C<req>
 
-=item I<reqenv>
+=item C<reqenv>
 
-=item I<req_novary>
+=item C<req_novary>
 
-=item I<resp>
+=item C<resp>
 
-=item I<sha1>
+=item C<sha1>
 
-=item I<tolower>
+=item C<tolower>
 
-=item I<toupper>
+=item C<toupper>
 
-=item I<unbase64>
+=item C<unbase64>
 
-=item I<unescape>
+=item C<unescape>
 
 =back
 
@@ -4329,7 +4343,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-Lhttps://gitlab.com/jackdeguest/Apache2-SSI>
+L<https://gitlab.com/jackdeguest/Apache2-SSI>
 
 =head1 SEE ALSO
 

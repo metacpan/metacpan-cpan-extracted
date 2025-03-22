@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 use strict;
 use warnings;
 
@@ -14,6 +14,7 @@ use EBook::Ishmael::EBook::CHM;
 use EBook::Ishmael::EBook::Epub;
 use EBook::Ishmael::EBook::FictionBook2;
 use EBook::Ishmael::EBook::HTML;
+use EBook::Ishmael::EBook::KF8;
 use EBook::Ishmael::EBook::Mobi;
 use EBook::Ishmael::EBook::PalmDoc;
 use EBook::Ishmael::EBook::PDF;
@@ -22,7 +23,7 @@ use EBook::Ishmael::EBook::XHTML;
 use EBook::Ishmael::EBook::zTXT;
 
 our %EBOOK_FORMATS = map { lc $_ => "EBook::Ishmael::EBook::$_" } qw(
-	CB7 CBR CBZ CHM Epub FictionBook2 HTML Mobi PalmDoc PDF Text XHTML zTXT
+	CB7 CBR CBZ CHM Epub FictionBook2 HTML KF8 Mobi PalmDoc PDF Text XHTML zTXT
 );
 
 sub ebook_id {

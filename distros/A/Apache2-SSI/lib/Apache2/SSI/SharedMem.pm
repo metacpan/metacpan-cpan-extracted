@@ -219,13 +219,7 @@ sub exists
 sub flags
 {
     my $self   = shift( @_ );
-    my $opts   = {};
-    no warnings 'uninitialized';
-    $opts = Scalar::Util::reftype( $_[0] ) eq 'HASH'
-        ? shift( @_ )
-        : !( scalar( @_ ) % 2 )
-            ? { @_ }
-            : {};
+    my $opts   = $self->_get_args_as_hash( @_ );
     $opts->{create} = $self->create unless( length( $opts->{create} ) );
     $opts->{exclusive} = $self->exclusive unless( length( $opts->{exclusive} ) );
     $opts->{mode} = $self->mode unless( length( $opts->{mode} ) );

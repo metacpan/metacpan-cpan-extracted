@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.10.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.11.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/03/20
+## Modified 2025/03/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.10.0';
+    our $VERSION = 'v0.11.0';
 };
 
 use strict;
@@ -2076,6 +2076,14 @@ sub load_csv
         }
     }
 
+    # If the user prefers a callback for each CSV row
+    my $callback;
+    if( exists( $opts->{callback} ) &&
+        ref( $opts->{callback} // '' ) eq 'CODE' )
+    {
+        $callback = $opts->{callback};
+    }
+
     my $csv;
     # try-catch
     local $@;
@@ -2313,31 +2321,81 @@ sub load_csv
             }
             my $ref = {};
             @$ref{ @$cols } = @$row;
-            push( @$all, $ref );
+            if( defined( $callback ) )
+            {
+                my $rv = eval
+                {
+                    $callback->( $ref );
+                };
+                if( $@ )
+                {
+                    $self->error( "An error occurred executing callback with data from CSV at line $n", { cause => { data => $ref } } );
+                    return(0);
+                }
+                # Returned value from callback is defined, but explicitly false, we indicate that this is the end
+                elsif( defined( $rv ) && !$rv )
+                {
+                    return( $rv );
+                }
+            }
+            else
+            {
+                push( @$all, $ref );
+            }
         }
         else
         {
-            push( @$all, $row );
+            if( defined( $callback ) )
+            {
+                my $rv = eval
+                {
+                    $callback->( $row );
+                };
+                if( $@ )
+                {
+                    $self->error( "An error occurred executing callback with data from CSV at line $n", { cause => { data => $row } } );
+                    return(0);
+                }
+                # Returned value from callback is defined, but explicitly false, we indicate that this is the end
+                elsif( defined( $rv ) && !$rv )
+                {
+                    return( $rv );
+                }
+            }
+            else
+            {
+                push( @$all, $row );
+            }
         }
+        return(1);
     };
 
     # If we have a initial first raw from our detect BOM operation earlier, then we use that line of data now.
     $process->( $first_row ) if( $first_row );
 
-    eval
+    # Read each line of CSV data until the end.
+    my $row;
+    # while( my $row = $csv->getline( $io ) )
+    while( $io->opened && ( $row = eval{ $csv->getline( $io ) } ) )
     {
-        # Read each line of CSV data until the end.
-        my $row;
-        # while( my $row = $csv->getline( $io ) )
-        while( $io->opened && ( $row = $csv->getline( $io ) ) )
+        $n++;
+        my $rv = $process->( $row );
+        if( !$rv )
         {
-            $n++;
-            $process->( $row );
+            if( $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->new_array );
         }
-    };
+    }
     if( $@ )
     {
         return( $self->error( "Error trying to load data from CSV file $file: $@" ) );
+    }
+    elsif( !$csv->eof && ( my $error = $csv->error_diag ) )
+    {
+        warn( "Warning: error reading a CSV line: ${error}" ) if( $is_warnings_enabled );
     }
     # Return a Module::Generic::Array object.
     return( $self->new_array( $all ) );
@@ -3887,9 +3945,9 @@ sub unload_csv
 
     my $headers  = $opts->{headers} || [];
 
-    if( Scalar::Util::reftype( $data // '' ) ne 'ARRAY' )
+    if( Scalar::Util::reftype( $data // '' ) ne 'ARRAY' && ref( $data // '' ) ne 'CODE' )
     {
-        return( $self->error( "Data provided is not an array reference." ) );
+        return( $self->error( "Data provided is not an array reference or anonymous subroutine." ) );
     }
     elsif( !$self->_load_class( 'Text::CSV' ) )
     {
@@ -3898,6 +3956,12 @@ sub unload_csv
 
     $opts->{lock} //= 0;
     my $file = $self->filepath;
+    my $callback;
+    if( ref( $data ) eq 'CODE' )
+    {
+        $callback = $data;
+    }
+
     my $io;
     my $opened = $io = $self->opened;
     if( !$opened )
@@ -3915,11 +3979,144 @@ sub unload_csv
     {
         return( $self->error( "File \"$file\" is opened, but not in write mode. Cannot unload data into it." ) );
     }
-    $self->lock if( $opts->{lock} );
-    if( scalar( @$data ) )
+
+    my $csv;
+    # try-catch
+    local $@;
+    eval
     {
-        my $is_array = Scalar::Util::reftype( $data->[0] // '' ) eq 'ARRAY';
-        my $is_hash  = ref( $data->[0] // '' ) eq 'HASH';
+        $csv = Text::CSV->new( $args );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error instantiating a new Text::CSV object: $@" ) );
+    }
+
+    my( $is_array, $is_hash );
+    my $warnings_enabled = $self->_is_warnings_enabled( 'Module::Generic' );
+    $self->lock if( $opts->{lock} );
+    # The user has provided us with a callback to get the data to write to the CSV file
+    if( defined( $callback ) )
+    {
+        my $n = 0;
+        my $cols = $opts->{cols} // $opts->{columns};
+        while(1)
+        {
+            $n++;
+            my $row = eval
+            {
+                $callback->( $self );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error has occurred while trying to execute the callback for CSV line No $n: $@" ) );
+            }
+            elsif( !$row )
+            {
+                last;
+            }
+            # We make sure the data received is acceptable
+            elsif( Scalar::Util::reftype( $row // '' ) eq 'ARRAY' )
+            {
+                $is_array //= 1;
+            }
+            elsif( ref( $row // '' ) eq 'HASH' )
+            {
+                $is_hash //= 1;
+            }
+            else
+            {
+                warn( "CSV row of data returned by the callback is neither an array or an hash reference for CSV line $n." ) if( $warnings_enabled );
+                next;
+            }
+
+            # This is done once
+            unless( defined( $is_array ) && defined( $is_hash ) )
+            {
+                $is_array = Scalar::Util::reftype( $row // '' ) eq 'ARRAY' ? 1 : 0;
+                $is_hash  = ref( $row // '' ) eq 'HASH' ? 1 : 0;
+                if( $headers eq 'auto' )
+                {
+                    if( !$is_hash )
+                    {
+                        warn( "You can only set the option 'headers' to 'auto' when you provide an array reference of hash reference." ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                        $headers = [];
+                    }
+                    else
+                    {
+                        # We sort it to make it predictable
+                        $headers = [sort( keys( %$row ) )];
+                    }
+                }
+                elsif( Scalar::Util::reftype( $headers ) ne 'ARRAY' )
+                {
+                    return( $self->error( "Invalid value provided for 'headers'. It can only be an array reference of headers or 'auto' (if the data is an array of hash reference)." ) );
+                }
+
+                if( defined( $headers ) && scalar( @$headers ) )
+                {
+                    $n = 1;
+                    eval
+                    {
+                        $csv->say( $io => $headers );
+                    };
+                    if( $@ )
+                    {
+                        return( $self->error( "Error writing the CSV headers to the file ${file}: $@" ) );
+                    }
+                    elsif( my $error = $csv->error_diag )
+                    {
+                        warn( "Warning: error trying to write headers for line $n to the CSV file ${file}: ${error}" ) if( $warnings_enabled );
+                    }
+                }
+            }
+
+            if( $is_array && ref( $row ) eq 'HASH' || $is_hash && Scalar::Util::reftype( $row // '' ) eq 'ARRAY' )
+            {
+                warn( "Row data type switched at line $n. Expected " . ( $is_array ? 'array' : 'hash' ) . " reference." ) if( $warnings_enabled );
+                next;
+            }
+            elsif( $is_array )
+            {
+                eval
+                {
+                    $csv->say( $io => $row );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error writing the CSV data for line $n to the file ${file}: $@" ) );
+                }
+                elsif( my $error = $csv->error_diag )
+                {
+                    warn( "Warning: error trying to write data for line $n to the file ${file}: ${error}" ) if( $warnings_enabled );
+                }
+            }
+            elsif( $is_hash )
+            {
+                unless( defined( $cols ) && Scalar::Util::reftype( $cols // '' ) eq 'ARRAY' )
+                {
+                    $cols = ( defined( $headers ) && scalar( @$headers ) ) ? $headers : [sort( keys( %$row ) )];
+                }
+                my $vals = [@$row{ @$cols }];
+                eval
+                {
+                    $csv->say( $io => $vals );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error writing the CSV data for line $n to the file ${file}: $@" ) );
+                }
+                elsif( my $error = $csv->error_diag )
+                {
+                    warn( "Warning: error trying to write data for line $n to the file ${file}: ${error}" ) if( $warnings_enabled );
+                }
+            }
+        }
+    }
+    elsif( scalar( @$data ) )
+    {
+        $is_array = Scalar::Util::reftype( $data->[0] // '' ) eq 'ARRAY';
+        $is_hash  = ref( $data->[0] // '' ) eq 'HASH';
         if( !$is_array && !$is_hash )
         {
             return( $self->error( "Data provided is neither an array reference nor an hash reference." ) );
@@ -3942,18 +4139,6 @@ sub unload_csv
             return( $self->error( "Invalid value provided for 'headers'. It can only be an array reference of headers or 'auto' (if the data is an array of hash reference)." ) );
         } 
 
-        my $csv;
-        # try-catch
-        local $@;
-        eval
-        {
-            $csv = Text::CSV->new( $args );
-        };
-        if( $@ )
-        {
-            return( $self->error( "Error instantiating a new Text::CSV object: $@" ) );
-        }
-
         if( defined( $headers ) && scalar( @$headers ) )
         {
             eval
@@ -3964,7 +4149,12 @@ sub unload_csv
             {
                 return( $self->error( "Error writing the CSV headers to the file ${file}: $@" ) );
             }
+            elsif( my $error = $csv->error_diag )
+            {
+                warn( "Warning: error trying to write headers to the CSV file ${file}: ${error}" ) if( $warnings_enabled );
+            }
         }
+
         if( $is_array )
         {
             for( my $i = 0; $i < scalar( @$data ); $i++ )
@@ -3997,6 +4187,10 @@ sub unload_csv
                 if( $@ )
                 {
                     return( $self->error( "Error writing the CSV data at offset $i to the file ${file}: $@" ) );
+                }
+                elsif( my $error = $csv->error_diag )
+                {
+                    warn( "Warning: error trying to write data for offset ${i} to the file ${file}: ${error}" ) if( $warnings_enabled );
                 }
             }
         }
@@ -5155,7 +5349,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.10.0
+    v0.11.0
 
 =head1 DESCRIPTION
 
@@ -6090,6 +6284,16 @@ Below are the supported options. Any other options will be passed directly to L<
 
 Optional. Specifies the encoding to apply when reading the file. This defaults to C<utf-8>
 
+=item * C<callback>
+
+Optional. If provided, must be a code reference, such as an anonymous subroutine or a reference to a subroutine. This callback will be called for each parsed CSV row. The callback receives one argument: an hash reference, or an array reference representing the row retrieved. Returning any false value, such as C<undef> or C<0>, stops further processing.
+
+The type of data the callback receives (array reference or hash reference) depends on other options you provide.
+
+For example, if you do not provide any columns using C<cols> or C<columns>, or if you expect an array reference to be returned, then the callback will be called with an array reference of columns.
+
+Any exception thrown during the execution of the callback will be caught, and an L<error object|Module::Generic::Exception> will be set, and an empty list will be returned in list context, and C<undef> will be returned in scalar context.
+
 =item * C<columns> or C<cols>
 
 Optional. Specifies the exact column names to be returned in the final dataset.
@@ -7012,7 +7216,13 @@ It returns the current object upon success, or undef and sets an exception objec
 
 This takes an array reference (which can be an array object, such as L<Module::Generic::Array>), and either an hash or hash reference of options, and writes the given data to the underlying file as CSV data using L<Text::CSV>. So, you need L<Text::CSV> to be installed in order to use this method.
 
-The data provided must be an array reference of either array reference or a hash reference.
+The data provided must be an array reference of either array reference or a hash reference, or an anonymous subroutine serving as a callback to feed in data.
+
+If a callback is provided, instead of an array reference, this callback will be called repeatedly until it returns a false value, such as C<undef>, or C<0>. The callback receives the file object as its argument and must return an array reference or hash reference per row. The data type is sticky, so if the callback returns a certain data type, it must keep returning that data type for all rows. Subsequent rows whose data type would differ would trigger a warning (if they are enabled), and that row would be ignored.
+
+Any exception thrown by the callback will be caught, and an L<error object|Module::Generic::Exception> will be set and an empty list will be returned in list context, or C<undef> in scalar context.
+
+If the callback is returning a true value that is neither an array reference nor an hash reference, a warning will be issued if warnings are enabled for C<Module::Generic>, and that data will be ignored.
 
 When writing data to the file, it uses the L<say method|Text::CSV/say> that uses the value of C<$\> to write the new line delimiter.
 

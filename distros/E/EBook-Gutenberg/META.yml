@@ -30,11 +30,11 @@ requires:
   File::Temp: '0.10'
   Getopt::Long: '0'
   JSON::PP: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Text::CSV_XS: '0'
   perl: '5.016'
 resources:
   bugtracker: https://codeberg.org/1-1sam/gutenberg/issues
   repository: https://codeberg.org/1-1sam/gutenberg.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

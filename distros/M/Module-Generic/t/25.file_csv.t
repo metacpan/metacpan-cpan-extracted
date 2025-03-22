@@ -112,6 +112,21 @@ $csv_in->close;
     is_deeply( [sort( keys( %{$all->[0]} ) )], [qw(balance missing_col)], 'handles missing columns correctly' );
 }
 
+# NOTE: load_csv with callback
+$csv_in->close;
+my $result = [];
+$csv_in->load_csv(
+    headers => 'auto',
+    callback => sub
+    {
+        my $row = shift( @_ );
+        push( @$result, $row );
+    },
+) || BAIL_OUT( $csv_in->error );
+is( scalar( @$result ), 3, 'count' );
+is_deeply( [sort( keys( %{$result->[0]} ) )], [qw( balance credit date debit narration type )], 'load_csv with callback' );
+
+
 $csv_empty->unload_utf8( "date,type,narration\n2024-01-01,a,b\n\n2024-01-02,c,d" ) ||
     BAIL_OUT( $csv_empty->error );
 my $rows = $csv_empty->load_csv( headers => 'auto' );
@@ -143,6 +158,19 @@ $csv_out->unload_csv( $sample_data, headers => 'auto' ) || BAIL_OUT( $csv_out->e
 my $loaded_data = $csv_out->load_csv( headers => 'auto' ) || BAIL_OUT( $csv_out->error );
 
 # Validate data consistency
+is_deeply( $loaded_data, $sample_data, 'Loaded data matches original unloaded data' );
+
+# NOTE: unload_csv with a callback
+my $cnt = -1;
+$csv_out->close;
+$csv_out->remove if( $csv_out->exists );
+$csv_out->unload_csv(sub
+{
+    # Will return undef when $cnt exceed the size of the array.
+    return( $sample_data->[ ++$cnt ] );
+}, headers => 'auto' ) || BAIL_OUT( $csv_out->error );
+is( $cnt, 3, 'unload_csv with callback' );
+$loaded_data = $csv_out->load_csv( headers => 'auto' ) || BAIL_OUT( $csv_out->error );
 is_deeply( $loaded_data, $sample_data, 'Loaded data matches original unloaded data' );
 
 foreach my $enc (qw( utf-16be utf-16le utf-32be utf-32le ))

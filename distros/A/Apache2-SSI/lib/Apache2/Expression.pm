@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/Expression.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/02/20
-## Modified 2021/02/20
+## Modified 2025/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use Regexp::Common qw( Apache2 );
     use PPI;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -42,15 +42,7 @@ sub parse
     my $self = shift( @_ );
     my $data = shift( @_ );
     return( '' ) if( !length( $data ) );
-    my $opts = {};
-    if( @_ )
-    {
-        $opts = ref( $_[0] ) eq 'HASH'
-            ? shift( @_ )
-            : !( @_ % 2 )
-                ? { @_ }
-                : {};
-    }
+    my $opts = $self->_get_args_as_hash( @_ );
     pos( $data ) = 0;
     my $prefix = $self->legacy ? 'Legacy' : $self->trunk ? 'Trunk' : '';
     my @callinfo = caller(0);
@@ -75,22 +67,25 @@ sub parse
     PARSE:
     {
         my $pos = pos( $data );
+        if( pos( $data ) == length( $data ) )
+        {
+            last PARSE;
+        }
         if( $data =~ m/\G\r?\n$/ )
         {
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with legacy variable." ) && 
-               $data =~ /\A\G$RE{Apache2}{LegacyVariable}\Z/gmcs && 
+        elsif( $data =~ /\A\G$RE{Apache2}{LegacyVariable}\Z/gmcs && 
                length( $+{variable} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'variable',
-            raw => $re->{variable},
-            re => $re,
+                elements => [],
+                type => 'variable',
+                raw => $re->{variable},
+                re => $re,
             };
             if( length( $re->{var_func_name} ) )
             {
@@ -123,7 +118,6 @@ sub parse
             redo PARSE;
         }
         elsif( !$skip->{cond} && 
-               $self->message( 3, "Trying with condition." ) && 
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Cond"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Cond"}/gmcs ) &&
                length( $+{cond} ) )
         {
@@ -131,10 +125,10 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'cond',
-            raw => $re->{cond},
-            re => $re,
+                elements => [],
+                type => 'cond',
+                raw => $re->{cond},
+                re => $re,
             };
             $def->{is_negative} = 1 if( $re->{cond_neg} );
             $p->{is_negative} = 1 if( $re->{cond_neg} && $opts->{top} );
@@ -210,21 +204,20 @@ sub parse
             push( @$elems, $def ) if( length( $re->{cond} ) );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with string comparison." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}StringComp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}StringComp"}/gmcs ) && 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}StringComp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}StringComp"}/gmcs ) && 
                length( $+{stringcomp} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'stringcomp',
-            raw         => $re->{stringcomp},
-            re          => $re,
-            op          => $re->{stringcomp_op},
-            worda       => $re->{stringcomp_worda},
-            wordb       => $re->{stringcomp_wordb},
+                elements    => [],
+                type        => 'stringcomp',
+                raw         => $re->{stringcomp},
+                re          => $re,
+                op          => $re->{stringcomp_op},
+                worda       => $re->{stringcomp_worda},
+                wordb       => $re->{stringcomp_wordb},
             };
             $def->{worda_def} = [];
             $def->{wordb_def} = [];
@@ -243,21 +236,20 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with integer comparison." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}IntegerComp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}IntegerComp"}/gmcs ) && 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}IntegerComp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}IntegerComp"}/gmcs ) && 
                length( $+{integercomp} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'integercomp',
-            raw         => $re->{integercomp},
-            re          => $re,
-            op          => $re->{integercomp_op},
-            worda       => $re->{integercomp_worda},
-            wordb       => $re->{integercomp_wordb},
+                elements    => [],
+                type        => 'integercomp',
+                raw         => $re->{integercomp},
+                re          => $re,
+                op          => $re->{integercomp_op},
+                worda       => $re->{integercomp_worda},
+                wordb       => $re->{integercomp_wordb},
             };
             if( length( $re->{integercomp_worda} ) )
             {
@@ -274,8 +266,7 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with general comparison." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Comp"}\Z/gms ) || 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Comp"}\Z/gms ) || 
                  ( $pos > 0 && $data =~ /\G$RE{Apache2}{"${prefix}Comp"}/gmcs ) ) && 
                length( $+{comp} ) )
         {
@@ -294,10 +285,10 @@ sub parse
             # next PARSE unless( length( $re->{comp} ) );
             my $def =
             {
-            elements => [],
-            type => 'comp',
-            raw => $re->{comp},
-            re => $re,
+                elements => [],
+                type => 'comp',
+                raw => $re->{comp},
+                re => $re,
             };
             my $this;
             my $chunk = $re->{comp};
@@ -353,7 +344,7 @@ sub parse
                 push( @{$def->{elements}}, @{$this2->{elements}} );
                 $def->{function_def} = $this2->{elements};
             }
-            elsif( length( $re->{comp_in_regexp} ) || length( $re->{comp_in_regexp_legacy} ) )
+            elsif( length( $re->{comp_in_regexp} // '' ) || length( $re->{comp_in_regexp_legacy} // '' ) )
             {
                 $def->{subtype} = 'regexp';
                 $def->{word}    = $re->{comp_word};
@@ -376,7 +367,7 @@ sub parse
                     $def->{regexp_def} = $this2->{elements};
                 }
             }
-            elsif( length( $re->{comp_word_in_list} ) )
+            elsif( length( $re->{comp_word_in_list} // '' ) )
             {
                 $def->{subtype} = 'list';
                 $def->{word}    = $re->{comp_word};
@@ -402,19 +393,22 @@ sub parse
             }
             else
             {
+                # No match found in comparison.
             }
             if( defined( $this ) && scalar( keys( %$this ) ) )
             {
                 $def->{elements} = $this->{elements};
             }
             push( @$elems, $def ) if( length( $re->{comp} ) );
-            $cur_pos == length( $data ) && $self->message( 3, "End of string (", length( $data ), " bytes long) reached at pos ", $cur_pos ) && last PARSE;
+            if( $cur_pos == length( $data ) )
+            {
+                last PARSE;
+            }
             # redo PARSE unless( !length( $re->{comp} ) && ++$looping > 1 );
             redo PARSE;
         }
         # Trunk function
-        elsif( $self->message( 3, "Trying with trunk join." ) && 
-               $prefix eq 'Trunk' &&
+        elsif( $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Join"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Join"}/gmcs ) && 
                length( $+{join} ) )
         {
@@ -422,12 +416,12 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'join',
-            raw         => $re->{join},
-            re          => $re,
-            word        => $re->{join_word},
-            list        => $re->{join_list},
+                elements    => [],
+                type        => 'join',
+                raw         => $re->{join},
+                re          => $re,
+                word        => $re->{join_word},
+                list        => $re->{join_list},
             };
             # word is optional
             if( length( $def->{word} ) )
@@ -450,8 +444,7 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with trunk split." ) && 
-               $prefix eq 'Trunk' &&
+        elsif( $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Split"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Split"}/gmcs ) && 
                length( $+{split} ) )
         {
@@ -459,13 +452,13 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'split',
-            raw         => $re->{split},
-            re          => $re,
-            regex       => $re->{split_regex},
-            word        => $re->{split_word},
-            list        => $re->{split_list},
+                elements    => [],
+                type        => 'split',
+                raw         => $re->{split},
+                re          => $re,
+                regex       => $re->{split_regex},
+                word        => $re->{split_word},
+                list        => $re->{split_list},
             };
             # It is either a word or a list as parameter
             if( length( $def->{word} ) )
@@ -488,8 +481,7 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with legacy variable." ) && 
-               $prefix eq 'Trunk' &&
+        elsif( $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Sub"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Sub"}/gmcs ) && 
                length( $+{sub} ) )
         {
@@ -497,12 +489,12 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'sub',
-            raw         => $re->{sub},
-            re          => $re,
-            regsub      => $re->{sub_regsub},
-            word        => $re->{sub_word},
+                elements    => [],
+                type        => 'sub',
+                raw         => $re->{sub},
+                re          => $re,
+                regsub      => $re->{sub_regsub},
+                word        => $re->{sub_word},
             };
             if( length( $def->{word} ) )
             {
@@ -519,20 +511,19 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with function." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Function"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Function"}/gmcs ) && 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Function"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Function"}/gmcs ) && 
                length( $+{function} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'function',
-            raw         => $re->{function},
-            re          => $re,
-            name        => $re->{func_name},
-            args        => $re->{func_args},
+                elements    => [],
+                type        => 'function',
+                raw         => $re->{function},
+                re          => $re,
+                name        => $re->{func_name},
+                args        => $re->{func_args},
             };
             if( length( $def->{args} ) )
             {
@@ -548,20 +539,19 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with list function." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}ListFunc"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}ListFunc"}/gmcs ) && 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}ListFunc"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}ListFunc"}/gmcs ) && 
                length( $+{listfunc} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'listfunc',
-            raw => $re->{listfunc},
-            re => $re,
-            name => $re->{func_name},
-            args => $re->{func_args},
+                elements => [],
+                type => 'listfunc',
+                raw => $re->{listfunc},
+                re => $re,
+                name => $re->{func_name},
+                args => $re->{func_args},
             };
             if( length( $def->{args} ) )
             {
@@ -577,48 +567,45 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with regex." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regexp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regexp"}/gmcs ) && 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regexp"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regexp"}/gmcs ) && 
                length( $+{regex} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'regex',
-            raw         => $re->{regex},
-            re          => $re,
-            pattern     => $re->{regpattern},
-            flags       => $re->{regflags},
-            sep         => $re->{regsep},
+                elements    => [],
+                type        => 'regex',
+                raw         => $re->{regex},
+                re          => $re,
+                pattern     => $re->{regpattern},
+                flags       => $re->{regflags},
+                sep         => $re->{regsep},
             };
             push( @$elems, $def );
             redo PARSE;
         }
         # Trunk only
-        elsif( $self->message( 3, "Trying with regex any." ) && 
-               $prefix eq 'Trunk' &&
+        elsif( $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regany"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regany"}/gmcs ) && 
-               length( $+{regany} ) )
+               length( $+{regany} // '' ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'regany',
-            raw         => $re->{regany},
-            re          => $re,
-            regex       => $re->{regany_regex},
-            regsub      => $re->{regany_regsub},
+                elements    => [],
+                type        => 'regany',
+                raw         => $re->{regany},
+                re          => $re,
+                regex       => $re->{regany_regex},
+                regsub      => $re->{regany_regsub},
             };
             push( @$elems, $def );
             redo PARSE;
         }
         # Trunk only
-        elsif( $self->message( 3, "Trying with regsub." ) && 
-               $prefix eq 'Trunk' &&
+        elsif( $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regsub"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regsub"}/gmcs ) && 
                length( $+{regsub} ) )
         {
@@ -626,20 +613,19 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements    => [],
-            type        => 'regsub',
-            raw         => $re->{regsub},
-            re          => $re,
-            pattern     => $re->{regpattern},
-            replacement => $re->{regstring},
-            flags       => $re->{regflags},
-            sep         => $re->{regsep},
+                elements    => [],
+                type        => 'regsub',
+                raw         => $re->{regsub},
+                re          => $re,
+                pattern     => $re->{regpattern},
+                replacement => $re->{regstring},
+                flags       => $re->{regflags},
+                sep         => $re->{regsep},
             };
             push( @$elems, $def );
             redo PARSE;
         }
         elsif( !$skip->{words} &&
-               $self->message( 3, "Trying with words." ) && 
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Words"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Words"}/gmcs ) &&
                length( $+{words} ) )
         {
@@ -647,11 +633,11 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'words',
-            raw => $re->{words},
-            re => $re,
-            word => $re->{words_word},
+                elements => [],
+                type => 'words',
+                raw => $re->{words},
+                re => $re,
+                word => $re->{words_word},
             };
             if( length( $re->{words_list} ) )
             {
@@ -684,8 +670,7 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with word." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Word"}\Z/gms ) || 
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Word"}\Z/gms ) || 
                  ( $pos > 0 && $data =~ /\G$RE{Apache2}{"${prefix}Word"}/gmcs ) 
                ) &&
                length( $+{word} ) )
@@ -694,10 +679,10 @@ sub parse
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'word',
-            raw => $re->{word},
-            re => $re,
+                elements => [],
+                type => 'word',
+                raw => $re->{word},
+                re => $re,
             };
             if( length( $re->{word_digits} ) )
             {
@@ -790,34 +775,38 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        elsif( $self->message( 3, "Trying with string." ) && 
-               ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}String"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}String"}/gmcs ) &&
+        elsif( ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}String"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}String"}/gmcs ) &&
                length( $+{string} ) )
         {
             my $re = { %+ };
             $self->whereami( \$data, pos( $data ) );
             my $def =
             {
-            elements => [],
-            type => 'string',
-            raw => $re->{string},
-            re => $re,
+                elements => [],
+                type => 'string',
+                raw => $re->{string},
+                re => $re,
             };
             push( @$elems, $def );
             redo PARSE;
         }
         else
         {
+            # Do not know what to do with this.
+        }
+        if( ++$looping > 1 )
+        {
+            last PARSE;
         }
         # We arrived here, which means we could not find anything suitable in our parser, instead of returning a result for part of the data parsed, we return the original string marking it as nomatch string.
         if( $opts->{top} )
         {
             @$elems =
             ({
-            type => 'string',
-            subtype => 'nomatch',
-            raw => $data,
-            pos => $pos,
+                type => 'string',
+                subtype => 'nomatch',
+                raw => $data,
+                pos => $pos,
             });
             last PARSE;
         }
@@ -958,7 +947,7 @@ sub _trim
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -977,7 +966,7 @@ Apache2::Expression - Apache2 Expressions
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -993,11 +982,11 @@ It takes an optional hash of parameters, as follows :
 
 =over 4
 
-=item I<legacy>
+=item C<legacy>
 
 When this is provided with a positive value, this will enable Apache2 legacy regular expression. See L<Regexp::Common::Apache2> for more information on what this means.
 
-=item I<trunk>
+=item C<trunk>
 
 When this is provided with a positive value, this will enable Apache2 experimental and advanced expressions. See L<Regexp::Common::Apache2> for more information on what this means.
 
@@ -1068,41 +1057,41 @@ The properties returned in the hash are:
 
 =over 4
 
-=item I<elements>
+=item C<elements>
 
 An array reference of sub elements contained which provides granular definition.
 
-Whatever the I<elements> array reference contains is defined in one of the types below.
+Whatever the C<elements> array reference contains is defined in one of the types below.
 
-=item I<name>
+=item C<name>
 
 The name of the element. For example if this is a function, this would be the function name, or if this is a variable, this would be the variable name without it leading dollar or percent sign nor its possible surrounding accolades.
 
-=item I<raw>
+=item C<raw>
 
 The raw string, or chunk of string that was processed.
 
-=item I<re>
+=item C<re>
 
 This contains the hash of capture groups as provided by L<Regexp::Common::Apache2>. It is made available to enable finer and granular control.
 
-=item I<regexp>
+=item C<regexp>
 
-=item I<subtype>
+=item C<subtype>
 
 A sub type that provide more information about the type of expression processed.
 
-This can be any of the I<type> mentioned below plus the following ones : binary (for comparison), list (for word to list comparison), negative, parenthesis, rebackref, regexp, unary (for comparison)
+This can be any of the C<type> mentioned below plus the following ones : binary (for comparison), list (for word to list comparison), negative, parenthesis, rebackref, regexp, unary (for comparison)
 
 See below for possible combinations.
 
-=item I<type>
+=item C<type>
 
 The main type matching the Apache2 expression. This can be comp, cond, digits, function, integercomp, quote (for quoted words), regex, stringcomp, listfunc, variable, word
 
 See below for possible combinations.
 
-=item I<word>
+=item C<word>
 
 If this is a word, this contains the word. In th example above, C<$HTTP_COOKIE> would be the word used in the regular expression comparison.
 
@@ -1113,6 +1102,8 @@ If this is a word, this contains the word. In th example above, C<$HTTP_COOKIE> 
 Given a string that represents typically a function arguments, this method will use L<PPI> to parse it and returns an array of parameters as string.
 
 Parsing a function argument is non-trivial as it can contain function call within function call.
+
+=for Pod::Coverage whereami
 
 =head1 COMBINATIONS
 
@@ -1126,7 +1117,7 @@ Possible sub types:
 
 =over 8
 
-=item I<binary>
+=item C<binary>
 
 When a binary operator is used, such as :
 
@@ -1136,13 +1127,13 @@ Example :
 
     192.168.2.10 -ipmatch 192.168.2/24
 
-C<192.168.2.10> would be captured in property I<worda>, C<ipmatch> (without leading dash) would be captured in property I<op> and C<192.168.2/24> would be captured in property I<wordb>.
+C<192.168.2.10> would be captured in property C<worda>, C<ipmatch> (without leading dash) would be captured in property C<op> and C<192.168.2/24> would be captured in property C<wordb>.
 
-The array reference in property I<elements> will contain more information on I<worda> and I<wordb>
+The array reference in property C<elements> will contain more information on C<worda> and C<wordb>
 
-Also the details of elements for I<worda> can be accessed with property I<worda_def> as an array reference and likewise for I<wordb> with I<wordb_def>.
+Also the details of elements for C<worda> can be accessed with property C<worda_def> as an array reference and likewise for C<wordb> with C<wordb_def>.
 
-=item I<function>
+=item C<function>
 
 This contains the function name and arguments when the lefthand side word is compared to a list function.
 
@@ -1150,23 +1141,23 @@ For example :
 
     192.168.1.10 in split( /\,/, $ip_list )
 
-In this example, C<192.168.1.10> would be captured in I<word> and C<split( /\,/, $ip_list )> would be captured in I<function> with the array reference I<elements> containing more information about the word and the function.
+In this example, C<192.168.1.10> would be captured in C<word> and C<split( /\,/, $ip_list )> would be captured in C<function> with the array reference C<elements> containing more information about the word and the function.
 
-Also the details of elements for I<word> can be accessed with property I<word_def> as an array reference and likewise for I<function> with I<function_def>.
+Also the details of elements for C<word> can be accessed with property C<word_def> as an array reference and likewise for C<function> with C<function_def>.
 
-=item I<list>
+=item C<list>
 
 Is true when the comparison is of a word on the lefthand side to a list of words, such as :
 
     %{SOME_VALUE} in {"John", "Peter", "Paul"}
 
-In this example, C<%{SOME_VALUE}> would be captured in property I<word> and C<"John", "Peter", "Paul"> (without enclosing accolades or possible spaces after and before them) would be captured in property I<list>
+In this example, C<%{SOME_VALUE}> would be captured in property C<word> and C<"John", "Peter", "Paul"> (without enclosing accolades or possible spaces after and before them) would be captured in property C<list>
 
-The array reference I<elements> will possibly contain more information on I<word> and each element in I<list>
+The array reference C<elements> will possibly contain more information on C<word> and each element in C<list>
 
-Also the details of elements for I<word> can be accessed with property I<word_def> as an array reference and likewise for I<list> with I<list_def>.
+Also the details of elements for C<word> can be accessed with property C<word_def> as an array reference and likewise for C<list> with C<list_def>.
 
-=item I<regexp>
+=item C<regexp>
 
 When the lefthand side word is being compared to a regular expression.
 
@@ -1174,13 +1165,13 @@ For example :
 
     %{HTTP_COOKIE} =~ /lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/
 
-In this example, C<%{HTTP_COOKIE}> would be captured in property I<word> and C</lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/> would be captured in property I<regexp> and C<=~> would be captured in property I<op>
+In this example, C<%{HTTP_COOKIE}> would be captured in property C<word> and C</lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/> would be captured in property C<regexp> and C<=~> would be captured in property C<op>
 
-Check the array reference in property I<elements> for more details about the I<word> and the regular expression in I<regexp>.
+Check the array reference in property C<elements> for more details about the C<word> and the regular expression in C<regexp>.
 
-Also the details of elements for I<word> can be accessed with property I<word_def> as an array reference and likewise for I<regexp> with I<regexp_def>.
+Also the details of elements for C<word> can be accessed with property C<word_def> as an array reference and likewise for C<regexp> with C<regexp_def>.
 
-=item I<unary>
+=item C<unary>
 
 When the following operator is used against a word :
 
@@ -1202,11 +1193,11 @@ For example:
     -U /some/uri.html # check if the uri is accessible to all (Apache2 does a sub query to check)
     -z %{QUERY_STRING} # true if string is empty (opposite of -n)
 
-In this example C<-e /some/folder/file.txt>, C<e> (without leading dash) would be captured in I<op> and C</some/folder/file.txt> would be captured in I<word>
+In this example C<-e /some/folder/file.txt>, C<e> (without leading dash) would be captured in C<op> and C</some/folder/file.txt> would be captured in C<word>
 
-Check the array reference in property I<elements> for more information about the word in I<word>
+Check the array reference in property C<elements> for more information about the word in C<word>
 
-Also the details of elements for I<word> can be accessed with property I<word_def> as an array reference.
+Also the details of elements for C<word> can be accessed with property C<word_def> as an array reference.
 
 See here for more information: L<Regexp::Common::Apache2::comp>
 
@@ -1216,7 +1207,7 @@ Available properties:
 
 =over 8
 
-=item I<op>
+=item C<op>
 
 Contains the operator used. See L<Regexp::Common::Apache2::comp>, L<Regexp::Common::Apache2/stringcomp> and L<Regexp::Common::Apache2/integercomp>
 
@@ -1236,19 +1227,19 @@ For string comparison :
 
     ==, !=, <, <=, >, >=
 
-In all the possible operators above, I<op> contains the value, but without the leading dash, if any.
+In all the possible operators above, C<op> contains the value, but without the leading dash, if any.
 
-=item I<word>
+=item C<word>
 
 The word being compared.
 
-=item I<worda>
+=item C<worda>
 
 The first word being compared, and on the left of the operator. For example :
 
     12 -ne 10
 
-=item I<wordb>
+=item C<wordb>
 
 The second word, being compared to, and on the right of the operator.
 
@@ -1264,27 +1255,27 @@ Possible sub types:
 
 =over 8
 
-=item I<and>
+=item C<and>
 
 When the condition is an ANDed expression such as :
 
     $ap_true && $ap_false
 
-In this case, C<$ap_true> would be captured in property I<expr1> and C<$ap_false> would be captured in property I<expr2>
+In this case, C<$ap_true> would be captured in property C<expr1> and C<$ap_false> would be captured in property C<expr2>
 
-Also the details of elements for the variable can be accessed with property I<and_def> as an array reference and I<and_expr1_def> and I<and_expr2_def>
+Also the details of elements for the variable can be accessed with property C<and_def> as an array reference and C<and_expr1_def> and C<and_expr2_def>
 
-=item I<comp>
+=item C<comp>
 
 Contains the expression when the condition is actually a comparison.
 
-This will recurse and you can see more information in the array reference in the property I<elements>. For more information on what it will contain, check the B<comp> type.
+This will recurse and you can see more information in the array reference in the property C<elements>. For more information on what it will contain, check the B<comp> type.
 
-=item I<cond>
+=item C<cond>
 
 Default sub type
 
-=item I<negative>
+=item C<negative>
 
 When the condition is negative, ie prefixed by an exclamation mark.
 
@@ -1292,37 +1283,37 @@ For example :
 
     !-z /some/folder/file.txt
 
-You need to check for the details in array reference contained in property I<elements>
+You need to check for the details in array reference contained in property C<elements>
 
-Also the details of elements for the variable can be accessed with property I<negative_def> as an array reference.
+Also the details of elements for the variable can be accessed with property C<negative_def> as an array reference.
 
-=item I<or>
+=item C<or>
 
 When the condition is an ORed expression such as :
 
     $ap_true || $ap_false
 
-In this case, C<$ap_true> would be captured in property I<expr1> and C<$ap_false> would be captured in property I<expr2>
+In this case, C<$ap_true> would be captured in property C<expr1> and C<$ap_false> would be captured in property C<expr2>
 
-Also the details of elements for the variable can be accessed with property I<and_def> as an array reference and I<and_expr1_def> and I<and_expr2_def>
+Also the details of elements for the variable can be accessed with property C<and_def> as an array reference and C<and_expr1_def> and C<and_expr2_def>
 
-=item I<parenthesis>
+=item C<parenthesis>
 
 When the condition is embedded within parenthesis
 
-You need to check the array reference in property I<elements> for information about the embedded condition.
+You need to check the array reference in property C<elements> for information about the embedded condition.
 
-Also the details of elements for the variable can be accessed with property I<parenthesis_def> as an array reference.
+Also the details of elements for the variable can be accessed with property C<parenthesis_def> as an array reference.
 
-=item I<variable>
+=item C<variable>
 
 Contains the expression when the condition is based on a variable, such as :
 
     %{REQUEST_URI}
 
-Check the array reference in property I<elements> for more details about the variable, especially the property I<name> which would contain the name of the variable; in this case : C<REQUEST_URI>
+Check the array reference in property C<elements> for more details about the variable, especially the property C<name> which would contain the name of the variable; in this case : C<REQUEST_URI>
 
-Also the details of elements for the variable can be accessed with property I<variable_def> as an array reference.
+Also the details of elements for the variable can be accessed with property C<variable_def> as an array reference.
 
 =back
 
@@ -1330,15 +1321,15 @@ Available properties:
 
 =over 8
 
-=item I<args>
+=item C<args>
 
-Function arguments. See the content of the I<elements> array reference for more breakdown on the arguments provided.
+Function arguments. See the content of the C<elements> array reference for more breakdown on the arguments provided.
 
-=item I<is_negative>
+=item C<is_negative>
 
 If the condition is negative, this value is true
 
-=item I<name>
+=item C<name>
 
 Function name
 
@@ -1356,13 +1347,13 @@ Available properties:
 
 =over 8
 
-=item I<args>
+=item C<args>
 
-Function arguments. See the content of the I<elements> array reference for more breakdown on the arguments provided.
+Function arguments. See the content of the C<elements> array reference for more breakdown on the arguments provided.
 
-Also the details of elements for those args can be accessed with property I<args_def> as an array reference.
+Also the details of elements for those args can be accessed with property C<args_def> as an array reference.
 
-=item I<name>
+=item C<name>
 
 Function name
 
@@ -1380,23 +1371,23 @@ Available properties:
 
 =over 8
 
-=item I<op>
+=item C<op>
 
 Contains the operator used. See L<Regexp::Common::Apache2/integercomp>
 
-=item I<worda>
+=item C<worda>
 
 The first word being compared, and on the left of the operator. For example :
 
     12 -ne 10
 
-Also the details of elements for I<worda> can be accessed with property I<worda_def> as an array reference.
+Also the details of elements for C<worda> can be accessed with property C<worda_def> as an array reference.
 
-=item I<wordb>
+=item C<wordb>
 
 The second word, being compared to, and on the right of the operator.
 
-Also the details of elements for I<wordb> can be accessed with property I<wordb_def> as an array reference.
+Also the details of elements for C<wordb> can be accessed with property C<wordb_def> as an array reference.
 
 =back
 
@@ -1412,17 +1403,17 @@ Available properties:
 
 =over 8
 
-=item I<list>
+=item C<list>
 
-The list of strings to be joined. See the content of the I<elements> array reference for more breakdown on the arguments provided.
+The list of strings to be joined. See the content of the C<elements> array reference for more breakdown on the arguments provided.
 
-Also the details of elements for those args can be accessed with property I<list_def> as an array reference.
+Also the details of elements for those args can be accessed with property C<list_def> as an array reference.
 
-=item I<word>
+=item C<word>
 
 The word used to join the list. This parameter is optional.
 
-Details for the word parameter, if any, can be found in the I<elements> array reference or can be accessed with the I<word_def> property.
+Details for the word parameter, if any, can be found in the C<elements> array reference or can be accessed with the C<word_def> property.
 
 =back
 
@@ -1446,13 +1437,13 @@ Available properties:
 
 =over 8
 
-=item I<args>
+=item C<args>
 
-Function arguments. See the content of the I<elements> array reference for more breakdown on the arguments provided.
+Function arguments. See the content of the C<elements> array reference for more breakdown on the arguments provided.
 
-Also the details of elements for those args can be accessed with property I<args_def> as an array reference.
+Also the details of elements for those args can be accessed with property C<args_def> as an array reference.
 
-=item I<name>
+=item C<name>
 
 Function name
 
@@ -1470,15 +1461,15 @@ Available properties:
 
 =over 8
 
-=item I<flags>
+=item C<flags>
 
 Example: C<mgis>
 
-=item I<pattern>
+=item C<pattern>
 
 Regular expression pattern, excluding enclosing separators.
 
-=item I<sep>
+=item C<sep>
 
 Type of separators used. It can be: /, #, $, %, ^, |, ?, !, ', ", ",", ";", ":", ".", _, and -
 
@@ -1496,23 +1487,23 @@ Available properties:
 
 =over 8
 
-=item I<op>
+=item C<op>
 
 COntains the operator used. See L<Regexp::Common::Apache2/stringcomp>
 
-=item I<worda>
+=item C<worda>
 
 The first word being compared, and on the left of the operator. For example :
 
     12 -ne 10
 
-Also the details of elements for I<worda> can be accessed with property I<worda_def> as an array reference.
+Also the details of elements for C<worda> can be accessed with property C<worda_def> as an array reference.
 
-=item I<wordb>
+=item C<wordb>
 
 The second word, being compared to, and on the right of the operator.
 
-Also the details of elements for I<wordb> can be accessed with property I<wordb_def> as an array reference.
+Also the details of elements for C<wordb> can be accessed with property C<wordb_def> as an array reference.
 
 =back
 
@@ -1526,15 +1517,15 @@ Possible sub types:
 
 =over 8
 
-=item I<function>
+=item C<function>
 
     %{md5:"some arguments"}
 
-=item I<rebackref>
+=item C<rebackref>
 
 This is a regular expression back reference, such as C<$1>, C<$2>, etc. up to 9
 
-=item I<variable>
+=item C<variable>
 
     %{REQUEST_URI}
     # or by enabling the legacy expressions
@@ -1546,15 +1537,15 @@ Available properties:
 
 =over 8
 
-=item I<args>
+=item C<args>
 
-Function arguments. See the content of the I<elements> array reference for more breakdown on the arguments provided.
+Function arguments. See the content of the C<elements> array reference for more breakdown on the arguments provided.
 
-=item I<name>
+=item C<name>
 
 Function name, or variable name.
 
-=item I<value>
+=item C<value>
 
 The regular expression back reference value, such as C<1>, C<2>, etc
 
@@ -1570,37 +1561,37 @@ Possible sub types:
 
 =over 8
 
-=item I<digits>
+=item C<digits>
 
 When the word contains one or more digits.
 
-=item I<dotted>
+=item C<dotted>
 
 When the word contains words sepsrated by dots, such as C<192.168.1.10>
 
-=item I<function>
+=item C<function>
 
 When the word is a function.
 
-=item I<parens>
+=item C<parens>
 
 When the word is surrounded by parenthesis
 
-=item I<quote>
+=item C<quote>
 
 When the word is surrounded by single or double quotes
 
-=item I<rebackref>
+=item C<rebackref>
 
 When the word is a regular expression back reference such as C<$1>, C<$2>, etc up to 9.
 
-=item I<regex>
+=item C<regex>
 
 This is an extension I added to make work some function such as C<split( /\w+/, $ip_list)>
 
 Without it, the regular expression would not be recognised as the Apache BNF stands.
 
-=item I<variable>
+=item C<variable>
 
 When the word is a variable. For example : C<%{REQUEST_URI}>, and it can also be a variable like C<${REQUEST_URI> if the legacy mode is enabled.
 
@@ -1610,37 +1601,37 @@ Available properties:
 
 =over 8
 
-=item I<flags>
+=item C<flags>
 
 The regular expression flags used, such as C<mgis>
 
-=item I<parens>
+=item C<parens>
 
 Contains an array reference of the open and close parenthesis, such as:
 
     ["(", ")"]
 
-=item I<pattern>
+=item C<pattern>
 
 The regular expression pattern
 
-=item I<quote>
+=item C<quote>
 
-Contains the type of quote used if the sub type is I<quote>
+Contains the type of quote used if the sub type is C<quote>
 
-=item I<regex>
+=item C<regex>
 
 Contains the regular expression
 
-=item I<sep>
+=item C<sep>
 
 The separator used in the regular expression, such as C</>
 
-=item I<value>
+=item C<value>
 
-The value of the digits if the sub type is I<digits> or I<rebackref>
+The value of the digits if the sub type is C<digits> or C<rebackref>
 
-=item I<word>
+=item C<word>
 
 The word enclosed in quotes
 

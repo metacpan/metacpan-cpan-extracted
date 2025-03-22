@@ -628,12 +628,7 @@ sub lookup_uri
     my $self = shift( @_ );
     my $uri  = '';
     $uri = shift( @_ ) if( @_ && !ref( $_[0] ) && ( scalar( @_ ) % 2 ) );
-    my $opts = {};
-    $opts = Scalar::Util::reftype( $_[0] ) eq 'HASH'
-        ? shift( @_ )
-        : !( scalar( @_ ) % 2 )
-            ? { @_ }
-            : {};
+    my $opts = $self->_get_args_as_hash( @_ );
     $uri = $opts->{uri} if( !length( $uri ) );
     return( $self->error( "No uri provided." ) ) if( !length( $uri ) );
     my $r = $opts->{apache_request} || $self->apache_request;
@@ -697,17 +692,7 @@ sub make
 {
     my $self = shift( @_ );
     return( $self->error( "Must be called with an existing object and not as ", __PACKAGE__, "->make()" ) ) if( !Scalar::Util::blessed( $self ) );
-    my $p = {};
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( scalar( @_ ) )
-    {
-        no warnings 'uninitialized';
-        $p = Scalar::Util::reftype( $_[0] ) eq 'HASH'
-            ? shift( @_ )
-            : !( scalar( @_ ) % 2 )
-                ? { @_ }
-                : {};
-    }
+    my $p = $self->_get_args_as_hash( @_ );
     my $r = $self->apache_request;
     my $d = $self->document_root;
     my $b = $self->base_uri;
@@ -956,7 +941,7 @@ sub _trim_trailing_slash
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1062,7 +1047,7 @@ This instantiate an object that is used to access other key methods. It takes th
 
 =over 4
 
-=item I<apache_request>
+=item C<apache_request>
 
 This is the L<Apache2::RequestRec> object that is provided if running under mod_perl.
 
@@ -1075,7 +1060,7 @@ Note that there is a main request object and subprocess request object, so to fi
     use Apache2::RequestUtil (); # extends Apache2::RequestRec objects
     my $r = $r->is_initial_req ? $r : $r->main;
 
-=item I<base_uri>
+=item C<base_uri>
 
 This is the base uri which is used to make uri absolute.
 
@@ -1093,11 +1078,11 @@ One would instantiate an object using C</some/folder/file.html> as the base_uri 
         # the Apache2::RequestRec provided with the apache_request parameter.
     );
 
-=item I<document_root>
+=item C<document_root>
 
 This is only necessary to be provided if this is not running under Apache mod_perl. Without this value, L<Apache2::SSI> has no way to guess the document root and will not be able to function properly and will return an L</error>.
 
-=item I<document_uri>
+=item C<document_uri>
 
 This is only necessary to be provided if this is not running under Apache mod_perl. This must be the uri of the document being served, such as C</my/path/index.html>. So, if you are using this outside of the rim of Apache mod_perl and your file resides, for example, at C</home/john/www/my/path/index.html> and your document root is C</home/john/www>, then the document uri would be C</my/path/index.html>
 
@@ -1110,6 +1095,8 @@ Sets or gets the L<Apache2::RequestRec> object. As explained in the L</new> meth
 When running under Apache mod_perl this is set automatically from the special L</handler> method, such as:
 
     my $r = $f->r; # $f is the Apache2::Filter object provided by Apache
+
+=for Pod::Coverage base_dir
 
 =head2 base_uri
 
@@ -1137,6 +1124,8 @@ This is done as per the L<RFC 3986 section 5.2.4 algorithm|https://tools.ietf.or
     # would become /a/c/d.html?foo=../bar
     $uri->query # foo=../bar
 
+=for Pod::Coverage document_dir
+
 =head2 document_directory
 
 Returns an L<Apache2::SSI::URI> object of the current directory of the L</document_uri> provided.
@@ -1157,7 +1146,7 @@ Sets or gets the document root.
 
 Wen running under Apache mod_perl, this value will be available automatically, using L<Apache2::RequestRec/document_root> method.
 
-If it runs outside of Apache, this will use the value provided upon instantiating the object and passing the I<document_root> parameter. If this is not set, it will return the value of the environment variable C<DOCUMENT_ROOT>.
+If it runs outside of Apache, this will use the value provided upon instantiating the object and passing the C<document_root> parameter. If this is not set, it will return the value of the environment variable C<DOCUMENT_ROOT>.
 
 =head2 document_uri
 
@@ -1196,9 +1185,25 @@ It is the equivalent of L<Apache2::RequestRec/subprocess_env>. Actually it uses 
 
 This returns the system file path to the document uri as a string.
 
+=head2 filepath
+
+This is an alias for L<filename|/filename>
+
 =head2 finfo
 
 Returns a L<Apache2::SSI::Finfo> object. This provides access to L<perlfunc/stat> information as method, taking advantage of L<APR::Finfo> when running under Apache, and an identical interface otherwise. See L<Apache2::SSI::Finfo> for more information.
+
+=head2 lookup_uri
+
+This takes an URI, and attempts at resolving it using Apache L<lookup_uri|Apache2::SubRequest/lookup_uri>
+
+If it succeeds, i twill return an L<URI object|URI>, or an L<Apache2::SubRequest> object otherwise.
+
+=head2 make
+
+Provided with an hash or hash reference of options, and this creates a new L<Apache2::SSI::URI> object.
+
+Supported options are the same ones used for creating a new object.
 
 =head2 new_uri
 
@@ -1257,7 +1262,7 @@ it takes an hash reference of parameters:
 
 =over 4
 
-=item I<binmode>
+=item C<binmode>
 
     my $content = $uri->slurp({ binmode => ':utf-8' });
 

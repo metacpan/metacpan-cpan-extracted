@@ -1,5 +1,21 @@
 Revision history for MIDI-RtController
 
+0.0503 2025-03-22 00:07:11
+    - Forgot to actually include eg/dual.pl. Whoopsy.
+
+0.0502 2025-03-22 00:02:28
+    - Add the eg/dual.pl program.
+    - Make the output attribute optional.
+
+0.0501 2025-03-21 18:52:25
+    - Actually document usage of this feature. Wow.
+
+0.0500 2025-03-21 18:45:08
+    - Make the midi_output port a public attribute.
+
+0.0406 2025-03-21 18:23:06
+    - Improve documentation.
+
 0.0405 2025-03-13 10:25:27
     - Update the eg/tester.pl program.
 

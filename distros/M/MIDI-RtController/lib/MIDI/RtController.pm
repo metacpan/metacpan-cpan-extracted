@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0405';
+our $VERSION = '0.0503';
 
 use Moo;
 use strictures 2;
@@ -35,8 +35,7 @@ has input => (
 
 
 has output => (
-    is       => 'ro',
-    required => 1,
+    is => 'ro',
 );
 
 
@@ -61,14 +60,15 @@ has _midi_channel => (
     default => sub { IO::Async::Channel->new },
 );
 
-has _midi_out => (
+
+has midi_out => (
     is      => 'ro',
     default => sub { RtMidiOut->new },
 );
 
 
 sub BUILD {
-    my ($self) = @_;
+    my ($self, $args) = @_;
 
     my $midi_rtn = IO::Async::Routine->new(
         channels_in  => [ $self->_msg_channel ],
@@ -90,13 +90,15 @@ sub BUILD {
     my $input_name = $self->input;
     $self->_msg_channel->send(\$input_name);
 
-    $self->_midi_out->open_virtual_port('foo');
+    unless ($args->{midi_out}) {
+        $self->midi_out->open_virtual_port('foo');
 
-    _log(sprintf 'Opening %s port %s...', $self->_midi_out->{type}, $self->output)
-        if $self->verbose;
-    _open_port($self->_midi_out, $self->output);
-    _log(sprintf 'Opened %s port %s', $self->_midi_out->{type}, $self->output)
-        if $self->verbose;
+        _log(sprintf 'Opening %s port %s...', $self->midi_out->{type}, $self->output)
+            if $self->verbose;
+        _open_port($self->midi_out, $self->output);
+        _log(sprintf 'Opened %s port %s', $self->midi_out->{type}, $self->output)
+            if $self->verbose;
+    }
 }
 
 sub _log {
@@ -140,7 +142,7 @@ sub add_filter ($self, $name, $event_type, $action) {
 
 sub send_it ($self, $event) {
     _log("Event: @$event") if $self->verbose;
-    $self->_midi_out->send_event(@$event);
+    $self->midi_out->send_event(@$event);
 }
 
 
@@ -172,15 +174,15 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0405
+version 0.0503
 
 =head1 SYNOPSIS
 
   use MIDI::RtController ();
 
   my $rtc = MIDI::RtController->new(
-    input  => 'input-MIDI-device',
-    output => 'output-MIDI-device',
+    input  => 'input device 1',
+    output => 'output device',
   );
 
   sub filter_notes {
@@ -212,9 +214,16 @@ version 0.0405
     }
   );
 
-  # add other stuff to the $rtc->loop...
-
+  # add stuff to the $rtc->loop...
   $rtc->run;
+
+  # you can also use multiple input sources simultaneously:
+  my $rtc2 = MIDI::RtController->new(
+    input    => 'input device 2',
+    loop     => $rtc->loop,
+    midi_out => $rtc->midi_out,
+  );
+  $rtc2->run;
 
 =head1 DESCRIPTION
 
@@ -252,6 +261,12 @@ Return the L<IO::Async::Loop>.
   $filters = $rtc->filters;
 
 Return or set the B<filters>.
+
+=head2 midi_out
+
+  $midi_out = $rtc->midi_out;
+
+Return the B<midi_out> port.
 
 =head1 METHODS
 

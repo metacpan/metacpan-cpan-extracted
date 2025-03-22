@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>06f663db-e3e2-4012-bc89-f28eeca22e5e</MessageSerialNumber>
-  <MessageDate>Sat, 15 Mar 2025 03:44:38 GMT</MessageDate>
+  <MessageSerialNumber>ea830e8d-193a-4a63-a767-fffc3b03d457</MessageSerialNumber>
+  <MessageDate>Sat, 22 Mar 2025 03:46:06 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8592,6 +8592,32 @@
         </Rule>
         <Rule>
           <Range>9000000-9999999</Range>
+          <Length>3</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-99997</Prefix>
+      <Agency>Srpska, Republic of</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>1000000-3999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>4000000-5499999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>5500000-9499999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9500000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

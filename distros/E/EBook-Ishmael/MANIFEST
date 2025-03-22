@@ -13,6 +13,7 @@ lib/EBook/Ishmael/EBook/CHM.pm
 lib/EBook/Ishmael/EBook/Epub.pm
 lib/EBook/Ishmael/EBook/FictionBook2.pm
 lib/EBook/Ishmael/EBook/HTML.pm
+lib/EBook/Ishmael/EBook/KF8.pm
 lib/EBook/Ishmael/EBook/Metadata.pm
 lib/EBook/Ishmael/EBook/Mobi.pm
 lib/EBook/Ishmael/EBook/PalmDoc.pm
@@ -47,8 +48,10 @@ t/19_cbz.t
 t/20_cb7.t
 t/21_cbr.t
 t/22_chm.t
+t/23_kf8.t
 t/40_ishmael.t
 t/data/gerwinski-gnu-head.png
+t/data/gpl3.azw3
 t/data/gpl3.cb7
 t/data/gpl3.cbr
 t/data/gpl3.cbz

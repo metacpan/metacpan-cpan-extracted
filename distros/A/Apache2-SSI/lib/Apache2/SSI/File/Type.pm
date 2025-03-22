@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File/Type.pm
-## Version v0.1.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/27
-## Modified 2024/09/04
+## Modified 2025/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,40 +25,40 @@ BEGIN
     use JSON;
     use Scalar::Util ();
     use URI::file;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
     # Translation of type in magic file to unpack template and byte count
     our $TEMPLATES = 
     {
-    'byte'      => [ 'c', 1 ],
-    'ubyte'     => [ 'C', 1 ],
-    'char'      => [ 'c', 1 ],
-    'uchar'     => [ 'C', 1 ],
-    'short'     => [ 's', 2 ],
-    'ushort'    => [ 'S', 2 ],
-    'long'      => [ 'l', 4 ],
-    'ulong'     => [ 'L', 4 ],
-    'date'      => [ 'l', 4 ],
-    'ubeshort'  => [ 'n', 2 ],
-    'beshort'   => [ [ 'n', 'S', 's' ], 2 ],
-    'ubelong'   => [   'N',             4 ],
-    'belong'    => [ [ 'N', 'I', 'i' ], 4 ],
-    'bedate'    => [   'N',             4 ],
-    'uleshort'  => [   'v',             2 ],
-    'leshort'   => [ [ 'v', 'S', 's' ], 2 ],
-    'ulelong'   => [   'V',             4 ],
-    'lelong'    => [ [ 'V', 'I', 'i' ], 4 ],
-    'ledate'    => [   'V',             4 ],
-    'string'    => undef(),
+        'byte'      => [ 'c', 1 ],
+        'ubyte'     => [ 'C', 1 ],
+        'char'      => [ 'c', 1 ],
+        'uchar'     => [ 'C', 1 ],
+        'short'     => [ 's', 2 ],
+        'ushort'    => [ 'S', 2 ],
+        'long'      => [ 'l', 4 ],
+        'ulong'     => [ 'L', 4 ],
+        'date'      => [ 'l', 4 ],
+        'ubeshort'  => [ 'n', 2 ],
+        'beshort'   => [ [ 'n', 'S', 's' ], 2 ],
+        'ubelong'   => [   'N',             4 ],
+        'belong'    => [ [ 'N', 'I', 'i' ], 4 ],
+        'bedate'    => [   'N',             4 ],
+        'uleshort'  => [   'v',             2 ],
+        'leshort'   => [ [ 'v', 'S', 's' ], 2 ],
+        'ulelong'   => [   'V',             4 ],
+        'lelong'    => [ [ 'V', 'I', 'i' ], 4 ],
+        'ledate'    => [   'V',             4 ],
+        'string'    => undef(),
     };
     
     # For letter escapes in magic file
     our $ESC = 
     {
-    'n' => "\n",
-    'r' => "\r",
-    'b' => "\b",
-    't' => "\t",
-    'f' => "\f"
+        'n' => "\n",
+        'r' => "\r",
+        'b' => "\b",
+        't' => "\t",
+        'f' => "\f"
     };
     # Cache
     our $MAGIC_DATA = [];
@@ -204,12 +204,12 @@ sub init
 
     $self->{FILE_EXTS} = 
     {
-    qr/\.gz$/   => 'application/x-gzip',
-    qr/\.bz2$/  => 'application/x-bzip2',
-    qr/\.Z$/    => 'application/x-compress',
-    qr/\.txt$/  => 'text/plain',
-    qr/\.html$/ => 'text/html',
-    qr/\.htm$/  => 'text/html',
+        qr/\.gz$/   => 'application/x-gzip',
+        qr/\.bz2$/  => 'application/x-bzip2',
+        qr/\.Z$/    => 'application/x-compress',
+        qr/\.txt$/  => 'text/plain',
+        qr/\.html$/ => 'text/html',
+        qr/\.htm$/  => 'text/html',
     };
     return( $self );
 }
@@ -508,7 +508,7 @@ sub parse_magic_file
 {
     my $self = shift( @_ );
     my $io   = shift( @_ );
-    #----{ Initialize values
+    # Initialize values
     $self->{magic}->{io}     = $io;
     $self->{magic}->{buffer} = undef();
     $self->{magic}->{count}  = 0;
@@ -712,15 +712,15 @@ sub read_magic_entry
     my $data  = shift( @_ ) || $self->{magic_data};
     my $depth = shift( @_ );
     my $magic = $self->{magic};
-    
+
     my $io = $magic->{io};
     # A ref to an array containing a magic line's components
     my $entry = [];
     my $line  = '';
-    
+
     # Buffered last line
     $line = $magic->{buffer};
-    while( 1 ) 
+    while(1) 
     {
         $line = '' if( !defined( $line ) );
         if( $line =~ /^\#/ || $line =~ /^[[:blank:]\h]*$/ ) 
@@ -730,11 +730,11 @@ sub read_magic_entry
             $magic->{count}++;
             next;
         }
-    
+
         my $this_depth = ( $line =~ /^(>+)/ )[0];
         $this_depth    = '' if( !defined( $this_depth ) );
         $depth         = 0 if( !defined( $depth ) );
-    
+
         if( length( $this_depth ) > $depth ) 
         {
             $magic->{buffer} = $line;
@@ -781,40 +781,6 @@ sub read_magic_entry
         }
         # print( STDERR "$line" );
     }
-}
-
-sub with_magic 
-{
-    my $self = shift( @_ );
-    my $data = shift( @_ );
-    my $desc = '';
-    my $type = '';
-    
-    return( 'application/octet-stream' ) if( length( $data ) <= 0 );
-    
-    # 3) Iterate over each magic entry.
-    for( my $m = 0; $m <= $#{ $self->{magic_data} }; $m++ ) 
-    {
-        # Check if the m-th magic entry matches and if it does, then $desc will contain 
-        # an updated description
-        if( $self->_magic_match_str( $self->{magic_data}->[ $m ], \$desc, $data ) ) 
-        {
-            if( defined( $desc ) && $desc ne '' ) 
-            {
-                $type = $desc;
-                last;
-            }
-        }
-    
-        # Read another entry from the magic file if we've exhausted all the entries 
-        # already buffered. read_magic_entry will add to the end of the array if 
-        # there are more.
-        if( $m == $#{ $self->{magic_data} } && !$self->{magic}->{io}->eof() )
-        {
-            $self->read_magic_entry();
-        }
-    }
-    return( $type );
 }
 
 sub with_data 
@@ -878,6 +844,40 @@ sub with_filename
                 # has no x-type param
                 $type = $self->{FILE_EXTS}->{ $regex };
             }
+        }
+    }
+    return( $type );
+}
+
+sub with_magic 
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    my $desc = '';
+    my $type = '';
+    
+    return( 'application/octet-stream' ) if( length( $data ) <= 0 );
+    
+    # 3) Iterate over each magic entry.
+    for( my $m = 0; $m <= $#{ $self->{magic_data} }; $m++ ) 
+    {
+        # Check if the m-th magic entry matches and if it does, then $desc will contain 
+        # an updated description
+        if( $self->_magic_match_str( $self->{magic_data}->[ $m ], \$desc, $data ) ) 
+        {
+            if( defined( $desc ) && $desc ne '' ) 
+            {
+                $type = $desc;
+                last;
+            }
+        }
+    
+        # Read another entry from the magic file if we've exhausted all the entries 
+        # already buffered. read_magic_entry will add to the end of the array if 
+        # there are more.
+        if( $m == $#{ $self->{magic_data} } && !$self->{magic}->{io}->eof() )
+        {
+            $self->read_magic_entry();
         }
     }
     return( $type );
@@ -1268,7 +1268,7 @@ sub add_magic_entry
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =head1 NAME
@@ -1320,6 +1320,12 @@ The internal magic data is provided internally from a json data file located in 
 
 =head1 METHODS
 
+=for Pod::Coverage add_file_exts
+
+=for Pod::Coverage add_magic_entry
+
+=for Pod::Coverage add_specials
+
 =head2 as_json
 
 This returns the internal magic data as a properly formatted json string using L<JSON>.
@@ -1342,7 +1348,7 @@ Guess the mime type based upon the data provided with C<$some_data> and returns 
 
 If C<$some_data> is zero length big, it will return C<application/x-empty>.
 
-Otherwise, it defaults to the value set with L</default_type>, which, by default, is I<text/plain> if L</default_type> is set to a true value or an empty value otherwise.
+Otherwise, it defaults to the value set with L</default_type>, which, by default, is C<text/plain> if L</default_type> is set to a true value or an empty value otherwise.
 
 =head2 default_type
 
@@ -1400,6 +1406,26 @@ Default to true.
 Provided with an opened file handle and this method will try to guess the mime type and returns it.
 
 It defaults to whatever value is set with L</default_type>.
+
+=head2 parse_magic_file
+
+Provided with a file handle, and this will parse the magic file, and load its data into the object.
+
+=for Pod::Coverage parse_magic_line
+
+=for Pod::Coverage read_magic_entry
+
+=head2 with_data
+
+Provided with some data, and this will attempt at guessing the mime type, and return it.
+
+=head2 with_filename
+
+Provided with a file name, and this will attempt at guessing the mime type, and return it.
+
+=head2 with_magic
+
+Provided with a C<magic> value, and this will attempt at guessing the mime type, and return it.
 
 =head1 AUTHOR
 

@@ -1,4 +1,7 @@
 Revision history for Perl module EBook::Gutenberg
 
+0.02  Mar 21 2025
+  - Require List::Util 1.33.
+
 0.01  Mar 11 2025
   - Initial release.

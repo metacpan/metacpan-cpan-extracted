@@ -1,6 +1,6 @@
 package EBook::Gutenberg::Catalog;
 use 5.016;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strict;
 use warnings;
 

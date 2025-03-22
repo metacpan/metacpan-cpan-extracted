@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="München U- and S-Bahn and Trams">
+  <lines>
+    <!-- Tram -->
+    <line id="MVG_12" name="12" color="#9E4694"/>
+    <!-- Tram -->
+    <line id="MVG_16" name="16" color="#0065AE"/>
+    <!-- Tram -->
+    <line id="MVG_17" name="17" color="#8B563E"/>
+    <!-- Tram -->
+    <line id="MVG_18" name="18" color="#13A538"/>
+    <!-- Tram -->
+    <line id="MVG_19" name="19" color="#E30613"/>
+    <!-- Tram -->
+    <line id="MVG_20" name="20" color="#16BAE7"/>
+    <!-- Tram -->
+    <line id="MVG_21" name="21" color="#BC7A00"/>
+    <!-- Tram -->
+    <line id="MVG_23" name="23" color="#BCCF00"/>
+    <!-- Tram -->
+    <line id="MVG_25" name="25" color="#F1919C"/>
+    <!-- Tram -->
+    <line id="MVG_27" name="27" color="#F7A600"/>
+    <!-- Tram -->
+    <line id="MVG_28" name="28" color="#E09F00"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S1" name="S1" color="#14BAE7"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S2" name="S2" color="#75B728"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S20" name="S20" color="#EA516C"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S3" name="S3" color="#951781"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S4" name="S4" color="#E30B12"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S6" name="S6" color="#00975F"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S7" name="S7" color="#882D22"/>
+    <!-- S-Bahn -->
+    <line id="MVG_S8" name="S8" color="#060708"/>
+    <!-- Metro -->
+    <line id="MVG_U1" name="U1" color="#51822E"/>
+    <!-- Metro -->
+    <line id="MVG_U2" name="U2" color="#C20C31"/>
+    <!-- Metro -->
+    <line id="MVG_U3" name="U3" color="#EC6624"/>
+    <!-- Metro -->
+    <line id="MVG_U4" name="U4" color="#05A983"/>
+    <!-- Metro -->
+    <line id="MVG_U5" name="U5" color="#BB7A05"/>
+    <!-- Metro -->
+    <line id="MVG_U6" name="U6" color="#0065AD"/>
+    <!-- Metro -->
+    <line id="MVG_U7" name="U7" color="#874730"/>
+    <!-- Metro -->
+    <line id="MVG_U8" name="U8" color="#D7392A"/>
+  </lines>
+  <stations>
+    <!-- 12 -->
+    <station id="mvg_1201" name="Schwabing Nord" line="MVG_12:1,MVG_23:1" link="mvg_1202"/>
+    <station id="mvg_1202" name="Domagkstr." line="MVG_12:2,MVG_23:2" link="mvg_1201,mvg_1203"/>
+    <station id="mvg_1203" name="Anni-Albers-Str." line="MVG_12:3,MVG_23:3" link="mvg_1202,mvg_1204"/>
+    <station id="mvg_1204" name="Am Münchner Tor" line="MVG_12:4,MVG_23:4" link="mvg_1203,mvg_1205"/>
+    <station id="mvg_1205" name="Schwabinger Tor" line="MVG_12:5,MVG_23:5" link="mvg_1204,mvg_1206"/>
+    <station id="mvg_1206" name="Parzivalplatz" line="MVG_12:6,MVG_23:6" link="mvg_1205,mvg_1207,mvg_2307"/>
+    <station id="mvg_1207" name="Kölner Platz" line="MVG_12:7" link="mvg_1206,mvg_u208"/>
+    <station id="mvg_u208" name="Scheidplatz" line="MVG_12:8,MVG_28:1,MVG_U2:8,MVG_U3:7,MVG_U8:3" link="mvg_1207,mvg_1209,mvg_u207,mvg_u209,mvg_u306,mvg_u308"/>
+    <station id="mvg_1209" name="Karl-Theodor-Str." line="MVG_12:9,MVG_28:2" link="mvg_1210,mvg_u208"/>
+    <station id="mvg_1210" name="Clemensstr." line="MVG_12:10,MVG_28:3" link="mvg_1209,mvg_1211"/>
+    <station id="mvg_1211" name="Kurfürstenplatz" line="MVG_12:11,MVG_27:7,MVG_28:4" link="mvg_1210,mvg_2708,mvg_u209"/>
+    <station id="mvg_u209" name="Hohenzollernplatz" line="MVG_12:12,MVG_27:6,MVG_U2:9,MVG_U8:4" link="mvg_1211,mvg_1213,mvg_u208,mvg_u210"/>
+    <station id="mvg_1213" name="Nordbad" line="MVG_12:13,MVG_27:5" link="mvg_1214,mvg_2704,mvg_u209"/>
+    <station id="mvg_1214" name="Barbarastr." line="MVG_12:14" link="mvg_1213,mvg_1215"/>
+    <station id="mvg_1215" name="Infanteriestr." line="MVG_12:15" link="mvg_1214,mvg_1216"/>
+    <station id="mvg_1216" name="Leonrodplatz" line="MVG_12:16,MVG_20:10,MVG_21:6" link="mvg_1215,mvg_1217,mvg_2009,mvg_2011"/>
+    <station id="mvg_1217" name="Fasaneriestr." line="MVG_12:17" link="mvg_1216,mvg_1218"/>
+    <station id="mvg_1218" name="Albrechtstr." line="MVG_12:18" link="mvg_1217,mvg_u105"/>
+    <station id="mvg_u105" name="Rotkreuzplatz" line="MVG_12:19,MVG_U1:5,MVG_U7:5" link="mvg_1218,mvg_1220,mvg_u104,mvg_u106"/>
+    <station id="mvg_1220" name="Volkartstr." line="MVG_12:20" link="mvg_1221,mvg_u105"/>
+    <station id="mvg_1221" name="Neuhausen" line="MVG_12:21" link="mvg_1220,mvg_1222"/>
+    <station id="mvg_1222" name="Renatastr." line="MVG_12:22" link="mvg_1221,mvg_1223"/>
+    <station id="mvg_1223" name="Hubertusstr." line="MVG_12:23" link="mvg_1222,mvg_1224"/>
+    <station id="mvg_1224" name="Romanplatz" line="MVG_12:24,MVG_16:1,MVG_17:6" link="mvg_1223,mvg_1602,mvg_1705"/>
+    <!-- 16 -->
+    <station id="mvg_1602" name="Kriemhildenstr." line="MVG_16:2,MVG_17:7" link="mvg_1224,mvg_1603"/>
+    <station id="mvg_1603" name="Steubenplatz" line="MVG_16:3,MVG_17:8" link="mvg_1602,mvg_1604"/>
+    <station id="mvg_1604" name="Briefzentrum" line="MVG_16:4,MVG_17:9" link="mvg_1603,mvg_1605"/>
+    <station id="mvg_1605" name="Burghausener Str." line="MVG_16:5,MVG_17:10" link="mvg_1604,mvg_1606"/>
+    <station id="mvg_1606" name="Donnersberger Str." line="MVG_16:6,MVG_17:11" link="mvg_1605,mvg_1607"/>
+    <station id="mvg_1607" name="Marsstr." line="MVG_16:7,MVG_17:12" link="mvg_1606,mvg_1608"/>
+    <station id="mvg_1608" name="Deroystr." line="MVG_16:8,MVG_17:13" link="mvg_1607,mvg_s116"/>
+    <station id="mvg_s116" name="Hackerbrücke" line="MVG_16:9,MVG_17:14,MVG_S1:16,MVG_S2:22,MVG_S3:14,MVG_S4:15,MVG_S6:16,MVG_S7:8,MVG_S8:17" link="mvg_1608,mvg_1610,mvg_s115,mvg_u108"/>
+    <station id="mvg_1610" name="Hopfenstr." line="MVG_16:10,MVG_17:15" link="mvg_1611,mvg_s116"/>
+    <station id="mvg_1611" name="Hauptbahnhof Nord" line="MVG_16:11,MVG_17:16,MVG_20:15,MVG_21:11" link="mvg_1610,mvg_1919,mvg_2014,mvg_u108" other_link="walk_hbfns:mvg_1818"/>
+    <station id="mvg_u108" name="Hauptbahnhof" line="MVG_16:12,MVG_17:17,MVG_19:18,MVG_20:18,MVG_S1:17,MVG_S2:23,MVG_S3:15,MVG_S4:16,MVG_S6:17,MVG_S7:9,MVG_S8:18,MVG_U1:8,MVG_U2:13,MVG_U4:5,MVG_U5:7,MVG_U7:8,MVG_U8:8" link="mvg_1611,mvg_1818,mvg_1919,mvg_s116,mvg_u107,mvg_u109,mvg_u212,mvg_u404,mvg_u406"/>
+    <station id="mvg_u406" name="Karlsplatz" line="MVG_16:13,MVG_17:18,MVG_18:19,MVG_27:14,MVG_28:11,MVG_S1:18,MVG_S2:24,MVG_S3:16,MVG_S4:17,MVG_S6:18,MVG_S7:10,MVG_S8:19,MVG_U4:6,MVG_U5:8" link="mvg_1818,mvg_2713,mvg_u108,mvg_u109,mvg_u312,mvg_u313" other_link="walk_kn:mvg_1919,walk_ks:mvg_2017"/>
+    <station id="mvg_u109" name="Sendlinger Tor" line="MVG_16:14,MVG_17:19,MVG_18:20,MVG_27:15,MVG_28:12,MVG_U1:9,MVG_U2:14,MVG_U3:14,MVG_U6:11,MVG_U7:9,MVG_U8:9" link="mvg_1615,mvg_u108,mvg_u110,mvg_u313,mvg_u315,mvg_u406"/>
+    <station id="mvg_1615" name="Müllerstr." line="MVG_16:15,MVG_17:20,MVG_18:21" link="mvg_1616,mvg_u109,mvg_u110"/>
+    <station id="mvg_1616" name="Reichenbachplatz" line="MVG_16:16,MVG_17:21" link="mvg_1615,mvg_s120"/>
+    <station id="mvg_s120" name="Isartor" line="MVG_16:17,MVG_17:22,MVG_S1:20,MVG_S2:26,MVG_S3:18,MVG_S4:19,MVG_S6:20,MVG_S7:12,MVG_S8:21" link="mvg_1616,mvg_1618,mvg_1723,mvg_s121,mvg_u313"/>
+    <station id="mvg_1618" name="Mariannenplatz" line="MVG_16:18" link="mvg_1619,mvg_s120"/>
+    <station id="mvg_1619" name="Maxmonument" line="MVG_16:19,MVG_19:24,MVG_21:17" link="mvg_1618,mvg_1923,mvg_1925,mvg_u408"/>
+    <station id="mvg_u408" name="Lehel" line="MVG_16:20,MVG_U4:8,MVG_U5:10" link="mvg_1619,mvg_1621,mvg_u312,mvg_u409"/>
+    <station id="mvg_1621" name="Nationalmuseum/Haus der Kunst" line="MVG_16:21" link="mvg_1622,mvg_u408"/>
+    <station id="mvg_1622" name="Paradiesstr." line="MVG_16:22" link="mvg_1621,mvg_1623"/>
+    <station id="mvg_1623" name="Tivolistr." line="MVG_16:23" link="mvg_1622,mvg_1624"/>
+    <station id="mvg_1624" name="Mauerkircherstr." line="MVG_16:24" link="mvg_1623,mvg_1625"/>
+    <station id="mvg_1625" name="Herkomerplatz" line="MVG_16:25,MVG_17:31" link="mvg_1624,mvg_1626,mvg_1730"/>
+    <station id="mvg_1626" name="Effnerplatz" line="MVG_16:26,MVG_17:32" link="mvg_1625,mvg_1627"/>
+    <station id="mvg_1627" name="Arabellastr." line="MVG_16:27,MVG_17:33" link="mvg_1626,mvg_u413"/>
+    <station id="mvg_u413" name="Arabellapark" line="MVG_16:28,MVG_17:34,MVG_U4:13" link="mvg_1627,mvg_1629,mvg_u412"/>
+    <station id="mvg_1629" name="Cosimabad" line="MVG_16:29,MVG_17:35" link="mvg_1630,mvg_u413"/>
+    <station id="mvg_1630" name="Schlösselgarten" line="MVG_16:30,MVG_17:36" link="mvg_1629,mvg_1631"/>
+    <station id="mvg_1631" name="Prinz-Eugen-Park" line="MVG_16:31,MVG_17:37" link="mvg_1630,mvg_1632"/>
+    <station id="mvg_1632" name="Taimerhofstr." line="MVG_16:32,MVG_17:38" link="mvg_1631,mvg_1633"/>
+    <station id="mvg_1633" name="Regina-Ullmann-Str." line="MVG_16:33,MVG_17:39" link="mvg_1632,mvg_1634"/>
+    <station id="mvg_1634" name="Fritz-Meyer-Weg" line="MVG_16:34,MVG_17:40" link="mvg_1633,mvg_1635"/>
+    <station id="mvg_1635" name="St. Emmeram" line="MVG_16:35,MVG_17:41" link="mvg_1634"/>
+    <!-- 17 -->
+    <station id="mvg_1701" name="Amalienburgstr." line="MVG_17:1" link="mvg_1702"/>
+    <station id="mvg_1702" name="Botanischer Garten" line="MVG_17:2" link="mvg_1701,mvg_1703"/>
+    <station id="mvg_1703" name="Maria-Ward-Str." line="MVG_17:3" link="mvg_1702,mvg_1704"/>
+    <station id="mvg_1704" name="Dall'Armistr." line="MVG_17:4" link="mvg_1703,mvg_1705"/>
+    <station id="mvg_1705" name="Schloss Nymphenburg" line="MVG_17:5" link="mvg_1224,mvg_1704"/>
+    <station id="mvg_1723" name="Deutsches Museum" line="MVG_17:23" link="mvg_1724,mvg_s120"/>
+    <station id="mvg_1724" name="Am Gasteig" line="MVG_17:24" link="mvg_1723,mvg_1725"/>
+    <station id="mvg_1725" name="Wiener Platz" line="MVG_17:25" link="mvg_1724,mvg_u409"/>
+    <station id="mvg_u409" name="Max-Weber-Platz" line="MVG_17:26,MVG_19:26,MVG_21:19,MVG_25:1,MVG_U4:9,MVG_U5:11" link="mvg_1725,mvg_1727,mvg_1925,mvg_1927,mvg_2120,mvg_u408,mvg_u410,mvg_u512"/>
+    <station id="mvg_1727" name="Friedensengel/Villa Stuck" line="MVG_17:27" link="mvg_1728,mvg_u409"/>
+    <station id="mvg_1728" name="Holbeinstr." line="MVG_17:28" link="mvg_1727,mvg_1729"/>
+    <station id="mvg_1729" name="Sternwartstr." line="MVG_17:29" link="mvg_1728,mvg_1730"/>
+    <station id="mvg_1730" name="Bundesfinanzhof" line="MVG_17:30" link="mvg_1625,mvg_1729"/>
+    <!-- 18 -->
+    <station id="mvg_1801" name="Gondrellplatz" line="MVG_18:1" link="mvg_1802"/>
+    <station id="mvg_1802" name="Senftenauerstr." line="MVG_18:2" link="mvg_1801,mvg_1803"/>
+    <station id="mvg_1803" name="Ammerseestr." line="MVG_18:3" link="mvg_1802,mvg_1804"/>
+    <station id="mvg_1804" name="Stegener Weg" line="MVG_18:4" link="mvg_1803,mvg_1805"/>
+    <station id="mvg_1805" name="Säulinstr." line="MVG_18:5" link="mvg_1804,mvg_1806"/>
+    <station id="mvg_1806" name="Fachnerstr." line="MVG_18:6" link="mvg_1805,mvg_u401"/>
+    <station id="mvg_u401" name="Westendstr." line="MVG_18:7,MVG_U4:1,MVG_U5:3" link="mvg_1806,mvg_1808,mvg_u402,mvg_u502"/>
+    <station id="mvg_1808" name="Hans-Thonauer-Str." line="MVG_18:8" link="mvg_1809,mvg_u401"/>
+    <station id="mvg_1809" name="Siglstr." line="MVG_18:9" link="mvg_1808,mvg_1810"/>
+    <station id="mvg_1810" name="Lautensackstr." line="MVG_18:10,MVG_19:9" link="mvg_1809,mvg_1811,mvg_1908"/>
+    <station id="mvg_1811" name="Am Lokschuppen" line="MVG_18:11,MVG_19:10" link="mvg_1810,mvg_1812"/>
+    <station id="mvg_1812" name="Barthstr." line="MVG_18:12,MVG_19:11" link="mvg_1811,mvg_1813"/>
+    <station id="mvg_1813" name="Trappentreustr." line="MVG_18:13,MVG_19:12" link="mvg_1812,mvg_1814"/>
+    <station id="mvg_1814" name="Schrenkstr." line="MVG_18:14,MVG_19:13" link="mvg_1813,mvg_1815"/>
+    <station id="mvg_1815" name="Holzapfelstr." line="MVG_18:15,MVG_19:14" link="mvg_1814,mvg_1816"/>
+    <station id="mvg_1816" name="Hermann-Lingg-Str." line="MVG_18:16,MVG_19:15" link="mvg_1815,mvg_1817"/>
+    <station id="mvg_1817" name="Holzkirchner Bahnhof" line="MVG_18:17,MVG_19:16" link="mvg_1816,mvg_1818"/>
+    <station id="mvg_1818" name="Hauptbahnhof Süd" line="MVG_18:18,MVG_19:17" link="mvg_1817,mvg_u108,mvg_u406" other_link="walk_hbfns:mvg_1611"/>
+    <station id="mvg_u110" name="Fraunhoferstr." line="MVG_18:22,MVG_U1:10,MVG_U2:15,MVG_U7:10,MVG_U8:10" link="mvg_1615,mvg_1823,mvg_u109,mvg_u111"/>
+    <station id="mvg_1823" name="Eduard-Schmid-Str." line="MVG_18:23" link="mvg_1824,mvg_u110"/>
+    <station id="mvg_1824" name="Mariahilfplatz" line="MVG_18:24" link="mvg_1823,mvg_1825"/>
+    <station id="mvg_1825" name="Ostfriedhof" line="MVG_18:25,MVG_25:6" link="mvg_1824,mvg_1826,mvg_2505,mvg_u217"/>
+    <station id="mvg_1826" name="St.-Martins-Platz" line="MVG_18:26" link="mvg_1825,mvg_1827"/>
+    <station id="mvg_1827" name="Werinherstr." line="MVG_18:27" link="mvg_1826,mvg_u219"/>
+    <station id="mvg_u219" name="Giesing" line="MVG_18:28,MVG_S3:22,MVG_S7:16,MVG_U2:19,MVG_U7:14,MVG_U8:14" link="mvg_1827,mvg_1829,mvg_s321,mvg_s323,mvg_s717,mvg_u218,mvg_u220"/>
+    <station id="mvg_1829" name="Chiemgaustr." line="MVG_18:29" link="mvg_1830,mvg_u219"/>
+    <station id="mvg_1830" name="Schwanseestr." line="MVG_18:30" link="mvg_1829"/>
+    <!-- 19 -->
+    <station id="mvg_s310" name="Pasing" line="MVG_19:1,MVG_S20:9,MVG_S3:10,MVG_S4:11,MVG_S6:12,MVG_S8:13" link="mvg_1902,mvg_s113,mvg_s309,mvg_s410,mvg_s611,mvg_u402"/>
+    <station id="mvg_1902" name="Rathaus Pasing" line="MVG_19:2" link="mvg_1903,mvg_s310"/>
+    <station id="mvg_1903" name="Offenbachstr." line="MVG_19:3" link="mvg_1902,mvg_1904"/>
+    <station id="mvg_1904" name="Am Knie" line="MVG_19:4" link="mvg_1903,mvg_1905"/>
+    <station id="mvg_1905" name="Westbad" line="MVG_19:5" link="mvg_1904,mvg_1906"/>
+    <station id="mvg_1906" name="Lohensteinstr." line="MVG_19:6" link="mvg_1905,mvg_1907"/>
+    <station id="mvg_1907" name="Willibaldplatz" line="MVG_19:7" link="mvg_1906,mvg_1908"/>
+    <station id="mvg_1908" name="Agnes-Bernauer-Str." line="MVG_19:8" link="mvg_1810,mvg_1907"/>
+    <station id="mvg_1919" name="Karlsplatz Nord" line="MVG_19:19,MVG_20:16,MVG_21:12" link="mvg_1611,mvg_1920,mvg_2017,mvg_u108" other_link="walk_kn:mvg_u406"/>
+    <station id="mvg_1920" name="Lenbachplatz" line="MVG_19:20,MVG_21:13" link="mvg_1919,mvg_1921"/>
+    <station id="mvg_1921" name="Marienplatz/Theatinerstr." line="MVG_19:21,MVG_21:14" link="mvg_1920,mvg_1922" other_link="walk_mt:mvg_u313"/>
+    <station id="mvg_1922" name="Nationaltheater" line="MVG_19:22,MVG_21:15" link="mvg_1921,mvg_1923"/>
+    <station id="mvg_1923" name="Kammerspiele" line="MVG_19:23,MVG_21:16" link="mvg_1619,mvg_1922"/>
+    <station id="mvg_1925" name="Maximilianeum" line="MVG_19:25,MVG_21:18" link="mvg_1619,mvg_u409"/>
+    <station id="mvg_1927" name="Flurstr." line="MVG_19:27" link="mvg_1928,mvg_u409"/>
+    <station id="mvg_1928" name="Grillparzerstr." line="MVG_19:28" link="mvg_1927,mvg_1929"/>
+    <station id="mvg_1929" name="Einsteinstr." line="MVG_19:29" link="mvg_1928,mvg_1930"/>
+    <station id="mvg_1930" name="Vogelweideplatz" line="MVG_19:30" link="mvg_1929,mvg_1931"/>
+    <station id="mvg_1931" name="Riedenburger Str." line="MVG_19:31" link="mvg_1930,mvg_s230"/>
+    <station id="mvg_s230" name="Berg am Laim" line="MVG_19:32,MVG_S2:30,MVG_S4:23,MVG_S6:24" link="mvg_1931,mvg_s123,mvg_s231,mvg_u224"/>
+    <!-- 20 -->
+    <station id="mvg_u301" name="Moosach" line="MVG_20:1,MVG_S1:12,MVG_U3:1" link="mvg_2002,mvg_s111,mvg_s113,mvg_u302"/>
+    <station id="mvg_2002" name="Pelkovenstr." line="MVG_20:2" link="mvg_2003,mvg_u301"/>
+    <station id="mvg_2003" name="Hugo-Troendle-Str." line="MVG_20:3" link="mvg_2002,mvg_2004"/>
+    <station id="mvg_2004" name="Wintrichring" line="MVG_20:4" link="mvg_2003,mvg_2005"/>
+    <station id="mvg_2005" name="Hanauer Str." line="MVG_20:5" link="mvg_2004,mvg_u103"/>
+    <station id="mvg_u103" name="Westfriedhof" line="MVG_20:6,MVG_21:2,MVG_U1:3,MVG_U7:3" link="mvg_2005,mvg_2007,mvg_u102,mvg_u104"/>
+    <station id="mvg_2007" name="Borstel" line="MVG_20:7,MVG_21:3" link="mvg_2008,mvg_2101,mvg_u103"/>
+    <station id="mvg_2008" name="Olympiapark West" line="MVG_20:8,MVG_21:4" link="mvg_2007,mvg_2009"/>
+    <station id="mvg_2009" name="Heideckstr." line="MVG_20:9,MVG_21:5" link="mvg_1216,mvg_2008"/>
+    <station id="mvg_2011" name="Hochschule München" line="MVG_20:11,MVG_21:7" link="mvg_1216,mvg_2012"/>
+    <station id="mvg_2012" name="Sandstr." line="MVG_20:12,MVG_21:8" link="mvg_2011,mvg_u107"/>
+    <station id="mvg_u107" name="Stiglmaierplatz" line="MVG_20:13,MVG_21:9,MVG_U1:7,MVG_U7:7" link="mvg_2012,mvg_2014,mvg_u106,mvg_u108"/>
+    <station id="mvg_2014" name="Karlstr." line="MVG_20:14,MVG_21:10" link="mvg_1611,mvg_u107"/>
+    <station id="mvg_2017" name="Karlsplatz Süd" line="MVG_20:17" link="mvg_u108" other_link="walk_ks:mvg_u406"/>
+    <!-- 21 -->
+    <station id="mvg_2101" name="Stadtwerke München" line="MVG_21:1" link="mvg_u103"/>
+    <station id="mvg_2120" name="Wörthstr." line="MVG_21:20,MVG_25:2" link="mvg_s121,mvg_u409,mvg_u512"/>
+    <station id="mvg_u512" name="Ostbahnhof" line="MVG_21:21,MVG_S1:22,MVG_S2:28,MVG_S3:20,MVG_S4:21,MVG_S6:22,MVG_S7:14,MVG_S8:23,MVG_U5:12" link="mvg_2120,mvg_2122,mvg_s121,mvg_s123,mvg_s321,mvg_u221,mvg_u409"/>
+    <station id="mvg_2122" name="Haidenauplatz" line="MVG_21:22" link="mvg_2123,mvg_u512"/>
+    <station id="mvg_2123" name="Ampfingstr." line="MVG_21:23" link="mvg_2122,mvg_2124"/>
+    <station id="mvg_2124" name="Schlüsselbergstr." line="MVG_21:24" link="mvg_2123,mvg_2125"/>
+    <station id="mvg_2125" name="Baumkirchner Str." line="MVG_21:25" link="mvg_2124,mvg_2126"/>
+    <station id="mvg_2126" name="Mutschellestr." line="MVG_21:26" link="mvg_2125,mvg_u223"/>
+    <station id="mvg_u223" name="Kreillerstr." line="MVG_21:27,MVG_U2:23" link="mvg_2126,mvg_2128,mvg_u222,mvg_u224"/>
+    <station id="mvg_2128" name="St.-Veit-Str." line="MVG_21:28" link="mvg_u223"/>
+    <!-- 23 -->
+    <station id="mvg_2307" name="Potsdamer Str." line="MVG_23:7" link="mvg_1206,mvg_u309"/>
+    <station id="mvg_u309" name="Münchner Freiheit" line="MVG_23:8,MVG_U3:9,MVG_U6:16" link="mvg_2307,mvg_u308,mvg_u310,mvg_u617"/>
+    <!-- 25 -->
+    <station id="mvg_s121" name="Rosenheimer Platz" line="MVG_25:3,MVG_S1:21,MVG_S2:27,MVG_S3:19,MVG_S4:20,MVG_S6:21,MVG_S7:13,MVG_S8:22" link="mvg_2120,mvg_2504,mvg_s120,mvg_u512"/>
+    <station id="mvg_2504" name="Regerplatz" line="MVG_25:4" link="mvg_2505,mvg_s121"/>
+    <station id="mvg_2505" name="Carl-Amery-Platz" line="MVG_25:5" link="mvg_1825,mvg_2504"/>
+    <station id="mvg_u217" name="Silberhornstr." line="MVG_25:7,MVG_U2:17,MVG_U7:12,MVG_U8:12" link="mvg_1825,mvg_2508,mvg_u111,mvg_u218"/>
+    <station id="mvg_2508" name="Tegernseer Landstr." line="MVG_25:8" link="mvg_u113,mvg_u217"/>
+    <station id="mvg_u113" name="Wettersteinplatz" line="MVG_25:9,MVG_U1:13" link="mvg_2508,mvg_2510,mvg_u112,mvg_u114"/>
+    <station id="mvg_2510" name="Kurzstr." line="MVG_25:10" link="mvg_2511,mvg_u113"/>
+    <station id="mvg_2511" name="Südtiroler Str." line="MVG_25:11" link="mvg_2510,mvg_2512"/>
+    <station id="mvg_2512" name="Tiroler Platz" line="MVG_25:12" link="mvg_2511,mvg_2513"/>
+    <station id="mvg_2513" name="Authariplatz" line="MVG_25:13" link="mvg_2512,mvg_2514"/>
+    <station id="mvg_2514" name="Theodolindenplatz" line="MVG_25:14" link="mvg_2513,mvg_2515"/>
+    <station id="mvg_2515" name="Klinikum Harlaching" line="MVG_25:15" link="mvg_2514,mvg_2516"/>
+    <station id="mvg_2516" name="Menterschwaige" line="MVG_25:16" link="mvg_2515,mvg_2517"/>
+    <station id="mvg_2517" name="Großhesseloher Brücke" line="MVG_25:17" link="mvg_2516,mvg_2518"/>
+    <station id="mvg_2518" name="Schilcherweg" line="MVG_25:18" link="mvg_2517,mvg_2519"/>
+    <station id="mvg_2519" name="Grünwald, Bavariafilmplatz" line="MVG_25:19" link="mvg_2518,mvg_2520"/>
+    <station id="mvg_2520" name="Robert-Koch-Str." line="MVG_25:20" link="mvg_2519,mvg_2521"/>
+    <station id="mvg_2521" name="Parkplatz" line="MVG_25:21" link="mvg_2520,mvg_2522"/>
+    <station id="mvg_2522" name="Ludwig-Thoma-Str." line="MVG_25:22" link="mvg_2521,mvg_2523"/>
+    <station id="mvg_2523" name="Derbolfinger Platz" line="MVG_25:23" link="mvg_2522"/>
+    <!-- 27 -->
+    <station id="mvg_u306" name="Petuelring" line="MVG_27:1,MVG_U3:6,MVG_U8:2" link="mvg_2702,mvg_u208,mvg_u305"/>
+    <station id="mvg_2702" name="Gartenstr." line="MVG_27:2" link="mvg_2703,mvg_u306"/>
+    <station id="mvg_2703" name="Ackermannstr." line="MVG_27:3" link="mvg_2702,mvg_2704"/>
+    <station id="mvg_2704" name="Herzogstr." line="MVG_27:4" link="mvg_1213,mvg_2703"/>
+    <station id="mvg_2708" name="Elisabethplatz" line="MVG_27:8,MVG_28:5" link="mvg_1211,mvg_2709"/>
+    <station id="mvg_2709" name="Nordensdstr." line="MVG_27:9,MVG_28:6" link="mvg_2708,mvg_2710"/>
+    <station id="mvg_2710" name="Schellingstr." line="MVG_27:10,MVG_28:7" link="mvg_2709,mvg_2711"/>
+    <station id="mvg_2711" name="Pinakotheken" line="MVG_27:11,MVG_28:8" link="mvg_2710,mvg_2712"/>
+    <station id="mvg_2712" name="Karolinenplatz" line="MVG_27:12,MVG_28:9" link="mvg_2711,mvg_2713"/>
+    <station id="mvg_2713" name="Ottostr." line="MVG_27:13,MVG_28:10" link="mvg_2712,mvg_u406"/>
+    <!-- 28 -->
+    <!-- S1 -->
+    <station id="mvg_s101" name="Flughafen" line="MVG_S1:1,MVG_S8:32" link="mvg_s102"/>
+    <station id="mvg_s102" name="Besucherpark" line="MVG_S1:2,MVG_S8:31" link="mvg_s101,mvg_s105,mvg_s830"/>
+    <station id="mvg_s103" name="Freising" line="MVG_S1:3" link="mvg_s104"/>
+    <station id="mvg_s104" name="Pulling" line="MVG_S1:4" link="mvg_s103,mvg_s105"/>
+    <station id="mvg_s105" name="Neufahrn" line="MVG_S1:5" link="mvg_s102,mvg_s104,mvg_s106"/>
+    <station id="mvg_s106" name="Eching" line="MVG_S1:6" link="mvg_s105,mvg_s107"/>
+    <station id="mvg_s107" name="Lohhof" line="MVG_S1:7" link="mvg_s106,mvg_s108"/>
+    <station id="mvg_s108" name="Unterschleißheim" line="MVG_S1:8" link="mvg_s107,mvg_s109"/>
+    <station id="mvg_s109" name="Oberschleißheim" line="MVG_S1:9" link="mvg_s108,mvg_u201"/>
+    <station id="mvg_u201" name="Feldmoching" line="MVG_S1:10,MVG_U2:1" link="mvg_s109,mvg_s111,mvg_u202"/>
+    <station id="mvg_s111" name="Fasanerie" line="MVG_S1:11" link="mvg_u201,mvg_u301"/>
+    <station id="mvg_s113" name="Laim" line="MVG_S1:13,MVG_S2:19,MVG_S3:11,MVG_S4:12,MVG_S6:13,MVG_S8:14" link="mvg_s114,mvg_s218,mvg_s310,mvg_u301"/>
+    <station id="mvg_s114" name="Hirschgarten" line="MVG_S1:14,MVG_S2:20,MVG_S3:12,MVG_S4:13,MVG_S6:14,MVG_S8:15" link="mvg_s113,mvg_s115"/>
+    <station id="mvg_s115" name="Donnersbergerbrücke" line="MVG_S1:15,MVG_S2:21,MVG_S3:13,MVG_S4:14,MVG_S6:15,MVG_S7:7,MVG_S8:16" link="mvg_s114,mvg_s116,mvg_s706"/>
+    <station id="mvg_u313" name="Marienplatz" line="MVG_S1:19,MVG_S2:25,MVG_S3:17,MVG_S4:18,MVG_S6:19,MVG_S7:11,MVG_S8:20,MVG_U3:13,MVG_U6:12" link="mvg_s120,mvg_u109,mvg_u312,mvg_u406" other_link="walk_mt:mvg_1921"/>
+    <station id="mvg_s123" name="Leuchtenbergring" line="MVG_S1:23,MVG_S2:29,MVG_S4:22,MVG_S6:23,MVG_S8:24" link="mvg_s230,mvg_s825,mvg_u512"/>
+    <!-- S2 -->
+    <station id="mvg_s201" name="Altomünster" line="MVG_S2:1" link="mvg_s202"/>
+    <station id="mvg_s202" name="Kleinberghofen" line="MVG_S2:2" link="mvg_s201,mvg_s203"/>
+    <station id="mvg_s203" name="Erdweg" line="MVG_S2:3" link="mvg_s202,mvg_s204"/>
+    <station id="mvg_s204" name="Arnbach" line="MVG_S2:4" link="mvg_s203,mvg_s205"/>
+    <station id="mvg_s205" name="Markt Indersdorf" line="MVG_S2:5" link="mvg_s204,mvg_s206"/>
+    <station id="mvg_s206" name="Niederroth" line="MVG_S2:6" link="mvg_s205,mvg_s207"/>
+    <station id="mvg_s207" name="Schwabhausen" line="MVG_S2:7" link="mvg_s206,mvg_s208"/>
+    <station id="mvg_s208" name="Bachern" line="MVG_S2:8" link="mvg_s207,mvg_s209"/>
+    <station id="mvg_s209" name="Dachau Stadt" line="MVG_S2:9" link="mvg_s208,mvg_s214"/>
+    <station id="mvg_s210" name="Petershausen" line="MVG_S2:10" link="mvg_s211"/>
+    <station id="mvg_s211" name="Vierkirchen-Esterhofen" line="MVG_S2:11" link="mvg_s210,mvg_s212"/>
+    <station id="mvg_s212" name="Röhrmoos" line="MVG_S2:12" link="mvg_s211,mvg_s213"/>
+    <station id="mvg_s213" name="Hebertshausen" line="MVG_S2:13" link="mvg_s212,mvg_s214"/>
+    <station id="mvg_s214" name="Dachau Bahnhof" line="MVG_S2:14" link="mvg_s209,mvg_s213,mvg_s215"/>
+    <station id="mvg_s215" name="Karlsfeld" line="MVG_S2:15" link="mvg_s214,mvg_s216"/>
+    <station id="mvg_s216" name="Allach" line="MVG_S2:16" link="mvg_s215,mvg_s217"/>
+    <station id="mvg_s217" name="Untermenzing" line="MVG_S2:17" link="mvg_s216,mvg_s218"/>
+    <station id="mvg_s218" name="Obermenzing" line="MVG_S2:18" link="mvg_s113,mvg_s217"/>
+    <station id="mvg_s231" name="Riem" line="MVG_S2:31" link="mvg_s230,mvg_s232"/>
+    <station id="mvg_s232" name="Feldkirchen" line="MVG_S2:32" link="mvg_s231,mvg_s233"/>
+    <station id="mvg_s233" name="Heimstetten" line="MVG_S2:33" link="mvg_s232,mvg_s234"/>
+    <station id="mvg_s234" name="Grub" line="MVG_S2:34" link="mvg_s233,mvg_s235"/>
+    <station id="mvg_s235" name="Poing" line="MVG_S2:35" link="mvg_s234,mvg_s236"/>
+    <station id="mvg_s236" name="Markt Schwaben" line="MVG_S2:36" link="mvg_s235,mvg_s237"/>
+    <station id="mvg_s237" name="Ottenhofen" line="MVG_S2:37" link="mvg_s236,mvg_s238"/>
+    <station id="mvg_s238" name="St. Koloman" line="MVG_S2:38" link="mvg_s237,mvg_s239"/>
+    <station id="mvg_s239" name="Aufhausen" line="MVG_S2:39" link="mvg_s238,mvg_s240"/>
+    <station id="mvg_s240" name="Altenerding" line="MVG_S2:40" link="mvg_s239,mvg_s241"/>
+    <station id="mvg_s241" name="Erding" line="MVG_S2:41" link="mvg_s240"/>
+    <!-- S20 -->
+    <station id="mvg_s2001" name="Höllriegelskreuth" line="MVG_S20:1" link="mvg_s2002"/>
+    <station id="mvg_s2002" name="Pullach" line="MVG_S20:2" link="mvg_s2001,mvg_s2003"/>
+    <station id="mvg_s2003" name="Großhesselohe Isartalbahnhof" line="MVG_S20:3" link="mvg_s2002,mvg_s2004"/>
+    <station id="mvg_s2004" name="Solln" line="MVG_S20:4" link="mvg_s2003,mvg_s2005"/>
+    <station id="mvg_s2005" name="Siemenswerke" line="MVG_S20:5" link="mvg_s2004,mvg_s2006" other_link="walk_so:mvg_u320"/>
+    <station id="mvg_s2006" name="Mittersendling" line="MVG_S20:6" link="mvg_s2005,mvg_u607"/>
+    <station id="mvg_u607" name="Harras" line="MVG_S20:7,MVG_U6:7" link="mvg_s2006,mvg_u317,mvg_u402,mvg_u606"/>
+    <station id="mvg_u402" name="Heimeranplatz" line="MVG_S20:8,MVG_U4:2,MVG_U5:4" link="mvg_s310,mvg_u401,mvg_u403,mvg_u607"/>
+    <!-- S3 -->
+    <station id="mvg_s301" name="Mammendorf" line="MVG_S3:1" link="mvg_s302"/>
+    <station id="mvg_s302" name="Malching" line="MVG_S3:2" link="mvg_s301,mvg_s303"/>
+    <station id="mvg_s303" name="Maisach" line="MVG_S3:3" link="mvg_s302,mvg_s304"/>
+    <station id="mvg_s304" name="Gernlinden" line="MVG_S3:4" link="mvg_s303,mvg_s305"/>
+    <station id="mvg_s305" name="Esting" line="MVG_S3:5" link="mvg_s304,mvg_s306"/>
+    <station id="mvg_s306" name="Olching" line="MVG_S3:6" link="mvg_s305,mvg_s307"/>
+    <station id="mvg_s307" name="Gröbenzell" line="MVG_S3:7" link="mvg_s306,mvg_s308"/>
+    <station id="mvg_s308" name="Lochhausen" line="MVG_S3:8" link="mvg_s307,mvg_s309"/>
+    <station id="mvg_s309" name="Langwied" line="MVG_S3:9" link="mvg_s308,mvg_s310"/>
+    <station id="mvg_s321" name="St.-Martin-Str." line="MVG_S3:21,MVG_S7:15" link="mvg_u219,mvg_u512"/>
+    <station id="mvg_s323" name="Fasangarten" line="MVG_S3:23" link="mvg_s324,mvg_u219"/>
+    <station id="mvg_s324" name="Fasanenpark" line="MVG_S3:24" link="mvg_s323,mvg_s325"/>
+    <station id="mvg_s325" name="Unterhaching" line="MVG_S3:25" link="mvg_s324,mvg_s326"/>
+    <station id="mvg_s326" name="Taufkirchen" line="MVG_S3:26" link="mvg_s325,mvg_s327"/>
+    <station id="mvg_s327" name="Furth" line="MVG_S3:27" link="mvg_s326,mvg_s328"/>
+    <station id="mvg_s328" name="Deisenhofen" line="MVG_S3:28" link="mvg_s327,mvg_s329"/>
+    <station id="mvg_s329" name="Sauerlach" line="MVG_S3:29" link="mvg_s328,mvg_s330"/>
+    <station id="mvg_s330" name="Otterfing" line="MVG_S3:30" link="mvg_s329,mvg_s331"/>
+    <station id="mvg_s331" name="Holzkirchen" line="MVG_S3:31" link="mvg_s330"/>
+    <!-- S4 -->
+    <station id="mvg_s401" name="Geltendorf" line="MVG_S4:1" link="mvg_s402"/>
+    <station id="mvg_s402" name="Türkenfeld" line="MVG_S4:2" link="mvg_s401,mvg_s403"/>
+    <station id="mvg_s403" name="Grafrath" line="MVG_S4:3" link="mvg_s402,mvg_s404"/>
+    <station id="mvg_s404" name="Schöngeising" line="MVG_S4:4" link="mvg_s403,mvg_s405"/>
+    <station id="mvg_s405" name="Buchenau" line="MVG_S4:5" link="mvg_s404,mvg_s406"/>
+    <station id="mvg_s406" name="Fürstenfeldbruck" line="MVG_S4:6" link="mvg_s405,mvg_s407"/>
+    <station id="mvg_s407" name="Eichenau" line="MVG_S4:7" link="mvg_s406,mvg_s408"/>
+    <station id="mvg_s408" name="Puchheim" line="MVG_S4:8" link="mvg_s407,mvg_s409"/>
+    <station id="mvg_s409" name="Aubing" line="MVG_S4:9" link="mvg_s408,mvg_s410"/>
+    <station id="mvg_s410" name="Leienfelsstr." line="MVG_S4:10" link="mvg_s310,mvg_s409"/>
+    <station id="mvg_u224" name="Trudering" line="MVG_S4:24,MVG_S6:25,MVG_U2:24" link="mvg_s230,mvg_s425,mvg_u223,mvg_u225"/>
+    <station id="mvg_s425" name="Gronsdorf" line="MVG_S4:25,MVG_S6:26" link="mvg_s426,mvg_u224"/>
+    <station id="mvg_s426" name="Haar" line="MVG_S4:26,MVG_S6:27" link="mvg_s425,mvg_s427"/>
+    <station id="mvg_s427" name="Vaterstetten" line="MVG_S4:27,MVG_S6:28" link="mvg_s426,mvg_s428"/>
+    <station id="mvg_s428" name="Baldham" line="MVG_S4:28,MVG_S6:29" link="mvg_s427,mvg_s429"/>
+    <station id="mvg_s429" name="Zorneding" line="MVG_S4:29,MVG_S6:30" link="mvg_s428,mvg_s430"/>
+    <station id="mvg_s430" name="Eglharting" line="MVG_S4:30,MVG_S6:31" link="mvg_s429,mvg_s431"/>
+    <station id="mvg_s431" name="Kirchseeon" line="MVG_S4:31,MVG_S6:32" link="mvg_s430,mvg_s432"/>
+    <station id="mvg_s432" name="Grafing Bahnhof" line="MVG_S4:32,MVG_S6:33" link="mvg_s431,mvg_s433"/>
+    <station id="mvg_s433" name="Grafing Stadt" line="MVG_S4:33,MVG_S6:34" link="mvg_s432,mvg_s434"/>
+    <station id="mvg_s434" name="Ebersberg" line="MVG_S4:34,MVG_S6:35" link="mvg_s433"/>
+    <!-- S6 -->
+    <station id="mvg_s601" name="Tutzing" line="MVG_S6:1" link="mvg_s602"/>
+    <station id="mvg_s602" name="Feldafing" line="MVG_S6:2" link="mvg_s601,mvg_s603"/>
+    <station id="mvg_s603" name="Possenhofen" line="MVG_S6:3" link="mvg_s602,mvg_s604"/>
+    <station id="mvg_s604" name="Starnberg" line="MVG_S6:4" link="mvg_s603,mvg_s605"/>
+    <station id="mvg_s605" name="Starnberg Nord" line="MVG_S6:5" link="mvg_s604,mvg_s606"/>
+    <station id="mvg_s606" name="Gauting" line="MVG_S6:6" link="mvg_s605,mvg_s607"/>
+    <station id="mvg_s607" name="Stockdorf" line="MVG_S6:7" link="mvg_s606,mvg_s608"/>
+    <station id="mvg_s608" name="Planegg" line="MVG_S6:8" link="mvg_s607,mvg_s609"/>
+    <station id="mvg_s609" name="Gräfelfing" line="MVG_S6:9" link="mvg_s608,mvg_s610"/>
+    <station id="mvg_s610" name="Lochham" line="MVG_S6:10" link="mvg_s609,mvg_s611"/>
+    <station id="mvg_s611" name="Westkreuz" line="MVG_S6:11,MVG_S8:12" link="mvg_s310,mvg_s610,mvg_s811"/>
+    <!-- S7 -->
+    <station id="mvg_s701" name="Wolfratshausen" line="MVG_S7:1" link="mvg_s702"/>
+    <station id="mvg_s702" name="Icking" line="MVG_S7:2" link="mvg_s701,mvg_s703"/>
+    <station id="mvg_s703" name="Ebenhausen-Schäftlarn" line="MVG_S7:3" link="mvg_s702,mvg_s704"/>
+    <station id="mvg_s704" name="Hohenschäftlarn" line="MVG_S7:4" link="mvg_s703,mvg_s705"/>
+    <station id="mvg_s705" name="Baierbrunn" line="MVG_S7:5" link="mvg_s704,mvg_s706"/>
+    <station id="mvg_s706" name="Buchenhain" line="MVG_S7:6" link="mvg_s115,mvg_s705"/>
+    <station id="mvg_s717" name="Perlach" line="MVG_S7:17" link="mvg_u219,mvg_u518"/>
+    <station id="mvg_u518" name="Neuperlach Süd" line="MVG_S7:18,MVG_U5:18" link="mvg_s717,mvg_s719,mvg_u517"/>
+    <station id="mvg_s719" name="Neubiberg" line="MVG_S7:19" link="mvg_s720,mvg_u518"/>
+    <station id="mvg_s720" name="Ottobrunn" line="MVG_S7:20" link="mvg_s719,mvg_s721"/>
+    <station id="mvg_s721" name="Hohenbrunn" line="MVG_S7:21" link="mvg_s720,mvg_s722"/>
+    <station id="mvg_s722" name="Wächterhof" line="MVG_S7:22" link="mvg_s721,mvg_s723"/>
+    <station id="mvg_s723" name="Höhenkirchen-Siegertsbrunn" line="MVG_S7:23" link="mvg_s722,mvg_s724"/>
+    <station id="mvg_s724" name="Dürrnhaar" line="MVG_S7:24" link="mvg_s723,mvg_s725"/>
+    <station id="mvg_s725" name="Aying" line="MVG_S7:25" link="mvg_s724,mvg_s726"/>
+    <station id="mvg_s726" name="Peiß" line="MVG_S7:26" link="mvg_s725,mvg_s727"/>
+    <station id="mvg_s727" name="Großhelfendorf" line="MVG_S7:27" link="mvg_s726,mvg_s728"/>
+    <station id="mvg_s728" name="Kreuzstr." line="MVG_S7:28" link="mvg_s727"/>
+    <!-- S8 -->
+    <station id="mvg_s801" name="Herrsching" line="MVG_S8:1" link="mvg_s802"/>
+    <station id="mvg_s802" name="Seefeld-Hechendorf" line="MVG_S8:2" link="mvg_s801,mvg_s803"/>
+    <station id="mvg_s803" name="Steinebach" line="MVG_S8:3" link="mvg_s802,mvg_s804"/>
+    <station id="mvg_s804" name="Weßling" line="MVG_S8:4" link="mvg_s803,mvg_s805"/>
+    <station id="mvg_s805" name="Neugilching" line="MVG_S8:5" link="mvg_s804,mvg_s806"/>
+    <station id="mvg_s806" name="Gilching-Argelsried" line="MVG_S8:6" link="mvg_s805,mvg_s807"/>
+    <station id="mvg_s807" name="Geisenbrunn" line="MVG_S8:7" link="mvg_s806,mvg_s808"/>
+    <station id="mvg_s808" name="Germering-Unterpfaffenhofen" line="MVG_S8:8" link="mvg_s807,mvg_s809"/>
+    <station id="mvg_s809" name="Harthaus" line="MVG_S8:9" link="mvg_s808,mvg_s810"/>
+    <station id="mvg_s810" name="Freiham" line="MVG_S8:10" link="mvg_s809,mvg_s811"/>
+    <station id="mvg_s811" name="Neuaubing" line="MVG_S8:11" link="mvg_s611,mvg_s810"/>
+    <station id="mvg_s825" name="Daglfing" line="MVG_S8:25" link="mvg_s123,mvg_s826"/>
+    <station id="mvg_s826" name="Englschalking" line="MVG_S8:26" link="mvg_s825,mvg_s827"/>
+    <station id="mvg_s827" name="Johanneskirchen" line="MVG_S8:27" link="mvg_s826,mvg_s828"/>
+    <station id="mvg_s828" name="Unterföhring" line="MVG_S8:28" link="mvg_s827,mvg_s829"/>
+    <station id="mvg_s829" name="Ismaning" line="MVG_S8:29" link="mvg_s828,mvg_s830"/>
+    <station id="mvg_s830" name="Hallbergmoos" line="MVG_S8:30" link="mvg_s102,mvg_s829"/>
+    <!-- U1 -->
+    <station id="mvg_u101" name="Olympia-Einkaufszentrum" line="MVG_U1:1,MVG_U3:3,MVG_U7:1" link="mvg_u102,mvg_u302,mvg_u304"/>
+    <station id="mvg_u102" name="Georg-Brauchle-Ring" line="MVG_U1:2,MVG_U7:2" link="mvg_u101,mvg_u103"/>
+    <station id="mvg_u104" name="Gern" line="MVG_U1:4,MVG_U7:4" link="mvg_u103,mvg_u105"/>
+    <station id="mvg_u106" name="Maillingerstr." line="MVG_U1:6,MVG_U7:6" link="mvg_u105,mvg_u107"/>
+    <station id="mvg_u111" name="Kolumbusplatz" line="MVG_U1:11,MVG_U2:16,MVG_U7:11,MVG_U8:11" link="mvg_u110,mvg_u112,mvg_u217"/>
+    <station id="mvg_u112" name="Candidplatz" line="MVG_U1:12" link="mvg_u111,mvg_u113"/>
+    <station id="mvg_u114" name="St.-Quirin-Platz" line="MVG_U1:14" link="mvg_u113,mvg_u115"/>
+    <station id="mvg_u115" name="Mangfallplatz" line="MVG_U1:15" link="mvg_u114"/>
+    <!-- U2 -->
+    <station id="mvg_u202" name="Hasenbergl" line="MVG_U2:2" link="mvg_u201,mvg_u203"/>
+    <station id="mvg_u203" name="Dülferstr." line="MVG_U2:3" link="mvg_u202,mvg_u204"/>
+    <station id="mvg_u204" name="Harthof" line="MVG_U2:4" link="mvg_u203,mvg_u205"/>
+    <station id="mvg_u205" name="Am Hart" line="MVG_U2:5" link="mvg_u204,mvg_u206"/>
+    <station id="mvg_u206" name="Frankfurter Ring" line="MVG_U2:6" link="mvg_u205,mvg_u207"/>
+    <station id="mvg_u207" name="Milbertshofen" line="MVG_U2:7" link="mvg_u206,mvg_u208"/>
+    <station id="mvg_u210" name="Josephsplatz" line="MVG_U2:10,MVG_U8:5" link="mvg_u209,mvg_u211"/>
+    <station id="mvg_u211" name="Theresienstr." line="MVG_U2:11,MVG_U8:6" link="mvg_u210,mvg_u212"/>
+    <station id="mvg_u212" name="Königsplatz" line="MVG_U2:12,MVG_U8:7" link="mvg_u108,mvg_u211"/>
+    <station id="mvg_u218" name="Untersbergstr." line="MVG_U2:18,MVG_U7:13,MVG_U8:13" link="mvg_u217,mvg_u219"/>
+    <station id="mvg_u220" name="Karl-Preis-Platz" line="MVG_U2:20,MVG_U7:15,MVG_U8:15" link="mvg_u219,mvg_u221"/>
+    <station id="mvg_u221" name="Innsbrucker Ring" line="MVG_U2:21,MVG_U5:13,MVG_U7:16,MVG_U8:16" link="mvg_u220,mvg_u222,mvg_u512,mvg_u514"/>
+    <station id="mvg_u222" name="Josephsburg" line="MVG_U2:22" link="mvg_u221,mvg_u223"/>
+    <station id="mvg_u225" name="Moosfeld" line="MVG_U2:25" link="mvg_u224,mvg_u226"/>
+    <station id="mvg_u226" name="Messestadt West" line="MVG_U2:26" link="mvg_u225,mvg_u227"/>
+    <station id="mvg_u227" name="Messestadt Ost" line="MVG_U2:27" link="mvg_u226"/>
+    <!-- U3 -->
+    <station id="mvg_u302" name="Moosacher St.-Martins-Platz" line="MVG_U3:2" link="mvg_u101,mvg_u301"/>
+    <station id="mvg_u304" name="Oberwiesenfeld" line="MVG_U3:4" link="mvg_u101,mvg_u305"/>
+    <station id="mvg_u305" name="Olympiazentrum" line="MVG_U3:5,MVG_U8:1" link="mvg_u304,mvg_u306"/>
+    <station id="mvg_u308" name="Bonner Platz" line="MVG_U3:8" link="mvg_u208,mvg_u309"/>
+    <station id="mvg_u310" name="Giselastr." line="MVG_U3:10,MVG_U6:15" link="mvg_u309,mvg_u311"/>
+    <station id="mvg_u311" name="Universität" line="MVG_U3:11,MVG_U6:14" link="mvg_u310,mvg_u312"/>
+    <station id="mvg_u312" name="Odeonsplatz" line="MVG_U3:12,MVG_U4:7,MVG_U5:9,MVG_U6:13" link="mvg_u311,mvg_u313,mvg_u406,mvg_u408"/>
+    <station id="mvg_u315" name="Goetheplatz" line="MVG_U3:15,MVG_U6:10" link="mvg_u109,mvg_u316"/>
+    <station id="mvg_u316" name="Poccistr." line="MVG_U3:16,MVG_U6:9" link="mvg_u315,mvg_u317"/>
+    <station id="mvg_u317" name="Implerstr." line="MVG_U3:17,MVG_U6:8" link="mvg_u316,mvg_u318,mvg_u607"/>
+    <station id="mvg_u318" name="Brudermühlstr." line="MVG_U3:18" link="mvg_u317,mvg_u319"/>
+    <station id="mvg_u319" name="Thalkirchen" line="MVG_U3:19" link="mvg_u318,mvg_u320"/>
+    <station id="mvg_u320" name="Obersendling" line="MVG_U3:20" link="mvg_u319,mvg_u321" other_link="walk_so:mvg_s2005"/>
+    <station id="mvg_u321" name="Aidenbachstr." line="MVG_U3:21" link="mvg_u320,mvg_u322"/>
+    <station id="mvg_u322" name="Machtlfinger Str." line="MVG_U3:22" link="mvg_u321,mvg_u323"/>
+    <station id="mvg_u323" name="Forstenrieder Allee" line="MVG_U3:23" link="mvg_u322,mvg_u324"/>
+    <station id="mvg_u324" name="Basler Str." line="MVG_U3:24" link="mvg_u323,mvg_u325"/>
+    <station id="mvg_u325" name="Fürstenried West" line="MVG_U3:25" link="mvg_u324"/>
+    <!-- U4 -->
+    <station id="mvg_u403" name="Schwanthalerhöhe" line="MVG_U4:3,MVG_U5:5" link="mvg_u402,mvg_u404"/>
+    <station id="mvg_u404" name="Theresienwiese" line="MVG_U4:4,MVG_U5:6" link="mvg_u108,mvg_u403"/>
+    <station id="mvg_u410" name="Prinzregentenplatz" line="MVG_U4:10" link="mvg_u409,mvg_u411"/>
+    <station id="mvg_u411" name="Böhmerwaldplatz" line="MVG_U4:11" link="mvg_u410,mvg_u412"/>
+    <station id="mvg_u412" name="Richard-Strauss-Str." line="MVG_U4:12" link="mvg_u411,mvg_u413"/>
+    <!-- U5 -->
+    <station id="mvg_u501" name="Laimer Platz" line="MVG_U5:1" link="mvg_u502"/>
+    <station id="mvg_u502" name="Friedenheimer Str." line="MVG_U5:2" link="mvg_u401,mvg_u501"/>
+    <station id="mvg_u514" name="Michaelibad" line="MVG_U5:14,MVG_U7:17,MVG_U8:17" link="mvg_u221,mvg_u515"/>
+    <station id="mvg_u515" name="Quiddestr." line="MVG_U5:15,MVG_U7:18,MVG_U8:18" link="mvg_u514,mvg_u516"/>
+    <station id="mvg_u516" name="Neuperlach Zentrum" line="MVG_U5:16,MVG_U7:19,MVG_U8:19" link="mvg_u515,mvg_u517"/>
+    <station id="mvg_u517" name="Therese-Giehse-Allee" line="MVG_U5:17" link="mvg_u516,mvg_u518"/>
+    <!-- U6 -->
+    <station id="mvg_u601" name="Klinikum Großhadern" line="MVG_U6:1" link="mvg_u602"/>
+    <station id="mvg_u602" name="Großhadern" line="MVG_U6:2" link="mvg_u601,mvg_u603"/>
+    <station id="mvg_u603" name="Haderner Stern" line="MVG_U6:3" link="mvg_u602,mvg_u604"/>
+    <station id="mvg_u604" name="Holzapfelkreuth" line="MVG_U6:4" link="mvg_u603,mvg_u605"/>
+    <station id="mvg_u605" name="Westpark" line="MVG_U6:5" link="mvg_u604,mvg_u606"/>
+    <station id="mvg_u606" name="Partnachplatz" line="MVG_U6:6" link="mvg_u605,mvg_u607"/>
+    <station id="mvg_u617" name="Dietlindenstr." line="MVG_U6:17" link="mvg_u309,mvg_u618"/>
+    <station id="mvg_u618" name="Nordfriedhof" line="MVG_U6:18" link="mvg_u617,mvg_u619"/>
+    <station id="mvg_u619" name="Alte Heide" line="MVG_U6:19" link="mvg_u618,mvg_u620"/>
+    <station id="mvg_u620" name="Studentenstadt" line="MVG_U6:20" link="mvg_u619,mvg_u621"/>
+    <station id="mvg_u621" name="Freimann" line="MVG_U6:21" link="mvg_u620,mvg_u622"/>
+    <station id="mvg_u622" name="Kieferngarten" line="MVG_U6:22" link="mvg_u621,mvg_u623"/>
+    <station id="mvg_u623" name="Fröttmaning" line="MVG_U6:23" link="mvg_u622,mvg_u624"/>
+    <station id="mvg_u624" name="Garching-Hochbrück" line="MVG_U6:24" link="mvg_u623,mvg_u625"/>
+    <station id="mvg_u625" name="Garching-Forschungszentrum" line="MVG_U6:25" link="mvg_u624"/>
+    <!-- U7 -->
+    <!-- U8 -->
+  </stations>
+</tube>

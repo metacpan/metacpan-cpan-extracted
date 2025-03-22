@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.036-4-gb6b1214
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.037-3-g853910f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -296,7 +296,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

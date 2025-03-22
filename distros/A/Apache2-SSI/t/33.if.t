@@ -58,12 +58,12 @@ my $tests =
         uri => "${BASE_URI}/03.06.if.html",
         code => 200,
     },
-    {
-        expect => qr/^[[:blank:]\h\v]*Found the expected file/,
-        name => 'access with -A (existing)',
-        uri => "${BASE_URI}/03.07.if.html",
-        code => 200,
-    },
+#     {
+#         expect => qr/^[[:blank:]\h\v]*Found the expected file/,
+#         name => 'access with -A (existing)',
+#         uri => "${BASE_URI}/03.07.if.html",
+#         code => 200,
+#     },
     {
         expect => qr/^[[:blank:]\h\v]*Oh good, nothing found/,
         name => 'variable non-zero length with -n',

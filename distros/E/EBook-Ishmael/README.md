@@ -13,6 +13,7 @@ program for further processing. For example, you can pipe it into a pager like
 **ishmael** currently supports the following ebook formats:
 * EPUB
 * MOBI
+* AZW3/KF8
 * AZW
 * HTML/XHTML
 * PDF
@@ -93,7 +94,7 @@ zTXT test file.
 * [MobileRead](https://wiki.mobileread.com/wiki/Main_Page) - Mobi reader,
 PalmDoc reader.
 * [KindleUnpack](https://github.com/kevinhendricks/KindleUnpack) - Mobi
-reader, Mobi Huff/CDIC decoder.
+reader, Mobi Huff/CDIC decoder, KF8 reader.
 * [web2help](https://www.skeed.it/web2help) - CHM test file.
 
 ## History

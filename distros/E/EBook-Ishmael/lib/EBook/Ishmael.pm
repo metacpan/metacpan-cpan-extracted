@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 use strict;
 use warnings;
 
@@ -69,6 +69,7 @@ my $STDOUT = '-';
 my %FORMAT_ALTS = (
 	'fb2'       => 'fictionbook2',
 	'azw'       => 'mobi',
+	'azw3'      => 'kf8',
 );
 
 my %META_MODES = map { $_ => 1 } qw(

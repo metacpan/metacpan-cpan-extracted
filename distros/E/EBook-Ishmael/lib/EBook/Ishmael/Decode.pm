@@ -1,6 +1,6 @@
 package EBook::Ishmael::Decode;
 use 5.016;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 use strict;
 use warnings;
 
@@ -11,11 +11,14 @@ sub lz77_decode {
 
 	my $encode = shift;
 
+	my $len = length $encode;
+	my $p = 0;
+
 	my $decode = '';
 
-	while ($encode) {
+	while ($p < $len) {
 
-		my $b = ord substr $encode, 0, 1, '';
+		my $b = ord substr $encode, $p++, 1;
 
 		# space + xor byte with 0x80
 		if ($b >= 0xc0) {
@@ -24,7 +27,7 @@ sub lz77_decode {
 		# length-distance pair: get next byte, strip 2 leading bits, split byte
 		# into 11 bits of distance and 3 bits of length + 3
 		} elsif ($b >= 0x80) {
-			$b = ($b << 8) + ord substr $encode, 0, 1, '';
+			$b = ($b << 8) + ord substr $encode, $p++, 1;
 			my $d = ($b & 0x3fff) >> 3;
 			my $l = ($b & 0x0007) + 3;
 			$decode .= substr $decode, -$d, 1 while $l--;
@@ -33,7 +36,8 @@ sub lz77_decode {
 			$decode .= chr $b;
 		# copy next 1-8 bytes
 		} elsif ($b >= 0x01) {
-			$decode .= substr $encode, 0, $b, '';
+			$decode .= substr $encode, $p, $b;
+			$p += $b;
 		# copy null byte
 		} else {
 			$decode .= "\0";

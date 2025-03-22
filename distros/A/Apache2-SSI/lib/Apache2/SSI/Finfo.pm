@@ -583,7 +583,7 @@ AUTOLOAD
 };
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -696,7 +696,7 @@ This instantiate an object that is used to access other key methods. It takes a 
 
 =over 4
 
-=item I<apache_request>
+=item C<apache_request>
 
 This is the L<Apache2::RequestRec> object that is provided if running under mod_perl.
 
@@ -738,6 +738,8 @@ For example:
 
 Returns the preferred I/O size in bytes for interacting with the file.
 You can also use C<block_size>.
+
+=for Pod::Coverage block_size
 
 =head2 blocks
 
@@ -798,6 +800,8 @@ Returns the numeric group ID of file's owner. Same as L</group>
 =head2 group
 
 Returns the numeric group ID of file's owner. Same as L</gid>
+
+=for Pod::Coverage ino
 
 =head2 inode
 

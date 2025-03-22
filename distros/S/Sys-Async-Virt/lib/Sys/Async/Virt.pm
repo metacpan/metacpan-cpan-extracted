@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.0.0
+#                   and LibVirt version v11.1.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,9 +16,9 @@ no warnings qw(void);
 use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
-use Sublike::Extended 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
+use Sublike::Extended 0.29 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.16;
+package Sys::Async::Virt v0.0.17;
 
 use parent qw(IO::Async::Notifier);
 
@@ -28,30 +28,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.0.0;
+use Protocol::Sys::Virt::Remote::XDR v11.1.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.0.0;
-use Protocol::Sys::Virt::Remote v11.0.0;
-use Protocol::Sys::Virt::Transport v11.0.0;
-use Protocol::Sys::Virt::URI v11.0.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v11.1.0;
+use Protocol::Sys::Virt::Remote v11.1.0;
+use Protocol::Sys::Virt::Transport v11.1.0;
+use Protocol::Sys::Virt::URI v11.1.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.16;
-use Sys::Async::Virt::Domain v0.0.16;
-use Sys::Async::Virt::DomainCheckpoint v0.0.16;
-use Sys::Async::Virt::DomainSnapshot v0.0.16;
-use Sys::Async::Virt::Network v0.0.16;
-use Sys::Async::Virt::NetworkPort v0.0.16;
-use Sys::Async::Virt::NwFilter v0.0.16;
-use Sys::Async::Virt::NwFilterBinding v0.0.16;
-use Sys::Async::Virt::Interface v0.0.16;
-use Sys::Async::Virt::StoragePool v0.0.16;
-use Sys::Async::Virt::StorageVol v0.0.16;
-use Sys::Async::Virt::NodeDevice v0.0.16;
-use Sys::Async::Virt::Secret v0.0.16;
+use Sys::Async::Virt::Connection::Factory v0.0.17;
+use Sys::Async::Virt::Domain v0.0.17;
+use Sys::Async::Virt::DomainCheckpoint v0.0.17;
+use Sys::Async::Virt::DomainSnapshot v0.0.17;
+use Sys::Async::Virt::Network v0.0.17;
+use Sys::Async::Virt::NetworkPort v0.0.17;
+use Sys::Async::Virt::NwFilter v0.0.17;
+use Sys::Async::Virt::NwFilterBinding v0.0.17;
+use Sys::Async::Virt::Interface v0.0.17;
+use Sys::Async::Virt::StoragePool v0.0.17;
+use Sys::Async::Virt::StorageVol v0.0.17;
+use Sys::Async::Virt::NodeDevice v0.0.17;
+use Sys::Async::Virt::Secret v0.0.17;
 
-use Sys::Async::Virt::Callback v0.0.16;
-use Sys::Async::Virt::Stream v0.0.16;
+use Sys::Async::Virt::Callback v0.0.17;
+use Sys::Async::Virt::Stream v0.0.17;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -230,6 +230,8 @@ use constant {
     LIST_NODE_DEVICES_CAP_AP_QUEUE                      => 1 << 19,
     LIST_NODE_DEVICES_CAP_AP_MATRIX                     => 1 << 20,
     LIST_NODE_DEVICES_CAP_VPD                           => 1 << 21,
+    LIST_NODE_DEVICES_CAP_CCWGROUP_DEV                  => 1 << 22,
+    LIST_NODE_DEVICES_CAP_CCWGROUP_MEMBER               => 1 << 23,
     LIST_NODE_DEVICES_PERSISTENT                        => 1 << 28,
     LIST_NODE_DEVICES_TRANSIENT                         => 1 << 29,
     LIST_NODE_DEVICES_INACTIVE                          => 1 << 30,
@@ -2352,9 +2354,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.16
+v0.0.17
 
-Based on LibVirt tag v11.0.0
+Based on LibVirt tag v11.1.0
 
 =head1 SYNOPSIS
 
@@ -2411,7 +2413,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v11.0.0. This means
+The reference LibVirt version of this module is v11.1.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2420,7 +2422,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v11.0.0;
+The module can run against any version of LibVirt newer than v11.1.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 
@@ -3776,6 +3778,10 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 
 =item LIST_NODE_DEVICES_CAP_VPD
 
+=item LIST_NODE_DEVICES_CAP_CCWGROUP_DEV
+
+=item LIST_NODE_DEVICES_CAP_CCWGROUP_MEMBER
+
 =item LIST_NODE_DEVICES_PERSISTENT
 
 =item LIST_NODE_DEVICES_TRANSIENT
@@ -3970,8 +3976,6 @@ C<auth> method rather pointless.
 =item * Modules implementing connections for various protocols (tcp, tls, etc)
 
 =item * C<@generate: none> entrypoints review (and implement relevant ones)
-
-=item * C<@generate: server> entrypoints review (and implement relevant ones)
 
 =item * libvirt client configuration (C</etc/libvirt/libvirt.conf> (for C<root>)
  or C<$XDG_CONFIG_HOME/libvirt/libvirt.conf> (for other users))

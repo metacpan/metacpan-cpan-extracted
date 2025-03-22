@@ -1,5 +1,9 @@
 Revision history for Perl module YAML::Tidy
 
+v0.11.0 2025-03-21 23:28:09+01:00
+
+    - Do not add or remove spaces in the middle of comments (issue#13)
+
 v0.10.0 2024-02-01 15:19:24+01:00
 
     - Ensure quotes are not removed from a scalar in a flow collection
