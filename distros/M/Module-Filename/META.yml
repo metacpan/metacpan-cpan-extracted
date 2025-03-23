@@ -1,16 +1,29 @@
---- #YAML:1.0
-name:                Module-Filename
-version:             0.02
-abstract:            Returns the filename for a given module
-license:             ~
-author:              
-    - Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Path::Class:                   0
-    strict:                        0
-    Test::Simple:                  0.44
+---
+abstract: 'Returns the filename for a given module'
+author:
+  - 'Michael R. Davis (MRDVT)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Filename
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Path::Class: '0'
+  Test::Simple: '0.44'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Module-Filename/issues
+  homepage: https://github.com/mrdvt92/perl-Module-Filename
+  repository: https://github.com/mrdvt92/perl-Module-Filename.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

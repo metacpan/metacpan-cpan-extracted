@@ -1,7 +1,6 @@
 MANIFEST
-README
+README.md
 LICENSE
-Todo
 Changes
 Makefile.PL
 lib/Module/Filename.pm
@@ -10,4 +9,5 @@ t/002_oo.t
 t/003_export.t
 scripts/module_filename.pl
 perl-Module-Filename.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

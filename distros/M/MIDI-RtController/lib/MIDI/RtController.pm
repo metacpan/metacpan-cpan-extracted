@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0503';
+our $VERSION = '0.0601';
 
 use Moo;
 use strictures 2;
@@ -80,10 +80,11 @@ sub BUILD {
     $self->loop->add($midi_rtn);
     $self->_midi_channel->configure(
         on_recv => sub ($channel, $event) {
-            my $dt = shift @$event;
-            $event = shift @$event;
-            print "Delta time: $dt\n" if $self->verbose;
-            $self->_filter_and_forward($dt, $event);
+            my $dt   = shift @$event;
+            my $ev   = shift @$event;
+            my $port = shift @$event;
+            print "Delta time: $dt, MIDI port: $port\n" if $self->verbose;
+            $self->_filter_and_forward($port, $dt, $ev);
         }
     );
 
@@ -108,21 +109,24 @@ sub _log {
 sub _open_port($device, $name) {
     $device->open_port_by_name(qr/\Q$name/i)
         || croak "Failed to open port $name";
+    return $name;
 }
 
 sub _rtmidi_loop ($msg_ch, $midi_ch) {
     my $midi_in = MIDI::RtMidi::FFI::Device->new(type => 'in');
-    _open_port($midi_in, ${ $msg_ch->recv });
-    $midi_in->set_callback_decoded(sub { $midi_ch->send([ @_[0, 2] ]) }); # delta-time, event
+    my $name = _open_port($midi_in, ${ $msg_ch->recv });
+    $midi_in->set_callback_decoded(
+        sub { $midi_ch->send([ @_[0, 2], $name ]) }
+    ); # delta-time, event, midi port
     sleep;
 }
 
-sub _filter_and_forward ($self, $dt, $event) {
+sub _filter_and_forward ($self, $port, $dt, $event) {
     my $event_filters = $self->filters->{all} // [];
     push @$event_filters, @{ $self->filters->{ $event->[0] } // [] };
 
     for my $filter (@$event_filters) {
-        return if $filter->($dt, $event);
+        return if $filter->($port, $dt, $event);
     }
 
     $self->send_it($event);
@@ -174,7 +178,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0503
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -190,7 +194,7 @@ version 0.0503
     return $note, $note + 7, $note + 12;
   }
   sub filter_tone {
-    my ($delta_time, $event) = @_; # 2 required filter arguments
+    my ($midi_port, $delta_time, $event) = @_; # 3 required filter arguments
     my ($ev, $channel, $note, $vel) = $event->@*;
     my @notes = filter_notes($note);
     $rtc->send_it([ $ev, $channel, $_, $vel ]) for @notes;
@@ -207,8 +211,8 @@ version 0.0503
   $rtc->add_filter(
     'echo',
     all => sub {
-      my ($dt, $event) = @_;
-      print "dt: $dt, ev: ", join( ', ', @$event ), "\n"
+      my ($port, $dt, $event) = @_;
+      print "port: $port, delta-time: $dt, ev: ", join(', ', @$event), "\n"
         unless $event->[0] eq 'clock';
       return 0;
     }

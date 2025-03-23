@@ -1,3 +1,7 @@
+Version 0.18 - 2025-03-22
+  - New method 'rekey', for modifying existing keys by an offset
+  - XS fix for passing hashref to constructor, previously would miss attributes
+
 Version 0.17 - 2024-12-30
   - XS fix for crash in Node::STORABLE_thaw when ssize_t is 32 bit and IV is 64 bit.
 

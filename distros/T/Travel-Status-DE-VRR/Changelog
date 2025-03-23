@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 3.09 - Sun Mar 23 2025
+
+    * Trip: Add polyline accessor
+
 Travel::Status::DE::VRR 3.08 - Sat Feb 08 2025
 
     * EFA->new_p: Return $efa instance in rejected promise if it was

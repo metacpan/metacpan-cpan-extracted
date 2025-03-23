@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0201';
 
 use Moo;
 use strictures 2;
@@ -117,7 +117,7 @@ has arp_type => (
 sub _pedal_notes ($self, $note) {
     return $self->pedal, $note, $note + 7;
 }
-sub pedal_tone ($self, $dt, $event) {
+sub pedal_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_pedal_notes($note);
     my $delay_time = 0;
@@ -143,7 +143,7 @@ sub _chord_notes ($self, $note) {
     @notes = map { Music::Note->new($_, 'ISO')->format('midinum') } @notes;
     return @notes;
 }
-sub chord_tone ($self, $dt, $event) {
+sub chord_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_chord_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $vel ]) for @notes;
@@ -154,7 +154,7 @@ sub chord_tone ($self, $dt, $event) {
 sub _delay_notes ($self, $note) {
     return ($note) x $self->feedback;
 }
-sub delay_tone ($self, $dt, $event) {
+sub delay_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_delay_notes($note);
     my $delay_time = 0;
@@ -172,7 +172,7 @@ sub _offset_notes ($self, $note) {
     push @notes, $note + $self->offset if $self->offset;
     return @notes;
 }
-sub offset_tone ($self, $dt, $event) {
+sub offset_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_offset_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $vel ]) for @notes;
@@ -192,7 +192,7 @@ sub _walk_notes ($self, $note) {
     );
     return map { $voice->rand } 1 .. $self->feedback;
 }
-sub walk_tone ($self, $dt, $event) {
+sub walk_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_walk_notes($note);
     my $delay_time = 0;
@@ -225,7 +225,7 @@ sub _arp_notes ($self, $note) {
     }
     return @notes;
 }
-sub arp_tone ($self, $dt, $event) {
+sub arp_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_arp_notes($note);
     my $delay_time = 0;
@@ -250,7 +250,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0200
+version 0.0201
 
 =head1 SYNOPSIS
 
@@ -387,10 +387,10 @@ Default: C<up>
 
 =head1 METHODS
 
-All filter methods must accept the object, a delta-time, and a MIDI
-event ARRAY reference, like:
+All filter methods must accept the object, a MIDI device name, a
+delta-time, and a MIDI event ARRAY reference, like:
 
-  sub pedal_tone ($self, $dt, $event) {
+  sub pedal_tone ($self, $name, $delta, $event) {
     my ($event_type, $chan, $note, $value) = $event->@*;
     ...
     return $boolean;

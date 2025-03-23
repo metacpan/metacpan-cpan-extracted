@@ -32,8 +32,10 @@ subtest single_arg_compare_fn => sub {
 };
 
 subtest single_arg_hashref => sub {
-	my $tree= Tree::RB::XS->new({ compare_fn => CMP_INT });
+	my $tree= Tree::RB::XS->new({ compare_fn => CMP_INT, kv => [1,1], allow_duplicates => 1 });
 	is( $tree->compare_fn, CMP_INT, 'compare_fn' );
+	is( $tree->allow_duplicates, 1, 'allow_duplicates' );
+	is( [ $tree->kv ], [1,1], 'kv' );
 };
 
 subtest int_tree => sub {

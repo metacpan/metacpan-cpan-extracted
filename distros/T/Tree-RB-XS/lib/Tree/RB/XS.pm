@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.17';
+$Tree::RB::XS::VERSION = '0.18';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -186,6 +186,10 @@ Tree-specific features:
   
   $tree->put(b => 2);
   $tree->min_node->prune;                # manipulate tree via node methods
+  
+  my $tree= Tree::RB::XS->new('int');
+  $tree->put_multi(1,1, 2,2, 3,3);
+  $tree->rekey(offset => 5);             # shift all keys by +5 in O(N) time
 
 Support duplicate keys:
 
@@ -644,6 +648,26 @@ The keys (or nodes) must be given in ascending order, else no nodes are deleted.
 If you want to delete a range *exclusive* of one or both ends of the range, just
 use the L</get_node> method with the desired mode to look up each end of the nodes
 that you do want removed.
+
+=head2 rekey
+
+  $tree->rekey(
+    offset => $n,
+    min => $min_key_or_node_or_iter,
+    max => $max_key_or_node_or_iter
+  );
+
+This rewrites the keys of one or more nodes, like removing and re-adding the nodes with
+different keys, but more efficient.  If the offset applied to the key does not cause any nodes
+to change order, this operates in C<< O(N) >> time, and if the "relative_keys" feature is
+enabled, it operates in C<< O(log(N)) >> time.  If the nodes do change order (e.g. from
+min_node overlapping with the node before it, or max_node overlapping with the node after it)
+then it falls back to C<< O(N log(N)) >> time but at least saves the overhead of re-allocating
+nodes.  Note that if C<allow_duplicates> is false, key collisions will cause other nodes to be
+deleted from the tree.
+
+This modification does not affect the list of "recent" nodes.  (except for any nodes removed
+due to key collisions)
 
 =head2 truncate_recent
 
@@ -1135,7 +1159,7 @@ fast and minimal.  Tree::RB::XS can do the same a bit faster with:
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 
@@ -1143,7 +1167,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2025 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

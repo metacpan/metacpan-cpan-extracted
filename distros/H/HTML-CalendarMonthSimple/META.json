@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl Module for Generating HTML Calendars",
+   "author" : [
+      "Michael R. Davis - MRDVT"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-CalendarMonthSimple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple.git"
+      }
+   },
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

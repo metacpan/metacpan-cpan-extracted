@@ -1,0 +1,27 @@
+GnuPG Version 2.2 - Additional Notes
+
+The default OpenPGP configuration used by Perl-ECS is intended for use
+with GnuPG (gpg) versions 1.4 and 2.0.  However, gpg version 2.2 is a
+standard component of newer Linux systems such as Ubuntu 18.
+
+For systems using gpg version 2.2, configuration adjustments are needed
+in order to enable Perl-ECS to transmit the passphrase to gpg via stdin
+(pinentry-mode loopback).
+
+1. Create or edit $GNUPGHOME/gpg-agent.conf, adding the line:
+
+ allow-loopback-pinentry
+
+2. Execute the command:
+
+ gpg-connect-agent /bye
+
+3. In the ecs.cfg configuration file, revise the OPENPGP_CMD_ENCRYPT and
+OPENPGP_CMD_DECRYPT settings to add the following.  (If needed, first
+uncomment those settings.):
+
+ --pinentry-mode loopback
+
+4. If upgrading from an earlier gpg version, use ecstool --tweak to modify
+all (addr_r) key IDs in the node table, because the IDs change when the
+keyring is converted to gpg 2.2.

@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Filename
 
+0.03 2025-03-22
+  - Moved from internal repo to github
+  - Dropped Todo and kwalitee.t files
+  - Added ref to Module::Runtime/module_notional_filename - Fixed RT-101091
+
 0.02 2014-12-22
   - Added export function module_path to compete with Module::Path
   - Updated documentation

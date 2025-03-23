@@ -1,0 +1,15 @@
+commands useful for smoke testing
+-----
+docker cp EMDIS-ECS-0.44.tar.gz perlecs_dist:/home/perlecs
+-----
+cpanm --local-lib ${HOME}/perl5lib EMDIS-ECS-0.44.tar.gz
+for F in AA BB CC DD EE; do rm -rf ecs-$F; done
+for F in AA BB CC DD EE; do tar zxf ecs-$F.tar.gz; done
+for F in AA BB CC DD EE; do cd ${HOME}/ecs-$F; echo "===== node $F ====="; pwd; ecstool; done
+for F in AA BB CC DD EE; do cd ${HOME}/ecs-$F; echo "===== node $F ====="; pwd; cat ecs_chk_com.log; done
+for F in AA BB CC DD EE; do cd ${HOME}/ecs-$F; echo "===== node $F ====="; pwd; cat ecs_scan_mail.log; done
+for F in AA BB CC DD EE; do cd ${HOME}/ecs-$F; echo "===== node $F ====="; pwd; ecs_chk_com --once; done
+for F in AA BB CC DD EE; do cd ${HOME}/ecs-$F; echo "===== node $F ====="; pwd; ecs_scan_mail --once; done
+
+for F in BB CC DD EE; do cd ${HOME}/ecs-AA/mboxes/to_dir/to_$F; for N in 01 02 03 04; do echo "msg$N from AA to $F" > $N.msg; done; done
+for F in BB CC DD EE; do cd ${HOME}/ecs-AA/mboxes/to_dir/to_$F; for N in 01 02 03 04 05; do echo "doc$N from AA to $F" > $N.doc; done; done

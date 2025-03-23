@@ -10,16 +10,16 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.21";
+$VERSION="0.22";
 use Config;
 my $mswin = 0;
-$mswin = 1 if $Config{'osname'} eq 'MSWin32';
 my $osname = $Config{'osname'};
+$mswin = 1 if $osname eq 'MSWin32';
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 use File::Basename;
-use File::MimeInfo::Magic qw( magic mimetype);
+use File::MimeInfo::Magic qw(mimetype);
 use Imager;
 use MIME::Base64;
 require FreeDesktop::Icons;
@@ -27,13 +27,20 @@ require Tk::Compound;
 require Tk::Photo;
 use Tk::PNG;
 
+#setting up support for File::MimeInfo;
+eval 'use File::MimeInfo::Magic qw(mimetype);' unless $mswin;
+eval 'use File::MimeInfo::Simple qw(mimetype);' if $mswin;
+
+#testing if Image::LibRSVG is installed.
 my $svgsupport = 0;
 eval 'use Image::LibRSVG';
 $svgsupport = 1 unless $@;
 
+#checking support for text2image.
 my $t;
-eval '$t = `fc-list :family=xxxx:style=yyyy`';
+eval '$t = `fc-list :family=xxxx:style=yyyy`' unless $mswin;
 my $fc_list_supported = defined $t;
+$fc_list_supported = 1 if $mswin;
 
 =head1 SYNOPSIS
 
@@ -460,11 +467,17 @@ my %genicons = (
 	video => 'video-x-generic',
 );
 
+=item B<getFileIcon>I<($file>);>
+
+Returns the mime type of I<$file>.
+
+=cut
+
 sub getFileIcon {
 	my $self = shift;
 	my $file = shift;
 	if (-e $file) {
-		my $mime = mimetype($file);
+		my $mime = $self->getFileMimeInfo($file);
 		if (defined $mime) {
 			if ($mime =~ /^([^\/]+)\//) {
 				my $ico = $genicons{$1};
@@ -480,6 +493,11 @@ sub getFileIcon {
 		return $self->getIcon('text-x-generic', @_) if -T $file;
 	}
 	return $self->getIcon('text-plain', @_);
+}
+
+sub getFileMimeInfo {
+	my ($self, $file) = @_;
+	return mimetype($file);
 }
 
 =item B<getIcon>I<($name>, [ I<$size, $context> ] I<);>

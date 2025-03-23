@@ -36,6 +36,7 @@
          "requires" : {
             "List::SomeUtils" : "0",
             "MIDI::Drummer::Tiny" : "0",
+            "MIDI::RtController" : "0.0600",
             "MIDI::RtMidi::ScorePlayer" : "0",
             "Moo" : "2",
             "Types::Standard" : "0",
@@ -65,7 +66,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-Drums"
       }
    },
-   "version" : "0.0103",
+   "version" : "0.0104",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

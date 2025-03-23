@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 d544add5a1446331bf249fafcf71ee42e580bbd147f4c8d788ac969dec1a9fae Build.PL
+SHA256 7550352af47d5f2aa9f1be7062f49059c77a91641234bd7868d0df9954931e94 CONTRIBUTING
+SHA256 faea092232fde24a3109699b51a9dbca7b0164b1c399df9f4c5123fce37ceeb7 Changes
+SHA256 bcc1227e81f87bdad567489f1e7c9dfe3a466b79f49590c16bff1730c8710c49 LICENSE
+SHA256 d77d235e41d54594865151f4751e835c5a82322b0e87ace266567c3391a4b912 LICENSES/Copying
+SHA256 b7fd9b73ea99602016a326e0b62e6646060d18febdd065ceca8bb482208c3d88 LICENSES/artistic.txt
+SHA256 d77d235e41d54594865151f4751e835c5a82322b0e87ace266567c3391a4b912 LICENSES/gpl-1.0.txt
+SHA256 8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643 LICENSES/gpl-2.0.txt
+SHA256 8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903 LICENSES/gpl-3.0.txt
+SHA256 18345e1a92e536058f146b409a9a95ec966d8072cd1db07e5da00abf39cc5a8b MANIFEST
+SHA256 82b95839761416450c91d1756061a30d6fae5057820c53ccdb4926ea1d51f007 MANIFEST.SKIP
+SHA256 add2ed850f37f422b6731b09cadb5d74234bbba0ebed91e618759e4dde1524df META.json
+SHA256 8ae0a7dacc0218a5881db4bb968a9739477363b075a423ad44ab81f670e734e0 META.yml
+SHA256 f8c1c44daccc4e0b826a88edadc851fa3cf36036de7becf8780539b142f51def README
+SHA256 9c50f197170af891e9c4eda85011b6acebeb03e7ca748b3a92b782a5d1b71ec7 inc/Crypt/Diceware/Wordlist/NL/Module/Build.pm
+SHA256 91c2c44691daf725a9e1b2b099f38879e99854a4f4728ec8118128569d0df621 inc/Crypt/Diceware/Wordlist/NL/Module/Build/LICENSE.txt
+SHA256 eb477d8e064dd50b16902ead58cb291169c12a1ea2aab4befa27b3a3e6d668db inc/Crypt/Diceware/Wordlist/NL/Module/Build/Standard.pm
+SHA256 d44eed3afc570ff3450cd5e8e7da74fb548f1a1cd9cbf0b5530e1bf5b17d4c73 lib/Crypt/Diceware/Wordlist/NL.pm
+SHA256 fcb49c3271e37ed130525ef17678207fce59c19764cb660785d84e7970313b47 t/00_base.t
+SHA256 a41d5504e7d158bd021191634268acda4c5e325dfbc8c9e1d7584c1e01428998 t/00_signature.t
+SHA256 414ccccb360c0c910fb5c8feff24d5ef3d5245331d1a7cec97601838a20b3b29 t/01_words.t
+SHA256 ce69c7ba250f3df1055cd801cb32774dbf6a6fae20c1a9f1d7ad02610e05f8fb tools/update_wordlist.pl
+SHA256 f92cf74c1db5febf9d158233c6933ac1841435495ee672adf3959718eb32dfdb xt/91_pod.t
+SHA256 f27f402ea0bd7b5a29f311d8dacc2da3113de0da8824b59f0cf8125146df2463 xt/92_pod-coverage.t
+SHA256 b68dc661b2a7bc6aa1629c37c41c2e62a9bb3ef2ee0b3121abb9fd453ae97a15 xt/93_test-coverage.t
+SHA256 7b91521b7e566a2ded4b5593d8c662b34553e126a283a8eab0ff3714c8d4c823 xt/94_manifest.t
+SHA256 e5f8ea98090ad1560e818a71692b9f67bf4ca45f065501c07964ff3f3a69775a xt/95_critic.t
+SHA256 8b03dcdd253ca8486ef866033b1ee7e83ae67a38778f19bc311461dcf753ec70 xt/96_kwalitee.t
+SHA256 603f1e3d8352310b94a087e388b89f8a3f77cc83e26fb6ed9e950769bed257e9 xt/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBAwAdFiEEpwqtnU18KIcnPBHi74yNr4V4dOkFAmffGpcACgkQ74yNr4V4
+dOnv4AgAggzlDxXwP0xi+JXl7jMgjwCvEsvLrgXmB7BqjRBBG9aTsInACw+kSXgw
+38jKoIoTyGAj7gklj5VS35u5gk393j8PUfOfM9FXPC35qxuDpbjF0u0s9YQjy9qM
+toVvK57FqJmcNpg6BqoBbPYNYGIIqtgeOUjDVov1NYypC9WXGK6lcEmvipsshxRD
+nIRoAlqczimr/XGX+gyQSGrMWPuBaPHkCJWk4jAFTjFYKpAcOE53ykK2ABTLgTDJ
+OGbpyEXOs5VMSYE5yIn1N1T4HdUoL69JZ6kW4zmJq+3vOfRpPMYADYhRXpWy5p2n
+jCqBlgl35uOiAV3zAkLjYl3k5ZDB/Q==
+=SMfW
+-----END PGP SIGNATURE-----

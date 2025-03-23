@@ -1,5 +1,12 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.22 Date
+	- Removed all references to a previously existing extension Balloon.
+	- Added methods abreviate and fontFams to Tk::AppWindow.
+	- Extension MDI sets and clears indicators on the document tabs.
+	- Art uses File::MimeInfo::Simple under Windows.
+	- Art is silent in Windows on support of fc-list command.
+
 0.21 Sat Feb 08 2025
 	- Added -colorhistoryfile option to Tk::QuickForm creation in extension Settings.
 	- Hooks can no longer manipulate parameters for callbacks in base class Callback.
@@ -121,3 +128,4 @@ Revision history for Perl extension Tk::AppWindow.
 0.01  Sun Dec 19 23:09:57 2021
 	- original version; created by h2xs 1.23 with options
 		-X -n Tk::AppWindow
+

@@ -4,7 +4,7 @@ use warnings;
 use base qw{Exporter};
 use Path::Class qw{file};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(module_filename);
 
 =head1 NAME
@@ -105,7 +105,6 @@ sub module_filename {
   return $return;
 }
 
-
 =head1 LIMITATIONS
 
 The algorithm does not scan inside module files for provided packages.
@@ -114,17 +113,9 @@ The algorithm does not scan inside module files for provided packages.
 
 Submit to RT and email author.
 
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  STOP, LLC
-  domain=>michaelrdavis,tld=>com,account=>perl
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
@@ -140,7 +131,7 @@ Module::Filename predates L<Module::Path> by almost 4 years but it appears more 
 
 =head2 Similar Capabilities
 
-L<Module::Path>, L<perlvar> %INC, L<pmpath>, L<Module::Info> constructor=>new_from_module, method=>file, L<Module::InstalledVersion> property=>"dir", L<Module::Locate> method=>locate, L<Module::Util> method=>find_installed
+L<Module::Path>, L<perlvar> %INC, L<pmpath>, L<Module::Info> constructor=>new_from_module, method=>file, L<Module::InstalledVersion> property=>"dir", L<Module::Locate> method=>locate, L<Module::Util> method=>find_installed, L<Module::Runtime/module_notional_filename>
 
 =head2 Comparison
 

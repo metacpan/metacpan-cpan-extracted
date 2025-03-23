@@ -17,7 +17,7 @@ SKIP: {
     is_deeply $obj->filters, {}, 'filters';
     isa_ok $obj->_msg_channel, 'IO::Async::Channel';
     isa_ok $obj->_midi_channel, 'IO::Async::Channel';
-    isa_ok $obj->_midi_out, 'MIDI::RtMidi::FFI::Device';
+    isa_ok $obj->midi_out, 'MIDI::RtMidi::FFI::Device';
 };
 
 done_testing();

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.21";
+$VERSION="0.22";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -172,7 +172,6 @@ sub Populate {
 	$self->DynaMouseWheelBind(
 		'Tk::Canvas',
 		'Tk::HList',
-		'Tk::IconList',
 		'Tk::ITree',
 		'Tk::Pane',
 		'Tk::Tree',
@@ -265,6 +264,28 @@ sub Populate {
 =head1 METHODS
 
 =over 4
+
+=item B<abbreviate>I<($string, ?$size?, ?$firstsize?)>
+
+Shortens $string to $size by leaving out a middle part. Then returns it.
+$size is set to 30 unless you specify it. $firstsize is set to 25% of $size
+unless you set it.
+
+=cut
+
+sub abbreviate {
+	my ($self, $string, $size, $firstsize) = @_;
+	$size = 30 unless defined $size;
+	$firstsize = int($size / 4) unless defined $firstsize;
+	my $length = length($string);
+	if ($length > $size) {
+		my $first = substr($string, 0, $firstsize) . ' ... ';
+		my $lastsize = $size - $firstsize - 5;
+		my $last = substr($string, $length - $lastsize, $lastsize);
+		$string = $first . $last;
+	}
+	return $string;
+}
 
 =item B<addPostConfig>I<('Method', $obj, @options)>
 
@@ -763,6 +784,40 @@ sub fileSeparator {
 	my $self = shift;
 	return '\\' if $mswin;
 	return '/'
+}
+
+=item B<fontFams>
+
+Replaces the method I<fontFamilies>, which crashes when used under windows.
+This one queries the registry for font families on Windows, and calls
+I<fontFamilies> on other operating systems.
+
+=cut
+
+sub fontFams {
+	my $self = shift;
+	if ($mswin) {
+		my @fams;
+		my $raw = `reg query "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts" /s`;
+		my @lines = split /\n/, $raw;
+		for (@lines) {
+			my $lin = $_;
+			chomp $lin;
+			next if $lin eq '';
+			next if $lin =~ /^HKEY/;
+			$lin =~ s/^\s+//; #remove leading spaces
+			$lin =~ s/^([^\(]+).*/$1/; #remove all as of TrueType;
+			$lin =~ s/\s+$//; #remove trailing spaces
+			next if $lin =~ /bold/i; #ignore bold
+			next if $lin =~ /italic/i; #ignore italic
+			next if $lin =~ /\.FON$/; #only truetype fonts
+			$lin =~ s/\s\d+.+$//; #adjust for some older fonts
+			push @fams, $lin;
+		}
+		return @fams
+	} else {
+		return $self->fontFamilies;
+	}
 }
 
 sub GetArgsRef { return $_[0]->{ARGS} }

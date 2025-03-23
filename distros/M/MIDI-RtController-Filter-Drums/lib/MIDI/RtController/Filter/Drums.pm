@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use Moo;
 use strictures 2;
@@ -54,7 +54,7 @@ sub _drum_parts ($self, $note) {
     }
     return $part;
 }
-sub drums ($self, $dt, $event) {
+sub drums ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     return 1 unless $ev eq 'note_on';
     my $part = $self->_drum_parts($note);
@@ -63,7 +63,7 @@ sub drums ($self, $dt, $event) {
         bars => $self->bars,
     );
     MIDI::RtMidi::ScorePlayer->new(
-      device   => $self->rtc->_midi_out,
+      device   => $self->rtc->midi_out,
       score    => $d->score,
       common   => { drummer => $d },
       parts    => [ $part ],
@@ -87,7 +87,7 @@ MIDI::RtController::Filter::Drums - RtController drum filters
 
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 SYNOPSIS
 
@@ -138,10 +138,10 @@ Default: C<120>
 
 =head1 METHODS
 
-All filter methods must accept the object, a delta-time, and a MIDI
-event ARRAY reference, like:
+All filter methods must accept the object, a MIDI device name, a
+delta-time, and a MIDI event ARRAY reference, like:
 
-  sub drums ($self, $dt, $event) {
+  sub drums ($self, $device, $delta, $event) {
     my ($event_type, $chan, $note, $value) = $event->@*;
     ...
     return $boolean;

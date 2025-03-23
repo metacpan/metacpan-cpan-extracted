@@ -21,6 +21,7 @@ createapp(
 		components => [ 'Tk', 'Imager' ],
 	},
 	-helpfile => 't/sample_help.pod',
+	-reportproblemlink => 'https://github.com/haje61/Tk-AppWindow/issues',
 	-updatesmenuitem => 1,
 #	-helpfile => 'https://www.google.com',
 );

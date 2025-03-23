@@ -1,0 +1,29 @@
+---
+abstract: 'dutch wordlist for Diceware'
+author:
+  - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
+build_requires:
+  Test::More: '0.86'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Diceware-Wordlist-NL
+provides:
+  Crypt::Diceware::Wordlist::NL:
+    file: lib/Crypt/Diceware/Wordlist/NL.pm
+    version: v0.0.1
+requires:
+  Readonly: '1.03'
+  perl: v5.16.0
+resources:
+  bugtracker: https://bitbucket.org/rolandvanipenburg/crypt-diceware-wordlist-nl/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/rolandvanipenburg/crypt-diceware-wordlist-nl
+version: v0.0.1
+x_authority: cpan:IPENBURG
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

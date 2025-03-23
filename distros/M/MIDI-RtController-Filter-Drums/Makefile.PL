@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "List::SomeUtils" => 0,
     "MIDI::Drummer::Tiny" => 0,
+    "MIDI::RtController" => "0.0600",
     "MIDI::RtMidi::ScorePlayer" => 0,
     "Moo" => 2,
     "Types::Standard" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0103",
+  "VERSION" => "0.0104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::SomeUtils" => 0,
   "MIDI::Drummer::Tiny" => 0,
+  "MIDI::RtController" => "0.0600",
   "MIDI::RtMidi::ScorePlayer" => 0,
   "Moo" => 2,
   "Test::More" => "0.88",

@@ -5,7 +5,9 @@ Email communications testing is dependent on SMTP, POP3, and IMAP services,
 typically provided by a companion greenmail container.
 
 AMQP 1.0 communications testing is dependent on an AMQP broker, typically
-provided by a companion qpid-broker-cpp container.
+provided by a companion qpid-broker-python or qpid-broker-cpp container.
+For AMQP testing, the generate_ca_and_certfiles.sh script is useful for
+generating a new set of SSL certificates when the old ones expire.
 
 The ecs-AA, ecs-BB, ecs-CC, ecs-DD, and ecs-EE subdirectories contain test
 configurations for nodes AA, BB, CC, DD, and EE.  The .gnupg subdirectory

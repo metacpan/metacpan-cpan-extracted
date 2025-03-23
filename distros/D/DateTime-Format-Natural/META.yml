@@ -22,7 +22,7 @@ name: DateTime-Format-Natural
 provides:
   DateTime::Format::Natural:
     file: lib/DateTime/Format/Natural.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Format::Natural::Calc:
     file: lib/DateTime/Format/Natural/Calc.pm
     version: '1.46'
@@ -34,7 +34,7 @@ provides:
     version: '0.07'
   DateTime::Format::Natural::Duration::Checks:
     file: lib/DateTime/Format/Natural/Duration/Checks.pm
-    version: '0.05'
+    version: '0.06'
   DateTime::Format::Natural::Expand:
     file: lib/DateTime/Format/Natural/Expand.pm
     version: '0.04'
@@ -84,5 +84,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/DateTime-Format-Natural
-version: '1.19'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.202501";
+our $VERSION = "0.202502";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2025a";
+use constant olson_version => "2025b";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2025a";
+use constant olson_code_version => "2025b";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2025a";
+use constant olson_data_version => "2025b";
 
 =back
 
@@ -136,13 +136,14 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	America/Boa_Vista America/Bogota America/Boise America/Cambridge_Bay
 	America/Campo_Grande America/Cancun America/Caracas America/Cayenne
 	America/Chicago America/Chihuahua America/Ciudad_Juarez
-	America/Costa_Rica America/Cuiaba America/Danmarkshavn America/Dawson
-	America/Dawson_Creek America/Denver America/Detroit America/Edmonton
-	America/Eirunepe America/El_Salvador America/Fort_Nelson
-	America/Fortaleza America/Glace_Bay America/Goose_Bay America/Grand_Turk
-	America/Guatemala America/Guayaquil America/Guyana America/Halifax
-	America/Havana America/Hermosillo America/Indiana/Indianapolis
-	America/Indiana/Knox America/Indiana/Marengo America/Indiana/Petersburg
+	America/Costa_Rica America/Coyhaique America/Cuiaba America/Danmarkshavn
+	America/Dawson America/Dawson_Creek America/Denver America/Detroit
+	America/Edmonton America/Eirunepe America/El_Salvador
+	America/Fort_Nelson America/Fortaleza America/Glace_Bay
+	America/Goose_Bay America/Grand_Turk America/Guatemala America/Guayaquil
+	America/Guyana America/Halifax America/Havana America/Hermosillo
+	America/Indiana/Indianapolis America/Indiana/Knox
+	America/Indiana/Marengo America/Indiana/Petersburg
 	America/Indiana/Tell_City America/Indiana/Vevay
 	America/Indiana/Vincennes America/Indiana/Winamac America/Inuvik
 	America/Iqaluit America/Jamaica America/Juneau

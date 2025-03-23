@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController
 
+0.0601 2025-03-22 15:58:57
+    - Fix lingering artifacts.
+
+0.0600 2025-03-22 14:33:52
+    - Detect and pass the MIDI input port name to the filters.
+
 0.0503 2025-03-22 00:07:11
     - Forgot to actually include eg/dual.pl. Whoopsy.
 

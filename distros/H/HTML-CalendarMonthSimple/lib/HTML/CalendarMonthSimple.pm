@@ -3,7 +3,7 @@
 # Herein, the symbol $self is used to refer to the object that's being passed around.
 
 package HTML::CalendarMonthSimple;
-our $VERSION = "1.26";
+our $VERSION = "1.27";
 use strict;
 use warnings;
 use Date::Calc;
@@ -66,7 +66,7 @@ sub new {
 
 sub as_HTML {
    my $self = shift;
-   my %params = @_; 
+   my %params = @_;
    my $html = '';
    my(@days,$weeks,$WEEK,$DAY);
 
@@ -174,55 +174,55 @@ sub as_HTML {
       my @weekdays = $self->weekdays();
 
       my $saturday_html = "<$celltype"
-                        . ( defined $weekendheadercolor 
-                            ? qq| bgcolor="$weekendheadercolor"| 
+                        . ( defined $weekendheadercolor
+                            ? qq| bgcolor="$weekendheadercolor"|
                             : '' )
-                        . ( defined $weekendcellclass 
-                            ? qq| class="$weekendcellclass"| 
-                            : '' ) 
+                        . ( defined $weekendcellclass
+                            ? qq| class="$weekendcellclass"|
+                            : '' )
                         . ">"
-                        . ( defined $weekendheadercontentcolor 
-                            ? qq|<font color="$weekendheadercontentcolor">| 
-                            : '' ) 
+                        . ( defined $weekendheadercontentcolor
+                            ? qq|<font color="$weekendheadercontentcolor">|
+                            : '' )
                         . $self->saturday()
-                        . ( defined $weekendheadercontentcolor 
+                        . ( defined $weekendheadercontentcolor
                             ? qq|</font>|
                             : '' )
                         . "</$celltype>\n";
 
       my $sunday_html   = "<$celltype"
-                        . ( defined $weekendheadercolor 
-                            ? qq| bgcolor="$weekendheadercolor"| 
+                        . ( defined $weekendheadercolor
+                            ? qq| bgcolor="$weekendheadercolor"|
                             : '' )
-                        . ( defined $weekendcellclass 
-                            ? qq| class="$weekendcellclass"| 
-                            : '' ) 
+                        . ( defined $weekendcellclass
+                            ? qq| class="$weekendcellclass"|
+                            : '' )
                         . ">"
-                        . ( defined $weekendheadercontentcolor 
-                            ? qq|<font color="$weekendheadercontentcolor">| 
-                            : '' ) 
+                        . ( defined $weekendheadercontentcolor
+                            ? qq|<font color="$weekendheadercontentcolor">|
+                            : '' )
                         . $self->sunday()
-                        . ( defined $weekendheadercontentcolor 
+                        . ( defined $weekendheadercontentcolor
                             ? qq|</font>|
                             : '' )
                         . "</$celltype>\n";
-      
+
       my $weekday_html = '';
       foreach (@weekdays) { # draw the weekday headers
 
          $weekday_html  .= "<$celltype"
-                        . ( defined $weekendheadercolor 
-                            ? qq| bgcolor="$weekdayheadercolor"| 
+                        . ( defined $weekendheadercolor
+                            ? qq| bgcolor="$weekdayheadercolor"|
                             : '' )
-                        . ( defined $weekendcellclass 
-                            ? qq| class="$weekdaycellclass"| 
-                            : '' ) 
+                        . ( defined $weekendcellclass
+                            ? qq| class="$weekdaycellclass"|
+                            : '' )
                         . ">"
-                        . ( defined $weekdayheadercontentcolor 
-                            ? qq|<font color="$weekdayheadercontentcolor">| 
-                            : '' ) 
+                        . ( defined $weekdayheadercontentcolor
+                            ? qq|<font color="$weekdayheadercontentcolor">|
+                            : '' )
                         . $_
-                        . ( defined $weekdayheadercontentcolor 
+                        . ( defined $weekdayheadercontentcolor
                             ? qq|</font>|
                             : '' )
                         . "</$celltype>\n";
@@ -252,7 +252,6 @@ sub as_HTML {
    foreach $WEEK (0 .. ($weeks-1)) {
       $html .= "<tr>\n";
 
-      
       foreach $DAY ( 0 .. 6 ) {
          my($thiscontent,$thisday,$thisbgcolor,$thisbordercolor,$thiscontentcolor,$thiscellclass);
          $thisday = $days[((7*$WEEK)+$DAY)];
@@ -262,7 +261,7 @@ sub as_HTML {
             $thiscontent = '&nbsp;'; }
          else { # A real date cell with potential content
             # Get the content
-            if ($self->showdatenumbers()) { 
+            if ($self->showdatenumbers()) {
               if ( $self->getdatehref( $thisday )) {
                 $thiscontent = "<p><b><a href=\"".$self->getdatehref($thisday);
                 $thiscontent .= "\">$thisday</a></b></p>\n";
@@ -816,6 +815,7 @@ sub _date_string_to_numeric {
 __END__;
 #################################################################################
 
+=encoding UTF-8
 
 =head1 NAME
 
@@ -957,8 +957,6 @@ This method returns a string containing the HTML table for the month.
 
 It's okay to continue modifying the calendar after calling as_HTML(). My guess is that you'd want to call as_HTML() again to print the further-modified calendar, but that's your business...
 
-
-
 =head2 weekstartsonmonday([1|0])
 
 By default, calendars are displayed with Sunday as the first day of the week (American style). Most of the world prefers for calendars to start the week on Monday. This method selects which type is used: 1 specifies that the week starts on Monday, 0 specifies that the week starts on Sunday (the default). If no value is given at all, the current value (1 or 0) is returned.
@@ -1000,12 +998,9 @@ These allow the date-number in a calendar cell to become a hyperlink to the spec
    # if we wanted the second Wednesday to go to that special URL, we should've done that one after this!
    $cal->setdatehref('wednesdays','http://every-wednesday.net/');
 
-
-
 =head2 contentfontsize([STRING])
 
 contentfontsize() sets the font size for the contents of the cell, overriding the browser's default. Can be expressed as an absolute (1 .. 6) or relative (-3 .. +3) size.
-
 
 =head2 border([INTEGER])
 
@@ -1019,7 +1014,7 @@ If a value is not specified, the current value is returned. If a value is specif
 
 =head2 width([INTEGER][%])
 
-This sets the value of the width attribute to the <TABLE> declaration for the calendar. As such, this controls the horizintal width of the calendar.
+This sets the value of the width attribute to the <TABLE> declaration for the calendar. As such, this controls the horizontal width of the calendar.
 
 The width value can be either an integer (e.g. 600) or a percentage string (e.g. "80%"). Most web browsers take an integer to be the table's width in pixels and a percentage to be the table width relative to the screen's width. The default width is "100%".
 
@@ -1029,7 +1024,6 @@ If a value is not specified, the current value is returned. If a value is specif
    $cal->width(600);    # absolute pixel width
    $cal->width("100%"); # percentage of screen size
 
-
 =head2 showdatenumbers([1 or 0])
 
 If showdatenumbers() is set to 1, then the as_HTML() method will put date labels in each cell (e.g. a 1 on the 1st, a 2 on the 2nd, etc.) If set to 0, then the date labels will not be printed. The default is 1.
@@ -1037,7 +1031,6 @@ If showdatenumbers() is set to 1, then the as_HTML() method will put date labels
 If no value is specified, the current value is returned.
 
 The date numbers are shown in boldface, normal size font. If you want to change this, consider setting showdatenumbers() to 0 and using setcontent()/addcontent() instead.
-
 
 =head2 showweekdayheaders([1 or 0])
 
@@ -1049,7 +1042,6 @@ If weekdayheadersbig() is set to 1 (the default) then the weekday headers will b
 
 For both functions, if no value is specified, the current value is returned.
 
-
 =head2 cellalignment([STRING])
 
 =head2 vcellalignment([STRING])
@@ -1057,7 +1049,6 @@ For both functions, if no value is specified, the current value is returned.
 cellalignment() sets the value of the align attribute to the <TD> tag for each day's cell. This controls how text will be horizontally centered/aligned within the cells. vcellalignment() does the same for vertical alignment. By default, content is aligned horizontally "left" and vertically "top"
 
 Any value can be used, if you think the web browser will find it interesting. Some useful alignments are: left, right, center, top, and bottom.
-
 
 =head2 header([STRING])
 
@@ -1071,8 +1062,6 @@ If the header is set to an empty string, then no header will be printed at all. 
    # Set the month/year header to something snazzy.
    my($y,$m) = ( $cal->year() , $cal->monthname() );
    $cal->header("<center><font size=+2 color=red>$m $y</font></center>\n\n");
-
-
 
 =head2 bgcolor([STRING])
 
@@ -1114,7 +1103,7 @@ If the header is set to an empty string, then no header will be printed at all. 
 
 =head2 weekendheadercontentcolor([STRING])
 
-These define the colors of the cells. If a string (which should be either a HTML color-code like '#000000' or a color-word like 'yellow') is supplied as an argument, then the color is set to that specified. Otherwise, the current value is returned. To un-set a value, try assigning the null string as a value.
+These define the colors of the cells. If a string (which should be either a HTML color-code like '#000000' or a color-word like 'yellow') is supplied as an argument, then the color is set to that specified. Otherwise, the current value is returned. To unset a value, try assigning the null string as a value.
 
 The bgcolor defines the color of all cells. The weekdaycolor overrides the bgcolor for weekdays (Monday through Friday), the weekendcolor overrides the bgcolor for weekend days (Saturday and Sunday), and the todaycolor overrides the bgcolor for today's date. (Which may not mean a lot if you're looking at a calendar other than the current month.)
 
@@ -1140,7 +1129,6 @@ Finally, the color of the cells' contents may be set with contentcolor, weekdayc
    $cal->todaycontentcolor('yellow');       # Override today's content color
    print $cal->as_HTML;                     # Print a really ugly calendar!
 
-
 =head2 datecolor(DATE,[STRING])
 
 =head2 datecontentcolor(DATE,[STRING])
@@ -1162,13 +1150,9 @@ The date may be a numeric date or a weekday string as described in setcontent() 
    $cal->datecolor('tuesdays','green');
    $cal->datecontentcolor('tuesdays','yellow');
 
-
-
 =head2 nowrap([1 or 0])
 
 If set to 1, then calendar cells will have the NOWRAP attribute set, preventing their content from wrapping. If set to 0 (the default) then NOWRAP is not used and very long content may cause cells to become stretched out.
-
-
 
 =head2 sharpborders([1 or 0])
 
@@ -1176,17 +1160,13 @@ If set to 1, this gives very crisp edges between the table cells. If set to 0 (t
 
 FYI: To accomplish the crisp border, the entire calendar table is wrapped inside a table cell.
 
-
-
 =head2 cellheight([NUMBER])
 
 This specifies the height in pixels of each cell in the calendar. By default, no height is defined and the web browser usually chooses a reasonable default.
 
 If no value is given, the current value is returned.
 
-To un-specify a height, try specifying a height of 0 or undef.
-
-
+To unspecify a height, try specifying a height of 0 or undef.
 
 =head2 tableclass([STRING])
 
@@ -1202,7 +1182,6 @@ To un-specify a height, try specifying a height of 0 or undef.
 
 =head2 headerclass([STRING])
 
-
 These specify which CSS class will be attributed to the calendar's table and the calendar's cells. By default, no classes are specified or used.
 
 tableclass() sets the CSS class for the calendar table.
@@ -1213,9 +1192,7 @@ datecellclass() sets the CSS class for the cell for the specified date. This set
 
 If no value is given, the current value is returned.
 
-To un-specify a class, try specifying an empty string, e.g. cellclass('')
-
-
+To unspecify a class, try specifying an empty string, e.g. cellclass('')
 
 =head2 sunday([STRING])
 
@@ -1226,9 +1203,9 @@ To un-specify a class, try specifying an empty string, e.g. cellclass('')
 These functions allow the days of the week to be "renamed", which is useful for displaying the weekday headers in another language.
 
    # show the days of the week in Spanish
-   $cal->saturday('S·bado');
+   $cal->saturday('S√°bado');
    $cal->sunday('Domingo');
-   $cal->weekdays('Lunes','Martes','MiÈrcoles','Jueves','Viernes');
+   $cal->weekdays('Lunes','Martes','Mi√©rcoles','Jueves','Viernes');
 
    # show the days of the week in German
    $cal->saturday('Samstag');
@@ -1236,8 +1213,6 @@ These functions allow the days of the week to be "renamed", which is useful for 
    $cal->weekdays('Montag','Dienstag','Mittwoch','Donnerstag','Freitag');
 
 If no value is specified (or, for weekdays() if exactly 5 arguments aren't given) then the current value is returned.
-
-
 
 =head1 BUGS
 
@@ -1277,7 +1252,7 @@ Bill Turner <b@brilliantcorners.org> supplied the headerclass() method and the r
 
 Bill Rhodes <wrhodes@27.org> provided the contentfontsize() method for version 1.14
 
-Alberto Simıes <albie@alfarrabio.di.uminho.pt> provided the tableclass() function and the saturday(), sunday(), and weekdays() functions for version 1.18. Thanks, Alberto, I've been wanting this since the beginning!
+Alberto Sim√µes <albie@alfarrabio.di.uminho.pt> provided the tableclass() function and the saturday(), sunday(), and weekdays() functions for version 1.18. Thanks, Alberto, I've been wanting this since the beginning!
 
 Blair Zajac <blair@orcaware.com> provided the fixes for 1.19
 
@@ -1289,3 +1264,4 @@ Dan Boitnott <dboitnot@yahoo.com> provided today_year() et al in 1.23
 
 Peter Venables <pvenables@rogers.com> provided the XML validation fixes for 1.24
 
+=cut

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '3.08';
+our $VERSION = '3.09';
 
 use parent 'Travel::Status::DE::EFA';
 
@@ -43,7 +43,7 @@ Travel::Status::DE::VRR - unofficial VRR departure monitor.
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

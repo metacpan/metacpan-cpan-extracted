@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2019 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2019-2025 National Marrow Donor Program. All rights reserved.
 # See also LICENSE file.
 #
 # Usage example:
@@ -10,11 +10,11 @@
 #  --username emdis-us --password SECRET --inputfile test_msg.txt
 #
 # See also:
-# https://qpid.apache.org/releases/qpid-proton-0.29.0/
-# https://qpid.apache.org/releases/qpid-proton-0.29.0/proton/python/book/overview.html
-# https://qpid.apache.org/releases/qpid-proton-0.29.0/proton/python/book/tutorial.html
-# https://qpid.apache.org/releases/qpid-proton-0.29.0/proton/python/api/
-# https://qpid.apache.org/releases/qpid-proton-0.29.0/proton/c/api/
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/python/docs/proton.html#proton.Message
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/python/docs/proton.html#proton.SSLDomain
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/python/docs/proton.handlers.html#proton.handlers.MessagingHandler
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/python/docs/proton.reactor.html#proton.reactor.Container
 #
 # Influenced by solace-samples-amqp-qpid-proton-python and cli-proton-python:
 # https://github.com/SolaceSamples/solace-samples-amqp-qpid-proton-python
@@ -126,25 +126,25 @@ class Send(MessagingHandler):
         if self.debug >= 1:
             print('on_start:  {}'.format(event))
 
+        ssl_domain = SSLDomain(SSLDomain.MODE_CLIENT)
         # SSL trust store (e.g. PEM file containing trusted CA certificate(s))
         if self.truststore:
-            event.container.ssl.client.set_trusted_ca_db(self.truststore)
+            ssl_domain.set_trusted_ca_db(self.truststore)
         if True:
             # use trust store to verify peer's (e.g. broker's) SSL certificate
-            event.container.ssl.client.set_peer_authentication(SSLDomain.VERIFY_PEER)
+            ssl_domain.set_peer_authentication(SSLDomain.VERIFY_PEER)
         else:
             # verify hostname on peer's (e.g. broker's) SSL certificate
-            event.container.ssl.client.set_peer_authentication(SSLDomain.VERIFY_PEER_NAME)
+            ssl_domain.set_peer_authentication(SSLDomain.VERIFY_PEER_NAME)
 
         # client-side certificate
         if self.sslkey:
-            event.container.ssl.client.set_credentials(self.sslcert,
-                                                       self.sslkey,
-                                                       self.sslpass)
+            ssl_domain.set_credentials(self.sslcert, self.sslkey, self.sslpass)
 
         if self.username:
             # basic username and password authentication
             event.container.connect(url=self.url,
+                                    ssl_domain=ssl_domain,
                                     user=self.username,
                                     password = self.password,
                                     allow_insecure_mechs=False,
@@ -154,6 +154,7 @@ class Send(MessagingHandler):
         else:
             # anonymous authentication
             event.container.connect(url=self.url,
+                                    ssl_domain=ssl_domain,
                                     allow_insecure_mechs=False,
                                     sasl_enabled=True,
                                     allowed_mechs="ANONYMOUS",

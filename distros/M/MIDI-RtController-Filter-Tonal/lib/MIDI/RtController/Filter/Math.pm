@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0200';
+$MIDI::RtController::Filter::Math::VERSION = '0.0201';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -72,7 +72,7 @@ sub _stair_step_notes ($self, $note) {
     return @notes;
 }
 
-sub stair_step ($self, $dt, $event) {
+sub stair_step ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = $self->_stair_step_notes($note);
     my $delay_time = 0;
@@ -97,7 +97,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0200
+version 0.0201
 
 =head1 SYNOPSIS
 
@@ -175,10 +175,10 @@ Default: C<-1>
 
 =head1 METHODS
 
-All filter methods must accept the object, a delta-time, and a MIDI
-event ARRAY reference, like:
+All filter methods must accept the object, a MIDI device name, a
+delta-time, and a MIDI event ARRAY reference, like:
 
-  sub stair_step ($self, $dt, $event) {
+  sub stair_step ($self, $device, $delta, $event) {
     my ($event_type, $chan, $note, $value) = $event->@*;
     ...
     return $boolean;

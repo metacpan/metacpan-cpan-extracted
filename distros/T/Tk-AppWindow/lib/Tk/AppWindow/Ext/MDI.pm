@@ -316,6 +316,7 @@ sub CmdDocSave {
 			if ($doc->Save($name)) {
 				$self->monitorUpdate($name);
 				$self->log("Saved '$name'");
+				$self->Interface->indicator($name, 0);
 				my $nav = $self->navigator;
 				$nav->EntrySaved($name) if defined $nav; 
 				return $name
@@ -512,6 +513,7 @@ sub CreateInterface {
 	my $self = shift;
 	$self->{INTERFACE} = $self->WorkSpace->YANoteBook(
 		-image => $self->getArt('document-multiple', 16),
+		-indicatorimage => $self->getArt('document-save', 16),
 		-selecttabcall => ['cmdExecute', $self, 'doc_select'],
 		-closetabcall => ['cmdExecute', $self, 'doc_close'],
 	)->pack(-expand => 1, -fill => 'both');
@@ -1252,14 +1254,15 @@ and updates the navigator.
 sub monitorModified {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
-#	print "monitorModified $name\n";
 	my $mod = $self->{MONITOR}->{$name}->{'modified'};
 	my $docmod = $self->docModified($name);
 	my $nav = $self->navigator;
 	if ($mod ne $docmod) {
 		if ($docmod) {
+			$self->Interface->indicator($name, 1);
 			$nav->EntryModified($name) if defined $nav;
 		} else {
+			$self->Interface->indicator($name, 0);
 			$nav->EntrySaved($name) if defined $nav;
 		}
 		$self->{MONITOR}->{$name}->{'modified'} = $docmod;

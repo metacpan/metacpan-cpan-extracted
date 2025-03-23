@@ -11,18 +11,23 @@
 #
 #    cd docker/qpid-broker-cpp
 #
-# 2) Build a "perlecs/qpid-broker-cpp" Docker image based on the Dockerfile, e.g.
+# 2) Build a "perlecs/qpid-broker-cpp" Docker image based on the Dockerfile.
+#    If needed, first copy certfiles.tar.gz file from neighboring ../dist
+#    directory.
 #
-#    docker build -t perlecs/qpid-broker-cpp:0.43-1 .
+#    cp ../dist/certfiles.tar.gz .
+#    docker build --network=host -t perlecs/qpid-broker-cpp:0.44-1 .
+#
+#    (the --network=host option may be needed to overcome a build-time error)
 #
 #    Alternatively, use --build-arg to override the GENERATE_NEW_CERTFILES
 #    environment variable at build time.
 #
-#    docker build --build-arg GENERATE_NEW_CERTFILES=YES -t perlecs/qpid-broker-cpp:0.43-1 .
+#    docker build --build-arg GENERATE_NEW_CERTFILES=YES -t perlecs/qpid-broker-cpp:0.44-1 .
 #
 # 3) Run a Docker container based on the image, e.g.
 #
-#    docker run --rm --name=perlecs_qpid_broker_cpp --expose 5671 --expose 5672 perlecs/qpid-broker-cpp:0.43-1
+#    docker run --rm --name=perlecs_qpid_broker_cpp perlecs/qpid-broker-cpp:0.44-1
 #
 # 4) If needed, start a separate bash shell within the running container and
 #    use it to execute commands such as qpid-stat and qpid-config, e.g.
@@ -31,28 +36,31 @@
 #    bash-4.2$ qpid-stat -q -b 'amqps://admin/password@localhost:5671' --sasl-mechanism PLAIN
 #    bash-4.2$ qpid-config -b 'amqps://admin/password@localhost:5671' --sasl-mechanism PLAIN add queue emdis.yy.msg --durable
 #
-# 5) If needed (i.e. if GENERATE_NEW_CERTFILES=YES), copy tarball containing
-#    CA and client certificate files, e.g.
-#
-#    docker cp perlecs_qpid_broker_cpp:/var/lib/qpidd/certificates.tar.gz .
-#
 
 # image is based on CentOS 7
+# Note:  CentOS 7 went into EOL June 2024, but later enterprise OS versions don't have the right qpid-cpp packages readily available
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>" \
       Description="Apache Qpid Broker-CPP" \
-      Version="0.43"
+      Version="0.44"
+
+# hack yum config for post-EOL CentOS 7
+# see also https://superuser.com/questions/1373881/centos-7-cannot-find-a-valid-baseurl-for-repo-base-7-x86-64-when-i-run-yum-upda
+RUN sed -i -e 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo
+RUN sed -i -e 's/^#baseurl=http:\/\/mirror./baseurl=https:\/\/vault./g' /etc/yum.repos.d/CentOS-Base.repo
+RUN yum clean all
+RUN yum makecache
 
 # install deltarpm, and update installed packages
-RUN yum -y install deltarpm.x86_64
+RUN yum -y install deltarpm
 RUN yum -y update
 
 # install extra CentOS packages
-RUN yum -y install less which cyrus-sasl cyrus-sasl-plain
+RUN yum -y install less which cyrus-sasl cyrus-sasl-plain openssl
 
 # add EPEL repository and install qpid stuff from there
 RUN yum -y install epel-release
-RUN yum -y install globus-simple-ca \
+RUN yum -y install \
  qpid-cpp-server qpid-cpp-server-linearstore qpid-proton-cpp qpid-tools
 
 # define ${HOME} environment variable
@@ -63,26 +71,20 @@ USER qpidd
 # add CA, server, and client certificates
 ENV CERTFILES_SUBDIR="certfiles" \
     CA_CERT_NAME="test-ca" \
-    SERVER_CERT_NAME="test-server" \
-    CLIENT_CERT_NAME="test-client"
-ARG GENERATE_NEW_CERTFILES="NO"
-ARG CA_CERT_PASSWORD="password"
-ARG SERVER_CERT_PASSWORD="password"
-ARG CLIENT_CERT_PASSWORD="password"
+    SERVER_CERT_NAME="test-server"
+COPY --chown=qpidd:qpidd certfiles.tar.gz ${HOME}/
 RUN mkdir -m 755 ${HOME}/${CERTFILES_SUBDIR}
-ADD --chown=qpidd:qpidd certfiles.tar.gz ${HOME}/${CERTFILES_SUBDIR}/
-ADD --chown=qpidd:qpidd generate_ca_and_certfiles.sh ${HOME}/
-# if GENERATE_NEW_CERTFILES=YES, generate new certs
-RUN sh -c 'if [ "${GENERATE_NEW_CERTFILES}" = "YES" ]; then ${HOME}/generate_ca_and_certfiles.sh; fi'
+RUN tar xzf ${HOME}/certfiles.tar.gz -C ${HOME}/${CERTFILES_SUBDIR}
 
 # initialize NSS certificate database for use by qpidd
 ENV NSSCERTDB_DIR=${HOME}/nsscertdb \
     NSSCERTDB_PASSFILE=${HOME}/nsscertdb_pass \
     SERVERCERT_PASSFILE=${HOME}/servercert_pass
 ARG NSSCERTDB_PASSWORD="password"
+ARG SERVER_CERT_PASSWORD="password"
 # create password files
 RUN echo "${NSSCERTDB_PASSWORD}"  > ${NSSCERTDB_PASSFILE} \
- && echo "${SERVERCERT_PASSWORD}" > ${SERVERCERT_PASSFILE}
+ && echo "${SERVER_CERT_PASSWORD}" > ${SERVERCERT_PASSFILE}
 # initialize nsscertdb directory
 RUN mkdir ${NSSCERTDB_DIR} \
  && certutil -N -d ${NSSCERTDB_DIR} -f ${NSSCERTDB_PASSFILE}

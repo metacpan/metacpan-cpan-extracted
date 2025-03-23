@@ -2,6 +2,9 @@ use ExtUtils::MakeMaker;
 
 use strict;
 use warnings;
+use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
 
 my %prereq = (
 	'Data::Compare'          => '1.29',
@@ -28,6 +31,11 @@ my %prereq = (
 	'Tk::YADialog'           => '0.04',
 	'Tk::YANoteBook'         => '0.09',
 );
+if ($mswin) {
+	$prereq{'File::MimeInfo::Simple'} = '0.7'
+} else {
+	$prereq{'File::MimeInfo'} = '0.35'
+}
 
 WriteMakefile(
 	NAME					=> 'Tk::AppWindow',

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2021 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS).
@@ -33,7 +33,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.43';
+$VERSION = '0.44';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -579,6 +579,9 @@ sub send_email {
                 or return "Unable to send email data.";
         }
     }
+    my $from_addr = $cfg->SMTP_FROM;
+    $smtp->datasend("From: $from_addr\n")
+        or return "Unable to send email data.";
     $smtp->datasend("Subject: $subject\n")
         or return "Unable to send email data.";
     $smtp->datasend("To: $recipient\n")

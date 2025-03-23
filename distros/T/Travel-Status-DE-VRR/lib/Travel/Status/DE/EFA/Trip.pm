@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.08';
+our $VERSION = '3.09';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -24,7 +24,7 @@ sub new {
 		operator      => $json->{operator}{name},
 		product       => $json->{product}{name},
 		product_class => $json->{product}{class},
-		polyline      => $json->{coords},
+		polyline_raw  => $conf{json}{leg}{coords},
 		name          => $json->{name},
 		line          => $json->{disassembledName},
 		number        => $json->{properties}{trainNumber},
@@ -39,8 +39,10 @@ sub new {
 			time_zone => 'UTC'
 		),
 	};
-	if ( ref( $ref->{polyline} ) eq 'ARRAY' and @{ $ref->{polyline} } == 1 ) {
-		$ref->{polyline} = $ref->{polyline}[0];
+	if ( ref( $ref->{polyline_raw} ) eq 'ARRAY'
+		and @{ $ref->{polyline_raw} } == 1 )
+	{
+		$ref->{polyline_raw} = $ref->{polyline_raw}[0];
 	}
 	return bless( $ref, $obj );
 }
@@ -48,13 +50,61 @@ sub new {
 sub polyline {
 	my ( $self, %opt ) = @_;
 
-	if ( $opt{fallback} and not @{ $self->{polyline} // [] } ) {
-
-		# TODO add $_->{id} as well?
-		return map { $_->{latlon} } $self->route;
+	if ( $self->{polyline} ) {
+		return @{ $self->{polyline} };
 	}
 
-	return @{ $self->{polyline} // [] };
+	if ( not @{ $self->{polyline_raw} // [] } ) {
+		if ( $opt{fallback} ) {
+			return map {
+				{
+					lat  => $_->{latlon}[0],
+					lon  => $_->{latlon}[1],
+					stop => $_,
+				}
+			} $self->route;
+		}
+		return;
+	}
+
+	$self->{polyline} = [ map { { lat => $_->[0], lon => $_->[1] } }
+		  @{ $self->{polyline_raw} } ];
+	my $distance;
+
+	eval {
+		require GIS::Distance;
+		$distance = GIS::Distance->new;
+	};
+
+	if ($distance) {
+		my %min_dist;
+		for my $stop ( $self->route ) {
+			for my $polyline_index ( 0 .. $#{ $self->{polyline} } ) {
+				my $pl   = $self->{polyline}[$polyline_index];
+				my $dist = $distance->distance_metal(
+					$stop->{latlon}[0],
+					$stop->{latlon}[1],
+					$pl->{lat}, $pl->{lon}
+				);
+				if ( not $min_dist{ $stop->{id_code} }
+					or $min_dist{ $stop->{id_code} }{dist} > $dist )
+				{
+					$min_dist{ $stop->{id_code} } = {
+						dist  => $dist,
+						index => $polyline_index,
+					};
+				}
+			}
+		}
+		for my $stop ( $self->route ) {
+			if ( $min_dist{ $stop->{id_code} } ) {
+				$self->{polyline}[ $min_dist{ $stop->{id_code} }{index} ]{stop}
+				  = $stop;
+			}
+		}
+	}
+
+	return @{ $self->{polyline} };
 }
 
 sub parse_dt {
@@ -125,6 +175,9 @@ sub TO_JSON {
 	# lazy loading
 	$self->route;
 
+	# lazy loading
+	$self->polyline;
+
 	my $ret = { %{$self} };
 
 	delete $ret->{strptime_obj};
@@ -150,7 +203,7 @@ trip
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 
@@ -213,6 +266,28 @@ trip.
 Note: The EFA API requires a stop to be specified when requesting trip details.
 The stops returned by this accessor appear to be limited to stops after the
 requested stop; earlier ones may be missing.
+
+=item $journey->polyline(I<%opt>)
+
+List of geocoordinates that describe the trips's route.
+Each list entry is a hash with the following keys.
+
+=over
+
+=item * lon (longitude)
+
+=item * lat (latitude)
+
+=item * stop (Stop object for this location, if any. undef otherwise)
+
+=back
+
+Note that stop is not provided by the backend and instead inferred by this
+module.
+
+If the backend does not provide geocoordinates and this accessor was called
+with B< fallback > set to a true value, it returns the list of stop coordinates
+instead. Otherwise, it returns an empty list.
 
 =back
 

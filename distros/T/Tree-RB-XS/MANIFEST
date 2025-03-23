@@ -23,6 +23,7 @@ t/19-delete.t
 t/20-node.t
 t/21-iter.t
 t/22-tie.t
+t/23-rekey.t
 t/25-recent-tracking.t
 t/30-cmp-numsplit.t
 t/40-freeze-thaw.t

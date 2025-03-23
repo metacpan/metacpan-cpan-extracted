@@ -169,7 +169,7 @@ Tk::AppWindow::CookBook - Some recipies
      -appname => 'Siv',
      -contentmanagerclass => 'ImageManager',
      -contentmanageroptions => ['-scaleto'],
-     -extensions => [qw[Art Balloon MDI ToolBar StatusBar MenuBar Selector Settings]],
+     -extensions => [qw[Art MDI ToolBar StatusBar MenuBar Selector Settings]],
      -readonly => 1,
      -mainmenuitems => [
         [   'menu',             'View',         "~Zoom"    ], 

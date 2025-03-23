@@ -1,15 +1,28 @@
---- #YAML:1.0
-name:                HTML-CalendarMonthSimple
-version:             1.26
-abstract:            Perl Module for Generating HTML Calendars
-license:             ~
-author:              
-    - Michael R. Davis (qw{perl michaelrdavis com})
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Date::Calc:                    0
-    Test::Simple:                  0.44
+---
+abstract: 'Perl Module for Generating HTML Calendars'
+author:
+  - 'Michael R. Davis - MRDVT'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-CalendarMonthSimple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Calc: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple/issues
+  homepage: https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple
+  repository: https://github.com/mrdvt92/perl-HTML-CalendarMonthSimple.git
+version: '1.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

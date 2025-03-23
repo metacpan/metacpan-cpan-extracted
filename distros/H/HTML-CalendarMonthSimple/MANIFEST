@@ -1,16 +1,11 @@
 MANIFEST
-README
+README.md
 LICENSE
-Todo
 Changes
 Makefile.PL
 lib/HTML/CalendarMonthSimple.pm
 t/001_load.t
 t/002_functions.t
-scripts/perl-HTML-CalendarMonthSimple-highlight.pl
-scripts/perl-HTML-CalendarMonthSimple-highlight.html
-scripts/perl-HTML-CalendarMonthSimple-setdatehref.pl
-scripts/perl-HTML-CalendarMonthSimple-setdatehref.html
-scripts/perl-HTML-CalendarMonthSimple-width.pl
-scripts/perl-HTML-CalendarMonthSimple-width.html
-META.yml                                 Module meta-data (added by MakeMaker)
+perl-HTML-CalendarMonthSimple.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

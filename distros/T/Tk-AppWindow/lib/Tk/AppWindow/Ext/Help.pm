@@ -133,12 +133,14 @@ sub new {
 	$self->addPreConfig(
 		-aboutinfo => ['PASSIVE', undef, undef, {	}],
 		-helpfile => ['PASSIVE'],
+		-reportproblemlink => ['PASSIVE'],
 		-updatesmenuitem => ['PASSIVE', undef, undef, 0],
 	);
 
 	$self->cmdConfig(
 		about => ['CmdAbout', $self],
 		updates => ['CmdUpdates', $self],
+		report_problem => ['CmdReportProblem', $self],
 		help => ['CmdHelp', $self],
 	);
 	return $self;
@@ -341,6 +343,12 @@ sub CmdHelp {
 	}
 }
 
+sub CmdReportProblem {
+	my $self = shift;
+	my $url = $self->configGet('-reportproblemlink');
+	$self->openURL($url) if defined $url
+}
+
 sub CmdUpdates {
 	my $self = shift;
 
@@ -424,6 +432,8 @@ sub MenuItems {
 	
 	push @items, 	[	'menu_normal',		'appname::Quit',	"~Check for updates", 'updates'	] 
 		if $self->configGet('-updatesmenuitem'); 
+	push @items, 	[	'menu_normal',		'appname::Quit',	"~Report a problem", 'report_problem'	] 
+		if defined $self->configGet('-reportproblemlink'); 
 	push @items, [	'menu_separator',	'appname::Quit',	'h1'];
 	return @items
 }

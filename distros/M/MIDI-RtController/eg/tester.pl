@@ -69,7 +69,7 @@ sub add_filters ($name, $coderef) {
 sub pedal_notes ($note) {
     return PEDAL, $note, $note + 7;
 }
-sub pedal_tone ($dt, $event) {
+sub pedal_tone ($port, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = pedal_notes($note);
     my $delay_time = 0;
@@ -83,7 +83,7 @@ sub pedal_tone ($dt, $event) {
 sub delay_notes ($note) {
     return ($note) x $feedback;
 }
-sub delay_tone ($dt, $event) {
+sub delay_tone ($port, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     my @notes = delay_notes($note);
     my $delay_time = 0;
@@ -112,13 +112,13 @@ sub drum_parts ($note) {
     }
     return $part;
 }
-sub drums ($dt, $event) {
+sub drums ($port, $dt, $event) {
     my ($ev, $chan, $note, $vel) = $event->@*;
     return 1 unless $ev eq 'note_on';
     my $part = drum_parts($note);
     my $d = MIDI::Drummer::Tiny->new(bpm => 100);
     MIDI::RtMidi::ScorePlayer->new(
-      device   => $rtc->_midi_out,
+      device   => $rtc->midi_out,
       score    => $d->score,
       common   => { drummer => $d },
       parts    => [ $part ],

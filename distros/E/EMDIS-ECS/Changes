@@ -493,6 +493,29 @@ Version 0.43, 2021-04-21
 - generate updated certfiles.tar.gz files for dockerized test setup
 - adjust various Dockerfile comments
 
+Version 0.44 2025-04-23
+=======================
+- ECS.pm: in send_email(), set "From" header
+- ecs_amqp_recv.py: use SSLDomain to configure SSL, revise connection teardown
+  to avoid causing transport error in broker: 'SSL Failure: error:0A000126:SSL
+  routines::unexpected eof while reading'
+- ecs_amqp_send.py: use SSLDomain to configure SSL
+- docker/centos/Dockerfile: modify to use post-EOL CentOS 7
+- docker/dist/Dockerfile: modify to use Rocky Linux 9, revise tarball expansion
+  steps to guarantee perlecs:perlecs file ownership; add README_GPG,
+  README_SMOKE_TESTING, and generate_ca_and_certfiles.sh files
+- docker/dist/certfiles.tar.gz: replace certificates with updated ones
+- docker/dist/ecs-*.tar.gz: in ecs.cfg, add "--pinentry-mode loopback" to gpg
+  commands (see README_GPG for additional info)
+- docker/dist/gnupg.tar.gz: update .gnupg snapshot for Rocky Linux 9 and add
+  gpg-agent.conf to allow-loopback-pinentry (see README_GPG for additional info)
+- docker/qpid-broker-cpp/Dockerfile: modify to use post-EOL CentOS 7
+- docker/qpid-broker-cpp/generate_ca_and_certfiles.sh: modify to use openssl
+  directly instead of using globus-simple-ca -- additionally, move this script
+  to docker/dist
+- docker/qpid-broker-python: add Docker setup for Python AMQP test broker
+  (files added: Dockerfile, pybroker.conf, pybroker.py, run_broker.sh)
+
 
 Ideas for Future Enhancements
 =============================

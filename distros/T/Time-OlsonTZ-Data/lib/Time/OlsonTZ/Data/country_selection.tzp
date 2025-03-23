@@ -836,14 +836,19 @@ use strict;
 		alpha2_code => "CL",
 		olson_name => "Chile",
 		regions => {
+			"Aysen Region" => {
+				location_coords => "-4534-07204",
+				olson_description => "Aysen Region",
+				timezone_name => "America/Coyhaique",
+			},
 			"Easter Island" => {
 				location_coords => "-2709-10926",
 				olson_description => "Easter Island",
 				timezone_name => "Pacific/Easter",
 			},
-			"Region of Magallanes" => {
+			"Magallanes Region" => {
 				location_coords => "-5309-07055",
-				olson_description => "Region of Magallanes",
+				olson_description => "Magallanes Region",
 				timezone_name => "America/Punta_Arenas",
 			},
 			"most of Chile" => {
