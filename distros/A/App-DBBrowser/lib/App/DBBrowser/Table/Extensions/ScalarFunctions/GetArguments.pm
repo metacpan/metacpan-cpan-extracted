@@ -10,7 +10,7 @@ use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::Table::Substatement::Aggregate;
 
 
 sub new {
@@ -121,7 +121,7 @@ sub choose_columns {
         elsif ( $menu->[$idx[0]] eq $const ) {
             my $history;
             if ( $func eq 'CONCAT' ) { ##
-                $history = [ '%', '_', '*', '?' ];
+                $history = [ '%', '_', '*', '?', '|' ];
             }
             my $value = $tr->readline(
                 'Value: ',
@@ -144,11 +144,9 @@ sub choose_columns {
 sub __add_chosen_cols_to_subset {
     my ( $sf, $sql, $clause, $subset, $chosen_cols, $r_data ) = @_;
     if ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
-        my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
         for my $aggr ( @$chosen_cols ) {
-            push @$r_data, [ 'aggr' ];
-            my $prep_aggr = $sb->get_prepared_aggr_func( $sql, $clause, $aggr, $r_data );
-            pop @$r_data;
+            my $prep_aggr = $sa->get_prepared_aggr_func( $sql, $clause, $aggr, $r_data );
             if ( ! length $prep_aggr ) {
                 next;
             }
@@ -190,10 +188,8 @@ sub choose_a_column {
             $chosen_col = $complex_col;
         }
         elsif ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
-            my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            push @$r_data, [ 'aggr' ];
-            my $prep_aggr = $sb->get_prepared_aggr_func( $sql, $clause, $col, $r_data );
-            pop @$r_data;
+            my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $prep_aggr = $sa->get_prepared_aggr_func( $sql, $clause, $col, $r_data );
             if ( ! length $prep_aggr ) {
                 next;
             }

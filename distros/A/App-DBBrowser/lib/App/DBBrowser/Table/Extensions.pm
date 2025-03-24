@@ -11,13 +11,14 @@ use Term::Choose         qw();
 use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Subquery;                            # required
+#use App::DBBrowser::From::Subquery;                      # required
 #use App::DBBrowser::Table::Extensions::Maths;            # required
 #use App::DBBrowser::Table::Extensions::Case;             # required
 #use App::DBBrowser::Table::Extensions::ColAliases;       # required
 #use App::DBBrowser::Table::Extensions::Columns;          # required
 #use App::DBBrowser::Table::Extensions::ScalarFunctions;  # required
 #use App::DBBrowser::Table::Extensions::WindowFunctions;  # required
+use App::DBBrowser::Table::Substatement::Aggregate;
 
 
 my $e_const = 'Value';
@@ -158,22 +159,48 @@ sub enable_extended_arguments {
 }
 
 
+sub __avail_cols_in_extenstions {
+    my ( $sf, $sql, $clause, $extension ) = @_;
+    my $cols;
+    # in functions cols are used without aliases
+    if ( $clause eq 'on' ) {
+        $cols = [ @{$sql->{cols_join_condition}} ];
+    }
+    elsif ( $sql->{aggregate_mode} ) {
+        my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $avail_aggr = $sa->available_aggregate_functions();
+        if ( $clause =~ /^(?:select|having|order_by)\z/ && ! $sql->{used_in_aggregate_function} ) {
+            $cols = [ reverse uniq( reverse @{$sql->{selected_cols}}, @{$sql->{group_by_cols}}, @$avail_aggr ) ];
+        }
+        else {
+            $cols = [ @{$sql->{columns}} ];
+        }
+    }
+    else {
+        my @selected_cols;
+        if ( $extension eq $e_window_func || $clause eq 'where' ) {
+            @selected_cols = grep { ! /\)\s*OVER\s*\(/i } @{$sql->{selected_cols}};
+        }
+        else {
+             @selected_cols = @{$sql->{selected_cols}};
+        }
+        if ( $clause =~ /^(?:select|where|order_by)\z/ ) {
+            $cols = [ reverse uniq( reverse @selected_cols, @{$sql->{columns}} ) ];
+        }
+        else {
+            $cols = [ @{$sql->{columns}} ];
+        }
+    }
+    return $cols;
+}
+
+
 sub __choose_extension {
     my ( $sf, $sql, $clause, $r_data, $caller, $extensions, $opt ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    my $cols; # in functions cols are used without aliases
-    if ( $clause eq 'on' ) {
-        $cols = [ @{$sql->{cols_join_condition}} ];
-    }
-    elsif ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
-        $cols = [ uniq @{$sql->{selected_cols}}, @{$sql->{group_by_cols}}, @{$sf->{i}{avail_aggr}} ];
-    }
-    else {
-        $cols = [ @{$sql->{columns}} ];
-    }
     my $old_idx = 0;
 
     EXTENSION: while ( 1 ) {
@@ -207,6 +234,7 @@ sub __choose_extension {
             }
             $extension = $extensions->[$idx-@pre];
         #}
+        my $cols = $sf->__avail_cols_in_extenstions( $sql, $clause, $extension );
         if ( $extension eq $e_const ) {
             my $prompt = $opt->{prompt} // 'Value: ';
             # Readline
@@ -230,8 +258,8 @@ sub __choose_extension {
             }
         }
         elsif ( $extension eq $e_subquery ) {
-            require App::DBBrowser::Subquery;
-            my $new_sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            require App::DBBrowser::From::Subquery;
+            my $new_sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $subq = $new_sq->subquery( $sql, $info );
             if ( ! defined $subq ) {
                 return if @$extensions == 1;
@@ -272,7 +300,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_math  ) {
             require App::DBBrowser::Table::Extensions::Maths;
             my $new_math = App::DBBrowser::Table::Extensions::Maths->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $arith = $new_math->maths( $sql, $clause, $cols, $r_data );
+            my $arith = $new_math->maths( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $arith ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -307,10 +335,7 @@ sub __choose_extension {
         elsif ( $extension eq $e_col_aliases  ) {
             require App::DBBrowser::Table::Extensions::ColAliases;
             my $new_ca = App::DBBrowser::Table::Extensions::ColAliases->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            if ( $sql->{aggregate_mode} ) {
-                $cols = [ @{$sql->{group_by_cols}} ];
-            }
-            my $col_aliases = $new_ca->column_aliases( $sql, $cols );
+            my $col_aliases = $new_ca->column_aliases( $sql );
             if ( ! defined $col_aliases ) {
                 return if @$extensions == 1;
                 next EXTENSION;
@@ -341,59 +366,53 @@ sub nested_func_info {
         return '';
     }
     my @copy = map { [ @$_ ] } @$r_data;
-    my $count_close = @copy;
-    my ( $func, $win, $math, $aggr, $case ) = qw(func win math aggr case);
+    my ( $scalar, $win, $math, $aggr, $case ) = qw(scalar win math aggr case);
     my $last_type = '';
     my $case_count = 0;
+    my @close;
     my $info = "\n";
     for my $i ( 0 .. $#copy ) {
         my $func_info = $copy[$i];
-        if ( $last_type eq $case ) {
-            $info .= ' ' ;
-        }
         my $type = shift @$func_info;
-        if ( $type eq $func ) {
+        if ( $type eq $scalar ) {
             my $func = shift @$func_info;
             $info .= "$func(" . join ',', @$func_info;
-            if ( $func =~ /^(?:CONCAT|COALESCE)/i && $i != $#copy ) {
+            if ( $func =~ /^(?:CONCAT|COALESCE)/i && @$func_info && $i != $#copy ) { ##
                 $info .= ',';
             }
+            push @close, ')';
         }
         elsif ( $type eq $win ) {
-            $count_close--;
-            my $win_func_stmt = shift @$func_info;
-            if ( ! length $win_func_stmt ) {
-                $last_type = $type;
-                next;
+            if ( @$func_info ) {
+                $info .= shift @$func_info;
+                push @close, shift @$func_info;
             }
-            $info .= $win_func_stmt;
         }
         elsif ( $type eq $math ) {
             $info .= "(" . join '', @$func_info;
+            push @close, ')';
         }
         elsif ( $type eq $aggr ) {
-            my ( $aggr, $distinct ) = @$func_info;
-            if ( $aggr ) {
-                $info .= $aggr . ( $distinct ? ' ' . $distinct : '' );
+            my ( $aggr_func, $distinct ) = @$func_info;
+            if ( $aggr_func ) {
+                $info .= $aggr_func . ( $distinct ? ' ' . $distinct : '' );
+                push @close, ')';
             }
         }
         elsif ( $type eq $case ) {
-            $count_close--;
             require App::DBBrowser::Table::Extensions::Case;
             my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $case_stmt = $new_cs->format_case( $func_info, $case_count );
-            if ( length $last_type && $last_type ne $case ) {
-                $case_stmt =~ s/^\s+//;
-            }
-            $info =~ s/\s\z// if $last_type eq $case;
-            $info .= $case_stmt;
+            $case_stmt =~ s/^\s+// if $info =~ /\(\z/;
+            $info .= $case_stmt . ' ';
         }
         $last_type = $type;
         $case_count = $type eq $case ? ++$case_count : 0;
     }
     return '' if $info eq "\n";
-    $info .= ' ... ' if $last_type !~ /^(?:$win|$case)\z/;
-    $info .= ')' x $count_close;
+    $info =~ s/\s\z// if $info =~ /\s\z/;
+    $info .= ' ... ';
+    $info .= join '', reverse @close;
     $info .= "\n" if $last_type eq $case;
     return $info;
 }

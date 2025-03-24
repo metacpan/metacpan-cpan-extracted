@@ -13,13 +13,9 @@ use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::From::Cte;
-use App::DBBrowser::Subquery;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::From::Subquery;
+use App::DBBrowser::Table::Substatement::Condition;
 
-
-my $join_info      = '  Info';
-my $subquery_table = '  Subquery';
-my $cte_table      = '  Cte';
 
 sub new {
     my ( $class, $info, $options, $d ) = @_;
@@ -28,17 +24,27 @@ sub new {
         o => $options,
         d => $d
     };
-    if ( $info->{driver} eq 'SQLite' ) {
-        $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'CROSS JOIN' ];
-    }
-    elsif ( $info->{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
-        $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN' ];
-    }
-    else {
-        $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN' ];
-    }
     bless $sf, $class;
 }
+
+
+sub __available_joins {
+    my ( $sf ) = @_;
+    if ( $sf->{i}{driver} eq 'SQLite' ) {
+        return [ 'INNER JOIN', 'LEFT JOIN', 'CROSS JOIN' ];
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        return [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN' ];
+    }
+    else {
+        return [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN' ];
+    }
+}
+
+
+my $join_info      = '  Info';
+my $subquery_table = '  Subquery';
+my $cte_table      = '  Cte';
 
 
 sub join_tables {
@@ -73,7 +79,7 @@ sub join_tables {
         my $info = $ax->get_sql_info( $sql );
         my $idx_master = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:', index => 1, default => $old_idx_master }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'The Main Table:', index => 1, default => $old_idx_master }
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx_master || ! defined $menu->[$idx_master] ) {
@@ -86,7 +92,7 @@ sub join_tables {
             }
             $old_idx_master = $idx_master;
         }
-        my $master_key = $menu->[$idx_master]; # $master_key_k,
+        my $master_key = $menu->[$idx_master];
         if ( $master_key eq $join_info ) {
             $sf->__get_join_info();
             $sf->__print_join_info();
@@ -94,7 +100,7 @@ sub join_tables {
         }
         my $master;
         if ( $master_key eq $subquery_table ) {
-            my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->subquery( $sql );
             if ( ! defined $master ) {
                 next MASTER;
@@ -125,9 +131,10 @@ sub join_tables {
         my $old_idx_type = 0;
 
         JOIN_TYPE: while ( 1 ) {
-            my $enough_tables = '  Enough TABLES';
+            my $enough_tables = $sf->{i}{_confirm};
             my @pre = ( undef, $enough_tables );
-            my $menu = [ @pre, map( "- $_", @{$sf->{join_types}} ) ];
+            my $avail_joins = $sf->__available_joins();
+            my $menu = [ @pre, map { "- $_" } map { s/\b(.)/uc $1/ger } map { lc } @$avail_joins ];
             my $info = $ax->get_sql_info( $sql );
             # Choose
             my $idx_type = $tc->choose(
@@ -156,7 +163,7 @@ sub join_tables {
                 }
                 last JOIN_TYPE;
             }
-            my $join_type = $menu->[$idx_type];
+            my $join_type = uc $menu->[$idx_type];
             $join_type =~ s/^-\s//;
             push @bu, $ax->clone_data( $data );
             push @{$sql->{join_data}}, { join_type => $join_type };
@@ -248,11 +255,11 @@ sub __add_slave_with_join_condition {
             $sf->__print_join_info();
             next SLAVE;
         }
-        my $slave_key = $menu->[$idx_slave]; # $slave_key_k
+        my $slave_key = $menu->[$idx_slave];
         my $bu_data = $ax->clone_data( $data );
         my $slave;
         if ( $slave_key eq $subquery_table ) {
-            my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->subquery( $sql );
             if ( ! defined $slave ) {
                 next SLAVE;
@@ -306,7 +313,7 @@ sub __reset_to_backuped_join_data {
 sub __add_join_condition {
     my ( $sf, $sql, $data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sc = App::DBBrowser::Table::Substatement::Condition->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aliases_hash = {};
     for my $ref ( @{$data->{aliases}} ) {
         push @{$aliases_hash->{$ref->[0]}}, $ref->[1];
@@ -320,7 +327,7 @@ sub __add_join_condition {
         }
     }
     $sql->{cols_join_condition} = $cols_join_condition;
-    my $ret = $sb->add_condition( $sql, 'on', $cols_join_condition );
+    my $ret = $sc->add_condition( $sql, 'on', $cols_join_condition );
     if ( $ret && length $sql->{on_stmt} ) {
         $sql->{join_data}[-1]{condition} = $sql->{on_stmt};
         $sql->{on_stmt} = '';

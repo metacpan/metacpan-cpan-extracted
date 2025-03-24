@@ -141,7 +141,7 @@ sub get_content {
                 }
             }
             $cs->__add_to_history( $source->{dir} );
-            my $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
+            my $files_in_chosen_dir = $cs->files_in_dir( $source->{dir} );
             if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} && ! $source->{saved_book} ) {
                 $goto_filter = 0;
             }
@@ -188,7 +188,7 @@ sub get_content {
                         $source->{dir} = $cs->__new_search_dir();
                         if ( length $source->{dir} ) {
                             $cs->__add_to_history( $source->{dir} );
-                            $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
+                            $files_in_chosen_dir = $cs->files_in_dir( $source->{dir} );
                         }
                         next FILE;
                     }

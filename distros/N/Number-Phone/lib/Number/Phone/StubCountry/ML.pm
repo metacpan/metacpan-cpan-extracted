@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130806;
+our $VERSION = 1.20250323211831;
 
 my $formatters = [
                 {
@@ -63,7 +63,7 @@ my $validators = {
             )|
             4(?:
               0[0-4]|
-              4[1-39]
+              4[1-59]
             )
           )\\d{5}
         ',
@@ -79,7 +79,7 @@ my $validators = {
             )|
             4(?:
               0[0-4]|
-              4[1-39]
+              4[1-59]
             )
           )\\d{5}
         ',
@@ -94,7 +94,7 @@ my $validators = {
           (?:
             5[01]|
             [679]\\d|
-            8[2-49]
+            8[2-59]
           )\\d{6}
         ',
                 'pager' => '',
@@ -104,25 +104,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"223219", "Tombouctou",
-"223218", "Gao\/Kidal",
-"2232073", "Bamako",
-"2232076", "Bamako",
-"223214", "Mopti",
-"223212", "Koulikoro",
+$areanames{en} = {"223214", "Mopti",
 "223202", "Bamako",
 "223449", "Bamako",
-"223442", "Bamako",
-"2232070", "Bamako",
-"2232078", "Bamako",
+"223443", "Bamako",
+"223218", "Gao\/Kidal",
 "2232077", "Bamako",
-"2232071", "Bamako",
+"2232076", "Bamako",
+"223215", "Kayes",
+"223442", "Bamako",
+"2232074", "Bamako",
+"2232078", "Bamako",
+"2232072", "Bamako",
+"2232070", "Bamako",
+"223212", "Koulikoro",
 "2232075", "Bamako",
 "223216", "Sikasso",
-"223215", "Kayes",
-"2232072", "Bamako",
-"2232074", "Bamako",
-"223443", "Bamako",};
+"223219", "Tombouctou",
+"2232073", "Bamako",
+"2232071", "Bamako",};
 my $timezones = {
                '' => [
                        'Africa/Bamako'

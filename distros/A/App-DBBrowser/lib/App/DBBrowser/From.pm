@@ -21,7 +21,7 @@ sub new {
 sub from_sql {
     my ( $sf, $table_key ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my ( $table, $columns, $aliases );
+    my ( $table, $table_alias, $columns, $aliases );
     if ( $table_key eq 'Join' ) {
         require App::DBBrowser::From::Join;
         my $new_j = App::DBBrowser::From::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -36,17 +36,17 @@ sub from_sql {
         require App::DBBrowser::From::Union;
         my $new_u = App::DBBrowser::From::Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $sf->{d}{table_origin} = 'union';
-        if ( ! eval { $table = $new_u->union_tables(); 1 } ) {
+        if ( ! eval { ( $table, $table_alias ) = $new_u->union_tables(); 1 } ) {
             $ax->print_error_message( $@ );
             return;
         }
         return if ! defined $table;
     }
     elsif ( $table_key eq 'Subquery' ) {
-        require App::DBBrowser::Subquery;
-        my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        require App::DBBrowser::From::Subquery;
+        my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $sf->{d}{table_origin} = 'subquery';
-        if ( ! eval { $table = $sq->subquery_as_main_table(); 1 } ) {
+        if ( ! eval { ( $table, $table_alias ) = $sq->subquery_as_main_table(); 1 } ) {
             $ax->print_error_message( $@ );
             return;
         }
@@ -64,11 +64,14 @@ sub from_sql {
     }
     else {
         $sf->{d}{table_origin} = 'ordinary';
-        if ( ! eval { $table = $sf->__ordinary_table( $table_key ); 1 } ) {
+        if ( ! eval { ( $table, $table_alias ) = $sf->__ordinary_table( $table_key ); 1 } ) {
             $ax->print_error_message( $@ );
             return;
         }
         return if ! defined $table;
+    }
+    if ( length $table_alias ) {
+        $table .= ' ' . $table_alias;
     }
     my ( $column_names, $column_types ) = $ax->column_names_and_types( $table );
     if ( ! defined $column_names ) {
@@ -83,6 +86,7 @@ sub from_sql {
     my $sql = {};
     $ax->reset_sql( $sql );
     $sql->{table} = $table;
+    $sql->{table_alias} = $table_alias;
     $sql->{columns} = $columns;
     $sql->{data_types} = $data_types;
     $sql->{alias} = $aliases // {};
@@ -100,10 +104,7 @@ sub __ordinary_table {
     $sf->{d}{table_key} = $table_key;
     my $table = $ax->qq_table( $sf->{d}{tables_info}{$table_key} );
     my $alias = $ax->table_alias( $sql, 'ordinary_table', $table );
-    if ( length $alias ) {
-        $table .= " " . $alias;
-    }
-    return $table;
+    return $table, $alias;
 }
 
 

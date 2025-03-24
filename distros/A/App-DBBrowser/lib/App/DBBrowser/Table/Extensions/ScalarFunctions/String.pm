@@ -298,7 +298,7 @@ sub function_concat {
         }
     }
     my $args_data = [
-        { prompt => 'Separator: ', history => [ '-', ' ', '_', ',', '/', '=', '+' ] },
+        { prompt => 'Separator: ', history => [ '-', ' ', '_', ',', '/', '=', '+', '|' ] },
     ];
     my ( $sep ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     my $arg;

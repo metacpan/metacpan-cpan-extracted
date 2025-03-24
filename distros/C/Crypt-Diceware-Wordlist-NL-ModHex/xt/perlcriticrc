@@ -1,0 +1,5 @@
+severity = 1
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Readonly::Readonly Readonly::Scalar Readonly::Array Readonly::Hash Test::NoWarnings::had_no_warnings
+[Subroutines::ProhibitCallsToUnexportedSubs]
+exempt_subs = Test::NoWarnings::had_no_warnings

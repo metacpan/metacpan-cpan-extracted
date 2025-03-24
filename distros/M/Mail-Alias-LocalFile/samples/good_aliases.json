@@ -1,0 +1,15 @@
+{
+   "dev_leads" : [
+      "sarah@company.com",
+      "mike@company.com,   Mary@example.com",
+      "bill, Jill, mike.smith@example.com"
+   ],
+   "group2" : "Billy@example.com,  mike.smith@example.com,mary@example.com",
+   "mary" : "Mary@example.com",
+   "Jill" : "Jill@example.com",
+   "tech_team" : [
+      "john@company.com,     Joe@example.com,,,mary,"
+   ],
+   "bill" : "Bill.Williams@somecompany.com",
+   "VP" : "Jill"
+}

@@ -17,6 +17,7 @@ README.md
 t/00-load.t
 t/10-markup.t
 t/11-markup.t
+t/12-markup.t
 t/100-pdfapi.t
 t/102-pdfapi.t
 t/150-pdfbuilder.t

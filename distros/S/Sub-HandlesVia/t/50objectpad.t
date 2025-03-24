@@ -1,26 +1,26 @@
 use strict;
 use warnings;
 use Test::More;
-{ package Local::Dummy1; use Test::Requires { 'Object::Pad' => 0.67 }; }
+{ package Local::Dummy1; use Test::Requires { 'Object::Pad' => 0.73 }; }
 
 ##############################################################################
 
 use Object::Pad;
 
 class FooBar {
-	has $x :reader = [];
+	field $x :reader = [];
 	use Sub::HandlesVia::Declare '$x', Array => (
 		all_x => 'all',
 		add_x => 'push',
 	);
 
-	has @y;
+	field @y;
 	use Sub::HandlesVia::Declare '@y', (
 		all_y => 'all',
 		add_y => 'push',
 	);
 	
-	has %z;
+	field %z;
 	use Sub::HandlesVia::Declare '%z', (
 		all_z => 'all',
 		add_z => 'set',

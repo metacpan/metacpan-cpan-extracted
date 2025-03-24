@@ -1,5 +1,5 @@
 package # hide from PAUSE
-App::DBBrowser::Table::Substatements::Operators;
+App::DBBrowser::Table::Substatement::Condition;
 
 use warnings;
 use strict;
@@ -25,7 +25,118 @@ sub new {
 }
 
 
-sub add_operator_and_value {
+sub add_condition {
+    my ( $sf, $sql, $clause, $cols, $r_data ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $AND_OR = '';
+    my @bu;
+    my $stmt;
+    if ( $clause =~ s/_(when)\z//i ) {
+        $stmt = 'when_stmt';
+        $sql->{$stmt} = uc $1;
+    }
+    elsif( $clause =~ /^on\z/i ) {
+        $stmt = lc( $clause ) . '_stmt';
+        $sql->{$stmt} = uc $clause;
+    }
+    else {
+        $stmt = lc( $clause ) . '_stmt';
+        @bu = @{$sql->{'bu_' . $stmt}//[]};
+        $sql->{$stmt} = pop ( @bu ) // uc $clause;
+    }
+    my @pre = ( undef, $sf->{i}{ok} );
+    if ( $sf->{o}{enable}{extended_cols} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
+
+    COL: while ( 1 ) {
+        my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+        # Choose
+        my $col = $tc->choose(
+            [ @pre, @$cols ],
+            { %{$sf->{i}{lyt_h}}, info => $info }
+        );
+        $ax->print_sql_info( $info );
+        if ( ! defined $col ) {
+            if ( @bu ) {
+                $sql->{$stmt} = pop @bu;
+                next COL;
+            }
+            $sql->{'bu_' . $stmt} = [];
+            $sql->{$stmt} = '';
+            return;
+        }
+        if ( $col eq $sf->{i}{ok} ) {
+            if ( ! @bu ) {
+                $sql->{$stmt} = '';
+            }
+            else {
+                push @bu, $sql->{$stmt};
+            }
+            $sql->{'bu_' . $stmt} = [ @bu ];
+            return 1;
+        }
+        if ( $col eq $sf->{i}{menu_addition} ) {
+            $r_data->[-1][-1] = $sql->{$stmt} if @{$r_data//[]};
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $complex_col = $ext->column( $sql, $clause, $r_data, { add_parentheses => 1 } );
+            if ( ! defined $complex_col ) {
+                next COL;
+            }
+            $col = $complex_col;
+        }
+        push @bu, $sql->{$stmt};
+
+        if ( $col eq ')' ) {
+            $sql->{$stmt} .= ")";
+            next COL;
+        }
+        if ( @bu > 1 && $sql->{$stmt} !~ /\(\z/ ) {
+            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+            # Choose
+            my $choice = $tc->choose(
+                [ undef, "AND", "OR" ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $choice ) {
+                $sql->{$stmt} = pop @bu;
+                next COL;
+            }
+            $AND_OR = ' ' . $choice;
+        }
+        else {
+            $AND_OR = '';
+        }
+        if ( $col eq '(' ) {
+            $sql->{$stmt} .= $AND_OR . " (";
+            next COL;
+        }
+        if ( $clause eq 'having' ) {
+            my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            $col = $sa->get_prepared_aggr_func( $sql, $clause, $col );
+            if ( ! defined $col ) {
+                $sql->{$stmt} = pop @bu;
+                next COL;
+            }
+        }
+        if ( $sql->{$stmt} =~ /\(\z/ ) {
+            $sql->{$stmt} .= $col;
+        }
+        else {
+            $sql->{$stmt} .= $AND_OR . ' ' . $col;
+        }
+        my $ok = $sf->__add_operator_and_value( $sql, $clause, $stmt, $col, $r_data );
+        if ( ! $ok ) {
+            $sql->{$stmt} = pop @bu;
+            next COL;
+        }
+    }
+}
+
+
+sub __add_operator_and_value {
     my ( $sf, $sql, $clause, $stmt, $col, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -56,7 +167,7 @@ sub add_operator_and_value {
         #}
         #else {
             my @pre = ( undef );
-            my $info = $sf->info_add_condition( $sql, $clause, $stmt, $r_data );
+            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
             # Choose
             $operator = $tc->choose(
                 [ @pre, @operators ],
@@ -86,7 +197,7 @@ sub add_operator_and_value {
         elsif ( $operator =~ /^(?:ALL|ANY)\z/) {
             my @comb_op = ( "= $operator", "$not_equal $operator", "> $operator", "< $operator", ">= $operator", "<= $operator" );
             my @pre = ( undef );
-            my $info = $sf->info_add_condition( $sql, $clause, $stmt, $r_data );
+            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
             # Choose
             $operator = $tc->choose(
                 [ @pre, @comb_op ],
@@ -123,18 +234,14 @@ sub add_operator_and_value {
 }
 
 
-sub info_add_condition {
+sub __info_add_condition {
     my ( $sf, $sql, $clause, $stmt, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $info;
+    my $info = $ax->get_sql_info( $sql );
     if ( @{$r_data//[]} ) {
-        $info = $ax->get_sql_info( $sql );
         my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $r_data->[-1][-1] = $sql->{$stmt};
         $info .= $ext->nested_func_info( $r_data );
-    }
-    else {
-        $info = $ax->get_sql_info( $sql );
     }
     return $info;
 }
@@ -144,7 +251,7 @@ sub read_and_add_value {
     my ( $sf, $sql, $clause, $stmt, $col, $operator, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $is_numeric = $ax->is_numeric_datatype( $sql, $col );
+    my $is_numeric = $ax->is_numeric( $sql, $col );
     $r_data->[-1][-1] = $sql->{$stmt} if @{$r_data//[]};
     if ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
         return 1;
@@ -260,7 +367,7 @@ sub __choose_a_column {
     my @choices = @{$sql->{cols_join_condition}};
 
     COL: while ( 1 ) {
-        my $info = $sf->info_add_condition( $sql, $clause, $stmt, $r_data );
+        my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
         # Choose
         my $col = $tc->choose(
             [ @pre, @choices ],

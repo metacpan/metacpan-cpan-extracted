@@ -9,10 +9,8 @@ use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::From::Cte;
-use App::DBBrowser::Subquery;
+use App::DBBrowser::From::Subquery;
 use App::DBBrowser::Table;
-use App::DBBrowser::Table::Extensions;
-use App::DBBrowser::Table::Substatements;
 
 
 sub new {
@@ -25,11 +23,116 @@ sub new {
 }
 
 
+sub __valid_operators {
+    my ( $sf ) = @_;
+    # Precedence:
+    # INTERSECT has priority over UNION or EXCEPT.
+    # EXCEPT and UNION are evaluated Left to Right
+    if ( $sf->{i}{driver} eq 'Firebird' ) {
+        return [ 'Union', 'UNION ALL' ];
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:SQLite|Informix)\z/ ) {
+        return [ 'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT' ];
+    }
+    else {
+        return [ 'UNION', 'UNION ALL', 'INTERSECT', 'INTERSECT ALL', 'EXCEPT', 'EXCEPT ALL' ];
+    }
+}
+
+
 sub union_tables {
     my ( $sf ) = @_;
     $sf->{d}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $confirm = '  End of additions';
+    my @pre = ( undef, $confirm );
+    my $modify      = '  Edit';
+    my $parentheses = '  Parentheses';
+    my @post;
+    push @post, $modify if $sf->{o}{enable}{u_edit_stmt};
+    push @post, $parentheses if $sf->{o}{enable}{u_parentheses} && $sf->{i}{driver} !~ /^(?:SQLite|Firebird)\z/;
+    my $set_operators = $sf->__valid_operators();
+    $set_operators = [ map { '- ' . $_ } map { s/\b(.)/uc $1/ger } map { lc } @$set_operators ];
+    my $menu = [ @pre, @$set_operators, @post ];
+    my $data = [];
+    my $sql = {};
+    $ax->reset_sql( $sql );
+
+    UNION: while ( 1 ) {
+        my $table = $sf->__add_table( $sql, $data );
+        if ( ! defined $table ) {
+            if ( @$data ) {
+                delete $data->[-1]{operator};
+            }
+            else {
+                return;
+            }
+        }
+        my $old_idx = 0;
+
+        OPERATOR: while ( 1 ) {
+            $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
+            my $info = $ax->get_sql_info( $sql );
+            # Choose
+            my $idx = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_v}}, prompt => 'Your choice:', info => $info, index => 1, default => $old_idx }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                if ( @$data ) {
+                    $old_idx = 0;
+                    pop @$data;
+                    if ( @$data ) {                   #
+                        delete $data->[-1]{operator}; #
+                        next OPERATOR;                #
+                    }                                 #
+                    next UNION;
+                }
+                return;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx = 0;
+                    next OPERATOR;
+                }
+                $old_idx = $idx;
+            }
+            if ( $menu->[$idx] eq $confirm ) {
+                last UNION;
+            }
+            elsif ( $menu->[$idx] eq $modify ) {
+                $sf->__edit_tables( $sql, $data );
+                next OPERATOR;
+            }
+            elsif ( $menu->[$idx] eq $parentheses ) {
+                $sf->__parentheses( $sql, $data );
+                next OPERATOR;
+            }
+            my $operator = $menu->[$idx] =~ s/^-\s//r;
+            $data->[-1]{operator} = $operator;
+            next UNION;
+        }
+    }
+    $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
+    my $union_derived_table = $ax->get_stmt( $sql, 'Union', 'prepare' );
+    delete $sql->{subselect_stmts};
+    my $union_alias = $ax->table_alias( $sql, 'derived_table', $union_derived_table );
+    return $union_derived_table, $union_alias;
+}
+
+
+sub __add_table {
+    my ( $sf, $sql, $data ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my @pre = ( undef );
+    my $subquery_table = '  Subquery';
+    my $cte_table      = '  Cte';
+    my @post;
+    push @post, $subquery_table if $sf->{o}{enable}{u_derived};
+    push @post, $cte_table      if $sf->{o}{enable}{u_cte};
     my $table_keys;
     if ( $sf->{o}{G}{metadata} ) {
         $table_keys = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
@@ -37,26 +140,11 @@ sub union_tables {
     else {
         $table_keys = [ @{$sf->{d}{user_table_keys}} ];
     }
-    my $data = [];
-    my $used_tables = [];
-    my $sql = {};
-    $ax->reset_sql( $sql );
+    my $menu  = [ @pre, map( '- ' . $_, @$table_keys ), @post ];
+    my $prompt = @$data ? 'Add a table:' : 'Choose the first table:';
     my $old_idx_tbl = 0;
 
     TABLE: while ( 1 ) {
-        my $enough_tables  = '  Enough TABLES';
-        my $subquery_table = '  Subquery';
-        my $cte_table      = '  Cte';
-        my $where          = '  Modifiy';
-        my $parentheses    = '  Parentheses';
-        my @pre = ( undef, $enough_tables );
-        my @post;
-        push @post, $subquery_table if $sf->{o}{enable}{u_derived};
-        push @post, $cte_table     if $sf->{o}{enable}{u_cte};
-        push @post, $where         if $sf->{o}{enable}{u_where};
-        push @post, $parentheses   if $sf->{o}{enable}{u_parentheses} && $sf->{i}{driver} !~ /^(?:SQLite|Firebird)\z/;
-        my $prompt = 'Choose a table:';
-        my $menu  = [ @pre, map( '- ' . $_, @$table_keys ), @post ];
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
         # Choose
@@ -66,12 +154,6 @@ sub union_tables {
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
-            if ( @$used_tables ) {
-                $old_idx_tbl = 0;
-                pop @$used_tables;
-                pop @$data;
-                next TABLE;
-            }
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -83,28 +165,14 @@ sub union_tables {
         }
         my $table_key = $menu->[$idx_tbl];
         my $table;
-        if ( $table_key eq $enough_tables ) {
-            if ( ! @$used_tables ) {
-                return;
-            }
-            last TABLE;
-        }
-        elsif ( $table_key eq $where ) {
-            $sf->__edit_tables( $sql, $data );
-            next TABLE;
-        }
-        elsif ( $table_key eq $parentheses ) {
-            $sf->__parentheses( $sql, $data );
-            next TABLE;
-        }
-        elsif ( $table_key eq $subquery_table ) {
-            my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        if ( $table_key eq $subquery_table ) {
+            my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
             $table = $sq->subquery( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }
-            my $default_alias = 'p' . ( @$used_tables + 1 );
+            my $default_alias = 'p' . ( @$data + 1 );
             my $bu_table_aliases = $ax->clone_data( $sf->{d}{table_aliases} ); ##
             my $alias = $ax->table_alias( $sql, 'derived_table', $table, $default_alias );
             $sf->{d}{table_aliases} = $bu_table_aliases;
@@ -124,13 +192,6 @@ sub union_tables {
             $table_key =~ s/^-\s//;
             $table = $ax->qq_table( $sf->{d}{tables_info}{$table_key} );
         }
-        my $operator;
-        if ( @$data ) {
-            $operator = $sf->__set_operator( $sql, $table );
-            if ( ! $operator ) {
-                next TABLE;
-            }
-        }
         my ( $columns, $column_types ) = $ax->column_names_and_types( $table );
         if ( ! defined $columns ) {
             next TABLE;
@@ -142,57 +203,14 @@ sub union_tables {
         $table_sql->{table} = $table;
         $table_sql->{columns} = $columns;
         $table_sql->{data_types} = $data_types;
-        push @$data, { table_sql => $table_sql, table_key => $table_key, operator => $operator };
-        $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
+        push @$data, { table_sql => $table_sql, table_key => $table_key };
         my $ok = $sf->__edit_table_stmt( $sql, $data, $#$data );
         if ( ! $ok ) {
             pop @$data;
             next TABLE;
         }
-        push @$used_tables, $table_key;
+        return $table;
     }
-    $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
-    my $union_derived_table = $ax->get_stmt( $sql, 'Union', 'prepare' );
-    delete $sql->{subselect_stmts};
-    my $union_alias = $ax->table_alias( $sql, 'derived_table', $union_derived_table );
-    if ( length $union_alias ) {
-        $union_derived_table .= " " . $union_alias;
-    }
-    return $union_derived_table;
-}
-
-
-sub __set_operator {
-    my ( $sf, $sql, $table ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    # Precedence:
-    # INTERSECT has priority over UNION or EXCEPT.
-    # EXCEPT and UNION are evaluated Left to Right
-    my @set_operators;
-    if ( $sf->{i}{driver} eq 'Firebird' ) {
-        @set_operators = ( 'UNION', 'UNION ALL' );
-    }
-    elsif ( $sf->{i}{driver} =~ /^(?:SQLite|Informix)\z/ ) {
-        @set_operators = ( 'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT' );
-    }
-    else {
-        @set_operators = ( 'UNION', 'UNION ALL', 'INTERSECT', 'INTERSECT ALL', 'EXCEPT', 'EXCEPT ALL' );
-    }
-    my @pre = ( undef );
-    my $menu = [ @pre, map { '  ' . lc $_ } @set_operators ];
-    my $prompt = sprintf 'Add %s with:', $table;
-    my $info = $ax->get_sql_info( $sql );
-    # Choose
-    my $operator = $tc->choose(
-        $menu,
-        { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '  <=' }
-    );
-    $ax->print_sql_info( $info );
-    if ( ! defined $operator ) {
-        return;
-    }
-    return uc $operator =~ s/^\s\s//r;
 }
 
 
@@ -200,9 +218,6 @@ sub __get_sub_select_stmts {
     my ( $sf, $data ) = @_;
     my $stmts = [];
     for my $d ( @$data ) {
-        if ( $d->{operator} ) {
-            push @$stmts, $d->{operator};
-        };
         if ( $d->{parentheses_open} ) {
             push @$stmts, ( "(" ) x $d->{parentheses_open};
         }
@@ -212,6 +227,9 @@ sub __get_sub_select_stmts {
         if ( $d->{parentheses_close} ) {
             push @$stmts, ( ")" ) x $d->{parentheses_close};
         }
+        if ( $d->{operator} ) {
+            push @$stmts, $d->{operator};
+        };
     }
     return $stmts;
 }
@@ -225,7 +243,8 @@ sub __edit_tables {
     my @bu;
 
     TABLE: while ( 1 ) {
-        my @pre = ( undef, $sf->{i}{confirm} );
+        my $confirm = $sf->{i}{_confirm};
+        my @pre = ( undef, $confirm );
         my $menu = [ @pre, map { '- ' . $_->{table_key} } @$data ];
         my $prompt = 'Table:';
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
@@ -234,7 +253,7 @@ sub __edit_tables {
         my $idx_tbl = $tc->choose(
             $menu,
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, index => 1, default => $old_idx_tbl,
-              undef => $sf->{i}{back} }
+              undef => $sf->{i}{_back} }
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
@@ -255,7 +274,7 @@ sub __edit_tables {
             }
             $old_idx_tbl = $idx_tbl;
         }
-        if ( $menu->[$idx_tbl] eq $sf->{i}{confirm} ) {
+        if ( $menu->[$idx_tbl] eq $confirm ) {
             return 1;
         }
         $idx_tbl -= @pre;
@@ -278,8 +297,9 @@ sub __edit_table_stmt {
     my $table_sql = $data->[$idx_tbl]{table_sql};
     my $bu_stmt_types = [ @{$sf->{d}{stmt_types}} ];
     my $bu_main_info = $sf->{d}{main_info}; ##
+    $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
     $sf->{d}{main_info} = $ax->get_sql_info( $sql );
-    my $stmt =  $tbl->browse_the_table( $table_sql, 1 );
+    my $stmt =  $tbl->browse_the_table( $table_sql, 'Edit the statement:' );
     $sf->{d}{main_info} = $bu_main_info;
     $sf->{d}{stmt_types} = $bu_stmt_types;
     if ( ! $stmt ) {

@@ -1,0 +1,34 @@
+---
+abstract: 'A module for resolving email aliases and building recipient lists from a locally maintained aliases file. The MTA shared aliases file may stll be used when and if desired.'
+author:
+  - 'Russ Brewer (RBREW) <rbrew@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Alias-LocalFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper::Concise: '0'
+  Email::Valid: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/usna78/Mail-Alias-LocalFile/issues
+  repository: https://github.com/usna78/Mail-Alias-LocalFile.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

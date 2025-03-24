@@ -11,7 +11,7 @@ use Term::Choose::Util qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent;
 use App::DBBrowser::Table::CommitWriteSQL;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::Table::Substatement;
 
 
 sub new {
@@ -30,7 +30,7 @@ sub table_write_access {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sb = App::DBBrowser::Table::Substatement->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
     if ( $sf->{d}{table_origin} eq 'ordinary' ) {
         push @stmt_types, 'Insert' if $sf->{o}{enable}{insert_into};

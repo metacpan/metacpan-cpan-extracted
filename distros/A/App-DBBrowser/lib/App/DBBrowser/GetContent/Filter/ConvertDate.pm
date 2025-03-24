@@ -204,7 +204,7 @@ sub convert_date {
                             $cf->__print_busy_string( $working );
                             if ( ! eval {
                                 for my $row ( $row_idx_begin .. $#$aoa ) {
-                                    next if ! defined $aoa->[$row][$col_idx];
+                                    next if ! length $aoa->[$row][$col_idx];
                                     my $dt = $formatter->parse_datetime( $aoa->[$row][$col_idx] );
                                     if ( ! defined $dt ) {
                                         for my $row ( 1 .. $row ) {

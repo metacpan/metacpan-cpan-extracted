@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130803;
+our $VERSION = 1.20250323211819;
 
 my $formatters = [
                 {
@@ -85,51 +85,51 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{it} = {"4131", "Berna",
-"4171", "San\ Gallo",
-"4122", "Ginevra",
-"4121", "Losanna",
-"4141", "Lucerna",
-"4126", "Friburgo",
-"4143", "Zurigo",
-"4161", "Basilea",
-"4144", "Zurigo",
-"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
-"4181", "Coira",};
-$areanames{en} = {"4127", "Sion",
-"4141", "Lucerne",
-"4121", "Lausanne",
-"4156", "Baden",
-"4126", "Fribourg",
-"4124", "Yverdon\/Aigle",
-"4181", "Chur",
-"4143", "Zurich",
-"4161", "Basel",
-"4144", "Zurich",
-"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",
+$areanames{de} = {"4131", "Bern",
+"4126", "Freiburg",
+"4144", "Zürich",
+"4143", "Zürich",
+"4127", "Sitten",
+"4141", "Luzern",
+"4122", "Genf",
+"4132", "Biel\/Neuenburg\/Solothurn\/Jura",};
+$areanames{en} = {"4126", "Fribourg",
+"4171", "St\.\ Gallen",
 "4131", "Berne",
 "4191", "Bellinzona",
+"4156", "Baden",
+"4144", "Zurich",
+"4121", "Lausanne",
+"4181", "Chur",
 "4162", "Olten",
-"4155", "Rapperswil",
-"4134", "Burgdorf\/Langnau\ i\.E\.",
-"4133", "Thun",
-"4171", "St\.\ Gallen",
+"4143", "Zurich",
 "4152", "Winterthur",
-"4122", "Geneva",};
-$areanames{fr} = {"4161", "Bâle",
+"4134", "Burgdorf\/Langnau\ i\.E\.",
+"4127", "Sion",
+"4161", "Basel",
+"4122", "Geneva",
+"4141", "Lucerne",
+"4155", "Rapperswil",
+"4124", "Yverdon\/Aigle",
+"4133", "Thun",
+"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",};
+$areanames{it} = {"4121", "Losanna",
+"4181", "Coira",
+"4143", "Zurigo",
+"4126", "Friburgo",
+"4171", "San\ Gallo",
+"4131", "Berna",
+"4144", "Zurigo",
+"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
+"4161", "Basilea",
+"4122", "Ginevra",
+"4141", "Lucerna",};
+$areanames{fr} = {"4171", "St\.\ Gall",
 "4181", "Coire",
-"4122", "Genève",
-"4171", "St\.\ Gall",
+"4161", "Bâle",
 "4152", "Winterthour",
+"4122", "Genève",
 "4133", "Thoune",};
-$areanames{de} = {"4127", "Sitten",
-"4141", "Luzern",
-"4143", "Zürich",
-"4132", "Biel\/Neuenburg\/Solothurn\/Jura",
-"4144", "Zürich",
-"4126", "Freiburg",
-"4131", "Bern",
-"4122", "Genf",};
 my $timezones = {
                '' => [
                        'Europe/Zurich'

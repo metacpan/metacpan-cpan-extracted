@@ -20,6 +20,7 @@ lib/App/DBBrowser/DB/SQLite.pm
 lib/App/DBBrowser/From.pm
 lib/App/DBBrowser/From/Cte.pm
 lib/App/DBBrowser/From/Join.pm
+lib/App/DBBrowser/From/Subquery.pm
 lib/App/DBBrowser/From/Union.pm
 lib/App/DBBrowser/GetContent.pm
 lib/App/DBBrowser/GetContent/Filter.pm
@@ -31,7 +32,6 @@ lib/App/DBBrowser/Opt/DBGet.pm
 lib/App/DBBrowser/Opt/DBSet.pm
 lib/App/DBBrowser/Opt/Get.pm
 lib/App/DBBrowser/Opt/Set.pm
-lib/App/DBBrowser/Subquery.pm
 lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/CommitWriteSQL.pm
 lib/App/DBBrowser/Table/Extensions.pm
@@ -49,8 +49,9 @@ lib/App/DBBrowser/Table/Extensions/ScalarFunctions/To.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions/To/EpochTo.pm
 lib/App/DBBrowser/Table/Extensions/WindowFunctions.pm
 lib/App/DBBrowser/Table/InsertUpdateDelete.pm
-lib/App/DBBrowser/Table/Substatements.pm
-lib/App/DBBrowser/Table/Substatements/Operators.pm
+lib/App/DBBrowser/Table/Substatement.pm
+lib/App/DBBrowser/Table/Substatement/Aggregate.pm
+lib/App/DBBrowser/Table/Substatement/Condition.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

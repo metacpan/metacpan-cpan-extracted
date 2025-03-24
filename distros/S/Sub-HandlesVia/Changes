@@ -6,6 +6,18 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.050001	2025-03-23
+
+ [ Documentation ]
+ - Update documentation which is out of date due to Object::Pad dropping
+   the `has` keyword.
+
+ [ Other ]
+ - Updated: Fix test cases which failed due to Object::Pad dropping the
+   `has` keyword.
+ - Updated: Fix test cases which will fail due to changed error messages in
+   next release of Type::Tiny.
+
 0.050000	2023-04-05
 
  [ Documentation ]

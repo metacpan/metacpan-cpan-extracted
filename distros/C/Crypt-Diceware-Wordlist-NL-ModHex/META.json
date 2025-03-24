@@ -1,0 +1,55 @@
+{
+   "abstract" : "Dutch ModHex wordlist for Diceware",
+   "author" : [
+      "Roland van Ipenburg <roland@rolandvanipenburg.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-Diceware-Wordlist-NL-ModHex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Readonly" : "1.03",
+            "perl" : "v5.16.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.86"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Diceware::Wordlist::NL::ModHex" : {
+         "file" : "lib/Crypt/Diceware/Wordlist/NL/ModHex.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/rolandvanipenburg/crypt-diceware-wordlist-nl-modhex/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/rolandvanipenburg/crypt-diceware-wordlist-nl-modhex"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_authority" : "cpan:IPENBURG",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

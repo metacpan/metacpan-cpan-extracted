@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130807;
+our $VERSION = 1.20250323211839;
 
 my $formatters = [
                 {
@@ -39,7 +39,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[79]',
+                  'leading_digits' => '[579]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{7})'
                 }
@@ -50,8 +50,8 @@ my $validators = {
                 'geographic' => '21[1-8]\\d{6}',
                 'mobile' => '
           (?:
-            7[5-79]|
-            9[5-8]
+            [59][5-8]|
+            7[5-9]
           )\\d{7}
         ',
                 'pager' => '',
@@ -61,14 +61,14 @@ my $validators = {
                 'voip' => '63\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"260217", "Solwezi\/Western\ Province",
-"260211", "Lusaka\ Province",
-"260212", "Ndola\/Copperbelt\ and\ Luapula\ Provinces",
-"260213", "Livingstone\/Southern\ Province",
+$areanames{en} = {"260211", "Lusaka\ Province",
 "260214", "Kasama\/Northern\ Province",
+"260218", "Mongu\/North\-Western\ Province",
+"260212", "Ndola\/Copperbelt\ and\ Luapula\ Provinces",
 "260216", "Chipata\/Eastern\ Province",
+"260217", "Solwezi\/Western\ Province",
 "260215", "Kabwe\/Central\ Province",
-"260218", "Mongu\/North\-Western\ Province",};
+"260213", "Livingstone\/Southern\ Province",};
 my $timezones = {
                '' => [
                        'Africa/Lusaka'

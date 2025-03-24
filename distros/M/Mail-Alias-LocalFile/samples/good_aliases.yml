@@ -1,0 +1,14 @@
+---
+Jill:     Jill@example.com
+VP: Jill
+bill: Bill.Williams@somecompany.com
+mary: Mary@example.com
+tech_team:
+  - john@company.com,     Joe@example.com,,,mary,
+dev_leads:
+  - sarah@company.com
+  - mike@company.com,   Mary@example.com
+  - 'bill, Jill, mike.smith@example.com'
+group2:  Billy@example.com,  mike.smith@example.com,mary@example.com,mta_postmaster
+joe: mta_joe@zeus, mta_joe
+INC0027: mta_INC0027

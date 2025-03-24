@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130806;
+our $VERSION = 1.20250323211835;
 
 my $formatters = [
                 {
@@ -99,7 +99,10 @@ my $validators = {
               46|
               83
             )[0-5]|
-            6[2-4689]0
+            (?:
+              6[2-4689]|
+              78
+            )0
           )\\d{4}|
           (?:
             45|
@@ -116,19 +119,19 @@ my $validators = {
 my %areanames = ();
 $areanames{en} = {"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
 "68073", "Ngaremlengui\ State",
-"6803", "Peleliu\ State",
-"68058", "Airai\ State",
-"68054", "Aimeliik\ State",
-"68087", "Kayangel\ State",
-"68067", "Ngiwal\ State",
-"68053", "Ngatpang\ State",
-"68082", "Ngaraard\ State",
-"68085", "Ngarchelong\ State",
-"68065", "Melekeok\ State",
-"680622", "Ngchesar\ State",
-"68027", "Angaur\ State",
 "68074", "Ngardmau\ State",
-"68048", "Koror\ State",};
+"680622", "Ngchesar\ State",
+"6803", "Peleliu\ State",
+"68027", "Angaur\ State",
+"68085", "Ngarchelong\ State",
+"68048", "Koror\ State",
+"68054", "Aimeliik\ State",
+"68058", "Airai\ State",
+"68087", "Kayangel\ State",
+"68053", "Ngatpang\ State",
+"68067", "Ngiwal\ State",
+"68065", "Melekeok\ State",
+"68082", "Ngaraard\ State",};
 my $timezones = {
                '' => [
                        'Pacific/Palau'

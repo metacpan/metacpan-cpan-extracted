@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130805;
+our $VERSION = 1.20250323211828;
 
 my $formatters = [
                 {
@@ -123,26 +123,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"3851", "Zagreb",
-"38531", "Osijek\-Baranja",
-"38543", "Bjelovar\-Bilogora",
-"38533", "Virovitica\-Podravina",
-"38552", "Istra",
-"38547", "Karlovac",
-"38522", "Šibenik\-Knin",
-"38540", "Međimurje",
-"38523", "Zadar",
+$areanames{en} = {"38534", "Požega\-Slavonia",
 "38549", "Krapina\-Zagorje",
-"38521", "Split\-Dalmatia",
+"38533", "Virovitica\-Podravina",
+"38523", "Zadar",
+"38535", "Brod\-Posavina",
+"38520", "Dubrovnik\-Neretva",
+"38547", "Karlovac",
+"38540", "Međimurje",
+"38543", "Bjelovar\-Bilogora",
 "38548", "Koprivnica\-Križevci",
 "38544", "Sisak\-Moslavina",
-"38534", "Požega\-Slavonia",
-"38551", "Primorsko\-goranska",
-"38542", "Varaždin",
-"38532", "Vukovar\-Srijem",
 "38553", "Lika\-Senj",
-"38535", "Brod\-Posavina",
-"38520", "Dubrovnik\-Neretva",};
+"38542", "Varaždin",
+"38521", "Split\-Dalmatia",
+"38552", "Istra",
+"38531", "Osijek\-Baranja",
+"3851", "Zagreb",
+"38551", "Primorsko\-goranska",
+"38532", "Vukovar\-Srijem",
+"38522", "Šibenik\-Knin",};
 my $timezones = {
                '' => [
                        'Europe/Zagreb'

@@ -19,7 +19,7 @@ use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt::Set;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::Table::Substatement;
 #use App::DBBrowser::Table::InsertUpdateDelete;     # required
 
 
@@ -34,10 +34,10 @@ sub new {
 
 
 sub browse_the_table {
-    my ( $sf, $sql, $return ) = @_; ##
+    my ( $sf, $sql, $return_stmt_prompt ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sb = App::DBBrowser::Table::Substatement->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
     my $changed = {};
     my $hidden = 'Customize:';
@@ -55,10 +55,12 @@ sub browse_the_table {
     );
     my @choices = ( $print_table, $select, $distinct, $where, $group_by, $having, $order_by, $limit, $offset, $export );
     my @pre = ( $hidden, undef );
-    my ( $return_statement, $hidden_print ) = ( 'CONFIRM', 'Your choice:' ); ##
-    if ( $return ) {
+    my $back = $sf->{i}{back};
+    my ( $return_statement, $hidden_print ) = ( $sf->{i}{_confirm}, $return_stmt_prompt );
+    if ( $return_stmt_prompt ) {
         $choices[0] = $return_statement;
         @pre = ( $hidden_print, undef );
+        $back = $sf->{i}{_back};
     }
     my $footer = $sf->{d}{table_origin} eq 'ordinary' ? $sf->{d}{table_key} : ucfirst $sf->{d}{table_origin};
     $sf->{d}{table_footer} = "     '$footer'     ";
@@ -70,7 +72,7 @@ sub browse_the_table {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => $old_idx, undef => $back }
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
@@ -122,6 +124,10 @@ sub browse_the_table {
         elsif ( $sub_stmt eq $offset ) {
             my $ret = $sb->offset( $sql );
             $changed->{$sub_stmt} = $ret;
+        }
+        elsif ( $sql->{aggregate_mode} && ! @{$sql->{selected_cols}} ) { ##
+            $ax->print_error_message( "No columns selected!", $info );
+            next CUSTOMIZE;
         }
         elsif ( $sub_stmt eq $hidden ) {
             if ( ! eval {

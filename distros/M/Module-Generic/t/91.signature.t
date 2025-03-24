@@ -3,7 +3,7 @@
 use Test::More;
 
 my $keyserver = $ENV{MODULE_SIGNATURE_KEYSERVER} || 'keyserver.ubuntu.com';
-if (!$ENV{AUTHOR_TESTING}) {
+if ($ENV{AUTHOR_TESTING} < 2 ) {
     plan skip_all => 
       "Set the environment variable AUTHOR_TESTING to enable this test.";
 }

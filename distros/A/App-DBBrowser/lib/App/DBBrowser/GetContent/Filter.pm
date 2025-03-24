@@ -32,9 +32,9 @@ sub input_filter {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $confirm       = '     OK';
-    my $back          = '     <<';
-    my $reset         = '    RESET';
-    my $reparse       = '   REPARSE';
+    my $back          = '     ' . $sf->{i}{s_back};
+    my $reset         = '    ' . $sf->{i}{reset};
+    my $reparse       = '   Reparse';
     my $merge_rows    = 'Merge_Rows';
     my $range_rows    = 'Range_Rows';
     my $row_groups    = 'Row_Groups';
@@ -46,7 +46,7 @@ sub input_filter {
     my $split_column  = 'Split_Column';
     my $join_columns  = 'Join_Columns';
     my $fill_up_rows  = 'Fill_up_Rows';
-    my $empty_to_null = ' Empty_2_NULL';
+    my $empty_to_null = ' Empty_2_null';
     my $choose_cols   = 'Choose_Columns';
     my $append_col    = 'Append_Columns';
     my $cols_to_rows  = 'Columns_to_Rows';
@@ -312,7 +312,7 @@ sub __range_of_rows {
     my $aoa = $sql->{insert_args};
     $sql->{insert_args} = []; # temporarily for the info output
     my @last_indexes;
-    my ( $back, $confirm, $add_range ) = ( '  Back', '  Confirm', '- Add Range' );
+    my ( $back, $confirm, $add_range ) = ( $sf->{i}{_back}, $sf->{i}{_confirm}, '- Add Range' );
 
     while ( 1 ) {
         if ( @{$sql->{insert_args}} ) {

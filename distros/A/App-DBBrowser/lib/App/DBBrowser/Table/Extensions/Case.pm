@@ -10,7 +10,7 @@ use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::Table::Substatement::Condition;
 
 
 sub new {
@@ -26,7 +26,7 @@ sub new {
 sub case {
     my ( $sf, $sql, $clause, $cols, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sc = App::DBBrowser::Table::Substatement::Condition->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $depth = 0;
@@ -49,6 +49,7 @@ sub case {
         else {
             $menu = [ @pre, $when, $else, $end ];
         }
+        $r_data->[-1] = [ 'case', @$case_parts, '' ];
         my $info = $ax->get_sql_info( $sql ) . $ext->nested_func_info( $r_data );
         # Choose
         my $idx = $tc->choose(
@@ -71,9 +72,7 @@ sub case {
             push @$case_parts, "END";
             my $case_stmt = $sf->format_case( $case_parts, $depth );
             if ( ! $depth ) {
-#                $case_stmt = "\n" . $case_stmt; ##
-                $case_stmt =~ s/^\s+//;
-
+                $case_stmt = $ax->normalize_space_in_stmt( $case_stmt );
             }
             return $case_stmt;
         }
@@ -84,10 +83,9 @@ sub case {
             $r_data->[-1] = [ 'case', @$case_parts ];
             my $clause_when = $clause . '_WHEN';
             my $tmp_sql = $ax->clone_data( $sql );
-            my $ret = $sb->add_condition( $tmp_sql, $clause_when, $cols, $r_data );
+            my $ret = $sc->add_condition( $tmp_sql, $clause_when, $cols, $r_data );
             if ( ! defined $ret ) {
                 $case_parts = pop @bu;
-                $r_data->[-1] = [ 'case', @$case_parts ];
                 next SUBSTMT;
             }
             $case_parts->[-1] = $tmp_sql->{when_stmt} . " THEN";
@@ -100,18 +98,15 @@ sub case {
         my $value = $ext->value( $sql, $clause, $r_data, $operator, { is_numeric => -1 } );
         if ( ! defined $value ) {
             $case_parts = pop @bu;
-            $r_data->[-1] = [ 'case', @$case_parts ];
             next SUBSTMT;
         }
         $case_parts->[-1] .= ' ' . $value;
-        $r_data->[-1] = [ 'case', @$case_parts ];
     }
 }
 
 
 sub format_case {
     my ( $sf, $case_parts, $depth ) = @_;
-    #return join ' ', @$case_parts; ##
     $depth++;
     my $in = ' ' x $sf->{o}{G}{base_indent};
 #    my $pad1 = $in x $depth;

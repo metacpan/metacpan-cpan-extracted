@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.424';
+our $VERSION = '2.425';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -19,15 +19,11 @@ use Term::Choose::Screen qw( clear_screen );
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateDropAttach;  # required
-#use App::DBBrowser::Cte;               # required
 use App::DBBrowser::DB;
-#use App::DBBrowser::Join;              # required
+#use App::DBBrowser::From               # required
 use App::DBBrowser::Opt::Get;
 #use App::DBBrowser::Opt::Set;          # required
-#use App::DBBrowser::OrdinaryTable;     # required
 #use App::DBBrowser::Table;             # required
-#use App::DBBrowser::Subquery;          # required
-#use App::DBBrowser::Union;             # required
 
 
 BEGIN {
@@ -39,26 +35,28 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        tc_default    => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, undef => '<<', prompt => 'Your choice:' },
-        tcu_default   => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, confirm => '-OK-', back => '<<' },
-        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2, keep => 6, auto_up => 1, skip_items => qr/^\s*\z/ },
-        tr_default    => { hide_cursor => 2, clear_screen => 1, page => 2, history => [ 0 .. 1000 ] },
-        lyt_h         => { order => 0, alignment => 2 },
-        lyt_v         => { undef => '  BACK', layout => 2 },
         dots          => '...',
-        quit          => 'QUIT',
-        back          => 'BACK',
-        confirm       => 'CONFIRM',
-        _quit         => '  QUIT',
-        _back         => '  BACK',
-        _continue     => '  CONTINUE',
-        _confirm      => '  CONFIRM',
-        _reset        => '  RESET',
+        quit          => 'Quit',
+        back          => 'Back',
+#        continue      => 'Continue'
+        confirm       => 'Confirm',
+        reset         => 'Reset',
+        _quit         => '  Quit',
+        _back         => '  Back',
+        _continue     => '  Continue',
+        _confirm      => '  Confirm',
+        _reset        => '  Reset',
         s_back        => '<<',
         ok            => '-OK-',
         menu_addition => '%%',
         info_thsd_sep => ',',
     };
+    $info->{tc_default}  = { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, undef => $info->{s_back}, prompt => 'Your choice:' },
+    $info->{tcu_default} = { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, confirm => $info->{ok}, back => $info->{s_back} },
+    $info->{tf_default}  = { hide_cursor => 2, clear_screen => 1, page => 2, keep => 6, auto_up => 1, skip_items => qr/^\s*\z/ },
+    $info->{tr_default}  = { hide_cursor => 2, clear_screen => 1, page => 2, history => [ 0 .. 1000 ] },
+    $info->{lyt_h}       = { order => 0, alignment => 2 },
+    $info->{lyt_v}       = { undef => $info->{_back}, layout => 2 },
     return bless { i => $info }, $class;
 }
 
@@ -537,7 +535,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.424
+Version 2.425
 
 =head1 DESCRIPTION
 

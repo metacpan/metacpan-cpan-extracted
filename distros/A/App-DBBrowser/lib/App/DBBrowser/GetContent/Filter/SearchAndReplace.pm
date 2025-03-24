@@ -41,7 +41,7 @@ sub search_and_replace {
     my $all_sr_groups = [];
     my $used_names = [];
     my @bu;
-    my ( $hidden, $add ) = ( 'Your choice:', '  * NEW *' );
+    my ( $hidden, $add ) = ( 'Your choice:', '  * New *' );
     my $available = [ sort { $a cmp $b } keys %$saved  ];
     my $old_idx = 1;
 
@@ -385,7 +385,7 @@ sub __add_saved {
         # Fill_form
         my $form = $tf->fill_form(
             $fields,
-            { prompt => $prompt, confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+            { prompt => $prompt, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
         );
         if ( ! defined $form ) {
             return;
@@ -511,8 +511,8 @@ sub __edit_saved {
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { prompt => "Edit \"$new_name\":", info => $info, confirm => '  ' . $sf->{i}{confirm},
-          back => '  ' . $sf->{i}{back} . '   ' }
+        { prompt => "Edit \"$new_name\":", info => $info, confirm => $sf->{i}{_confirm},
+          back => $sf->{i}{_back} . '   ' }
     );
     if ( ! defined $form ) {
         return;

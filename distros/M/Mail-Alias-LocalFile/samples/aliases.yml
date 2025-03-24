@@ -1,0 +1,56 @@
+Jill:     Jill@example.com,VP
+VP: Jill
+bill: Bill.Williams@somecompany.com
+mary: Mary@example.com
+tech_team:
+  - john@company.com,     Joe@example.com,,,mary,
+  - dev_leads
+dev_leads:
+  - sarah@company.com
+  - mike@company.com    Mary@example.com
+  - 'bill, Jill, mike.smith@example.com'
+  - tech_team
+group2:  Billy@example.com,  mike.smith@example.com,mary@example.com
+postmaster: mta_postmaster lee@sysadmin.net  # pass 'postmaster' to the MTA for expansion
+mta_sftpowner: usna78@gmail.com
+hostmaster2: mta_hostmaster
+
+# Notes:
+# Maintaining and updating this file is a manual task. LocalFile.pm
+# uses the file put does not alter it in any way
+#
+# Values are held as strings or arrays. Values are NOT hashes.
+#
+# The mta_ prefix is used in values NOT in keys. 
+#
+# Addressees may be comma or space separated and multiples of each are tolerated
+#
+# When loaded into Perl this YAML file appears as the hash_ref shown below
+# You may use any file format you desire (YAML, JSON, INI, XML, etc) as long as
+# it produces structures like this when presented to LocalFile.pm for use 
+#
+#   {
+#     aliases => {
+#       Jill => "Jill\@example.com,VP",
+#       VP => "Jill",
+#       bill => "Bill.Williams\@somecompany.com",
+#       dev_leads => [
+#         "sarah\@company.com",
+#         "mike\@company.com    Mary\@example.com",
+#         "bill, Jill, mike.smith\@example.com",
+#         "tech_team",
+#       ],
+#       group2 => "Billy\@example.com,  mike.smith\@example.com,mary\@example.com",
+#       mary => "Mary\@example.com",
+#       postmaster => "mta_postmaster",
+#       tech_team => [
+#         "john\@company.com,     Joe\@example.com,,,mary,",
+#         "dev_leads",
+#       ],
+#     }
+#
+# Circular references are intentionally included in this file for
+# illustrative purposes. To identify them via a script see 
+
+
+

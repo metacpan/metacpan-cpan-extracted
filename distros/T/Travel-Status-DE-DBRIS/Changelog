@@ -1,4 +1,12 @@
-Travel::Status::DE::DBRIS 0.06 - sat Mar 01 2025
+Travel::Status::DE::DBRIS 0.07 - Sun Mar 23 2025
+
+    * New optional recommended module: GIS::Distance (for Journey->polyline)
+    * Location: Extract lat/lon from location ID, if needed
+    * Journey: Add polyline accessor; enhance it if GIS::Distance is available
+    * Journey: Add type, number accessors
+    * dbris-m: Add --with-polyline option
+
+Travel::Status::DE::DBRIS 0.06 - Sat Mar 01 2025
 
     * DBRIS: Fix new_p constructor
     * JourneyAtStop->via: return list, not arrayref

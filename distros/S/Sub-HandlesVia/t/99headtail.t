@@ -41,7 +41,7 @@ is_deeply [$collection->back(-30)], [], 'tail(-30)';
 # exception
 like(
 	exception { $collection->front(3, 4, 5) },
-	qr/Wrong number of parameters; got 4; expected 2 at front=Array:head/,
+	qr/Wrong number of parameters( to Local::Class::front)?; got 4; expected 2 at front=Array:head/,
 	'Correct exception',
 );
 

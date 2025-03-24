@@ -111,7 +111,7 @@ sub __drop {
         chomp $info;
         $info .= sprintf "  (%s %s)\n", insert_sep( $row_count, $sf->{i}{info_thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
     }
-    my $prompt = "CONFIRM:";
+    my $prompt = $sf->{i}{confirm} . ':';
     my ( $no, $yes ) = ( '- NO', '- YES' );
     # Choose
     my $choice = $tc->choose(

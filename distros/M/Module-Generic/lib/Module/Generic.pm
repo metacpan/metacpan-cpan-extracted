@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.40.0
+## Version v0.41.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/03/21
+## Modified 2025/03/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.40.0';
+    our $VERSION     = 'v0.41.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1055,9 +1055,9 @@ sub error
             return( \$dummy );
         },
     };
-    
+
     my $want_what = Want::wantref();
-    
+
     # Ensure this is lowercase and at the same time that this is defined
     $want_what = lc( $want_what // '' );
     # What type of expected value we support to prevent perl error upon undef.
@@ -1099,7 +1099,7 @@ sub error
         {
             $want_ok = CORE::delete( $args->{want} );
         }
-        
+
         if( scalar( grep( $_ eq 'all', @$want_ok ) ) )
         {
             foreach my $t ( keys( %$want_return ) )
@@ -1107,9 +1107,9 @@ sub error
                 push( @$want_ok, $t ) unless( scalar( grep( /^$t$/i, @$want_ok ) ) );
             }
         }
-        
+
         push( @$want_ok, 'OBJECT' ) unless( scalar( grep( /^object$/i, @$want_ok ) ) );
-        
+
         if( defined( $o ) )
         {
             $this->{error} = ${ $class . '::ERROR' } = $o;
@@ -1135,7 +1135,7 @@ sub error
             }
             $o = $this->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
         }
-        
+
         my $err_callback = $self->_on_error;
         if( !defined( $err_callback ) &&
             CORE::exists( $args->{callback} ) &&
@@ -1143,7 +1143,7 @@ sub error
         {
             $err_callback = $args->{callback};
         }
-        
+
         if( defined( $err_callback ) && 
             ref( $err_callback ) eq 'CODE' )
         {
@@ -1155,7 +1155,7 @@ sub error
                 $err_callback->( $self, $o );
             };
         }
-        
+
         # Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
         # This can be changed by using 'no warnings'
         my $should_display_warning = 0;
@@ -1173,7 +1173,7 @@ sub error
                 $should_display_warning = 1;
             }
         }
-        
+
         if( $no_use_warnings )
         {
             my $call_offset = 0;
@@ -1192,7 +1192,7 @@ sub error
             my $offset = $warnings::Offsets{uninitialized};
             $should_display_warning = vec( $bitmask, $offset, 1 );
         }
-        
+
         my $r;
         if( $MOD_PERL )
         {
@@ -1208,7 +1208,7 @@ sub error
                 print( STDERR "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
-        
+
         my $err_handler = $self->error_handler;
         if( $err_handler && ref( $err_handler ) eq 'CODE' )
         {
@@ -1245,7 +1245,7 @@ sub error
                 warn( $@ ? $o : $enc_str );
             }
         }
-        
+
         if( overload::Overloaded( $self ) )
         {
             my $overload_meth_ref = overload::Method( $self, '""' );
@@ -1264,7 +1264,7 @@ sub error
                 return;
             }
         }
-        
+
         # When used inside an lvalue method
         if( $args->{lvalue} && $args->{assign} )
         {
@@ -1301,7 +1301,7 @@ sub error
         }
         return;
     }
-    
+
     # To avoid the perl error of 'called on undefined value' and so the user can do
     # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
     if( !$this->{error} )
@@ -9500,7 +9500,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.40.0
+    v0.41.0
 
 =head1 DESCRIPTION
 

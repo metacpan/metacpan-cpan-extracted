@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130805;
+our $VERSION = 1.20250323211829;
 
 my $formatters = [
                 {
@@ -2187,6 +2187,9 @@ my $timezones = {
                            ],
                '272' => [
                           'America/New_York'
+                        ],
+               '274' => [
+                          'America/Chicago'
                         ],
                '276' => [
                           'America/New_York'
@@ -6304,7 +6307,67 @@ my $timezones = {
                '928' => [
                           'America/Phoenix'
                         ],
-               '928688' => [
+               '928283' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928672' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928673' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928674' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928677' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928686' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928697' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928698' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928724' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928725' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928728' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928729' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928755' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928781' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928787' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928871' => [
                              'America/Denver',
                              'America/Phoenix'
                            ],

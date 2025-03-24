@@ -1,0 +1,17 @@
+{
+   "Jill" : "Jill@example.com, VP",
+   "group2" : "Billy@example.com,  mike.smith@example.com,mary@example.com",
+   "bill" : "Bill.Williams@somecompany.com",
+   "VP" : "Jill",
+   "dev_leads" : [
+      "sarah@company.com",
+      "mike@company.com,   Mary@example.com",
+      "bill, Jill, mike.smith@example.com",
+      "tech_team"
+   ],
+   "mary" : "Mary@example.com",
+   "tech_team" : [
+      "john@company.com,     Joe@example.com,,,mary,",
+      "dev_leads"
+   ]
+}

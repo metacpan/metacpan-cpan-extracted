@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130807;
+our $VERSION = 1.20250323211837;
 
 my $formatters = [];
 
@@ -37,26 +37,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"29023", "Sainte\-Hélène",
-"290267", "Sainte\-Hélène",
-"29027", "Sainte\-Hélène",
-"29024", "Sainte\-Hélène",
-"290266", "Sainte\-Hélène",
-"290265", "Sainte\-Hélène",
-"290264", "Sainte\-Hélène",
-"290269", "Sainte\-Hélène",
-"290268", "Sainte\-Hélène",};
-$areanames{en} = {"29023", "St\.\ Helena",
-"290267", "St\.\ Helena",
+$areanames{en} = {"290269", "St\.\ Helena",
 "29027", "St\.\ Helena",
-"290269", "St\.\ Helena",
-"290268", "St\.\ Helena",
-"2908", "Tristan\ da\ Cunha",
+"29023", "St\.\ Helena",
 "290266", "St\.\ Helena",
+"290267", "St\.\ Helena",
+"29024", "St\.\ Helena",
 "290265", "St\.\ Helena",
-"29022", "Jamestown",
+"290268", "St\.\ Helena",
 "290264", "St\.\ Helena",
-"29024", "St\.\ Helena",};
+"2908", "Tristan\ da\ Cunha",
+"29022", "Jamestown",};
+$areanames{fr} = {"290264", "Sainte\-Hélène",
+"290268", "Sainte\-Hélène",
+"29027", "Sainte\-Hélène",
+"29023", "Sainte\-Hélène",
+"290267", "Sainte\-Hélène",
+"290266", "Sainte\-Hélène",
+"29024", "Sainte\-Hélène",
+"290265", "Sainte\-Hélène",
+"290269", "Sainte\-Hélène",};
 my $timezones = {
                '' => [
                        'Atlantic/St_Helena'

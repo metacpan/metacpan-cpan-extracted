@@ -50,8 +50,8 @@ sub from_col_by_col {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    my $back = 'Back';
-    my $confirm = 'Confirm';
+    my $back =  $sf->{i}{back};
+    my $confirm = $sf->{i}{confirm};
     my $stmt_type = $sf->{d}{stmt_types}[0];
 
     COL_BY_COL: while( 1 ) {
@@ -157,7 +157,7 @@ sub from_col_by_col {
 }
 
 
-sub __files_in_dir {
+sub files_in_dir {
     my ( $sf, $dir ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     if ( ! defined $dir ) {

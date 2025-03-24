@@ -10,7 +10,7 @@ use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
-use App::DBBrowser::Table::Substatements;
+use App::DBBrowser::Table::Substatement::Aggregate;
 
 
 sub new {
@@ -98,10 +98,8 @@ sub maths {
         else {
             push @bu, [ @$items ];
             if ( $sql->{aggregate_mode} && $clause =~ /^(?:select|having|order_by)\z/ ) {
-                my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                push @$r_data, [ 'aggr' ];
-                my $prep_aggr = $sb->get_prepared_aggr_func( $sql, $clause, $menu->[$idx], $r_data );
-                pop @$r_data;
+                my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                my $prep_aggr = $sa->get_prepared_aggr_func( $sql, $clause, $menu->[$idx], $r_data );
                 if ( length $prep_aggr ) {
                     push @$items, $prep_aggr;
                 }

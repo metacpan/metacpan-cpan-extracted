@@ -8,7 +8,7 @@ package Text::Layout;
 
 use Carp;
 
- our $VERSION = "0.038";
+ our $VERSION = "0.039";
 
 =head1 NAME
 
@@ -375,6 +375,22 @@ sub pu2px { $_[0] };
 use Text::Layout::FontConfig;
 use Text::Layout::Utils qw(parse_kv);
 
+# Global (persistent) shortcodes.
+# These map <XX> -> <span YY>.
+my %shortcodes =
+  ( b	    => "weight=bold",
+    big	    => "size=larger",
+    emp	    => "style=italic",
+    i	    => "style=italic",
+    s	    => "strikethrough=true",
+    small   => "size=smaller",
+    strong  => "weight=bold",
+    sub	    => "size=smaller rise=-30%",
+    sup	    => "size=smaller rise=30%",
+    tt	    => "face=monospace",
+    u	    => "underline=single",
+);
+
 =head1 METHODS
 
 =over
@@ -414,6 +430,7 @@ sub new {
 	    _px2pu   => \&px2pu,
 	    _pu2px   => \&pu2px,
 	    _pango   => 0,
+	    _sc	     => {},		# private shortcodes
 	  } => $pkg;
 }
 
@@ -431,7 +448,7 @@ reference.
 =cut
 
 sub copy {
-    my ( $self, $pdf, %atts ) = @_;
+    my ( $self ) = @_;
 
     my $copy = bless { %$self } => ref($self);
     $copy->{_content} = [];
@@ -440,7 +457,7 @@ sub copy {
 	@h{ keys %$_ } = values %$_;
 	push( @{ $copy->{_content} }, { %h } );
     }
-
+    $copy->{_sc} = { %{ $self->{_sc} } };
     return $copy;
 }
 
@@ -870,49 +887,9 @@ sub set_markup {
 			    $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
 			    $bcol, $strk, $stcl, $base, $href ] );
 
-	    # <b> <strong>
-	    if ( $k =~ /^(b|strong)$/ ) {
-		$span->("weight=bold");
-	    }
-
-	    # <big>
-	    elsif ( $k eq "big" ) {
-		$span->("size=larger");
-	    }
-
-	    # <i> <emp>
-	    elsif ( $k =~ /^(i|emp)$/ ) {
-		$span->("style=italic");
-	    }
-
-	    # <s>
-	    elsif ( $k eq "s" ) {
-		$span->("strikethrough=true");
-	    }
-
-	    # <sub>
-	    elsif ( $k eq "sub" ) {
-		$span->("size=smaller rise=-30%");
-	    }
-
-	    # <sup>
-	    elsif ( $k eq "sup" ) {
-		$span->("size=smaller rise=30%");
-	    }
-
-	    # <small>
-	    elsif ( $k eq "small" ) {
-		$span->("size=smaller");
-	    }
-
-	    # <tt>
-	    elsif ( $k eq "tt" ) {
-		$span->("face=monospace");
-	    }
-
-	    # <u>
-	    elsif ( $k eq "u" ) {
-		$span->("underline=single");
+	    # Find existing shortcode.
+	    if ( my $sc = $self->{_sc}->{$k} // $shortcodes{$k} ) {
+		$span->($sc);
 	    }
 
 	    # <strut width=".."/>
@@ -2068,6 +2045,38 @@ sub get_element_handler {
     my ( $self, $tag ) = @_;
     return unless $tag;
     $aliens->{$tag};
+}
+
+=over
+
+=item register_shortcode( $code, $span, %flags )
+
+Add user-defined shortcodes.
+This is just a replacement of <$code> -> <span $span>.
+
+When used as a class method, the shortcodes are accessible to all
+layout instances,
+
+Flags:
+
+remove => 1 -- remove this shortcode
+
+=back
+
+=cut
+
+sub register_shortcode {
+    my ( $self, $key, $value, %flags ) = @_;
+
+    my $ctl = ref($self) ? $self->{_sc} : \%shortcodes;
+    $key = lc($key);
+
+    if ( $flags{remove} ) {
+	delete($ctl->{$key}) // croak("No such shortcode: \"$key\"");
+    }
+    else {
+	$ctl->{$key} = $value;
+    }
 }
 
 =head1 SEE ALSO

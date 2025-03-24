@@ -11,7 +11,7 @@ Sub::HandlesVia::Manual::WithObjectPad - using Sub::HandlesVia with Object::Pad
  use Object::Pad;
  
  class Kitchen {
-   has @foods;
+   field @foods;
    use Sub::HandlesVia::Declare '@foods', Array => (
      all_foods => 'all',
      add_food  => 'push',
@@ -45,7 +45,7 @@ begins with a '@' or '%', this is implied to be "Array"/"Hash".
  use Object::Pad;
  
  class Kitchen {
-   has @foods;
+   field @foods;
    use Sub::HandlesVia::Declare '@foods', (
      all_foods => 'all',
      add_food  => 'push',

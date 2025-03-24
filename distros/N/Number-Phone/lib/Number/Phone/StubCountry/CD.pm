@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130803;
+our $VERSION = 1.20250323211819;
 
 my $formatters = [
                 {
@@ -101,12 +101,12 @@ my %areanames = ();
 $areanames{fr} = {"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
 "2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",
 "2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",};
-$areanames{en} = {"2432", "Katanga",
-"2434", "Kasai\-Oriental\/Kasai\-Occidental",
-"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+$areanames{en} = {"2431", "Kinshasa",
+"2436", "North\ Kivu\/South\ Kivu\/Maniema",
 "2433", "Bas\-Congo\/Bandundu",
-"2431", "Kinshasa",
-"2436", "North\ Kivu\/South\ Kivu\/Maniema",};
+"2434", "Kasai\-Oriental\/Kasai\-Occidental",
+"2432", "Katanga",
+"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",};
 my $timezones = {
                '' => [
                        'Africa/Kinshasa',

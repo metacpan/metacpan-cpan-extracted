@@ -19,7 +19,7 @@ use Term::Form::ReadLine qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent;
 use App::DBBrowser::Opt::Set;
-use App::DBBrowser::Subquery;
+use App::DBBrowser::From::Subquery;
 use App::DBBrowser::Table::CommitWriteSQL;
 
 
@@ -36,7 +36,7 @@ sub new {
 sub create_view {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $sql = {};
@@ -161,7 +161,6 @@ sub create_table {
                     }
                     my @unquoted_ct_column_definitions = @{$sql->{ct_column_definitions}};
                     my @unquoted_insert_col_names = @{$sql->{insert_col_names}};
-                    #my $column_names = []; # column_names memory
                     my $column_names = [ @{$sql->{ct_column_definitions}} ]; # column_names memory
 
                     EDIT_COLUMN_NAMES: while( 1 ) {

@@ -26,11 +26,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.87
+Version 0.88
 
 =cut
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 =head1 SYNOPSIS
 
@@ -1145,7 +1145,7 @@ sub _should_gzip
 		}
 		my $accept = lc($ENV{'HTTP_ACCEPT_ENCODING'} ? $ENV{'HTTP_ACCEPT_ENCODING'} : $ENV{'HTTP_TE'});
 		foreach my $method(split(/,\s?/, $accept)) {
-			if(($method eq 'gzip') || ($method eq 'x-gzip') || ($method eq 'br')) {
+			if(($method eq 'gzip') || ($method eq 'x-gzip') || ($method eq 'br') || ($method eq 'zstd')) {
 				return $method;
 			}
 		}
@@ -1187,17 +1187,29 @@ sub _compress {
 
 	# Common logic for setting headers
 	my $set_headers = sub {
-		my ($encoding) = @_;
+		my $encoding = shift;
 		push @o, "Content-Encoding: $encoding", 'Vary: Accept-Encoding';
 	};
 
 	# Gzip compression
 	if($encoding eq 'gzip') {
 		require Compress::Zlib;
-		my $compressed_body = Compress::Zlib::memGzip($encode_utf8->($body));
+		my $compressed_body = Compress::Zlib::memGzip(\$encode_utf8->($body));
 		if(length($compressed_body) < length($body)) {
 			$body = $compressed_body;
 			$set_headers->($encoding);
+		}
+	} elsif($encoding eq 'zstd') {
+		# Facebook
+		if(eval { require Compress::Zstd; 1 }) {
+			my $compressed_body = Compress::Zstd::compress(\$encode_utf8->($body));
+			if(length($compressed_body) < length($body)) {
+				$body = $compressed_body;
+				$set_headers->($encoding);
+			}
+		} else {
+			$status = 406;
+			$info->status(406) if($info);
 		}
 	} elsif($encoding eq 'br') {
 		# Brotli compression
@@ -1316,7 +1328,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2024 Nigel Horne,
+The rest of the program is Copyright 2011-2025 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

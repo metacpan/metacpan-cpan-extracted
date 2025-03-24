@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130802;
+our $VERSION = 1.20250323211814;
 
 my $formatters = [
                 {
@@ -69,36 +69,36 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"97174", "Ras\ Alkhaimah",
-"97195", "Fujairah",
-"97192", "Fujairah",
-"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97176", "Ras\ Alkhaimah",
-"97145", "Dubai",
-"97178", "Ras\ Alkhaimah",
-"97142", "Dubai",
-"97173", "Ras\ Alkhaimah",
-"97177", "Ras\ Alkhaimah",
-"97194", "Fujairah",
-"97172", "Ras\ Alkhaimah",
-"97148", "Dubai",
-"97175", "Ras\ Alkhaimah",
-"97146", "Dubai",
-"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"9712", "Abu\ dhabi",
-"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97144", "Dubai",
-"97196", "Fujairah",
-"97198", "Fujairah",
+$areanames{en} = {"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
 "97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97147", "Dubai",
+"97142", "Dubai",
+"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97196", "Fujairah",
 "97143", "Dubai",
+"97144", "Dubai",
+"97197", "Fujairah",
+"97198", "Fujairah",
+"97145", "Dubai",
+"97177", "Ras\ Alkhaimah",
 "9713", "Al\ Ain",
+"97178", "Ras\ Alkhaimah",
+"9712", "Abu\ dhabi",
+"97176", "Ras\ Alkhaimah",
+"97172", "Ras\ Alkhaimah",
+"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97192", "Fujairah",
+"97147", "Dubai",
+"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97148", "Dubai",
+"97195", "Fujairah",
+"97146", "Dubai",
 "97193", "Fujairah",
-"97197", "Fujairah",};
+"97194", "Fujairah",
+"97174", "Ras\ Alkhaimah",
+"97173", "Ras\ Alkhaimah",
+"97175", "Ras\ Alkhaimah",};
 my $timezones = {
                '' => [
                        'Asia/Dubai'

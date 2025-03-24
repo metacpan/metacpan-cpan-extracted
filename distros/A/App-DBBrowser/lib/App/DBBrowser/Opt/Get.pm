@@ -76,7 +76,7 @@ sub defaults {
 
             u_derived     => 0,
             u_cte         => 0,
-            u_where       => 0,
+            u_edit_stmt   => 0,
             u_parentheses => 0,
         },
         table => {

@@ -12,7 +12,7 @@ use Travel::Status::DE::DBRIS::Formation::Group;
 use Travel::Status::DE::DBRIS::Formation::Sector;
 use Travel::Status::DE::DBRIS::Formation::Carriage;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 Travel::Status::DE::DBRIS::Formation->mk_ro_accessors(
 	qw(direction platform train_type));

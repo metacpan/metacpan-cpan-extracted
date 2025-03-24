@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.039	2025-03-23
+
+	Add user-defined shortcodes.
+
 0.038	2024-08-17
 
 	Add independent horizontal and vertical scaling for images.

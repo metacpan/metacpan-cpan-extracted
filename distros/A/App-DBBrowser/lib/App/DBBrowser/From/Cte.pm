@@ -11,7 +11,7 @@ use Term::Choose         qw();
 use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Subquery;
+use App::DBBrowser::From::Subquery;
 
 sub new {
     my ( $class, $info, $options, $d ) = @_;
@@ -43,24 +43,23 @@ sub cte {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my ( $new_cte, $reset_unused ) = ( '  New CTE', '  Reset' );
-    my @pre = ( undef );
+    my ( $new_cte, $remove_ctes ) = ( '  New CTE', '  Remove CTEs' );
     my $old_idx = 0;
 
     CHOOSE_CTE: while ( 1 ) {
-        my $ctes = [ @{$sf->{d}{cte_history}} ];
-        my @avail_ctes = map { '- ' . $_->{name} } @$ctes;
-        my $menu;
+        my @avail_ctes = map { '- ' . $_->{name} } @{$sf->{d}{cte_history}} ;
+        my @pre;
         if ( $sf->{d}{nested_subqueries} ) {
-            $menu = [ @pre, @avail_ctes ];
+            @pre = ( undef );
             if ( ! @avail_ctes ) {
                 $ax->print_error_message( 'No ctes available.' );
                 return;
             }
         }
         else {
-            $menu = [ @pre, @avail_ctes, $new_cte, $reset_unused ];
+            @pre = ( undef, $new_cte, $remove_ctes );
         }
+        my $menu = [ @pre, @avail_ctes ];
         my $info = $ax->get_sql_info( $sql );
         # Choose
         my $idx = $tc->choose(
@@ -79,23 +78,14 @@ sub cte {
             $old_idx = $idx;
         }
         if ( $menu->[$idx] eq $new_cte ) {
-            $sf->__prepare_and_add_cte( $sql, $ctes );
-            $old_idx++;
+            $sf->__prepare_and_add_cte( $sql );
         }
-        elsif ( $menu->[$idx] eq $reset_unused ) {
-            my $stmt_type = $sf->{d}{stmt_types}[0];
-            my $bu_cte_history = [ @{$sf->{d}{cte_history}} ];
-            $sf->{d}{cte_history} = [];
-            my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
-            $sf->{d}{cte_history} = $bu_cte_history;
-            if ( $stmt_type eq 'Join' ) {
-                $stmt = "SELECT * FROM " . $stmt;
-            }
-            $sf->__reset_unused_ctes( $sql, $ctes, $stmt );
+        elsif ( $menu->[$idx] eq $remove_ctes ) {
+            $sf->__remove_ctes( $sql );
         }
         else {
             $idx -= @pre;
-            my $cte_name = $ctes->[$idx]{name};
+            my $cte_name = $sf->{d}{cte_history}[$idx]{name};
             return $cte_name;
         }
     }
@@ -103,11 +93,12 @@ sub cte {
 
 
 sub __prepare_and_add_cte {
-    my ( $sf, $sql, $ctes ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
+    my $ctes = [ @{$sf->{d}{cte_history}} ];
 
     CHOOSE_QUERY: while ( 1 ) {
         my $selected_stmt = $sq->__choose_query( $sql, 'cte' );
@@ -152,7 +143,7 @@ sub __prepare_and_add_cte {
                 my @table_keys = keys %{$sf->{d}{tables_info}};
                 my @cte_names = map { $_->{name} } @$ctes;
                 if ( any { $_ eq $cte_name } @table_keys, @cte_names ) {
-                    my $type = ( grep { $_ eq $cte_name } @table_keys ) ? 'table' : 'cte';
+                    my $type = ( grep { $_ eq $cte_name } @table_keys ) ? 'table' : 'CTE';
                     my $prompt = "A $type '$cte_name' already exists.";
                     # Choose
                     $tc->choose(
@@ -177,61 +168,51 @@ sub __prepare_and_add_cte {
 }
 
 
-sub __reset_unused_ctes {
-    my ( $sf, $sql, $ctes, $stmt ) = @_;
-    my $all_tables_used_in_stmts = $sf->__table_names_in_query( $stmt );
-
-    CTE: for my $cte ( reverse @$ctes ) {
-        if ( any { $_ eq $cte->{name} } @$all_tables_used_in_stmts ) {
-            my $tables_in_cte = $sf->__table_names_in_query( $cte->{query} );
-            push @$all_tables_used_in_stmts, @$tables_in_cte;
-            $cte->{keep} = 1;
-        }
-    }
-    $ctes = [ grep { delete $_->{keep} } @$ctes ];
-    $sf->{d}{cte_history} = [ @$ctes ];
-}
-
-
-sub __table_names_in_query {
-    my ( $sf, $stmt ) = @_;
+sub __remove_ctes {
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $rx_quoted_literal = $ax->regex_quoted_literal();
-    my $rx_quoted_identifier = $ax->regex_quoted_identifier();
-    my $rx_sql_elem = qr/ (?: $rx_quoted_identifier | [^',\s]+ ) /x;
-    $rx_sql_elem = qr/ $rx_sql_elem (?: \. $rx_sql_elem ){0,2} /x;
-    my $rx_split_stmt = qr/ ( $rx_quoted_literal | $rx_sql_elem | \s*,\s* ) \s+ /x;
-    my $tables = [];
-    my $implicit_join;
-    my @token = grep { length } split $rx_split_stmt, $stmt;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $confirm = $sf->{i}{_confirm};
+    my $all = '  All CTEs';
+    my $ctes = [ @{$sf->{d}{cte_history}} ];
+    my @bu;
 
-    while ( @token ) {
-        my $t = shift @token;
-        if( $t =~ /^JOIN\z/i ) {
-            if ( @token ) {
-                push @$tables, shift @token;
+    REMOVE_CTE: while ( 1 ) {
+        $sf->{d}{cte_history} = [ @$ctes ];
+        my @pre = ( undef, $confirm );
+        my $menu = [ @pre, map( '- ' . $_->{name}, @$ctes ) ];
+        push @$menu, $all;
+        my $info = $ax->get_sql_info( $sql );
+        # Choose
+        my $idx = $tc->choose(
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Remove CTE:', index => 1, undef => $sf->{i}{_back} }
+        );
+        $ax->print_sql_info( $info );
+        if ( ! defined $idx || $idx == 0 ) {
+            if ( @bu ) {
+                $ctes = pop @bu;
+                next REMOVE_CTE;
             }
+            return;
         }
-        elsif ( $t =~ /^FROM\z/i || $implicit_join ) {
-            if ( @token ) {
-                push @$tables, shift @token;
-            }
-            if ( defined $token[1] && $token[1] eq ',' ) {
-                shift @token;
-            }
-            elsif ( defined $token[2] && $token[2] eq ',' && $token[0] =~ /^AS\z/i ) {
-                shift @token;
-                shift @token;
-            }
-            $implicit_join = defined $token[0] && $token[0] eq ',' ? 1 : 0;
+        push @bu, [ @$ctes ];
+        if ( $menu->[$idx] eq $confirm ) {
+            $sf->{d}{cte_history} = [ @$ctes ];
+            return 1;
+        }
+        elsif ( $menu->[$idx] eq $all ) {
+            $ctes = [];
+        }
+        else {
+            $idx -= @pre;
+            splice( @$ctes, $idx, 1 );
         }
     }
-    return $tables;
 }
 
 
 
 1;
-
 
 __END__

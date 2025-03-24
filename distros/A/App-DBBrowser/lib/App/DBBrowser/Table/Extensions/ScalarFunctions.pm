@@ -74,17 +74,14 @@ my $dayofweek          = 'DAYOFWEEK';
 my $dayofweek_iso      = 'DAYOFWEEK_ISO';
 my $dayofyear          = 'DAYOFYEAR';
 my $extract            = 'EXTRACT';
-my $hour               = 'HOUR';
 my $julianday          = 'JULIANDAY';
 my $julian_day         = 'JULIAN_DAY';
 my $last_day           = 'LAST_DAY';
-my $minute             = 'MINUTE';
 my $month              = 'MONTH';
 my $monthname          = 'MONTHNAME';
 my $months_between     = 'MONTHS_BETWEEN';
 my $now                = 'NOW';
 my $quarter            = 'QUARTER';
-my $second             = 'SECOND';
 my $timediff           = 'TIMEDIFF';
 my $timestampdiff      = 'TIMESTAMPDIFF';
 my $time               = 'TIME';
@@ -185,16 +182,13 @@ sub __available_functions {
             $dayofyear          => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $days               => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $extract            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            #$hour               => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $julian_day         => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $julianday          => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
             $last_day           => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ], # firebird 4.0
-            #$minute             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $month              => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix',  000000  ],
             $monthname          => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $months_between     => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ],
             $quarter            => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            #$second             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $timediff           => [ 'SQLite', 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
             $time               => [ 'SQLite', 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
             $timestampdiff      => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
@@ -224,6 +218,7 @@ sub __available_functions {
             $coalesce           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
         },
     };
+
     my $driver = $sf->{i}{driver};
     my $index = {
         SQLite => 0, mysql => 1, MariaDB => 2, Pg => 3, Firebird => 4, DB2 => 5, Informix => 6, Oracle => 7
@@ -300,7 +295,7 @@ sub scalar_function {
                 $old_idx_func = $idx_func;
             }
             my $func = $menu->[$idx_func] =~ s/^-\s//r;
-            push @$r_data, [ 'func', $func ];
+            push @$r_data, [ 'scalar', $func ];
             my $new_func;
             if ( $type eq 'string' ) {
                 $new_func = App::DBBrowser::Table::Extensions::ScalarFunctions::String->new( $sf->{i}, $sf->{o}, $sf->{d} );

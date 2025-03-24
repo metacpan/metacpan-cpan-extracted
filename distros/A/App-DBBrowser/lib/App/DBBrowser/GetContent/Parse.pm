@@ -275,7 +275,7 @@ sub parse_with_template {
                 # Choose
                 my $remove_leading_spaces = $tc->choose(
                     [ undef, $no, $yes ],
-                    { info => $info, prompt => $prompt, undef => '  ' . $sf->{i}{back}, layout => 2 }
+                    { info => $info, prompt => $prompt, undef => $sf->{i}{_back}, layout => 2 }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $remove_leading_spaces ) {

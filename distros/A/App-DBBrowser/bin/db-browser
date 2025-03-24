@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.424';
+our $VERSION = '2.425';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.424
+Version 2.425
 
 =head1 SYNOPSIS
 
@@ -291,11 +291,9 @@ L<Subquery> above describes how to build/enter the query.
 
 Select from the built CTEs.
 
-=item Reset
+=item Remove
 
-Removes CTEs. In Join and Union: CTEs that are used directly or indirectly are retained when I<Reset> pressed.
-
-Do not use the I<Reset> button if implicit joins (joins without the JOIN key word) have been entered with I<Readline>.
+Remove CTEs.
 
 =back
 
@@ -875,7 +873,8 @@ C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parenthese
 
 =item Column Aliases
 
-Selecting C<alias> allows the user to add, change or remove aliases for the selected columns and the current table.
+Selecting C<alias> allows the user to add, change or remove aliases for the selected columns and the current table. It
+is also possible to change the table alias and rearrange the selected columns.
 
 =back
 

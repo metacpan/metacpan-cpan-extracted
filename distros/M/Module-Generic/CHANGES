@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.41.0 2025-03-24T09:40:36+0900
+    - Added module Module::Generic::JSON
+
 v0.40.0 2025-03-21T20:33:29+0900
     - Added support for callback to the methods load_csv and unload_csv
 

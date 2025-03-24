@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130805;
+our $VERSION = 1.20250323211828;
 
 my $formatters = [
                 {
@@ -78,11 +78,14 @@ my $validators = {
           )\\d{4}
         ',
                 'mobile' => '
-          510\\d{4}|
           (?:
-            6\\d|
-            7[0-5]
-          )\\d{5}
+            510|
+            6\\d\\d|
+            7(?:
+              [0-5]\\d|
+              6[01]
+            )
+          )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -101,73 +104,73 @@ my $validators = {
                 'voip' => '515\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"592444", "Linden\/Canvas\ City\/Wisroc",
-"592255", "Paradise\/Golden\ Grove\/Haslington",
-"592277", "Zeeburg\/Uitvlugt",
-"592225", "Georgetown",
-"592331", "Adventure\/Joanna",
-"592333", "New\ Amsterdam",
-"592330", "Rosignol\/Shieldstown",
-"592219", "Georgetown\,Sophia",
-"592218", "Georgetown\ \(S\/R\/Veldt\)",
-"592325", "Mibikuri\/No\:\ 34\/Joppa\/Brighton",
-"592337", "Whim\/Bloomfield\/Liverpool\/Rose\ Hall",
-"592772", "Lethem",
-"592231", "Georgetown",
-"592271", "Canal\ No\.\ 1\/Canal\ No\.\ 2",
-"592270", "Melanie\/Non\ Pariel\/Enmore",
-"592233", "Agricola\/Houston\/Eccles\/Nandy\ Park",
-"592269", "Windsor\ Forest",
-"592268", "Leonora",
-"592262", "Parika",
-"592442", "Christianburg\/Amelia\’s\ Ward",
-"592223", "Georgetown",
-"592220", "B\/V\ Central",
-"592253", "La\ Grange\/Goed\ Fortuin",
-"592335", "Crabwood\ Creek\/No\:\ 76\/Corentyne",
-"592327", "Blairmont\/Cumberland",
-"592266", "New\ Hope\/Friendship\/Grove\/Land\ of\ Canaan",
-"592221", "Mahaicony",
-"592455", "Bartica",
-"592216", "Diamond\/Grove",
-"592227", "Georgetown",
-"592275", "Met\-en\-Meer\-Zorg",
-"592257", "Cane\ Grove\/Strangroen",
-"592264", "Vreed\-en\-Hoop",
-"592217", "Mocha",
-"592226", "Georgetown",
-"592261", "Timehri\/Long\ Creek\/Soesdyke",
-"592256", "Victoria\/Hope\ West",
-"592773", "Aishalton",
-"592272", "B\/V\ West",
-"592232", "Novar\/Catherine\/Belladrum\/Bush\ Lot",
-"592260", "Tuschen\/Parika",
-"592279", "Good\ Hope\/Stanleytown",
-"592326", "Adelphi\/Fryish\/No\.\ 40",
-"592254", "New\ Road\/Best",
-"592267", "Wales",
-"592332", "Sheet\ Anchor\/Susannah",
-"592777", "Mabaruma\/Port\ Kaituma",
-"592339", "No\:\ 52\/Skeldon",
-"592338", "Benab\/No\.\ 65\ Village\/Massiah",
-"592322", "Kilcoy\/Hampshire\/Nigg",
-"592775", "Matthews\ Ridge",
+$areanames{en} = {"592330", "Rosignol\/Shieldstown",
 "592328", "Cottage\/Tempe\/Onverwagt\/Bath\/Waterloo",
-"592329", "Willemstad\/Fort\ Wellington\/Ithaca",
-"592336", "Edinburg\/Port\ Mourant",
-"592274", "Vigilance",
-"592234", "B\/V\ Central",
+"592259", "Clonbrook\/Unity",
+"592442", "Christianburg\/Amelia\’s\ Ward",
+"592333", "New\ Amsterdam",
+"592233", "Agricola\/Houston\/Eccles\/Nandy\ Park",
+"592256", "Victoria\/Hope\ West",
+"592777", "Mabaruma\/Port\ Kaituma",
+"592228", "Mahaica\/Belmont",
+"592262", "Parika",
+"592218", "Georgetown\ \(S\/R\/Veldt\)",
+"592272", "B\/V\ West",
+"592221", "Mahaicony",
+"592275", "Met\-en\-Meer\-Zorg",
+"592219", "Georgetown\,Sophia",
+"592216", "Diamond\/Grove",
 "592265", "Diamond",
+"592258", "Planters\ Hall\/Mortice",
+"592329", "Willemstad\/Fort\ Wellington\/Ithaca",
+"592226", "Georgetown",
+"592326", "Adelphi\/Fryish\/No\.\ 40",
+"592229", "Enterprise\/Cove\ \&\ John",
+"592254", "New\ Road\/Best",
+"592260", "Tuschen\/Parika",
+"592270", "Melanie\/Non\ Pariel\/Enmore",
+"592257", "Cane\ Grove\/Strangroen",
 "592440", "Kwakwani",
 "592456", "Mahdia",
-"592222", "B\/V\ West",
-"592258", "Planters\ Hall\/Mortice",
-"592228", "Mahaica\/Belmont",
-"592229", "Enterprise\/Cove\ \&\ John",
-"592259", "Clonbrook\/Unity",
+"592332", "Sheet\ Anchor\/Susannah",
+"592232", "Novar\/Catherine\/Belladrum\/Bush\ Lot",
+"592335", "Crabwood\ Creek\/No\:\ 76\/Corentyne",
+"592217", "Mocha",
+"592227", "Georgetown",
+"592327", "Blairmont\/Cumberland",
+"592253", "La\ Grange\/Goed\ Fortuin",
+"592277", "Zeeburg\/Uitvlugt",
+"592339", "No\:\ 52\/Skeldon",
+"592336", "Edinburg\/Port\ Mourant",
+"592267", "Wales",
+"592231", "Georgetown",
+"592772", "Lethem",
+"592331", "Adventure\/Joanna",
+"592775", "Matthews\ Ridge",
+"592338", "Benab\/No\.\ 65\ Village\/Massiah",
+"592455", "Bartica",
+"592234", "B\/V\ Central",
+"592223", "Georgetown",
+"592220", "B\/V\ Central",
 "592334", "New\ Amsterdam",
+"592773", "Aishalton",
 "592276", "Anna\ Catherina\/\ Cornelia\ Ida\/Hague\/Fellowship",
-"592441", "Ituni",};
+"592269", "Windsor\ Forest",
+"592337", "Whim\/Bloomfield\/Liverpool\/Rose\ Hall",
+"592266", "New\ Hope\/Friendship\/Grove\/Land\ of\ Canaan",
+"592441", "Ituni",
+"592279", "Good\ Hope\/Stanleytown",
+"592225", "Georgetown",
+"592271", "Canal\ No\.\ 1\/Canal\ No\.\ 2",
+"592325", "Mibikuri\/No\:\ 34\/Joppa\/Brighton",
+"592261", "Timehri\/Long\ Creek\/Soesdyke",
+"592322", "Kilcoy\/Hampshire\/Nigg",
+"592222", "B\/V\ West",
+"592255", "Paradise\/Golden\ Grove\/Haslington",
+"592444", "Linden\/Canvas\ City\/Wisroc",
+"592268", "Leonora",
+"592274", "Vigilance",
+"592264", "Vreed\-en\-Hoop",};
 my $timezones = {
                '' => [
                        'America/Guyana'

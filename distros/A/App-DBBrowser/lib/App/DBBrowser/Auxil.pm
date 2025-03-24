@@ -38,7 +38,7 @@ sub reset_sql {
     };
     # reset/initialize:
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
-    my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
+    my @string = qw( distinct_stmt set_stmt where_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
     my @array  = qw( group_by_cols selected_cols set_args order_by_cols
                      ct_column_definitions ct_table_constraints ct_table_options
                      insert_col_names insert_args );
@@ -53,9 +53,8 @@ sub reset_sql {
 
 
 sub __stmt_fold {
-    my ( $sf, $used_for, $stmt, $indent ) = @_;
+    my ( $sf, $term_w, $used_for, $stmt, $indent ) = @_;
     if ( $used_for eq 'print' ) {
-        my $term_w = get_term_width() + EXTRA_W;
         my $in = ' ' x $sf->{o}{G}{base_indent};
         my %tabs = ( init_tab => $in x $indent, subseq_tab => $in x ( $indent + 1 ) );
         return line_fold( $stmt, $term_w, { %tabs, join => 0 } );
@@ -74,27 +73,26 @@ sub __select_cols {
     }
     elsif ( keys %{$sql->{alias}} && ! $sql->{aggregate_mode} ) {
         @cols = @{$sql->{columns}};
-        # use column names and not * if columns have aliases
-        # unless aggregate_mode (columns are aggregate functions and group by columns)
+        # use column names and not * if columns have aliases (join)
+        # unless aggregate_mode (columns are aggregate functions and group by columns) ##
     }
     if ( ! @cols ) {
+        return "" if $sql->{aggregate_mode};
         return " *";
     }
     elsif ( ! keys %{$sql->{alias}} ) {
         return ' ' . join ', ', @cols;
     }
     else {
-        my @cols_alias;
-        for ( @cols ) {
-            if ( length $sql->{alias}{$_} ) {
-                push @cols_alias, $_ . " AS " . $sql->{alias}{$_};
-            }
-            else {
-                push @cols_alias, $_;
-            }
-        }
-        return ' ' . join ', ', @cols_alias;
+        return ' ' . join ', ', map { length $sql->{alias}{$_} ? "$_ AS $sql->{alias}{$_}" : $_ } @cols;
     }
+}
+
+
+sub __group_by_stmt {
+    my ( $sf, $sql ) = @_;
+    my $aliases = $sf->{o}{alias}{use_in_group_by} ? $sql->{alias} : {};
+    return "GROUP BY " . join ', ', map { length $aliases->{$_} ? $aliases->{$_} : $_ } @{$sql->{group_by_cols}};
 }
 
 
@@ -112,9 +110,10 @@ sub __cte_stmts {
     for my $cte ( @$ctes ) {
         $with .= " RECURSIVE" and last if $cte->{is_recursive};
     }
+    my $term_w = get_term_width() + EXTRA_W;
     my @tmp = ( $with );
     for my $cte ( @$ctes ) {
-        push @tmp, $sf->__stmt_fold( $used_for, sprintf( '%s AS (%s),', $cte->{full_name}, $cte->{query} ), $indent1 );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, sprintf( '%s AS (%s),', $cte->{full_name}, $cte->{query} ), $indent1 );
     }
     $tmp[-1] =~ s/,\z//;
     push @tmp, " ";
@@ -124,6 +123,7 @@ sub __cte_stmts {
 
 sub get_stmt {
     my ( $sf, $sql, $stmt_type, $used_for ) = @_;
+    my $term_w = get_term_width() + EXTRA_W;
     my $in = ' ' x $sf->{o}{G}{base_indent};
     my $indent0 = 0;
     my $indent1 = 1;
@@ -135,53 +135,52 @@ sub get_stmt {
         push @tmp, $ctes;
     }
     if ( $stmt_type eq 'Drop_Table' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DROP TABLE $table", $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "DROP TABLE $table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Drop_View' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DROP VIEW $table", $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "DROP VIEW $table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_Table' ) {
         my $stmt = sprintf "CREATE TABLE $table (%s)", join ', ', @{$sql->{ct_column_definitions}}, @{$sql->{ct_table_constraints}};
         if ( @{$sql->{ct_table_options}} ) {
             $stmt .= ' ' . join ', ', @{$sql->{ct_table_options}};
         }
-        @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, $stmt, $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_View' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "CREATE VIEW $table", $indent0 ) );
-        push @tmp, $sf->__stmt_fold( $used_for, "AS " . $sql->{view_select_stmt}, $indent1 );
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "CREATE VIEW $table", $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, "AS " . $sql->{view_select_stmt}, $indent1 );
     }
     elsif ( $stmt_type eq 'Select' ) {
-        push @tmp, $sf->__stmt_fold( $used_for, "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $indent0 );
-        #@tmp = ( $sf->__stmt_fold( $used_for, "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $indent0 ) );
-        push @tmp, $sf->__stmt_fold( $used_for, "FROM " . $table,   $indent1 );
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt},    $indent2 ) if $sql->{where_stmt};
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{group_by_stmt}, $indent2 ) if $sql->{group_by_stmt};
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{having_stmt},   $indent2 ) if $sql->{having_stmt};
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{order_by_stmt}, $indent2 ) if $sql->{order_by_stmt};
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $indent0 );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, "FROM " . $table,   $indent1 );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{where_stmt},    $indent2 )        if $sql->{where_stmt};
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sf->__group_by_stmt( $sql ), $indent2 ) if @{$sql->{group_by_cols}};
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{having_stmt},   $indent2 )        if $sql->{having_stmt};
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{order_by_stmt}, $indent2 )        if $sql->{order_by_stmt};
         if ( $sql->{limit_stmt} =~ /^LIMIT\b/ ) {
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 );
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{limit_stmt},  $indent2 );
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
         }
         else {
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 ) if $sql->{limit_stmt};
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{limit_stmt},  $indent2 ) if $sql->{limit_stmt};
         }
     }
     elsif ( $stmt_type eq 'Delete' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "DELETE FROM " . $table, $indent0 ) );
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "DELETE FROM " . $table, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Update' ) {
-        @tmp = ( $sf->__stmt_fold( $used_for, "UPDATE " . $table, $indent0 ) );
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{set_stmt},   $indent1 ) if $sql->{set_stmt};
-        push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "UPDATE " . $table, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{set_stmt},   $indent1 ) if $sql->{set_stmt};
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Insert' ) {
         my $columns = join ', ', map { $_ // '' } @{$sql->{insert_col_names}};
         my $placeholders = join ', ', ( '?' ) x @{$sql->{insert_col_names}};
         my $stmt = "INSERT INTO $sql->{table} ($columns) VALUES($placeholders)";
-        @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
+        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, $stmt, $indent0 ) );
         if ( $used_for eq 'print' ) {
             my $arg_rows = $sf->info_format_insert_args( $sql, $in x 2 );
             push @tmp, @$arg_rows;
@@ -201,19 +200,19 @@ sub get_stmt {
         my @join_data = @{$sql->{join_data}//[]};
         if ( @join_data ) {
             my $master_data = shift @join_data;
-            push @tmp, $sf->__stmt_fold( $used_for, $select_from . $master_data->{table}, $indent0 );
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $select_from . $master_data->{table}, $indent0 );
             if ( @join_data ) {
                 my $last_table = pop @join_data;
                 for my $slave_data ( @join_data ) {
                     my $sub_stmt = join ' ', grep { length } @{$slave_data}{ qw(join_type table condition) };
-                    push @tmp, $sf->__stmt_fold( $used_for, $sub_stmt, $indent1 );
+                    push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sub_stmt, $indent1 );
                 }
                 my $sub_stmt = join ' ', grep { length } @{$last_table}{ qw(join_type table condition) }, $sql->{on_stmt};
-                push @tmp, $sf->__stmt_fold( $used_for, $sub_stmt, $indent1 );     # either condition or on_stmt
+                push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sub_stmt, $indent1 );     # either condition or on_stmt
             }
         }
         else {
-            push @tmp, $sf->__stmt_fold( $used_for, $select_from, $indent0 );
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, $select_from, $indent0 );
         }
     }
     elsif ( $stmt_type eq 'Union' ) {
@@ -234,14 +233,14 @@ sub get_stmt {
             push @tmp, ")";
         }
         else {
-            push @tmp, $sf->__stmt_fold( $used_for, "SELECT *", $indent0 ); ##
-            push @tmp, $sf->__stmt_fold( $used_for, "FROM ()", $indent1 ); ##
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, "SELECT *", $indent0 ); ##
+            push @tmp, $sf->__stmt_fold( $term_w, $used_for, "FROM ()", $indent1 ); ##
             if ( @{$sql->{subselect_stmts}//[]} ) {
                 push @tmp, ' ';
                 my $extra = 0;
                 for my $stmt ( @{$sql->{subselect_stmts}} ) {
                     $extra-- if $stmt eq ")" && $extra;
-                    push @tmp, $sf->__stmt_fold( $used_for, $stmt, $indent0 + $extra );
+                    push @tmp, $sf->__stmt_fold( $term_w, $used_for, $stmt, $indent0 + $extra );
                     $extra++ if $stmt eq "(";
                 }
             }
@@ -405,23 +404,7 @@ sub column_names_and_types {
 }
 
 
-#sub avail_cols_aggregate_mode {
-#    my ( $sf, $sql, $clause, $in_extension ) = @_;
-#    my $cols = [ uniq( @{$sql->{selected_cols}}, @{$sql->{group_by_cols}} ) ];
-#    #if ( $clause eq 'having' ) {
-#    #    my $rx_groub_by_cols = join '|', map { quotemeta } @{$sql->{group_by_cols}};
-#    #    $cols = [ grep { $_ !~ /^(?:$rx_groub_by_cols)\z/ } @$cols ];
-#    #}
-#    if ( ! $in_extension && $sf->{o}{alias}{'use_in_' . $clause} ) {
-#        my $aliases = $sql->{alias};
-#        $cols = [ map { length $aliases->{$_} ? $aliases->{$_} : $_ } @$cols ];
-#    }
-#    $cols = [ grep( $_ ne 'COUNT(*)', @$cols ), @{$sf->{i}{avail_aggr}} ];
-#    return $cols;
-#}
-
-
-sub is_numeric_datatype {
+sub is_numeric {
     my ( $sf, $sql, $col ) = @_;
     my $is_numeric = 0;
     if ( ! length $sql->{data_types}{$col} || ( $sql->{data_types}{$col} >= 2 && $sql->{data_types}{$col} <= 8 ) ) {

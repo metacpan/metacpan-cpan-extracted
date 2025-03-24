@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20241212130806;
+our $VERSION = 1.20250323211835;
 
 my $formatters = [
                 {
@@ -85,7 +85,7 @@ my $validators = {
                 'voip' => '
           9(?:
             399[0-3]|
-            479[0-5]|
+            479[0-6]|
             76(?:
               2[278]|
               3[0-37]

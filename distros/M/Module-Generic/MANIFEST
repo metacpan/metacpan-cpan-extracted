@@ -21,6 +21,7 @@ lib/Module/Generic/HeaderValue.pm
 lib/Module/Generic/Iterator.pm
 lib/Module/Generic/Iterator.pod
 lib/Module/Generic/Iterator/Element.pod
+lib/Module/Generic/JSON.pm
 lib/Module/Generic/Null.pm
 lib/Module/Generic/Null.pod
 lib/Module/Generic/Number.pm
@@ -70,6 +71,7 @@ t/22.parse_timestamp.t
 t/23.tiehash.t
 t/24.exception.t
 t/25.file_csv.t
+t/26.json.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

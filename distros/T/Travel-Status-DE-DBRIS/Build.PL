@@ -16,10 +16,11 @@ Module::Build->new(
 	},
 	module_name => 'Travel::Status::DE::DBRIS',
 	license     => 'perl',
-	recommends => {
-		'Cache::File' => 0,
+	recommends  => {
+		'Cache::File'   => 0,
+		'GIS::Distance' => 0,
 	},
-	requires    => {
+	requires => {
 		'perl'                       => '5.20.0',
 		'Carp'                       => 0,
 		'Class::Accessor'            => '0.16',
@@ -31,12 +32,10 @@ Module::Build->new(
 		'LWP::UserAgent'             => 0,
 		'LWP::Protocol::https'       => 0,
 	},
-	script_files  => 'bin/',
-	sign          => 1,
-	meta_merge    => {
-		resources => {
-			repository =>
-			  'https://github.com/derf/Travel-Status-DE-DBRIS'
-		}
+	script_files => 'bin/',
+	sign         => 1,
+	meta_merge   => {
+		resources =>
+		  { repository => 'https://github.com/derf/Travel-Status-DE-DBRIS' }
 	},
 )->create_build_script();

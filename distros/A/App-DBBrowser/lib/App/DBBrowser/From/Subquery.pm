@@ -1,5 +1,5 @@
 package # hide from PAUSE
-App::DBBrowser::Subquery;
+App::DBBrowser::From::Subquery;
 
 use warnings;
 use strict;
@@ -17,7 +17,7 @@ use Term::Form::ReadLine   qw();
 use App::DBBrowser::Auxil;
 
 my $pf_saved_subqueries = '- ';
-my $pf_subquery_history = '  ';
+my $pf_subquery_history = '~ ';
 my $pf_print_history    = '| ';
 
 
@@ -46,10 +46,7 @@ sub subquery_as_main_table {
     }
     # Oracle: key word "AS" not supported in Table aliases
     my $alias = $ax->table_alias( $sql, 'derived_table', $subquery );
-    if ( length $alias ) {
-        $subquery .= " " . $alias;
-    }
-    return $subquery;
+    return $subquery, $alias;
 }
 
 
@@ -98,7 +95,7 @@ sub __choose_query {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $saved_subqueries, $subquery_history, $print_history ) = $sf->__get_history();
     my $edit_sq_history_file = 'Choose:';
-    my ( $readline, $build_SQ ) = ( 'Readline', 'SQL Menu' );
+    my ( $readline, $build_SQ ) = ( '  Readline', '  SQL Menu' );
     my @pre = ( $edit_sq_history_file, undef, $build_SQ, $readline );
     my $old_idx = 1;
 
@@ -256,7 +253,7 @@ sub __edit_sq_history_file {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, index => 1, undef => '  <=', default => $old_idx }
+            { %{$sf->{i}{lyt_v}}, info => $info, index => 1, undef => '<=', default => $old_idx }
         );
         $ax->print_sql_info( $info );
         my $changed = 0;
@@ -300,8 +297,8 @@ sub __add_subqueries {
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $subquery_history, $print_history ) = $sf->__session_history();
-    my $readline = '  Read-Line'; ##
-    my @pre = ( undef, $sf->{i}{_confirm}, $readline );
+    my ( $confirm, $readline ) = ( $sf->{i}{_confirm}, '  Read-Line' ); ##
+    my @pre = ( undef, $confirm, $readline );
     my @bu;
     my $added_sq = [];
 
@@ -337,7 +334,7 @@ sub __add_subqueries {
             }
             return;
         }
-        elsif ( $menu->[$idx] eq $sf->{i}{_confirm} ) {
+        elsif ( $menu->[$idx] eq $confirm ) {
             push @$saved_subqueries, @$added_sq;
             return 1;
         }
@@ -509,7 +506,7 @@ sub __build_SQ {
         push @$menu_table, $from_join     if $sf->{o}{enable}{join};
         push @$menu_table, $from_union    if $sf->{o}{enable}{union};
         my $info = $sf->{d}{main_info};
-        my $prompt = 'Build the ' . ( $caller eq 'cte' ? 'CTE statement:' : 'subquery:' );
+        my $prompt = ( $caller eq 'cte' ? 'CTE statement table:' : 'Subquery table:' );
         # Choose
         my $idx_tbl = $tc->choose(
             $menu_table,
@@ -537,7 +534,8 @@ sub __build_SQ {
         $ax->print_sql_info( $ax->get_sql_info( $sql ) ); ##
         require App::DBBrowser::Table; ##
         my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $statement = $tbl->browse_the_table( $sql, 1 );
+        $prompt = ( $caller eq 'cte' ? 'CTE statement:' : 'Subquery:' );
+        my $statement = $tbl->browse_the_table( $sql, $prompt );
         if ( ! defined $statement ) {
             next TABLE;
         }

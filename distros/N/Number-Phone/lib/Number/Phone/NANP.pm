@@ -226,8 +226,8 @@ sub is_valid {
         $digits{D}            ne '1'  &&
         $digits{B}.$digits{C} ne '11' &&
 
-        # checked on 2024-03-05
-        # next check due 2025-01-01 (annually)
+        # checked on 2025-03-23
+        # next check due 2026-01-01 (annually)
         # https://en.wikipedia.org/wiki/List_of_North_American_Numbering_Plan_area_codes#Summary_table
         $digits{B}            ne '9'  &&
         $digits{A}.$digits{B} ne '37' &&
@@ -470,7 +470,7 @@ perl itself.
 
 David Cantrell E<lt>david@cantrell.org.ukE<gt>
 
-Copyright 2024
+Copyright 2025
 
 =cut
 

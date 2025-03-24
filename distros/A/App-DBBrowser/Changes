@@ -1,6 +1,15 @@
 Revision history for App-DBBrowser
 
 
+2.425  2025-03-23
+        - Filter 'convert date': skip empty cells.
+        - Union: the option 'edit statement' replaces the option 'where'.
+        - Refactored union.
+        - Bugfix in group_by.
+        - Improved info output functions.
+        - Update menus.
+        - Let the user decide which ctes to remove.
+
 2.424  2025-03-09
         - Update aggregate mode.
         - Bugfix SQLite, first_column_is_autoincrement: tablenames in sqlite_master are not qualified.
