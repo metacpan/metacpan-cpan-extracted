@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -1131,7 +1131,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -1267,15 +1267,25 @@ because of its very good performance when rendering templates.
       'content' => 'blah blah',
     };
 
-    sub myfunc { return "funced ".$_[0] }
-
     my $latte = LaTeX::Easy::Templates->new({
       debug => {verbosity=>2, cleanup=>1},
       'templater-parameters' => {
         # passing parameters to Text::Xslate's constructor
-        # myfunc() will be accessible from each template
-        'function' => {
-          'myfunc' => \&myfunc,
+
+        # myfunc() will be a function accessible
+        # from each template enhancing Text::Xslate
+        'function' =>{ 
+             # list here all functions you want to use in a template
+             # perhaps in a scenario like this one:
+             #   : for $authors -> $author {
+             #   :   if( ref($author) == 'HASH' ){ ... }
+             #   :   elsif( ref($author) == 'ARRAY' ){ ... }
+             #       <: myfunc($author) :>
+             #   : }
+             'ref' => sub { return ref($_[0]) },
+             'myfunc' => \&myfunc,
+             # something like this defines myfunc():
+             #    sub myfunc { return "funced ".$_[0] }
         },
         'module' => [
           # and so the exports of this module:
@@ -1297,7 +1307,7 @@ because of its very good performance when rendering templates.
     });
     die unless $latte;
 
-    my $ret = $latter->format({
+    my $ret = $latte->format({
       'template-data' => $template_data,
       'outfile' => 'xyz.pdf',
       # this is the in-memory LaTeX template
@@ -1503,6 +1513,34 @@ when templates are including other templates in different directories.
 
 =item * B<function>, B<module> : specify your own perl functions and modules you want to use
 from within a template. That's very handy in overcoming the limitations of the template syntax.
+See L<Text::Xslate::Syntax::Kolon#Functions-and-filters>.
+For example, if you want to use Perl's C<ref()> inside a
+L<Text::Xslate> template, or use your own function called C<myfunc()>,
+e.g. in a scenario similar to this:
+
+    # in the template you want to use Perl's builtin ref()
+    # and also user-defined myfunc():
+    : for $authors -> $author {
+    :   if( ref($author) == 'HASH' ){ ... }
+    :   elsif( ref($author) == 'ARRAY' ){ ... }
+        <: myfunc($author) :>
+    : }
+
+then (as it is stated also in the L<SYNOPSIS>), pass
+all these function references into the constructor of
+L<LaTeX::Easy::Templates> under key C<function>,like this:
+
+    my $latte = LaTeX::Easy::Templates->new({
+      ...
+      'function' => {
+        # list here all functions you want to use in a template
+        'ref' => sub { return ref($_[0]) },
+        'myfunc' => \&myfunc,
+        # something like this defines myfunc():
+        #    sub myfunc { return "funced ".$_[0] }
+      },
+      ...
+    });
 
 =back
 

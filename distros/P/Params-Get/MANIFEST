@@ -1,11 +1,19 @@
+Changes
 lib/Params/Get.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/00-load.t
 t/30-basics.t
+t/eof.t
+t/eol.t
 t/get_params.t
+t/pod-cm.t
+t/pod-coverage.t
+t/pod.t
 t/validate-strict.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

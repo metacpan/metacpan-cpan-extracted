@@ -57,7 +57,7 @@ sub __stmt_fold {
     if ( $used_for eq 'print' ) {
         my $in = ' ' x $sf->{o}{G}{base_indent};
         my %tabs = ( init_tab => $in x $indent, subseq_tab => $in x ( $indent + 1 ) );
-        return line_fold( $stmt, $term_w, { %tabs, join => 0 } );
+        return line_fold( $stmt, { width => $term_w, %tabs, join => 0 } );
     }
     else {
         return $stmt;

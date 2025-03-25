@@ -59,3 +59,7 @@ Revision history for LaTeX-Easy-Templates
         global variables and it is not safe to use either.
         Great, now I have to import the latter for unit testing
         and the former for main package code./rant off, sorry.
+
+1.03    2025-03-24/15:00
+        Fixed git repository in Makefile.PL
+        Pod enhancements regarding defining functions for use in a template.

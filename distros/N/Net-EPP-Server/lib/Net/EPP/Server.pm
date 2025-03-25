@@ -252,7 +252,8 @@ sub process_frame {
         return $self->generate_greeting;
     }
 
-    my $clTRID = $frame->getElementsByTagName('clTRID')->item(0)->textContent;
+    my $clTRID = $frame->getElementsByTagName('clTRID')->item(0);
+    $clTRID = $clTRID->textContent if ($clTRID);
 
     my $command;
 
@@ -714,7 +715,7 @@ Net::EPP::Server - A simple EPP server implementation.
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

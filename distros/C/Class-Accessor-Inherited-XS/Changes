@@ -1,5 +1,8 @@
 Revision history for Class::Accessor::Inherited::XS.
 
+0.39 Mon Mar 24 12:34:06 MSK 2025
+    - do make copy in getters to avoid some stack-not-refcounted corner cases
+
 0.38 Tue Oct  4 21:42:44 MSK 2022
     - fix for broken 5.37
 

@@ -4,7 +4,7 @@ Log::Abstraction - Logging abstraction layer
 
 # VERSION
 
-0.06
+0.07
 
 # SYNOPSIS
 
@@ -31,6 +31,11 @@ It also supports logging to syslog if configured.
     my $logger = Log::Abstraction->new(%args);
 
 Creates a new `Log::Abstraction` object.
+
+Clones existing objects with or without modifications.
+
+    my $clone = $logger->new();
+
 The argument can be a hash,
 a reference to a hash or the `logger` value.
 The following arguments can be provided:
@@ -82,6 +87,38 @@ falls back to `Carp`.
 # AUTHOR
 
 Nigel Horne ` <njh@nigelhorne.com` >
+
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to `bug-log-abstraction at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-Abstraction](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-Abstraction).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Log::Abstraction
+
+You can also look for information at:
+
+- MetaCPAN
+
+    [https://metacpan.org/dist/Log-Abstraction](https://metacpan.org/dist/Log-Abstraction)
+
+- RT: CPAN's request tracker
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Abstraction](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Abstraction)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Log-Abstraction](http://matrix.cpantesters.org/?dist=Log-Abstraction)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=Log::Abstraction](http://deps.cpantesters.org/?module=Log::Abstraction)
 
 # COPYRIGHT AND LICENSE
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More ( tests => 6 );
+use Test::More ( tests => 7 );
 
 use Devel::Walk;
 use Storable qw( freeze );
@@ -91,4 +91,13 @@ is( $bottom, '$${$o->{array}[5]}{arraywithhash}[1]{file}', "Found one bad, with 
 $o = $top;
 $val = eval $bottom;
 is( $val, $fh, "a file ref" );
+
+############################################
+
+my $obj = bless { e=>\&everything }, 'main';
+@everything = ();
+walk( $obj, \&everything, '$obj' );
+#use Data::Dump qw( pp );
+#warn pp [ sort @everything ];
+is_deeply( \@everything, [ "\$obj", "\$obj->{e}"], "Walked a blessed reference" );
 

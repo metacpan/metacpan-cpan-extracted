@@ -4,7 +4,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -139,15 +139,25 @@ because of its very good performance when rendering templates.
       'content' => 'blah blah',
     };
 
-    sub myfunc { return "funced ".$_[0] }
-
     my $latte = LaTeX::Easy::Templates->new({
       debug => {verbosity=>2, cleanup=>1},
       'templater-parameters' => {
         # passing parameters to Text::Xslate's constructor
-        # myfunc() will be accessible from each template
-        'function' => {
-          'myfunc' => \&myfunc,
+
+        # myfunc() will be a function accessible
+        # from each template enhancing Text::Xslate
+        'function' =>{ 
+             # list here all functions you want to use in a template
+             # perhaps in a scenario like this one:
+             #   : for $authors -> $author {
+             #   :   if( ref($author) == 'HASH' ){ ... }
+             #   :   elsif( ref($author) == 'ARRAY' ){ ... }
+             #       <: myfunc($author) :>
+             #   : }
+             'ref' => sub { return ref($_[0]) },
+             'myfunc' => \&myfunc,
+             # something like this defines myfunc():
+             #    sub myfunc { return "funced ".$_[0] }
         },
         'module' => [
           # and so the exports of this module:
@@ -169,7 +179,7 @@ because of its very good performance when rendering templates.
     });
     die unless $latte;
 
-    my $ret = $latter->format({
+    my $ret = $latte->format({
       'template-data' => $template_data,
       'outfile' => 'xyz.pdf',
       # this is the in-memory LaTeX template
@@ -308,6 +318,34 @@ specified hash and should contain these items:
         when templates are including other templates in different directories.
         - **function**, **module** : specify your own perl functions and modules you want to use
         from within a template. That's very handy in overcoming the limitations of the template syntax.
+        See [Text::Xslate::Syntax::Kolon#Functions-and-filters](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3AKolon%23Functions-and-filters).
+        For example, if you want to use Perl's `ref()` inside a
+        [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) template, or use your own function called `myfunc()`,
+        e.g. in a scenario similar to this:
+
+                # in the template you want to use Perl's builtin ref()
+                # and also user-defined myfunc():
+                : for $authors -> $author {
+                :   if( ref($author) == 'HASH' ){ ... }
+                :   elsif( ref($author) == 'ARRAY' ){ ... }
+                    <: myfunc($author) :>
+                : }
+
+            then (as it is stated also in the [SYNOPSIS](https://metacpan.org/pod/SYNOPSIS)), pass
+            all these function references into the constructor of
+            [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates) under key `function`,like this:
+
+                my $latte = LaTeX::Easy::Templates->new({
+                  ...
+                  'function' => {
+                    # list here all functions you want to use in a template
+                    'ref' => sub { return ref($_[0]) },
+                    'myfunc' => \&myfunc,
+                    # something like this defines myfunc():
+                    #    sub myfunc { return "funced ".$_[0] }
+                  },
+                  ...
+                });
 
         See [Text::Xslate#Text::Xslate-%3Enew(%options)](https://metacpan.org/pod/Text%3A%3AXslate%23Text%3A%3AXslate-%253Enew%28%25options%29) for all the supported options.
 

@@ -28,7 +28,7 @@ my $foo = \$bonk;
 walk( $foo, \&everything, '$foo' );
 pass( "Successful walk" );
 
-use Data::Dump qw( pp );
+# use Data::Dump qw( pp );
 #warn pp [ @everything ];
 
 is_deeply( [ sort @everything ], [ sort

@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9983';
+$Geo::Address::Formatter::VERSION = '1.9985';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -114,11 +114,12 @@ sub _read_configuration {
                 }
             }
         }
+        my %h_known = map { $_ => 1 } @{$self->{ordered_components}};
+        $self->{h_known} = \%h_known;
+
         if ($debug){
             say STDERR 'component_aliases';
             say STDERR Dumper $self->{component_aliases};
-            say STDERR 'ordered_components';
-            say STDERR Dumper $self->{ordered_components};
             say STDERR 'component2type';
             say STDERR Dumper $self->{component2type};
         }
@@ -218,10 +219,16 @@ sub format_address {
         say STDERR "component_aliases";
         say STDERR Dumper $self->{component_aliases};
     }
-
     # done with the options
 
-    # 3. set the aliases, unless this would overwrite something
+    # 3. deal wtih terrible inputs
+    $self->_sanity_cleaning($rh_components);
+    if ($debug){
+        say STDERR "after sanity_cleaning applied";
+        say STDERR Dumper $rh_components;
+    }
+
+    # 4. set the aliases, unless this would overwrite something
     # need to do this in the right order (as defined in the components file)
     # For example:
     # both 'city_district' and 'suburb' are aliases of 'neighbourhood'
@@ -271,13 +278,6 @@ sub format_address {
         say STDERR Dumper $rh_components;
     }
 
-    # 4. deal wtih terrible inputs
-    $self->_sanity_cleaning($rh_components);
-    if ($debug){
-        say STDERR "after sanity_cleaning applied";
-        say STDERR Dumper $rh_components;
-    }
-
     # 5. determine the template
     my $template_text;
     my $rh_config = $self->{templates}{uc($cc)} || $self->{templates}{default};
@@ -316,11 +316,15 @@ sub format_address {
         say STDERR Dumper $rh_components;
     }
 
-    $self->_apply_replacements($rh_components, $rh_config->{replace});
-    if ($debug){
-        say STDERR "after applying_replacements applied";
-        say STDERR Dumper $rh_components;
+    # apply replacements if we have any
+    if (defined($rh_config->{replace})){
+        $self->_apply_replacements($rh_components, $rh_config->{replace});
+        if ($debug){
+            say STDERR "after applying_replacements applied";
+            say STDERR Dumper $rh_components;
+        }
     }
+
     $self->_add_state_code($rh_components);
     $self->_add_county_code($rh_components);
     if ($debug){
@@ -342,11 +346,11 @@ sub format_address {
     }
     else {
         my $ra_unknown = $self->_find_unknown_components($rh_components);
-        if ($debug){
-            say STDERR "unknown_components:";
-            say STDERR Dumper $ra_unknown;
-        }
         if (scalar(@$ra_unknown)){
+            if ($debug){
+                say STDERR "unknown_components:";
+                say STDERR Dumper $ra_unknown;
+            }
             $rh_components->{attention} =
                 join(', ', map { $rh_components->{$_} } @$ra_unknown);
             if ($debug){
@@ -386,7 +390,7 @@ sub format_address {
     # 12. clean again
     $text = $self->_clean($text);
 
-    # 13. set final components
+    # 13. set final components (so we can get them later)
     $self->{final_components} = $rh_components;
 
     # all done
@@ -508,7 +512,7 @@ sub _determine_country_code {
     if (my $cc = lc($rh_components->{country_code})) {
 
         # is it two letters long?
-        return      if ($cc !~ m/^[a-z][a-z]$/);
+        return      if (length($cc) != 2);
         return 'GB' if ($cc eq 'uk');
 
         $cc = uc($cc);
@@ -566,17 +570,14 @@ sub _determine_country_code {
 
 # hacks for bad country data
 sub _fix_country {
-    my $self          = shift;
-    my $rh_components = shift || return;
+    my $self = shift;
+    my $rh_c = shift || return;
 
     # is the country a number?
     # if so, and there is a state, use state as country
-    if (defined($rh_components->{country})) {
-        if (looks_like_number($rh_components->{country})) {
-            if (defined($rh_components->{state})) {
-                $rh_components->{country} = $rh_components->{state};
-                delete $rh_components->{state};
-            }
+    if (defined($rh_c->{country}) && defined($rh_c->{state})){
+        if (looks_like_number($rh_c->{country})){
+            $rh_c->{country} = delete $rh_c->{state};
         }
     }
     return;
@@ -586,14 +587,20 @@ sub _fix_country {
 # note may also set other values in some odd edge cases
 sub _add_state_code {
     my $self          = shift;
-    my $rh_components = shift;
-    return $self->_add_code('state', $rh_components);
+    my $rh_components = shift // return;
+    if (defined($rh_components->{state})){
+        return $self->_add_code('state', $rh_components);
+    }
+    return;
 }
 
 sub _add_county_code {
     my $self          = shift;
-    my $rh_components = shift;
-    return $self->_add_code('county', $rh_components);
+    my $rh_components = shift // return;
+    if (defined($rh_components->{county})){
+        return $self->_add_code('county', $rh_components);
+    }
+    return;
 }
 
 sub _add_code {
@@ -605,18 +612,15 @@ sub _add_code {
 
     my $code = $keyname . '_code';
 
-    if (defined($rh_components->{$code})) {    # do we already have code?
-                                               # but could have situation
-                                               # where code and long name are
-                                               # the same which we want to correct
-        if ($rh_components->{$code} ne $rh_components->{$keyname}) {
-            return;
-        }
+    if (defined($rh_components->{$code})) {
+        # do we already have code?
+        # we could have situation where code and long name are same
+        # so we want to corrent
+        return if ($rh_components->{$code} ne $rh_components->{$keyname});
     }
 
     # ensure country_code is uppercase as we use it as conf key
-    $rh_components->{country_code} = uc($rh_components->{country_code});
-    my $cc = $rh_components->{country_code};
+    my $cc = uc($rh_components->{country_code});
 
     if (my $mapping = $self->{$code . 's'}{$cc}) {
 
@@ -634,7 +638,9 @@ sub _add_code {
                 push(@confnames, $mapping->{$abbrv});
             }
 
+            # FIXME: should only uc the names once when reading from conf
             foreach my $confname (@confnames) {
+
                 if ($uc_name eq uc($confname)) {
                     $rh_components->{$code} = $abbrv;
                     last LOCCODE;
@@ -655,9 +661,9 @@ sub _add_code {
         # didn't find a valid code or name
 
         # try again for odd variants like "United States Virgin Islands"
-        if ($keyname eq 'state') {
-            if (!defined($rh_components->{state_code})) {
-                if ($cc eq 'US') {
+        if ($cc eq 'US') {
+            if ($keyname eq 'state') {
+                if (!defined($rh_components->{state_code})) {
                     if ($rh_components->{state} =~ m/^united states/i) {
                         my $state = $rh_components->{state};
                         $state =~ s/^United States/US/i;
@@ -683,7 +689,7 @@ sub _add_code {
 sub _apply_replacements {
     my $self          = shift;
     my $rh_components = shift;
-    my $raa_rules     = shift;
+    my $raa_rules     = shift // return; # bail out if no rules
 
     if ($debug){
         say STDERR "in _apply_replacements";
@@ -692,7 +698,6 @@ sub _apply_replacements {
 
     foreach my $component (keys %$rh_components) {
         foreach my $ra_fromto (@$raa_rules) {
-
             my $regexp;
             # do key specific replacement
             if ($ra_fromto->[0] =~ m/^$component=/){
@@ -839,9 +844,9 @@ sub _render_template {
     $output = $self->_clean($output);
 
     # is it empty?
-    # if yes and there is only one component then just use that one
-    if ($output !~ m/\w/) {
-        my @comps = sort keys %$components;
+    if (length($output) == 0){
+        # if yes and there is only one component then just use that one
+        my @comps = keys %$components;
         if (scalar(@comps) == 1) {
             foreach my $k (@comps) {
                 $output = $components->{$k};
@@ -880,15 +885,15 @@ sub _select_first {
 }
 
 my %small_district = (
-    'br' => 1,
-    'cr' => 1,
-    'es' => 1,
-    'ni' => 1,
-    'py' => 1,
-    'ro' => 1,
-    'tg' => 1,
-    'tm' => 1,
-    'xk' => 1,
+    'BR' => 1,
+    'CR' => 1,
+    'ES' => 1,
+    'NI' => 1,
+    'PY' => 1,
+    'RO' => 1,
+    'TG' => 1,
+    'TM' => 1,
+    'XK' => 1,
 );
 
 # correct the alias for "district"
@@ -896,18 +901,19 @@ my %small_district = (
 # others to mean "state_district"
 sub _set_district_alias {
     my $self = shift;
-    my $cc = shift;
+    my $cc = shift // return;
+
+    my $ucc = uc($cc);
 
     # this may get called repeatedly
     # no need to do the work again
-    if (defined($cc)){
-        my $ucc = uc($cc);
-        return if (defined($self->{set_district_alias}{$ucc}));
-        $self->{set_district_alias}{$ucc} = 1;
-    }
+    return if (defined($self->{set_district_alias}{$ucc}));
+
+    # note that we are here so don't do this work again
+    $self->{set_district_alias}{$ucc} = 1;
 
     my $oldalias;
-    if (defined($small_district{$cc})){
+    if (defined($small_district{$ucc})){
         $self->{component2type}{district} = 'neighbourhood';
         $oldalias = 'state_district';
 
@@ -925,7 +931,9 @@ sub _set_district_alias {
     } 
 
     # remove from the old alias list
-    my @temp = grep { $_ ne 'district' } @{$self->{component_aliases}{$oldalias}};
+    my @temp = grep { $_ ne 'district' }
+               @{$self->{component_aliases}{$oldalias}};
+    
     $self->{component_aliases}{$oldalias} = \@temp;
     return;
 }  
@@ -933,11 +941,10 @@ sub _set_district_alias {
 
 # returns []
 sub _find_unknown_components {
-    my $self       = shift;
-    my $rh_components = shift;
+    my $self    = shift;
+    my $rh_comp = shift;
 
-    my %h_known   = map  { $_ => 1 } @{$self->{ordered_components}};
-    my @a_unknown = grep { !exists($h_known{$_}) } sort keys %$rh_components;
+    my @a_unknown = grep { !exists($self->{h_known}->{$_}) } keys %$rh_comp;
     return \@a_unknown;
 }
 
@@ -955,7 +962,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9983
+version 1.9985
 
 =head1 SYNOPSIS
 
@@ -999,8 +1006,8 @@ completion of B<format_address>. Warns if called before they have been set
 
   my $text = $GAF->format_address(\%components, \%options );
 
-Given a structures address (hashref) and options (hashref) returns a
-formatted address.
+Given structured address components (hashref) and options (hashref) returns a
+formatted address (string).
 
 Possible options are:
 
@@ -1053,7 +1060,7 @@ Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Opencage GmbH.
+This software is copyright (c) 2025 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

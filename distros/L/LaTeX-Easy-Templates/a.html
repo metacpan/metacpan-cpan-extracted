@@ -1,0 +1,1160 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templates.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:andreas@fedora.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new()</a></li>
+      <li><a href="#untemplate">untemplate()</a></li>
+      <li><a href="#format">format()</a></li>
+      <li><a href="#max_size_for_filecopy-maxsize">max_size_for_filecopy($maxsize)</a></li>
+      <li><a href="#verbosity-verbosity">verbosity($verbosity)</a></li>
+      <li><a href="#cleanup-c">cleanup($c)</a></li>
+      <li><a href="#templater-t">templater($t)</a></li>
+      <li><a href="#templater_reset">templater_reset()</a></li>
+      <li><a href="#log-l">log($l)</a></li>
+      <li><a href="#latex_driver_executable-program_name">latex_driver_executable($program_name)</a></li>
+      <li><a href="#processors">processors()</a></li>
+      <li><a href="#loaded_info">loaded_info()</a></li>
+    </ul>
+  </li>
+  <li><a href="#TEMPLATE-PROCESSING">TEMPLATE PROCESSING</a></li>
+  <li><a href="#TEMPLATES-INCLUDING-TEMPLATES">TEMPLATES INCLUDING TEMPLATES</a>
+    <ul>
+      <li><a href="#In-memory-templates">In-memory templates</a></li>
+      <li><a href="#On-disk-file-templates">On-disk file templates</a></li>
+      <li><a href="#Mixed-use-of-in-memory-and-on-disk-templates">Mixed use of in-memory and on-disk templates</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE:-PRINTING-STICKY-LABELS">EXAMPLE: PRINTING STICKY LABELS</a></li>
+  <li><a href="#EXAMPLE:-NESTED-PERL-DATA-STRUCTURES-TO-PDF">EXAMPLE: NESTED PERL DATA STRUCTURES TO PDF</a></li>
+  <li><a href="#STARTING-WITH-LaTeX">STARTING WITH LaTeX</a></li>
+  <li><a href="#LaTeX-TEMPLATES">LaTeX TEMPLATES</a></li>
+  <li><a href="#INSTALLING-LaTeX">INSTALLING LaTeX</a></li>
+  <li><a href="#INSTALLING-LaTeX-PACKAGES">INSTALLING LaTeX PACKAGES</a>
+    <ul>
+      <li><a href="#Manual-installation">Manual installation</a></li>
+    </ul>
+  </li>
+  <li><a href="#TESTING">TESTING</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#HUGS">HUGS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templates.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.03</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>This module provides functionality to format text content from a Perl data structure into printer-ready documents (PDF/Postscript/DVI). It utilises the idea of Templates and employs the powerful LaTeX (via <a>LaTeX::Driver</a>) in order to format and render the final documents into printer feed.</p>
+
+<p>Its use requires that LaTeX is already installed in your system. Don&#39;t be alarmed! LaTeX is simple to install in any OS, see section <a href="#INSTALLING-LaTeX">&quot;INSTALLING LaTeX&quot;</a> for how. In Linux it is provided by the system package manager.</p>
+
+<p>Using LaTeX will not only empower you like Guttenberg&#39;s press did and does, but it will also satisfy even the highest aesthetic standards with its 20/20 perfect typography. LaTeX is one of the rare cases where Software can be termed as Hardware. Install it and use it. Now.</p>
+
+<p>Here is a basic scenario borrowed from Dilbert&#39;s adventures. You have a number of emails with fields like <code>sender</code>, <code>recipient</code>, <code>subject</code> and <code>content</code>. This data can be represented in Perl as an array of hashes like:</p>
+
+<pre><code>[
+  {
+    sender =&gt; &#39;jack&#39;,
+    recipient =&gt; &#39;the clown&#39;,
+    subject =&gt; &#39;hello&#39;,
+    content =&gt; &#39;blah blah&#39;,
+  },
+  {
+    sender =&gt; &#39;dede&#39;,
+    recipient =&gt; &#39;kinski&#39;,
+    subject =&gt; &#39;Paris rooftops&#39;,
+    content =&gt; &#39;blah2 blah2&#39;,
+  },
+  ...
+]</code></pre>
+
+<p>You want to render this data to PDF.</p>
+
+<p>A more interesting scenario:</p>
+
+<p>You are scraping a, say, News website. You want each article rendered as PDF. Your scraper provides the following data for each News article, and you have lots of those:</p>
+
+<pre><code>[
+  {
+    author =&gt; &#39;jack&#39;,
+    title =&gt; &#39;123&#39;,
+    date =&gt; &#39;12/12/2012&#39;,
+    content =&gt; [
+       &#39;paragraph1&#39;,
+       &#39;paragraph2&#39;,
+       ...
+    ],
+    usercomments =&gt; [
+      {
+        &#39;author&#39; =&gt; &#39;sappho&#39;,
+        &#39;content&#39; =&gt; &#39;yearning ...&#39;,
+     },
+     ... # more comments
+  }
+  ... # more News articles
+]</code></pre>
+
+<p>Once you collect your data and save it into a Perl data structure as above (note: the stress is on <b>structure</b>) you need to create a templated LaTeX document which will be complete except that where the <code>author</code>, <code>sender</code>, <code>recipient</code>, <code>content</code>, etc. would be, you will place some tags like:</p>
+
+<pre><code>&lt;: $author :&gt;
+&lt;: $sender :&gt;</code></pre>
+
+<p>or control like:</p>
+
+<pre><code>: for $authors -&gt; $author {
+: # call a new template for each author and
+: # append the result here
+:   include &quot;authors-template.tex.tx&quot; {
+:     author =&gt; $author
+:   }
+: }</code></pre>
+
+<p>etc.</p>
+
+<p>The <a>LaTeX::Easy::Templates</a> module will then take your data and your LaTeX template and produce the final rendered documents.</p>
+
+<p>In section <a href="#STARTING-WITH-LaTeX">&quot;STARTING WITH LaTeX&quot;</a> you will see how to easily build a LaTeX template from open source, publicly available, superbly styled &quot;<i>themes</i>&quot;.</p>
+
+<p>The template engine used in this module is <a>Text::Xslate</a>, chosen because of its very good performance when rendering templates.</p>
+
+<pre><code>use LaTeX::Easy::Templates;
+
+# templated LaTeX document in-memory
+# (with variables to be substituted)
+my $latex_template =&lt;&lt;&#39;EOLA&#39;;
+% basic LaTeX document
+\documentclass[a4,12pt]{article}
+\begin{document}
+\title{ &lt;: $data.[&#39;title&#39;] :&gt; }
+\author{ &lt;: $data.author.name :&gt; &lt;: $data.author[&#39;surname&#39;] :&gt; }
+\date{ &lt;: $data.date :&gt; }
+\maketitle
+&lt;: $data.content :&gt;
+\end{document}
+EOLA
+
+# my template variable substitutions
+my $template_data = {
+  &#39;title&#39; =&gt; &#39;a test title&#39;,
+  &#39;author&#39; =&gt; {
+    &#39;name&#39; =&gt; &#39;myname&#39;,
+    &#39;surname&#39; =&gt; &#39;surname&#39;,
+  },
+  &#39;date&#39; =&gt; &#39;2024/12/12&#39;,
+  &#39;content&#39; =&gt; &#39;blah blah&#39;,
+};
+
+my $latte = LaTeX::Easy::Templates-&gt;new({
+  debug =&gt; {verbosity=&gt;2, cleanup=&gt;1},
+  &#39;templater-parameters&#39; =&gt; {
+    # passing parameters to Text::Xslate&#39;s constructor
+
+    # myfunc() will be a function accessible
+    # from each template enhancing Text::Xslate
+    &#39;function&#39; =&gt;{ 
+         # list here all functions you want to use in a template
+         # perhaps in a scenario like this one:
+         #   : for $authors -&gt; $author {
+         #   :   if( ref($author) == &#39;HASH&#39; ){ ... }
+         #   :   elsif( ref($author) == &#39;ARRAY&#39; ){ ... }
+         #       &lt;: myfunc($author) :&gt;
+         #   : }
+         &#39;ref&#39; =&gt; sub { return ref($_[0]) },
+         &#39;myfunc&#39; =&gt; \&amp;myfunc,
+         # something like this defines myfunc():
+         #    sub myfunc { return &quot;funced &quot;.$_[0] }
+    },
+    &#39;module&#39; =&gt; [
+      # and so the exports of this module:
+      &#39;Data::Roundtrip&#39; =&gt; [qw/perl2json json2perl/],
+    ],
+  },
+  &#39;processors&#39; =&gt; {
+    # if it includes other in-memory templates
+    # then just include them here with their name
+    &#39;mytemplate&#39; =&gt; {
+      &#39;template&#39; =&gt; {
+        &#39;content&#39; =&gt; $latex_template_string,
+      },
+      &#39;output&#39; =&gt; {
+        &#39;filepath&#39; =&gt; &#39;output.pdf&#39;
+      }
+    }
+  }
+});
+die unless $latte;
+
+my $ret = $latte-&gt;format({
+  &#39;template-data&#39; =&gt; $template_data,
+  &#39;outfile&#39; =&gt; &#39;xyz.pdf&#39;,
+  # this is the in-memory LaTeX template
+  &#39;processor&#39; =&gt; &#39;mytemplate&#39;
+});
+die unless $ret;
+# check output xyz.pdf !</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<ul>
+
+<li><p><a href="#latex_driver_executable-program_name">&quot;latex_driver_executable($program_name)&quot;</a></p>
+
+</li>
+</ul>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new"><code>new()</code></h2>
+
+<p>The constructor.</p>
+
+<p>The full list of arguments, provided as a hashref, is as follows:</p>
+
+<ul>
+
+<li><p><b>processors</b> : required parameter as a hash(ref) specifying one or more <i>processors</i> which are responsible for rendering the final typeset document from either a template or a LaTeX source file. The processor name is a key to the specified hash and should contain these items:</p>
+
+<ul>
+
+<li><p><b>template</b> : a hash(ref) containing information about the input LaTeX template. This information must be specified if no LaTeX source file is specified (see <b>latex</b> section below). Basically you need to specify the location of the LaTeX template file or a string with the contents of this template (as an in-memory template).</p>
+
+<p>Note that <b>basedir</b> and <b>filename</b> are explictly specified (instead of <b>filepath</b>) then <b>**ALL CONTENTS**</b> of <b>basedir</b> will be <b>copied recursively</b> to the output dir assuming that there are other files there (for example images, LaTeX style files etc.) which are needed during processing the template or running latex. If you do not want this file copying then just specify <b>filepath</b>.</p>
+
+<p>If there are other files or directories you will need during processing the template or running latex then you can specify them as an array(ref) in <b>auxfiles</b>. These will be <b>copied recursively</b> to the output dir.</p>
+
+<ul>
+
+<li><p><b>filepath</b> : specify the full path to the template file, or,</p>
+
+</li>
+<li><p><b>filename</b> and <b>basedir</b> : specify a filename (not a file path) and the directory it resides. Note that if you specify these two, then <b>**ALL CONTENTS**</b> of <b>basedir</b> will be <b>copied recursively</b> to the output dir assuming that there are other files there (for example images, LaTeX style files etc.) which are needed during processing the template or running latex.</p>
+
+</li>
+<li><p><b>content</b> : specify a string with the template contents. If this template calls other templates (from disk) then you should specify <b>basedir</b> to point to the path which holds these extra files. In this case <b>basedir</b> can be an array(ref) with more than one paths or just a scalar with a single path.</p>
+
+</li>
+<li><p><b>auxfiles</b> : specify a set of files or directories, as an array(ref), to be <b>copied recursively</b> to the output dir. These files may be needed for processing the template or for running latex (for example, style files, images, other template files, etc.). However, copying directories recursively can be pretty heavy. So, there is an upper limit on the total file size of each of the paths specified. This can be set during runtime with</p>
+
+<pre><code>$self-&gt;max_size_for_filecopy(1024*1024);
+# or set it to negative for skipping all file size checks
+$self-&gt;max_size_for_filecopy(-1);</code></pre>
+
+</li>
+</ul>
+
+</li>
+<li><p><b>output</b> : specifies the file path to the output typeset document:</p>
+
+<ul>
+
+<li><p><b>filepath</b> : specify the full path to the output file, or,</p>
+
+</li>
+<li><p><b>filename</b> and <b>basedir</b> : specify a filename (not a file path) and the directory it should reside.</p>
+
+<p>Note that the path will be created if it does not exist.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><b>latex</b> : a hash(ref) containing information about the LaTeX source which will either be created from a LaTeX template (see <b>template</b> above) and some data for the template variables (more on this later) or be provided (the LaTeX source file) by the caller without any template.</p>
+
+<ul>
+
+<li><p><b>filepath</b> : specify the full path to the LaTeX source file which will be created from the template if the <b>template</b> parameter was specified, or be used directly if no template was specified. In the former case, the file may or may not exist on disk and will be created. In the latter case, it must exist on disk.</p>
+
+</li>
+<li><p><b>filename</b> and <b>basedir</b> : specify a filename (not a file path) and the directory it resides. Again, the LaTeX source file needs to exist if no <b>template</b> parameter was specified.</p>
+
+</li>
+<li><p><b>latex-driver-parameters</b> : parameters in a hash(ref) to be passed on to the LaTeX driver (<a>LaTeX::Driver</a>) which does the actual rendering of the LaTeX source file into the typeset printer-ready document. Refer to the <a>documentation</a> of <a>LaTeX::Driver</a>&#39;s constructor for the description of each of the parameters.</p>
+
+<p>Note that <b>only the following</b> parameters will be passed on:</p>
+
+<ul>
+
+<li><p><b>format</b> : specify the output format (e.g. <b>pdf</b>, <b>ps</b>, etc.) of the rendered document and, optionally, the LaTeX &quot;<i>flavour</i>&quot; or &quot;<i>processor</i>&quot; to be used, e.g. <code>xelatex</code>, <code>pdflatex</code>, <code>latex</code>, etc. The default value is <code>pdf(pdflatex)</code>.</p>
+
+</li>
+<li><p><b>paths</b> : specifies a mapping of program names to full pathname as a hash reference. These paths override the paths determined at installation time (of <a>LaTeX::Driver</a>).</p>
+
+</li>
+<li><p><b>maxruns</b> : The maximum number of runs of the formatter program (defaults to 10 in <a>LaTeX::Driver</a>)</p>
+
+</li>
+<li><p><b>extraruns</b> : The number of additional runs of the formatter program after the document has stabilized.</p>
+
+</li>
+<li><p><b>timeout</b> : Specifies a timeout in seconds within which any commands spawned should finish. Even for very long documents LaTeX is extremely fast, so this can be well under a minute.</p>
+
+</li>
+<li><p><b>indexstyle</b> : The name of a makeindex index style file that should be passed to makeindex.</p>
+
+</li>
+<li><p><b>indexoptions</b> : Specifies additional options that should be passed to makeindex. Useful options are: -c to compress intermediate blanks in index keys, -l to specify letter ordering rather than word ordering, -r to disable implicit range formation. Refer to LaTeX&#39;s makeindex(1) for full details.</p>
+
+</li>
+<li><p><b>DEBUG</b> : Enables debug statements if set to a non-zero value. The value will be the same as our verbosity level.</p>
+
+</li>
+<li><p><b>DEBUGPREFIX</b> : Sets the debug prefix, which is prepended to debug output if debug statements. By default there is no prefix.</p>
+
+</li>
+</ul>
+
+<p>Note that the descriptions of the parameters (above) to be passed on to <a>LaTeX::Driver</a> are taken more-or-less verbatim from its documentation page, refer to the original document in case there are changes.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><b>latex</b> : specify default parameters for <b>processors</b>&#39; <b>latex</b> data in case it is absent:</p>
+
+<ul>
+
+<li><p><b>filename</b> : default LaTeX source filename (not a filepath).</p>
+
+</li>
+<li><p><b>latex-driver-parameters</b> : default parameters to be passed on to <a>LaTeX::Driver</a>&#39;s constructor. See above for what it includes.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><b>debug</b> :</p>
+
+<ul>
+
+<li><p><b>verbosity</b> : script&#39;s verbosity. A value of zero mutes the script. A higher integer increases the verbosity.</p>
+
+</li>
+<li><p><b>cleanup</b> : a non-zero value will clean up all temporary files and directories including those created by <a>LaTeX::Driver</a>. This is the default. For debugging purpose, set this to zero so that you can inspect all intermediate files created.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><b>tempdir</b> : specify where the temporary files will be placed. This location will be created if it does not exist. Default is to use a temporary location as given by the OS.</p>
+
+</li>
+<li><p><b>logfile</b> : specify a file to redirect the logger&#39;s output to. Default is to log messages to the console (STDOUT, STDERR).</p>
+
+</li>
+<li><p><b>logger_object</b> : supply a <a>Mojo::Log</a> object to use as the logger. In fact any object implementing just these three: <code>error()</code>, <code>warn()</code> and <code>info()</code>, which <a>Mojo::Log</a> does, will be accepted.</p>
+
+</li>
+<li><p><b>templater-parameters</b> : a HASH containing parameters to be passed on to the <a>Text::Xslate</a> constructor.</p>
+
+<p>These are some common templater paramaters:</p>
+
+<ul>
+
+<li><p><b>syntax</b> : specify the template syntax to be either <a>Kolon</a> or <code>TTerse|Text::Xslate::Syntax::TTerse</code>. Default is <code>Kolon</code>.</p>
+
+</li>
+<li><p><b>suffix</b> : specify the template files suffix. Default is <code>.tx</code> (do not forget the dot).</p>
+
+</li>
+<li><p><b>verbose</b> : set the verbosity of <a>Text::Xslate</a>. Default is the verbosity level currently set in the <a>LaTeX::Easy::Templates</a> object.</p>
+
+</li>
+<li><p><b>path</b> : an array(ref) of paths to be searched for included templates. This is crucial when templates are including other templates in different directories.</p>
+
+</li>
+<li><p><b>function</b>, <b>module</b> : specify your own perl functions and modules you want to use from within a template. That&#39;s very handy in overcoming the limitations of the template syntax. See <a>Text::Xslate::Syntax::Kolon#Functions-and-filters</a>. For example, if you want to use Perl&#39;s <code>ref()</code> inside a <a>Text::Xslate</a> template, or use your own function called <code>myfunc()</code>, e.g. in a scenario similar to this:</p>
+
+<pre><code># in the template you want to use Perl&#39;s builtin ref()
+# and also user-defined myfunc():
+: for $authors -&gt; $author {
+:   if( ref($author) == &#39;HASH&#39; ){ ... }
+:   elsif( ref($author) == &#39;ARRAY&#39; ){ ... }
+    &lt;: myfunc($author) :&gt;
+: }</code></pre>
+
+<p>then (as it is stated also in the <a>SYNOPSIS</a>), pass all these function references into the constructor of <a>LaTeX::Easy::Templates</a> under key <code>function</code>,like this:</p>
+
+<pre><code>my $latte = LaTeX::Easy::Templates-&gt;new({
+  ...
+  &#39;function&#39; =&gt; {
+    # list here all functions you want to use in a template
+    &#39;ref&#39; =&gt; sub { return ref($_[0]) },
+    &#39;myfunc&#39; =&gt; \&amp;myfunc,
+    # something like this defines myfunc():
+    #    sub myfunc { return &quot;funced &quot;.$_[0] }
+  },
+  ...
+});</code></pre>
+
+</li>
+</ul>
+
+<p>See <a>Text::Xslate#Text::Xslate-%3Enew(%options)</a> for all the supported options.</p>
+
+<ul>
+
+<li><p><b>path</b> : an array of paths to be searched for on-disk template files which are dependencies, i.e. they are included by other templates (in-memory or on-disk). This is very important if your main template includes other templates which are in different directories.</p>
+
+</li>
+<li><p><b>syntax</b> : the template syntax. Default is &#39;Kolon&#39;.</p>
+
+</li>
+<li><p><b>function</b>, <b>module</b> : a hash of user-specified or built-in perl functions (coderefs) to be used in the templates. And a list of modules to be included for using these. Quite a powerful feature of <a>Text::Xslate</a>.</p>
+
+</li>
+<li><p><b>cache</b>, <b>cache_dir</b> : cache level and location.</p>
+
+</li>
+<li><p><b>line_start</b>, <b>tag_start</b>, <b>line_end</b>, <b>tag_end</b> : the token strings denoting the start and end of lines and tags.</p>
+
+</li>
+</ul>
+
+<p>For example:</p>
+
+<pre><code>&#39;templater-parameters&#39; =&gt; {
+  # dependent templates search paths
+  &#39;path&#39; =&gt; [&#39;a/b/c&#39;, &#39;x/y/z&#39;, ...],
+  # user-specified functions to be called
+  # from a template
+  &#39;function&#39; =&gt; {
+    &#39;xyz&#39; =&gt; sub { my (@params) = @_; ...; return ... }
+  },
+  # installed Perl modules can be accessed
+  # from a template (caveat: complains for fully
+  # qualified sub names &#39;::&#39;)
+  &#39;module&#39; =&gt; [
+    &#39;Data::Roundtrip&#39; =&gt; [qw/perl2json json2perl/],
+  ],
+  ...
+},</code></pre>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<p>The constructor returns <code>undef</code> on failure.</p>
+
+<p>Here is example code for calling the constructor:</p>
+
+<pre><code> use LaTeX::Easy::Template;
+ my $latter = LaTeX::Easy::Template-&gt;new({
+  &#39;processors&#39; =&gt; {
+    &#39;in-memory&#39; =&gt; {
+       &#39;latex&#39; =&gt; {
+            &#39;filename&#39; =&gt; undef # create tmp
+       },
+       &#39;template&#39; =&gt; {
+            # the template is in-memory string
+            &#39;content&#39; =&gt; &#39;...&#39;
+       },
+       &#39;output&#39; =&gt; {
+            &#39;filename&#39; =&gt; &#39;out.pdf&#39;
+       }
+    }
+    &#39;on-disk&#39; =&gt; {
+      &#39;latex&#39; =&gt; {
+            &#39;filename&#39; =&gt; undef, # create tmp
+       },
+       &#39;template&#39; =&gt; {
+            &#39;filepath&#39; =&gt; &#39;t/templates/simple01/main.tex.tx&#39;
+       },
+       &#39;output&#39; =&gt; {
+            &#39;filename&#39; =&gt; &#39;out2.pdf&#39;
+       }
+    }
+  }, # end processors
+  # log to this file, path will be created if not exists
+  &#39;logfile&#39; =&gt; &#39;xyz/abc.log&#39;,
+  &#39;latex&#39; =&gt; {
+    &#39;latex-driver-parameters&#39; =&gt; {
+       # we want PDF output run with xelatex which
+       # easily supports multi-language documents
+       &#39;format&#39; =&gt; &#39;pdf(xelatex)&#39;,
+       &#39;paths&#39; =&gt; {
+          # the path to the xelatex needed only if not standard
+          &#39;xelatex&#39; =&gt; &#39;/non-standard-path/xyz/xelatex&#39;
+       }
+    }
+  },
+  &#39;verbosity&#39; =&gt; 1,
+  &#39;cleanup&#39; =&gt; 0,
+});</code></pre>
+
+<p>The above creates a <a>LaTeX::Easy::Templates</a> object which has 2 &quot;processors&quot; one which uses a LaTeX template from disk and one in-memory. Default <a>LaTeX::Driver</a> parameters are specified as well and will be used for these processors which do not specify any.</p>
+
+<h2 id="untemplate"><code>untemplate()</code></h2>
+
+<p>It creates a LaTeX source file from a template. This is the first step in rendering the final typeset document. which is done by <a href="#format">&quot;format()&quot;</a>.</p>
+
+<p>Note that calling this method is not necessary if you intend to call <a href="#format">&quot;format()&quot;</a> next. The latter will call the former if needed.</p>
+
+<p>The full list of arguments is as follows:</p>
+
+<ul>
+
+<li><p><b>processor</b> : specify the name of the &quot;processor&quot; to use. The &quot;processor&quot; must be a key to the <b>processors</b> parameter passed to the constructor.</p>
+
+</li>
+<li><p><b>template-data</b> : specify the data for the template&#39;s variables as a hash or array ref, depending on the structure of the template in use. This data is passed on to the template using the key <code>data</code>. So if your template data is this:</p>
+
+<pre><code>{
+  name =&gt; &#39;aa&#39;,
+}</code></pre>
+
+<p>Then your template will access <code>name</code>&#39;s value via <code> &lt;: $data.name :</code> &gt;</p>
+
+<p>See <a href="#TEMPLATE-PROCESSING">&quot;TEMPLATE PROCESSING&quot;</a> for more on the syntax of the template files.</p>
+
+</li>
+<li><p><b>latex</b>, <b>template</b> : optionally, overwrite &quot;processor&quot;&#39;s <b>latex</b>, <b>template</b> fields by specifying any of these fields here in exactly the same format as that of the <b>processors</b> parameter passed to the constructor (<a href="#new">&quot;new()&quot;</a>).</p>
+
+</li>
+</ul>
+
+<p>On failure, <a href="#untemplate">&quot;untemplate()&quot;</a> returns <code>undef</code>.</p>
+
+<p>On success, it returns a hash(ref) with two entries:</p>
+
+<ul>
+
+<li><p><b>latex</b> : contains <b>fileapth</b>, <b>filename</b> and <b>basedir</b> of the produced LaTeX source file.</p>
+
+</li>
+<li><p><b>template</b> : it contains <b>fileapth</b>, <b>filename</b>, <b>basedir</b> and <b>content</b>. The last one will be undefined if the template used if the template was a file read from disk. The first three will be undefined otherwise.</p>
+
+</li>
+</ul>
+
+<h2 id="format"><code>format()</code></h2>
+
+<p>It renders the final typeset document. It will call <a href="#untemplate">&quot;untemplate()&quot;</a> if is required to produce the intermediate LaTeX source file. If that file was specified, then it will render the final document by calling <a>LaTeX::Driver</a>.</p>
+
+<p>The full list of arguments, provided by a hashref, is as follows:</p>
+
+<ul>
+
+<li><p><b>processor</b> : specify the name of the &quot;processor&quot; to use. The &quot;processor&quot; must be a key to the <b>processors</b> parameter passed to the constructor.</p>
+
+</li>
+<li><p><b>template-data</b> : specify the data for the template&#39;s variables as a hash or array ref, depending on the structure of the template in use. This data is only needed if the intermediate LaTeX source file needs to be produced.</p>
+
+</li>
+<li><p><b>latex</b>, <b>template</b>, <b>output</b> : optionally, overwrite &quot;processor&quot;&#39;s <b>latex</b>, <b>template</b>, <b>output</b> fields by specifying any of these fields here in exactly the same format as that of the <b>processors</b> parameter passed to the constructor (<a href="#new">&quot;new()&quot;</a>).</p>
+
+</li>
+</ul>
+
+<p>On failure, <a href="#format">&quot;format()&quot;</a> returns <code>undef</code>.</p>
+
+<p>On success, it returns a hash(ref) with three entries:</p>
+
+<ul>
+
+<li><p><b>latex</b> : contains <b>fileapth</b>, <b>filename</b> and <b>basedir</b> of the produced LaTeX source file.</p>
+
+</li>
+<li><p><b>template</b> : it contains <b>fileapth</b>, <b>filename</b>, <b>basedir</b> and <b>content</b>. The last one will be undefined if the template used if the template was a file read from disk. The first three will be undefined otherwise.</p>
+
+</li>
+<li><p><b>output</b> : it contains <b>fileapth</b>, <b>filename</b> and <b>basedir</b> pointing to the output typeset document it created.</p>
+
+</li>
+</ul>
+
+<h2 id="max_size_for_filecopy-maxsize"><code>max_size_for_filecopy($maxsize)</code></h2>
+
+<p>It gets or sets (with optional parameter <code>$maxsize</code>) the maximum size for doing a recursive file copy. Recursive file copies are done for template extra files which may be needed for processing the template or running latex. They are specified if <b>template-&gt;basedir</b> is explicitly set (then the whole <b>basedir</b> will be copied) or when <b>template-&gt;auxfiles</b> are specified as an arrayref of files/dirs to copy individually. In order to reduce the risk of unintentionally copying vast files and directories there is a limit to the total (recursively calculated) size of files/directories to be copied. This can be set here. The default is 3MB. However if you set this limit to a negative integer no checks will be make and file copying will be done unreservedly.</p>
+
+<h2 id="verbosity-verbosity"><code>verbosity($verbosity)</code></h2>
+
+<p>It gets or sets (with optional parameter <code>$verbosity</code>) the verbosity level.</p>
+
+<h2 id="cleanup-c"><code>cleanup($c)</code></h2>
+
+<p>It gets or sets (with optional parameter <code>$c</code>) the <b>cleanup</b> parameter which contols the cleaning up of temporary files and directories or not. Set it to 1 to clean up. This is currently the default. Set it to 0 to keep these files for inspection during debugging.</p>
+
+<h2 id="templater-t"><code>templater($t)</code></h2>
+
+<p>It gets or sets (with optional parameter <code>$t</code>) the templater object. This is the object which convertes the LaTeX template into LaTeX source. Currently only <a>Text::Xslate</a> is supported.</p>
+
+<h2 id="templater_reset"><code>templater_reset()</code></h2>
+
+<p>Reset the templater object which means to forget all the templates it knows and had possibly loaded in memory. After a reset all &quot;processors&quot; will be forgotten as well.</p>
+
+<h2 id="log-l"><code>log($l)</code></h2>
+
+<p>It gets or sets (with optional parameter <code>$l</code>) the logger object. Currently the logger is of type <a>Mojo::Log</a>.</p>
+
+<h2 id="latex_driver_executable-program_name"><code>latex_driver_executable($program_name)</code></h2>
+
+<p>This is an exported sub (and not a method)</p>
+
+<p>It enquires <a>LaTeX::Driver</a> for what is the fullpath to the program named <code>$program_name</code>. The program can be <code>latex</code>, <code>dvips</code>, <code>makeindex</code>, <code>pdflatex</code> etc. If the program is not found or if it is not an executable (for the current user), it returns <code>undef</code>. If it is found and it is executable (for the current user), its fullpath is returned.</p>
+
+<p>The parameter <code>$program_name</code> is optional, if it is omitted, it returns a hash(ref) with all known programs (the keys) and their full paths (the values).</p>
+
+<p>Note that <a>LaTeX::Driver</a>&#39;s paths are detected during its installation (according to its documentation).</p>
+
+<p>Program full paths can be set during running <a href="#format">&quot;format()&quot;</a> by passing it the parameter <b>latex-&gt;latex-driver-parameters-&gt;paths</b> (a hashref mapping program names to their paths).</p>
+
+<h2 id="processors"><code>processors()</code></h2>
+
+<p>It returns the hash(ref) of known &quot;processors&quot; as they were set up during construction.</p>
+
+<h2 id="loaded_info"><code>loaded_info()</code></h2>
+
+<p>It returns the hash(ref) of extra information relating to the &quot;processors&quot;.</p>
+
+<h1 id="TEMPLATE-PROCESSING">TEMPLATE PROCESSING</h1>
+
+<p>The LaTeX templates will be processed with <a>Text::Xslate</a> and must follow its rules. It understands two template syntaxes:</p>
+
+<ul>
+
+<li><p>it&#39;s own <a>Text::Xslate::Syntax::Kolon</a></p>
+
+</li>
+<li><p>and a subset of Template Toolkit 2 <a>Text::Xslate::Syntax::TTerse</a></p>
+
+</li>
+</ul>
+
+<p>The default syntax is <a>Text::Xslate::Syntax::Kolon</a>. This can be changed via the parameters to the constructor of <a>LaTeX::Easy::Templates</a> by specifying this:</p>
+
+<pre><code>&#39;templater-parameters&#39; =&gt; {
+    &#39;syntax&#39; =&gt; &#39;Kolon&#39; #or &#39;TTerse&#39;
+}</code></pre>
+
+<p>The <b>data</b> for substituting into the template variables comes bundled into a hashref which comes bundled into a hashref keyed under the name &quot;<code>data</code>&quot;. Therefore all references must be preceded by key <code>data.</code></p>
+
+<p>So if your template data is this:</p>
+
+<pre><code>{
+  name =&gt; &#39;aa&#39;,
+}</code></pre>
+
+<p>Then your template will access <code>name</code>&#39;s value via <code> &lt;: $data.name :</code> &gt;.</p>
+
+<p><a>Text::Xslate</a> supports loops and conditional statements. It also offers a lot of <a>builtin functions</a>. Additionally you can call user-specified perl subs (or subs from other modules) from within a template.</p>
+
+<p>Read the documentation for <a>Text::Xslate</a>&#39;s syntax <a>Text::Xslate::Syntax::Kolon</a> or <a>Text::Xslate::Syntax::TTerse</a>.</p>
+
+<h1 id="TEMPLATES-INCLUDING-TEMPLATES">TEMPLATES INCLUDING TEMPLATES</h1>
+
+<p>Templates which include other templates are supported.</p>
+
+<p>The included and the includee templates can be a combination of on-disk files and/or in-memory strings. Which means in-memory templates can include on-disk and vice-versa.</p>
+
+<h2 id="In-memory-templates">In-memory templates</h2>
+
+<p>The <code>processor</code> parameter to <a>LaTeX::Easy::Templates</a>&#39;s <a href="#new">constructor</a> should contain both the main template and all other included templates keyed on their include name. For example, the main template is:</p>
+
+<pre><code> \documentclass[letterpaper,twoside,12pt]{article}
+ \begin{document}
+ : include &quot;preamble.tex.tx&quot; {data =&gt; $data};
+ : for [1, 2, 3] -&gt; $i {
+   \section{Content for section &lt;: $i :&gt;}
+   : include &quot;content.tex.tx&quot; {data =&gt; $data};
+: }
+\end{document}</code></pre>
+
+<p>The above <i>includes</i> two other templates:</p>
+
+<pre><code>:# preamble.tex.tx
+\title{ &lt;: $data.title :&gt; }
+\author{ &lt;: $data.author.name :&gt; &lt;: $data.author.surname :&gt; }
+\date{ &lt;: $data.date :&gt; }</code></pre>
+
+<p>and</p>
+
+<pre><code>:# content.tex.tx
+&lt;: $data.content :&gt;</code></pre>
+
+<p>In order to load all above templates, construct the <a>LaTeX::Easy::Templates</a> object like this:</p>
+
+<pre><code>my $latter = LaTeX::Easy::Template-&gt;new({
+ &#39;processors&#39; =&gt; {
+   # the main entry
+   &#39;main.tex.tx&#39; =&gt; {
+      &#39;template&#39; =&gt; {
+           &#39;content&#39; =&gt; &#39;... main.tex.tx contents ...&#39;
+      },
+      &#39;output&#39; =&gt; {
+           &#39;filename&#39; =&gt; &#39;out.pdf&#39;
+      }
+   },
+   # it includes these other templates:
+   &#39;preamble.tex.tx&#39; =&gt; { # one ...
+      &#39;template&#39; =&gt; {
+           &#39;content&#39; =&gt; &#39;... preamble.tex.tx contents ...&#39;
+      }
+   },
+   &#39;content.tex.tx&#39; =&gt; { # ... and two
+      &#39;template&#39; =&gt; {
+           &#39;content&#39; =&gt; &#39;... content.tex.tx contents ...&#39;
+      },
+   }
+ } # end &#39;processors&#39;</code></pre>
+
+<p>With the above, all in-memory templates required are loaded in memory. All you need now is to specify &quot;<code>main.tex.tx</code>&quot; (which is the main entry point) as the <code>processor</code> name when calling <a href="#untemplate">&quot;untemplate()&quot;</a> or <a href="#format">&quot;format()&quot;</a>. You do not need to mention the included template names at all:</p>
+
+<pre><code>    my $ret = $latter-&gt;format({
+      &#39;template-data&#39; =&gt; $template_data,
+      &#39;output&#39; =&gt; {
+        &#39;filepath&#39; =&gt; ...,
+      },
+      # just specify the main entry template
+      &#39;processor&#39; =&gt; &#39;main.tex.tx&#39;,
+});</code></pre>
+
+<p>The above functionality is demonstrated and tested in file <code>t/460-inmemory-template-usage-calling-other-templates.t</code></p>
+
+<h2 id="On-disk-file-templates">On-disk file templates</h2>
+
+<p>If both the main template and all templates it includes are in the same directory then you only need to specify the <code>main.tex.tx</code> template under key <code>processors</code> in the parameters to <a>LaTeX::Easy::Templates</a>&#39;s <a href="#new">constructor</a>. In this case all dependencies will be taken care of (thank you <a>Text::Xslate</a>).</p>
+
+<p>Additionally, you can specify a list of directories as paths to be searched for dependent templates. These <i>include paths</i> can be passed on as parameters to <a>LaTeX::Easy::Templates</a>&#39;s <a href="#new">constructor</a>, under</p>
+
+<pre><code>...
+&#39;templater-parameters&#39; =&gt; {
+  &#39;path&#39; =&gt; [&#39;a/b/c&#39;, &#39;x/y/z&#39;, ...]
+},
+...
+
+my $latter = LaTeX::Easy::Template-&gt;new({
+  &#39;templater-parameters&#39; =&gt; {
+    &#39;path&#39; =&gt; [&#39;a/b/c&#39;, &#39;x/y/z&#39;, ...],
+    ...
+  },
+  &#39;processors&#39; =&gt; {
+   # the main entry
+    &#39;main.tex.tx&#39; =&gt; {
+      &#39;template&#39; =&gt; {
+        &#39;filepath&#39; =&gt; &#39;/x/y/z/main.tex.tx&#39;
+        # works also with specifying
+        #   &#39;filename&#39; &amp; &#39;basedir&#39;  
+      },
+      &#39;output&#39; =&gt; {
+           &#39;filename&#39; =&gt; &#39;out.pdf&#39;
+      }
+    },
+    # the dependent templates are not needed
+    # to be included if in same dir
+    # include them ONLY if in different dir
+  } # end &#39;processors&#39;
+}); # end constructor</code></pre>
+
+<p>With the above, the &quot;<code>main.tex.tx</code>&quot; template, which is the main entry point, is loaded. As long as its dependencies, i.e. the templates it includes, are in the same directory or are specified with their full path, then there is nothing else you need to include. The dependencies will be found and included as needed.</p>
+
+<p>All you need now is to specify &quot;<code>main.tex.tx</code>&quot; as the <code>processor</code> name when calling <a href="#untemplate">&quot;untemplate()&quot;</a> or <a href="#format">&quot;format()&quot;</a>. You do not need to mention the included template names at all. Like this:</p>
+
+<pre><code>    my $ret = $latter-&gt;format({
+      &#39;template-data&#39; =&gt; $template_data,
+      &#39;output&#39; =&gt; {
+        &#39;filepath&#39; =&gt; &#39;/x/y/z/out.pdf&#39;,
+      },
+      # just specify the main entry template
+      # dependencies will be included as needed:
+      &#39;processor&#39; =&gt; &#39;main.tex.tx&#39;,
+});</code></pre>
+
+<p>The above functionality is demonstrated and tested in file <code>t/360-ondisk-template-usage-calling-other-templates.t</code></p>
+
+<h2 id="Mixed-use-of-in-memory-and-on-disk-templates">Mixed use of in-memory and on-disk templates</h2>
+
+<p>One can have a project of mixed, in-memory and on-disk, templates one including the other in any combination. This is straightforward, just follow the above guidelines.</p>
+
+<p>Mixed templates functionality is demonstrated and tested in file <code>t/500-mix-template-usage-calling-other-mix-templates.t</code>.</p>
+
+<h1 id="EXAMPLE:-PRINTING-STICKY-LABELS">EXAMPLE: PRINTING STICKY LABELS</h1>
+
+<p>We will use the LaTeX package <a href="https://ctan.org/pkg/labels?lang=en">labels</a> (documented <a href="https://mirrors.ctan.org/macros/latex/contrib/labels/labels.pdf">here</a>) to prepare sticky labels for addressing envelopes etc. By the way, there is also the <a href="https://ctan.org/pkg/ticket?lang=en">ticket</a> LaTeX package available over at CTAN (documented <a href="http://mirrors.ctan.org/macros/latex/contrib/ticket/doc/manual.pdf">here</a>) which can be of similar use, printing tickets.</p>
+
+<p>We will create two template files. One called <code>labels.tex.tx</code> as the main entry point. And one called <code>label.tex.tx</code> to be called by the first one in a loop over each label item in the input data.</p>
+
+<p>Here they are:</p>
+
+<pre><code>% I am ./templates/labels/labels.tex.tx
+\documentclass[12pt]{letter}
+\usepackage{graphicx}
+\usepackage{labels}
+\begin{document}
+: for $data -&gt; $label {
+:   include &#39;label.tex.tx&#39; { label =&gt; $label };
+: }
+\end{document}</code></pre>
+
+<p>and</p>
+
+<pre><code>% I am ./templates/labels/label.tex.tx
+\genericlabel{
+  \begin{tabular}{|c|}
+    \hline
+: if $label.sender.logo {
+    \includegraphics[width=1cm,angle=0]{&lt;: $label.sender.logo :&gt;}\\
+: }
+    \hline
+    &lt;: $label.recipient.fullname :&gt;\\
+    \hline
+: for $label.recipient.addresslines -&gt; $addressline {
+    &lt;: $addressline :&gt;
+: }
+    \\
+    &lt;: $label.recipient.postcode :&gt;\\
+    \hline
+  \end{tabular}
+}</code></pre>
+
+<p>Save them on disk in the suggested directory structure. Or, if you decide to change it, make sure you adjust the paths in the script below.</p>
+
+<p>Optionally, save a logo image to <a>&quot;templates/images/logo.png&quot; in .</a>. If that exists then the template will pick it up.</p>
+
+<p>And here is the Perl script to harness the beast:</p>
+
+<pre><code>use LaTeX::Easy::Templates;
+use FindBin;
+
+my $curdir = $FindBin::Bin;
+
+# the templates can be placed anywhere as long these
+# paths are adjusted. As it is now, they
+# must both be placed in ./templates/labels
+# the main entry is ./templates/labels/labels.tex.tx
+# which calls/includes ./templates/labels/label.tex.tx
+my $template_filename = File::Spec-&gt;catfile($curdir, &#39;templates&#39;, &#39;labels&#39;, &#39;labels.tex.tx&#39;);
+# optionally specify a logo image
+my $logo_filename = File::Spec-&gt;catfile($curdir, &#39;templates&#39;, &#39;images&#39;, &#39;logo.png&#39;);
+if( ! -e $logo_filename ){ $logo_filename = undef }
+
+my $output_filename = &#39;labels.pdf&#39;;
+
+# see LaTeX::Driver&#39;s doc for other formats, e.g. pdf(xelatex)
+my $latex_driver_and_format = &#39;pdf(pdflatex)&#39;;
+
+# debug settings:
+my $verbosity = 1;
+# keep intermediate latex file for inspection
+my $cleanup = 1;
+
+my $sender = {
+  fullname =&gt; &#39;Gigi Comp&#39;,
+  addresslines =&gt; [
+    &#39;Apt 5&#39;,
+    &#39;25, Jen Way&#39;,
+    &#39;Balac&#39;
+  ],
+  postcode =&gt; &#39;1An34&#39;,
+  # this assumes that ./templates/images/logo.png exists, else comment it out:  
+  logo =&gt; $logo_filename,
+};
+my @labels_data = map {
+  {
+    recipient =&gt; {
+      fullname =&gt; &quot;Teli Bingo ($_)&quot;,
+      addresslines =&gt; [
+        &#39;Apt 5&#39;,
+        &#39;25, Jen Way&#39;,
+        &#39;Balac&#39;
+      ],
+      postcode =&gt; &#39;1An34&#39;,
+    },
+    sender =&gt; $sender,
+  }
+} (1..42); # create many labels yummy
+
+my $latter = LaTeX::Easy::Templates-&gt;new({
+  &#39;debug&#39; =&gt; {
+    &#39;verbosity&#39; =&gt; $verbosity,
+    &#39;cleanup&#39; =&gt; $cleanup
+  },
+  &#39;processors&#39; =&gt; {
+    &#39;custom-labels&#39; =&gt; {
+    &#39;template&#39; =&gt; {
+      &#39;filepath&#39; =&gt; $template_filename,
+    },
+    &#39;latex&#39; =&gt; {
+      &#39;filepath&#39; =&gt; &#39;xyz.tex&#39;,
+      &#39;latex-driver-parameters&#39; =&gt; {
+        &#39;format&#39; =&gt; $latex_driver_and_format,
+      }
+    }
+    },
+  }
+});
+die &quot;failed to instantiate &#39;LaTeX::Easy::Templates&#39;&quot; unless defined $latter;
+
+my $ret = $latter-&gt;format({
+  &#39;template-data&#39; =&gt; \@labels_data,
+  &#39;output&#39; =&gt; {
+    &#39;filepath&#39; =&gt; $output_filename,
+  },
+  &#39;processor&#39; =&gt; &#39;custom-labels&#39;,
+});
+die &quot;failed to format the document, most likely latex command has failed.&quot; unless defined $ret;
+print &quot;$0 : done, output in &#39;$output_filename&#39;.\n&quot;;</code></pre>
+
+<p>This is the result in very low resolution:</p>
+
+<img src="data:image/jpeg;base64,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">
+
+<h1 id="EXAMPLE:-NESTED-PERL-DATA-STRUCTURES-TO-PDF">EXAMPLE: NESTED PERL DATA STRUCTURES TO PDF</h1>
+
+<p>Thanks to the amazing work put in <a>Text::Xslate</a> one can have access to user-defined Perl functions, Perl modules and macros from inside a template file.</p>
+
+<p>This allows recusrsion which makes possible walking and printing a nested Perl data structure with this simple template:</p>
+
+<pre><code>%templates/nested-data-structures/nested-data-structures.tex.tx
+\documentclass[12pt]{article}
+\begin{document}
+
+: macro walk -&gt; $d {
+:   if( ref($d) == &#39;ARRAY&#39; ){
+$\lbrack$
+:     for $d -&gt; $item {
+:       walk($item);
+:     }
+$\rbrack,$
+:   } elsif( ref($d) == &#39;HASH&#39; ){
+$\{$
+:     for $d.kv() -&gt; $pair {
+        &lt;: $pair.key() :&gt; $=&gt;$
+:       walk($pair.value())
+:     }
+$\},$
+:   } elsif( ref($d) == &#39;&#39; ){
+      &lt;: $d :&gt;,
+:   } else {
+      beginUNKNOWN &lt;: $d :&gt; endUNKNOWN
+:   }
+: } # macro
+
+&lt;: walk($data) :&gt;
+
+\end{document}</code></pre>
+
+<p>First we create a macro which walks the input data structure and recurses into it until a scalar is found.</p>
+
+<p>The function <code>ref()</code> is Perl&#39;s builtin but it is not available from inside an <a>Text::Xslate</a> template. So, we create our own function for doing this and pass it on to the <a>Text::Xslate</a>&#39;s constructor, as was demonstrated previously with the <code>templater-parameters</code> hash pass to <a>LaTeX::Easy::Templates</a>&#39;s <a>constructor</a>.</p>
+
+<p>Here is a Perl script to render any data structure into PDF:</p>
+
+<pre><code>use strict;
+use warnings;
+
+use LaTeX::Easy::Templates;
+use FindBin;
+
+my $curdir = $FindBin::Bin;
+
+# the templates must be placed in ./templates/nested-data-structures
+my $template_filename = File::Spec-&gt;catfile($curdir, &#39;templates&#39;, &#39;nested-data-structures&#39;, &#39;nested-data-structures.tex.tx&#39;);
+
+my $output_filename = &#39;nested-data-structures.pdf&#39;;
+
+# see LaTeX::Driver&#39;s doc for other formats, e.g. pdf(xelatex)
+my $latex_driver_and_format = &#39;pdf(pdflatex)&#39;;
+
+my $nested_data_structure = {&#39;a&#39; =&gt; [1,2,3], &#39;b&#39; =&gt; {&#39;c&#39; =&gt; [4,5,6, {&#39;z&#39;=&gt;1}]}};
+
+# debug settings:
+my $verbosity = 1;
+# keep intermediate latex file for inspection
+my $cleanup = 1;
+
+my $latter = LaTeX::Easy::Templates-&gt;new({
+  &#39;debug&#39; =&gt; {
+    &#39;verbosity&#39; =&gt; $verbosity,
+    &#39;cleanup&#39; =&gt; $cleanup
+  },
+  &#39;templater-parameters&#39; =&gt; {
+    &#39;function&#39; =&gt; {&#39;ref&#39; =&gt; sub { return ref($_[0]) } }
+  },
+  &#39;processors&#39; =&gt; {
+    &#39;nested-data-structures&#39; =&gt; {
+      &#39;template&#39; =&gt; {
+        &#39;filepath&#39; =&gt; $template_filename,
+      },
+      &#39;latex&#39; =&gt; {
+        &#39;filepath&#39; =&gt; &#39;xyz.tex&#39;,
+        &#39;latex-driver-parameters&#39; =&gt; {
+          &#39;format&#39; =&gt; $latex_driver_and_format,
+        }
+      },
+    }
+  }
+});
+die &quot;failed to instantiate &#39;LaTeX::Easy::Templates&#39;&quot; unless defined $latter;
+
+my $ret = $latter-&gt;format({
+  &#39;template-data&#39; =&gt; $nested_data_structure,
+  &#39;output&#39; =&gt; {
+    &#39;filepath&#39; =&gt; $output_filename,
+  },
+  &#39;processor&#39; =&gt; &#39;nested-data-structures&#39;,
+});
+die &quot;failed to format the document, most likely latex command has failed.&quot; unless defined $ret;
+print &quot;$0 : done, output in &#39;$output_filename&#39;.\n&quot;;</code></pre>
+
+<p>And here is the result:</p>
+
+<img src="data:image/jpeg;base64,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">
+
+<p>Thank you LaTeX, thank you Xslate.</p>
+
+<h1 id="STARTING-WITH-LaTeX">STARTING WITH LaTeX</h1>
+
+<p>Currently, the best place to get started with LaTeX is at the site <a href="https://www.overleaf.com/">https://www.overleaf.com/</a> (which I am not affiliated in any way). There is no subscription involved or any registration required.</p>
+
+<p>Click on <a href="https://www.overleaf.com/latex/templates">Templates</a> and search the presented PDFs of example typeset documents for a look you fancy. For example, if you are scraping a news website you may be interested in the <a href="https://www.overleaf.com/latex/templates/newspaper-slash-news-letter-template/wjxxhkxdjxhw">Committee Times</a> template. First check its license and if you agree with that, click on <b>View Source</b>, copy the contents and paste them into your new LaTeX file, let&#39;s call that <code>main.tex</code> located in a new directory <code>templates/committee-times</code>.</p>
+
+<p>Firstly, run latex on it with this command <code>latex main.tex</code>. It will fail if it can not find, in your LaTeX installation, the packages it requires. For example it requires package <code>newspaper</code>. If it complains that certain packages are not found, please read section <a href="#INSTALLING-LaTeX-PACKAGES">&quot;INSTALLING LaTeX PACKAGES&quot;</a>.</p>
+
+<p>Now study that LaTeX source file and identify what template variables and control structures to use in order to turn it into a template. Rename the file to <code>main.tex.tx</code> and you are ready.</p>
+
+<p>Naturally, there will be a lot of head banging and hair pulling before you manage to produce results.</p>
+
+<h1 id="LaTeX-TEMPLATES">LaTeX TEMPLATES</h1>
+
+<p>Creating a LaTeX template is very easy. You need to start with a usual LaTeX document and identify those sections which can be replaced by the template variables. You can also identify repeated sections and replace them with loops. It is exactly the same procedure as with creating HTML templates or email messages templates.</p>
+
+<p>At this moment, the template processor is <a>Text::Xslate</a>. Therefore the syntax for declaring template variables, loops, conditionals, etc. must comply with what <a>Text::Xslate</a> expects. See section <a href="#TEMPLATE-PROCESSING">&quot;TEMPLATE PROCESSING&quot;</a> for where to start with <a>Text::Xslate</a>.</p>
+
+<p>A LaTeX template can live in memory as a Perl string or on disk, as a file in its own directory or not.</p>
+
+<p>If your template dependes on other templates you can include all as files in the same directory.</p>
+
+<p>If your template depends on your own LaTeX style files, packages etc., then include those in the same directory with the LaTeX templates. Additionally, when specifying the location of the template, specify <code>basedir</code> and <code>filename</code> (instead of a single <code>filepath</code>). This will ensure that all file dependencies contained within <code>basedir</code> will be copied to the temporary processing directories. See <a href="#new">&quot;new()&quot;</a> for how this works.</p>
+
+<h1 id="INSTALLING-LaTeX">INSTALLING LaTeX</h1>
+
+<p>Today, as far as I know, there are two main TeX/LaTeX distributions: <a href="https://miktex.org/">MikTeX</a> and <a href="https://www.tug.org/texlive/">TexLive</a></p>
+
+<p>Both provide the same LaTeX. They just package different things with it. And both provide package managers in order to make installing extra packages easy.</p>
+
+<p>I believe <a href="https://miktex.org/">MikTeX</a> was, at some time, aimed for M$ systems and <a href="https://www.tug.org/texlive/">TexLive</a> for the proper operating systems.</p>
+
+<p>My Linux package manager installs <a href="https://www.tug.org/texlive/">TexLive</a> and I am absolutely happy with it.</p>
+
+<h1 id="INSTALLING-LaTeX-PACKAGES">INSTALLING LaTeX PACKAGES</h1>
+
+<p>In Linux, it is preferred to install LaTeX packages via the system package manager.</p>
+
+<p>With modern TeX distributions installing LaTeX packages is quite simple. Both <a href="https://miktex.org/">MikTeX</a> and <a href="https://www.tug.org/texlive/">TexLive</a> provide package installers.</p>
+
+<p>See <a href="https://en.wikibooks.org/wiki/LaTeX/Installing_Extra_Packages#Automatic_installation">this guide</a> for more information.</p>
+
+<h2 id="Manual-installation">Manual installation</h2>
+
+<p>This is the hard way.</p>
+
+<p>All available LaTeX packages are located at the <a>Comprehensive TeX Archive Network (CTAN) site </a>. Search the package, download it, locate and change to your LaTeX installation directory (for example <code>/usr/share/texlive/texmf-dist</code>), change to <code>tex</code>. Decide which flavour of LaTeX (processor) this package is for, e.g. <code>latex</code>, <code>pdflatex</code> or <code>xelatex</code>, change to that directory and unzip the downloaded file there.</p>
+
+<h1 id="TESTING">TESTING</h1>
+
+<p>Some tests may fail because some required LaTeX fonts and/or style files are missing from your LaTeX installation. As of version 0.04 the test files which use complex LaTeX formatting and may require extra LaTeX packages have been designated as <i>author tests</i> and have been moved to the <code>xt/</code> directory. They are not part of the usual unit tests suite run with <code>make test</code>. They can be run using <code>make authortest</code>. If there are failures, try installing the missing LaTeX fonts and style files (see section <a href="#INSTALLING-LaTeX-PACKAGES">&quot;INSTALLING LaTeX PACKAGES&quot;</a>). Or freshen up your LaTeX installation. In any event, these tests are not important and their possible failure should not cause any convern.</p>
+
+<p>In order to run all tests download the tarball distribution of this module from CPAN (there is a link on the left side of the module&#39;s page for that), extract it, enter the directory and do:</p>
+
+<pre><code>perl Makefile.PL
+make all
+make test
+make authortest</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>There are a lot of temporary files/directories created by this package and its dependencies (e.g. <a>LaTeX::Driver</a>, <a>Capture::Tiny</a>, etc.). If you observe stray temporary files remaining in <code>/tmp</code> or equivalent, please let me know.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andreas Hadjiprocopis, <code>&lt;bliako at cpan.org&gt;</code></p>
+
+<h1 id="HUGS">HUGS</h1>
+
+<p>!Almaz!</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-latex-easy-templates at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=LaTeX-Easy-Templates">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=LaTeX-Easy-Templates</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>perldoc LaTeX::Easy::Templates</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=LaTeX-Easy-Templates">https://rt.cpan.org/NoAuth/Bugs.html?Dist=LaTeX-Easy-Templates</a></p>
+
+</li>
+<li><p>Review this module at PerlMonks</p>
+
+<p><a href="https://www.perlmonks.org/?node_id=21144">https://www.perlmonks.org/?node_id=21144</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/LaTeX-Easy-Templates">https://metacpan.org/release/LaTeX-Easy-Templates</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<ul>
+
+<li><p>TeX/LaTeX - excellent typography, superb aesthetics. Thank you Donald Knuth and Leslie Lamport and countless contributors.</p>
+
+</li>
+<li><p><a>Text::Xslate</a> - fast and feature-rich template engine. Thank you Shoichi Kaji and contributors.</p>
+
+</li>
+</ul>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2023 by Andreas Hadjiprocopis.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

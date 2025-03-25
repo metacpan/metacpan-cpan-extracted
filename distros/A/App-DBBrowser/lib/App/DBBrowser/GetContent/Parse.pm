@@ -15,7 +15,7 @@ use Encode::Locale    qw();
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold print_columns );
 use Term::Choose::Screen   qw( clear_screen );
-use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
+use Term::Choose::Util     qw( get_term_size unicode_sprintf insert_sep );
 use Term::Form             qw();
 
 use App::DBBrowser::Opt::Set;
@@ -66,7 +66,7 @@ sub parse_with_Text_CSV {
             $error_input =~ s/\R/ /g;
             my $info = "Close with ENTER\nText::CSV_XS\n$code $str\nrecord:$rec field:$fld position:$pos\n";
             $tc->choose(
-                [ line_fold( $error_input, get_term_width() ) ],
+                [ line_fold( $error_input, { join => 0 } ) ],
                 { info => $info, prompt => $prompt  }
             );
             $ax->print_sql_info( $info );

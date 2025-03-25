@@ -65,7 +65,7 @@ WriteMakefile(
         'String::Substitution'       => 0,
         'String::Unescape'           => 0,
         'SQL::Type::Guess'           => 0,
-        'Term::Choose'               => '1.768',
+        'Term::Choose'               => '1.769',
         'Term::Choose::Util'         => '0.143',
         'Term::Form'                 => '0.558',
         'Term::Form::ReadLine'       => '0.558',

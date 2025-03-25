@@ -4,7 +4,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-use Scalar::Util qw( refaddr );
+use Scalar::Util qw( refaddr reftype );
 
 require Exporter;
 
@@ -13,25 +13,27 @@ our %EXPORT_TAGS = ( 'all' => [ qw( walk unstorable ) ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( walk );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $TOP = 1;
 our %SEEN;
 
+sub DEBUG () { 0 }
+
 sub walk
 {
     my( $obj, $sub, $loc ) = @_;
-    # Thank you for pointing out tobyink@cpan.org
+    # Thank you tobyink@cpan.org for pointing out refaddr()
     my $addr = refaddr( $obj );
 
     $loc ||= '$o';
     return unless $sub->($loc, $obj);
 
-    my $r = ref $obj;
+    my $r = reftype $obj;
     return unless $r;
     return if $SEEN{$addr};
 
-    # warn "$loc is $r";
+    DEBUG and warn "$loc is $r";
 
     my $was_top = $TOP;
     local $TOP = 0;
@@ -88,7 +90,9 @@ Devel::Walk - Walk a complex object or reference.
 
 =head1 DESCRIPTION
 
-This is actually a very simple module.
+Devel::Walk is used to recursely walk through a data structure, visiting
+each element in it one at a time.  It keeps track of the location as a
+string that could, potentially, be used to delete or modify the structure.
 
 =head2 walk
 
@@ -108,11 +112,11 @@ For each element of the structure, C<$sub> is invoked as follows:
 
 Where C<$obj> is the current element of the structure being looked at and
 C<$location> is a string that can be used to find the current value.  Think
-of it as the I<address> of the current object, but in perl format.  It can
-be L<perlfunc/eval>ed to a value, provided C<$basename> is available in the
-current context.
+of it as the I<address> of the current object, but in perl format.  You can
+use L<perlfunc/eval> to find a value, provided C<$basename> is available in
+the current context.
 
-Example : "$o->{top}{second}[3]"
+Example : C<"$o->{top}{second}[3]">
 
 If C<$sub> returns true, recursion will happen on that reference.  If
 C<$sub> returns false, recursion ends.  
@@ -138,7 +142,7 @@ L<Devel::Walk::Unstorable>
 
 =head1 AUTHOR
 
-Philip Gwyn, E<lt>fil-at-pied.nuE<gt>
+Philip Gwyn, E<lt>perl -at- pied.nuE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

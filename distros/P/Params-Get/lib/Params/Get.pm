@@ -13,11 +13,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -44,6 +44,9 @@ our $VERSION = '0.01';
         print 'You are at ', $params->{'latitude'}, ', ', $params->{'longitude'}, "\n";
     }
 
+    where_am_i(latitude => 0.3, longitude => 124);
+    where_am_i({ latitude => 3.14, longitude => -155 });
+
 =head1	METHODS
 
 =head2 get_params
@@ -51,8 +54,8 @@ our $VERSION = '0.01';
 Parse the arguments given to a function.
 Processes arguments passed to methods and ensures they are in a usable format,
 allowing the caller to call the function in any way that they want
-e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-when called _get_params('arg', @_);
+e.g. `foo('bar')`, `foo(arg => 'bar')`, `foo({ arg => 'bar' })` all mean the same
+when called get_params('arg', @_);
 
 =cut
 
@@ -63,31 +66,34 @@ sub get_params
 	# Directly return hash reference if the first parameter is a hash reference
 	return $_[0] if(ref($_[0]) eq 'HASH');
 
-	my %rc;
 	my $num_args = scalar(@_);
 
 	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && defined($default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && defined($default)) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif($num_args == 0) {
-		return;
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} else {
+	if($num_args == 1) {
+		if(defined($default)) {
+			# %rc = ($default => shift);
+			return { $default => shift };
+		}
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
+	if($num_args == 0) {
+		if(defined($default)) {
+			# No means to say that the default is optional
+			Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+		}
+		return;
+	}
+	if(($num_args % 2) == 0) {
+		my %rc = @_;
+		return \%rc;
+	}
 
-	return \%rc;
+	Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 

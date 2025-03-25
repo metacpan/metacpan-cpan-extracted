@@ -11,7 +11,6 @@ use List::MoreUtils qw( any );
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( get_term_width );
 use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::Auxil;
@@ -242,10 +241,7 @@ sub __edit_sq_history_file {
         my $saved_subqueries = $h_ref->{$driver}{$db} // [];
         my @tmp_info = (
             @$top_lines,
-            map( line_fold(
-                $_->{name}, get_term_width(),
-                { init_tab => '  ', subseq_tab => '    ', join => 1 }
-            ), @$saved_subqueries ), #
+            map( line_fold( $_->{name}, { init_tab => '  ', subseq_tab => '    ' } ), @$saved_subqueries ), #
             ' '
         );
         my $info = join( "\n", @tmp_info );
@@ -305,15 +301,11 @@ sub __add_subqueries {
     while ( 1 ) {
         my @tmp_info = (
             @$top_lines,
-            map( line_fold(
-                $_->{name}, get_term_width(),
-                { init_tab => '  ', subseq_tab => '    ', join => 1 }
-            ), @$saved_subqueries ), #
+            map( line_fold( $_->{name}, { init_tab => '  ', subseq_tab => '    ' } ), @$saved_subqueries ), #
         );
         if ( @$added_sq ) {
-            push @tmp_info, map( line_fold(
-                $_->{name}, get_term_width(),
-                { init_tab => $pf_saved_subqueries, subseq_tab => '    ', join => 1 }
+            push @tmp_info, map(
+                line_fold( $_->{name}, { init_tab => $pf_saved_subqueries, subseq_tab => '    ' }
             ), @$added_sq ); #
         }
         push @tmp_info, ' ';
@@ -351,8 +343,7 @@ sub __add_subqueries {
                     next;
             }
             my $folded_stmt = "\n" . line_fold(
-                'Stmt: ' . $stmt, get_term_width(),
-                { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 }
+                'Stmt: ' . $stmt, { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) }
             );
             $info = join( "\n", @tmp_info ) . $folded_stmt;
             # Readline
@@ -403,8 +394,7 @@ sub __edit_subqueries {
         return;
     }
     my $folded_stmt = "\n" . line_fold(
-        'Stmt: ' . $stmt, get_term_width(),
-        { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 }
+        'Stmt: ' . $stmt, { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) }
     );
     $info .= $folded_stmt;
     my $default_name;
@@ -457,12 +447,10 @@ sub __remove_subqueries {
        $idx -= @pre;
         my @tmp_prompt = ( '' );
         push @tmp_prompt, line_fold(
-            'Name: ' . $saved_subqueries->[$idx]{name}, get_term_width(),
-            { init_tab => '', subseq_tab => ' ' x length( 'Name: ' ), join => 0 }
+            'Name: ' . $saved_subqueries->[$idx]{name}, { init_tab => '', subseq_tab => ' ' x length( 'Name: ' ) }
         );
         push @tmp_prompt, line_fold(
-            'Stmt: ' . $saved_subqueries->[$idx]{stmt}, get_term_width(),
-            { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 0 }
+            'Stmt: ' . $saved_subqueries->[$idx]{stmt}, { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) }
         );
         push @tmp_prompt, '', $prompt;
         my $ok = $tc->choose(

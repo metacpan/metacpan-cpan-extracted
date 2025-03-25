@@ -7,12 +7,13 @@ use 5.014;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose           qw();
-use Term::Choose::LineFold qw( line_fold print_columns );
-use Term::Choose::Util     qw( insert_sep get_term_width get_term_height unicode_sprintf );
-use Term::Choose::Screen   qw( clear_screen );
-use Term::Form             qw();
-use Term::Form::ReadLine   qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( EXTRA_W );
+use Term::Choose::LineFold  qw( line_fold print_columns );
+use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
+use Term::Choose::Screen    qw( clear_screen );
+use Term::Form              qw();
+use Term::Form::ReadLine    qw();
 
 use App::DBBrowser::Auxil;
 
@@ -464,12 +465,10 @@ sub __insert_cell {
         splice( @row, $col_idx, 0, '<*>' );
         my $str_row_with_placeholder = _stringify_row( \@row );
         $str_row_with_placeholder =~ s/"<\*>"/<*>/;
-        my $term_w = get_term_width();
         my $label = 'Row: ';
         my @tmp_info = ( $filter_str );
         push @tmp_info, line_fold(
-            $label . $str_row_with_placeholder, $term_w,
-            { subseq_tab => ' ' x length $label, join => 0 }
+            $label . $str_row_with_placeholder, { subseq_tab => ' ' x length $label, join => 0 }
         );
         $prompt = "<*>: ";
         $info = $sf->__get_filter_info( $sql, join( "\n", @tmp_info ) );
@@ -659,7 +658,7 @@ sub __merge_rows {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $aoa = $sql->{insert_args};
-    my $term_w = get_term_width();
+    my $term_w = get_term_width() + EXTRA_W;
     my $stringified_rows;
     {
         my $dots = $sf->{i}{dots};
@@ -668,7 +667,7 @@ sub __merge_rows {
         @$stringified_rows = map {
             my $str_row = join( ',', @$_ );
             if ( print_columns( $str_row ) > $term_w ) {
-                unicode_sprintf( $str_row, $term_w, { mark_if_trundated => [ $dots, $dots_w ] } );
+                $str_row = unicode_sprintf( $str_row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
             }
             else {
                 $str_row;
@@ -751,7 +750,7 @@ sub __join_columns {
         my @tmp_info = ( $filter_str );
         my $label = 'Cols: ';
         push @tmp_info, line_fold(
-            $label . '"' . join( '", "', @{$header}[@$chosen_idxs] ) . '"', get_term_width(),
+            $label . '"' . join( '", "', @{$header}[@$chosen_idxs] ) . '"',
             { subseq_tab => ' ' x length $label, join => 0 }
         );
         $info = $sf->__get_filter_info( $sql, join( "\n", @tmp_info ) );

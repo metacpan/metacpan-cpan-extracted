@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.768';
+our $VERSION = '1.769';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -742,8 +742,9 @@ sub __prepare_info_and_prompt_lines {
         my $subseq   = $self->{tabs_info}[1] // 0;
         my $r_margin = $self->{tabs_info}[2] // 0;
         push @tmp_prompt, line_fold(
-            $self->{info}, $info_w - $r_margin,
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 0 }
+            $self->{info},
+            { width => $info_w - $r_margin, init_tab => ' ' x $init, subseq_tab => ' ' x $subseq,
+              color => $self->{color}, join => 0 }
         );
     }
     if ( length $self->{prompt} ) {
@@ -751,8 +752,9 @@ sub __prepare_info_and_prompt_lines {
         my $subseq   = $self->{tabs_prompt}[1] // 0;
         my $r_margin = $self->{tabs_prompt}[2] // 0;
         push @tmp_prompt, line_fold(
-            $self->{prompt}, $info_w - $r_margin,
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 0 }
+            $self->{prompt},
+            { width => $info_w - $r_margin, init_tab => ' ' x $init, subseq_tab => ' ' x $subseq,
+              color => $self->{color}, join => 0 }
         );
     }
     if ( length $self->{search_info} ) {
@@ -1278,7 +1280,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.768
+Version 1.769
 
 =cut
 
@@ -1923,8 +1925,10 @@ It is required a terminal that uses a monospaced font which supports the printed
 
 =head2 Ambiguous width characters
 
-By default ambiguous width characters are treated as half width. If the environment variable C<TC_AMBIGUOUS_WIDE> is set
-to a true value, ambiguous width characters are treated as full width.
+By default ambiguous width characters are treated as half width. If the environment variable
+C<TC_AMBIGUOUS_WIDTH_IS_WIDE> is set to a true value, ambiguous width characters are treated as full width.
+
+The support for the old variable name C<TC_AMBIGUOUS_WIDE> will be removed.
 
 =head2 Escape sequences
 

@@ -13,10 +13,11 @@ use File::Spec::Functions qw( catfile catdir );
 use List::MoreUtils qw( uniq firstidx );
 use Encode::Locale  qw();
 
-use Term::Choose           qw();
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( get_term_width );
-use Term::Form             qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( EXTRA_W );
+use Term::Choose::LineFold  qw( line_fold );
+use Term::Choose::Util      qw( get_term_width );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 
@@ -34,11 +35,11 @@ sub new {
 
 sub __get_read_info {
     my ( $sf, $aoa ) = @_;
-    my $term_w = get_term_width();
+    my $term_w = get_term_width() + EXTRA_W;
     my @tmp = ( 'DATA:' );
     for my $row ( @$aoa ) {
         no warnings 'uninitialized';
-        push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4, join => 0 } );
+        push @tmp, line_fold( join( ', ', @$row ), { width => $term_w, subseq_tab => ' ' x 4, join => 0 } );
     }
     return join( "\n", @tmp ) . "\n";
 }

@@ -71,25 +71,6 @@ if (-d $path) {
                             last; # bail out
                         }
                     }
-
-                    # check for text in a {{#first}} block
-                    if ($line =~ m/\{\{\#first\}\}/){
-                        while ($line =~ m/\#first\}\}(.*?)\{\{\/first/){
-                            my $text_in_sub = 0;
-                            my $fblock = $1;
-                            my @pieces = split(/ \|\| /, $fblock);
-                            foreach my $piece (@pieces){
-                                $piece =~ s/^\s//;
-                                $piece =~ s/\s$//;
-                                if (($piece !~ m/^\{\{/) || ($piece !~ m/\}\}$/)){
-                                    warn "text in first block $fblock";
-                                    $text_in_sub = 1;
-                                }
-                            }
-                            ok($text_in_sub == 0, "no text in first block");
-                            last;
-                        }
-                    }
                 }
                 close $FH;
                 ok($no_bad_parens == 1, 'no badly escaped parens in worldwide conf file');

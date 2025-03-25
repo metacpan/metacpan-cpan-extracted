@@ -13,6 +13,7 @@ is($$bar, 24);
 $$bar++;
 is($obj->foo, 25);
 
+=cut
 my $baz = \($obj->foo);
 $$baz++;
 is($obj->foo, 26);
@@ -24,5 +25,6 @@ is(__PACKAGE__->cfoo, 25);
 my $cbaz = \(__PACKAGE__->cfoo);
 $$cbaz++;
 is(__PACKAGE__->cfoo, 26);
+=cut
 
 done_testing;

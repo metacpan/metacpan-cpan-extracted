@@ -192,7 +192,7 @@ L<Storable>
 
 =head1 AUTHOR
 
-Philip Gwyn, E<lt>fil-at-pied.nuE<gt>
+Philip Gwyn, E<lt>perl -at- pied.nuE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -14,11 +14,11 @@ Log::Abstraction - Logging abstraction layer
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 =head1 SYNOPSIS
 
@@ -42,9 +42,14 @@ It also supports logging to syslog if configured.
 
 =head2 new
 
-  my $logger = Log::Abstraction->new(%args);
+    my $logger = Log::Abstraction->new(%args);
 
 Creates a new C<Log::Abstraction> object.
+
+Clones existing objects with or without modifications.
+
+    my $clone = $logger->new();
+
 The argument can be a hash,
 a reference to a hash or the C<logger> value.
 The following arguments can be provided:
@@ -92,6 +97,20 @@ sub new {
 		my $config = Config::Auto::parse($args{'config_file'});
 		# my $config = YAML::XS::LoadFile($args{'config_file'});
 		%args = (%{$config}, %args);
+	}
+
+	if(!defined($class)) {
+		if((scalar keys %args) > 0) {
+			# Using Log::Abstraction:new(), not Log::Abstraction->new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %args }, ref($class);
 	}
 
 	if($args{'syslog'} && !$args{'script_name'}) {
@@ -241,19 +260,24 @@ sub warn {
 		return;
 	}
 
+	# Log the warning message
+	$self->_log('warn', $warning);
+
 	if($self->{syslog}) {
 		# Handle syslog-based logging
 		if(ref($self->{syslog}) eq 'HASH') {
 			Sys::Syslog::setlogsock($self->{syslog});
 		}
 		openlog($self->{script_name}, 'cons,pid', 'user');
-		syslog('warning|local0', $warning);
+		eval {
+			syslog('warning|local0', $warning);
+		};
+		my $err = $@;
 		closelog();
-	}
-
-	# Log the warning message
-	$self->_log('warn', $warning);
-	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
+		if($err)  {
+			Carp::carp($err);
+		}
+	} elsif(!defined($self->{logger})) {
 		# Fallback to Carp if no logger or syslog is defined
 		Carp::carp($warning);
 	}
@@ -262,6 +286,42 @@ sub warn {
 =head1 AUTHOR
 
 Nigel Horne C< <njh@nigelhorne.com> >
+
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-log-abstraction at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-Abstraction>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Log::Abstraction
+
+You can also look for information at:
+
+=over 4
+
+=item * MetaCPAN
+
+L<https://metacpan.org/dist/Log-Abstraction>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Abstraction>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Log-Abstraction>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=Log::Abstraction>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

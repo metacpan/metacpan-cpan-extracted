@@ -1,7 +1,7 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.41.0
+## Version v0.42.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.41.0';
+    our $VERSION     = 'v0.42.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1672,6 +1672,31 @@ sub new_json
             }
         }
     }
+    return( $j );
+}
+
+sub new_json_safe
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $self->_load_class( 'Module::Generic::JSON' ) || return( $self->pass_error );
+    my $defaults =
+    {
+        allow_nonref    => 1,
+        allow_blessed   => 1,
+        convert_blessed => 1,
+        allow_tags      => 1,
+        relaxed         => 1,
+    };
+    foreach my $opt ( keys( %$defaults ) )
+    {
+        if( !exists( $opts->{ $opt } ) || !defined( $opts->{ $opt } ) )
+        {
+            $opts->{ $opt } = $defaults->{ $opt };
+        }
+    }
+    my $j = Module::Generic::JSON->new( %$opts ) ||
+        return( $self->pass_error( Module::Generic::JSON->error ) );
     return( $j );
 }
 
@@ -9500,7 +9525,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.41.0
+    v0.42.0
 
 =head1 DESCRIPTION
 
@@ -10333,6 +10358,10 @@ Boolean. When enabled, this will add an extra optional space before the ":" sepa
 Boolean. This option is ignored, because the JSON data are saved to file using UTF-8 and double encoding would produce mojibake.
 
 =back
+
+=head2 new_json_safe
+
+This is the same as L<new_json|/new_json>, except that it uses L<Module::Generic::JSON>, which is a thin, and reliable wrapper around L<JSON>. L<Module::Generic::JSON> never dies, but instead sets an L<error object|Module::Generic::Exception>, and returns C<undef>, or an empty list depending on the caller context.
 
 =head2 new_null
 

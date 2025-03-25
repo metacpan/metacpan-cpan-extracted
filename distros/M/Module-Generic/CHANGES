@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v0.42.0 2025-03-24T22:15:34+0900
+    - Added method new_json_safe in Module::Generic
+    - Corrected unit tests for 25.file_csv.t
+
 v0.41.0 2025-03-24T09:40:36+0900
     - Added module Module::Generic::JSON
 

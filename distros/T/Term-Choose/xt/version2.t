@@ -2,7 +2,7 @@ use 5.10.0;
 use strict;
 use warnings;
 use Time::Piece;
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 
 
@@ -23,6 +23,17 @@ close $fh;
 is( $v, $v_pod, 'Version in POD Term::Choose OK' );
 
 
+my $lf_v_pod = -1;
+open $fh, '<', 'lib/Term/Choose/LineFold.pm' or die $!;
+while ( my $line = <$fh> ) {
+    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
+        if ( $line =~ /^\s*Version\s+(\S+)/ ) {
+            $lf_v_pod = $1;
+        }
+    }
+}
+close $fh;
+is( $v, $lf_v_pod, 'Version in POD Term::Choose::LineFold OK' );
 
 
 my @modules = qw(

@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
                 type => 'git',
             },
             bugtracker => {
-                web => 'https://github.com/hadjiprocopis/LaTeX-Easy-Templates/issues',
+                web => 'https://github.com/hadjiprocopis/perl-LaTeX-Easy-Templates/issues',
             }
         },
     },

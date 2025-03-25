@@ -1,0 +1,5 @@
+Revision history for Perl extension String::CRC32C
+
+0.01  Mon 24 Mar 2025 11:12:57 CET
+	- cloned from Convert-Scalar, which is my module starter.
+

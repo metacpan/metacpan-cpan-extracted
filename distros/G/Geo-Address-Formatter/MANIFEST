@@ -312,7 +312,6 @@ t/blackbox/countries.t
 t/blackbox/state_code.t
 t/unit/abbreviate.t
 t/unit/countries.t
-t/unit/critic.t
 t/unit/formatter.t
 t/unit/memory_use.t
 t/unit/only_address.t

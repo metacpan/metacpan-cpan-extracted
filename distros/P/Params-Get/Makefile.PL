@@ -13,7 +13,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	ABSTRACT_FROM	=> 'lib/Params/Get.pm',
-	AUTHOR => 'Nigel Horne <njh@bandsman.co.uk>',
+	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
 	NAME => 'Params::Get',
 	VERSION_FROM => 'lib/Params/Get.pm', # finds $VERSION in the module
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))

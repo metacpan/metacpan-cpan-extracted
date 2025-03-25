@@ -178,7 +178,7 @@ sub AUTOLOAD
 
     if( $self )
     {
-        my $j = $self->{_json} || die( "No JSON object could be found! This should not happen." );
+        my $j = $self->{_json} || return( $self->error( "No JSON object could be found! This should not happen." ) );
         if( $code = $j->can( $meth ) )
         {
             local $@;

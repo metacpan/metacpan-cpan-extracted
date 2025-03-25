@@ -1,29 +1,52 @@
 use 5.10.0;
 use strict;
 use warnings;
-use Test::More tests => 1;
+use File::Basename qw( basename );
+use Test::More;
 
 
-my $file = 'lib/Term/Choose.pm';
+for my $file ( qw(
+lib/Term/Choose.pm
+lib/Term/Choose/Constants.pm
+lib/Term/Choose/LineFold.pm
+lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
+lib/Term/Choose/LineFold/CharWidthDefault.pm
+lib/Term/Choose/Linux.pm
+lib/Term/Choose/Opt/Mouse.pm
+lib/Term/Choose/Opt/Search.pm
+lib/Term/Choose/Opt/SkipItems.pm
+lib/Term/Choose/Screen.pm
+lib/Term/Choose/ValidateOptions.pm
+lib/Term/Choose/Win32.pm
+) ) {
 
+    my $data_dumper   = 0;
+    my $warnings      = 0;
+    my $use_lib       = 0;
+    my $warn_to_fatal = 0;
 
-my $test_env = 0;
-
-open my $fh1, '<', $file or die $!;
-while ( my $line = <$fh1> ) {
-    if ( $line =~ /\$\s*SIG\s*{\s*__WARN__\s*}/ ) {
-        $test_env++;
+    open my $fh, '<', $file or die $!;
+    while ( my $line = <$fh> ) {
+        if ( $line =~ /^\s*use\s+Data::Dumper/s ) {
+            $data_dumper++;
+        }
+        if ( $line =~ /^\s*use\s+warnings\s+FATAL/s ) {
+            $warnings++;
+        }
+        if ( $line =~ /^\s*use\s+lib\s/s ) {
+            $use_lib++;
+        }
+        if ( $line =~ /__WARN__.+die/s ) {
+            $warn_to_fatal++;
+        }
     }
-    if ( $line =~ /^\s*use\s+warnings\s+FATAL/s ) {
-        $test_env++;
-    }
-    if ( $line =~ /(?:^\s*|\s+)use\s+Log::Log4perl/ ) {
-        $test_env++;
-    }
-    if ( $line =~ /(?:^\s*|\s+)use\s+Data::Dumper/ ) {
-        $test_env++;
-    }
+    close $fh;
+
+    is( $data_dumper,   0, 'OK - Data::Dumper in "'         . basename( $file ) . '" disabled.' );
+    is( $warnings,      0, 'OK - warnings FATAL in "'       . basename( $file ) . '" disabled.' );
+    is( $use_lib,       0, 'OK - no "use lib" in "'         . basename( $file ) . '"' );
+    is( $warn_to_fatal, 0, 'OK - no "warn to fatal" in "'   . basename( $file ) . '"' );
 }
-close $fh1;
 
-is( $test_env, 0, "OK - test environment in $file disabled." );
+
+done_testing();

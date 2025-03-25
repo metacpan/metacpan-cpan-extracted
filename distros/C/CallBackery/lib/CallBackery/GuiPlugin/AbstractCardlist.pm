@@ -116,8 +116,14 @@ sub getData {
     my $self = shift;
     my $call = shift // '';
 
-    if ($call eq 'allCardData') {
-        return $self->$call(@_);
+    if ($call eq 'getAllCardData') {
+        my $parentFormData = shift;
+        return $self->getAllCardData($parentFormData, @_);
+    }
+    elsif ($call eq 'allCardData') {
+        # backward compatibility with previously broken CardList.js implementation
+        $self->log->warn("allCardData() is deprecated, use getAllCardData() instead");
+        return $self->allCardData(@_);
     }
     else {
         return $self->SUPER::getData($call, @_);
@@ -125,15 +131,36 @@ sub getData {
 }
 
 
-=head2 getTableRowCount({formData=>{}})
+=head2 getAllCardData(parentFormData, { currentFormData => data }, @_)
 
-is not used for card plugins.
+return data appropriate for the card list widget
 
 =cut
 
-sub getTableRowCount {
-    return;
+sub getAllCardData {
+    my $self = shift;
+    state $warned = 0;
+    if (not $warned) {
+        $self->log->warn("getAllCardData() must be overridden");
+        $self->log->warn("Calling deprecated method allCardData(), you should use getAllCardData() instead.");
+        $warned = 1;
+    }
+    return $self->allCardData(@_);
 }
+
+
+=head2 allCardData()
+
+deprecated, return data appropriate for the card list widget
+
+=cut
+
+sub allCardData {
+    my $self = shift;
+    $self->log->warn("allCardData() is deprecated, use getAllCardData() instead");
+    return [{}];
+}
+
 
 =head2 makeExportAction(type => 'XLSX', filename => 'export-"now"', label => 'Export')
 

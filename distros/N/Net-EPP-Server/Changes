@@ -1,5 +1,8 @@
 Revision history for perl module Net::EPP::Server:
 
+0.004 - 2025-03-24
+  - avoid exception when client doesn't use <clTRID> in commands.
+
 0.003 - 2025-02-19
   - fix copyright date
   - minor documentation update

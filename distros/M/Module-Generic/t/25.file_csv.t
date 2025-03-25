@@ -7,7 +7,6 @@ BEGIN
     use vars qw( $DEBUG );
     use open ':std' => ':utf8';
     use Test::More;
-    use_ok( 'Module::Generic::File', ('file') ) || BAIL_OUT( "Unable to load Module::Generic::File" );
     local $@;
     eval( 'require Text::CSV' );
     if( $@ )
@@ -18,6 +17,7 @@ BEGIN
     {
         plan();
     }
+    use_ok( 'Module::Generic::File', ('file') ) || BAIL_OUT( "Unable to load Module::Generic::File" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

@@ -4,24 +4,39 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.768';
+our $VERSION = '1.769';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
 
-use Term::Choose::Constants qw( PH SGR_ES );
+use Carp qw( croak );
+
+use Term::Choose::Constants qw( PH SGR_ES EXTRA_W );
+use Term::Choose::Screen    qw( get_term_size );
 
 
 BEGIN {
-    if ( $ENV{TC_AMBIGUOUS_WIDE} ) {
-        require Term::Choose::LineFold::CharWidthAmbiguousWide;
-        Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );
-    }
-    else {
-        require Term::Choose::LineFold::CharWidthDefault;
-        Term::Choose::LineFold::CharWidthDefault->import( 'table_char_width' );
-    }
+    if ( exists $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {                                       #
+        if ( $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {
+            require Term::Choose::LineFold::CharWidthAmbiguousWide;
+            Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );
+        }
+        else {
+            require Term::Choose::LineFold::CharWidthDefault;
+            Term::Choose::LineFold::CharWidthDefault->import( 'table_char_width' );
+        }
+    }                                                                                       #
+    else {                                                                                  #
+        if ( $ENV{TC_AMBIGUOUS_WIDE} ) {                                                    #
+            require Term::Choose::LineFold::CharWidthAmbiguousWide;                         #
+            Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );   #
+        }                                                                                   #
+        else {                                                                              #
+            require Term::Choose::LineFold::CharWidthDefault;                               #
+            Term::Choose::LineFold::CharWidthDefault->import( 'table_char_width' );         #
+        }                                                                                   #
+    }                                                                                       #
 }
 
 
@@ -71,7 +86,8 @@ sub print_columns {
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_width, $return_remainder ) = @_;
+    my ( $str, $avail_width ) = @_;
+    my $return_remainder = wantarray;
     my $count = 0;
     my $total = 0;
     my $c;
@@ -97,16 +113,37 @@ sub cut_to_printwidth {
 
 
 sub line_fold {
-    my ( $str, $avail_width, $opt ) = @_; #copy $str
+    my ( $str, $opt ) = @_; # copy $str
     if ( ! length $str ) {
         return $str;
     }
-    my $max_tab_width = int( $avail_width / 2 );
+    ################################### 24.03.2025
+    if ( defined $opt && ! ref $opt ) {
+        my $width = $opt;
+        $opt = $_[2] // {};
+        $opt->{width} = $width;
+    }
+    ###################################
+    $opt //= {};
+    $opt->{join} //= 1;
+    if ( ! defined $opt->{width} ) {
+        my ( $term_width, undef ) = get_term_size();
+        $opt->{width} = $term_width + EXTRA_W;
+    }
+    elsif ( $opt->{width} !~ /^[1-9][0-9]*\z/ ) {
+        croak "Option 'width': '$opt->{width}' is not an Integer 1 or greater!";
+    }
+    my $max_tab_width = int( $opt->{width} / 2 );
     for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
         if ( length ) {
-            s/\t/ /g;
-            s/\v+/\ \ /g;
-            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            if ( /^[0-9]+\z/ ) {
+                $_ = ' ' x $_;
+            }
+            else {
+                s/\t/ /g;
+                s/\v+/\ \ /g; ##
+                s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            }
             if ( length > $max_tab_width ) {
                 $_ = cut_to_printwidth( $_, $max_tab_width );
             }
@@ -132,7 +169,7 @@ sub line_fold {
     $str =~ s/\t/ /g;
     $str =~ s/[^\v\P{Cc}]//g; # remove control chars but keep vertical spaces
     $str =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
-    if ( $str !~ /\R/ && print_columns( $opt->{init_tab} . $str ) <= $avail_width && ! @color ) {
+    if ( $str !~ /\R/ && print_columns( $opt->{init_tab} . $str ) <= $opt->{width} && ! @color ) {
         return $opt->{init_tab} . $str;
     }
     my @paragraphs;
@@ -144,7 +181,7 @@ sub line_fold {
         my $line = $opt->{init_tab};
 
         for my $i ( 0 .. $#words ) {
-            if ( print_columns( $line . $words[$i] ) <= $avail_width ) {
+            if ( print_columns( $line . $words[$i] ) <= $opt->{width} ) {
                 $line .= $words[$i];
             }
             else {
@@ -157,11 +194,11 @@ sub line_fold {
                     $words[$i] =~ s/^\s+//;
                     $tmp = $opt->{subseq_tab} . $words[$i];
                 }
-                ( $line, my $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
+                ( $line, my $remainder ) = cut_to_printwidth( $tmp, $opt->{width} );
                 while ( length $remainder ) {
                     push( @lines, $line );
                     $tmp = $opt->{subseq_tab} . $remainder;
-                    ( $line, $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
+                    ( $line, $remainder ) = cut_to_printwidth( $tmp, $opt->{width} );
                 }
             }
             if ( $i == $#words ) {
@@ -210,3 +247,115 @@ sub line_fold {
 
 
 1;
+
+__END__
+
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Choose::LineFold
+
+=head1 VERSION
+
+Version 1.769
+
+=cut
+
+=head1 DESCRIPTION
+
+I<Width> in this context refers to the number of occupied columns of a character string on a terminal with a monospaced
+font.
+
+By default ambiguous width characters are treated as half width. If the environment variable
+C<TC_AMBIGUOUS_WIDTH_IS_WIDE> is set to a true value, ambiguous width characters are treated as full width.
+
+=head1 EXPORT
+
+Nothing by default.
+
+    use Term::Choose qw( print_columns );
+
+=head1 FUNCTIONS
+
+=head2 print_columns
+
+Get the number of occupied columns of a character string on a terminal.
+
+The string passed to this function is a decoded string, free of control characters, non-characters, and surrogates.
+
+    $print_width = print_columns( $string );
+
+=head2 cut_to_printwidth
+
+Cut a string to a specified width.
+
+The string passed to this function is a decoded string, free of control characters, non-characters, and surrogates.
+
+    $cut_string = cut_to_printwidth( $string, $width );
+
+When used in a list context, the function returns both the cut string and the remaining portion of the original string.
+If there is no remaining portion, it returns an empty string instead.
+
+    ( $cut_string, $remainder ) = cut_to_printwidth( $string, $width );
+
+If the width of the cut string is less than C<$width>, a space character is appended.
+
+=head2 line_fold
+
+Fold a string.
+
+This function accepts a decoded string. Control characters (excluding vertical spaces), non-characters, and surrogates
+are removed before the string is folded. Changes are applied to a copy; the passed string is unchanged.
+
+    $folded_string = line_fold( $string );
+
+    $folded_string = line_fold( $string, { width => 120, color => 1 } );
+
+=head3 Options
+
+=over
+
+=item width
+
+If not set, defaults to the terminal width.
+
+I<width> is C<1> or greater.
+
+=item init_tab
+
+Sets the initial tab inserted at the beginning of paragraphs. If a positive integer is provided, the initial tab will be
+I<int_tab> spaces. If a non-numeric value is provided, it will be used as the initial tab directly. By default, no
+initial tab is inserted. If the initial tab is longer than half the available width, it will be cut to half the
+available width
+
+=item subseq_tab
+
+Sets the subsequent tab inserted at the beginning of all broken lines (excluding paragraph beginnings). If a positive
+integer is provided, the subsequent tab will be I<subseq_tab> spaces. If a non-numeric value is provided, it will be
+used as the subsequent tab directly. By default, no subsequent tab is inserted. If the subsequent tab is longer than
+half the available width, it will be cut to half the available width
+
+=item color
+
+Enables support for ANSI SGR escape sequences. If enabled, all zero-width no-break spaces (C<0xfeff>) are removed.
+
+I<color> is C<0> or C<1>.
+
+=back
+
+=head1 AUTHOR
+
+Matthäus Kiem <cuer2s@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2025 Matthäus Kiem.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
+details, see the full text of the licenses in the file LICENSE.
+
+=cut

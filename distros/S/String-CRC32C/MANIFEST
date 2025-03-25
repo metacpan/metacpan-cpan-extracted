@@ -1,0 +1,16 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+CRC32C.pm
+CRC32C.xs
+t/00_load.t
+t/01_testvec.t
+crc32csb8.c
+crc32ctables.c
+crc32intelc.c
+crc32intelc.h
+crc32inteltable.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.559';
+our $VERSION = '0.560';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -272,7 +272,7 @@ sub __init_readline {
     }
     if ( length $self->{info} ) {
         my $info_w = $term_w + EXTRA_W;
-        my @info = line_fold( $self->{info}, $info_w, { color => $self->{color}, join => 0 } );
+        my @info = line_fold( $self->{info}, { width => $info_w, color => $self->{color}, join => 0 } );
         $self->{i}{info_row_count} = @info;
         if ( $self->{clear_screen} == 2 ) {
             print clear_to_end_of_line();
@@ -480,7 +480,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.559
+Version 0.560
 
 =cut
 

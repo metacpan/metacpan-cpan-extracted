@@ -1,5 +1,9 @@
 Revision history for Log-Abstraction
 
+0.07	Mon Mar 24 08:36:01 EDT 2025
+	Handle "Socket operation on non-socket" on Solaris
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.06	Wed Mar 12 13:23:24 EDT 2025
 	Don't put spaces between elements of an array
 

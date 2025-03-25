@@ -33,14 +33,14 @@
     if (TYPE_INHERITED && payload->read_cb) {  \
         ENTER;                                      \
         PUSHMARK(SP);                               \
-        *(SP+1) = result;                           \
+        *(SP+1) = sv_2mortal(newSVsv(result));      \
         if (type == InheritedCbNamed) {             \
             PUSH_PAYLOAD_KEY;                       \
         }                                           \
         call_sv(payload->read_cb, G_SCALAR);        \
         LEAVE;                                      \
     } else {                                        \
-        *(SP+1) = result;                           \
+        *(SP+1) = sv_2mortal(newSVsv(result));      \
     }                                               \
 
 #define CALL_WRITE_CB(slot, need_alloc)             \

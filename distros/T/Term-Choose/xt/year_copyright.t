@@ -11,6 +11,7 @@ my @files = (
     'README',
     'LICENSE',
     'lib/Term/Choose.pm',
+    'lib/Term/Choose/LineFold.pm',
 );
 
 my $author = 'Matth..?us Kiem';

@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel::Walk.
 
+0.04  Mar 24 20:08 2025
+    - use Scalar::Util::reftype() instead of ref()
+
 0.03  Mar 21 14:14 2025
     - Detect circular references in a structure thanks to Scalar::Util::refaddr
         - Thank you Toby Inkster (TOBYINK) <tobyink@cpan.org>

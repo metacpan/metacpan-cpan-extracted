@@ -1,3 +1,8 @@
+0.52.0 2025-03-24 11:18:49 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+  - Make CardList return the parentFormData. Deprecate allCardData(),
+    use getAllCardData() instead.
+
 0.51.0 2025-03-13 17:19:07 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - add info box for card list. see GuiPlugin/AbstractCardlist.pm 

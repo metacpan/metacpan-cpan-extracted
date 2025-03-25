@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.426  2025-03-24
+        - Term::Choose minimum version 1.769.
+        - Update 'line_fold'.
+        - Bugfix in input filter 'merge_rows' info output.
+
 2.425  2025-03-23
         - Filter 'convert date': skip empty cells.
         - Union: the option 'edit statement' replaces the option 'where'.

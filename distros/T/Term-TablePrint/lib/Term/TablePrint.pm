@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.167';
+our $VERSION = '0.168';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -763,7 +763,7 @@ sub __print_single_row {
         my $subseq_tab = ' ' x ( $max_key_w + $sep_w );
         my $count;
 
-        for my $line ( line_fold( $value, $max_value_w, { join => 0, color => $self->{color}, binary_filter => $self->{binary_filter} } ) ) {
+        for my $line ( line_fold( $value, { width => $max_value_w, color => $self->{color}, binary_filter => $self->{binary_filter}, join => 0 } ) ) {
             if ( ! $count++ ) {
                 push @$row_data, $key . $separator . $line;
             }
@@ -915,7 +915,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.167
+Version 0.168
 
 =cut
 

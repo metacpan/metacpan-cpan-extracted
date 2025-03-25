@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.559';
+our $VERSION = '0.560';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -534,7 +534,7 @@ sub __print_readline {
 sub __unicode_trim {
     my ( $self, $str, $len ) = @_;
     return $str if print_columns( $str ) <= $len;
-    return cut_to_printwidth( $str, $len - $self->{i}{char_trimmed_w}, 0 ) . $self->{i}{char_trimmed};
+    return cut_to_printwidth( $str, $len - $self->{i}{char_trimmed_w} ) . $self->{i}{char_trimmed};
 }
 
 
@@ -560,7 +560,7 @@ sub __prepare_hight {
     $self->{i}{avail_h} = $term_h;
     if ( length $self->{i}{info_prompt} ) {
         my $info_w = $term_w + EXTRA_W;
-        my @info_prompt = line_fold( $self->{i}{info_prompt}, $info_w, { color => $self->{color}, join => 0 } );
+        my @info_prompt = line_fold( $self->{i}{info_prompt}, { width => $info_w, color => $self->{color}, join => 0 } );
         $self->{i}{info_prompt_row_count} = @info_prompt;
         $self->{i}{info_prompt} = join "\n", @info_prompt;
         $self->{i}{avail_h} -= $self->{i}{info_prompt_row_count};
@@ -614,11 +614,11 @@ sub __prepare_skip_row {
     my ( $self, $list, $idx ) = @_;
     my $remainder = '';
     my $val = '';
-    ( $self->{i}{keys}[$idx], $remainder ) = cut_to_printwidth( $list->[$idx][0], $self->{i}{max_key_w}, 1 );
+    ( $self->{i}{keys}[$idx], $remainder ) = cut_to_printwidth( $list->[$idx][0], $self->{i}{max_key_w} );
     if ( length $remainder ) {
-        ( $self->{i}{seps}[$idx], $remainder ) = cut_to_printwidth( $remainder, 2, 1 );
+        ( $self->{i}{seps}[$idx], $remainder ) = cut_to_printwidth( $remainder, 2 );
         if ( length $remainder ) {
-            $val = cut_to_printwidth( $remainder, $self->{i}{avail_w}, 0 );
+            $val = cut_to_printwidth( $remainder, $self->{i}{avail_w} );
         }
     }
     if ( ! length $self->{i}{seps}[$idx] ) {
@@ -762,7 +762,7 @@ sub __prepare_meta_menu_elements {
         }
         $tmp = $self->__sanitized_string( $tmp );
         if ( print_columns( $tmp ) > $term_w ) {
-            $tmp = cut_to_printwidth( $tmp, $term_w, 0 );
+            $tmp = cut_to_printwidth( $tmp, $term_w );
         }
         if ( @color ) {
             $tmp =~ s/${\PH}/shift @color/ge;
@@ -1170,7 +1170,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.559
+Version 0.560
 
 =cut
 

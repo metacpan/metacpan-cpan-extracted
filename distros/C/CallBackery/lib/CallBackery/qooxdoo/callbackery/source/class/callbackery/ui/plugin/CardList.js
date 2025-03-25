@@ -15,9 +15,10 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
 
         // replace setData method of parent class
         this._form['setData'] = qx.lang.Function.bind(this.setData, this);
+        this._getParentFormData = getParentFormData;
 
         this.addListener('actionResponse', function(e){
-            var data = e.getData();
+            let data = e.getData();
             switch (data.action){
             case 'reload':
             case 'dataModified':
@@ -75,10 +76,14 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
 
         // called from form appear listener
         _loadData : function() {
-            var that = this;
-            var rpc = callbackery.data.Server.getInstance();
-            var currentFormData = this._form.getData();
-            var busy = callbackery.ui.Busy.getInstance();
+            let that = this;
+            let rpc = callbackery.data.Server.getInstance();
+            let currentFormData = this._form.getData();
+            let parentFormData;
+            if (this._getParentFormData) {
+                 parentFormData = this._getParentFormData();
+            }
+            let busy = callbackery.ui.Busy.getInstance();
             busy.manifest(this.tr('Loading Card Data'));
             this._loading++;
             rpc.callAsync(function(data,exc){
@@ -111,7 +116,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
                 }
                 busy.vanish();
                 that._loading--;
-            }, 'getPluginData', this._cfg.name, 'allCardData', currentFormData);
+            }, 'getPluginData', this._cfg.name, 'getAllCardData', parentFormData, { currentFormData: this._form.getData()});
         },
 
         // now special handling here
@@ -129,7 +134,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             let that = this;
 
             // add new cards
-            var buttonMap = this._action.getButtonMap();
+            let buttonMap = this._action.getButtonMap();
             data.forEach(function(row){
                 let key = row.id;
                 currentKeys[key] = 1;
@@ -148,7 +153,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             },this);
 
             // remove deleted cards
-            for ( var key in cards ) {
+            for ( let key in cards ) {
                 if (!currentKeys[key]){
                     that.__cardList.remove(cards[key]);
                     if (cards[key]){
