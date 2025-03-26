@@ -19,7 +19,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # {{{ Constructors
 
@@ -153,7 +153,7 @@ sub new {
 		$self->parse_stationboard;
 	}
 	elsif ( $conf{journey} ) {
-		$self->parse_journey;
+		$self->parse_journey( id => $conf{journey} );
 	}
 	elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
 		$self->parse_search;
@@ -194,7 +194,7 @@ sub new_p {
 				$self->parse_stationboard;
 			}
 			elsif ( $conf{journey} ) {
-				$self->parse_journey;
+				$self->parse_journey( id => $conf{journey} );
 			}
 			elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
 				$self->parse_search;
@@ -312,9 +312,10 @@ sub get_with_cache_p {
 }
 
 sub parse_journey {
-	my ($self) = @_;
+	my ( $self, %opt ) = @_;
 
 	$self->{result} = Travel::Status::DE::DBRIS::Journey->new(
+		id           => $opt{id},
 		json         => $self->{raw_json},
 		strpdate_obj => $self->{strpdate_obj},
 		strptime_obj => $self->{strptime_obj},
@@ -426,7 +427,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

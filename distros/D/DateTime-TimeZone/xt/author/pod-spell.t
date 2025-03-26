@@ -121,6 +121,7 @@ Colombo
 Cordoba
 Costa
 Costa_Rica
+Coyhaique
 Cuiaba
 Cunha
 Czechia
@@ -540,6 +541,7 @@ drolsky
 env
 ether
 gb
+guillermo
 jhoblitt
 jkeenan
 jwilk

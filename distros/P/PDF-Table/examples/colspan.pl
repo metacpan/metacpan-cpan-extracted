@@ -97,7 +97,7 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.007'; # VERSION
 our $LAST_UPDATE = '1.006'; # manually update whenever code is changed
 
 my $outfile = $0;
@@ -122,6 +122,8 @@ $pdf->mediabox('A4');
 
 my $data = [
 
+#   # Header (row 0)
+#   [   "Header 1", "Header 2", "Header 3" ],
     # Row 1, with 3 cols
     [   "(r1c1) Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         "(r1c2) Ut",
@@ -156,6 +158,10 @@ $pdftable->table(
     x            => 10,     # position from left
     start_y      => 750,    # or y. position from bottom
     start_h      => 700,    # or h. max height of table
+    start_h      => 700,    # or h. max height of table
+#   start_h      => 300,    # or h. max height of table  to force split
+#   next_y       => 700,    # following pages start y
+#   next_h       => 400,    # following pages height
     padding      => 5,      # padding on all 4 sides of a cell
     column_props => [
         { min_w => 150, background_color => 'grey' },    # col 1
@@ -163,7 +169,9 @@ $pdftable->table(
 	                    # colspanned col 3 on row 3
         {}                                               # col 3 (nothing)
     ],
-    cell_props => [  # no header, so data row 0 is actually row 1
+    cell_props => [
+          # no header, so data row 0 is actually row 1
+#       [ ],     # if using header (as row 0)
         [   {},    # row 1 cell 2 & 3 overrides
             { background_color => 'pink' },   # or bg_color
             { background_color => 'blue', colspan => 1 }
@@ -173,6 +181,7 @@ $pdftable->table(
         [ ],                         # row 4
         [ { colspan => 2 } ],        # row 5 cell 1 override
     ],
+#   header_props => { bg_color => '#00FF00'},
 );
 
 $pdf->save();

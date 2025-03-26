@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.64';
+our $VERSION = '2.65';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -620,7 +620,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.64
+version 2.65
 
 =head1 SYNOPSIS
 
@@ -919,7 +919,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Molchanov Alfie John Andrew Paprocki Brian Fraser Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura kclaggett Matthew Horsfall Mohammad S Anwar Olaf Alders Peter Rabbitson Tom Wyant
+=for stopwords Alexey Molchanov Alfie John Andrew Paprocki Brian Fraser Bron Gondwana Daisuke Maki David Pinkowitz guillermo.galindo Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura kclaggett Matthew Horsfall Mohammad S Anwar Olaf Alders Peter Rabbitson Tom Wyant
 
 =over 4
 
@@ -950,6 +950,10 @@ Daisuke Maki <dmaki@cpan.org>
 =item *
 
 David Pinkowitz <dave@pinkowitz.com>
+
+=item *
+
+guillermo.galindo <guillermo.galindo@meteologica.com>
 
 =item *
 

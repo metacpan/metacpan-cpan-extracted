@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::BlueskyLite;
-$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.47';
+$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.48';
 # ABSTRACT: Simple Class to post status to BlueSky.
 
 use LWP::UserAgent;
@@ -101,6 +101,12 @@ sub _generate_facets {
       if (defined $val) {
         $type = 'app.bsky.richtext.facet#mention';
         $attrib = 'did';
+      }
+    } elsif ($w =~ /^#/) {
+      $val = substr($w, 1);
+      if (defined $val) {
+        $type = 'app.bsky.richtext.facet#tag';
+        $attrib = 'tag';
       }
     }
 
@@ -257,7 +263,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - Simple Class to post status to BlueS
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 Methods
 

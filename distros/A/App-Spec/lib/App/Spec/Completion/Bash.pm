@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion::Bash;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = 'v0.15.0'; # VERSION
 
 use Moo;
 extends 'App::Spec::Completion';
@@ -27,7 +27,7 @@ sub generate_completion {
     my $global_options = $spec->options;
     my ($flags_string, $options_string) = $self->flags_options($global_options);
     my $body = <<"EOM";
-#!bash
+#!/usr/bin/env bash
 
 # Generated with perl module App::Spec v$appspec_version
 
@@ -84,6 +84,7 @@ sub flags_options {
         my $name = $o->name;
         my $aliases = $o->aliases;
         my $summary = $o->summary;
+        $summary =~ s/\s+/ /g if defined $summary;
         my @names = ($name, @$aliases);
         ($summary, @names) = $self->escape_singlequote( $summary, @names );
         @names = map {
@@ -132,6 +133,7 @@ sub completion_commands {
         my $summary = $commands->{ $_ }->summary;
         for ($name, $summary) {
             no warnings 'uninitialized';
+            s/\s+/ /g;
             s/['`]/'"'"'/g;
             s/\$/\\\$/g;
         }
@@ -295,8 +297,11 @@ sub completion_options  {
         next if $type eq "flag";
         my $enum = $opt->enum;
         my $summary = $opt->summary;
-        $summary =~ s/['`]/'"'"'/g;
-        $summary =~ s/\$/\\\$/g;
+        if (defined $summary) {
+            $summary =~ s/\s+/ /g;
+            $summary =~ s/['`]/'"'"'/g;
+            $summary =~ s/\$/\\\$/g;
+        }
         my $aliases = $opt->aliases;
         my @names = ($name, @$aliases);
         my @option_strings;

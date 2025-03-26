@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.47
+    version 0.48
 
 DESCRIPTION
 
@@ -778,6 +778,27 @@ EXTENDING TO NEW TARGETS
     test file provided in this distribution at t/new_target.t, which just
     prints out the revolutionary date on the standard output using core
     module IO::Handle.
+
+    Your new App::SpreadRevolutionaryDate::Target::Mytarget target class
+    should consumes the App::SpreadRevolutionaryDate::Target role, by
+    specifying the worker class:
+
+      use Moose;
+      with 'App::SpreadRevolutionaryDate::Target'
+        => {worker => 'My::Worker::Class'};
+
+    Then, you have to add a hook, being called before Moose constructor, so
+    to pass as an additional argument to Moose constructor, an instance of
+    your worker class as obj attribute of your new target class. You may
+    need some configuration parameters, like worker_param in the example
+    below, to create an instance of your worker class:
+
+      around BUILDARGS => sub {
+        my ($orig, $class) = @_;
+        my $args = $class->$orig(@_);
+        my $args->{obj} = My::Worker::Class->new(worker_param => $args->{worker_param});
+        return $args;
+      }
 
     Starting from version 0.39, you may have noticed that Mastodon and
     Bluesky targets can now spread not only a text message, but also an

@@ -16,10 +16,13 @@ SYNOPSIS
       # Set directory before applying migrations
       $m->dir( '~/Projects/myapp/db/migrations' );
 
+      # Get latest migration version from the migrations directory
+      my $latest_version = $m->latest;
+
       # Migrate database to version 1
       $m->migrate( 1 );
 
-      # Migrate database to the latest version
+      # Migrate database to the latest migration version
       $m->migrate;
 
       -- ~/Projects/myapp/db/migrations/schema_1_up.sql
@@ -112,8 +115,16 @@ ACCESSORS
         Get tracking table.
 
 METHODS
+    $self->create_tracking_table
+        Create the tracking table if it does not exist yet. This method is
+        overrideable in subclasses.
+
     $self->driver, $class->driver( $dsn )
-        Extracts and returns the driver name from the data source name.
+        Extract and return the driver name from the data source name.
+
+    $self->latest
+        Get latest migration version comparing the migrations in the
+        migrations directory.
 
     $self->migrate( $version )
         Migrate database to version. Returns true in case of success;
@@ -121,12 +132,13 @@ METHODS
         migration version will be used.
 
     $self->quoted_tracking_table
-        Quotes and returns the tracking table using "quote_identifier" in
-        DBI. This method is overrideable in subclasses.
+        Quote and return the tracking table using "quote_identifier" in DBI.
+        This method is overrideable in subclasses.
 
     $self->version
-        Get migration version from database. Will be "undef" if no migration
-        has taken place yet. The version is stored in the tracking table.
+        Get current migration version from database. Will be "undef" if no
+        migration has taken place yet. The version is stored in the tracking
+        table.
 
 LOGGING
     The logging of this class is based on a static Log::Any logger. Its

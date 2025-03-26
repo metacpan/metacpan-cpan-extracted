@@ -50,11 +50,11 @@ Database::Abstraction - read-only database abstraction layer (ORM)
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 DESCRIPTION
 
@@ -257,7 +257,7 @@ or a filename.
 
 =item * C<max_slurp_size>
 
-CSV/PSV/XML files smaller than this are held in RAM (default is 16K),
+CSV/PSV/XML files smaller than this are held in a HASH in RAM (default is 16K),
 falling back to SQL on larger data sets.
 Setting this value to 0 will turn this feature off,
 thus forcing SQL to be used to access the database
@@ -408,7 +408,9 @@ sub _open
 
 	$self->_debug("_open: try to open $slurp_file");
 
+	# Look at various places to find the file and derive the file type from the file's name
 	if(-r $slurp_file) {
+		# SQLite file
 		require DBI;
 
 		DBI->import();
@@ -438,6 +440,7 @@ sub _open
 				# Pipe separated file
 				$args{'sep_char'} = '|';
 			} else {
+				# CSV file
 				($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'csv:db', '<');
 			}
 		}
@@ -519,7 +522,7 @@ sub _open
 			if(((-s $slurp_file) <= $self->{'max_slurp_size'}) && !$args{'column_names'}) {
 				if((-s $slurp_file) == 0) {
 					# Empty file
-					$self->{'data'} = {};
+					$self->{'data'} = ();
 				} else {
 					require Text::xSV::Slurp;
 					Text::xSV::Slurp->import();
@@ -539,20 +542,20 @@ sub _open
 						# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
 						file => $slurp_file
 					)};
+					@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
 
 					# $self->{'data'} = @data;
 					if($self->{'no_entry'}) {
 						# Not keyed, will need to scan each entry
 						my $i = 0;
 						$self->{'data'} = ();
-						foreach my $d(@data) {
+						while(my $d = shift @data) {
 							$self->{'data'}[$i++] = $d;
 						}
 					} else {
 						# keyed on the $self->{'id'} (default: "entry") column
 						# Ignore blank lines or lines starting with # in the CSV file
-						@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
-						foreach my $d(@data) {
+						while(my $d = shift @data) {
 							$self->{'data'}->{$d->{$self->{'id'}}} = $d;
 						}
 					}
@@ -1191,7 +1194,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(\@messages);
+		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
 

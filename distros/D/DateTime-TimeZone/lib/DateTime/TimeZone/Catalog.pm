@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.64';
+our $VERSION = '2.65';
 
 our @ALL =
 qw(
@@ -67,6 +67,7 @@ qw(
   America/Chihuahua
   America/Ciudad_Juarez
   America/Costa_Rica
+  America/Coyhaique
   America/Cuiaba
   America/Danmarkshavn
   America/Dawson
@@ -399,6 +400,7 @@ Chicago
 Chihuahua
 Ciudad_Juarez
 Costa_Rica
+Coyhaique
 Cuiaba
 Danmarkshavn
 Dawson
@@ -881,6 +883,7 @@ Pacific/Rarotonga
 ) ],
   'cl' => [ qw(
 America/Santiago
+America/Coyhaique
 America/Punta_Arenas
 Pacific/Easter
 ) ],
@@ -1861,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2025a' }
+sub OlsonVersion { '2025b' }
 
 
 1;
@@ -1928,6 +1931,7 @@ so that applications can easily present a list of timezones.
   America/Campo_Grande
   America/Caracas
   America/Cayenne
+  America/Coyhaique
   America/Cuiaba
   America/Eirunepe
   America/Fortaleza
@@ -2466,7 +2470,8 @@ so that applications can easily present a list of timezones.
 =head3 Chile (CL)
 
   America/Santiago - most of Chile
-  America/Punta_Arenas - Region of Magallanes
+  America/Coyhaique - Aysen Region
+  America/Punta_Arenas - Magallanes Region
   Pacific/Easter - Easter Island
 
 =head3 China (CN)

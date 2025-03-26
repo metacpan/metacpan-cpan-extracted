@@ -8,7 +8,7 @@ use Sub::Name;
 
 __PACKAGE__->mk_classdata( '_column_encoders' );
 
-our $VERSION = '0.00020';
+our $VERSION = '0.00032';
 $VERSION = eval $VERSION;
 
 sub register_column {
@@ -247,7 +247,7 @@ kentnl - Kent Fredric <kentnl@cpan.org>
 
 mst - Matt S Trout <mst@shadowcat.co.uk>
 
-wreis - Wallace reis <wreis@cpan.org>
+wreis - Wallace Reis <wreis@cpan.org>
 
 =head1 COPYRIGHT
 

@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.19';
+$TOML::Tiny::VERSION = '0.20';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -68,7 +68,11 @@ sub decode {
 
 sub encode {
   my ($self, $data) = @_;
-  TOML::Tiny::Writer::to_toml($data, strict => $self->{strict});
+  TOML::Tiny::Writer::to_toml(
+    $data,
+    strict => $self->{strict},
+    no_string_guessing => $self->{no_string_guessing},
+  );
 }
 
 #-------------------------------------------------------------------------------
@@ -92,7 +96,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

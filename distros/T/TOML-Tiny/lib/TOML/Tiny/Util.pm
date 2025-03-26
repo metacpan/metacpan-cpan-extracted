@@ -1,6 +1,6 @@
 package TOML::Tiny::Util;
 # ABSTRACT: utility functions used by TOML::Tiny
-$TOML::Tiny::Util::VERSION = '0.19';
+$TOML::Tiny::Util::VERSION = '0.20';
 use strict;
 use warnings;
 no warnings 'experimental';
@@ -76,7 +76,7 @@ TOML::Tiny::Util - utility functions used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

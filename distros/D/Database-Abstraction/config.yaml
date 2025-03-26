@@ -1,16 +1,17 @@
+---
 # Configuration for Database::Abstraction
 
 # Directory where the database files are stored
 directory: /
 
 # Cache settings
-cache_duration: 3600 # Cache duration in seconds (default is 1 hour)
-max_slurp_size: 16384 # Maximum size in bytes for in-memory CSV/PSV/XML files (default is 16K)
+cache_duration: 3600  # Cache duration in seconds (default is 1 hour)
+max_slurp_size: 16384  # Maximum size in bytes for in-memory CSV/PSV/XML files (default is 16K)
 
 # Logging options
 logger:
-  level: INFO # Log level: DEBUG, INFO, WARN, ERROR
-  file: /tmp/file.log # Log file path
+  level: INFO  # Log level: DEBUG, INFO, WARN, ERROR
+  file: /tmp/file.log  # Log file path
 
-id: entry # Default key column name
-auto_load: false	# Disable AUTOLOAD feature for convenient access to database columns
+id: entry  # Default key column name
+auto_load: false  # Disable AUTOLOAD feature for convenient access to database columns

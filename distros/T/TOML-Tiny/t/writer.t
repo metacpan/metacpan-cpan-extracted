@@ -72,6 +72,30 @@ subtest 'oddballs and regressions' => sub{
       like $@, qr/found undefined value/;
 
   };
+
+
+  subtest 'quoted inline table keys' => sub {
+
+      my $data = { q{foo} => [ q{bar}, { q{<=} => 33 } ] } ;
+      my $encoded = to_toml( $data );
+
+      my $decoded;
+      ok( lives { $decoded = from_toml( $encoded ) },
+          'decode succeeded' ) or note $@;
+      is ( $decoded, $data, 'round trip successful' );
+
+  };
+
+  subtest 'encoding a non-hashref' => sub {
+
+      eval { to_toml( q{} ) };
+      like $@, qr/must be a hashref/, 'scalar';
+
+      eval { to_toml( [] ) };
+      like $@, qr/must be a hashref/, 'array';
+
+  };
+
 };
 
 subtest 'to_toml_array' => sub{
@@ -119,6 +143,15 @@ hosts = [
   "alpha",
   "omega"
 ]
+
+[cfg."something with a 'single-quote'".nested]
+inner = "forty-one"
+
+[cfg.'something with a "double-quote"'.nested]
+inner = "forty-two"
+
+[cfg."something with a 'single-quote' and a \"double-quote\"".nested]
+inner = "forty-three"
 
 [[products]]
 name = "Hammer"

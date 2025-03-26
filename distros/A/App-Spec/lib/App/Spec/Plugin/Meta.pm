@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 package App::Spec::Plugin::Meta;
-our $VERSION = '0.013'; # VERSION
+our $VERSION = 'v0.15.0'; # VERSION
 
 use List::Util qw/ any /;
 

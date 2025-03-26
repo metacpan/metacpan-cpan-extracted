@@ -50,7 +50,7 @@ Get PostgreSQL database specific default list of SQL statements that are
 executed before the migration transaction begins.  The default list contains a
 single statement that assigns the managed schema to the C<search_path> option.
 
-=item $self->do_before
+=item $self->do_while
 
 Get PostgreSQL database specific default list of SQL statements that are
 executed immediately after the migration transaction was enabled.  The default
@@ -69,6 +69,11 @@ Get schema that the tracking table belongs to.
 =head1 METHODS
 
 =over 
+
+=item $self->create_tracking_table
+
+Create the tracking table if it does not exist yet. Beforehand create the
+tracking schema if it does not exist yet.
 
 =item $self->quoted_tracking_table
 

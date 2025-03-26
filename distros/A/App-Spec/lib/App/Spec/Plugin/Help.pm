@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 package App::Spec::Plugin::Help;
-our $VERSION = '0.013'; # VERSION
+our $VERSION = 'v0.15.0'; # VERSION
 
 use Moo;
 with 'App::Spec::Role::Plugin::Subcommand';

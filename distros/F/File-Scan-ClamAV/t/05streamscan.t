@@ -13,14 +13,14 @@ if (!$pid) {
     die "clamd failed to start: $!";
 }
 for (1..120) {
-  last if (-e "clamsock");
+  last if (-e "/tmp/clamsock");
   if (kill(0 => $pid) == 0) {
     die "clamd appears to have died";
   }
   sleep(1);
 }
 
-my $av = new File::Scan::ClamAV(port => "clamsock");
+my $av = new File::Scan::ClamAV(port => "/tmp/clamsock");
 ok($av, "Init ok");
 
 my $dir = cwd;
@@ -40,11 +40,11 @@ ok($data, "Data exists");
 my ($ans, $vir) = $av->streamscan($data);
 
 cmp_ok($ans, 'eq', 'FOUND', "Positive hit");
-cmp_ok($vir, 'eq', 'Eicar-Test-Signature', "Match correct sig");
+like($vir, qr/Eicar/i, "Match correct sig");
 
 ok(kill(9 => $pid), "Kill ok");
 
 
 waitpid($pid, 0);
-unlink("clamsock");
+unlink("/tmp/clamsock");
 

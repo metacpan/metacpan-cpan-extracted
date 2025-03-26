@@ -4,7 +4,7 @@
       "Marek Rouchal <marekr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -75,7 +75,7 @@
    "provides" : {
       "Pod::Usage" : {
          "file" : "lib/Pod/Usage.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -90,12 +90,15 @@
          "web" : "https://github.com/Dual-Life/Pod-Usage"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
       "Karl Williamson <khw@cpan.org>",
+      "lilinjie <lilinjie@uniontech.com>",
       "Marek Rouchal <43476190+marekro@users.noreply.github.com>",
       "Marek Rouchal <marek.rouchal@gmx.net>",
-      "Nicolas R <nicolas@atoomic.org>"
+      "Nicolas R <nicolas@atoomic.org>",
+      "ubinator <ntadic001@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",

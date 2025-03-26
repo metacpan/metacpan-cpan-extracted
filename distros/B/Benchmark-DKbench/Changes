@@ -1,5 +1,12 @@
 Revision history for Benchmark-DKbench
 
+3.0     2025-03-25
+        - Docker image available.
+        - Fix invalid key error with newer CryptX.
+        - Compatible with older versions of DBI.
+        - Supress prove error output.
+        - Update package versions, setup_dkbench --force skips identical ver.
+
 2.9     2024-07-29
         - Added --duration option.
         - Added min/max scores to the summary.

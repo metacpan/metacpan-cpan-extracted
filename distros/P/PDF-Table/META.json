@@ -4,7 +4,7 @@
       "Phil Perry"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,6 @@
          "url" : "https://github.com/PhilterPaper/PDF-Table"
       }
    },
-   "version" : "1.006",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,34 @@
+Win32-ExeAsDll version 0.01
+===========================
+
+Win32::ExeAsDll is a an experimental small FFI-like module to load and run
+a 2nd .exe in the virtual address space of the 1st (perl).  Cuts 10ms, 20ms
+or more of overhead off , compared to launching an .exe the normal way in a
+separate kernel process object and address space.  This module was only tested
+to work with cmd.exe, other cmd line apps are unknown.  It is intended that
+cmd.exe will be called in a loop many times per perl process lifetime.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None except the interpreter's core modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2025 by Daniel Dragan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

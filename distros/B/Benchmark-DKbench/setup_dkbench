@@ -100,6 +100,7 @@ Benchmark::DKbench::Setup::fetch_genbank();
 system "cp -r $data/* ".Benchmark::DKbench::Setup::datadir() if $data;
 
 my @packages = Benchmark::DKbench::Setup::cpan_packages();
+my %mod_ver  = Benchmark::DKbench::Setup::cpan_versions();
 
 print $force ? "Installing reference cpan versions ...\n" : "Checking cpan modules ...\n";
 foreach (@packages) {
@@ -108,11 +109,12 @@ foreach (@packages) {
     $mod .= "::$2" if $2;
     $mod .= "::$3" if $3;
     $mod .= "::$4" if $4;
-    my $ver = eval "use $mod; return \$${mod}::VERSION";
+    my $ver = eval "use $mod; return \$${mod}::VERSION" || '';
     if (!$force && !$@) {
         print "Skipping $mod (found version $ver)\n";
     } else {
-        system "$sudo cpanm $t http://cpan.metacpan.org/authors/id/$_";
+        system "$sudo cpanm $t http://cpan.metacpan.org/authors/id/$_"
+            unless $ver eq $mod_ver{$mod};
     }
 }
 system "$sudo cpanm $t System::Info MCE::Loop Test::Harness Test::Output Test::Requires";

@@ -1,6 +1,12 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.47 2025-03-21T08:29:17
+0.48 2025-03-25T10:01:22
+ - Process tags for Bluesky
+ - Do not use IO::Handle for testing with accents and document obj
+   attribute in test
+ - Document obj attribute of target class
+
+0.47 2025-03-21T08:29:17Z
  - Do not bother with accent in text new target
  - Configuration file should be opened in UTF-8, pass filehandle to
    AppConfig

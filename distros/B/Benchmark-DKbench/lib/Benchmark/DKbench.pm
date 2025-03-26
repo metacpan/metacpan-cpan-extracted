@@ -38,7 +38,7 @@ use Text::Levenshtein::XS;
 
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.9';
+our $VERSION = '3.00';
 our @EXPORT  = qw(system_identity suite_run calc_scalability suite_calc);
 our $datadir = dist_dir("Benchmark-DKbench");
 
@@ -70,7 +70,22 @@ real-world scenarios. It runs single and multi-threaded (able to scale to hundre
 of CPUs) and can be fully customized to run the benchmarks that better suit your own
 scenario - even allowing you to add your own custom benchmarks.
 
-=head1 INSTALLATION
+=head1 RUNNING WITH DOCKER
+
+For convenience, there is a ready-to-run Debian-based L<Docker image|https://github.com/dkechag/dkbench-docker>
+available.
+
+With Docker installed, you can run:
+
+ docker run -it --rm dkechag/dkbench
+
+which drops you into a bash shell inside the container. There, the C<dkbench>
+command is available to run the suite.
+
+Docker does add a small overhead and variance to the test suite, so be aware there
+is still an advantage in manual installation.
+
+=head1 MANUAL INSTALLATION
 
 See the L</"setup_dkbench"> script below for more on the installation of a couple
 of optional benchmarks and standardizing your benchmarking environment, otherwise
@@ -858,7 +873,7 @@ sub bench_dbi {
             buffer => 2
         );
         $inserter->insert($data->[int(rand(20))]) for 1..2;
-        $d->add($dbh->last_insert_id);
+        $d->add($dbh->last_insert_id(undef, undef, undef, undef));
         my $sql = SQL::Abstract::Classic->new();
         my ($stmt, @bind) = $sql->insert('table', $data->[int(rand(20))]);
         $d->add($dbh->quote($stmt));
@@ -996,20 +1011,20 @@ sub bench_jwt {
     my $d    = Digest->new("MD5");
     my $data = _random_str(5000);
     my $rsa ='-----BEGIN PRIVATE KEY-----
-    MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t
-    gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ
-    jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw
-    Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj
-    hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb
-    NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH
-    /bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh
-    BVl433tgTTQ=
-    -----END PRIVATE KEY-----';
+MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t
+gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ
+jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw
+Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj
+hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb
+NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH
+/bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh
+BVl433tgTTQ=
+-----END PRIVATE KEY-----';
     my $key = '-----BEGIN PRIVATE KEY-----
-    MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgYirTZSx+5O8Y6tlG
-    cka6W6btJiocdrdolfcukSoTEk+hRANCAAQkvPNu7Pa1GcsWU4v7ptNfqCJVq8Cx
-    zo0MUVPQgwJ3aJtNM1QMOQUayCrRwfklg+D/rFSUwEUqtZh7fJDiFqz3
-    -----END PRIVATE KEY-----';
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgYirTZSx+5O8Y6tlG
+cka6W6btJiocdrdolfcukSoTEk+hRANCAAQkvPNu7Pa1GcsWU4v7ptNfqCJVq8Cx
+zo0MUVPQgwJ3aJtNM1QMOQUayCrRwfklg+D/rFSUwEUqtZh7fJDiFqz3
+-----END PRIVATE KEY-----';
     foreach (1..$iter) {
         my $extra   = _random_str(100);
         my $data_in = $data . $extra;
@@ -1120,9 +1135,9 @@ sub bench_moose_prv {
     my $result;
     if ($iter < 1) {
         $tdir = catfile($tdir, 'recipes');
-        $result = `prove -rQ $tdir`;
+        $result = `prove -rQ $tdir 2>/dev/null`;
     } else {
-        $result = `prove -rQ $tdir` for (1..$iter);
+        $result = `prove -rQ $tdir 2>/dev/null` for (1..$iter);
     }
     if ($result =~ /Result: (\w*)/) {
         return $1;

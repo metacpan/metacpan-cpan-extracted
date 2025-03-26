@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9985';
+$Geo::Address::Formatter::VERSION = '1.9986';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -351,8 +351,10 @@ sub format_address {
                 say STDERR "unknown_components:";
                 say STDERR Dumper $ra_unknown;
             }
+            # need to sort for consistency
+            # FIXME - add better sorting based on meaning of the values
             $rh_components->{attention} =
-                join(', ', map { $rh_components->{$_} } @$ra_unknown);
+                join(', ', map { $rh_components->{$_} } sort @$ra_unknown);
             if ($debug){
                 say STDERR "putting unknown_components in 'attention'";
             }
@@ -962,7 +964,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9985
+version 1.9986
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Argument;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = 'v0.15.0'; # VERSION
 
 use Moo;
 
@@ -129,7 +129,7 @@ sub from_dsl {
         }
     }
 
-    if ($dsl =~ s/^\s*--\s*(.*)//) {
+    if ($dsl =~ s/^\s*--\s*(.*)//s) {
         # TODO only summary should be supported
         $hash{summary} = $1;
     }

@@ -1,6 +1,6 @@
 package TOML::Tiny::Tokenizer;
 # ABSTRACT: tokenizer used by TOML::Tiny
-$TOML::Tiny::Tokenizer::VERSION = '0.19';
+$TOML::Tiny::Tokenizer::VERSION = '0.20';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -196,9 +196,7 @@ sub tokenize_key {
   my @keys;
 
   for my $seg (@segs) {
-    $seg =~ s/^["']//;
-    $seg =~ s/["']$//;
-    $seg = $self->unescape_str($seg);
+    $seg = $self->tokenize_string($seg) if $seg =~ m/^['"]/;
     push @keys, $seg;
   }
 
@@ -285,7 +283,7 @@ TOML::Tiny::Tokenizer - tokenizer used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

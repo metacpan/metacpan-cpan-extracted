@@ -1,3 +1,10 @@
+0.20 2025-03-25
+- Fix parsing of quoted keys (GH#41) (Ian Jackson)
+- Fix writing of more kinds of quote-needing keys (GH#40) (Ian Jackson)
+- Avoid looking at string values to try to find the type (GH#37) (Ian Jackson)
+- die if data to be encoded is not a hashref (GH#36) (djerius)
+- inline table keys were not normalized via to_toml_key() (GH#35) (djerius)
+
 0.19 2025-02-11
 - trap and die on undefined values (GH#32) (djerius)
 

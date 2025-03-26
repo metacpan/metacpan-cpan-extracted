@@ -8,7 +8,7 @@ use Test::Fatal qw( dies_ok exception );
 use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 19 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 22 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -27,18 +27,20 @@ subtest 'wrong dsn' => sub {
   }, qr/unable to open database file/, 'calling migrate() throws exception';
 };
 
-my $tempdir = tempdir( CLEANUP => 1 );
-my $m       = DBIx::Migration->new(
-  tracking_table => 'dbix-tracking',
+my $expected_tracking_table = 'dbix-tracking';
+my $tempdir                 = tempdir( CLEANUP => 1 );
+my $m                       = DBIx::Migration->new(
+  tracking_table => $expected_tracking_table,
   dsn            => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' )
 );
 note 'dsn: ', $m->dsn;
 
-my $tracking_table = $m->tracking_table;
+is my $tracking_table = $m->tracking_table, $expected_tracking_table, 'get tracking table';
 is $m->version, undef, "\"$tracking_table\" table does not exist == migrate() not called yet";
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
-dies_ok { $m->migrate( 0 ) } '"dir" not set';
+dies_ok { $m->latest } 'cannot call latest() because "dir" is not set';
+dies_ok { $m->migrate( 0 ) } 'cannot call migrate() because "dir" not set';
 $m->dir( cwd->child( qw( t sql advanced ) ) );
 
 ok $m->migrate( 0 ), "initially (if the \"$tracking_table\" table does not exist yet) a database is at version 0";
@@ -77,7 +79,8 @@ subtest
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version, [ $tracking_table ];
 
-$target_version = 3;
+my $expected_latest_version = 3;
+is $target_version = $m->latest, $expected_latest_version, 'get latest version';
 ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ],

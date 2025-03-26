@@ -15,7 +15,7 @@ Database::Abstraction - read-only database abstraction layer (ORM)
 
 # VERSION
 
-Version 0.22
+Version 0.23
 
 # DESCRIPTION
 
@@ -192,7 +192,7 @@ Takes different argument formats (hash or positional)
 
 - `max_slurp_size`
 
-    CSV/PSV/XML files smaller than this are held in RAM (default is 16K),
+    CSV/PSV/XML files smaller than this are held in a HASH in RAM (default is 16K),
     falling back to SQL on larger data sets.
     Setting this value to 0 will turn this feature off,
     thus forcing SQL to be used to access the database

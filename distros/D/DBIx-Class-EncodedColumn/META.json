@@ -4,13 +4,13 @@
       "Guillermo Roditi (groditi) <groditi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "DBIx-Class-EncodedColumn",
    "no_index" : {
@@ -33,7 +33,7 @@
          "requires" : {
             "Crypt::Eksblowfish::Bcrypt" : "0",
             "DBIx::Class::TimeStamp" : "0",
-            "Dist::Milla" : "v1.0.20",
+            "Dist::Milla" : "v1.0.22",
             "Test::Pod" : "1.41"
          }
       },
@@ -45,6 +45,8 @@
             "Math::Pari" : "0"
          },
          "requires" : {
+            "Crypt::URandom" : "0",
+            "Crypt::URandom::Token" : "0",
             "DBIx::Class" : "0.06002",
             "Encode" : "0",
             "Sub::Name" : "0.04"
@@ -73,21 +75,24 @@
          "web" : "https://github.com/wreis/DBIx-Class-EncodedColumn"
       }
    },
-   "version" : "0.00020",
+   "version" : "0.00032",
    "x_contributors" : [
+      "Ferenc Erki <erkiferenc@gmail.com>",
       "Jonathan Scott Duff <duff@localhost.localdomain>",
       "Jonathan Scott Duff <duff@pobox.com>",
       "Jonathan Yu <frequency@cpan.org>",
       "Lisa Hare <lhare@inview.co.uk>",
       "Peter Mottram <peter@sysnix.com>",
       "Robert Rothenberg <rrwo@cpan.org>",
+      "Stig Palmquist <git@stig.io>",
       "Tina Mueller <cpan2@tinita.de>",
       "Wallace Reis <wallace@reis.me>",
       "Wallace Reis <wreis@devserver.perceptyx.com>",
       "wreis <wallace@reis.org.br>"
    ],
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
 

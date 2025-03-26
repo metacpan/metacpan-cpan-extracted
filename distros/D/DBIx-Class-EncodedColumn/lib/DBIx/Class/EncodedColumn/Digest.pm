@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Digest;
 use Encode qw( str2bytes );
+use Crypt::URandom::Token qw( urandom_token );
 
 our $VERSION = '0.00001';
 
@@ -49,7 +50,7 @@ sub make_encode_sub {
   my $encoder = sub {
     my ($plain_text, $salt) = @_;
     $plain_text = str2bytes($encode, $plain_text,  Encode::FB_PERLQQ | Encode::LEAVE_SRC) if $encode;
-    $salt ||= join('', map { $salt_pool[int(rand(65))] } 1 .. $slen);
+    $salt ||= $slen ? urandom_token($slen, \@salt_pool) : "";
     $object->reset()->add($plain_text.$salt);
     my $digest = $object->$format_method;
     #print "${plain_text}\t ${salt}:\t${digest}${salt}\n" if $salt;

@@ -8,10 +8,10 @@ use parent 'Class::Accessor';
 
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 Travel::Status::DE::DBRIS::Journey->mk_ro_accessors(
-	qw(day train type number is_cancelled));
+	qw(day id train type number is_cancelled));
 
 sub new {
 	my ( $obj, %opt ) = @_;
@@ -21,6 +21,7 @@ sub new {
 	my $strptime = $opt{strptime_obj};
 
 	my $ref = {
+		id           => $opt{id},
 		day          => $strpdate->parse_datetime( $json->{reisetag} ),
 		train        => $json->{zugName},
 		is_cancelled => $json->{cancelled},
@@ -32,6 +33,13 @@ sub new {
 	# Number is either train no (ICE, RE) or line no (S, U, Bus, ...)
 	# with no way of distinguishing between those
 	( $ref->{type}, $ref->{number} ) = split( qr{\s+}, $ref->{train} );
+
+	# The line number seems to be encoded in the trip ID
+	if ( not defined $ref->{number}
+		and $opt{id} =~ m{ [#] ZE [#] (?<line> [^#]+ ) [#] ZB [#] }x )
+	{
+		$ref->{number} = $+{line};
+	}
 
 	bless( $ref, $obj );
 

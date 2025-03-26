@@ -119,7 +119,7 @@ sub check_kit {
         my $ver = eval "\$${module}::VERSION" || 'none';
         unless ($ver eq $mod_ver{$module}) {
             my $msg = "! $module $mod_ver{$module} suggested as a comparison base ($ver found).";
-            $msg .= " Older versions may show benchmark failures."
+            $msg .= " Old versions may cause a 'Fail'."
                 if $mod_ver{$module} cmp $ver; # $ver is less
             if ($module =~ /^Bio/ && $ver eq 'none') {
                 $opt{skip_bio}   = 1;

@@ -1,3 +1,11 @@
+2.04      2025-03-25
+
+2.04      2025-03-25
+
+- merged three pull requests, removing the internal Pod::PlainText
+- fixed Github: Relies on formatter to inherit from Exporter #17
+
+
 2.03      2022-05-21
 
 2.02      2022-05-21
@@ -74,7 +82,7 @@
     the patch, applied in slightly modified way
 
 1.65 (marekr)
-- CPAN#81059: [RT #115534]: Pod::Usage Failes to Select -sections with Negation
+- CPAN#81059: [RT #115534]: Pod::Usage Fails to Select -sections with Negation
     fixed a specific corner case for section selection
 - CPAN#101538: Pod::Usage doesn't handle E<copy> correctly
     introduced a utf8 option; this may actually not solve the problem, but

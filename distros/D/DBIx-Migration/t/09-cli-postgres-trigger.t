@@ -19,10 +19,11 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   plan skip_all => $Test::PostgreSQL::errstr;
 };
 
-note 'managed schema: ',  my $managed_schema  = 'myschema';
-note 'tracking schema: ', my $tracking_schema = 'public';
-note 'tracking table',    my $tracking_table  = 'migrations';
-note 'dsn: ',             my $dsn             = $pgsql->dsn . ';options=--client_min_messages=WARNING';
+my $managed_schema  = 'myschema';
+# on purpose choose a tracking schema name that requires quoting
+my $tracking_schema = 'my-trackingschema';
+my $tracking_table  = 'migrations';
+note 'dsn: ', my $dsn = $pgsql->dsn . ';options=--client_min_messages=WARNING';
 local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
 plan tests => 8;
@@ -37,8 +38,10 @@ subtest 'migrate to version 0' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( '-s', $managed_schema, '-T', $tracking_table, $dsn, $dir, 0 ) } '',
-    'check stdout';
+  stdout_is {
+    $got_exitval = $coderef->( '-s', $managed_schema, '-t', $tracking_schema, '-T', $tracking_table, $dsn, $dir, 0 )
+  }
+  '', 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
@@ -46,8 +49,10 @@ subtest 'migrate to latest version' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( '-s', $managed_schema, '-T', $tracking_table, $dsn, $dir ) } '',
-    'check stdout';
+  stdout_is {
+    $got_exitval = $coderef->( '-s', $managed_schema, '-t', $tracking_schema, '-T', $tracking_table, $dsn, $dir )
+  }
+  '', 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
@@ -56,12 +61,13 @@ subtest 'version is latest' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( '-s', $managed_schema, '-T', $tracking_table, $dsn ) } "$target_version\n",
-    'check stdout';
+  stdout_is { $got_exitval = $coderef->( '-s', $managed_schema, '-t', $tracking_schema, '-T', $tracking_table, $dsn ) }
+  "$target_version\n", 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 tables_are $managed_schema, [ qw( products product_price_changes ) ], 'Check tables';
-tables_are [ "$tracking_schema.$tracking_table", map { "$managed_schema.$_" } qw( products product_price_changes ) ];
+tables_are [ "\"$tracking_schema\".$tracking_table",
+  map { "$managed_schema.$_" } qw( products product_price_changes ) ];
 triggers_are $managed_schema, 'products', [ qw( price_changes ) ];
 triggers_are 'products', [ "$managed_schema.price_changes" ];

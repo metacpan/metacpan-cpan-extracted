@@ -3,6 +3,7 @@ package DBIx::Class::EncodedColumn::Crypt::Eksblowfish::Bcrypt;
 use strict;
 use warnings;
 use Crypt::Eksblowfish::Bcrypt ();
+use Crypt::URandom qw( urandom );
 use Encode qw(is_utf8 encode_utf8);
 
 our $VERSION = '0.00001';
@@ -30,7 +31,7 @@ sub make_encode_sub {
       $plain_text = encode_utf8($plain_text);
     }
     unless ( $settings_str ) {
-      my $salt = join('', map { chr(int(rand(256))) } 1 .. 16);
+      my $salt = urandom(16);
       $salt = Crypt::Eksblowfish::Bcrypt::en_base64( $salt );
       $settings_str =  $settings_base.$salt;
     }

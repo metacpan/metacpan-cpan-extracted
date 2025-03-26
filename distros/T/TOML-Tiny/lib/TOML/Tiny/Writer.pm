@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.19';
+$TOML::Tiny::Writer::VERSION = '0.20';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -16,7 +16,14 @@ my @KEYS;
 
 sub to_toml {
   my $data  = shift;
-  my $param = ref($_[1]) eq 'HASH' ? $_[1] : undef;
+  die 'toml: data to encode must be a hashref' if ref $data ne 'HASH';
+  return _to_toml( $data, { @_ } );
+}
+
+sub _to_toml ($$);
+sub _to_toml ($$) {
+  my $data  = shift;
+  my $param = shift;
 
   die 'toml: found undefined value, which is unsupported by TOML' if ! defined $data;
 
@@ -35,7 +42,7 @@ sub to_toml {
     } elsif ($$data eq '0') {
       return 'false';
     } else {
-      return to_toml($$_, $param);
+      return _to_toml($$_, $param);
     }
   }
 
@@ -76,6 +83,7 @@ sub to_toml {
       return 'nan'  if Math::BigFloat->new($data)->is_nan;
       return $data;
     }
+    return to_toml_string($data) if $param->{no_string_guessing};
     #return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
     return $data if $data =~ /^$DateTime$/;
     return lc($data) if $data =~ /^$SpecialFloat$/;
@@ -90,13 +98,14 @@ sub to_toml_inline_table {
   my ($data, $param) = @_;
   my @buff;
 
-  for my $key (keys %$data) {
-    my $value = $data->{$key};
+  for my $k (keys %$data) {
+    my $key = to_toml_key($k);
+    my $val = $data->{$k};
 
-    if (ref $value eq 'HASH') {
-      push @buff, $key . '=' . to_toml_inline_table($value);
+    if (ref $val eq 'HASH') {
+      push @buff, $key . '=' . to_toml_inline_table($val);
     } else {
-      push @buff, $key . '=' . to_toml($value);
+      push @buff, $key . '=' . _to_toml($val, $param);
     }
   }
 
@@ -111,7 +120,7 @@ sub to_toml_table {
   # Generate simple key/value pairs for scalar data
   for my $k (grep{ ref($data->{$_}) !~ /HASH|ARRAY/ } sort keys %$data) {
     my $key = to_toml_key($k);
-    my $val = to_toml($data->{$k}, $param);
+    my $val = _to_toml($data->{$k}, $param);
     push @buff_assign, "$key=$val";
   }
 
@@ -128,7 +137,7 @@ sub to_toml_table {
     # Mixed array
     if (grep{ ref $_ ne 'HASH' } @{$data->{$k}}) {
       my $key = to_toml_key($k);
-      my $val = to_toml($data->{$k}, $param);
+      my $val = _to_toml($data->{$k}, $param);
       push @buff_assign, "$key=$val";
     }
     # Array of tables
@@ -137,7 +146,7 @@ sub to_toml_table {
 
       for (@{ $data->{$k} }) {
         push @buff_tables, '', '[[' . join('.', map{ to_toml_key($_) } @KEYS) . ']]';
-        push @buff_tables, to_toml($_);
+        push @buff_tables, _to_toml($_, $param);
       }
 
       pop @KEYS;
@@ -154,7 +163,7 @@ sub to_toml_table {
       # Generate [table]
       push @KEYS, $k;
       push @buff_tables, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
-      push @buff_tables, to_toml($data->{$k}, $param);
+      push @buff_tables, _to_toml($data->{$k}, $param);
       pop @KEYS;
     }
   }
@@ -176,7 +185,7 @@ sub to_toml_array {
     if (ref $item eq 'HASH') {
       push @items, to_toml_inline_table($item, $param);
     } else {
-      push @items, to_toml($item, $param);
+      push @items, _to_toml($item, $param);
     }
   }
 
@@ -188,18 +197,10 @@ sub to_toml_key {
 
   if ($str =~ /^$BareKey$/) {
     return $str;
-  }
-
-  # Escape control characters
-  $str =~ s/([\p{General_Category=Control}])/'\\u00' . unpack('H2', $1)/eg;
-
-  # Escape unicode characters
-  #$str =~ s/($NonASCII)/'\\u00' . unpack('H2', $1)/eg;
-
-  if ($str =~ /^"/) {
-    return qq{'$str'};
   } else {
-    return qq{"$str"};
+    # Not valid as a "bare key".  Encode it as a "quoted key"
+    # (in TOML terminology), using the "literal string" format.
+    return to_toml_string($str);
   }
 }
 
@@ -282,7 +283,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

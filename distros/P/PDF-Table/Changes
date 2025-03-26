@@ -1,6 +1,26 @@
 Change history for Perl extension PDF::Table.
 
-=== Version 1.006 (2024-03-20)
+=== Version 1.007 (2025-03-25)
+
+    devtools/PDFversion.pl, devtools/TableBuild.pl, util/3_examples.pl
+     Updated to modern Perl standards to make 1_pc.pl PerlCritic happy.
+
+    lib/PDF/Table.pm
+     Permit 'trans' or 'transparent' background color (mostly for overriding
+      a default bg color). Per #80 (reported by @az143).
+
+    lib/PDF/Table.pm, examples/colspan.pl
+     Fix colspan interference with a header row. Add (commented out) test
+      code to show effect in colspan example. Per #78 (reported and fix 
+      supplied by @BlueWlvrn).
+
+=== Version 1.006 (2024-03-21)
+
+    devtools/*
+     As was done with PDF::Builder, gather together the home-brew tools needed
+      to build a release, with instructions. This ensures that someone taking 
+      over PDF::Table (for whatever reason) has a chance to hit the ground
+      running.
 
     examples/*.pl
      Add ability to read an ENV environmental variable 'PDF_prefLib' to get
@@ -89,7 +109,7 @@ Change history for Perl extension PDF::Table.
 
 === Version 1.003 (2022-07-05)
 
- lib/PDF/Table/ColumnWidth.pm, lib/PDF/Table/Table.pod, examples/size.pl,
+ lib/PDF/Table/ColumnWidth.pm, lib/PDF/Table/Table.pod, examples/size.pl (new),
    MANIFEST, util/3_examples.pl
   Add the ability to specify fixed and relative sizes for column widths, 
    rather than having to accept system-calculated widths. You give a string

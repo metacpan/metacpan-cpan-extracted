@@ -6,7 +6,7 @@ use strict;
 use FindBin qw($Bin);
 
 use File::Temp;
-use Test::Most tests => 35;
+use Test::Most tests => 34;
 
 use lib 't/lib';
 
@@ -57,7 +57,7 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 	};
 	my $test4 = new_ok('Database::test4' => [{ directory => "$Bin/../data", logger => $logger }] );
 	ok(!defined($test4->ordinal(cardinal => 'four')), 'CSV AUTOLOAD works');
-	cmp_ok($code_called, '==', 9, 'Setting the logger as a ref to code works');
+	cmp_ok($code_called, '==', 8, 'Setting the logger as a ref to code works');
 }
 
 # set_logger with file

@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Moo;
 use MooX::SetOnce;
@@ -73,10 +73,12 @@ sub BUILD {
 }
 
 # overrideable
-sub quoted_tracking_table {
+sub create_tracking_table {
   my $self = shift;
 
-  return $self->dbh->quote_identifier( $self->tracking_table );
+  my $tracking_table = $self->quoted_tracking_table;
+  $Logger->debugf( "Create tracking table '%s'", $tracking_table );
+  $self->dbh->do( "CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) )" );
 }
 
 # can be used as an object method ($dsn not specified) and as a class method
@@ -87,18 +89,34 @@ sub driver {
   return ( DBI->parse_dsn( defined $dsn ? $dsn : $self->dsn ) )[ 1 ];
 }
 
+sub latest {
+  my $self = shift;
+  Dir->assert_valid( $self->dir );
+
+  my $latest = 0;
+  $self->dir->visit(
+    sub {
+      return unless m/_up\.sql\z/;
+      m/\D*(\d+)_up\.sql\z/;
+      $latest = $1 if $1 > $latest;
+    }
+  );
+
+  return $latest;
+}
+
 sub migrate {
   my ( $self, $target ) = @_;
   Dir->assert_valid( $self->dir );
 
-  $target = $self->_latest unless defined $target;
+  $target = $self->latest unless defined $target;
 
   my $fatal_error;
   my $return_value = try {
 
     # on purpose outside of the transaction
     # doesn't use _dbh (the cloned dbh)
-    $self->_create_tracking_table;
+    $self->create_tracking_table;
 
     $self->{ _dbh } = $self->dbh->clone(
       {
@@ -179,6 +197,13 @@ sub migrate {
   return $return_value;
 }
 
+# overrideable
+sub quoted_tracking_table {
+  my $self = shift;
+
+  return $self->dbh->quote_identifier( $self->tracking_table );
+}
+
 sub version {
   my $self = shift;
 
@@ -187,9 +212,7 @@ sub version {
   try {
     my $tracking_table = $self->quoted_tracking_table;
     $Logger->debugf( "Read tracking table '%s'", $tracking_table );
-    my $sth = $dbh->prepare( <<"EOF" );
-SELECT value FROM $tracking_table WHERE name = ?;
-EOF
+    my $sth = $dbh->prepare( "SELECT value FROM $tracking_table WHERE name = ?" );
     $sth->execute( 'version' );
     my $version = undef;
     for my $val ( $sth->fetchrow_arrayref ) {
@@ -217,39 +240,12 @@ sub _files {
   return ( @files and @$need == @files ) ? \@files : undef;
 }
 
-sub _latest {
-  my $self = shift;
-
-  my $latest = 0;
-  $self->dir->visit(
-    sub {
-      return unless m/_up\.sql\z/;
-      m/\D*(\d+)_up\.sql\z/;
-      $latest = $1 if $1 > $latest;
-    }
-  );
-
-  return $latest;
-}
-
-sub _create_tracking_table {
-  my $self = shift;
-
-  my $tracking_table = $self->quoted_tracking_table;
-  $Logger->debugf( "Create tracking table '%s'", $tracking_table );
-  $self->dbh->do( <<"EOF" );
-CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
-EOF
-}
-
 sub _initialize_tracking_table {
   my $self = shift;
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Initialize tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
-INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? );
-EOF
+  $self->{ _dbh }->do( "INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? )", undef, 'version', 0 );
 }
 
 sub _update_tracking_table {
@@ -257,9 +253,7 @@ sub _update_tracking_table {
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Update tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
-UPDATE $tracking_table SET value = ? WHERE name = ?;
-EOF
+  $self->{ _dbh }->do( "UPDATE $tracking_table SET value = ? WHERE name = ?", undef, $version, 'version' );
 }
 
 1;

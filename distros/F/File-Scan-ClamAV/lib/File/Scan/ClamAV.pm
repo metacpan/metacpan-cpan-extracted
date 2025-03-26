@@ -4,7 +4,7 @@ use warnings;
 use File::Find qw(find);
 use IO::Socket;
 
-our $VERSION = '1.95';
+our $VERSION = '1.96';
 
 =head1 NAME
 
@@ -224,11 +224,18 @@ sub streamscan {
  chomp(my $r = $conn->getline);
 
  my @return;
- if($r =~ /stream:\ (.+)\ FOUND/ix){
-	@return = ('FOUND', $1);
+ if(not $r){
+  $self->_seterrstr('Error: no response');
+  @return = ('Error: no response');
+ } elsif($r =~ /stream:\ (.+)\ FOUND/ix){
+  @return = ('FOUND', $1);
+ } elsif($r =~ /^stream: OK/){
+  @return = ('OK');
  } else {
-	@return = ('OK');
+  $self->_seterrstr("Error: unexpected response [$r]");
+  @return = ("Error: unexpected response [$r]");
  }
+
  $conn->close;
  return @return;
 }

@@ -1,0 +1,15 @@
+.gitignore
+Changes
+ExeAsDll.xs
+MANIFEST
+Makefile.PL
+README
+lib/Win32/ExeAsDll.pm
+ppport.h
+t/Win32-ExeAsDll.t
+t/benchmark.t
+t/pod.t
+t/w32ead_test.pl
+wide_xs.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

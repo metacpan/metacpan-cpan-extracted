@@ -2,6 +2,8 @@
 requires 'DBIx::Class' => '0.06002';
 requires 'Sub::Name' => '0.04';
 requires 'Encode';
+requires 'Crypt::URandom';
+requires 'Crypt::URandom::Token';
 
 recommends 'Digest';
 recommends 'Digest::SHA';

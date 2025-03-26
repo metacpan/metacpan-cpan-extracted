@@ -106,7 +106,7 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.007'; # VERSION
 our $LAST_UPDATE = '1.006'; # manually update whenever code is changed
 
 my $outfile = $0;

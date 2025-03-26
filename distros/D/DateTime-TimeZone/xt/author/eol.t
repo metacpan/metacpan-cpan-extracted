@@ -60,6 +60,7 @@ my @files = (
     'lib/DateTime/TimeZone/America/Chihuahua.pm',
     'lib/DateTime/TimeZone/America/Ciudad_Juarez.pm',
     'lib/DateTime/TimeZone/America/Costa_Rica.pm',
+    'lib/DateTime/TimeZone/America/Coyhaique.pm',
     'lib/DateTime/TimeZone/America/Cuiaba.pm',
     'lib/DateTime/TimeZone/America/Danmarkshavn.pm',
     'lib/DateTime/TimeZone/America/Dawson.pm',

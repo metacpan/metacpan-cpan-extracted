@@ -1,5 +1,9 @@
 File::Scan::ClamAV Changes
 
+1.96 2025-03-25
+    - Fix potential false negative in streamscan()
+    - Fix failing test sigs
+    - Fix failures due to apparmor
 1.95 2016-07-15
     - Add executable path error handling to tests
     - Switch to "INSTREAM" for scanning streams

@@ -1,5 +1,8 @@
 Revision history for Database-Abstraction
 
+0.23	Tue Mar 25 08:06:33 EDT 2025
+	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
+
 0.22	Fri Mar 14 08:02:39 EDT 2025
 	Allow the AUTOLOAD feature to be disabled
 	Added the auto_load parameter to disable AUTOLOAD

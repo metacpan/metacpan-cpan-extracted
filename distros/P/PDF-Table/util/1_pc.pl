@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.007'; # VERSION
 our $LAST_UPDATE = '1.002'; # manually update whenever code is changed
 
 # command line:

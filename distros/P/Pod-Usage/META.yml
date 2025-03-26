@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Pod::Usage:
     file: lib/Pod/Usage.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   Cwd: '0'
   File::Basename: '0'
@@ -42,12 +42,15 @@ resources:
   bugtracker: https://github.com/Dual-Life/Pod-Usage/issues
   homepage: https://github.com/Dual-Life/Pod-Usage
   repository: https://github.com/Dual-Life/Pod-Usage.git
-version: '2.03'
+version: '2.04'
 x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Karl Williamson <khw@cpan.org>'
+  - 'lilinjie <lilinjie@uniontech.com>'
   - 'Marek Rouchal <43476190+marekro@users.noreply.github.com>'
   - 'Marek Rouchal <marek.rouchal@gmx.net>'
   - 'Nicolas R <nicolas@atoomic.org>'
+  - 'ubinator <ntadic001@gmail.com>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

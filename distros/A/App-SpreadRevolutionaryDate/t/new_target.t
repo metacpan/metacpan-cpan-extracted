@@ -21,9 +21,8 @@ use Test::NoWarnings;
 
 package App::SpreadRevolutionaryDate::Target::Ezln;
 use Moose;
-with 'App::SpreadRevolutionaryDate::Target' => {worker => 'IO::Handle'};
+with 'App::SpreadRevolutionaryDate::Target' => {worker => 'Bool'};
 use namespace::autoclean;
-use IO::Handle;
 
 has 'subcomandantes' => (is => 'ro', isa => 'ArrayRef[Str]', required => 1);
 has 'land' => (is => 'ro', isa => 'Str', required => 1);
@@ -31,16 +30,18 @@ has 'land' => (is => 'ro', isa => 'Str', required => 1);
 around BUILDARGS => sub {
   my ($orig, $class) = @_;
 
-  my $io = IO::Handle->new;
-  $io->fdopen(fileno(STDOUT), "w");
-  return $class->$orig(@_, obj => $io);
+  # App::SpreadRevolutionaryDate::Target consumer classes
+  # should have a mandatory 'obj' parameter valued by an
+  # instance of the 'worker' class.
+  # Since we do not need any worker here to simply printing
+  # an output message, we just defined the 'worker' as 'Bool'
+  # and instanciate obj to a true value.
+  return $class->$orig(@_, obj => 1);
 };
 
 sub spread {
   my ($self, $msg) = @_;
-
-  $self->{obj}->say("From " . $self->land . "\n$msg\nSubcomandantes " . join(', ', @{$self->subcomandantes}));
-  $self->obj->flush;
+  print "From " . $self->land . "\n$msg\nSubcomandantes " . join(', ', @{$self->subcomandantes}) . "\n";
 }
 
 1;
@@ -52,8 +53,8 @@ use App::SpreadRevolutionaryDate;
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 is_deeply($spread_revolutionary_date->config->targets, ['ezln'], 'EZLN target option set');
 is($spread_revolutionary_date->config->ezln_land, 'Chiapas', 'EZLN land value');
-is_deeply($spread_revolutionary_date->config->ezln_subcomandantes, ['Marcos', 'Moises', 'Galeano'], 'EZLN subcomandantes values');
-stdout_like {$spread_revolutionary_date->spread } qr/^From Chiapas\nWe are .+\nSubcomandantes Marcos, Moises, Galeano\n$/u, 'Spread to Ezln';
+is_deeply($spread_revolutionary_date->config->ezln_subcomandantes, ['Marcos', 'Moisés', 'Galeano'], 'EZLN subcomandantes values');
+stdout_like {$spread_revolutionary_date->spread } qr/^From Chiapas\nWe are .+\nSubcomandantes Marcos, Moisés, Galeano\n$/u, 'Spread to Ezln';
 
 __DATA__
 targets = 'ezln'
@@ -61,6 +62,6 @@ locale = 'en'
 
 [ezln]
 subcomandantes = 'Marcos'
-subcomandantes = 'Moises'
+subcomandantes = 'Moisés'
 subcomandantes = 'Galeano'
 land = 'Chiapas'

@@ -32,7 +32,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 DESCRIPTION
 
@@ -562,6 +562,21 @@ Such a target class is actually just a wrapper. Usually a target has to use an e
 To perform authentication and to post a message, there is a strong likelihood that the new target requires specific parameters (e.g.: tokens, keys, account name, password, channels, etc.). These parameters should be defined as required attributes of the target class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the target in lower case (C<[mytarget]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the target in lower case, followed by an underscore (C<--mytarget_myparam>).
 
 Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>, L<App::SpreadRevolutionaryDate::BlueskyLite> C<worker>, and L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>. C<Mastodon> and C<Twitter> are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The other default targets, <App::SpreadRevolutionaryDate::Target::Liberachat> and C<App::SpreadRevolutionaryDate::Target::Freenode>, use a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> and L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>, subclassing L<Bot::BasicBot> C<worker>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
+
+Your new C<App::SpreadRevolutionaryDate::Target::Mytarget> target class should consumes the L<App::SpreadRevolutionaryDate::Target> role, by specifying the C<worker> class:
+
+  use Moose;
+  with 'App::SpreadRevolutionaryDate::Target'
+    => {worker => 'My::Worker::Class'};
+
+Then, you have to add a hook, being called before C<Moose> constructor, so to pass as an additional argument to C<Moose> constructor, an instance of your C<worker> class as C<obj> attribute of your new target class. You may need some configuration parameters, like C<worker_param> in the example below, to create an instance of your C<worker> class:
+
+  around BUILDARGS => sub {
+    my ($orig, $class) = @_;
+    my $args = $class->$orig(@_);
+    my $args->{obj} = My::Worker::Class->new(worker_param => $args->{worker_param});
+    return $args;
+  }
 
 Starting from version 0.39, you may have noticed that C<Mastodon> and C<Bluesky> targets can now spread not only a text message, but also an image, with an alternative text for accessibily purpose. If the alternative text is not provided, it is set with the name of the image file. This is used by C<Telechat> message maker, to post an image of Groucha, the presenter of Téléchat, and by C<PromptUser> and C<Gemini> to send either an image file on local disk or an external image on the web.
 

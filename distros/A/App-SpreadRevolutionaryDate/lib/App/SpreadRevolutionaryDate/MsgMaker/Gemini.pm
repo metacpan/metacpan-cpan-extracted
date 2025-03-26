@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Gemini;
-$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.47';
+$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.48';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Gemini prompt
 
 use Moose;
@@ -176,7 +176,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Gemini - MsgMaker class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 METHODS
 

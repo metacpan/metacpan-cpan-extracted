@@ -14,14 +14,14 @@ if (!$pid) {
 }
 
 for (1..120) {
-  last if (-e "clamsock");
+  last if (-e "/tmp/clamsock");
   if (kill(0 => $pid) == 0) {
     die "clamd appears to have died";
   }
   sleep(1);
 }
 
-my $av = new File::Scan::ClamAV(port => "clamsock"); 
+my $av = new File::Scan::ClamAV(port => "/tmp/clamsock");
 ok($av, "Init ok");
 
 ok($av->quit, "Quit ok");
@@ -35,4 +35,4 @@ alarm(5);
 1 while(waitpid($pid, &WNOHANG) != -1);
 
 ok(! kill(9 => $pid), "Kill should fail");
-unlink("clamsock");
+unlink("/tmp/clamsock");
