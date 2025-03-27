@@ -245,6 +245,7 @@ use constant GLFW_VRESIZE_CURSOR => 0x00036006;
 use constant GLFW_CONNECTED => 0x00040001;
 use constant GLFW_DISCONNECTED => 0x00040002;
 use constant GLFW_DONT_CARE => -1;
+use constant GLFW_TRANSPARENT_FRAMEBUFFER => 0x0002000A;
 
 require Exporter;
 
@@ -280,6 +281,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
         glfwGetMonitorName
         glfwGetMonitorPhysicalSize
         glfwGetMonitorPos
+        glfwGetMonitorWorkarea
         glfwGetMonitors
         glfwGetMouseButton
         glfwGetPrimaryMonitor
@@ -586,6 +588,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
         GLFW_CONNECTED
         GLFW_DISCONNECTED
         GLFW_DONT_CARE
+        GLFW_TRANSPARENT_FRAMEBUFFER
         glfwCreateWindowSurface
         glfwGetInstanceProcAddress
         glfwGetPhysicalDevicePresentationSupport
@@ -597,10 +600,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 
-our $VERSION    = '0.04';
+our $VERSION    = '0.0401';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;    # see L<perlmodstyle>
 
@@ -696,46 +699,46 @@ None by default.
 
   glfwSetWindowPosCallback($window, $cbfun)
   $windowpos_cbfun = sub ($window, $xpos, $ypos) { ... }
-  
+
   glfwSetWindowSizeCallback($window, $cbfun)
   $windowsize_cbfun = sub ($window, $width, $height) { ... }
-  
+
   glfwSetWindowCloseCallback($window, $cbfun)
   $windowclose_cbfun = sub ($window) { ... }
-  
+
   glfwSetWindowRefreshCallback($window, $cbfun)
   $windowrefresh_cbfun = sub ($window) { ... }
-  
+
   glfwSetWindowFocusCallback($window, $cbfun)
   $windowfocus_cbfun = sub ($window, $focused) { ... }
-  
+
   glfwSetWindowIconifyCallback($window, $cbfun)
   $windowiconify_cbfun = sub ($window, $iconified) { ... }
-  
+
   glfwSetFramebufferSizeCallback($window, $cbfun)
   $framebuffersize_cbfun = sub ($window, $width, $height) { ... }
-  
+
   glfwSetKeyCallback($window, $cbfun)
   $key_cbfun = sub ($window, $key, $scancode, $action, $mods) { ... }
-  
+
   glfwSetCharCallback($window, $cbfun)
   $char_cbfun = sub ($window, $codepoint) { ... }
-  
+
   glfwSetCharModsCallback($window, $cbfun)
   $charmods_cbfun = sub ($window, $codepoint, $mods) { ... }
-  
+
   glfwSetMouseButtonCallback($window, $cbfun)
   $mousebutton_cbfun = sub ($window, $button, $action, $mods) { ... }
-  
+
   glfwSetCursorPosCallback($window, $cbfun)
   $cursorpos_cbfun = sub ($window, $xpos, $ypos) { ... }
-  
+
   glfwSetCursorEnterCallback($window, $cbfun)
   $cursorenter_cbfun = sub ($window, $entered) { ... }
-  
+
   glfwSetScrollCallback($window, $cbfun)
   $scroll_cbfun = sub ($window, $xoffset, $yoffset) { ... }
-  
+
   glfwSetDropCallback($window, $cbfun)
   $drop_cbfun = sub ($window, $count, @paths) { ... }
 
@@ -744,10 +747,10 @@ None by default.
 
   glfwSetErrorCallback($cbfun)
   $error_cbfun = sub ($error, $description) { ... }
-  
+
   glfwSetMonitorCallback($cbfun)
   $monitor_cbfun = sub ($monitor, $event) { ... }
-  
+
   glfwSetJoystickCallback($cbfun)
   $joystick_cbfun = sub ($joy_id, $event) { ... }
 
@@ -755,13 +758,13 @@ None by default.
 =head2 Icons/Cursors/Images
 
   glfwSetWindowIcon($window, $image_hash, ...)
-  
+
   $cursor = glfwCreateCursor($image_hash, $xhot, $yhot)
-  
+
   $cursor = glfwCreateStandardCursor($shape)
-  
+
   glfwDestroyCursor($cursor)
-  
+
   glfwSetCursor($window, $cursor)
 
 where
@@ -770,7 +773,7 @@ where
 
     # The width, in pixels, of this image.
     width  => $width,
-    
+
     # The height, in pixels, of this image.
     height => $height,
 
@@ -785,21 +788,23 @@ where
 =head2 Monitors
 
   $monitor = glfwGetPrimaryMonitor()
-  
+
   @monitors = glfwGetMonitors()
-  
+
   $name = glfwGetMonitorName($monitor)
-  
+
   ($widthMM, $heightMM) = glfwGetMonitorPhysicalSize($monitor)
-  
+
   ($xpos, $ypos) = glfwGetMonitorPos($monitor)
-  
+
+  ($xpos, $ypos, $width, $height) = glfwGetMonitorWorkarea($monitor)
+
 =head2 Gamma Settings
 
   glfwSetGamma($monitor, $gamma)
-  
+
   $gammaramp_hash = glfwGetGammaRamp($monitor)
-  
+
   glfwSetGammaRamp($monitor, $gammaramp_hash)
 
 where
@@ -829,7 +834,7 @@ where
 =head2 Video Mode
 
   $vidmode_hash = glfwGetVideoMode($monitor)
-  
+
   @vidmodes = glfwGetVideoModes($monitor);  # elements are vid mode hashes
 
 where
@@ -859,133 +864,133 @@ where
 =head2 Windows and Interaction
 
   $monitor = glfwGetWindowMonitor($window); # monitor of full screen window or undef?
-  
+
   $window = glfwCreateWindow($width, $height, $title, $monitor or NULL, $share_window or NULL)
-  
+
   glfwSetWindowMonitor($window, $monitor, $xpos, $ypos, $width, $height, $refreshRate)
-  
+
   $window = glfwGetCurrentContext()
-  
+
   $value = glfwGetInputMode($window, $mode)
-  
+
   $pressed = glfwGetKey($window, $key)
-  
+
   $pressed = glfwGetMouseButton($window, $button)
-  
+
   $value = glfwGetWindowAttrib($window, $attrib)
-  
+
   $value = glfwWindowShouldClose($window)
-  
+
   glfwDestroyWindow($window)
-  
+
   glfwFocusWindow($window)
-  
+
   $string = glfwGetClipboardString($window)
-  
+
   ($xpos, $ypos) = glfwGetCursorPos($window)
-  
+
   ($width, $height) = glfwGetFramebufferSize($window)
-  
+
   ($left, $top, $right, $bottom) = glfwGetWindowFrameSize($window)
-  
+
   ($xpos, $ypos) = glfwGetWindowPos($window)
-  
+
   ($width, $height) = glfwGetWindowSize($window)
-  
+
   glfwHideWindow($window)
-  
+
   glfwIconifyWindow($window)
-  
+
   glfwMakeContextCurrent($window)
-  
+
   glfwMaximizeWindow($window)
-  
+
   glfwRestoreWindow($window)
-  
+
   glfwSetClipboardString($window, $string)
-  
+
   glfwSetCursorPos($window, $xpos, $ypos)
-  
+
   glfwSetInputMode($window, $mode, $value)
-  
+
   glfwSetWindowAspectRatio($window, $numer, $denom)
-  
+
   glfwSetWindowPos($window, $xpos, $ypos)
-  
+
   glfwSetWindowShouldClose($window, $value)
-  
+
   glfwSetWindowSize($window, $width, $height)
-  
+
   glfwSetWindowSizeLimits($window, $minwidth, $minheight, $maxwidth, $maxheight)
-  
+
   glfwSetWindowTitle($window, $title)
-  
+
   glfwSetWindowUserPointer($window, $ref)
-  
+
   glfwShowWindow($window)
-  
+
   glfwSwapBuffers($window)
-  
+
   $ref = glfwGetWindowUserPointer($window)
-  
+
   glfwDefaultWindowHints()
-  
+
   ($major, $minor, $rev) = glfwGetVersion()
-  
+
   glfwPollEvents()
-  
+
   glfwPostEmptyEvent()
-  
+
   glfwSetTime($time)
-  
+
   glfwSwapInterval($interval)
-  
+
   glfwTerminate()
-  
+
   glfwWaitEvents()
-  
+
   glfwWaitEventsTimeout($timeout)
-  
+
   glfwWindowHint($hint, $value)
-  
+
   $name = glfwGetJoystickName($joy)
-  
+
   $name = glfwGetKeyName($key, $scancode)
-  
+
   $version = glfwGetVersionString()
-  
+
   @axes = glfwGetJoystickAxes($joy)
-  
+
   @buttons = glfwGetJoystickButtons($joy)
-  
+
   $status = glfwInit()
-  
+
   $ispresent = glfwJoystickPresent($joy)
-  
+
   $time = glfwGetTime()
-  
+
   $frequency = glfwGetTimerFrequency()
-  
+
   $timervalue = glfwGetTimerValue()
-  
+
   $supported = glfwVulkanSupported()
 
 
 =head2 GLFW OpenGL Extension checks are not implemented
 
   glfwExtensionSupported
-  
+
   glfwGetProcAddress
 
 
 =head2 Vulkan not implemented
 
   glfwGetRequiredInstanceExtensions
-  
+
   glfwGetInstanceProcAddress
-  
+
   glfwGetPhysicalDevicePresentationSupport
-  
+
   glfwCreateWindowSurface
 
 

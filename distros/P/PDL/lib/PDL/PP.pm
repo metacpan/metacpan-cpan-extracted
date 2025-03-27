@@ -662,6 +662,7 @@ sub _pp_line_number_file {
 	confess "pp_line_numbers called with undef" if !defined $string;
 	# The line needs to be incremented by one for the bookkeeping to work
 	$line++;
+	$filename = 'lib/PDL/PP.pm' if $filename eq __FILE__;
 	$filename =~ s/\\/\\\\/g; # Escape backslashes
 	my @to_return = "\nPDL_LINENO_START $line \"$filename\"\n";
 	# Look for broadcastloops and loops and add # line directives
@@ -863,12 +864,13 @@ sub pp_def {
 	}
 	PDL::PP->printxs($obj{NewXSCode});
 	pp_add_boot($obj{BootSetNewXS}) if $obj{BootSetNewXS};
-	PDL::PP->pp_add_exported($name);
+	PDL::PP->pp_add_exported($name) unless $obj{NoExport};
 	PDL::PP::_pp_addpm_nolineno("\n".$obj{PdlDoc}."\n") if $obj{PdlDoc};
 	PDL::PP::_pp_addpm_nolineno($obj{PMCode}) if defined $obj{PMCode};
 	PDL::PP::_pp_addpm_nolineno($obj{PMFunc}."\n") if defined $obj{PMFunc};
 
 	print "*** Leaving pp_def for $name\n" if $::PP_VERBOSE;
+    \%obj;
 }
 
 # marks this module as deprecated. This handles the user warnings, and adds a
@@ -1389,21 +1391,22 @@ $PDL::PP::deftbl =
       }),
    PDL::PP::Rule::Returns::EmptyString->new("InplaceCode", []),
    PDL::PP::Rule->new("InplaceDocValues",
-     [qw(Name SignatureObj InplaceNormalised)],
+     [qw(Name SignatureObj InplaceNormalised NoExport?)],
      'doc describing usage inplace',
      sub {
-       my ($name, $sig, $inplace) = @_;
+       my ($name, $sig, $inplace, $noexport) = @_;
        my @args = @{ $sig->args_callorder };
        my %inplace_involved = map +($_=>1), my ($in, $out) = @$inplace;
        my $meth_call = $args[0] eq $in;
        @args = grep !$inplace_involved{$_}, @args;
        my @vals = !$meth_call ? () : [
         "\$$in->inplace->$name".(
-           !@args ? '' : "(@{[join ',', map qq{\$$_}, @args]})"
+           !@args ? '' : "(@{[join ', ', map qq{\$$_}, @args]})"
          ).";", []
        ];
-       push @vals, [ "$name(\$$in->inplace".(
-           !@args ? '' : ",@{[join ',', map qq{\$$_}, @args]}"
+       my $prefix = $noexport ? "$::PDLOBJ\::" : "";
+       push @vals, [ "$prefix$name(\$$in->inplace".(
+           !@args ? '' : ", @{[join ', ', map qq{\$$_}, @args]}"
          ).");", []];
        $vals[0][1] = ["can be used inplace"];
        \@vals;
@@ -1461,25 +1464,27 @@ EOF
        my @outs = $sig->names_out;
        confess "$name error in Overload doc: !=1 output (@outs)" if @outs != 1;
        my @ins = $sig->names_in;
+       my $sp = $op !~ /^[a-z]/ ? '' : ' ';
        my @vals = ["\$$outs[0] = ".(
-         !$one_arg ? "\$$ins[0] $op \$$ins[1]" :
-         $op.($op =~ /[^a-z]/ ? '' : ' ')."\$$ins[0]"
+         $one_arg ? "$op$sp\$$ins[0]" :
+         $sp ? "$op \$$ins[0], \$$ins[1]" :
+         "\$$ins[0] $op \$$ins[1]"
        ).";", 
        ["overloads the Perl '$op' operator"]
        ];
-       push @vals, ["\$$ins[0] $op= \$$ins[1];", []] if $mutator;
+       push @vals, ["\$$ins[0] $op= \$$ins[1];", []] if $mutator && !$one_arg;
        \@vals;
      }),
    PDL::PP::Rule::Returns->new("OverloadDocValues", []),
 
    PDL::PP::Rule->new([qw(UsageDoc ParamDoc)],
      [qw(Name Doc? SignatureObj OtherParsDefaults? ArgOrder?
-       OverloadDocValues InplaceDocValues ParamDesc? Lvalue?
+       OverloadDocValues InplaceDocValues ParamDesc? Lvalue? NoExport?
      )],
      'generate "usage" section of doc',
      sub {
        my ($name, $doc, $sig, $otherdefaults, $argorder,
-         $overloadvals, $inplacevals, $paramdesc, $lvalue,
+         $overloadvals, $inplacevals, $paramdesc, $lvalue, $noexport,
        ) = @_;
        $otherdefaults ||= {};
        $paramdesc ||= {};
@@ -1503,8 +1508,8 @@ EOF
        } elsif ($argorder) {
          my @allouts = grep $any_out{$_} || $outca{$_}, @args;
          push @argsets, map [[ @inargs[0..$_] ], \@allouts, []],
-           ($#inargs-$noptional)..$#inargs;
-         push @{$argsets[-1][2]}, 'all arguments given';
+           ($#inargs-$noptional)..$#inargs-@allouts;
+         push @argsets, [\@args, [], ['all arguments given']];
          unshift @{$argsets[0][2]}, "using default$plural$override" if $override;
        } else {
          push @argsets, [
@@ -1522,10 +1527,11 @@ EOF
          push @argsets, [\@args, [], ['all arguments given']];
        }
        my @invocs = @$overloadvals;
+       my $prefix = $noexport ? "$::PDLOBJ\::" : "";
        push @invocs, map [(!@{$_->[1]} ? '' :
            @{$_->[1]} == 1 ? "\$$_->[1][0] = " :
            "(".join(", ", map "\$$_", @{$_->[1]}).") = "
-         )."$name(".join(", ", map "\$$_", @{$_->[0]}).");",
+         )."$prefix$name(".join(", ", map "\$$_", @{$_->[0]}).");",
          [@{$_->[2]}]], @argsets;
        $argsets[0][2] = ['method call'];
        $argsets[$_][2] = [] for 1..$#argsets; # they get the idea

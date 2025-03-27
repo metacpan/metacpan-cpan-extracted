@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 74;
 
-use Math::BigInt;
+my $class = "Math::BigInt";
+use_ok($class);
 
 my $x;
 
@@ -15,72 +16,69 @@ my $x;
 
 my $y;
 
-# Finite numbers.
+my $cases =
+  [
+   [ "-20", "-15127" ],
+   [ "-15", "1364" ],
+   [ "-2", "-3" ],
+   [ "-1", "1" ],
+   [ "0", "2" ],
+   [ "1", "1" ],
+   [ "2", "3" ],
+   [ "15", "1364" ],
+   [ "20", "15127" ],
+   [ "250", "17656721319717734662791328845675730903632844218828123" ],
+   [ "+inf", "inf" ],
+   [ "-inf", "NaN" ],
+   [ "NaN", "NaN" ],
+  ];
 
-$x = Math::BigInt -> new("-20");
-$y = $x -> blucas();
-is($y, "-15127", "blucas(-20)");
+# blucas() as instance method
 
-$x = Math::BigInt -> new("-15");
-$y = $x -> blucas();
-is($y, "1364", "blucas(-15)");
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    my $test = qq|\$x = $class -> new("$in"); \$y = \$x -> blucas();|;
+    note "\n$test\n\n";
+    my ($x, $y);
+    eval $test;
+    die $@ if $@;
+    is(ref($y), $class, "output class is $class");
+    is($y, $want, "output value is $want");
+}
 
-$x = Math::BigInt -> new("-2");
-$y = $x -> blucas();
-is($y, "-3", "blucas(-2)");
+# blucas() as class method
 
-$x = Math::BigInt -> new("-1");
-$y = $x -> blucas();
-is($y, "1", "blucas(-1)");
-
-$x = Math::BigInt -> new("0");
-$y = $x -> blucas();
-is($y, "2", "blucas(0)");
-
-$x = Math::BigInt -> new("1");
-$y = $x -> blucas();
-is($y, "1", "blucas(1)");
-
-$x = Math::BigInt -> new("2");
-$y = $x -> blucas();
-is($y, "3", "blucas(2)");
-
-$x = Math::BigInt -> new("15");
-$y = $x -> blucas();
-is($y, "1364", "blucas(15)");
-
-$x = Math::BigInt -> new("20");
-$y = $x -> blucas();
-is($y, "15127", "blucas(20)");
-
-$x = Math::BigInt -> new("250");
-$y = $x -> blucas();
-is($y, "17656721319717734662791328845675730903632844218828123", "blucas(250)");
-
-# Infinites and NaN.
-
-$x = Math::BigInt -> binf("+");
-$y = $x -> blucas();
-is($y, "inf", "blucas(+inf)");
-
-$x = Math::BigInt -> binf("-");
-$y = $x -> blucas();
-is($y, "NaN", "blucas(-inf)");
-
-$x = Math::BigInt -> bnan();
-$y = $x -> blucas();
-is($y, "NaN", "blucas(NaN)");
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    my $test = qq|\$y = $class -> blucas("$in");|;
+    note "\n$test\n\n";
+    my $y;
+    eval $test;
+    die $@ if $@;
+    is(ref($y), $class, "output class is $class");
+    is($y, $want, "output value is $want");
+}
 
 ###############################################################################
 # List context.
 ###############################################################################
 
-my @y;
+for (my $k = 0 ; $k <= 10 ; $k++) {
+    my $want = [ (2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 123) [0 .. $k] ];
+    my $test = qq|\@y = $class -> blucas("$k");|;
+    note "\n$test\n\n";
+    my @y;
+    eval $test;
+    die $@ if $@;
+    is_deeply(\@y, $want, "output values");
+}
 
-$x = Math::BigInt -> new("10");
-@y = $x -> blucas();
-is_deeply(\@y, [2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 123], "blucas(10)");
-
-$x = Math::BigInt -> new("-10");
-@y = $x -> blucas();
-is_deeply(\@y, [2, 1, -3, 4, -7, 11, -18, 29, -47, 76, -123], "blucas(-10)");
+for (my $k = -1 ; $k >= -10 ; $k--) {
+    my $want = [ (2, 1, -3, 4, -7, 11, -18, 29, -47, 76, -123) [0 .. -$k] ];
+    my $test = qq|\@y = $class -> blucas("$k");|;
+    note "\n$test\n\n";
+    my @y;
+    eval $test;
+    die $@ if $@;
+    is_deeply(\@y, $want, "output values");
+}

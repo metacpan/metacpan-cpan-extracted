@@ -7,6 +7,8 @@ use Test::More;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigInt;
+use Math::BigFloat;
+use Math::BigRat;
 
 my ($x, $y);
 
@@ -30,6 +32,42 @@ subtest '$x = Math::BigInt -> new("2"); $y = $x -> as_int();' => sub {
     isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
 };
 
+$x = Math::BigFloat -> new("2"); $y = $x -> as_int();
+subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
+    cmp_ok($y, "==", 2, '$y == 2');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigFloat -> new("2.8"); $y = $x -> as_int();
+subtest '$x = Math::BigFloat -> new("2.8"); $y = $x -> as_int();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
+    cmp_ok($y, "==", 2, '$y == 2');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigRat -> new("2"); $y = $x -> as_int();
+subtest '$x = Math::BigRat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigRat', '$x is a Math::BigRat');
+    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
+    cmp_ok($y, "==", 2, '$y == 2');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigRat -> new("14/5"); $y = $x -> as_int();
+subtest '$x = Math::BigRat -> new("14/5"); $y = $x -> as_int();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigRat', '$x is a Math::BigRat');
+    is(ref($y), 'Math::BigInt', '$y is a Math::BigInt');
+    cmp_ok($y, "==", 2, '$y == 2');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
 note("as_int() returns a Math::BigInt regardless of upgrading/downgrading");
 
 require Math::BigFloat;
@@ -37,30 +75,65 @@ Math::BigInt -> upgrade("Math::BigFloat");
 Math::BigFloat -> downgrade("Math::BigInt");
 Math::BigFloat -> upgrade("Math::BigRat");
 
-$x = Math::BigInt -> new("3");
-$y = $x -> as_int();
+$y = Math::BigInt -> as_int("2");
 
-subtest '$x = Math::BigInt -> new("3"); $y = $x -> as_int();' => sub {
+subtest '$y = Math::BigInt -> as_int("2");' => sub {
+    plan tests => 2;
+    is(ref($y), 'Math::BigInt', 'class of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
+};
+
+$y = Math::BigInt -> as_int("2.8");
+
+subtest '$y = Math::BigInt -> as_int("2.8");' => sub {
+    plan tests => 2;
+    is(ref($y), 'Math::BigInt', 'class of $y');
+    is($y, "2", 'value of $y');
+};
+
+$x = Math::BigInt -> new("2"); $y = $x -> as_int();
+
+subtest '$x = Math::BigInt -> new("2"); $y = $x -> as_int();' => sub {
     plan tests => 3;
     is(ref($x), 'Math::BigInt', 'class of $x');
     is(ref($y), 'Math::BigInt', 'class of $y');
-    cmp_ok($y -> numify(), "==", 3, 'value of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
 };
 
-$y = Math::BigInt -> as_int("3");
+$x = Math::BigFloat -> new("2"); $y = $x -> as_int();
 
-subtest '$y = Math::BigInt -> as_int("3");' => sub {
-    plan tests => 2;
+subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 3;
+    is(ref($x), 'Math::BigInt', 'class of $x');
     is(ref($y), 'Math::BigInt', 'class of $y');
-    cmp_ok($y -> numify(), "==", 3, 'value of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
 };
 
-$y = Math::BigInt -> as_int("3.5");
+$x = Math::BigFloat -> new("2.8"); $y = $x -> as_int();
 
-subtest '$y = Math::BigInt -> as_int("3.5");' => sub {
-    plan tests => 2;
+subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 3;
+    is(ref($x), 'Math::BigFloat', 'class of $x');
     is(ref($y), 'Math::BigInt', 'class of $y');
-    is($y, "NaN", 'value of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
+};
+
+$x = Math::BigRat -> new("2"); $y = $x -> as_int();
+
+subtest '$x = Math::BigRat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 3;
+    is(ref($x), 'Math::BigRat', 'class of $x');
+    is(ref($y), 'Math::BigInt', 'class of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
+};
+
+$x = Math::BigRat -> new("14/5"); $y = $x -> as_int();
+
+subtest '$x = Math::BigRat -> new("2"); $y = $x -> as_int();' => sub {
+    plan tests => 3;
+    is(ref($x), 'Math::BigRat', 'class of $x');
+    is(ref($y), 'Math::BigInt', 'class of $y');
+    cmp_ok($y -> numify(), "==", 2, 'value of $y');
 };
 
 note("as_int() preserves all instance variables");

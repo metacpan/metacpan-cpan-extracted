@@ -29,7 +29,7 @@ sub sig_alarm
 
 @ISA = qw( Exporter );
 @EXPORT_OK = qw( set_sig_handler timeout_call sig_name sig_number sig_alarm );
-$VERSION = '0.23';
+$VERSION = '0.24';
 
 use Config;
 my %signame = ();

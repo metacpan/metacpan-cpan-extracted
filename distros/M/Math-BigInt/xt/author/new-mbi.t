@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 106;
-
+use Test::More tests => 208;
 use Scalar::Util qw< refaddr >;
 
 my $class;
@@ -18,9 +17,15 @@ while (<DATA>) {
     next unless length; # skip empty lines
 
     my ($in0, $out0) = split /:/;
-    my $x;
-    my $test = qq|\$x = $class -> new("$in0");|;
-    my $desc = $test;
+    my ($x, $y);
+    my ($test, $desc);
+
+    # new() as a class method:
+    #
+    # $y = $class -> new(...)
+
+    $test = qq|\$x = $class -> new("$in0");|;
+    $desc = $test;
 
     eval $test;
     die $@ if $@;       # this should never happen
@@ -34,9 +39,33 @@ while (<DATA>) {
         is($x, $out0, 'output arg has the right value');
     };
 
+    # new() as an instance method:
+    #
+    # $y = $x -> new(...)
+
+    $test = qq|\$x = $class -> new("999"); \$y = \$x -> new("$in0");|;
+    $desc = $test;
+
+    eval $test;
+    die $@ if $@;       # this should never happen
+
+    subtest $desc, sub {
+        plan tests => 3;
+
+        # Check output.
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, $out0, 'output arg has the right value');
+
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
 }
 
-# new()
+###############################################################################
+
+# new() as a class method:
+#
+# $y = $class -> new()
 
 {
     my $x = $class -> new();
@@ -48,7 +77,27 @@ while (<DATA>) {
     };
 }
 
-# new("")
+# new() as an instance method:
+#
+# $y = $x -> new()
+
+{
+    my $x = $class -> new("999");
+    my $y = $x -> new();
+    subtest qq|\$x = $class -> new("999"); \$y = \$x -> new();|, => sub {
+        plan tests => 3;
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
+
+# new() as a class method:
+#
+# $class -> new("")
 
 {
     no warnings "numeric";
@@ -62,7 +111,29 @@ while (<DATA>) {
     };
 }
 
-# new(undef)
+# new() as an instance method:
+#
+# $x -> new("")
+
+{
+    no warnings "numeric";
+    my $x = $class -> new("999");
+    my $y = $x -> new("");
+    subtest qq|\$x = $class -> new("999"); \$y = \$x -> new("");|, => sub {
+        plan tests => 3;
+
+        is(ref($y), $class, "output arg is a $class");
+#        is($y, "0", 'output arg has the right value');
+        is($y, "NaN", 'output arg has the right value');
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
+
+# new() as a class method
+#
+# $class -> new(undef)
 
 {
     no warnings "uninitialized";
@@ -75,7 +146,26 @@ while (<DATA>) {
     };
 }
 
-# new($x)
+# new() as an instance method
+#
+# $x -> new(undef)
+
+{
+    no warnings "uninitialized";
+    my $x = $class -> new("999");
+    my $y = $x -> new(undef);
+    subtest qq|\$y = $class -> new(undef);|, => sub {
+        plan tests => 3;
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
+
+# $class -> new($x)
 #
 # In this case, when $x isa Math::BigInt, only the sign and value should be
 # copied from $x, not the accuracy or precision.

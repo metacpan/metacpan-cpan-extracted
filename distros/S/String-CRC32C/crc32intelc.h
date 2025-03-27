@@ -95,7 +95,7 @@
 
 #ifndef __LP64__
 #define CombineCRC()\
-asm volatile (\
+__asm__ __volatile__ (\
 "movdqu (%3), %%xmm0\n\t"\
 "movd %0, %%xmm1\n\t"\
 "pclmullqlqdq %%xmm0, %%xmm1\n\t"\
@@ -115,7 +115,7 @@ asm volatile (\
 );
 #else
 #define CombineCRC()\
-asm volatile (\
+__asm__ __volatile__ (\
 "movdqa (%3), %%xmm0\n\t"\
 "movq %0, %%xmm1\n\t"\
 "pclmullqlqdq %%xmm0, %%xmm1\n\t"\

@@ -641,7 +641,7 @@ Also see L</setvaltobad> and L</setnantobad>.
  $b = $a->setvaltobad($value);     # method call
  $a->setvaltobad($b, $value);
  $a->inplace->setvaltobad($value); # can be used inplace
- setvaltobad($a->inplace,$value);
+ setvaltobad($a->inplace, $value);
 
 =for ref
 
@@ -878,7 +878,7 @@ operation, it clears the bad flag.
  $b = $a->setbadtoval($newval);     # method call
  $a->setbadtoval($b, $newval);
  $a->inplace->setbadtoval($newval); # can be used inplace
- setbadtoval($a->inplace,$newval);
+ setbadtoval($a->inplace, $newval);
 
 =for ref
 
@@ -929,7 +929,7 @@ values are copied with no replacement.
  $c = $a->badmask($b);     # method call
  $a->badmask($b, $c);
  $a->inplace->badmask($b); # can be used inplace
- badmask($a->inplace,$b);
+ badmask($a->inplace, $b);
 
 =for ref
 
@@ -970,7 +970,7 @@ If bad values are present, these are also cleared.
  $b = $a->copybad($mask);     # method call
  $a->copybad($mask, $b);
  $a->inplace->copybad($mask); # can be used inplace
- copybad($a->inplace,$mask);
+ copybad($a->inplace, $mask);
 
 =for ref
 

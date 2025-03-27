@@ -1,4 +1,4 @@
-1.03 2025
+1.04 2025-03-26
 
   - Remove unnecessary files from Manifest
   - Get rid of Moose dependency

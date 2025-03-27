@@ -1,3 +1,4 @@
+#define FIONREAD 127 //vvvvvvv vv
 #include <internal/events.h>
 #include <chrono>
 using time_point = std::chrono::steady_clock::time_point;

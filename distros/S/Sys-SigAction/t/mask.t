@@ -26,19 +26,44 @@ use POSIX ':signal_h' ;
 use Sys::SigAction qw( set_sig_handler sig_name sig_number );
 
 ### identify platforms I don't think can be supported per the smoke testers
+### if this test was skipped in your environment and you want to use signal
+### masks, find your archname in the list below, and comment it out.
+### Then you can run the test as follows:
+###
+###    MASK_T=1 perl -Ilib t/mask.t
+###
+
 my $mask_broken_platforms = {
-    'archname' => { 'i686-cygwin-thread-multi-64int' => 1
+    'archname' => { #'i686-cygwin-thread-multi-64int' => 1,
+                    #'i686-cygwin-thread-multi' => 1,
+                    'x86_64-cygwin-threads-multi' => 1,
+                    'x86_64-cygwin' => 1,
+                    'x86_64-cygwin-ld' => 1,
+                    'x86_64-cygwin-ld' => 1,
+                    'x86_64-cygwin-quadmath' => 1,
+                    'x86_64-cygwin-thread' => 1,
+                    'x86_64-cygwin-thread-ld' => 1,
+                    'x86_64-cygwin-thread-multi' => 1,
+                    'x86_64-cygwin-thread-multi-ld' => 1,
+                    'x86_64-cygwin-thread-multi-quadmath' => 1,
+                    'x86_64-cygwin-thread-quadmath' => 1,
+                    'x86_64-cygwin-threads-multi' => 1,
+                    'arm-android' => 1,
+                    #'x86_64-linux-gnu-thread-multi' => 1 #testing on my system only
                   }
-   ,'perlver' =>  { 'v5.10.1' => 1 
-                  }
+#    ,'perlver' =>  { 'v5.10.1' => 1 
+#                   }
+#    ,'cygwin'  =>  { 'cygwin' -> 1
+#                   }
 };
 
 
-my $on_broken_platform = (
+my $on_broken_platform = 
+  (
       exists ( $mask_broken_platforms->{'archname'}->{$Config{'archname'}} )
-   && exists ( $mask_broken_platforms->{'perlver'}->{$^V} )
-   );
-
+#       $Config{'osname'} eq "cygwin" )
+#       && exists ( $mask_broken_platforms->{'perlver'}->{$^V} )
+  );
 
 my $hup = 0;
 my $int = 0;
@@ -58,14 +83,14 @@ sub sigINT_1
 { 
    #since USR1 is delayed by mask of USR1 on this Signal handler
    #
-   ok( ($cnt==3) ,"sigINT_1 called(3) failure: ($cnt!=3) this should have been delayed by mask until sigHUP finished" );
+   ok( ($cnt==3) ,"sigINT_1 called(3) failure: if ($cnt!=3) this should have been delayed by mask until sigHUP finished" );
    $cnt++;
    $int++; 
    sleep 1;
    ok( ($cnt++==4) ,"sig mask delayed USR1 (signaled from sigHUP)(4)" );
 }
 sub sigUSR_1 { 
-   ok( ($cnt==5) ,"sigUSR called (5) failure: ($cnt!=5) it should have been delayed by mask until sigHUP finished)" );
+   ok( ($cnt==5) ,"sigUSR called (5) failure: if ($cnt!=5) it should have been delayed by mask until sigHUP finished)" );
    $cnt++;
    $usr++; 
 }
@@ -104,16 +129,45 @@ sub sigUSR_2 { #no mask
 #
 #then we do the same thing for new sig handers on INT and USR1
 #
+
+my $skip_msg = "
+       
+   NOTE: Masked signals does not seem to work on at least some cygwin and arm
+   platforms. 3 tests fail:
+
+        sigUSR called (5) failure
+        sigINT_1 called(3) failure
+        sig mask delayed USR1
+
+   osname = $Config{'osname'}
+   archname = $Config{'archname'}
+
+   Signal masking may not work for you.
+
+   If you have an application for masking signals and can come up with a patch
+   for Sys::SigAction that gets this test working, or a patch to the test
+   that shows how to fix it, please send it to me, or create a pull request
+   for https://github.com/labaxter/sys-sigaction
+
+   This test can be executed from the command line as follows:
+
+       MASK_T=1 perl -Ilib t/mask.t
+
+   To test on this platform find the variable \$on_broken_platforms 
+   at the top of t/maks.t, and comment that line out.
+
+   Lincoln
+
+   \n\n";
+
 SKIP: { 
-   plan skip_all => "perl $^V on $Config{'archname'} does not appear to mask signals correctly." if ( $on_broken_platform ); 
-   #plan skip_all => "masking signals is broken on at least some versions of cygwin" if ( $^O =~ /cygwin/ );
+  plan skip_all => $skip_msg #"perl $^V on $Config{'archname'} does not appear to mask signals correctly." 
+    if ( $on_broken_platform );
+
    plan skip_all => "requires perl 5.8.0 or later" if ( $] < 5.008 ); 
    plan tests => $tests;
+#    ok( 1, 'skipping test of masked signals' );
    
-#   print STDERR "
-#      NOTE: Setting safe=>1... with masked signals... does not seem to work
-#      the masked signals are not masked; when safe=>0 then it does...
-#      Not testing safe=>1 for now\n";
          
 
 

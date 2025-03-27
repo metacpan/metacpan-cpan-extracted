@@ -25,7 +25,7 @@ my %WriteMakefileArgs =
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 2.004001,
+                            'Math::BigInt'        => 2.005001,
                             'Carp'                => 1.22,
                             'XSLoader'            => 0,
                            },

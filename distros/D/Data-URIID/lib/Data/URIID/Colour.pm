@@ -16,7 +16,7 @@ use Carp;
 use UUID::Tiny ':std';
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 use parent 'Data::URIID::Base';
 
@@ -80,7 +80,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

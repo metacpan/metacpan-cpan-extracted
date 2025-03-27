@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 74;
 
-use Math::BigInt;
+my $class = "Math::BigInt";
+use_ok($class);
 
 my $x;
 
@@ -15,72 +16,69 @@ my $x;
 
 my $y;
 
-# Finite numbers.
+my $cases =
+  [
+   [ "-20", "-6765" ],
+   [ "-15", "610" ],
+   [ "-2", "-1" ],
+   [ "-1", "1" ],
+   [ "0", "0" ],
+   [ "1", "1" ],
+   [ "2", "1" ],
+   [ "15", "610" ],
+   [ "20", "6765" ],
+   [ "250", "7896325826131730509282738943634332893686268675876375" ],
+   [ "inf", "inf" ],
+   [ "-inf", "NaN" ],
+   [ "NaN", "NaN" ],
+  ];
 
-$x = Math::BigInt -> new("-20");
-$y = $x -> bfib();
-is($y, "-6765", "bfib(-20)");
+# bfib() as instance method
 
-$x = Math::BigInt -> new("-15");
-$y = $x -> bfib();
-is($y, "610", "bfib(-15)");
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    my $test = qq|\$x = $class -> new("$in"); \$y = \$x -> bfib();|;
+    note "\n$test\n\n";
+    my ($x, $y);
+    eval $test;
+    die $@ if $@;
+    is(ref($y), $class, "output class is $class");
+    is($y, $want, "output value is $want");
+}
 
-$x = Math::BigInt -> new("-2");
-$y = $x -> bfib();
-is($y, "-1", "bfib(-2)");
+# bfib() as class method
 
-$x = Math::BigInt -> new("-1");
-$y = $x -> bfib();
-is($y, "1", "bfib(-1)");
-
-$x = Math::BigInt -> new("0");
-$y = $x -> bfib();
-is($y, "0", "bfib(0)");
-
-$x = Math::BigInt -> new("1");
-$y = $x -> bfib();
-is($y, "1", "bfib(1)");
-
-$x = Math::BigInt -> new("2");
-$y = $x -> bfib();
-is($y, "1", "bfib(2)");
-
-$x = Math::BigInt -> new("15");
-$y = $x -> bfib();
-is($y, "610", "bfib(15)");
-
-$x = Math::BigInt -> new("20");
-$y = $x -> bfib();
-is($y, "6765", "bfib(20)");
-
-$x = Math::BigInt -> new("250");
-$y = $x -> bfib();
-is($y, "7896325826131730509282738943634332893686268675876375", "bfib(250)");
-
-# Infinites and NaN.
-
-$x = Math::BigInt -> binf("+");
-$y = $x -> bfib();
-is($y, "inf", "bfib(+inf)");
-
-$x = Math::BigInt -> binf("-");
-$y = $x -> bfib();
-is($y, "NaN", "bfib(-inf)");
-
-$x = Math::BigInt -> bnan();
-$y = $x -> bfib();
-is($y, "NaN", "bfib(NaN)");
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    my $test = qq|\$y = $class -> bfib("$in");|;
+    note "\n$test\n\n";
+    my $y;
+    eval $test;
+    die $@ if $@;
+    is(ref($y), $class, "output class is $class");
+    is($y, $want, "output value is $want");
+}
 
 ###############################################################################
 # List context.
 ###############################################################################
 
-my @y;
+for (my $k = 0 ; $k <= 10 ; $k++) {
+    my $want = [ (0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55) [0 .. $k] ];
+    my $test = qq|\@y = $class -> bfib("$k");|;
+    note "\n$test\n\n";
+    my @y;
+    eval $test;
+    die $@ if $@;
+    is_deeply(\@y, $want, "output values");
+}
 
-$x = Math::BigInt -> new("10");
-@y = $x -> bfib();
-is_deeply(\@y, [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55], "bfib(10)");
-
-$x = Math::BigInt -> new("-10");
-@y = $x -> bfib();
-is_deeply(\@y, [0, 1, -1, 2, -3, 5, -8, 13, -21, 34, -55], "bfib(-10)");
+for (my $k = -1 ; $k >= -10 ; $k--) {
+    my $want = [ (0, 1, -1, 2, -3, 5, -8, 13, -21, 34, -55) [0 .. -$k] ];
+    my $test = qq|\@y = $class -> bfib("$k");|;
+    note "\n$test\n\n";
+    my @y;
+    eval $test;
+    die $@ if $@;
+    is_deeply(\@y, $want, "output values");
+}

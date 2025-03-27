@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 use parent 'Data::URIID::Base';
 
@@ -195,7 +195,7 @@ my $config_factgrid = {
     ],
 };
 
-my @fellig_types = qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype);
+my @fellig_types = qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier e621-pool-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype);
 
 my %attrmap_osm = (
     name        => 'displayname',
@@ -427,7 +427,10 @@ sub _own_well_known {
                 {uuid => '8a31868b-0a26-42e0-ac54-819a9ed9dcab', sid => 39, name => 'in-response-to'},
                 {uuid => 'ffa893a2-9a0e-4013-96b4-307e2bca15b9', sid => 40, name => 'has-message-body'},
                 {uuid => 'b72508ba-7fb9-42ae-b4cf-b850b53a16c2', sid => 41, name => 'account'},
-                # Unassigned: 42 - 47
+                # Unassigned: 42
+                {uuid => '4e855294-4b4f-443e-b67b-8cb9d733a889', sid => 43, name => 'backwards'},
+                {uuid => '6ad2c921-7a3e-4859-ae02-98e42522e2f8', sid => 44, name => 'forwards'},
+                # Unassigned: 45 - 47
                 {uuid => 'dd8e13d3-4b0f-5698-9afa-acf037584b20', sid => 48, name => 'zero'},
                 {uuid => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', sid => 49, name => 'one'},
                 {uuid => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', sid => 50, name => 'two'},
@@ -446,7 +449,9 @@ sub _own_well_known {
                 {uuid => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d', sid => 63, name => 'grey'},
                 {uuid => 'dd708015-0fdd-4543-9751-7da42d19bc6a', sid => 64, name => 'Sun'},
                 {uuid => '23026974-b92f-4820-80f6-c12f4dd22fca', sid => 65, name => 'Luna'},
-                # Unassigned: 66 - 76
+                # Unassigned: 66 - 74
+                {uuid => 'd642eff3-bee6-5d09-aea9-7c47b181dd83', sid => 75, name => 'male'},
+                {uuid => 'db9b0db1-a451-59e8-aa3b-9994e683ded3', sid => 76, name => 'female'},
                 {uuid => 'f6249973-59a9-47e2-8314-f7cf9a5f77bf', sid => 77, name => 'person'},
                 {uuid => '5501e545-f39a-4d62-9f65-792af6b0ccba', sid => 78, name => 'body'},
                 {uuid => 'a331f2c5-20e5-4aa2-b277-8e63fd03438d', sid => 79, name => 'character'},
@@ -510,6 +515,19 @@ sub _own_well_known {
                 {uuid => '8a1cb2d6-df2f-46db-89c3-a75168adebf6', sid => 189, name => 'generator'},
                 {uuid => '3c9f40b4-2b98-44ce-b4dc-97649eb528ae', sid => 190, name => 'using-namespace'},
                 {uuid => 'bc2d2e7c-8aa4-420e-ac07-59c422034de9', sid => 191, name => 'for-type'},
+                {uuid => '5cbdbe1c-e8b6-4cac-b274-b066a7f86b28', sid => 192, name => 'left'},
+                {uuid => '3b1858a9-996b-4831-b600-eb55ab7bb0d1', sid => 193, name => 'right'},
+                {uuid => 'f158e457-9a75-42ac-b864-914b34e813c7', sid => 194, name => 'up'},
+                {uuid => '4c834505-8e77-4da6-b725-e11b6572d979', sid => 195, name => 'down'},
+                # Unassigned: 196 - 207
+                {uuid => 'fd324dee-4bc7-4716-bf0c-6d50a69961b7', sid => 208, name => 'north'},
+                {uuid => '8685e1d8-f313-403a-9f4d-48fce22f9312', sid => 209, name => 'east'},
+                {uuid => 'c65c5baf-630e-4a28-ace5-1082b032dd07', sid => 210, name => 'south'},
+                {uuid => '7ed25dc4-5afc-4b39-8446-4df7748040a4', sid => 211, name => 'west'},
+                {uuid => '7ce365d8-71d2-4bd6-95c9-888a8f1d834c', sid => 212, name => 'northeast'},
+                {uuid => '39be7db6-1dc7-41c3-acd2-de19ad17a97f', sid => 213, name => 'northwest'},
+                {uuid => '33233365-20ec-4073-9962-0cb4b1b1e48d', sid => 214, name => 'southeast'},
+                {uuid => 'b47ecfde-02b1-4790-85dd-c2e848c89d2e', sid => 215, name => 'southwest'},
             ),
         },
     );
@@ -687,15 +705,18 @@ sub _extra_lookup_services {
         ],
         'Data::Identifier'      => [
             qw(uuid oid uri),                               # ISE,
+            qw(e621-post-identifier e621-pool-identifier),  # e621
             keys %{_own_well_known()},
         ],
         'factgrid'              => [values(%{$config_factgrid->{idmap}}), qw(factgrid-identifier)],
         'doi'                   => [qw(doi)],
         'iconclass'             => ['iconclass-identifier'],
         'xkcd'                  => ['xkcd-num'],
-        'e621'                  => ['e621-post-identifier'],
+        'e621'                  => ['e621-post-identifier', 'e621-pool-identifier'],
         'furaffinity'           => ['furaffinity-post-identifier'],
         'imgur'                 => ['imgur-post-identifier'],
+        'notalwaysright'        => ['notalwaysright-post-identifier'],
+        'ruthede'               => ['ruthede-comic-post-identifier'],
     }
 }
 
@@ -1346,6 +1367,47 @@ sub _online_lookup__imgur {
     return \%res;
 }
 
+sub _online_lookup__notalwaysright {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'notalwaysright', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+    my %raw = map {$_->attr('property') => $_->attr('content')} $html->findnodes('/html/head/meta[@property]');
+
+    $res{url_overrides} = {};
+
+    $self->_load_open_graph(\%res, $html, [qw(title)]);
+
+    if (defined(my $url = $raw{'og:url'})) {
+        if (length($url)) {
+            $res{url_overrides}{'info'} = $url;
+            $res{url_overrides}{'render'} = $url;
+        }
+    }
+
+    return \%res;
+}
+
+sub _online_lookup__ruthede {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'ruthede', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+
+    $self->_load_open_graph(\%res, $html, [qw(image)]);
+
+    if (defined($attr{thumbnail}) && defined(my $url = $attr{thumbnail}{'*'})) {
+        if ($url =~ m#^(https://ruthe\.de/cartoons/)(strip_2487\.jpg)$#) {
+            $attr{thumbnail} = {'*' => $1.'tn_'.$2};
+            $res{url_overrides} = {
+                'file-fetch' => $url,
+            };
+        }
+    }
+
+    return \%res;
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub displayname {
@@ -1367,7 +1429,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -1454,6 +1516,13 @@ The C<factgrid> provides information mostly on history topics. It contains a lar
 
 This service is used to perform internal offline lookups on identifiers known to the module.
 It mainly provides display names for ISEs used by this module.
+
+=head2 C<Data::Identifier>
+
+This service uses L<Data::Identifier> as a data source.
+It can provide display names and similar for a number of common identifiers.
+
+See also L<Data::Identifier::Wellknown>.
 
 =head1 AUTHOR
 

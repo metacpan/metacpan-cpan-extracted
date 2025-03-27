@@ -448,25 +448,27 @@ sub PDL::range :lvalue {
   my $index = (ref $ind && UNIVERSAL::isa($ind,'PDL') && $ind->type eq 'indx') ? $ind : indx($ind);
   my $size = defined($sz) ? PDL->pdl($sz) : undef;
   # Handle empty PDL case: return a properly constructed Empty.
-  if($index->isempty) {
-      my @sdims= $source->dims;
-      splice(@sdims, 0, $index->dim(0) + ($index->dim(0)==0)); # added term is to treat Empty[0] like a single empty coordinate
-      unshift(@sdims, $size->list) if(defined($size));
-      return PDL->new_from_specification(0 x ($index->ndims-1), @sdims);
+  if ($index->isempty) {
+      my @sdims = $source->dims;
+      splice @sdims, 0, $index->dim(0) + ($index->dim(0)==0); # added term is to treat Empty[0] like a single empty coordinate
+      unshift @sdims, $size->list if defined $size;
+      my @index_dims = ((0) x ($index->ndims-1));
+      @index_dims = 0 if !@index_dims; # always at least one 0
+      return PDL->new_from_specification(@index_dims, @sdims);
   }
   $index = $index->dummy(0,1) unless $index->ndims;
   # Pack boundary string if necessary
-  if(defined $bound) {
-    if(ref $bound eq 'ARRAY') {
+  if (defined $bound) {
+    if (ref $bound eq 'ARRAY') {
       my ($s,$el);
-      foreach $el(@$bound) {
+      foreach $el (@$bound) {
         barf "Illegal boundary value '$el' in range"
-          unless( $el =~ m/^([0123fFtTeEpPmM])/ );
+          unless $el =~ m/^([0123fFtTeEpPmM])/;
         $s .= $1;
       }
       $bound = $s;
     }
-    elsif($bound !~ m/^[0123ftepx]+$/  && $bound =~ m/^([0123ftepx])/i ) {
+    elsif ($bound !~ m/^[0123ftepx]+$/  && $bound =~ m/^([0123ftepx])/i) {
       $bound = $1;
     }
   }
@@ -727,7 +729,7 @@ makes it easier to loop over the index array but a little more brain-bending
 to tease out the algorithm.
 
 =cut
-#line 731 "lib/PDL/Slices.pm"
+#line 733 "lib/PDL/Slices.pm"
 
 
 =head2 rangeb
@@ -813,14 +815,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1030 "lib/PDL/Slices.pd"
+#line 1032 "lib/PDL/Slices.pd"
 sub PDL::rld {
   my ($x,$y) = @_;
   my ($c,$sm) = @_ == 3 ? ($_[2], $_[2]->dim(0)) : (PDL->null, $x->sumover->max->sclr);
   PDL::_rld_int($x,$y,$c,$sm);
   $c;
 }
-#line 824 "lib/PDL/Slices.pm"
+#line 826 "lib/PDL/Slices.pm"
 
 *rld = \&PDL::rld;
 
@@ -896,7 +898,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "lib/PDL/Slices.pd"
+#line 1062 "lib/PDL/Slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -905,7 +907,7 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 909 "lib/PDL/Slices.pm"
+#line 911 "lib/PDL/Slices.pm"
 
 *rle = \&PDL::rle;
 
@@ -1010,14 +1012,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1185 "lib/PDL/Slices.pd"
+#line 1187 "lib/PDL/Slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
   PDL::_rldvec_int($a,$b,$c,$sm);
   return $c;
 }
-#line 1021 "lib/PDL/Slices.pm"
+#line 1023 "lib/PDL/Slices.pm"
 
 *rldvec = \&PDL::rldvec;
 
@@ -1119,14 +1121,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1256 "lib/PDL/Slices.pd"
+#line 1258 "lib/PDL/Slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
   PDL::_rldseq_int($a,$b,$c,$sm);
   return $c;
 }
-#line 1130 "lib/PDL/Slices.pm"
+#line 1132 "lib/PDL/Slices.pm"
 
 *rldseq = \&PDL::rldseq;
 
@@ -1134,7 +1136,7 @@ sub PDL::rldseq {
 
 
 
-#line 1290 "lib/PDL/Slices.pd"
+#line 1292 "lib/PDL/Slices.pd"
 
 =head2 rleND
 
@@ -1213,7 +1215,7 @@ sub rldND {
 
   return $data;
 }
-#line 1217 "lib/PDL/Slices.pm"
+#line 1219 "lib/PDL/Slices.pm"
 
 *_clump_int = \&PDL::_clump_int;
 
@@ -1275,7 +1277,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1446 "lib/PDL/Slices.pd"
+#line 1448 "lib/PDL/Slices.pd"
 
 =head2 reorder
 
@@ -1395,7 +1397,7 @@ sub PDL::reorder :lvalue {
         # a quicker way to do the reorder
         return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1399 "lib/PDL/Slices.pm"
+#line 1401 "lib/PDL/Slices.pm"
 
 
 =head2 mv
@@ -1452,7 +1454,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1619 "lib/PDL/Slices.pd"
+#line 1621 "lib/PDL/Slices.pd"
 
 =head2 using
 
@@ -1512,7 +1514,7 @@ sub PDL::meshgrid {
   }
   @out;
 }
-#line 1516 "lib/PDL/Slices.pm"
+#line 1518 "lib/PDL/Slices.pm"
 
 
 =head2 lags
@@ -1761,7 +1763,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1955 "lib/PDL/Slices.pd"
+#line 1957 "lib/PDL/Slices.pd"
 
 =head2 dice
 
@@ -1911,7 +1913,7 @@ sub PDL::dice_axis :lvalue {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1915 "lib/PDL/Slices.pm"
+#line 1917 "lib/PDL/Slices.pm"
 
 
 =head2 slice
@@ -2099,7 +2101,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2273 "lib/PDL/Slices.pd"
+#line 2275 "lib/PDL/Slices.pd"
 sub PDL::slice :lvalue {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -2135,7 +2137,7 @@ sub PDL::slice :lvalue {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 2139 "lib/PDL/Slices.pm"
+#line 2141 "lib/PDL/Slices.pm"
 
 *slice = \&PDL::slice;
 
@@ -2213,9 +2215,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2488 "lib/PDL/Slices.pd"
+#line 2490 "lib/PDL/Slices.pd"
 sub PDL::diagonal :lvalue { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 2219 "lib/PDL/Slices.pm"
+#line 2221 "lib/PDL/Slices.pm"
 
 *diagonal = \&PDL::diagonal;
 
@@ -2225,7 +2227,7 @@ sub PDL::diagonal :lvalue { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
 
-#line 2538 "lib/PDL/Slices.pd"
+#line 2540 "lib/PDL/Slices.pd"
 
 =head1 BUGS
 
@@ -2250,7 +2252,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 2254 "lib/PDL/Slices.pm"
+#line 2256 "lib/PDL/Slices.pm"
 
 # Exit with OK status
 

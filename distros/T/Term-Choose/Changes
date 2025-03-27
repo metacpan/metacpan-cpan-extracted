@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.771   2025-03-27
+    - Removed 'cut_to_printwidth' from the public.
+
+1.770   2025-03-26
+    - Bugfix documentation Term::Choose::LineFold.
+
 1.769   2025-03-24
     - Make 'print_columns', 'cut_to_printwidth' and 'line_fold' public.
     - 'cut_to_printwidth': The context decides whether the remainder is also returned.

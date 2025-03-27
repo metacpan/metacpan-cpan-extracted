@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3014';
+our $VERSION = '1.3016';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul
@@ -166,21 +166,23 @@ sub _mod { $_[1] %= $_[2]; }
 sub _nok {
     my ($class, $n, $k) = @_;
 
-    # Math::Pari doesn't seem to be able to handle the case when n is large and
-    # k is almost as big as n. For instance, the following returns zero (at
-    # least for certain versions and configurations):
+    # Math::Pari::binomial() doesn't seem to be able to handle input larger
+    # than 9223372036854775807, i.e., 2**63-1. For instance, the following
+    # returns zero, not one (at least for certain versions and configurations):
     #
-    # $n = PARI("10000000000000000000");
-    # $k = PARI("9999999999999999999");
-    # print Math::Pari::binomial($n, $k);'
+    # $n = PARI("9223372036854775808");
+    # $k = PARI("9223372036854775808");
+    # print Math::Pari::binomial($n, $k);
 
     # If k > n/2, or, equivalently, 2*k > n, compute nok(n, k) as nok(n, n-k).
 
-    my $umax = $class -> _new(~0);
+    #my $imax = $class -> _new("9223372036854775807");
 
-    if ($class -> _acmp($n, $umax) >= 0) {
-        return $class -> SUPER::_nok($n, $k);
-    }
+    #if ($class -> _acmp($n, $imax) > 0 ||
+    #    $class -> _acmp($k, $imax) > 0)
+    #{
+    #    return $class -> SUPER::_nok($n, $k);
+    #}
 
     my $twok = $class -> _mul($class -> _two(), $class -> _copy($k));
     if ($class -> _acmp($twok, $n) > 0) {

@@ -20,6 +20,8 @@ use UUID::Tiny ':std';
 use Math::BigInt;
 use MIME::Base64;
 
+use Data::Identifier;
+
 use Data::URIID::Service;
 use Data::URIID::Digest;
 
@@ -31,7 +33,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 use parent 'Data::URIID::Base';
 
@@ -62,7 +64,7 @@ my %attributes = (
     icon => {},
     thumbnail => {},
     website => {},
-    final_file_size => {
+    final_file_size => { # experimental
         source_type => 'uint',
     },
     service => {},
@@ -94,10 +96,10 @@ my %attributes = (
         },
     },
 
-    # TODO: define type.
+    # TODO: define type. # experimental
     (map {$_ => {source_type => 'string'}} qw(date_of_birth date_of_death)),
 
-    ext => {},
+    ext => {}, # experimental
 );
 
 my %id_conv = (
@@ -121,6 +123,7 @@ my %best_services = (
     'e621tagtype'                   => 'e621',
     'wikimedia-commons-identifier'  => 'wikimedia-commons',
     'e621-post-identifier'          => 'e621',
+    'e621-pool-identifier'          => 'e621',
     'osm-node'                      => 'osm',
     'osm-way'                       => 'osm',
     'osm-relation'                  => 'osm',
@@ -153,6 +156,9 @@ my %best_services = (
     #'chat-0-word-identifier'        => '',
     'furaffinity-post-identifier'   => 'furaffinity',
     'imgur-post-identifier'         => 'imgur',
+    'notalwaysright-post-identifier' => 'notalwaysright',
+    'fefe-blog-post-identifier'     => 'fefe',
+    'ruthede-comic-post-identifier' => 'ruthede',
 );
 
 # Load extra services:
@@ -188,7 +194,7 @@ my %url_templates = (
         map {
             [$_ => sprintf('https://www.fellig.org/subject/best/any/%s/%%s', $_), undef, [qw(info render)]],
             [$_ => sprintf('https://api.fellig.org/v0/overview/%s/%%s', $_), undef, [qw(metadata)]],
-        } qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype)
+        } qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier e621-pool-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype)
     ],
     'youtube' => [
         ['youtube-video-identifier' => 'https://www.youtube.com/watch?v=%s', undef, [qw(info render)]],
@@ -201,6 +207,8 @@ my %url_templates = (
         ['e621tagtype'          => 'https://e621.net/wiki_pages/show_or_new?title=%s', undef, [qw(info)]],
         ['e621-post-identifier' => 'https://e621.net/posts/%u',                        undef, [qw(info render)]],
         ['e621-post-identifier' => 'https://e621.net/posts.json?limit=1&tags=id:%u',   undef, [qw(metadata)]],
+        ['e621-pool-identifier' => 'https://e621.net/pools/%u',                        undef, [qw(info render)]],
+        ['e621-pool-identifier' => 'https://e621.net/pools.json?search[id]=%u',        undef, [qw(metadata)]],
     ],
     'dnb' => [
         ['gnd-identifier' => 'https://d-nb.info/gnd/%s', undef, [qw(info)]],
@@ -287,6 +295,22 @@ my %url_templates = (
     ],
     'imgur' => [
         ['imgur-post-identifier' => 'https://imgur.com/%s', undef, [qw(info render)]],
+    ],
+    'notalwaysright' => [
+        ['notalwaysright-post-identifier' => 'https://notalwaysright.com/x/%u/', undef, [qw(info render)]],
+    ],
+    'fefe' => [
+        ['fefe-blog-post-identifier' => 'https://blog.fefe.de/?ts=%s', undef, [qw(info render)]],
+        ['fefe-blog-post-identifier' => 'https://blog.fefe.de/rss.xml?ts=%s', undef, [qw(metadata)]],
+    ],
+    'schemaorg' => [
+        ['uri' => '%s', qr#^https://schema\.org/[^/]+$#, [qw(info)], {no_escape => 1}],
+    ],
+    'purlorg' => [
+        ['uri' => '%s', qr#^http://purl\.org/dc/(?:elements/1\.1|terms|dcam|dcmitype)/[^/]+$#, [qw(info)], {no_escape => 1}],
+    ],
+    'ruthede' => [
+        ['ruthede-comic-post-identifier' => 'https://ruthe.de/static/cartoon_%s.html', undef, [qw(info render)]],
     ],
 );
 my %digest_url_templates = (
@@ -395,7 +419,7 @@ my %url_parser = (
         },
         {
             host => 'www.fellig.org',
-            path => qr#^/subject/(?:info|best)/[^/]+/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-post-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
+            path => qr#^/subject/(?:info|best)/[^/]+/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-(?:post|pool)-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
             source => 'fellig',
             type => \1,
             id => \2,
@@ -403,7 +427,7 @@ my %url_parser = (
         },
         {
             host => 'api.fellig.org',
-            path => qr#^/v0/(?:overview|full)/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-post-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
+            path => qr#^/v0/(?:overview|full)/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-(?:post|pool)-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
             source => 'fellig',
             type => \1,
             id => \2,
@@ -454,6 +478,14 @@ my %url_parser = (
             path => qr#^/posts/([1-9][0-9]*)$#,
             source => 'e621',
             type => 'e621-post-identifier',
+            id => \1,
+            action => 'render',
+        },
+        {
+            host => 'e621.net',
+            path => qr#^/pools/([1-9][0-9]*)$#,
+            source => 'e621',
+            type => 'e621-pool-identifier',
             id => \1,
             action => 'render',
         },
@@ -659,6 +691,80 @@ my %url_parser = (
             id => \1,
             action => 'file-fetch',
         },
+        {
+            host => 'notalwaysright.com',
+            path => qr#^/[^/]+/([0-9]+)/$#,
+            source => 'notalwaysright',
+            type => 'notalwaysright-post-identifier',
+            id => \1,
+            action => 'render',
+        },
+        {
+            host => 'blog.fefe.de',
+            path => qr#^/$#,
+            source => 'fefe',
+            type => 'fefe-blog-post-identifier',
+            action => 'render',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                if ($uri->query =~ /^ts=([0-9a-f]{8})$/) {
+                    return $1;
+                }
+                return undef;
+            },
+        },
+        {
+            host => 'blog.fefe.de',
+            path => qr#^/rss\.xml$#,
+            source => 'fefe',
+            type => 'fefe-blog-post-identifier',
+            action => 'metadata',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                if ($uri->query =~ /^(?:html\&)?ts=([0-9a-f]{8})(?:\&html)?$/) {
+                    return $1;
+                }
+                return undef;
+            },
+        },
+        {
+            host => 'schema.org',
+            path => qr#^/[^/]+$#,
+            source => 'schemaorg',
+            type => 'uri',
+            action => 'info',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                return $uri;
+            },
+        },
+        {
+            host => 'purl.org',
+            path => qr#^/dc/(?:elements/1\.1|terms|dcam|dcmitype)/[^/]+$#,
+            source => 'purlorg',
+            type => 'uri',
+            action => 'info',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                return $uri;
+            },
+        },
+        {
+            host => 'ruthe.de',
+            path => qr#^/cartoon/([1-9][0-9]*)/datum/asc/#,
+            source => 'ruthede',
+            type => 'ruthede-comic-post-identifier',
+            action => 'render',
+            id => \1,
+        },
+        {
+            host => 'ruthe.de',
+            path => qr#^/static/cartoon_([1-9][0-9]*)\.html$#,
+            source => 'ruthede',
+            type => 'ruthede-comic-post-identifier',
+            action => 'render',
+            id => \1,
+        },
     ],
 );
 
@@ -693,8 +799,9 @@ my %syntax = (
     'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
     'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+$/,
     'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}$/,
+    'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier notalwaysright-post-identifier ruthede-comic-post-identifier)),
 );
 
 my %fellig_tables = (
@@ -766,6 +873,11 @@ sub _set {
 
     if (defined(my $best_service_name = $best_services{$type_name // ''})) {
         $best_service = $extractor->service($best_service_name);
+    }
+
+    if (defined($type_name) && $type_name eq 'uri') {
+        # normalise a bit.
+        $id =~ s#^http://schema\.org/#https://schema\.org/#;
     }
 
     $self->{primary} = {
@@ -1012,7 +1124,6 @@ sub _cast_id {
     if ($as eq 'raw' || $as eq 'string' || $as eq $src_type) {
         return $src;
     } elsif ($as eq 'Data::Identifier') {
-        require Data::Identifier;
         return Data::Identifier->new($src_type => $src);
     } elsif ($as eq __PACKAGE__) {
         return $self->_as_lookup([$src_type => $src], %opts);
@@ -1083,6 +1194,8 @@ sub _cast {
             return $value->rgb;
         } elsif (eval {$value->isa('Data::URIID::Base')} && defined(my $r = eval {$value->ise(as => $as)})) {
             return $r;
+        } elsif (($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$value->isa($as)}) {
+            return $value;
         }
 
         if ($as eq __PACKAGE__ && defined(my $ise = eval{$self->attribute($key, %opts, as => 'ise')})) {
@@ -1475,6 +1588,16 @@ sub _id_conv__doi__grove_art_online_identifier {
     $self->{id}{$type_want} = sprintf('10.1093/gao/9781884446054.article.%s', $id);
 }
 
+sub _id_conv__uri__fefe_blog_post_identifier {
+    my ($self, $type_want, $type_name_have, $id) = @_;
+    $self->{id}{$type_want} = sprintf('https://blog.fefe.de/?ts=%s', $id);
+}
+
+sub _id_conv__uuid__e621_post_identifier {
+    my ($self, $type_want, $type_name_have, $id) = @_;
+    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, 'ac59062c-6ba2-44de-9f54-09e28f2c0b5c', lc $id);
+}
+
 # --- Overrides for Data::URIID::Base ---
 sub ise {
     my ($self, %opts) = @_;
@@ -1516,7 +1639,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

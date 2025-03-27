@@ -1,0 +1,17 @@
+name           = "App-xlate"
+badges         = [ "github-actions/test.yml", "metacpan" ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+script_files   = [ "script/xlate" ]
+readme_from    = "script/xlate"
+
+[release]
+branch = "main"
+hooks = [
+    "perl -Ilib -MApp::xlate=\$VERSION -i -pE 's/^\s*Version \K([\d.]+)/$VERSION/' script/xlate",
+    "perl -Ilib -MApp::xlate=\$VERSION -i -pE 's/^\s*Version \K([\d.]+)/$VERSION/' README.md",
+    "make -C script",
+]
+
+[FileGatherer]
+exclude_match = [ '^images/.*' ]

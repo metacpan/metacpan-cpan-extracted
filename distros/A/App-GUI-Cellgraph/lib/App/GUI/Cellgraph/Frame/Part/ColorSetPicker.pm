@@ -89,7 +89,7 @@ sub new {
     $row1->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $row2 = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
-    $row2->AddSpacer( 60 );
+    $row2->AddSpacer( 66 );
     $row2->Add( $self->{'display'}[$_], 0, $all_attr, 5 ) for 0 .. 8;
     $row2->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 

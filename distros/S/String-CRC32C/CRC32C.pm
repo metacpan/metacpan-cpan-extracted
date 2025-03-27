@@ -14,17 +14,20 @@ Strihng::CRC32C - Castagnoli CRC
 
 This module calculates the Castagnoli CRC32 variant (polynomial 0x11EDC6F41).
 
-It is used by iSCSI, SCTP, BTRFS, ext4, leveldb, AMD64 CPUs and others.
+It is used by iSCSI, SCTP, BTRFS, ext4, leveldb, x86 CPUs and others.
 
-This module uses an optimized implementation for SSE 4.2 CPUs and the
+This module uses an optimized implementation for SSE 4.2 targets (GCC
+and compatible supported, SSE 4.2 must be enabled in your Perl) and the
 SlicingBy8 algorithm for anything else.
 
 =cut
 
 package String::CRC32C;
 
+our $IMPL;
+
 BEGIN {
-   $VERSION = 0.01;
+   $VERSION = 0.02;
    @ISA = qw(Exporter);
    @EXPORT_OK = qw(crc32c);
 
@@ -54,6 +57,11 @@ needs to be given as C<0> (or C<~-1>).
 This allows easy chaining, e.g.
 
    (crc32c "abcdefghi") eq (crc32 "ghi", crc32 "def", crc32 "abc)
+
+=item $impl = $String::CRC32C::IMPL
+
+Returns a string indicating the implementation that will be used. Currently either C<SlicingBy8>
+for the portable implementation or C<IntelCSSE42> for the SSE 4.2 optimized intel version.
 
 =back
 

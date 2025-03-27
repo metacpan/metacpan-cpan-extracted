@@ -18,10 +18,12 @@ use Scalar::Util qw(blessed);
 use I18N::LangTags;
 use I18N::LangTags::Detect;
 
+use Data::Identifier;
+
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %names = (
     service => {
@@ -64,6 +66,11 @@ my %names = (
         'oidref'            => 'b5a63482-f92c-4ed5-8ec3-49caa0bafa66', # oidref.com
         'furaffinity'       => '978a4622-2a87-4c67-b9bf-c1b1e5d69b05',
         'imgur'             => 'e6c5f855-221a-4c48-9f31-cf0a852140da', # imgur.com
+        'notalwaysright'    => '50882a9d-b405-4d5d-8068-0d38fb0b2f90', # notalwaysright.com
+        'fefe'              => '80195e74-7afb-435b-8c76-3da8b343f235', # fefe.de
+        'schemaorg'         => 'b1db320a-ab00-4650-ab54-f162b52bca08', # schema.org
+        'purlorg'           => '53f8ea47-1de3-4562-9459-5f093782ae10', # purl.org
+        'ruthede'           => '6c7dba44-dd07-4928-874e-f076e98cc96b', # ruthe.de
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -80,6 +87,7 @@ my %names = (
         'e621tagtype'                   => 'da72fa90-5990-46b4-b4ca-05eaf68170a5',
         'wikimedia-commons-identifier'  => 'a6b1a981-48a0-445e-adc7-11df14e91769',
         'e621-post-identifier'          => '4a7fc2e2-854b-42ec-b24f-c7fece371865',
+        'e621-pool-identifier'          => 'a0a4fae2-be6f-4a51-8326-6110ba845a16',
         'osm-node'                      => '6c09afad-0109-4a05-a430-f3bdade19c24',
         'osm-way'                       => '01da1735-25b3-4560-9c8c-186e42dd8904',
         'osm-relation'                  => 'bdd9b297-e0a8-427e-8487-83f600226f5b',
@@ -112,6 +120,9 @@ my %names = (
         'chat-0-word-identifier'        => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a',
         'furaffinity-post-identifier'   => 'b8dd10ec-d46b-4316-b3f3-2bc28cff9d35',
         'imgur-post-identifier'         => 'f2425e42-0083-4205-aa0b-2005f1fa62a3',
+        'notalwaysright-post-identifier' => '700a0082-0201-46f1-b0a1-37e2caf76cc2',
+        'fefe-blog-post-identifier'     => '9ad1edae-f08e-4605-b9f9-a1d3894c290a',
+        'ruthede-comic-post-identifier' => '2db1003d-dbf4-47bf-bfe4-7874c5bf0263',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -344,7 +355,6 @@ sub known {
                 croak 'Cannot return requested data: as=uuid not supported on all elements of list. Try as=ise' unless $e =~ Data::URIID::Result->RE_UUID;
             }
         } elsif ($as eq 'Data::Identifier') {
-            require Data::Identifier;
             @list = map {Data::Identifier->new(ise => $_)} @list;
         }
     }
@@ -442,7 +452,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -475,9 +485,6 @@ In order to do so, an extractor (instance of this package) is created.
 On that extractor L</lookup> is called for every input to process resulting in a L<Data::URIID::Result> object holding the acquired knowledge.
 
 The module supports both online and offline lookups. See L</online>.
-
-B<Note:>
-Future versions of this module will depend on L<Data::Identifier>.
 
 =head1 METHODS
 

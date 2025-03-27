@@ -5,9 +5,11 @@ MANIFEST			This list of files
 README
 t/00-load.t
 t/01-false.t
-t/02-undef.t
+t/02-undef_default.t
+t/03-undef_strict.t
 t/lib/Local/ImportModule.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -15,7 +15,7 @@ Database::Abstraction - read-only database abstraction layer (ORM)
 
 # VERSION
 
-Version 0.23
+Version 0.24
 
 # DESCRIPTION
 
@@ -32,7 +32,8 @@ By handling numerous database and file formats,
 # SYNOPSIS
 
 Abstract class giving read-only access to CSV,
-XML and SQLite databases via Perl without writing any SQL,
+XML,
+BerkeleyDB and SQLite databases via Perl without writing any SQL,
 using caching for performance optimization.
 
 The module promotes code maintainability by abstracting database access logic into a single interface.
@@ -65,6 +66,10 @@ Look for databases in $directory in this order:
 - 4 `XML`
 
     File ends with .xml
+
+- 5 `BerkeleyDB`
+
+    File ends with .db
 
 The AUTOLOAD feature allows for convenient access to database columns using method calls.
 It hides the complexity of querying the underlying data storage.

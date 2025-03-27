@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-
 use ExtUtils::MakeMaker;
 
 WriteMakefile
@@ -26,7 +25,7 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 2.003001,
+                            'Math::BigInt'        => 2.005001,
                             'Math::Pari'          => 2.010709,
                            },
 

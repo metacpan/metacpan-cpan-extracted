@@ -9,6 +9,19 @@ Easy way to connect to MySQL/MariaDB via command line.
     $ sudo make install
     $ make clean
 
+# Debian
+
+It may be better to install debian packages before installing
+`MySQL::HI` and `mysqlhi` script:
+
+     root@[boxname]:~# apt install libconfig-simple-perl \
+      libfile-homedir-perl \
+      libtest-warn-perl \
+      libtest-deep-perl \
+      cpanminus
+      
+     root@[boxname]:~# cpanm MySQL::Hi
+
 # Usage
 
 - 1. Create a config file

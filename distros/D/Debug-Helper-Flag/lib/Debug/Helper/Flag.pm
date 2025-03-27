@@ -4,13 +4,14 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(DEBUG_FLAG);
 
 use Carp;
 
+our $strict = $ENV{PERL_DEBUG_HELPER_FLAG_STRICT};
 
 my $Value;
 
@@ -46,7 +47,14 @@ sub import {
     }
   }
   if ($exp) {
-    croak("Attempt to export while constant is not yet defined") if !defined($Value);
+    if (!defined($Value)) {
+      state $msg = "Attempt to export while constant is not yet defined";
+      if ($strict) {
+        croak($msg);
+      } else {
+        carp($msg);
+      }
+    }
     __PACKAGE__->export_to_level(1, $caller, $exp)
   }
 }
@@ -65,7 +73,7 @@ Debug::Helper::Flag - Define and import boolean constant DEBUG_FLAG helping to o
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 
 =head1 SYNOPSIS
@@ -132,10 +140,18 @@ error message C<Attempt to redefine DEBUG_FLAG with different value>.
 B<Note:> only load this module directly via C<use> or in a C<BEGIN> block and
 never try to load it at runtime, otherwise the optimization will not work!
 
+If you try to import C<DEBUG_FLAG> while it is not yet defined, the warning
+"Attempt to export while constant is not yet defined" is printed. If you want
+a fatal error instead, set the environment variable
+C<PERL_DEBUG_HELPER_FLAG_STRICT> (or C<$Debug::Helper::Flag::strict>) to a
+I<true> value. This is a warning by default to avoid problems when using
+L<Perl::LanguageServer> with e.g. the corresponding vs code plugin.
+
 
 =head1 SEE ALSO
 
-L<https://metacpan.org/pod/Getopt::constant>
+L<https://metacpan.org/pod/Getopt::c
+onstant>
 
 =head1 AUTHOR
 

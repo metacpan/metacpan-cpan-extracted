@@ -88,6 +88,7 @@ xt/author/lib-boolean-_is_ten.t
 xt/author/lib-boolean-_is_two.t
 xt/author/lib-boolean-_is_zero.t
 xt/author/lib-comparison-_acmp.t
+xt/author/lib-comparison-_scmp.t
 xt/author/lib-constructor-binary-_from_base.dat
 xt/author/lib-constructor-binary-_from_base.t
 xt/author/lib-constructor-nullary-_one.t

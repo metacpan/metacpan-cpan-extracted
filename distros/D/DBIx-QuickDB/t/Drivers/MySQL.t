@@ -24,7 +24,7 @@ skipall_unless_can_db('MySQL');
 
 subtest use_it => sub {
     my $db = get_db db => {driver => 'MySQL', load_sql => [quickdb => 't/schema/mysql.sql']};
-    isa_ok($db, ['DBIx::QuickDB::Driver::MySQL::Base'], "Got a database of the right type");
+    isa_ok($db, ['DBIx::QuickDB::Driver::MySQL'], "Got a database of the right type");
 
     is(get_db_or_skipall('db'), exact_ref($db), "Cached the instance by name");
 
@@ -97,10 +97,13 @@ subtest cleanup => sub {
 
 subtest viable => sub {
     no warnings 'redefine';
-    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub() { undef };
-    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub() { undef };
-    *DBIx::QuickDB::Driver::Percona::server_bin = sub() { undef };
-    *DBIx::QuickDB::Driver::Percona::client_bin = sub() { undef };
+    no warnings 'once';
+    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub { undef };
+    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub { undef };
+    *DBIx::QuickDB::Driver::Percona::server_bin = sub { undef };
+    *DBIx::QuickDB::Driver::Percona::client_bin = sub { undef };
+    *DBIx::QuickDB::Driver::MySQLCom::server_bin   = sub { undef };
+    *DBIx::QuickDB::Driver::MySQLCom::client_bin   = sub { undef };
 
     my ($v, $why) = $CLASS->viable({bootstrap => 1});
     ok(!$v, "Not viable without a valid mysqld");

@@ -45,9 +45,9 @@ SKIP: {
     nesting itself is corrupting the call stack somehow.  This testing
     will be skipped on arm* platforms.
 
-    All that said, this was an intentially a very twisted test.  It seems
-    unlikly that one would really want to do what this tests for.  It is
-    reasonable to nest signal handlers in nexted call stacks however:
+    All that said, this was an intentionally a very twisted test.  It seems
+    unlikely that one would really want to do what this tests for.  It is
+    reasonable to nest signal handlers in nested call stacks however:
     See recursive_nested.t, which does run on arm platforms.
 
     This test can be executed manually from the command line on arm platforms

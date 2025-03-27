@@ -19,7 +19,7 @@ use DynaLoader;
 { package # hide from MetaCPAN
  PDL;
 
-#line 1437 "/home/osboxes/pdl-code/lib/PDL/PP.pm"
+#line 1440 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
   use overload 'x' => $overload_sub = sub {
@@ -273,7 +273,7 @@ L</matmult> method.
 
 =for usage
 
- $c = $a x $b;         # overloads the Perl 'x' operator
+ $c = x $a, $b;        # overloads the Perl 'x' operator
  $c = matmult($a, $b);
  matmult($a, $b, $c);  # all arguments given
  $c = $a->matmult($b); # method call
@@ -3870,14 +3870,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $result = approx_artol($got, $expected);                        # using defaults of atol=1e-06, rtol=0
+ $result = approx_artol($got, $expected);               # using defaults of atol=1e-06, rtol=0
  $result = approx_artol($got, $expected, $atol);
  $result = approx_artol($got, $expected, $atol, $rtol);
- $result = approx_artol($got, $expected, $atol, $rtol, $result); # all arguments given
- $result = $got->approx_artol($expected);                        # method call
+ approx_artol($got, $expected, $atol, $rtol, $result);  # all arguments given
+ $result = $got->approx_artol($expected);               # method call
  $result = $got->approx_artol($expected, $atol);
  $result = $got->approx_artol($expected, $atol, $rtol);
- $result = $got->approx_artol($expected, $atol, $rtol, $result);
+ $got->approx_artol($expected, $atol, $rtol, $result);
 
 =for ref
 

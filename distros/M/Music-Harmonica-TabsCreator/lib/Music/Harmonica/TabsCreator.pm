@@ -10,10 +10,11 @@ use Exporter qw(import);
 use List::Util qw(min max none);
 use Music::Harmonica::TabsCreator::NoteToToneConverter;
 use Music::Harmonica::TabsCreator::TabParser;
+use Music::Harmonica::TabsCreator::Warning;
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our @EXPORT_OK = qw(tune_to_tab get_tuning_details tune_to_tab_rendered
     transpose_tab transpose_tab_rendered list_tunings);
@@ -29,7 +30,7 @@ sub extend_chromatic_tuning ($tuning, $fix) {
   my $size = @{$tuning->{notes}};
   for my $i (0 .. $size - 1) {
     push @{$tuning->{tabs}}, sprintf('(%s)', $tuning->{tabs}[$i]);
-    $tuning->{notes}[$i] =~ m/^(\w)(\d)$/ or die 'Unexpected error';  ## no critic (RequireCarping)
+    $tuning->{notes}[$i] =~ m/^(\w)(\d)$/ or die 'Unexpected error';
     push @{$tuning->{notes}}, "${1}#${2}";
   }
   if ($fix) {
@@ -37,7 +38,7 @@ sub extend_chromatic_tuning ($tuning, $fix) {
     # one more note (instead of duplicating the C). It’s not really an issue if
     # the harmonica does not have it as the missing C is there anyway on the
     # harmonica (and worst case, the tab can’t be played if it requires (-12)).
-    die 'Unexpected error' unless $tuning->{notes}[-1] =~ m/^B#(\d+)$/;  ## no critic (RequireCarping)
+    die 'Unexpected error' unless $tuning->{notes}[-1] =~ m/^B#(\d+)$/;
     $tuning->{notes}[-1] = 'D'.($1 + 1);
   }
   # We put the notes with the slides pushed-in at the beginning of the array so
@@ -151,6 +152,14 @@ Readonly my %ALL_TUNINGS => (
     },
     1
   ),
+  xylophone => {
+    tags => [qw(diatonic)],
+    name => 'Xylophone',
+    tabs => [qw(  1  2  3  4  5  6  7  8  9 10 11 12)],
+    notes => [qw(C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5)],
+    bends => [qw( 0  0  0  0  0  0  0  0  0  0  0  0)],
+    key => 'C',
+  },
 );
 #>>>
 
@@ -296,6 +305,7 @@ sub match_notes_to_tuning ($tones, $tuning, $preferred_key) {
   my $note_converter = Music::Harmonica::TabsCreator::NoteToToneConverter->new();
   my ($scale_min, $scale_max) = (min(@{$tuning->{tones}}), max(@{$tuning->{tones}}));
   my @real_tones = grep { looks_like_number($_) } @{$tones};
+  die Music::Harmonica::TabsCreator::Warning->new('No melody found in input') unless @real_tones;
   my ($tones_min, $tones_max) = (min(@real_tones), max(@real_tones));
   my %scale_tones = map { $tuning->{tones}[$_] => $tuning->{tabs}[$_] } 0 .. $#{$tuning->{tones}};
   my ($o_min, $o_max) = ($scale_min - $tones_min, $scale_max - $tones_max);

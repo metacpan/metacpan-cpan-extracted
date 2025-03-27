@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Debug-Helper-Flag
-version:            0.01
+version:            0.02
 abstract:           Define and import boolean constant DEBUG_FLAG helping to optimize code.
 author:
     - Abdul al Hazred <451@gmx.eu>

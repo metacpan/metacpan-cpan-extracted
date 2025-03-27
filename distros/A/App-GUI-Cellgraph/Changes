@@ -1,4 +1,12 @@
 
+0.73 2025-03-26  lichtkind
+-------
+    * = fix release
+    / = make progress bar thinner
+    * ? align preview in color set picker
+    * ? small POD fixes
+    * - remove a little dead code
+
 0.72 2025-02-23  lichtkind
 -------
     * = fix release
@@ -115,5 +123,6 @@
 
 
 TODO:
- switch to prima widget toolkit
- event driven data store
+ switch to prima widget toolkit ??
+ adopt event driven data store Data::Store::Consistent
+ display percantage use of subrules

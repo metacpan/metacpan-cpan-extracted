@@ -48,7 +48,7 @@ sub new {
     $self->{'tabs'}->AddPage( $self->{'panel'}{'action'}, 'Action Rules');
     $self->{'tabs'}->AddPage( $self->{'panel'}{'color'},  'Colors');
     $self->{'tabs'}{'selected'} = 0;
-    $self->{'progress'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 400, 10, $self->{'panel'}{'color'}->get_active_colors);
+    $self->{'progress'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 320, 10, $self->{'panel'}{'color'}->get_active_colors);
 
     $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self, 700 );
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
@@ -107,7 +107,7 @@ sub new {
     Wx::Event::EVT_MENU( $self, 12400, sub { $self->save_image_dialog });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
 
-    my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_HORIZONTAL;
+    my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_VERTICAL;
     my $vert_attr = $std_attr | &Wx::wxTOP;
     my $vset_attr = $std_attr | &Wx::wxTOP| &Wx::wxBOTTOM;
     my $horiz_attr = $std_attr | &Wx::wxLEFT;
@@ -118,18 +118,18 @@ sub new {
     $board_sizer->Add( $self->{'board'}, 0, $all_attr,  5);
     $board_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
-    my $cmd_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $paint_lbl = Wx::StaticText->new( $self, -1, 'Grid Status:' );
-    $cmd_sizer->Add( $paint_lbl,     0, $all_attr, 15 );
-    $cmd_sizer->Add( $self->{'progress'},         1, $all_attr, 10 );
-    $cmd_sizer->AddSpacer(5);
-    $cmd_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
-    $cmd_sizer->AddSpacer(10);
+    my $draw_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $draw_sizer->Add( $paint_lbl,                  0, $all_attr, 15 );
+    $draw_sizer->Add( $self->{'progress'},         0, &Wx::wxALIGN_CENTER_VERTICAL, 10 );
+    $draw_sizer->AddSpacer(5);
+    $draw_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
+    $draw_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $setting_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $setting_sizer->Add( $self->{'tabs'}, 1, &Wx::wxEXPAND | &Wx::wxGROW);
     $setting_sizer->AddSpacer(10);
-    $setting_sizer->Add( $cmd_sizer,      0,  0, 0);
+    $setting_sizer->Add( $draw_sizer,      0,  0, 0);
     $setting_sizer->AddSpacer(5);
     # $setting_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 

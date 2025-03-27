@@ -26,7 +26,7 @@ $x = Math::BigInt -> new("2.5");        # upgrades
 subtest '$x = Math::BigInt -> new("2.5");' => sub {
     plan tests => 2;
     is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
-    cmp_ok($x, "==", 2.5, '$x == 2');
+    cmp_ok($x, "==", 2.5, '$x == 2.5');
 };
 
 # brsft()

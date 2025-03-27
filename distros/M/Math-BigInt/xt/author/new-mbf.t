@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 116;
-
+use Test::More tests => 222;
 use Scalar::Util qw< refaddr >;
 
 my $class;
@@ -20,10 +19,15 @@ while (<DATA>) {
     next unless length; # skip empty lines
 
     my ($in0, $out0) = split /:/;
-    my $x;
+    my ($x, $y);
+    my ($test, $desc);
 
-    my $test = qq|\$x = $class -> new("$in0");|;
-    my $desc = $test;
+    # new() as a class method:
+    #
+    # $y = $class -> new(...)
+
+    $test = qq|\$y = $class -> new("$in0");|;
+    $desc = $test;
 
     eval $test;
     die $@ if $@;       # this should never happen
@@ -33,74 +37,186 @@ while (<DATA>) {
 
         # Check output.
 
-        is(ref($x), $class, "output arg is a $class");
-        is($x, $out0, 'output arg has the right value');
+        is(ref($y), $class, "output arg is a $class");
+        is($y, $out0, 'output arg has the right value');
 
-        if ($LIB -> _is_zero($x->{_e})) {
-            is($x->{_es}, '+', "exponent sign is + when exponent is 0");
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
         } else {
-            ok($x->{_es} eq '+' || $x->{_es} eq '-', "exponent sign is valid");
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
         }
     };
 
+    # new() as an instance method:
+    #
+    # $y = $x -> new(...)
+
+    $test = qq|\$x = $class -> new("999"); \$y = \$x -> new("$in0");|;
+    $desc = $test;
+
+    eval $test;
+    die $@ if $@;       # this should never happen
+
+    subtest $desc, sub {
+        plan tests => 4;
+
+        # Check output.
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, $out0, 'output arg has the right value');
+
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
+        } else {
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
+        }
+
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
 }
 
-# new()
+###############################################################################
+
+# new() as a class method:
+#
+# $y = $class -> new()
 
 {
-    my $x = $class -> new();
-    subtest qq|\$x = $class -> new();|, => sub {
+    my $y = $class -> new();
+    subtest qq|\$y = $class -> new();|, => sub {
         plan tests => 3;
 
-        is(ref($x), $class, "output arg is a $class");
-        is($x, "0", 'output arg has the right value');
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
 
-        if ($LIB -> _is_zero($x->{_e})) {
-            is($x->{_es}, '+', "exponent sign is + when exponent is 0");
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
         } else {
-            ok($x->{_es} eq '+' || $x->{_es} eq '-', "exponent sign is valid");
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
         }
     };
 }
 
-# new("")
+# new() as an instance method:
+#
+# $y = $x -> new()
+
+{
+    my $x = $class -> new("999");
+    my $y = $x -> new();
+    subtest qq|\$x = $class -> new("999"); \$y = \$x -> new();|, => sub {
+        plan tests => 4;
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
+
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
+        } else {
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
+        }
+
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
+
+# new() as a class method:
+#
+# $class -> new("")
 
 {
     no warnings "numeric";
-    my $x = $class -> new("");
-    subtest qq|\$x = $class -> new("");|, => sub {
+    my $y = $class -> new("");
+    subtest qq|\$y = $class -> new("");|, => sub {
         plan tests => 3;
 
-        is(ref($x), $class, "output arg is a $class");
-#        is($x, "0", 'output arg has the right value');
-        is($x, "NaN", 'output arg has the right value');
+        is(ref($y), $class, "output arg is a $class");
+#        is($y, "0", 'output arg has the right value');
+        is($y, "NaN", 'output arg has the right value');
 
-        if ($LIB -> _is_zero($x->{_e})) {
-            is($x->{_es}, '+', "exponent sign is + when exponent is 0");
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
         } else {
-            ok($x->{_es} eq '+' || $x->{_es} eq '-', "exponent sign is valid");
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
         }
     };
 }
 
-# new(undef)
+# new() as an instance method:
+#
+# $x -> new("")
+
+{
+    no warnings "numeric";
+    my $x = $class -> new("999");
+    my $y = $x -> new("");
+    subtest qq|\$x = $class -> new("999"); \$y = \$x -> new("");|, => sub {
+        plan tests => 4;
+
+        is(ref($y), $class, "output arg is a $class");
+#        is($y, "0", 'output arg has the right value');
+        is($y, "NaN", 'output arg has the right value');
+
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
+        } else {
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
+        }
+
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
+
+# new() as a class method
+#
+# $class -> new(undef)
 
 {
     no warnings "uninitialized";
-    my $x = $class -> new(undef);
-    subtest qq|\$x = $class -> new(undef);|, => sub {
+    my $y = $class -> new(undef);
+    subtest qq|\$y = $class -> new(undef);|, => sub {
         plan tests => 3;
 
-        is(ref($x), $class, "output arg is a $class");
-        is($x, "0", 'output arg has the right value');
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
 
-        if ($LIB -> _is_zero($x->{_e})) {
-            is($x->{_es}, '+', "exponent sign is '+' when exponent is 0");
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is '+' when exponent is 0");
         } else {
-            ok($x->{_es} eq '+' || $x->{_es} eq '-', "exponent sign is valid");
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
         }
     };
 }
+
+# new() as an instance method
+#
+# $x -> new(undef)
+
+{
+    no warnings "uninitialized";
+    my $x = $class -> new("999");
+    my $y = $x -> new(undef);
+    subtest qq|\$y = $class -> new(undef);|, => sub {
+        plan tests => 4;
+
+        is(ref($y), $class, "output arg is a $class");
+        is($y, "0", 'output arg has the right value');
+
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is '+' when exponent is 0");
+        } else {
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
+        }
+
+        isnt(refaddr($x), refaddr($y), "output is not the invocand");
+    };
+}
+
+###############################################################################
 
 # new($x)
 #
@@ -140,7 +256,7 @@ SKIP: {
         my @keys = ('_m', '_e');
         plan tests => scalar @keys;
         for my $key (@keys) {
-            isnt(refaddr($y -> {$key}), refaddr($x -> {$key}),
+            isnt(refaddr($x -> {$key}), refaddr($y -> {$key}),
                  'library thingy is a copy');
         }
     };
@@ -157,18 +273,18 @@ for my $str (qw/
                    1e+6277101735386680763835789423207666416102355444464034512896
                /)
 {
-    my $x;
-    $x = $class -> new($str);
+    my $y;
+    $y = $class -> new($str);
     subtest $str, sub {
         plan tests => 3;
 
-        is(ref($x), $class, "output arg is a $class");
-        is($x -> bnstr(), $str, 'output arg has the right value');
+        is(ref($y), $class, "output arg is a $class");
+        is($y -> bnstr(), $str, 'output arg has the right value');
 
-        if ($LIB -> _is_zero($x->{_e})) {
-            is($x->{_es}, '+', "exponent sign is + when exponent is 0");
+        if ($LIB -> _is_zero($y->{_e})) {
+            is($y->{_es}, '+', "exponent sign is + when exponent is 0");
         } else {
-            ok($x->{_es} eq '+' || $x->{_es} eq '-', "exponent sign is valid");
+            ok($y->{_es} eq '+' || $y->{_es} eq '-', "exponent sign is valid");
         }
     }
 }

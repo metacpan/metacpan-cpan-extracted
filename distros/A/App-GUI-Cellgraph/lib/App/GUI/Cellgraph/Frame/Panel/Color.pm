@@ -211,9 +211,7 @@ sub set_all_colors {
     return unless @color;
     map { return if ref $_ ne 'Graphics::Toolkit::Color' } @color;
     $self->{'state_colors'}[$_] = $color[$_] for 0 .. $#color;
-    # $self->{'state_colors'}[$_] = color( $default_color_def ) for $self->{'state_count'} .. $self->{'last_state'};
-    $self->{'state_pic'}[$_]->set_color( $self->{'state_colors'}[$_]->rgb_hash ) for 0 .. $self->{'last_state'};
-    $self->{'state_pic'}[$_]->set_color( $self->{'state_colors'}[$_]->values ) for 0 .. $self->{'last_state'};
+    $self->{'state_pic'}[$_]->set_color( $self->{'state_colors'}[$_]->values(as => 'hash') ) for 0 .. $self->{'last_state'};
     $self->select_state;
     $self->{'call_back'}->( 'color' ); # update whole app
 }

@@ -97,8 +97,9 @@ subtest cleanup => sub {
 
 subtest viable => sub {
     no warnings 'redefine';
-    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub() { undef };
-    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub() { undef };
+    no warnings 'once';
+    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub { undef };
+    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub { undef };
 
     my ($v, $why) = $CLASS->viable({bootstrap => 1});
     ok(!$v, "Not viable without a valid mariadbd");

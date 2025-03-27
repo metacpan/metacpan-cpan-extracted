@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/xlate.pm
+lib/App/xlate.pod
+minil.toml
+script/Makefile
+script/xlate
+share/XLATE.mk
+share/xlate.el
+t/00_compile.t
+META.yml
+MANIFEST

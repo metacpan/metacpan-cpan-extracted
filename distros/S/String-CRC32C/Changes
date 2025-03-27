@@ -1,5 +1,10 @@
 Revision history for Perl extension String::CRC32C
 
+	- only compile optimised implementation when sse 4.2 is actually
+          enabled in the compiler.
+        - added $String::CRC32C::IMPL.
+        - misc prtability fixes in crc32 code.
+
 0.01  Mon 24 Mar 2025 11:12:57 CET
 	- cloned from Convert-Scalar, which is my module starter.
 

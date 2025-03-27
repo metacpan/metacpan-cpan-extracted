@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2 * 462;
+use Test::More tests => 929;
 
 use Math::BigFloat;
 
@@ -32,6 +32,43 @@ while (<DATA>) {
         }
     }
 }
+
+# Reset accuracy and precision.
+
+Math::BigFloat -> accuracy(undef);
+Math::BigFloat -> precision(undef);
+
+# 355/113 rounded to 40 digits.
+
+my $str = '3.141592920353982300884955752212389380531';
+
+# Default rounding.
+
+note(qq|\nMath::BigFloat -> new("$str") -> bdstr();\n\n|);
+is(Math::BigFloat -> new($str) -> bdstr(),
+   '3.141592920353982300884955752212389380531');
+
+# Accuracy as argument.
+
+note(qq|\nMath::BigFloat -> new("$str") -> bdstr(3);\n\n|);
+is(Math::BigFloat -> new($str) -> bdstr(3), '3.14');
+
+# Precision as argument.
+
+note(qq|\nMath::BigFloat -> new("$str") -> bdstr(undef, -3);\n\n|);
+is(Math::BigFloat -> new($str) -> bdstr(undef, -3), '3.142');
+
+# Accuracy as class variable.
+
+note(qq|\nMath::BigFloat -> accuracy(5); Math::BigFloat -> new("$str") -> bdstr();\n\n|);
+Math::BigFloat -> accuracy(5);
+is(Math::BigFloat -> new($str) -> bdstr(), '3.1416');
+
+# Precision as class variable.
+
+note(qq|\nMath::BigFloat -> precision(-5); Math::BigFloat -> new("$str") -> bdstr();\n\n|);
+Math::BigFloat -> precision(-5);
+is(Math::BigFloat -> new($str) -> bdstr(), '3.14159');
 
 __DATA__
 

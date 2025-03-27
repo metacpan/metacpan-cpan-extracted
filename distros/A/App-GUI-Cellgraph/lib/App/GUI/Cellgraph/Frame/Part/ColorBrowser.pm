@@ -17,8 +17,7 @@ sub new {
     return unless ref $init_color;
 
     my $self = $class->SUPER::new( $parent, -1);
-
-    $self->{'init_color'} = $init_color;
+    $self->{'init_color'} = $init_color->values( as => 'hash' );
     $self->{'call_back'} = sub {};
 
     my @rgb = $init_color->values('RGB');

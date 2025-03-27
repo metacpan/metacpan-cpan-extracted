@@ -13,7 +13,7 @@ lib/DBIx/QuickDB.pm
 lib/DBIx/QuickDB/Driver.pm
 lib/DBIx/QuickDB/Driver/MariaDB.pm
 lib/DBIx/QuickDB/Driver/MySQL.pm
-lib/DBIx/QuickDB/Driver/MySQL/Base.pm
+lib/DBIx/QuickDB/Driver/MySQLCom.pm
 lib/DBIx/QuickDB/Driver/Percona.pm
 lib/DBIx/QuickDB/Driver/PostgreSQL.pm
 lib/DBIx/QuickDB/Driver/SQLite.pm
@@ -27,6 +27,7 @@ t/00-report.t
 t/Drivers/ANY.t
 t/Drivers/MariaDB.t
 t/Drivers/MySQL.t
+t/Drivers/MySQLCom.t
 t/Drivers/Percona.t
 t/Drivers/PostgreSQL.t
 t/Drivers/SQLite.t
@@ -34,11 +35,13 @@ t/HashBase.t
 t/Pool/Pool.pm
 t/Pool/mariadb.t
 t/Pool/mysql.t
+t/Pool/mysqlcom.t
 t/Pool/percona.t
 t/Pool/postgresql.t
 t/Pool/sqlite.t
 t/QuickDB/Mariadb.t
 t/QuickDB/MySQL.t
+t/QuickDB/MySQLCom.t
 t/QuickDB/Percona.t
 t/QuickDB/PostgreSQL.t
 t/QuickDB/QuickDB.pm
@@ -46,6 +49,7 @@ t/QuickDB/SQLite.t
 t/Tools/QuickDB.t
 t/schema/mariadb.sql
 t/schema/mysql.sql
+t/schema/mysqlcom.sql
 t/schema/percona.sql
 t/schema/postgresql.sql
 t/schema/sqlite.sql

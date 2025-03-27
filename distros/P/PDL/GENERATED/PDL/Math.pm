@@ -490,7 +490,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $c = $a->pow($b);     # method call
  $a->pow($b, $c);
  $a->inplace->pow($b); # can be used inplace
- pow($a->inplace,$b);
+ pow($a->inplace, $b);
 
 =for ref
 
@@ -894,7 +894,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $b = $a->bessjn($n);     # method call
  $a->bessjn($n, $b);
  $a->inplace->bessjn($n); # can be used inplace
- bessjn($a->inplace,$n);
+ bessjn($a->inplace, $n);
 
 =for ref
 
@@ -938,7 +938,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $b = $a->bessyn($n);     # method call
  $a->bessyn($n, $b);
  $a->inplace->bessyn($n); # can be used inplace
- bessyn($a->inplace,$n);
+ bessyn($a->inplace, $n);
 
 =for ref
 

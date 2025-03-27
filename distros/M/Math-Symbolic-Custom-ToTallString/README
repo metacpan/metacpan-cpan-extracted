@@ -1,0 +1,82 @@
+Math::Symbolic::Custom::ToTallString
+====================================
+
+Provides to_tall_string() through the Math::Symbolic module extension class. Large Math::Symbolic expressions can sometimes be difficult to read when displayed with to_string() and to_shorter_infix_string() (from Math::Symbolic::Custom::ToShorterString). The primary obstacles are the division and exponent operators, so to_tall_string() will compose numerator and denominator onto different lines of output and will put exponents on the line above in an attempt to improve readability. See the examples. Note that unlike to_shorter_infix_string() the output from to_tall_string() is in no way compatible with the Math::Symbolic parser.
+
+to_tall_string() accepts one optional parameter, the number of spaces to indent the returned string block.
+
+EXAMPLES
+
+use strict;
+use Math::Symbolic 0.613 qw(:all);
+use Math::Symbolic::Custom::ToTallString;
+
+my $example1 = "x / 5";
+print parse_from_string($example1)->to_tall_string(), "\n\n";
+
+#  x 
+# ---
+#  5 
+
+my $example2 = "(sin((1 / x) - (1 / y))) / (x + y)";
+print parse_from_string($example2)->to_tall_string(), "\n\n";
+
+#     ( 1     1 ) 
+#  sin(--- - ---) 
+#     ( x     y ) 
+# ----------------
+#      x + y      
+
+my $example3 = "K + (K * ((1 - exp(-2 * K * t))/(1 + exp(-2 * K * t))) )";
+print parse_from_string($example3)->to_tall_string(10), "\n\n";
+
+#               (           (-2*K*t) )
+#               (     1 - e^         )
+#           K + (K * ----------------)
+#               (           (-2*K*t) )
+#               (     1 + e^         )
+
+my $example4 = "((e^x) + (e^-x))/2";
+print parse_from_string($example4)->to_tall_string(3), "\n\n";
+
+#       x     -x 
+#     e^  + e^   
+#    ------------
+#         2     
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Symbolic::Custom::ToTallString
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Symbolic-Custom-ToTallString
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Symbolic-Custom-ToTallString
+
+    Search CPAN
+        https://metacpan.org/release/Math-Symbolic-Custom-ToTallString
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Matt Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -253,15 +253,6 @@ char *getData(TInputLine *til)
     OUTPUT:
 	RETVAL
 
-#if 0
-MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
-TEditWindow* new(int _ax, int ay, int bx, int by, char *title, int num)
-    CODE:
-        RETVAL = new TEditWindow(TRect(_ax,ay,bx,by),title,num);
-    OUTPUT:
-	RETVAL
-#endif
-
 MODULE=TVision::TMenuItem PACKAGE=TVision::TMenuItem
 
 TMenuItem *newLine()

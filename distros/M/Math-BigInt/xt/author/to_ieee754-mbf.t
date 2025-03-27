@@ -9,14 +9,6 @@ use Math::BigFloat;
 
 my @k = (16, 32, 64, 128);
 
-sub stringify {
-    my $x = shift;
-    return "$x" unless $x -> is_finite();
-    my $nstr = $x -> bnstr();
-    my $sstr = $x -> bsstr();
-    return length($nstr) < length($sstr) ? $nstr : $sstr;
-}
-
 for my $k (@k) {
 
     # Parameters specific to this format:
@@ -51,7 +43,7 @@ for my $k (@k) {
              . ("0" x ($p - 2)) . "1",
         asc => "$b ** ($emin) * $b ** (" . (1 - $p) . ") "
              . "= $b ** (" . ($emin + 1 - $p) . ")",
-        mbf => $binv ** ($p - 1 - $emin),
+        obj => $binv ** ($p - 1 - $emin),
        },
 
        {
@@ -60,7 +52,7 @@ for my $k (@k) {
              . ("0" x $w)
              . ("1" x ($p - 1)),
         asc => "$b ** ($emin) * (1 - $b ** (" . (1 - $p) . "))",
-        mbf => $binv ** (-$emin) * (1 - $binv ** ($p - 1)),
+        obj => $binv ** (-$emin) * (1 - $binv ** ($p - 1)),
        },
 
        {
@@ -69,7 +61,7 @@ for my $k (@k) {
              . ("0" x ($w - 1)) . "1"
              . ("0" x ($p - 1)),
         asc => "$b ** ($emin)",
-        mbf => $binv ** (-$emin),
+        obj => $binv ** (-$emin),
        },
 
        {
@@ -78,7 +70,7 @@ for my $k (@k) {
              . ("1" x ($w - 1)) . "0"
              . "1" x ($p - 1),
         asc => "$b ** $emax * ($b - $b ** (" . (1 - $p) . "))",
-        mbf => $b ** $emax * ($b - $binv ** ($p - 1)),
+        obj => $b ** $emax * ($b - $binv ** ($p - 1)),
        },
 
        {
@@ -87,7 +79,7 @@ for my $k (@k) {
              . "0" . ("1" x ($w - 2)) . "0"
              . "1" x ($p - 1),
         asc => "1 - $b ** (-$p)",
-        mbf => 1 - $binv ** $p,
+        obj => 1 - $binv ** $p,
        },
 
        {
@@ -96,7 +88,7 @@ for my $k (@k) {
              . "0" . ("1" x ($w - 1))
              . ("0" x ($p - 2)) . "1",
         asc => "1 + $b ** (" . (1 - $p) . ")",
-        mbf => 1 + $binv ** ($p - 1),
+        obj => 1 + $binv ** ($p - 1),
        },
 
        {
@@ -105,7 +97,7 @@ for my $k (@k) {
              . "0" . ("1" x ($w - 1))
              . ("0" x ($p - 3)) . "10",
         asc => "1 + $b ** (" . (2 - $p) . ")",
-        mbf => 1 + $binv ** ($p - 2),
+        obj => 1 + $binv ** ($p - 2),
        },
 
        {
@@ -114,7 +106,7 @@ for my $k (@k) {
              . "0" . ("1" x ($w - 1))
              . "0" x ($p - 1),
         asc => "1",
-        mbf => Math::BigFloat -> new("1"),
+        obj => Math::BigFloat -> new("1"),
        },
 
        {
@@ -123,7 +115,7 @@ for my $k (@k) {
              . "0" . ("1" x ($w - 1))
              . "0" x ($p - 1),
         asc => "-1",
-        mbf => Math::BigFloat -> new("-1"),
+        obj => Math::BigFloat -> new("-1"),
        },
 
        {
@@ -132,7 +124,7 @@ for my $k (@k) {
              . "1" . ("0" x ($w - 1))
              . ("0" x ($p - 1)),
         asc => "2",
-        mbf => Math::BigFloat -> new("2"),
+        obj => Math::BigFloat -> new("2"),
        },
 
        {
@@ -141,7 +133,7 @@ for my $k (@k) {
              . "1" . ("0" x ($w - 1))
              . ("0" x ($p - 1)),
         asc => "-2",
-        mbf => Math::BigFloat -> new("-2"),
+        obj => Math::BigFloat -> new("-2"),
        },
 
        {
@@ -150,7 +142,7 @@ for my $k (@k) {
              . ("0" x $w)
              . ("0" x ($p - 1)),
         asc => "+0",
-        mbf => Math::BigFloat -> new("0"),
+        obj => Math::BigFloat -> new("0"),
        },
 
        {
@@ -159,7 +151,7 @@ for my $k (@k) {
              . ("1" x $w)
              . ("0" x ($p - 1)),
         asc => "+inf",
-        mbf => Math::BigFloat -> new("inf"),
+        obj => Math::BigFloat -> new("inf"),
        },
 
        {
@@ -168,7 +160,7 @@ for my $k (@k) {
              . ("1" x $w)
              . ("0" x ($p - 1)),
         asc => "-inf",
-        mbf => Math::BigFloat -> new("-inf"),
+        obj => Math::BigFloat -> new("-inf"),
        },
 
        {
@@ -177,7 +169,7 @@ for my $k (@k) {
              . ("1" x $w)
              . ("1" . ("0" x ($p - 2))),
         asc => "NaN",
-        mbf => Math::BigFloat -> new("NaN"),
+        obj => Math::BigFloat -> new("NaN"),
        },
 
       ];
@@ -189,10 +181,9 @@ for my $k (@k) {
 
         note("\n", $entry -> {dsc}, " (k = $k): ", $entry -> {asc}, "\n\n");
 
-        my $x = $entry -> {mbf};
+        my $x = $entry -> {obj};
 
-        my $test = qq|Math::BigFloat -> new("| . stringify($x)
-                 . qq|") -> to_ieee754("$format")|;
+        my $test = qq|Math::BigFloat -> new("$x") -> to_ieee754("$format")|;
 
         my $got_bytes = $x -> to_ieee754($format);
         my $got_hex = unpack "H*", $got_bytes;

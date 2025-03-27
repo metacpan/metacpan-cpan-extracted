@@ -403,7 +403,23 @@ is
     else {
         pass "[SKIPPED - threading not supported] runt - simple return";
     }
+
+    is_deeply { run1 @actions }, \%expected, "run1 - simple return";
+
 }
+
+######################################
+#            Time Related
+######################################
+
+is
+    tm(
+        year  => 2025,
+        month => 3,
+        day   => 14,
+    )->strftime("%Y-%m-%d"),
+    "2025-03-14",
+    "tm - strftime simple check";
 
 ######################################
 #         Package Building

@@ -1,5 +1,9 @@
 Revision history for Database-Abstraction
 
+0.24	Wed Mar 26 11:46:57 EDT 2025
+	Added basic support for BerkeleyDBs (files ending in .db)
+	If config_file has a section for this class, use that
+
 0.23	Tue Mar 25 08:06:33 EDT 2025
 	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
 

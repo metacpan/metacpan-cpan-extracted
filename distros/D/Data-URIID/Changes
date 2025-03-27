@@ -1,3 +1,13 @@
+v0.13  XXXZ
+    - Improved e621 support
+    - Updated database of well known IDs
+    - Added basic support for Not Always Right
+    - Added basic support for Fefes Blog
+    - Added basic support for schema.org
+    - Added basic support for DC via purl.org
+    - Added basic support for ruthe.de
+    - Improved documentation
+
 v0.12  2025-01-10Z
     - Initial support for Fur Affinity, Imgur
     - Added option services_online

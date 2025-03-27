@@ -528,15 +528,6 @@ TEditor* new_obsoleted(int _ax, int ay, int bx, int by, TScrollBar *sb1, TScroll
     OUTPUT:
 	RETVAL
 
-#if 0
-MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
-TEditWindow* new(int _ax, int ay, int bx, int by, char *title, int num)
-    CODE:
-        RETVAL = new TEditWindow(TRect(_ax,ay,bx,by),title,num);
-    OUTPUT:
-	RETVAL
-#endif
-
 MODULE=TVision::TDeskTop PACKAGE=TVision::TDeskTop
 
 void insert_obsoleted(SV *self, SV *what)

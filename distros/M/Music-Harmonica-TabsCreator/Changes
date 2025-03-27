@@ -1,5 +1,9 @@
 Revision history for Perl distribution Music-Harmonica-Tabs
 
+1.02 - 2025-03-26
+ - Catch a minor error when the input music does not contain any note to avoid
+   some warnings.
+
 1.01 - 2025-01-30
  - Add initial support for Chromatic Harmonicas.
  - Minor parsing fix.

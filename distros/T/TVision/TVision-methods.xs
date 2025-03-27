@@ -112,7 +112,7 @@ TScrollBar* new(TRect r)
 MODULE=TVision::TColorSelector PACKAGE=TVision::TColorSelector
 TColorSelector* new(TRect Bounds, int ASelType)
     CODE:
-        RETVAL = new TColorSelector( Bounds,  TColorSelector::ColorSel(ASelType));
+        RETVAL = new TColorSelector( Bounds,  (TColorSelector::ColorSel)ASelType);
     OUTPUT:
 	RETVAL
 
@@ -1694,15 +1694,6 @@ TEditor* new_obsoleted(int _ax, int ay, int bx, int by, TScrollBar *sb1, TScroll
         RETVAL = new TEditor(TRect(_ax,ay,bx,by),sb1,sb2,ind, n);
     OUTPUT:
 	RETVAL
-
-#if 0
-MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
-TEditWindow* new(int _ax, int ay, int bx, int by, char *title, int num)
-    CODE:
-        RETVAL = new TEditWindow(TRect(_ax,ay,bx,by),title,num);
-    OUTPUT:
-	RETVAL
-#endif
 
 MODULE=TVision::TDeskTop PACKAGE=TVision::TDeskTop
 

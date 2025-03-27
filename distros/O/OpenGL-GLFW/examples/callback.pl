@@ -25,7 +25,7 @@
 
 #========================================================================
 # OpenGL routines used:
-# 
+#
 #   glAttachShader
 #   glBindBuffer
 #   glClear
@@ -37,15 +37,15 @@
 #   glLinkProgram
 #   glUseProgram
 #   glViewport
-#   
+#
 #   glGetAttribLocation_c
 #   glGetUniformLocation_c
 #   glUniformMatrix4fv_c
 #   glVertexAttribPointer_c
-#   
+#
 #   glBufferData_p
 #   glGenBuffers_p
-#   glGenBuffers_p 
+#   glGenBuffers_p
 #   glShaderSource_p
 #========================================================================
 
@@ -90,9 +90,14 @@ my $cursorenter_callback = sub {
     printf STDERR "CursorEnter callback: " . ($entered ? "entered" : "left") . " window\n";
 };
 
+my $cursorpos_numcalls = 0;
 my $cursorpos_callback = sub {
     my ($window, $xpos, $ypos) = @_;
-    printf STDERR "CursorPos callback: cursor at ($xpos,$ypos)\n";
+    $cursorpos_numcalls++;
+    if (0 == $cursorpos_numcalls % 100) {
+        printf STDERR "$cursorpos_numcalls CursorPos callbacks: cursor now at ($xpos,$ypos)\n";
+        $cursorpos_numcalls = 0;
+    }
 };
 
 my $char_callback = sub {
@@ -192,30 +197,30 @@ unless (defined $window) {
 
 glfwSetKeyCallback($window, $key_callback);
 
-# glfwSetCharCallback($window, $char_callback);
+glfwSetCharCallback($window, $char_callback);
 
-# glfwSetCharModsCallback($window, $charmods_callback);
+glfwSetCharModsCallback($window, $charmods_callback);
 
-# glfwSetCursorEnterCallback($window, $cursorenter_callback);
+glfwSetCursorEnterCallback($window, $cursorenter_callback);
 
-# glfwSetCursorPosCallback($window, $cursorpos_callback);
+glfwSetCursorPosCallback($window, $cursorpos_callback);
 
-# glfwSetFramebufferSizeCallback($window, $framebuffersize_callback);
+glfwSetFramebufferSizeCallback($window, $framebuffersize_callback);
 
-# glfwSetMouseButtonCallback($window, $mousebutton_callback);
+glfwSetMouseButtonCallback($window, $mousebutton_callback);
 
-# glfwSetScrollCallback($window, $scroll_callback);
+glfwSetScrollCallback($window, $scroll_callback);
 
-# glfwSetJoystickCallback($joystick_callback);
+glfwSetJoystickCallback($joystick_callback);
 
 glfwSetWindowCloseCallback($window, $windowclose_callback);
 
-# glfwSetWindowFocusCallback($window, $windowfocus_callback);
+glfwSetWindowFocusCallback($window, $windowfocus_callback);
 
-# glfwSetWindowIconifyCallback($window, $windowiconify_callback);
+glfwSetWindowIconifyCallback($window, $windowiconify_callback);
 
 # Doesn't seem to change with using mouse to drag cygwin window
-# glfwSetWindowPosCallback($window, $windowpos_callback);
+glfwSetWindowPosCallback($window, $windowpos_callback);
 
 glfwSetWindowRefreshCallback($window, $windowrefresh_callback);
 

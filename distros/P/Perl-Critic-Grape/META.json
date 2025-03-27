@@ -1,0 +1,34 @@
+{
+	"version" : "0.0.1",
+	"name"    : "Perl::Critic::Grape",
+	"author"  : "Brian Blackmore",
+	"abstract": "Additional Perl::Critic policies",
+	"license" : "perl",
+	"prereqs" : {
+		"runtime": {
+			"requires": {
+				"Perl::Critic": "1.156",
+				"Perl::Critic::Policy": "1.156",
+				"Perl::Critic::Utils": "1.156",
+				"perl": "5.20.0",
+				"Readonly": "2.05"
+			}
+		},
+		"configure": {
+			"requires": {
+				"Module::Build::Tiny": "0.044"
+			}
+		},
+		"build": {
+			"requires": {
+				"Perl::Critic": "1.156",
+				"Ref::Util": "0.204",
+				"Test::More": "1.302209"
+			}
+		}
+	},
+	"resources" : {
+		"bugtracker": {"web":"https://github.com/blb8/perl-critic-grape/issues"},
+		"repository": {"url":"git://github.com/blb8/perl-critic-grape.git"}
+	}
+}

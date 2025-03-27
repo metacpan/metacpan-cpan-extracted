@@ -8,7 +8,7 @@ Module::Build->VERSION( '0.4004' );
 
 my $class = Module::Build->subclass(
     code => q{
-        use Cwd qw( cwd );
+        require Cwd;
 
         #---------------------------------
         #            Build
@@ -16,25 +16,59 @@ my $class = Module::Build->subclass(
 
         sub ACTION_build {
             my ($s) = @_;
-            $s->_readme();
+
+            # Only for the maintainer on "Build build".
+            if ( $^V >= v5.30.0 ) {
+                if ( Cwd::cwd() =~ m{ / git / perlmy / [^/]+ $ }x ) {
+                    $s->_update_logo_version();
+                    $s->_build_readme();
+                }
+            }
+
             $s->SUPER::ACTION_build;
         }
 
-        # Only for the maintainer on "Build build".
-        sub _readme {
+        sub _update_logo_version {
             my ($s) = @_;
-            return if cwd() !~ m{ / git / perlmy / [^/]+ $ }x;
+            print "Updating log ...\n";
 
+            require lib;
+            lib->import();
+
+            require e;
+            e->import();
+
+            @ARGV = ( "lib/e.pm" );
+            local $^I = "";
+            local $\  = "\n";
+
+            while (<ARGV>) {
+                chomp;
+
+                my $n =
+                / unleashed /x ...
+                / ^ =head1 \s+ NAME /x;
+
+                next unless $n and $n == 2;
+
+                s/ v \K \S+ /$e::VERSION/xg;
+            }
+            continue {
+                print;
+            }
+        }
+
+        sub _build_readme {
+            my ($s) = @_;
             my ($installed) =
                 grep { -x "$_/pod2markdown" }
                 split /:/, $ENV{PATH};
             return if !$installed;
 
-            print "Building README\n";
+            print "Building README ...\n";
             my $lib = $s->{properties}{dist_version_from};
             system "pod2markdown $lib > README.md";
         }
-
         #---------------------------------
         #           Install
         #---------------------------------
@@ -62,7 +96,7 @@ my $builder = $class->new(
         'Test::More' => '0',
     },
     requires => {
-        'perl'                  => '5.016',
+        'perl'                  => '5.018',
         'App::Pod'              => '0.39',
         'Data::Printer'         => '0',
         'Data::Trace'           => '1.05',
@@ -73,6 +107,7 @@ my $builder = $class->new(
         'Sub::Util'             => '0',
         'Term::Table'           => '0',
         'Text::CSV_XS'          => '0',
+        'Time::Moment'          => '0',
         'Tiny::Prof'            => '0.03',
         'YAML::XS'              => '0',
     },

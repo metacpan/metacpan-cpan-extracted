@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.34
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.35
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 =head1 SYNOPSIS
 
@@ -582,8 +582,7 @@ when STDOUT and/or STDERR are redirected:
         say "Shown with no stdout/err";
         print "Print not seen\n";
     '
-    111
-    222
+    Shown with no stdout/err
 
 =head3 p
 
@@ -792,6 +791,47 @@ Returns the results.
     }
 
 This is the fastest run* command usually.
+
+=head3 run1
+
+Run tasks in series (normal 1-by-1 way).
+
+Mainly for switching between parallel and series
+processing (incase parallel does not work in certain
+cases).
+
+    $ perl -Me -e '
+        p {
+            run1
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+
+=cut
+
+=head2 Time Related
+
+=head3 tm
+
+Creates a L<Time::Moment> object.
+
+    # Just the object.
+    my $tm = tm;
+
+    # Specific time.
+    my $tm  = tm( year => 2025, month => 3, day => 14 );
+    my $now = tm->now;
 
 =cut
 
@@ -1295,6 +1335,22 @@ sub import {
 
             map { $_->join }
             map { threads->create( $_ ) } @_;
+        },
+
+        run1 => sub {
+            map { $_->() } @_;
+        },
+
+        ######################################
+        #            Time Related
+        ######################################
+
+        tm => sub {
+            if ( !$imported{$caller}{"Time::Moment"}++ ) {
+                require Time::Moment;
+            }
+
+            Time::Moment->new( @_ );
         },
 
         ######################################

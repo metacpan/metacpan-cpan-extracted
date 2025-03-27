@@ -13,7 +13,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.12;
+use Data::Identifier v0.08;
+
+our $VERSION = v0.13;
 
 
 
@@ -83,7 +85,6 @@ sub _cast_ise {
     if ($as eq 'raw' || $as eq 'ise' || $as eq $src_type) {
         return $src;
     } elsif ($as eq 'Data::Identifier') {
-        require Data::Identifier;
         return Data::Identifier->new($src_type => $src);
     } elsif ($as eq 'Data::URIID::Result') {
         return $self->_as_lookup([$src_type => $src], %opts);
@@ -92,10 +93,7 @@ sub _cast_ise {
     }
 
     {
-        my $val = eval {
-            require Data::Identifier;
-            Data::Identifier->new($src_type => $src)->as($as, %opts{'no_defaults'}, default => undef);
-        };
+        my $val = Data::Identifier->new($src_type => $src)->as($as, %opts{'no_defaults'}, default => undef);
         return $val if defined $val;
     }
 
@@ -116,7 +114,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

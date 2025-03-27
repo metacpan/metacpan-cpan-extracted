@@ -1,5 +1,6 @@
 use Test2::V0 -target => DBIx::QuickDB::Driver::Percona;
 use Test2::Tools::QuickDB;
+use Carp::Always;
 
 my @ENV_VARS;
 
@@ -97,8 +98,9 @@ subtest cleanup => sub {
 
 subtest viable => sub {
     no warnings 'redefine';
-    *DBIx::QuickDB::Driver::Percona::server_bin = sub() { undef };
-    *DBIx::QuickDB::Driver::Percona::client_bin = sub() { undef };
+    no warnings 'once';
+    *DBIx::QuickDB::Driver::Percona::server_bin = sub { undef };
+    *DBIx::QuickDB::Driver::Percona::client_bin = sub { undef };
 
     my ($v, $why) = $CLASS->viable({bootstrap => 1});
     ok(!$v, "Not viable without a valid mysqld");

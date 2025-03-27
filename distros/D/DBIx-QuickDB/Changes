@@ -1,3 +1,12 @@
+0.000037  2025-03-26 23:10:00-07:00 America/Los_Angeles
+
+    - Fix typo that caused the MySQL driver to break
+
+0.000036  2025-03-26 22:56:11-07:00 America/Los_Angeles
+
+    - Support MySQL community server (MySQLCom)
+    - Default to DBD::MariaDB for all mysql variants
+
 0.000035  2024-07-10 08:25:37-07:00 America/Los_Angeles
 
     - Documentation Updates

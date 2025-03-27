@@ -5,7 +5,6 @@ etc/mysqlhi.conf
 etc/README.pod
 lib/MySQL/Hi.pm
 LICENSE
-Makefile
 Makefile.PL
 MANIFEST
 README.md

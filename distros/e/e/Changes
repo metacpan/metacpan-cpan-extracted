@@ -1,6 +1,15 @@
 Revision history for e
 
 =================
+1.35 - 2025-03-26
+=================
+
+Added tm Time::Moment object.
+Added run1 for easy switch between parallel and series running.
+Fixed pod typo.
+Increased min perl version to 5.18 due to repl requirement.
+
+=================
 1.34 - 2025-01-05
 =================
 

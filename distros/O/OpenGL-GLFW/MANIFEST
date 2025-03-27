@@ -1,17 +1,18 @@
 Changes
-GLFW.xs
-MANIFEST
-Makefile.PL
-README.md
-TODO.md
 examples/callback.pl
 examples/checkimg.pl
 examples/gears.pl
 examples/simple.pl
+examples/windows.pl
+GLFW.xs
 lib/OpenGL/GLFW.pm
+Makefile.PL
+MANIFEST			This list of files
 ppport.h
+README.md
 t/OpenGL-GLFW.t
 test.pl
+TODO.md
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

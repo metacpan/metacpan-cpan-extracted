@@ -144,7 +144,7 @@ else
 
    #diag( "Testing HiRes where msecs is greater than maxint (" .POSIX::INT_MAX().")" );
    my $toobig = INT_MAX();
-   $toobig = ($toobig/1_000_000.0) + 1.1;
+   $toobig = (1 . 0 x length INT_MAX()) / 1_000_000;
    $ret = 0;
    eval { 
       $ret = timeout_call( $toobig, \&sleep_one ); 

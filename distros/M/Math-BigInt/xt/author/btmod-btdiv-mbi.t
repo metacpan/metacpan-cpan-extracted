@@ -133,15 +133,15 @@ sub tdiv {
 for my $num (-$inf, -20 .. 20, $inf, $nan) {
     for my $den (-$inf, -20 .. 20, $inf, $nan) {
 
-        # Compute expected output values.
-
-        my ($quo, $rem) = tdiv($num, $den);
-
         #######################################################################
         # btdiv() in list context.
         #######################################################################
 
         {
+            # Compute expected output values.
+
+            my ($quo, $rem) = tdiv($num, $den);
+
             note(qq|\n(\$quo, \$rem) = | .
                  qq|Math::BigInt -> new("$num") -> btdiv("$den")\n\n|);
 
@@ -204,6 +204,10 @@ for my $num (-$inf, -20 .. 20, $inf, $nan) {
         #######################################################################
 
         {
+            # Compute expected output values.
+
+            my $quo = tdiv($num, $den);
+
             note(qq|\n\$quo = | .
                  qq|Math::BigInt -> new("$num") -> btdiv("$den")\n\n|);
 
@@ -256,6 +260,10 @@ for my $num (-$inf, -20 .. 20, $inf, $nan) {
         #######################################################################
 
         {
+            # Compute expected output values.
+
+            my (undef, $rem) = tdiv($num, $den);
+
             note(qq|\n\$quo = | .
                  qq|Math::BigInt -> new("$num") -> btmod("$den")\n\n|);
 
@@ -309,15 +317,15 @@ for my $num (-$inf, -20 .. 20, $inf, $nan) {
 
 for my $num (-$inf, -20 .. -1, 1 .. 20, $inf, $nan) {
 
-    # Compute expected output values.
-
-    my ($quo, $rem) = tdiv($num, $num);
-
     #######################################################################
     # btdiv() in list context.
     #######################################################################
 
     {
+        # Compute expected output values.
+
+        my ($quo, $rem) = tdiv($num, $num);
+
         note(qq|\n\$x = Math::BigInt -> new("$num"); | .
              qq|(\$quo, \$rem) = \$x -> btdiv("\$x")\n\n|);
 
@@ -373,7 +381,11 @@ for my $num (-$inf, -20 .. -1, 1 .. 20, $inf, $nan) {
     #######################################################################
 
     {
-        note(qq|\n\$x = Math::BigInt -> new("$num"); | .
+        # Compute expected output values.
+
+        my $quo = tdiv($num, $num);
+
+         note(qq|\n\$x = Math::BigInt -> new("$num"); | .
              qq|\$quo = \$x -> btdiv(\$x)\n\n|);
 
         # Input values as objects.
@@ -419,7 +431,11 @@ for my $num (-$inf, -20 .. -1, 1 .. 20, $inf, $nan) {
     #######################################################################
 
     {
-        note(qq|\n\$x = Math::BigInt -> new("$num") | .
+        # Compute expected output values.
+
+        my (undef, $rem) = tdiv($num, $num);
+
+         note(qq|\n\$x = Math::BigInt -> new("$num") | .
              qq|\$quo = \$x -> btmod(\$x)\n\n|);
 
         # Input values as objects.

@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.34
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.35
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -554,8 +554,7 @@ when STDOUT and/or STDERR are redirected:
         say "Shown with no stdout/err";
         print "Print not seen\n";
     '
-    111
-    222
+    Shown with no stdout/err
 
 ### p
 
@@ -760,6 +759,44 @@ Returns the results.
     }
 
 This is the fastest run\* command usually.
+
+### run1
+
+Run tasks in series (normal 1-by-1 way).
+
+Mainly for switching between parallel and series
+processing (incase parallel does not work in certain
+cases).
+
+    $ perl -Me -e '
+        p {
+            run1
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+## Time Related
+
+### tm
+
+Creates a [Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment) object.
+
+    # Just the object.
+    my $tm = tm;
+
+    # Specific time.
+    my $tm  = tm( year => 2025, month => 3, day => 14 );
+    my $now = tm->now;
 
 ## Package Tools
 

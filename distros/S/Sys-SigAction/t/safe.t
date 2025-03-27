@@ -105,8 +105,9 @@ SKIP: {
      When safe=>0 they are.  
 
      If you have an application for safe=>1 and can come up with a patch
-     for this module that gets this test working, or a patch to the test
-     that shows how to fix it, please send it to me. 
+     for Sys::SigAction that gets this test working, or a patch to the test
+     that shows how to fix it, please send it to me or create a pull request
+     for https://github.com/labaxter/sys-sigaction
 
      See the block below this one... which if executed would test safe mode
      with masked signals... it is a clone of part of mask.t that proves this

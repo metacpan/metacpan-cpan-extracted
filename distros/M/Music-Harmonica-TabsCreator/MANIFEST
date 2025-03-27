@@ -3,6 +3,7 @@ cpanfile
 lib/Music/Harmonica/TabsCreator.pm
 lib/Music/Harmonica/TabsCreator/NoteToToneConverter.pm
 lib/Music/Harmonica/TabsCreator/TabParser.pm
+lib/Music/Harmonica/TabsCreator/Warning.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

@@ -3,10 +3,12 @@ use Test2::Tools::QuickDB;
 
 use List::Util qw/shuffle/;
 
-my @drivers = shuffle qw/MariaDB Percona PostgreSQL SQLite/;
-my %load = (
-    MariaDB      => [quickdb => 't/schema/mariadb.sql'],
-    Percona      => [quickdb => 't/schema/percona.sql'],
+my @drivers = shuffle qw/MariaDB Percona MySQL AnyMySQL PostgreSQL SQLite/;
+my %load    = (
+    MariaDB    => [quickdb => 't/schema/mariadb.sql'],
+    Percona    => [quickdb => 't/schema/percona.sql'],
+    MySQL      => [quickdb => 't/schema/mysql.sql'],
+    AnyMySQL   => [quickdb => 't/schema/mysql.sql'],
     PostgreSQL => [quickdb => 't/schema/postgresql.sql'],
     SQLite     => [quickdb => 't/schema/sqlite.sql'],
 );
