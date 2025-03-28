@@ -7,7 +7,7 @@ BEGIN
 	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.08';
+	$VERSION = '0.10';
 
 	$LocaleRange = qr/(\p{InArabic}|\p{InArabicPresentationFormsA}|\p{InArabicPresentationFormsB})/;
 
@@ -139,7 +139,7 @@ __END__
 
 =head1 NAME
 
-Text::TransMetaphone::ar – Transcribe Arabic words into IPA symbols.
+Text::TransMetaphone::ar - Transcribe Arabic words into IPA symbols.
 
 =head1 SYNOPSIS
 

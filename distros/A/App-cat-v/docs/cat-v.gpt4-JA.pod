@@ -20,6 +20,7 @@ cat-v [ オプション ] 引数 ...
           --tabstop=#     Set tab width
           --tabhead=#     Set tab-head character
           --tabspace=#    Set tab-space character
+     -C   --color=#       Set color
      -h   --help          Print this message
      -v   --version       Print version
 
@@ -34,7 +35,7 @@ cat-v [ オプション ] 引数 ...
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -104,7 +105,7 @@ C<cat-v> を使用すると、表示上のスペースが変わらないよう�
     us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
     sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
     del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ␣  OPEN BOX
+    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
 
 この時点で、以下の文字に対してUnicodeマーキングが利用可能です
 
@@ -159,7 +160,7 @@ C<cat-v> を使用すると、表示上のスペースが変わらないよう�
 
 上記のコマンドはこれと同一です。
 
-    cat-v --no-expand --reset --visible all=e,nl=0
+    cat-v --reset --visible all=e,nl=0
 
 =item B<-->I<name>[=I<replacement>]
 
@@ -243,6 +244,10 @@ C<~/.cat-vrc>ファイルに以下の設定を入れることで、デフォル�
 タブの展開方法のスタイルを設定します。例えばC<symbol>やC<shade>を選択します。2つのスタイル名が組み合わされている場合、例えばC<squat-arrow,middle-dot>、タブの先頭にはC<squat-arrow>を、タブスペースにはC<middle-dot>を使用します。
 
 パラメータなしで呼び出された場合、利用可能なスタイルリストを表示します。スタイルはL<Text::ANSI::Fold>ライブラリで定義されています。
+
+=item B<-C>=I<color>, B<--color>=I<color>
+
+置換された文字は、I<color>で指定された色で表示されます。このオプションは、ANSIカラーシーケンスを含む出力には適していません。
 
 =item B<-E>, B<--escape-backslash>
 

@@ -2,15 +2,18 @@ NAME
     File::Util::Rename - Utilities related to renaming files
 
 VERSION
-    This document describes version 0.002 of File::Util::Rename (from Perl
-    distribution File-Util-Rename), released on 2024-02-12.
+    This document describes version 0.003 of File::Util::Rename (from Perl
+    distribution File-Util-Rename), released on 2025-03-28.
 
 SYNOPSIS
      use File::Util::Rename qw(
          rename_noclobber
+         rename_warnclobber
      );
 
-     rename_noclobber "foo.txt", "bar.txt"; # will rename to "bar (01).txt" etc if "bar.txt" exists
+     rename_noclobber "foo.txt", "bar.txt"; # will rename to "bar (01).txt" if "bar.txt" exists (or "bar (02).txt" if "bar (01).txt" also exists, and so on)
+
+     rename_warnclobber "foo.txt", "bar.txt"; # will emit a warning to stdrr if "bar.txt" exists, but rename it anyway
 
 DESCRIPTION
   rename_noclobber
@@ -23,6 +26,18 @@ DESCRIPTION
     *   pattern
 
         Str. Defaults to " (%02d)".
+
+  rename_warnclobber
+    Usage:
+
+     rename_warnclobber( [ \%opts , ] $from, $to );
+
+    Known options:
+
+    *   log
+
+        Bool. If set to true, will log using Log::ger instead of printing
+        warning to stderr.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -55,7 +70,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025, 2024 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

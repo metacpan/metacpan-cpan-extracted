@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @EXPORT = qw(
   get_block_hashlist
@@ -158,7 +158,7 @@ Circle::Block - the block module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -205,7 +205,7 @@ So you just use the module:
 =head1 METHODS
 
 
-=head2 get_block_hashlist($base_height)
+=head2 get_block_hashlist( $base_height )
 
     my $response = get_block_hashlist(0);
     if ($response->{status} != 200) {
@@ -215,7 +215,7 @@ So you just use the module:
     # process the block hash list data here.
 
 
-=head2 get_block($hash)
+=head2 get_block( $hash )
 
     my $hash = 'xxxxxxxxx';
     my $response = get_block($hash);
@@ -225,7 +225,7 @@ So you just use the module:
     my $data = $response->{data};
     // process block data here.
 
-=head2 get_block_header_list($base_height)
+=head2 get_block_header_list( $base_height )
 
     my $response = get_block_header_list(0);
     if ($response->{status} != 200) {
@@ -237,14 +237,14 @@ So you just use the module:
 =head2 get_block_data($hash)
 
     my $hash = 'xxxxxxxxx';
-    my $response = get_block_data($hash);
+    my $response = get_block_data( $hash );
     if ($response->{status} != 200) {
         croak 'cannot get block data:' . $response->{status};
     }
     my $data = $response->{data};
     // process block data here.
 
-=head2 get_blocktails_hashlist($base_height)
+=head2 get_blocktails_hashlist( $base_height )
 
     my $response = get_blocktails_hashlist(0);
     if ($response->{status} != 200) {
@@ -253,7 +253,7 @@ So you just use the module:
     my $data = $response->{data};
     // process block tails hash list here.
 
-=head2 get_blocktails_po($hash)
+=head2 get_blocktails_po( $hash )
 
     my $hash = 'xxxxxxxxx';
     my $response = get_blocktails_po($hash);
@@ -263,7 +263,7 @@ So you just use the module:
     my $data = $response->{data};
     // process block tails here.
 
-=head2 get_tx_by_txid($txid)
+=head2 get_tx_by_txid( $txid )
 
     my $txid = 'xxxxxxxxx';
     my $response = get_tx_by_txid($txid);
@@ -274,7 +274,7 @@ So you just use the module:
     // process tx here.
 
 
-=head2 search_tx_by_txid($txid)
+=head2 search_tx_by_txid( $txid )
 
     my $txid = 'xxxxxxxxx';
     my $response = search_tx_by_txid($txid);
@@ -284,7 +284,7 @@ So you just use the module:
     my $data = $response->{data};
     // process tx list here.
 
-=head2 search_tx_by_address(address, min_output_key, limit)
+=head2 search_tx_by_address( $address, $min_output_key, $limit )
 
     my $address = 'xxxxxxxxx';
     my $response = search_tx_by_address($address, '', 100);
@@ -302,7 +302,7 @@ how to set min_output_key? In the response, we can get outputs:
 
     my $min_output_key = $data->{minOutputKey};
 
-=head2 search_utxos(address, min_output_key, limit)
+=head2 search_utxos( $address, $min_output_key, $limit )
 
     my $address = 'xxxxxxxxx';
     my $response = search_utxos($address, '', 100);

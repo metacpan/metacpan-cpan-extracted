@@ -68,11 +68,13 @@ ERROR HANDLING
 AUTHOR
     Aaron Crane, <arc@cpan.org>
 
+    Currently maintained by Robert Rothenberg <rrwo@cpan.org>.
+
     The initial development of this module was sponsored by Science Photo
     Library <https://www.sciencephoto.com/>.
 
 COPYRIGHT
-    Copyright 2017 Aaron Crane.
+    Copyright 2017, 2025 Aaron Crane.
 
 LICENSE
     This library is free software and may be distributed under the same

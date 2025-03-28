@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tube name="Test stations linked that share no line">
+<tube name="Test stations with line that does not link">
   <lines>
     <line id="A" name="A" color="red"/>
     <line id="B" name="B" color="#FFFF00"/>

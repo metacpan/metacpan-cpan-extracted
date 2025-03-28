@@ -18,6 +18,7 @@ cat-v \[ 옵션 \] args ...
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
             --tabspace=#    Set tab-space character
+       -C   --color=#       Set color
        -h   --help          Print this message
        -v   --version       Print version
 
@@ -32,7 +33,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -96,7 +97,7 @@ Version 1.04
     us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
     sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
     del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ␣  OPEN BOX
+    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
 
 현재 다음 문자에 대해 유니코드 표시를 사용할 수 있습니다.
 
@@ -149,7 +150,7 @@ Version 1.04
 
     위의 명령은 이와 동일합니다.
 
-        cat-v --no-expand --reset --visible all=e,nl=0
+        cat-v --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -229,6 +230,10 @@ Version 1.04
     탭이 펼쳐지는 스타일을 설정합니다. 예를 들어 `기호` 또는 `음영`을 선택합니다. `스쿼트 화살표, 가운데 점`과 같이 두 가지 스타일 이름이 결합된 경우 탭헤드에는 `스쿼트 화살표`, 탭스페이스에는 `가운데 점`을 사용합니다.
 
     매개변수 없이 호출하면 사용 가능한 스타일 목록을 표시합니다. 스타일은 [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) 라이브러리에 정의되어 있습니다.
+
+- **-C**=_color_, **--color**=_color_
+
+    대체된 문자는 _색상_에 지정된 색상으로 표시됩니다. 이 옵션은 ANSI 색상 시퀀스가 포함된 출력에는 적합하지 않습니다.
 
 - **-E**, **--escape-backslash**
 

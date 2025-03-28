@@ -7,7 +7,7 @@ BEGIN
 	use warnings;
 	use vars qw( $VERSION $LocaleRange );
 
-	$VERSION = '0.08';
+	$VERSION = '0.10';
 
 	$LocaleRange = qr/\p{InGujarti}/;
 
@@ -113,7 +113,7 @@ __END__
 
 =head1 NAME
 
-Text::TransMetaphone::gu – Transcribe Gujarti words into IPA symbols.
+Text::TransMetaphone::gu - Transcribe Gujarti words into IPA symbols.
 
 =head1 SYNOPSIS
 

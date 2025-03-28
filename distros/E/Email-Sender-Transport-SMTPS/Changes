@@ -1,5 +1,8 @@
 Revision history for Email-Sender-Transport-SMTPS
 
+0.05  2025-03-28 08:55:26 CST
+        - add ssl_args option to be able to configure ssl connection. #5 (thinksilicon)
+
 0.04  2017-04-05 09:20:56 CST
         - DEPRECATED in favour of Email::Sender::Transport::SMTP
 
@@ -7,7 +10,7 @@ Revision history for Email-Sender-Transport-SMTPS
         - add debug option
 
 0.02  2013-11-30 11:24:45 CST
-		- more examples
+	- more examples
 
 0.01  2013-11-30 11:19:50 CST
         - Initial release

@@ -4,6 +4,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 Size.xs
 lib/Image/JPEG/Size.pm
 t/basic.t

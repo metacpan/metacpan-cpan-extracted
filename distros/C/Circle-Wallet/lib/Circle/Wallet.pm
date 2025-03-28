@@ -34,11 +34,11 @@ Circle::Wallet - the circle chain SDK in PERL
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ The default exported methods:
 
 =head1 SUBROUTINES/METHODS
 
-=head2 create_wallet
+=head2 create_wallet()
 
 create wallet in the cloud.
 
@@ -123,7 +123,7 @@ sub _build_create_wallet_url {
     return "${host}${base_uri}";
 }
 
-=head2 list_wallet
+=head2 list_wallet()
 
 list the wallet address
 
@@ -148,7 +148,7 @@ sub _build_list_wallet_url {
     return "${host}${base_uri}";
 }
 
-=head2 balance_of_address
+=head2 balance_of_address( $address, $type )
 
 get the balance of the address
 
@@ -183,7 +183,7 @@ sub get_host {
     return "$protocol://$host";
 }
 
-=head2 balance_of_wallet
+=head2 balance_of_wallet()
 
 get the balance of the wallets
 
@@ -208,7 +208,7 @@ sub _build_balance_of_wallet {
     return "${host}${base_uri}";
 }
 
-=head2 assets_of_address
+=head2 assets_of_address( $address, $type )
 
 get the assets of the address
 
@@ -235,7 +235,7 @@ sub _build_assets_of_address {
     return "${host}${base_uri}?address=${address}&type=${type}";
 }
 
-=head2 assets_of_wallet
+=head2 assets_of_wallet()
 
 get the assets of the wallet
 
@@ -260,7 +260,7 @@ sub _build_assets_of_wallet {
     return "${host}${base_uri}";
 }
 
-=head2 public_key_hash_from_address
+=head2 public_key_hash_from_address( $address )
 
 get the public key hash from address
 
@@ -287,19 +287,19 @@ sub _build_public_key_hash_from_address {
     return "${host}${base_uri}?address=${address}";
 }
 
-=head2 send_to
+=head2 send_to( $input )
 
 send assets to others
 
   my $response = send_to({
-    from => '<from-address>',
-    address => '<to-address>',
-    email => 'test@gmail.com',
+    from         => '<from-address>',
+    address      => '<to-address>',
+    email        => 'test@gmail.com',
     transContent => {
       type => 1, # 1 ownership, 2 identity
       uuid => '<asset uuid string>',
     },
-    payPassword => '<pay password>'
+    payPassword  => '<pay password>'
   });
   if ($response->{status} == 200) {
     my $success = $response->{data};
@@ -322,14 +322,14 @@ sub _build_send_to {
     return "${host}${base_uri}";
 }
 
-=head2 pay
+=head2 pay( $input )
 
 pay balance to others
 
   my $response = pay({
-    from => '<from-address>',
-    to => '<to-address>',
-    value => 1000, # send 1000 li to others.
+    from        => '<from-address>',
+    to          => '<to-address>',
+    value       => 1000, # send 1000 li to others.
     payPassword => '<pay password>'
   });
   if ($response->{status} == 200) {
@@ -353,14 +353,14 @@ sub _build_pay {
     return "${host}${base_uri}";
 }
 
-=head2 search_tx_by_type
+=head2 search_tx_by_type( $type, $page_o, $page_size )
 
 search transaction by type.
 
-  my $type = 0; // balance
-  my $page_no = 1;
+  my $type      = 0; // balance
+  my $page_no   = 1;
   my $page_size = 100;
-  my $response = search_tx_by_type( $type, $page_no, $page_size );
+  my $response  = search_tx_by_type( $type, $page_no, $page_size );
   if ($response->{status} == 20) {
     my $tx_info_list = $response->{data};
     // process your tx info list here.
@@ -385,14 +385,14 @@ sub _build_search_tx_by_type {
     return "${host}${base_uri}?type=${type}&pageNo=${page_no}&pageSize=${page_size}";
 }
 
-=head2 search_tx_by_time
+=head2 search_tx_by_time( $start_time, $end_time, $page_size )
 
 search transaction by time
 
-  my $start_time = 1764233300;
-  my $end_time = 18343232300;
-  my $page_size = 100;
-  my $response = search_tx_by_time( $start_time, $end_time, $page_size );
+  my $start_time = 1764233300; // in seconds
+  my $end_time   = 18343232300;  // in seconds
+  my $page_size  = 100;
+  my $response   = search_tx_by_time( $start_time, $end_time, $page_size );
   if ( $response->{status} == 20 ) {
     my $tx_info_list = $response->{data};
     // process your tx info list here .;
@@ -420,7 +420,7 @@ sub _build_search_tx_by_time {
     return "${host}${base_uri}?startTime=${start_time}&endTime=${end_time}&pageNo=${page_no}&pageSize=${page_size}";
 }
 
-=head2 let_me_try
+=head2 let_me_try()
 
 let me try to mine the block, and get some assets and balances.
 

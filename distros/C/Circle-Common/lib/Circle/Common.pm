@@ -21,7 +21,7 @@ our @EXPORT_OK = qw(
   http_json_get
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $config = undef;
 
@@ -30,7 +30,13 @@ sub load_config {
         return $config;
     }
 
-    my $config_path = dist_file('Circle-Common', 'config.yml');
+    my $config_path;
+    if (-e "./config.yml") {
+        $config_path = "./config.yml";
+    } else {
+        $config_path = dist_file('Circle-Common', 'config.yml');
+    }
+
     try {
         my $content = slurp($config_path);
         $config = Load($content);
@@ -174,7 +180,7 @@ Circle::Common - the common module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -201,7 +207,7 @@ The L<Circle::Common> is common module which provides common functions: http res
 
 =head1 METHODS
 
-=head2 build_url_template
+=head2 build_url_template( $buz, $path, $params_for )
 
     my $url = build_url_template('user', 'getBlockHashList', {
       baseHeight => 10,
@@ -215,19 +221,19 @@ The L<Circle::Common> is common module which provides common functions: http res
   $path stands for the key of the variant urls.
   $params_for stands for the request query map.
 
-=head2 load_config
+=head2 load_config()
 
     my $config = load_config();
     # process the config data here.
 
-=head2 get_session_key
+=head2 get_session_key()
 
     my $session_key = get_session_key();
     # process the session key here.
 
 In fact, you needn't set session key when you post apis. In SDK we set the session key in the post/get headers after you logged successfully.
 
-=head2 http_json_get
+=head2 http_json_get( $url )
 
     my $response = http_json_get($url);
 
@@ -240,7 +246,7 @@ Invokes the http json get request to circle chain server. the response data cont
     }
 
 
-=head2 http_json_post
+=head2 http_json_post( $url, $body )
 
     my $response = http_json_post($url, $body);
 

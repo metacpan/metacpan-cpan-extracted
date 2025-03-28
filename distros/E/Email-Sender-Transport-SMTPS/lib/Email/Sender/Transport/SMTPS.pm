@@ -7,10 +7,23 @@ use MooX::Types::MooseLike::Base qw(Bool Int Str);
 use Email::Sender::Failure::Multi;
 use Email::Sender::Success::Partial;
 use Email::Sender::Util;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has host => (is => 'ro', isa => Str,  default => sub { 'localhost' });
 has ssl  => (is => 'ro', isa => Str);
+my $SSLArgs = sub {
+    my $ref = shift;
+    die "ssl_args must be a hash reference" unless ref($ref) eq 'HASH';
+    for my $key (keys %$ref) {
+        die "Invalid key in ssl_args: $key (must start with SSL_)" unless $key =~ /^SSL_/;
+    }
+    return $ref;
+};
+has ssl_args => (
+    is      => 'ro',
+    isa     => $SSLArgs,
+    default => sub { {} },
+);
 has port => (
   is  => 'ro',
   isa => Int,
@@ -86,10 +99,11 @@ sub _net_smtp_args {
     Port    => $self->port,
     Timeout => $self->timeout,
     defined $ssl             ? (doSSL     => $ssl)             : (),
+    defined $self->ssl_args  ? %{ $self->ssl_args }            : (),
     defined $self->helo      ? (Hello     => $self->helo)      : (),
     defined $self->localaddr ? (LocalAddr => $self->localaddr) : (),
     defined $self->localport ? (LocalPort => $self->localport) : (),
-    defined $self->debug     ? (Debug     => $self->debug) : (),
+    defined $self->debug     ? (Debug     => $self->debug)     : (),
   );
 }
 

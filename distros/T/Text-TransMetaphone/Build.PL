@@ -9,7 +9,10 @@ my $builder = Module::Build->new(
 	dist_abstract		=> "Translingual Phonetic Encoding of Words.",
 	release_status		=> 'stable',
 	configure_requires	=> { 'Module::Build' => 0.42 },
-	requires		=> { 'Regexp::Ethiopic' => 0 },
+	requires 		=> {
+		'perl'		=> '5.8.0',
+		'Regexp::Ethiopic' => 0
+	},
 	license			=> 'perl',
 	add_to_cleanup		=> [ 'Text-Transmetaphone-*' ],
 	create_makefile_pl	=> 0,  # change to 1 if desired.

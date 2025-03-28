@@ -12,5 +12,6 @@ a key in one language and then search for it any other
 supported language.
 
 Such is the goal, an extended description is provided in
-the `doc/index.html` file.  See also the `doc/KeyTable.html`
+the [doc/index.html](https://htmlpreview.github.io/?https://github.com/dyacob/Text-TransMetaphone/blob/main/doc/index.html) file.
+See also the [doc/KeyTable.html](https://htmlpreview.github.io/?https://github.com/dyacob/Text-TransMetaphone/blob/main/doc/KeyTable.html)
 file, which is not perfect but not too far off either.

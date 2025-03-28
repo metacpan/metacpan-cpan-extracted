@@ -25,7 +25,7 @@ check_lib_or_exit(
 my $module_file = 'lib/Image/JPEG/Size.pm';
 my %make = (
     NAME => 'Image::JPEG::Size',
-    AUTHOR => 'Aaron Crane <arc@cpan.org>',
+    AUTHOR => 'Robert Rothenberg <rrwo@cpan.org>',
     ABSTRACT_FROM => $module_file,
     VERSION_FROM => $module_file,
     OBJECT => 'Size.o',
@@ -43,8 +43,8 @@ my %make = (
     LIBS => [join ' ', (map "-L$_", @libs), "-ljpeg"],
     META_MERGE => {
         resources => {
-            repository => 'git://github.com/arc/image-jpeg-size.git',
-            bugtracker => 'https://github.com/arc/image-jpeg-size/issues',
+            repository => 'git://github.com/robrwo/image-jpeg-size.git',
+            bugtracker => 'https://github.com/robrwo/image-jpeg-size/issues',
         },
     },
 );

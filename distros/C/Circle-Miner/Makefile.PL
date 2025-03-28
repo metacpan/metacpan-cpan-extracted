@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Circle::COMMON'           => '0.05',
+        'Circle::Common'           => '0.06',
         'Mojo::IOLoop::Subprocess' => '9.39',
         'File::ShareDir::Install'  => '0.14',
         'File::Share'              => '0.27',

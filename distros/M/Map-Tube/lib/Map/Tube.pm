@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '4.02';
+$Map::Tube::VERSION   = '4.03';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 4.02
+Version 4.03
 
 =cut
 
@@ -75,8 +75,10 @@ documented in L<Map::Tube::Cookbook>.
     |                      |          | Sofia, Tbilisi, Vienna, Warsaw,          |
     |                      |          | Yekaterinburg                            |
     |                      |          |                                          |
-    | Gisbert W Selke      | GWS      | 8 (Beijing, Glasgow, Hamburg, KoelnBonn, |
-    |                      |          | Lyon, Rhein/Ruhr, Stockholm, Toulouse)   |
+    | Gisbert W Selke      | GWS      | 14 (Beijing, Brussels, Chicago, Glasgow, |
+    |                      |          | Hamburg, KoelnBonn, Lyon, Muenchen,      |
+    |                      |          | Napoli, Oslo, Rhein/Ruhr, Stockholm,     |
+    |                      |          | Stuttgart, Toulouse)                     |
     |                      |          |                                          |
     | Mohammad Sajid Anwar | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                      |          | Madrid, NYC, Tokyo)                      |
@@ -814,7 +816,16 @@ sub _get_shortest_route {
             my $links = [ split /\,/, $f_node->{link} ];
             while (scalar(@$links) > 0) {
                 my ($success, $link) = $self->_get_next_link($from, $seen, $links);
-                $success or ($links = [ grep(!/\b\Q$link\E\b/, @$links) ]) and next;
+				# was: $success or ($links = [ grep(!/\b\Q$link\E\b/, @$links) ]) and next;
+				# was: next unless defined($link);	-> if this ever happens, we'll be stuck in an infinite loop
+				if (!$success) {
+					# If we didn't find any existing node at all, we're done:
+					last unless defined $link;
+					# Else: we found some node but it doesn't fit our needs; so remove it from
+					# the candidates and try the next one:
+					$links = [ grep(!/\b\Q$link\E\b/, @$links) ];
+					next;
+				}
 
                 if (($self->_get_length($link) == 0) || ($length > ($index + 1))) {
                     $self->_set_length($link, $length + 1);
@@ -1108,7 +1119,7 @@ sub _get_next_link {
 
     my $link = undef;
     foreach my $_link (@$links) {
-        return (0,  $_link) if ((exists $seen->{$_link}) || ($from eq $_link));
+		return (0, $_link) if ((exists $seen->{$_link}) || ($from eq $_link));
 
         my $node = $nodes->{$_link};
         next unless defined $node;
@@ -1122,7 +1133,7 @@ sub _get_next_link {
         $link = $_link;
     }
 
-    return (1, $link);
+	return (defined($link), $link);
 }
 
 sub _set_active_links {

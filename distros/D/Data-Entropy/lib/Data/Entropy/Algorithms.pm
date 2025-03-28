@@ -51,7 +51,7 @@ use Data::Float 0.008 qw(
 );
 use Params::Classify 0.000 qw(is_ref);
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -441,9 +441,11 @@ L<Data::Entropy::Source>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
+Maintained by Robert Rothenberg <rrwo@cpan.org>
+
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011
+Copyright (C) 2006, 2007, 2009, 2011, 2025
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

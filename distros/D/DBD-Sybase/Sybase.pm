@@ -1,6 +1,6 @@
 # -*-Perl-*-
 
-# Copyright (c) 1996-2023   Michael Peppler
+# Copyright (c) 1996-2025   Michael Peppler
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -24,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.25';
+  $VERSION   = '1.26';
   
   require_version DBI 1.30;
 

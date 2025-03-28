@@ -1,43 +1,40 @@
-NAME
+Data::Pond
 
-Data::Pond - Perl-based open notation for data
-
-DESCRIPTION
-
-This module is concerned with representing data structures in a
-textual notation known as "Pond" (Perl-based open notation for data).
-The notation is a strict subset of Perl expression syntax, but is intended
-to have language-independent use.  It is similar in spirit to JSON, which
-is based on JavaScript, but Pond represents fewer data types directly.
+This module is concerned with representing data structures in a textual
+notation known as "Pond" (*P*erl-based *o*pen *n*otation for *d*ata).
+The notation is a strict subset of Perl expression syntax, but is
+intended to have language-independent use. It is similar in spirit to
+JSON, which is based on JavaScript, but Pond represents fewer data types
+directly.
 
 The data that can be represented in Pond consist of strings (of
-characters), arrays, and string-keyed hashes.  Arrays and hashes can
+characters), arrays, and string-keyed hashes. Arrays and hashes can
 recursively (but not cyclically) contain any of these kinds of data.
 This does not cover the full range of data types that Perl or other
 languages can handle, but is intended to be a limited, fixed repertoire
-of data types that many languages can readily process.  It is intended
-that more complex data can be represented using these basic types.
-The arrays and hashes provide structuring facilities (ordered and
-unordered collections, respectively), and strings are a convenient way
-to represent atomic data.
+of data types that many languages can readily process. It is intended
+that more complex data can be represented using these basic types. The
+arrays and hashes provide structuring facilities (ordered and unordered
+collections, respectively), and strings are a convenient way to
+represent atomic data.
 
 The Pond syntax is a subset of Perl expression syntax, consisting of
-string literals and constructors for arrays and hashes.  Strings may
-be single-quoted or double-quoted, or may be decimal integer literals.
+string literals and constructors for arrays and hashes. Strings may be
+single-quoted or double-quoted, or may be decimal integer literals.
 Double-quoted strings are restricted in which backslash sequences they
-can use: the permitted ones are the single-character ones (such as "\n"),
-"\x" sequences (such as "\xe3" and "\x{e3}"), and octal digit sequences
-(such as "\010").  Non-ASCII characters are acceptable in quoted strings.
-Strings may also appear as pure-ASCII barewords, when they directly
-precede "=>" in an array or hash constructor.  Array ("[]") and hash
-("{}") constructors must contain data items separated by "," and
-"=>" commas, and can have a trailing comma but not adjacent commas.
-Whitespace is permitted where Perl allows it.  Control characters are
-not permitted, except for whitespace outside strings.
+can use: the permitted ones are the single-character ones (such as
+"\n"), "\x" sequences (such as "\xe3" and "\x{e3}"), and octal digit
+sequences (such as "\010"). Non-ASCII characters are acceptable in
+quoted strings. Strings may also appear as pure-ASCII barewords, when
+they directly precede "=>" in an array or hash constructor. Array ("[]")
+and hash ("{}") constructors must contain data items separated by ","
+and "=>" commas, and can have a trailing comma but not adjacent commas.
+Whitespace is permitted where Perl allows it. Control characters are not
+permitted, except for whitespace outside strings.
 
-A Pond expression can be "eval"ed by Perl to yield the data item
-that it represents, but this is not the recommended way to do it.
-Any use of "eval" on data opens up security issues.  Instead use the
+A Pond expression can be "eval"ed by Perl to yield the data item that it
+represents, but this is not the recommended way to do it. Any use of
+"eval" on data opens up security issues. Instead use the
 "pond_read_datum" function of this module, which does not use Perl's
 parser but directly parses the restricted Pond syntax.
 
@@ -46,14 +43,20 @@ systems that can't handle XS.
 
 INSTALLATION
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-AUTHOR
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-Andrew Main (Zefram) <zefram@fysh.org>
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
 COPYRIGHT
 

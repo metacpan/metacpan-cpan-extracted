@@ -1,6 +1,6 @@
 package App::cat::v;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use 5.024;
 use warnings;
@@ -21,6 +21,7 @@ use List::Util qw(max pairmap);
 use Hash::Util qw(lock_keys);
 use Getopt::EX;
 use Text::ANSI::Tabs qw(ansi_expand);
+use Term::ANSIColor::Concise qw(ansi_color);
 
 my %control = (
     nul  => [ 'm', "\x00", { s => "\x{2400}",      # ␀ SYMBOL FOR NULL
@@ -64,7 +65,7 @@ my %control = (
 			     m => "\x{00B7}", } ], # · MIDDLE DOT
     del  => [ 'm', "\x7f", { s => "\x{2421}",    , # ␡ SYMBOL FOR DELETE
 			     m => "\x{232B}", } ], # ⌫ ERASE TO THE LEFT
-    nbsp => [ 's', "\xa0", { s => "\x{2423}", } ], # ␣ OPEN BOX
+    nbsp => [ 's', "\xa0", { s => "\x{237D}", } ], # ⍽ SHOULDERED OPEN BOX
 );
 
 package #
@@ -117,6 +118,7 @@ use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
     has visible    => ' c  =s@ ' ;
     has reset      => ' n      ' ;
+    has color      => ' C  =s  ' ;
     has expand     => ' t  :1  ' , default => 1 ;
     has no_expand  => ' T  !   ' ;
     has repeat     => ' r  =s  ' , default => 'nl,np' ;
@@ -214,8 +216,9 @@ use Getopt::EX::Hashed; {
 
     # internal use
 
-    has flags   => default => { pairmap { $a => $b->default } %control };
-    has convert => default => {};
+    has flags    => default => { pairmap { $a => $b->default } %control };
+    has convert  => default => {};
+    has colorize => default => sub { sub { $_[0] } } ;
 
 } no Getopt::EX::Hashed;
 
@@ -239,6 +242,10 @@ sub options {
     Getopt::EX::LabeledParam
 	->new(HASH => $app->flags, NEWLABEL => 0, DEFAULT => 1)
 	->load_params($app->visible->@*);
+
+    if (my $color = $app->color) {
+	$app->colorize = sub { ansi_color($color, @_) };
+    }
 
     return $app;
 }
@@ -282,9 +289,16 @@ sub doit {
     while (<>) {
 	my $orig = $_;
 	$_ = ansi_expand($_) if $app->expand;
-	# (*F) is necessary possibly due to the bug
-	s{ (?=(${repeat_re}?)) ([\Q$replace\E]|(*F)) }{$convert->{$2}$1}xg
-	    if $replace ne '';
+	if ($replace ne '') {
+	    s{
+		(?= (?<r> ${repeat_re}?) )
+		(?<c> [\Q$replace\E]
+		| (*F) # without this line, the regex does not work
+		)
+	    }{
+		$app->colorize->($convert->{$+{c}}) . $+{r}
+	    }xeg;
+	}
 	if ($app->original > 1 or ($app->original and $_ ne $orig)) {
 	    print $orig;
 	}

@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Circle::COMMON: '0.05'
+  Circle::Common: '0.06'
   File::Share: '0.27'
   File::ShareDir::Install: '0.14'
   Mojo::IOLoop::Subprocess: '9.39'
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

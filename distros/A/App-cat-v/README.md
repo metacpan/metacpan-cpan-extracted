@@ -19,6 +19,7 @@ cat-v \[ options \] args ...
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
             --tabspace=#    Set tab-space character
+       -C   --color=#       Set color
        -h   --help          Print this message
        -v   --version       Print version
 
@@ -33,7 +34,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -110,7 +111,7 @@ for Unicode mark, and `0` for no conversion.
     us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
     sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
     del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ␣  OPEN BOX
+    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
 
 At this time, Unicode markings are available for the following
 characters
@@ -179,7 +180,7 @@ characters
 
     The above command is identical to this.
 
-        cat-v --no-expand --reset --visible all=e,nl=0
+        cat-v --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -282,6 +283,12 @@ characters
 
     Show available style list if called without parameter.  Styles are
     defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) library.
+
+- **-C**=_color_, **--color**=_color_
+
+    Replaced characters are displayed in the color specified by the
+    _color_.  This option is not suitable for output containing ANSI
+    color sequences.
 
 - **-E**, **--escape-backslash**
 

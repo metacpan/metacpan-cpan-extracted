@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_isa check_required);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 has issn => (
 	is => 'ro',
@@ -195,6 +195,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

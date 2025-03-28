@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Circle::COMMON" : "0.05",
+            "Circle::Common" : "0.06",
             "File::Share" : "0.27",
             "File::ShareDir::Install" : "0.14",
             "Mojo::IOLoop::Subprocess" : "9.39",
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

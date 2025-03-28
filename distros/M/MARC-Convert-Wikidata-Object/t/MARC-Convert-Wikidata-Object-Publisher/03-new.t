@@ -3,6 +3,7 @@ use warnings;
 
 use Error::Pure::Utils qw(clean);
 use English;
+use MARC::Convert::Wikidata::Object::ExternalId;
 use MARC::Convert::Wikidata::Object::Publisher;
 use Test::More 'tests' => 4;
 use Test::NoWarnings;
@@ -15,6 +16,12 @@ isa_ok($obj, 'MARC::Convert::Wikidata::Object::Publisher');
 
 # Test.
 $obj = MARC::Convert::Wikidata::Object::Publisher->new(
+        'external_ids' => [
+                MARC::Convert::Wikidata::Object::ExternalId->new(
+                        'name' => 'nkcr_aut',
+                        'value' => 'ko2002101950',
+                ),
+        ],
 	'id' => '000010003',
 	'name' => 'Academia',
 	'place' => 'Praha',

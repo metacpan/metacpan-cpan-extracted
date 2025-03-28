@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
+            "Log::ger" : "0.038",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -47,11 +48,11 @@
    "provides" : {
       "File::Util::Rename" : {
          "file" : "lib/File/Util/Rename.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "File::Util::Rename::NoClobber" : {
          "file" : "lib/File/Util/Rename/NoClobber.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-File-Util-Rename"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

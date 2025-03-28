@@ -4,16 +4,17 @@ use strict;
 use warnings;
 use Test::Lib;
 use File::Spec;
-use Test::More tests => 7;
+use Test::More tests => 9;
 use Test::Map::Tube;
 use Sample;
 
 my %tests = (
-              'good-map.xml'                       => undef, # supposed to pass
-              'station-other-link.xml'             => undef, # supposed to pass
-              'station-linked-share-no-line.xml'   => 'Stations id A1 and A2 are linked but share no line',           # supposed to fail
-              'station-line-not-linking.xml'       => 'Line id B at station id A1 does not serve any linked station', # supposed to fail
-              'station-other-link-not-linking.xml' => 'Stations id A1 and B2 are linked but share no line',           # supposed to fail
+              'good-map.xml'                             => undef, # supposed to pass
+              'station-other-link.xml'                   => undef, # supposed to pass
+              'station-linked-share-no-line.xml'         => 'Stations id A1 and A2 are linked but share no line',                       # supposed to fail
+              'station-line-not-linking.xml'             => 'Line id B at station id A1 serves neither a linked nor a linking station', # supposed to fail
+              'station-line-not-linking-at-terminal.xml' => undef, # supposed to pass
+              'station-other-link-not-linking.xml'       => 'Stations id A1 and B2 are linked but share no line',                       # supposed to fail
             );
 
 my @localdir = File::Spec->splitdir($0);

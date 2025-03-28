@@ -3,7 +3,7 @@ package Image::JPEG::Size;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(croak);
 use XSLoader;
@@ -122,12 +122,14 @@ stops immediately, and its dimensions are reported as 0×0 pixels.
 
 Aaron Crane, E<lt>arc@cpan.orgE<gt>
 
+Currently maintained by Robert Rothenberg E<lt>rrwo@cpan.orgE<gt>.
+
 The initial development of this module was sponsored by Science Photo Library
 L<https://www.sciencephoto.com/>.
 
 =head1 COPYRIGHT
 
-Copyright 2017 Aaron Crane.
+Copyright 2017, 2025 Aaron Crane.
 
 =head1 LICENSE
 

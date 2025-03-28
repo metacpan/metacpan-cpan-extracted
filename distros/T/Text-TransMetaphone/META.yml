@@ -15,47 +15,48 @@ name: Text-TransMetaphone
 provides:
   Text::TransMetaphone:
     file: lib/Text/TransMetaphone.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::am:
     file: lib/Text/TransMetaphone/am.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::ar:
     file: lib/Text/TransMetaphone/ar.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::chr:
     file: lib/Text/TransMetaphone/chr.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::el:
     file: lib/Text/TransMetaphone/el.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::en_US:
     file: lib/Text/TransMetaphone/en_US.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::gu:
     file: lib/Text/TransMetaphone/gu.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::he:
     file: lib/Text/TransMetaphone/he.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::ja_hiragana:
     file: lib/Text/TransMetaphone/ja_hiragana.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::ja_katakana:
     file: lib/Text/TransMetaphone/ja_katakana.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::ru:
     file: lib/Text/TransMetaphone/ru.pm
-    version: '0.08'
+    version: '0.10'
   Text::TransMetaphone::ti:
     file: lib/Text/TransMetaphone/ti.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Regexp::Ethiopic: '0'
+  perl: v5.8.0
 resources:
   bugtracker: https://github.com/dyacob/Text-TransMetaphone/issues
   homepage: https://github.com/dyacob/Text-TransMetaphone
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dyacob/Text-TransMetaphone.git
-version: '0.08'
+version: '0.10'
 x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

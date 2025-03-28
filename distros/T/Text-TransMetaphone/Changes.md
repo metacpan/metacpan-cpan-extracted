@@ -1,5 +1,13 @@
 # Revision History for the Text::Transmetaphone Perl Distribution
 
+## 0.10 Thu Mar 27 17:41:17 EDT 2025
+	- Added LICENSE to MANTIFEST.
+
+## 0.09 Thu Mar 27 17:34:23 EDT 2025
+	- Missing License file added.
+	- Perl version set in Build.PL and META files.
+	- Replaced hyphen with minus sign in abstract to avoide 'has_abstract_in_pod' error.
+
 ## 0.08 Sun Mar  2 19:46:24 EST 2025
 	- Migration to a Build.PL & GitHub system.
 	- Pure Perl implementation of the `en_US` Double Metaphone algorithm.

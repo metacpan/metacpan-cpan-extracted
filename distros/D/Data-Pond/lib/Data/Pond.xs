@@ -33,6 +33,10 @@ typedef SSize_t array_ix_t;
 typedef I32 array_ix_t;
 #endif /* <5.19.4 */
 
+#ifndef uvchr_to_utf8_flags
+#define uvchr_to_utf8_flags(d, uv, flags) uvuni_to_utf8_flags(d, uv, flags);
+#endif
+
 /* parameter classification */
 
 #define sv_is_glob(sv) (SvTYPE(sv) == SVt_PVGV)
@@ -156,7 +160,7 @@ static void THX_sv_cat_unichar(pTHX_ SV *str, U32 val)
 	vlen = SvCUR(str);
 	vstart = (U8*)SvGROW(str, vlen+6+1);
 	voldend = vstart + vlen;
-	vnewend = uvuni_to_utf8_flags(voldend, val, UNICODE_ALLOW_ANY);
+	vnewend = uvchr_to_utf8_flags(voldend, val, UNICODE_ALLOW_ANY);
 	*vnewend = 0;
 	SvCUR_set(str, vnewend - vstart);
 }

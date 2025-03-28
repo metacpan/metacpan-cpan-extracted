@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Test terminal station with line that does not link">
+  <lines>
+    <line id="A" name="A" color="red"/>
+  </lines>
+  <stations>
+    <station id="A1" name="Station A1"  line="A:1" link="A2"/>
+    <station id="A2" name="Stazione A2" line="A:2" link=""/>
+  </stations>
+</tube>

@@ -3,16 +3,18 @@ package File::Util::Rename;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-12'; # DATE
+our $DATE = '2025-03-28'; # DATE
 our $DIST = 'File-Util-Rename'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        rename_noclobber
+                       rename_warnclobber
                );
 
 sub rename_noclobber {
@@ -38,6 +40,23 @@ sub rename_noclobber {
     rename $from, $to_final;
 }
 
+sub rename_warnclobber {
+    my $opts = ref $_[0] eq 'HASH' ? shift : {};
+    $opts->{log} //= 0;
+
+    my ($from, $to) = @_;
+
+    if (-e $to) {
+        if ($opts->{log}) {
+            log_warn "rename_warnclobber(`$from`, `$to`): Target already exists, renaming anyway ...";
+        } else {
+            warn "rename_warnclobber(`$from`, `$to`): Target already exists, renaming anyway ...\n";
+        }
+    }
+
+    rename $from, $to;
+}
+
 1;
 # ABSTRACT: Utilities related to renaming files
 
@@ -53,15 +72,18 @@ File::Util::Rename - Utilities related to renaming files
 
 =head1 VERSION
 
-This document describes version 0.002 of File::Util::Rename (from Perl distribution File-Util-Rename), released on 2024-02-12.
+This document describes version 0.003 of File::Util::Rename (from Perl distribution File-Util-Rename), released on 2025-03-28.
 
 =head1 SYNOPSIS
 
  use File::Util::Rename qw(
      rename_noclobber
+     rename_warnclobber
  );
 
- rename_noclobber "foo.txt", "bar.txt"; # will rename to "bar (01).txt" etc if "bar.txt" exists
+ rename_noclobber "foo.txt", "bar.txt"; # will rename to "bar (01).txt" if "bar.txt" exists (or "bar (02).txt" if "bar (01).txt" also exists, and so on)
+
+ rename_warnclobber "foo.txt", "bar.txt"; # will emit a warning to stdrr if "bar.txt" exists, but rename it anyway
 
 =head1 DESCRIPTION
 
@@ -78,6 +100,23 @@ Known options:
 =item * pattern
 
 Str. Defaults to " (%02d)".
+
+=back
+
+=head2 rename_warnclobber
+
+Usage:
+
+ rename_warnclobber( [ \%opts , ] $from, $to );
+
+Known options:
+
+=over
+
+=item * log
+
+Bool. If set to true, will log using L<Log::ger> instead of printing warning to
+stderr.
 
 =back
 
@@ -117,7 +156,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025, 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

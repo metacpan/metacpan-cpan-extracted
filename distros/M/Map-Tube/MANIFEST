@@ -32,10 +32,13 @@ t/line-stations.t
 t/map.t
 t/not_ok_map.t
 t/ok_map.t
+t/ok_map_forked.t
 t/ok_map_functions.t
 t/ok_map_routes.t
 t/preferred-route.t
 t/Sample.pm
+t/Forked.pm
+t/forked-map.xml
 t/sample.xml
 t/lib/BadSample.pm
 t/lib/Sample.pm
@@ -90,6 +93,7 @@ t/test-the-test/sample.xml
 t/test-the-test/station-id-invalid1.xml
 t/test-the-test/station-id-invalid2.xml
 t/test-the-test/station-line-not-linking.xml
+t/test-the-test/station-line-not-linking-at-terminal.xml
 t/test-the-test/station-linked-share-no-line.xml
 t/test-the-test/station-linked-unknown.xml
 t/test-the-test/station-multilined.xml

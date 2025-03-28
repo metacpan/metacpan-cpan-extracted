@@ -8,7 +8,7 @@ use warnings;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -36,7 +36,7 @@ sub new {
 
         ( $self->parent // $self )->dispatch->log(
             level   => $level,
-            message => encode( 'UTF-8', $_ ),
+            message => $_,
         ) for (@_);
     } );
     return $self;
@@ -143,7 +143,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple)

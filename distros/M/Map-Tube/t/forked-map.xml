@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="test">
+  <lines>
+    <line id="A" name="A" color="red"/>
+  </lines>
+  <stations>
+    <station id="A1" name="A1" line="A:1" link="A2"   />
+    <station id="A2" name="A2" line="A:2" link="A1,A3"/>
+    <station id="A3" name="A3" line="A:3" link="" other_link="walk:A4"/>
+    <station id="A4" name="A4" line="A:4" link="A2"/>
+  </stations>
+</tube>

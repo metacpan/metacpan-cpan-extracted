@@ -3,27 +3,37 @@ abstract: 'Perl-based open notation for data'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
   Test::More: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
 configure_requires:
-  Module::Build: '0'
+  Module::Build: '0.28'
   perl: '5.008'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Pond
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   Data::Pond:
     file: lib/Data/Pond.pm
-    version: '0.005'
+    version: '0.006'
 recommends:
   XSLoader: '0'
 requires:
@@ -35,7 +45,12 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Pond
-  license: http://dev.perl.org/licenses/
-version: '0.005'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://github.com/Grinnz/Data-Pond/issues
+  homepage: https://github.com/Grinnz/Data-Pond
+  repository: https://github.com/Grinnz/Data-Pond.git
+version: '0.006'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

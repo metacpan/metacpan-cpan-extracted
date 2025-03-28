@@ -1,4 +1,11 @@
-version 0.005; 2017-07-19
+0.006     2025-03-28 02:02:42 EDT
+
+  * change in maintainer, authoring tool, bug tracker
+
+  * use uvchr_to_utf8_flags instead of uvuni_to_utf8_flags (which is
+    removed in perl 5.38.0) (RT#150404)
+
+0.005     2017-07-19
 
   * port to Perl 5.19.4, where the C type of array indices has changed
 
@@ -11,7 +18,7 @@ version 0.005; 2017-07-19
 
   * use cBOOL() where appropriate
 
-version 0.004; 2012-02-05
+0.004     2012-02-05
 
   * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
     of unintended prototypes
@@ -33,7 +40,7 @@ version 0.004; 2012-02-05
 
   * add MYMETA.json to .cvsignore
 
-version 0.003; 2010-10-20
+0.003     2010-10-20
 
   * use full stricture in test suite
 
@@ -50,7 +57,7 @@ version 0.003; 2010-10-20
 
   * add MYMETA.yml to .cvsignore
 
-version 0.002; 2009-11-04
+0.002     2009-11-04
 
   * bugfix: in XS implementation, avoid memory leak when parsing hashes
 
@@ -63,12 +70,12 @@ version 0.002; 2009-11-04
 
   * remove bogus "exit 0" from Build.PL
 
-version 0.001; 2009-05-15
+0.001     2009-05-15
 
   * bugfix: correct flags on exported regexps (lack of /x caused these
     regexps to match the wrong things, but did not affect parsing with
     pond_read_datum())
 
-version 0.000; 2009-05-14
+0.000     2009-05-14
 
   * initial released version

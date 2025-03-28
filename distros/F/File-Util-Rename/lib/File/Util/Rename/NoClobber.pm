@@ -8,9 +8,9 @@ use Exporter 'import';
 use File::Util::Rename ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-12'; # DATE
+our $DATE = '2025-03-28'; # DATE
 our $DIST = 'File-Util-Rename'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        rename_noclobber
@@ -33,7 +33,7 @@ File::Util::Rename::NoClobber - Rename files, avoid clobbering existing files
 
 =head1 VERSION
 
-This document describes version 0.002 of File::Util::Rename::NoClobber (from Perl distribution File-Util-Rename), released on 2024-02-12.
+This document describes version 0.003 of File::Util::Rename::NoClobber (from Perl distribution File-Util-Rename), released on 2025-03-28.
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025, 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

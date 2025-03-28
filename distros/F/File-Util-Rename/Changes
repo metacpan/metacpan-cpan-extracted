@@ -1,8 +1,20 @@
+0.003   2025-03-28  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.002 and 0.002.2.
+
+
 0.002   2024-02-12  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
         - [doc] Fix typo in Synopsis.
+
+
+0.002.2 2024-11-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: rename_warnclobber().
+
+        - UPDATE 2025-03-28: rename release 0.002 -> 0.002.2 due to conflict.
 
 
 0.001   2024-01-22  Released-By: PERLANCAR

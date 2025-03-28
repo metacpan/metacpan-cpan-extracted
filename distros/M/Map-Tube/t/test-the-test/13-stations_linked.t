@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use Test::Lib;
 use File::Spec;
-use Test::More tests => 3;
+use Test::More tests => 5;
 use Test::Map::Tube;
 use Sample;
 
 my %tests = (
-              'good-map.xml'               => undef, # supposed to pass
+              'good-map.xml'                             => undef, # supposed to pass
+              'station-line-not-linking-at-terminal.xml' => undef, # supposed to pass
               'station-linked-unknown.xml' => 'Undefined station ID X2 is linked to from station(s) A1', # supposed to fail
             );
 

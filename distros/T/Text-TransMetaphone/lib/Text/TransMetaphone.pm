@@ -8,7 +8,7 @@ BEGIN
 	use warnings;
 	use vars qw($VERSION @EXPORT_OK %LocaleRanges);
 
-	$VERSION = "0.08";
+	$VERSION = "0.10";
 
 	@EXPORT_OK = qw( trans_metaphone reverse_key );
 
@@ -110,7 +110,7 @@ __END__
 
 =head1 NAME
 
-Text::TransMetaphone – Translingual phonetic encoding of words. 
+Text::TransMetaphone - Translingual phonetic encoding of words. 
 
 =head1 SYNOPSIS
 

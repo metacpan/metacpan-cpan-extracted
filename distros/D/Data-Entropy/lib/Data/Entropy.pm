@@ -14,6 +14,24 @@ Data::Entropy - entropy (randomness) management
 		@a = shuffle(@a);
 	};
 
+=head1 STATUS
+
+This module is deprecated.
+
+For most purposes (including cryptography and security), modules like
+L<Crypt::URandom>, L<Crypt::SysRandom> or L<Crypt::PRNG> are more than
+adequate.
+
+Modern operating systems provide good sources of random bytes, and
+the above mentioned modules work on many kinds of systems, including Windows.
+
+There is no need to choose an entropy source, and some users of this
+module have omitted that step, and prior to version 0.008 they may
+have been relying on Perl's builtin C<rand> function.
+
+Please see CPAN Author's Guide to Random Data for Security
+L<https://security.metacpan.org/docs/guides/random-data-for-security.html>.
+
 =head1 DESCRIPTION
 
 This module maintains a concept of a current selection of
@@ -27,12 +45,7 @@ avoiding the need to explicitly configure a source at all.
 
 If nothing is done to set a source then it defaults to the use of Rijndael
 (AES) in counter mode (see L<Data::Entropy::RawSource::CryptCounter>
-and L<Crypt::Rijndael>), keyed using Perl's built-in C<rand> function.
-This gives a data stream that looks like concentrated entropy, but really
-only has at most the entropy of the C<rand> seed.  Within a single run it
-is cryptographically difficult to detect the correlation between parts
-of the pseudo-entropy stream.  If more true entropy is required then it
-is necessary to configure a different entropy source.
+and L<Crypt::Rijndael>), keyed using L<Crypt::URandom>.
 
 =cut
 
@@ -45,7 +58,7 @@ use strict;
 use Carp qw(croak);
 use Params::Classify 0.000 qw(is_ref);
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(entropy_source with_entropy_source);
@@ -75,10 +88,8 @@ sub entropy_source() {
 	}
 	unless(defined $entropy_source) {
 		unless(defined $default_entropy_source) {
-			my $key = "";
-			for(my $i = 32; $i--; ) {
-				$key .= chr(int(CORE::rand(256)));
-			}
+			require Crypt::URandom;
+			my $key = Crypt::URandom::urandom(32);
 			require Crypt::Rijndael;
 			require Data::Entropy::RawSource::CryptCounter;
 			require Data::Entropy::Source;
@@ -128,9 +139,11 @@ L<Data::Entropy::Source>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
+Maintained by Robert Rothenberg <rrwo@cpan.org>
+
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011
+Copyright (C) 2006, 2007, 2009, 2011, 2025
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

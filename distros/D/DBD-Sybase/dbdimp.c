@@ -655,6 +655,8 @@ static CS_INT get_cwidth(CS_DATAFMT *column) {
   case CS_LONGBINARY_TYPE:
 #if defined(CS_UNICHAR_TYPE)
 	case CS_UNICHAR_TYPE:
+#endif
+#if defined(CS_UNITEXT_TYPE)
 	case CS_UNITEXT_TYPE:
 #endif
     len = (2 * column->maxlength) + 2;
@@ -6139,8 +6141,10 @@ static int map_syb_types(int syb_type) {
     return SQL_SMALLINT;
   case CS_INT_TYPE:
     return SQL_INTEGER;
+#if defined(CS_BIGINT_TYPE)
   case CS_BIGINT_TYPE:
     return SQL_BIGINT;
+#endif
   case CS_REAL_TYPE:
     return SQL_REAL;
   case CS_FLOAT_TYPE:

@@ -4,6 +4,7 @@ use warnings;
 use MARC::Convert::Wikidata::Object;
 use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
+use MARC::Convert::Wikidata::Object::Series;
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
@@ -19,6 +20,9 @@ my $author = MARC::Convert::Wikidata::Object::People->new(
 	'name' => decode_utf8('Antonín'),
 	'nkcr_aut' => 'jk01033252',
 	'surname' => 'Halouzka',
+);
+my $cycle = MARC::Convert::Wikidata::Object::Series->new(
+	'name' => 'Harry Potter',
 );
 my $editor = MARC::Convert::Wikidata::Object::People->new(
 	'date_of_birth' => '1814',
@@ -47,6 +51,7 @@ my $publisher = MARC::Convert::Wikidata::Object::Publisher->new(
 $obj = MARC::Convert::Wikidata::Object->new(
 	'authors' => [$author],
 	'ccnb' => 'cnb000750997',
+	'cycles' => [$cycle],
 	'edition_number' => 1,
 	'editors' => [$editor],
 	'illustrators' => [$illustrator],

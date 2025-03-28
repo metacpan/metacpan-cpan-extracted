@@ -1,5 +1,11 @@
 Revision history for Circle-Common
 
-0.01    Date/time
+0.01   2024-01-08
         First version, released on an unsuspecting world.
+
+0.05  2024-01-08
+        common functions
+
+0.06    2025-03-07
+        support debug configure
 

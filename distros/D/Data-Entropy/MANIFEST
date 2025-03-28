@@ -1,18 +1,18 @@
-.cvsignore
-Build.PL
 Changes
-MANIFEST
-META.json
-META.yml
-Makefile.PL
-README
 lib/Data/Entropy.pm
 lib/Data/Entropy/Algorithms.pm
 lib/Data/Entropy/RawSource/CryptCounter.pm
 lib/Data/Entropy/RawSource/Local.pm
-lib/Data/Entropy/RawSource/RandomOrg.pm
 lib/Data/Entropy/RawSource/RandomnumbersInfo.pm
+lib/Data/Entropy/RawSource/RandomOrg.pm
 lib/Data/Entropy/Source.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+SECURITY.md
 t/choose.t
 t/get_bits.t
 t/get_int_large.t
@@ -38,4 +38,4 @@ t/rs_randomorg.t
 t/shuffle.t
 t/test0.entropy
 t/with.t
-SIGNATURE    Added here by Module::Build
+SIGNATURE                                Public-key signature (added by MakeMaker)

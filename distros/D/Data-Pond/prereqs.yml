@@ -1,0 +1,36 @@
+configure:
+  requires:
+    Module::Build: 0
+    perl: '5.008'
+    strict: 0
+    warnings: 0
+  recommends:
+    ExtUtils::CBuilder: '0.15'
+build:
+  requires:
+    Module::Build: 0
+    perl: '5.008'
+    strict: 0
+    warnings: 0
+  recommends:
+    ExtUtils::CBuilder: '0.15'
+test:
+  requires:
+    Test::More: 0
+    perl: '5.008'
+    strict: 0
+    warnings: 0
+runtime:
+  requires:
+    Exporter: 0
+    Carp: 0
+    Params::Classify: 0
+    parent: 0
+    perl: '5.008'
+    strict: 0
+    warnings: 0
+  recommends:
+    XSLoader: 0
+develop:
+  requires:
+    Test::Pod::Coverage: 0

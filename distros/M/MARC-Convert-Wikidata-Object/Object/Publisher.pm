@@ -3,10 +3,15 @@ package MARC::Convert::Wikidata::Object::Publisher;
 use strict;
 use warnings;
 
-use Mo qw(build is);
-use Mo::utils qw(check_required);
+use Mo qw(build default is);
+use Mo::utils 0.21 qw(check_array_object check_required);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
+
+has external_ids => (
+	default => [],
+	is => 'ro',
+);
 
 has id => (
 	is => 'ro',
@@ -23,6 +28,10 @@ has place => (
 sub BUILD {
 	my $self = shift;
 
+	# Check external_ids.
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+
+	# Check name.
 	check_required($self, 'name');
 
 	return;
@@ -45,6 +54,7 @@ MARC::Convert::Wikidata::Object::Publisher - Bibliographic Wikidata object for p
  use MARC::Convert::Wikidata::Object::Publisher;
 
  my $obj = MARC::Convert::Wikidata::Object::Publisher->new(%params);
+ my $external_ids_ar = $obj->external_ids;
  my $id = $obj->id;
  my $name = $obj->name;
  my $place = $obj->place;
@@ -60,6 +70,14 @@ Constructor.
 Returns instance of object.
 
 =over 8
+
+=item * C<external_ids>
+
+External ids.
+
+Need to be a reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
+
+Default value is [].
 
 =item * C<id>
 
@@ -84,6 +102,14 @@ Location of publishing house.
 Default value is undef.
 
 =back
+
+=head2 C<external_ids>
+
+ my $external_ids_ar = $obj->external_ids;
+
+Get list of external ids.
+
+Returns reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
 
 =head2 C<id>
 
@@ -112,6 +138,8 @@ Returns string.
 =head1 ERRORS
 
  new():
+         External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
+         Parameter 'external_ids' must be a array.
          Parameter 'name' is required.
 
 =head1 EXAMPLE1
@@ -122,9 +150,16 @@ Returns string.
  use warnings;
 
  use Data::Printer;
+ use MARC::Convert::Wikidata::Object::ExternalId;
  use MARC::Convert::Wikidata::Object::Publisher;
  
  my $obj = MARC::Convert::Wikidata::Object::Publisher->new(
+         'external_ids' => [
+                 MARC::Convert::Wikidata::Object::ExternalId->new(
+                         'name' => 'nkcr_aut',
+                         'value' => 'ko2002101950',
+                 ),
+         ],
          'id' => '000010003',
          'name' => 'Academia',
          'place' => 'Praha',
@@ -134,13 +169,19 @@ Returns string.
 
  # Output:
  # MARC::Convert::Wikidata::Object::Publisher  {
- #     Parents       Mo::Object
- #     public methods (4) : can (UNIVERSAL), DOES (UNIVERSAL), isa (UNIVERSAL), VERSION (UNIVERSAL)
- #     private methods (1) : __ANON__ (Mo::is)
+ #     parents: Mo::Object
+ #     public methods (2):
+ #         BUILD
+ #         Mo::utils:
+ #             check_required
+ #     private methods (0)
  #     internals: {
- #         id      "000010003",
- #         name    "Academia",
- #         place   "Praha"
+ #         external_ids   [
+ #             [0] MARC::Convert::Wikidata::Object::ExternalId
+ #         ],
+ #         id             "000010003" (dualvar: 10003),
+ #         name           "Academia",
+ #         place          "Praha"
  #     }
  # }
 
@@ -177,6 +218,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

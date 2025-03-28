@@ -52,7 +52,7 @@ use strict;
 use Errno 1.00 qw(EIO);
 use HTTP::Lite 2.2 ();
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 =head1 CONSTRUCTOR
 
@@ -257,9 +257,11 @@ L<http://www.random.org>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
+Maintained by Robert Rothenberg <rrwo@cpan.org>
+
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011
+Copyright (C) 2006, 2007, 2009, 2011, 2025
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

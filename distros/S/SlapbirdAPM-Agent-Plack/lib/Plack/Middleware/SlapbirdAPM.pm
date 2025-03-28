@@ -15,11 +15,12 @@ use Carp ();
 use System::Info;
 use Time::HiRes qw(time);
 use SlapbirdAPM::Plack::DBIx::Tracer;
+use POSIX;
 use namespace::clean;
 
 $Carp::Internal{__PACKAGE__} = 1;
 
-use Plack::Util::Accessor qw(key quiet);
+use Plack::Util::Accessor qw(key quiet ignored_headers);
 
 const my $SLAPBIRD_APM_URI => $ENV{SLAPBIRD_APM_DEV}
   ? $ENV{SLAPBIRD_APM_URI} . '/apm'
@@ -29,6 +30,7 @@ const my $OS => System::Info->new->os;
 sub _unfold_headers {
     my ( $self, $headers ) = @_;
     my %headers = (@$headers);
+    delete $headers{$_} for ( $self->ignored_headers );
     return \%headers;
 }
 

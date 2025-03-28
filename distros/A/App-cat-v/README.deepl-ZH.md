@@ -18,6 +18,7 @@ cat-v \[ 选项 \] args ...
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
             --tabspace=#    Set tab-space character
+       -C   --color=#       Set color
        -h   --help          Print this message
        -v   --version       Print version
 
@@ -32,7 +33,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -96,7 +97,7 @@ Version 1.04
     us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
     sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
     del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ␣  OPEN BOX
+    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
 
 目前，Unicode 标识可用于以下字符
 
@@ -149,7 +150,7 @@ Version 1.04
 
     上述命令与此完全相同。
 
-        cat-v --no-expand --reset --visible all=e,nl=0
+        cat-v --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -229,6 +230,10 @@ Version 1.04
     设置制表符展开的样式。例如选择 `symbol` 或 `shade`。如果组合了两个样式名称，如 `squat-arrow,middle-dot`，则在制表符头使用 `squat-arrow`，在制表符空间使用 `middle-dot`。
 
     如果调用时不带参数，则显示可用样式表。样式在 [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) 库中定义。
+
+- **-C**=_color_, **--color**=_color_
+
+    被替换的字符将以 _color_ 指定的颜色显示。该选项不适用于包含 ANSI 颜色序列的输出。
 
 - **-E**, **--escape-backslash**
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension App-cat-v
 
+1.05 2025-03-27T13:16:45Z
+
+    - use "SHOULDERED OPEN BOX" for NBSP
+    - add -C option to colorization
+
 1.04 2025-02-11T02:27:17Z
 
     - add link to "UNIX Style, or cat -v Considered Harmful"

@@ -1,3 +1,7 @@
+0.11 2025-03-27T16:49:28+01:00
+ - Add 'external_ids' parameter to Publisher object.
+ - Add tests for 'cycles' parameter.
+
 0.10 2025-03-17T18:19:08+01:00
  - Add 'valid' parameter to ISBN object.
  - Update copyright years.

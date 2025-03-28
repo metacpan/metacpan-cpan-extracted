@@ -1,3 +1,7 @@
+Release 1.26
+    Fix missing conditional statements for "new" datatypes introduced with
+    ASE 15.x
+
 Release 1.25
     Fix issue in bigtime/bigdatetime ISO conversion.
     Allow ability to set configuration options via environment

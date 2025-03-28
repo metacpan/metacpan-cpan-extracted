@@ -1,5 +1,11 @@
 Revision history for Perl module Image::JPEG::Size
 
+0.03  2025-03-27 15:07:00+0000
+
+  * Update the current maintainer in the metadata.
+
+  * Add a security policy.
+
 0.02  2017-12-01 19:44:03+0000
 
   * Fix package metadata

@@ -12,7 +12,7 @@ BEGIN
 	use warnings;
 	use vars qw( $VERSION $LocaleRange %IMExpected %IMError %plosives );
 
-	$VERSION = '0.08';
+	$VERSION = '0.10';
 
 	$LocaleRange = qr/[ሀ-ቍበ-ኾዐ-ዷጀ-ጕጠ-፼]/;
 
@@ -189,7 +189,7 @@ __END__
 
 =head1 NAME
 
-Text::TransMetaphone::am – Transcribe Amharic words into IPA symbols.
+Text::TransMetaphone::am - Transcribe Amharic words into IPA symbols.
 
 =head1 SYNOPSIS
 

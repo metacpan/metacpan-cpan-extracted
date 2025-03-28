@@ -50,99 +50,99 @@
    "provides" : {
       "App::gherkin" : {
          "file" : "lib/App/gherkin.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin" : {
          "file" : "lib/Gherkin.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::AstBuilder" : {
          "file" : "lib/Gherkin/AstBuilder.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::AstNode" : {
          "file" : "lib/Gherkin/AstNode.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Dialect" : {
          "file" : "lib/Gherkin/Dialect.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::AstBuilder" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::CompositeParser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::NoSuchLanguage" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::Parser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::SingleParser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::UnexpectedEOF" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Exceptions::UnexpectedToken" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Generated::Languages" : {
          "file" : "lib/Gherkin/Generated/Languages.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Generated::Parser" : {
          "file" : "lib/Gherkin/Generated/Parser.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Line" : {
          "file" : "lib/Gherkin/Line.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Parser" : {
          "file" : "lib/Gherkin/Parser.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::ParserBase" : {
          "file" : "lib/Gherkin/ParserBase.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::ParserContext" : {
          "file" : "lib/Gherkin/ParserContext.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Pickles::Compiler" : {
          "file" : "lib/Gherkin/Pickles/Compiler.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::Token" : {
          "file" : "lib/Gherkin/Token.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::TokenFormatterBuilder" : {
          "file" : "lib/Gherkin/TokenFormatterBuilder.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::TokenMatcher" : {
          "file" : "lib/Gherkin/TokenMatcher.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       },
       "Gherkin::TokenScanner" : {
          "file" : "lib/Gherkin/TokenScanner.pm",
-         "version" : "v32.0.0"
+         "version" : "v32.0.1"
       }
    },
    "release_status" : "stable",
@@ -156,7 +156,7 @@
          "web" : "https://github.com/cucumber/gherkin"
       }
    },
-   "version" : "32.0.0",
+   "version" : "32.0.1",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "MIT"

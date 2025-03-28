@@ -1,5 +1,8 @@
 Revision history for MojoX::Log::Dispatch::Simple
 
+1.14      2025-03-27 15:43:26-07:00 America/Los_Angeles
+        - Removed forced UTF-8 encoding; encoding now up to client
+
 1.13      2025-02-13 13:33:02-08:00 America/Los_Angeles
         - Perl minimum version align
 

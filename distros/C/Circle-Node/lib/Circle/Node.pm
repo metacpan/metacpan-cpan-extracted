@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @EXPORT = qw(
   subscribe
@@ -44,7 +44,7 @@ Circle::Node - The Circle Chain's Node module.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -70,7 +70,7 @@ Version 0.04
 
 =head1 SUBROUTINES/METHODS
 
-=head2 subscribe
+=head2 subscribe()
 
   my $response = subscribe();
   if ($response->{status} == 200) {
@@ -87,7 +87,7 @@ subscribe the circle chain server node and get the basic data of the node:
 
 =cut
 
-=head2 serverFeatures
+=head2 serverFeatures()
 
   my $response = serverFeatures();
   if ($response->{status} == 200) {
@@ -111,7 +111,7 @@ serverFeatures api provides the server features:
 
 =cut
 
-=head2 broadcastTransaction
+=head2 broadcastTransaction( $input )
 
   my $response = broadcastTransaction({
     txid => '',

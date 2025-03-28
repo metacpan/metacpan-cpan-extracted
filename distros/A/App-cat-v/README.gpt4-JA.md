@@ -18,6 +18,7 @@ cat-v \[ オプション \] 引数 ...
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
             --tabspace=#    Set tab-space character
+       -C   --color=#       Set color
        -h   --help          Print this message
        -v   --version       Print version
 
@@ -32,7 +33,7 @@ cat-v \[ オプション \] 引数 ...
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -96,7 +97,7 @@ Version 1.04
     us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
     sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
     del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ␣  OPEN BOX
+    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
 
 この時点で、以下の文字に対してUnicodeマーキングが利用可能です
 
@@ -149,7 +150,7 @@ Version 1.04
 
     上記のコマンドはこれと同一です。
 
-        cat-v --no-expand --reset --visible all=e,nl=0
+        cat-v --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -229,6 +230,10 @@ Version 1.04
     タブの展開方法のスタイルを設定します。例えば`symbol`や`shade`を選択します。2つのスタイル名が組み合わされている場合、例えば`squat-arrow,middle-dot`、タブの先頭には`squat-arrow`を、タブスペースには`middle-dot`を使用します。
 
     パラメータなしで呼び出された場合、利用可能なスタイルリストを表示します。スタイルは[Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold)ライブラリで定義されています。
+
+- **-C**=_color_, **--color**=_color_
+
+    置換された文字は、_color_で指定された色で表示されます。このオプションは、ANSIカラーシーケンスを含む出力には適していません。
 
 - **-E**, **--escape-backslash**
 

@@ -17,11 +17,11 @@ Circle::Miner - The miner module for circle chain sdk.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -335,7 +335,7 @@ Throws:
 
 Example:
 
-    my $result = $miner->post_my_block('1ABC...', $mined_block, '127.0.0.1:8080');
+    my $result = $miner->post_my_block('1ABC...', $mined_block, '0c50c941bb6856b36216c4df1ce5c96815d02c5d5c33ff64c55471f3f1ea1792');
     if ($result->{status} == 200) {
         # Block successfully posted
     }
@@ -344,9 +344,9 @@ Example:
 
 sub post_my_block {
     my $self = shift;
-    my ( $address, $header_hex, $ip_port ) = @_;
-    if (!$address || !$header_hex || !$ip_port) {
-        croak "address header_hex and ip_port must be non-empty!";
+    my ( $address, $header_hex, $channelId ) = @_;
+    if (!$address || !$header_hex || !$channelId) {
+        croak "address header_hex and channelId must be non-empty!";
     }
     if (length($address) != 34 || substr($address, 0, 1) ne "1") {
         croak "address is invalid";
@@ -356,7 +356,7 @@ sub post_my_block {
         $url,
         {
             address              => $address,
-            ipPort               => $ip_port,
+            channelId            => $channelId,
             blockHeaderHexString => $header_hex
         }
     );

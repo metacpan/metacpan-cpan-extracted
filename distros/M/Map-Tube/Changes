@@ -1,5 +1,14 @@
 Revision history for Map::Tube
 
+4.03  2025-03-27T11:58:00+00:00
+      Thanks to @GWS for these changes:
+      - Fixed over-eager testing in Test::Map::Tube.
+        (https://github.com/manwar/Map-Tube/issues/19)
+      - Fixed possibe infinite loop in _get_shortest_route( ).
+        (https://github.com/manwar/Map-Tube/issues/18)
+      - Augmented test cases.
+      - Added documentation for available maps.
+
 4.02  2025-03-01T13:15:00+00:00
       - Removed redundant code as suggested by @GWS.
 
