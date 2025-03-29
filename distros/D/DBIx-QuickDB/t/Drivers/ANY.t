@@ -3,6 +3,12 @@ use Test2::Tools::QuickDB;
 
 use List::Util qw/shuffle/;
 
+BEGIN {
+    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}"    if -d "$ENV{HOME}/dbs/mysql8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/percona8/bin:$ENV{PATH}"  if -d "$ENV{HOME}/dbs/percona8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/mariadb11/bin";
+}
+
 my @drivers = shuffle qw/MariaDB Percona MySQL AnyMySQL PostgreSQL SQLite/;
 my %load    = (
     MariaDB    => [quickdb => 't/schema/mariadb.sql'],

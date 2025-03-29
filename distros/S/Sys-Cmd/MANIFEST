@@ -1,15 +1,12 @@
 Changes
 cpanfile
+example/ex.pl
 lib/Sys/Cmd.pm
-lib/Sys/Cmd/Template.pm
-lib/Sys/Cmd/Template_CI.pm
-lib/Sys/Cmd_CI.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/info.pl
-t/Sys/Cmd.t
-t/Sys/Cmd/Template.t
+t/sys-cmd.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

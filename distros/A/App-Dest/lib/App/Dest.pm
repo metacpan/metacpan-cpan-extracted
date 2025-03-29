@@ -14,7 +14,7 @@ use IPC::Run 'run';
 use Path::Tiny 'path';
 use Text::Diff ();
 
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -281,6 +281,12 @@ sub preinstall {
         }
     }
 
+    return 0;
+}
+
+sub nuke {
+    my $self = _new(shift);
+    rmtree( $self->_rel2dir('.dest') );
     return 0;
 }
 
@@ -760,7 +766,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)
@@ -788,6 +794,7 @@ dest COMMAND [OPTIONS]
     dest diff [NAME]        # display a diff of any modified actions
     dest clean [NAME]       # reset dest state to match current files/dirs
     dest preinstall [NAME]  # set dest state so an update will deploy everything
+    dest nuke               # de-initialize dest; remove all dest stuff
 
     dest deploy NAME [-d]   # deployment of a specific action
     dest verify [NAME]      # verification of tracked actions or specific action
@@ -980,6 +987,12 @@ Here's an example of what you might want:
 
 You can optionally provide a specific action or even a step of an action to
 C<preinstall> similar to C<clean>.
+
+=head2 nuke
+
+Completely remove all traces of C<dest>. In effect, this is a de-initialization
+of C<dest>, like an un-C<init> command. It's like C<preinstall>, but it reverses
+all initializations and watches.
 
 =head2 deploy NAME [-d]
 

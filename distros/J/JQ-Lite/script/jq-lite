@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use JSON::PP;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use JQ::Lite;
+
+# Argument parsing
+my $raw_output = 0;
+my $query;
+my $filename;
+
+while (@ARGV) {
+    my $arg = shift @ARGV;
+    if ($arg eq '--raw-output' || $arg eq '-r') {
+        $raw_output = 1;
+    } elsif ($arg eq '--help' || $arg eq '-h') {
+        print <<'USAGE';
+Usage: jq-lite [--raw-output|-r] [--help|-h] '.query' [file.json]
+
+Examples:
+  cat users.json | jq-lite '.users[0].name'
+  jq-lite '.users[].name' users.json
+  jq-lite -r '.users[] | select(.age > 25)' users.json
+USAGE
+        exit 0;
+    } elsif (!defined $query && $arg =~ /^\./) {
+        $query = $arg;
+    } elsif (!defined $query) {
+        die "Error: Invalid query syntax '$arg'\nUsage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
+    } elsif (!defined $filename) {
+        $filename = $arg;
+    } else {
+        die "Usage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
+    }
+}
+
+die "Usage: jq-lite [--raw-output|-r] '.query' [file.json]\n" unless defined $query;
+
+# Load JSON from file or STDIN
+my $json_text;
+if (defined $filename) {
+    open my $fh, '<', $filename or die "Cannot open file '$filename': $!\n";
+    local $/;
+    $json_text = <$fh>;
+    close $fh;
+} else {
+    local $/;
+    $json_text = <STDIN>;
+}
+
+# Run query
+my $jq = JQ::Lite->new(raw => $raw_output);
+my @results = $jq->run_query($json_text, $query);
+
+# Output formatter
+my $pp = JSON::PP->new->utf8->canonical->pretty;
+
+# Print results
+for my $r (@results) {
+    if (!defined $r) {
+        print "null\n";
+    } elsif ($raw_output && ref($r) eq '') {
+        print "$r\n";
+    } else {
+        print $pp->encode($r);
+    }
+}

@@ -1,34 +1,33 @@
 {
    "abstract" : "details of the floating point data type",
    "author" : [
-      "Andrew Main (Zefram) <zefram@fysh.org>"
+      "Robert Rothenberg <rrwo@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Data-Float",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -42,24 +41,23 @@
             "strict" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Data::Float" : {
-         "file" : "lib/Data/Float.pm",
-         "version" : "0.013"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Data-Float@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Float"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Data-Float.git"
+      }
    },
-   "version" : "0.013",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

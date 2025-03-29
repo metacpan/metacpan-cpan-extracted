@@ -16,7 +16,14 @@ use EBook::Ishmael::EBook::CHM;
 use EBook::Ishmael::EBook::PDF;
 use EBook::Ishmael::TextBrowserDump;
 
+# The following formats depend on system utilities to be installed to be
+# processed correctly. Some systems' versions of the utilities may not work
+# as intended and cause test failures, so give the user the option to disable
+# tests for those formats.
 my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
+my $TEST_CBR = $ENV{TEST_CBR} // $EBook::Ishmael::EBook::CBR::CAN_TEST;
+my $TEST_CB7 = $ENV{TEST_CB7} // $EBook::Ishmael::EBook::CB7::CAN_TEST;
+my $TEST_CHM = $ENV{TEST_CHM} // $EBook::Ishmael::EBook::CHM::CAN_TEST;
 
 my @FILES = map { File::Spec->catfile(qw(t data), $_) } qw(
 	gpl3.epub gpl3.fb2 gpl3.html gpl3.mobi gpl3.pdb gpl3.txt gpl3.xhtml
@@ -53,25 +60,30 @@ for my $f (@FILES) { SKIP: {
 	my ($file) = $f =~ /\.(.+)$/;
 
 	if (!$TEST_PDF and $file eq 'pdf') {
-		skip "TEST_PDF set to 0 or poppler utils not installed", 8;
+		skip "TEST_PDF set to 0 or poppler utils not installed", 10;
 	}
 
-	if (!$EBook::Ishmael::EBook::CBR::CAN_TEST and $file eq 'cbr') {
-		skip "unrar not installed", 8;
+	if (!$TEST_CBR and $file eq 'cbr') {
+		skip "TEST_CBR set to 0 or unrar not installed", 10;
 	}
 
-	if (!$EBook::Ishmael::EBook::CB7::CAN_TEST and $file eq 'cb7') {
-		skip "7z not installed", 8;
+	if (!$TEST_CB7 and $file eq 'cb7') {
+		skip "TEST_CB7 set to 0 or 7z not installed", 10;
 	}
 
-	if (!$EBook::ishmael::EBook::CHM::CAN_TEST and $file eq 'chm') {
-		skip "chmlib not installed", 8;
+	if (!$TEST_CHM and $file eq 'chm') {
+		skip "TEST_CHM set to 0 or chmlib not installed", 10;
 	}
 
 	@ARGV = ('-H', $f);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-H w/ $file ok");
+
+	@ARGV = (qw(-H -e cp1252), $f);
+	$ishmael = EBook::Ishmael->init();
+
+	ok($ishmael->run, "cp1252 -H w/ $file ok");
 
 	@ARGV = ('-i', $f);
 	$ishmael = EBook::Ishmael->init();
@@ -107,6 +119,11 @@ for my $f (@FILES) { SKIP: {
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-r w/ $file ok");
+
+	@ARGV = (qw(-r -e cp1252), $f);
+	$ishmael = EBook::Ishmael->init();
+
+	ok($ishmael->run, "cp1252 -r w/ $file ok");
 
 	@ARGV = ('-c', $f, $tmpimg);
 	$ishmael = EBook::Ishmael->init();

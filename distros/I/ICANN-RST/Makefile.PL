@@ -40,9 +40,10 @@ my %WriteMakefileArgs = (
     "utf8" => 0
   },
   "TEST_REQUIRES" => {
+    "LWP::Online" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "GraphViz2" => 0,
   "IPC::Open2" => 0,
   "JSON::Schema" => 0,
+  "LWP::Online" => 0,
   "List::Util" => 0,
   "Test::More" => 0,
   "Text::Unidecode" => 0,

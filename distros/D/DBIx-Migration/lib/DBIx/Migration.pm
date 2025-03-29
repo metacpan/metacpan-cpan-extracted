@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Moo;
 use MooX::SetOnce;
@@ -9,9 +9,10 @@ use MooX::StrictConstructor;
 use DBI                     ();
 use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
+use String::Expand          qw( expand_string );
 use Try::Tiny               qw( catch try );
 use Types::Path::Tiny       qw( Dir );
-use Types::Standard         qw( ArrayRef Str );
+use Types::Standard         qw( ArrayRef HashRef Str );
 
 use namespace::clean -except => [ qw( before new ) ];
 
@@ -22,9 +23,10 @@ has [ qw( password username ) ] => ( is => 'ro',   isa => Str );
 has dbh => ( is => 'lazy' );
 
 has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
-has do_before      => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
-has do_while       => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
+has do_before      => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
+has do_while       => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
 has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
+has placeholders   => ( is => 'lazy', isa => HashRef [ Str ], default => sub { {} }, init_arg => undef );
 
 sub _build_dbh {
   my $self = shift;
@@ -126,13 +128,13 @@ sub migrate {
       }
     );
 
-    $Logger->debugf( "Execute 'before' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+    $Logger->debugf( "Execute 'before' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( ref eq 'ARRAY' ? @$_ : $_ )
       foreach @{ $self->do_before };
 
     $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;
 
-    $Logger->debugf( "Execute 'while' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+    $Logger->debugf( "Execute 'while' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( ref eq 'ARRAY' ? @$_ : $_ )
       foreach @{ $self->do_while };
 
     my $version = $self->version;
@@ -158,13 +160,15 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         $Logger->debugf( "Process migration '%s'", $name );
-        my $text      = $name->slurp_raw;
-        my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
+        my $content   = $name->slurp_raw;
+        my $delimiter = ( $content =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         $Logger->debugf( "Migration section delimiter is '%s'", $delimiter );
-        $text =~ s/\s*--.*$//mg;
-        for my $sql ( split /$delimiter/, $text ) {
+        $content =~ s/\s*--.*$//mg;
+        # split content into sections ($sql)
+        for my $sql ( split /$delimiter/, $content ) {
           $sql =~ s/\A\s*//;
           next unless $sql =~ /\w/;
+          $sql = expand_string( $sql, $self->placeholders );
           # prepend $sql to error message
           local $self->{ _dbh }->{ HandleError } = sub { $_[ 0 ] = "$sql\n$_[0]"; return 0; };
           $self->{ _dbh }->do( $sql );

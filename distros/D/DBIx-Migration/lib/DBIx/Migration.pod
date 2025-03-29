@@ -87,6 +87,11 @@ The annotation has to be specified in the first line. The delimiter has to be
 a single printable ASCII character, excluding the space character. In the
 previous example it is the C</> (slash) character.
 
+You may use certain placeholders (embedded variables) in an SQL migration
+section.  The placeholders are expanded before the section gets executed. A
+placeholder name starts with a C<dbix_migration_*> prefix. The supported
+placeholders are subclass (driver) specific.
+
 =head1 LIFECYCLE METHODS
 
 =over
@@ -134,6 +139,10 @@ transaction was enabled. The list is empty by default.
 =item $self->tracking_table
 
 Get tracking table.
+
+=item $self->placeholders
+
+Get map of placeholders. The map is empty by default.
 
 =back
 

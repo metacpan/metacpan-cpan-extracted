@@ -681,7 +681,7 @@ sub url_encode {
 
   # XXX: Forward slash (and ':') is allowed, for cleaner url. This may break...
   $encode
-    =~ s{([^A-Za-z0-9\-_.!~*'() /:])}{ uc sprintf "%%%02x",ord $1 }eg;
+    =~ s{([^A-Za-z0-9\-_.!~*\'() /:])}{ uc sprintf "%%%02x",ord $1 }eg;
   $encode =~ tr/ /+/;
   return $encode;
 }
@@ -730,7 +730,13 @@ sub ostream {
 
 sub read_file {
   my ($fn, $layer) = @_;
-  open my $fh, '<' . ($layer // ''), $fn or die "Can't open '$fn': $!";
+  my $fh;
+  if ($fn eq '-') {
+    $fh = \*STDIN;
+  } else {
+    open $fh, '<' . ($layer // ''), $fn
+      or die "Can't open '$fn': $!";
+  }
   local $/;
   scalar <$fh>;
 }

@@ -63,6 +63,6 @@
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.0.17",
+   "version" : "v0.0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

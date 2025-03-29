@@ -1,7 +1,7 @@
 package ICANN::RST::Spec;
 # ABSTRACT: an object representing the RST test specifications.
 use Carp;
-use Data::Mirror qw(mirror_file);
+use Data::Mirror qw(mirror_file mirror_json);
 use ICANN::RST::Case;
 use ICANN::RST::ChangeLog;
 use ICANN::RST::DataProvider;
@@ -11,21 +11,33 @@ use ICANN::RST::Plan;
 use ICANN::RST::Resource;
 use ICANN::RST::Suite;
 use ICANN::RST::Text;
-use YAML::XS;
 use List::Util qw(pairmap);
-use constant {
-    SCHEMA_VERSION => q{1.14.0},
-    SPEC_URL => q{https://icann.github.io/rst-test-specs/rst-test-specs.yaml},
-};
+use URI;
+use YAML::XS;
+use constant SCHEMA_VERSION => q{1.14.0};
 use feature qw(say);
 use strict;
 
 $YAML::XS::Boolean = q{JSON::PP};
 
+sub url_from_release {
+    my ($package, $release) = @_;
+
+    return URI->new(sprintf(q{https://github.com/icann/rst-test-specs/releases/download/%s/rst-test-specs.yaml}, $release));
+}
+
+sub current_version { shift->url_from_release(mirror_json(q{https://api.github.com/repos/icann/rst-test-specs/releases/latest})->{name}) }
+
+sub new_from_version {
+    my ($package, $version) = @_;
+    my $file = mirror_file($package->url_from_release($version));
+    return $file ? $package->new($file) : undef;
+}
+
 sub new {
     my ($package, $file) = @_;
 
-    $file ||= mirror_file(SPEC_URL);
+    $file ||= mirror_file($package->current_version);
 
     my $self = bless(
         {
@@ -114,13 +126,20 @@ ICANN::RST::Spec - an object representing the RST test specifications.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 METHODS
 
 =head2 new($file)
 
-Constructor. C<$file> is the YAML file.
+Constructor. C<$file> is the YAML file. If not provided, the most recent
+version will be retrieved from
+L<GitHub|https://github.com/icann-rst-test/specs/releases>.
+
+=head2 new_from_version($version);
+
+Returns an L<ICANN::RST::Spec> object corresponding to the version of the test
+specs identified by C<$version>.
 
 =head2 schemaVersion()
 

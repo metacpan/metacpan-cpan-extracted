@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -22,6 +22,7 @@ my @ORDER = qw(
 	links
 	elinks
 	w3m
+	chawan
 	queequeg
 );
 
@@ -30,14 +31,14 @@ my %Browsers = (
 		Bins  => [ qw(lynx) ],
 		Bin   => undef,
 		Opts  => [ qw(-dump -force_html -nolist -display_charset=utf8) ],
-		Width => '-width',
+		Width => '-width %d',
 		Xhtml => [ qw(-xhtml_parsing) ],
 	},
 	'links' => {
 		Bins  => [ qw(links links2) ],
 		Bin   => undef,
 		Opts  => [ qw(-dump -force-htm -codepage utf8) ],
-		Width => '-width',
+		Width => '-width %d',
 		Xhtml => [],
 	},
 	'elinks' => {
@@ -45,21 +46,28 @@ my %Browsers = (
 		Bin   => undef,
 		Opts  => [ qw(-dump -force-html -no-home -no-references -no-numbering
 		              -dump-charset utf8) ],
-		Width => '-dump-width',
+		Width => '-dump-width %d',
 		Xhtml => [],
 	},
 	'w3m' => {
 		Bins  => [ qw(w3m) ],
 		Bin   => undef,
 		Opts  => [ qw(-dump -T text/html -O utf8) ],
-		Width => '-cols',
+		Width => '-cols %d',
+		Xhtml => [],
+	},
+	'chawan' => {
+		Bins  => [ qw(cha) ],
+		Bin   => undef,
+		Opts  => [ qw(-d -I utf8 -O utf8 -T text/html) ],
+		Width => "-o 'display.columns=%d'",
 		Xhtml => [],
 	},
 	'queequeg' => {
 		Bins  => [ qw(queequeg) ],
 		Bin   => undef,
 		Opts  => [ qw(-e utf8) ],
-		Width => '-w',
+		Width => '-w %d',
 		Xhtml => [],
 	},
 );
@@ -87,6 +95,9 @@ unless ($CAN_DUMP) {
 
 sub browser_dump {
 
+	# Automatically convert qx// input to Perl's internal encoding.
+	use open IN => ':crlf :encoding(UTF-8)';
+
 	unless (defined $Default) {
 		die "Cannot use browser to dump HTML; no valid browser was found on your system\n";
 	}
@@ -111,9 +122,9 @@ sub browser_dump {
 	}
 
 	my $cmd = sprintf
-		"%s %s %d %s %s '%s'",
+		"%s %s %s %s '%s'",
 		$Browsers{ $browser }->{Bin},
-		$Browsers{ $browser }->{Width}, $width,
+		sprintf($Browsers{ $browser }->{Width}, $width),
 		join(" ", @{ $Browsers{ $browser }->{Opts} }),
 		($xhtml ? join(" ", @{ $Browsers{ $browser }->{Xhtml} }) : ''),
 		$file;
@@ -160,6 +171,8 @@ programs to be installed:
 
 =item L<w3m(1)>
 
+=item chawan
+
 =item L<queequeg(1)>
 
 =back
@@ -191,9 +204,6 @@ Specify the width of the formatted text. Defaults to C<80>.
 
 =back
 
-Dumped text is UTF8-encoded (or, more accurately, the dumper's notion of
-UTF8-encoded).
-
 =head1 GLOBAL VARIABLES
 
 =head2 $EBook::Ishmael::TextBrowserDump::CAN_DUMP
@@ -220,6 +230,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
+L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>, L<cha(1)>
 
 =cut

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -266,12 +266,6 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
 	my $ns = $self->{_dom}->documentElement->namespaceURI;
 
 	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
@@ -282,11 +276,21 @@ sub html {
 		'/FictionBook:body'
 	) or die "Invalid FictionBook2 file $self->{Source}\n";
 
-	print { $fh } map { $_->toString } map { $_->childNodes } @bodies;
+	my $html = join '',
+		map { $_->toString }
+		map { $_->childNodes }
+		@bodies;
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -295,12 +299,6 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
 	my $ns = $self->{_dom}->documentElement->namespaceURI;
 
 	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
@@ -311,11 +309,18 @@ sub raw {
 		'/FictionBook:body'
 	) or die "Invalid FictionBook2 file $self->{Source}\n";
 
-	print { $fh } map { $_->textContent } @bodies;
+	my $raw = join '', map { $_->textContent } @bodies;
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 
@@ -342,17 +347,18 @@ sub cover {
 
 	return undef unless $self->has_cover;
 
-	my $bin;
+	my $bin = decode_base64($self->{_cover}->textContent);
 
-	open my $fh, '>', $out // \$bin
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh;
-
-	print { $fh } decode_base64($self->{_cover}->textContent);
-
-	close $fh;
-
-	return $out // $bin;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh;
+		print { $fh } $bin;
+		close $fh;
+		return $out;
+	} else {
+		return $bin;
+	}
 
 }
 

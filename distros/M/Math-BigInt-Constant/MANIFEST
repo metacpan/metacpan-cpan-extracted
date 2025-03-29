@@ -2,6 +2,7 @@ BUGS
 CHANGES
 lib/Math/BigFloat/Constant.pm
 lib/Math/BigInt/Constant.pm
+lib/Math/BigRat/Constant.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -12,6 +13,7 @@ t/00sig.t
 t/01load.t
 t/bigfltcpm.t
 t/bigintcpm.t
+t/bigratcpm.t
 TODO
 xt/author/critic.t
 xt/release/changelog.t

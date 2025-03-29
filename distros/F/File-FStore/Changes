@@ -1,3 +1,13 @@
+v0.02   2025-03-28Z
+    - Added support for easy link generation
+    - Added fix() method on the store object to allow for easy maintenance of the store
+    - Improved query() with a lot of new options
+    - Added simple CGI query example script
+    - Improved documentation
+    - Added support to delete files from the store
+    - Added way to sync with a Data::TagDB database
+    - Improved performance by loading dependencies on-demand
+
 v0.01   2025-03-19Z
     - Initial release
     - Basic support for scaning for, querying, and adding files.

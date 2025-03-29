@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -250,15 +250,7 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
-	# Go through each file in _spine and extract the body of the XHTML tree.
-
-	print { $fh } map {
+	my $html = join '', map {
 
 		my $dom = XML::LibXML->load_xml(location => $_);
 		my $ns = $dom->documentElement->namespaceURI;
@@ -273,9 +265,16 @@ sub html {
 
 	} @{ $self->{_spine} };
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -284,13 +283,7 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
-	print { $fh } join "\n\n", map {
+	my $raw = join "\n\n", map {
 
 		my $dom = XML::LibXML->load_xml(location => $_);
 		my $ns = $dom->documentElement->namespaceURI;
@@ -305,9 +298,16 @@ sub raw {
 
 	} @{ $self->{_spine} };
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 
@@ -334,24 +334,22 @@ sub cover {
 
 	return undef unless defined $self->{_cover};
 
-	my $bin;
-
 	open my $rh, '<', $self->{_cover}
 		or die "Failed to open $self->{_cover} for reading: $!\n";
 	binmode $rh;
-
-	open my $wh, '>', $out // \$bin
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $wh;
-
-	while (CORE::read $rh, my ($buf), 1024) {
-		print { $wh } $buf;
-	}
-
+	my $bin = do { local $/ = undef; readline $rh };
 	close $rh;
-	close $wh;
 
-	return $out // $bin;
+	if (defined $out) {
+		open my $wh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $wh;
+		print { $wh } $bin;
+		close $wh;
+		return $out;
+	} else {
+		return $bin;
+	}
 
 }
 

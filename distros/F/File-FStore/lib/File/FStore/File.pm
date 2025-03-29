@@ -22,7 +22,7 @@ use File::FStore;
 
 use constant WRITE_BITS => S_IWUSR|S_IWGRP|S_IWOTH;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
@@ -37,6 +37,17 @@ my %_exts = (
     'application/pdf'           => 'pdf',
     'application/zip'           => 'zip',
     'text/plain'                => 'txt',
+);
+
+my %_db_tags = (
+    # well known tags:
+    final_file_size     => Data::Identifier->new(uuid => '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d'),
+    final_file_encoding => Data::Identifier->new(uuid => '448c50a8-c847-4bc7-856e-0db5fea8f23b'),
+    final_file_hash     => Data::Identifier->new(uuid => '79385945-0963-44aa-880a-bca4a42e9002'),
+    also_has_role       => Data::Identifier->new(uuid => 'd2750351-aed7-4ade-aa80-c32436cc6030'),
+    also_has_state      => Data::Identifier->new(uuid => '4c426c3c-900e-4350-8443-e2149869fbc9'),
+    has_final_state     => Data::Identifier->new(uuid => '54d30193-2000-4d8a-8c28-3fa5af4cad6b'),
+    specific_proto_file_state => Data::Identifier->new(uuid => '63da70a8-78a4-51b0-8b87-86872b474a5d'),
 );
 
 
@@ -94,6 +105,18 @@ sub open {
     $self->_detach_fh;
 
     return $fh;
+}
+
+
+sub link_out {
+    my ($self, $filename) = @_;
+    link($self->filename, $filename) or croak $!;
+}
+
+
+sub symlink_out {
+    my ($self, $filename) = @_;
+    symlink($self->filename, $filename) or croak $!;
 }
 
 
@@ -182,30 +205,10 @@ sub update {
 
             # Create symlinks:
             {
-                my $ext = $_exts{$properties->{mediasubtype} // 'x.x/x.x'};
                 my $dbname = $self->dbname;
                 my $filename = File::Spec->catfile('..', '..', 'store', $dbname);
 
-                unless (defined $ext) {
-
-                    if ($dbname =~ /\.([a-z0-9]{1,4})$/) {
-                        $ext = $1;
-
-                        if ($dbname =~ /\.(tar\.(?:gz|bz2|xz|lz|zst))$/) {
-                            $ext = $1;
-                        }
-                    }
-                }
-
-                $ext = '.'.$ext if defined $ext;
-
-                foreach my $digest (keys %{$digests}) {
-                    my $v = $digests->{$digest} // next;
-                    my $fn;
-
-                    $v .= $ext if defined $ext;
-                    $fn = $store->_file(v2 => by => $digest => $v);
-
+                foreach my $fn ($self->_linknames($digests)) {
                     next if -l $fn;
                     symlink($filename, $fn) or croak $!;
                 }
@@ -377,6 +380,95 @@ sub set {
 }
 
 
+sub delete {
+    my ($self) = @_;
+    my $store = $self->store;
+    my $dbid = $self->{dbid} or croak 'Call on invalid object';
+
+    $store->in_transaction(rw => sub {
+            my $filename = $self->filename;
+            my @linknames = $self->_linknames;
+            my $sth;
+
+            unlink($filename) or croak 'Cannot unlink file: '.$!;
+            unlink($_) foreach @linknames;
+
+            $sth = $self->_prepare('DELETE FROM file_hash WHERE file = ?');
+            $sth->execute($dbid);
+            $sth = $self->_prepare('DELETE FROM file_properties WHERE file = ?');
+            $sth->execute($dbid);
+            $sth = $self->_prepare('DELETE FROM file WHERE id = ?');
+            $sth->execute($dbid);
+        });
+
+    %{$self} = ();
+}
+
+
+sub sync_with_db {
+    my ($self, %opts) = @_;
+    my $db = $opts{db} // $self->db;
+    my $fii_inode = $self->_fii_inode;
+    $db->in_transaction(rw => sub {
+            my $data = $self->get;
+            my %ids = (
+                contentise          => $self->contentise(as => 'Data::Identifier'),
+                inodeise            => $fii_inode->get('inodeise', as => 'Data::Identifier', default => undef),
+                proto               => (defined($opts{proto}) ? $opts{proto}->Data::Identifier::as('Data::Identifier') : undef),
+
+                # Related values:
+
+                encoding            => (defined($data->{properties}{mediasubtype}) ? Data::Identifier::Generate->generic(
+                        namespace   => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9',
+                        input       => $data->{properties}{mediasubtype},
+                    ): undef),
+
+                %_db_tags,
+            );
+            my %tags = map {$_ => scalar(eval {$ids{$_}->as('Data::TagDB::Tag', %opts{autocreate}, db => $db)})} grep {defined $ids{$_}} keys %ids;
+
+            if (defined(my $tag = $tags{contentise})) {
+                my $size = $data->{properties}{size};
+
+                if (defined($tags{also_has_role}) && defined($tags{specific_proto_file_state})) {
+                    $db->create_relation(tag => $tag, relation => $tags{also_has_role}, related => $tags{specific_proto_file_state});
+                }
+
+                if (defined($size) && defined($tags{final_file_size})) {
+                    $db->create_metadata(tag => $tag, relation => $tags{final_file_size}, data_raw => $size);
+                }
+
+                if (defined($tags{encoding}) && defined($tags{final_file_encoding})) {
+                    $db->create_relation(tag => $tag, relation => $tags{final_file_encoding}, related => $tags{encoding});
+                }
+
+                if (defined($tags{final_file_hash}) && defined($size) && $size > 0) {
+                    foreach my $digest (keys %{$data->{digests}}) {
+                        my $v = sprintf('v0 %s bytes 0-%u/%u %s', $digest, $size - 1, $size, $data->{digests}{$digest} // next);
+                        $db->create_metadata(tag => $tag, relation => $tags{final_file_hash}, data_raw => $v);
+                    }
+                }
+            }
+
+            if (defined(my $proto = $tags{proto})) {
+                if (defined(my $tag = $tags{contentise})) {
+                    if (defined(my $relation = $opts{final_of_proto} ? $tags{has_final_state} : $tags{also_has_state})) {
+                        $db->create_relation(tag => $proto, relation => $relation, related => $tag);
+                    }
+                }
+            }
+
+            if (defined(my $inode = $tags{inodeise})) {
+                if (defined(my $tag = $tags{contentise})) {
+                    if (defined($tags{has_final_state})) {
+                        $db->create_relation(tag => $inode, relation => $tags{has_final_state}, related => $tag);
+                    }
+                }
+            }
+        });
+}
+
+
 #@returns File::FStore
 sub store {
     my ($self) = @_;
@@ -481,13 +573,61 @@ sub _calculate_contentise {
     return undef;
 }
 
+sub _ext {
+    my ($self) = @_;
+
+    return $self->{ext} if exists $self->{ext};
+
+    {
+        my $mediasubtype = eval {$self->get(properties => 'mediasubtype')} // 'x.x/x.x';
+        return $self->{ext} = $_exts{$mediasubtype} if defined $_exts{$mediasubtype};
+    }
+
+    {
+        my $dbname = $self->dbname;
+        if ($dbname =~ /\.([a-z0-9]{1,4})$/) {
+            my $ext = $1;
+
+            if ($dbname =~ /\.(tar\.(?:gz|bz2|xz|lz|zst))$/) {
+                $ext = $1;
+            }
+
+            return $self->{ext} = $ext;
+        }
+    }
+
+    return $self->{ext} = undef;
+}
+
+sub _linknames {
+    my ($self, $digests) = @_;
+    my File::FStore $store = $self->store;
+    my $ext = $self->_ext;
+    my @res;
+
+    $ext = '.'.$ext if defined $ext;
+
+    $digests //= $self->get('digests');
+
+    foreach my $digest (keys %{$digests}) {
+        my $v = $digests->{$digest} // next;
+        my $fn;
+
+        $v .= $ext if defined $ext;
+        $fn = $store->_file(v2 => by => $digest => $v);
+
+        push(@res, $fn);
+    }
+
+    return @res;
+}
+
 # Bad workaround for File::ExtAttr
 package File::FStore::File::_DUMMY_FOR_XATTR {
-    my $HAVE_XATTR              = eval {require File::ExtAttr; File::ExtAttr->import; 1;};
 
     sub new {
         my ($pkg, $fh) = @_;
-        return undef unless $HAVE_XATTR;
+        return undef unless eval {require File::ExtAttr; File::ExtAttr->import; 1;};
         return bless \$fh;
     }
     sub isa {
@@ -524,7 +664,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -595,11 +735,37 @@ Currently an alias for L</contentise>. Later versions may add more logic.
 
     my $fh = $file->open;
 
+    $fh->binmode; # allow binary data.
+
 Opens the file and returns a filehandle.
 The file is opened read-only (as all files in the store are read-only to begin with).
 
+B<Note:>
+This module doesn't set the handle to binary mode similar to L<perlfunc/open>.
+See L<perlfunc/binmode> for details.
+
 See also:
 L</filename>.
+
+=head2 link_out
+
+    $file->link_out($filename);
+
+Creates an hardlink to this file as C<$filename>.
+C<die>s on any error.
+
+See also:
+L<perlfunc/link>.
+
+=head2 symlink_out
+
+    $file->symlink_out($filename);
+
+Creates an symlink to this file as C<$filename>.
+C<die>s on any error.
+
+See also:
+L<perlfunc/symlink>.
 
 =head2 update
 
@@ -684,6 +850,95 @@ a single hashref with the domain(s) as keys and hashrefs with key-value pairs as
 
 See also:
 L</get>.
+
+=head2 delete
+
+    $file->delete;
+
+Removes the given file from the store.
+This also unlinks all links within the store.
+
+If there is no hardlink outside the store to the given file it is
+fully removed from the filesystem.
+
+B<Note:>
+After this call B<no> future calls are allowed on this handle
+or any other handle referencing the same file.
+
+=head2 sync_with_db
+
+    $file->sync_with_db;
+    # or:
+    $file->sync_with_db(%opts);
+
+Syncs the file with the database.
+It may read data from, and write data to the database related to this file.
+
+B<Note:>
+This method calls L<Data::TagDB/in_transaction> with type C<rw>.
+
+It mainly operates on three tags:
+
+=over
+
+=item content
+
+The content tag is the tag that represents the state of this file (size, digests, ...)
+(but not the filesystem object or other objects).
+
+See also L</contentise>.
+
+=item inode
+
+The inode tag represents the actual file on the filesystem.
+This is the tag file system browsing software will use.
+
+The inode tag has the content tag as it's final state.
+
+See also L<File::Information::Base/inodeise>.
+
+=item proto
+
+The proto tag represents the work independent on the filesystem.
+This is often used by software that implement some kind of catalogue.
+
+The proto tag has the content tag as a state, maybe as it's final state.
+
+=back
+
+The following (all optional) options are supported:
+
+=over
+
+=item C<autocreate>
+
+Whether tags should be automatically created if not yet part of the database.
+
+Defaults to false.
+
+See also L<Data::Identifier/as>.
+
+=item C<db>
+
+The database object to use.
+
+Defaults to the value returned by L</db>.
+
+=item C<final_of_proto>
+
+Whether this file is the final state of the proto tag (true value) or
+just one of it's states (false value).
+
+Defaults to false.
+
+=item C<proto>
+
+The tag to be used as proto tag (if any).
+This may be anything that L<Data::Identifier/as> will accept.
+
+Defaults to C<undef>.
+
+=back
 
 =head2 store
 

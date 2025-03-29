@@ -190,7 +190,7 @@ sub apply_changes {
   $tmpl->{cf_mtime} = time;
   my $changed = join("\n", @$lines);
 
-  if ($ENV{DEBUG_YATT_LANGSERVER} and $self->debug_changes_dir_exists) {
+  if ($self->debug_changes_dir_exists) {
     my $destFn = $self->debug_changes_write_file($fileName, $changed);
     print STDERR "# Wrote: $destFn\n";
   }
@@ -239,6 +239,8 @@ sub head_as_json_array {
 
 sub debug_changes_dir_exists {
   (my MY $self) = @_;
+  -e "$self->{dir}/DEBUG_YATT_LANGSERVER"
+    &&
   -d "$self->{dir}/$self->{debug_changes_dir}";
 }
 
@@ -267,7 +269,16 @@ sub debug_changes_write_file {
 # [["fxxar","baz"]]
 
 sub cmd_apply_all_change_to_lines {
-  (my MY $self, my $lines, my $changeList) = @_;
+  (my MY $self, my $linesOrFileName, my $changeList) = @_;
+
+  my $lines = do {
+    if (ref $linesOrFileName) {
+      $linesOrFileName
+    } else {
+      [split /\r?\n/, YATT::Lite::Util::read_file($linesOrFileName)]
+    }
+  };
+
   my $result = $self->apply_all_change_to_lines($lines, $changeList);
   print $_, "\n" for @$result;
 }
@@ -293,7 +304,7 @@ sub apply_change_to_lines {
       substr($edited[0]
              , $start->{character}, $end->{character} - $start->{character}
              , $change->{text});
-      @edited = split /\n/, $edited[0], -1;
+      @edited = split /\n/, $edited[0], -1 if $edited[0] ne '';
     } catch {
       Carp::croak "failed to apply changes: "
         . terse_dump([original => $lines->[$start->{line}]
@@ -316,7 +327,8 @@ sub apply_change_to_lines {
                       , changed => $change->{text}]). ": $_";
     };
     my $edited = $pre_edit.$change->{text}.$post_edit;
-    [@pre, split(/\n/, $edited, -1), @post];
+    my @edited = $edited ne '' ? split(/\n/, $edited, -1) : $edited;
+    [@pre, @edited, @post];
   }
 }
 
@@ -437,11 +449,11 @@ sub make_line_range {
 
 sub alttree {
   (my MY $self, my ($tmpl, $tree)) = @_;
-  [YATT::Lite::LRXML::AltTree->new(
+  my $converter = YATT::Lite::LRXML::AltTree->new(
     string => $tmpl->cget('string'),
     with_source => 0,
-  )
-   ->convert_tree($tree)];
+  );
+  [$converter->convert_tree($tree)];
 }
 
 sub lookup_symbol_definition {
@@ -628,7 +640,7 @@ sub locate_entity_function {
 
   my ($tmpl, $core) = $self->find_template($sym->{filename});
 
-  $self->find_entity_from($tmpl->cget('entns'), $sym->{name});
+  $self->find_entity_from($tmpl, $sym->{name});
 }
 
 sub md_quote_code_as {
@@ -1006,7 +1018,10 @@ sub find_template {
   my $yatt = $self->find_yatt_for_template($fileName);
   my $core = $yatt->open_trans;
   my $tmpl = $core->find_file($fn);
-  # XXX: force refresh?
+
+  # perl コードの生成を行わないと、継承が設定されないため。
+  $core->find_product(perl => $tmpl);
+
   wantarray ? ($tmpl, $core) : $tmpl;
 }
 
@@ -1047,9 +1062,9 @@ sub show_file_line {
 }
 
 sub find_entity_from {
-  (my MY $self, my ($fromFile, $entityName)) = @_;
+  (my MY $self, my ($tmplOrFile, $entityName)) = @_;
 
-  my ($tmpl, $core) = $self->find_template($fromFile);
+  my ($tmpl) = ref $tmplOrFile ? $tmplOrFile : $self->find_template($tmplOrFile);
 
   my $entns = $tmpl->cget('entns');
   $entns->can("entity_$entityName")

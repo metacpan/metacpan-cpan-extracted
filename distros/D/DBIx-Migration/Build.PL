@@ -42,6 +42,7 @@ my $build = Module::Build->new(
     'PerlX::Maybe'              => 0,
     'Pod::Find'                 => 0,
     'Pod::Usage'                => 1.64,
+    'String::Expand'            => 0,
     'Try::Tiny'                 => 0,
     'Types::Path::Tiny'         => 0,
     'namespace::clean'          => 0

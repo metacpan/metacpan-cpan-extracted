@@ -4,13 +4,14 @@ use base qw(MARC::Convert::Wikidata::Item);
 use strict;
 use warnings;
 
+use Error::Pure qw(err);
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.25;
+our $VERSION = 0.27;
 
 sub wikidata {
 	my $self = shift;
@@ -69,8 +70,21 @@ sub _description {
 	my ($self, $lang) = @_;
 
 	my $ret;
+	my @lang = @{$self->{'transform_object'}->languages};
 	if ($lang eq 'cs') {
-		$ret = decode_utf8('české knižní vydání');
+		if (@lang == 1 && $lang[0] eq 'cze') {
+			$ret = decode_utf8('české');
+		} elsif (@lang == 1 && $lang[0] eq 'slo') {
+			$ret = decode_utf8('slovenské');
+		} elsif (@lang > 1) {
+			err "Multiple language description isn't supported.";
+		} else {
+			err "Description for language '$lang[0]' isn't supported.";
+		}
+		if (length($ret) > 0) {
+			$ret .= ' ';
+		}
+		$ret .= decode_utf8('knižní vydání');
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret .= ' z roku '.$self->{'transform_object'}->publication_date;
 		}
@@ -79,7 +93,19 @@ sub _description {
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret = $self->{'transform_object'}->publication_date.' ';
 		}
-		$ret .= 'Czech book edition';
+		if (@lang == 1 && $lang[0] eq 'cze') {
+			$ret .= 'Czech';
+		} elsif (@lang == 1 && $lang[0] eq 'slo') {
+			$ret .= 'Slovak';
+		} elsif (@lang > 1) {
+			err "Multiple language description isn't supported.";
+		} else {
+			err "Description for language '$lang[0]' isn't supported.";
+		}
+		if (length($ret) > 0) {
+			$ret .= ' ';
+		}
+		$ret .= 'book edition';
 	}
 
 	return $ret;

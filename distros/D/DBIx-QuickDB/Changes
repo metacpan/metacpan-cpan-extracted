@@ -1,3 +1,8 @@
+0.000038  2025-03-29 00:35:02-07:00 America/Los_Angeles
+
+    - Remove rogue Carp::Always from test
+    - MAke it easier to runt he tests on my machine
+
 0.000037  2025-03-26 23:10:00-07:00 America/Los_Angeles
 
     - Fix typo that caused the MySQL driver to break

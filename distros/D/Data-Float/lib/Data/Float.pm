@@ -175,7 +175,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -1380,9 +1380,11 @@ L<perlnumber(1)>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
+Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2008, 2010, 2012, 2017
+Copyright (C) 2006, 2007, 2008, 2010, 2012, 2017, 2025
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

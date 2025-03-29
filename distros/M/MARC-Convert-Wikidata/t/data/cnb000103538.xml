@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01686nam a2200433   4500</leader>
+  <controlfield tag="001">np9537385</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20080910163641.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">950207s1994    xr a          000 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000103538</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-900273-6-9</subfield>
+    <subfield code="q">(brož.)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85663096</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-cz-cc</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x8x9</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">069</subfield>
+    <subfield code="x">Muzea. Muzeologie. Muzejnictví. Výstavy</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">12</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">069</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">72/76</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Zrcadlení :</subfield>
+    <subfield code="b">setkání IV.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">[Praha] :</subfield>
+    <subfield code="b">Výtvarná společnost Kruh ve spolupráci s Galerií H v Kostelci nad Černými lesy a Galerií R v Praze,</subfield>
+    <subfield code="c">1994</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">80 s. :</subfield>
+    <subfield code="b">il. ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Vydáno jako příležitostný tisk k zahájení výstavy Zrcadlení 1994</subfield>
+  </datafield>
+  <datafield tag="610" ind1="2" ind2="7">
+    <subfield code="a">Galerie H (Kostelec nad Černými lesy, Česko)</subfield>
+    <subfield code="7">kn20050512006</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Kostelec nad Černými lesy (Česko)</subfield>
+    <subfield code="7">ge129646</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="653" ind1="0" ind2=" ">
+    <subfield code="a">Zrcadlení</subfield>
+    <subfield code="a">umělecké galerie</subfield>
+    <subfield code="a">výtvarné akce</subfield>
+    <subfield code="a">české výtvarné umění</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">brožury</subfield>
+    <subfield code="7">fd131925</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Výtvarná společnost Kruh</subfield>
+    <subfield code="7">kn20080910001</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Galerie H (Kostelec nad Černými lesy, Česko)</subfield>
+    <subfield code="7">kn20050512006</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Galerie R (Praha, Česko)</subfield>
+    <subfield code="7">kn20080910002</subfield>
+  </datafield>
+  <datafield tag="740" ind1="0" ind2="2">
+    <subfield code="a">Zrcadlení 1994</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="f">[1.vyd.]</subfield>
+    <subfield code="g">ISBN uvedeno pouze na zadní straně obálky</subfield>
+    <subfield code="o">19950207</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Kruh</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Galerie H</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Galerie R</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Galerie H - Kostelec nad Černými lesy - r. 1983-1993 - brožury</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Zrcadlení (akce výtvarná) - Kostelec nad Černými lesy - r. 1993 - brožury</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000103538</subfield>
+  </datafield>
+</record>
+
+</collection>

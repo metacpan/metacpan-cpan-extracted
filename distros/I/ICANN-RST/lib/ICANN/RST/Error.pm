@@ -34,7 +34,7 @@ ICANN::RST::Error - an object representing an RST error.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 

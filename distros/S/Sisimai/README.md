@@ -1,7 +1,7 @@
 ![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-sisimai/blob/master/LICENSE)
 [![Perl](https://img.shields.io/badge/perl-v5.26--v5.40-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v5.2.1-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v5.3.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 [![codecov](https://codecov.io/github/sisimai/p5-sisimai/branch/5-stable/graph/badge.svg?token=8kvF4rWPM3)](https://codecov.io/github/sisimai/p5-sisimai)
 
 > [!IMPORTANT]
@@ -25,7 +25,7 @@
 > such as PHP, Python, Go, and Rust. By obtaining the analysis results, it is very useful for understanding
 > the bounce occurrence status. 
 
-- [**README-JA(日本語)**](README-JA.md)
+- [**README-JA(日本�**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
     - [The key features of Sisimai](#the-key-features-of-sisimai)
     - [Command line demo](#command-line-demo)
@@ -366,7 +366,7 @@ Beginning with v5.0.0, Sisimai requires **Perl 5.26.0 or later.**
 | Dependencies (Except core modules of Perl)           | 2 modules          | 2 modules           |
 | Source lines of code                                 | 10,800 lines       | 9,900 lines         |
 | The number of tests in t/, xt/ directory             | 270,000 tests      | 320,000 tests       | 
-| The number of bounce emails decoded per second[^4]   | 340 emails         | 450 emails          |
+| The number of bounce emails decoded per second[^4]   | 750 emails         | 750 emails          |
 | License                                              | 2 Clause BSD       | 2 Caluse BSD        |
 | Commercial support                                   | Available          | Available           |
 
@@ -456,7 +456,7 @@ Related sites
 
 See also
 ---------------------------------------------------------------------------------------------------
-* [README-JA.md - README.md in Japanese(日本語)](https://github.com/sisimai/p5-sisimai/blob/master/README-JA.md)
+* [README-JA.md - README.md in Japanese(日本�](https://github.com/sisimai/p5-sisimai/blob/master/README-JA.md)
 * [RFC3463 - Enhanced Mail System Status Codes](https://tools.ietf.org/html/rfc3463)
 * [RFC3464 - An Extensible Message Format for Delivery Status Notifications](https://tools.ietf.org/html/rfc3464)
 * [RFC3834 - Recommendations for Automatic Responses to Electronic Mail](https://tools.ietf.org/html/rfc3834)

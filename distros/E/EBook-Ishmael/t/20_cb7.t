@@ -10,8 +10,10 @@ use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::CB7;
 use EBook::Ishmael::ImageID;
 
-unless ($EBook::Ishmael::EBook::CB7::CAN_TEST) {
-	plan skip_all => "7z not installed";
+my $TEST_CB7 = $ENV{TEST_CB7} // $EBook::Ishmael::EBook::CB7::CAN_TEST;
+
+unless ($TEST_CB7) {
+	plan skip_all => "TEST_CB7 set to 0 or 7z not installed";
 }
 
 my $CB7 = File::Spec->catfile(qw/t data gpl3.cb7/);

@@ -21,8 +21,11 @@ my @files = (
     'lib/MIDI/Drummer/Tiny/Tutorial/Advanced.pod',
     'lib/MIDI/Drummer/Tiny/Tutorial/Basics.pod',
     'lib/MIDI/Drummer/Tiny/Tutorial/Quickstart.pod',
+    'lib/MIDI/Drummer/Tiny/Types.pm',
+    'lib/MIDI/Drummer/Tiny/Types/MIDI.pm',
     't/00-compile.t',
-    't/01-methods.t'
+    't/01-methods.t',
+    't/verbose_add_fill.t'
 );
 
 notabs_ok($_) foreach @files;

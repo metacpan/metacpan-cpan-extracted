@@ -6,6 +6,7 @@ use Prima qw(Application GLWidget);
 $::application-> insert( GLWidget => 
 	size    => [400,400],
 	layered => 1,
+	gl_config => {alpha_bits => 8},
 	onPaint => sub {
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT);

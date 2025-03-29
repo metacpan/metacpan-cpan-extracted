@@ -17,12 +17,47 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.010"
+            "perl" : "5.024"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::ExtraTests" : "0",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaConfig" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodCoverageTests" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::Readme" : "0",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::EOL" : "0",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Synopsis" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
             "Test::EOL" : "0",
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
@@ -34,33 +69,44 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Combinatorics" : "0",
+            "Carp" : "0",
             "Data::Dumper::Compact" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.26",
             "MIDI::Util" : "0.1304",
             "Math::Bezier" : "0",
             "Moo" : "2",
             "Music::Duration" : "0.0900",
             "Music::RhythmSet::Util" : "0",
+            "Type::Library" : "0",
+            "Type::Utils" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "0",
             "constant" : "0",
+            "experimental" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010",
-            "strictures" : "2"
+            "perl" : "5.024",
+            "strict" : "0",
+            "strictures" : "2",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "English" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "Test::Output" : "0.04",
+            "perl" : "5.024"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {},
       "homepage" : "https://github.com/ology/MIDI-Drummer-Tiny",
       "repository" : {
          "type" : "git",
@@ -68,7 +114,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.5013",
+   "version" : "0.6004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -88,6 +134,11 @@
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::AuthorDeps",
+            "name" : "Prereqs::AuthorDeps",
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -130,22 +181,22 @@
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
-                        "name" : "@Default/SingleEncoding",
+                        "name" : "-SingleEncoding",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
-                        "name" : "@Default/Name",
+                        "name" : "Name",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
-                        "name" : "@Default/Version",
+                        "name" : "Version",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "@Default/prelude",
+                        "name" : "prelude",
                         "version" : "4.020"
                      },
                      {
@@ -165,6 +216,11 @@
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "TYPES",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
                         "version" : "4.020"
                      },
@@ -179,23 +235,38 @@
                         "version" : "4.020"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "NOTE ATTRIBUTES",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "DRUMKIT",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "DURATIONS",
+                        "version" : "4.020"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Leftovers",
-                        "name" : "@Default/Leftovers",
+                        "name" : "Leftovers",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "@Default/postlude",
+                        "name" : "postlude",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
-                        "name" : "@Default/Authors",
+                        "name" : "Authors",
                         "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
-                        "name" : "@Default/Legal",
+                        "name" : "Legal",
                         "version" : "4.020"
                      }
                   ]

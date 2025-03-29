@@ -40,7 +40,6 @@ either CPAN or your system's package manager:
 
 **ishmael** also depends on the following programs to be installed on your
 system:
-* `perl` (>= `5.16`)
 * `poppler-utils` (optional; for PDF support)
 * `unrar` (optional; for CBR support)
 * `7z` (optional; for CB7 support)
@@ -53,6 +52,7 @@ formatting script called **queequeg**.
 * `links`
 * `lynx`
 * `w3m`
+* `chawan`
 
 Once the aforementioned dependencies are installed, **ishmael** can then be
 installed via the following commands:

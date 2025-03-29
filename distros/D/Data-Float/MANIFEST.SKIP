@@ -1,0 +1,9 @@
+.gitignore
+MANIFEST.bak
+.git/
+_build/
+MYMETA.*
+Makefile$
+Data-Float-*
+blib/
+pm_to_blib

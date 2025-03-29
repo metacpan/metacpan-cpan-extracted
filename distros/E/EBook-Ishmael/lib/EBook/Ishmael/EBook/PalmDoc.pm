@@ -1,8 +1,10 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
+
+use Encode qw(decode);
 
 use EBook::Ishmael::Decode qw(lz77_decode);
 use EBook::Ishmael::EBook::Metadata;
@@ -126,18 +128,23 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
-	print { $fh } text2html(
-		join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
+	my $html = decode(
+		'UTF-8',
+		text2html(
+			join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
+		),
 	);
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -146,16 +153,21 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
+	my $raw = decode(
+		'UTF-8',
+		join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
+	);
 
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
-	print { $fh } map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1;
-
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 

@@ -1,6 +1,15 @@
 use Test2::V0 -target => DBIx::QuickDB::Driver::MySQL;
 use Test2::Tools::QuickDB;
 
+BEGIN {
+    # Add these paths to find a DB (Author puts them here) if none is installed to the system.
+    # On most machines for most users it will just use the system mysql
+    # MariaDB is lst so that it is the one that gets used if it is present.
+    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}"    if -d "$ENV{HOME}/dbs/mysql8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/percona8/bin:$ENV{PATH}"  if -d "$ENV{HOME}/dbs/percona8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/mariadb11/bin";
+}
+
 my @ENV_VARS;
 
 # Contaminate the ENV vars to make sure things work even when these are all

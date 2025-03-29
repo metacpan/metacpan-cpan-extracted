@@ -16,7 +16,6 @@ sub set_state {
 }
 set_state;
 
-
 stderr_is(
     sub { App::Dest->init },
     "Created new watch list based on dest.watch file:\n  actions\n",
@@ -66,6 +65,9 @@ open( my $in, '<', 'dest.watch' );
 is( join( '', <$in> ), "actions\nactions2\n", 'new dest.watch is correct' );
 
 stdout_like( sub { App::Dest->version }, qr/^dest version [\d\.]+$/, 'version' );
+
+ok( lives { App::Dest->nuke }, 'nuke' ) or note $@;
+ok( ! -d '.dest', '.dest nuked' );
 
 set_state;
 done_testing;

@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Local v0.0.17;
+package Sys::Async::Virt::Connection::Local v0.0.18;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -70,7 +70,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.0.17
+v0.0.18
 
 =head1 SYNOPSIS
 

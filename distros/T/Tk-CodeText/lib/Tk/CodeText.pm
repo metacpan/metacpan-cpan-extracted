@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.66';
+$VERSION = '0.67';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -461,8 +461,9 @@ sub Populate {
 		-relief => 'flat',
 		-scrollbars => $scrollbars,
 		-yscrollcmd => sub {
-			$self->lnumberCheck;
 			$self->foldsCheck;
+			$self->lnumberCheck;
+			$self->bookmarkCheck;
 		},
 	);
 	my $text;
@@ -1395,6 +1396,8 @@ sub linespercycle {
 
 
 =item B<lineVisible>I<($line)>
+
+Returns true if line $line is visible on the display.
 
 =cut
 

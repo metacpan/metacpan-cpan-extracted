@@ -155,7 +155,7 @@ sub create_gl_widget
 		layered   => 1,
 		origin    => [0, 0],
 		size      => [ $top-> size ],
-		gl_config => { double_buffer => $gl_buffer, depth_bits => 16 },
+		gl_config => { double_buffer => $gl_buffer, depth_bits => 16, alpha_bits => 8 },
 		onCreate  => sub {
 			my $self = shift;
 			return unless $self->gl_paint_state;
@@ -211,7 +211,15 @@ sub create_window
 				( $show_off ? '*' : '-' ),
 				'~Layered' => 'Ctrl+Y' => '^Y' => sub { 
 					my $self = shift;
-					$self->layered( $self-> menu-> toggle( shift ));
+					my $layered = $self-> menu-> toggle( shift );
+					my $c = $config{widget}->gl_config;
+					if ( $layered ) {
+						$c->{alpha_bits} = 8;
+					} else {
+						delete $c->{alpha_bits};
+					}
+					$config{widget}->gl_config($c);
+					$self->layered( $layered );
 				}],
 				['' => '~Buffered' => sub {
 					my $self = shift;
@@ -246,6 +254,7 @@ sub create_window
 		origin  => [ 5, 5 ],
 		text    => '~Quit',
 		onClick => sub { $::application-> close },
+		autoShaping => 1,
 	);
 }
 

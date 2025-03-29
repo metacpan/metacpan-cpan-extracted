@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Unixy;
-$ExtUtils::Builder::Linker::Unixy::VERSION = '0.025';
+$ExtUtils::Builder::Linker::Unixy::VERSION = '0.026';
 use strict;
 use warnings;
 

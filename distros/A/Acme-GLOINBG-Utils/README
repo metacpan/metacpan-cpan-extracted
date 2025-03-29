@@ -1,0 +1,81 @@
+Acme-GLOINBG-Utils
+
+This project is a Chapter 21, Exercise 3 and 4 implementation.
+Exercise 4 is actually a break distribution to test how PAUSE will reject it because of namespcace everlap.
+
+INSTALLATION
+
+To create this module:
+    cd ~/goroExt/sandbox/Perl/trunk/books/IntermediatePerl
+    module-starter --module=Acme::GLOINBG::Utils
+    cd ~/goroExt/sandbox/Perl/trunk/books/IntermediatePerl/Acme-GLOINBG-Utils
+    # add t/sum.t to test the sum function; then update the manifest, either manually or with this command:
+    ./Build manifest
+
+To introduce namespace overlap error:
+    module-starter --module=Tie::Cycle --dist=.
+    ./Build manifest
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+    perl -Iblib/lib xt/boilerplate.t
+	./Build install
+
+EXPORT TO THE WORLD
+
+Testing distribution fails:
+   ./Build disttest
+Perhaps the reason is the missing MANIFEST.SKIP file in the MANIFEST
+DeepSeek advised to recreate this way:
+    ./Build realclean
+    rm -rf _build/ MANIFEST
+    cat > MANIFEST.SKIP <<'EOF'
+    ^_build/
+    ^blib/
+    ^Build$
+    ^Build.bat$
+    ^Makefile$
+    ^Makefile\.old$
+    ^pm_to_blib$
+    ^.*\.swp$
+    ^.*\.bak$
+    ^\..*
+    ^cover_db/
+    ^local/
+    ^t/lib/
+    EOF
+    ./Build manifest
+    ./Build disttest
+The real reason was the missing MANIFEST.SKIP line in the MANIFEST file.
+    ./Build dist
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::GLOINBG::Utils
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-GLOINBG-Utils
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Acme-GLOINBG-Utils
+
+    Search CPAN
+        https://metacpan.org/release/Acme-GLOINBG-Utils
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Georgi Kolarov.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

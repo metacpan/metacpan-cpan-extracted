@@ -38,6 +38,42 @@ require_ok('YATT::Lite::Inspector');
     "insert multiline changes with newlines"
   );
 
+  $test->(
+    [qw(foo bar baz qux quux)],
+    [
+      {
+        'range' => {
+          'end' => { 'character' => 3, 'line' => 1, },
+          'start' => { 'character' => 0, 'line' => 1, },
+        },
+        'rangeLength' => 3, 'text' => '',
+      },
+      {
+        'range' => {
+          'end' => { 'character' => 0, 'line' => 2, },
+          'start' => { 'character' => 0, 'line' => 1, },
+        },
+        'rangeLength' => 1, 'text' => '',
+      },
+      {
+        'range' => {
+          'end' => { 'character' => 3, 'line' => 2, },
+          'start' => { 'character' => 0, 'line' => 2, },
+        },
+        'rangeLength' => 3, 'text' => '',
+      },
+      {
+        'range' => {
+          'end' => { 'character' => 0, 'line' => 3, },
+          'start' => { 'character' => 0, 'line' => 2, },
+        },
+        'rangeLength' => 1, 'text' => '',
+      },
+    ],
+    [qw(foo baz quux)],
+    "delete 2nd and 4th lines"
+  );
+
 }
 
 done_testing();

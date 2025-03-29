@@ -17,6 +17,7 @@ lib/Power/Outlet/Hue.pm
 lib/Power/Outlet/iBoot.pm
 lib/Power/Outlet/iBootBar.pm
 lib/Power/Outlet/iBootBarGroup.pm
+lib/Power/Outlet/Kauf.pm
 lib/Power/Outlet/MQTT.pm
 lib/Power/Outlet/Shelly.pm
 lib/Power/Outlet/SonoffDiy.pm
@@ -31,6 +32,7 @@ t/002_http.t
 t/002_ip.t
 t/002_iBoot_live.t
 t/003_iBootBar_live.t
+t/003_Kauf_live.t
 t/003_Hue_live.t
 t/003_MQTT_live.t
 t/003_Shelly_live.t

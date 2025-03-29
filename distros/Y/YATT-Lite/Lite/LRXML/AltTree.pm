@@ -52,65 +52,68 @@ sub cli_write_fh_as_xhf {
 
 sub convert_tree {
   (my MY $self, my ($tree, $with_text)) = @_;
-  map {
-    if (not ref $_) {
-      ($with_text || $self->{with_text}) ? $_ : ();
-    } elsif (not ref $_->[NODE_TYPE] and my $sub = $self->can("convert_node__$TYPES[$_->[NODE_TYPE]]")) {
-      $sub->($self, $_, $with_text);
-    } elsif (not ref $_->[NODE_TYPE]) {
+  my @result;
+  foreach my $item (@$tree) {
+    if (not ref $item) {
+      push @result, ($with_text || $self->{with_text}) ? $item : ();
+    } elsif (not ref $item->[NODE_TYPE] and my $sub = $self->can("convert_node__$TYPES[$item->[NODE_TYPE]]")) {
+      push @result, $sub->($self, $item, $with_text);
+    } elsif (not ref $item->[NODE_TYPE]) {
       my AltNode $altnode = +{};
-      $altnode->{kind} = $TYPES[$_->[NODE_TYPE]];
-      $altnode->{path} = $self->convert_path_of($_);
+      $altnode->{kind} = $TYPES[$item->[NODE_TYPE]];
+      $altnode->{path} = $self->convert_path_of($item);
 
-      $self->fill_source_range_of($altnode, $_);
+      $self->fill_source_range_of($altnode, $item);
 
-      if ($_->[NODE_TYPE] == TYPE_ELEMENT || $_->[NODE_TYPE] == TYPE_ATT_NESTED) {
+      if ($item->[NODE_TYPE] == TYPE_ELEMENT || $item->[NODE_TYPE] == TYPE_ATT_NESTED) {
         my @origSubTree;
-        if (my $attlist = $self->node_unwrap_attlist($_->[NODE_ATTLIST])) {
+        if (my $attlist = $self->node_unwrap_attlist($item->[NODE_ATTLIST])) {
           push @origSubTree, $attlist;
         }
-        if (my $subtree = $_->[NODE_AELEM_HEAD]) {
+        if (my $subtree = $item->[NODE_AELEM_HEAD]) {
           push @origSubTree, $subtree;
         }
-        if (defined $_->[NODE_BODY] and ref $_->[NODE_BODY] eq 'ARRAY') {
-          push @origSubTree, $self->node_body_slot($_);
+        if (defined $item->[NODE_BODY] and ref $item->[NODE_BODY] eq 'ARRAY') {
+          push @origSubTree, $self->node_body_slot($item);
         }
-        if (my $subtree = $_->[NODE_AELEM_FOOT]) {
+        if (my $subtree = $item->[NODE_AELEM_FOOT]) {
           push @origSubTree, $subtree;
         }
         $altnode->{subtree} = [map {
           $self->convert_tree($_, $with_text);
         } @origSubTree];
       } else {
-        if ($_->[NODE_TYPE] == TYPE_COMMENT) {
-          $altnode->{value} = $_->[NODE_ATTLIST];
-        } elsif ($_->[NODE_TYPE] == TYPE_ENTITY) {
-          $altnode->{value} = [@{$_}[NODE_BODY .. $#$_]];
+        if ($item->[NODE_TYPE] == TYPE_COMMENT) {
+          $altnode->{value} = $item->[NODE_ATTLIST];
+        } elsif ($item->[NODE_TYPE] == TYPE_ENTITY) {
+          $altnode->{value} = [@{$item}[NODE_BODY .. $#$item]];
         } else {
-          if ($_->[NODE_TYPE] == TYPE_ATT_TEXT) {
+          if ($item->[NODE_TYPE] == TYPE_ATT_TEXT) {
             $altnode->{symbol_range}
-              = $self->make_range($_->[NODE_BEGIN]
-                                  , ($_->[NODE_BEGIN] + length($_->[NODE_PATH]))
-                                  , $_->[NODE_LNO])
-              if defined $_->[NODE_BEGIN] and defined $_->[NODE_PATH];
+              = $self->make_range($item->[NODE_BEGIN]
+                                  , ($item->[NODE_BEGIN] + length($item->[NODE_PATH]))
+                                  , $item->[NODE_LNO])
+              if defined $item->[NODE_BEGIN] and defined $item->[NODE_PATH];
           }
-          if (defined $_->[NODE_BODY] and ref $_->[NODE_BODY] eq 'ARRAY') {
+          if (defined $item->[NODE_BODY] and ref $item->[NODE_BODY] eq 'ARRAY') {
             $altnode->{subtree} = [$self->convert_tree(
-              $self->node_body_slot($_), $with_text
+              $self->node_body_slot($item), $with_text
             )];
           } else {
-            $altnode->{value} = $_->[NODE_BODY];
+            $altnode->{value} = $item->[NODE_BODY];
           }
         }
       }
-      $altnode;
+      push @result, $altnode;
     } else {
       # XXX: Is this ok?
       print STDERR "# really?: ".YATT::Lite::Util::terse_dump($tree), "\n";
       ...;
-      # $self->convert_tree($_);
+      # $self->convert_tree($item);
     }
-  } @$tree;
+  };
+
+  @result;
 }
 
 sub fill_source_range_of {

@@ -10,8 +10,10 @@ use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::CBR;
 use EBook::Ishmael::ImageID;
 
-unless ($EBook::Ishmael::EBook::CBR::CAN_TEST) {
-	plan skip_all => "unrar not installed";
+my $TEST_CBR = $ENV{TEST_CBR} // $EBook::Ishmael::EBook::CBR::CAN_TEST;
+
+unless ($TEST_CBR) {
+	plan skip_all => "TEST_CBR set to 0 or unrar not installed";
 }
 
 my $CBR = File::Spec->catfile(qw/t data gpl3.cbr/);

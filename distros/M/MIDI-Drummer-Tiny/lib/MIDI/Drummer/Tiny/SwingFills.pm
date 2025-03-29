@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::SwingFills;
-$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.5013';
+$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.6004';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -7,7 +7,51 @@ use strictures 2;
 use MIDI::Util qw(dura_size);
 use namespace::clean;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use MIDI::Drummer::Tiny;
+#pod   use MIDI::Drummer::Tiny::SwingFills;
+#pod
+#pod   my $d = MIDI::Drummer::Tiny->new;
+#pod   my $f = MIDI::Drummer::Tiny::SwingFills->new;
+#pod
+#pod   for my $i (1 .. $d->beats * $d->bars) {
+#pod     my $remainder = $d->beats * $d->bars - $i;
+#pod     my $fill = $f->get_fill($d, $d->ride2);
+#pod     if ($remainder == $fill->{dura}) {
+#pod       $fill->{fill}->();
+#pod       last;
+#pod     }
+#pod     else {
+#pod       $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare);
+#pod     }
+#pod   }
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod TBD
+#pod
+#pod =cut
 
+#pod =head1 METHODS
+#pod
+#pod =head2 new
+#pod
+#pod   $f = MIDI::Drummer::Tiny::Fills->new;
+#pod
+#pod Return a new C<MIDI::Drummer::Tiny::Fills> object.
+#pod
+#pod =head2 get_fill
+#pod
+#pod  $fill = $f->get_fill($drummer_obj, $cymbal);
+#pod
+#pod Return a random fill given a B<drummer_object> and an optional
+#pod B<cymbal>.
+#pod
+#pod The fill that is returned is a hash reference with keys: C<fill> - a
+#pod code reference, and C<dura> - the numerical duration of the fill.
+#pod
+#pod =cut
 
 sub get_fill {
     my ($self, $drummer, $cymbal) = @_;
@@ -347,7 +391,7 @@ MIDI::Drummer::Tiny::SwingFills
 
 =head1 VERSION
 
-version 0.5013
+version 0.6004
 
 =head1 SYNOPSIS
 

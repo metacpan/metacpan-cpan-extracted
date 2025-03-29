@@ -20,7 +20,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'CGI::Info',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/CGI/Info.pm',
 	ABSTRACT_FROM	=> 'lib/CGI/Info.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))

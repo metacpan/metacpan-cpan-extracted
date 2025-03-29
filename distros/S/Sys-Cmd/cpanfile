@@ -6,6 +6,8 @@ on configure => sub {
 
 on runtime => sub {
     requires 'Carp'            => 0;
+    requires 'Encode'          => 0;
+    requires 'Encode::Locale'  => 0;
     requires 'Exporter::Tidy'  => 0;
     requires 'File::Which'     => 0;
     requires 'File::chdir'     => 0;
@@ -15,7 +17,7 @@ on runtime => sub {
 };
 
 on develop => sub {
-    requires 'App::githook::perltidy';
+    requires 'App::githook::perltidy' => 0;
 };
 
 on test => sub {
@@ -23,5 +25,5 @@ on test => sub {
     requires 'Data::Dumper' => 0;
     requires 'File::Temp'   => 0;
     requires 'File::Spec'   => 0;
-    requires 'Test::More'   => 0;
+    requires 'Test2::V0'    => 0;
 };

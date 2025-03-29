@@ -1,7 +1,7 @@
 {
    "abstract" : "run a system command or spawn a system processes",
    "author" : [
-      "Mark Lawrence <nomad@null.net>"
+      "Mark Lawrence <mark@rekudos.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
@@ -36,6 +36,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
+            "Encode::Locale" : "0",
             "Exporter::Tidy" : "0",
             "File::Which" : "0",
             "File::chdir" : "0",
@@ -50,18 +52,21 @@
             "Data::Dumper" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "Test2::V0" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {},
+      "bugtracker" : {
+         "web" : "https://github.com/mlawren/p5-Sys-Cmd/issues"
+      },
+      "homepage" : "https://github.com/mlawren/p5-Sys-Cmd",
       "repository" : {
          "type" : "git",
          "url" : "ssh://git@github.com/mlawren/p5-Sys-Cmd.git"
       }
    },
-   "version" : "v0.99.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v0.99.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

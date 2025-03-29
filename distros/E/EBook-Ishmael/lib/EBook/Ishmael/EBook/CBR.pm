@@ -1,12 +1,15 @@
 package EBook::Ishmael::EBook::CBR;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
 use parent 'EBook::Ishmael::EBook::CB';
 
 use File::Which;
+
+# TODO: Create new CBR test file that uses older RAR version, so that tests
+# on systems with older unrar's can pass.
 
 my $MAGIC = pack "C*", 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07;
 

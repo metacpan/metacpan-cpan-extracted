@@ -1,9 +1,13 @@
 {
-	"version" : "0.0.3",
+	"version" : "0.0.5",
 	"name"    : "File Find Mason",
 	"author"  : "Brian Blackmore",
 	"abstract": "Quickly identify Mason files in Perl repositories",
 	"license" : "perl",
+	"meta-spec" : {
+		"url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+		"version" : "2"
+	},
 	"prereqs" : {
 		"runtime": {
 			"requires": {
@@ -24,5 +28,9 @@
 				"Test::More": "1.302209"
 			}
 		}
+	},
+	"resources" : {
+		"bugtracker": {"web":"https://github.com/blb8/perl-file-find-mason/issues"},
+		"repository": {"url":"git://github.com/blb8/perl-file-find-mason.git"}
 	}
 }

@@ -1,0 +1,8 @@
+Revision history for perl module ICANN::RST:
+
+0.03 - 2025-03-28
+  - removed versions() and added new_from_version().
+
+0.02 - 2025-03-28
+  - use the GitHub API to query for the most recently released version of the
+    test specs, and also add the versions() method that returns a list of them.

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CHM;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -166,7 +166,7 @@ sub _clean_html {
 
 	my $node = shift;
 
-	my @children = grep { ref eq 'XML::LibXML::Element' } $node->childNodes;
+	my @children = grep { $_->isa('XML::LibXML::Element') } $node->childNodes;
 
 	# Remove the ugly nav bars from the top and bottom of the page. We
 	# determine if a node is a navbar node if it contains an image that is
@@ -231,13 +231,7 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
-	print { $fh } map {
+	my $html = join '', map {
 
 		my $dom = XML::LibXML->load_html(
 			location => $_,
@@ -253,9 +247,16 @@ sub html {
 
 	} @{ $self->{_content} };
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -264,13 +265,7 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
-	print { $fh } map {
+	my $raw = join '', map {
 
 		my $dom = XML::LibXML->load_html(
 			location => $_,
@@ -284,9 +279,16 @@ sub raw {
 
 	} @{ $self->{_content} };
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 
@@ -313,22 +315,22 @@ sub cover {
 
 	return undef unless $self->has_cover;
 
-	my $bin;
-
 	open my $rh, '<', $self->{_cover}
 		or die "Failed to open $self->{_cover} for reading: $!\n";
 	binmode $rh;
-
-	open my $wh, '>', $out // \$bin
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $wh;
-
-	print { $wh } do { local $/ = undef; readline $rh };
-
+	my $bin = do { local $/ = undef; readline $rh };
 	close $rh;
-	close $wh;
 
-	return $out // $bin;
+	if (defined $out) {
+		open my $wh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $wh;
+		print { $wh } $bin;
+		close $wh;
+		return $out;
+	} else {
+		return $bin;
+	}
 
 }
 

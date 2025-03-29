@@ -1,12 +1,11 @@
 MANIFEST
 Changes
-README
+README.md
 Makefile.PL
 OpenGL.xs
 win32.c
 x11.c
 lib/Prima/OpenGL.pm
-lib/Prima/OpenGL/Modern.pm
 lib/Prima/GLWidget.pm
 include/prima_gl.h
 examples/application.pl 

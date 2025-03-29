@@ -47,7 +47,7 @@ CARP: {
 		qr/^POST failed: something else may have read STDIN/
 	);
 
-	does_carp_that_matches(sub { CGI::Info->new({ expect => 'foo' }); }, qr/must be a reference to an array/);
+	does_croak_that_matches(sub { CGI::Info->new({ expect => 'foo' }); }, qr/must be a reference to an array/);
 
 	{
 		local $ENV{'REQUEST_METHOD'} = 'POST';

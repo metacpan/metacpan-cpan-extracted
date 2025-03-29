@@ -1,10 +1,11 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
 use Compress::Zlib;
+use Encode qw(decode);
 
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
@@ -157,16 +158,18 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
+	my $html = decode('UTF-8', text2html($self->_text));
 
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
-	print { $fh } text2html($self->_text);
-
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -175,16 +178,18 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
+	my $raw = decode('UTF-8', $self->_text);
 
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
-	print { $fh } $self->_text;
-
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 

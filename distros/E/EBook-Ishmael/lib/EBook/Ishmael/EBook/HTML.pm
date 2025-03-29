@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -123,22 +123,23 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
 	# Extract body from HTML tree and serialize that, or just serialize the
 	# entire tree if there is no body.
 	my ($body) = $self->{_dom}->documentElement->findnodes('/html/body');
 	$body //= $self->{_dom}->documentElement;
 
-	print { $fh } $body->toString();
+	my $html = join '', map { $_->toString } $body->childNodes;
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -147,20 +148,21 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
 	my ($body) = $self->{_dom}->findnodes('/html/body');
 	$body //= $self->{_dom}->documentElement;
 
-	print { $fh } $body->textContent;
+	my $raw = $body->textContent;
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 

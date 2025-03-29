@@ -100,7 +100,7 @@ sub _html2text {
 		},
 	);
 
-	if (ref $node eq 'XML::LibXML::Element') {
+	if ($node->isa('XML::LibXML::Element')) {
 
 		for my $k (keys %handle) {
 			if ($handle{ $k }->{isa}(lc $node->nodeName)) {
@@ -110,7 +110,7 @@ sub _html2text {
 
 		return join('', map { _html2text($_) } $node->childNodes) . "\n\n";
 
-	} elsif (ref $node eq 'XML::LibXML::Text') {
+	} elsif ($node->isa('XML::LibXML::Text')) {
 		return $node->data =~ s/\s+/ /gr;
 	} else {
 		return '';

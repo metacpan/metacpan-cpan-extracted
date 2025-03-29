@@ -1,9 +1,8 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
+#!perl
 
+use Data::Dumper::Compact qw(ddc);
 use Test::More;
-use Test::Exception;
+use File::Temp qw(tempfile);
 
 use_ok 'Music::Drummer';
 
@@ -59,7 +58,7 @@ subtest basic => sub {
     is $score[3][0], 'time_signature', 'time signature added';
     is $score[3][2], 5, '5 signature beats';
 
-    my $expect = 99;
+    $expect = 99;
     $d->set_bpm($expect);
     is $d->bpm, $expect, 'set_bpm';
 };
@@ -77,7 +76,7 @@ subtest pattern => sub {
         [ 'note', 384, 96, 9, 46, 100 ],
     ];
 
-    my @score = $d->score->Score;
+    @score = $d->score->Score;
 
     is_deeply [ @score[4 .. 8] ], $expect, 'pattern';
 };
@@ -87,7 +86,7 @@ subtest fill => sub {
 #        verbose => 1
     ];
 
-    my $expect = [
+    $expect = [
         { 35 => ['10000000'], 38 => ['00000111'], 46 => ['10000000'] },
         { 35 => ['10001000'], 38 => ['00000111'], 46 => ['10001000'] },
         { 35 => ['100000001000000000000000'],
@@ -117,7 +116,7 @@ subtest fill => sub {
     }
 
     $expect = { 35 => ['10101000'], 38 => ['00000111'], 46 => ['11111000'] };
-    my $got = $d->add_fill(
+    $got = $d->add_fill(
         undef,
         $d->open_hh => [ '11111111' ],
         $d->snare   => [ '0000' ],
@@ -155,16 +154,18 @@ subtest fill => sub {
 };
 
 subtest timidity_conf => sub {
-    my $d = new_ok 'Music::Drummer' => [
-        soundfont => 'soundfont.sf2',
-    ];
+    my ( $sf_fh, $soundfont )
+        = tempfile( 'soundfontXXXX', SUFFIX => '.sf2', UNLINK => 1 );
+    my ( $timidity_fh, $timidity_conf )
+        = tempfile( 'timidityXXXX', SUFFIX => '.conf', UNLINK => 1 );
+    my $d
+        = new_ok 'Music::Drummer' => [ soundfont => $soundfont ];
+
     my $sf = $d->soundfont;
-    like $d->timidity_cfg, qr/$sf$/, 'timidity_conf';
-    my $filename = 'timidity_conf';
-    $d->timidity_cfg($filename);
-    ok -e $filename, 'timidity_conf with filename';
-    unlink $filename;
-    ok !-e $filename, 'file unlinked';
+    like $d->timidity_cfg, qr/$sf$/, 'timidity configuration';
+    $d->timidity_cfg($timidity_conf);
+    ok -e $timidity_conf, 'timidity configuration with filename';
 };
 
 done_testing();
+

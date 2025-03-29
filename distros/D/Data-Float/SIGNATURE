@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.89.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,30 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 67ab6441ac84593b05be87ec425194d069a51a4f .gitignore
-SHA1 51038d8df8e8a4aa29c0b5462db2a554079dd1d4 Build.PL
-SHA1 083de6c6b8b9b82eabc05f87708086791c66d14a Changes
-SHA1 efa3ba002e530881eb04ceb66df34f8d5151e6ee MANIFEST
-SHA1 3d9fb5d89a73d9dd7dd9ce83e05d6b9f58e8b274 META.json
-SHA1 093974afafda5e5df08e79ecdf9f553c7d8864d5 META.yml
-SHA1 0e70e74666ed9702cbce0899ed0a2e759c532b0c README
-SHA1 7d2f83d9e82cc04b8f03716373f6e4f963da5079 lib/Data/Float.pm
-SHA1 1108747d9aec62d4eadd34403fa59f1c54df153f t/class.t
-SHA1 eba7f4eeb285767f6546eebdca9cd07011b4dd51 t/const.t
-SHA1 a4ee7a6b431b6e5ee3872ff2dba90663c28148d7 t/copysign.t
-SHA1 34457366a44bf157a3ae868ac68314c1516b8b42 t/hex.t
-SHA1 cee994f9596999d49c9ec8b89c6f78afbcc16198 t/id_cmp.t
-SHA1 9230c3e8c1e76d8534092c9117c0584b80774c9b t/nextafter.t
-SHA1 01f3111f0df11ae3b7be3672c99abd0d74b9ba72 t/parts.t
-SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 3369ba662006149c6e5a089e6f2a440367f6df64 t/pow2.t
+SHA256 596bd38224a0c4e97ac43cacb362676b53591f558bfee0ed1ba99d7d36f08c84 Changes
+SHA256 f5930add3dc5bcde575ead01d2a1979900e2fdd94379068cfb19d40e85234118 MANIFEST
+SHA256 1a008c14e0d11e0f42223f670f80de1bc5c8649d5bf94536b54a75a4ecafb8d2 MANIFEST.SKIP
+SHA256 a0e89528c1f78e892117a00fe06012db731179e7442077f63318df5380768d77 META.json
+SHA256 33da743f6bb723a0f2578defef2c96070c492a2cc7b2c4f625610e0644135382 META.yml
+SHA256 9dc7f14c0056900bb1691b12fb10b7a4dbf1c8d196c8d242200079ebb141a73a Makefile.PL
+SHA256 f73ba8e3d00bc7960973792e4c1e1d6b2175bcc3dbfb6a04fcec94bdcee95f26 README
+SHA256 20cc658f735c530fa21dde30fbb4e2662a472e370057cbb9eb18ccd913cfbe56 SECURITY.md
+SHA256 15c29fc94c6c0f287dd4e362ebce3bf45d0860dbcbbb928b525e7c228245efe0 lib/Data/Float.pm
+SHA256 49fc08e7f68f5ec367e51b6ab36c10f6bd8e30557b52b51c576b80013ecec7c5 t/class.t
+SHA256 78d49bfa54d55407977a2192d585c5adb1f16fa04dfb301216847c4e6c220989 t/const.t
+SHA256 4b6512931cef329ca7a50c179acea0f80b817a2ad2dc5f1cfd3a17a7ae91e69d t/copysign.t
+SHA256 bf6c16ce8de9cc4e9a1a517c3e660143a0fe00e0af04f8c594673b591f049fe6 t/hex.t
+SHA256 84a6b96f536b8616bb3a7f58ee3e219c18daee675c1d16052e8f4e74a1ab1fd1 t/id_cmp.t
+SHA256 6f1ecc37d1eba70fc7d98f8ee46f99f2648ecd682b221636b75a6ae6bebea380 t/nextafter.t
+SHA256 8529715e3a4895014c25192e31b35ed684df5f427c177e50da509675843895bb t/parts.t
+SHA256 3679257bdfb4a07658e98a41325f82c1744f7dae6d1d0151f1b216af0c1df5c9 t/pod_cvg.t
+SHA256 e16860066c4ca9b2ee9e7d4604297def8a58b53bf0ca03eed863b5d9c5a2ac91 t/pod_syn.t
+SHA256 071111c3214ff842bc787e80e45124c5d5120fcb01a8d9edabaa2738b4c4b3d6 t/pow2.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAll85HQACgkQOV9mt2VyAVG57wCfWtVZY5fr+Sm2iKataje2u6s8
-HsIAoJaNsFJB2s+xS3UlCJdqvXRe103v
-=fbmx
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmfm14sACgkQHmWrcYGD
+C6y/uAv6A5AlXfRDDfwLS2fBNNf8IV0Xwwy6hJ3jPrMzalIL/Xhs7uUKuotP4F0k
+QlIKmy4R53q2gFTWgTDSIX9DXrcKMXC3mXotmMgwKfBGRZiSCXskj6VvLmFULDOE
+Ky//6SlJWaHz68cNR2URqbGy8gXv8IeD2cnUZAt8lcxt4CtWfVqhbW+f/P5r3g9R
+HezIFf81JOkLL4MNbpij5bylMsB0iVHbQVa/eTV1khmw1cZzxA8hhKF3ed8zbIic
+F7gcHa/fV2Hs7Sq/kiQzwYtgWS8LzT9AeFxBONW9HWm6RpJ82knPcvsUq3xPqgNN
+Ns7p/60vMyyQycdarSytDXUSXpF9Rsw6Wjqvp3WNPiq/8gkr1vEznGZS0f0ME1NW
+weLCHR1AEmSivpzBjF+Pgj+saQJSfI6KvxbcARzBDwW/M0SDdIh227IsuLNxeZht
+73YMglfAFbtLwgXqZR/HVgvtWs2IQrMWw2+aZs4ypbkNs18cnKYi8CTDVf0Yj2PN
+pnfiTXWb
+=/17G
 -----END PGP SIGNATURE-----

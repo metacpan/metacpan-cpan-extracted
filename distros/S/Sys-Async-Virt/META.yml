@@ -36,5 +36,5 @@ requires:
   perl: v5.26.0
 resources:
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.17
+version: v0.0.18
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

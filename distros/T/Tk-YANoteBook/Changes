@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.10  Fri Mar 21 2025
+	- Added an indicator label to the notebook tabs.
+
 0.09  Thu Oct 10 2024
 	cover frame now disappears when page is unselected
 

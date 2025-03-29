@@ -32,11 +32,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.96
+Version 0.97
 
 =cut
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 =head1 SYNOPSIS
 
@@ -45,10 +45,11 @@ It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
 
-All too often Perl programs have information such as the script's name
+All too often,
+Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -76,7 +77,7 @@ it is another layer and every little helps.
 
 Creates a CGI::Info object.
 
-It takes four optional arguments allow, logger, expect and upload_dir,
+It takes four optional arguments: allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
 It takes other optional parameters:
@@ -88,6 +89,13 @@ It takes other optional parameters:
 Enable/disable the AUTOLOAD feature.
 The default is to have it enabled.
 
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
 =item * C<syslog>
 
 Takes an optional parameter syslog, to log messages to
@@ -97,11 +105,11 @@ to a hash to be given to Sys::Syslog::setlogsock.
 
 =item * C<cache>
 
-An object which is used to cache IP lookups.
+An object that is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-=item * C<max_upload>
+=item * C<max_upload_size>
 
 The maximum file size you can upload (-1 for no limit), the default is 512MB.
 
@@ -126,23 +134,14 @@ sub new
 		%args = @_;
 	} else {
 		# If there is an odd number of arguments, treat it as an error
-		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		croak(__PACKAGE__, ': Invalid arguments passed to new()');
 		return;
-	}
-
-	if(defined($args{expect})) {
-		if(ref($args{expect}) ne 'ARRAY') {
-			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
-			return;
-		}
-		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
 	}
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
-			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
 
@@ -151,6 +150,24 @@ sub new
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
+	}
+
+	# Load the configuration from a config file, if provided
+	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
+		# my $config = YAML::XS::LoadFile($args{'config_file'});
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		%args = (%{$config}, %args);
+	}
+
+	if(defined($args{'expect'})) {
+		if(ref($args{expect}) ne 'ARRAY') {
+			Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
+			return;
+		}
+		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
 	}
 
 	if(my $logger = $args{'logger'}) {
@@ -878,14 +895,14 @@ sub params {
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
-			if($value =~ /\.\.\//) {
-				$self->status(403);
-				$self->_warn("Blocked directory traversal attack for '$key'");
-				return;
-			}
 			if($value =~ /mustleak\.com\//) {
 				$self->status(403);
 				$self->_warn("Blocked mustleak attack for '$key'");
+				return;
+			}
+			if($value =~ /\.\.\//) {
+				$self->status(403);
+				$self->_warn("Blocked directory traversal attack for '$key'");
 				return;
 			}
 		}
@@ -1421,9 +1438,13 @@ sub logdir {
 		$self = __PACKAGE__->new();
 	}
 
-	if(defined($dir)) {
-		# No sanity testing is done
-		return $self->{logdir} = $dir;
+	if($dir) {
+		if(length($dir) && (-d $dir) && (-w $dir)) {
+			return $self->{'logdir'} = $dir;
+		}
+		$self->_warn("Invalid logdir: $dir");
+		Carp::croak("Invalid logdir: $dir");
+		return;
 	}
 
 	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
@@ -1432,7 +1453,7 @@ sub logdir {
 			last;
 		}
 	}
-	carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
+	$self->_warn("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
 	$self->{logdir} ||= $dir;
 
 	return $dir;
@@ -1599,7 +1620,8 @@ Is the visitor a search engine?
 
 =cut
 
-sub is_search_engine {
+sub is_search_engine
+{
 	my $self = shift;
 
 	if(defined($self->{is_search_engine})) {
@@ -1889,7 +1911,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(\@messages);
+		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
 
@@ -1963,16 +1985,16 @@ sub AUTOLOAD
 
 	my $self = shift or return;
 
-	Carp::croak(__PACKAGE__, ": Unknown method $self") if(!ref($self));
-
-	# Allow the AUTOLOAD feature to be disabled
-	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
-
 	# Extract the method name from the AUTOLOAD variable
 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
 
 	# Skip if called on destruction
-	return if $method eq 'DESTROY';
+	return if($method eq 'DESTROY');
+
+	Carp::croak(__PACKAGE__, ": Unknown method $method") if(!ref($self));
+
+	# Allow the AUTOLOAD feature to be disabled
+	Carp::croak(__PACKAGE__, ": Unknown method $method") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
 
 	# Ensure the method is called on the correct package object
 	return unless ref($self) eq __PACKAGE__;
@@ -1983,7 +2005,7 @@ sub AUTOLOAD
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -2045,10 +2067,20 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 Copyright 2010-2025 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
 
 =cut
 
 1;
-
-__END__

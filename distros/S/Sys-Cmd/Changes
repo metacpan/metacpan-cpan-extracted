@@ -1,3 +1,58 @@
+0.99.1 (2025-03-28)
+
+    Code Maintenance
+        - Correct broken info.pl test script
+        - Add missing kitchen sink test for multiple features at a
+          time.
+
+    Dependencies:
+        - Minimum Perl version is now 5.18, for lexical subs and the
+          "fc" function.
+
+0.99.1_3 (2025-03-27)
+
+    Enhancements:
+        - Replace default UTF-8 encoding assumption with Encode::Locale
+
+    Bug Fixes:
+        - Use an explicit "binmode" on parent and child handles when
+          forking.
+
+    Dependencies:
+        - Moved from Test::More to Test2::V0
+        - New: Encode, Encode::Locale
+
+0.99.1_2 (2025-03-25)
+
+    Bug Fixes:
+        - Correctly process utf8 arguments.
+
+    Code Maintenance
+        - Do not use an undefined `pid` when warning of uncollected
+          error output.
+
+    Packaging:
+        - Fix broken homepage and bugtracker urls
+
+0.99.1_1 (2025-03-21)
+
+    API / Behaviour Changes:
+        - Deprecate runx() since run() now does the same but better.
+        - Deprecate Sys::Cmd::Template as Sys::Cmd now does it better
+
+    New Features:
+        - Template functions "syscmd", "runsub" and "spawnsub" for
+          repeated calls.
+        - Experimental mock process support
+
+    Enhancements:
+        - The "run()" function now lets the caller capture process
+          stdout and stderr separately.
+
+    Code Maintenance
+        - Major code restructure and documentation update
+        - Minor test cleanups
+
 0.99.0 (2022-10-05)
 
     Dependencies:

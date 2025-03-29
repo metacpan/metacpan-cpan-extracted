@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_issn clean_edi
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.25;
+our $VERSION = 0.27;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -134,7 +134,7 @@ sub clean_edition_number {
 	# Edition.
 	my $v1 = decode_utf8('Vydání');
 	my $v2 = decode_utf8('vydání');
-	$ret_edition_number =~ s/\s*(Vyd\.|vyd\.|$v1|$v2|Vydanie|vyd|published)//gx;
+	$ret_edition_number =~ s/\s*(Vyd\.|vyd\.|$v1|$v2|Vydanie|vydanie|vyd|published)//gx;
 	$ret_edition_number =~ s/English edition//ms;
 
 	$ret_edition_number =~ s/\s*rozmn\.//ms;
@@ -211,6 +211,7 @@ sub clean_edition_number {
 	# Rewrite number in Czech to number.
 	my $dict_hr = {
 		decode_utf8('První') => 1,
+		decode_utf8('Prvé') => 1,
 		decode_utf8('první') => 1,
 		'First' => 1,
 		decode_utf8('prvé') => 1,
@@ -872,6 +873,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.27
 
 =cut

@@ -4,13 +4,13 @@
       "Michael R. Davis (mrdvt92@yahoo.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Power-Outlet",
    "no_index" : {
@@ -64,5 +64,6 @@
          "web" : "https://github.com/mrdvt92/perl-Power-Outlet.git"
       }
    },
-   "version" : "0.50"
+   "version" : "0.51",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

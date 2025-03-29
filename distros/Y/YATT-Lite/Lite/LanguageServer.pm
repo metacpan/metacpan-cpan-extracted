@@ -139,8 +139,9 @@ sub lspcall__textDocument__hover {
 }
 
 
-*lspcall__textDocument__definition = *lspcall__textDocument__implementation;
-*lspcall__textDocument__definition = *lspcall__textDocument__implementation;
+sub lspcall__textDocument__definition {
+  goto &lspcall__textDocument__implementation;
+}
 
 #
 sub lspcall__textDocument__implementation {

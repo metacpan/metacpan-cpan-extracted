@@ -15,7 +15,7 @@ WriteMakefile(
 		'Test::Tk' => '3.03',
 		'Tk' => '804.030',
 		'Tk::ColorEntry' => '0.11',
-		'Tk::PopList' => '0.09',
+		'Tk::PopList' => '0.14',
 		'Tk::YADialog' => '0.05',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",

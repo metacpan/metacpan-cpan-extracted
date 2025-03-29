@@ -1,9 +1,10 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
+use Encode qw(:fallbacks find_encoding);
 use File::Basename;
 use File::Path qw(remove_tree);
 use File::Temp qw(tempfile);
@@ -17,7 +18,7 @@ use EBook::Ishmael::EBook;
 use EBook::Ishmael::ImageID;
 use EBook::Ishmael::TextBrowserDump;
 
-# TODO: Add an option to specify output encoding
+$PerlIO::encoding::fallback = FB_DEFAULT;
 
 use constant {
 	MODE_TEXT      => 0,
@@ -40,6 +41,7 @@ Usage:
 
 Options:
   -d|--dumper=<dumper>   Specify dumper to use for formatting text
+  -e|--encoding=<enc>    Print text output in specified encoding
   -f|--format=<format>   Specify ebook format
   -w|--width=<width>     Specify output line width
   -H|--html              Dump ebook HTML
@@ -98,6 +100,7 @@ sub init {
 		Ebook  => undef,
 		Mode   => MODE_TEXT,
 		Dumper => $ENV{ISHMAEL_DUMPER},
+		Encode => $ENV{ISHMAEL_ENCODING},
 		Format => undef,
 		Output => undef,
 		Width  => 80,
@@ -107,6 +110,7 @@ sub init {
 	Getopt::Long::config('bundling');
 	GetOptions(
 		'dumper|d=s'   => \$self->{Dumper},
+		'encoding|e=s' => \$self->{Encode},
 		'format|f=s'   => \$self->{Format},
 		'width|w=i'    => \$self->{Width},
 		'html|H'       => sub { $self->{Mode} = MODE_HTML },
@@ -134,7 +138,7 @@ sub init {
 	$self->{Output} = shift @ARGV;
 
 	if ($self->{Mode} == MODE_COVER) {
-		$self->{Output} //= (fileparse($self->{Ebook}, qr/\.[^.]*/))[0] . '.*';
+		$self->{Output} //= (fileparse($self->{Ebook}, qr/\.[^.]*/))[0] . '.-';
 	} elsif ($self->{Mode} == MODE_IMAGE) {
 		$self->{Output} //= (fileparse($self->{Ebook}, qr/\.[^.]*/))[0];
 	} else {
@@ -155,6 +159,10 @@ sub init {
 
 	}
 
+	if (defined $self->{Encode} and not defined find_encoding($self->{Encode})) {
+		die "'$self->{Encode}' is an invalid character encoding\n";
+	}
+
 	bless $self, $class;
 
 	return $self;
@@ -170,14 +178,29 @@ sub text {
 		$self->{Format}
 	);
 
-	my ($tfh, $tmp) = tempfile(UNLINK => 1);
-	close $tfh;
+	my $tmp = do {
+		my ($tf, $tp) = tempfile(UNLINK => 1);
+		close $tf;
+		$tp;
+	};
 
 	$ebook->html($tmp);
 
 	my $oh = _get_out($self->{Output});
 
-	print { $oh } browser_dump $tmp, { browser => $self->{Dumper}, width => $self->{Width} };
+	if (defined $self->{Encode}) {
+		binmode $oh, ":encoding($self->{Encode})";
+	} else {
+		binmode $oh, ':utf8';
+	}
+
+	print { $oh } browser_dump(
+		$tmp,
+		{
+			browser => $self->{Dumper},
+			width   => $self->{Width},
+		}
+	);
 
 	close $oh unless $self->{Output} eq $STDOUT;
 
@@ -283,7 +306,7 @@ sub meta_xml {
 		XML::LibXML::Element->new('metadata')
 	);
 
-	for my $k (sort keys %{ $meta }) {
+	for my $k (sort keys %$meta) {
 
 		my $n = $metan->appendChild(
 			XML::LibXML::Element->new(lc $k)
@@ -334,6 +357,12 @@ sub html {
 
 	my $oh = _get_out($self->{Output});
 
+	if (defined $self->{Encode}) {
+		binmode $oh, ":encoding($self->{Encode})";
+	} else {
+		binmode $oh, ':utf8';
+	}
+
 	say { $oh } $ebook->html;
 
 	close $oh unless $self->{Output} eq $STDOUT;
@@ -352,6 +381,12 @@ sub raw {
 	);
 
 	my $oh = _get_out($self->{Output});
+
+	if (defined $self->{Encode}) {
+		binmode $oh, ":encoding($self->{Encode})";
+	} else {
+		binmode $oh, ':utf8';
+	}
 
 	say { $oh } $ebook->raw;
 
@@ -382,7 +417,11 @@ sub cover {
 		die "Could not dump $self->{Ebook} cover; could not identify cover image format\n";
 	}
 
-	$self->{Output} =~ s/\.\*$/.$fmt/;
+	if ($self->{Output} =~ /\.\*$/) {
+		warn "Using '.*' for suffix substitution is deprecated; please use '.-' instead\n";
+	}
+
+	$self->{Output} =~ s/\.[\-@]$/.$fmt/;
 
 	my $oh = _get_out($self->{Output});
 	binmode $oh;
@@ -398,6 +437,10 @@ sub cover {
 sub image {
 
 	my $self = shift;
+
+	if ($self->{Output} eq $STDOUT) {
+		die "Cannot dump images to stdout\n";
+	}
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},

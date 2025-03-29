@@ -49,3 +49,9 @@ the test specifications.
 - [ICANN::RST::Spec](https://metacpan.org/pod/ICANN%3A%3ARST%3A%3ASpec)
 - [ICANN::RST::Suite](https://metacpan.org/pod/ICANN%3A%3ARST%3A%3ASuite)
 - [ICANN::RST::Text](https://metacpan.org/pod/ICANN%3A%3ARST%3A%3AText)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Internet Corporation for Assigned Names and Number (ICANN).
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

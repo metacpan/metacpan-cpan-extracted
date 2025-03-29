@@ -4,7 +4,7 @@
       "Dmitry Karasik <dmitry@karasik.eu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "OpenGL" : "0",
-            "Prima" : "1.49",
+            "Prima" : "1.74",
             "perl" : "5.012"
          }
       }
@@ -44,6 +44,6 @@
          "url" : "http://github.com/dk/Prima-OpenGL"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

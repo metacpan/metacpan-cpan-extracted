@@ -13,7 +13,6 @@ sub set_state {
 }
 set_state;
 
-
 stderr_is(
     sub { App::Dest->init },
     "Created new watch list based on dest.watch file:\n  actions\n",

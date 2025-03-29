@@ -104,7 +104,7 @@ ICANN::RST::Suite - an object representing an RST test suite.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 

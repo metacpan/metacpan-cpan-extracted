@@ -14,14 +14,12 @@ use warnings;
 use Carp;
 use DBI;
 use File::Spec;
-use File::Information v0.06;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
 use File::FStore::File;
-use File::FStore::Adder;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -174,6 +172,9 @@ sub in_transaction {
 sub query {
     my ($self, @query) = @_;
     my %fields = (properties => {}, digests => {});
+    my $limit;
+    my $offset;
+    my $order;
     my @q;
     my @p;
 
@@ -192,6 +193,14 @@ sub query {
             }
         } elsif ($cmd eq 'all') {
             push(@q, 'SELECT id FROM file');
+        } elsif ($cmd eq 'limit') {
+            $limit = shift(@query) // croak 'Incomplete query';
+        } elsif ($cmd eq 'offset') {
+            $offset = shift(@query) // croak 'Incomplete query';
+        } elsif ($cmd eq 'order') {
+            $order = shift(@query) // croak 'Incomplete query';
+            $order = uc($order);
+            croak 'Bad order' if $order ne 'ASC' && $order ne 'DESC';
         } elsif ($cmd eq 'dbname') {
             my $v = shift(@query) // croak 'Incomplete query';
             my $placeholders;
@@ -211,12 +220,12 @@ sub query {
     }
 
     foreach my $digest (keys %{$fields{digests}}) {
-        unshift(@q, 'SELECT file FROM file_hash WHERE algo = ? AND hash = ?');
+        unshift(@q, 'SELECT file AS id FROM file_hash WHERE algo = ? AND hash = ?');
         unshift(@p, $digest, $fields{digests}{$digest});
     }
 
     foreach my $property (keys %{$fields{properties}}) {
-        push(@q, 'SELECT file FROM file_properties WHERE key = ? AND value = ?');
+        push(@q, 'SELECT file AS id FROM file_properties WHERE key = ? AND value = ?');
         push(@p, $property, $fields{properties}{$property});
     }
 
@@ -229,7 +238,21 @@ sub query {
         my $sth;
         my @result;
 
-        $q .= ' LIMIT 2' unless wantarray;
+        if (defined $order) {
+            $q .= ' ORDER BY id '.$order;
+        }
+
+        $limit = 2 unless wantarray;
+
+        if (defined $limit) {
+            $q .= ' LIMIT ?';
+            push(@p, $limit);
+        }
+
+        if (defined $offset) {
+            $q .= ' OFFSET ?';
+            push(@p, $offset);
+        }
         $sth = $self->{dbh}->prepare($q);
         $sth->execute(@p);
 
@@ -337,8 +360,35 @@ sub scan {
 }
 
 
+sub fix {
+    my ($self, @fixes) = @_;
+    my %fixes = map {$_ => 1} @fixes;
+
+    foreach my $fix (qw(scrub remove-inode remove-mediasubtype scan)) {
+        next unless delete $fixes{$fix};
+
+        if ($fix eq 'scrub') {
+            $self->scrub;
+        } elsif ($fix eq 'scan') {
+            $self->scan;
+        } elsif ($fix =~ /^remove-(inode|mediasubtype)$/) {
+            my $what = $1;
+            my $sth = $self->{dbh}->prepare('DELETE FROM file_properties WHERE key = ?');
+            $sth->execute($what);;
+        } else {
+            croak 'BUG';
+        }
+    }
+
+    if (scalar keys %fixes) {
+        croak 'Invalid/unknown fixes passed: '.join(', ', keys %fixes);
+    }
+}
+
+
 sub new_adder {
     my ($self) = @_;
+    require File::FStore::Adder;
     return File::FStore::Adder->_new(store => $self);
 }
 
@@ -455,6 +505,8 @@ sub fii {
     my ($self) = @_;
     return $self->{fii} if defined $self->{fii};
 
+    require File::Information;
+    File::Information->VERSION(v0.06);
     return $self->{fii} = File::Information->new(
         db        => $self->db(default => undef),
         extractor => $self->extractor(default => undef),
@@ -549,7 +601,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -557,8 +609,18 @@ version v0.01
 
     my File::FStore $store = File::FStore->new(path => '...');
 
+    my @files = $store->query(properties => mediasubtype => 'image/png', order => 'asc', offset => 10, limit => 5);
+
+    my $fh = $store->query(digests => 'sha-3-224' => '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7')->open;
+
 This package provides access to a hash based/final state file store in Fellig format.
 Files in such a store are considered final, meaning their content will no longer be altered.
+
+In addition to digests (hashes) some file level metadata is kept in the store (see L<File::FStore::File/PROPERTIES>).
+This metadata is mainly used to ensure the integrity of the store.
+Other metadata is intentionally not supported.
+For storage of other metadata see L<Data::TagDB> and L</db>.
+For reading metadata and file analysis see L<File::Information> and L</fii>.
 
 =head1 METHODS
 
@@ -700,6 +762,21 @@ This should be used with care as a very long list might be returned.
 Selects files by their I<dbname> (see L<File::FStore::File/dbname>).
 Takes a single filename or a list of filenames (as an arrayref).
 
+=item C<limit>
+
+Limits the number of returned files.
+It is undefined what happens if this is used in scalar context.
+
+=item C<offset>
+
+The offset into the list. Often used with C<limit> to implement pagination.
+B<Note:>
+It is important to also give C<order> when using this, as otherwise the order is not stable.
+
+=item C<order>
+
+The order in which to return the files. One of C<asc> or C<desc>.
+
 =back
 
 =head2 scrub
@@ -737,6 +814,43 @@ This determines whether L<File::FStore::File/update> is called on all files, onl
 =item C<no_digests>
 
 Passed to L<File::FStore::File/update>.
+
+=back
+
+=head2 fix
+
+    $store->fix(qw(fixes...));
+
+Runs maintenance/fixes to the store.
+
+Takes the names of the fixes to run as arguments.
+The order does not matter, as the method reorders them internally.
+
+On any error this method C<die>s.
+
+Currently the following fixes are supported:
+
+=over
+
+=item C<remove-inode>
+
+Removes the inode properties from the store.
+This is useful when transfering the store to another filesystem,
+or if the store is managed externally (e.g. via an vcs).
+
+=item C<remove-mediasubtype>
+
+Removes the mediasubtype properties from the store.
+This is useful when you imported invalid mediasubtypes from a bad source.
+Adding C<scan> to the list of fixes will add correct values back.
+
+=item C<scan>
+
+Runs L</scan> with default options.
+
+=item C<scrub>
+
+Runs L</scrub>.
 
 =back
 

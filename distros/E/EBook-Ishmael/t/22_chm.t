@@ -10,11 +10,11 @@ use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::CHM;
 use EBook::Ishmael::ImageID;
 
-unless ($EBook::Ishmael::EBook::CHM::CAN_TEST) {
-	plan skip_all => "chmlib not installed";
-}
+my $TEST_CHM = $ENV{TEST_CHM} // $EBook::Ishmael::EBook::CHM::CAN_TEST;
 
-# TODO: Create a better CHM test target file.
+unless ($TEST_CHM) {
+	plan skip_all => "TEST_CHM set to 0 or chmlib not installed";
+}
 
 # I couldn't be bothered to figure out how to use Microsoft's CHM creator, so
 # I just took a random CHM I found on the web (licensed under the GPL3).

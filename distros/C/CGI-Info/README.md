@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.96
+Version 0.97
 
 # SYNOPSIS
 
@@ -25,10 +25,11 @@ It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
 
-All too often Perl programs have information such as the script's name
+All too often,
+Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -56,7 +57,7 @@ it is another layer and every little helps.
 
 Creates a CGI::Info object.
 
-It takes four optional arguments allow, logger, expect and upload\_dir,
+It takes four optional arguments: allow, logger, expect and upload\_dir,
 which are documented in the params() method.
 
 It takes other optional parameters:
@@ -65,6 +66,13 @@ It takes other optional parameters:
 
     Enable/disable the AUTOLOAD feature.
     The default is to have it enabled.
+
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
 
 - `syslog`
 
@@ -75,11 +83,11 @@ It takes other optional parameters:
 
 - `cache`
 
-    An object which is used to cache IP lookups.
+    An object that is used to cache IP lookups.
     This cache object is an object that understands get() and set() messages,
     such as a [CHI](https://metacpan.org/pod/CHI) object.
 
-- `max_upload`
+- `max_upload_size`
 
     The maximum file size you can upload (-1 for no limit), the default is 512MB.
 
@@ -471,7 +479,7 @@ but nowhere else.
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -524,4 +532,11 @@ You can also look for information at:
 
 Copyright 2010-2025 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+- Personal single user, single computer use: GPL2
+- All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.

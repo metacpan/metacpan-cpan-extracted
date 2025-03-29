@@ -5,9 +5,9 @@ package Math::BigInt::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
-use Math::BigInt '1.999802';
+use Math::BigInt;
 our @ISA = qw( Math::BigInt );
 
 use overload;                   # inherit from Math::BigInt
@@ -32,7 +32,7 @@ sub modify {
 }
 
 ##############################################################################
-# But cloning us creates a modifyable Math::BigInt, so that overload works
+# But cloning us creates a modifiable Math::BigInt, so that overload works
 
 sub copy {
     my $x = shift;
@@ -121,9 +121,14 @@ Math::BigInt::Constant - arbitrary sized constant integers
   $x->bround($N);               # accuracy: preserve $N digits
   $x->bfround($N);              # round to $Nth digit, no-op for Math::BigInt objects
 
-  # The following do not modify their arguments in Math::BigInt, so they are allowed:
+  # The following do not modify their arguments, so they are allowed:
+
   $x->bfloor();                 # return integer less or equal than $x
   $x->bceil();                  # return integer greater or equal than $x
+
+  $x->as_int();                 # return a copy of the object as Math::BigInt
+  $x->as_float();               # return a copy of the object as Math::BigFloat
+  $x->as_rat();                 # return a copy of the object as Math::BigRat
 
   bgcd(@values);                # greatest common divisor
   blcm(@values);                # lowest common multiplicator
@@ -133,7 +138,6 @@ Math::BigInt::Constant - arbitrary sized constant integers
   $x->length();                 # return number of digits in number
   $x->digit($n);                # extract N'th digit from number
 
-  $x->as_int();                 # return a copy of the object as Math::BigInt
   $x->as_hex();                 # return number as hex string
   $x->as_bin();                 # return number as binary string
   $x->as_oct();                 # return number as octal string
@@ -146,8 +150,8 @@ constants in the script at compile time, but will not let you create constant
 values on the fly, nor work for strings and/or floating point constants like
 C<1e5>.
 
-C<Math::BigInt::Constant> is a true subclass of L<Math::BigInt> and can do all
-the same things - except modifying any of the objects.
+C<Math::BigInt::Constant> is a subclass of L<Math::BigInt> and can do all the
+same things - except modifying any of the objects.
 
 =head1 EXAMPLES
 
@@ -157,8 +161,8 @@ Opposed to compile-time checking via C<use constant>:
     use constant X => Math::BigInt->new("12345678");
 
     print X," ",X+2,"\n";       # okay
-    print "X\n";                # oups
-    X += 2;                     # not okay, will die
+    print "X\n";                # does not print value of X
+    X += 2;                     # not okay, dies
 
 these provide runtime checks and can be interpolated into strings:
 
@@ -166,8 +170,8 @@ these provide runtime checks and can be interpolated into strings:
     $x = Math::BigInt::Constant->new("3141592");
 
     print "$x\n";               # okay
-    print $x+2,"\n";            # dito
-    $x += 2;                    # not okay, will die
+    print $x+2,"\n";            # ditto
+    $x += 2;                    # not okay, dies
 
 =head1 METHODS
 
@@ -218,7 +222,7 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Math::BigInt>, L<Math::BigFloat::Constant>.
+L<Math::BigInt>, L<Math::BigFloat::Constant>, L<Math::BigRat::Constant>.
 
 =head1 AUTHORS
 

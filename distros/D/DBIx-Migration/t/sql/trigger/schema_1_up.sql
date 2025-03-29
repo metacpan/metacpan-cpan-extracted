@@ -1,5 +1,5 @@
 -- https://www.postgresql.org/docs/current/ddl-schemas.html
-CREATE SCHEMA myschema;
+CREATE SCHEMA ${dbix_migration_managed_schema};
 
 CREATE TABLE products (
    id SERIAL,

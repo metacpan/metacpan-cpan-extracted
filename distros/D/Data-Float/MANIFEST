@@ -1,11 +1,13 @@
-.gitignore
-Build.PL
 Changes
+lib/Data/Float.pm
+Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README
-lib/Data/Float.pm
+SECURITY.md
+SIGNATURE			Added here by Module::Build
 t/class.t
 t/const.t
 t/copysign.t
@@ -16,4 +18,3 @@ t/parts.t
 t/pod_cvg.t
 t/pod_syn.t
 t/pow2.t
-SIGNATURE    Added here by Module::Build

@@ -23,12 +23,12 @@ ishmael - EBook dumper
 B<ishmael> is a Perl program that can read and dump the contents of various
 popular (and unpopular) ebook formats. It originally only dumped the formatted
 text contents of an ebook, but has since grown to be able to dump metadata,
-images, and more. B<ishmael> dumps text by default, but it can dump other kinds
-of content through the use of command-line options.
+images, and more. B<ishmael> dumps formatted text by default, but it can dump
+other kinds of content through the use of command-line options.
 
 I<file> is the ebook file for B<ishmael> to dump. I<output> is the path to
-write any output to. If not specified, it defaults to F<stdout> (except for
-B<-c>|B<--cover> and B<-g>|B<--image>). F<stdout> can also be manually
+write any output to. If not specified, it defaults to F<stdout> (except for the
+B<-c>|B<--cover> and B<-g>|B<--image> options). F<stdout> can also be manually
 specified via C<->.
 
 B<ishmael> currently supports the following ebook formats:
@@ -80,6 +80,8 @@ options, as long they're installed on your system:
 
 =item w3m
 
+=item chawan
+
 =item queequeg
 
 =back
@@ -91,6 +93,18 @@ installed normally, L<queequeg(1)> should always be available to B<ishmael>.
 By default, B<ishmael> will either use the dumper specified by the
 C<ISHMAEL_DUMPER> environment variable if set, or the first one it finds
 installed on your system otherwise.
+
+=item B<-e>|B<--encoding>=I<enc>
+
+Print outputted text in the I<enc> character encoding. This option only affects
+the formatted text dump, raw text dump, and HTML dump modes.
+
+For a list of supported encodings, please consult the Perl documentation for
+L<Encode::Supported>.
+
+Can also be set by the C<ISHMAEL_ENCODING> environment variable.
+
+If not specified, the default encoding is C<utf8>.
 
 =item B<-f>|B<--format>=I<format>
 
@@ -134,7 +148,7 @@ heuristics, manually specify the format. The following are valid options
 
 =item B<-w>|B<--width>=I<width>
 
-Specify the outputted line width. Defaults to C<80>.
+Specify the formatted text line width. Defaults to C<80>.
 
 =item B<-H>|B<--html>
 
@@ -144,11 +158,11 @@ Dump the HTML-ified contents of the ebook instead of the formatted plain text.
 
 Dump the ebook's cover image, if it has one. By default, output is written to
 F<I<file-basename>.I<image-suffix>>. When specifying the output yourself, you
-can get put a C<.*> (dot asterisk) at the end of the path name, which B<ishmael>
-will substitute for the the image's format suffix.
+can put a C<.-> (dot hyphen) at the end of the path name, which B<ishmael>
+will substitute for the image's format suffix.
 
   # Could create foo.jpg, foo.png, foo.gif, etc.
-  ishmael -c ebook.epub 'foo.*'
+  ishmael -c ebook.epub 'foo.-'
 
 =item B<-g>|B<--image>
 
@@ -212,7 +226,11 @@ L<grep(1)> for a specific pattern in an ebook.
 
 =item ISHMAEL_DUMPER
 
-Name of dumper program to use by default.
+Name of dumper program to use for formatting text by default.
+
+=item ISHMAEL_ENCODING
+
+Name of character encoding to use for outputted text by default.
 
 =back
 
@@ -262,6 +280,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
+L<queequeg(1)>, L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>, L<cha(1)>,
+L<Encode::Supported>
 
 =cut

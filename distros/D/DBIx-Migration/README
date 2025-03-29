@@ -83,6 +83,11 @@ DESCRIPTION
     to be a single printable ASCII character, excluding the space character.
     In the previous example it is the "/" (slash) character.
 
+    You may use certain placeholders (embedded variables) in an SQL
+    migration section. The placeholders are expanded before the section gets
+    executed. A placeholder name starts with a "dbix_migration_*" prefix.
+    The supported placeholders are subclass (driver) specific.
+
 LIFECYCLE METHODS
     $self->BUILD( $args )
         Validate object.
@@ -113,6 +118,9 @@ ACCESSORS
 
     $self->tracking_table
         Get tracking table.
+
+    $self->placeholders
+        Get map of placeholders. The map is empty by default.
 
 METHODS
     $self->create_tracking_table

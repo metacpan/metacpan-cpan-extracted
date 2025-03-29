@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.13] - 2025-03-28
+
+### Added
+
+- Add "rel='me'" to the social links
+
 ## [0.0.12] - 2025-02-22
 
 ### Added

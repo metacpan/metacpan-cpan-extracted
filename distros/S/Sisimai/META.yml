@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.2.1
+    version: v5.3.0
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -288,11 +288,7 @@ requires:
   Time::Local: '1.19'
   Time::Piece: '1.29'
   perl: v5.26.0
-resources:
-  bugtracker: https://github.com/sisimai/p5-sisimai/issues
-  homepage: https://libsisimai.org/
-  repository: git://github.com/sisimai/p5-sisimai.git
-version: v5.2.1
+version: v5.3.0
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CB;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -110,7 +110,7 @@ sub raw {
 	open my $fh, '>', $out // \$raw
 		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
 
-	print { $fh } '';;
+	print { $fh } '';
 
 	close $fh;
 

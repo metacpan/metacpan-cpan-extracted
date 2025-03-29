@@ -27,23 +27,23 @@ sub _parse_text_entities {
 sub _parse_text_entities_at {
   my MY $self = $_[0];
   local ($self->{curpos}, $_) = @_[1,2];
-  my ($curpos, $endpos) = ($self->{curpos});
-  my $offset = $curpos;
+  my ($curpos) = ($self->{curpos});
+  my $totalEnd = $curpos + length $_;
   my @result;
   {
 
     my $total = length $_;
     while (s{^(.*?)$$self{re_entopn}}{}xs) {
+      my $before = $curpos;
       if (length $1) {
 	push @result, $1;
 	$self->{endln} += numLines($1);
 	$curpos += length $1;
       }
       push @result, my $node = $self->mkentity($curpos, undef, $self->{endln});
-      $curpos = $total - length $_;
-      $node->[NODE_END] = $curpos + $offset;
+      $curpos = $totalEnd - length $_;
+      $node->[NODE_END] = $curpos;
     }
-    $endpos = $self->{curpos};
   }
   if (@result) {
     push @result, $_ if length $_;

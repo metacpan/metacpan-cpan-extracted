@@ -52,15 +52,15 @@
    "provides" : {
       "File::FStore" : {
          "file" : "lib/File/FStore.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "File::FStore::Adder" : {
          "file" : "lib/File/FStore/Adder.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "File::FStore::File" : {
          "file" : "lib/File/FStore/File.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/phschafft/File-FStore.git"
       }
    },
-   "version" : "v0.01",
+   "version" : "v0.02",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

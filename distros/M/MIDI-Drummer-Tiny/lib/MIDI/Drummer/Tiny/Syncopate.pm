@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Syncopate;
-$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.5013';
+$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.6004';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Syncopation logic
@@ -13,19 +13,88 @@ use namespace::clean;
 
 extends 'MIDI::Drummer::Tiny';
 
+#pod =head1 SYNOPSIS
+#pod
+#pod  use MIDI::Drummer::Tiny::Syncopate;
+#pod
+#pod  my $d = MIDI::Drummer::Tiny::Syncopate->new(
+#pod     file   => 'syncopate.mid',
+#pod     reverb => 15,
+#pod  );
+#pod
+#pod  $d->combinatorial( $d->snare, {
+#pod     repeat   => 2,
+#pod     patterns => [qw(0101 1001)],
+#pod  });
+#pod
+#pod  # Play parts simultaneously
+#pod  $d->sync( \&snare, \&kick, \&hhat );
+#pod  sub snare { $d->combinatorial( $d->snare, { count => 1 } ) }
+#pod  sub kick { $d->combinatorial( $d->kick, { negate => 1 } ) }
+#pod  sub hhat { $d->steady( $d->closed_hh ) }
+#pod
+#pod  $d->write;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<MIDI::Drummer::Tiny::Syncopate> provides methods to use in the
+#pod F<eg/syncopation/*> lessons.
+#pod
+#pod =cut
 
+#pod =head1 ATTRIBUTES
+#pod
+#pod =head2 duration
+#pod
+#pod   $duration = $d->duration;
+#pod
+#pod Default: C<quarter>
+#pod
+#pod =cut
 
 has duration => (
     is      => 'ro',
     default => sub { 'qn' },
 );
 
+#pod =head2 repeat
+#pod
+#pod   $repeat = $d->repeat;
+#pod
+#pod Default: C<4>
+#pod
+#pod =cut
 
 has repeat => (
     is      => 'ro',
     default => sub { 4 },
 );
 
+#pod =head1 METHODS
+#pod
+#pod =head2 new
+#pod
+#pod   $d = MIDI::Drummer::Tiny::Syncopate->new(%arguments);
+#pod
+#pod Return a new C<MIDI::Drummer::Tiny::Syncopate> object.
+#pod
+#pod =head2 steady
+#pod
+#pod   $d->steady;
+#pod   $d->steady( $d->kick );
+#pod   $d->steady( $d->kick, { duration => $d->eighth } );
+#pod
+#pod Play a steady beat with the given B<instrument> and optional
+#pod B<duration>, for the number of beats accumulated in the object's
+#pod B<counter> attribute.
+#pod
+#pod Defaults:
+#pod
+#pod   instrument: closed_hh
+#pod   Options:
+#pod     duration: given by constructor
+#pod
+#pod =cut
 
 sub steady {
     my ( $self, $instrument, $opts ) = @_;
@@ -40,6 +109,37 @@ sub steady {
     }
 }
 
+#pod =head2 combinatorial
+#pod
+#pod   $d->combinatorial;
+#pod   $d->combinatorial( $d->kick );
+#pod   $d->combinatorial( $d->kick, \%options );
+#pod
+#pod Play a beat pattern with the given B<instrument>, given by
+#pod L<Algorithm::Combinatorics/variations_with_repetition>.
+#pod
+#pod This method accumulates beats in the object's B<counter> attribute if
+#pod the B<count> option is set.
+#pod
+#pod The B<vary> option is a hashref of coderefs, keyed by single character
+#pod tokens, like the digits, 0-9.  The coderef durations should add up to
+#pod the B<duration> option.
+#pod
+#pod Defaults:
+#pod
+#pod   instrument: snare
+#pod   Options:
+#pod     duration: given by constructor
+#pod     count: 0
+#pod     negate: 0
+#pod     beats: given by constructor
+#pod     repeat: given by constructor
+#pod     vary:
+#pod         0 => sub { $self->rest( $options->{duration} ) },
+#pod         1 => sub { $self->note( $options->{duration}, $instrument ) },
+#pod     patterns: undef
+#pod
+#pod =cut
 
 sub combinatorial {
     my ( $self, $instrument, $opts ) = @_;
@@ -91,7 +191,7 @@ MIDI::Drummer::Tiny::Syncopate - Syncopation logic
 
 =head1 VERSION
 
-version 0.5013
+version 0.6004
 
 =head1 SYNOPSIS
 

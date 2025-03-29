@@ -2,26 +2,40 @@ NAME
     Sys::Cmd - run a system command or spawn a system processes
 
 VERSION
-    0.99.0 (2022-10-05)
+    0.99.1 (2025-03-28)
 
 SYNOPSIS
         use Sys::Cmd qw/run spawn/;
 
-        # Get command output, raise exception on failure:
+        # Simplest scenario:
+        #   - returns standard output
+        #   - warns about standard error
+        #   - raises exception on failure
         $output = run(@cmd);
 
-        # Feed command some input, get output as lines,
-        # raise exception on failure:
-        @output = run( @cmd, { input => 'feedme' } );
+        # Alternative input / output:
+        #  - returns standard output lines
+        #  - after feeding its standard input
+        @output = run( @cmd, { input => 'food' } );
 
-        # Spawn and interact with a process somewhere else:
-        $proc = spawn(
+        # More flexibility:
+        #  - Run in alternative directory
+        #  - With a modified environment
+        #  - Capturing stdout/stderr into variables
+        run(
             @cmd,
             {
                 dir      => '/',
-                encoding => 'encoding(iso-8859-3)'
-            },
+                env => { SECRET => $pass },
+                out => \$out,
+                err => \$err,
+            }
         );
+
+        # Spawn a process for asynchronous interaction
+        #  - Caller responsible for exec path, all input & output
+        #  - No exception raised on non-zero exit
+        $proc = spawn( @cmd, { encoding => 'iso-8859-3' },);
 
         while ( my $line = $proc->stdout->getline ) {
             $proc->stdin->print("thanks\n");
@@ -32,7 +46,7 @@ SYNOPSIS
         $proc->close();         # Finished talking to file handles
         $proc->wait_child();    # Cleanup
 
-        # read exit information
+        # read process termination information
         $proc->exit();          # exit status
         $proc->signal();        # signal
         $proc->core();          # core dumped? (boolean)
@@ -40,165 +54,228 @@ SYNOPSIS
 DESCRIPTION
     Sys::Cmd lets you run system commands and capture their output, or
     spawn and interact with a system process through its "STDIN",
-    "STDOUT", and "STDERR" file handles. The following functions are
-    exported on demand by this module:
+    "STDOUT", and "STDERR" file handles.
+
+    It also provides mock process support, where the caller defines
+    their own outputs and error values. Log::Any is used for logging.
+
+    The following functions are exported on demand:
 
     run( @cmd, [\%opt] ) => $output | @output
-        Execute @cmd and return what the command sent to its "STDOUT",
-        raising an exception in the event of error. In array context
-        returns a list instead of a plain string.
+        Execute @cmd and return what the command sends to its "STDOUT",
+        raising an exception in the event of non-zero exit value. In
+        array context returns a list of lines instead of a scalar
+        string.
 
         The first element of @cmd determines what/how things are run:
 
-        *   If it is a relative file name it is executed directly using
-            Proc::Spawn.
+        *   If it has a path component (absolute or relative) it is
+            executed as is, using Proc::Spawn.
 
-        *   If it is a CODE reference (subroutine) Sys::Cmd forks before
-            running it in the child process. This is not supported on
+        *   If it is a CODE reference (subroutine) then the funtion
+            forks before running it in a child process. Unsupported on
             Win32.
 
-        *   Everything else is looked up using File::Which and then
-            executed with Proc::Spawn.
+        *   Everything else is looked up using File::Which and the
+            result is executed with Proc::Spawn.
 
-        The command input and environment can be modified with an
-        optional hashref containing the following key/values:
+        The optional "\%opts" hashref lets you modify the execution via
+        the following configuration keys (=> default):
 
-        dir The working directory the command will be run in.
+        dir => $PWD
+            The working directory the command will be run in. Note that
+            if @cmd is a relative path, it may not be found from the new
+            location.
 
-        encoding
-            An string value identifying the encoding of the input/output
-            file-handles. Defaults to 'utf8'.
+        encoding => $Encode::Locale::ENCODING_LOCALE
+            A string value identifying the encoding that applies to
+            input/output file-handles, command arguments, and
+            environment variables. Defaults to the 'locale' alias from
+            Encode::Locale.
 
         env A hashref containing key/values to be added to the current
             environment at run-time. If a key has an undefined value
             then the key is removed from the environment altogether.
 
         input
-            A string which is fed to the command via its standard input,
-            which is then closed.
+            A scalar (string), or ARRAY reference, which is fed to the
+            command via its standard input, which is then closed. An
+            empty value ('') or empty list will close the command's
+            standard input without printing. An undefined value (the
+            default) leaves the handle open.
 
-    runx( @cmd, [\%opt] ) => $outerrput | @outerrput
-        The same as the "run" function but with the command's "STDERR"
-        output appended to the "STDOUT" output.
+            Some commands close their standard input on startup, which
+            causes a SIGPIPE when trying to write to it, for which
+            Sys::Cmd will warn.
 
-    spawn( @cmd, [\%opt] ) => Sys::Cmd
-        Return a Sys::Cmd object (documented below) representing the
-        process running @cmd, with attributes set according to the
-        optional \%opt hashref. The first element of @cmd determines the
-        execution method just like the "run()" function.
+        mock
+            A subroutine reference which runs instead of the actual
+            command, which provides the fake outputs and exit values.
+            See "MOCKING" below for details.
 
-    Sys::Cmd objects can of course be created using the standard "new"
-    constructor if you prefer that to the "spawn" function:
+        out A reference to a scalar which is populated with output. When
+            used, "run()" returns nothing.
 
-        $proc = Sys::Cmd->new(
-            cmd => \@cmd,
-            dir => '/',
-            env => { SOME => 'VALUE' },
-            enc => 'iso-8859-3',
-            input => 'feedme',
-            on_exit => sub {
-                my $proc = shift;
-                print $proc->pid .' exited with '. $proc->exit;
-            },
+        err A reference to a scalar which is populated with error
+            output. When used, "run()" does not warn of errors.
+
+        on_exit
+            A subref to be called at the time that process termination
+            is detected.
+
+    spawn( @cmd, [\%opt] ) => Sys::Cmd::Process
+        Executes @cmd, similarly to "run()" above, but without any input
+        handling, output collection, or process waiting; the "\%opt"
+        keys "input", "out" and "err" keys are *invalid* for this
+        function.
+
+        This returns a (Sys::Cmd::Process) object representing the
+        running process, which has the following methods:
+
+        cmdline() => @list | $str
+            In array context returns a list of the command and its
+            arguments. In scalar context returns a string of the command
+            and its arguments joined together by spaces.
+
+        close()
+            Close all filehandles to the child process. Note that file
+            handles will automaticaly be closed when the Sys::Cmd object
+            is destroyed. Annoyingly, this means that in the following
+            example $fh will be closed when you tried to use it:
+
+                my $fh = Sys::Cmd->new( %args )->stdout;
+
+            So you have to keep track of the Sys::Cmd object manually.
+
+        pid()
+            The command's process ID.
+
+        stderr()
+            The command's *STDERR* file handle, based on IO::Handle so
+            you can call getline() etc methods on it.
+
+        stdin()
+            The command's *STDIN* file handle, based on IO::Handle so
+            you can call print() etc methods on it. Autoflush is
+            automatically enabled on this handle.
+
+        stdout()
+            The command's *STDOUT* file handle, based on IO::Handle so
+            you can call getline() etc methods on it.
+
+        wait_child() -> $exit_value
+            Wait for the child to exit using waitpid
+            <http://perldoc.perl.org/functions/waitpid.html>, collect
+            the exit status and return it. This method sets the *exit*,
+            *signal* and *core* attributes and is called automatically
+            when the Sys::Cmd::Process object is destroyed.
+
+        After "wait_child" has been called the following are also valid:
+
+        core()
+            A boolean indicating the process core was dumped.
+
+        exit()
+            The command's exit value, shifted by 8 (see "perldoc -f
+            system").
+
+        signal()
+            The signal number (if any) that terminated the command,
+            bitwise-added with 127 (see "perldoc -f system").
+
+    syscmd( @cmd, [\%opt] ) => Sys::Cmd
+        When calling a command multiple times, possibly with different
+        arguments or environments, a kind of "templating" mechanism can
+        be useful, to avoid repeatedly specifying configuration values
+        and wearing a path lookup penalty each call.
+
+        A Sys::Cmd object represents a command (or coderef) *to be*
+        executed, which you can create with the "syscmd" function:
+
+            my $git  = syscmd('git',
+                env => {
+                    GIT_AUTHOR_NAME  => 'Geekette',
+                    GIT_AUTHOR_EMAIL => 'xyz@example.com',
+                }
+            );
+
+        You can then repeatedly call "run()" or "spawn()" *methods* on
+        the object for the actual work. The methods work the same way in
+        terms of input, output, and return values as the exported
+        package functions. However, additional arguments and options are
+        *merged*:
+
+            my @list = $git->run('ls-files');    # $PWD
+            my $commit = $git->run( 'commit', {
+                env => { GIT_AUTHOR_NAME => 'Sysgeek' }
+            });
+
+        For even less syntax you can use the "runsub" or "spawnsub"
+        methods to get a subroutine you can call directly:
+
+            my $git    = syscmd('git')->runsub;
+            my @list   = $git->('ls-files');
+            my $commit = $git->('show');
+
+    runsub( @cmd, [\%opt] ) => CODEref
+        Equivalent to manually calling "syscmd(...)" followed by the
+        "runsub" method.
+
+            #!perl
+            use Sys::Cmd 'runsub';
+            my $ls = runsub('ls');
+            $ls->('here');
+            $ls->('there');
+
+    spawnsub( @cmd, [\%opt] ) => CODEref
+        Equivalent to manually calling "syscmd(...)" followed by the
+        "spawnsub" method.
+
+            #!perl
+            use Sys::Cmd 'spawnsub';
+            my $spawn = spawnsub('command');
+            foreach my $i (0..9) {
+                my $proc = $spawn->('arg', $i);
+                $proc->stdin->print("Hello\n");
+                print $proc->stdout->getlines;
+                $proc->wait_child
+            }
+
+MOCKING (EXPERIMENTAL!)
+    The "mock" subroutine, when given, runs instead of the command line
+    process. It is passed the Sys::Cmd::Process object as its first
+    argument, which gives it access to the cmdline, dir, env, encoding,
+    attributes as methods.
+
+        run(
+            'junk',
+            {
+                input => 'food',
+                mock  => sub {
+                    my $proc  = shift;
+                    my $input = shift;
+                    [ $proc->cmdline . ":Thanks for $input!\n", '', 0 ];
+                }
+            }
         );
 
-    Note that Sys::Cmd objects created this way will not lookup the
-    command using File::Which the way the "run", "runx" and "spawn"
-    functions do. CODE references in $cmd[0] are however still
-    recognized and forked off.
+    It is required to return an ARRAY reference (possibly empty), with
+    the following elements:
 
-    Sys::Cmd uses Log::Any "debug" calls for logging purposes. An easy
-    way to see the output is to add "use Log::Any::Adapter 'Stdout'" in
-    your program.
+        [
+            "standard output\n",    # default ''
+            "standard error\n",     # default ''
+            $exit,                  # default 0
+            $signal,                # default 0
+            $core,                  # default 0
+        ]
 
-CONSTRUCTOR
-    new(%args) => Sys::Cmd
-        Spawns a process based on %args. %args must contain at least a
-        "cmd" value, and optionally "encoding", "env", "dir" and "input"
-        values as defined as attributes below.
+    Those values are then returned from "run" as usual. At present this
+    feature is not useful for interactive (i.e. spawned) use, as it does
+    not dynamically respond to calls to "$proc-"stdin->print()>.
 
-        If an "on_exit" subref argument is provided it will be called by
-        the "wait_child" method, which can either be called manually or
-        will be automatically called when the object is destroyed.
-
-ATTRIBUTES
-    All attributes are read-only.
-
-    cmd An array ref containing the command or CODE reference (UNIX
-        only) and its arguments.
-
-    dir The working directory the command will be run in.
-
-    encoding
-        An string value identifying the encoding of the input/output
-        file-handles. Defaults to 'utf8'.
-
-    env A hashref containing key/values to be added to the current
-        environment at run-time. If a key has an undefined value then
-        the key is removed from the environment altogether.
-
-    input
-        A string which is fed to the command via its standard input,
-        which is then closed. This is a shortcut for printing to, and
-        closing the command's *stdin* file-handle. An empty string will
-        close the command's standard input without writing to it. On
-        some systems, some commands may close standard input on startup,
-        which will cause a SIGPIPE when trying to write to it for which
-        Sys::Cmd will warn.
-
-    pid The command's process ID.
-
-    stdin
-        The command's *STDIN* file handle, based on IO::Handle so you
-        can call print() etc methods on it. Autoflush is automatically
-        enabled on this handle.
-
-    stdout
-        The command's *STDOUT* file handle, based on IO::Handle so you
-        can call getline() etc methods on it.
-
-    stderr
-        The command's *STDERR* file handle, based on IO::Handle so you
-        can call getline() etc methods on it.
-
-    exit
-        The command's exit value, shifted by 8 (see "perldoc -f
-        system"). Set by "wait_child()".
-
-    signal
-        The signal number (if any) that terminated the command,
-        bitwise-added with 127 (see "perldoc -f system"). Set by
-        "wait_child()".
-
-    core
-        A boolean indicating the process core was dumped. Set by
-        "wait_child()".
-
-METHODS
-    cmdline => @list | $str
-        In array context returns a list of the command and its
-        arguments. In scalar context returns a string of the command and
-        its arguments joined together by spaces.
-
-    close()
-        Close all filehandles to the child process. Note that file
-        handles will automaticaly be closed when the Sys::Cmd object is
-        destroyed. Annoyingly, this means that in the following example
-        $fh will be closed when you tried to use it:
-
-            my $fh = Sys::Cmd->new( %args )->stdout;
-
-        So you have to keep track of the Sys::Cmd object manually.
-
-    wait_child() -> $exit_value
-        Wait for the child to exit using waitpid
-        <http://perldoc.perl.org/functions/waitpid.html>, collect the
-        exit status and return it. This method sets the *exit*, *signal*
-        and *core* attributes and will also be called automatically when
-        the Sys::Cmd object is destroyed.
-
-SEE ALSO
-    Sys::Cmd::Template
+    Note that this interface is EXPERIMENTAL and subject to change!
+    Don't use it anywhere you can't deal with breakage!
 
 ALTERNATIVES
     AnyEvent::Run, AnyEvent::Util, Argv, Capture::Tiny, Child,
@@ -211,7 +288,7 @@ ALTERNATIVES
 SUPPORT
     This distribution is managed via github:
 
-        https://github.com/mlawren/sys-cmd/tree/devel
+        https://github.com/mlawren/p5-Sys-Cmd
 
     This distribution follows the semantic versioning model:
 
@@ -222,11 +299,11 @@ SUPPORT
         http://github.com/mlawren/githook-perltidy
 
 AUTHOR
-    Mark Lawrence <nomad@null.net>, based heavily on
+    Mark Lawrence <mark@rekudos.net>, based heavily on
     Git::Repository::Command by Philippe Bruhat (BooK).
 
 COPYRIGHT AND LICENSE
-    Copyright 2011-2021 Mark Lawrence <nomad@null.net>
+    Copyright 2011-2025 Mark Lawrence <nomad@null.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

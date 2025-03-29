@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -139,12 +139,6 @@ sub html {
 		die "Cannot read PDF $self->{Source}: pdftohtml not installed\n";
 	}
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
-
 	my $raw = qx/$PDFTOHTML -i -s -stdout '$self->{Source}'/;
 
 	unless ($? >> 8 == 0) {
@@ -157,11 +151,18 @@ sub html {
 
 	my ($body) = $dom->findnodes('/html/body');
 
-	print { $fh } map { $_->toString() } $body->childNodes();
+	my $html = join '', map { $_->toString } $body->childNodes;
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -173,12 +174,6 @@ sub raw {
 	unless (defined $PDFTOHTML) {
 		die "Cannot read PDF $self->{Source}: pdftohtml not installed\n";
 	}
-
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
 
 	my $rawml = qx/$PDFTOHTML -i -s -stdout '$self->{Source}'/;
 
@@ -192,11 +187,18 @@ sub raw {
 
 	my ($body) = $dom->findnodes('/html/body');
 
-	print { $fh } $body->textContent;
+	my $raw = join '', $body->textContent;
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 
@@ -236,24 +238,22 @@ sub cover {
 		die "'$PDFTOPNG' could not produce a cover image from $self->{Source}\n";
 	}
 
-	my $bin;
-
-	open my $wh, '>', $out // \$bin
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $wh;
-
 	open my $rh, '<', $png
 		or die "Failed to open $png for reading: $!\n";
 	binmode $rh;
-
-	while (read $rh, my ($buf), 1024) {
-		print { $wh } $buf;
-	}
-
-	close $wh;
+	my $bin = do { local $/ = undef; readline $rh };
 	close $rh;
 
-	return $out // $bin;
+	if (defined $out) {
+		open my $wh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $wh;
+		print { $wh } $bin;
+		close $wh;
+		return $out;
+	} else {
+		return $bin;
+	}
 
 }
 

@@ -21,13 +21,13 @@ no_index:
 provides:
   File::FStore:
     file: lib/File/FStore.pm
-    version: v0.1.0
+    version: v0.2.0
   File::FStore::Adder:
     file: lib/File/FStore/Adder.pm
-    version: v0.1.0
+    version: v0.2.0
   File::FStore::File:
     file: lib/File/FStore/File.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   Carp: '1.35'
   DBD::SQLite: '1.72'
@@ -39,7 +39,7 @@ requires:
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/phschafft/File-FStore.git
-version: v0.01
+version: v0.02
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

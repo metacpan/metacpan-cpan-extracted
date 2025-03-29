@@ -18,6 +18,7 @@ my $nb;
 if (defined $app) {
 	my $nbf = $app->Frame(-relief => 'groove', -borderwidth => 4);
 	$nb = $nbf->YANoteBook(
+		-indicatorimage => $app->Getimage('info'),
 #		-image => $app->Pixmap(-file => 'document-multiple.xpm'),
 #		-autoupdate => 1,
 #		-background => 'red',
@@ -51,9 +52,24 @@ if (defined $app) {
 		)->pack();
 	}
 # 	$app->Label(-text => '------')->pack;
-	$app->geometry('700x500+100+100');
 #	$app->after(100, ['UpdateTabs', $nb]);
 	$nbf->pack(-expand => 1, -fill => 'both');
+	my $butf = $nbf->Frame->pack(-fill => 'x');
+	my $val = '';
+	$butf->Checkbutton(
+		-text =>'Indicator',
+		-variable => \$val,
+		-command => sub {
+			my $cur = $nb->Selected;
+#			if ($val) {
+#				$val = ''
+#			} else {
+#				$val = 1
+#			}
+			$nb->indicator($cur, $val);
+		},
+	)->pack(-side => 'left');
+	$app->geometry('700x500+100+100');
 }
 
 @tests = (

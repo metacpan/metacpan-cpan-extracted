@@ -2,6 +2,10 @@ use Test2::V0;
 use Test2::Tools::QuickDB;
 use File::Spec;
 
+BEGIN {
+    $ENV{PATH}="$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/mariadb11/bin";
+}
+
 use Test2::Require::Module 'DBD::MariaDB';
 
 my @ENV_VARS;

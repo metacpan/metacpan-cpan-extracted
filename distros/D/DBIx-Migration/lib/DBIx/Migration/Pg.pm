@@ -15,7 +15,7 @@ extends 'DBIx::Migration';
 has '+do_before' => (
   default => sub {
     my $self = shift;
-    return [ 'SET search_path TO ' . $self->managed_schema ];
+    return [ [ 'SET search_path TO ?', {}, $self->managed_schema ] ];
   }
 );
 has '+do_while' => (
@@ -26,6 +26,12 @@ has '+do_while' => (
 );
 has managed_schema  => ( is => 'ro', isa => Str, default => 'public' );
 has tracking_schema => ( is => 'ro', isa => Str, default => 'public' );
+has '+placeholders' => (
+  default => sub {
+    my $self = shift;
+    return { dbix_migration_managed_schema => $self->{ _dbh }->quote_identifier( $self->managed_schema ) };
+  }
+);
 
 sub create_tracking_table {
   my $self = shift;

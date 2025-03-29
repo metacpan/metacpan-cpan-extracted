@@ -17,11 +17,12 @@ BEGIN {
 # "before" should not be part of the API:
 # https://github.com/haarg/MooX-SetOnce/issues/2
 class_api_ok( $class,
-  qw( before new dsn username password dbh dir do_before do_while tracking_table create_tracking_table quoted_tracking_table driver latest migrate version )
+  qw( before new dsn username password dbh dir do_before do_while tracking_table placeholders create_tracking_table quoted_tracking_table driver latest migrate version )
 );
 
 class_api_ok( $subclass,
-  qw( new do_before do_while managed_schema tracking_schema create_tracking_table quoted_tracking_table ) );
+  qw( new do_before do_while managed_schema tracking_schema create_tracking_table placeholders quoted_tracking_table )
+);
 
 like exception { $class->new() }, qr/\Aboth dsn and dbh are not set/, '"dsn" or "dbh" are both absent';
 

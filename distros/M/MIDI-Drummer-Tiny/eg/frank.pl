@@ -11,7 +11,7 @@ my $d = MIDI::Drummer::Tiny->new(
     signature => '3/4',
     bpm       => 114,
     bars      => 2,
-    soundfont => '/Users/gene/Music/FluidR3_GM.sf2',
+    soundfont => '/Users/gene/Music/soundfont/FluidR3_GM.sf2',
 );
 
 my $dura   = $d->quarter;

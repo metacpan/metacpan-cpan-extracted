@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Prima: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,9 @@ no_index:
     - inc
 requires:
   OpenGL: '0'
-  Prima: '1.49'
+  Prima: '1.74'
   perl: '5.012'
 resources:
   repository: http://github.com/dk/Prima-OpenGL
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.24 Fri Mar 28 12:23:36 CET 2025
+        - Implement migration placeholders; the first supported placeholder is
+          dbix_migration_managed_schema
+        - Allow ($statement, \%attr, @bind_values) argument set for do_*
+          attributes
+
 0.23 Wed Mar 26 08:21:31 CET 2025
         - Fix documentation
         - Use less here-document syntax for SQL statements

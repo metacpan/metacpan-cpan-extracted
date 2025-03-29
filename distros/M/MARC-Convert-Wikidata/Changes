@@ -1,3 +1,14 @@
+0.27 2025-03-29T09:53:02+01:00
+ - Remove obsolete module in tests (GH#4, thank Slaven Rezić).
+
+0.26 2025-03-28T17:14:27+01:00
+ - Add Czech book edition Wikidata description test.
+ - Add book edition cleanup use case.
+ - Add test for failing multiple publishers cnb record.
+ - Add test for multiple 700 field with multiple roles.
+ - Fix Slovak Wikidata description, add tests.
+ - Move some test data to XML.
+
 0.25 2025-03-19T22:38:02+01:00
  - Add constructor tests for Transform.
  - Add processing of bad ISBN.

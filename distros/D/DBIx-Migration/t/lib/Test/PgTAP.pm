@@ -80,7 +80,7 @@ EOF
   } else {
     $sth = $Dbh->prepare( <<'EOF' );
 SELECT
-  event_object_schema || '.' || trigger_name
+  quote_ident( event_object_schema ) || '.' || trigger_name
 FROM
   information_schema.triggers
 WHERE

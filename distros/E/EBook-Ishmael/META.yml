@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/ishmael/issues
   repository: https://codeberg.org/1-1sam/ishmael.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

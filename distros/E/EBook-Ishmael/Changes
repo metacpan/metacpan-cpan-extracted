@@ -1,5 +1,21 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.04  Mar 28 2025
+  - Added the -e|--encoding option: Specify the output encoding for outputted
+    text.
+    - Also added the ISHMAEL_ENCODING environment variable.
+  - Improve UTF8-handling for plain text ebook formats (text, zTXT, PalmDoc).
+  - Added support for the chawan web browser as a potential HTML formatter.
+  - When specifying cover image output, '.-' should be used now instead of '.*'
+    for suffix substitution. '.*' is now deprecated, but will still be
+    supported. However, it will be removed at some point in a future release.
+  - Die when stdout ('-') is given as output argument to --image|-g.
+  - '<body>' tags are no longer included in HTML/XHTML html dump.
+  - Added additional test environment variables to force enable/disable tests
+    for optional ebook formats.
+    - TEST_CBR, TEST_CB7, TEST_CHM
+  - Fix typos in documentation.
+
 1.03  Mar 21 2025
   - Add support for the KF8/AZW3 ebook format.
   - Fix raw text dumping in Mobis.

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -785,11 +785,7 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $fh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
+	my $html;
 
 	if ($self->{_version} == 8) {
 
@@ -802,7 +798,7 @@ sub html {
 
 			my ($body) = $dom->findnodes('/html/body') or next;
 
-			print { $fh } map { $_->toString } $body->childNodes;
+			$html .= join '', map { $_->toString } $body->childNodes;
 
 		}
 
@@ -815,12 +811,19 @@ sub html {
 			encoding => $enc,
 			recover => 2
 		);
-		print { $fh } $dom->documentElement->toString;
+		$html = $dom->documentElement->toString;
 	}
 
-	close $fh;
-
-	return $out // $html;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $html;
+		close $fh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -829,11 +832,7 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $fh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh, ':utf8';
+	my $raw;
 
 	if ($self->{_version} == 8) {
 
@@ -843,7 +842,7 @@ sub raw {
 				recover => 2,
 			);
 			my ($body) = $dom->findnodes('/html/body') or next;
-			print { $fh } $body->textContent;
+			$raw .= $body->textContent;
 		}
 
 	} else {
@@ -856,13 +855,20 @@ sub raw {
 			recover => 2,
 		);
 
-		print { $fh } $dom->textContent;
+		$raw = $dom->documentElement->textContent;
 
 	}
 
-	close $fh;
-
-	return $out // $raw;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh, ':utf8';
+		print { $fh } $raw;
+		close $fh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 
@@ -889,17 +895,18 @@ sub cover {
 
 	return undef unless $self->has_cover;
 
-	my $bin;
+	my $bin = $self->{_pdb}->record($self->{_coverrec})->data;
 
-	open my $fh, '>', $out // \$bin
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-	binmode $fh;
-
-	print { $fh } $self->{_pdb}->record($self->{_coverrec})->data;
-
-	close $fh;
-
-	return $out // $bin;
+	if (defined $out) {
+		open my $fh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $fh;
+		print { $fh } $out;
+		close $fh;
+		return $out;
+	} else {
+		return $bin;
+	}
 
 }
 

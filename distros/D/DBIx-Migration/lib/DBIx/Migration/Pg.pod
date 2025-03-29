@@ -64,6 +64,11 @@ Get schema that your application refers to.
 
 Get schema that the tracking table belongs to.
 
+=item $self->placeholders
+
+Get map of placeholders. The map contains a single key value pair. The
+C<dbix_migration_managed_schema> key refers to the C<managed_schema> value.
+
 =back
 
 =head1 METHODS

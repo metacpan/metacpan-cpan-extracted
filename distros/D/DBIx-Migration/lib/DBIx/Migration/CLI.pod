@@ -6,7 +6,7 @@ DBIx::Migration::CLI - Seamless database schema up- and downgrades CLI
 
 =head1 VERSION
 
-0.23
+0.24
 
 =head1 SYNOPSIS
 
@@ -69,12 +69,12 @@ Execute this script and return a proper C<exit()> argument value.
 
 =head1 EXAMPLES
 
-  dbix-migration -s myapp -t myapp_tracking ':dbi:Pg:service=myapp' ~/Projects/myapp/db/migrations 2
+  dbix-migration -t myapp_tracking -s myapp ':dbi:Pg:service=myservice' ~/Projects/myapp/db/migrations 2
 
 initiates a migration to the target version 2. The tracking schema is
 "myapp_tracking".  The managed schema is "myapp". The connection details are
-configured in a service file and extracted from there using the service name
-"myapp".
+configured in a I<pg_service.conf> service file and extracted from there using
+the service name "myservice".
 
 =head1 SEE ALSO
 

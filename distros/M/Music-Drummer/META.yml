@@ -3,10 +3,11 @@ abstract: 'Use MIDI::Drummer::Tiny'
 author:
   - 'Gene Boggs <gene.boggs@gmail.com>'
 build_requires:
+  Data::Dumper::Compact: '0'
   File::Spec: '0'
+  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::Exception: '0'
   Test::More: '0.88'
   perl: '5.006'
   strict: '0'
@@ -22,13 +23,13 @@ meta-spec:
   version: '1.4'
 name: Music-Drummer
 requires:
-  MIDI::Drummer::Tiny: '0.5013'
+  MIDI::Drummer::Tiny: '0.6004'
   parent: '0'
   perl: '5.006'
 resources:
   homepage: https://github.com/ology/Music-Drummer
   repository: https://github.com/ology/Music-Drummer.git
-version: '0.5013'
+version: '0.6004'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

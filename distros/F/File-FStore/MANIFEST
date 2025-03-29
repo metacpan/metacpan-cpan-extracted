@@ -9,6 +9,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+examples/store.cgi
 lib/File/FStore.pm
 lib/File/FStore/Adder.pm
 lib/File/FStore/File.pm

@@ -1,3 +1,12 @@
+1.16 2025-03-28
+
+ * Update documentation.
+
+ * Add new module Math::BigRat::Constant similar to Math::BigInt::Constant and
+   Math::BigRat::Constant.
+
+ * Fix typos in documentation.
+
 1.15 2023-04-03
 
  * Update documentation. Remove/update obsolete URLs.

@@ -1,6 +1,6 @@
 package EBook::Ishmael::Decode;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 

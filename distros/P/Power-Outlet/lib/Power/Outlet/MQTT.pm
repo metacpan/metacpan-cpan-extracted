@@ -18,7 +18,7 @@ Tasmota defaults
 
   my $outlet = Power::Outlet::MQTT->new(
                                         host                => "mqtt",
-                                        name                => "my_device",
+                                        device              => "my_device",
                                         relay               => "POWER1",
                                        );
 
@@ -39,8 +39,8 @@ or explicit definitions with no defaults
                                         publish_switch      => "cmnd/my_device/POWER1+TOGGLE",
                                         publish_query       => "cmnd/my_device/POWER1+",
                                         subscribe_topic     => "stat/my_device/POWER1",
-                                        subscribe_value_on  => 'ON'  #or qr/\A(?:ON|1)\Z/i,
-                                        subscribe_value_off => 'OFF, #or qr/\A(?:OFF|0)\Z/i,
+                                        subscribe_value_on  => 'ON',  #or qr/\A(?:ON|1)\Z/i,
+                                        subscribe_value_off => 'OFF', #or qr/\A(?:OFF|0)\Z/i,
                                        );
   print $outlet->query, "\n";
   print $outlet->on, "\n";
@@ -59,7 +59,7 @@ Examples:
 =head1 USAGE
 
   use Power::Outlet::MQTT;
-  my $outlet = Power::Outlet::MQTT->new(host=>"mqtt", name=>"my_device");
+  my $outlet = Power::Outlet::MQTT->new(host=>"mqtt", device=>"my_device");
   print $outlet->on, "\n";
 
 =head1 CONSTRUCTOR

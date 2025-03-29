@@ -7,7 +7,7 @@ use MIDI::Drummer::Tiny::SwingFills;
 
 my $d = MIDI::Drummer::Tiny->new(
     bars      => 16,
-    soundfont => '/Users/gene/Music/FluidR3_GM.sf2',
+    soundfont => '/Users/gene/Music/soundfont/FluidR3_GM.sf2',
 );
 my $f = MIDI::Drummer::Tiny::SwingFills->new;
 

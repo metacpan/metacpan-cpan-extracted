@@ -13,9 +13,10 @@ plan skip_all => $xerror if defined $xerror;
 my $tests = 3;
 plan tests => $tests;
 $::application = Prima::Application-> new;
-$::application-> begin_paint;
+my $w = Prima::Window->new;
+$w-> begin_paint;
 
-my $ctx = Prima::OpenGL::context_create($::application, {});
+my $ctx = Prima::OpenGL::context_create($w, {});
 unless ( ok( $ctx, 'create_context')) {
 	my $err = Prima::OpenGL::last_error();
 	diag $err;
@@ -28,4 +29,4 @@ ok( 1, "direct: $direct");
 ok(Prima::OpenGL::context_make_current($ctx));
 
 Prima::OpenGL::context_destroy($ctx);
-$::application-> end_paint;
+$w-> end_paint;

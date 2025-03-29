@@ -5,9 +5,9 @@ package Math::BigFloat::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
-use Math::BigFloat '1.999802';
+use Math::BigFloat;
 our @ISA = qw( Math::BigFloat );
 
 use overload;                   # inherit from Math::BigFloat
@@ -32,7 +32,7 @@ sub modify {
 }
 
 ##############################################################################
-# But cloning us creates a modifyable Math::BigInt, so that overload works
+# But cloning us creates a modifiable Math::BigFloat, so that overload works
 
 sub copy {
     my $x = shift;
@@ -123,10 +123,13 @@ Math::BigFloat::Constant - arbitrary sized constant integers
 
   $x->bfloor();                 # return integer less or equal than $x
   $x->bceil();                  # return integer greater or equal than $x
+
   $x->as_int();                 # return a copy of the object as Math::BigInt
-  $x->as_number();              # return a copy of the object as Math::BigInt
+  $x->as_float();               # return a copy of the object as Math::BigFloat
+  $x->as_rat();                 # return a copy of the object as Math::BigRat
 
   # The following do not modify their arguments, so they are allowed:
+
   bgcd(@values);                # greatest common divisor
   blcm(@values);                # lowest common multiplicator
 
@@ -144,11 +147,11 @@ Math::BigFloat::Constant - arbitrary sized constant integers
 With this module you can define constant Math::BigFloat objects on a per-object
 basis. The usual C<use Math::BigFloat ':constant'> will catch B<all> floating
 point constants in the script at compile time, but will not let you create
-constant values on the fly, nor work for strings and/or floating point constants
-like C<1e5>.
+constant values on the fly, nor work for strings and/or floating point
+constants like C<1e5>.
 
-C<Math::BigFloat::Constant> is a true subclass of L<Math::BigFloat> and can
-do all the same things - except modifying any of the objects.
+C<Math::BigFloat::Constant> is a subclass of L<Math::BigFloat> and can do all
+the same things - except modifying any of the objects.
 
 =head1 EXAMPLES
 
@@ -219,7 +222,7 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Math::BigFloat>, L<Math::BigInt::Constant>.
+L<Math::BigFloat>, L<Math::BigInt::Constant>, L<Math::BigRat::Constant>.
 
 =head1 AUTHORS
 

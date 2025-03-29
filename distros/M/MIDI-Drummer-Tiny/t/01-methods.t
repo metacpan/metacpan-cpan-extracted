@@ -2,6 +2,7 @@
 
 use Data::Dumper::Compact qw(ddc);
 use Test::More;
+use File::Temp qw(tempfile);
 
 use_ok 'MIDI::Drummer::Tiny';
 
@@ -153,16 +154,17 @@ subtest fill => sub {
 };
 
 subtest timidity_conf => sub {
-    my $d = new_ok 'MIDI::Drummer::Tiny' => [
-        soundfont => 'soundfont.sf2',
-    ];
+    my ( $sf_fh, $soundfont )
+        = tempfile( 'soundfontXXXX', SUFFIX => '.sf2', UNLINK => 1 );
+    my ( $timidity_fh, $timidity_conf )
+        = tempfile( 'timidityXXXX', SUFFIX => '.conf', UNLINK => 1 );
+    my $d
+        = new_ok 'MIDI::Drummer::Tiny' => [ soundfont => $soundfont ];
+
     my $sf = $d->soundfont;
-    like $d->timidity_cfg, qr/$sf$/, 'timidity_conf';
-    my $filename = 'timidity_conf';
-    $d->timidity_cfg($filename);
-    ok -e $filename, 'timidity_conf with filename';
-    unlink $filename;
-    ok !-e $filename, 'file unlinked';
+    like $d->timidity_cfg, qr/$sf$/, 'timidity configuration';
+    $d->timidity_cfg($timidity_conf);
+    ok -e $timidity_conf, 'timidity configuration with filename';
 };
 
 done_testing();

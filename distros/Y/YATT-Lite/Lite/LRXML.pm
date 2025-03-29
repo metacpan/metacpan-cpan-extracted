@@ -706,7 +706,9 @@ sub build_entity { shift->Entity->new(@_) }
 sub declare_base {
   (my MY $self, my Template $tmpl, my ($ns, @args)) = @_;
 
-  $self->{cf_vfs}->declare_base($self, $tmpl, $ns, @args);
+  # Accept empty '<!yatt:base>' declaration as nop for parser testing aid.
+  $self->{cf_vfs}->declare_base($self, $tmpl, $ns, @args)
+    if @args;
 
   undef;
 }
@@ -715,9 +717,17 @@ sub declare_args {
   (my MY $self, my Template $tmpl, my ($ns, @args)) = @_;
   my $kind = 'args';
   my $declkind = join(":", $ns, $kind);
-  my Part $newpart = $self->cut_implicit_default_part($tmpl, $declkind)
+  my Widget $newpart = $self->cut_implicit_default_part($tmpl, $declkind)
     || $self->build($ns, $kind => $self->default_part_for($tmpl), ''
                     , startln => $self->{startln});
+
+  if (not grep {/\S/} @{$newpart->{toks}}) {
+    $newpart->configure(
+      # startpos => $self->{curpos},
+      startln => $self->{startln},
+    );
+    $newpart->{toks} = [];
+  }
 
   $self->cut_root_route_and_install_url_params($newpart, \@args);
 

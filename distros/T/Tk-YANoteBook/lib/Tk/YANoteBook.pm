@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -33,7 +33,9 @@ You can drag tabs with your mouse.
 
 It has an overload if tabs won't fit any more.
 
-You can specify a close button for a tab.
+You can specify a close button for a tab. Besides that every
+tab contains an indicator that is hidden by default. You can
+set it to alert the end user for pending actions on the tab.
 
 =head1 CONFIG VARIABLES
 
@@ -65,7 +67,17 @@ Default value is the I<close_icon.xpm> in this distribution.
 Calback, called when you press the close button on a tab. By default it calls B<deletePage>.
 If you replace it, you should call B<deletePage> in your callback for the page to actually be removed.
 
-=item Switch: B<-image>
+=item Switch: B<-indicatorimage>
+
+Image for the indicator. Not defined by default.
+
+=item Switch: B<-indicatortext>
+
+Text for the indicator. Not defined by default.
+
+=item Switch: B<-closetabcall>
+
+=item Switch: B<-moreimage>
 
 Image to be used for the more button.
 Default value none.
@@ -214,6 +226,8 @@ sub Populate {
 		-closeimage => ['PASSIVE', undef, undef, $self->Pixmap(-file => Tk->findINC('close_icon.xpm'))],
 		-closetabcall => ['CALLBACK', undef, undef, ['deletePage', $self]],
 		-image => [$morebutton],
+		-indicatorimage => ['PASSIVE'],
+		-indicatortext	=> ['PASSIVE'],
 		-onlyselect => ['PASSIVE', undef, undef, 1], 
 		-rigid => ['PASSIVE', undef, undef, 1], 
 		-selectoptions => ['PASSIVE', undef, undef, [
@@ -283,6 +297,8 @@ sub addPage {
 		-background => $self->cget('-backpagecolor'),
 		-clickcall => ['ClickCall', $self],
 		-closecall => $self->cget('-closetabcall'),
+		-indicatorimage => $self->cget('-indicatorimage'),
+		-indicatortext => $self->cget('-indicatortext'),
 		-motioncall => ['MotionCall', $self],
 		-releasecall => ['ReleaseCall', $self],
 		-tpadx => $self->cget('-tabpadx'),
@@ -398,7 +414,7 @@ to be closed.
 sub deletePage {
 	my ($self, $name) = @_;
 	unless ($self->pageExists($name)) {
-		warn "Page '$name' does not exist\n";
+		croak "Page '$name' does not exist\n";
 		return 0
 	}
 	my $newselect;
@@ -455,6 +471,25 @@ sub getTab {
 	my ($self, $name) = @_;
 	return $self->{PAGES}->{$name}->[0] if defined $name;
 	return undef;
+}
+
+=item B<indicator>I<($name, ?$flag?)>
+
+Sets and clears the indicator in the tab of I<$name>.
+Returns it's status. The indicator can be used to
+alert the end user to some pending action in this
+tab.
+
+=cut
+
+sub indicator {
+	my ($self, $name, $flag) = @_;
+	my $tab = $self->getTab($name);
+	if (defined $flag) {
+		$tab->Indicator($flag);
+		$self->UpdateTabs;
+	}
+	return $tab->Indicator
 }
 
 =item B<isDisplayed>I<($name)>
@@ -751,7 +786,7 @@ sub selectPage {
 		$self->CoverUp;
 		$self->Callback('-selecttabcall', $name);
 	} else {
-		warn "Page $name does not exist"
+		croak "Page $name does not exist"
 	}
 }
 

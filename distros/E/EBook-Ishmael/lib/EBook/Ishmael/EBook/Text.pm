@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -49,21 +49,22 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = '';
-
-	open my $wh, '>', $out // \$html
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
 	open my $rh, '<', $self->{Source}
 		or die "Failed to open $self->{Source} for reading: $!\n";
-
-	local $/ = undef;
-	print { $wh } text2html(readline $rh);
-
+	binmode $rh, ':encoding(UTF-8)';
+	my $html = text2html(do { local $/ = undef; readline $rh });
 	close $rh;
-	close $wh;
 
-	return $out // $html;
+	if (defined $out) {
+		open my $wh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $wh, ':utf8';
+		print { $wh } $html;
+		close $wh;
+		return $out;
+	} else {
+		return $html;
+	}
 
 }
 
@@ -72,22 +73,22 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = '';
-
-	open my $wh, '>', $out // \$raw
-		or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-
 	open my $rh, '<', $self->{Source}
 		or die "Failed to open $self->{Source} for reading: $!\n";
-
-	local $/ = undef;
-
-	print { $wh } readline $rh;
-
+	binmode $rh, ':encoding(UTF-8)';
+	my $raw = do { local $/ = undef; readline $rh };
 	close $rh;
-	close $wh;
 
-	return $out // $raw;
+	if (defined $out) {
+		open my $wh, '>', $out
+			or die "Failed to open $out for writing: $!\n";
+		binmode $wh, ':utf8';
+		print { $wh } $raw;
+		close $wh;
+		return $out;
+	} else {
+		return $raw;
+	}
 
 }
 

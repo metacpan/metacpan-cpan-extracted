@@ -1,0 +1,10 @@
+0.08  2025-03-29
+    - Added 'has' operator: select(.meta has "key")
+    - Added 'first' and 'last' operators for arrays
+    - Added 'reverse' operator to reverse array order
+    - JQ-compatible enhancements for improved filtering and data navigation
+
+0.07  2025-03-29
+    - Removed use of eval in _evaluate_condition for better performance and stability.
+    - Refactored _traverse for readability and maintainability.
+    - Added support for multi-level array traversal (e.g., .users[].friends[].name).

@@ -1,5 +1,10 @@
 Tk::CodeText module changes log
 
+0.67 28 Mar 2025
+	- Fixed missing call to bookmarkCheck.
+	- Moved keybinding for upper/lower case to CTRL+I and CTRL+SHIFT+I.
+	- You can drag scroll the text using the middle mouse button.
+
 0.66 13 Mar 2025
 	- Tag sel is also the last to be raised instead of first in method spacesLine.
 	- Tag sel is raised when a Find tag is added.

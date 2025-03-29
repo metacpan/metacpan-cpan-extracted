@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -14,30 +14,40 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MIDI-Drummer-Tiny",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "MIDI::Drummer::Tiny",
   "PREREQ_PM" => {
     "Algorithm::Combinatorics" => 0,
+    "Carp" => 0,
     "Data::Dumper::Compact" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.26",
     "MIDI::Util" => "0.1304",
     "Math::Bezier" => 0,
     "Moo" => 2,
     "Music::Duration" => "0.0900",
     "Music::RhythmSet::Util" => 0,
+    "Type::Library" => 0,
+    "Type::Utils" => 0,
+    "Types::Path::Tiny" => 0,
+    "Types::Standard" => 0,
     "constant" => 0,
+    "experimental" => 0,
     "namespace::clean" => 0,
-    "strictures" => 2
-  },
-  "TEST_REQUIRES" => {
-    "File::Spec" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
-    "Test::More" => 0,
     "strict" => 0,
+    "strictures" => 2,
     "warnings" => 0
   },
-  "VERSION" => "0.5013",
+  "TEST_REQUIRES" => {
+    "English" => 0,
+    "File::Spec" => 0,
+    "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test2::V0" => 0,
+    "Test::More" => 0,
+    "Test::Output" => "0.04"
+  },
+  "VERSION" => "0.6004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,18 +56,28 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::Combinatorics" => 0,
+  "Carp" => 0,
   "Data::Dumper::Compact" => 0,
+  "English" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.26",
   "MIDI::Util" => "0.1304",
   "Math::Bezier" => 0,
   "Moo" => 2,
   "Music::Duration" => "0.0900",
   "Music::RhythmSet::Util" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
+  "Test::Output" => "0.04",
+  "Type::Library" => 0,
+  "Type::Utils" => 0,
+  "Types::Path::Tiny" => 0,
+  "Types::Standard" => 0,
   "constant" => 0,
+  "experimental" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

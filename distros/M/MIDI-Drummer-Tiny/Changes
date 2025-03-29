@@ -1,5 +1,23 @@
 Revision history for MIDI-Drummer
 
+0.6004 2025-03-28 11:27:39
+    - Move Types::MIDI under the main module.
+
+0.6003 2025-03-28 09:40:27
+    - Tweeze documentation.
+    - Add MIDI types.
+
+0.6002 2025-03-25 17:05:23
+    - Improve documentation.
+    - Require Perl v5.24.
+    - Move experimental import after Moo.
+
+0.6001 2025-03-25 10:17:01
+    - Tweak allowed syntax.
+
+0.6000 2025-03-23 14:24:23
+    - MJGardner refactored many many things. This is a modern module now. Woo! :D
+
 0.5013 2025-02-13 20:04:06
     - Add the setup attribute.
 

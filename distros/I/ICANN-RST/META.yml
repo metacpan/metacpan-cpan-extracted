@@ -3,6 +3,7 @@ abstract: 'a module for interacting with the Registry System Testing (RST) test 
 author:
   - 'Gavin Brown <gavin.brown@icann.org>'
 build_requires:
+  LWP::Online: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -36,7 +37,7 @@ requires:
   feature: '0'
   strict: '0'
   utf8: '0'
-version: '0.01'
+version: '0.03'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

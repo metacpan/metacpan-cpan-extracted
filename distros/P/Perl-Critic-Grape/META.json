@@ -1,9 +1,13 @@
 {
-	"version" : "0.0.1",
+	"version" : "0.0.2",
 	"name"    : "Perl::Critic::Grape",
 	"author"  : "Brian Blackmore",
 	"abstract": "Additional Perl::Critic policies",
 	"license" : "perl",
+	"meta-spec" : {
+		"url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+		"version" : "2"
+	},
 	"prereqs" : {
 		"runtime": {
 			"requires": {

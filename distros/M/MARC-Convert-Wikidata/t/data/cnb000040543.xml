@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01500nam a2200421   4500</leader>
+  <controlfield tag="001">ck8805698</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20230322165418.0</controlfield>
+  <controlfield tag="007">tu</controlfield>
+  <controlfield tag="008">881122s1988    xr a   g e   u000 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000040543</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Váz.) :</subfield>
+    <subfield code="c">Kčs 22,00</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85624531</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">ita</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">51</subfield>
+    <subfield code="x">Matematika</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">13</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">51</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(031)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Rossi Dell'Acqua, Alba</subfield>
+    <subfield code="7">xx0102664</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Encyklopedie matematiky /</subfield>
+    <subfield code="c">Alba Rossiová Dell'Acqua ; [z ital. přel., upravili a předml. naps. Bohdan Zelinka, Antonín Vrba ; obálka a graf. úprava Richard Maršák]</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Mladá fronta,</subfield>
+    <subfield code="c">1988</subfield>
+    <subfield code="f">(Mír 3)</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">280 s. :</subfield>
+    <subfield code="b">il., tb., schémata ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Malé encyklopedie ;</subfield>
+    <subfield code="v">sv. 20</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">20000 výt.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Symboly</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Frontispis</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přeloženo z italštiny</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Část nákladu vyšla brož.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">matematika</subfield>
+    <subfield code="7">ph117231</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">encyklopedie</subfield>
+    <subfield code="7">fd132201</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Zelinka, Bohdan,</subfield>
+    <subfield code="d">1940-2005</subfield>
+    <subfield code="7">jk01152417</subfield>
+    <subfield code="4">com</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Vrba, Antonín</subfield>
+    <subfield code="7">jk01150955</subfield>
+    <subfield code="4">com</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="765" ind1="0" ind2=" ">
+    <subfield code="t">Enciclopedia della matematica</subfield>
+    <subfield code="9">Česky</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Malé encyklopedie (Mladá fronta)</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:7a0f3b50-b8ca-11e3-b833-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000040543</subfield>
+  </datafield>
+</record>
+
+</collection>

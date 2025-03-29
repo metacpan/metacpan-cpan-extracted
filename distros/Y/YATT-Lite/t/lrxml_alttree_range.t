@@ -482,4 +482,38 @@ END_DUMP
 
 }
 
+{
+  my $parser = $CLASS->new(all => 1);
+  my $tmpl = $CLASS->Template->new;
+  $parser->load_string_into($tmpl, my $cp = <<END);
+<!yatt:base>
+
+<!yatt:args x y>
+<yatt:foo bar="&yatt:x; and &yatt:y;"/>
+
+<!yatt:widget foo bar>
+<h2>&yatt:bar;</h2>
+END
+
+  ;
+  my $name = '';
+  my $w = $tmpl->{Item}{$name};
+
+  my $alttree = alt_tree_for($tmpl->{cf_string}, $w->{tree});
+  # print YATT::Lite::Util::terse_dump($alttree), "\n";
+  my ($elem_foo, undef) = @$alttree;
+  my ($att_bar) = @{$elem_foo->{subtree}};
+  my ($x, undef, $y) = @{$att_bar->{subtree}};
+
+  is_deeply $x->{tree_range}
+    , +{start => {line => 3, character => 15}
+        , end => {line => 3, character => 23}}
+    , "entities in argument text - x";
+
+  is_deeply $y->{tree_range}
+    , +{start => {line => 3, character => 28}
+        , end => {line => 3, character => 36}}
+    , "entities in argument text - y";
+}
+
 done_testing();

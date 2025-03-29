@@ -26,10 +26,10 @@ requires:
   Test::Tk: '3.03'
   Tk: '804.030'
   Tk::ColorEntry: '0.11'
-  Tk::PopList: '0.09'
+  Tk::PopList: '0.14'
   Tk::YADialog: '0.05'
 resources:
   bugtracker: https://github.com/haje61/Tk-CodeText/issues
   repository: git://github.com/haje61/Tk-CodeText.git
-version: '0.66'
+version: '0.67'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

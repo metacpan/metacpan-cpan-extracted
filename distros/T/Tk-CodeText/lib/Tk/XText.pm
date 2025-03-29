@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.66';
+$VERSION = '0.67';
 use strict;
 use warnings;
 use Carp;
@@ -185,8 +185,8 @@ the following events and key bindings:
  <<UnComment>>  CONTROL+SHIFT+G
  <<Undo>>       CONTROL+Z
  <<Redo>>       CONTROL+SHIFT+Z
- <<UpperCase>>  CONTROL+U
- <<LowerCase>>  ALT+U
+ <<UpperCase>>  CONTROL+I
+ <<LowerCase>>  CONTROL+SHIFT+I
 
 Further more, CONTROL+A selects all text.
 
@@ -281,11 +281,14 @@ sub Populate {
 	$self->eventAdd('<<UnComment>>', '<Control-G>');
 	$self->eventAdd('<<Undo>>', '<Control-z>');
 	$self->eventAdd('<<Redo>>', '<Control-Z>');
-	$self->eventAdd('<<UpperCase>>', '<Control-u>');
-	$self->eventAdd('<<LowerCase>>', '<Alt-u>');
+	$self->eventAdd('<<UpperCase>>', '<Control-i>');
+	$self->eventAdd('<<LowerCase>>', '<Control-I>');
 	$self->bind('<KeyRelease>', [$self, 'KeyReleased', Ev('A')]);
 	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
+	$self->bind('<Button-2>', [ $self, 'Button2', Ev('x'), Ev('y') ]);
+	$self->bind('<B2-Motion>', [ $self, 'Button2Motion', Ev('x'), Ev('y') ]);
+	$self->bind('<ButtonRelease-2>', [ $self, 'Button2Release', Ev('x'), Ev('y') ]);
 	$self->markSet('match', '0.0');
 	$self->after(10, ['DoPostConfig', $self]);
 }
@@ -766,6 +769,33 @@ sub BufferStart {
 	my $self = shift;
 	$self->{BUFFERSTART} = shift if @_;
 	return $self->{BUFFERSTART}
+}
+
+sub Button2 {
+	my ($self, $x, $y) = @_;
+	my $cursor = $self->cget('-cursor');
+	$self->configure(-cursor => 'fleur');
+	$self->{'mouse_pos'} = [$x, $y, $cursor];
+}
+
+sub Button2Motion {
+	my ($self, $x, $y) = @_;
+
+	my $mousepos = $self->{'mouse_pos'};
+	my ($mx, $my, $cursor) = @$mousepos;
+	$self->{'mouse_pos'} = [$x, $y, $cursor];
+
+	my $dx = $mx - $x;
+	my $dy = $my - $y;
+
+	$self->yviewScroll(-$dy, 'units');
+}
+
+sub Button2Release {
+	my $self = shift;
+	my $mousepos = $self->{'mouse_pos'};
+	$self->configure(-cursor => $mousepos->[2]);
+	delete $self->{'mouse_pos'};
 }
 
 =item B<canUndo>

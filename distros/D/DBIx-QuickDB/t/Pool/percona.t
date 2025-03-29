@@ -2,6 +2,10 @@ use Test2::V0;
 use Test2::Tools::QuickDB;
 use File::Spec;
 
+BEGIN {
+    $ENV{PATH}="$ENV{HOME}/dbs/percona8/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/percona8/bin";
+}
+
 my @ENV_VARS;
 
 # Contaminate the ENV vars to make sure things work even when these are all

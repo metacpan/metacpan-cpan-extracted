@@ -21,7 +21,7 @@ use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed >;
 use Math::BigInt  qw< >;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.005002';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -5014,9 +5014,11 @@ sub bblsft {
 
     my ($class, $x, $y, @r) = ref($_[0]) ? (ref($_[0]), @_) : @_;
 
-    # The check for read-only objects is done in Math::BigInt.
+    # Don't modify constant (read-only) objects.
 
-    #return $x if $x -> modify('bblsft');
+    return $x if $x -> modify('bblsft');
+
+    # Let Math::BigInt do the job.
 
     my $xint = Math::BigInt -> bblsft($x, $y, @r);
 
@@ -5060,9 +5062,11 @@ sub bbrsft {
 
     my ($class, $x, $y, @r) = ref($_[0]) ? (ref($_[0]), @_) : @_;
 
-    # The check for read-only objects is done in Math::BigInt.
+    # Don't modify constant (read-only) objects.
 
-    #return $x if $x -> modify('bbrsft');
+    return $x if $x -> modify('bbrsft');
+
+    # Let Math::BigInt do the job.
 
     my $xint = Math::BigInt -> bbrsft($x, $y, @r);
 
