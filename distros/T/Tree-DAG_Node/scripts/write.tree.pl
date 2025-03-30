@@ -6,7 +6,7 @@ use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 use open     qw(:std :utf8); # Undeclared streams in UTF-8.
 use utf8;
 
-use File::Slurp::Tiny 'write_file';
+use File::Slurper 'write_text';
 
 use File::Spec;
 
@@ -63,4 +63,4 @@ add_child($daughter_4, '»');
 
 my($output_file_name) = File::Spec -> catfile('t', "tree.utf8.attributes.txt");
 
-write_file($output_file_name, join("\n", @{$root -> tree2string}) . "\n", binmode => ':encoding(utf-8)');
+write_text($output_file_name, join("\n", @{$root -> tree2string}) . "\n");

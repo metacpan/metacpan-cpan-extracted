@@ -13,13 +13,7 @@ BEGIN { use_ok('LaunchDarkly::Server') };
 
 
 my $fail = 0;
-foreach my $constname (qw(
-	LD_CLIENT_NOT_READY LD_CLIENT_NOT_SPECIFIED LD_ERROR LD_FALLTHROUGH
-	LD_FLAG_NOT_FOUND LD_LOG_CRITICAL LD_LOG_DEBUG LD_LOG_ERROR
-	LD_LOG_FATAL LD_LOG_INFO LD_LOG_TRACE LD_LOG_WARNING LD_MALFORMED_FLAG
-	LD_NULL_KEY LD_OFF LD_OOM LD_PREREQUISITE_FAILED LD_RULE_MATCH
-	LD_STORE_ERROR LD_TARGET_MATCH LD_UNKNOWN LD_USER_NOT_SPECIFIED
-	LD_WRONG_TYPE)) {
+foreach my $constname (qw()) {
   next if (eval "my \$a = $constname; 1");
   if ($@ =~ /^Your vendor has not defined LaunchDarkly::Server macro $constname/) {
     print "# pass: $@";

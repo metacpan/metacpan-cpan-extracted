@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::BlueskyLite;
-$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::BlueskyLite::VERSION = '0.49';
 # ABSTRACT: Simple Class to post status to BlueSky.
 
 use LWP::UserAgent;
@@ -263,7 +263,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - Simple Class to post status to BlueS
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 Methods
 

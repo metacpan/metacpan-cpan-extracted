@@ -7,13 +7,17 @@ maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 t/basic.t
+t/corpus/CoveredByParent.pm
+t/corpus/CoveredByRole.pm
+t/corpus/CoveredFile.pm
 t/corpus/moo/BasicMoo.pm
 t/corpus/moo/BasicMooRole.pm
 t/corpus/moo/BasicMooWithRole.pm
-t/corpus/OtherFile.pm
-t/corpus/SomeFile.pm
-t/corpus/SomeRole.pm
-t/corpus/UsingRole.pm
+t/corpus/NoPod.pm
+t/corpus/NoSymbols.pm
+t/corpus/Privates.pm
+t/corpus/RoleWithCoverage.pm
+t/corpus/WithUTF8.pm
 t/moo.t
 t/Pod-Coverage-TrustPod/basic.t
 t/Pod-Coverage-TrustPod/lib/BaseWithNoPod.pm
@@ -52,6 +56,28 @@ t/Pod-Coverage/lib/Simple9.pm
 t/Pod-Coverage/lib/Tie.pm
 t/Pod-Coverage/lib/Trustme.pm
 t/Pod-Coverage/lib/XS4ALL.pm
+t/Test-Pod-Coverage-PC-via-TPCTM/all_pod_coverage_ok.t
+t/Test-Pod-Coverage-PC-via-TPCTM/alt_class.t
+t/Test-Pod-Coverage-PC-via-TPCTM/nopod.t
+t/Test-Pod-Coverage-PC-via-TPCTM/nosymbols.t
+t/Test-Pod-Coverage-PC-via-TPCTM/parms.t
+t/Test-Pod-Coverage-PC-via-TPCTM/privates.t
+t/Test-Pod-Coverage-PC-via-TPCTM/self.t
+t/Test-Pod-Coverage-PC-via-TPCTM/simple.t
+t/Test-Pod-Coverage-PCTM-via-TPC/all_pod_coverage_ok.t
+t/Test-Pod-Coverage-PCTM-via-TPC/alt_class.t
+t/Test-Pod-Coverage-PCTM-via-TPC/nopod.t
+t/Test-Pod-Coverage-PCTM-via-TPC/nosymbols.t
+t/Test-Pod-Coverage-PCTM-via-TPC/parms.t
+t/Test-Pod-Coverage-PCTM-via-TPC/privates.t
+t/Test-Pod-Coverage-PCTM-via-TPC/self.t
+t/Test-Pod-Coverage-PCTM-via-TPC/simple.t
+t/Test-Pod-Coverage/nopod.t
+t/Test-Pod-Coverage/nosymbols.t
+t/Test-Pod-Coverage/parms.t
+t/Test-Pod-Coverage/privates.t
+t/Test-Pod-Coverage/simple.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)

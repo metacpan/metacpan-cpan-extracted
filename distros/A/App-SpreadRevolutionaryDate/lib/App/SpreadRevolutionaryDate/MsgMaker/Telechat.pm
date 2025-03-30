@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Telechat;
-$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::MsgMaker::Telechat::VERSION = '0.49';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Téléchat date
 
 use Moose;
@@ -981,7 +981,7 @@ sub compute {
 
   my @telechat_days = ('Lourdi', 'Pardi', 'Morquidi', 'Jourdi', 'Dendrevi', 'Sordi', 'Mitanche');
 
-  my $today = DateTime->now(time_zone => 'Europe/Paris');
+  my $today = DateTime->now(locale => $self->locale);
   my $day_name = $telechat_days[$today->day_of_week_0];
 
   my @calendars = sort keys %telechat_calendars;
@@ -994,6 +994,14 @@ sub compute {
   $feast_singular =~ s/\b(\w)/\U$1/g;
   my $feast_plural = $feast->[1];
   my $every_gender = $feast->[2] eq 'm' ? 'tous' : 'toutes';
+
+  if ($self->special_birthday_day && $self->special_birthday_month && $self->special_birthday_name && $today->day == $self->special_birthday_day && $today->month == $self->special_birthday_month) {
+      $feast_gender = $self->special_birthday_gender eq 'm' ? 'Saint' : 'Sainte';
+      $feast_singular = $self->special_birthday_name;
+      $feast_plural = $self->special_birthday_plural;
+      $every_gender = $self->special_birthday_gender eq 'm' ? 'tous' : 'toutes';
+  }
+
   my $msg = sprintf("Chalut ! Aujourd'hui, %s %d, c'est la %s-%s.\nBonne fête à %s les %s !", $day_name, $today->day, $feast_gender, $feast_singular, $every_gender, $feast_plural);
 
   my $img_path = dist_file('App-SpreadRevolutionaryDate', 'images/groucha.png');
@@ -1027,7 +1035,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Telechat - MsgMaker class for L<App::Spr
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 
@@ -1037,9 +1045,9 @@ Computes date of the day similar to the Belgian-French TV show 'Téléchat" on t
 
 This message maker is greatly based on I<SaintObjetBot> a bot spreading, in "Téléchat style", the date and the feast of the day, see L<https://github.com/tobozo/SaintObjetBot>.
 
-There is no really offical Téléchat calendar (named calendar of hlly objetcs, calendrier des objet sains in French), the principle is use new inventions of objects instead of outdated objects.
+There is no really offical Téléchat calendar (named calendar of holly objects, calendrier des objet saints in French), the principle is to use new inventions of objects instead of outdated objects.
 
-We have found three sources for calendar names: what has actually been broadcasted on tv show, see L<https://www.tvtime.com/fr/show/257185>, and two versions computed by I<SaintObjetBot>, see L<https://github.com/tobozo/SaintObjetBot/blob/main/data/saint-objet-bot-2023-11-09.csv>. We pickup randomly among theses three calendars, and when there is nothing for the current day in the first calendar (because, nothing was broadcasted this day), only amon the two last ones.
+We have found three sources for calendar names: what has actually been broadcasted on tv show, see L<https://www.tvtime.com/fr/show/257185>, and two versions computed by I<SaintObjetBot>, see L<https://github.com/tobozo/SaintObjetBot/blob/main/data/saint-objet-bot-2023-11-09.csv>. We pickup randomly among theses three calendars, and when there is nothing for the current day in the first calendar (because, nothing was broadcasted this day), only among the two last ones.
 
 =head1 SEE ALSO
 

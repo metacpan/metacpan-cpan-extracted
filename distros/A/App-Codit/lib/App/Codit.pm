@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.18";
+$VERSION = '0.19';
 use Tk;
 use App::Codit::CodeTextManager;
 use Config;
@@ -38,8 +38,8 @@ for editing, the graphical user interface, syntax highlighting and (un)loading p
 
 L<Tk::CodeText> offers syntax highlighting and code folding in plenty formats and languages.
 It has and advanced word based undo/redo stack that keeps track of selections and save points.
-It does auto indent, bookmarks, comment, uncomment, indent and unindent. Tab size and indent style are
-fully user configurable.
+It does auto indent, auto brackets, auto complete, bookmarks, comment, uncomment, indent and unindent.
+Tab size and indent style are fully user configurable.
 
 An online manual can be found here:
 L<http://www.perlgui.org/wp-content/uploads/2025/01/manual-0.16.pdf>
@@ -215,6 +215,8 @@ Codit comes with these plugins:
 
 =item B<Git> see L<App::Codit::Plugins::Git>
 
+=item B<Icons> see L<App::Codit::Plugins::Icons>
+
 =item B<PerlSubs> see L<App::Codit::Plugins::PerlSubs>
 
 =item B<PodViewer> see L<App::Codit::Plugins::PodViewer>
@@ -224,6 +226,8 @@ Codit comes with these plugins:
 =item B<Sessions> see L<App::Codit::Plugins::Sessions>
 
 =item B<Snippets> see L<App::Codit::Plugins::Snippets>
+
+=item B<SpltView> see L<App::Codit::Plugins::SplitView>
 
 =back
 
@@ -263,25 +267,12 @@ B<App::Codit> inherits L<Tk::AppWindow> and all of its methods.
 sub Populate {
 	my ($self,$args) = @_;
 
-	$self->geometry('800x600+150+150');
-
 	my $rawdir = Tk::findINC('App/Codit/Icons');
-	my @fontfamily = ();
-	if ($mswin) {
-		@fontfamily = 	(-contentfontfamily => ['text', 'Family'])
-	} else {
-		@fontfamily = 	(-contentfontfamily => ['list', 'Family', -filter => 1,
-			-values => sub { return sort $self->fontFamilies }
-		])
-	}
 	my %opts = (
 #		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
 		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Selector Help Settings Plugins]],
 		-documentinterface => 'CoditMDI',
-#		-menuitems => [
-#			[	'menu_normal',		'Codit::Quit',	"~Report a problem", 'report_issue'	],
-#		],
 		-namespace => 'App::Codit',
 		-rawiconpath => [ $rawdir ],
 		-savegeometry => 1,
@@ -305,7 +296,6 @@ sub Populate {
 				-sticky => 'nsew',
 			},
 			WORK => {
-				-weight => 1,
 				-in => 'SUBCENTER',
 				-weight => 1,
 				-column => 0,
@@ -367,7 +357,10 @@ sub Populate {
 				'Tk::ColorEntry',
 				'Tk::DocumentTree',
 				'Tk::FileBrowser',
+				'Tk::ListBrowser',
+				'Tk::ListEntry',
 				'Tk::PodViewer',
+				'Tk::PopList',
 				'Tk::QuickForm',
 				'Tk::Terminal',
 				'Tk::YADialog',
@@ -375,7 +368,7 @@ sub Populate {
 			],
 			http => 'https://www.perlgui.org/appcodit/',
 		},
-		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2025/01/manual-0.16.pdf',
+		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2025/03/manual-0.19.pdf',
 
 		#configure content manager
 		-contentmanagerclass => 'CodeTextManager',
@@ -383,6 +376,7 @@ sub Populate {
 			'-contentacpopsize',
 			'-contentacscansize',
 			'-contentactivedelay',
+			'-contentautobrackets',
 			'-contentautocomplete',
 			'-contentautoindent',
 			'-contentbackground',
@@ -412,22 +406,29 @@ sub Populate {
 		-useroptions => [
 			'*page' => 'Editing',
 			'*section' => 'Font',
-			@fontfamily,
+			-contentfontfamily => ['list', 'Family', -filter => 1,	-values => sub { return sort $self->fontFams }
+		],
 			'*column',
 			-contentfontsize => ['spin', 'Size'],
 			'*end',
 			'*section' => 'Editor settings',
 			'*frame',
 			-contentautoindent => ['boolean', 'Auto indent'],
-			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],
+			'*column',
+			-contentautobrackets => ['boolean', 'Auto brackets'],
 			'*column',
 			-contentshowspaces => ['boolean', 'Show spaces'],
+			'*end',
+			'*frame',
+			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],
+			'*column',
 			-contentindent => ['text', 'Indent style', -regex => qr/^\d+|tab$/, -width => 4],
 			'*end',
 			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
 			'*end',
 			'*section' => 'Show indicators',
 			-showfolds => ['boolean', 'Fold indicators'],
+			'*column',
 			-shownumbers => ['boolean', 'Line numbers'],
 			'*column',
 			-showstatus => ['boolean', 'Doc status'],
@@ -498,6 +499,7 @@ sub Populate {
 		],
 		-contentautoindent => 1,
 		-contentindent => 'tab',
+		-contentshowspaces => 0,
 		-contenttabs => '8m',
 		-contentwrap => 'none',
 		-showfolds => 1,
@@ -510,6 +512,8 @@ sub Populate {
 	}
 	$self->SUPER::Populate($args);
 	
+	$self->geometry('800x600+150+150');
+
 	$self->{UNIQUE} = 0;
 
 	$self->extGet('Panels')->panelHide('TOOL');
@@ -526,28 +530,6 @@ sub Populate {
 	);
 }
 
-=item B<abbreviate>I<($string, ?$size?, ?$firstsize?)>
-
-Shortens $string to $size by leaving out a middle part. Then returns it.
-$size is set to 30 unless you specify it. $firstsize is set to 25% of $size
-unless you set it.
-
-=cut
-
-sub abbreviate {
-	my ($self, $string, $size, $firstsize) = @_;
-	$size = 30 unless defined $size;
-	$firstsize = int($size / 4) unless defined $firstsize;
-	my $length = length($string);
-	if ($length > $size) {
-		my $first = substr($string, 0, $firstsize) . ' ... ';
-		my $lastsize = $size - $firstsize - 5;
-		my $last = substr($string, $length - $lastsize, $lastsize);
-		$string = $first . $last;
-	}
-	return $string;
-}
-
 sub CanQuit {
 	my $self = shift;
 	my $file = $self->lockfile;
@@ -559,7 +541,6 @@ sub DoPostConfig {
 	my $self = shift;
 	$self->SetThemeFile;
 	$self->cmdExecute('doc_new');
-#	$self->mdi->createContextMenu;
 }
 
 sub GetThemeFile {
@@ -599,8 +580,8 @@ sub lockScan {
 	my $self = shift;
 	return unless $self->lockModified;
 	$self->deiconify unless $self->ismapped;
-	$self->raise;
 	$self->focus;
+	$self->raise;
 	if (my $file = $self->lockfile) {
 		if (open(LIN, '<', $file)) {
 			while (<LIN>) {
@@ -624,11 +605,12 @@ sub mdi {
 	return $_[0]->extGet('CoditMDI');
 }
 
-#sub MenuItems {
-#	return (
-#		[ 'menu_normal',		  'appname::h1',	   '~Report a problem',  'report_issue'	],
-#	)
-#}
+sub MenuItems {
+	my $self = shift;
+	return ($self->SUPER::MenuItems,
+		[ 'menu_normal',		  'appname::h1',	   '~Report a problem',  'report_issue'	],
+	)
+}
 
 =item B<panels>
 
@@ -833,7 +815,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-If you find any bugs, please contact the author.
+If you find any bugs, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 
@@ -860,21 +842,3 @@ If you find any bugs, please contact the author.
 =cut
 
 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

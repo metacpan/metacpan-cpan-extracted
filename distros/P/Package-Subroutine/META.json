@@ -1,34 +1,35 @@
 {
    "abstract" : "minimalistic import/export and other util package functions",
    "author" : [
-      "Sebastian Knapp <rock@ccls-online.de>"
+      "Sebastian Knapp <sknpp@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Package-Subroutine",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::Manifest" : 0,
-            "IO::File" : 0,
-            "Test::More" : 0
+            "ExtUtils::Manifest" : "0",
+            "IO::File" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
-            "Class::ISA" : 0,
+            "Class::ISA" : "0",
             "Perl6::Junction" : "1.30000",
             "perl" : "v5.6.0"
          }
@@ -37,7 +38,7 @@
    "provides" : {
       "Package::Subroutine" : {
          "file" : "lib/Package/Subroutine.pm",
-         "version" : "v0.22.1"
+         "version" : "v0.22.4"
       }
    },
    "release_status" : "stable",
@@ -46,5 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.22.1"
+   "version" : "v0.22.4",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

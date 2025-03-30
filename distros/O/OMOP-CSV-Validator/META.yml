@@ -1,0 +1,35 @@
+---
+abstract: 'Validates OMOP CDM CSV files against their expected data types'
+author:
+  - 'Manuel Rueda <mrueda@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.30'
+configure_requires:
+  ExtUtils::MakeMaker: '7.70'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OMOP-CSV-Validator
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  JSON::Validator: '5.14'
+  JSON::XS: '4.03'
+  Path::Tiny: '0.144'
+  Text::CSV_XS: '1.50'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/mrueda/omop-csv-validator/issues
+  homepage: https://github.com/mrueda/omop-csv-validator
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/mrueda/omop-csv-validator.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

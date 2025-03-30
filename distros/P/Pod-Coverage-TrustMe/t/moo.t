@@ -4,7 +4,7 @@ use Test::Needs 'Moo';
 use Test::More;
 use Pod::Coverage::TrustMe;
 
-unshift @INC, 't/corpus/moo';
+use lib 't/corpus/moo';
 
 for my $file (glob('t/corpus/moo/*.pm')) {
   $file =~ s{\At/corpus/moo/}{};
@@ -18,7 +18,7 @@ for my $file (glob('t/corpus/moo/*.pm')) {
     ignore_imported => 0,
   );
 
-  is $cover->coverage, 1, "$file is covered"
+  is $cover->coverage, 1, "$package is covered"
     or diag $cover->report;
 }
 

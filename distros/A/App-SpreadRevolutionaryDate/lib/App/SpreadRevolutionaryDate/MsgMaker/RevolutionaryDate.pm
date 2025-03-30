@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.49';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with revolutionary date
 
 use Moose;
@@ -59,13 +59,20 @@ sub compute {
       App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar->now->set(hour => 1, minute => 31, second => 20, locale => $self->locale)
     : App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar->now->set(locale => $self->locale);
 
+  my $feast_long = $revolutionary->feast_long;
+  my $today = DateTime->today;
+  $today = DateTime->new(locale => $self->locale, day => 21, month => 6, year => $today->year);
+  if ($self->special_birthday_day && $self->special_birthday_month && $self->special_birthday_name && $today->day == $self->special_birthday_day && $today->month == $self->special_birthday_month) {
+      $feast_long = $revolutionary->locale->prefixes->[$self->special_birthday_prefix] . $self->special_birthday_name . $revolutionary->locale->suffix;
+  }
+
   my $msg = __x("We are {day_name}, {day} {month} of Revolution year {roman_year} ({year}), {feast_long}, it is {time}!",
       day_name   => $revolutionary->day_name,
       day        => $revolutionary->day,
       month      => $revolutionary->month_name,
       roman_year => $revolutionary->strftime("%EY"),
       year       => $revolutionary->year,
-      feast_long => $revolutionary->feast_long,
+      feast_long => $feast_long,
       time       => $revolutionary->hms,
   );
 
@@ -101,7 +108,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate - MsgMaker class for L
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 

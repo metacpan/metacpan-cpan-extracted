@@ -9,7 +9,7 @@ App::Codit::Plugins::Bookmarks - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = '0.19';
 
 use Data::Compare;
 require Tk::ITree;
@@ -50,7 +50,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
-	my $page = $self->ToolLeftPageAdd('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks');
+	my $page = $self->ToolLeftPageAdd('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks', 250);
 
 	$self->cmdConfig(
 		bm_plug_next => ['bmNext', $self],
@@ -359,7 +359,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-If you find any bugs, please contact the author.
+If you find any bugs, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 

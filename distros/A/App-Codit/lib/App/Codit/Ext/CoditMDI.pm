@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.17";
+$VERSION = '0.19';
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -44,6 +44,14 @@ This is a specially crafted multiple document interface for l<App::Codit>.
 
 =over 4
 
+=item B<-doc_autobrackets> I<hookable>
+
+Sets and returns the autobrackets option of the currently selected document.
+
+=item B<-doc_autocomplete> I<hookable>
+
+Sets and returns the autocomplete option of the currently selected document.
+
 =item B<-doc_autoindent> I<hookable>
 
 Sets and returns the autoindent option of the currently selected document.
@@ -76,15 +84,32 @@ Sets and returns the wrap option of the currently selected document.
 
 =item B<bookmark_add>
 
+Adds the current line to the bookmarks list.
+
 =item B<bookmark_clear>
+
+Clears all bookmarks in the current document.
 
 =item B<bookmark_fill>
 
+Called when the bookmark menu is popped. It fills it with
+the bookmarks in the current document.
+
 =item B<bookmark_next>
+
+Jump to the next bookmark in the current document.
 
 =item B<bookmark_prev>
 
+Jump to the previous bookmark in the current document.
+
 =item B<bookmark_remove>
+
+Removes the bookmark on the current line, if any.
+
+=item B<doc_autobracket>
+
+Sets and returns the autobracket option of the currently selected document.
 
 =item B<doc_autoindent>
 
@@ -187,6 +212,8 @@ sub new {
 
 	$self->configInit(
 		-doc_autoindent => ['docAutoIndent', $self],
+		-doc_autobrackets => ['docAutoBrackets', $self],
+		-doc_autocomplete=> ['docAutoComplete', $self],
 		-doc_show_spaces => ['docShowSpaces', $self],
 		-doc_view_folds => ['docViewFolds', $self],
 		-doc_view_numbers => ['docViewNumbers', $self],
@@ -355,10 +382,23 @@ sub ContextMenu {
 }
 
 sub CreateContentHandler {
-	my ($self, $name) = @_;
-	my $h = $self->SUPER::CreateContentHandler($name);
+	my ($self, $name, $parent) = @_;
+	my $h = $self->SUPER::CreateContentHandler($name, $parent);
 	$h->Name($name);
 	return $h;
+}
+
+sub CreateInterface {
+	my $self = shift;
+	my $w = $self->WorkSpace;
+	$w->gridColumnconfigure(0, -weight => 1);
+	$w->gridRowconfigure(0, -weight => 1);
+	$self->{INTERFACE} = $w->YANoteBook(
+		-image => $self->getArt('document-multiple', 16),
+		-indicatorimage => $self->getArt('document-save', 16),
+		-selecttabcall => ['cmdExecute', $self, 'doc_select'],
+		-closetabcall => ['cmdExecute', $self, 'doc_close'],
+	)->grid(-row => 0, -column => 0, -sticky => 'nsew');
 }
 
 sub deferredOpen {
@@ -391,6 +431,16 @@ sub disposeUntitled {
 sub docAutoIndent {
 	my $self = shift;
 	return $self->docOption('-contentautoindent', @_);
+}
+
+sub docAutoBrackets {
+	my $self = shift;
+	return $self->docOption('-contentautobrackets', @_);
+}
+
+sub docAutoComplete {
+	my $self = shift;
+	return $self->docOption('-contentautocomplete', @_);
 }
 
 sub docCase {
@@ -491,7 +541,7 @@ sub docSelect {
 
 sub docShowSpaces {
 	my $self = shift;
-	return $self->docOption('-showspaces', @_);
+	return $self->docOption('-contentshowspaces', @_);
 }
 
 sub docSelectFirst {
@@ -713,8 +763,8 @@ sub MenuItems {
 		[ 'menu_normal',    'Edit::',          '~Indent',            '<Control-j>',       'format-indent-more','*CTRL+J'],
 		[ 'menu_normal',    'Edit::',          'Unin~dent',          '<Control-J>',       'format-indent-less','*CTRL+SHIFT+J'],
 		[ 'menu_separator', 'Edit::',          'e4' ],
-		[ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','*CTRL+U'],
-		[ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','*ALT+U'],
+		[ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','*CTRL+I'],
+		[ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','*CTL+SHIFT+I'],
 		[ 'menu_separator', 'Edit::',          'e5' ],
 		[ 'menu_normal',    'Edit::',          '~Select all',        '<Control-a>',       'edit-select-all','*CTRL+A'],
 
@@ -732,18 +782,19 @@ sub MenuItems {
 		[ 'menu_check',     'View::',          'Show ~line numbers',   undef,   '-doc_view_numbers', undef, 0, 1],
 		[ 'menu_check',     'View::',          'Show ~document status',undef,   '-doc_view_status', undef, 0, 1],
 		[ 'menu_separator', 'View::',          'v2' ],
-		[ 'menu_check',     'View::',          'Show ~spaces and tabs','show-spaces', '-doc_show_spaces', undef, 0, 1],
+		[ 'menu_check',     'View::',          'Show ~spaces and tabs','show-spaces',   '-doc_show_spaces', undef, 0, 1],
 
 		[ 'menu',           undef,             '~Tools'],
 		[ 'menu_normal',    'Tools::',         '~Find',              'doc_find',          'edit-find',      '*CTRL+F',],
 		[ 'menu_normal',    'Tools::',         '~Replace',	          'doc_replace',       'edit-find-replace','*CTRL+R',],
 		[ 'menu_separator', 'Tools::',          't1' ],
 		[ 'menu_check',     'Tools::',          'A~uto indent',        undef,   '-doc_autoindent', undef, 0, 1],
+		[ 'menu_check',     'Tools::',          'A~uto brackets',        undef,   '-doc_autobrackets', undef, 0, 1],
+		[ 'menu_check',     'Tools::',          'A~uto complete',        undef,   '-doc_autocomplete', undef, 0, 1],
 		[ 'menu_radio_s',   'Tools::',          '~Wrap',  [qw/char word none/],  undef, '-doc_wrap'],
 		[ 'menu_separator', 'Tools::',          't1' ],
 		[ 'menu_normal',    'Tools::',          'R~emove trailing spaces',   'doc_remove_trailing',],
 		[ 'menu_normal',    'Tools::',          'F~ix indentation',   'doc_fix_indent',],
-		[ 'menu_normal',		  'appname::h1',	   '~Report a problem',  'report_issue'	],
 	);
 }
 
@@ -801,62 +852,6 @@ sub SettingsPage {
 	)
 }
 
-sub spaceMacroAdd {
-	my ($self, $doc) = @_;
-	return if defined $self->macroGet($doc, 'space');
-	my $macro = $self->macroInit($doc, 'space', ['spaceMacroCycle', $self]);
-	$macro->remain(1);
-	$macro->start;
-#	$self->macroStart($doc, 'space');
-}
-
-sub spaceMacroCycle {
-	my ($self, $widg, $line) = @_;
-	my $begin = $widg->index("$line.0");
-	my $end = $widg->index("$begin lineend");
-	my $text = $widg->get($begin, $end);
-	for ('dspace', 'dtab') {
-		$widg->tagRemove($_, $begin, $end)
-	}
-	if ($text =~ /^([\s|\t]+)/) {
-		my $spaces = $1;
-		my $count = 0;
-		while ($spaces ne '') {
-			my $char = substr $spaces, 0, 1, '';
-			my $next = $count + 1;
-			$widg->tagAdd('dspace', "$begin + $count c", "$begin + $next c") if $char eq ' ';
-			$widg->tagAdd('dtab', "$begin + $count c", "$begin + $next c") if $char eq "\t";
-			$count ++
-		}
-	}
-	if ($text =~ /(\s+)$/) {
-		my $spaces = $1;
-		my $l = length($spaces);
-		$end = $widg->index("$end - $l c");
-		my $count = 0;
-		while ($spaces ne '') {
-			my $char = substr $spaces, 0, 1, '';
-			my $next = $count + 1;
-			$widg->tagAdd('dspace', "$end + $count c", "$end + $next c") if $char eq ' ';
-			$widg->tagAdd('dtab', "$end + $count c", "$end + $next c") if $char eq "\t";
-			$count ++
-		}
-	}
-	$widg->tagRaise('dspace');
-	$widg->tagRaise('dtab');
-}
-
-sub spaceMacroRemove {
-	my ($self, $doc) = @_;
-	return unless defined $self->macroGet($doc, 'space');
-	$self->macroRemove($doc, 'space');
-	my $widg = $self->docGet($doc)->CWidg;
-	for ('dspace', 'dtab') {
-		$widg->tagRemove($_, '1.0', 'end')
-	}
-}
-
-
 sub ToolItems {
 	my $self = shift;
 	my @items = $self->SUPER::ToolItems;
@@ -884,7 +879,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS
 
-Unknown. If you find any, please contact the author.
+Unknown. If you find any, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,8 @@ no_index:
     - t
     - inc
 requires:
-  File::Slurp::Tiny: '0.003'
+  ExtUtils::MakeMaker: '7.7'
+  File::Slurper: '0.014'
   open: '0'
   strict: '0'
   utf8: '0'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/ronsavage/Tree-DAG_Node/issues
   license: http://opensource.org/licenses/Artistic-2.0
   repository: https://github.com/ronsavage/Tree-DAG_Node.git
-version: '1.32'
+version: '1.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -20,7 +20,7 @@ our @ISA = qw(Math::BigInt Exporter);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -1502,6 +1502,11 @@ sub bfloor {
     $x;                         # no-op
 }
 
+sub bint {
+    my ($class, $x) = ref($_[0]) ? (undef, $_[0]) : objectify(1, @_);
+    $x;                         # no-op
+}
+
 sub bfac {
     my ($self, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) :
       ($class, $class->new($_[0]), $_[1], $_[2], $_[3], $_[4]);
@@ -1516,6 +1521,21 @@ sub bdfac {
 
     $x = $upgrade->new($$x) if $x->isa($class);
     $upgrade->bdfac($x, @r);
+}
+
+sub btfac {
+    my ($self, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) :
+      ($class, $class->new($_[0]), $_[1], $_[2], $_[3], $_[4]);
+
+    $x = $upgrade->new($$x) if $x->isa($class);
+    $upgrade->btfac($x, @r);
+}
+
+sub bmfac {
+    my ($class, $x, $k, @r) = objectify(2, @_);
+
+    $x = $upgrade->new($$x) if $x->isa($class);
+    $upgrade->bmfac($x, $k, @r);
 }
 
 sub bpow {

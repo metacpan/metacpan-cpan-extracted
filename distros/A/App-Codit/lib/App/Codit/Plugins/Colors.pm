@@ -9,7 +9,7 @@ App::Codit::Plugins::Colors - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.18;
+$VERSION = '0.19';
 
 require Tk::ColorPicker;
 use Tie::Watch;
@@ -176,7 +176,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-If you find any bugs, please contact the author.
+If you find any bugs, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 

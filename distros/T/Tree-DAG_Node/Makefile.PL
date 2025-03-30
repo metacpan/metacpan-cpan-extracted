@@ -29,11 +29,12 @@ my(%params) =
 	PL_FILES	=> {},
 	PREREQ_PM	=>
 	{
-		'File::Slurp::Tiny'	=> 0.003,
-		'open'				=> 0,
-		'strict'			=> 0,
-		'utf8'				=> 0,
-		'warnings'			=> 0,
+		'ExtUtils::MakeMaker'	=> 7.70,
+		'File::Slurper'			=> 0.014,
+		'open'					=> 0,
+		'strict'				=> 0,
+		'utf8'					=> 0,
+		'warnings'				=> 0,
 	},
 	TEST_REQUIRES =>
 	{

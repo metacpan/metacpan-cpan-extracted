@@ -1,0 +1,18 @@
+CHANGES
+CONTRIBUTING.md
+lib/String/Fuzzy.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/001_load.t
+t/002_fuzzy.t
+t/900_pod.t
+t/910_coverage.t
+t/920_manifest.t
+t/930_signature.t
+t/999_kwalitee.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

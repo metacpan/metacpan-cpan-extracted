@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION = '0.19';
 
 use App::Codit;
 use Getopt::Long;

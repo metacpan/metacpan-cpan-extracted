@@ -1,9 +1,9 @@
-package SomeRole;
+package RoleWithCoverage;
 use strict;
 use warnings;
 
 sub DOES {
-  return 1 if $_[1] eq 'SomeRole';
+  return 1 if $_[1] eq __PACKAGE__;
   return 0;
 }
 

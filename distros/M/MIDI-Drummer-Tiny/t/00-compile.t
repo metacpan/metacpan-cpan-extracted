@@ -6,14 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MIDI/Drummer/Tiny.pm',
     'MIDI/Drummer/Tiny/SwingFills.pm',
     'MIDI/Drummer/Tiny/Syncopate.pm',
-    'MIDI/Drummer/Tiny/Types.pm',
-    'MIDI/Drummer/Tiny/Types/MIDI.pm'
+    'MIDI/Drummer/Tiny/Types.pm'
 );
 
 

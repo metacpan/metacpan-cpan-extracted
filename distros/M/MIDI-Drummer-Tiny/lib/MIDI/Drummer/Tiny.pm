@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.6004';
+our $VERSION = '0.6005';
 
 use 5.024;
 use strictures 2;
@@ -1467,7 +1467,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.6004
+version 0.6005
 
 =head1 SYNOPSIS
 
@@ -1953,7 +1953,7 @@ See L<MIDI::Util/play_fluidsynth> for more details.
 
 Any of these attributes may be changed when calling L</new>.
 Drumkit values must be a valid
-L<MIDI::Drummer::Tiny::Types::MIDI/PercussionNote>,
+L<Types::MIDI/PercussionNote>,
 while note duration values must be a valid
 L<MIDI::Drummer::Tiny/Duration>.
 

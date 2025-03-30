@@ -3,20 +3,21 @@ use warnings;
 use Test::More;
 use Pod::Coverage::TrustMe;
 
-unshift @INC, 't/corpus';
+use lib 't/corpus';
 
-for my $file (glob('t/corpus/*.pm')) {
-  $file =~ s{\At/corpus/}{};
-  my $package = $file;
-  $package =~ s{\.pm\z}{};
-  $package =~ s{/|\\}{::}g;
-
+for my $package (qw(
+  CoveredByParent
+  CoveredByRole
+  CoveredFile
+  RoleWithCoverage
+  WithUTF8
+)) {
   my $cover = Pod::Coverage::TrustMe->new(
     package => $package,
     require_link => 1,
   );
 
-  is $cover->coverage, 1, "$file is covered"
+  is $cover->coverage, 1, "$package is covered"
     or diag $cover->report;
 }
 

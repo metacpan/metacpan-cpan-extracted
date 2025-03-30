@@ -18,7 +18,7 @@ use Config;
 use Exporter qw(import);
 use File::Spec;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 our @EXPORT = qw(&pod2usage);
 our @ISA;
@@ -26,7 +26,7 @@ BEGIN {
     $Pod::Usage::Formatter ||= 'Pod::Text';
     eval "require $Pod::Usage::Formatter";
     die $@ if $@;
-    @ISA = ( $Pod::Usage::Formatter, 'Exporter' );
+    @ISA = ( $Pod::Usage::Formatter );
 }
 
 our $MAX_HEADING_LEVEL = 3;

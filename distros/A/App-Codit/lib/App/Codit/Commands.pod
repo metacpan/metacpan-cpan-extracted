@@ -14,7 +14,7 @@ A command can be executed as follows:
  my $result = $app->cmdExecute('command_name', @options)
  my @result = $app->cmdExecute('command_name', @options)
 
-Generated: Wed Jan  8 10:52:21 2025
+Generated: Sat Mar 29 08:32:06 2025
 
 =head1 COMMANDS
 
@@ -42,20 +42,37 @@ Jumps to the previous selected bookmark.
 
 =item B<bookmark_add> in L<App::Codit::Ext::CoditMDI>
 
+Adds the current line to the bookmarks list.
+
 =item B<bookmark_clear> in L<App::Codit::Ext::CoditMDI>
+
+Clears all bookmarks in the current document.
 
 =item B<bookmark_fill> in L<App::Codit::Ext::CoditMDI>
 
+Called when the bookmark menu is popped. It fills it with
+the bookmarks in the current document.
+
 =item B<bookmark_next> in L<App::Codit::Ext::CoditMDI>
+
+Jump to the next bookmark in the current document.
 
 =item B<bookmark_prev> in L<App::Codit::Ext::CoditMDI>
 
+Jump to the previous bookmark in the current document.
+
 =item B<bookmark_remove> in L<App::Codit::Ext::CoditMDI>
+
+Removes the bookmark on the current line, if any.
 
 =item B<deferred_open> in L<Tk::AppWindow::Ext::MDI>
 
 Takes a document name that is in deferred state as parameter and creates a new content handler for it.
 Returns a boolean indicating the succesfull load of its content.
+
+=item B<doc_autobracket> in L<App::Codit::Ext::CoditMDI>
+
+Sets and returns the autobracket option of the currently selected document.
 
 =item B<doc_autoindent> in L<App::Codit::Ext::CoditMDI>
 
@@ -227,6 +244,30 @@ Is called when the file menu is opened in the menubar. It populates the
 
 Calls the CmdQuit method. See there.
 
+=item B<session_dialog> in L<App::Codit::Plugins::Sessions>
+
+Pops the dialog for managing sessions.
+
+=item B<session_fill_menu> in L<App::Codit::Plugins::Sessions>
+
+Called when the Session menu in the menu bar is opened.
+
+=item B<session_new> in L<App::Codit::Plugins::Sessions>
+
+Closes current session and creates a new, unnamed, one.
+
+=item B<session_open> in L<App::Codit::Plugins::Sessions>
+
+Takes a session name as parameter. Closes current session and opens the new one.
+
+=item B<session_save> in L<App::Codit::Plugins::Sessions>
+
+Save current session. If the session was not saved before, a dialog will pop to enter a name.
+
+=item B<session_save_as> in L<App::Codit::Plugins::Sessions>
+
+Save current session under a new name.
+
 =item B<set_title> in L<Tk::AppWindow::Ext::MDI>
 
 Takes a document name as parameter and sets the main window title accordingly.
@@ -235,9 +276,25 @@ Takes a document name as parameter and sets the main window title accordingly.
 
 Launches the settings dialog.
 
+=item B<split_cancel> in L<App::Codit::Plugins::SplitView>
+
+Removes an existing split from view.
+
+=item B<split_horizontal> in L<App::Codit::Plugins::SplitView>
+
+Creates a horizontal split.
+
+=item B<split_vertical> in L<App::Codit::Plugins::SplitView>
+
+Creates a vertical split.
+
 =item B<updates> in L<Tk::AppWindow::Ext::Help>
 
 Pops the updates box and starts checking for updates.
+
+=item Switch B<-report_issue> in L<App::Codit>
+
+Opens the issues web page of the App::Codit github repository.
 
 =back
 

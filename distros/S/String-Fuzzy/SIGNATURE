@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 dc4b90a3f7b7d07defc6ba20b074a5fbe5749c21a855cf3816cb18314888ab7c CHANGES
+SHA256 c26f3668a7d1fd3080734025af729a357578dde6400640cd91635a35807677fa CONTRIBUTING.md
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 1f7f5b8447d315c02f6ec05062a1e57af55ec2f27af0c0b232f32dd22e2ab2c7 MANIFEST
+SHA256 f60447abb4a35b4093315ba238e25386a2514bade5afe9586323a2bebb798290 META.json
+SHA256 1e3c4013e743351bf7de09d1d5328739c450eaf5821986de8207afb65cdf2766 META.yml
+SHA256 ab5f87c57fc5eddae05e1e67e386f5e9fe1f9cb6d1ebd9566bd0800ffc0d481f Makefile.PL
+SHA256 7d53d3c235d6c9f25dc58c8d85dde0513cd4cce3d317a5973dd0c3701bd699c8 README.md
+SHA256 d4b62e9aabe84bb430bebd1d3b66bccc30064bc845e067d86c17e78e6515a038 TODO
+SHA256 73972efad364792ed9998271b102f8c5e317359693ee6a3d31f95eee2b6953d9 lib/String/Fuzzy.pm
+SHA256 617a6e1f63bde41faf2953e1f8ce9c689bb6cee405bd923a68468440bcbfaf56 t/001_load.t
+SHA256 1b233d2103b572b838365c239efdd4bdf0760aff95233a7423f2aca23f65ce4b t/002_fuzzy.t
+SHA256 62aa6aa85707f9693e678da55a78a461e292bab447734b35129e8e9c68eb7619 t/900_pod.t
+SHA256 1855f1851cc59711d63c6ce10bb000e24b838e77cc02acd2a314b03bda80cb49 t/910_coverage.t
+SHA256 310a1b527105a8453812d86a4829006f901591218f00e708bdc45ef2f5e8f5f6 t/920_manifest.t
+SHA256 f229776ce2dd7cd0fa3b6b87fc42ddfe50bdb505b736154ebfd4c5bcf5b5129e t/930_signature.t
+SHA256 51e3199e1210ec73cf9bf5acee8de3216cb6002150cad36c10de47fa36c87f55 t/999_kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmfpBgIACgkQXzwCYc2y
+51LFNxAArhM/srVpS20vu0a+SHjSnyKZD8xc6R6BhuUFYeNyV8PeLUDOYzKI2Sjh
+fcbDwog2EIkeWiFSw1oP6AB92JndBLsir93pHvU+45Wt3XQPogOTtV1U/yWqrVug
+frVx7lAHS3Ho0mi5D5+3nts8pqSIR8e3tf2emfIy25GrqufeoaUnWydvv8ZtrBHz
+jUcbcebTDE6fgrQIxt6966rAy2F3yH8tdiKt8yRzh8llfjiWX66als/U3pYIAeFx
+wZh5nMtEdRbbrUR/4AqzeN0d+CPMvmKKjDJn7nu5vPiSX9IQx9UGRVlP0eJ8SMkh
+4hbrPDjV4mUiTJRBpJomoGuzEZPKMVEjnavAV/EPkrYvXjoyfR7SNxMZSlWe/sYJ
+oqwlc8/FjAhSKMDYR/NGN5jdGAIv1+5hycG5fqZdaR2oC1Bo0RFhLvizMdwYmhFM
+n/nxuKtrpZGpgyQmVF7+gPU00vAdE/0PIjsSiEoHBn8xvVcZ68PvmJeylkl3mK2a
+/oMQ1fIS5wyoAZnVFUpk9LhMVyupe3qhAnb1wGmNX/z+/yfbICh3zrFh6P/gyYKh
+NwWZdjTa1E4V82P7wx8ivr9Uwgq9jYc43j+ZZoxxagLyf7RanZfJXz+UF+owz6+D
+AXOTkqx4OnoAD6chM77ecGx6kpApHQBXT+BKEteqctya2h25JG8=
+=ppIk
+-----END PGP SIGNATURE-----

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.14";
+$VERSION = '0.19';
 use Tk;
 use Tie::Watch;
 require Tk::CodeText::TagsEditor;

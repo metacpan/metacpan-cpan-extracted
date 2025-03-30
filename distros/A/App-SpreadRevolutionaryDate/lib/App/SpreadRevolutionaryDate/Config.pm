@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.49';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -206,6 +206,14 @@ sub new {
     'gemini_img_path' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gip'},
     'gemini_img_alt' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'gia'},
     'gemini_img_url' => {ARGCOUNT => ARGCOUNT_HASH, ALIAS => 'giu'},
+    'special_birthday_name' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bn'},
+    'special_birthday_day' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bd'},
+    'special_birthday_month' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bm'},
+    'special_birthday_url' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bu'},
+    'special_birthday_gemini' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bg'},
+    'special_birthday_prefix' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bp'},
+    'special_birthday_plural' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bpl'},
+    'special_birthday_gender' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bge'},
   );
 
   # Rewind configuration file if needed and read it
@@ -422,7 +430,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 

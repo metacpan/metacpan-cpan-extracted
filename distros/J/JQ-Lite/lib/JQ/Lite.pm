@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use JSON::PP;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub new {
     my ($class, %opts) = @_;
@@ -101,6 +101,22 @@ sub run_query {
         if ($part eq 'reverse') {
             @next_results = map {
                 ref $_ eq 'ARRAY' ? [ reverse @$_ ] : $_
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        if ($part =~ /^limit\((\d+)\)$/) {
+            my $limit = $1;
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    my $arr = $_;
+                    my $end = $limit - 1;
+                    $end = $#$arr if $end > $#$arr;
+                    [ @$arr[0 .. $end] ]
+                } else {
+                    $_
+                }
             } @results;
             @results = @next_results;
             next;
@@ -226,6 +242,22 @@ sub _evaluate_condition {
         return 0;
     }
 
+    # match 演算子対応（iオプション付き）
+    if ($cond =~ /^\s*\.(.+?)\s+match\s+"(.*?)"(i?)\s*$/) {
+        my ($path, $pattern, $ignore_case) = ($1, $2, $3);
+        my $re = eval {
+            $ignore_case eq 'i' ? qr/$pattern/i : qr/$pattern/
+        };
+        return 0 unless $re;
+
+        my @vals = _traverse($item, $path);
+        for my $val (@vals) {
+            next if ref $val;
+            return 1 if $val =~ $re;
+        }
+        return 0;
+    }
+ 
     # 単一条件パターン
     if ($cond =~ /^\s*\.(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+?)\s*$/) {
         my ($path, $op, $value_raw) = ($1, $2, $3);
@@ -314,7 +346,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -375,6 +407,9 @@ This module uses only core Perl modules:
 =head1 SEE ALSO
 
 L<JSON::PP>
+
+L<JQ::Lite on GitHub|https://github.com/kawamurashingo/JQ-Lite>
+
 
 =head1 AUTHOR
 

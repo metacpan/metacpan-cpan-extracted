@@ -11,12 +11,14 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 43476190
+Aristotle
 CPAN
 Graham
 Karl
 Knop
 Marek
 Nicolas
+Pagaltzis
 Pod
 Rouchal
 Usage
@@ -29,4 +31,5 @@ marek
 marekr
 nicolas
 ntadic001
+pagaltzis
 ubinator

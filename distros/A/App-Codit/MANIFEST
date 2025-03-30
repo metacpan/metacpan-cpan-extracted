@@ -6,6 +6,7 @@ lib/App/Codit/CodeTextManager.pm
 lib/App/Codit/codit_logo.png
 lib/App/Codit/CoditTagsEditor.pm
 lib/App/Codit/Commands.pod
+lib/App/Codit/ConfigVariables.pod
 lib/App/Codit/Ext/CoditMDI.pm
 lib/App/Codit/highlight_theme.ctt
 lib/App/Codit/Icons/bookmark_delete.png
@@ -24,11 +25,13 @@ lib/App/Codit/Plugins/Console.pm
 lib/App/Codit/Plugins/Exporter.pm
 lib/App/Codit/Plugins/FileBrowser.pm
 lib/App/Codit/Plugins/Git.pm
+lib/App/Codit/Plugins/Icons.pm
 lib/App/Codit/Plugins/PerlSubs.pm
 lib/App/Codit/Plugins/PodViewer.pm
 lib/App/Codit/Plugins/SearchReplace.pm
 lib/App/Codit/Plugins/Sessions.pm
 lib/App/Codit/Plugins/Snippets.pm
+lib/App/Codit/Plugins/SplitView.pm
 lib/App/Codit/SessionManager.pm
 LICENSE
 Makefile.PL
@@ -45,11 +48,13 @@ t/070-App-Codit-Plugins-Colors.t
 t/075-App-Codit-Plugins-Console.t
 t/078-App-Codit-Plugins-Exporter.t
 t/080-App-Codit-Plugins-FileBrowser.t
+t/085-App-Codit-Plugins-Icons.t
 t/090-App-Codit-Plugins-Git.t
 t/100-App-Codit-Plugins-PerlSubs.t
 t/110-App-Codit-Plugins-PodViewer.t
 t/120-App-Codit-Plugins-SearchReplace.t
 t/130-App-Codit-Plugins-Snippets.t
 t/140-App-Codit-Plugins-Sessions.t
+t/150-App-Codit-Plugins-SplitView.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

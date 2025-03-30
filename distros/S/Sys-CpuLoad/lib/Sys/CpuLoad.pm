@@ -21,7 +21,7 @@ use XSLoader;
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(load getloadavg proc_loadavg uptime);
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 XSLoader::load 'Sys::CpuLoad', $VERSION;
 
@@ -104,7 +104,7 @@ Sys::CpuLoad - retrieve system load averages
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -243,7 +243,7 @@ Vincent Lefèvre <vincent@vinc17.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1999-2002, 2020 by Clinton Wong <clintdw@cpan.org>.
+This software is copyright (c) 1999-2002, 2020, 2025 by Clinton Wong <clintdw@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

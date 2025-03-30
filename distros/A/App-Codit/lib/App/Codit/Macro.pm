@@ -9,7 +9,7 @@ App::Codit::Macro - Little applets for line to line text tasks.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.14;
+$VERSION = '0.19';
 use Tk;
 
 =head1 SYNOPSIS
@@ -214,7 +214,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-If you find any bugs, please contact the author.
+If you find any bugs, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 

@@ -1,28 +1,30 @@
 ---
 abstract: 'minimalistic import/export and other util package functions'
 author:
-  - 'Sebastian Knapp <rock@ccls-online.de>'
+  - 'Sebastian Knapp <sknpp@cpan.org>'
 build_requires:
-  ExtUtils::Manifest: 0
-  IO::File: 0
-  Test::More: 0
+  ExtUtils::Manifest: '0'
+  IO::File: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Package-Subroutine
 provides:
   Package::Subroutine:
     file: lib/Package/Subroutine.pm
-    version: v0.22.1
+    version: v0.22.4
 requires:
-  Class::ISA: 0
-  Perl6::Junction: 1.30000
+  Class::ISA: '0'
+  Perl6::Junction: '1.30000'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.22.1
+version: v0.22.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

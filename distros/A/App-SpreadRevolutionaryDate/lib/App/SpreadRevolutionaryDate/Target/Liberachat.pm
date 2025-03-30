@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat;
-$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.49';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Liberachat.
 
 use Moose;
@@ -111,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat - Target class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 

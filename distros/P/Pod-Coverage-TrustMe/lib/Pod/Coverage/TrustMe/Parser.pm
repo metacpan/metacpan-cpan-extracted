@@ -2,7 +2,7 @@ package Pod::Coverage::TrustMe::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002001';
 $VERSION =~ tr/_//d;
 
 use Pod::Simple ();
@@ -15,29 +15,6 @@ sub new {
   $self->accept_targets_as_text('Pod::Coverage');
   $self->{+__PACKAGE__} = {};
   return $self;
-}
-
-sub parse_lines {
-  my $self = shift;
-  $self->SUPER::parse_lines(@_);
-  my $me = $self->{+__PACKAGE__};
-  {
-    # these are regexes
-    my $trusted = $me->{trusted} ||= [];
-    my %seen;
-    @$trusted = sort grep !$seen{$_}++, @$trusted;
-  }
-  {
-    my $links = $me->{links} ||= [];
-    my %seen;
-    @$links = sort grep !$seen{$_}++, @$links;
-  }
-  {
-    my $covered = $me->{covered} ||= [];
-    my %seen;
-    @$covered = sort grep !$seen{$_}++, @$covered;
-  }
-  return;
 }
 
 sub ignore_empty {
@@ -57,7 +34,9 @@ sub _handle_element_start {
     push @{ $me->{in} }, $attr;
   }
   elsif ($name eq 'L' && $attr->{type} eq 'pod' && defined $attr->{to}) {
-    push @{ $me->{links} }, "$attr->{to}";
+    my $to = "$attr->{to}";
+    push @{ $me->{links} }, $to
+      unless $me->{links_hash}{$to}++;
   }
   elsif ($name eq 'item-text' || $name eq 'item-bullet' || $name =~ /\Ahead[2-9]\z/) {
     delete $me->{maybe_covered};
@@ -93,7 +72,9 @@ sub _handle_element_end {
       push @{ $me->{maybe_covered} }, @covered;
     }
     else {
-      push @{ $me->{covered} }, @covered;
+      push @{ $me->{covered} },
+        grep !$me->{covered_hash}{$_}++,
+        @covered;
     }
   }
   $self->SUPER::_handle_element_end(@_);
@@ -105,46 +86,47 @@ sub _handle_text {
   my ($text) = @_;
   my $in = $me->{in};
   if ($in && @$in && $in->[-1]{target} =~ /\APod::Coverage(?:::Trust(?:Me|Pod))?\z/) {
-    my @trusted;
     for my $token ($text =~ /(\S+)/g) {
+      my $re;
       if ($token eq '*EVERYTHING*') {
-        push @trusted, qr{.?};
+        $re = qr{.?};
       }
       else {
-        my $re = eval { qr/\A(?:$token)\z/ };
+        $re = eval { qr{\A(?:$token)\z} };
         if (!$re) {
           my $file = $self->{source_filename} || '<input>';
           my $line = $in->[-1]{start_line} || '<unknown>';
           croak "Error compiling Pod::Coverage regex /$token/ at $file line $line: $@";
         }
-        push @trusted, $re;
       }
+      push @{ $me->{trusted} }, $re
+        unless $me->{trusted_hash}{$re}++;
     }
-
-    push @{ $me->{trusted} }, @trusted;
   }
   elsif ($me->{consider}) {
     $me->{consider_text} .= $text;
   }
   elsif ($me->{maybe_covered}) {
-    push @{ $me->{covered} }, @{ delete $me->{maybe_covered} };
+    push @{ $me->{covered} },
+      grep !$me->{covered_hash}{$_}++,
+      @{ delete $me->{maybe_covered} };
   }
   $self->SUPER::_handle_text(@_);
 }
 
 sub links {
   my $self = shift;
-  return $self->{+__PACKAGE__}{links};
+  return $self->{+__PACKAGE__}{links} ||= [];
 }
 
 sub trusted {
   my $self = shift;
-  return $self->{+__PACKAGE__}{trusted};
+  return $self->{+__PACKAGE__}{trusted} ||= [];
 }
 
 sub covered {
   my $self = shift;
-  return $self->{+__PACKAGE__}{covered};
+  return $self->{+__PACKAGE__}{covered} ||= [];
 }
 
 1;

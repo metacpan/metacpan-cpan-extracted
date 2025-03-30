@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+#
+# OMOP CSV Validator
+# Last Modified: 2025-05-10
+# License: Artistic License 2.0
+# Copyright (C) 2025 Manuel Rueda - CNAG
+
+use strict;
+use warnings;
+use utf8;
+use lib 'lib';
+use feature qw(say);
+use Getopt::Long;
+use Path::Tiny;
+use OMOP::CSV::Validator;  # Now loads the OO version (no explicit import list)
+use JSON::XS;
+use Pod::Usage;
+
+# If you want the module's version, access it directly:
+my $VERSION = $OMOP::CSV::Validator::VERSION;
+
+# Command-line arguments
+my $ddl_file;
+my $csv_file;
+my $sep = ',';
+
+GetOptions(
+    'ddl=s'     => \$ddl_file,  # Path to the DDL file (PostgreSQL)
+    'input=s'   => \$csv_file,  # Path to the input CSV file
+    'sep=s'     => \$sep,       # Field separator (default: comma)
+    'help|h'    => \my $help,   # Show help message
+    'version|V' => sub { say "$0 Version $VERSION"; exit; },
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+unless ( $ddl_file && $csv_file ) {
+    warn "[ERROR] --ddl and --input are required parameters.\n";
+    pod2usage(1);
+}
+
+# Read the DDL file (UTF-8) using Path::Tiny
+my $ddl_text = path($ddl_file)->slurp_utf8;
+
+# Create the validator object
+my $validator = OMOP::CSV::Validator->new();
+
+# Load schemas from the DDL
+my $schemas = $validator->load_schemas_from_ddl($ddl_text);
+
+# Determine which schema to use based on the CSV file name
+my $schema = $validator->get_schema_from_csv_filename($csv_file, $schemas)
+  or die "No schema found for table derived from '$csv_file'\n";
+
+# Validate the CSV file
+my $errors = $validator->validate_csv_file($csv_file, $schema, $sep);
+
+if (@$errors) {
+    foreach my $err (@$errors) {
+        warn "Row $err->{row} validation failed:\n",
+          join( "\n", @{ $err->{errors} } ), "\n";
+    }
+    exit 1;
+}
+else {
+    print
+      "CSV file '$csv_file' is valid against the '$schema->{title}' schema.\n";
+    exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+omop_csv_validator - Validate OMOP CDM CSV files against DDL-derived schemas
+
+=head1 SYNOPSIS
+
+  omop_csv_validator --ddl DDL.sql --input DATA.csv [--sep $'\t']
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--ddl>
+
+(required) Path to the PostgreSQL DDL file defining OMOP CDM table structures.
+
+=item B<--input>
+
+(required) Path to the input CSV file to validate.
+
+=item B<--sep>
+
+CSV field separator (default: comma). For tab, use: --sep $'\t'
+
+=item B<--help>, B<-h>
+
+Display this help message.
+
+=item B<--version>, B<-V>
+
+Show the script's version (which corresponds to C<OMOP::CSV::Validator::VERSION>).
+
+=back
+
+=head1 EXAMPLE
+
+  bin/omop_csv_validator --ddl ddl/postgres.sql --input data/person.csv --sep $'\t'
+
+=cut

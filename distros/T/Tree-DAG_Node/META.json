@@ -4,7 +4,7 @@
       "Sean M. Burke <sburke@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,8 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Slurp::Tiny" : "0.003",
+            "ExtUtils::MakeMaker" : "7.7",
+            "File::Slurper" : "0.014",
             "open" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -66,6 +67,6 @@
          "web" : "https://github.com/ronsavage/Tree-DAG_Node"
       }
    },
-   "version" : "1.32",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.33",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

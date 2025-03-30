@@ -10,6 +10,7 @@ scripts/cut.and.paste.subtrees.pl
 scripts/read.tree.log
 scripts/read.tree.pl
 scripts/write.tree.pl
+SECURITY.md
 t/00.versions.t
 t/00.versions.tx
 t/about.perl.t

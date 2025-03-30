@@ -14,12 +14,14 @@ my %prereq = (
 	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.032',
-	'Tk::AppWindow'       => '0.21',
-	'Tk::CodeText'        => '0.64',
+	'Tk::AppWindow'       => '0.22',
+	'Tk::CodeText'        => '0.67',
 	'Tk::FileBrowser'     =>	'0.09',
+	'Tk::ListBrowser'     =>	'0.03',
 	'Tk::PodViewer'       =>	'0.06',
 	'Tk::QuickForm'       =>	'0.09',
 	'Tk::Terminal'        =>	'0.03',
+	'Tk::YANoteBook'      =>	'0.10',
 );
 
 WriteMakefile(

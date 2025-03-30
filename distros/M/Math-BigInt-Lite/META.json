@@ -51,6 +51,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-Lite"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

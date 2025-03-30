@@ -1,0 +1,156 @@
+=encoding utf8
+
+=head1 NAME
+
+autobox::Lookup - easy autoboxed lookup 
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+    use autobox::Lookup;
+
+    my $data = {
+        level1 => {
+            level2 => {
+                level3 => "value at level 3",
+            },
+            array_key => [
+                { sub_key => "value in array 0" },
+                { sub_key => "value in array 1" },
+            ],
+        },
+    };
+
+    my $result = $data->get("level1.level2.level3");
+
+=head1 DESCRIPTION
+
+L<autobox::Lookup> provides a way to retrieve values
+from deeply nested data structures using a query string that supports accessing
+hashes and arrays through dot (C<.>) notation and bracket (C<[]>)
+notation.
+
+=head1 autobox::Lookup Query String Syntax
+
+=head2 Basic Query Syntax
+
+The query string consists of key names separated by dots (C<.>) or
+array indices specified numerically. The following conventions apply:
+
+=over
+
+=item * B<Dot Notation (C<.>)>: Used to navigate through nested hash
+keys.
+
+=item * B<Array Indexing (C<N>)>: Used to access specific elements in
+arrays.
+
+=item * B<Wildcard Array Mapping (C<[]>)>: Used to extract values from
+all array elements.
+
+=item * B<Multiple Key Selection (C<,>)>: Allows retrieving multiple
+values at once.
+
+=back
+
+=head2 Query String Behavior
+
+=head3 Dot Notation (C<.>)
+
+Dot notation allows accessing nested hash keys. For example:
+
+ $data->get("level1.level2.level3");  # Retrieves $data->{level1}->{level2}->{level3}
+
+=head4 Edge Cases
+
+=over
+
+=item * If a key does not exist, C<undef> is returned.
+
+=item * Leading or trailing dots result in C<undef>.
+
+=back
+
+=head3 Array Indexing (C<N>)
+
+When an array is encountered, an integer index retrieves a specific
+element:
+
+ $data->get("level1.array_key.1.sub_key");  # Retrieves $data->{level1}->{array_key}->[1]->{sub_key}
+
+When an hash is encountered, an integer index is treated as a key and
+retrieves a specific element:
+
+ $data->get("level1.array_key.1.sub_key");  # Retrieves $data->{level1}->{array_key}->{"1}"->{sub_key}
+
+=head4 Edge Cases
+
+=over
+
+=item * Non-integer indices on an array return C<undef>.
+
+=item * Out-of-bounds indices return C<undef>.
+
+=back
+
+=head3 Wildcard Array Mapping (C<[]>)
+
+When an array is encountered, using C<[]> retrieves values from all
+elements of the array:
+
+ $data->get("level1.array_key.[].sub_key");  # Retrieves all sub_key values in array
+
+When a hash is encountered, using C<[]> retrieves all the values from
+the hash:
+
+ $data->get("level1.array_key.[].sub_key");  # Retrieves all sub_key values in array
+
+=over
+
+=item * C<$data->get("level1.array_key.[]")> returns the entire
+array.
+
+=item * If applied to an empty array, it returns an empty array.
+
+=item * C<$data->get("level1.array_key.[]")> returns all the values
+in the hash.
+
+=item * If applied to an empty array, it returns an empty array.
+
+=back
+
+=head2 Multiple Key Selection (C<,>)
+
+A comma-separated query retrieves multiple values at once:
+
+   $data->get("level1.level2.level3,another_key");
+
+This returns an array containing both values.
+
+=head3 Flat vs Recursive Lookup
+
+   $data->get("[].key") # retrieves key from all hash elements.
+
+   $data->get("[]") # returns the array of hash elements as-is.
+
+=head3 Special Cases and Invalid Queries
+
+=begin text
+
+
+| Query                                 | Result                     |
+| ------------------------------------- | -------------------------- |
+| `"foo.bar"` (non-existent key)        | `undef`                    |
+| `"arr.foo"` (string index on array)   | `undef`                    |
+| `"arr.5"` (out-of-bounds index)       | `undef`                    |
+| `".foo.bar."` (leading/trailing dots) | `undef`                    |
+| `{}` (empty hash) with any key        | `undef`                    |
+| `""` (empty string)                   | Returns whole structure    |
+| Scalar base structure                 | `undef`                    |
+| Circular references                   | Returns circular reference |
+
+
+=end text
+
+=cut

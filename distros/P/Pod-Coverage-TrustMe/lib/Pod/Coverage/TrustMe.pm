@@ -2,7 +2,7 @@ package Pod::Coverage::TrustMe;
 use strict;
 use warnings;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002001';
 $VERSION =~ tr/_//d;
 
 use Pod::Coverage::TrustMe::Parser;
@@ -404,6 +404,12 @@ sub _symbols_for {
         $self->{ignore_imported} && $self->_imported_check($_)
         or $self->_private_check($_)
       ),
+      map {
+        my $sym = $_;
+        utf8::decode($sym)
+          if !utf8::is_utf8($_);
+        $sym;
+      }
       grep !/::\z/ && defined &{$package.'::'.$_},
       keys %{$package.'::'};
   }

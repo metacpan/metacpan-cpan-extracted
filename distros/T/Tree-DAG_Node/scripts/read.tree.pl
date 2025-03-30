@@ -7,8 +7,6 @@ use open     qw(:std :utf8); # Undeclared streams in UTF-8.
 
 use File::Spec;
 
-use File::Slurp::Tiny 'read_file';
-
 use Tree::DAG_Node;
 
 # ------------------------------------------------

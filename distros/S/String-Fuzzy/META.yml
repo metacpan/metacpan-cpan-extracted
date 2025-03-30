@@ -1,0 +1,41 @@
+---
+abstract: 'Python-style fuzzy string matching (fuzzywuzzy port)'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  Test::Pod: '1.52'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Fuzzy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '2.50'
+  Exporter: '5.68'
+  List::Util: '1.28'
+  Scalar::Util: '1.28'
+  Text::Levenshtein::XS: '0.31'
+  Unicode::Normalize: '1.17'
+  overload: '0'
+  parent: '0'
+  perl: '5.014004'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/String-Fuzzy/issues
+  repository: https://gitlab.com/jackdeguest/String-Fuzzy
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

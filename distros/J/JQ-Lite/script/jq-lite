@@ -16,23 +16,54 @@ while (@ARGV) {
     my $arg = shift @ARGV;
     if ($arg eq '--raw-output' || $arg eq '-r') {
         $raw_output = 1;
-    } elsif ($arg eq '--help' || $arg eq '-h') {
+    }
+    elsif ($arg eq '--help' || $arg eq '-h') {
         print <<'USAGE';
-Usage: jq-lite [--raw-output|-r] [--help|-h] '.query' [file.json]
+jq-lite - A lightweight jq-like JSON query tool written in pure Perl
+
+Usage:
+  jq-lite [options] '.query' [file.json]
+
+Options:
+  -r, --raw-output    Print raw strings instead of JSON-encoded values
+  -h, --help          Show this help message
 
 Examples:
-  cat users.json | jq-lite '.users[0].name'
-  jq-lite '.users[].name' users.json
-  jq-lite -r '.users[] | select(.age > 25)' users.json
+  cat users.json | jq-lite '.users[].name'
+  jq-lite '.users[] | select(.age > 25)' users.json
+  jq-lite -r '.users[] | .name' users.json
+  jq-lite '.meta has "version"' config.json
+  jq-lite '.items | sort | reverse | first' data.json
+
+Query Syntax:
+  .key                Access a key (e.g. .user.name)
+  .key?               Optional access (no error if missing)
+  .array[]            Traverse all array elements
+  .array[n]           Index into array
+  |                   Pipe to next operation
+  select(condition)   Filter values
+  Built-in functions: length, keys, first, last, reverse, sort, unique, has
+
+Tips:
+  - Query must start with a dot (e.g. '.users[]')
+  - Reads from STDIN if no file is provided
+  - Outputs JSON by default; use -r for plain text
+
+Homepage:
+  https://metacpan.org/pod/JQ::Lite
 USAGE
         exit 0;
-    } elsif (!defined $query && $arg =~ /^\./) {
+    }
+    elsif (!defined $query && $arg =~ /^\./) {
         $query = $arg;
-    } elsif (!defined $query) {
+    }
+    elsif (!defined $query) {
         die "Error: Invalid query syntax '$arg'\nUsage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
-    } elsif (!defined $filename) {
+    }
+    elsif (!defined $filename) {
         $filename = $arg;
-    } else {
+    }
+    else {
         die "Usage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
     }
 }
@@ -46,7 +77,8 @@ if (defined $filename) {
     local $/;
     $json_text = <$fh>;
     close $fh;
-} else {
+}
+else {
     local $/;
     $json_text = <STDIN>;
 }
@@ -62,9 +94,11 @@ my $pp = JSON::PP->new->utf8->canonical->pretty;
 for my $r (@results) {
     if (!defined $r) {
         print "null\n";
-    } elsif ($raw_output && ref($r) eq '') {
+    }
+    elsif ($raw_output && ref($r) eq '') {
         print "$r\n";
-    } else {
+    }
+    else {
         print $pp->encode($r);
     }
 }

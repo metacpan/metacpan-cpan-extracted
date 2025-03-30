@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.49';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
@@ -38,6 +38,54 @@ has locale => (
   },
 );
 
+has special_birthday_name => (
+  is => 'ro',
+  isa => 'Str',
+  default => '',
+);
+
+has special_birthday_day => (
+  is => 'ro',
+  isa => 'Int',
+  default => 0,
+);
+
+has special_birthday_month => (
+  is => 'ro',
+  isa => 'Int',
+  default => 0,
+);
+
+has special_birthday_url => (
+  is => 'ro',
+  isa => 'Str',
+  default => '',
+);
+
+has special_birthday_gemini => (
+  is => 'ro',
+  isa => 'Str',
+  default => '',
+);
+
+has special_birthday_prefix => (
+  is => 'ro',
+  isa => 'Int',
+  default => 0,
+);
+
+has special_birthday_plural => (
+  is => 'ro',
+  isa => 'Str',
+  default => '',
+);
+
+has special_birthday_gender => (
+  is => 'ro',
+  isa => 'Str',
+  default => 'f',
+);
+
 requires 'compute';
 
 
@@ -60,7 +108,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

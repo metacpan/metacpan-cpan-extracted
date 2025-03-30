@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION='0.17';
+$VERSION = '0.19';
 use Tk;
 require Tk::CodeText;
 
@@ -43,6 +43,7 @@ sub Populate {
 		-contentacpopsize => [{-acpopsize => $xt}],
 		-contentacscansize => [{-acscansize => $xt}],
 		-contentactivedelay => [{-activedelay => $xt}],
+		-contentautobrackets => [{-autobrackets => $xt}],
 		-contentautocomplete => [{-autocomplete => $xt}],
 		-contentautoindent => [{-autoindent => $xt}],
 		-contentbackground => [{-background => $xt}],
@@ -74,27 +75,6 @@ sub Populate {
 	);
 	$self->after(10, ['configureTags', $self]);
 }
-
-#sub ConfigureCM {
-#	my $self = shift;
-#	my $ext = $self->Extension;
-#	my $cmopt = $ext->configGet('-contentmanageroptions');
-#	
-#	my @matchoptions = ();
-#	my @o = @$cmopt; #Hack preventing from the original being modified. No idea why this is needed.
-#	for (@o) {
-#		my $key = $_;
-#		my $val = $ext->configGet($key);
-#		if ((defined $val) and ($val ne '')) {
-#			if ($key =~ /^\-contentmatch/) {
-#				push @matchoptions, $key, $val
-#			} else {
-#				$self->configure($key, $val);
-#			}
-#		}
-#	}
-#	$self->CWidg->configure('-matchoptions', \@matchoptions) if @matchoptions;
-#}
 
 sub Close {
 	my $self = shift;
@@ -132,6 +112,9 @@ sub configureTags {
 	my $siz = $self->cget('-contentfontsize');
 	$siz = 10 unless defined $siz;
 	$widg->configure(-font => "{$fam} $siz");
+
+	#configuring showspaces. Hack, do not know why this is needed.
+	$widg->configure(-showspaces => $self->Extension->configGet('-contentshowspaces'));
 }
 
 sub doClear {
@@ -209,7 +192,7 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-If you find any bugs, please contact the author.
+If you find any bugs, please report them here L<https://github.com/haje61/App-Codit/issues>.
 
 =head1 SEE ALSO
 

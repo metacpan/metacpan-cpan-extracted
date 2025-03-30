@@ -75,7 +75,7 @@
    "provides" : {
       "Pod::Usage" : {
          "file" : "lib/Pod/Usage.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       }
    },
    "release_status" : "stable",
@@ -90,8 +90,9 @@
          "web" : "https://github.com/Dual-Life/Pod-Usage"
       }
    },
-   "version" : "2.04",
+   "version" : "2.05",
    "x_contributors" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>",
       "Graham Knop <haarg@haarg.org>",
       "Karl Williamson <khw@cpan.org>",
       "lilinjie <lilinjie@uniontech.com>",

@@ -29,7 +29,7 @@ no_index:
 provides:
   Pod::Usage:
     file: lib/Pod/Usage.pm
-    version: '2.04'
+    version: '2.05'
 requires:
   Cwd: '0'
   File::Basename: '0'
@@ -42,8 +42,9 @@ resources:
   bugtracker: https://github.com/Dual-Life/Pod-Usage/issues
   homepage: https://github.com/Dual-Life/Pod-Usage
   repository: https://github.com/Dual-Life/Pod-Usage.git
-version: '2.04'
+version: '2.05'
 x_contributors:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Karl Williamson <khw@cpan.org>'
   - 'lilinjie <lilinjie@uniontech.com>'

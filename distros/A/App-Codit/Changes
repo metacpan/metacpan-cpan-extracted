@@ -1,5 +1,14 @@
 Revision history for Perl extension App::Codit.
 
+0.19 Sat Mar 29 2025
+	- Fixed -contentshowspaces on opening document.
+	- Added option -contentautobrackets and tool menu entry for it.
+	- Moved method abbreviate to Tk::AppWindow.
+	- Changed default size of PerlSubs and Bookmarks plugins tabwindow.
+	- New plugins Icons and SplitView.
+	- Updated manual and documentation.
+	- Auto complete is in the tool menu.
+
 0.18 Tue Feb 25 2025
 	- Added 'Report a problem' option to the menus.
 	- Moved all functionality for showing spaces and tabs, fix indentation and remove trailing spaces, to Tk::CodeText.

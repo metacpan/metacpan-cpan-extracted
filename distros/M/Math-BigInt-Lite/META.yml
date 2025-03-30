@@ -25,5 +25,5 @@ requires:
   perl: '5.006001'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-Lite.git
-version: '0.29'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

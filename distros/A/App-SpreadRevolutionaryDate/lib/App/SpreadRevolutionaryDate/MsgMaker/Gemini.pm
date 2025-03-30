@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Gemini;
-$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.48';
+$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.49';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Gemini prompt
 
 use Moose;
@@ -146,6 +146,11 @@ sub compute {
     $msg = $intro . "\n" . $msg;
   }
 
+  if ($self->special_birthday_gemini && $self->special_birthday_gemini eq $self->process && $self->special_birthday_day && $self->special_birthday_month && $self->special_birthday_name && $today->day == $self->special_birthday_day && $today->month == $self->special_birthday_month) {
+      my $name= $self->special_birthday_name;
+      $msg =~ s/^((?:\*|\d\.)\s+)(.+)$/$1$name/m;
+  }
+
   my $img;
   $img->{path} = $self->img_path->{$self->process} if $self->img_path && $self->img_path->{$self->process};
   $img->{url} = $self->img_url->{$self->process} if $self->img_url && $self->img_url->{$self->process};
@@ -176,7 +181,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Gemini - MsgMaker class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 

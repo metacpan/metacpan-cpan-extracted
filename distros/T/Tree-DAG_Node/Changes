@@ -1,5 +1,13 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.33  2025-03-20T11:16:00
+	- Replace the discouraged File::Slurp::Tiny with File::Slurper.
+		Thanx to Marcel Telka for the report.
+		But why not use File::Slurp? Because...
+		https://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html
+	- Add a security policy file SECURITY.md
+	- Update Makefile.PL to include both ExtUtils::MakeMaker and perl.
+
 1.32  2021-02-01T15:56:00
 	- Update Makefile.PL and POD to change RT to github.
 

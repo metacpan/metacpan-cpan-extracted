@@ -90,7 +90,7 @@ for my $backend (sort keys %backends) {
 
         subtest bin_string_convert => sub {
             my $subs;
-            warnings { $subs = Test2::Util::UUID->get_gen_uuid(backends => [$backend]) },
+            my $ignore = warnings { $subs = Test2::Util::UUID->get_gen_uuid(backends => [$backend]) },
 
             my $uuid = $subs->{gen_uuid}->();
             ok(looks_like_uuid($uuid), "Looks like a uuid ($uuid)");
