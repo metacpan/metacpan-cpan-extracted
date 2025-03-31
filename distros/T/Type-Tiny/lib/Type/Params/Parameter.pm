@@ -1,5 +1,3 @@
-# INTERNAL MODULE: a parameter within a Type::Params::Signature.
-
 package Type::Params::Parameter;
 
 use 5.008001;
@@ -12,12 +10,20 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Parameter::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Parameter::VERSION    = '2.006000';
+	$Type::Params::Parameter::VERSION    = '2.008000';
 }
 
 $Type::Params::Parameter::VERSION =~ tr/_//d;
 
 use Types::Standard qw( -is -types );
+
+my $RE_WORDLIKE = qr/\A[^\W0-9]\w*\z/;
+
+my $Attrs = Enum[ qw/
+	name type slurpy default alias strictness coerce clone in_list optional
+	getter predicate allow_dash vartail default_on_undef
+	quux
+/ ];
 
 sub _croak {
 	require Carp;
@@ -33,7 +39,20 @@ sub new {
 		$self{alias} = [ $self{alias} ];
 	}
 
-	bless \%self, $class;
+	my $self = bless \%self, $class;
+	
+	$Attrs->all( sort keys %$self ) or do {
+		require Carp;
+		require Type::Utils;
+		my @bad = ( ~ $Attrs )->grep( sort keys %$self );
+		Carp::carp( sprintf(
+			"Warning: unrecognized parameter %s: %s, continuing anyway",
+			@bad == 1 ? 'option' : 'options',
+			Type::Utils::english_list( @bad ),
+		) );
+	};
+
+	return $self;
 }
 
 sub name       { $_[0]{name} }        sub has_name       { exists $_[0]{name} }
@@ -42,7 +61,13 @@ sub default    { $_[0]{default} }     sub has_default    { exists $_[0]{default}
 sub alias      { $_[0]{alias} }       sub has_alias      { @{ $_[0]{alias} } }
 sub strictness { $_[0]{strictness} }  sub has_strictness { exists $_[0]{strictness} }
 
-sub should_clone { $_[0]{clone} }
+sub should_clone     { $_[0]{clone} }
+sub default_on_undef { $_[0]{default_on_undef} }
+
+sub in_list {
+	return $_[0]{in_list} if exists $_[0]{in_list};
+	$_[0]{in_list} = !$_[0]->optional;
+}
 
 sub coerce  {
 	exists( $_[0]{coerce} )
@@ -75,6 +100,23 @@ sub predicate  {
 
 sub might_supply_new_value {
 	$_[0]->has_default or $_[0]->coerce or $_[0]->should_clone;
+}
+
+sub _all_aliases {
+	my ( $self, $signature ) = @_;
+	my $allow_dash = $self->{allow_dash};
+	$allow_dash = $signature->allow_dash if !defined $allow_dash;
+	my @aliases;
+	if ( $allow_dash and $self->name =~ $RE_WORDLIKE ) {
+		push @aliases, sprintf( '-%s', $self->name );
+	}
+	for my $name ( @{ $self->alias } ) {
+		push @aliases, $name;
+		if ( $allow_dash and $name =~ $RE_WORDLIKE ) {
+			push @aliases, sprintf( '-%s', $name );
+		}
+	}
+	return @aliases;
 }
 
 sub _code_for_default {
@@ -169,10 +211,10 @@ sub _make_code {
 		$constraint->display_name,
 	) );
 
-	if ( $args{is_named} and $self->has_alias ) {
+	if ( $args{is_named} and my @aliases = $self->_all_aliases($signature) ) {
 		$coderef->add_line( sprintf(
 			'for my $alias ( %s ) {',
-			join( q{, }, map B::perlstring($_), @{ $self->alias } ),
+			join( q{, }, map B::perlstring($_), @aliases ),
 		) );
 		$coderef->increase_indent;
 		$coderef->add_line( 'exists $in{$alias} or next;' );
@@ -202,11 +244,29 @@ sub _make_code {
 		$coderef->add_line( '}' );
 	}
 
+	if ( $args{is_named} and $signature->list_to_named and $self->in_list ) {
+		$coderef->addf( 'if ( not exists %s ) {', $varname );
+		$coderef->increase_indent;
+		$coderef->addf( 'for my $ix ( 0 .. $#positional ) {' );
+		$coderef->increase_indent;
+		$coderef->addf( '%s or next;', ( $really_optional or $constraint )->coercibles->inline_check( '$positional[$ix]' ) );
+		$coderef->addf( '( %s ) = splice( @positional, $ix, 1 );', $varname );
+		$coderef->addf( 'last;' );
+		$coderef->decrease_indent;
+		$coderef->addf( '}' );
+		$coderef->decrease_indent;
+		$coderef->addf( '}' );
+	}
+
 	if ( $self->has_default ) {
+		my $check = $exists_check;
+		if ( $self->default_on_undef ) {
+			$check = "( $check and defined $varname )";
+		}
 		$self->{vartail} = $vartail; # hack
 		$coderef->add_line( sprintf(
 			'$dtmp = %s ? %s : %s;',
-			$exists_check,
+			$check,
 			$self->_maybe_clone( $varname ),
 			$self->_code_for_default( $signature, $coderef ),
 		) );
@@ -365,3 +425,152 @@ sub _make_code {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Params::Parameter - internal representation of a parameter in a function signature
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can be used to provide basic introspection
+for signatures.
+
+=head2 Constructor
+
+=over
+
+=item C<< new(%attributes) >>
+
+=back
+
+=head2 Attributes
+
+All attributes are read-only.
+
+=over
+
+=item C<< type >> B<TypeTiny>
+
+Type constraint for the parameter.
+
+=item C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
+
+A default for the parameter: either a coderef to generate a value,
+a reference to a string of Perl code to generate the value, an
+a reference to an empty array or empty hash, a literal string
+to use as a default, or a literal undef to use as a default.
+
+=item C<< strictness >> B<< Bool|ScalarRef >>
+
+A boolean indicating whether to be stricter with type checks,
+or a reference to a string of Perl code naming a Perl variable
+or constant which controls strict behaviour.
+
+=item C<< clone >> B<< Bool >>
+
+The method for accessing this is called C<should_clone> for no
+particular reason.
+
+=item C<< coerce >> B<< Bool >>
+
+Defaults to true if C<type> has a coercion.
+
+=item C<< optional >> B<< Bool >>
+
+Defaults to true if there is a C<default> or if C<type> is a subtype of
+B<Optional>.
+
+=item C<< in_list >> B<< Bool >>
+
+Boolean that is only used when the signature has the C<list_to_named>
+feature enabled.
+
+=item C<< default_on_undef >> B<< Bool >>
+
+Should the default be triggered if the caller passes an explicit undef?
+
+=back
+
+=head3 Attributes related to named parameters
+
+=over
+
+=item C<< name >> B<Str>
+
+=item C<< alias >> B<< ArrayRef[Str] >>
+
+=item C<< getter >> B<Str>
+
+=item C<< predicate >> B<< Str >>
+
+=back
+
+=head2 Methods
+
+=head3 Predicates
+
+Predicate methods return true/false to indicate the presence or absence of
+attributes.
+
+=over
+
+=item C<< has_type >>
+
+=item C<< has_default >>
+
+=item C<< has_strictness >>
+
+=item C<< has_name >>
+
+=item C<< has_alias >>
+
+=back
+
+=head3 Other methods
+
+=over
+
+=item C<< might_supply_new_value >>
+
+Indicates that the parameter can't simply be referenced within C<< @_ >>
+because a default value might be used, the given value might be coerced,
+or the given value might be cloned using L<Storable>.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Params>, L<Type::Params::Signature>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

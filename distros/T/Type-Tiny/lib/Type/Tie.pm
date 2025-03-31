@@ -11,7 +11,7 @@ use Scalar::Util ();
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.006000';
+	our $VERSION   = '2.008000';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -37,7 +37,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.006000';
+	our $VERSION   = '2.008000';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -161,7 +161,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.006000';
+	our $VERSION   = '2.008000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -204,7 +204,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.006000';
+	our $VERSION   = '2.008000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -239,7 +239,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.006000';
+	our $VERSION   = '2.008000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -375,12 +375,6 @@ If you clone tied variables with C<dclone> from L<Storable>, the clone
 will also be tied. The L<Clone> module is also able to successfully clone
 tied variables. With other cloning techniques, your level of success may vary.
 
-=begin trustme
-
-=item ttie
-
-=end trustme
-
 =head1 BUGS
 
 Please report any bugs to
@@ -400,7 +394,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2018-2019, 2022-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2018-2019, 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -410,4 +404,10 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item ttie
+
+=end trustme
 

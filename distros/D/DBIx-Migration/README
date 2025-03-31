@@ -71,10 +71,10 @@ DESCRIPTION
     executed independently. All related sections are encapsulated in a
     database transaction. If a migration embeds stored logic containing one
     or more semicolons (a PostgreSQL trigger function for example), the
-    "migrate()" method incorrectly splits the migration into sections,
-    causing an error. You can set a different delimiter to overcome this
-    problem. Add the "dbix_migration_delimiter" annotation as an SQL comment
-    to the migration
+    migrate() method incorrectly splits the migration into sections, causing
+    an error. You can set a different delimiter to overcome this problem.
+    Add the "dbix_migration_delimiter" annotation as an SQL comment to the
+    migration
 
       -- dbix_migration_delimiter: /
       ...

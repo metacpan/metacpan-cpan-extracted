@@ -11,6 +11,7 @@ examples/create_and_dump_publication_date5.pl
 examples/create_and_dump_publisher.pl
 examples/create_and_dump_series.pl
 examples/create_and_dump_wikidata_object.pl
+examples/create_and_dump_work.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -34,6 +35,7 @@ Object/People.pm
 Object/PublicationDate.pm
 Object/Publisher.pm
 Object/Series.pm
+Object/Work.pm
 README
 SIGNATURE
 t/MARC-Convert-Wikidata-Object-ExternalId/01-use.t
@@ -92,6 +94,9 @@ t/MARC-Convert-Wikidata-Object-Series/04-issn.t
 t/MARC-Convert-Wikidata-Object-Series/05-name.t
 t/MARC-Convert-Wikidata-Object-Series/06-publisher.t
 t/MARC-Convert-Wikidata-Object-Series/07-series_ordinal.t
+t/MARC-Convert-Wikidata-Object-Work/01-use.t
+t/MARC-Convert-Wikidata-Object-Work/02-version.t
+t/MARC-Convert-Wikidata-Object-Work/03-new.t
 t/MARC-Convert-Wikidata-Object/01-use.t
 t/MARC-Convert-Wikidata-Object/02-version.t
 t/MARC-Convert-Wikidata-Object/03-new.t
@@ -137,5 +142,7 @@ xt/MARC-Convert-Wikidata-Object-Publisher/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-Publisher/02-pod.t
 xt/MARC-Convert-Wikidata-Object-Series/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-Series/02-pod.t
+xt/MARC-Convert-Wikidata-Object-Work/01-pod_coverage.t
+xt/MARC-Convert-Wikidata-Object-Work/02-pod.t
 xt/MARC-Convert-Wikidata-Object/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object/02-pod.t

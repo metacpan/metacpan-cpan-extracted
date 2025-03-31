@@ -10,6 +10,8 @@ cnb000403605.mrc - Multiple publishers (260 field). Series (490 field).
 cnb000573607.mrc
 cnb000576456.mrc
 cnb000641953.mrc - Special format of series ordinal (490 field).
+                   Titles of separate works (505 field).
+cnb000750575.xml - Field 700 with t subfield.
 cnb000750997.mrc
 cnb000754547.mrc
 cnb000974260.mrc - Has sine loco as publication place.
@@ -20,6 +22,7 @@ cnb002031137.xml - Has three languages (041 field).
 cnb002181872.mrc - Editor (100 field).
 cnb002276974.mrc - Two ISBNs in the same publishing place.
 cnb002341867.mrc - Four ISBNs in two publishing houses with two book covers.
+                   Titles of separate works (505 field).
 cnb002467522.mrc - Publisher (264 field). Illustrator (700 field).
 cnb002536669.mrc - Two publishers, two places (264 field). Two ISBNs (020 field). Book series.
 cnb002662450.xml - Three ISBNs (020 field). Two publishing houses and box.

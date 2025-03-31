@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.015';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -95,7 +95,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ version 0.015
 
  sub MY::make_plans {
    my ($self, $planner) = @_;
-   $planner->load_module('Some::Module');
+   $planner->load_extension('Some::Module');
    ... # Add plans to $planner
  }
 

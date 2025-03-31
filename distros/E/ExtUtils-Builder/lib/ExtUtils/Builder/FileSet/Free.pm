@@ -1,5 +1,5 @@
 package ExtUtils::Builder::FileSet::Free;
-$ExtUtils::Builder::FileSet::Free::VERSION = '0.015';
+$ExtUtils::Builder::FileSet::Free::VERSION = '0.016';
 use strict;
 use warnings;
 

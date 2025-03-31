@@ -1,5 +1,14 @@
 Revision history for Kelp
 
+2.20 - 2025-03-30
+            [Changes]
+            - Fixed value 0 being ignored during url building
+            - Bad attempt to build an url will now always croak (instead of sometimes raising a warning and returning undef)
+                * this breaking change is considered a bugfix, since the old behavior was surprising and inconsistent
+
+            [Deprecations]
+            - Removed deprecated json_param scalar context behavior (deprecated in 2.10)
+
 2.19 - 2024-10-10
             [New Interface]
             - Added middleware_obj attribute to Kelp

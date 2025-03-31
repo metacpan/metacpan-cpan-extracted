@@ -6,12 +6,12 @@ use warnings;
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Mo qw(build default is);
-use Mo::utils 0.26 qw(check_array check_array_object check_number);
+use Mo::utils 0.26 qw(check_array check_array_object check_isa check_number);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 has authors => (
 	default => [],
@@ -52,6 +52,10 @@ has dml => (
 );
 
 has edition_number => (
+	is => 'ro',
+);
+
+has edition_of_work => (
 	is => 'ro',
 );
 
@@ -184,6 +188,9 @@ sub BUILD {
 	# Check dml id
 	check_number($self, 'dml');
 
+	# Check edition_of_work.
+	check_isa($self, 'edition_of_work', 'MARC::Convert::Wikidata::Object::Work');
+
 	# Check editors.
 	check_array_object($self, 'editors',
 		'MARC::Convert::Wikidata::Object::People', 'Editor');
@@ -264,6 +271,7 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $directors_ar = $obj->directors;
  my $dml = $obj->dml;
  my $edition_number = $obj->edition_number;
+ my $edition_of_work = $obj->edition_of_work;
  my $editors_ar = $obj->editors;
  my $end_time = $obj->end_time;
  my $external_ids_ar = $obj->external_ids;
@@ -356,6 +364,12 @@ Default value is undef.
 =item * C<edition_number>
 
 Edition number.
+
+Default value is undef.
+
+=item * C<edition_of_work>
+
+Edition of work.
 
 Default value is undef.
 
@@ -553,6 +567,14 @@ Get edition number.
 
 Returns number.
 
+=head2 C<edition_of_work>
+
+ my $edition_of_work = $obj->edition_of_work;
+
+Get edition of work.
+
+Returns L<MARC::Convert::Wikidata::Object::Work> instance.
+
 =head2 C<editors>
 
  my $editors_ar = $obj->editors;
@@ -733,6 +755,10 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Parameter 'translators' must be a array.
                  Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
                  Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
+         From Mo::utils::check_isa():
+                 Parameter 'edition_of_work' must be a 'MARC::Convert::Wikidata::Object::Work' object.
+                         Value: %s
+                         Reference: %s
          From Mo::utils::check_number():
                  Parameter '%s' must a number.
                          Value: %s
@@ -750,6 +776,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  use MARC::Convert::Wikidata::Object::ISBN;
  use MARC::Convert::Wikidata::Object::People;
  use MARC::Convert::Wikidata::Object::Publisher;
+ use MARC::Convert::Wikidata::Object::Work;
  use Unicode::UTF8 qw(decode_utf8);
  
  my $aut = MARC::Convert::Wikidata::Object::People->new(
@@ -778,6 +805,10 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
          'authors' => [$aut],
          'date_of_publication' => 2002,
          'edition_number' => 2,
+         'edition_of_work' => MARC::Convert::Wikidata::Object::Work->new(
+                 'title' => decode_utf8('Dějiny města Příbora'),
+                 'title_language' => 'cze',
+         ),
          'external_ids' => [
                  MARC::Convert::Wikidata::Object::ExternalId->new(
                          'name' => 'cnb',
@@ -791,6 +822,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
          'isbns' => [$isbn],
          'number_of_pages' => 414,
          'publishers' => [$publisher],
+         'title' => decode_utf8('Dějiny města Příbora'),
  );
  
  p $obj;
@@ -815,6 +847,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  #         ],
  #         date_of_publication   2002,
  #         edition_number        2,
+ #         edition_of_work       MARC::Convert::Wikidata::Object::Work,
  #         external_ids          [
  #             [0] MARC::Convert::Wikidata::Object::ExternalId,
  #             [1] MARC::Convert::Wikidata::Object::ExternalId
@@ -825,7 +858,8 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  #         number_of_pages       414,
  #         publishers            [
  #             [0] MARC::Convert::Wikidata::Object::Publisher
- #         ]
+ #         ],
+ #         title                 "Dějiny města Příbora"
  #     }
  # }
 
@@ -865,6 +899,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

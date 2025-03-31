@@ -15,6 +15,7 @@ SYNOPSIS
      my $directors_ar = $obj->directors;
      my $dml = $obj->dml;
      my $edition_number = $obj->edition_number;
+     my $edition_of_work = $obj->edition_of_work;
      my $editors_ar = $obj->editors;
      my $end_time = $obj->end_time;
      my $external_ids_ar = $obj->external_ids;
@@ -100,6 +101,12 @@ METHODS
     *       "edition_number"
 
             Edition number.
+
+            Default value is undef.
+
+    *       "edition_of_work"
+
+            Edition of work.
 
             Default value is undef.
 
@@ -292,6 +299,13 @@ METHODS
 
     Returns number.
 
+  "edition_of_work"
+     my $edition_of_work = $obj->edition_of_work;
+
+    Get edition of work.
+
+    Returns MARC::Convert::Wikidata::Object::Work instance.
+
   "editors"
      my $editors_ar = $obj->editors;
 
@@ -462,6 +476,10 @@ ERRORS
                      Parameter 'translators' must be a array.
                      Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
                      Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
+             From Mo::utils::check_isa():
+                     Parameter 'edition_of_work' must be a 'MARC::Convert::Wikidata::Object::Work' object.
+                             Value: %s
+                             Reference: %s
              From Mo::utils::check_number():
                      Parameter '%s' must a number.
                              Value: %s
@@ -476,6 +494,7 @@ EXAMPLE1
      use MARC::Convert::Wikidata::Object::ISBN;
      use MARC::Convert::Wikidata::Object::People;
      use MARC::Convert::Wikidata::Object::Publisher;
+     use MARC::Convert::Wikidata::Object::Work;
      use Unicode::UTF8 qw(decode_utf8);
  
      my $aut = MARC::Convert::Wikidata::Object::People->new(
@@ -504,6 +523,10 @@ EXAMPLE1
              'authors' => [$aut],
              'date_of_publication' => 2002,
              'edition_number' => 2,
+             'edition_of_work' => MARC::Convert::Wikidata::Object::Work->new(
+                     'title' => decode_utf8('Dějiny města Příbora'),
+                     'title_language' => 'cze',
+             ),
              'external_ids' => [
                      MARC::Convert::Wikidata::Object::ExternalId->new(
                              'name' => 'cnb',
@@ -517,6 +540,7 @@ EXAMPLE1
              'isbns' => [$isbn],
              'number_of_pages' => 414,
              'publishers' => [$publisher],
+             'title' => decode_utf8('Dějiny města Příbora'),
      );
  
      p $obj;
@@ -541,6 +565,7 @@ EXAMPLE1
      #         ],
      #         date_of_publication   2002,
      #         edition_number        2,
+     #         edition_of_work       MARC::Convert::Wikidata::Object::Work,
      #         external_ids          [
      #             [0] MARC::Convert::Wikidata::Object::ExternalId,
      #             [1] MARC::Convert::Wikidata::Object::ExternalId
@@ -551,7 +576,8 @@ EXAMPLE1
      #         number_of_pages       414,
      #         publishers            [
      #             [0] MARC::Convert::Wikidata::Object::Publisher
-     #         ]
+     #         ],
+     #         title                 "Dějiny města Příbora"
      #     }
      # }
 
@@ -576,5 +602,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.11
+    0.12
 

@@ -1,12 +1,12 @@
 ##----------------------------------------------------------------------------
 ## String Fuzzy - ~/lib/String/Fuzzy.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
-## Credits: Albert (OpenAI), Grok 3 (xAI)
 ## Created 2025/03/29
-## Modified 2025/03/30
+## Modified 2025/03/31
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -34,7 +34,7 @@ BEGIN
         token_set_ratio
         token_sort_ratio
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -307,7 +307,7 @@ String::Fuzzy - Python-style fuzzy string matching (fuzzywuzzy port)
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

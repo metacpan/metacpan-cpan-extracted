@@ -4,7 +4,7 @@ use strict;
 use App::Prove;
 use Getopt::Long;
 
-our $VERSION = '3.36';
+our $VERSION = '3.37';
 $|++;
 
 # Fire up the app, process args, and run the tests.
@@ -40,7 +40,9 @@ sub process_args {
         Getopt::Long::Configure(qw(no_ignore_case bundling pass_through));
         # Silence "Duplicate specification" warnings, since we replace some of
         # App::Prove's options.
-        local $^W;
+        local $SIG{__WARN__} = sub {
+            warn @_ if $_[0] !~ /^Duplicate specification/
+        };
         return Getopt::Long::GetOptions(
             @_,
             'psql-bin|b=s' => \$opts->{psql},
@@ -806,6 +808,6 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright
 
-Copyright (c) 2008-2022 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2008-2025 David E. Wheeler. Some Rights Reserved.
 
 =cut

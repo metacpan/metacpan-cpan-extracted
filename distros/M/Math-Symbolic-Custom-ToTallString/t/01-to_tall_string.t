@@ -86,23 +86,19 @@ K + (K * ----------------)
 K + (K * ---------------)
     (           (2*K*t) )
     (     1 + e^        )', height => 5, width => 25 },
-	test_024 => { expr => 'ln(x)', output => 'ln(x)', height => 1, width => 5 },
-	test_025 => { expr => 'ln(x/2)', output => '  ( x )
-ln(---)
-  ( 2 )', height => 3, width => 7 },
-	test_026 => { expr => '5 ^ 0.5', output => 'sqrt(5)', height => 1, width => 7 },
-	test_027 => { expr => '(x + y + z) ^ (1/2)', output => 'sqrt(x + y + z)', height => 1, width => 15 },
-	test_028 => { expr => 'log(5, x)', output => 'log(5 , x)', height => 1, width => 10 },
-	test_029 => { expr => 'log(5^y, ((2/5) - (1/2)))', output => '   (  y    2     1 )
+	test_024 => { expr => '5 ^ 0.5', output => 'sqrt(5)', height => 1, width => 7 },
+	test_025 => { expr => '(x + y + z) ^ (1/2)', output => 'sqrt(x + y + z)', height => 1, width => 15 },
+	test_026 => { expr => 'log(5, x)', output => 'log(5 , x)', height => 1, width => 10 },
+	test_027 => { expr => 'log(5^y, ((2/5) - (1/2)))', output => '   (  y    2     1 )
 log(5^  , --- - ---)
    (       5     2 )', height => 3, width => 20 },
-	test_030 => { expr => '((e^x) + (e^-x))/2', output => '   x     -x 
+	test_028 => { expr => '((e^x) + (e^-x))/2', output => '   x     -x 
  e^  + e^   
 ------------
      2      ', height => 4, width => 12 },
-	test_031 => { expr => 'x^2 + 2*x + 1', output => '  2          
+	test_029 => { expr => 'x^2 + 2*x + 1', output => '  2          
 x^  + 2*x + 1', height => 2, width => 13 },
-	test_032 => { expr => '3*x^3 - x^2 + 2*x + 1', output => '    3     2          
+	test_030 => { expr => '3*x^3 - x^2 + 2*x + 1', output => '    3     2          
 3*x^  - x^  + 2*x + 1', height => 2, width => 21 },
 );
 

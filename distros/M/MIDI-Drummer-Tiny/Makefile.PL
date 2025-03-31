@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Music::RhythmSet::Util" => 0,
     "Type::Library" => 0,
     "Type::Utils" => 0,
+    "Types::MIDI" => "0.601.0",
     "Types::Path::Tiny" => 0,
     "Types::Standard" => 0,
     "constant" => 0,
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Output" => "0.04"
   },
-  "VERSION" => "0.6005",
+  "VERSION" => "0.6006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "Test::Output" => "0.04",
   "Type::Library" => 0,
   "Type::Utils" => 0,
+  "Types::MIDI" => "0.601.0",
   "Types::Path::Tiny" => 0,
   "Types::Standard" => 0,
   "constant" => 0,

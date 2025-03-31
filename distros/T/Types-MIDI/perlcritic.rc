@@ -1,0 +1,14 @@
+severity = brutal
+verbose  = 9
+
+[Documentation::PodSpelling]
+stop_words = namespace TypeName barewords PercussionNote bugtracker
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | AUTHOR | COPYRIGHT AND LICENSE
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test2::V0
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Test2::V0

@@ -10,7 +10,7 @@ use Test::LivesOK 'lives_ok';
 use ExtUtils::Builder::Planner;
 
 my $planner = ExtUtils::Builder::Planner->new;
-$planner->load_module("Callback");
+$planner->load_extension("Callback");
 
 our @triggered;
 

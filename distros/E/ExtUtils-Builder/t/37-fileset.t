@@ -12,7 +12,7 @@ use ExtUtils::Builder::Planner;
 use File::Spec::Functions 'catfile';
 
 my $planner = ExtUtils::Builder::Planner->new;
-$planner->load_module("Callback");
+$planner->load_extension("Callback");
 
 my $sources = $planner->create_pattern(file => "*.src");
 my %sources;

@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use lib './lib';
 our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
-
+use Encode qw( encode_utf8 );
 use String::Fuzzy qw(
     ratio
     partial_ratio
@@ -80,7 +80,7 @@ else
 is( ratio( "café", "cafe" ), 100, 'Diacritics are normalized by default' );
 $score = ratio( "café", "cafe", normalize => 0 );
 is( $score, 80, "Diacritics matter without normalization (got $score)" );
-diag( "Debug: distance = ", String::Fuzzy::distance("café", "cafe"), ", len1 = ", length("café"), ", len2 = ", length("cafe") ) if( $DEBUG );
+diag( "Debug: distance = ", String::Fuzzy::distance("café", "cafe"), ", len1 = ", length(encode_utf8("café")), ", len2 = ", length(encode_utf8("cafe")) ) if( $DEBUG );
 
 # Edge cases
 is( ratio( "", "SparkPost" ), 0, 'Empty string against text gives 0' );
@@ -99,11 +99,12 @@ if ( !defined( $float_score ) )
 }
 else
 {
-    ok( $float_score > 79 && $float_score < 81, 'Ratio returns float (hello vs helo ~80)' );
+    is( sprintf( '%.2f', $float_score), sprintf( '%.2f', 80 ), 'Ratio returns float (hello vs helo ~80)' );
 }
 
 # Test partial_ratio with normalization disabled
-is( partial_ratio( "Cat", "category", normalize => 0 ), 66.66666666666666, 'Case-sensitive partial match' );
+my $partial_score = partial_ratio( "Cat", "category", normalize => 0 );
+is( sprintf("%.2f", $partial_score), 66.67, 'Case-sensitive partial match' );
 
 # Test undef handling
 is( ratio( undef, "cafe" ), 0, "Undef s1 returns 0" );

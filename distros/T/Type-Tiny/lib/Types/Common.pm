@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::VERSION   = '2.006000';
+	$Types::Common::VERSION   = '2.008000';
 }
 
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
@@ -55,6 +55,11 @@ Types::Common - the one stop shop
 
 This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 PLANNED FUTURE CHANGES
+
+In the future, this module may also export C<signature_for_func>
+and C<signature_for_method>.
 
 =head1 DESCRIPTION
 
@@ -117,7 +122,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2024 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

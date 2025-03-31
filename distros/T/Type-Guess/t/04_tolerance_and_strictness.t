@@ -5,11 +5,11 @@ use Type::Guess;
 
 my $t;
 
-Type::Guess->strictness(0);
+Type::Guess->skip_empty(0);
 $t = Type::Guess->new(1, 2, "", 3, 4);
 is($t->type, "Int");
 
-Type::Guess->strictness(1);
+Type::Guess->skip_empty(1);
 Type::Guess->tolerance(0.25);
 
 $t = Type::Guess->new(1, 2, "", 3, 4);

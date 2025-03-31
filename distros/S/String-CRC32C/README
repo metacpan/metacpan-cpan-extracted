@@ -1,5 +1,5 @@
 NAME
-    Strihng::CRC32C - Castagnoli CRC
+    String::CRC32C - Castagnoli CRC
 
 SYNOPSIS
      use String::CRC32C; # does not export anything by default
@@ -34,12 +34,19 @@ DESCRIPTION
 
         This allows easy chaining, e.g.
 
-           (crc32c "abcdefghi") eq (crc32 "ghi", crc32 "def", crc32 "abc)
+           (crc32c "abcdefghi") eq (crc32 "ghi", crc32 "def", crc32 "abc")
 
-    $impl = $String::CRC32C::IMPL
-        Returns a string indicating the implementation that will be used.
+    $String::CRC32C::IMPL
+        Contains a string indicating the implementation that will be used.
         Currently either "SlicingBy8" for the portable implementation or
         "IntelCSSE42" for the SSE 4.2 optimized intel version.
+
+PERLMULTICORE SUPPORT
+    This module supports the perl multicore spoecification
+    (<http://perlmulticore.schmorp.de/>): the "crc32c" function will
+    relinquish the current thread for crc32c lengths larger than 64k (the
+    break-even point on my machine is around 128k), so multiprocessing makes
+    only sense for very long blocks.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

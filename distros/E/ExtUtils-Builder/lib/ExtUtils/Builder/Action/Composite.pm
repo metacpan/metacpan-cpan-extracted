@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Composite;
-$ExtUtils::Builder::Action::Composite::VERSION = '0.015';
+$ExtUtils::Builder::Action::Composite::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ ExtUtils::Builder::Action::Composite - A base role for composite action classes
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 DESCRIPTION
 

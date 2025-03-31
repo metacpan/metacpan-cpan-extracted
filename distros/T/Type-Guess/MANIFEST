@@ -6,6 +6,7 @@ Makefile.PL
 README
 dist.ini
 lib/Type/Guess.pm
+lib/Type/Guess.pod
 lib/Type/Guess/Role/Date.pm
 lib/Type/Guess/Role/Tiny.pm
 lib/Type/Guess/Role/Unicode.pm
@@ -15,8 +16,5 @@ t/03_unicode.t
 t/04_tolerance_and_strictness.t
 t/05_type_tiny.t
 t/09_like_initial_with_tiny.t
-type_format/better_unilen.pl
-type_format/lib/Foo.pm
-type_format/messing_with_table.pl
-type_format/test_01.pl
-type_format/unilen.pl
+t/10_setting_length.t
+t/11_as_object.t

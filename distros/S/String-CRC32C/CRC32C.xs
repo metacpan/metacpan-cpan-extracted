@@ -2,6 +2,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "perlmulticore.h"
+
 // portable impl
 #include "crc32csb8.c"
 
@@ -42,6 +44,7 @@ detect (void)
 MODULE = String::CRC32C		PACKAGE = String::CRC32C
 
 BOOT:
+	perlmulticore_support ();
 	sv_setpv (get_sv ("String::CRC32C::IMPL", GV_ADD), detect ());
 
 PROTOTYPES: ENABLE
@@ -51,7 +54,9 @@ U32 crc32c (SV *data, U32 initvalue = 0)
 {
 	STRLEN len;
 	const char *ptr = SvPVbyte (data, len);
+	if (len > 65536) perlinterp_release ();
 	RETVAL = ~crc32c (~initvalue, ptr, len);
+	if (len > 65536) perlinterp_acquire ();
 }
 	OUTPUT: RETVAL
 

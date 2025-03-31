@@ -1,5 +1,9 @@
 Revision history for Math::Cephes
 
+0.5307  2025-03-31
+    - Apply https://github.com/shlomif/Math-Cephes/pull/5
+        - ExtUtils::MakeMaker fixes.
+
 0.5306  2025-02-25
     - Convert Changes to CPAN::Changes format.
     - Some patches from debian.org for better portability.

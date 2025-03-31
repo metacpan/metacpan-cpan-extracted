@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tied::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tied::VERSION   = '2.006000';
+	$Types::Standard::Tied::VERSION   = '2.008000';
 }
 
 $Types::Standard::Tied::VERSION =~ tr/_//d;
@@ -24,6 +24,7 @@ no warnings;
 sub __constraint_generator {
 	return Types::Standard->meta->get_type( 'Tied' ) unless @_;
 	
+	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Tied', \@_, 1 );
 	my $param = Types::TypeTiny::to_TypeTiny( shift );
 	unless ( Types::TypeTiny::is_TypeTiny( $param ) ) {
 		Types::TypeTiny::is_StringLike( $param )

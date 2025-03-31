@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.006000';
+	$Type::Tiny::VERSION    = '2.008000';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -430,6 +430,7 @@ sub new {
 	if ( $params{my_methods} ) {
 		require Eval::TypeTiny;
 		Scalar::Util::reftype( $params{my_methods}{$_} ) eq 'CODE'
+			and /\A[^0-9\W]\w+\z/
 			and Eval::TypeTiny::set_subname(
 				sprintf( "%s::my_%s", $self->qualified_name, $_ ),
 				$params{my_methods}{$_},
@@ -1184,6 +1185,23 @@ sub is_parameterized {
 	} #/ sub parameterize
 }
 
+sub check_parameter_count_for_parameterized_type {
+	my ( $library, $type_name, $args, $max_args, $min_args ) = @_;
+	$args = @$args if ref $args;
+	
+	if ( ( defined $max_args and $args > $max_args ) or ( defined $min_args and $args < $min_args ) ) {
+		require Error::TypeTiny::WrongNumberOfParameters;
+		Error::TypeTiny::WrongNumberOfParameters->throw(
+			target => "$library\::$type_name\[]",
+			( defined $min_args ) ? ( minimum => $min_args ) : (),
+			( defined $max_args ) ? ( maximum => $max_args ) : (),
+			got => $args,
+		);
+	}
+	
+	return;
+}
+
 sub child_type_class {
 	__PACKAGE__;
 }
@@ -1731,62 +1749,63 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
- use v5.12;
- use strict;
- use warnings;
- 
- package Horse {
-   use Moo;
-   use Types::Standard qw( Str Int Enum ArrayRef Object );
-   use Type::Params qw( signature );
-   use namespace::autoclean;
-   
-   has name => (
-     is       => 'ro',
-     isa      => Str,
-     required => 1,
-   );
-   has gender => (
-     is       => 'ro',
-     isa      => Enum[qw( f m )],
-   );
-   has age => (
-     is       => 'rw',
-     isa      => Int->where( '$_ >= 0' ),
-   );
-   has children => (
-     is       => 'ro',
-     isa      => ArrayRef[Object],
-     default  => sub { return [] },
-   );
-   
-   sub add_child {
-     state $check = signature(
-       method     => Object,
-       positional => [ Object ],
-     );                                         # method signature
-     my ( $self, $child ) = $check->( @_ );     # unpack @_
-     
-     push @{ $self->children }, $child;
-     return $self;
-   }
- }
- 
- package main;
- 
- my $boldruler = Horse->new(
-   name    => "Bold Ruler",
-   gender  => 'm',
-   age     => 16,
- );
- 
- my $secretariat = Horse->new(
-   name    => "Secretariat",
-   gender  => 'm',
-   age     => 0,
- );
- 
- $boldruler->add_child( $secretariat );
+  use v5.36;
+  
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Int Enum ArrayRef Object );
+    use Type::Params qw( signature_for );
+    use namespace::autoclean;
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+      required => 1,
+    );
+    
+    has gender => (
+      is       => 'ro',
+      isa      => Enum[qw( f m )],
+    );
+    
+    has age => (
+      is       => 'rw',
+      isa      => Int->where( '$_ >= 0' ),
+    );
+    
+    has children => (
+      is       => 'ro',
+      isa      => ArrayRef[Object],
+      default  => sub { return [] },
+    );
+    
+    # method signature
+    signature_for add_child => (
+      method     => Object,
+      positional => [ Object ],
+    );
+    
+    sub add_child ( $self, $child ) {
+      push $self->children->@*, $child;
+      return $self;
+    }
+  }
+  
+  package main;
+  
+  my $boldruler = Horse->new(
+    name    => "Bold Ruler",
+    gender  => 'm',
+    age     => 16,
+  );
+  
+  my $secretariat = Horse->new(
+    name    => "Secretariat",
+    gender  => 'm',
+    age     => 0,
+  );
+  
+  $boldruler->add_child( $secretariat );
 
 =head1 STATUS
 
@@ -2067,8 +2086,9 @@ Optional.
 =item C<< coercion_generator >>
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
-Called with the same parameters and package variables as the
-C<constraint_generator>. Expected to return a blessed object.
+It is passed the parent type, child type, and list of parameters. It should
+have access to the same package variables as the C<constraint_generator>.
+Expected to return a blessed object.
 
 Optional.
 
@@ -2586,6 +2606,21 @@ anything useful.
 
 =back
 
+=head2 Functions
+
+=over
+
+=item *
+
+C<< check_parameter_count_for_parameterized_type( $lib, $typename, $args, $max, $min ) >>
+
+Utility function used by some types from Types::Standard, etc.
+
+Will throw a L<Error::TypeTiny::WrongNumberOfParameters> exception referencing
+C<< "$lib::\$typename\[]" >> if C<< $args >> is greater than C<< $max >> or
+less than C<< $min >>, if they're defined. If C<< $args >> is an arrayref,
+will use the length of the array.
+
 =head2 Overloading
 
 =over
@@ -2751,7 +2786,7 @@ Thanks to Matt S Trout for advice on L<Moo> integration.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

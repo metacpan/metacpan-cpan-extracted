@@ -1,5 +1,5 @@
 package ExtUtils::Builder::FileSet::Subst;
-$ExtUtils::Builder::FileSet::Subst::VERSION = '0.015';
+$ExtUtils::Builder::FileSet::Subst::VERSION = '0.016';
 use strict;
 use warnings;
 

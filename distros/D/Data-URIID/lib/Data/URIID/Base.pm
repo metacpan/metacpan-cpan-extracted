@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier v0.08;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 
 
@@ -52,6 +52,13 @@ sub displayname {
     return $opts{default} if exists $opts{default};
 
     croak 'No displayname known';
+}
+
+
+sub as {
+    my ($self, $as, %opts) = @_;
+    $opts{extractor} //= $self->{extractor};
+    return $self->Data::Identifier::as($as, %opts);
 }
 
 # ---- Private helpers ----
@@ -114,7 +121,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -171,9 +178,6 @@ L<Data::URIID::Result>,
 L<Data::URIID::Service>,
 L<Data::Identifier>.
 
-If using this parameter it is recommended to have L<Data::Identifier> installed.
-It may become a requirement in future versions.
-
 =item C<default>
 
 Returns the given value if no value is found.
@@ -214,6 +218,14 @@ B<Experimental:>
 If set to true this will avoid returning an identifier or any other default value.
 
 =back
+
+=head2 as
+
+    my $xxx = $base->as($as, [ %opts ] );
+
+Proxy for L<Data::Identifier/as>.
+
+Automatically adds C<extractor> to C<%opts> if any is known (see L</extractor>).
 
 =head1 AUTHOR
 

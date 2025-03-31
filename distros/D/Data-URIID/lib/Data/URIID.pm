@@ -23,7 +23,7 @@ use Data::Identifier;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %names = (
     service => {
@@ -204,6 +204,7 @@ sub new {
 #@returns Data::URIID::Result
 sub lookup {
     my ($self, $type, $uri) = @_;
+    my %secondary;
 
     # Note: We use 'auto' as default and try to figure out of it's an ISE or an URI.
 
@@ -215,6 +216,18 @@ sub lookup {
     croak 'Passed undef as URI' unless defined $uri;
 
     if (blessed($uri) && !$uri->isa('URI')) {
+        if (defined(my $displaycolour = eval {$uri->displaycolour})) {
+            if (eval {$displaycolour->isa('Data::URIID::Colour')}) {
+                $secondary{attributes} //= {};
+                $secondary{attributes}{displaycolour} //= {'*' => $displaycolour};
+            }
+        }
+
+        if (defined(my $displayname = eval {$uri->displayname(default => undef, no_defaults => 1)})) {
+            $secondary{attributes} //= {};
+            $secondary{attributes}{displayname} //= {'*' => $displayname};
+        }
+
         if ($uri->isa('Data::URIID::Result')) {
             $uri = $uri->url;
         } elsif ($uri->isa('Data::Identifier')) {
@@ -224,6 +237,15 @@ sub lookup {
             ($type, $uri) = (ise => $uri->ise);
         } elsif ($uri->isa('Mojo::URL')) {
             $uri = URI->new("$uri"); # convert to URI as per documentation of Mojo::URL
+        } elsif ($uri->isa('File::FStore::File')) {
+            my $data = $uri->get;
+            $type = 'ise';
+            $uri = $uri->get(properties => 'contentise');
+
+            $secondary{attributes} //= {};
+            $secondary{attributes}{final_file_size} //= {'*' => $data->{properties}{size}} if defined $data->{properties}{size};
+            $secondary{attributes}{roles} = [[Data::Identifier->new(sid => 17)]];
+            $secondary{digest} = $data->{digests};
         } else {
             croak 'Invalid type of object passed';
         }
@@ -233,7 +255,7 @@ sub lookup {
         if (ref $type) {
             my URI $u;
 
-            if ($type->isa('URI')) {
+            if ($type->isa('URI') || $type->isa('Mojo::URL')) {
                 $type = $self->lookup($type);
             }
 
@@ -269,7 +291,7 @@ sub lookup {
 
     croak 'URI is not absolute' unless defined($uri->scheme) && length($uri->scheme);
 
-    return Data::URIID::Result->new(uri => $uri, extractor => $self);
+    return Data::URIID::Result->new(uri => $uri, extractor => $self, secondary => \%secondary);
 }
 
 
@@ -452,7 +474,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -463,6 +485,7 @@ version v0.13
     my $result = $extractor->lookup( $uri );
 
     my $id = $result->id( $type );
+    my $displayname = $result->attribute('displayname');
 
 This module provides a way to extract knowledge (mainly identifier) from a given URL, a QR Code,
 or similar objects.
@@ -578,9 +601,14 @@ Useragent to use (L<LWP::UserAgent>).
 Tries to look up the URI and returns the result.
 Takes an L<URI> object (preferred) or a plain string as argument.
 Alternatively can internally also convert from
-L<Mojo::URL>, L<Data::URIID::Service>, L<Data::URIID::Result>, and L<Data::URIID::Colour>.
+L<Mojo::URL>,
+L<File::FStore::File>,
+L<Data::Identifier>,
+L<Data::URIID::Service>,
+L<Data::URIID::Result>,
+and L<Data::URIID::Colour>.
 
-C<$type> is one of C<uri>, C<ise>, or C<qrcode>, an UUID, or an object of type L<URI> or L<Data::URIID::Result>.
+C<$type> is one of C<uri>, C<ise>, or C<qrcode>, an UUID, or an object of any type supported for C<$uri>.
 Defaults to C<uri>.
 When C<ise> an UUID or OID can be provided instead of an URI.
 When C<qrcode> the text content from an QR code can be provided.

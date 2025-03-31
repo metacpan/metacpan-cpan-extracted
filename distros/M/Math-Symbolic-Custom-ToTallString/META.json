@@ -54,6 +54,6 @@
          "web" : "https://github.com/mjohnson108/p5-msc-totallstring"
       }
    },
-   "version" : "0.1",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

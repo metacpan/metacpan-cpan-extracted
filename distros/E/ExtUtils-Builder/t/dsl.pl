@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-load_module("Callback");
+load_extension("Callback");
 
 add_foo($_) for 0..2;
 

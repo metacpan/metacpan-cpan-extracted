@@ -59,27 +59,27 @@
    "provides" : {
       "Data::URIID" : {
          "file" : "lib/Data/URIID.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       },
       "Data::URIID::Base" : {
          "file" : "lib/Data/URIID/Base.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       },
       "Data::URIID::Colour" : {
          "file" : "lib/Data/URIID/Colour.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       },
       "Data::URIID::Digest" : {
          "file" : "lib/Data/URIID/Digest.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       },
       "Data::URIID::Result" : {
          "file" : "lib/Data/URIID/Result.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       },
       "Data::URIID::Service" : {
          "file" : "lib/Data/URIID/Service.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.14.0"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-URIID.git"
       }
    },
-   "version" : "v0.13",
+   "version" : "v0.14",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

@@ -177,14 +177,14 @@ automatically coerce a parameter if there is a coercion for that type.
 
   use Types::Standard qw( Object );
   use Types::Common::String qw( UpperCaseStr );
-  use Type::Params;
+  use Type::Params qw( signature_for );
   
-  sub set_account_name {
-    state $check = signature(
-      method     => Object,
-      positional => [ UpperCaseStr->no_coercions ],
-    );
-    my ( $self, $name ) = $check->( @_ );
+  signature_for set_account_name => (
+    method     => Object,
+    positional => [ UpperCaseStr->no_coercions ],
+  );
+  
+  sub set_account_name ( $self, $name ) {
     $self->_account_name( $name );
     $self->db->update( $self );
     return $self;
@@ -442,7 +442,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

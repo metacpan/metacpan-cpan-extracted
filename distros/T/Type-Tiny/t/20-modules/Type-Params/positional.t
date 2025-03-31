@@ -21,7 +21,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -64,12 +64,12 @@ is_deeply(
 
 {
 	my $e = exception { nth_root() };
-	like($e, qr{^Wrong number of parameters; got 0; expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 0; expected 2}, '(1)');
 }
 
 {
 	my $e = exception { nth_root(1) };
-	like($e, qr{^Wrong number of parameters; got 1; expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 1; expected 2}, '(1)');
 }
 
 {
@@ -79,7 +79,7 @@ is_deeply(
 
 {
 	my $e = exception { nth_root(1, 2, 3) };
-	like($e, qr{^Wrong number of parameters; got 3; expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 3; expected 2}, '(1)');
 }
 
 my $fooble_check;

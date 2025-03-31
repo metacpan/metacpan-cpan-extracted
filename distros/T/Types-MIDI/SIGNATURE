@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a32978cc0a3d4b0b234e54583b6cb4b7952e66386b5cdd3c6761ceb25482a8b1 CONTRIBUTING.md
+SHA256 22cc9be3984eff6855460328b472374528e2c81be69266c11ca76654ac0b183d Changes
+SHA256 ff447abc6218e205ea69e57690e94f0bb5ec93fe076007b1ce49ef1f870c52b9 LICENSE
+SHA256 a95e6a0467a5594bafc0a721b48d6a570058835d2b3795318e4b6e998c1ee7b4 MANIFEST
+SHA256 f18d3fe999080118a0f2dbbf3ea64121c0eade97616d514ffc4c4c38dd5dce42 META.json
+SHA256 b87cadedd123518b3c3367f4b7bfe438b24e3ce0b84c3cf6546924aa60773419 META.yml
+SHA256 404a548090fa07c1bd1306e4ce895441f650a28f33aefe4296f7b563f70f5fc1 Makefile.PL
+SHA256 63dacacf77ce0ca42b352a75728d82875423c18ad722ee0919467c01e7cf3e27 README
+SHA256 3040cace61e85cde84c2eea855e2e59e0c21e4f08bea7897bef53746ce8b3887 README.md
+SHA256 392473f16b92d6edd62ae602420b5f523fbf8a74cc777449293e24187ee13f44 dist.ini
+SHA256 6b2e9d09132d3aee98de0554e4354277c1e954e299a61d499ec9ae631a404d6c lib/Types/MIDI.pm
+SHA256 56574e780f8dd9afee93e25e364016190d3bbca24652f247d7c1c87076b96d64 perlcritic.rc
+SHA256 a2ecc94dc89374d1248471790b927efbf8fe626d9f1c528f5f37d2b346ef330a t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 4b70b3281104ad0ee824bedd0b99fb060fa48999a2dfdc4e5e047a64619d1f1c t/lib/TestPercussion.pm
+SHA256 5543d8b3bf44207494eb879c602e6f65bb736fd67493702842329cb06ffa8003 t/library_functions.t
+SHA256 51030af7a3bfcc1274edabf402061eee7891b228984bf202f12629cdafc1f26f t/midi-perl_percussion.t
+SHA256 c06931b3879abcfab1e418c23c17a0884e1eec83c19798ea60e80aee43f3b14d t/test_percussion.t
+SHA256 69ebab3ef32da9a530c6f941804197f49dd117a757a40b0f856c103739d9770d weaver.ini
+SHA256 ae694d0ebed108ba8f79bfdb41011859bc8ed3b9e3b6af061331e29f74dac401 xt/author/00-compile.t
+SHA256 00c93f4bc35e4cc76a062803ce946df608b3fc2d8be49ff56f5e3ba0c8ed8f2b xt/author/critic.t
+SHA256 fce44608a4b31479d43c79a91659a25a48ce8ad1ebfd5afa81c599fd865d8bb8 xt/author/eol.t
+SHA256 38143646fbc9229fca774cd930f58acd60f7d8eb4bc19d6d478415a697470aab xt/author/no-tabs.t
+SHA256 338e11a8a30d1e4c50f199edcf6455bba8f634d53224aeb656fc696fb783bf6e xt/author/pod-coverage.t
+SHA256 01c189b60dbbc17780700c3d394ebe0930b9802329799f968dcce40436484111 xt/author/pod-syntax.t
+SHA256 e0f7231f875bb7b8a5f22ea4104ce06a2e6824fa4367846d7d2e02200073904e xt/author/synopsis.t
+SHA256 35eeaf905a0d1787a6c788122de15b18d234495db7733cfc35eb49587243f66c xt/release/changes_has_content.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBAwAdFiEETa3+/o5K0Pkry7uBQvPKiYywikUFAmfp7OkACgkQQvPKiYyw
+ikWbWgf+INeaxmgKEjIe8Vm1w3xpoIpmphgWkxFbwf6KS4RvI1lE2dQGzmLbcTdc
+Wv3LNLqCjXDp+bwdSlUpSGlBGOv7hTDglN/qMhQfJB1O/kJkziPpv1psMJfbqxnL
+5143q7hmMC4qK3QqRFW1Qqkq1tlfyw1prLcHvfBB5OL4fEsa4yS51c+meERCVS60
+jnncQ25EmbwG1jZQzGCspyLtMiZN0JH6Dce3OfauYxVUDtgqtOFQwuACnWplGJDN
+aAtAHN3S7WkqKDq16XPdET1XM073UhQcy9Hl7WeXGSwaxykKvJkD5B4saFIdZuIk
+V37t88g9vYiJeouZl38xRsI22+QoHg==
+=P0eY
+-----END PGP SIGNATURE-----

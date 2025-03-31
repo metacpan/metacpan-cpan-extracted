@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019-2024 by Toby Inkster.
+This software is copyright (c) 2019-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -25,6 +25,7 @@ use Test::More;
 use Test::Requires '5.020';
 use Test::Fatal;
 use Test::TypeTiny;
+use Test::Requires qw(boolean);
 use Types::Standard qw( StrMatch );
 use Test::Requires { 'Test::Warnings' => 0.005 };
 use Test::Warnings ':all';

@@ -14,25 +14,50 @@ use overload '""' => \&rgb;
 
 use Carp;
 use UUID::Tiny ':std';
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use parent 'Data::URIID::Base';
+
+my %_registered;
 
 
 
 sub new {
     my ($pkg, %opts) = @_;
+    my __PACKAGE__ $self;
 
-    die 'No RGB value given' unless defined $opts{rgb};
+    if (defined(my $from = delete($opts{from}))) {
+        if (blessed $from) {
+            if ($from->isa('Data::URIID::Base')) {
+                $opts{extractor} //= $from->extractor(default => undef);
+            }
+
+            if ($from->isa(__PACKAGE__)) {
+                $opts{rgb} //= $from->rgb;
+            } else {
+                $from = $from->ise;
+            }
+        }
+
+        $opts{rgb} //= $_registered{$from};
+    }
+
+    croak 'No RGB value given' unless defined $opts{rgb};
 
     $opts{rgb} = uc($opts{rgb});
     $opts{rgb} =~ /^#[0-9A-F]{6}$/ or die 'Bad format';
 
     weaken($opts{extractor});
 
-    return bless \%opts, $pkg;
+    $self = bless \%opts, $pkg;
+
+    if (delete $opts{register}) { # not (yet) part of public API
+        $_registered{$self->ise} //= $opts{rgb};
+    }
+
+    return $self;
 }
 
 
@@ -66,6 +91,14 @@ sub displayname {
     return $self->SUPER::displayname(%opts, _fallback => $self->rgb);
 }
 
+# ---- Private helpers ----
+
+# Private for now.
+sub displaycolour {
+    my ($self) = @_;
+    return $self;
+}
+
 1;
 
 __END__
@@ -80,7 +113,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -110,6 +143,18 @@ The RGB value in hex notation. E.g. C<#FF0000>.
 =item C<extractor>
 
 optionally, an instance of L<Data::URIID>.
+
+=item C<from>
+
+optionally, an instance of any colour provider.
+The provider might be used to fill defaults for the other options (such as C<rgb> or C<extractor>).
+
+Currently the value must be one of
+L<Data::URIID::Colour>,
+or L<Data::URIID::Result>.
+But other types might also be supported.
+
+If using L<Data::URIID::Result> this might not be what you want. See also L<Data::URIID::Result/displaycolour>.
 
 =back
 

@@ -33,7 +33,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use parent 'Data::URIID::Base';
 
@@ -1228,7 +1228,7 @@ sub attribute {
 
             @value = @{$value} if ref($value) eq 'ARRAY';
 
-            foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+            foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
                 next unless defined($result) && defined($result->{attributes});
                 if (defined($value = $result->{attributes}->{$key})) {
                     if (ref($value) eq 'HASH') {
@@ -1324,7 +1324,7 @@ sub digest {
         $self->{offline_results} //= {};
         $self->{online_results}  //= {};
 
-        foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
             next unless defined($result) && defined($result->{digest});
             last if defined($value = $result->{digest}{$key});
         }
@@ -1372,7 +1372,7 @@ sub available_keys {
         $self->{offline_results} //= {};
         $self->{online_results}  //= {};
 
-        foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
             next unless defined($result) && defined($result->{digest});
             %digest = (%digest, %{$result->{digest}});
         }
@@ -1639,7 +1639,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

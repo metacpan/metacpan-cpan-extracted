@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '2.006000';
+	$Types::Standard::VERSION   = '2.008000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -97,6 +97,14 @@ my $add_core_type = sub {
 	if ( Type::Tiny::_USE_XS
 		and ( Type::Tiny::XS->VERSION < 0.016 or $] < 5.018 )
 		and $name eq 'Int' )
+	{
+		# Broken implementation of Int
+		$xsub = $xsubname = undef;
+	}
+
+	if ( Type::Tiny::_USE_XS
+		and $name eq 'Int'
+		and do { use Config (); $Config::Config{usequadmath} } )
 	{
 		# Broken implementation of Int
 		$xsub = $xsubname = undef;
@@ -387,6 +395,7 @@ my $_ref = $meta->$add_core_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Ref' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Ref', \@_, 1 );
 			my $reftype = shift;
 			$reftype =~
 				/^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|REGEXP|Regexp)$/i
@@ -577,6 +586,7 @@ $meta->$add_core_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Maybe' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Maybe', \@_, 1 );
 			my $param = Types::TypeTiny::to_TypeTiny( shift );
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -671,6 +681,7 @@ my $_Optional = $meta->add_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Optional' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Optional', \@_, 1 );
 			my $param = Types::TypeTiny::to_TypeTiny( shift );
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -715,6 +726,8 @@ $_slurpy = $meta->add_type(
 		parent               => $_item,
 		constraint_generator => sub {
 			my $self  = $_slurpy;
+			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Slurpy', \@_, 1 );
 			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -1126,70 +1139,71 @@ Types::Standard - bundled set of built-in types for Type::Tiny
 
 =head1 SYNOPSIS
 
- use v5.12;
- use strict;
- use warnings;
- 
- package Horse {
-   use Moo;
-   use Types::Standard qw( Str Int Enum ArrayRef Object );
-   use Type::Params qw( compile );
-   use namespace::autoclean;
-   
-   has name => (
-     is       => 'ro',
-     isa      => Str,
-     required => 1,
-   );
-   has gender => (
-     is       => 'ro',
-     isa      => Enum[qw( f m )],
-   );
-   has age => (
-     is       => 'rw',
-     isa      => Int->where( '$_ >= 0' ),
-   );
-   has children => (
-     is       => 'ro',
-     isa      => ArrayRef[Object],
-     default  => sub { return [] },
-   );
-   
-   sub add_child {
-     state $check = signature(
-       method     => Object,
-       positional => [ Object ],
-     );                                         # method signature
-     my ( $self, $child ) = $check->( @_ );     # unpack @_
-     
-     push @{ $self->children }, $child;
-     return $self;
-   }
- }
- 
- package main;
- 
- my $boldruler = Horse->new(
-   name    => "Bold Ruler",
-   gender  => 'm',
-   age     => 16,
- );
- 
- my $secretariat = Horse->new(
-   name    => "Secretariat",
-   gender  => 'm',
-   age     => 0,
- );
- 
- $boldruler->add_child( $secretariat );
- 
- use Types::Standard qw( is_Object assert_Object );
- 
- # is_Object($thing) returns a boolean
- my $is_it_an_object = is_Object($boldruler);
- 
- # assert_Object($thing) returns $thing or dies
- say assert_Object($boldruler)->name;  # says "Bold Ruler"
+  use v5.36;
+  
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Int Enum ArrayRef Object );
+    use Type::Params qw( signature_for );
+    use namespace::autoclean;
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+      required => 1,
+    );
+    
+    has gender => (
+      is       => 'ro',
+      isa      => Enum[qw( f m )],
+    );
+    
+    has age => (
+      is       => 'rw',
+      isa      => Int->where( '$_ >= 0' ),
+    );
+    
+    has children => (
+      is       => 'ro',
+      isa      => ArrayRef[Object],
+      default  => sub { return [] },
+    );
+    
+    # method signature
+    signature_for add_child => (
+      method     => Object,
+      positional => [ Object ],
+    );
+    
+    sub add_child ( $self, $child ) {
+      push $self->children->@*, $child;
+      return $self;
+    }
+  }
+  
+  package main;
+  
+  my $boldruler = Horse->new(
+    name    => "Bold Ruler",
+    gender  => 'm',
+    age     => 16,
+  );
+  
+  my $secretariat = Horse->new(
+    name    => "Secretariat",
+    gender  => 'm',
+    age     => 0,
+  );
+  
+  $boldruler->add_child( $secretariat );
+  
+  use Types::Standard qw( is_Object assert_Object );
+  
+  # is_Object($thing) returns a boolean
+  my $is_it_an_object = is_Object $boldruler;
+  
+  # assert_Object($thing) returns $thing or dies
+  say assert_Object($boldruler)->name;  # says "Bold Ruler"
 
 =head1 STATUS
 
@@ -1486,12 +1500,6 @@ how slurpy types were created.
 Outside of B<Dict> and B<Tuple>, B<< Slurpy[Foo] >> should just act the
 same as B<Foo>. But don't do that.
 
-=begin trustme
-
-=item slurpy
-
-=end trustme
-
 =head2 Objects
 
 Okay, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
@@ -1683,7 +1691,7 @@ Similar to B<Tuple>, but cyclical.
    CycleTuple[Int, HashRef]
 
 will allow C<< [1,{}] >> and C<< [1,{},2,{}] >> but disallow
-C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
+C<< [1,{},2] >> and C<< [1,{},2,"not a hashref"] >>.
 
 I think you understand B<CycleTuple> already.
 
@@ -1843,7 +1851,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -1853,3 +1861,9 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item slurpy
+
+=end trustme

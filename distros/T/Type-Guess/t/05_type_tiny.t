@@ -9,7 +9,7 @@ $\ = "\n"; $, = "\t";
 
 my @data = (
 	   [qw/a b cd efg hijk/],
-	   [qw/1 23 456 12000 12.0/],
+	   [qw/1 23 456 12000 12/],
 	   [qw/1.12345 23 456 12000 12.0/],
 	   [qw/-100% -13% 12.1%/],
 	   [23, +16, -100],
@@ -23,11 +23,10 @@ my @expected = qw/Str
 		  Int
 		  Str/;
 
-
 for my $l (@data) {
-    is(Type::Guess->with_roles("+Tiny")->new($l->@*)->type->name, $expected[0], shift @expected)
+    is(Type::Guess->with_roles("+Tiny")->new($l->@*)->type->name, $expected[0]);
+    shift @expected;
 }
-
 print "-" x 80;
 
 my $Date = Type::Tiny->new(

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.015';
+$ExtUtils::Builder::Planner::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -123,8 +123,11 @@ sub _make_pattern {
 			};
 		}
 	} elsif ($options{dir}) {
+		my $dir = ExtUtils::Builder::Util::native_to_unix_path($options{dir});
 		return sub {
-			my ($filename) = @_;
+			my ($input) = @_;
+			my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
+			$filename =~ s{(?<!/)$}{/}ms;
 			return substr($filename, 0, length $options{dir}) eq $options{dir};
 		};
 	} else {
@@ -179,12 +182,13 @@ sub add_delegate {
 	return;
 }
 
-sub load_module {
+sub load_extension {
 	my ($self, $plannable, $version, %options) = @_;
 	ExtUtils::Builder::Util::require_module($plannable);
 	$plannable->VERSION($version) if $version;
 	return $plannable->add_methods($self, %options);
 }
+*load_module = \&load_extension;
 
 sub materialize {
 	my $self = shift;
@@ -246,7 +250,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -386,9 +390,11 @@ this sets the name of the new set, if none is given one will be generated.
 
 This marks a file as existing on the filesystem by adding it to the C<'all-files'> fileset.
 
-=head2 load_module($extension, $version, %options)
+=head2 load_extension($extension, $version, %options)
 
 This adds the delegate from the given module. If C<$version> is defined it will verify if the extension is at least that version.
+
+C<load_module> is a depreciated alias for this function.
 
 =head2 new_scope()
 
@@ -401,7 +407,7 @@ This runs C<$filename> as a DSL file. This is a script file that includes Planne
  use strict;
  use warnings;
 
- load_module("Foo");
+ load_extension("Foo");
 
  add_foo("a.foo", "a.bar");
 
@@ -429,6 +435,7 @@ This will also add C<command>, C<function> and C<code> helper functions that cor
 This returns a new L<ExtUtils::Builder::Plan|ExtUtils::Builder::Plan> object based on the planner.
 
 =for Pod::Coverage new
+load_module
 
 =head1 AUTHOR
 

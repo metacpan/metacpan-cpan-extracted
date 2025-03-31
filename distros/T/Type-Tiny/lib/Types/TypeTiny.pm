@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '2.006000';
+our $VERSION   = '2.008000';
 
 $VERSION =~ tr/_//d;
 
@@ -445,16 +445,22 @@ sub BoolLike () {
 		constraint => sub {
 			!defined( $_ )
 				or !ref( $_ ) && ( $_ eq '' || $_ eq '0' || $_ eq '1' )
-				or blessed( $_ ) && _check_overload( $_, q[bool] )
-				or blessed( $_ ) && _check_overload( $_, q[0+] ) && do { my $n = sprintf('%d', $_); $n==0 or $n==1 };
+				or blessed( $_ ) && (
+					_check_overload( $_, q[bool] )
+					or _check_overload( $_, q[0+] ) && do { my $n = sprintf('%d', $_); $n==0 or $n==1 }
+					or do { my $d = $_->can('DOES') || $_->can('isa'); $_->$d('boolean') }
+				)
 		},
 		inlined => sub {
 			qq/do {
 				local \$_ = $_;
 				!defined()
 					or !ref() && ( \$_ eq '' || \$_ eq '0' || \$_ eq '1' )
-					or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[bool])
-					or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[0+]) && do { my \$n = sprintf('%d', $_); \$n==0 or \$n==1 }
+					or Scalar::Util::blessed(\$_) && (
+						${\ +_get_check_overload_sub() }(\$_, q[bool])
+						or ${\ +_get_check_overload_sub() }(\$_, q[0+]) && do { my \$n = sprintf('%d', $_); \$n==0 or \$n==1 }
+						or do { my \$d = \$_->can('DOES') || \$_->can('isa'); \$_->\$d('boolean') }
+					)
 			}/;
 		},
 		type_default => sub { return !!0 },
@@ -860,7 +866,8 @@ B<< BoolLike >>
 
 Accepts undef, "", 0, 1; accepts any blessed object overloading "bool";
 accepts any blessed object overloading "0+" to return 0 or 1. (Needs to
-actually call the overloaded operation to check that.)
+actually call the overloaded operation to check that.) Also accepts any
+object that inherits from C<boolean> or reports that as a role (C<DOES>).
 
 Warning: an object which overloads "0+" without also turning on overload
 fallbacks may actually be useless as a practical boolean. But some common
@@ -1006,7 +1013,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

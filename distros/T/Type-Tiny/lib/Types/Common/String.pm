@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '2.006000';
+	$Types::Common::String::VERSION   = '2.008000';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;
@@ -160,6 +160,7 @@ $meta->add_type(
 	constraint_generator => sub {
 		return $meta->get_type( 'StrLength' ) unless @_;
 		
+		Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::String', "StrLength", \@_, 2 );
 		my ( $min, $max ) = @_;
 		Types::Standard::is_Int( $_ )
 			|| Types::Standard::_croak(
@@ -220,6 +221,8 @@ $meta->add_type(
 	type_default         => undef,
 	constraint_generator => sub {
 		return $meta->get_type( 'DelimitedStr' ) unless @_;
+		
+		Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::String', "DelimitedStr", \@_, 5 );
 		my ( $delimiter, $part_constraint, $min_parts, $max_parts, $ws ) = @_;
 		
 		Types::Standard::assert_Str( $delimiter );
@@ -429,7 +432,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

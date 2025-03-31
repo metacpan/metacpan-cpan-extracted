@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use parent 'Data::URIID::Base';
 
@@ -530,6 +530,15 @@ sub _own_well_known {
                 {uuid => 'b47ecfde-02b1-4790-85dd-c2e848c89d2e', sid => 215, name => 'southwest'},
             ),
         },
+        'uuid' => {
+            map {$_->{uuid} => {
+                    attributes => {
+                        displayname => {'*' => $_->{name}},
+                    },
+                }} (
+                {uuid => '878aac4c-581b-4257-998c-19a9c4003d22', name => 'colour'},
+            ),
+        },
     );
 
     foreach my $id (keys %{$own_well_known{'wikidata-identifier'}}) {
@@ -569,14 +578,28 @@ sub _own_well_known {
         [aqua     => '4feff8a2-dbe4-447b-b052-db333b9ebee3' => '#00FFFF'],
         [white    => 'a671d5f4-5a1d-498d-b3ec-52b92f15218e' => '#FFFFFF'],
     );
+    my $colour_roles = {'*' => [[URI->new('urn:uuid:878aac4c-581b-4257-998c-19a9c4003d22')]]};
+    my @displaycolours;
 
-    foreach my $colour (@colours) {
-        my ($name, $uuid, $displaycolour) = @{$colour};
-        my $e = ($own_well_known{uuid}{$uuid} //= {})->{attributes} //= {};
-        $e->{displayname} //= {};
-        $e->{displayname}{'*'} //= $name;
-        $e->{displaycolour} //= {};
-        $e->{displaycolour}{'*'} //= Data::URIID::Colour->new(rgb => $displaycolour);
+    foreach my $list (\@colours, \@displaycolours) {
+        foreach my $colour (@{$list}) {
+            my ($name, $uuid, $displaycolour) = @{$colour};
+            my $e = ($own_well_known{uuid}{$uuid} //= {})->{attributes} //= {};
+            my $colour_object = Data::URIID::Colour->new(rgb => $displaycolour, register => 1);
+
+            if (defined $name) {
+                $e->{displayname} //= {};
+                $e->{displayname}{'*'} //= $name;
+            }
+
+            $e->{displaycolour} //= {};
+            $e->{displaycolour}{'*'} //= $colour_object;
+            $e->{roles} = $colour_roles;
+
+            if ($list != \@displaycolours) {
+                push(@displaycolours, [undef, $colour_object->ise, $displaycolour]);
+            }
+        }
     }
 
     # Add an entry for each colour used.
@@ -1429,7 +1452,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

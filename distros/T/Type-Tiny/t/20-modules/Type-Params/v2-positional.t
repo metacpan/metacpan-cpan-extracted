@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2024 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -38,10 +38,12 @@ BEGIN {
 	use Types::Standard -types;
 	use Type::Params -sigs;
 	
-	signature_for myfunc => (
+	my $meta = signature_for myfunc => (
 		method => Object | Str,
 		pos    => [ ArrayRef, Int ],
 	);
+	
+	sub get_meta { $meta }
 	
 	sub myfunc ( $self, $arr, $int ) {
 		return $arr->[$int];
@@ -56,13 +58,36 @@ BEGIN {
 		
 		return $arr->[$int];
 	}
+	
+	signature_for myfunc3 => (
+		method => Object | Str,
+		pos    => [ ArrayRef, Int ],
+		goto_next => sub ( $self, $arr, $int ) {
+			return $arr->[$int];
+		},
+	);
+
+	sub myfunc4 {
+		state $signature = signature(
+			method => 1,
+			pos    => [ ArrayRef, Int ],
+			goto_next => sub ( $self, $arr, $int ) {
+				return $arr->[$int];
+			},
+		);
+		return &$signature;
+	}
 };
 
 my $o   = bless {} => 'Local::MyPackage';
 my @arr = ( 'a' .. 'z' );
 
+ok( Local::MyPackage->get_meta->isa('Type::Params::Signature'), 'return value of signature_for' );
+
 is $o->myfunc( \@arr, 2 ),  'c', 'myfunc (happy path)';
 is $o->myfunc2( \@arr, 4 ), 'e', 'myfunc2 (happy path)';
+is $o->myfunc3( \@arr, 6 ), 'g', 'myfunc3 (happy path)';
+is $o->myfunc4( \@arr, 8 ), 'i', 'myfunc4 (happy path)';
 
 {
 	my $e = exception {
@@ -80,6 +105,20 @@ is $o->myfunc2( \@arr, 4 ), 'e', 'myfunc2 (happy path)';
 
 {
 	my $e = exception {
+		$o->myfunc3( \@arr, undef );
+	};
+	like $e, qr/Undef did not pass type constraint "Int"/, 'myfunc3 (type exception)'
+}
+
+{
+	my $e = exception {
+		$o->myfunc4( \@arr, undef );
+	};
+	like $e, qr/Undef did not pass type constraint "Int"/, 'myfunc4 (type exception)'
+}
+
+{
+	my $e = exception {
 		$o->myfunc( \@arr, 6, undef );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc (param count exception)'
@@ -90,6 +129,20 @@ is $o->myfunc2( \@arr, 4 ), 'e', 'myfunc2 (happy path)';
 		$o->myfunc2( \@arr, 8, undef );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc2 (param count exception)'
+}
+
+{
+	my $e = exception {
+		$o->myfunc3( \@arr, 8, undef );
+	};
+	like $e, qr/Wrong number of parameters/, 'myfunc3 (param count exception)'
+}
+
+{
+	my $e = exception {
+		$o->myfunc4( \@arr, 8, undef );
+	};
+	like $e, qr/Wrong number of parameters/, 'myfunc4 (param count exception)'
 }
 
 done_testing;

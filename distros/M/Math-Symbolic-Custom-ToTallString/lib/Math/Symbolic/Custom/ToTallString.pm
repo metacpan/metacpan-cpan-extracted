@@ -15,11 +15,11 @@ Math::Symbolic::Custom::ToTallString - Pretty-print Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;

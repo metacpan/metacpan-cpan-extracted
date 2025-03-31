@@ -1,4 +1,10 @@
-version 0.004; 2017-07-30
+Revision history for Perl module Module::List
+
+0.005 2025-03-30 NEILB
+  * Added a bunch of relevant modules to SEE ALSO.
+  * Switched to Dist::Zilla
+
+0.004 2017-07-30 ZEFRAM
 
   * new "return_path" option to report pathnames
 
@@ -13,7 +19,8 @@ version 0.004; 2017-07-30
 
   * convert .cvsignore to .gitignore
 
-version 0.003; 2011-04-09
+
+0.003 2011-04-09 ZEFRAM
 
   * new "use_pod_dir" option for POD documentation in a subdirectory
 
@@ -29,7 +36,8 @@ version 0.003; 2011-04-09
 
   * add MYMETA.json and MYMETA.yml to .cvsignore
 
-version 0.002; 2009-05-20
+
+0.002 2009-05-20 ZEFRAM
 
   * bugfix: avoid unreliable "\w" in regexps in code
 
@@ -51,7 +59,8 @@ version 0.002; 2009-05-20
 
   * in documentation, separate "license" section from "copyright" section
 
-version 0.001; 2006-06-29
+
+0.001 2006-06-29 ZEFRAM
 
   * new "trivial_syntax" option for pseudo-bareword syntax
 
@@ -59,6 +68,8 @@ version 0.001; 2006-06-29
 
   * typo fix in documentation
 
-version 0.000; 2004-06-20
+
+0.000 2004-06-20 ZEFRAM
 
   * initial released version
+

@@ -9,6 +9,7 @@ use MARC::Convert::Wikidata::Object::ExternalId;
 use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
+use MARC::Convert::Wikidata::Object::Work;
 use Unicode::UTF8 qw(decode_utf8);
 
 my $aut = MARC::Convert::Wikidata::Object::People->new(
@@ -37,6 +38,10 @@ my $obj = MARC::Convert::Wikidata::Object->new(
         'authors' => [$aut],
         'date_of_publication' => 2002,
         'edition_number' => 2,
+        'edition_of_work' => MARC::Convert::Wikidata::Object::Work->new(
+                'title' => decode_utf8('Dějiny města Příbora'),
+                'title_language' => 'cze',
+        ),
         'external_ids' => [
                 MARC::Convert::Wikidata::Object::ExternalId->new(
                         'name' => 'cnb',
@@ -50,6 +55,7 @@ my $obj = MARC::Convert::Wikidata::Object->new(
         'isbns' => [$isbn],
         'number_of_pages' => 414,
         'publishers' => [$publisher],
+        'title' => decode_utf8('Dějiny města Příbora'),
 );
 
 p $obj;
@@ -74,6 +80,7 @@ p $obj;
 #         ],
 #         date_of_publication   2002,
 #         edition_number        2,
+#         edition_of_work       MARC::Convert::Wikidata::Object::Work,
 #         external_ids          [
 #             [0] MARC::Convert::Wikidata::Object::ExternalId,
 #             [1] MARC::Convert::Wikidata::Object::ExternalId
@@ -84,6 +91,7 @@ p $obj;
 #         number_of_pages       414,
 #         publishers            [
 #             [0] MARC::Convert::Wikidata::Object::Publisher
-#         ]
+#         ],
+#         title                 "Dějiny města Příbora"
 #     }
 # }

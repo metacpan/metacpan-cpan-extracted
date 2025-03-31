@@ -1,4 +1,10 @@
-v0.13  XXXZ
+v0.14  2025-03-31Z
+    - Support learning data from passed object
+    - Added as() to Data::URIID::Base
+    - Added basic support for File::FStore::File
+    - Improved support for colours
+
+v0.13  2025-03-26Z
     - Improved e621 support
     - Updated database of well known IDs
     - Added basic support for Not Always Right

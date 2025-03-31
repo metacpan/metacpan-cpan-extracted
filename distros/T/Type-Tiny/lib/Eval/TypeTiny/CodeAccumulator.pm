@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Eval::TypeTiny::CodeAccumulator::AUTHORITY  = 'cpan:TOBYINK';
-	$Eval::TypeTiny::CodeAccumulator::VERSION    = '2.006000';
+	$Eval::TypeTiny::CodeAccumulator::VERSION    = '2.008000';
 }
 
 $Eval::TypeTiny::CodeAccumulator::VERSION =~ tr/_//d;
@@ -38,6 +38,12 @@ sub add_line {
 	push @{ $self->{code} }, map { $indent . $_ } map { split /\n/ } @_;
 
 	$self;
+}
+
+sub addf {
+	my $self = shift;
+	my $fmt  = shift;
+	$self->add_line( sprintf $fmt, @_ );
 }
 
 sub increase_indent {
@@ -190,6 +196,10 @@ Returns the same description given to the constructor, if any.
 
 Adds the next line of code.
 
+=item C<< addf( $fmt, @args ) >>
+
+Shortcut for C<< add_line( sprintf $fmt, @args ) >>.
+
 =item C<< add_gap() >>
 
 Adds a blank line of code.
@@ -255,7 +265,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2024 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

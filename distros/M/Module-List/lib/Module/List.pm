@@ -260,11 +260,44 @@ sub list_modules($$) {
 
 =head1 SEE ALSO
 
+L<Path::ScanInc> will list all modules available, but taking
+a partial path rather than a module name.
+
+L<Module::Finder> gives you quite a bit of control but as a result
+has a more complex interface.
+
+L<Module::Collect> looks for modules, and seems to be aimed at
+finding plugins in a namespace.
+
+L<Module::Find> can look for, and load, modules in a given namespace,
+for example looking for plugins or drivers.
+
+There are also a number of modules which will take a module name
+and tell you where that is installed locally,
+such as L<Module::Path>, L<App::whichpm>, L<Class::Inspector>,
+and others.
+
+L<Module::Loader> can find modules that start with a specified substring,
+such as C<Template::Plugin>, and then can also be used to load them.
+It was inspired by L<Mojo::Loader>.
+
+L<Module::Pluggable> gives your module the ability to have plugins,
+finding plugin modules which match a pattern.
+
+L<Module::PluginFinder> is another module that can be used to find
+plugin modules.
+
+PERLANCAR has released multiple modules based on C<Module::List>:
+L<Module::List::More>, L<Module::List::Tiny>, L<Module::List::Wildcard>,
+L<Module::List::WithPath>, and others.
+
 L<Module::Runtime>
 
 =head1 AUTHOR
 
-Andrew Main (Zefram) <zefram@fysh.org>
+Andrew Main (Zefram).
+
+Now being maintained by Neil Bowers.
 
 =head1 COPYRIGHT
 

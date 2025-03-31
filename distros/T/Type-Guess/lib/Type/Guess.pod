@@ -1,0 +1,159 @@
+=head1 NAME
+
+Type::Guess - Infer data types from an array of scalars
+
+=head1 SYNOPSIS
+
+  use Type::Guess;
+
+  my @list = qw/a b cd efg hijk/;
+  my $guess = Type::Guess->new(@list);
+  
+  print $guess->type;       # Str
+  print $guess->precision;  # 0
+  print $guess->length;     # 4
+  print $guess->to_string;  # %-7s
+
+=head1 DESCRIPTION
+
+Type::Guess analyzes an array of scalar values and determines the most appropriate data type.
+It provides type inference, precision estimation, and formatting options.
+
+=head1 METHODS
+
+=head2 new
+
+  my $guess = Type::Guess->new(@list);
+
+Creates a new Type::Guess object based on the input list.
+
+=head2 type
+
+  my $type = $guess->type;
+
+Returns the inferred type. Possible values include:
+
+=over 4
+
+=item * Str (String)
+
+=item * Int (Integer)
+
+=item * Num (Floating point number)
+
+=item * Other types based on roles
+
+=back
+
+=head2 precision
+
+  my $precision = $guess->precision;
+
+Returns the detected precision for numeric values. Defaults to 0 for integers.
+
+=head2 length
+
+  my $length = $guess->length;
+
+Returns the length of the longest string representation in the list.
+
+=head2 integer_chars
+
+  my $int_chars = $guess->integer_chars;
+
+Returns the count of integer digits in numeric types.
+
+=head2 signed
+
+  my $signed = $guess->signed;
+
+Returns true if negative values are detected.
+
+=head2 to_string
+
+  my $format = $guess->to_string;
+
+Returns a format string suitable for printf-style formatting.
+
+=head2 sql
+
+  my $sql_type = $guess->sql;
+
+Returns the SQL equivalent type, such as "integer" or "float".
+
+=head2 precision($new_precision)
+
+  $guess->precision(2);
+
+Sets the precision for floating point numbers.
+
+=head2 type($new_type)
+
+  $guess->type("Str");
+
+Forces a new type assignment.
+
+=head1 ROLES
+
+Type::Guess supports additional roles for specialized type handling:
+
+=head2 +Date
+
+  my $guess = Type::Guess->with_roles("+Date")->new(@dates);
+
+Enables date recognition for values like YYYY-MM-DD.
+
+=head2 +Unicode
+
+  my $guess = Type::Guess->with_roles("+Unicode")->new(@unicode_strings);
+
+Handles multibyte characters correctly in formatting.
+
+=head2 +Tiny
+
+  my $guess = Type::Guess->with_roles("+Tiny")->new(@list);
+
+Integrates with Type::Tiny for strict type validation.
+
+=head1 CONFIGURATION
+
+=head2 tolerance
+
+  Type::Guess->tolerance(0.1);
+
+Sets tolerance for non-compliant data.
+
+  Type::Guess->tolerance(0.25);
+
+  my $t = Type::Guess->new(1, 2, 3, "a");
+  # Int
+
+  Type::Guess->tolerance(0);
+
+  my $t = Type::Guess->new(1, 2, 3, "a");
+  # Str
+
+=head2 skip_empty
+
+  Type::Guess->skip_empty(1);
+
+When false, all values - empty or not - are checked. Defaults to true.
+
+  Type::Guess->skip_empty(1);
+  $t = Type::Guess->new(1, 2, "", 3, 4);
+  # int
+
+  Type::Guess->skip_empty(0);
+  $t = Type::Guess->new(1, 2, "", 3, 4);
+  # Snt
+
+=head1 AUTHOR
+
+Your Name <scesano@cpan.org>
+
+=head1 LICENSE
+
+This module is licensed under the same terms as Perl itself.
+
+=cut
+

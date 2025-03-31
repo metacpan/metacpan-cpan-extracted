@@ -1,3 +1,8 @@
+0.12 2025-03-30T15:12:57+02:00
+ - API change: Add 'edition_of_work' parameter to Object.
+ - Add Work object.
+ - Add title to Object example in doc.
+
 0.11 2025-03-27T16:49:28+01:00
  - Add 'external_ids' parameter to Publisher object.
  - Add tests for 'cycles' parameter.

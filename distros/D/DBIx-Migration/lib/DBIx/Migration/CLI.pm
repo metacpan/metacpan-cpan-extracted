@@ -40,7 +40,8 @@ sub run {
   return _usage( -exitval => 2, -message => 'Missing mandatory arguments' ) unless @ARGV;
 
   my $log_any_adapter_entry;
-  $log_any_adapter_entry = Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
+  $log_any_adapter_entry = Log::Any::Adapter->set( { category => qr/\ADBIx::Migration/ }, 'Stderr' )
+    if exists $opts->{ v };
   my $Logger = Log::Any->get_logger( category => 'DBIx::Migration' );
   $exitval = try {
     my $dsn    = shift @ARGV;

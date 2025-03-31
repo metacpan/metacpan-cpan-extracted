@@ -1,5 +1,10 @@
 Revision history for Perl extension String::CRC32C
 
+1.0 Sun 30 Mar 2025 14:41:30 CEST
+        - port to c89. maybe.
+        - http://perlmulticore.schmorp.de/ support added.
+
+0.02 forgot
 	- only compile optimised implementation when sse 4.2 is actually
           enabled in the compiler.
         - added $String::CRC32C::IMPL.

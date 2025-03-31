@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.49 2025-03-29T10:48:29
+0.50 2025-03-30T10:42:55
+ - Use link for easter egg
+ - Delete debug instruction
+
+0.49 2025-03-29T10:48:29Z
  - Add an easter egg ;-)
  - Fix some typos in doc
 

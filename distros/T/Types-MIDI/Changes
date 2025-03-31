@@ -1,0 +1,24 @@
+v0.601.0  2025-03-30 20:16:24 CDT
+  - convert old MIDI-Drummer-Tiny version to new-style version that
+    PAUSE will believe is newer
+
+v0.0.5    2025-03-30 18:46:56 CDT
+  - Add authority data to distribution and perform full release
+
+v0.0.4    2025-03-30 12:11:01 CDT (TRIAL RELEASE)
+  - increase Type::Tiny library prerequisites to version 2.000000
+    to deal with CPAN Testers failures
+
+v0.0.3    2025-03-29 19:57:16 CDT (TRIAL RELEASE)
+  - Dist::Zilla-related revisions under the hood
+  - add CONTRIBUTING.md file to guide potential collaborations
+  - fix PercussionNote synopsis and add a test
+
+v0.0.2    2025-03-29 18:07:21 CDT (TRIAL RELEASE)
+  - spun off from MIDI::Drummer::Tiny
+  - use MIDI-Perl's %notenum2percussion for PercussionNote and then
+    amend it with notes introduced in General MIDI 2
+  - expanded documentation
+
+v0.0.1    2025-03-28 09:40:27
+  - initially released as part of MIDI-Drummer-Tiny 0.6003

@@ -1,5 +1,7 @@
 Revision history for Perl module String::Fuzzy
 
+v0.1.1 2025-03-31T09:32:38+0900
+    - Updated test t/002_fuzzy.t to round floating-point scores to 2 decimal places in comparisons (e.g., expecting 66.67, 80.00) to handle system-dependent precision (CPAN Testers bug report).
+
 v0.1.0 2025-03-30T17:50:42+0900
 	- Initial version
-

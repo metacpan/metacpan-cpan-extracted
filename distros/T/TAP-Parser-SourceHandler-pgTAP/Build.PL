@@ -50,25 +50,31 @@ $class->new(
     module_name        => 'TAP::Parser::SourceHandler::pgTAP',
     license            => 'perl',
     configure_requires => {
-        'Module::Build' => '0.30',
+        'Module::Build' => '0.4209',
     },
-    build_requires     => {
-        'Module::Build' => '0.30',
+    test_requires      => {
+        'Module::Build' => '0.4209',
         'Test::More'    => '0.88',
     },
-    requires => {
+    requires           => {
         'TAP::Parser::SourceHandler' => 0,
         'perl'                       => 5.006000,
     },
-    recommends         => {
-        'Test::Pod'           => '1.41',
-        'Test::Pod::Coverage' => '1.06',
-    },
     meta_merge         => {
+        "meta-spec" => { version => 2 },
         resources => {
             homepage    => 'https://search.cpan.org/dist/Tap-Parser-Sourcehandler-pgTAP/',
             bugtracker  => 'https://github.com/theory/tap-parser-sourcehandler-pgtap/issues/',
             repository  => 'https://github.com/theory/tap-parser-sourcehandler-pgtap',
-        }
+        },
+        prereqs => {
+            develop => {
+                requires => {
+                    'Test::Pod'           => '1.41',
+                    'Test::Pod::Coverage' => '1.06',
+                    'Test::Spelling'      => '0.25',
+                },
+            },
+        },
     },
 )->create_build_script;

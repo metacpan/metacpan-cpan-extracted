@@ -1,0 +1,9 @@
+use strict;
+use warnings;
+
+use MARC::Convert::Wikidata::Object::Work;
+use Test::More 'tests' => 2;
+use Test::NoWarnings;
+
+# Test.
+is($MARC::Convert::Wikidata::Object::Work::VERSION, 0.12, 'Version.');

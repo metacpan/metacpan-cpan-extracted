@@ -1,31 +1,19 @@
-NAME
 
-Module::List - module `directory' listing
+    README for Perl module Module::List
 
-DESCRIPTION
+This Perl module will find all modules available locally that match
+a namespace. It can provide some information about the identified
+modules, depending on what parameters you pass.
 
-This module deals with the examination of the namespace of Perl modules.
-The contents of the module namespace is split across several physical
-directory trees, but this module hides that detail, providing instead
-a view of the abstract namespace.
+You can read a nicely formatted version of the documentation for
+this module online:
 
-INSTALLATION
+    https://metacpan.org/pod/Module::List
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
 
-AUTHOR
+    http://www.cpan.org/modules/INSTALL.html
 
-Andrew Main (Zefram) <zefram@fysh.org>
-
-COPYRIGHT
-
-Copyright (C) 2004, 2006, 2009, 2011, 2017
-Andrew Main (Zefram) <zefram@fysh.org>
-
-LICENSE
-
-This module is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This module was written by Andrew Main (ZEFRAM).
+It is now being maintained by Neil Bowers (NEILB).

@@ -1,3 +1,15 @@
+1.225 2025-03-31
+================
+
+[Quiq::Json]
+* Klasse hinzugefügt
+
+[Quiq::Json::Code]
+* Umbenannt von Quiq::Json
+
+[Quiq::Zugferd]
+* Template für Profil EN16931 ergänzt
+
 1.224 2025-02-28
 ================
 
@@ -1306,7 +1318,7 @@ commands() - PostgreSQL / END hinzugefügt
 [Quiq::JavaScript]
 * line() - Kommentare werden entfernt
 
-[Quiq::Json]
+[Quiq::Json::Code]
 * Objektattribute mit Wert undef werden weggelassen
 
 [Quiq::Ssh]
@@ -1394,7 +1406,7 @@ commands() - PostgreSQL / END hinzugefügt
 [Quiq::Assert]
 * Doku bearbeitet
 
-[Quiq::Json]
+[Quiq::Json::Code]
 * Doku bearbeitet
 * Array-Verarbeitung korrigiert
 

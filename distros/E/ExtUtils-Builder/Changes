@@ -1,5 +1,10 @@
 Revision history for ExtUtils-Builder
 
+0.016     2025-03-30 12:23:45+02:00 Europe/Brussels
+
+          - Rename load_module to load_extension
+          - Normalize directory pattern without file pattern too
+
 0.015     2025-03-16 22:03:54+01:00 Europe/Brussels
           - Add create_filter, create_pattern, create_subst and add_seen to Planner
           - Rename add_plan to merge_plan

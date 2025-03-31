@@ -1,6 +1,6 @@
 =head1 NAME
 
-Strihng::CRC32C - Castagnoli CRC
+String::CRC32C - Castagnoli CRC
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ package String::CRC32C;
 our $IMPL;
 
 BEGIN {
-   $VERSION = 0.02;
+   $VERSION = '1.0';
    @ISA = qw(Exporter);
    @EXPORT_OK = qw(crc32c);
 
@@ -56,14 +56,22 @@ needs to be given as C<0> (or C<~-1>).
 
 This allows easy chaining, e.g.
 
-   (crc32c "abcdefghi") eq (crc32 "ghi", crc32 "def", crc32 "abc)
+   (crc32c "abcdefghi") eq (crc32 "ghi", crc32 "def", crc32 "abc")
 
-=item $impl = $String::CRC32C::IMPL
+=item $String::CRC32C::IMPL
 
-Returns a string indicating the implementation that will be used. Currently either C<SlicingBy8>
+Contains a string indicating the implementation that will be used. Currently either C<SlicingBy8>
 for the portable implementation or C<IntelCSSE42> for the SSE 4.2 optimized intel version.
 
 =back
+
+=head1 PERLMULTICORE SUPPORT
+
+This module supports the perl multicore spoecification
+(L<http://perlmulticore.schmorp.de/>): the C<crc32c> function will
+relinquish the current thread for crc32c lengths larger than 64k (the
+break-even point on my machine is around 128k), so multiprocessing makes
+only sense for very long blocks.
 
 =head1 AUTHOR
 

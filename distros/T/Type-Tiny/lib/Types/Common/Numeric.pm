@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '2.006000';
+	$Types::Common::Numeric::VERSION   = '2.008000';
 }
 
 $Types::Common::Numeric::VERSION =~ tr/_//d;
@@ -21,7 +21,8 @@ use Type::Library -base, -declare => qw(
 );
 
 use Type::Tiny ();
-use Types::Standard qw( Num Int Bool );
+use Types::Standard qw( Num Int );
+use Types::TypeTiny qw( BoolLike );
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -134,6 +135,7 @@ for my $base ( qw/Num Int/ ) {
 			
 			my $base_obj = Types::Standard->get_type( $base );
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::Numeric', "${base}Range", \@_, 4 );
 			my ( $min, $max, $min_excl, $max_excl ) = @_;
 			!defined( $min )
 				or $base_obj->check( $min )
@@ -148,10 +150,10 @@ for my $base ( qw/Num Int/ ) {
 				$max
 				);
 			!defined( $min_excl )
-				or Bool->check( $min_excl )
+				or BoolLike->check( $min_excl )
 				or _croak( "${base}Range minexcl must be a boolean; got $min_excl" );
 			!defined( $max_excl )
-				or Bool->check( $max_excl )
+				or BoolLike->check( $max_excl )
 				or _croak( "${base}Range maxexcl must be a boolean; got $max_excl" );
 				
 			# this is complicated so defer to the inline generator
@@ -343,7 +345,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

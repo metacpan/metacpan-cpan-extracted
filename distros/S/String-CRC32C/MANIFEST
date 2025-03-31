@@ -5,6 +5,7 @@ COPYING
 Makefile.PL
 CRC32C.pm
 CRC32C.xs
+perlmulticore.h
 t/00_load.t
 t/01_testvec.t
 crc32csb8.c

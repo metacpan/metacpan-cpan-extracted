@@ -233,10 +233,10 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.224';
+our $VERSION = '1.225';
 
 use Quiq::Math;
-use Quiq::Json;
+use Quiq::Json::Code;
 use Quiq::JavaScript;
 use Quiq::Html::Table::Simple;
 use Quiq::JQuery::Function;
@@ -509,7 +509,7 @@ sub html {
 
     # JavaScript-Code
 
-    my $j = Quiq::Json->new;
+    my $j = Quiq::Json::Code->new;
 
     # * Namespace mit Datenstrukturen und Funktionen
 
@@ -1236,7 +1236,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.224
+1.225
 
 =head1 AUTHOR
 

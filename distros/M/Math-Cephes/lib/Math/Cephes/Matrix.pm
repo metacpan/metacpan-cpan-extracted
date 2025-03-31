@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 @EXPORT_OK = qw(mat);
 
-$VERSION = '0.5306';
+$VERSION = '0.5307';
 
 require Math::Cephes;
 

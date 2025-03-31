@@ -1,10 +1,10 @@
 {
    "abstract" : "module `directory' listing",
    "author" : [
-      "Andrew Main (Zefram) <zefram@fysh.org>"
+      "Andrew Main <zefram@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,21 +14,9 @@
    },
    "name" : "Module-List",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -42,24 +30,25 @@
             "strict" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Module::List" : {
-         "file" : "lib/Module/List.pm",
-         "version" : "0.004"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Module-List@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "homepage" : "https://github.com/neilb/Module-List",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Module-List.git",
+         "web" : "https://github.com/neilb/Module-List"
+      }
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

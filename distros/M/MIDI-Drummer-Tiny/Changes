@@ -1,5 +1,9 @@
 Revision history for MIDI-Drummer
 
+0.6006 2025-03-31 00:35:50
+    - Make Types::MIDI an explicit prereq.
+    - Use the AWOL numeric types too.
+
 0.6005 2025-03-29 23:33:24
     - Use Types::MIDI now.
 

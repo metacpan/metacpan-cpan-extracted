@@ -6,14 +6,14 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '2.006000';
+	$Error::TypeTiny::VERSION   = '2.008000';
 }
 
 $Error::TypeTiny::VERSION =~ tr/_//d;
 
 require Type::Tiny;
 __PACKAGE__->Type::Tiny::_install_overloads(
-	q[""]   => sub { $_[0]->to_string },
+	q[""]   => sub { local $@; $_[0]->to_string },
 	q[bool] => sub { 1 },
 );
 
@@ -93,7 +93,7 @@ sub to_string {
 	my $e = shift;
 	my $c = $e->context;
 	my $m = $e->message;
-	
+
 	$m =~ /\n\z/s
 		? $m
 		: $c ? sprintf(
@@ -130,19 +130,18 @@ Error::TypeTiny - exceptions for Type::Tiny and friends
 
 =head1 SYNOPSIS
 
+   use feature 'try';
    use Data::Dumper;
-   use Try::Tiny;
-   use Types::Standard qw(Str);
+   use Types::Standard qw( Str );
    
    try {
-      Str->assert_valid(undef);
+      Str->assert_valid( undef );
    }
-   catch {
-      my $exception = shift;
+   catch ( $exception ) {
       warn "Encountered Error: $exception";
-      warn Dumper($exception->explain)
-         if $exception->isa("Error::TypeTiny::Assertion");
-   };
+      warn Dumper( $exception->explain )
+         if $exception->isa( "Error::TypeTiny::Assertion" );
+   }
 
 =head1 STATUS
 
@@ -276,7 +275,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

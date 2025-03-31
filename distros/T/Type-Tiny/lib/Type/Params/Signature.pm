@@ -1,5 +1,3 @@
-# INTERNAL MODULE: OO backend for Type::Params signatures.
-
 package Type::Params::Signature;
 
 use 5.008001;
@@ -12,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '2.006000';
+	$Type::Params::Signature::VERSION    = '2.008000';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -22,6 +20,17 @@ use Eval::TypeTiny::CodeAccumulator;
 use Types::Standard qw( -is -types -assert );
 use Types::TypeTiny qw( -is -types to_TypeTiny );
 use Type::Params::Parameter;
+
+my $Attrs = Enum[ qw/
+	caller_level package subname description _is_signature_for ID
+	method head tail parameters slurpy
+	message on_die next fallback strictness is_named allow_dash method_invocant
+	bless class constructor named_to_list list_to_named oo_trace
+	class_prefix class_attributes
+	returns_scalar returns_list
+	want_details want_object want_source can_shortcut coderef
+	quux mite_signature is_wrapper
+/ ]; # quux for reasons
 
 sub _croak {
 	require Error::TypeTiny;
@@ -40,11 +49,22 @@ sub _new_code_accumulator {
 
 sub new {
 	my $class = shift;
-	my %self  = @_ == 1 ? %{$_[0]} : @_;
+	my %self = @_ == 1 ? %{$_[0]} : @_;
 	my $self = bless \%self, $class;
 	$self->{parameters}   ||= [];
 	$self->{class_prefix} ||= 'Type::Params::OO::Klass';
+	$self->{next}         ||= delete $self->{goto_next} if exists $self->{goto_next};
 	$self->BUILD;
+	$Attrs->all( sort keys %$self ) or do {
+		require Carp;
+		require Type::Utils;
+		my @bad = ( ~ $Attrs )->grep( sort keys %$self );
+		Carp::carp( sprintf(
+			"Warning: unrecognized signature %s: %s, continuing anyway",
+			@bad == 1 ? 'option' : 'options',
+			Type::Utils::english_list( @bad ),
+		) );
+	};
 	return $self;
 }
 
@@ -54,7 +74,7 @@ sub new {
 	sub BUILD {
 		my $self = shift;
 
-		if ( $self->{named_to_list} and not ref $self->{named_to_list} ) {
+		if ( $self->{named_to_list} and not is_ArrayRef $self->{named_to_list} ) {
 			$self->{named_to_list} = [ map $_->name, @{ $self->{parameters} } ];
 		}
 
@@ -74,7 +94,9 @@ sub new {
 			);
 		}
 
-		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
+		$self->_rationalize_returns;
+
+		if ( defined $self->{bless} and is_BoolLike $self->{bless} and $self->{bless} and not $self->{named_to_list} ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
 			$self->{oo_trace} = 1 unless exists $self->{oo_trace};
@@ -169,6 +191,32 @@ sub _rationalize_slurpies {
 	}
 }
 
+sub _rationalize_returns {
+	my $self = shift;
+	
+	my $typify = sub {
+		my $ref = shift;
+		if ( is_Str $$ref ) {
+			require Type::Utils;
+			$$ref = Type::Utils::dwim_type( $$ref, $self->{package} ? ( for => $self->{package} ) : () );
+		}
+		else {
+			$$ref = to_TypeTiny( $$ref );
+		}
+	};
+	
+	if ( my $r = delete $self->{returns} ) {
+		$typify->( \ $r );
+		$self->{returns_scalar} ||= $r;
+		$self->{returns_list}   ||= ArrayRef->of( $r );
+	}
+
+	exists $self->{$_} && $typify->( \ $self->{$_} )
+		for qw/ returns_scalar returns_list /;
+	
+	return $self;
+}
+
 sub _parameters_from_list {
 	my ( $class, $style, $list, %opts ) = @_;
 	my @return;
@@ -240,7 +288,20 @@ sub new_from_v2api {
 		unless $positional || $named || $multiple;
 
 	if ( $multiple ) {
-		$multiple = [] unless is_ArrayRef $multiple;
+		if ( is_HashRef $multiple ) {
+			my @tmp;
+			while ( my ( $name, $alt ) = each %$multiple ) {
+				push @tmp,
+					is_HashRef($alt)  ? { ID => $name, %$alt } :
+					is_ArrayRef($alt) ? { ID => $name, pos => $alt } :
+					is_CodeRef($alt)  ? { ID => $name, closure => $alt } :
+					$class->_croak( "Bad alternative in multiple signature" );
+			}
+			$multiple = \@tmp;
+		}
+		elsif ( not is_ArrayRef $multiple ) {
+			$multiple = [];
+		}
 		unshift @$multiple, { positional => $positional } if $positional;
 		unshift @$multiple, { named      => $named      } if $named;
 		require Type::Params::Alternatives;
@@ -272,13 +333,18 @@ sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0
 sub slurpy        { $_[0]{slurpy} }          sub has_slurpy        { exists $_[0]{slurpy} }
 sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0]{on_die} }
 sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
-sub goto_next     { $_[0]{goto_next} }
+sub next          { $_[0]{next} }
+sub goto_next     { $_[0]{next} }
 sub is_named      { $_[0]{is_named} }
+sub allow_dash    { $_[0]{allow_dash} }
 sub bless         { $_[0]{bless} }
 sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
+sub list_to_named { $_[0]{list_to_named} }
 sub oo_trace      { $_[0]{oo_trace} }
+sub returns_scalar{ $_[0]{returns_scalar} }  sub has_returns_scalar{ defined $_[0]{returns_scalar} }
+sub returns_list  { $_[0]{returns_list} }    sub has_returns_list  { defined $_[0]{returns_list} }
 
 sub method_invocant { $_[0]{method_invocant} = defined( $_[0]{method_invocant} ) ? $_[0]{method_invocant} : 'undef' }
 
@@ -323,7 +389,7 @@ sub _coderef_start {
 	$coderef->add_line( 'sub {' );
 	$coderef->{indent} .= "\t";
 
-	if ( my $next = $self->goto_next ) {
+	if ( my $next = $self->next ) {
 		if ( is_CodeLike $next ) {
 			$coderef->add_variable( '$__NEXT__', \$next );
 		}
@@ -420,7 +486,22 @@ sub _coderef_check_count {
 	#   your_func( %opts, y => 2 ); # override y
 	#
 
-	if ( $is_named ) {
+	if ( $is_named and $self->list_to_named ) {
+		require List::Util;
+		my $args_if_hashref  = $headtail + 1;
+		my $min_args_if_list = $headtail + List::Util::sum( 0, map { $_->optional ? 0 : $_->in_list ? 1 : 2 } @{ $self->parameters } );
+		$self->{min_args} = List::Util::min( $args_if_hashref, $min_args_if_list );
+		
+		$coderef->add_line( $strictness_test . sprintf(
+			"\@_ >= %d\n\tor %s;",
+			$self->{min_args},
+			$self->_make_count_fail(
+				coderef   => $coderef,
+				got       => 'scalar( @_ )',
+			),
+		) );
+	}
+	elsif ( $is_named ) {
 		my $args_if_hashref  = $headtail + 1;
 		my $hashref_index    = @{ $self->head || [] };
 		my $arity_if_hash    = $headtail % 2;
@@ -571,12 +652,27 @@ sub _coderef_parameters {
 	my ( $self, $coderef ) = ( shift, @_ );
 
 	if ( $self->is_named ) {
+		
+		if ( $self->list_to_named ) {
+			require Type::Tiny::Enum;
+			my $Keys = Type::Tiny::Enum->new( values => [ map { $_->name, $_->_all_aliases($self) } @{ $self->parameters } ] );
+			$coderef->addf( 'my @positional;' );
+			$coderef->addf( '{' );
+			$coderef->increase_indent;
+			$coderef->addf( 'last if ( @_ == 0 );' );
+			$coderef->addf( 'last if ( @_ == 1 and %s );', HashRef->inline_check( '$_[0]' ) );
+			$coderef->addf( 'last if ( @_ %% 2 == 0 and %s );', $Keys->inline_check( '$_[0]' ) );
+			$coderef->addf( 'push @positional, shift @_;' );
+			$coderef->addf( 'redo;' );
+			$coderef->decrease_indent;
+			$coderef->addf( '}' );
+			$coderef->add_gap;
+		}
 
 		$coderef->add_line( sprintf(
 			'%%in = ( @_ == 1 and %s ) ? %%{ $_[0] } : @_;',
 			HashRef->inline_check( '$_[0]' ),
 		) );
-
 		$coderef->add_gap;
 
 		for my $parameter ( @{ $self->parameters } ) {
@@ -591,6 +687,16 @@ sub _coderef_parameters {
 				key         => $parameter->name,
 				type        => 'named_arg',
 			);
+		}
+		
+		if ( $self->list_to_named ) {
+			$coderef->add_line( sprintf(
+				'@positional and %s;',
+				$self->_make_general_fail(
+					coderef  => $coderef,
+					message  => q{'Superfluous positional arguments'},
+				),
+			) );
 		}
 	}
 	else {
@@ -703,6 +809,13 @@ sub _coderef_extra_names {
 sub _coderef_end {
 	my ( $self, $coderef ) = ( shift, @_ );
 
+	if ( $self->{_is_signature_for} and $self->next ) {
+		$coderef->add_variable( '$return_check_for_scalar', \ $self->returns_scalar->compiled_check )
+			if $self->has_returns_scalar;
+		$coderef->add_variable( '$return_check_for_list', \ $self->returns_list->compiled_check )
+			if $self->has_returns_list;
+	}
+
 	if ( $self->bless and $self->oo_trace ) {
 		my $package = $self->package;
 		my $subname = $self->subname;
@@ -771,8 +884,12 @@ sub _make_return_expression {
 
 	my $list = join q{, }, $self->_make_return_list;
 
-	if ( $self->goto_next ) {
-		if ( $list eq '@_' ) {
+	if ( $self->next ) {
+		if ( $self->{_is_signature_for} and ( $self->has_returns_list or $self->has_returns_scalar ) ) {
+			my $call = sprintf '$__NEXT__->( %s )', $list;
+			return $self->_make_typed_return_expression( $call );
+		}
+		elsif ( $list eq '@_' ) {
 			return sprintf 'goto( $__NEXT__ )';
 		}
 		else {
@@ -785,6 +902,62 @@ sub _make_return_expression {
 	}
 	else {
 		return sprintf '( %s )', $list;
+	}
+}
+
+sub _make_typed_return_expression {
+	my ( $self, $expr ) = @_;
+
+	return sprintf 'wantarray ? %s : defined( wantarray ) ? %s : do { %s; undef; }',
+		$self->has_returns_list ? $self->_make_typed_list_return_expression( $expr, $self->returns_list ) : $expr,
+		$self->has_returns_scalar ? $self->_make_typed_scalar_return_expression( $expr, $self->returns_scalar ) : $expr,
+		$expr;
+}
+
+sub _make_typed_scalar_return_expression {
+	my ( $self, $expr, $constraint ) = @_;
+
+	if ( $constraint->{uniq} == Any->{uniq} ) {
+		return $expr;
+	}
+	elsif ( $constraint->can_be_inlined ) {
+		return sprintf 'do { my $__RETURN__ = %s; ( %s ) ? $__RETURN__ : %s }',
+			$expr,
+			$constraint->inline_check( '$__RETURN__' ),
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__' );
+	}
+	else {
+		return sprintf 'do { my $__RETURN__ = %s; $return_check_for_scalar->( $__RETURN__ ) ? $__RETURN__ : %s }',
+			$expr,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__' );
+	}
+}
+
+sub _make_typed_list_return_expression {
+	my ( $self, $expr, $constraint ) = @_;
+
+	my $slurp_into = Slurpy->of( $constraint )->my_slurp_into;
+	my $varname = $slurp_into eq 'HASH' ? '%__RETURN__' : '@__RETURN__';
+
+	if ( $constraint->{uniq} == Any->{uniq} ) {
+		return $expr;
+	}
+	elsif ( $constraint->can_be_inlined ) {
+		return sprintf 'do { my %s = %s; my $__RETURN__ = \ %s; ( %s ) ? %s : %s }',
+			$varname,
+			$expr,
+			$varname,
+			$constraint->inline_check( '$__RETURN__' ),
+			$varname,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__', display_var => "\\$varname" );
+	}
+	else {
+		return sprintf 'do { my %s = %s; my $__RETURN__ = \ %s; $return_check_for_list->( $__RETURN__ ) ? %s : %s }',
+			$varname,
+			$expr,
+			$varname,
+			$varname,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__', display_var => "\\$varname" );
 	}
 }
 
@@ -830,6 +1003,13 @@ sub _make_count_fail {
 			$c,
 			$args{$c},
 		);
+	}
+
+	if ( my $package = $self->package and my $subname = $self->subname ) {
+		push @counts, sprintf(
+			'target => %s',
+			B::perlstring( "$package\::$subname" ),
+		) if $package ne '__ANON__' && $subname ne '__ANON__';
 	}
 
 	return sprintf(
@@ -981,3 +1161,258 @@ sub return_wanted {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Params::Signature - internal representation of a function signature
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can be used to provide basic introspection
+for signatures.
+
+=head2 Constructors
+
+=over
+
+=item C<< new(%attributes) >>
+
+=item C<< new_from_compile($style, %attributes) >>
+
+=item C<< new_from_v2api(\%attributes) >>
+
+=back
+
+=head2 Attributes
+
+All attributes are read-only.
+
+=over
+
+=item C<< package >> B<ClassName>
+
+The package we're providing a signature for. Will be used to look up any
+stringy type names.
+
+=item C<< subname >> B<Str>
+
+The sub we're providing a signature for.
+
+=item C<< description >> B<Str>
+
+=item C<< method >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< head >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< tail >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< parameters >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< slurpy >> B<< InstanceOf['Type::Params::Parameter'] >>
+
+=item C<< on_die >> B<CodeRef>
+
+=item C<< strictness >> B<< Bool|ScalarRef >>
+
+=item C<< next >> B<CodeRef>
+
+=item C<< goto_next >> B<CodeRef>
+
+Alias for C<next>.
+
+=item C<< can_shortcut >> B<Bool>
+
+Indicates whether the signature has no potential to alter C<< @_ >> allowing
+it to be returned without being copied if type checks pass. Generally speaking,
+you should not provide this to the constructor and rely on
+Type::Params::Signature to figure it out.
+
+=item C<< coderef >> B<< InstanceOf['Eval::TypeTiny::CodeAccumulator'] >>
+
+You probably don't want to provide this to the constructor. The whole point
+of this module is to build it for you!
+
+=back
+
+=head3 Attributes related to named parameters
+
+=over
+
+=item C<< is_named >> B<Bool>
+
+=item C<< allow_dash >> B<Bool>
+
+=item C<< bless >> B<Bool|ClassName>
+
+=item C<< class >> B<ClassName>
+
+=item C<< constructor >> B<Str>
+
+=item C<< class_attributes >> B<HashRef>
+
+HashRef suitable for passing to the C<import> method of
+L<Class::XSAccessor>. A default will be generated based
+on C<parameters>
+
+=item C<< named_to_list >> B<< ArrayRef >>
+
+Can be coerced from a bool based on C<parameters>.
+
+=item C<< list_to_named >> B<< Bool >>
+
+=item C<< oo_trace >> B<Bool>
+
+Defaults to true. Indicates whether blessed C<< $arg >> hashrefs created by
+the signature will include a C<< '~~caller' >> key.
+
+=back
+
+=head3 Bare attributes
+
+These attributes may be passed to the constructors and may do something,
+but no methods are provided to access the values later.
+
+=over
+
+=item C<< positional >> or C<< pos >> B<ArrayRef>
+
+=item C<< named >> B<ArrayRef>
+
+=item C<< multiple >> or C<< multi >> B<ArrayRef>
+
+=item C<< returns >> B<Bool>
+
+Shortcut for setting C<returns_scalar> and C<returns_list> simultaneously.
+
+=item C<< want_source >> B<Bool>
+
+=item C<< want_details >> B<Bool>
+
+=item C<< want_object >> B<Bool>
+
+=item C<< rationalize_slurpies >> B<Bool>
+
+=back
+
+=head2 Methods
+
+=head3 Predicates
+
+Predicate methods return true/false to indicate the presence or absence of
+attributes.
+
+=over
+
+=item C<< has_description >>
+
+=item C<< has_head >>
+
+=item C<< has_tail >>
+
+=item C<< has_parameters >>
+
+=item C<< has_slurpy >>
+
+=item C<< has_on_die >>
+
+=item C<< has_strictness >>
+
+=item C<< has_returns_scalar >>
+
+=item C<< has_returns_list >>
+
+=back
+
+=head3 Class making methods
+
+These methods will be called automatically during object construction
+and should not typically be called. They are public methods in case
+it is desired to subclass Type::Params::Signature.
+
+=over
+
+=item C<< make_class_pp >>
+
+Builds the class specified in C<bless> by evaluating Perl code.
+
+=item C<< make_class_xs >>
+
+Builds the class specified in C<bless> using L<Class::XSAccessor>.
+
+=item C<< make_class >>
+
+Calls either C<make_class_pp> or C<make_class_xs>.
+
+=item C<< make_class_pp_code >>
+
+Generates the code for C<make_class_pp>.
+
+=back
+
+=head3 Other methods
+
+=over
+
+=item C<< BUILD >>
+
+Called by the constructors. You should not call this.
+
+=item C<< return_wanted >>
+
+Normally returns the signature coderef, unless C<want_source>, C<want_details>,
+or C<want_object> were provided to the constructor, in which case it will
+return the source code for the coderef, a hashref of details, or C<< $self >>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<PERL_TYPE_PARAMS_XS>
+
+Affects the building of accessors for C<< $arg >> objects. If set to true,
+will use L<Class::XSAccessor>. If set to false, will use pure Perl. If this
+environment variable does not exist, will use Class::XSAccessor.
+
+If Class::XSAccessor is not installed or is too old, pure Perl will always
+be used as a fallback.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Params>, L<Type::Params::Parameter>, L<Type::Params::Alternatives>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

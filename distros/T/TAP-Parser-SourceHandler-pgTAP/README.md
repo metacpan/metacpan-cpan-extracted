@@ -1,9 +1,9 @@
-TAP/Parser/SourceHandler/pgTAP version 3.36
+TAP/Parser/SourceHandler/pgTAP version 3.37
 ===========================================
 
 [![CPAN version](https://badge.fury.io/pl/TAP-Parser-SourceHandler-pgTAP.svg)](https://badge.fury.io/pl/TAP-Parser-SourceHandler-pgTAP)
-[![Docker release](https://images.microbadger.com/badges/version/itheory/pg_prove.svg)](https://hub.docker.com/r/itheory/pg_prove/)
-[![Test & Release Status](https://github.com/theory/tap-parser-sourcehandler-pgtap/workflows/CI/CD/badge.svg)](https://github.com/theory/tap-parser-sourcehandler-pgtap/actions)
+[![Docker release](https://img.shields.io/docker/v/itheory/pg_prove?label=🐳%20Docker&sort=semver)](https://hub.docker.com/r/itheory/pg_prove/)
+[![✅ Test Status](https://github.com/theory/tap-parser-sourcehandler-pgtap/actions/workflows/ci.yml/badge.svg)](https://github.com/theory/tap-parser-sourcehandler-pgtap/actions/workflows/ci.yml)
 
 This module adds support for executing [pgTAP](https://pgtap.org/) PostgreSQL
 tests under Test::Harness and `prove. This is useful for executing your Perl
@@ -61,10 +61,10 @@ Dependencies
 
 TAP::Parser::SourceHandler::pgTAP requires TAP::Parser::SourceHandler.
 
-Copyright and Licence
+Copyright and License
 ---------------------
 
-Copyright (c) 2018-2022 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2018-2025 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

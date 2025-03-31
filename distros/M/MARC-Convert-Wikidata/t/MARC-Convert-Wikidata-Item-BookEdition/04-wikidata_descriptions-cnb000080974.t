@@ -24,7 +24,6 @@ my $obj = MARC::Convert::Wikidata::Item::BookEdition->new(
 	'marc_record' => $marc_record,
 	'transform_object' => $transform_obj->object,
 );
-use Data::Printer;
 my @descriptions = @{$obj->wikidata_descriptions};
 is($descriptions[0]->language, 'cs', 'Get first description language (cs).');
 my $cs_desc = decode_utf8('české knižní vydání z roku 1994');

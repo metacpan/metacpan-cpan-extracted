@@ -3,7 +3,6 @@
     xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
     xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
     xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
-
   <rsm:ExchangedDocumentContext>
     <ram:BusinessProcessSpecifiedDocumentContextParameter>
       <ram:ID schemeID=""></ram:ID>
@@ -12,7 +11,6 @@
       <ram:ID schemeID="">BT-24</ram:ID> <!-- 1..1 -->
     </ram:GuidelineSpecifiedDocumentContextParameter>
   </rsm:ExchangedDocumentContext>
-
   <rsm:ExchangedDocument>
     <ram:ID schemeID="">BT-1</ram:ID> <!-- 1..1 -->
     <ram:TypeCode>BT-3</ram:TypeCode> <!-- 1..1 -->
@@ -24,9 +22,7 @@
       <ram:SubjectCode listID="" listVersionID=""></ram:SubjectCode>
     </ram:IncludedNote>
   </rsm:ExchangedDocument>
-
   <rsm:SupplyChainTradeTransaction>
-
     <ram:IncludedSupplyChainTradeLineItem>
       <ram:AssociatedDocumentLineDocument>
         <ram:LineID schemeID="">BT-126</ram:LineID> <!-- 1..1 -->
@@ -188,7 +184,6 @@
         </ram:ReceivableSpecifiedTradeAccountingAccount>
       </ram:SpecifiedLineTradeSettlement>
     </ram:IncludedSupplyChainTradeLineItem>
-
     <ram:ApplicableHeaderTradeAgreement>
       <ram:BuyerReference></ram:BuyerReference>
       <ram:SellerTradeParty> <!-- 1..1 -->
@@ -235,7 +230,7 @@
         <ram:Name>BT-44</ram:Name> <!-- 1..1 -->
         <ram:Description></ram:Description>
         <ram:SpecifiedLegalOrganization>
-          <ram:ID schemeID=""></ram:ID>
+          <ram:ID schemeID="BT-30-1">BT-30</ram:ID> <!-- 0..1 -->
           <ram:TradingBusinessName></ram:TradingBusinessName>
         </ram:SpecifiedLegalOrganization>
         <ram:DefinedTradeContact>
@@ -264,7 +259,7 @@
           <ram:CompleteNumber></ram:CompleteNumber>
         </ram:URIUniversalCommunication>
         <ram:SpecifiedTaxRegistration>
-          <ram:ID schemeID=""></ram:ID>
+          <ram:ID schemeID="BT-48-0">BT-48</ram:ID> <!-- 1..1 -->
         </ram:SpecifiedTaxRegistration>
       </ram:BuyerTradeParty>
       <ram:SellerTaxRepresentativeTradeParty>
@@ -358,7 +353,6 @@
         <ram:Name></ram:Name>
       </ram:SpecifiedProcuringProject>
     </ram:ApplicableHeaderTradeAgreement>
-
     <ram:ApplicableHeaderTradeDelivery>
       <ram:ShipToTradeParty>
         <ram:ID schemeID=""></ram:ID>
@@ -387,7 +381,7 @@
           <ram:LineTwo></ram:LineTwo>
           <ram:LineThree></ram:LineThree>
           <ram:CityName></ram:CityName>
-          <ram:CountryID></ram:CountryID>
+          <ram:CountryID>BT-80</ram:CountryID> <!-- 1..1 -->
           <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
@@ -428,7 +422,6 @@
         </ram:FormattedIssueDateTime>
       </ram:ReceivingAdviceReferencedDocument>
     </ram:ApplicableHeaderTradeDelivery>
-
     <ram:ApplicableHeaderTradeSettlement> <!-- 1..1 -->
       <ram:CreditorReferenceID schemeID=""></ram:CreditorReferenceID>
       <ram:PaymentReference></ram:PaymentReference>
@@ -437,7 +430,7 @@
       <ram:PayeeTradeParty>
         <ram:ID schemeID=""></ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
-        <ram:Name>BT-59</ram:Name> <!-- 1..1 -->
+        <ram:Name></ram:Name>
         <ram:Description></ram:Description>
         <ram:SpecifiedLegalOrganization>
           <ram:ID schemeID=""></ram:ID>
@@ -456,13 +449,13 @@
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>
         <ram:PostalTradeAddress>
-          <ram:PostcodeCode listID="" listVersionID="">BT-53</ram:PostcodeCode> <!-- 0..1 -->
-          <ram:LineOne>BT-50</ram:LineOne> <!-- 0..1 -->
-          <ram:LineTwo>BT-51</ram:LineTwo> <!-- 0..1 -->
-          <ram:LineThree>BT-163</ram:LineThree> <!-- 0..1 -->
-          <ram:CityName>BT-52</ram:CityName> <!-- 0..1 -->
-          <ram:CountryID>BT-55</ram:CountryID> <!-- 1..1 -->
-          <ram:CountrySubDivisionName>BT-54</ram:CountrySubDivisionName>  <!-- 0..1 -->
+          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
+          <ram:LineOne></ram:LineOne>
+          <ram:LineTwo></ram:LineTwo>
+          <ram:LineThree></ram:LineThree>
+          <ram:CityName></ram:CityName>
+          <ram:CountryID></ram:CountryID>
+          <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
           <ram:URIID schemeID=""></ram:URIID>
@@ -494,7 +487,7 @@
       <ram:ApplicableTradeTax> <!-- 1..n -->
         <ram:CalculatedAmount currencyID="">BT-117</ram:CalculatedAmount> <!-- 1..1 -->
         <ram:TypeCode>BT-118-0</ram:TypeCode> <!-- 1..1 -->
-        <ram:ExemptionReason></ram:ExemptionReason>
+        <ram:ExemptionReason>BT-120</ram:ExemptionReason>
         <ram:BasisAmount currencyID="">BT-116</ram:BasisAmount> <!-- 1..1 -->
         <ram:CategoryCode>BT-118</ram:CategoryCode> <!-- 1..1 -->
         <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>

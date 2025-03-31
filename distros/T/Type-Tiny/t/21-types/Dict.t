@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019-2024 by Toby Inkster.
+This software is copyright (c) 2019-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,6 +24,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Test::TypeTiny;
+use Test::Requires qw(boolean);
 use Types::Standard qw( Dict );
 
 isa_ok(Dict, 'Type::Tiny', 'Dict');
@@ -101,6 +102,10 @@ my @tests = (
 	fail => 'object overloading coderef' => do { package Local::OL::Code; use overload q[&{}] => sub { $_[0][0] }; bless [sub { 1 }] },
 	fail => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
 	fail => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
+	fail => 'boolean::false'           => boolean::false,
+	fail => 'boolean::true'            => boolean::true,
+	fail => 'builtin::false'           => do { no warnings; builtin->can('false') ? builtin::false() : !!0 },
+	fail => 'builtin::true'            => do { no warnings; builtin->can('true') ? builtin::true() : !!1 },
 #TESTS
 );
 
@@ -359,6 +364,34 @@ is_deeply(
 	{ foo => 4.1, bar => 'xyz' },
 	'cowardly refuses to drop keys to allow coercion to work',
 );
+
+# Combine Dicts
+
+my $combined = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ age => Types::Standard::Int, Types::Standard::Slurpy[Types::Standard::HashRef[Types::Standard::Int]] ],
+	Dict[ id => Types::Standard::Str, name => Types::Standard::ArrayRef, Types::Standard::Slurpy[Types::Standard::ArrayRef] ],
+	Dict[],
+)->create_child_type( display_name => 'CombinedDetails' );
+
+ok( $combined->is_a_type_of( Dict ) );
+should_pass( { name => 'X', age => 1, id => 'ABC', foo => 1 }, $combined );
+should_pass( { name => [ 'X' ], age => 1, id => 'ABC', foo => 1 }, $combined );
+should_fail( { name => 'X', age => [ 1 ], id => 'ABC', foo => 1 }, $combined );
+
+my $combined2 = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ name => Types::Standard::Str ],
+);
+
+is( $combined2->display_name, 'Dict[name=>Str]' );
+
+my $combined3 = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ name => Types::Standard::Int ],
+);
+
+is( $combined3->display_name, 'Dict[name=>Str|Int]' );
 
 done_testing;
 

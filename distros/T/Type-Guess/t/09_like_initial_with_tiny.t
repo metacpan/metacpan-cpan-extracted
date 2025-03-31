@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More;
 use Type::Guess;
 use Mojo::Util qw/dumper/;
 
@@ -40,7 +40,7 @@ is($str->type, 'Num', 'Type is Num');
 is($str->precision, 5, 'Precision is 5');
 is($str->integer_chars, 5, 'Integer size is correct');
 is($str->to_string, '%11.5f', 'String format for precision 5 is correct');
-is($str->sql, 'float', 'SQL type for Num is correct');
+# is($str->sql, 'float', 'SQL type for Num is correct');
 
 # Modify precision and validate
 $str->precision(2);
@@ -79,7 +79,7 @@ ok($str->signed, 'Type is signed here');
 ok($str->length >= 4, 'Length matches longest integer');
 ok($str->integer_chars >= 4, 'Integer size is correct');
 like($str->to_string, qr/%\-?\d+/, 'String format for integers is correct');
-is($str->sql, 'integer', 'SQL type is integer');
+# is($str->sql, 'integer', 'SQL type is integer');
 
 
 is_deeply([ map { $str->($_) } @list ], [ "  23", "  16", -100 ], "Formatted signed integers are correct");

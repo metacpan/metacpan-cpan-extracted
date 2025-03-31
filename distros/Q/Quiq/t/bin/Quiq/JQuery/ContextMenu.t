@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Quiq::Json;
+use Quiq::Json::Code;
 
 # -----------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ sub test_js : Test(1) {
     my $self = shift;
 
     # JSON-Generator
-    my $j = Quiq::Json->new;
+    my $j = Quiq::Json::Code->new;
 
     my $obj = Quiq::JQuery::ContextMenu->new(
         className => 'contextMenu',
