@@ -25,35 +25,35 @@ my $meta = {
   "provides"       => {
                         "Acme::Marvel::CinematicUniverse::Character"                             => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Bruce_Banner"     => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Bruce_Banner.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Clint_Barton"     => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Clint_Barton.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Natasha_Romanoff" => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Natasha_Romanoff.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Steve_Rogers"     => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Steve_Rogers.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Thor_Odinson"     => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Thor_Odinson.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Character::Instance::Tony_Stark"       => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Character/Instance/Tony_Stark.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Characters"                            => {
                                                                                                       file => "lib/Acme/Marvel/CinematicUniverse/Characters.pm",
-                                                                                                      version => 0.003,
+                                                                                                      version => 0.004,
                                                                                                     },
                         "Acme::Marvel::CinematicUniverse::Mite"                                  => { file => "lib/Acme/Marvel/CinematicUniverse/Mite.pm" },
                       },
@@ -71,7 +71,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-Marvel-CinematicUniverse-Characters/project",
                       },
-  "version"        => 0.003,
+  "version"        => 0.004,
 };
 
 my %dynamic_config;

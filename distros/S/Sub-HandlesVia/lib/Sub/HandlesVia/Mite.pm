@@ -17,13 +17,9 @@ or do {
 };
 
 # Constants
-sub true  () { !!1 }
-sub false () { !!0 }
-sub ro    () { 'ro' }
-sub rw    () { 'rw' }
-sub rwp   () { 'rwp' }
-sub lazy  () { 'lazy' }
-sub bare  () { 'bare' }
+sub true  () { !!1 }    sub false () { !!0 }
+sub ro    () { 'ro' }   sub rw    () { 'rw' }   sub rwp   () { 'rwp' }
+sub lazy  () { 'lazy' } sub bare  () { 'bare' }
 
 # More complicated constants
 BEGIN {
@@ -109,9 +105,19 @@ sub import {
         );
     }
     else {
+        # Try to determine original filename for caller, minus libdir.
+        # This would normally be in %INC but caller hasn't finished loading yet.
+        require File::Spec;
+        my $orig = $file;
+        for my $base ( @INC ) {
+            $base eq substr $file, 0, length $base
+            and -f File::Spec->catfile( $base, substr $file, 1 + length $base )
+            and $orig = File::Spec->abs2rel( $file, $base )
+            and last;
+        }
+
         # Changes to this filename must be coordinated with Mite::Compiled
-        my $mite_file = $file . '.mite.pm';
-        local @INC = ( '.', @INC );
+        my $mite_file = $orig . '.mite.pm';
         local $@;
         if ( not eval { require $mite_file; 1 } ) {
             my $e = $@;

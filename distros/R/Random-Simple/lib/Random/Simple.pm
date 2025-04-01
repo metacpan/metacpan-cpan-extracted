@@ -5,9 +5,10 @@ use warnings;
 use Time::HiRes;
 use Carp qw(croak);
 use Config;
+use v5.10; # For state
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 our $debug   = 0;
 
 # Check if the UV (unsigned value) Perl type is 64bit
@@ -20,7 +21,7 @@ require XSLoader;
 XSLoader::load();
 
 use Exporter 'import';
-our @EXPORT = qw(random_int random_bytes random_float random_elem rand srand);
+our @EXPORT = qw(random_int random_bytes random_float random_elem shuffle_array rand srand);
 
 #############################################################
 
@@ -59,7 +60,10 @@ sub os_random_bytes {
 	if ($^O eq 'MSWin32') {
 		require Win32::API;
 
-		my $rand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)') or croak("Could not import SystemFunction036: $^E");
+		state $rand = Win32::API->new(
+			'advapi32',
+			'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)'
+		) or croak("Could not import SystemFunction036: $^E");
 
 		$ret = chr(0) x $count;
 		$rand->Call($ret, $count) or croak("Could not read from csprng: $^E");
@@ -68,7 +72,7 @@ sub os_random_bytes {
 
 		sysread($urandom, $ret, $count) or croak("Couldn't read from csprng: $!");
 	} else {
-		croak("Unknown operating systen $^O");
+		croak("Unknown operating system $^O");
 	};
 
 	if (length($ret) != $count) {
@@ -214,6 +218,18 @@ sub random_elem {
 	return $ret;
 }
 
+# Use the Fisher-Yates algo to shuffle an array in a non-biased way
+sub shuffle_array {
+    my @array = @_;
+    my $i = @array;
+    while ($i--) {
+        my $j = random_int(0, $i);
+        @array[$i, $j] = @array[$j, $i];
+    }
+
+	return @array;
+}
+
 sub perl_rand64 {
 	my $high = rand() * 4294967295;
 	my $low  = rand() * 4294967295;
@@ -279,6 +295,8 @@ Random::Simple - Generate good random numbers in a user consumable way.
     my @arr            = ('red', 'green', 'blue');
     my $rand_item      = random_elem(@arr);
 
+    my @mixed          = shuffle_array(@arr);
+
 =head1 DESCRIPTION
 
 Perl's internal C<rand()> function uses C<drand48> which is an older
@@ -315,6 +333,10 @@ returns a string of random bytes with length of C<$number>.
 
 returns a random element from C<@array>.
 
+=item B<shuffle_array(@array)>
+
+returns an array that has been randomized using the Fisher-Yates alorgithm
+
 =item B<srand()>
 
 emulates C<CORE::srand()> using a better PRNG.
@@ -340,7 +362,7 @@ to generate good random numbers. C<Random::Simple> automatically generates high
 quality seeds by reading random bytes from your operating system and converting
 appropriately.
 
-If you manually seed C<Random::Simple>, then make sure you use good seeds that
+If you manually seed C<Random::Simple>, make sure you use good seeds that
 are mostly non-zero. The larger the number the better seed it will make. A good
 seed is a decimal number with 18 or 19 digits.
 

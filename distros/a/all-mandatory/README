@@ -1,0 +1,33 @@
+NAME
+    all::mandatory - Load all packages under a namespace, but die instead of
+    warn if a module fails to load.
+
+SYNOPSIS
+      # use everything in the IO:: namespace
+      use all::mandatory of => 'IO::*';
+      use all::mandatory 'IO::*';
+
+      # use everything in the IO:: and Sys:: namespaces
+      use all::mandatory 'IO::*', 'Sys::*';
+      use all::mandatory of => qw{IO::* Sys::*};
+
+DESCRIPTION
+    Duplicate of the 'all' CPAN module, but will die if a module cannot be
+    loaded, or if no modules under a namespace can be found.
+
+AUTHOR
+    James A. Duncan <jduncan@fotango.com>
+
+    Piotr Roszatycki <dexter@cpan.org>
+
+    Dondi Michael Stroma <dstroma@gmail.com>
+
+LICENSE
+    Copyright 2003 Fotango Ltd. All Rights Reserved.
+
+    Copyright 2008 Piotr Roszatycki <dexter@cpan.org>.
+
+    Copyright 2025 Dondi Michael Stroma <dstroma@gmail.com>.
+
+    This module is released under the same terms as Perl itself.
+

@@ -11,6 +11,7 @@ SYNOPSIS
      my $authors_of_introduction_ar = $obj->authors_of_introduction;
      my $compilers = $obj->compilers;
      my $cover = $obj->cover;
+     my $covers_ar = $obj->covers;
      my $cycles_ar = $obj->cycles;
      my $directors_ar = $obj->directors;
      my $dml = $obj->dml;
@@ -74,9 +75,19 @@ METHODS
 
     *       "cover"
 
+            *Parameter is deprecated. Use covers instead of it.*
+
             Book cover. Possible values: * hardback * paperback
 
             Default value is undef.
+
+    *       "covers"
+
+            Book covers.
+
+            It's reference to array with 'hardback', 'paperback' values.
+
+            Default value is [].
 
     *       "cycles"
 
@@ -268,6 +279,13 @@ METHODS
     Get book cover.
 
     Returns string (hardback or paperback).
+
+  "covers"
+     my $covers_ar = $obj->covers;
+
+    Get book covers.
+
+    Returns reference to array with cover strings.
 
   "cycles"
      my $cycles_ar = $obj->cycles;
@@ -563,6 +581,7 @@ EXAMPLE1
      #         authors               [
      #             [0] MARC::Convert::Wikidata::Object::People
      #         ],
+     #         covers                [],
      #         date_of_publication   2002,
      #         edition_number        2,
      #         edition_of_work       MARC::Convert::Wikidata::Object::Work,
@@ -602,5 +621,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

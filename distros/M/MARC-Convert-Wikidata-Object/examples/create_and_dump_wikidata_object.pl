@@ -78,6 +78,7 @@ p $obj;
 #         authors               [
 #             [0] MARC::Convert::Wikidata::Object::People
 #         ],
+#         covers                [],
 #         date_of_publication   2002,
 #         edition_number        2,
 #         edition_of_work       MARC::Convert::Wikidata::Object::Work,

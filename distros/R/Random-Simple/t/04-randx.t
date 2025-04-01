@@ -44,7 +44,7 @@ ok($num > 2**30 && $num < 2**32, "rand32() generates the right size numbers") or
 if ($has_64bit) {
 	# _rand64() average should be about 2**63
 	$num = get_avg_randX(64, $iterations);
-	ok($num > 2**62 && $num < 2**64, "rand64() generates the right size numbers") or diag("rand664(): $num not in range");
+	ok($num > 2**62 && $num < 2**64, "rand64() generates the right size numbers") or diag("rand64(): $num not in range");
 } else {
 	diag("Skipping 64bit tests on 32bit platform");
 }

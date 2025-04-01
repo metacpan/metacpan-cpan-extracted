@@ -129,6 +129,14 @@ sub _clean_old_data ($self) {
         say 'Removing ', $path->basename;
         $path->remove;
     }
+
+    $ptr  = Path::Tiny::Rule->new;
+    $iter = $ptr->file->name(qr/\.pl$/)->iter('share');
+    while ( my $path = $iter->() ) {
+        ## no critic (InputOutput::RequireCheckedSyscalls)
+        say 'Removing ', $path->basename;
+        $path->remove;
+    }
 }
 
 sub _build_locales ($self) {

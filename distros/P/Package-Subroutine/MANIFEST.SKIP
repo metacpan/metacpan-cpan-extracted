@@ -29,6 +29,7 @@ ENV.sh
 
 # release
 ^Package-Subroutine-v?\d+\.\d*\.tar\.gz$
+^Package-Subroutine-v?\d+\.\d+\.\d+\.tar\.gz$
 ^Package-Subroutine-v?\d+\.?\d*_\d+\.tar\.gz$
 ^MYMETA.yml$
 ^.shipit$

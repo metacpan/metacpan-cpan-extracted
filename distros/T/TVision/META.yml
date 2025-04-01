@@ -3,7 +3,7 @@ abstract: 'Perl glue to the TurboVision library'
 author:
   - 'Vadim Konovalov <vkon@cpan.org>'
 build_requires:
-  Text::Template: '0'
+  ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,5 +20,5 @@ no_index:
 resources:
   bugtracker: https://github.com/vadrerko/perl-tvision/issues
   repository: https://github.com/vadrerko/perl-tvision.git
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

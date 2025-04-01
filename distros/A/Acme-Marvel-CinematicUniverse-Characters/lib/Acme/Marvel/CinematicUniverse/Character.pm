@@ -5,12 +5,12 @@ use warnings;
 package Acme::Marvel::CinematicUniverse::Character;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 use Acme::Marvel::CinematicUniverse::Mite qw( param -bool );
 
 use overload (
-	q[bool]  => sub { !!1 },
+	q[bool]  => sub { true },
 	q[""]    => sub { shift->real_name },
 	q[0+]    => sub { shift->power },
 	fallback => !!1,

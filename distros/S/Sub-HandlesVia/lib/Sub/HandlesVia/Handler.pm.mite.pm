@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.012000";
+    our $MITE_VERSION = "0.013000";
 
     # Mite keywords
     BEGIN {
@@ -67,8 +67,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -275,7 +275,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -287,7 +287,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -307,7 +307,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -319,7 +319,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -339,7 +339,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -351,7 +351,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -375,7 +375,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -387,7 +387,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -411,7 +411,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -423,7 +423,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -701,7 +701,7 @@
                         (
                             (
                                 !ref $to_coerce
-                                  and (!defined $to_coerce
+                                  and ( !defined $to_coerce
                                     or $to_coerce eq q()
                                     or $to_coerce eq '0'
                                     or $to_coerce eq '1' )
@@ -713,7 +713,7 @@
                     };
                     (
                         !ref $default_value
-                          and (!defined $default_value
+                          and ( !defined $default_value
                             or $default_value eq q()
                             or $default_value eq '0'
                             or $default_value eq '1' )
@@ -940,7 +940,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.012000";
+    our $MITE_VERSION = "0.013000";
 
     # Mite keywords
     BEGIN {
@@ -1179,7 +1179,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1191,7 +1191,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1211,7 +1211,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1223,7 +1223,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1243,7 +1243,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1255,7 +1255,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1279,7 +1279,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1291,7 +1291,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1315,7 +1315,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1327,7 +1327,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1492,7 +1492,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.012000";
+    our $MITE_VERSION = "0.013000";
 
     # Mite keywords
     BEGIN {
@@ -1747,7 +1747,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1759,7 +1759,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1779,7 +1779,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1791,7 +1791,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1811,7 +1811,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1823,7 +1823,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1847,7 +1847,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1859,7 +1859,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1883,7 +1883,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1895,7 +1895,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )

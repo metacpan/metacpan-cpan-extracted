@@ -341,7 +341,7 @@ EOS
         void append(TMenuItem *aNext)
       TGroup:
         void insert(TWindow *what)
-	void insertView(TView *p, TView *Target) /*???*/
+	void insertView(TView *p, TView *Target)
         void remove( TView *p )
         void removeView( TView *p )
         void resetCurrent()

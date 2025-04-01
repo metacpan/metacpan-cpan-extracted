@@ -1,3 +1,7 @@
+0.13 2025-03-31T22:28:23+02:00
+ - API change: Add 'covers' parameter.
+ - Parameter 'cover' is deprecated.
+
 0.12 2025-03-30T15:12:57+02:00
  - API change: Add 'edition_of_work' parameter to Object.
  - Add Work object.

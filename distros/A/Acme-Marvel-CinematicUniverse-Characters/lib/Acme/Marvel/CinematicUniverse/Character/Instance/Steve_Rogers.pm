@@ -5,7 +5,7 @@ use warnings;
 package Acme::Marvel::CinematicUniverse::Character::Instance::Steve_Rogers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 use Acme::Marvel::CinematicUniverse::Character;
 

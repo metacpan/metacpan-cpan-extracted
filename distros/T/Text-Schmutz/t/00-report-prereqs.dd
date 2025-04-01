@@ -7,6 +7,8 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Software::Security::Policy::Individual' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
@@ -30,6 +32,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'Types::Common' => '0',
                                       'experimental' => '0',
+                                      'namespace::autoclean' => '0',
                                       'perl' => 'v5.20.0',
                                       'utf8' => '0'
                                     }

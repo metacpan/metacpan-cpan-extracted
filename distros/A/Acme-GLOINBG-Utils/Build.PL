@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
     },
     test_requires => {
         'Test::More' => '0',
+        'Test::NoWarnings'	=> '0', # or a minimum working version
     },
     requires => {
         #'ABC'              => '1.6',

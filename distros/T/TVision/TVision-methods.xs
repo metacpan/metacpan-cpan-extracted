@@ -112,7 +112,7 @@ TScrollBar* new(TRect r)
 MODULE=TVision::TColorSelector PACKAGE=TVision::TColorSelector
 TColorSelector* new(TRect Bounds, int ASelType)
     CODE:
-        RETVAL = new TColorSelector( Bounds,  (TColorSelector::ColorSel)ASelType);
+        RETVAL = new TColorSelector( Bounds,  TColorSelector::ColorSel(ASelType));
     OUTPUT:
 	RETVAL
 
@@ -919,7 +919,7 @@ void insert(TGroup *self,TWindow *what)
 
 void insertView(TGroup *self,TView *p, TView *Target)
     CODE:
-        /*???*/
+        self->insertView(p, Target);
 
 
 void remove(TGroup *self,TView *p)

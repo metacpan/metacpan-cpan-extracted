@@ -19,12 +19,12 @@ name: Package-Subroutine
 provides:
   Package::Subroutine:
     file: lib/Package/Subroutine.pm
-    version: v0.22.4
+    version: v0.22.5
 requires:
   Class::ISA: '0'
   Perl6::Junction: '1.30000'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.22.4
+version: v0.22.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

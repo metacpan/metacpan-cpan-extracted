@@ -1,195 +1,140 @@
+# NOTE: Since the intention is to ship this file with a project, this file
+# cannot have any non-core dependencies.
+package Acme::Marvel::CinematicUniverse::Mite;
 use 5.008001;
 use strict;
 use warnings;
+no strict 'refs';
 
-package Acme::Marvel::CinematicUniverse::Mite;
-
-# NOTE: Since the intention is to ship this file with a project, this file
-# cannot have any non-core dependencies.
-
-use strict;
-use warnings;
-
-BEGIN {
-    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
-        ? sub () { !!1 }
-        : sub () { !!0 }
-};
-
-if ( $] < 5.009005 ) {
-    require MRO::Compat;
-}
-else {
-    require mro;
-}
+if ( $] < 5.009005 ) { require MRO::Compat; }
+else                 { require mro;         }
 
 defined ${^GLOBAL_PHASE}
 or eval { require Devel::GlobalDestruction; 1 }
 or do {
-    warn "WARNING: Devel::GlobalDestruction recommended!\n";
+    carp( "WARNING: Devel::GlobalDestruction recommended!" );
     *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
 };
 
 # Constants
-sub true  () { !!1 }
-sub false () { !!0 }
-sub ro    () { 'ro' }
-sub rw    () { 'rw' }
-sub rwp   () { 'rwp' }
-sub lazy  () { 'lazy' }
-sub bare  () { 'bare' }
+sub true  () { !!1 }    sub false () { !!0 }
+sub ro    () { 'ro' }   sub rw    () { 'rw' }   sub rwp   () { 'rwp' }
+sub lazy  () { 'lazy' } sub bare  () { 'bare' }
 
-my $parse_mm_args = sub {
-    my $coderef = pop;
-    my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
-    ( $names, $coderef );
+# More complicated constants
+BEGIN {
+    my @bool = ( \&false, \&true );
+    *_HAS_AUTOCLEAN = $bool[ 0+!! eval { require namespace::autoclean } ];
+    *STRICT         = $bool[ 0+!! ( $ENV{PERL_STRICT} || $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) ];
 };
 
+# Exportable error handlers
+sub _error_handler {
+    my ( $func, $message, @args ) = @_;
+    if ( @args ) {
+        require Data::Dumper;
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 0;
+        $message = sprintf $message, map {
+            ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
+        } @args;
+    }
+    my $next = do { require Carp; \&{"Carp::$func"} };
+    @_ = ( $message );
+    goto $next;
+}
+
+sub carp    { unshift @_, 'carp'   ; goto \&_error_handler }
+sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
+sub confess { unshift @_, 'confess'; goto \&_error_handler }
+
+# Exportable guard function
+{
+    my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][0] or $_[0][1]->() };
+    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = true };
+    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = true };
+    *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
+    *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
+}
+
+# Exportable lock and unlock
+sub _lul {
+    my ( $lul, $ref ) = @_;
+    if ( ref $ref eq 'ARRAY' ) {
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for @$ref;
+        return;
+    }
+    if ( ref $ref eq 'HASH' ) {
+        &Internals::hv_clear_placeholders( $ref );
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for values %$ref;
+        return;
+    }
+    return;
+}
+
+sub lock {
+    unshift @_, true;
+    goto \&_lul;
+}
+
+sub unlock {
+    my $ref = shift;
+    _lul( 0 , $ref );
+    &guard( sub { _lul( 1, $ref ) } );
+}
+
 sub _is_compiling {
-    return $ENV{MITE_COMPILE} ? 1 : 0;
+    defined $Mite::COMPILING and $Mite::COMPILING eq __PACKAGE__;
 }
 
 sub import {
-    my $class = shift;
-    my %arg = map { lc($_) => 1 } @_;
+    my $me = shift;
+    my %arg = map +( lc($_) => true ), @_;
     my ( $caller, $file ) = caller;
-
-    # Turn on warnings and strict in the caller
-    warnings->import;
-    strict->import;
-
-    my $kind = $arg{'-role'} ? 'role' : 'class';
 
     if( _is_compiling() ) {
         require Mite::Project;
-        Mite::Project->default->inject_mite_functions(
-            package     => $caller,
-            file        => $file,
-            arg         => \%arg,
-            kind        => $kind,
-            shim        => $class,
+        'Mite::Project'->default->inject_mite_functions(
+            'package' => $caller,
+            'file'    => $file,
+            'arg'     => \%arg,
+            'shim'    => $me,
         );
     }
     else {
-        # Work around Test::Compile's tendency to 'use' modules.
-        # Mite.pm won't stand for that.
-        return if $ENV{TEST_COMPILE};
+        # Try to determine original filename for caller, minus libdir.
+        # This would normally be in %INC but caller hasn't finished loading yet.
+        require File::Spec;
+        my $orig = $file;
+        for my $base ( @INC ) {
+            $base eq substr $file, 0, length $base
+            and -f File::Spec->catfile( $base, substr $file, 1 + length $base )
+            and $orig = File::Spec->abs2rel( $file, $base )
+            and last;
+        }
 
         # Changes to this filename must be coordinated with Mite::Compiled
-        my $mite_file = $file . ".mite.pm";
-        if( !-e $mite_file ) {
-            require Carp;
-            Carp::croak("Compiled Mite file ($mite_file) for $file is missing");
-        }
-
-        {
-            local @INC = ('.', @INC);
-            require $mite_file;
-        }
-
-        $class->_inject_mite_functions( $caller, $file, $kind, \%arg );
-    }
-
-    if ( _HAS_AUTOCLEAN and not $arg{'-unclean'} ) {
-        'namespace::autoclean'->import( -cleanee => $caller );
-    }
-}
-
-sub _inject_mite_functions {
-    my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
-    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
-
-    no strict 'refs';
-    my $has = $class->_make_has( $caller, $file, $kind );
-    *{"$caller\::has"}   = $has if $requested->( has   => 1 );
-    *{"$caller\::param"} = $has if $requested->( param => 0 );
-    *{"$caller\::field"} = $has if $requested->( field => 0 );
-
-    *{ $caller .'::with' } = $class->_make_with( $caller, $file, $kind )
-        if $requested->( with => 1 );
-
-    *{ $caller .'::extends'} = sub {}
-        if $kind eq 'class' && $requested->( extends => 1 );
-    *{ $caller .'::requires'} = sub {}
-        if $kind eq 'role' && $requested->( requires => 1 );
-
-    my $MM = ( $kind eq 'role' ) ? \@{"$caller\::METHOD_MODIFIERS"} : [];
-
-    for my $modifier ( qw/ before after around / ) {
-        next unless $requested->( $modifier => 1 );
-
-        if ( $kind eq 'class' ) {
-            *{"$caller\::$modifier"} = sub {
-                $class->$modifier( $caller, @_ );
-                return;
-            };
-        }
-        else {
-            *{"$caller\::$modifier"} = sub {
-                my ( $names, $coderef ) = &$parse_mm_args;
-                push @$MM, [ $modifier, $names, $coderef ];
-                return;
-            };
+        my $mite_file = $orig . '.mite.pm';
+        local $@;
+        if ( not eval { require $mite_file; 1 } ) {
+            my $e = $@;
+            croak "Compiled Mite file ($mite_file) for $file is missing or an error occurred loading it: $e";
         }
     }
-}
 
-sub _make_has {
-    my ( $class, $caller, $file, $kind ) = @_;
-
-    return sub {
-        my $names = shift;
-        $names = [$names] unless ref $names;
-        my %args = @_;
-        for my $name ( @$names ) {
-           $name =~ s/^\+//;
-
-           my $default = $args{default};
-           if ( ref $default eq 'CODE' ) {
-               no strict 'refs';
-               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-           }
-
-           my $builder = $args{builder};
-           if ( ref $builder eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_build_$name"} = $builder;
-           }
-
-           my $trigger = $args{trigger};
-           if ( ref $trigger eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_trigger_$name"} = $trigger;
-           }
-        }
-
-        return;
-    };
-}
-
-sub _make_with {
-    my ( $class, $caller, $file, $kind ) = @_;
-
-    return sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
-                $class->_finalize_application_roletiny( $role, $caller, $args );
-            }
-            else {
-                $role->__FINALIZE_APPLICATION__( $caller, $args );
-            }
-        }
-        return;
-    };
+    'warnings'->import;
+    'strict'->import;
+    'namespace::autoclean'->import( -cleanee => $caller )
+        if _HAS_AUTOCLEAN && !$arg{'-unclean'};
 }
 
 {
     my ( $cb_before, $cb_after );
     sub _finalize_application_roletiny {
-        my ( $class, $role, $caller, $args ) = @_;
-
+        my ( $me, $role, $caller, $args ) = @_;
         if ( $INC{'Role/Hooks.pm'} ) {
             $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
             $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
@@ -197,40 +142,90 @@ sub _make_with {
         if ( $cb_before ) {
             $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
         }
-
         'Role::Tiny'->_check_requires( $caller, $role );
-
         my $info = $Role::Tiny::INFO{$role};
         for ( @{ $info->{modifiers} || [] } ) {
-            my @args = @$_;
-            my $kind = shift @args;
-            $class->$kind( $caller, @args );
+            my @args         = @$_;
+            my $modification = shift @args;
+            my $handler      = "HANDLE_$modification";
+            $me->$handler( $caller, undef, @args );
         }
-
         if ( $cb_after ) {
             $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
         }
+        return;
+    }
 
+    # Usage: $me, $caller, @with_args
+    sub HANDLE_with {
+        my ( $me, $caller ) = ( shift, shift );
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
+                $me->_finalize_application_roletiny( $role, $caller, $args );
+            }
+            else {
+                $role->__FINALIZE_APPLICATION__( $caller, $args );
+            }
+        }
         return;
     }
 }
 
+# Usage: $me, $caller, $keyword, @has_args
+sub HANDLE_has {
+    my ( $me, $caller, $keyword, $names ) = ( shift, shift, shift, shift );
+    if ( @_ % 2 ) {
+        my $default = shift;
+        unshift @_, ( 'CODE' eq ref( $default ) )
+            ? ( is => lazy, builder => $default )
+            : ( is => ro, default => $default );
+    }
+    my %spec = @_;
+    my $code;
+    for my $name ( ref($names) ? @$names : $names ) {
+        $name =~ s/^\+//;
+        'CODE' eq ref( $code = $spec{default} )
+            and ${"$caller\::__$name\_DEFAULT__"} = $code;
+        'CODE' eq ref( $code = $spec{builder} )
+            and *{"$caller\::_build_$name"} = $code;
+        'CODE' eq ref( $code = $spec{trigger} )
+            and *{"$caller\::_trigger_$name"} = $code;
+        'CODE' eq ref( $code = $spec{clone} )
+            and *{"$caller\::_clone_$name"} = $code;
+    }
+    return;
+}
+
 {
-    my $get_orig = sub {
+    my $_kind = sub { ${ shift() . '::USES_MITE' } =~ /Role/ ? 'role' : 'class' };
+
+    sub _get_orig_method {
         my ( $caller, $name ) = @_;
-
-        my $orig = $caller->can($name);
+        my $orig = $caller->can( $name );
         return $orig if $orig;
+        croak "Cannot modify method $name in $caller: no such method";
+    }
 
-        require Carp;
-        Carp::croak( "Cannot modify method $name in $caller: no such method" );
-    };
+    sub _parse_mm_args {
+        my $coderef = pop;
+        my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
+        ( $names, $coderef );
+    }
 
-    sub before {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+    # Usage: $me, $caller, $caller_kind, @before_args
+    sub HANDLE_before {
+        my ( $me, $caller, $kind ) = ( shift, shift, shift );
+        my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
+        if ( $kind eq 'role' ) {
+            push @{"$caller\::METHOD_MODIFIERS"},
+                [ before => $names, $coderef ];
+            return;
+        }
         for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
+            my $orig = _get_orig_method( $caller, $name );
             local $@;
             eval <<"BEFORE" or die $@;
                 package $caller;
@@ -245,11 +240,18 @@ BEFORE
         return;
     }
 
-    sub after {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+    # Usage: $me, $caller, $caller_kind, @after_args
+    sub HANDLE_after {
+        my ( $me, $caller, $kind ) = ( shift, shift, shift );
+        my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
+        if ( $kind eq 'role' ) {
+            push @{"$caller\::METHOD_MODIFIERS"},
+                [ after => $names, $coderef ];
+            return;
+        }
         for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
+            my $orig = _get_orig_method( $caller, $name );
             local $@;
             eval <<"AFTER" or die $@;
                 package $caller;
@@ -275,11 +277,18 @@ AFTER
         return;
     }
 
-    sub around {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+    # Usage: $me, $caller, $caller_kind, @around_args
+    sub HANDLE_around {
+        my ( $me, $caller, $kind ) = ( shift, shift, shift );
+        my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
+        if ( $kind eq 'role' ) {
+            push @{"$caller\::METHOD_MODIFIERS"},
+                [ around => $names, $coderef ];
+            return;
+        }
         for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
+            my $orig = _get_orig_method( $caller, $name );
             local $@;
             eval <<"AROUND" or die $@;
                 package $caller;
@@ -294,39 +303,12 @@ AROUND
     }
 }
 
+# Usage: $me, $caller, $caller_kind, @signature_for_args
+sub HANDLE_signature_for {
+    my ( $me, $caller, $kind, $name ) = @_;
+    $name =~ s/^\+//;
+    $me->HANDLE_around( $caller, $kind, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
+    return;
+}
+
 1;
-
-__END__
-
-=pod
-
-=head1 NAME
-
-Acme::Marvel::CinematicUniverse::Mite - shim to load .mite.pm files
-
-=head1 DESCRIPTION
-
-This is a copy of L<Mite::Shim>.
-
-=head1 AUTHOR
-
-Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
-
-Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
-
-=head1 COPYRIGHT AND LICENCE
-
-This software is copyright (c) 2011-2014 by Michael G Schwern.
-
-This software is copyright (c) 2022 by Toby Inkster.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 DISCLAIMER OF WARRANTIES
-
-THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-=cut

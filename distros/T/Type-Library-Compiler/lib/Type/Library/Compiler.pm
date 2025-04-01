@@ -5,7 +5,7 @@ use warnings;
 package Type::Library::Compiler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.008';
 
 use Type::Library::Compiler::Mite -all;
 use B ();
@@ -110,7 +110,7 @@ BEGIN {
 		fallback => !!1,
 		'|'      => 'union',
 		bool     => sub { !! 1 },
-		'""'     => sub { shift->[1] },
+		'""'     => sub { shift->{name} },
 		'&{}'    => sub {
 			my $self = shift;
 			return sub { $self->assert_return( @_ ) };
@@ -118,62 +118,63 @@ BEGIN {
 	);
 
 	sub union {
-		my @types = grep ref( $_ ), @_;
-		my @codes = map $_->[0], @types;
-		bless [
-			sub { for ( @codes ) { return 1 if $_->(@_) } return 0 },
-			join( '|', map $_->[1], @types ),
-			\@types,
-		], __PACKAGE__;
+		my @types  = grep ref( $_ ), @_;
+		my @checks = map $_->{check}, @types;
+		bless {
+			check => sub { for ( @checks ) { return 1 if $_->(@_) } return 0 },
+			name  => join( '|', map $_->{name}, @types ),
+			union => \@types,
+		}, __PACKAGE__;
 	}
 
 	sub check {
-		$_[0][0]->( $_[1] );
+		$_[0]{check}->( $_[1] );
 	}
 
 	sub get_message {
 		sprintf '%%s did not pass type constraint "%%s"',
 			defined( $_[1] ) ? $_[1] : 'Undef',
-			$_[0][1];
+			$_[0]{name};
 	}
 
 	sub validate {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? undef
 			: $_[0]->get_message( $_[1] );
 	}
 
 	sub assert_valid {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? 1
 			: Carp::croak( $_[0]->get_message( $_[1] ) );
 	}
 
 	sub assert_return {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? $_[1]
 			: Carp::croak( $_[0]->get_message( $_[1] ) );
 	}
 
 	sub to_TypeTiny {
-		my ( $coderef, $name, $library, $origname ) = @{ +shift };
-		if ( ref $library eq 'ARRAY' ) {
+		if ( $_[0]{union} ) {
 			require Type::Tiny::Union;
 			return 'Type::Tiny::Union'->new(
-				display_name     => $name,
-				type_constraints => [ map $_->to_TypeTiny, @$library ],
+				display_name     => $_[0]{name},
+				type_constraints => [ map $_->to_TypeTiny, @{ $_[0]{union} } ],
 			);
 		}
-		if ( $library ) {
+		if ( my $library = $_[0]{library} ) {
 			local $@;
 			eval "require $library; 1" or die $@;
-			my $type = $library->get_type( $origname );
+			my $type = $library->get_type( $_[0]{library_name} );
 			return $type if $type;
 		}
 		require Type::Tiny;
+		my $check = $_[0]{check};
+		my $name  = $_[0]{name};
 		return 'Type::Tiny'->new(
 			name       => $name,
-			constraint => sub { $coderef->( $_ ) },
+			constraint => sub { $check->( $_ ) },
 			inlined    => sub { sprintf '%%s::is_%%s(%%s)', $LIBRARY, $name, pop }
 		);
 	}
@@ -181,7 +182,7 @@ BEGIN {
 	sub DOES {
 		return 1 if $_[1] eq 'Type::API::Constraint';
 		return 1 if $_[1] eq 'Type::Library::Compiler::TypeConstraint';
-		shift->DOES( @_ );
+		shift->SUPER::DOES( @_ );
 	}
 };
 
@@ -210,7 +211,7 @@ sub _compile_type {
 	push @code, sprintf <<'CODE', $name, $name, B::perlstring( $name ), B::perlstring( $type->library ), B::perlstring( $type->name ), B::perlstring( $self->constraint_module );
 	my $type;
 	sub %s () {
-		$type ||= bless( [ \&is_%s, %s, %s, %s ], %s );
+		$type ||= bless( { check => \&is_%s, name => %s, library => %s, library_name => %s }, %s );
 	}
 CODE
 
@@ -281,6 +282,35 @@ sub _compile_pod_footer {
 	my $self = shift;
 
 	return <<'CODE';
+#=head1 TYPE CONSTRAINT METHODS
+
+For any type constraint B<Foo> the following methods are available:
+
+ Foo->check( $value )         # boolean
+ Foo->get_message( $value )   # error message, even if $value is ok 
+ Foo->validate( $value )      # error message, or undef if ok
+ Foo->assert_valid( $value )  # returns true, dies if error
+ Foo->assert_return( $value ) # returns $value, or dies if error
+ Foo->to_TypeTiny             # promotes the object to Type::Tiny
+
+Objects overload stringification to return their name and overload
+coderefification to call C<assert_return>.
+
+The objects as-is can be used in L<Moo> or L<Mite> C<isa> options.
+
+ has myattr => (
+   is => 'rw',
+   isa => Foo,
+ );
+
+They cannot be used as-is in L<Moose> or L<Mouse>, but can be promoted
+to Type::Tiny and will then work:
+
+ has myattr => (
+   is => 'rw',
+   isa => Foo->to_TypeTiny,
+ );
+
 #=cut
 
 CODE

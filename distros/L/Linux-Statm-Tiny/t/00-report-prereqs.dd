@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Mite' => '0.002001',
+                                      'Mite' => '0.013000',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
@@ -20,11 +20,15 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Data::Dumper' => '0',
                                       'Fcntl' => '0',
+                                      'File::Spec' => '0',
+                                      'MRO::Compat' => '0',
                                       'POSIX' => '0',
                                       'constant' => '0',
                                       'mro' => '0',
-                                      'perl' => '5.010001',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.10.1',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

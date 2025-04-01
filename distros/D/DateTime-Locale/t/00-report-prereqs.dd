@@ -80,6 +80,7 @@ do { my $x = {
                                    'IPC::System::Simple' => '0',
                                    'Path::Tiny' => '0',
                                    'Scalar::Util' => '0',
+                                   'Term::ANSIColor' => '0',
                                    'Test2::Plugin::NoWarnings' => '0',
                                    'Test2::Plugin::UTF8' => '0',
                                    'Test2::Require::Module' => '0',

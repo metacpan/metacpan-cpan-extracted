@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+SECURITY.md
 SIGNATURE
 cpanfile
 dist.ini
@@ -16,6 +17,8 @@ script/schmutz
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t
+t/author-changes.t
+t/author-clean-namespaces.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -25,6 +28,7 @@ t/author-pod-coverage.t
 t/author-pod-linkcheck.t
 t/author-pod-syntax.t
 t/author-portability.t
+t/author-vars.t
 t/etc/perlcritic.rc
 t/release-dist-manifest.t
 t/release-fixme.t

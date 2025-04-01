@@ -52,6 +52,18 @@ DeepSeek advised to recreate this way:
 The real reason was the missing MANIFEST.SKIP line in the MANIFEST file.
     ./Build dist
 
+Observer the cpan and install
+    https://pause.perl.org/pause/authenquery?ACTION=show_files
+    https://metacpan.org/author/GLOINBG
+    https://metacpan.org/release/GLOINBG/Acme-GLOINBG-Utils-0.05
+    cpan Acme::GLOINBG::Utils
+    cpan -I Acme::GLOINBG::Utils
+    Retries just install the erroneous old v0.04; to see the fixed v0.05:
+    cpan
+    > reload index
+    > install Acme::GLOINBG::Utils
+    perl -MAcme::GLOINBG::Utils -e 'print "Version = $Acme::GLOINBG::Utils::VERSION\n"'
+
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the

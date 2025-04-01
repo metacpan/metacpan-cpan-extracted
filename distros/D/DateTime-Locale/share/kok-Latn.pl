@@ -267,5 +267,5 @@
   time_format_medium => "a\N{U+202f}h:mm:ss",
   time_format_short => "a\N{U+202f}h:mm",
   variant => undef,
-  version => 46,
+  version => 47,
 }

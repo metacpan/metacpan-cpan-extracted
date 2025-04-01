@@ -1,0 +1,16 @@
+Revision history for Types-Music:
+
+0.0104 2025-03-31 15:02:06
+  - Improve documentation.
+
+0.0103 2025-03-31 12:56:01
+  - For real this time...
+
+0.0102 2025-03-31 12:43:14
+  - Re-add AWOL PodWeaver in dist.
+
+0.0101 2025-03-31 12:26:12
+  - Correct license.
+
+0.0100 2025-03-31 11:25:25
+  - Port from Types::MIDI.

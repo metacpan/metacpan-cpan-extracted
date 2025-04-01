@@ -1,4 +1,5 @@
 #include <internal/sighandl.h>
+#include <signal.h>
 
 #ifdef _TV_UNIX
 
@@ -11,6 +12,9 @@ std::atomic<SignalHandlerCallback *> SignalHandler::callback {nullptr};
 const int SignalHandler::handledSignals[HandledSignalCount] =
     { SIGINT, SIGQUIT, SIGILL, SIGABRT, SIGFPE, SIGSEGV, SIGTERM, SIGTSTP };
 
+#ifndef SA_NOCLDWAIT
+#define SA_NOCLDWAIT 0
+#endif
 static bool operator==(const struct sigaction &a, const struct sigaction &b) noexcept
 {
     constexpr int knownFlags =

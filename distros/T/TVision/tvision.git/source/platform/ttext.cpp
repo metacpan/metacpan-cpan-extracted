@@ -122,7 +122,21 @@ namespace tvision
 #ifdef _TV_UNIX
 int UnixConsoleStrategy::charWidth(uint32_t wc) noexcept
 {
-    return wcwidth(wc);
+//////    return wcwidth(wc);
+    return 1 +
+        (wc >= 0x1100 &&
+         (wc <= 0x115f ||
+          wc == 0x2329 || wc == 0x232a ||
+          (wc >= 0x2e80 && wc <= 0xa4cf &&
+           wc != 0x303f) ||
+          (wc >= 0xac00 && wc <= 0xd7a3) ||
+          (wc >= 0xf900 && wc <= 0xfaff) ||
+          (wc >= 0xfe10 && wc <= 0xfe19) ||
+          (wc >= 0xfe30 && wc <= 0xfe6f) ||
+          (wc >= 0xff00 && wc <= 0xff60) ||
+          (wc >= 0xffe0 && wc <= 0xffe6) ||
+          (wc >= 0x20000 && wc <= 0x2fffd) ||
+          (wc >= 0x30000 && wc <= 0x3fffd)));
 }
 #endif // _TV_UNIX
 

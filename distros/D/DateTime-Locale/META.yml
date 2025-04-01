@@ -11,6 +11,7 @@ build_requires:
   IPC::System::Simple: '0'
   Path::Tiny: '0'
   Scalar::Util: '0'
+  Term::ANSIColor: '0'
   Test2::Plugin::NoWarnings: '0'
   Test2::Plugin::UTF8: '0'
   Test2::Require::Module: '0'
@@ -36,22 +37,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.44'
+    version: '1.45'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.44'
+    version: '1.45'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.44'
+    version: '1.45'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.44'
+    version: '1.45'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.44'
+    version: '1.45'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.44'
+    version: '1.45'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -72,7 +73,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.44'
+version: '1.45'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -1930,6 +1931,7 @@ x_Dist_Zilla:
             - Ahd
             - Aib
             - Aibreán
+            - Aitar
             - Aj
             - Ajé
             - Akaas
@@ -2428,6 +2430,7 @@ x_Dist_Zilla:
             - Cyn
             - Cyprus
             - Cyrillic
+            - Cyrl
             - Cze
             - Czech
             - Czechia
@@ -3536,6 +3539,7 @@ x_Dist_Zilla:
             - Desimber
             - Desàmbar
             - Desèmber
+            - Deva
             - Devanagari
             - Dez
             - Dezember
@@ -4441,6 +4445,7 @@ x_Dist_Zilla:
             - KW3
             - KW4
             - KWOTA
+            - KZ
             - Ka
             - Kab
             - Kabla
@@ -4457,6 +4462,7 @@ x_Dist_Zilla:
             - Kala
             - Kalaallisut
             - Kalenjin
+            - Kalpak
             - Kam
             - Kamba
             - Kamena
@@ -4733,7 +4739,9 @@ x_Dist_Zilla:
             - Lapa
             - Lar
             - Laraba
+            - Latgalian
             - Latin
+            - Latn
             - Latvia
             - Latvian
             - Lebanon
@@ -6069,6 +6077,7 @@ x_Dist_Zilla:
             - Som
             - Somali
             - Somalia
+            - Somar
             - Somwaar
             - Son
             - Sondag
@@ -6667,6 +6676,7 @@ x_Dist_Zilla:
             - acafʊnɖuka
             - acapomka
             - achiel
+            - acho
             - ad
             - adamsan
             - adar
@@ -8529,6 +8539,7 @@ x_Dist_Zilla:
             - lávvordat
             - lätni
             - lóndɛ́
+            - lönesc
             - lör
             - lördag
             - lør
@@ -9784,6 +9795,7 @@ x_Dist_Zilla:
             - suenter
             - sukru
             - sukul
+            - suman
             - sun
             - sungula
             - sunnudagur
@@ -14931,13 +14943,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.47.0
+          git_version: 2.49.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.037'
+      version: '0.038'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -15140,7 +15152,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.22'
@@ -15152,7 +15164,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -15186,7 +15198,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.051'
@@ -15210,7 +15222,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -15223,11 +15235,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.44
+          tag: v1.45
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -15241,7 +15253,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.051'
@@ -15271,7 +15283,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -15285,7 +15297,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.0
+          git_version: 2.49.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.051'
@@ -15325,7 +15337,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Test::CheckBreaks
-      version: '0.019'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

@@ -51,6 +51,7 @@ my $publisher = MARC::Convert::Wikidata::Object::Publisher->new(
 $obj = MARC::Convert::Wikidata::Object->new(
 	'authors' => [$author],
 	'ccnb' => 'cnb000750997',
+	'covers' => ['hardback'],
 	'cycles' => [$cycle],
 	'edition_number' => 1,
 	'editors' => [$editor],

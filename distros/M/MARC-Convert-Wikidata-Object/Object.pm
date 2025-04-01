@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 has authors => (
 	default => [],
@@ -34,6 +34,11 @@ has compilers => (
 );
 
 has cover => (
+	is => 'ro',
+);
+
+has covers => (
+	default => [],
 	is => 'ro',
 );
 
@@ -173,8 +178,17 @@ sub BUILD {
 	check_array_object($self, 'compilers',
 		'MARC::Convert::Wikidata::Object::People', 'Compiler');
 
+	# Check cover.
 	if (defined $self->{'cover'} && none { $_ eq $self->{'cover'} } @COVERS) {
 		err "Book cover '".$self->{'cover'}."' doesn't exist.";
+	}
+
+	# Check covers.
+	# XXX Common check.
+	foreach my $cover (@{$self->covers}) {
+		if (! defined $cover && none { $_ eq $cover } @COVERS) {
+			err "Book cover '".$cover."' doesn't exist.";
+		}
 	}
 
 	# Check cycles.
@@ -267,6 +281,7 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $authors_of_introduction_ar = $obj->authors_of_introduction;
  my $compilers = $obj->compilers;
  my $cover = $obj->cover;
+ my $covers_ar = $obj->covers;
  my $cycles_ar = $obj->cycles;
  my $directors_ar = $obj->directors;
  my $dml = $obj->dml;
@@ -334,12 +349,22 @@ Default value is reference to blank array.
 
 =item * C<cover>
 
+I<Parameter is deprecated. Use L<covers> instead of it.>
+
 Book cover.
 Possible values:
  * hardback
  * paperback
 
 Default value is undef.
+
+=item * C<covers>
+
+Book covers.
+
+It's reference to array with 'hardback', 'paperback' values.
+
+Default value is [].
 
 =item * C<cycles>
 
@@ -534,6 +559,14 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 Get book cover.
 
 Returns string (hardback or paperback).
+
+=head2 C<covers>
+
+ my $covers_ar = $obj->covers;
+
+Get book covers.
+
+Returns reference to array with cover strings.
 
 =head2 C<cycles>
 
@@ -845,6 +878,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  #         authors               [
  #             [0] MARC::Convert::Wikidata::Object::People
  #         ],
+ #         covers                [],
  #         date_of_publication   2002,
  #         edition_number        2,
  #         edition_of_work       MARC::Convert::Wikidata::Object::Work,
@@ -899,6 +933,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

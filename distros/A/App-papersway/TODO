@@ -1,3 +1,6 @@
 - We could use a different default ncols for workspaces on different outputs.
   It could be configurable and/or calculated from the dimensions of the outputs.
   E.g. three or four columns default ncols, automatically, on wider monitors.
+  Possible design: --ncols-min-width=N option, incompatible with --cols.
+  Then the default ncols for a workspace on an output is the output's width
+  divided by N, rounded down.

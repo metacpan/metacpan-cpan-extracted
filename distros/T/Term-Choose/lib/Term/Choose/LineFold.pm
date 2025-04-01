@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.771';
+our $VERSION = '1.772';
 
 use Exporter qw( import );
 
@@ -17,7 +17,7 @@ use Term::Choose::Screen    qw( get_term_size );
 
 
 BEGIN {
-    if ( exists $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {                                       #
+    if ( exists $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {                                       # 24.03.2025
         if ( $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {
             require Term::Choose::LineFold::CharWidthAmbiguousWide;
             Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );
@@ -68,47 +68,35 @@ sub _char_width {
     return 1;
 }
 
-
 sub print_columns {
     #my $str = $_[0];
     my $width = 0;
     my $c;
     for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
         $c = ord substr $_[0], $i, 1;
-        $width = $width + (
-            defined $cache->{$c}
-            ? $cache->{$c}
-            : ( $cache->{$c} = _char_width( $c ) )
-        );
+        $width += ( $cache->{$c} //= _char_width( $c ) );
     }
     return $width;
 }
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_width ) = @_;
-    my $return_remainder = wantarray;
-    my $count = 0;
-    my $total = 0;
+    #my ( $str, $avail_width ) = @_;
+    my $str_w = 0;
     my $c;
-    for my $i ( 0 .. ( length( $str ) - 1 ) ) {
-        $c = ord substr $str, $i, 1;
-        if ( ! defined $cache->{$c} ) {
-            $cache->{$c} = _char_width( $c )
-        }
-        if ( ( $total = $total + $cache->{$c} ) > $avail_width ) {
-            if ( ( $total - $cache->{$c} ) < $avail_width ) {
-                return substr( $str, 0, $count ) . ' ', substr( $str, $count ) if $return_remainder;
-                return substr( $str, 0, $count ) . ' ';
+    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
+        $c = ord substr $_[0], $i, 1;
+        if ( ( $str_w += ( $cache->{$c} //= _char_width( $c ) ) ) > $_[1] ) {
+            if ( ( $str_w - $cache->{$c} ) < $_[1] ) {
+                return substr( $_[0], 0, $i ) . ' ', substr( $_[0], $i ) if wantarray;
+                return substr( $_[0], 0, $i ) . ' ';
             }
-            return substr( $str, 0, $count ), substr( $str, $count ) if $return_remainder;
-            return substr( $str, 0, $count );
-
+            return substr( $_[0], 0, $i ), substr( $_[0], $i ) if wantarray;
+            return substr( $_[0], 0, $i );
         }
-        ++$count;
     }
-    return $str, '' if $return_remainder;
-    return $str;
+    return $_[0], '' if wantarray;
+    return $_[0];
 }
 
 
@@ -261,7 +249,7 @@ Term::Choose::LineFold
 
 =head1 VERSION
 
-Version 1.771
+Version 1.772
 
 =cut
 
@@ -312,17 +300,16 @@ I<width> is C<1> or greater.
 
 =item init_tab
 
-Sets the initial tab inserted at the beginning of paragraphs. If a positive integer is provided, the initial tab will be
-I<int_tab> spaces. If a non-numeric value is provided, it will be used as the initial tab directly. By default, no
-initial tab is inserted. If the initial tab is longer than half the available width, it will be cut to half the
-available width
+Sets the initial tab inserted at the beginning of paragraphs. If a value consisting of C</^[0-9]+$/> is provided,
+the tab will be that number of spaces. Otherwise, the provided value is used directly as the tab. By default, no initial
+tab is inserted. If the initial tab is longer than half the available width, it will be cut to half the available width.
 
 =item subseq_tab
 
-Sets the subsequent tab inserted at the beginning of all broken lines (excluding paragraph beginnings). If a positive
-integer is provided, the subsequent tab will be I<subseq_tab> spaces. If a non-numeric value is provided, it will be
-used as the subsequent tab directly. By default, no subsequent tab is inserted. If the subsequent tab is longer than
-half the available width, it will be cut to half the available width
+Sets the subsequent tab inserted at the beginning of all broken lines (excluding paragraph beginnings). If a value
+consisting of C</^[0-9]+$/> is provided, the tab will be that number of spaces. Otherwise, the provided value is
+used directly as the tab. By default, no subsequent tab is inserted. If the subsequent tab is longer than half the
+available width, it will be cut to half the available width.
 
 =item color
 

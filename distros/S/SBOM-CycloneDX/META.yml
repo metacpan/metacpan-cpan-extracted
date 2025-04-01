@@ -1,0 +1,36 @@
+---
+abstract: unknown
+author:
+  - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SBOM-CycloneDX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cpanel::JSON::XS: '0'
+  JSON::Validator: '0'
+  List::Util: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  URI::PackageURL: '2.22'
+  UUID::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/giterlizzi/perl-SBOM-CycloneDX/issues
+  repository: git://github.com/giterlizzi/perl-SBOM-CycloneDX
+version: 1.03
+x_purl: pkg:cpan/GDT/SBOM-CycloneDX
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

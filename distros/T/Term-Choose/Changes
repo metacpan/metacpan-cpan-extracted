@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.772   2025-03-31
+    - Refactored 'print_columns' and 'cut_to_printwidth'.
+    - Update documentation Term::Choose::LineFold.
+
 1.771   2025-03-27
     - Removed 'cut_to_printwidth' from the public.
 

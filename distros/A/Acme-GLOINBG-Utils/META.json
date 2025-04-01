@@ -21,14 +21,15 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
          }
       }
    },
    "provides" : {
       "Acme::GLOINBG::Utils" : {
          "file" : "lib/Acme/GLOINBG/Utils.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -37,6 +38,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

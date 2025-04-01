@@ -6,6 +6,23 @@ Home page:    <https://metacpan.org/release/Type-Library-Compiler>
 Bug tracker:  <https://github.com/tobyink/p5-type-library-compiler/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2025-03-31
+
+ [ SECURITY ]
+ - Fix: Rebuild using newer version of Mite.
+
+ [ Bug Fixes ]
+ - Fix DOES to prevent infinite recursion.
+
+0.007	2022-07-19
+
+ [ Test Suite ]
+ - Add test for using compiled libraries with Moo.
+
+ [ Other ]
+ - Improved generated pod.
+ - Internally use blessed hashrefs instead of blessed arrayrefs.
+
 0.006	2022-07-19
 
  - Set $TLC_VERSION package variable in compiled libraries.

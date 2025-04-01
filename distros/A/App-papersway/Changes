@@ -1,5 +1,29 @@
 Revision history for App::papersway
 
+2.000     2025-04-01 11:49:09+08:00 Asia/Shanghai
+    - New wide windows replace monocle mode.
+      'width toggle' command replaces 'monocle toggle'.
+      Prompted by some feedback from PaperWM user Joey Hess.
+    - New 'bury-workspace' command.
+    - New --cols option.
+    - Rename 'absorb_expel' command to 'absorb-expel'.
+    - Rename 'move_workspace' command to 'move-to-workspace'.
+    - Rename 'other column' command to 'other-column'.
+
+    - 'other-column' command does nothing when a wide window is displayed.
+      Its operation in that case is too different to be of much use, I think.
+    - Update status display when moving column left/right with a wide window.
+    - Fix an operator precedence mistake in the normalisation routine.
+    - Fix skipping the current line of i3status output upon decoding error.
+    - Don't hide Sway's workspace buttons when in debug mode.
+    - Don't allow sending columns with rows to fresh workspaces.
+    - Fix moving previously-hidden containers to a fresh workspace on reload.
+    - Fix pulling multiple columns from the right when some have >1 row.
+
+    - papersway(1): Fix sample $mod+Shift+Right binding.
+      Thanks to Joey Hess for the report.
+    - papersway(1): Add missing '--debug' to synopsis.
+
 1.004     2024-10-23 20:29:58+08:00 Asia/Shanghai
     - Update --i3status output when title of the caffeinated window changes.
     - Don't allow reducing the number of columns below two.

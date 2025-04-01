@@ -1,5 +1,8 @@
 Revision history for Acme-GLOINBG-Utils
 
+0.06    2025-03-31/16:40
+        Exercise 7, Fix the required modules in Build.PL
+
 0.05    2025-03-29/19:19
         Exercise 7, Repair the module (fix the 'sum' function).
 

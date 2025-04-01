@@ -1,5 +1,12 @@
 Revision history for Linux-Statm-Tiny
 
+0.0701    2025-03-31 14:51:49+01:00 Europe/London
+  [Security]
+  - Rebuilt with Mite 0.013000.
+
+  [Documentation]
+  - Added a security policy.
+
 0.0700    2022-07-26 17:27:32+01:00 Europe/London
   [Enhancements]
   - Ported over from Moo to Mite (tobyink), which removes the

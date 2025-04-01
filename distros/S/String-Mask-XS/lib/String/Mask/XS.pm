@@ -2,7 +2,7 @@ package String::Mask::XS;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 use base 'Import::Export';
 our %EX = (
 	mask => [qw/all/]
@@ -20,7 +20,7 @@ String::Mask::XS - mask sensitive data faster
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 

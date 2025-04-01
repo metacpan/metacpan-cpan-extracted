@@ -268,5 +268,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a \N{U+0928}\N{U+093f} h:mm",
   variant => undef,
-  version => 46,
+  version => 47,
 }

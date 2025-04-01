@@ -1,5 +1,5 @@
 {
-   "abstract" : "You\u0307r screen is quit\u0323e dirty, please clea\u0307n it.",
+   "abstract" : "Y\u0323ou\u0323r \u0323Scre\u0312en is q\u0312ui\u0323t\u0312e di\u0307r\u0323t\u0307y\u0307, pl\u0312e\u0312a\u0312s\u0312e cl\u0307e\u0323a\u0323n i\u0307t\u0323.",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -29,6 +29,8 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Software::Security::Policy::Individual" : "0",
+            "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
@@ -52,6 +54,7 @@
             "Moo" : "0",
             "Types::Common" : "0",
             "experimental" : "0",
+            "namespace::autoclean" : "0",
             "perl" : "v5.20.0",
             "utf8" : "0"
          }
@@ -73,7 +76,7 @@
    "provides" : {
       "Text::Schmutz" : {
          "file" : "lib/Text/Schmutz.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -87,7 +90,7 @@
          "web" : "https://github.com/robrwo/perl-Text-Schmutz"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

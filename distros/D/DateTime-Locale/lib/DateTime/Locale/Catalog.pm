@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 DESCRIPTION
 
@@ -202,6 +202,8 @@ The available locales are:
  ckb-IR           Central Kurdish Iran                              کوردیی ناوەندی ئێران
  co               Corsican                                          corsu
  co-FR            Corsican France                                   corsu
+ cop              Coptic
+ cop-EG           Coptic Egypt
  cs               Czech                                             čeština
  cs-CZ            Czech Czechia                                     čeština Česko
  csw              Swampy Cree                                       ᓀᐦᐃᓇᐍᐏᐣ
@@ -271,6 +273,7 @@ The available locales are:
  en-CM            English Cameroon                                  English Cameroon
  en-CX            English Christmas Island                          English Christmas Island
  en-CY            English Cyprus                                    English Cyprus
+ en-CZ            English Czechia                                   English Czechia
  en-DE            English Germany                                   English Germany
  en-DG            English Diego Garcia                              English Diego Garcia
  en-DK            English Denmark                                   English Denmark
@@ -278,25 +281,30 @@ The available locales are:
  en-Dsrt          English Deseret                                   𐐀𐑍𐑊𐐮𐑇 𐐔𐐯𐑆𐐲𐑉𐐯𐐻
  en-Dsrt-US       English United States Deseret                     𐐀𐑍𐑊𐐮𐑇 𐐏𐐭𐑌𐐴𐐻𐐲𐐼 𐐝𐐻𐐩𐐻𐑅 𐐔𐐯𐑆𐐲𐑉𐐯𐐻
  en-ER            English Eritrea                                   English Eritrea
+ en-ES            English Spain                                     English Spain
  en-FI            English Finland                                   English Finland
  en-FJ            English Fiji                                      English Fiji
  en-FK            English Falkland Islands                          English Falkland Islands
  en-FM            English Micronesia                                English Micronesia
+ en-FR            English France                                    English France
  en-GB            English United Kingdom                            English United Kingdom
  en-GD            English Grenada                                   English Grenada
  en-GG            English Guernsey                                  English Guernsey
  en-GH            English Ghana                                     English Ghana
  en-GI            English Gibraltar                                 English Gibraltar
  en-GM            English Gambia                                    English Gambia
+ en-GS            English South Georgia & South Sandwich Islands    English South Georgia & South Sandwich Islands
  en-GU            English Guam                                      English Guam
  en-GY            English Guyana                                    English Guyana
  en-HK            English Hong Kong SAR China                       English Hong Kong SAR China
+ en-HU            English Hungary                                   English Hungary
  en-ID            English Indonesia                                 English Indonesia
  en-IE            English Ireland                                   English Ireland
  en-IL            English Israel                                    English Israel
  en-IM            English Isle of Man                               English Isle of Man
  en-IN            English India                                     English India
  en-IO            English British Indian Ocean Territory            English British Indian Ocean Territory
+ en-IT            English Italy                                     English Italy
  en-JE            English Jersey                                    English Jersey
  en-JM            English Jamaica                                   English Jamaica
  en-KE            English Kenya                                     English Kenya
@@ -320,15 +328,19 @@ The available locales are:
  en-NF            English Norfolk Island                            English Norfolk Island
  en-NG            English Nigeria                                   English Nigeria
  en-NL            English Netherlands                               English Netherlands
+ en-NO            English Norway                                    English Norway
  en-NR            English Nauru                                     English Nauru
  en-NU            English Niue                                      English Niue
  en-NZ            English New Zealand                               English New Zealand
  en-PG            English Papua New Guinea                          English Papua New Guinea
  en-PH            English Philippines                               English Philippines
  en-PK            English Pakistan                                  English Pakistan
+ en-PL            English Poland                                    English Poland
  en-PN            English Pitcairn Islands                          English Pitcairn Islands
  en-PR            English Puerto Rico                               English Puerto Rico
+ en-PT            English Portugal                                  English Portugal
  en-PW            English Palau                                     English Palau
+ en-RO            English Romania                                   English Romania
  en-RW            English Rwanda                                    English Rwanda
  en-SB            English Solomon Islands                           English Solomon Islands
  en-SC            English Seychelles                                English Seychelles
@@ -337,6 +349,7 @@ The available locales are:
  en-SG            English Singapore                                 English Singapore
  en-SH            English St. Helena                                English St Helena
  en-SI            English Slovenia                                  English Slovenia
+ en-SK            English Slovakia                                  English Slovakia
  en-SL            English Sierra Leone                              English Sierra Leone
  en-SS            English South Sudan                               English South Sudan
  en-SX            English Sint Maarten                              English Sint Maarten
@@ -534,6 +547,8 @@ The available locales are:
  hr-HR            Croatian Croatia                                  hrvatski Hrvatska
  hsb              Upper Sorbian                                     hornjoserbšćina
  hsb-DE           Upper Sorbian Germany                             hornjoserbšćina Němska
+ ht               Haitian Creole                                    Kreyòl Ayisyen
+ ht-HT            Haitian Creole Haiti                              Kreyòl Ayisyen Haïti
  hu               Hungarian                                         magyar
  hu-HU            Hungarian Hungary                                 magyar Magyarország
  hy               Armenian                                          հայերեն
@@ -1094,6 +1109,7 @@ The available locales are:
  yue-Hant         Cantonese Traditional                             粵語 繁體
  yue-Hant-CN      Cantonese China Traditional                       粵語 中國 繁體
  yue-Hant-HK      Cantonese Hong Kong SAR China Traditional         粵語 中國香港特別行政區 繁體
+ yue-Hant-MO      Cantonese Macao SAR China Traditional             粵語 中國澳門特別行政區 繁體
  za               Zhuang                                            Vahcuengh
  za-CN            Zhuang China                                      Vahcuengh Cunghgoz
  zgh              Standard Moroccan Tamazight                       ⵜⴰⵎⴰⵣⵉⵖⵜ
@@ -1132,7 +1148,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2024 by Dave Rolsky.
+This software is copyright (c) 2003 - 2025 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

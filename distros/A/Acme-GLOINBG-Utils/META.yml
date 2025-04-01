@@ -4,6 +4,7 @@ author:
   - 'Georgi Kolarov <gkolarov1970@gmail.com>'
 build_requires:
   Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -16,8 +17,8 @@ name: Acme-GLOINBG-Utils
 provides:
   Acme::GLOINBG::Utils:
     file: lib/Acme/GLOINBG/Utils.pm
-    version: '0.05'
+    version: '0.06'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

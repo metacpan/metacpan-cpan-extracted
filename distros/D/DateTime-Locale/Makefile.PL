@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::System::Simple" => 0,
     "Path::Tiny" => 0,
     "Scalar::Util" => 0,
+    "Term::ANSIColor" => 0,
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::Plugin::UTF8" => 0,
     "Test2::Require::Module" => 0,
@@ -60,7 +61,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.44",
+  "VERSION" => "1.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,6 +85,7 @@ my %FallbackPrereqs = (
   "Specio::Declare" => 0,
   "Specio::Library::String" => 0,
   "Storable" => 0,
+  "Term::ANSIColor" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::Plugin::UTF8" => 0,
   "Test2::Require::Module" => 0,

@@ -1,3 +1,7 @@
+0.24 2025-03-31
+	- Add `shuffle_array()` function
+	- Minor fixes for Win32 seeding
+
 0.22 2025-02-04
 	- BUGFIX: rand_float() on 32bit platforms was broken
 

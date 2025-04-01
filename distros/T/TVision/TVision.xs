@@ -37,6 +37,7 @@
 
 #include "TVision.h"
 
+extern "C" void boot_TVision_more();
 static int initialized = 0;
 CV *cv_on_idle = 0;
 CV *cv_handleEvent = 0;
@@ -329,6 +330,5 @@ BOOT:
     TObject *tvnull = NULL;
     new_tv_a(tvnull, "TVision");
     sv_setsv(get_sv("TVision::NULL", GV_ADD), rself);
-    extern void boot_TVision_more();
     boot_TVision_more(); /* for TVision-methods.xs */
 

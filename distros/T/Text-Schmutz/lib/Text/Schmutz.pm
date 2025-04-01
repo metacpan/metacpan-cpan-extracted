@@ -1,6 +1,6 @@
 package Text::Schmutz;
 
-# ABSTRACT: You̇r screen is quiṭe dirty, please cleȧn it.
+# ABSTRACT: Ỵoụr ̣Scre̒en is q̒uịt̒e di̇ṛṫẏ, pl̒e̒a̒s̒e cl̇ẹạn i̇ṭ.
 
 use v5.20;
 use utf8;
@@ -9,11 +9,13 @@ use Moo;
 
 use Types::Common qw( ArrayRef Bool NumRange StrLength );
 
+use namespace::autoclean;
+
 # RECOMMEND PREREQ: Type::Tiny::XS
 
 use experimental qw( postderef signatures );
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 
 my $Prob = NumRange [ 0, 1 ];
@@ -84,11 +86,11 @@ __END__
 
 =head1 NAME
 
-Text::Schmutz - You̇r screen is quiṭe dirty, please cleȧn it.
+Text::Schmutz - Ỵoụr ̣Scre̒en is q̒uịt̒e di̇ṛṫẏ, pl̒e̒a̒s̒e cl̇ẹạn i̇ṭ.
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -102,7 +104,8 @@ version v0.1.1
 
 "Th̔ough̜t̒s of ḍirt spill ̵ȯve̜r to ̜yo͘ur ̜u̒nico͘de̜ ͘enabled t̵ext"
 
-This is a Perl adaptation of F<schmutz.go> by Clemens Fries <github-schmutz@xenoworld.de>.
+This is a Perl adaptation of F<schmutz.go> by Clemens Fries <github-schmutz@xenoworld.de>, from which a lot of the
+documentation comes from.
 
 =head1 ATTRIBUTES
 
@@ -167,7 +170,7 @@ The original L<schmutz|https://github.com/githubert/schmutz> was written by Clem
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Robert Rothenberg.
+This software is Copyright (c) 2024-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

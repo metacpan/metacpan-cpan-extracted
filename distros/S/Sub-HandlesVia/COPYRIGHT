@@ -4,16 +4,6 @@ Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-HandlesVia
 
 Files: dist.ini
- lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
- lib/Sub/HandlesVia/Handler.pm.mite.pm
- lib/Sub/HandlesVia/Mite.pm
- lib/Sub/HandlesVia/Toolkit.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/00begin.t
  t/02moo.t
  t/02moo/ext_attr.t
@@ -142,6 +132,8 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
+ lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
+ lib/Sub/HandlesVia/Handler.pm.mite.pm
  lib/Sub/HandlesVia/HandlerLibrary.pm
  lib/Sub/HandlesVia/HandlerLibrary/Array.pm
  lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
@@ -151,12 +143,20 @@ Files: Changes
  lib/Sub/HandlesVia/HandlerLibrary/Number.pm
  lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
  lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Mite.pm
+ lib/Sub/HandlesVia/Toolkit.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mite.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Moo.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Moose.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/50objectpad.t
  t/99headtail.t
 Copyright: Copyright 2025 Toby Inkster.

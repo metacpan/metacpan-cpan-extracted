@@ -1659,6 +1659,7 @@ Ahad
 Ahd
 Aib
 Aibreán
+Aitar
 Aj
 Ajé
 Akaas
@@ -2163,6 +2164,7 @@ Cya
 Cyn
 Cyprus
 Cyrillic
+Cyrl
 Cze
 Czech
 Czechia
@@ -3275,6 +3277,7 @@ Deseret
 Desimber
 Desàmbar
 Desèmber
+Deva
 Devanagari
 Dez
 Dezember
@@ -4184,6 +4187,7 @@ KW2
 KW3
 KW4
 KWOTA
+KZ
 Ka
 Kab
 Kabla
@@ -4200,6 +4204,7 @@ Kako
 Kala
 Kalaallisut
 Kalenjin
+Kalpak
 Kam
 Kamba
 Kamena
@@ -4477,7 +4482,9 @@ Laos
 Lapa
 Lar
 Laraba
+Latgalian
 Latin
+Latn
 Latvia
 Latvian
 Lebanon
@@ -5819,6 +5826,7 @@ Solomon
 Som
 Somali
 Somalia
+Somar
 Somwaar
 Son
 Sondag
@@ -6422,6 +6430,7 @@ abɔkɔɩ
 acafʊnɖuka
 acapomka
 achiel
+acho
 ad
 adamsan
 adar
@@ -8323,6 +8332,10 @@ ka-4
 ka-GE
 ka_GE
 kaa
+kaa_Cyrl
+kaa_Cyrl_UZ
+kaa_Latn
+kaa_Latn_UZ
 kaana
 kab
 kab-DZ
@@ -8423,6 +8436,10 @@ kisɛ́ndɛ
 kiɛmɛ́ɛm
 kk
 kk-KZ
+kk_Arab
+kk_Arab_CN
+kk_Cyrl
+kk_Cyrl_KZ
 kk_KZ
 kkj
 kkj-CM
@@ -8450,7 +8467,10 @@ ko_KP
 ko_KR
 kok
 kok-IN
-kok_IN
+kok_Deva
+kok_Deva_IN
+kok_Latn
+kok_Latn_IN
 kol
 kolmapäev
 kolovoz
@@ -8670,6 +8690,8 @@ liɓ
 lkt
 lkt-US
 lkt_US
+lld
+lld_IT
 llu
 llunes
 lm
@@ -8704,6 +8726,8 @@ lrc_IR
 lt
 lt-LT
 lt_LT
+ltg
+ltg_LV
 lu
 lu-CD
 lu_CD
@@ -8755,6 +8779,7 @@ lávvardat
 lávvordat
 lätni
 lóndɛ́
+lönesc
 lör
 lördag
 lør
@@ -8949,6 +8974,8 @@ mgh_MZ
 mgo
 mgo-CM
 mgo_CM
+mhn
+mhn_IT
 mi
 mi-NZ
 mi_NZ
@@ -10192,6 +10219,7 @@ subota
 suenter
 sukru
 sukul
+suman
 sun
 sungula
 sunnudagur
@@ -10855,6 +10883,7 @@ yue-Hant-HK
 yue_Hans
 yue_Hans_CN
 yue_Hant
+yue_Hant_CN
 yue_Hant_HK
 yuk
 yukuakú
@@ -10923,11 +10952,15 @@ zh_Hans
 zh_Hans_CN
 zh_Hans_HK
 zh_Hans_MO
+zh_Hans_MY
 zh_Hans_SG
 zh_Hant
 zh_Hant_HK
 zh_Hant_MO
+zh_Hant_MY
 zh_Hant_TW
+zh_Latn
+zh_Latn_CN
 zil
 zilye
 zin

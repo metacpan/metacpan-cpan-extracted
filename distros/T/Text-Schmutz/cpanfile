@@ -4,6 +4,7 @@
 requires "Moo" => "0";
 requires "Types::Common" => "0";
 requires "experimental" => "0";
+requires "namespace::autoclean" => "0";
 requires "perl" => "v5.20.0";
 requires "utf8" => "0";
 recommends "Type::Tiny::XS" => "0";
@@ -27,6 +28,8 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Software::Security::Policy::Individual" => "0";
+  requires "Test::CleanNamespaces" => "0.15";
   requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";

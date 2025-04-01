@@ -44,15 +44,6 @@ static double _uint32_to_double(uint32_t x) {
     return (x + 0.5) * (1.0 / 4294967296.0);  // 1/2^32
 }
 
-// Use the C rand() function to return a 64 bit number
-static uint64_t _crand64() {
-	uint64_t high = rand();
-	uint32_t low  = rand();
-	uint64_t ret  = (high << 32) | low;
-
-	return ret;
-}
-
 // MurmurHash3 Finalizer (Passes SmallCrush)
 static uint64_t _hash_mur3(uint64_t x) {
     x ^= x >> 33;

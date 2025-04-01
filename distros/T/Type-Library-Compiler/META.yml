@@ -27,7 +27,7 @@ optional_features: {}
 provides:
   Type::Library::Compiler:
     file: lib/Type/Library/Compiler.pm
-    version: '0.006'
+    version: '0.008'
   Type::Library::Compiler::Mite:
     file: lib/Type/Library/Compiler/Mite.pm
 requires:
@@ -38,7 +38,7 @@ resources:
   homepage: https://metacpan.org/release/Type-Library-Compiler
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-library-compiler.git
-version: '0.006'
+version: '0.008'
 x_provides_scripts:
   type-library-compile:
     file: bin/type-library-compile

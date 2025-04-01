@@ -1,7 +1,10 @@
 Changelog of Package-Subroutine
 ###############################
 
-0.22.4 2025-03-31
+0.22.5 2025-03-31
+     - improve test which checks import call on unknown package
+
+0.22.4 2025-03-29
      - fix test for recent perl where unimport is a method in UNIVERSAL
 
 0.22.1/0.22.2 Mi 29. Feb. 2012
@@ -17,7 +20,7 @@ Changelog of Package-Subroutine
 
 0.20 Do 4. Aug 23:16:50 CEST 2011
      - released with ShipIt
-     - removed xt/critic.t - because this modul is build around bad practice
+     - removed xt/critic.t - because this module is build around bad practice
  
 0.19 Do 4. Aug 23:01:00 CEST 2011
      - delete t/09*-tests in favor of a xt directory

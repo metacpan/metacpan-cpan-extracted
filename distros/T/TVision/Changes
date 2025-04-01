@@ -1,5 +1,8 @@
 Revision history for the TurboVision Perl extension.
 
+0.22	2025-03-28
+	- should be ok on linux, cygwin
+
 0.21	2025-03-26
 	- Makefile.PL more linux-friendly
 

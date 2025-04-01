@@ -6,7 +6,6 @@ Source: https://metacpan.org/release/Acme-Mitey-Cards
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/Acme/Mitey/Cards/Card.pm
  lib/Acme/Mitey/Cards/Card.pm.mite.pm
@@ -26,6 +25,10 @@ Files: Changes
  lib/Acme/Mitey/Cards/Set.pm.mite.pm
  lib/Acme/Mitey/Cards/Suit.pm
  lib/Acme/Mitey/Cards/Suit.pm.mite.pm
+Copyright: Copyright 2025 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
  lib/Acme/Mitey/Cards/Types.pm
  lib/Acme/Mitey/Cards/Types/Source.pm
  t/00-cards.t
@@ -60,14 +63,14 @@ Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

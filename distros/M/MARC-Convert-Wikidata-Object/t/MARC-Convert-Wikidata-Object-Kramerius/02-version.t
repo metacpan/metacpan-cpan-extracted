@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Convert::Wikidata::Object::Kramerius::VERSION, 0.12, 'Version.');
+is($MARC::Convert::Wikidata::Object::Kramerius::VERSION, 0.13, 'Version.');

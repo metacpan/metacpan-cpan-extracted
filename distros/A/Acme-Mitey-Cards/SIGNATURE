@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.87.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,38 +14,38 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: RIPEMD160
 
-SHA256 6e2239debced2d6b205e95063d366f54354d77a4541b21d06e8915a59cd0e913 COPYRIGHT
+SHA256 d55e588cf4d6575590aab1c22527a0833b9bb0b6877907122b2ea51eb88bc78c COPYRIGHT
 SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
-SHA256 54d908ff319709704b33e6b18532818cb85fd765c071bfeae93af578bacf0b22 Changes
+SHA256 9aadffb57fccbc94e290279be5fcfc10f525864b5e404bceec2377f1f184e43d Changes
 SHA256 9deb2960d7fc9e57ac1b962fb1c1f615d3ceac751e7a5bc466fa421663929181 INSTALL
-SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
 SHA256 0097d68da0eaae1e3fcc94645b16bc5d30aa863de4df1ad75b37dcb2260d5dac MANIFEST
-SHA256 85ae87f8f2170b82c556df94d3525faa1f85788233f146a879f4c70d2537b1a8 META.json
-SHA256 ea3c7c9bb08e86636e71e60b58f13e9970729943e8e527289664d1f7ed1bef42 META.yml
-SHA256 65bcd9ad0bb92dc63d6a20ced859595892484fb7bc468462a700fdc5c9430db4 Makefile.PL
+SHA256 ce25c2adbe4f300c9d402c48cac5c88086c9012e5eebba7782970e51c8c16297 META.json
+SHA256 c13969f947ce6bef28babc2cf99f8bb0b00c67b22be38df852b4f066014c69fd META.yml
+SHA256 43d4a0e2d2595cb3df6959d95482cb0eb382b24538a3f43306f25a0b0f402a40 Makefile.PL
 SHA256 a8a1a96ce0e7b191f195eeda9a5200ac920f6fd0ebc5e71dbcde6fe24d56f2e7 README
 SHA256 1125bbecbd6788d94f1e6139b10c4cef6c20d361a2068811ca959a1851852e30 dist.ini
-SHA256 cc34502d52f69a9c1855e9a0ba54dfc47840ac5f6925bf73bd05192e9e1b4499 doap.ttl
+SHA256 4a8cf703f182750e9712e1c6da367635e3338bb51d3362712c92e9dc1179bab0 doap.ttl
 SHA256 44ff551d89e11f6e2d5b5a545d6ca4e1142a0912260ccfb1fdb7300172e5bbc7 examples/demo.pl
-SHA256 3eacac4aeb6bef52bc6beab405138fff0e1a1afe8e99ff9b525e3622da2a6ef3 lib/Acme/Mitey/Cards.pm
-SHA256 8366ce3c17599939b158e0cf80f5c7d3a127b9d67e8655fecea9b6d6d802b94d lib/Acme/Mitey/Cards/Card.pm
-SHA256 d607610525e980f2c1f33d61a99789b4a15e3e5fde4c89644636ce1c20547449 lib/Acme/Mitey/Cards/Card.pm.mite.pm
-SHA256 3b02c877bec9c536ced808e9a8ab74c6f74667bf8d89ebf11489d1f16d707e84 lib/Acme/Mitey/Cards/Card/Face.pm
-SHA256 1999e7a3e9549433fb0436767620c8c84189ffb80646668de70dbc49c667d1b4 lib/Acme/Mitey/Cards/Card/Face.pm.mite.pm
-SHA256 d084913071c174fb4f1e0f25fe9a4414e3801a0b3292daacfbab68d81626e847 lib/Acme/Mitey/Cards/Card/Joker.pm
-SHA256 7f34b6cb00e5d0cf32c0f06d97c10cc2bed19224f35302ad450f030b28f1546b lib/Acme/Mitey/Cards/Card/Joker.pm.mite.pm
-SHA256 91a1af18de3248e0b60e3fad7c9f328e14f7289446df61dece9c08ffbe542b76 lib/Acme/Mitey/Cards/Card/Numeric.pm
-SHA256 34daefcc0739c17710136f8979872c8d262c7b3d80afa9dcb5b136d51a827243 lib/Acme/Mitey/Cards/Card/Numeric.pm.mite.pm
-SHA256 392e8e41d34483704693c9bed5350389aeb4eeb209d1c3a2a3370c582333c7e2 lib/Acme/Mitey/Cards/Deck.pm
-SHA256 cb6347d387c9d40cf44cb29855364d1f87668d99159df1d9192b9e523110b778 lib/Acme/Mitey/Cards/Deck.pm.mite.pm
-SHA256 7ba4f59218274506a0fc095e33fb4e890d1113bf30c42e8408a289fd5fea2915 lib/Acme/Mitey/Cards/Hand.pm
-SHA256 210644a5abc7a66b960b355c7b2904bbff6934a7562856ffe5d028eb91310093 lib/Acme/Mitey/Cards/Hand.pm.mite.pm
+SHA256 1bec8d2722cd0fc91d86666b5b7357531476fb02145a89fd55e1892de5cd914a lib/Acme/Mitey/Cards.pm
+SHA256 b30b8a8def8788a372889853e41e7d494897995d64af6703ebb0c12e8fd71688 lib/Acme/Mitey/Cards/Card.pm
+SHA256 0db0f35c03152e081006266d67871602538fc43ebda47acade75bb773af625b0 lib/Acme/Mitey/Cards/Card.pm.mite.pm
+SHA256 1faf6e6af347e10882d04eed046ec82ed37840081bd03a463c65835e38911098 lib/Acme/Mitey/Cards/Card/Face.pm
+SHA256 92ab95fd0b607c2dd633fcd5237b7c8f54a56efb327c0d28b282aa399f0d47dc lib/Acme/Mitey/Cards/Card/Face.pm.mite.pm
+SHA256 224ad282a66fc5c65ae53fe8f67049fd0bf68913eb6399813ea454c934a9f8fb lib/Acme/Mitey/Cards/Card/Joker.pm
+SHA256 b4d67f25d93304d22518238b4af13d8da25765569a32b90e5898eae4443c8929 lib/Acme/Mitey/Cards/Card/Joker.pm.mite.pm
+SHA256 245ee796e54c5722f7f8e0d7dee26de9af8db37943d3d820fa9d89406bbf360a lib/Acme/Mitey/Cards/Card/Numeric.pm
+SHA256 6c179847709c13e51d1f2961b549d27ac71b825eaee610587e8dd53c114a584a lib/Acme/Mitey/Cards/Card/Numeric.pm.mite.pm
+SHA256 ce4cacf030c11de2e535e543851079a1b85e6eb11db5fd5d7f4da846477bdce7 lib/Acme/Mitey/Cards/Deck.pm
+SHA256 dbbda810c0d84c541e5743c8d23f5f465048d7f4a378eeea06caabcc100b57d3 lib/Acme/Mitey/Cards/Deck.pm.mite.pm
+SHA256 dbf634cd306b89c4af0f255313052cbc813b6bbc895b99169d3d649b0fb06959 lib/Acme/Mitey/Cards/Hand.pm
+SHA256 d69eb4d971ed14f4e4df98c4a1b9853fbb68a19c1401731291830011eff1176a lib/Acme/Mitey/Cards/Hand.pm.mite.pm
 SHA256 a6aefd013bc11517b7c9fd3bd5cea61a1e00b585f00f7a4a32c5011e8df77252 lib/Acme/Mitey/Cards/MOP.pm
-SHA256 2b72bf7b33f3e9320f301563612ae60bf88e42089c2da9770b4ff1bef9dcaa0e lib/Acme/Mitey/Cards/Mite.pm
-SHA256 9698ef0af6924c936c87819bfcfa3df9842b02b5e74e9858dce3b064954adb0a lib/Acme/Mitey/Cards/Set.pm
-SHA256 2f7788bc8f29cbf2834db5fc980250b2a84ba8c6f09269c86389f6dc5d9404ac lib/Acme/Mitey/Cards/Set.pm.mite.pm
-SHA256 1054d4a3cf291e2940716a6ff98ccc127348fd96ddfed17d8b4c8075ca014fe4 lib/Acme/Mitey/Cards/Suit.pm
-SHA256 04eade7c4a0d56a41b243e14ce067a9caaba0d8f70e85485d8f259ae1aab6886 lib/Acme/Mitey/Cards/Suit.pm.mite.pm
+SHA256 22b12e0c65a1f6964a7f800db8b555ef912dff7fca7cb30ea6b43e54d6a273b0 lib/Acme/Mitey/Cards/Mite.pm
+SHA256 b1335267de2e67db354c261ec429f0e76e69ef58e8521eb8a5bef0a96c3650a7 lib/Acme/Mitey/Cards/Set.pm
+SHA256 5f35e28dfb593abec14a2147675f2a386358cb8e3a74f828ea9fe3f64e18c56b lib/Acme/Mitey/Cards/Set.pm.mite.pm
+SHA256 66bc006cf512372153b08603401d1c0adc3bcb3ef17eddab8511ce1875652284 lib/Acme/Mitey/Cards/Suit.pm
+SHA256 5d983157f4eaf7a031c377853fb331eb5648d334ba320362f76a3fe0882ebf1b lib/Acme/Mitey/Cards/Suit.pm.mite.pm
 SHA256 4e9ab9686a3c265006248ded9ef2a596533aba2ee45b05e24ee5220f77f0b558 lib/Acme/Mitey/Cards/Types.pm
 SHA256 27a5bd20dfb5dbd9d14bfdfedd285e6514f9830d0ff493b1caefb6335a71aec4 lib/Acme/Mitey/Cards/Types/Source.pm
 SHA256 4bbdf032ce9b1cf1e46c7cbd0732d7f1aba757f8f16e428fa2c57de049f69374 t/00-cards.t
@@ -60,7 +60,7 @@ SHA256 8fff32413b19152a943f20ef4f237fe9d505367265bf8dfb5a4e64c7e1876c75 t/set.t
 SHA256 7fa25d832f9ead096e674280582b38842b1475a37df8bb73f576473e0d381c65 t/suit.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY20flAAKCRDOv4Eoaip9
-OShLAKCayvT6F4yln2/L7oG7SBxJacootACeOcmNaDwodF/5x2iLp2ngTCWz6pc=
-=Hlrd
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCZ+p97gAKCRDOv4Eoaip9
+OUBIAJkBJJ4aGI9BDE7ODEQdRsd0mQl6/wCcDpEAupOZMzNkN2wfpS1/Uo3CDgQ=
+=XO81
 -----END PGP SIGNATURE-----

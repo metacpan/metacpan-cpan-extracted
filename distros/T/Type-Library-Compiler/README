@@ -9,7 +9,7 @@ DESCRIPTION
     This class performs the bulk of the work for type-library-compiler.
 
   Constructor
-   `new( %attributes )`
+   new( %attributes )
   Attributes
    `types` Map[ NonEmptyStr => Object ]
     Required hash of Type::Tiny objects. Hash keys are the names the types
@@ -28,14 +28,14 @@ DESCRIPTION
     Leave this as the default.
 
   Object Methods
-   `compile_to_file()`
+   compile_to_file()
     Writes the module to `destination_filename`.
 
-   `compile_to_string()`
+   compile_to_string()
     Returns the module as a string of Perl code.
 
   Class Methods
-   `parse_list( @argv )`
+   parse_list( @argv )
     Parses a list of strings used to specify type constraints on the command
     line, and returns a hashref of Type::Tiny objects, suitable for the
     `types` attribute.

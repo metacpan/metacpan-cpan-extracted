@@ -10,11 +10,11 @@ Acme::GLOINBG::Utils - Utilities module for GLOINBG projects
 
 =head1 VERSION
 
-Version 0.05 Exercise 7, Repair the module (fix the 'sum' function).
+Version 0.06 Exercise 7, Fix the required modules in Build.PL
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS

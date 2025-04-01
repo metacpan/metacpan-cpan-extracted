@@ -1,10 +1,10 @@
 # NAME
 
-Text::Schmutz - You̇r screen is quiṭe dirty, please cleȧn it.
+Text::Schmutz - Ỵoụr ̣Scre̒en is q̒uịt̒e di̇ṛṫẏ, pl̒e̒a̒s̒e cl̇ẹạn i̇ṭ.
 
 # VERSION
 
-version v0.1.1
+version v0.1.2
 
 # SYNOPSIS
 
@@ -20,7 +20,8 @@ say $s->mangle($text);
 
 "Th̔ough̜t̒s of ḍirt spill ̵ȯve̜r to ̜yo͘ur ̜u̒nico͘de̜ ͘enabled t̵ext"
 
-This is a Perl adaptation of `schmutz.go` by Clemens Fries <github-schmutz@xenoworld.de>.
+This is a Perl adaptation of `schmutz.go` by Clemens Fries <github-schmutz@xenoworld.de>, from which a lot of the
+documentation comes from.
 
 # ATTRIBUTES
 
@@ -93,7 +94,7 @@ The original [schmutz](https://github.com/githubert/schmutz) was written by Clem
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Robert Rothenberg.
+This software is Copyright (c) 2024-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -7,7 +7,7 @@ use 5.020000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "You\x{307}r screen is quit\x{323}e dirty, please clea\x{307}n it.",
+  "ABSTRACT" => "Y\x{323}ou\x{323}r \x{323}Scre\x{312}en is q\x{312}ui\x{323}t\x{312}e di\x{307}r\x{323}t\x{307}y\x{307}, pl\x{312}e\x{312}a\x{312}s\x{312}e cl\x{307}e\x{323}a\x{323}n i\x{307}t\x{323}.",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Types::Common" => 0,
     "experimental" => 0,
+    "namespace::autoclean" => 0,
     "utf8" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Types::Common" => 0,
   "experimental" => 0,
+  "namespace::autoclean" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

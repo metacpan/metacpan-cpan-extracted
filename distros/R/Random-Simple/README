@@ -4,9 +4,9 @@ Random::Simple - Generate good random numbers in a user consumable way.
 
 # SYNOPSIS
 
+```perl
 use Random::Simple;
 
-```perl
 my $coin_flip      = random_int(1, 2);
 my $die_roll       = random_int(1, 6);
 my $random_percent = random_float() * 100;
@@ -14,6 +14,8 @@ my $buffer         = random_bytes(8);
 
 my @arr            = ('red', 'green', 'blue');
 my $rand_item      = random_elem(@arr);
+
+my @mixed          = shuffle_array(@arr);
 ```
 
 # DESCRIPTION
@@ -50,6 +52,10 @@ get a handful of other useful random related methods.
 
     returns a random element from `@array`.
 
+- **shuffle\_array(@array)**
+
+	returns an array that has been randomized using the Fisher-Yates alorgithm
+
 - **srand()**
 
     emulates `CORE::srand()` using a better PRNG.
@@ -73,7 +79,7 @@ to generate good random numbers. `Random::Simple` automatically generates high
 quality seeds by reading random bytes from your operating system and converting
 appropriately.
 
-If you manually seed `Random::Simple`, then make sure you use good seeds that
+If you manually seed `Random::Simple`, make sure you use good seeds that
 are mostly non-zero. The larger the number the better seed it will make. A good
 seed is a decimal number with 18 or 19 digits.
 

@@ -279,5 +279,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => "Valencian",
-  version => 46,
+  version => 47,
 }

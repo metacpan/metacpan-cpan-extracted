@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.050002	2025-03-23
+
+ [ SECURITY ]
+ - Fix: Rebuild using Mite 0.013000.
+
 0.050001	2025-03-23
 
  [ Documentation ]

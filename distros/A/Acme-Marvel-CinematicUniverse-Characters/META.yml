@@ -25,28 +25,28 @@ optional_features: {}
 provides:
   Acme::Marvel::CinematicUniverse::Character:
     file: lib/Acme/Marvel/CinematicUniverse/Character.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Bruce_Banner:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Bruce_Banner.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Clint_Barton:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Clint_Barton.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Natasha_Romanoff:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Natasha_Romanoff.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Steve_Rogers:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Steve_Rogers.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Thor_Odinson:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Thor_Odinson.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Character::Instance::Tony_Stark:
     file: lib/Acme/Marvel/CinematicUniverse/Character/Instance/Tony_Stark.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Characters:
     file: lib/Acme/Marvel/CinematicUniverse/Characters.pm
-    version: '0.003'
+    version: '0.004'
   Acme::Marvel::CinematicUniverse::Mite:
     file: lib/Acme/Marvel/CinematicUniverse/Mite.pm
 requires:
@@ -58,5 +58,5 @@ resources:
   homepage: https://metacpan.org/release/Acme-Marvel-CinematicUniverse-Characters
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-acme-marvel-cinematicuniverse-characters.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

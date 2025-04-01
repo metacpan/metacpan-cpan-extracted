@@ -34,6 +34,8 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     byn-ER
     cad
     cad-US
+    cop
+    cop-EG
     cu
     cu-RU
     dv

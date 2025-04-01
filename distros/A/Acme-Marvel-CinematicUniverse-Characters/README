@@ -24,7 +24,7 @@ DESCRIPTION
 
         Characters are Acme::Marvel::CinematicUniverse::Character objects.
 
-    `find($needle)`
+    find($needle)
         Given a string or regexp to search for, searches for a character by
         name, returning all the results as a list. In scalar context, returns
         the first match, which may or may not be the "best" match.
@@ -37,7 +37,7 @@ DESCRIPTION
     `instance_modules`
         Returns a list of modules that have been used to find character data.
 
-    `load_character($character)`
+    load_character($character)
         Used by instance modules to load characters.
 
 BUGS

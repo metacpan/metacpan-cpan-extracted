@@ -6,11 +6,18 @@ Source: https://metacpan.org/release/Type-Library-Compiler
 Files: Changes
  META.json
  META.yml
- bin/type-library-compile
- dist.ini
  doap.ttl
  lib/Type/Library/Compiler.pm.mite.pm
-Copyright: Copyright 2022 Toby Inkster.
+ lib/Type/Library/Compiler/Mite.pm
+Copyright: Copyright 2025 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Type/Library/Compiler.pm
+ t/01basic.t
+ t/02example-library.t
+ t/03moo.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -20,11 +27,10 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/Type/Library/Compiler.pm
- t/01basic.t
- t/02example-library.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
+Files: bin/type-library-compile
+ dist.ini
+ t/lib/TLC/Example.pm
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -37,20 +43,15 @@ Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Type/Library/Compiler/Mite.pm
-Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
- This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 License: Artistic-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
