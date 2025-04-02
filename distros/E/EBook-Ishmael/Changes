@@ -1,5 +1,14 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.05  Apr 01 2025
+  - Fix indefinite hang in formatted text dump for pre-5.34 perls.
+  - Fix character mapping errors in -e option.
+  - When using the -e option, characters that cannot be converted are silently
+    discarded, rather than causing a warning or being substituted with a '?'
+    character.
+  - During ishmael tests, write output to temporary file rather than to stdout.
+  - Add Encode to prerequisites.
+
 1.04  Mar 28 2025
   - Added the -e|--encoding option: Specify the output encoding for outputted
     text.

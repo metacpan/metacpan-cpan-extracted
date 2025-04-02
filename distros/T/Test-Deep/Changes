@@ -1,5 +1,9 @@
 Revision history for Test-Deep
 
+1.205     2025-04-01 11:01:50-04:00 America/New_York
+        - add "use v5.12" to Test::Deep, just for clarity
+        - fix a test so that if an "A" module is in @INC, the tests still pass
+
 1.204     2023-01-07 18:01:37-05:00 America/New_York
         - restore v5.12 compatibility (see commit 66b79eb for the amusing
           anecdote)

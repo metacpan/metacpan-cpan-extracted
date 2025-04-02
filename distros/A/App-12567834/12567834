@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+use 5.034 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts ',L:2:P' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use List::Util qw[ min max uniq ] ; 
+use utf8 ; 
+use Scalar::Util qw[ looks_like_number ] ; 
+
+no warnings ; 
+* d3 = sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+use warnings ; 
+
+$ARGV[0] //= 8 ; 
+$o{L} //= 100 ;  # 「ページ指定」受付最大文字列長さ
+my $p1 ; # 元のPDFファイルの最初のページ番号
+my $p2 ; # 元のPDFファイルの最後のページ番号
+my $p2a ; # $p2+1 以下の、 $p2a - $p1 が4の倍数となる最大の数。
+
+# コマンド引数から、与え方に応じて3通りに、ページ数の最初と最後を取り出す。
+($p1,$p2) = $ARGV[0] =~ m/(.*)(-|\.\.)(.*)/ ? ($1,$3) : exists $ARGV[1] ? @ARGV : (1,$ARGV[0]) ; 
+exit if map {say "'$_' seems not a numbper."} grep { ! looks_like_number $_ } ($p1,$p2) ;
+exit if  $p1 > $p2 && say "'$p1 <= $p2' does not hold." ;
+
+
+# 最後に出力する紙の処理 および 出力枚数の算出
+my $pr = ($p2-$p1+1) % 4 ; # reminder 余り
+$p2a = $p2 - $pr + 1 ; 
+my $q = ($p2a-$p1) / 4 ; 
+
+my @P0 = () ; 
+my @P1 = () ; 
+my $p = $p1 ;
+my $o0 = ''  ; # 出力文字列　仮格納
+my $o1 = ''  ; # 出力文字列
+my $L = 0 ; # 出力した行数
+
+
+* con = $o{','} ? sub { $_[0] .. $_[1] } : sub { "$_[0]-$_[1]" } ; # 関数を定義。-でつなげるか、,でつなげるか
+* con2 = sub { $p2a < $p2 ? join "," , con ($p2a,$p2)  : "$p2" } ;
+
+if ( $o{P} ) {
+  my @P ; 
+  my $out = "pdftk INPUT.pdf cat " ; 
+  $p=$p1-1;splice @P,@P/2,0,$p+1..($p+=4)for 1..$q;$out .= join" ",@P ;
+  $out .= " output OUTPUT.pdf" ;
+  say $out ; 
+  print "# Page " . con2($p2a, $p2)  . " has not contained above." if $pr ; 
+  say "# The above contains " . length ($out) . " characters." ;  
+  $o{2}//= 0 ; 
+  exit ; 
+}
+
+
+say CYAN + (map { join '', 1..9,($_% 10 ) } ( 1..$o{L}/10) ) , 1..$o{L} % 10 if ($o{2}//'')ne"0"; # 文字列長さの定規
+for ( 1 .. $q ) {
+  @P0 = @P1  ;
+  splice @P0 , @P0/2 , 0 , con($p,$p+3) ; # $p . "-" . ($p+3) ; # 試しに1度に4ページ挿入。
+  if ( length ( $o0 = join "," , @P0 ) > $o{L} ) 
+    { say $o1 ; $o0 = '' ; @P1 = () ; @P0 = con($p,$p+3) ; $L++ }  ; # 長すぎたら出力。
+  splice @P1 , @P1/2 , 0 , con($p++,$p++) , con($p++,$p++) ;
+  $o1 = $o0 ;  
+}
+do { say join "," , @P0 ; $L ++ } if @P0  ; 
+#print $p2a < $p2 ? (join",",con($p2a,$p2))."\n" : $p2a == $p2 ? "$p2\n" : '' ; # 最後のページの出力。4の倍数か否か、1枚だけか否かにより、3通りに分けた。
+#print $p2a > $p2 ? '' : con2 ( $p2a , $p2 ) . "\n" ; 
+$L ++ and say con2($p2a,$p2)  if $pr ;  
+exit ;
+
+END {
+  exit if ($o{2}//'') eq "0" ; 
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " seconds in process. " . $L. " lines output." ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+12567834 NUMBER_OF_PAGES
+12567834 N1 N2 
+12567834 N1-N2
+   NUMER_OF_PAGES は、出力したい元のPDFファイルのページ数である。1始まりを仮定。
+   N1 と N2 は、最初のページ番号 と 最後のページ番号である。
+
+  Adobe Acrobat Reader 等のソフトウェアで PDFファイルの「小冊子」印刷をする時に、
+  通常多くの場合は、印刷された紙に印刷される内容は、1～4、5～8ページ目... のようには
+  ならない。最初の紙に1,2,7,8ページ目、最後の紙に3,4,5,6ページ目のようになってしまう。
+  このように印刷された紙だと、印刷された紙を1枚ずつ半分に手で折って、重ねて、背表紙を
+  のり付けするのに不便である。
+
+  「ページ指定」を工夫することで、この不便さを回避できる。そのページ指定をする時に使う
+  文字列をこのコマンド$0は標準出力に出力する。複数回印刷をする必要がある場合
+  (元のPDFファイルのページの数が4で無い場合およびページ数が多い場合)、出力は改行文字で
+  区切られて表示される。
+
+使用例 : 
+  12567834 8  # 1-2,5-8,3-4
+  12567834 9  # 1-2,5-8,3-4 の次の行に 9
+  12567834 40 # 1-2,5-6,9-10,13-14,17-20,15-16,11-12,7-8,3-4 に続けて
+               # 21-22,25-26,29-30,33-34,37-40,35-36,31-32,27-28,23-24
+オプション :
+ -,     : ハイフン(-)で区切らない。この場合、Adobe Acrobatでのコンマで区切られた部分が26個までという制約に注意。
+ -L n   : 未指定だと n=100 。「ページ指定」は100文字以下の制限があるので、指定文字列の各長さを制限する。
+ -P     : pdftk を使う場合のコマンド文を出力する。
+ -2 0   : 最初の n 文字の定規と 最後の標準エラー出力の2次情報を出力しないようにする。
+ --help : このオンラインヘルプの文面を表示する。
+
+開発メモ : 
+  * ローマ数字指定に対応していない。(pdftkなどのコマンド出力を利用するなどの方法が考えられる。)
+  * コマンド文の 12567834 -P 1852 は、 8190 文字を出力した。
+=cut

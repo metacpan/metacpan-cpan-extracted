@@ -10,6 +10,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use Test::Warnings qw(warnings :no_end_test had_no_warnings allow_warnings);
 use Test::Fatal;
 use JSON::Schema::Modern::Utilities qw(get_type);
 
@@ -98,7 +99,7 @@ subtest 'simple validation' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          error => 'not a valid uuid',
+          error => 'not a valid uuid string',
         },
       ],
     },
@@ -171,7 +172,7 @@ subtest 'override a format sub' => sub {
         {
           instanceLocation => '/5',
           keywordLocation => '/items/format',
-          error => 'not a valid uuid',
+          error => 'not a valid uuid string',
         },
         {
           instanceLocation => '',
@@ -236,12 +237,12 @@ subtest 'override a format sub' => sub {
         {
           instanceLocation => '/0/mult_5',
           keywordLocation => '/items/properties/mult_5/format',
-          error => 'not a valid mult_5',
+          error => 'not a valid mult_5 number',
         },
         {
           instanceLocation => '/0/uuid',
           keywordLocation => '/items/properties/uuid/format',
-          error => 'not a valid uuid',
+          error => 'not a valid uuid string',
         },
         {
           instanceLocation => '/0',
@@ -279,7 +280,7 @@ subtest 'override a format sub' => sub {
         (map +{
           instanceLocation => '/'.$_,
           keywordLocation => '/items/format',
-          error => 'not a valid mult_5',
+          error => 'not a valid mult_5 object',
         }, 0, 1, 2),
         {
           instanceLocation => '',
@@ -311,7 +312,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
-          error => 'not a valid ipv4',
+          error => 'not a valid ipv4 string',
         },
       ],
     },
@@ -335,7 +336,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
-          error => 'not a valid ipv4',
+          error => 'not a valid ipv4 string',
         },
       ],
     },
@@ -432,6 +433,7 @@ subtest 'core formats added after draft7' => sub {
 };
 
 subtest 'unimplemented core formats' => sub {
+  # all specification versions
   foreach my $spec_version (JSON::Schema::Modern::SPECIFICATION_VERSIONS_SUPPORTED->@*) {
     my $js = JSON::Schema::Modern->new(specification_version => $spec_version, validate_formats => 1);
     cmp_result(
@@ -442,10 +444,11 @@ subtest 'unimplemented core formats' => sub {
         },
       )->TO_JSON,
       { valid => true },
-      $spec_version . ' with validate_formats = 1, no error when an unimplemented core format is used',
+      $spec_version . ' with validate_formats = 1 and default dialect, no error when an unimplemented core format is used',
     );
   }
 
+  # specification version draft2020-12 and later, format-assertion vocabulary
   foreach my $spec_version (JSON::Schema::Modern::SPECIFICATION_VERSIONS_SUPPORTED->@*) {
     next if $spec_version =~ /^draft(?:[467]|2019-09)$/;
     my $js = JSON::Schema::Modern->new(specification_version => $spec_version);
@@ -474,11 +477,11 @@ subtest 'unimplemented core formats' => sub {
           {
             instanceLocation => '',
             keywordLocation => '/format',
-            error => 'unimplemented format "uri-template"',
+            error => 'unimplemented core format "uri-template"',
           },
         ],
       },
-      $spec_version . ' with Format-Assertion vocabulary: error when an unimplemented core format is used',
+      $spec_version . ' with Format-Assertion vocabulary: error when using a core format that is unimplemented',
     );
 
     cmp_result(
@@ -498,11 +501,26 @@ subtest 'unimplemented core formats' => sub {
           {
             instanceLocation => '',
             keywordLocation => '/anyOf/1/format',
-            error => 'unimplemented format "uri-template"',
+            error => 'unimplemented core format "uri-template"',
           },
         ],
       },
-      $spec_version . ' with Format-Assertion vocabulary: error is seen even when containing subschema would be true',
+      $spec_version . ' with Format-Assertion vocabulary: error is seen even when containing subschema would be true, and evaluation is short-circuited',
+    );
+
+    # add uri-template definition that allows lower-cased characters
+    $js->add_format_validation('uri-template' => sub { $_[0] !~ /[A-Z]/ });
+
+    cmp_result(
+      $js->evaluate(
+        'hello',
+        {
+          '$schema' => 'https://my_metaschema',
+          format => 'uri-template',
+        },
+      )->TO_JSON,
+      { valid => true },
+      'unimplemented core format can have a custom definition provided',
     );
   }
 };
@@ -535,6 +553,9 @@ subtest 'unknown custom formats' => sub {
     );
   }
 
+  # see https://json-schema.org/draft/2020-12/json-schema-validation#section-7.2.3
+  # "When the Format-Assertion vocabulary is specified, implementations MUST fail upon encountering
+  # unknown formats."
   foreach my $spec_version (JSON::Schema::Modern::SPECIFICATION_VERSIONS_SUPPORTED->@*) {
     next if $spec_version =~ /^draft[467]$/ or $spec_version eq 'draft2019-09';
 
@@ -544,26 +565,41 @@ subtest 'unknown custom formats' => sub {
       '$schema' => JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version},
       '$vocabulary' => {
         JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/core}r => true,
+        JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/applicator}r => true,
+        JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/validation}r => true,
         JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/format-assertion}r => true,
       },
       '$ref' => JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version},
     });
 
+    my $doc = $js->add_schema({
+      '$schema' => 'https://my_metaschema',
+      anyOf => [
+        { minLength => 3 },
+        { format => 'bloop' },
+      ],
+    });
+    is($doc->errors, 0, $spec_version . ': for format validation with the Format-Assertion vocabulary, no errors during traversal when using an unknown custom format');
+
     cmp_result(
-      JSON::Schema::Modern::Document->new(
-        evaluator => $js,
-        schema => { '$schema' => 'https://my_metaschema', format => 'bloop' },
-      ),
-      listmethods(
+      $js->evaluate('hi', $doc)->TO_JSON,
+      {
+        valid => false,
         errors => [
-          methods(TO_JSON => {
+          {
             instanceLocation => '',
-            keywordLocation => '/format',
+            keywordLocation => '/anyOf/1/format',
             error => 'unimplemented custom format "bloop"',
-          }),
+          },
         ],
-      ),
-      $spec_version . ': for format validation with the Format-Assertion vocabulary, unrecognized format attributes are detected at traverse time',
+      },
+      $spec_version . ': for format validation with the Format-Assertion vocabulary, unrecognized custom formats are detected at evaluation time',
+    );
+
+    cmp_result(
+      $js->evaluate('hello', $doc, { short_circuit => 1 })->TO_JSON,
+      { valid => true },
+      '...but this error can be avoided if the keyword is never evaluated',
     );
   }
 };
@@ -614,12 +650,12 @@ subtest 'format: pure_integer' => sub {
         {
           instanceLocation => '/1',
           keywordLocation => '/items/format',
-          error => 'not a valid pure_integer',
+          error => 'not a valid pure_integer number',
         },
         {
           instanceLocation => '/2',
           keywordLocation => '/items/format',
-          error => 'not a valid pure_integer',
+          error => 'not a valid pure_integer number',
         },
         {
           instanceLocation => '/4',
@@ -660,12 +696,12 @@ subtest 'format: pure_integer' => sub {
         {
           instanceLocation => '/1',
           keywordLocation => '/items/format',
-          error => 'not a valid pure_integer',
+          error => 'not a valid pure_integer number',
         },
         {
           instanceLocation => '/2',
           keywordLocation => '/items/format',
-          error => 'not a valid pure_integer',
+          error => 'not a valid pure_integer number',
         },
         {
           instanceLocation => '',
@@ -742,7 +778,7 @@ subtest 'formats supporting multiple core types' => sub {
           (map +{
             instanceLocation => "/$_",
             keywordLocation => '/items/format',
-            error => 'not a valid int64',
+            error => 'not a valid int64 number, string',
           },
           4, 10, 11, 12, 13, 19),
           {
@@ -783,12 +819,12 @@ subtest 'stringy numbers with a numeric format' => sub {
         {
           instanceLocation => '/0',
           keywordLocation => '/items/format',
-          error => 'not a valid mult_5',
+          error => 'not a valid mult_5 number',
         },
         {
           instanceLocation => '/1',
           keywordLocation => '/items/format',
-          error => 'not a valid mult_5',
+          error => 'not a valid mult_5 number',
         },
         {
           instanceLocation => '',
@@ -880,48 +916,95 @@ subtest 'annotation formats using implementations that rely on optional dependen
 };
 
 subtest 'assertion formats using implementations that rely on optional dependencies' => sub {
-  my $js = JSON::Schema::Modern->new(validate_formats => 1);
-  cmp_result(
-    $js->evaluate(
-      [
-        undef,
-        true,
-        {},
-        [],
-        1
-      ],
-      {
-        type => 'array',
-        items => { allOf => [ map +{ format => $_ }, ALL_FORMATS->@* ] }
-      },
-    )->TO_JSON,
-    { valid => true },
-    'can assert a non-string against formats without their optional dependencies, without dying',
-  );
+  foreach my $spec_version (JSON::Schema::Modern::SPECIFICATION_VERSIONS_SUPPORTED->@*) {
+    my $js = JSON::Schema::Modern->new(
+      specification_version => $spec_version,
+      validate_formats => 1,
+    );
 
-  cmp_result(
-    $js->evaluate(
-      '2025-01-01T00:00:00Z',
-      {
-        type => 'string',
+    cmp_result(
+      $js->evaluate(
+        [
+          undef,
+          true,
+          {},
+          [],
+          1
+        ],
+        {
+          type => 'array',
+          items => { allOf => [ map +{ format => $_ }, ALL_FORMATS->@* ] }
+        },
+      )->TO_JSON,
+      { valid => true },
+      $spec_version . ': for format validation with the Format-Annotation vocabulary, can assert a non-string against formats without their optional dependencies, without dying',
+    );
+
+    cmp_result(
+      $js->evaluate(
+        '2025-01-01T00:00:00Z',
+        {
+          type => 'string',
+          allOf => [
+            { format => 'date-time' },
+            true,
+          ],
+        },
+      )->TO_JSON,
+      { valid => true },
+      $spec_version . ': for format validation with the Format-Annotation vocabulary, in assertion mode, we treat missing prereqs as the format being valid',
+    );
+  }
+
+  foreach my $spec_version (JSON::Schema::Modern::SPECIFICATION_VERSIONS_SUPPORTED->@*) {
+    next if $spec_version =~ /^draft[467]$/ or $spec_version eq 'draft2019-09';
+
+    my $js = JSON::Schema::Modern->new(specification_version => $spec_version);
+    $js->add_schema({
+      '$id' => 'https://my_metaschema',
+      '$schema' => JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version},
+      '$vocabulary' => {
+        JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/core}r => true,
+        JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/applicator}r => true,
+        JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version} =~ s{schema$}{vocab/format-assertion}r => true,
+      },
+      '$ref' => JSON::Schema::Modern::METASCHEMA_URIS->{$spec_version},
+    });
+
+    my $doc;
+    my @warnings = warnings {
+      $doc = $js->add_schema({
+        '$schema' => 'https://my_metaschema',
         allOf => [
           { format => 'date-time' },
           true,
         ],
+      });
+    };
+    is($doc->errors, 0, $spec_version . ': for format validation with the Format-Assertion vocabulary, no errors during traversal when using an unknown custom format');
+
+    cmp_deeply(
+      \@warnings,
+      [ re(qr{Can't locate Time/Moment\.pm}) ],
+      '...but we do warn for the missing module',
+    );
+
+    cmp_result(
+      $js->evaluate('2025-01-01T00:00:00Z', $doc)->TO_JSON,
+      {
+        valid => false,
+        errors => [
+          {
+            error => re(qr{^EXCEPTION: Can't locate Time/Moment\.pm}),
+            instanceLocation => '',
+            keywordLocation => '/allOf/0/format',
+          },
+        ],
       },
-    )->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          error => re(qr{^EXCEPTION: Can't locate Time/Moment\.pm}),
-          instanceLocation => '',
-          keywordLocation => '/allOf/0/format',
-        },
-      ],
-    },
-    'in assertion mode, we immediately abort when encountering a format that throws an exception',
-  );
+      $spec_version . ': for Format-Asertion vocabulary, we immediately abort when encountering a format that throws an exception',
+    );
+  }
 };
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

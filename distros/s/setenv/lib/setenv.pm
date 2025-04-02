@@ -1,7 +1,7 @@
 package setenv;
 
 # where are we?
-$VERSION= '0.06';
+$VERSION= '0.07';
 
 # be as strict and verbose as possible
 use strict;
@@ -79,7 +79,7 @@ additives.
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.07.
 
 =head1 METHODS
 
@@ -98,9 +98,11 @@ C<use> or C<no>, it will perform any (re)setting of %ENV at that time.
 
  Elizabeth Mattijsen
 
+ maintained by Robert Acock (LNATION).
+
 =head1 COPYRIGHT
 
-Copyright (c) 2008, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+Copyright (c) 2008, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 Robert Acock <email@lnation.org> All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

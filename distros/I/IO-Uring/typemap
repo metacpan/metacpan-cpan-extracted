@@ -1,5 +1,5 @@
 TYPEMAP
-IO::Uring	T_MAGIC
+IO::Uring	T_MAGICEXT
 Signal::Info	T_OPAQUEOBJ
 Time::Spec	T_OPAQUEOBJ
 FileDescriptor	T_FILE_DESCRIPTOR
@@ -23,10 +23,10 @@ T_DIR_DESCRIPTOR
 			$var = -1;
 	} else
 		$var = AT_FDCWD;
-T_MAGIC
+T_MAGICEXT
 	{
 	%:ifdef mg_findext
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
 	%:else
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
 	%:endif
@@ -79,8 +79,12 @@ T_OPAQUEOBJ
 
 
 OUTPUT
-T_MAGIC
-	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+T_MAGICEXT
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	magic->mg_flags |= MGf_COPY|MGf_DUP;
+	}
+
 T_TIMESPEC
 	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);
 T_OPAQUEOBJ

@@ -19,7 +19,7 @@ sub server_read {
 	my ($fh) = @_;
 	my $buffer = "\0" x 512;
 
-	$ring->recv($fh, $buffer, 0, 0, sub {
+	$ring->recv($fh, $buffer, 0, 0, 0, sub {
 		my ($res, $flags) = @_;
 		if ($res < 0) {
 			$! = -$res;
@@ -36,7 +36,7 @@ sub server_read {
 
 sub server_send {
 	my ($fh, $buffer) = @_;
-	$ring->send($fh, $buffer, 0, 0, sub {
+	$ring->send($fh, $buffer, 0, 0, 0, sub {
 		my ($res, $flags) = @_;
 		if ($res < 0) {
 			$! = -$res;
@@ -58,11 +58,11 @@ my $continue = 1;
 sub client_write {
 	my ($fh) = @_;
 	my $message = shift @messages;
-	$ring->send($fh, $message, 0, 0, sub {
+	$ring->send($fh, $message, 0, 0, 0, sub {
 		my ($res, $flags) = @_;
 		die if $res < 0;
 		my $response = "\0" x 16;
-		$ring->recv($fh, $response, 0, 0, sub {
+		$ring->recv($fh, $response, 0, 0, 0, sub {
 			my ($res, $flags) = @_;
 			die if $res < 0;
 			is substr($response, 0, $res), $message, "Expected $message, got $res bytes";

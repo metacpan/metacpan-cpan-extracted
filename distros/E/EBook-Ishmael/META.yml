@@ -25,6 +25,7 @@ requires:
   Archive::Zip: '0'
   Compress::Zlib: '0'
   Cwd: '0'
+  Encode: '0'
   File::Basename: '0'
   File::Path: '0'
   File::Spec: '0'
@@ -38,5 +39,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/ishmael/issues
   repository: https://codeberg.org/1-1sam/ishmael.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

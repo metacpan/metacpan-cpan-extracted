@@ -130,8 +130,9 @@ use Test::Deep;
 
 {
   package C;
-  use base 'A';
+  our @ISA = 'A';
 }
+
 package main;
 {
   my $c = bless {}, "C";

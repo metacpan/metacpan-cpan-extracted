@@ -26,6 +26,7 @@ WriteMakefile(
     LIBS                => ['-llaunchdarkly-cpp-server'],
     TYPEMAPS            => ['stl_typemap', 'obj_typemap'],
     'CC'                => $CC,
+    'CCFLAGS'           => "$Config::Config{ccflags} -std=c++17",
     'LD'                => '$(CC)',
     'XSOPT'             => '-C++ -hiertype',
 );

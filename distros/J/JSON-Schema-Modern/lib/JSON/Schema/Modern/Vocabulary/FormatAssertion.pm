@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.606';
+our $VERSION = '0.607';
 
 use 5.020;
 use Moo;
@@ -32,15 +32,18 @@ sub vocabulary ($class) {
 sub evaluation_order ($class) { 2 }
 
 sub keywords ($class, $spec_version) {
-  qw(format);
+  return (
+    $spec_version !~ /^draft(?:[467]|2019-09)$/ ? qw(format) : (),
+  );
 }
 
+# these definitions are shared with the FormatAnnotation vocabulary
 {
   # for now, all built-in formats are constrained to the 'string' type
 
   my $is_email = sub {    # email, idn-email
     require Email::Address::XS; Email::Address::XS->VERSION(1.04);
-    Email::Address::XS->parse($_[0])->is_valid;
+    Email::Address::XS->parse_bare_address($_[0])->is_valid;
   };
   my $is_hostname = sub { # hostname, idn-hostname
     # FIXME: draft7 hostname uses RFC1034, draft2019-09+ hostname uses RFC1123
@@ -162,7 +165,7 @@ sub keywords ($class, $spec_version) {
     },
 
     'iri-reference' => sub { 1 },
-    'uri-template' => sub { 1 },
+    # uri-template is not implemented, but user can add a custom definition
   };
 
   my %formats_by_spec_version = (
@@ -196,20 +199,37 @@ sub keywords ($class, $spec_version) {
   sub _get_default_format_validation ($class, $state, $format) {
     # all core formats are of type string (so far)
     return { type => 'string', sub => $formats->{$format} }
-      if grep $format eq $_, $formats_by_spec_version{$state->{spec_version}}->@*;
+      if grep $format eq $_, $formats_by_spec_version{$state->{spec_version}}->@*
+        and $formats->{$format};
   }
 }
 
+my $warnings = {
+  email => sub { require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 },
+  hostname => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); 1 },
+  'idn-hostname' => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); require Net::IDN::Encode; 1 },
+  'date-time' => sub { require Time::Moment; require DateTime::Format::RFC3339; 1 },
+  date => sub { require Time::Moment; 1 },
+};
+$warnings->{'idn-email'} = $warnings->{email};
+
 sub _traverse_keyword_format ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
-  return E($state, 'unimplemented format "%s"', $schema->{format})
-    if $schema->{format} eq 'uri-template';
 
-  # in the draft2020-12 (and later) FormatAssertion vocabulary, an unrecognized format is an error
-  return E($state, 'unimplemented custom format "%s"', $schema->{format})
-    if $state->{spec_version} !~ /^draft(?:[467]|2019-09)$/
-      and not $class->_get_default_format_validation($state, $schema->{format})
+  # warn when prereq is missing for a format implementation
+  if (my $warn_sub = $warnings->{$schema->{format}}) {
+    try { $warn_sub->() } catch ($e) { warn $e }
+  }
+
+  # §7.2.2 (draft2020-12) "When the Format-Assertion vocabulary is declared with a value of true,
+  # implementations MUST provide full validation support for all of the formats defined by this
+  # specification. Implementations that cannot provide full validation support MUST refuse to
+  # process the schema."
+  return E($state, 'unimplemented core format "%s"', $schema->{format})
+    if $schema->{format} eq 'uri-template'
       and not $state->{evaluator}->_get_format_validation($schema->{format});
+
+  # unimplemented custom formats are detected at runtime, only if actually evaluated
 
   return 1;
 }
@@ -219,12 +239,7 @@ sub _traverse_keyword_format ($class, $schema, $state) {
 sub _eval_keyword_format ($class, $data, $schema, $state) {
   A($state, $schema->{format});
 
-  # §7.2.2 (draft2020-12) "When the Format-Assertion vocabulary is declared with a value of true,
-  # implementations MUST provide full validation support for all of the formats defined by this
-  # specification. Implementations that cannot provide full validation support MUST refuse to
-  # process the schema."
-  abort($state, 'unimplemented format "%s"', $schema->{format})
-    if $schema->{format} eq 'uri-template';
+  # unimplemented core formats were already detected in the traverse phase
 
   my $spec = $state->{evaluator}->_get_format_validation($schema->{format})
     // $class->_get_default_format_validation($state, $schema->{format});
@@ -260,7 +275,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.606
+version 0.607
 
 =head1 DESCRIPTION
 

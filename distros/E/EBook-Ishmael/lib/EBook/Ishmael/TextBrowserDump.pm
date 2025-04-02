@@ -1,12 +1,13 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 use strict;
 use warnings;
 
 use Exporter 'import';
 our @EXPORT = qw(browser_dump);
 
+use Encode qw(decode);
 use List::Util qw(first);
 
 use File::Which;
@@ -95,9 +96,6 @@ unless ($CAN_DUMP) {
 
 sub browser_dump {
 
-	# Automatically convert qx// input to Perl's internal encoding.
-	use open IN => ':crlf :encoding(UTF-8)';
-
 	unless (defined $Default) {
 		die "Cannot use browser to dump HTML; no valid browser was found on your system\n";
 	}
@@ -135,7 +133,9 @@ sub browser_dump {
 		die "Failed to dump $file with $Browsers{ $browser }->{Bin}\n";
 	}
 
-	return $dump;
+	# We can't use 'open IN => ":encoding(UTF-8)"' because it was broken prior
+	# to 5.34, so we must manually decode :-/.
+	return decode('UTF-8', $dump);
 
 }
 

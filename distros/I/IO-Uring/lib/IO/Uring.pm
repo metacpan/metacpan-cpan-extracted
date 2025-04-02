@@ -1,5 +1,5 @@
 package IO::Uring;
-$IO::Uring::VERSION = '0.002';
+$IO::Uring::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ IO::Uring - io_uring for Perl
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Shut down a part of a connection, the same way the core builtin C<shutdown($fh, 
 
 =head2 splice($fh_in, $off_in, $fh_out, $off_out, $nbytes, $flags, $s_flags, $callback)
 
-Move data between two file handle without copying
+Move data between two file handles without copying
 between kernel address space and user address space. It transfers
 up to size bytes of data from the file handle C<$fh_in> to the
 file handle C<fh_out>, where one of the file handles must
@@ -175,7 +175,7 @@ Synchronize the given range to disk. C<$flags> must currently be C<0>.
 
 Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
-=head2 recv($sock, $buffer, $flags, $s_flags, $callback)
+=head2 recv($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
@@ -187,11 +187,11 @@ Rename the file at C<$old_path> to C<$new_path>.
 
 Rename the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_path> in C<$new_dir>.
 
-=head2 send($sock, $buffer, $flags, $s_flags, $callback)
+=head2 send($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
 Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
 
-=head2 sendto($sock, $buffer, $flags, $sockaddr, $s_flags, $callback)
+=head2 sendto($sock, $buffer, $flags, $sockaddr, $pflags, $s_flags, $callback)
 
 Send a buffer to a specific address. The buffer and address must be kept alive, typically by enclosing over it in the callback.
 
@@ -246,13 +246,13 @@ These flags are passed to all event methods, and affect how the submission is pr
 
 =item * C<IOSQE_ASYNC>
 
-Normal operation for io_uring is to try and issue an SQE as
+Normal operation for io_uring is to try and issue an submission as
 non-blocking first, and if that fails, execute it in an
 async manner. To support more efficient overlapped
 operation of requests that the application knows/assumes
 will always (or most of the time) block, the application
-can ask for an SQE to be issued async from the start. Note
-that this flag immediately causes the SQE to be offloaded
+can ask for an submission to be issued async from the start. Note
+that this flag immediately causes the submission to be offloaded
 to an async helper thread with no initial non-blocking
 attempt. This may be less efficient and should not be used
 liberally or without understanding the performance and
@@ -260,31 +260,31 @@ efficiency tradeoffs.
 
 =item * C<IOSQE_IO_LINK>
 
-When this flag is specified, the SQE forms a link with the
-next SQE in the submission ring. That next SQE will not be
+When this flag is specified, the submission forms a link with the
+next submission in the submission ring. That next submission will not be
 started before the previous request completes. This, in
-effect, forms a chain of SQEs, which can be arbitrarily
-long. The tail of the chain is denoted by the first SQE
+effect, forms a chain of submissions, which can be arbitrarily
+long. The tail of the chain is denoted by the first submission
 that does not have this flag set. Chains are not supported
-across submission boundaries. Even if the last SQE in a
+across submission boundaries. Even if the last submission in a
 submission has this flag set, it will still terminate the
-current chain. This flag has no effect on previous SQE
-submissions, nor does it impact SQEs that are outside of
+current chain. This flag has no effect on previous submission
+submissions, nor does it impact submission that are outside of
 the chain tail. This means that multiple chains can be
-executing in parallel, or chains and individual SQEs. Only
-members inside the chain are serialized. A chain of SQEs
+executing in parallel, or chains and individual submissions. Only
+members inside the chain are serialized. A chain of submissions
 will be broken if any request in that chain ends in error.
 
 =item * C<IOSQE_IO_HARDLINK>
 
-Like IOSQE_IO_LINK , except the links aren't severed if an
+Like C<IOSQE_IO_LINK> , except the links aren't severed if an
 error or unexpected result occurs.
 
 =item * C<IOSQE_IO_DRAIN>
 
-When this flag is specified, the SQE will not be started
-before previously submitted SQEs have completed, and new
-SQEs will not be started before this one completes.
+When this flag is specified, the submission will not be started
+before previously submitted submissions have completed, and new
+submissions will not be started before this one completes.
 
 =back
 
@@ -329,7 +329,7 @@ request rather than the user_data. Available since 5.19.
 =item * C<IORING_ASYNC_CANCEL_ANY>
 
 Match any request in the ring, regardless of user_data or
-file handle.  Can be used to cancel any pending request
+file handle. Can be used to cancel any pending request
 in the ring. Available since 5.19.
 
 =back
@@ -370,13 +370,13 @@ If set, C<io_uring> will assume the socket is currently empty and attempting to 
 
 =item * C<RENAME_EXCHANGE>
 
-Atomically exchange oldpath and newpath.  Both pathnames
+Atomically exchange oldpath and newpath. Both pathnames
 must exist but may be of different types (e.g., one could
 be a non-empty directory and the other a symbolic link).
 
 =item * C<RENAME_NOREPLACE>
 
-Don't overwrite newpath of the rename.  Return an error if
+Don't overwrite newpath of the rename. Return an error if
 newpath already exists.
 
 C<RENAME_NOREPLACE> can't be employed together with

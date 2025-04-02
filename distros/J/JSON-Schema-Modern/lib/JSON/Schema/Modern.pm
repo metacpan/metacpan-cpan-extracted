@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.605-5-gbeded549
+package JSON::Schema::Modern; # git description: v0.606-9-g675111f3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.606';
+our $VERSION = '0.607';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -378,7 +378,9 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     }
     else {
       # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
-      my $document = $self->add_schema($schema_reference);
+      my $document =
+          $schema_reference->$_isa('JSON::Schema::Modern::Document') ? $self->add_document($schema_reference)
+        : $self->add_schema($schema_reference);
       my $base_resource = $document->_get_resource($document->canonical_uri)
         || croak "couldn't get resource: document parse error";
 
@@ -1248,7 +1250,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.606
+version 0.607
 
 =head1 SYNOPSIS
 
@@ -1970,13 +1972,18 @@ C<regex>
 =back
 
 A few optional prerequisites are needed for some of these (if the prerequisite is missing,
-validation will always succeed):
+validation will always succeed, unless draft2020-12 is in use with the Format-Assertion vocabulary
+declared in the metaschema, in which case use of the format will produce an error).
 
 =over 4
 
 =item *
 
-C<date-time>, C<date>, and C<time> require L<Time::Moment>, L<DateTime::Format::RFC3339>
+C<date-time> and C<date> require L<Time::Moment>
+
+=item *
+
+C<date-time> also requires <DateTime::Format::RFC3339>
 
 =item *
 
@@ -1984,11 +1991,11 @@ C<email> and C<idn-email> require L<Email::Address::XS> version 1.04 (or higher)
 
 =item *
 
-C<hostname> and C<idn-hostname> require L<Data::Validate::Domain>
+C<hostname> and C<idn-hostname> require L<Data::Validate::Domain> version 0.13 (or higher)
 
 =item *
 
-C<idn-hostname> requires L<Net::IDN::Encode>
+C<idn-hostname> also requires L<Net::IDN::Encode>
 
 =back
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.606';
+our $VERSION = '0.607';
 
 use 5.020;
 use Moo::Role;
@@ -107,7 +107,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.606
+version 0.607
 
 =head1 SYNOPSIS
 

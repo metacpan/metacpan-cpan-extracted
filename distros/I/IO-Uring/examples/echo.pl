@@ -15,7 +15,7 @@ my $listener = IO::Socket::IP->new(
 sub do_read($fh) {
 	my $buffer = "\0" x 512;
 
-	$ring->recv($fh, $buffer, 0, 0, sub($res, $flags) {
+	$ring->recv($fh, $buffer, 0, 0, 0, sub($res, $flags) {
 		if ($res < 0) {
 			$! = -$res;
 			die "Could not recv: $!";
@@ -27,7 +27,7 @@ sub do_read($fh) {
 }
 
 sub do_send($fh, $buffer) {
-	$ring->send($fh, $buffer, 0, 0, sub($res, $flags) {
+	$ring->send($fh, $buffer, 0, 0, 0, sub($res, $flags) {
 		if ($res < 0) {
 			$! = -$res;
 			die "Could not recv: $!";

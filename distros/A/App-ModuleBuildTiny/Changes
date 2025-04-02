@@ -1,5 +1,8 @@
 Revision history for App-ModuleBuildTiny
 
+0.049     2025-04-01 23:34:41+0200
+          - Eliminate argument parsing warning in minting
+
 0.048     2025-03-20 13:47:15+0100
           - Add support for dynamic prerequisites
           - Add setup minimal mode

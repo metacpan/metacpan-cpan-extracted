@@ -1,0 +1,5 @@
+Revision history for perl module Net::RDAP:
+
+0.04 - 2025-04-01
+  - fix handling of keyData.
+  - send appropriate HTTP status code if <info> fails.

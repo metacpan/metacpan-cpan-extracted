@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAnnotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Annotation vocabulary
 
-our $VERSION = '0.606';
+our $VERSION = '0.607';
 
 use 5.020;
 use Moo;
@@ -16,6 +16,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use Feature::Compat::Try;
 use JSON::Schema::Modern::Utilities qw(A E assert_keyword_type get_type);
 use JSON::Schema::Modern::Vocabulary::FormatAssertion;
 use List::Util 'any';
@@ -66,7 +67,18 @@ sub _eval_keyword_format ($class, $data, $schema, $state) {
       and is_plain_arrayref($spec->{type}) ? any { $_ eq 'number' } $spec->{type}->@* : $spec->{type} eq 'number'
       and looks_like_number($data));
 
-  return E($state, 'not a valid %s', $schema->{format}) if not $spec->{sub}->($data);
+  my $valid;
+  try {
+    $valid = $spec->{sub}->($data);
+  }
+  catch ($e) {
+    # we treat a missing optional prereq as if the format is not implemented, therefore it is valid
+    $valid = 1;
+  }
+
+  return E($state, 'not a valid %s %s', $schema->{format},
+      is_plain_arrayref($spec->{type}) ? join(', ', $spec->{type}->@*) : $spec->{type})
+    if not $valid;
   return 1;
 }
 
@@ -84,7 +96,7 @@ JSON::Schema::Modern::Vocabulary::FormatAnnotation - Implementation of the JSON 
 
 =head1 VERSION
 
-version 0.606
+version 0.607
 
 =head1 DESCRIPTION
 

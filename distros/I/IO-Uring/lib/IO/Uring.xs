@@ -11,6 +11,16 @@ typedef struct ring {
 	unsigned cqe_count;
 } *IO__Uring;
 
+int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
+	struct ring* self = (struct ring*)magic->mg_ptr;
+	io_uring_queue_exit(&self->uring);
+	safefree(self);
+}
+
+static const MGVTBL IO__Uring_magic = {
+	.svt_free = uring_destroy,
+};
+
 static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 	struct io_uring_sqe* sqe = io_uring_get_sqe(&ring->uring);
 
@@ -161,12 +171,6 @@ CODE:
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL
-
-
-void DESTROY(IO::Uring self)
-	CODE:
-	io_uring_queue_exit(&self->uring);
-	safefree(self);
 
 
 void run_once(IO::Uring self, unsigned min_events = 1)
@@ -444,11 +448,12 @@ OUTPUT:
 	RETVAL
 
 
-UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV iflags, SV* callback)
+UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_recv(sqe, fd, buffer, STRLEN_length_of_buffer, rflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio |= pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:
@@ -477,22 +482,24 @@ OUTPUT:
 	RETVAL
 
 
-UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, UV iflags, SV* callback)
+UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio = pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:
 	RETVAL
 
 
-UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV iflags, SV* callback)
+UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio = pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:

@@ -47,7 +47,7 @@ my %IMAGES = (
 	azw3  => 2,
 );
 
-my $tmpimg = do {
+my $tmpout = do {
 	my ($fh, $tmp) = tempfile(UNLINK => 1);
 	close $fh;
 	$tmp;
@@ -75,12 +75,12 @@ for my $f (@FILES) { SKIP: {
 		skip "TEST_CHM set to 0 or chmlib not installed", 10;
 	}
 
-	@ARGV = ('-H', $f);
+	@ARGV = ('-H', $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-H w/ $file ok");
 
-	@ARGV = (qw(-H -e cp1252), $f);
+	@ARGV = (qw(-H -e cp1252), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "cp1252 -H w/ $file ok");
@@ -90,42 +90,42 @@ for my $f (@FILES) { SKIP: {
 
 	ok($ishmael->run, "-i w/ $file ok");
 
-	@ARGV = (qw(-m ishmael), $f);
+	@ARGV = (qw(-m ishmael), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m ishmael w/ $file ok");
 
-	@ARGV = (qw(-m json), $f);
+	@ARGV = (qw(-m json), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m json w/ $file ok");
 
-	@ARGV = (qw(-m pjson), $f);
+	@ARGV = (qw(-m pjson), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m pjson w/ $file ok");
 
-	@ARGV = (qw(-m xml), $f);
+	@ARGV = (qw(-m xml), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m xml w/ $file ok");
 
-	@ARGV = (qw(-m pxml), $f);
+	@ARGV = (qw(-m pxml), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-m pxml w/ $file ok");
 
-	@ARGV = ('-r', $f);
+	@ARGV = ('-r', $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-r w/ $file ok");
 
-	@ARGV = (qw(-r -e cp1252), $f);
+	@ARGV = (qw(-r -e cp1252), $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "cp1252 -r w/ $file ok");
 
-	@ARGV = ('-c', $f, $tmpimg);
+	@ARGV = ('-c', $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "-c w/ $file ok");

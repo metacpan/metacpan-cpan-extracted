@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -547,7 +547,10 @@ my %actions = (
 		);
 		my %config;
 		my @options = qw/version=s abstract=s dirname=s init_git|init-git/;
-		push @options, map { "$_->[0]|" . ($_->[0] =~ s/_/-/gr) . ($_->[2] eq 'yn' ? '!' : '=s') } @config_items;
+		for my $config_item (@config_items) {
+			my $entry = $config_item->[0] =~ s{^(\w+_\w+)\K$}{ '|' . $1 =~ tr/_/-/r }er;
+			push @options, $entry . ($config_item->[2] eq 'yn' ? '!' : '=s');
+		}
 		GetOptionsFromArray(\@arguments, \%args, @options) or return 2;
 		for my $item (@config_items) {
 			my ($key, $description, $type, $default) = @{$item};

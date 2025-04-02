@@ -68,7 +68,7 @@ Net::RDAP::Server::Request - An RDAP request object.
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 DESCRIPTION
 

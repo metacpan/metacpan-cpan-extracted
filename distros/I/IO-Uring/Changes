@@ -1,5 +1,8 @@
 Revision history for IO-Uring
 
+0.003     2025-04-01 22:13:31+02:00 Europe/Brussels
+          - Add pflags argument to recv and send
+
 0.002     2025-02-19 17:04:50+01:00 Europe/Brussels
           - Add bind, listen, sendto and socket methods
           - Add probe method

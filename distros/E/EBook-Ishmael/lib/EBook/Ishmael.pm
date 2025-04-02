@@ -1,10 +1,10 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 use strict;
 use warnings;
 
-use Encode qw(:fallbacks find_encoding);
+use Encode qw(find_encoding encode);
 use File::Basename;
 use File::Path qw(remove_tree);
 use File::Temp qw(tempfile);
@@ -17,8 +17,6 @@ use XML::LibXML;
 use EBook::Ishmael::EBook;
 use EBook::Ishmael::ImageID;
 use EBook::Ishmael::TextBrowserDump;
-
-$PerlIO::encoding::fallback = FB_DEFAULT;
 
 use constant {
 	MODE_TEXT      => 0,
@@ -77,6 +75,9 @@ my %FORMAT_ALTS = (
 my %META_MODES = map { $_ => 1 } qw(
 	ishmael json pjson xml pxml
 );
+
+# Replace characters that cannot be encoded with empty strings.
+my $ENC_SUBST = sub { q[] };
 
 sub _get_out {
 
@@ -188,19 +189,23 @@ sub text {
 
 	my $oh = _get_out($self->{Output});
 
-	if (defined $self->{Encode}) {
-		binmode $oh, ":encoding($self->{Encode})";
-	} else {
+	unless (defined $self->{Encode}) {
 		binmode $oh, ':utf8';
 	}
 
-	print { $oh } browser_dump(
+	my $dump = browser_dump(
 		$tmp,
 		{
 			browser => $self->{Dumper},
 			width   => $self->{Width},
 		}
 	);
+
+	if (defined $self->{Encode}) {
+		print { $oh } encode($self->{Encode}, $dump, $ENC_SUBST);
+	} else {
+		print { $oh } $dump;
+	}
 
 	close $oh unless $self->{Output} eq $STDOUT;
 
@@ -357,13 +362,17 @@ sub html {
 
 	my $oh = _get_out($self->{Output});
 
-	if (defined $self->{Encode}) {
-		binmode $oh, ":encoding($self->{Encode})";
-	} else {
+	unless (defined $self->{Encode}) {
 		binmode $oh, ':utf8';
 	}
 
-	say { $oh } $ebook->html;
+	my $html = $ebook->html;
+
+	if (defined $self->{Encode}) {
+		say { $oh } encode($self->{Encode}, $html, $ENC_SUBST);
+	} else {
+		say { $oh } $html;
+	}
 
 	close $oh unless $self->{Output} eq $STDOUT;
 
@@ -382,13 +391,17 @@ sub raw {
 
 	my $oh = _get_out($self->{Output});
 
-	if (defined $self->{Encode}) {
-		binmode $oh, ":encoding($self->{Encode})";
-	} else {
+	unless (defined $self->{Encode}) {
 		binmode $oh, ':utf8';
 	}
 
-	say { $oh } $ebook->raw;
+	my $raw = $ebook->raw;
+
+	if (defined $self->{Encode}) {
+		say { $oh } encode($self->{Encode}, $raw, $ENC_SUBST);
+	} else {
+		say { $oh } $raw;
+	}
 
 	close $oh unless $self->{Output} eq $STDOUT;
 
