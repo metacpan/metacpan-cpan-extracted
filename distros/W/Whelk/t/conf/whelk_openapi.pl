@@ -15,7 +15,7 @@
 	},
 
 	openapi => {
-		path => '/',
+		path => '/openapi.json',
 		formatter => 'YAML',
 		info => {
 			title => 'OpenApi/Swagger integration for Whelk',

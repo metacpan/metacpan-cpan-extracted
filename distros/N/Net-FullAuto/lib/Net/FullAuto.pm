@@ -3,7 +3,7 @@ package Net::FullAuto;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2024  Brian M. Kelly
+#    Copyright © 2000-2025  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -2372,7 +2372,7 @@ L<Brian.Kelly@FullAuto.com|mailto:Brian.Kelly@FullAuto.com>
 
 =head1 Copyright
 
-Copyright (C) 2000-2024
+Copyright (C) 2000-2025
 
 by Brian M. Kelly.
 

@@ -51,13 +51,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Float"
+         "web" : "https://github.com/robrwo/Data-Float/issues"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robrwo/Data-Float.git"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

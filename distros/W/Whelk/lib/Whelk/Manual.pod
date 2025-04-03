@@ -268,6 +268,10 @@ data through L<Whelk::OpenAPI/generate>. This is useful if you would like to
 install your own endpoint which may use something like Swagger UI to visualize
 the document.
 
+The endpoint will be mounted in the App's router with the name
+C<'whelk_openapi'>. It may be useful if you wish to redirect to it from
+somewhere else.
+
 =item * formatter
 
 Same as L</formatter>, but specialized for OpenAPI endpont only. Does nothing

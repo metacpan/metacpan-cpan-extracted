@@ -175,7 +175,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.014";
+our $VERSION = "0.015";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

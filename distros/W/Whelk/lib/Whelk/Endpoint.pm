@@ -1,5 +1,5 @@
 package Whelk::Endpoint;
-$Whelk::Endpoint::VERSION = '1.02';
+$Whelk::Endpoint::VERSION = '1.03';
 use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.6006';
+our $VERSION = '0.6008';
 
 use 5.024;
 use strictures 2;
@@ -25,8 +25,8 @@ use Music::Duration        ();
 use Music::RhythmSet::Util qw(upsize);
 
 use MIDI::Drummer::Tiny::Types qw(:all);
-use Types::Standard            qw(InstanceOf FileHandle);
-use Types::Path::Tiny          qw(File Path assert_Path);
+use Types::Standard            qw(InstanceOf);
+use Types::Path::Tiny          qw(assert_Path);
 
 use Data::Dumper::Compact qw(ddc);
 use namespace::clean;
@@ -138,7 +138,7 @@ sub BUILD ( $self, $args_ref ) {
 
 has file => (
     is      => 'ro',
-    isa     => Path | FileHandle,
+    isa     => MIDI_File,
     coerce  => 1,
     default => 'MIDI-Drummer.mid',
 );
@@ -154,7 +154,7 @@ has file => (
 
 has soundfont => (
     is     => 'rw',
-    isa    => File,
+    isa    => Soundfont_File,
     coerce => 1,
 );
 
@@ -1467,7 +1467,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.6006
+version 0.6008
 
 =head1 SYNOPSIS
 

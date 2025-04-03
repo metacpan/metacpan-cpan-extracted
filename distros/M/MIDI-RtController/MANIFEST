@@ -7,6 +7,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/control_change.pl
 eg/dual.pl
 eg/echo.pl
 eg/tester.pl

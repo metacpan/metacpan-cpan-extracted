@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.34';
+our $VERSION = '1.1.0';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -403,7 +403,8 @@ sub restart {
 sub is_running {
   my ($self) = shift;
   $self->session->consume_collected_info;
-  $self->process_id ? kill 0 => $self->process_id : 0;
+  return 0 unless my $pid = $self->process_id;
+  kill(0, ($self->kill_whole_group ? (-$pid, $pid) : ($pid)));
 }
 
 sub write_pidfile {
@@ -519,7 +520,6 @@ sub stop {
   my $pid = $self->pid;
   return $self               unless defined $pid;
   return $self->_shutdown(1) unless $self->is_running;
-  $self->_diag("Stopping $pid") if DEBUG;
 
   my $ret;
   my $attempt      = 1;
@@ -527,7 +527,9 @@ sub stop {
   my $sleep_time   = $self->sleeptime_during_kill;
   my $max_attempts = $self->max_kill_attempts;
   my $signal       = $self->_default_kill_signal;
-  $pid = -getpgrp($pid) if $self->kill_whole_group;
+  $pid = -$pid if $self->kill_whole_group;
+  $self->_diag("Stopping $pid") if DEBUG;
+
   until ((defined $ret && ($ret == $pid || $ret == -1))
       || ($attempt > $max_attempts && $timeout <= 0))
   {
@@ -666,6 +668,10 @@ Mojo::IOLoop::ReadWriteProcess - Execute external programs or internal code bloc
     my $pid = $process->pid();
     $process->stop();
     my @errors = $process->error;
+
+    # To help when debugging Mojo::Collections
+    use Mojo::Util qw(dumper);
+    my $errors = dumper $process->error->to_array;
 
     # Get process return value
     $process = process( sub { return "256"; } )->start()->wait_stop;

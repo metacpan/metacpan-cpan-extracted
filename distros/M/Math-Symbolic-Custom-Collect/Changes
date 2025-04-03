@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-Collect
 
+0.36    Wed Apr 02 13:30 2025
+
+        - Fixed bug in exponents of negative numbers that was affecting Math::Symbolic::Custom::Polynomial
+
 0.35    Tue Mar 18 12:30 2025
 
         - Improved handling of expressions with large exponents

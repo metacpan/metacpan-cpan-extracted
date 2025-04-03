@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '1.02';
+$Whelk::Schema::Definition::VERSION = '1.03';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;

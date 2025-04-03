@@ -1,5 +1,5 @@
 package Whelk::Wrapper;
-$Whelk::Wrapper::VERSION = '1.02';
+$Whelk::Wrapper::VERSION = '1.03';
 use Kelp::Base;
 
 use Try::Tiny;

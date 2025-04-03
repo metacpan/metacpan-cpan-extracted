@@ -1,5 +1,19 @@
 Revision history for Math-Symbolic-Custom-Polynomial
 
+0.31    Wed Apr 02 13:30 2025
+
+        - Updated dependencies to fix bug in test suite
+
+0.3     Fri Jan 10 10:00 2025
+
+        - Added apply_synthetic_division() and apply_polynomial_division()
+
+0.2     Sat Jan 04 10:00 2025
+
+        - test_polynomial() will try to detect polynomial variable if it is not supplied
+        - Fixed bug in coefficient collection
+        - Added an example
+
 0.11    Fri Nov 29 10:02 2024
 
         - Updated POD

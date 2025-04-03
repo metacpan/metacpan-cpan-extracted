@@ -7,14 +7,10 @@ package Comics::Plugin::9ChickweedLane;
 
 use parent qw(Comics::Fetcher::GoComics);
 
-our $VERSION = "0.02";
+our $VERSION = "1.02";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "9 Chickweed Lane",
-	  url     => "https://www.gocomics.com/9_chickweed_lane",
-	} );
-}
+our $name    = "9 Chickweed Lane";
+our $url     = "https://www.gocomics.com/9-chickweed-lane";
 
 # Important: Return the package name!
 __PACKAGE__;

@@ -28,7 +28,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Float
+  bugtracker: https://github.com/robrwo/Data-Float/issues
   repository: git://github.com/robrwo/Data-Float.git
-version: '0.014'
+version: '0.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

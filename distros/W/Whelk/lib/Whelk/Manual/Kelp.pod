@@ -74,7 +74,7 @@ initial module load.
 
 Whelk works exclusively in the controller mode, so C<Router> module must have
 correct setting of C<base> and C<rebless>. Whelk is not guaranteed to work with
-custom Kelp routers.
+custom Kelp routers. Whelk works well with L<KelpX::Controller>.
 
 Unlike standalone Whelk, all configuration listed in
 L<Whelk::Manual/Configuration> is not taken from root hash but instead from

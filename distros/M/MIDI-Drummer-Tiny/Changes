@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.6008 2025-04-02 11:32:50
+    - Add and use MIDI and soundfont file types.
+
+0.6007 2025-04-02 10:59:40
+    - Use Types::Music.
+
 0.6006 2025-03-31 00:35:50
     - Make Types::MIDI an explicit prereq.
     - Use the AWOL numeric types too.

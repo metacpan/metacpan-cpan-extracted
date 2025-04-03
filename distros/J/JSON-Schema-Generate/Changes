@@ -1,7 +1,11 @@
 Revision history for JSON-Schema-Generate
 
+0.12	2025/04/02
+	- Fix the generated $id's so they pass JSON::Schema::Modern validation.
+	- Update documentation
+
 0.08    2022/05/31
-	- Increate test coverage to 100%
+	- Increase test coverage to 100%
 
 0.04    2020/05/31
 	Adds Options:

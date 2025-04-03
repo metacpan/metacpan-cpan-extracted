@@ -1,5 +1,5 @@
 package Whelk::Schema::ExtraRule;
-$Whelk::Schema::ExtraRule::VERSION = '1.02';
+$Whelk::Schema::ExtraRule::VERSION = '1.03';
 use Whelk::StrictBase;
 use Carp;
 

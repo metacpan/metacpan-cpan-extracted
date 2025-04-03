@@ -14,11 +14,12 @@ meta-spec:
 name: KelpX-Controller
 requires:
   Kelp: '2.18'
+  Module::Loader: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/Kelp-framework/Extension-Controller/issues
   repository: git://github.com/Kelp-framework/Extension-Controller.git
-version: '1.02'
+version: '2.00'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

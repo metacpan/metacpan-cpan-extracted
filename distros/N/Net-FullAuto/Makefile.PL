@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2024  Brian M. Kelly
+#    Copyright © 2000-2025  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000816';
+our $VERSION='1.0000817';
 
 #print `env`,"\n\n\n";
 
@@ -2579,6 +2579,8 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Hook::LexWrap','install','Makefile');
    &fa_install_module('Test::SubCalls','install','Makefile');
    &fa_install_module('Class::Inspector','install','Makefile');
+   &fa_install_module('Safe::Isa','install','Makefile');
+   &fa_install_module('YAML::PP','install','Makefile');
    &fa_install_module('PPI','install','Makefile');
    &fa_install_module('Tie::Cache','install','Makefile');
    &fa_install_module('String::Random','install','Build');

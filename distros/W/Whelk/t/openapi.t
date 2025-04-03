@@ -19,7 +19,7 @@ my $content = do {
 	$app->yaml->decode(<DATA>);
 };
 
-$t->request(GET '/')
+$t->request(GET $app->url_for('whelk_openapi'))
 	->code_is(200)
 	->yaml_cmp($content);
 

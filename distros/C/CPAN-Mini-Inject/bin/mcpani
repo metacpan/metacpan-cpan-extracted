@@ -301,11 +301,17 @@ Output the version of B<mcpani> and exit.
 
 Shawn Sorichetti C<< <ssoriche@coloredblocks.net> >>
 
-=head1 ISSUES
+=head1 SOURCE AVAILABILITY
 
-Report issues to the GitHub queue:
+The main repository is on GitHub:
 
-	https://github.com/briandfoy/cpan-mini-inject/issues
+	https://github.com/briandfoy/cpan-mini-inject
+
+There are also backup repositories on several other services:
+
+	https://bitbucket.org/briandfoy/cpan-mini-inject
+	https://codeberg.org/briandfoy/cpan-mini-inject
+	https://gitlab.com/briandfoy/cpan-mini-inject
 
 =head1 COPYRIGHT & LICENSE
 

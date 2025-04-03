@@ -1,5 +1,5 @@
 package Whelk::ResourceMeta;
-$Whelk::ResourceMeta::VERSION = '1.02';
+$Whelk::ResourceMeta::VERSION = '1.03';
 use Kelp::Base;
 
 attr name => sub { $_[0]->config->{name} // $_[0]->class };

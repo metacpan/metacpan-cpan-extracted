@@ -1,5 +1,5 @@
 {
-   "abstract" : "A friendly API framework based on Kelp",
+   "abstract" : "A fortified API framework based on Kelp",
    "author" : [
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
@@ -59,7 +59,7 @@
          "web" : "https://github.com/Kelp-framework/Whelk"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Math::Symbolic" : "0.613",
-            "Math::Symbolic::Custom::Collect" : "0.2",
+            "Math::Symbolic::Custom::Collect" : "0.36",
             "perl" : "5.006"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/mjohnson108/p5-msc-polynomial"
       }
    },
-   "version" : "0.11",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

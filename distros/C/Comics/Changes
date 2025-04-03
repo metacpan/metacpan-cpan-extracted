@@ -1,5 +1,11 @@
 Revision history for Comics
 
+1.23	2025-04-02
+
+	Fix GoComics fetcher.
+	Fix GoComics: OverTheHedge, 9ChiokweedLane, EEK, WorkingDaze,
+	LearnToSpeakCat, OffTheMark.
+
 1.21	2024-12-27
 
 	Fix pattern for FokkeEnSukke.

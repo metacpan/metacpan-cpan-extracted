@@ -33,7 +33,7 @@ use feature qw( say );
 use parent  qw( Exporter );
 use subs    qw( uniq );
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -407,11 +407,11 @@ CODE
 
 Works like eval, but without L<the lossy bug|/Lossy undef Variable>
 
-repl (
-    history_file => "$ENV{HOME}/.runtime_debugger.yml",
-    debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
-    levels_up    => 0,
-);
+ repl (
+     history_file => "$ENV{HOME}/.runtime_debugger.yml",
+     debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
+     levels_up    => 0,
+ );
 
 Can specify the level at which to perform an eval
 in relation to the level of this function call:
@@ -882,6 +882,7 @@ sub _to_peek {
     my $is_curly_close = qr{ \} }x;    # To make my editor happy.
 
     if ( $repl->debug ) {
+        say "";
         say "var:   $var";
         say "name:  $name";
         say "sigil: $sigil";
@@ -904,8 +905,7 @@ sub _to_peek {
     my $val = sprintf( '$%s::PEEKS{qq(%s)}', __PACKAGE__, quotemeta( $var ), );
 
     if ( $repl->debug ) {
-        say "";
-        say "var2   $var";
+        say "var2:  $var";
         say "ref:   $ref";
     }
 
@@ -922,7 +922,11 @@ sub _to_peek {
         $val = "${sigil}{$val}";
     }
     else {
-        return $var;
+        $val = $var;
+    }
+
+    if ( $repl->debug ) {
+        say "val:   $val";
     }
 
     $val;
@@ -984,7 +988,11 @@ sub _build_step {
 
     $input = $repl->_apply_peeks( $input );
 
-    say "input_after_step=[$input]" if $repl->debug;
+    if ( $repl->debug ) {
+        say "";
+        say "input_after_step=[$input]";
+        say "";
+    }
 
     $input;
 }

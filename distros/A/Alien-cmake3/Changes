@@ -1,5 +1,8 @@
 Revision history for Alien-cmake3
 
+0.09      2025-04-02 12:54:07 -0600
+  - Only use CMake 3.x, not 4.x (gh#20, gh#21)
+
 0.08      2021-07-16 12:05:39 -0600
   - Documentation improvements (gh#3, gh#15)
 

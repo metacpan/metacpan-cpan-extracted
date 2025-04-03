@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use File::Temp qw/tempfile/;
+use Test::HTTPStatus;
 use Test::Most;
 use Test::RequiresInternet ('nominatim.openstreetmap.org' => 'https');
 
@@ -13,6 +15,16 @@ local $SIG{__WARN__} = sub { };
 
 # 1. Object Creation Tests
 my $osm = new_ok('HTML::OSM');
+
+subtest 'should load config file if provided' => sub {
+	my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml');
+	print $fh "---\ncss_url: https://example.com\n";
+	close $fh;
+
+	my $osm = HTML::OSM->new(config_file => $config_file);
+	is $osm->{'css_url'}, 'https://example.com', 'Config file loaded correctly';
+	unlink $config_file;
+};
 
 # Check default values
 cmp_ok($osm->{zoom}, '==', 12, 'Default zoom is 12');
@@ -64,9 +76,13 @@ like($body, qr/map\.setView/, 'Body includes map initialization');
 my $osm_empty = HTML::OSM->new();
 dies_ok { $osm_empty->onload_render() } 'Dies if no coordinates are provided';
 
-# 7. Clone Tests
+# Clone Tests
 my $osm_clone = $osm->new(zoom => 17);
 isa_ok($osm_clone, 'HTML::OSM', 'Cloned object is still HTML::OSM');
 is($osm_clone->{zoom}, 17, 'Cloned object has updated zoom');
+
+# HTTP Tests
+http_ok($osm->{'css_url'}, HTTP_OK);
+http_ok($osm->{'js_url'}, HTTP_OK);
 
 done_testing();

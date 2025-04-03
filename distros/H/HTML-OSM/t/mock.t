@@ -22,7 +22,7 @@ $mock->mock(
     }
 );
 
-my $osm = HTML::OSM->new(geocoder => $mock);
+my $osm = HTML::OSM->new({ geocoder => $mock });
 
 # Test valid address lookup
 my @results = $osm->_fetch_coordinates('New York, NY');

@@ -173,8 +173,11 @@ subtest stress_test => sub {
 # Started as long as resources allows (maximum_processes of the main pool)
 # That requires then to subscribe for each process event's separately (manually)
   for (1 .. $proc) {
-    my $p = process(sub { shift; sleep 4; exit shift() })->set_pipes(0)
-      ->internal_pipes(0)->args($i);
+    my $p
+      = process(sub { shift; sleep 4; exit shift() })
+      ->set_pipes(0)
+      ->internal_pipes(0)
+      ->args($i);
     $p->once(
       stop => sub {
         $fired++;

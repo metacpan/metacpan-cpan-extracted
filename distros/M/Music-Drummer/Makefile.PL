@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Music::Drummer",
   "PREREQ_PM" => {
-    "MIDI::Drummer::Tiny" => "0.6006",
+    "MIDI::Drummer::Tiny" => "0.6008",
     "parent" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.6006",
+  "VERSION" => "0.6008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "MIDI::Drummer::Tiny" => "0.6006",
+  "MIDI::Drummer::Tiny" => "0.6008",
   "Test::More" => "0.88",
   "parent" => 0,
   "strict" => 0,

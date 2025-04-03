@@ -7,14 +7,10 @@ package Comics::Plugin::OverTheHedge;
 
 use parent qw(Comics::Fetcher::GoComics);
 
-our $VERSION = "0.02";
+our $VERSION = "1.02";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Over the hedge",
-	  url     => "https://www.gocomics.com/over_the_hedge",
-	} );
-}
+our $name    = "Over the hedge";
+our $url     = "https://www.gocomics.com/overthehedge";
 
 # Important: Return the package name!
 __PACKAGE__;

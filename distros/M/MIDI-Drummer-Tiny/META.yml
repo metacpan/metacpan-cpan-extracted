@@ -35,6 +35,7 @@ requires:
   Type::Library: '0'
   Type::Utils: '0'
   Types::MIDI: v0.601.0
+  Types::Music: '0.0104'
   Types::Path::Tiny: '0'
   Types::Standard: '0'
   constant: '0'
@@ -47,7 +48,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.6006'
+version: '0.6008'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

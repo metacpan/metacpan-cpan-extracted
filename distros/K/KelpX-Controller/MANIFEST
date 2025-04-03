@@ -14,3 +14,4 @@ t/base.t
 t/conf/test.pl
 t/lib/TestApp.pm
 t/lib/TestApp/Controller.pm
+t/lib/TestApp/Controller/Nested.pm

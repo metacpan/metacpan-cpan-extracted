@@ -1,5 +1,11 @@
 Revision history for Perl extension KelpX::Controller.
 
+2.00 - 2025-04-02
+	- Add 'build_controllers' to context
+	- Add 'add_route' to controller
+	- 'build' method of controllers will not be called if it was not reimplemented
+	- All routes in an app will now use the base controller as call context
+
 1.02 - 2024-10-08
 	- Updated for Kelp 2.18
 	- Documented a common trap (route setting in build)

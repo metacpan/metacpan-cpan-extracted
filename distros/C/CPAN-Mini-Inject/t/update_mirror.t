@@ -106,18 +106,17 @@ subtest 'mirror state' => sub {
 		return;
 	}
 
-	ok( -e catfile( $tmp_dir, qw(authors) ), 'authors/ exists' );
-	ok( -e catfile( $tmp_dir, qw(modules) ), 'modules/ exists' );
-	ok( -e catfile( $tmp_dir, qw(authors 01mailrc.txt.gz) ), '01mailrc.txt.gz exists' );
-	ok( -e catfile( $tmp_dir, qw(modules 02packages.details.txt.gz) ), '02packages.details.txt.gz exists' );
-	ok( -e catfile( $tmp_dir, qw(modules 03modlist.data.gz) ), '03modlist.data.gz exists' );
-	ok( -e catfile( $tmp_dir, qw(authors id R RJ RJBS CHECKSUMS) ), 'RJBS/CHECKSUMS exists' );
-	ok( -e catfile( $tmp_dir, qw(authors id R RJ RJBS CPAN-Mini-2.1828.tar.gz) ), 'CPAN-Mini-2.1828.tar.gz exists' );
-	ok( -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CHECKSUMS) ), 'SSORICHE/CHECKSUMS exists' );
-	ok( -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CPAN-Mini-Inject-1.01.tar.gz) ), 'CPAN::Mini::Inject exixts' );
+	ok -e catfile( $tmp_dir, qw(authors) ), 'authors/ exists';
+	ok -e catfile( $tmp_dir, qw(modules) ), 'modules/ exists';
+	ok -e catfile( $tmp_dir, qw(authors 01mailrc.txt.gz) ), '01mailrc.txt.gz exists';
+	ok -e catfile( $tmp_dir, qw(modules 02packages.details.txt.gz) ), '02packages.details.txt.gz exists';
+	ok -e catfile( $tmp_dir, qw(modules 03modlist.data.gz) ), '03modlist.data.gz exists';
+	ok -e catfile( $tmp_dir, qw(authors id R RJ RJBS CHECKSUMS) ), 'RJBS/CHECKSUMS exists';
+	ok -e catfile( $tmp_dir, qw(authors id R RJ RJBS CPAN-Mini-2.1828.tar.gz) ), 'CPAN-Mini-2.1828.tar.gz exists';
+	ok -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CHECKSUMS) ), 'SSORICHE/CHECKSUMS exists';
+	ok -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CPAN-Mini-Inject-1.01.tar.gz) ), 'CPAN::Mini::Inject exixts';
 	};
 
-sleep 1; # allow locks to expire
-kill( 9, $pid );
+kill 9, $pid;
 
 done_testing();

@@ -5,11 +5,12 @@ author:
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
   Module::Build: '0.4005'
   perl: '5.016'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +26,19 @@ no_index:
     - examples
     - author
     - builder
+optional_features:
+  ci:
+    description: ci
+    requires:
+      Devel::Cover: '0'
+      Devel::Cover::Report::Codecovbash: '0'
+      Minilla: '0'
+      TAP::Formatter::GitHubActions: '0'
+      Test::Pod::Coverage: '0'
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.34'
+    version: v1.1.0
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -88,23 +98,25 @@ resources:
   bugtracker: https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess
   repository: https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.34'
+version: 1.1.0
 x_contributors:
   - 'Adam Williamson <awilliam@redhat.com>'
   - 'Clemens Famulla-Conrad <cfamullaconrad@suse.de>'
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
   - 'Ettore Di Giacinto <mudler@users.noreply.github.com>'
-  - 'Marius Kittler <mkittler@suse.de>'
   - 'Martchus <martchus@gmx.net>'
+  - 'Martchus <mkittler@suse.de>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nick Morrott <knowledgejunkie@gmail.com>'
   - 'Oliver Kurz <okurz@suse.de>'
   - 'Santiago Zarate <229240+foursixnine@users.noreply.github.com>'
   - 'Santiago Zarate <santiago+github@zarate.co>'
+  - 'Santiago Zarate <santiago.zarate@suse.com>'
   - 'Santiago Zarate <santiago@zarate.co>'
   - 'Sebastian Riedel <s@kraih.com>'
   - 'Sebastian Riedel <sri@cpan.org>'
   - 'Tina Müller <cpan2@tinita.de>'
+  - 'Wabri <12409541+Wabri@users.noreply.github.com>'
   - 'cfconrad <40127946+cfconrad@users.noreply.github.com>'
   - 'gregor herrmann <gregoa@debian.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -82,6 +82,17 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
     the label is taken to be a location to be added.
     If no coordinates are provided, an error will be thrown.
 
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
+
+- `css_url`
+
+    Location of the CSS, default [https://unpkg.com/leaflet@1.9.4/dist/leaflet.css](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css).
+
 - `geocoder`
 
     An optional geocoder object such as [Geo::Coder::List](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AList) or [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree).
@@ -89,6 +100,10 @@ Creates a new `HTML::OSM` object with the provided coordinates and optional zoom
 - `height`
 
     Height (in pixels or using your own unit), the default is 400px.
+
+- `js_url`
+
+    Location of the JavaScript, default [https://unpkg.com/leaflet@1.9.4/dist/leaflet.js](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js).
 
 - `min_interval`
 
@@ -162,7 +177,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
     Much of the interface to `HTML::OSM` mimicks this for compatibility.
 
-- [Leaflet](https://metacpan.org/pod/Leaflet)
+- [https://leafletjs.com/](https://leafletjs.com/)
 
 You can find documentation for this module with the perldoc command.
 

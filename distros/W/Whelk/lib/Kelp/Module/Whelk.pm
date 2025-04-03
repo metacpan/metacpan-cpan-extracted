@@ -1,5 +1,5 @@
 package Kelp::Module::Whelk;
-$Kelp::Module::Whelk::VERSION = '1.02';
+$Kelp::Module::Whelk::VERSION = '1.03';
 use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;
@@ -152,12 +152,16 @@ sub _install_openapi
 		my $formatter = $formatter_class->new(app => $self->app);
 
 		$app->add_route(
-			[GET => $config->{path}] => sub {
-				my ($app) = @_;
+			[GET => $config->{path}] => {
+				to => sub {
+					my ($controller) = @_;
+					my $app = $controller->context->app;
 
-				my $generated = $self->openapi_generator->generate();
+					my $generated = $self->openapi_generator->generate();
 
-				return $formatter->format_response($app, $generated, 'openapi');
+					return $formatter->format_response($app, $generated, 'openapi');
+				},
+				name => 'whelk_openapi',
 			}
 		);
 	}

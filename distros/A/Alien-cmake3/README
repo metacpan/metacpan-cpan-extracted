@@ -1,10 +1,10 @@
 NAME
 
-    Alien::cmake3 - Find or download or build cmake 3 or better
+    Alien::cmake3 - Find or download or build cmake 3
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -34,8 +34,7 @@ SYNOPSIS
 DESCRIPTION
 
     This Alien distribution provides an external dependency on the build
-    tool cmake version 3.0.0 or better. cmake is a popular alternative to
-    autoconf.
+    tool cmake version 3.x.x. cmake is a popular alternative to autoconf.
 
 METHODS
 
@@ -76,7 +75,7 @@ SEE ALSO
 
 	It integrates better with Aliens that are based on that technology.
 
-      Alien::cmake3 will provide version 3.0.0 or better
+      Alien::cmake3 will provide version 3.x.x
 
 	Alien::CMake will provide 2.x.x on some platforms where more recent
 	binaries are not available.
@@ -106,8 +105,8 @@ ENVIRONMENT
 
 CAVEATS
 
-    If you do not have a system cmake of at least 3.0.0 available, then a
-    share install will be attempted.
+    If you do not have a system cmake version 3.x.x available, then a share
+    install will be attempted.
 
     Binary share installs are attempted on platforms for which the latest
     version of cmake are provided. As of this writing, this includes:
@@ -124,8 +123,8 @@ CAVEATS
 
     Install system version of cmake
 
-      If you can find an older version better than 3.0.0 that is supported
-      by your operating system.
+      If you can find an older version of cmake 3.x.x that is supported by
+      your operating system.
 
     Force a source code install
 
@@ -145,9 +144,11 @@ AUTHOR
 
     Adriano Ferreira (FERREIRA)
 
+    Dagfinn Ilmari Mannsåker (ilmari)
+
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2024 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

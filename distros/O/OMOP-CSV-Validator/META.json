@@ -61,7 +61,7 @@
          "web" : "https://github.com/mrueda/omop-csv-validator"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

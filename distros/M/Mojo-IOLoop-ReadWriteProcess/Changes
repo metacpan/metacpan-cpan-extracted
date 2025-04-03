@@ -1,6 +1,22 @@
 
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+1.1.0 2025-04-02T17:01:36Z
+ -  README: Update POD using minilla
+ -  Try to prevent warnings about Formatter
+ -  Update Build.PL and META.json with minilla 3.1.25
+ -  Remove obsolete dependency on TAP::Formatter::Color
+ -  Fix changelog
+
+1.0.0 2025-03-17 12:20:20Z
+ -  Various test fixes
+ -  Fix race condition in `is_running` when `kill_whole_group` is set
+ -  Fix handling process groups when initial process is not running anymore
+ -  Add Minilla to the ci target
+ -  Update minil.toml to have the harness arguments enabled
+ -  Mention syntactic sugar to help when debugging
+ -  Enable support for MacOSX (darwin)
+
 0.34 2023-09-18T15:47:18Z
  - Adapt to deprecation of spurt in upstream Mojolicious
  - Make git work in github workflow

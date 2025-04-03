@@ -9,7 +9,7 @@ use Text::CSV_XS;
 use Scalar::Util qw(looks_like_number);
 use Path::Tiny;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -106,16 +106,16 @@ sub _build_schema {
         required             => [],
         additionalProperties => 0,
     };
+
     for my $line ( grep /\S/, split /\n/, $cols_block ) {
-        $line         =~ s/^\s+|\s+$//g;
-        $line         =~ s/,$//;
-        next if $line =~ /^--/;            # skip comment lines
-                                           # Greedy match for the type
-        if ( $line =~
-            /^(\w+)\s+([A-Za-z]+)(?:\(\d+(?:,\d+)?\))?(?:\s+(NOT NULL))?/i )
-        {
-            my ( $col, $type, $notnull ) = ( lc $1, lc $2, defined $3 );
+        $line =~ s/^\s+|\s+$//g;
+        $line =~ s/,$//;
+        next if $line =~ /^--/;    # Skip comment lines
+
+        if ( $line =~ /^(\w+)\s+([A-Za-z]+)(?:\((\d+(?:,\d+)?)\))?(?:\s+(NOT NULL))?/i ) {
+            my ( $col, $type, $length, $notnull ) = ( lc $1, lc $2, $3, defined $4 );
             my $prop = {};
+
             if ( $type =~ /int/ ) {
                 $prop->{type} = 'integer';
             }
@@ -130,9 +130,19 @@ sub _build_schema {
                 $prop->{type}   = 'string';
                 $prop->{format} = 'date-time';
             }
+            elsif ( $type eq 'varchar' ) {
+                $prop->{type} = 'string';
+                if ( defined $length ) {
+                    # Capture only the first number if a comma is present (e.g., varchar(10,2))
+                    if ( $length =~ /^(\d+)/ ) {
+                        $prop->{maxLength} = int($1);
+                    }
+                }
+            }
             else {
                 $prop->{type} = 'string';
             }
+
             $schema->{properties}{$col} = $prop;
             push @{ $schema->{required} }, $col if $notnull;
         }

@@ -1,5 +1,5 @@
 package Whelk::Wrapper::WithStatus;
-$Whelk::Wrapper::WithStatus::VERSION = '1.02';
+$Whelk::Wrapper::WithStatus::VERSION = '1.03';
 use Kelp::Base 'Whelk::Wrapper';
 
 use Whelk::Schema;

@@ -341,11 +341,11 @@ time has limits. [See also](#lossy-undef-variable)
 
 Works like eval, but without [the lossy bug](#lossy-undef-variable)
 
-repl (
-    history\_file => "$ENV{HOME}/.runtime\_debugger.yml",
-    debug        => $ENV{RUNTIME\_DEBUGGER\_DEBUG} // 0,
-    levels\_up    => 0,
-);
+    repl (
+        history_file => "$ENV{HOME}/.runtime_debugger.yml",
+        debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
+        levels_up    => 0,
+    );
 
 Can specify the level at which to perform an eval
 in relation to the level of this function call:

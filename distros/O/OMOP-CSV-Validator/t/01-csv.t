@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use utf8;
 use lib 'lib';
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Path::Tiny;
-use JSON;
+use JSON::XS;
 use Text::CSV_XS;
 use JSON::Validator;
 
@@ -134,6 +134,22 @@ my $errors_obs_invalid =
 ok( scalar(@$errors_obs_invalid) > 0,
     'Invalid observation CSV returns errors' );
 
+# (5) Person invalid CSV due to varchar length violation:
+#     person_source_value exceeds 50 characters.
+my $person_invalid_varchar_csv = $sections{'CSV_person_invalid_varchar'} // '';
+my $errors_person_invalid_varchar =
+  validate_csv_from_text( $validator, $person_invalid_varchar_csv, $person_schema, ',' );
+ok( scalar(@$errors_person_invalid_varchar) > 0,
+    'Person CSV with varchar length violation returns errors' );
+
+# (6) Observation invalid CSV due to varchar length violation:
+#     value_as_string exceeds 60 characters.
+my $obs_invalid_varchar_csv = $sections{'CSV_observation_invalid_varchar'} // '';
+my $errors_obs_invalid_varchar =
+  validate_csv_from_text( $validator, $obs_invalid_varchar_csv, $obs_schema, ',' );
+ok( scalar(@$errors_obs_invalid_varchar) > 0,
+    'Observation CSV with varchar length violation returns errors' );
+
 done_testing();
 
 __DATA__
@@ -179,6 +195,11 @@ person_id,gender_concept_id,year_of_birth,month_of_birth,day_of_birth,birth_date
 A,8532,1963,12,31,"1966-12-31T00:00:00Z",8516,0,\N,\N,\N,source1,F,0,black,0,west_indian,0
 __END_CSV_person_invalid__
 
+__CSV_person_invalid_varchar__
+person_id,gender_concept_id,year_of_birth,month_of_birth,day_of_birth,birth_datetime,race_concept_id,ethnicity_concept_id,location_id,provider_id,care_site_id,person_source_value,gender_source_value,gender_source_concept_id,race_source_value,race_source_concept_id,ethnicity_source_value,ethnicity_source_concept_id
+2,8532,1963,12,31,"1966-12-31T00:00:00Z",8516,0,\N,\N,\N,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",F,0,black,0,west_indian,0
+__END_CSV_person_invalid_varchar__
+
 __CSV_observation_valid__
 observation_id,person_id,observation_date,observation_datetime,value_as_number,value_as_string
 1,1,1963-12-31,"1963-12-31T00:00:00Z",123.45,valid observation
@@ -188,3 +209,8 @@ __CSV_observation_invalid__
 observation_id,person_id,observation_date,observation_datetime,value_as_number,value_as_string
 X,1,1963-12-31,"not a timestamp",abc,invalid observation
 __END_CSV_observation_invalid__
+
+__CSV_observation_invalid_varchar__
+observation_id,person_id,observation_date,observation_datetime,value_as_number,value_as_string
+2,1,1963-12-31,"1963-12-31T00:00:00Z",123.45,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+__END_CSV_observation_invalid_varchar__

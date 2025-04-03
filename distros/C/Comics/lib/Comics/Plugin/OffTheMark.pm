@@ -7,14 +7,10 @@ package Comics::Plugin::OffTheMark;
 
 use parent qw(Comics::Fetcher::GoComics);
 
-our $VERSION = "0.02";
+our $VERSION = "1.02";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Off the mark",
-	  url     => "https://www.gocomics.com/off_the_mark",
-	} );
-}
+our $name    = "Off the mark";
+our $url     = "https://www.gocomics.com/offthemark";
 
 # Important: Return the package name!
 __PACKAGE__;

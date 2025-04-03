@@ -33,12 +33,14 @@ perl reorder-csv.pl -ddl-type postgresql --ddl DDL_FILE --input INPUT_CSV --outp
 - `--input`: Input CSV file (must include a header row).
 - `--output`: Output CSV file with columns reordered to match the DDL.
 - `--sep`: *(Optional)* Field separator character (defaults to tab `\t`).
+- `--table`: *(Optional)* Override the table name to look up in the DDL. If not provided, the script derives it from the CSV filename.
 - `--ddl-type`: Type of the DDL format. Supported values: `sqlite`, `postgresql` (required).
 
 ### Example
 
 ```bash
-perl reorder-csv.pl --ddl schema_postgres.sql --ddl-type postgresql --input PERSON.csv --output reordered_data.csv --sep ","
+perl reorder-csv.pl --ddl schema_postgres.sql --ddl-type postgresql --input PERSON.csv --output reordered_data.csv --sep $'\t'
+perl reorder-csv.pl --ddl schema_postgres.sql --ddl-type postgresql --input my_table.csv --output reordered_data.csv --sep $'\t' --table person
 ```
 
 ## Author 

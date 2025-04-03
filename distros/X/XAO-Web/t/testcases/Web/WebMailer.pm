@@ -386,7 +386,104 @@ sub test_mailer {
                 qr/\r/s,
             ],
         },
-
+        t12a => {
+            args    => {
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => "Hello",
+                'html.template' => "<h1>Header</h1>",
+                'header.a.name' => 'Extra-Header:',
+                'header.a.value'=> 'Some value',
+            },
+            regex   => [
+                qr/Extra-Header:\s+Some\svalue/,
+            ],
+        },
+        t12b => {
+            args    => {
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => "Hello",
+                'html.template' => "<h1>Header</h1>",
+                'header.1.name' => 'Extra-Header',
+                'header.1.value'=> 'Some value',
+                'header.2.name' => 'X-Extra-Header',
+                'header.2.value'=> 'Different value',
+            },
+            regex   => [
+                qr/Extra-Header:\s+Some\svalue/,
+                qr/X-Extra-Header:\s+Different\svalue/,
+            ],
+        },
+        t13 => {
+            args    => {
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => "Hello",
+                'html.template' => "<h1>Header</h1>",
+                one_click_unsubscribe => 'https://fubar.org/unsubscribe',
+            },
+            regex   => [
+                qr/List-Unsubscribe:\s+<https:\/\/fubar.org\/unsubscribe>/,
+                qr/List-Unsubscribe-Post:\s+List-Unsubscribe=One-Click/,
+            ],
+        },
+        # Unparsed templates
+        t14a => {
+            args    => {
+                'html.template' => q(HTML-<%MyAction mode='foo'%>-HTML),
+                'text.template' => q(TEXT-<%MyAction mode='foo'%>-TEXT),
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => 'SUBJECT-CONTENT',
+            },
+            regex   => [
+                qr/HTML-Got FOO-HTML/,
+                qr/TEXT-Got FOO-TEXT/,
+            ],
+        },
+        t14b => {
+            args    => {
+                'html.template' => q(HTML-<%MyAction mode='foo'%>-HTML),
+                'html.unparsed' => 1,
+                'text.template' => q(TEXT-<%MyAction mode='foo'%>-TEXT),
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => 'SUBJECT-CONTENT',
+            },
+            regex   => [
+                qr/HTML-<%MyAction mode='foo'%>-HTML/,
+                qr/TEXT-Got FOO-TEXT/,
+            ],
+        },
+        t14c => {
+            args    => {
+                'html.template' => q(HTML-<%MyAction mode='foo'%>-HTML),
+                'text.template' => q(TEXT-<%MyAction mode='foo'%>-TEXT),
+                'text.unparsed' => 1,
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => 'SUBJECT-CONTENT',
+            },
+            regex   => [
+                qr/HTML-Got FOO-HTML/,
+                qr/TEXT-<%MyAction mode='foo'%>-TEXT/,
+            ],
+        },
+        t14d => {
+            args    => {
+                'html.template' => q(HTML-<%MyAction mode='foo'%>-HTML),
+                'text.template' => q(TEXT-<%MyAction mode='foo'%>-TEXT),
+                'unparsed'      => 1,
+                to              => 'to@test.org',
+                from            => 'from@test.org',
+                subject         => 'SUBJECT-CONTENT',
+            },
+            regex   => [
+                qr/HTML-<%MyAction mode='foo'%>-HTML/,
+                qr/TEXT-<%MyAction mode='foo'%>-TEXT/,
+            ],
+        },
     );
 
     my $outfile=$self->{'outfile'};

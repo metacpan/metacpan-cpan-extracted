@@ -65,8 +65,10 @@ sub enable {
 sub _collect {
   my ($self, $pid, $status, $errno) = @_;
   my $p = $singleton->resolve($pid);
-  $p->emit('SIG_CHLD')->emit(collect_status => $pid => $status => $errno)
-    ->emit('collected')->emit('stop');
+  $p->emit('SIG_CHLD')
+    ->emit(collect_status => $pid => $status => $errno)
+    ->emit('collected')
+    ->emit('stop');
 }
 
 sub collect {

@@ -20,7 +20,7 @@ cd "${0%/*}/.."
 # just to make sure we are at the right location
 test -e tools/tidy || exit 1
 
-find -name '*.tdy' -delete
+find . -name '*.tdy' -delete
 
 find . \( -name '*.p[lm]' -o -name '*.t' \) -print0 | xargs -0 perltidy --pro=.../.perltidyrc
 

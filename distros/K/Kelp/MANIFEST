@@ -11,7 +11,7 @@ bin/kelp-generator
 conf/test.pl
 cpanfile
 dist.ini
-ex/router_bench.pl
+ex/perldoc.psgi
 lib/Kelp.pm
 lib/Kelp/Base.pm
 lib/Kelp/Context.pm

@@ -14,7 +14,11 @@ pod_spelling_system:
     - FERREIRA
     - Ferreira
     - macOS
-
+    - Dagfinn
+    - Ilmari
+    - Manns
+    - ilmari
+    - ker
 
 pod_coverage:
   skip: 0

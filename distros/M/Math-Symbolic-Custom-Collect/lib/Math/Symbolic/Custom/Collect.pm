@@ -15,7 +15,7 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
@@ -24,7 +24,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw/symbolic_complex/;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Derivative qw//;
@@ -1827,7 +1827,7 @@ sub prepare {
                 elsif ( ($val > 1) && ($val eq int($val)) ) {        
 
                     if ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') ) {
-                        $return_t = Math::Symbolic::Operator->new('^', $op1->value(), $val);
+                        $return_t = Math::Symbolic::Operator->new('^', $op1->new(), $op2->new());
                     }
                     else {
 

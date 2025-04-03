@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+4.05  2025-04-02T17:40:00+00:00
+      - Updated doc about color names of line.
+
 4.04  2025-03-29T06:00:00+00:00
       - Fixed empty link issue, thanks @GWS.
 

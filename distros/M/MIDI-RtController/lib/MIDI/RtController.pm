@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
 use Moo;
 use strictures 2;
@@ -178,7 +178,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,7 @@ Barrett AKA fuzzix).
 
 =head1 SEE ALSO
 
-The F<eg/*.pl> example programs
+The F<eg/*.pl> example programs!
 
 L<Future::AsyncAwait>
 

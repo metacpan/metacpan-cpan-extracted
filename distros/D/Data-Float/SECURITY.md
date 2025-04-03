@@ -1,12 +1,12 @@
 # Security Policy for the Data-Float distribution.
 
-Report issues via email at: Robert Rothenberg <rrwo@cpan.org>.
-
+Security vulnerabilities can be reported via the project GitHub
+repository [Security Advisories](https://github.com/robrwo/Data-Float/security/advisories).
 
 This is the Security Policy for Data-Float.
 
 This text is based on the CPAN Security Group's Guidelines for Adding
-a Security Policy to Perl Distributions (version 1.0.0)
+a Security Policy to Perl Distributions (version 1.2.0)
 https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability

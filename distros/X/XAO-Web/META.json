@@ -38,7 +38,7 @@
             "CGI::Cookie" : "4.5",
             "CGI::PSGI" : "0.15",
             "Crypt::Rijndael" : "1.13",
-            "Data::Entropy::Algorithms" : "0.007",
+            "Crypt::URandom" : "0.54",
             "Digest::Bcrypt" : "1.203",
             "Digest::MD5" : "2.13",
             "Digest::SHA" : "5.63",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/amaltsev/XAO-Web"
       }
    },
-   "version" : "1.91",
+   "version" : "1.93",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

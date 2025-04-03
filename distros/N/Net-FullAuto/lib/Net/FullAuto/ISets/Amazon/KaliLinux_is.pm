@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Amazon::KaliLinux_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2024  Brian M. Kelly
+#    Copyright © 2000-2025  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -91,7 +91,7 @@ my $install_dashboard_on_kalilinux=sub {
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ ©
 
 
-   Copyright © 2000-2024  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2025  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    if (defined $Net::FullAuto::FA_Core::dashboard) {

@@ -7,6 +7,7 @@ use warnings;
 
 use Carp;
 use CHI;
+use Config::Auto;
 use File::Slurp;
 use LWP::UserAgent;
 use JSON::MaybeXS;
@@ -19,11 +20,11 @@ HTML::OSM - A module to generate an interactive OpenStreetMap with customizable 
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -107,6 +108,17 @@ If latitude and/or longitude is undefined,
 the label is taken to be a location to be added.
 If no coordinates are provided, an error will be thrown.
 
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
+=item * C<css_url>
+
+Location of the CSS, default L<https://unpkg.com/leaflet@1.9.4/dist/leaflet.css>.
+
 =item * C<geocoder>
 
 An optional geocoder object such as L<Geo::Coder::List> or L<Geo::Coder::Free>.
@@ -114,6 +126,10 @@ An optional geocoder object such as L<Geo::Coder::List> or L<Geo::Coder::Free>.
 =item * C<height>
 
 Height (in pixels or using your own unit), the default is 400px.
+
+=item * C<js_url>
+
+Location of the JavaScript, default L<https://unpkg.com/leaflet@1.9.4/dist/leaflet.js>.
 
 =item * C<min_interval>
 
@@ -175,6 +191,15 @@ sub new
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	# Load the configuration from a config file, if provided
+	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
+		# my $config = YAML::XS::LoadFile($args{'config_file'});
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		%args = (%{$config}, %args);
+	}
+
 	if($args{'coordinates'} && !ref($args{'coordinates'})) {
 		Carp::croak(__PACKAGE__, ': coordinates must be a reference to an array');
 	}
@@ -198,6 +223,8 @@ sub new
 		zoom => $args{zoom} || 12,
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
+		css_url => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+		js_url => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
 		%args
 	}, $class;
 }
@@ -462,9 +489,12 @@ sub onload_render
 		$center_lon = ($min_lon + $max_lon) / 2;
 	}
 
+	my $css_url = $self->{'css_url'};
+	my $js_url = $self->{'js_url'};
+
 	my $head = qq{
-			<link rel="stylesheet" href="https://unpkg.com/leaflet\@1.7.1/dist/leaflet.css" />
-			<script src="https://unpkg.com/leaflet\@1.7.1/dist/leaflet.js"></script>
+			<link rel="stylesheet" href="$css_url" />
+			<script src="$js_url"></script>
 			<style>
 				#map { width: $width; height: $height; }
 				#search-box { margin: 10px; padding: 5px; }
@@ -492,7 +522,7 @@ sub onload_render
 		my ($lat, $lon, $label, $icon_url) = @$coord;
 		$label =~ s/'/\\'/g;	# Escape single quotes
 
-		# $icon_url ||= 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png';
+		# $icon_url ||= 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/$leaflet_version/images/marker-icon.png';
 		if ($icon_url) {
 			my $icon_js = qq{
 				const customIcon = L.icon({
@@ -625,7 +655,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Much of the interface to C<HTML::OSM> mimicks this for compatibility.
 
-=item * L<Leaflet>
+=item * L<https://leafletjs.com/>
 
 =back
 

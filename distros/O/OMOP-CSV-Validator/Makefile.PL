@@ -30,11 +30,11 @@ WriteMakefile(
         'JSON::XS'                       => '4.03',
         'Path::Tiny'                     => '0.144',
         'Text::CSV_XS'                   => '1.50',
-        'JSON::Validator'                => '5.14',
+        'JSON::Validator'                => '5.14'
     },
     EXE_FILES     => ['bin/omop-csv-validator','utils/reorder-csv.pl'],
     TEST_REQUIRES => {
-        'Test::More'      => '1.30',
+        'Test::More'      => '1.30'
     },
     test               => { TESTS => 't/*.t' },
     CONFIGURE_REQUIRES => {

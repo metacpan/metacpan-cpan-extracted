@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Integer;
-$Whelk::Schema::Definition::Integer::VERSION = '1.02';
+$Whelk::Schema::Definition::Integer::VERSION = '1.03';
 use Whelk::StrictBase 'Whelk::Schema::Definition::Number';
 
 sub openapi_dump

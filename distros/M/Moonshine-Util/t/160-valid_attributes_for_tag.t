@@ -131,7 +131,8 @@ moon_test_one(
           'property',
           'resource',
           'typeof',
-          'vocab'
+          'vocab',
+	  'slot'
         ],
 );
 
@@ -264,7 +265,8 @@ moon_test_one(
           'property',
           'resource',
           'typeof',
-          'vocab'
+          'vocab',
+	  'slot'
         ],
 );
 

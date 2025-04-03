@@ -17,6 +17,17 @@ use Mojo::IOLoop::ReadWriteProcess::Container   qw(container);
 use Mojo::Util 'monkey_patch';
 use Mojo::IOLoop::ReadWriteProcess::Namespace;
 
+eval {
+  die "OS Unsupported: " . $^O if ($^O !~ m#(?i)(Linux)#);
+  my $try_cgroup
+    = cgroupv1(controller => 'pids', name => 'group')->child('test')->create;
+  die unless $try_cgroup->exists();
+};
+
+plan skip_all =>
+  "This test works only if you have cgroups permissions or a supported OS"
+  if $@;
+
 sub mock_test {
   my $c = shift;
   my @pids;
@@ -29,7 +40,7 @@ sub mock_test {
 
   attempt {
     attempts  => 20,
-    condition => sub { defined $cgroups->first->process_list },
+    condition => sub { $cgroups->first->process_list // '' =~ /\d+/ },
     cb        => sub { sleep 1; }
   };
 

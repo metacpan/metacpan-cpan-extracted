@@ -1,4 +1,6 @@
 Changes
+examples/pod_examples_1.pl
+examples/pod_examples_2.pl
 ignore.txt
 lib/Math/Symbolic/Custom/Polynomial.pm
 Makefile.PL

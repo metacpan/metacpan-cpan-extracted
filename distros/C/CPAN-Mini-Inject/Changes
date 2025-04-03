@@ -1,6 +1,12 @@
 Revision history for CPAN-Mini-Inject
 
+1.012 2025-04-03T04:07:45Z
+	* fix a documentation nit with add() (GitHub #21)
+
 1.011 2025-02-13T02:38:03Z
+	* HTTP::Daemon and Net::EmptyPort are no longer prereqs and are
+	moved to TEST_REQUIRES. If they are not present, those tests that
+	use them will be skipped (#7)
 	* you can now inject into an empty directory. Previously the module
 	would throw an error about a missing 02packages file. Now the module
 	just ignores that missing file and will recreate it. (#9)
@@ -11,7 +17,7 @@ Revision history for CPAN-Mini-Inject
 	edit the same file at the same time (#18)
 	* error messages now include the name of the program and the names of
 	any files involved. If you are testing for certain strings, you should
-	check for the new strings. 
+	check for the new strings.
 
 1.009_01 2025-02-01T18:02:55Z
 	* create 02packages as a temp file first, then move it into place.
@@ -23,7 +29,7 @@ Revision history for CPAN-Mini-Inject
 	correctly.
 
 1.007 2025-01-16T21:09:23Z
-	
+
 	* pass CPAN::Mini config parameters to CPAN::Mini while calling
 	update (#16)
 
@@ -47,7 +53,7 @@ Revision history for CPAN-Mini-Inject
 	* some small refactorings and doc improvements
 
 1.004_02 2024-07-30T10:51:40Z
-	* override some of CPAN::Meta::Converter so it doesn't change the 
+	* override some of CPAN::Meta::Converter so it doesn't change the
 	version string. This was exposed by an edge case like v1.2.3_4 where
 	the numified and string versions are different. CPAN::Mini::Inject will
 	use the original string version that the distribution declared. (GitHub #11)

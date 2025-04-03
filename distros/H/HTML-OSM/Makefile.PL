@@ -22,12 +22,13 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'CHI' => 0,
+		'Config::Auto' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Slurp' => 0,
 		'LWP::UserAgent' => 0,
 		'JSON::MaybeXS' => 0,
 		'Scalar::Util' => 0,
-		'Time::HiRes' => 0,
+		'Time::HiRes' => 0
 	},
 	META_MERGE => {
 		resources => {
@@ -42,9 +43,11 @@ WriteMakefile(
 		},
 	},
 	TEST_REQUIRES => {
+		'File::Temp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::HTML::Lint' => 0,
+		'Test::HTTPStatus' => 0,
 		'Test::JSON' => 0,
 		'Test::MockObject' => 0,
 		'Test::Most' => 0,

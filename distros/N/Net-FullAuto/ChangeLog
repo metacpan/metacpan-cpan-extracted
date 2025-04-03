@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2024  Brian M. Kelly
+#    Copyright © 2000-2025  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -19,9 +19,17 @@
 #
 #######################################################################
 
+2025-04-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000817 released
+
+	* Added Safe::Isa and YAML::PPI to Makefile.PL
+
+	* Updated Copyright to 2025
+
 2024-12-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
-        * Version 1.0000815 released
+        * Version 1.0000816 released
 
 	* Fixed Makefile.PL for BerkeleyDB reinstall
 

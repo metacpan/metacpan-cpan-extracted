@@ -129,8 +129,8 @@ sub start {
     $self->process->diag("Starting container");
     $self->process->diag("\tName: " . $self->name)   if defined $self->name;
     $self->process->diag("\tGroup: " . $self->group) if defined $self->group;
-    $self->cgroups->each(sub { $self->process->diag("CGroup: " . $_->_cgroup) }
-    );
+    $self->cgroups->each(
+      sub { $self->process->diag("CGroup: " . $_->_cgroup) });
   }
 
   local ($@, $!);

@@ -1,6 +1,6 @@
 package Map::Tube::Cookbook;
 
-$Map::Tube::Cookbook::VERSION   = '4.04';
+$Map::Tube::Cookbook::VERSION   = '4.05';
 $Map::Tube::Cookbook::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Cookbook - Cookbook for Map::Tube library.
 
 =head1 VERSION
 
-Version 4.04
+Version 4.05
 
 =cut
 
@@ -248,7 +248,7 @@ terminology, which straightforwardly translates into JSON.)
 
 =item * The C<color> attribute MAY specify the color which graphical representations of the map
         SHOULD use for this line. The value MUST be either a color in HTML-style triple-hexadecimal
-        code (C<#RRGGBB>) or one of a set of color names predefined by L<Map::Tube::Utils> (q.v.).
+        code (C<#RRGGBB>) or one of a set of color names predefined in C<share/color-names.txt>.
 
 =item * Under the C<< <stations> >> element, there MUST be two or more C<< <station> >> elements,
         each completely defining one tube station.

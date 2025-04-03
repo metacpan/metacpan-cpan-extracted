@@ -1,5 +1,5 @@
 ---
-abstract: 'Find or download or build cmake 3 or better'
+abstract: 'Find or download or build cmake 3'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -18,7 +18,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-cmake3/issues
   homepage: https://metacpan.org/pod/Alien::cmake3
   repository: git://github.com/PerlAlien/Alien-cmake3.git
-version: '0.08'
+version: '0.09'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -42,6 +42,7 @@ x_alienfile:
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
@@ -50,7 +51,8 @@ x_alienfile:
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Adriano Ferreira (FERREIRA)'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  - 'Dagfinn Ilmari Mannsåker (ilmari)'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

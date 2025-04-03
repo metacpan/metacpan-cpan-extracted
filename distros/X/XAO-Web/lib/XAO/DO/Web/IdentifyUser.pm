@@ -401,7 +401,7 @@ Now, let us look at some examples that show how each mode works.
 package XAO::DO::Web::IdentifyUser;
 use strict;
 use Authen::SASL::SASLprep qw(saslprep);
-use Data::Entropy::Algorithms qw(rand_bits);
+use Crypt::URandom qw();
 use Digest::Bcrypt qw();
 use Digest::MD5 qw(md5_base64);
 use Digest::SHA qw(sha1_base64 sha256_base64);
@@ -2088,7 +2088,7 @@ sub data_password_encrypt ($@) {
 
             $cost||=8;  # About 15ms per digest on Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz
 
-            $salt_bits=rand_bits(16*8);
+            $salt_bits=Crypt::URandom::urandom(16);
 
             $salt=sprintf('%u-%s',$cost,substr(encode_base64($salt_bits,''),0,22));
         }

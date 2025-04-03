@@ -14,6 +14,9 @@ use builder::custom;
 use File::Basename;
 use File::Spec;
 
+die "OS unsupported\n" if $^O eq "MSWin32";
+die "OS unsupported\n" if $^O eq "cygwin";
+
 my %args = (
     license              => 'perl_5',
     dynamic_config       => 0,
@@ -39,6 +42,7 @@ my %args = (
     test_requires => {
         'Test::Exception' => '0',
         'Test::More' => '0',
+        'Test::Pod' => '0',
     },
 
     name            => 'Mojo-IOLoop-ReadWriteProcess',
@@ -51,6 +55,7 @@ my %args = (
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
     recursive_test_files => 1,
 
+    tap_harness_args => {"merge" => 1},
 
 );
 if (-d 'share') {

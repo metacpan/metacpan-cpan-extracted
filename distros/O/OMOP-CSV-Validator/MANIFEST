@@ -1,5 +1,6 @@
 .gitignore
 bin/omop-csv-validator
+Changes
 cpanfile
 lib/OMOP/CSV/Validator.pm
 LICENSE

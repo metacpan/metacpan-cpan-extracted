@@ -102,7 +102,7 @@ WriteMakefile(
         'CGI::Cookie'               => 4.50,
         'CGI::PSGI'                 => 0.15,
         'Crypt::Rijndael'           => 1.13,
-        'Data::Entropy::Algorithms' => 0.007,
+        'Crypt::URandom'            => 0.54,
         'Digest::Bcrypt'            => 1.203,
         'Digest::MD5'               => 2.13,
         'Digest::SHA'               => 5.63,

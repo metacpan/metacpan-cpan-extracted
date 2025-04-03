@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Types;
-$MIDI::Drummer::Tiny::Types::VERSION = '0.6006';
+$MIDI::Drummer::Tiny::Types::VERSION = '0.6008';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Type library for MIDI::Drummer::Tiny
@@ -10,25 +10,19 @@ use warnings;
 use Type::Library
     -extends => [ qw(
         Types::MIDI
-        Types::Common::Numeric
+        Types::Music
         Types::Common::String
     ) ],
     -declare => qw(
-        BPM
         Duration
+        MIDI_File
+        Soundfont_File
     );
 use Type::Utils -all;
+use Types::Standard   qw(FileHandle);
+use Types::Path::Tiny qw(File Path);
 
 use MIDI::Util qw(midi_dump);
-
-#pod =type BPM
-#pod
-#pod A L<positive number|Types::Common::Numeric/PositiveNum> expressing
-#pod beats per minute.
-#pod
-#pod =cut
-
-declare BPM, as PositiveNum;
 
 #pod =type Duration
 #pod
@@ -39,6 +33,22 @@ declare BPM, as PositiveNum;
 
 my %length = %{ midi_dump('length') };
 declare Duration, as NonEmptyStr, where { exists $length{$_} };
+
+#pod =type MIDI_File
+#pod
+#pod The name of the MIDI file to be written.
+#pod
+#pod =cut
+
+declare MIDI_File, as NonEmptyStr | Path | FileHandle;
+
+#pod =type Soundfont_File
+#pod
+#pod The name of the MIDI soundfont file to use.
+#pod
+#pod =cut
+
+declare Soundfont_File, as NonEmptyStr | File;
 
 1;
 
@@ -54,19 +64,22 @@ MIDI::Drummer::Tiny::Types - Type library for MIDI::Drummer::Tiny
 
 =head1 VERSION
 
-version 0.6006
+version 0.6008
 
 =head1 TYPES
-
-=head2 BPM
-
-A L<positive number|Types::Common::Numeric/PositiveNum> expressing
-beats per minute.
 
 =head2 Duration
 
 A L<non-empty string|Types::Common::String/Types> corresponding to
 a L<duration in MIDI::Simple|MIDI::Simple/"Parameters for n/r/noop">.
+
+=head2 MIDI_File
+
+The name of the MIDI file to be written.
+
+=head2 Soundfont_File
+
+The name of the MIDI soundfont file to use.
 
 =head1 AUTHOR
 

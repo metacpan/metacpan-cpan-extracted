@@ -1,6 +1,45 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 086643a88db8ddea22fa2688f936744efe6e0ea6
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Apr 2 18:59:13 2025 -0700
+
+    v1.93 Added 'unparsed' options to Web::Mailer
+    
+    It is convenient sometimes to use with pre-processed templates.
+
+commit df482c7fc65b5fbd02f8d14192fd52d92492c585
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Apr 2 17:46:18 2025 -0700
+
+    v1.92 List-unsubscribe & extra headers in Mailer
+    
+    Added support for providing extra headers to emails, and an easy way to
+    add RFC-8058 one click unsubscribe links.
+
+commit 1f8e98ccdc72bd64aca6dad2a7c35c876a9c86f9
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Apr 2 15:44:22 2025 -0700
+
+    Replaced Data::Entropy with Crypt::URandom
+    
+    The Data::Entropy is deprecated. I got the email below from Robert
+    Rothenberg:
+    
+    > XAO::DO::Web::IdentifyUser uses Data::Entropy, which defaults to using
+    > the builtin rand() function before version 0.008. See CVE 2025-1860.
+    >
+    > At a minimum you should update the base version or Data::Entropy
+    > that is required to v0.008, but the module is now deprecated, so I
+    > recommend that you use something else, such as Crypt::URandom.
+
+commit b82c260d3030d0b1e616c93efe3eb429f1b8dccf
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon May 22 14:50:01 2023 -0700
+
+    SEFL tracking numbers don't work with dashes
+
 commit 4e0e5603ab6094699db5bca768ba98163fc6d94c
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Mon May 22 14:37:26 2023 -0700
@@ -46,40 +85,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Apr 8 19:04:06 2022 -0700
 
     1.88 Added array operations to Web::Clipboard
-
-commit 888d6b90c512e5f0e62f96a1fd7f7fd2e471f37a
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Jun 8 14:53:36 2021 -0700
-
-    1.87 Filtering out %00 in CgiParam
-
-commit 7211a2637c489b576834c2d60154b0358f2dae5b
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Sep 22 17:47:52 2020 -0700
-
-    1.86: Fixed subtle bugin 1.85 (json object caching)
-    
-    Since 1.85 returned a cached JSON object and then could call utf8(0)
-    on it when embedding that effectively switched the cached object to
-    character mode.
-    
-    This can also happen in client code and there is no easy way to protect
-    the cached object, so removed the caching completely.
-
-commit dd29f042210768b0a92608a66576e68e5949a7af
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Sep 22 16:45:21 2020 -0700
-
-    v1.85 Made it possible to output sorted "canonical" JSON
-    
-    This is useful for stabilizing output, making it unchanged on the same
-    data from one run to another.
-
-commit 20dd1d3bc5b811503f5722a16037b60197fe7ef4
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Thu Sep 17 20:22:22 2020 -0700
-
-    1.84 Security fix for json-embed in Web::Action
-    
-    Encoding <> characters in json output
 

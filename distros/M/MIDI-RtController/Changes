@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0602 2025-04-03 00:21:43
+    - Add the eg/control_change.pl program to illustrate control-change.
+
 0.0601 2025-03-22 15:58:57
     - Fix lingering artifacts.
 

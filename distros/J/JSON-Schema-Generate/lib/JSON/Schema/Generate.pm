@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.11';
+use 5.006; use strict; use warnings; our $VERSION = '0.12';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -118,7 +118,7 @@ sub _build_props {
 		}
 		for my $key (sort keys %{$data}) {
 			$props->{required}->{$key}++ unless $self->{none_required};
-			my $id = $path . '/properties/' . $key;
+			my $id = $path . ( $path eq '#' ? '' : '-' ) . 'properties-' . $key;
 			unless ($props->{properties}{$key}) {
 				$props->{properties}{$key} = _tie_hash();
 				%{$props->{properties}{$key}} = (
@@ -132,7 +132,7 @@ sub _build_props {
 		}
 	} elsif ($ref eq 'ARRAY') {
 		$self->_add_type($props, 'array');
-		my $id = $path . '/items';
+		my $id = $path . '-items';
 		unless ($props->{items}) {
 			$props->{items} = _tie_hash();
 			$props->{items}{'$id'} = $id unless $self->{no_id};
@@ -204,7 +204,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -245,14 +245,31 @@ Version 0.11
 
 	...
 
+	use JSON::Schema::Draft201909;
 	my $schema = JSON::Schema::Generate->new(
 		no_id => 1
 	)->learn($data)->generate(1);
 
-	use JSON::Schema::Draft201909;
-
 	$js = JSON::Schema::Draft201909->new;
 	$result = $js->evaluate_json_string($data, $schema);
+
+	...
+
+	use JSON::Schema::Modern;
+
+	$data = json_decode($data);
+
+	my $schema = JSON::Schema::Generate->new(
+		id => 'https://flat.world-wide.world/schema',
+		title => '...'
+		description => '...',
+	)->learn($data)->generate(1);
+
+	$js = JSON::Schema::Modern->new(
+		specification_version => 'draft2020-12',
+	);
+
+	$result = $js->evaluate($data, $schema);
 
 
 =head1 DESCRIPTION
@@ -470,7 +487,7 @@ Will generate the following schema:
 		],
 		"properties" : {
 			"asciiname" : {
-				"$id" : "#/properties/asciiname",
+				"$id" : "#properties-asciiname",
 				"title" : "The Asciiname Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -480,7 +497,7 @@ Will generate the following schema:
 				]
 			},
 			"city" : {
-				"$id" : "#/properties/city",
+				"$id" : "#properties-city",
 				"title" : "The City Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -489,7 +506,7 @@ Will generate the following schema:
 				]
 			},
 			"country" : {
-				"$id" : "#/properties/country",
+				"$id" : "#properties-country",
 				"title" : "The Country Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -498,7 +515,7 @@ Will generate the following schema:
 				]
 			},
 			"email" : {
-				"$id" : "#/properties/email",
+				"$id" : "#properties-email",
 				"title" : "The Email Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : [
@@ -506,7 +523,7 @@ Will generate the following schema:
 					"string"
 				],
 				"items" : {
-					"$id" : "#/properties/email/items",
+					"$id" : "#properties-email-items",
 					"title" : "The Items Schema",
 					"description" : "An explanation about the purpose of this instance.",
 					"type" : "string",
@@ -519,7 +536,7 @@ Will generate the following schema:
 				]
 			},
 			"gravatar_url" : {
-				"$id" : "#/properties/gravatar_url",
+				"$id" : "#properties-gravatar_url",
 				"title" : "The Gravatar_url Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -529,7 +546,7 @@ Will generate the following schema:
 				]
 			},
 			"is_pause_custodial_account" : {
-				"$id" : "#/properties/is_pause_custodial_account",
+				"$id" : "#properties-is_pause_custodial_account",
 				"title" : "The Is_pause_custodial_account Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "boolean",
@@ -539,7 +556,7 @@ Will generate the following schema:
 				]
 			},
 			"links" : {
-				"$id" : "#/properties/links",
+				"$id" : "#properties-links",
 				"title" : "The Links Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "object",
@@ -571,7 +588,7 @@ Will generate the following schema:
 				],
 				"properties" : {
 					"backpan_directory" : {
-						"$id" : "#/properties/links/properties/backpan_directory",
+						"$id" : "#properties-links-properties-backpan_directory",
 						"title" : "The Backpan_directory Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -581,7 +598,7 @@ Will generate the following schema:
 						]
 					},
 					"cpan_directory" : {
-						"$id" : "#/properties/links/properties/cpan_directory",
+						"$id" : "#properties-links-properties-cpan_directory",
 						"title" : "The Cpan_directory Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -591,7 +608,7 @@ Will generate the following schema:
 						]
 					},
 					"cpantesters_matrix" : {
-						"$id" : "#/properties/links/properties/cpantesters_matrix",
+						"$id" : "#properties-links-properties-cpantesters_matrix",
 						"title" : "The Cpantesters_matrix Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -601,7 +618,7 @@ Will generate the following schema:
 						]
 					},
 					"cpantesters_reports" : {
-						"$id" : "#/properties/links/properties/cpantesters_reports",
+						"$id" : "#properties-links-properties-cpantesters_reports",
 						"title" : "The Cpantesters_reports Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -611,7 +628,7 @@ Will generate the following schema:
 						]
 					},
 					"cpants" : {
-						"$id" : "#/properties/links/properties/cpants",
+						"$id" : "#properties-links-properties-cpants",
 						"title" : "The Cpants Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -621,7 +638,7 @@ Will generate the following schema:
 						]
 					},
 					"metacpan_explorer" : {
-						"$id" : "#/properties/links/properties/metacpan_explorer",
+						"$id" : "#properties-links-properties-metacpan_explorer",
 						"title" : "The Metacpan_explorer Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "string",
@@ -633,7 +650,7 @@ Will generate the following schema:
 				}
 			},
 			"name" : {
-				"$id" : "#/properties/name",
+				"$id" : "#properties-name",
 				"title" : "The Name Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -643,7 +660,7 @@ Will generate the following schema:
 				]
 			},
 			"pauseid" : {
-				"$id" : "#/properties/pauseid",
+				"$id" : "#properties-pauseid",
 				"title" : "The Pauseid Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -653,7 +670,7 @@ Will generate the following schema:
 				]
 			},
 			"region" : {
-				"$id" : "#/properties/region",
+				"$id" : "#properties-region",
 				"title" : "The Region Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -662,7 +679,7 @@ Will generate the following schema:
 				]
 			},
 			"release_count" : {
-				"$id" : "#/properties/release_count",
+				"$id" : "#properties-release_count",
 				"title" : "The Release_count Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "object",
@@ -685,7 +702,7 @@ Will generate the following schema:
 				],
 				"properties" : {
 					"backpan-only" : {
-						"$id" : "#/properties/release_count/properties/backpan-only",
+						"$id" : "#properties-release_count-properties-backpan-only",
 						"title" : "The Backpan-only Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "integer",
@@ -695,7 +712,7 @@ Will generate the following schema:
 						]
 					},
 					"cpan" : {
-						"$id" : "#/properties/release_count/properties/cpan",
+						"$id" : "#properties-release_count-properties-cpan",
 						"title" : "The Cpan Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "integer",
@@ -705,7 +722,7 @@ Will generate the following schema:
 						]
 					},
 					"latest" : {
-						"$id" : "#/properties/release_count/properties/latest",
+						"$id" : "#properties-release_count-properties-latest",
 						"title" : "The Latest Schema",
 						"description" : "An explanation about the purpose of this instance.",
 						"type" : "integer",
@@ -717,7 +734,7 @@ Will generate the following schema:
 				}
 			},
 			"updated" : {
-				"$id" : "#/properties/updated",
+				"$id" : "#properties-updated",
 				"title" : "The Updated Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "string",
@@ -726,12 +743,12 @@ Will generate the following schema:
 				]
 			},
 			"website" : {
-				"$id" : "#/properties/website",
+				"$id" : "#properties-website",
 				"title" : "The Website Schema",
 				"description" : "An explanation about the purpose of this instance.",
 				"type" : "array",
 				"items" : {
-					"$id" : "#/properties/website/items",
+					"$id" : "#properties-website-items",
 					"title" : "The Items Schema",
 					"description" : "An explanation about the purpose of this instance.",
 					"type" : "string",

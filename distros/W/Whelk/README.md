@@ -1,6 +1,6 @@
 <div align="center" width="100%">
     <p><img width="80%" src="https://raw.githubusercontent.com/Kelp-framework/Art/master/whelk/logo_wide.png" alt="logo"></p>
-    <p><b>A friendly web API framework</b></p>
+    <p><b>A fortified web API framework</b></p>
 </div>
 
 Whelk is an API framework designed to build self-documenting, correct and

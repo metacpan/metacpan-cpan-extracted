@@ -28,7 +28,7 @@ WriteMakefile(
     'META_MERGE'  => {
         resources    => {
             repository => 'git://github.com/robrwo/Data-Float.git',
-            bugtracker => "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Float",
+            bugtracker => 'https://github.com/robrwo/Data-Float/issues',
         },
     }
 );

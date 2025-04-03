@@ -41,10 +41,10 @@ sub acquire {
   my %args = @_ % 2 == 0 ? @_ : @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : ();
 
   # Defaults
-  $args{'sem'}  = 0  unless defined($args{'sem'});
-  $args{'wait'} = 0  unless defined($args{'wait'});
+  $args{'sem'}  =  0 unless defined($args{'sem'});
+  $args{'wait'} =  0 unless defined($args{'wait'});
   $args{'max'}  = -1 unless defined($args{'max'});
-  $args{'undo'} = 0  unless defined($args{'undo'});
+  $args{'undo'} =  0 unless defined($args{'undo'});
   warn "[debug:$$] Acquire semaphore " . $self->key if DEBUG;
 
   my $sem   = $self->_sem;

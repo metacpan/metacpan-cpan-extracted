@@ -1,5 +1,9 @@
 Revision history for Whelk
 
+1.03 - 2025-04-03
+	- OpenAPI endpoint will now correctly get the app object from context (in controller environment)
+	- OpenAPI endpoint now has a name 'whelk_openapi' in the router
+
 1.02 - 2025-03-04
 	- Added response_code to endpoint definition, which changes success code in generated OpenAPI
 	- Added 'schemas' method to resources as a special method executed before 'api' method is executed

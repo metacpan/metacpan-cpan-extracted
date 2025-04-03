@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Empty;
-$Whelk::Schema::Definition::Empty::VERSION = '1.02';
+$Whelk::Schema::Definition::Empty::VERSION = '1.03';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 sub inhale

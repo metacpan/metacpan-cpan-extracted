@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Type::Library" => 0,
     "Type::Utils" => 0,
     "Types::MIDI" => "0.601.0",
+    "Types::Music" => "0.0104",
     "Types::Path::Tiny" => 0,
     "Types::Standard" => 0,
     "constant" => 0,
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Output" => "0.04"
   },
-  "VERSION" => "0.6006",
+  "VERSION" => "0.6008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +77,7 @@ my %FallbackPrereqs = (
   "Type::Library" => 0,
   "Type::Utils" => 0,
   "Types::MIDI" => "0.601.0",
+  "Types::Music" => "0.0104",
   "Types::Path::Tiny" => 0,
   "Types::Standard" => 0,
   "constant" => 0,

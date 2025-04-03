@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::_Scalar;
-$Whelk::Schema::Definition::_Scalar::VERSION = '1.02';
+$Whelk::Schema::Definition::_Scalar::VERSION = '1.03';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?required' => sub { !$_[0]->has_default };

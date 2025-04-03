@@ -33,11 +33,15 @@ probe sub {
     if($old_cmake_version)
     {
       my($major) = $old_cmake_version =~ /^([0-9])\./;
-      if($major >= 3)
+      if($major == 3)
       {
         $build->install_prop->{my_old_cmake_use} = 1;
         $build->log("GOOD found cmake version $old_cmake_version");
         return 'system' unless $ENV{ALIEN_CMAKE_FROM_SOURCE};
+      }
+      elsif ($major > 3)
+      {
+        $build->log("TOO NEW found cmake version $old_cmake_version");
       }
       else
       {
@@ -110,7 +114,7 @@ share {
   {
     start_url 'https://cmake.org/download/';
     plugin Download => (
-      filter  => qr/^cmake-[0-9\.]+-\Q$binary_release_name\E\.\Q$binary_format\E$/,
+      filter  => qr/^cmake-3\.[0-9\.]+-\Q$binary_release_name\E\.\Q$binary_format\E$/,
       version => qr/([0-9\.]+)/,
       ($^O eq 'MSWin32' ? (bootstrap_ssl => 1) : ()),
     );
@@ -147,7 +151,7 @@ share {
   {
     start_url 'https://cmake.org/download/';
     plugin Download => (
-      filter  => qr/^cmake-[0-9\.]+\.tar.gz$/,
+      filter  => qr/^cmake-3\.[0-9\.]+\.tar.gz$/,
       version => qr/([0-9\.]+)/,
     );
     plugin Extract => 'tar.gz';

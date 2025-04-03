@@ -14,8 +14,8 @@ our @EXPORT_OK = (qw/left_trim_ws right_trim_ws trim_ws trim_ws_lines trim_blank
 elide append_str prepend_str join_class assert_valid_html5_tag valid_attributes_for_tag/); 
 
 our %EXPORT_TAGS = (
-    base => \@EXPORT,
-    all  => \@EXPORT_OK,
+	base => \@EXPORT,
+	all  => \@EXPORT_OK,
 );
 
 =head1 NAME
@@ -24,137 +24,137 @@ Moonshine::Util - Utils
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
 =head1 EXPORT
 
-    use Moonshine::Util "trim_blank_ws_lines" => { -as => "tbwl" };
+	use Moonshine::Util "trim_blank_ws_lines" => { -as => "tbwl" };
 
 =head1 SUBROUTINES/METHODS
 
 =head2 assert_valid_html5_tag
 
-    assert_valid_html5_tag('span');
+	assert_valid_html5_tag('span');
 
 =cut
 
 sub assert_valid_html5_tag {
-    return $isHTML5{$_[0]} ? 1 : 0;
+	return $isHTML5{$_[0]} ? 1 : 0;
 }
 
 =head2 valid_attributes_for_tag 
-    
-    valid_attributes_for_tag('a');
-    valid_attributes_for_tag('a', standard => 'html5')
-    
+	
+	valid_attributes_for_tag('a');
+	valid_attributes_for_tag('a', standard => 'html5')
+	
 Returns an array reference containing all valid attributes for the specified html tag.
 
 =cut
 
 sub valid_attributes_for_tag {
-    return attributes(@_);
+	return attributes(@_);
 }
 
 =head2 left_trim_ws
-    
-    left_trim_ws($string)
+	
+	left_trim_ws($string)
 
 =cut
 
 sub left_trim_ws {
-    return String::Trim::More::ltrim(@_);
+	return String::Trim::More::ltrim(@_);
 }
 
 =head2 right_trim_ws
 
-    right_trim_ws($string)
+	right_trim_ws($string)
 
 =cut
 
 sub right_trim_ws {
-    return String::Trim::More::rtrim(@_);
+	return String::Trim::More::rtrim(@_);
 }
 
 =head2 trim_ws
 
-    trim_ws($string)
+	trim_ws($string)
 
 =cut
 
 sub trim_ws {
-    return String::Trim::More::trim(@_);
+	return String::Trim::More::trim(@_);
 }
 
 =head2 trim_ws_lines
 
-    trim_ws_line($multi_line_str);
+	trim_ws_line($multi_line_str);
 
 =cut
 
 sub trim_ws_lines {
-    return String::Trim::More::trim_lines(@_);
+	return String::Trim::More::trim_lines(@_);
 }
 
 =head2 trim_blank_ws_lines
 
-    trim_ws_line($multi_line_str);
+	trim_ws_line($multi_line_str);
 
 =cut
 
 sub trim_blank_ws_lines {
-    return String::Trim::More::trim_blank_lines(@_);
+	return String::Trim::More::trim_blank_lines(@_);
 }
 
 =head2 ellipsis
 
-    ellipsis($str);
+	ellipsis($str);
 
 =cut
 
 sub ellipsis {
-    return String::Trim::More::ellipsis(@_);
+	return String::Trim::More::ellipsis(@_);
 }
 
 =head2 prepend_str
 
-    prepend_str($str_exists, $str_might_not);
+	prepend_str($str_exists, $str_might_not);
 
 =cut
 
 sub prepend_str {
-    return defined $_[1] ? sprintf '%s %s', $_[1], $_[0] : $_[0];
+	return defined $_[1] ? sprintf '%s %s', $_[1], $_[0] : $_[0];
 }
 
 =head2 append_str
 
-    append_str($str_exists, $str_might_not);
+	append_str($str_exists, $str_might_not);
 
 =cut
 
 sub append_str {
-    return defined $_[1] ? sprintf '%s %s', $_[0], $_[1] : $_[0];
+	return defined $_[1] ? sprintf '%s %s', $_[0], $_[1] : $_[0];
 }
 
 =head2 join_class
 
-    join_class($class_exists, $class_might_not);
+	join_class($class_exists, $class_might_not);
 
 =cut
 
 sub join_class {
-    defined $_[0] && defined $_[1] and return sprintf '%s%s', $_[0], $_[1];
-    return undef;
+	defined $_[0] && defined $_[1] and return sprintf '%s%s', $_[0], $_[1];
+	return undef;
 }
 
 =head2 elide
-    
-    elide($text, 16, { truncate => 'left', marker => '...' })
+	
+	elide($text, 16, { truncate => 'left', marker => '...' })
 
 =cut
 
@@ -172,7 +172,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Moonshine::Util
+	perldoc Moonshine::Util
 
 
 You can also look for information at:
