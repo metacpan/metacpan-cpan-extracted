@@ -9,7 +9,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
@@ -3590,6 +3590,10 @@ sub _create_cl_dictionary (@cl_symbols) {
 
 sub deflate_create_block_type_2 ($literals, $distances, $lengths) {
 
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsing
+
     state $deflate_tables = [make_deflate_tables()];
     my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
 
@@ -3697,6 +3701,10 @@ sub deflate_create_block_type_2 ($literals, $distances, $lengths) {
 }
 
 sub deflate_create_block_type_1 ($literals, $distances, $lengths) {
+
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsing
 
     state $deflate_tables = [make_deflate_tables()];
     my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
@@ -3858,6 +3866,10 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
 sub deflate_extract_block_type_0 ($in_fh, $buffer, $search_window) {
 
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = 32768;                     # maximum allowed back-reference distance in LZ parsing
+
     $$buffer = '';
 
     my $len           = bytes2int_lsb($in_fh, 2);
@@ -3874,8 +3886,8 @@ sub deflate_extract_block_type_0 ($in_fh, $buffer, $search_window) {
     read($in_fh, (my $chunk), $len) // confess "Read error: $!";
     $$search_window .= $chunk;
 
-    $$search_window = substr($$search_window, -$Compression::Util::LZ_MAX_DIST)
-      if (length($$search_window) > 2 * $Compression::Util::LZ_MAX_DIST);
+    $$search_window = substr($$search_window, -$LZ_MAX_DIST)
+      if (length($$search_window) > 2 * $LZ_MAX_DIST);
 
     return $chunk;
 }
@@ -3954,13 +3966,17 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
         confess "[!] Something went wrong: code `$code` is not empty!";
     }
 
-    $$search_window = substr($$search_window, -$Compression::Util::LZ_MAX_DIST)
-      if (length($$search_window) > 2 * $Compression::Util::LZ_MAX_DIST);
+    $$search_window = substr($$search_window, -$LZ_MAX_DIST)
+      if (length($$search_window) > 2 * $LZ_MAX_DIST);
 
     return $data;
 }
 
 sub deflate_extract_block_type_1 ($in_fh, $buffer, $search_window) {
+
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = 32768;                     # maximum allowed back-reference distance in LZ parsing
 
     state $rev_dict;
     state $dist_rev_dict;
@@ -4037,6 +4053,10 @@ sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
 
 sub deflate_extract_block_type_2 ($in_fh, $buffer, $search_window) {
 
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = 32768;                     # maximum allowed back-reference distance in LZ parsing
+
     # (5 bits) HLIT = (number of LL code entries present) - 257
     my $HLIT = bits2int_lsb($in_fh, 5, $buffer) + 257;
 
@@ -4071,6 +4091,10 @@ sub deflate_extract_block_type_2 ($in_fh, $buffer, $search_window) {
 }
 
 sub deflate_extract_next_block ($in_fh, $buffer, $search_window) {
+
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = 32768;                     # maximum allowed back-reference distance in LZ parsing
 
     my $block_type = bits2int_lsb($in_fh, 2, $buffer);
 

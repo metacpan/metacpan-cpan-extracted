@@ -35,7 +35,7 @@ METHODS
     Returns instance of object.
 
   "lang"
-     my $lane = $obj->lang;
+     my $lang = $obj->lang;
 
     Get ISO 639-1 language code of text.
 
@@ -103,10 +103,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

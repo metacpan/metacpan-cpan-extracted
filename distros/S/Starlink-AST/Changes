@@ -1,5 +1,9 @@
 Revision history for Starlink::AST
 
+3.05 2025-04-03
+    - Update to AST version 9.2.13
+    - Return value from astRate
+
 3.04 2024-09-25
     - Update to AST version 9.2.12
 

@@ -80,7 +80,7 @@
    "provides" : {
       "DBIx::Class::Helper::ColumnNames" : {
          "file" : "lib/DBIx/Class/Helper/ColumnNames.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.1.3"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

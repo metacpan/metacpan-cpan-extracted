@@ -62,7 +62,7 @@ our $HAVE_VERSION = eval {
   return $TRUE;
 };
 
-our $VERSION = '1.7.2';
+our $VERSION = '1.7.6';
 
 caller or __PACKAGE__->main();
 

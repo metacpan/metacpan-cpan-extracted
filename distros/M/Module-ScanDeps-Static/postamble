@@ -1,4 +1,8 @@
+#-*- mode:makefile; -*-
+
 postamble ::
 install::
+	destdir=$(DESTDIR); \
+	test -n "$$destdir" && destdir="-d $$destdir"; \
 	create-modulino.pl -m Module::ScanDeps::FindRequires \
-           -a find-requires -d $(DESTDIR) -b $(INSTALLSITESCRIPT)
+	   -a find-requires $$destdir -b $(INSTALLSITESCRIPT)

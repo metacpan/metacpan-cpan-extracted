@@ -23,8 +23,9 @@ t/Data-Person/01-use.t
 t/Data-Person/02-version.t
 t/Data-Person/03-new.t
 t/Data-Person/04-email.t
-t/Data-Person/05-id.t
-t/Data-Person/06-name.t
-t/Data-Person/07-sex.t
+t/Data-Person/05-external_ids.t
+t/Data-Person/06-id.t
+t/Data-Person/07-name.t
+t/Data-Person/08-sex.t
 xt/Data-Person/01-pod_coverage.t
 xt/Data-Person/02-pod.t

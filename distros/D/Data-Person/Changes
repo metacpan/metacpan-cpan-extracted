@@ -1,3 +1,7 @@
+0.04 2025-04-03T17:15:43+02:00
+ - Add 'external_ids' parameter.
+ - Update copyright years.
+
 0.03 2024-05-27T10:45:18+02:00
  - Fix DEPENDENCIES section in doc.
  - Fix github repository.

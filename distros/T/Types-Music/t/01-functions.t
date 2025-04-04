@@ -1,14 +1,19 @@
 #!/usr/bin/env perl
 
 use Test2::V0;
-plan 22;
+plan 16;
 
 use Types::Music;
 
 can_ok 'Types::Music', [
     map { ( $_, "is_$_", "assert_$_", "to_$_" ) } qw(
+        PosInt
         Octave
+        Signature
+        Key
+        Named_Note
         Named_Note_Octave
+        Mode
     )
 ], 'type functions';
 
@@ -17,21 +22,17 @@ use Types::Music -all;
 
 imported_ok
     map { ( $_, "is_$_", "assert_$_", "to_$_" ) } qw(
+        PosInt
         Octave
+        Signature
+        Key
+        Named_Note
         Named_Note_Octave
+        Mode
     );
 
-ok is_BPM(120), 'is_BPM';
-is 120, assert_BPM(120), 'assert_BPM';
-
-ok is_Bars(8), 'is_Bars';
-is 8, assert_Bars(8), 'assert_Bars';
-
-ok is_Beats(4), 'is_Beats';
-is 4, assert_Beats(4), 'assert_Beats';
-
-ok is_Divisions(4), 'is_Divisions';
-is 4, assert_Divisions(4), 'assert_Divisions';
+ok is_PosInt(120), 'is_PosInt';
+is 120, assert_PosInt(120), 'assert_PosInt';
 
 ok is_Octave(4), 'is_Octave';
 is 4, assert_Octave(4), 'assert_Octave';

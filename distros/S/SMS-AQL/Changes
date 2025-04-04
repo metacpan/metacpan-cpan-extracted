@@ -1,5 +1,10 @@
 Revision history for Perl extension SMS::AQL.
 
+1.03 2025-03-04
+- Remove live "get credit" test from t/1-basic.t
+  We already have a mocked version of that, and it no longer works as the
+  test account at AQL appears to be gone (or have a different pw)
+  (thanks to andk, GH-4)
 
 1.02 2015-03-20
 - Declare HTTP::Message as a pre-req (thanks to pink-mist, GH-2)

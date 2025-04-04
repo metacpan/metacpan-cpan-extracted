@@ -36,6 +36,7 @@
             "JSON::Validator" : "5.14",
             "JSON::XS" : "4.03",
             "Path::Tiny" : "0.144",
+            "Term::ANSIColor" : "5.01",
             "Text::CSV_XS" : "1.50",
             "perl" : "5.026000"
          }
@@ -61,7 +62,7 @@
          "web" : "https://github.com/mrueda/omop-csv-validator"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use File::Temp qw/tempfile/;
 use Test::Most;
 use Test::Needs 'CHI', 'IP::Country', 'Test::LWP::UserAgent', 'Test::MockModule';
 use Test::Without::Module qw(Geo::IP);
@@ -409,5 +410,16 @@ subtest 'Sublanguage Handling' => sub {
 		is($lingua2->language(), 'French', 'Cached result');
 	};
 };
+
+subtest 'should load config file if provided' => sub {
+	my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml');
+	print $fh "---\nsupported: fr\n";
+	close $fh;
+
+	my $info = CGI::Lingua->new(config_file => $config_file);
+	is($info->{'supported'}, 'fr', 'Config file loaded correctly');
+	unlink $config_file;
+};
+
 
 done_testing();

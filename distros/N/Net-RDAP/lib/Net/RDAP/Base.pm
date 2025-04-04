@@ -86,6 +86,40 @@ sub links { $_[0]->objects('Net::RDAP::Link', $_[0]->{'links'}) }
 
 =pod
 
+    $link = $object->link($rel);
+
+Returns the first L<Net::RDAP::Link> object whose C<rel> property matches the
+value in C<$rel> (or C<undef> if no subject object is found).
+
+=cut
+
+sub link {
+    my ($self, $rel) = @_;
+    return [ grep { $_->rel eq $rel } $self->links ]->[0];
+}
+
+=pod
+
+    $link = $object->related;
+
+Returns the first L<Net::RDAP::Link> object with a C<rel> property of
+C<related> and a C<type> property of C<application/rdap+json> (or C<undef>
+if no subject object is found).
+
+=cut
+
+sub related {
+    my $self = shift;
+
+    foreach my $link ($self->links) {
+        if (q{related} eq $link->rel && $link->type =~ m/^application\/rdap\+json/) {
+            return $link;
+        }
+    }
+
+    return undef;
+}
+
 =head2 "Self" Link
 
     $self = $object->self;

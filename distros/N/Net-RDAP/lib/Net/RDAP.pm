@@ -26,7 +26,7 @@ use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 use warnings;
 
-$VERSION = '0.36';
+$VERSION = '0.37';
 
 =pod
 

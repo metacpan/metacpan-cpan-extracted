@@ -1,5 +1,11 @@
 Revision history for Types-Music:
 
+0.0200 2025-04-04 00:40:04
+  - Use Ints not Nums!!!
+  - Add AWOL tests for can and imported. Oof
+  - Replace BPM, Bars, Beats, and Divisions with PosInt,
+    because they are all the same thing.
+
 0.0104 2025-03-31 15:02:06
   - Improve documentation.
 

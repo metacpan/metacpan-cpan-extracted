@@ -1,0 +1,5 @@
+Revision history for MIDI-RtController-Filter-CC
+
+0.0100 2025-04-04 01:25:04
+  - Add the breathe() filter.
+  - Port from MIDI::RtController::Filter::Math

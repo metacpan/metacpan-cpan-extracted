@@ -1,5 +1,10 @@
 Revision history for CGI-Lingua
 
+0.71	Thu Apr  3 07:55:44 EDT 2025
+	Use Log::Abstraction
+	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
+	Added config_file argument to new()
+
 0.70	Sat Mar  8 10:59:48 EST 2025
 	Better support for CHI::Driver::Memory global
 

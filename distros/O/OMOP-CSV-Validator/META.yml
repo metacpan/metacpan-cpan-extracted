@@ -23,6 +23,7 @@ requires:
   JSON::Validator: '5.14'
   JSON::XS: '4.03'
   Path::Tiny: '0.144'
+  Term::ANSIColor: '5.01'
   Text::CSV_XS: '1.50'
   perl: '5.026000'
 resources:
@@ -30,6 +31,6 @@ resources:
   homepage: https://github.com/mrueda/omop-csv-validator
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mrueda/omop-csv-validator.git
-version: '0.02'
+version: '0.03'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

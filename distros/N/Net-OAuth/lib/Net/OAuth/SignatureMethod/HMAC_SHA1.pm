@@ -1,15 +1,16 @@
 package Net::OAuth::SignatureMethod::HMAC_SHA1;
 use warnings;
 use strict;
-use Digest::HMAC_SHA1;
+use Digest::SHA ();
 use MIME::Base64;
 
 sub sign {
     my $self = shift;
     my $request = shift;
-    my $hmac = Digest::HMAC_SHA1->new($request->signature_key);
-    $hmac->add($request->signature_base_string);
-    return encode_base64($hmac->digest, '');
+    my $hmac_digest = Digest::SHA::hmac_sha1(
+        $request->signature_base_string, $request->signature_key
+    );
+    return encode_base64($hmac_digest, '');
 }
 
 sub verify {

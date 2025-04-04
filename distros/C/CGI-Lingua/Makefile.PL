@@ -66,6 +66,7 @@ if(eval 'require IP::Country') {
 }
 
 my $test_requires = {
+	'File::Temp' => 0,
 	'Test::Carp' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
@@ -109,6 +110,7 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
+    	'Config::Auto' => 0,
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
 	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
@@ -118,6 +120,7 @@ WriteMakefile(
 	'I18N::LangTags::Detect' => 1.04,
 	'Data::Validate::IP' => 0.25,	# For is_private_ip
 	'Locale::Codes' => 3.59,	# Silence noisy warn messages in perl 5.28
+	'Log::Abstraction' => 0.05,
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,

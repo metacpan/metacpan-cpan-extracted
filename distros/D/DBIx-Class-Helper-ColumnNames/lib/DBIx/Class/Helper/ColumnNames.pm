@@ -15,7 +15,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::clean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 
 
 sub get_column_names ($self) {
@@ -59,7 +59,7 @@ DBIx::Class::Helper::ColumnNames - Retrieve column names from a resultset
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.3
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -129,7 +134,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Robert Rothenberg.
+This software is Copyright (c) 2024-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

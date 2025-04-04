@@ -1,5 +1,18 @@
 Revision history for Net-OAuth
 
+       [Bug Fixes]
+       - Added missing dependency RT#70407.
+
+       - Removed use of Digest::HMAC_SHA1.
+
+       [Documentation]
+       - Updated Changes for v0.29 with CVE.
+
+       - Updated the security policy.
+
+       [Toolchain]
+       - Remove Build.PL and just use Makefile.PL.
+
 0.30   Fri, 03 Jan 2025 09:46 GMT
        [Bug Fixes]
        - Fixed syntax error in Net::OAuth::Client (oops).
@@ -7,7 +20,7 @@ Revision history for Net-OAuth
 
 0.29   Fri, 03 Jan 2025 09:15 GMT
        [Security]
-       - Net::OAuth::Client uses a better source of randomness for generating the nonce
+       - Net::OAuth::Client uses a better source of randomness for generating the nonce CVE-2025-22376
 
        [Bug Fixes]
        - Removed unnecessary prerequisite RT#69810 GH#4 GH#6

@@ -8,7 +8,7 @@ sub PROTOCOL_VERSION_1_0A() {1.001}
 
 sub OAUTH_VERSION() {'1.0'}
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 our $SKIP_UTF8_DOUBLE_ENCODE_CHECK = 0;
 our $PROTOCOL_VERSION = PROTOCOL_VERSION_1_0;
 
@@ -314,7 +314,7 @@ This method is a trivial signature which adds no security.  Not recommended.
 
 =head3 HMAC-SHA1 SIGNATURES
 
-This method is available if you have Digest::HMAC_SHA1 installed.  This is by far the most commonly used method.
+This method is available if you have Digest::SHA installed.  This is by far the most commonly used method.
 
 =head3 HMAC-SHA256 SIGNATURES
 

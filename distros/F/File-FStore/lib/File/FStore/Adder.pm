@@ -15,7 +15,7 @@ use Carp;
 use File::Spec;
 use Data::Identifier;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 sub link_in {
@@ -276,7 +276,7 @@ File::FStore::Adder - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

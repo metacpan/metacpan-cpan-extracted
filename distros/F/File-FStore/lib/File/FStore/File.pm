@@ -20,13 +20,22 @@ use Data::Identifier::Generate;
 
 use File::FStore;
 
-use constant WRITE_BITS => S_IWUSR|S_IWGRP|S_IWOTH;
+use constant {
+    WRITE_BITS  => S_IWUSR|S_IWGRP|S_IWOTH,
+    RE_ISE      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
+};
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
-my %_valid_properties = map {$_ => 1} qw(size inode mediasubtype contentise);
+my %_valid_properties = (
+    size            => qr<^(?:0|[1-9][0-9]*)$>,
+    inode           => qr<>, # any
+    mediasubtype    => qr<^(?:application|audio|example|font|haptics|image|message|model|multipart|text|video)/[0-9a-zA-Z][0-9a-zA-Z\!\#\$\&\-\^_\.\+]{0,126}$>,
+    contentise      => RE_ISE,
+    inodeise        => RE_ISE,
+);
 
 my %_exts = (
     'image/jpeg'                => 'jpg',
@@ -94,6 +103,13 @@ sub contentise {
 sub ise {
     my ($self, @args) = @_;
     return $self->contentise(@args);
+}
+
+
+sub as {
+    my ($self, $as, %opts) = @_;
+    $opts{store} //= $self->{store};
+    return $self->Data::Identifier::as($as, %opts);
 }
 
 
@@ -169,6 +185,12 @@ sub update {
                     if (defined(my $v = $inode->get('mediatype', lifecycle => $lifecycle, default => undef, as => 'mediatype'))) {
                         $properties->{mediasubtype} //= $v;
                         croak sprintf('Media subtype missmatch on (%s): "%s" vs. "%s"', $self->dbname, $properties->{mediasubtype}, $v) if $properties->{mediasubtype} ne $v;
+                    }
+
+                    if (defined(my $v = $inode->get('inodeise', lifecycle => $lifecycle, default => undef, as => 'mediatype'))) {
+                        $properties->{inodeise} //= $v;
+                        # XXX:  We ignore missmatches here. This can be for a number of reasons. Such as switches between different sources of the value.
+                        # TODO: A better policy should be implemented later on.
                     }
 
                     if (defined(my $v = $inode->get('st_ino', lifecycle => $lifecycle, default => undef))) {
@@ -366,13 +388,14 @@ sub set {
                     $valids = \%_valid_properties;
                 } elsif ($cdomain eq 'digests') {
                     $sth = $self->_prepare('INSERT INTO file_hash (file,algo,hash) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT TRUE FROM file_hash WHERE file = ? AND algo = ? AND hash = ?)');
-                    $valids = \%File::FStore::_valid_digests;
+                    $valids = $self->_valid_digests;
                 }
 
                 croak 'Invalid domain: '.$domain unless defined $sth;
 
                 foreach my $key (keys %{$d}) {
                     croak 'Invalid key '.$key.' for domain '.$cdomain unless defined $valids->{$key};
+                    croak 'Invalid value for key '.$key.' for domain '.$cdomain unless $d->{$key} =~ $valids->{$key};
                     $sth->execute($dbid, $key, $d->{$key}, $dbid, $key, $d->{$key});
                 }
             }
@@ -498,6 +521,10 @@ sub fii {
 }
 
 # ---- Private helpers ----
+sub _valid_digests {
+    return state $digests = {map {$_ => qr/^[0-9a-f]{$File::FStore::_valid_digests{$_}}$/} keys %File::FStore::_valid_digests};
+}
+
 sub _new {
     my ($pkg, %opts) = @_;
     my $self = bless \%opts, $pkg;
@@ -664,7 +691,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -730,6 +757,14 @@ and the values for C<sha-1-160> and C<sha-3-512> from the C<digests> domain.
 Returns an ISE (identifier) for this file.
 
 Currently an alias for L</contentise>. Later versions may add more logic.
+
+=head2 as
+
+    my $xxx = $base->as($as, [ %opts ] );
+
+Proxy for L<Data::Identifier/as>.
+
+Automatically adds C<store> to C<%opts> if any is known (see L</store>).
 
 =head2 open
 
@@ -998,6 +1033,19 @@ Any value not listed by IANA is invalid.
 The content ISE (identifier) value.
 This value is mainly maintained internally, however may be set early as a mean to verify the file integrity.
 For reading the value there is a special method L</contentise>.
+
+=head2 inodeise
+
+The inode ISE (identifier) value.
+This value represents the inode on the file system.
+It is mainly maintained internally, but used by and imported from external sources
+such as tagpool.
+The value is stable for the inode's lifetime.
+It may be different or the same if the inode number is reused.
+It is stable since when the inode was created and also doesn't change when the inode is written to (in contrast to L</contenise>.
+
+See also:
+L<File::Information::Base/get>.
 
 =head1 AUTHOR
 

@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -30,6 +30,7 @@ use constant {
     RE_QID  => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
     RE_UNICODE => qr/^U\+([0-9A-F]{4,7})$/,
+    RE_SIMPLE_TAG => qr/^\p{lower case}+$/,
 };
 
 use constant {
@@ -205,12 +206,25 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         '2bffc55d-7380-454e-bd53-c5acd525d692' => '744eaf4e-ae93-44d8-9ab5-744105222da6', # roaraudio-error-number: roaraudio-error-namespace
         '4a7fc2e2-854b-42ec-b24f-c7fece371865' => 'ac59062c-6ba2-44de-9f54-09e28f2c0b5c', # e621-post-identifier: e621-post-namespace
         'a0a4fae2-be6f-4a51-8326-6110ba845a16' => '69b7ff38-ca78-43a8-b9ea-66cb02312eef', # e621-pool-identifier: e621-pool-namespace
+        '6e3590b6-2a0c-4850-a71f-8ba196a52280' => 'b96e5d94-0767-40fa-9864-5977eb507ae0', # danbooru2chanjp-post-identifier: danbooru2chanjp-post-namespace
+    );
+    my %namespaces_simple_tag = (
+        '6fe0dbf0-624b-48b3-b558-0394c14bad6a' => '3623de4d-0dd4-4236-946a-2613467d50f1', # e621tag: e621tag-namespace
+        'c5632c60-5da2-41af-8b60-75810b622756' => '93f2c36b-8cb6-4f2c-924b-98188f224235', # danbooru2chanjp-tag: danbooru2chanjp-tag-namespace
     );
 
     foreach my $ise (keys %namespaces_uint) {
         my $identifier = __PACKAGE__->new(ise => $ise);
         $identifier->{namespace}    //= __PACKAGE__->new(ise => $namespaces_uint{$ise});
         $identifier->{validate}     //= RE_UINT;
+        $identifier->{generate}     //= 'id-based';
+        $identifier->register; # re-register
+    }
+
+    foreach my $ise (keys %namespaces_simple_tag) {
+        my $identifier = __PACKAGE__->new(ise => $ise);
+        $identifier->{namespace}    //= __PACKAGE__->new(ise => $namespaces_simple_tag{$ise});
+        $identifier->{validate}     //= RE_SIMPLE_TAG;
         $identifier->{generate}     //= 'id-based';
         $identifier->register; # re-register
     }
@@ -251,6 +265,9 @@ sub new {
                 $opts{displayname} //= sub { $from->displayname };
                 $type = 'ise';
                 $id   = $id->ise;
+            } elsif ($id->isa('File::FStore::File') || $id->isa('File::FStore::Adder')) {
+                $type = 'ise';
+                $id = $id->contentise;
             } elsif ($id->isa('Business::ISBN')) {
                 $type = $well_known{gtin};
                 $id   = $id->as_isbn13->as_string([]);
@@ -546,12 +563,21 @@ sub as {
         return $opts{extractor}->lookup($self->type->uuid => $self->id);
     } elsif ($as eq 'Data::URIID::Service' && defined($opts{extractor})) {
         return $opts{extractor}->service($self->uuid);
+    } elsif ($as eq 'Data::URIID::Colour' && eval {
+            require Data::URIID;
+            require Data::URIID::Colour;
+            Data::URIID::Colour->VERSION(v0.14);
+            1;
+        }) {
+        return Data::URIID::Colour->new(from => $self, %opts{qw(extractor db fii store)});
     } elsif ($as eq 'Data::TagDB::Tag' && defined($opts{db})) {
         if ($opts{autocreate}) {
             return $opts{db}->create_tag($self);
         } else {
             return $opts{db}->tag_by_id($self);
         }
+    } elsif ($as eq 'File::FStore::File' && defined($opts{store})) {
+        return scalar($opts{store}->query(ise => $self));
     } elsif ($as eq 'Business::ISBN' && $self->type->eq('gtin')) {
         require Business::ISBN;
         my $val = Business::ISBN->new($self->id);
@@ -756,7 +782,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -846,6 +872,7 @@ In this case not all options might be supported. Currently it is possible to con
 L<Data::Identifier>,
 L<Data::URIID::Colour>, L<Data::URIID::Service>, L<Data::URIID::Result>,
 L<Data::TagDB::Tag>,
+L<File::FStore::File>, L<File::FStore::Adder> (see limitations of L<File::FStore::Adder/contentise>),
 and L<Business::ISBN>. If C<$id> is not a reference it is parsed as with C<ise>.
 
 The following type names are currently well known:
@@ -908,13 +935,21 @@ The name as to be returned by L</displayname>.
 Must be a scalar string value or a code reference that returns a scalar string.
 If it is a code reference the identifier object is passed as C<$_[0]>.
 
+=item C<db>
+
+An instance of L<Data::TagDB>. This option is currently ignored.
+
 =item C<extractor>
 
 An instance of L<Data::URIID>. This option is currently ignored.
 
-=item C<db>
+=item C<fii>
 
-An instance of L<Data::TagDB>. This option is currently ignored.
+An instance of L<File::Information>. This option is currently ignored.
+
+=item C<store>
+
+An instance of L<File::FStore>. This option is currently ignored.
 
 =back
 
@@ -1053,6 +1088,7 @@ L<Data::Identifier>,
 L<Data::URIID::Result>,
 L<Data::URIID::Service>,
 L<Data::TagDB::Tag>,
+L<File::FStore::File> (requires version v0.03 or later),
 L<Business::ISBN>.
 Other packages might be supported. Packages need to be installed in order to be supported.
 Also some packages need special options to be passed to be available.
@@ -1088,6 +1124,15 @@ An instance of L<Data::TagDB>. This is used to create instances of related packa
 
 Same as in L</uuid>.
 
+=item C<extractor>
+
+An instance of L<Data::URIID>. This is used to create instances of related packages
+such as L<Data::URIID::Result>.
+
+=item C<fii>
+
+An instance of L<File::Information>. This is used to create instances of related packages.
+
 =item C<no_defaults>
 
 Same as in L</uuid>.
@@ -1097,10 +1142,10 @@ Same as in L</uuid>.
 If C<$as> is given as C<raw> then this value is used for C<$as>.
 This can be used to ease implementation of other methods that are required to accept C<raw>.
 
-=item C<extractor>
+=item C<store>
 
-An instance of L<Data::URIID>. This is used to create instances of related packages
-such as L<Data::URIID::Result>.
+An instance of L<File::FStore>. This is used to create instances of related packages
+such as L<File::FStore::File>.
 
 =back
 
@@ -1208,7 +1253,13 @@ If set true do not try to use any identifier or other fallback as displayname.
     my $icontext      = $identifier->icontext( [ %opts ] );
     my $description   = $identifier->description( [ %opts ] );
 
-These functions always return C<undef>. They are for compatibility with L<Data::TagDB::Tag>.
+These functions return C<undef>. They are for compatibility with L<Data::TagDB::Tag>.
+
+B<Note:>
+Future versions of those methods will C<die> if no value is found (most likely) unless C<default> is given.
+
+B<Note:>
+Future versions may return some actual data.
 
 The following options (all optional) are supported:
 

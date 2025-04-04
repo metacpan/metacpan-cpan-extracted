@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 
+use Data::ExternalId;
 use Data::Person;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -15,11 +16,27 @@ isa_ok($obj, 'Data::Person');
 # Test.
 $obj = Data::Person->new(
 	'email' => 'skim@cpan.org',
+	'external_ids' => [
+		Data::ExternalId->new(
+			'key' => 'Wikidata',
+			'value' => 'Q27954834',
+		),
+	],
 	'id' => 1,
 	'name' => decode_utf8('Michal Josef Špaček'),
 	'sex' => 'male',
 );
 isa_ok($obj, 'Data::Person');
+
+# Test.
+eval {
+	Data::Person->new(
+		'external_ids' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'external_ids' must be a array.\n",
+	"Parameter 'external_ids' must be a array (bad).");
+clean;
 
 # Test.
 eval {

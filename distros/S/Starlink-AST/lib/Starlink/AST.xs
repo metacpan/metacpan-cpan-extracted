@@ -335,23 +335,6 @@ static void My_astCopyErrMsg ( AV ** newbuff, int status ) {
 
 }
 
-/* Since you can not put CPP code within CPP code inside XS we need
-   to provide a special wrapper routine for astRate */
-static void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2,
-                        double * d2) {
-  double RETVAL;
-  dXSARGS;
-
-  ASTCALL(
-    RETVAL = astRate( this, cat, ax1, ax2 );
-  )
-  if ( RETVAL != AST__BAD ) {
-     XPUSHs(sv_2mortal(newSVnv(RETVAL)));
-  } else {
-     XSRETURN_EMPTY;
-  }
-}
-
 
 MODULE = Starlink::AST     PACKAGE = Starlink::AST
 
@@ -3549,7 +3532,7 @@ astMapSplit( this, in )
   }
 
 # astRate
-#  Returns the rate and (sometimes) the second derivatives
+#  Returns the rate
 #  Returns empty list if astRate returns AST__BAD
 
 void
@@ -3559,6 +3542,7 @@ astRate( this, at, ax1, ax2 )
   int ax1
   int ax2
  PREINIT:
+  double RETVAL;
   int nin;
   int len;
   double * cat;
@@ -3570,7 +3554,15 @@ astRate( this, at, ax1, ax2 )
       Perl_croak(aTHX_ "Must supply Nin coordinates to astRate [%d != %d]",
                         nin, len);
   cat = pack1D( newRV_noinc((SV*)at), 'd');
-  myAstRate( this, cat ,ax1, ax2, &d2 );
+
+  ASTCALL(
+    RETVAL = astRate( this, cat, ax1, ax2 );
+  )
+  if ( RETVAL != AST__BAD ) {
+     XPUSHs(sv_2mortal(newSVnv(RETVAL)));
+  } else {
+     XSRETURN_EMPTY;
+  }
 
 void
 astQuadApprox( this, lbnd, ubnd, nx, ny )

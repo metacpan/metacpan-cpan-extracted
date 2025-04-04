@@ -3,6 +3,7 @@ abstract: 'Data objects for person.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Data::ExternalId: 0
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
@@ -35,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-Person
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Person
-version: '0.03'
+version: '0.04'

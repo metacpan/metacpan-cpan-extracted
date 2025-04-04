@@ -399,7 +399,7 @@ Net::RDAP::Server::EPPBackend - an RDAP server that retrieves registration data 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

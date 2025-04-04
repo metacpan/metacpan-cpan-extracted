@@ -8,8 +8,9 @@ use JSON::Validator;
 use Text::CSV_XS;
 use Scalar::Util qw(looks_like_number);
 use Path::Tiny;
+use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -25,7 +26,7 @@ OMOP::CSV::Validator - Validates OMOP CDM CSV files against their expected data 
     my $schemas = $validator->load_schemas_from_ddl($ddl_text);
 
     # Retrieve specific table schema for a CSV file
-    my $schema  = $validator->get_schema_from_csv_filename($csv_file, $schemas);
+    my $schema = $validator->get_schema_from_csv_filename($csv_file, $schemas);
 
     # Validate CSV file
     my $errors  = $validator->validate_csv_file($csv_file, $schema);
@@ -53,7 +54,7 @@ OMOP::CSV::Validator is a CLI tool and Perl module designed to validate OMOP Com
 # Constructor: new()
 ##########################################################################
 sub new {
-    my ($class, %args) = @_;
+    my ( $class, %args ) = @_;
     my $self = bless {}, $class;
     return $self;
 }
@@ -65,7 +66,7 @@ sub new {
 # and returns a hashref of JSON schemas keyed by table name (lowercase).
 ##########################################################################
 sub load_schemas_from_ddl {
-    my ($self, $ddl_text) = @_;
+    my ( $self, $ddl_text ) = @_;
     return $self->_ddl_to_json_schemas($ddl_text);
 }
 
@@ -75,7 +76,7 @@ sub load_schemas_from_ddl {
 # Internal subroutine that iterates over all CREATE TABLE blocks.
 ##########################################################################
 sub _ddl_to_json_schemas {
-    my ($self, $ddl_text) = @_;
+    my ( $self, $ddl_text ) = @_;
     my %schemas;
     while (
         $ddl_text =~ /
@@ -108,19 +109,25 @@ sub _build_schema {
     };
 
     for my $line ( grep /\S/, split /\n/, $cols_block ) {
-        $line =~ s/^\s+|\s+$//g;
-        $line =~ s/,$//;
-        next if $line =~ /^--/;    # Skip comment lines
+        $line         =~ s/^\s+|\s+$//g;
+        $line         =~ s/,$//;
+        next if $line =~ /^--/;            # Skip comment lines
 
-        if ( $line =~ /^(\w+)\s+([A-Za-z]+)(?:\((\d+(?:,\d+)?)\))?(?:\s+(NOT NULL))?/i ) {
-            my ( $col, $type, $length, $notnull ) = ( lc $1, lc $2, $3, defined $4 );
+        if ( $line =~
+            /^(\w+)\s+([A-Za-z]+)(?:\((\d+(?:,\d+)?)\))?(?:\s+(NOT NULL))?/i )
+        {
+            my ( $col, $type, $length, $notnull ) =
+              ( lc $1, lc $2, $3, defined $4 );
             my $prop = {};
 
             if ( $type =~ /int/ ) {
-                $prop->{type} = 'integer';
+                $prop->{type}    = 'integer';
+                $prop->{_coerce} = 1;
             }
             elsif ( $type =~ /numeric|real|double/ ) {
-                $prop->{type} = 'number';
+                $prop->{type}    = 'number';
+                $prop->{_coerce} = 1;
+
             }
             elsif ( $type eq 'date' ) {
                 $prop->{type}   = 'string';
@@ -133,6 +140,7 @@ sub _build_schema {
             elsif ( $type eq 'varchar' ) {
                 $prop->{type} = 'string';
                 if ( defined $length ) {
+
                     # Capture only the first number if a comma is present (e.g., varchar(10,2))
                     if ( $length =~ /^(\d+)/ ) {
                         $prop->{maxLength} = int($1);
@@ -141,6 +149,11 @@ sub _build_schema {
             }
             else {
                 $prop->{type} = 'string';
+            }
+
+            # If the column is not marked as NOT NULL, allow null values
+            unless ($notnull) {
+                $prop->{type} = [ $prop->{type}, 'null' ];
             }
 
             $schema->{properties}{$col} = $prop;
@@ -176,10 +189,11 @@ sub validate_csv_file {
 
     my $csv_handle = path($csv_file)->openr_utf8;
     my $csv =
-      Text::CSV_XS->new( { binary => 1, sep_char => $sep, auto_diag => 1 } )
+      Text::CSV_XS->new(
+        { binary => 1, sep_char => $sep, auto_diag => 1, blank_is_undef => 1 } )
       or die "Cannot use CSV: " . Text::CSV_XS->error_diag();
 
-    my $header  = $csv->getline($csv_handle);
+    my $header = $csv->getline($csv_handle);
     $csv->column_names(@$header);
 
     my $records = $csv->getline_hr_all($csv_handle);
@@ -196,8 +210,9 @@ sub validate_csv_file {
         for my $col ( keys %{ $schema->{properties} } ) {
             if ( exists $record->{$col} ) {
                 my $prop = $schema->{properties}->{$col};
-                if ( $prop->{type} eq 'integer' or $prop->{type} eq 'number' ) {
-                    $record->{$col} = $self->dotify_and_coerce_number( $record->{$col} );
+                if ( defined $prop->{_coerce} && $prop->{_coerce} ) {
+                    $record->{$col} =
+                      $self->dotify_and_coerce_number( $record->{$col} );
                 }
             }
         }
@@ -205,6 +220,7 @@ sub validate_csv_file {
         # Validate
         my $errs = [ $validator->validate($record) ];
         if (@$errs) {
+
             # row number excludes header → row index + 1
             push @errors, { row => $i + 1, errors => $errs };
         }

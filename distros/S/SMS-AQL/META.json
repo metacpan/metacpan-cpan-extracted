@@ -4,13 +4,13 @@
       "David Precious <davidp@preshweb.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SMS-AQL",
    "no_index" : {
@@ -48,5 +48,6 @@
          "url" : "https://github.com/bigpresh/SMS-AQL"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

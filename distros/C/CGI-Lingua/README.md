@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.70
+Version 0.71
 
 # SYNOPSIS
 
@@ -93,39 +93,60 @@ For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
 
 Supported\_languages is the same as supported.
 
-Takes optional parameter cache, an object which is used to cache country
-lookups.
-This cache object is an object that understands get() and set() messages,
-such as a [CHI](https://metacpan.org/pod/CHI) object.
+It takes several optional parameters:
 
-Takes an optional parameter syslog, to log messages to
-[Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
-It can be a boolean to enable/disable logging to syslog, or a reference
-to a hash to be given to Sys::Syslog::setlogsock.
+- `cache`
 
-Takes an optional parameter logger, which is used for warnings and traces.
-It can be an object that understands warn() and trace() messages,
-such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
-a reference to code,
-a reference to an array,
-or a filename.
+    An object which is used to cache country lookups.
+    This cache object is an object that understands get() and set() messages,
+    such as a [CHI](https://metacpan.org/pod/CHI) object.
 
-Takes an optional parameter info, an object which can be used to see if a CGI
-parameter is set, for example, an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
+
+- `logger`
+
+    Used for warnings and traces.
+    It can be an object that understands warn() and trace() messages,
+    such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+    a reference to code,
+    a reference to an array,
+    or a filename.
+    See [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) for further details.
+
+- `info`
+
+    Takes an optional parameter info, an object which can be used to see if a CGI
+    parameter is set, for example, an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
+
+- `data`
+
+    Passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage).
+
+- `dont_use_ip`
+
+    By default, if none of the
+    requested languages is supported, CGI::Lingua->language() looks in the IP
+    address for the language to use.
+    This may not be what you want,
+    so use this option to disable the feature.
+
+- `syslog`
+
+    Takes an optional parameter syslog, to log messages to
+    [Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
+    It can be a boolean to enable/disable logging to syslog, or a reference
+    to a hash to be given to Sys::Syslog::setlogsock.
 
 Since emitting warnings from a CGI class can result in messages being lost (you
 may forget to look in your server's log), or appear to the client in
 amongst HTML causing invalid HTML, it is recommended either syslog
 or logger (or both) are set.
 If neither is given, [Carp](https://metacpan.org/pod/Carp) will be used.
-
-Takes an optional parameter dont\_use\_ip.  By default, if none of the
-requested languages is supported, CGI::Lingua->language() looks in the IP
-address for the language to use.
-This may not be what you want,
-so use this option to disable the feature.
-
-The optional parameter debug is passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage).
 
 ## language
 
@@ -246,11 +267,13 @@ This means that if you support languages at a lower priority, it may be missed.
 
 # SEE ALSO
 
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
-[I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
-[Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
+- [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
+- [I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
+- [Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

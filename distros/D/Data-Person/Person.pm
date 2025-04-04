@@ -3,16 +3,21 @@ package Data::Person;
 use strict;
 use warnings;
 
-use Mo qw(build is);
-use Mo::utils 0.28 qw(check_length check_number_id check_strings);
+use Mo qw(build default is);
+use Mo::utils 0.28 qw(check_array_object check_length check_number_id check_strings);
 use Mo::utils::Email qw(check_email);
 use Readonly;
 
 Readonly::Array our @SEX => qw(female male unknown);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has email => (
+	is => 'ro',
+);
+
+has external_ids => (
+	default => [],
 	is => 'ro',
 );
 
@@ -33,6 +38,9 @@ sub BUILD {
 
 	# Check email.
 	check_email($self, 'email');
+
+	# Check external_ids.
+	check_array_object($self, 'external_ids', 'Data::ExternalId', 'External id');
 
 	# Check id.
 	check_number_id($self, 'id');
@@ -64,6 +72,7 @@ Data::Person - Data object for person.
 
  my $obj = Data::Person->new(%params);
  my $email = $obj->email;
+ my $external_ids_ar = $obj->external_ids;
  my $id = $obj->id;
  my $name = $obj->name;
  my $sex = $obj->sex;
@@ -85,6 +94,13 @@ Returns instance of object.
 Person's email for external identification.
 It's optional.
 Default value is undef.
+
+=item * C<external_ids>
+
+Person external ids.
+It's optional.
+Value must be a instance of L<Data::ExternalId> object.
+Default value is [].
 
 =item * C<id>
 
@@ -115,6 +131,14 @@ Get person email.
 
 Returns string.
 
+=head2 C<external_ids>
+
+ my $external_ids_ar = $obj->external_ids;
+
+Get external ids.
+
+Returns reference to array with L<Data::ExternalId> instances.
+
 =head2 C<id>
 
  my $id = $obj->id;
@@ -142,6 +166,13 @@ Returns string.
 =head1 ERRORS
 
  new():
+         From Mo::utils::check_array_object():
+                 Parameter 'external_ids' must be a array.
+                         Value: %s
+                         Reference: %s
+                 External id isn't 'Data::ExternalId' object.
+                         Value: %s
+                         Reference: %s
          From Mo::utils::check_number_id():
                  Parameter 'id' must a natural number.
                          Value: %s
@@ -158,12 +189,19 @@ Returns string.
  use strict;
  use warnings;
 
+ use Data::ExternalId;
  use Data::Person;
  use DateTime;
  use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
  my $obj = Data::Person->new(
          'email' => 'skim@cpan.org',
+         'external_ids' => [
+                 Data::ExternalId->new(
+                         'key' => 'Wikidata',
+                         'value' => 'Q27954834',
+                 ),
+         ],
          'id' => 1,
          'name' => decode_utf8('Michal Josef Špaček'),
          'sex' => 'male',
@@ -174,12 +212,16 @@ Returns string.
  print 'Name: '.encode_utf8($obj->name)."\n";
  print 'Email: '.$obj->email."\n";
  print 'Sex: '.$obj->sex."\n";
+ foreach my $external_id (@{$obj->external_ids}) {
+        print 'External id - '.$external_id->key.': '.$external_id->value."\n";
+ }
 
  # Output:
  # Id: 1
  # Name: Michal Josef Špaček
  # Email: skim@cpan.org
  # Sex: male
+ # External id - Wikidata: Q27954834
 
 =head1 DEPENDENCIES
 
@@ -200,12 +242,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

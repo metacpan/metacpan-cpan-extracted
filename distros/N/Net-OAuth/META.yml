@@ -1,85 +1,36 @@
 ---
-abstract: 'An implementation of the OAuth protocol'
+abstract: 'OAuth 1.0 for Perl'
 author:
-  - 'Keith Grennan <kgrennan@cpan.org>'
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.66'
   Test::Warn: '0.21'
 configure_requires:
-  Module::Build: '0.4234'
-  Module::Build::Compat: '0.4234'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-OAuth
-provides:
-  Net::OAuth:
-    file: lib/Net/OAuth.pm
-    version: '0.30'
-  Net::OAuth::AccessToken:
-    file: lib/Net/OAuth/AccessToken.pm
-  Net::OAuth::AccessTokenRequest:
-    file: lib/Net/OAuth/AccessTokenRequest.pm
-  Net::OAuth::AccessTokenResponse:
-    file: lib/Net/OAuth/AccessTokenResponse.pm
-  Net::OAuth::Client:
-    file: lib/Net/OAuth/Client.pm
-    version: '0.30'
-  Net::OAuth::ConsumerRequest:
-    file: lib/Net/OAuth/ConsumerRequest.pm
-  Net::OAuth::Message:
-    file: lib/Net/OAuth/Message.pm
-  Net::OAuth::ProtectedResourceRequest:
-    file: lib/Net/OAuth/ProtectedResourceRequest.pm
-  Net::OAuth::Request:
-    file: lib/Net/OAuth/Request.pm
-    version: '0.30'
-  Net::OAuth::RequestTokenRequest:
-    file: lib/Net/OAuth/RequestTokenRequest.pm
-  Net::OAuth::RequestTokenResponse:
-    file: lib/Net/OAuth/RequestTokenResponse.pm
-  Net::OAuth::Response:
-    file: lib/Net/OAuth/Response.pm
-  Net::OAuth::SignatureMethod::HMAC_SHA1:
-    file: lib/Net/OAuth/SignatureMethod/HMAC_SHA1.pm
-  Net::OAuth::SignatureMethod::HMAC_SHA256:
-    file: lib/Net/OAuth/SignatureMethod/HMAC_SHA256.pm
-  Net::OAuth::SignatureMethod::PLAINTEXT:
-    file: lib/Net/OAuth/SignatureMethod/PLAINTEXT.pm
-  Net::OAuth::SignatureMethod::RSA_SHA1:
-    file: lib/Net/OAuth/SignatureMethod/RSA_SHA1.pm
-  Net::OAuth::UserAuthRequest:
-    file: lib/Net/OAuth/UserAuthRequest.pm
-  Net::OAuth::UserAuthResponse:
-    file: lib/Net/OAuth/UserAuthResponse.pm
-  Net::OAuth::V1_0A::AccessTokenRequest:
-    file: lib/Net/OAuth/V1_0A/AccessTokenRequest.pm
-  Net::OAuth::V1_0A::RequestTokenRequest:
-    file: lib/Net/OAuth/V1_0A/RequestTokenRequest.pm
-  Net::OAuth::V1_0A::RequestTokenResponse:
-    file: lib/Net/OAuth/V1_0A/RequestTokenResponse.pm
-  Net::OAuth::V1_0A::UserAuthResponse:
-    file: lib/Net/OAuth/V1_0A/UserAuthResponse.pm
-  Net::OAuth::XauthAccessTokenRequest:
-    file: lib/Net/OAuth/XauthAccessTokenRequest.pm
-  Net::OAuth::YahooAccessTokenRefreshRequest:
-    file: lib/Net/OAuth/YahooAccessTokenRefreshRequest.pm
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Class::Accessor: '0.31'
   Class::Data::Inheritable: '0.06'
   Crypt::URandom: '0.37'
-  Digest::HMAC_SHA1: '1.01'
   Digest::SHA: '5.47'
   Encode: '2.35'
   LWP::UserAgent: '1'
+  Test::More: '0.66'
+  Test::Warn: '0.21'
   URI: '5.15'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/keeth/Net-OAuth.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

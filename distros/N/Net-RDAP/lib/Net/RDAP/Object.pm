@@ -138,6 +138,21 @@ sub events { $_[0]->objects('Net::RDAP::Event', $_[0]->{'events'}) }
 
 =pod
 
+    $event = $object->event($action);
+
+Returns the first L<Net::RDAP::Event> object whose C<action> property
+matches C<$action> (or C<undef> if no such event is found).
+
+=cut
+
+sub event {
+    my ($self, $action) = @_;
+
+    return [ grep { $_->action eq $action } $self->events ]->[0];
+}
+
+=pod
+
 =head2 Port-43 Whois Server
 
     $port43 = $object->port43;
@@ -172,6 +187,32 @@ Returns a (potentially empty) array of L<Net::RDAP::Object::Entity> objects.
 =cut
 
 sub entities { $_[0]->objects('Net::RDAP::Object::Entity', $_[0]->{'entities'}) }
+
+=pod
+
+    $entity = $object->entity($role);
+
+Returns the first L<Net::RDAP::Object::Entity> object whose C<roles> property
+contains C<$role> (or C<undef> if no such entity is found).
+
+    $registrant = $object->registrant;
+
+Alias for C<$object-E<gt>entity('registrant')>.
+
+    $registrar = $object->registrar;
+
+Alias for C<$object-E<gt>entity('registrar')>.
+
+=cut
+
+sub entity {
+    my ($self, $role) = @_;
+
+    return [ grep { $_->has_role($role) } $self->entities ]->[0];
+}
+
+sub registrant { shift->entity(q{registrant}) }
+sub registrar  { shift->entity(q{registrar}) }
 
 =pod
 

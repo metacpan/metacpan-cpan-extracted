@@ -29,7 +29,7 @@ Readonly::Scalar our $FAILURE => 1;
 Readonly::Scalar our $MIN_PERL_VERSION => $PERL_VERSION;
 
 require Module::ScanDeps::Static::VERSION;
-our $VERSION = '1.7.2';
+our $VERSION = '1.7.6';
 
 use parent qw(CLI::Simple);
 
@@ -486,7 +486,7 @@ sub dump_map {
 
   foreach my $f (@filter_list) {
     foreach my $file ( keys %requirements ) {
-      foreach my $m ( keys $requirements{$file} ) {
+      foreach my $m ( keys %{ $requirements{$file} } ) {
         next if $m !~ /^$f/xsm;
         delete $requirements{$file}->{$m};
       }
@@ -499,7 +499,8 @@ sub dump_map {
   else {
     foreach my $m ( keys %requirements ) {
       print {$fh} sprintf "%s\n", $m;
-      my @map_w_version = map { sprintf "\t%s, %s\n", $_, $requirements{$m}->{$_} } sort keys $requirements{$m};
+      my @map_w_version
+        = map { sprintf "\t%s, %s\n", $_, $requirements{$m}->{$_} } sort keys %{ $requirements{$m} };
       print {$fh} join q{}, @map_w_version;
     }
 

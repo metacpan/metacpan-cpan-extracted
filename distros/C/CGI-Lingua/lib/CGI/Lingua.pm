@@ -3,11 +3,13 @@ package CGI::Lingua;
 use warnings;
 use strict;
 
+use Config::Auto;
+use Log::Abstraction;
 use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 =head1 NAME
 
@@ -15,7 +17,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 =cut
 
@@ -94,25 +96,58 @@ For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
 
 Supported_languages is the same as supported.
 
-Takes optional parameter cache, an object which is used to cache country
-lookups.
+It takes several optional parameters:
+
+=over 4
+
+=item * C<cache>
+
+An object which is used to cache country lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
+
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
+=item * C<logger>
+
+Used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
+such as a L<Log::Log4perl> or L<Log::Any> object,
+a reference to code,
+a reference to an array,
+or a filename.
+See L<Log::Abstraction> for further details.
+
+=item * C<info>
+
+Takes an optional parameter info, an object which can be used to see if a CGI
+parameter is set, for example, an L<CGI::Info> object.
+
+=item * C<data>
+
+Passed on to L<I18N::AcceptLanguage>.
+
+=item * C<dont_use_ip>
+
+By default, if none of the
+requested languages is supported, CGI::Lingua->language() looks in the IP
+address for the language to use.
+This may not be what you want,
+so use this option to disable the feature.
+
+=item * C<syslog>
 
 Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes an optional parameter logger, which is used for warnings and traces.
-It can be an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> or L<Log::Any> object,
-a reference to code,
-a reference to an array,
-or a filename.
-
-Takes an optional parameter info, an object which can be used to see if a CGI
-parameter is set, for example, an L<CGI::Info> object.
+=back
 
 Since emitting warnings from a CGI class can result in messages being lost (you
 may forget to look in your server's log), or appear to the client in
@@ -120,44 +155,54 @@ amongst HTML causing invalid HTML, it is recommended either syslog
 or logger (or both) are set.
 If neither is given, L<Carp> will be used.
 
-Takes an optional parameter dont_use_ip.  By default, if none of the
-requested languages is supported, CGI::Lingua->language() looks in the IP
-address for the language to use.
-This may not be what you want,
-so use this option to disable the feature.
-
-The optional parameter debug is passed on to L<I18N::AcceptLanguage>.
-
 =cut
 
-sub new {
+sub new
+{
 	my $class = shift;
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
-		# Using CGI::Lingua->new(), not CGI::Lingua()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if($params) {
+			# Using CGI::Lingua:new(), not CGI::Lingua->new()
+			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		}
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
 		# clone the given object
-		return bless { %{$class}, %params }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
+	}
+
+	# Load the configuration from a config file, if provided
+	if(exists($params->{'config_file'}) && (my $config = Config::Auto::parse($params->{'config_file'}))) {
+		# my $config = YAML::XS::LoadFile($params->{'config_file'});
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		$params = {%{$config}, %{$params}};
 	}
 
 	# TODO: check that the number of supported languages is > 0
-	# unless($params{supported} && ($#params{supported} > 0)) {
+	# unless($params->{supported} && ($#params->{supported} > 0)) {
 		# croak('You must give a list of supported languages');
 	# }
-	$params{'supported'} ||= $params{'supported_languages'};
-	unless($params{supported}) {
+	$params->{'supported'} ||= $params->{'supported_languages'};
+	unless($params->{supported}) {
 		Carp::croak('You must give a list of supported languages');
 	}
 
-	my $cache = $params{cache};
-	my $logger = $params{logger};
-	my $info = $params{info};
+	my $cache = $params->{cache};
+	my $logger;
+	if($logger = $params->{'logger'}) {
+		if(!Scalar::Util::blessed($logger)) {
+			$logger = Log::Abstraction->new($logger);
+		}
+	} else {
+		$logger = Log::Abstraction->new();
+	}
+	my $info = $params->{info};
 
 	if($cache && $ENV{'REMOTE_ADDR'}) {
 		my $key = "$ENV{REMOTE_ADDR}/";
@@ -167,7 +212,7 @@ sub new {
 		} elsif($l = $class->_what_language()) {
 			$key .= "$l/";
 		}
-		$key .= join('/', @{$params{supported}});
+		$key .= join('/', @{$params->{supported}});
 		if($logger) {
 			# $self->debug("Looking in cache for $key");
 		}
@@ -177,9 +222,9 @@ sub new {
 			# }
 			$rc = Storable::thaw($rc);
 			$rc->{_logger} = $logger;
-			$rc->{_syslog} = $params{syslog};
+			$rc->{_syslog} = $params->{syslog};
 			$rc->{_cache} = $cache;
-			$rc->{_supported} = $params{supported};
+			$rc->{_supported} = $params->{supported};
 			$rc->{_info} = $info;
 			$rc->{_have_ipcountry} = -1;
 			$rc->{_have_geoip} = -1;
@@ -195,8 +240,8 @@ sub new {
 	}
 
 	return bless {
-		%params,
-		_supported => $params{supported}, # List of languages (two letters) that the application
+		%{$params},
+		_supported => $params->{supported}, # List of languages (two letters) that the application
 		_cache => $cache,	# CHI
 		_info => $info,
 		# _rlanguage => undef,	# Requested language
@@ -206,13 +251,14 @@ sub new {
 		# _sublanguage_code_alpha2 => undef, # E.g. us, gb
 		# _country => undef,	# Two letters, e.g. gb
 		# _locale => undef,	# Locale::Object::Country
-		_syslog => $params{syslog},
-		_dont_use_ip => $params{dont_use_ip} || 0,
+		_syslog => $params->{syslog},
+		_dont_use_ip => $params->{dont_use_ip} || 0,
 		_logger => $logger,
 		_have_ipcountry => -1,	# -1 = don't know
 		_have_geoip => -1,	# -1 = don't know
 		_have_geoipfree => -1,	# -1 = don't know
-		_debug => $params{debug} || 0,
+		_debug => $params->{debug} || 0,
+		logger => $logger,
 	}, $class;
 }
 
@@ -840,7 +886,7 @@ caching capability of CGI::Lingua.
 sub country {
 	my $self = shift;
 
-	$self->_trace('Entered country');
+	$self->_trace(__PACKAGE__, ': Entered country()');
 
 	# FIXME: If previous calls to country() return undef, we'll
 	# waste time going through again and no doubt returning undef
@@ -1305,38 +1351,18 @@ sub _code2countryname
 	}
 }
 
-# Helper routines for logger()
+# Log and remember a message
 sub _log
 {
 	my ($self, $level, @messages) = @_;
 
 	# FIXME: add caller's function
 	# if(($level eq 'warn') || ($level eq 'notice')) {
-		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
+		push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		if(ref($logger) eq 'CODE') {
-			# Code reference
-			$logger->({
-				class => ref($self) // __PACKAGE__,
-				function => (caller(2))[3],
-				line => (caller(1))[2],
-				level => $level,
-				message => \@messages
-			});
-		} elsif(ref($logger) eq 'ARRAY') {
-			push @{$logger}, { level => $level, message => join(' ', grep defined, @messages) };
-		} elsif(!ref($logger)) {
-			# File
-			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
-				close $fout;
-			}
-		} else {
-			# Object
-			$logger->$level(@messages);
-		}
+		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
 
@@ -1363,40 +1389,9 @@ sub _trace {
 # Emit a warning message somewhere
 sub _warn {
 	my $self = shift;
-
 	my $params = Params::Get::get_params('warning', @_);
 
-	# Validate input parameters
-	return unless($params && (ref($params) eq 'HASH'));
-	my $warning = $params->{'warning'};
-	return unless($warning);
-
-	if($self eq __PACKAGE__) {
-		# Called from class method
-		Carp::carp($warning);
-		return;
-	}
-	# return if($self eq __PACKAGE__);  # Called from class method
-
-	# Handle syslog-based logging
-	if($self->{syslog}) {
-		require Sys::Syslog;
-
-		Sys::Syslog->import();
-		if(ref($self->{syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{syslog});
-		}
-		openlog($self->{'_info'}->script_name(), 'cons,pid', 'user');
-		syslog('warning|local0', $warning);
-		closelog();
-	}
-
-	# Handle logger-based logging
-	$self->_log('warn', $warning);
-	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
-		# Fallback to Carp
-		Carp::carp($warning);
-	}
+	$self->_log('warn', $params->{'warning'});
 }
 
 =head1 AUTHOR
@@ -1422,11 +1417,19 @@ This means that if you support languages at a lower priority, it may be missed.
 
 =head1 SEE ALSO
 
-L<HTTP::BrowserDetect>
-L<I18N::AcceptLangauge>
-L<Locale::Country>
+=over 4
+
+=item * L<HTTP::BrowserDetect>
+
+=item * L<I18N::AcceptLangauge>
+
+=item * L<Locale::Country>
+
+=back
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

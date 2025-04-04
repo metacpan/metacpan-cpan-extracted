@@ -1,14 +1,22 @@
 Revision history for perl module Net::RDAP:
 
-0.35 - 2026-03-19
+0.37 - 2025-04-03
+  - added link() and related() methods to Net::RDAP::Base.
+  - added event(), entity(), registrant() and registrar() methods to
+    Net::RDAP::Object.
+  - added has_role() to Net::RDAP::Object::Entity.
+
+0.36 - 2025-03-19
   - remove vCard as a dependency in Makefile.PL
-  - change use of DateTime::Format::ISO8601 in Net::RDAP::Registry::IANARegistry.
+  - change use of DateTime::Format::ISO8601 in
+    Net::RDAP::Registry::IANARegistry.
   - thanks to Petr Pisar for reporting these issues!
 
 0.35 - 2025-03-19
   - limited support for the Reverse Search and RIR Reverse Search specs.
   - add Net::RDAP::JSON to allow JSON backends to be switched.
-  - use DateTime::Tiny instead of DateTime::Format::ISO8601 to improve performance.
+  - use DateTime::Tiny instead of DateTime::Format::ISO8601 to improve
+    performance.
   - Remove support for vCard.
 
 0.34 - 2025-03-13
@@ -58,8 +66,8 @@ Revision history for perl module Net::RDAP:
     addresses.
 
 0.25 - 2024-06-07
-  - add a new object (Net::RDAP::JCard) that provides a way to access
-    contact data in entity objects that isn't lossless, unlike vCard.
+  - add a new object (Net::RDAP::JCard) that provides a way to access contact
+    data in entity objects that isn't lossless, unlike vCard.
 
 0.24 - 2024-05-30
   - add support for Redacted Fields (RFC 9537)
@@ -87,19 +95,17 @@ Revision history for perl module Net::RDAP:
 0.17 - (skipped)
 
 0.16 - 2022-10-06
-  - be more lenient in what we accept to improve
-    interoperability
+  - be more lenient in what we accept to improve interoperability
 
 0.15 - 2020-07-07
   - fixed RT#132736 (Noisy warning on ->fetch(url))
 
 0.14 - 2019-03-06
-  - support for getting help response from RDAP
-    services
+  - support for getting help response from RDAP services
 
   - added Net::RDAP::Registry::IANARegistry and
-    Net::RDAP::Registry::IANARegistry::Service
-    and refactored Net::RDAP::Registry to use them
+    Net::RDAP::Registry::IANARegistry::Service and refactored
+    Net::RDAP::Registry to use them
 
 0.13 - 2019-01-15
   - add support for RFC 8521 object tagging

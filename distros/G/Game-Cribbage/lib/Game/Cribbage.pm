@@ -1,15 +1,10 @@
 package Game::Cribbage;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use Rope;
 use Rope::Autoload;
 use Game::Cribbage::Board;
-
-property inverse => (
-	initable => 1,
-	value => 1
-);
 
 prototyped 'board' => undef, dealer => undef, crib_set => 0, starter_card => undef; 
 
@@ -653,13 +648,21 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
 =head1 SYNOPSIS
 
 	lnation$ cribbage
+
+	...
+
+	use Game::Cribbage;
+
+	Game::Cribbage->new()->start();
+
+	...
 	
 =for html <img style="width:500px" src="https://raw.githubusercontent.com/ThisUsedToBeAnEmail/Game-Cribbage/main/test.png" title="img-tag, local-dist" alt="Inlineimage" />
 
@@ -698,6 +701,247 @@ Version 0.11
 	$engine->end_hands();
 	$engine->score;
 
+=head1 DESCRIPTION
+
+Cribbage is a card game, typically for two players, where the goal is to be the first to reach 121 points by forming counting combinations of cards and using a special pegging board to track scores. 
+
+The L<Game::Cribbage> class is an implementation of cribbage using the terminal. The distribution itself is an game engine and should contain all the logic you need to build a version of Cribbage using any alternative interface.
+
+=head1 PROPERTIES
+
+The following properties are defined in L<Game::Cribbage>
+
+=head2 board
+
+Property to store the current L<Game::Cribbage::Board>
+
+	$game->board;
+
+=head2 dealer
+
+Property to store a boolean of whether the current player is the dealer for the current round. If true they are.
+
+	$game->dealer;
+
+=head2 crib_set
+
+Property to store a boolean of whether the current plays crib is set.
+
+	$game->crib_set;
+
+=head2 starter_card
+
+Property to store the starter card for the current play.
+
+	$game->starter_card;.
+
+
+=head1 FUNCTIONS
+
+The following functions are defined in L<Game::Cribbage>
+
+
+	my $game = Game::Cribbage->new;
+
+	$game->clear_screen;
+
+        $game->print_header("Welcome to terminal Cribbage");
+
+        $game->print_footer("Insert name: ");
+
+        my $name = <STDIN>;
+
+        chomp($name);
+
+        my $board = Game::Cribbage::Board->new();
+
+        $board->add_player(name => 'Bot');
+        $board->add_player(name => $name);
+
+        $board->start_game();
+/split
+        $game->board = $board;
+
+	$game->clear_screen;
+
+	$game->reset_cursor();
+	
+	$game->split_cards();
+
+	$game->init_draw();
+
+
+=head2 start
+
+Start a new terminal cribbage game. This function setups the L<Game::Cribbage::Board> setting the players and starting the game. It will then call init_game.
+
+	$game->start();
+
+
+=head2 init_game
+
+Initialise a new terminal game, clearing the welcome start screen, calling split_cards and then init_draw.
+
+	$game->init_game();
+
+
+=head2 init_draw
+
+This is where the main terminal game loop happens. For each new round/draw this function is called recursively. Cards are drawn, discarded and the starter card is set. Hands are played until no cards are left, scores are calculated and we repeat..
+
+	$game->init_draw();
+
+=head2 end_hands
+
+When all cards have been used in the current draw/round then this end_hands function should be called. It handles the ending of the round and will render to the terminal an overview of the round/draw including all cards and the relevant scores.
+
+	$game->end_hands();
+
+=head2 play_hand
+
+Contains the logic needed to handle the play of the players hand, aka placing a card or calling go because you cannot play a card.
+
+	$game->play_hand();. 
+
+
+=head2 split_cards
+
+Contains the logic needed to decide which player goes first as the dealer.
+
+	$game->split_cards();
+
+=head2 draw_cards
+
+Contains the logic needed to draw player cards so they can then decide which two to discard.
+
+	$game->draw_cards();
+
+=head2 discard_cards
+
+Contains the logic neeeded to discard two cards from the players and bots hands into the crib.
+
+	$game->discard_cards();
+
+=head2 starter
+
+Contains the logic needed to select the starter card for the current draw.
+
+	$game->starter();
+
+=head2 render_card
+
+Contians the logic needed to render a card to the terminal.
+
+	$game->render_card($card, $row, $col);
+
+=head2 render_opponent_cards
+
+Contains the logic needed to render the opponents cards to the terminal. AKA face down at the top of the screen.
+
+	$game->render_opponent_cards($num);
+
+=head2 render_player_cards
+
+Contains the logic needed to render the players cards to the terminal. AKA face up at the bottom of the screen.
+
+	$game->render_player_cards($cards, $row, $col, $all);
+
+=head2 render_run_play
+
+Contains the logic needed to render the current plays run cards. AKA the cards that have been played for the current play in the middle of the screen.
+
+	$game->render_run_play;
+
+
+=head2 show_face_down_split
+
+Utility function to render face down cards to the terminal.
+
+	$game->show_face_down_split($num, $vertical);
+
+=head2 draw_background
+
+Utility function to draw the basic cribbage game, this function calls draw_dealer, draw_crib, draw_starter and reset_cursor. It will render the green background, dealer, crib and starter card to the terminal.
+
+	$game->draw_background();
+
+=head2 draw_starter
+
+Utility function to draw the starter card to the terminal. If no starter card is set then nothing will be drawn.
+
+	$game->draw_starter();
+
+=head2 draw_crib
+
+Utility function to draw the crib to the terminal, depending on who is the dealer.
+
+	$game->draw_crib();
+
+=head2 draw_go
+
+Utitlity function to draw GO to the terminal.
+
+	$game->draw_go();
+
+=head2 draw_dealer
+
+Utility function to draw the text "Dealer" to the terminal, this will be against the player who is currently the dealer.
+
+	$game->draw_dealer();.
+
+=head2 draw_scores
+
+Utility function to draw the current scores to the terminal.
+
+	$game->draw_scores();
+
+=head2 winner
+
+Utility function to draw the winners screen to the terminal at the end of the game.
+
+	$game->winner();
+
+=head2 clear_screen
+
+Utility function to clear the terminal.
+
+	$game->clear_screen();
+
+=head2 reset_cursor
+
+Utility function to reset the terminal cursor position.
+
+	$game->reset_cursor();
+
+=head2 set_cursor_vertical
+
+Utiltiy function to set the vertical position of the terminal cursor.
+
+	$game->set_cursor_vertical($y);
+
+=head2 set_cursor_horizontal
+
+Utility function to set the horizontal position of the terminal cursor.
+
+	$game->set_cursor_horizontal($x);
+
+=head2 say
+
+Utility function to print text to the terminal.
+
+	$game->say("Hello World", $new_line, $indent, $color, $background);
+
+=head2 print_header
+
+Utility function to print the header to the terminal
+
+	$game->print_header("Print some header text");
+
+=head2 print_footer
+
+Utility function to print the footer to the terminal
+
+	$game->print_footer("Print some footer text");
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
 Revision history for Compression-Util
 
+0.15    2025-04-03
+
+        [BUG-FIXES]
+
+        - Set the appropriate DEFLATE values inside the `deflate_*` functions.
+
 0.14    2024-11-06
 
         [ADDITIONS]

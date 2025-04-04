@@ -1,3 +1,10 @@
+v0.03   2025-04-03Z
+    - Improved input validation
+    - Added property inodeise
+    - Added new special filters for query(): ise, min_size, max_size
+    - Allow lists in query()
+    - Added new fix remove-inodeise
+
 v0.02   2025-03-28Z
     - Added support for easy link generation
     - Added fix() method on the store object to allow for easy maintenance of the store

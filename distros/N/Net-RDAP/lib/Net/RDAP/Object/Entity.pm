@@ -1,5 +1,6 @@
 package Net::RDAP::Object::Entity;
 use base qw(Net::RDAP::Object);
+use List::Util qw(any);
 use strict;
 use warnings;
 
@@ -25,6 +26,10 @@ Other methods include:
 Returns a (potentially empty) array listing this entity's roles. The possible
 values is defined by an IANA registry, see:
 
+    $object->has_role($role);
+
+Returns a true value if the entity has the role specified by C<$role>.
+
 =over
 
 =item * L<https://www.iana.org/assignments/rdap-json-values/rdap-json-values.xhtml>
@@ -34,6 +39,11 @@ values is defined by an IANA registry, see:
 =cut
 
 sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
+
+sub has_role {
+    my ($self, $role) = @_;
+    return any { $_ eq $role } $self->roles;
+}
 
 =pod
 

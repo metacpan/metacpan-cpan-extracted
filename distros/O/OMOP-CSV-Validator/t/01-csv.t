@@ -59,13 +59,12 @@ sub validate_csv_from_text {
     for my $i ( 0 .. $#$records ) {
         my $record = $records->[$i];
 
-        # Coerce numeric fields based on the schema
+        # Coerce numeric fields based on the _coerce flag
         for my $col ( keys %{ $schema->{properties} } ) {
             if ( exists $record->{$col} ) {
                 my $prop = $schema->{properties}->{$col};
-                if ( $prop->{type} eq 'integer' or $prop->{type} eq 'number' ) {
-                    my $new_val =
-                      $validator->dotify_and_coerce_number( $record->{$col} );
+                if ( defined $prop->{_coerce} && $prop->{_coerce} ) {
+                    my $new_val = $validator->dotify_and_coerce_number( $record->{$col} );
                     if ( defined $new_val ) {
                         $record->{$col} = $new_val;
                     }

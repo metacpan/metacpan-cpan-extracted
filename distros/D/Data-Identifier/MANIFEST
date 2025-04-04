@@ -10,6 +10,7 @@ README
 cpanfile
 dist.ini
 lib/Data/Identifier.pm
+lib/Data/Identifier/Cloudlet.pm
 lib/Data/Identifier/Generate.pm
 lib/Data/Identifier/Interface/Known.pm
 lib/Data/Identifier/Wellknown.pm

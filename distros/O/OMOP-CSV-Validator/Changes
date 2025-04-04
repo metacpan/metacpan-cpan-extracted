@@ -1,4 +1,12 @@
-Rvision history for Perl distribution OMOP-CSV-Validator
+Revision history for Perl distribution OMOP-CSV-Validator
+
+0.03 2025-04-03T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added blank_is_undef => 1 to TEXT::CSV_XS
+ - Fixed issue with non-required properties with NULL values
+ - Added a custom "_coerce" property on numeric fields to enable coercion into number
+ - Added Term::ANSIColor + emojis to stdout
+ - Added optional <--no-colors> parameter to turn off Term::ANSIColor
 
 0.02 2025-04-02T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

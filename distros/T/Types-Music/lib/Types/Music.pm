@@ -4,7 +4,7 @@ package Types::Music;
 
 our $AUTHORITY = 'cpan:GENE';
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0200';
 
 use 5.016;
 use strict;
@@ -18,12 +18,9 @@ use Type::Library 2.000000
         Types::Common::String
     )],
     -declare => qw(
-        BPM
-        Bars
-        Beats
-        Divisions
-        Signature
+        PosInt
         Octave
+        Signature
         Key
         Named_Note
         Named_Note_Octave
@@ -32,23 +29,14 @@ use Type::Library 2.000000
 
 use Type::Utils 2.000000 -all;
 
-declare BPM,
-    as PositiveNum;
+declare PosInt,
+    as PositiveInt;
 
-declare Bars,
-    as PositiveNum;
-
-declare Beats,
-    as PositiveNum;
-
-declare Divisions,
-    as PositiveNum;
+declare Octave,
+    as PositiveOrZeroInt; # the zero-octave means "use pitch-class" in some module of mine...
 
 declare Signature,
     as StrMatch[ qr/^[1-9]\d?\/[1-9]\d?$/ ];
-
-declare Octave,
-    as PositiveOrZeroNum; # the zero-octave means "use pitch-class" in some module of mine...
 
 declare Key,
     as StrMatch[ qr/^[A-G][#b]?$/ ];
@@ -86,14 +74,20 @@ Types::Music - Type Library for Music Programming
 
 =head1 VERSION
 
-version 0.0104
+version 0.0200
 
 =head1 SYNOPSIS
 
     use Moo;
     use Types::Music -all;
 
-    has named_note => (
+    has bars => (
+        is      => 'ro',
+        isa     => PosInt,
+        default => '4',
+    );
+
+    has iso_note => (
         is      => 'ro',
         isa     => Named_Note_Octave,
         default => 'C4',
@@ -135,32 +129,21 @@ Exports everything.
 
 =head1 TYPES
 
-=head2 BPM
+=head2 PosInt
 
-A positive integer beats per minute.
+A positive integer. This can be used for things like beats per minute,
+number of measures (or "bars"), beats, etc.
 
-=head2 Bars
+=head2 Octave
 
-A positive integer number of bars (or measures).
-
-=head2 Beats
-
-A positive integer number of beats per measure.
-
-=head2 Divisions
-
-A positive integer number of divisions.
+A numeric octave. Usually C<1> to C<6>. Higher and it's not really
+audible. Zero C<0> is special cased to allow specific module behavior.
 
 =head2 Signature
 
 A string representing a time signature, like C<3/4>. The B<Signature>
 is a fraction with B<Beats> as numerator and B<Divisions> as
 denominator.
-
-=head2 Octave
-
-A numeric octave. Usually C<1> to C<6>. Higher and it's not really
-audible. Zero C<0> is special cased to allow specific module behavior.
 
 =head2 Key
 
@@ -190,44 +173,23 @@ A mode name. The known modes are:
 
 =head1 FUNCTIONS
 
-=head2 is_BPM
+=head2 is_PosInt
 
-Returns true if the passed value can be used as a L</BPM>.
+Returns true if the passed value can be used as a L</PosInt>.
 
-=head2 assert_BPM
+=head2 assert_PosInt
 
 Returns the passed value if and only if it can be used as a
-L</BPM>, otherwise an exception is thrown.
+L</PosInt>, otherwise an exception is thrown.
 
-=head2 is_Bars
+=head2 is_Octave
 
-Returns true if the passed value can be used as the number of
-L</Bars>.
+Returns true if the passed value can be used as an L</Octave>.
 
-=head2 assert_Bars
+=head2 assert_Octave
 
-Returns the passed value if and only if it can be used as the number
-of L</Bars>, otherwise an exception is thrown.
-
-=head2 is_Beats
-
-Returns true if the passed value can be used as the number of
-L</Beats>.
-
-=head2 assert_Beats
-
-Returns the passed value if and only if it can be used as the number
-of L</Beats>, otherwise an exception is thrown.
-
-=head2 is_Divisions
-
-Returns true if the passed value can be used as the number of
-L</Divisions>.
-
-=head2 assert_Divisions
-
-Returns the passed value if and only if it can be used as the number
-of L</Divisions>, otherwise an exception is thrown.
+Returns the passed value if and only if it can be used as an
+L</Octave>, otherwise an exception is thrown.
 
 =head2 is_Signature
 
@@ -238,15 +200,6 @@ L</Signature>.
 
 Returns the passed value if and only if it can be used as a time
 signature L</Signature>, otherwise an exception is thrown.
-
-=head2 is_Octave
-
-Returns true if the passed value can be used as an L</Octave>.
-
-=head2 assert_Octave
-
-Returns the passed value if and only if it can be used as an
-L</Octave>, otherwise an exception is thrown.
 
 =head2 is_Key
 

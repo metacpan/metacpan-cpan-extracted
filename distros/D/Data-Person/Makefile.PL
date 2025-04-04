@@ -26,11 +26,12 @@ resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Person';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-Person';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
+test_requires 'Data::ExternalId' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

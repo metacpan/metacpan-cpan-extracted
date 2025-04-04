@@ -3,7 +3,7 @@ use warnings;
 use Module::Build;
 use Config;
 
-my $VERSION = '3.04';
+my $VERSION = '3.05';
 
 # On OSX we need to restrict the exported symbols in the bundle
 # to prevent NDF linking against libast clashing with NDF loading

@@ -93,9 +93,19 @@ foreach my $test (@tests) {
 my $result = $rdap->domain((q{test.} x 13).q{com});
 isa_ok($result, $class.q{::Error});
 
-my $domain = $rdap->domain('icann.org');
+my $domain = $rdap->domain('perl.org');
 ok($domain->zoneSigned || 1);
 ok($domain->delegationSigned || 1);
 cmp_ok(scalar($domain->ds), '>', 0);
+
+isa_ok($domain->event('registration'),  $class.q{::Event});
+isa_ok($domain->registrar,              $class.q{::Object::Entity});
+
+my $link = $domain->related;
+isa_ok($link, $class.q{::Link});
+
+my $rar_record = $rdap->fetch($link);
+isa_ok($rar_record,             $class.q{::Object::Domain});
+isa_ok($rar_record->registrant, $class.q{::Object::Entity});
 
 done_testing;

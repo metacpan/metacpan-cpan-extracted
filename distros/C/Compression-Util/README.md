@@ -46,7 +46,8 @@ $opts{d} ? decompress(\*STDIN, \*STDOUT) : compress(\*STDIN, \*STDOUT);
     * LZ77/LZSS (de)compression
     * LZW (de)compression
     * Bzip2 (de)compression
-    * Gzip (de)compression
+    * GZIP (de)compression
+    * ZLIB (de)compression
     * LZ4 (de)compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
@@ -193,8 +194,11 @@ By default, `$LZ_MAX_CHAIN_LEN` is set to `32`.
       bzip2_compress($string)              # Compress a given string using the Bzip2 format
       bzip2_decompress($fh)                # Inverse of the above method
 
-      gzip_compress($string)               # Compress a given string using the Gzip format
+      gzip_compress($string)               # Compress a given string using the GZIP format
       gzip_decompress($fh)                 # Inverse of the above method
+
+      zlib_compress($string)               # Compress a given string using the ZLIB format
+      zlib_decompress($fh)                 # Inverse of the above method
 
       lzss_compress($string)               # LZSS + DEFLATE-like encoding of lengths and distances
       lzss_decompress($fh)                 # Inverse of the above method
@@ -616,7 +620,7 @@ Valid Bzip2 decompressor, given a string or an input file-handle.
     my $string = gzip_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
 ```
 
-Valid Gzip compressor, given a string or an input file-handle.
+Valid GZIP compressor (RFC 1952), given a string or an input file-handle.
 
 ## gzip\_decompress
 
@@ -625,7 +629,26 @@ Valid Gzip compressor, given a string or an input file-handle.
     my $data = gzip_decompress($fh);
 ```
 
-Valid Bzip2 decompressor, given a string or an input file-handle.
+Valid GZIP decompressor (RFC 1952), given a string or an input file-handle.
+
+## zlib\_compress
+
+```perl
+    my $string = zlib_compress($fh);
+    my $string = zlib_compress($data);
+    my $string = zlib_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
+```
+
+Valid ZLIB compressor (RFC 1950), given a string or an input file-handle.
+
+## zlib\_decompress
+
+```perl
+    my $data = zlib_decompress($string);
+    my $data = zlib_decompress($fh);
+```
+
+Valid ZLIB decompressor (RFC 1950), given a string or an input file-handle.
 
 ## mrl\_compress / mrl\_compress\_symbolic
 
@@ -1046,7 +1069,16 @@ The function returns the decoded string.
     my $int32 = crc32($data, $prev_crc32);
 ```
 
-Compute the CRC32 of a given string.
+Compute the CRC32 checksum of a given string.
+
+## adler32
+
+```perl
+    my $int32 = adler32($data);
+    my $int32 = adler32($data, $prev_adler32);
+```
+
+Compute the Adler32 checksum of a given string.
 
 ## read\_bit
 
@@ -1410,6 +1442,103 @@ There is no need to call this function explicitly. Use `deflate_encode()` instea
 
 Low-level function that returns the index inside the DEFLATE tables for a given value.
 
+## deflate\_create\_block\_type\_0\_header
+
+```perl
+    my $bt0_header = deflate_create_block_type_0_header($chunk);
+```
+
+Creates the header for a DEFLATE block of type 0 (uncompressed), as a bitstring, without including the block code number `00`.
+
+The length of the `$chunk` must not exceed `2^16 - 1`.
+
+To create a DEFLATE block of type 0, including the content, use:
+
+```perl
+    my $block_type_0 = pack('b*', '00') . pack('b*', $bt0_header) . $chunk;
+```
+
+which can be recovered as:
+
+```perl
+    open my $fh, '<:raw', \$block_type_0;
+    my ($buffer, $search_window) = ('', '');
+    my $chunk = deflate_extract_next_block($fh, \$buffer, \$search_window);
+```
+
+## deflate\_create\_block\_type\_1
+
+```perl
+    my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+```
+
+Creates a DEFLATE block of type 1 (fixed prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by `lzss_encode()`.
+
+This type of block uses fixed prefix-codes and is pretty fast.
+
+## deflate\_create\_block\_type\_2
+
+```perl
+    my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+```
+
+Creates a DEFLATE block of type 2 (dynamic prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by `lzss_encode()`.
+
+This type of block uses dynamic prefix-codes (Huffman codes) and produces good compression ratio on most inputs.
+
+## deflate\_extract\_block\_type\_0
+
+```perl
+    my $data = deflate_extract_block_type_0($fh, \$buffer, \$search_window);
+```
+
+Given an input filehandle, it extracts a DEFLATE block of type 0 (uncompressed).
+
+```perl
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 0 or die "Not a block of type 0";
+    my $decoded_chunk = deflate_extract_block_type_0($fh, \$buffer, \$search_window);
+```
+
+## deflate\_extract\_block\_type\_1
+
+```perl
+    my $data = deflate_extract_block_type_1($fh, \$buffer, \$search_window);
+```
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts a DEFLATE block of type 1 (fixed prefix-codes).
+
+```perl
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 1 or die "Not a block of type 1";
+    my $decoded_chunk = deflate_extract_block_type_1($fh, \$buffer, \$search_window);
+```
+
+## deflate\_extract\_block\_type\_2
+
+```perl
+    my $data = deflate_extract_block_type_2($fh, \$buffer, \$search_window);
+```
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts a DEFLATE block of type 2 (dynamic prefix-codes).
+
+```perl
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 2 or die "Not a block of type 2";
+    my $decoded_chunk = deflate_extract_block_type_2($fh, \$buffer, \$search_window);
+```
+
+## deflate\_extract\_next\_block
+
+```perl
+    my $data = deflate_extract_next_block($fh, \$buffer, \$search_window);
+```
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts the next DEFLATE block. The next two bits in the input file-handle (or in the bitstring buffer) must contain the block-type number.
+
 # EXPORT
 
 Each function can be exported individually, as:
@@ -1501,6 +1630,8 @@ The functions can be combined in various ways, easily creating novel compression
     * [https://datatracker.ietf.org/doc/html/rfc1951](https://datatracker.ietf.org/doc/html/rfc1951)
 - GZIP file format specification
     * [https://datatracker.ietf.org/doc/html/rfc1952](https://datatracker.ietf.org/doc/html/rfc1952)
+- ZLIB Compressed Data Format Specification
+    * [https://datatracker.ietf.org/doc/html/rfc1950](https://datatracker.ietf.org/doc/html/rfc1950)
 - BZIP2 Format Specification, by Joe Tsai:
     * [https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf](https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf)
 - LZ4 Frame format

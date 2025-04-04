@@ -10,7 +10,7 @@ use Readonly;
 
 Readonly::Array our @TYPES => qw(info error);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has lang => (
 	is => 'ro',
@@ -101,7 +101,7 @@ Returns instance of object.
 
 =head2 C<lang>
 
- my $lane = $obj->lang;
+ my $lang = $obj->lang;
 
 Get ISO 639-1 language code of text.
 
@@ -182,12 +182,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

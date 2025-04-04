@@ -1,3 +1,10 @@
+v0.10  2025-04-03Z
+    - Allow passing fii (File::Information), and store (File::FStore) objects
+    - Updated infos on prototype of displaycolour(), icontext(), and description()
+    - Added support for cloudlets
+    - Added better support for Data::URIID::Colour
+    - Added support for File::FStore::File
+
 v0.09  2025-03-19Z
     - Fixed handling of Data::URIID::Base objects in as()
     - Added additional small-identifier values

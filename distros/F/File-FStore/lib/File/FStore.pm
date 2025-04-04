@@ -19,7 +19,7 @@ use Data::Identifier::Generate;
 
 use File::FStore::File;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -201,18 +201,43 @@ sub query {
             $order = shift(@query) // croak 'Incomplete query';
             $order = uc($order);
             croak 'Bad order' if $order ne 'ASC' && $order ne 'DESC';
+        } elsif ($cmd eq 'min_size') {
+            my $v = shift(@query) // croak 'Incomplete query';
+            push(@q, 'SELECT file AS id FROM file_properties WHERE key = \'size\' AND CAST(value AS BIG INTEGER) >= ?');
+            push(@p, $v);
+        } elsif ($cmd eq 'max_size') {
+            my $v = shift(@query) // croak 'Incomplete query';
+            push(@q, 'SELECT file AS id FROM file_properties WHERE key = \'size\' AND CAST(value AS BIG INTEGER) <= ?');
+            push(@p, $v);
         } elsif ($cmd eq 'dbname') {
             my $v = shift(@query) // croak 'Incomplete query';
-            my $placeholders;
 
             $v = [$v] unless ref $v;
 
             croak 'Empty list for dbname' unless scalar(@{$v});
 
-            $placeholders = '?,' x scalar(@{$v});
-            $placeholders =~ s/,$//;
+            push(@q, 'SELECT id FROM file WHERE '.$self->_placeholders(filename => $v));
+            push(@p, @{$v});
+        } elsif ($cmd eq 'ise') {
+            my $v = shift(@query) // croak 'Incomplete query';
 
-            push(@q, 'SELECT id FROM file WHERE filename IN ('.$placeholders.')');
+            if (ref $v) {
+                if (eval {$v->isa('Data::Identifier::Cloudlet')}) {
+                    $v = [$v->entries];
+                } elsif (eval {$v->can('ise')}) {
+                    $v = [$v];
+                }
+            } else {
+                $v = [$v];
+            }
+
+            croak 'Empty list for ise' unless scalar(@{$v});
+
+            foreach my $s (@{$v}) {
+                $s = $s->ise if ref $s;
+            }
+
+            push(@q, 'SELECT file AS id FROM file_properties WHERE key IN (\'contentise\', \'inodeise\') AND '.$self->_placeholders(value => $v));
             push(@p, @{$v});
         } else {
             croak 'Invalid query command: '.$cmd;
@@ -220,13 +245,17 @@ sub query {
     }
 
     foreach my $digest (keys %{$fields{digests}}) {
-        unshift(@q, 'SELECT file AS id FROM file_hash WHERE algo = ? AND hash = ?');
-        unshift(@p, $digest, $fields{digests}{$digest});
+        my $v = $fields{digests}{$digest};
+        $v = [$v] unless ref($v) eq 'ARRAY';
+        unshift(@q, 'SELECT file AS id FROM file_hash WHERE algo = ? AND '.$self->_placeholders(hash => $v));
+        unshift(@p, $digest, @{$v});
     }
 
     foreach my $property (keys %{$fields{properties}}) {
-        push(@q, 'SELECT file AS id FROM file_properties WHERE key = ? AND value = ?');
-        push(@p, $property, $fields{properties}{$property});
+        my $v = $fields{properties}{$property};
+        $v = [$v] unless ref($v) eq 'ARRAY';
+        push(@q, 'SELECT file AS id FROM file_properties WHERE key = ? AND '.$self->_placeholders(value => $v));
+        push(@p, $property, @{$v});
     }
 
     unless (scalar @q) {
@@ -364,14 +393,14 @@ sub fix {
     my ($self, @fixes) = @_;
     my %fixes = map {$_ => 1} @fixes;
 
-    foreach my $fix (qw(scrub remove-inode remove-mediasubtype scan)) {
+    foreach my $fix (qw(scrub remove-inode remove-mediasubtype remove-inodeise scan)) {
         next unless delete $fixes{$fix};
 
         if ($fix eq 'scrub') {
             $self->scrub;
         } elsif ($fix eq 'scan') {
             $self->scan;
-        } elsif ($fix =~ /^remove-(inode|mediasubtype)$/) {
+        } elsif ($fix =~ /^remove-(inode|mediasubtype|inodeise)$/) {
             my $what = $1;
             my $sth = $self->{dbh}->prepare('DELETE FROM file_properties WHERE key = ?');
             $sth->execute($what);;
@@ -515,6 +544,15 @@ sub fii {
 
 # ---- Private helpers ----
 
+sub _placeholders {
+    my ($self, $field, $list) = @_;
+    my $placeholders = '?,' x scalar(@{$list});
+
+    $placeholders =~ s/,$//;
+
+    return sprintf('%s IN (%s)', $field, $placeholders);
+}
+
 sub DESTROY {
     my ($self) = @_;
     $self->{dbh}->disconnect if defined $self->{dbh};
@@ -601,7 +639,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -747,6 +785,7 @@ Currently the following commands are defined:
 =item C<properties>
 
 This takes a key and value or a single hashref with properties to match exactly.
+The value can also be an arrayref of values (which are or-ed).
 
 =item C<digests>
 
@@ -761,6 +800,25 @@ This should be used with care as a very long list might be returned.
 
 Selects files by their I<dbname> (see L<File::FStore::File/dbname>).
 Takes a single filename or a list of filenames (as an arrayref).
+
+=item C<ise>
+
+Selects files by their I<ise> (such as their L<File::FStore::File/contentise>, or L<File::FStore::File/inodeise>).
+Takes a single ISE,
+L<Data::Identifier>,
+L<Data::TagDB::Tag>,
+L<Data::URIID::Base>,
+or a list of them (as an arrayref) or a L<Data::Identifier::Cloudlet>.
+
+If a L<Data::Identifier::Cloudlet> all entries are used (see L<Data::Identifier::Cloudlet/entries>), not just root entries.
+
+=item C<min_size>
+
+Selects files by their minimum size. This uses the C<size> value of the C<properties> domain.
+
+=item C<max_size>
+
+Selects files by their maximum size. This uses the C<size> value of the C<properties> domain.
 
 =item C<limit>
 
@@ -837,6 +895,14 @@ Currently the following fixes are supported:
 Removes the inode properties from the store.
 This is useful when transfering the store to another filesystem,
 or if the store is managed externally (e.g. via an vcs).
+
+=item C<remove-inodeise>
+
+Removes the inodeise properties from the store.
+This is useful when transfering the store to another filesystem,
+or if the store is managed externally (e.g. via an vcs).
+In contrast to C<remove-inode> this might not be needed, depending on
+which schema for inodeise was used.
 
 =item C<remove-mediasubtype>
 

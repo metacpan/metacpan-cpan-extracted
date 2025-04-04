@@ -23,21 +23,24 @@ no_index:
 provides:
   Module::ScanDeps::FindRequires:
     file: lib/Module/ScanDeps/FindRequires.pm
-    version: v1.7.2
+    version: v1.7.6
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: v1.7.2
+    version: v1.7.6
   Module::ScanDeps::Static::VERSION:
     file: lib/Module/ScanDeps/Static/VERSION.pm
-    version: v1.7.2
+    version: v1.7.6
 requires:
-  CLI::Simple: v0.0.4
-  Class::Accessor::Fast: '0.51'
-  IO::Scalar: '2.111'
-  JSON: '4.10'
+  CLI::Simple: '0'
+  Class::Accessor::Fast: '0'
+  IO::Scalar: '0'
+  JSON: '0'
   Pod::Find: '0'
-  Readonly: '2.05'
+  Progress::Any: '0'
+  Progress::Any::Output: '0'
+  Progress::Any::Output::TermProgressBarColor: '0'
+  Readonly: '0'
   perl: '5.010'
 resources: {}
-version: v1.7.2
+version: v1.7.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
