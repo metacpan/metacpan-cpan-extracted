@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.67';
+$VERSION = '0.68';
 use strict;
 use warnings;
 use Carp;
@@ -785,10 +785,10 @@ sub Button2Motion {
 	my ($mx, $my, $cursor) = @$mousepos;
 	$self->{'mouse_pos'} = [$x, $y, $cursor];
 
-	my $dx = $mx - $x;
 	my $dy = $my - $y;
 
 	$self->yviewScroll(-$dy, 'units');
+	$self->Callback('-yscrollcmd', $x, $y);
 }
 
 sub Button2Release {

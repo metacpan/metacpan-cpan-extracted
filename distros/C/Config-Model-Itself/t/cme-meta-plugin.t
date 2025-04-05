@@ -32,6 +32,7 @@ SKIP: {
     $wr_test->remove_tree if $wr_test->is_dir;
 
     $wr_test->mkpath;
+    $wr_test->child('models')->mkpath;
 
     {
         # test plugin
@@ -50,6 +51,7 @@ SKIP: {
         my $result = test_app( 'App::Cme' => \@test_args ) ;
 
         is($result->error, undef, 'threw no exceptions');
+        is($result->stderr, '', 'nothing sent to sderr');
 
         say "-- stdout --\n", $result->stdout,"-----"  if $trace;
 

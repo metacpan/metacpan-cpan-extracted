@@ -8,7 +8,7 @@ use parent 'Class::Accessor';
 
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 Travel::Status::DE::DBRIS::Journey->mk_ro_accessors(
 	qw(day id train type number is_cancelled));
@@ -32,7 +32,9 @@ sub new {
 
 	# Number is either train no (ICE, RE) or line no (S, U, Bus, ...)
 	# with no way of distinguishing between those
-	( $ref->{type}, $ref->{number} ) = split( qr{\s+}, $ref->{train} );
+	if ( $ref->{train} ) {
+		( $ref->{type}, $ref->{number} ) = split( qr{\s+}, $ref->{train} );
+	}
 
 	# The line number seems to be encoded in the trip ID
 	if ( not defined $ref->{number}

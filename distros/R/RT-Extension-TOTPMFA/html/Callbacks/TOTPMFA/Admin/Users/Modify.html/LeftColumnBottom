@@ -1,0 +1,19 @@
+<%doc>
+Show the user's MFA type.
+</%doc>
+\
+<%ARGS>
+$UserObj => undef
+</%ARGS>
+\
+<%INIT>
+return if (not $UserObj);
+return if (not $UserObj->Id);
+return if (not $UserObj->Privileged);
+
+my $Settings = RT::Extension::TOTPMFA::UserSettings($UserObj);
+</%INIT>
+\
+<&| /Widgets/TitleBox, title => loc('Multi-factor authentication'), id => "user-prefs-totpmfa" &>
+<& /Elements/TOTPMFATypeSelector, Settings => $Settings &>
+</&>

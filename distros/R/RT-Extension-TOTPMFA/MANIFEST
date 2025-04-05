@@ -1,0 +1,18 @@
+Changes
+.gitignore
+html/Callbacks/TOTPMFA/Admin/Users/Modify.html/BeforeUpdate
+html/Callbacks/TOTPMFA/Admin/Users/Modify.html/LeftColumnBottom
+html/Callbacks/TOTPMFA/autohandler/Auth
+html/Callbacks/TOTPMFA/Prefs/AboutMe.html/UpdateLogic
+html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn
+html/Elements/TOTPMFATypeSelector
+html/NoAuth/TOTPMFALogin.html
+html/Prefs/TOTPMFA.png
+lib/RT/Extension/TOTPMFA.pm
+LICENSE
+make-dist.sh
+Makefile.PL
+MANIFEST
+META.yml
+README.md
+SIGNATURE                                Public-key signature (added by MakeMaker)

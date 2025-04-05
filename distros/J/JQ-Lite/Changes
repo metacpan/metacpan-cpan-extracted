@@ -1,3 +1,27 @@
+0.14  2025-04-05
+    - Fixed: --raw-output (-r) now pretty-prints objects and arrays,
+             and outputs scalars as plain text, matching jq behavior.
+    - Improved: Output formatting now distinguishes between scalars and structures.
+    - Updated: Interactive mode preserves output consistency with command-line usage.
+0.13  2025-04-05
+    - Added real-time interactive mode: users can now type queries character-by-character
+      and see results update immediately without pressing Enter.
+    - Retains previous valid results on incomplete or invalid query input.
+    - Displays full JSON on startup in interactive mode using '.' as default query.
+    - Automatically enters interactive mode when reading JSON from STDIN without a query.
+    - No non-core modules required: implemented raw terminal mode using 'stty'.
+0.12 2025-04-05
+    [Enhancement]
+    - Added fallback behavior to show help message when jq-lite is executed with no arguments.
+      This prevents the script from hanging waiting on STDIN and improves user experience.
+0.11  2025-04-05
+    - Added interactive mode to jq-lite command-line tool
+      * Launches when no query is given
+      * Accepts queries from /dev/tty
+      * Clears screen before printing each result
+      * Supports --raw-output (-r) in interactive mode
+    - Improved argument parsing to allow: jq-lite users.json
+    - Enhanced usability and documentation in README.md
 0.10  2025-03-30
     - Added match operator for regular expressions (e.g. match "Bob")
 

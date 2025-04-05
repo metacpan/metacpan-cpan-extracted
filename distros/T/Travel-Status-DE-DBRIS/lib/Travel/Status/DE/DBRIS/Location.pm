@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
 	qw(eva id lat lon name products type is_cancelled is_additional is_separation display_priority
@@ -23,7 +23,7 @@ sub new {
 
 	# station search results include lat/lon keys in JSON; route entries do not
 	my ( $lon, $lat );
-	if ( $json->{id} =~ m{ [@]X= (?<lon> \d+) [@]Y= (?<lat> \d+) }x ) {
+	if ( $json->{id} =~ m{ [@]X= (?<lon> -? \d+) [@]Y= (?<lat> -? \d+) }x ) {
 		$lat = $+{lat} / 1e6;
 		$lon = $+{lon} / 1e6;
 	}

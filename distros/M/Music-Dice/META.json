@@ -39,7 +39,7 @@
             "List::Util::WeightedChoice" : "0",
             "MIDI::Util" : "0",
             "Moo" : "2",
-            "Music::Duration::Partition" : "0",
+            "Music::Duration::Partition" : "0.0823",
             "Music::Scales" : "0",
             "Music::ToRoman" : "0.2001",
             "Types::Standard" : "0",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-Dice"
       }
    },
-   "version" : "0.0202",
+   "version" : "0.0203",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

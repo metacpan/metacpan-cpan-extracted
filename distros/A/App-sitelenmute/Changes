@@ -1,3 +1,9 @@
+3.03
+
+* Handle UTF-8 encoded filenames including spaces and parenthesis in
+  their names
+* Handle long options (they all failed)
+
 3.00
 
 * Added tests

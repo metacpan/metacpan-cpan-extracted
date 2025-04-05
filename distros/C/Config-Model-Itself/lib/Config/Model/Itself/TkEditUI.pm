@@ -7,14 +7,14 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself::TkEditUI 2.023;
+package Config::Model::Itself::TkEditUI 2.024;
 
 use strict;
 use warnings ;
 use Carp ;
 use 5.10.0;
 
-use Config::Model::TkUI 1.370;
+use Config::Model::TkUI 1.378;
 
 
 use base qw/Config::Model::TkUI/;

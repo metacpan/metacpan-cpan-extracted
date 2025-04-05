@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "List::Util::WeightedChoice" => 0,
     "MIDI::Util" => 0,
     "Moo" => 2,
-    "Music::Duration::Partition" => 0,
+    "Music::Duration::Partition" => "0.0823",
     "Music::Scales" => 0,
     "Music::ToRoman" => "0.2001",
     "Types::Standard" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "strict" => 0
   },
-  "VERSION" => "0.0202",
+  "VERSION" => "0.0203",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "List::Util::WeightedChoice" => 0,
   "MIDI::Util" => 0,
   "Moo" => 2,
-  "Music::Duration::Partition" => 0,
+  "Music::Duration::Partition" => "0.0823",
   "Music::Scales" => 0,
   "Music::ToRoman" => "0.2001",
   "Test::More" => "0.88",

@@ -4,7 +4,7 @@
       "Alex Schroeder"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -56,10 +56,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://alexschroeder.ch/cgit/",
-         "web" : "https://alexschroeder.ch/cgit/sitelen-mute/about/"
+         "url" : "https://src.alexschroeder.ch/sitelen-mute.git",
+         "web" : "https://src.alexschroeder.ch/sitelen-mute.git"
       }
    },
-   "version" : 3.02,
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : 3.03,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

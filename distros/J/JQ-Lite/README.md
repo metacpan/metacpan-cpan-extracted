@@ -18,15 +18,16 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Built-in functions: `length`, `keys`, `first`, `last`, `reverse`, `sort`, `unique`, `has`
 - ✅ Command-line interface: `jq-lite`
 - ✅ Reads from STDIN or file
+- ✅ **Interactive mode** for exploring JSON line-by-line
 
 ---
 
 ## 🤔 Why JQ::Lite (vs `jq` or `JSON::PP`)?
 
-| Use Case | Tool |
-|----------|------|
-| Simple JSON decode | ✅ `JSON::PP` |
-| Shell processing | ✅ `jq` |
+| Use Case              | Tool            |
+|-----------------------|-----------------|
+| Simple JSON decode    | ✅ `JSON::PP`    |
+| Shell processing      | ✅ `jq`          |
 | jq-style queries in Perl | ✅ **JQ::Lite** |
 | Lightweight & portable | ✅ **JQ::Lite** |
 
@@ -66,6 +67,33 @@ jq-lite -r '.users[].name' users.json
 ```
 
 > ⚠️ `jq-lite` is named to avoid conflict with the real `jq`.
+
+---
+
+### 🔄 Interactive Mode
+
+If you omit the query, `jq-lite` enters **interactive mode**, allowing you to type queries line-by-line against a fixed JSON input.
+
+```bash
+jq-lite users.json
+```
+
+This launches:
+
+```
+jq-lite interactive mode. Enter query (empty line to quit):
+> .users[0].name
+"Alice"
+> .users[] | select(.age > 25)
+{
+  "name" : "Alice",
+  "age" : 30,
+  ...
+}
+```
+
+- Results will be **re-rendered each time**, clearing the previous output (like a terminal UI).
+- Works with `--raw-output` (`-r`) as well.
 
 ---
 

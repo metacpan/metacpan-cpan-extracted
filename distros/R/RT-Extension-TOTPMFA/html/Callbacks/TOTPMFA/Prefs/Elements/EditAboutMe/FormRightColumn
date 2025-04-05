@@ -1,0 +1,92 @@
+<%doc>
+Add a section to the user "about me" page providing the TOTPMFA settings. 
+These are processed on form submission by the UpdateLogic callback of the
+/Prefs/AboutMe.html page.
+</%doc>
+\
+<%ARGS>
+$UserObj => undef
+</%ARGS>
+\
+<%INIT>
+return if (not $UserObj);
+return if (not $UserObj->Id);
+return if (not $UserObj->Privileged);
+
+my $Settings = RT::Extension::TOTPMFA::UserSettings($UserObj);
+my $Digits = RT->Config->Get('TOTPMFA_Digits') || 6;
+</%INIT>
+\
+<&| /Widgets/TitleBox, title => loc('Multi-factor authentication'), id => "user-prefs-totpmfa" &>
+<& /Elements/TOTPMFATypeSelector, Settings => $Settings &>
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>Register with TOTP app</&>:</div>
+    <div class="value col-9"><b><a target="TOTPMFA.png" href="TOTPMFA.png"><&|/l&>Click to view QR code</&></a></b></div>
+  </div>
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>MFA validation duration</&>:</div>
+    <div class="value col-9"><input name="TOTPMFADuration" size="8" value="<% $Settings->{'Duration'} %>" /> <&|/l&>(seconds between MFA prompts)</&></div>
+  </div>
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>Yubikey identifier</&>:</div>
+    <div class="value col-9"><input size="50" name="TOTPMFAYubikey" value="<% $Settings->{'Yubikey'} %>" placeholder="<&|/l&>Enter a Yubikey OTP here to register the device</&>" /></div>
+  </div>
+
+  <div class="form-row">
+    <div class="label col-12">
+<& /Elements/Submit, Label => loc('Save Preferences') &>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="value col-12">
+<&|/l&>To test your authenticator app without switching on multi-factor authentication, enter a one-time passcode from it here and click on the "Test" button.</&>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>One-time passcode</&>:</div>
+    <div class="value col-9">
+<input type="text" name="TestTOTPMFA" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" />
+<input type="submit" name="TestTOTPMFAButton" value="<&|/l&>Test</&>" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="value col-12">
+<&|/l&>If your TOTP app is lost or the QR code is exposed to others, you can generate a new TOTP secret below.</&>
+<b><&|/l&>This will invalidate any previously registered secret.</&></b>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="value col-12" style="text-align: center; font-weight: bold;">
+<a href="#" id="ResetTOTPMFASecretPrompt" style="display: none"><&|/l&>Click here to show the reset button.</&></a>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="label col-12">
+      <div class="submit" id="ResetTOTPMFASecretContainer">
+        <div class="extra-buttons">
+          <label><input type="checkbox" name="ConfirmResetTOTPMFASecret" value="Confirm" />
+          <&|/l&> Check this box to confirm.</&>
+          </label>
+        </div>
+        <div class="buttons">
+          <span class="caption"></span>
+          <input type="submit" name="ResetTOTPMFASecret" value="<&|/l&>Reset TOTP secret</&>" class="button btn btn-primary form-control" />
+        </div>
+        <div class="submit-clear"></div>
+      </div>
+      <script>
+          jQuery("#ResetTOTPMFASecretContainer").hide();
+          jQuery("#ResetTOTPMFASecretPrompt").show().click(function(ev) {
+              jQuery(this).slideUp();
+              jQuery("#ResetTOTPMFASecretContainer").slideDown();
+              ev.preventDefault();
+          });
+      </script>	
+    </div>
+  </div>
+
+</&>

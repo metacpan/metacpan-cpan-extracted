@@ -77,4 +77,4 @@ Non Debian users can also prepare a patch using CPAN tarball:
 Feedback is important. Please take a moment to rate, comment or add
 stars to this project:
 
-* [config-model-itself github](https://github.com/dod38fr/config-model-itself) or [config-model-itself cpan ratings](http://cpanratings.perl.org/rate/?distribution=Config::Model::Itself)
+* [config-model-itself github](https://github.com/dod38fr/config-model-itself)

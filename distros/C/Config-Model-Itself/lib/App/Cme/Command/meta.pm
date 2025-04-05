@@ -9,7 +9,7 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta 2.023;
+package App::Cme::Command::meta 2.024;
 
 use strict ;
 use warnings ;
@@ -22,13 +22,14 @@ use base qw/App::Cme::Common/;
 use Config::Model 2.075;
 
 use Config::Model::Itself ;
-use YAML::XS;
-$YAML::XS::LoadBlessed = 0;
+use YAML::PP qw/Load Dump/;
 
 use Tk ;
 use Config::Model::TkUI ;
 use Config::Model::Itself::TkEditUI ;
 use Path::Tiny ;
+
+binmode STDOUT, ':encoding(UTF-8)';
 
 my %meta_cmd = (
     check => \&check,
@@ -143,7 +144,7 @@ sub load_meta_model {
     my $cm_lib_dir = path(split m!/!, $opt->{dir}) ; # replace with cm_lib_dir ???
 
     if (! $cm_lib_dir->is_dir) {
-        $cm_lib_dir->mkpath(0, oct(755)) || die "can't create $cm_lib_dir:$!";
+        $cm_lib_dir->mkdir();
     }
 
     my $meta_model = $self->{meta_model} = Config::Model -> new();
@@ -314,7 +315,7 @@ sub dump_cds {
 
     my $dump_string = $meta_root->dump_tree( mode => $opt->{dumptype} || 'custom' ) ;
 
-    path($dump_file)->spew($dump_string);
+    path($dump_file)->spew_utf8($dump_string);
 }
 
 sub dump_yaml{
@@ -326,7 +327,7 @@ sub dump_yaml{
 
     my $dump_string = Dump($meta_root->dump_as_data(ordered_hash_as_list => 0)) ;
 
-    path($dump_file)->spew($dump_string);
+    path($dump_file)->spew_utf8($dump_string);
 
 }
 
@@ -405,7 +406,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.023
+version 2.024
 
 =head1 SYNOPSIS
 

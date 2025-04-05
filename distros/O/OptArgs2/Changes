@@ -1,3 +1,36 @@
+v2.0.13 (2025-04-04)
+
+    No change from v2.0.12.
+
+v2.0.12 (2025-04-03) TRIAL RELEASE
+
+    Enhancements:
+        - Disallow duplicate option aliases
+
+    Code Maintenance
+        - Removed unused _opts,_args attributes from CmdBase
+
+    Dependencies:
+        - Add Encode::Locale.
+        - Remove direct dependency on Encode and I18N::Langinfo.
+
+    Packaging:
+        - Large VERSION jump due to a long misunderstanding of how
+          development "a.b.c_z" numbers normalize.
+
+2.0.1_1 (2025-03-26)
+
+    Enhancements:
+        - Catch and re-throw Getopt::Long errors (Thanks to Diab
+          Jerius for the patch and test)
+
+    Bug Fixes:
+        - Restore broken legacy API calls from "main" package.
+
+    Packaging:
+        - Adjust no_index list in Makefile.PL
+        - Fix broken homepage and bugtracker urls
+
 2.0.0 (2022-10-05)
 
     Code Maintenance
@@ -12,7 +45,7 @@
         - StatusLine reworked to be much simpler in interface and
           implementation.
 
-    Bug Fixes:
+    Enhancements:
         - Option types & defaults are no longer UPPERCASE
 
     Packaging:

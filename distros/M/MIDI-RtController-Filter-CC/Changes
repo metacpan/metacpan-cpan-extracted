@@ -1,5 +1,30 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0301 2025-04-04 21:45:42
+  - Refactor the stair_step filter logic.
+  - Improve documentation.
+
+0.0300 2025-04-04 20:53:43
+  - Add the stair_step filter and related attributes.
+  - Improve the scatter filter.
+  - Enhance the eg/control-change.pl program.
+
+0.0200 2025-04-04 13:52:40
+  - Add the scatter filter.
+  - Improve documentation.
+
+0.0104 2025-04-04 13:21:42
+  - Improve documentation yet again!
+
+0.0103 2025-04-04 13:06:45
+  - Improve documentation some more.
+
+0.0102 2025-04-04 11:58:11
+  - Improve documentation.
+
+0.0101 2025-04-04 11:22:22
+  - Fix synopsis and the eg/control-change.pl program.
+
 0.0100 2025-04-04 01:25:04
   - Add the breathe() filter.
   - Port from MIDI::RtController::Filter::Math

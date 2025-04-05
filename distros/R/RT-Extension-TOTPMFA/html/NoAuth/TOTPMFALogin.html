@@ -1,0 +1,136 @@
+<%doc>
+The MFA authentication login page.  Posting to it will, if the OTP is valid,
+redirect the user to the page (with arguments intact) encoded in the "next"
+parameter.  The user is sent here by the autohandler "Auth" callback.
+</%doc>
+\
+<%ARGS>
+$totpmfa_otp => ''
+$actions => undef
+$next => ''
+</%ARGS>
+\
+<%INIT>
+my $Digits = RT->Config->Get('TOTPMFA_Digits') || 6;
+if (defined $ARGS{'totpmfa_otp'}) {
+    my ($OK, $Message) = RT::Extension::TOTPMFA::MFALogin(\%session, $ARGS{'totpmfa_otp'});
+    if ($OK) {
+        RT->Logger->info('TOTPMFA - Successful OTP MFA login for '
+              . $session{'CurrentUser'}->Name
+              . ' from '
+              . $ENV{'REMOTE_ADDR'});
+
+        my $next = RT::Interface::Web::RemoveNextPage($ARGS{'next'});
+        $next = $next->{'url'} if (ref $next);
+
+        $m->callback(
+            %ARGS,
+            CallbackName => 'SuccessfulLogin',
+            CallbackPage => '/autohandler',
+            RedirectTo   => \$next
+        );
+
+        if ($next) {
+            RT::Interface::Web::Redirect($next);
+        } else {
+            RT::Interface::Web::Redirect(RT->Config->Get('WebURL'));
+        }
+    } elsif ($Message) {
+        $ARGS{'actions'} = [$Message];
+    }
+}
+</%INIT>
+\
+% if ( RT::Interface::Web::MobileClient() || $ARGS{'mobile'} ) {
+% # Mobile view.  Derived from RT 5.0.1 /m/_elements/login.
+\
+<&| /m/_elements/wrapper, title => loc('Multi-factor authentication'), show_home_button => 0 &>
+<div id="body" class="login-body">
+
+<& /Elements/ListActions,
+    title       => loc('Error'),
+    titlebox    => { class => 'error', hideable => 0 },
+    actions     => $actions,
+&>
+\
+<div id="login-box">
+<&| /Widgets/TitleBox, title => loc('One-time passcode'), hideable => 0 &>
+
+<& /Elements/LoginRedirectWarning, %ARGS &>
+
+<form id="login" name="login" method="post" action="<% RT->Config->Get("WebPath") %>/NoAuth/TOTPMFALogin.html">
+
+<div class="entry">
+    <span class="label"><&|/l&>One-time passcode</&>:</span><span class="value"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></span>
+</div>
+
+<& /Elements/Submit, Label => loc('Login')&>
+
+<input type="hidden" name="next" value="<% $next %>" />
+<input type="hidden" name="mobile" value="1" />
+
+<script type="text/javascript">
+if (window.location.hash) {
+    var form = (document.getElementsByName("login"))[0];
+    if (form) {
+        form.action = form.action + '#' + window.location.hash.replace(/^#/, '');
+    }
+}
+</script>
+
+</form>
+</&>
+</div><!-- #login-box -->
+</div><!-- #login-body -->
+<& /m/_elements/full_site_link &>
+</&>
+\
+% } else {
+% # Desktop (non-mobile) view.  Derived from RT 5.0.1 /Elements/Login.
+\
+<& /Elements/Header, Title => loc('Multi-factor authentication'), Focus => '#totpmfa_otp', RichText => 0 &>
+
+<div id="body" class="login-body">
+
+<& /Elements/ListActions,
+    title       => loc('Error'),
+    titlebox    => { class => 'error', hideable => 0 },
+    actions     => $actions
+&>
+
+<div id="login-box">
+<&| /Widgets/TitleBox, title => loc('One-time passcode'), hideable => 0 &>
+
+<& /Elements/LoginRedirectWarning, %ARGS &>
+
+<form id="login" name="login" method="post" action="<% RT->Config->Get('WebPath') %>/NoAuth/TOTPMFALogin.html">
+
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>One-time passcode</&>:</div>
+    <div class="valueu col-9"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></div>
+  </div>
+
+<input type="hidden" name="next" value="<% $next %>" />
+
+<script type="text/javascript">
+jQuery(function(){
+    if (window.location.hash) {
+        var form = jQuery("form[name=login]");
+        form.attr('action', form.attr('action') + '#' + window.location.hash.replace(/^#/, ''));
+    }
+});
+</script>
+
+  <div class="form-row">
+    <div class="col-12 text-right">
+      <input type="submit" class="form-control btn btn-primary" value="<&|/l&>Login</&>" />
+    </div>
+  </div>
+
+</form>
+</&>
+</div><!-- #login-box -->
+</div><!-- #login-body -->
+<& /Elements/Footer, Menu => 0 &>
+\
+% }

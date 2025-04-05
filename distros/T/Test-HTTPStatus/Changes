@@ -1,5 +1,8 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.09	Fri Apr  4 08:01:10 EDT 2025
+	Fix logic on when to use GET after HEAD as failed
+
 2.08	Mon Feb 10 15:22:59 EST 2025
 	Honour NO_NETWORK_TESTING - always succeed when that is set
 

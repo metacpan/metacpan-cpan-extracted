@@ -1,5 +1,8 @@
 Revision history for Music-Dice
 
+0.0203 2025-04-04 08:59:15
+    - Fix Music::Duration::Partition prereq version (rt#157625).
+
 0.0202 2024-12-20 23:35:03
     - Add the semitones attribute.
     - Add the identity attribute and intervals.

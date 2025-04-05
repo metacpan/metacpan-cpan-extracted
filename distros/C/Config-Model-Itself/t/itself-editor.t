@@ -13,7 +13,7 @@ use Test::Memory::Cycle;
 
 use warnings;
 use strict;
-$File::Copy::Recursive::DirPerms = 0755;
+$File::Copy::Recursive::DirPerms = oct(755);
 
 
 my ($meta_model, $trace, $args) = init_test('show','interactive');

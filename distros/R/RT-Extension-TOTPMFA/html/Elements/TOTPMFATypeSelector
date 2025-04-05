@@ -1,0 +1,15 @@
+<%doc>
+Display a form row that allows the MFA type to be selected, pre-selecting the type in $Settings.
+</%doc>
+\
+<%ARGS>
+$Settings => {}
+</%ARGS>
+\
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>Multi-factor authentication</&>:</div>
+    <div class="value col-9"><select name="TOTPMFAType">\
+<option value="None"<% $Settings->{'Type'} eq 'None' ? ' selected' : '' %>><&|/l&>Not enabled</&></option>\
+<option value="TOTP"<% $Settings->{'Type'} eq 'TOTP' ? ' selected' : '' %>><&|/l&>One-time passcode (OATH TOTP or Yubikey)</&></option>\
+</select></div>
+  </div>

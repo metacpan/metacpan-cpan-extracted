@@ -15,7 +15,7 @@ use Carp;
 
 use Music::AirGuitar;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 {
     no strict 'refs'; # This is an invalid access, but it is the only one working in perl v5.24.1, the correct one segfaults.
@@ -93,7 +93,7 @@ Music::AirGuitar::Performance - Interface for air guitars performances
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

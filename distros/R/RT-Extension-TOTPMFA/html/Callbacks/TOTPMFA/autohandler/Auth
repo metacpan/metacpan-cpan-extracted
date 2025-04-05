@@ -1,0 +1,46 @@
+<%doc>
+Redirect the user to the TOTP MFA authentication page if the user is logged
+in, has MFA enabled, and their MFA session isn't currently valid.
+</%doc>
+\
+<%INIT>
+# We need a logged-in, privileged, user.
+return if (not $session{'CurrentUser'});
+return if (not $session{'CurrentUser'}->Id);
+return if (not $session{'CurrentUser'}->UserObj->Privileged);
+
+my $CurrentPath = $m->request_comp->path;
+
+# Don't redirect if we're already on the target page.
+return if ($CurrentPath =~ /\Q\/NoAuth\/TOTPMFALogin.html\E/);
+
+# Don't redirect if this is a helper, not a main page.
+return if ($CurrentPath =~ /\Q\/Helpers\/\E/);
+
+# Don't redirect if the session is authenticated for MFA already.
+return if RT::Extension::TOTPMFA::SessionIsAuthenticated(\%session);
+
+# Don't redirect unless the user has MFA enabled.
+return
+  if not RT::Extension::TOTPMFA::IsEnabledForUser(
+    $session{'CurrentUser'}->UserObj);
+
+# Redirect to the MFA login form, with "next" set to a hash encoding our
+# original destination.
+
+RT->Logger->debug('TOTPMFA - redirecting to the authentication page');
+
+# Save the arguments into a "next" parameter so that after authentication,
+# the user goes to where they were originally headed.
+
+my %AuthPageArgs = (%ARGS);
+$AuthPageArgs{'mobile'} = 1 if ($CurrentPath =~ m{^/m(/|$)});
+$AuthPageArgs{'next'}   = RT::Interface::Web::SetNextPage(\%ARGS);
+
+RT::Interface::Web::Redirect(RT->Config->Get('WebBaseURL')
+      . RT->Config->Get('WebPath')
+      . '/NoAuth/TOTPMFALogin.html?'
+      . $m->comp('/Elements/QueryString', %AuthPageArgs));
+
+return;
+</%INIT>

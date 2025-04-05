@@ -1,7 +1,7 @@
 package UNIVERSAL::dump;
 
 # version info
-$VERSION= '0.09';
+$VERSION= '0.10';
 
 # be as strict and verbose as possible
 use strict;
@@ -111,7 +111,7 @@ UNIVERSAL::dump - add dump and other methods to all classes and objects
 
 =head1 VERSION
 
-This documentation describes version 0.07.
+This documentation describes version 0.10.
 
 =head1 DESCRIPTION
 

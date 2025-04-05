@@ -1,14 +1,23 @@
 package LWP::CurlLog;
 use strict;
 use warnings;
-use LWP::UserAgent ();
 
-our $VERSION = "0.03";
+BEGIN {
+    eval {
+        require LWP::UserAgent;
+    };
+    eval {
+        require HTTP::Tiny;
+    };
+}
+
+our $VERSION = "0.04";
 our %opts = (
     file => undef,
     response => 1,
     options => "-k",
     timing => 0,
+    trace => 0,
 );
 
 sub import {
@@ -21,12 +30,12 @@ sub import {
         $opts{fh} = \*STDERR;
     }
     else {
-        my $file2 = $opts{file};
-        if ($file2 =~ m{^~/}) {
+        my $expanded_file = $opts{file};
+        if ($expanded_file =~ m{^~/}) {
             my $home = $ENV{HOME} || (getpwuid($<))[7];
-            $file2 =~ s{^~/}{$home/};
+            $expanded_file =~ s{^~/}{$home/};
         }
-        open $opts{fh}, ">>", $file2 or die "Can't open $opts{file}: $!";
+        open $opts{fh}, ">>", $expanded_file or die "Can't open $opts{file}: $!";
     }
     select($opts{fh});
     $| = 1;
@@ -36,60 +45,127 @@ sub import {
 no strict "refs";
 no warnings "redefine";
 
-my $orig_sub = \&LWP::UserAgent::send_request;
+my $orig_lusr = \&LWP::UserAgent::send_request;
 *{"LWP::UserAgent::send_request"} = sub {
-    my ($self, $request) = @_;
+    my ($self, $req) = @_;
+    my $headers = {};
+    for my $name ($req->headers()->header_field_names()) {
+        $headers->{$name} = $req->{headers}{$name};
+    }
+    my $content = $req->decoded_content();
+    my $res = request("LWP", $orig_lusr, \@_, $req->method(), $req->uri(), $headers, $content);
+    return $res;
+};
+
+my $orig_htr = \&HTTP::Tiny::_request;
+*{"HTTP::Tiny::_request"} = sub {
+    my ($self, $method, $url, $args) = @_;
+    my $res = request("HT", $orig_htr, \@_, $method, $url, $args->{headers}, $args->{content});
+    return $res;
+};
+
+sub request {
+    my ($module, $orig_sub, $orig_args, $method, $url, $headers, $content) = @_;
 
     my $cmd = "curl ";
-    my $url = $request->uri();
     if ($url =~ /[=&;?]/) {
         $cmd .= "\"$url\" ";
     }
     else {
-        $cmd .= "$url "
+        $cmd .= "$url ";
     }
     if ($opts{options}) {
         $cmd .= "$opts{options} ";
     }
-    if ($request->method() && ($request->method() ne "GET" || $request->content_length())) {
-        $cmd .= "-X " . $request->method() . " ";
+
+    if ($method && ($method ne "GET" || length $content)) {
+        $cmd .= "-X $method ";
     }
-    for my $header ($request->header_field_names) {
-        if ($header =~ /^(Content-Length|User-Agent)$/i) {
+
+    for my $name (keys %$headers) {
+        if ($name =~ /^(Content-Length|User-Agent)$/i) {
             next;
         }
-        my $value = $request->header($header);
+        my $value = $headers->{$name};
         $value =~ s{([\\\$"])}{\\$1}g;
-        $cmd .= "-H \"$header: $value\" ";
+        $cmd .= "-H \"$name: $value\" ";
     }
-    if ($request->header("Content-Length")) {
-        my $content = $request->decoded_content();
+
+    if (defined $content && length $content) {
         $content =~ s{([\\\$"])}{\\$1}g;
         $cmd .= "-d \"$content\" ";
     }
     $cmd =~ s/\s*$//;
 
-    print {$opts{fh}} "# " . localtime() . " LWP request\n";
-    print {$opts{fh}} "$cmd\n";
+    log_print("# " . localtime() . " $module request\n");
+    log_print_stack();
+    log_print("$cmd\n");
     my $time1 = time();
-    my $response = $orig_sub->(@_);
+    my $res = $orig_sub->(@$orig_args);
     my $time2 = time();
 
     if ($opts{response}) {
-        print {$opts{fh}} "\n# " . localtime() . " LWP response\n";
-        my $response2 = $response->as_string;
-        $response2 =~ s/\s*$//g;
-        print {$opts{fh}} "$response2\n";
+        log_print("\n# " . localtime() . " $module response\n");
+        my $str;
+        if (eval {$res->isa("HTTP::Response")}) {
+            $str = $res->as_string();
+        }
+        else {
+            $str = "$res->{protocol} $res->{status} $res->{reason}\n";
+            for my $name (keys %{$res->{headers}}) {
+                $str .= "$name: $res->{headers}{$name}\n";
+            }
+            $str .= "\n";
+            $str .= $res->{content};
+        }
+        $str =~ s/\s*$//g;
+        log_print("$str\n");
     }
     if ($opts{timing}) {
         my $diff = $time2 - $time1;
-        print {$opts{fh}} "# ${diff}s\n";
+        log_print("# ${diff}s\n");
     }
 
-    print {$opts{fh}} "\n";
+    log_print("\n");
 
-    return $response;
-};
+    return $res;
+}
+
+sub log_print {
+    my (@args) = @_;
+    my $mesg = join("", @args);
+    print {$opts{fh}} $mesg;
+}
+
+
+sub log_print_stack {
+    my @callers;
+    for (my $i = 0; my @caller = caller($i); $i++) {
+        push @callers, \@caller;
+    }
+
+    my @filtered_callers;
+    CALLER: for my $caller (reverse @callers) {
+        my ($package, $file, $line, $long_name) = @$caller;
+        for my $test_package ("LWP::CurlLog", "HTTP::Tiny", "HTTP::AnyUA", "LWP::UserAgent") {
+            if ($package =~ /^${test_package}($|::)/) {
+                last CALLER;
+            }
+        }
+        push @filtered_callers, $caller;
+
+    }
+    if (!$opts{trace}) {
+        @filtered_callers = ($filtered_callers[-1]);
+    }
+
+    for my $caller (@filtered_callers) {
+        my ($package, $file, $line, $long_name) = @$caller;
+        my $name = $long_name;
+        $name =~ s/.*:://;
+        log_print("#     $name $file $line\n");
+    }
+}
 
 1;
 
@@ -99,7 +175,7 @@ __END__
 
 =head1 NAME
 
-LWP::CurlLog - Log LWP requests as curl commands
+LWP::CurlLog - Log LWP::UserAgent / HTTP::Tiny requests as curl commands
 
 =head1 SYNOPSIS
 
@@ -107,10 +183,10 @@ LWP::CurlLog - Log LWP requests as curl commands
 
 =head1 DESCRIPTION
 
-This module can be used to log LWP requests as curl commands so you
-can redo requests the perl script makes, manually, on the command
-line. Just include a statement "use LWP::CurlLog;" to the top of
-your perl script and then check the output for curl commands.
+This module can be used to log LWP::UserAgent or HTTP::Tiny requests as curl
+commands so you can redo requests the perl script makes, manually, on the
+command line. Just include a statement "use LWP::CurlLog;" to the top of your
+perl script and then check the output for curl commands.
 
 The default location is to STDERR, but you can change it
 by setting the file option on the use line like this:

@@ -1,0 +1,29 @@
+---
+abstract: 'Multi-factor authentication with time-based one-time passcodes'
+author:
+  - 'Andrew Wood.'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: gpl_3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-TOTPMFA
+no_index:
+  directory:
+    - html
+    - inc
+requires:
+  perl: 5.10.1
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://codeberg.org/ivarch/rt-extension-totpmfa
+version: '0.04'
+x_module_install_rtx_version: '0.44'
+x_requires_rt: 5.0.0
+x_rt_too_new: 5.2.0

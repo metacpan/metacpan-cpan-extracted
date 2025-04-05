@@ -1,4 +1,9 @@
-This file documents the revision history for Perl extension DBIx::Migration.
+Revision history for perl distribution DBIx-Migration
+
+0.26 Fri Apr  4 11:47:43 CEST 2025
+        - Add more files to be cleaned by the clean action
+        - Introduce Type::Tiny based MigrationsDir constraint
+        - latest() can now be called as a class method and an object method
 
 0.25 Mon Mar 31 08:59:19 CEST 2025
         - Require most recent (2.05) Pod::Usage release

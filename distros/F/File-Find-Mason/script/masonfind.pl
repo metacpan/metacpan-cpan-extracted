@@ -21,7 +21,7 @@ GetOptions(
 if($opt{help}||!@ARGV) { exit(Help()) }
 
 foreach my $target (@ARGV) {
-	my @found=File::Find::Mason::find({wanted=>undef,%opt{qw/verbose/}},$target);
+	my @found=File::Find::Mason::find({wanted=>undef,verbose=>$opt{verbose}},$target);
 	if(@found) { print join("\n",@found,"") }
 }
 

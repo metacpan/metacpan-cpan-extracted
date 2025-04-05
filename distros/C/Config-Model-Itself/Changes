@@ -1,3 +1,16 @@
+2.024 2025-04-04
+
+  Bug fix:
+    * avoid warnings related to utf-8
+    * fix calls to Path::Tiny mkpath (Closes Debian #1101994)
+
+  Misc:
+    * docs: remove links to cpanratings
+    * tests: check stderr and error of test_app results
+    * bump version dep on Tk 1.378
+    * use YAML::PP instead of YAML::XS
+    * do not ship test files in wr_root
+
 2.023 2022-01-07
 
   Model update:

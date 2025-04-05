@@ -21,7 +21,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ requires:
   App::Cme::Common: '0'
   Carp: '0'
   Config::Model: '2.142'
-  Config::Model::TkUI: '1.370'
+  Config::Model::TkUI: '1.378'
   Config::Model::Value: '0'
   Data::Compare: '0'
   Data::Dumper: '0'
@@ -47,7 +47,7 @@ requires:
   Pod::POM: '0'
   Scalar::Util: '0'
   Tk: '0'
-  YAML::XS: '0'
+  YAML::PP: '0'
   base: '0'
   lib: '0'
   perl: '5.014'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-itself/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-itself.git
-version: '2.023'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '2.024'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: LGPL-2.1

@@ -8,6 +8,6 @@ BEGIN { Safe->new }
 
 use OptArgs2;
 
-like( dies { cmd 'Class' }, qr/attribute\(s\) required/, 'Expected error' );
+like( dies { cmd 'Class' }, qr/required initial/, 'Expected error' );
 
 done_testing();

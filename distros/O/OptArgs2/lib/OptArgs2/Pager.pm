@@ -5,30 +5,126 @@ use Carp ();
 use Exporter::Tidy other => [qw/page start_pager stop_pager/];
 use File::Which;
 use IO::Handle;
-use OptArgs2::Pager_CI {
+### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:35 2025
+require Carp;
+our ( @_CLASS, $_FIELDS, %_NEW );
 
-    # User provided arguments
-    auto     => { default => 1, },
-    encoding => { default => ':utf8', },
-    pager    => { default => \&_build_pager, },
+sub new {
+    my $class = shift;
+    my $CLASS = ref $class || $class;
+    $_NEW{$CLASS} //= do {
+        my @possible = ($CLASS);
+        if ( defined &{"${CLASS}::DOES"} ) {
+            push @possible, grep !/^${CLASS}$/, $CLASS->DOES('*');
+        }
+        my ( @new, @build );
+        while (@possible) {
+            no strict 'refs';
+            my $c = shift @possible;
+            push @new,   $c . '::_NEW'  if exists &{ $c . '::_NEW' };
+            push @build, $c . '::BUILD' if exists &{ $c . '::BUILD' };
+            push @possible, @{ $c . '::ISA' };
+        }
+        [ [ reverse(@new) ], [ reverse(@build) ] ];
+    };
+    my $self = { @_ ? @_ > 1 ? @_ : %{ $_[0] } : () };
+    bless $self, $CLASS;
+    my $attrs = { map { ( $_ => 1 ) } keys %$self };
+    map { $self->$_($attrs) } @{ $_NEW{$CLASS}->[0] };
+    {
+        local $Carp::CarpLevel = 3;
+        Carp::carp("OptArgs2::Pager: unexpected argument '$_'")
+          for keys %$attrs;
+    }
+    map { $self->$_ } @{ $_NEW{$CLASS}->[1] };
+    $self;
+}
 
-    # Attributes
-    fh => {
-        init_arg => undef,
-        is       => 'rw',
-        default  => sub { IO::Handle->new },
-    },
-    orig_fh => {
-        init_arg => undef,
-        default  => sub { select },
-    },
-    pid => {
-        init_arg => undef,
-        is       => 'rw',
-        init_arg => undef,
-    },
-};
+sub _NEW {
+    CORE::state $fix_FIELDS = do {
+        $_FIELDS = { @_CLASS > 1 ? @_CLASS : %{ $_CLASS[0] } };
+        $_FIELDS = $_FIELDS->{'FIELDS'} if exists $_FIELDS->{'FIELDS'};
+    };
+    map { delete $_[1]->{$_} } 'auto', 'encoding', 'pager';
+}
 
+sub __RO {
+    my ( undef, undef, undef, $sub ) = caller(1);
+    Carp::confess("attribute $sub is read-only");
+}
+sub auto { __RO() if @_ > 1; $_[0]{'auto'} //= $_FIELDS->{'auto'}->{'default'} }
+
+sub encoding {
+    __RO() if @_ > 1;
+    $_[0]{'encoding'} //= $_FIELDS->{'encoding'}->{'default'};
+}
+
+sub fh {
+    if ( @_ > 1 ) { $_[0]{'fh'} = $_[1]; }
+    $_[0]{'fh'} //= $_FIELDS->{'fh'}->{'default'}->( $_[0] );
+}
+
+sub orig_fh {
+    __RO() if @_ > 1;
+    $_[0]{'orig_fh'} //= $_FIELDS->{'orig_fh'}->{'default'}->( $_[0] );
+}
+
+sub pager {
+    __RO() if @_ > 1;
+    $_[0]{'pager'} //= $_FIELDS->{'pager'}->{'default'}->( $_[0] );
+}
+
+sub pid {
+    if ( @_ > 1 ) { $_[0]{'pid'} = $_[1]; }
+    $_[0]{'pid'} // undef;
+}
+
+sub _dump {
+    my $self = shift;
+    my $x    = do {
+        require Data::Dumper;
+        no warnings 'once';
+        local $Data::Dumper::Indent   = 1;
+        local $Data::Dumper::Maxdepth = ( shift // 2 );
+        local $Data::Dumper::Sortkeys = 1;
+        Data::Dumper::Dumper($self);
+    };
+    $x =~ s/.*?{/{/;
+    $x =~ s/}.*?\n$/}/;
+    my $i = 0;
+    my @list;
+    do {
+        @list = caller( $i++ );
+    } until $list[3] eq __PACKAGE__ . '::_dump';
+    warn "$self $x at $list[1]:$list[2]\n";
+}
+
+@_CLASS = grep 1,### END Class::Inline ###
+
+
+  # User provided arguments
+  auto     => { default => 1, },
+  encoding => { default => ':utf8', },
+  pager    => { default => \&_build_pager, },
+
+  # Attributes
+  fh => {
+    init_arg => undef,
+    is       => 'rw',
+    default  => sub { IO::Handle->new },
+  },
+  orig_fh => {
+    init_arg => undef,
+    default  => sub { select },
+  },
+  pid => {
+    init_arg => undef,
+    is       => 'rw',
+    init_arg => undef,
+  },
+  ;
+
+our $VERSION  = 'v2.0.13';
 our @CARP_NOT = (__PACKAGE__);
 
 sub _build_pager {
@@ -134,7 +230,7 @@ OptArgs2::Pager - pipe output to a system (text) pager
 
 =head1 VERSION
 
-2.0.0 (2022-10-05)
+v2.0.13 (2025-04-04)
 
 =head1 SYNOPSIS
 

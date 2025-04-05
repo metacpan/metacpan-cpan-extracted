@@ -1,0 +1,22 @@
+Revision history for File::Find::Mason
+
+0.0.6 - 2025-04-04
+	- Backport to 5.16.3
+	- Realign module and package version
+
+0.0.5 - 2025-03-28
+	- META, link issues and repository to github
+
+0.0.4 - 2025-03-28
+	- Fix META version
+
+0.0.3 - 2025-03-17
+	- Fix META dependencies
+	- Improve verbose mode
+
+0.0.2 - 2025-03-14
+	- Improve POD
+
+0.0.1 - 2025-03-13
+	- Core functionality
+

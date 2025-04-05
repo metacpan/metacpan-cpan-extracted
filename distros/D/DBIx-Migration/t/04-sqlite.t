@@ -8,7 +8,7 @@ use Test::Fatal qw( dies_ok exception );
 use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 22 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 23 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -39,6 +39,8 @@ is my $tracking_table = $m->tracking_table, $expected_tracking_table, 'get track
 is $m->version, undef, "\"$tracking_table\" table does not exist == migrate() not called yet";
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
+dies_ok { $m->dir( cwd->child( qw( t sql invalid ) ) ) }
+'"dir" is not valid with respect to the latest() based "MigrationsDir" constraint';
 dies_ok { $m->latest } 'cannot call latest() because "dir" is not set';
 dies_ok { $m->migrate( 0 ) } 'cannot call migrate() because "dir" not set';
 $m->dir( cwd->child( qw( t sql advanced ) ) );

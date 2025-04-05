@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,6 +32,6 @@ requires:
   Time::Progress: '0'
   perl: '5.026000'
 resources:
-  repository: https://alexschroeder.ch/cgit/
-version: 3.02
+  repository: https://src.alexschroeder.ch/sitelen-mute.git
+version: 3.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

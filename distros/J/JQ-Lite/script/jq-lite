@@ -3,9 +3,49 @@
 use strict;
 use warnings;
 use JSON::PP;
+use IO::File;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use JQ::Lite;
+
+# Show help if no arguments are given
+if (!@ARGV) {
+    print <<'USAGE';
+jq-lite - A lightweight jq-like JSON query tool written in pure Perl
+
+Usage:
+  jq-lite [options] '.query' [file.json]
+
+Options:
+  -r, --raw-output    Print raw strings instead of JSON-encoded values
+  -h, --help          Show this help message
+
+Examples:
+  cat users.json | jq-lite '.users[].name'
+  jq-lite '.users[] | select(.age > 25)' users.json
+  jq-lite -r '.users[] | .name' users.json
+  jq-lite '.meta has "version"' config.json
+  jq-lite '.items | sort | reverse | first' data.json
+
+Query Syntax:
+  .key                Access a key (e.g. .user.name)
+  .key?               Optional access (no error if missing)
+  .array[]            Traverse all array elements
+  .array[n]           Index into array
+  |                   Pipe to next operation
+  select(condition)   Filter values
+  Built-in functions: length, keys, first, last, reverse, sort, unique, has
+
+Tips:
+  - Query must start with a dot (e.g. '.users[]')
+  - Reads from STDIN if no file is provided
+  - Outputs JSON by default; use -r for plain text
+
+Homepage:
+  https://metacpan.org/pod/JQ::Lite
+USAGE
+    exit 0;
+}
 
 # Argument parsing
 my $raw_output = 0;
@@ -57,8 +97,11 @@ USAGE
     elsif (!defined $query && $arg =~ /^\./) {
         $query = $arg;
     }
-    elsif (!defined $query) {
+    elsif (!defined $query && !-f $arg) {
         die "Error: Invalid query syntax '$arg'\nUsage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
+    }
+    elsif (!defined $query) {
+        $filename = $arg;
     }
     elsif (!defined $filename) {
         $filename = $arg;
@@ -67,8 +110,6 @@ USAGE
         die "Usage: jq-lite [--raw-output|-r] '.query' [file.json]\n";
     }
 }
-
-die "Usage: jq-lite [--raw-output|-r] '.query' [file.json]\n" unless defined $query;
 
 # Load JSON from file or STDIN
 my $json_text;
@@ -83,22 +124,121 @@ else {
     $json_text = <STDIN>;
 }
 
-# Run query
+# Create JQ::Lite object
 my $jq = JQ::Lite->new(raw => $raw_output);
-my @results = $jq->run_query($json_text, $query);
 
-# Output formatter
-my $pp = JSON::PP->new->utf8->canonical->pretty;
+# Output helper
+sub print_results {
+    my @results = @_;
+    my $pp = JSON::PP->new->utf8->canonical->pretty;
 
-# Print results
-for my $r (@results) {
-    if (!defined $r) {
-        print "null\n";
-    }
-    elsif ($raw_output && ref($r) eq '') {
-        print "$r\n";
-    }
-    else {
-        print $pp->encode($r);
+    for my $r (@results) {
+        if (!defined $r) {
+            print "null\n";
+        }
+        elsif ($raw_output && !ref($r)) {
+            print "$r\n";
+        }
+        else {
+            print $pp->encode($r);
+        }
     }
 }
+
+# Interactive mode
+if (!defined $query) {
+    system("stty -icanon -echo");
+
+    $SIG{INT} = sub {
+        system("stty sane");
+        print "\n[EXIT]\n";
+        exit 0;
+    };
+
+    my $input = '';
+    my @last_results;
+
+    # Initial display
+    my $ok = eval {
+        @last_results = $jq->run_query($json_text, '.');
+        1;
+    };
+    if (!$ok || !@last_results) {
+        my $data = eval { JSON::PP->new->decode($json_text) };
+        if ($data) {
+            @last_results = ($data);
+        }
+    }
+
+    system("clear");
+    print "> $input\n";
+    if (@last_results) {
+        print_results(@last_results);
+    } else {
+        print "[INFO] Failed to load initial JSON data.\n";
+    }
+
+    print "\nType query (ESC to quit):\n";
+
+    while (1) {
+        my $char;
+        sysread(STDIN, $char, 1);
+
+        my $ord = ord($char);
+        last if $ord == 27;
+
+        if ($ord == 127 || $char eq "\b") {
+            chop $input if length($input);
+        } else {
+            $input .= $char;
+        }
+
+        system("clear");
+        print "> $input\n";
+
+        my @results;
+        my $ok = eval {
+            @results = $jq->run_query($json_text, $input);
+            1;
+        };
+
+        if ($ok && @results) {
+            @last_results = @results;
+        }
+
+        if (!$ok) {
+            print "[INFO] Invalid or partial query. Showing last valid results.\n";
+        } elsif (!@results) {
+            print "[INFO] Query returned no results. Showing last valid results.\n";
+        }
+
+        if (@last_results) {
+            eval {
+                print_results(@last_results);
+                1;
+            } or do {
+                my $e = $@ || 'Unknown error';
+                print "[ERROR] Failed to print: $e\n";
+            };
+        } else {
+            print "[INFO] No previous valid results.\n";
+        }
+    }
+
+    system("stty sane");
+    print "\nGoodbye.\n";
+    exit 0;
+}
+
+# One-shot mode
+my @results = eval { $jq->run_query($json_text, $query) };
+if ($@) {
+    die "[ERROR] Invalid query: $@\n";
+}
+
+if (!@results) {
+    warn "[INFO] No results returned for query.\n";
+    exit 1;
+}
+
+print_results(@results);

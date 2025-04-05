@@ -20,15 +20,13 @@
       ],
       "package" : [
          "OptArgs2::Arg",
-         "OptArgs2::Arg_CI",
-         "OptArgs2::Cmd",
-         "OptArgs2::Cmd_CI",
          "OptArgs2::CODEREF",
+         "OptArgs2::Cmd",
+         "OptArgs2::CmdBase",
          "OptArgs2::Opt",
-         "OptArgs2::Opt_CI",
-         "OptArgs2::Pager_CI",
-         "OptArgs2::StatusLine::Line",
-         "OptArgs2::StatusLine::Prefix"
+         "OptArgs2::OptArgBase",
+         "OptArgs2::Status",
+         "OptArgs2::SubCmd"
       ]
    },
    "prereqs" : {
@@ -46,11 +44,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Encode" : "2.24",
+            "Encode::Locale" : "0",
             "Exporter::Tidy" : "0",
             "File::Which" : "0",
             "Getopt::Long" : "2.37",
-            "I18N::Langinfo" : "0",
             "List::Util" : "0",
             "Term::Size::Perl" : "0",
             "Text::Abbrev" : "0",
@@ -67,12 +64,15 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {},
+      "bugtracker" : {
+         "web" : "https://github.com/mlawren/p5-OptArgs/issues"
+      },
+      "homepage" : "https://github.com/mlawren/p5-OptArgs",
       "repository" : {
          "type" : "git",
          "url" : "ssh://git@github.com/mlawren/p5-OptArgs.git"
       }
    },
-   "version" : "v2.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v2.0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

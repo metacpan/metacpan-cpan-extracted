@@ -30,6 +30,8 @@ SKIP: {
 
     {
         my $result = test_app( 'App::Cme' => [ qw/meta edit fstab -system -test-and-quit q/ ]) ;
+        is($result->stderr, '', 'nothing sent to sderr');
+        is($result->error, undef, 'threw no exceptions');
         like($result->stdout , qr/Reading model from/, "edit and quit");
         like($result->stdout , qr/Test mode: quit/, "edit is in test mode");
     }

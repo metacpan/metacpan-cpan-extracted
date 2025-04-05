@@ -21,7 +21,10 @@ DBIx::Migration - Seamless database schema up- and downgrades
   $m->dir( '~/Projects/myapp/db/migrations' );
 
   # Get latest migration version from the migrations directory
+  # object method call
   my $latest_version = $m->latest;
+  # class method call
+  my $latest_version = DBIx::Migration->latest( '~/Projects/myapp/db/migrations' );
 
   # Migrate database to version 1
   $m->migrate( 1 );
@@ -159,7 +162,7 @@ in subclasses.
 
 Extract and return the driver name from the data source name.
 
-=item $self->latest
+=item $self->latest, $class->latest( $dir )
 
 Get latest migration version comparing the migrations in the migrations
 directory.

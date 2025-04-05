@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0e6304c8872e15e5508fa5d4144bd8de2432668cec81dce958fe8afcb7f2b6fe .gitignore
+SHA256 58c006f2966dc1f173e5ece27261b499cfe9bc0f1ef502ed7f2576359ebbedaf Changes
+SHA256 9e906c120470ed3478f00ef39a00eb71c4a008e2932dbbab66dfb79965368593 LICENSE
+SHA256 c8ca1b332370d913b89ed050cea64e000af20f3eeca86c80b92526f90caea9d5 MANIFEST
+SHA256 1bef5099084b3439e595fcb9bdb4b396ba282ba8bcb5bb6202051f3cee085168 META.yml
+SHA256 3d3461963e95dbafff30d5ebf8dcefac667e500eada99bd6334adde85b994bd3 Makefile.PL
+SHA256 b4b35b0bafc388a76894d29e17481c9bc0ea085c84d63ef6baf8afff0b4a0855 README.md
+SHA256 7c826daf9ccde1e096424d7f24942ea1b793a67003bc575aeec310405aa1246b html/Callbacks/TOTPMFA/Admin/Users/Modify.html/BeforeUpdate
+SHA256 9ca7eb62391637d9db0303729a8d5647cba86da6068b28da4236a15588f5a434 html/Callbacks/TOTPMFA/Admin/Users/Modify.html/LeftColumnBottom
+SHA256 e532e415c42be77810fe1b6511bc1fc51d3f2d2e1bbd9b01103953a192cf99d9 html/Callbacks/TOTPMFA/Prefs/AboutMe.html/UpdateLogic
+SHA256 754e16e431c0d7077ccdcf9fd7cc30f0c2bd5f80c812ea4705bbf06c07067c95 html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn
+SHA256 0300fd3f5057133483254a776dc159f2f55a20cafdc5d3b18aa61b5921956180 html/Callbacks/TOTPMFA/autohandler/Auth
+SHA256 b338b8b32c1e99bef7cb0adfd13c39d05d632e8df3149668240ac4822b89ffe3 html/Elements/TOTPMFATypeSelector
+SHA256 d7ef26caa61c357dcbb1e19ce289076993d6fb2ebb31c3278530592d11157ab5 html/NoAuth/TOTPMFALogin.html
+SHA256 9233e90040d203905330aedb14a146f9b5ddac50ed09159f3fe033bd4da11eda html/Prefs/TOTPMFA.png
+SHA256 23b9e41d49547ef33322685eabaa3b33478e97e582ca485ece735481437cdff1 lib/RT/Extension/TOTPMFA.pm
+SHA256 9f6d1af5c89abc7a1c1376fe1a7d426b28bd712774829a3ae95b342e7f400348 make-dist.sh
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEQme0+Q8meKESFpvWHR73WBtF6aAFAmfwUCYACgkQHR73WBtF
+6aD42wwAgeClVLFa4ZOZzFKtYJkzYtQcSvG4rk2B8Su1v30ld2R0pZ5yNX7PgbAK
+rTAfsjCLsEXNZ6AloE4TXO/BlCGajRJkvnHmwOEZwtZpl9rj7MOxP5xPypsi+C/U
+qoe2KxHzY4X9ccTKXebLOqzcPpHNuISnOPudDzuideTSxR7nLhHOfu/v8FZIDUM3
+qja4c6afO0Ai2rNkquDvSjfko9fOt9LF606CyzIcgJRb3qeUOhJZFTrtZGkpUt7X
+1mRt5bjrnytq5i6vxjHKiM1eFC+qR4SFGfVT3PGhkoY3CQ93JAO2BwVTenS2As7f
+zuu0lXkbNfj2YwtmwVqrEsuc9Xakzo5hdeR3Kb2FDX/cP7tilX7NAqars3kstUk/
+8GXPTIl86TTw9HrG7NMG5fgZ/kMXyFDyM8G9e6Gd5+gW3JaUb2AUr16QbqLIWxTr
+9aq9EcgdLQVUZic7NS35QV9LG8PeiZWyb2VUGMLHex1BpeLgSB7nBF415jDSXG6v
+vb4z3fUF
+=vXvf
+-----END PGP SIGNATURE-----

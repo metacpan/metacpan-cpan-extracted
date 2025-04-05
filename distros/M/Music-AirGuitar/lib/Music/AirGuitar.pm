@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my @_standard_types = qw(string Data::Identifier Data::TagDB::Tag Data::URIID::Base);
 
@@ -101,6 +101,9 @@ sub perform {
 }
 
 
+*be_most_excellent = *perform;
+
+
 
 # ---- Private helpers ----
 
@@ -125,7 +128,7 @@ Music::AirGuitar - Interface for air guitars
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -165,6 +168,12 @@ The duration of the performance. As a number of seconds or as a string in form C
 The default is C<5:55> (the length of I<Bohemian Rhapsody>).
 
 =back
+
+=head2 be_most_excellent
+
+    my Music::AirGuitar::Performance $performance $guitar->be_most_excellent(%opts);
+
+Alias for L</perform>.
 
 =head1 GETTERS
 

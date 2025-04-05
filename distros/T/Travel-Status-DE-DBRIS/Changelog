@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.09 - Sat Apr 05 2025
+
+    * dbris-m: Handle departures with undefined destination
+    * Location: Handle negative coordinate values
+
 Travel::Status::DE::DBRIS 0.08 - Tue Mar 25 2025
 
     * Journey: Add id accessor

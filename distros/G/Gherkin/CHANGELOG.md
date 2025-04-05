@@ -8,6 +8,15 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [32.1.0] - 2025-04-04
+### Changed
+- [Java] Optimize GherkinLine performance ([#361](https://github.com/cucumber/gherkin/issues/361))
+- [Java] Optimize number of array copies ([#388](https://github.com/cucumber/gherkin/pull/388))
+- [Java] Optimize Location performance ([#385](https://github.com/cucumber/gherkin/pull/385))
+- [Java] Optimize AstNode performance ([#383](https://github.com/cucumber/gherkin/pull/383))
+- [Java] Optimize EncodingParser performance ([#382](https://github.com/cucumber/gherkin/pull/382))
+- [Java] Optimize GherkinDialect performance ([#380](https://github.com/cucumber/gherkin/pull/380))
+
 ## [32.0.1] - 2025-03-27
 ### Fixed
 - [Python] Fix a regression when a feature file only has a comment in the description
@@ -750,7 +759,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v32.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v32.1.0...HEAD
+[32.1.0]: https://github.com/cucumber/gherkin/compare/v32.0.1...v32.1.0
 [32.0.1]: https://github.com/cucumber/gherkin/compare/v32.0.0...v32.0.1
 [32.0.0]: https://github.com/cucumber/gherkin/compare/v31.0.0...v32.0.0
 [31.0.0]: https://github.com/cucumber/gherkin/compare/v30.0.4...v31.0.0

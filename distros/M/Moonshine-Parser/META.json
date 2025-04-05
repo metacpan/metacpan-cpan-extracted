@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Moonshine-Parser",
    "no_index" : {
@@ -42,11 +42,11 @@
    "provides" : {
       "Moonshine::Parser" : {
          "file" : "lib/Moonshine/Parser.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Moonshine::Parser::HTML" : {
          "file" : "lib/Moonshine/Parser/HTML.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -57,5 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Parser"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

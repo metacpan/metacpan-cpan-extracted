@@ -36,6 +36,8 @@ share/view/overview.js
 share/view/overview.png
 share/view/throbber.gif
 t/album.t
+t/album/Blaufußtölpel.jpg
+t/album/Blaufußtölpel.txt
 t/album/head.png
 t/album/P3111190.JPG
 t/album/P3111190.txt

@@ -26,17 +26,5 @@ WriteMakefile(
             },
         },
     },
-    META_ADD => {
-        resources => {
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/kawamurashingo/JQ-Lite.git',
-                web  => 'https://github.com/kawamurashingo/JQ-Lite',
-            },
-            bugtracker => {
-                web => 'https://github.com/kawamurashingo/JQ-Lite/issues',
-            },
-        },
-    },
 );
 

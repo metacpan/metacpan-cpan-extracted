@@ -2,7 +2,7 @@ NAME
     OptArgs2 - command-line argument and option processor
 
 VERSION
-    2.0.0 (2022-10-05)
+    v2.0.13 (2025-04-04)
 
 SYNOPSIS
         #!/usr/bin/env perl
@@ -35,7 +35,7 @@ SYNOPSIS
             comment => 'handy work app',
             optargs => [
                 command => {
-                    isa      => 'Str',
+                    isa      => 'SubCmd',
                     required => 1,
                     comment  => 'the action to take',
                 },
@@ -493,8 +493,8 @@ DESCRIPTION
         is primarily to support --help or --version options which would
         typically override usage errors.
 
-            opt version => (
-                isa     => 'Flag',
+            version => (
+                isa     => '--Flag',
                 alias   => 'V',
                 comment => 'print version string and exit',
                 trigger => sub {
@@ -563,8 +563,7 @@ FUNCTIONS
     class_optargs( $class, [ @argv ] ) -> ($subclass, $opts, $file)
         Parse @ARGV by default (or @argv when given) for the arguments
         and options defined for command $class. @ARGV will first be
-        decoded into UTF-8 (if necessary) from whatever I18N::Langinfo
-        says your current locale codeset is.
+        decoded using Encode::Locale.
 
         Returns the following values:
 
@@ -656,7 +655,7 @@ FUNCTIONS
         "main").
 
 SEE ALSO
-    OptArgs2::Pager, OptArgs2::StatusLine, Getopt::Long
+    OptArgs2::Pager, OptArgs2::StatusLine, Getopt::Long, Encode::Locale
 
     This module used to duplicate itself on CPAN as Getopt::Args2, but
     as of the version 2 series that is no longer the case.

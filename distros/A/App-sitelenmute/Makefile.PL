@@ -41,8 +41,8 @@ WriteMakefile(
     resources => {
       repository => {
 	type => 'git',
-	url  => 'https://alexschroeder.ch/cgit/',
-	web  => 'https://alexschroeder.ch/cgit/sitelen-mute/about/',
+	url  => 'https://src.alexschroeder.ch/sitelen-mute.git',
+	web  => 'https://src.alexschroeder.ch/sitelen-mute.git',
       },
     },
   },

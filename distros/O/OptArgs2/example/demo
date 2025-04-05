@@ -49,7 +49,11 @@ subcmd 'demo::arg::arrayref' => (
 subcmd 'demo::arg::greedy' => (
     comment => 'arguments',
     optargs => [
-
+        filler => {
+            isa      => 'Str',
+            comment  => 'Str in front of a SubCmd',
+            required => 1,
+        },
         type => {
             isa      => 'SubCmd',
             comment  => 'arg type',

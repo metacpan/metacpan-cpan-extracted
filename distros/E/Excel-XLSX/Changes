@@ -1,0 +1,7 @@
+Revision history for Excel::XLSX
+
+1.02      2025-04-04 16:13:45-07:00 America/Los_Angeles
+        - Fix typo in dist.ini file
+
+1.01      2025-04-04 10:22:43-07:00 America/Los_Angeles
+        - First version, released on an unsuspecting world.

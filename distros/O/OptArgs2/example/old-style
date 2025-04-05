@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib 'lib';
+
+#use lib 'blib/lib';
+use lib "$FindBin::Bin/../lib";
+use Data::Dumper;
+use OptArgs2;
+
+### DO NOT USE THIS STYLE OF INTERFACE
+### Just checking that v1-type compatibility still works
+
+arg item => (
+    isa      => 'Str',
+    required => 1,
+    comment  => 'the item to paint',
+);
+
+opt quiet => (
+    isa     => 'Flag',
+    alias   => 'q',
+    comment => 'output nothing while working',
+);
+
+my $args = optargs;
+print "Painting $args->{item}\n" unless $args->{quiet};
+

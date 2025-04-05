@@ -1,5 +1,8 @@
 Tk::CodeText module changes log
 
+0.68 04 Apr 2025
+	- Fixed updating line numbers and fold indicators when drag scrolling.
+
 0.67 28 Mar 2025
 	- Fixed missing call to bookmarkCheck.
 	- Moved keybinding for upper/lower case to CTRL+I and CTRL+SHIFT+I.

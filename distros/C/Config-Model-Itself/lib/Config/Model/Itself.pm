@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.023;
+package Config::Model::Itself 2.024;
 
 use Mouse ;
 use Config::Model 2.141;
@@ -117,7 +117,7 @@ sub _build_cm_lib_dir {
     my $self = shift;
     my $p =  path('lib/Config/Model');
     if (! $p->is_dir) {
-        $p->mkpath(0, oct(755)) || die "can't create $p:$!";
+        $p->mkdir();
     }
     return $p;
 }
@@ -147,7 +147,7 @@ has model_dir => (
 sub _build_model_dir {
     my $self = shift;
     my $md = $self->cm_lib_dir->child('models');
-    $md->mkpath;
+    $md->mkdir;
     return $md;
 }
 
@@ -257,7 +257,7 @@ sub read_all {
     croak "read_all: unexpected parameters ",join(' ', keys %args) if %args ;
 
     my $dir = $self->model_dir;
-    $dir->mkpath ;
+    $dir->mkdir ;
 
     my $root_model_file = $model ;
     $root_model_file =~ s!::!/!g ;
@@ -480,7 +480,7 @@ sub write_app_files {
         $logger->debug("writing $app_name...");
         my $app = $app_obj->fetch_with_id($app_name);
         my $cat_dir_name = $app->fetch_element_value( name =>'category' ).'.d';
-        $app_dir->child($cat_dir_name)->mkpath();
+        $app_dir->child($cat_dir_name)->mkdir();
         my $app_file = $app_dir->child($cat_dir_name)->child($app->index_value) ;
 
         my @lines ;
@@ -516,7 +516,7 @@ sub write_all {
 
     my $map = $self->{map} ;
 
-    $dir->mkpath;
+    $dir->mkdir;
 
     # get list of all classes loaded by the editor
     my %loaded_classes
@@ -857,7 +857,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.023
+version 2.024
 
 =head1 SYNOPSIS
 

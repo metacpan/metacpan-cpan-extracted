@@ -1,0 +1,65 @@
+<%doc>
+Act upon the extra fields this extension has added to the "About Me" page
+when the page's form is submitted.
+</%doc>
+\
+<%ARGS>
+$fields => []
+$results => []
+$UserObj => {}
+$ARGSRef => {}
+</%ARGS>
+\
+<%INIT>
+# Can't do anything without a user object.
+return if (not $UserObj);
+return if (not $UserObj->Id);
+
+# Restricted to privileged users.
+return if (not $UserObj->Privileged);
+
+my $Settings = RT::Extension::TOTPMFA::UserSettings($UserObj);
+
+if (   $ARGSRef->{'ResetTOTPMFASecret'}
+    && $ARGSRef->{'ConfirmResetTOTPMFASecretContainer'})
+{
+
+    # Reset the TOTP secret.
+    my ($OK, $Message) = RT::Extension::TOTPMFA::NewSecret($UserObj);
+    push @$results, $Message;
+
+} elsif ($ARGSRef->{'ResetTOTPMFASecret'}
+    && not $ARGSRef->{'ConfirmResetTOTPMFASecretContainer'})
+{
+
+    # Don't reset the TOTP secret - not confirmed.
+    push @$results,
+      $UserObj->loc('Confirmation not received - secret has not been reset.');
+
+} else {
+
+    # Store changes.
+    foreach my $Key (keys %$Settings) {
+        next if ($Key eq 'Secret');
+        next if (not defined $ARGSRef->{'TOTPMFA' . $Key});
+        next if ($ARGSRef->{'TOTPMFA' . $Key} eq $Settings->{$Key});
+        my ($OK, $Message) =
+          RT::Extension::TOTPMFA::UpdateUserSetting($UserObj, $Key,
+            $ARGSRef->{'TOTPMFA' . $Key});
+        push @$results, $Message;
+    }
+}
+
+if ($ARGSRef->{'TestTOTPMFA'}) {
+    my ($OK, $Message) =
+      RT::Extension::TOTPMFA::MFALogin(\%session, $ARGSRef->{'TestTOTPMFA'});
+    if ($OK) {
+        push @$results,
+          $UserObj->loc('Test successful: One-time passcode accepted.');
+    } else {
+        push @$results, $UserObj->loc('Test failed: [_1]', $Message);
+    }
+}
+
+return;
+</%INIT>

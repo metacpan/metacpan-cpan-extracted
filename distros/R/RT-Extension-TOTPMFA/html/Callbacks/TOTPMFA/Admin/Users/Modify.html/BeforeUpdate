@@ -1,0 +1,32 @@
+<%doc>
+Store changes to the MFA type.
+</%doc>
+\
+<%ARGS>
+$User => undef
+$ARGSRef => undef
+$Results => undef
+</%ARGS>
+\
+<%INIT>
+return if (not defined $User);
+return if (not $User->Id);
+return if (not $User->Privileged);
+return if (not defined $ARGSRef);
+return if (not defined $Results);
+
+return if (not $User->CurrentUserHasRight('AdminUsers'));
+return if (not defined $ARGSRef->{'TOTPMFAType'});
+return if ($ARGSRef->{'TOTPMFAType'} !~ /\S/);
+
+my ($OK, $Message) =
+  RT::Extension::TOTPMFA::UpdateUserSetting($User, 'Type',
+    $ARGSRef->{'TOTPMFAType'});
+
+push @$Results, $Message if ($Message);
+
+# Remove the setting from the args to avoid confusing RT.
+delete $ARGSRef->{'TOTPMFAType'};
+
+return;
+</%INIT>

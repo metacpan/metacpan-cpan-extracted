@@ -21,6 +21,7 @@ my @requires = (
     "strict" => 0,
     "warnings" => 0,
     "LWP::UserAgent" => 0,
+    "HTTP::Tiny" => 0,
 );
 
 my @test_requires = (

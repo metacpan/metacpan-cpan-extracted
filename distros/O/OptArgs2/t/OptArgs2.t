@@ -34,4 +34,23 @@ $o    = optargs(
 
 is $o, { arg => 'the arg', three => 3 }, 'optargs as ARRAY ref';
 
-done_testing;
+isa_ok dies {
+    cmd(
+        DupArgs => comment => 'test',
+        optargs => [
+            o1 => {
+                isa     => '--Flag',
+                comment => 'XX',
+                alias   => 'o',
+            },
+            o2 => {
+                isa     => '--Flag',
+                comment => 'YY',
+                alias   => 'o',
+            },
+        ],
+    )
+}
+, 'OptArgs2::Error::DuplicateAlias';
+
+done_testing();

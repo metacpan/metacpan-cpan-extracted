@@ -1,0 +1,12 @@
+<%doc>
+Show the user's current TOTP MFA secret as a QR code in a PNG image.
+</%doc>
+\
+<%INIT>
+my $UserObj = $session{'CurrentUser'}->UserObj;
+my $Image = RT::Extension::TOTPMFA::QRCode($UserObj);
+$r->content_type('image/png');
+$m->out($Image);
+$m->abort();
+return;
+</%INIT>
