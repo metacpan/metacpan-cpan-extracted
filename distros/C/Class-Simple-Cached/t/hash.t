@@ -49,10 +49,10 @@ CLASS: {
 	ok(scalar(@empty) == 0);
 
 	# White box test the cache
-	ok($cache{'barney'} eq 'betty');
-	my $a = $cache{'a'};
+	ok($cache{'Class::Simple::Cached:barney'} eq 'betty');
+	my $a = $cache{'Class::Simple::Cached:a'};
 	ok(ref($a) eq 'ARRAY');
-	my $abc = $cache{'abc'};
+	my $abc = $cache{'Class::Simple::Cached:abc'};
 	ok(ref($abc) eq 'ARRAY');
 	ok(scalar(@{$abc}) == 3);
 

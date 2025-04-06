@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.024;
+package Config::Model::Itself 2.025;
 
 use Mouse ;
 use Config::Model 2.141;
@@ -22,7 +22,7 @@ use File::Find ;
 use File::Path ;
 use File::Basename ;
 use Data::Compare ;
-use Path::Tiny 0.062;
+use Path::Tiny 0.125; # for mkdir
 use Mouse::Util::TypeConstraints;
 
 my $logger = Log::Log4perl::get_logger("Backend::Itself");
@@ -857,7 +857,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.024
+version 2.025
 
 =head1 SYNOPSIS
 

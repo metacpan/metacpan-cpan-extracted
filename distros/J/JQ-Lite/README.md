@@ -1,3 +1,5 @@
+![JQ::Lite](./images/JQ_Lite_logo_small.png)
+
 # JQ::Lite
 
 [![MetaCPAN](https://img.shields.io/cpan/v/JQ::Lite?color=blue)](https://metacpan.org/pod/JQ::Lite)
@@ -15,10 +17,12 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
-- ✅ Built-in functions: `length`, `keys`, `first`, `last`, `reverse`, `sort`, `unique`, `has`
+- ✅ Built-in functions: `length`, `keys`, `first`, `last`, `reverse`, `sort`, `unique`, `has`,`map`
 - ✅ Command-line interface: `jq-lite`
 - ✅ Reads from STDIN or file
 - ✅ **Interactive mode** for exploring JSON line-by-line
+- ✅ **v0.19+:** `--use` option to select decoder (JSON::PP, JSON::XS, etc.)
+- ✅ **v0.19+:** `--debug` option to show active JSON module
 
 ---
 
@@ -65,6 +69,11 @@ cat users.json | jq-lite '.users[].name'
 jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite -r '.users[].name' users.json
 ```
+for windows
+```powershell
+type user.json | jq-lite ".users[].name"
+jq-lite -r ".users[].name" users.json
+```
 
 > ⚠️ `jq-lite` is named to avoid conflict with the real `jq`.
 
@@ -77,9 +86,7 @@ If you omit the query, `jq-lite` enters **interactive mode**, allowing you to ty
 ```bash
 jq-lite users.json
 ```
-
-This launches:
-
+![JQ::Lite demo](images/jq_lite.gif)
 ```
 jq-lite interactive mode. Enter query (empty line to quit):
 > .users[0].name
@@ -94,6 +101,25 @@ jq-lite interactive mode. Enter query (empty line to quit):
 
 - Results will be **re-rendered each time**, clearing the previous output (like a terminal UI).
 - Works with `--raw-output` (`-r`) as well.
+
+---
+
+### 🔍 Decoder selection and debug output
+
+If installed, the following JSON modules are checked and used in order of priority: `JSON::MaybeXS`, `Cpanel::JSON::XS`, `JSON::XS`, and `JSON::PP`. You can see which module is being used with the --debug option.
+
+```bash
+$ jq-lite --debug .users[0].age users.json
+[DEBUG] Using Cpanel::JSON::XS
+30
+
+$ jq-lite --use JSON::PP .users[0].age users.json
+30
+
+$ jq-lite --use JSON::PP --debug .users[0].age users.json
+[DEBUG] Using JSON::PP
+30
+```
 
 ---
 

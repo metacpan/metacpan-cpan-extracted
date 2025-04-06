@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.03
+version 0.04
 Hades::Macro::YAML base Hades::Macro {
 	abstract { Hades macro helpers for YAML }
 	synopsis {

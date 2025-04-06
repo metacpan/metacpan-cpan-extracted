@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "DynaLoader" => 0,
-    "ExtUtils::Builder" => "0.013",
+    "ExtUtils::Builder" => "0.016",
     "ExtUtils::Builder::Action::Command" => 0,
     "ExtUtils::Builder::Node" => 0,
     "ExtUtils::Builder::Planner" => "0.007",
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open2" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "DynaLoader" => 0,
-  "ExtUtils::Builder" => "0.013",
+  "ExtUtils::Builder" => "0.016",
   "ExtUtils::Builder::Action::Command" => 0,
   "ExtUtils::Builder::Node" => 0,
   "ExtUtils::Builder::Planner" => "0.007",

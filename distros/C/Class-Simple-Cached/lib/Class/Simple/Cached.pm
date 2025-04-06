@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Carp;
 use Class::Simple;
+use Params::Get;
+use Scalar::Util;
 
 my @ISA = ('Class::Simple');
 
@@ -13,22 +15,23 @@ Class::Simple::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
-A sub-class of L<Class::Simple> which caches calls to read
-the status of an object that are otherwise expensive.
+A subclass of L<Class::Simple> which caches calls to read the status of an object that are otherwise expensive.
 
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
-for example by changing its state.
+for example,
+by changing its state.
 
-You can use this class to create a caching layer to an object of any class
-that works on objects with a get/set model such as:
+You can use this class to create a caching layer for any object of any class
+that works on objects with a get/set model,
+such as:
 
     use Class::Simple;
     my $obj = Class::Simple->new();
@@ -42,12 +45,12 @@ that works on objects with a get/set model such as:
 Creates a Class::Simple::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands clear(), get() and set() calls,
+which is either an object which understands purge(), get() and set() calls,
 such as an L<CHI> object;
 or is a reference to a hash where the return values are to be stored.
 
 It takes one optional argument: object,
-which is an object which is taken to be the object to be cached.
+which is an object that is taken to be the object to be cached.
 If not given, an object of the class L<Class::Simple> is instantiated
 and that is used.
 
@@ -55,34 +58,38 @@ and that is used.
 
 sub new
 {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 
 	# Use Class::Simple::Cached->new(), not Class::Simple::Cached::new()
 	if(!defined($class)) {
 		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		return;
 	}
-
-	my %args;
-	if(ref($_[0]) eq 'HASH') {
-		%args = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
-		return;
-	} elsif(@_ % 2 == 0) {
-		%args = @_;
+	if(Scalar::Util::blessed($class)) {
+		my $params = Params::Get::get_params(undef, @_) || {};
+		# clone the given object
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	if(!defined($args{'object'})) {
-		$args{'object'} = Class::Simple->new(%args);
+	my $params = Params::Get::get_params('cache', @_) || {};
+
+	# Later Perls can use //=
+	$params->{object} ||= Class::Simple->new(%{$params});	# Default to Class::Simple object
+
+	# FIXME: If there are arguments, put the values in the cache
+
+	# Ensure cache implements required methods
+	if(Scalar::Util::blessed($params->{cache})) {
+		unless($params->{cache}->can('get') && $params->{cache}->can('set') && $params->{cache}->can('purge')) {
+			Carp::croak("Cache object must implement 'get', 'set', and 'purge' methods");
+		}
+		return bless $params, $class;
+	}
+	if(ref($params->{'cache'}) eq 'HASH') {
+		return bless $params, $class;
 	}
 
-	if($args{'cache'} && ref($args{'cache'})) {
-		return bless \%args, $class;
-	}
-	Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
-	return;	# undef
+	Carp::croak("$class: Cache must be ref to HASH or object");
 }
 
 =head2 can
@@ -93,13 +100,9 @@ Returns if the embedded object can handle a message
 
 sub can
 {
-	my $self = shift;
-	my $method = shift;
+	my ($self, $method) = @_;
 
-	if(($method eq 'new') || $self->{'object'}->can($method) || $self->SUPER::can($method)) {
-		return 1;
-	}
-	return 0;
+	return ($method eq 'new') || $self->{'object'}->can($method) || $self->SUPER::can($method);
 }
 
 =head2 isa
@@ -110,10 +113,9 @@ Returns if the embedded object is the given type of object
 
 sub isa
 {
-	my $self = shift;
-	my $class = shift;
+	my ($self, $class) = @_;
 
-	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($self)) {
+	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($class)) {
 		return 1;
 	}
 	return $self->{'object'}->isa($class);
@@ -122,38 +124,60 @@ sub isa
 # sub _caller_class
 # {
 	# my $self = shift;
-# 
+#
 	# if(ref($self->{'object'}) eq 'Class::Simple') {
 		# # return $self->SUPER::_caller_class(@_);
 		# return $self->Class::Simple::_caller_class(@_);
 	# }
 # }
 
+# For older Perls - define a DESTROY method
+# See https://github.com/Perl/perl5/issues/14673
+sub DESTROY
+{
+	my $self = shift;
+	if(my $cache = $self->{'cache'}) {
+		if(ref($cache) eq 'HASH') {
+			my $class = ref($self);
+			# while(my($key, $value) = each %{$cache}) {
+				# if($key =~ /^$class/) {
+					# delete $cache->{$key};
+				# }
+			# }
+			delete $cache->{$_} for grep { /^$class/ } keys %{$cache};
+		} else {
+			$cache->purge();
+		}
+	}
+}
+
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
-	my $param = $AUTOLOAD;
-	$param =~ s/.*:://;
+	my ($param) = $AUTOLOAD =~ /::(\w+)$/;
 
 	my $self = shift;
 	my $cache = $self->{'cache'};
 
 	if($param eq 'DESTROY') {
 		if(ref($cache) eq 'HASH') {
-			while(my($key, $value) = each %{$cache}) {
-				delete $cache->{$key};
-			}
+			my $class = ref($self);
+			# while(my($key, $value) = each %{$cache}) {
+				# if($key =~ /^$class/) {
+					# delete $cache->{$key};
+				# }
+			# }
+			delete $cache->{$_} for grep { /^$class/ } keys %{$cache};
 			return;
 		}
 		if(defined($^V) && ($^V ge 'v5.14.0')) {
 			return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
 		}
-		$cache->clear();
+		$cache->purge();
 		return;
 	}
 
 	# my $method = $self->{'object'} . "::$param";
-	my $method = $param;
 	my $object = $self->{'object'};
 
 	# if($param =~ /^[gs]et_/) {
@@ -161,13 +185,18 @@ sub AUTOLOAD
 		# return $object->$method(\@_);
 	# }
 
-	if(scalar(@_) == 0) {
+	# TODO: To add argument support, make the code more than simply "param",
+	#	e.g. my $cache_key = join('|', $param, @_);
+
+	my $key = ref($self) . ":$param";
+
+	if(scalar(@_) == 0) {	# Getter
 		# Retrieving a value
 		my $rc;
 		if(ref($cache) eq 'HASH') {
-			$rc = $cache->{$param};
+			$rc = $cache->{$key};
 		} else {
-			$rc = $cache->get($param);
+			$rc = $cache->get($key);
 		}
 		if($rc) {
 			die $param if($rc eq 'never');
@@ -183,54 +212,56 @@ sub AUTOLOAD
 			return $rc;
 		}
 		if(wantarray) {
-			my @rc = $object->$method();
+			my @rc = $object->$param();
 			if(scalar(@rc) == 0) {
 				return;
 			}
 			if(ref($cache) eq 'HASH') {
-				$cache->{$param} = \@rc;
+				$cache->{$key} = \@rc;
 			} else {
-				$cache->set($param, \@rc, 'never');
+				$cache->set($key, \@rc, 'never');
 			}
 			return @rc;
 		}
-		if(defined(my $rc = $object->$method())) {
+		if(defined(my $rc = $object->$param())) {
 			if(ref($cache) eq 'HASH') {
-				return $cache->{$param} = $rc;
+				return $cache->{$key} = $rc;
 			}
-			return $cache->set($param, $rc, 'never');
+			return $cache->set($key, $rc, 'never');
 		}
 		if(ref($cache) eq 'HASH') {
-			return $cache->{$param} = __PACKAGE__ . '>UNDEF<';
+			return $cache->{$key} = __PACKAGE__ . '>UNDEF<';
 		}
-		$cache->set($param, __PACKAGE__ . '>UNDEF<', 'never');
+		$cache->set($key, __PACKAGE__ . '>UNDEF<', 'never');
 		return;
 	}
 
+	# Setter
+
 	# $param = "SUPER::$param";
-	# return $cache->set($param, $self->$param(@_), 'never');
+	# return $cache->set($key, $self->$param(@_), 'never');
 	if($_[1]) {
 		# Storing an array
 		# We store a ref to the array, and dereference on retrieval
-		if(defined(my $val = $object->$method(\@_))) {
+		if(defined(my $val = $object->$param(\@_))) {
 			if(ref($cache) eq 'HASH') {
-				$cache->{$param} = $val;
+				$cache->{$key} = $val;
 			} else {
-				$cache->set($param, $val, 'never');
+				$cache->set($key, $val, 'never');
 			}
 			return @{$val};
 		}
 		if(ref($cache) eq 'HASH') {
 			return $cache->{$param} = __PACKAGE__ . '>UNDEF<';
 		}
-		$cache->set($param, __PACKAGE__ . '>UNDEF<', 'never');
+		$cache->set($key, __PACKAGE__ . '>UNDEF<', 'never');
 		return;
 	}
 	# Storing a scalar
 	if(ref($cache) eq 'HASH') {
-		return $cache->{$param} = $object->$method($_[0]);
+		return $cache->{$key} = $object->$param($_[0]);
 	}
-	return $cache->set($param, $object->$method($_[0]), 'never');
+	return $cache->set($key, $object->$param($_[0]), 'never');
 }
 
 =head1 AUTHOR
@@ -245,14 +276,16 @@ Only works on messages that take no arguments.
 For that, use L<Class::Simple::Readonly::Cached>.
 
 Please report any bugs or feature requests to L<https://github.com/nigelhorne/Class-Simple-Readonly/issues>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+I will be notified,
+and then you'll automatically be notified of the progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
 L<Class::Simple>, L<CHI>
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -287,7 +320,7 @@ L<http://deps.cpantesters.org/?module=Class::Simple::Cached>
 =head1 LICENCE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2024, Nigel Horne
+Copyright (C) 2019-2025, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

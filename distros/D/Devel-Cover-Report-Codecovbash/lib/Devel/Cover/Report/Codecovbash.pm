@@ -12,7 +12,7 @@ use namespace::autoclean;
 use File::Spec;
 use JSON::MaybeXS qw( encode_json );
 
-our $VERSION = '0.04';
+our $VERSION = 'v0.41.0'; # VERSION
 
 sub report {
     shift;
@@ -47,6 +47,10 @@ sub _get_file_coverage {
     my @coverage   = (undef);
 
     for my $i ( 1 .. $lines ) {
+        unless (defined $statements) {
+            push @coverage, undef;
+            next;
+        }
         my $statement = $statements->location($i);
         my $branch    = defined $branches ? $branches->location($i) : undef;
         push @coverage, _get_line_coverage( $statement, $branch );
@@ -100,18 +104,6 @@ sub _get_line_coverage {
 
 __END__
 
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Devel::Cover::Report::Codecovbash - Generate a JSON file to be uploaded with the codecov bash script.
-
-=head1 VERSION
-
-version 0.04
-
 =head1 DESCRIPTION
 
 This is a coverage reporter for Codecov. It generates a JSON file that can be
@@ -133,13 +125,10 @@ Use the codecov bash script:
     cover -report codecovbash
     bash <(curl -s https://codecov.io/bash) -t token -f cover_db/codecov.json
 
-=head1 SUPPORT
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
-The source code repository for Devel-Cover-Report-Codecovbash can be found at L<https://github.com/perlpunk/Devel-Cover-Report-Codecovbash>.
+The source code repository for Devel-Cover-Report-Codecovbash can be found at
+L<https://github.com/perlpunk/Devel-Cover-Report-Codecovbash>.
 
 =head1 AUTHOR
 

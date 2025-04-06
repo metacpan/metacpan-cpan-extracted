@@ -15,15 +15,39 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Type-Guess",
   "LICENSE" => "perl",
   "NAME" => "Type::Guess",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.004",
+  "PREREQ_PM" => {
+    "Class::Method::Modifiers" => 0,
+    "Encode" => 0,
+    "List::Util" => 0,
+    "Mojo::Base" => 0,
+    "Mojo::Util" => 0,
+    "Package::Stash" => 0,
+    "Scalar::Util" => 0,
+    "Text::VisualPrintf" => 0,
+    "Text::VisualWidth::PP" => 0,
+    "Type::Tiny" => 0,
+    "Types::Standard" => 0
+  },
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Class::Method::Modifiers" => 0,
+  "Encode" => 0,
+  "List::Util" => 0,
+  "Mojo::Base" => 0,
+  "Mojo::Util" => 0,
+  "Package::Stash" => 0,
+  "Scalar::Util" => 0,
+  "Text::VisualPrintf" => 0,
+  "Text::VisualWidth::PP" => 0,
+  "Type::Tiny" => 0,
+  "Types::Standard" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

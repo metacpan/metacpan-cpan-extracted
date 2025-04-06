@@ -33,5 +33,5 @@ requires:
   perl: '5.026000'
 resources:
   repository: https://src.alexschroeder.ch/sitelen-mute.git
-version: 3.03
+version: 3.04
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

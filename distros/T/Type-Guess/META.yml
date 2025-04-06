@@ -12,7 +12,19 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Type-Guess
-version: '0.004'
+requires:
+  Class::Method::Modifiers: '0'
+  Encode: '0'
+  List::Util: '0'
+  Mojo::Base: '0'
+  Mojo::Util: '0'
+  Package::Stash: '0'
+  Scalar::Util: '0'
+  Text::VisualPrintf: '0'
+  Text::VisualWidth::PP: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+version: '0.005'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

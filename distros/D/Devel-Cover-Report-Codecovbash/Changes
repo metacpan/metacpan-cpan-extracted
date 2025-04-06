@@ -1,3 +1,7 @@
+v0.41.0 2025-04-06 01:05:36+02:00
+
+- Avoid die when statements could not be found
+
 0.04     2021-07-20
 
 - Fix report for uncoverable lines

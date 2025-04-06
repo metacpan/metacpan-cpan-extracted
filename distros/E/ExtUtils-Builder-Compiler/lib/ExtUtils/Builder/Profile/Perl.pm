@@ -1,9 +1,10 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.026';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.027';
 use strict;
 use warnings;
 
 use ExtUtils::Helpers 0.027 'split_like_shell';
+use File::Basename 'dirname';
 use File::Spec::Functions qw/catdir/;
 
 sub _get_var {
@@ -85,11 +86,11 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
- $planner->load_module('ExtUtils::Builder::AutoDetect::C',
+ $planner->load_extension('ExtUtils::Builder::AutoDetect::C',
     profile => '@Perl',
  );
 

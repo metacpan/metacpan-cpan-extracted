@@ -1,3 +1,3 @@
 runtime:
   requires:
-    ExtUtils::Builder: 0.013
+    ExtUtils::Builder: 0.016

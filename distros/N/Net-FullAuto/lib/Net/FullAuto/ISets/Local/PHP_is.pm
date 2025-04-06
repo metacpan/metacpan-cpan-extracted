@@ -163,7 +163,8 @@ my $configure_php=sub {
          'yum -y install yum-utils','__display__');
    }
 #cleanup;
-   ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
+   ($stdout,$stderr)=$handle->cmd(
+      "wget --no-check-certificate -qO- http://icanhazip.com");
    $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;
@@ -187,7 +188,7 @@ my $configure_php=sub {
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://www.sourceware.org/bzip2/');
+      'wget --no-check-certificate -qO- https://www.sourceware.org/bzip2/');
    $stdout=~s/^.*?stable version is bzip2 ([\d\.]*\d)\..*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "ls -1 /usr/local/lib | grep libbz2.so.$stdout");
@@ -230,8 +231,8 @@ my $configure_php=sub {
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- http://xmlsoft.org/news.html');
-   $stdout=~s/^.*?public releases.*?v(.*?):.*$/$1/s;
+      'wget --no-check-certificate -qO- https://en.wikipedia.org/wiki/Libxml2');
+   $stdout=~s/^.*?Stable release.*?-data["][>](.*?) *[(].*$/$1/s;
    my $lxmlver=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "ls -1 /usr/local/lib | grep libxml2.so.$lxmlver");
@@ -311,7 +312,7 @@ my $configure_php=sub {
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://en.wikipedia.org/wiki/OpenSSL');
+      'wget --no-check-certificate -qO- https://en.wikipedia.org/wiki/OpenSSL');
    $stdout=~s/^.*?Stable release.*?-data["][>](.*?) *[(].*$/$1/s;
    my $osslv=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -513,7 +514,8 @@ $stdout='rel-1-6-1';
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://doc.libsodium.org/#downloading-libsodium');
+      'wget --no-check-certificate -qO- '.
+      'https://doc.libsodium.org/#downloading-libsodium');
    $stdout=~s/^.*?libsodium (.*?)-stable.*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "strings /usr/local/lib/libsodium.so | grep $stdout");
@@ -562,7 +564,8 @@ $stdout='rel-1-6-1';
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://www.php.net/releases/index.php');
+      'wget --no-check-certificate -qO- '.
+      'https://www.php.net/releases/index.php');
    $stdout=~s/^.*?php-($vn.*?)\.tar\.gz.*$/$1/s;
    my $phpv=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -793,7 +796,8 @@ END
          'ldconfig -v /usr/local/lib','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget -qO- https://pecl.php.net/package/imagick','300');
+         'wget --no-check-certificate -qO- '.
+         'https://pecl.php.net/package/imagick','300');
       $stdout=~s/^.*?get\/(imagick-.*?).tgz.*$/$1/s;
       $version=$stdout;
       $handle->print($sudo.

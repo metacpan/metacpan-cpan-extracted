@@ -1,3 +1,70 @@
+0.25  2025-04-07
+    - Added support for aggregation functions:
+        * add   - sum of numeric arrays
+        * min   - minimum value of numeric arrays
+        * max   - maximum value of numeric arrays
+        * avg   - average of numeric arrays
+    - Improved CLI argument parsing:
+        * Queries no longer require a leading dot (e.g. 'map(...)' now works)
+        * File arguments are more accurately distinguished from query strings
+        * Interactive mode works even without a query when only a JSON file is provided
+    - Confirmed compatibility of map(), select(), and arithmetic expressions across CLI and interactive modes
+    - All previous features and test cases remain working and fully compatible
+0.24  2025-04-06
+    - Added support for numeric expressions inside select(), e.g.:
+        select(.id + 5 > 20)
+    - Enhanced run_query() to evaluate simple arithmetic operations (+, -, *, /, %) in filters
+    - Improved CLI query parsing to allow function-style queries like:
+        map(select(.id > 10))
+      without requiring a leading dot ('.')
+    - Verified compatibility with map(), length, sort, and select chaining
+    - Added test cases for arithmetic expressions and map/select combinations
+0.23  2025-04-06
+    - Added support for `map(...)` query syntax.
+      Allows jq-style mapping and filtering of arrays, e.g.:
+        map(select(.id > 10))
+        map(.name)
+    - Improved CLI (jq-lite) to accept function-style queries like map(...)
+    - Fixed command-line argument parsing to handle non-dot-prefixed queries
+    - Added tests for map(select(...)) to verify behavior
+0.22  2025-04-06
+    - Added test files:
+        t/contains.t
+        t/first_last.t
+        t/friends.t
+        t/has.t
+        t/limit.t
+        t/match_i.t
+        t/match.t
+        t/reverse.t
+        t/sort_unique.t
+0.21  2025-04-06
+    - Prefer JSON::MaybeXS as the default decoder if available
+    - Added support for user-specified decoder module selection including JSON::MaybeXS
+    - Updated internal decoder selection logic with fallback to Cpanel::JSON::XS, JSON::XS, and JSON::PP
+0.20  2025-04-06
+    - Improved POD documentation: Added full CLI and API usage, supported syntax, and examples.
+    - Added support for reverse, sort, first, last, unique, and has functions.
+    - Added --use and --debug options to jq-lite CLI.
+    - Added interactive mode to CLI when no query is provided.
+    - Internal refactoring for modular query processing.
+0.19  2025-04-06
+    - Added support for faster JSON decoding by conditionally using Cpanel::JSON::XS or JSON::XS.
+      Falls back to JSON::PP when XS modules are not available.
+    - Added --debug option to show which JSON module is being used.
+    - Added --use <ModuleName> option to explicitly select JSON parser (e.g. --use JSON::PP).
+    - Improved CLI behavior and internal flexibility.
+0.18  2025-04-06
+    - Moved CLI script from script/jq-lite to bin/jq-lite for MetaCPAN visibility
+    - Updated Makefile.PL to include EXE_FILES => ['bin/jq-lite']
+0.17  2025-04-05
+    - Added --color option to jq-lite CLI script to enable colorized JSON output.
+      Keys are cyan, strings green, numbers yellow, and booleans/null magenta.
+    - Updated help and usage examples to reflect the new --color option.
+    - Improved CLI usability by simplifying option name (from --color-output to --color).
+0.16  2025-04-05
+    - Added --version (-v) option to the jq-lite CLI script.
+      It displays the installed version of JQ::Lite.
 0.14  2025-04-05
     - Fixed: --raw-output (-r) now pretty-prints objects and arrays,
              and outputs scalars as plain text, matching jq behavior.

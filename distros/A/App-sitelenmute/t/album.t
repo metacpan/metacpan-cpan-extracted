@@ -31,6 +31,9 @@ use Mojo::DOM58;
 plan skip_all => "'convert' not installed"
     unless searchpath('convert');
 
+plan skip_all => "neither '7z' nor 'zip' installed"
+    unless searchpath('7za') || searchpath('zip');
+
 my $options = " -v -v";
 # -o means without auto-orient
 $options .= " -o" unless searchpath('exiftran') or searchpath('exifautotran');

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.026';
+$ExtUtils::Builder::Conf::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ sub add_methods {
 		print $source_file $args{source};
 
 		my $inner = $self->new_planner;
-		$inner->load_module('ExtUtils::Builder::AutoDetect::C', 0.015);
+		$inner->load_extension('ExtUtils::Builder::AutoDetect::C', 0.015);
 
 		my @include_dirs         = (@{ $args{include_dirs} // [] }, @{ $self->{include_dirs} // [] });
 		my @extra_compiler_flags = (@{ $args{extra_compiler_flags} // [] }, @{ $self->{extra_compiler_flags} // [] });
@@ -223,11 +223,11 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
- load_module("ExtUtils::Builder::Conf");
+ load_extension("ExtUtils::Builder::Conf");
  assert_compile_run(diag => 'no PF_MOONLASER', source => <<'EOF');
  #include <stdio.h>
  #include <sys/socket.h>

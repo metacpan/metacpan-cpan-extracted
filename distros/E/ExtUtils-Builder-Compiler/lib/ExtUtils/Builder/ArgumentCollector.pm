@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ArgumentCollector;
-$ExtUtils::Builder::ArgumentCollector::VERSION = '0.026';
+$ExtUtils::Builder::ArgumentCollector::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ ExtUtils::Builder::ArgumentCollector - Helper role for argument collecting class
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

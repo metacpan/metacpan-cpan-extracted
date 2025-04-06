@@ -7,18 +7,19 @@ Class::Simple::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
-A sub-class of [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) which caches calls to read
-the status of an object that are otherwise expensive.
+A subclass of [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) which caches calls to read the status of an object that are otherwise expensive.
 
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
-for example by changing its state.
+for example,
+by changing its state.
 
-You can use this class to create a caching layer to an object of any class
-that works on objects with a get/set model such as:
+You can use this class to create a caching layer for any object of any class
+that works on objects with a get/set model,
+such as:
 
     use Class::Simple;
     my $obj = Class::Simple->new();
@@ -32,12 +33,12 @@ that works on objects with a get/set model such as:
 Creates a Class::Simple::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands clear(), get() and set() calls,
+which is either an object which understands purge(), get() and set() calls,
 such as an [CHI](https://metacpan.org/pod/CHI) object;
 or is a reference to a hash where the return values are to be stored.
 
 It takes one optional argument: object,
-which is an object which is taken to be the object to be cached.
+which is an object that is taken to be the object to be cached.
 If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) is instantiated
 and that is used.
 
@@ -61,14 +62,16 @@ Only works on messages that take no arguments.
 For that, use [Class::Simple::Readonly::Cached](https://metacpan.org/pod/Class%3A%3ASimple%3A%3AReadonly%3A%3ACached).
 
 Please report any bugs or feature requests to [https://github.com/nigelhorne/Class-Simple-Readonly/issues](https://github.com/nigelhorne/Class-Simple-Readonly/issues).
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+I will be notified,
+and then you'll automatically be notified of the progress on your bug as I make changes.
 
 # SEE ALSO
 
 [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple), [CHI](https://metacpan.org/pod/CHI)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -99,7 +102,7 @@ You can also look for information at:
 # LICENCE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019-2024, Nigel Horne
+Copyright (C) 2019-2025, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

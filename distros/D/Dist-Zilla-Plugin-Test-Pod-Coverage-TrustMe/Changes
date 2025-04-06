@@ -1,4 +1,9 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe
 
+v1.0.1  2025-04-05
+  - add description text to pod
+  - fix order of pod content
+  - add newer develop prereq of Test::Pod::Coverage::TrustMe
+
 v1.0.0  2024-10-09
   - initial release

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.026';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -212,12 +212,12 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
  my $planner = ExtUtils::Builder::Planner->new;
- $planner->load_module('ExtUtils::Builder::AutoDetect::C', '0.001',
+ $planner->load_extension('ExtUtils::Builder::AutoDetect::C', '0.001',
 	profiles => ['@Perl'],
 	type     => 'loadable-object',
  );
@@ -238,7 +238,7 @@ This adds two delegate methods to the planner, C<compile> and C<link>. It takes 
 
 If your C<$planner> has a C<config> delegate, that will be used as default value for C<config>.
 
-This is usually not called directly, but through L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner>'s C<load_module> method.
+This is usually not called directly, but through L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner>'s C<load_extension> method.
 
 =head2 link(\@sources, $target, %options)
 

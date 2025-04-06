@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Owner;
-$Software::Copyright::Owner::VERSION = '0.014';
+$Software::Copyright::Owner::VERSION = '0.015';
 use warnings;
 use 5.20.0;
 use utf8;
@@ -100,7 +100,7 @@ Software::Copyright::Owner - Copyright owner class
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

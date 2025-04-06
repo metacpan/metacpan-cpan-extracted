@@ -20,7 +20,7 @@ name: Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe
 provides:
   Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe:
     file: lib/Dist/Zilla/Plugin/Test/Pod/Coverage/TrustMe.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Data::Dumper: '0'
   Data::Section: '0'
@@ -31,9 +31,9 @@ requires:
 resources:
   bugtracker: https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe/issues
   repository: https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe.git
-version: v1.0.0
-x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: v1.0.1
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1
 x_use_unsafe_inc: 0

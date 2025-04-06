@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.027     2025-04-05 19:45:01+02:00 Europe/Brussels
+          - Adapt to load_extension rename
+          - Add missing dirname include to Profile::Perl
+
 0.026     2025-03-28 12:37:34+01:00 Europe/Brussels
           - Add definition file to MSVC linker arguments
 

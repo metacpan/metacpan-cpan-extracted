@@ -28,7 +28,7 @@ TEST: {
 	@rc = $l->foo();
 	ok(!defined($rc[0]));
 
-	ok($cache->get('fred') eq 'wilma');
+	ok($cache->get('Class::Simple::Cached:fred') eq 'wilma');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		foreach my $key($cache->get_keys()) {
@@ -55,4 +55,3 @@ sub foo {
 }
 
 1;
-

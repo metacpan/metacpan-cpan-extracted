@@ -3,7 +3,7 @@ use Object::Pad;
 
 package OpenTelemetry::Propagator::TraceContext;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 class OpenTelemetry::Propagator::TraceContext :does(OpenTelemetry::Propagator) {
     use isa 'OpenTelemetry::X';

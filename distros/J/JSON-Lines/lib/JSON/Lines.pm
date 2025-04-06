@@ -1,5 +1,5 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.03';
+use 5.006; use strict; use warnings; our $VERSION = '1.04';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
@@ -176,13 +176,15 @@ sub _deparse_headers {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
@@ -395,10 +397,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-Lines>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/JSON-Lines>
 
 =item * Search CPAN
 

@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright;
-$Software::Copyright::VERSION = '0.014';
+$Software::Copyright::VERSION = '0.015';
 use 5.20.0;
 use warnings;
 use utf8;
@@ -38,7 +38,7 @@ sub _clean_copyright ($c) {
 
 sub _create_or_merge ($result, $c) {
     my $st = Software::Copyright::Statement->new($c);
-    my $name = NFKD($st->name // '');
+    my $name = $st->name // '';
     if ($result->{$name}) {
         $result->{$name}->merge($st);
     }
@@ -174,7 +174,7 @@ Software::Copyright - Copyright class
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

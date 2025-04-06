@@ -4,7 +4,7 @@ use Object::Pad ':experimental(init_expr)';
 package
     OpenTelemetry::Context::Key;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 class OpenTelemetry::Context::Key {
     use UUID::URandom 'create_uuid';
@@ -17,46 +17,67 @@ class OpenTelemetry::Context::Key {
 
 package OpenTelemetry::Context;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 sub key ( $, $name ) {
     OpenTelemetry::Context::Key->new( name => $name );
 }
 
 class OpenTelemetry::Context {
+    use Carp qw( carp croak );
+    use List::Util qw( pairs all );
     use OpenTelemetry::X;
 
     use isa 'OpenTelemetry::Context::Key';
 
-    field $data :param = {};
+    field $data;
 
-    sub BUILDARGS ( $class, %args ) { ( data => { %args } ) }
+    sub BUILDARGS ( $class, %args ) {
+        carp 'The OpenTelemetry::Context constructor no longer takes arguments'
+            if %args;
+        return;
+    }
+
+    method $init ( %data ) {
+        $data = \%data;
+        $self;
+    }
 
     method get ( $key ) {
-        die OpenTelemetry::X->create(
+        croak +OpenTelemetry::X->create(
             Invalid => 'Keys in a context object must be instances of OpenTelemetry::Context::Key',
         ) unless isa_OpenTelemetry_Context_Key $key;
 
         $data->{ $key->string };
     }
 
-    method set ( $key, $value ) {
-        die OpenTelemetry::X->create(
-            Invalid => 'Keys in a context object must be instances of OpenTelemetry::Context::Key',
-        ) unless isa_OpenTelemetry_Context_Key $key;
+    method set ( @pairs ) {
+        my %pairs;
+        for ( pairs @pairs ) {
+            croak +OpenTelemetry::X->create(
+                Invalid => 'Keys in a context object must be instances of OpenTelemetry::Context::Key',
+            ) unless isa_OpenTelemetry_Context_Key $_->[0];
 
-        OpenTelemetry::Context->new( %$data, $key->string, $value )
+            $pairs{ $_->[0]->string } = $_->[1];
+        }
+
+        OpenTelemetry::Context->new->$init( %$data, %pairs );
     }
 
-    method delete ( $key ) {
-        die OpenTelemetry::X->create(
-            Invalid => 'Keys in a context object must be instances of OpenTelemetry::Context::Key',
-        ) unless isa_OpenTelemetry_Context_Key $key;
+    method delete ( @keys ) {
+        my @strings;
+        for (@keys) {
+            croak +OpenTelemetry::X->create(
+                Invalid => 'Keys in a context object must be instances of OpenTelemetry::Context::Key',
+            ) unless isa_OpenTelemetry_Context_Key $_;
+
+            push @strings, $_->string;
+        }
 
         my %copy = %$data;
-        delete $copy{$key->string};
+        delete @copy{@strings};
 
-        OpenTelemetry::Context->new(%copy);
+        OpenTelemetry::Context->new->$init(%copy);
     }
 }
 
@@ -71,7 +92,7 @@ class OpenTelemetry::Context {
         sentinel(
             get => sub { $current },
             set => sub {
-                die OpenTelemetry::X->create(
+                croak +OpenTelemetry::X->create(
                     Invalid => 'Current context must be an instance of OpenTelemetry::Context, received instead ' . ref $_[0],
                 ) unless isa_OpenTelemetry_Context $_[0];
 

@@ -43,7 +43,7 @@ requires:
   Log::Log4perl: '1.11'
   Mouse: '0'
   Mouse::Util::TypeConstraints: '0'
-  Path::Tiny: '0.062'
+  Path::Tiny: '0.125'
   Pod::POM: '0'
   Scalar::Util: '0'
   Tk: '0'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-itself/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-itself.git
-version: '2.024'
+version: '2.025'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: LGPL-2.1

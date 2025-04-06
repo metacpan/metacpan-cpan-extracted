@@ -2,7 +2,7 @@ package Hades::Macro::YAML;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 our ( $YAML_CLASS, $CLASS_LOADED );
 
 BEGIN {
@@ -689,7 +689,7 @@ Hades::Macro::YAML - Hades macro helpers for YAML
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 

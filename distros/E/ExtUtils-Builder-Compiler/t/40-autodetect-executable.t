@@ -21,7 +21,7 @@ sub capturex {
 }
 
 my $planner = ExtUtils::Builder::Planner->new;
-$planner->load_module('ExtUtils::Builder::AutoDetect::C', undef,
+$planner->load_extension('ExtUtils::Builder::AutoDetect::C', undef,
 	type => 'executable',
 );
 

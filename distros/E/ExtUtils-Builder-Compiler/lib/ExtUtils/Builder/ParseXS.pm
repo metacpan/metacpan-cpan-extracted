@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.026';
+$ExtUtils::Builder::ParseXS::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -99,11 +99,11 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
- $planner->load_module("ExtUtils::Builder::ParseXS");
+ $planner->load_extension("ExtUtils::Builder::ParseXS");
  $planner->parse_xs("foo.xs", "foo.c");
 
 =head1 DESCRIPTION

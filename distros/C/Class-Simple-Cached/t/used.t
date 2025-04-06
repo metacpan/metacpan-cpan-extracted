@@ -1,11 +1,10 @@
 #!perl -w
 
-use warnings;
 use strict;
 use Test::Most;
 
-unless($ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
+unless($ENV{RELEASE_TESTING}) {
+	plan(skip_all => "Author tests not required for installation");
 }
 
 eval 'use Test::Module::Used';

@@ -9,7 +9,7 @@ my $BAGGAGE_KEY = OpenTelemetry::Context->key('baggage');
 package
     OpenTelemetry::Baggage::Entry;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 class OpenTelemetry::Baggage::Entry {
     field $value :param :reader;
@@ -19,7 +19,7 @@ class OpenTelemetry::Baggage::Entry {
 package
     OpenTelemetry::Baggage::Builder;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 class OpenTelemetry::Baggage::Builder {
     field %data;
@@ -40,7 +40,7 @@ class OpenTelemetry::Baggage::Builder {
 
 package OpenTelemetry::Baggage;
 
-our $VERSION = '0.027';
+our $VERSION = '0.029';
 
 my sub from_context ( $context = undef ) {
     ( $context // OpenTelemetry::Context->current )->get($BAGGAGE_KEY) // {}
@@ -50,7 +50,11 @@ sub set ( $, $name, $value, $meta = undef, $context = undef ) {
     $context //= OpenTelemetry::Context->current;
 
     my %new = %{ from_context $context };
-    $new{$name} = OpenTelemetry::Baggage::Entry->new( value => $value, meta => $meta );
+    $new{$name} = OpenTelemetry::Baggage::Entry->new(
+        value => $value,
+        meta  => $meta,
+    );
+
     $context->set( $BAGGAGE_KEY => \%new );
 }
 

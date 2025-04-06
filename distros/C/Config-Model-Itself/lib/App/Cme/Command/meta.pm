@@ -9,7 +9,7 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta 2.024;
+package App::Cme::Command::meta 2.025;
 
 use strict ;
 use warnings ;
@@ -27,7 +27,7 @@ use YAML::PP qw/Load Dump/;
 use Tk ;
 use Config::Model::TkUI ;
 use Config::Model::Itself::TkEditUI ;
-use Path::Tiny ;
+use Path::Tiny 0.125; # for mkdir
 
 binmode STDOUT, ':encoding(UTF-8)';
 
@@ -406,7 +406,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.024
+version 2.025
 
 =head1 SYNOPSIS
 

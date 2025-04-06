@@ -2,10 +2,6 @@
 
 Devel::Cover::Report::Codecovbash - Generate a JSON file to be uploaded with the codecov bash script.
 
-# VERSION
-
-version 0.04
-
 # DESCRIPTION
 
 This is a coverage reporter for Codecov. It generates a JSON file that can be
@@ -27,10 +23,6 @@ Use the codecov bash script:
     cover -report codecovbash
     bash <(curl -s https://codecov.io/bash) -t token -f cover_db/codecov.json
 
-# SUPPORT
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for Devel-Cover-Report-Codecovbash can be found at [https://github.com/perlpunk/Devel-Cover-Report-Codecovbash](https://github.com/perlpunk/Devel-Cover-Report-Codecovbash).
@@ -46,7 +38,7 @@ Tina Müller <tinita@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2021 by Pine Mizune.
+This software is Copyright (c) 2019 - 2025 by Pine Mizune.
 
 This is free software, licensed under:
 

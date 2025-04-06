@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself::TkEditUI 2.024;
+package Config::Model::Itself::TkEditUI 2.025;
 
 use strict;
 use warnings ;

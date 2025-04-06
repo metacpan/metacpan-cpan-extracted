@@ -1,20 +1,3 @@
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe/is
-    sues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    Graham Knop <haarg@haarg.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by Graham Knop.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
-
 NAME
     Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe - An author test for
     Pod Coverage
@@ -27,6 +10,11 @@ SYNOPSIS
         $ dzil test --release
 
 DESCRIPTION
+    This extension provides a test file to check for Pod coverage using
+    Test::Pod::Coverage::TrustMe. It is meant as a replacement for the
+    [PodCoverageTests] plugin, but providing some additional options and
+    using a different underlying test module.
+
 OPTIONS
     filename
         The name of the test file to generate. Defaults to
@@ -38,10 +26,8 @@ OPTIONS
         Aliased as "module".
 
     finder
-        The file finder
-        <https://metacpan.org/pod/Dist::Zilla::Role::FileFinderUser/default_
-        finders> used to find modules to check. Will only be used if a list
-        of modules is not given. Defaults to ":InstallModules".
+        The file finder used to find modules to check. Will only be used if
+        a list of modules is not given. Defaults to ":InstallModules".
 
         To generate the list of modules, the output of this finder will be
         filtered to only files ending in ".pm" and will be transformed to
@@ -77,4 +63,21 @@ OPTIONS
         should be specified like:
 
             options = extra_option = 1
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe/is
+    sues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Graham Knop <haarg@haarg.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2025 by Graham Knop.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

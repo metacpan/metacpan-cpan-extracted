@@ -2,7 +2,7 @@ package Hades::Realm::Compiled::Params;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -162,7 +162,7 @@ Hades::Realm::Compiled::Params - The great new Hades::Realm::Compiled::Params!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -1,8 +1,19 @@
 Revision history for Class::Simple::Cached
 
-0.05	Fri Jun 21 12:47:10 EDT 2024
-	Added can() and isa() methods
+0.06	Sat Apr  5 08:20:10 EDT 2025
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Use gtar to create a distribution on Macs
+	Added t/30-basics.t
+	Better argument testing to new()
+	Handle https://github.com/Perl/perl5/issues/14673
+	Fix isa() to work properly on subclasses
+	Keep class name in the key to keep purges safer
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
+0.05	Mon Jul 29 21:29:15 EDT 2024
 	Commented out what I believe is legacy code
+	Added can() and isa() methods
 
 0.04	Tue Mar  2 10:26:40 EST 2021
 	Fix "Can't use an undefined value as an ARRAY reference"

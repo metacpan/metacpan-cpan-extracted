@@ -4,7 +4,7 @@
       "Kawamura Shingo <pannakoota1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

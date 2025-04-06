@@ -13,7 +13,7 @@ WriteMakefile(
         'Test::More' => 0,
         'FindBin'    => 0,
     },
-    EXE_FILES    => ['script/jq-lite'],  # changed from script/jq
+    EXE_FILES    => ['bin/jq-lite'],  # changed from script/jq
     META_MERGE   => {
         resources => {
             repository => {

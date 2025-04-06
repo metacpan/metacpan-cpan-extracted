@@ -95,6 +95,13 @@ Jonathan Stowe 2015-2021',
         '2001-2004, Éric Duchmol'
     ],
     [
+        # another to test debian bug #1101987
+        '2018 Jelmer Vernooij <jelmer@samba.org>
+2020-2022 Jelmer Vernooĳ <jelmer@jelmer.uk>',
+        '2020-2022, Jelmer Vernooĳ <jelmer@jelmer.uk>
+2018, Jelmer Vernooij <jelmer@samba.org>',
+    ],
+    [
         '2015, 2018, Blaine Bublitz <blaine.bublitz@gmail.com> and Eric Schoffstall <yo@contra.io>',
     ],
     [

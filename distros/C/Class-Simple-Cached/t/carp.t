@@ -5,21 +5,18 @@ use warnings;
 use Class::Simple::Cached;
 use CHI;
 use Test::Most;
-
-eval 'use Test::Carp';
+use Test::Needs 'Test::Carp';
 
 CARP: {
-	if($@) {
-		plan(skip_all => 'Test::Carp needed to check error messages');
-	} else {
-		does_carp_that_matches(sub {
-			Class::Simple::Cached->new()
-		}, qr/^Usage:\s/);
+	Test::Carp->import();
 
-		does_carp_that_matches(sub {
-			Class::Simple::Cached->new({ foo => 'bar' })
-		}, qr/^Usage:\s/);
+	does_croak_that_matches(sub {
+		Class::Simple::Cached->new()
+	}, qr/^Usage:\s/);
 
-		done_testing();
-	}
+	does_croak_that_matches(sub {
+		Class::Simple::Cached->new({ foo => 'bar' })
+	}, qr/Cache must be\s/);
+
+	done_testing();
 }
