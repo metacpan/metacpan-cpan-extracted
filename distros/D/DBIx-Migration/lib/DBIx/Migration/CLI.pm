@@ -64,7 +64,7 @@ sub run {
     if ( @ARGV ) {
       $m->dir( shift @ARGV );
 
-      return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
+      return ( $m->migrate( @ARGV ? shift @ARGV : () ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
       my $version = $m->version;
       print STDOUT ( defined $version ? $version : '' ), "\n";

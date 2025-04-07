@@ -1,5 +1,15 @@
 Revision history for Class::Simple::Readonly::Cached
 
+0.11	Sun Apr  6 08:47:56 EDT 2025
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Support CircleCI
+	Added t/30-basics.t
+	Better argument testing to new()
+	Fix isa() to work properly on subclasses
+	Keep class name in the key to keep purges safer
+	Use Params::Get
+
 0.10	Sat Jun 22 10:22:42 EDT 2024
 	Added can() and isa() methods
 	Commented out what I believe is legacy code

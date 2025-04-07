@@ -5,6 +5,10 @@ class TestCase::HTTP::Tiny {
   use Array;
   use HTTP::Tiny::Daemon;
   
+  use HTTP::Tiny::Transaction;
+  use HTTP::Tiny::Transaction::HTTP;
+  use HTTP::Tiny::Content::Single;
+  
   our $RESULT : IntList;
   
   static method test : int () {

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-ModuleBuildTiny
 
+0.018     2025-04-06 23:28:49+02:00 Europe/Brussels
+          - Add a auto_configure_requires option
+          - Use perl v5.20 syntax
+
 0.017     2023-05-08 18:42:37+02:00 Europe/Amsterdam
           - Include extra newline in Build.PL to facilitate other plugins
 

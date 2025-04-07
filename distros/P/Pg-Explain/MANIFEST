@@ -345,6 +345,8 @@ t/58-auto-explain.d/xml-simple.plan
 t/58-auto-explain.d/yaml-analyze.plan
 t/58-auto-explain.d/yaml-simple.plan
 t/58-auto-explain.t
+t/59-jit.d/jit-deform.plan.json
+t/59-jit.d/jit-deform.plan.text
 t/59-jit.d/jit.plan.json
 t/59-jit.d/jit.plan.text
 t/59-jit.d/jit.plan.xml

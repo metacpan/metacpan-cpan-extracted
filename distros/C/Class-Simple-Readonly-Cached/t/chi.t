@@ -1,4 +1,4 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ CHI: {
 
 	cmp_ok($l->isa('t::x'), '==', 1, 'isa finds embedded object');
 	cmp_ok($l->isa('Class::Simple::Readonly::Cached'), '==', 1, 'isa finds class');
-	cmp_ok($l->isa('UNIVERSAL'), '==', 1, 'isa enhericance works');
+	cmp_ok($l->isa('UNIVERSAL'), '==', 1, 'isa inheritance works');
 	cmp_ok($l->isa('CHI'), '==', 0, 'isa works out when not object');
 
 	ok($l->barney('betty') eq 'betty');
@@ -61,13 +61,13 @@ CHI: {
 	ok(!defined($empty[0]));
 
 	# White box test the cache
-	ok($cache->get('barney::') eq 'betty');
-	ok($cache->get('barney::betty') eq 'betty');
-	ok($cache->get('echo::foo') eq 'foo');
-	ok($cache->get('echo::bar') eq 'bar');
-	my $a = $cache->get('a::');
+	ok($cache->get('Class::Simple::Readonly::Cached::barney::') eq 'betty');
+	ok($cache->get('Class::Simple::Readonly::Cached::barney::betty') eq 'betty');
+	ok($cache->get('Class::Simple::Readonly::Cached::echo::foo') eq 'foo');
+	ok($cache->get('Class::Simple::Readonly::Cached::echo::bar') eq 'bar');
+	my $a = $cache->get('Class::Simple::Readonly::Cached::a::');
 	ok(ref($a) eq 'ARRAY');
-	my $abc = $cache->get('abc::');
+	my $abc = $cache->get('Class::Simple::Readonly::Cached::abc::');
 	ok(ref($abc) eq 'ARRAY');
 
 	# foreach my $key($cache->get_keys()) {

@@ -31,9 +31,9 @@ my $build = Module::Build->new(
   },
   requires => {
     'perl'                      => '5.8.9',
-    'DBI'                       => 1.33,      # DBI::clone() is in use
+    'DBI'                       => 1.33,       # DBI::clone() is in use
     'File::Spec'                => 0,
-    'Log::Any'                  => 1.044,     # Flexible naming of imported log object
+    'Log::Any'                  => 1.044,      # Flexible naming of imported log object
     'Module::Load::Conditional' => 0.60,
     'Moo'                       => 0,
     'MooX::SetOnce'             => 0,
@@ -41,10 +41,12 @@ my $build = Module::Build->new(
     'Path::Tiny'                => 0.062,
     'PerlX::Maybe'              => 0,
     'Pod::Find'                 => 0,
-    'Pod::Usage'                => 2.05,      # Stop inheriting from Exporter
+    'Pod::Usage'                => 2.05,       # Stop inheriting from Exporter
     'String::Expand'            => 0,
     'Try::Tiny'                 => 0,
+    'Type::Tiny'                => 2.000001,
     'Types::Path::Tiny'         => 0,
+    'Types::Self'               => 0,
     'namespace::clean'          => 0
   },
   create_readme  => 1,

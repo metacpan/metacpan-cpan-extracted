@@ -7,7 +7,7 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -33,6 +33,9 @@ that works on objects which doesn't change its state based on input:
 
     $val = $obj->val(a => 'b');
 
+Note that when the object goes out of scope or becomes undefined (i.e. DESTROYed),
+the cache is cleared.
+
 # SUBROUTINES/METHODS
 
 ## new
@@ -40,7 +43,7 @@ that works on objects which doesn't change its state based on input:
 Creates a Class::Simple::Readonly::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands clear(), get() and set() calls,
+which is either an object which understands purge(), get() and set() calls,
 such as an [CHI](https://metacpan.org/pod/CHI) object;
 or is a reference to a hash where the return values are to be stored.
 
@@ -121,10 +124,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached](http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached](http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached](http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached)
@@ -136,7 +135,7 @@ You can also look for information at:
 # LICENSE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019-2024 Nigel Horne
+Copyright (C) 2019-2025 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

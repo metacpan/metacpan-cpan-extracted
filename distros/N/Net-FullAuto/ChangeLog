@@ -19,6 +19,20 @@
 #
 #######################################################################
 
+
+2025-04-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000821 released
+
+	* Updated PHP_is.pm from WordPress_is.pm 
+
+2025-04-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000820 released
+
+        * Updated PHP_is.pm to add 300 sec timeout
+	  for all git clone downloads
+
 2025-04-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000819 released

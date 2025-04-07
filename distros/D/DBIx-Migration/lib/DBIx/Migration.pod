@@ -21,9 +21,9 @@ DBIx::Migration - Seamless database schema up- and downgrades
   $m->dir( '~/Projects/myapp/db/migrations' );
 
   # Get latest migration version from the migrations directory
-  # object method call
+  # Object method call
   my $latest_version = $m->latest;
-  # class method call
+  # Class method call
   my $latest_version = DBIx::Migration->latest( '~/Projects/myapp/db/migrations' );
 
   # Migrate database to version 1

@@ -9,22 +9,30 @@ use autodie;
 use FindBin;
 use Pg::Explain;
 
-# 3 tests each for non-jit plans (4 formats)
-# 9 tests each for jit-including plans (4 formats)
-plan 'tests' => 3 * 4 + 9 * 4;
-
 our $data_dir = sprintf '%s/%s.d', $FindBin::Bin, basename( $0, '.t' );
 
-for my $format ( qw( text json yaml xml ) ) {
-    my $test    = "nojit.plan.${format}";
+my @all_plans = @ARGV;
+if ( 0 == scalar @all_plans ) {
+    opendir my $dir, $data_dir;
+    @all_plans = sort grep { /\.plan\.(?:text|json|yaml|xml)$/ } readdir $dir;
+    closedir $dir;
+}
+
+my @jit_plans   = grep { /^jit/ } @all_plans;
+my @nojit_plans = grep { /^nojit/ } @all_plans;
+
+# 3 tests each for non-jit plans (4 formats)
+# 9 tests each for jit-including plans (4 formats)
+plan 'tests' => 3 * scalar( @nojit_plans ) + 9 * scalar( @jit_plans );
+
+for my $test ( @nojit_plans ) {
     my $explain = Pg::Explain->new( 'source' => load_file( $test ) );
     isa_ok( $explain, 'Pg::Explain', "(${test}) Object creation" );
     lives_ok( sub { $explain->parse_source(); }, "(${test}) Parsing lives" );
     is( $explain->jit, undef, "${test} JIT info, correctly, missing" );
 }
 
-for my $format ( qw( text json yaml xml ) ) {
-    my $test = "jit.plan.${format}";
+for my $test ( @jit_plans ) {
 
     my $explain = Pg::Explain->new( 'source' => load_file( $test ) );
     isa_ok( $explain, 'Pg::Explain', "(${test}) Object creation" );

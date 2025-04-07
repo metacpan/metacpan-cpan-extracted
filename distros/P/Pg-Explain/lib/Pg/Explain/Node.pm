@@ -31,11 +31,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 2.8
+Version 2.9
 
 =cut
 
-our $VERSION = '2.8';
+our $VERSION = '2.9';
 
 # Start counter for all node ids.
 our $base_id = 1;

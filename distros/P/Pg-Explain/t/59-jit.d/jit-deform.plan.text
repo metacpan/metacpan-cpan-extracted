@@ -1,0 +1,13 @@
+                                                                 QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Seq Scan on installations_address  (cost=10000000000.00..10000066852.52 rows=13319 width=49) (actual time=32.089..358.956 rows=989 loops=1)
+   Filter: (upper((number)::text) ~~ '12A%'::text)
+   Rows Removed by Filter: 2662779
+   Buffers: shared hit=619 read=26277
+ Planning Time: 0.140 ms
+ JIT:
+   Functions: 2
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 0.327 ms (Deform 0.131 ms), Inlining 15.092 ms, Optimization 11.314 ms, Emission 4.356 ms, Total 31.089 ms
+ Execution Time: 359.366 ms
+(10 rows)

@@ -11,6 +11,8 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   use HTTP::Tiny::Headers;
   use HTTP::Tiny::Status;
   
+  use HTTP::Tiny::Content;
+  
   # Fields
   has protocol : ro string;
   
@@ -18,8 +20,10 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   
   has success : ro byte;
   
+  has content_v2 : ro HTTP::Tiny::Content;
+  
   # Class Methods
-  private static method new : HTTP::Tiny::Message::Response () {
+  static method new : HTTP::Tiny::Message::Response () {
     
     my $self = new HTTP::Tiny::Message::Response;
     
@@ -70,4 +74,18 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
     return $self->reason;
   }
   
+  method parse : void ($chunk : string) {
+    
+    die "TODO";
+  }
+  
+  method is_info : int () {
+    
+    die "TODO";
+  }
+  
+  method is_empty : int () {
+    
+    die "TODO";
+  }
 }

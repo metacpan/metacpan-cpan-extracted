@@ -43,7 +43,9 @@
             "Pod::Usage" : "2.05",
             "String::Expand" : "0",
             "Try::Tiny" : "0",
+            "Type::Tiny" : "2.000001",
             "Types::Path::Tiny" : "0",
+            "Types::Self" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.8.9"
          }
@@ -65,7 +67,7 @@
    "provides" : {
       "DBIx::Migration" : {
          "file" : "lib/DBIx/Migration.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "DBIx::Migration::CLI" : {
          "file" : "lib/DBIx/Migration/CLI.pm"
@@ -87,6 +89,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.26",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

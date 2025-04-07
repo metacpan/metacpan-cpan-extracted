@@ -1,0 +1,82 @@
+---
+name: -c finds things
+args: God -c t/text
+stdout: |
+  t/text/amontillado.txt:2
+  t/text/bill-of-rights.txt:0
+  t/text/constitution.txt:0
+  t/text/gettysburg.txt:1
+  t/text/movies.txt:0
+  t/text/number.txt:0
+  t/text/numbered-text.txt:0
+  t/text/ozymandias.txt:0
+  t/text/raven.txt:2
+
+---
+name: -c finds nothing
+args: NOTTHERE -c t/text
+exitcode: 1
+stdout: |
+  t/text/amontillado.txt:0
+  t/text/bill-of-rights.txt:0
+  t/text/constitution.txt:0
+  t/text/gettysburg.txt:0
+  t/text/movies.txt:0
+  t/text/number.txt:0
+  t/text/numbered-text.txt:0
+  t/text/ozymandias.txt:0
+  t/text/raven.txt:0
+
+---
+name: -c and --no-filename
+args: God -c --no-filename t/text
+stdout: |
+  5
+
+---
+name: -c and -v
+args: the -i -w -v -c --sort-files t/text
+ordered: true
+stdout: |
+  t/text/amontillado.txt:206
+  t/text/bill-of-rights.txt:45
+  t/text/constitution.txt:259
+  t/text/gettysburg.txt:15
+  t/text/movies.txt:25
+  t/text/number.txt:1
+  t/text/numbered-text.txt:20
+  t/text/ozymandias.txt:9
+  t/text/raven.txt:77
+
+---
+name: -c and -l
+args: congress -i -l -c --sort-files t/text
+ordered: true
+stdout: |
+  t/text/bill-of-rights.txt:1
+  t/text/constitution.txt:29
+
+---
+name: -c and -l find nothing
+args: NOTTHERE -i -l -c --sort-files t/text
+ordered: true
+exitcode: 1
+stdout:
+
+---
+name: -c and -h
+args: Montresor -c -h t/text
+stdout: |
+  3
+
+---
+name: Normal count
+args: Montresor -c -h t/text/amontillado.txt
+stdout: |
+  3
+
+---
+name: Count with --not
+args: Montresor -c -h --not God t/text/amontillado.txt
+stdout: |
+  2

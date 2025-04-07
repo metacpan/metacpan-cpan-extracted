@@ -1,5 +1,5 @@
 package CGI::BrowserDetect;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use base qw/HTTP::BrowserDetect/;
 
 sub new {
@@ -66,7 +66,7 @@ CGI::BrowserDetect - Browser Detect
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -84,6 +84,7 @@ Perhaps a little code snippet.
 
 	my $hash = $ua->detect(qw/os browser type language country/);
 
+This module inherits L<HTTP::BrowserDetect>.
 
 =head1 SUBROUTINES/METHODS
 
@@ -128,14 +129,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-BrowserDetect>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-BrowserDetect>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-BrowserDetect>
 
 =item * Search CPAN
 

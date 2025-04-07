@@ -1,8 +1,9 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
-use Test::Most tests => 43;
+use Class::Simple;
+use Test::Most tests => 51;
 use Test::NoWarnings;
 
 BEGIN {
@@ -15,8 +16,9 @@ HASH: {
 
 	ok($cached->can('object'));
 	ok($cached->can('barney'));
+	ok($cached->can('abc'));
 	ok(!$cached->can('xyz'));
-	ok($cached->can('xyz') || $cached->isa('Class::Simple::Readonly::Cached'));
+	ok($cached->isa('Class::Simple::Readonly::Cached'));
 
 	ok($cached->barney('betty') eq 'betty');
 	ok($cached->barney() eq 'betty');
@@ -37,7 +39,7 @@ HASH: {
 	# Check reading scalar after reading array
 	my $abc = $cached->abc();
 	my $abc2 = $uncached->abc();
-	ok($abc eq $abc2);
+	cmp_ok($abc, 'eq', $abc2, 'test reading scalar after reading array');
 
 	# Check reading array after reading scalar
 	my $def = $cached->def();
@@ -67,13 +69,13 @@ HASH: {
 	ok(!defined($cached->empty()));
 
 	# White box test the cache
-	ok($cache->{'barney::'} eq 'betty');
-	ok($cache->{'barney::betty'} eq 'betty');
-	ok($cache->{'echo::foo'} eq 'foo');
-	ok($cache->{'echo::bar'} eq 'bar');
-	my $a = $cache->{'a::'};
+	ok($cache->{'Class::Simple::Readonly::Cached::barney::'} eq 'betty');
+	ok($cache->{'Class::Simple::Readonly::Cached::barney::betty'} eq 'betty');
+	ok($cache->{'Class::Simple::Readonly::Cached::echo::foo'} eq 'foo');
+	ok($cache->{'Class::Simple::Readonly::Cached::echo::bar'} eq 'bar');
+	my $a = $cache->{'Class::Simple::Readonly::Cached::a::'};
 	ok(ref($a) eq 'ARRAY');
-	$abc = $cache->{'abc::'};
+	$abc = $cache->{'Class::Simple::Readonly::Cached::abc::'};
 	ok(ref($abc) eq 'ARRAY');
 
 	ok(ref($cached->object()) eq 'x');
@@ -95,6 +97,21 @@ HASH: {
 		$count += $v;
 	}
 	ok($count == 10);
+
+	# Test caching objects that return objects
+	my $simple = new_ok('Class::Simple');
+	my $one = new_ok('Class::Simple');
+	$one->one('1');
+	$simple->one($one);
+	my $two = new_ok('Class::Simple');
+	$two->two('2');
+	$two->two($two);
+
+	$cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => $simple ]);
+	cmp_ok($one->one(), '==', 1);
+	cmp_ok($cached->one()->one(), '==', 1);
+	cmp_ok($cached->one()->one(), '==', 1);
+
 }
 
 package x;

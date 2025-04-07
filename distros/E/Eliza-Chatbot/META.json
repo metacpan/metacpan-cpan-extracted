@@ -46,7 +46,7 @@
    "provides" : {
       "Eliza::Chatbot" : {
          "file" : "lib/Eliza/Chatbot.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Eliza::Chatbot::Brain" : {
          "file" : "lib/Eliza/Chatbot/Brain.pm"
@@ -66,6 +66,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Eliza-Chatbot"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

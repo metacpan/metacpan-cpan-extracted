@@ -4,6 +4,7 @@ author:
   - 'Andy Lester <andy@petdance.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  YAML::PP: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -44,4 +45,4 @@ resources:
   homepage: https://beyondgrep.com/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.8.1
+version: v3.8.2

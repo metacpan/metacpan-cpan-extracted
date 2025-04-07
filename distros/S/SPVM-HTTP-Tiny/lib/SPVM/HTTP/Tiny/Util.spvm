@@ -49,12 +49,176 @@ class HTTP::Tiny::Util {
     return $string_ref->[0];
   }
   
+  private enum {
+    PC_BASE         = 36,
+    PC_TMIN         = 1,
+    PC_TMAX         = 26,
+    PC_SKEW         = 38,
+    PC_DAMP         = 700,
+    PC_INITIAL_BIAS = 72,
+    PC_INITIAL_N    = 128,
+  }
+  
   static method punycode_decode : string ($string : string) {
-    die "TODO.";
+    
+    my $n = &PC_INITIAL_N;
+    my $i = 0;
+    my $bias = &PC_INITIAL_BIAS;
+    
+    my $output_buffer = StringBuffer->new;
+    
+    my $string_ref = [$string];
+    if (my $_ = Re->s($string_ref, ["(.*)\x2d", "s"], "")) {
+      $string = $string_ref->[0];
+      my $m = $_->match;
+      
+      my $items = Fn->split("", $m->cap1);
+      
+      for my $_ (@$items) {
+        $output_buffer->push($_);
+      }
+    }
+    
+    while (length $string) {
+      my $oldi = $i;
+      my $w = 1;
+      
+      for (my $k = &PC_BASE; 1; $k += &PC_BASE) {
+        my $digit = Fn->ord(Fn->substr($string, 0, 1, ""));
+        if ($digit < 0x40) {
+          $digit = $digit + (26 - 0x30);
+        }
+        else {
+          $digit = ($digit & 0x1f) - 1;
+        }
+        $i += $digit * $w;
+        my $t = $k - $bias;
+        if ($t < &PC_TMIN) {
+          $t = &PC_TMIN;
+        }
+        elsif ($t > &PC_TMAX) {
+          $t = &PC_TMAX;
+        }
+        
+        if ($digit < $t) {
+          last;
+        }
+        
+        $w *= &PC_BASE - $t;
+      }
+      
+      $bias = &_adapt($i - $oldi, $output_buffer->length + 1, $oldi == 0);
+      $n += $i / ($output_buffer->length + 1);
+      $i = $i % ($output_buffer->length + 1);
+      
+      $output_buffer->replace($i++, 0, Fn->chr($n));
+    }
+    
+    my $output = $output_buffer->to_string;
+    
+    return $output;  
   }
   
   static method punycode_encode : string ($string : string) {
-    die "TODO.";
+    
+    my $n = &PC_INITIAL_N;
+    my $delta = 0;
+    my $bias = &PC_INITIAL_BIAS;
+    
+    my $input_obj = Fn->map(method : Int ($_ : string) { return (Int)Fn->ord($_); }, Fn->split("", $string));
+    
+    my $string_ref = [$string];
+    Re->s($string_ref, ["[^\x00-\x7f]+", "gs"], "");
+    $string = $string_ref->[0];
+    my $h = my $basic = length $string;
+    if ($basic > 0) {
+      $string .= "\x2d";
+    }
+    
+    my $input_obj_grep = (Int[])Fn->grep(method : int ($_ : Int) { return (int)$_ >= &PC_INITIAL_N; }, $input_obj);
+    
+    my $input = Array->to_array_int($input_obj_grep);
+    
+    Sort->sort_int_asc($input);
+    
+    for my $m (@$input) {
+      if ($m < $n) {
+        next;
+      }
+      $delta += ($m - $n) * ($h + 1);
+      $n = $m;
+      
+      for my $c (@$input) {
+        
+        if    ($c < $n) { $delta++; }
+        elsif ($c == $n) {
+          my $q = $delta;
+          
+          for (my $k = &PC_BASE; 1; $k += &PC_BASE) {
+            my $t = $k - $bias;
+            if ($t < &PC_TMIN) {
+              $t = &PC_TMIN;
+            }
+            elsif ( $t > &PC_TMAX) {
+              $t = &PC_TMAX;
+            }
+            if ($q < $t) {
+              last;
+            }
+            my $o = $t + (($q - $t) % (&PC_BASE - $t));
+            my $o_plus = 0;
+            if ($o < 26) {
+              $o_plus = 0x61;
+            }
+            else {
+              $o_plus = 0x30 - 26;
+            }
+            $string .= Fn->chr($o + $o_plus);
+            $q = ($q - $t) / (&PC_BASE - $t);
+          }
+          
+          my $q_plus = 0;
+          if ($q < 26) {
+            $q_plus = 0x61;
+          }
+          else {
+            $q_plus = 0x30 - 26;
+          }
+          $string .= Fn->chr($q + $q_plus);
+          $bias  = &_adapt($delta, $h + 1, $h == $basic);
+          $delta = 0;
+          $h++;
+        }
+      }
+      
+      $delta++;
+      $n++;
+    }
+    
+    return $string;
   }
   
+  static method _adapt : int ($delta : int, $numpoints : int, $firsttime : int) {
+    
+    if ($firsttime) {
+      $delta = $delta / &PC_DAMP;
+    }
+    else {
+      $delta = $delta / 2;
+    }
+    
+    $delta += $delta / $numpoints;
+    my $k = 0;
+    while ($delta > ((&PC_BASE - &PC_TMIN) * &PC_TMAX) / 2) {
+      $delta /= &PC_BASE - &PC_TMIN;
+      $k     += &PC_BASE;
+    }
+    
+    return $k + (((&PC_BASE - &PC_TMIN + 1) * $delta) / ($delta + &PC_SKEW));
+  }
+  
+  static method network_contains : int ($cidr : string, $addr : string) {
+    
+    die "[TODO]Not implemented.";
+  }
 }

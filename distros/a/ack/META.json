@@ -53,6 +53,11 @@
             "perl" : "5.010001",
             "version" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "YAML::PP" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -70,5 +75,5 @@
       },
       "x_MailingList" : "https://groups.google.com/group/ack-users"
    },
-   "version" : "v3.8.1"
+   "version" : "v3.8.2"
 }

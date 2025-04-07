@@ -12,9 +12,11 @@ use Cwd ();
 use File::Next ();
 use File::Spec ();
 use File::Temp ();
+use List::Util qw( any );
 use Scalar::Util qw( tainted );
 use Term::ANSIColor ();
 use Test::More;
+use YAML::PP;
 
 our @EXPORT = qw(
     prep_environment
@@ -77,6 +79,8 @@ our @EXPORT = qw(
     subtest_name
 
     permutate
+
+    read_tests
 );
 
 my $orig_wd;
@@ -1263,7 +1267,7 @@ sub permutate {
 
     return map {
         my ($f, @r) = list_with_x_first($_, @_);
-        map [$f, @$_], permutate(@r);
+        map [$f, @{$_}], permutate(@r);
     } 0..$#_;
 }
 
@@ -1272,6 +1276,88 @@ sub list_with_x_first {
     return if @_ == 1;
     my $i = shift;
     return @_[$i, 0..$i-1, $i+1..$#_];
+}
+
+
+sub read_tests {
+    my $filename = shift;
+
+    my $ypp = YAML::PP->new;
+    my @tests = $ypp->load_file( $filename );
+
+    for my $test ( @tests ) {
+        $test->{stdout} = _lineify( $test->{stdout} );
+
+        if ( my $n = $test->{'indent-stdout'} ) {
+            my $indent = ' ' x $n;
+            $_ = "$indent$_" for @{$test->{stdout}};
+        }
+
+        $test->{args} = _split_args( $test->{args} );
+
+        # Assume successful run.
+        $test->{exitcode} //= 0;
+
+        # Assume order doesn't matter.
+        $test->{ordered} //= 0;
+
+        _validate_test( $test );
+    }
+
+    return @tests;
+}
+
+
+sub _split_args {
+    my $args = shift;
+
+    $args = [ $args ] unless ref($args);
+    for ( @{$args} ) {
+        $_ = [ split / / ];
+    }
+    return $args;
+}
+
+
+sub _lineify {
+    my $block = shift;
+
+    my @lines;
+    if ( $block ) {
+        @lines = split( /\n/, $block );
+        chomp $lines[-1] if @lines;
+    }
+
+    return \@lines;
+}
+
+
+sub _validate_test {
+    my $test = shift;
+
+    my @valid_keys = qw(
+        args
+        exitcode
+        indent-stdout
+        name
+        ordered
+        stdin
+        stderr
+        stdout
+    );
+    for my $key ( keys %{$test} ) {
+        die "Invalid key $key" unless _in( $key, \@valid_keys );
+    }
+
+    return;
+}
+
+
+sub _in {
+    my $needle = shift;
+    my $haystack = shift;
+
+    return any { $_ eq $needle } @{$haystack};
 }
 
 

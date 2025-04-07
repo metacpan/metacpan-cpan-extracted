@@ -29,17 +29,13 @@ my $result1 = $dynamic->evaluate({
 			prereqs => { Quz => "1.5" },
 		},
 		{
-			condition => [ has_module => 'CPAN::Meta', '2' ],
-			prereqs => { Wuz => "1.6" },
-		},
-		{
-			condition => [ and => [ has_module => 'CPAN::Meta', '2' ], [ is_os => 'non-existent' ] ],
+			condition => [ and => [ has_perl => "$]" ], [ is_os => 'non-existent' ] ],
 			prereqs => { Euz => "1.7" },
 		},
 	],
 });
 
 my $hash1 = $result1->as_string_hash;
-is_deeply($hash1, { runtime => { requires => { Foo => '1.2', Baz => '1.4', Quz => '1.5', Wuz => '1.6' } } }) or diag explain $hash1;
+is_deeply($hash1, { runtime => { requires => { Foo => '1.2', Baz => '1.4', Quz => '1.5' } } }) or diag explain $hash1;
 
 done_testing;

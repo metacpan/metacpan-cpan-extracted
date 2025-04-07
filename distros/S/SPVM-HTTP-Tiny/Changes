@@ -1,3 +1,10 @@
+0.009 2025-04-07
+  [Requirement Changes]
+    * Require SPVM::Digest::SHA 0.065.
+    * Require SPVM 0.990052.
+  [Intrnal Changes]
+    * Add some internal classes.
+
 0.008 2025-03-21
   [Requirement Changes]
     * Require SPVM::File::Temp 0.026.

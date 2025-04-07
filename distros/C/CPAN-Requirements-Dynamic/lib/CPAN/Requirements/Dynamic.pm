@@ -1,5 +1,5 @@
 package CPAN::Requirements::Dynamic;
-$CPAN::Requirements::Dynamic::VERSION = '0.001';
+$CPAN::Requirements::Dynamic::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -12,35 +12,7 @@ sub _version_satisfies {
 	return CPAN::Meta::Requirements::Range->with_string_requirement($range)->accepts($version);
 }
 
-sub _is_interactive {
-	return -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
-}
-
-sub _read_line {
-	return undef if $ENV{PERL_MM_USE_DEFAULT} || !_is_interactive && eof STDIN;;
-
-	my $answer = <STDIN>;
-	chomp $answer if defined $answer;
-	return $answer;
-}
-
-sub _prompt {
-	my ($mess, $default) = @_;
-
-	local $|=1;
-	print "$mess [$default]";
-	my $answer = _read_line;
-	$answer = $default if !defined $answer or !length $answer;
-
-	return $answer;
-}
-
 my %default_commands = (
-	can_xs => sub {
-		my ($self) = @_;
-		require ExtUtils::HasCompiler;
-		return ExtUtils::HasCompiler::can_compile_extension(config => $self->{config});
-	},
 	can_run => sub {
 		my ($self, $command) = @_;
 		require IPC::Cmd;
@@ -54,23 +26,12 @@ my %default_commands = (
 		my ($self, $entry) = @_;
 		return !!$ENV{$entry};
 	},
-	has_module => sub {
-		my ($self, $module, $range) = @_;
-		require Module::Metadata;
-		my $data = Module::Metadata->new_from_module($module);
-		return !!0 unless $data;
-		return !!1 if not defined $range;
-		return _version_satisfies($data->version($module), $range);
-	},
 	has_perl => sub {
 		my ($self, $range) = @_;
 		return _version_satisfies($], $range);
 	},
 	is_extended => sub {
 		return !!$ENV{EXTENDED_TESTING};
-	},
-	is_interactive => sub {
-		return _is_interactive;
 	},
 	is_os => sub {
 		my ($self, @wanted) = @_;
@@ -84,27 +45,11 @@ my %default_commands = (
 	is_smoker => sub {
 		return !!$ENV{AUTOMATED_TESTING};
 	},
-	prompt_default_yes => sub {
-		my ($self, $message) = @_;
-		return _prompt("$message [Y/n]", "y") =~ /^y/i;
-	},
-	prompt_default_no => sub {
-		my ($self, $message) = @_;
-		return _prompt("$message [y/N]", "n") =~ /^y/i;
-	},
-	want_pureperl => sub {
-		my ($self) = @_;
-		return !!$self->{pureperl_only};
-	},
 	want_xs => sub {
 		my ($self) = @_;
 		return !!0 if $self->{pureperl_only};
 		require ExtUtils::HasCompiler;
 		return ExtUtils::HasCompiler::can_compile_extension(config => $self->{config});
-	},
-	want_compiled => sub {
-		my ($self) = @_;
-		return defined $self->{pureperl_only} && $self->{pureperl_only} == 0;
 	},
 );
 
@@ -200,7 +145,7 @@ CPAN::Requirements::Dynamic - Dynamic prerequisites in meta files
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -217,10 +162,6 @@ version 0.001
      {
        condition => [ config_defined => 'usethreads' ],
        prereqs => { Quz => "1.5" },
-     },
-     {
-       condition => [ has_module => 'CPAN::Meta', '2' ],
-       prereqs => { Wuz => "1.6" },
      },
      {
        condition => [ and =>
@@ -294,10 +235,6 @@ This takes a filename, that can be either a YAML file or a JSON file, and evalua
 
 =head2 Conditions
 
-=head3 can_xs
-
-This returns true if a compiler appears to be available.
-
 =head3 can_run($command)
 
 Returns true if a C<$command> can be run.
@@ -310,10 +247,6 @@ This returns true if a specific configuration variable is defined.
 
 This returns true if the environmental variable with the name in C<$variable> is true.
 
-=head3 has_module($module, $version = 0)
-
-Returns true if a module is installed on the system. If a C<$version> is given, it will also check if that version is provided. C<$version> is interpreted exactly as in the CPAN::Meta spec.
-
 =head3 has_perl($version)
 
 Returns true if the perl version satisfies C<$version>. C<$version> is interpreted exactly as in the CPAN::Meta spec (e.g. C<1.2> equals C<< '>= 1.2' >>).
@@ -321,10 +254,6 @@ Returns true if the perl version satisfies C<$version>. C<$version> is interpret
 =head3 is_extended
 
 Returns true if extended testing is asked for.
-
-=head3 is_interactive
-
-Returns true if installed from a terminal that can answer prompts.
 
 =head3 is_os(@systems)
 
@@ -342,21 +271,9 @@ Returns true when running on a smoker.
 
 This returns true if the given environmental variable is true.
 
-=head3 prompt_default_no
+=head3 want_xs
 
-This will ask a yes/no question to the user, defaulting to no.
-
-=head3 prompt_default_yes
-
-This will ask a yes/no question to the user, defaulting to yes.
-
-=head3 want_pureperl
-
-This returns true if the user has indicated they want a pure-perl build.
-
-=head3 want_compiled
-
-This returns true if the user has explicitly indicated they do not want a pure-perl build.
+This returns true if a compiler appears to be available, and the C<pureperl_only> option has not been set.
 
 =head3 not
 

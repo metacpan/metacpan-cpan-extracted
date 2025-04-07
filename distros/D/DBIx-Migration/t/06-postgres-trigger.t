@@ -19,7 +19,7 @@ plan skip_all => 'Test::PostgreSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
-  plan skip_all => $Test::PostgreSQL::errstr;
+  plan skip_all => $Test::PostgreSQL::errstr ? $Test::PostgreSQL::errstr : $@;
 };
 note 'managed schema: ', my $managed_schema = 'my-schema';
 note 'dsn: ',            my $dsn            = $pgsql->dsn . ';options=--client_min_messages=WARNING';

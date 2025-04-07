@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+2.9     2025/04/07
+        Add handling if JIT timings with subelements, like:
+        Timing: Generation 0.327 ms (Deform 0.131 ms), Inlining 15.092 ms, Optimization 11.314 ms, Emission 4.356 ms, Total 31.089 ms
+
 2.8     2025/02/28
         Handle fractional rowcounts, per change in PostgreSQL 18.
 

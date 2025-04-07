@@ -1,0 +1,19 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Cookie::Request {
+  version_from HTTP::Tiny;
+  
+  static method new : HTTP::Tiny::Cookie::Request () {
+    
+    my $self = new HTTP::Tiny::Cookie::Request;
+    
+    return $self;
+  }
+  
+  method parse : void ($string : string) {
+    
+    # TODO
+  }
+  
+}

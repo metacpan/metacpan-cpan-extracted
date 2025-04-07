@@ -21,7 +21,7 @@ class HTTP::Tiny::Asset {
   
   method contains : int ($string : string) { die "Not implemented."; }
   
-  method get_chunk : string ($offset : long, $max : int)  { die "Not implemented."; }
+  method get_chunk : string ($offset : long, $max : int = -1)  { die "Not implemented."; }
   
   method is_file : int () { die "Not implemented."; }
   

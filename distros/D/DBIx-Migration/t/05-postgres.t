@@ -14,7 +14,7 @@ plan skip_all => 'Test::PostgreSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
-  plan skip_all => $Test::PostgreSQL::errstr;
+  plan skip_all => $Test::PostgreSQL::errstr ? $Test::PostgreSQL::errstr : $@;
 };
 note 'dsn: ', my $dsn = $pgsql->dsn . ';options=--client_min_messages=WARNING';
 local $Test::PgTAP::Dbh = DBI->connect( $dsn );
@@ -67,7 +67,9 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration::Pg->new( dbh => $m->dbh, dir => $m->dir );
+# stringify "dir" (although not necessary) to test coercion of MigrationsDir
+# constraint
+my $m1 = DBIx::Migration::Pg->new( dbh => $m->dbh, dir => $m->dir->stringify );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 

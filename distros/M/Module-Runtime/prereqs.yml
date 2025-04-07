@@ -1,0 +1,6 @@
+runtime:
+  requires:
+    perl: '5.006000'
+test:
+  requires:
+    Test::More: 0

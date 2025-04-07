@@ -1,4 +1,4 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ UTF8: {
 	ok($cached->utf8() eq 'Mrkvička');
 
 	# White box test the cache
-	is($cache->{'utf8::'}, 'Mrkvička', 'White box test');
+	is($cache->{'Class::Simple::Readonly::Cached::utf8::'}, 'Mrkvička', 'White box test');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		foreach my $key(sort keys %{$cache}) {

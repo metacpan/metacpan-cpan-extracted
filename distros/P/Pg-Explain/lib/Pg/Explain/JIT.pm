@@ -25,11 +25,11 @@ Pg::Explain::JIT - Stores information about JIT from PostgreSQL's explain analyz
 
 =head1 VERSION
 
-Version 2.8
+Version 2.9
 
 =cut
 
-our $VERSION = '2.8';
+our $VERSION = '2.9';
 
 =head1 SYNOPSIS
 
@@ -116,10 +116,27 @@ sub as_text {
         my $str = join( ', ', map { "$_ " . ( $self->option( $_ ) ? "true" : "false" ) } keys %{ $self->options } );
         $output .= sprintf "  Options: %s\n", $str;
     }
-    if ( 0 < scalar keys %{ $self->timings } ) {
-        my $str = join( ', ', map { "$_ " . $self->timing( $_ ) . ' ms' } keys %{ $self->timings } );
-        $output .= sprintf "  Timing: %s\n", $str;
+
+    # Shortcircuit as logic to build timings line will be slightly longer than options…
+    return $output if 0 == scalar keys %{ $self->timings };
+
+    my @parts = ();
+    for my $key ( sort keys %{ $self->timings } ) {
+        my $val = $self->timings->{ $key };
+
+        # Two potential cases, value is scalar, and it's simply time, and it's hash, in which case we have to build all subparts
+        if ( '' eq ref $val ) {
+            push @parts, "${key} ${val} ms";
+            next;
+        }
+
+        # This is the more complex case:
+        my @subelements = map { sprintf "%s %s ms", $_, $val->{ $_ } } grep { $_ ne 'Total' } sort keys %{ $val };
+        push @parts, sprintf "%s %s ms (%s)", $key, $val->{ 'Total' }, join( ', ', @subelements );
     }
+    $output .= sprintf "  Timing: %s\n", join( ', ', @parts );
+
+    return $output;
 }
 
 =head1 INTERNAL METHODS
@@ -134,14 +151,11 @@ sub _parse_struct {
     my $self   = shift;
     my $struct = shift;
     $self->functions( $struct->{ 'Functions' } );
-    for my $key ( keys %{ $struct->{ 'Options' } } ) {
-        my $val = $struct->{ 'Options' }->{ $key };
+    while ( my ( $key, $val ) = each %{ $struct->{ 'Options' } } ) {
         $val = undef if $val eq 'false';
         $self->option( $key, $val ? 1 : 0 );
     }
-    for my $key ( keys %{ $struct->{ 'Timing' } } ) {
-        $self->timing( $key, $struct->{ 'Timing' }->{ $key } );
-    }
+    $self->timings( $struct->{ 'Timing' } );
     return;
 }
 
@@ -166,10 +180,36 @@ sub _parse_lines {
             }
         }
         elsif ( $line =~ m{ \A \s* Timing: \s+ (\S.*\S) \s* \z }xms ) {
-            my @parts = split( /\s*,\s*/, $1 );
-            for my $e ( @parts ) {
-                $e =~ s/\s*(\d+\.\d+)\s+ms\z//;
-                $self->timing( $e, $1 );
+            my $timings = $1;
+
+            # Two types of timing information:
+            # 1: "Optimization 11.314 ms"
+            # 2: "Generation 0.327 ms (Deform 0.131 ms)"
+            while (
+                $timings =~ s{ \A
+                    (?<name> \S+ )
+                    \s+
+                    (?<total> \d+\.\d+ )
+                    \s+
+                    ms
+                    (?: \s+ \( (?<subelements> [^\)]+ ) \) )? 
+                    (?: \z | , \s+ )
+                }{}x
+                )
+            {
+                my ( $t_name, $t_total, $t_subelements ) = ( $+{ 'name' }, $+{ 'total' }, $+{ 'subelements' } );
+                if ( !defined $t_subelements ) {
+
+                    # This is the simple format of timing information
+                    $self->timing( $t_name, $t_total );
+                    next;
+                }
+
+                # In here, we have subelements, so extract them separately, and put the total timing into Total key
+                my @parts = $t_subelements =~ m{(\S+)\s+(\d+\.\d+)\s+ms(?:$|, )}g;
+                my $val   = { @parts };
+                $val->{ "Total" } = $t_total;
+                $self->timing( $t_name, $val );
             }
         }
     }

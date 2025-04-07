@@ -4,7 +4,7 @@
       "LNATION <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "Catalyst::Plugin::Shorten" : {
          "file" : "lib/Catalyst/Plugin/Shorten.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Catalyst::Plugin::Shorten::Store::Dummy" : {
          "file" : "lib/Catalyst/Plugin/Shorten/Store/Dummy.pm"
@@ -57,5 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Catalyst-Plugin-Shorten"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -32,11 +32,11 @@ Pg::Explain::Buffers - Object to store buffers information about node in Postgre
 
 =head1 VERSION
 
-Version 2.8
+Version 2.9
 
 =cut
 
-our $VERSION = '2.8';
+our $VERSION = '2.9';
 
 =head1 SYNOPSIS
 
@@ -489,7 +489,7 @@ sub _buffers_subtract {
                 my $val = ( $L->{ $subtype } // 0 ) - ( $R->{ $subtype } // 0 );
 
                 # Weirdish comparison to get rid of floating point arithmetic errors, like:
-                # 32.874 - 18.153 - 14.721 => 3.5527136788005e-15
+                # 32.974 - 18.153 - 14.721 => 3.5527136788005e-15
                 next if $val <= 0.00001;
                 $new_data->{ $type }->{ $subtype } = $val;
             }

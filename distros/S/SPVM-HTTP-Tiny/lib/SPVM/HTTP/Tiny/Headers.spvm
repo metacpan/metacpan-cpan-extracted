@@ -146,4 +146,59 @@ class HTTP::Tiny::Headers {
     return $clone;
   }
   
+  method upgrade : int () {
+    
+    die "TODO";
+  }
+  
+  method connection : string () {
+    
+    die "TODO";
+  }
+  
+  method content_type : string () {
+    
+    die "TODO";
+  }
+  
+  method content_length : string () {
+    
+    die "TODO";
+  }
+  
+  method transfer_encoding : string () {
+    
+    die "TODO";
+  }
+  
+  method content_encoding : string () {
+    
+    die "TODO";
+  }
+  
+  method set_transfer_encoding : string ($value : string) {
+    
+    die "TODO";
+  }
+  
+  method set_content_length : string ($value : string) {
+    
+    die "TODO";
+  }
+  
+  method parse : void ($chunk : string) {
+    
+    die "TODO";
+  }
+  
+  method is_finished : int () {
+    
+    die "TODO";
+  }
+  
+  method leftovers : string () {
+    
+    die "TODO";
+  }
+  
 }

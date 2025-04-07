@@ -2,8 +2,10 @@ package Class::Simple::Readonly::Cached;
 
 use strict;
 use warnings;
+
 use Carp;
 use Class::Simple;
+use Params::Get;
 
 my @ISA = ('Class::Simple');
 
@@ -15,11 +17,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -45,6 +47,9 @@ that works on objects which doesn't change its state based on input:
 
     $val = $obj->val(a => 'b');
 
+Note that when the object goes out of scope or becomes undefined (i.e. DESTROYed),
+the cache is cleared.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
@@ -52,7 +57,7 @@ that works on objects which doesn't change its state based on input:
 Creates a Class::Simple::Readonly::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands clear(), get() and set() calls,
+which is either an object which understands purge(), get() and set() calls,
 such as an L<CHI> object;
 or is a reference to a hash where the return values are to be stored.
 
@@ -80,62 +85,63 @@ The 'quiet' option, when non-zero, silences the warning.
 sub new
 {
 	my $class = shift;
-	my %args;
-
-	if(ref($_[0]) eq 'HASH') {
-		%args = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
-		return;
-	} elsif(@_ % 2 == 0) {
-		%args = @_;
-	}
 
 	# Use Class::Simple::Readonly::Cached->new(), not Class::Simple::Readonly::Cached::new()
 	if(!defined($class)) {
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		return;
-	} elsif(ref($class)) {
+	}
+	if(Scalar::Util::blessed($class)) {
+		my $params = Params::Get::get_params(undef, @_) || {};
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	if(!$args{'cache'}) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
-		return;
+	my $params = Params::Get::get_params('cache', @_) || {};
+
+	# Ensure cache implements required methods
+	if(Scalar::Util::blessed($params->{cache})) {
+		if((ref($params->{cache}) ne 'HASH') && !($params->{cache}->can('get') && $params->{cache}->can('set') && $params->{cache}->can('purge'))) {
+			Carp::croak("Cache object must implement 'get', 'set', and 'purge' methods");
+		}
+	} elsif(ref($params->{'cache'}) ne 'HASH') {
+		Carp::croak("$class: Cache must be ref to HASH or object");
 	}
 
-	if(defined($args{'object'})) {
-		if(ref($args{'object'})) {
-			if(ref($args{'object'}) eq __PACKAGE__) {
+	if(defined($params->{'object'})) {
+		if(ref($params->{'object'})) {
+			if(ref($params->{'object'}) eq __PACKAGE__) {
 				Carp::carp(__PACKAGE__, ' warning: $object is a cached object');
 				# Note that this isn't a technique for clearing the cache
-				return $args{'object'};
+				return $params->{'object'};
 			}
 		} else {
 			Carp::carp(__PACKAGE__, ' $object is a scalar');
 			return;
 		}
 	} else {
-		$args{'object'} = Class::Simple->new(%args);
+		# FIXME: If there are arguments, put the values in the cache
+
+		$params->{'object'} = Class::Simple->new(%{$params});
 	}
 
 	# Warn if we're caching an object that's already cached, then
 	# return the previously cached object.  Note that it could be in
 	# a separate cache
 	my $rc;
-	if($rc = $cached{$args{'object'}}) {
-		unless($args{'quiet'}) {
+	if($rc = $cached{$params->{'object'}}) {
+		unless($params->{'quiet'}) {
 			Carp::carp(__PACKAGE__, ' $object is already cached at ', $rc->{'line'}, ' of ', $rc->{'file'});
 		}
 		return $rc->{'object'};
 	}
-	$rc = bless \%args, $class;
-	$cached{$args{'object'}}->{'object'} = $rc;
+	$rc = bless $params, $class;
+	$cached{$params->{'object'}}->{'object'} = $rc;
 	my @call_details = caller(0);
-	$cached{$args{'object'}}->{'file'} = $call_details[1];
-	$cached{$args{'object'}}->{'line'} = $call_details[2];
+	$cached{$params->{'object'}}->{'file'} = $call_details[1];
+	$cached{$params->{'object'}}->{'line'} = $call_details[2];
 
+	# Return the blessed object
 	return $rc;
 }
 
@@ -185,14 +191,9 @@ Returns if the embedded object can handle a message
 
 sub can
 {
-	my $self = shift;
-	my $method = shift;
+	my ($self, $method) = @_;
 
-	if(($method eq 'state') || ($method eq 'object') || ($method eq 'new') ||
-	   $self->{'object'}->can($method) || $self->SUPER::can($method)) {
-		return 1;
-	}
-	return 0;
+	return ($method eq 'new') || $self->{'object'}->can($method) || $self->SUPER::can($method);
 }
 
 =head2 isa
@@ -203,10 +204,9 @@ Returns if the embedded object is the given type of object
 
 sub isa
 {
-	my $self = shift;
-	my $class = shift;
+	my ($self, $class) = @_;
 
-	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($self)) {
+	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($class)) {
 		return 1;
 	}
 	return $self->{'object'}->isa($class);
@@ -217,24 +217,27 @@ sub isa
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
-	my $param = $AUTOLOAD;
-	$param =~ s/.*:://;
+	my ($param) = $AUTOLOAD =~ /::(\w+)$/;
 
 	my $self = shift;
 	my $cache = $self->{'cache'};
 
 	if($param eq 'DESTROY') {
+		if(defined($^V) && ($^V ge 'v5.14.0')) {
+			return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
+		}
 		if($cache) {
 			if(ref($cache) eq 'HASH') {
-				while(my($key, $value) = each %{$cache}) {
-					delete $cache->{$key};
-				}
+				my $class = ref($self);
+				# while(my($key, $value) = each %{$cache}) {
+					# if($key =~ /^$class/) {
+						# delete $cache->{$key};
+					# }
+				# }
+				delete $cache->{$_} for grep { /^$class/ } keys %{$cache};
 				return;
 			}
-			if(defined($^V) && ($^V ge 'v5.14.0')) {
-				return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
-			}
-			$cache->clear();
+			$cache->purge();
 		}
 		return;
 	}
@@ -247,7 +250,7 @@ sub AUTOLOAD
 		# return $object->$method(\@_);
 	# }
 
-	my $key = $param . '::' . join('::', grep defined, @_);
+	my $key = ref($self) . "::${param}::" . join('::', grep defined, @_);
 
 	my $rc;
 	if(ref($cache) eq 'HASH') {
@@ -306,6 +309,7 @@ sub AUTOLOAD
 	}
 	# This would be nice, but it does break gedcom.  TODO: find out why
 	# if(ref($rc) && (ref($rc) =~ /::/) && (ref($rc) ne __PACKAGE__)) {
+	# if(Scalar::Util::blessed($rc) && (ref($rc) ne __PACKAGE__)) {
 		# $rc = Class::Simple::Readonly::Cached->new(object => $rc, cache => $cache);
 	# }
 	if(ref($cache) eq 'HASH') {
@@ -356,10 +360,6 @@ L<http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached>
 
 L<http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached>
@@ -373,7 +373,7 @@ L<http://search.cpan.org/dist/Class-Simple-Readonly-Cached/>
 =head1 LICENSE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2024 Nigel Horne
+Copyright (C) 2019-2025 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

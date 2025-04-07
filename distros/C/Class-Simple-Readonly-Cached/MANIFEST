@@ -6,6 +6,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/10-new.t
+t/30-basics.t
 t/carp.t
 t/chi.t
 t/comment-spelling.t
