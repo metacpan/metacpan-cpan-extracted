@@ -3,7 +3,7 @@
 <div class="container">
   <div class="message message-<TMPL_VAR NAME="ALERT"> alert" trspan="<TMPL_VAR NAME="MSG">"></div>
   <div class="buttons">
-    <form action="/2fchoice" method="POST">
+    <form action="<TMPL_VAR NAME="TARGET">" method="POST">
       <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
       <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />
       <input type="hidden" id="stayconnected" name="stayconnected" value="<TMPL_VAR NAME="STAYCONNECTED">" />

@@ -28,7 +28,7 @@
         </div>
       </div>
   </TMPL_IF>
-  <form id="checkDevOps" action="/checkdevops" method="post" class="password" role="form">
+  <form id="checkDevOps" action="<TMPL_VAR NAME="FORM_ACTION">" method="post" class="password" role="form">
     <TMPL_IF NAME="TOKEN">
       <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     </TMPL_IF>

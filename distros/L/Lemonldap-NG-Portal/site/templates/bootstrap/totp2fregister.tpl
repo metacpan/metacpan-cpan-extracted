@@ -53,10 +53,10 @@
 </div>
 
 <!-- //if:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/qrious/dist/qrious.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/totpregistration.min.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/qrious/dist/qrious.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/totpregistration.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
 //else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/qrious/dist/qrious.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/totpregistration.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/qrious/dist/qrious.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/totpregistration.js?v=<TMPL_VAR CACHE_TAG>"></script>
 <!-- //endif -->
 <TMPL_INCLUDE NAME="footer.tpl">

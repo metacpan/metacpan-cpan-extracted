@@ -15,6 +15,9 @@
     <TMPL_IF NAME="CONFIRMKEY">
       <input type="hidden" id="confirm" name="confirm" value="<TMPL_VAR NAME="CONFIRMKEY">" />
     </TMPL_IF>
+    <TMPL_IF NAME="LOGIN_HINT">
+      <input type="hidden" name="login_hint" value="<TMPL_VAR NAME="LOGIN_HINT">" />
+    </TMPL_IF>
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
     <div class="card border-info">
@@ -43,9 +46,9 @@
       </div>
 
       <!-- //if:jsminified
-        <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.min.js"></script>
+        <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
       //else -->
-        <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.js"></script>
+        <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.js?v=<TMPL_VAR CACHE_TAG>"></script>
       <!-- //endif -->
 
       </div>

@@ -2,7 +2,7 @@ package Lemonldap::NG::Common::Logger::MessageBroker;
 
 use strict;
 
-our $VERSION = '2.0.18';
+our $VERSION = '2.21.0';
 
 sub new {
     my $self = bless {}, shift;
@@ -10,8 +10,10 @@ sub new {
     my $show = 1;
     die 'Missing conf->loggerBroker' unless $conf->{loggerBroker};
     $conf->{loggerBroker} =~ s/^::/Lemonldap::NG::Common::MessageBroker::/;
-    my $brokerChannel = $conf->{loggerBrokerChannel}
-      || ( $args{user} ? 'llng-userlogs' : 'llng-logs' );
+    my $brokerChannel =
+      $args{user}
+      ? ( $conf->{loggerUserBrokerChannel} || 'llng-userlogs' )
+      : ( $conf->{loggerBrokerChannel} || 'llng-logs' );
     my $type = $args{user} ? 'logs' : 'userLogs';
     eval "use $conf->{loggerBroker}";
     die "Unable to load $conf->{loggerBroker}: $@" if $@;

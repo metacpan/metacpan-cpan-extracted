@@ -15,21 +15,21 @@
  </form>
  <script type="text/JavaScript" src="<TMPL_VAR NAME="SCRIPTNAME">psgi.js"></script>
  <!-- //if:usedebianlibs
-  <script type="text/javascript" src="/javascript/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js"></script>
+  <script type="text/javascript" src="/javascript/jquery/jquery.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
 //elsif:useexternallibs
-  <script type="text/javascript" src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
  //elsif:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
  //else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jssha/dist/sha1.js?v=<TMPL_VAR CACHE_TAG>"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/registerbrowser.js?v=<TMPL_VAR CACHE_TAG>"></script>
  <!-- //endif -->
 </body>
 </html>

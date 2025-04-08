@@ -2,6 +2,7 @@ package Lemonldap::NG::Portal::UserDB::OpenIDConnect;
 
 use strict;
 use Mouse;
+use Lemonldap::NG::Common::JWT 'getJWTPayload';
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_AUTH_ERROR
   PE_BADCREDENTIALS
@@ -9,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::UserDB
@@ -42,7 +43,33 @@ sub getUser {
         return PE_ERROR;
     }
 
-    my $userinfo_content = $self->getUserInfo( $op, $access_token );
+    my $userinfo_content;
+    my $source = $self->opOptions->{$op}->{oidcOPMetaDataOptionsUserinfoSource}
+      || 'userinfo';
+    if ( $source eq 'id_token' ) {
+        $userinfo_content = getJWTPayload( $req->data->{id_token} );
+        $self->logger->error(
+            "Unable to read ID token content: " . $req->data->{id_token} )
+          unless ($userinfo_content);
+    }
+    elsif ( $source eq 'access_token' ) {
+        my $tmp = getJWTPayload($access_token);
+        if ($tmp) {
+            $userinfo_content = { %{ $userinfo_content || {} }, %$tmp };
+        }
+        else {
+            $self->logger->error(
+                "Unable to read ID token content: $access_token");
+        }
+    }
+    unless ($userinfo_content) {
+        unless ( $source eq 'userinfo' ) {
+            $self->logger->error(
+                "Failed to get user info from $source, trying userinfo endpoint"
+            );
+        }
+        $userinfo_content = $self->getUserInfo( $op, $access_token );
+    }
 
     unless ($userinfo_content) {
         $self->logger->warn("No User Info content");
@@ -81,14 +108,12 @@ sub setSessionInfo {
     my ( $self, $req ) = @_;
     my $op = $req->data->{_oidcOPCurrent};
 
-    my %vars = (
-        %{ $self->conf->{exportedVars} },
-        %{ $self->opAttributes->{$op} }
-    );
+    my %vars =
+      ( %{ $self->conf->{exportedVars} }, %{ $self->opAttributes->{$op} } );
 
     while ( my ( $k, $v ) = each %vars ) {
         my $value = $req->data->{OpenIDConnect_user_info}->{$v};
-        if (  ref($value) and ref($value) eq "ARRAY" ) {
+        if ( ref($value) and ref($value) eq "ARRAY" ) {
             $req->{sessionInfo}->{$k} =
               join( $self->conf->{multiValuesSeparator}, @$value );
         }

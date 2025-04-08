@@ -59,13 +59,13 @@ SKIP: {
 
     # IDP must be sorted
     my @idp = map /val="http:\/\/(.+?)\/saml\/metadata">/g, $res->[2]->[0];
-    ok( $idp[0] eq 'auth.idp2.com', '1st = idp2' )
+    ok( $idp[0] eq 'auth.idp3.com', '1st = idp3' )
       or print STDERR Dumper( \@idp );
-    ok( $idp[1] eq 'auth.idp2_z.com', '2nd = idp2_z' )
+    ok( $idp[1] eq 'auth.idp.com', '2nd = idp' )
       or print STDERR Dumper( \@idp );
-    ok( $idp[2] eq 'auth.idp3.com', '3rd = idp3' )
+    ok( $idp[2] eq 'auth.idp2.com', '3rd = idp2' )
       or print STDERR Dumper( \@idp );
-    ok( $idp[3] eq 'auth.idp.com', '4th = idp' )
+    ok( $idp[3] eq 'auth.idp2_z.com', '4th = idp2_z' )
       or print STDERR Dumper( \@idp );
 
     ok(

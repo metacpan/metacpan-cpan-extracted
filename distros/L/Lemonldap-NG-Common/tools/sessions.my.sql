@@ -26,6 +26,7 @@ CREATE TABLE psessions (
     _httpSessionType varchar(64),
     _whatToTrace varchar(64),
     ipAddr varchar(64),
+    _webAuthnUserHandle varchar(128),
     _session_uid varchar(64)
 )  DEFAULT CHARSET utf8;
 CREATE INDEX i_p__session_kind ON psessions (_session_kind);
@@ -33,6 +34,7 @@ CREATE INDEX i_p__httpSessionType ON psessions (_httpSessionType);
 CREATE INDEX i_p__session_uid ON psessions (_session_uid);
 CREATE INDEX i_p_ipAddr ON psessions (ipAddr);
 CREATE INDEX i_p__whatToTrace ON psessions (_whatToTrace);
+CREATE INDEX i_p__webAuthnUserHandle ON psessions (_webAuthnUserHandle);
 
 CREATE TABLE samlsessions (
     id varchar(64) not null primary key,
@@ -57,10 +59,16 @@ CREATE TABLE oidcsessions (
     id varchar(64) not null primary key,
     a_session text,
     _session_kind varchar(15),
-    _utime bigint
+    _utime bigint,
+    user_session_id varchar(128),
+    _oidc_sid varchar(128),
+    _oidc_sub varchar(128)
 )  DEFAULT CHARSET utf8;
-CREATE INDEX i_o__session_kind ON oidcsessions (_session_kind);
-CREATE INDEX i_o__utime ON oidcsessions (_utime);
+CREATE INDEX i_o__session_kind   ON oidcsessions (_session_kind);
+CREATE INDEX i_o__utime          ON oidcsessions (_utime);
+CREATE INDEX i_o_user_session_id ON oidcsessions (user_session_id);
+CREATE INDEX i_o__oidc_sid       ON oidcsessions (_oidc_sid);
+CREATE INDEX i_o__oidc_sub       ON oidcsessions (_oidc_sub);
 
 
 CREATE TABLE cassessions (

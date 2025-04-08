@@ -26,7 +26,7 @@ subtest 'Valid Inputs' => sub {
 
 	my $args = {
 		username => 'test_user',
-		age => "30",
+		age => '30',
 		email => 'test@example.com',
 		bio => "A test bio",
 		price => "19.99",

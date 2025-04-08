@@ -78,9 +78,37 @@ ERRORS
      check_array_css_color():
              Parameter '%s' has bad color name.
                      Value: %s
+             Parameter '%s' has bad hsl color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsl degree.
+                     Value: %s
+             Parameter '%s' has bad hsl percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsl percent.
+                     Value: %s
+             Parameter '%s' has bad hsla alpha.
+                     Value: %s
+             Parameter '%s' has bad hsla color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsla degree.
+                     Value: %s
+             Parameter '%s' has bad hsla percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsla percent.
+                     Value: %s
              Parameter '%s' has bad rgb color (bad hex number).
                      Value: %s
              Parameter '%s' has bad rgb color (bad length).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad rgba alpha.
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number of arguments).
                      Value: %s
              Parameter '%s' must be a array.
                      Value: %s
@@ -94,11 +122,39 @@ ERRORS
                      Value: %s
              Parameter '%s' doesn't contain unit number.
                      Value: %s
+             Parameter '%s' has bad color name.
+                     Value: %s
+             Parameter '%s' has bad hsl color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsl degree.
+                     Value: %s
+             Parameter '%s' has bad hsl percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsl percent.
+                     Value: %s
+             Parameter '%s' has bad hsla alpha.
+                     Value: %s
+             Parameter '%s' has bad hsla color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsla degree.
+                     Value: %s
+             Parameter '%s' has bad hsla percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsla percent.
+                     Value: %s
              Parameter '%s' has bad rgb color (bad hex number).
                      Value: %s
              Parameter '%s' has bad rgb color (bad length).
                      Value: %s
-             Parameter '%s' has bad color name.
+             Parameter '%s' has bad rgb color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad rgba alpha.
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number of arguments).
                      Value: %s
              Parameter '%s' hasn't border style.
                      Value: %s
@@ -115,9 +171,37 @@ ERRORS
      check_css_color():
              Parameter '%s' has bad color name.
                      Value: %s
+             Parameter '%s' has bad hsl color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsl degree.
+                     Value: %s
+             Parameter '%s' has bad hsl percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsl percent.
+                     Value: %s
+             Parameter '%s' has bad hsla alpha.
+                     Value: %s
+             Parameter '%s' has bad hsla color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad hsla degree.
+                     Value: %s
+             Parameter '%s' has bad hsla percent (missing %).
+                     Value: %s
+             Parameter '%s' has bad hsla percent.
+                     Value: %s
              Parameter '%s' has bad rgb color (bad hex number).
                      Value: %s
              Parameter '%s' has bad rgb color (bad length).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad number of arguments).
+                     Value: %s
+             Parameter '%s' has bad rgba alpha.
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number).
+                     Value: %s
+             Parameter '%s' has bad rgba color (bad number of arguments).
                      Value: %s
 
      check_css_unit():
@@ -344,10 +428,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

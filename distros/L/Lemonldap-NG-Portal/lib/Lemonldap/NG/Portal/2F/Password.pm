@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -68,7 +68,8 @@ sub run {
         $req,
         'password2fcheck',
         params => {
-            TOKEN => $token,
+            TARGET => $self->p->relativeUrl( $req, 'password2fcheck' ),
+            TOKEN  => $token,
             $self->get2fTplParams($req),
         }
     );

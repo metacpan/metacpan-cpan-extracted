@@ -7,7 +7,7 @@
 </TMPL_IF>
 <TMPL_IF NAME="DATA">
   <div id="color" class="message message-positive alert"><span id="msg" trspan="webAuthnRequired"></span></div>
-  <form id="verify-form" action="/webauthn2fcheck" method="post">
+  <form id="verify-form" action="<TMPL_VAR NAME="TARGET">" method="post">
     <input type="hidden" id="credential" name="credential" value="" />
     <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />

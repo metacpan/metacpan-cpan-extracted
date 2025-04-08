@@ -5,7 +5,7 @@ use base Lemonldap::NG::Common::PSGI;
 sub init {
     my ( $self, $args ) = @_;
 
-    $args->{logLevel} = "error";
+    $args->{logLevel} ||= "error";
     my $super = $self->SUPER::init($args);
 
     no warnings 'redefine';
@@ -27,7 +27,6 @@ sub handler {
     # NB: $req is a Lemonldap::NG::Common::PSGI::Request object
     $self->logger->notice("Request handled by TestPsgi handler");
     $self->userLogger->info("User logger trace");
-
 
     $self->auditLog( $req, message => "audit" );
     $self->auditLog( $req, field1 => "one", field2 => "two" );

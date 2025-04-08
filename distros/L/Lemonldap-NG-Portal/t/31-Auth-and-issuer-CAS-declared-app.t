@@ -128,6 +128,9 @@ ok(
 count(1);
 expectOK($res);
 $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+is( expectPdata($res)->{targetAuthnLevel}, 1,
+    "Target Authnlevel set in pdata" );
+count(1);
 
 # Try to authenticate with an authorized to IdP
 $body = $res->[2]->[0];
@@ -223,20 +226,34 @@ count(1);
 expectRedirection( $res,
     'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
 
+# Test AuthnLevel dynamic requirement
+$idpId = $issuer->login("rtyler");
+ok(
+    $res = $issuer->_get(
+        '/cas/login',
+        query  => 'service=http://auth.sp.com/',
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    'Query CAS server'
+);
+count(1);
+expectXpath( $res, '//span[@trspan="askToUpgrade"]' );
+
 clean_sessions();
 done_testing( count() );
 
 sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => $debug,
-                domain                     => 'idp.com',
-                portal                     => 'http://auth.idp.com/',
-                authentication             => 'Demo',
-                userDB                     => 'Same',
-                issuerDBCASActivation      => 1,
-                issuerDBCASRule            => '$uid eq "french"',
-                casAttr                    => 'uid',
+                logLevel              => $debug,
+                domain                => 'idp.com',
+                portal                => 'http://auth.idp.com/',
+                authentication        => 'Demo',
+                userDB                => 'Same',
+                issuerDBCASActivation => 1,
+                issuerDBCASRule       => '$uid eq "french" or $uid eq "rtyler"',
+                casAttr               => 'uid',
                 casAccessControlPolicy     => 'error',
                 multiValuesSeparator       => ';',
                 casAppMetaDataExportedVars => {
@@ -248,7 +265,9 @@ sub issuer {
                 },
                 casAppMetaDataOptions => {
                     sp => {
-                        casAppMetaDataOptionsService => 'http://auth.sp.com',
+                        casAppMetaDataOptionsService    => 'http://auth.sp.com',
+                        casAppMetaDataOptionsAuthnLevel =>
+                          '$uid eq "rtyler" ? 5 : 1',
                     },
                     sp2 => {
                         casAppMetaDataOptionsService => 'http://auth.sp2.com',

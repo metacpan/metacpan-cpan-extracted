@@ -31,7 +31,7 @@
       <TMPL_ELSE>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><label for="oldpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
+            <span class="input-group-text"><label for="oldpassword" class="mb-0"><span trspan="currentPwd" hidden></span><i class="fa fa-lock"></i></label></span>
           </div>
           <TMPL_IF NAME="DONT_STORE_PASSWORD">
             <input id="oldpassword" name="oldpassword" type="text" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" autocomplete="off" required aria-required="true">
@@ -56,7 +56,7 @@
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><label for="newpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
+        <span class="input-group-text"><label for="newpassword" class="mb-0"><span trspan="newPassword" hidden></span><i class="fa fa-lock"></i></label></span>
       </div>
       <TMPL_IF NAME="DONT_STORE_PASSWORD">
         <input id="newpassword" name="newpassword" type="text" class="form-control" trplaceholder="newPassword" autocomplete="off" required aria-required="true"/>
@@ -76,7 +76,7 @@
     </div>
     <div class="form-group input-group">
       <div class="input-group-prepend">
-        <span class="input-group-text"><label for="confirmpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
+        <span class="input-group-text"><label for="confirmpassword" class="mb-0"><span trspan="confirmPwd" hidden></span><i class="fa fa-lock"></i></label></span>
       </div>
       <TMPL_IF NAME="DONT_STORE_PASSWORD">
         <input id="confirmpassword" name="confirmpassword" type="text" class="form-control" trplaceholder="confirmPwd" autocomplete="off" required aria-required="true"/>

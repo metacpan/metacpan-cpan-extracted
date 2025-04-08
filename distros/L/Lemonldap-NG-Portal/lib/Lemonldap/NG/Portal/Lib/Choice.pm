@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.21.0';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -143,21 +143,29 @@ sub _getChoiceFromReq {
         return ( $self->{conf}->{authChoiceAuthBasic}, "basic auth context" );
     }
 
-    # Check with other methods
-    my $options = [
-        [ findUser => $req->data->{findUserChoice} ],
-        [ param    => scalar( $req->param( $self->conf->{authChoiceParam} ) ) ],
-        [ userData => $req->userData->{_choice} ],
-        [ sessionInfo => $req->sessionInfo->{_choice} ],
-    ];
-    for my $opt (@$options) {
-        return ( $opt->[1], $opt->[0] )
-          if $opt->[1];
+    if ( $req->data->{findUserChoice} ) {
+        return ( $req->data->{findUserChoice}, "findUser" );
     }
 
-    if ($self->conf->{authChoiceSelectOnly}) {
+    if ( $req->parameters->get( $self->conf->{authChoiceParam} ) ) {
+        return ( $req->parameters->get( $self->conf->{authChoiceParam} ),
+            "param" );
+    }
+
+    # Use the choice from current session unless we are doing an upgrade
+    # in which case the user should be offered to choose again
+    unless ( $req->data->{discardChoiceForCurrentSession} ) {
+        if ( $req->userData->{_choice} ) {
+            return ( $req->userData->{_choice}, "userData" );
+        }
+        if ( $req->sessionInfo->{_choice} ) {
+            return ( $req->sessionInfo->{_choice}, "sessionInfo" );
+        }
+    }
+
+    if ( $self->conf->{authChoiceSelectOnly} ) {
         my @allowed_choices = grep { $self->_evaluateRule( $req, $_ ) }
-        keys %{ $self->conf->{authChoiceModules} };
+          keys %{ $self->conf->{authChoiceModules} };
         if ( @allowed_choices == 1 ) {
             return ( $allowed_choices[0], "only available" );
         }

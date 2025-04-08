@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   portalConsts
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 has resend_interval => (
     is      => 'rw',
@@ -229,16 +229,20 @@ sub sendCodeForm {
             PREFIX           => $prefix,
             (
                 $self->resend_interval
-                ? ( RESENDTARGET => '/'
-                      . $self->prefix
-                      . '2fresend?skin='
-                      . $self->p->getSkin($req) )
+                ? (
+                    RESENDTARGET => $self->p->relativeUrl(
+                        $req,
+                        $self->prefix . '2fresend',
+                        { skin => $self->p->getSkin($req) }
+                    )
+                  )
                 : ()
             ),
-            TARGET => '/'
-              . $self->prefix
-              . '2fcheck?skin='
-              . $self->p->getSkin($req),
+            TARGET => $self->p->relativeUrl(
+                $req,
+                $self->prefix . '2fcheck',
+                { skin => $self->p->getSkin($req) }
+            ),
             $self->get2fTplParams($req),
             %params,
         }

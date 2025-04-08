@@ -4,7 +4,7 @@ package Lemonldap::NG::Handler::Lib::StatusConstants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 sub portalConsts {
     return {

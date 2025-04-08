@@ -11,7 +11,7 @@ use Time::Local;
 use DBI;
 use Encode;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -122,7 +122,7 @@ sub getAll {
             date      => $h->{date},
             uid       => $h->{uid},
             ref       => $h->{ref},
-            condition => $h->{condition}
+            condition => $h->{cond}
         };
     }
     $self->logger->warn( $self->sth->err() ) if ( $self->sth->err() );
@@ -142,7 +142,7 @@ sub getExisting {
             date      => $h->{date},
             uid       => $h->{uid},
             ref       => $h->{ref},
-            condition => $h->{condition}
+            condition => $h->{cond}
         };
     }
     $self->logger->warn( $self->sth->err() ) if ( $self->sth->err() );
@@ -247,8 +247,12 @@ sub getDone {
             $self->logger->warn("Bad date: $h->{date}");
             return {};
         }
-        $result->{"$h->{date}#$h->{uid}#$h->{ref}"} =
-          { notified => $done, uid => $h->{uid}, ref => $h->{ref}, };
+        $result->{"$h->{date}#$h->{uid}#$h->{ref}"} = {
+            notified  => $done,
+            uid       => $h->{uid},
+            ref       => $h->{ref},
+            condition => $h->{cond}
+        };
     }
     $self->logger->warn( $self->sth->err() ) if ( $self->sth->err() );
     return $result;

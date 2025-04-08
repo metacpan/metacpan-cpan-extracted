@@ -1,3 +1,9 @@
+2.101 2025-04-08
+- non-trivial tests added
+- add overloads of ::Quaternion
+- change mouse control from ArcBall-like to orbiting-camera-like
+- convert event-handling from X-windows style to generic
+
 2.100 2025-01-16
 - adjust MathGraph and Labels so Debian packaging is happy
 

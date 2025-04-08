@@ -9,8 +9,7 @@ require 't/test-lib.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             ext2fActivation      => 1,
@@ -66,10 +65,13 @@ ok( $res->[2]->[0] =~ /<h3 trspan="Dwho_notAllowed">Dwho_notAllowed<\/h3>/,
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
-ok( $res->[2]->[0] =~ qr%src="/static/common/js/info.(?:min\.)?js"></script>%,
-    'Found INFO js' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(1);
+expectXpath(
+    $res,
+    '//script['
+      . 'starts-with(@src,"/static/common/js/info.min.js?v=")'
+      . ' or starts-with(@src,"/static/common/js/info.js?v=")]',
+    "Found info JS"
+);
 
 clean_sessions();
 

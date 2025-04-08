@@ -7,8 +7,9 @@ package Lemonldap::NG::Common::Apache::Session::SOAP;
 
 use strict;
 use SOAP::Lite;
+use JSON qw(from_json to_json);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 #parameter proxy Url of SOAP service
 #parameter proxyOptions SOAP::Lite options
@@ -153,8 +154,9 @@ sub get {
     my $id   = shift;
 
     # Check cache
-    if ( $self->{localStorage} && $self->cache->get("soap$id") ) {
-        return $self->{data} = $self->cache->get("soap$id");
+    if ( $self->{localStorage} and my $res = $self->cache->get($id) ) {
+        $res = eval { from_json($res) };
+        return $self->{data} = $res if $res;
     }
 
     # No cache, use SOAP and set cache
@@ -162,7 +164,7 @@ sub get {
     return 0 unless ( $r or $r->{error} );
     $self->{data} = $r->{attributes};
 
-    $self->cache->set( "soap$id", $self->{data} ) if $self->{localStorage};
+    $self->cache->set( $id, to_json( $self->{data} ) ) if $self->{localStorage};
 
     return $self->{data};
 }
@@ -176,11 +178,11 @@ sub newSession {
 
     # Set cache
     if ( $self->{localStorage} ) {
-        my $id = "soap" . $self->{data}->{_session_id};
+        my $id = $self->{data}->{_session_id};
         if ( $self->cache->get($id) ) {
             $self->cache->remove($id);
         }
-        $self->cache->set( $id, $self->{data} );
+        $self->cache->set( $id, to_json( $self->{data} ) );
     }
 
     return $self->{data};
@@ -194,11 +196,11 @@ sub save {
 
     # Update session in cache
     if ( $self->{localStorage} ) {
-        my $id = "soap" . $self->{data}->{_session_id};
+        my $id = $self->{data}->{_session_id};
         if ( $self->cache->get($id) ) {
             $self->cache->remove($id);
         }
-        $self->cache->set( $id, $self->{data} );
+        $self->cache->set( $id, to_json( $self->{data} ) );
     }
 
     # SOAP
@@ -213,7 +215,7 @@ sub delete {
 
     # Remove session from cache
     if ( $self->{localStorage} ) {
-        my $id = "soap" . $self->{data}->{_session_id};
+        my $id = $self->{data}->{_session_id};
         if ( $self->cache->get($id) ) {
             $self->cache->remove($id);
         }
@@ -362,9 +364,9 @@ SOAP::transport can use basic authentication by rewriting
 C<>SOAP::Transport::HTTP::Client::get_basic_credentials>:
 
   package My::Package;
-  
+
   use base Lemonldap::NG::Handler::SharedConf;
-  
+
   __PACKAGE__->init ( {
       globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
       globalStorageOptions => {
@@ -380,13 +382,13 @@ SOAP::transport provides a simple way to use SSL certificate: you've just to
 set environment variables.
 
   package My::Package;
-  
+
   use base Lemonldap::NG::Handler::SharedConf;
-  
+
   # AUTHENTICATION
   $ENV{HTTPS_CERT_FILE} = 'client-cert.pem';
   $ENV{HTTPS_KEY_FILE}  = 'client-key.pem';
-  
+
   __PACKAGE__->init ( {
       globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
       globalStorageOptions => {

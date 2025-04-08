@@ -1,3 +1,10 @@
+0.09 2025-04-07T16:34:03+02:00
+ - Add tests for check_css_border().
+ - Fix ERRORS section in doc.
+ - Remove unused module from tests.
+ - Simplify internal code.
+ - Update copyright years.
+
 0.08 2024-05-18T09:12:31+02:00
  - Fix doc for check_css_unit(). Last described version is 0.07.
 

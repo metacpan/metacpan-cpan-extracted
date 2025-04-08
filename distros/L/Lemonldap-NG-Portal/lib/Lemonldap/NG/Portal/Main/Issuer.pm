@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 # PROPERTIES
 
@@ -260,8 +260,9 @@ sub restoreRequest {
 
 sub reAuth {
     my ( $self, $req ) = @_;
+    my $cacheTag = $self->p->cacheTag;
     $req->data->{customScript} =
-qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js?v=$cacheTag"></script>'
       if ( $self->conf->{skipRenewConfirmation} );
 
     my $portal_without_slash = $req->portal =~ s/\/+$//r;
@@ -275,8 +276,9 @@ qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/auto
 
 sub upgradeAuth {
     my ( $self, $req ) = @_;
+    my $cacheTag = $self->p->cacheTag;
     $req->data->{customScript} =
-qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js?v=$cacheTag"></script>'
       if ( $self->conf->{skipUpgradeConfirmation} );
     my $portal_without_slash = $req->portal =~ s/\/+$//r;
     $req->data->{_url} =

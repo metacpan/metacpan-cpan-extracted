@@ -9,6 +9,7 @@ lib/Lemonldap/NG/Common/Apache/Session/Serialize/JSON.pm
 lib/Lemonldap/NG/Common/Apache/Session/SOAP.pm
 lib/Lemonldap/NG/Common/Apache/Session/Store.pm
 lib/Lemonldap/NG/Common/AuditLogger/UserLoggerCompat.pm
+lib/Lemonldap/NG/Common/AuditLogger/UserLoggerJSON.pm
 lib/Lemonldap/NG/Common/Cli.pm
 lib/Lemonldap/NG/Common/CliSessions.pm
 lib/Lemonldap/NG/Common/Combination/Parser.pm
@@ -46,6 +47,7 @@ lib/Lemonldap/NG/Common/Logger/_Duplicate.pm
 lib/Lemonldap/NG/Common/Logger/Apache2.pm
 lib/Lemonldap/NG/Common/Logger/Dispatch.pm
 lib/Lemonldap/NG/Common/Logger/Log4perl.pm
+lib/Lemonldap/NG/Common/Logger/Loki.pm
 lib/Lemonldap/NG/Common/Logger/MessageBroker.pm
 lib/Lemonldap/NG/Common/Logger/Null.pm
 lib/Lemonldap/NG/Common/Logger/Sentry.pm
@@ -104,7 +106,9 @@ t/03-Common-Conf-RDBI.t
 t/05-Common-Conf-LDAP.t
 t/10-PSGI-Request.t
 t/10-PSGI.t
+t/11-Logger-Log4Perl.t
 t/11-Logger.t
+t/11-LokiLogger.t
 t/11-TestLogger.t
 t/30-Common-Safelib.t
 t/35-Common-Crypto.t
@@ -124,6 +128,7 @@ t/71-Util-Crypto.t
 t/99-pod.t
 t/data/preview-all-test-metadata.xml
 t/lemonldap-ng.ini
+t/log4perl.ini
 t/overlay_test/lmConf-1.json
 t/overlay_test/overlay/globalStorage
 t/overlay_test/overlay/globalStorageOptions

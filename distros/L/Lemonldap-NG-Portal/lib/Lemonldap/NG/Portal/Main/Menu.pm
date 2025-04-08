@@ -67,7 +67,6 @@ sub init {
 # Prepare menu template elements
 # Returns hash (=list) containing :
 #  - DISPLAY_MODULES
-#  - DISPLAY_TAB
 #  - AUTH_ERROR
 #  - AUTH_ERROR_TYPE
 sub params {
@@ -82,46 +81,6 @@ sub params {
 
     # Display noApp message
     $res{NO_APP_ALLOWED} = $req->data->{noApp};
-
-    # Force password tab in case of password error
-    if (
-        $req->menuError
-        and scalar(
-            grep { $_ == $req->menuError } (
-                25,    #PE_PP_CHANGE_AFTER_RESET
-                26,    #PE_PP_PASSWORD_MOD_NOT_ALLOWED
-                27,    #PE_PP_MUST_SUPPLY_OLD_PASSWORD
-                28,    #PE_PP_INSUFFICIENT_PASSWORD_QUALITY
-                29,    #PE_PP_PASSWORD_TOO_SHORT
-                30,    #PE_PP_PASSWORD_TOO_YOUNG
-                31,    #PE_PP_PASSWORD_IN_HISTORY
-                32,    #PE_PP_GRACE
-                33,    #PE_PP_EXP_WARNING
-                34,    #PE_PASSWORD_MISMATCH
-                39,    #PE_BADOLDPASSWORD
-                74,    #PE_MUST_SUPPLY_OLD_PASSWORD
-            )
-        )
-      )
-    {
-        $res{DISPLAY_TAB} = "password";
-    }
-
-    # else compute modules to display and default tab
-    else {
-        # Get the tab URL parameter
-
-        my $tab = $req->param("tab");
-        if ( defined $tab and grep /^$tab$/, ( @defaultTabs, @customTabs ) ) {
-            $self->logger->debug( "Select menu tab "
-                  . $req->param("tab")
-                  . "from GET parameter" );
-            $res{DISPLAY_TAB} = $req->param("tab");
-        }
-        else {
-            $res{DISPLAY_TAB} = $res{DISPLAY_MODULES}->[0];
-        }
-    }
 
     $res{AUTH_ERROR_TYPE} =
       $req->error_type( $res{AUTH_ERROR} = $req->menuError );

@@ -16,7 +16,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.21.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -40,6 +40,13 @@ sub init {
         ['DELETE']
       )
 
+      # DELETE ALL SESSIONS FOR A USER
+      ->addRoute(
+        sessions =>
+          { glogout => { ':sessionType' => { ':sessionId' => 'userLogout' } } },
+        ['POST']
+      )
+
       # DELETE OIDC CONSENT
       ->addRoute(
         sessions => {
@@ -58,6 +65,58 @@ sub init {
     $self->{hiddenAttributes} .= ' _session_id'
       unless $conf->{displaySessionId};
     return 1;
+}
+
+#
+# User logout
+#
+
+sub userLogout {
+    my ( $self, $req ) = @_;
+
+    my $mod = $self->getMod($req)
+      or return $self->sendError( $req, undef, 400 );
+    my $id = $req->params('sessionId')
+      or return $self->sendError( $req, 'sessionId is missing', 400 );
+    my $session = $self->getApacheSession( $mod, $id );
+
+    my $uidKey = Lemonldap::NG::Handler::Main->tsv->{whatToTrace};
+    my $uid    = $session->data->{$uidKey};
+
+    my $count = 0;
+    foreach my $storage (qw(oidcStorage sessionStorage)) {
+        my $storageModule =
+          Lemonldap::NG::Handler::Main->tsv->{"${storage}Module"};
+        if ( defined $storageModule ) {
+            next if ( $storageModule eq "Apache::Session::Memcached" );
+            my $opts = Lemonldap::NG::Handler::Main->tsv->{"${storage}Options"};
+            $opts->{backend} = $storageModule;
+            my $sessions =
+              Lemonldap::NG::Common::Apache::Session->searchOn( $opts, $uidKey,
+                $uid );
+            my @keys;
+            if ( $sessions and %$sessions ) {
+                @keys = keys %$sessions;
+                foreach my $sid (@keys) {
+                    my $session = Lemonldap::NG::Common::Session->new(
+                        storageModule        => $storageModule,
+                        storageModuleOptions => $opts,
+                        cacheModule => Lemonldap::NG::Handler::Main->tsv
+                          ->{sessionCacheModule},
+                        cacheModuleOptions => Lemonldap::NG::Handler::Main->tsv
+                          ->{sessionCacheOptions},
+                        id => $sid,
+                    );
+                    if ( $session->data ) {
+                        $session->remove;
+                        $count++;
+                    }
+                }
+            }
+        }
+    }
+    Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
+    return $self->sendJSONresponse( $req, { result => 1, count => $count } );
 }
 
 #######################

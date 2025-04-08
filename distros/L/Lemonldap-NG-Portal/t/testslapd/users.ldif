@@ -172,6 +172,7 @@ objectClass: groupOfNames
 objectClass: top
 cn: mygroup
 member: uid=dwho,ou=users,dc=example,dc=com
+member: uid=grace,ou=users,dc=example,dc=com
 
 dn: cn=extgroup,ou=groups,dc=example,dc=com
 objectClass: extensibleObject

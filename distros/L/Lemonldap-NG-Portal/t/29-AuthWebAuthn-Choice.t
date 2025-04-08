@@ -85,10 +85,11 @@ ENDKEY
     $client->p->getPersistentSession( "dwho", $info );
 
     expectXpath( $res,
-        '//script[@src="/static/common/js/webauthn-json.browser-global.min.js"]'
-    );
+            '//script[starts-with(@src,"/static/common/js/'
+          . 'webauthn-json.browser-global.min.js?v=")]' );
     expectXpath( $res,
-        '//script[@src="/static/common/js/webauthncheck.min.js"]' );
+            '//script[starts-with(@src,"/static/common/js/'
+          . 'webauthncheck.min.js?v=")]' );
     my $js_vars   = getJsVars($res);
     my $request   = $js_vars->{request};
     my $challenge = $request->{challenge};

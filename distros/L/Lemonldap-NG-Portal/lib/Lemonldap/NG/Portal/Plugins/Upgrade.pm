@@ -6,11 +6,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_CONFIRM
   PE_TOKENEXPIRED
+  PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
+
+sub forAuthUser { 'handleAuthRequests' }
 
 # INITIALIZATION
 
@@ -53,6 +56,8 @@ sub askRenew {
 sub confirmUpgrade {
     my ( $self, $req ) = @_;
 
+    $req->data->{discardChoiceForCurrentSession} = 1;
+
     # sfOnlyUpgrade feature can only be used during session renew
     return $self->confirm( $req, $self->conf->{sfOnlyUpgrade} );
 }
@@ -82,6 +87,7 @@ sub ask {
     $url = '' if $self->p->checkXSSAttack('url', $url);
     $forceUpgrade = '' if $self->p->checkXSSAttack('forceUpgrade', $forceUpgrade);
 
+    my $cacheTag = $self->p->cacheTag;
     # Display form
     return $self->p->sendHtml(
         $req,
@@ -97,7 +103,7 @@ sub ask {
             (
                 $self->conf->{"skip${action}Confirmation"}
                 ? ( CUSTOM_SCRIPT =>
-qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js?v=$cacheTag"></script>'
                   )
                 : ()
             )
@@ -108,6 +114,8 @@ qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/auto
 sub confirm {
     my ( $self, $req, $sfOnly ) = @_;
     my $upg;
+
+    my $old_id = $req->userData->{_session_id};
 
     if ( $req->param('kerberos') ) {
         $upg = 1;
@@ -150,7 +158,13 @@ sub confirm {
                 '', 0
             );    # Insert token
                   # Do a regular login
-            return $self->p->login($req);
+            my $res = $self->p->login($req);
+
+            if ( $old_id and $req->id and $old_id ne $req->id ) {
+                $self->p->processHook( $req, 'updateSessionId', $old_id,
+                    $req->id );
+            }
+            return $res;
         }
     }
     else {
@@ -160,6 +174,20 @@ sub confirm {
         $req->mustRedirect(1);
         return $self->p->do( $req, [ sub { PE_OK } ] );
     }
+}
+
+# Takes care of callbacks for external methods (SAML, OIDC...)
+sub handleAuthRequests {
+    my ( $self, $req ) = @_;
+    if (    $self->p->_authentication->can('isCallback')
+        and $self->p->_authentication->isCallback($req) )
+    {
+        $req->id(undef);
+        $req->parameters->{'confirm'} = 1;
+        $req->response( $self->confirm($req) );
+        return PE_SENDRESPONSE;
+    }
+    return PE_OK;
 }
 
 1;

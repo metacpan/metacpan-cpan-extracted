@@ -1,6 +1,6 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
-<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/redirect.min.js"></script>
+<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/redirect.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
 <script id="redirect" type="custom">
 <TMPL_IF NAME="HIDDEN_INPUTS">
 form

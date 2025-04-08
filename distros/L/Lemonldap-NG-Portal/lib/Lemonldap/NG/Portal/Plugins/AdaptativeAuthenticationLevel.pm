@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 

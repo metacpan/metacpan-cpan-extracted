@@ -8,7 +8,7 @@ use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -64,9 +64,10 @@ use constant supportedActions => {
 sub initDisplay {
     my ( $self, $req ) = @_;
 
+    my $cacheTag = $self->p->cacheTag;
     $req->data->{customScript} .= <<"EOF";
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js"></script>
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthnregistration.min.js"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js?v=$cacheTag"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthnregistration.min.js?v=$cacheTag"></script>
 EOF
 
 }

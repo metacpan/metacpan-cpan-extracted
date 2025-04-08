@@ -89,6 +89,42 @@ ok(
   );
 count(1);
 
+# Check that cookie is removed
+{
+    my $previous, $success;
+    my $cookie_count = 0;
+    for ( @{ $res->[1] } ) {
+        if ( $_ eq "Cookie" ) {
+            $success = $previous =~ /^Deleteheader/;
+            $cookie_count++;
+        }
+        $previous = $_;
+    }
+    is( $cookie_count, 1, "One occurence of Cookie in response headers" );
+    ok( $success, "Cookie occurence appears after a Deleteheader instruction" );
+    count(2);
+}
+
+# Authorized query with cookie
+ok(
+    $res = $client->_get(
+        '/', undef, 'test4.example.com', "a=b; lemonldap=$sessionId; x=y"
+    ),
+    'Authentified query'
+);
+ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
+count(2);
+
+# Check that cookie is modified
+{
+    %h = @{ $res->[1] };
+    my @cookie_occurences = grep { $_ eq "Cookie" } @{ $res->[1] };
+    is( scalar(@cookie_occurences),
+        1, "One occurence of Cookie in response headers" );
+    is( $h{Cookie}, "a=b; x=y", "Correct cookie value" );
+    count(2);
+}
+
 # Authorized query
 ok( $res = $client->_get( '/', undef, undef, "lemonldap=$sessionId" ),
     'Authentified query' );

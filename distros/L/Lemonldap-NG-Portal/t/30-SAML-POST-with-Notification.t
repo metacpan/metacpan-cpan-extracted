@@ -40,7 +40,7 @@ SKIP: {
       "reference": "testref",
       "title": "Test title",
       "subtitle": "Test subtitle",
-      "text": "This is a test text",
+      "text": "This is a test text for $uid",
       "check": ["Accept test","Accept test2"]
     }
     ]';
@@ -91,6 +91,14 @@ SKIP: {
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     ( $host, $url, $s ) =
       expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
+
+    is(
+        getHtmlElement( $res, '//p[@class="notifText"]/text()' )->pop()->data,
+        "This is a test text for dwho",
+        "Found notification text"
+    );
+    count(1);
+
     ok(
         $res = $issuer->_post(
             '/notifback',

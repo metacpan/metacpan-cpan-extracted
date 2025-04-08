@@ -41,7 +41,7 @@ ok( $res->{error} =~ /^Malformed date$/, 'Notification not inserted' );
 count(1);
 
 $notif =
-'{"date":"2099-12-31","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
+'{"date":"2099-12-31","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}", "condition": "1==1"}';
 $res =
   &client->jsonPostResponse( 'notifications/actives', '',
     IO::String->new($notif),
@@ -74,7 +74,8 @@ displayTests('done');
 
 # Delete notification
 $res =
-  &client->_del('notifications/done/dwho_Test_20991231_dwho_VGVzdA==.done');
+  &client->_del(
+    'notifications/done/dwho_Test_20991231_dwho_VGVzdA==_MT09MQ==.done');
 $res = &client->jsonResponse( 'notifications/done', 'groupBy=substr(uid,1)' );
 ok( $res->{result} == 1, 'Result = 1' );
 ok( $res->{count} == 0,  'Count = 0' );
@@ -123,17 +124,29 @@ sub displayTests {
         $res = &client->jsonResponse( "notifications/$type/dwho_Test", '' );
         ok( $res->{result} == 1, 'Result = 1' );
         ok( $res->{count} == 1,  'Count = 1' );
-        ok( eval { from_json( $res->{notifications}->[0] ) },
+        ok( $res = eval { from_json( $res->{notifications}->[0] ) },
             'Response is JSON' )
           or print STDERR "Expect JSON, found:\n$res->{notifications}->[0]\n";
-        count(3);
+        is_deeply(
+            $res,
+            {
+                'condition' => '1==1',
+                'date'      => '2099-12-31',
+                'reference' => 'Test',
+                'title'     => 'Test',
+                'uid'       => 'dwho'
+            },
+            "Notification is as expected"
+        );
+
+        count(4);
     }
 
     if ( $type eq 'done' ) {
         $res = &client->jsonResponse( "notifications/$type", 'uid=dwho' );
         ok(
             $res->{values}->[0]->{notification} =~
-              /^\d{8}_dwho_VGVzdA==\.done$/,
+              /^\d{8}_dwho_VGVzdA==_MT09MQ==\.done$/,
             'Reference found'
         ) or diag Dumper($res);
         my $internal_ref = $res->{values}->[0]->{notification};
@@ -144,15 +157,18 @@ sub displayTests {
         ok( $res = eval { from_json( $res->{notifications}->[0] ) },
             'Response is JSON' )
           or print STDERR "Expect JSON, found:\n$res->{notifications}->[0]\n";
-        ok( $res->{reference} eq 'Test', 'reference found' )
-          or diag Dumper($res);
-        ok( $res->{title} eq 'Test', 'title found' )
-          or diag Dumper($res);
-        ok( $res->{date} eq '2099-12-31', 'date found' )
-          or diag Dumper($res);
-        ok( $res->{uid} eq 'dwho', 'uid found' )
-          or diag Dumper($res);
-        count(7);
+        is_deeply(
+            $res,
+            {
+                'condition' => '1==1',
+                'date'      => '2099-12-31',
+                'reference' => 'Test',
+                'title'     => 'Test',
+                'uid'       => 'dwho'
+            },
+            "Notification is as expected"
+        );
+        count(4);
     }
 }
 

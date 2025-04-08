@@ -89,6 +89,10 @@ LcJp
 -----END CERTIFICATE-----";
 }
 
+sub oidc_cert_op_public_sig_x5t {
+    return "4Pims8kl3DEgB2ld9pmvz9svAxo";
+}
+
 sub alt_oidc_key_op_private_sig {
     '-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCWS2Wd0gXbiMDU

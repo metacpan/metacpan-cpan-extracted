@@ -16,6 +16,12 @@ my ( $op, $rp, $res );
 LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
+        if ( my $jwt = $req->parameters->{client_assertion} ) {
+            my $h = id_token_header($jwt);
+            is( $h->{x5t}, oidc_cert_op_public_sig_x5t,
+                "Correct X509 thumbprint in JWT header" );
+            count(1);
+        }
         ok( $req->uri =~ m#http://auth.((?:o|r)p).com(.*)#, ' REST request' );
         my $host = $1;
         my $url  = $2;
@@ -160,7 +166,7 @@ my $spId = expectCookie($res);
 
 # Logout initiated by OP
 
-# Reset conf to make sure to make sure lazy loading works during logout (#3014)
+# Reset conf to make sure lazy loading works during logout (#3014)
 withHandler( 'op', sub { $op->p->HANDLER->checkConf(1) } );
 
 ok(

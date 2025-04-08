@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 sub cTrees {
     return {
@@ -200,7 +200,9 @@ sub cTrees {
                             'oidcOPMetaDataOptionsTokenEndpointAuthMethod',
                             'oidcOPMetaDataOptionsCheckJWTSignature',
                             'oidcOPMetaDataOptionsIDTokenMaxAge',
-                            'oidcOPMetaDataOptionsUseNonce'
+                            'oidcOPMetaDataOptionsUseNonce',
+                            'oidcOPMetaDataOptionsUserinfoSource',
+                            'oidcOPMetaDataOptionsNoJwtHeader',
                         ]
                     },
                     'oidcOPMetaDataOptionsComment'
@@ -243,6 +245,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsAccessTokenJWT',
                             'oidcRPMetaDataOptionsAccessTokenClaims',
                             'oidcRPMetaDataOptionsRefreshToken',
+                            'oidcRPMetaDataOptionsNoJwtHeader',
                             'oidcRPMetaDataOptionsUserIDAttr',
                             'oidcRPMetaDataOptionsAdditionalAudiences',
                             'oidcRPMetaDataOptionsTokenXAuthorizedRP',
@@ -262,6 +265,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsRequirePKCE',
                             'oidcRPMetaDataOptionsRefreshTokenRotation',
                             'oidcRPMetaDataOptionsAllowOffline',
+                            'oidcRPMetaDataOptionsAllowNativeSso',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
                             'oidcRPMetaDataOptionsAllowClientCredentialsGrant',
                             'oidcRPMetaDataOptionsRequestUris',
@@ -366,6 +370,8 @@ sub cTrees {
                 nodes => [
                     'casAppMetaDataOptionsService',
                     'casAppMetaDataOptionsUserAttribute',
+                    'casAppMetaDataOptionsAllowProxy',
+                    'casSrvMetaDataOptionsSamlValidate',
                     'casAppMetaDataOptionsLogout',
                     'casAppMetaDataOptionsAuthnLevel',
                     'casAppMetaDataOptionsRule',

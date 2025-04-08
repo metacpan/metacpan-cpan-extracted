@@ -288,6 +288,11 @@ sub update {
         }
 
         $self->_save_data($data);
+        $self->id( $data->{_session_id} );
+        if ( $self->hashStore and $self->id ) {
+            $self->_hashDataSessionId($data);
+            $data->{_session_hashed} ||= 1;
+        }
 
         untie(%$data);
         return 1;
@@ -301,6 +306,10 @@ sub remove {
     my ( $self, $tieOptions ) = @_;
 
     my $data = $self->_tie_session($tieOptions);
+    unless ($data) {
+        $self->error("Unable to delete session: $@");
+        return 0;
+    }
 
     # Before saving, hide the real ID and replace it by the storage ID
     $self->_hashDataSessionId($data) if $self->hashStore;

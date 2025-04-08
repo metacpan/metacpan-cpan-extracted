@@ -9,7 +9,7 @@ use Lemonldap::NG::Handler::PSGI::Main;
 
 extends 'Lemonldap::NG::Handler::Lib::PSGI', 'Lemonldap::NG::Common::PSGI';
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.21.0';
 
 sub init {
     my ( $self, $args ) = @_;
@@ -35,7 +35,7 @@ Lemonldap::NG::Handler::PSGI - Base library for protected PSGI applications.
   use base Lemonldap::NG::Handler;
   
   sub init {
-    my ($self,$args) = @_;
+    my ( $self, $args ) = @_;
     $self->protection('manager');
     # See Lemonldap::NG::Common::PSGI for more
     ...
@@ -47,7 +47,7 @@ Lemonldap::NG::Handler::PSGI - Base library for protected PSGI applications.
   sub handler {
     my ( $self, $req ) = @_;
 
-    # Will be called only if authorisated
+    # Will be called only if authorized
     my $userId = $self->userId;
     ...
     $self->sendJSONresponse(...);

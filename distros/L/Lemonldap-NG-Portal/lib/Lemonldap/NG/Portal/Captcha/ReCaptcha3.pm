@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::UserAgent;
 
 # Add constants used by this module
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 

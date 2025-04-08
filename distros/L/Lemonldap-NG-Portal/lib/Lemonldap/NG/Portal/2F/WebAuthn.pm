@@ -18,7 +18,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -54,9 +54,10 @@ sub run {
 
     $self->ott->updateToken( $token, _webauthn_request => $request );
 
+    my $cacheTag = $self->p->cacheTag;
     $req->data->{customScript} .= <<"EOF";
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js"></script>
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthncheck.min.js"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js?v=$cacheTag"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthncheck.min.js?v=$cacheTag"></script>
 EOF
 
     # Prepare form
@@ -64,7 +65,8 @@ EOF
         $req,
         'webauthn2fcheck',
         params => {
-            DATA =>
+            TARGET => $self->p->relativeUrl( $req, 'webauthn2fcheck' ),
+            DATA   =>
               to_json( { request => $request, webauthn_autostart => \1 } ),
             TOKEN         => $token,
             CUSTOM_SCRIPT => $req->data->{customScript},

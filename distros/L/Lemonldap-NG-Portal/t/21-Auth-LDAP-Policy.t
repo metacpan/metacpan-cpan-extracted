@@ -8,7 +8,7 @@ require 't/test-lib.pm';
 use lib 't/lib';
 
 my $res;
-my $maintests = 42;
+my $maintests = 44;
 
 no warnings 'once';
 
@@ -155,6 +155,18 @@ m%<input id="staticUser" type="text" readonly class="form-control" value="$user"
 
     # Try to authenticate
     # -------------------
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new($postString),
+            length => length($postString),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    $match = 'trspan="' . $code . '"';
+    ok( $res->[2]->[0] =~ /$match/, 'Grace remaining' );
+
+    # Try again to make sur "0" is properly handled
     ok(
         $res = $client->_post(
             '/', IO::String->new($postString),

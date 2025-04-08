@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Lib::OpenIDConnect;
 use strict;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
-use Crypt::JWT qw(encode_jwt decode_jwt);
+use Crypt::JWT  qw(encode_jwt decode_jwt);
 use Digest::SHA qw/sha1 hmac_sha256_base64 sha256 sha384 sha512 sha256_base64/;
 use JSON;
 use Lemonldap::NG::Common::FormEncode;
@@ -28,7 +28,13 @@ use URI;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
+
+use constant oidcErrorLevel => {
+    server_error     => 'error',
+    invalid_request  => 'warn',
+    consent_required => 'notice',
+};
 
 # PROPERTIES
 
@@ -40,17 +46,18 @@ has rpAttributes => ( is => 'rw', default => sub { {} }, );
 has rpMacros     => ( is => 'rw', default => sub { {} } );
 has rpOptions    => ( is => 'rw', default => sub { {} }, );
 has rpRules      => ( is => 'rw', default => sub { {} } );
+has rpLevelRules => ( is => 'rw', default => sub { {} } );
 has rpScopes     => ( is => 'rw', default => sub { {} } );
 has rpScopeRules => ( is => 'rw', default => sub { {} } );
 has rpEncKey     => ( is => 'rw', default => sub { {} } );
 has rpSigKey     => ( is => 'rw', default => sub { {} } );
 
 # Deprecated names, remove in 3.0
-*oidcOPList   = *opMetadata;
-*oidcRPList   = *rpOptions;
-*spMacros     = *rpMacros;
-*spRules      = *rpRules;
-*spScopeRules = *rpScopeRules;
+*oidcOPList   = \&opMetadata;
+*oidcRPList   = \&rpOptions;
+*spMacros     = \&rpMacros;
+*spRules      = \&rpRules;
+*spScopeRules = \&rpScopeRules;
 
 # return LWP::UserAgent object
 has ua => (
@@ -151,10 +158,10 @@ sub load_rp {
 
     # Additional claims
     my $extraClaims = $config{extraClaims};
-
     if ($extraClaims) {
+        $self->logger->debug("Processing extra claims for RP $rp...");
         foreach my $scope ( keys %$extraClaims ) {
-            $self->logger->debug("Processing scope value $scope for $rp");
+            $self->logger->debug("Processing scope value $scope for RP $rp...");
             my @extraAttributes = split( /\s/, $extraClaims->{$scope} );
             $scope_values->{$scope} = \@extraAttributes;
         }
@@ -163,12 +170,19 @@ sub load_rp {
     # Access rule
     my $rule = $config{options}->{oidcRPMetaDataOptionsRule};
     if ( length $rule ) {
-        $rule = $self->p->HANDLER->substitute($rule);
-        unless ( $rule = $self->p->HANDLER->buildSub($rule) ) {
-            $self->logger->error( "Unable to build access rule for RP $rp: "
-                  . $self->p->HANDLER->tsv->{jail}->error );
+        $self->logger->debug("Processing access rule for RP $rp...");
+        $rule = $self->p->buildRule( $rule, "access rule for RP $rp" );
+        unless ($rule) {
             $valid = 0;
         }
+    }
+
+    # Required authentication level rule
+    my $levelrule = $config{options}->{oidcRPMetaDataOptionsAuthnLevel} || 0;
+    $levelrule = $self->p->buildRule( $levelrule,
+        "required authentication level rule for RP $rp" );
+    unless ($levelrule) {
+        $valid = 0;
     }
 
     # Load per-RP macros
@@ -177,6 +191,7 @@ sub load_rp {
     for my $macroAttr ( keys %{$macros} ) {
         my $macroRule = $macros->{$macroAttr};
         if ( length $macroRule ) {
+            $self->logger->debug("Processing macros for RP $rp...");
             $macroRule = $self->p->HANDLER->substitute($macroRule);
             if ( $macroRule = $self->p->HANDLER->buildSub($macroRule) ) {
                 $compiledMacros->{$macroAttr} = $macroRule;
@@ -196,6 +211,7 @@ sub load_rp {
     for my $scopeName ( keys %{$scope_rules} ) {
         my $scopeRule = $scope_rules->{$scopeName};
         if ( length $scopeRule ) {
+            $self->logger->debug("Processing dynamic scopes for RP $rp...");
             $scopeRule = $self->p->HANDLER->substitute($scopeRule);
             if ( $scopeRule = $self->p->HANDLER->buildSub($scopeRule) ) {
                 $compiled_scope_rules->{$scopeName} = $scopeRule;
@@ -214,10 +230,14 @@ sub load_rp {
             or $config{options}->{oidcRPMetaDataOptionsJwks} )
       )
     {
+        $self->logger->debug("Processing JWKS options for RP $rp...");
         my $jwks = $config{options}->{oidcRPMetaDataOptionsJwks};
+        $jwks = $self->decodeJSON($jwks) if $jwks and not ref $jwks;
+
         if ( !$jwks
             and my $url = $config{options}->{oidcRPMetaDataOptionsJwksUri} )
         {
+            $self->logger->debug("Fetching JWKS URL: $url for RP $rp");
             my $resp = $self->ua->get($url);
             if ( $resp->is_success ) {
                 my $content = $self->decodeJSON( $resp->decoded_content );
@@ -237,6 +257,7 @@ sub load_rp {
             }
         }
         if ( $jwks and ref($jwks) eq 'HASH' and $jwks->{keys} ) {
+            $self->logger->debug("Processing JWKS document for RP $rp");
             my %keys;
             my %validKeys;
             foreach my $key ( sort @{ $jwks->{keys} } ) {
@@ -265,7 +286,8 @@ sub load_rp {
                 }
             }
             unless (%validKeys) {
-                $self->logger->error("Unable to find a supported key for $rp");
+                $self->logger->error(
+                    "Unable to find a supported key for RP $rp");
                 $valid = 0;
             }
             else {
@@ -281,6 +303,7 @@ sub load_rp {
         }
     }
     if ($valid) {
+        $self->logger->debug(" -> RP $rp is valid");
 
         # Register RP
         $self->rpOptions->{$rp}    = $config{options};
@@ -289,8 +312,10 @@ sub load_rp {
         $self->rpMacros->{$rp}     = $compiledMacros;
         $self->rpScopeRules->{$rp} = $compiled_scope_rules;
         $self->rpRules->{$rp}      = $rule;
+        $self->rpLevelRules->{$rp} = $levelrule;
     }
     else {
+        $self->logger->debug(" -> RP $rp is NOT valid");
         $self->logger->error(
             "Relying Party $rp has errors and will be ignored");
     }
@@ -318,7 +343,7 @@ sub refreshJWKSdata {
 }
 
 sub refreshJWKSdataForOp {
-    my ( $self, $op ) = @_;
+    my ( $self, $op, $force ) = @_;
 
     $self->logger->debug("Attempting to refresh JWKS data for $op");
 
@@ -330,22 +355,27 @@ sub refreshJWKSdataForOp {
       $self->opOptions->{$op}->{oidcOPMetaDataOptionsJWKSTimeout};
     my $jwksUri = $self->opMetadata->{$op}->{conf}->{jwks_uri};
 
-    unless ($jwksTimeout) {
-        $self->logger->debug(
-            "No JWKS refresh timeout defined for $op, skipping...");
-        return;
-    }
-
     unless ($jwksUri) {
         $self->logger->debug("No JWKS URI defined for $op, skipping...");
         return;
     }
 
-    if ( $self->opMetadata->{$op}->{jwks}->{time}
-        && ( $self->opMetadata->{$op}->{jwks}->{time} + $jwksTimeout > time ) )
-    {
-        $self->logger->debug("JWKS data still valid for $op, skipping...");
-        return;
+    if ( !$force ) {
+        unless ($jwksTimeout) {
+            $self->logger->debug(
+                "No JWKS refresh timeout defined for $op, skipping...");
+            return;
+        }
+
+        if (
+            $self->opMetadata->{$op}->{jwks}->{time}
+            && (
+                $self->opMetadata->{$op}->{jwks}->{time} + $jwksTimeout > time )
+          )
+        {
+            $self->logger->debug("JWKS data still valid for $op, skipping...");
+            return;
+        }
     }
 
     $self->logger->debug("Refresh JWKS data for $op from $jwksUri");
@@ -375,7 +405,8 @@ sub getCallbackUri {
 
     my $callback_get_param = $self->conf->{oidcRPCallbackGetParam};
 
-    my $callback_uri = $self->p->buildUrl( $req->portal, { $callback_get_param => 1 } );
+    my $callback_uri =
+      $self->p->buildUrl( $req->portal, { $callback_get_param => 1 } );
 
     $self->logger->debug("OpenIDConnect Callback URI: $callback_uri");
     return $callback_uri;
@@ -409,14 +440,16 @@ sub buildAuthorizationCodeAuthnRequest {
     my $max_age       = $self->opOptions->{$op}->{oidcOPMetaDataOptionsMaxAge};
     my $ui_locales = $self->opOptions->{$op}->{oidcOPMetaDataOptionsUiLocales};
     my $acr_values = $self->opOptions->{$op}->{oidcOPMetaDataOptionsAcrValues};
+    my $login_hint = $req->data->{suggestedLogin};
 
     my $authorize_request_oauth2_params = {
         response_type => $response_type,
         client_id     => $client_id,
         scope         => $scope,
         redirect_uri  => $redirect_uri,
-        ( defined $state ? ( state => $state ) : () ),
-        ( defined $nonce ? ( nonce => $nonce ) : () ),
+        ( defined $state      ? ( state      => $state )      : () ),
+        ( defined $nonce      ? ( nonce      => $nonce )      : () ),
+        ( defined $login_hint ? ( login_hint => $login_hint ) : () ),
     };
     my $authorize_request_params = {
         %$authorize_request_oauth2_params,
@@ -764,7 +797,9 @@ sub getAccessTokenFromTokenEndpoint {
     }
 
     if ( $response->is_error ) {
-        $self->logger->error( "Bad token response: " . $response->message );
+        $self->logger->error(
+            "Bad token response from $op, grant_type: $grant_type, error: "
+              . $response->message );
         $self->logger->debug( $response->content );
         return 0;
     }
@@ -1119,11 +1154,10 @@ sub newAuthorizationCode {
     return $self->getOpenIDConnectSession(
         undef,
         "authorization_code",
-        $self->rpOptions->{$rp}
+        ttl => $self->rpOptions->{$rp}
           ->{oidcRPMetaDataOptionsAuthorizationCodeExpiration}
           || $self->conf->{oidcServiceAuthorizationCodeExpiration},
-        ,
-        $info
+        info => $info
     );
 }
 
@@ -1161,8 +1195,11 @@ sub newAccessToken {
     my $ttl =
          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
-    my $session =
-      $self->getOpenIDConnectSession( undef, "access_token", $ttl, $at_info, );
+    my $session = $self->getOpenIDConnectSession(
+        undef, "access_token",
+        ttl  => $ttl,
+        info => $at_info,
+    );
 
     if ($session) {
 
@@ -1299,8 +1336,11 @@ sub newRefreshToken {
           || $self->conf->{oidcServiceOfflineSessionExpiration} )
       : $self->conf->{timeout};
 
-    return $self->getOpenIDConnectSession( undef, "refresh_token", $ttl,
-        $info );
+    return $self->getOpenIDConnectSession(
+        undef, "refresh_token",
+        ttl  => $ttl,
+        info => $info
+    );
 }
 
 # Get existing Refresh Token
@@ -1310,7 +1350,7 @@ sub newRefreshToken {
 sub getRefreshToken {
     my ( $self, $id ) = @_;
 
-    return $self->getOpenIDConnectSession( $id, "refresh_token" );
+    return $self->getOpenIDConnectSession( $id, "refresh_token", noCache => 1 );
 }
 
 sub updateRefreshToken {
@@ -1344,24 +1384,38 @@ sub updateToken {
 # If id is set to undef, return a new session
 # @return Lemonldap::NG::Common::Session object
 sub getOpenIDConnectSession {
-    my ( $self, $id, $type, $ttl, $info ) = @_;
+    my $self = shift;
+    my $id   = shift;
+    my $type = shift;
 
-    $ttl ||= $self->conf->{timeout};
+    # Check old method signature ($id, $type, $ttl, $info)
+    my %opts =
+        ( ( $_[0] and $_[0] =~ /^\d+$/ ) or ( $_[1] and ref $_[1] ) )
+      ? ( ttl => $_[0], info => $_[1] )
+      : (@_);
+
+    $opts{ttl} ||= $self->conf->{timeout};
 
     my $oidcSession = Lemonldap::NG::Common::Session->new( {
             $self->_storeOpts(),
-            cacheModule        => $self->conf->{localSessionStorage},
-            cacheModuleOptions => $self->conf->{localSessionStorageOptions},
-            hashStore          => $self->conf->{hashedSessionStore},
-            id                 => $id,
-            kind               => $self->sessionKind,
             (
-                $info
+                $opts{noCache} ? ()
+                : (
+                    cacheModule        => $self->conf->{localSessionStorage},
+                    cacheModuleOptions =>
+                      $self->conf->{localSessionStorageOptions}
+                )
+            ),
+            hashStore => $opts{hashStore} // $self->conf->{hashedSessionStore},
+            id        => $id,
+            kind      => $self->sessionKind,
+            (
+                $opts{info}
                 ? (
                     info => {
                         _type  => $type,
-                        _utime => time + $ttl - $self->conf->{timeout},
-                        %{$info}
+                        _utime => time + $opts{ttl} - $self->conf->{timeout},
+                        %{ $opts{info} }
                     }
                   )
                 : ()
@@ -1398,7 +1452,7 @@ sub getOpenIDConnectSession {
         if (
             time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) )
         {
-            $self->logger->error("Session $id has expired");
+            $self->logger->notice("Session $id has expired");
             return undef;
         }
     }
@@ -1406,7 +1460,7 @@ sub getOpenIDConnectSession {
     # Make sure the token is still valid, we already compensated for
     # different TTLs when storing _utime
     if ( time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) ) {
-        $self->logger->error("Session $id has expired");
+        $self->logger->notice("Session $id has expired");
         return undef;
     }
 
@@ -1497,7 +1551,25 @@ sub decodeJWT {
 
     my $jwks;
     if ($op) {
+
+        # Always refresh JWKS if timeout has elapsed
         $self->refreshJWKSdataForOp($op);
+
+        my $kid = $jwt_header->{kid};
+
+        # If the JWT is signed by an unknown kid, force a refresh
+        if (
+            $kid
+            and !$self->_kid_found_in_jwks(
+                $kid, $self->opMetadata->{$op}->{jwks}
+            )
+          )
+        {
+            $self->logger->debug(
+                "Key ID $kid not found in current JWKS, forcing JWKS refresh");
+            $self->refreshJWKSdataForOp( $op, 1 );
+        }
+
         $jwks = $self->opMetadata->{$op}->{jwks};
     }
     else {
@@ -1510,7 +1582,7 @@ sub decodeJWT {
                 "Cannot verify $alg signature: no JWKS data found");
             return;
         }
-        unless ($jwks->{keys}
+        unless ( $jwks->{keys}
             and ref( $jwks->{keys} ) eq 'ARRAY'
             and @{ $jwks->{keys} } )
         {
@@ -1570,6 +1642,18 @@ sub decodeJWT {
         return;
     }
     return wantarray ? ( $content, $alg ) : $content;
+}
+
+sub _kid_found_in_jwks {
+    my ( $self, $kid, $jwks ) = @_;
+
+    return 0 if !$kid;
+
+    my @keys = $jwks ? @{ $jwks->{keys} // [] } : ();
+
+    my @found = grep { $_->{kid} and $_->{kid} eq $kid } @keys;
+
+    return @found > 0;
 }
 
 ### HERE
@@ -1650,6 +1734,7 @@ sub createHash {
 # @param state OAuth 2.0 state value
 # @param fragment Set to true to return fragment component
 # @return void
+
 sub returnRedirectError {
     my ( $self, $req, $redirect_url, $error, $error_description,
         $error_uri, $state, $fragment )
@@ -1663,6 +1748,7 @@ sub returnRedirectError {
         ( $error_description ? ( reason => $error_description ) : () ),
         oauth_error  => $error,
         portal_error => portalConsts->{PE_REDIRECT},
+        user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
     );
 
     my $urldc =
@@ -1807,6 +1893,8 @@ sub checkEndPointAuthenticationCredentials {
             }
         }
     }
+    $self->p->HANDLER->set_user( $req,
+        $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID} );
     return ( $rp, $method );
 }
 
@@ -1817,12 +1905,12 @@ sub getEndPointAuthenticationCredentials {
     my ( $client_id, $client_secret, $scheme );
 
     my $authorization = $req->authorization;
-    if ( $authorization and $authorization =~ /^Basic (\w+)/i ) {
+    if ( $authorization and $authorization =~ m#^Basic ([[:alnum:]+/=]+)#i ) {
         $scheme = 'client_secret_basic';
         $self->logger->debug("Method client_secret_basic used");
         eval {
             ( $client_id, $client_secret ) =
-              split( /:/, decode_base64($1) );
+              split( ':', decode_base64($1), 2 );
         };
         $self->logger->error("Bad authentication header: $@") if ($@);
 
@@ -2258,6 +2346,7 @@ sub _createJWT {
     my ( $self, $payload, $alg, $partner, $type, $isRp ) = @_;
 
     my @keyArg;
+    my %extra_headers;
 
     # Set Cript::JWT arguments depending on "alg"
     #  a) "none"
@@ -2292,10 +2381,23 @@ sub _createJWT {
         @keyArg = ( key => \$priv_key, );
 
         if ( $self->conf->{oidcServiceKeyIdSig} ) {
-            push @keyArg,
-              extra_headers => { kid => $self->conf->{oidcServiceKeyIdSig} };
+            $extra_headers{kid} = $self->conf->{oidcServiceKeyIdSig};
         }
+        my $key_info =
+          $self->getCertInfo( $self->conf->{oidcServicePublicKeySig} );
+        if ( $key_info->{x5t} ) {
+            $extra_headers{x5t} = $key_info->{x5t};
+        }
+
     }
+    my $noTyp =
+        $isRp
+      ? $self->opOptions->{$partner}->{oidcOPMetaDataOptionsNoJwtHeader}
+      : $self->rpOptions->{$partner}->{oidcRPMetaDataOptionsNoJwtHeader};
+    unless ($noTyp) {
+        $extra_headers{typ} = $type || 'JWT';
+    }
+    push @keyArg, extra_headers => \%extra_headers if %extra_headers;
 
     # Encode payload here due to #2748
     my $jwt = eval {
@@ -2681,7 +2783,8 @@ sub generateNonce {
 
 sub getSidFromSession {
     my ( $self, $rp, $sessionInfo ) = @_;
-    return Digest::SHA::hmac_sha256_base64(
+    return $sessionInfo->{_oidc_sid}
+      || Digest::SHA::hmac_sha256_base64(
         $sessionInfo->{_session_id} . ':' . $rp );
 }
 
@@ -2888,7 +2991,7 @@ Build Logout Request URI
 
 =head2 buildLogoutResponse
 
-Build Logout Response URI 
+Build Logout Response URI
 
 =head2 addRouteFromConf
 

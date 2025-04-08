@@ -3,7 +3,7 @@ package Log::Dispatch::WarnDie;
 # Make sure we have version info for this module
 # Be strict from now on
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 use strict;
 
 # The logging dispatcher that should be used

@@ -22,7 +22,6 @@ meta-spec:
 name: MIDI-RtController
 requires:
   Carp: '0'
-  Future::AsyncAwait: '0'
   IO::Async::Channel: '0'
   IO::Async::Loop: '0'
   IO::Async::Routine: '0'
@@ -35,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController
   repository: https://github.com/ology/MIDI-RtController.git
-version: '0.0602'
+version: '0.0603'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

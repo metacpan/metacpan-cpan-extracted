@@ -4,7 +4,7 @@ use strict;
 use Log::Log4perl;
 use Log::Log4perl::MDC;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.21.0';
 
 our $init = 0;
 
@@ -65,6 +65,24 @@ sub new {
       ? ( $conf->{log4perlUserLogger} || 'LLNG.user' )
       : ( $conf->{log4perlLogger} || 'LLNG' );
     $self->{log} = Log::Log4perl->get_logger($logger);
+
+    no warnings 'redefine';
+    my $show = 1;
+
+    foreach (qw(error warn notice info debug)) {
+        if ($show) {
+            my $name = $_;
+            $name = 'info' if ( $_ eq 'notice' );
+            eval
+              qq'sub $_ {shift->{log}->$name(\@_)}';
+            die $@ if ($@);
+        }
+        else {
+            eval qq'sub $_ {1}';
+        }
+        $show = 0 if ( $conf->{logLevel} eq $_ );
+    }
+    die "Unknown logLevel $conf->{logLevel}" if $show;
     return $self;
 }
 
@@ -76,14 +94,6 @@ sub setRequestObj {
 sub clearRequestObj {
     my ( $self, $req ) = @_;
     my $text = Log::Log4perl::MDC->remove();
-}
-
-sub AUTOLOAD {
-    my $self = shift;
-    no strict;
-    $AUTOLOAD =~ s/.*:://;
-    $AUTOLOAD =~ s/notice/info/;
-    return $self->{log}->$AUTOLOAD(@_);
 }
 
 1;

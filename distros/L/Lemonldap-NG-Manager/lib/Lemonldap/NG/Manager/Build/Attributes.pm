@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -524,6 +524,10 @@ sub attributes {
             default       => 400,
             documentation => 'Display back to top button',
         },
+        floatingCategoryName => {
+            type          => 'text',
+            documentation => 'Name of the category displayed as floating menu',
+        },
         staticPrefix => {
             type          => 'text',
             documentation => 'Prefix of static files for HTML templates',
@@ -542,8 +546,7 @@ sub attributes {
         rememberAuthChoiceForgetAtLogout => {
             type          => 'bool',
             default       => 0,
-            documentation =>
-              'Forget Auth Choice at logout',
+            documentation => 'Forget Auth Choice at logout',
         },
         rememberAuthChoiceRule => {
             type          => 'boolOrExpr',
@@ -994,6 +997,51 @@ sub attributes {
             documentation => 'Log4Perl logger configuration file',
             flags         => 'hmp',
         },
+        lokiUrl => {
+            type          => 'text',
+            documentation => 'Loki API',
+            flags         => 'hmp',
+        },
+        lokiLabel => {
+            type          => 'text',
+            documentation => 'Loki label, default llng',
+            flags         => 'hmp',
+        },
+        lokiInstance => {
+            type          => 'text',
+            documentation => 'Loki instance, default `hostname` output',
+            flags         => 'hmp',
+        },
+        lokiEnv => {
+            type          => 'text',
+            documentation => 'Loki env, default "prod"',
+            flags         => 'hmp',
+        },
+        lokiTenant => {
+            type          => 'text',
+            documentation => 'Loki Tenant',
+            flags         => 'hmp',
+        },
+        lokiTenantHeader => {
+            type          => 'text',
+            documentation => 'Loki Tenant Header name',
+            flags         => 'hmp',
+        },
+        lokiAuthorization => {
+            type          => 'text',
+            documentation => 'Loki Authorization header value',
+            flags         => 'hmp',
+        },
+        lokiService => {
+            type          => 'text',
+            documentation => 'Loki Service (technical context)',
+            flags         => 'hmp',
+        },
+        lokiUserService => {
+            type          => 'text',
+            documentation => 'Loki (userLogger context)',
+            flags         => 'hmp',
+        },
         sentryDsn => {
             type          => 'text',
             documentation => 'Sentry logger DSN',
@@ -1098,6 +1146,10 @@ sub attributes {
             test          => sub { 1 },
             msgFail       => '__badValue__',
             documentation => 'Rules to choose portal skin',
+        },
+        cacheTagSalt => {
+            type          => 'text',
+            documentation => 'Salt value for cache busting tag',
         },
 
         # Security
@@ -1364,8 +1416,9 @@ sub attributes {
         useRedirectAjaxOnUnauthorized => {
             type          => 'bool',
             default       => 1,
-            documentation => 'Redirect Ajax requests to portal for unauthorized (401)',
-            flags         => 'h',
+            documentation =>
+              'Redirect Ajax requests to portal for unauthorized (401)',
+            flags => 'h',
         },
         useRedirectOnError => {
             type          => 'bool',
@@ -1623,6 +1676,11 @@ sub attributes {
             type          => 'text',
             default       => 'allusers',
             documentation => 'Notification string to match all users',
+        },
+        publicNotifications => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable PublicNotification plugin',
         },
         notificationXSLTfile => {
             type          => 'text',
@@ -3026,7 +3084,8 @@ sub attributes {
             documentation => 'CAS exported variables',
         },
         casAppMetaDataOptionsAuthnLevel => {
-            type          => 'intOrNull',
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
             documentation =>
               'Authentication level requires to access to this CAS application',
         },
@@ -3050,9 +3109,18 @@ sub attributes {
             type          => 'text',
             documentation => 'CAS application service',
         },
+        casSrvMetaDataOptionsSamlValidate => {
+            type          => 'bool',
+            documentation => 'use SAML validateion',
+        },
         casAppMetaDataOptionsUserAttribute => {
             type          => 'text',
             documentation => 'CAS User attribute',
+        },
+        casAppMetaDataOptionsAllowProxy => {
+            type          => 'bool',
+            documentation => 'Allow CAS proxy',
+            default       => 1,
         },
         casAppMetaDataMacros => {
             type => 'keyTextContainer',
@@ -3227,6 +3295,7 @@ sub attributes {
         },
         samlAuthnContextMapExtra => {
             type          => 'keyTextContainer',
+            keyTest       => qr/\w/,
             documentation => 'SAML extra authn contexts',
         },
         samlAuthnContextMapPassword => {
@@ -3692,7 +3761,8 @@ sub attributes {
             default => 1,
         },
         samlSPMetaDataOptionsAuthnLevel => {
-            type          => 'intOrNull',
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
             documentation =>
               'Authentication level requires to access to this SP',
         },
@@ -3799,6 +3869,7 @@ sub attributes {
         },
         sfOnlyUpgrade => {
             type          => 'bool',
+            default       => 0,
             help          => 'secondfactor.html',
             documentation => 'Only trigger second factor on session upgrade',
         },
@@ -4676,6 +4747,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'keyTextContainer',
             documentation => 'Custom plugins parameters',
         },
+        disabledPlugins => {
+            type          => 'text',
+            documentation => 'Disabled plugins',
+        },
 
         # OpenID Connect auth params
         oidcAuthnLevel => {
@@ -4760,6 +4835,19 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 'loa-5' => 5,
             },
             documentation => 'OpenID Connect Authentication Context Class Ref',
+        },
+        oidcServiceMetaDataAmrRules => {
+            type    => 'keyTextContainer',
+            keyTest => qr/\w/,
+            test       => sub { return perlExpr(@_) },
+            default => {
+                'pwd' => '$authenticationLevel == 2',
+                'mfa' => '$_2f',
+                'pop' => '$_auth eq "WebAuthn" or $_auth eq "SSL"',
+                'otp' => '$_2f eq "TOTP"',
+            },
+            documentation => 'OpenID Connect AMR rules',
+            help => 'openidconnectservice.html#amrrules',
         },
         oidcServiceHideMetadata => {
             type          => 'bool',
@@ -4942,6 +5030,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             documentation => 'Drop CORS headers from OIDC issuer responses',
         },
+        oidcServiceMetadataTtl => {
+            type          => 'int',
+            documentation => 'OIDC Metadata TTL',
+        },
+        oidcServiceMetaDataDisallowNoneAlg => {
+            type        => 'bool',
+            description => 'Disallow "none" algorithm for signature',
+        },
 
         # OpenID Connect metadata nodes
         oidcOPMetaDataNodes => {
@@ -5035,6 +5131,21 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             default       => 0,
             documentation => 'Use PKCE with this OP',
+        },
+        oidcOPMetaDataOptionsUserinfoSource => {
+            type    => 'select',
+            default => 'userinfo',
+            select  => [
+                { k => 'userinfo',     v => 'Userinfo endpoint' },
+                { k => 'id_token',     v => 'ID Token' },
+                { k => 'access_token', v => 'Access Token' },
+            ],
+            documentation => "Source of userinfo",
+        },
+        oidcOPMetaDataOptionsNoJwtHeader => {
+            type          => 'bool',
+            default       => 0,
+            documentation => "Don't insert typ header",
         },
 
         # OpenID Connect relying parties
@@ -5185,7 +5296,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Invalidate refresh token after use',
         },
         oidcRPMetaDataOptionsAuthnLevel => {
-            type          => 'intOrNull',
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
             documentation =>
               'Authentication level requires to access to this RP',
         },
@@ -5193,6 +5305,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'text',
             test          => sub { return perlExpr(@_) },
             documentation => 'Rule to grant access to this RP',
+        },
+        oidcRPMetaDataOptionsAllowNativeSso => {
+            type          => 'bool',
+            documentation => 'Allow Native SSO for Mobile Apps',
         },
         oidcRPMetaDataMacros => {
             type => 'keyTextContainer',
@@ -5293,10 +5409,16 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation =>
               'List of RP authorized to query for an access_token of this RP',
         },
+        oidcRPMetaDataOptionsNoJwtHeader => {
+            type          => 'bool',
+            default       => 0,
+            documentation => "Don't insert typ header",
+        },
         appAccessHistoryEnabled => {
-            type    => 'bool',
-            default => 0,
-			documentation => 'Shall OIDC/SAML/CAS protected apps access be recorded to session?'
+            type          => 'bool',
+            default       => 0,
+            documentation =>
+'Shall OIDC/SAML/CAS protected apps access be recorded to session?'
         },
     };
 }

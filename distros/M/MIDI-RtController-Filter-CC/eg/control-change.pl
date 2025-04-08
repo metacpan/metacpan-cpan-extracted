@@ -17,14 +17,19 @@ my $control = MIDI::RtController->new(
 
 my $filter = MIDI::RtController::Filter::CC->new(rtc => $control);
 
-# $control->add_filter('breathe', ['all'], $filter->curry::breathe);
+$filter->control(1); # CC#01 = mod-wheel
+# $filter->range_bottom(10);
+# $filter->range_top(100);
+# $filter->range_step(2);
+# $filter->time_step(125_000);
+# $filter->step_up(10);
+# $filter->step_down(2);
 
-# $filter->time_step(500_000);
+$control->add_filter('breathe', ['all'], $filter->curry::breathe);
+
 # $control->add_filter('scatter', ['all'], $filter->curry::scatter);
 
-$filter->step_up(10);
-$filter->step_down(2);
-$control->add_filter('stair_step', ['all'], $filter->curry::stair_step);
+# $control->add_filter('stair_step', ['all'], $filter->curry::stair_step);
 
 $control->run;
 

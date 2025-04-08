@@ -1,8 +1,25 @@
 use strict;
-use Redis;
 use Time::HiRes qw/usleep/;
 
 use constant REDISSERVER => 'localhost:63379';
+
+our $noRedis;
+our $REDIS;
+
+BEGIN {
+    eval 'use Redis::Fast';
+    if ($@) {
+        diag "Redis::Fast not available: $@";
+        $REDIS = 'Redis';
+        eval 'use Redis';
+        if ($@) {
+            $noRedis++;
+        }
+    }
+    else {
+        $REDIS = 'Redis::Fast';
+    }
+}
 
 sub startRedis {
     note "Starting Redis server";
@@ -31,7 +48,7 @@ sub waitForRedis {
     my $waitloop = 0;
     note "Waiting for Redis server to be available";
     while ( $waitloop < 100 ) {
-        my $r = Redis->new(server => REDISSERVER);
+        my $r = $REDIS->new(server => REDISSERVER);
         last if ( $r and $r->set('test','test') );
         $waitloop++;
         usleep 100000;

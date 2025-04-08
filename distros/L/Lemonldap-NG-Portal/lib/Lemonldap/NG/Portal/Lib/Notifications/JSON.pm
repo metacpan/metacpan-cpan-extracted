@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json);
 use POSIX qw(strftime);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 no warnings 'redefine';
 
@@ -242,7 +242,19 @@ sub getNotifBack {
 
             # Get pending notifications and verify that they have been accepted
           LOOP: foreach my $notif (@$json) {
+
+                # Get the reference
                 my $reference = $notif->{reference};
+                $self->logger->debug("Get reference: $reference");
+
+                # Check it in session
+                if ( exists $req->{sessionInfo}->{"notification_$reference"} ) {
+
+                    # The notification was already accepted
+                    $self->logger->debug(
+                        "Notification $reference was already accepted");
+                    next LOOP;
+                }
 
                 # Check date
                 my $date = $notif->{date};
@@ -357,6 +369,9 @@ sub toForm {
             $_->{check} =
               [ map { $j++; { id => '1x' . $i . 'x' . $j, value => $_ } }
                   @{ $_->{check} } ];
+        }
+        if ( $_->{text} ) {
+            $_->{text} =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
         }
         $_->{id} = "1x$i";
         $_;

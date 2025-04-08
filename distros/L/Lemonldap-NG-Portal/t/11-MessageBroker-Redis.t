@@ -1,24 +1,17 @@
 use strict;
 use Test::More;
 use IO::String;
+use Lemonldap::NG::Common::Session;
 use Time::Fake;
-
-our $noRedis;
 
 BEGIN {
     require 't/test-lib.pm';
-    eval 'use Redis';
-    if ($@) {
-        $noRedis++;
-    }
-    else {
-        require 't/redis/redis.pm';
-    }
 }
 
 SKIP: {
     skip( "LLNGTESTREDIS isn't set", 1 ) unless $ENV{LLNGTESTREDIS};
-    skip( 'Redis is missing',        1 ) if $noRedis;
+    require 't/redis/redis.pm';
+    skip( 'Redis is missing', 1 ) if $main::noRedis;
     &startRedis;
     my $client = LLNG::Manager::Test->new( {
             ini => {
@@ -48,7 +41,8 @@ SKIP: {
         my $id = $client->login('dwho');
         ok(
             unlink(
-                $client->ini->{globalStorageOptions}->{Directory} . "/$id"
+                $client->ini->{globalStorageOptions}->{Directory} . '/'
+                  . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id )
             ),
             'Delete session from global storage'
         );
@@ -70,7 +64,8 @@ SKIP: {
         my $id2 = $client->login('french');
         ok(
             unlink(
-                $client->ini->{globalStorageOptions}->{Directory} . "/$id"
+                $client->ini->{globalStorageOptions}->{Directory} . '/'
+                  . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id )
             ),
             'Delete session from global storage'
         );
@@ -86,7 +81,8 @@ SKIP: {
         expectReject($res);
         ok(
             unlink(
-                $client->ini->{globalStorageOptions}->{Directory} . "/$id2"
+                $client->ini->{globalStorageOptions}->{Directory} . '/'
+                  . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id2) : $id2 )
             ),
             'Delete session from global storage'
         );
@@ -97,6 +93,34 @@ SKIP: {
         );
         expectOK($res);
     };
+
+    # Test to verify that subscribe channels are kept after Redis restart
+    # from pub/sub
+    subtest "Reconnect after Redis crash" => sub {
+        my $id = $client->login('dwho');
+        &stopRedis;
+        &startRedis;
+        my $res;
+        Time::Fake->offset('+24s');
+        ok( $res = $client->_get( '/', cookie => "lemonldap=$id" ),
+            'Reinit Redis connection' );
+        expectAuthenticatedAs( $res, 'dwho' );
+        ok(
+            unlink(
+                $client->ini->{globalStorageOptions}->{Directory} . '/'
+                  . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id )
+            ),
+            'Delete session from global storage'
+        );
+        my $sd = $client->ini->{globalStorageOptions}->{Directory};
+        note "Push unlog event";
+        $pub->publish( 'llng_events', { action => 'unlog', id => $id } );
+        Time::Fake->offset('+30s');
+        ok( $res = $client->_get( '/', cookie => "lemonldap=$id" ),
+            'Try / after 6 seconds' );
+        expectReject($res);
+    };
+
 }
 
 eval { &stopRedis };

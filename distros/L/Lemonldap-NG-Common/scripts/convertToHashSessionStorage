@@ -9,7 +9,7 @@ use Lemonldap::NG::Common;
 use Pod::Usage;
 
 my %opts;
-my $result = GetOptions( \%opts, 'help|h', 'version|v' );
+my $result = GetOptions( \%opts, 'help|h', 'version|v', 'keep|k' );
 
 if ( $opts{version} ) {
     print "$Lemonldap::NG::Common::VERSION\n";
@@ -19,45 +19,54 @@ pod2usage(0) if $opts{help};
 
 my @storages = map { s/SSO/global/; lc($_) } hashedKinds;
 
-my $confAcc = Lemonldap::NG::Common::Conf->new( {} ) or die $Lemonldap::NG::Common::Conf::msg;
+# Get config
+my $res = Lemonldap::NG::Common::Conf->new();
+die $Lemonldap::NG::Common::Conf::msg unless ($res);
+my $conf = $res->getConf();
 
-my $cfgNum = $confAcc->lastCfg
-  or die 'No configuration found:' . $Lemonldap::NG::Common::Conf::msg;
+my $localconf = $res->getLocalConf()
+  or die "Unable to get local configuration ($!)";
 
-my $conf = $confAcc->getConf({cfgNum => $cfgNum});
+$conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
 
 my %done;
 foreach my $kind (hashedKinds) {
-    my $type = shift @storages;
-    my $moduleOptions = $conf->{"${type}StorageOptions"} // $conf->{globalStorageOptions};
-    $moduleOptions->{backend} = $conf->{"${type}Storage"} // $conf->{globalStorage};
-    my $sessions = Lemonldap::NG::Common::Apache::Session->searchOn($moduleOptions, '_session_kind', $kind);
+    my $type          = shift @storages;
+    my $moduleOptions = $conf->{"${type}StorageOptions"}
+      // $conf->{globalStorageOptions};
+    $moduleOptions->{backend} = $conf->{"${type}Storage"}
+      // $conf->{globalStorage};
+    my $sessions =
+      Lemonldap::NG::Common::Apache::Session->searchOn( $moduleOptions,
+        '_session_kind', $kind );
     my $found = 0;
     foreach my $oldId ( keys %$sessions ) {
-        my $oldSession = Lemonldap::NG::Common::Session->new({
-            hashStore => 0,
-            id => $oldId,
-            storageModule => $moduleOptions->{backend},
-            storageModuleOptions => $moduleOptions,
-            kind => $kind,
-        });
+        my $oldSession = Lemonldap::NG::Common::Session->new( {
+                hashStore            => 0,
+                id                   => $oldId,
+                storageModule        => $moduleOptions->{backend},
+                storageModuleOptions => $moduleOptions,
+                kind                 => $kind,
+            }
+        );
         next unless $oldSession;
         next if $oldSession->data->{_session_hashed};
         my $info = $oldSession->data;
         $info->{_session_hashed} = JSON::true;
         delete $info->{_session_id};
-        my $newSession = Lemonldap::NG::Common::Session->new({
-            hashStore => 1,
-            id => $oldId,
-            storageModule => $moduleOptions->{backend},
-            storageModuleOptions => $moduleOptions,
-            kind => $kind,
-            info => $info,
-            force => 1,
-        });
+        my $newSession = Lemonldap::NG::Common::Session->new( {
+                hashStore            => 1,
+                id                   => $oldId,
+                storageModule        => $moduleOptions->{backend},
+                storageModuleOptions => $moduleOptions,
+                kind                 => $kind,
+                info                 => $info,
+                force                => 1,
+            }
+        );
         $found++;
 
-        $oldSession->remove;
+        $oldSession->remove unless $opts{keep};
     }
     print "$found $kind session(s) converted\n";
 }
@@ -83,6 +92,14 @@ migrates from standard session storage to hashed session storage>.
 B<Do not use it a second time>.
 
 convertToHashSessionStorage converts all unhashed sessions into hashed session.
+
+=head1 OPTIONS
+
+=over
+
+=item * B<--keep> duplicate sessions I<(keep old ones unhashed)>
+
+=back
 
 =head1 SEE ALSO
 

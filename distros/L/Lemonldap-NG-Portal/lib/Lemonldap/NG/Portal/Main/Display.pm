@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -134,6 +134,7 @@ sub display {
         $skinfile       = 'notification';
         %templateParams = (
             $self->getErrorTplParams($req),
+            FORM_ACTION   => $self->relativeUrl( $req, 'notifback' ),
             NOTIFICATION  => $notif,
             HIDDEN_INPUTS => $self->buildHiddenForm($req),
             AUTH_URL      => $req->{data}->{_url},
@@ -158,20 +159,24 @@ sub display {
             MSG           => $req->info,
             HIDDEN_INPUTS => $self->buildHiddenForm($req),
             ACTIVE_TIMER  => $req->data->{activeTimer},
-            FORM_ACTION   => $req->data->{confirmFormAction} || "#",
-            FORM_METHOD   => $self->conf->{confirmFormMethod},
-            CHOICE_PARAM  => $self->conf->{authChoiceParam},
-            CHOICE_VALUE  => $req->data->{_authChoice},
-            CHECK_LOGINS  => $self->conf->{portalCheckLogins}
+            FORM_ACTION   => $req->data->{confirmFormAction}
+              || "#",
+            FORM_METHOD  => $self->conf->{confirmFormMethod},
+            CHOICE_PARAM => $self->conf->{authChoiceParam},
+            CHOICE_VALUE => $req->data->{_authChoice},
+            CHECK_LOGINS => $self->conf->{portalCheckLogins}
               && $req->data->{login},
-            ASK_LOGINS        => $req->param('checkLogins')   || 0,
-            ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
-            CONFIRMKEY        => $self->stamp(),
+            ASK_LOGINS => $req->param('checkLogins')
+              || 0,
+            ASK_STAYCONNECTED => $req->param('stayconnected')
+              || 0,
+            CONFIRMKEY => $self->stamp(),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
                 : ()
             ),
+
         );
     }
 
@@ -193,7 +198,8 @@ sub display {
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
             CONFIRMKEY        => $self->stamp(),
-            LIST => $req->data->{list} || [],
+            LIST              => $req->data->{list} || [],
+            LOGIN_HINT        => $req->data->{suggestedLogin},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -411,7 +417,7 @@ sub display {
     # 3 Authentication has been refused OR first access
     else {
         $skinfile = 'login';
-        my $login = $req->user;
+        my $login = $req->user || $req->data->{suggestedLogin};
         %templateParams = (
             $self->getErrorTplParams($req),
             AUTH_URL              => $req->{data}->{_url},
@@ -579,7 +585,6 @@ sub display {
                     AUTH_LOOP            => $authLoop,
                     CHOICE_PARAM         => $self->conf->{authChoiceParam},
                     CHOICE_VALUE         => $req->data->{_authChoice},
-                    DISPLAY_TAB          => scalar( $req->param("tab") ),
                     DISPLAY_FORM         => 0,
                     DISPLAY_OPENID_FORM  => 0,
                     DISPLAY_YUBIKEY_FORM => 0,

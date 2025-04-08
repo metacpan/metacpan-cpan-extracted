@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -119,7 +119,9 @@ sub parse_xml ($list, $map) {
 
         # apply substitution only on variable names (FooBar=). The regexp must test
         # for capital letter and C<..> to avoid breaking URL parameters
-        $desc =~ s/C<([A-Z]\w+)=>/C<$1>/g;
+        # But C<Foo>=C<bar> must be kept, hence the 2 regexps with negative and positive lookahead
+        $desc =~ s/C<([A-Z]\w+)=>(?!C<)/C<$1>/g;
+        $desc =~ s/C<([A-Z]\w+)=>(?=C<)/C<$1>=/g;
 
         # detect verbatim parts setup with programlisting tag
         $desc =~ s/^\+-\+/    /gm;
@@ -239,7 +241,7 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
     $desc =~ s/[\s\n]+/ /g;
 
     my $value_type
-        = $desc =~ /Takes a boolean argument or/ ? 'enum'
+        = $desc =~ /Takes a boolean (argument\s)?or/ ? 'enum'
         : $desc =~ /Takes an? (boolean|integer)/ ? $1
         : $desc =~ /Takes time \(in seconds\)/   ? 'integer'
         : $desc =~ /allowed range/i              ? 'integer'
@@ -291,8 +293,8 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
         elsif ($extra_info =~ /\w\|\w/) {
             @choices = split /\|/, $extra_info ;
         }
-        elsif ($desc =~ /Takes a boolean argument or /) {
-            my ($choices) = ($desc =~ /Takes a boolean argument or (?:the )?(?:special values|architecture identifiers\s*)?([^.]+?)\./);
+        elsif ($desc =~ /Takes a boolean (argument )?or /) {
+            my ($choices) = ($desc =~ /Takes a boolean (?:argument )?or (?:the )?(?:special values|architecture identifiers\s*)?([^.]+?)\./);
             @choices = ('no','yes');
             push @choices, extract_choices($choices);
             push @load, qw/replace:false=no replace:true=yes replace:0=no replace:1=yes/;

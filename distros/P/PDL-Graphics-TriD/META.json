@@ -4,7 +4,7 @@
       "PerlDL Developers <pdl-general@lists.sourceforge.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,15 +28,13 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "OpenGL" : "0.70",
-            "OpenGL::GLUT" : "0.72",
+            "OpenGL" : "0.7004",
             "PDL" : "2.096"
          }
       },
       "runtime" : {
          "requires" : {
-            "OpenGL" : "0.70",
-            "OpenGL::GLUT" : "0.72",
+            "OpenGL" : "0.7004",
             "PDL" : "2.096"
          }
       },
@@ -59,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.100",
+   "version" : "2.101",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

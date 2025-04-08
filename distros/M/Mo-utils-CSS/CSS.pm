@@ -19,7 +19,7 @@ Readonly::Array our @BORDER_WIDTHS => qw(thin medium thick);
 Readonly::Array our @RELATIVE_LENGTHS => qw(em ex ch rem vw vh vmin vmax %);
 Readonly::Array our @COLOR_FUNC => qw(rgb rgba hsl hsla);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub check_array_css_color {
 	my ($self, $key) = @_;
@@ -117,9 +117,8 @@ sub check_css_unit {
 }
 
 sub _check_alpha {
-	my ($value, $key, $args_ar, $func, $error_value) = @_;
+	my ($alpha, $key, $func, $error_value) = @_;
 
-	my $alpha = $args_ar->[3];
 	if ($alpha !~ m/^[\d\.]+$/ms || $alpha > 1) {
 		err "Parameter '$key' has bad $func alpha.",
 			'Value', $error_value,
@@ -176,32 +175,33 @@ sub _check_color {
 					'Value', $error_value,
 				;
 			}
-			_check_colors($value, $key, \@args, $func, $error_value);
+			_check_colors([@args[0 .. 2]], $key, $func, $error_value);
 		} elsif ($func eq 'rgba') {
 			if (@args != 4) {
 				err "Parameter '$key' has bad rgba color (bad number of arguments).",
 					'Value', $error_value,
 				;
 			}
-			_check_colors($value, $key, \@args, $func, $error_value);
-			_check_alpha($value, $key, \@args, $func, $error_value);
+			_check_colors([@args[0 .. 2]], $key, $func, $error_value);
+			_check_alpha($args[3], $key, $func, $error_value);
 		} elsif ($func eq 'hsl') {
 			if (@args != 3) {
 				err "Parameter '$key' has bad hsl color (bad number of arguments).",
 					'Value', $error_value,
 				;
 			}
-			_check_degree($value, $key, \@args, $func, $error_value);
-			_check_percent($value, $key, \@args, $func, $error_value);
+			_check_degree($args[0], $key, $func, $error_value);
+			_check_percent([@args[1 .. 2]], $key, $func, $error_value);
+		# hsla
 		} else {
 			if (@args != 4) {
 				err "Parameter '$key' has bad hsla color (bad number of arguments).",
 					'Value', $error_value,
 				;
 			}
-			_check_degree($value, $key, \@args, $func, $error_value);
-			_check_percent($value, $key, \@args, $func, $error_value);
-			_check_alpha($value, $key, \@args, $func, $error_value);
+			_check_degree($args[0], $key, $func, $error_value);
+			_check_percent([@args[1 .. 2]], $key, $func, $error_value);
+			_check_alpha($args[3], $key, $func, $error_value);
 		}
 	} else {
 		if (none { $value eq $_ } keys %{Graphics::ColorNames::CSS->NamesRgbTable}) {
@@ -215,9 +215,9 @@ sub _check_color {
 }
 
 sub _check_colors {
-	my ($value, $key, $args_ar, $func, $error_value) = @_;
+	my ($value_ar, $key, $func, $error_value) = @_;
 
-	foreach my $i (@{$args_ar}[0 .. 2]) {
+	foreach my $i (@{$value_ar}) {
 		if ($i !~ m/^\d+$/ms || $i > 255) {
 			err "Parameter '$key' has bad $func color (bad number).",
 				'Value', $error_value,
@@ -229,9 +229,8 @@ sub _check_colors {
 }
 
 sub _check_degree {
-	my ($value, $key, $args_ar, $func, $error_value) = @_;
+	my ($angle, $key, $func, $error_value) = @_;
 
-	my $angle = $args_ar->[0];
 	if ($angle !~ m/^\d+$/ms || $angle > 360) {
 		err "Parameter '$key' has bad $func degree.",
 			'Value', $error_value,
@@ -252,9 +251,9 @@ sub _check_key {
 }
 
 sub _check_percent {
-	my ($value, $key, $args_ar, $func, $error_value) = @_;
+	my ($value_ar, $key, $func, $error_value) = @_;
 
-	foreach my $i (@{$args_ar}[1 .. 2]) {
+	foreach my $i (@{$value_ar}) {
 
 		# Check percent sign.
 		if ($i =~ m/^(\d+)(\%)?$/ms) {
@@ -409,9 +408,37 @@ Returns undef.
  check_array_css_color():
          Parameter '%s' has bad color name.
                  Value: %s
+         Parameter '%s' has bad hsl color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsl degree.
+                 Value: %s
+         Parameter '%s' has bad hsl percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsl percent.
+                 Value: %s
+         Parameter '%s' has bad hsla alpha.
+                 Value: %s
+         Parameter '%s' has bad hsla color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsla degree.
+                 Value: %s
+         Parameter '%s' has bad hsla percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsla percent.
+                 Value: %s
          Parameter '%s' has bad rgb color (bad hex number).
                  Value: %s
          Parameter '%s' has bad rgb color (bad length).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad rgba alpha.
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number of arguments).
                  Value: %s
          Parameter '%s' must be a array.
                  Value: %s
@@ -425,11 +452,39 @@ Returns undef.
                  Value: %s
          Parameter '%s' doesn't contain unit number.
                  Value: %s
+         Parameter '%s' has bad color name.
+                 Value: %s
+         Parameter '%s' has bad hsl color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsl degree.
+                 Value: %s
+         Parameter '%s' has bad hsl percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsl percent.
+                 Value: %s
+         Parameter '%s' has bad hsla alpha.
+                 Value: %s
+         Parameter '%s' has bad hsla color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsla degree.
+                 Value: %s
+         Parameter '%s' has bad hsla percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsla percent.
+                 Value: %s
          Parameter '%s' has bad rgb color (bad hex number).
                  Value: %s
          Parameter '%s' has bad rgb color (bad length).
                  Value: %s
-         Parameter '%s' has bad color name.
+         Parameter '%s' has bad rgb color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad rgba alpha.
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number of arguments).
                  Value: %s
          Parameter '%s' hasn't border style.
                  Value: %s
@@ -446,9 +501,37 @@ Returns undef.
  check_css_color():
          Parameter '%s' has bad color name.
                  Value: %s
+         Parameter '%s' has bad hsl color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsl degree.
+                 Value: %s
+         Parameter '%s' has bad hsl percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsl percent.
+                 Value: %s
+         Parameter '%s' has bad hsla alpha.
+                 Value: %s
+         Parameter '%s' has bad hsla color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad hsla degree.
+                 Value: %s
+         Parameter '%s' has bad hsla percent (missing %).
+                 Value: %s
+         Parameter '%s' has bad hsla percent.
+                 Value: %s
          Parameter '%s' has bad rgb color (bad hex number).
                  Value: %s
          Parameter '%s' has bad rgb color (bad length).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad number of arguments).
+                 Value: %s
+         Parameter '%s' has bad rgba alpha.
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number).
+                 Value: %s
+         Parameter '%s' has bad rgba color (bad number of arguments).
                  Value: %s
 
  check_css_unit():
@@ -723,12 +806,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

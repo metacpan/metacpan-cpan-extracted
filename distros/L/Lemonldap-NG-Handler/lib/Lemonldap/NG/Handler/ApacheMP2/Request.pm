@@ -6,7 +6,7 @@ use Plack::Util;
 use URI;
 use URI::Escape;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 # Build Plack::Request (inspired from Plack::Handler::Apache2)
 sub new {

@@ -93,7 +93,7 @@ SKIP: {
         ),
         'Ask to renew'
     );
-    like( $res->[2]->[0], qr/script.*kerberos.js/, "Found Kerberos JS" );
+    like( $res->[2]->[0], qr/script.*kerberos\.min\.js/, "Found Kerberos JS" );
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
     ( $host, $tmp, $query ) =
@@ -181,8 +181,7 @@ count($maintests);
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => $debug,
                 domain                   => 'idp.com',
@@ -235,8 +234,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

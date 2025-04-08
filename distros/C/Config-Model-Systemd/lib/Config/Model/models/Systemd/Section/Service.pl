@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -68,7 +68,7 @@ has finished. One of C<simple>, C<exec>, C<forking>,
 C<oneshot>, C<dbus>, C<notify>,
 C<notify-reload>, or C<idle>:
 
-It is recommended to use C<Type>C<exec> for long-running
+It is recommended to use C<Type>=C<exec> for long-running
 services, as it ensures that process setup errors (e.g. errors such as a missing service
 executable, or missing user) are properly tracked. However, as this service type won't propagate
 the failures in the service's own startup code (as opposed to failures in the preparatory steps the
@@ -103,8 +103,8 @@ for such service execution setup operations to complete before proceeding.",
         'description' => 'Specifies when the manager should consider the service to be finished. One of C<main> or
 C<cgroup>:
 
-It is generally recommended to use C<ExitType>C<main> when a service has
-a known forking model and a main process can reliably be determined. C<ExitType>C<cgroup> is meant for applications
+It is generally recommended to use C<ExitType>=C<main> when a service has
+a known forking model and a main process can reliably be determined. C<ExitType>=C<cgroup> is meant for applications
 whose forking model is not known ahead of time and which
 might not have a specific main process. It is well suited for transient or automatically generated services,
 such as graphical applications inside of a desktop environment.',
@@ -178,27 +178,23 @@ this.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Commands that are executed when this service is started. The value is split into zero
-or more command lines according to the rules described in the section "Command Lines" below.
+        'description' => 'Commands that are executed when this service is started.
 
-Unless C<Type> is C<oneshot>, exactly one command must be given. When
-C<Type=oneshot> is used, zero or more commands may be specified. Commands may be specified by
-providing multiple command lines in the same directive, or alternatively, this directive may be specified more
-than once with the same effect. If the empty string is assigned to this option, the list of commands to start
-is reset, prior assignments of this option will have no effect. If no C<ExecStart> is
-specified, then the service must have C<RemainAfterExit=yes> and at least one
-C<ExecStop> line set. (Services lacking both C<ExecStart> and
-C<ExecStop> are not valid.)
+Unless C<Type> is C<oneshot>, exactly one command must be
+given. When C<Type=oneshot> is used, this setting may be used multiple times to
+define multiple commands to execute. If the empty string is assigned to this option, the list of
+commands to start is reset, prior assignments of this option will have no effect. If no
+C<ExecStart> is specified, then the service must have
+C<RemainAfterExit=yes> and at least one C<ExecStop> line
+set. (Services lacking both C<ExecStart> and C<ExecStop> are not
+valid.)
 
-If more than one command is specified, the commands are
-invoked sequentially in the order they appear in the unit
-file. If one of the commands fails (and is not prefixed with
-C<->), other lines are not executed, and the
-unit is considered failed.
+If more than one command is configured, the commands are invoked sequentially in the order they
+appear in the unit file. If one of the commands fails (and is not prefixed with
+C<->), other lines are not executed, and the unit is considered failed.
 
-Unless C<Type=forking> is set, the
-process started via this command line will be considered the
-main process of the daemon.',
+Unless C<Type=forking> is set, the process started via this command line will
+be considered the main process of the daemon.',
         'type' => 'list'
       },
       'ExecStartPre',
@@ -207,12 +203,10 @@ main process of the daemon.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Additional commands that are executed before
-or after the command in C<ExecStart>,
-respectively. Syntax is the same as for
-C<ExecStart>, except that multiple command
-lines are allowed and the commands are executed one after the
-other, serially.
+        'description' => 'Additional commands that are executed before or after the command in
+C<ExecStart>, respectively. Syntax is the same as for C<ExecStart>.
+Multiple command lines are allowed, regardless of the service type (i.e. C<Type>),
+and the commands are executed one after the other, serially.
 
 If any of those commands (not prefixed with
 C<->) fail, the rest are not executed and the
@@ -251,12 +245,10 @@ C<Before>/C<After> ordering constraints.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Additional commands that are executed before
-or after the command in C<ExecStart>,
-respectively. Syntax is the same as for
-C<ExecStart>, except that multiple command
-lines are allowed and the commands are executed one after the
-other, serially.
+        'description' => 'Additional commands that are executed before or after the command in
+C<ExecStart>, respectively. Syntax is the same as for C<ExecStart>.
+Multiple command lines are allowed, regardless of the service type (i.e. C<Type>),
+and the commands are executed one after the other, serially.
 
 If any of those commands (not prefixed with
 C<->) fail, the rest are not executed and the
@@ -295,8 +287,9 @@ C<Before>/C<After> ordering constraints.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Optional commands that are executed before the commands in C<ExecStartPre>.
-Syntax is the same as for C<ExecStart>, except that multiple command lines are allowed and the
+        'description' => 'Optional commands that are executed before the commands in
+C<ExecStartPre>. Syntax is the same as for C<ExecStart>. Multiple
+command lines are allowed, regardless of the service type (i.e. C<Type>), and the
 commands are executed one after the other, serially.
 
 The behavior is like an C<ExecStartPre> and condition check hybrid: when an
@@ -332,7 +325,7 @@ set to the main process of the daemon, and may be used for command lines like th
 Note however that reloading a daemon by enqueuing a signal (as with the example line above) is
 usually not a good choice, because this is an asynchronous operation and hence not suitable when
 ordering reloads of multiple services against each other. It is thus strongly recommended to either
-use C<Type>C<notify-reload> in place of
+use C<Type>=C<notify-reload> in place of
 C<ExecReload>, or to set C<ExecReload> to a command that not only
 triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For
 example, L<dbus-broker(1)>
@@ -402,11 +395,11 @@ is optional. Specifier and environment variable substitution is supported. Note 
 C<ExecStop> \x{2013} commands specified with this setting are invoked when a service failed to start
 up correctly and is shut down again.
 
-It is recommended to use this setting for clean-up operations that shall be executed even when the
-service failed to start up correctly. Commands configured with this setting need to be able to operate even if
-the service failed starting up half-way and left incompletely initialized data around. As the service's
-processes have been terminated already when the commands specified with this setting are executed they should
-not attempt to communicate with them.
+It is recommended to use this setting for clean-up operations that shall be executed even when
+the service failed to start up correctly. Commands configured with this setting need to be able to
+operate even if the service failed starting up half-way and left incompletely initialized data
+around. As the service's processes have likely exited already when the commands specified with this
+setting are executed they should not attempt to communicate with them.
 
 Note that all commands that are configured with this setting are invoked with the result code of the
 service, as well as the main process' exit code and status, set in the C<\$SERVICE_RESULT>,
@@ -729,15 +722,20 @@ C<on-abnormal> is an alternative choice.',
       'RestartMode',
       {
         'description' => 'Takes a string value that specifies how a service should restart:
-If set to C<normal> (the default), the service restarts by
-going through a failed/inactive state.If set to C<direct>, the service transitions to the activating
+If set to C<normal> (the default), the service restarts by going through
+a failed/inactive state.If set to C<direct>, the service transitions to the activating
 state directly during auto-restart, skipping failed/inactive state.
-C<ExecStopPost> is invoked.
-C<OnSuccess> and C<OnFailure> are skipped.
-
-This option is useful in cases where a dependency can fail temporarily
-but we don\'t want these temporary failures to make the dependent units fail.
-When this option is set to C<direct>, dependent units are not notified of these temporary failures.',
+C<ExecStopPost> is still invoked.
+C<OnSuccess> and C<OnFailure> are skipped.This option is useful in cases where a dependency can fail temporarily but we
+don\'t
+want these temporary failures to make the dependent units fail. Dependent units are not
+notified of these temporary failures.If set to C<debug>, the service manager will log messages that are
+related to this unit at debug level while automated restarts are attempted, until either the
+service hits the rate limit or it succeeds, and the C<$DEBUG_INVOCATION=1>
+environment variable will be set for the unit. This is useful to be able to get additional
+information when a service fails to start, without needing to proactively or permanently
+enable debug level logging in systemd, which is very verbose. This is otherwise equivalent
+to C<normal> mode.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -881,7 +879,7 @@ forked off the process, i.e. on all processes that match C<main> or
 C<exec>. Conversely, if an auxiliary process of the unit sends an
 sd_notify() message and immediately exits, the service manager might not be able to
 properly attribute the message to the unit, and thus will ignore it, even if
-C<NotifyAccess>C<all> is set for it.
+C<NotifyAccess>=C<all> is set for it.
 
 Hence, to eliminate all race conditions involving lookup of the client\'s unit and attribution of notifications
 to units correctly, sd_notify_barrier() may be used. This call acts as a synchronization point
@@ -1079,7 +1077,7 @@ If the empty string is assigned, the entire list of open files defined prior to 
       {
         'description' => 'Configures the UNIX process signal to send to the service\'s main process when asked
 to reload the service\'s configuration. Defaults to C<SIGHUP>. This option has no
-effect unless C<Type>C<notify-reload> is used, see
+effect unless C<Type>=C<notify-reload> is used, see
 above.',
         'type' => 'leaf',
         'value_type' => 'uniline'

@@ -1,0 +1,185 @@
+=head1 NAME
+
+Router::Ragel - A high-performance URL router using the Ragel finite state machine
+
+=head1 SYNOPSIS
+
+    use Router::Ragel;
+
+    # Create a new router
+    my $router = Router::Ragel->new;
+
+    # Add routes
+    $router->add('/users', { controller => 'users', action => 'index' });
+    $router->add('/users/:id', { controller => 'users', action => 'show' });
+    $router->add('/blog/:year/:month/:slug', { controller => 'blog', action => 'post' });
+
+    # Compile the routes (must be done before matching)
+    $router->compile;
+
+    # Match a path
+    my ($route_data, @captures) = $router->match('/users/42');
+    # $route_data = { controller => 'users', action => 'show' }
+    # @captures = ('42')
+
+    my ($blog_data, @blog_captures) = $router->match('/blog/2023/04/perl-routing');
+    # $blog_data = { controller => 'blog', action => 'post' }
+    # @blog_captures = ('2023', '04', 'perl-routing')
+
+    # Non-matching path returns empty list
+    my @no_match = $router->match('/nonexistent');
+    # @no_match = ()
+
+=head1 DESCRIPTION
+
+Router::Ragel is a fast URI path router for Perl applications that uses the Ragel state machine compiler to generate efficient C code for route matching. This approach offers significant performance advantages over regex-based routers, especially for applications with many routes or high request volumes.
+
+The router supports:
+
+=over 4
+
+=item * Static routes (C</users>, C</products>)
+
+=item * Dynamic routes with named placeholders (C</users/:id>, C</blog/:year/:month/:day>)
+
+=item * Multiple independent router instances
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+    my $router = Router::Ragel->new;
+
+Creates a new router instance.
+
+=head2 add($pattern, $data)
+
+    $router->add('/users', { controller => 'users', action => 'index' });
+    $router->add('/users/:id', { controller => 'users', action => 'show' });
+    $router->add('/api', $whatever);
+
+Adds a route to the router. The C<$pattern> parameter defines the URL pattern to match, and C<$data> is the data to be returned when the pattern matches.
+
+Patterns can include named placeholders that start with a colon, like C<:id> or C<:slug>. These placeholders will capture the corresponding segments from the URL path.
+
+=head2 compile
+
+    $router->compile;
+
+Compiles the routes into a Ragel state machine. This method must be called after adding all routes and before attempting to match any paths.
+
+=head2 match($path)
+
+    my ($route_data, @captures) = $router->match('/users/42');
+
+Matches a path against the compiled routes. Returns the route data and any captured values from placeholders.
+
+If the path doesn't match any route, an empty list is returned.
+
+=head1 ROUTE PATTERNS
+
+Route patterns are strings that define the URL paths to match. They can include:
+
+=over 4
+
+=item * Static segments: C</users>, C</products>
+
+=item * Named placeholders: C<:id>, C<:slug>, C<:year>
+
+=back
+
+Named placeholders start with a colon (C<:>) and match any characters except for a forward slash (C</>). The values captured by these placeholders are returned as additional values from the C<match> method.
+
+Examples:
+
+    '/users'                  # Matches only '/users'
+    '/users/:id'              # Matches '/users/42', '/users/john', etc.
+    '/blog/:year/:month/:day' # Matches '/blog/2023/04/15', etc.
+
+=head1 MULTIPLE ROUTERS
+
+You can create multiple independent router instances:
+
+    my $api_router = Router::Ragel->new;
+    $api_router->add('/api/users', 'api_users_handler');
+
+    my $admin_router = Router::Ragel->new;
+    $admin_router->add('/admin/users', 'admin_users_handler');
+
+    $api_router->compile;
+    $admin_router->compile;
+
+=head1 PERFORMANCE
+
+Router::Ragel is designed for high performance. According to benchmarks, it outperforms other popular Perl routing libraries:
+
+    Benchmark comparing Router::XS (XS), Router::R3 (R3), URI::Router (UR), and Router::Ragel (Ragel):
+
+                       Rate R3(method) R3(fun) XS(fun) UR(method) UR(fun) Ragel(method) Ragel(fun)
+    R3(method)     265481/s         --     -4%    -57%       -58%    -63%          -70%       -77%
+    R3(fun)        276801/s         4%      --    -55%       -56%    -61%          -68%       -76%
+    XS(fun)        613304/s       131%    122%      --        -2%    -14%          -30%       -47%
+    UR(method)     625570/s       136%    126%      2%         --    -12%          -29%       -45%
+    UR(fun)        710874/s       168%    157%     16%        14%      --          -19%       -38%
+    Ragel(method)  877196/s       230%    217%     43%        40%     23%            --       -24%
+    Ragel(fun)    1146879/s       332%    314%     87%        83%     61%           31%         --
+
+ref: ex/bench.pl
+
+=head1 HOW IT WORKS
+
+Router::Ragel uses the Ragel state machine compiler to generate efficient C code for route matching. The workflow is:
+
+=over 4
+
+=item 1. Create a new router instance
+
+=item 2. Add routes with patterns and associated data
+
+=item 3. Compile the routes, which generates a Ragel state machine in C
+
+=item 4. Match incoming paths against the compiled state machine
+
+=back
+
+The compiled state machine is highly optimized for path matching and can handle a large number of routes with minimal overhead.
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Router::Ragel assumes input as byte strings
+
+=item * The C<compile> method must be called after adding all routes and before matching
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Router::R3>
+
+=item * L<Router::XS>
+
+=item * L<URI::Router>
+
+=item * L<Inline::C>
+
+=item * L<Inline::Filters::Ragel>
+
+=back
+
+=head1 AUTHOR
+
+Yegor Korablev
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Yegor Korablev.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=cut

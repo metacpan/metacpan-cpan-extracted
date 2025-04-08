@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 sub tree {
     return [ {
@@ -54,6 +54,7 @@ sub tree {
                                 'portalFavicon',
                                 'showLanguages',
                                 'scrollTop',
+                                'floatingCategoryName',
                                 'portalCustomCss',
                                 'portalCustomJs',
                                 'portalSkin',
@@ -111,6 +112,7 @@ sub tree {
                                         'portalErrorOnExpiredSession',
                                         'portalErrorOnMailNotFound',
                                         'portalDisplayRefreshMyRights',
+                                        'cacheTagSalt',
                                     ]
                                 }
                             ]
@@ -176,9 +178,9 @@ sub tree {
                                 {
                                     title => 'dbiConnection',
                                     help  => 'authdbi.html#connection',
+                                    form  => 'simpleInputContainer',
                                     nodes => [
-                                        'dbiAuthChain',
-                                        'dbiAuthUser',
+                                        'dbiAuthChain', 'dbiAuthUser',
                                         'dbiAuthPassword'
                                     ]
                                 },
@@ -243,9 +245,7 @@ sub tree {
                             title => 'webauthnParams',
                             form  => 'simpleInputContainer',
                             help  => 'authwebauthn.html',
-                            nodes => [
-                                'webauthnAuthnLevel',
-                            ]
+                            nodes => [ 'webauthnAuthnLevel', ]
                         },
                         {
                             title => 'ldapParams',
@@ -708,7 +708,7 @@ sub tree {
                             ]
                         },
                         {
-                            title => 'passwordManagement',
+                            title => 'passwordResetByMailManagement',
                             help  => 'resetpassword.html',
                             nodes => [ {
                                     title => 'mailContent',
@@ -814,6 +814,7 @@ sub tree {
                             help  => 'notifications.html',
                             nodes => [
                                 'notification',
+                                'publicNotifications',
                                 'notificationsExplorer',
                                 'notificationWildcard',
                                 'oldNotifFormat',
@@ -944,8 +945,8 @@ sub tree {
                         },
                         {
                             title => 'customPluginsNode',
-                            help  => 'plugincustom.html',
-                            nodes => [ 'customPlugins', 'customPluginsParams' ]
+                            help  => 'plugincustom.html#plugin-options',
+                            nodes => [ 'customPlugins', 'customPluginsParams', 'disabledPlugins' ]
                         },
                     ]
                 },
@@ -1515,6 +1516,7 @@ sub tree {
                     ]
                 },
                 'oidcServiceMetaDataAuthnContext',
+                'oidcServiceMetaDataAmrRules',
                 {
                     title => "oidcServiceDynamicRegistration",
                     help  => 'openidconnectservice.html#dynamic-registration',
@@ -1572,6 +1574,7 @@ sub tree {
                         'oidcServiceEncAlgorithmAlg',
                         'oidcServiceEncAlgorithmEnc',
                         'oidcServiceHideMetadata',
+                        'oidcServiceMetaDataDisallowNoneAlg',
                     ],
                 },
                 {
@@ -1583,6 +1586,7 @@ sub tree {
                         'oidcServiceIDTokenExpiration',
                         'oidcServiceAccessTokenExpiration',
                         'oidcServiceOfflineSessionExpiration',
+                        'oidcServiceMetadataTtl',
                     ]
                 },
                 {

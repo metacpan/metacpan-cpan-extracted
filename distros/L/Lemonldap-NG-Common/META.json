@@ -28,6 +28,8 @@
             "Crypt::URandom" : "0",
             "DBI" : "0",
             "Date::Parse" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Email::Address::XS" : "0",
             "IO::String" : "0",
             "LWP::Protocol::https" : "0",
             "MIME::Entity" : "0",
@@ -52,6 +54,8 @@
             "Crypt::URandom" : "0",
             "DBI" : "0",
             "Date::Parse" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Email::Address::XS" : "0",
             "LWP::Protocol::https" : "0",
             "Net::LDAP" : "0",
             "SOAP::Lite" : "0",
@@ -93,6 +97,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.20.1",
+   "version" : "v2.21.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

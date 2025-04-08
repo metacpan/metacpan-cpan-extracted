@@ -22,8 +22,7 @@ SKIP: {
         skip 'Missing dependencies', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,
@@ -123,12 +122,15 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
     );
     ok( mail() =~ /<span>Your new password is<\/span>/, 'New password sent' );
     ok( mail() =~ /<b>(.+?)<\/b>/s, 'New generated password found' );
+    my $password = $1;
     ok(
-        $1 =~ /[A-Z]{1}[a-z]{1}\d{2}[*#@]{1}/,
-        'New generated password matches'
+        length $password == 5
+          && $password =~ /[*#@]/
+          && $password =~ /[A-Z]/
+          && $password =~ /[a-z]/
+          && $password =~ /\d/,
+        'New generated password matches policy'
     );
-
-    #print STDERR Dumper($query);
 }
 count($maintests);
 

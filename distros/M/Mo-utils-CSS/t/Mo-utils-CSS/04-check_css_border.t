@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils::CSS qw(check_css_border);
 use Readonly;
-use Test::More 'tests' => 63;
+use Test::More 'tests' => 67;
 use Test::NoWarnings;
 
 Readonly::Array our @RIGTH_BORDERS => (
@@ -59,6 +59,8 @@ Readonly::Hash our %BAD_BORDERS => (
 	'solid hsl(120,120%,50%)' => "Parameter 'key' has bad hsl percent.",
 	'solid hsla(120,100%,50%)' => "Parameter 'key' has bad hsla color (bad number of arguments).",
 	'solid hsla(120,100%,50%,1.5)' => "Parameter 'key' has bad hsla alpha.",
+	'solid hsla(120,100,50%,0.3)' => "Parameter 'key' has bad hsla percent (missing %).",
+	'solid hsla(120,120%,50%,0.3)' => "Parameter 'key' has bad hsla percent.",
 );
 
 # Test.

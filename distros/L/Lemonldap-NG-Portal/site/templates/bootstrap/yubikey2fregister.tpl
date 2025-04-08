@@ -6,7 +6,7 @@
 
     <div class="card">
       <div class="card-body">
-      <form action="/2fregisters/yubikey/register" method="post">
+      <form action="<TMPL_VAR NAME="PORTAL_BASE">2fregisters/yubikey/register" method="post">
 
       <div class="row">
 

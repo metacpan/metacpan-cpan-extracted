@@ -3,7 +3,8 @@
 html,
 body {
   height: 100%;
-  background: radial-gradient(circle at 50% 0% ,  #fff 0%, #ddd 100%) no-repeat scroll 0% 0% #ddd;
+  background: radial-gradient(circle at 50% 0%, #fff 0%, #ddd 100%) no-repeat
+    scroll 0% 0% #ddd;
   /* The html and body elements cannot have any padding or margin. */
 }
 
@@ -20,26 +21,28 @@ body {
 /* Set the fixed height of the footer here */
 #footer {
   height: 80px;
-  background-color: rgb(255,255,255);
-  background-color: rgba(255,255,255,0.9);
+  background-color: rgb(255, 255, 255);
+  background-color: rgba(255, 255, 255, 0.9);
   text-align: center;
   padding-top: 10px;
   overflow: hidden;
 }
 
 #header img {
-  background-color: rgb(255,255,255);
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgb(255, 255, 255);
+  background-color: rgba(255, 255, 255, 0.8);
   margin-bottom: 20px;
 }
 
-.card, .navbar-light {
-  background-color: rgb(255,255,255);
-  background-color: rgba(255,255,255,0.9);
+.card,
+.navbar-light {
+  background-color: rgb(255, 255, 255);
+  background-color: rgba(255, 255, 255, 0.9);
   background-image: none;
 }
 
-.login, .password {
+.login,
+.password {
   text-align: center;
   padding: 20px;
 }
@@ -77,12 +80,30 @@ div.actions button {
 
 /* Make active tab more visible */
 li.ui-state-active {
-  background-color: rgb(250,250,250);
-  background-color: rgba(250,250,250,0.9);
+  background-color: rgb(250, 250, 250);
+  background-color: rgba(250, 250, 250, 0.9);
 }
 
-#appslist, #password, #loginHistory, #logout, #oidcConsents  {
+#appslist,
+#password,
+#loginHistory,
+#logout,
+#oidcConsents {
   margin-top: 20px;
+}
+
+.bg-info{
+  background-color: #0E606C !important;
+}
+
+.btn-primary {
+  background-color: #0054ad;
+  border-color: #0054ad;
+}
+
+.btn-success {
+  background-color: #175e28;
+  border-color: #175e28;
 }
 
 div.category {
@@ -95,8 +116,9 @@ div.application {
   overflow: hidden;
 }
 
-div.application a, div.application a:hover {
-  text-decoration:none;
+div.application a,
+div.application a:hover {
+  text-decoration: none;
 }
 
 p.notifCheck label {
@@ -106,17 +128,19 @@ p.notifCheck label {
 }
 
 .notif div.form {
-  margin 0 auto;
+  margin: 0 auto;
   max-width: 1024px;
 }
 
-.notif .h2, h2 {
+.notif .h2,
+h2 {
   font-size: 1.6rem;
-  font-weght: bold;
+  font-weight: bold;
   text-align: center;
 }
 
-.notif .h3, h3 {
+.notif .h3,
+h3 {
   margin-top: 30px;
   margin-bottom: 30px;
   font-size: 1.2rem;
@@ -156,7 +180,7 @@ div.oidc_consent_message > ul {
     height: 80px;
   }
   div.application h4.appname {
-    margin:0;
+    margin: 0;
   }
   #wrap {
     margin: 0 auto -60px;
@@ -169,7 +193,7 @@ div.oidc_consent_message > ul {
 .hiddenFrame {
   border: none;
   display: hidden;
-  margin: 0
+  margin: 0;
 }
 
 .noborder {
@@ -184,12 +208,14 @@ div.oidc_consent_message > ul {
   cursor: pointer;
 }
 
-.nodecor:hover, .nodecor:active, .nodecor:focus {
+.nodecor:hover,
+.nodecor:active,
+.nodecor:focus {
   text-decoration: none;
 }
 
 .fa.icon-blue {
-    color: blue;
+  color: blue;
 }
 
 .progress-bar-animated {
@@ -197,16 +223,21 @@ div.oidc_consent_message > ul {
 }
 
 input.key {
-  font-family: 'password';
-  width: 100px;  
+  -webkit-text-security: disc;
 }
 
+/* Uncomment this if browser does not support '-webkit-text-security' directive
+input.key {
+  font-family: "password";
+  width: 100px;
+}
 @font-face {
   font-family: 'password';
-  /*font-style: normal;*/
-  /*font-weight: 400;*/
+  font-style: normal;
+  font-weight: 400;
   src: url(/static/common/fonts/password.ttf);
 }
+*/
 
 .info.table caption {
   color: black;
@@ -227,8 +258,18 @@ div.input-group > p.form-control > label {
 #btn-back-to-top {
   position: fixed;
   bottom: 70px;
-  right: 20px;
+  right: 15px;
   display: none;
+}
+
+#floating-menu {
+  position: fixed;
+  bottom: 30px;
+  left: -100px;
+  display: block;
+  transform: scale(.7);
+  cursor: move;
+  z-index: 1000;
 }
 
 /* Hide "remember my authentication choice" timer */
@@ -242,5 +283,20 @@ div.input-group > p.form-control > label {
 }
 
 .renewcaptchaclick {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+.notif-container {
+  padding: 20px;
+  height: 200px;
+  overflow: auto;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  filter: invert(100%);
+}
+
+.carousel-indicators li {
+  filter: invert(50%);
 }

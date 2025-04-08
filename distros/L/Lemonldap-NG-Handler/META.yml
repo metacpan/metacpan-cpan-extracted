@@ -5,7 +5,6 @@ author:
 build_requires:
   Cache::Memcached: '0'
   Cwd: '0'
-  Digest::HMAC_SHA1: '0'
   Env: '0'
   HTTP::Message: '0'
   IO::Pipe: '0'
@@ -27,12 +26,11 @@ no_index:
     - inc
 recommends:
   Cache::Memcached: '0'
-  Digest::HMAC_SHA1: '0'
   HTTP::Message: '0'
   SOAP::Lite: '0'
 requires:
   LWP::UserAgent: '0'
-  Lemonldap::NG::Common: v2.20.2
+  Lemonldap::NG::Common: v2.21.0
   Mouse: '0'
   URI: '0'
 resources:
@@ -41,5 +39,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.20.2
+version: v2.21.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

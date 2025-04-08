@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
@@ -44,9 +44,10 @@ EOF
         die "Could not generate WebAuthn challenge";
     }
 
+    my $cacheTag = $self->p->cacheTag;
     $req->data->{customScript} .= <<"EOF";
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js"></script>
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthncheck.min.js"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthn-json.browser-global.min.js?v=$cacheTag"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/webauthncheck.min.js?v=$cacheTag"></script>
 EOF
 }
 

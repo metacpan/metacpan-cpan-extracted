@@ -8,7 +8,7 @@ use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -124,7 +124,7 @@ sub verify {
     }
 
     # Add a new one
-    my $res = $self->registerDevice(
+    $res = $self->registerDevice(
         $req,
         $req->userData,
         {

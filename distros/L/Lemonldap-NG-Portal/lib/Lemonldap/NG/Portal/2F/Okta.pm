@@ -15,6 +15,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
+our $VERSION = '2.21.0';
+
 extends 'Lemonldap::NG::Portal::Lib::Code2F';
 with 'Lemonldap::NG::Portal::Lib::Okta';
 
@@ -105,6 +107,7 @@ sub run {
             'okta2fchoice',
             params => {
                 TOKEN   => $token,
+                TARGET  => $self->p->relativeUrl( $req, 'okta2fchoice' ),
                 MODULES => [
                     map { { CODE => $_, LABEL => $okta_factors->{$_} } }
                     sort keys %$okta_factors

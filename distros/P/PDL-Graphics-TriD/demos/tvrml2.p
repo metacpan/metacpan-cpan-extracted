@@ -60,7 +60,7 @@ PDL::Graphics::VRML::Protos->import();
 #																	  vrn(Transform,
 #																			translation => '0 0 -1',
 #																			children =>
-#																			[new PDL::Graphics::VRMLNode('PDLBlockText10')
+#																			[PDL::Graphics::VRMLNode->new('PDLBlockText10')
 #																			]
 #																		  )
 #																	 ));

@@ -10,7 +10,7 @@
 
 <div class="card">
 
-<form action="/password2fcheck" method="post" class="password" role="form">
+<form action="<TMPL_VAR NAME="TARGET">" method="post" class="password" role="form">
   <div class="form">
     <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />

@@ -27,7 +27,6 @@ my $op = LLNG::Manager::Test->new( {
             authentication                  => 'Demo',
             userDB                          => 'Same',
             issuerDBOpenIDConnectActivation => 1,
-            issuerDBOpenIDConnectRule       => '$uid eq "french"',
             oidcRPMetaDataExportedVars      => {
                 rp => {
                     email       => "mail",
@@ -67,6 +66,19 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsRule         => '$uid eq "dwho"',
                     oidcRPMetaDataOptionsRedirectUris => 'http://rp2.com/',
+                },
+                rp3 => {
+                    oidcRPMetaDataOptionsDisplayName           => "RP3",
+                    oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
+                    oidcRPMetaDataOptionsClientID              => "rp3id",
+                    oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
+                    oidcRPMetaDataOptionsClientSecret          => "rp3secret",
+                    oidcRPMetaDataOptionsUserIDAttr            => "",
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                    oidcRPMetaDataOptionsBypassConsent         => 1,
+                    oidcRPMetaDataOptionsRedirectUris => 'http://rp3.com/',
+                    oidcRPMetaDataOptionsAuthnLevel   =>
+                      '$uid eq "french" ? 9 : 1',
                 },
                 rp_denied => {
                     oidcRPMetaDataOptionsDisplayName           => "RP",
@@ -478,6 +490,36 @@ subtest "Use expired access token" => sub {
     is( getHeader( $res, "Access-Control-Allow-Origin" ),
         "*", "CORS header present on userinfo error response" );
     count(1);
+};
+
+subtest "Check AuthenticationLevel requirement" => sub {
+
+    # As french, required authenlevel is 9
+    $res = authorize(
+        $op, $idpId,
+        {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "rp3id",
+            redirect_uri  => "http://rp3.com/",
+        }
+    );
+    expectForm( $res, undef, '/upgradesession' );
+
+    # As dwho, access is allowed
+    my $idpId2 = $op->login("dwho");
+    $res = authorize(
+        $op, $idpId2,
+        {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "rp3id",
+            redirect_uri  => "http://rp3.com/",
+        }
+    );
+    ok( expectRedirection( $res, qr#http://.*code=([^\&]*)# ),
+        "Access was allowed" );
+
 };
 
 clean_sessions();

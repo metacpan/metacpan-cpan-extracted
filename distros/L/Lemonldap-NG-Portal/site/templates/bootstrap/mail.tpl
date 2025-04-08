@@ -7,6 +7,7 @@
     <span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span>
     </div>
   </TMPL_IF>
+<main>
 
   <TMPL_IF NAME="DISPLAY_FORM">
   <div class="card">
@@ -23,7 +24,7 @@
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
-          <span class="input-group-text"><label for="mail" class="mb-0"><i class="fa fa-envelope"></i></label></span>
+          <span  class="input-group-text"><label for="mail" class="mb-0"><span trspan="mail" hidden></span><i class="fa fa-envelope"></i></label></span>
         </div>
         <input id="mail" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
       </div>
@@ -212,6 +213,7 @@
       <span trspan="back2Portal">Go back to portal</span>
     </a>
   </div>
+</main>
 
 </div>
 

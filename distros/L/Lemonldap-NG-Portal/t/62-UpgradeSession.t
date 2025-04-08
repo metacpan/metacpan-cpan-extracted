@@ -11,8 +11,7 @@ use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
 my $res;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                     => 'error',
             upgradeSession               => 1,
@@ -118,7 +117,6 @@ my $pdata = expectCookie( $res, 'lemonldappdata' );
 $query = $query . "&lmAuth=strong";
 
 # Attempt login with the "strong" auth choice
-# this should trigger 2FA
 # -------------------------------------------
 
 ok(
@@ -152,6 +150,57 @@ ok(
 );
 count(1);
 expectOK($res);
+
+# Try to upgrade session again
+ok(
+    $res = $client->_get(
+        '/upgradesession',
+        accept => 'text/html',
+        cookie => "lemonldap=$id",
+    ),
+    'Upgrade session query'
+);
+count(1);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/upgradesession', 'confirm', 'url' );
+
+# Accept session upgrade, choice form should be shown again
+ok(
+    $res = $client->_post(
+        '/upgradesession',
+        IO::String->new($query),
+        length => length($query),
+        accept => 'text/html',
+        cookie => "lemonldap=$id",
+    ),
+    'Accept session upgrade query'
+);
+count(1);
+expectPortalError( $res, 9 );
+
+( $host, $url, $query ) = expectForm( $res, '#', undef, 'upgrading', 'url' );
+
+$query = $query . "&lmAuth=strong";
+
+# login with the "strong" auth choice
+
+ok(
+    $res = $client->_post(
+        '/upgradesession',
+        IO::String->new($query),
+        length => length($query),
+        accept => 'text/html',
+        cookie => "lemonldap=$id",
+        custom => {
+            REMOTE_USER => 'dwho',
+        },
+    ),
+    'Post login'
+);
+count(1);
+
+$id = expectCookie($res);
 
 $client->logout($id);
 clean_sessions();

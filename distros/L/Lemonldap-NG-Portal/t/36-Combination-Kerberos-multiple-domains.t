@@ -29,8 +29,7 @@ SKIP: {
         "INSERT INTO users_dom1 VALUES ('hford','harrison','Harrison Ford')");
     $dbh->do("INSERT INTO users_dom2 VALUES ('hford','henry','Henry Ford')");
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -88,8 +87,11 @@ SKIP: {
 
         ok( $res = $client->_get( '/', accept => 'text/html' ),
             'Simple access' );
-        ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' )
-          or explain( $res->[2]->[0], 'script.*kerberos.js' );
+        like(
+            $res->[2]->[0],
+            qr/script.*kerberos\.min\.js/s,
+            'Found Kerberos JS'
+        );
         my ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'kerberos', 'ajax_auth_token' );
 
@@ -133,8 +135,11 @@ SKIP: {
         $ENV{krb_user} = 'hford@car.com';
         ok( $res = $client->_get( '/', accept => 'text/html' ),
             'Simple access' );
-        ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' )
-          or explain( $res->[2]->[0], 'script.*kerberos.js' );
+        like(
+            $res->[2]->[0],
+            qr/script.*kerberos\.min\.js/s,
+            'Found Kerberos JS'
+        );
         my ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'kerberos', 'ajax_auth_token' );
 
@@ -177,8 +182,11 @@ SKIP: {
     subtest "Fallback to Dom1" => sub {
         ok( $res = $client->_get( '/', accept => 'text/html' ),
             'Simple access' );
-        ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' )
-          or explain( $res->[2]->[0], 'script.*kerberos.js' );
+        like(
+            $res->[2]->[0],
+            qr/script.*kerberos\.min\.js/s,
+            'Found Kerberos JS'
+        );
         my ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'kerberos', 'ajax_auth_token' );
 
@@ -210,8 +218,11 @@ SKIP: {
     subtest "Fallback to Dom2" => sub {
         ok( $res = $client->_get( '/', accept => 'text/html' ),
             'Simple access' );
-        ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' )
-          or explain( $res->[2]->[0], 'script.*kerberos.js' );
+        like(
+            $res->[2]->[0],
+            qr/script.*kerberos\.min\.js/s,
+            'Found Kerberos JS'
+        );
         my ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'kerberos', 'ajax_auth_token' );
 

@@ -13,7 +13,7 @@ my $json = '{
 "reference": "testref",
 "uid": "dwho",
 "title": "Test title",
-"text": "This is a test text"
+"text": "This is a test text for $uid"
 }';
 
 my $bad_json = '{
@@ -227,7 +227,7 @@ ok( $res->[2]->[0] =~ /"reference"\s*:\s*"testref"/,
   or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ /"title"\s*:\s*"Test title"/, 'Notification title found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ /"text"\s*:\s*"This is a test text"/,
+ok( $res->[2]->[0] =~ /"text"\s*:\s*"This is a test text for \$uid"/,
     'Notification text found' )
   or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ /"date"\s*:\s*"2016-05-30"/, 'Notification date found' )

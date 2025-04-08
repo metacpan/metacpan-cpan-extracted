@@ -1,7 +1,7 @@
 <!-- //if:jsminified
-<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/ssl.min.js"></script>
+<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/ssl.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
 //else -->
-<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/ssl.js"></script>
+<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/ssl.js?v=<TMPL_VAR CACHE_TAG>"></script>
 <!-- //endif -->
 
 <div class="form">

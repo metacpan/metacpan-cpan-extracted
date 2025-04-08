@@ -10,7 +10,7 @@ use Mouse;
 use Time::Local;
 use MIME::Base64;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -196,16 +196,17 @@ sub getDone {
     @notif = grep /^\d{8}${fns}\S*\.done$/, readdir(D);
     my $res;
     foreach my $file (@notif) {
-        my ( $u, $r ) =
+        my ( $u, $r, $c ) =
           ( $file =~
-/^\d+${fns}([^${fns}]+)${fns}([^${fns}]+)${fns}?([^${fns}]+)\.done$/
+/^\d+${fns}([^${fns}]+)${fns}([^${fns}]+)(?:${fns}([^${fns}]+))?\.done$/
           );
         die unless ( -f "$self->{dirName}/$file" );
         my $time = ( stat("$self->{dirName}/$file") )[10];
         $res->{$file} = {
-            'uid'      => $u,
-            'ref'      => decode_base64($r),
-            'notified' => $time,
+            'uid'       => $u,
+            'ref'       => decode_base64($r),
+            'notified'  => $time,
+            'condition' => decode_base64( $c // '' ),
         };
     }
     return $res;

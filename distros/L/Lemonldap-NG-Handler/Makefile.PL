@@ -9,22 +9,20 @@ WriteMakefile(
     LICENSE        => 'gpl',
     PMLIBDIRS      => ['lib'],
     BUILD_REQUIRES => {
-        'Cache::Memcached'  => 0,
-        'Cwd'               => 0,
-        'Digest::HMAC_SHA1' => 0,
-        'Env'               => 0,
-        'HTTP::Message'     => 0,
-        'IO::Pipe'          => 0,
-        'SOAP::Lite'        => 0,
-        'Test::Pod'         => 1.00,
-        'Time::Fake'        => 0,
+        'Cache::Memcached' => 0,
+        'Cwd'              => 0,
+        'Env'              => 0,
+        'HTTP::Message'    => 0,
+        'IO::Pipe'         => 0,
+        'SOAP::Lite'       => 0,
+        'Test::Pod'        => 1.00,
+        'Time::Fake'       => 0,
     },
     META_MERGE => {
         'recommends' => {
-            'Cache::Memcached'  => 0,
-            'Digest::HMAC_SHA1' => 0,
-            'HTTP::Message'     => 0,
-            'SOAP::Lite'        => 0,
+            'Cache::Memcached' => 0,
+            'HTTP::Message'    => 0,
+            'SOAP::Lite'       => 0,
         },
         resources => {
             repository => {
@@ -41,7 +39,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'Lemonldap::NG::Common' => '2.20.2',
+        'Lemonldap::NG::Common' => '2.21.0',
         'LWP::UserAgent'        => 0,
         'Mouse'                 => 0,
         'URI'                   => 0,

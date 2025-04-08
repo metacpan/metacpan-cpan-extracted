@@ -28,7 +28,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 use Lemonldap::NG::Common::Util qw/display2F filterKey2F/;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with qw(
@@ -482,6 +482,7 @@ sub run {
         $req,
         '2fchoice',
         params => {
+            TARGET        => $self->p->relativeUrl( $req, '2fchoice' ),
             CHECKLOGINS   => $checkLogins,
             STAYCONNECTED => $stayconnected,
             TOKEN         => $token,
@@ -512,6 +513,7 @@ sub save2faSessionInfo {
     $info->{_2fRetries}     = $req->data->{_2fRetries};
     $info->{_2fRealSession} = $req->id;
     $info->{_2fUrldc}       = $req->urldc;
+    $info->{_2fInfo}        = $req->info;
     $info->{_2fUtime}       = $req->sessionInfo->{_utime};
     if ( $self->conf->{impersonationRule} ) {
         $info->{_impSpoofId} = $spoofId;
@@ -531,6 +533,7 @@ sub restore2faSessionInfo {
     $req->sessionInfo($info);
     $req->id( delete $req->sessionInfo->{_2fRealSession} );
     $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
+    $req->info( delete $req->sessionInfo->{_2fInfo} );
     $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
 }
 
@@ -663,8 +666,9 @@ sub _displayRegister {
         if ( $m->{r}->( $req, $req->userData ) ) {
             push @am,
               {
-                CODE  => $m->{m}->prefix,
-                URL   => '/2fregisters/' . $m->{m}->prefix,
+                CODE => $m->{m}->prefix,
+                URL  =>
+                  $self->p->relativeUrl( $req, '2fregisters', $m->{m}->prefix ),
                 LOGO  => $m->{m}->logo,
                 LABEL => $m->{m}->label
               };
@@ -1085,7 +1089,7 @@ sub searchForAuthorized2Fmodules {
     my @am;
     foreach ( @{ $self->sfModules } ) {
         my $authModuleName = $_->{m}->prefix;
-        $self->logger->debug('Looking for ' . $authModuleName . ' 2f');
+        $self->logger->debug( 'Looking for ' . $authModuleName . ' 2f' );
 
         # Adding targetAuthnLevel from req to session;
         my $modifiedSession = {%$session};
@@ -1093,7 +1097,8 @@ sub searchForAuthorized2Fmodules {
           if $req->{pdata}->{targetAuthnLevel};
 
         if ( $_->{r}->( $req, $modifiedSession ) ) {
-            $self->logger->debug(' -> ' . $authModuleName . ' 2f is available');
+            $self->logger->debug(
+                ' -> ' . $authModuleName . ' 2f is available' );
             push @am, $_->{m};
         }
     }

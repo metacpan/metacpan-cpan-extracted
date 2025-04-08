@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -435,6 +435,7 @@ sub forbidden {
     }
 
     if ( $session->{_upgrade} ) {
+        $class->localUnlog($req);
         return $class->goToPortal( $req, $uri, undef, '/upgradesession' );
     }
 
@@ -452,6 +453,7 @@ sub forbidden {
     );
     $class->updateStatus( $req, 'REJECT',
         $session->{ $class->tsv->{whatToTrace} } );
+    $class->localUnlog($req);
 
     # Redirect or Forbidden?
     if ( $class->tsv->{useRedirectOnForbidden} && $vhost ne $portal ) {
@@ -876,6 +878,14 @@ sub localUnlog {
             my $cache = $module->new($options);
             if ( $cache->get($id) ) {
                 $cache->remove($id);
+            }
+
+            # Modules like Apache::Session::REST stores hashed id in cache
+            if ( $class->tsv->{hashedSessionStore} ) {
+                $id = id2storage($id);
+                if ( $cache->get($id) ) {
+                    $cache->remove($id);
+                }
             }
         }
     }

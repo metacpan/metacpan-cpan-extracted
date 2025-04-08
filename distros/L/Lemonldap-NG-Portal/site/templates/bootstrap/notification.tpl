@@ -2,7 +2,7 @@
 
 <div id="notifcontent" class="container">
 
-  <form action="/notifback" method="post" class="notif" role="form">
+  <form action="<TMPL_VAR NAME="FORM_ACTION">" method="post" class="notif" role="form">
     <TMPL_VAR NAME="HIDDEN_INPUTS">
     <TMPL_IF NAME="CHOICE_VALUE">
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />

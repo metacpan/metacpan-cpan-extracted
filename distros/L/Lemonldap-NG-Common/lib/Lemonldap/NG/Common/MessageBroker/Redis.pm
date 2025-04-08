@@ -3,19 +3,25 @@ package Lemonldap::NG::Common::MessageBroker::Redis;
 use strict;
 use JSON;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
+our $REDISCLASS = 'Redis::Fast';
 
 sub new {
     my ( $class, $conf, $logger ) = @_;
-    require Redis;
     my $self = bless { logger => $logger }, $class;
+    eval { require Redis::Fast };
+    if ($@) {
+        print STDERR "Redis::Fast not available, switching to Redis\n";
+        $REDISCLASS = 'Redis';
+        require Redis;
+    }
     my $args = $conf->{messageBrokerOptions} // {};
 
     # Reconnection parameters
-    #  - try to reconnect every 1s up to 60s
-    $args->{reconnect} //= 60;
+    #  - try to reconnect every 1s up to 3600s
+    $args->{reconnect} //= 3600;
     $args->{every}     //= 1000000;
-    $self->{redis}    = Redis->new(%$args);
+    $self->{redis}    = $REDISCLASS->new(%$args);
     $self->{messages} = {};
     return $self;
 }

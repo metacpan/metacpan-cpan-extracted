@@ -80,6 +80,41 @@ LWP::Protocol::PSGI->register(
     }
 );
 
+sub tryauth {
+    my ($rp) = @_;
+    ok( my $res = $rp->_get( '/', accept => 'text/html' ),
+        'Unauth SP request' );
+    my ($url) =
+      expectRedirection( $res,
+        qr#(https://op.example.com/oauth2/authorize\?.*)# );
+    $url = URI->new($url);
+    is( $url->host, "op.example.com", "Correct host" );
+    my %query = $url->query_form;
+    is( $query{client_id}, 'rpid',                 "Correct client_id" );
+    is( $query{scope},     'openid profile email', "Correct scope" );
+    is(
+        $query{redirect_uri},
+        'http://auth.rp.com/?openidconnectcallback=1',
+        "Correct redirect_uri"
+    );
+    ok( my $state = $query{state}, "Found state" );
+
+    # Post return authorization code
+    ok(
+        $res = $rp->_get(
+            '/',
+            query => {
+                openidconnectcallback => 1,
+                code                  => "aaa",
+                state                 => $state,
+            },
+            accept => 'text/html'
+        ),
+        'Authorization code'
+    );
+    return $res;
+}
+
 my $metadata = <<EOF;
 {
   "authorization_endpoint": "https://op.example.com/oauth2/authorize",
@@ -95,69 +130,31 @@ $main::jwks_show_kid   = 0;
 my $rp = rp($metadata);
 is( $main::jwks_call_count, 1, "JWKS url was called during startup" );
 
-ok( my $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
-
-my ($url) =
-  expectRedirection( $res, qr#(https://op.example.com/oauth2/authorize\?.*)# );
-$url = URI->new($url);
-is( $url->host, "op.example.com", "Correct host" );
-my %query = $url->query_form;
-is( $query{client_id}, 'rpid',                 "Correct client_id" );
-is( $query{scope},     'openid profile email', "Correct scope" );
-is(
-    $query{redirect_uri},
-    'http://auth.rp.com/?openidconnectcallback=1',
-    "Correct redirect_uri"
-);
-ok( my $state = $query{state}, "Found state" );
-
-# Post return authorization code
-ok(
-    $res = $rp->_get(
-        '/',
-        query => {
-            openidconnectcallback => 1,
-            code                  => "aaa",
-            state                 => $state,
-        },
-        accept => 'text/html'
-    ),
-    'Authorization code'
-);
+# Try to authenticate with a token containing a kid that is not found in jwks
+my $res = tryauth($rp);
 expectPortalError( $res, 106 );
+is( $main::jwks_call_count, 2, "JWKS refresh was forced due to wrong kid" );
 
-Time::Fake->offset("+600s");
+# Update OP's JWKS to publish the correct kid
 $main::jwks_show_kid = 1;
 
-ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
-($url) =
-  expectRedirection( $res, qr#(https://op.example.com/oauth2/authorize\?.*)# );
-$url = URI->new($url);
-is( $url->host, "op.example.com", "Correct host" );
-%query = $url->query_form;
-is( $query{client_id}, 'rpid',                 "Correct client_id" );
-is( $query{scope},     'openid profile email', "Correct scope" );
-is(
-    $query{redirect_uri},
-    'http://auth.rp.com/?openidconnectcallback=1',
-    "Correct redirect_uri"
-);
-ok( $state = $query{state}, "Found state" );
-
-ok(
-    $res = $rp->_get(
-        '/',
-        query => {
-            openidconnectcallback => 1,
-            code                  => "aaa",
-            state                 => $state,
-        },
-        accept => 'text/html'
-    ),
-    'Authorization code'
-);
-is( $main::jwks_call_count, 2, "JWKS url was called again" );
+# LemonLDAP immediately refreshes its JWKS
+$res = tryauth($rp);
 expectCookie($res);
+is( $main::jwks_call_count, 3, "JWKS refresh was forced due to wrong kid" );
+
+# The next attempt does not trigger a refresh
+$res = tryauth($rp);
+expectCookie($res);
+is( $main::jwks_call_count, 3, "JWKS url was not called again" );
+
+# After cache expiration, the next attemps triggers a refresh
+Time::Fake->offset("+600s");
+
+$res = tryauth($rp);
+expectCookie($res);
+is( $main::jwks_call_count, 4,
+    "JWKS url was called again due to cache expiration" );
 
 clean_sessions();
 done_testing();

@@ -80,7 +80,17 @@ my $op = LLNG::Manager::Test->new(
                     oidcRPMetaDataOptionsPublic                      => 1,
                     oidcRPMetaDataOptionsRule       => '$uid eq "french"',
                     oidcRPMetaDataOptionsUserIDAttr => "",
-                }
+                },
+
+              # This RP is specially crafted so that the base64 Basic encoding
+              # contains a special character (+) and its password contains a ":"
+              # to test proper Auth Basic decoding
+                specialchars => {
+                    oidcRPMetaDataOptionsDisplayName  => "RP",
+                    oidcRPMetaDataOptionsClientID     => "rpidx",
+                    oidcRPMetaDataOptionsClientSecret => "Pa~:ss",
+                    oidcRPMetaDataOptionsAllowClientCredentialsGrant => 1,
+                },
             },
             oidcRPMetaDataScopeRules => {
                 rp => {
@@ -211,11 +221,52 @@ ok(
     "Post introspection"
 );
 $payload = expectJSON($res);
-like( $payload->{scope}, qr/\bread\b/,   "Scope read found" );
-like( $payload->{scope}, qr/\balways\b/, "Rule-enforced scope found" );
+like( $payload->{scope}, qr/\bread\b/,      "Scope read found" );
+like( $payload->{scope}, qr/\balways\b/,    "Rule-enforced scope found" );
 like( $payload->{scope}, qr/\bcc_hooked\b/, "Hook-enforced scope found" );
 is( $token_res_scope, $payload->{scope},
     "Token response scope match token scope" );
+
+## Test special characters in password (POST)
+$res = $op->_post(
+    "/oauth2/token",
+    {
+        client_id     => 'rpidx',
+        client_secret => 'Pa~:ss',
+        grant_type    => 'client_credentials',
+        scope         => 'read profile',
+    },
+    accept => 'application/json',
+);
+$payload = expectJSON($res);
+
+## Test special characters in password (POST)
+$res = $op->_post(
+    "/oauth2/token",
+    {
+        client_id     => 'rpidx',
+        client_secret => 'Pa~:ss',
+        grant_type    => 'client_credentials',
+        scope         => 'read profile',
+    },
+    accept => 'application/json',
+);
+ok( expectJSON($res)->{access_token}, "Found access token" );
+
+## Test special characters in password (POST)
+$res = $op->_post(
+    "/oauth2/token",
+    {
+        grant_type => 'client_credentials',
+        scope      => 'read profile',
+    },
+    custom => {
+
+        # rpidx:Pa~:ss
+        HTTP_AUTHORIZATION => "Basic cnBpZHg6UGF+OnNz",
+    }
+);
+ok( expectJSON($res)->{access_token}, "Found access token" );
 
 clean_sessions();
 done_testing();

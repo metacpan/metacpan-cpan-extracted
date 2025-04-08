@@ -1,7 +1,7 @@
 package Lemonldap::NG::Portal::Issuer::OpenIDConnect;
 
 use strict;
-use JSON qw(from_json to_json);
+use JSON                       qw(from_json to_json);
 use Lemonldap::NG::Common::JWT qw(getJWTPayload);
 use Mouse;
 use Lemonldap::NG::Common::FormEncode;
@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -38,6 +38,7 @@ with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration',
 # INTERFACE
 
 sub beforeAuth { 'exportRequestParameters' }
+use constant hook => { updateSessionId => 'updateOidcSecondarySessions' };
 
 # INITIALIZATION
 
@@ -64,6 +65,8 @@ has iss => (
           || $_[0]->p->HANDLER->tsv->{portal}->();
     }
 );
+
+has amrRules => ( is => 'rw', default => sub { {} } );
 
 sub get_issuer {
     my ( $self, $req ) = @_;
@@ -121,7 +124,7 @@ sub init {
         oidcServiceMetaDataEndSessionURI    => 'endSessionDone',
         oidcServiceMetaDataCheckSessionURI  => 'checkSession',
         oidcServiceMetaDataTokenURI         => 'token',
-        oidcServiceMetaDataUserInfoURI      => 'userInfo',
+        oidcServiceMetaDataUserInfoURI      => 'unauthUserInfo',
         oidcServiceMetaDataJWKSURI          => 'jwks',
         oidcServiceMetaDataRegistrationURI  => 'registration',
         oidcServiceMetaDataIntrospectionURI => 'introspection',
@@ -155,6 +158,16 @@ sub init {
         $self->conf->{oidcServiceMetaDataEndSessionURI},
       ) . ')';
     $self->ssoMatchUrl(qr/$m/);
+
+    while ( my ( $amr_value, $rule ) =
+        each %{ $self->conf->{oidcServiceMetaDataAmrRules} || {} } )
+    {
+        $self->logger->debug("Compiling AMR rule for $amr_value");
+        my $compiled_rule =
+          $self->p->buildRule( $rule, "amr rule for $amr_value" );
+        $self->amrRules->{$amr_value} = $compiled_rule if $compiled_rule;
+    }
+
     return 1;
 }
 
@@ -245,6 +258,8 @@ sub loadRPs {
 
 sub ssoMatch {
     my ( $self, $req ) = @_;
+    my $lh = $req->param('login_hint');
+    $req->data->{suggestedLogin} ||= $lh if $lh;
     return ( $req->uri =~ $self->ssoMatchUrl ? 1 : 0 );
 }
 
@@ -554,8 +569,8 @@ sub _authorizeEndpoint {
         );
     }
 
-    my $spAuthnLevel =
-      $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthnLevel} || 0;
+    my $spAuthnLevel = $self->rpLevelRules->{$rp}->( $req, $req->sessionInfo );
+    $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthnLevel} || 0;
 
     # RP may increase, but not lower, the requirement set in LLNG conf
     if ( $oidc_request->{'acr_values'} ) {
@@ -914,7 +929,8 @@ sub _authorizeEndpoint {
 
         my $state = $oidc_request->{'state'};
 
-    	$self->p->registerProtectedAppAccess( $req, $req->sessionInfo->{ $self->conf->{whatToTrace} }, "oidc:$rp" );
+        $self->p->registerProtectedAppAccess( $req,
+            $req->sessionInfo->{ $self->conf->{whatToTrace} }, "oidc:$rp" );
 
         $self->auditLog(
             $req,
@@ -1195,6 +1211,7 @@ sub _failAuthorize {
         message => ( "OIDC login failed" . $reason ),
         ( $reason ? ( reason => $reason ) : () ),
         portal_error => portalConsts->{$res},
+        user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
     );
 
     return $res;
@@ -1339,6 +1356,7 @@ sub findRPFromUri {
 sub isUriAllowedForRP {
     my ( $self, $uri, $rp, $option, $wildcard_allowed ) = @_;
     my $allowed_uris = $self->rpOptions->{$rp}->{$option} // "";
+    $self->logger->debug("Allowed URIs for $rp: $allowed_uris");
 
     my $is_uri_allowed;
     if ($wildcard_allowed) {
@@ -1502,7 +1520,8 @@ sub _handleClientCredentialsGrant {
     }
 
     my $access_token = $self->newAccessToken(
-        $req, $rp, $scope, $session->data,
+        $req, $rp, $scope,
+        $session->data,
         {
             scope           => $scope,
             rp              => $rp,
@@ -1722,7 +1741,7 @@ sub _handleAuthorizationCodeGrant {
 
     my $codeSession = $self->getAuthorizationCode($code);
     unless ($codeSession) {
-        $self->logger->error("Unable to find OIDC session $code");
+        $self->logger->warn("Unable to find OIDC session $code");
         return $self->sendOIDCError( $req, 'invalid_grant', 400 );
     }
 
@@ -1750,8 +1769,9 @@ sub _handleAuthorizationCodeGrant {
     # Check we have the same redirect_uri value
     unless ( $req->param("redirect_uri") eq $codeSession->data->{redirect_uri} )
     {
-        $self->userLogger->error( "Provided redirect_uri does not match "
-              . $codeSession->data->{redirect_uri} );
+        $self->userLogger->error( "Provided redirect_uri does not match: "
+              . $codeSession->data->{redirect_uri} . ' != '
+              . $req->param("redirect_uri") );
         return $self->sendOIDCError( $req, 'invalid_grant', 400 );
     }
 
@@ -1760,7 +1780,7 @@ sub _handleAuthorizationCodeGrant {
       $self->p->getApacheSession( $codeSession->data->{user_session_id} );
 
     unless ($apacheSession) {
-        $self->userLogger->error("Unable to find user session");
+        $self->userLogger->warn("Unable to find user session");
         return $self->sendOIDCError( $req, 'invalid_grant', 400 );
     }
 
@@ -1791,7 +1811,7 @@ sub _handleAuthorizationCodeGrant {
     # Generate refresh_token
     my $refresh_token = undef;
 
-    my $sid;
+    my $sid = $self->getSidFromSession( $rp, $apacheSession->data );
 
     # For offline access, the refresh token isn't tied to the session ID
     if ( $codeSession->{data}->{offline} ) {
@@ -1818,6 +1838,7 @@ sub _handleAuthorizationCodeGrant {
                   $apacheSession->data->{ $self->conf->{whatToTrace} },
                 auth_time  => $apacheSession->data->{_lastAuthnUTime},
                 grant_type => "authorizationcode",
+                _oidc_sid  => $sid,
             },
             1,
         );
@@ -1831,9 +1852,6 @@ sub _handleAuthorizationCodeGrant {
         $refresh_token = $refreshTokenSession->id;
 
         $self->logger->debug("Generated offline refresh token: $refresh_token");
-
-        $sid = $self->getSidFromSession( $rp,
-            { _session_id => $refreshTokenSession->id } );
     }
 
     # For online access, if configured
@@ -1850,6 +1868,7 @@ sub _handleAuthorizationCodeGrant {
                   $apacheSession->data->{ $self->conf->{whatToTrace} },
                 user_session_id => $codeSession->data->{user_session_id},
                 grant_type      => "authorizationcode",
+                _oidc_sid       => $sid,
             },
             0,
         );
@@ -1881,7 +1900,6 @@ sub _handleAuthorizationCodeGrant {
             ( $nonce   ? ( nonce   => $nonce )   : () ),
             ( $at_hash ? ( at_hash => $at_hash ) : () ),
         },
-        $sid,
     );
 
     unless ($id_token) {
@@ -1946,7 +1964,7 @@ sub _handleRefreshTokenGrant {
     my $refreshSession = $self->getRefreshToken($refresh_token);
 
     unless ($refreshSession) {
-        $self->logger->error("Unable to find OIDC session $refresh_token");
+        $self->logger->warn("Unable to find OIDC session $refresh_token");
         return $self->sendOIDCError( $req, 'invalid_request', 400 );
     }
 
@@ -2003,24 +2021,9 @@ sub _handleRefreshTokenGrant {
     # Else, we are in an offline session
     else {
 
-        $req->userData( $refreshSession->data );
-        $req->{error} = $self->p->processRefreshSession($req);
-
-        if ( $req->error > 0 ) {
-
-            # PE_BADCREDENTIAL is returned by UserDB modules when the user was
-            # explicitly not found. And not in case of temporary failures
-            if ( $req->error == PE_BADCREDENTIALS ) {
-                $self->logger->error( "User: "
-                      . $req->user
-                      . " no longer exists, removing offline session" );
-                $refreshSession->remove;
-            }
-            else {
-                $self->logger->error( "Could not resolve user: " . $req->user );
-            }
-            return $self->sendOIDCError( $req, 'invalid_grant', 400 );
-        }
+        # Lookup attributes and macros for user
+        $self->getAttributesForUser( $req, $refreshSession )
+          or return $self->sendOIDCError( $req, 'invalid_grant', 400 );
 
         # Cleanup sessionInfo
         delete $req->sessionInfo->{_utime};
@@ -2151,9 +2154,14 @@ sub _rotateRefreshSession {
     return $refreshSession;
 }
 
+sub unauthUserInfo {
+    my ( $self, $req ) = @_;
+    return $self->userInfo( $req, 1 );
+}
+
 # Handle userinfo endpoint
 sub userInfo {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, $setUser ) = @_;
     $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect USERINFO URL");
 
@@ -2180,6 +2188,10 @@ sub userInfo {
     my $scope           = $accessTokenSession->data->{scope};
     my $rp              = $accessTokenSession->data->{rp};
     my $user_session_id = $accessTokenSession->data->{user_session_id};
+
+    $self->p->HANDLER->set_user( $req,
+        $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID} )
+      if $setUser;
 
     if ( $self->rpOptions->{$rp}
         ->{oidcRPMetaDataOptionsUserinfoRequireHeaderToken}
@@ -2263,13 +2275,13 @@ sub _getSessionFromAccessTokenData {
 
         # Get user identifier
         $session = $self->p->getApacheSession( $tokenData->{user_session_id} );
-        $self->logger->error("Unable to find user session") unless ($session);
+        $self->logger->warn("Unable to find user session") unless ($session);
     }
     else {
         my $offline_session_id = $tokenData->{offline_session_id};
         if ($offline_session_id) {
             $session = $self->getRefreshToken($offline_session_id);
-            $self->logger->error("Unable to find refresh session")
+            $self->logger->warn("Unable to find refresh session")
               unless ($session);
         }
     }
@@ -2317,7 +2329,7 @@ sub introspection {
               $oidcSession->{data}->{_utime} + $self->conf->{timeout};
         }
         else {
-            $self->logger->error("Count not find session tied to Access Token");
+            $self->logger->warn("Count not find session tied to Access Token");
         }
     }
     return $self->p->sendJSONresponse( $req, $response );
@@ -2704,8 +2716,11 @@ sub logout {
 sub metadata {
     my ( $self, $req ) = @_;
     $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
+    my %args;
+    $args{ttl} = $self->conf->{oidcServiceMetadataTtl}
+      if $self->conf->{oidcServiceMetadataTtl};
     return $self->p->sendJSONresponse( $req,
-        $self->metadataDoc( $self->get_issuer($req) ) );
+        $self->metadataDoc( $self->get_issuer($req) ), %args );
 }
 
 # Store request parameters in %ENV
@@ -2754,8 +2769,7 @@ sub exportRequestParameters {
 
     # Store target authentication level in pdata
     if ($rp) {
-        my $targetAuthnLevel =
-          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthnLevel};
+        my $targetAuthnLevel = $self->rpLevelRules->{$rp}->( $req, {} );
 
         if ( my $acr_values = $req->env->{'llng_oidc_acr_values'} ) {
             $targetAuthnLevel =
@@ -2876,6 +2890,8 @@ sub _generateIDToken {
 
     my $sub = $self->getUserIDForRP( $req, $rp, $sessionInfo );
 
+    my $amr = $self->getAmr( $req, $rp, $sessionInfo );
+
     my $id_token_payload_hash = {
         iss       => $self->get_issuer($req),            # Issuer Identifier
         sub       => $sub,                               # Subject Identifier
@@ -2885,8 +2901,8 @@ sub _generateIDToken {
         auth_time => $sessionInfo->{_lastAuthnUTime},    # Authentication time
         acr       => $id_token_acr,  # Authentication Context Class Reference
         azp       => $client_id,     # Authorized party, this is used for logout
-                                     # TODO amr
-        sid       => $sid,
+        ( @$amr ? ( amr => $amr ) : () ),
+        sid => $sid,
     };
 
     for ( keys %{$extra_claims} ) {
@@ -2929,6 +2945,29 @@ sub _generateIDToken {
     return $self->createIDToken( $req, $id_token_payload_hash, $rp );
 }
 
+sub getAmr {
+    my ( $self, $req, $rp, $sessionInfo ) = @_;
+    my $result = [];
+
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
+
+    for my $amr_value ( sort keys %{ $self->amrRules } ) {
+        my $richSessionInfo = {
+            %{ $sessionInfo || {} },
+            _clientId      => $client_id,
+            _clientConfKey => $rp,
+        };
+
+        if (    $self->amrRules->{$amr_value}
+            and $self->amrRules->{$amr_value}->( $req, $richSessionInfo ) )
+        {
+            push @$result, $amr_value;
+        }
+    }
+
+    return $result;
+}
+
 sub encryptToken {
     my ( $self, $rp, $token, $alg, $enc ) = @_;
     return $token unless $alg;
@@ -2958,6 +2997,67 @@ sub encryptToken {
         return undef;
     }
     return $token;
+}
+
+# Used to build refresh_token
+sub getAttributesForUser {
+    my ( $self, $req, $session ) = @_;
+    $req->userData( $session->data );
+    $req->{error} = $self->p->processRefreshSession($req);
+
+    return 1 unless $req->error > 0;
+
+    # PE_BADCREDENTIAL is returned by UserDB modules when the user was
+    # explicitly not found. And not in case of temporary failures
+    if ( $req->error == PE_BADCREDENTIALS ) {
+        $self->logger->error( "User: "
+              . $req->user
+              . " no longer exists, removing offline session" );
+        $session->remove;
+    }
+    else {
+        $self->logger->error( "Could not resolve user: " . $req->user );
+    }
+    return 0;
+}
+
+# Change the ID of secondary sessions (during upgrade)
+sub updateOidcSecondarySessions {
+    my ( $self, $req, $old_session_id, $new_session_id ) = @_;
+
+    my $module = "Lemonldap::NG::Common::Apache::Session";
+
+    my %opts    = $self->_storeOpts;
+    my $options = $opts{storageModuleOptions};
+    $options->{backend} = $opts{storageModule};
+
+    my $oidc_sessions =
+      $module->searchOn( $options, "user_session_id", $old_session_id );
+
+    if (
+        my @oidc_sessions_keys =
+        grep { $oidc_sessions->{$_}->{_session_kind} eq $self->sessionKind }
+        keys %$oidc_sessions
+      )
+    {
+
+        foreach my $oidc_session (@oidc_sessions_keys) {
+
+            # Get session
+            $self->logger->debug("Retrieve OIDC session $oidc_session");
+
+            my $oidcSession = $self->getOpenIDConnectSession( $oidc_session, '',
+                hashStore => 0 );
+
+            if ($oidcSession) {
+
+                # Delete session
+                $oidcSession->update( { user_session_id => $new_session_id } );
+            }
+        }
+    }
+
+    return;
 }
 
 1;

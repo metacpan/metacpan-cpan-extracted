@@ -19,7 +19,7 @@ A short human readable title of the unit. This may be used by
 systemd (and other UIs) as a user-visible label for the unit, so this string
 should identify the unit rather than describe it, despite the name. This string also shouldn't just
 repeat the unit name. C<Apache2 Web Server> is a good example. Bad examples are
-C<high-performance light-weight HTTP server> (too generic) or
+C<high-performance lightweight HTTP server> (too generic) or
 C<Apache2> (meaningless for people who do not know Apache, duplicates the unit
 name). systemd may use this string as a noun in status messages (C<Starting
 description...>, C<Started
@@ -507,7 +507,7 @@ cancelled, the unit however will not change state or even enter the C<failed> mo
 
 Both settings take a time span with the default unit of seconds, but other units may be
 specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
 C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
@@ -526,7 +526,7 @@ cancelled, the unit however will not change state or even enter the C<failed> mo
 
 Both settings take a time span with the default unit of seconds, but other units may be
 specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
 C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
@@ -1013,7 +1013,9 @@ relative comparisons are supported for versioned parameters (e.g. C<VERSION_ID>;
 with C<< < >>, C<< <= >>, C<==>,
 C<< <> >>, C<< >= >>, C<< > >>), and shell-style
 wildcard comparisons (C<*>, C<?>, C<[]>) are
-supported with the C<$=> (match) and C<!$=> (non-match). I< Optional. Type list of uniline.  > 
+supported with the C<$=> (match) and C<!$=> (non-match).
+
+If the given key is not found in the file, the match is done against an empty value. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionMemoryPressure
 
@@ -1560,7 +1562,7 @@ are allowed.
 
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The special value C<infinity> can be used to limit the total number of start
 attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
@@ -1611,7 +1613,7 @@ are allowed.
 
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The special value C<infinity> can be used to limit the total number of start
 attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may

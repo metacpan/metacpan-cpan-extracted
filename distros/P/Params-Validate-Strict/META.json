@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "6.64",
+            "Params::Get" : "0"
          }
       },
       "test" : {
@@ -48,6 +49,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

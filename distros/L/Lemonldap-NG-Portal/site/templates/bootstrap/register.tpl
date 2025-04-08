@@ -1,5 +1,4 @@
 <TMPL_INCLUDE NAME="header.tpl">
-
 <div id="mailcontent" class="container">
 
   <TMPL_IF NAME="AUTH_ERROR">
@@ -7,7 +6,7 @@
   </TMPL_IF>
 
 
-
+<main>
   <TMPL_IF NAME="DISPLAY_FORM">
   <div class="card">
     <form action="#" method="post" class="login" role="form">
@@ -21,21 +20,21 @@
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><label for="firstnamefield" class="mb-0"><i class="fa fa-user"></i></label></span>
+        <span class="input-group-text"><label for="firstnamefield" class="mb-0"><span trspan="firstName" hidden></span><i class="fa fa-user"></i></label></span>
       </div>
       <input id="firstnamefield" name="firstname" type="text" value="<TMPL_VAR NAME="FIRSTNAME">" class="form-control" trplaceholder="firstName" required aria-required="true" autocomplete="given-name" />
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><label for="lastnamefield" class="mb-0"><i class="fa fa-user"></i></label></span>
+        <span class="input-group-text"><label for="lastnamefield" class="mb-0"><span trspan="lastName" hidden></span><i class="fa fa-user"></i></label></span>
       </div>
       <input id="lastnamefield" name="lastname" type="text" value="<TMPL_VAR NAME="LASTNAME">" class="form-control" autocomplete="family-name" trplaceholder="lastName" required aria-required="true"/>
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><label for="mailfield" class="mb-0"><i class="fa fa-envelope"></i></label></span>
+        <span class="input-group-text"><label for="mailfield" class="mb-0"><span trspan="mail" hidden></span><i class="fa fa-envelope"></i></label></span>
       </div>
       <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required aria-required="true" autocomplete="email" />
     </div>
@@ -137,6 +136,7 @@
 	    <span trspan="back2Portal">Go back to portal</span>
 	  </a>
 	</div>
+</main>
 
 </div>
 

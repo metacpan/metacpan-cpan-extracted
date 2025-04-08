@@ -2,8 +2,9 @@ package Lemonldap::NG::Common::MessageBroker::Pg;
 
 use strict;
 use JSON;
+use POSIX qw(:signal_h);
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 sub new {
     my ( $class, $conf, $logger ) = @_;
@@ -67,8 +68,34 @@ sub waitForNextMessage {
 sub _dbh {
     my ($self) = @_;
     return $self->{_dbh} if ( $self->{_dbh} and $self->{_dbh}->ping );
-    $self->{_dbh} = DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
-        $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+    $self->{_dbh} = undef;
+
+    # This timeout is inspired from example given by DBI(3)
+    my $mask = POSIX::SigSet->new(SIGALRM);
+    my $action =
+      POSIX::SigAction->new( sub { die "connect timeout\n" }, $mask );
+    my $oldaction = POSIX::SigAction->new();
+    sigaction( SIGALRM, $action, $oldaction );
+    eval {
+        eval {
+            alarm(10);
+            $self->{_dbh} =
+              DBI->connect( $self->{dbiChain}, $self->{dbiUser},
+                $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+
+            # Re subscribe to all channels when reconnecting
+            $self->subscribe($_) foreach ( keys %{ $self->{messages} || {} } );
+        };
+        alarm(0);
+    };
+    return $self->{_dbh} ||= bless {}, 'Lemonldap::NG::DBI::Failed';
+}
+
+package Lemonldap::NG::DBI::Failed;
+
+sub AUTOLOAD {
+    print STDERR "MsgBroker: Unable to load DBI\n";
+    return undef;
 }
 
 1;

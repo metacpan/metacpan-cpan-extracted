@@ -105,10 +105,11 @@ ENDKEY
         );
 
         expectXpath( $res,
-                '//script[@src="/static/common/js/'
-              . 'webauthn-json.browser-global.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthn-json.browser-global.min.js?v=")]' );
         expectXpath( $res,
-            '//script[@src="/static/common/js/webauthnregistration.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthnregistration.min.js?v=")]' );
 
         like(
             $res->[2]->[0],

@@ -36,8 +36,9 @@ Makefile\.old
 \.tar\.gz$
 \b_eumm/
 
-^OpenGLQ/OpenGLQ\.*
-^Rout/Rout\.*
+lib/PDL/Graphics/OpenGLQ(\.(pm|xs|c)$|-pp-)
+lib/PDL/Graphics/TriD/Rout(\.(pm|xs|c)$|-pp-)
+
 ^TriD/Tk.pm$
 
 ^\.git

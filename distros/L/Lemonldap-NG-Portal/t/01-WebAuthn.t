@@ -84,10 +84,11 @@ ENDKEY
           expectForm( $res, "", '/webauthn2fcheck', 'token', 'credential' );
 
         expectXpath( $res,
-                '//script[@src="/static/common/js/'
-              . 'webauthn-json.browser-global.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthn-json.browser-global.min.js?v=")]' );
         expectXpath( $res,
-            '//script[@src="/static/common/js/webauthncheck.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthncheck.min.js?v=")]' );
         is( getJsVars($res)->{webauthn_autostart},
             "1", "WebAuthn set to autostart" );
         ok( my $request = getJsVars($res)->{request},
@@ -165,10 +166,11 @@ ENDKEY
           expectForm( $res, "", '/webauthn2fcheck', 'token', 'credential' );
 
         expectXpath( $res,
-                '//script[@src="/static/common/js/'
-              . 'webauthn-json.browser-global.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthn-json.browser-global.min.js?v=")]' );
         expectXpath( $res,
-            '//script[@src="/static/common/js/webauthncheck.min.js"]' );
+                '//script[starts-with(@src,"/static/common/js/'
+              . 'webauthncheck.min.js?v=")]' );
 
         ok( my $request = getJsVars($res)->{request},
             "Found WebAuthn request" );

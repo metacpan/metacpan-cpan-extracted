@@ -1,0 +1,17 @@
+Revision history for Config::Abstraction - Configuration Abstraction Layer
+
+0.04	Mon Apr  7 21:06:26 EDT 2025
+	Better handling of config_file mode when an XML file is missing its header
+	Handle more drivers
+	Added the sep_char option
+
+0.03	Mon Apr  7 16:22:16 EDT 2025
+	Use Params::Get
+	Needs Test::Most
+	Improved handling of XML files
+
+0.02	Mon Apr  7 12:50:34 EDT 2025
+	Added config_file option
+
+0.01	Mon Apr  7 11:45:31 EDT 2025
+        First draft

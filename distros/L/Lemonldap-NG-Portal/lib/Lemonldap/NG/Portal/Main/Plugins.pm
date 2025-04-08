@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -13,11 +13,13 @@ use Mouse;
 #
 # Developers: 2FA must be loaded before Notifications
 # Developers: GlobalLogout must be the last loaded plugin
+# Developers: Notifications must be loaded before PublicNotifications
 our @pList = (
     portalDisplayResetPassword          => '::Plugins::MailPasswordReset',
     portalDisplayCertificateResetByMail => '::Plugins::CertificateResetByMail',
     cda                                 => '::Plugins::CDA',
     notification                        => '::Plugins::Notifications',
+    publicNotifications                 => '::Plugins::PublicNotifications',
     rememberAuthChoiceRule              => '::Plugins::RememberAuthChoice',
     stayConnected                       => '::Plugins::StayConnected',
     portalCheckLogins                   => '::Plugins::History',
@@ -44,6 +46,8 @@ our @pList = (
     locationDetect      => '::Plugins::LocationDetect',
     globalLogoutRule    => '::Plugins::GlobalLogout',
     samlFederationFiles => '::Plugins::SamlFederation',
+    'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsAllowNativeSso' =>
+      '::Plugins::OIDCNativeSso',
     'or::oidcOPMetaDataOptions/*/oidcOPMetaDataOptionsRequirePkce' =>
       '::Plugins::AuthOidcPkce',
     'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsTokenXAuthorizedRP' =>
@@ -72,7 +76,7 @@ sub enabledServices {
     push @res, [ secondFactor => $self->conf->{'sfEngine'} ];
 
     # Portal menu
-    push @res, [ menu         => "::Main::Menu" ];
+    push @res, [ menu => "::Main::Menu" ];
 
     # Trusted browser
     if ( $self->conf->{trustedBrowserRule} or $self->conf->{stayConnected} ) {

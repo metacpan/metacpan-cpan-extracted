@@ -77,12 +77,26 @@ count(1);
 ok( $resp[1] eq 'french', 'Username is returned' );
 count(1);
 
+ok(
+    $res = $issuer->_get(
+        '/cas/validate',
+        query  => 'service=http://auth.sp.com/&' . $query,
+        accept => 'text/html'
+    ),
+    'Query CAS server'
+);
+count(1);
+
+@resp = split /\n/, $res->[2]->[0];
+
+is( $resp[0], 'no', 'Ticket is no longer valid' );
+count(1);
+
 clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

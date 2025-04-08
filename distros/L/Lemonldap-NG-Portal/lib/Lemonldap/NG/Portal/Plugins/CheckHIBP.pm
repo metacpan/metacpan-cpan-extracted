@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -68,13 +68,14 @@ sub init {
         ['POST']
     );
 
+    my $cacheTag = $self->p->cacheTag;
     $self->p->addPasswordPolicyDisplay(
         'ppolicy-checkhibp',
         {
             condition  => $self->conf->{checkHIBP},
             label      => "passwordCompromised",
             customHtml =>
-qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/hibp.min.js"></script>',
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/hibp.min.js?v=$cacheTag"></script>',
             order => 201,
         }
     );

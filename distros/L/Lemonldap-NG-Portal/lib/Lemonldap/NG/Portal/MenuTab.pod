@@ -1,3 +1,4 @@
+
 =pod
 
 =encoding utf8
@@ -11,12 +12,12 @@ Lemonldap:NG::Portal::MenuTab - Writing custom menu tabs for LemonLDAP::NG
   package Lemonldap::NG::Portal::Plugins::CustomMenuTab;
 
   use strict;
+  use warnings;
   use Mouse;
 
   our $VERSION = '0.1';
 
   extends 'Lemonldap::NG::Portal::Main::Plugin';
-  with 'Lemonldap::NG::Portal::MenuTab';
 
   use constant name => "CustomMenuTab";
 
@@ -25,6 +26,7 @@ Lemonldap:NG::Portal::MenuTab - Writing custom menu tabs for LemonLDAP::NG
       lazy    => 1,
       builder => sub { $_[0]->conf->{customPluginsParams}->{customMenuRule} },
   );
+  with 'Lemonldap::NG::Portal::MenuTab';
 
   sub display {
       my ( $self, $req ) = @_;

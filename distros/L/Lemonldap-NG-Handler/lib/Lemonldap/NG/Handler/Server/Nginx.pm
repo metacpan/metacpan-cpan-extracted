@@ -6,7 +6,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Handler::Server::Main;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Handler::PSGI';
 
@@ -66,9 +66,8 @@ sub _run {
 #@param $req Lemonldap::NG::Common::PSGI::Request
 sub handler {
     my ( $self, $req ) = @_;
-    my @convertedHdrs =
-      ( 'Content-Length' => 0, Cookie => ( $req->env->{HTTP_COOKIE} // '' ) );
-    my $i = 0;
+    my @convertedHdrs = ( 'Content-Length' => 0 );
+    my $i             = 0;
     while ( my ( $k, $v ) = splice( @{ $req->{respHeaders} }, 0, 2 ) ) {
         if ( $k =~ /^(?:Deleteheader\d+|Lm-Remote-(?:User|Custom)|Cookie)$/ ) {
             push @convertedHdrs, $k, $v;

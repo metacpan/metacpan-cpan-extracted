@@ -4,7 +4,6 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils::CSS qw(check_array_css_color);
-use Test::MockObject;
 use Test::More 'tests' => 8;
 use Test::NoWarnings;
 

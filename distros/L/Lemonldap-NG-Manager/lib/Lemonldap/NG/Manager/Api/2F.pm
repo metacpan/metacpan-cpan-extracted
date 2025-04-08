@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::2F;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -513,6 +513,11 @@ sub _totpKeyToSecret {
     return undef;
 }
 
+sub _get_epoch {
+    my ($self) = @_;
+    return time();
+}
+
 sub _add2F {
     my ( $self, $uid, $type, $add, $allow_create ) = @_;
 
@@ -521,7 +526,10 @@ sub _add2F {
 
     my $device = $res->{device};
 
-    $device->{epoch} = time();
+    $device->{epoch} = $self->_get_epoch();
+
+    $res = $self->_check_duplicates( $uid, $device );
+    return $res if ( $res->{res} ne 'ok' );
 
     $res =
       $self->_add2FToSessions( $uid, $device, $self->_getPersistentMod,
@@ -535,6 +543,30 @@ sub _add2F {
         $whatToTrace );
 
     return { res => "ok" };
+}
+
+sub _check_duplicates {
+    my ( $self, $uid, $device ) = @_;
+    my $type   = $device->{type};
+    my $new_id = genId2F($device);
+
+    my $res = $self->_get2F( $uid, uc $type );
+    if ( $res->{res} eq 'ok' ) {
+        my @devices = @{ $res->{secondFactors} // [] };
+        if ( grep { $_->{id} and $_->{id} eq $new_id } @devices ) {
+            return {
+                res  => 'ko',
+                code => 409,
+                msg  => "ID $new_id is already used by an existing device"
+            };
+        }
+        else {
+            return { res => 'ok' };
+        }
+    }
+    else {
+        return { res => 'ok' };
+    }
 }
 
 sub _add2FToSessions {

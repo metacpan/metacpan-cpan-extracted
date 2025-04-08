@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -51,7 +51,8 @@ sub run {
         $req,
         'totp2fcheck',
         params => {
-            TOKEN => $token,
+            TARGET => $self->p->relativeUrl( $req, 'totp2fcheck' ),
+            TOKEN  => $token,
             $self->get2fTplParams($req),
         }
     );

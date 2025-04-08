@@ -11,14 +11,13 @@ SKIP: {
     skip "Manual skip of GPG test", $mainTests if ( $ENV{LLNG_SKIP_GPG_TEST} );
     eval "use IPC::Run 0.93 'run',";
     skip "Missing dependency", $mainTests if ($@);
-    my $gpg = `which gpg`;
-    skip "Missing gpg", $mainTests if ($@);
+    my $gpg = eval { `which gpg` };
+    skip "Missing gpg", $mainTests if $@ or not $gpg;
     chomp $gpg;
     my $res;
     use_ok('Lemonldap::NG::Common::FormEncode');
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 authentication => 'GPG',

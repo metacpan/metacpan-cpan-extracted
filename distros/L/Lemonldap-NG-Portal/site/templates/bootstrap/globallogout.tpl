@@ -41,7 +41,7 @@
       <p id="timer" trspan="autoGlobalLogout">Automatically global logout in 30 seconds</p>
     </div>
   </p>
-  <form id="globallogout" action="/globallogout?all=1" method="post" class="password" role="form">
+  <form id="globallogout" action="<TMPL_VAR NAME="FORM_ACTION">" method="post" class="password" role="form">
     <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     <div class="buttons">
       <button type="submit" class="btn btn-danger">
@@ -60,9 +60,9 @@
   </form>
 
   <!-- //if:jsminified
-    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/globalLogout.min.js"></script>
+    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/globalLogout.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
   //else -->
-    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/globalLogout.js"></script>
+    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/globalLogout.js?v=<TMPL_VAR CACHE_TAG>"></script>
   <!-- //endif -->
 
 </div>

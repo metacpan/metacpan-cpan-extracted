@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use JSON;
 use Encode;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.20.2';
 our $initDone;
 
 sub Lemonldap::NG::Common::Conf::_lock {
@@ -123,6 +123,7 @@ sub load {
         }
         binmode FILE;
         $f = join( '', <FILE> );
+        close FILE;
         eval { $ret = from_json( $f, { allow_nonref => 1 } ) };
         if ($@) {
             print STDERR "$@\n";

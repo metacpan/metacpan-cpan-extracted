@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -307,7 +307,7 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
 systemd (and other UIs) as a user-visible label for the unit, so this string
 should identify the unit rather than describe it, despite the name. This string also shouldn\'t just
 repeat the unit name. C<Apache2 Web Server> is a good example. Bad examples are
-C<high-performance light-weight HTTP server> (too generic) or
+C<high-performance lightweight HTTP server> (too generic) or
 C<Apache2> (meaningless for people who do not know Apache, duplicates the unit
 name). systemd may use this string as a noun in status messages (C<Starting
 description...>, C<Started
@@ -912,7 +912,7 @@ cancelled, the unit however will not change state or even enter the C<failed> mo
 
 Both settings take a time span with the default unit of seconds, but other units may be
 specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
 C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
@@ -933,7 +933,7 @@ cancelled, the unit however will not change state or even enter the C<failed> mo
 
 Both settings take a time span with the default unit of seconds, but other units may be
 specified, see
-L<systemd.time(5)>.
+L<systemd.time(7)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
 C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
@@ -1639,7 +1639,9 @@ relative comparisons are supported for versioned parameters (e.g. C<VERSION_ID>;
 with C<< < >>, C<< <= >>, C<==>,
 C<< <> >>, C<< >= >>, C<< > >>), and shell-style
 wildcard comparisons (C<*>, C<?>, C<[]>) are
-supported with the C<$=> (match) and C<!$=> (non-match).',
+supported with the C<$=> (match) and C<!$=> (non-match).
+
+If the given key is not found in the file, the match is done against an empty value.',
         'type' => 'list'
       },
       'ConditionMemoryPressure',
@@ -2171,7 +2173,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

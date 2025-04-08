@@ -56,6 +56,27 @@ subtest "Default ID token" => sub {
     is( $payload->{iss},   "http://auth.op.com/", "Issuer is correct" );
     is( $payload->{sub},   "french",              "Subject is correct" );
     is( $payload->{email}, undef,                 "No claims in ID Token" );
+    ok( !exists $payload->{amr}, "No amr set" );
+};
+
+subtest "Custom AMR rule" => sub {
+    my $op = getop( {
+            oidcServiceMetaDataAmrRules => {
+                myamr  => '$uid eq "french"',
+                cigood => '$_clientId eq "rpid"',
+                ckgood => '$_clientConfKey eq "rp"',
+                cibad  => '$_clientId eq "rpid2"',
+                ckbad  => '$_clientConfKey eq "rp2"',
+            }
+        }
+    );
+
+    my ( $header, $payload ) = getIDTokenParts($op);
+    is_deeply(
+        [ sort @{ $payload->{amr} } ],
+        [qw/cigood ckgood myamr/],
+        "Correct AMR values found"
+    );
 };
 
 subtest "Has Key ID in conf" => sub {

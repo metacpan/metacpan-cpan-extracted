@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -334,6 +334,23 @@ C<PrivateDevices>.
 In order to allow propagating mounts at runtime in a safe manner, C</run/systemd/propagate/>
 on the host will be used to set up new mounts, and C</run/host/incoming/> in the private namespace
 will be used as an intermediate step to store them before being moved to the final mount point.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'BindLogSockets',
+      {
+        'description' => 'Takes a boolean argument. If true, sockets from L<systemd-journald.socket(8)>
+will be bind mounted into the mount namespace. This is particularly useful when a different instance
+of C</run/> is employed, to make sure processes running in the namespace
+can still make use of L<sd-journal(3)>.
+
+This option is implied when C<LogNamespace> is used,
+when C<MountAPIVFS=yes>, or when C<PrivateDevices=yes> is used
+in conjunction with either C<RootDirectory> or C<RootImage>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -709,12 +726,13 @@ UID/GIDs are recycled after a unit is terminated. Care should be taken that any 
 part of a unit for which dynamic users/groups are enabled do not leave files or directories owned by
 these users/groups around, as a different unit might get the same UID/GID assigned later on, and thus
 gain access to these files or directories. If C<DynamicUser> is enabled,
-C<RemoveIPC> and C<PrivateTmp> are implied (and cannot be turned
-off). This ensures that the lifetime of IPC objects and temporary files created by the executed
-processes is bound to the runtime of the service, and hence the lifetime of the dynamic
-user/group. Since C</tmp/> and C</var/tmp/> are usually the only
-world-writable directories on a system this ensures that a unit making use of dynamic user/group
-allocation cannot leave files around after unit termination. Furthermore
+C<RemoveIPC> is implied (and cannot be turned off). This ensures that the lifetime
+of IPC objects and temporary files created by the executed processes is bound to the runtime of the
+service, and hence the lifetime of the dynamic user/group. Since C</tmp/> and
+C</var/tmp/> are usually the only world-writable directories on a system, unless
+C<PrivateTmp> is manually set to C<true>, C<disconnected>
+would be implied. This ensures that a unit making use of dynamic user/group allocation cannot
+leave files around after unit termination. Furthermore
 C<NoNewPrivileges> and C<RestrictSUIDSGID> are implicitly enabled
 (and cannot be disabled), to ensure that processes invoked cannot take benefit or create SUID/SGID
 files or directories. Moreover C<ProtectSystem=strict> and
@@ -792,10 +810,10 @@ main unit process will be migrated to its own session scope unit when it is acti
 be associated with two units: the unit it was originally started from (and for which
 C<PAMName> was configured), and the session scope unit. Any child processes of that process
 will however be associated with the session scope unit only. This has implications when used in combination
-with C<NotifyAccess>C<all>, as these child processes will not be able to affect
+with C<NotifyAccess>=C<all>, as these child processes will not be able to affect
 changes in the original unit through notification messages. These messages will be considered belonging to the
 session scope unit and not the original unit. It is hence not recommended to use C<PAMName> in
-combination with C<NotifyAccess>C<all>.',
+combination with C<NotifyAccess>=C<all>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2132,7 +2150,11 @@ made read-only. Similar, C<StateDirectory>, C<LogsDirectory>, \x{2026} and
 related directory settings (see below) also exclude the specific directories from the effect of
 C<ProtectSystem>. This setting is implied if C<DynamicUser> is
 set. This setting cannot ensure protection in all cases. In general it has the same limitations as
-C<ReadOnlyPaths>, see below. Defaults to off.",
+C<ReadOnlyPaths>, see below. Defaults to off.
+
+Note that if C<ProtectSystem> is set to C<strict> and
+C<PrivateTmp> is enabled, then C</tmp/> and
+C</var/tmp/> will be writable.",
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -2188,6 +2210,12 @@ below the locations defined in the following table. Also, the corresponding envi
 be defined with the full paths of the directories. If multiple directories are set, then in the
 environment variable the paths are concatenated with colon (C<:>).
 
+If C<DynamicUser> is used, and if the kernel version supports
+L<id-mapped mounts|https://lwn.net/Articles/896255/>, the specified directories will
+be owned by \"nobody\" in the host namespace and will be mapped to (and will be owned by) the service's
+UID/GID in its own namespace. For backward compatibility, existing directories created without id-mapped
+mounts will be kept untouched.
+
 In case of C<RuntimeDirectory> the innermost subdirectories are removed when
 the unit is stopped. It is possible to preserve the specified directories in this case if
 C<RuntimeDirectoryPreserve> is configured to C<restart> or
@@ -2227,12 +2255,19 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
-and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
-The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
-The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
-options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter.
+C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>	optionally support two
+more parameters, separated by C<:>. The second parameter will be interpreted as a
+destination path that will be created as a symlink to the directory. The symlinks will be created
+after any C<BindPaths> or C<TemporaryFileSystem> options have been
+set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by using
+the same first parameter, but a different second parameter. The third parameter is a flags field,
+and since v257 can take a value of C<ro> to make the directory read only for the
+service. This is also supported for C<ConfigurationDirectory>. If multiple symlinks
+are set up, the directory will be read only if at least one is configured to be read only. To pass a
+flag without a destination symlink, the second parameter can be empty, for example:
+
+    ConfigurationDirectory=foo::ro
 
 The directories defined by these options are always created under the standard paths used by systemd
 (C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
@@ -2286,6 +2321,12 @@ below the locations defined in the following table. Also, the corresponding envi
 be defined with the full paths of the directories. If multiple directories are set, then in the
 environment variable the paths are concatenated with colon (C<:>).
 
+If C<DynamicUser> is used, and if the kernel version supports
+L<id-mapped mounts|https://lwn.net/Articles/896255/>, the specified directories will
+be owned by \"nobody\" in the host namespace and will be mapped to (and will be owned by) the service's
+UID/GID in its own namespace. For backward compatibility, existing directories created without id-mapped
+mounts will be kept untouched.
+
 In case of C<RuntimeDirectory> the innermost subdirectories are removed when
 the unit is stopped. It is possible to preserve the specified directories in this case if
 C<RuntimeDirectoryPreserve> is configured to C<restart> or
@@ -2325,12 +2366,19 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
-and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
-The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
-The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
-options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter.
+C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>	optionally support two
+more parameters, separated by C<:>. The second parameter will be interpreted as a
+destination path that will be created as a symlink to the directory. The symlinks will be created
+after any C<BindPaths> or C<TemporaryFileSystem> options have been
+set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by using
+the same first parameter, but a different second parameter. The third parameter is a flags field,
+and since v257 can take a value of C<ro> to make the directory read only for the
+service. This is also supported for C<ConfigurationDirectory>. If multiple symlinks
+are set up, the directory will be read only if at least one is configured to be read only. To pass a
+flag without a destination symlink, the second parameter can be empty, for example:
+
+    ConfigurationDirectory=foo::ro
 
 The directories defined by these options are always created under the standard paths used by systemd
 (C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
@@ -2384,6 +2432,12 @@ below the locations defined in the following table. Also, the corresponding envi
 be defined with the full paths of the directories. If multiple directories are set, then in the
 environment variable the paths are concatenated with colon (C<:>).
 
+If C<DynamicUser> is used, and if the kernel version supports
+L<id-mapped mounts|https://lwn.net/Articles/896255/>, the specified directories will
+be owned by \"nobody\" in the host namespace and will be mapped to (and will be owned by) the service's
+UID/GID in its own namespace. For backward compatibility, existing directories created without id-mapped
+mounts will be kept untouched.
+
 In case of C<RuntimeDirectory> the innermost subdirectories are removed when
 the unit is stopped. It is possible to preserve the specified directories in this case if
 C<RuntimeDirectoryPreserve> is configured to C<restart> or
@@ -2423,12 +2477,19 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
-and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
-The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
-The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
-options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter.
+C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>	optionally support two
+more parameters, separated by C<:>. The second parameter will be interpreted as a
+destination path that will be created as a symlink to the directory. The symlinks will be created
+after any C<BindPaths> or C<TemporaryFileSystem> options have been
+set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by using
+the same first parameter, but a different second parameter. The third parameter is a flags field,
+and since v257 can take a value of C<ro> to make the directory read only for the
+service. This is also supported for C<ConfigurationDirectory>. If multiple symlinks
+are set up, the directory will be read only if at least one is configured to be read only. To pass a
+flag without a destination symlink, the second parameter can be empty, for example:
+
+    ConfigurationDirectory=foo::ro
 
 The directories defined by these options are always created under the standard paths used by systemd
 (C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
@@ -2482,6 +2543,12 @@ below the locations defined in the following table. Also, the corresponding envi
 be defined with the full paths of the directories. If multiple directories are set, then in the
 environment variable the paths are concatenated with colon (C<:>).
 
+If C<DynamicUser> is used, and if the kernel version supports
+L<id-mapped mounts|https://lwn.net/Articles/896255/>, the specified directories will
+be owned by \"nobody\" in the host namespace and will be mapped to (and will be owned by) the service's
+UID/GID in its own namespace. For backward compatibility, existing directories created without id-mapped
+mounts will be kept untouched.
+
 In case of C<RuntimeDirectory> the innermost subdirectories are removed when
 the unit is stopped. It is possible to preserve the specified directories in this case if
 C<RuntimeDirectoryPreserve> is configured to C<restart> or
@@ -2521,12 +2588,19 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
-and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
-The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
-The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
-options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter.
+C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>	optionally support two
+more parameters, separated by C<:>. The second parameter will be interpreted as a
+destination path that will be created as a symlink to the directory. The symlinks will be created
+after any C<BindPaths> or C<TemporaryFileSystem> options have been
+set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by using
+the same first parameter, but a different second parameter. The third parameter is a flags field,
+and since v257 can take a value of C<ro> to make the directory read only for the
+service. This is also supported for C<ConfigurationDirectory>. If multiple symlinks
+are set up, the directory will be read only if at least one is configured to be read only. To pass a
+flag without a destination symlink, the second parameter can be empty, for example:
+
+    ConfigurationDirectory=foo::ro
 
 The directories defined by these options are always created under the standard paths used by systemd
 (C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
@@ -2580,6 +2654,12 @@ below the locations defined in the following table. Also, the corresponding envi
 be defined with the full paths of the directories. If multiple directories are set, then in the
 environment variable the paths are concatenated with colon (C<:>).
 
+If C<DynamicUser> is used, and if the kernel version supports
+L<id-mapped mounts|https://lwn.net/Articles/896255/>, the specified directories will
+be owned by \"nobody\" in the host namespace and will be mapped to (and will be owned by) the service's
+UID/GID in its own namespace. For backward compatibility, existing directories created without id-mapped
+mounts will be kept untouched.
+
 In case of C<RuntimeDirectory> the innermost subdirectories are removed when
 the unit is stopped. It is possible to preserve the specified directories in this case if
 C<RuntimeDirectoryPreserve> is configured to C<restart> or
@@ -2619,12 +2699,19 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
-and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
-The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
-The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
-options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter.
+C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>	optionally support two
+more parameters, separated by C<:>. The second parameter will be interpreted as a
+destination path that will be created as a symlink to the directory. The symlinks will be created
+after any C<BindPaths> or C<TemporaryFileSystem> options have been
+set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by using
+the same first parameter, but a different second parameter. The third parameter is a flags field,
+and since v257 can take a value of C<ro> to make the directory read only for the
+service. This is also supported for C<ConfigurationDirectory>. If multiple symlinks
+are set up, the directory will be read only if at least one is configured to be read only. To pass a
+flag without a destination symlink, the second parameter can be empty, for example:
+
+    ConfigurationDirectory=foo::ro
 
 The directories defined by these options are always created under the standard paths used by systemd
 (C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
@@ -3180,20 +3267,27 @@ C</var/lib/systemd> or its contents.',
       },
       'PrivateTmp',
       {
-        'description' => 'Takes a boolean argument. If true, sets up a new file system namespace for the
-executed processes and mounts private C</tmp/> and C</var/tmp/>
-directories inside it that are not shared by processes outside of the namespace. This is useful to
-secure access to temporary files of the process, but makes sharing between processes via
-C</tmp/> or C</var/tmp/> impossible. If true, all temporary files
-created by a service in these directories will be removed after the service is stopped. Defaults to
-false. It is possible to run two or more units within the same private C</tmp/> and
-C</var/tmp/> namespace by using the C<JoinsNamespaceOf> directive,
-see L<systemd.unit(5)>
-for details. This setting is implied if C<DynamicUser> is set. For this setting, the
-same restrictions regarding mount propagation and privileges apply as for
-C<ReadOnlyPaths> and related calls, see above. Enabling this setting has the side
-effect of adding C<Requires> and C<After> dependencies on all mount
-units necessary to access C</tmp/> and C</var/tmp/>. Moreover an
+        'description' => 'Takes a boolean argument, or C<disconnected>. If enabled, a new
+file system namespace will be set up for the executed processes, and C</tmp/>
+and C</var/tmp/> directories inside it are not shared with processes outside of
+the namespace, plus all temporary files created by a service in these directories will be removed after
+the service is stopped. If C<true>, the backing storage of the private temporary directories
+will remain on the host\'s C</tmp/> and C</var/tmp/> directories.
+If C<disconnected>, the directories will be backed by a completely new tmpfs instance,
+meaning that the storage is fully disconnected from the host namespace. Defaults to false.
+
+This setting is useful to secure access to temporary files of the process, but makes sharing
+between processes via C</tmp/> or C</var/tmp/> impossible.
+If not set to C<disconnected>, it is possible to run two or more units within
+the same private C</tmp/> and C</var/tmp/> namespace by using
+the C<JoinsNamespaceOf> directive, see
+L<systemd.unit(5)>
+for details. This setting is implied if C<DynamicUser> is set. For this setting,
+the same restrictions regarding mount propagation and privileges apply as for
+C<ReadOnlyPaths> and related calls, see above. If set to C<true>
+(as opposed to C<disconnected>), this has the side effect of adding
+C<Requires> and C<After> dependencies on all mount units necessary
+to access C</tmp/> and C</var/tmp/> on the host. Moreover an
 implicitly C<After> ordering on
 L<systemd-tmpfiles-setup.service(8)>
 is added.
@@ -3369,26 +3463,69 @@ L<prctl(2)>.',
           'yes'
         ]
       },
+      'PrivatePIDs',
+      {
+        'description' => 'Takes a boolean argument. Defaults to false. If enabled, sets up a new PID namespace
+for the executed processes. Each executed process is now PID 1 - the init process - in the new namespace.
+C</proc/> is mounted such that only processes in the PID namespace are visible.
+If C<PrivatePIDs> is set, C<MountAPIVFS=yes> is implied.
+
+C<PrivatePIDs> is only supported for service units. This setting is not supported
+with C<Type=forking> since the kernel will kill all processes in the PID namespace if
+the init process terminates.
+
+This setting will be ignored if the kernel does not support PID namespaces.
+
+Note unprivileged user services (i.e. a service run by the per-user instance of the service manager)
+will fail with C<PrivatePIDs=yes> if C</proc/> is masked
+(i.e. C</proc/kmsg> is over-mounted with C<tmpfs> like
+L<systemd-nspawn(1)> does).
+This is due to a kernel restriction not allowing unprivileged user namespaces to mount a less restrictive
+instance of C</proc/>.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'PrivateUsers',
       {
-        'description' => 'Takes a boolean argument. If true, sets up a new user namespace for the executed processes and
-configures a minimal user and group mapping, that maps the C<root> user and group as well as
-the unit\'s own user and group to themselves and everything else to the C<nobody> user and
-group. This is useful to securely detach the user and group databases used by the unit from the rest of the
-system, and thus to create an effective sandbox environment. All files, directories, processes, IPC objects and
-other resources owned by users/groups not equaling C<root> or the unit\'s own will stay visible
-from within the unit but appear owned by the C<nobody> user and group. If this mode is enabled,
-all unit processes are run without privileges in the host user namespace (regardless if the unit\'s own
-user/group is C<root> or not). Specifically this means that the process will have zero process
-capabilities on the host\'s user namespace, but full capabilities within the service\'s user namespace. Settings
-such as C<CapabilityBoundingSet> will affect only the latter, and there\'s no way to acquire
-additional capabilities in the host\'s user namespace. Defaults to off.
+        'choice' => [
+          'identity',
+          'no',
+          'self',
+          'yes'
+        ],
+        'description' => 'Takes a boolean argument or one of C<self> or
+C<identity>. Defaults to false. If enabled, sets up a new user namespace for the
+executed processes and configures a user and group mapping. If set to a true value or
+C<self>, a minimal user and group mapping is configured that maps the
+C<root> user and group as well as the unit\'s own user and group to themselves and
+everything else to the C<nobody> user and group. This is useful to securely detach
+the user and group databases used by the unit from the rest of the system, and thus to create an
+effective sandbox environment. All files, directories, processes, IPC objects and other resources
+owned by users/groups not equaling C<root> or the unit\'s own will stay visible from
+within the unit but appear owned by the C<nobody> user and group.
+
+If the parameter is C<identity>, user namespacing is set up with an identity
+mapping for the first 65536 UIDs/GIDs. Any UIDs/GIDs above 65536 will be mapped to the
+C<nobody> user and group, respectively. While this does not provide UID/GID isolation,
+since all UIDs/GIDs are chosen identically it does provide process capability isolation, and hence is
+often a good choice if proper user namespacing with distinct UID maps is not appropriate.
+
+If this mode is enabled, all unit processes are run without privileges in the host user
+namespace (regardless if the unit\'s own user/group is C<root> or not). Specifically
+this means that the process will have zero process capabilities on the host\'s user namespace, but
+full capabilities within the service\'s user namespace. Settings such as
+C<CapabilityBoundingSet> will affect only the latter, and there\'s no way to acquire
+additional capabilities in the host\'s user namespace.
 
 When this setting is set up by a per-user instance of the service manager, the mapping of the
 C<root> user and group to itself is omitted (unless the user manager is root).
 Additionally, in the per-user instance manager case, the
 user namespace will be set up before most other namespaces. This means that combining
-C<PrivateUsers>C<true> with other namespaces will enable use of features not
+C<PrivateUsers>=C<true> with other namespaces will enable use of features not
 normally supported by the per-user instances of the service manager.
 
 This setting is particularly useful in conjunction with
@@ -3399,12 +3536,14 @@ are C<root>, C<nobody> and the unit\'s own user and group.
 Note that the implementation of this setting might be impossible (for example if user namespaces are not
 available), and the unit should be written in a way that does not solely rely on this setting for
 security.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
         'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
+        'value_type' => 'enum'
       },
       'ProtectHostname',
       {
@@ -3513,19 +3652,35 @@ C</proc/kmsg>. If enabled, these are made inaccessible to all the processes in t
       },
       'ProtectControlGroups',
       {
-        'description' => 'Takes a boolean argument. If true, the Linux Control Groups (L<cgroups(7)>) hierarchies
-accessible through C</sys/fs/cgroup/> will be made read-only to all processes of the
-unit. Except for container managers no services should require write access to the control groups hierarchies;
-it is hence recommended to turn this on for most services. For this setting the same restrictions regarding
-mount propagation and privileges apply as for C<ReadOnlyPaths> and related calls, see
-above. Defaults to off. If C<ProtectControlGroups> is set, C<MountAPIVFS=yes>
-is implied.',
-        'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
+        'choice' => [
           'no',
+          'private',
+          'strict',
           'yes'
-        ]
+        ],
+        'description' => 'Takes a boolean argument or the special values C<private> or
+C<strict>. If true, the Linux Control Groups (L<cgroups(7)>) hierarchies
+accessible through C</sys/fs/cgroup/> will be made read-only to all processes of the
+unit. If set to C<private>, the unit will run in a cgroup namespace with a private
+writable mount of C</sys/fs/cgroup/>. If set to C<strict>, the unit
+will run in a cgroup namespace with a private read-only mount of C</sys/fs/cgroup/>.
+Defaults to off. If C<ProtectControlGroups> is set, C<MountAPIVFS=yes>
+is implied. Note C<private> and C<strict> are downgraded to false and
+true respectively unless the system is using the unified control group hierarchy and the kernel supports
+cgroup namespaces.
+
+Except for container managers no services should require write access to the control groups hierarchies;
+it is hence recommended to set C<ProtectControlGroups> to true or C<strict>
+for most services. For this setting the same restrictions regarding mount propagation and privileges apply
+as for C<ReadOnlyPaths> and related settings, see above.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
+        'type' => 'leaf',
+        'value_type' => 'enum'
       },
       'RestrictAddressFamilies',
       {
@@ -4242,7 +4397,12 @@ to it will be lost.
 
 C<tty> connects standard output to a tty (as configured via C<TTYPath>,
 see below). If the TTY is used for output only, the executed process will not become the controlling process of
-the terminal, and will not fail or wait for other processes to release the terminal.
+the terminal, and will not fail or wait for other processes to release the terminal. Note: if a unit
+tries to print multiple lines to a TTY during bootup or shutdown, then there's a chance that those
+lines will be broken up by status messages. SetShowStatus() can be used to
+prevent this problem. See
+L<org.freedesktop.systemd1(5)>
+for details.
 
 C<journal> connects standard output with the journal, which is accessible via
 L<journalctl(1)>. Note
@@ -4432,7 +4592,7 @@ C<notice>, C<info>, C<debug> (highest log level, also lowest priority
 messages). See L<syslog(3)> for
 details. By default no filtering is applied (i.e. the default maximum log level is C<debug>). Use
 this option to configure the logging system to drop log messages of a specific service above the specified
-level. For example, set C<LogLevelMax>C<info> in order to turn off debug logging
+level. For example, set C<LogLevelMax>=C<info> in order to turn off debug logging
 of a particularly chatty unit. Note that the configured level is applied to any log messages written by any
 of the processes belonging to this unit, as well as any log messages written by the system manager process
 (PID 1) in reference to this unit, sent via any supported logging protocol. The filtering is applied
@@ -4641,7 +4801,8 @@ Defaults to true.',
       'TTYReset',
       {
         'description' => 'Reset the terminal device specified with C<TTYPath> before and after
-execution. Defaults to C<no>.',
+execution. This does not erase the screen (see C<TTYVTDisallocate> below for
+that). Defaults to C<no>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -4652,25 +4813,28 @@ C<TTYPath> before and after execution. Defaults to C<no>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
-      'TTYRows',
-      {
-        'description' => 'Configure the size of the TTY specified with C<TTYPath>. If unset or
-set to the empty string, the kernel default is used.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
       'TTYColumns',
       {
         'description' => 'Configure the size of the TTY specified with C<TTYPath>. If unset or
-set to the empty string, the kernel default is used.',
+set to the empty string, it is attempted to retrieve the dimensions of the terminal screen via ANSI
+sequences, and if that fails the kernel defaults (typically 80x24) are used.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'TTYRows',
+      {
+        'description' => 'Configure the size of the TTY specified with C<TTYPath>. If unset or
+set to the empty string, it is attempted to retrieve the dimensions of the terminal screen via ANSI
+sequences, and if that fails the kernel defaults (typically 80x24) are used.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'TTYVTDisallocate',
       {
-        'description' => 'If the terminal device specified with C<TTYPath> is a virtual console
-terminal, try to deallocate the TTY before and after execution. This ensures that the screen and scrollback
-buffer is cleared. Defaults to C<no>.',
+        'description' => 'If the terminal device specified with C<TTYPath> is a virtual
+console terminal, try to deallocate the TTY before and after execution. This ensures that the screen
+and scrollback buffer is cleared. If the terminal device is of any other type of TTY an attempt is
+made to clear the screen via ANSI sequences. Defaults to C<no>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -4962,6 +5126,18 @@ a single trailing C<*> wildcard may be specified. Both C<?> and
 C<[]> wildcards are not permitted, nor are C<*> wildcards anywhere
 except at the end of the glob expression.
 
+Optionally, the credential name or glob may be followed by a colon followed by a rename pattern.
+If specified, all credentials matching the credential name or glob are renamed according to the given
+pattern. For example, if C<ImportCredential=my.original.cred:my.renamed.cred> is
+specified, the service manager will read the C<my.original.cred> credential and make
+it available as the C<my.renamed.cred> credential to the service. Similarly, if
+C<ImportCredential=my.original.*:my.renamed.> is specified, the service manager will
+read all credentials starting with C<my.original.> and make them available as
+C<my.renamed.xxx> to the service.
+
+If C<ImportCredential> is specified multiple times and multiple credentials
+end up with the same name after renaming, the first one is kept and later ones are dropped.
+
 When multiple credentials of the same name are found, credentials found by
 C<LoadCredential> and C<LoadCredentialEncrypted> take priority over
 credentials found by C<ImportCredential>.",
@@ -5062,7 +5238,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

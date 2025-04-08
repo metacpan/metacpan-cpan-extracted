@@ -1,7 +1,7 @@
 package Plack::Middleware::Auth::LemonldapNG;
 
 our $AUTHORITY = 'cpan:GUIMARD';
-our $VERSION   = '2.0';
+our $VERSION   = '2.21.0';
 our $llclass   = 'Lemonldap::NG::Handler::Server';
 
 use strict;
@@ -32,10 +32,6 @@ sub call {
         }
     }
     my $app  = $self->app;
-    my %hdrs = @{ $res->[1] };
-    foreach ( keys %hdrs ) {
-        $env->{$_} = 'HTTP_' . uc( $hdrs{$_} ) foreach ( keys %hdrs );
-    }
     @_ = $env;
     goto $app;
 }

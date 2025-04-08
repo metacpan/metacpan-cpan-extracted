@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -77,7 +77,7 @@ setting has no effect.',
       {
         'description' => 'These settings control the C<cpu> controller in the unified hierarchy.
 
-These options accept an integer value or a the special string "idle":
+These options accept an integer value or the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
@@ -96,7 +96,7 @@ configuration, so users should be careful to not mistake one for the other.',
       {
         'description' => 'These settings control the C<cpu> controller in the unified hierarchy.
 
-These options accept an integer value or a the special string "idle":
+These options accept an integer value or the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
@@ -804,7 +804,7 @@ in case of egress traffic the destination IP address is checked. The following r
 turn:
 
 In order to implement an allow-listing IP firewall, it is recommended to use a
-C<IPAddressDeny>C<any> setting on an upper-level slice unit
+C<IPAddressDeny>=C<any> setting on an upper-level slice unit
 (such as the root slice C<-.slice> or the slice containing all system services
 C<system.slice> \x{2013} see
 L<systemd.special(7)>
@@ -850,7 +850,7 @@ in case of egress traffic the destination IP address is checked. The following r
 turn:
 
 In order to implement an allow-listing IP firewall, it is recommended to use a
-C<IPAddressDeny>C<any> setting on an upper-level slice unit
+C<IPAddressDeny>=C<any> setting on an upper-level slice unit
 (such as the root slice C<-.slice> or the slice containing all system services
 C<system.slice> \x{2013} see
 L<systemd.special(7)>
@@ -881,7 +881,7 @@ them for IP security.",
       'SocketBindAllow',
       {
         'description' => "Configures restrictions on the ability of unit processes to invoke L<bind(2)> on a
-socket. Both allow and deny rules may defined that restrict which addresses a socket may be bound
+socket. Both allow and deny rules to be defined that restrict which addresses a socket may be bound
 to.
 
 bind-rule describes socket properties such as address-family,
@@ -970,7 +970,7 @@ Examples:
       'SocketBindDeny',
       {
         'description' => "Configures restrictions on the ability of unit processes to invoke L<bind(2)> on a
-socket. Both allow and deny rules may defined that restrict which addresses a socket may be bound
+socket. Both allow and deny rules to be defined that restrict which addresses a socket may be bound
 to.
 
 bind-rule describes socket properties such as address-family,
@@ -1172,7 +1172,7 @@ empty string is assigned to these settings the program list is reset and all pre
 
 If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
 is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+C<BPFProgram>=C<ingress>:BPF_FS_PROGRAM_PATH,
 the assignment will be still considered valid and the program will be attached to a cgroup. Same for
 C<IPEgressFilterPath> path and C<egress> hook.
 
@@ -1186,7 +1186,7 @@ one more restricted, depending on the use case.
 Note that these settings might not be supported on some systems (for example if eBPF control group
 support is not enabled in the underlying kernel or container manager). These settings will fail the service in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting.',
+(requires C<Delegate>=C<yes>) instead of using this setting.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1207,7 +1207,7 @@ empty string is assigned to these settings the program list is reset and all pre
 
 If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
 is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+C<BPFProgram>=C<ingress>:BPF_FS_PROGRAM_PATH,
 the assignment will be still considered valid and the program will be attached to a cgroup. Same for
 C<IPEgressFilterPath> path and C<egress> hook.
 
@@ -1221,7 +1221,7 @@ one more restricted, depending on the use case.
 Note that these settings might not be supported on some systems (for example if eBPF control group
 support is not enabled in the underlying kernel or container manager). These settings will fail the service in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting.',
+(requires C<Delegate>=C<yes>) instead of using this setting.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1525,11 +1525,26 @@ for systemd-oomd to terminate.',
       {
         'description' => 'Overrides the default memory pressure limit set by
 L<oomd.conf(5)> for
-this unit (cgroup). Takes a percentage value between 0% and 100%, inclusive. This property is
-ignored unless C<ManagedOOMMemoryPressure>C<kill>. Defaults to 0%,
+the cgroup of this unit. Takes a percentage value between 0% and 100%, inclusive. Defaults to 0%,
 which means to use the default set by
 L<oomd.conf(5)>.
+This property is ignored unless C<ManagedOOMMemoryPressure>=C<kill>.
 ',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ManagedOOMMemoryPressureDurationSec',
+      {
+        'description' => "Overrides the default memory pressure duration set by
+L<oomd.conf(5)> for
+the cgroup of this unit. The specified value supports a time unit such as C<ms> or
+C<\x{3bc}s>, see
+L<systemd.time(7)>
+for details on the permitted syntax. Must be set to either empty or a value of at least 1s. Defaults
+to empty, which means to use the default set by
+L<oomd.conf(5)>.
+This property is ignored unless C<ManagedOOMMemoryPressure>=C<kill>.
+",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1582,24 +1597,23 @@ and L<oomd.conf(5)>.
       {
         'choice' => [
           'auto',
-          'off',
-          'on',
-          'skip'
+          'no',
+          'skip',
+          'yes'
         ],
-        'description' => 'Controls memory pressure monitoring for invoked processes. Takes one of
-C<off>, C<on>, C<auto> or C<skip>. If
-C<off> tells the service not to watch for memory pressure events, by setting the
-C<$MEMORY_PRESSURE_WATCH> environment variable to the literal string
-C</dev/null>. If C<on> tells the service to watch for memory
-pressure events. This enables memory accounting for the service, and ensures the
-C<memory.pressure> cgroup attribute file is accessible for reading and writing by the
-service\'s user. It then sets the C<$MEMORY_PRESSURE_WATCH> environment variable for
-processes invoked by the unit to the file system path to this file. The threshold information
-configured with C<MemoryPressureThresholdSec> is encoded in the
-C<$MEMORY_PRESSURE_WRITE> environment variable. If the C<auto> value
-is set the protocol is enabled if memory accounting is anyway enabled for the unit, and disabled
-otherwise. If set to C<skip> the logic is neither enabled, nor disabled and the two
-environment variables are not set.
+        'description' => 'Controls memory pressure monitoring for invoked processes. Takes a boolean or one of
+C<auto> and C<skip>. If C<no>, tells the service not
+to watch for memory pressure events, by setting the C<$MEMORY_PRESSURE_WATCH>
+environment variable to the literal string C</dev/null>. If C<yes>,
+tells the service to watch for memory pressure events. This enables memory accounting for the
+service, and ensures the C<memory.pressure> cgroup attribute file is accessible for
+reading and writing by the service\'s user. It then sets the C<$MEMORY_PRESSURE_WATCH>
+environment variable for processes invoked by the unit to the file system path to this file. The
+threshold information configured with C<MemoryPressureThresholdSec> is encoded in
+the C<$MEMORY_PRESSURE_WRITE> environment variable. If the C<auto>
+value is set the protocol is enabled if memory accounting is anyway enabled for the unit, and
+disabled otherwise. If set to C<skip> the logic is neither enabled, nor disabled and
+the two environment variables are not set.
 
 Note that services are free to use the two environment variables, but it\'s unproblematic if
 they ignore them. Memory pressure handling must be implemented individually in each service, and
@@ -1614,6 +1628,12 @@ to watch for and handle memory pressure events.
 
 If not explicit set, defaults to the C<DefaultMemoryPressureWatch> setting in
 L<systemd-system.conf(5)>.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -1640,7 +1660,8 @@ with C<Delegate=yes>. Defaults to false.
 When systemd-coredump is handling a coredump for a process from a container,
 if the container\'s leader process is a descendant of a cgroup with C<CoredumpReceive=yes>
 and C<Delegate=yes>, then systemd-coredump will attempt to forward
-the coredump to systemd-coredump within the container.',
+the coredump to systemd-coredump within the container. See also
+L<systemd-coredump(8)>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -1649,7 +1670,7 @@ the coredump to systemd-coredump within the container.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

@@ -4,7 +4,7 @@ use base 'Log::Dispatch::Buffer';
 # Make sure we have version info for this module
 # Be strict from now on
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 use strict;
 
 # Satisfy require

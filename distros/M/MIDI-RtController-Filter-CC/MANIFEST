@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/control-change.pl
+eg/multi.pl
 lib/MIDI/RtController/Filter/CC.pm
 t/00-compile.t
 t/01-functions.t

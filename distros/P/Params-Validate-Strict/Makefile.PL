@@ -20,8 +20,9 @@ WriteMakefile(
 		? ('LICENSE'=> 'GPL')
 		: ()),
 	PREREQ_PM => {
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Carp' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'Params::Get' => 0,
 	},
 	META_MERGE => {
 		resources => {

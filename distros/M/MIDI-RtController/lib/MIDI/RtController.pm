@@ -5,12 +5,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0602';
+our $VERSION = '0.0603';
 
 use Moo;
 use strictures 2;
 use Carp qw(croak);
-use Future::AsyncAwait;
 use IO::Async::Channel ();
 use IO::Async::Loop ();
 use IO::Async::Routine ();
@@ -178,7 +177,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0602
+version 0.0603
 
 =head1 SYNOPSIS
 

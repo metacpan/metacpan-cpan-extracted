@@ -10,7 +10,7 @@
         </button>
       </div>
       <div class="modal-body">
-      <form action="/finduser" method="POST" id="finduserForm" role="form" class="login">
+      <form action="<TMPL_VAR NAME="FORM_ACTION">" method="POST" id="finduserForm" role="form" class="login">
         <div class="form">
           <TMPL_IF NAME="TOKEN">
             <input id="finduserToken" type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />

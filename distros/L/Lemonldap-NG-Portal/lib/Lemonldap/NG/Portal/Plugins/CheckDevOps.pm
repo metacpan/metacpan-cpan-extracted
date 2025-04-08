@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REGISTERFORMEMPTY
 );
 
-our $VERSION = '2.18.2';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -66,10 +66,11 @@ sub display {
 
     # Display form
     my $params = {
-        DOWNLOAD => $self->conf->{checkDevOpsDownload},
-        MSG      => 'checkDevOps',
-        ALERTE   => 'alert-info',
-        TOKEN    => (
+        FORM_ACTION => $self->p->relativeUrl( $req, 'checkdevops' ),
+        DOWNLOAD    => $self->conf->{checkDevOpsDownload},
+        MSG         => 'checkDevOps',
+        ALERTE      => 'alert-info',
+        TOKEN       => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''
@@ -107,10 +108,11 @@ sub parse {
 
         # Prepare form
         my $params = {
-            DOWNLOAD => $self->conf->{checkDevOpsDownload},
-            MSG      => "PE$msg",
-            ALERTE   => 'alert-warning',
-            TOKEN    => $token
+            FORM_ACTION => $self->p->relativeUrl( $req, 'checkdevops' ),
+            DOWNLOAD    => $self->conf->{checkDevOpsDownload},
+            MSG         => "PE$msg",
+            ALERTE      => 'alert-warning',
+            TOKEN       => $token
         };
         return $self->p->sendJSONresponse( $req, $params )
           if ( $req->wantJSON && $msg );
@@ -214,7 +216,7 @@ sub parse {
             $Lemonldap::NG::Common::Safelib::functions );
 
         foreach ( keys %{ $json->{rules} } ) {
-            $cpt->reval($json->{rules}->{$_});
+            $cpt->reval( $json->{rules}->{$_} );
             my $err = join(
                 '',
                 grep(
@@ -299,15 +301,16 @@ sub parse {
 
     # Prepare form
     my $params = {
-        DOWNLOAD => $self->conf->{checkDevOpsDownload},
-        MSG      => $msg,
-        UNKNOWN  => join( $self->conf->{multiValuesSeparator}, @$unknown ),
-        ALERTE   => $alert,
-        FILE     => $json,
-        HEADERS  => $headers,
-        RULES    => $rules,
-        URL      => $url,
-        TOKEN    => (
+        FORM_ACTION => $self->p->relativeUrl( $req, 'checkdevops' ),
+        DOWNLOAD    => $self->conf->{checkDevOpsDownload},
+        MSG         => $msg,
+        UNKNOWN     => join( $self->conf->{multiValuesSeparator}, @$unknown ),
+        ALERTE      => $alert,
+        FILE        => $json,
+        HEADERS     => $headers,
+        RULES       => $rules,
+        URL         => $url,
+        TOKEN       => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''

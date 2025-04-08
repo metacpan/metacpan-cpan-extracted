@@ -3,7 +3,7 @@ package Lemonldap::NG::Handler::PSGI::Try;
 use strict;
 use Mouse;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
@@ -92,17 +92,30 @@ sub _run {
                 $req->userData( $self->api->data );
                 $req->respHeaders( $res->[1] );
             }
-            elsif ( $res->[0] != 403 and not $req->data->{noTry} ) {
-
-                # Unset headers (handler adds a Location header)
-                $self->logger->debug(
-                    "User not authenticated, Try in use, cancel redirection");
-                $req->userData( {} );
-                $req->respHeaders( [] );
-                $self->routes( $self->unAuthRoutes );
-            }
             else {
-                return $res;
+                my $mt = $self->api->checkMaintenanceMode($req);
+                if (
+                    not $req->data->{noTry}
+                    and (
+                       # Normal case, only Forbidden response are given directly
+                        ( $res->[0] != 403 and !$mt )
+
+            # If portal is in maintainance mode call it only to display /lmerror
+                        or ( $mt and $req->path_info =~ m#^/+lmerror/#i )
+                    )
+                  )
+                {
+                    # Unset headers (handler adds a Location header)
+                    $self->logger->debug(
+                        "User not authenticated, Try in use, cancel redirection"
+                    );
+                    $req->userData( {} );
+                    $req->respHeaders( [] );
+                    $self->routes( $self->unAuthRoutes );
+                }
+                else {
+                    return $res;
+                }
             }
             $res = $self->handler($req);
             push @{ $res->[1] }, $req->spliceHdrs;

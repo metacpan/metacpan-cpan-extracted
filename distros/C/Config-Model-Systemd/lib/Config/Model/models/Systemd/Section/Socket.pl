@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -430,13 +430,15 @@ C<USBFunctionStrings> options set.
       'SocketProtocol',
       {
         'choice' => [
+          'mptcp',
           'sctp',
           'udplite'
         ],
-        'description' => 'Takes one of C<udplite>
-or C<sctp>. The socket will use the UDP-Lite
-(C<IPPROTO_UDPLITE>) or SCTP
-(C<IPPROTO_SCTP>) protocol, respectively.',
+        'description' => 'Takes one of C<udplite>,
+C<sctp> or C<mptcp>. The socket will use
+the UDP-Lite (C<IPPROTO_UDPLITE>), SCTP
+(C<IPPROTO_SCTP>) or MPTCP
+(C<IPPROTO_MPTCP>) protocol, respectively.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -491,7 +493,7 @@ above).',
       'SocketUser',
       {
         'description' => 'Takes a UNIX user/group name. When specified, all C<AF_UNIX>
-sockets and FIFO nodes in the file system are owned by the specified user and group. If unset (the
+sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the
 default), the nodes are owned by the root user/group (if run in system context) or the invoking
 user/group (if run in user context).  If only a user is specified but no group, then the group is
 derived from the user\'s default group.',
@@ -501,7 +503,7 @@ derived from the user\'s default group.',
       'SocketGroup',
       {
         'description' => 'Takes a UNIX user/group name. When specified, all C<AF_UNIX>
-sockets and FIFO nodes in the file system are owned by the specified user and group. If unset (the
+sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the
 default), the nodes are owned by the root user/group (if run in system context) or the invoking
 user/group (if run in user context).  If only a user is specified but no group, then the group is
 derived from the user\'s default group.',
@@ -510,10 +512,9 @@ derived from the user\'s default group.',
       },
       'SocketMode',
       {
-        'description' => 'If listening on a file system socket or FIFO,
-this option specifies the file system access mode used when
-creating the file node. Takes an access mode in octal
-notation. Defaults to 0666.',
+        'description' => 'If listening on a file system socket, FIFO, or message queue, this option specifies
+the file system access mode used when creating the file node. Takes an access mode in octal notation.
+Defaults to 0666.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -547,14 +548,19 @@ daemons designed for usage with L<inetd(8)> to work
 unmodified with systemd socket activation.
 
 Note that depending on this setting the services activated by units of this type are either
-regular services (in case of C<Accept>C<no>) or instances of templated
-services (in case of C<Accept>C<yes>). See the Description section
+regular services (in case of C<Accept>=C<no>) or instances of templated
+services (in case of C<Accept>=C<yes>). See the Description section
 above for a more detailed discussion of the naming rules of triggered services.
 
-For IPv4 and IPv6 connections, the C<REMOTE_ADDR> environment variable will
-contain the remote IP address, and C<REMOTE_PORT> will contain the remote port. This
+For IPv4 and IPv6 connections, the C<$REMOTE_ADDR> environment variable will
+contain the remote IP address, and C<$REMOTE_PORT> will contain the remote port. This
 is the same as the format used by CGI. For C<SOCK_RAW>, the port is the IP
 protocol.
+
+For C<AF_UNIX> socket connections, the C<$REMOTE_ADDR>
+environment variable will contain either the remote socket\'s file system path starting with a slash
+(C</>) or its address in the abstract namespace starting with an at symbol
+(C<@>). If the socket is unnamed, C<$REMOTE_ADDR> won\'t be set.
 
 It is recommended to set C<CollectMode=inactive-or-failed> for service
 instances activated via C<Accept=yes>, to ensure that failed connection services are
@@ -1098,18 +1104,15 @@ list.',
       },
       'FileDescriptorName',
       {
-        'description' => 'Assigns a name to all file descriptors this
-socket unit encapsulates. This is useful to help activated
-services identify specific file descriptors, if multiple fds
-are passed. Services may use the
+        'description' => 'Assigns a name to all file descriptors this socket unit encapsulates.
+This is useful to help activated services identify specific file descriptors, if multiple fds are passed.
+Services may use the
 L<sd_listen_fds_with_names(3)>
-call to acquire the names configured for the received file
-descriptors. Names may contain any ASCII character, but must
-exclude control characters and C<:>, and must
-be at most 255 characters in length. If this setting is not
-used, the file descriptor name defaults to the name of the
-socket unit, including its C<.socket>
-suffix.',
+call to acquire the names configured for the received file descriptors. Names may contain any ASCII character,
+but must exclude control characters and C<:>, and must be at most 255 characters in length.
+If this setting is not used, the file descriptor name defaults to the name of the socket unit
+(including its C<.socket> suffix) when C<Accept=no>,
+C<connection> otherwise.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1228,7 +1231,7 @@ C<ExecStartPre> command cannot access socket file descriptors.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NOTIFICATION
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -166,6 +166,7 @@ sub notificationServer {
 sub myNotifs {
     my ( $self, $req, $ref ) = @_;
 
+    $self->p->importHandlerData($req);
     if ($ref) {
         return $self->sendJSONresponse( $req,
             { error => 'Missing epoch parameter' } )

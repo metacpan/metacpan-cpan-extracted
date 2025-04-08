@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_FIRSTACCESS PE_ERROR);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Lib::Choice';
 
@@ -70,6 +70,18 @@ sub setSecurity {
             last;
         }
     }
+}
+
+sub isCallback {
+    my ( $self, $req ) = @_;
+    if ( my $choice = $req->pdata->{_choice} ) {
+        my $mod = $self->modules->{$choice};
+        if ( $mod and $mod->can('isCallback') and $mod->isCallback($req) ) {
+            $self->logger->debug("Detected callback for $choice");
+            return 1;
+        }
+    }
+    return;
 }
 
 1;

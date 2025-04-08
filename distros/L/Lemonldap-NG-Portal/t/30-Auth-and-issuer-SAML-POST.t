@@ -266,6 +266,8 @@ SKIP: {
         );
         expectOK($res);
         my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+        is( expectPdata($res)->{targetAuthnLevel},
+            1, "Expected target AuthnLevel" );
 
         # Try to authenticate with an authorized user to IdP
         $s = "user=french&password=french&$s";
@@ -395,6 +397,32 @@ SKIP: {
         expectOK($res);
         expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
             'SAMLRequest' );
+
+        subtest "Check dynamic required authentication level" => sub {
+            $idpId = $issuer->login("rtyler");
+            ok(
+                $res = $sp->_get(
+                    '/', accept => 'text/html',
+                ),
+                'Unauth SP request'
+            );
+            expectOK($res);
+            ( $host, $url, $s ) =
+              expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+                'SAMLRequest' );
+
+            ok(
+                $res = $issuer->_post(
+                    $url,
+                    IO::String->new($s),
+                    accept => 'text/html',
+                    length => length($s),
+                    cookie => "lemonldap=$idpId",
+                ),
+                'Post SAML request to IdP'
+            );
+            expectXpath( $res, '//span[@trspan="askToUpgrade"]' );
+        };
     };
 }
 
@@ -412,14 +440,16 @@ sub issuer {
                 globalLogoutRule       => 1,
                 globalLogoutTimer      => 0,
                 issuerDBSAMLActivation => 1,
-                issuerDBSAMLRule       => '$uid eq "french"',
-                samlSPMetaDataOptions  => {
+                issuerDBSAMLRule      => '$uid eq "french" or $uid eq "rtyler"',
+                samlSPMetaDataOptions => {
                     'sp.com' => {
                         samlSPMetaDataOptionsEncryptionMode           => 'none',
                         samlSPMetaDataOptionsSignSSOMessage           => 1,
                         samlSPMetaDataOptionsSignSLOMessage           => 1,
                         samlSPMetaDataOptionsCheckSSOMessageSignature => 1,
                         samlSPMetaDataOptionsCheckSLOMessageSignature => 1,
+                        samlSPMetaDataOptionsAuthnLevel               =>
+                          '$uid eq "rtyler" ? 9 : 1',
                     }
                 },
                 samlSPMetaDataExportedAttributes => {

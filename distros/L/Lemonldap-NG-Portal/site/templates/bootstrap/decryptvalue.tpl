@@ -7,7 +7,7 @@
   <div class="alert <TMPL_VAR NAME="DALERTE"> alert"><div class="text-center"><span trspan="<TMPL_VAR NAME="DECRYPTED">"></span></div></div>
   </TMPL_IF>
 
-  <form id="findUser" action="/decryptvalue" method="post" class="password" role="form">
+  <form id="findUser" action="<TMPL_VAR NAME="FORM_ACTION">" method="post" class="password" role="form">
     <div class="buttons">
       <TMPL_IF NAME="TOKEN">
       <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />

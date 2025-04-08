@@ -69,6 +69,10 @@ the /\=/ is used as the name with everything after being the value.
 Lines matching /^[A-Za-z0-9\_]+\|/ are checks to run. Anything before
 the /\|/ is the name with everything after command to run.
 
+Lines matching /^\%[A-Za-z0-9\_]+\|/ are debug check to run. Anything before the
+/\|/ is the name with everything after command to run. These will not count towards
+the any of the counts. This exists purely for debugging purposes.
+
 Any other sort of lines are considered an error.
 
 Variables in the checks are in the form of /%+varaible_name%+/.
@@ -79,13 +83,16 @@ the config.
 ## EXAMPLE CONFIG
 
 ```
-    env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-    # this is a comment
-    GEOM_DEV=foo
-    geom_foo|/usr/local/libexec/nagios/check_geom mirror %GEOM_DEV%
-    does_not_exist|/bin/this_will_error yup... that it will
+env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+# this is a comment
+GEOM_DEV=foo
+geom_foo|/usr/local/libexec/nagios/check_geom mirror %GEOM_DEV%
+does_not_exist|/bin/this_will_error yup... that it will
     
-    does_not_exist_2|/usr/bin/env /bin/this_will_also_error
+does_not_exist_2|/usr/bin/env /bin/this_will_also_error
+
+#includes route info
+%routes|netstat -rn
 ```
 
 The first line sets the %ENV variable PATH.
@@ -169,6 +176,21 @@ For the following `$name` is the name of the check ran.
 - .data.checks.$name.exit :: The exit code.
 
 - .data.checks.$name.error :: Only present it died on a signal or
+  could not be executed. Provides a brief description.
+
+For the following `$name` is the name of the debug check ran.
+
+- .data.debugs.$name :: A hash with info on the checks ran.
+
+- .data.debugs.$name.check :: The command pre-variable substitution.
+
+- .data.debugs.$name.ran :: The command ran.
+
+- .data.debugs.$name.output :: The output of the check.
+
+- .data.debugs.$name.exit :: The exit code.
+
+- .data.debugs.$name.error :: Only present it died on a signal or
   could not be executed. Provides a brief description.
 
 ## INSTALLING

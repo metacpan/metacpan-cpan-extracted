@@ -37,6 +37,8 @@ my @notManagedAttributes = (
     # Loggers
     'log4perlConfFile', 'userSyslogFacility', 'logger', 'sentryDsn',
     'syslogFacility',   'userLogger',         'logLevel',
+    'lokiUserService',  'lokiTenant',         'lokiUrl', 'lokiTenantHeader',
+    'lokiLabel', 'lokiService', 'lokiInstance', 'lokiEnv', 'lokiAuthorization',
 
     # Plugins parameters
     'notificationsMaxRetrieve', 'persistentSessionAttributes',
@@ -60,7 +62,7 @@ my @notManagedAttributes = (
     'zimbraUrl',
 
     # Other ini-only prms
-    'checkTime',, 'eventStatus', 'statusQueueName', 'soapProxyUrn',
+    'checkTime', 'eventStatus', 'statusQueueName', 'soapProxyUrn',
     'impersonationPrefix',       'pdataDomain',
     'mySessionAuthorizedRWKeys', 'contextSwitchingPrefix',
     'defaultNewKeySize',         'checkMsg',

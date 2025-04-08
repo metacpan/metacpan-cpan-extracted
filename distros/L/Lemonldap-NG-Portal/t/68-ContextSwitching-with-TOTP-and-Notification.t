@@ -16,7 +16,7 @@ print F '[
   "reference": "testref",
   "title": "Test title",
   "subtitle": "Test subtitle",
-  "text": "This is a test text",
+  "text": "This is a test text for $uid",
   "check": ["Accept test","Accept test2"]
 }
 ]';
@@ -358,7 +358,13 @@ ok(
 ok( $res->[2]->[0] =~ m%trspan="gotNewMessages">%,
     'You have some new messages' )
   or explain( $res->[2]->[0], 'trspan="gotNewMessages"' );
-count(2);
+is(
+    getHtmlElement( $res, '//p[@class="notifText"]/text()' )->pop()->data,
+    "This is a test text for msmith",
+    "Found notification text"
+);
+count(3);
+
 
 ## Try to authenticate => TOTP prompted
 ok(

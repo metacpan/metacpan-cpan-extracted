@@ -241,7 +241,6 @@ if (!defined $query) {
     }
 
     system("clear");
-    print "> $input\n";
     if (@last_results) {
         print_results(@last_results);
     } else {
@@ -249,6 +248,7 @@ if (!defined $query) {
     }
 
     print "\nType query (ESC to quit):\n";
+    print "> $input\n";
 
     while (1) {
         my $char;
@@ -264,7 +264,6 @@ if (!defined $query) {
         }
 
         system("clear");
-        print "> $input\n";
 
         my @results;
         my $ok = eval {
@@ -293,6 +292,8 @@ if (!defined $query) {
         } else {
             print "[INFO] No previous valid results.\n";
         }
+
+        print "\n> $input\n";
     }
 
     system("stty sane");

@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Util qw/display2F getPSessionID/;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -58,7 +58,8 @@ sub delSession {
     );
     $session->remove;
 
-    Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
+    Lemonldap::NG::Handler::Main->publishEvent( $req,
+        { action => 'unlog', id => $id } );
     return $session->error
       ? $self->sendError( $req, $session->error, 200 )
       : $self->sendJSONresponse( $req, { result => 1 } );
@@ -333,7 +334,8 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
     #   { session => <sessionId>, userId => <_session_uid> }
     else {
         $res = [
-            map {
+            sort { $a->{userId} cmp $b->{userId} }
+              map {
                 {
                     session => $_,
                     userId  => $res->{$_}->{_session_uid},
@@ -457,7 +459,9 @@ sub _session {
       or return $self->sendError( $req, undef, 400 );
 
     # Try to read session
-    my $apacheSession = $self->getApacheSession( $mod, $id, hashStore => 0 )
+    my $hashed = $req->param('hash') ? 1 : 0;
+    my $apacheSession =
+      $self->getApacheSession( $mod, $id, hashStore => $hashed )
       or return $self->sendError( $req, undef, 400 );
 
     my %session = %{ $apacheSession->data };

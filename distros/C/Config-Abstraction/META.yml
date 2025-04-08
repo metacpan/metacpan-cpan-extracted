@@ -1,0 +1,44 @@
+---
+abstract: 'Configuration Abstraction Layer'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::TempDir::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Abstraction
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config::Auto: '0'
+  Config::IniFiles: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  Hash::Flatten: '0'
+  Hash::Merge: '0'
+  JSON::MaybeXS: '0'
+  Params::Get: '0'
+  XML::LibXML: '0'
+  XML::Parser::Expat: '0'
+  XML::Simple: '0'
+  YAML::XS: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
+  homepage: https://metacpan.org/pod/Config::Abstraction
+  repository: https://github.com/nigelhorne/Config-Abstraction
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

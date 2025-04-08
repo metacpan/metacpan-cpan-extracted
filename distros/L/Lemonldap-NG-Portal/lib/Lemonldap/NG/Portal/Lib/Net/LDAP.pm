@@ -260,7 +260,7 @@ sub userBind {
         elsif ( $mesg->code == 0 ) {
 
             # Get expiration warning and graces
-            if ( $resp->grace_authentications_remaining ) {
+            if ( defined( $resp->grace_authentications_remaining ) ) {
                 $self->{portal}->logger->debug(
                     "LDAP password policy - grace authentications remaining: "
                       . $resp->grace_authentications_remaining );

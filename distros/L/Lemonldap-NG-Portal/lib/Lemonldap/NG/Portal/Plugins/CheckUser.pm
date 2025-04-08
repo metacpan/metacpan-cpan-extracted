@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -165,13 +165,14 @@ sub display {
         $self->_createArray( $req, $attrs, $req->userData ) );
 
     my $params = {
-        MSG     => 'checkUser' . $self->merged,
-        ALERTE  => ( $self->merged ? 'alert-warning' : 'alert-info' ),
-        LOGIN   => $req->{userData}->{ $self->conf->{whatToTrace} },
-        HISTORY => ( @{ $history->[0] } || @{ $history->[1] } ) ? 1 : 0,
-        SUCCESS => $history->[0],
-        FAILED  => $history->[1],
-        DISPLAY => (
+        FORM_ACTION => $self->p->relativeUrl( $req, 'checkuser' ),
+        MSG         => 'checkUser' . $self->merged,
+        ALERTE      => ( $self->merged ? 'alert-warning' : 'alert-info' ),
+        LOGIN       => $req->{userData}->{ $self->conf->{whatToTrace} },
+        HISTORY     => ( @{ $history->[0] } || @{ $history->[1] } ) ? 1 : 0,
+        SUCCESS     => $history->[0],
+        FAILED      => $history->[1],
+        DISPLAY     => (
                  @{ $array_attrs->[0] }
               || @{ $array_attrs->[1] }
               || @{ $array_attrs->[2] }
@@ -217,10 +218,11 @@ sub check {
         }
 
         my $params = {
-            MSG    => "PE$msg",
-            ALERTE => 'alert-warning',
-            LOGIN  => '',
-            TOKEN  => $token,
+            FORM_ACTION => $self->p->relativeUrl( $req, 'checkuser' ),
+            MSG         => "PE$msg",
+            ALERTE      => 'alert-warning',
+            LOGIN       => '',
+            TOKEN       => $token,
         };
         return $self->p->sendJSONresponse( $req, $params )
           if $req->wantJSON && $msg;
@@ -244,10 +246,11 @@ sub check {
             $req,
             'checkuser',
             params => {
-                MSG    => 'PE' . PE_MALFORMEDUSER,
-                ALERTE => 'alert-warning',
-                LOGIN  => '',
-                TOKEN  => (
+                FORM_ACTION => $self->p->relativeUrl( $req, 'checkuser' ),
+                MSG         => 'PE' . PE_MALFORMEDUSER,
+                ALERTE      => 'alert-warning',
+                LOGIN       => '',
+                TOKEN       => (
                       $self->ottRule->( $req, {} )
                     ? $self->ott->createToken()
                     : ''
@@ -411,6 +414,7 @@ sub check {
 
     # TODO:
     my $params = {
+        FORM_ACTION => $self->p->relativeUrl( $req, 'checkuser' ),
         MSG         => $msg,
         ALERTE      => ( $msg eq 'checkUser' ? 'alert-info' : 'alert-warning' ),
         LOGIN       => $user,
@@ -596,12 +600,13 @@ sub _headers {
 sub _createArray {
     my ( $self, $req, $attrs, $userData ) = @_;
     my $array_attrs = [];
-    my @hidden = split /[,\s]+/, $self->conf->{checkUserHiddenAttributes};
+    my @hidden      = split /[,\s]+/, $self->conf->{checkUserHiddenAttributes};
 
     foreach ( sort keys %$attrs ) {
         push @$array_attrs,
           { key => $_, value => $attrs->{$_} }
-          unless ( ( isHiddenAttr( $self->conf, $_, @hidden )
+          unless ( (
+                isHiddenAttr( $self->conf, $_, @hidden )
                 && !$self->displayHiddenAttributesRule->( $req, $userData )
             )
             || (   !$attrs->{$_}

@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Manager::Conf::Parser;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 *defaultValue = \&Lemonldap::NG::Manager::Conf::Parser::defaultValue;
 
@@ -90,7 +90,10 @@ sub diff {
     }
     while ( my $key = shift @{ $keys[1] } ) {
         next unless ( defined( $conf[1]->{$key} ) );
-        next if ( $key =~ $hashParameters and ref( $conf[1]->{$key} ) eq 'HASH' and not( %{ $conf[1]->{$key} } ) );
+        next
+          if (  $key =~ $hashParameters
+            and ref( $conf[1]->{$key} ) eq 'HASH'
+            and not( %{ $conf[1]->{$key} } ) );
         if ( (
                 not ref( $conf[1]->{$key} ) and not( (
                         defined defaultValue( $self, $key )
@@ -146,52 +149,49 @@ sub appListDiff {
 
             # Category doesn't exists in new conf
             else {
-                $res[0]->{$cat} = $conf[0]->{$key};
+                my @tmp = _copyAppList( $self, $conf[0]->{$key} );
+                $res[0]->{$cat} = $tmp[1];
             }
         }
 
         # Checking for applications
         else {
-            my $name = $conf[0]->{$key}->{options}->{name};
+            my $oldname = $conf[0]->{$key}->{options}->{name};
+            if ( $conf[1]->{$key} ) {
+                my $newname = $conf[1]->{$key}->{options}->{name};
 
-            # Searching for the same name in new conf
-            my $found = undef;
-            my ( @newK, @newC );
-            for ( my $i = 0 ; $i < @{ $keys[1] } ; $i++ ) {
-                if ( $conf[1]->{ $keys[1]->[$i] }->{options}->{name} eq $name )
-                {
-                    # Same name found, checking for diff in options
-                    my $diff = 0;
-                    foreach my $k (
-                        keys %{ $conf[1]->{ $keys[1]->[$i] }->{options} } )
+                # compare options
+                foreach my $k ( keys %{ $conf[1]->{$key}->{options} } ) {
+                    unless ( ( $conf[1]->{$key}->{options}->{$k} // "" ) eq
+                        ( $conf[0]->{$key}->{options}->{$k} // "" ) )
                     {
-                        unless (
-                            $conf[1]->{ $keys[1]->[$i] }->{options}->{$k} eq
-                            $conf[0]->{$key}->{options}->{$k} )
-                        {
-                            $res[0]->{$name}->{options}->{$k} =
-                              $conf[0]->{$key}->{options}->{$k};
-                            $res[1]->{$name}->{options}->{$k} =
-                              $conf[1]->{$key}->{options}->{$k};
-                        }
+                        $res[0]->{$newname}->{options}->{$k} =
+                          $conf[0]->{$key}->{options}->{$k};
+                        $res[1]->{$newname}->{options}->{$k} =
+                          $conf[1]->{$key}->{options}->{$k};
                     }
-                    $found = $i unless ($diff);
                 }
-                else {
-                    push @newK, $keys[1]->[$i];
-                }
-            }
-            if ( defined $found ) {
-                $keys[1] = \@newK;
-            }
 
-            # Not found
+                # look for deleted options as well
+                foreach my $k ( keys %{ $conf[0]->{$key}->{options} } ) {
+                    unless ( exists $conf[1]->{$key}->{options}->{$k} ) {
+                        $res[0]->{$newname}->{options}->{$k} =
+                          $conf[0]->{$key}->{options}->{$k};
+                        $res[1]->{$newname}->{options}->{$k} = undef;
+                    }
+                }
+
+                # Remove found key from new keys
+                $keys[1] = [ grep { $_ ne $key } @{ $keys[1] // [] } ];
+            }
             else {
-                $res[0]->{$name} = $conf[0]->{$key};
+                # Mark not found key as an old element
+                $res[0]->{$oldname} = $conf[0]->{$key};
             }
         }
     }
 
+    # Mark each remaining new key as a new element
     while ( my $key = shift @{ $keys[1] } ) {
         my @tmp = _copyAppList( $self, $conf[1]->{$key} );
         $res[1]->{ $tmp[0] } = $tmp[1];

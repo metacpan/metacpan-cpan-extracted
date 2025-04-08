@@ -8,60 +8,151 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
+sub runTest {
+    my ( $name, $configuration, $post_params, $expected ) = @_;
+    subtest $name => sub {
+        my $client = LLNG::Manager::Test->new( { ini => $configuration } );
+
+        ok(
+            my $res = $client->_post(
+                '/', { user => "dwho", password => "dwho" },
+                %$post_params
+            ),
+            'Auth query'
+        );
+        my $id   = expectCookie($res);
+        my $data = getSession($id)->data;
+        while ( my ( $key, $value ) = each(%$expected) ) {
+            is( $data->{$key}, $value, "Session $key is $value" );
+        }
+    };
+}
+
 SKIP: {
     eval "use GeoIP2; use HTTP::BrowserDetect;";
     if ($@) {
         skip 'GeoIP2 / HTTP::BrowserDetect not found', 0;
     }
-    my ( $res, $id, $json );
 
-    my $client = LLNG::Manager::Test->new(
+    runTest(
+        "City database, city precision",
         {
-            ini => {
-                logLevel                     => 'error',
-                authentication               => 'Demo',
-                userDB                       => 'Same',
-                locationDetect               => 1,
-                locationDetectGeoIpDatabase  => 't/geoip/test.mmdb',
-                locationDetectGeoIpLanguages => 'en, fr',
-                restSessionServer            => 1,
-                exportedAttr => '+ mail , uid _location_detect_env'
-            }
+            locationDetect               => 1,
+            locationDetectIpDetail       => "city",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-City-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "81.2.69.161",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/2643743/GB',
+            '_location_detect_env_ip' => 'London (United Kingdom)',
         }
     );
 
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new('user=dwho&password=dwho'),
-            accept => 'text/html',
-            length => 23
-        ),
-        'Auth query'
+    runTest(
+        "City database, city precision, french",
+        {
+            locationDetect               => 1,
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-City-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            cookie => "llnglanguage=fr",
+            ip     => "81.2.69.161",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/2643743/GB',
+            '_location_detect_env_ip' => 'Londres (Royaume-Uni)',
+        }
     );
-    count(1);
-    $id = expectCookie($res);
 
-    ok(
-        $res = $client->_get(
-            '/session/my/global', cookie => "lemonldap=$id"
-        ),
-        'Get session'
+    runTest(
+        "City database, city precision, unknown IP",
+        {
+            locationDetect               => 1,
+            locationDetectIpDetail       => "city",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-City-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "1.2.3.4",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/unknown/unknown',
+            '_location_detect_env_ip' => 'Unknown (Unknown)',
+        }
     );
-    count(1);
-    $json = expectJSON($res);
 
-    ok( $json->{uid} eq 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
-    ok( $json->{_location_detect_env}, '_location_detect_env found' )
-      or explain( $json, "_location_detect_env" );
-    ok( scalar keys %$json == 11, '11 exported attributes found' )
-      or explain( $json, '11 exported attributes' );
-    count(3);
+    runTest(
+        "City database, country precision",
+        {
+            locationDetect               => 1,
+            locationDetectIpDetail       => "country",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-City-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "81.2.69.161",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/GB',
+            '_location_detect_env_ip' => 'United Kingdom',
+        }
+    );
 
-    ok( $client->logout($id), 'Logout' );
-    count(1);
+    runTest(
+        "City database, country precision, unknown IP",
+        {
+            locationDetect               => 1,
+            locationDetectIpDetail       => "country",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-City-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "1.2.3.4",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/unknown',
+            '_location_detect_env_ip' => 'Unknown',
+        }
+    );
+
+    runTest(
+        "Country database, country precision",
+        {
+            locationDetect               => 1,
+            locationDetectIpDetail       => "country",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-Country-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "81.2.69.161",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/GB',
+            '_location_detect_env_ip' => 'United Kingdom',
+        }
+    );
+    runTest(
+        "Country database, city precision",
+        {
+            locationDetect               => 1,
+            locationDetectIpDetail       => "city",
+            locationDetectGeoIpDatabase  => 't/geoip/GeoIP2-Country-Test.mmdb',
+            locationDetectGeoIpLanguages => 'en, fr',
+        },
+        {
+            ip => "81.2.69.161",
+        },
+        {
+            '_location_detect_env'    => 'mozilla/vms/unknown/GB',
+            '_location_detect_env_ip' => 'Unknown (United Kingdom)',
+        }
+    );
 }
 
 clean_sessions();
 
-done_testing( count() );
+done_testing();

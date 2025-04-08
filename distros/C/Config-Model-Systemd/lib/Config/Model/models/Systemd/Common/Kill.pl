@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -171,7 +171,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

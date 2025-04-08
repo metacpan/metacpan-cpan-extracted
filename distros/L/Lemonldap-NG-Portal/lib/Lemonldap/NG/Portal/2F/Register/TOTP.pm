@@ -6,7 +6,7 @@ use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::2F::Register::Base

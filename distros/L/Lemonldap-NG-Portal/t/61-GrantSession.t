@@ -10,8 +10,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => 'error',
             authentication    => 'Demo',
@@ -78,10 +77,14 @@ ok( $res->[2]->[0] =~ /<h3 trspan="dwho not allowed">dwho not allowed<\/h3>/,
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
-ok( $res->[2]->[0] =~ qr%src="/static/common/js/info.(?:min\.)?js"></script>%,
-    'Found INFO js' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(1);
+expectXpath(
+    $res,
+    '//script['
+      . 'starts-with(@src,"/static/common/js/info.min.js?v=")'
+      . ' or starts-with(@src,"/static/common/js/info.js?v=")]',
+    "Found info JS"
+);
+
 ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
     'Found custom Main Logo' )
   or print STDERR Dumper( $res->[2]->[0] );
@@ -144,8 +147,7 @@ ok( not(%$c), 'No cookie' );
 count(1);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-$client = LLNG::Manager::Test->new(
-    {
+$client = LLNG::Manager::Test->new( {
         ini => {
             authentication    => 'Demo',
             userdb            => 'Same',

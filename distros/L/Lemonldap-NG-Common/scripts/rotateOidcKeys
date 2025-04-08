@@ -13,7 +13,31 @@ use Lemonldap::NG::Common::Conf;
 use Lemonldap::NG::Common::Util::Crypto;
 use URI;
 
-my $debug = 0;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = "2.0.21";
+
+# Options
+my $opts = {};
+my $help;
+my $opt_user  = '__APACHEUSER__';
+my $opt_group = '__APACHEGROUP__';
+
+GetOptions(
+    'help|h'         => \$help,
+    'debug|d'         => \$opts->{debug},
+) or pod2usage( -exitcode => 1, -verbose => 0 );
+
+pod2usage(2) if $help;
+
+eval {
+    no warnings;
+    POSIX::setgid( scalar( getgrnam($opt_group) ) );
+    POSIX::setuid( scalar( getpwnam($opt_user) ) );
+};
+
+my $debug = $opts->{debug};
 
 #=============================================================================
 # Load configuration
@@ -110,3 +134,80 @@ if ( $conf->{oidcServicePrivateKeyEnc} ) {
 print "Configuration saved\n" if $debug;
 
 exit 0;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+rotateOidcKeys - rotate OpenID Connect signing keys
+
+=head1 SYNOPSIS
+
+  rotateOidcKeys [<options>]
+
+B<Options>:
+
+=over
+
+=item B<--help>: Show this help message
+
+=item B<--debug>: Increase verbosity of output
+
+=back
+
+=head1 DESCRIPTION
+
+rotateOidcKeys is a script that you can run in your crontab to periodically
+renew you OpenID Connect signing keys.
+
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Clement Oudot, E<lt>clement@oodo.netE<gt>
+
+=item Xavier Guimard, E<lt>yadd@debian.orgE<gt>
+
+=item Maxime Besson, E<lt>maxime.besson@worteks.comE<gt>
+
+=item Christophe Maudoux, E<lt>chrmdx@gmail.comE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+=over
+
+=item Copyright (C) 2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=item Copyright (C) 2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

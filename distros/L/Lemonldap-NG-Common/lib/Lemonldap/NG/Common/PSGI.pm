@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -431,8 +431,8 @@ sub _run {
     );
 }
 
-# This method turns a sub that takes a Lemonldap::NG::Common::PSGI::Request
-# obect and returns a PSGI response into a proper PSGI method.
+# This method returns a sub that takes a Lemonldap::NG::Common::PSGI::Request
+# object and returns a PSGI response into a proper PSGI method.
 sub psgiAdapter {
     my ( $self, $sub ) = @_;
     return sub {

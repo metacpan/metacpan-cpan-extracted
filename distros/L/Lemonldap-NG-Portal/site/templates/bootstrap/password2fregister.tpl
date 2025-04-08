@@ -39,9 +39,9 @@
   </div>
 
 <!-- //if:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/password2fregistration.min.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/password2fregistration.min.js?v=<TMPL_VAR CACHE_TAG>"></script>
 //else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/password2fregistration.js"></script>
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/password2fregistration.js?v=<TMPL_VAR CACHE_TAG>"></script>
 <!-- //endif -->
 
 <TMPL_INCLUDE NAME="footer.tpl">

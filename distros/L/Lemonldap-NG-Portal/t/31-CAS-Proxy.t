@@ -85,8 +85,7 @@ my $pt2 = casGetProxyTicket( $issuer, $pgt2, "http://subservice.com/srv" );
 $res = casGetProxyResponse( $issuer, $pt2, "http://subservice.com/srv" );
 expectCasSuccess($res);
 
-is_deeply(
-    [
+is_deeply( [
         casXPathAll(
             $res->[2]->[0],
             '/cas:serviceResponse/cas:authenticationSuccess'
@@ -104,12 +103,16 @@ $pt = casGetProxyTicket( $issuer, $pgt, "http://service.com/srv" );
 expectCasSuccess(
     casGetProxyResponse( $issuer, $pt, "http://service.com/srv" ) );
 
+# Try to get a proxy ticket for an app that doesn't support them
+$ticket = casGetTicket( $issuer, $idpId, "http://casnoproxy.com/" );
+casGetPgtNotAllowed( $issuer, $ticket, "http://casnoproxy.com/",
+    "http://casnoproxy.com/proxy" );
+
 clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel              => $debug,
                 domain                => 'idp.com',
@@ -122,6 +125,11 @@ sub issuer {
                 casAppMetaDataOptions => {
                     sp => {
                         casAppMetaDataOptionsService => 'http://casapp.com/',
+                    },
+                    spnoproxy => {
+                        casAppMetaDataOptionsService =>
+                          'http://casnoproxy.com/',
+                        casAppMetaDataOptionsAllowProxy => 0,
                     },
                 },
                 casAppMetaDataExportedVars => {
@@ -144,6 +152,7 @@ sub issuer {
 }
 
 sub casGetTicket {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $issuer, $id, $service ) = @_;
     ok(
         my $res = $issuer->_get(
@@ -156,18 +165,45 @@ sub casGetTicket {
     );
     count(1);
     my ($ticket) =
-      expectRedirection( $res, qr#^http://casapp.com/\?.*ticket=([^&]+)# );
+      expectRedirection( $res, qr#^http://[^/]*/\?.*ticket=([^&]+)# );
 
     return $ticket;
 }
 
+sub casGetPgtNotAllowed {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $issuer, $ticket, $service, $pgtUrl ) = @_;
+    my $pgtResponse = casTryGetPgt( $issuer, $ticket, "http://casnoproxy.com/",
+        "http://casnoproxy.com/proxy" );
+
+    ok(
+        my $codexml = casXPath(
+            $pgtResponse->[2]->[0],
+            '/cas:serviceResponse/cas:authenticationFailure/@code'
+        ),
+        "Found error code"
+    );
+    is( $codexml->value, "UNAUTHORIZED_SERVICE_PROXY", "Correct error code" );
+    count(2);
+}
+
 sub casGetPgt {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $issuer, $ticket, $service, $pgtUrl ) = @_;
+    my $res = casTryGetPgt( $issuer, $ticket, $service, $pgtUrl );
+
+    expectOK($res);
+    my $pgt = casXPath( $res->[2]->[0], '//cas:proxyGrantingTicket/text()' );
+    return $PGTs->{$pgt};
+}
+
+sub casTryGetPgt {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $issuer, $ticket, $service, $pgtUrl ) = @_;
     ok(
         my $res = $issuer->_get(
             '/cas/p3/proxyValidate',
-            query => buildForm(
-                {
+            query => buildForm( {
                     service => $service,
                     ticket  => $ticket,
                     pgtUrl  => $pgtUrl,
@@ -179,13 +215,11 @@ sub casGetPgt {
     );
     count(1);
 
-    expectOK($res);
-
-    my $pgt = casXPath( $res->[2]->[0], '//cas:proxyGrantingTicket/text()' );
-    return $PGTs->{$pgt};
+    return $res;
 }
 
 sub casGetProxyResponse {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $issuer, $ticket, $service ) = @_;
     ok(
         my $res = $issuer->_get(
@@ -202,12 +236,12 @@ sub casGetProxyResponse {
 }
 
 sub casGetProxyTicket {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $issuer, $pgt, $service ) = @_;
     ok(
         my $res = $issuer->_get(
             '/cas/proxy',
-            query => buildForm(
-                {
+            query => buildForm( {
                     pgt           => $pgt,
                     targetService => $service,
                 }
@@ -224,6 +258,7 @@ sub casGetProxyTicket {
 }
 
 sub expectCasSuccess {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     my $content = $res->[2]->[0];
     ok(
@@ -234,6 +269,7 @@ sub expectCasSuccess {
 }
 
 sub casXPath {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $xmlString, $expr ) = @_;
 
     my $dom = XML::LibXML->load_xml( string => $xmlString );
@@ -246,6 +282,7 @@ sub casXPath {
 }
 
 sub casXPathAll {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $xmlString, $expr ) = @_;
 
     my $dom = XML::LibXML->load_xml( string => $xmlString );

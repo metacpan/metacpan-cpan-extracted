@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -153,8 +153,10 @@ sub run {
         $req,
         'ext2fcheck',
         params => {
-            TOKEN     => $token,
-            TARGET    => '/yubikey2fcheck?skin=' . $self->p->getSkin($req),
+            TOKEN  => $token,
+            TARGET => $self->p->relativeUrl(
+                $req, 'yubikey2fcheck', { skin => $self->p->getSkin($req) }
+            ),
             INPUTLOGO => $self->logo,
             LEGEND    => 'clickOnYubikey',
             $self->get2fTplParams($req),

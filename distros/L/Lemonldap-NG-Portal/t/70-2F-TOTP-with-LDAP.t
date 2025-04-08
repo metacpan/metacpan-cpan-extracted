@@ -2,9 +2,10 @@ use warnings;
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
 
 require 't/test-lib.pm';
-my $maintests = 22;
+my $maintests = 9;
 
 no warnings 'once';
 
@@ -18,8 +19,7 @@ SKIP: {
 
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => 'error',
                 totp2fSelfRegistration => 1,
@@ -35,121 +35,69 @@ SKIP: {
                 ldapGroupBase          => 'ou=groups,dc=example,dc=com',
                 managerDn              => 'cn=admin,dc=example,dc=com',
                 managerPassword        => 'admin',
+                ldapPpolicyControl     => 1,
             }
         }
     );
     my $res;
 
-    # Try to authenticate
-    # -------------------
-    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
-    my ( $host, $url, $query ) =
-      expectForm( $res, '#', undef, 'user', 'password' );
+    # Register TOTP
+    my $key = "dx3e34svy6jag5jtgdn2e6y7xyzmti6z";
 
-    $query =~ s/user=/user=dwho/;
-    $query =~ s/password=/password=dwho/;
+    $client->p->getPersistentSession(
+        "grace",
+        {
+            _2fDevices => to_json [ {
+                    "epoch"   => "1640015033",
+                    "name"    => "MyTOTP",
+                    "type"    => "TOTP",
+                    "_secret" => $key,
+                },
+            ],
+        }
+    );
+
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new($query),
-            length => length($query),
+            { user => "grace", password => "grace" },
             accept => 'text/html',
         ),
         'Auth query'
     );
-    my $id = expectCookie($res);
-    expectRedirection( $res, 'http://auth.example.com/' );
+    my ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
 
-    # TOTP form
     ok(
-        $res = $client->_get(
-            '/2fregisters',
-            cookie => "lemonldap=$id",
-            accept => 'text/html',
+        my $code = Lemonldap::NG::Common::TOTP::_code(
+            undef, Convert::Base32::decode_base32($key),
+            0,     30, 6
         ),
-        'Form registration'
+        'Code'
     );
-    expectRedirection( $res, qr#/2fregisters/totp$# );
-    ok(
-        $res = $client->_get(
-            '/2fregisters/totp',
-            cookie => "lemonldap=$id",
-            accept => 'text/html',
-        ),
-        'Form registration'
-    );
-    ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' );
-
-    # JS query
-    ok(
-        $res = $client->_post(
-            '/2fregisters/totp/getkey', IO::String->new(''),
-            cookie => "lemonldap=$id",
-            length => 0,
-        ),
-        'Get new key'
-    );
-    eval { $res = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), 'Content is JSON' )
-      or explain( $res->[2]->[0], 'JSON content' );
-    my ( $key, $token );
-    ok( $key   = $res->{secret}, 'Found secret' );
-    ok( $token = $res->{token},  'Found token' );
-    $key = Convert::Base32::decode_base32($key);
-
-    # Post code
-    my $code;
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-
-    my $s = "code=$code&token=$token";
-    ok(
-        $res = $client->_post(
-            '/2fregisters/totp/verify',
-            IO::String->new($s),
-            length => length($s),
-            cookie => "lemonldap=$id",
-        ),
-        'Post code'
-    );
-    eval { $res = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), 'Content is JSON' )
-      or explain( $res->[2]->[0], 'JSON content' );
-    ok( $res->{result} == 1, 'Key is registered' );
-    $client->logout($id);
-
-    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
-    ( $host, $url, $query ) =
-      expectForm( $res, '#', undef, 'user', 'password' );
-
-    $query =~ s/user=/user=dwho/;
-    $query =~ s/password=/password=dwho/;
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new($query),
-            length => length($query),
-            accept => 'text/html',
-        ),
-        'Auth query'
-    );
-    ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
-
     $query =~ s/code=/code=$code/;
     ok(
         $res = $client->_post(
             '/totp2fcheck', IO::String->new($query),
             length => length($query),
+            accept => "text/html",
         ),
         'Post code'
     );
-    $id = expectCookie($res);
+
+    # Some OpenLDAP versions incorrectly report the number of grace logins
+    # https://bugs.openldap.org/show_bug.cgi?id=7596
+    like(
+        $res->[2]->[0],
+        qr,<h3>(?:2|1) <span trspan="ppGrace">,,
+        "Found grace info message"
+    );
+
+    my $id   = expectCookie($res);
     my $attr = getSessionAttributes( $client, $id );
     is( $attr->{_auth}, "LDAP" );
     is( $attr->{_2f},   "totp" );
-    is( $attr->{uid},   "dwho" );
-    is( $attr->{_dn},   "uid=dwho,ou=users,dc=example,dc=com" );
+    is( $attr->{uid},   "grace" );
+    is( $attr->{_dn},   "uid=grace,ou=users,dc=example,dc=com" );
     is( $attr->{hGroups}->{mygroup}->{name}, "mygroup" );
     $client->logout($id);
 }

@@ -3,8 +3,11 @@ package Monitoring::Sneck;
 use 5.006;
 use strict;
 use warnings;
-use File::Slurp;
-use Sys::Hostname;
+use File::Slurp   qw(read_file);
+use Sys::Hostname qw(hostname);
+use IPC::Open3    qw(open3);
+use Symbol        qw(gensym);
+use IO::Select;
 
 =head1 NAME
 
@@ -12,11 +15,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 0.5.0
+Version 1.0.1
 
 =cut
 
-our $VERSION = '0.5.0';
+our $VERSION = '1.0.1';
 
 =head1 SYNOPSIS
 
@@ -49,6 +52,10 @@ Lines matching /^[A-Za-z0-9\_]+\=/ are variables. Anything before the the
 Lines matching /^[A-Za-z0-9\_]+\|/ are checks to run. Anything before the
 /\|/ is the name with everything after command to run.
 
+Lines matching /^\%[A-Za-z0-9\_]+\|/ are debug check to run. Anything before the
+/\|/ is the name with everything after command to run. These will not count towards
+the any of the counts. This exists purely for debugging purposes.
+
 Any other sort of lines are considered an error.
 
 Variables in the checks are in the form of /%+varaible_name%+/.
@@ -62,7 +69,7 @@ Variable names and check names may not be redefined once defined in the config.
     GEOM_DEV=foo
     geom_foo|/usr/local/libexec/nagios/check_geom mirror %GEOM_DEV%
     does_not_exist|/bin/this_will_error yup... that it will
-    
+
     does_not_exist_2|/usr/bin/env /bin/this_will_also_error
 
 The first line sets the %ENV variable PATH.
@@ -106,41 +113,56 @@ longer polling time for LibreNMS or the like when it queries it.
 The data section of the return hash is as below.
 
     - $hash{data}{alert} :: 0/1 boolean for if there is a aloert or not.
-    
+
     - $hash{data}{ok} :: Count of the number of ok checks.
-    
+
     - $hash{data}{warning} :: Count of the number of warning checks.
-    
+
     - $hash{data}{critical} :: Count of the number of critical checks.
-    
+
     - $hash{data}{unknown} :: Count of the number of unkown checks.
-    
+
     - $hash{data}{errored} :: Count of the number of errored checks.
-    
+
     - $hash{data}{alertString} :: The cumulative outputs of anything
       that returned a warning, critical, or unknown.
-    
+
     - $hash{data}{vars} :: A hash with the variables to use.
-    
+
     - $hash{data}{time} :: Time since epoch.
-    
+
     - $hash{data}{time} :: The hostname the check was ran on.
-    
+
     - $hash{data}{config} :: The raw config file if told to include it.
 
 For below '$name' is the name of the check in question.
 
     - $hash{data}{checks}{$name} :: A hash with info on the checks ran.
-    
+
     - $hash{data}{checks}{$name}{check} :: The command pre-variable substitution.
-    
+
     - $hash{data}{checks}{$name}{ran} :: The command ran.
-    
+
     - $hash{data}{checks}{$name}{output} :: The output of the check.
-    
+
     - $hash{data}{checks}{$name}{exit} :: The exit code.
-    
+
     - $hash{data}{checks}{$name}{error} :: Only present it died on a
+      signal or could not be executed. Provides a brief description.
+
+For below '$name' is the name of the debug checks in question.
+
+    - $hash{data}{debugs}{$name} :: A hash with info on the checks ran.
+
+    - $hash{data}{debugs}{$name}{check} :: The command pre-variable substitution.
+
+    - $hash{data}{debugs}{$name}{ran} :: The command ran.
+
+    - $hash{data}{debugs}{$name}{output} :: The output of the check.
+
+    - $hash{data}{debugs}{$name}{exit} :: The exit code.
+
+    - $hash{data}{debugs}{$name}{error} :: Only present it died on a
       signal or could not be executed. Provides a brief description.
 
 =head1 METHODS
@@ -179,7 +201,9 @@ sub new {
 	}
 
 	# init the object
+
 	my $self = {
+
 		config    => '/usr/local/etc/sneck.conf',
 		to_return => {
 			error       => 0,
@@ -193,7 +217,8 @@ sub new {
 				errored     => 0,
 				alert       => 0,
 				alertString => '',
-				checks      => {}
+				checks      => {},
+				debugs      => {},
 			},
 			version => 1,
 		},
@@ -225,21 +250,20 @@ sub new {
 	my $found_items  = 0;
 	foreach my $line (@config_split) {
 		$line =~ s/^[\ \t]*//;
-		if (  $line =~ /^[Ee][Nn][Vv]\ [A-Za-z0-9\_]+\=/ ) {
+		if ( $line =~ /^[Ee][Nn][Vv]\ [A-Za-z0-9\_]+\=/ ) {
 			my ( $name, $value ) = split( /\=/, $line, 2 );
 
 			# make sure we have a value
 			if ( !defined($value) ) {
-				$value='';
+				$value = '';
 			}
 
 			# remove the starting bit
-			$name=~s/^[Ee][Nn][Vv]\ //;
-			$ENV{$name}=$value;
-		}elsif( $line =~ /^[A-Za-z0-9\_]+\=/ ) {
+			$name =~ s/^[Ee][Nn][Vv]\ //;
+			$ENV{$name} = $value;
+		} elsif ( $line =~ /^[A-Za-z0-9\_]+\=/ ) {
 
 			# we found a variable
-
 			my ( $name, $value ) = split( /\=/, $line, 2 );
 
 			# make sure we have a value
@@ -263,7 +287,7 @@ sub new {
 			}
 
 			$self->{vars}{$name} = $value;
-		} elsif ( $line =~ /^[A-Za-z0-9\_]+\|/ ) {
+		} elsif ( $line =~ /^\%*[A-Za-z0-9\_]+\|/ ) {
 
 			# we found a check to add
 			my ( $name, $check ) = split( /\|/, $line, 2 );
@@ -331,27 +355,49 @@ sub run {
 	my @vars   = keys( %{ $self->{vars} } );
 	my @checks = keys( %{ $self->{checks} } );
 	foreach my $name (@checks) {
+		my $type = 'checks';
+		if ( $name =~ /^\%/ ) {
+			$type = 'debugs';
+		}
+
 		my $check = $self->{checks}{$name};
-		$self->{to_return}{data}{checks}{$name} = { check => $check };
+		$name =~ s/^\%//;
+		$self->{to_return}{data}{$type}{$name} = { check => $check };
 
 		# put the variables in place
 		foreach my $var_name (@vars) {
 			my $value = $self->{vars}{$var_name};
 			$check =~ s/%+$var_name%+/$value/g;
 		}
-		$self->{to_return}{data}{checks}{$name}{ran} = $check;
+		$self->{to_return}{data}{$type}{$name}{ran} = $check;
 
-		$self->{to_return}{data}{checks}{$name}{output} = `$check`;
+		my $check_pid = open3( my $std_in, my $std_out, my $std_err = gensym, $check );
+
+		my $s = IO::Select->new();
+		$s->add($std_out);
+		$s->add($std_err);
+		my $output = '';
+		while ( my @ready = $s->can_read ) {
+			foreach my $handle (@ready) {
+				if ( sysread( $handle, my $buf, 4096 ) ) {
+					$output = $output . $buf;
+				} else {
+					$s->remove($handle);
+				}
+			}
+		}
+
 		my $exit_code = $?;
-		if ( defined( $self->{to_return}{data}{checks}{$name}{output} ) ) {
-			chomp( $self->{to_return}{data}{checks}{$name}{output} );
+		$self->{to_return}{data}{$type}{$name}{output} = $output;
+		if ( defined( $self->{to_return}{data}{$type}{$name}{output} ) ) {
+			chomp( $self->{to_return}{data}{$type}{$name}{output} );
 		}
 
 		# handle the exit code
 		if ( $exit_code == -1 ) {
-			$self->{to_return}{data}{checks}{$name}{error} = 'failed to execute';
+			$self->{to_return}{data}{$type}{$name}{error} = 'failed to execute';
 		} elsif ( $exit_code & 127 ) {
-			$self->{to_return}{data}{checks}{$name}{error} = sprintf(
+			$self->{to_return}{data}{$type}{$name}{error} = sprintf(
 				"child died with signal %d, %s coredump\n",
 				( $exit_code & 127 ),
 				( $exit_code & 128 ) ? 'with' : 'without'
@@ -359,24 +405,26 @@ sub run {
 		} else {
 			$exit_code = $exit_code >> 8;
 		}
-		$self->{to_return}{data}{checks}{$name}{exit} = $exit_code;
+		$self->{to_return}{data}{$type}{$name}{exit} = $exit_code;
 
 		# anything other than 0, 1, 2, or 3 is a error
-		if ( $self->{to_return}{data}{checks}{$name}{exit} == 0 ) {
-			$self->{to_return}{data}{ok}++;
-		} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 1 ) {
-			$self->{to_return}{data}{warning}++;
-			$self->{to_return}{data}{alert} = 1;
-		} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 2 ) {
-			$self->{to_return}{data}{critical}++;
-			$self->{to_return}{data}{alert} = 1;
-		} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 3 ) {
-			$self->{to_return}{data}{unknown}++;
-			$self->{to_return}{data}{alert} = 1;
-		} else {
-			$self->{to_return}{data}{errored}++;
-			$self->{to_return}{data}{alert} = 1;
-		}
+		if ( $type eq 'checks' ) {
+			if ( $self->{to_return}{data}{checks}{$name}{exit} == 0 ) {
+				$self->{to_return}{data}{ok}++;
+			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 1 ) {
+				$self->{to_return}{data}{warning}++;
+				$self->{to_return}{data}{alert} = 1;
+			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 2 ) {
+				$self->{to_return}{data}{critical}++;
+				$self->{to_return}{data}{alert} = 1;
+			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 3 ) {
+				$self->{to_return}{data}{unknown}++;
+				$self->{to_return}{data}{alert} = 1;
+			} else {
+				$self->{to_return}{data}{errored}++;
+				$self->{to_return}{data}{alert} = 1;
+			}
+		} ## end if ( $type eq 'checks' )
 
 		# add it to the alert string if it is a warning
 		if ( $exit_code == 1 || $exit_code == 2 || $exit_code == 3 ) {

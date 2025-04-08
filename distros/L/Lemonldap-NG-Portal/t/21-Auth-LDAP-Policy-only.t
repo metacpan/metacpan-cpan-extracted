@@ -8,7 +8,7 @@ require 't/test-lib.pm';
 use lib 't/lib';
 
 my $res;
-my $maintests = 36;
+my $maintests = 38;
 
 no warnings 'once';
 
@@ -80,7 +80,7 @@ SKIP: {
             ),
             'Auth query'
         );
-        
+
         if ( $code == PE_BADOLDPASSWORD ) {
             $match = 'trmsg="' . PE_PP_CHANGE_AFTER_RESET . '"';
             ok( $res->[2]->[0] =~ /$match/,
@@ -170,6 +170,18 @@ m%<input id="staticUser" type="text" readonly class="form-control" value="$user"
 
     # Try to authenticate
     # -------------------
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new($postString),
+            length => length($postString),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    $match = 'trspan="' . $code . '"';
+    ok( $res->[2]->[0] =~ /$match/, 'Grace remaining' );
+
+    # Try again to make sure "0" is properly handled
     ok(
         $res = $client->_post(
             '/', IO::String->new($postString),

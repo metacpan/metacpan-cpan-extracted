@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0401';
 
 use v5.36;
 
 use strictures 2;
+use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
 use Time::HiRes qw(usleep);
@@ -69,7 +70,7 @@ has range_step => (
 has time_step => (
     is      => 'rw',
     isa     => PositiveNum,
-    default => 250_000,
+    default => 0.25,
 );
 
 
@@ -103,8 +104,7 @@ has stop => (
 
 sub breathe ($self, $device, $dt, $event) {
     return 0 if $self->running;
-
-    my ($ev, $chan, $ctl, $val) = $event->@*;
+    $self->running(1);
 
     my $it = Iterator::Breathe->new(
         bottom => $self->range_bottom,
@@ -112,14 +112,16 @@ sub breathe ($self, $device, $dt, $event) {
         step   => $self->range_step,
     );
 
-    $self->running(1);
-
-    while (!$self->stop) {
-        $it->iterate;
-        my $cc = [ 'control_change', $self->channel, $self->control, $it->i ];
-        $self->rtc->send_it($cc);
-        usleep $self->time_step;
-    }
+    $self->rtc->loop->add(
+        IO::Async::Timer::Periodic->new(
+            interval  => $self->time_step,
+            on_tick => sub {
+                $it->iterate;
+                my $cc = [ 'control_change', $self->channel, $self->control, $it->i ];
+                $self->rtc->send_it($cc);
+            },
+        )->start
+    );
 
     return 0;
 }
@@ -127,20 +129,21 @@ sub breathe ($self, $device, $dt, $event) {
 
 sub scatter ($self, $device, $dt, $event) {
     return 0 if $self->running;
-
-    my ($ev, $chan, $ctl, $val) = $event->@*;
-
     $self->running(1);
 
     my $value  = $self->initial_point;
     my @values = ($self->range_bottom .. $self->range_top);
 
-    while (!$self->stop) {
-        my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-        $self->rtc->send_it($cc);
-        $value = $values[ int rand @values ];
-        usleep $self->time_step;
-    }
+    $self->rtc->loop->add(
+        IO::Async::Timer::Periodic->new(
+            interval  => $self->time_step,
+            on_tick => sub {
+                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                $self->rtc->send_it($cc);
+                $value = $values[ int rand @values ];
+            },
+        )->start
+    );
 
     return 0;
 }
@@ -148,44 +151,42 @@ sub scatter ($self, $device, $dt, $event) {
 
 sub stair_step ($self, $device, $dt, $event) {
     return 0 if $self->running;
-
-    my ($ev, $chan, $ctl, $val) = $event->@*;
+    $self->running(1);
 
     my $it = Iterator::Breathe->new(
         bottom => $self->range_bottom,
         top    => $self->range_top,
     );
 
-    $self->running(1);
-
     my $value     = $self->initial_point;
     my $direction = 1; # up
 
-    while (!$self->stop) {
-        my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-        $self->rtc->send_it($cc);
+    $self->rtc->loop->add(
+        IO::Async::Timer::Periodic->new(
+            interval  => $self->time_step,
+            on_tick => sub {
+                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                $self->rtc->send_it($cc);
 
-        # compute the stair-stepping
-        if ($direction) {
-            $it->step($self->step_up);
-        }
-        else {
-            $it->step(- $self->step_down);
-        }
+                # compute the stair-stepping
+                if ($direction) {
+                    $it->step($self->step_up);
+                }
+                else {
+                    $it->step(- $self->step_down);
+                }
 
-        # toggle the stair-step direction
-        $direction = !$direction;
+                # toggle the stair-step direction
+                $direction = !$direction;
 
-        # iterate the breathing
-        $it->iterate;
-        $value = $it->i;
-        $value = $self->range_top    if $value >= $self->range_top;
-        $value = $self->range_bottom if $value <= $self->range_bottom;
-
-        # pause until the next iteration
-        usleep $self->time_step;
-    }
-
+                # iterate the breathing
+                $it->iterate;
+                $value = $it->i;
+                $value = $self->range_top    if $value >= $self->range_top;
+                $value = $self->range_bottom if $value <= $self->range_bottom;
+            },
+        )->start
+    );
     return 0;
 }
 
@@ -203,7 +204,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0301
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -223,7 +224,7 @@ version 0.0301
   $filter->range_bottom(10);
   $filter->range_top(100);
   $filter->range_step(2);
-  $filter->time_step(125_000);
+  $filter->time_step(0.25);
 
   $control->add_filter('breathe', all => $filter->curry::breathe);
 
@@ -320,10 +321,9 @@ Default: C<1>
   $time_step = $filter->time_step;
   $filter->time_step($number);
 
-The current iteration step in microseconds (where
-C<1,000,000> = C<1> second).
+The current iteration step in seconds (probably fractions).
 
-Default: C<250_000> (a quarter of a second)
+Default: C<0.25> (a quarter of a second)
 
 =head2 step_up
 

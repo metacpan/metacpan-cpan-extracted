@@ -32,6 +32,45 @@ sub checkJWT {
     cmp_ok( $payload->{exp}, "<", time + 7200, "Expiration date sanity check" );
 }
 
+sub renewSession {
+    my ( $op, $idpId ) = @_;
+
+    my $res = $op->_get(
+        '/renewsession',
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId"
+    );
+    my ( $host, $tmp, $query ) =
+      expectForm( $res, undef, '/renewsession', 'confirm' );
+    ok( $res->[2]->[0] =~ /trspan="askToRenew"/, 'Propose to renew session' );
+    ok(
+        $res = $op->_post(
+            '/renewsession',
+            IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldap=$idpId",
+        ),
+        'Ask to renew'
+    );
+    ( $host, $tmp, $query ) =
+      expectForm( $res, '#', undef, 'upgrading', 'url' );
+    $query .= "&password=french";
+    ok(
+        $res = $op->_post(
+            '/renewsession',
+            IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldap=$idpId",
+        ),
+        'Ask to renew'
+    );
+    my $newIdpId = expectCookie($res);
+    isnt( $newIdpId, $idpId, "Session ID has changed" );
+    return $newIdpId;
+}
+
 # Full test case
 sub runTest {
     my ( $op, $jwt, $refresh_rotation ) = @_;
@@ -149,10 +188,36 @@ sub runTest {
     ok( $json->{'sub'} eq "french",            'Got User Info' );
     ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
+    # Skip ahead in time again
+    Time::Fake->offset("+6h");
+
+    # Verify access token is rejected
+    $res = getUserinfo( $op, $access_token );
+    is( $res->[0], 401, "Access token rejected" );
+
+    $idpId = renewSession( $op, $idpId );
+
+    # Refresh access token after session renew
+    $json         = expectJSON( refreshGrant( $op, "rpid", $refresh_token ) );
+    $access_token = $json->{access_token};
+
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
+
+    $json = expectJSON( getUserinfo( $op, $access_token ) );
+    ok( $json->{'sub'} eq "french",            'Got User Info' );
+    ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
+
     # Check failure conditions
     $op->logout($idpId);
-
-    # Refresh access token
     $res = refreshGrant( $op, "rpid", $refresh_token );
     expectReject( $res, 400, 'invalid_grant' );
 

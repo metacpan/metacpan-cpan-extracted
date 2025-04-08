@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration';
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 # PROPERTIES
 
@@ -34,6 +34,7 @@ has idpAttributes => ( is => 'rw', default => sub { {} } );
 has idpOptions    => ( is => 'rw', default => sub { {} } );
 has spList        => ( is => 'rw', default => sub { {} } );
 has spRules       => ( is => 'rw', default => sub { {} } );
+has spLevelRules  => ( is => 'rw', default => sub { {} } );
 has spMacros      => ( is => 'rw', default => sub { {} } );
 has spAttributes  => ( is => 'rw', default => sub { {} } );
 has spOptions     => ( is => 'rw', default => sub { {} } );
@@ -461,15 +462,22 @@ sub load_sp_metadata {
       = @_;
 
     my $valid = 1;
-    my $rule  = $options->{samlSPMetaDataOptionsRule};
 
+    # Access Rule
+    my $rule = $options->{samlSPMetaDataOptionsRule};
     if ( length $rule ) {
-        $rule = $self->p->HANDLER->substitute($rule);
-        unless ( $rule = $self->p->HANDLER->buildSub($rule) ) {
-            $self->logger->error( 'SAML SP rule error: '
-                  . $self->p->HANDLER->tsv->{jail}->error );
+        $rule = $self->p->buildRule( $rule, "access rule for SP $spConfKey" );
+        unless ($rule) {
             $valid = 0;
         }
+    }
+
+    # Required authentication level rule
+    my $levelrule = $options->{samlSPMetaDataOptionsAuthnLevel} || 0;
+    $levelrule = $self->p->buildRule( $levelrule,
+        "required authentication level rule for SP $spConfKey" );
+    unless ($levelrule) {
+        $valid = 0;
     }
 
     # Load per-SP macros
@@ -491,8 +499,9 @@ sub load_sp_metadata {
     }
 
     if ($valid) {
-        $self->spRules->{$spConfKey}  = $rule;
-        $self->spMacros->{$spConfKey} = $compiledMacros;
+        $self->spRules->{$spConfKey}      = $rule;
+        $self->spLevelRules->{$spConfKey} = $levelrule;
+        $self->spMacros->{$spConfKey}     = $compiledMacros;
     }
     else {
         $self->logger->error(
@@ -1594,7 +1603,8 @@ sub getAttributeValue {
         $value = join(
             $self->{conf}->{multiValuesSeparator},
             map {
-                eval { $_->any->content } || ()
+                eval { $_->any->content }
+                  || ()
             } @attr_values
         );
     }
@@ -3305,6 +3315,39 @@ sub setProviderEncryptionMode {
 
     return $self->checkLassoError($@);
 
+}
+
+## @method boolean updateSAMLSecondarySessions(string old_session_id, string new_session_id)
+# Update _saml_id of secondary sessions when the session ID is changed (upgrade)
+sub updateSAMLSecondarySessions {
+    my ( $self, $req, $old_session_id, $new_session_id ) = @_;
+
+    # Find SAML sessions
+    my $saml_sessions =
+      Lemonldap::NG::Common::Apache::Session->searchOn( $self->amOpts,
+        "_saml_id", $old_session_id );
+
+    if (
+        my @saml_sessions_keys =
+        grep { $saml_sessions->{$_}->{_session_kind} eq $self->sessionKind }
+        keys %$saml_sessions
+      )
+    {
+
+        foreach my $saml_session (@saml_sessions_keys) {
+
+            # Get session
+            $self->logger->debug("Retrieve SAML session $saml_session");
+
+            my $samlSessionInfo = $self->getSamlSession($saml_session);
+
+            # Update session
+            if ($samlSessionInfo) {
+                $samlSessionInfo->update( { '_saml_id' => $new_session_id } );
+            }
+        }
+    }
+    return;
 }
 
 ## @method boolean deleteSAMLSecondarySessions(string session_id)

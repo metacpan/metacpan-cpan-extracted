@@ -6,15 +6,13 @@
 #
 # Create a secure token used to resolve user identity by a protected application
 
-# This specific handler is intended to be called directly by Apache
-
 package Lemonldap::NG::Handler::Lib::SecureToken;
 
 use strict;
 use Cache::Memcached;
 use Apache::Session::Generate::MD5;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.21.0';
 
 # Shared variables
 our $secureTokenMemcachedConnection;

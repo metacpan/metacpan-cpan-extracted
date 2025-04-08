@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(to_json);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -55,7 +55,7 @@ sub getNotifications {
     }
     my $forUser = $self->get($uid);
     if ( $forUser and $forAll ) {
-        return { %$forUser, %$forAll };
+        return ( { %$forUser, %$forAll }, $forUser );
     }
     else {
         return ( ( $forUser ? $forUser : $forAll ), $forUser );

@@ -90,9 +90,9 @@ count(1);
 
 # OIDC idp must be sorted
 my @idp = map /idploop py-3" val="(.+?)">/g, $res->[2]->[0];
-ok( $idp[0] eq 'op2', '1st = op2' ) or print STDERR Dumper( \@idp );
-ok( $idp[1] eq 'op3', '2nd = op3' ) or print STDERR Dumper( \@idp );
-ok( $idp[2] eq 'op',  '3rd = op' )  or print STDERR Dumper( \@idp );
+ok( $idp[0] eq 'op3', '1st = op3' ) or print STDERR Dumper( \@idp );
+ok( $idp[1] eq 'op', '2nd = op' ) or print STDERR Dumper( \@idp );
+ok( $idp[2] eq 'op2',  '3rd = op2' )  or print STDERR Dumper( \@idp );
 count(3);
 
 # Found OIDC idp logo and display name

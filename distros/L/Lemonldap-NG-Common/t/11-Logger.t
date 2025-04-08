@@ -16,7 +16,7 @@ subtest "Check logging API" => sub {
     $psgi->userLogger->contains( "info", "User logger trace" );
 
     # no auditLogger defined: audit logs are sent to userLogger
-    $psgi->userLogger->contains( "info", "audit" );
+    $psgi->userLogger->contains( "notice", "audit" );
 
   # Audit log without a message is reported as an error with correct stack trace
     $psgi->userLogger->contains( "info",

@@ -41,7 +41,7 @@ SKIP: {
       "reference": "testref2",
       "title": "Test title",
       "subtitle": "Test subtitle",
-      "text": "This is a test text",
+      "text": "This is a test text for $uid",
       "check": ["Accept test","Accept test2"]
     }
     ]';
@@ -119,6 +119,13 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     ( $host, $url, $s ) =
       expectForm( $res, undef, '/notifback', 'reference1x1' );
+
+    is(
+        getHtmlElement( $res, '//p[@class="notifText"]/text()' )->pop()->data,
+        "This is a test text for dwho",
+        "Found notification text"
+    );
+    count(1);
     ok(
         $res = $issuer->_post(
             '/notifback',

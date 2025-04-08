@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0401 2025-04-07 16:48:21
+  - Enhance the eg/multi.pl example program.
+
+0.0400 2025-04-07 14:16:04
+  - Use IO::Async::Timer::Periodic instead of while/usleep.
+
 0.0301 2025-04-04 21:45:42
   - Refactor the stair_step filter logic.
   - Improve documentation.

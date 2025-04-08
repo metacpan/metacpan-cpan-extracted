@@ -62,16 +62,16 @@ Includes the config file used.
 
 use strict;
 use warnings;
-use Getopt::Long;
-use File::Slurp;
-use JSON;
-use Monitoring::Sneck;
-use MIME::Base64;
-use IO::Compress::Gzip qw(gzip $GzipError);
-use Pod::Usage;
+use Getopt::Long       qw( GetOptions );
+use File::Slurp        qw(read_file write_file);
+use JSON               qw(encode_json);
+use Monitoring::Sneck  ();
+use MIME::Base64       qw(encode_base64);
+use IO::Compress::Gzip qw(gzip);
+use Pod::Usage         qw(pod2usage);
 
 sub main::VERSION_MESSAGE {
-	print 'sneck v. '.$Monitoring::Sneck::VERSION."\n";
+	print 'sneck v. ' . $Monitoring::Sneck::VERSION . "\n";
 	exit 255;
 }
 
@@ -118,7 +118,7 @@ if ($version) {
 # prints the cache and exit if requested
 if ($print_cache) {
 	if ($compress) {
-		$cache_file=$cache_file.'.snmp';
+		$cache_file = $cache_file . '.snmp';
 	}
 
 	if ( !-f $cache_file || !-r $cache_file ) {
@@ -133,7 +133,7 @@ if ($print_cache) {
 	print $cache;
 
 	exit;
-}
+} ## end if ($print_cache)
 
 my $sneck    = Monitoring::Sneck->new( { config => $config_file, include => $include } );
 my $returned = $sneck->run;
@@ -150,9 +150,9 @@ gzip \$raw_json => \$compressed_string;
 my $compressed = encode_base64($compressed_string);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
-my $snmp=$raw_json;
+my $snmp = $raw_json;
 if ( length($compressed) < length($raw_json) ) {
-	$snmp=$compressed;
+	$snmp = $compressed;
 }
 
 # non-pretty does not include a new line, so add it
@@ -163,6 +163,6 @@ if ( !$pretty ) {
 print $raw_json;
 
 if ($update) {
-	write_file($cache_file, $raw_json);
-	write_file($cache_file.'.snmp', $snmp);
+	write_file( $cache_file,           $raw_json );
+	write_file( $cache_file . '.snmp', $snmp );
 }

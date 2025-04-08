@@ -8,7 +8,7 @@ our @EXPORT_OK =
 use JSON;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.21.0';
 
 # Gets the Access Token session ID embedded in a LLNG-emitted JWT
 sub getAccessTokenSessionId {
@@ -40,9 +40,9 @@ sub getAccessTokenSessionId {
 sub getJWTPart {
     my ( $jwt, $part ) = @_;
     my @jwt_parts = split( /\./, $jwt );
-    my $data      = decode_base64url( $jwt_parts[$part] );
+    return undef unless @jwt_parts > 1;
     my $json_hash;
-    eval { $json_hash = from_json($data); };
+    eval { $json_hash = from_json( decode_base64url( $jwt_parts[$part] ) ); };
     return undef if ($@);
     return $json_hash;
 }

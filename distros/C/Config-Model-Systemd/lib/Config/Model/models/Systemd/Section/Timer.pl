@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2024 by Dominique Dumont.
+# This software is Copyright (c) 2008-2025 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -384,6 +384,27 @@ C<false>.',
           'yes'
         ]
       },
+      'DeferReactivation',
+      {
+        'description' => 'Takes a boolean argument. When enabled, the timer schedules the next elapse based on
+the trigger unit entering inactivity, instead of the last trigger time.
+This is most apparent in the case where the service unit takes longer to run than the timer interval.
+With this setting enabled, the timer will schedule the next elapse based on when the service finishes
+running, and so it will have to wait until the next realtime elapse time to trigger.
+Otherwise, the default behavior is for the timer unit to immediately trigger again once the service
+finishes running. This happens because the timer schedules the next elapse based on the previous trigger
+time, and since the interval is shorter than the service runtime, that elapse will be in the past,
+causing it to immediately trigger once done.
+
+This setting has no effect if a realtime timer has not been specified with
+C<OnCalendar>. Defaults to C<false>.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'OnClockChange',
       {
         'description' => 'These options take boolean arguments. When true, the service unit will be triggered
@@ -484,7 +505,7 @@ C<true>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 256 doc',
+    'generated_by' => 'parse-man.pl from systemd 257 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

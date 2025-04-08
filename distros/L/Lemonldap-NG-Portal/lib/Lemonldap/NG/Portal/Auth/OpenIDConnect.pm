@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -38,7 +38,7 @@ sub init {
         $self->logger->error("No OP configured");
         return 0;
     }
-    my @list       = ();
+    my @list = ();
 
     foreach (@tab) {
         my $name = $_;
@@ -48,7 +48,7 @@ sub init {
         my $tooltip =
           $self->opOptions->{$_}->{oidcOPMetaDataOptionsTooltip} || $name;
         my $order = $self->opOptions->{$_}->{oidcOPMetaDataOptionsSortNumber}
-          // 0;
+          // 999999;
         my $img_src;
 
         if ($icon) {
@@ -68,7 +68,7 @@ sub init {
           };
     }
 
-    my $re     = '^/' . $self->path . '/(?:' . join(
+    my $re = '^/' . $self->path . '/(?:' . join(
         '|',
         map {
             my $s = $self->conf->{$_};
@@ -121,7 +121,7 @@ sub extractFormInfo {
     }
 
     # Check callback
-    if ( $req->param( $self->conf->{oidcRPCallbackGetParam} ) ) {
+    if ( $self->isCallback($req) ) {
 
         $self->logger->debug(
             'OpenIDConnect callback URI detected: ' . $req->uri );
@@ -209,6 +209,7 @@ sub extractFormInfo {
                 $self->decodeJWT( $id_token, $op ) )
             {
                 $self->logger->error("JWT signature verification failed");
+                $self->logger->error("Failing JWT is: $id_token");
                 return PE_OIDC_AUTH_ERROR;
             }
             $self->logger->debug("JWT signature verified");
@@ -368,6 +369,11 @@ sub extractFormInfo {
     $req->steps( [] );
 
     return PE_OK;
+}
+
+sub isCallback {
+    my ( $self, $req ) = @_;
+    return $req->param( $self->conf->{oidcRPCallbackGetParam} );
 }
 
 sub authenticate {

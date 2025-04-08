@@ -10,14 +10,15 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                  => 'error',
-            authentication            => 'Demo',
-            userDB                    => 'Same',
-            loginHistoryEnabled       => 0,
-            brutForceProtection       => 0,
-            requireToken              => 0,
-            checkUser                 => 1,
-            checkUserIdRule           => '$uid ne "msmith"',
+            logParams           => 1,                 # Require logLevel = debug
+            logLevel            => 'error',
+            authentication      => 'Demo',
+            userDB              => 'Same',
+            loginHistoryEnabled => 0,
+            brutForceProtection => 0,
+            requireToken        => 0,
+            checkUser           => 1,
+            checkUserIdRule     => '$uid ne "msmith"',
             checkUserSearchAttributes => 'employee_nbr  test1 _user test2 mail',
             checkUserDisplayPersistentInfo => 1,
             checkUserDisplayEmptyHeaders   => '$uid eq "dwho"',

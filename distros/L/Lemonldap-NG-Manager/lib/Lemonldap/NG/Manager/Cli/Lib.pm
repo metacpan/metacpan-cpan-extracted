@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Manager;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.21.0';
 
 extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 
@@ -14,7 +14,10 @@ has app => (
     is      => 'ro',
     isa     => 'CodeRef',
     builder => sub {
-        my $args = { protection => 'none' };
+        my $args = {
+            protection     => 'none',
+            enabledModules => "conf, sessions, notifications, 2ndFA, api"
+        };
         $args->{configStorage} = { confFile => $_[0]->{iniFile} }
           if ( $_[0]->{iniFile} );
         $_[0]->{mgr} = Lemonldap::NG::Manager->new($args);
