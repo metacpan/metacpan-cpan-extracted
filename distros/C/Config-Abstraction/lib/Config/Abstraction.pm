@@ -12,7 +12,7 @@ use XML::Simple qw(XMLin);
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
-use Hash::Flatten qw(flatten unflatten);
+use Hash::Flatten qw(flatten);
 use Params::Get;
 
 =head1 NAME
@@ -21,11 +21,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ It loads the following files in order of preference:
 C<base.yaml>, C<local.yaml>, C<base.json>, C<local.json>, C<base.xml>,
 C<local.xml>, C<base.ini>, and C<local.ini>.
 
-If C<config_file> is set, that file is loaded last.
+If C<config_file> or C<config_files> is set, those files are loaded last.
 
 =item 2. Merging and Resolving
 
@@ -193,6 +193,10 @@ An arrayref of directories to look for configuration files (default: C<['config'
 
 Points to a configuration file of any format.
 
+=item * C<config_files>
+
+An arrayref of files to look for in the configration directories.
+
 =item * C<env_prefix>
 
 A prefix for environment variable keys and comment line options, e.g. C<MYAPP_DATABASE__USER>,
@@ -200,7 +204,12 @@ A prefix for environment variable keys and comment line options, e.g. C<MYAPP_DA
 
 =item * C<flatten>
 
-If true, returns a flat configuration structure like C<'database.user'> (default: C<0>).
+If true, returns a flat hash structure like C<{database.user}> (default: C<0>) instead of C<{database}{user}>.
+`
+=item * C<logger>
+
+Used for warnings and traces.
+An object that understands debug() and trace() messages.
 
 =item * C<sep_char>
 
@@ -237,10 +246,19 @@ sub _load_config
 	my $self = shift;
 	my %merged;
 
+	my $logger = $self->{'logger'};
+
 	for my $dir (@{ $self->{config_dirs} }) {
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
 			my $path = File::Spec->catfile($dir, $file);
+			if($logger) {
+				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
+			}
 			next unless -f $path;
+
+			if($logger) {
+				$logger->debug(ref($self), ' ', __LINE__, ": Loading data from $path");
+			}
 
 			my $data;
 			# TODO: only load config modules when they are needed
@@ -261,14 +279,26 @@ sub _load_config
 					$section => { map { $_ => $ini->val($section, $_) } $ini->Parameters($section) }
 				} $ini->Sections() };
 			}
-			%merged = %{ merge( $data, \%merged ) };
+			if($data) {
+				if($logger) {
+					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
+				}
+				%merged = %{ merge( $data, \%merged ) };
+			}
 		}
 
 		# Put $self->{config_file} through all parsers, ignoring all errors, then merge that in
-		if(my $config_file = $self->{'config_file'}) {
+		for my $config_file ($self->{'config_file'}, @{$self->{'config_files'}}) {
+			next unless defined($config_file);
 			my $path = File::Spec->catfile($dir, $config_file);
+			if($logger) {
+				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
+			}
 			if((-f $path) && (-r $path)) {
 				my $data = read_file($path);
+				if($logger) {
+					$logger->debug(ref($self), ' ', __LINE__, ": Loading data from $path");
+				}
 				eval {
 					if($data =~ /^\s*<\?xml/) {
 						$data = XMLin($path, ForceArray => 0, KeyAttr => []);
@@ -297,6 +327,9 @@ sub _load_config
 						}
 					}
 				};
+				if($logger) {
+					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
+				}
 				if(scalar(keys %merged)) {
 					if($data) {
 						%merged = %{ merge( $data, \%merged ) };
@@ -395,6 +428,8 @@ You can find documentation for this module with the perldoc command.
 =over 4
 
 =item * L<Config::Auto>
+
+=item * L<Log::Abstraction>
 
 =back
 

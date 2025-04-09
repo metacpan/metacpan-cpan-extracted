@@ -4,8 +4,8 @@ use Test::More tests => 1 + ( 3 * 3 ) + 10 + ( 2 * 7 ) + 1 + 1;
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker;
 use Devel::Required;
+use ExtUtils::MakeMaker;
 can_ok( 'Devel::Required', qw(
   import
 ) );

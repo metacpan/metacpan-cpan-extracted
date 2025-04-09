@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.016';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
 use ExtUtils::Manifest ();
+use version ();
 
 sub import {
 	my ($class, @args) = @_;
@@ -43,14 +44,25 @@ sub postamble {
 	my $config = ExtUtils::Config::MakeMaker->new($maker);
 	$planner->add_delegate('config', sub { $config });
 	$planner->add_delegate('distribution', sub { $maker->{DIST_NAME} });
-	$planner->add_delegate('distribution_version', sub { $maker->{VERSION} });
+	$planner->add_delegate('version', sub { version->new($maker->{VERSION}) });
 	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
+	$planner->add_delegate('verbose', sub { !!0 });
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
 	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
 	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
 	$planner->add_delegate('jobs', sub { 1 });
+
+	$planner->add_delegate('is_os', sub {
+		my ($self, @wanted) = @_;
+		return not not grep { $_ eq $^O } @wanted
+	});
+	$planner->add_delegate('is_os_type', sub {
+		my ($self, $wanted) = @_;
+		require Perl::OSType;
+		return Perl::OSType::is_os_type($wanted);
+	});
 
 	$planner->add_delegate('new_planner', sub {
 		my $inner = ExtUtils::Builder::Planner->new;
@@ -62,10 +74,7 @@ sub postamble {
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
-		my $inner = $planner->new_scope;
-		$inner->add_delegate('self', sub { $inner });
-		$inner->add_delegate('outer', sub { $planner });
-		$inner->run_dsl($file);
+		$planner->new_scope->run_dsl($file);
 	}
 
 	my $plan = $planner->materialize;
@@ -95,7 +104,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -116,6 +125,68 @@ version 0.016
 =head1 DESCRIPTION
 
 This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files, these are run in a new scope so delegates don't leak out. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
+
+=head1 DELEGATES
+
+By default, the following delegates are defined on your L<planner|ExtUtils::Builder::Planner>:
+
+=over 4
+
+=item * meta
+
+A L<CPAN::Meta|CPAN::Meta> object representing the C<META.json> file.
+
+=item * distribution
+
+The name of the distribution
+
+=item * version
+
+The version of the distribution
+
+=item * main_module
+
+The main module of the distribution.
+
+=item * release_status
+
+The release status of the distribution (e.g. C<'stable'>).
+
+=item * perl_path
+
+The path to the perl executable.
+
+=item * config
+
+The L<ExtUtils::Config::MakeMaker|ExtUtils::Config::MakeMaker> object for this build
+
+=item * is_os(@os_names)
+
+This returns true if the current operating system matches any of the listed ones.
+
+=item * is_os_type($os_type)
+
+This returns true if the type of the OS matches C<$os_type>. Legal values are C<Unix>, C<Windows> and C<VMS>.
+
+=item * verbose
+
+This is always false.
+
+=item * uninst
+
+The value of the C<uninst> command line argument.
+
+=item * jobs
+
+This is always C<1>.
+
+=item * pureperl_only
+
+The value of the C<PUREPERL_ONLY> command line argument.
+
+=back
+
+These are the same ones as L<Dist::Build> sets except C<install_paths> is missing.
 
 =for Pod::Coverage postamble
 

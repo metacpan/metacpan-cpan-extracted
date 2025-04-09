@@ -3,94 +3,40 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 5;
 
 use Test::Deep;
 
 use Geo::Coder::GeocodeFarm;
 
 my $ua = My::Mock::LWP::UserAgent->new;
-my $geocode = new_ok 'Geo::Coder::GeocodeFarm' => [ua => $ua];
+my $geocode = new_ok 'Geo::Coder::GeocodeFarm' => [key => 'xxx', ua => $ua];
 
 can_ok $geocode, qw(reverse_geocode);
 
 my $expected = {
-    'ACCOUNT' => {
-        'ip_address' => '1.2.3.4',
-        'used_today' => '28',
-        'distribution_license' => 'NONE, UNLICENSED',
-        'first_used' => '26 Mar 2015',
-        'used_total' => '28',
-        'usage_limit' => '250'
-    },
-    'LEGAL_COPYRIGHT' => {
-        'copyright_logo' => 'https://www.geocode.farm/images/logo.png',
-        'privacy_policy' => 'https://www.geocode.farm/policies/privacy-policy/',
-        'copyright_notice' => 'Copyright (c) 2015 Geocode.Farm - All Rights Reserved.',
-        'terms_of_service' => 'https://www.geocode.farm/policies/terms-of-service/'
-    },
-    'RESULTS' => [
-        {
-            'formatted_address' => '530 West Main Street, Anoka, MN 55303, USA',
-            'ADDRESS' => {
-                'street_name' => 'West Main Street',
-                'postal_code' => '55303',
-                'street_number' => '530',
-                'locality' => 'Anoka',
-                'admin_1' => 'Minnesota',
-                'country' => 'United States',
-                'admin_2' => 'Anoka County'
-            },
-            'LOCATION_DETAILS' => {
-                'timezone_long' => 'UNAVAILABLE',
-                'elevation' => 'UNAVAILABLE',
-                'timezone_short' => 'America/Menominee'
-            },
-            'result_number' => 1,
-            'accuracy' => 'EXACT_MATCH',
-            'BOUNDARIES' => {
-                'southwest_longitude' => '-93.4017002802923',
-                'northeast_longitude' => '-93.4003513351005',
-                'southwest_latitude' => '45.2027761197094',
-                'northeast_latitude' => '45.2041251364687'
-            },
-            'COORDINATES' => {
-                'longitude' => '-93.4003513716516',
-                'latitude' => '45.2041251738751'
-            }
-        }
-    ],
-    'STATISTICS' => {
-        'https_ssl' => 'DISABLED, INSECURE'
-    },
-    'STATUS' => {
-        'address_provided' => '530 W Main St Anoka MN 55303 US',
-        'access' => 'FREE_USER, ACCESS_GRANTED',
-        'status' => 'SUCCESS',
-        'result_count' => 1
-    },
+    'accuracy'          => 'EXACT_MATCH',
+    'formatted_address' => '500 W Main St, Anoka, MN 55303, United States',
+    'locality'          => 'Anoka',
+    'latitude'          => '45.2035740615438',
+    'street_name'       => 'W Main St',
+    'longitude'         => '-93.3995153025847',
+    'house_number'      => '500',
+    'admin_2'           => 'Anoka Co.',
+    'admin_1'           => 'MN',
+    'postal_code'       => '55303',
+    'country'           => 'United States'
 };
 
 {
-    my $result = $geocode->reverse_geocode(latlng => '45.2040305,-93.3995728');
+    my $result = $geocode->reverse_geocode(lat => '45.2040305', lon => '-93.3995728');
 
     isa_ok $result, 'HASH';
 
     cmp_deeply $result, $expected, '$result matches deeply';
 
-    is $ua->{url}, 'http://www.geocode.farm/v3/json/reverse/?lat=45.2040305&lon=-93.3995728', 'url matches';
+    is $ua->{url}, 'https://api.geocode.farm/reverse/?lat=45.2040305&lon=-93.3995728&key=xxx', 'url matches';
 }
-
-{
-    my $result = $geocode->reverse_geocode(lat => 45.2040305, lon => -93.3995728);
-
-    isa_ok $result, 'HASH';
-
-    cmp_deeply $result, $expected, '$result matches deeply';
-
-    is $ua->{url}, 'http://www.geocode.farm/v3/json/reverse/?lat=45.2040305&lon=-93.3995728', 'url matches';
-}
-
 
 package My::Mock;
 
@@ -99,18 +45,13 @@ sub new {
     return bless +{} => $class;
 }
 
-
 package LWP::UserAgent;
 
-sub get { }
-
+sub _placeholder { }
 
 package HTTP::Response;
 
-sub is_success { }
-
-sub decoded_content { }
-
+sub _placeholder { }
 
 package My::Mock::LWP::UserAgent;
 
@@ -122,7 +63,6 @@ sub get {
     return My::Mock::HTTP::Response->new;
 }
 
-
 package My::Mock::HTTP::Response;
 
 use base 'My::Mock', 'HTTP::Response';
@@ -132,62 +72,47 @@ sub is_success {
 }
 
 sub decoded_content {
-    return << 'END';
+    return <<'END';
 {
-    "geocoding_results": {
-        "LEGAL_COPYRIGHT": {
-            "copyright_notice": "Copyright (c) 2015 Geocode.Farm - All Rights Reserved.",
-            "copyright_logo": "https:\/\/www.geocode.farm\/images\/logo.png",
-            "terms_of_service": "https:\/\/www.geocode.farm\/policies\/terms-of-service\/",
-            "privacy_policy": "https:\/\/www.geocode.farm\/policies\/privacy-policy\/"
+    "LEGAL": {
+        "notice": "This system is the property of Geocode.Farm and any information contained herein is Copyright (c) Geocode.Farm. Usage is subject to the Terms of Service.",
+        "terms": "https:\/\/geocode.farm\/policies\/terms-of-service\/",
+        "privacy": "https:\/\/geocode.farm\/policies\/privacy-policy\/"
+    },
+    "STATUS": {
+        "key": "VALID",
+        "request": "VALID",
+        "status": "SUCCESS",
+        "credit_used": "1"
+    },
+    "USER": {
+        "key": "FAKE-API-KEY",
+        "name": "Fake Name",
+        "email": "fake.email@example.com",
+        "usage_limit": "250",
+        "used_today": "1",
+        "remaining_limit": 249
+    },
+    "RESULTS": {
+        "request": {
+            "point": "-93.3995728 45.2040305",
+            "latitude": "45.2040305",
+            "longitude": "-93.3995728"
         },
-        "STATUS": {
-            "access": "FREE_USER, ACCESS_GRANTED",
-            "status": "SUCCESS",
-            "address_provided": "530 W Main St Anoka MN 55303 US",
-            "result_count": 1
-        },
-        "ACCOUNT": {
-            "ip_address": "1.2.3.4",
-            "distribution_license": "NONE, UNLICENSED",
-            "usage_limit": "250",
-            "used_today": "28",
-            "used_total": "28",
-            "first_used": "26 Mar 2015"
-        },
-        "RESULTS": [
-            {
-                "result_number": 1,
-                "formatted_address": "530 West Main Street, Anoka, MN 55303, USA",
-                "accuracy": "EXACT_MATCH",
-                "ADDRESS": {
-                    "street_number": "530",
-                    "street_name": "West Main Street",
-                    "locality": "Anoka",
-                    "admin_2": "Anoka County",
-                    "admin_1": "Minnesota",
-                    "postal_code": "55303",
-                    "country": "United States"
-                },
-                "LOCATION_DETAILS": {
-                    "elevation": "UNAVAILABLE",
-                    "timezone_long": "UNAVAILABLE",
-                    "timezone_short": "America\/Menominee"
-                },
-                "COORDINATES": {
-                    "latitude": "45.2041251738751",
-                    "longitude": "-93.4003513716516"
-                },
-                "BOUNDARIES": {
-                    "northeast_latitude": "45.2041251364687",
-                    "northeast_longitude": "-93.4003513351005",
-                    "southwest_latitude": "45.2027761197094",
-                    "southwest_longitude": "-93.4017002802923"
-                }
-            }
-        ],
-        "STATISTICS": {
-            "https_ssl": "DISABLED, INSECURE"
+        "result": {
+            "0": {
+                "house_number": "500",
+                "street_name": "W Main St",
+                "locality": "Anoka",
+                "admin_2": "Anoka Co.",
+                "admin_1": "MN",
+                "country": "United States",
+                "postal_code": "55303",
+                "formatted_address": "500 W Main St, Anoka, MN 55303, United States",
+                "latitude": "45.2035740615438",
+                "longitude": "-93.3995153025847"
+            },
+            "accuracy": "EXACT_MATCH"
         }
     }
 }

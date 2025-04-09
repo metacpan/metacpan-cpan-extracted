@@ -1,7 +1,10 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/geocode.pl
 examples/reverse_geocode.pl
+inc/Module/Build/My.pm
 lib/Geo/Coder/GeocodeFarm.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -39,4 +42,3 @@ Makefile.PL
 LICENSE
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-Scanner-DistBuild
 
+0.002     2025-04-08 21:42:35+0200
+          - Add support for load_extension
+
 0.001     2024-07-11 19:01:54+0200
           - Initial release to an unsuspecting world
 

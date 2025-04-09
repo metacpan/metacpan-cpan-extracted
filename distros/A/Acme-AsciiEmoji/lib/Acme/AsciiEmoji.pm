@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter::Shiny;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our %EMOJI;
 
@@ -287,7 +287,7 @@ Acme::AsciiEmoji - Emoji
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

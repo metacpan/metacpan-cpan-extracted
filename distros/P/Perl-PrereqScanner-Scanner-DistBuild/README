@@ -6,7 +6,7 @@ NAME
 DESCRIPTION
 
     This scanner is intended for Dist::Build planner files. It recognizes
-    load_module calls and detects the appropriate module dependency.
+    load_extension calls and detects the appropriate module dependency.
 
 AUTHOR
 

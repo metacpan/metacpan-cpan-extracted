@@ -80,6 +80,7 @@ is $config->get('database.user'), 'env_user', 'ENV override on database.user';
 is $config->get('database.pass'), 'local_pass', 'local.json overrides base.yaml';
 ok $config->get('feature.enabled'), 'feature.enabled from JSON';
 is $config->get('extra.debug'), '1', 'extra.debug from ENV';
+is($config->all()->{'database'}{'user'}, 'env_user', 'all() works, when not flattened');
 
 # XML merge
 is $config->get('api.url'), 'https://api.example.com', 'API URL from base.xml';
@@ -104,6 +105,7 @@ my $flat = Config::Abstraction->new(
 
 is $flat->get('api.timeout'), '60', 'Flattened: XML override timeout';
 is($flat->get('database.user'), 'env_user', 'Flattened: ENV override still works');
+is($flat->all()->{'database.user'}, 'env_user', 'all() works, when flattened');
 
 # Test config_file
 write_file("$test_dir/foo", <<'YAML');

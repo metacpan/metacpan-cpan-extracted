@@ -32,10 +32,11 @@ XML
 
 $config = Config::Abstraction->new(
 	config_dirs => [$test_dir],
-	config_file => 'xml_test'
+	config_files => ['foo', 'xml_test']
 );
 
 diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 cmp_ok($config->get('UserName'), 'eq', 'nan', 'XML can be read in from a file with no XML header');
+cmp_ok($config->all()->{'UserName'}, 'eq', 'nan', 'XML can be read in from a file with no XML header');
 
 done_testing();

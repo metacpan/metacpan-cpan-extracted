@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0500';
 
 use v5.36;
 
@@ -11,7 +11,6 @@ use strictures 2;
 use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
-use Time::HiRes qw(usleep);
 use Types::MIDI qw(Channel Velocity);
 use Types::Common::Numeric qw(PositiveNum);
 use Types::Standard qw(Bool Num);
@@ -35,6 +34,13 @@ has channel => (
 has control => (
     is      => 'rw',
     isa     => Velocity, # no CC# in Types::MIDI yet
+    default => 1,
+);
+
+
+has value => (
+    is      => 'rw',
+    isa     => Num,
     default => 1,
 );
 
@@ -100,6 +106,13 @@ has stop => (
     isa     => Bool,
     default => 0,
 );
+
+
+sub single ($self, $device, $dt, $event) {
+    my $cc = [ 'control_change', $self->channel, $self->control, $self->value ];
+    $self->rtc->send_it($cc);
+    return 0;
+}
 
 
 sub breathe ($self, $device, $dt, $event) {
@@ -204,7 +217,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0401
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -277,6 +290,17 @@ Default: C<0>
 Return or set the control change number between C<0> and C<127>.
 
 Default: C<1> (mod-wheel)
+
+=head2 value
+
+  $value = $filter->value;
+  $filter->value($number);
+
+Return or set the control change value. This is a generic setting that
+can be used by filters to set state. This often a whole number between
+C<0> and C<127>, but can take any number.
+
+Default: C<0>
 
 =head2 initial_point
 
@@ -369,6 +393,16 @@ Default: C<0>
 
 Return a new C<MIDI::RtController::Filter::CC> object.
 
+=head2 single
+
+  $control->add_filter('single', all => $filter->curry::single);
+
+This filter sets a single B<control> change message, over the MIDI
+B<channel> once.
+
+Passing C<all> means that any MIDI event will cause this filter to be
+triggered.
+
 =head2 breathe
 
   $control->add_filter('breathe', all => $filter->curry::breathe);
@@ -413,15 +447,17 @@ triggered.
 
 The F<eg/*.pl> program(s) in this distribution
 
+L<IO::Async::Timer::Periodic>
+
 L<Iterator::Breathe>
+
+L<MIDI::RtController>
 
 L<Moo>
 
-L<Time::HiRes>
+L<Types::MIDI>
 
 L<Types::Common::Numeric>
-
-L<Types::MIDI>
 
 L<Types::Standard>
 

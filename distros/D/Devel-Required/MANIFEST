@@ -1,6 +1,5 @@
 MANIFEST
 CHANGELOG
-README
 TODO
 Makefile.PL
 lib/Devel/Required.pm

@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.041",
+   "generated_by" : "App::ModuleBuildTiny version 0.048",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.041"
+            "App::ModuleBuildTiny" : "0.048"
          }
       },
       "runtime" : {
@@ -45,11 +45,11 @@
    "provides" : {
       "Perl::PrereqScanner::Scanner::DistBuild" : {
          "file" : "lib/Perl/PrereqScanner/Scanner/DistBuild.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

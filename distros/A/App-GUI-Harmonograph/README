@@ -1,34 +1,29 @@
 NAME
-    App::GUI::Harmonograph - sculpting beautiful circular drawings
+    App::GUI::Harmonograph - drawing by lateral and rotary pendula
 
 SYNOPSIS
-    1.  read this POD
+    1.  read this POD page
 
-    2.  start the program ("harmonograph")
+    2.  start the program in shell: > "harmonograph"
 
-    3.  move knobs in tabs and observe preview sketch reacting til settings
-        are interesting
+    3.  move knobs in tabs and observe preview sketch reacting until the
+        drawing is interesting
 
     4.  push *Draw* (right below drawing board or "Ctrl+D" or "Alt+D" or in
         Image menu) to produce a full image
 
-    5.  choose in image menu output size (in pixel) and output format. Then
-        select there *Save* (or "Ctrl+S") to store image in a PNG / JPEG /
-        SVG file.
+    5.  choose in menu *"Image"* > *"Size"* size of output image in pixel
+        and right below also output format. Then select there *"Save"* (or
+        push "Ctrl+S") to store image in a PNG / JPEG / SVG file.
 
-    6.  choose *Write* in settings menu ("Ctrl+W") to save settings into an
-        INI file. Load it from there later to restore settings for further
-        tweaking.
-
-    Please note that color changes do not trigger a new preview sketch and
-    if you sketch is not visible, it is most likely due the combination in
-    LINE SETTINGS of line being off (dots only), dot thinkness is low and
-    dot density being also low.
+    6.  choose *"Write"* in *"Settings"* menu ("Ctrl+W") to save settings
+        into an INI file. Load it from there later to restore settings for
+        further tweaking.
 
     After first use of the program, a config file will be created under
     *~/.config/harmonograph* in your home directory. It contains mainly
-    stored colors and dirs where to load and store setting files. You may
-    change it manually or deleted it to reset defaults.
+    stored colors and dir entries that tell the app from where to load and
+    store files. You may change it manually or deleted it to reset defaults.
 
 DESCRIPTION
     An Harmonograph is an apparatus with several connected pendula, creating
@@ -54,45 +49,61 @@ Mechanics
     it only moves along the x-axis (left to right and back). In the same
     fashion the second (Y) only moves up and down. When both are connected
     to a pen, we get a combination of both movements. As long as X and Y
-    swing at the same speed, the result is a diagonal line. Because when X
-    goes right Y goes up and vice versa. But if we start one pendulum at the
-    center and the other at the upmost position we get a circle. In other
-    words: we added an offset of 90 degrees to Y (or X). Our third pendulum
-    Z moves the paper in circulating manner and but not rotating the paper
-    around its center. If both circular movements (of X, Y and Z) are
-    concurrent - the pen just stays at one point over the paper. If both are
-    countercurrent - we get a circle. Interesting things start to happen, if
-    we alter the speed of of X, Y and Z. Than famous harmonic pattern
-    appear. And for even more complex drawings I added R, which is not
-    really a pendulum and not part of the original harmonograph, but an
-    additional rotary movement of Z around its center. The pendula out of
-    metal do of course fizzle out over time, which you can see in the
-    drawing, in a spiraling movement toward the center. We emulate this with
-    two damping factors: one for amplitude and one for the frequency
-    (speed).
+    swing at the same speed (frequency), the result is a diagonal line.
+    Because when X goes right Y goes up and vice versa. But if we start one
+    pendulum at the center and the other at the upmost position we get a
+    circle. In other words: we added an offset of 90 degrees to Y (or X).
+    Our third pendulum W moves (wobbles) the paper in circulating manner
+    around its center (but not rotating, so a dot in the left corner will
+    always left). If both circular movements (of X, Y and the one of W) are
+    concurrent - the pen just stays at one point over the paper and paints
+    only a dot. If both are countercurrent - we get a circle. Interesting
+    things start to happen, if we alter the speed of of X, Y and W. Than
+    famous harmonic pattern appear. And for even more complex drawings I
+    added R, which is not really a pendulum and not part of the original
+    Harmonograph, but an additional rotary movement of the paper around its
+    center. I added even 2 more pendula (E and F which are also lateral like
+    X and Y), which draw an epicycle around the point where the dot would be
+    normally drawn.
+
+    The pendula out of metal do of course fizzle out over time, which you
+    can see in the drawing as a spiraling movement toward the center. We
+    emulate this with two damping factors: one for amplitude/radius and one
+    for the frequency (speed). The radius or ampitude of Pendulum R is
+    special and allows you to zoom in or out in case you wish to do so.
+    Normally this is not necessary, since the program autoadjusts to the
+    settings, so that the picture is always fully visible and as big as
+    possible.
 
 GUI
-    The general layout of the program has three parts, which flow from the
-    position of the drawing board.
+    The general layout of the program has three parts:
 
     1   In the left upper corner is the drawing board - showing the result
         of the Harmonograph.
 
     2   The whole right half of the window contains the settings, which
-        guide the drawing operation. These are divided into four tabs -
-        roughly devided in form (3) and decoration (last one).
+        guide the drawing operation. These are divided into six tabs, which
+        will be explained in detail below.
 
-    3   In the lower left corner are two rows of command buttons. All other
-        commands are in the menu. The upper row is just for drawing and the
-        lower for image mass production more under "Commands".
+    3   In the lower left corner are two rows of buttons. The first row
+        contains only the progress bar and the *Draw* button for drawing a
+        full picture. The progress bar remains white whily previe sketches
+        are shown. But when a full picture is drawn, then it gets filled
+        with colors that reflect the color flow used while drawing.
+
+        The second row of buttons allow the mass production of graphic files
+        without using the menu. That is explained in detail under
+        "Commands".
 
     Please mind the tool tips - short help texts which appear if the mouse
-    stands still over most widgets. Also helpful are messages in the status
-    bar at the bottom - on bottom left regarding current state of the image
-    and bottom right about state of the settings. Settings are all the
-    parameters of the image, that are dialed in via widget in the tabs.
-    Configuration are the general settings of this program, which are mostly
-    saved colors and paths were to store images and settings.
+    stands still over a widgets. Also helpful are messages in the status bar
+    at the bottom - on bottom left regarding current state of the image and
+    bottom right about state of the settings. Settings are all the
+    parameters that guide the drawing. You change them via widgets controls
+    on the right side. They can be saved and loaded from a file via the
+    settings menu. Configuration are the general settings of this program,
+    which are mostly saved colors and paths were to store images and
+    settings.
 
     When browsing the main menu, help texts about the highlighted item also
     appears in the status bar. The Menu can be completely navigated with the
@@ -101,95 +112,200 @@ GUI
     see which Alt + letter combinations trigger which button.
 
   Pendulum
-    Each of the first two tabs contains the settings of two pendula. The
-    first tab has the lateral pendula: X (left right movement) and Y (up and
-    down). The second tab has Z (wobble - moving the center of the paper in
-    rotating movement around the center of the space without rotating the
-    paper) and R (actual rotation around center of the pater). Most settings
-    can be changed with a combo-slider which allows input by typing, moving
-    the slider or fine tuning the value by pushing the minus and plus
-    buttons. The settings for each pendulum are identical and are as follow:
+    Each of the first three tabs contains the settings of two pendula. The
+    first tab holds the lateral or linear pendula: X (left right movement)
+    and Y (up and down). The second tab shows settings of the epicycle
+    pendula E (left right) and F (up down). They also just move in x or y
+    direction, but they swing not around the center of the image but around
+    the point, where the pencil would have been. The third tab allows you to
+    tweak the pendula W (wobble) and R (rotation). W moves the center of the
+    paper beneath the pencil in a rotating manner whereas R rotates the
+    paper around its center. Each of these 6 pendula have the exact same
+    settings which behave all the same, except radius of R, which works as a
+    zoom.
 
-    Each pendulum section starts with the name of the pendulum, but in front
-    of that (tothe right) is a checkbox to (de-)activate the entire
-    pendulum. The first row lets you dial in the speed (frequency). This is
-    most fundamental to the shape of the drawing. For instance 2 means that
-    the pendulum swings back and fourth twice as fast. To the right you can
-    choose an additional factor the frequency gets multiplied with. This can
-    be a constant like Pi or Phi or the frequency of another pendulum or
-    just simply one. This is especially handy when browsing the classic
-    shapes with three pendula. For these the frequency of X and Y has to be
-    the same - which will be ensured when you set the frequency factor of Y
-    to X (or vice versa) and keep the frequency of the connected pendulum to
-    one. The next combo control below adds decimals to the frequency value
-    for more complex rotating drawings. Behind that are two check boxes to
-    invert the final frequency value to 1/x or to flip the direction of the
-    pendulum. Below that follows a frequency damping, which will change the
-    frequency over time. To the right of that value you can set the damping
-    mode. Set it to minus for linear damping or to "*" for accelerated
-    damping. the same as the second row only with slightly different optical
-    results.
+    In the left upper corner of each pendulum settings is a checkbox to
+    activate or deactivate the pendulum - good to see the pendulums part in
+    the pen movement. The rest is organized in 8 rows, which can be divided
+    into 3 parts. Row 1 - 4 are about the pendulum frequency in Hertz. Row
+    five allows you set the starting point (offset) and the last 3 rows are
+    about the radius or amplitude of the pendulum mirroring the rows 1, 3
+    and 4 because the work exactly the same way just not for the frequency
+    but the radius parameter.
 
-    The fourth row starts with a slider to fine tune the starting point of
-    the pendulum. It can be chosen between zero and a quater rotation. This
-    can have great effects on the shape. Because of the special desirability
-    offsets of an half (180 degree) or quarter (90 degree) rotation can be
-    activated by checkbox (to the right of the slider). The final offset is
-    the sum of the checked with the slider value.
+    Row one sets the whole number part of the frequency. This is the part
+    you need to generate to generate the famous images which are based on
+    integer rations. You can either use the slider the + an - buttons or
+    insert a number into the text field (which is true off all slider combo
+    widgets). Behind the slider combo in row one is a drop down menu which
+    lets you choose a natural constant like Pi or Phi. It gets multiplied
+    with the frequency. This allows you to explore the nature of these
+    famous constants. Among the constants are also the natural numbers 1, 2
+    and 3 in case you need to crank up the frequency up to 300.
 
-    The fifth row is the amplitude size, which simple allows to make the
+    The second row enables you to set values with three decimals. If you for
+    instance choose a base frequency of 5 and dial in 15 in the second row,
+    the actual frequency will be 5.015 times the natural constant. Behind
+    the slider are two checkboxes. One to additionally invert (1/x) the
+    frequency value and one to flip the pendulum direction (f = -f).
+
+    The third row lets you dial in a damping value which makes the pendulum
+    each round slower (bigger value -> more damping). Behind it is a
+    selector. If its on minus the damping will be same each round but set on
+    "*" the damping will be proportional to the frequency. Still behind it
+    is a checkbox. When selected the frequency is allowed to become negative
+    by damping.
+
+    The fourth row is about daming acceleration or with other words, how
+    much the damping changes from dot to dot. Beside the c value you have
+    this time four types of acceleration. Minus and times work as before and
+    plus and divided by are just their opposite.
+
+    The fifth row has a slider that sets the starting position of the
+    pendulum along its expected track. If the slider is on max you move the
+    pendulum a quater rotation ahead. To add another quarter check the box
+    left beside it. The last box adds another half rotation. This allows you
+    to flip or mirror the image in meaningful ways.
+
+    The sixth row mirrors the first but with 2 distinctions. Its not about
+    integer values but percentage values of the original pendulum length.
+    This length will be calculated by the program for opimal display. Thi
+    slider helps you only to change the proportions of the amplitude towards
+    the other pendula. Natural constants are also here available as a factor
+    and behind the on the most right is a button to reset the radius to 100
+    percent.
+
+    The seventh row is the amplitude size, which simple allows to make the
     picture larger or smaller depending if the pendulum left the frame or
     doesn't move enough. As with reqency, also the amplitude can be damped
     over time and this damping can accelerated.
 
-  Mod Matrix
-    The third tab allows the deepest alterations to the drawing, which
-    leaves the original concept of a Harmonograph. For instance the X -
-    Pendulum is basically a little more than the a cosine function to the
-    time variable. The time variable represents the frequency since we
-    simulate a double frequency by doubling the speed time passes for this
-    pendulum. If you change the function from cosine (cos) to tangent or
-    other trigonometric functions the shapes will change redically. Same
-    goes for Y and Z which is computation wise just a combination of X and Y
-    applied to a offset. R is different since its computed with a rotation
-    matrix. But in same manner as X or Y you can change here for each cell
-    of the matrix the variable and the function that computes on that
-    variable. Please note the most beautiful examples were computed by
-    changing the variable of just one cell of the rotation matrix.
+    Row eight and nine are exact copies of row three and four, they just
+    affect the radius / amplitude.
 
-  Pen Settings
-    The last tab on the right contains the visual properties (of the pen).
-    In left upper corner yo set the amount of rotations (swings) to be
-    drawn. Right beside is the distance between dots. Greater distances,
-    together with color changes, help to clearify muddled up drawings. Also
-    - many rotations and little distance between dots will slow down the
-    computation. In the second row left is a checkbox to answer if the dots
-    should be connected. The fourth selector sets the dot size in pixel.
-    Zero mens here very thin = one half of an pixel - which is still
-    visible, but very airy.
+  Functions
+    This tab lets you meddle with the equations that compute the mechanics
+    of a pendulum. Because all ten rows are built the same I will explain
+    only one. For instance the X pendulum has only influence on the x
+    coordinate of a dot, it is computed: "x = radius * cos (time)". The
+    first selector allows you to swap out the cosine function. Instead you
+    could get sine, tangent, cotangent, secant, cosekcant and the hyperbolic
+    twin of the already mentioned functions.
+
+    The second selector has five options: "= + - * /". If you choose the
+    first (equal sign) your time variable will be just swapped out with
+    another variable. The other four option describe the operation that will
+    be applied upon you time value. So e.g. if you select plus the resulting
+    formula will be "x = radius * cos (time + (...))". The allude to
+    whatever you will choose with the next three selectors.
+
+    Selector three and four are just factors. They contain natural numbers
+    and natural constants you can multiply the variable with. And last not
+    least selector five holds the variables time frequency and
+    radus/amplitude of each pendulum. This allows you for instance add the
+    (always) current pendulum frequency of pendulum W to the time value of
+    Pendulum X resulting in unpredictable shapes. There is lot to explore.
+
+    Pendulum W affects the x and y coordinate, hence it has two rows for
+    each case. Even more special is "Pendulum" R - the rotation movement of
+    the paper. This is computed by an ordinary 2 x 2 rotation matrix (we are
+    in 2D). Each cell of this matrix has here its own row. Its R_11, R_12,
+    R_21, R_22. But if you not sure just hover with the mouse and get the
+    hints.
+
+    The very last row is different and contains only one switch that will
+    determine if W or R pendulum is applied first. Default and what is also
+    more comprehensible is that R is apllied first. But the arstist in you
+    might can choose here differently.
+
+  Visual Settings
+    Due to the section headins, this tab is self explanatory. First choos if
+    you want to paint dots or connect them. Please not that pen thickness of
+    one is very thin and you might not see any dots in that setting. The pen
+    style is more of an gimmick. Most useful are solid and dotted lines. The
+    dot density allows you to juggle two extremes. Low density makes for
+    fast drawn lines and dots but also pointy curves. So you might want to
+    raise the value for smooth curves. The fine tuning of dot density makes
+    only sense if you draw dots, becasue even a slight change can produce
+    very different dot pattern. The line length is in seconds in minutes so
+    you can understand their proportion to the frequencies, which are in
+    Hertz (rotation / second).
+
+    The last section on this tab is about the color change or color flow.
+    You have 4 types and according to the current type only the widgets
+    which have an impact are enabled. When flow type *"no"* in on, you paint
+    only with color number 1 and the progress bar in the left lower corner
+    will have one color. It allows you always to track which color rainbow
+    you actually chose. But its only visible if you make a full picture. So
+    push the Draw button. When color flow type *"one_time"* is active, you
+    have to also select how many colors you like. And if you e.g. choose 3,
+    your rainbow will go from color 1 to color 2 to color 3. And it will be
+    spreat of the whole painting time, depending how much you selected. The
+    dynamic option tells something about how the change from one color to
+    the next will look like. Positive values bend the rainbow toward the
+    start of a gradient and negative toward the end. So with a dynamic of 5
+    the rainbow will linger on the starting color for a long time and will
+    then change faster and faster. The color flow type "alternate" moves
+    from color one to two, three and so forth and then backwards back to one
+    and then again forward as long as your chosen painting time permits.
+    Regulate the color change speed with the "Speed" slider. For extra slow
+    color changes hit the "Invert" checkbox. Than high speed values will
+    make it extra slow. The last color flow type is *"circular"*. Here you
+    go again from color one to the selected last color and from there
+    directly to color one. This round will repeated as time permits.
 
   Colors
-    On the lower part of the pen settings tab are the are the options for
-    colorization and this has in itself three parts. Topmost are the
-    settings for the color change, which is set on default to *no*. In that
-    case only the upper *start color* (below the color change section) will
-    be used, and not the *end color* (target - which is even below that).
+    This tab is just for choosing the available colors. There are alway ten
+    colors visible, but colors with a "x" below are currently not in use.
+    This tab page has five sections which will be explained from top to
+    bottom.
 
-    Both colors can be changed via controls for the red, green and blue
-    value (see labels "R", "G" and "B" ) or hue, saturation and lightness
-    (HSL). The result can be seen in the color monitor at the center of a
-    color browser.
+    The first section is about loading saving sets of colors, so you don't
+    have to dial in your favorit arrangements every time. Just choose your
+    set via the drop down menu or browse there with the arrow buttons. A
+    preview will be shown below th e selector. Then press load and the
+    selected set will be loaded into the currently used colors in the middle
+    of the page. If you want to tweak a set you can do so color by color (as
+    shown below) and then save (overwrite) the color set which is currently
+    displayed. Or press new to create a new color set that contains the
+    currently displayed colors. You will be asked to give it a name that is
+    not already taken. And caution with the "Del" button. If you press it,
+    the currently displayed set is gone.
 
-    An one time or alternating gradient between both colors with different
-    dynamics (first in second row) can be employed. Circular gradients
-    travel around the rainbow through a complement color with saturation and
-    lightness of the target settings. Steps size refers always to how maby
-    circles are draw before the color changes.
+    Below that is the second section with buttons that trigger color
+    functions. This helps you to compute related colors. To better
+    understand their working check the module Graphics::Toolkit::Color. If
+    you push the "Gradient" button that a smooth color gradient will be
+    calculated between the leftmost color number one and the currently
+    selected color. The value after the button skews the gradient towart the
+    start (positive values) or the end (negative values). The "Complement"
+    button also computes colors between color one and the current but these
+    will have equally distanced hues but the same brightness and saturation.
+    The text fields after the button allow you to skew the brightness and
+    saturation. Behind that, at the rightmost position are two buttons to
+    move the currently selected color around.
 
-    The third part of the tab grants you access to the color section of the
-    config file ".harmonograph". There you can store your favorite colors
-    under a name and reload or delete them later. The upper row is for
-    interactions with the *start color* and the lower with the *end color*.
+    The third section below that displays the colors than can be used to
+    draw the picture. They are ten colors, numbered from left to right.
+    Below each color field there is a second rectangle showing the status of
+    the color. If this rectangle is empty, the status is normal (used). If
+    it's crossed out, them the color is inactive because in the visual
+    settings you choose to use less than ten colors. The third option is
+    selected color. To select a color, just click on the rectangle
+    displaying that color or the status rectangle below. Then the status
+    will show an arrow down.
+
+    This means the section below displays the values of this color. And the
+    values can also be changed there. First your have the *red* (R), *green*
+    (G) and *blue* (B) values of the RGB color space. below that are ones of
+    HSB: *hue*, *saturation* and *lightness*. These are more meaningful to
+    the human mind. At the right end of each row that shows amd changes one
+    color value is a button with a question mark. Push that to randomize
+    this one value.
+
+    The last and fifth section is analogous to the first one. It is a store
+    for your favorite single colors. Just load and safe the currently
+    selected color via the buttons. Be again cautious with the "Del" button.
 
   Commands
     In the lower left corner are two rows of command buttons. All other

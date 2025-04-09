@@ -4,38 +4,46 @@
       "Piotr Roszatycki <dexter@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Coder-GeocodeFarm",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::Deep" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0.88",
-            "Test::RequiresInternet" : "0"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0",
+            "Software::License" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
             "JSON" : "0",
             "URI" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::RequiresInternet" : "0"
          }
       }
    },
    "provides" : {
       "Geo::Coder::GeocodeFarm" : {
          "file" : "lib/Geo/Coder/GeocodeFarm.pm",
-         "version" : "0.0402"
+         "version" : "0.0500"
       }
    },
    "release_status" : "stable",
@@ -50,5 +58,6 @@
          "url" : "http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm"
       }
    },
-   "version" : "0.0402"
+   "version" : "0.0500",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

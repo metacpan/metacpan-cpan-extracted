@@ -1,0 +1,165 @@
+NAME
+    Mo::utils::Number - Mo number utilities.
+
+SYNOPSIS
+     use Mo::utils::number qw(check_int check_natural check_percent check_positive_natural);
+
+     check_int($self, $key);
+     check_natural($self, $key);
+     check_percent($self, $key);
+     check_positive_natural($self, $key);
+
+DESCRIPTION
+    Mo number utilities for checking of data objects.
+
+SUBROUTINES
+  "check_int"
+     check_int($self, $key);
+
+    Check parameter defined by $key if it's number integer (... -2, -1, 0,
+    1, 2, ...). Value could be undefined or doesn't exist.
+
+    Returns undef.
+
+  "check_natural"
+     check_natural($self, $key);
+
+    Check parameter defined by $key if it's number a natural number (0, 1,
+    2, ...). Value could be undefined or doesn't exist.
+
+    Returns undef.
+
+  "check_percent"
+     check_percent($self, $key);
+
+    Check parameter defined by $key if it's number a percent. Value could be
+    undefined or doesn't exist.
+
+    Returns undef.
+
+  "check_positive_natural"
+     check_positive_natural($self, $key);
+
+    Check parameter defined by $key if it's number a positive natural number
+    (1, 2, ...). Value could be undefined or doesn't exist.
+
+    Returns undef.
+
+ERRORS
+     check_int():
+             Parameter '%s' must be a integer.
+                     Value: %s
+     check_natural():
+             Parameter '%s' must be a natural number.
+                     Value: %s
+     check_percent():
+             Parameter '%s' has bad percent value.
+                     Value: %s
+             Parameter '%s' has bad percent value (missing %).
+                     Value: %s
+     check_positive_natural():
+             Parameter '%s' must be a positive natural number.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Number qw(check_int);
+
+     my $self = {
+             'key' => -2,
+     };
+     check_int($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Number qw(check_int);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 1.2,
+     };
+     check_int($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...Number.pm:?] Parameter 'key' must be a integer.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Natural qw(check_natural);
+
+     my $self = {
+             'key' => 0,
+     };
+     check_natural($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Number qw(check_natural);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => -2,
+     };
+     check_natural($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...Number.pm:?] Parameter 'key' must be a natural number.
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Number>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -121,7 +121,7 @@ This will override any value set for `database.user` in the configuration files.
     `base.yaml`, `local.yaml`, `base.json`, `local.json`, `base.xml`,
     `local.xml`, `base.ini`, and `local.ini`.
 
-    If `config_file` is set, that file is loaded last.
+    If `config_file` or `config_files` is set, those files are loaded last.
 
 - 2. Merging and Resolving
 
@@ -158,6 +158,10 @@ Options:
 
     Points to a configuration file of any format.
 
+- `config_files`
+
+    An arrayref of files to look for in the configration directories.
+
 - `env_prefix`
 
     A prefix for environment variable keys and comment line options, e.g. `MYAPP_DATABASE__USER`,
@@ -165,7 +169,12 @@ Options:
 
 - `flatten`
 
-    If true, returns a flat configuration structure like `'database.user'` (default: `0`).
+    If true, returns a flat hash structure like `{database.user}` (default: `0`) instead of `{database}{user}`.
+    \`
+    &#x3d;item \* `logger`
+
+    Used for warnings and traces.
+    An object that understands debug() and trace() messages.
 
 - `sep_char`
 
@@ -205,6 +214,7 @@ You can find documentation for this module with the perldoc command.
 # SEE ALSO
 
 - [Config::Auto](https://metacpan.org/pod/Config%3A%3AAuto)
+- [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)
 
 # AUTHOR
 

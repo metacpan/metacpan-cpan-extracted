@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Iterator::Breathe" => 0,
     "MIDI::RtController" => "0.0602",
     "Moo" => 2,
-    "Time::HiRes" => 0,
     "Types::Common::Numeric" => 0,
     "Types::MIDI" => 0,
     "Types::Standard" => 0,
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0401",
+  "VERSION" => "0.0500",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +51,6 @@ my %FallbackPrereqs = (
   "MIDI::RtController" => "0.0602",
   "Moo" => 2,
   "Test::More" => "0.88",
-  "Time::HiRes" => 0,
   "Types::Common::Numeric" => 0,
   "Types::MIDI" => 0,
   "Types::Standard" => 0,

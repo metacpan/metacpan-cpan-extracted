@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-ModuleBuildTiny
 
+0.019     2025-04-08 21:43:40+02:00 Europe/Brussels
+          - Allow module sharedirs
+          - Allow dynamic_config=1
+
 0.018     2025-04-06 23:28:49+02:00 Europe/Brussels
           - Add a auto_configure_requires option
           - Use perl v5.20 syntax

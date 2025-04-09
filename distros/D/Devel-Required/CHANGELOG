@@ -1,3 +1,9 @@
+0.17	28 August 2024
+	Fix module so it should work on any version of perl.
+	Note the order it is used in a Makefile.PL has changed,
+	it should be loaded in an eval BEFORE loading ExtUtils::MakeMaker
+	not afterwards.. (YVES)
+
 0.15	9 November 2019
 	Adoption.
 

@@ -1,11 +1,12 @@
 package Devel::Required;
 
 # set version information
-$VERSION= '0.16';
+$VERSION= '0.17';
 
 # make sure we do everything by the book from now on
 use strict;
 use warnings;
+use ExtUtils::MakeMaker ();
 
 # initializations
 my @TEXT;         # list with text-file conversion
@@ -16,7 +17,7 @@ my $INSTALLATION; # any installation information
 BEGIN {
     no warnings 'redefine';
     no strict 'refs';
-    my $subname= caller() . '::WriteMakefile';
+    my $subname= 'ExtUtils::MakeMaker::WriteMakefile';
     my $old= \&{$subname};
     *$subname= sub {
 
@@ -255,29 +256,32 @@ This documentation describes version 0.16.
 
 =head1 SYNOPSIS
 
- use ExtUtils::MakeMaker; # check README and lib/Your/Module.pm
- eval "use Devel::Required";
- WriteMakefile (
-  NAME         => "Your::Module",
-  VERSION_FROM => "lib/Your/Module.pm",
-  PREREQ_PM    => { 'Foo' => '1.0', 'Bar::Baz' => '0.05' }
- );
+	eval "use Devel::Required";
+	use ExtUtils::MakeMaker; # check README and lib/Your/Module.pm
+	WriteMakefile (
+		NAME         => "Your::Module",
+		VERSION_FROM => "lib/Your/Module.pm",
+		PREREQ_PM    => { 'Foo' => '1.0', 'Bar::Baz' => '0.05' }
+	);
 
- use ExtUtils::MakeMaker; # specify which files should be checked
- eval <<"CODE";
- use Devel::Required
-   text => 'INSTALL',
-   pod  => [ qw( lib/Your/Module.pod ) ],
- ;
- CODE
- WriteMakefile (
-  NAME         => "Your::Module",
-  VERSION_FROM => "lib/Your/Module.pm",
-  PREREQ_PM    => { 'Foo' => '1.0', 'Bar::Baz' => '0.05' }
- );
+...
 
- use ExtUtils::MakeMaker; # specify maint / blead installation information
- eval "use Devel::Required maint_blead => 5.014";
+	eval <<"CODE";
+		use Devel::Required
+		text => 'INSTALL',
+		pod  => [ qw( lib/Your/Module.pod ) ];
+	CODE
+	use ExtUtils::MakeMaker; # specify which files should be checked
+	WriteMakefile (
+		NAME         => "Your::Module",
+		VERSION_FROM => "lib/Your/Module.pm",
+		PREREQ_PM    => { 'Foo' => '1.0', 'Bar::Baz' => '0.05' }
+	);
+
+...
+
+ 	eval "use Devel::Required maint_blead => 5.014";
+ 	use ExtUtils::MakeMaker; # specify maint / blead installation information
 
 =head1 DESCRIPTION
 
@@ -297,6 +301,10 @@ Optionally, it will also update installation information, specifically for
 distributions that have a C<maint> and C<blead> version internally.
 
 This module should B<only> be installed on the system of the developer.
+
+Note that as 0.17 the module should be used in an eval BEFORE loading
++L<ExtUtils::MakeMaker>, not afterwards as in previous versions. This version
++should work on any version of perl.
 
 =head1 FILES CHANGED
 
@@ -429,7 +437,7 @@ the future to provide more clarity for developers and packagers.
 
 =head1 REQUIRED MODULES
 
- (none)
+ ExtUtils::MakeMaker
 
 =head1 THEORY OF OPERATION
 

@@ -22,7 +22,7 @@ use Test::DZil;
 
 	like(
 		exception { $tzil->build },
-		qr/\[ModuleBuildTiny\] Unsupported use of a module sharedir/,
+		qr/\[ModuleBuildTiny\] Sharedir location for module Foo sharedir should be 'module-share\/Foo'/,
 		'warning issued when there is a module sharedir in use',
 	);
 }

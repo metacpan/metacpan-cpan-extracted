@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 f1657318a544a4929c882e8a2de62cbf16f407d3744f642fb35fbe79028316a0 Changes
+SHA256 494d1c738f27df1e94422f5d58be4be57bd5bc5dd2b2894d554a38db31b5d44a LICENSE
+SHA256 a79fac7ddb9a93abfef8c96d60b9ef3c171e41aa4ec032ce776c8fdca97f67c6 MANIFEST
+SHA256 deee4211be8eea57aa0be24cba3f14578b1cb346129de9f72206203cad7aefea META.yml
+SHA256 40e8a2207b21c686a27a54437743a97d1ffba6ac6e12f521e5762dbd4133a006 Makefile.PL
+SHA256 f6440ffbb96753f65feb72a8fbd2538d3f0ec48e657720e54f8c3e80f9e69304 Number.pm
+SHA256 3f09f38ba58dab6545e28c928eaf797011469a018e0d7f6e37a2aeb8706cb6c3 Number/Utils.pm
+SHA256 039f30f5abbae6742b54968ff417fa4ce1d49f85fa2df4b18f8a0bf83fd0aa23 README
+SHA256 8c4227ce5947f4923364fc7d9429d39acc4122c3d7a4688c953b7c11ba64473a examples/check_int_fail.pl
+SHA256 cded35fd1f86e62f13480dbfe095ef563f0c2ee6eb64694de6159202f362e070 examples/check_int_ok.pl
+SHA256 c9ddf0f865b45928fe2b0c9c28f6e0e0b2f48a80d3fd2b77c45c2c6f88a62efe examples/check_natural_fail.pl
+SHA256 b28a8952b8ade0d1cfea795fe824982e0e940407a9977ddc050e516b00d7d480 examples/check_natural_ok.pl
+SHA256 703ed57d52e65635705d24f82be5f01068461999b2f2eee5965f3e6063b276af examples/sub_check_percent.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 8d292df873ded8b28c37fd8a9e481f69093af40b9326e947607025c043dfe5d8 t/Mo-utils-Number-Utils/01-use.t
+SHA256 7668a1bafda12a8856c5d1766c26bd3bae57741427c841346f1a5f449a2566a7 t/Mo-utils-Number-Utils/02-version.t
+SHA256 4ff7e09b0a3d53ceee7997c4d77d7ba609aa39058b98e0c365dd1744ab4b307d t/Mo-utils-Number-Utils/03-sub_check_percent.t
+SHA256 25b3b50508af99685042ae063374f8119fe702eeb777529f56a99788a1f1af63 t/Mo-utils-Number/01-use.t
+SHA256 f9cf63f109af6a7d45471ce765816e55ad0a4e0cb5d631ae939b068f7953a120 t/Mo-utils-Number/02-version.t
+SHA256 1a16be9bde56b890e7d66348dabd42f4fa3c384a6d393242877e50de88b05495 t/Mo-utils-Number/03-check_int.t
+SHA256 27725b4d15e32c3ec86a8486b1023384ff07998417df5d6feb49bde478d51746 t/Mo-utils-Number/04-check_natural.t
+SHA256 d8c338d3b34f670a5a7685396865624af2f4443d62671d60a1821f6a3536dc2c t/Mo-utils-Number/05-check_percent.t
+SHA256 313e62e5f6d3d606cef9afae37fd131a60167c511680b961681204da0f4b8ab7 t/Mo-utils-Number/06-check_positive_natural.t
+SHA256 52ab7b32dbac0e22ebf59c3c2713265e9d04065b64f734dead15d022a389b39b xt/Mo-utils-Number-Utils/01-pod_coverage.t
+SHA256 ce05d02911f213e9bbd3c772998a2de9999e77aaeb68b1b2e9891cb6fe3d7b06 xt/Mo-utils-Number-Utils/02-pod.t
+SHA256 dc1daff3ebe05cc99afed89b13d4aa3ae797c96f7497ac7d9bf61f72c2842fff xt/Mo-utils-Number/01-pod_coverage.t
+SHA256 60ebc8acc7b6a8afeef7bf9322ac3c4882e7082a424cef7bd1e895262980099a xt/Mo-utils-Number/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmf09nEACgkQonze/HtI
+OPDhnwv+MxaLa1aQq/9gzxBzYDyd4/di0F0e4czRLIQIQfnp9XjNv4gGDZJfqoei
+CpGhzs9LvO/enBOqdD5MhDeWt7O4TPah+Im/2VX+z4U9v5geqDX7fW2XAF8tI8K0
+YJKNxX2Wql5hEJtkDpyZ2DMyu3CSXZ+BnPeijmSdJCubs3VVgNH5WVRC27Do+Jow
+eBOANroVCBYuCx1dWO+X6jJAh1lcEX+qKcUZCn0uGQBDR33IG+EK3ObUvt91pnrq
+jmaKkpdKxKVnMg7scNlncG2hDcIjeTgK8Pjl5DGuj1uHIpl43WSJoYd3z5j2nBK1
+uZKK/19sTH4JbSn0y+7egvKaWPvHDJiVyUpoKUbf77FK7oOVQch6WBlG8c84bddm
+tPYh4/K6sL3lNFXxfWxZQYdsURNCSsblir9CKc3A7LJytR+Ro8pj/idCAsPl2/Vm
++8ymkBq0wtXMgN7MPmKgU6y0uu4hSjf/pvBTMROuLisrjzGDZHFmpY24Bm422XdX
+mq52StzQ
+=1VOK
+-----END PGP SIGNATURE-----

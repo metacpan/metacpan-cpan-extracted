@@ -25,61 +25,61 @@ name: ExtUtils-Builder
 provides:
   ExtUtils::Builder:
     file: lib/ExtUtils/Builder.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action:
     file: lib/ExtUtils/Builder/Action.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Code:
     file: lib/ExtUtils/Builder/Action/Code.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Command:
     file: lib/ExtUtils/Builder/Action/Command.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Composite:
     file: lib/ExtUtils/Builder/Action/Composite.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Function:
     file: lib/ExtUtils/Builder/Action/Function.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Perl:
     file: lib/ExtUtils/Builder/Action/Perl.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Action::Primitive:
     file: lib/ExtUtils/Builder/Action/Primitive.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::FileSet:
     file: lib/ExtUtils/Builder/FileSet.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::FileSet::Filter:
     file: lib/ExtUtils/Builder/FileSet/Filter.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::FileSet::Free:
     file: lib/ExtUtils/Builder/FileSet/Free.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::FileSet::Subst:
     file: lib/ExtUtils/Builder/FileSet/Subst.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::MakeMaker:
     file: lib/ExtUtils/Builder/MakeMaker.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Node:
     file: lib/ExtUtils/Builder/Node.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Plan:
     file: lib/ExtUtils/Builder/Plan.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Planner:
     file: lib/ExtUtils/Builder/Planner.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Planner::Extension:
     file: lib/ExtUtils/Builder/Planner/Extension.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Serializer:
     file: lib/ExtUtils/Builder/Serializer.pm
-    version: '0.016'
+    version: '0.017'
   ExtUtils::Builder::Util:
     file: lib/ExtUtils/Builder/Util.pm
-    version: '0.016'
+    version: '0.017'
 recommends:
   Sub::Util: '1.40'
 requires:
@@ -94,16 +94,18 @@ requires:
   File::Spec: '0'
   File::Spec::Unix: '0'
   List::Util: '1.45'
+  Perl::OSType: '0'
   Scalar::Util: '0'
   base: '0'
   parent: '0'
   perl: '5.010'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/extutils-builder-plan/issues
   repository: git://github.com/Leont/extutils-builder-plan.git
-version: '0.016'
+version: '0.017'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

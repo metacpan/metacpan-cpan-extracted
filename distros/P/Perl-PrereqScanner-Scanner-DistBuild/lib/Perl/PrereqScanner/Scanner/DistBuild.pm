@@ -2,7 +2,7 @@ package Perl::PrereqScanner::Scanner::DistBuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 with 'Perl::PrereqScanner::Scanner';
@@ -13,12 +13,14 @@ sub scan_for_prereqs {
 	# Moose-based roles / inheritance
 	my @chunks =
 		map  { [ $_->schildren ] }
-		grep { $_->child(0)->literal =~ m{\A(?:load_module)\z} }
+		grep { $_->child(0)->literal =~ m{\A(?:load_module|load_extension)\z} }
 		grep { $_->child(0)->isa('PPI::Token::Word') }
 		@{ $ppi_doc->find('PPI::Statement') || [] };
 
 	foreach my $hunk ( @chunks ) {
 		my ($load_module, @arguments) = @$hunk;
+
+		pop @arguments if @arguments > 1 && $arguments[-1]->isa('PPI::Token::Structure') && $arguments[-1]->content eq ';';
 
 		if (@arguments == 1) {
 			if ($arguments[0]->isa('PPI::Structure::List')) {
@@ -57,7 +59,7 @@ Perl::PrereqScanner::Scanner::DistBuild - scan for Dist::Build dependencies
 
 =head1 DESCRIPTION
 
-This scanner is intended for L<Dist::Build> planner files. It recognizes C<load_module> calls and detects the appropriate module dependency.
+This scanner is intended for L<Dist::Build> planner files. It recognizes C<load_extension> calls and detects the appropriate module dependency.
 
 =head1 AUTHOR
 

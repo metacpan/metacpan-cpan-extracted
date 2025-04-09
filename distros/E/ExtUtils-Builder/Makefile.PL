@@ -28,10 +28,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Spec::Unix" => 0,
     "List::Util" => "1.45",
+    "Perl::OSType" => 0,
     "Scalar::Util" => 0,
     "base" => 0,
     "parent" => 0,
     "strict" => 0,
+    "version" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -45,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.89",
     "lib" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,6 +71,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.45",
+  "Perl::OSType" => 0,
   "Scalar::Util" => 0,
   "Test::Builder" => 0,
   "Test::More" => "0.89",
@@ -76,6 +79,7 @@ my %FallbackPrereqs = (
   "lib" => 0,
   "parent" => 0,
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

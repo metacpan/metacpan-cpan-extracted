@@ -25,7 +25,6 @@ requires:
   Iterator::Breathe: '0'
   MIDI::RtController: '0.0602'
   Moo: '2'
-  Time::HiRes: '0'
   Types::Common::Numeric: '0'
   Types::MIDI: '0'
   Types::Standard: '0'
@@ -35,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-CC
   repository: https://github.com/ology/MIDI-RtController-Filter-CC.git
-version: '0.0401'
+version: '0.0500'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

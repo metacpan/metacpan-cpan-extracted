@@ -7,15 +7,15 @@ use base qw/Wx::Panel/;
 
 sub new {
     my ( $class, $parent, $x, $y, $color  ) = @_;
-    return unless ref $color eq 'HASH' and exists $color->{'red'} and exists $color->{'green'}and exists $color->{'blue'};
+    return unless ref $color eq 'ARRAY' and @{$color} == 3;
 
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x, $y]);
-    
+
     $self->{'x'}     = $x;
     $self->{'y'}     = $y;
     $self->{'color'} = $color;
     $self->{'percentage'} = [];
- 
+
     Wx::Event::EVT_PAINT( $self, sub {
         my( $cpanel, $event ) = @_;
         my $dc = Wx::PaintDC->new( $cpanel );
@@ -25,7 +25,7 @@ sub new {
         $dc->Clear();
 
         my $l_pos = 0;
-        my $l_color = Wx::Colour->new( @{$self->{'color'}}{qw/red green blue/} );
+        my $l_color = Wx::Colour->new( @{$self->{'color'}} );
         if (@{$self->{'percentage'}} > 1){
             my $i = 1;
             while (exists $self->{'percentage'}[$i]){
@@ -48,15 +48,16 @@ sub reset {
 }
 
 sub set_color {
-    my ( $self, $color ) = @_;
-    return unless ref $color eq 'HASH' and exists $color->{'red'} and exists $color->{'green'} and exists $color->{'blue'};
-    $self->{'color'} = $color;
+    my ( $self, $r, $g, $b ) = @_;
+    return unless defined $b;
+    $self->{'color'} = [$r, $g, $b];
 }
 
 sub add_percentage {
-    my ( $self, $p, $color ) = @_;
-    return unless defined $p and $p <= 100 and $p >= 0 and $p != $self->{'percentage'};
-    push @{$self->{'percentage'}}, $color, $p; # say " $p  $color->[0],$color->[1],$color->[2]";
+    my ( $self, $percent, $color ) = @_;
+    return unless defined $percent and $percent <= 100 and $percent >= 0
+        and $percent != $self->{'percentage'} and ref $color eq 'ARRAY' and @$color == 3;
+    push @{$self->{'percentage'}}, $color, $percent; # say " $percent  $color->[0],$color->[1],$color->[2]";
     $self->Refresh;
 }
 

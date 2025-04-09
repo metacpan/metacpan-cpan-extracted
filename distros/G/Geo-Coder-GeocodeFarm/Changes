@@ -1,3 +1,7 @@
+0.0500  2025-04-08      Piotr Roszatycki <dexter@cpan.org>
+
+* Updated to V4 of API.
+
 0.0402  2015-03-27      Piotr Roszatycki <dexter@cpan.org>
 
 * Bugfix for `reverse_geocode` method.
@@ -37,4 +41,3 @@
 0.0100  2013-07-09      Piotr Roszatycki <dexter@cpan.org>
 
 * First CPAN release.
-

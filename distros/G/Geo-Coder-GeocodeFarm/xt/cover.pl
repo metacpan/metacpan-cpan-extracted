@@ -10,8 +10,8 @@ use Cwd;
 
 BEGIN {
     chdir dirname(__FILE__) or die "$!";
-    chdir '..' or die "$!";
-};
+    chdir '..'              or die "$!";
+}
 
 do "./Build.PL";
 

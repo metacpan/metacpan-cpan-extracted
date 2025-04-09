@@ -1,178 +1,118 @@
-[![Build Status](https://travis-ci.org/dex4er/perl-Geo-Coder-GeocodeFarm.png?branch=master)](https://travis-ci.org/dex4er/perl-Geo-Coder-GeocodeFarm)
+# Geo::Coder::GeocodeFarm
 
-# NAME
+[![CI](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/actions/workflows/ci.yaml/badge.svg)](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/actions/workflows/ci.yaml)
+[![Trunk Check](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/actions/workflows/trunk.yaml/badge.svg)](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/actions/workflows/trunk.yaml)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-GeocodeFarm)](https://metacpan.org/dist/Geo-Coder-GeocodeFarm)
+
+## NAME
 
 Geo::Coder::GeocodeFarm - Geocode addresses with the GeocodeFarm API
 
-# SYNOPSIS
+## SYNOPSIS
+
+```perl
 
     use Geo::Coder::GeocodeFarm;
 
     my $geocoder = Geo::Coder::GeocodeFarm->new(
-        key => '3d517dd448a5ce1c2874637145fed69903bc252a',
+        key => 'YOUR-API-KEY-HERE',
     );
+
     my $result = $geocoder->geocode(
         location => '530 W Main St Anoka MN 55303 US',
-        lang     => 'en',
-        count    => 1,
     );
-    printf "%f,%f",
-        $result->{RESULTS}{COORDINATES}{latitude},
-        $result->{RESULTS}{COORDINATES}{longitude};
+    printf "%f,%f\n",
+        $result->{coordinates}{lat},
+        $result->{coordinates}{lon};
 
-# DESCRIPTION
+    my $reverse = $geocoder->reverse_geocode(
+        lat      => '45.2040305',
+        lon      => '-93.3995728',
+    );
+    print $reverse->{formatted_address}, "\n";
+
+```
+
+## DESCRIPTION
 
 The `Geo::Coder::GeocodeFarm` module provides an interface to the geocoding
-functionality of the GeocodeFarm API v3.
+functionality of the GeocodeFarm API v4.
 
-# METHODS
+## METHODS
 
 ## new
 
+```perl
+
     $geocoder = Geo::Coder::GeocodeFarm->new(
-        key    => '3d517dd448a5ce1c2874637145fed69903bc252a',
-        url    => 'https://www.geocode.farm/v3/',
+        key    => 'YOUR-API-KEY-HERE',
+        url    => 'https://api.geocode.farm/',
         ua     => HTTP::Tiny->new,
         parser => JSON->new->utf8,
         raise_failure => 1,
     );
 
+```
+
 Creates a new geocoding object with optional arguments.
 
-An API key is optional and can be obtained at
-[https://www.geocode.farm/dashboard/login/](https://www.geocode.farm/dashboard/login/)
-
-`url` argument is optional and then the default address is http-based if
-`key` argument is missing and https-based if `key` is provided.
-
-`ua` argument is a [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny) object by default and can be also set to
-[LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object.
-
-New account can be registered at [https://www.geocode.farm/register/](https://www.geocode.farm/register/)
+An API key is required and can be obtained at
+[https://geocode.farm/store/api-services/](https://geocode.farm/store/api-services/)
 
 ## geocode
 
+```perl
+
     $result = $geocoder->geocode(
         location => $location,
-        lang     => 'en',  # optional: 'en' or 'de'
-        country  => 'US',  # optional
-        count    => 1,     # optional
     )
 
-Forward geocoding takes a provided address or location and returns the
-coordinate set for the requested location as a nested list:
+```
 
-    {
-        "geocoding_results": {
-            "LEGAL_COPYRIGHT": {
-                "copyright_notice": "Copyright (c) 2015 Geocode.Farm - All Rights Reserved.",
-                "copyright_logo": "https:\/\/www.geocode.farm\/images\/logo.png",
-                "terms_of_service": "https:\/\/www.geocode.farm\/policies\/terms-of-service\/",
-                "privacy_policy": "https:\/\/www.geocode.farm\/policies\/privacy-policy\/"
-            },
-            "STATUS": {
-                "access": "FREE_USER, ACCESS_GRANTED",
-                "status": "SUCCESS",
-                "address_provided": "530 W Main St Anoka MN 55303 US",
-                "result_count": 1
-            },
-            "ACCOUNT": {
-                "ip_address": "1.2.3.4",
-                "distribution_license": "NONE, UNLICENSED",
-                "usage_limit": "250",
-                "used_today": "26",
-                "used_total": "26",
-                "first_used": "26 Mar 2015"
-            },
-            "RESULTS": [
-                {
-                    "result_number": 1,
-                    "formatted_address": "530 West Main Street, Anoka, MN 55303, USA",
-                    "accuracy": "EXACT_MATCH",
-                    "ADDRESS": {
-                        "street_number": "530",
-                        "street_name": "West Main Street",
-                        "locality": "Anoka",
-                        "admin_2": "Anoka County",
-                        "admin_1": "Minnesota",
-                        "postal_code": "55303",
-                        "country": "United States"
-                    },
-                    "LOCATION_DETAILS": {
-                        "elevation": "UNAVAILABLE",
-                        "timezone_long": "UNAVAILABLE",
-                        "timezone_short": "America\/Menominee"
-                    },
-                    "COORDINATES": {
-                        "latitude": "45.2041251174690",
-                        "longitude": "-93.4003513528652"
-                    },
-                    "BOUNDARIES": {
-                        "northeast_latitude": "45.2041251778513",
-                        "northeast_longitude": "-93.4003513845523",
-                        "southwest_latitude": "45.2027761197097",
-                        "southwest_longitude": "-93.4017002802923"
-                    }
-                }
-            ],
-            "STATISTICS": {
-                "https_ssl": "DISABLED, INSECURE"
-            }
-        }
-    }
+Forward geocoding takes a provided address or location and returns the
+coordinate set for the requested location.
 
 Method throws an error (or returns failure as nested list if raise\_failure
 argument is false) if the service failed to find coordinates or wrong key was
 used.
-
-Methods throws an error if there was an other problem.
 
 ## reverse\_geocode
 
+```perl
+
     $result = $geocoder->reverse_geocode(
         lat      => $latitude,
-        lon      => $longtitude,
-        lang     => 'en',  # optional: 'en' or 'de'
-        country  => 'US',  # optional
-        count    => 1,     # optional
+        lon      => $longitude,
     )
 
-or
-
-    $result = $geocoder->reverse_geocode(
-        latlng => "$latitude,$longtitude",
-        # ... optional args
-    )
+```
 
 Reverse geocoding takes a provided coordinate set and returns the address for
-the requested coordinates as a nested list. Its format is the same as for
-["geocode"](#geocode) method.
+the requested coordinates.
 
 Method throws an error (or returns failure as nested list if raise\_failure
 argument is false) if the service failed to find coordinates or wrong key was
 used.
 
-Method throws an error if there was an other problem.
+## SEE ALSO
 
-# SEE ALSO
+[https://geocode.farm/](https://geocode.farm/)
 
-[https://www.geocode.farm/](https://www.geocode.farm/)
-
-# BUGS
+## BUGS
 
 If you find the bug or want to implement new features, please report it at
 [https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/issues](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/issues)
 
 The code repository is available at
-[http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm](http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm)
+[https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm](https://github.com/dex4er/perl-Geo-Coder-GeocodeFarm)
 
-# AUTHOR
+## AUTHOR
 
 Piotr Roszatycki <dexter@cpan.org>
 
-# LICENSE
+## LICENSE
 
-Copyright (c) 2013, 2015 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2013, 2015, 2025 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

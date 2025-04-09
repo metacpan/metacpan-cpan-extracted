@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.048, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +20,12 @@ name: Perl-PrereqScanner-Scanner-DistBuild
 provides:
   Perl::PrereqScanner::Scanner::DistBuild:
     file: lib/Perl/PrereqScanner/Scanner/DistBuild.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Moo: '0'
   Perl::PrereqScanner::Scanner: '0'
   strict: '0'
   warnings: '0'
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

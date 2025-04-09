@@ -1,10 +1,10 @@
 {
    "abstract" : "Generate shared secret using elliptic-curve Diffie-Hellman function",
    "author" : [
-      "Alex J. G. Burzyski <ajgb\@cpan.org>"
+      "Alex J. G. Burzyski <ajgb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -35,6 +35,11 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/dk/crypt-curve25519"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

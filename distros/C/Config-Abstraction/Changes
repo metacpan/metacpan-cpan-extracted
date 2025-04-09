@@ -1,5 +1,10 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.05	Tue Apr  8 09:50:15 EDT 2025
+	Added tests for all()
+	Added the logger option to new()
+	Added the config_files option
+
 0.04	Mon Apr  7 21:06:26 EDT 2025
 	Better handling of config_file mode when an XML file is missing its header
 	Handle more drivers

@@ -4,7 +4,7 @@ require 5.008001; # must have a good B in the core
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 use strict;
 
 # At compile time
@@ -175,7 +175,7 @@ ogd - ordered global destruction
 
 =head1 VERSION
 
-This documentation describes version 0.04.
+This documentation describes version 0.05.
 
 =head1 DESCRIPTION
 
@@ -337,7 +337,9 @@ Examples should be added.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by Robert Acock, <email@lnation.org>.
+
+Please report bugs to <email@lnation.org>.
 
 =head1 ACKNOWLEDGEMENTS
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::FileSet::Filter;
-$ExtUtils::Builder::FileSet::Filter::VERSION = '0.016';
+$ExtUtils::Builder::FileSet::Filter::VERSION = '0.017';
 use strict;
 use warnings;
 

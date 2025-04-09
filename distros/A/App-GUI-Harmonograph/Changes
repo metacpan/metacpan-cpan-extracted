@@ -1,3 +1,19 @@
+1.0  2025-04-08  lichtkind
+-------
+    * = major feature release
+    * * added 2 epicycle pendula
+    * * reworked visual settings tab with more options and better control
+    * * reworked functions tab with more options
+    * * same color selector tab as cellgraph, now 10 not 2 colors
+    * + move coloring order
+    * + pen style option
+    * + dot randomisation
+    * + invert color change speed for extra slow change
+    * + radius damping acceleration
+    * + optional preventing damping into negative values for radius and freq
+    * ? more GUI documentation
+    * + frequency damping acceleration settings (parallel radius settings)
+
 0.71  2023-11-17  lichtkind
 -------
     * = minor fix

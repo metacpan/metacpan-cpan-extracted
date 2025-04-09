@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::Curve25519.
 
+0.08   2025-04-09
+     - Fix metadata
+
 0.07   2022-12-14 19:00:00
      - Fix compilation issues with fmul name clash
 

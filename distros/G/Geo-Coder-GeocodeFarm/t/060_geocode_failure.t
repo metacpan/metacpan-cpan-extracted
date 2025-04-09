@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 
 use Test::Deep;
 use Test::Exception;
@@ -19,7 +19,8 @@ my $ua = My::Mock::HTTP::Tiny->new;
 
     throws_ok {
         $geocode->geocode(no => 'location');
-    } qr/Attribute .* is required/;
+    }
+    qr/Attribute .* is required/;
 }
 
 {
@@ -28,10 +29,12 @@ my $ua = My::Mock::HTTP::Tiny->new;
     can_ok $geocode, qw(geocode);
 
     throws_ok {
-        $geocode->geocode(location => '530 W Main St Anoka MN 55303 US');
-    } qr/FAILED, ACCESS_DENIED/;
+        $geocode->geocode(location => 'non-existing address');
+    }
+    qr/404 Not found/;
 
-    is $ua->{url}, 'https://www.geocode.farm/v3/json/forward/?addr=530+W+Main+St+Anoka+MN+55303+US&key=xxx', 'url matches';
+    is $ua->{url}, 'https://api.geocode.farm/forward/?addr=non-existing+address&key=xxx',
+        'url matches';
 }
 
 {
@@ -39,29 +42,12 @@ my $ua = My::Mock::HTTP::Tiny->new;
 
     can_ok $geocode, qw(geocode);
 
-    my $result = $geocode->geocode(location => '530 W Main St Anoka MN 55303 US');
+    is $geocode->geocode(location => 'non-existing address'), undef,
+        'result is undef';
 
-    isa_ok $result, 'HASH';
-
-    cmp_deeply $result, {
-        'LEGAL_COPYRIGHT' => {
-            'copyright_logo' => 'https://www.geocode.farm/images/logo.png',
-            'privacy_policy' => 'https://www.geocode.farm/policies/privacy-policy/',
-            'copyright_notice' => 'Copyright (c) 2015 Geocode.Farm - All Rights Reserved.',
-            'terms_of_service' => 'https://www.geocode.farm/policies/terms-of-service/'
-        },
-        'STATISTICS' => {
-            'https_ssl' => 'ENABLED, SECURE'
-        },
-        'STATUS' => {
-            'access' => 'API_KEY_INVALID',
-            'status' => 'FAILED, ACCESS_DENIED'
-        },
-    }, '$result matches deeply';
-
-    is $ua->{url}, 'https://www.geocode.farm/v3/json/forward/?addr=530+W+Main+St+Anoka+MN+55303+US&key=xxx', 'url matches';
+    is $ua->{url}, 'https://api.geocode.farm/forward/?addr=non-existing+address&key=xxx',
+        'url matches';
 }
-
 
 package My::Mock;
 
@@ -70,7 +56,6 @@ sub new {
     return bless +{} => $class;
 }
 
-
 package My::Mock::HTTP::Tiny;
 
 use base 'My::Mock';
@@ -78,31 +63,34 @@ use base 'My::Mock';
 sub get {
     my ($self, $url) = @_;
     $self->{url} = $url;
-    my $content = << 'END';
+    my $res = {
+        protocol => 'HTTP/1.1',
+        status   => 404,
+        reason   => 'Not found',
+        success  => '',
+        content  => <<'END',
 {
-    "geocoding_results": {
-        "LEGAL_COPYRIGHT": {
-            "copyright_notice": "Copyright (c) 2015 Geocode.Farm - All Rights Reserved.",
-            "copyright_logo": "https:\/\/www.geocode.farm\/images\/logo.png",
-            "terms_of_service": "https:\/\/www.geocode.farm\/policies\/terms-of-service\/",
-            "privacy_policy": "https:\/\/www.geocode.farm\/policies\/privacy-policy\/"
-        },
-        "STATUS": {
-            "access": "API_KEY_INVALID",
-            "status": "FAILED, ACCESS_DENIED"
-        },
-        "STATISTICS": {
-            "https_ssl": "ENABLED, SECURE"
-        }
+    "LEGAL": {
+        "notice": "This system is the property of Geocode.Farm and any information contained herein is Copyright (c) Geocode.Farm. Usage is subject to the Terms of Service.",
+        "terms": "https:\/\/geocode.farm\/policies\/terms-of-service\/",
+        "privacy": "https:\/\/geocode.farm\/policies\/privacy-policy\/"
+    },
+    "STATUS": {
+        "key": "VALID",
+        "status": "NO_RESULTS",
+        "request": "VALID",
+        "credit_used": "0"
+    },
+    "USER": {
+        "key": "FAKE-API-KEY",
+        "name": "Fake Name",
+        "email": "fake.email@example.com",
+        "usage_limit": "250",
+        "used_today": "1",
+        "remaining_limit": 249
     }
 }
 END
-    my $res = {
-        protocol => 'HTTP/1.1',
-        status => 200,
-        reason => 'OK',
-        success => 1,
-        content => $content,
     };
     return $res;
 }

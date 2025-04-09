@@ -7,8 +7,12 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.88'
   Test::RequiresInternet: '0'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,15 +21,17 @@ name: Geo-Coder-GeocodeFarm
 provides:
   Geo::Coder::GeocodeFarm:
     file: lib/Geo/Coder/GeocodeFarm.pm
-    version: '0.0402'
+    version: '0.0500'
 requires:
   Carp: '0'
   HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
   JSON: '0'
   URI: '0'
-  perl: '5.008'
+  perl: '5.008001'
 resources:
   bugtracker: http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm
-version: '0.0402'
+version: '0.0500'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

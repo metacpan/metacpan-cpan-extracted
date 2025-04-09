@@ -4,8 +4,8 @@ use Test::More tests => ( 3 * 3 ) + 11;
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker;
 use Devel::Required pod => 'Foo.pm', text => 'README';
+use ExtUtils::MakeMaker;
 
 my @modules= qw( Foo Bar Baz );
 foreach (@modules) {
