@@ -1,5 +1,5 @@
 #formtools-form-body {
-    max-width: 700px;
+    max-width: 720px;
 }
 
 #formtools-form-body .button[name="AddMoreAttach"] {
@@ -93,4 +93,8 @@ div .formtools-admin-description {
 /* Make select options fully clickable */
 #formtools-edit .custom-checkbox {
     z-index: auto;
+}
+
+.formtools-item .value .custom-control.custom-checkbox {
+    margin-top: 5px;
 }

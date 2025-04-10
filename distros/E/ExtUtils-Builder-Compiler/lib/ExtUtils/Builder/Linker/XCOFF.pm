@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::XCOFF;
-$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.027';
+$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.028';
 use strict;
 use warnings;
 

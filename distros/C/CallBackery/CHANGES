@@ -1,3 +1,8 @@
+0.53.0 2025-04-09 14:06:53 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+  - AbstractForm: add formData and formPhase subs.
+                  Use signatures and cleanup parameter names.
+
 0.52.0 2025-03-24 11:18:49 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
   - Make CardList return the parentFormData. Deprecate allCardData(),

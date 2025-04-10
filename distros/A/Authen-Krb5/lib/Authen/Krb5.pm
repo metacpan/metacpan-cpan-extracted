@@ -1,5 +1,5 @@
 package Authen::Krb5;
-$Authen::Krb5::VERSION = '1.905';
+$Authen::Krb5::VERSION = '1.906';
 # ABSTRACT: XS bindings for Kerberos 5
 
 use strict;
@@ -99,7 +99,7 @@ Authen::Krb5 - XS bindings for Kerberos 5
 
 =head1 VERSION
 
-version 1.905
+version 1.906
 
 =head1 SYNOPSIS
 

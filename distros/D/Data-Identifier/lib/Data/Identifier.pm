@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -29,8 +29,9 @@ use constant {
     RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
     RE_QID  => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
+    RE_GTIN => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
     RE_UNICODE => qr/^U\+([0-9A-F]{4,7})$/,
-    RE_SIMPLE_TAG => qr/^\p{lower case}+$/,
+    RE_SIMPLE_TAG => qr/^[^\p{upper case}\s]+$/,
 };
 
 use constant {
@@ -50,6 +51,7 @@ use constant {
     NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
     NS_INT  => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
     NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
+    NS_GTIN => 'd95d8b1f-5091-4642-a6b0-a585313915f1', # gtin-namespace
     NS_UNICODE_CP => '132aa723-a373-48bf-a88d-69f1e00f00cf', # 'unicode-character-namespace'
 };
 
@@ -74,9 +76,9 @@ my %well_known = (
     oid  => __PACKAGE__->new($well_known_uuid => WK_OID,    validate => RE_OID),
     uri  => __PACKAGE__->new($well_known_uuid => WK_URI,    validate => RE_URI),
     sid  => __PACKAGE__->new($well_known_uuid => WK_SID,    validate => RE_UINT),
-    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID, namespace => NS_WD, generate => 'id-based'),
-    fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID, namespace => NS_FC, generate => 'id-based'),
-    gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_UINT),
+    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID,  namespace => NS_WD,   generate => 'id-based'),
+    fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID,  namespace => NS_FC,   generate => 'id-based'),
+    gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_GTIN, namespace => NS_GTIN, generate => 'id-based'),
     iban => __PACKAGE__->new($well_known_uuid => WK_IBAN),
     bic  => __PACKAGE__->new($well_known_uuid => WK_BIC),
     doi  => __PACKAGE__->new($well_known_uuid => WK_DOI,    validate => RE_DOI),
@@ -782,7 +784,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 

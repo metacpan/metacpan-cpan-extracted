@@ -25,6 +25,7 @@ extern "C" {
 #define KRB5_DEFAULT_LIFE 60*60*10
 
 typedef krb5_ccache		Authen__Krb5__Ccache;
+typedef krb5_context		Authen__Krb5__Context;
 typedef krb5_principal		Authen__Krb5__Principal;
 typedef krb5_auth_context	Authen__Krb5__AuthContext;
 typedef krb5_rcache		Authen__Krb5__Rcache;
@@ -44,6 +45,20 @@ typedef krb5_keyblock		*Authen__Krb5__KeyBlock;
 static krb5_context context = NULL;
 static krb5_error_code err;
 static krb5_keytab_entry keytab_entry_init;
+
+
+/*
+ * function prototypes against implicit declaration of functions,
+ * taken from k5-int.h
+ */
+
+krb5_error_code krb5_gen_portaddr(krb5_context, const krb5_address *,
+                                  krb5_const_pointer, krb5_address **);
+krb5_error_code krb5_gen_replay_name(krb5_context, const krb5_address *,
+                                     const char *, char **);
+void KRB5_CALLCONV krb5_free_enc_tkt_part(krb5_context, krb5_enc_tkt_part *);
+void KRB5_CALLCONV krb5_free_address(krb5_context, krb5_address *);
+
 
 /*
  * The following three routines implement a "safehouse" for nested Kerberos
@@ -115,14 +130,18 @@ krb5_error(e = 0)
 		SvIOK_on(ST(0));
 	}
 
-void
+Authen::Krb5::Context
 krb5_init_context()
 
 	CODE:
-	if (context) croak("Authen::Krb5 already initialized");
-	err = krb5_init_context(&context);
-	if (err) XSRETURN_UNDEF;
-	XSRETURN_YES;
+	if (!context) {
+		err = krb5_init_context(&context);
+		if (err) XSRETURN_UNDEF;
+	}
+	RETVAL = context;
+
+	OUTPUT:
+	RETVAL
 
 void
 krb5_free_context()
@@ -454,7 +473,9 @@ krb5_mk_req(auth_context, ap_req_options, service, hostname, in, cc)
 	krb5_data in_data, out_data;
 
 	CODE:
-	in_data.data = SvPV(in,in_data.length);
+	STRLEN data_length;
+	data_length = in_data.length;
+	in_data.data = SvPV(in,data_length);
 	err = krb5_mk_req(context,&auth_context,ap_req_options,service,hostname,
 		&in_data,cc,&out_data);
 	if (err) XSRETURN_UNDEF;
@@ -476,7 +497,9 @@ krb5_rd_req(auth_context,in,server,keytab=0)
 
 	CODE:
 	if (!New(0,t,1,krb5_ticket)) XSRETURN_UNDEF;
-	in_data.data = SvPV(in,in_data.length);
+	STRLEN data_length;
+	data_length = in_data.length;
+	in_data.data = SvPV(in,data_length);
 	err = krb5_rd_req(context,&auth_context,&in_data,server,keytab,
 		NULL,&t);
 	if (err) XSRETURN_UNDEF;
@@ -535,7 +558,9 @@ krb5_mk_priv(auth_context,in)
 	krb5_data in_data, out_data;
 
 	PPCODE:
-	in_data.data = SvPV(in,in_data.length);
+	STRLEN data_length;
+	data_length = in_data.length;
+	in_data.data = SvPV(in,data_length);
 	err = krb5_mk_priv(context,auth_context,&in_data,&out_data,NULL);
 	if (err) XSRETURN_UNDEF;
 	XPUSHs(sv_2mortal(newSVpv(out_data.data,out_data.length)));
@@ -550,7 +575,9 @@ krb5_rd_priv(auth_context,in)
 	krb5_data in_data, out_data;
 
 	PPCODE:
-	in_data.data = SvPV(in,in_data.length);
+	STRLEN data_length;
+	data_length = in_data.length;
+	in_data.data = SvPV(in,data_length);
 	err = krb5_rd_priv(context,auth_context,&in_data,&out_data,NULL);
 	if (err) XSRETURN_UNDEF;
 	XPUSHs(sv_2mortal(newSVpv(out_data.data,out_data.length)));
@@ -563,7 +590,9 @@ krb5_get_server_rcache(piece)
 	krb5_data rc_data;
 
 	CODE:
-	rc_data.data=SvPV(piece,rc_data.length);
+	STRLEN rc_data_length;
+	rc_data_length = rc_data.length;
+	rc_data.data=SvPV(piece,rc_data_length);
 	err = krb5_get_server_rcache(context,&rc_data,&RETVAL);
 
 	if (err) XSRETURN_UNDEF;
@@ -590,7 +619,9 @@ krb5_sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)
 
 	PPCODE:
 	fd = fileno(fh);
-	in_data.data = SvPV(in,in_data.length);
+	STRLEN data_length;
+	data_length = in_data.length;
+	in_data.data = SvPV(in,data_length);
 	err = krb5_sendauth(context,&auth_context,&fd,version,client,server,
 		options,&in_data,in_creds,cc,NULL,NULL,&out_creds);
 	if (err) XSRETURN_UNDEF;
@@ -1023,7 +1054,9 @@ new(class,addrtype,contents)
 	CODE:
 	if (!New(0,RETVAL,1,krb5_address)) XSRETURN_UNDEF;
 	RETVAL->addrtype = addrtype;
-	RETVAL->contents = (krb5_octet *)SvPV(contents,RETVAL->length);
+	STRLEN retval_length;
+	retval_length = RETVAL->length;
+	RETVAL->contents = (krb5_octet *)SvPV(contents,retval_length);
 	
 	OUTPUT:
 	RETVAL

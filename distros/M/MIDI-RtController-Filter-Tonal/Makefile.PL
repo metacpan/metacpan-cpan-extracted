@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Music::Scales" => 0,
     "Music::ToRoman" => 0,
     "Music::VoiceGen" => 0,
+    "Types::MIDI" => 0,
     "Types::Standard" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0201",
+  "VERSION" => "0.0204",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +64,7 @@ my %FallbackPrereqs = (
   "Music::ToRoman" => 0,
   "Music::VoiceGen" => 0,
   "Test::More" => "0.88",
+  "Types::MIDI" => 0,
   "Types::Standard" => 0,
   "namespace::clean" => 0,
   "strict" => 0,

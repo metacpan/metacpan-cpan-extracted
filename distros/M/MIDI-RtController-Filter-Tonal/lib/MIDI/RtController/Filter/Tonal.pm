@@ -5,19 +5,20 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0204';
 
-use Moo;
 use strictures 2;
 use Array::Circular ();
 use List::SomeUtils qw(first_index);
 use List::Util qw(shuffle uniq);
 use MIDI::RtMidi::ScorePlayer ();
+use Moo;
 use Music::Scales qw(get_scale_MIDI get_scale_notes);
 use Music::Chord::Note ();
 use Music::Note ();
 use Music::ToRoman ();
 use Music::VoiceGen ();
+use Types::MIDI qw(Channel);
 use Types::Standard qw(ArrayRef Num Str);
 use namespace::clean;
 
@@ -39,7 +40,7 @@ has pedal => (
 
 has channel => (
     is  => 'rw',
-    isa => Num,
+    isa => Channel,
     default => sub { 0 },
 );
 
@@ -250,20 +251,22 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0201
+version 0.0204
 
 =head1 SYNOPSIS
 
   use curry;
-  use Future::IO::Impl::IOAsync;
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Tonal ();
 
-  my $rtc = MIDI::RtController->new; # * input/output required
+  my $rtc = MIDI::RtController->new(
+    input  => 'keyboard',
+    output => 'usb',
+  );
 
-  my $rtf = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
+  my $filter = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
 
-  $rtc->add_filter('pedal', note_on => $rtf->curry::pedal_tone);
+  $rtc->add_filter('pedal', note_on => $filter->curry::pedal_tone);
 
   $rtc->run;
 
@@ -276,15 +279,15 @@ L<MIDI::RtController> filters.
 
 =head2 rtc
 
-  $rtc = $rtf->rtc;
+  $rtc = $filter->rtc;
 
 The required L<MIDI::RtController> instance provided in the
 constructor.
 
 =head2 pedal
 
-  $pedal = $rtf->pedal;
-  $rtf->pedal($note);
+  $pedal = $filter->pedal;
+  $filter->pedal($note);
 
 The B<note> used by the pedal-tone filter.
 
@@ -294,8 +297,8 @@ Which is the MIDI-number for G below middle-C.
 
 =head2 channel
 
-  $channel = $rtf->channel;
-  $rtf->channel($number);
+  $channel = $filter->channel;
+  $filter->channel($number);
 
 The current MIDI channel (0-15, drums=9).
 
@@ -303,8 +306,8 @@ Default: C<0>
 
 =head2 delay
 
-  $delay = $rtf->delay;
-  $rtf->delay($number);
+  $delay = $filter->delay;
+  $filter->delay($number);
 
 The current delay time.
 
@@ -312,8 +315,8 @@ Default: C<0.1> seconds
 
 =head2 velocity
 
-  $velocity = $rtf->velocity;
-  $rtf->velocity($number);
+  $velocity = $filter->velocity;
+  $filter->velocity($number);
 
 The velocity (or volume) change increment (0-127).
 
@@ -321,8 +324,8 @@ Default: C<10>
 
 =head2 feedback
 
-  $feedback = $rtf->feedback;
-  $rtf->feedback($number);
+  $feedback = $filter->feedback;
+  $filter->feedback($number);
 
 The feedback.
 
@@ -330,8 +333,8 @@ Default: C<1>
 
 =head2 offset
 
-  $offset = $rtf->offset;
-  $rtf->offset($number);
+  $offset = $filter->offset;
+  $filter->offset($number);
 
 The note offset number.
 
@@ -339,37 +342,37 @@ Default: C<-12>
 
 =head2 key
 
-  $key = $rtf->key;
-  $rtf->key($number);
+  $key = $filter->key;
+  $filter->key($number);
 
 The musical key (C<C-B>).
 
 =head2 scale
 
-  $scale = $rtf->scale;
-  $rtf->scale($name);
+  $scale = $filter->scale;
+  $filter->scale($name);
 
 The name of the musical scale.
 
 =head2 intervals
 
-  $intervals = $rtf->intervals;
-  $rtf->intervals(\@intervals);
+  $intervals = $filter->intervals;
+  $filter->intervals(\@intervals);
 
 The voice intervals used by L<Music::VoiceGen> and the C<chord_tone>
 filter.
 
 =head2 arp
 
-  $arp = $rtf->arp;
-  $rtf->arp(\@notes);
+  $arp = $filter->arp;
+  $filter->arp(\@notes);
 
 The list of MIDI numbered pitches used by the C<arp_tone> filter.
 
 =head2 arp_types
 
-  $arp_types = $rtf->arp_types;
-  $rtf->arp_types(\@strings);
+  $arp_types = $filter->arp_types;
+  $filter->arp_types(\@strings);
 
 A list of known arpeggiation types. This is an L<Array::Circular>
 instance.
@@ -378,8 +381,8 @@ Default: C<[up, down, random]>
 
 =head2 arp_type
 
-  $arp_type = $rtf->arp_type;
-  $rtf->arp_type($string);
+  $arp_type = $filter->arp_type;
+  $filter->arp_type($string);
 
 The current arpeggiation type.
 
@@ -402,9 +405,11 @@ not.
 
 =head2 pedal_tone
 
-  pedal, $note, $note + 7
+Play a series of notes in succession by B<delay>.
 
-Where the B<pedal> is the object attribute.
+Default: C<pedal, $note, $note + 7 semitones>
+
+Where B<pedal> is the object attribute.
 
 =head2 chord_tone
 
@@ -432,7 +437,15 @@ setting.
 
 =head1 SEE ALSO
 
-The F<eg/*.pl> program(s)
+The F<eg/*.pl> program(s) in this distribution
+
+L<MIDI::RtController::Filter::Drums>
+
+L<MIDI::RtController::Filter::Math>
+
+L<MIDI::RtController::Filter::CC>
+
+L<Array::Circular>
 
 L<List::SomeUtils>
 
@@ -451,6 +464,8 @@ L<Music::Note>
 L<Music::ToRoman>
 
 L<Music::VoiceGen>
+
+L<Types::MIDI>
 
 L<Types::Standard>
 

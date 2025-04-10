@@ -3,6 +3,19 @@
 <& /Elements/ListActions, actions => \@results &>
 <div id="formtools-edit">
 <& /Admin/Elements/FormToolsHelp &>
+
+% if ( %dependent_custom_fields ) {
+  <select id="formtools-select-custom-field-values" class="hidden">
+% for my $name ( sort { lc $a cmp lc $b } keys %dependent_custom_fields ) {
+    <optgroup label="<% $name %>">
+%   for my $value ( @{$dependent_custom_fields{$name}} ) {
+      <option value="<% $value %>"><% $value %></option>
+%   }
+    </optgroup>
+% }
+  </select>
+% }
+
 <div class="row">
   <div class="formtools-component-menu boxcontainer col-md-3" id="formtools-component-wrapper">
     <&| /Widgets/TitleBox, title => loc('FormTools Components') &>
@@ -42,6 +55,9 @@
                   </a>
                 </div>
                 <div class="modal-body">
+%               if ( $item eq 'hr' ) {
+                  <input type ="hidden" name="content" value="<hr/>"/>
+%               } else {
                   <&| /Elements/LabeledValue, Label => loc("Content") &>
 %                   if ( $item =~ /^h\d/ ) {
                     <input name="content" class="form-control" data-wrapper="<% $item %>" />
@@ -51,6 +67,7 @@
                     <textarea name="content" class="form-control"></textarea>
 %                   }
                   </&>
+%               }
 
 %               if ( $item eq 'p' ) {
                   <&| /Elements/LabeledValue, Label => loc("Alignment") &>
@@ -78,7 +95,7 @@
           <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
           <p class="m-1 p-2 border rounded">
             <span class="badge badge-primary align-text-bottom"><% loc('Core Field') %></span>
-            <span class="content"><% $item %> <span class="label"></span></span>
+            <span class="content"><% loc($item) %> <span class="label"></span></span>
             <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
               <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
             </a>
@@ -230,14 +247,6 @@
                         is
                         <div class="d-inline-block">
                           <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control">
-                            <option value=""><&|/l&>(no value)</&></option>
-%                         for my $name ( sort keys %dependent_custom_fields ) {
-                            <optgroup label="<% $name %>">
-%                           for my $value ( @{$dependent_custom_fields{$name}} ) {
-                              <option value="<% $value %>"><% $value %></option>
-%                           }
-                            </optgroup>
-%                         }
                           </select>
                         </div>
                       </label>
@@ -285,7 +294,7 @@
           <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
           <p class="m-1 p-2 border rounded">
             <span class="badge badge-primary align-text-bottom"><% $other_components{$item}{type} eq 'hidden' ? loc('Hidden') : loc('Component') %></span>
-            <span class="content"><% $item %></span>
+            <span class="content"><% loc($item) %></span>
 %         if ( $item eq 'Hidden' || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
             <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
               <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
@@ -422,7 +431,11 @@
 %               } elsif ( $item->{type} eq 'hidden' ) {
                   <% $item->{'input-name'} %>: <% $item->{'input-value'} %>
 %               } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) {
-                  <% $item->{arguments}{name} || $item->{comp_name} %>
+                  <% (   RT::Extension::FormTools::is_core_field( $item->{arguments}{name} )
+                       ? loc( $item->{arguments}{name} )
+                       : $item->{arguments}{name}
+                     )
+                       || $item->{comp_name} %>
                   <span class="label"><% $item->{arguments}{label} ? "($item->{arguments}{label})" : '' %></span>
 %               } else {
                   <% $item->{comp_name} %>
@@ -458,15 +471,19 @@
                     </div>
                     <div class="modal-body">
 %                   if ( $item->{type} eq 'raw_html' ) {
+%                       if ( lc ($item->{wrapper} // '') eq 'hr' ) {
+                        <input type ="hidden" name="content" value="<hr/>"/>
+%                       } else {
                       <&| /Elements/LabeledValue, Label => loc("Content") &>
-%                     if ( ($item->{wrapper} // '') =~ /^h\d/i ) {
+%                           if ( ($item->{wrapper} // '') =~ /^h\d/i ) {
                         <input name="content" class="form-control" data-wrapper="<% $item->{wrapper} %>" value="<% $item->{content} %>"/>
-%                     } elsif ( lc ($item->{wrapper} // '') eq 'p' ) {
+%                           } elsif ( lc ($item->{wrapper} // '') eq 'p' ) {
                         <textarea name="content" class="form-control" data-wrapper="<% $item->{wrapper} %>"><% $item->{content} %></textarea>
-%                     } else {
+%                           } else {
                         <textarea name="content" class="form-control"><% $item->{html} %></textarea>
-%                     }
+%                           }
                       </&>
+%                       }
 %                     if ( ($item->{wrapper} // '') eq 'p' ) {
                       <&| /Elements/LabeledValue, Label => loc("Alignment") &>
                         <select name="alignment" class="form-control selectpicker">
@@ -535,14 +552,11 @@
                             is
                             <div class="d-inline-block">
                               <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control selectpicker">
-                                <option value=""><&|/l&>(no value)</&></option>
-%                              for my $name ( sort keys %dependent_custom_fields ) {
-                                <optgroup label="<% $name %>">
-%                                for my $value ( @{$dependent_custom_fields{$name}} ) {
-                                  <option value="<% $value %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name && grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
-%                                }
-                                </optgroup>
-%                              }
+%                             if ( my $name = $item->{arguments}{dependent_validation}{name} ) {
+%                               for my $value ( @{ $dependent_custom_fields{$name} || [] } ) {
+                                  <option value="<% $value %>" <% grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%                               }
+%                             }
                               </select>
                             </div>
                           </label>
@@ -640,43 +654,43 @@ jQuery(function() {
         }
     });
 
+    const select_cf_values = jQuery('#formtools-select-custom-field-values');
     jQuery('[name=dependent_name]').change(function () {
         const modal = jQuery(this).closest('.modal');
         const target = modal.find('[data-dependent-name="' + jQuery(this).attr('name') + '"');
         const name = jQuery(this).val();
-        target.find('optgroup').addClass('hidden');
-        target.find('optgroup[label="' + name + '"]').removeClass('hidden');
+        target.selectpicker('deselectAll');
+        target.find('option').remove();
+        target.append(select_cf_values.find('optgroup[label="' + name + '"] option').clone());
+        target.val(null);
         target.selectpicker('refresh');
-        // Hide duplicate dividers
-        target.closest('div').find('li.dropdown-divider').slice(1).hide();
     });
 
     jQuery('[name=show_condition_name]').change(function () {
         const modal = jQuery(this).closest('.modal');
         const target = modal.find('[data-show-condition-name="' + jQuery(this).attr('name') + '"');
         const name = jQuery(this).val();
-        target.find('optgroup').addClass('hidden');
-        target.find('optgroup[label="' + name + '"]').removeClass('hidden');
+        target.selectpicker('deselectAll');
+        target.find('option').remove();
+        target.append(select_cf_values.find('optgroup[label="' + name + '"] option').clone());
+        target.val(null);
         target.selectpicker('refresh');
-        // Hide duplicate dividers
-        target.closest('div').find('li.dropdown-divider').slice(1).hide();
     });
 
     jQuery('.formtools-element-modal').on('shown.bs.modal', function (e) {
         const name = jQuery(this).attr('data-name');
 
-        const select = jQuery(this).find('select[name=dependent_name], select[name=show_condition_name]');
-
-        select.find('option').addClass('hidden');
-        jQuery('.formtools-form-pages [data-type=component][data-name]').each(function () {
-            const available_name = jQuery(this).attr('data-name');
-            if ( available_name !== name ) {
-                select.find('option[value="' + available_name + '"]').removeClass('hidden');
-            }
+        jQuery(this).find('select[name=dependent_name], select[name=show_condition_name]').each(function() {
+            const select = jQuery(this);
+            select.find('option').slice(1).addClass('hidden');
+            jQuery('.formtools-form-pages [data-type=component][data-name]').each(function () {
+                const available_name = jQuery(this).attr('data-name');
+                if ( available_name !== name ) {
+                    select.find('option[value="' + available_name + '"]').removeClass('hidden');
+                }
+            });
+            select.selectpicker('refresh');
         });
-
-        select.change();
-        select.selectpicker('refresh');
     });
 
     // Cloned selectpicker stuff doesn't work, here we destroy selectpicker
@@ -788,7 +802,7 @@ my $title = loc("Modify form [_1]", $form_attribute->Description);
 my $nav_type = 'pill'; # 'tab' or 'pill'
 
 my @html_components = qw( h1 h2 h3 hr p html );
-my @core_components = qw( Requestors Cc AdminCc Owner Subject Content Due TimeEstimated Attach );
+my @core_components = qw( Requestors Cc AdminCc Owner Subject Content Due Starts TimeEstimated Attach );
 
 my $queue = RT::Queue->new($session{'CurrentUser'});
 $queue->Load($form->{queue});
@@ -878,13 +892,10 @@ $AddPage => undef
       is
       <div class="d-inline-block">
         <select name="show_condition_value" data-show-condition-name="show_condition_name" multiple class="form-control selectpicker">
-          <option value=""><&|/l&>(no value)</&></option>
-%       for my $name ( sort keys %$Options ) {
-          <optgroup label="<% $name %>">
-%         for my $value ( @{$Options->{$name}} ) {
-            <option value="<% $value %>" <% ($Item->{arguments}{show_condition}{name} // '') eq $name && grep( { $value eq $_ } @{$Item->{arguments}{show_condition}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%       if ( my $name = $Item->{arguments}{show_condition}{name} ) {
+%         for my $value ( @{ $Options->{$name} || [] } ) {
+            <option value="<% $value %>" <% grep( { $value eq $_ } @{$Item->{arguments}{show_condition}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
 %         }
-          </optgroup>
 %       }
         </select>
       </div>

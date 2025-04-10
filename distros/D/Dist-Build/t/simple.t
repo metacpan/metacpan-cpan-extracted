@@ -28,12 +28,12 @@ $dist->add_file('script/simple', undent(<<'    ---'));
     print Foo::Bar->VERSION . "\n";
     ---
 $dist->add_file('planner/shared.pl', undent(<<'	---'));
-	load_module("Dist::Build::ShareDir");
+	load_extension("Dist::Build::ShareDir");
 	dist_sharedir('share', 'Foo-Bar');
 	module_sharedir('module-share/Foo-Bar', 'Foo::Bar');
 	---
 $dist->add_file('planner/dynamic.pl', undent(<<'	---'));
-	load_module("Dist::Build::DynamicPrereqs");
+	load_extension("Dist::Build::DynamicPrereqs");
 	evaluate_dynamic_prereqs();
 	---
 
@@ -77,9 +77,9 @@ if ($has_compiler) {
 		---
 	$dist->add_file('planner/xs.pl', undent(<<'		---'));
 		use lib 'inc';
-		load_module("Dist::Build::XS");
-		load_module("Dist::Build::XS::Export");
-		load_module("Dist::Build::XS::Import");
+		load_extension("Dist::Build::XS");
+		load_extension("Dist::Build::XS::Export");
+		load_extension("Dist::Build::XS::Import");
 
 		export_headers(dir => 'include');
 		export_flags(extra_compiler_flags => [ '-Wall' ]);

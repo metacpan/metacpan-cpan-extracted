@@ -1,0 +1,468 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-12-14 20:00+0100\n"
+"Last-Translator: Eduardo Domínguez Vázquez <eduardo.dominguez@uib.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. (uc($item))
+#: html/Admin/FormTools/Modify.html:22
+msgid "%1 Element"
+msgstr "%1 Element"
+
+#: html/Admin/FormTools/Modify.html:212 html/Admin/FormTools/Modify.html:221 html/Admin/FormTools/Modify.html:499 html/Admin/FormTools/Modify.html:508
+msgid "(no value)"
+msgstr "(sense valor)"
+
+#: html/Admin/FormTools/Modify.html:327 html/Admin/FormTools/Modify.html:327
+msgid "Add Page"
+msgstr "Afegir Pàgina"
+
+#: html/Admin/FormTools/index.html:1
+msgid "Admin FormTools"
+msgstr "Administrar formularis"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:37
+msgid "Advanced"
+msgstr "Avançat"
+
+#: html/Admin/FormTools/Modify.html:444 html/Admin/FormTools/Modify.html:56
+msgid "Alignment"
+msgstr "Alineació"
+
+#: html/Admin/FormTools/Modify.html:367
+msgid "Basics"
+msgstr "Bàsics"
+
+#: html/Admin/Elements/FormToolsHelp:50
+msgid "Build your form using the tools below. To create new pages for a multi-page form, click the plus (+). To change the order of pages, click the gear and update the Sort order. To remove a page, click the gear and click Delete. Make sure to Save Changes at the bottom of the form after any updates."
+msgstr "Construeix el teu formulari emprant les eines de més avall. Per crear pàgines noves per a un formulari multi-pàgina, pitja el més (+). Per canviar l'ordre de les pàgines, pitja l'engranatge i actualitza l'ordre. Per llevar una pàgina, pitja l'engranatge i Esborrar. Assegura't de Desar els Canvis avall del formulari després de cada canvi."
+
+#: html/Admin/FormTools/Modify.html:447 html/Admin/FormTools/Modify.html:59
+msgid "Center"
+msgstr "Centre"
+
+#: html/FormTools/Field:226
+msgid "Choose file"
+msgstr "Trieu un fitxer"
+
+#: html/Admin/FormTools/Modify.html:266 html/Admin/FormTools/Modify.html:379
+msgid "Component"
+msgstr "Component"
+
+#: html/Admin/FormTools/Advanced.html:10 html/Admin/FormTools/Modify.html:368 html/Admin/FormTools/Modify.html:434 html/Admin/FormTools/Modify.html:45
+msgid "Content"
+msgstr "Contingut"
+
+#: html/Admin/FormTools/Modify.html:383 html/Admin/FormTools/Modify.html:79
+msgid "Core Field"
+msgstr "Camp del nucli"
+
+#. ($msg)
+#: html/Admin/FormTools/Describe.html:72
+msgid "Could not update description: %1"
+msgstr "No es pot actualitzar la descripció: %1"
+
+#. ($msg)
+#: html/Admin/FormTools/Create.html:65
+msgid "Couldn't create the form: %1"
+msgstr "No es pot crear el formulari: %1"
+
+#: html/Admin/FormTools/Advanced.html:97 html/Admin/FormTools/Modify.html:688
+msgid "Couldn't decode JSON"
+msgstr "No es pot descodificar el JSON"
+
+#. ($name, $msg)
+#: html/Admin/FormTools/index.html:88
+msgid "Couldn't disable %1: %2"
+msgstr "No es pot deshabilitar %1: %2"
+
+#. ($name, $msg)
+#: html/Admin/FormTools/index.html:91
+msgid "Couldn't enable %1: %2"
+msgstr "No es pot habilitar %1: %2"
+
+#. ($msg)
+#: html/Admin/FormTools/Advanced.html:107 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
+msgid "Couldn't update content: %1"
+msgstr "No es pot actualitzar el contingut: %1"
+
+#. ($msg)
+#: html/Admin/FormTools/Advanced.html:86
+msgid "Couldn't update name: %1"
+msgstr "No es pot actualitzar el nom: %1"
+
+#: html/Admin/FormTools/Create.html:15 html/Callbacks/FormTools/Elements/Tabs/Privileged:12 html/Callbacks/FormTools/Elements/Tabs/Privileged:20 html/Callbacks/FormTools/Elements/Tabs/Privileged:23
+msgid "Create"
+msgstr "Crear"
+
+#: html/Admin/FormTools/Create.html:26
+msgid "Create form"
+msgstr "Crear formulari"
+
+#: lib/RT/Extension/FormTools.pm:11
+msgid "Create, modify and disable forms"
+msgstr "Crear, modificar i inhabilitar formularis"
+
+#. ($Description)
+#: html/Admin/FormTools/Create.html:59
+msgid "Created form %1"
+msgstr "Formulari creat %1"
+
+#: html/Admin/FormTools/index.html:11
+msgid "Creates Tickets in Queue"
+msgstr "Crea Tiquets en la cua"
+
+#: html/Admin/FormTools/Modify.html:157 html/Admin/FormTools/Modify.html:385
+msgid "Custom Field"
+msgstr "Camp personalitzat"
+
+#: html/Admin/FormTools/Modify.html:105 html/Admin/FormTools/Modify.html:183 html/Admin/FormTools/Modify.html:460 html/Admin/FormTools/Modify.html:468
+msgid "Default Value"
+msgstr "Valor per defecte"
+
+#: html/Admin/FormTools/Modify.html:355
+msgid "Delete Page"
+msgstr "Esborrar pàgina"
+
+#: html/Admin/FormTools/Describe.html:25 html/Callbacks/FormTools/Elements/Tabs/Privileged:36
+msgid "Description"
+msgstr "Descripció"
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/Describe.html:59
+msgid "Description for form %1"
+msgstr "Descripció del formulari %1"
+
+#. ($name)
+#: html/Admin/FormTools/index.html:80
+msgid "Disabled %1"
+msgstr "Deshabilitat %1"
+
+#: html/Admin/FormTools/Modify.html:160 html/Admin/FormTools/Modify.html:160 html/Admin/FormTools/Modify.html:25 html/Admin/FormTools/Modify.html:25 html/Admin/FormTools/Modify.html:270 html/Admin/FormTools/Modify.html:270 html/Admin/FormTools/Modify.html:406 html/Admin/FormTools/Modify.html:406 html/Admin/FormTools/Modify.html:82 html/Admin/FormTools/Modify.html:82
+msgid "Edit"
+msgstr "Editar"
+
+#: html/Admin/FormTools/index.html:12
+msgid "Enabled"
+msgstr "Habilitat"
+
+#. ($name)
+#: html/Admin/FormTools/index.html:83
+msgid "Enabled %1"
+msgstr "Habilitat %1"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:18
+msgid "Form Tools"
+msgstr "Eines del formulari"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:7
+msgid "FormTools"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:8
+msgid "FormTools Components"
+msgstr "Components de formularis"
+
+#: html/Admin/Elements/FormToolsHelp:49
+msgid "FormTools Configuration"
+msgstr "Configuració de formularis"
+
+#: html/Admin/FormTools/Modify.html:310
+msgid "FormTools Pages"
+msgstr "Pàgines de formularis"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:45 html/Callbacks/FormTools/Elements/Tabs/SelfService:4
+msgid "Forms"
+msgstr "Formularis"
+
+#: html/Forms.html:1 html/SelfService/Forms.html:2
+msgid "Forms Home"
+msgstr "Inici dels formularis"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:38
+msgid "Group Rights"
+msgstr "Permisos de grup"
+
+#: html/Admin/FormTools/Modify.html:266 html/Admin/FormTools/Modify.html:381
+msgid "Hidden"
+msgstr "Ocult"
+
+#: html/Admin/FormTools/Modify.html:129 html/Admin/FormTools/Modify.html:239 html/Admin/FormTools/Modify.html:528
+msgid "Hide"
+msgstr "Ocultar"
+
+#: html/Admin/FormTools/Describe.html:9
+msgid "Icon"
+msgstr "Icona"
+
+#: html/Admin/FormTools/index.html:35
+msgid "Include disabled forms in listing."
+msgstr "Incloure al llistat els formularis deshabilitats."
+
+#: html/Admin/FormTools/Advanced.html:16
+msgid "Invalid JSON"
+msgstr "JSON no vàlid"
+
+#. ($ARGS{Description})
+#. ($Description)
+#: html/Admin/FormTools/Advanced.html:73 html/Admin/FormTools/Create.html:70
+msgid "Invalid form name (can only contain letters, numbers, underscore, and spaces): %1"
+msgstr "Format de nom no vàlid (només pot contenir lletres, números, guions baixos i espais): %1"
+
+#. ($Queue)
+#: html/Admin/FormTools/Create.html:45
+msgid "Invalid queue %1"
+msgstr "Cua no vàlida: %1"
+
+#: html/Admin/FormTools/Modify.html:101 html/Admin/FormTools/Modify.html:178 html/Admin/FormTools/Modify.html:454
+msgid "Label"
+msgstr "Etiqueta"
+
+#: html/Admin/FormTools/Modify.html:446 html/Admin/FormTools/Modify.html:58
+msgid "Left"
+msgstr "Esquerra"
+
+#: html/Admin/FormTools/Advanced.html:92 html/Admin/FormTools/Create.html:29
+msgid "Missing Name"
+msgstr "Nom no trobat"
+
+#: html/Admin/FormTools/Create.html:30
+msgid "Missing Queue"
+msgstr "Cua no trobada"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:35
+msgid "Modify"
+msgstr "Modificar"
+
+#: html/Admin/FormTools/Modify.html:339
+msgid "Modify Basics"
+msgstr "Modificar lo bàsic"
+
+#: html/Admin/FormTools/Modify.html:172 html/Admin/FormTools/Modify.html:284 html/Admin/FormTools/Modify.html:39 html/Admin/FormTools/Modify.html:427 html/Admin/FormTools/Modify.html:94
+msgid "Modify Element"
+msgstr "Modificar Element"
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/Advanced.html:64 html/Admin/FormTools/Modify.html:734
+msgid "Modify form %1"
+msgstr "Modificar formulari %1"
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/GroupRights.html:29
+msgid "Modify group rights for Form %1"
+msgstr "Modificar els permisos de grup pel formulari %1"
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/UserRights.html:29
+msgid "Modify user rights for Form %1"
+msgstr "Modificar els permisos d'usuari pel formulari %1"
+
+#: html/Admin/FormTools/Advanced.html:7 html/Admin/FormTools/Create.html:7 html/Admin/FormTools/Modify.html:290 html/Admin/FormTools/Modify.html:543 html/Admin/FormTools/index.html:10
+msgid "Name"
+msgstr "Nom"
+
+#. ($ARGS{Description})
+#. ($Description)
+#: html/Admin/FormTools/Advanced.html:78 html/Admin/FormTools/Create.html:39
+msgid "Name %1 already exists"
+msgstr "Ja existeix el nom %1"
+
+#: html/Admin/FormTools/Modify.html:312
+msgid "New changes pending. Click \"Save Changes\" to update the form."
+msgstr "Canvis pendents. Pitja \"Desar Canvis\" per actualitzar el formulari."
+
+#: html/Forms/dhandler:12
+msgid "Next"
+msgstr "Següent"
+
+#: html/Admin/FormTools/Modify.html:345
+msgid "Page Name"
+msgstr "Nom de la pàgina"
+
+#: html/Admin/FormTools/Advanced.html:67 html/Admin/FormTools/Create.html:22 html/Admin/FormTools/Describe.html:62 html/Admin/FormTools/Modify.html:658 html/Admin/FormTools/Modify.html:683 html/Forms/dhandler:206
+msgid "Permission Denied"
+msgstr "Permís denegat"
+
+#: html/Admin/FormTools/Modify.html:155 html/Admin/FormTools/Modify.html:19 html/Admin/FormTools/Modify.html:264 html/Admin/FormTools/Modify.html:373 html/Admin/FormTools/Modify.html:416 html/Admin/FormTools/Modify.html:77
+msgid "Place here"
+msgstr "Col·locar aquí"
+
+#: html/Admin/FormTools/Create.html:11
+msgid "Queue"
+msgstr "Cua"
+
+#: html/Admin/FormTools/Modify.html:138 html/Admin/FormTools/Modify.html:247 html/Admin/FormTools/Modify.html:537
+msgid "Readonly"
+msgstr "Només lectura"
+
+#: html/Admin/FormTools/Modify.html:163 html/Admin/FormTools/Modify.html:163 html/Admin/FormTools/Modify.html:274 html/Admin/FormTools/Modify.html:274 html/Admin/FormTools/Modify.html:29 html/Admin/FormTools/Modify.html:29 html/Admin/FormTools/Modify.html:410 html/Admin/FormTools/Modify.html:410 html/Admin/FormTools/Modify.html:85 html/Admin/FormTools/Modify.html:85
+msgid "Remove"
+msgstr "Llevar"
+
+#: html/Admin/FormTools/Modify.html:121 html/Admin/FormTools/Modify.html:200 html/Admin/FormTools/Modify.html:486
+msgid "Require"
+msgstr "Requereix"
+
+#: html/Admin/FormTools/Modify.html:209 html/Admin/FormTools/Modify.html:496
+msgid "Require if"
+msgstr "Requereix si"
+
+#: html/FormTools/Field:165 html/FormTools/Field:358
+msgid "Required"
+msgstr "Requerit"
+
+#: html/Admin/FormTools/Modify.html:448 html/Admin/FormTools/Modify.html:60
+msgid "Right"
+msgstr "Dreta"
+
+#: html/Admin/FormTools/Describe.html:37
+msgid "Save"
+msgstr "Desar"
+
+#: html/Admin/FormTools/Advanced.html:22 html/Admin/FormTools/GroupRights.html:11 html/Admin/FormTools/Modify.html:572 html/Admin/FormTools/UserRights.html:11
+msgid "Save Changes"
+msgstr "Desar Canvis"
+
+#: html/Admin/FormTools/Modify.html:12
+msgid "Search..."
+msgstr "Cercar..."
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:11 html/Callbacks/FormTools/Elements/Tabs/Privileged:19 html/Callbacks/FormTools/Elements/Tabs/Privileged:22
+msgid "Select"
+msgstr "Seleccionar"
+
+#: html/Admin/FormTools/Modify.html:348
+msgid "Sort Order"
+msgstr "Ordre de classificació"
+
+#: html/Forms/dhandler:29
+msgid "Submit"
+msgstr "Enviar"
+
+#: html/Admin/FormTools/Create.html:11
+msgid "Tickets will be created in this queue"
+msgstr "Els tiquets es crearan en aquesta cua"
+
+#: html/Admin/Elements/FormToolsHelp:52
+msgid "To create your form, drag components from the Components box on the left to the Content area on the right. Click the pencil to edit components. Click the X to remove them. Click Save Changes to save the new page."
+msgstr "Per crear el teu formulari, amolla els components de la capsa de Components de l'esquerra a l'àrea de Contingut de la dreta. Pitja el llapis per editar els components. Pitja la ix (X) per llevar-los. Pitja Desar Canvis per desar la nova pàgina."
+
+#: html/Admin/FormTools/Modify.html:113 html/Admin/FormTools/Modify.html:193 html/Admin/FormTools/Modify.html:478
+msgid "Tooltip"
+msgstr "Consell"
+
+#: html/Admin/FormTools/Describe.html:102
+msgid "Unable to set form icon"
+msgstr "No es pot incloure la icona del formulari"
+
+#: html/Admin/FormTools/Modify.html:145 html/Admin/FormTools/Modify.html:253 html/Admin/FormTools/Modify.html:298 html/Admin/FormTools/Modify.html:360 html/Admin/FormTools/Modify.html:552 html/Admin/FormTools/Modify.html:66 html/Admin/FormTools/index.html:42
+msgid "Update"
+msgstr "Actualitzar"
+
+#: html/Admin/FormTools/Advanced.html:104 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
+msgid "Updated content"
+msgstr "Contingut actualitzat"
+
+#: html/Admin/FormTools/Describe.html:69
+msgid "Updated description"
+msgstr "Descripció actualitzada"
+
+#: html/Admin/FormTools/Advanced.html:83
+msgid "Updated name"
+msgstr "Nom actualitzat"
+
+#: html/Admin/FormTools/Describe.html:20
+msgid "Upload an icon for this form"
+msgstr "Pujar una icona per aquest formulari"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:39
+msgid "User Rights"
+msgstr "Permisos d'usuari"
+
+#: html/Admin/FormTools/Modify.html:293 html/Admin/FormTools/Modify.html:546
+msgid "Value"
+msgstr "Valor"
+
+#: lib/RT/Extension/FormTools.pm:105
+msgid "View forms"
+msgstr "Veure formularis"
+
+#: html/Admin/FormTools/Groups/index.html:1
+msgid "Admin FormTools Groups"
+msgstr "Administra grups de formularis"
+
+#: html/Admin/FormTools/Groups/index.html:34
+msgid "Include disabled form groups in listing."
+msgstr "Incloure grups de formularis deshabilitats al llistat."
+
+#: html/Admin/FormTools/Groups/Modify.html:6
+msgid "Form groups are shown to users on a page in the RT Self Service interface. Below you can manage how the form group details will appear to end users."
+msgstr "Els grups de formularis es mostren als usuaris en una pàgina de la interfície d'autoservei d'RT. Més avall pot gestionar com es mostrarà als usuaris els detalls del grup de formularis."
+
+#: html/Admin/FormTools/Groups/Modify.html:22
+msgid "Upload an icon for this form group"
+msgstr "Puja una icona per aquest grup de formularis"
+
+#: html/Admin/FormTools/Groups/Modify.html:35
+msgid "Banner Message"
+msgstr "Missatge de l'anunci"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:28
+msgid "Form Groups"
+msgstr "Grups de formularis"
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:72
+msgid "Routing"
+msgstr "Encaminament"
+
+#: html/Admin/FormTools/Routing.html:28
+msgid "Update Routing"
+msgstr "Actualitzar l'encaminament"
+
+#: html/Admin/FormTools/Routing.html:135
+msgid "Add Routing"
+msgstr "Afegir encaminament"
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/Routing.html:175
+msgid "Routing for form %1"
+msgstr "Encaminament del formulari %1"
+
+#: html/Admin/FormTools/Describe.html:6
+msgid "Forms are shown to users on a page in the RT Self Service interface. Below you can manage how the form details will appear to end users."
+msgstr "Els formularis es mostren als usuaris a una pàgina en la interfície d'autoservei d'RT. Més abaix pot gestionar com es mostren a l'usuari els detalls del formulari."
+
+#: html/Admin/FormTools/Describe.html:13
+msgid "Upload an icon to be shown to users on the Forms page or select a color for the background of graphical box users can click."
+msgstr "Pugi una icona per mostrar als usuaris en la pàgina del formulari o seleccioni un color pel fons de la capsa que els usuaris poden pitjar per accedir-hi."
+
+#: html/Admin/FormTools/Describe.html:26
+msgid "Describe what the form should be used for and include instructions to help users pick the correct form."
+msgstr "Descrigui per a què serveix el formulari i inclogui instruccions per ajudar els usuaris a seleccionar el formulari correcte."
+
+#: html/Admin/FormTools/Routing.html:12
+msgid "Default Queue"
+msgstr "Cua per defecte"
+
+#: html/Admin/FormTools/Routing.html:20
+msgid "Update Default Queue"
+msgstr "Actualitza la cua per defecte"
+
+#: html/Admin/FormTools/Routing.html:99
+msgid "Add new routing"
+msgstr "Afegeix un nou encaminament"
+
+#: html/Admin/FormTools/Routing.html:32 html/Admin/FormTools/Routing.html:105
+msgid "Criteria"
+msgstr "Criteri"
+
+#: html/Admin/FormTools/Routing.html:35 html/Admin/FormTools/Routing.html:108
+msgid "Route to Queue"
+msgstr "Encamina cap a la cua"
+
+#: html/Admin/FormTools/Routing.html:44 html/Admin/FormTools/Routing.html:47 html/Admin/FormTools/Routing.html:117 html/Admin/FormTools/Routing.html:120
+msgid "and then"
+msgstr "i llavors"
+

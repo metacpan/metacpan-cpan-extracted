@@ -1,5 +1,5 @@
 package Dist::Build::XS::WriteConstants;
-$Dist::Build::XS::WriteConstants::VERSION = '0.018';
+$Dist::Build::XS::WriteConstants::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ sub add_methods {
 	my ($self, $planner, %args) = @_;
 
 	my $parse_xs = $planner->can('parse_xs') // do {
-		$planner->load_module('ExtUtils::Builder::ParseXS', 0.016, config => $args{config});
+		$planner->load_extension('ExtUtils::Builder::ParseXS', 0.016, config => $args{config});
 		$planner->can('parse_xs');
 	};
 
@@ -63,12 +63,12 @@ Dist::Build::XS::WriteConstants - Dist::Build extension integrating ExtUtils::Co
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module('Dist::Build::XS');
- load_module('Dist::Build::XS::WriteConstants');
+ load_extension('Dist::Build::XS');
+ load_extension('Dist::Build::XS::WriteConstants');
 
  add_xs(
      module          => 'Foo::Bar',

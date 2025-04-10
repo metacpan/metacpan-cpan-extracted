@@ -16,7 +16,7 @@ use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
 use Data::Dumper;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 $Data::Dumper::Terse = 1;
  
@@ -274,14 +274,15 @@ sub __run_forking
   delete $self->{ 'KID_PIDS' };
 
   # reinstall signal handlers in the kid
-  $SIG{ 'INT'   } = sub { $self->break_main_loop(); };
-  $SIG{ 'TERM'  } = sub { $self->break_main_loop(); };
-  $SIG{ 'CHLD'  } = 'IGNORE';
+  $SIG{ 'INT'   } = sub { $self->break_main_loop();   };
+  $SIG{ 'TERM'  } = sub { $self->break_main_loop();   };
   $SIG{ 'HUP'   } = sub { $self->__child_sig_hup();   };
   $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
   $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
-  $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
-  $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()   };
+  $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()     };
+  $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()     };
+  # ignored here, if smb needs it, should reinstall
+  $SIG{ 'CHLD'  } = 'IGNORE';
 
   $self->{ 'SHA' } = new IPC::Shareable key => $self->{ 'SHA_KEY' } or die "fatal: cannot attach shared memory segment\n";
 
@@ -297,6 +298,7 @@ sub __run_forking
   $self->im_idle();
   
   $self->on_child_exit();
+
   if( ! $self->{ 'NOFORK' } )
     {
     exit();
@@ -358,14 +360,15 @@ sub __run_prefork
       delete $self->{ 'KID_PIDS' };
 
       # reinstall signal handlers in the kid
-      $SIG{ 'INT'   } = sub { $self->break_main_loop(); };
-      $SIG{ 'TERM'  } = sub { $self->break_main_loop(); };
-      $SIG{ 'CHLD'  } = 'IGNORE';
+      $SIG{ 'INT'   } = sub { $self->break_main_loop();   };
+      $SIG{ 'TERM'  } = sub { $self->break_main_loop();   };
       $SIG{ 'HUP'   } = sub { $self->__child_sig_hup();   };
       $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
       $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
-      $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
-      $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()   };
+      $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()     };
+      $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()     };
+      # ignored here, if smb needs it, should reinstall
+      $SIG{ 'CHLD'  } = 'IGNORE';
 
       $self->{ 'SHA' } = new IPC::Shareable key => $self->{ 'SHA_KEY' } or die "fatal: cannot attach shared memory segment\n";
       
@@ -388,6 +391,7 @@ sub __run_prefork
         $0 = $tt . " [$kid_idle]";
         }
       $self->on_child_exit();
+
       exit;  
       # ------- child exits here -------
       }  
@@ -663,7 +667,7 @@ sub __sig_child
     {
     $self->{ 'KIDS' }--;
     delete $self->{ 'KID_PIDS' }{ $cpid };
-    $self->on_sig_child( $cpid );
+    $self->on_sig_child( $cpid, $? );
     }
   $SIG{ 'CHLD' } = sub { $self->__sig_child(); };
 }
@@ -1112,12 +1116,13 @@ whoever forks further here, should reinstall signal handler if needed.
 
 Net::Waiter tries to use as little modules as possible. Currenlty only those
 core modules are in use:
-  * IO::Socket::INET
-  * POSIX ":sys_wait_h";
-  * IO::Socket::INET;
-  * Sys::SigAction qw( set_sig_handler );
-  * IPC::Shareable;
-  * Data::Dumper;
+
+    * IO::Socket::INET
+    * POSIX ":sys_wait_h";
+    * IO::Socket::INET;
+    * Sys::SigAction qw( set_sig_handler );
+    * IPC::Shareable;
+    * Data::Dumper;
 
 =head1 DEMO
 

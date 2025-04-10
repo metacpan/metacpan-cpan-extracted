@@ -13,7 +13,7 @@ Authen::Krb5::Ccache - Kerberos 5 credentials cache object.
 
 =head1 VERSION
 
-version 1.905
+version 1.906
 
 =head1 METHODS
 

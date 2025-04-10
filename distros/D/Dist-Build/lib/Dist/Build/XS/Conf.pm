@@ -1,5 +1,5 @@
 package Dist::Build::XS::Conf;
-$Dist::Build::XS::Conf::VERSION = '0.018';
+$Dist::Build::XS::Conf::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ sub add_methods {
 
 	my $add_xs = $planner->can('add_xs') or die "XS must be loaded before imports can be done";
 
-	$planner->load_module('ExtUtils::Builder::Conf');
+	$planner->load_extension('ExtUtils::Builder::Conf');
 
 	$planner->add_delegate('add_xs', sub {
 		my ($planner, %args) = @_;
@@ -42,11 +42,11 @@ Dist::Build::XS::Conf - Configure-time utilities for Dist::Build for using C hea
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module("Dist::Build::XS");
+ load_extension("Dist::Build::XS");
  
  find_libs_for(source => <<'EOF', libs => [ ['socket'], ['moonlaser'] ]);
  #include <stdio.h>

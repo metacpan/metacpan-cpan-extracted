@@ -1,5 +1,12 @@
 Revision history for Dist-Build
 
+0.019     2025-04-09 23:20:58+02:00 Europe/Brussels
+          - Adapt to load_extension
+          - Normalize sharedir paths in create_pattern
+          - Add is_os and is_os_type delegates
+          - Rename distribution_version delegate to version
+          - Adapt to standard self and outer methods on Planner
+
 0.018     2025-03-17 11:58:21+01:00 Europe/Brussels
           - Add auto_xs to Dist::Build::XS
           - Use filesets to find files

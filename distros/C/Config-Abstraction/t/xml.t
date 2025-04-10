@@ -24,6 +24,13 @@ my $config = Config::Abstraction->new(
 diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 cmp_ok($config->get('UserName'), 'eq', 'njh', 'XML can be read in from a file with an XML header');
 
+$config = Config::Abstraction->new(
+	config_dirs => ['/'],
+	config_file => "$test_dir/xml_test"
+);
+
+cmp_ok($config->get('UserName'), 'eq', 'njh', 'absolute path to config_file works');
+
 write_file(File::Spec->catdir($test_dir, 'xml_test'), <<'XML');
 <config>
 	<UserName>nan</UserName>

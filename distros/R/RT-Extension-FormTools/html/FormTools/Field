@@ -33,7 +33,7 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
     $field_type = 'core';
     my $res = $m->notes(
         core_fields_on_page => [ @{$m->notes('core_fields_on_page')||[]}, $name ] );
-    $field_label ||= $name;
+    $field_label ||= loc($name);
     $default ||= $ticket->$name if $ticket && $ticket->_Accessible($name, 'read');
     $input_name = $name;
 } else {
@@ -234,7 +234,7 @@ $Token              => ''
 % if (@values > 1) {
     <ul class="list-group list-group-borderless list-group-compact">
 % for (@values) {
-    <li class="readonly list-group-item"><% $_ %></span>
+    <li class="readonly list-group-item"><% $_ %></li>
 %   if ($render_as eq 'readonly_plus_values') {
     <input type="hidden" name="<% $input_name %>" value="<% $_ %>"/>
 %   }
@@ -256,7 +256,7 @@ $Token              => ''
     AutocompleteMultiple => 1,
     (exists $ARGS{cols} ? (Size => $cols) : ()),
 &>
-% } elsif ( $name eq "Due" ) {
+% } elsif ( $name eq "Due" || $name eq "Starts" ) {
 <& /Elements/SelectDate, Name => $name, Default => $default, current => 0, (defined $cols ? (Size => $cols) : ()) &>
 % } elsif ( $name eq "TimeEstimated" ) {
 <& /Elements/EditTimeValue, Name => $name, Default => $default &>

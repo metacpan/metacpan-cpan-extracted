@@ -1,5 +1,5 @@
 package Dist::Build::XS::Alien;
-$Dist::Build::XS::Alien::VERSION = '0.018';
+$Dist::Build::XS::Alien::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -71,12 +71,12 @@ Dist::Build::XS::Alien - Dist::Build extension to use Alien modules.
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module('Dist::Build::XS');
- load_module('Dist::Build::XS::Alien');
+ load_extension('Dist::Build::XS');
+ load_extension('Dist::Build::XS::Alien');
 
  add_xs(
      module => 'Foo::Bar',

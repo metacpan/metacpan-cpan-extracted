@@ -1,6 +1,7 @@
 TYPEMAP
 
 Authen::Krb5::Ccache		T_PTROBJ_NU
+Authen::Krb5::Context		T_PTROBJ_NU
 Authen::Krb5::Principal		T_PTROBJ_NU
 Authen::Krb5::AuthContext	T_PTROBJ_NU
 Authen::Krb5::Rcache		T_PTROBJ_NU

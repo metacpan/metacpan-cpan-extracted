@@ -1,5 +1,5 @@
 package Dist::Build::ShareDir;
-$Dist::Build::ShareDir::VERSION = '0.018';
+$Dist::Build::ShareDir::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -15,10 +15,9 @@ sub add_methods {
 	$planner->add_delegate('dist_sharedir', sub {
 		my ($planner, $dir, $dist_name) = @_;
 		$dist_name //= $planner->distribution;
-		$dir = unix_to_native_path($dir);
 
 		my $inner = $planner->new_scope;
-		$inner->load_module("Dist::Build::Core");
+		$inner->load_extension("Dist::Build::Core");
 
 		my $outputs = $inner->create_subst(
 			on     => $inner->create_pattern(dir => $dir),
@@ -35,10 +34,9 @@ sub add_methods {
 		my ($planner, $dir, $module_name) = @_;
 		$module_name //= $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
-		$dir = unix_to_native_path($dir);
 
 		my $inner = $planner->new_scope;
-		$inner->load_module("Dist::Build::Core");
+		$inner->load_extension("Dist::Build::Core");
 
 		my $outputs = $inner->create_subst(
 			on     => $inner->create_pattern(dir => $dir),
@@ -68,11 +66,11 @@ Dist::Build::ShareDir - Sharedir support for Dist::Build
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module("Dist::Build::ShareDir");
+ load_extension("Dist::Build::ShareDir");
  dist_sharedir('share', 'Foo-Bar');
  module_sharedir('foo', 'Foo::Bar');
 

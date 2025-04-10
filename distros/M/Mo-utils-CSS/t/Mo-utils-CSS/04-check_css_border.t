@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils::CSS qw(check_css_border);
 use Readonly;
-use Test::More 'tests' => 67;
+use Test::More 'tests' => 69;
 use Test::NoWarnings;
 
 Readonly::Array our @RIGTH_BORDERS => (
@@ -31,7 +31,9 @@ Readonly::Array our @RIGTH_BORDERS => (
 	'1rem double rgb(255,0,0)',
 	'1em double rgba(255,0,0,0.3)',
 	'1em double hsl(120, 100%, 50%)',
+	'1em double hsl(120, 99.5%, 50.5%)',
 	'1em double hsla(120, 100%, 50%, 0.3)',
+	'1em double hsla(120, 99.5%, 50.5%, 0.3)',
 );
 Readonly::Hash our %BAD_BORDERS => (
 	# Common issues.

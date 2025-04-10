@@ -8,6 +8,7 @@ META.json
 META.yml
 README
 dist.ini
+examples/mbt-compat.pl
 lib/Dist/Build.pm
 lib/Dist/Build/Core.pm
 lib/Dist/Build/DynamicPrereqs.pm

@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.018';
+$Dist::Build::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -15,8 +15,9 @@ use ExtUtils::InstallPaths;
 use File::Spec::Functions qw/catfile catdir abs2rel /;
 use Getopt::Long 2.36 qw/GetOptionsFromArray/;
 use Parse::CPAN::Meta;
+use version ();
 
-use ExtUtils::Builder::Planner 0.015;
+use ExtUtils::Builder::Planner 0.016;
 use ExtUtils::Builder::Util qw/get_perl unix_to_native_path/;
 use Dist::Build::Serializer;
 
@@ -73,7 +74,7 @@ sub Build_PL {
 
 	$planner->add_delegate('meta', sub { $meta });
 	$planner->add_delegate('distribution', sub { $meta->name });
-	$planner->add_delegate('distribution_version', sub { $meta->version });
+	$planner->add_delegate('version', sub { version->new($meta->version) });
 	(my $main_module = $meta->name) =~ s/-/::/g;
 	$planner->add_delegate('main_module', sub { $main_module });
 	$planner->add_delegate('release_status', sub { $meta->release_status });
@@ -82,6 +83,16 @@ sub Build_PL {
 	for my $variable (qw/config install_paths verbose uninst jobs pureperl_only/) {
 		$planner->add_delegate($variable, sub { $options{$variable} });
 	}
+
+	$planner->add_delegate('is_os', sub {
+			my ($self, @wanted) = @_;
+			return not not grep { $_ eq $^O } @wanted
+	});
+	$planner->add_delegate('is_os_type', sub {
+			my ($self, $wanted) = @_;
+			require Perl::OSType;
+			return Perl::OSType::is_os_type($wanted);
+	});
 
 	$planner->add_delegate('new_planner', sub {
 		my $inner = ExtUtils::Builder::Planner->new;
@@ -96,7 +107,7 @@ sub Build_PL {
 	});
 
 	my $core = $planner->new_scope;
-	$core->load_module('Dist::Build::Core');
+	$core->load_extension('Dist::Build::Core');
 
 	my @blibs = map { catfile('blib', $_) } qw/lib arch bindoc libdoc script bin/;
 	$core->mkdir($_) for @blibs;
@@ -109,10 +120,7 @@ sub Build_PL {
 	$core->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	for my $file (glob 'planner/*.pl') {
-		my $inner = $planner->new_scope;
-		$inner->add_delegate('self', sub { $inner });
-		$inner->add_delegate('outer', sub { $planner });
-		$inner->run_dsl($file);
+		$planner->new_scope->run_dsl($file);
 	}
 
 	$core->autoclean;
@@ -171,17 +179,17 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 DESCRIPTION
 
 C<Dist::Build> is a Build.PL implementation. Unlike L<Module::Build::Tiny> it is extensible, unlike L<Module::Build> it uses a build graph internally which makes it easy to combine different customizations. It's typically extended by adding a C<.pl> script in C<planner/>. E.g.
 
- load_module("Dist::Build::ShareDir");
+ load_extension("Dist::Build::ShareDir");
  dist_sharedir('share', 'Foo-Bar');
  
- load_module("Dist::Build::XS");
- load_module("Dist::Build::XS::Alien");
+ load_extension("Dist::Build::XS");
+ load_extension("Dist::Build::XS::Alien");
  add_xs(
    alien         => 'foo',
    extra_sources => [ glob 'src/*.c' ],
@@ -251,7 +259,7 @@ A L<CPAN::Meta|CPAN::Meta> object representing the C<META.json> file.
 
 The name of the distribution
 
-=item * distribution_version
+=item * version
 
 The version of the distribution
 
@@ -274,6 +282,14 @@ The L<ExtUtils::Config|ExtUtils::Config> object for this build
 =item * install_paths
 
 The L<ExtUtils::InstallPaths|ExtUtils::InstallPaths> object for this build.
+
+=item * is_os(@os_names)
+
+This returns true if the current operating system matches any of the listed ones.
+
+=item * is_os_type($os_type)
+
+This returns true if the type of the OS matches C<$os_type>. Legal values are C<Unix>, C<Windows> and C<VMS>.
 
 =item * verbose
 

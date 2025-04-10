@@ -1,3 +1,6 @@
+v0.11  2025-04-10Z
+    - Improved/corrected identifier validation
+
 v0.10  2025-04-03Z
     - Allow passing fii (File::Information), and store (File::FStore) objects
     - Updated infos on prototype of displaycolour(), icontext(), and description()

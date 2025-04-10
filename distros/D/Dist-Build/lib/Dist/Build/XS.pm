@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.018';
+$Dist::Build::XS::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -28,8 +28,8 @@ sub add_methods {
 
 		my $config = $args{config} // $planner->config;
 
-		$planner->load_module('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
-		$planner->load_module('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
+		$planner->load_extension('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
+		$planner->load_extension('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
 
 		my $xs_base = $args{xs_base} // 'lib';
 		my ($module_name, $xs_file);
@@ -43,7 +43,7 @@ sub add_methods {
 			$module_name = $planner->main_module;
 			$xs_file = catfile($xs_base, split /::/, $module_name) . '.xs';
 		}
-		my $module_version = $args{version} // $planner->distribution_version;
+		my $module_version = $args{version} // $planner->version;
 
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
@@ -147,13 +147,13 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
  # planner/xs.pl
 
- load_module('Dist::Build::XS');
+ load_extension('Dist::Build::XS');
  add_xs(
    module        => 'Foo::Bar',
    extra_sources => [ glob 'src/*.c' ],

@@ -4,7 +4,7 @@
       "Jeff Horwitz <jeff@smashing.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,26 +59,30 @@
    "provides" : {
       "Authen::Krb5" : {
          "file" : "lib/Authen/Krb5.pm",
-         "version" : "1.905"
+         "version" : "1.906"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/sophos/p5-Krb5/issues"
+         "web" : "https://github.com/zim-upb/p5-krb5/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/sophos/p5-Krb5.git",
-         "web" : "https://github.com/sophos/p5-Krb5"
+         "url" : "git://github.com/zim-upb/p5-krb5.git",
+         "web" : "https://github.com/zim-upb/p5-krb5"
       }
    },
-   "version" : "1.905",
+   "version" : "1.906",
    "x_contributors" : [
+      "Christopher Odenbach <odenbach@uni-paderborn.de>",
       "Damyan Ivanov <dam+cpan@ktnx.net>",
+      "Daniel Cave <99478314+DanielCaveSophos@users.noreply.github.com>",
       "Ioan Rogers <ioanr@cpan.org>",
       "Ken Dreyer <ktdreyer@ktdreyer.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

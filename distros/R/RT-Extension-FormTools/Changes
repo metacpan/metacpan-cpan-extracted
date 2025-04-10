@@ -1,5 +1,12 @@
 Revision history for RT-Extension-FormTools
 
+1.17 2025-04-09
+ - Fix issue with HR component
+ - Dynamically create cascaded custom field value options on custom field change
+ - Add core field Starts
+ - Localize additional strings and core fields - Sollericos
+ - Add translation for Spanish and Catalan - Sollericos
+
 1.16 2024-12-03
  - Support to conditionally show fields
 

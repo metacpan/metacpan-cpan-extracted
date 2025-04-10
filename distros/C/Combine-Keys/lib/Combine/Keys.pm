@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Import::Export';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 require XSLoader;
 XSLoader::load('Combine::Keys', $VERSION);
 
@@ -24,7 +24,7 @@ Combine::Keys - keys on multiple hash references
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 

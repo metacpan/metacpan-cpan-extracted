@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.027';
+$ExtUtils::Builder::Conf::VERSION = '0.028';
 use strict;
 use warnings;
 
@@ -17,10 +17,12 @@ sub fail {
 	die $message;
 }
 
+my @names = qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags/;
+
 sub add_methods {
 	my ($self, $planner, %args) = @_;
 
-	for my $name (qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags/) {
+	for my $name (@names) {
 		$planner->add_delegate($name, sub {
 			my $self = shift;
 			return @{ $self->{$name} // [] };
@@ -74,12 +76,14 @@ sub add_methods {
 		my $inner = $self->new_planner;
 		$inner->load_extension('ExtUtils::Builder::AutoDetect::C', 0.015);
 
-		my @include_dirs         = (@{ $args{include_dirs} // [] }, @{ $self->{include_dirs} // [] });
+		my @include_dirs         = (@{ $args{include_dirs} // [] },         @{ $self->{include_dirs} // [] });
 		my @extra_compiler_flags = (@{ $args{extra_compiler_flags} // [] }, @{ $self->{extra_compiler_flags} // [] });
+		my %defines              = (%{ $args{defines} // {} },              %{ $self->{defines} // {} });
 
 		my %compile_args = (
 			extra_args   => \@extra_compiler_flags,
 			include_dirs => \@include_dirs,
+			defines      => \%defines,
 		);
 
 		my $basename = basename($c_file, '.c');
@@ -123,6 +127,19 @@ sub add_methods {
 
 		$self->define($args{define}) if defined $args{define};
 
+		if ($args{push_args}) {
+			for my $name (@names) {
+				if (my $arg = $args{$name}) {
+					push @{ $self->{$name} }, @{$arg};
+				}
+			}
+			if ($args{defines}) {
+				for my $key (keys %{$args{defines}}) {
+					$self->{defines}{$key} = $args{defines}{$key};
+				}
+			}
+		}
+
 		return !!1;
 	});
 
@@ -141,8 +158,7 @@ sub add_methods {
 		foreach my $f (@$cflags) {
 			ref $f eq "ARRAY" or croak "Expected 'cflags' element as ARRAY ref";
 
-			$self->try_compile_run(%args, extra_compiler_flags => $f) or next;
-			$self->push_extra_compiler_flags(@$f);
+			$self->try_compile_run(%args, extra_compiler_flags => $f, push_args => 1) or next;
 			return !!1;
 		}
 
@@ -157,8 +173,7 @@ sub add_methods {
 		foreach my $d (@$dirs) {
 			ref $d eq "ARRAY" or croak "Expected 'dirs' element as ARRAY ref";
 
-			$self->try_compile_run(%args, include_dirs => $d) or next;
-			$self->push_include_dirs(@$d);
+			$self->try_compile_run(%args, include_dirs => $d, push_args => 1) or next;
 			return !!1;
 		}
 
@@ -171,8 +186,7 @@ sub add_methods {
 		ref(my $libs = $args{libs}) eq "ARRAY" or croak "Expected 'libs' as ARRAY ref";
 
 		foreach my $libraries (@$libs) {
-			$self->try_compile_run(%args, libraries => $libraries) or next;
-			$self->push_libraries(@$libraries);
+			$self->try_compile_run(%args, libraries => $libraries, push_args => 1) or next;
 			return !!1;
 		}
 
@@ -187,8 +201,7 @@ sub add_methods {
 		foreach my $d (@$dirs) {
 			ref $d eq "ARRAY" or croak "Expected 'dirs' element as ARRAY ref";
 
-			$self->try_compile_run(%args, library_dirs => $d) or next;
-			$self->push_library_dirs(@$d);
+			$self->try_compile_run(%args, library_dirs => $d, push_args => 1) or next;
 			return !!1;
 		}
 
@@ -223,7 +236,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -261,6 +274,10 @@ Takes the following named arguments:
 
 The source code of the C program to try compiling, building, and running.
 
+=item defines => HASH
+
+Optional. A set of defines to be passed to the compiler.
+
 =item extra_compiler_flags => ARRAY
 
 Optional. If specified, pass extra flags to the compiler.
@@ -269,6 +286,18 @@ Optional. If specified, pass extra flags to the compiler.
 
 Optional. If specified, pass extra flags to the linker.
 
+=item include_dirs => ARRAY
+
+Optional. If specified, pass extra include dirs to the compiler.
+
+=item libraries => ARRAY
+
+Optional. If specified, pass extra libaries to the linker.
+
+=item library_dirs => ARRAY
+
+Optional. If specified, pass extra libary directories to the linker.
+
 =item quiet => BOOL
 
 This makes C<try_compile_run> run quietly.
@@ -276,6 +305,10 @@ This makes C<try_compile_run> run quietly.
 =item define => STRING
 
 Optional. If specified, then the named symbol will be defined if the program ran successfully. This will either on the C compiler commandline (by passing an option C<-DI<SYMBOL>>), in the C<defines> method, or via the C<write_defines> method.
+
+=item push_args => BOOL
+
+If true, any of C<extra_compiler_flags>, C<extra_linker_flags>, C<include_dirs>, C<libraries>, C<library_dirs> or C<defines> will have its value pushed on success (e.g. C<push_include_dirs> for the C<include_dirs> argument).
 
 =back
 

@@ -44,7 +44,7 @@ is $acme->spell('takns'), 'tanks';
 	'status' => '404',
 };});
 
-my $dead_client = Acme::ICan'tSpell->new(
+my $dead_client = Acme::ICan::tSpell->new(
     tiny => $dead,
 );
 

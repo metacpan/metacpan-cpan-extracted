@@ -1,5 +1,5 @@
 package Dist::Build::DynamicPrereqs;
-$Dist::Build::DynamicPrereqs::VERSION = '0.018';
+$Dist::Build::DynamicPrereqs::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -50,11 +50,11 @@ Dist::Build::DynamicPrereqs - Support dynamic prerequisites in Dist::Build
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module("Dist::Build::DynamicPrereqs");
+ load_extension("Dist::Build::DynamicPrereqs");
  evaluate_dynamic_prereqs();
 
 =head1 DESCRIPTION

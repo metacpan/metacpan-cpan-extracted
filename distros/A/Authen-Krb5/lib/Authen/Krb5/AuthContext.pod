@@ -13,7 +13,7 @@ Authen::Krb5::AuthContext - Kerberos 5 auth_context object.
 
 =head1 VERSION
 
-version 1.905
+version 1.906
 
 =head1 METHODS
 

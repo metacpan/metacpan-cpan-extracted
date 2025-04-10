@@ -4,15 +4,10 @@ use strict;
 use warnings;
 
 use Carp;
-use Config::Auto;
-use Config::IniFiles;
-use YAML::XS qw(LoadFile);
-use JSON::MaybeXS qw(decode_json);
-use XML::Simple qw(XMLin);
+use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
-use Hash::Flatten qw(flatten);
 use Params::Get;
 
 =head1 NAME
@@ -21,11 +16,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -41,10 +36,11 @@ our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
-C<Config::Abstraction> is a flexible configuration management module
-that allows loading and merging configuration data from multiple file
-formats: YAML, JSON, XML, and INI via a number of different drivers.
-It also integrates environment variable
+C<Config::Abstraction> is a flexible configuration management layer that sits above C<Config::*> modules.
+In addition to using drivers to load configuration data from multiple file
+formats (YAML, JSON, XML, and INI),
+it also allows levels of configuration, each of which overrides the lower levels.
+So, it also integrates environment variable
 overrides and command line arguments for runtime configuration adjustments.
 This module is designed to help developers manage layered configurations that can be loaded from files and overridden by environment variables,
 offering a robust and dynamic approach
@@ -196,6 +192,8 @@ Points to a configuration file of any format.
 =item * C<config_files>
 
 An arrayref of files to look for in the configration directories.
+Put the more important files later,
+since later files override earlier ones.
 
 =item * C<env_prefix>
 
@@ -209,7 +207,7 @@ If true, returns a flat hash structure like C<{database.user}> (default: C<0>) i
 =item * C<logger>
 
 Used for warnings and traces.
-An object that understands debug() and trace() messages.
+An object that understands warn(), debug() and trace() messages.
 
 =item * C<sep_char>
 
@@ -263,15 +261,18 @@ sub _load_config
 			my $data;
 			# TODO: only load config modules when they are needed
 			if ($file =~ /\.ya?ml$/) {
+				$self->_load_driver('YAML::XS', ['LoadFile']);
 				$data = eval { LoadFile($path) };
 				croak "Failed to load YAML from $path: $@" if $@;
 			} elsif ($file =~ /\.json$/) {
 				$data = eval { decode_json(read_file($path)) };
 				croak "Failed to load JSON from $path: $@" if $@;
 			} elsif ($file =~ /\.xml$/) {
+				$self->_load_driver('XML::Simple', ['XMLin']);
 				$data = eval { XMLin($path, ForceArray => 0, KeyAttr => []) };
 				croak "Failed to load XML from $path: $@" if $@;
 			} elsif ($file =~ /\.ini$/) {
+				$self->_load_driver('Config::IniFiles');
 				my $ini = Config::IniFiles->new(-file => $path);
 				croak "Failed to load INI from $path" unless $ini;
 				$data = { map {
@@ -284,6 +285,10 @@ sub _load_config
 					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
 				}
 				%merged = %{ merge( $data, \%merged ) };
+				if($merged{'config_path'}) {
+					$merged{'config_path'} .= ':';
+				}
+				$merged{'config_path'} .= $path;
 			}
 		}
 
@@ -301,6 +306,7 @@ sub _load_config
 				}
 				eval {
 					if($data =~ /^\s*<\?xml/) {
+						$self->_load_driver('XML::Simple', ['XMLin']);
 						$data = XMLin($path, ForceArray => 0, KeyAttr => []);
 					} else {
 						eval { $data = decode_json($data) };
@@ -309,8 +315,10 @@ sub _load_config
 						}
 					}
 					if(!$data) {
+						$self->_load_driver('YAML::XS', ['LoadFile']);
 						$data = LoadFile($path);
 						if((!$data) || (ref($data) ne 'HASH')) {
+							$self->_load_driver('Config::IniFiles');
 							if(my $ini = Config::IniFiles->new(-file => $path)) {
 								$data = { map {
 									my $section = $_;
@@ -319,8 +327,10 @@ sub _load_config
 							}
 							if((!$data) || (ref($data) ne 'HASH')) {
 								# Maybe XML without the leading XML header
+								$self->_load_driver('XML::Simple', ['XMLin']);
 								eval { $data = XMLin($path, ForceArray => 0, KeyAttr => []) };
 								if((!$data) || (ref($data) ne 'HASH')) {
+									$self->_load_driver('Config::Auto');
 									$data = Config::Auto->new(source => $path)->parse();
 								}
 							}
@@ -328,7 +338,11 @@ sub _load_config
 					}
 				};
 				if($logger) {
-					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
+					if($@) {
+						$logger->warn(ref($self), ' ', __LINE__, $@);
+					} else {
+						$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
+					}
 				}
 				if(scalar(keys %merged)) {
 					if($data) {
@@ -337,6 +351,10 @@ sub _load_config
 				} else {
 					%merged = %{$data};
 				}
+				if($merged{'config_path'}) {
+					$merged{'config_path'} .= ':';
+				}
+				$merged{'config_path'} .= $path;
 			}
 		}
 	}
@@ -364,6 +382,9 @@ sub _load_config
 		$ref->{ $parts[-1] } = $value;
 	}
 
+	if($self->{'flatten'}) {
+		$self->_load_driver('Hash::Flatten', ['flatten']);
+	}
 	$self->{config} = $self->{flatten} ? flatten(\%merged) : \%merged;
 }
 
@@ -394,6 +415,8 @@ sub get
 Returns the entire configuration hash,
 possibly flattened depending on the C<flatten> option.
 
+The entry C<config_path> contains a colon separated list of the files that the configuration was loaded from.
+
 =cut
 
 sub all
@@ -401,6 +424,18 @@ sub all
 	my $self = shift;
 
 	return $self->{'config'};
+}
+
+# Helper routine to load a driver
+sub _load_driver
+{
+	my($self, $driver, $imports) = @_;
+
+	return if($self->{'loaded'}{$driver});
+
+	eval "require $driver";
+	$driver->import(@{$imports});
+	$self->{'loaded'}{$driver} = 1;
 }
 
 1;

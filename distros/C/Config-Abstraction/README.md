@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -20,10 +20,11 @@ Version 0.05
 
 # DESCRIPTION
 
-`Config::Abstraction` is a flexible configuration management module
-that allows loading and merging configuration data from multiple file
-formats: YAML, JSON, XML, and INI via a number of different drivers.
-It also integrates environment variable
+`Config::Abstraction` is a flexible configuration management layer that sits above `Config::*` modules.
+In addition to using drivers to load configuration data from multiple file
+formats (YAML, JSON, XML, and INI),
+it also allows levels of configuration, each of which overrides the lower levels.
+So, it also integrates environment variable
 overrides and command line arguments for runtime configuration adjustments.
 This module is designed to help developers manage layered configurations that can be loaded from files and overridden by environment variables,
 offering a robust and dynamic approach
@@ -161,6 +162,8 @@ Options:
 - `config_files`
 
     An arrayref of files to look for in the configration directories.
+    Put the more important files later,
+    since later files override earlier ones.
 
 - `env_prefix`
 
@@ -174,7 +177,7 @@ Options:
     &#x3d;item \* `logger`
 
     Used for warnings and traces.
-    An object that understands debug() and trace() messages.
+    An object that understands warn(), debug() and trace() messages.
 
 - `sep_char`
 
@@ -192,6 +195,8 @@ Retrieve a configuration value using dotted key notation (e.g.,
 
 Returns the entire configuration hash,
 possibly flattened depending on the `flatten` option.
+
+The entry `config_path` contains a colon separated list of the files that the configuration was loaded from.
 
 # BUGS
 

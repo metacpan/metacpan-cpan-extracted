@@ -1,13 +1,14 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0201';
+$MIDI::RtController::Filter::Math::VERSION = '0.0204';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
 
 use v5.36;
 
-use Moo;
 use strictures 2;
+use Moo;
+use Types::MIDI qw(Channel);
 use Types::Standard qw(Num);
 use namespace::clean;
 
@@ -22,7 +23,7 @@ has rtc => (
 
 has channel => (
     is  => 'rw',
-    isa => Num,
+    isa => Channel,
     default => sub { 0 },
 );
 
@@ -97,20 +98,25 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0201
+version 0.0204
 
 =head1 SYNOPSIS
 
   use curry;
-  use Future::IO::Impl::IOAsync;
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Math ();
 
-  my $rtc = MIDI::RtController->new; # * input/output required
+  my $rtc = MIDI::RtController->new(
+    input  => 'keyboard',
+    output => 'usb',
+  );
 
-  my $rtf = MIDI::RtController::Filter::Math->new(rtc => $rtc);
+  my $filter = MIDI::RtController::Filter::Math->new(rtc => $rtc);
 
-  $rtc->add_filter('stair_step', note_on => $rtf->curry::stair_step);
+  $filter->control(1); # CC#01 = mod-wheel
+  $filter->channel(0);
+
+  $rtc->add_filter('stair_step', note_on => $filter->curry::stair_step);
 
   $rtc->run;
 
@@ -123,15 +129,15 @@ L<MIDI::RtController> filters.
 
 =head2 rtc
 
-  $rtc = $rtf->rtc;
+  $rtc = $filter->rtc;
 
 The required L<MIDI::RtController> instance provided in the
 constructor.
 
 =head2 channel
 
-  $channel = $rtf->channel;
-  $rtf->channel($number);
+  $channel = $filter->channel;
+  $filter->channel($number);
 
 The current MIDI channel (0-15, drums=9).
 
@@ -139,8 +145,8 @@ Default: C<0>
 
 =head2 delay
 
-  $delay = $rtf->delay;
-  $rtf->delay($number);
+  $delay = $filter->delay;
+  $filter->delay($number);
 
 The current delay time.
 
@@ -148,8 +154,8 @@ Default: C<0.1> seconds
 
 =head2 feedback
 
-  $feedback = $rtf->feedback;
-  $rtf->feedback($number);
+  $feedback = $filter->feedback;
+  $filter->feedback($number);
 
 The amount of feedback.
 
@@ -157,8 +163,8 @@ Default: C<3>
 
 =head2 up
 
-  $up = $rtf->up;
-  $rtf->up($number);
+  $up = $filter->up;
+  $filter->up($number);
 
 The upward movement steps.
 
@@ -166,8 +172,8 @@ Default: C<2>
 
 =head2 down
 
-  $down = $rtf->down;
-  $rtf->down($number);
+  $down = $filter->down;
+  $filter->down($number);
 
 The downward movement steps.
 
@@ -194,7 +200,17 @@ Notes are played from the event note, in up-down, stair-step fashion.
 
 =head1 SEE ALSO
 
+The eg/*.pl program(s) in this distribution
+
+L<MIDI::RtController::Filter::Tonal>
+
+L<MIDI::RtController::Filter::Drums>
+
+L<MIDI::RtController::Filter::CC>
+
 L<Moo>
+
+L<Types::MIDI>
 
 L<Types::Standard>
 

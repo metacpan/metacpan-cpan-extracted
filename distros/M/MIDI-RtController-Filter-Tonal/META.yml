@@ -32,6 +32,7 @@ requires:
   Music::Scales: '0'
   Music::ToRoman: '0'
   Music::VoiceGen: '0'
+  Types::MIDI: '0'
   Types::Standard: '0'
   namespace::clean: '0'
   perl: v5.36.0
@@ -39,7 +40,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-Tonal
   repository: https://github.com/ology/MIDI-RtController-Filter-Tonal.git
-version: '0.0201'
+version: '0.0204'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

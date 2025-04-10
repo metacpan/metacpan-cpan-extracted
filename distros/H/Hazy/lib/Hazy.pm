@@ -4,105 +4,105 @@ use strict;
 use warnings;
 use 5.012;
 use Cwd qw/abs_path/;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
-    my ( $pkg, @new ) = @_;
-    my %args = scalar @new == 1 ? @{ shift @new } : @new;
-    $args{file_name} //= 'test';
-    $args{find}      //= 'css';
-    my $path = abs_path( [caller()]->[1] );
-    $args{abs_path} = substr($path, 0, rindex($path, '/'));
-    if ($args{write_dir}) {
-	$args{write_dir} = sprintf "%s/%s", $args{abs_path}, $args{write_dir};
-	unless(-d $args{write_dir}) {
-	    my $dir = '';
-	    map {
-		(-e ($dir .= "/$_")) or mkdir $dir;
-	    } (split /\//, $args{write_dir});
-        }
-    }
-    bless {%args}, $pkg;
+	my ( $pkg, @new ) = @_;
+	my %args = scalar @new == 1 ? @{ shift @new } : @new;
+	$args{file_name} //= 'test';
+	$args{find} //= 'css';
+	my $path = abs_path( [caller()]->[1] );
+	$args{abs_path} = substr($path, 0, rindex($path, '/'));
+	if ($args{write_dir}) {
+		$args{write_dir} = sprintf "%s/%s", $args{abs_path}, $args{write_dir};
+		unless(-d $args{write_dir}) {
+			my $dir = '';
+			map {
+				(-e ($dir .= "/$_")) or mkdir $dir;
+			} (split /\//, $args{write_dir});
+		}
+	}
+	bless {%args}, $pkg;
 }
 
 sub process {
-    $_[1] //= $_[0]->{read_dir} // die 'No read_dir provided';
-    $_[1] = sprintf "%s/%s", $_[0]->{abs_path}, $_[1];
-    my ( $spec, @files ) = $_[0]->lookup_dir( $_[1] );
-    my $build_css;
-    for my $css_file (@files) {
-        open my $fh, "<$css_file" or die "Cannot open $css_file";
-        my $css = do { local $/; <$fh> };
-        $css = $_[0]->make_replacements( $spec, $css );
-        $build_css .= $css;
-    }
-    my $write = exists $_[0]->{write_dir}
-      ? sprintf "%s/%s", $_[0]->{write_dir}, $_[0]->{file_name}
-      : $_[0]->{file_name};
-    write_file( "$write.css",     $build_css );
-    write_file( "$write.min.css", $_[0]->min_css($build_css) );
-    return 1;
+	$_[1] //= $_[0]->{read_dir} // die 'No read_dir provided';
+	$_[1] = sprintf "%s/%s", $_[0]->{abs_path}, $_[1];
+	my ( $spec, @files ) = $_[0]->lookup_dir( $_[1] );
+	my $build_css;
+	for my $css_file (@files) {
+		open my $fh, "<$css_file" or die "Cannot open $css_file";
+		my $css = do { local $/; <$fh> };
+		$css = $_[0]->make_replacements( $spec, $css );
+		$build_css .= $css;
+	}
+	my $write = exists $_[0]->{write_dir}
+	  ? sprintf "%s/%s", $_[0]->{write_dir}, $_[0]->{file_name}
+	  : $_[0]->{file_name};
+	write_file( "$write.css",	 $build_css );
+	write_file( "$write.min.css", $_[0]->min_css($build_css) );
+	return 1;
 }
 
 sub write_file {
-    open( my $fh, '>', $_[0] ) or die "could not open file $_[0]";
-    print $fh $_[1];
-    close $fh;
+	open( my $fh, '>', $_[0] ) or die "could not open file $_[0]";
+	print $fh $_[1];
+	close $fh;
 }
 
 sub make_replacements {
-    my $regx = join "|", map { quotemeta($_) } keys %{ $_[1] };
-    return $_[2] unless $regx;
-    $_[2] =~ s/($regx)/$_[1]->{$1}/g;
-    ( !$_[2] =~ m/\n$/ ) and $_[2] .= "\n";
-    return $_[2];
+	my $regx = join "|", map { quotemeta($_) } keys %{ $_[1] };
+	return $_[2] unless $regx;
+	$_[2] =~ s/($regx)/$_[1]->{$1}/g;
+	( !$_[2] =~ m/\n$/ ) and $_[2] .= "\n";
+	return $_[2];
 }
 
 sub lookup_dir {
-    my $look = $_[0]->{find};
-    opendir( my $dh, $_[1] ) or die "Could not open dir - $_[1]";
-    my %files = map { $_ => sprintf "%s/%s", $_[1], $_ }
-      grep { /config|\.$look$/ } readdir $dh;
-    closedir($dh);
-    my $spec = delete $files{config} or die 'no config found';
-    return ( _read_spec($spec), sort values %files );
+	my $look = $_[0]->{find};
+	opendir( my $dh, $_[1] ) or die "Could not open dir - $_[1]";
+	my %files = map { $_ => sprintf "%s/%s", $_[1], $_ }
+	  grep { /config|\.$look$/ } readdir $dh;
+	closedir($dh);
+	my $spec = delete $files{config} or die 'no config found';
+	return ( _read_spec($spec), sort values %files );
 }
 
 sub min_css {
-    $_[1] =~ s/[\s]{2,}|[\t\r\n]+//g;
-    my %minify = (' {', '{', '{ ', '{', ' }', '}', '} ', '}', ': ', 
+	$_[1] =~ s/[\s]{2,}|[\t\r\n]+//g;
+	my %minify = (' {', '{', '{ ', '{', ' }', '}', '} ', '}', ': ', 
 	':', ';}', '}', ' ,', ',', ', ', ',', '( ', '(', ' )', ')' );
-    my $regx = join "|", map { quotemeta($_) } sort keys %minify;
-    $_[1] =~ s/($regx)/$minify{$1}/g;
-    $_[1];
+	my $regx = join "|", map { quotemeta($_) } sort keys %minify;
+	$_[1] =~ s/($regx)/$minify{$1}/g;
+	$_[1];
 }
 
 sub _read_spec {
-    my ( %spec, %arg );
-    open( my $fh, "<$_[0]" );
-    $arg{end} = ';';
-    while ( sysread( $fh, $arg{buffer}, 1 ) ) {
-	if ( ! exists $arg{value} && $arg{buffer} =~ m/\s/ ) { next }	
-	if ( !$arg{flag} && !$arg{multi} && $arg{buffer} eq ':' ) { $arg{flag} = 1; next; }
-        if ($arg{buffer} eq $arg{end}) {
-	    map { $arg{$_} =~ s/^\s+|\s+$// } qw/key value/;
-	    $spec{"$arg{key}"} = $arg{value};
-            map { delete $arg{$_} } qw/key value flag multi/;
-	    $arg{end} = ';';
-            next;
-        }
-	if ( exists $arg{flag} && ! exists $arg{value} ) {
-		next if ($arg{buffer} =~ m/\s/);
-		if ($arg{buffer} =~ m/[\@\$\^\&\*\{\/\\\~\`\>\<\+\_\]\[\?\|\"\'\=\!]/ ) {
-			$arg{multi} = 1;
-			$arg{end} = $arg{buffer};
+	my ( %spec, %arg );
+	open( my $fh, "<$_[0]" );
+	$arg{end} = ';';
+	while ( sysread( $fh, $arg{buffer}, 1 ) ) {
+		if ( ! exists $arg{value} && $arg{buffer} =~ m/\s/ ) { next }	
+		if ( !$arg{flag} && !$arg{multi} && $arg{buffer} eq ':' ) { $arg{flag} = 1; next; }
+		if ($arg{buffer} eq $arg{end}) {
+			map { $arg{$_} =~ s/^\s+|\s+$// } qw/key value/;
+			$spec{"$arg{key}"} = $arg{value};
+			map { delete $arg{$_} } qw/key value flag multi/;
+			$arg{end} = ';';
 			next;
 		}
+		if ( exists $arg{flag} && ! exists $arg{value} ) {
+			next if ($arg{buffer} =~ m/\s/);
+			if ($arg{buffer} =~ m/[\@\$\^\&\*\{\/\\\~\`\>\<\+\_\]\[\?\|\"\'\=\!]/ ) {
+				$arg{multi} = 1;
+				$arg{end} = $arg{buffer};
+				next;
+			}	
+		}
+		exists $arg{flag} ? ( $arg{value} .= $arg{buffer} ) : ( $arg{key} .= $arg{buffer} );
 	}
-        exists $arg{flag} ? ( $arg{value} .= $arg{buffer} ) : ( $arg{key} .= $arg{buffer} );
-    }
-    close($fh);
-    return \%spec;
+	close($fh);
+	return \%spec;
 }
 
 1;
@@ -116,61 +116,61 @@ Hazy - A simple, minimalistic CSS framework.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
 =head1 SYNOPSIS
-    
-    *
-    **
-    # hazy.pl
-    use Hazy;
+	
+	*
+	**
+	# hazy.pl
+	use Hazy;
 
-    Hazy->new(
-        read_dir => 't/vanilla/', 
-        write_dir => 'static/css', 
-        file_name => 'vanilla', 
-        find => 'high', # default is css
-    )->process();
+	Hazy->new(
+		read_dir => 't/vanilla/', 
+		write_dir => 'static/css', 
+		file_name => 'shiny', 
+		find => 'high', # default is css
+	)->process();
 
-    1;
+	1;
 
-    ***
+	***
 
-    # Create a config 
-    # t/hazy/config ....
-    @one: #fff;
-    $two: #ccc;
-    %three: auto 0;
-    *four: * 
+	# Create a config 
+	# t/vanilla/config
+	@one: #fff;
+	$two: #ccc;
+	%three: auto 0;
+	*four: * 
 	padding: 10px; 
 	margin: auto;
-    * 
+	* 
 
-    ****
+	****
 
-    # Add some *css* files - t/hazy/base.meh
-    body {
-        background: @one;
-        color: $two;
-	*four
-    }
-    # form.css
-    .form {
-        margin: %three;
-    }
+	# Add some *css* files - t/vanilla/base.high
+	body {
+		background: @one;
+		color: $two;
+		*four
+	}
+	# form.css
+	.form {
+		margin: %three;
+	}
 
-    *****
+	*****
 
-    # run
+	# run
 
-    perl hazy.pl
+	perl hazy.pl
 
-    ******
+	******
 
-    # compiles static/css/shiny.min.css or static/css/shiny.css
-    .body{background:#fff;color:#ccc}.div{margin:auto,0}
+	# compiles static/css/shiny.min.css and static/css/shiny.css
+	.body{background:#fff;color:#ccc;padding:10px;margin:auto}.div{margin:auto,0}
 
  
 =head1 AUTHOR
@@ -187,7 +187,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Hazy
+	perldoc Hazy
 
 
 You can also look for information at:

@@ -1,5 +1,5 @@
 package Dist::Build::XS::Import;
-$Dist::Build::XS::Import::VERSION = '0.018';
+$Dist::Build::XS::Import::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -69,12 +69,12 @@ Dist::Build::XS::Import - Dist::Build extension to import headers for other XS m
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
- load_module('Dist::Build::XS');
- load_module('Dist::Build::XS::Import');
+ load_extension('Dist::Build::XS');
+ load_extension('Dist::Build::XS::Import');
 
  add_xs(
      module => 'Foo::Bar',

@@ -56,23 +56,23 @@
    "provides" : {
       "Data::Identifier" : {
          "file" : "lib/Data/Identifier.pm",
-         "version" : "v0.10.0"
+         "version" : "v0.11.0"
       },
       "Data::Identifier::Cloudlet" : {
          "file" : "lib/Data/Identifier/Cloudlet.pm",
-         "version" : "v0.10.0"
+         "version" : "v0.11.0"
       },
       "Data::Identifier::Generate" : {
          "file" : "lib/Data/Identifier/Generate.pm",
-         "version" : "v0.10.0"
+         "version" : "v0.11.0"
       },
       "Data::Identifier::Interface::Known" : {
          "file" : "lib/Data/Identifier/Interface/Known.pm",
-         "version" : "v0.10.0"
+         "version" : "v0.11.0"
       },
       "Data::Identifier::Wellknown" : {
          "file" : "lib/Data/Identifier/Wellknown.pm",
-         "version" : "v0.10.0"
+         "version" : "v0.11.0"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-Identifier.git"
       }
    },
-   "version" : "v0.10",
+   "version" : "v0.11",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

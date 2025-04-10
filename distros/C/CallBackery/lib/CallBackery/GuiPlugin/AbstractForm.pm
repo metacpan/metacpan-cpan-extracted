@@ -3,7 +3,6 @@ use Carp qw(carp croak);
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
 use Mojo::Promise;
-use Mojo::JSON qw(encode_json);
 use Mojo::Util qw(dumper);
 use Time::HiRes;
 
@@ -13,7 +12,7 @@ CallBackery::GuiPlugin::AbstractForm - form base class
 
 =head1 SYNOPSIS
 
- use Mojo::Base 'CallBackery::GuiPlugin::AbstractForm';
+ use Mojo::Base 'CallBackery::GuiPlugin::AbstractForm', -signatures;
 
 =head1 DESCRIPTION
 
@@ -35,8 +34,7 @@ Qooxdoo form.
 
 =cut
 
-has screenCfg => sub {
-    my $self = shift;
+has screenCfg => sub ($self) {
     my $cfg = $self->SUPER::screenCfg;
     $cfg->{type} = 'form';
     $cfg->{form} = $self->formCfg;
@@ -59,14 +57,59 @@ TODOC
 
 =cut
 
-has formCfgMap => sub {
-    my $self = shift;
+has formCfgMap => sub ($self) {
     my %map;
     for my $row (@{$self->formCfg}){
         next unless $row->{key};
         $map{$row->{key}} = $row;
     }
     return \%map;
+};
+
+
+=head2 formData ()
+
+Return the form data independently from the form phase.
+
+=cut
+
+sub formData ($self) {
+    my $args = $self->args || {};
+    return $args->{currentFormData} || $args->{formData} || {};
+};
+
+
+=head2 formPhase ()
+
+Return the form phase.
+
+=cut
+
+sub formPhase ($self) {
+    my $args = $self->args;
+
+    # if called from CardList or Table plugins
+    return 'instantiate' if $args->{selection};
+
+    # data
+    if ($args->{currentFormData}) {
+        return 'reconfigure' if $args->{triggerField};
+        return 'initialize';
+    }
+
+    # actions
+    if ($args->{formData}) {
+        return "action:$args->{key}" if $args->{key};
+    }
+
+    # config
+    if ( $args and not keys $args->%*) {
+        return 'pluginConfig';
+    }
+
+    # catch all, if ever reached
+    $self->log->warn('Unknown form phase, args=', dumper $args);
+    return 'unknown';
 };
 
 
@@ -114,10 +157,8 @@ and then store the data into the config database.
 
 =cut
 
-sub processData {
-    my $self = shift;
-    my $args = shift;
-    $self->args($args) if $args;
+sub processData ($self, $args, $extraArgs=undef) {
+   $self->args($args) if $args;
     my $form = $self->formCfgMap;
     my $formData = $args->{formData};
     # this is only to be sure ... data should be pre-validated
@@ -150,9 +191,7 @@ database. Keys will be prefixed by the plugin instance name
 
 =cut
 
-sub saveFormDataToConfig {
-    my $self = shift;
-    my $formData = shift;
+sub saveFormDataToConfig ($self, $formData) {
     my $form = $self->formCfgMap;
     for my $key (keys %$form){
         next if not exists $formData->{$key};
@@ -168,9 +207,7 @@ config database.
 
 =cut
 
-sub getFieldValue {
-    my $self = shift;
-    my $field = shift;
+sub getFieldValue ($self, $field) {
     my $entry = $self->formCfgMap->{$field};
     my $log = $self->log;
     return undef unless ref $entry eq 'HASH';
@@ -202,10 +239,7 @@ Return all field values of the form.
 
 =cut
 
-sub getAllFieldValues {
-    my $self = shift;
-    my $parentForm = shift;
-    my $currentForm = shift;
+sub getAllFieldValues ($self, $parentForm, $currentForm, $args) {
     my %map;
     my @promises;
     $self->args($currentForm) if $currentForm;
@@ -234,6 +268,7 @@ sub getAllFieldValues {
     return \%map;
 }
 
+
 =head2 getData (type,field)
 
 Return the value of the given field. If no field name is specified
@@ -241,14 +276,12 @@ return a hash with all the current data known to the plugin.
 
 =cut
 
-sub getData {
-    my $self = shift;
-    my $type = shift;
+sub getData ($self, $type, @args) {
     if ($type eq 'field'){
-        return $self->getFieldValue(@_);
+        return $self->getFieldValue(@args);
     }
     elsif ($type eq 'allFields') {
-        return $self->getAllFieldValues(@_);
+        return $self->getAllFieldValues(@args);
     }
     else {
         die mkerror(38334, 'Requested unknown data type ' . ($type // 'unknown'));
@@ -256,6 +289,7 @@ sub getData {
 }
 
 1;
+
 __END__
 
 =head1 LICENSE

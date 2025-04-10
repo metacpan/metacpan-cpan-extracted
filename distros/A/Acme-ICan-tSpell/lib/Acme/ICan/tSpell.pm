@@ -1,6 +1,6 @@
 package Acme::ICan::tSpell;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moo;
 use MooX::LazierAttributes qw/rw lzy/;
@@ -11,37 +11,37 @@ use URI::Escape;
 use Carp qw/croak/;
 
 attributes (
-    tiny => [Object, {lzy, default => sub {HTTP::Tiny->new}}],
-    base_url => [Str, {lzy, default => 'http://www.google.com/search?gws_rd=ssl&hl=en&q='}],
+	tiny => [Object, {lzy, default => sub {HTTP::Tiny->new}}],
+	base_url => [Str, {lzy, default => 'http://www.google.com/search?gws_rd=ssl&hl=en&q='}],
 );
 
 validate_subs ( 
-    get => { params => [ [Str] ], returns => [[HashRef]] },
-    spell_check => { 
-        params => { check => [Str], base_url => [Str, 'base_url'] },
-        returns => [[Str]],
-    }, 
-    spell => { params => [[Str]], returns => [[Str]] },
+	get => { params => [ [Str] ], returns => [[HashRef]] },
+	spell_check => { 
+		params => { check => [Str], base_url => [Str, 'base_url'] },
+		returns => [[Str]],
+	}, 
+	spell => { params => [[Str]], returns => [[Str]] },
 );
 
 sub get {
-    my $response = $_[0]->tiny->get($_[1]);
-    $response->{success} and return $response;
-    croak sprintf "something went terribly wrong: status - %s - reason - %s", 
-        $response->{status}, $response->{reason};
+	my $response = $_[0]->tiny->get($_[1]);
+	$response->{success} and return $response;
+	croak sprintf "something went terribly wrong: status - %s - reason - %s", 
+		$response->{status}, $response->{reason};
 }
 
 sub spell_check {
-    my $moon = $_[0]->get(sprintf('%s%s', $_[1]->{base_url}, uri_escape($_[1]->{check})))->{content};
-    if ($moon =~ m{(?:Showing results for|Did you mean|Including results for)[^\0]*?<a.*?>(.*?)</a>}){
-        (my $str = $1) =~ s/<.*?>//g;
+	my $moon = $_[0]->get(sprintf('%s%s', $_[1]->{base_url}, uri_escape($_[1]->{check})))->{content};
+	if ($moon =~ m{(?:Showing results for|Did you mean|Including results for)[^\0]*?<a.*?>(.*?)</a>}){
+		(my $str = $1) =~ s/<.*?>//g;
  		return $_[0]->spell_check({ check => $str }); # work around googles struggles  	
-    }
-    return $_[1]->{check};
+	}
+	return $_[1]->{check};
 }
 
 sub spell {
-    return $_[0]->spell_check({ check => $_[1] });
+	return $_[0]->spell_check({ check => $_[1] });
 }
 
 1;
@@ -54,7 +54,7 @@ Acme::ICan::tSpell - What do you do..
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -62,12 +62,12 @@ Version 0.04
 
 You use google...
 
-    use Acme::ICan'tSpell;
+	use Acme::ICan'tSpell;
 
-    my $speller = Acme::ICan'tSpell->new();
-    ...
-    
-    $speller->spell(q|last day stuk in a big Austrlien bank surrnded by srum and UX desigers.|);
+	my $speller = Acme::ICan'tSpell->new();
+	...
+	
+	$speller->spell(q|last day stuk in a big Austrlien bank surrnded by srum and UX desigers.|);
 	# last day stuck in a big Australian bank surrounded by scrum and UX designers.	
 	
 =head1 SUBROUTINES/METHODS
@@ -77,7 +77,7 @@ You use google...
 Accepts a word, phrase or sentence and uses google search to return the
 correctly spelled version. 
 
-    $speller->spell();
+	$speller->spell();
 
 =head1 AUTHOR
 
@@ -93,7 +93,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Acme::ICan::tSpell
+	perldoc Acme::ICan::tSpell
 
 You can also look for information at:
 

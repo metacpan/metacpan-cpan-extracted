@@ -61,9 +61,10 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 patches/Support-custom-labels-for-ValidateCustomFields.patch
+po/ca.po
+po/es.po
 po/formtools.pot
 po/fr.po
 README
 static/css/rt-extension-formtools.css
 static/js/rt-extension-formtools.js
-SIGNATURE                                Public-key signature (added by MakeMaker)

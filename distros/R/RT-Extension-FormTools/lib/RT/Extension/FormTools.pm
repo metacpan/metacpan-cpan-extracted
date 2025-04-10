@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -350,6 +350,8 @@ Valid core fields include:
 
 =item Due
 
+=item Starts
+
 =item TimeEstimated
 
 =back
@@ -389,6 +391,7 @@ my %is_core_field = map { $_ => 1 } qw(
     Content
     Attach
     Due
+    Starts
     TimeEstimated
 );
 

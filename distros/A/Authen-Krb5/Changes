@@ -1,5 +1,17 @@
 Revision history for Perl extension Authen-Krb5.
 
+1.906 2025-04-07T17:24:02Z
+ - Make init_context() really return the context as documented. We also
+   make it safe to call init_context() several times in case one wants to
+   access the context object later. (Ansgar Burchardt <ansgar@43-1.org>)
+ - Remove compiler errors about implicit function declarations which have
+   flipped from warnings to errors since c compiler c99. (Christopher
+   Odenbach)
+ - Remove compiler errors about incompatible pointers. The SvPV macro needs
+   a STRLEN variable. As the krb5 data structures only use some other type
+   we simply copy the value to a locally defined STRLEN variable.
+   (Christopher Odenbach)
+
 1.905 2017-12-04T20:30:08Z
  - Make sure tests and author/release tests are run before making a release
    (Ioan Rogers)

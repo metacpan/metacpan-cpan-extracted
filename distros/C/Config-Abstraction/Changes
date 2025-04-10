@@ -1,5 +1,11 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.06	Wed Apr  9 08:30:55 EDT 2025
+	Put the paths used to load the configuration file into config_path
+	Only load the modules that are needed
+	Improved logging of errors
+	Added _load_driver
+
 0.05	Tue Apr  8 09:50:15 EDT 2025
 	Added tests for all()
 	Added the logger option to new()
