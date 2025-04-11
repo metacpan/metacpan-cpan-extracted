@@ -17,8 +17,8 @@ use CPAN::Meta;
 				'source/dist.ini' => simple_ini(
 					'GatherDir',
 					'MetaJSON',
-					[ 'DynamicPrereqs::Meta' => {
-							condition => [ 'is_os linux' ],
+					[ 'DynamicPrereqs::ModuleBuildTiny' => {
+							conditions => [ 'is_os linux' ],
 							prereqs => [ 'Foo 1' ],
 						}
 					],
@@ -57,7 +57,7 @@ use CPAN::Meta;
 				'source/dist.ini' => simple_ini(
 					'GatherDir',
 					'MetaJSON',
-					[ 'DynamicPrereqs::Meta' => {
+					[ 'DynamicPrereqs::DistBuild' => {
 							condition => [ 'is_os linux' ],
 							error => 'OS not supported'
 						}
@@ -95,7 +95,7 @@ use CPAN::Meta;
 				'source/dist.ini' => simple_ini(
 					'GatherDir',
 					'MetaJSON',
-					[ 'DynamicPrereqs::Meta' => {
+					[ 'DynamicPrereqs::ModuleBuildTiny' => {
 							condition => [ 'is_os linux', 'has_perl 5.010' ],
 							prereqs => [ 'Foo 1' ],
 						}

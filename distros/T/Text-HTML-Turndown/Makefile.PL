@@ -51,6 +51,7 @@ my %module = (
 
     PREREQ_PM => {
         'experimental'        => '0.034',
+        'PerlX::Maybe'        => 0,
 
         'Carp'                => 0,
         'File::Basename'      => 0,
@@ -59,6 +60,9 @@ my %module = (
         'List::MoreUtils'     => 0,
         'List::Util'          => 0,
         'XML::LibXML'         => 0,
+        'Text::CleanFragment' => 0,
+        'Text::FrontMatter::YAML' => 0,
+
     },
     TEST_REQUIRES => {
         'Test2::V0'    => 0,

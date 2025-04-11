@@ -29,6 +29,7 @@ WriteMakefile (
   PREREQ_PM => {
     'PDL' => '2.096',
     'OpenGL' => '0.7004',
+    'OpenGL::GLFW' => '0.0402',
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88',

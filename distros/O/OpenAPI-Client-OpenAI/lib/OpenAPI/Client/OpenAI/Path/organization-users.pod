@@ -1,0 +1,93 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-users - Documentation for the /organization/users path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/users>.
+
+=head1 PATHS
+
+
+=head2 C<GET /organization/users>
+
+Lists all of the users in the organization.
+
+
+
+=head3 Operation ID
+
+C<list-users>
+
+    $client->list-users( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=item * C<emails> (in query) (Optional) - Filter by the email address of users.
+
+Type: C<array>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Users listed successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n    \"object\": \"organization.user\",\n    \"id\": \"user_abc\",\n    \"name\": \"First Last\",\n    \"email\": \"user@example.com\",\n    \"role\": \"owner\",\n    \"added_at\": 1711471533\n}\n"
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

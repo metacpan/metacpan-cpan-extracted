@@ -4,8 +4,7 @@ use Moonshine::Magic;
 use Moonshine::Util;
 use Params::Validate qw/ARRAYREF HASHREF/;
 
-use feature qw/switch/;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use Switch::Back;
 
 extends (
     'Moonshine::Bootstrap::Component',
@@ -73,7 +72,7 @@ sub pager {
             $base_args->{previous}->{class} =
               prepend_str( $dis, $base_args->{previous}->{class} );
         }
-	}
+    }
 
     return $self->pagination($base_args);
 }

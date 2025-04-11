@@ -1,0 +1,228 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::threads-runs - Documentation for the /threads/runs path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</threads/runs>.
+
+=head1 PATHS
+
+
+=head2 C<POST /threads/runs>
+
+Create a thread and run it in one request.
+
+
+
+=head3 Operation ID
+
+C<createThreadAndRun>
+
+    $client->createThreadAndRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+
+=head4 Models
+
+The ID of the L<Model|https://platform.openai.com/docs/api-reference/models> to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used.
+
+=over 4
+      
+=item * C<gpt-4o>
+
+=item * C<gpt-4o-2024-11-20>
+
+=item * C<gpt-4o-2024-08-06>
+
+=item * C<gpt-4o-2024-05-13>
+
+=item * C<gpt-4o-mini>
+
+=item * C<gpt-4o-mini-2024-07-18>
+
+=item * C<gpt-4.5-preview>
+
+=item * C<gpt-4.5-preview-2025-02-27>
+
+=item * C<gpt-4-turbo>
+
+=item * C<gpt-4-turbo-2024-04-09>
+
+=item * C<gpt-4-0125-preview>
+
+=item * C<gpt-4-turbo-preview>
+
+=item * C<gpt-4-1106-preview>
+
+=item * C<gpt-4-vision-preview>
+
+=item * C<gpt-4>
+
+=item * C<gpt-4-0314>
+
+=item * C<gpt-4-0613>
+
+=item * C<gpt-4-32k>
+
+=item * C<gpt-4-32k-0314>
+
+=item * C<gpt-4-32k-0613>
+
+=item * C<gpt-3.5-turbo>
+
+=item * C<gpt-3.5-turbo-16k>
+
+=item * C<gpt-3.5-turbo-0613>
+
+=item * C<gpt-3.5-turbo-1106>
+
+=item * C<gpt-3.5-turbo-0125>
+
+=item * C<gpt-3.5-turbo-16k-0613>
+
+=back
+      
+      
+Example:
+
+    {
+       "model" : "gpt-4o",
+       "temperature" : 1,
+       "thread" : {
+          "messages" : [
+             {
+                "attachments" : [
+                   {
+                      "tools" : [
+                         null
+                      ]
+                   }
+                ]
+             }
+          ],
+          "tool_resources" : {
+             "code_interpreter" : {
+                "file_ids" : [
+                   null
+                ]
+             },
+             "file_search" : {
+                "vector_store_ids" : [
+                   null
+                ],
+                "vector_stores" : [
+                   {
+                      "file_ids" : [
+                         null
+                      ]
+                   }
+                ]
+             }
+          }
+       },
+       "tool_resources" : {
+          "code_interpreter" : {
+             "file_ids" : [
+                null
+             ]
+          },
+          "file_search" : {
+             "vector_store_ids" : [
+                null
+             ]
+          }
+       },
+       "tools" : [
+          null
+       ],
+       "top_p" : 1
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "run_abc123",
+      "object": "thread.run",
+      "created_at": 1698107661,
+      "assistant_id": "asst_abc123",
+      "thread_id": "thread_abc123",
+      "status": "completed",
+      "started_at": 1699073476,
+      "expires_at": null,
+      "cancelled_at": null,
+      "failed_at": null,
+      "completed_at": 1699073498,
+      "last_error": null,
+      "model": "gpt-4o",
+      "instructions": null,
+      "tools": [{"type": "file_search"}, {"type": "code_interpreter"}],
+      "metadata": {},
+      "incomplete_details": null,
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 456,
+        "total_tokens": 579
+      },
+      "temperature": 1.0,
+      "top_p": 1.0,
+      "max_prompt_tokens": 1000,
+      "max_completion_tokens": 1000,
+      "truncation_strategy": {
+        "type": "auto",
+        "last_messages": null
+      },
+      "response_format": "auto",
+      "tool_choice": "auto",
+      "parallel_tool_calls": true
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

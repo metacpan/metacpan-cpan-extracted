@@ -1,5 +1,10 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.07	Thu Apr 10 19:40:41 EDT 2025
+	Change the default for config_dirs to $HOME/.conf, $DOCUMENT_ROOT/conf, ./conf
+	In YAML files, split comma separated entries
+	Honour path as well as config_dirs
+
 0.06	Wed Apr  9 08:30:55 EDT 2025
 	Put the paths used to load the configuration file into config_path
 	Only load the modules that are needed

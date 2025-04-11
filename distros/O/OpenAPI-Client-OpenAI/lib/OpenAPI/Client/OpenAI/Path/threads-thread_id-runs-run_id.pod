@@ -1,0 +1,209 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id - Documentation for the /threads/{thread_id}/runs/{run_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</threads/{thread_id}/runs/{run_id}>.
+
+=head1 PATHS
+
+
+=head2 C<GET /threads/{thread_id}/runs/{run_id}>
+
+Retrieves a run.
+
+
+
+=head3 Operation ID
+
+C<getRun>
+
+    $client->getRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) that was run.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "run_abc123",
+      "object": "thread.run",
+      "created_at": 1698107661,
+      "assistant_id": "asst_abc123",
+      "thread_id": "thread_abc123",
+      "status": "completed",
+      "started_at": 1699073476,
+      "expires_at": null,
+      "cancelled_at": null,
+      "failed_at": null,
+      "completed_at": 1699073498,
+      "last_error": null,
+      "model": "gpt-4o",
+      "instructions": null,
+      "tools": [{"type": "file_search"}, {"type": "code_interpreter"}],
+      "metadata": {},
+      "incomplete_details": null,
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 456,
+        "total_tokens": 579
+      },
+      "temperature": 1.0,
+      "top_p": 1.0,
+      "max_prompt_tokens": 1000,
+      "max_completion_tokens": 1000,
+      "truncation_strategy": {
+        "type": "auto",
+        "last_messages": null
+      },
+      "response_format": "auto",
+      "tool_choice": "auto",
+      "parallel_tool_calls": true
+    }
+
+
+=back
+
+=head2 C<POST /threads/{thread_id}/runs/{run_id}>
+
+Modifies a run.
+
+
+
+=head3 Operation ID
+
+C<modifyRun>
+
+    $client->modifyRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) that was run.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to modify.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "run_abc123",
+      "object": "thread.run",
+      "created_at": 1698107661,
+      "assistant_id": "asst_abc123",
+      "thread_id": "thread_abc123",
+      "status": "completed",
+      "started_at": 1699073476,
+      "expires_at": null,
+      "cancelled_at": null,
+      "failed_at": null,
+      "completed_at": 1699073498,
+      "last_error": null,
+      "model": "gpt-4o",
+      "instructions": null,
+      "tools": [{"type": "file_search"}, {"type": "code_interpreter"}],
+      "metadata": {},
+      "incomplete_details": null,
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 456,
+        "total_tokens": 579
+      },
+      "temperature": 1.0,
+      "top_p": 1.0,
+      "max_prompt_tokens": 1000,
+      "max_completion_tokens": 1000,
+      "truncation_strategy": {
+        "type": "auto",
+        "last_messages": null
+      },
+      "response_format": "auto",
+      "tool_choice": "auto",
+      "parallel_tool_calls": true
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

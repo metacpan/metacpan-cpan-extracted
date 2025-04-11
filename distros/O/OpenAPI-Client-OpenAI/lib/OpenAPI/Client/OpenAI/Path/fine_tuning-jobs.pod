@@ -1,0 +1,230 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::fine_tuning-jobs - Documentation for the /fine_tuning/jobs path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</fine_tuning/jobs>.
+
+=head1 PATHS
+
+
+=head2 C<GET /fine_tuning/jobs>
+
+List your organization's fine-tuning jobs
+
+
+
+=head3 Operation ID
+
+C<listPaginatedFineTuningJobs>
+
+    $client->listPaginatedFineTuningJobs( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<after> (in query) (Optional) - Identifier for the last job from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of fine-tuning jobs to retrieve.
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<metadata> (in query) (Optional) - Optional metadata filter. To filter, use the syntax `metadata[k]=v`. Alternatively, set `metadata=null` to indicate no metadata.
+
+
+Type: C<object>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"fine_tuning.job\",\n  \"id\": \"ftjob-abc123\",\n  \"model\": \"davinci-002\",\n  \"created_at\": 1692661014,\n  \"finished_at\": 1692661190,\n  \"fine_tuned_model\": \"ft:davinci-002:my-org:custom_suffix:7q8mpxmy\",\n  \"organization_id\": \"org-123\",\n  \"result_files\": [\n      \"file-abc123\"\n  ],\n  \"status\": \"succeeded\",\n  \"validation_file\": null,\n  \"training_file\": \"file-abc123\",\n  \"hyperparameters\": {\n      \"n_epochs\": 4,\n      \"batch_size\": 1,\n      \"learning_rate_multiplier\": 1.0\n  },\n  \"trained_tokens\": 5768,\n  \"integrations\": [],\n  \"seed\": 0,\n  \"estimated_finish\": 0,\n  \"method\": {\n    \"type\": \"supervised\",\n    \"supervised\": {\n      \"hyperparameters\": {\n        \"n_epochs\": 4,\n        \"batch_size\": 1,\n        \"learning_rate_multiplier\": 1.0\n      }\n    }\n  },\n  \"metadata\": {\n    \"key\": \"value\"\n  }\n}\n"
+       ]
+    }
+
+
+=back
+
+=head2 C<POST /fine_tuning/jobs>
+
+Creates a fine-tuning job which begins the process of creating a new model from a given dataset.
+
+Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
+
+L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+
+
+
+=head3 Operation ID
+
+C<createFineTuningJob>
+
+    $client->createFineTuningJob( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+
+=head4 Models
+
+The name of the model to fine-tune. You can select one of the
+L<supported models|https://platform.openai.com/docs/guides/fine-tuning#which-models-can-be-fine-tuned>.
+
+=over 4
+      
+=item * C<babbage-002>
+
+=item * C<davinci-002>
+
+=item * C<gpt-3.5-turbo>
+
+=item * C<gpt-4o-mini>
+
+=back
+      
+      
+Example:
+
+    {
+       "hyperparameters" : null,
+       "integrations" : [
+          {
+             "wandb" : {
+                "project" : "my-wandb-project",
+                "tags" : [
+                   "custom-tag"
+                ]
+             }
+          }
+       ],
+       "method" : {
+          "dpo" : {
+             "hyperparameters" : null
+          },
+          "supervised" : {
+             "hyperparameters" : null
+          }
+       },
+       "model" : "gpt-4o-mini",
+       "seed" : 42,
+       "training_file" : "file-abc123",
+       "validation_file" : "file-abc123"
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "fine_tuning.job",
+      "id": "ftjob-abc123",
+      "model": "davinci-002",
+      "created_at": 1692661014,
+      "finished_at": 1692661190,
+      "fine_tuned_model": "ft:davinci-002:my-org:custom_suffix:7q8mpxmy",
+      "organization_id": "org-123",
+      "result_files": [
+          "file-abc123"
+      ],
+      "status": "succeeded",
+      "validation_file": null,
+      "training_file": "file-abc123",
+      "hyperparameters": {
+          "n_epochs": 4,
+          "batch_size": 1,
+          "learning_rate_multiplier": 1.0
+      },
+      "trained_tokens": 5768,
+      "integrations": [],
+      "seed": 0,
+      "estimated_finish": 0,
+      "method": {
+        "type": "supervised",
+        "supervised": {
+          "hyperparameters": {
+            "n_epochs": 4,
+            "batch_size": 1,
+            "learning_rate_multiplier": 1.0
+          }
+        }
+      },
+      "metadata": {
+        "key": "value"
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

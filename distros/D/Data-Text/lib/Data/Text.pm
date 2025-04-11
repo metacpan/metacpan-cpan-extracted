@@ -2,8 +2,11 @@ package Data::Text;
 
 use warnings;
 use strict;
+
 use Carp;
 use Lingua::Conjunction;
+use Params::Get;
+use Scalar::Util;
 use String::Clean;
 use String::Util;
 
@@ -13,18 +16,18 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use overload (
-        '==' => \&equal,
-        '!=' => \&not_equal,
-        '""' => \&as_string,
-        bool => sub { 1 },
-        fallback => 1   # So that boolean tests don't cause as_string to be called
+	'==' => \&equal,
+	'!=' => \&not_equal,
+	'""' => \&as_string,
+	bool => sub { 1 },
+	fallback => 1	# So that boolean tests don't cause as_string to be called
 );
 
 =head1 SYNOPSIS
@@ -48,28 +51,30 @@ The optional parameter contains a string, or object, to initialise the object wi
 =cut
 
 sub new {
-	my $class = shift;
+	my ($class, @args) = @_;
 	my $self;
 
 	if(!defined($class)) {
-		# Using Data::Text->new(), not Data::Text::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
+		if((scalar @args) > 0) {
+			# Using Data::Text->new(), not Data::Text::new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 		# FIXME: this only works when no arguments are given
 		$self = bless { }, __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		$self = bless { }, ref($class);
-		return $self->set($class);
+		return $self->set($class) if(!scalar(@args));
 	} else {
+		# Create a new object
 		$self = bless { }, $class;
 	}
 
-	if(scalar(@_)) {
-		return $self->set(@_);
-	}
+	# Set additional attributes if arguments are provided
+	$self->set(@args) if(scalar(@args));
 
+	# Return the blessed object
 	return $self;
 }
 
@@ -87,41 +92,34 @@ If called with an object, the message as_string() is sent to it for its contents
 
 sub set {
 	my $self = shift;
+	my $params = Params::Get::get_params('text', @_);
 
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'text'} = shift;
-	}
-
-	if(!defined($params{'text'})) {
+	if(!defined($params->{'text'})) {
 		Carp::carp(__PACKAGE__, ': no text given');
 		return;
 	}
 
+	# @{$self}{'file', 'line'} = (caller(0))[1, 2];
 	my @call_details = caller(0);
 	$self->{'file'} = $call_details[1];
 	$self->{'line'} = $call_details[2];
 
-	if(ref($params{'text'})) {
+	if(ref($params->{'text'})) {
 		# Allow the text to be a reference to a list of strings
-		if(ref($params{'text'}) eq 'ARRAY') {
-			if(scalar(@{$params{'text'}}) == 0) {
+		if(ref($params->{'text'}) eq 'ARRAY') {
+			if(scalar(@{$params->{'text'}}) == 0) {
 				Carp::carp(__PACKAGE__, ': no text given');
 				return;
 			}
 			delete $self->{'text'};
-			foreach my $text(@{$params{'text'}}) {
+			foreach my $text(@{$params->{'text'}}) {
 				$self = $self->append($text);
 			}
 			return $self;
 		}
-		$self->{'text'} = $params{'text'}->as_string();
+		$self->{'text'} = $params->{'text'}->as_string();
 	} else {
-		$self->{'text'} = $params{'text'};
+		$self->{'text'} = $params->{'text'};
 	}
 
 	return $self;
@@ -142,61 +140,47 @@ If called with an object, the message as_string() is sent to it for its contents
 
 =cut
 
-sub append {
+sub append
+{
 	my $self = shift;
+	my $params = Params::Get::get_params('text', @_);
+	my $text = $params->{'text'};
 
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'text'} = shift;
-	}
-
-	if(!defined($params{'text'})) {
+	# Check if text is provided
+	unless(defined $text) {
 		Carp::carp(__PACKAGE__, ': no text given');
 		return;
 	}
 
-	# Make a note of the caller for ease of debugging
+	# Capture caller information for debugging
 	my $file = $self->{'file'};
 	my $line = $self->{'line'};
-	my @call_details = caller(0);
-	$self->{'file'} = $call_details[1];
-	$self->{'line'} = $call_details[2];
+	# my @call_details = caller(0);
+	# $self->{'file'} = $call_details[1];
+	# $self->{'line'} = $call_details[2];
+	@{$self}{'file', 'line'} = (caller(0))[1, 2];
 
-	if(ref($params{'text'})) {
-		# Allow the text to be a reference to a list of strings
-		if(ref($params{'text'}) eq 'ARRAY') {
-			if(scalar(@{$params{'text'}}) == 0) {
-				Carp::carp(__PACKAGE__, ': no text given');
-				return;
-			}
-			foreach my $text(@{$params{'text'}}) {
-				$self = $self->append($text);
-			}
+	# Process if text is a reference
+	if(ref $text) {
+		if(ref $text eq 'ARRAY') {
+			return Carp::carp(__PACKAGE__, ': no text given') unless @$text;
+			$self->append($_) for @$text;
 			return $self;
 		}
-		$params{'text'} = $params{'text'}->as_string();
+		$text = $text->as_string();
 	}
 
+	# Check for consecutive punctuation
 	# FIXME: handle ending with an abbreviation
-
-	if($self->{'text'} && ($self->{'text'} =~ /\s*[\.\,;]\s*$/)) {
-		if($params{'text'} =~ /^\s*[\.\,;]/) {
-			# die(__PACKAGE__,
-			Carp::carp(__PACKAGE__,
-				": attempt to add consecutive punctuation\n\tCurrent = '",
-				$self->{'text'},
-				"' added at $line of $file\n\tAppend = '",
-				$params{'text'},
-				"'",
-			);
-			return;
-		}
+	if($self->{'text'} && ($self->{'text'} =~ /\s*[\.,;]\s*$/) && ($text =~ /^\s*[\.,;]/)) {
+		Carp::carp(__PACKAGE__,
+			": attempt to add consecutive punctuation\n\tCurrent = '", $self->{'text'},
+			"' at $line of $file\n\tAppend = '", $text, "'");
+		return;
 	}
-	$self->{'text'} .= $params{'text'};
+
+	# Append text
+	$self->{'text'} .= $text;
 
 	return $self;
 }
@@ -380,7 +364,7 @@ L<http://deps.cpantesters.org/?module=Data::Text>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2024 Nigel Horne.
+Copyright 2021-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

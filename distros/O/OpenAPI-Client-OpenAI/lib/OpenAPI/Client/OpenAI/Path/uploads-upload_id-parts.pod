@@ -1,0 +1,92 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::uploads-upload_id-parts - Documentation for the /uploads/{upload_id}/parts path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</uploads/{upload_id}/parts>.
+
+=head1 PATHS
+
+
+=head2 C<POST /uploads/{upload_id}/parts>
+
+Adds a L<Part|https://platform.openai.com/docs/api-reference/uploads/part-object> to an L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object. A Part represents a chunk of bytes from the file you are trying to upload. 
+
+Each Part can be at most 64 MB, and you can add Parts until you hit the Upload maximum of 8 GB.
+
+It is possible to add multiple Parts in parallel. You can decide the intended order of the Parts when you L<complete the Upload|https://platform.openai.com/docs/api-reference/uploads/complete>.
+
+
+
+=head3 Operation ID
+
+C<addUploadPart>
+
+    $client->addUploadPart( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<upload_id> (in path) (Required) - The ID of the Upload.
+
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<multipart/form-data>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+        "id": "part_def456",
+        "object": "upload.part",
+        "created_at": 1719186911,
+        "upload_id": "upload_abc123"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

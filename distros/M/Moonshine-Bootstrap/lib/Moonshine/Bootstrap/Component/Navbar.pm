@@ -4,8 +4,7 @@ use Moonshine::Magic;
 use Moonshine::Util;
 use Params::Validate qw/ARRAYREF SCALAR/;
 
-use feature qw/switch/;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use Switch::Back;
 
 extends(
     'Moonshine::Bootstrap::Component',

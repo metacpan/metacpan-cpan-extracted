@@ -34,6 +34,8 @@ key authentication according to the provided environment.
 Note that the OpenAI API is a paid service. You will need to sign up for an
 account.
 
+See [OpenAI::Client::OpenAI::Path](https://metacpan.org/pod/OpenAI%3A%3AClient%3A%3AOpenAI%3A%3APath) for a list of all available paths and methods.
+
 See the `examples/` directory in the distribution for more examples, along
 with the tests.
 
@@ -69,9 +71,11 @@ exception of the following extra options:
 
 ## Other Methods
 
-Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods).
+Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods). These
+method are deprecated and will be removed in a future version.
 
-The schema is documented in [OpenAPI::Client::OpenAI::Schema](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3ASchema).
+See [OpenAPI::Client::OpenAI::Path](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3APath) for an index of all paths available. You
+can click through each of them for more detail.
 
 # DEPRECATED METHODS
 

@@ -47,11 +47,11 @@ $SCRIPT = $FindBin::Bin . "/../lib/PkgConfig.pm"
 
 sub run_common {
     my @args = @_;
-    my $pkg_config = join ' ',
-                     map { /\s/ ? "\"$_\"" : $_ }
-                     ($^X, $SCRIPT);
-    (my $ret = qx($pkg_config --env-only @args))
-        =~ s/(?:^\s+)|($?:\s+$)//g;
+    unshift @args, $^X, $SCRIPT, '--env-only';
+    open my $fh, "-|", @args or die "open @args: $!";
+    local $/;
+    (my $ret = <$fh>) =~ s/(?:^\s+)|($?:\s+$)//g;
+    close $fh;
     $RV = $?;
     $S = $ret;
 }
@@ -67,8 +67,8 @@ sub run_exists_test {
     foreach my $fname (@$flist) {
         next unless -f $fname;
         my ($base) = fileparse($fname, ".pc");
-        run_common("$base");
-        ok($RV == 0, "Package $base exists");
+        run_common($base);
+        is $RV, 0, "Package $base exists";
     }
 }
 
@@ -76,8 +76,8 @@ sub _single_flags_test {
     my $fname = shift;
     return unless -f $fname;
     my ($base) = fileparse($fname, ".pc");
-    run_common("--libs --cflags $base --define-variable=prefix=blah");
-    ok($RV == 0, "Got OK for --libs and --cflags");
+    run_common(qw(--libs --cflags), $base, qw(--define-variable=prefix=blah));
+    is $RV, 0, "Got OK for '$fname' --libs and --cflags";
     if($S =~ /-(?:L|I)/) {
         if($S !~ /blah/) {
             
@@ -97,13 +97,13 @@ sub _single_flags_test {
             
             my @lines = <$fh>;
             if(grep /\$\{prefix\}/, @lines) {
-                ok(0, "Expected substituted prefix for $base");
+                fail "Expected substituted prefix for $base";
             } else {
                 note "File $fname has no \${prefix} directive";
             }
             return;
         }
-        ok($S =~ /blah/, "Found modified prefix for $base");
+        like $S, qr/blah/, "Found modified prefix for $base";
     }
 }
 

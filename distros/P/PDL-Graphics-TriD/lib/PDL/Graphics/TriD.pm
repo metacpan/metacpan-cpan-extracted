@@ -263,7 +263,7 @@ routines are supported:
 
 3D line plot, defined by a variety of contexts.
 
-Implemented by C<PDL::Graphics::TriD::LineStrip>.
+Implemented by L<PDL::Graphics::TriD::LineStrip>.
 
 =for usage
 
@@ -293,7 +293,7 @@ contexts and options
 
 3D line plot of non-continuous segments, defined by a variety of contexts.
 
-Implemented by C<PDL::Graphics::TriD::Lines>. Handles pairs of vertices
+Implemented by L<PDL::Graphics::TriD::Lines>. Handles pairs of vertices
 as produced by L<PDL::ImageND/contour_segments>.
 
 =for usage
@@ -319,9 +319,9 @@ as produced by L<PDL::ImageND/contour_segments>.
 
 3D rendered image plot, defined by a variety of contexts
 
-Implemented by C<PDL::Graphics::TriD::SLattice_S>.
+Implemented by L<PDL::Graphics::TriD::SLattice_S>.
 
-The variant, C<imag3d_ns>, is implemented by C<PDL::Graphics::TriD::SLattice>.
+The variant, C<imag3d_ns>, is implemented by L<PDL::Graphics::TriD::SLattice>.
 
 =for usage
 
@@ -345,7 +345,7 @@ contexts and options
 
 3D mesh plot, defined by a variety of contexts
 
-Implemented by C<PDL::Graphics::TriD::Lattice>.
+Implemented by L<PDL::Graphics::TriD::Lattice>.
 
 =for usage
 
@@ -383,13 +383,13 @@ vector points towards the clockface if the points go clockwise.
 Options: C<Smooth> (on by default), C<Lines> (off by default),
 C<ShowNormals> (off by default, useful for debugging).
 
-Implemented by C<PDL::Graphics::TriD::STrigrid_S>.
+Implemented by L<PDL::Graphics::TriD::STrigrid_S>.
 
 =head2 trigrid3d_ns
 
 Like L</trigrid3d>, but without shading or normals.
 
-Implemented by C<PDL::Graphics::TriD::STrigrid>.
+Implemented by L<PDL::Graphics::TriD::STrigrid>.
 
 =head2 points3d
 
@@ -397,7 +397,7 @@ Implemented by C<PDL::Graphics::TriD::STrigrid>.
 
 3D points plot, defined by a variety of contexts
 
-Implemented by C<PDL::Graphics::TriD::Points>.
+Implemented by L<PDL::Graphics::TriD::Points>.
 
 =for usage
 
@@ -424,7 +424,7 @@ This is a preliminary implementation as a proof of
 concept.  It has fixed radii for the spheres being
 drawn and no control of color or transparency.
 
-Implemented by C<PDL::Graphics::TriD::Spheres>.
+Implemented by L<PDL::Graphics::TriD::Spheres>.
 
 =for usage
 
@@ -445,7 +445,7 @@ Example:
 
 2D RGB image plot (see also imag2d)
 
-Implemented by C<PDL::Graphics::TriD::Image>.
+Implemented by L<PDL::Graphics::TriD::Image>.
 
 =for usage
 
@@ -470,7 +470,7 @@ e.g.
 
 2D RGB image plot as an object inside a 3D space
 
-Implemented by C<PDL::Graphics::TriD::Image>.
+Implemented by L<PDL::Graphics::TriD::Image>.
 
 =for usage
 
@@ -713,7 +713,7 @@ our @EXPORT_OK = qw/imag3d_ns imag3d line3d mesh3d lattice3d points3d
   twiddle3d grabpic3d tridsettings/;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 our $verbose;
-our $VERSION = '2.101';
+our $VERSION = '2.102';
 
 use PDL::Graphics::TriD::Object;
 use PDL::Graphics::TriD::Window;

@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,40 +17,42 @@
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034",
-            "perl" : "5.004"
+            "perl" : "5.020"
          }
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "CPAN::Meta::Converter" : "0",
+            "CPAN::Meta::Merge" : "0",
             "Dist::Zilla::Role::MetaProvider" : "0",
             "Dist::Zilla::Role::PrereqSource" : "0",
             "Moose" : "0",
             "MooseX::Types::Moose" : "0",
             "MooseX::Types::Stringlike" : "0",
             "Parse::CPAN::Meta" : "0",
+            "experimental" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.006"
+            "perl" : "5.020"
          }
       },
       "test" : {
          "requires" : {
             "File::Slurper" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "JSON::PP" : "0",
             "Test::DZil" : "0",
             "Test::More" : "0",
-            "perl" : "5.006",
+            "perl" : "5.020",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -59,18 +61,17 @@
    "provides" : {
       "Dist::Zilla::Plugin::MetaMergeFile" : {
          "file" : "lib/Dist/Zilla/Plugin/MetaMergeFile.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Dist::Zilla::Plugin::PrereqsFile" : {
          "file" : "lib/Dist/Zilla/Plugin/PrereqsFile.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-plugin-metamergefile at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaMergeFile"
+         "web" : "https://github.com/Leont/dist-zilla-plugin-metamergefile/issues"
       },
       "repository" : {
          "type" : "git",
@@ -78,13 +79,9 @@
          "web" : "https://github.com/Leont/dist-zilla-plugin-metamergefile"
       }
    },
-   "version" : "0.004",
-   "x_contributors" : [
-      "Dan Book <grinnz@gmail.com>",
-      "Leon Timmermans <fawaka@gmail.com>"
-   ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -7,20 +7,10 @@
 # You may use and distribute this software under the same terms and conditions
 # as Perl itself.
 
-package
-    PkgConfig::Vars;
-# this is a namespace for .pc files to hold their variables without
-# relying on lexical scope.
-
-package
-    PkgConfig::UDefs;
-# This namespace provides user-defined variables which are to override any
-# declarations within the .pc file itself.
-
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.25026';
+our $VERSION = '0.26026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -58,8 +48,6 @@ BEGIN {
 
     }
 }
-
-our $VarClassSerial = 0;
 
 ################################################################################
 ### Sane Defaults                                                            ###
@@ -475,9 +463,6 @@ struct(
      'pkg_description' => '$',
      'errmsg'   => '$',
 
-     # classes used for storing persistent data
-     'varclass' => '$',
-     'udefclass' => '$',
      'filevars' => '*%',
      'uservars' => '*%',
 
@@ -499,64 +484,41 @@ struct(
 ################################################################################
 ################################################################################
 
-sub _get_pc_varname {
-    my ($self,$vname_base) = @_;
-    $self->varclass . "::" . $vname_base;
-}
-
-sub _get_pc_udefname {
-    my ($self,$vname_base) = @_;
-    $self->udefclass . "::" . $vname_base;
-}
-
-sub _pc_var {
-    my ($self,$vname) = @_;
-    $vname =~ s,\.,DOT,g;
-    no strict 'refs';
-    $vname = $self->_get_pc_varname($vname);
-    no warnings qw(once);
-    my $glob = *{$vname};
-    $glob ? $$glob : ();
-}
-
-sub _quote_cvt($)  {
-    join ' ', map { s/(\s|"|')/\\$1/g; $_ } shellwords(shift)
-}
-
 sub assign_var {
-    my ($self,$field,$value) = @_;
-    no strict 'refs';
-
+    my ($self,$field,$value,$force) = @_;
     # if the user has provided a definition, use that.
-    if(exists ${$self->udefclass."::"}{$field}) {
+    if (!$force && exists $self->uservars->{$field}) {
         log_debug("Prefix already defined by user");
         return;
     }
-    my $evalstr = sprintf('$%s = PkgConfig::_quote_cvt(%s)',
-                    $self->_get_pc_varname($field), $value);
-
-    log_debug("EVAL", $evalstr);
-    do {
-        no warnings 'uninitialized';
-        eval $evalstr;
-    };
-    if($@) {
-        log_err($@);
+    my $filevars = $self->filevars;
+    if ($field =~ /(dir|prefix)$/ && $value !~ /\$/) {
+      # heuristic - it's a directory
+      $filevars->{$field} = [grep length, $value];
+      return;
     }
+    my (@inwords, @outwords) = shellwords $value; # FIRST split it
+    for my $inword (@inwords) {                   # THEN sub
+      my ($word, $outword) = ($inword, '');
+      while ($word =~ s/(^|.*?[^\$])\$\{([a-z_.]+)\}//s) {
+        my ($start, $var) = ($1, $2);
+        $outword .= $start;
+        my $val = $filevars->{$var};
+        next if !defined($val) or !grep length, @$val;
+        $outword .= "@$val";
+      }
+      $outword .= $word; # what's left
+      next if !length $outword;
+      $outword =~ s/\$\$/\$/g; # pkg-config escapes a '$' with a '$$'
+      push @outwords, $outword;
+    }
+    $filevars->{$field} = \@outwords;
 }
 
 sub prepare_vars {
     my $self = shift;
-    my $varclass = $self->varclass;
-    no strict 'refs';
-
-    %{$varclass . "::"} = ();
-
-    while (my ($name,$glob) = each %{$self->udefclass."::"}) {
-        my $ref = *$glob{SCALAR};
-        next unless defined $ref;
-        ${"$varclass\::$name"} = $$ref;
-    }
+    my $uv = $self->uservars;
+    $self->assign_var($_, $uv->{$_}, 1) for keys %$uv;
 }
 
 ################################################################################
@@ -587,19 +549,9 @@ sub find {
         #print "$basekey: " . Dumper($list);
     }
 
-    $VarClassSerial++;
-    $options{varclass} = sprintf("PkgConfig::Vars::SERIAL_%d", $VarClassSerial);
-    $options{udefclass} = sprintf("PkgConfig::UDefs::SERIAL_%d", $VarClassSerial);
+    $options{filevars} = {};
+    $options{uservars} = {$options{VARS} ? %{ delete $options{VARS} } : ()};
     $options{original} = \%original;
-
-
-    my $udefs = delete $options{VARS} || {};
-
-    while (my ($k,$v) = each %$udefs) {
-        no strict 'refs';
-        my $vname = join('::', $options{udefclass}, $k);
-        ${$vname} = $v;
-    }
 
     my $o = $cls->new(%options);
 
@@ -649,8 +601,7 @@ sub find {
 ################################################################################
 ################################################################################
 sub append_ldflags {
-    my ($self,@flags) = @_;
-    my @ld_flags = _split_flags(@flags);
+    my ($self,@ld_flags) = @_;
 
     foreach my $ldflag (@ld_flags) {
         next unless $ldflag =~ /^-Wl/;
@@ -677,7 +628,7 @@ sub append_ldflags {
 # notify us about extra compiler flags
 sub append_cflags {
     my ($self,@flags) = @_;
-    push @{$self->cflags}, _split_flags(@flags);
+    push @{$self->cflags}, @flags;
 }
 
 
@@ -724,10 +675,8 @@ sub get_requires {
     @ret;
 }
 
-
 sub parse_line {
-    my ($self,$line,$evals) = @_;
-    no strict 'vars';
+    my ($self,$line) = @_;
 
     $line =~ s/#[^#]+$//g; # strip comments
     return unless $line;
@@ -751,37 +700,20 @@ sub parse_line {
 
     $field = lc($field);
 
-    #perl variables can't have '.' in them:
-    $field =~ s/\./DOT/g;
+    my $filevars = $self->filevars;
+    if ($tok eq ':' and $field !~ /^(cflags|libs)/) {
+      $value =~ s/(^|[^\$])\$\{([a-z_.]+)\}/$1$filevars->{$2}[0]/g;
+      $filevars->{$field} = [grep length, $value]; # no need quoting
+      return;
+    }
 
     #remove quotes from field names
     $field =~ s/['"]//g;
 
-
-    # pkg-config escapes a '$' with a '$$'. This won't go in perl:
-    $value =~ s/[^\\]\$\$/\\\$/g;
-    $value =~ s/([@%&])/\$1/g;
-
-
-    # append our pseudo-package for persistence.
-    my $varclass = $self->varclass;
     $value =~ s/(\$\{[^}]+\})/lc($1)/ge;
 
-    $value =~ s/\$\{/\$\{$varclass\::/g;
-
-    # preserve quoted space
-    $value = join ' ', map { s/(["'])/\\$1/g; "'$_'" } shellwords $value
-      if $value =~ /[\\"']/;
-
-    #quote the value string, unless quoted already
-    $value = "\"$value\"";
-
     #get existent variables from our hash:
-
-
-    #$value =~ s/'/"/g; #allow for interpolation
     $self->assign_var($field, $value);
-
 }
 
 sub parse_pcfile {
@@ -798,33 +730,31 @@ sub parse_pcfile {
     $text =~ s,\\[\r\n],,g;
     @lines = split(/[\r\n]/, $text);
 
-    my @eval_strings;
-
     #Fold lines:
 
     my $pcfiledir = dirname $pcfile;
     $pcfiledir =~ s{\\}{/}g;
 
     foreach my $line ("pcfiledir=$pcfiledir", @lines) {
-        $self->parse_line($line, \@eval_strings);
+        $self->parse_line($line);
     }
 
     #now that we have eval strings, evaluate them all within the same
     #lexical scope:
 
 
-    $self->append_cflags(  $self->_pc_var('cflags') );
+    $self->append_cflags(  $self->get_var('cflags') );
     if($self->static) {
-        $self->append_cflags( $self->_pc_var('cflags.private') );
+        $self->append_cflags( $self->get_var('cflags.private') );
     }
-    $self->append_ldflags( $self->_pc_var('libs') );
+    $self->append_ldflags( $self->get_var('libs') );
     if($self->static) {
-        $self->append_ldflags( $self->_pc_var('libs.private') );
+        $self->append_ldflags( $self->get_var('libs.private') );
     }
 
     my @deps;
-    my @deps_dynamic = $self->get_requires( $self->_pc_var('requires'));
-    my @deps_static = $self->get_requires( $self->_pc_var('requires.private') );
+    my @deps_dynamic = $self->get_requires( $self->get_var('requires'));
+    my @deps_static = $self->get_requires( $self->get_var('requires.private') );
     @deps = @deps_dynamic;
 
 
@@ -833,9 +763,9 @@ sub parse_pcfile {
     }
 
     if($self->recursion == 1 && (!$self->pkg_exists())) {
-        $self->pkg_version( $self->_pc_var('version') );
-        $self->pkg_url( $self->_pc_var('url') );
-        $self->pkg_description( $self->_pc_var('description') );
+        $self->pkg_version( $self->get_var('version') );
+        $self->pkg_url( $self->get_var('url') );
+        $self->pkg_description( $self->get_var('description') );
         $self->pkg_exists(1);
     }
 
@@ -897,8 +827,15 @@ sub find_pcfile {
 ################################################################################
 ################################################################################
 
-sub _return_context (@) {
-    wantarray ? (@_) : join(' ', map { s/(\s|['"])/\\$1/g; $_ } @_)
+sub _quote_protect {
+  my ($v) = @_;
+  return qq{""} if !length($v); # empty strings get preserved
+  return $v if $v !~ /['"\s\\]/;
+  $v =~ s/["\\]/\\$&/g; # the "" will already protect from ' and space
+  $v =~ /['\s]/ ? qq{"$v"} : $v;
+}
+sub _return_context {
+  wantarray ? @_ : join ' ', map _quote_protect($_), @_;
 }
 
 sub get_cflags {
@@ -932,7 +869,7 @@ sub get_ldflags {
 
 sub get_var {
     my($self, $name) = @_;
-    $self->_pc_var($name);
+    _return_context @{ $self->filevars->{$name} };
 }
 
 sub get_list {
@@ -945,7 +882,7 @@ sub get_list {
         for my $pc (bsd_glob("$d/*.pc")) {
             if ($pc =~ m|/([^\\\/]+)\.pc$|) {
                 $self->parse_pcfile($pc);
-                push @rv, [$1, $self->_pc_var('name') . ' - ' . $self->_pc_var('description')];
+                push @rv, [$1, $self->get_var('name') . ' - ' . $self->get_var('description')];
             }
         }
     }
@@ -968,7 +905,6 @@ sub _split_flags {
     if(@flags == 1) {
         my $str = shift @flags;
         return () if !$str;
-        #@flags = map { s/\\(\s)/$1/g; $_ } split(/(?<!\\)\s+/, $str);
         @flags = shellwords $str;
     }
     @flags = grep $_, @flags;
@@ -981,7 +917,6 @@ sub filter_dups {
     my $array = shift;
     my @ret;
     my %seen_hash;
-    #@$array = reverse @$array;
     foreach my $elem (@$array) {
         if(exists $seen_hash{$elem}) {
             next;
@@ -1270,7 +1205,7 @@ if($o->print_variables) {
 }
 
 if($OutputVariableValue) {
-    my $val = ($o->_pc_var($OutputVariableValue) or "");
+    my $val = $o->get_var($OutputVariableValue) || "";
     print $val . "\n";
 }
 

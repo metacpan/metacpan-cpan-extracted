@@ -20,24 +20,23 @@ name: Excel-ValueReader-XLSX
 provides:
   Excel::ValueReader::XLSX:
     file: lib/Excel/ValueReader/XLSX.pm
-    version: '1.15'
+    version: '1.16'
   Excel::ValueReader::XLSX::Backend:
     file: lib/Excel/ValueReader/XLSX/Backend.pm
-    version: '1.15'
   Excel::ValueReader::XLSX::Backend::LibXML:
     file: lib/Excel/ValueReader/XLSX/Backend/LibXML.pm
-    version: '1.15'
   Excel::ValueReader::XLSX::Backend::Regex:
     file: lib/Excel/ValueReader/XLSX/Backend/Regex.pm
-    version: '1.15'
 recommends:
   XML::LibXML::Reader: '0'
 requires:
   Archive::Zip: '1.61'
   Carp: '0'
   Date::Calc: '0'
+  Iterator::Simple: '0'
   Module::Load: '0'
   Moose: '0'
+  MooseX::StrictConstructor: '0'
   POSIX: '0'
   Scalar::Util: '0'
   perl: '5.012001'
@@ -45,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-ValueReader-XLSX
-version: '1.15'
+version: '1.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

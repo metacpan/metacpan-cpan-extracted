@@ -1,0 +1,123 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::completions - Documentation for the /completions path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</completions>.
+
+=head1 PATHS
+
+
+=head2 C<POST /completions>
+
+Creates a completion for the provided prompt and parameters.
+
+
+
+=head3 Operation ID
+
+C<createCompletion>
+
+    $client->createCompletion( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+
+=head4 Models
+
+ID of the model to use. You can use the L<List models|https://platform.openai.com/docs/api-reference/models/list> API to see all of your available models, or see our L<Model overview|https://platform.openai.com/docs/models> for descriptions of them.
+
+=over 4
+      
+=item * C<gpt-3.5-turbo-instruct>
+
+=item * C<davinci-002>
+
+=item * C<babbage-002>
+
+=back
+      
+      
+Example:
+
+    {
+       "max_tokens" : 16,
+       "n" : 1,
+       "stream_options" : null,
+       "suffix" : "test.",
+       "temperature" : 1,
+       "top_p" : 1,
+       "user" : "user-1234"
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+      "object": "text_completion",
+      "created": 1589478378,
+      "model": "gpt-4-turbo",
+      "choices": [
+        {
+          "text": "\n\nThis is indeed a test",
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 7,
+        "total_tokens": 12
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

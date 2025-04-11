@@ -1,0 +1,249 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::chat-completions-completion_id - Documentation for the /chat/completions/{completion_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</chat/completions/{completion_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /chat/completions/{completion_id}>
+
+Delete a stored chat completion. Only Chat Completions that have been
+created with the C<store> parameter set to C<true> can be deleted.
+
+
+
+=head3 Operation ID
+
+C<deleteChatCompletion>
+
+    $client->deleteChatCompletion( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<completion_id> (in path) (Required) - The ID of the chat completion to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The chat completion was deleted successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /chat/completions/{completion_id}>
+
+Get a stored chat completion. Only Chat Completions that have been created
+with the C<store> parameter set to C<true> will be returned.
+
+
+
+=head3 Operation ID
+
+C<getChatCompletion>
+
+    $client->getChatCompletion( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<completion_id> (in path) (Required) - The ID of the chat completion to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+A chat completion
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "chatcmpl-B9MHDbslfkBeAs8l4bebGdFOJ6PeG",
+      "object": "chat.completion",
+      "created": 1741570283,
+      "model": "gpt-4o-2024-08-06",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The image shows a wooden boardwalk path running through a lush green field or meadow. The sky is bright blue with some scattered clouds, giving the scene a serene and peaceful atmosphere. Trees and shrubs are visible in the background.",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 46,
+        "total_tokens": 1163,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_fc9f1d7035"
+    }
+
+
+=back
+
+=head2 C<POST /chat/completions/{completion_id}>
+
+Modify a stored chat completion. Only Chat Completions that have been
+created with the C<store> parameter set to C<true> can be modified. Currently,
+the only supported modification is to update the C<metadata> field.
+
+
+
+=head3 Operation ID
+
+C<updateChatCompletion>
+
+    $client->updateChatCompletion( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<completion_id> (in path) (Required) - The ID of the chat completion to update.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+A chat completion
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "chatcmpl-B9MHDbslfkBeAs8l4bebGdFOJ6PeG",
+      "object": "chat.completion",
+      "created": 1741570283,
+      "model": "gpt-4o-2024-08-06",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The image shows a wooden boardwalk path running through a lush green field or meadow. The sky is bright blue with some scattered clouds, giving the scene a serene and peaceful atmosphere. Trees and shrubs are visible in the background.",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 46,
+        "total_tokens": 1163,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_fc9f1d7035"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

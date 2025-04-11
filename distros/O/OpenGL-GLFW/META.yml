@@ -20,7 +20,8 @@ no_index:
     - inc
 requires:
   ExtUtils::MakeMaker: '6.64'
+  perl: '5.010'
 resources:
   repository: git://github.com/devel-chm/OpenGL-GLFW.git
-version: '0.0401'
+version: '0.0402'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

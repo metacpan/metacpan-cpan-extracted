@@ -1,0 +1,124 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::models-model - Documentation for the /models/{model} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</models/{model}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /models/{model}>
+
+Delete a fine-tuned model. You must have the Owner role in your organization to delete a model.
+
+
+
+=head3 Operation ID
+
+C<deleteModel>
+
+    $client->deleteModel( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<model> (in path) (Required) - The model to delete
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /models/{model}>
+
+Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
+
+
+
+=head3 Operation ID
+
+C<retrieveModel>
+
+    $client->retrieveModel( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<model> (in path) (Required) - The ID of the model to use for this request
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "VAR_chat_model_id",
+      "object": "model",
+      "created": 1686935002,
+      "owned_by": "openai"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

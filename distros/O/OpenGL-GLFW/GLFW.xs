@@ -1682,6 +1682,37 @@ glfwGetTimerFrequency();
 uint64_t
 glfwGetTimerValue();
 
+#if (GLFW_VERSION_MAJOR*10000 + GLFW_VERSION_MINOR*100) >= 30300
+
+void
+glfwRequestWindowAttention(GLFWwindow* window);
+
+#endif
+
+#if (GLFW_VERSION_MAJOR*10000 + GLFW_VERSION_MINOR*100) >= 30400
+
+int
+glfwPlatformSupported(int platform);
+
+int
+glfwGetPlatform();
+
+#endif
+
+void
+glfwGetError();
+PREINIT:
+  int errcode;
+  char* description;
+PPCODE:
+  errcode = glfwGetError((const char**)&description);
+  EXTEND(SP, 2);
+  PUSHs(sv_2mortal(newSViv(errcode)));
+  PUSHs(!description ? &PL_sv_undef : sv_2mortal(newSVpv(description, 0)));
+
+void
+glfwInitHint(int hint, int value);
+
 #//-------------------------------------------------------------------
 #// OpenGL not supported (use GLEW)
 #//-------------------------------------------------------------------

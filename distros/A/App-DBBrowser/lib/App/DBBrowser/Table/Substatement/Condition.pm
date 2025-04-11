@@ -92,7 +92,10 @@ sub add_condition {
             $sql->{$stmt} .= ")";
             next COL;
         }
-        if ( @bu > 1 && $sql->{$stmt} !~ /\(\z/ ) {
+        if ( @bu == 1 || $sql->{$stmt} =~ /\(\z/ ) {
+            $AND_OR = '';
+        }
+        else {
             my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
             # Choose
             my $choice = $tc->choose(
@@ -105,9 +108,6 @@ sub add_condition {
                 next COL;
             }
             $AND_OR = ' ' . $choice;
-        }
-        else {
-            $AND_OR = '';
         }
         if ( $col eq '(' ) {
             $sql->{$stmt} .= $AND_OR . " (";

@@ -1,5 +1,8 @@
 Revision history for PkgConfig
 
+0.26026 2025-04-10 08:11:00 -0700
+  - Fixes for spaces and long filenames (gh#48, gh#61, mohawk++)
+
 0.25026 2020-11-11 03:32:17 -0700
   - Handle spaces in Perl and PkgConfig.pm path (gh#47, gh#52)
   - Fixed bug where --print-errors and --silence-errors were backwards,

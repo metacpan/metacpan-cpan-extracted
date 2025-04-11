@@ -1,0 +1,143 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-usage-audio_speeches - Documentation for the /organization/usage/audio_speeches path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/usage/audio_speeches>.
+
+=head1 PATHS
+
+
+=head2 C<GET /organization/usage/audio_speeches>
+
+Get audio speeches usage details for the organization.
+
+
+
+=head3 Operation ID
+
+C<usage-audio-speeches>
+
+    $client->usage-audio-speeches( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<start_time> (in query) (Required) - Start time (Unix seconds) of the query time range, inclusive.
+
+Type: C<integer>
+
+
+
+=item * C<end_time> (in query) (Optional) - End time (Unix seconds) of the query time range, exclusive.
+
+Type: C<integer>
+
+
+
+=item * C<bucket_width> (in query) (Optional) - Width of each time bucket in response. Currently `1m`, `1h` and `1d` are supported, default to `1d`.
+
+Type: C<string>
+
+Allowed values: C<1m, 1h, 1d>
+
+
+Default: C<1d>
+
+
+=item * C<project_ids> (in query) (Optional) - Return only usage for these projects.
+
+Type: C<array>
+
+
+
+=item * C<user_ids> (in query) (Optional) - Return only usage for these users.
+
+Type: C<array>
+
+
+
+=item * C<api_key_ids> (in query) (Optional) - Return only usage for these API keys.
+
+Type: C<array>
+
+
+
+=item * C<models> (in query) (Optional) - Return only usage for these models.
+
+Type: C<array>
+
+
+
+=item * C<group_by> (in query) (Optional) - Group the usage data by the specified fields. Support fields include `project_id`, `user_id`, `api_key_id`, `model` or any combination of them.
+
+Type: C<array>
+
+
+
+=item * C<limit> (in query) (Optional) - Specifies the number of buckets to return.
+- `bucket_width=1d`: default: 7, max: 31
+- `bucket_width=1h`: default: 24, max: 168
+- `bucket_width=1m`: default: 60, max: 1440
+
+
+Type: C<integer>
+
+
+
+=item * C<page> (in query) (Optional) - A cursor for use in pagination. Corresponding to the `next_page` field from the previous response.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Usage data retrieved successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          {
+             "result" : [
+                null
+             ]
+          }
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

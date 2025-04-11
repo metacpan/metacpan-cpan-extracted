@@ -9,9 +9,11 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.md
+t/from_filehandle.t
 t/ulibuck.xlsx
 t/valuereader.t
 t/valuereader.xlsx
 t/valuereader1904.xlsx
 t/Mappe1.xlsx
 t/cells_without_r_attr.xlsx
+

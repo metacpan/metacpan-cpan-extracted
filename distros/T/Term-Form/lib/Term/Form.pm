@@ -2,9 +2,9 @@ package Term::Form;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '0.560';
+our $VERSION = '0.561';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -649,7 +649,7 @@ sub __get_row {
         my $key = $list->[$idx][0];
         $self->{i}{keys}[$idx] = unicode_sprintf(
             $key, $self->{i}{max_key_w},
-            { mark_if_truncated => [ $self->{i}{char_trimmed}, $self->{i}{char_trimmed_w} ] }
+            { suffix_on_truncate => [ $self->{i}{char_trimmed}, $self->{i}{char_trimmed_w} ] }
         );
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
@@ -1170,7 +1170,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.560
+Version 0.561
 
 =cut
 
@@ -1366,7 +1366,7 @@ The expected value is a regex quoted with the C<qr> operator.
 
 =head2 Perl version
 
-Requires Perl version 5.10.0 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Terminal
 

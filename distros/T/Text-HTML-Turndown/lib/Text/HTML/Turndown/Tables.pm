@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::Tables 0.04;
+package Text::HTML::Turndown::Tables 0.05;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';
@@ -37,7 +37,7 @@ our %RULES = (
                         $border = $alignMap->{$align} || $border;
                     }
 
-                    $borderCells .= cell($border, $ch)
+                    $borderCells .= cell($border, $ch, undef)
                 }
             }
             return "\n" . $content . ($borderCells ? "\n" . $borderCells : '')
@@ -102,11 +102,20 @@ sub isFirstTbody ($element) {
   )
 }
 
-sub cell ($content, $node) {
-  #my $index = indexOf.call(node.parentNode.childNodes, node)
+sub cell ($content, $node, $escape=1) {
   my $first = !$node->previousSibling;
   my $prefix = ' ';
   if ($first) { $prefix = '| ' };
+
+  # We assume that we have no further HTML tags contained in $content
+  # convert all elements in $content into their Markdown equivalents
+  if( $escape ) {
+    $content = Text::HTML::Turndown->escape( $content );
+  }
+
+  # Fix up newlines
+  $content =~ s!\r?\n!<br/>!g;
+
   return $prefix . $content . ' |'
 }
 

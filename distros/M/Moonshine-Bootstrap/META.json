@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Moonshine-Bootstrap",
    "no_index" : {
@@ -35,11 +35,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Method::Traits" : "0.08",
             "Module::Find" : "0.13",
             "Moonshine::Component" : "0.06",
             "Moonshine::Element" : "0.10",
             "Moonshine::Magic" : "0.06",
             "Moonshine::Util" : "0.06",
+            "Switch::Back" : "0.000005",
             "feature" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -49,11 +51,12 @@
    },
    "provides" : {
       "Moonshine::Bootstrap" : {
-         "file" : "lib/Moonshine/Bootstrap.pm"
+         "file" : "lib/Moonshine/Bootstrap.pm",
+         "version" : "0.04"
       },
       "Moonshine::Bootstrap::Component" : {
          "file" : "lib/Moonshine/Bootstrap/Component.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Moonshine::Bootstrap::Component::Abbr" : {
          "file" : "lib/Moonshine/Bootstrap/Component/Abbr.pm"
@@ -481,6 +484,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Bootstrap"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

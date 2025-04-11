@@ -1,34 +1,33 @@
+0.0402 2025-04-11
+- minimum Perl 5.10 for better Exporter
+- add constants up to GLFW 3.4
+- add functions: glfwPlatformSupported, glfwGetPlatform, glfwGetError, glfwInitHint, glfwRequestWindowAttention
+
 0.0401 2025-03-27
 - add GLFW_TRANSPARENT_FRAMEBUFFER and glfwGetMonitorWorkarea (#1) - thanks @SeHarrys
 
 0.04     2017-09-23 16:29:52-04:00
-         - New offical release
-
+- New offical release
 
 0.03_01  2017-09-20 13:44:28-04:00
-         - Increment reference counts on callbacks
-	   to avoid problems when the original CV
-	   goes out of scope.
-
+- Increment reference counts on callbacks
+  to avoid problems when the original CV
+  goes out of scope.
 
 0.03     2017-08-25 12:13:51-04:00
-         - First official CPAN release
-	 - Clean up perl docs
-	 - Add git repo information to META
+- First official CPAN release
+- Clean up perl docs
+- Add git repo information to META
 
 0.02_02  2017-08-19 14:48:34-04:00
-         - Improved documentation of implementation
-         - Added gears.pl implementation to examples
-         - This is release candidate for our first
-           official release
-
+- Improved documentation of implementation
+- Added gears.pl implementation to examples
+- This is release candidate for our first official release
 
 0.02_01  2017-08-06 12:13:54-04:00
-         - First complete coverage of GLFW bindings
-         - Add rudimentary pkg-config for build support
+- First complete coverage of GLFW bindings
+- Add rudimentary pkg-config for build support
 
 0.01     2017-06-14 17:13:17-04:00 
-         - original version; created by h2xs 1.23 with options
-             -b 5.10.1 -OAfn OpenGL::GLFW
-         - edit template h2xs files
-
+- original version; created by h2xs 1.23 with options -b 5.10.1 -OAfn OpenGL::GLFW
+- edit template h2xs files

@@ -15,7 +15,7 @@ use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::Auxil;
 
-my $pf_saved_subqueries = '- ';
+my $pf_saved_subqueries = '= ';
 my $pf_subquery_history = '~ ';
 my $pf_print_history    = '| ';
 

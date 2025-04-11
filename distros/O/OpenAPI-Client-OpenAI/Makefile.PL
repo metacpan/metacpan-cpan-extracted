@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
         'Markdown::Pod'        => '0',
         'Feature::Compat::Try' => '0',
         'Perl::Tidy'           => '0',
-        'Pod::Markdown'        => '0',
+        'Markdown::Pod'        => '0',
         'Template'             => '0',
     },
     CONFIGURE_REQUIRES => {

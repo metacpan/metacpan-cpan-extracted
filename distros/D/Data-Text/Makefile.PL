@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'Data::Text',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -18,19 +27,19 @@ WriteMakefile(
 	TEST_REQUIRES => {
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
-		'Test::Needs' => 0,
-		'Test::Requires' => 0,	# Actually only if AUTHOR_TESTING is set
-		'Test::Warn' => 0
+		'Test::Needs' => 0
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Lingua::Conjunction' => 0,
 		'overload' => 0,
+		'Params::Get' => 0,
+		'Scalar::Util' => 0,
 		'String::Clean' => 0,
 		'String::Util' => 0
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	}, dist => $dist,
 	clean		=> { FILES => 'Data-Text-*' },
 	# META_ADD => {
 		# provides => {}

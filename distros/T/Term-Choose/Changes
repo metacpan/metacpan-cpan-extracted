@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.773   2025-04-10
+    - Removed expensive shortcut in 'line_fold'.
+    - Updated 'print_columns': less slowdown with long strings.
+    - New function 'adjust_to_printwidth' in LineFold.pm.
+    - Raised Perl minimum version to 5.10.1.
+    - Made 'char_width' exportable.
+
 1.772   2025-03-31
     - Refactored 'print_columns' and 'cut_to_printwidth'.
     - Update documentation Term::Choose::LineFold.

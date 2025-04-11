@@ -14,7 +14,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 extends ("Moonshine::Component");
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 BEGIN {
     my %grid = (
@@ -104,7 +104,7 @@ Moonshine::Bootstrap::Component - HTML Bootstrap Component base.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 

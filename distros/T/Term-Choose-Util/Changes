@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.145   2025-04-10
+        - Raised Perl minimum version to 5.10.1.
+        - Bugfix in 'unicode_sprintf'.
+
 0.144   2025-03-05
         - Term::Choose minimum version 1.768.
 

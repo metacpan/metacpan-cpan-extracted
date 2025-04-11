@@ -1,7 +1,7 @@
 This archive contains the distribution Dist-Zilla-Plugin-DynamicPrereqs-Meta,
-version 0.004:
+version 0.005:
 
-  Add dynamic prereqs to to the metadata in our Dist::Zilla build
+  Add dynamic prereqs to the metadata
 
 This software is copyright (c) 2024 by Leon Timmermans.
 

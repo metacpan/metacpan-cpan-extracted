@@ -9,12 +9,15 @@ demos/tvrml2.p
 lib/PDL/Demos/TriD1.pm
 lib/PDL/Demos/TriD2.pm
 lib/PDL/Demos/TriDGallery.pm
+lib/PDL/Graphics/OpenGLQ-font.c
+lib/PDL/Graphics/OpenGLQ-sphere.c
 lib/PDL/Graphics/OpenGLQ.pd
 lib/PDL/Graphics/TriD.pm
 lib/PDL/Graphics/TriD/ArcBall.pm
 lib/PDL/Graphics/TriD/ButtonControl.pm
 lib/PDL/Graphics/TriD/Contours.pm
 lib/PDL/Graphics/TriD/GL.pm
+lib/PDL/Graphics/TriD/GL/GLFW.pm
 lib/PDL/Graphics/TriD/GL/GLUT.pm
 lib/PDL/Graphics/TriD/GL/GLX.pm
 lib/PDL/Graphics/TriD/Graph.pm
@@ -31,7 +34,6 @@ lib/PDL/Graphics/TriD/ScrollButtonScaler.pm
 lib/PDL/Graphics/TriD/SimpleController.pm
 lib/PDL/Graphics/TriD/SimpleScaler.pm
 lib/PDL/Graphics/TriD/TextObjects.pm
-lib/PDL/Graphics/TriD/Tk.pm
 lib/PDL/Graphics/TriD/ViewPort.pm
 lib/PDL/Graphics/TriD/VRML.pm
 lib/PDL/Graphics/TriD/Window.pm

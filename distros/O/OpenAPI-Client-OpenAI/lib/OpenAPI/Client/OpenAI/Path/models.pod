@@ -1,0 +1,71 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::models - Documentation for the /models path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</models>.
+
+=head1 PATHS
+
+
+=head2 C<GET /models>
+
+Lists the currently available models, and provides basic information about each one such as the owner and availability.
+
+
+
+=head3 Operation ID
+
+C<listModels>
+
+    $client->listModels( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"id\": \"VAR_chat_model_id\",\n  \"object\": \"model\",\n  \"created\": 1686935002,\n  \"owned_by\": \"openai\"\n}\n"
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

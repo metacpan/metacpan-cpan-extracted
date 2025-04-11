@@ -1,23 +1,63 @@
 package Moonshine::Bootstrap;
 
+our $VERSION = '0.04';
+
 1;
 
 __END__
-
-=cut
-
 
 =head1 NAME
 
 Moonshine::Bootstrap - Shine.
 
+=head1 SYNOPSIS
+
+	use Moonshine::Bootstrap::v3;
+
+	my $bs = Moonshine::Bootstrap::v3->new();
+
+	my $template = $bs->basic_template();
+
+	my $body = $template->get_element('body', ['tag']);
+
+	$body->add_child(
+		$bs->nav({
+			switch => 'tabs',
+			nav_items => [
+				{
+					data => 'Home',
+					active => 1
+				},
+				{
+					data => 'Profile'
+				},
+				{
+					data => 'Messages'
+				}
+			],
+		})
+	);
+
+	my $jumbo = $bs->jumbotron();
+
+	$jumbo->add_child({
+		tag => "h1",
+		data => "Hello World"
+	});
+
+	$body->add_child($jumbo);
+
+	print $template->render();
+
+	...
+	
+	<html lang="en"><head><meta charset="utf-8"></meta><meta content="IE=edge" http-equiv="X-UA-Compatible"></meta><meta content="width=device-width, inline-scale=1" name="viewport"></meta></head><body><ul class="nav nav-tabs"><li class="active" role="presentation"><a href="#">Home</a></li><li role="presentation"><a href="#">Profile</a></li><li role="presentation"><a href="#">Messages</a></li></ul><div class="jumbotron"><h1>Hello World</h1></div></body></html>
+
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
-
-our $VERSION = '0.03';
 
 =head1 AUTHOR
 

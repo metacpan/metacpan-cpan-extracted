@@ -16,6 +16,7 @@ WriteMakefile(
     PREREQ_PM         => {
         'ExtUtils::MakeMaker' => 6.64,         # needed for TEST_REQUIRES
     },
+    MIN_PERL_VERSION => '5.010',
     TEST_REQUIRES     => {
         'OpenGL::Modern' => 0.04,
     },

@@ -1,0 +1,223 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id - Documentation for the /vector_stores/{vector_store_id}/files/{file_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</vector_stores/{vector_store_id}/files/{file_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /vector_stores/{vector_store_id}/files/{file_id}>
+
+Delete a vector store file. This will remove the file from the vector store but the file itself will not be deleted. To delete the file, use the L<delete file|https://platform.openai.com/docs/api-reference/files/delete> endpoint.
+
+
+
+=head3 Operation ID
+
+C<deleteVectorStoreFile>
+
+    $client->deleteVectorStoreFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the file belongs to.
+
+Type: C<string>
+
+
+
+=item * C<file_id> (in path) (Required) - The ID of the file to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /vector_stores/{vector_store_id}/files/{file_id}>
+
+Retrieves a vector store file.
+
+
+
+=head3 Operation ID
+
+C<getVectorStoreFile>
+
+    $client->getVectorStoreFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the file belongs to.
+
+Type: C<string>
+
+
+
+=item * C<file_id> (in path) (Required) - The ID of the file being retrieved.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "file-abc123",
+      "object": "vector_store.file",
+      "usage_bytes": 1234,
+      "created_at": 1698107661,
+      "vector_store_id": "vs_abc123",
+      "status": "completed",
+      "last_error": null,
+      "chunking_strategy": {
+        "type": "static",
+        "static": {
+          "max_chunk_size_tokens": 800,
+          "chunk_overlap_tokens": 400
+        }
+      }
+    }
+
+
+=back
+
+=head2 C<POST /vector_stores/{vector_store_id}/files/{file_id}>
+
+Update attributes on a vector store file.
+
+
+
+=head3 Operation ID
+
+C<updateVectorStoreFileAttributes>
+
+    $client->updateVectorStoreFileAttributes( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<vector_store_id> (in path) (Required) - The ID of the vector store the file belongs to.
+
+Type: C<string>
+
+
+
+=item * C<file_id> (in path) (Required) - The ID of the file to update attributes.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "file-abc123",
+      "object": "vector_store.file",
+      "usage_bytes": 1234,
+      "created_at": 1698107661,
+      "vector_store_id": "vs_abc123",
+      "status": "completed",
+      "last_error": null,
+      "chunking_strategy": {
+        "type": "static",
+        "static": {
+          "max_chunk_size_tokens": 800,
+          "chunk_overlap_tokens": 400
+        }
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

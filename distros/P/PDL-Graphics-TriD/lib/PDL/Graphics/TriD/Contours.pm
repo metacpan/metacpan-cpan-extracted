@@ -57,12 +57,10 @@ value using the set_color_table function.
   ContourMax  => 10.0 # explicitly set a contour maximum
   ContourVals => $pdl # explicitly set all contour values
   Label => [1,5,$myfont] # see addlabels below
-  Font =>  $font      # explicitly set the font for contour labels
 
   If ContourVals is specified ContourInt, ContourMin, and ContourMax
   are ignored.  If no options are specified, the algorithm tries to
-  choose values based on the data supplied.  Font can also be specified or
-  overwritten by the addlabels() function below.
+  choose values based on the data supplied.
 
 =cut
 
@@ -152,8 +150,7 @@ sub get_valid_options{
 			 ContourMax=>  undef,
 			 ContourVals=> pdl->null,
 			 UseDefcols=>1,
-	                 Labels=> undef,
-			 Font=>$PDL::Graphics::TriD::GL::fontbase}
+	                 Labels=> undef}
 }
 
 =head2 addlabels()
@@ -164,7 +161,7 @@ Add labels to a contour plot
 
 =for usage
 
-  $contour->addlabels($labelint,$segint,$font);
+  $contour->addlabels($labelint,$segint);
 
 $labelint is the integer interval between labeled contours.  If you
 have 8 contour levels and specify $labelint=3 addlabels will attempt
@@ -178,10 +175,9 @@ $segint defaults to 5, that is every fifth line segment will be labeled.
 =cut
 
 sub addlabels{
-  my ($self,$labelint, $segint ,$font) = @_;
+  my ($self,$labelint, $segint) = @_;
 
   $labelint = 1 unless(defined $labelint);
-  $font =  $self->{Options}{Font} unless(defined $font);
   $segint = 5 unless(defined $segint);
 
   my $cnt=0;
@@ -224,7 +220,6 @@ sub addlabels{
 		->append($lp->reshape(3,$lp->nelem/3)->transpose)->transpose;
 	 $self->{Labels} = [$cnt+1,$cnt+$lp->nelem/3];
 	 $self->{LabelStrings} = $strlist;
-	 $self->{Options}{Font}=$font;
   }
 
 }

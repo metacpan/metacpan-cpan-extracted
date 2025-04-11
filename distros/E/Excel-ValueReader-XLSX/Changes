@@ -1,5 +1,9 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.16 07.04.2025
+  - new methods ivalues() and itable(), iterators for getting rows one at a time
+  - tables with a 'totals' row can be retrieved without or with that final row
+
 1.15 11.01.2025
   - fix bug in table() with 'ref' param (Ephraim Stevens++)
 

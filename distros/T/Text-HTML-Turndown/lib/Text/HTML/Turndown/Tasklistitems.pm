@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::Tasklistitems 0.04;
+package Text::HTML::Turndown::Tasklistitems 0.05;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';

@@ -1,0 +1,144 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id - Documentation for the /organization/admin_api_keys/{key_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/admin_api_keys/{key_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /organization/admin_api_keys/{key_id}>
+
+Delete an organization admin API key
+
+
+Delete the specified admin API key.
+
+
+
+=head3 Operation ID
+
+C<admin-api-keys-delete>
+
+    $client->admin-api-keys-delete( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<key_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Confirmation that the API key was deleted.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "deleted" : true,
+       "id" : "key_abc",
+       "object" : "organization.admin_api_key.deleted"
+    }
+
+
+=back
+
+=head2 C<GET /organization/admin_api_keys/{key_id}>
+
+Retrieve a single organization API key
+
+
+Get details for a specific organization API key by its ID.
+
+
+
+=head3 Operation ID
+
+C<admin-api-keys-get>
+
+    $client->admin-api-keys-get( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<key_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Details of the requested API key.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "created_at" : 1711471533,
+       "id" : "key_abc",
+       "name" : "Administration Key",
+       "object" : "organization.admin_api_key",
+       "owner" : {
+          "created_at" : 1711471533,
+          "id" : "sa_456",
+          "name" : "My Service Account",
+          "role" : "member",
+          "type" : "service_account"
+       },
+       "redacted_value" : "sk-admin...def",
+       "value" : "sk-admin-1234abcd"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

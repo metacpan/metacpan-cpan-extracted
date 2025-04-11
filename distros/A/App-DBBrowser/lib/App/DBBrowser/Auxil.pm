@@ -12,7 +12,7 @@ use List::MoreUtils qw( none uniq );
 
 use Term::Choose            qw();
 use Term::Choose::Constants qw( EXTRA_W );
-use Term::Choose::LineFold  qw( line_fold print_columns );
+use Term::Choose::LineFold  qw( line_fold );
 use Term::Choose::Screen    qw( clear_screen );
 use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
 use Term::Form::ReadLine    qw();
@@ -298,32 +298,30 @@ sub info_format_insert_args {
         my $begin_idx_part_2 = $row_count - $count_part_2;
         my $end___idx_part_2 = $row_count - 1;
         for my $row ( @{$sql->{insert_args}}[ $begin_idx_part_1 .. $end___idx_part_1 ] ) {
-            push @$tmp, $sf->__prepare_table_row( $row, $indent, $term_w );
+            push @$tmp, $sf->__prepare_data_row( $row, $indent, $term_w );
         }
         push @$tmp, $indent . '[...]';
         for my $row ( @{$sql->{insert_args}}[ $begin_idx_part_2 .. $end___idx_part_2 ] ) {
-            push @$tmp, $sf->__prepare_table_row( $row, $indent, $term_w );
+            push @$tmp, $sf->__prepare_data_row( $row, $indent, $term_w );
         }
         my $row_count = scalar( @{$sql->{insert_args}} );
         push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{i}{info_thsd_sep} ) . ' rows]';
     }
     else {
         for my $row ( @{$sql->{insert_args}} ) {
-            push @$tmp, $sf->__prepare_table_row( $row, $indent, $term_w );
+            push @$tmp, $sf->__prepare_data_row( $row, $indent, $term_w );
         }
     }
     return $tmp;
 }
 
 
-sub __prepare_table_row {
+sub __prepare_data_row {
     my ( $sf, $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
-    my $dots = $sf->{i}{dots};
-    my $dots_w = print_columns( $dots );
     no warnings 'uninitialized';
     my $row_str = join( $list_sep, map { s/\t/  /g; s/\n/\\n/g; s/\v/\\v/g; $_ } @$row );
-    return unicode_sprintf( $indent . $row_str, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
+    return unicode_sprintf( $indent . $row_str, $term_w, { suffix_on_truncate => $sf->{i}{dots} } );
 }
 
 

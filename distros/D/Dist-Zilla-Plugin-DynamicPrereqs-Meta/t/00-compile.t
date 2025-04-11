@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Dist/Zilla/Plugin/DynamicPrereqs/Meta.pm'
+    'Dist/Zilla/Plugin/DynamicPrereqs/DistBuild.pm',
+    'Dist/Zilla/Plugin/DynamicPrereqs/Meta.pm',
+    'Dist/Zilla/Plugin/DynamicPrereqs/ModuleBuildTiny.pm',
+    'Dist/Zilla/Role/DynamicPrereqs/Meta.pm'
 );
 
 

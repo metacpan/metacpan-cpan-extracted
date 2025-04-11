@@ -2,9 +2,9 @@ package Term::Choose;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '1.772';
+our $VERSION = '1.773';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1280,7 +1280,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.772
+Version 1.773
 
 =cut
 
@@ -1900,7 +1900,7 @@ list context.
 
 =head2 Perl version
 
-Requires Perl version 5.10.0 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Optional modules
 

@@ -1,0 +1,174 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::files - Documentation for the /files path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</files>.
+
+=head1 PATHS
+
+
+=head2 C<GET /files>
+
+Returns a list of files.
+
+
+
+=head3 Operation ID
+
+C<listFiles>
+
+    $client->listFiles( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<purpose> (in query) (Optional) - Only return files with the given purpose.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 10,000, and the default is 10,000.
+
+
+Type: C<integer>
+
+
+Default: C<10000>
+
+
+=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
+
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<desc>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"id\": \"file-abc123\",\n  \"object\": \"file\",\n  \"bytes\": 120000,\n  \"created_at\": 1677610602,\n  \"expires_at\": 1680202602,\n  \"filename\": \"salesOverview.pdf\",\n  \"purpose\": \"assistants\",\n}\n"
+       ],
+       "first_id" : "file-abc123",
+       "has_more" : false,
+       "last_id" : "file-abc456",
+       "object" : "list"
+    }
+
+
+=back
+
+=head2 C<POST /files>
+
+Upload a file that can be used across various endpoints. Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 100 GB.
+
+The Assistants API supports files up to 2 million tokens and of specific file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for details.
+
+The Fine-tuning API only supports C<.jsonl> files. The input also has certain required formats for fine-tuning L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input> or L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input> models.
+
+The Batch API only supports C<.jsonl> files up to 200 MB in size. The input also has a specific required L<format|https://platform.openai.com/docs/api-reference/batch/request-input>.
+
+Please L<contact us|https://help.openai.com/> if you need to increase these storage limits.
+
+
+
+=head3 Operation ID
+
+C<createFile>
+
+    $client->createFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<multipart/form-data>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "file-abc123",
+      "object": "file",
+      "bytes": 120000,
+      "created_at": 1677610602,
+      "expires_at": 1680202602,
+      "filename": "salesOverview.pdf",
+      "purpose": "assistants",
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

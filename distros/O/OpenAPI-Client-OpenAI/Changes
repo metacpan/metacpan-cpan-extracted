@@ -1,5 +1,43 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.21    2025-04-11
+        - Added examples to the docs, along with allowed models for each path.
+
+0.20    2025-04-06
+        - Complete revamped documentation. Much easier to read than the
+          near-useless Schema.pod that we used to have.
+
+0.16    2025-04-06
+        - Audio API Updates: The audio text-to-speech model is updated to
+          gpt-4o-mini-tts, and the audio transcription model is updated to
+          gpt-4o-transcribe, with the addition of a streaming option for the
+          transcription api.
+        - Chat Completions Enhancements: Introduces new features for the Chat
+          Completions API, including the ability to list, retrieve, update, and delete
+          chat completions. Support for metadata filtering is added, and the
+          documentation clarifies parameter support across different models.   
+        - Realtime API Expansion: Adds a new endpoint for creating realtime
+          transcription sessions and incorporates C# examples for both audio generation
+          and transcription.   
+        - Responses API Improvements:  Significant updates to the Responses
+          API, with a focus on enhanced tool usage, including web search and file search,
+          and the ability to stream responses. The API now also supports including image
+          URLs in the input and provides detailed usage information.   
+        - Fine-tuning API Updates: Introduces new endpoints for managing
+          fine-tuning checkpoints and their permissions, enabling organization owners to
+          share and control access to fine-tuned models. Metadata is now supported for
+          fine-tuning jobs.   
+        - Other Updates:  Minor documentation improvements and clarifications
+          across various API endpoints and parameters, including updates to model
+          descriptions and available tools.
+
+0.15    2025-02-28
+        - Update to latest version of OpenAI API spec.
+          Even though the 4.5-preview has been released
+          (https://platform.openai.com/docs/models#gpt-4-5), it's not listed
+          in their openapi.yaml document. The changes are largely around the
+          documentation in the API spec.
+
 0.14    2025-02-05
         - Update to latest version of OpenAI API spec. Amongst many changes,
           this includes the new o3-mini model.
@@ -14,8 +52,8 @@ Revision history for OpenAPI-Client-OpenAI
         - Added examples/get-embeddings.pl to the MANIFEST
 
 0.11    2024-11-18
-		- Update to the latest OpenAPI spec
-		- Add example of fetching embeddings from the API
+        - Update to the latest OpenAPI spec
+        - Add example of fetching embeddings from the API
 
 0.10    2024-10-05
         - Update MANIFEST to include missing example files

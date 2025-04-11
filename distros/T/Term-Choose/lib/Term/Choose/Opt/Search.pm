@@ -2,9 +2,9 @@ package Term::Choose::Opt::Search;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '1.772';
+our $VERSION = '1.773';
 
 use Term::Choose::Constants qw( ROW COL );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen show_cursor hide_cursor );

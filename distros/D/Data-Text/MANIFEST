@@ -8,6 +8,7 @@ README.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t
+t/30-basics.t
 t/comment-spelling.t
 t/conjunction.t
 t/coverage.t
@@ -22,15 +23,16 @@ t/kwalitee.t
 t/links.t
 t/manifest.t
 t/metrics.t
+t/modules-used.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
+t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
-t/snippets.t
 t/strict.t
 t/unused.t
 t/vars.t

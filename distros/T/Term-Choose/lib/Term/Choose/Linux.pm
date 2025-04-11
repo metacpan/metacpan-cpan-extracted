@@ -2,9 +2,9 @@ package Term::Choose::Linux;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '1.772';
+our $VERSION = '1.773';
 
 use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );

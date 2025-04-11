@@ -1,0 +1,195 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files - Documentation for the /vector_stores/{vector_store_id}/files path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</vector_stores/{vector_store_id}/files>.
+
+=head1 PATHS
+
+
+=head2 C<GET /vector_stores/{vector_store_id}/files>
+
+Returns a list of vector store files.
+
+
+
+=head3 Operation ID
+
+C<listVectorStoreFiles>
+
+    $client->listVectorStoreFiles( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the files belong to.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
+
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<desc>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=item * C<before> (in query) (Optional) - A cursor for use in pagination. `before` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with obj_foo, your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
+
+
+Type: C<string>
+
+
+
+=item * C<filter> (in query) (Optional) - Filter by file status. One of `in_progress`, `completed`, `failed`, `cancelled`.
+
+Type: C<string>
+
+Allowed values: C<in_progress, completed, failed, cancelled>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"id\": \"file-abc123\",\n  \"object\": \"vector_store.file\",\n  \"usage_bytes\": 1234,\n  \"created_at\": 1698107661,\n  \"vector_store_id\": \"vs_abc123\",\n  \"status\": \"completed\",\n  \"last_error\": null,\n  \"chunking_strategy\": {\n    \"type\": \"static\",\n    \"static\": {\n      \"max_chunk_size_tokens\": 800,\n      \"chunk_overlap_tokens\": 400\n    }\n  }\n}\n"
+       ],
+       "first_id" : "file-abc123",
+       "has_more" : false,
+       "last_id" : "file-abc456",
+       "object" : "list"
+    }
+
+
+=back
+
+=head2 C<POST /vector_stores/{vector_store_id}/files>
+
+Create a vector store file by attaching a L<File|https://platform.openai.com/docs/api-reference/files> to a L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>.
+
+
+
+=head3 Operation ID
+
+C<createVectorStoreFile>
+
+    $client->createVectorStoreFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<vector_store_id> (in path) (Required) - The ID of the vector store for which to create a File.
+
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "file-abc123",
+      "object": "vector_store.file",
+      "usage_bytes": 1234,
+      "created_at": 1698107661,
+      "vector_store_id": "vs_abc123",
+      "status": "completed",
+      "last_error": null,
+      "chunking_strategy": {
+        "type": "static",
+        "static": {
+          "max_chunk_size_tokens": 800,
+          "chunk_overlap_tokens": 400
+        }
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

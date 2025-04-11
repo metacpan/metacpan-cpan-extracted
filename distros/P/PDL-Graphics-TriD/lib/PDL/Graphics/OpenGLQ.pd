@@ -2,6 +2,10 @@ use strict;
 use warnings;
 use PDL::Types qw(types ppdefs_all);
 
+{ no warnings 'once'; # pass info back to Makefile.PL
+$PDL::Core::Dev::EXTRAS{$::PDLMOD}{OBJECT} .= join '', map " $::PDLBASE-$_\$(OBJ_EXT)", qw(font sphere);
+}
+
 my $F = ['F'];
 
 pp_addpm({At=>'Top'},<<'EOD');
@@ -31,17 +35,11 @@ the copyright notice should be included in the file.
 EOD
 
 pp_addhdr('
-#ifdef HAVE_AGL_GLUT
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 #else
 #include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-#include <GL/freeglut.h>
 #endif
-/* #include <GL/glx.h> */
 ');
 
 my @internal = (Doc => 'internal', NoPthread => 1);
@@ -51,6 +49,7 @@ pp_def(
   GenericTypes => $F,
   Pars => 'coords(tri=3,n);',
   OtherPars => 'double radius; int slices; int stacks;',
+  CHeader => "char *pdl_3d_solidSphere(double radius, GLint slices, GLint stacks);\n",
   Code => '
     float oldcoord0 = 0.0, oldcoord1 = 0.0, oldcoord2 = 0.0;
     glPushMatrix();
@@ -60,7 +59,8 @@ pp_def(
 	$coords(tri=>1) - oldcoord1,
 	$coords(tri=>2) - oldcoord2
       );
-      glutSolidSphere($COMP(radius), $COMP(slices), $COMP(stacks));
+      char *err = pdl_3d_solidSphere($COMP(radius), $COMP(slices), $COMP(stacks));
+      if (err) $CROAK("%s", err);
       oldcoord0 = $coords(tri=>0), oldcoord1 = $coords(tri=>1), oldcoord2 = $coords(tri=>2);
     %}
     glPopMatrix();
@@ -100,35 +100,25 @@ sub make_func {
 make_func($_) for qw(gl_line_strip gl_lines gl_points);
 
 pp_def(
- 	'gl_texts',
-	GenericTypes => $F,
- 	Pars => 'coords(tri,x); ',
-	OtherPars => 'int in_glut; IV base; SV *arr',
-	Code => '
-		SV *sv = $COMP(arr);
-		if(!(SvROK(sv) && SvTYPE(SvRV(sv))==SVt_PVAV)) {
-			$CROAK("gl_texts requires an array ref");
-		}
-		AV *arr = (AV *)SvRV(sv);
-		if ( !$COMP(in_glut) ) {
-			glPushAttrib(GL_LIST_BIT);
-			glListBase($COMP(base));
-		}
-		loop(x) %{
-			SV *elem = *(av_fetch(arr, x, 0));
-			if (!elem) continue;
-                        char *str = SvPV_nolen(elem);
-			'.RPOS().'
-			if ( $COMP(in_glut) )
-				glutBitmapString((void *)$COMP(base), (unsigned char *)str);
-			else
-				glCallLists(strlen(str),GL_UNSIGNED_BYTE,
-					(GLubyte*)str);
-		%}
-		if ( !$COMP(in_glut) )
-			glPopAttrib();
-	',
-	@internal
+  'gl_texts',
+  GenericTypes => $F,
+  Pars => 'coords(tri,x); ',
+  OtherPars => 'SV *arr',
+  CHeader => "void pdl_3d_bitmapString( const unsigned char *string );\n",
+  Code => '
+    SV *sv = $COMP(arr);
+    if (!(SvROK(sv) && SvTYPE(SvRV(sv))==SVt_PVAV))
+      $CROAK("gl_texts requires an array ref");
+    AV *arr = (AV *)SvRV(sv);
+    loop(x) %{
+      SV *elem = *(av_fetch(arr, x, 0));
+      if (!elem) continue;
+      char *str = SvPV_nolen(elem);
+      '.RPOS().'
+      pdl_3d_bitmapString((const unsigned char *)str);
+    %}
+  ',
+  @internal
 );
 
 for my $m (
@@ -141,18 +131,22 @@ for(
 {Name => 'gl_triangles',
  NormalCode => ''},
 {Name => 'gl_triangles_n',
- NormalCode => '
+ NormalInit => '
 	tmp1[0] = $coordsb(tri => 0) - $coordsa(tri => 0);
 	tmp1[1] = $coordsb(tri => 1) - $coordsa(tri => 1);
 	tmp1[2] = $coordsb(tri => 2) - $coordsa(tri => 2);
 	tmp2[0] = $coordsc(tri => 0) - $coordsa(tri => 0);
 	tmp2[1] = $coordsc(tri => 1) - $coordsa(tri => 1);
 	tmp2[2] = $coordsc(tri => 2) - $coordsa(tri => 2);
-	glNormal3f(
-		tmp1[1]*tmp2[2] - tmp2[1]*tmp1[2],
-	      -(tmp1[0]*tmp2[2] - tmp2[0]*tmp1[2]),
-		tmp1[0]*tmp2[1] - tmp2[0]*tmp1[1]
-	);
+        tmp3[0] = tmp1[1]*tmp2[2] - tmp2[1]*tmp1[2];
+        tmp3[1] = -(tmp1[0]*tmp2[2] - tmp2[0]*tmp1[2]);
+        tmp3[2] = tmp1[0]*tmp2[1] - tmp2[0]*tmp1[1];
+        magn = sqrt(tmp3[0]*tmp3[0] + tmp3[1]*tmp3[1] + tmp3[2]*tmp3[2]);
+        tmp3[0] = tmp3[0] / magn;
+        tmp3[1] = tmp3[1] / magn;
+        tmp3[2] = tmp3[2] / magn;',
+ NormalCode => '
+	glNormal3f(tmp3[0], tmp3[1], tmp3[2]);
  '
 },
 {Name => 'gl_triangles_wn',
@@ -168,15 +162,16 @@ pp_def(
 		 ($_->{NormalArgs}//'').
 		'colorsa(tri); colorsb(tri); colorsc(tri);',
 	Code => '
-		float tmp1[3]; float tmp2[3];
+		float tmp1[3], tmp2[3], tmp3[3], magn;
 		glBegin(GL_TRIANGLES);
 		broadcastloop %{'.
-			($_->{NormalCode}//'')
-			.&{$m->{Func}}("a").VERTEX("a").
-			($_->{NormalCodeB}//'')
-	  		.&{$m->{Func}}("b").VERTEX("b").
-			($_->{NormalCodeC}//'')
-			.&{$m->{Func}}("c").VERTEX("c").'
+			($_->{NormalInit}//"\n").
+			($_->{NormalCode}//'').
+			&{$m->{Func}}("a").VERTEX("a").
+			($_->{NormalCodeB}//'').
+			&{$m->{Func}}("b").VERTEX("b").
+			($_->{NormalCodeC}//'').
+			$m->{Func}->("c").VERTEX("c").'
 		%}
 		glEnd();
 		',

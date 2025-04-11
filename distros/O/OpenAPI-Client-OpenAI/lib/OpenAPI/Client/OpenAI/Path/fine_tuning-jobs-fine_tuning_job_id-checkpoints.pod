@@ -1,0 +1,92 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-checkpoints - Documentation for the /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</fine_tuning/jobs/{fine_tuning_job_id}/checkpoints>.
+
+=head1 PATHS
+
+
+=head2 C<GET /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints>
+
+List checkpoints for a fine-tuning job.
+
+
+
+=head3 Operation ID
+
+C<listFineTuningJobCheckpoints>
+
+    $client->listFineTuningJobCheckpoints( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<fine_tuning_job_id> (in path) (Required) - The ID of the fine-tuning job to get checkpoints for.
+
+
+Type: C<string>
+
+
+
+=item * C<after> (in query) (Optional) - Identifier for the last checkpoint ID from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of checkpoints to retrieve.
+
+Type: C<integer>
+
+
+Default: C<10>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"fine_tuning.job.checkpoint\",\n  \"id\": \"ftckpt_qtZ5Gyk4BLq1SfLFWp3RtO3P\",\n  \"created_at\": 1712211699,\n  \"fine_tuned_model_checkpoint\": \"ft:gpt-4o-mini-2024-07-18:my-org:custom_suffix:9ABel2dg:ckpt-step-88\",\n  \"fine_tuning_job_id\": \"ftjob-fpbNQ3H1GrMehXRf8cO97xTN\",\n  \"metrics\": {\n    \"step\": 88,\n    \"train_loss\": 0.478,\n    \"train_mean_token_accuracy\": 0.924,\n    \"valid_loss\": 10.112,\n    \"valid_mean_token_accuracy\": 0.145,\n    \"full_valid_loss\": 0.567,\n    \"full_valid_mean_token_accuracy\": 0.944\n  },\n  \"step_number\": 88\n}\n"
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

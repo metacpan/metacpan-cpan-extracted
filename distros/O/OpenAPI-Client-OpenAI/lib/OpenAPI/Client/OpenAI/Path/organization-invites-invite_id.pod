@@ -1,0 +1,134 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-invites-invite_id - Documentation for the /organization/invites/{invite_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/invites/{invite_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /organization/invites/{invite_id}>
+
+Delete an invite. If the invite has already been accepted, it cannot be deleted.
+
+
+
+=head3 Operation ID
+
+C<delete-invite>
+
+    $client->delete-invite( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<invite_id> (in path) (Required) - The ID of the invite to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Invite deleted successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /organization/invites/{invite_id}>
+
+Retrieves an invite.
+
+
+
+=head3 Operation ID
+
+C<retrieve-invite>
+
+    $client->retrieve-invite( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<invite_id> (in path) (Required) - The ID of the invite to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Invite retrieved successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "organization.invite",
+      "id": "invite-abc",
+      "email": "user@example.com",
+      "role": "owner",
+      "status": "accepted",
+      "invited_at": 1711471533,
+      "expires_at": 1711471533,
+      "accepted_at": 1711471533,
+      "projects": [
+        {
+          "id": "project-xyz",
+          "role": "member"
+        }
+      ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

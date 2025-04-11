@@ -1,3 +1,9 @@
+2.102 2025-04-11
+- fix scrolling out with mousewheel/double-touch-scroll in GLUT
+- add support for POGL_WINDOW_TYPE of glfw, which is now default
+- add own text rendering, now Helvetica
+- add own sphere-rendering, removing dependency on GLUT
+
 2.101 2025-04-08
 - non-trivial tests added
 - add overloads of ::Quaternion

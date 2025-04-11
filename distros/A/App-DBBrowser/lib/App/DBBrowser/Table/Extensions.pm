@@ -63,7 +63,7 @@ sub column {
         $extensions = [ $e_subquery, $e_scalar_func, $e_case, $e_math ];
     }
     if ( $clause =~ /^where\z/i ) {
-        push @$extensions, $e_skip_col, $e_multi_col; ##
+        push @$extensions, $e_skip_col, $e_multi_col;
     }
     if ( $opt->{add_parentheses} ) {
         push @$extensions, $e_par_open, $e_par_close;

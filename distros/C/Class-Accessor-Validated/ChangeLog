@@ -1,0 +1,15 @@
+Thu Apr 10 14:04:20 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+
+	[0.03]:
+	* lib/Class/Accessor/Validated.pm
+	- refactored to allow for inheriting %ATTRIBUTES
+	- refactored to use set_*/get_* methods as indicators of option existence
+	* t/00-class-accessor-validated.t: new tests based on changes
+
+	[0.04]:
+	* lib/Class/Accessor/Validated.pm
+	- pod tweak
+	(new)
+	- must have both set_ and get_ methods

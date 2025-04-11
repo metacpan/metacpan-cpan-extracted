@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.427  2025-04-10
+        - Term::TablePrint minimum version 0.169.
+        - Term::Choose::Util minimum version 0.145.
+        - Update aggregate mode in group_by.
+        - Code refactoring.
+
 2.426  2025-03-24
         - Term::Choose minimum version 1.769.
         - Update 'line_fold'.

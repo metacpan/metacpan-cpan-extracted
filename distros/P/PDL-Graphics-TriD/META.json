@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "OpenGL" : "0.7004",
+            "OpenGL::GLFW" : "0.0402",
             "PDL" : "2.096"
          }
       },
@@ -57,6 +58,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.101",
+   "version" : "2.102",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

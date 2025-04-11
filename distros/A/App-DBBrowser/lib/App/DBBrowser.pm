@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.426';
+our $VERSION = '2.427';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -35,7 +35,7 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        dots          => '...',
+        dots          => [ '...', 3 ],
         quit          => 'Quit',
         back          => 'Back',
 #        continue      => 'Continue'
@@ -535,7 +535,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.426
+Version 2.427
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,10 @@
 Revision history for Data::Text
 
+0.15	Thu Apr 10 07:41:32 EDT 2025
+	Use Test::DescribeMe
+	Use Params::Get
+	Added t/30-basics.t
+
 0.14	Tue Jul  9 10:01:32 EDT 2024
 	Fix https://www.cpantesters.org/cpan/report/f993e0d0-de29-11ee-8176-03e06d8775ea
 

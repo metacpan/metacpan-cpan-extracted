@@ -3,13 +3,17 @@ lib/Config/Abstraction.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/30-basics.t
+t/auto.t
 t/eof.t
 t/eol.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/port.t
 t/prereq.t
 t/rt-59921.t
 t/rt-59922.t

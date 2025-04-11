@@ -1,7 +1,7 @@
 package # hide
 Y_Data_Test_Arguments;
 
-use 5.10.0;
+use 5.10.1;
 use warnings;
 use strict;
 

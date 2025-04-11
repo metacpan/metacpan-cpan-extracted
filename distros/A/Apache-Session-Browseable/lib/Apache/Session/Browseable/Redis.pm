@@ -9,7 +9,7 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.9';
+our $VERSION = '1.3.15';
 our @ISA     = qw(Apache::Session);
 
 our $redis = $Apache::Session::Browseable::Store::Redis::redis;
@@ -38,9 +38,7 @@ sub searchOn {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
 
     my %res = ();
-    my $index =
-      ref( $args->{Index} ) ? $args->{Index} : [ split /\s+/, $args->{Index} ];
-    if ( grep { $_ eq $selectField } @$index ) {
+    if ( $class->isIndexed( $args, $selectField ) ) {
 
         my $redisObj = $class->_getRedis($args);
         my @keys     = $redisObj->smembers("${selectField}_$value");
@@ -85,37 +83,200 @@ sub searchOn {
     return \%res;
 }
 
+sub searchOnExpr {
+    my ( $class, $args, $selectField, $value, @fields ) = @_;
+    my %res;
+    if ( $class->isIndexed( $args, $selectField ) ) {
+        my $redisObj = $class->_getRedis($args);
+        my $cursor   = 0;
+        do {
+            my ( $new_cursor, $sets ) =
+              $redisObj->scan( $cursor, MATCH => "${selectField}_$value" );
+            foreach my $set (@$sets) {
+                next unless $redisObj->type($set) eq 'set';
+                my @keys = $redisObj->smembers($set);
+                foreach my $k (@keys) {
+                    my $v = $redisObj->get($k);
+                    next unless $v;
+                    my $tmp = unserialize($v);
+                    if ($tmp) {
+                        $res{$k} = $class->extractFields( $tmp, @fields );
+                    }
+                }
+            }
+            $cursor = $new_cursor;
+        } while ( $cursor != 0 );
+    }
+    else {
+        $value = quotemeta($value);
+        $value =~ s/\\\*/\.\*/g;
+        $value = qr/^$value$/;
+        $class->get_key_from_all_sessions(
+            $args,
+            sub {
+                my ( $entry, $id ) = @_;
+                return undef unless ( $entry->{$selectField} =~ $value );
+                $res{$id} = $class->extractFields( $entry, @fields );
+                undef;
+            }
+        );
+    }
+    return \%res;
+}
+
+sub deleteIfLowerThan {
+    my ( $class, $args, $rule ) = @_;
+    my @toDelete;
+    my %seen;
+    if ( $rule->{or} ) {
+        foreach ( keys %{ $rule->{or} } ) {
+            push @toDelete,
+              grep { !$seen{$_}++ }
+              $class->filterIfLowerThan( $args, $_, $rule->{or}->{$_} );
+        }
+    }
+    elsif ( $rule->{and} ) {
+        foreach ( keys %{ $rule->{and} } ) {
+            @toDelete =
+              grep { !$seen{$_}++ }
+              $class->filterIfLowerThan( $args, $_, $rule->{and}->{$_},
+                @toDelete );
+        }
+    }
+    if (@toDelete) {
+        my $redisObj = $class->_getRedis($args);
+        if ( $rule->{not} ) {
+            foreach ( keys %{ $rule->{not} } ) {
+                my $keep = $class->searchOn( $args, $_, $rule->{not}->{$_} );
+                foreach my $k ( keys %$keep ) {
+                    @toDelete = grep { $_ ne $k } @toDelete;
+                }
+            }
+        }
+        $redisObj->del($_) foreach (@toDelete);
+    }
+}
+
+sub filterIfLowerThan {
+    my ( $class, $args, $field, $value, @keys ) = @_;
+    my @res;
+    my $redisObj = $class->_getRedis($args);
+    if ( $class->isIndexed( $args, $field ) ) {
+        my $cursor = 0;
+        do {
+            my ( $new_cursor, $sets ) =
+              $redisObj->scan( $cursor, MATCH => "${field}_*" );
+            foreach my $set (@$sets) {
+                next unless $redisObj->type($set) eq 'set';
+                my $v = $set;
+                $v =~ s/^\Q$field\E_//;
+                next if int($v) >= $value;
+                my @nk = $redisObj->smembers($set);
+                if (@keys) {
+                    push @res, map {
+                        my $t = $_;
+                        grep { $_ eq $t } @keys ? $t : ()
+                    } @nk;
+                }
+                else {
+                    push @res, @nk;
+                }
+            }
+            $cursor = $new_cursor;
+        } while ( $cursor != 0 );
+    }
+    else {
+        unless (@keys) {
+            $class->get_key_from_all_sessions(
+                $args,
+                sub {
+                    my ( $v, $k ) = @_;
+                    push @res, $k
+                      if defined( $v->{$field} )
+                      and $v->{$field} < $value;
+                    undef;
+                }
+            );
+        }
+        foreach my $k (@keys) {
+            eval {
+                my $v = $redisObj->get($k);
+                next unless $v;
+                $v = unserialize($v);
+                push @res, $k
+                  if defined( $v->{$field} )
+                  and $v->{$field} < $value;
+            };
+        }
+    }
+    return @res;
+}
+
+sub extractFields {
+    my ( $class, $entry, @fields ) = @_;
+    my $res;
+    if (@fields) {
+        $res->{$_} = $entry->{$_} foreach (@fields);
+    }
+    else {
+        $res = $entry;
+    }
+    return $res;
+}
+
+sub isIndexed {
+    my ( $class, $args, $field ) = @_;
+    my $indexes =
+      ref( $args->{Index} ) ? $args->{Index} : [ split /\s+/, $args->{Index} ];
+    return grep { $_ eq $field } @$indexes;
+}
+
+sub isLlngKey {
+    my ( $class, $args, $name ) = @_;
+    my $expr = $args->{keysRe} || '^[0-9a-f]{32,}$';
+    return ( $name =~ /$expr/o );
+}
+
 sub get_key_from_all_sessions {
-    my $class = shift;
-    my $args  = shift;
-    my $data  = shift;
+    my ( $class, $args, $data ) = @_;
     my %res;
 
     my $redisObj = $class->_getRedis($args);
-    my @keys     = $redisObj->keys('*');
-    foreach my $k (@keys) {
-        next if ( !$k or $k =~ /_/ );
-        eval {
-            my $v   = $redisObj->get($k);
-            next unless $v;
-            my $tmp = unserialize($v);
-            if ( ref($data) eq 'CODE' ) {
-                $tmp = &$data( $tmp, $k );
-                $res{$k} = $tmp if ( defined($tmp) );
+    my $cursor   = 0;
+    do {
+        my ( $new_cursor, $keys ) = $redisObj->scan($cursor);
+        foreach my $k (@$keys) {
+
+            # Keep only our keys
+            next unless $class->isLlngKey( $args, $k );
+
+            # Don't scan sets,...
+            next unless $redisObj->type($k) eq 'string';
+            eval {
+                my $v = $redisObj->get($k);
+                next unless $v;
+                my $tmp = unserialize($v);
+                if ( ref($data) eq 'CODE' ) {
+                    $tmp = &$data( $tmp, $k );
+                    $res{$k} = $tmp if ( defined($tmp) );
+                }
+                elsif ($data) {
+                    $data = [$data] unless ( ref($data) );
+                    $res{$k}->{$_} = $tmp->{$_} foreach (@$data);
+                }
+                else {
+                    $res{$k} = $tmp;
+                }
+            };
+            if ($@) {
+                print STDERR "Error in session $k: $@\n";
+
+                # Don't delete, it may own to another app
+                #delete $res{$k};
             }
-            elsif ($data) {
-                $data = [$data] unless ( ref($data) );
-                $res{$k}->{$_} = $tmp->{$_} foreach (@$data);
-            }
-            else {
-                $res{$k} = $tmp;
-            }
-        };
-        if ($@) {
-            print STDERR "Error in session $k: $@\n";
-            delete $res{$k};
         }
-    }
+        $cursor = $new_cursor;
+    } while ( $cursor != 0 );
     return \%res;
 }
 
@@ -220,15 +381,15 @@ L<Apache::Session>
 
 =over
 
-=item 2009-2023 by Xavier Guimard
+=item 2009-2025 by Xavier Guimard
 
-=item 2013-2023 by Clément Oudot
+=item 2013-2025 by Clément Oudot
 
-=item 2019-2023 by Maxime Besson
+=item 2019-2025 by Maxime Besson
 
-=item 2013-2023 by Worteks
+=item 2013-2025 by Worteks
 
-=item 2023 by Linagora
+=item 2023-2025-2025 by Linagora
 
 =back
 

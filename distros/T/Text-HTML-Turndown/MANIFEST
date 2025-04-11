@@ -1,6 +1,7 @@
 .gitignore
 Changes
 lib/Text/HTML/CollapseWhitespace.pm
+lib/Text/HTML/ExtractInfo.pm
 lib/Text/HTML/Turndown.pm
 lib/Text/HTML/Turndown/GFM.pm
 lib/Text/HTML/Turndown/HighlightedCodeBlock.pm
@@ -17,9 +18,11 @@ META.json
 META.yml
 README
 README.mkdn
+scripts/html2markdown.pl
 t/00-load.t
 t/01-turndown.t
 t/02-turndown-gfm.t
+t/03-extractinfo.t
 t/index-gfm.html
 t/index.html
 testrules.yml

@@ -17,6 +17,7 @@ my @test_cases = (
             role    => 'assistant',
             content => re('\b(?:Hello|Hi|Hey)\b'),
             refusal => undef,
+            annotations => [],
         },
     },
     {
@@ -33,6 +34,7 @@ my @test_cases = (
             role    => 'assistant',
             content => re('^\s*$'),
             refusal => undef,
+            annotations => [],
         },
     },
 );

@@ -33,7 +33,6 @@ random($nc->inplace);
 use OpenGL qw(:all);
 glShadeModel (&GL_SMOOTH);
 
-$lb = $win->glpRasterFont("5x8",0,255);
 $win->add_object(TOBJ->new);
 $win->twiddle();
 
@@ -49,7 +48,6 @@ sub togl {
 	OpenGL::glDisable(&OpenGL::GL_LIGHTING);
 	PDL::gl_line_strip_col($::nx,$::nc);
 	OpenGL::glColor3f(1,0,1);
-	gl_texts(PDL->pdl(0,0,0.5), OpenGL::GLUT::done_glutInit(),
-	  $::lb, ["HELLO HELLO HELLO GLWORLD!!!"]);
+	gl_texts(PDL->pdl(0,0,0.5), ["HELLO HELLO HELLO GLWORLD!!!"]);
 	OpenGL::glEnable(&OpenGL::GL_LIGHTING);
 }

@@ -2,13 +2,13 @@ package Term::Choose::LineFold;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '1.772';
+our $VERSION = '1.773';
 
 use Exporter qw( import );
 
-our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
+our @EXPORT_OK = qw( char_width print_columns cut_to_printwidth line_fold adjust_to_printwidth );
 
 use Carp qw( croak );
 
@@ -45,7 +45,7 @@ my $table = table_char_width();
 my $cache = {};
 
 
-sub _char_width {
+sub char_width {
     #my $c = $_[0];
     my $min = 0;
     my $mid;
@@ -72,9 +72,16 @@ sub print_columns {
     #my $str = $_[0];
     my $width = 0;
     my $c;
-    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
-        $c = ord substr $_[0], $i, 1;
-        $width += ( $cache->{$c} //= _char_width( $c ) );
+    if ( length( $_[0] ) < 120 ) {
+        for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
+            $c = ord substr $_[0], $i, 1;
+            $width += ( $cache->{$c} //= char_width( $c ) );
+        }
+        return $width;
+    }
+    for ( $_[0] =~ /./gs) {
+        $c = ord;
+        $width += ( $cache->{$c} //= char_width( $c ) );
     }
     return $width;
 }
@@ -86,7 +93,7 @@ sub cut_to_printwidth {
     my $c;
     for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
         $c = ord substr $_[0], $i, 1;
-        if ( ( $str_w += ( $cache->{$c} //= _char_width( $c ) ) ) > $_[1] ) {
+        if ( ( $str_w += ( $cache->{$c} //= char_width( $c ) ) ) > $_[1] ) {
             if ( ( $str_w - $cache->{$c} ) < $_[1] ) {
                 return substr( $_[0], 0, $i ) . ' ', substr( $_[0], $i ) if wantarray;
                 return substr( $_[0], 0, $i ) . ' ';
@@ -97,6 +104,30 @@ sub cut_to_printwidth {
     }
     return $_[0], '' if wantarray;
     return $_[0];
+}
+
+
+sub adjust_to_printwidth {
+#    my ( $str, $width, $opt ) = @_;
+    my $str_w = 0;
+    my $c;
+    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
+        $c = ord substr $_[0], $i, 1;
+        if ( ( $str_w += ( $cache->{$c} //= char_width( $c ) ) ) > $_[1] ) {
+            if ( ( $str_w - $cache->{$c} ) < $_[1] ) {
+                return ' ' . substr( $_[0], 0, $i ) if $_[2];
+                return substr( $_[0], 0, $i ) . ' ';
+            }
+            return substr( $_[0], 0, $i );
+        }
+    }
+    if ( $str_w == $_[1] ) {
+        return $_[0];
+    }
+    elsif ( $_[2] ) {
+        return( ( ' ' x ( $_[1] - $str_w ) ) .  $_[0] );
+    }
+    return $_[0] . ' ' x ( $_[1] - $str_w );
 }
 
 
@@ -157,9 +188,6 @@ sub line_fold {
     $str =~ s/\t/ /g;
     $str =~ s/[^\v\P{Cc}]//g; # remove control chars but keep vertical spaces
     $str =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
-    if ( $str !~ /\R/ && print_columns( $opt->{init_tab} . $str ) <= $opt->{width} && ! @color ) {
-        return $opt->{init_tab} . $str;
-    }
     my @paragraphs;
 
     for my $row ( split /\R/, $str, -1 ) { # -1 to keep trailing empty fields
@@ -249,7 +277,7 @@ Term::Choose::LineFold
 
 =head1 VERSION
 
-Version 1.772
+Version 1.773
 
 =cut
 

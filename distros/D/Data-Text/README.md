@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -139,6 +139,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2021-2024 Nigel Horne.
+Copyright 2021-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

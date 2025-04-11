@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 45;
+use Test::Most tests => 58;
 use Test::Carp;
 
 BEGIN {
@@ -75,12 +75,12 @@ DATA: {
 		qr/attempt to add/
 	);
 
-	does_carp_that_matches(
+	does_croak_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->append();
 		},
-		qr/no text given/
+		qr/Usage:\s/
 	);
 
 	does_carp_that_matches(
@@ -115,12 +115,12 @@ DATA: {
 		qr/no text given/
 	);
 
-	does_carp_that_matches(
+	does_croak_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->set();
 		},
-		qr/no text given/
+		qr/Usage:\s/
 	);
 
 	$d = new_ok('Data::Text');
@@ -138,4 +138,54 @@ DATA: {
 		'There are some spaces here.', 'Verify trim() works');
 
 	is(new_ok('Data::Text')->append({ text => "\tThe tab stays   " })->rtrim()->as_string(), "\tThe tab stays", 'Verify rtrim() works');
+
+	# Test Data::Text->new()
+	my $obj1 = Data::Text->new('Hello');
+	is($obj1->as_string(), 'Hello', 'new() initializes correctly with string');
+
+	my $obj2 = Data::Text->new(['Hello', 'World']);
+	is($obj2->as_string(), 'HelloWorld', 'new() initializes correctly with array reference');
+
+	# Test set()
+	$obj1->set('World');
+	is($obj1->as_string(), 'World', 'set() updates string correctly');
+
+	$obj1->set(['New', 'String']);
+	is($obj1->as_string(), 'NewString', 'set() updates with array reference correctly');
+
+	# Test append()
+	$obj1->append(' Again');
+	is($obj1->as_string(), 'NewString Again', 'append() works with string');
+
+	$obj1->append(['!']);
+	is($obj1->as_string(), 'NewString Again!', 'append() works with array reference');
+
+	# Test equal and not_equal
+	my $obj3 = Data::Text->new('Test');
+	my $obj4 = Data::Text->new('Test');
+	my $obj5 = Data::Text->new('Different');
+
+	ok($obj3 == $obj4, '== operator works for equal objects');
+	ok($obj3 != $obj5, '!= operator works for different objects');
+
+	# Test length()
+	is($obj3->length, 4, 'length() returns correct length');
+
+	# Test trim() and rtrim()
+	$obj1->set('   Trim me   ');
+	$obj1->trim();
+	is($obj1->as_string(), 'Trim me', 'trim() removes leading and trailing spaces');
+
+	$obj1->set('Trim trailing   ');
+	$obj1->rtrim();
+	is($obj1->as_string(), 'Trim trailing', 'rtrim() removes trailing spaces');
+
+	# Test replace()
+	$obj1->set('Hello World');
+	$obj1->replace({ 'World' => 'Universe' });
+	is($obj1->as_string(), 'Hello Universe', 'replace() works correctly');
+
+	# Test appendconjunction()
+	$obj1->set('')->appendconjunction('Apple', 'Banana', 'Cherry');
+	is($obj1->as_string(), 'Apple, Banana, and Cherry', 'appendconjunction() works correctly');
 }

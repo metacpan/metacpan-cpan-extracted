@@ -1,0 +1,117 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::realtime-sessions - Documentation for the /realtime/sessions path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</realtime/sessions>.
+
+=head1 PATHS
+
+
+=head2 C<POST /realtime/sessions>
+
+Create an ephemeral API token for use in client-side applications with the
+Realtime API. Can be configured with the same session parameters as the
+C<session.update> client event.
+
+It responds with a session object, plus a C<client_secret> key which contains
+a usable ephemeral API token that can be used to authenticate browser clients
+for the Realtime API.
+
+
+
+=head3 Operation ID
+
+C<create-realtime-session>
+
+    $client->create-realtime-session( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      Realtime session object configuration.
+
+      
+      
+Example:
+
+    {
+       "input_audio_noise_reduction" : null,
+       "input_audio_transcription" : null,
+       "tools" : [
+          null
+       ],
+       "turn_detection" : null,
+       "voice" : "ash"
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Session created successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "sess_001",
+      "object": "realtime.session",
+      "model": "gpt-4o-realtime-preview",
+      "modalities": ["audio", "text"],
+      "instructions": "You are a friendly assistant.",
+      "voice": "alloy",
+      "input_audio_format": "pcm16",
+      "output_audio_format": "pcm16",
+      "input_audio_transcription": {
+          "model": "whisper-1"
+      },
+      "turn_detection": null,
+      "tools": [],
+      "tool_choice": "none",
+      "temperature": 0.7,
+      "max_response_output_tokens": 200,
+      "client_secret": {
+        "value": "ek_abc123", 
+        "expires_at": 1234567890
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

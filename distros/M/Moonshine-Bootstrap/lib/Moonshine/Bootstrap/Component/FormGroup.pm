@@ -3,9 +3,7 @@ package Moonshine::Bootstrap::Component::FormGroup;
 use Moonshine::Magic;
 use Params::Validate qw/ARRAYREF/;
 
-use feature 'switch';
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
-
+use Switch::Back;
 
 extends (
     'Moonshine::Bootstrap::Component',

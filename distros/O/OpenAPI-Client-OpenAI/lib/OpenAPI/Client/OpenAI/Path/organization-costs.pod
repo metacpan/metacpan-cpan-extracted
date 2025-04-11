@@ -1,0 +1,124 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-costs - Documentation for the /organization/costs path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/costs>.
+
+=head1 PATHS
+
+
+=head2 C<GET /organization/costs>
+
+Get costs details for the organization.
+
+
+
+=head3 Operation ID
+
+C<usage-costs>
+
+    $client->usage-costs( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<start_time> (in query) (Required) - Start time (Unix seconds) of the query time range, inclusive.
+
+Type: C<integer>
+
+
+
+=item * C<end_time> (in query) (Optional) - End time (Unix seconds) of the query time range, exclusive.
+
+Type: C<integer>
+
+
+
+=item * C<bucket_width> (in query) (Optional) - Width of each time bucket in response. Currently only `1d` is supported, default to `1d`.
+
+Type: C<string>
+
+Allowed values: C<1d>
+
+
+Default: C<1d>
+
+
+=item * C<project_ids> (in query) (Optional) - Return only costs for these projects.
+
+Type: C<array>
+
+
+
+=item * C<group_by> (in query) (Optional) - Group the costs by the specified fields. Support fields include `project_id`, `line_item` and any combination of them.
+
+Type: C<array>
+
+
+
+=item * C<limit> (in query) (Optional) - A limit on the number of buckets to be returned. Limit can range between 1 and 180, and the default is 7.
+
+
+Type: C<integer>
+
+
+Default: C<7>
+
+
+=item * C<page> (in query) (Optional) - A cursor for use in pagination. Corresponding to the `next_page` field from the previous response.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Costs data retrieved successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          {
+             "result" : [
+                null
+             ]
+          }
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

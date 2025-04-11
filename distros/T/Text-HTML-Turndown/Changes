@@ -1,3 +1,7 @@
+0.04 2025-04-10
+    * Handle newlines in table cells
+      We convert them into <br/> , as Markdown tables don't really handle newlines
+
 0.04 2025-02-10
     * Fix compatibility with Perl between 5.20 and 5.24
 

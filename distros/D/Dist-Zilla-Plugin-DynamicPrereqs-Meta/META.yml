@@ -1,5 +1,5 @@
 ---
-abstract: 'Add dynamic prereqs to to the metadata in our Dist::Zilla build'
+abstract: 'Add dynamic prereqs to the metadata'
 author:
   - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
@@ -24,16 +24,27 @@ meta-spec:
   version: '1.4'
 name: Dist-Zilla-Plugin-DynamicPrereqs-Meta
 provides:
+  Dist::Zilla::Plugin::DynamicPrereqs::DistBuild:
+    file: lib/Dist/Zilla/Plugin/DynamicPrereqs/DistBuild.pm
+    version: '0.005'
   Dist::Zilla::Plugin::DynamicPrereqs::Meta:
     file: lib/Dist/Zilla/Plugin/DynamicPrereqs/Meta.pm
-    version: '0.004'
+    version: '0.005'
+  Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny:
+    file: lib/Dist/Zilla/Plugin/DynamicPrereqs/ModuleBuildTiny.pm
+    version: '0.005'
+  Dist::Zilla::Role::DynamicPrereqs::Meta:
+    file: lib/Dist/Zilla/Role/DynamicPrereqs/Meta.pm
+    version: '0.005'
 requires:
   Carp: '0'
   Cpanel::JSON::XS: '0'
   Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
   Dist::Zilla::Role::MetaProvider: '0'
   Dist::Zilla::Role::PrereqSource: '0'
   Moose: '0'
+  Moose::Role: '0'
   MooseX::Types::Moose: '0'
   Text::ParseWords: '0'
   experimental: '0'
@@ -41,7 +52,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/dist-zilla-plugin-dynamicprereqs-meta/issues
   repository: git://github.com/Leont/dist-zilla-plugin-dynamicprereqs-meta.git
-version: '0.004'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.005'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

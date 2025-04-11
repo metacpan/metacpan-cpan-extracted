@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -12,7 +12,7 @@ Version 0.06
 
     my $config = Config::Abstraction->new(
       config_dirs => ['config'],
-      env_prefix  => 'MYAPP_',
+      env_prefix => 'MYAPP_',
       flatten => 0,
     );
 
@@ -26,8 +26,8 @@ formats (YAML, JSON, XML, and INI),
 it also allows levels of configuration, each of which overrides the lower levels.
 So, it also integrates environment variable
 overrides and command line arguments for runtime configuration adjustments.
-This module is designed to help developers manage layered configurations that can be loaded from files and overridden by environment variables,
-offering a robust and dynamic approach
+This module is designed to help developers manage layered configurations that can be loaded from files and overridden by at run-time for debugging,
+offering a modern, robust and dynamic approach
 to configuration management.
 
 ## KEY FEATURES
@@ -153,7 +153,7 @@ Options:
 
 - `config_dirs`
 
-    An arrayref of directories to look for configuration files (default: `['config']`).
+    An arrayref of directories to look for configuration files (default: `[$HOME/.conf]`, `[$DOCUMENT_ROOT/conf]`, or `['conf']`).
 
 - `config_file`
 
@@ -161,7 +161,7 @@ Options:
 
 - `config_files`
 
-    An arrayref of files to look for in the configration directories.
+    An arrayref of files to look for in the configuration directories.
     Put the more important files later,
     since later files override earlier ones.
 
@@ -178,6 +178,10 @@ Options:
 
     Used for warnings and traces.
     An object that understands warn(), debug() and trace() messages.
+
+- `path`
+
+    A synonym of `config_dirs`.
 
 - `sep_char`
 

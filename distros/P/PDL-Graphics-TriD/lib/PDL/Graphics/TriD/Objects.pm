@@ -172,7 +172,7 @@ sub smoothn { my ($this) = @_;
 package PDL::Graphics::TriD::GObject_Lattice;
 use base qw/PDL::Graphics::TriD::GObject/;
 sub r_type {return "SURF2D";}
-sub get_valid_options { return {UseDefcols => 0,Lines => 1}; }
+sub get_valid_options { return {UseDefcols=>0, Lines=>1}; }
 
 package PDL::Graphics::TriD::Lattice;
 use base qw/PDL::Graphics::TriD::GObject_Lattice/;
@@ -198,7 +198,7 @@ sub cdummies {
   $_[1]->slice(":," . join ',', map "*$_", ($_[2]->dims)[1,2])
 }
 sub get_valid_options {
-  {UseDefcols => 0,Lines => 1, Smooth => 1}
+  {UseDefcols=>0, Lines=>1, Smooth=>1, ShowNormals=>0}
 }
 sub new {
   my ($class,$points,$colors,$options) = @_;

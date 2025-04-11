@@ -1,7 +1,7 @@
 ---
 abstract: 'Add index and search methods to Apache::Session'
 author:
-  - 'Xavier Guimard, E<lt>x.guimard@free.frE<gt>'
+  - 'LLNG Team <https://lemonldap-ng.org>'
 build_requires:
   DBD::SQLite: '0'
   DBI: '0'
@@ -17,7 +17,7 @@ name: Apache-Session-Browseable
 provides:
   Apache::Session::Browseable:
     file: lib/Apache/Session/Browseable.pm
-    version: v1.3.13
+    version: v1.3.15
   Apache::Session::Browseable::Cassandra:
     file: lib/Apache/Session/Browseable/Cassandra.pm
     version: v1.3.13
@@ -53,7 +53,7 @@ provides:
     version: v1.3.1
   Apache::Session::Browseable::Redis:
     file: lib/Apache/Session/Browseable/Redis.pm
-    version: v1.3.9
+    version: v1.3.15
   Apache::Session::Browseable::SQLite:
     file: lib/Apache/Session/Browseable/SQLite.pm
     version: v1.2.2
@@ -83,7 +83,7 @@ provides:
     version: v1.2.2
   Apache::Session::Browseable::Store::Redis:
     file: lib/Apache/Session/Browseable/Store/Redis.pm
-    version: v1.3.2
+    version: v1.3.15
   Apache::Session::Browseable::Store::SQLite:
     file: lib/Apache/Session/Browseable/Store/SQLite.pm
     version: v1.2.7
@@ -106,12 +106,12 @@ recommends:
   DBD::Cassandra: '0'
   DBI: '0'
   Net::LDAP: '0.38'
-  Redis: '0'
+  Redis::Fast: '0'
 requires:
   Apache::Session: '0'
   JSON: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/LemonLDAPNG/Apache-Session-Browseable
-version: v1.3.13
+version: v1.3.15
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

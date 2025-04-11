@@ -124,8 +124,8 @@ subtest 'pcfiles included' => sub {
           note $dir;
         }
       }
-
-      ok $ok1, "good directory included";
+      $dir ||= '';
+      ok $ok1, "good directory included, found '$dir'";
 
     };
   }

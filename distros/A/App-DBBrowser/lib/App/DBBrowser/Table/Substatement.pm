@@ -306,6 +306,9 @@ sub group_by {
                 #$sql->{having_stmt} = '';
                 $sql->{aggregate_mode} = 0;
             }
+            elsif ( ! @{$sql->{selected_cols}} ) {
+                $sql->{aggregate_mode} = 0;
+            }
             return;
         }
         if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {

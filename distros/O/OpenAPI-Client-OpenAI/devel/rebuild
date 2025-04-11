@@ -97,12 +97,6 @@ perl Makefile.PL
 
 make
 
-if [ "$notest" = false ]; then
-    RELEASE_TESTING=1 make test
-else
-    echo Skipping tests due to -n|--notest flag
-fi
-
 # Obviously, this builds the documentation
 perl devel/build_docs.pl
 
@@ -112,4 +106,10 @@ if command -v pod2markdown &> /dev/null; then
 else
     echo "Error: pod2markdown is not available."
     exit 1
+fi
+
+if [ "$notest" = false ]; then
+    RELEASE_TESTING=1 make test
+else
+    echo Skipping tests due to -n|--notest flag
 fi

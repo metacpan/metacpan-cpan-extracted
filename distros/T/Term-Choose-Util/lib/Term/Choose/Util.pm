@@ -2,9 +2,9 @@ package Term::Choose::Util;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '0.144';
+our $VERSION = '0.145';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -20,7 +20,7 @@ use Encode::Locale qw();
 use File::HomeDir  qw();
 
 use Term::Choose                  qw( choose );
-use Term::Choose::Constants       qw( SGR_ES );
+use Term::Choose::Constants       qw( SGR_ES PH );
 use Term::Choose::LineFold        qw( cut_to_printwidth print_columns );
 use Term::Choose::ValidateOptions qw( validate_options );
 
@@ -597,7 +597,7 @@ sub choose_a_number {
         $begin = 0 if $di == 0;
         $begin = insert_sep( $begin, $self->{thousands_separator} );
         ( my $end = $begin ) =~ s/^[01]/9/;
-        unshift @ranges,  unicode_sprintf( $begin, $longest, { right_justify => 1, color => $self->{color} } )
+        unshift @ranges, unicode_sprintf( $begin, $longest, { right_justify => 1, color => $self->{color} } )
                                . $tab
                                . unicode_sprintf( $end, $longest, { right_justify => 1, color => $self->{color} } );
     }
@@ -612,7 +612,7 @@ sub choose_a_number {
             unshift @ranges, unicode_sprintf( $begin, $longest, { color => $self->{color} } );
         }
         $confirm_tmp = $self->{confirm};
-        $back_tmp    = $self->{back};
+        $back_tmp = $self->{back};
     }
     my %numbers;
     my $result;
@@ -913,7 +913,6 @@ sub settings_menu {
 
 sub insert_sep {
     my ( $number, $separator ) = @_;
-    return           if ! defined $number;
     return $number   if ! length $number;
     $separator = ',' if ! defined $separator;
     return $number   if $separator eq '';
@@ -946,27 +945,30 @@ sub get_term_height {
 sub unicode_sprintf {
     my ( $str, $avail_w, $opt ) = @_;
     $opt ||= {};
-    my $colwidth;
+    my @color;
     if ( $opt->{color} ) {
-        ( my $tmp = $str ) =~ s/${\SGR_ES}//g;
-        $colwidth = print_columns( $tmp );
+        $str =~ s/${\PH}//g;
+        $str =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
     }
-    else {
-        $colwidth = print_columns( $str );
-    }
-    #my $colwidth = print_columns_ext( $str, $opt->{color} );
-    if ( $colwidth > $avail_w ) {
-        if ( @{$opt->{mark_if_truncated}||[]} ) {
-            return cut_to_printwidth( $str, $avail_w - $opt->{mark_if_truncated}[1] ) . $opt->{mark_if_truncated}[0];
+    my $str_w = print_columns( $str, $avail_w + 1 );
+    if ( $str_w > $avail_w ) {
+        if ( @{$opt->{suffix_on_truncate}||[]} ) {
+            $str = cut_to_printwidth( $str, $avail_w - $opt->{suffix_on_truncate}[1] ) . $opt->{suffix_on_truncate}[0];
         }
-        return cut_to_printwidth( $str, $avail_w );
+        $str = cut_to_printwidth( $str, $avail_w );
     }
-    elsif ( $colwidth < $avail_w ) {
+    if ( @color ) {
+        $str =~ s/${\PH}/shift @color/ge;
+        if ( @color ) {
+            $str .= join '', @color;
+        }
+    }
+    if ( $str_w < $avail_w ) {
         if ( $opt->{right_justify} ) {
-            return " " x ( $avail_w - $colwidth ) . $str;
+            return " " x ( $avail_w - $str_w ) . $str;
         }
         else {
-            return $str . " " x ( $avail_w - $colwidth );
+            return $str . " " x ( $avail_w - $str_w );
         }
     }
     else {
@@ -1000,7 +1002,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.144
+Version 0.145
 
 =cut
 
@@ -1679,7 +1681,7 @@ Setting the option I<cs_label> to a defined value adds an info output line.
 
 =head2 Perl version
 
-Requires Perl version 5.10.0 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Encoding layer
 

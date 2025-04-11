@@ -1,4 +1,4 @@
-package Text::HTML::CollapseWhitespace 0.04;
+package Text::HTML::CollapseWhitespace 0.05;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';
@@ -14,7 +14,7 @@ Text::HTML::CollapseWhitespace - remove extraneous whitespace from a fragment
 
 =head1 SYNOPSIS
 
-  my $tree = XML::LibXML->parse_html_string(
+  my $tree = XML::LibXML->new->parse_html_string(
       $input,
       { recover => 2, encoding => 'UTF-8' }
   );

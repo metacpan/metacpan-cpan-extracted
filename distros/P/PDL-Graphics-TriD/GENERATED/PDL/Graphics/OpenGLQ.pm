@@ -23,7 +23,7 @@ use DynaLoader;
 
 
 
-#line 7 "lib/PDL/Graphics/OpenGLQ.pd"
+#line 11 "lib/PDL/Graphics/OpenGLQ.pd"
 
 =head1 NAME
 

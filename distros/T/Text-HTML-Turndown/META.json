@@ -38,6 +38,9 @@
             "List::Util" : "0",
             "Module::Load" : "0",
             "Moo" : "2",
+            "PerlX::Maybe" : "0",
+            "Text::CleanFragment" : "0",
+            "Text::FrontMatter::YAML" : "0",
             "XML::LibXML" : "0",
             "experimental" : "0.034",
             "perl" : "5.020"
@@ -64,7 +67,7 @@
          "web" : "https://github.com/Corion/Text-HTML-Turndown"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

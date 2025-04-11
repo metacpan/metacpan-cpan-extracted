@@ -3,8 +3,7 @@ package Moonshine::Bootstrap::Component::NavbarForm;
 use Moonshine::Magic;
 use Params::Validate qw/ARRAYREF/;
 
-use feature qw/switch/;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use Switch::Back;
 
 lazy_components qw/form/;
 

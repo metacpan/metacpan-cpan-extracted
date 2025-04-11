@@ -1,0 +1,231 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::threads-thread_id-messages-message_id - Documentation for the /threads/{thread_id}/messages/{message_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</threads/{thread_id}/messages/{message_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /threads/{thread_id}/messages/{message_id}>
+
+Deletes a message.
+
+
+
+=head3 Operation ID
+
+C<deleteMessage>
+
+    $client->deleteMessage( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<thread_id> (in path) (Required) - The ID of the thread to which this message belongs.
+
+Type: C<string>
+
+
+
+=item * C<message_id> (in path) (Required) - The ID of the message to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /threads/{thread_id}/messages/{message_id}>
+
+Retrieve a message.
+
+
+
+=head3 Operation ID
+
+C<getMessage>
+
+    $client->getMessage( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) to which this message belongs.
+
+Type: C<string>
+
+
+
+=item * C<message_id> (in path) (Required) - The ID of the message to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "msg_abc123",
+      "object": "thread.message",
+      "created_at": 1698983503,
+      "thread_id": "thread_abc123",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": {
+            "value": "Hi! How can I help you today?",
+            "annotations": []
+          }
+        }
+      ],
+      "assistant_id": "asst_abc123",
+      "run_id": "run_abc123",
+      "attachments": [],
+      "metadata": {}
+    }
+
+
+=back
+
+=head2 C<POST /threads/{thread_id}/messages/{message_id}>
+
+Modifies a message.
+
+
+
+=head3 Operation ID
+
+C<modifyMessage>
+
+    $client->modifyMessage( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<thread_id> (in path) (Required) - The ID of the thread to which this message belongs.
+
+Type: C<string>
+
+
+
+=item * C<message_id> (in path) (Required) - The ID of the message to modify.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "msg_abc123",
+      "object": "thread.message",
+      "created_at": 1698983503,
+      "thread_id": "thread_abc123",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": {
+            "value": "Hi! How can I help you today?",
+            "annotations": []
+          }
+        }
+      ],
+      "assistant_id": "asst_abc123",
+      "run_id": "run_abc123",
+      "attachments": [],
+      "metadata": {}
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

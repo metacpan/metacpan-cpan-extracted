@@ -2,9 +2,9 @@ package Term::TablePrint::ProgressBar;
 
 use strict;
 use warnings;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 
 use Term::Choose::Constants qw( EXTRA_W );
 use Term::Choose::Screen    qw( clear_screen clear_to_end_of_line );
@@ -17,7 +17,6 @@ sub new {
     $self->{show_progress_bar} //= 1;
     return $self;
 }
-
 
 sub set_progress_bar {
     my ( $self ) = @_;
@@ -68,7 +67,7 @@ Term::TablePrint::ProgressBar - Show a progress bar.
 
 =head1 VERSION
 
-Version 0.168
+Version 0.169
 
 =cut
 

@@ -1,0 +1,68 @@
+{
+   "abstract" : "Class::Accessor::Validated",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Accessor-Validated",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Accessor::Validated" : {
+         "file" : "lib/Class/Accessor/Validated.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "http://github.com/rlauer6/Class-Accessor-Validated"
+      },
+      "homepage" : "http://github.com/rlauer6/Class-Accessor-Validated",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/Class-Accessor-Validated.git",
+         "web" : "http://github.com/rlauer6/Class-Accessor-Validated"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

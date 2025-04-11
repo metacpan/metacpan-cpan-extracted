@@ -26,10 +26,12 @@ WriteMakefile(
         'Moonshine::Element' => '0.10',
         'Moonshine::Magic' => '0.06',
         'Moonshine::Util' => '0.06',
+	'Method::Traits' => '0.08',
         'feature' => 0,
         'strict' => 0,
         'warnings' => 0,
         'Module::Find' => '0.13',
+	'Switch::Back' => '0.000005'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Moonshine-Bootstrap-*' },

@@ -1,0 +1,107 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::embeddings - Documentation for the /embeddings path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</embeddings>.
+
+=head1 PATHS
+
+
+=head2 C<POST /embeddings>
+
+Creates an embedding vector representing the input text.
+
+
+
+=head3 Operation ID
+
+C<createEmbedding>
+
+    $client->createEmbedding( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+
+=head4 Models
+
+ID of the model to use. You can use the L<List models|https://platform.openai.com/docs/api-reference/models/list> API to see all of your available models, or see our L<Model overview|https://platform.openai.com/docs/models> for descriptions of them.
+
+=over 4
+      
+=item * C<text-embedding-ada-002>
+
+=item * C<text-embedding-3-small>
+
+=item * C<text-embedding-3-large>
+
+=back
+      
+      
+Example:
+
+    {
+       "encoding_format" : "float",
+       "input" : "The quick brown fox jumped over the lazy dog",
+       "model" : "text-embedding-3-small",
+       "user" : "user-1234"
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"embedding\",\n  \"embedding\": [\n    0.0023064255,\n    -0.009327292,\n    .... (1536 floats total for ada-002)\n    -0.0028842222,\n  ],\n  \"index\": 0\n}\n"
+       ],
+       "usage" : null
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

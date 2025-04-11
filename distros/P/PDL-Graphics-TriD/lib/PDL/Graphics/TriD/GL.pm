@@ -2,7 +2,6 @@ use strict;
 use warnings;
 no warnings 'redefine';
 use OpenGL qw/ :glfunctions :glconstants gluPerspective gluOrtho2D /;
-use OpenGL::GLUT qw( :all );
 use PDL::Core qw(barf);
 
 sub PDL::Graphics::TriD::Material::togl{
@@ -79,7 +78,6 @@ sub PDL::Graphics::TriD::Graph::togl {
 use PDL;
 sub PDL::Graphics::TriD::CylindricalEquidistantAxes::togl_axis {
 	my($this,$graph) = @_;
-	my $fontbase = $PDL::Graphics::TriD::GL::fontbase;
         my (@nadd,@nc,@ns);
 	for my $dim (0..1) {
 	  my $width = $this->{Scale}[$dim][1]-$this->{Scale}[$dim][0];
@@ -126,7 +124,6 @@ sub PDL::Graphics::TriD::CylindricalEquidistantAxes::togl_axis {
 sub PDL::Graphics::TriD::EuclidAxes::togl_axis {
 	my($this,$graph) = @_;
         print "togl_axis: got object type " . ref($this) . "\n" if $PDL::Graphics::TriD::verbose;
-	my $fontbase = $PDL::Graphics::TriD::GL::fontbase;
 	glLineWidth(1); # ought to be user defined
 	glDisable(GL_LIGHTING);
 	my $ndiv = 4;
@@ -140,8 +137,7 @@ sub PDL::Graphics::TriD::EuclidAxes::togl_axis {
 	my @label = map sprintf("%.3f", $_), @{ $axisvals->flat->unpdl };
 	push @label, @{$this->{Names}};
 	glColor3d(1,1,1);
-	PDL::Graphics::OpenGLQ::gl_texts($ends->glue(1, $id3), done_glutInit(),
-	    $fontbase, \@label);
+	PDL::Graphics::OpenGLQ::gl_texts($ends->glue(1, $id3), \@label);
 	PDL::gl_lines_nc($line_coord->splitdim(0,3)->clump(1,2));
 	glEnable(GL_LIGHTING);
 }
@@ -236,6 +232,11 @@ sub PDL::Graphics::TriD::GObject::glOptions {
   my ($this) = @_;
   glLineWidth($this->{Options}{LineWidth} || 1);
   glPointSize($this->{Options}{PointSize} || 1);
+  glEnable(GL_DEPTH_TEST); # moved here from gdriver else GLFW evaporates it
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+  glLightfv_s(GL_LIGHT0,GL_POSITION,pack "f*",1.0,1.0,1.0,0.0);
 }
 
 sub PDL::Graphics::TriD::GObject::_lattice_lines {
@@ -269,7 +270,6 @@ sub PDL::Graphics::TriD::Contours::gdraw {
 	   glColor3d(1,1,1);
 	   my $seg = sprintf ":,%d:%d",$this->{Labels}[0],$this->{Labels}[1];
 	   PDL::Graphics::OpenGLQ::gl_texts($points->slice($seg),
-		   done_glutInit(), $this->{Options}{Font},
 		   $this->{LabelStrings});
     }
   };
@@ -303,8 +303,7 @@ sub PDL::Graphics::TriD::SLattice::gdraw {
 	glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
 	$this->glOptions;
 	glDisable(GL_LIGHTING);
-# By-vertex doesn't make sense otherwise.
-	glShadeModel(GL_SMOOTH);
+	glShadeModel(GL_SMOOTH); # By-vertex doesn't make sense otherwise.
 	eval {
 	  _lattice_slice(\&PDL::gl_triangles, $points, $this->{Colors});
 	  $this->_lattice_lines($points) if $this->{Options}{Lines};
@@ -320,8 +319,7 @@ sub PDL::Graphics::TriD::SCLattice::gdraw {
 	glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
 	$this->glOptions;
 	glDisable(GL_LIGHTING);
-# By-vertex doesn't make sense otherwise.
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_FLAT); # By-vertex doesn't make sense otherwise.
 	eval {
 	  _lattice_slice(\&PDL::gl_triangles, $points, $this->{Colors});
 	  $this->_lattice_lines($points) if $this->{Options}{Lines};
@@ -331,28 +329,32 @@ sub PDL::Graphics::TriD::SCLattice::gdraw {
 }
 
 sub PDL::Graphics::TriD::SLattice_S::gdraw {
-	my($this,$points) = @_;
-	barf "Need 3D points"
-	  if grep $_->ndims < 3, $points;
-	glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
-	$this->glOptions;
-# For some reason, we need to set this here as well.
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-# By-vertex doesn't make sense otherwise.
-	glShadeModel(GL_SMOOTH);
-	eval {
-	  my $f = 'PDL::gl_triangles_';
-	  $f .= 'w' if $this->{Options}{Smooth};
-	  $f .= 'n_mat';
-	  { no strict 'refs'; $f = \&$f; }
-	  my @pdls = $points;
-	  push @pdls, $this->{Normals} if $this->{Options}{Smooth};
-	  push @pdls, $this->{Colors};
-	  _lattice_slice($f, @pdls);
-	  $this->_lattice_lines($points) if $this->{Options}{Lines};
-	};
-	{ local $@; glPopAttrib(); }
-	die if $@;
+  my($this,$points) = @_;
+  barf "Need 3D points"
+    if grep $_->ndims < 3, $points;
+  glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
+  $this->glOptions;
+  glShadeModel(GL_SMOOTH); # By-vertex doesn't make sense otherwise.
+  eval {
+    my $f = 'PDL::gl_triangles_';
+    $f .= 'w' if $this->{Options}{Smooth};
+    $f .= 'n_mat';
+    { no strict 'refs'; $f = \&$f; }
+    my @pdls = $points;
+    push @pdls, $this->{Normals} if $this->{Options}{Smooth};
+    push @pdls, $this->{Colors};
+    _lattice_slice($f, @pdls);
+    $this->_lattice_lines($points) if $this->{Options}{Lines};
+    if ($this->{Options}{ShowNormals}) {
+      die "No normals to show!" if !defined $this->{Normals};
+      my $arrows = $points->append($points + $this->{Normals}*0.1)->splitdim(0,3);
+      glDisable(GL_LIGHTING);
+      glColor3d(1,1,1);
+      PDL::Graphics::OpenGLQ::gl_arrows($arrows, 0, 1, 0.5, 0.02);
+    }
+  };
+  { local $@; glPopAttrib(); }
+  die if $@;
 }
 
 sub PDL::Graphics::TriD::STrigrid_S::gdraw {
@@ -361,10 +363,7 @@ sub PDL::Graphics::TriD::STrigrid_S::gdraw {
   glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
   $this->glOptions;
   eval {
-    # For some reason, we need to set this here as well.
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    # By-vertex doesn't make sense otherwise.
-    glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_SMOOTH); # By-vertex doesn't make sense otherwise.
     my @sls = (":,(0)",":,(1)",":,(2)");
     my $idx = [0,1,2,0]; # for lines, below
     if ($this->{Options}{Smooth}) {
@@ -402,8 +401,7 @@ sub PDL::Graphics::TriD::STrigrid::gdraw {
   $this->glOptions;
   eval {
     glDisable(GL_LIGHTING);
-# By-vertex doesn't make sense otherwise.
-    glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_SMOOTH); # By-vertex doesn't make sense otherwise.
     PDL::gl_triangles(map $_->mv(1,-1)->dog, $faces, $this->{Colors});
     if ($this->{Options}{Lines}) {
       glColor3f(0,0,0);
@@ -478,7 +476,6 @@ sub PDL::Graphics::TriD::SimpleController::togl {
 package PDL::Graphics::TriD::Window;
 
 use OpenGL qw/ :glfunctions :glconstants /;
-use OpenGL::GLUT qw( :all );
 
 use base qw/PDL::Graphics::TriD::Object/;
 use fields qw/Ev Width Height Interactive _GLObject
@@ -491,25 +488,17 @@ sub gdriver {
     print "WARNING: Graphics Driver already defined for this window \n";
     return;
   }
-  # Use GLUT windows and event handling as the TriD default
-  my $window_type = $ENV{POGL_WINDOW_TYPE} || 'glut';
+  my $window_type = $ENV{POGL_WINDOW_TYPE} || 'glfw';
   my $gl_class = $window_type =~ /x11/i ? 'PDL::Graphics::TriD::GL::GLX' :
-    'PDL::Graphics::TriD::GL::GLUT';
+    $window_type =~ /glut/i ? 'PDL::Graphics::TriD::GL::GLUT' :
+    'PDL::Graphics::TriD::GL::GLFW';
   (my $file = $gl_class) =~ s#::#/#g; require "$file.pm";
   print "gdriver: Calling $gl_class(@$options{qw(width height)})\n" if $PDL::Graphics::TriD::verbose;
   $this->{_GLObject} = $gl_class->new($options, $this);
   print "gdriver: Calling glClearColor...\n" if $PDL::Graphics::TriD::verbose;
   glClearColor(0,0,0,1);
-  print "gdriver: Calling glpRasterFont...\n" if $PDL::Graphics::TriD::verbose;
-  $PDL::Graphics::TriD::GL::fontbase = $this->{_GLObject}->glpRasterFont($ENV{PDL_3D_FONT} || "8x13", 0, 256);
   glShadeModel(GL_FLAT);
-  glEnable(GL_DEPTH_TEST);
   glEnable(GL_NORMALIZE);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-  my $light = pack "f*",1.0,1.0,1.0,0.0;
-  glLightfv_s(GL_LIGHT0,GL_POSITION,$light);
   glColor3f(1,1,1);
   print "STARTED OPENGL!\n" if $PDL::Graphics::TriD::verbose;
   if($PDL::Graphics::TriD::offline) {
@@ -786,13 +775,13 @@ miscellaneous OpenGL or GUI related functionality to
 support PDL::Graphics::TriD refactoring.
 
 It defines an interface that subclasses will conform to, implementing
-support for GLUT, X11+GLX, etc, as mechanism for creating windows
+support for GLFW, GLUT, X11+GLX, etc, as the mechanism for creating windows
 and graphics contexts.
 
 =head1 CONFIG
 
-Defaults to using L<OpenGL::GLUT> - override by setting the environment
-variable C<POGL_WINDOW_TYPE> to C<x11> (the default is C<glut>).
+Defaults to using L<OpenGL::GLFW> - override by setting the environment
+variable C<POGL_WINDOW_TYPE> to C<glut>, C<x11> , or the default is C<glfw>.
 This is implemented by C<PDL::Graphics::TriD::Window::gdriver>.
 
 =head2 new
@@ -824,6 +813,8 @@ Returns a new OpenGL object.
 Allowed 3d window types, case insensitive, are:
 
 =over
+
+=item glfw - use Perl OpenGL bindings and GLFW windows (no Tk)
 
 =item glut - use Perl OpenGL bindings and GLUT windows (no Tk)
 

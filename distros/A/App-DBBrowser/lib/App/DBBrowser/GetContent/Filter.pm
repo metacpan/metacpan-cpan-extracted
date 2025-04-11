@@ -661,13 +661,11 @@ sub __merge_rows {
     my $term_w = get_term_width() + EXTRA_W;
     my $stringified_rows;
     {
-        my $dots = $sf->{i}{dots};
-        my $dots_w = print_columns( $dots );
         no warnings 'uninitialized';
         @$stringified_rows = map {
             my $str_row = join( ',', @$_ );
             if ( print_columns( $str_row ) > $term_w ) {
-                $str_row = unicode_sprintf( $str_row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
+                $str_row = unicode_sprintf( $str_row, $term_w, { suffix_on_truncate => $sf->{i}{dots} } );
             }
             else {
                 $str_row;

@@ -1,0 +1,169 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-key_id - Documentation for the /organization/projects/{project_id}/api_keys/{key_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/projects/{project_id}/api_keys/{key_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /organization/projects/{project_id}/api_keys/{key_id}>
+
+Deletes an API key from the project.
+
+
+
+=head3 Operation ID
+
+C<delete-project-api-key>
+
+    $client->delete-project-api-key( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<project_id> (in path) (Required) - The ID of the project.
+
+Type: C<string>
+
+
+
+=item * C<key_id> (in path) (Required) - The ID of the API key.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Project API key deleted successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head4 Status Code: C<400>
+
+Error response for various conditions.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "error" : null
+    }
+
+
+=back
+
+=head2 C<GET /organization/projects/{project_id}/api_keys/{key_id}>
+
+Retrieves an API key in the project.
+
+
+
+=head3 Operation ID
+
+C<retrieve-project-api-key>
+
+    $client->retrieve-project-api-key( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<project_id> (in path) (Required) - The ID of the project.
+
+Type: C<string>
+
+
+
+=item * C<key_id> (in path) (Required) - The ID of the API key.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Project API key retrieved successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+        "object": "organization.project.api_key",
+        "redacted_value": "sk-abc...def",
+        "name": "My API Key",
+        "created_at": 1711471533,
+        "id": "key_abc",
+        "owner": {
+            "type": "user",
+            "user": {
+                "object": "organization.project.user",
+                "id": "user_abc",
+                "name": "First Last",
+                "email": "user@example.com",
+                "role": "owner",
+                "created_at": 1711471533
+            }
+        }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

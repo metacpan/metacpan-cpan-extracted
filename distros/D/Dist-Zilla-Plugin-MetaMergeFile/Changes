@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MetaMergeFile
 
+0.005     2025-04-10 23:48:17+02:00 Europe/Brussels
+          - Allow any number of metamerge files
+
 0.004     2020-06-20 23:37:17+02:00 Europe/Amsterdam
           - Correct [PrereqsFile] abstract and docs
 

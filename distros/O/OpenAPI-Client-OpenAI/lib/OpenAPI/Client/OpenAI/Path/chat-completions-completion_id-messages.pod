@@ -1,0 +1,113 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages - Documentation for the /chat/completions/{completion_id}/messages path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</chat/completions/{completion_id}/messages>.
+
+=head1 PATHS
+
+
+=head2 C<GET /chat/completions/{completion_id}/messages>
+
+Get the messages in a stored chat completion. Only Chat Completions that
+have been created with the C<store> parameter set to C<true> will be
+returned.
+
+
+
+=head3 Operation ID
+
+C<getChatCompletionMessages>
+
+    $client->getChatCompletionMessages( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<completion_id> (in path) (Required) - The ID of the chat completion to retrieve messages from.
+
+Type: C<string>
+
+
+
+=item * C<after> (in query) (Optional) - Identifier for the last message from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of messages to retrieve.
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order for messages by timestamp. Use `asc` for ascending order or `desc` for descending order. Defaults to `asc`.
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<asc>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+A list of messages
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "list",
+      "data": [
+        {
+          "id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+          "role": "user",
+          "content": "write a haiku about ai",
+          "name": null,
+          "content_parts": null
+        }
+      ],
+      "first_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+      "last_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+      "has_more": false
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

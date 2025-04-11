@@ -6,7 +6,7 @@ use File::Spec::Functions qw(catfile);
 
 use Mojo::Base 'OpenAPI::Client';
 
-our $VERSION = '0.14';
+our $VERSION = '0.21';
 
 sub new {
     my ( $class, $specification ) = ( shift, shift );
@@ -123,6 +123,8 @@ key authentication according to the provided environment.
 Note that the OpenAI API is a paid service. You will need to sign up for an
 account.
 
+See L<OpenAI::Client::OpenAI::Path> for a list of all available paths and methods.
+
 See the C<examples/> directory in the distribution for more examples, along
 with the tests.
 
@@ -162,9 +164,11 @@ exception of the following extra options:
 
 =head2 Other Methods
 
-Other methods are documented in L<OpenAPI::Client::OpenAI::Methods>.
+Other methods are documented in L<OpenAPI::Client::OpenAI::Methods>. These
+method are deprecated and will be removed in a future version.
 
-The schema is documented in L<OpenAPI::Client::OpenAI::Schema>.
+See L<OpenAPI::Client::OpenAI::Path> for an index of all paths available. You
+can click through each of them for more detail.
 
 =head1 DEPRECATED METHODS
 

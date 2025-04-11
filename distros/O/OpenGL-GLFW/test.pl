@@ -3,8 +3,8 @@
 # after the test suite so you see something if the build worked.
 #========================================================================
 
-# skip test under under headless macOS
-exit if exists $ENV{CI} and $^O eq 'darwin';
+# skip test under under headless CI
+exit if exists $ENV{CI} and $^O eq 'darwin' or $^O eq 'MSWin32';
 
 #========================================================================
 # Simple GLFW example

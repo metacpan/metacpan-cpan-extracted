@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.561   2025-04-10
+    - Term::Choose::Util minimum version 0.145.
+    - Raised Perl minimum version to 5.10.1.
+
 0.560   2025-03-24
     - Term::Choose minimum version 1.769.
     - Update 'line_fold' and 'cut_to_printwidth'.

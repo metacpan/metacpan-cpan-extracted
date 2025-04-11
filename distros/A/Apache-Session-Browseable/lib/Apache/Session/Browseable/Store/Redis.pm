@@ -2,7 +2,7 @@ package Apache::Session::Browseable::Store::Redis;
 
 use strict;
 
-our $VERSION = '1.3.2';
+our $VERSION = '1.3.15';
 our $redis;
 
 BEGIN {
@@ -51,8 +51,8 @@ sub insert {
     my $id = $session->{data}->{_session_id};
     $self->{cache}->set( $id, $session->{serialized} );
     foreach my $i (@$index) {
-        my $t;
-        next unless ( $t = $session->{data}->{$i} );
+        my $t = $session->{data}->{$i};
+        next unless ( defined($t) and ( length($t) > 0 ) );
         $self->{cache}->sadd( "${i}_$t", $id );
     }
 }
@@ -114,15 +114,15 @@ L<Apache::Session::Browseable>, L<Apache::Session::NoSQL>, L<Apache::Session>
 
 =over
 
-=item 2009-2023 by Xavier Guimard
+=item 2009-2025 by Xavier Guimard
 
-=item 2013-2023 by Clément Oudot
+=item 2013-2025 by Clément Oudot
 
-=item 2019-2023 by Maxime Besson
+=item 2019-2025 by Maxime Besson
 
-=item 2013-2023 by Worteks
+=item 2013-2025 by Worteks
 
-=item 2023 by Linagora
+=item 2023-2025 by Linagora
 
 =back
 

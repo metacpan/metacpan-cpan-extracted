@@ -5,15 +5,14 @@ use Moose;
 use Archive::Zip 1.61     qw(AZ_OK);
 use Carp                  qw/croak/;
 use Scalar::Util          qw/openhandle/;
+use Encode                qw/decode/;
 
-our $VERSION = '1.15';
 
 #======================================================================
 # ATTRIBUTES
 #======================================================================
 has 'frontend'      => (is => 'ro', isa => 'Excel::ValueReader::XLSX',
-                        required => 1, weak_ref => 1,
-                        handles => [qw/A1_to_num formatted_date/]);
+                        required => 1, weak_ref => 1, handles => [qw/formatted_date/]);
 
 my %lazy_attrs = ( zip             => 'Archive::Zip',
                    date_styles     => 'ArrayRef',
@@ -54,13 +53,14 @@ sub _table_info {
   my %table_info;
   my @table_members = $self->zip->membersMatching(qr[^xl/tables/table\d+\.xml$]);
   foreach my $table_member (map {$_->fileName} @table_members) {
-    my ($table_id)     = $table_member =~ /table(\d+)\.xml/;
-    my $table_xml      = $self->_zip_member_contents($table_member);
-    my ($name, $ref, $table_columns, $no_headers)
-                       = $self->_parse_table_xml($table_xml); # defined in subclass
-    my $sheet_id       = $self->sheet_for_table->[$table_id]
+    my ($table_id)            = $table_member =~ /table(\d+)\.xml/;
+    my $table_xml             = $self->_zip_member_contents($table_member);
+    my $this_table_info       = $self->_parse_table_xml($table_xml); # defined in subclass
+    $this_table_info->{id}    = $table_id;
+    $this_table_info->{sheet} = $self->sheet_for_table->[$table_id]
       or croak "could not find sheet id for table $table_id";
-    $table_info{$name} = [$sheet_id, $table_id, $ref, $table_columns, $no_headers];
+
+    $table_info{$this_table_info->{name}}  = $this_table_info;
   }
 
   return \%table_info;
@@ -82,8 +82,11 @@ sub _sheet_for_table {
   return \@sheet_for_table;
 }
 
+for my $abstract_meth (qw/_date_styles _strings _workbook_data/) {
+  no strict 'refs';
+  *{$abstract_meth} = sub {die "->$abstract_meth() should be implemented in subclass"}
+}
 
-# attribute constructors for _date_styles, _strings and _workbook_data are supplied in subclasses
 
 #======================================================================
 # METHODS
@@ -122,9 +125,8 @@ sub _zip_member_contents {
 
   my $contents = $self->zip->contents($member)
     or die "no contents for member $member";
-  utf8::decode($contents);
 
-  return $contents;
+  return decode('UTF-8', $contents);
 }
 
 sub _zip_member_name_for_sheet {

@@ -2,9 +2,9 @@ package Term::Form::ReadLine;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '0.560';
+our $VERSION = '0.561';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -480,7 +480,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.560
+Version 0.561
 
 =cut
 
@@ -642,7 +642,7 @@ default: C<0>
 
 =head2 Perl version
 
-Requires Perl version 5.10.0 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Terminal
 

@@ -17,7 +17,7 @@ if (not $bin) {
     print "🤗 No binary provided\n";
     exit 0;
 }
-my $local_lib = getcwd . "/.cpx"; 
+my $local_lib = getcwd . "/local";
 
 # Check if it is already installed (and execute) 
 if (-f "$local_lib/bin/$bin") {
@@ -96,7 +96,7 @@ sub execute {
     my $b = shift; # bin
 
     if (-f "$ll/bin/$b") {
-    exec "perl", "-Mlocal::lib=$ll", "$ll/bin/$b", @ARGV;
+        exec "perl", "-Mlocal::lib=$ll", "$ll/bin/$b", @ARGV;
     } else {
         print "💀 Executable was found, but not installed correctly\n";
         exit -1;

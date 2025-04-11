@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::batches - Documentation for the /batches path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</batches>.
+
+=head1 PATHS
+
+
+=head2 C<GET /batches>
+
+List your organization's batches.
+
+
+
+=head3 Operation ID
+
+C<listBatches>
+
+    $client->listBatches( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Batch listed successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"id\": \"batch_abc123\",\n  \"object\": \"batch\",\n  \"endpoint\": \"/v1/completions\",\n  \"errors\": null,\n  \"input_file_id\": \"file-abc123\",\n  \"completion_window\": \"24h\",\n  \"status\": \"completed\",\n  \"output_file_id\": \"file-cvaTdG\",\n  \"error_file_id\": \"file-HOWS94\",\n  \"created_at\": 1711471533,\n  \"in_progress_at\": 1711471538,\n  \"expires_at\": 1711557933,\n  \"finalizing_at\": 1711493133,\n  \"completed_at\": 1711493163,\n  \"failed_at\": null,\n  \"expired_at\": null,\n  \"cancelling_at\": null,\n  \"cancelled_at\": null,\n  \"request_counts\": {\n    \"total\": 100,\n    \"completed\": 95,\n    \"failed\": 5\n  },\n  \"metadata\": {\n    \"customer_id\": \"user_123456789\",\n    \"batch_description\": \"Nightly eval job\",\n  }\n}\n"
+       ],
+       "first_id" : "batch_abc123",
+       "last_id" : "batch_abc456"
+    }
+
+
+=back
+
+=head2 C<POST /batches>
+
+Creates and executes a batch from an uploaded file of requests
+
+
+
+=head3 Operation ID
+
+C<createBatch>
+
+    $client->createBatch( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Batch created successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "batch_abc123",
+      "object": "batch",
+      "endpoint": "/v1/completions",
+      "errors": null,
+      "input_file_id": "file-abc123",
+      "completion_window": "24h",
+      "status": "completed",
+      "output_file_id": "file-cvaTdG",
+      "error_file_id": "file-HOWS94",
+      "created_at": 1711471533,
+      "in_progress_at": 1711471538,
+      "expires_at": 1711557933,
+      "finalizing_at": 1711493133,
+      "completed_at": 1711493163,
+      "failed_at": null,
+      "expired_at": null,
+      "cancelling_at": null,
+      "cancelled_at": null,
+      "request_counts": {
+        "total": 100,
+        "completed": 95,
+        "failed": 5
+      },
+      "metadata": {
+        "customer_id": "user_123456789",
+        "batch_description": "Nightly eval job",
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

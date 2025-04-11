@@ -1,0 +1,109 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::uploads - Documentation for the /uploads path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</uploads>.
+
+=head1 PATHS
+
+
+=head2 C<POST /uploads>
+
+Creates an intermediate L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object
+that you can add L<Parts|https://platform.openai.com/docs/api-reference/uploads/part-object> to.
+Currently, an Upload can accept at most 8 GB in total and expires after an
+hour after you create it.
+
+Once you complete the Upload, we will create a
+L<File|https://platform.openai.com/docs/api-reference/files/object> object that contains all the parts
+you uploaded. This File is usable in the rest of our platform as a regular
+File object.
+
+For certain C<purpose> values, the correct C<mime_type> must be specified. 
+Please refer to documentation for the 
+L<supported MIME types for your use case|https://platform.openai.com/docs/assistants/tools/file-search#supported-files>.
+
+For guidance on the proper filename extensions for each purpose, please
+follow the documentation on L<creating a
+File|https://platform.openai.com/docs/api-reference/files/create>.
+
+
+
+=head3 Operation ID
+
+C<createUpload>
+
+    $client->createUpload( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "id": "upload_abc123",
+      "object": "upload",
+      "bytes": 2147483648,
+      "created_at": 1719184911,
+      "filename": "training_examples.jsonl",
+      "purpose": "fine-tune",
+      "status": "completed",
+      "expires_at": 1719127296,
+      "file": {
+        "id": "file-xyz321",
+        "object": "file",
+        "bytes": 2147483648,
+        "created_at": 1719186911,
+        "filename": "training_examples.jsonl",
+        "purpose": "fine-tune",
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

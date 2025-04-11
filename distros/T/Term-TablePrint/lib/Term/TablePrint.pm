@@ -2,9 +2,9 @@ package Term::TablePrint;
 
 use warnings;
 use strict;
-use 5.10.0;
+use 5.10.1;
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -15,7 +15,7 @@ use Scalar::Util qw( looks_like_number );
 
 use Term::Choose                  qw( choose );
 use Term::Choose::Constants       qw( EXTRA_W PH SGR_ES );
-use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::LineFold        qw( print_columns cut_to_printwidth adjust_to_printwidth line_fold );
 use Term::Choose::Screen          qw( hide_cursor show_cursor );
 use Term::Choose::ValidateOptions qw( validate_options );
 use Term::Choose::Util            qw( get_term_width insert_sep );
@@ -285,8 +285,8 @@ sub __write_table {
         }
     }
     my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $self->{_search_regex} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
-    my $auto_jumped_to_first_row = 2;
-    my $row_is_expanded = 0;
+    my $auto_jumped_to_first_row = 0;
+    my $row_was_expanded = 0;
 
     while ( 1 ) {
         if ( $term_w != get_term_width() + EXTRA_W ) {
@@ -323,53 +323,42 @@ sub __write_table {
             }
         }
         if ( ! $self->{table_expand} ) {
-            if ( $row == 0 ) {
-                return $return;
-            }
+            return $return if $row == 0;
             next;
         }
-        else {
-            if ( $old_row == $row ) {
-                if ( $row == 0 ) {
-                    if ( $self->{table_expand} ) {
-                        if ( $row_is_expanded ) {
-                            return $return;
-                        }
-                        if ( $auto_jumped_to_first_row == 1 ) {
-                            return $return;
-                        }
-                    }
-                    $auto_jumped_to_first_row = 0;
-                }
-                elsif ( $ENV{TC_RESET_AUTO_UP} ) {
-                    $auto_jumped_to_first_row = 0;
-                }
-                else {
-                    $old_row = 0;
-                    $auto_jumped_to_first_row = 1;
-                    $row_is_expanded = 0;
-                    next;
-                }
-            }
-            $old_row = $row;
-            $row_is_expanded = 1;
-            if ( $self->{_info_row} && $row == $#{$tbl_print} ) {
-                # Choose
-                choose(
-                    [ 'Close' ],
-                    { prompt => $self->{_info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
-                );
+        if ( $ENV{TC_RESET_AUTO_UP} ) { # name
+            $auto_jumped_to_first_row = 0;
+            $row_was_expanded = 0;
+        }
+        if ( $old_row == $row ) {
+            if ( $row > 0 && $row_was_expanded ) {
+                $old_row = 0;
+                $auto_jumped_to_first_row = 1;
+                $row_was_expanded = 0;
                 next;
             }
-            my $orig_row;
-            if ( @{$self->{_idx_search_matches}} ) {
-                $orig_row = $self->{_idx_search_matches}[$row];
+            elsif ( $row == 0 && ( $row_was_expanded || $auto_jumped_to_first_row ) ) {
+                return $return;
             }
-            else {
-                $orig_row = $row + 1; # because $tbl_print has no header row while $tbl_orig has a header row
-            }
-            $self->__print_single_row( $tbl_orig, $orig_row, $w_col_names, $footer );
         }
+        $old_row = $row;
+        $row_was_expanded = 1;
+        if ( $self->{_info_row} && $row == $#{$tbl_print} ) {
+            # Choose
+            choose(
+                [ 'Close' ],
+                { prompt => $self->{_info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+            );
+            next;
+        }
+        my $orig_row;
+        if ( @{$self->{_idx_search_matches}} ) {
+            $orig_row = $self->{_idx_search_matches}[$row];
+        }
+        else {
+            $orig_row = $row + 1; # because $tbl_print has no header row while $tbl_orig has a header row
+        }
+        $self->__print_single_row( $tbl_orig, $orig_row, $w_col_names, $footer );
         delete $ENV{TC_RESET_AUTO_UP};
     }
 }
@@ -503,7 +492,7 @@ sub __calc_avail_col_width {
     elsif ( $sum > $avail_w ) {
         if ( $self->{trunc_fract_first} ) {
 
-            TRUNC_FRACT: while ( $sum > $avail_w ) {
+            TRUNC_FRACT: while ( 1 ) {
                 my $prev_sum = $sum;
                 for my $col ( 0 .. $#$w_cols_calc ) {
                     if (   $w_fract->[$col] && $w_fract->[$col] > 3 # 3 == 1 decimal separator + 2 decimal places
@@ -628,14 +617,15 @@ sub __cols_to_string {
                     $number = $tbl_copy->[$row][$col];
                 }
                 if ( length $number > $w_cols_calc->[$col] ) {
-                    my $signed_1_precision_w = $one_precision_w + ( $number =~ /^-/ ? 1 : 0 );
+                    my $signed_one_precision_w = $one_precision_w + ( $number =~ /^-/ ? 1 : 0 );
                     my $precision;
-                    if ( $w_cols_calc->[$col] < $signed_1_precision_w ) {
+                    if ( $w_cols_calc->[$col] < $signed_one_precision_w ) {
                         # special treatment because zero precision has no dot
                         $precision = 0;
                     }
                     else {
-                        $precision = $w_cols_calc->[$col] - ( $signed_1_precision_w - 1 );
+                        $precision = $w_cols_calc->[$col] - ( $signed_one_precision_w - 1 );
+                        # -1 because $signed_one_precision_w contains already one precision
                     }
                     $number = sprintf "%.*e", $precision, $number;
                     # if $number is a scientific-notation-string which is to big for a conversation to a number
@@ -659,16 +649,7 @@ sub __cols_to_string {
                 }
             }
             else {
-                my $str_w = print_columns( $tbl_copy->[$row][$col] );
-                if ( $str_w > $w_cols_calc->[$col] ) {
-                    $str = $str . cut_to_printwidth( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
-                }
-                elsif ( $str_w < $w_cols_calc->[$col] ) {
-                    $str =  $str . $tbl_copy->[$row][$col] . ' ' x ( $w_cols_calc->[$col] - $str_w );
-                }
-                else {
-                    $str = $str . $tbl_copy->[$row][$col];
-                }
+                $str .= adjust_to_printwidth( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
             }
             if ( $self->{color} ) {
                 if ( defined $tbl_orig->[$row][$col] ) {
@@ -741,13 +722,7 @@ sub __print_single_row {
         $key =~ s/\t/ /g;
         $key =~ s/\v+/\ \ /g;
         $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-        my $key_w = print_columns( $key );
-        if ( $key_w > $max_key_w ) {
-            $key = cut_to_printwidth( $key, $max_key_w );
-        }
-        elsif ( $key_w < $max_key_w ) {
-            $key = ( ' ' x ( $max_key_w - $key_w ) ) . $key;
-        }
+        $key = adjust_to_printwidth( $key, $max_key_w );
         if ( @key_color ) {
             $key =~ s/${\PH}/shift @key_color/ge;
             $key .= "\e[0m";
@@ -915,7 +890,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.168
+Version 0.169
 
 =cut
 
@@ -1278,7 +1253,7 @@ if an invalid option value is passed.
 
 =head2 Perl version
 
-Requires Perl version 5.10.0 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Decoded strings
 

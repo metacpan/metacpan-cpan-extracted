@@ -1,6 +1,8 @@
 package Dist::Zilla::Plugin::PrereqsFile;
-$Dist::Zilla::Plugin::PrereqsFile::VERSION = '0.004';
+$Dist::Zilla::Plugin::PrereqsFile::VERSION = '0.005';
+use 5.020;
 use Moose;
+use experimental qw/signatures postderef/;
 use namespace::autoclean;
 
 with qw/Dist::Zilla::Role::PrereqSource/;
@@ -18,23 +20,22 @@ has filenames => (
 	},
 );
 
-sub register_prereqs {
-	my $self = shift;
-	for my $filename (@{ $self->filenames }) {
+sub register_prereqs($self) {
+	for my $filename ($self->filenames->@*) {
 		require Parse::CPAN::Meta;
 		my $prereqs = Parse::CPAN::Meta->load_file($filename);
-		for my $phase (keys %{ $prereqs }) {
-			for my $type (keys %{ $prereqs->{$phase} }) {
+		for my $phase (keys $prereqs->%*) {
+			for my $type (keys $prereqs->{$phase}->%*) {
 				$self->zilla->register_prereqs(
 					{ phase => $phase, type => $type },
-					%{ $prereqs->{$phase}{$type} }
+					$prereqs->{$phase}{$type}->%*
 				);
 			}
 		}
 	}
 }
 
-sub mvp_aliases {
+sub mvp_aliases($self) {
 	return {
 		filename => 'filenames',
 	};
@@ -58,7 +59,7 @@ Dist::Zilla::Plugin::PrereqsFile - Add static prereqs using a prereqs file
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
