@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 use parent 'Data::URIID::Base';
 
@@ -723,12 +723,13 @@ sub _extra_lookup_services {
         'osm'                   => [qw(osm-node osm-way osm-relation)],
         'overpass'              => [qw(wikidata-identifier)],
         'Data::URIID'           => [
-            qw(uuid oid uri),                               # ISE,
+            qw(uuid oid uri),                                                   # ISE,
             keys %{_own_well_known()},
         ],
         'Data::Identifier'      => [
-            qw(uuid oid uri),                               # ISE,
-            qw(e621-post-identifier e621-pool-identifier),  # e621
+            qw(uuid oid uri),                                                   # ISE,
+            qw(e621-post-identifier e621-pool-identifier e621tagtype e621tag),  # e621
+            qw(danbooru2chanjp-post-identifier danbooru2chanjp-tag),            # danbooru2chanjp
             keys %{_own_well_known()},
         ],
         'factgrid'              => [values(%{$config_factgrid->{idmap}}), qw(factgrid-identifier)],
@@ -740,6 +741,7 @@ sub _extra_lookup_services {
         'imgur'                 => ['imgur-post-identifier'],
         'notalwaysright'        => ['notalwaysright-post-identifier'],
         'ruthede'               => ['ruthede-comic-post-identifier'],
+        'danbooru2chanjp'       => ['danbooru2chanjp-post-identifier'],
     }
 }
 
@@ -1339,10 +1341,54 @@ sub _online_lookup__e621 {
         my $file = $post->{file};
 
         $ids{'e621-post-identifier'} = int($post->{id});
-        $attr{ext}              = {'*' => $file->{ext}}     if defined $file->{ext};
-        $attr{final_file_size}  = {'*' => $file->{size}}    if defined $file->{size};
-        $attr{thumbnail}        = {'*' => $preview->{url}}  if defined $preview->{url};
-        $digest{'md-5-128'}     = $file->{md5}              if defined $file->{md5};
+        $attr{ext}              = {'*' => $file->{ext}}                 if defined $file->{ext};
+        $attr{final_file_size}  = {'*' => $file->{size}}                if defined $file->{size};
+        $attr{thumbnail}        = {'*' => URI->new($preview->{url})}    if defined $preview->{url};
+        $digest{'md-5-128'}     = $file->{md5}                          if defined $file->{md5};
+
+        if (defined(my $tagroot = $post->{tags})) {
+            $attr{tagged_as} = [map {[Data::Identifier->new('6fe0dbf0-624b-48b3-b558-0394c14bad6a' => $_)]} map {@{$_}} values %{$tagroot}];
+        }
+    }
+
+    return \%res;
+}
+
+sub _online_lookup__danbooru2chanjp {
+    my ($self, $result, %opts) = @_;
+    my $url = $result->url(service => 'danbooru2chanjp', action => 'info');
+    my $html = $self->_get_html($url) // return undef;
+    my $json = from_json(((($html->findnodes('//script[@id="metadata" and @type="application/json"]'))[0] // return undef)->content_list)[0]);
+    my %attr;
+    my %digest;
+    my %res = (attributes => \%attr, digest => \%digest);
+
+    $digest{'md-5-128'}     = $json->{hash} if defined($json->{hash}) && $json->{hash} =~ /^[0-9a-f]{32}$/;
+    $attr{final_file_size}  = {'*' => int($json->{filesize})} if defined($json->{filesize}) && int($json->{filesize});
+    $attr{ext}              = {'*' => $1} if defined($json->{ext}) && $json->{ext} =~ /^\.?([0-9a-z]{1,5})$/;
+
+    if (defined(my $tags = $json->{tags})) {
+        my @list;
+        $attr{tagged_as} = \@list;
+
+        foreach my $tag (split /\s+/, $tags) {
+            next unless length $tag;
+            eval { # eval required for Data::Identifier < v0.11
+                push(@list, [Data::Identifier->new('c5632c60-5da2-41af-8b60-75810b622756' => $tag)]);
+            };
+        }
+    }
+
+    if (defined(my $image = $json->{image}) && defined(my $directory = $json->{directory})) {
+        my $file_fetch = $url->clone;
+
+        $file_fetch->query(undef);
+        $file_fetch->path_segments('', 'images', $directory, $image);
+
+        $res{url_overrides} = {
+            'fetch'      => $file_fetch,
+            'file-fetch' => $file_fetch,
+        };
     }
 
     return \%res;
@@ -1452,7 +1498,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

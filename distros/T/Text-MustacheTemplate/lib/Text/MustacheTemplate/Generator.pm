@@ -51,26 +51,41 @@ sub generate_from_tokens {
 
 =head1 NAME
 
-Text::MustacheTemplate::Generator - Simple mustache template generator
+Text::MustacheTemplate::Generator - Template generator for Mustache templates
 
 =head1 SYNOPSIS
 
+    use Text::MustacheTemplate::Lexer;
     use Text::MustacheTemplate::Generator;
 
-    my $source = Text::MustacheTemplate::Generator->generate_from_tokens(@tokens);
+    my @tokens = Text::MustacheTemplate::Lexer->tokenize('Hello {{name}}!');
+    my $regenerated_template = Text::MustacheTemplate::Generator->generate_from_tokens(@tokens);
+    
+    # Result: 'Hello {{name}}!'
 
 =head1 DESCRIPTION
 
-Text::MustacheTemplate::Generator is a simple generator for Mustache tempalte.
+Text::MustacheTemplate::Generator can regenerate a Mustache template from tokens.
+This is primarily used for lambda functions that need access to the raw template string.
 
-This is low-level interface for Text::MustacheTemplate.
-The APIs may be change without notice.
+This is a low-level interface for Text::MustacheTemplate.
+The APIs may change without notice.
 
 =head1 METHODS
 
-=over 2
+=over 4
 
-=item generate_from_tokens
+=item generate_from_tokens($delimiter_token, @tokens)
+
+Regenerates a Mustache template string from lexer tokens.
+
+Parameters:
+=over 8
+=item $delimiter_token - The delimiter token containing open/close delimiters
+=item @tokens - Array of tokens from Text::MustacheTemplate::Lexer
+=back
+
+Returns a string containing the regenerated template.
 
 =back
 

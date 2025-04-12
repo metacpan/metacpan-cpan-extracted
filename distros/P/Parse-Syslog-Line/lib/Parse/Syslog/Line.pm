@@ -18,7 +18,7 @@ use Ref::Util           qw( is_arrayref );
 use Time::Moment;
 # RECOMMEND PREREQ: Cpanel::JSON::XS
 
-our $VERSION = '6.1';
+our $VERSION = '6.2';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -673,7 +673,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 6.1
+version 6.2
 
 =head1 SYNOPSIS
 

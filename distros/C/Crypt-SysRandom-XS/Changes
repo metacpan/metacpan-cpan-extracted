@@ -1,5 +1,9 @@
 Revision history for Crypt-SysRandom-XS
 
+0.009     2025-04-11 18:46:31+02:00 Europe/Brussels
+          - Handle exceptions in signal handler during getrandom correctly
+          - Add BACKENDS section to documentation
+
 0.008     2025-02-20 13:51:46+01:00 Europe/Brussels
           - Correctly set ending nullbyte in rdrand64 code
 

@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 sub new {
@@ -64,7 +64,7 @@ File::Information::Lock - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

@@ -25,7 +25,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -54,6 +54,7 @@ our %_mediatypes = ( # Copied from tags-universal
     'application/octet-stream'                                  => '4076d9f9-ca42-5976-b41b-e54aa912ccf3',
     'application/ogg'                                           => 'f4a4beee-e0f4-567a-ada4-a15d387a953c',
     'application/pdf'                                           => '03e6c035-e046-5b7e-a016-55b51c4836ea',
+    'application/postscript'                                    => '85224b06-7548-5319-b635-4b37dc78880d',
     'application/vnd.debian.binary-package'                     => '026b4c07-00ab-581d-a493-73e0b9b1cff9',
     'application/vnd.oasis.opendocument.base'                   => '319de973-68e2-5a01-af87-6fe4a5b800c6',
     'application/vnd.oasis.opendocument.chart'                  => '271d085d-1a51-5795-86f5-e6849166cbf6',
@@ -374,7 +375,7 @@ sub digest {
 
     $value = $self->{digest}{$lifecycle}{$key};
 
-    if (!defined($value) && $lifecycle eq 'current' && $self->isa('File::Information::Inode')) {
+    if (!defined($value) && $lifecycle eq 'current' && $self->isa('File::Information::Inode') && !$opts{no_defaults}) {
         my $size = $self->get('size', default => undef);
         my $limit = $self->instance->{digest_sizelimit};
 
@@ -716,7 +717,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -937,6 +938,10 @@ from C<die>-ing when no value is available to returning C<undef>.
 
 The lifecycle to get the value for. The default is C<current>
 See also L<File::Information/lifecycles>.
+
+=item C<no_defaults>
+
+Skips calculation of digest in case the digest is not known but could be calculated.
 
 =back
 

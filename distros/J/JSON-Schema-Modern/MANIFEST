@@ -9,7 +9,7 @@ META.json
 META.yml
 README
 dist.ini
-inc/AppendSupport.pm
+inc/AppendSection.pm
 inc/CheckConflicts.pm
 lib/JSON/Schema/Modern.pm
 lib/JSON/Schema/Modern/Annotation.pm

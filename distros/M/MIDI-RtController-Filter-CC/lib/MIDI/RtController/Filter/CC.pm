@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0501';
 
 use v5.36;
 
@@ -217,7 +217,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0500
+version 0.0501
 
 =head1 SYNOPSIS
 

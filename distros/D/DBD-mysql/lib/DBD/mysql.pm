@@ -13,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '5.011';
+our $VERSION = '5.012';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -1261,7 +1261,7 @@ In this case DBD::mysql fallbacks to normal non-prepared statement and tries aga
 
 =item mysql_server_prepare_disable_fallback
 
-This option disable fallback to normal non-prepared statement when mysql server
+This option disables fallback to normal non-prepared statement when mysql server
 does not support execution of current statement as prepared.
 
 Useful when you want to be sure that statement is going to be executed as

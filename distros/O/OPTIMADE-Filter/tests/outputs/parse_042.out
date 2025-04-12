@@ -1,0 +1,60 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operator' => 'HAS ALL',
+                                          'property' => bless( {
+                                                                 'name' => [
+                                                                             'statements'
+                                                                           ]
+                                                               }, 'OPTIMADE::Filter::Property' ),
+                                          'values' => [
+                                                        [
+                                                          '=',
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' )
+                                                        ],
+                                                        [
+                                                          '=',
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' )
+                                                        ]
+                                                      ]
+                                        }, 'OPTIMADE::Filter::ListComparison' ),
+                                 bless( {
+                                          'operator' => 'HAS ALL',
+                                          'properties' => [
+                                                            bless( {
+                                                                     'name' => [
+                                                                                 'number'
+                                                                               ]
+                                                                   }, 'OPTIMADE::Filter::Property' ),
+                                                            bless( {
+                                                                     'name' => [
+                                                                                 'is_prime'
+                                                                               ]
+                                                                   }, 'OPTIMADE::Filter::Property' )
+                                                          ],
+                                          'values' => [
+                                                        [
+                                                          [
+                                                            '<',
+                                                            '100'
+                                                          ],
+                                                          [
+                                                            '=',
+                                                            bless( {
+                                                                     'value' => 1
+                                                                   }, 'OPTIMADE::Filter::Boolean' )
+                                                          ]
+                                                        ]
+                                                      ]
+                                        }, 'OPTIMADE::Filter::Zip' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((statements HAS ALL = TRUE, = TRUE) AND (number:is_prime HAS ALL < "100" : = TRUE))
+== SQL ==
+<no SQL representation> AND <no SQL representation>

@@ -1,10 +1,10 @@
 {
-   "abstract" : "mustache template engine",
+   "abstract" : "Fast and specification compliant Mustache template engine for Perl",
    "author" : [
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Text::MustacheTemplate" : {
          "file" : "lib/Text/MustacheTemplate.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Text::MustacheTemplate::Compiler" : {
          "file" : "lib/Text/MustacheTemplate/Compiler.pm"
@@ -97,7 +97,7 @@
          "web" : "https://github.com/karupanerura/Text-MustacheTemplate"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

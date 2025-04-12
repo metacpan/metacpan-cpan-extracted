@@ -1,14 +1,35 @@
 ==================================================
-Changes from 2023-01-13 00:00:00 +0000 to present.
+Changes from 2023-04-13 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.1 at 2025-01-12 00:55:29 +0000
+version 6.2 at 2025-04-12 01:12:51 +0000
 ----------------------------------------
 
-  Change: 81cdc83eeb1014dfd3d143355ec65a20b7240890
+  Change: 55c77867bd6a1e8fd7c6601f854c7929fbad4410
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2025-01-11 16:54:41 +0000
+  Date : 2025-04-11 18:12:35 +0000
+
+    Release 6.2 to address test failures 
+
+  Change: ba05a2cf6ac90285e7c60d4cdaa24a594a6f61ff
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-11 18:06:21 +0000
+
+    Fix tests with around DST sensitivities
+
+    Remove a broken test that wasn't very clear in what it was doing. There
+    might be some indigestion between `Test::MockTime` and all the timezone
+    madness in this test. We'll see once Poland flips back to standard time.
+    Yay, DST! 
+
+----------------------------------------
+version 6.1 at 2025-01-12 01:01:33 +0000
+----------------------------------------
+
+  Change: 6099102d49105be45e045e0aac20db26450d8b0b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-01-11 17:01:33 +0000
 
     Make SDATA cumulative and improve performance
 
@@ -338,5 +359,5 @@ version 5.1 at 2024-05-24 18:17:59 +0000
     Attempt to enable GitHub Actions to run the test suite. 
 
 =================================================
-Plus 39 releases after 2023-01-13 00:00:00 +0000.
+Plus 39 releases after 2023-04-13 00:00:00 +0000.
 =================================================

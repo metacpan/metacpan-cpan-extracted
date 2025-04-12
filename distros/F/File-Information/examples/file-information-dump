@@ -125,6 +125,8 @@ sub dump_base {
                         if (defined(my $displayname = $tag->displayname(no_defaults => 1, default => undef))) {
                             $value .= sprintf(' (%s)', $displayname);
                         }
+                    } elsif ($value->isa('Data::URIID::Barcode')) {
+                        $value = sprintf('Barcode <%s>', $value->data);
                     }
                 } elsif ($type eq 'bool') {
                     $value = $value ? 'true' : 'false';

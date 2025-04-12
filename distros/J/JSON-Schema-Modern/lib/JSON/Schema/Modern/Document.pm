@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.607';
+our $VERSION = '0.608';
 
 use 5.020;
 use Moo;
@@ -20,6 +20,7 @@ use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
 use Ref::Util 0.100 'is_plain_hashref';
+use builtin::compat 'refaddr';
 use Safe::Isa 1.000008;
 use MooX::TypeTiny;
 use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional);
@@ -41,10 +42,20 @@ has canonical_uri => (
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
+# this is also known as the retrieval uri in the OpenAPI::Modern specification
+has original_uri => (
+  is => 'rwp',
+  isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
+  init_arg => undef,
+);
+*retrieval_uri = \&original_uri;
+
 has metaschema_uri => (
   is => 'rwp',
   isa => (InstanceOf['Mojo::URL'])->where(q{not length $_->fragment}), # allow for .../draft-07/schema#
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+  predicate => '_has_metaschema_uri',
+  # default not defined here, but might be defined in a subclass
 );
 
 has evaluator => (
@@ -85,6 +96,7 @@ sub _add_resource {
   $_[0]->{resource_index}{$resource_key_type->($_[1])} = $resource_type->($_[2]);
 }
 
+# this is not "the path to the resource", but rather "have path, want resource"
 has _path_to_resource => (
   is => 'ro',
   isa => HashRef[$resource_type],
@@ -156,14 +168,13 @@ sub TO_JSON { shift->schema }
 
 # note that this is always called, even in subclasses
 sub BUILD ($self, $args) {
-  my $original_uri = $self->canonical_uri->clone;
+  # note! not a clone! Please don't change canonical_uri in-place.
+  $self->_set_original_uri($self->canonical_uri);
+
   my $state = $self->traverse(
     $self->evaluator // $self->_set_evaluator(JSON::Schema::Modern->new),
     $args->{specification_version} ? +{ $args->%{specification_version} } : (),
   );
-
-  # if the schema identified a canonical uri for itself, it overrides the initial value
-  $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
 
   if ($state->{errors}->@*) {
     $self->_set_errors($state->{errors});
@@ -176,10 +187,12 @@ sub BUILD ($self, $args) {
     $self->_add_resource($key => $value);
 
     # we're adding a non-anchor entry for the document root
-    ++$seen_root if $value->{path} eq '' and $key !~ /#./
+    ++$seen_root if $value->{path} eq '';
   }
 
-  $self->_add_resource($original_uri.'' => {
+  # we only index the original uri if nothing in the schema itself identified a root resource:
+  # otherwise the top of the document would be unreferenceable.
+  $self->_add_resource($self->original_uri.'' => {
       path => '',
       canonical_uri => $self->canonical_uri,
       specification_version => $state->{spec_version},
@@ -196,13 +209,22 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   die 'wrong class - use JSON::Schema::Modern::Document::OpenAPI instead'
     if is_plain_hashref($self->schema) and exists $self->schema->{openapi};
 
+  my $original_uri = $self->original_uri;
+
   my $state = $evaluator->traverse($self->schema,
     {
-      initial_schema_uri => $self->canonical_uri->clone,
-      $self->metaschema_uri ? ( metaschema_uri => $self->metaschema_uri ) : (),
+      initial_schema_uri => $original_uri,
+      $self->_has_metaschema_uri ? ( metaschema_uri => $self->metaschema_uri ) : (),
       %$config_override,
     }
   );
+
+  die 'original_uri has changed' if $self->original_uri ne $original_uri
+    or refaddr($self->original_uri) != refaddr($original_uri);
+
+  # if the schema identified a canonical uri for itself via '$id', it overrides the initial value
+  # Note that subclasses of this class may choose to identify the canonical uri in a different way
+  $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
 
   return $state if $state->{errors}->@*;
 
@@ -251,7 +273,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.607
+version 0.608
 
 =head1 SYNOPSIS
 
@@ -271,17 +293,23 @@ version 0.607
 
 This class represents one JSON Schema document, to be used by L<JSON::Schema::Modern>.
 
-=head1 ATTRIBUTES
+=head1 CONSTRUCTOR ARGUMENTS
+
+Unless otherwise noted, these are also available as read-only accessors.
 
 =head2 schema
 
-The actual raw data representing the schema.
+The actual raw data representing the schema. Required.
 
 =head2 canonical_uri
 
-When passed in during construction, this represents the initial URI by which the document should
-be known. It is overwritten with the (resolved form of the) root schema's C<$id> property when one
-exists, and as such can be considered the canonical URI for the document as a whole.
+As a constructor value, represents the initial URI by which the document should be known, or a base
+URI to use to determine that value. The URI found in the root schema's C<$id> keyword is resolved
+against this URI to determine the final value, which is then stored in this accessor. As such, it
+can be considered the canonical URI for the document as a whole, from which subsequent C<$ref>
+keywords are resolved.
+
+The original passed-in value is saved in L</original_uri>.
 
 =head2 metaschema_uri
 
@@ -292,7 +320,9 @@ contained within the document), which determines the
 specification version and vocabularies used during evaluation. Does not override any
 C<$schema> keyword actually present in the schema document.
 
-=head2 specification version
+=head2 specification_version
+
+Only a constructor argument, not an accessor method.
 
 Indicates which version of the JSON Schema specification is used during evaluation. This value is
 overridden by the value determined from the C<$schema> keyword in the schema used in evaluation
@@ -331,6 +361,30 @@ L<C<draft4> or C<4>|https://json-schema.org/specification-links.html#draft-4>, c
 
 A L<JSON::Schema::Modern> object. Optional, unless custom metaschemas are used.
 
+=head1 METHODS
+
+=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD FREEZE THAW traverse has_errors path_to_resource
+resource_pairs get_entity_at_location get_entity_locations retrieval_uri
+
+=head2 errors
+
+Returns a list of L<JSON::Schema::Modern::Error> objects that resulted when the schema document was
+originally parsed. (If a syntax error occurred, usually there will be just one error, as parse
+errors halt the parsing process.) Documents with errors cannot be used for evaluation.
+
+=head2 original_uri
+
+Returns the original value of L</canonical_uri> that was passed to the document constructor (which
+C<$id> keywords within the document would have been resolved against, if they were not already
+absolute). Some subclasses may make use of this value for resolving URIs when matching HTTP requests
+at runtime.
+
+This URI is B<not> added to the document's resource index, so if you want the document to be
+addressable at this location you must add it to the evaluator yourself with the two-argument form of
+L<JSON::Schema::Modern/add_document>.
+
+Read-only.
+
 =head2 resource_index
 
 An index of URIs to subschemas (JSON pointer to reach the location, and the canonical URI of that
@@ -342,29 +396,6 @@ externally (you should use the public accessors in L<JSON::Schema::Modern> inste
 
 When called as a method, returns the flattened list of tuples (path, uri). You can also use
 C<resource_pairs> which returns a list of tuples as arrayrefs.
-
-=head2 canonical_uri_index
-
-An index of JSON pointers (from the document root) to canonical URIs. This is the inversion of
-L</resource_index> and is constructed as that is built up.
-
-=head2 errors
-
-A list of L<JSON::Schema::Modern::Error> objects that resulted when the schema document was
-originally parsed. (If a syntax error occurred, usually there will be just one error, as parse
-errors halt the parsing process.) Documents with errors cannot be evaluated.
-
-=head1 METHODS
-
-=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD FREEZE THAW traverse has_errors path_to_resource resource_pairs get_entity_at_location get_entity_locations
-
-=head2 path_to_canonical_uri
-
-=for stopwords fragmentless
-
-Given a JSON pointer (a path) within this document, returns the canonical URI corresponding to that location.
-Only fragmentless URIs can be looked up in this manner, so it is only suitable for finding the
-canonical URI corresponding to a subschema known to have an C<$id> keyword.
 
 =head2 contains
 
@@ -437,5 +468,7 @@ This software is copyright (c) 2020 by Karen Etheridge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Some schema files have their own licence, in share/LICENSE.
 
 =cut

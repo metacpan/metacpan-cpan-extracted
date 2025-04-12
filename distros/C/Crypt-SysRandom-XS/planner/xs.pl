@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-load_module('Dist::Build::XS');
-load_module('Dist::Build::XS::Conf');
+load_extension('Dist::Build::XS');
+load_extension('Dist::Build::XS::Conf');
 
 my %options;
 
@@ -32,24 +32,34 @@ int main(void)
         return 0;
 }
 EOF
-	['getentropy in sys/random.h', 'SYS_RANDOM_GETENTROPY', {}, <<EOF ],
+	['arc4random in sys/random.h', 'SYS_RANDOM_ARC4RANDOM', {}, <<EOF ],
 #include <sys/types.h>
 #include <sys/random.h>
 
 int main(void)
 {
         char buf[16];
-        int r = getentropy(buf, sizeof(buf));
+        arc4random_buf(buf, sizeof(buf));
         return 0;
 }
 EOF
-	['getentropy in unistd.h', 'UNISTD_GETENTROPY', {}, <<EOF ],
+	['arc4random in unistd.h', 'UNISTD_ARC4RANDOM', {}, <<EOF ],
 #include <unistd.h>
 
 int main(void)
 {
         char buf[16];
-        int r = getentropy(buf, sizeof(buf));
+        arc4random_buf(buf, sizeof(buf));
+        return 0;
+}
+EOF
+	['arc4random in stdlib.h', 'STDLIB_ARC4RANDOM', {}, <<EOF ],
+#include <stdlib.h>
+
+int main(void)
+{
+        char buf[16];
+        arc4random_buf(buf, sizeof(buf));
         return 0;
 }
 EOF
@@ -69,7 +79,7 @@ int main(void)
         return 0;
 }
 EOF
-	[ 'rdrandom64 in immintrin.h', 'RDRAND64', { run => 0, extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
+	[ 'rdrandom64 in immintrin.h', 'RDRAND64', { extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
 #include <immintrin.h>
 
 int main(void) {
@@ -79,7 +89,7 @@ int main(void) {
 		_rdrand64_step((unsigned long long*)(buf + i));
 }
 EOF
-	[ 'rdrandom32 in immintrin.h', 'RDRAND32', { run => 0, extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
+	[ 'rdrandom32 in immintrin.h', 'RDRAND32', { extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
 #include <immintrin.h>
 
 int main(void) {
@@ -93,8 +103,7 @@ EOF
 
 for my $possibility (@possibilities) {
 	my ($name, $define, $options, $code) = @{ $possibility };
-	if (try_compile_run(source => $code, define => "HAVE_\U$define", %$options, quiet => 1)) {
-		%options = %$options;
+	if (try_compile_run(source => $code, define => "HAVE_\U$define", %$options, quiet => 1, push_args => 1)) {
 		print "Found $name\n";
 		last;
 	}

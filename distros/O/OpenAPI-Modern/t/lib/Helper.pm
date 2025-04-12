@@ -136,7 +136,7 @@ sub response ($code, $headers = [], $body_content = undef) {
         and not defined $res->headers->header('Transfer-Encoding');
   }
   elsif ($TYPE eq 'catalyst') {
-    test_needs('Catalyst::Response');
+    test_needs('Catalyst::Response', { 'HTTP::Headers' => '6.07' });
 
     $res = Catalyst::Response->new(status => $code, body => $body_content);
     $res->headers->push_header(@$_) foreach pairs @$headers;

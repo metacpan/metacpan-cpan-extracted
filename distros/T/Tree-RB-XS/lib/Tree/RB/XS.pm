@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.18';
+$Tree::RB::XS::VERSION = '0.19';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -222,6 +222,13 @@ LRU Cache feature:
   $tree->iter_newer->next_keys(1e99);    # (3,2,1)
   $tree->iter_older->next_keys(1e99);    # (1,2,3)
   @removed= $tree->truncate_recent(2);   # returns (3), leaves (2,1) in tree
+  my %hash;
+  tie %hash, 'Tree::RB::XS',
+     compare_fn => 'str',
+     track_recent => 1,
+     keys_in_recent_order => 1;
+  @hash{qw/y g t e f s/}= (undef) x 6;
+  @insertion_order= keys %hash;          # ('y', 'g', 't', 'e', 'f', 's')
 
 Case-folding tied hashes:
 
@@ -348,6 +355,14 @@ Whether L</lookup> and L</get> methods automatically mark a node as the most rec
 
 =item *
 
+C<keys_in_recent_order>
+
+Whether the convenience methods L</keys>, L</values>, L</kv> (etc.) for dumping the keys and/or
+values of the tree use the "recent" iterator instead of natural key order iterator.  Defaults
+to false.  See L</keys_in_recent_order> attribute for caveats.
+
+=item *
+
 C<kv>
 
 An initial arrayref of C<key,value> pairs to initialize the tree with.  If allow_duplicates
@@ -434,9 +449,23 @@ and L</recent_tracked>.
 
 Whether L</lookup> and L</get> methods automatically mark a node as the most recent.
 This defaults to false, so only 'put' methods (including insert) mark a node recent.
-Even when true, 'exists' does not mark a node as recent, nor do iterators, min_node, max_node,
-nth_node, newest_node or oldest_node, as it is assumed using those methods are more about
-inspecting the state of the tree than representing access patterns of important keys.
+Even when true, C<exists> does not mark a node as recent, nor do iterators, C<min_node>,
+C<max_node>, C<nth_node>, C<newest_node> or C<oldest_node>, as it is assumed using those
+methods are more about inspecting the state of the tree than representing access patterns of
+important keys.
+
+=head2 keys_in_recent_order
+
+When true, the convenience accessors for keys/values return items in the recent order, instead
+of the natural key sort order.  Note that B<< this may not always return all keys in the tree >>
+because you can remove nodes from the 'recent' list, or toggle the status of the
+L</track_recent> attribute as nodes are added causing the 'recent' list to contain only part of
+the tree.
+
+This controls the behavior of L</keys>, L</values>, L</kv>, L</reverse_keys>, L</reverse_values>,
+L</reverse_kv>, and the C<keys> operator on a tied hash.
+
+The L</iter> rev L</rev_iter> methods are unaffected by this setting.
 
 =head2 key_type
 
@@ -691,12 +720,13 @@ the nodes without worrying about the tree structure or shifting iterators aside.
 
 =head2 keys
 
-Return a list of all keys in the tree, in sorted order.  If your tree is large, consider using
-an iterator instead of putting all keys onto the perl stack at once.
+Return a list of all keys in the tree, in sorted order (unless keys_in_recent_order is true,
+then you get recent order).  If your tree is large, consider using an iterator instead of
+putting all keys onto the perl stack at once.
 
 =head2 reverse_keys
 
-Same, but in reverse sorted order.
+Same, but in reverse order.
 
 =head2 values
 
@@ -708,11 +738,11 @@ Same, but in reverse order.
 
 =head2 kv
 
-Return all the key/value pairs of the tree, as a list.
+Return all the key/value pairs of the tree, in key order (or recent order), as a list.
 
 =head2 reverse_kv
 
-Return all the key/value pairs as a list in reverse key order.
+Return all the key/value pairs as a list in reverse order.
 
 =head2 iter
 
@@ -730,13 +760,13 @@ values, and the default C<$get_mode> is L</GET_LE_LAST>.
 
 =head2 iter_newer
 
-Return an iterator that iterates the insertion-order from oldest to newest.  This only iterates
-nodes with insertion-order tracking enabled.  See L</track_recent>.
+Return an iterentator that iterates the recent-order from oldest to newest.  This only iterates
+nodes with rec-order tracking enabled.  See L</track_recent>.
 
 =head2 iter_older
 
-Return an iterator that iterates the insertion-order from newest to oldest.  This only iterates
-nodes with insertion-order tracking enabled.  See L</track_recent>.
+Return an iterator that iterates the recent-order from newest to oldest.  This only iterates
+nodes with recent-order tracking enabled.  See L</track_recent>.
 
 =head1 NODE OBJECTS
 
@@ -1159,7 +1189,7 @@ fast and minimal.  Tree::RB::XS can do the same a bit faster with:
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 AUTHOR
 

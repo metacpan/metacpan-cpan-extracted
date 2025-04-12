@@ -1,4 +1,4 @@
-LWP-UserAgent-Throttled 0.12
+LWP-UserAgent-Throttled 0.13
 
 INSTALLATION
 
@@ -26,7 +26,6 @@ You can also look for information at:
 
     Search CPAN
         http://search.cpan.org/dist/LWP-UserAgent-Throttled/
-
 
 LICENSE AND COPYRIGHT
 

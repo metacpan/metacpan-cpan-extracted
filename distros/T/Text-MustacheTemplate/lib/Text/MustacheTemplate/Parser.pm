@@ -78,7 +78,10 @@ sub _parse {
                         $prev--;
                     }
                     my $before_prev_token = $prev != 1 ? $tokens[$prev-1] : undef;
-                    if (_is_trim_target($before_prev_token, $tokens[$prev], $token)) {
+                    my $is_empty_before_prev = !defined $before_prev_token || $before_prev_token->[0] == TOKEN_PADDING || (
+                        $before_prev_token->[0] == TOKEN_RAW_TEXT && $before_prev_token->[2] =~ /[\r\n]\z/mano
+                    );
+                    if ($is_empty_before_prev) {
                         $text =~ s/\A(\r\n|[\r\n])//mano;
                     }
                 }
@@ -87,15 +90,20 @@ sub _parse {
         } elsif ($type == TOKEN_PADDING) {
             my (undef, undef, $padding) = @$token;
             my $needs_padding = 1;
-            if ($i != $#tokens) { # optimized $i <= $#tokens
-                my $next = $i+1;
-                if (_needs_trim_around_whitespaces($tokens[$next])) {
-                    while ($next != $#tokens && _needs_trim_around_whitespaces($tokens[$next+1])) {
-                        $next++;
-                    }
-                    my $after_next_token = $next != $#tokens ? $tokens[$next+1] : undef;
-                    $needs_padding = !_is_trim_target($token, $tokens[$next], $after_next_token);
+            if ($i == $#tokens) { # uncoverable branch true
+                _error($token, 'Syntax Error: Padding token should not be last'); # uncoverable statement
+            }
+
+            my $next = $i+1;
+            if (_needs_trim_around_whitespaces($tokens[$next])) {
+                while ($next != $#tokens && _needs_trim_around_whitespaces($tokens[$next+1])) {
+                    $next++;
                 }
+                my $after_next_token = $next != $#tokens ? $tokens[$next+1] : undef;
+                my $is_empty_after_next = !defined $after_next_token || (
+                    $after_next_token->[0] == TOKEN_RAW_TEXT && $after_next_token->[2] =~ /\A[\r\n]/mano
+                );
+                $needs_padding = !$is_empty_after_next;
             }
             if ($needs_padding) {
                 push @$ast => [SYNTAX_RAW_TEXT, $padding];
@@ -202,23 +210,6 @@ sub _parse {
     return \@root;
 }
 
-sub _is_trim_target {
-    my ($prev, $token, $next) = @_;
-
-    my $is_empty_prev = !defined $prev || $prev->[0] == TOKEN_PADDING || (
-        $prev->[0] == TOKEN_RAW_TEXT && (
-            $prev->[2] eq '' || $prev->[2] =~ /[\r\n]\z/mano
-        )
-    ) || ($prev->[0] == TOKEN_DELIMITER && !defined $prev->[2]);
-    return unless $is_empty_prev;
-
-    my $is_empty_next = !defined $next || (
-        $next->[0] == TOKEN_RAW_TEXT && $next->[2] =~ /\A[\r\n]/mano
-    );
-    return unless $is_empty_next;
-    return !!1;
-}
-
 sub _needs_trim_around_whitespaces {
     my $token = shift;
     my ($type) = @$token;
@@ -245,7 +236,7 @@ sub _error {
     my $curr  = $token->[1];
     my $line  = 1;
     my $start = 0;
-    while ($src =~ /$/smgco and pos $src <= $curr) {
+    while ($src =~ /$/smgco and pos $src <= $curr) {# uncoverable condition left
         $start = pos $src;
         $line++;
     }
@@ -285,7 +276,7 @@ Text::MustacheTemplate::Parser - Simple mustache template parser
 
 =head1 DESCRIPTION
 
-Text::MustacheTemplate::Parser is a simple parser for Mustache tempalte.
+Text::MustacheTemplate::Parser is a simple parser for Mustache template.
 
 This is low-level interface for Text::MustacheTemplate.
 The APIs may be change without notice.
@@ -294,43 +285,102 @@ The APIs may be change without notice.
 
 =over 2
 
-=item parse
+=item parse(\@tokens)
+
+Parses the token array from L<Text::MustacheTemplate::Lexer> and converts it into an abstract syntax tree (AST).
+Returns a nested ArrayRef structure representing the template's parsed form.
+
+The AST consists of nodes, where each node is an array reference with the following structure:
+
+=over 4
+
+=item * First element: Node type constant (see L</SYNTAXES>)
+
+=item * Remaining elements: Node-specific data
+
+=back
 
 =back
 
 =head1 SYNTAXES
 
+The following constants define the various syntax node types that make up the abstract syntax tree (AST) after parsing.
+
 =over 2
 
 =item SYNTAX_RAW_TEXT
 
+Represents literal text content in the template. 
+
+Format: C<[SYNTAX_RAW_TEXT, $text]>
+
 =item SYNTAX_VARIABLE
+
+Represents a variable interpolation tag (e.g., {{name}} or {{{name}}}).
+
+Format: C<[SYNTAX_VARIABLE, $escape_type, $variable_name]>
+
+Where $escape_type is one of:
 
 =over 4
 
 =item VARIABLE_HTML_ESCAPE
 
+The variable should be HTML-escaped before output (used with {{name}})
+
 =item VARIABLE_RAW
+
+The variable should not be escaped (used with {{{name}}} or {{&name}})
 
 =back
 
 =item SYNTAX_BOX
 
+Represents block-like structures that may contain child content.
+
+Format: C<[SYNTAX_BOX, $box_type, ...]> where the remaining parameters depend on the box type.
+
+Box types include:
+
 =over 4
 
 =item BOX_SECTION
 
+A regular Mustache section ({{#section}}...{{/section}}).
+
+Format: C<[SYNTAX_BOX, BOX_SECTION, $name, $inner_template, \@children]>
+
+$inner_template contains the raw template source of the section for lambda support.
+
 =item BOX_INVERTED_SECTION
+
+An inverted section ({{^section}}...{{/section}}) which renders when the value is falsy.
+
+Format: C<[SYNTAX_BOX, BOX_INVERTED_SECTION, $name, \@children]>
 
 =item BOX_BLOCK
 
+A block definition ({{$block}}...{{/block}}) for template inheritance.
+
+Format: C<[SYNTAX_BOX, BOX_BLOCK, $name, \@children]>
+
 =item BOX_PARENT
+
+A parent template reference ({{<parent}}...{{/parent}}) for template inheritance.
+
+Format: C<[SYNTAX_BOX, BOX_PARENT, $reference_type, $name, \@children]>
+
+Where $reference_type is one of:
 
 =over 4
 
 =item REFERENCE_STATIC
 
+A static parent template name
+
 =item REFERENCE_DYNAMIC
+
+A dynamic parent template name (e.g., {{<*dynamic}})
 
 =back
 
@@ -338,17 +388,37 @@ The APIs may be change without notice.
 
 =item SYNTAX_COMMENT
 
+Represents a comment ({{! comment }}) which doesn't appear in the output.
+
+Format: C<[SYNTAX_COMMENT, $comment_text]>
+
 =item SYNTAX_PARTIAL
+
+Represents including a partial template ({{> partial}}).
+
+Format: C<[SYNTAX_PARTIAL, $reference_type, $name, $padding]>
+
+Where $reference_type is one of:
 
 =over 4
 
 =item REFERENCE_STATIC
 
+A static partial template name
+
 =item REFERENCE_DYNAMIC
+
+A dynamic partial template name (e.g., {{>*dynamic}})
 
 =back
 
+$padding contains any whitespace that preceded the tag, used for indenting partial content.
+
 =item SYNTAX_DELIMITER
+
+Represents a delimiter change ({{=<% %>=}}).
+
+Format: C<[SYNTAX_DELIMITER, $open_delimiter, $close_delimiter]>
 
 =back
 

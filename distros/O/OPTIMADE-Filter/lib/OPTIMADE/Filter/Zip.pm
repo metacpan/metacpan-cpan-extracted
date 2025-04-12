@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use parent 'OPTIMADE::Filter::Modifiable';
+use List::Util qw(any);
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.10.2'; # VERSION
+our $VERSION = '0.11.0'; # VERSION
 
 sub new {
     my( $class ) = @_;
@@ -94,6 +95,10 @@ sub validate
     }
     if( !$self->values ) {
         die 'values undefined for OPTIMADE::Filter::Zip';
+    }
+    if( any { scalar @$_ != scalar @{$self->{properties}} }
+            @{$self->values} ) {
+        die 'different number of properties and values for OPTIMADE::Filter::Zip';
     }
 }
 

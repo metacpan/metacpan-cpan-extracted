@@ -19,9 +19,9 @@ is($ua->throttle('www.example.com'), 1, 'Throttle time set correctly');
 is($ua->throttle('www.nonexistent.com'), 0, 'Default throttle time for unconfigured host is 0');
 
 # Test daisy-chaining throttle
-$ua->throttle({ 'test.com' => 0.5 })->throttle({ 'api.example.com' => 2 });
+$ua->throttle({ 'test.com' => 0.5 })->throttle({ 'www.example.com' => 2 });
 is($ua->throttle('test.com'), 0.5, 'Daisy-chained throttle time set correctly');
-is($ua->throttle('api.example.com'), 2, 'Throttle time for second host set correctly');
+is($ua->throttle('www.example.com'), 2, 'Throttle time for second host set correctly');
 
 # Mock an HTTP request and test throttling
 my $request1 = HTTP::Request->new(GET => 'http://www.example.com/page1.html');
@@ -33,8 +33,8 @@ my $mid_time = Time::HiRes::time();
 $ua->send_request($request2);
 my $end_time = Time::HiRes::time();
 
-ok(($mid_time - $start_time) < 0.5, 'First request sent immediately');
-ok(($end_time - $mid_time) >= 1, 'Second request throttled correctly');
+cmp_ok(($mid_time - $start_time), '<', 1, 'First request sent immediately');
+cmp_ok(($end_time - $mid_time), '>=', 2, 'Second request throttled correctly');
 
 # Test user agent assignment
 my $custom_ua = new_ok('LWP::UserAgent');

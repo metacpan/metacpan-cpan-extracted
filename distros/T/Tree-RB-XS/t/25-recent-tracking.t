@@ -6,29 +6,37 @@ use Tree::RB::XS;
 use Time::HiRes 'time';
 
 subtest basic_insertion_order => sub {
-   my $t= Tree::RB::XS->new(track_recent => 1);
+   my $t= Tree::RB::XS->new(track_recent => 1, keys_in_recent_order => 1);
    is( $t->oldest, undef, 'oldest of empty tree' );
    is( $t->newest, undef, 'newest of empty tree' );
-   $t->put(1,1);
-   $t->put(2,2);
-   $t->put(0,0);
+   $t->put(1,'a');
+   $t->put(2,'b');
+   $t->put(0,'c');
    is( $t->oldest->key, 1, 'oldest' );
    is( $t->newest->key, 0, 'newest' );
    is( $t->recent_count, 3, 'recent_count' );
    is( $t->oldest->newer->key, 2, 'oldest->newer' );
    is( $t->newest->older->key, 2, 'newest->older' );
+   is( [ $t->keys ], [ 1, 2, 0 ], 'keys' );
+   is( [ $t->values ], [qw( a b c )], 'values' );
+   is( [ $t->kv ], [ 1,'a', 2,'b', 0,'c' ], 'kv' );
+   is( [ $t->reverse_keys ], [ 0, 2, 1 ], 'keys' );
+   is( [ $t->reverse_values ], [qw( c b a )], 'values' );
+   is( [ $t->reverse_kv ], [ 0,'c', 2,'b', 1,'a' ], 'reverse_kv' );
 };
 
 subtest re_insert => sub {
-   my $t= Tree::RB::XS->new(track_recent => 1);
+   my $t= Tree::RB::XS->new(track_recent => 1, keys_in_recent_order => 1);
    $t->put(1,1);
    $t->put(2,2);
    $t->put(1,1);
-   is( $t->oldest->key, 2, 'oldest' );
-   is( $t->newest->key, 1, 'newest' );
+   is( [ $t->keys ], [ 2, 1 ], 'keys' );
    is( $t->recent_count, 2, 'recent_count' );
    is( $t->oldest->newer->key, 1, 'oldest->newer' );
    is( $t->newest->older->key, 2, 'newest->older' );
+   # using insert for a value that exists should not update recent order
+   $t->insert(2, 5);
+   is( [ $t->kv ], [ 2,2, 1,1 ], 'keys unchanged' );
 
    $t->put(6,6);
    is( $t->newest->key, 6, 'newest = 6' );

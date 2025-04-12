@@ -20,7 +20,7 @@ build_requires:
   Test::More: '0.96'
   Test::Needs: '0'
   Test::Warnings: '0'
-  Test::Without::Module: '0'
+  Test::Without::Module: '0.19'
   lib: '0'
   perl: v5.20.0
   utf8: '0'
@@ -51,52 +51,52 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.607'
+    version: '0.608'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.607'
+    version: '0.608'
 requires:
   B: '0'
   Carp: '0'
@@ -144,7 +144,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.607'
+version: '0.608'
 x_Dist_Zilla:
   perl:
     version: '5.041010'
@@ -333,7 +333,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
       name: '@Author::ETHER/Test::Pod::Coverage::TrustMe'
-      version: v1.0.0
+      version: v1.0.1
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -396,6 +396,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::GenerateSection
               name: SUPPORT
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: 'COPYRIGHT AND LICENCE'
               version: '4.020'
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -494,8 +498,12 @@ x_Dist_Zilla:
               name: '@Author::ETHER/footer'
               version: '4.020'
             -
-              class: inc::AppendSupport
-              name: =inc::AppendSupport
+              class: inc::AppendSection
+              name: AppendSupport
+              version: ~
+            -
+              class: inc::AppendSection
+              name: AppendCopyright
               version: ~
       name: '@Author::ETHER/PodWeaver'
       version: '4.010'
@@ -580,7 +588,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@Author::ETHER/ModuleBuildTiny'
-      version: '0.017'
+      version: '0.019'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -816,7 +824,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.607
+          tag: v0.608
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

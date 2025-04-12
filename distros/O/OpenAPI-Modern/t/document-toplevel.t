@@ -15,7 +15,7 @@ use Helper;
 subtest 'basic construction' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -42,39 +42,26 @@ subtest 'basic construction' => sub {
   );
 };
 
-subtest 'top level document fields' => sub {
-  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
-    schema => 1,
-  );
-
-  cmp_deeply(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      {
-        instanceLocation => '',
-        keywordLocation => '/type',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/type',
-        error => 'got integer, not object',
-      },
-    ],
+subtest 'top level document checks' => sub {
+  die_result(
+    sub {
+      JSON::Schema::Modern::Document::OpenAPI->new(
+        canonical_uri => 'http://localhost:1234/api',
+        evaluator => JSON::Schema::Modern->new,
+        schema => 1,
+      );
+    },
+    qr/^Value "1" did not pass type constraint "HashRef"/,
     'document is wrong type',
   );
 
-  is(
-    document_result($doc),
-    q!'': got integer, not object!,
-    'stringified errors',
-  );
 
-
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {},
   );
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -102,7 +89,7 @@ subtest 'top level document fields' => sub {
       paths => {},
     },
   );
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -134,7 +121,7 @@ ERRORS
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -166,7 +153,7 @@ ERRORS
       jsonSchemaDialect => undef,
     },
   );
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -190,6 +177,78 @@ ERRORS
 ERRORS
 
 
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      '$self' => '#frag\\ment',
+    },
+  );
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '/$self',
+        keywordLocation => '/properties/$self/pattern',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/$self/pattern',
+        error => '$self cannot contain a fragment',
+      },
+      {
+        instanceLocation => '/$self',
+        keywordLocation => '/properties/$self/format',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/$self/format',
+        error => 'not a valid uri-reference string',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        error => 'not all properties are valid',
+      },
+    ],
+    'invalid $self uri, with custom error message',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      jsonSchemaDialect => '/foo',
+    },
+  );
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '/jsonSchemaDialect',
+        keywordLocation => '/properties/jsonSchemaDialect/format',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/jsonSchemaDialect/format',
+        error => 'not a valid uri string',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        error => 'not all properties are valid',
+      },
+    ],
+    'invalid jsonSchemaDialect uri',
+  );
+
+
   $js->add_schema({
     '$id' => 'https://metaschema/with/wrong/spec',
     '$vocabulary' => {
@@ -211,7 +270,7 @@ ERRORS
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -238,103 +297,7 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      map +($_ => 'not an object'), qw(servers security tags externalDocs),
-    },
-  );
-  my $iter = 0;
-  cmp_deeply(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      (map +{
-        instanceLocation => '',
-        keywordLocation => '/$ref/anyOf/'.$iter.'/required',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf/'.$iter++.'/required',
-        error => 'object is missing property: '.$_,
-      }, qw(paths components webhooks)),
-      {
-        instanceLocation => '',
-        keywordLocation => '/$ref/anyOf',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf',
-        error => 'no subschemas are valid',
-      },
-      (map +{
-        instanceLocation => '/'.$_,
-        keywordLocation => ignore,  # a $defs somewhere
-        absoluteKeywordLocation => ignore,
-        error => re(qr/^got string, not (object|array)$/),
-      }, qw(externalDocs security servers tags)),
-      {
-        instanceLocation => '',
-        keywordLocation => "/\$ref/properties",
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
-      },
-    ],
-    'missing paths (etc), and bad types for top level fields',
-  );
-
-  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'': object is missing property: paths
-'': object is missing property: components
-'': object is missing property: webhooks
-'': no subschemas are valid
-'/externalDocs': got string, not object
-'/security': got string, not array
-'/servers': got string, not array
-'/tags': got string, not array
-'': not all properties are valid
-ERRORS
-
-
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      map +($_ => 'not an object'), qw(paths webhooks components),
-    },
-  );
-  cmp_deeply(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      (map +{
-        instanceLocation => '/'.$_,
-        keywordLocation => ignore,  # a $defs somewhere
-        absoluteKeywordLocation => ignore,
-        error => 'got string, not object',
-      }, qw(components paths webhooks)),
-      {
-        instanceLocation => '',
-        keywordLocation => '/$ref/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
-      },
-    ],
-    'bad types for paths, webhooks, components',
-  );
-  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'/components': got string, not object
-'/paths': got string, not object
-'/webhooks': got string, not object
-'': not all properties are valid
-ERRORS
-
-
-  $js = JSON::Schema::Modern->new(validate_formats => 1);
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
+    evaluator => $js = JSON::Schema::Modern->new,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -346,7 +309,7 @@ ERRORS
     },
   );
 
-  cmp_deeply([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
+  cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
   is($doc->json_schema_dialect, DEFAULT_DIALECT, 'default jsonSchemaDialect is saved in the document');
 
   $js->add_document($doc);
@@ -369,7 +332,8 @@ ERRORS
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
-        vocabularies => ignore,
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
         configs => {},
         anchors => {
           meta => {
@@ -383,7 +347,8 @@ ERRORS
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
-        vocabularies => ignore,
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
         configs => {},
         anchors => {
           meta => {
@@ -393,12 +358,12 @@ ERRORS
         },
       },
     }),
-    'resources are properly stored on the evaluator',
+    'dialect resources are properly stored on the evaluator',
   );
 
 
-  $js = JSON::Schema::Modern->new(validate_formats => 1);
-  $js->add_schema({
+  $js = JSON::Schema::Modern->new;
+  my $mymetaschema_doc = $js->add_schema({
     '$id' => 'https://mymetaschema',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
@@ -417,12 +382,19 @@ ERRORS
         version => '1.2.3',
       },
       jsonSchemaDialect => 'https://mymetaschema',
-      paths => {},
+      components => {
+        schemas => {
+          Foo => {
+            maxLength => false,  # this is a bad schema, but our custom dialect does not detect that
+          },
+        },
+      },
     },
     metaschema_uri => DEFAULT_METASCHEMA, # '#meta' is now just {"type": ["object","boolean"]}
   );
-  cmp_deeply([], [ map $_->TO_JSON, $doc->errors ], 'no errors with a custom jsonSchemaDialect');
+  cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
   is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');
+  is($doc->metaschema_uri, DEFAULT_METASCHEMA, 'custom metaschema is saved');
 
   $js->add_document($doc);
   cmp_deeply(
@@ -437,16 +409,217 @@ ERRORS
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
         configs => {},
       },
-      (map +($_ => {
+      'https://mymetaschema' => {
         canonical_uri => str('https://mymetaschema'),
         path => '',
         specification_version => 'draft2020-12',
-        document => ignore,
-        vocabularies => ignore,
+        document => shallow($mymetaschema_doc),
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
         configs => {},
-      }), 'https://mymetaschema'),
+      },
     }),
-    'resources are properly stored on the evaluator',
+    'dialect resources are properly stored on the evaluator',
+  );
+
+
+  $js = JSON::Schema::Modern->new;
+  $js->add_document($mymetaschema_doc);
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      jsonSchemaDialect => 'https://mymetaschema',
+      components => {
+        schemas => {
+          Foo => {
+            maxLength => false,  # this is a bad schema, but our custom dialect does not detect that
+          },
+        },
+      },
+    },
+    # metaschema_uri is not set, but autogenerated
+  );
+  cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
+  is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');
+  like($doc->metaschema_uri, qr{^https://custom-dialect\.example\.com/[[:xdigit:]]{32}$}, 'dynamic metaschema is used');
+
+  $js->add_document($doc);
+  cmp_deeply(
+    $js->{_resource_index},
+    superhashof({
+      # our document itself is a resource, even if it isn't a json schema itself
+      'http://localhost:1234/api' => {
+        canonical_uri => str('http://localhost:1234/api'),
+        path => '',
+        specification_version => 'draft2020-12',
+        document => shallow($doc),
+        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
+        configs => {},
+      },
+      'https://mymetaschema' => {
+        canonical_uri => str('https://mymetaschema'),
+        path => '',
+        specification_version => 'draft2020-12',
+        document => shallow($mymetaschema_doc),
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
+        configs => {},
+      },
+      $doc->metaschema_uri => {
+        canonical_uri => str($doc->metaschema_uri),
+        path => '',
+        specification_version => 'draft2020-12',
+        document => ignore,
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
+        configs => {},
+        anchors => {
+          meta => {
+            path => '/$defs/schema',
+            canonical_uri => str($doc->metaschema_uri.'#/$defs/schema'),
+          },
+        },
+      },
+    }),
+    'dialect resources are properly stored on the evaluator',
+  );
+
+
+  # relative $self, absolute original_uri - $self is resolved with original_uri
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/foo/api.json',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      '$self' => 'user/api.json',  # the 'user' family of APIs
+      paths => {},
+    },
+  );
+
+  is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
+  is($doc->canonical_uri, 'http://localhost:1234/foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
+  cmp_deeply(
+    $doc->{resource_index},
+    {
+      'http://localhost:1234/foo/user/api.json' => {
+        canonical_uri => str('http://localhost:1234/foo/user/api.json'),
+        path => '',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        configs => {},
+      },
+    },
+    'resource is properly indexed',
+  );
+
+
+  # absolute $self, absolute original_uri - $self is used as is
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/foo/api.json',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      '$self' => 'http://localhost:5555/user/api.json',  # the 'user' family of APIs
+      paths => {},
+    },
+  );
+
+  is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
+  is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
+  cmp_deeply(
+    $doc->{resource_index},
+    {
+      'http://localhost:5555/user/api.json' => {
+        canonical_uri => str('http://localhost:5555/user/api.json'),
+        path => '',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        configs => {},
+      },
+    },
+    'resource is properly indexed',
+  );
+
+
+  # relative $self, relative original_uri - $self is resolved with original_uri
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      '$self' => 'user/api.json',  # the 'user' family of APIs
+      paths => {},
+    },
+  );
+
+  is($doc->original_uri, 'foo/api.json', 'retrieval uri');
+  is($doc->canonical_uri, 'foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
+  cmp_deeply(
+    $doc->{resource_index},
+    {
+      'foo/user/api.json' => {
+        canonical_uri => str('foo/user/api.json'),
+        path => '',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        configs => {},
+      },
+    },
+    'resource is properly indexed',
+  );
+
+
+  # absolute $self, relative original_uri - $self is used as is
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      '$self' => 'http://localhost:5555/user/api.json',  # the 'user' family of APIs
+      paths => {},
+    },
+  );
+
+  is($doc->original_uri, 'foo/api.json', 'retrieval uri');
+  is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
+  cmp_deeply(
+    $doc->{resource_index},
+    {
+      'http://localhost:5555/user/api.json' => {
+        canonical_uri => str('http://localhost:5555/user/api.json'),
+        path => '',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        configs => {},
+      },
+    },
+    'resource is properly indexed',
   );
 };
 

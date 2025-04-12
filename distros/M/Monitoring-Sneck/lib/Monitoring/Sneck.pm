@@ -15,11 +15,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.0.2
 
 =cut
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 =head1 SYNOPSIS
 
@@ -387,6 +387,8 @@ sub run {
 			}
 		}
 
+		# call wait pid so we can get the exit code
+		waitpid( $check_pid, 0 );
 		my $exit_code = $?;
 		$self->{to_return}{data}{$type}{$name}{output} = $output;
 		if ( defined( $self->{to_return}{data}{$type}{$name}{output} ) ) {

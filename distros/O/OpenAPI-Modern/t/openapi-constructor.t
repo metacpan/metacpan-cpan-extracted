@@ -85,37 +85,10 @@ subtest 'missing arguments' => sub {
 };
 
 subtest 'document errors' => sub {
-  my $result;
-  try {
-    OpenAPI::Modern->new(
-      openapi_uri => '/api',
-      openapi_schema => [ 'this is not a valid openapi document' ],
-    )
-  }
-  catch ($e) {
-    $result = $e;
-  }
-
-  cmp_result(
-    $result->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/type',
-          absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/type',
-          error => 'got array, not object',
-        },
-      ],
-    },
+  die_result(
+    sub { OpenAPI::Modern->new(openapi_uri => '/api', openapi_schema => [ 'invalid openapi document' ]) },
+    qr/^Reference \["invalid openapi document"\] did not pass type constraint "HashRef"/,
     'bad document causes validation to immediately fail',
-  );
-
-  is(
-    "$result",
-    q!'': got array, not object!,
-    'exception during construction serializes the error correctly',
   );
 };
 

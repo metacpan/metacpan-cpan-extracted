@@ -1,3 +1,7 @@
+Version 0.19 - 2025-04-11
+  - New attribute 'keys_in_recent_order' changes behavior of convenience
+    iteration methods, including for tied hashes.
+
 Version 0.18 - 2025-03-22
   - New method 'rekey', for modifying existing keys by an offset
   - XS fix for passing hashref to constructor, previously would miss attributes

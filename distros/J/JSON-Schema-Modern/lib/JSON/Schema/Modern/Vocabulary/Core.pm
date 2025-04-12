@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.607';
+our $VERSION = '0.608';
 
 use 5.020;
 use Moo;
@@ -105,6 +105,8 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
   return 1
     if $state->{spec_version} =~ /^draft[467]$/ and $schema->{$state->{keyword}} =~ /^#/;
 
+  # we could use _fetch_from_uri here to use the parent base uri to resolve against $id at our
+  # current location, but looking up the current path in the resource index is faster.
   my $schema_info = $state->{document}->path_to_resource($state->{document_path}.$state->{schema_path});
   # this should never happen, if the pre-evaluation traversal was performed correctly
   abort($state, 'failed to resolve "%s" to canonical uri', $state->{keyword}) if not $schema_info;
@@ -395,7 +397,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.607
+version 0.608
 
 =head1 DESCRIPTION
 
@@ -450,5 +452,7 @@ This software is copyright (c) 2020 by Karen Etheridge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Some schema files have their own licence, in share/LICENSE.
 
 =cut

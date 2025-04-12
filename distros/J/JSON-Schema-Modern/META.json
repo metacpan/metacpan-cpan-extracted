@@ -63,7 +63,7 @@
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage::TrustMe" : "0",
+            "Test::Pod::Coverage::TrustMe" : "0.002001",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.17",
             "Time::Moment" : "0"
@@ -148,7 +148,7 @@
             "Test::More" : "0.96",
             "Test::Needs" : "0",
             "Test::Warnings" : "0",
-            "Test::Without::Module" : "0",
+            "Test::Without::Module" : "0.19",
             "lib" : "0",
             "perl" : "v5.20.0",
             "utf8" : "0"
@@ -239,67 +239,67 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::ResultNode" : {
          "file" : "lib/JSON/Schema/Modern/ResultNode.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.607"
+         "version" : "0.608"
       }
    },
    "release_status" : "stable",
@@ -314,7 +314,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.607",
+   "version" : "0.608",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041010"
@@ -559,7 +559,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Pod::Coverage::TrustMe",
-            "version" : "v1.0.0"
+            "version" : "v1.0.1"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -641,6 +641,11 @@
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "SUPPORT",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "COPYRIGHT AND LICENCE",
                         "version" : "4.020"
                      },
                      {
@@ -764,8 +769,13 @@
                         "version" : "4.020"
                      },
                      {
-                        "class" : "inc::AppendSupport",
-                        "name" : "=inc::AppendSupport",
+                        "class" : "inc::AppendSection",
+                        "name" : "AppendSupport",
+                        "version" : null
+                     },
+                     {
+                        "class" : "inc::AppendSection",
+                        "name" : "AppendCopyright",
                         "version" : null
                      }
                   ]
@@ -880,7 +890,7 @@
                }
             },
             "name" : "@Author::ETHER/ModuleBuildTiny",
-            "version" : "0.017"
+            "version" : "0.019"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -1195,7 +1205,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.607",
+                  "tag" : "v0.608",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

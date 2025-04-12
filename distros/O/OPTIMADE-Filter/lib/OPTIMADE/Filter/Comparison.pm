@@ -6,7 +6,7 @@ use warnings;
 use parent 'OPTIMADE::Filter::Modifiable';
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.10.2'; # VERSION
+our $VERSION = '0.11.0'; # VERSION
 
 sub new {
     my( $class, $operator ) = @_;

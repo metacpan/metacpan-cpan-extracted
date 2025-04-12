@@ -1,15 +1,16 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::DistBuild;
-$Dist::Zilla::Plugin::DynamicPrereqs::DistBuild::VERSION = '0.005';
+$Dist::Zilla::Plugin::DynamicPrereqs::DistBuild::VERSION = '0.006';
 use 5.020;
 use Moose;
 use experimental qw/signatures/;
+use namespace::autoclean;
 
-with 'Dist::Zilla::Role::PrereqSource', 'Dist::Zilla::Role::DynamicPrereqs::Meta', 'Dist::Zilla::Role::FileGatherer';
+with 'Dist::Zilla::Role::PrereqSource', 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::DynamicPrereqs::Meta';
 
 sub register_prereqs($self) {
 	$self->zilla->register_prereqs({ phase => 'configure' }, 'Dist::Build::DynamicPrereqs' => '0.019');
 	return;
-};
+}
 
 my $content = <<EOF;
 load_extension('Dist::Build::DynamicPrereqs', 0.019);
@@ -23,8 +24,12 @@ sub gather_files($self) {
 		content => $content,
 	});
 
+	$self->add_file($file);
+
 	return;
-};
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -42,7 +47,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::DistBuild - Add dynamic prereqs to the meta
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

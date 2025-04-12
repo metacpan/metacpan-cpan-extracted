@@ -16,12 +16,13 @@ use parent 'File::Information::Base';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_properties = (
     pdf_version     => {loader => \&_load_pdf},
     pdf_pages       => {loader => \&_load_pdf},
     odf_keywords    => {loader => \&_load_odf},
+    data_uriid_barcodes => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
 );
 
 my @_odf_medadata_keys = qw(title description subject creator language initial_creator editing_cycles editing_duration generator creation_date date);
@@ -161,6 +162,7 @@ sub _load_pdf {
     # Check for module;
     if (eval {
             require PDF::API2;
+            PDF::API2->VERSION(2.044);
             PDF::API2->import();
             1;
         }) {
@@ -338,6 +340,24 @@ sub _load_audio_scan {
     }
 }
 
+sub _load_barcodes {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my @barcodes;
+
+    return if defined $self->{_loaded_barcodes};
+    $self->{_loaded_barcodes} = 1;
+
+    return unless defined $self->{path};
+    return unless eval { require Data::URIID::Barcode; 1; };
+
+    @barcodes = eval { Data::URIID::Barcode->sheet(filename => $self->{path}) };
+
+    if (scalar @barcodes) {
+        $pv->{data_uriid_barcodes} = [map {{raw => $_}} @barcodes];
+    }
+}
+
 1;
 
 __END__
@@ -352,7 +372,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

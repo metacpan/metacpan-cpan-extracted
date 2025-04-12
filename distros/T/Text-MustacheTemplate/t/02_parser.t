@@ -13,12 +13,39 @@ filters {
     expected => [qw/eval/],
 };
 
-for my $block (blocks) {
-    my @tokens = @{ $block->input };
-    my $ast = Text::MustacheTemplate::Parser->parse(@tokens);
-    is_deeply $ast, $block->expected, $block->name
-        or diag dump_ast($ast, 0);
-}
+subtest 'parse' => sub {
+    for my $block (blocks) {
+        my @tokens = @{ $block->input };
+        my $ast = Text::MustacheTemplate::Parser->parse(@tokens);
+        is_deeply $ast, $block->expected, $block->name
+            or diag dump_ast($ast, 0);
+    }
+};
+
+subtest 'error reporting' => sub {
+    subtest 'with source' => sub {
+        local $Text::MustacheTemplate::Parser::SOURCE = '{{#cond}}';
+        eval {
+            Text::MustacheTemplate::Parser->parse(
+                [Text::MustacheTemplate::Lexer::TOKEN_DELIMITER,0,undef,"{{","}}"],
+                [Text::MustacheTemplate::Lexer::TOKEN_TAG,0,"#","cond"],
+            );
+        };
+        note $@;
+        like $@, qr/line:1/, 'should found line info';
+    };
+
+    subtest 'without source' => sub {
+        eval {
+            Text::MustacheTemplate::Parser->parse(
+                [Text::MustacheTemplate::Lexer::TOKEN_DELIMITER,0,undef,"{{","}}"],
+                [Text::MustacheTemplate::Lexer::TOKEN_TAG,0,"#","cond"],
+            );
+        };
+        note $@;
+        unlike $@, qr/line:/, 'should not found line info';
+    };
+};
 
 sub dump_ast {
     my ($ast, $indent) = @_;

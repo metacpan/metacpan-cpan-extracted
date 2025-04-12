@@ -1,8 +1,11 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::Meta;
-$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.005';
+$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.006';
 use Moose;
+use namespace::autoclean;
 
 with 'Dist::Zilla::Role::DynamicPrereqs::Meta';
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -20,7 +23,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::Meta - Add dynamic prereqs to the metadata
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

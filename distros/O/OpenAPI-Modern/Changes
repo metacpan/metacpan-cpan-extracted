@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.084     2025-04-11 21:10:20Z
+          - no longer require the user to define a custom metaschema when
+            changing jsonSchemaDialect (we dynamically create one for you)
+          - pre-emptive support for '$self' property in the OpenAPI document
+            (to be officially added in v3.2)
+
 0.083     2025-02-28 23:48:29Z
           - fix Sereal serialization and deserialization hooks
           - operation_uri is now resolved against the document uri and request

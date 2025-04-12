@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -505,7 +505,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

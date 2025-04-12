@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0501 2025-04-11 22:17:26
+  - Parameterize the eg/multi.pl logic.
+
 0.0500 2025-04-08 10:11:36
   - Remove no-longer-used import.
   - Improve documentation.

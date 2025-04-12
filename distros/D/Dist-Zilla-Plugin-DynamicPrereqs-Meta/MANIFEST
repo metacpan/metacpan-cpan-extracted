@@ -10,6 +10,7 @@ README
 dist.ini
 lib/Dist/Zilla/Plugin/DynamicPrereqs/DistBuild.pm
 lib/Dist/Zilla/Plugin/DynamicPrereqs/Meta.pm
+lib/Dist/Zilla/Plugin/DynamicPrereqs/ModuleBuild.pm
 lib/Dist/Zilla/Plugin/DynamicPrereqs/ModuleBuildTiny.pm
 lib/Dist/Zilla/Role/DynamicPrereqs/Meta.pm
 t/00-compile.t

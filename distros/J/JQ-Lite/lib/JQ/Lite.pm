@@ -5,7 +5,7 @@ use warnings;
 use JSON::PP;
 use List::Util qw(sum min max);
 
-our $VERSION = '0.26';
+our $VERSION = '0.30';
 
 sub new {
     my ($class, %opts) = @_;
@@ -23,16 +23,32 @@ sub run_query {
         return ($data);
     }
     
-    my @parts = split /\|/, $query;
+    # instead of: my @parts = split /\|/, $query;
+    my @parts = map { s/^\s+|\s+$//gr } split /\|/, $query;
+    
+    # detect .[] and convert to pseudo-command
     @parts = map {
-        s/^\s+|\s+$//g;
-        s/^\.//;
-        $_;
+        if ($_ eq '.[]') {
+            'flatten'
+        } elsif ($_ =~ /^\.(.+)$/) {
+            $1
+        } else {
+            $_
+        }
     } @parts;
 
     my @results = ($data);
     for my $part (@parts) {
         my @next_results;
+
+        # support for flatten (alias for .[])
+        if ($part eq 'flatten') {
+            @next_results = map {
+                ref $_ eq 'ARRAY' ? @$_ : ()
+            } @results;
+            @results = @next_results;
+            next;
+        }
 
         # support for select(...)
         if ($part =~ /^select\((.+)\)$/) {
@@ -169,6 +185,30 @@ sub run_query {
                 ref $_ eq 'ARRAY' && @$_ ? sum(map { 0 + $_ } @$_) / scalar(@$_) : 0
             } @results;
             @results = @next_results;
+            next;
+        }
+
+        # support for group_by(key)
+        if ($part =~ /^group_by\((.+)\)$/) {
+            my $key_path = $1;
+            @next_results = map {
+                _group_by($_, $key_path)
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for count
+        if ($part eq 'count') {
+            my $n = 0;
+            for my $item (@results) {
+                if (ref $item eq 'ARRAY') {
+                    $n += scalar(@$item);
+                } else {
+                    $n += 1;  # count as 1 item
+                }
+            }
+            @results = ($n);
             next;
         }
 
@@ -414,6 +454,19 @@ sub _key {
     }
 }
 
+sub _group_by {
+    my ($array_ref, $path) = @_;
+    return {} unless ref $array_ref eq 'ARRAY';
+
+    my %groups;
+    for my $item (@$array_ref) {
+        my @keys = _traverse($item, $path);
+        my $key = defined $keys[0] ? "$keys[0]" : 'null';
+        push @{ $groups{$key} }, $item;
+    }
+    return \%groups;
+}
+
 1;
 __END__
 
@@ -425,7 +478,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.26
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -460,7 +513,15 @@ jq-like syntax — entirely within Perl, with no external binaries or XS modules
 
 =item * select(...) filters with ==, !=, <, >, and, or
 
+=item * Pipe-style query support (e.g. .[] | select(.age > 25) | .name)
+
 =item * Built-in functions: length, keys, first, last, reverse, sort, unique, has
+
+=item * count function to return the number of results (v0.29+)
+
+=item * count function to count number of elements in an array
+
+=item * group_by(...) to group array items by a key
 
 =item * Command-line interface: C<jq-lite>
 
@@ -505,7 +566,17 @@ The return value is a list of matched results. Each result is a Perl scalar
 
 =item * select(.key > 1 and .key2 == "foo")
 
+=item * group_by(.field)
+
+=item * .key | count
+
+=item * .[] | select(...) | count
+
+=item * .array | count
+
 =item * Functions: length, keys, first, last, reverse, sort, unique, has
+
+=item * .[] as alias for flattening top-level arrays
 
 =back
 
@@ -516,6 +587,8 @@ C<jq-lite> is a CLI wrapper for this module.
   cat data.json | jq-lite '.users[].name'
   jq-lite '.users[] | select(.age > 25)' data.json
   jq-lite -r '.users[].name' data.json
+  jq-lite '.[] | select(.active == true) | .name' data.json
+  jq-lite '.users[] | select(.age > 25) | count' data.json
 
 =head2 Interactive Mode
 

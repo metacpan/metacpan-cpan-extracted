@@ -14,6 +14,128 @@ use Helper;
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
+subtest 'basic document validation' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => my $js = JSON::Schema::Modern->new,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+        contact => { url => '/foo' },
+      },
+      map +($_ => 'not an object'), qw(servers security tags externalDocs),
+    },
+  );
+  my $iter = 0;
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      (map +{
+        instanceLocation => '',
+        keywordLocation => '/$ref/anyOf/'.$iter.'/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf/'.$iter++.'/required',
+        error => 'object is missing property: '.$_,
+      }, qw(paths components webhooks)),
+      {
+        instanceLocation => '',
+        keywordLocation => '/$ref/anyOf',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf',
+        error => 'no subschemas are valid',
+      },
+      do {
+        my @e = (map +{
+          instanceLocation => '/'.$_,
+          keywordLocation => ignore,  # a $defs somewhere
+          absoluteKeywordLocation => ignore,
+          error => re(qr/^got string, not (object|array)$/),
+        }, qw(externalDocs security servers tags));
+        splice @e, 1, 0,
+          {
+            instanceLocation => '/info/contact/url',
+            keywordLocation => ignore,  # a $defs somewhere
+            absoluteKeywordLocation => ignore,
+            error => 'not a valid uri string',
+          },
+          {
+            instanceLocation => '/info/contact',
+            keywordLocation => ignore,  # a $defs somewhere
+            absoluteKeywordLocation => ignore,
+            error => 'not all properties are valid',
+          },
+          {
+            instanceLocation => '/info',
+            keywordLocation => ignore,  # a $defs somewhere
+            absoluteKeywordLocation => ignore,
+            error => 'not all properties are valid',
+          };
+        @e;
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => "/\$ref/properties",
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        error => 'not all properties are valid',
+      },
+    ],
+    'missing paths (etc), and bad types for top level fields',
+  );
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'': object is missing property: paths
+'': object is missing property: components
+'': object is missing property: webhooks
+'': no subschemas are valid
+'/externalDocs': got string, not object
+'/info/contact/url': not a valid uri string
+'/info/contact': not all properties are valid
+'/info': not all properties are valid
+'/security': got string, not array
+'/servers': got string, not array
+'/tags': got string, not array
+'': not all properties are valid
+ERRORS
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js,
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      map +($_ => 'not an object'), qw(paths webhooks components),
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      (map +{
+        instanceLocation => '/'.$_,
+        keywordLocation => ignore,  # a $defs somewhere
+        absoluteKeywordLocation => ignore,
+        error => 'got string, not object',
+      }, qw(components paths webhooks)),
+      {
+        instanceLocation => '',
+        keywordLocation => '/$ref/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        error => 'not all properties are valid',
+      },
+    ],
+    'bad types for paths, webhooks, components',
+  );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/components': got string, not object
+'/paths': got string, not object
+'/webhooks': got string, not object
+'': not all properties are valid
+ERRORS
+};
+
 subtest 'bad subschemas' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -384,9 +506,7 @@ YAML
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
-    # Note: OpenAPI::Modern sets this value to true, but the current 3.1 schema disallows templated
-    # server urls (via the uri-reference format requirement).
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 0),
+    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       %$servers,
@@ -401,40 +521,40 @@ YAML
     },
   );
 
-  cmp_deeply(
-    [ $doc->errors ],
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
     [
       map +(
-        methods(TO_JSON => {
+        {
           instanceLocation => '',
           keywordLocation => $_.'/servers/0/variables/version/default',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/0/variables/version/default',
           error => 'servers default is not a member of enum',
-        }),
-        methods(TO_JSON => {
+        },
+        {
           instanceLocation => '',
           keywordLocation => $_.'/servers/1/url',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/1/url',
           error => 'duplicate of templated server url "https://example.com/{version}/{greeting}"',
-        }),
-        methods(TO_JSON => {
+        },
+        {
           instanceLocation => '',
           keywordLocation => $_.'/servers/1',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/1',
           error => '"variables" property is required for templated server urls',
-        }),
-        methods(TO_JSON => {
+        },
+        {
           instanceLocation => '',
           keywordLocation => $_.'/servers/2/variables',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/2/variables',
           error => 'missing "variables" definition for templated variable "foo"',
-        }),
-        methods(TO_JSON => {
+        },
+        {
           instanceLocation => '',
           keywordLocation => $_.'/servers/3/variables/version/default',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/3/variables/version/default',
           error => 'servers default is not a member of enum',
-        }),
+        },
       ), '', '/components/pathItems/path0', '/components/pathItems/path0/get',
     ],
     'all issues with server entries found',

@@ -96,7 +96,7 @@ sub _error {
     my $src   = $_SOURCE;
     my $line  = 1;
     my $start = 0;
-    while ($src =~ /$/smgco && pos $src <= $curr) {
+    while ($src =~ /$/smgco && pos $src <= $curr) {# uncoverable condition left
         $start = pos $src;
         $line++;
     }
@@ -132,7 +132,7 @@ Text::MustacheTemplate::Lexer - Simple mustache template lexer
 
 =head1 DESCRIPTION
 
-Text::MustacheTemplate::Lexer is a simple lexer for Mustache tempalte.
+Text::MustacheTemplate::Lexer is a simple lexer for Mustache template.
 
 This is low-level interface for Text::MustacheTemplate.
 The APIs may be change without notice.
@@ -141,7 +141,23 @@ The APIs may be change without notice.
 
 =over 2
 
-=item tokenize
+=item tokenize($source)
+
+Converts the given source template string into tokens. Returns an array of token tuple.
+
+Each token is an array reference in the form C<[$token_type, $position, $data, ...]> where:
+
+=over 4
+
+=item * $token_type - One of the token type constants (see L</TOKENS>)
+
+=item * $position - Position in the source string where the token begins
+
+=item * $data - Token-specific data (raw text, tag content, etc.)
+
+=back
+
+Special tokens may contain additional elements in the array.
 
 =back
 
@@ -151,11 +167,21 @@ The APIs may be change without notice.
 
 =item TOKEN_RAW_TEXT
 
+Represents raw text content in the template. Format: C<[TOKEN_RAW_TEXT, $position, $text]>
+
 =item TOKEN_PADDING
+
+Represents whitespace in the template. Format: C<[TOKEN_PADDING, $position, $whitespace]>
 
 =item TOKEN_TAG
 
+Represents a mustache tag ({{tag}}). Format: C<[TOKEN_TAG, $position, $type, $content]> or C<[TOKEN_TAG, $position, $content]>
+
+The $type parameter is present for special tags and indicates the tag type (such as '{' for triple mustache, '#' for section start, etc.)
+
 =item TOKEN_DELIMITER
+
+Represents a delimiter change. Format: C<[TOKEN_DELIMITER, $position, $raw_content, $open_delimiter, $close_delimiter]>
 
 =back
 

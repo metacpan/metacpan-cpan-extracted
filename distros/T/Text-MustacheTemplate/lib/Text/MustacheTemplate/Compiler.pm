@@ -13,7 +13,7 @@ use Text::MustacheTemplate::Evaluator qw/retrieve_variable evaluate_section_vari
 use Text::MustacheTemplate::HTML qw/escape_html/;
 
 use constant {
-    DEBUG          => !!$ENV{PERL_TEXT_MUSTACHE_TINY_COMPILER_DEBUG},
+    DEBUG          => !!$ENV{PERL_TEXT_MUSTACHE_TEMPLATE_COMPILER_DEBUG},
     DISCARD_RESULT => '##DISCARD##',
 };
 
@@ -63,7 +63,7 @@ sub compile {
         local $_DEFAULT_CLOSE_DELIMITER = $close_delimiter;
         local $_CURRENT_OPEN_DELIMITER = $open_delimiter;
         local $_CURRENT_CLOSE_DELIMITER = $close_delimiter;
-        _compile(\@ast, 4);
+        _generate_code(\@ast, 4);
     };
     die "Invalid AST: $@" if "$@"; # uncoverable branch true
 
@@ -80,35 +80,6 @@ __CODE__
     my $f = eval $code;
     die $@ if $@; # uncoverable branch true
     return $f;
-}
-
-sub _compile {
-    my ($ast, $indent) = @_;
-
-    my $initial_text = '';
-    # Optimize: remove first raw text and fill initial text if no contains new lines
-    if ($ast->[0]->[0] == SYNTAX_RAW_TEXT && $ast->[0]->[1] !~ /[\r\n]/mano) {
-        my (undef, $text) = @{ shift @$ast };
-        $initial_text = $text;
-    }
-
-    my $initial_text_perl = B::perlstring($initial_text);
-    my $default_open_delimiter_perl = B::perlstring($_DEFAULT_OPEN_DELIMITER);
-    my $default_close_delimiter_perl = B::perlstring($_DEFAULT_CLOSE_DELIMITER);
-    my $current_open_delimiter_perl = B::perlstring($_CURRENT_OPEN_DELIMITER);
-    my $current_close_delimiter_perl = B::perlstring($_CURRENT_CLOSE_DELIMITER);
-
-    my $code = '';
-    $code .= (' ' x $indent)."sub {\n";
-    $code .= (' ' x $indent)."    local \@_CTX = \@_;\n";
-    $code .= (' ' x $indent)."    local (\$_OPEN_DELIMITER, \$_CLOSE_DELIMITER) = ($default_open_delimiter_perl, $default_close_delimiter_perl);\n";
-    $code .= (' ' x $indent)."    local \$Text::MustacheTemplate::Evaluator::LAMBDA_RENDERER = \\&_render_template_in_context;\n" if $indent == 4;
-    $code .= "\n";
-    $code .= (' ' x $indent)."    my \$_result = $initial_text_perl;\n";
-    $code .=                      _compile_body($ast, $indent+4, '$_result');
-    $code .= (' ' x $indent)."    return \$_result;\n";
-    $code .= (' ' x $indent)."};\n";
-    return $code;
 }
 
 sub _optimize {
@@ -189,14 +160,44 @@ sub _optimize {
     return @optimized_ast;
 }
 
-sub _compile_body {
+sub _generate_code {
+    my ($ast, $indent) = @_;
+
+    my $initial_text = '';
+    # Optimize: remove first raw text and fill initial text if no contains new lines
+    if ($ast->[0]->[0] == SYNTAX_RAW_TEXT && $ast->[0]->[1] !~ /[\r\n]/mano) {
+        my (undef, $text) = @{ shift @$ast };
+        $initial_text = $text;
+    }
+
+    my $initial_text_perl = B::perlstring($initial_text);
+    my $default_open_delimiter_perl = B::perlstring($_DEFAULT_OPEN_DELIMITER);
+    my $default_close_delimiter_perl = B::perlstring($_DEFAULT_CLOSE_DELIMITER);
+
+    my $code = '';
+    $code .= (' ' x $indent)."sub {\n";
+    $code .= (' ' x $indent)."    local \@_CTX = \@_;\n";
+    $code .= (' ' x $indent)."    local (\$_OPEN_DELIMITER, \$_CLOSE_DELIMITER) = ($default_open_delimiter_perl, $default_close_delimiter_perl);\n";
+    $code .= (' ' x $indent)."    local \$Text::MustacheTemplate::Evaluator::LAMBDA_RENDERER = \\&_render_template_in_context;\n" if $indent == 4;
+    $code .= "\n";
+    $code .= (' ' x $indent)."    my \$_result = $initial_text_perl;\n";
+    $code .=                      _generate_body($ast, $indent+4, '$_result');
+    $code .= (' ' x $indent)."    return \$_result;\n";
+    $code .= (' ' x $indent)."};\n";
+    return $code;
+}
+
+sub _generate_body {
     my ($ast, $indent, $result) = @_;
 
     my $code = '';
     for my $i (keys @$ast) {
         my $syntax = $ast->[$i];
         my ($type) = @$syntax;
-        if ($type == SYNTAX_RAW_TEXT) { # uncoverable branch false count:5
+
+        # uncoverable branch true count:6
+        # uncoverable branch false count:5..6
+        if ($type == SYNTAX_RAW_TEXT) {
             my (undef, $text) = @$syntax;
             next if $result eq DISCARD_RESULT;
             if ($i == $#{$ast} ? $text =~ /[\r\n](?!\z)/mano : $text =~ /[\r\n]/mano) {
@@ -208,27 +209,30 @@ sub _compile_body {
             } else {
                 $code .= (' ' x $indent).$result.' .= '.B::perlstring($text).";\n";
             }
+        } elsif ($type == SYNTAX_VARIABLE) {
+            $code .= _generate_variable($syntax, $indent, $result);
         } elsif ($type == SYNTAX_DELIMITER) {
             my (undef, $open_delimiter, $close_delimiter) = @$syntax;
             ($_CURRENT_OPEN_DELIMITER, $_CURRENT_CLOSE_DELIMITER) = ($open_delimiter, $close_delimiter);
-        } elsif ($type == SYNTAX_VARIABLE) {
-            $code .= _compile_variable($syntax, $indent, $result);
         } elsif ($type == SYNTAX_BOX) {
-            $code .= _compile_box($syntax, $indent, $result);
-        } elsif ($type == SYNTAX_COMMENT) {
-            # ignore
+            $code .= _generate_box($syntax, $indent, $result);
         } elsif ($type == SYNTAX_PARTIAL) {
             my (undef, $reference, $name, $padding) = @$syntax;
             $padding = B::perlstring($padding) if $padding;
+
+            # uncoverable branch false count:2
             my $retriever = $reference == REFERENCE_DYNAMIC ? ($name eq '.' ? '$_CTX[-1]' : 'retrieve_variable(\@_CTX, '.(join ', ', map B::perlstring($_), split /\./ano, $name).')')
                           : $reference == REFERENCE_STATIC  ? B::perlstring($name)
                           : die "Unknown reference: $reference";
+
             $code .= (' ' x $indent)."\$_name = $retriever;\n";
             $code .= (' ' x $indent)."$result .= do {\n";
             $code .= (' ' x $indent)."    local \$_PADDING;\n" unless $padding;
             $code .= (' ' x $indent)."    local \$_PADDING = $padding;\n" if $padding;
             $code .= (' ' x $indent)."    \$Text::MustacheTemplate::REFERENCES{\$_name}->(\@_CTX);\n";
             $code .= (' ' x $indent)."} if exists \$Text::MustacheTemplate::REFERENCES{\$_name};\n";
+        } elsif ($type == SYNTAX_COMMENT) {
+            # ignore
         } else {
             die "Unknown syntax: $type"; # uncoverable statement
         }
@@ -236,7 +240,7 @@ sub _compile_body {
     return $code;
 }
 
-sub _compile_variable {
+sub _generate_variable {
     my ($syntax, $indent, $result) = @_;
 
     my (undef, $type, $name) = @$syntax;
@@ -251,7 +255,7 @@ sub _compile_variable {
     }
 }
 
-sub _compile_box {
+sub _generate_box {
     my ($syntax, $indent, $result) = @_;
 
     my (undef, $type) = @$syntax;
@@ -259,7 +263,7 @@ sub _compile_box {
         my (undef, undef, $name, $inner_template, $children) = @$syntax;
         my $no_lambda = @CONTEXT_HINT && !$Text::MustacheTemplate::LAMBDA_TEMPLATE_RENDERING;
 
-        my $inner_code = _compile_body($children, $no_lambda ? $indent+4 : $indent+8, $result);
+        my $inner_code = _generate_body($children, $no_lambda ? $indent+4 : $indent+8, $result);
         my $evaluator = $name eq '.'
             ? 'evaluate_section($_CTX[-1])'
             : 'evaluate_section_variable(\@_CTX, '.(join ', ', map B::perlstring($_), split /\./ano, $name).')';
@@ -298,7 +302,7 @@ sub _compile_box {
             ? 'evaluate_section($_CTX[-1])'
             : 'evaluate_section_variable(\@_CTX, '.(join ', ', map B::perlstring($_), split /\./ano, $name).')';
         my $code = (' ' x $indent)."if (!$evaluator) {\n";
-        $code .= _compile_body($children, $indent+4, $result);
+        $code .= _generate_body($children, $indent+4, $result);
         $code .= (' ' x $indent)."}\n";
         return $code;
     } elsif ($type == BOX_BLOCK) {
@@ -308,13 +312,13 @@ sub _compile_box {
             my $code = (' ' x $indent)."if (exists \$_BLOCKS{$name}) {\n";
             $code .= (' ' x $indent)."    $result .= \$_BLOCKS{$name}->(\@_CTX);\n";
             $code .= (' ' x $indent)."} else {\n";
-            $code .= _compile_body($children, $indent+4, $result);
+            $code .= _generate_body($children, $indent+4, $result);
             $code .= (' ' x $indent)."}\n";
             return $code;
         }
 
         my ($open_delimiter, $close_delimiter) = ($_CURRENT_OPEN_DELIMITER, $_CURRENT_CLOSE_DELIMITER);
-        my $sub_code = _compile($children, $indent+4);
+        my $sub_code = _generate_code($children, $indent+4);
         $sub_code = substr $sub_code, $indent+4; # remove first indent
         my $code = (' ' x $indent)."unless (exists \$_BLOCKS{$name}) {\n";
         $code .= (' ' x $indent)."    \$_BLOCKS{$name} = $sub_code";
@@ -323,14 +327,17 @@ sub _compile_box {
     } elsif ($type == BOX_PARENT) {
         local $_PARENT = $syntax;
         my (undef, undef, $reference, $name, $children) = @$syntax;
+
+        # uncoverable branch false count:2
         my $retriever = $reference == REFERENCE_DYNAMIC ? ($name eq '.' ? '$_CTX[-1]' : 'retrieve_variable(\@_CTX, '.(join ', ', map B::perlstring($_), split /\./ano, $name).')')
                       : $reference == REFERENCE_STATIC  ? B::perlstring($name)
                       : die "Unknown reference: $type";
+
         my $code = (' ' x $indent)."{\n";
         $code .= (' ' x $indent)."    \$_name = $retriever;\n";
         $code .= (' ' x $indent)."    my \$_parent = \$Text::MustacheTemplate::REFERENCES{\$_name} or croak \"Unknown parent template: \$_name\";\n";
         $code .= (' ' x $indent)."    local \%_BLOCKS = \%_BLOCKS;\n";
-        $code .= _compile_body($children, $indent+4, DISCARD_RESULT);
+        $code .= _generate_body($children, $indent+4, DISCARD_RESULT);
         $code .= (' ' x $indent)."    $result .= do {\n";
         $code .= (' ' x $indent)."        local \$_PADDING;\n";
         $code .= (' ' x $indent)."        \$_parent->(\@_CTX);\n";
@@ -393,7 +400,7 @@ Text::MustacheTemplate::Compiler - Simple mustache template compiler
 
 =head1 DESCRIPTION
 
-Text::MustacheTemplate::Compiler is a compiler for Mustache tempalte.
+Text::MustacheTemplate::Compiler is a compiler for Mustache template.
 
 This is low-level interface for Text::MustacheTemplate.
 The APIs may be change without notice.
@@ -402,7 +409,57 @@ The APIs may be change without notice.
 
 =over 2
 
-=item compile
+=item compile($ast)
+
+Compiles the abstract syntax tree (AST) from L<Text::MustacheTemplate::Parser> into a Perl code reference (CodeRef) that renders the template when called.
+
+Parameters:
+
+=over 4
+
+=item $ast - The abstract syntax tree structure from the parser
+
+=back
+
+Returns a CodeRef that takes a context scalar value and returns the rendered template string.
+
+=back
+
+=head1 DESCRIPTION
+
+Text::MustacheTemplate::Compiler takes the parsed AST and transforms it into executable Perl code that can efficiently render the template with a given context.
+This module handles the optimization of the compilation process and creates specialized code paths depending on the template structure.
+
+The compiler performs several optimizations:
+
+=over 4
+
+=item * Direct interpolation of static text
+
+=item * Specialized handling for arrays, hashes, and lambda functions in section blocks
+
+=item * Optimized variable lookup with dot notation support
+
+=item * Proper handling of context stacking
+
+=back
+
+=head1 INTERNALS
+
+The compiler uses string eval to generate efficient Perl code that handles the template rendering.
+It creates a closure that has access to utility functions for HTML escaping, context resolution, etc.
+
+The following internal optimizations are used:
+
+=over 4
+
+=item * Avoiding unnecessary concatenations for performance
+
+=item * Proper scope handling for nested sections 
+
+=item * Special handling for lambda functions in templates
+
+=item * Context path resolution that follows Mustache specification
 
 =back
 

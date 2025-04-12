@@ -1,3 +1,10 @@
+v0.07  2025-04-11Z
+    - Fixed error with too old versions of PDF::API2
+    - Added no_defaults support to digest calculation to query but not calculate digests
+    - Lowered required versions of dependencies
+    - Added media subtype for PostScript
+    - Added basic barcode recognition
+
 v0.06  2025-03-19Z
     - Made Data::Identifier a requirement
     - Improved documentation

@@ -21,7 +21,7 @@ t/03_compiler.t
 t/04_evaluator.t
 t/05_generator.t
 t/06_erorrs.t
-t/07_integration.t
+t/07_misc.t
 t/specs/comments.t
 t/specs/delimiters.t
 t/specs/dynamic-names.t

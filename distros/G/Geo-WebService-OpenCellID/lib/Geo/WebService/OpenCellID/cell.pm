@@ -4,7 +4,7 @@ use strict;
 use base qw{Geo::WebService::OpenCellID::Base};
 use Geo::WebService::OpenCellID::Response::cell::get;
 use Geo::WebService::OpenCellID::Response::cell::getMeasures;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -49,9 +49,9 @@ Get the position of a specific cell http://www.opencellid.org/cell/get?key=myapi
     lac: locale area code (decimal)
     cellid: value of the cell id 
 
-lac can be ommitted.  However, if cellid is not present or if cellid i unkown, a defaut return will be based on lac information, but with a much lower accuracy. In that case, cellid return will be -1.
+lac can be omitted.  However, if cellid is not present or if cellid i unknown, a default return will be based on lac information, but with a much lower accuracy. In that case, cellid return will be -1.
 
-The postion is returned in xml format by the web service but this package wraps this return in a blessed object.
+The position is returned in xml format by the web service but this package wraps this return in a blessed object.
 
 Example: http://www.opencellid.org/cell/get?mcc=250&mnc=99&cellid=29513&lac=0 
 
@@ -113,31 +113,15 @@ sub getMeasures {
                              @_);
 }
 
-=head1 BUGS
-
-Submit to RT and email the Author
-
-=head1 SUPPORT
-
-Try the Author or Try 8motions.com
-
-=head1 AUTHOR
-
-    Michael R. Davis
-    CPAN ID: MRDVT
-    STOP, LLC
-    domain=>michaelrdavis,tld=>com,account=>perl
-    http://www.stopllc.com/
-
 =head1 COPYRIGHT
+
+Copyright (c) 2025 Michael R. Davis
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 The full text of the license can be found in the
 LICENSE file included with this module.
-
-=head1 SEE ALSO
 
 =cut
 

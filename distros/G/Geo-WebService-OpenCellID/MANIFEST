@@ -12,13 +12,10 @@ lib/Geo/WebService/OpenCellID/Response/measure/add.pm
 LICENSE
 Makefile.PL
 MANIFEST
-README
-scripts/example-cell-get.pl
-scripts/example-cell-getMeasures.pl
-scripts/example-measure-add.pl
+README.md
 t/001_load.t
 t/002_get.t
 t/003_getMeasures.t
 t/004_add.t
-Todo
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

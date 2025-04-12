@@ -1,0 +1,31 @@
+no SQL representation
+$VAR1 = bless( {
+                 'operator' => 'HAS',
+                 'properties' => [
+                                   bless( {
+                                            'name' => [
+                                                        'name'
+                                                      ]
+                                          }, 'OPTIMADE::Filter::Property' ),
+                                   bless( {
+                                            'name' => [
+                                                        'surname'
+                                                      ]
+                                          }, 'OPTIMADE::Filter::Property' )
+                                 ],
+                 'values' => [
+                               [
+                                 [
+                                   'STARTS WITH',
+                                   'J'
+                                 ],
+                                 [
+                                   'CONTAINS',
+                                   'Doe'
+                                 ]
+                               ]
+                             ]
+               }, 'OPTIMADE::Filter::Zip' );
+== Filter ==
+(name:surname HAS STARTS WITH "J" : CONTAINS "Doe")
+== SQL ==

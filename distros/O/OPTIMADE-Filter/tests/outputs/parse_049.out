@@ -1,0 +1,18 @@
+no SQL representation
+$VAR1 = bless( {
+                 'operator' => 'HAS ALL',
+                 'property' => bless( {
+                                        'name' => [
+                                                    'elements'
+                                                  ]
+                                      }, 'OPTIMADE::Filter::Property' ),
+                 'values' => [
+                               [
+                                 'STARTS WITH',
+                                 'S'
+                               ]
+                             ]
+               }, 'OPTIMADE::Filter::ListComparison' );
+== Filter ==
+(elements HAS ALL STARTS WITH "S")
+== SQL ==

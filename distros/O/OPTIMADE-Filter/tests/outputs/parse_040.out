@@ -1,0 +1,71 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'true'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   bless( {
+                                                                                            'value' => 1
+                                                                                          }, 'OPTIMADE::Filter::Boolean' )
+                                                                                 ],
+                                                                   'operator' => '='
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'false'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   bless( {
+                                                                                            'value' => ''
+                                                                                          }, 'OPTIMADE::Filter::Boolean' )
+                                                                                 ],
+                                                                   'operator' => '='
+                                                                 }, 'OPTIMADE::Filter::Comparison' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'true'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   bless( {
+                                                                                            'value' => 1
+                                                                                          }, 'OPTIMADE::Filter::Boolean' )
+                                                                                 ],
+                                                                   'operator' => '!='
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'false'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   bless( {
+                                                                                            'value' => ''
+                                                                                          }, 'OPTIMADE::Filter::Boolean' )
+                                                                                 ],
+                                                                   'operator' => '!='
+                                                                 }, 'OPTIMADE::Filter::Comparison' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' )
+                               ],
+                 'operator' => 'OR'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+(((true = TRUE) AND (false = FALSE)) OR ((true != TRUE) AND (false != FALSE)))
+== SQL ==
+(<no SQL representation> AND <no SQL representation>) OR (<no SQL representation> AND <no SQL representation>)

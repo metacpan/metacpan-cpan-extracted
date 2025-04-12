@@ -7,6 +7,7 @@ use warnings;
 use Scalar::Util qw(blessed);
 
 use OPTIMADE::Filter::AndOr;
+use OPTIMADE::Filter::Boolean;
 use OPTIMADE::Filter::Comparison;
 use OPTIMADE::Filter::Known;
 use OPTIMADE::Filter::ListComparison;
@@ -28,54 +29,61 @@ filter: expression ;
 
 # Values
 
-constant: string | number ;
+ordered_constant: string | number ;
 
-value: string | number | property ;
+unordered_constant: TRUE
+                    {
+                        return OPTIMADE::Filter::Boolean->new( 1 );
+                    }
+                  | FALSE
+                    {
+                        return OPTIMADE::Filter::Boolean->new( '' );
+                    }
+                  ;
 
-value_list: value
+value: unordered_constant | ordered_value ;
+
+ordered_value: ordered_constant | property ;
+
+value_list_entry: value
+                    {
+                        return [ '=', $_[1] ];
+                    }
+                | value_eq_rhs
+                    {
+                        return [ $_[1]->operator, $_[1]->left ];
+                    }
+                | value_rel_comp_rhs
+                    {
+                        return [ $_[1]->operator, $_[1]->left ];
+                    }
+                | fuzzy_string_op_rhs
+                    {
+                        return [ $_[1]->operator, $_[1]->left ];
+                    }
+                ;
+
+value_list: value_list_entry
             {
-                return [ [ '=', $_[1] ] ];
+                return [ $_[1] ];
             }
-          | operator value
+          | value_list comma value_list_entry
             {
-                return [ [ @_[1..$#_] ] ];
-            }
-          | value_list comma value
-            {
-                push @{$_[1]}, [ '=', $_[3] ];
-                return $_[1];
-            }
-          | value_list comma operator value
-            {
-                push @{$_[1]}, [ $_[3], $_[4] ];
+                push @{$_[1]}, $_[3];
                 return $_[1];
             }
           ;
 
-value_zip: value value_zip_part
+value_zip: value_list_entry colon value_list_entry
             {
-                return [ [ '=', $_[1] ], $_[2] ];
+                return [ $_[1], $_[3] ];
             }
-         | operator value value_zip_part
+         | value_zip colon value_list_entry
             {
-                return [ [ $_[1], $_[2] ], $_[3] ];
-            }
-         | value_zip value_zip_part
-            {
-                push @{$_[1]}, $_[2];
+                push @{$_[1]}, $_[3];
                 return $_[1];
             }
          ;
-
-value_zip_part: colon value
-                {
-                    return [ '=', $_[2] ];
-                }
-              | colon operator value
-                {
-                    return [ $_[2], $_[3] ];
-                }
-              ;
 
 value_zip_list: value_zip
                 {
@@ -121,52 +129,74 @@ expression_phrase: comparison
 
 comparison: constant_first_comparison | property_first_comparison ;
 
-constant_first_comparison: constant value_op_rhs
+constant_first_comparison: ordered_constant value_op_rhs
+                            {
+                                $_[2]->unshift_operand( $_[1] );
+                                return $_[2];
+                            }
+                         | unordered_constant value_eq_rhs
                             {
                                 $_[2]->unshift_operand( $_[1] );
                                 return $_[2];
                             }
                          ;
 
-property_first_comparison: property value_op_rhs
+property_first_comparison: property
+                                {
+                                    my $cmp = OPTIMADE::Filter::Comparison->new( '=' );
+                                    $cmp->left( $_[1] );
+                                    $cmp->right( OPTIMADE::Filter::Boolean->new( 1 ) );
+                                    return $cmp;
+                                }
+                         | property value_op_rhs
                                 {
                                     $_[2]->unshift_operand( $_[1] );
                                     return $_[2];
                                 }
-                           | property known_op_rhs
+                         | property known_op_rhs
                                 {
                                     $_[2]->property( $_[1] );
                                     return $_[2];
                                 }
-                           | property fuzzy_string_op_rhs
+                         | property fuzzy_string_op_rhs
                                 {
                                     $_[2]->unshift_operand( $_[1] );
                                     return $_[2];
                                 }
-                           | property set_op_rhs
+                         | property set_op_rhs
                                 {
                                     $_[2]->property( $_[1] );
                                     return $_[2];
                                 }
-                           | property set_zip_op_rhs
+                         | property set_zip_op_rhs
                                 {
                                     $_[2]->unshift_property( $_[1] );
                                     return $_[2];
                                 }
-                           | property length_op_rhs
+                         | property length_op_rhs
                                 {
                                     $_[2]->property( $_[1] );
                                     return $_[2];
                                 }
-                           ;
+                         ;
 
-value_op_rhs: operator value
+value_op_rhs: value_eq_rhs | value_rel_comp_rhs ;
+
+value_eq_rhs: equality_operator value
                 {
                     my $cmp = OPTIMADE::Filter::Comparison->new( $_[1] );
                     $cmp->push_operand( $_[2] );
                     return $cmp;
                 }
             ;
+
+value_rel_comp_rhs: relative_comparison_operator ordered_value
+                    {
+                        my $cmp = OPTIMADE::Filter::Comparison->new( $_[1] );
+                        $cmp->push_operand( $_[2] );
+                        return $cmp;
+                    }
+                  ;
 
 known_op_rhs: IS KNOWN
                 {
@@ -222,10 +252,22 @@ set_op_rhs: HAS value
                 $lc->values( [ [ '=', $_[2] ] ] );
                 return $lc;
             }
-          | HAS operator value
+          | HAS equality_operator value
             {
                 my $lc = OPTIMADE::Filter::ListComparison->new( $_[1] );
                 $lc->values( [ [ $_[2], $_[3] ] ] );
+                return $lc;
+            }
+          | HAS relative_comparison_operator ordered_value
+            {
+                my $lc = OPTIMADE::Filter::ListComparison->new( $_[1] );
+                $lc->values( [ [ $_[2], $_[3] ] ] );
+                return $lc;
+            }
+          | HAS fuzzy_string_op_rhs
+            {
+                my $lc = OPTIMADE::Filter::ListComparison->new( $_[1] );
+                $lc->values( [ [ $_[2]->operator, $_[2]->left ] ] );
                 return $lc;
             }
           | HAS ALL value_list
@@ -326,23 +368,27 @@ comma: ',' ;
 
 colon: ':' ;
 
-# OperatorComparison operator tokens
+# Comparison operator tokens
 
-operator: '<'
-        | '<' '='
-            {
-                return join( '', @_[1..$#_] );
-            }
-        | '>'
-        | '>' '='
-            {
-                return join( '', @_[1..$#_] );
-            }
-        | '='
-        | '!' '='
-            {
-                return join( '', @_[1..$#_] );
-            }
+operator: equality_operator | relative_comparison_operator ;
+
+equality_operator: '='
+                 | '!' '='
+                    {
+                        return join( '', @_[1..$#_] );
+                    }
+    ;
+
+relative_comparison_operator: '<'
+                            | '<' '='
+                                {
+                                    return join( '', @_[1..$#_] );
+                                }
+                            | '>'
+                            | '>' '='
+                                {
+                                    return join( '', @_[1..$#_] );
+                                }
     ;
 
 %%
@@ -415,11 +461,12 @@ sub _Lexer
         return( 'identifier', $1 );
     }
 
-    # Handling boolean relations
+    # Handling textual operators and other literals
     if( $self->YYData->{INPUT} =~ s/^(AND|NOT|OR|
                                       IS|UNKNOWN|KNOWN|
                                       CONTAINS|STARTS|ENDS|WITH|
-                                      LENGTH|HAS|ALL|ONLY|ANY)//x ) {
+                                      LENGTH|HAS|ALL|ONLY|ANY|
+                                      TRUE|FALSE)//x ) {
         $self->{USER}{CHARNO} += length( $1 );
         return( $1, $1 );
     }

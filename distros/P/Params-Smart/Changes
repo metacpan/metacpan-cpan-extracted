@@ -1,5 +1,13 @@
 Revision history for Perl extension Params::Smart.
 
+0.09
+        - This module has been marked as deprecated
+        - updated README from POD
+        - updated metadata in Makefile.PL
+        - removed Build.PL
+        - updated copyright year
+        - cleaned up whitespace
+
 0.08  Wed Mar 21 2007
 	- added case where undef value used in positional parameter
           (thanks to Rick Westerman)
@@ -61,4 +69,3 @@ Revision history for Perl extension Params::Smart.
 0.01  Fri Apr 15 23:24:25 2005
 	- original version; created by h2xs 1.23 with options
 		-X -b 5.6.0 -n Params::Smart -v 0.01
-

@@ -2,7 +2,7 @@ package App::ModuleBuildTiny::Dist;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 use CPAN::Meta;
 use Config;
@@ -260,25 +260,25 @@ sub new {
 		my %resources = $class->generate_resources(%opts);
 
 		my $metahash = {
-			name           => $distname,
-			version        => $version->stringify,
-			author         => \@authors,
-			abstract       => $abstract,
-			dynamic_config => 0,
-			license        => [ $license->meta2_name ],
-			prereqs        => $prereqs,
-			release_status => $opts{trial} // $version =~ /_/ ? 'testing' : 'stable',
-			generated_by   => "App::ModuleBuildTiny version $VERSION",
-			'meta-spec'    => {
-				version    => '2',
-				url        => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec'
+			name                => $distname,
+			version             => $version->stringify,
+			author              => \@authors,
+			abstract            => $abstract,
+			dynamic_config      => 0,
+			license             => [ $license->meta2_name ],
+			prereqs             => $prereqs,
+			release_status      => $opts{trial} // $version =~ /_/ ? 'testing' : 'stable',
+			generated_by        => "App::ModuleBuildTiny version $VERSION",
+			'meta-spec'         => {
+				version         => 2,
+				url             => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec'
 			},
-			(resources      => \%resources) x!! %resources,
-			x_spdx_expression => $license->spdx_expression,
+			(resources          => \%resources) x!! %resources,
+			x_spdx_expression   => $license->spdx_expression,
+			x_generated_by_perl => "$^V",
 		};
 
 		if (-e 'dynamic-prereqs.yml') {
-			$metahash->{prereqs}{configure}{requires}{'CPAN::Requirements::Dynamic'} //= '0.001';
 			my $dynamic_prereqs = load_jsonyaml('dynamic-prereqs.yml');
 			for my $expression (@{ $dynamic_prereqs->{expressions}}) {
 				$expression->{condition} = [ shellwords($expression->{condition}) ] unless ref $expression->{condition};
@@ -293,6 +293,10 @@ sub new {
 		if (%{$mergedata}) {
 			require CPAN::Meta::Merge;
 			$metahash = CPAN::Meta::Merge->new(default_version => '2')->merge($metahash, $mergedata);
+		}
+		if ($metahash->{x_dynamic_prereqs}) {
+			$metahash->{dynamic_config} = 1;
+			$metahash->{prereqs}{configure}{requires}{'CPAN::Requirements::Dynamic'} //= '0.002' if $mode eq 'MBT';
 		}
 
 		# this avoids a long-standing CPAN.pm bug that incorrectly merges runtime and
@@ -340,8 +344,11 @@ sub new {
 			"$header\nuse $minimum_perl;\nuse Dist::Build $minimum_db;\nBuild_PL(\\\@ARGV, \\\%ENV);\n";
 		}
 	};
-	$files{'META.json'} //= $meta->as_string;
-	$files{'META.yml'} //= $meta->as_string({ version => 1.4 });
+	{
+		local $ENV{CPAN_META_JSON_BACKEND} = JSON::MaybeXS::JSON();
+		$files{'META.json'} //= $meta->as_string;
+		$files{'META.yml'} //= $meta->as_string({ version => 1.4 });
+	}
 	$files{LICENSE} //= $license->fulltext;
 	$files{README} //= generate_readme($dist_name);
 	if ($opts{regenerate}{Changes}) {
@@ -372,13 +379,13 @@ sub generate_resources {
 		if ($origin =~ m{https://github.com/([\w.-]+)/([\w.-]+).git}) {
 			$result{repository} = {
 				type => 'git',
-				web  => "https://github.com/$1/$2/",
+				web  => "https://github.com/$1/$2",
 				url  => $origin,
 			};
 		} elsif ($origin =~ m{git\@github.com:([\w.-]+)/([\w.-]+).git}) {
 			$result{repository} = {
 				type => 'git',
-				web  => "https://github.com/$1/$2/",
+				web  => "https://github.com/$1/$2",
 				url  => "https://github.com/$1/$2.git",
 			};
 		} elsif ($origin =~ m{^https?://}) {

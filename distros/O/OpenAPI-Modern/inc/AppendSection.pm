@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package inc::AppendSupport;
+package inc::AppendSection;
 
 use Moose;
 extends 'Pod::Weaver::Section::AllowOverride';

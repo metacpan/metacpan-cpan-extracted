@@ -33,7 +33,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 use parent 'Data::URIID::Base';
 
@@ -100,6 +100,7 @@ my %attributes = (
     (map {$_ => {source_type => 'string'}} qw(date_of_birth date_of_death)),
 
     ext => {}, # experimental
+    tagged_as => {}, # experimental
 );
 
 my %id_conv = (
@@ -159,6 +160,7 @@ my %best_services = (
     'notalwaysright-post-identifier' => 'notalwaysright',
     'fefe-blog-post-identifier'     => 'fefe',
     'ruthede-comic-post-identifier' => 'ruthede',
+    'danbooru2chanjp-post-identifier' => 'danbooru2chanjp',
 );
 
 # Load extra services:
@@ -311,6 +313,10 @@ my %url_templates = (
     ],
     'ruthede' => [
         ['ruthede-comic-post-identifier' => 'https://ruthe.de/static/cartoon_%s.html', undef, [qw(info render)]],
+    ],
+    'danbooru2chanjp' => [
+        ['danbooru2chanjp-post-identifier' => 'https://danbooru.2chan.jp/index.php?page=post&s=view&id=%s', undef, [qw(info render)]],
+        ['danbooru2chanjp-post-identifier' => 'https://danbooru.2chan.jp/image_data.php?start=%s&limit=1', undef, [qw(metadata)]],
     ],
 );
 my %digest_url_templates = (
@@ -475,7 +481,7 @@ my %url_parser = (
         },
         {
             host => 'e621.net',
-            path => qr#^/posts/([1-9][0-9]*)$#,
+            path => qr#^/(?:posts|post/show)/([1-9][0-9]*)$#,
             source => 'e621',
             type => 'e621-post-identifier',
             id => \1,
@@ -765,6 +771,36 @@ my %url_parser = (
             action => 'render',
             id => \1,
         },
+        {
+            host => 'danbooru.2chan.jp',
+            path => qr#^/index\.php$#,
+            source => 'danbooru2chanjp',
+            type => 'danbooru2chanjp-post-identifier',
+            action => 'render',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                my %query = $uri->query_form;
+                if (($query{page} // '') eq 'post' && ($query{s} // '') eq 'view' && defined($query{id})) {
+                    return $query{id};
+                }
+                return undef;
+            }
+        },
+        {
+            host => 'danbooru.2chan.jp',
+            path => qr#^/image_data\.php$#,
+            source => 'danbooru2chanjp',
+            type => 'danbooru2chanjp-post-identifier',
+            action => 'metadata',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                my %query = $uri->query_form;
+                if (int($query{limit} // '0') == 1 && int($query{offset} // 0) == 0 && defined($query{start})) {
+                    return $query{start};
+                }
+                return undef;
+            }
+        },
     ],
 );
 
@@ -783,6 +819,7 @@ my %syntax = (
     'fellig-identifier'             => qr/^[A-Z]+[1-9][0-9]*$/,
     'youtube-video-identifier'      => qr/^.{11}$/,
     'e621tagtype'                   => qr/./,
+    'e621tag'                       => qr/./,
     'amc-artist-identifier'         => qr/^[a-z]+(-[a-z]+)+$/,
     'tww-artist-identifier'         => qr/^[\p{L}\d]+(-[\p{L}\d]+)*$/,
     'grove-art-online-identifier'   => qr/^T(?:0|20|22)\d{5}$/,
@@ -800,8 +837,9 @@ my %syntax = (
     'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+$/,
     'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}$/,
     'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
+    'danbooru2chanjp-tag'           => qr/./,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier notalwaysright-post-identifier ruthede-comic-post-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
 );
 
 my %fellig_tables = (
@@ -1093,6 +1131,16 @@ sub _lookup__https {
             $self->{primary}{digest} //= {};
             $self->{primary}{digest}{'md-5-128'} = $md5;
         }
+        if (scalar(@segments) == 6 &&
+            $segments[0] eq '' && $segments[1] eq 'data' &&
+            $segments[2] eq 'preview' &&
+            length($segments[3]) == 2 && length($segments[4]) == 2 &&
+            length($segments[5]) > 32) {
+            my ($md5, $ext) = $segments[5] =~ /^([0-9a-f]{32})\.([0-9a-z]+)$/;
+            $self->_set('e621');
+            $self->{primary}{digest} //= {};
+            $self->{primary}{digest}{'md-5-128'} = $md5;
+        }
     } elsif ($host eq 'files.fellig.org' || $host eq 'thumbnails.fellig.org') {
         my @segments = $uri->path_segments;
         if (scalar(@segments) == 5 &&
@@ -1241,8 +1289,6 @@ sub attribute {
                     }
 
                     if (defined($value)) {
-                        next unless defined $value;
-
                         if (ref($value) eq 'ARRAY') {
                             push(@value, @{$value});
                         } else {
@@ -1639,7 +1685,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

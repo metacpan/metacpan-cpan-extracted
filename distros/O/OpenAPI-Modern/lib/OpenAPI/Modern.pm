@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.082-14-gc3d980e
+package OpenAPI::Modern; # git description: v0.083-17-ga39ba29
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 use 5.020;
 use utf8;
@@ -896,6 +896,7 @@ sub _convert_response ($response) {
   }
   elsif ($response->isa('Catalyst::Response')) {
     $res->code($response->status);
+    HTTP::Headers->VERSION('6.07');
     $res->headers->add(@$_) foreach pairs $response->headers->flatten;
     my $body = $response->body;
     $res->body($body) if length $body;
@@ -939,7 +940,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.083
+version 0.084
 
 =head1 SYNOPSIS
 

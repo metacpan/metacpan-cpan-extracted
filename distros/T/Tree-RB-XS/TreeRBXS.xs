@@ -263,6 +263,7 @@ struct TreeRBXS {
 	bool compat_list_get;          // flag to enable full compat with Tree::RB's list context behavior
 	bool track_recent;             // flag to automatically add new nodes to the recent-list
 	bool lookup_updates_recent;    // whether 'lookup' and 'get' move a node to the front of the recent-list
+	bool keys_in_recent_order;     // whether the 'keys' method iterates recent order instead of sort order
 	rbtree_node_t root_sentinel;   // parent-of-root, used by rbtree implementation.
 	rbtree_node_t leaf_sentinel;   // dummy node used by rbtree implementation.
 	struct TreeRBXS_iter *hashiter;// iterator used for TIEHASH
@@ -426,6 +427,7 @@ struct TreeRBXS_iter * TreeRBXS_get_hashiter(struct TreeRBXS *tree) {
 	if (!tree->hashiter) {
 		Newxz(tree->hashiter, 1, struct TreeRBXS_iter);
 		tree->hashiter->tree= tree;
+		tree->hashiter->recent= tree->keys_in_recent_order;
 	}
 	return tree->hashiter;
 }
@@ -1679,7 +1681,10 @@ IV init_tree_from_attr_list(
 			else goto keep_unknown;
 		case 16: if (strcmp("allow_duplicates", attrname) == 0) { tree->allow_duplicates= val && SvTRUE(val); break; }
 			else goto keep_unknown;
+		case 20: if (strcmp("keys_in_recent_order", attrname) == 0) { tree->keys_in_recent_order= val && SvTRUE(val); break; }
+			else goto keep_unknown;
 		case 21: if (strcmp("lookup_updates_recent", attrname) == 0) { tree->lookup_updates_recent= val && SvTRUE(val); break; }
+
 		default: keep_unknown:
 			/* unknown attribute.  Re-pack it into the list */
 			if (i > out_i) {
@@ -2085,7 +2090,8 @@ STORABLE_freeze(tree, cloning)
 		flags= (tree->allow_duplicates? 1 : 0)
 		     | (tree->compat_list_get? 2 : 0)
 		     | (tree->track_recent? 4 : 0)
-		     | (tree->lookup_updates_recent? 8 : 0);
+		     | (tree->lookup_updates_recent? 8 : 0)
+		     | (tree->keys_in_recent_order? 0x10 : 0);
 		sb[8]= flags & 0xFF;
 		sb[9]= (flags >> 8) & 0xFF;
 
@@ -2133,6 +2139,7 @@ STORABLE_thaw(objref, cloning, serialized, attrs)
 		tree->compat_list_get= flags & 2;
 		tree->track_recent= flags & 4;
 		tree->lookup_updates_recent= flags & 8;
+		tree->keys_in_recent_order= flags & 0x10;
 
 		if (key_type <= 0 || key_type > KEY_TYPE_MAX)
 			croak("Invalid serialized key_type");
@@ -2248,6 +2255,19 @@ lookup_updates_recent(tree, enable= NULL)
 			//ST(0) is $self, so let it be the return value
 		} else {
 			ST(0)= tree->lookup_updates_recent? &PL_sv_yes : &PL_sv_no;
+		}
+		XSRETURN(1);
+
+void
+keys_in_recent_order(tree, enable= NULL)
+	struct TreeRBXS *tree
+	SV *enable
+	PPCODE:
+		if (items > 1) {
+			tree->keys_in_recent_order= SvTRUE(enable);
+			//ST(0) is $self, so let it be the return value
+		} else {
+			ST(0)= tree->keys_in_recent_order? &PL_sv_yes : &PL_sv_no;
 		}
 		XSRETURN(1);
 
@@ -2924,10 +2944,11 @@ keys(tree)
 		Tree::RB::XS::reverse_values     = 5
 		Tree::RB::XS::reverse_kv         = 6
 	INIT:
-		size_t n_ret, i, node_count= TreeRBXS_get_count(tree);
-		rbtree_node_t *node;
-		rbtree_node_t *(*start)(rbtree_node_t *)= (ix & 4)? rbtree_node_right_leaf : rbtree_node_left_leaf;
-		rbtree_node_t *(*step)(rbtree_node_t *)= (ix & 4)? rbtree_node_prev : rbtree_node_next;
+		size_t n_ret, i, node_count= tree->keys_in_recent_order? tree->recent_count : TreeRBXS_get_count(tree);
+		bool reverse= (ix & 4),
+		     keys_only= (ix & 3) == 0,
+		     values_only= (ix & 3) == 1,
+		     want_kv= (ix & 3) == 2;
 	PPCODE:
 		if (GIMME_V == G_VOID) {
 			n_ret= 0;
@@ -2937,27 +2958,54 @@ keys(tree)
 			ST(0)= sv_2mortal(newSViv(node_count));
 		}
 		else {
-			n_ret= ix == 2? node_count*2 : node_count;
+			n_ret= want_kv? node_count*2 : node_count;
 			EXTEND(SP, n_ret);
-			node= start(TreeRBXS_get_root(tree));
-			if ((ix & 3) == 0) {
-				for (i= 0; i < n_ret && node; i++, node= step(node))
-					ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
-			}
-			else if ((ix & 3) == 1) {
-				for (i= 0; i < n_ret && node; i++, node= step(node))
-					ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+			if (tree->keys_in_recent_order) {
+				struct dllist_node *node= reverse? tree->recent.prev : tree->recent.next;
+				struct dllist_node *limit= &tree->recent;
+				if (keys_only) {
+					for (i= 0; i < n_ret && node != limit; i++, node= reverse? node->prev : node->next)
+						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_recent(node)));
+				}
+				else if (values_only) {
+					for (i= 0; i < n_ret && node != limit; i++, node= reverse? node->prev : node->next)
+						ST(i)= GET_TreeRBXS_item_FROM_recent(node)->value;
+				}
+				else {
+					for (i= 0; i < n_ret && node != limit; node= reverse? node->prev : node->next) {
+						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_recent(node)));
+						i++;
+						ST(i)= GET_TreeRBXS_item_FROM_recent(node)->value;
+						i++;
+					}
+				}
+				if (node != limit) i++; // for error reporting
 			}
 			else {
-				for (i= 0; i < n_ret && node; node= step(node)) {
-					ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
-					i++;
-					ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
-					i++;
+				rbtree_node_t *node= (reverse? rbtree_node_right_leaf : rbtree_node_left_leaf)(TreeRBXS_get_root(tree));
+				rbtree_node_t *(*step)(rbtree_node_t *)= reverse? rbtree_node_prev : rbtree_node_next;
+				if (keys_only) {
+					for (i= 0; i < n_ret && node; i++, node= step(node))
+						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
 				}
+				else if (values_only) {
+					for (i= 0; i < n_ret && node; i++, node= step(node))
+						ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+				}
+				else {
+					for (i= 0; i < n_ret && node; node= step(node)) {
+						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
+						i++;
+						ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+						i++;
+					}
+				}
+				if (node) i++; // for error reporting
 			}
-			if (i != n_ret || node != NULL)
-				croak("BUG: expected %ld nodes but found %ld", (long) (n_ret>>1), (long) ((ix & 3) == 2? i : (i>>1)));
+			if (i != n_ret)
+				croak("BUG: expected %ld nodes but found %ld",
+					(long) node_count,
+					(long) (want_kv? ((i+1)>>1) : i));
 		}
 		XSRETURN(n_ret);
 
@@ -2969,8 +3017,10 @@ FIRSTKEY(tree)
 	CODE:
 		if (tree->hashiterset)
 			tree->hashiterset= false; // iter has 'hseek' applied, don't change it
-		else
+		else {
+			iter->recent= tree->keys_in_recent_order;
 			TreeRBXS_iter_rewind(iter);
+		}
 		RETVAL= TreeRBXS_item_wrap_key(iter->item); // handles null by returning undef
 	OUTPUT:
 		RETVAL
@@ -3003,6 +3053,7 @@ _set_hashiter(tree, item_sv, reverse)
 		if (item && (TreeRBXS_item_get_tree(item) != tree))
 			croak("Node is not part of this tree");
 		iter->reverse= reverse;
+		iter->recent= tree->keys_in_recent_order;
 		TreeRBXS_iter_set_item(iter, item);
 		if (!item) TreeRBXS_iter_rewind(iter);
 		tree->hashiterset= true;

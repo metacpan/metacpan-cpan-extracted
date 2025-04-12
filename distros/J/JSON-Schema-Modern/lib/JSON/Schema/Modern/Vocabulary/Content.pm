@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.607';
+our $VERSION = '0.608';
 
 use 5.020;
 use Moo;
@@ -121,7 +121,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.607
+version 0.608
 
 =head1 DESCRIPTION
 
@@ -174,5 +174,7 @@ This software is copyright (c) 2020 by Karen Etheridge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Some schema files have their own licence, in share/LICENSE.
 
 =cut

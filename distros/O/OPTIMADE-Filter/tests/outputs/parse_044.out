@@ -1,0 +1,35 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'a'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' )
+                                                        ],
+                                          'operator' => '='
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'b'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' )
+                                                        ],
+                                          'operator' => '='
+                                        }, 'OPTIMADE::Filter::Comparison' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((a = TRUE) AND (b = TRUE))
+== SQL ==
+<no SQL representation> AND <no SQL representation>

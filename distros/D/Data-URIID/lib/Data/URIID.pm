@@ -23,7 +23,7 @@ use Data::Identifier;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my %names = (
     service => {
@@ -71,6 +71,7 @@ my %names = (
         'schemaorg'         => 'b1db320a-ab00-4650-ab54-f162b52bca08', # schema.org
         'purlorg'           => '53f8ea47-1de3-4562-9459-5f093782ae10', # purl.org
         'ruthede'           => '6c7dba44-dd07-4928-874e-f076e98cc96b', # ruthe.de
+        'danbooru2chanjp'   => 'dac7a0ba-9090-4db7-bb94-373fabf98103', # danbooru.2chan.jp
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -85,6 +86,7 @@ my %names = (
         'fellig-identifier'             => '90ecb0c5-f99a-4702-8575-430247de8f48',
         'youtube-video-identifier'      => '0d88a8f0-0fce-41ae-beef-88d74d83eb32', # P1651
         'e621tagtype'                   => 'da72fa90-5990-46b4-b4ca-05eaf68170a5',
+        'e621tag'                       => '6fe0dbf0-624b-48b3-b558-0394c14bad6a',
         'wikimedia-commons-identifier'  => 'a6b1a981-48a0-445e-adc7-11df14e91769',
         'e621-post-identifier'          => '4a7fc2e2-854b-42ec-b24f-c7fece371865',
         'e621-pool-identifier'          => 'a0a4fae2-be6f-4a51-8326-6110ba845a16',
@@ -123,6 +125,8 @@ my %names = (
         'notalwaysright-post-identifier' => '700a0082-0201-46f1-b0a1-37e2caf76cc2',
         'fefe-blog-post-identifier'     => '9ad1edae-f08e-4605-b9f9-a1d3894c290a',
         'ruthede-comic-post-identifier' => '2db1003d-dbf4-47bf-bfe4-7874c5bf0263',
+        'danbooru2chanjp-post-identifier' => '6e3590b6-2a0c-4850-a71f-8ba196a52280',
+        'danbooru2chanjp-tag'           => 'c5632c60-5da2-41af-8b60-75810b622756',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -230,6 +234,10 @@ sub lookup {
 
         if ($uri->isa('Data::URIID::Result')) {
             $uri = $uri->url;
+        } elsif ($uri->isa('Data::URIID::Barcode')) {
+            # We guess here.
+            $uri = $uri->data;
+            $type = 'qrcode';
         } elsif ($uri->isa('Data::Identifier')) {
             $type = $uri->type->uuid;
             $uri  = $uri->id;
@@ -474,7 +482,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

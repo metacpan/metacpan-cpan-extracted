@@ -33,7 +33,7 @@ Text::MustacheTemplate::HTML - HTML escape for Text::MustacheTemplate
 
 =head1 DESCRIPTION
 
-Text::MustacheTemplate::HTML is a HTML escape for Mustache tempalte.
+Text::MustacheTemplate::HTML is a HTML escape for Mustache template.
 
 This is low-level interface for Text::MustacheTemplate.
 The APIs may be change without notice.

@@ -1,3 +1,9 @@
+0.11.0 2025-04-11
+
+    - Declare conformance to OPTIMADE specification v1.2.0.
+    - Implement boolean value support.
+    - Implement support for fuzzy comparisons on lists.
+
 0.10.2 2021-01-23
 
     - Fixing repository and issue tracker URLs.

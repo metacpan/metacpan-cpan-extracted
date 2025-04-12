@@ -14,7 +14,7 @@ configure_requires:
   Devel::CheckLib: '1.09'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-mysql.git
-version: '5.011'
+version: '5.012'
 x_contributors:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
@@ -95,4 +95,4 @@ x_contributors:
   - 'tokuhirom <tokuhirom@gmail.com>'
   - 'zefram <zefram@fysh.org>'
   - 'zentooo <ankerasoy@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

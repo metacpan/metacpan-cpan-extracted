@@ -12,11 +12,22 @@ filters {
     expected => [qw/eval/],
 };
 
-for my $block (blocks) {
-    my @tokens = Text::MustacheTemplate::Lexer->tokenize($block->input);
-    is_deeply \@tokens, $block->expected, $block->name
-        or diag dump_tokens(@tokens);
-}
+subtest 'tokenize' => sub {
+    for my $block (blocks) {
+        my @tokens = Text::MustacheTemplate::Lexer->tokenize($block->input);
+        is_deeply \@tokens, $block->expected, $block->name
+            or diag dump_tokens(@tokens);
+    }
+};
+
+subtest 'error reporting' => sub {
+    eval {
+        Text::MustacheTemplate::Lexer->tokenize("{{foo}}\n  {{foo}");
+    };
+    note $@;
+    like $@, qr/line:2/m, 'should found line info';
+    like $@, qr/^  \^$/m, 'should found position hint';
+};
 
 sub dump_tokens {
     my @tokens = @_;

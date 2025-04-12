@@ -16,5 +16,8 @@ t/reverse.t
 t/sort_unique.t
 t/map.t
 t/arithmetic.t
+t/pipe_select_name.t
+t/group_by.t
+t/count.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

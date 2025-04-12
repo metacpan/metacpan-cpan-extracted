@@ -2275,7 +2275,7 @@ SKIP: {
 } # end SKIP
 };
 
-subtest $::TYPE.' custom error messages for false schemas' => sub {
+subtest $::TYPE.': custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -2337,7 +2337,7 @@ YAML
   );
 };
 
-subtest $::TYPE.' multiple documents' => sub {
+subtest $::TYPE.': multiple documents' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),

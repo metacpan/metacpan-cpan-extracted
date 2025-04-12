@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl API for the opencellid.org database",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-WebService-OpenCellID",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Simple" : "0",
+            "Test::Simple" : "0.44",
+            "URI" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-Geo-WebService-OpenCellID/perl-Geo-WebService-OpenCellID/issues"
+      },
+      "homepage" : "https://github.com/perl-Geo-WebService-OpenCellID/perl-Geo-WebService-OpenCellID",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/perl-Geo-WebService-OpenCellID/perl-Geo-WebService-OpenCellID.git"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

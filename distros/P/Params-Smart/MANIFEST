@@ -1,11 +1,9 @@
-Build.PL
 Changes
+lib/Params/Smart.pm
 Makefile.PL
 MANIFEST
 META.yml
 README
+SIGNATURE			Added here by Module::Build
 t/Params-Smart.t
-lib/Params/Smart.pm
-
-SIGNATURE    Added here by Module::Build
-SIGNATURE    Added here by Module::Build
+META.json                                Module JSON meta-data (added by MakeMaker)

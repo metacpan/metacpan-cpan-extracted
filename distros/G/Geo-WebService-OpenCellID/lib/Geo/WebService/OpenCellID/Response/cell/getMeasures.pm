@@ -2,7 +2,7 @@ package Geo::WebService::OpenCellID::Response::cell::getMeasures;
 use warnings;
 use strict;
 use base qw{Geo::WebService::OpenCellID::Response::cell::get};
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Perl Interface to the database at http://www.opencellid.org/
 
 =head1 METHODS
 
-=head2 measures
+=head2 measure, measures
 
 Returns a list of measures (list of hash references)
 
@@ -32,31 +32,15 @@ sub measures {
   return wantarray ? @$list : $list;
 }
 
-=head1 BUGS
-
-Submit to RT and email the Author
-
-=head1 SUPPORT
-
-Try the Author or Try 8motions.com
-
-=head1 AUTHOR
-
-    Michael R. Davis
-    CPAN ID: MRDVT
-    STOP, LLC
-    domain=>michaelrdavis,tld=>com,account=>perl
-    http://www.stopllc.com/
-
 =head1 COPYRIGHT
+
+Copyright (c) 2025 Michael R. Davis
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 The full text of the license can be found in the
 LICENSE file included with this module.
-
-=head1 SEE ALSO
 
 =cut
 

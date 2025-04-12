@@ -1,0 +1,33 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' ),
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'property'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' )
+                                                        ],
+                                          'operator' => '='
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'value' => 1
+                                                                 }, 'OPTIMADE::Filter::Boolean' ),
+                                                          bless( {
+                                                                   'value' => ''
+                                                                 }, 'OPTIMADE::Filter::Boolean' )
+                                                        ],
+                                          'operator' => '='
+                                        }, 'OPTIMADE::Filter::Comparison' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((TRUE = property) AND (TRUE = FALSE))
+== SQL ==
+<no SQL representation> AND <no SQL representation>

@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c47bf2e2599183de365cdda91005332d265c0d7b17b9690859863a9a59944bc0 Changes
+SHA256 a3795120dcedd8b09196f3b4f0deb6c0f420033b57a2c9ad251121e2b7bc54d6 MANIFEST
+SHA256 d81284eb245c6f6c6c0a3a1d648a35ed42893d73d180e1a301734c8e709493fc META.json
+SHA256 27795efd3a3dcf2e253953c4eb70943125d087a974d77a532f29c155b3492ed6 META.yml
+SHA256 0976e85a599c8fa767dabbc772111babb8ae6e28d8dadbbae89c24d95201e8e4 Makefile.PL
+SHA256 58f31e33f870d09f2c083b46638e1bb8584b29876207f05e90eb2f4a1df4d9e4 README
+SHA256 94c03cd656cafc9943b72a39ab4d76a4b5bb21c0a3d59b13a222a598dc441e2c lib/Params/Smart.pm
+SHA256 668552414e4b58979a2b503fe06459cbaf573173f9308889496b525be4cd44ca t/Params-Smart.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmf6KmsACgkQHmWrcYGD
+C6zhBQv+LYa6MIFjvGMDqtECny4y21U5Bx1Mgs/5BLZd1HJy7KVTS7Azqhh1fQcr
+pOGwy0qsYCDtQMFpW07aMsn7Z8Wt0j0hYVDDvtq8UJjni6TsPLxYPpkwOkBbpYyL
+IkQGhd4pl2yivjIo/YSV8yd3uo6LjcnGfT8LMkgIjBkzkoPb/p5KfG2pUPLPO0R+
+kR0SRX5q+8JIuoRiTyHj0LMwlBN1OYMUL+8F2KfBHPePyxKlAcZDx4+Wxs9mYa5W
+BGr1rvps0Pzs9g4EpltvBzfjArEjU/JDyIeosZ3NUp70YjL7Y5cfKtxGxRcEix8T
+LucvmmISGWzr93WKntchFiLRUdzPt7T49Hj0ZXNeTCHYZ5B65x8IO28GmTR14+St
+fVGubLQVqiKAKiaxx5xSsPtRoTSGsQnZTz0Itt14nVEgX7F2KlvwYZvo3WpK9VOV
+tIeZ6TV7ga6iBjIjyrrKg45Q3MUqyImdYbRLiMVFtVAQqz5llx8pa9hnjmlDjMAm
+/GozvTnw
+=9aON
+-----END PGP SIGNATURE-----

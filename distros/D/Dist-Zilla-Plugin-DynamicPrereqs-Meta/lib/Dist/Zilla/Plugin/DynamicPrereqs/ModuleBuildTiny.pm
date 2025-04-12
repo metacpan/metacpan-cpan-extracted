@@ -1,8 +1,9 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny;
-$Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny::VERSION = '0.005';
+$Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny::VERSION = '0.006';
 use 5.020;
 use Moose;
 use experimental qw/signatures/;
+use namespace::autoclean;
 
 with 'Dist::Zilla::Role::PrereqSource', 'Dist::Zilla::Role::DynamicPrereqs::Meta';
 
@@ -11,6 +12,8 @@ sub register_prereqs($self) {
 	$self->zilla->register_prereqs({ phase => 'configure' }, 'CPAN::Requirements::Dynamic' => '0.002');
 	return;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -28,7 +31,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny - Add dynamic prereqs to th
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

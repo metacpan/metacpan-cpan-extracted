@@ -154,7 +154,7 @@ Shortcut for C<< $node->tree->iter_new_to_old($node) >>.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 AUTHOR
 

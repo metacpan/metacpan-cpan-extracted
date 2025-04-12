@@ -150,6 +150,13 @@ sub render {
 
 	if ( $fragment->{type} eq "strut" ) {
 	    $x += $fragment->{width};
+	    if ( length($fragment->{label}) ) {
+		my $pdf = $text->{' api'};
+		my $x = ref($pdf) . '::NamedDestination';
+		my $dest = $x->new($pdf);
+		$dest->goto( $text->{' apipage'}, xyz => (undef,undef,undef) );
+		$pdf->named_destination( 'Dests', $fragment->{label}, $dest );
+	    }
 	}
 
 	elsif ( my $hd = $self->get_element_handler($fragment->{type}) ) {
@@ -303,11 +310,15 @@ sub render {
 	if ( $fragment->{href} ) {
 	    my $sz = $fragment->{size} || $self->{_currentsize};
 	    my $ann = $text->{' apipage'}->annotation;
-	    $ann->url( $fragment->{href},
-		     #  -border => [ 0, 0, 1 ],
-		       -rect => [ $x0, $y0, #-$fragment->{base}-$bl,
-		     		  $x, $y0 - $sz ]
-		     );
+	    my $target = $fragment->{href};
+	    if ( $target =~ /^#(.+)/ ) { # named destination
+		$ann->link($1);
+	    }
+	    else {
+		$ann->uri($target);
+	    }
+	    # $ann->border( 0, 0, 1 );
+	    $ann->rect( $x0, $y0, $x, $y0 - $sz );
 	}
     }
 }

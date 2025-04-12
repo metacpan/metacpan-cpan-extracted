@@ -3,7 +3,7 @@ use 5.022000;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 use Text::MustacheTemplate::Lexer;
 use Text::MustacheTemplate::Parser;
@@ -37,7 +37,7 @@ __END__
 
 =head1 NAME
 
-Text::MustacheTemplate - mustache template engine
+Text::MustacheTemplate - Fast and specification compliant Mustache template engine for Perl
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ It's used by inheritance or partial template feature.
 =item $LAMBDA_TEMPLATE_RENDERING
 
 When this flag is truthy, lambda template rendering is enabled.
-The default value is falsey.
+The default value is falsy.
 
 =back
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # set up version info
-our $VERSION= '0.11';
+our $VERSION= '0.13';
 
 # we need this otherwise nothing works
 use Data::Alias qw( alias copy );
@@ -62,8 +62,7 @@ sub reuse (@); # needed because of recursion
 sub reuse (@) {
 
     # being called with return values
-    my $not_void= defined wantarray;
-
+    alias my $not_void = defined wantarray;
     # we're one level deeper
     $level++;
 
@@ -168,9 +167,8 @@ sub reuse (@) {
 
                                 # not seen, recurse, set result if first
                                 if ( !$reuse{$id} ) {
-                                    ($scalar)= reuse $scalar;
+		                   ($scalar) = reuse $scalar;
                                     copy Internals::SvREADONLY $scalar, 1;
-
                                     # recursive structures may be replaced
                                     $id= md5( $S . $scalar );
                                 }
@@ -181,11 +179,10 @@ sub reuse (@) {
                                 $id= $U;
                             }
                         }
-
                         # huh?
                         else {
-                            croak "Cannot reuse '$reftype' references";
-                        }
+                        	$id = md5( $S . $_ );
+			}
 
 =for Explanation:
      When called in void context, perl may actually have used a memory location
@@ -195,17 +192,16 @@ sub reuse (@) {
      are also not going to overwrite anything that's there already.
 
 =cut
-
                         $reuse{$id} ||= $_ if $not_void;
 
                         # store in data store
-                        $reuse{$_}= $reuse{$id} || $_;
+                        $reuse{$_} = $reuse{$id} || $_;
                     };   #alias
 
                     # done handling this ref
                     delete $handling{$_};
                 }
-
+		
                 # not a ref, but now already in store
                 elsif ( exists $reuse{$_} ) {
                 }
@@ -415,7 +411,7 @@ Data::Reuse - share constant values with Data::Alias
 
 =head1 VERSION
 
-This documentation describes version 0.11.
+This documentation describes version 0.13.
 
 =head1 SYNOPSIS
 

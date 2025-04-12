@@ -1,5 +1,8 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.13	Fri Apr 11 08:28:00 EDT 2025
+	Improve testing on slower machines
+
 0.12	Wed Jan  1 11:09:20 EST 2025
 	Use gtar to create a distribution on Macs
 	Use Test::DescribeMe to simplify tests

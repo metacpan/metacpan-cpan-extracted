@@ -1,5 +1,5 @@
 package Bijection;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Import::Export; use base qw/Import::Export/;
 use Carp qw/croak/;
 our %EX = (biject => [qw/all main/], inverse => [qw/all main/], bijection_set => [qw/all set/], offset_set => [qw/all set/]);
@@ -46,7 +46,7 @@ Bijection - Bijection of an integer.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

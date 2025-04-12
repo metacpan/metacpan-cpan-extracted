@@ -7,10 +7,11 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.006'
+  perl: '5.010'
 configure_requires:
-  Dist::Build: '0.001'
-  perl: '5.006'
+  Dist::Build: '0.019'
+  Dist::Build::XS: '0'
+  Dist::Build::XS::Conf: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,17 +22,17 @@ name: Crypt-SysRandom-XS
 provides:
   Crypt::SysRandom::XS:
     file: lib/Crypt/SysRandom/XS.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Exporter: '0'
   XSLoader: '0'
-  perl: '5.006'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/crypt-sysrandom-xs/issues
   repository: git://github.com/Leont/crypt-sysrandom-xs.git
-version: '0.008'
+version: '0.009'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

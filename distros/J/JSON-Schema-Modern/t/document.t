@@ -19,6 +19,12 @@ use Helper;
 # spec version -> vocab classes
 my %vocabularies = unpairs(JSON::Schema::Modern->new->__all_metaschema_vocabulary_classes);
 
+my %configs = (
+  specification_version => 'draft2020-12',
+  vocabularies => $vocabularies{'draft2020-12'},
+  configs => {},
+);
+
 subtest 'boolean document' => sub {
   cmp_deeply(
     JSON::Schema::Modern::Document->new(schema => false),
@@ -27,11 +33,10 @@ subtest 'boolean document' => sub {
         '' => {
           path => '',
           canonical_uri => str(''),
-          specification_version => 'draft2020-12',
-          vocabularies => ignore, # there are no keywords, so vocabularies doesn't matter
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str('') ],
       canonical_uri => [ str('') ],
       _entities => [ { '' => 0 } ],
     ),
@@ -59,9 +64,7 @@ subtest 'boolean document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => ignore, # there are no keywords, so vocabularies doesn't matter
-          configs => {},
+          %configs,
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
@@ -82,11 +85,10 @@ subtest 'object document' => sub {
         str($_//'') => {
           path => '',
           canonical_uri => str($_//''),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str($_//'') ],
       canonical_uri => [ str($_//'') ],
       _entities => [ { '' => 0 } ],
     ),
@@ -105,11 +107,10 @@ subtest 'object document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str('https://foo.com') ],
       canonical_uri => [ str('https://foo.com') ],
       _entities => [ { '' => 0 } ],
     ),
@@ -127,11 +128,10 @@ subtest 'object document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str($_//'') ],
       canonical_uri => [ str('https://foo.com') ], # note canonical_uri has been overwritten
       _entities => [ { '' => 0 } ],
     ),
@@ -150,11 +150,10 @@ subtest 'object document' => sub {
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str($_) ],
       canonical_uri => [ str('https://bar.com') ], # note canonical_uri has been overwritten
       _entities => [ { '' => 0 } ],
     ),
@@ -174,9 +173,7 @@ subtest 'object document' => sub {
         'https://example.com' => {
           path => '',
           canonical_uri => str('https://example.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
     ),
@@ -193,11 +190,10 @@ subtest 'object document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str('https://foo.com') ],
       canonical_uri => [ str('https://foo.com') ],
       _entities => [ { '' => 0 } ],
     ),
@@ -220,9 +216,7 @@ subtest 'object document' => sub {
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             my_anchor => {
               path => '/allOf/0',
@@ -233,11 +227,10 @@ subtest 'object document' => sub {
         'https://bar.com/x/y/z.json' => {
           path => '/allOf/1',
           canonical_uri => str('https://bar.com/x/y/z.json'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ),
+      original_uri => [ str('https://foo.com') ],
       canonical_uri => [ str('https://bar.com') ],
       _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/1' } ],
     ),
@@ -256,11 +249,10 @@ subtest 'object document' => sub {
         'https://my-base.com/relative' => {
           path => '',
           canonical_uri => str('https://my-base.com/relative'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
+      original_uri => [ str('https://my-base.com') ],
       canonical_uri => [ str('https://my-base.com/relative') ],
       _entities => [ { '' => 0 } ],
     ),
@@ -282,18 +274,17 @@ subtest 'object document' => sub {
     listmethods(
       resource_index => unordered_pairs(
         '' => {
-          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          path => '', canonical_uri => str(''),
+          %configs,
         },
         'my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('my_foo'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ),
+      original_uri => [ str('') ],
+      canonical_uri => [ str('') ],
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'relative uri for inner $id',
@@ -313,18 +304,17 @@ subtest 'object document' => sub {
     listmethods(
       resource_index => unordered_pairs(
         '' => {
-          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          path => '', canonical_uri => str(''),
+          %configs,
         },
         'http://localhost:4242/my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('http://localhost:4242/my_foo'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ),
+      original_uri => [ str('') ],
+      canonical_uri => [ str('') ],
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'no root $id; absolute uri with path in subschema resource',
@@ -339,9 +329,9 @@ subtest 'object document' => sub {
     listmethods(
       resource_index => [
         '' => {
-          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          path => '',
+          canonical_uri => str(''),
+          %configs,
           anchors => {
             my_anchor => {
               path => '',
@@ -350,6 +340,8 @@ subtest 'object document' => sub {
           },
         },
       ],
+      original_uri => [ str('') ],
+      canonical_uri => [ str('') ],
     ),
     'no root $id or canonical_uri provided; anchor is indexed at the root',
   );
@@ -366,9 +358,7 @@ subtest 'object document' => sub {
         'https://example.com' => {
           path => '',
           canonical_uri => str('https://example.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             my_anchor => {
               path => '',
@@ -377,6 +367,8 @@ subtest 'object document' => sub {
           },
         },
       ],
+      original_uri => [ str('https://example.com') ],
+      canonical_uri => [ str('https://example.com') ],
     ),
     'canonical_uri provided; empty uri not added as a referenceable uri when an anchor exists',
   );
@@ -393,9 +385,7 @@ subtest 'object document' => sub {
         'https://my-base.com' => {
           path => '',
           canonical_uri => str('https://my-base.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             my_anchor => {
               path => '',
@@ -404,6 +394,8 @@ subtest 'object document' => sub {
           },
         },
       ],
+      original_uri => [ str('') ],
+      canonical_uri => [ str('https://my-base.com') ],
     ),
     'absolute uri provided at root; adjacent anchor has the same canonical uri',
   );
@@ -424,9 +416,7 @@ subtest 'object document' => sub {
         'https://my-base.com' => {
           path => '',
           canonical_uri => str('https://my-base.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             my_anchor => {
               path => '/$defs/foo',
@@ -435,6 +425,8 @@ subtest 'object document' => sub {
           },
         },
       ],
+      original_uri => [ str('') ],
+      canonical_uri => [ str('https://my-base.com') ],
     ),
     'absolute uri provided at root; anchor lower down has its own canonical uri',
   );
@@ -454,9 +446,9 @@ subtest '$id and $anchor as properties' => sub {
     listmethods(
       resource_index => [
         '' => {
-          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          path => '',
+          canonical_uri => str(''),
+          %configs,
         },
       ],
       _entities => [ { map +($_ => 0), '', '/properties/$id', '/properties/$anchor' } ],
@@ -487,9 +479,7 @@ subtest '$id with an empty fragment' => sub {
         'http://localhost:4242/my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('http://localhost:4242/my_foo'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ),
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
@@ -668,9 +658,7 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
         },
         'https://bar.com' => {
           path => '/allOf/0', canonical_uri => str('https://bar.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             my_anchor => {
               path => '/allOf/0',
@@ -684,9 +672,7 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
         },
         'https://bar.com/inner_id' => {
           path => '/allOf/0/not/not', canonical_uri => str('https://bar.com/inner_id'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ),
       _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/0/not', '/allOf/0/not/not' } ],
@@ -741,9 +727,7 @@ subtest 'JSON pointer and URI escaping' => sub {
         'http://localhost:4242/~username' => {
           path => '/$defs/foo/patternProperties/~0',
           canonical_uri => str('http://localhost:4242/~username'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             tilde => {
               path => '/$defs/foo/patternProperties/~0/properties/~0~1',
@@ -754,9 +738,7 @@ subtest 'JSON pointer and URI escaping' => sub {
         'http://localhost:4242/my_slash' => {
           path => '/$defs/foo/patternProperties/~1',
           canonical_uri => str('http://localhost:4242/my_slash'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             slash => {
               path => '/$defs/foo/patternProperties/~1/properties/~0~1',
@@ -767,9 +749,7 @@ subtest 'JSON pointer and URI escaping' => sub {
         'http://localhost:4242/~username/my_slash' => {
           path => '/$defs/foo/patternProperties/[~0~1]',
           canonical_uri => str('http://localhost:4242/~username/my_slash'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
           anchors => {
             tildeslash => {
               path => '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
@@ -923,9 +903,7 @@ subtest 'create document with explicit canonical_uri set to the same as root $id
         'https://foo.com/x/y/z' => {
           path => '',
           canonical_uri => str('https://foo.com/x/y/z'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          %configs,
         },
       ],
       canonical_uri => [ str('https://foo.com/x/y/z') ],
@@ -1021,6 +999,99 @@ subtest 'custom metaschema_uri' => sub {
   );
 
   memory_cycle_ok($js, 'no leaks in the evaluator object');
+};
+
+subtest 'multiple uris used for resolution and identification, and original_uri' => sub {
+  my $js = JSON::Schema::Modern->new;
+  my $doc = $js->add_document(
+    'https://example.com/api/' => JSON::Schema::Modern::Document->new(
+      canonical_uri => 'staging/',
+      schema => {
+        '$id' => 'alpha.json',
+        properties => {
+          foo => { '$id' => 'beta' },
+        },
+      },
+      evaluator => $js,
+    )
+  );
+
+  cmp_deeply(
+    $doc,
+    listmethods(
+      original_uri => [ str('staging/') ],
+      canonical_uri => [ str('staging/alpha.json') ],
+      resource_index => unordered_pairs(
+        'staging/alpha.json' => {
+          path => '',
+          canonical_uri => str('staging/alpha.json'),
+          %configs,
+        },
+        'staging/beta' => {
+          canonical_uri => str('staging/beta'),
+          path => '/properties/foo',
+          %configs,
+        },
+      ),
+    ),
+    'document has correct resources, resolved against the provided base uri',
+  );
+
+  cmp_deeply(
+    $js->{_resource_index},
+    my $resource_index = {
+      'https://example.com/api/' => {
+        path => '',
+        canonical_uri => str('https://example.com/api/staging/alpha.json'),
+        document => $doc,
+        %configs,
+      },
+      'https://example.com/api/staging/alpha.json' => {
+        path => '',
+        canonical_uri => str('https://example.com/api/staging/alpha.json'),
+        document => $doc,
+        %configs,
+      },
+      'https://example.com/api/staging/beta' => {
+        path => '/properties/foo',
+        canonical_uri => str('https://example.com/api/staging/beta'),
+        document => $doc,
+        %configs,
+      },
+    },
+    'evaluator has correct resources, resolved against the provided base uri',
+  );
+
+
+  my $doc2 = $js->add_document('file:///usr/local/share/api.json' => $doc);
+  is($doc2, $doc, 'same document is added a second time');
+
+  cmp_deeply(
+    $js->{_resource_index},
+    {
+      %$resource_index, # original entries
+
+      'file:///usr/local/share/api.json' => {
+        path => '',
+        canonical_uri => str('file:///usr/local/share/staging/alpha.json'),
+        document => $doc,
+        %configs,
+      },
+      'file:///usr/local/share/staging/alpha.json' => {
+        path => '',
+        canonical_uri => str('file:///usr/local/share/staging/alpha.json'),
+        document => $doc,
+        %configs,
+      },
+      'file:///usr/local/share/staging/beta' => {
+        path => '/properties/foo',
+        canonical_uri => str('file:///usr/local/share/staging/beta'),
+        document => $doc,
+        %configs,
+      },
+    },
+    'document resources are added using new base, which appears in their canonical_uri values',
+  );
 };
 
 done_testing;

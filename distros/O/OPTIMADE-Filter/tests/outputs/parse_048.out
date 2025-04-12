@@ -1,0 +1,18 @@
+no SQL representation
+$VAR1 = bless( {
+                 'operator' => 'HAS',
+                 'property' => bless( {
+                                        'name' => [
+                                                    'title'
+                                                  ]
+                                      }, 'OPTIMADE::Filter::Property' ),
+                 'values' => [
+                               [
+                                 'ENDS WITH',
+                                 'MOF'
+                               ]
+                             ]
+               }, 'OPTIMADE::Filter::ListComparison' );
+== Filter ==
+(title HAS ENDS WITH "MOF")
+== SQL ==

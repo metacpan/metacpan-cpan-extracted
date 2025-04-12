@@ -16,6 +16,8 @@
    "no_index" : {
       "directory" : [
          "t",
+         "inc",
+         "t",
          "inc"
       ]
    },
@@ -34,12 +36,22 @@
          "requires" : {
             "FindBin" : "0",
             "JSON::PP" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.26",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kawamurashingo/JQ-Lite/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kawamurashingo/JQ-Lite.git",
+         "web" : "https://github.com/kawamurashingo/JQ-Lite"
+      }
+   },
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

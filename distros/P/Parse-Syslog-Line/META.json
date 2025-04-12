@@ -89,10 +89,10 @@
          "web" : "https://github.com/reyjrar/Parse-Syslog-Line"
       }
    },
-   "version" : "6.1",
+   "version" : "6.2",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.040000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -432,7 +432,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -456,7 +456,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -473,12 +473,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.1",
+                  "tag" : "v6.2",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -498,7 +498,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -537,7 +537,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -554,12 +554,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-6.1",
+                  "tag" : "release-6.2",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -647,7 +647,7 @@
       "Shawn Wilson <swilson@korelogic.com>",
       "Tomohiro Hosaka <bokutin@bokut.in>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
+   "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "BSD-3-Clause"
 }

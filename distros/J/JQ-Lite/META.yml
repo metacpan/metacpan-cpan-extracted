@@ -17,10 +17,15 @@ no_index:
   directory:
     - t
     - inc
+    - t
+    - inc
 requires:
   FindBin: '0'
   JSON::PP: '0'
   Test::More: '0'
-resources: {}
-version: '0.26'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/kawamurashingo/JQ-Lite/issues
+  repository: https://github.com/kawamurashingo/JQ-Lite.git
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

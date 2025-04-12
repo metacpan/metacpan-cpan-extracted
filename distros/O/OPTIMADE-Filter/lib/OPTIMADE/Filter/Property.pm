@@ -6,7 +6,7 @@ use warnings;
 use parent 'OPTIMADE::Filter::Modifiable';
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.10.2'; # VERSION
+our $VERSION = '0.11.0'; # VERSION
 
 use overload '@{}' => sub { return $_[0]->{name} },
              '""'  => sub { return $_[0]->to_filter },

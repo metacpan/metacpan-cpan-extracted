@@ -2,7 +2,7 @@ package Geo::WebService::OpenCellID::Response::cell::get;
 use warnings;
 use strict;
 use base qw{Geo::WebService::OpenCellID::Response::cell};
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -54,31 +54,15 @@ sub nbSamples {
   return $self->{"data"}->{"cell"}->[0]->{"nbSamples"};
 }
 
-=head1 BUGS
-
-Submit to RT and email the Author
-
-=head1 SUPPORT
-
-Try the Author or Try 8motions.com
-
-=head1 AUTHOR
-
-    Michael R. Davis
-    CPAN ID: MRDVT
-    STOP, LLC
-    domain=>michaelrdavis,tld=>com,account=>perl
-    http://www.stopllc.com/
-
 =head1 COPYRIGHT
+
+Copyright (c) 2025 Michael R. Davis
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 The full text of the license can be found in the
 LICENSE file included with this module.
-
-=head1 SEE ALSO
 
 =cut
 

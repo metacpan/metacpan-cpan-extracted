@@ -8,7 +8,7 @@ package Text::Layout;
 
 use Carp;
 
- our $VERSION = "0.039";
+ our $VERSION = "0.040";
 
 =head1 NAME
 
@@ -430,7 +430,7 @@ sub new {
 	    _px2pu   => \&px2pu,
 	    _pu2px   => \&pu2px,
 	    _pango   => 0,
-	    _sc	     => {},		# private shortcodes
+	    _sc	     => {},
 	  } => $pkg;
 }
 

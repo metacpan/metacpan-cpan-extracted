@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>ea830e8d-193a-4a63-a767-fffc3b03d457</MessageSerialNumber>
-  <MessageDate>Sat, 22 Mar 2025 03:46:06 GMT</MessageDate>
+  <MessageSerialNumber>4222bac0-3c0a-4601-98e3-5bf1781dc99a</MessageSerialNumber>
+  <MessageDate>Fri, 11 Apr 2025 04:46:05 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -4189,7 +4189,27 @@
       <Agency>Bangladesh</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-3899999</Range>
+          <Range>0000000-2199999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>2200000-2249999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>2250000-2599999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>2600000-2899999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>2900000-2999999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>3000000-3899999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
@@ -4409,6 +4429,36 @@
       </Rules>
     </Group>
     <Group>
+      <Prefix>978-9907</Prefix>
+      <Agency>Ecuador</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>1000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-6499999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>6500000-7999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>8000000-8749999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>8750000-9999999</Range>
+          <Length>0</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
       <Prefix>978-9908</Prefix>
       <Agency>Estonia</Agency>
       <Rules>
@@ -4477,23 +4527,19 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>0100000-0999999</Range>
+          <Range>0100000-1299999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1000000-6299999</Range>
+          <Range>1300000-5499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>6300000-7999999</Range>
+          <Range>5500000-7999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-8599999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>8600000-9999999</Range>
+          <Range>8000000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>

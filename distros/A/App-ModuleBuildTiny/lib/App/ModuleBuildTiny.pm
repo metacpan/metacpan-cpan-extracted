@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -17,7 +17,7 @@ use File::Path qw/mkpath/;
 use File::Slurper qw/write_text write_binary read_binary/;
 use File::Spec::Functions qw/catfile rel2abs/;
 use Getopt::Long 2.36 'GetOptionsFromArray';
-use JSON::PP qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Module::Runtime 'require_module';
 use Text::Template;
 
@@ -100,7 +100,7 @@ sub write_json {
 	my ($filename, $content) = @_;
 	my $dirname = dirname($filename);
 	mkdir $dirname if not -d $dirname;
-	my $json = JSON::PP->new->utf8->pretty->canonical->encode($content);
+	my $json = JSON::MaybeXS->new->utf8->pretty->canonical->encode($content);
 	return write_binary($filename, $json);
 }
 
@@ -186,7 +186,7 @@ sub ask {
 	my $value = $prompt_for{$type}->($description, $local_default // $global_default);
 
 	if ($value ne '-') {
-		$config->{$key} = $type eq 'open' ? $value : $value ? $JSON::PP::true : $JSON::PP::false;
+		$config->{$key} = $type eq 'open' ? $value : $value ? $JSON::MaybeXS::true : $JSON::MaybeXS::false;
 	}
 	else {
 		delete $config->{$key};
@@ -384,8 +384,7 @@ my %actions = (
 			}
 		}
 		else {
-			require JSON::PP;
-			print JSON::PP->new->ascii->canonical->pretty->encode($prereqs->as_string_hash);
+			print JSON::MaybeXS->new->ascii->canonical->pretty->encode($prereqs->as_string_hash);
 		}
 		return 0;
 	},

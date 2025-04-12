@@ -19,7 +19,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 
 use Data::Identifier v0.08;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
@@ -51,6 +51,7 @@ my %_magic_map = (
     # application/*
     '%PDF-'                             => 'application/pdf',
     "PK\x03\x04"                        => 'application/zip',
+    '%!PS-Adobe-'                       => 'application/postscript',
 );
 
 my %_wk_tagged_as_tags = (
@@ -919,7 +920,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

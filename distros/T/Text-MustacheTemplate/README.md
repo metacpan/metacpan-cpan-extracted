@@ -1,19 +1,21 @@
-[![Actions Status](https://github.com/karupanerura/Text-MustacheTemplate/actions/workflows/test.yml/badge.svg)](https://github.com/karupanerura/Text-MustacheTemplate/actions)
+[![Actions Status](https://github.com/karupanerura/Text-MustacheTemplate/actions/workflows/test.yml/badge.svg)](https://github.com/karupanerura/Text-MustacheTemplate/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-MustacheTemplate.svg)](https://metacpan.org/release/Text-MustacheTemplate)
 # NAME
 
-Text::MustacheTemplate - mustache template engine
+Text::MustacheTemplate - Fast and specification compliant Mustache template engine for Perl
 
 # SYNOPSIS
 
-    use Text::MustacheTemplate;
-    # local $Text::MustacheTemplate::OPEN_DELIMITER = '<%';
-    # local $Text::MustacheTemplate::CLOSE_DELIMITER = '%>';
+```perl
+use Text::MustacheTemplate;
+# local $Text::MustacheTemplate::OPEN_DELIMITER = '<%';
+# local $Text::MustacheTemplate::CLOSE_DELIMITER = '%>';
 
-    my $rendered = Text::MustacheTemplate->render('* {{variable}}', { variable => 'foo' }); # => "* foo"
+my $rendered = Text::MustacheTemplate->render('* {{variable}}', { variable => 'foo' }); # => "* foo"
 
-    my $template = Text::MustacheTemplate->parse('* {{variable}}');
-    $rendered = $template->({ variable => 'foo' }); # => "* foo"
-    $rendered = $template->({ variable => 'bar' }); # => "* bar"
+my $template = Text::MustacheTemplate->parse('* {{variable}}');
+$rendered = $template->({ variable => 'foo' }); # => "* foo"
+$rendered = $template->({ variable => 'bar' }); # => "* bar"
+```
 
 # DESCRIPTION
 
@@ -29,8 +31,10 @@ And it is passed all [mustache/spec](https://github.com/mustache/spec) test case
     Parses the template text. Returns a subroutine reference.
     The subroutine receives one argument and processes the parsed template using the context variable specified in the argument.
 
-        my $template = Text::MustacheTemplate->parse('* {{variable}}');
-        $rendered = $template->({ variable => 'foo' }); # => "* foo"
+    ```perl
+    my $template = Text::MustacheTemplate->parse('* {{variable}}');
+    $rendered = $template->({ variable => 'foo' }); # => "* foo"
+    ```
 
     This method is suitable for rendering the same template multiple times.
 
@@ -39,7 +43,9 @@ And it is passed all [mustache/spec](https://github.com/mustache/spec) test case
     Render the template text using the context.
     It returns a rendered text. 
 
-        my $rendered_text = Text::MustacheTemplate->render($template_text, $context);
+    ```perl
+    my $rendered_text = Text::MustacheTemplate->render($template_text, $context);
+    ```
 
     This method is suitable when the same template is rarely used.
 
@@ -66,47 +72,49 @@ By using `local`, this change can be localized.
 - $LAMBDA\_TEMPLATE\_RENDERING
 
     When this flag is truthy, lambda template rendering is enabled.
-    The default value is falsey.
+    The default value is falsy.
 
 # BENCHMARK
 
 Result of `author/benchmark.pl`:
 
-    =============================
-    parse
-    =============================
-    Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
-    Template::Mustache: 11 wallclock secs (10.44 usr +  0.07 sys = 10.51 CPU) @ 748.33/s (n=7865)
-    Text::MustacheTemplate: 10 wallclock secs (10.51 usr +  0.01 sys = 10.52 CPU) @ 10028.52/s (n=105500)
-                              Rate     Template::Mustache Text::MustacheTemplate
-    Template::Mustache       748/s                     --                   -93%
-    Text::MustacheTemplate 10029/s                  1240%                     --
-    =============================
-    render
-    =============================
-    Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
-    Template::Mustache: 10 wallclock secs (10.49 usr +  0.02 sys = 10.51 CPU) @ 730.73/s (n=7680)
-    Text::MustacheTemplate: 11 wallclock secs (10.60 usr +  0.02 sys = 10.62 CPU) @ 32508.29/s (n=345238)
-                              Rate     Template::Mustache Text::MustacheTemplate
-    Template::Mustache       731/s                     --                   -98%
-    Text::MustacheTemplate 32508/s                  4349%                     --
-    =============================
-    render (contextual optimization)
-    =============================
-    Benchmark: running disabled for at least 10 CPU seconds...
-      disabled: 11 wallclock secs (10.50 usr +  0.02 sys = 10.52 CPU) @ 9471.20/s (n=99637)
-                Rate disabled  enabled
-    disabled  9471/s       --     -71%
-    enabled  32508/s     243%       --
-    =============================
-    render(cached)
-    =============================
-    Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
-    Template::Mustache: 11 wallclock secs (10.49 usr +  0.01 sys = 10.50 CPU) @ 48871.81/s (n=513154)
-    Text::MustacheTemplate: 10 wallclock secs (10.57 usr +  0.01 sys = 10.58 CPU) @ 232286.39/s (n=2457590)
-                               Rate     Template::Mustache Text::MustacheTemplate
-    Template::Mustache      48872/s                     --                   -79%
-    Text::MustacheTemplate 232286/s                   375%                     --
+```
+=============================
+parse
+=============================
+Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
+Template::Mustache: 11 wallclock secs (10.44 usr +  0.07 sys = 10.51 CPU) @ 748.33/s (n=7865)
+Text::MustacheTemplate: 10 wallclock secs (10.51 usr +  0.01 sys = 10.52 CPU) @ 10028.52/s (n=105500)
+                          Rate     Template::Mustache Text::MustacheTemplate
+Template::Mustache       748/s                     --                   -93%
+Text::MustacheTemplate 10029/s                  1240%                     --
+=============================
+render
+=============================
+Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
+Template::Mustache: 10 wallclock secs (10.49 usr +  0.02 sys = 10.51 CPU) @ 730.73/s (n=7680)
+Text::MustacheTemplate: 11 wallclock secs (10.60 usr +  0.02 sys = 10.62 CPU) @ 32508.29/s (n=345238)
+                          Rate     Template::Mustache Text::MustacheTemplate
+Template::Mustache       731/s                     --                   -98%
+Text::MustacheTemplate 32508/s                  4349%                     --
+=============================
+render (contextual optimization)
+=============================
+Benchmark: running disabled for at least 10 CPU seconds...
+  disabled: 11 wallclock secs (10.50 usr +  0.02 sys = 10.52 CPU) @ 9471.20/s (n=99637)
+            Rate disabled  enabled
+disabled  9471/s       --     -71%
+enabled  32508/s     243%       --
+=============================
+render(cached)
+=============================
+Benchmark: running Template::Mustache, Text::MustacheTemplate for at least 10 CPU seconds...
+Template::Mustache: 11 wallclock secs (10.49 usr +  0.01 sys = 10.50 CPU) @ 48871.81/s (n=513154)
+Text::MustacheTemplate: 10 wallclock secs (10.57 usr +  0.01 sys = 10.58 CPU) @ 232286.39/s (n=2457590)
+                           Rate     Template::Mustache Text::MustacheTemplate
+Template::Mustache      48872/s                     --                   -79%
+Text::MustacheTemplate 232286/s                   375%                     --
+```
 
 # SEE ALSO
 

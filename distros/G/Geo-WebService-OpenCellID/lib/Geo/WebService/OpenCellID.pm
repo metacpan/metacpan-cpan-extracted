@@ -8,7 +8,7 @@ use LWP::Simple qw{};
 use XML::Simple qw{};
 use URI qw{};
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -41,13 +41,6 @@ Perl Interface to the database at http://www.opencellid.org/
 
 =cut
 
-sub initialize {
-  my $self=shift;
-  %$self=@_;
-  $self->url("http://www.opencellid.org/") unless $self->url; 
-  $self->key("myapikey")                   unless $self->key;
-}
-
 =head1 METHODS
 
 =head2 key
@@ -59,6 +52,7 @@ Sets and returns the API key.
 sub key {
   my $self=shift;
   $self->{"key"}=shift if @_;
+  $self->{"key"}="myapikey" unless $self->{"key"};
   return $self->{"key"};
 }
 
@@ -71,6 +65,7 @@ Sets and returns the URL.  Defaults to http://www.opencellid.org/
 sub url {
   my $self=shift;
   $self->{"url"}=shift if @_;
+  $self->{"url"}="http://www.opencellid.org/" unless $self->{"url"};
   return $self->{"url"};
 }
 
@@ -145,23 +140,9 @@ sub data_xml {
   return XML::Simple->new(ForceArray=>1)->XMLin($xml);
 }
 
-=head1 BUGS
-
-Submit to RT and email the Author
-
-=head1 SUPPORT
-
-Try the Author or Try 8motions.com
-
-=head1 AUTHOR
-
-    Michael R. Davis
-    CPAN ID: MRDVT
-    STOP, LLC
-    domain=>michaelrdavis,tld=>com,account=>perl
-    http://www.stopllc.com/
-
 =head1 COPYRIGHT
+
+Copyright (c) 2025 Michael R. Davis
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

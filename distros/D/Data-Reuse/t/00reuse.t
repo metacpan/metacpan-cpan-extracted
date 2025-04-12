@@ -37,7 +37,7 @@ is_ro( reuse( 1 ) );
 is( 2, ${ reuse( \2 ) } );
 is( \reuse( \2 ),
     \reuse( \2 ) );
-is_ro( ${ reuse( \2 ) } );
+is_ro( ${ reuse( \2 )  } );
 
 # lists
 reuse my @list = ( 3, 4 );

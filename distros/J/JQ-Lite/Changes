@@ -1,3 +1,26 @@
+0.30  2025-04-12
+    - Enhanced META information for CPAN Testers and MetaCPAN
+    - Added MIN_PERL_VERSION and no_index to Makefile.PL
+    - Included bugtracker and repository links
+
+0.29  2025-04-12
+    - Added count function to return the number of items in the result set
+    - Example: .users | count  → returns array length
+              .users[] | select(...) | count → counts matching items
+    - Adjusted count logic to treat both arrays and flat result lists properly
+    - Added test: t/count.t
+
+0.28  2025-04-12
+    - Added group_by(...) function to group arrays by a field
+    - Example: .users | group_by(department)
+    - Added test: t/group_by.t
+
+0.27  2025-04-12
+    - Added support for pipe-style queries using .[] (e.g. .[] | select(...) | .name)
+    - Introduced 'flatten' as internal command for .[] handling
+    - Improved run_query parsing to better support chained queries with select()
+    - Added test: t/pipe_select_name.t
+
 0.26  2025-04-06
     - Improved interactive mode: input prompt is now always displayed at the bottom of the screen
       to avoid being overwritten by JSON output. This improves readability and usability when working

@@ -110,4 +110,19 @@ subtest tie_cphash_tests => sub {
 	}
 };
 
+subtest keys_insertion_order => sub {
+	my %hash;
+	tie %hash, 'Tree::RB::XS',
+		compare_fn => 'str',
+		track_recent => 1,
+		keys_in_recent_order => 1;
+	my @keys= qw/ y g t e f s /;
+	@hash{@keys}= (1..6);
+	is( [ keys %hash ], \@keys, 'insertion order, keys' );
+	is( [ values %hash ], [1..6], 'insertion order, values' );
+	is( [ %hash ], [ y => 1, g => 2, t => 3, e => 4, f => 5, s => 6 ], 'insertion order, kv' );
+	tied(%hash)->keys_in_recent_order(0);
+	is( [ keys %hash ], [ sort @keys ], 'sort order' );
+};
+
 done_testing;

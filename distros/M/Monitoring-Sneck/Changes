@@ -1,5 +1,8 @@
 Revision history for Monitoring-Sneck
 
+1.0.2   2025-04-11/14:15
+		- call waitpid to actually get the exit code
+
 1.0.1   2025-04-07/10:30
 		- fix exit code stuff for debug
 

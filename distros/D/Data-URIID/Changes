@@ -1,3 +1,8 @@
+v0.15  2025-04-11Z
+    - Added support to recognise and render barcodes
+    - Improved e621 support
+    - Added basic support for danbooru.2chan.jp
+
 v0.14  2025-03-31Z
     - Support learning data from passed object
     - Added as() to Data::URIID::Base

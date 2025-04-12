@@ -1,5 +1,5 @@
 ---
-abstract: 'mustache template engine'
+abstract: 'Fast and specification compliant Mustache template engine for Perl'
 author:
   - 'karupanerura <karupa@cpan.org>'
 build_requires:
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Text::MustacheTemplate:
     file: lib/Text/MustacheTemplate.pm
-    version: '0.02'
+    version: '0.04'
   Text::MustacheTemplate::Compiler:
     file: lib/Text/MustacheTemplate/Compiler.pm
   Text::MustacheTemplate::Evaluator:
@@ -51,6 +51,6 @@ resources:
   bugtracker: https://github.com/karupanerura/Text-MustacheTemplate/issues
   homepage: https://github.com/karupanerura/Text-MustacheTemplate
   repository: https://github.com/karupanerura/Text-MustacheTemplate.git
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

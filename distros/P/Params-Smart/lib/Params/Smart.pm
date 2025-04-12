@@ -12,9 +12,9 @@ require Exporter;
 our @ISA         = qw( Exporter );
 our @EXPORT      = qw( Params );
 our @EXPORT_OK   = qw( Params ParamsNC );
-our %EXPORT_TAGS = ( all => \@EXPORT_OK ); 
+our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub parse_param {
   my $self  = shift;
@@ -26,7 +26,7 @@ sub parse_param {
     my $info = {
       _parsed => 0,
     };
-    foreach (qw( 
+    foreach (qw(
          name type default required name_only slurp
          callback comment needs
      )) {
@@ -221,7 +221,7 @@ sub args {
 
   my $named = !(@_ % 2);
 
-  # For even number positional parameter with undef in them. 
+  # For even number positional parameter with undef in them.
   for (my $i=0; ($named && ($i < @_)); $i += 2) {
     if (!defined $_[$i]) { $named = 0 }
   }
@@ -346,7 +346,7 @@ __END__
 
 =head1 NAME
 
-Params::Smart - use both positional and named arguments in a subroutine
+Params::Smart - use both positional and named arguments in a subroutine (deprecated)
 
 =begin readme
 
@@ -358,22 +358,11 @@ The following non-core modules are required:
 
 =head1 INSTALLATION
 
-Installation can be done using the traditional Makefile.PL or the newer
-Build.PL methods.
-
-Using Makefile.PL:
+Installation can be done using the traditional F<Makefile.PL> method:
 
   perl Makefile.PL
   make test
   make install
-
-(On Windows platforms you should use C<nmake> instead.)
-
-Using Build.PL (if you have Module::Build installed):
-
-  perl Build.PL
-  perl Build test
-  perl Build install
 
 =end readme
 
@@ -389,6 +378,12 @@ Using Build.PL (if you have Module::Build installed):
   my_sub( foo=> 1, bar=>2, bo=>3 );  # call with named arguments
 
   my_sub(1, 2, 3);                   # same, with positional args
+
+=head1 STATUS
+
+This module is deprecated.
+
+It has had no significant updates since 2007.
 
 =head1 DESCRIPTION
 
@@ -743,16 +738,18 @@ L<Class::ParmList> provides a framework for parameter validation as well.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo at cpan.org>
+Robert Rothenberg <rrwo@cpan.org>
 
 =head2 Suggestions and Bug Reporting
 
 Feedback is always welcome.  Please use the CPAN Request Tracker at
 L<http://rt.cpan.org> to submit bug reports.
 
+There is a git repository at L<https://github.com/robrwo/perl-Params-Smart>.
+
 =head1 LICENSE
 
-Copyright (c) 2005-2007 Robert Rothenberg. All rights reserved.
+Copyright (c) 2005-2007, 2025 Robert Rothenberg. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
