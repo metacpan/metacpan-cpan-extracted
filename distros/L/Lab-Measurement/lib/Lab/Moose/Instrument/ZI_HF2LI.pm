@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_HF2LI;
-$Lab::Moose::Instrument::ZI_HF2LI::VERSION = '3.920';
+$Lab::Moose::Instrument::ZI_HF2LI::VERSION = '3.930';
 #ABSTRACT: Zurich Instruments HF2LI Lock-in Amplifier
 
 use v5.20;
@@ -27,7 +27,7 @@ Lab::Moose::Instrument::ZI_HF2LI - Zurich Instruments HF2LI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ Identical to L<Lab::Moose::Instrument::ZI_MFLI>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2020       Simon Reinhardt
 

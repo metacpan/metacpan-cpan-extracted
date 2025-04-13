@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Common;
 #ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
-$Lab::Moose::Instrument::Common::VERSION = '3.920';
+$Lab::Moose::Instrument::Common::VERSION = '3.930';
 use v5.20;
 
 use Moose::Role;
@@ -107,7 +107,7 @@ Lab::Moose::Instrument::Common - Role for common commands declared mandatory by 
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 METHODS
 
@@ -158,7 +158,7 @@ Send I<*WAI> command.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

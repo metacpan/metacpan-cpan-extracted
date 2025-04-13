@@ -1,0 +1,23 @@
+---
+abstract: 'Module to generate 3D Objects as .scad files from Perl'
+author:
+  - 'Saif Ahmed <saiftynet { at } gmail.com>'
+build_requires:
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CAD-OpenSCAD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+version: v0.12.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

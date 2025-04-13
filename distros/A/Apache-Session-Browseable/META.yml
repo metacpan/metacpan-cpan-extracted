@@ -17,7 +17,7 @@ name: Apache-Session-Browseable
 provides:
   Apache::Session::Browseable:
     file: lib/Apache/Session/Browseable.pm
-    version: v1.3.15
+    version: v1.3.16
   Apache::Session::Browseable::Cassandra:
     file: lib/Apache/Session/Browseable/Cassandra.pm
     version: v1.3.13
@@ -53,7 +53,7 @@ provides:
     version: v1.3.1
   Apache::Session::Browseable::Redis:
     file: lib/Apache/Session/Browseable/Redis.pm
-    version: v1.3.15
+    version: v1.3.16
   Apache::Session::Browseable::SQLite:
     file: lib/Apache/Session/Browseable/SQLite.pm
     version: v1.2.2
@@ -113,5 +113,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/LemonLDAPNG/Apache-Session-Browseable
-version: v1.3.15
+version: v1.3.16
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

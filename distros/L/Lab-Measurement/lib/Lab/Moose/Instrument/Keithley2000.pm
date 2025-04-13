@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keithley2000;
-$Lab::Moose::Instrument::Keithley2000::VERSION = '3.920';
+$Lab::Moose::Instrument::Keithley2000::VERSION = '3.930';
 #ABSTRACT: Keithley 2000 digital multimeter
 
 use v5.20;
@@ -457,7 +457,7 @@ Lab::Moose::Instrument::Keithley2000 - Keithley 2000 digital multimeter
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -639,7 +639,7 @@ probably many
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2021       Andreas K. Huettel, Fabian Weinelt
 

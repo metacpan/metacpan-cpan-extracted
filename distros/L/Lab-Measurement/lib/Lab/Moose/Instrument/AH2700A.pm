@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AH2700A;
-$Lab::Moose::Instrument::AH2700A::VERSION = '3.920';
+$Lab::Moose::Instrument::AH2700A::VERSION = '3.930';
 #ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
 
 use v5.20;
@@ -242,7 +242,7 @@ Lab::Moose::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capac
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -334,7 +334,7 @@ version 3.920
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow
             2016       Andreas K. Huettel, Simon Reinhardt

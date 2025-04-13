@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -28,7 +28,7 @@ marc-filter - Script to filter records in MARC dataset.
 
 =head1 SYNOPSIS
 
- marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field subfield value
+ marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file field [subfield] value
 
 =head1 DESCRIPTION
 
@@ -41,6 +41,12 @@ It supports MARC XML files now.
 =item * C<-h>
 
 Print help.
+
+=item * C<-n num>
+
+Number of records to output,
+
+Default value is all records to output.
 
 =item * C<-o format>
 
@@ -64,13 +70,17 @@ MARC XML file name.
 
 MARC field.
 
+Field number or 'leader' string.
+
 =item * C<subfield>
 
 MARC subfield.
 
+It's optional in case of 'leader'.
+
 =item * C<value>
 
-MARC field/subfield value to filter.
+MARC field/subfield or leader value to filter.
 
 =back
 
@@ -86,12 +96,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

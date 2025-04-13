@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Synctek_MCL1_540;
-$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.920';
+$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.930';
 #ABSTRACT: Synctek MCL1-540 Lock-in Amplifier
 
 use v5.20;
@@ -362,7 +362,7 @@ Lab::Moose::Instrument::Synctek_MCL1_540 - Synctek MCL1-540 Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -384,7 +384,7 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Jonas Schambeck, Mia Schambeck, Simon Reinhardt
             2023       Mia Schambeck

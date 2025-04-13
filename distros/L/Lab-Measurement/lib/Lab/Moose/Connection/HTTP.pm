@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::HTTP;
-$Lab::Moose::Connection::HTTP::VERSION = '3.920';
+$Lab::Moose::Connection::HTTP::VERSION = '3.930';
 #ABSTRACT: Connection with Http requests
 
 use v5.20;
@@ -93,7 +93,7 @@ Lab::Moose::Connection::HTTP - Connection with Http requests
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ server.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Andreas K. Huettel, Mia Schambeck
 

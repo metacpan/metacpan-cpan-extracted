@@ -16,21 +16,27 @@ my $control = MIDI::RtController->new(
 );
 
 my %filters = (
-    1 => { # mod-wheel
-        type => 'scatter',
-        time_step => 0.25,
-    },
+    # 1 => { # mod-wheel
+        # type => 'breathe',
+        # time_step => 0.1,
+    # },
     # 13 => { # delay time
         # type => 'breathe',
         # time_step => 0.5,
         # range_bottom => 10,
         # range_top => 100,
     # },
+    # 14 => { # waveform modulate
+        # type => 'breathe',
+        # time_step => 0.25,
+        # range_bottom => 10,
+        # range_top => 100,
+    # },
     22 => { # noise
-        type => 'stair_step',
-        time_step => 0.5,
-        range_bottom => 0,
-        range_top => 80,
+        type => 'ramp',
+        # time_step => 0.2,
+        # range_bottom => 0,
+        # range_top => 80,
     },
     # 26 => { # filter e.g. release
         # type => 'breathe',
@@ -40,7 +46,7 @@ my %filters = (
     # },
     # 77 => {  # oscillator 1 waveform
         # type => 'single',
-        # value => 0, # 0: sawtooth
+        # value => 18, # 0: sawtooth, 18: square
     # },
 );
 

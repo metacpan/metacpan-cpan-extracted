@@ -16,11 +16,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ sub new
 	my $class = shift;
 	my $params = Params::Get::get_params(undef, @_) || {};
 
-	$params->{'config_dirs'} //= $params->{'path'};	# Compatability with Config::Auto
+	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
 
 	if(!defined($params->{'config_dirs'})) {
 		# Set up the default value for config_dirs
@@ -334,7 +334,9 @@ sub _load_config
 						$self->_load_driver('YAML::XS', ['LoadFile']);
 						if(($data = LoadFile($path)) && (ref($data) eq 'HASH')) {
 							# Could be colon file, could be YAML, whichever it is, break the configuration fields
-							foreach my($k, $v) (%{$data}) {
+							# foreach my($k, $v) (%{$data}) {
+							foreach my $k (keys %{$data}) {
+								my $v = $data->{$k};
 								next if($v =~ /^".+"$/);	# Quotes to keep in one field
 								if($v =~ /,/) {
 									my @vals = split(/\s*,\s*/, $v);

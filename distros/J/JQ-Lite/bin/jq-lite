@@ -26,6 +26,10 @@ for (my $i = 0; $i < @ARGV; $i++) {
         splice @ARGV, $i, 2;
         redo;
     }
+    if ($ARGV[$i] eq '--help-functions') {
+        print_supported_functions();
+        exit 0;
+    }
 }
 
 if ($decoder_choice) {
@@ -90,6 +94,7 @@ Options:
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
   -h, --help           Show this help message
+  --help-functions     Show list of all supported functions
   -v, --version        Show version information
 
 Examples:
@@ -133,6 +138,7 @@ Options:
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
   -h, --help           Show this help message
+  --help-functions     Show list of all supported functions
   -v, --version        Show version information
 
 Examples:
@@ -310,6 +316,32 @@ if ($@) {
 if (!@results) {
     warn "[INFO] No results returned for query.\n";
     exit 1;
+}
+
+sub print_supported_functions {
+    print <<'EOF';
+
+Supported Functions:
+  length           - Get number of elements in an array or keys in a hash
+  keys             - Extract sorted keys from a hash
+  values           - Extract values from a hash (v0.34)
+  sort             - Sort array items
+  sort_by(KEY)     - Sort array of objects by key
+  unique           - Remove duplicate values
+  reverse          - Reverse an array
+  first / last     - Get first / last element of an array
+  limit(N)         - Limit array to first N elements
+  count            - Count total number of matching items
+  map(EXPR)        - Map/filter array items with a subquery
+  group_by(KEY)    - Group array items by field
+  join(SEPARATOR)  - Join array elements with a string
+  has              - Check if object has a given key
+  contains         - Check if array or string contains a value
+  match("pattern") - Match string using regex
+  flatten          - Explicitly flatten arrays (same as .[])
+  empty            - Discard all output (for side-effect use)
+
+EOF
 }
 
 print_results(@results);

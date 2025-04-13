@@ -1,5 +1,5 @@
 package Enterprise::Licence;
-use utf8; use strict; use warnings; our $VERSION = '0.02';
+use utf8; use strict; use warnings; our $VERSION = '0.03';
 use DateTime; use Math::BigInt; use Compress::Huffman;
 use Shannon::Entropy qw/entropy/; use Bijection qw/all/;
 
@@ -60,7 +60,7 @@ Enterprise::Licence - Licence or License
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -85,7 +85,7 @@ Version 0.02
 
 =head1 Description
 
-My software is white labeled and distributed into environments that I do not control. I needed a way to programmatically licence code for a set period of time 1 month trial, 5 years etc.
+I used to have software which was white labeled and distributed into environments that I did not control. I needed a way to programmatically licence code for a set period of time 1 month trial, 5 years etc. Hence this module was created.
 
 =head2 The Licence
 
@@ -219,14 +219,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Enterprise-Licence>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Enterprise-Licence>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Enterprise-Licence>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Enterprise-Licence/>
@@ -239,7 +231,7 @@ L<http://search.cpan.org/dist/Enterprise-Licence/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 LNATION.
+Copyright 2019->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

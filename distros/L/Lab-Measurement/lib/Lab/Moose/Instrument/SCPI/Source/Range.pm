@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Range;
-$Lab::Moose::Instrument::SCPI::Source::Range::VERSION = '3.920';
+$Lab::Moose::Instrument::SCPI::Source::Range::VERSION = '3.930';
 #ABSTRACT: Role for the SCPI SOURce:RANGe subsystem.
 
 use v5.20;
@@ -49,7 +49,7 @@ Lab::Moose::Instrument::SCPI::Source::Range - Role for the SCPI SOURce:RANGe sub
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 METHODS
 
@@ -63,7 +63,7 @@ Query/Set the output range.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
 

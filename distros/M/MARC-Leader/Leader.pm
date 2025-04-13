@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use Data::MARC::Leader;
+use Data::MARC::Leader 0.05;
 use Error::Pure qw(err);
+use Mo::utils 0.06 qw(check_bool);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -17,8 +18,14 @@ sub new {
 	# Create object.
 	my $self = bless {}, $class;
 
+	# Verbose mode.
+	$self->{'verbose'} = 0;
+
 	# Process parameters.
 	set_params($self, @params);
+
+	# Check verbose.
+	check_bool($self, 'verbose');
 
 	return $self;
 }
@@ -28,13 +35,21 @@ sub parse {
 
 	# Check length.
 	if (length($leader) != 24) {
-		err 'Bad length of MARC leader.';
+		err 'Bad length of MARC leader.',
+			'Length', length($leader),
+		;
 	}
 
 	$leader =~ s/\-/\ /msg;
 
+	if ($self->{'verbose'}) {
+		print "Leader: |$leader|\n";
+	}
+
 	my %params = (
-		'length' => $self->_int($leader, 0, 5),,
+		'raw' => $leader,
+
+		'length' => $self->_int($leader, 0, 5),
 		'status' => (substr $leader, 5, 1),
 		'type' => (substr $leader, 6, 1),
 		'bibliographic_level' => (substr $leader, 7, 1),
@@ -122,6 +137,17 @@ MARC::Leader - MARC leader class.
 
 Constructor.
 
+=over 8
+
+=item * C<verbose>
+
+Verbose mode flag.
+It's boolean value.
+
+Default value is 0.
+
+=back
+
 Returns instance of object.
 
 =head2 C<parse>
@@ -145,9 +171,13 @@ Returns string.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_bool():
+                 Parameter 'verbose' must be a bool (0/1).
+                         Value: %s
 
  parse():
          Bad length of MARC leader.
+                 Length: %s
 
  serialize():
          Bad 'Data::MARC::Leader' instance to serialize.
@@ -298,6 +328,7 @@ Returns string.
 L<Class::Utils>,
 L<Data::MARC::Leader>,
 L<Error::Pure>,
+L<Mo::utils>,
 L<Scalar::Util>.
 
 =head1 SEE ALSO
@@ -322,12 +353,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -4,6 +4,9 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.930 2025-04-12
+  * Update the Cryomagnetics_4G driver to work with Sweep::Magnet
+
 3.920 2024-11-05
   * First rough version of AttoCube motion controller driver
   * AMI_430 magnet supply: add check of attribute persistent_mode

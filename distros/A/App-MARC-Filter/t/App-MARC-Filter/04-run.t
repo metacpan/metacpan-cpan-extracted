@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -42,6 +42,37 @@ stderr_is(
 
 # Test.
 @ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'015',
+	'a',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (no field/subfield value).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'leader'
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (no leader value).',
+);
+
+# Test.
+@ARGV = (
 	'-x',
 );
 $right_ret = help();
@@ -70,6 +101,40 @@ stdout_is(
 	},
 	$right_ret,
 	'Run filter for MARC XML file with 1 record (015a = cnb000000096).',
+);
+
+# Test.
+@ARGV = (
+	'-n 1',
+	$data_dir->file('ex3.xml')->s,
+	'040',
+	'a',
+	'ABA001',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (all 040a=ABA001, but filter to 1 output record).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'leader',
+	'     nam a22        4500',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (leader = \'     nam a22        4500\').',
 );
 
 # Test.
@@ -144,14 +209,16 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-o format] [-r] [--version] marc_xml_file field subfield value
+Usage: $script [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file field [subfield] value
 	-h		Print help.
+	-n num		Number of records to output (default value is all records).
 	-o format	Output MARC format. Possible formats are ascii, xml.
 	-r		Use value as Perl regexp.
+	-v		Verbose mode.
 	--version	Print version.
 	marc_xml_file	MARC XML file.
-	field		MARC field.
-	subfield	MARC subfield.
+	field		MARC field (field number or 'leader' string).
+	subfield	MARC subfield (optional in case of leader).
 	value		MARC field/subfield value to filter.
 END
 

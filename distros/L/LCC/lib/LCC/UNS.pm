@@ -6,7 +6,7 @@ package LCC::UNS;
 
 use strict;
 @LCC::UNS::ISA = qw(LCC);
-$LCC::UNS::VERSION = '0.02';
+$LCC::UNS::VERSION = '0.03';
 
 # Return true value for use
 

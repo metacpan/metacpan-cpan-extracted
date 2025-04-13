@@ -128,11 +128,11 @@ gate-frequency-sweep.pl - Sweep a gate voltage and a rf generator frequency
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel
 

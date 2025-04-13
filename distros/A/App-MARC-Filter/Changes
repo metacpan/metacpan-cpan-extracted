@@ -1,3 +1,9 @@
+0.04 2025-04-13T09:05:18+02:00
+ - Add -n option to number of output records.
+ - Add support for leader filtering.
+ - Add verbose mode.
+ - Update copyright years.
+
 0.03 2024-07-04T13:43:13+02:00
  - Add tests for run().
  - Rewrite arguments process to more intuitive way.

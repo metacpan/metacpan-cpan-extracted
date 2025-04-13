@@ -6,7 +6,7 @@ package LCC::Backend;
 
 use strict;
 @LCC::Backend::ISA = qw(LCC);
-$LCC::Backend::VERSION = '0.02';
+$LCC::Backend::VERSION = '0.03';
 
 # Return true value for use
 

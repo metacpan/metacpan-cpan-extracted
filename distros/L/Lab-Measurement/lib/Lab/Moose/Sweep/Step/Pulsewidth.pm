@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Pulsewidth;
-$Lab::Moose::Sweep::Step::Pulsewidth::VERSION = '3.920';
+$Lab::Moose::Sweep::Step::Pulsewidth::VERSION = '3.930';
 #ABSTRACT: Pulsewidth sweep.
 
 use v5.20;
@@ -49,7 +49,7 @@ Lab::Moose::Sweep::Step::Pulsewidth - Pulsewidth sweep.
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 Description
 
@@ -74,7 +74,7 @@ sweep example.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2021       Fabian Weinelt
 

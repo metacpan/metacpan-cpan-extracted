@@ -8,8 +8,8 @@ README
 README.md
 dist.ini
 eg/control_change.pl
-eg/dual.pl
 eg/echo.pl
+eg/multi.pl
 eg/tester.pl
 lib/MIDI/RtController.pm
 t/00-compile.t

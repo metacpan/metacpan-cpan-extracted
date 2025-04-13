@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZNL;
-$Lab::Moose::Instrument::RS_ZNL::VERSION = '3.920';
+$Lab::Moose::Instrument::RS_ZNL::VERSION = '3.930';
 #ABSTRACT: Rohde & Schwarz ZNL Vector Network Analyzer
 
 use v5.20;
@@ -42,7 +42,7 @@ Lab::Moose::Instrument::RS_ZNL - Rohde & Schwarz ZNL Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ C<sparam_catalog> methods.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2020       Simon Reinhardt
 

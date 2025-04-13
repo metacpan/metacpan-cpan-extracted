@@ -3,9 +3,8 @@ package Benchmark::Thread::Size;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 use strict;
-
 # Initialize the modules to be loaded string
 # While compiling
 #  Set to use forks if forks.pm loaded, otherwise threads
@@ -174,7 +173,7 @@ while (my($file,$list) = each %temp) {
 
 # print out the result summary
 
-printf( "  #   (ref)%12s%12s%12s%12s%12s\n",@ARGV,'','','','','','' );
+printf( "  #   (ref)%12s%12s%12s%12s%12s\n",@ARGV, "", "", "", "", "");
 foreach my $t (sort {$a <=> $b} keys %threads) {
     printf '%3d',$t;
     my $base = $result{''}->{$t};
@@ -575,9 +574,9 @@ a different way for you favourite Operating System, please let me know.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-maintained by LNATION, <thisusedtobeanemail@gmail.com>
+maintained by LNATION, <email@lnation.org>
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Please report bugs to <email@lnation.org>.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -589,7 +588,7 @@ that "ps" on Mac OS X has a bug in it.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>  All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

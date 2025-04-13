@@ -1,7 +1,7 @@
 package Devel::MaintBlead;
 
 # set version information
-$VERSION= '0.09';
+$VERSION= '0.10';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -333,7 +333,7 @@ Devel::MaintBlead - handle maint / blead code paths for distributions
 
 =head1 VERSION
 
-This documentation describes version 0.09.
+This documentation describes version 0.10.
 
 =head1 SYNOPSIS
 
@@ -521,7 +521,7 @@ maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.  All rights reserved.
+Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>  All rights reserved.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Power;
-$Lab::Moose::Sweep::Step::Power::VERSION = '3.920';
+$Lab::Moose::Sweep::Step::Power::VERSION = '3.930';
 #ABSTRACT: Power sweep.
 
 use v5.20;
@@ -44,7 +44,7 @@ Lab::Moose::Sweep::Step::Power - Power sweep.
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 Description
 
@@ -64,7 +64,7 @@ Default filename extension: C<'Power='>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel
             2021       Fabian Weinelt

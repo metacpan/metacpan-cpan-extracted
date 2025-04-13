@@ -6,7 +6,7 @@ package LCC::Documents::DBI;
 
 use strict;
 @LCC::Documents::DBI::ISA = qw(LCC::Documents);
-$LCC::Documents::DBI::VERSION = '0.01';
+$LCC::Documents::DBI::VERSION = '0.03';
 
 # Return true value for use
 

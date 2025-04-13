@@ -9,7 +9,7 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.15';
+our $VERSION = '1.3.16';
 our @ISA     = qw(Apache::Session);
 
 our $redis = $Apache::Session::Browseable::Store::Redis::redis;
@@ -126,90 +126,45 @@ sub searchOnExpr {
 
 sub deleteIfLowerThan {
     my ( $class, $args, $rule ) = @_;
-    my @toDelete;
-    my %seen;
-    if ( $rule->{or} ) {
-        foreach ( keys %{ $rule->{or} } ) {
-            push @toDelete,
-              grep { !$seen{$_}++ }
-              $class->filterIfLowerThan( $args, $_, $rule->{or}->{$_} );
-        }
-    }
-    elsif ( $rule->{and} ) {
-        foreach ( keys %{ $rule->{and} } ) {
-            @toDelete =
-              grep { !$seen{$_}++ }
-              $class->filterIfLowerThan( $args, $_, $rule->{and}->{$_},
-                @toDelete );
-        }
-    }
-    if (@toDelete) {
-        my $redisObj = $class->_getRedis($args);
-        if ( $rule->{not} ) {
-            foreach ( keys %{ $rule->{not} } ) {
-                my $keep = $class->searchOn( $args, $_, $rule->{not}->{$_} );
-                foreach my $k ( keys %$keep ) {
-                    @toDelete = grep { $_ ne $k } @toDelete;
-                }
-            }
-        }
-        $redisObj->del($_) foreach (@toDelete);
-    }
-}
-
-sub filterIfLowerThan {
-    my ( $class, $args, $field, $value, @keys ) = @_;
-    my @res;
+    my $deleted  = 0;
     my $redisObj = $class->_getRedis($args);
-    if ( $class->isIndexed( $args, $field ) ) {
-        my $cursor = 0;
-        do {
-            my ( $new_cursor, $sets ) =
-              $redisObj->scan( $cursor, MATCH => "${field}_*" );
-            foreach my $set (@$sets) {
-                next unless $redisObj->type($set) eq 'set';
-                my $v = $set;
-                $v =~ s/^\Q$field\E_//;
-                next if int($v) >= $value;
-                my @nk = $redisObj->smembers($set);
-                if (@keys) {
-                    push @res, map {
-                        my $t = $_;
-                        grep { $_ eq $t } @keys ? $t : ()
-                    } @nk;
-                }
-                else {
-                    push @res, @nk;
+    $class->get_key_from_all_sessions(
+        $args,
+        sub {
+            my ( $v, $k ) = @_;
+            if ( $rule->{not} ) {
+                foreach ( keys %{ $rule->{not} } ) {
+                    if (defined( $v->{$_} ) and $v->{$_} eq $rule->{not}->{$_}) {
+                        return ();
+                    }
                 }
             }
-            $cursor = $new_cursor;
-        } while ( $cursor != 0 );
-    }
-    else {
-        unless (@keys) {
-            $class->get_key_from_all_sessions(
-                $args,
-                sub {
-                    my ( $v, $k ) = @_;
-                    push @res, $k
-                      if defined( $v->{$field} )
-                      and $v->{$field} < $value;
-                    undef;
+            if ( $rule->{or} ) {
+                foreach ( keys %{ $rule->{or} } ) {
+                    if ( defined( $v->{$_} ) and $v->{$_} < $rule->{or}->{$_} )
+                    {
+                        $redisObj->del($k);
+                        $deleted++;
+                        return ();
+                    }
                 }
-            );
-        }
-        foreach my $k (@keys) {
-            eval {
-                my $v = $redisObj->get($k);
-                next unless $v;
-                $v = unserialize($v);
-                push @res, $k
-                  if defined( $v->{$field} )
-                  and $v->{$field} < $value;
-            };
-        }
-    }
-    return @res;
+            }
+            elsif ( $rule->{and} ) {
+                my $res = 1;
+                foreach ( keys %{ $rule->{and} } ) {
+                    $res = 0
+                      unless defined( $v->{$_} )
+                      and $v->{$_} < $rule->{not}->{$_};
+                }
+                if ($res) {
+                    $redisObj->del($k);
+                    $deleted++;
+                }
+            }
+            return ();
+        },
+    );
+    return ( 1, $deleted );
 }
 
 sub extractFields {

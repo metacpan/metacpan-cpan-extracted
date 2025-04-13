@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-Credentials
 
+0.007     2025-04-12 15:34:04+02:00 Europe/Brussels
+          - Try more editors if $EDITOR isn't set
+          - Fix typo in mojo credentials remove
+          - Handle absence of keys more cleanly
+          - Overwrite tempfiles after use
+
 0.006     2024-02-06 00:27:06+01:00 Europe/Brussels
           - Signal signature support dependency more actively
 

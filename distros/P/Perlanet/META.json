@@ -58,19 +58,18 @@
             "MooseX::ConfigFromFile" : "0",
             "MooseX::Traits" : "0",
             "Template" : "0",
-            "Try::Tiny" : "0",
             "URI::Fetch" : "0",
             "XML::Feed" : "0.22",
             "YAML" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.34.0"
          }
       }
    },
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.3.1"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -124,6 +123,6 @@
          "web" : "https://github.com/davorg-cpan/perlanet"
       }
    },
-   "version" : "v3.2.0",
+   "version" : "v3.3.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

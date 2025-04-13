@@ -29,7 +29,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v3.2.0
+    version: v3.3.1
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -72,16 +72,15 @@ requires:
   MooseX::ConfigFromFile: '0'
   MooseX::Traits: '0'
   Template: '0'
-  Try::Tiny: '0'
   URI::Fetch: '0'
   XML::Feed: '0.22'
   YAML: '0'
   namespace::autoclean: '0'
-  perl: v5.10.0
+  perl: v5.34.0
 resources:
   bugtracker: https://github.com/davorg-cpan/perlanet/issues
   homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg-cpan/perlanet.git
-version: v3.2.0
+version: v3.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

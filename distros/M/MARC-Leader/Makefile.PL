@@ -19,8 +19,9 @@ perl_version 5.006002;
 readme_from 'Leader.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
-requires 'Data::MARC::Leader' => 0.03;
+requires 'Data::MARC::Leader' => 0.05;
 requires 'Error::Pure' => 0;
+requires 'Mo::utils' => 0.05;
 requires 'Scalar::Util' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/MARC-Leader/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/MARC-Leader';
@@ -32,7 +33,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

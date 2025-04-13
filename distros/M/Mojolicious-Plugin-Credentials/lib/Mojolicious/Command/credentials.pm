@@ -1,10 +1,13 @@
 package Mojolicious::Command::credentials;
-$Mojolicious::Command::credentials::VERSION = '0.006';
+$Mojolicious::Command::credentials::VERSION = '0.007';
 use Mojo::Base 'Mojolicious::Command', -signatures;
 
+use Env '$EDITOR';
 use File::Slurper qw/read_binary write_binary/;
 use File::Temp 'tempfile';
 use Getopt::Long 'GetOptionsFromArray';
+use IPC::Cmd 'can_run';
+use List::Util 'first';
 use Text::ParseWords 'shellwords';
 use YAML::PP 'LoadFile';
 
@@ -18,7 +21,8 @@ sub run($self, $command, @args) {
 	my $credentials = $self->app->credentials;
 
 	if ($command eq 'edit') {
-		my $editor = $ENV{EDITOR} // 'vi';
+		my $editor = $EDITOR // first { can_run($_) } qw/editor vi nano/;
+		die 'Could not find an editor' if not defined $editor;
 		GetOptionsFromArray(\@args, 'yaml' => \my $yaml, 'editor=s' => \$editor) or die "Invalid arguments";
 		my $name = shift @args or die 'No credential name given';
 
@@ -29,6 +33,7 @@ sub run($self, $command, @args) {
 		system shellwords($editor), $filename and die 'Could not save file';
 
 		my $data = read_binary($filename);
+		write_binary($filename, scalar('\0' x length $data));
 		YAML::PP->new->load_string($data) if $yaml; # YAML validity check
 		$credentials->put($name, $data);
 	} elsif ($command eq 'show') {
@@ -37,7 +42,7 @@ sub run($self, $command, @args) {
 	} elsif ($command eq 'list') {
 		say for $credentials->list;
 	} elsif ($command eq 'remove') {
-		my $name = shift @args or die 'No credential name given';A
+		my $name = shift @args or die 'No credential name given';
 		$credentials->remove($name);
 	} elsif ($command eq 'recode') {
 		print 'Please input new key in hex form: ';
@@ -65,7 +70,7 @@ Mojolicious::Command::credentials - Manage your app's credentials
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

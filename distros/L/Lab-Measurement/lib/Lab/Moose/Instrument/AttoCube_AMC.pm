@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AttoCube_AMC;
-$Lab::Moose::Instrument::AttoCube_AMC::VERSION = '3.920';
+$Lab::Moose::Instrument::AttoCube_AMC::VERSION = '3.930';
 use 5.020;
 
 use Moose;
@@ -2707,7 +2707,7 @@ Lab::Moose::Instrument::AttoCube_AMC
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 AttoCube AMC300
 
@@ -5105,7 +5105,7 @@ Upload new license file in format base 64
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2024       Andreas K. Huettel, Robin Schock
 

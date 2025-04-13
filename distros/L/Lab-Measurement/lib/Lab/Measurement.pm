@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.920';
+$Lab::Measurement::VERSION = '3.930';
 #ABSTRACT: Temporary blocker module, errors out when used
 
 use v5.20;
@@ -36,7 +36,7 @@ Lab::Measurement - Temporary blocker module, errors out when used
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ L<Lab::Measurement::Legacy>. Install it and modify your script to start with
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2011       Andreas K. Huettel

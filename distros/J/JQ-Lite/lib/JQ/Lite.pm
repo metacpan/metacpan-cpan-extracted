@@ -5,7 +5,7 @@ use warnings;
 use JSON::PP;
 use List::Util qw(sum min max);
 
-our $VERSION = '0.30';
+our $VERSION = '0.35';
 
 sub new {
     my ($class, %opts) = @_;
@@ -209,6 +209,75 @@ sub run_query {
                 }
             }
             @results = ($n);
+            next;
+        }
+
+        # support for join(", ")
+        if ($part =~ /^join\((.*?)\)$/) {
+            my $sep = $1;
+            $sep =~ s/^['"](.*?)['"]$/$1/;  # remove quotes around separator
+
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    join($sep, map { defined $_ ? $_ : '' } @$_)
+                } else {
+                    ''
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for sort_by(key)
+        if ($part =~ /^sort_by\((.+?)\)$/) {
+            my $key_path = $1;
+            $key_path =~ s/^\.//;  # Remove leading dot
+        
+            my $cmp = _smart_cmp();
+            @next_results = ();
+        
+            for my $item (@results) {
+                if (ref $item eq 'ARRAY') {
+                    my @sorted = sort {
+                        my $a_val = (_traverse($a, $key_path))[0] // '';
+                        my $b_val = (_traverse($b, $key_path))[0] // '';
+        
+                        warn "[DEBUG] a=$a_val, b=$b_val => cmp=" . $cmp->($a_val, $b_val) . "\n";
+        
+                        $cmp->($a_val, $b_val);
+                    } @$item;
+        
+                    push @next_results, \@sorted;
+                } else {
+                    push @next_results, $item;
+                }
+            }
+        
+            @results = @next_results;
+            next;
+        }
+
+        # support for empty
+        if ($part eq 'empty') {
+            @results = ();  # discard all results
+            next;
+        }
+
+        # support for values
+        if ($part eq 'values') {
+            @next_results = map {
+                ref $_ eq 'HASH' ? [ values %$_ ] : $_
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for flatten()
+        if ($part eq 'flatten()' || $part eq 'flatten') {
+            @next_results = map {
+                (ref $_ eq 'ARRAY') ? @$_ : ()
+            } @results;
+            @results = @next_results;
             next;
         }
 
@@ -478,7 +547,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.30
+Version 0.35
 
 =head1 SYNOPSIS
 
@@ -503,33 +572,31 @@ jq-like syntax — entirely within Perl, with no external binaries or XS modules
 
 =over 4
 
-=item * Pure Perl (no XS, no external binaries)
+=item * Pure Perl (no XS, no external binaries required)
 
-=item * Dot notation (e.g. .users[].name)
+=item * Dot notation traversal (e.g. .users[].name)
 
-=item * Optional key access with '?' (e.g. .nickname?)
+=item * Optional key access using '?' (e.g. .nickname?)
 
-=item * Array indexing and flattening (e.g. .users[0], .users[])
+=item * Array indexing and flattening (.users[0], .users[])
 
-=item * select(...) filters with ==, !=, <, >, and, or
+=item * Boolean filters via select(...) with ==, !=, <, >, and, or
 
-=item * Pipe-style query support (e.g. .[] | select(.age > 25) | .name)
+=item * Pipe-style query chaining using | operator
 
-=item * Built-in functions: length, keys, first, last, reverse, sort, unique, has
+=item * Built-in functions: length, keys, values, first, last, reverse, sort, sort_by, unique, has, group_by, join, count, empty
 
-=item * count function to return the number of results (v0.29+)
+=item * Supports map(...) and limit(n) style transformations
 
-=item * count function to count number of elements in an array
+=item * Interactive mode for exploring queries line-by-line
 
-=item * group_by(...) to group array items by a key
+=item * Command-line interface: C<jq-lite> (compatible with stdin or file)
 
-=item * Command-line interface: C<jq-lite>
-
-=item * Interactive mode for line-by-line query exploration
-
-=item * Decoder selection via C<--use> (JSON::PP, JSON::XS, etc)
+=item * Decoder selection via C<--use> (JSON::PP, JSON::XS, etc.)
 
 =item * Debug output via C<--debug>
+
+=item * List all functions with C<--help-functions>
 
 =back
 
@@ -548,8 +615,7 @@ Creates a new instance. Options may be added in future versions.
   my @results = $jq->run_query($json_text, $query);
 
 Runs a jq-like query against the given JSON string.
-
-The return value is a list of matched results. Each result is a Perl scalar
+Returns a list of matched results. Each result is a Perl scalar
 (string, number, arrayref, hashref, etc.) depending on the query.
 
 =head1 SUPPORTED SYNTAX
@@ -558,23 +624,48 @@ The return value is a list of matched results. Each result is a Perl scalar
 
 =item * .key.subkey
 
-=item * .array[0]
+=item * .array[0] (index access)
 
-=item * .array[] (flattening)
+=item * .array[] (flattening arrays)
 
-=item * .key? (optional access)
+=item * .key? (optional key access)
 
-=item * select(.key > 1 and .key2 == "foo")
+=item * select(.key > 1 and .key2 == "foo") (boolean filters)
 
-=item * group_by(.field)
+=item * group_by(.field) (group array items by key)
 
-=item * .key | count
+=item * sort_by(.key) (sort array of objects by key)
 
-=item * .[] | select(...) | count
+=item * .key | count (count items or fields)
 
-=item * .array | count
+=item * .[] | select(...) | count (combine flattening + filter + count)
 
-=item * Functions: length, keys, first, last, reverse, sort, unique, has
+=item * .array | map(.field) | join(", ")
+
+Concatenates array elements with a custom separator string.
+Example:
+
+  .users | map(.name) | join(", ")
+
+Results in:
+
+  "Alice, Bob, Carol"
+
+=item * values()
+
+Returns all values of a hash as an array.
+Example:
+
+  .profile | values
+
+=item * empty()
+
+Discards all output. Compatible with jq.
+Useful when only side effects or filtering is needed without output.
+
+Example:
+
+  .users[] | select(.age > 25) | empty
 
 =item * .[] as alias for flattening top-level arrays
 
@@ -589,6 +680,9 @@ C<jq-lite> is a CLI wrapper for this module.
   jq-lite -r '.users[].name' data.json
   jq-lite '.[] | select(.active == true) | .name' data.json
   jq-lite '.users[] | select(.age > 25) | count' data.json
+  jq-lite '.users | map(.name) | join(", ")'
+  jq-lite '.users[] | select(.age > 25) | empty'
+  jq-lite '.profile | values'
 
 =head2 Interactive Mode
 
@@ -601,6 +695,12 @@ You can then type queries line-by-line against the same JSON input.
 =head2 Decoder Selection and Debug
 
   jq-lite --use JSON::PP --debug '.users[0].name' data.json
+
+=head2 Show Supported Functions
+
+  jq-lite --help-functions
+
+Displays all built-in functions and their descriptions.
 
 =head1 REQUIREMENTS
 
@@ -627,3 +727,4 @@ Kawamura Shingo E<lt>pannakoota1@gmail.comE<gt>
 Same as Perl itself.
 
 =cut
+

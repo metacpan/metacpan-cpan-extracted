@@ -6,7 +6,7 @@ package LCC;
 
 use strict;
 @LCC::ISA = qw();
-$LCC::VERSION = '0.02';
+$LCC::VERSION = '0.03';
 
 # Use the internal modules that we always need
 
@@ -1218,9 +1218,9 @@ method beforehand.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-maintained by LNATION, <thisusedtobeanemail@gmail.com>
+maintained by LNATION, <email@lnation.org>
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 

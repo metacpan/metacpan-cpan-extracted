@@ -17,13 +17,14 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
-- ✅ Built-in functions: `length`, `keys`, `first`, `last`, `reverse`, `sort`, `unique`, `has`, `map`, `group_by`, `count` (v0.29+)
+- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_by`, `unique`, `has`, `map`, `group_by`, `count`, `join`, `empty()` 
 - ✅ Pipe-style queries with `.[]` (e.g. `.[] | select(...) | .name`) 
 - ✅ Command-line interface: `jq-lite`
 - ✅ Reads from STDIN or file
 - ✅ **Interactive mode** for exploring JSON line-by-line
 - ✅ `--use` option to select decoder (JSON::PP, JSON::XS, etc.)
 - ✅ `--debug` option to show active JSON module
+- ✅ `--help-functions` to list all built-in functions
 
 ---
 
@@ -38,7 +39,33 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 
 ---
 
+## 📆 Supported Functions
+
+| Function       | Description                                           |
+|----------------|-------------------------------------------------------|
+| `length`       | Get number of elements in an array or keys in a hash |
+| `keys`         | Extract sorted keys from a hash                      |
+| `values`       | Extract values from a hash (v0.34)                   |
+| `sort`         | Sort array items                                     |
+| `sort_by(key)` | Sort array of objects by field (v0.32)               |
+| `unique`       | Remove duplicate values                              |
+| `first`        | Get the first element of an array                    |
+| `last`         | Get the last element of an array                     |
+| `reverse`      | Reverse an array                                     |
+| `limit(n)`     | Limit array to first `n` elements                    |
+| `map(expr)`    | Map/filter values using a subquery                   |
+| `add`, `min`, `max`, `avg` | Numeric aggregation functions            |
+| `group_by(key)`| Group array items by field                           |
+| `count`        | Count total number of matching items                 |
+| `join(sep)`    | Join array elements with custom separator (v0.31+)   |
+| `empty()`      | Discard all results (compatible with jq) (v0.33+)    |
+| `flatten()`    | Flatten array one level deep (like `.[]`) (v0.35)    |
+
+---
+
 ## 📦 Installation
+
+### 🛠️ From Source (Manual Build)
 
 ```sh
 perl Makefile.PL
@@ -46,6 +73,34 @@ make
 make test
 make install
 ```
+
+### 🍺 Using Homebrew (macOS)
+
+```sh
+brew tap kawamurashingo/jq-lite
+brew install --HEAD jq-lite
+```
+
+> ℹ️ Requires Xcode Command Line Tools.  
+> If installation fails due to outdated tools, run:
+>
+> ```sh
+> sudo rm -rf /Library/Developer/CommandLineTools
+> sudo xcode-select --install
+> ```
+
+### 🐙 Portable Install Script (Linux/macOS)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kawamurashingo/JQ-Lite/main/install.sh | bash
+```
+
+> Installs to `$HOME/.local/bin` by default.  
+> Add the following to your shell config if not already in PATH:
+>
+> ```sh
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
 
 ---
 
@@ -70,13 +125,15 @@ cat users.json | jq-lite '.users[].name'
 jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite -r '.users[].name' users.json
 ```
-for windows
+
+For Windows:
+
 ```powershell
 type user.json | jq-lite ".users[].name"
 jq-lite -r ".users[].name" users.json
 ```
 
-> ⚠️ `jq-lite` is named to avoid conflict with the real `jq`.
+> ⚠️ `jq-lite` is named to avoid conflict with the original `jq`.
 
 ---
 
@@ -88,6 +145,7 @@ If you omit the query, `jq-lite` enters **interactive mode**, allowing you to ty
 jq-lite users.json
 ```
 ![JQ::Lite demo](images/jq_lite.gif)
+
 ```
 jq-lite interactive mode. Enter query (empty line to quit):
 > .users[0].name
@@ -107,7 +165,7 @@ jq-lite interactive mode. Enter query (empty line to quit):
 
 ### 🔍 Decoder selection and debug output
 
-If installed, the following JSON modules are checked and used in order of priority: `JSON::MaybeXS`, `Cpanel::JSON::XS`, `JSON::XS`, and `JSON::PP`. You can see which module is being used with the --debug option.
+If installed, the following JSON modules are checked and used in order of priority: `JSON::MaybeXS`, `Cpanel::JSON::XS`, `JSON::XS`, and `JSON::PP`. You can see which module is being used with the `--debug` option.
 
 ```bash
 $ jq-lite --debug .users[0].age users.json
@@ -124,7 +182,7 @@ $ jq-lite --use JSON::PP --debug .users[0].age users.json
 
 ---
 
-## 📘 Example Input
+### 📘 Example Input
 
 ```json
 {
@@ -144,6 +202,10 @@ $ jq-lite --use JSON::PP --debug .users[0].age users.json
         "active": false,
         "country": "JP"
       }
+    },
+    {
+      "name": "Carol",
+      "age": 35
     }
   ]
 }
@@ -158,12 +220,15 @@ jq-lite '.users[0] | keys' users.json
 jq-lite '.users[].nickname?' users.json
 jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite '.users[] | select(.profile.active == true) | .name' users.json
-jq-lite '.users | sort | reverse | first' users.json
+jq-lite '.users | sort_by(.age)' users.json
+jq-lite '.users | map(.name) | join(", ")' users.json
+jq-lite '.users[] | select(.age > 25) | empty' users.json
+jq-lite '.users[0] | values' users.json
 ```
 
 ---
 
-## 🧪 Testing
+## 🤮 Testing
 
 ```bash
 prove -l t/
@@ -188,3 +253,4 @@ This module is released under the same terms as Perl itself.
 **Kawamura Shingo**  
 📧 pannakoota1@gmail.com  
 🔗 [GitHub @kawamurashingo](https://github.com/kawamurashingo/JQ-Lite)
+

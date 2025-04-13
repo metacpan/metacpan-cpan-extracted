@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Credentials;
-$Mojolicious::Plugin::Credentials::VERSION = '0.006';
+$Mojolicious::Plugin::Credentials::VERSION = '0.007';
 use 5.020;
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -8,12 +8,12 @@ use Carp 'croak';
 use Crypt::Credentials 0.002;
 use File::Spec::Functions 'catdir';
 
-use Env qw/@MOJO_CREDENTIALS_KEYS $MOJO_CREDENTIALS_DIR/;
+use Env qw/$MOJO_CREDENTIALS_KEYS @MOJO_CREDENTIALS_KEYS $MOJO_CREDENTIALS_DIR/;
 
 sub _get_keys($self, $config) {
 	if ($config->{keys}) {
 		return @{ $config->{keys} };
-	} elsif (@MOJO_CREDENTIALS_KEYS) {
+	} elsif ($MOJO_CREDENTIALS_KEYS) {
 		return map { pack 'H*', $_ } @MOJO_CREDENTIALS_KEYS;
 	} else {
 		croak 'No credentials key given';
@@ -47,7 +47,7 @@ Mojolicious::Plugin::Credentials - A credentials store in mojo
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

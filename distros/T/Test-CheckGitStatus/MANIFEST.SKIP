@@ -1,0 +1,8 @@
+^mydev
+^cover_db
+^local
+^dev.sh
+^nytprof
+^nytprof.out
+^pod2htmd.tmp
+^gh-pages

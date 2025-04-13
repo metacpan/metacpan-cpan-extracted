@@ -1,11 +1,13 @@
-.gitignore
-Build.PL
 Changes
+lib/Data/Integer.pm
+Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README
-lib/Data/Integer.pm
+SECURITY.md
+SIGNATURE			Added here by Module::Build
 t/arith.t
 t/bitwise.t
 t/canon.t
@@ -16,4 +18,3 @@ t/marith.t
 t/pod_cvg.t
 t/pod_syn.t
 t/shift.t
-SIGNATURE    Added here by Module::Build

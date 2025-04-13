@@ -6,7 +6,7 @@ package LCC::Backend::textfile;
 
 use strict;
 @LCC::Backend::textfile::ISA = qw(LCC::Backend);
-$LCC::Backend::textfile::VERSION = '0.02';
+$LCC::Backend::textfile::VERSION = '0.03';
 
 # Default filename
 

@@ -6,7 +6,7 @@ package LCC::Documents;
 
 use strict;
 @LCC::Documents::ISA = qw(LCC);
-$LCC::Documents::VERSION = '0.02';
+$LCC::Documents::VERSION = '0.03';
 
 # Return true value for use
 

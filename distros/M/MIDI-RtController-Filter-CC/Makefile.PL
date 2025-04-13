@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.036000",
   "NAME" => "MIDI::RtController::Filter::CC",
   "PREREQ_PM" => {
+    "IO::Async::Timer::Countdown" => 0,
     "IO::Async::Timer::Periodic" => 0,
     "Iterator::Breathe" => 0,
     "MIDI::RtController" => "0.0602",
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0501",
+  "VERSION" => "0.0601",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
+  "IO::Async::Timer::Countdown" => 0,
   "IO::Async::Timer::Periodic" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

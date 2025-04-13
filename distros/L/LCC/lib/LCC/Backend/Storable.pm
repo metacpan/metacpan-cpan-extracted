@@ -6,7 +6,7 @@ package LCC::Backend::Storable;
 
 use strict;
 @LCC::Backend::Storable::ISA = qw(LCC::Backend);
-$LCC::Backend::Storable::VERSION = '0.02';
+$LCC::Backend::Storable::VERSION = '0.03';
 
 # Use the modules that we always need
 

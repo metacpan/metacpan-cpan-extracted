@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA::VXI11;
-$Lab::Moose::Connection::VISA::VXI11::VERSION = '3.920';
+$Lab::Moose::Connection::VISA::VXI11::VERSION = '3.930';
 #ABSTRACT: VXI-11 frontend to National Instruments' VISA library.
 
 use v5.20;
@@ -49,7 +49,7 @@ Lab::Moose::Connection::VISA::VXI11 - VXI-11 frontend to National Instruments' V
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Creates a VXI-11 resource name for the VISA backend.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
 

@@ -6,7 +6,7 @@ package LCC::Backend::DBI::mysql;
 
 use strict;
 @LCC::Backend::DBI::mysql::ISA = qw(LCC::Backend::DBI);
-$LCC::Backend::DBI::mysql::VERSION = '0.02';
+$LCC::Backend::DBI::mysql::VERSION = '0.03';
 
 # Use the internal modules that we always need
 

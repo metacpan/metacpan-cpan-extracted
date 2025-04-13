@@ -21,6 +21,7 @@ meta-spec:
   version: '1.4'
 name: MIDI-RtController-Filter-CC
 requires:
+  IO::Async::Timer::Countdown: '0'
   IO::Async::Timer::Periodic: '0'
   Iterator::Breathe: '0'
   MIDI::RtController: '0.0602'
@@ -34,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-CC
   repository: https://github.com/ology/MIDI-RtController-Filter-CC.git
-version: '0.0501'
+version: '0.0601'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

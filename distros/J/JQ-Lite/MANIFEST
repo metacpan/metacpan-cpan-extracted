@@ -1,23 +1,30 @@
+bin/jq-lite
 Changes
 lib/JQ/Lite.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
-bin/jq-lite
+t/aggregate.t
+t/arithmetic.t
 t/basic.t
 t/contains.t
-t/first_last.t
-t/friends.t
-t/has.t
-t/limit.t
-t/match_i.t
-t/match.t
-t/reverse.t
-t/sort_unique.t
-t/map.t
-t/arithmetic.t
-t/pipe_select_name.t
-t/group_by.t
 t/count.t
+t/empty.t
+t/first_last.t
+t/flatten.t
+t/friends.t
+t/group_by.t
+t/has.t
+t/join.t
+t/limit.t
+t/map.t
+t/match.t
+t/match_i.t
+t/pipe_select_name.t
+t/reverse.t
+t/sort_by.t
+t/sort_unique.t
+t/values.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

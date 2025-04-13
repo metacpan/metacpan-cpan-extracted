@@ -14,7 +14,9 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
+
+$| = 1;
 
 # Constructor.
 sub new {
@@ -37,28 +39,30 @@ sub run {
 	# Process arguments.
 	$self->{'_opts'} = {
 		'h' => 0,
+		'n' => undef,
 		'o' => 'xml',
 		'r' => 0,
+		'v' => 0,
 	};
-	if (! getopts('ho:r', $self->{'_opts'})
+	if (! getopts('hn:o:rv', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
-		|| @ARGV < 4) {
+		|| @ARGV < 3) {
 
-		print STDERR "Usage: $0 [-h] [-o format] [-r] [--version] marc_xml_file field subfield value\n";
-		print STDERR "\t-h\t\tPrint help.\n";
-		print STDERR "\t-o format\tOutput MARC format. Possible formats are ascii, xml.\n";
-		print STDERR "\t-r\t\tUse value as Perl regexp.\n";
-		print STDERR "\t--version\tPrint version.\n";
-		print STDERR "\tmarc_xml_file\tMARC XML file.\n";
-		print STDERR "\tfield\t\tMARC field.\n";
-		print STDERR "\tsubfield\tMARC subfield.\n";
-		print STDERR "\tvalue\t\tMARC field/subfield value to filter.\n";
+		$self->_usage;
 		return 1;
 	}
 	$self->{'_marc_xml_file'} = shift @ARGV;
 	$self->{'_marc_field'} = shift @ARGV;
-	$self->{'_marc_subfield'} = shift @ARGV;
-	$self->{'_marc_value'} = decode_utf8(shift @ARGV);
+	if ($self->{'_marc_field'} ne 'leader') {
+		$self->{'_marc_subfield'} = shift @ARGV;
+	}
+	$self->{'_marc_value'} = shift @ARGV;
+	if (! defined $self->{'_marc_value'}) {
+		$self->_usage;
+		return 1;
+	} else {
+		$self->{'_marc_value'} = decode_utf8($self->{'_marc_value'});
+	}
 
 	# Check output format.
 	if (none { $self->{'_opts'}->{'o'} eq $_ } @OUTPUT_FORMATS) {
@@ -68,8 +72,13 @@ sub run {
 	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
 	my @ret;
 	my $num = 1;
+	$self->{'_num_found'} = 0;
 	my $previous_record;
 	while (1) {
+		if (defined $self->{'_opts'}->{'n'} && int($self->{'_opts'}->{'n'}) == $self->{'_num_found'}) {
+			last;
+		}
+
 		my $record = eval {
 			$marc_file->next;
 		};
@@ -88,26 +97,21 @@ sub run {
 		}
 		$previous_record = $record;
 
-		my @fields = $record->field($self->{'_marc_field'});
-		foreach my $field (@fields) {
-			my @subfield_values = $field->subfield($self->{'_marc_subfield'});
-			foreach my $subfield_value (@subfield_values) {
-				if (defined $subfield_value) {
-					my $match = 0;
-					if ($self->{'_opts'}->{'r'}) {
-						if ($subfield_value =~ m/$self->{'_marc_value'}/ms) {
-							$match = 1;
-						}
-					} else {
-						if ($subfield_value eq $self->{'_marc_value'}) {
-							$match = 1;
-						}
-					}
-					if ($match) {
-						push @ret, $record;
-					}
+		if ($self->{'_marc_field'} eq 'leader') {
+			my $leader = $record->leader;
+			push @ret, $self->_match($record, $leader);
+		} else {
+			my @fields = $record->field($self->{'_marc_field'});
+			foreach my $field (@fields) {
+				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+				foreach my $subfield_value (@subfield_values) {
+					push @ret, $self->_match($record, $subfield_value);
 				}
 			}
+		}
+
+		if ($self->{'_opts'}->{'v'}) {
+			print STDERR '.';
 		}
 
 		$num++;
@@ -137,6 +141,46 @@ sub run {
 	}
 	
 	return 0;
+}
+
+sub _match {
+	my ($self, $record, $value) = @_;
+
+	if (! defined $value) {
+		return ();
+	}
+
+	if ($self->{'_opts'}->{'r'}) {
+		if ($value =~ m/$self->{'_marc_value'}/ms) {
+			$self->{'_num_found'}++;
+			return ($record);
+		}
+	} else {
+		if ($value eq $self->{'_marc_value'}) {
+			$self->{'_num_found'}++;
+			return ($record);
+		}
+	}
+
+	return ();
+}
+
+sub _usage {
+	my $self = shift;
+
+	print STDERR "Usage: $0 [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file field [subfield] value\n";
+	print STDERR "\t-h\t\tPrint help.\n";
+	print STDERR "\t-n num\t\tNumber of records to output (default value is all records).\n";
+	print STDERR "\t-o format\tOutput MARC format. Possible formats are ascii, xml.\n";
+	print STDERR "\t-r\t\tUse value as Perl regexp.\n";
+	print STDERR "\t-v\t\tVerbose mode.\n";
+	print STDERR "\t--version\tPrint version.\n";
+	print STDERR "\tmarc_xml_file\tMARC XML file.\n";
+	print STDERR "\tfield\t\tMARC field (field number or 'leader' string).\n";
+	print STDERR "\tsubfield\tMARC subfield (optional in case of leader).\n";
+	print STDERR "\tvalue\t\tMARC field/subfield value to filter.\n";
+
+	return;
 }
 
 1;
@@ -457,12 +501,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

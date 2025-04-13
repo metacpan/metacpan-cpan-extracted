@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0601';
 
 use v5.36;
 
 use strictures 2;
+use IO::Async::Timer::Countdown ();
 use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
@@ -203,6 +204,38 @@ sub stair_step ($self, $device, $dt, $event) {
     return 0;
 }
 
+
+sub ramp ($self, $device, $dt, $event) {
+    return 0 if $self->running;
+    $self->running(1);
+
+    my $value = $self->range_bottom;
+
+    $self->rtc->loop->add(
+        IO::Async::Timer::Countdown->new(
+            delay     => $self->time_step,
+            on_expire => sub {
+                my $c = shift;
+
+                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                $self->rtc->send_it($cc);
+
+                $value += $self->range_step;
+
+                if ($value > $self->range_top) {
+                    $c->stop;
+                    $self->running(0);
+                }
+                else {
+                    $c->start;
+                }
+            },
+        )->start
+    );
+
+    return 0;
+}
+
 1;
 
 __END__
@@ -217,7 +250,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0501
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -247,6 +280,9 @@ version 0.0501
 
 C<MIDI::RtController::Filter::CC> is a (growing) collection of
 control-change based L<MIDI::RtController> filters.
+
+Passing C<all> to the C<add_filter> method means that any MIDI event
+will cause this filter to be triggered.
 
 =head2 Making filters
 
@@ -400,9 +436,6 @@ Return a new C<MIDI::RtController::Filter::CC> object.
 This filter sets a single B<control> change message, over the MIDI
 B<channel> once.
 
-Passing C<all> means that any MIDI event will cause this filter to be
-triggered.
-
 =head2 breathe
 
   $control->add_filter('breathe', all => $filter->curry::breathe);
@@ -427,9 +460,6 @@ until B<stop> is seen.
 The B<initial_point> is used as the first CC# message, then the
 randomization takes over.
 
-Passing C<all> means that any MIDI event will cause this filter to be
-triggered.
-
 =head2 stair_step
 
   $control->add_filter('stair_step', all => $filter->curry::stair_step);
@@ -440,8 +470,13 @@ from that number successively, sending the value as a B<control>
 change message, over the MIDI B<channel>, every iteration, until
 B<stop> is seen.
 
-Passing C<all> means that any MIDI event will cause this filter to be
-triggered.
+=head2 ramp
+
+  $control->add_filter('ramp', all => $filter->curry::ramp);
+
+This filter ramps-up (or down) a B<control> change message, over the
+MIDI B<channel>, from B<range_bottom> until the B<range_top> is
+reached.
 
 =head1 SEE ALSO
 

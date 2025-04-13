@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_SMB;
-$Lab::Moose::Instrument::RS_SMB::VERSION = '3.920';
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.930';
 #ABSTRACT: Rohde & Schwarz SMB Signal Generator
 
 use v5.20;
@@ -180,7 +180,7 @@ Lab::Moose::Instrument::RS_SMB - Rohde & Schwarz SMB Signal Generator
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -227,7 +227,7 @@ Get/Set output frequency (Hz).
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt

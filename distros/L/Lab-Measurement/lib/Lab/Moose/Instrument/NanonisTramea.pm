@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.920';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.930';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -2501,7 +2501,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 SYNOPSIS
 
@@ -2596,7 +2596,7 @@ C<float32_array> refers to float32 array binary.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Andreas K. Huettel, Erik Fabrizzi, Simon Reinhardt
             2023       Erik Fabrizzi

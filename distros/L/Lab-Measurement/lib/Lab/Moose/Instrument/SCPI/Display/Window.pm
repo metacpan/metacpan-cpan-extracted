@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Display::Window;
-$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.920';
+$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.930';
 #ABSTRACT: Role for the SCPI DISPlay:WINDow subsystem
 
 use v5.20;
@@ -47,7 +47,7 @@ Lab::Moose::Instrument::SCPI::Display::Window - Role for the SCPI DISPlay:WINDow
 
 =head1 VERSION
 
-version 3.920
+version 3.930
 
 =head1 METHODS
 
@@ -65,7 +65,7 @@ Sets the amplitude value of the reference level for the y-axis.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
 

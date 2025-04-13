@@ -6,7 +6,7 @@ package LCC::Documents::queue;
 
 use strict;
 @LCC::Documents::queue::ISA = qw(LCC::Documents);
-$LCC::Documents::queue::VERSION = '0.01';
+$LCC::Documents::queue::VERSION = '0.03';
 
 # Return true value for use
 

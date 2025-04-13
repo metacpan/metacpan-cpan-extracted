@@ -6,7 +6,7 @@ package LCC::Documents::filesystem;
 
 use strict;
 @LCC::Documents::filesystem::ISA = qw(LCC::Documents);
-$LCC::Documents::filesystem::VERSION = '0.01';
+$LCC::Documents::filesystem::VERSION = '0.03';
 
 # Use the external modules that we need
 

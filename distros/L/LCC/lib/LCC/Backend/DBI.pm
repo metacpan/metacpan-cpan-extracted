@@ -6,7 +6,7 @@ package LCC::Backend::DBI;
 
 use strict;
 @LCC::Backend::DBI::ISA = qw(LCC::Backend);
-$LCC::Backend::DBI::VERSION = '0.02';
+$LCC::Backend::DBI::VERSION = '0.03';
 
 # Make sure we have the external modules that we always need
 

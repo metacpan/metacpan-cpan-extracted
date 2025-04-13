@@ -2,7 +2,7 @@ NAME
     marc-filter - Script to filter records in MARC dataset.
 
 SYNOPSIS
-     marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field subfield value
+     marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field [subfield] value
 
 DESCRIPTION
     It supports MARC XML files now.
@@ -34,13 +34,17 @@ ARGUMENTS
 
             MARC field.
 
+            Field number or 'leader' string.
+
     *       "subfield"
 
             MARC subfield.
 
+            It's optional in case of 'leader'.
+
     *       "value"
 
-            MARC field/subfield value to filter.
+            MARC field/subfield or leader value to filter.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-MARC-Filter>
@@ -51,10 +55,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2024 Michal Josef Špaček
+    © 2022-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 
