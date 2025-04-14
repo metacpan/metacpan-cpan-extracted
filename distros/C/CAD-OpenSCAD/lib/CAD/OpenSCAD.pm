@@ -8,7 +8,7 @@ use CAD::OpenSCAD::Math;
 
 our $Math=new CAD::OpenSCAD::Math;
 
-our $VERSION='0.12.2';
+our $VERSION='0.13';
 
 =head1 NAME
 

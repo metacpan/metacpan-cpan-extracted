@@ -5,12 +5,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 57;
 
 my $class;
 
 BEGIN {
-    $class = 'Math::BigInt';
+    $class = 'Math::BigRat';
     use_ok($class);
 }
 
@@ -22,7 +22,7 @@ while (<DATA>) {
     my ($x_str, $n_str, $d_str) = split /:/;
     my $test;
 
-    # test fparts()
+    # test fparts() in list context
 
     $test = qq|\$x = $class -> new("$x_str");|
           . qq| (\$n, \$d) = \$x -> fparts();|;
@@ -41,6 +41,23 @@ while (<DATA>) {
         is($x, $x_str, "input is unmodified");
     };
 
+    # test fparts() in scalar context
+
+    $test = qq|\$x = $class -> new("$x_str");|
+          . qq| \$n = \$x -> fparts();|;
+
+    subtest $test => sub {
+        plan tests => 3;
+
+        my $x = $class -> new($x_str);
+        my $n = $x -> fparts();
+
+        is(ref($n), $class, "class of numerator");
+
+        is($n, $n_str, "value of numerator");
+        is($x, $x_str, "input is unmodified");
+    };
+
     # test numerator()
 
     $test = qq|\$x = $class -> new("$x_str");|
@@ -52,7 +69,7 @@ while (<DATA>) {
         my $x = $class -> new($x_str);
         my $n = $x -> numerator();
 
-        is(ref($n), $class, "class of numerator");
+        is(ref($n), "Math::BigInt", "class of numerator");
 
         is($n, $n_str, "value of numerator");
         is($x, $x_str, "input is unmodified");
@@ -69,7 +86,7 @@ while (<DATA>) {
         my $x = $class -> new($x_str);
         my $d = $x -> denominator();
 
-        is(ref($d), $class, "class of denominator");
+        is(ref($d), "Math::BigInt", "class of denominator");
 
         is($d, $d_str, "value of denominator");
         is($x, $x_str, "input is unmodified");
@@ -90,3 +107,8 @@ inf:inf:1
 1:1:1
 3:3:1
 30:30:1
+
+-31400:-31400:1
+-157/50:-157:50
+157/50:157:50
+31400:31400:1

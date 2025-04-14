@@ -1,5 +1,8 @@
 Revision history for Perl module App::Module::Lister
 
+1.003 2025-04-13T22:42:11Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.002 2025-01-06T06:18:17Z
 	* refresh distro and move to BRIANDFOY
 

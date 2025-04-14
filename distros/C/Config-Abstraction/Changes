@@ -1,5 +1,9 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.10	Sun Apr 13 21:45:12 EDT 2025
+	Check with JSON::Parse first
+	Use Data::Reuse, but note RT#100461
+
 0.09	Sat Apr 12 15:48:48 EDT 2025
 	Better fix for old Perls
 

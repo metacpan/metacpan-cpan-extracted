@@ -10,7 +10,7 @@ App::Greple::tee - Modul zum Ersetzen von übereinstimmendem Text durch das Erge
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ Kombinieren Sie eine Folge von Nicht-Leerzeilen zu einer einzigen Zeile, bevor S
 
 Kombiniert zwei oder mehr aufeinanderfolgende Zeilenumbruchzeichen zu einem.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-Die Option B<--offload> von L<teip(1)> ist in dem anderen Modul B<-Mline> implementiert.
+Die Option B<--offload> von L<teip(1)> ist in dem anderen Modul L<App::Greple::L> (B<-ML>) implementiert.
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-Sie können auch das Modul B<line> verwenden, um nur geradzahlige Zeilen zu verarbeiten.
+Sie können das Modul B<-ML> auch verwenden, um nur geradzahlige Zeilen zu verarbeiten, wie folgt.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Dann konvertieren Sie das CR-Zeichen mit dem Befehl L<tr(1)> oder ähnlichem in 
 
 Stellen Sie sich eine Situation vor, in der Sie nach Zeichenfolgen aus Nicht-Kopfzeilen suchen wollen. Sie könnten zum Beispiel nach Docker-Image-Namen aus dem Befehl C<docker image ls> suchen, aber die Kopfzeile weglassen. Sie können dies mit folgendem Befehl tun.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Die Option C<-Mline -L 2:> ruft die vorletzte Zeile ab und sendet sie an den Befehl C<grep perl>. Die Option --discrete ist erforderlich, weil sich die Anzahl der Ein- und Ausgabezeilen ändert, aber da der Befehl nur einmal ausgeführt wird, gibt es keine Leistungseinbußen.
+Mit der Option C<-ML 2:> werden die vorletzten Zeilen abgerufen und an den Befehl C<grep perl> gesendet. Die Option --discrete ist erforderlich, weil sich die Anzahl der Ein- und Ausgabezeilen ändert, aber da der Befehl nur einmal ausgeführt wird, gibt es keine Leistungseinbußen.
 
 Wenn Sie versuchen, dasselbe mit dem Befehl B<teip> zu tun, gibt C<teip -l 2- -- grep> einen Fehler aus, weil die Anzahl der Ausgabezeilen geringer ist als die Anzahl der Eingabezeilen. Das erhaltene Ergebnis ist jedoch unproblematisch.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

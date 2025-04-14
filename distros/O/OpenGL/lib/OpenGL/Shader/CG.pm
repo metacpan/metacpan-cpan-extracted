@@ -14,9 +14,9 @@ use Carp;
 
 use strict;
 use warnings;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-our $SHADER_VER;
+our $SHADER_VER = '1.0';
 our $DESCRIPTION = qq
 {nVidia's Cg Shader Language};
 
@@ -90,11 +90,10 @@ sub new
   my $ver = TypeVersion();
   return undef if (!$ver);
 
-  my $self = OpenGL::Shader::Objects->new(@_);
+  my $self = OpenGL::Shader::Objects->new('CG');
   return undef if (!$self);
   bless($self,$class);
 
-  $self->{type} = 'CG';
   $self->{version} = $ver;
   $self->{description} = $DESCRIPTION;
 

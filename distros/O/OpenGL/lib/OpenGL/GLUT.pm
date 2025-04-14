@@ -28,6 +28,8 @@ our @const = qw(
    GLUT_BITMAP_TIMES_ROMAN_10
    GLUT_BITMAP_TIMES_ROMAN_24
    GLUT_BLUE
+   GLUT_COMPATIBILITY_PROFILE
+   GLUT_CORE_PROFILE
    GLUT_CURSOR_BOTTOM_LEFT_CORNER
    GLUT_CURSOR_BOTTOM_RIGHT_CORNER
    GLUT_CURSOR_BOTTOM_SIDE
@@ -51,12 +53,14 @@ our @const = qw(
    GLUT_CURSOR_TOP_SIDE
    GLUT_CURSOR_UP_DOWN
    GLUT_CURSOR_WAIT
+   GLUT_DEBUG
    GLUT_DEPTH
    GLUT_DISPLAY_MODE_POSSIBLE
    GLUT_DOUBLE
    GLUT_DOWN
    GLUT_ELAPSED_TIME
    GLUT_ENTERED
+   GLUT_FORWARD_COMPATIBLE
    GLUT_FULLY_COVERED
    GLUT_FULLY_RETAINED
    GLUT_GAME_MODE_ACTIVE
@@ -81,6 +85,7 @@ our @const = qw(
    GLUT_INIT_WINDOW_WIDTH
    GLUT_INIT_WINDOW_X
    GLUT_INIT_WINDOW_Y
+   GLUT_KEY_DELETE
    GLUT_KEY_DOWN
    GLUT_KEY_END
    GLUT_KEY_F1
@@ -210,6 +215,9 @@ our @func = qw(
    glutIdleFunc
    glutIgnoreKeyRepeat
    glutInit
+   glutInitContextFlags
+   glutInitContextProfile
+   glutInitContextVersion
    glutInitDisplayMode
    glutInitDisplayString
    glutInitWindowPosition

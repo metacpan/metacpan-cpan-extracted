@@ -10,7 +10,7 @@ App::Greple::tee - module permettant de remplacer le texte correspondant par le 
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ Combiner une séquence de lignes non vides en une seule ligne avant de les passe
 
 Combine deux ou plusieurs caractères de retour à la ligne consécutifs en un seul.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-L'option B<--offload> de L<teip(1)> est implémentée dans le module différent B<-Mline>.
+L'option B<--offload> de L<teip(1)> est implémentée dans le module L<App::Greple::L> (B<-ML>).
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-Vous pouvez également utiliser le module B<line> pour ne traiter que les lignes paires comme suit.
+Vous pouvez également utiliser le module B<-ML> pour ne traiter que les lignes paires, comme suit.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Ensuite, convertissez le caractère CR en NL à l'aide de la commande L<tr(1)> o
 
 Considérons une situation dans laquelle vous souhaitez rechercher des chaînes de caractères dans des lignes autres que l'en-tête. Par exemple, vous pouvez rechercher les noms d'images Docker de la commande C<docker image ls>, mais laisser la ligne d'en-tête. Vous pouvez le faire à l'aide de la commande suivante.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-L'option C<-Mline -L 2:> récupère l'avant-dernière ligne et l'envoie à la commande C<grep perl>. L'option --discrete est nécessaire parce que le nombre de lignes d'entrée et de sortie change, mais comme la commande n'est exécutée qu'une seule fois, il n'y a pas d'inconvénient en termes de performances.
+L'option C<-ML 2:> récupère l'avant-dernière ligne et l'envoie à la commande C<grep perl>. L'option --discrete est nécessaire car le nombre de lignes d'entrée et de sortie change, mais comme la commande n'est exécutée qu'une seule fois, il n'y a pas d'inconvénient en termes de performances.
 
 Si vous essayez de faire la même chose avec la commande B<teip>, C<teip -l 2- -- grep> donnera une erreur parce que le nombre de lignes de sortie est inférieur au nombre de lignes d'entrée. Le résultat obtenu ne pose cependant aucun problème.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

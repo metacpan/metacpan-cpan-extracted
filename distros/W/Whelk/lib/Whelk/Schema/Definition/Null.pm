@@ -1,18 +1,13 @@
 package Whelk::Schema::Definition::Null;
-$Whelk::Schema::Definition::Null::VERSION = '1.03';
+$Whelk::Schema::Definition::Null::VERSION = '1.04';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 sub openapi_dump
 {
 	my ($self, $openapi_obj, %hints) = @_;
 
-	my $res = {
-		type => 'null',
-	};
-
-	if (defined $self->description) {
-		$res->{description} = $self->description;
-	}
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'null';
 
 	return $res;
 }

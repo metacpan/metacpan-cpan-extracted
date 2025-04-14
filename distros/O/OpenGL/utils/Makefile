@@ -1,22 +1,17 @@
 #!make
 
 # Default values for this Makefile
-GLUT_DEF=HAVE_FREEGLUT
-GLUT_LIB=-lglut
-
-# Key OpenGL compile/link locations
-INC=-I/usr/include -I/usr/X11R6/include -I/usr/local/include -I/usr/openwin/include
-LIBS=-L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib -L/usr/openwin/lib -L/usr/lib/xorg/modules -L/usr/X11R6/lib/modules -L/usr/lib/xorg/modules/extensions -L/usr/X11R6/lib/modules/extensions
+DEF = "ERROR: no DEF given. Please run: 'perl Makefile.PL verbose' and report result"
+INC = "ERROR: no INC given. Please run: 'perl Makefile.PL verbose' and report result"
+LIB = "ERROR: no LIB given. Please run: 'perl Makefile.PL verbose' and report result"
 
 # Compile command
 CC=cc
-CCFLAGS=${INC} -D${GLUT_DEF}
+CCFLAGS=$(INC) $(DEF)
 
 # Link command
 LINK=cc
-LDFLAGS=${LIBS} -lGL ${GLUT_LIB}
-EXTRALIBS=-lGLU -lXi -lXmu -lXext -lX11 -lm
-
+LDFLAGS=$(LIB)
 
 all: glversion.txt
 
@@ -24,13 +19,11 @@ glversion.txt: glversion
 	./glversion > glversion.txt
 
 glversion: glversion.o
-	${LINK} glversion.o ${LDFLAGS} ${EXTRALIBS} -o glversion
+	$(LINK) glversion.o $(LDFLAGS) -o glversion
 	chmod u+x glversion
 
 clean:
-	rm -f glversion.txt
-	rm -f glversion
-	rm -f glversion.o
+	rm -f glversion.txt glversion glversion.o
 
 .c.o:
-	${CC} ${CCFLAGS} -c $<
+	$(CC) $(CCFLAGS) -c $<

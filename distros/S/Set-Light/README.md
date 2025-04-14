@@ -4,7 +4,7 @@ Set::Light - (memory efficient) unordered set of strings
 
 # VERSION
 
-version 0.95
+version 0.96
 
 # SYNOPSIS
 
@@ -160,7 +160,7 @@ This was added in v0.91.
 
 # SEE ALSO
 
-[Set::Object](https://metacpan.org/pod/Set::Object), [Set::Scalar](https://metacpan.org/pod/Set::Scalar).
+[Set::Object](https://metacpan.org/pod/Set%3A%3AObject), [Set::Scalar](https://metacpan.org/pod/Set%3A%3AScalar).
 
 # SOURCE
 
@@ -180,13 +180,11 @@ feature.
 
 Tels <nospam-abuse@bloodgate.com>
 
-# CONTRIBUTOR
-
-Robert Rothenberg <rrwo@cpan.org>
+The current maintainer is Robert Rothenberg <rrwo@cpan.org>.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2008, 2019-2021 by Tels.
+This software is copyright (c) 2004-2008, 2019-2021, 2025 by Tels.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

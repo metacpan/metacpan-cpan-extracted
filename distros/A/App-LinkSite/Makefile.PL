@@ -21,7 +21,7 @@ WriteMakefile(
         'File::Find' => 0,
         'File::ShareDir' => 0,
         'FindBin' => 0,
-        'Feature::Compat::Class' => 0.06,
+        'Feature::Compat::Class' => 0.07,
         ($^V < v5.38 ? ('Object::Pad' => 0) : ()),
     },
     EXE_FILES    => [ 'bin/linksite' ],

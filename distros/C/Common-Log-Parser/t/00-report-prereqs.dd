@@ -28,7 +28,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '5.57',
-                                      'perl' => 'v5.14.0',
+                                      'experimental' => '0',
+                                      'perl' => 'v5.20.0',
                                       'warnings' => '0'
                                     }
                     },

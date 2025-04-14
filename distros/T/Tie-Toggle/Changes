@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Toggle
 
+1.087 2025-04-13T23:42:25Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.086 2025-01-04T05:08:54Z
 	* refresh distro and move to BRIANDFOY
 

@@ -1,4 +1,17 @@
 Revision history for Common-Log-Parser:
 
+v0.2.0    2025-04-13 17:37:41+01:00 Europe/London
+  [Incompatible Changes]
+  - The minimum Perl version is now v5.20.
+
+  [Documentation]
+  - Fixed typo in SEE ALSO.
+
+  - Added a security policy.
+
+  - Update copyright year.
+
+  - Documented minimum Perl version.
+
 v0.1.0    2024-02-09 15:10:37+00:00 Europe/London
   - Initial version released.

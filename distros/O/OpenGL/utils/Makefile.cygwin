@@ -1,23 +1,21 @@
 #!make
 # This Makefile was developed with GNU make on cygwin.
 
+DEF = "ERROR: no DEF given. Please run: 'perl Makefile.PL verbose' and report result"
+INC = "ERROR: no INC given. Please run: 'perl Makefile.PL verbose' and report result"
+LIB = "ERROR: no LIB given. Please run: 'perl Makefile.PL verbose' and report result"
+
 CC=gcc
 LINK=g++
 
 # For FreeGLUT over WGL
-CCFLAGS=-DWIN32 -DHAVE_FREEGLUT -I/usr/include/opengl
-LDFLAGS=-L../FreeGLUT -lopengl32 -lglu32 -lfreeglut
-
-# For FreeGLUT over GLX (set default for now)
-#### CCFLAGS=-DHAVE_FREEGLUT
-#### LDFLAGS=-lGL -lglut
+CCFLAGS=-DWIN32 $(INC) $(DEF)
+LDFLAGS=$(LIB)
 
 all: glversion.txt
 
 clean:
-	rm -f glversion.txt
-	rm -f glversion.exe
-	rm -f glversion.o
+	rm -f glversion.txt glversion glversion.o
 
 glversion.txt: glversion
 	./$< > $@

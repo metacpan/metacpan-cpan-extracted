@@ -41,7 +41,7 @@ sub go {
     glutKeyboardFunc(\&cb_keyboard);
 
     # Shader program
-    $shader      = new OpenGL::Shader('GLSL');
+    $shader      = OpenGL::Shader->new('GLSL');
     die "This program requires support for GLSL shaders.\n" unless $shader;
 
     my $fragment = fragment_shader();

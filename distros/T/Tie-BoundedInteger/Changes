@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::BoundedInteger
 
+1.075 2025-04-13T20:47:57Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.074 2025-01-04T05:21:45Z
 	* refresh distro and move to BRIANDFOY
 

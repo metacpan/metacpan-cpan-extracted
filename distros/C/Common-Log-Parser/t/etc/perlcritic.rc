@@ -1,2 +1,8 @@
+; -*- conf -*-
+
 [TestingAndDebugging::ProhibitNoStrict]
 allow = refs
+
+; Perl::Critic does not know about subroutine signatures
+[Subroutines::ProhibitSubroutinePrototypes]
+severity = 1

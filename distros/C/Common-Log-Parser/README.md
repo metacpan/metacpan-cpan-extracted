@@ -4,7 +4,7 @@ Common::Log::Parser - Parse the common log format lines used by Apache
 
 # VERSION
 
-version v0.1.0
+version v0.2.0
 
 # SYNOPSIS
 
@@ -37,7 +37,13 @@ It does not attempt to parse or unescape the contents. Surrounding brackets or q
 - [Apache::Log::Parser](https://metacpan.org/pod/Apache%3A%3ALog%3A%3AParser)
 - [Apache::ParseLog](https://metacpan.org/pod/Apache%3A%3AParseLog)
 - [ApacheLog::Parser](https://metacpan.org/pod/ApacheLog%3A%3AParser)
-- [Regexp::Long::Common](https://metacpan.org/pod/Regexp%3A%3ALong%3A%3ACommon)
+- [Regexp::Log::Common](https://metacpan.org/pod/Regexp%3A%3ALog%3A%3ACommon)
+
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.20 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 # SOURCE
 
@@ -53,6 +59,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -61,7 +72,7 @@ The initial development of this module was partially supported by Science Photo 
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Robert Rothenberg.
+This software is Copyright (c) 2024-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

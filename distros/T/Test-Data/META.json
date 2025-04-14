@@ -42,7 +42,8 @@
          "requires" : {
             "Test::Builder" : "0",
             "Test::Builder::Tester" : "0",
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -58,6 +59,6 @@
          "web" : "https://github.com/briandfoy/test-data"
       }
    },
-   "version" : "1.247",
+   "version" : "1.248",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -37,7 +37,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -50,6 +51,6 @@
          "web" : "https://github.com/briandfoy/tie-toggle"
       }
    },
-   "version" : "1.086",
+   "version" : "1.087",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

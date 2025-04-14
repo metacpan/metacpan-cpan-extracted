@@ -71,11 +71,11 @@ class HTTP::Tiny::Daemon {
       die "The HTTP response \$res must be defined.";
     }
     
-    my $content = $res->content;
+    my $content = $res->content_v0;
     
     my $chunked = 0;
     
-    my $status = $res->status;
+    my $status = $res->code;
     
     my $message = $res->message;
     
@@ -129,7 +129,7 @@ class HTTP::Tiny::Daemon {
     
     my $res = new HTTP::Tiny::Message::Response;
     
-    $res->{status} = $status;
+    $res->{code} = $status;
     
     my $status_message = $res->message;
     

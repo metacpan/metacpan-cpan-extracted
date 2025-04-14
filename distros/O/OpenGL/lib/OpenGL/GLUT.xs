@@ -1570,6 +1570,40 @@ glutCloseFunc(handler=0, ...)
 #endif
 	}
 
+#//# glutInitContextVersion($majorVersion, $minorVersion);
+void
+glutInitContextVersion(majorVersion, minorVersion)
+	int majorVersion
+	int minorVersion
+	CODE:
+	{
+#if defined HAVE_FREEGLUT
+		glutInitContextVersion(majorVersion, minorVersion);
+#endif
+	}
+
+#//# glutInitContextFlags($flags);
+void
+glutInitContextFlags(flags)
+	int flags
+	CODE:
+	{
+#if defined HAVE_FREEGLUT
+		glutInitContextFlags(flags);
+#endif
+	}
+
+#//# glutInitContextProfile($profile);
+void
+glutInitContextProfile(profile)
+	int profile
+	CODE:
+	{
+#if defined HAVE_FREEGLUT
+		glutInitContextProfile(profile);
+#endif
+	}
+
 BOOT:
 {
    HV *stash = gv_stashpvn("OpenGL::GLUT", strlen("OpenGL::GLUT"), TRUE);

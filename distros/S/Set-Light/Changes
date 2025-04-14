@@ -1,5 +1,18 @@
 History Revision for Set-Light:
 
+0.96      2025-04-13 13:44:13+01:00 Europe/London
+  [Documentation]
+  - Bumped copyright year.
+
+  - Fixed encoding of links in the README.
+
+  - Updated the POD about new maintainer.
+
+  - Added a security policy.
+
+  [Toolchain]
+  - Removed the requirement for Dist::Zilla::Plugin::Generate::ManifestSkip.
+
 0.95      2021-05-07 13:02:47+01:00 Europe/London
   [Documentation]
   - Changed website of bug tracker to github.

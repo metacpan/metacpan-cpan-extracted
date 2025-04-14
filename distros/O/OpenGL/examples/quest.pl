@@ -275,7 +275,7 @@ sub nav {
 	#print "fire\n";
 	local($d);
 	$d=$b + abs($t*7%60-30)-15;
-	new A(x=>$x,y=>$y,z=>0.5,
+	A->new(x=>$x,y=>$y,z=>0.5,
 		dx => 0.08*sin(($d)*3.14/180),dy=>0.08*cos(($d)*3.14/180) ,
 		dl=>3,angle=>-($d)
 	     );

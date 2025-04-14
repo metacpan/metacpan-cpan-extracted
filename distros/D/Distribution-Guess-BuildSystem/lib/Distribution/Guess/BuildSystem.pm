@@ -13,7 +13,7 @@ use File::Spec::Functions qw(catfile);
 
 use Module::Extract::VERSION;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =encoding utf8
 

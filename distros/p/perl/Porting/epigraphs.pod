@@ -17,6 +17,45 @@ Consult your favorite dictionary for details.
 
 =head1 EPIGRAPHS
 
+=head2 v5.41.10 - Terry Pratchett, Carpe Jugulum
+
+L<Announced on 2025-03-21 by Lukas Mai|https://www.nntp.perl.org/group/perl.perl5.porters/2025/03/msg269743.html>
+
+  "There's no greys, only white that's got grubby. I'm surprised you
+  don't know that. And sin, young man, is when you treat people as
+  things. Including yourself. That's what sin is."
+  "It's a lot more complicated than that -"
+  "No. It ain't. When people say things are a lot more complicated than
+  that, they means they're getting worried that they won't like the
+  truth. People as things, that's where it starts."
+
+=head2 v5.41.9 - Haruki Murakami (tr. Alfred Birnbaum), "Hard-boiled Wonderland and the End of the World"
+
+L<Announced on 2025-02-24 by Richard Leach|https://www.nntp.perl.org/group/perl.perl5.porters/2025/02/msg269592.html>
+
+  It may be the End of the World, but it has to have a way out. I know
+  that for certain. Look at the sky. Where do those birds go when they
+  fly over the Wall? To another world. If there was nothing out there,
+  why surround the place with a Wall? It has to let out somewhere.
+
+=head2 v5.41.8 - Syou Ishida, trans. E. Madison Shimoda, "We'll Prescribe You a Cat"
+
+L<Announced on 2025-01-20 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2025/01/msg269458.html>
+
+  'So Mr Kagawa, let's try this for a week.'
+  '...'
+  'I'm writing you a prescription.'
+  'You're writing me a prescription?'
+  'Correct.'
+Shuta looked at the cat in the carrier.
+  'Is that--a cat?'
+  'It is.'
+Shuta was starting to question his own sanity.
+  'A real cat?'
+  'Of course.  They're very effective.  You know the old saying, "A cat
+a day keeps the doctor away."  Cats are more effective than any other
+medicine out there.'
+
 =head2 v5.41.7 - Martha Wells
 
 L<Announced on 2024-12-20 by Max Maischein|https://www.nntp.perl.org/group/perl.perl5.porters/2024/12/msg269316.html>
@@ -73,6 +112,20 @@ L<Announced on 2024-07-02 by Philippe Bruhat (BooK)|https://www.nntp.perl.org/gr
   We find that in research a certain amount of intelligent ignorance
   is essential to progress; for, if you know too much, you won't try
   the thing.
+
+=head2 v5.40.1 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
+
+L<Announced on 2025-01-18 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2025/01/msg269454.html>
+
+At the time of Alexander the Great, the Roman empire was no more than a
+little patch of land in the heart of Italy, and Rome a tiny city of
+twisting streets within strong walls.  But Rome's inhabitants were a
+proud people.  They loved recounting stories of the greatness of their
+past and were convinced of a great future.  Their history, as they told
+it, went back to ancient Troy.  A Trojan named Aeneas fled to Italy.
+His descendants were the twin brothers Romulus and Remus, sons of Mars,
+the god of war, who were suckled and raised in the forest by a wild
+she-wolf.  Romulus, so the myth goes, founded Rome.
 
 =head2 v5.40.1-RC1 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
 
@@ -212,6 +265,20 @@ counterparts across the Atlantic were busy blowing each other to pieces
 in a Civil War, they embarked on the construction of the Metropolitan
 Line knowing only one thing for certain - there was no way they were
 going to be able to run steam trains through it.
+
+=head2 v5.38.3 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
+
+L<Announced on 2025-01-18 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2025/01/msg269453.html>
+
+When the Greeks came to Greece, they were not yet Greeks. Does that
+sound strange? Yet it is true. For the fact is that when the tribes
+from the north first invaded the lands they were to occupy, they
+weren't yet a unified people.  They spoke different dialects and were
+obedient to different chieftains.  They were tribes rather like the
+Sioux or the Mohicans you read about in stories of the Wild West, and
+had names such as the Dorians, Ionians and Aeolians.  Like the American
+Indians they were warlike and brave, but in other ways they were quite
+different.
 
 =head2 v5.38.3-RC1 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
 

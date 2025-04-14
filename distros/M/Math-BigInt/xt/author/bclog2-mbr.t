@@ -8,7 +8,7 @@ use Scalar::Util qw< refaddr >;
 
 use Math::BigRat;
 
-# ceil(log(x) / log(2)
+# ceil(log(x) / log(2))
 
 sub clog2 {
     my $x = shift;

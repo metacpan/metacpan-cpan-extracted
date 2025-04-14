@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our $SHADER_VER;
 our $DESCRIPTION = qq
@@ -79,10 +79,9 @@ sub new {
   # Check for additional required OpenGL extensions
   my $ver = TypeVersion();
   return undef if (!$ver);
-  my $self = OpenGL::Shader::Objects->new(@_);
+  my $self = OpenGL::Shader::Objects->new('GLSL');
   return undef if (!$self);
   bless($self,$class);
-  $self->{type} = 'GLSL';
   $self->{version} = $ver;
   $self->{description} = $DESCRIPTION;
   $self->{fragment_const} = GL_FRAGMENT_SHADER;
@@ -90,7 +89,4 @@ sub new {
   return $self;
 }
 
-
 1;
-__END__
-

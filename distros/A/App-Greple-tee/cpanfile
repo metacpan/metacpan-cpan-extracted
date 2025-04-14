@@ -1,6 +1,7 @@
 requires 'perl', 'v5.18.2';
 
-requires 'App::Greple', '9.1506';
+requires 'App::Greple', '9.22';
+requires 'App::Greple::L', '1.01';
 requires 'App::sdif', '4.35';
 
 on 'test' => sub {

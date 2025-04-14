@@ -11,6 +11,7 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
   use HTTP::Tiny::Headers;
   use Digest::SHA;
   use HTTP::Tiny::Cookie::Request;
+  use HTTP::Tiny::URL;
   
   # Fields
   has env : ro Hash of string;
@@ -27,7 +28,12 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
   
   has trusted_proxies : ro string[];
   
-  has via_proxy : byte;
+  has via_proxy : ro byte;
+  
+  # Undocumented Fields
+  has params : HTTP::Tiny::Parameters;
+  
+  has start_buffer : string;
   
   # Class Methods
   static method new : HTTP::Tiny::Message::Request ($options : object[] = undef) {
@@ -40,7 +46,9 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
     
     $self->{url} = (HTTP::Tiny::URL)$options_h->delete_or_default("url", undef);
     
-    $self->{headers} = (HTTP::Tiny::Headers)$options_h->delete_or_default("headers", undef);
+    $self->{content} = HTTP::Tiny::Content::Single->new;
+    
+    $self->content->set_headers((HTTP::Tiny::Headers)$options_h->delete_or_default("headers", undef));
     
     for my $name (@{$options_h->keys}) {
       die "The \"$name\" option is not available.";
@@ -49,9 +57,344 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
     return $self;
   }
   
-  method parse : void ($chunk : string) {
+  method clone : HTTP::Tiny::Message::Request () {
     
-    die "TODO";
+    # Dynamic requests cannot be cloned
+    my $content = $self->content->clone;
+    unless ($content) {
+      return undef;
+    }
+    
+    my $clone = (
+      my $_ = HTTP::Tiny::Message::Request->new,
+      $_->{content} = $content,
+      $_->{method} = $self->method,
+      $_->{url} = $self->url->clone,
+      $_->{version} = $self->version,
+      $_
+    );
+    
+    if ($self->{proxy}) {
+      $clone->{proxy} = $self->{proxy}->clone ;
+    }
+    
+    return $clone;
+  }
+  
+  method cookies : HTTP::Tiny::Cookie::Request[] () {
+    
+    # Parse cookies
+    my $headers = $self->headers;
+    
+    my $cookie_header = $headers->cookie;
+    
+    my $cookies = HTTP::Tiny::Cookie::Request->parse($cookie_header);
+    
+    return $cookies;
+  }
+  
+  method every_param : string[] ($name : string) { return $self->params->every_param($name); }
+  
+  method query_params : HTTP::Tiny::Parameters () { return $self->url->query; }
+  
+  method extract_start_line : int ($bufref : string[]) {
+    
+    # Ignore any leading empty lines
+    my $_ = Re->s($bufref, "^\s*(.*?)\x0d?\x0a", "");
+    unless ($_) {
+      return 0;
+    }
+    my $start_line = $_->match->cap1;
+    
+    # We have a (hopefully) full request-line
+    my $_ = Re->m($start_line, "^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$");
+    unless ($_) {
+      $self->set_error(Hash->new({message => "Bad request start-line"}));
+      
+      return 0;
+    }
+    
+    my $method = $_->cap1;
+    my $target = $_->cap2;
+    my $version = $_->cap3;
+    $self->{method} = $method;
+    $self->{version} = $version;
+    
+    my $url = $self->url;
+    
+    if ($method eq "CONNECT") {
+      $url->set_host_port($target);
+      return 1;
+    }
+    
+    if (Re->m($target, "^[^:\/?#]+:")) {
+      $url->parse($target);
+      $url->set_fragment(undef);
+      return 1;
+    }
+    
+    $url->set_path_query($target);
+    
+    return 1;
+  }
+
+  method fix_headers : void () {
+    
+    if ($self->{fix}) {
+      return;
+    }
+    
+    $self->SUPER::fix_headers;
+    
+    # Empty
+    my $headers = $self->headers;
+    if (($headers->content_length // "") eq "0" && $self->method eq "GET") {
+      $headers->remove("Content-Length");
+    }
+    
+    # Host
+    my $url = $self->url;
+    unless ($headers->host) {
+      $headers->set_host($url->host_port) ;
+    }
+    
+    # Basic authentication
+    if ((my $info = $url->userinfo) && !$headers->authorization) {
+      $headers->set_authorization("Basic " . HTTP::Tiny::Util->b64_encode($info, ""));
+    }
+    
+    # Basic proxy authentication
+    my $proxy = $self->proxy;
+    unless ($proxy && $self->via_proxy) {
+      return;
+    }
+    
+    my $info = $proxy->userinfo;
+    
+    unless ($info) {
+      return;
+    }
+    
+    unless ($headers->proxy_authorization) {
+      $headers->set_proxy_authorization("Basic " . HTTP::Tiny::Util->b64_encode($info, "")) ;
+    }
+    
+    return;
+  }
+  
+  method get_start_line_chunk : string ($offset : int) {
+    
+    $self->_start_line;
+    
+    $self->emit(progress => [(object)"start_line", $offset]);
+    
+    return Fn->substr($self->{start_buffer}, $offset, 131072);
+  }
+
+  method is_handshake : int () { return Fn->lc($self->headers->upgrade // "") eq "websocket"; }
+  
+  method is_secure : int () {
+    
+    my $url = $self->url;
+    
+    return ($url->protocol // $url->base->protocol) eq "https";
+  }
+  
+  method is_xhr : int () { return Re->m(($self->headers->header("X-Requested-With") // ""),  ["XMLHttpRequest", "i"]) ? 1 : 0; }
+  
+  method param : string ($name : string) { return $self->params->param($name); }
+  
+  method params : HTTP::Tiny::Parameters () {
+    
+    unless ($self->{params}) {
+      my $params = $self->body_params->clone;
+      $params->append($self->query_params);
+      $self->{params} = $params;
+    }
+    
+    return $self->{params};
+  }
+  
+  method parse : void ($chunk : string, $env : Hash of string = undef) {
+  
+    # Parse CGI environment
+    if ($env) {
+      $self->{env} = $env;
+      $self->_parse_env($env);
+    }
+    
+    # Parse normal message
+    if (($self->{state} // "") ne "cgi") { $self->SUPER::parse($chunk); }
+    
+    # Parse CGI content
+    else {
+      unless ($env) {
+        $self->{raw_size} += length $chunk;
+      }
+      
+      my $content = $self->content;
+      $content->parse_body($chunk);
+      $self->{content} = $content;
+      $self->SUPER::parse("");
+    }
+
+    # Check if we can fix things that require all headers
+    unless ($self->is_finished) {
+      return;
+    }
+    
+    # Base URL
+    my $base = $self->url->base;
+    unless ($base->scheme) {
+      $base->set_scheme("http");
+    }
+    my $headers = $self->headers;
+    if (!$base->host && (my $host = $headers->host)) { $base->set_host_port($host); }
+    
+    # Basic authentication
+    if (my $basic = &_basic($headers->authorization)) { $base->set_userinfo($basic); }
+    
+    # Basic proxy authentication
+    my $basic = &_basic($headers->proxy_authorization);
+    
+    if ($basic) {
+      $self->{proxy} = (my $_ = HTTP::Tiny::URL->new, $_->set_userinfo($basic), $_);
+    }
+    
+    # "X-Forwarded-Proto"
+    if ($self->reverse_proxy && ($headers->header("X-Forwarded-Proto") // "") eq "https") {
+      $base->set_scheme("https");
+    }
+    
+  }
+  
+  static method _basic : string ($proxy_authorization : string) { $proxy_authorization && (my $_ = Re->m($proxy_authorization, "Basic (.+)$")) ? HTTP::Tiny::Util->b64_decode($_->cap1) : undef; }
+  
+  method _parse_env : void ($env : Hash of string) {
+    
+    # Bypass normal message parser
+    $self->{state} = "cgi";
+
+    # Extract headers
+    my $headers = $self->headers;
+    my $url     = $self->url;
+    my $base    = $url->base;
+    for my $name (@{$env->keys}) {
+      my $value = $env->get_string($name);
+      my $name_ref = [$name];
+      unless (Re->s($name_ref, ["^HTTP_", "i"], "")) {
+        next;
+      }
+      $name = $name_ref->[0];
+      
+      my $tmp_name = (mutable string)copy $name;
+      Fn->replace_chars($tmp_name, '_', '-');
+      $name = $tmp_name;
+      
+      $headers->set_header($name => $value);
+      
+      # Host/Port
+      if ($name eq "HOST") {
+        my $value_ref = [$value];
+        
+        if (my $_ = Re->s($value_ref, ":(\d+)$", "")) {
+          $value = $value_ref->[0];
+          
+          $base->set_host($value);
+          $base->set_port((int)$_->match->cap1);
+        }
+        else {
+          $base->set_host($value);
+        }
+      }
+    }
+    
+    # Content-Type is a special case on some servers
+    if (length $env->get_string("CONTENT_TYPE")) {
+      $headers->set_content_type($env->get_string("CONTENT_TYPE")) ;
+    }
+    
+    # Content-Length is a special case on some servers
+    if (length $env->get_string("CONTENT_LENGTH")) {
+      $headers->set_content_length($env->get_string("CONTENT_LENGTH")) ;
+    }
+    
+    # Query
+    if (length $env->get_string("QUERY_STRING")) {
+      $url->query->parse($env->get_string("QUERY_STRING")) ;
+    }
+    
+    # Method
+    if (length $env->get_string("REQUEST_METHOD")) {
+      $self->{method} = $env->get_string("REQUEST_METHOD");
+    }
+    
+    # Scheme/Version
+    if (my $_ = Re->m(($env->get_string("SERVER_PROTOCOL") // ""), "^([^/]+)/([^/]+)$")) {
+      $base->set_scheme($_->cap1);
+      $self->{version} = $_->cap2 ;
+    }
+    
+    # HTTPS
+    if (Fn->uc($env->get_string("HTTPS") // "") eq "ON") {
+      $base->set_scheme("https");
+    }
+    
+    # Path
+    my $path = $url->path;
+    $path->parse(length $env->get_string("PATH_INFO") ? $env->get_string("PATH_INFO") : "");
+    
+    # Base path
+    if (my $value = $env->get_string("SCRIPT_NAME")) {
+      
+      # Make sure there is a trailing slash (important for merging)
+      $base->path->parse(Re->m($value, "/$") ? $value : "$value/");
+      
+      # Remove SCRIPT_NAME prefix if necessary
+      my $buffer = $path->to_string;
+      my $value_ref = [$value];
+      Re->s($value_ref, ["^/|/$", "g"], "");
+      $value = $value_ref->[0];
+      my $buffer_ref = [$buffer];
+      Re->s($buffer_ref, "^/?\\Q$value\\E/?", "");
+      Re->s($buffer_ref, "^/", "");
+      $buffer = $buffer_ref->[0];
+      $path->parse($buffer);
+    }
+  }
+  
+  method _start_line : void () {
+    
+    if ($self->{start_buffer}) {
+      return;
+    }
+    
+    # Path
+    my $url  = $self->url;
+    my $path = $url->path_query;
+    unless (Re->m($path, "^/")) {
+      $path = "/$path" ;
+    }
+    
+    # CONNECT
+    my $method = Fn->uc($self->method);
+    if ($method eq "CONNECT") {
+      my $port = (string)$url->port // ($url->protocol eq "https" ? "443" : "80");
+      $path = $url->ihost . ":$port";
+    }
+    
+    # Proxy
+    elsif ($self->proxy && $self->via_proxy && $url->protocol ne "https") {
+      unless ($self->is_handshake) {
+        my $url_clone = $url->clone;
+        $url_clone->set_userinfo(undef);
+        $path = $url_clone->to_string;
+      }
+    }
+    
+    my $version = $self->version;
+    
+    $self->{start_buffer} = "$method $path HTTP/$version\x0d\x0a";
   }
   
 }

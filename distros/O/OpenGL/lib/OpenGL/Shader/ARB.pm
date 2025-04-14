@@ -78,11 +78,10 @@ sub new {
   my $ver = TypeVersion();
   return undef if (!$ver);
 
-  my $self = OpenGL::Shader::Objects->new(@_);
+  my $self = OpenGL::Shader::Objects->new('ARB');
   return undef if (!$self);
   bless($self,$class);
 
-  $self->{type} = 'ARB';
   $self->{version} = $ver;
   $self->{description} = TypeDescription();
 

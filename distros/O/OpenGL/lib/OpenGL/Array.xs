@@ -2093,6 +2093,14 @@ DESTROY(oga)
 		free(oga);
 	}
 
+int
+type_size(type)
+	GLenum	type
+	CODE:
+		RETVAL = gl_type_size(type);
+	OUTPUT:
+		RETVAL
+
 #//# glpHasGPGPU();
 int
 glpHasGPGPU()

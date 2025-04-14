@@ -8,10 +8,11 @@ use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 use List::MoreUtils qw(uniq);
+use List::Util qw(max);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -112,7 +113,15 @@ sub run {
 	# Print out.
 	if (%{$ret_hr}) {
 		if ($self->{'_opts'}->{'f'}) {
-			print join "\n", reverse sort map { encode_utf8($ret_hr->{$_}.' '.$_) }
+			my $max = max(values %{$ret_hr});
+			my $num = length($max);
+			print join "\n",
+				map { sprintf("%${num}s", $ret_hr->{$_}).' '.encode_utf8($_) }
+				reverse sort {
+					$ret_hr->{$a} <=> $ret_hr->{$b}
+					||
+					$a cmp $b
+				}
 				keys %{$ret_hr};
 		} else {
 			print join "\n", map { encode_utf8($_) } sort keys %{$ret_hr};
@@ -358,6 +367,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -6,11 +6,32 @@ class HTTP::Tiny::Content::MultiPart extends HTTP::Tiny::Content {
   
   use HTTP::Tiny::Content::Single;
   
+  # Fields
+  has parts : HTTP::Tiny::Content[];
+  
+  # Undocumented Fields
+  has last_len : int;
+  
+  has last_part : int;
+  
+  has offset : int;
+  
+  has boundary : string;
+  
+  has multipart : string;
+  
+  has multi_state : string;
+  
   static method new : HTTP::Tiny::Content::MultiPart ($options : object[] = undef) {
     
-    die "TODO";
-    
     my $self = new HTTP::Tiny::Content::MultiPart;
+    
+    $self->on(read => method : void ($args : object[]) {
+      my $that = (HTTP::Tiny::Content::MultiPart)$args->[0];
+      my $chunk = (string)$args->[0];
+      
+      $that->_read($chunk);
+    });
     
     return $self;
   }
@@ -28,6 +49,282 @@ class HTTP::Tiny::Content::MultiPart extends HTTP::Tiny::Content {
     
     die "TODO";
   }
+  
+  method body_contains : int ($chunk : string) {
+    
+    my $parts = $self->{parts};
+    
+    for my $part (@$parts) {
+      
+      if ($part->headers_contain($chunk)) {
+        return 1;
+      }
+      elsif ($part->body_contains($chunk)) {
+        return 1;
+      }
+      
+    }
+    
+    return 0;
+  }
+  
+  method body_size : int () {
+    
+    # Check for existing Content-Length header
+    if (my $len = $self->headers->content_length) {
+      return Fn->to_int($len);
+    }
+    
+    # Calculate length of whole body
+    my $len = my $boundary_len = length($self->build_boundary) + 6;
+    
+    for my $_ (@{$self->{parts}}) {
+      $len += $_->header_size + $_->body_size + $boundary_len;
+    }
+    
+    return $len;
+  }
+
+  method build_boundary : string () {
+    
+    # Check for existing boundary
+    my $boundary = $self->boundary;
+    if ($boundary) {
+      return $boundary;
+    }
+    # Generate and check boundary
+    my $size = 1;
+    while (1) {
+      
+      my $boundary_ascii = new_string_len($size++ * 3);
+      for (my $i = 0; $i < length $boundary_ascii; $i++) {
+        $boundary_ascii->[$i] = Fn->chr((int)Sys->rand(256))->[0];
+      }
+      $boundary = HTTP::Tiny::Util->b64_encode($boundary_ascii);
+      my $boundary_ref = [$boundary];
+      Re->s($boundary_ref, ["\W", "g"], "X");
+      $boundary = $boundary_ref->[0];
+      
+      unless ($self->body_contains($boundary)) {
+        last;
+      }
+    }
+    
+    # Add boundary to Content-Type header
+    my $headers = $self->headers;
+    my $before = "multipart/mixed";
+    my $after = "";
+    
+    if (my $_ = Re->m($headers->content_type // "", "^(.*multipart/[^;]+)(.*)$")) {
+      $before = $_->cap1;
+      $after = $_->cap2;
+    }
+    
+    $headers->set_content_type("$before; boundary=$boundary$after");
+    
+    return $boundary;
+  }
+  
+  static method _range : int[] ($start : int, $end : int) {
+    
+    my $length = $end - $start + 1;
+    
+    my $nums = new int[$length];
+    
+    for (my $i = 0; $i < $end + 1; $i++) {
+      $nums->[$i] = $start + $i;
+    }
+    
+    return $nums;
+  }
+  
+  method clone : HTTP::Tiny::Content::MultiPart () {
+  
+    my $clone = (HTTP::Tiny::Content::MultiPart)$self->SUPER::clone();
+    
+    unless ($clone) {
+      return undef;
+    }
+    
+    $clone->{parts} = $self->{parts};
+    
+    return $clone;
+  }
+  
+  method get_body_chunk : string ($offset : int) {
+    
+    # Body generator
+    if ($self->is_dynamic) {
+      return $self->generate_body_chunk($offset);
+    }
+    
+    # First boundary
+    my $boundary     = $self->{boundary} //= $self->build_boundary;
+    my $boundary_len = length($boundary) + 6;
+    my $len          = $boundary_len - 2;
+    if ($len > $offset) {
+      return Fn->substr("--$boundary\x0d\x0a", $offset);
+    }
+    
+    # Skip parts that have already been processed
+    my $start = 0;
+    if ($self->{offset} && $offset > $self->{offset}) {
+      $len = $self->{last_len};
+      $start = 1;
+    }
+    
+    # Prepare content part by part
+    my $parts = $self->{parts};
+    for (my $i = $start; $i < @$parts; $i++) {
+      my $part = $parts->[$i];
+      
+      # Headers
+      my $header_len = $part->header_size;
+      if (($len + $header_len) > $offset) {
+        return $part->get_header_chunk($offset - $len);
+      }
+      $len += $header_len;
+      
+      # Content
+      my $content_len = $part->body_size;
+      if (($len + $content_len) > $offset) {
+        return $part->get_body_chunk($offset - $len);
+      }
+      $len += $content_len;
+      
+      # Boundary
+      if (@$parts - 1 == $i) {
+        $boundary .= "--";
+        $boundary_len += 2;
+      }
+      
+      if (($len + $boundary_len) > $offset) {
+        return Fn->substr("\x0d\x0a--$boundary\x0d\x0a", $offset - $len);
+      }
+      $len += $boundary_len;
+      
+      $self->{last_len} = $len;
+      $self->{last_part} = $i;
+      $self->{offset} = $offset;
+    }
+  }
+  
+  method is_multipart : int () {
+    return 1;
+  }
+  
+  method _parse_multipart_body : int ($boundary : string) {
+    
+    # Whole part in buffer
+    my $pos = Fn->index($self->{multipart}, "\x0d\x0a--$boundary");
+    if ($pos < 0) {
+      my $len = length($self->{multipart}) - (length($boundary) + 8);
+      
+      unless ($len > 0) {
+        return 0;
+      }
+      
+      # Store chunk
+      my $chunk = Fn->substr($self->{multipart}, 0, $len, "");
+      my $parts = $self->{parts};
+      
+      $parts->[@$parts - 1] = $parts->[@$parts - 1]->parse($chunk);
+      
+      return 0;
+    }
+    
+    # Store chunk
+    my $chunk = Fn->substr($self->{multipart}, 0, $pos, "");
+    my $parts = $self->{parts};
+    $parts->[@$parts - 1] = $parts->[@$parts - 1]->parse($chunk);
+    $self->{multi_state} = "multipart_boundary";
+    
+    return 1;
+  }
+  
+  method _parse_multipart_boundary : int ($boundary : string) {
+    
+    # Boundary begins
+    if (Fn->index($self->{multipart}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+      Fn->substr($self->{multipart}, 0, length($boundary) + 6, "");
+      
+      # New part
+      my $part = HTTP::Tiny::Content::Single->new;
+      $part->{relaxed} = 1;
+      $self->emit(part => [(object)$part]);
+      $self->{parts} = (HTTP::Tiny::Content[])Array->merge_object($self->{parts}, [$part]);
+      $self->{multi_state} = "multipart_body";
+      
+      return 1;
+    }
+    
+    # Boundary ends
+    my $end = "\x0d\x0a--$boundary--";
+    if (Fn->index($self->{multipart}, $end) == 0) {
+      Fn->substr($self->{multipart}, 0, length $end, "");
+      $self->{multi_state} = "finished";
+    }
+    
+    return 0;
+  }
+  
+  method _parse_multipart_preamble : int ($boundary : string) {
+    
+    # No boundary yet
+    my $pos = -1;
+    if (($pos = Fn->index($self->{multipart}, "--$boundary")) < 0) {
+      return 0;
+    }
+    
+    # Replace preamble with carriage return and line feed
+    Fn->substr($self->{multipart}, 0, $pos, "\x0d\x0a");
+    
+    # Parse boundary
+    $self->{multi_state} = "multipart_boundary";
+    
+    return 1;
+  }
+
+  method _read : void ($chunk : string) {
+    
+    $self->{multipart} .= $chunk;
+    
+    my $boundary = $self->boundary;
+    while (1) {
+      
+      if (($self->{multi_state} //= "multipart_preamble") eq "finished") {
+        last;
+      }
+      
+      # Preamble
+      if ($self->{multi_state} eq "multipart_preamble") {
+        unless ($self->_parse_multipart_preamble($boundary)) {
+          last;
+        }
+      }
+      
+      # Boundary
+      elsif ($self->{multi_state} eq "multipart_boundary") {
+        unless ($self->_parse_multipart_boundary($boundary)) {
+          last;
+        }
+      }
+      
+      # Body
+      elsif ($self->{multi_state} eq "multipart_body") {
+        unless ($self->_parse_multipart_body($boundary)) {
+          last;
+        }
+      }
+    }
+    
+    # Check buffer size
+    if (length($self->{multipart} // "") > $self->max_buffer_size) {
+      $self->{state} = "finished";
+      $self->{limit} = 1;
+    }
+  }
+  
 }
 
 __END__

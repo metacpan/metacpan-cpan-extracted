@@ -41,7 +41,7 @@ die $@ if $@;
 
 can_ok($LIB, '_clog2');
 
-# ceil(log(x) / log(2)
+# ceil(log(x) / log(2))
 
 sub clog2 {
     my $x = shift;

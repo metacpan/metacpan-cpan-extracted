@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.14] - 2025-04-14
+
+### Fixed
+
+- Require Feature::Compat::Class 0.07 (for :reader)
+
 ## [0.0.13] - 2025-03-28
 
 ### Added

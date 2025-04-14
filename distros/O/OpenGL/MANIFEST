@@ -1,13 +1,17 @@
 Changes
 COPYRIGHT
 examples/clip.pl
-examples/cube.pl
+examples/cube-glBegin.pl
+examples/cube-glDrawArrays.pl
+examples/cube-glDrawElements.pl
+examples/cube-indexbuffer.pl
 examples/depth.pl
 examples/double.pl
 examples/fun.pl
 examples/glu_test.pl
 examples/glxgears.pl
 examples/light.pl
+examples/menutest.pl
 examples/plane.pl
 examples/planets.pl
 examples/quest.pl
@@ -18,6 +22,7 @@ examples/smooth.pl
 examples/spaceship.nff
 examples/stan.ppm
 examples/tessellation.pl
+examples/tetrahedron.pl
 examples/texhack.pl
 examples/texture.pl
 examples/tk_demo.pl
@@ -26,8 +31,6 @@ examples/try.pl
 examples/with-glut.txt
 examples/with-glx.txt
 examples/wolf.bin
-fragment.arb
-fragment.glsl
 FreeGLUT/freeglut-Readme.txt
 FreeGLUT/freeglut.dll
 FreeGLUT/freeglut.lib
@@ -91,7 +94,6 @@ lib/OpenGL/V3.xs
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-menutest.pl
 oga.pl
 pgopogl.h
 ppport.h
@@ -113,7 +115,6 @@ test.pl
 test.tga
 TODO
 typemap
-utils/cleanup.pl
 utils/const.pl
 utils/exports.pl
 utils/exports.txt
@@ -122,14 +123,9 @@ utils/glversion.c
 utils/hdr_diff.pl
 utils/Makefile
 utils/Makefile.cygwin
-utils/Makefile.macosx
 utils/makefile.mak
 utils/makefile.mingw
 utils/mingw.bat
-utils/opengl32.txt
 utils/strawberry.bat
-utils/wgl_ext.txt
-vertex.arb
-vertex.glsl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

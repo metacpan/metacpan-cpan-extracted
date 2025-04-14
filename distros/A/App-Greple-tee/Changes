@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-tee
 
+1.02 2025-04-14T00:15:28Z
+
+    - use -ML module instead of -Mline
+
 1.01 2024-10-07T09:52:58Z
 
     - mainly document update

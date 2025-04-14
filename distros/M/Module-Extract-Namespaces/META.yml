@@ -4,6 +4,7 @@ author:
   - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -29,5 +30,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-namespaces/issues
   homepage: https://github.com/briandfoy/module-extract-namespaces
   repository: https://github.com/briandfoy/module-extract-namespaces
-version: '1.025'
+version: '1.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

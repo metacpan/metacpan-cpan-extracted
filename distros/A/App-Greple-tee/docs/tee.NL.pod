@@ -10,7 +10,7 @@ App::Greple::tee - module om gematchte tekst te vervangen door het externe opdra
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ Combineer een reeks niet-blanke regels tot één regel voordat je ze doorgeeft a
 
 Combineert twee of meer opeenvolgende newline-tekens tot één.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-De optie B<--offload> van L<teip(1)> is geïmplementeerd in de andere module B<-Mline>.
+De optie B<--offload> van L<teip(1)> is geïmplementeerd in de andere module L<App::Greple::L> (B<-ML>).
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-U kunt ook de module B<line> gebruiken om alleen even genummerde regels te verwerken.
+Je kunt de module B<-ML> ook gebruiken om alleen even genummerde regels te verwerken, als volgt.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Converteer vervolgens CR naar NL met L<tr(1)> of iets dergelijks.
 
 Denk aan een situatie waarin je wilt grepen naar tekenreeksen buiten de kopregels. Bijvoorbeeld, je wilt zoeken naar Docker image namen van het C<docker image ls> commando, maar laat de header regel staan. Je kunt dit doen met het volgende commando.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-De optie C<-Mline -L 2:> haalt de voorlaatste regels op en stuurt ze naar het commando C<grep perl>. De optie --discrete is nodig omdat het aantal regels van invoer en uitvoer verandert, maar omdat het commando maar één keer wordt uitgevoerd, is er geen nadeel voor de prestaties.
+Optie C<-ML 2:> haalt de voorlaatste regels op en stuurt ze naar het commando C<grep perl>. De optie --discrete is nodig omdat het aantal regels invoer en uitvoer verandert, maar omdat het commando maar één keer wordt uitgevoerd, is er geen nadeel voor de prestaties.
 
 Als je hetzelfde probeert te doen met het B<teip> commando, zal C<teip -l 2- -- grep> een foutmelding geven omdat het aantal uitvoerregels minder is dan het aantal invoerregels. Er is echter geen probleem met het verkregen resultaat.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISMN
 
+1.205 2025-04-13T22:56:31Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.204 2024-02-11T06:50:27Z
 	* refresh distro, update email address, move to BRIANDFOY
 

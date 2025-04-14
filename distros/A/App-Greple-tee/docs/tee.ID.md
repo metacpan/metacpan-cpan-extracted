@@ -8,7 +8,7 @@ App::Greple::tee - modul untuk mengganti teks yang cocok dengan hasil perintah e
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Baris data input dan output tidak harus identik ketika digunakan dengan opsi **-
 
     Menggabungkan dua atau lebih karakter baris baru yang berurutan menjadi satu.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    Opsi **--offload** [teip(1)](http://man.he.net/man1/teip) diimplementasikan dalam modul **-Mline** yang berbeda.
+    Opsi **--offload** dari [teip(1)](http://man.he.net/man1/teip) diimplementasikan di modul berbeda [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**).
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    Anda juga dapat menggunakan modul **line** untuk memproses hanya baris bernomor genap sebagai berikut.
+    Anda juga bisa menggunakan modul **-ML** untuk memproses baris bernomor genap seperti berikut ini.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Kemudian ubah karakter CR menjadi NL setelahnya dengan perintah [tr(1)](http://m
 
 Pertimbangkan situasi di mana Anda ingin mencari string dari baris non-header. Sebagai contoh, Anda mungkin ingin mencari nama citra Docker dari perintah `docker image ls`, tetapi meninggalkan baris header. Anda dapat melakukannya dengan perintah berikut.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Opsi `-Mline -L 2:` mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah `grep perl`. Opsi --discrete diperlukan karena jumlah baris dari input dan output berubah, tetapi karena perintah ini hanya dieksekusi satu kali, maka tidak ada kekurangan dalam hal performa.
+Opsi `-ML 2:` mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah `grep perl`. Opsi --discrete diperlukan karena jumlah baris dari input dan output berubah, tetapi karena perintah ini hanya dieksekusi satu kali, maka tidak ada kekurangan dalam hal performa.
 
 Jika Anda mencoba melakukan hal yang sama dengan perintah **teip**, `teip -l 2- - grep` akan memberikan kesalahan karena jumlah baris output kurang dari jumlah baris input. Namun, tidak ada masalah dengan hasil yang diperoleh.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

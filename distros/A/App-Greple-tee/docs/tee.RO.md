@@ -8,7 +8,7 @@ App::Greple::tee - modul de înlocuire a textului cu rezultatul unei comenzi ext
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci câ
 
     Combină două sau mai multe caractere de linie nouă consecutive într-unul singur.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    Opțiunea **--offload** a [teip(1)](http://man.he.net/man1/teip) este implementată în modulul diferit **-Mline**.
+    Opțiunea **--offload** a [teip(1)](http://man.he.net/man1/teip) este implementată în modulul diferit [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**).
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    De asemenea, puteți utiliza modulul **line** pentru a procesa numai liniile cu număr par, după cum urmează.
+    De asemenea, puteți utiliza modulul **-ML** pentru a procesa numai liniile cu număr par, după cum urmează.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Apoi, convertiți caracterul CR în NL prin comanda [tr(1)](http://man.he.net/ma
 
 Luați în considerare o situație în care doriți să căutați prin grep șiruri de caractere din liniile fără antet. De exemplu, este posibil să doriți să căutați numele imaginilor Docker din comanda `docker image ls`, dar să lăsați linia de antet. Puteți face acest lucru prin următoarea comandă.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Opțiunea `-Mline -L 2:` recuperează penultima linie și o trimite la comanda `grep perl`. Opțiunea --discrete este necesară deoarece numărul de linii de intrare și de ieșire se modifică, dar, deoarece comanda este executată o singură dată, nu există niciun dezavantaj de performanță.
+Opțiunea `-ML 2:` recuperează penultimele linii și le trimite către comanda `grep perl`. Opțiunea --discrete este necesară deoarece numărul de linii de intrare și de ieșire se modifică, dar deoarece comanda este executată o singură dată, nu există niciun dezavantaj de performanță.
 
 Dacă încercați să faceți același lucru cu comanda **teip**, `teip -l 2- -- grep` va da o eroare deoarece numărul de linii de ieșire este mai mic decât numărul de linii de intrare. Cu toate acestea, nu există nicio problemă cu rezultatul obținut.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

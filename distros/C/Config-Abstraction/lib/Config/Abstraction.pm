@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Data::Reuse;
 use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
@@ -16,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -321,14 +322,24 @@ sub _load_config
 					$logger->debug(ref($self), ' ', __LINE__, ": Loading data from $path");
 				}
 				eval {
-					if($data =~ /^\s*<\?xml/) {
+					if(($data =~ /^\s*<\?xml/) || ($data =~ /<\/.+>/)) {
 						$self->_load_driver('XML::Simple', ['XMLin']);
 						$data = XMLin($path, ForceArray => 0, KeyAttr => []);
-					} else {
-						eval { $data = decode_json($data) };
-						if($@) {
+					} elsif($data =~ /\{.+:.\}/s) {
+						$self->_load_driver('JSON::Parse');
+						# CPanel::JSON is very noisy, so be careful before attempting to use it
+						my $is_json;
+						eval { $is_json = JSON::Parse::parse_json($data) };
+						if($is_json) {
+							eval { $data = decode_json($data) };
+							if($@) {
+								undef $data;
+							}
+						} else {
 							undef $data;
 						}
+					} else {
+						undef $data;
 					}
 					if(!$data) {
 						$self->_load_driver('YAML::XS', ['LoadFile']);
@@ -440,6 +451,11 @@ sub get
 	for my $part (split qr/\Q$self->{sep_char}\E/, $key) {
 		return undef unless ref $ref eq 'HASH';
 		$ref = $ref->{$part};
+	}
+	if(ref($ref) eq 'HASH') {
+		Data::Reuse::fixate(%{$ref});
+	} elsif(ref($ref) eq 'ARRAY') {
+		Data::Reuse::fixate(@{$ref});
 	}
 	return $ref;
 }

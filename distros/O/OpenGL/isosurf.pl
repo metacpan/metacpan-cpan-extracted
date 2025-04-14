@@ -14,8 +14,8 @@ $light1 = GL_TRUE;
 
 $MAXVERTS = 10000;
 
-$verts = new OpenGL::Array $MAXVERTS * 3, GL_FLOAT;
-$norms = new OpenGL::Array $MAXVERTS * 3, GL_FLOAT;
+$verts = OpenGL::Array->new($MAXVERTS * 3, GL_FLOAT);
+$norms = OpenGL::Array->new($MAXVERTS * 3, GL_FLOAT);
 $numverts = 0;
 
 $xrot=0;

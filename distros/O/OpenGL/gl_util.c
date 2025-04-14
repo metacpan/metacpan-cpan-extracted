@@ -556,6 +556,9 @@ int gl_get_count(GLenum param)
 	case GL_UNPACK_SWAP_BYTES:
 	case GL_ZOOM_X:
 	case GL_ZOOM_Y:
+#ifdef GL_VERSION_3_0
+	case GL_MAX_ARRAY_TEXTURE_LAYERS:
+#endif
 		return 1;
 	case GL_DEPTH_RANGE:
 	case GL_LINE_WIDTH_RANGE:

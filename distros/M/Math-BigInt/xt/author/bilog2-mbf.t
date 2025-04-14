@@ -8,7 +8,7 @@ use Scalar::Util qw< refaddr >;
 
 use Math::BigFloat;
 
-# int(log(x) / log(2)
+# int(log(x) / log(2))
 
 sub ilog2 {
     my $x = shift;

@@ -1,5 +1,8 @@
 Revision history for Perl module Object::Iterate
 
+1.152 2025-04-13T22:25:59Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.151 2025-01-26T20:33:03Z
 	* dist refresh
 

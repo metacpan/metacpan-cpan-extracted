@@ -1,3 +1,20 @@
+0.7006 2025-04-14
+- incorporate Acme::MITHALDU::BleedingOpenGL changes - thanks @wchristian
+- add glGenVertexArrays_p, glBindVertexArray, glDeleteVertexArrays
+- add glAttachShader, glDeleteShader, glGetShaderiv_p, glGetShaderInfoLog_p, glGetProgramiv_p
+- added occlusion query capability
+- add glDrawElementsBaseVertex_c, GL_MAX_ARRAY_TEXTURE_LAYERS, GL_TEXTURE_2D_ARRAY
+
+0.7005 2025-04-13
+- OpenGL::Shader improved error reporting for shader compiles - thanks Ivan Baidakou
+- from unreleased OpenGL::Shader 1.02: add SetArray for setting integer uniforms
+- from unreleased OpenGL::Shader 1.02: update SetMatrix to handle both 3x3 and 4x4 matrices
+- add FreeGLUT glutInitContext{Flags,Profile,Version}
+- add Array::type_size
+- add to examples/cube* to show using glDraw{Array,Element}s and GPU buffers
+- allow `perl Makefile.PL interface=AGL` to work when FreeGLUT present
+- hopefully better MacPorts detection
+
 0.7004 2025-03-19
 - re-release with higher version number for OpenGL::Array
 

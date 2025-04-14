@@ -1,0 +1,26 @@
+Changes
+CONCEPT
+examples/material_type.pl
+inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/MARC-Leader-Utils/01-use.t
+t/MARC-Leader-Utils/02-version.t
+t/MARC-Leader-Utils/03-material_type.t
+Utils.pm
+xt/MARC-Leader-Utils/01-pod_coverage.t
+xt/MARC-Leader-Utils/02-pod.t

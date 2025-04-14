@@ -9,11 +9,11 @@ use Params::ValidationCompiler qw/ validation_for /;
 use Types::Standard qw/ Enum /;
 use Test2::API qw/ context /;
 
-use base qw/ Log::Dispatch::Output /;
+use parent qw/ Log::Dispatch::Output /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub new {
@@ -62,7 +62,7 @@ Log::Dispatch::TAP - Log to TAP output
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -102,10 +102,6 @@ Since v0.2.0, the this module requires Perl v5.14 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
-If you need this module on Perl v5.10, please use one of the v0.1.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
-
 =head1 SEE ALSO
 
 L<Log::Log4perl::Appender::TAP>
@@ -126,6 +122,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -135,7 +136,7 @@ and L<Log::Dispatch::TestDiag>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2023 by Robert Rothenberg.
+This software is Copyright (c) 2020-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

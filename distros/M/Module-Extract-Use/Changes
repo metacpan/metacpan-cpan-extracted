@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Use
 
+1.054 2025-04-13T22:28:12Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.053 2024-08-17T06:37:31Z
 	* changing over to BRIANDFOY and updating email, etc
 

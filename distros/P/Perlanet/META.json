@@ -69,7 +69,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.3.2"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -123,6 +123,6 @@
          "web" : "https://github.com/davorg-cpan/perlanet"
       }
    },
-   "version" : "v3.3.1",
+   "version" : "v3.3.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

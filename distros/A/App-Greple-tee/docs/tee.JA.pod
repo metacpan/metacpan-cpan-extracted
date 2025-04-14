@@ -10,7 +10,7 @@ App::Greple::tee - マッチしたテキストを外部コマンドの結果に�
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ B<--discrete>オプションを使用する場合、入出力データの行数�
 
 2つ以上の連続する改行文字を1つにまとめる。
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-L<teip(1)>のB<--offload>オプションは、別のモジュールB<-Mline>に実装されている。
+L<teip(1)> の B<--offload> オプションは、別のモジュール L<App::Greple::L> (B<-ML>) に実装されています。
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-また、B<-line> モジュールを使って、次のように偶数行だけを処理することもできる。
+B<-ML>モジュールを使って、次のように偶数行だけを処理することもできます。
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ discreteオプションは複数のプロセスを起動するので、プロセ
 
 ヘッダ行以外から文字列を grep したい場合を考えてみましょう。例えば、C<docker image ls>コマンドからDockerイメージ名を検索したいが、ヘッダ行は残したいとします。以下のコマンドで可能です。
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-オプションC<-Mline -L 2:>は2行目から最後の行を検索し、C<grep perl>コマンドに送ります。入出力の行数が変わるので-discreteオプションが必要だが、コマンドは一度しか実行されないので性能上の欠点はない。
+オプション C<-ML 2:> は最後から2番目の行を取り出し、C<grep perl> コマンドに送ります。入出力の行数が変わるので --discrete オプションが必要だが、コマンドは一度しか実行されないので、性能上の欠点はない。
 
 B<teip>コマンドで同じことをしようとすると、C<teip -l 2- -- grep>は出力行数が入力行数より少ないのでエラーになる。しかし、得られる結果に問題はない。
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

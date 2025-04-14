@@ -1,6 +1,8 @@
 use strict;
 use OpenGL qw(GL_FLOAT GL_INT GL_UNSIGNED_BYTE);
-use Test::More tests => 141;
+use Test::More;
+
+isnt OpenGL::Array::type_size(GL_INT), undef;
 
 my $o1 = OpenGL::Array->new(5, GL_FLOAT);
 ok($o1, "O::A->new");
@@ -588,4 +590,4 @@ is(fmt($o2), fmt(3,3,3,3,3,3,3,3,3), '$o2->calc("rows","rows","rows")');
 $o2->calc("row","row","row");
 is(fmt($o2), fmt(0,0,0,1,1,1,2,2,2), '$o2->calc("row","row","row")');
 
-###----------------------------------------------------------------###
+done_testing;

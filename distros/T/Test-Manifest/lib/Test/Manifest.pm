@@ -12,7 +12,7 @@ use File::Spec::Functions qw(catfile);
 our @EXPORT    = qw(run_t_manifest);
 our @EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
 
-our $VERSION = '2.025';
+our $VERSION = '2.026';
 
 my %SeenInclude = ();
 my %SeenTest = ();

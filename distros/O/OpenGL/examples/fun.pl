@@ -171,7 +171,7 @@ package B;
 );
 sub new {
 	my $type = shift;
-	my $self = new A(%defaults,@_);
+	my $self = A->new(%defaults,@_);
 	push(@objects,$self);
 	bless $self;
 }
@@ -207,7 +207,7 @@ package T;
 $damping = 0.99;
 sub new {
 	my $type = shift;
-	my $self = new B(%defaults,@_);
+	my $self = B->new(%defaults,@_);
 	push(@objects,$self);
 	bless $self;
 }
@@ -238,7 +238,7 @@ use OpenGL;
 );
 sub new {
 	my $type = shift;
-	my $self = new B(%defaults,@_);
+	my $self = B->new(%defaults,@_);
 	push(@objects,$self);
 	bless $self;
 }
@@ -315,11 +315,11 @@ initlists;
 glColor3f(1,0,0);
 glClearColor(0,0,0.3,1);
 
-new A('dl'=>$floor,'name'=>'the happy floor');
-#$a = new A( 'y' => 0.2,  'name' => 'useless dude');
-$b = new T( 'x' => 10, 'dx'=> 0.4,  'name' => 'bad dude');
+A->new('dl'=>$floor,'name'=>'the happy floor');
+#$a = A->new( 'y' => 0.2,  'name' => 'useless dude');
+$b = T->new( 'x' => 10, 'dx'=> 0.4,  'name' => 'bad dude');
 readnff;
-$c = new C('z' => 5,'dl'=>$enterprise, 'x' => -10, 'target'=>$b, 'name' => 'killer');
+$c = C->new('z' => 5,'dl'=>$enterprise, 'x' => -10, 'target'=>$b, 'name' => 'killer');
 $w=100.0;$t= time;$p= $t-1;
 $rin=$win=$ein='';
 $spf = 1;

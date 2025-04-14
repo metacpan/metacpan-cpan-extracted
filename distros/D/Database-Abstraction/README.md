@@ -1,21 +1,10 @@
-Database-Abstraction
-====================
-
-[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/database-abstraction)
-[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
-[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/Database-Abstraction/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Database-Abstraction?branch=master)
-[![CPAN](https://img.shields.io/cpan/v/Database-Abstraction.svg)](http://search.cpan.org/~nhorne/Database-Abstraction/)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/ntpdate/ntpdate.yml?branch=master)
-![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+Database+Environment+#perl+#ORM&url=https://github.com/nigelhorne/database-abstraction&via=nigelhorne)
-
 # NAME
 
-Database::Abstraction - read-only database abstraction layer (ORM)
+Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.24
+Version 0.25
 
 # DESCRIPTION
 
@@ -178,7 +167,8 @@ Takes different argument formats (hash or positional)
 
 - `directory`
 
-    Where the database file is held
+    Where the database file is held.
+    If only one argument is given to `new()`, it is taken to be `directory`.
 
 - `filename`
 

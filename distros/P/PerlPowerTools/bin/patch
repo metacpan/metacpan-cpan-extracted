@@ -24,7 +24,7 @@ use constant EX_SUCCESS => 0;
 use constant EX_REJECTS => 1;
 use constant EX_FAILURE => 2;
 
-my $VERSION = '0.33';
+my $VERSION = '0.35';
 
 $|++;
 
@@ -52,6 +52,13 @@ sub type_conflict {
         exit EX_FAILURE;
     }
     return;
+}
+
+sub ifdef_id_check {
+    my $id = shift;
+    return if (length($id) != 0 && $id =~ m/\A[A-Za-z]\w*\Z/);
+    warn "$0: argument to -D is not an identifier\n";
+    exit EX_FAILURE;
 }
 
 my ($patchfile, @options);
@@ -93,6 +100,7 @@ if (@ARGV) {
         my %opts;
         Getopt::Long::GetOptions(\%opts, @desc) or die("Bad options\n");
         type_conflict(\%opts);
+        ifdef_id_check($opts{'ifdef'}) if defined $opts{'ifdef'};
         $opts{origfile} = shift;
         $_ = \%opts;
         $patchfile = shift unless $next++;
@@ -151,6 +159,11 @@ while (<PATCH>) {
         my ($i_range, $i_start, $i_end, @i_hunk) = ($1, $2, $3 || $2);
         my ($o_range, $o_start, $o_end, @o_hunk);
         $patch->bless('context') or next PATCH;
+        if ($i_start > $i_end) {
+            $patch->note("Malformed input at line $.: $i_range\n");
+            $patch->reject($i_range);
+            last;
+        }
         my $o_hunk = qr/^$space(--- (\d+)(?:,(\d+))? ----\n)/;
         my $re = qr/^$space([ !-] )/;
         $_ = <PATCH>;
@@ -185,6 +198,7 @@ while (<PATCH>) {
             print PATCH;
             for ($o_start..$o_end) {
                 $_ = <PATCH>;
+                last unless defined $_; # EOF: no further hunks
                 unless (s/$re/$1/) {
                     $patch->note("Short hunk ignored.\n");
                     $patch->reject($i_range, @i_hunk, $o_range, @o_hunk);
@@ -199,8 +213,24 @@ while (<PATCH>) {
     } elsif (/^(\s*)((\d+)(?:,(\d+))?([acd])(\d+)(?:,(\d+))?\n)/) {
         # NORMAL DIFF
         my ($space, $range, $i_start, $i_end, $cmd, $o_start, $o_end) =
-           ($1,     $2,     $3,     $4 || $3, $5,   $6,       $7 || $6);
+           ($1,     $2,     $3,       $4,     $5,   $6,       $7 || $6);
         $patch->bless('normal') or next PATCH;
+        if ($cmd eq 'a' && defined($i_end)) { # invalid input "X,YaZ"
+            my $input = $_;
+            chomp $input;
+            $patch->note("Malformed input at line $.: $input\n");
+            $patch->reject($range);
+            last;
+        }
+        $i_end = $i_start unless defined $i_end; # for input "XcY,Z" and "XdY,Z"
+
+        if ($cmd ne 'a' && $i_start > $i_end) { # bad range "2,1c" and "2,1d"
+            my $input = $_;
+            chomp $input;
+            $patch->note("Malformed input at line $.: $input\n");
+            $patch->reject($range);
+            last;
+        }
         my (@d_hunk, @a_hunk);
         my $d_re = qr/^$space< /;
         my $a_re = qr/^$space> /;
@@ -277,8 +307,9 @@ if (ref $patch eq 'Patch') {
     $patch->end;
 }
 
+exit(EX_REJECTS) if $patch->error;
 $patch->note("done\n");
-exit($patch->error ? EX_REJECTS : EX_SUCCESS);
+exit EX_SUCCESS;
 
 END {
     close STDOUT || die "$0: can't close stdout: $!\n";
@@ -301,6 +332,7 @@ BEGIN {
 
 # Simple throw/catch error handling.
 sub throw {
+    my $self = shift;
     $@ = join '', @_;
     $@ .= sprintf " at %s line %d\n", (caller)[1..2] unless $@ =~ /\n\z/;
     goto CATCH;
@@ -356,13 +388,9 @@ sub bless {
                {};
     bless $self, $class;
 
-    # 'options' and 'garbage'  are probably better off as class
-    # data.  Why didn't I do that before?  But it's not broken
-    # so I'm not fixing it.
-    $self->{options} = $options;    # @options
+    # Item 'garbage' is probably better off as class data
     $self->{garbage} = [];          # garbage lines
     $self->{i_pos}   = 0;           # current position in 'in' file
-    $self->{o_pos}   = 0;           # just for symmetry
     $self->{i_lines} = 0;           # lines read in 'in' file
     $self->{o_lines} = 0;           # lines written to 'out' file
     $self->{hunk}    = 1;           # current hunk number
@@ -382,7 +410,7 @@ sub bless {
     $self->note("Hmm...  Looks like a$n $type diff to me...\n");
 
     # Get original file to patch...
-    my $orig = $self->{origfile};                   # ...from -o
+    my $orig = $self->{origfile};
 
     unless (defined $orig) {
         $orig = $self->rummage($garbage);           # ...from leading garbage
@@ -681,7 +709,7 @@ sub suffix_backup {
 sub apply {
     my ($self, $i_start, $o_start, @hunk) = @_;
 
-    $self->{skip} and throw('SKIP...ignore this patch');
+    $self->{skip} and $self->throw('SKIP...ignore this patch');
 
     if ($self->{reverse}) {
         my $not = { qw/ + - - + / };
@@ -729,15 +757,15 @@ sub apply {
                             $self->{reverse} = 0;
                             $position = 0;
                             prompt ('Apply anyway? [n] ') =~ /^[yY]/
-                                or throw('SKIP...ignore this patch');
+                                or $self->throw('SKIP...ignore this patch');
                         }
                     }
                 } else {
-                    throw('SKIP...ignore this patch') if $self->{forward};
+                    $self->throw('SKIP...ignore this patch') if $self->{forward};
                 }
             }
         }
-        $position or throw("Couldn't find anywhere to put hunk.\n");
+        $position or $self->throw("Couldn't find anywhere to put hunk.\n");
     } else {
         # No context.  Use given position.
         $position = [$i_start - $self->{i_lines} - 1]
@@ -749,7 +777,7 @@ sub apply {
     my $ifdef = $self->{ifdef};
 
     # Make sure we're where we left off.
-    seek $in, $self->{i_pos}, 0 or throw("Couldn't seek INFILE: $!");
+    seek $in, $self->{i_pos}, 0 or $self->throw("Couldn't seek INFILE: $!");
 
     my $line = $self->{o_lines} + $position->[0] + 1;
     my $off  = $line - $o_start;
@@ -815,7 +843,7 @@ sub index {
     my ($self, $match, $pos, $lines) = @_;
     my $in = $self->{i_fh};
 
-    seek($in, $pos, 0) or throw("Couldn't seek INFILE [$in, 0, $pos]: $!");
+    seek($in, $pos, 0) or $self->throw("Couldn't seek INFILE: $!");
     <$in> while $lines--;
 
     if ($self->{'ignore-whitespace'}) {
@@ -835,7 +863,7 @@ sub index {
                 $line eq $match->[$_] or $fail++, last;
             }
             if ($fail) {
-                seek($in, $tell, 0) or throw("Couldn't seek INFILE: $!");
+                seek($in, $tell, 0) or $self->throw("Couldn't seek INFILE: $!");
                 <$in>;
             } else {
                 return ($tell, $line);
@@ -916,42 +944,9 @@ use base 'Patch';
 sub apply {
     my ($self, @cmd) = @_;
 
-    $self->{skip} and throw('SKIP...ignore this patch');
+    $self->{skip} and $self->throw('SKIP...ignore this patch');
 
     my $out = $self->{o_fh};
-
-    $self->{check} and goto PLAN_J;
-
-    # We start out by adding a magic line to our output.  If this line
-    # is still there after piping to ed, then ed failed.  We do this
-    # because win32 will silently fail if there is no ed program.
-    my $magic = "#!/i/want/a/moogle/stuffy\n";
-    print $out $magic;
-
-    # Pipe to ed.
-    eval {
-        open ED, '|-', 'ed', '-s', $self->{'i_file'} or die "Couldn't fork ed: $!";
-        print ED map @$_, @cmd               or die "Couldn't print ed: $!";
-        print ED "wq $self->{o_file}\n"     or die "Couldn't print ed: $!";
-        close ED                             or die "Couldn't close ed: $?";
-    };
-
-    # Did pipe to ed work?
-    seek($out, 0, 0)  or throw("Couldn't seek OUT: $!");
-    my $testline = <$out>;
-    if (!$@ && $testline ne $magic) {
-        $self->note("Hunk #$self->{hunk} succeeded at 1.\n");
-        return 1;
-    }
-
-    # Erase any trace of magic line.
-    truncate($out, 0) or throw("Couldn't truncate OUT: $!");
-    seek($out, 0, 0)  or throw("Couldn't seek OUT: $!");
-
-    # Try to apply ed script by hand.
-    $self->note("Pipe to ed failed.  Switching to Plan J...\n");
-
-    PLAN_J:
 
     # Pre-process each ed command.  Ed diffs are reversed (so that each
     # command doesn't end up changing the line numbers of subsequent
@@ -963,9 +958,16 @@ sub apply {
         my @hunk = @{$cmd[$i]};
 
         shift(@hunk) =~ m!^(\d+)(?:,(\d+))?([acds])!
-            or throw('Unable to parse ed script');
+            or $self->throw('Unable to parse ed script');
 
-        my ($start, $end, $cmd) = ($1, $2 || $1, $3);
+        my ($start, $end, $cmd) = ($1, $2, $3);
+        $end = $start unless defined $end; # 0 can appear
+        if ($start > $end) {
+            $self->throw("Invalid address range: $start,$end\n");
+        }
+        if ($start == 0 && $cmd ne 'a') {
+            $self->throw("Address zero invalid for command: $start,$end$cmd\n");
+        }
 
         # We don't parse substitution commands and assume they all mean
         # s/\.\././ even if they really mean s/\s+// or such.  And we
@@ -974,6 +976,8 @@ sub apply {
             $cmd[$i] = '';
             s/\.\././ for @{$cmd[$i-1][3]};
             next;
+        } elsif ($cmd eq 'a') {
+            $start = $end if $start < $end; # "1,10a" takes 10 as target
         }
 
         # Remove '.' line used to terminate hunks.

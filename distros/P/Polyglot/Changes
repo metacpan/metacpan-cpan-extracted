@@ -1,5 +1,11 @@
 Revision history for Perl module Polyglot
 
+1.008 2025-04-13T20:44:12Z
+	* move version.pm to TEST_REQUIRES
+
+1.007 2025-04-13T18:51:23Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.006 2025-01-09T06:55:05Z
 	* refresh distro and move to BRIANDFOY
 

@@ -7,22 +7,22 @@ class HTTP::Tiny::EventEmitter {
   # Instance Methods
   method emit : void ($name : string, $args : object[] = undef) {
     
-    die "[TODO]";
+    # die "[TODO]";
   }
   
   method once : void ($name : string, $cb : object) {
     
-    die "TODO";
+    # die "TODO";
   }
   
   method on : void ($name : string, $cb : object) {
     
-    die "TODO";
+    # die "TODO";
   }
 
   method unsubscribe : void ($name : string, $cb : object) {
     
-    die "TODO";
+    # die "TODO";
   }
   
 }

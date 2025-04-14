@@ -28,8 +28,8 @@ do { my $x = {
                                       'Params::ValidationCompiler' => '0',
                                       'Test2::API' => '0',
                                       'Types::Standard' => '0',
-                                      'base' => '0',
                                       'namespace::autoclean' => '0',
+                                      'parent' => '0',
                                       'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }

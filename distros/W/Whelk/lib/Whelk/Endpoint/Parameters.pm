@@ -1,5 +1,5 @@
 package Whelk::Endpoint::Parameters;
-$Whelk::Endpoint::Parameters::VERSION = '1.03';
+$Whelk::Endpoint::Parameters::VERSION = '1.04';
 use Whelk::StrictBase;
 
 use Carp;

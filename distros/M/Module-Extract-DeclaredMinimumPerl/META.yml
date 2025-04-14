@@ -25,10 +25,10 @@ requires:
   Test::Output: '0'
   feature: '0'
   perl: '5.010'
-  version: '0'
+  version: '0.86'
 resources:
   bugtracker: https://github.com/briandfoy/module-extract-declaredminimumperl/issues
   homepage: https://github.com/briandfoy/module-extract-declaredminimumperl
   repository: https://github.com/briandfoy/module-extract-declaredminimumperl
-version: '1.025'
+version: '1.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

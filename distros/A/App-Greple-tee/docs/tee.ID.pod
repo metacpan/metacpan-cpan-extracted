@@ -10,7 +10,7 @@ App::Greple::tee - modul untuk mengganti teks yang cocok dengan hasil perintah e
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ Gabungkan urutan baris yang tidak kosong menjadi satu baris sebelum meneruskanny
 
 Menggabungkan dua atau lebih karakter baris baru yang berurutan menjadi satu.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-Opsi B<--offload> L<teip(1)> diimplementasikan dalam modul B<-Mline> yang berbeda.
+Opsi B<--offload> dari L<teip(1)> diimplementasikan di modul berbeda L<App::Greple::L> (B<-ML>).
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-Anda juga dapat menggunakan modul B<line> untuk memproses hanya baris bernomor genap sebagai berikut.
+Anda juga bisa menggunakan modul B<-ML> untuk memproses baris bernomor genap seperti berikut ini.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Kemudian ubah karakter CR menjadi NL setelahnya dengan perintah L<tr(1)> atau ya
 
 Pertimbangkan situasi di mana Anda ingin mencari string dari baris non-header. Sebagai contoh, Anda mungkin ingin mencari nama citra Docker dari perintah C<docker image ls>, tetapi meninggalkan baris header. Anda dapat melakukannya dengan perintah berikut.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Opsi C<-Mline -L 2:> mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah C<grep perl>. Opsi --discrete diperlukan karena jumlah baris dari input dan output berubah, tetapi karena perintah ini hanya dieksekusi satu kali, maka tidak ada kekurangan dalam hal performa.
+Opsi C<-ML 2:> mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah C<grep perl>. Opsi --discrete diperlukan karena jumlah baris dari input dan output berubah, tetapi karena perintah ini hanya dieksekusi satu kali, maka tidak ada kekurangan dalam hal performa.
 
 Jika Anda mencoba melakukan hal yang sama dengan perintah B<teip>, C<teip -l 2- - grep> akan memberikan kesalahan karena jumlah baris output kurang dari jumlah baris input. Namun, tidak ada masalah dengan hasil yang diperoleh.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

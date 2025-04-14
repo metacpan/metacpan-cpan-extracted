@@ -1,3 +1,10 @@
+0.010 2025-04-14
+  [Requirement Changes]
+    * Require MIME::Base64 1.003.
+    * Require SPVM::JSON 1.002.
+  [Internal Changes]
+    * Add some internal classes.
+
 0.009 2025-04-07
   [Requirement Changes]
     * Require SPVM::Digest::SHA 0.065.

@@ -1,0 +1,327 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Cookie::Response extends HTTP::Tiny::Cookie {
+  version_from HTTP::Tiny;
+  
+  use HTTP::Tiny::Util;
+  
+  # Class Variables
+  our $ATTRS : Hash;
+  INIT {
+    $ATTRS = Hash->new({
+      domain => 1,
+      expires => 1,
+      httponly => 1,
+      "max-age" => 1,
+      path => 1,
+      samesite => 1,
+      secure => 1,
+    });
+  }
+  
+  # Fields
+  has domain : ro string;
+  
+  has expires : ro long;
+  
+  has host_only : ro byte;
+  
+  has httponly : ro byte;
+  
+  has max_age : ro int;
+  
+  has path : ro string;
+  
+  has samesite : ro string;
+  
+  has secure : ro byte;
+  
+  # Class Methods
+  static method new : HTTP::Tiny::Cookie::Response () {
+    
+    my $self = new HTTP::Tiny::Cookie::Response;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  static method parse : HTTP::Tiny::Cookie::Response[] ($str : string) {
+    
+    my $cookies = List->new(new HTTP::Tiny::Cookie::Request[0]);
+    
+    my $tree = HTTP::Tiny::Util->split_cookie_header($str // "");
+    
+    for (my $i = 0; $i < @$tree; $i += 2) {
+      my $pairs = $tree->[$i];
+      my $name = $pairs->[0];
+      my $value = $pairs->[1];
+      
+      my $cookie = HTTP::Tiny::Cookie::Response->new;
+      $cookie->{name} = $name;
+      $cookie->{value} = $value // "";
+      
+      for (my $j = 2; $j < @$tree; $j += 2) {
+        my $name = $pairs->[$j];
+        my $value = $pairs->[$j + 1];
+        
+        my $attr = Fn->lc($name);
+        unless ($ATTRS->exists($attr)) {
+          next;
+        }
+        
+        if ($attr eq "domain") {
+          if ($value) {
+            my $value_ref = [$value];
+            Re->s($value_ref, "^\.", "");
+            $value = $value_ref->[0];
+            $cookie->{domain} = $value;
+          }
+        }
+        elsif ($attr eq "expires") {
+          $cookie->{expires} = HTTP::Tiny::Date->new($value // "")->epoch;
+        }
+        elsif ($attr eq "httponly") {
+          $cookie->{httponly} = 1;
+        }
+        elsif ($attr eq "max-age") {
+          $cookie->{max_age} = Fn->to_int($value);
+        }
+        elsif ($attr eq "path") {
+          $cookie->{path} = $value;
+        }
+        elsif ($attr eq "samesite") {
+          $cookie->{samesite} = $value;
+        }
+        elsif ($attr eq "secure") {
+          $cookie->{secure} = 1;
+        }
+      }
+      
+      $cookies->push($cookie);
+      
+    }
+    
+    return $cookies->to_array->(HTTP::Tiny::Cookie::Response[]);
+  }
+  
+  method to_string : string () {
+    
+    # Name and value
+    my $name = $self->name;
+    unless (length $name) {
+      return "";
+    }
+    my $value  = $self->value // "";
+    my $cookie = Fn->join("=", [$name, Re->m($value, "[,;\" ]") ? HTTP::Tiny::Util->quote($value) : $value]);
+    
+    # "expires"
+    my $expires = $self->expires;
+    if ($expires >= 0) {
+      $cookie .= "; expires=" . HTTP::Tiny::Date->new($expires)->to_string;
+    }
+    
+    # "domain"
+    if (my $domain = $self->domain) { $cookie .= "; domain=$domain"; }
+    
+    # "path"
+    if (my $path = $self->path) { $cookie .= "; path=$path"; }
+    
+    # "secure"
+    if ($self->secure) {
+      $cookie .= "; secure";
+    }
+    
+    # "HttpOnly"
+    if ($self->httponly) {
+      $cookie .= "; HttpOnly";
+    }
+    
+    # "Same-Site"
+    if (my $samesite = $self->samesite) {
+      $cookie .= "; SameSite=$samesite";
+    }
+    
+    # "Max-Age"
+    if ((my $max = $self->max_age) >= 0) {
+      $cookie .= "; Max-Age=$max";
+    }
+    
+    return $cookie;
+  }
+  
+}
+
+__END__
+
+TODO
+
+package Mojo::Cookie::Response;
+use Mojo::Base 'Mojo::Cookie';
+
+use Mojo::Date;
+use Mojo::Util qw(quote split_cookie_header);
+
+has [qw(domain expires host_only httponly max_age path samesite secure)];
+
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
+
+sub parse {
+  my ($self, $str) = @_;
+
+  my @cookies;
+  my $tree = split_cookie_header $str // '';
+  while (my $pairs = shift @$tree) {
+    my ($name, $value) = splice @$pairs, 0, 2;
+    push @cookies, $self->new(name => $name, value => $value // '');
+
+    while (my ($name, $value) = splice @$pairs, 0, 2) {
+      next unless $ATTRS{my $attr = lc $name};
+      $value =~ s/^\.// if $attr eq 'domain' && defined $value;
+      $value = Mojo::Date->new($value // '')->epoch if $attr eq 'expires';
+      $value = 1                                    if $attr eq 'secure' || $attr eq 'httponly';
+      $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
+    }
+  }
+
+  return \@cookies;
+}
+
+sub to_string {
+  my $self = shift;
+
+  # Name and value
+  return '' unless length(my $name = $self->name // '');
+  my $value  = $self->value // '';
+  my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote $value : $value;
+
+  # "expires"
+  my $expires = $self->expires;
+  $cookie .= '; expires=' . Mojo::Date->new($expires) if defined $expires;
+
+  # "domain"
+  if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
+
+  # "path"
+  if (my $path = $self->path) { $cookie .= "; path=$path" }
+
+  # "secure"
+  $cookie .= "; secure" if $self->secure;
+
+  # "HttpOnly"
+  $cookie .= "; HttpOnly" if $self->httponly;
+
+  # "Same-Site"
+  if (my $samesite = $self->samesite) { $cookie .= "; SameSite=$samesite" }
+
+  # "Max-Age"
+  if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
+
+  return $cookie;
+}
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mojo::Cookie::Response - HTTP response cookie
+
+=head1 SYNOPSIS
+
+  use Mojo::Cookie::Response;
+
+  my $cookie = Mojo::Cookie::Response->new;
+  $cookie->name('foo');
+  $cookie->value('bar');
+  say "$cookie";
+
+=head1 DESCRIPTION
+
+L<Mojo::Cookie::Response> is a container for HTTP response cookies, based on L<RFC
+6265|https://tools.ietf.org/html/rfc6265>.
+
+=head1 ATTRIBUTES
+
+L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and implements the following new ones.
+
+=head2 domain
+
+  my $domain = $cookie->domain;
+  $cookie    = $cookie->domain('localhost');
+
+Cookie domain.
+
+=head2 expires
+
+  my $expires = $cookie->expires;
+  $cookie     = $cookie->expires(time + 60);
+
+Expiration for cookie.
+
+=head2 host_only
+
+  my $bool = $cookie->host_only;
+  $cookie  = $cookie->host_only($bool);
+
+Host-only flag, indicating that the canonicalized request-host is identical to the cookie's L</"domain">.
+
+=head2 httponly
+
+  my $bool = $cookie->httponly;
+  $cookie  = $cookie->httponly($bool);
+
+HttpOnly flag, which can prevent client-side scripts from accessing this cookie.
+
+=head2 max_age
+
+  my $max_age = $cookie->max_age;
+  $cookie     = $cookie->max_age(60);
+
+Max age for cookie.
+
+=head2 path
+
+  my $path = $cookie->path;
+  $cookie  = $cookie->path('/test');
+
+Cookie path.
+
+=head2 samesite
+
+  my $samesite = $cookie->samesite;
+  $cookie      = $cookie->samesite('Lax');
+
+SameSite value. Note that this attribute is B<EXPERIMENTAL> because even though most commonly used browsers support the
+feature, there is no specification yet besides L<this
+draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
+
+=head2 secure
+
+  my $bool = $cookie->secure;
+  $cookie  = $cookie->secure($bool);
+
+Secure flag, which instructs browsers to only send this cookie over HTTPS connections.
+
+=head1 METHODS
+
+L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and implements the following new ones.
+
+=head2 parse
+
+  my $cookies = Mojo::Cookie::Response->parse('f=b; path=/');
+
+Parse cookies.
+
+=head2 to_string
+
+  my $str = $cookie->to_string;
+
+Render cookie.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+
+=cut

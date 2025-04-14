@@ -11,7 +11,7 @@ use File::Copy ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-22'; # DATE
 our $DIST = 'File-Util-Copy'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        copy_noclobber
@@ -76,7 +76,7 @@ File::Util::Copy - Utilities related to copying files
 
 =head1 VERSION
 
-This document describes version 0.001 of File::Util::Copy (from Perl distribution File-Util-Copy), released on 2024-11-22.
+This document describes version 0.002 of File::Util::Copy (from Perl distribution File-Util-Copy), released on 2024-11-22.
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,8 @@ Source repository is at L<https://github.com/perlancar/perl-File-Util-Copy>.
 =head1 SEE ALSO
 
 L<File::Copy::NoClobber> also has a non-clobber version of copy()
+
+L<File::Util::Rename>'s C<rename_noclobber()>, C<rename_warnclobber()>.
 
 =head1 AUTHOR
 

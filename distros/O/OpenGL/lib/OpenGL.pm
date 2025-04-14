@@ -15,7 +15,7 @@ use Exporter 'import';
 
 use Carp;
 
-our $VERSION = '0.7004';
+our $VERSION = '0.7006';
 our $BUILD_VERSION = our $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 
@@ -121,7 +121,9 @@ our $glext_dependencies =
 my @gl_func_common = qw(
    glAccum
    glAlphaFunc
+   glAttachShader
    glBegin
+   glBeginQuery
    glBlendColorEXT
    glBlendEquationEXT
    glBlendFunc
@@ -151,15 +153,19 @@ my @gl_func_common = qw(
    glCopyPixels
    glCullFace
    glDeleteLists
+   glDeleteQueries
+   glDeleteShader
    glDepthFunc
    glDepthMask
    glDepthRange
    glDisable
    glDrawBuffer
+   glDrawElementsBaseVertex_c
    glEdgeFlag
    glEnable
    glEnd
    glEndList
+   glEndQuery
    glEvalCoord1d
    glEvalCoord1f
    glEvalCoord2d
@@ -175,7 +181,14 @@ my @gl_func_common = qw(
    glFrontFace
    glFrustum
    glGenLists
+   glGenQueries_p
    glGetError
+   glGetProgramiv_p
+   glGetQueryObjectiv
+   glGetQueryObjectuiv
+   glGetQueryiv
+   glGetShaderiv_p
+   glGetShaderInfoLog_p
    glHint
    glIndexMask
    glIndexd
@@ -305,6 +318,7 @@ our @gl_func = (@gl_func_common, qw(
    glBindRenderbufferEXT
    glBindTexture
    glBindTextureEXT
+   glBindVertexArray
    glBitmap_c
    glBitmap_p
    glBitmap_s
@@ -410,6 +424,7 @@ our @gl_func = (@gl_func_common, qw(
    glDeleteTextures_c
    glDeleteTextures_p
    glDeleteTextures_s
+   glDeleteVertexArrays
    glDetachObjectARB
    glDisableClientState
    glDisableVertexAttribArrayARB
@@ -465,6 +480,7 @@ our @gl_func = (@gl_func_common, qw(
    glGenTextures_c
    glGenTextures_p
    glGenTextures_s
+   glGenVertexArrays_p
    glGenerateMipmapEXT
    glGetActiveAttribARB_c
    glGetActiveAttribARB_p
@@ -1315,6 +1331,7 @@ my @gl_const_common = qw(
    GL_DECAL
    GL_DECR
    GL_DEPTH
+   GL_DEPTH_ATTACHMENT
    GL_DEPTH_BIAS
    GL_DEPTH_BITS
    GL_DEPTH_BUFFER_BIT
@@ -1336,6 +1353,7 @@ my @gl_const_common = qw(
    GL_DONT_CARE
    GL_DOUBLEBUFFER
    GL_DRAW_BUFFER
+   GL_DRAW_FRAMEBUFFER
    GL_DRAW_PIXEL_TOKEN
    GL_DST_ALPHA
    GL_DST_COLOR
@@ -1365,6 +1383,9 @@ my @gl_const_common = qw(
    GL_FOG_INDEX
    GL_FOG_MODE
    GL_FOG_START
+   GL_FRAMEBUFFER
+   GL_FRAMEBUFFER_COMPLETE
+   GL_FRAMEBUFFER_SRGB
    GL_FRONT
    GL_FRONT_AND_BACK
    GL_FRONT_FACE
@@ -1373,6 +1394,7 @@ my @gl_const_common = qw(
    GL_FUNC_ADD_EXT
    GL_FUNC_REVERSE_SUBTRACT_EXT
    GL_FUNC_SUBTRACT_EXT
+   GL_GEOMETRY_SHADER
    GL_GEQUAL
    GL_GREATER
    GL_GREEN
@@ -1408,6 +1430,7 @@ my @gl_const_common = qw(
    GL_RETURN
    GL_SCISSOR_BIT
    GL_STENCIL_BUFFER_BIT
+   GL_TEXTURE_2D_ARRAY
    GL_TEXTURE_BIT
    GL_TRANSFORM_BIT
    GL_TRIANGLES
@@ -1514,6 +1537,7 @@ my @gl_const_common = qw(
    GL_MAP_STENCIL
    GL_MATRIX_MODE
    GL_MAX_3D_TEXTURE_SIZE_EXT
+   GL_MAX_ARRAY_TEXTURE_LAYERS
    GL_MAX_ATTRIB_STACK_DEPTH
    GL_MAX_CLIP_PLANES
    GL_MAX_CONVOLUTION_HEIGHT_EXT
@@ -1685,6 +1709,7 @@ my @gl_const_common = qw(
    GL_SRC_ALPHA
    GL_SRC_ALPHA_SATURATE
    GL_SRC_COLOR
+   GL_SRGB_ALPHA
    GL_STACK_OVERFLOW
    GL_STACK_UNDERFLOW
    GL_STENCIL

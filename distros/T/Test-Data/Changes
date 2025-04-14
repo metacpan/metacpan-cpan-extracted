@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Data
 
+1.248 2025-04-13T22:28:23Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.247 2025-01-13T13:26:17Z
 	* refresh distro
 

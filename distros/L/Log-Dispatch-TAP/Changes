@@ -1,5 +1,19 @@
 Revision history for Log-Dispatch-TAP:
 
+v0.2.2    2025-04-13 17:20:22+01:00 Europe/London
+  [Enhancements]
+  - Changed to use parent instead of base.
+
+  [Documentation]
+  - Added a security policy.
+
+  - Removed reference to earlier Perl versions.
+
+  - Updated copyright year.
+
+  [Toolchain]
+  - Removed building of MINIFEST.SKIP.
+
 v0.2.1    2023-05-08 10:35:10+01:00 Europe/London
   [Documentation]
   - Removed inaccurate statement about Log::Dispatch::TestDiag.

@@ -87,6 +87,7 @@ sub new {
   my $this = shift;
   my @types = @_ ? @_ : ('GLSL','CG','ARB');
   foreach my $type (@types) {
+    next if !$type;
     my $module = GetTypeModule($type);
     (my $file = $module) =~ s{::}{/}g;
     require "$file.pm";

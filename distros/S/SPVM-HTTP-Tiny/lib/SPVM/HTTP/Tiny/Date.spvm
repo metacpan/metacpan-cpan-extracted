@@ -37,6 +37,19 @@ class HTTP::Tiny::Date {
     return $self;
   }
   
+  static method new_from_epoch : HTTP::Tiny::Date ($epoch : long) {
+    
+    my $self = new HTTP::Tiny::Date;
+    
+    unless ($epoch >= 0) {
+      die "The epoch \$epoch must be a non-negative value.";
+    }
+    
+    $self->{epoch} = $epoch;
+    
+    return $self;
+  }
+  
   # Instance Methods
   method parse : void ($date : string) {
     

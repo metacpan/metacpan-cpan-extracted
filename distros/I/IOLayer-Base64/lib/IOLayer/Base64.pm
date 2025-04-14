@@ -4,7 +4,7 @@ package IOLayer::Base64;
 # Set the version info
 
 use strict;
-$IOLayer::Base64::VERSION = 0.03;
+$IOLayer::Base64::VERSION = 0.04;
 
 # Make sure the encoding/decoding stuff is available
 
@@ -120,6 +120,10 @@ IOLayer::Base64 - PerlIO layer for base64 (MIME) encoded strings
  
  open( my $out,'>Via(IOLayer::Base64)','file.mime' )
   or die "Can't open file.mime for writing: $!\n";
+
+=head1 DEPRECATED
+
+This module is deprecated please use L<PerlIO::Via::Base64> instead.
 
 =head1 DESCRIPTION
 

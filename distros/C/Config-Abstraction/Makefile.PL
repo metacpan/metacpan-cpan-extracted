@@ -27,16 +27,18 @@ WriteMakefile(
 		'Carp' => 0,
 		'Config::Auto' => 0,
 		'Config::IniFiles' => 0,
+		'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
 		'JSON::MaybeXS'	=> 0,
 		'Params::Get' => 0,
 		'YAML::XS' => 0,
 		'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
 		'XML::LibXML' => 0,	# do.
 		'XML::Simple' => 0,
-		'File::Slurp'	=> 0,
-		'File::Spec'	=> 0,
+		'File::Slurp' => 0,
+		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,
 		'Hash::Flatten'	=> 0,
+		'JSON::Parse' => 0
 	},
 	META_MERGE => {
 		resources => {

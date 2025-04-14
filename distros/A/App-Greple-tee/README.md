@@ -9,7 +9,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -73,17 +73,17 @@ with **--discrete** option.
 
     Combines two or more consecutive newline characters into one.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
     [teip(1)](http://man.he.net/man1/teip)'s **--offload** option is implemented in the different
-    module **-Mline**.
+    module [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**).
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    You can also use the **line** module to process only even-numbered
-    lines as follows.
+    You can also use the **-ML** module to process only even-numbered lines
+    as follows.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -194,9 +194,9 @@ non-header lines. For example, you may want to search for Docker image
 names from the `docker image ls` command, but leave the header line.
 You can do it by following command.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Option `-Mline -L 2:` retrieves the second to last lines and sends
+Option `-ML 2:` retrieves the second to last lines and sends
 them to the `grep perl` command.  The option --discrete is required
 because the number of lines of input and output changes, but since the
 command is only executed once, there is no performance drawback.
@@ -235,7 +235,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

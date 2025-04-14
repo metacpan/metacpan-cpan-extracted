@@ -8,7 +8,7 @@ App::Greple::tee - マッチしたテキストを外部コマンドの結果に�
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Filterコマンドはモジュール宣言(`-Mtee`)に続き、2つのダッシ�
 
     2つ以上の連続する改行文字を1つにまとめる。
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    [teip(1)](http://man.he.net/man1/teip)の**--offload**オプションは、別のモジュール**-Mline**に実装されている。
+    [teip(1)](http://man.he.net/man1/teip) の **--offload** オプションは、別のモジュール [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**) に実装されています。
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    また、**-line** モジュールを使って、次のように偶数行だけを処理することもできる。
+    **-ML**モジュールを使って、次のように偶数行だけを処理することもできます。
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ discreteオプションは複数のプロセスを起動するので、プロセ
 
 ヘッダ行以外から文字列を grep したい場合を考えてみましょう。例えば、`docker image ls`コマンドからDockerイメージ名を検索したいが、ヘッダ行は残したいとします。以下のコマンドで可能です。
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-オプション`-Mline -L 2:`は2行目から最後の行を検索し、`grep perl`コマンドに送ります。入出力の行数が変わるので-discreteオプションが必要だが、コマンドは一度しか実行されないので性能上の欠点はない。
+オプション `-ML 2:` は最後から2番目の行を取り出し、`grep perl` コマンドに送ります。入出力の行数が変わるので --discrete オプションが必要だが、コマンドは一度しか実行されないので、性能上の欠点はない。
 
 **teip**コマンドで同じことをしようとすると、`teip -l 2- -- grep`は出力行数が入力行数より少ないのでエラーになる。しかし、得られる結果に問題はない。
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

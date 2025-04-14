@@ -12,7 +12,3 @@ print $foo->serialise($foo->rotate([1,1,2],[0,$foo->pi,0])),":\n";
 print $foo->serialise([-1,1,-2]),":\n";    
 ok( $foo->serialise([-1,1]) eq $foo->serialise($foo->rotate([1,1],$foo->pi/2)),'test 2d rotate ' );
 ok( $foo->serialise([-1,1,-2]) eq $foo->serialise($foo->rotate([1,1,2],[0,$foo->pi,0])),'test 3d rotate ' );
-   
-
-
-

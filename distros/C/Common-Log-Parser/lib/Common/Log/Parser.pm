@@ -2,20 +2,21 @@ package Common::Log::Parser;
 
 # ABSTRACT: Parse the common log format lines used by Apache
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Exporter 5.57 qw( import );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 our @EXPORT_OK = qw( split_log_line );
 
+use experimental qw( signatures );
 
-sub split_log_line {
+
+sub split_log_line ($line) {
 
 
-    my ($line) = @_;
     my @matches = $line =~ /(?: \A | [ ]) ( - | \[ [^]]+ \] | " (?:\\.|[^"])* " | \S+ ) /agx;
     return \@matches;
 }
@@ -34,7 +35,7 @@ Common::Log::Parser - Parse the common log format lines used by Apache
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -76,9 +77,15 @@ L<ApacheLog::Parser>
 
 =item *
 
-L<Regexp::Long::Common>
+L<Regexp::Log::Common>
 
 =back
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.20 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SOURCE
 
@@ -94,6 +101,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -102,7 +114,7 @@ The initial development of this module was partially supported by Science Photo 
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Robert Rothenberg.
+This software is Copyright (c) 2024-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

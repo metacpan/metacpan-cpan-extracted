@@ -4,7 +4,7 @@ package IOLayer::MD5;
 # Set the version info
 
 use strict;
-$IOLayer::MD5::VERSION = 0.02;
+$IOLayer::MD5::VERSION = 0.03;
 
 # Make sure the encoding/decoding stuff is available
 
@@ -118,6 +118,10 @@ IOLayer::MD5 - PerlIO layer for creating an MD5 digest of a file
   or die "Can't open file for digesting: $!\n";
  my $digest = <$in>;
 
+=head1 DEPRECATED
+
+This module is deprecated please use L<PerlIO::via::MD5> instead.
+
 =head1 DESCRIPTION
 
 This module implements a PerlIO layer that can only read files and return an
@@ -150,7 +154,7 @@ L<IOLayer::Base64>.
 
 maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
-Copyright (c) 2002 Elizabeth Mattijsen.
+Copyright (c) 2002 Elizabeth Mattijsen. 2025 lnation
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

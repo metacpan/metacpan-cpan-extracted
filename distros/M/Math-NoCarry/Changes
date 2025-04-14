@@ -1,5 +1,8 @@
 Revision history for Perl module Math::NoCarry
 
+1.117 2025-04-13T22:28:40Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.116 2025-01-05T10:36:36Z
 	* refresh distro and move to BRIANDFOY
 

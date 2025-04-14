@@ -1,6 +1,6 @@
 package PerlIO::via::Include;
 
-$VERSION= '0.05';
+$VERSION= '0.06';
 
 # be as strict as possible
 use strict;
@@ -179,7 +179,7 @@ PerlIO::via::Include - PerlIO layer for including other files
 
 =head1 VERSION
 
-This documentation describes version 0.05.
+This documentation describes version 0.06.
 
 =head1 DESCRIPTION
 

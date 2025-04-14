@@ -1,5 +1,8 @@
 Revision history for Perl module Ma::OSVersion
 
+1.017 2025-04-13T22:31:45Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.016 2025-01-09T06:02:08Z
 	* add Sequoia
 

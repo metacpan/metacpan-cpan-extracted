@@ -2,7 +2,7 @@ use strict; use warnings;
 
 use Object::Pad;
 
-our $VERSION='0.12';
+our $VERSION='0.13';
 
 class CAD::OpenSCAD::Math{
 	field $pi  :reader;

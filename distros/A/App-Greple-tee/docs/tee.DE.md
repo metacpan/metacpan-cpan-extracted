@@ -8,7 +8,7 @@ App::Greple::tee - Modul zum Ersetzen von übereinstimmendem Text durch das Erge
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Die Zeilen der Ein- und Ausgabedaten müssen nicht identisch sein, wenn die Opti
 
     Kombiniert zwei oder mehr aufeinanderfolgende Zeilenumbruchzeichen zu einem.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    Die Option **--offload** von [teip(1)](http://man.he.net/man1/teip) ist in dem anderen Modul **-Mline** implementiert.
+    Die Option **--offload** von [teip(1)](http://man.he.net/man1/teip) ist in dem anderen Modul [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**) implementiert.
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    Sie können auch das Modul **line** verwenden, um nur geradzahlige Zeilen zu verarbeiten.
+    Sie können das Modul **-ML** auch verwenden, um nur geradzahlige Zeilen zu verarbeiten, wie folgt.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Dann konvertieren Sie das CR-Zeichen mit dem Befehl [tr(1)](http://man.he.net/ma
 
 Stellen Sie sich eine Situation vor, in der Sie nach Zeichenfolgen aus Nicht-Kopfzeilen suchen wollen. Sie könnten zum Beispiel nach Docker-Image-Namen aus dem Befehl `docker image ls` suchen, aber die Kopfzeile weglassen. Sie können dies mit folgendem Befehl tun.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Die Option `-Mline -L 2:` ruft die vorletzte Zeile ab und sendet sie an den Befehl `grep perl`. Die Option --discrete ist erforderlich, weil sich die Anzahl der Ein- und Ausgabezeilen ändert, aber da der Befehl nur einmal ausgeführt wird, gibt es keine Leistungseinbußen.
+Mit der Option `-ML 2:` werden die vorletzten Zeilen abgerufen und an den Befehl `grep perl` gesendet. Die Option --discrete ist erforderlich, weil sich die Anzahl der Ein- und Ausgabezeilen ändert, aber da der Befehl nur einmal ausgeführt wird, gibt es keine Leistungseinbußen.
 
 Wenn Sie versuchen, dasselbe mit dem Befehl **teip** zu tun, gibt `teip -l 2- -- grep` einen Fehler aus, weil die Anzahl der Ausgabezeilen geringer ist als die Anzahl der Eingabezeilen. Das erhaltene Ergebnis ist jedoch unproblematisch.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -39,6 +39,7 @@
             "DBI" : "0",
             "IPC::Open2" : "0",
             "Mojolicious" : "0",
+            "POSIX" : "0",
             "System::Info" : "0.064",
             "Time::HiRes" : "1.9764",
             "Time::Piece" : "1.3401",
@@ -61,6 +62,6 @@
          "url" : "https://github.com/mollusc-labs/slapbird"
       }
    },
-   "version" : 0.011,
+   "version" : 0.012,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

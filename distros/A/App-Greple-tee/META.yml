@@ -20,20 +20,20 @@ no_index:
   directory:
     - t
     - xt
-    - docs
 provides:
   App::Greple::tee:
     file: lib/App/Greple/tee.pm
-    version: '1.01'
+    version: '1.02'
 requires:
-  App::Greple: '9.1506'
+  App::Greple: '9.22'
+  App::Greple::L: '1.01'
   App::sdif: '4.35'
   perl: v5.18.2
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-Greple-tee/issues
   homepage: https://github.com/kaz-utashiro/App-Greple-tee
   repository: https://github.com/kaz-utashiro/App-Greple-tee.git
-version: '1.01'
+version: '1.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

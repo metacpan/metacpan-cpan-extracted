@@ -1,3 +1,8 @@
+2.005003 2025-04-13
+
+* Add new methods to_fp80() and from_fp80() for encoding and decoding values in
+  the x86 extended-precision 80 bit format.
+
 2.005002 2025-03-28
 
 * Fix the handling of read-only objects in bblsft() and bbrsft() in

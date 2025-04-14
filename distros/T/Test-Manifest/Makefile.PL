@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/test-manifest';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => 5.008,
+	'MIN_PERL_VERSION' => '5.008',
 
 	'NAME'	        => $module,
 	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
@@ -63,6 +63,7 @@ my %WriteMakefile = (
 	'TEST_REQUIRES' => {
 		'Test::More' => '1',
 		'File::Temp' => '0',
+		'version'    => '0.86',
 		},
 
 	'PREREQ_PM'     => {

@@ -31,7 +31,7 @@ is( IOLayer::Base64->eol,"\n",		'check eol setting first time' );
 # Create the encoded test-file
 
 ok(
- open( my $out,'>:Via(IOLayer::Base64)', $file ),
+ open( my $out,'>:via(IOLayer::Base64)', $file ),
  "opening '$file' for writing"
 );
 
@@ -50,7 +50,7 @@ ok( close( $test ),			'close test handle' );
 # Check decoding _with_ layers
 
 ok(
- open( my $in,'<:Via(IOLayer::Base64)', $file ),
+ open( my $in,'<:via(IOLayer::Base64)', $file ),
  "opening '$file' for reading"
 );
 is( join( '',<$in> ),$decoded,		'check decoding' );
@@ -59,12 +59,12 @@ ok( close( $in ),			'close decoding handle' );
 # Do the same, now without line endings
 
 IOLayer::Base64->eol( '' );
-is( IOLayer::Base64->eol,'',		'check eol setting second time' );
+is( IOLayer::Base64->eol,'',	'check eol setting second time' );
 
 # Create the encoded test-file
 
 ok(
- open( my $out,'>:Via(IOLayer::Base64)', $file ),
+ open( my $out,'>:via(IOLayer::Base64)', $file ),
  "opening '$file' for writing without eol"
 );
 
@@ -83,7 +83,7 @@ ok( close( $test ),			'close test handle without eol' );
 # Check decoding _with_ layers
 
 ok(
- open( my $in,'<:Via(IOLayer::Base64)', $file ),
+ open( my $in,'<:via(IOLayer::Base64)', $file ),
  "opening '$file' for reading without eol"
 );
 is( join( '',<$in> ),$decoded,		'check decoding without eol' );

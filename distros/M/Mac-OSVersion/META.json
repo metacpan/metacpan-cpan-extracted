@@ -35,7 +35,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -51,6 +52,6 @@
          "web" : "https://github.com/briandfoy/mac-osversion"
       }
    },
-   "version" : "1.016",
+   "version" : "1.017",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

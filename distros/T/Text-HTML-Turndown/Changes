@@ -1,4 +1,12 @@
-0.04 2025-04-10
+0.06 2025-04-12
+    * Don't generate Markdown for empty links as in
+      <a href="https://example.com"></a>
+      Such empty link tags are created by Markdown::Perl for text such as
+      [https://example.com] , if automatic link generation is on
+      (it generates <a ...><a ...></a></a> , and browsers turn the outer link
+      into an empty link, as links cannot be nested)
+
+0.05 2025-04-10
     * Handle newlines in table cells
       We convert them into <br/> , as Markdown tables don't really handle newlines
 

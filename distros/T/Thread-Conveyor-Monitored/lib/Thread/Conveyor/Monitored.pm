@@ -3,7 +3,7 @@ package Thread::Conveyor::Monitored;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 use strict;
 
 # Make sure we only load stuff when we actually need it
@@ -410,7 +410,7 @@ Thread::Conveyor::Monitored - monitor a belt for specific content
 
 =head1 VERSION
 
-This documentation describes version 0.15.
+This documentation describes version 0.16.
 
 =head1 SYNOPSIS
 
@@ -863,11 +863,13 @@ there for an up-to-date status of what can be passed around between threads.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2003, 2007, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>.
+Copyright (c) 2002-2003, 2007, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
 All rights reserved.  This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 

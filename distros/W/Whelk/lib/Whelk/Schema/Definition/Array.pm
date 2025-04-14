@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Array;
-$Whelk::Schema::Definition::Array::VERSION = '1.03';
+$Whelk::Schema::Definition::Array::VERSION = '1.04';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?items' => undef;
@@ -9,14 +9,11 @@ sub openapi_dump
 {
 	my ($self, $openapi_obj, %hints) = @_;
 
-	my $res = {
-		%{$self->_openapi_dump_extra_rules},
-		type => 'array',
-		($self->items ? (items => $self->items->openapi_schema($openapi_obj)) : ()),
-	};
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'array';
 
-	if (defined $self->description) {
-		$res->{description} = $self->description;
+	if ($self->items) {
+		$res->{items} = $self->items->openapi_schema($openapi_obj);
 	}
 
 	return $res;

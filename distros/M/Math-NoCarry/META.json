@@ -31,12 +31,14 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "version" : "0.86"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -52,6 +54,6 @@
          "web" : "https://github.com/briandfoy/math-nocarry"
       }
    },
-   "version" : "1.116",
+   "version" : "1.117",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

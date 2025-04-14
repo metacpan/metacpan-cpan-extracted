@@ -8,7 +8,7 @@ App::Greple::tee - module om gematchte tekst te vervangen door het externe opdra
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegev
 
     Combineert twee of meer opeenvolgende newline-tekens tot één.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    De optie **--offload** van [teip(1)](http://man.he.net/man1/teip) is geïmplementeerd in de andere module **-Mline**.
+    De optie **--offload** van [teip(1)](http://man.he.net/man1/teip) is geïmplementeerd in de andere module [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**).
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    U kunt ook de module **line** gebruiken om alleen even genummerde regels te verwerken.
+    Je kunt de module **-ML** ook gebruiken om alleen even genummerde regels te verwerken, als volgt.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Converteer vervolgens CR naar NL met [tr(1)](http://man.he.net/man1/tr) of iets 
 
 Denk aan een situatie waarin je wilt grepen naar tekenreeksen buiten de kopregels. Bijvoorbeeld, je wilt zoeken naar Docker image namen van het `docker image ls` commando, maar laat de header regel staan. Je kunt dit doen met het volgende commando.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-De optie `-Mline -L 2:` haalt de voorlaatste regels op en stuurt ze naar het commando `grep perl`. De optie --discrete is nodig omdat het aantal regels van invoer en uitvoer verandert, maar omdat het commando maar één keer wordt uitgevoerd, is er geen nadeel voor de prestaties.
+Optie `-ML 2:` haalt de voorlaatste regels op en stuurt ze naar het commando `grep perl`. De optie --discrete is nodig omdat het aantal regels invoer en uitvoer verandert, maar omdat het commando maar één keer wordt uitgevoerd, is er geen nadeel voor de prestaties.
 
 Als je hetzelfde probeert te doen met het **teip** commando, zal `teip -l 2- -- grep` een foutmelding geven omdat het aantal uitvoerregels minder is dan het aantal invoerregels. Er is echter geen probleem met het verkregen resultaat.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

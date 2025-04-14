@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Boolean;
-$Whelk::Schema::Definition::Boolean::VERSION = '1.03';
+$Whelk::Schema::Definition::Boolean::VERSION = '1.04';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 use List::Util qw(none);
@@ -8,21 +8,8 @@ sub openapi_dump
 {
 	my ($self, $openapi_obj, %hints) = @_;
 
-	my $res = {
-		type => 'boolean',
-	};
-
-	if (defined $self->description) {
-		$res->{description} = $self->description;
-	}
-
-	if ($self->has_default) {
-		$res->{default} = $self->inhale_exhale;
-	}
-
-	if (defined $self->example) {
-		$res->{example} = $self->inhale_exhale($self->example);
-	}
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'boolean';
 
 	return $res;
 }

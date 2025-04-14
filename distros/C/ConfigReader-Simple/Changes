@@ -1,5 +1,8 @@
 Revision history for Perl module ConfigReader::Simple
 
+1.298 2025-04-13T22:44:32Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.297 2025-01-04T16:09:56Z
 	* refresh distro and move to BRIANDFOY
 

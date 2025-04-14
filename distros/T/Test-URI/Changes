@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.087 2025-04-13T18:36:54Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.086 2025-01-04T15:57:17Z
 	* refresh distro and move to BRIANDFOY
 

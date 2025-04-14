@@ -177,5 +177,47 @@ subtest 'should be able to reuse partial schema defined in a hash' => sub {
 
 };
 
+subtest 'should correctly extend a scalar schema' => sub {
+	my $to_extend = Whelk::Schema->build(
+		scalar_unextended => {
+			type => 'string',
+		}
+	);
+
+	my $to_extend_wrapped = Whelk::Schema->build(
+		object_unextended => {
+			type => 'object',
+			properties => {
+				p1 => \'scalar_unextended',
+			},
+		},
+	);
+
+	# this triggers the error, as it spawns a default value in the object
+	ok !$to_extend->has_default, 'no default before extending ok';
+
+	my $extended = Whelk::Schema->build(
+		[
+			\'scalar_unextended',
+			example => 'test',
+		]
+	);
+
+	ok !$extended->has_default, 'default value not cloned ok';
+
+	my $extended_wrapped = Whelk::Schema->build(
+		[
+			\'object_unextended',
+			properties => {
+				p2 => {
+					type => 'null',
+				},
+			},
+		]
+	);
+
+	ok !$extended_wrapped->properties->{p1}->has_default, 'default wrapped value not cloned ok';
+};
+
 done_testing;
 

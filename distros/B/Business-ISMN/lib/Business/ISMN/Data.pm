@@ -3,7 +3,7 @@ use 5.008;
 package Business::ISMN::Data;
 use strict;
 
-our $VERSION  = '1.204';
+our $VERSION  = '1.205';
 
 =encoding utf8
 
@@ -25,7 +25,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2005-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2005-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

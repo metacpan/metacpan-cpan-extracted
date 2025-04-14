@@ -37,7 +37,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/briandfoy/tie-boundedinteger"
       }
    },
-   "version" : "1.074",
+   "version" : "1.075",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0605';
 
 use v5.36;
 
@@ -96,13 +96,6 @@ has step_down => (
 
 
 has running => (
-    is      => 'rw',
-    isa     => Bool,
-    default => 0,
-);
-
-
-has stop => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
@@ -209,7 +202,7 @@ sub ramp ($self, $device, $dt, $event) {
     return 0 if $self->running;
     $self->running(1);
 
-    my $value = $self->range_bottom;
+    my $value = $self->initial_point;
 
     $self->rtc->loop->add(
         IO::Async::Timer::Countdown->new(
@@ -250,7 +243,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0601
+version 0.0605
 
 =head1 SYNOPSIS
 
@@ -282,7 +275,7 @@ C<MIDI::RtController::Filter::CC> is a (growing) collection of
 control-change based L<MIDI::RtController> filters.
 
 Passing C<all> to the C<add_filter> method means that any MIDI event
-will cause this filter to be triggered.
+will trigger the filter.
 
 =head2 Making filters
 
@@ -412,15 +405,6 @@ Are we running a filter?
 
 Default: C<0>
 
-=head2 stop
-
-  $stop = $filter->stop;
-  $filter->stop($boolean);
-
-Stop running a filter.
-
-Default: C<0>
-
 =head1 METHODS
 
 =head2 new
@@ -442,8 +426,7 @@ B<channel> once.
 
 This filter sets the B<running> flag, then iterates between the
 B<range_bottom> and B<range_top> by B<range_step> increments, sending
-a B<control> change message, over the MIDI B<channel> every iteration,
-until B<stop> is seen.
+a B<control> change message, over the MIDI B<channel> every iteration.
 
 Passing C<all> means that any MIDI event will cause this filter to be
 triggered.
@@ -454,8 +437,7 @@ triggered.
 
 This filter sets the B<running> flag, chooses a random number between
 the B<range_bottom> and B<range_top>, and sends that as the value of a
-B<control> change message, over the MIDI B<channel>, every iteration,
-until B<stop> is seen.
+B<control> change message, over the MIDI B<channel>, every iteration.
 
 The B<initial_point> is used as the first CC# message, then the
 randomization takes over.
@@ -467,8 +449,7 @@ randomization takes over.
 This filter sets the B<running> flag, uses the B<initial_point> for
 the fist CC# message, then adds B<step_up> or subtracts B<step_down>
 from that number successively, sending the value as a B<control>
-change message, over the MIDI B<channel>, every iteration, until
-B<stop> is seen.
+change message, over the MIDI B<channel>, every iteration.
 
 =head2 ramp
 

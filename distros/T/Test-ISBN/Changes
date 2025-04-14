@@ -1,5 +1,8 @@
 Revision history for Perl module Test::ISBN
 
+2.046 2025-04-13T22:19:56Z
+	* require a newer version.pm for v5.10.1 tests
+
 2.045 2025-01-04T16:05:45Z
 	* refresh distro and move to BRIANDFOY
 

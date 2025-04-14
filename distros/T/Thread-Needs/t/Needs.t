@@ -35,6 +35,7 @@ can_ok( 'Thread::Needs',qw(
 # should fail because Storable not loaded
 my $thread = threads->new( sub { eval {Storable::freeze( \@_ )}; $@ } );
 isa_ok( $thread,'threads',			'check object type' );
+
 my $result = $thread->join;
 like( $result,qr/^Undefined subroutine &Storable::freeze called at/,
  'check result of eval' );
@@ -47,7 +48,6 @@ isa_ok( $thread,'threads',			'check object type' );
 $result = $thread->join;
 like( $result,qr/^Undefined subroutine &Storable::freeze called at/,
  'check result of eval' );
-
 my @notyet = Thread::Needs->import( qw(Storable) );
 ok( (@notyet == 1 and $notyet[0] eq 'Storable'),	'check import with' ); 
 

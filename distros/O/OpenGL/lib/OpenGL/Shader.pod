@@ -28,7 +28,7 @@ Example usage:
   my $ok = OpenGL::Shader::HasType('Cg');
 
   # Instantiate a shader - list acceptable shaders by priority
-  my $shdr = new OpenGL::Shader('GLSL','ARB');
+  my $shdr = OpenGL::Shader->new('GLSL','ARB');
 
   # Get shader type and version
   my $type = $shdr->GetType();

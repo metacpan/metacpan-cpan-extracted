@@ -6,7 +6,7 @@ package Database::Abstraction;
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
 # Personal single user, single computer use: GPL2
-# All other users (for example Commercial, Charity, Educational, Government)
+# All other users (for example, Commercial, Charity, Educational, Government)
 #	must apply in writing for a licence for use from Nigel Horne at the
 #	above e-mail.
 
@@ -23,6 +23,8 @@ package Database::Abstraction;
 # TODO:	It would be better for the default sep_char to be ',' rather than '!'
 # FIXME:	t/xml.t fails in slurping mode
 # TODO:	Other databases e.g. Redis, noSQL, remote databases such as MySQL, PostgresSQL
+# TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
+# TODO: Add support for DBM::Deep
 
 use warnings;
 use strict;
@@ -31,9 +33,9 @@ use boolean;
 use Carp;
 use Config::Auto;
 use Data::Dumper;
+use Data::Reuse;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use Fcntl;	# For O_RDONLY
-use File::Basename;
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
@@ -47,15 +49,15 @@ use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size 
 
 =head1 NAME
 
-Database::Abstraction - read-only database abstraction layer (ORM)
+Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 DESCRIPTION
 
@@ -189,15 +191,13 @@ Therefore when given with no arguments you can get the current default values:
 # Subroutine to initialize with args
 sub init
 {
-	if(scalar(@_)) {
-		my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-		if(($args{'expires_in'} && !$args{'cache_duration'})) {
+	if(my $params = Params::Get::get_params(undef, @_)) {
+		if(($params->{'expires_in'} && !$params->{'cache_duration'})) {
 			# Compatibility with CHI
-			$args{'cache_duration'} = $args{'expires_in'};
+			$params->{'cache_duration'} = $params->{'expires_in'};
 		}
 
-		%defaults = (%defaults, %args);
+		%defaults = (%defaults, %{$params});
 		$defaults{'cache_duration'} ||= '1 hour';
 	}
 
@@ -244,7 +244,8 @@ The database will be held in a file such as $dbname.csv.
 
 =item * C<directory>
 
-Where the database file is held
+Where the database file is held.
+If only one argument is given to C<new()>, it is taken to be C<directory>.
 
 =item * C<filename>
 
@@ -394,11 +395,10 @@ sub _open
 	}
 
 	my $self = shift;
-	my $sep_char = ($self->{'sep_char'} ? $self->{'sep_char'} : '!');
-	my %args = (
-		sep_char => $sep_char,
-		((ref($_[0]) eq 'HASH') ? %{$_[0]} : @_)
-	);
+	my $params = Params::Get::get_params(undef, @_);
+
+	$params->{'sep_char'} ||= $self->{'sep_char'} ? $self->{'sep_char'} : '!';
+	my $max_slurp_size = $params->{'max_slurp_size'} || $self->{'max_slurp_size'};
 
 	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
@@ -419,13 +419,13 @@ sub _open
 	# Look at various places to find the file and derive the file type from the file's name
 	if(-r $slurp_file) {
 		# SQLite file
-		require DBI;
-
-		DBI->import();
+		require DBI && DBI->import() unless DBI->can('connect');
 
 		$dbh = DBI->connect("dbi:SQLite:dbname=$slurp_file", undef, undef, {
 			sqlite_open_flags => SQLITE_OPEN_READONLY,
 		});
+	}
+	if($dbh) {
 		$dbh->do('PRAGMA synchronous = OFF');
 		$dbh->do('PRAGMA cache_size = 65536');
 		$self->_debug("read in $table from SQLite $slurp_file");
@@ -448,7 +448,7 @@ sub _open
 			($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'psv', '<');
 			if(defined($fin)) {
 				# Pipe separated file
-				$args{'sep_char'} = '|';
+				$params->{'sep_char'} = '|';
 			} else {
 				# CSV file
 				($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'csv:db', '<');
@@ -460,17 +460,17 @@ sub _open
 		}
 		if(defined($slurp_file) && (-r $slurp_file)) {
 			close($fin) if(defined($fin));
-			$sep_char = $args{'sep_char'};
+			my $sep_char = $params->{'sep_char'};
 
 			$self->_debug(__LINE__, ' of ', __PACKAGE__, ": slurp_file = $slurp_file, sep_char = $sep_char");
 
-			if($args{'column_names'}) {
+			if($params->{'column_names'}) {
 				$dbh = DBI->connect("dbi:CSV:db_name=$slurp_file", undef, undef,
 					{
 						csv_sep_char => $sep_char,
 						csv_tables => {
 							$table => {
-								col_names => $args{'column_names'},
+								col_names => $params->{'column_names'},
 							},
 						},
 					}
@@ -529,7 +529,7 @@ sub _open
 
 			# Can't slurp when we want to use our own column names as Text::xSV::Slurp has no way to override the names
 			# FIXME: Text::xSV::Slurp can't cope well with quotes in field contents
-			if(((-s $slurp_file) <= $self->{'max_slurp_size'}) && !$args{'column_names'}) {
+			if(((-s $slurp_file) <= $max_slurp_size) && !$params->{'column_names'}) {
 				if((-s $slurp_file) == 0) {
 					# Empty file
 					$self->{'data'} = ();
@@ -575,7 +575,7 @@ sub _open
 		} else {
 			$slurp_file = File::Spec->catfile($dir, "$dbname.xml");
 			if(-r $slurp_file) {
-				if((-s $slurp_file) <= $self->{'max_slurp_size'}) {
+				if((-s $slurp_file) <= $max_slurp_size) {
 					require XML::Simple;
 					XML::Simple->import();
 
@@ -585,8 +585,16 @@ sub _open
 					my @data;
 					if(ref($xml->{$key}) eq 'ARRAY') {
 						@data = @{$xml->{$key}};
-					} else {
+					} elsif(ref($xml) eq 'ARRAY') {
 						@data = @{$xml};
+					} elsif((ref($xml) eq 'HASH') && !$self->{'no_entry'}) {
+						if((scalar(keys %{$xml}) == 1) && $xml->{$table}) {
+							@data = $xml->{$table};
+						} else {
+							die 'TODO: import arbitrary XML with no "entry" field';
+						}
+					} else {
+						die 'TODO: import arbitrary XML';
 					}
 					$self->{'data'} = ();
 					if($self->{'no_entry'}) {
@@ -615,6 +623,8 @@ sub _open
 		}
 	}
 
+	# TODO: fixate $self->{'data'} if $self->{'data'}
+
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
 	$self->{'_updated'} = $statb[9];
@@ -638,6 +648,7 @@ sub selectall_hashref {
 	my $self = shift;
 
 	my @rc = $self->selectall_hash(@_);
+	Data::Reuse::fixate(@rc);
 	return \@rc;
 }
 
@@ -1011,15 +1022,15 @@ sub AUTOLOAD {
 
 	my $self = shift or return;
 
-	Carp::croak(__PACKAGE__, ": Unknown table $self") if(!ref($self));
+	Carp::croak(__PACKAGE__, ": Unknown column $column") if(!ref($self));
 
 	# Allow the AUTOLOAD feature to be disabled
-	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
+	Carp::croak(__PACKAGE__, ": Unknown column $column") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{$table});	# Open early to set $self->{'berkeley'}
+	$self->_open() if((!$self->{$table}) && (!$self->{'data'}));	# Open early to set $self->{'berkeley'}
 
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
@@ -1041,6 +1052,7 @@ sub AUTOLOAD {
 		return $self->{'berkeley'}->{$params{'entry'}};
 	}
 
+	croak('Where did the data come from?') if(!defined($self->{'type'}));
 	my $query;
 	my $done_where = 0;
 	my $distinct = delete($params{'distinct'}) || delete($params{'unique'});
@@ -1198,6 +1210,7 @@ sub AUTOLOAD {
 		if($cache) {
 			$cache->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
+		Data::Reuse::fixate(@rc);
 		return @rc;
 	}
 	my $rc = $sth->fetchrow_array();	# Return the first match only
@@ -1269,7 +1282,7 @@ sub _log
 		push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
 	# }
 
-	if(my $logger = $self->{'logger'}) {
+	if(scalar(@messages) && (my $logger = $self->{'logger'})) {
 		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
@@ -1277,16 +1290,6 @@ sub _log
 sub _debug {
 	my $self = shift;
 	$self->_log('debug', @_);
-}
-
-sub _info {
-	my $self = shift;
-	$self->_log('info', @_);
-}
-
-sub _notice {
-	my $self = shift;
-	$self->_log('notice', @_);
 }
 
 sub _trace {

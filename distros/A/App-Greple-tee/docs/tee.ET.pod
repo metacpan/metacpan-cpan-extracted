@@ -10,7 +10,7 @@ App::Greple::tee - moodul sobitatud teksti asendamiseks välise käsu tulemusega
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ See valik asendab kõik uue rea märgid iga ploki keskel vagunipöördumismärki
 
 Ühendab kaks või enam järjestikust uusjoonemärki üheks.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-L<teip(1)>'i B<--offload> valik on rakendatud erinevas moodulis B<-Mline>.
+L<teip(1)>'i B<--offload> valik on rakendatud erinevas moodulis L<App::Greple::L> (B<-ML>).
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-Mooduli B<line> abil saab töödelda ainult paarisnumbrilisi ridu järgmiselt.
+B<-ML> moodulit saab kasutada ka selleks, et töödelda ainult paarisnumbrilisi ridu järgmiselt.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Seejärel teisendage CR märk NL-ks pärast seda käsuga L<tr(1)> või mõnega.
 
 Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida Docker image'i nimesid käsust C<docker image ls>, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Valik C<-Mline -L 2:> otsib välja eelviimased read ja saadab need käsule C<grep perl>. Valik --diskreetne on vajalik, sest sisendi ja väljundi ridade arv muutub, kuid kuna käsk täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
+Valik C<-ML 2:> hangib eelviimased read ja saadab need käsule C<grep perl>. Valik --diskreetne on vajalik, sest sisend- ja väljundridade arv muutub, kuid kuna käsku täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
 
 Kui püüda sama asja teha käsuga B<teip>, annab C<teip -l 2- -- grep> vea, sest väljundridade arv on väiksem kui sisendridade arv. Saadud tulemusega ei ole aga mingit probleemi.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

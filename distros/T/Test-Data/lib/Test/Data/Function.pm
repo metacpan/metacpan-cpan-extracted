@@ -6,7 +6,7 @@ use strict;
 use Exporter qw(import);
 
 our @EXPORT  = qw(prototype_ok);
-our $VERSION = '1.247';
+our $VERSION = '1.248';
 
 use Test::Builder;
 my $Test = Test::Builder->new();

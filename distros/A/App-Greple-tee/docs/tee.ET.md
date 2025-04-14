@@ -8,7 +8,7 @@ App::Greple::tee - moodul sobitatud teksti asendamiseks välise käsu tulemusega
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut *
 
     Ühendab kaks või enam järjestikust uusjoonemärki üheks.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    [teip(1)](http://man.he.net/man1/teip)'i **--offload** valik on rakendatud erinevas moodulis **-Mline**.
+    [teip(1)](http://man.he.net/man1/teip)'i **--offload** valik on rakendatud erinevas moodulis [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**).
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    Mooduli **line** abil saab töödelda ainult paarisnumbrilisi ridu järgmiselt.
+    **-ML** moodulit saab kasutada ka selleks, et töödelda ainult paarisnumbrilisi ridu järgmiselt.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Seejärel teisendage CR märk NL-ks pärast seda käsuga [tr(1)](http://man.he.n
 
 Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida Docker image'i nimesid käsust `docker image ls`, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Valik `-Mline -L 2:` otsib välja eelviimased read ja saadab need käsule `grep perl`. Valik --diskreetne on vajalik, sest sisendi ja väljundi ridade arv muutub, kuid kuna käsk täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
+Valik `-ML 2:` hangib eelviimased read ja saadab need käsule `grep perl`. Valik --diskreetne on vajalik, sest sisend- ja väljundridade arv muutub, kuid kuna käsku täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
 
 Kui püüda sama asja teha käsuga **teip**, annab `teip -l 2- -- grep` vea, sest väljundridade arv on väiksem kui sisendridade arv. Saadud tulemusega ei ole aga mingit probleemi.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

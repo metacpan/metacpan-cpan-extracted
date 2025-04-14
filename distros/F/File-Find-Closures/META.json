@@ -38,7 +38,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -54,6 +55,6 @@
          "web" : "https://github.com/briandfoy/file-find-closures"
       }
    },
-   "version" : "1.117",
+   "version" : "1.118",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

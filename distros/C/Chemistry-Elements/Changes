@@ -1,5 +1,8 @@
 Revision history for Perl module Chemistry::Elements
 
+1.081 2025-04-13T22:44:24Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.079 2025-02-11T15:56:43Z
 	* update error messages to properly interpolate bad args (#17)
 	* update symbol for 105 from proposed Ha to actual Db (#16)

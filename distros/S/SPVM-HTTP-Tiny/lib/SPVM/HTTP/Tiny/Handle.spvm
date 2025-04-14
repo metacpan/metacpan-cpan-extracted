@@ -111,7 +111,7 @@ class HTTP::Tiny::Handle {
     my $method = $request->{method};
     my $url = $request->{url};
     my $url_string = $url->to_string;
-    my $headers = $request->{headers};
+    my $headers = $request->headers;
     
     # HTTP Headers
     {
@@ -183,7 +183,7 @@ class HTTP::Tiny::Handle {
     }
     
     $response->{protocol} = $protocol;
-    $response->{status} = Fn->to_int($status);
+    $response->{code} = Fn->to_int($status);
     
     if ($status && $status->[0] == '2') {
       $response->{success} = 1;
@@ -209,7 +209,7 @@ class HTTP::Tiny::Handle {
       }
     }
     
-    $response->{headers} = $headers;
+    $response->content->set_headers($headers);
   }
   
   private method readline : string () {

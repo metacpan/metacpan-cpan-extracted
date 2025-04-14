@@ -10,7 +10,7 @@ App::Greple::tee - eşleşen metni harici komut sonucu ile değiştiren modül
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -56,15 +56,15 @@ Bir dizi boş olmayan satırı filtre komutuna geçirmeden önce tek bir satırd
 
 İki veya daha fazla ardışık satırsonu karakterini tek bir karakterde birleştirir.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
-L<teip(1)>'in B<--offload> seçeneği farklı bir modül olan B<-Mline>'da uygulanmaktadır.
+L<teip(1)>'in B<--offload> seçeneği farklı bir modül olan L<App::Greple::L> (B<-ML>) içinde uygulanmaktadır.
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-B<line> modülünü sadece çift sayılı satırları işlemek için de aşağıdaki gibi kullanabilirsiniz.
+B<-ML> modülünü sadece çift sayılı satırları işlemek için aşağıdaki gibi de kullanabilirsiniz.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -156,9 +156,9 @@ Daha sonra CR karakterini L<tr(1)> komutu veya başka bir komutla NL'ye dönüş
 
 Başlık olmayan satırlardaki dizeler için grep yapmak istediğiniz bir durumu düşünün. Örneğin, C<docker image ls> komutundan Docker görüntü adlarını aramak, ancak başlık satırını bırakmak isteyebilirsiniz. Bunu aşağıdaki komutla yapabilirsiniz.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-C<-Mline -L 2:> seçeneği sondan ikinci satırları alır ve bunları C<grep perl> komutuna gönderir. Girdi ve çıktı satırlarının sayısı değiştiği için --discrete seçeneği gereklidir, ancak komut yalnızca bir kez çalıştırıldığı için performans açısından bir dezavantajı yoktur.
+C<-ML 2:> seçeneği sondan ikinci satırları alır ve bunları C<grep perl> komutuna gönderir. Girdi ve çıktı satırlarının sayısı değiştiği için --discrete seçeneği gereklidir, ancak komut yalnızca bir kez çalıştırıldığı için performans açısından bir dezavantajı yoktur.
 
 Aynı şeyi B<teip> komutuyla yapmaya çalışırsanız, C<teip -l 2- -- grep> hata verecektir çünkü çıktı satırlarının sayısı girdi satırlarının sayısından azdır. Ancak elde edilen sonuçta bir sorun yoktur.
 
@@ -190,7 +190,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

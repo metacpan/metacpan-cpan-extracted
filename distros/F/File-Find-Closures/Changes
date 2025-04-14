@@ -1,5 +1,8 @@
 Revision history for Perl module
 
+1.118 2025-04-13T22:44:44Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.117 2025-01-05T22:42:44Z
 	* refresh distro and move to BRIANDFOY
 	* fix problem testing on v5.8 since HTML::Tagset changed its minimum

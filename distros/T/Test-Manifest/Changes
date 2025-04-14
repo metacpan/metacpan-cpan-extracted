@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Manifest
 
+2.026 2025-04-13T22:11:37Z
+	* require a newer version.pm for v5.10.1 tests
+
 2.025 2025-01-04T15:58:23Z
 	* refresh distro and move to BRIANDFOY
 

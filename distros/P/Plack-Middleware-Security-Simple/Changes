@@ -1,5 +1,16 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.12.1   2025-04-13 14:01:21+01:00 Europe/London
+  [Documentation]
+  - Added a security policy.
+
+  - Updated the Perl version support policy.
+
+  - Updated the copygiht year.
+
+  [Tests]
+  - Switched package used for the release manifest.
+
 v0.12.0   2024-03-13 17:03:24+00:00 Europe/London
   [Exhancements]
   - Added the script_injection rule.

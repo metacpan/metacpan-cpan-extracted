@@ -1,5 +1,19 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0605 2025-04-13 23:45:54
+  - Start the ramp filter at the initial-point.
+  - Improve the eg/multi.pl program of course.
+
+0.0604 2025-04-13 21:40:24
+  - Improve the eg/multi.pl program yet again.
+  - Remove cruft and improve documentation.
+
+0.0603 2025-04-13 14:16:22
+  - Improve the eg/multi.pl program again!
+
+0.0602 2025-04-13 09:14:00
+  - Improve the eg/multi.pl program.
+
 0.0601 2025-04-12 23:49:48
   - Improve documentation.
   - Fix the ramp bounds.

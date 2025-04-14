@@ -126,6 +126,16 @@ subtest 'Math::BigRat -> as_float("3.5");' => sub {
     cmp_ok($y -> numify(), "==", 3.5, 'value of $y');
 };
 
+Math::BigRat -> downgrade("Math::BigFloat");
+
+$y = Math::BigRat -> as_float("3/2");
+
+subtest 'Math::BigRat -> as_float("3/2");' => sub {
+    plan tests => 2;
+    is(ref($y), 'Math::BigFloat', 'class of $y');
+    cmp_ok($y -> numify(), "==", 1.5, 'value of $y');
+};
+
 note("as_float() preserves all instance variables");
 
 Math::BigInt -> upgrade(undef);

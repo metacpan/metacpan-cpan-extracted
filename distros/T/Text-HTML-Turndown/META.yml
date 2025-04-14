@@ -36,6 +36,6 @@ resources:
   bugtracker: https://github.com/Corion/Text-HTML-Turndown/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Text-HTML-Turndown.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

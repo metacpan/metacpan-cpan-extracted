@@ -2,7 +2,7 @@ NAME
     File::Util::Copy - Utilities related to copying files
 
 VERSION
-    This document describes version 0.001 of File::Util::Copy (from Perl
+    This document describes version 0.002 of File::Util::Copy (from Perl
     distribution File-Util-Copy), released on 2024-11-22.
 
 SYNOPSIS
@@ -49,6 +49,8 @@ SOURCE
 
 SEE ALSO
     File::Copy::NoClobber also has a non-clobber version of copy()
+
+    File::Util::Rename's rename_noclobber(), rename_warnclobber().
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -44,7 +44,7 @@ die "No known shader types available" if !$good;
 
 pass "at least one test";
 test_shader('ARB');
-test_shader('CG');
+test_shader('CG') if !OpenGL::glpCheckExtension('GL_EXT_Cg_shader');
 test_shader('GLSL');
 
 sub test_shader {

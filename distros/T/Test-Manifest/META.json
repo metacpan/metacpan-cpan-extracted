@@ -40,7 +40,8 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -56,6 +57,6 @@
          "web" : "https://github.com/briandfoy/test-manifest"
       }
    },
-   "version" : "2.025",
+   "version" : "2.026",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

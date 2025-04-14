@@ -4,7 +4,7 @@ package Thread::Conveyor::Throttled;
 # Make sure we're a conveyor belt
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.19';
+$VERSION = '0.21';
 @ISA = qw(Thread::Conveyor);
 use strict;
 

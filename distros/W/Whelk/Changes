@@ -1,5 +1,9 @@
 Revision history for Whelk
 
+1.04 - 2025-04-13
+	- Fix extended scalar values causing an error when building OpenAPI
+	- Improve error reporting for invalid default / example values
+
 1.03 - 2025-04-03
 	- OpenAPI endpoint will now correctly get the app object from context (in controller environment)
 	- OpenAPI endpoint now has a name 'whelk_openapi' in the router

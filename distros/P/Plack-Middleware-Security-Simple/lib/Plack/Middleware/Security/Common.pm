@@ -34,7 +34,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.12.0';
+our $VERSION = 'v0.12.1';
 
 
 
@@ -226,7 +226,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.12.0
+version v0.12.1
 
 =head1 SYNOPSIS
 
@@ -436,13 +436,18 @@ feature.
 
 Suggestions for new rules or improving the existing rules are welcome.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

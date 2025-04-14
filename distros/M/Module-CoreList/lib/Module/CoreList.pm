@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20250321';
+our $VERSION = '5.20250414';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -436,6 +436,8 @@ sub changes_between {
     5.041008 => '2025-01-20',
     5.041009 => '2025-02-24',
     5.041010 => '2025-03-21',
+    5.038004 => '2025-04-13',
+    5.040002 => '2025-04-13',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -23050,6 +23052,28 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.038004 => {
+        delta_from => 5.038003,
+        changed => {
+            'B::Op_private'         => '5.038004',
+            'Config'                => '5.038004',
+            'Module::CoreList'      => '5.20250413_38',
+            'Module::CoreList::Utils'=> '5.20250413_38',
+        },
+        removed => {
+        }
+    },
+    5.040002 => {
+        delta_from => 5.040001,
+        changed => {
+            'B::Op_private'         => '5.040002',
+            'Config'                => '5.040002',
+            'Module::CoreList'      => '5.20250413_40',
+            'Module::CoreList::Utils'=> '5.20250413_40',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -24649,6 +24673,20 @@ sub is_core
     },
     5.041010 => {
         delta_from => 5.041009,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.038004 => {
+        delta_from => 5.038003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.040002 => {
+        delta_from => 5.040001,
         changed => {
         },
         removed => {

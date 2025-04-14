@@ -32,7 +32,8 @@
       "runtime" : {
          "requires" : {
             "URI" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "version" : "0.86"
          }
       },
       "test" : {
@@ -54,6 +55,6 @@
          "web" : "https://github.com/briandfoy/test-uri"
       }
    },
-   "version" : "1.086",
+   "version" : "1.087",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

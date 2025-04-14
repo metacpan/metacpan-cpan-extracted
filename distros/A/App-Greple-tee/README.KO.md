@@ -8,7 +8,7 @@ App::Greple::tee - 일치하는 텍스트를 외부 명령 결과로 대체하�
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Greple의 **-Mtee** 모듈은 지정된 필터 명령에 일치하는 텍스트 
 
     두 개 이상의 연속된 개행 문자를 하나로 결합합니다.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    [teip(1)](http://man.he.net/man1/teip)의 **--오프로드** 옵션은 다른 모듈 **-Mline**에서 구현됩니다.
+    [teip(1)](http://man.he.net/man1/teip)의 **--오프로드** 옵션은 다른 모듈인 [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL)(**-ML**)에서 구현됩니다.
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    다음과 같이 **line** 모듈을 사용하여 짝수 줄만 처리할 수도 있습니다.
+    **-ML** 모듈을 사용하여 다음과 같이 짝수 줄만 처리할 수도 있습니다.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ DeepL 서비스에서 위 명령어를 **-Mtee** 모듈과 결합하여 실행�
 
 헤더가 아닌 줄에서 문자열을 찾으려는 상황을 생각해 봅시다. 예를 들어, 헤더 줄은 그대로 두고 `docker image ls` 명령에서 Docker 이미지 이름을 검색하고 싶을 수 있습니다. 다음 명령을 사용하면 됩니다.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-옵션 `-Mline -L 2:`는 두 번째 줄부터 마지막 줄까지 검색하여 `grep perl` 명령으로 보냅니다. 입력 및 출력 줄 수가 변경되므로 --discrete 옵션이 필요하지만 명령이 한 번만 실행되므로 성능 저하가 없습니다.
+옵션 `-ML 2:`는 두 번째 줄부터 마지막 줄까지 검색하여 `grep perl` 명령으로 보냅니다. 입력 및 출력 줄 수가 변경되므로 --discrete 옵션이 필요하지만 명령이 한 번만 실행되므로 성능 저하가 없습니다.
 
 **teip** 명령으로 동일한 작업을 수행하려고 하면 출력 줄 수가 입력 줄 수보다 적기 때문에 `teip -l 2- -- grep` 오류를 발생시킵니다. 그러나 결과에는 아무런 문제가 없습니다.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

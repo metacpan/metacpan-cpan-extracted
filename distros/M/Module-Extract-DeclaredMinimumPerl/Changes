@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
+1.026 2025-04-13T19:21:56Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.025 2025-01-08T07:49:42Z
 	* refresh distro and move to BRIANDFOY
 

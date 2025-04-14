@@ -9,7 +9,7 @@ use warnings;
 
 use Array::RefElem ();
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 
 # shared undef variable
@@ -104,7 +104,7 @@ Set::Light - (memory efficient) unordered set of strings
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -258,15 +258,11 @@ feature.
 
 Tels <nospam-abuse@bloodgate.com>
 
-=head1 CONTRIBUTOR
-
-=for stopwords Robert Rothenberg
-
-Robert Rothenberg <rrwo@cpan.org>
+The current maintainer is Robert Rothenberg <rrwo@cpan.org>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2008, 2019-2021 by Tels.
+This software is copyright (c) 2004-2008, 2019-2021, 2025 by Tels.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

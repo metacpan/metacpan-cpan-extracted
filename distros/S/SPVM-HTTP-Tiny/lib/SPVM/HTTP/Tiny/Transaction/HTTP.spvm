@@ -37,7 +37,7 @@ class HTTP::Tiny::Transaction::HTTP extends HTTP::Tiny::Transaction {
     
     my $res = $self->res;
     if (Fn->uc($self->req->method eq "HEAD")) {
-      $res->content_v2->{skip_body} = 1 ;
+      $res->content->{skip_body} = 1 ;
     }
     
     $res->parse($chunk);
@@ -55,7 +55,7 @@ class HTTP::Tiny::Transaction::HTTP extends HTTP::Tiny::Transaction {
     
     $self->emit(unexpected => [(object)$res]);
     
-    my $leftovers = $res->content_v2->leftovers;
+    my $leftovers = $res->content->leftovers;
     
     unless (length $leftovers) {
       return;

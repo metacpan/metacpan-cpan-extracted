@@ -19,7 +19,7 @@ name: File-Util-Copy
 provides:
   File::Util::Copy:
     file: lib/File/Util/Copy.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   File::Copy: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-Copy
   homepage: https://metacpan.org/release/File-Util-Copy
   repository: git://github.com/perlancar/perl-File-Util-Copy.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

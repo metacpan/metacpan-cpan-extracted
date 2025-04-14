@@ -654,6 +654,15 @@ if (!strncmp(name, "GL_", 3)) {
 	i(MAX_GL_FOG_COUNT)
 	i(MAX_GL_GET_COUNT)
 
+#ifdef GL_VERSION_3_0
+	i(GL_DRAW_FRAMEBUFFER)
+	i(GL_DEPTH_ATTACHMENT)
+	i(GL_FRAMEBUFFER)
+	i(GL_FRAMEBUFFER_COMPLETE)
+	i(GL_FRAMEBUFFER_SRGB)
+	i(GL_SRGB_ALPHA)
+#endif
+
 /* 
  * Mesa 3D version 3.3 and 3.4 define GL_ALL_CLIENT_ATTRIB_BITS The
  * OpenGL Specification (1.1 and 1.2) defines this macro as well. Older

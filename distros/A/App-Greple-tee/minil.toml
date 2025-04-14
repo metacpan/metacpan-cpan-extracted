@@ -15,4 +15,4 @@ hooks = [
 exclude_match = [ '^images/', '^docs/.*\.json' ]
 
 [no_index]
-directory = [ 't', 'xt', 'docs' ]
+directory = [ 't', 'xt' ]

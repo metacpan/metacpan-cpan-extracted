@@ -3,7 +3,7 @@ use 5.008;
 package Test::Data;
 use strict;
 
-our $VERSION = '1.247';
+our $VERSION = '1.248';
 
 use Carp qw(carp);
 

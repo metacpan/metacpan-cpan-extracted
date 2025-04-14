@@ -1,0 +1,81 @@
+NAME
+    MARC::Leader::Utils - Utilities for MARC::Leader.
+
+SYNOPSIS
+     use MARC::Leader::Utils qw(material_type);
+
+     my $material_type = material_type($leader_obj);
+
+DESCRIPTION
+    The Perl module with common utilities for work with MARC leader field.
+
+SUBROUTINES
+  "material_type"
+     my $material_type = material_type($leader_obj);
+
+    Get material type. This process is defined in MARC 008 field.
+
+    $leader_obj variable is Data::MARC::Leader instace.
+
+    Returned strings are:
+
+    *       book =item * computer_file =item * continuing_resource =item *
+            map =item * mixed_material =item * music =item * visual_material
+
+    Returns string.
+
+ERRORS
+     material_type():
+             Leader object must be a Data::MARC::Leader instance.
+             Unsupported material type.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use MARC::Leader;
+     use MARC::Leader::Utils qw(material_type);
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 leader_string\n";
+             exit 1;
+     }
+     my $leader_string = $ARGV[0];
+
+     my $leader = MARC::Leader->new->parse($leader_string);
+
+     my $material_type = material_type($leader);
+
+     print "Leader: |$leader_string|\n";
+     print "Material type: $material_type\n";
+
+     # Output for '     nem a22     2  4500':
+     # Leader: |     nem a22     2  4500|
+     # Material type: map
+
+DEPENDENCIES
+    Error::Pure Exporter File::Spec::Functions, File::Share, Readonly.
+
+SEE ALSO
+    Data::MARC::Leader
+        Data object for MARC leader.
+
+    MARC::Leader
+        MARC leader class.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Leader-Utils>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

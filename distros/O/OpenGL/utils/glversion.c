@@ -8,7 +8,11 @@
 #include <GL/freeglut.h>
 #endif
 
+#define OGL_FREEGLUT_VERSION_EXPR glutGet(GLUT_VERSION)
+
 #else
+
+#define OGL_FREEGLUT_VERSION_EXPR -1
 
 #ifdef __APPLE__
 /* NB: not ideal -- this assumes that we always build with AGL interface on Mac OS X
@@ -44,7 +48,7 @@ int main(int argc, char **argv)
   renderer =    (char*)glGetString(GL_RENDERER);
   extensions =  (char*)glGetString(GL_EXTENSIONS);
 
-  freeglutVersion = glutGet(0x01FC);
+  freeglutVersion = OGL_FREEGLUT_VERSION_EXPR;
   if(freeglutVersion != -1) {
     printf("FREEGLUT=%d\n", freeglutVersion);
   }

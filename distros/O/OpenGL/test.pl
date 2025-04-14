@@ -1,12 +1,43 @@
 #!/usr/bin/perl -w
 use strict;
 
-my $stat = `perl -v`;
-our $IS_ACTIVEPERL = ($stat =~ m|ActiveState|s);
 our $PERL_VERSION = $^V;
 $PERL_VERSION =~ s|^v||;
 
-use OpenGL qw/ :all /;
+use OpenGL qw/
+  :glconstants
+  glpHasGLUT glpCheckExtension
+  glGetString glGetError
+  glGenTextures_p glBindTexture glTexParameteri glTexImage2D_c glTexEnvf
+    glDeleteTextures_p
+  glGenerateMipmapEXT
+  glGenFramebuffersEXT_p glBindFramebufferEXT glFramebufferTexture2DEXT
+    glCheckFramebufferStatusEXT glDeleteFramebuffersEXT_p
+  glGenRenderbuffersEXT_p glBindRenderbufferEXT glRenderbufferStorageEXT
+    glDeleteRenderbuffersEXT_p
+  glFramebufferRenderbufferEXT
+  glGenBuffersARB_p glBindBufferARB glBufferDataARB_p glBufferSubDataARB_p
+    glMapBufferARB_c glUnmapBufferARB glDeleteBuffersARB_p
+  glVertexPointer_p glNormalPointer_p glColorPointer_p glTexCoordPointer_p
+  glEnableClientState glDisableClientState
+  glEnable glDisable glBlendFunc glDepthFunc glShadeModel
+    glMatrixMode glLoadIdentity glLightfv_p glColorMaterial
+    glTranslatef glRotatef
+    glColor3f glColor4f
+    glPushMatrix glPopMatrix glPushAttrib glPopAttrib
+    glOrtho
+  glRasterPos2i glRasterPos2f
+  glPixelZoom glReadPixels_c glDrawPixels_c
+  glGetDoublev_c glGetIntegerv_c
+  glClearColor glClearDepth glClear glViewport glDrawElements_c
+/;
+use OpenGL::GLUT qw/
+  :constants :functions
+/;
+use OpenGL::GLU qw/
+  gluBuild2DMipmaps_c gluErrorString
+  gluOrtho2D gluProject_p gluUnProject_p gluPerspective
+/;
 use OpenGL::Config;     # for build information
 
 eval 'use OpenGL::Image 1.03';  # Need to use OpenGL::Image 1.03 or higher!
@@ -43,19 +74,14 @@ $|++;
 # Requires GLUT/FreeGLUT
 if (!glpHasGLUT())
 {
-  print qq
-  {
+  print <<'EOF';
     This test requires GLUT:
     If you have X installed, you can try the scripts in ./examples/
     Most of them do not use GLUT.
 
     It is recommended that you install FreeGLUT for improved Makefile.PL
     configuration, installation and debugging.
-
-  };
-
-  print "Attempting to run examples/texhack instead...\n";
-  `perl examples/texhack`;
+EOF
   exit 0;
 }
 
@@ -82,10 +108,8 @@ my $key_mods =
 # Some global variables.
 my $hasFBO = 0;
 my $hasVBO = 0;
-my $hasFragProg = 0;
-my $hasImagePointer = 0;
 my $idleTime = $hasHires ? gettimeofday() : time();
-my $idleSecsMax = 5;
+my $idleSecsMax = 8;
 my $er;
 
 # Window and texture IDs, window width and height.
@@ -108,7 +132,7 @@ my $Tex_Pixels;
 
 # Our display mode settings.
 my $Light_On = 0;
-my $Blend_On = 0;
+my $Blend_On = 1;
 my $Texture_On = 1;
 my $Alpha_Add = 1;
 my $FBO_On = 0;
@@ -149,51 +173,49 @@ my $cm = OpenGL::Array->new(16,GL_DOUBLE);
 my $vp = OpenGL::Array->new(4,GL_INT);
 
 # Vertex Buffer Object data
-my($VertexObjID,$NormalObjID,$ColorObjID,$TexCoordObjID,$IndexObjID);
+my ($VertexObjID,$NormalObjID,$ColorObjID,$TexCoordObjID,$IndexObjID,$FpsVertObjID,$FpsNormObjID,$FpsColourObjID,$FpsIndObjID);
+
+my @indices = (
+  0,1,2,     2,3,0,
+  4,5,6,     6,7,4,
+  8,9,10,    10,11,8,
+  12,13,14,  14,15,12,
+  16,17,18,  18,19,16,
+  20,21,22,  22,23,20,
+);
+my $indices = OpenGL::Array->new_list(GL_UNSIGNED_INT,@indices);
 
 my @verts =
 (
-  -1.0, -1.3, -1.0,
+  -1.0, -1.3, -1.0, # bottom
   1.0, -1.3, -1.0,
   1.0, -1.3,  1.0,
-  1.0, -1.3,  1.0,
   -1.0, -1.3,  1.0,
-  -1.0, -1.3, -1.0,
 
-  -1.0,  1.3, -1.0,
+  -1.0,  1.3, -1.0, # top
   -1.0,  1.3,  1.0,
   1.0,  1.3,  1.0,
-  1.0,  1.3,  1.0,
   1.0,  1.3, -1.0,
-  -1.0,  1.3, -1.0,
 
-  -1.0, -1.0, -1.3,
+  -1.0, -1.0, -1.3, # far
   -1.0,  1.0, -1.3,
   1.0,  1.0, -1.3,
-  1.0,  1.0, -1.3,
   1.0, -1.0, -1.3,
-  -1.0, -1.0, -1.3,
 
-  1.3, -1.0, -1.0,
+  1.3, -1.0, -1.0, # right
   1.3,  1.0, -1.0,
   1.3,  1.0,  1.0,
-  1.3,  1.0,  1.0,
   1.3, -1.0,  1.0,
-  1.3, -1.0, -1.0,
 
-  -1.0, -1.0,  1.3,
+  -1.0, -1.0,  1.3, # near
   1.0, -1.0,  1.3,
   1.0,  1.0,  1.3,
-  1.0,  1.0,  1.3,
   -1.0,  1.0,  1.3,
-  -1.0, -1.0,  1.3,
 
-  -1.3, -1.0, -1.0,
+  -1.3, -1.0, -1.0, # left
   -1.3, -1.0,  1.0,
   -1.3,  1.0,  1.0,
-  -1.3,  1.0,  1.0,
   -1.3,  1.0, -1.0,
-  -1.3, -1.0, -1.0,
 );
 my $verts = OpenGL::Array->new_list(GL_FLOAT,@verts);
 
@@ -217,47 +239,35 @@ my $norms = OpenGL::Array->new_list(GL_FLOAT,@norms);
 
 my @colors =
 (
-  0.9,0.2,0.2,.75,
-  0.9,0.2,0.2,.75,
-  0.9,0.2,0.2,.75,
+  0.9,0.2,0.2,.75, # red
   0.9,0.2,0.2,.75,
   0.9,0.2,0.2,.75,
   0.9,0.2,0.2,.75,
 
-  0.5,0.5,0.5,.5,
-  0.5,0.5,0.5,.5,
-  0.5,0.5,0.5,.5,
+  0.5,0.5,0.5,.5, # grey
   0.5,0.5,0.5,.5,
   0.5,0.5,0.5,.5,
   0.5,0.5,0.5,.5,
 
-  0.2,0.9,0.2,.5,
-  0.2,0.9,0.2,.5,
-  0.2,0.9,0.2,.5,
+  0.2,0.9,0.2,.5, # green
   0.2,0.9,0.2,.5,
   0.2,0.9,0.2,.5,
   0.2,0.9,0.2,.5,
 
-  0.2,0.2,0.9,.25,
-  0.2,0.2,0.9,.25,
-  0.2,0.2,0.9,.25,
+  0.2,0.2,0.9,.25, # blue
   0.2,0.2,0.9,.25,
   0.2,0.2,0.9,.25,
   0.2,0.2,0.9,.25,
 
-  0.9, 0.2, 0.2, 0.5,
+  0.9, 0.2, 0.2, 0.5, # red/green/blue
   0.2, 0.9, 0.2, 0.5,
   0.2, 0.2, 0.9, 0.5,
-  0.2, 0.2, 0.9, 0.5,
   0.1, 0.1, 0.1, 0.5,
-  0.9, 0.2, 0.2, 0.5,
 
-  0.9,0.9,0.2,0.0,
+  0.9,0.9,0.2,0.0, # yellow
   0.9,0.9,0.2,0.66,
   0.9,0.9,0.2,1.0,
-  0.9,0.9,0.2,1.0,
   0.9,0.9,0.2,0.33,
-  0.9,0.9,0.2,0.0,
 );
 my $colors = OpenGL::Array->new_list(GL_FLOAT,@colors);
 
@@ -266,12 +276,10 @@ my @rainbow =
   0.9, 0.2, 0.2, 0.5,
   0.2, 0.9, 0.2, 0.5,
   0.2, 0.2, 0.9, 0.5,
-  0.2, 0.2, 0.9, 0.5,
   0.1, 0.1, 0.1, 0.5,
-  0.9, 0.2, 0.2, 0.5,
 );
 my $rainbow = OpenGL::Array->new_list(GL_FLOAT,@rainbow);
-my $rainbow_offset = 96;
+my $rainbow_offset = 64;
 my @rainbow_inc;
 
 my @texcoords =
@@ -279,49 +287,34 @@ my @texcoords =
   0.800, 0.800,
   0.200, 0.800,
   0.200, 0.200,
-  0.200, 0.200,
   0.800, 0.200,
-  0.800, 0.800,
 
   0.005, 1.995,
   0.005, 0.005,
   1.995, 0.005,
-  1.995, 0.005,
   1.995, 1.995,
-  0.005, 1.995,
 
   0.995, 0.005,
   2.995, 2.995,
   0.005, 0.995,
-  0.005, 0.995,
   -1.995, -1.995,
-  0.995, 0.005,
 
   0.995, 0.005,
   0.995, 0.995,
   0.005, 0.995,
-  0.005, 0.995,
   0.005, 0.005,
-  0.995, 0.005,
 
   -0.5, -0.5,
   1.5, -0.5,
   1.5, 1.5,
-  1.5, 1.5,
   -0.5, 1.5,
-  -0.5, -0.5,
 
   0.005, 0.005,
   0.995, 0.005,
   0.995, 0.995,
-  0.995, 0.995,
   0.005, 0.995,
-  0.005, 0.005,
 );
 my $texcoords = OpenGL::Array->new_list(GL_FLOAT,@texcoords);
-
-my @indices = (0..35);
-my $indices = OpenGL::Array->new_list(GL_UNSIGNED_INT,@indices);
 
 my @xform =
 (
@@ -336,10 +329,21 @@ my @fpsbox_coords = (
     0.0, -2.0, 0.0,
     0.0, 12.0, 0.0,
   140.0, 12.0, 0.0,
-  140.0, 12.0, 0.0,
   140.0, -2.0, 0.0,
-    0.0, -2.0, 0.0,
 );
+my $fpsbox_coords = OpenGL::Array->new_list(GL_FLOAT,@fpsbox_coords);
+my @fpsbox_norms = (
+  (0.0,0.0,1.0) x 2,
+);
+my $fpsbox_norms = OpenGL::Array->new_list(GL_FLOAT,@fpsbox_norms);
+my @fpsbox_colours = (
+  (0.2,0.2,0.2,0.75) x 2,
+);
+my $fpsbox_colours = OpenGL::Array->new_list(GL_FLOAT,@fpsbox_colours);
+my @fpsbox_indices = (
+  0,1,2,     2,3,0,
+);
+my $fpsbox_indices = OpenGL::Array->new_list(GL_UNSIGNED_INT,@fpsbox_indices);
 
 # ------
 # Frames per second (FPS) statistic variables and routine.
@@ -387,10 +391,8 @@ sub ourInitVertexBuffers
 {
   # Set initial colors for rainbow face
   @rainbow = map [map rand(1.0), 0..3], 0..3;
-  @rainbow = @rainbow[0,1,2,2,3,0];
   @rainbow = map @$_, @rainbow;
   @rainbow_inc = map [map 0.01 - rand(0.02), 0..3], 0..3;
-  @rainbow_inc = @rainbow_inc[0,1,2,2,3,0];
   @rainbow_inc = map @$_, @rainbow_inc;
 
   # Initialize VBOs if supported
@@ -398,12 +400,11 @@ sub ourInitVertexBuffers
   {
     printf("Using VBOs\n");
 
-    ($VertexObjID,$NormalObjID,$ColorObjID,$TexCoordObjID,$IndexObjID) =
-      glGenBuffersARB_p(5);
+    ($VertexObjID,$NormalObjID,$ColorObjID,$TexCoordObjID,$IndexObjID,$FpsVertObjID,$FpsNormObjID,$FpsColourObjID,$FpsIndObjID) =
+      glGenBuffersARB_p(9);
 
     $verts->bind($VertexObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $verts, GL_STATIC_DRAW_ARB);
-    glVertexPointer_c(3, GL_FLOAT, 0, 0);
 
     if (DO_TESTS)
     {
@@ -423,29 +424,28 @@ sub ourInitVertexBuffers
 
     $norms->bind($NormalObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $norms, GL_STATIC_DRAW_ARB);
-    glNormalPointer_c(GL_FLOAT, 0, 0);
 
     $colors->bind($ColorObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $colors, GL_DYNAMIC_DRAW_ARB);
     $rainbow->assign(0,@rainbow);
     glBufferSubDataARB_p(GL_ARRAY_BUFFER_ARB, $rainbow_offset, $rainbow);
-    glColorPointer_c(4, GL_FLOAT, 0, 0);
 
     $texcoords->bind($TexCoordObjID);
     glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $texcoords, GL_STATIC_DRAW_ARB);
-    glTexCoordPointer_c(2, GL_FLOAT, 0, 0);
 
-    $indices->bind($IndexObjID);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $IndexObjID);
     glBufferDataARB_p(GL_ELEMENT_ARRAY_BUFFER_ARB, $indices, GL_STATIC_DRAW_ARB);
-  }
-  else
-  {
+
+    $fpsbox_coords->bind($FpsVertObjID);
+    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_coords, GL_STATIC_DRAW_ARB);
+    $fpsbox_norms->bind($FpsNormObjID);
+    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_norms, GL_STATIC_DRAW_ARB);
+    $fpsbox_colours->bind($FpsColourObjID);
+    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_colours, GL_STATIC_DRAW_ARB);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $FpsIndObjID);
+    glBufferDataARB_p(GL_ELEMENT_ARRAY_BUFFER_ARB, $fpsbox_indices, GL_STATIC_DRAW_ARB);
+  } else {
     print "Using classic Vertex Buffers\n";
-    glVertexPointer_p(3, $verts);
-    glNormalPointer_p($norms);
-    $colors->assign($rainbow_offset,@rainbow);
-    glColorPointer_p(4, $colors);
-    glTexCoordPointer_p(2, $texcoords);
   }
   print "-- done\n";
 }
@@ -513,7 +513,7 @@ sub ourBuildTextures
   # Use OpenGL::Image to load texture
   if ($hasImage && -e $Tex_File)
   {
-    my $img = new OpenGL::Image(source=>$Tex_File);
+    my $img = OpenGL::Image->new(source=>$Tex_File);
     die $@ if $@;
     my($eng,$ver) = $img->Get('engine','version');
     print "Using OpenGL::Image - $eng v$ver\n";
@@ -522,7 +522,7 @@ sub ourBuildTextures
     my $alpha = $img->Get('alpha') ? 'has' : 'no';
     print "Loading texture: $Tex_File, $Tex_Width x $Tex_Height, $alpha alpha\n";
 
-    ($Tex_Type,$Tex_Format,$Tex_Size) = 
+    ($Tex_Type,$Tex_Format,$Tex_Size) =
       $img->Get('gl_internalformat','gl_format','gl_type');
 
     # Use OGA for testing
@@ -601,7 +601,7 @@ sub ourBuildTextures
   {
     my $loops = 1000;
 
-    my $im = new Image::Magick();
+    my $im = Image::Magick->new();
     $im->Read($Tex_File);
     $im->Set(magick=>'RGBA',depth=>8);
     $im->Negate(channel=>'alpha');
@@ -694,109 +694,108 @@ sub ourSelectTexture
     glBindTexture(GL_TEXTURE_2D, $FBO_On ? $TextureID_FBO : $TextureID_image);
 }
 
+my %ext2shaders = (
+  arb => [
+<<'EOF',
+!!ARBfp1.0
+PARAM surfacecolor = program.local[5];
+TEMP color;
+MUL color, fragment.texcoord[0].y, 2.0;
+ADD color, 1.0, -color;
+ABS color, color;
+ADD color, 1.01, -color;  # Some cards have a rounding error
+MOV color.a, 1.0;
+MUL color, color, surfacecolor;
+MOV result.color, color;
+END
+EOF
+<<'EOF',
+!!ARBvp1.0
+PARAM center = program.local[0];
+PARAM xform[4] = {program.local[1..4]};
+TEMP vertexClip;
+
+# ModelView projection
+DP4 vertexClip.x, state.matrix.mvp.row[0], vertex.position;
+DP4 vertexClip.y, state.matrix.mvp.row[1], vertex.position;
+DP4 vertexClip.z, state.matrix.mvp.row[2], vertex.position;
+DP4 vertexClip.w, state.matrix.mvp.row[3], vertex.position;
+
+# Additional transform, via matrix variable
+DP4 vertexClip.x, vertexClip, xform[0];
+DP4 vertexClip.y, vertexClip, xform[1];
+DP4 vertexClip.z, vertexClip, xform[2];
+DP4 vertexClip.w, vertexClip, xform[3];
+
+#SUB result.position, vertexClip, center;
+MOV result.position, vertexClip;
+
+# Pass through color
+MOV result.color, vertex.color;
+
+# Pass through texcoords
+SUB result.texcoord[0], vertex.texcoord, center;
+END
+EOF
+  ],
+  glsl => [
+<<'EOF',
+uniform vec4 surfacecolor;
+
+void main (void) {
+   float v = 2.0 * gl_TexCoord[0].y;
+   v = 1.01 - abs(1.0 - v);  // Some cards have a rounding error
+   gl_FragColor = vec4(v,v,v, 1.0) * surfacecolor;
+}
+EOF
+<<'EOF',
+uniform vec4 center;
+uniform mat4 xform;
+
+void main(void) {
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  gl_Position *= xform;
+  // Calc texcoord values
+  vec4 pos = gl_Vertex;
+  float d = sqrt(pos.x * pos.x + pos.y * pos.y);
+  float a = atan(pos.x/pos.y) / 3.1415;
+  if (a < 0.0) a += 1.0;
+  a *= 2.0;
+  a -= float(int(a));
+  pos -= center;
+  float h = pos.z;
+  h = abs(2.0 * atan(h/d) / 3.1415);
+  gl_TexCoord[0].x = a;
+  gl_TexCoord[0].y = h;
+}
+EOF
+  ],
+);
 sub ourInitShaders
 {
   # Setup Vertex/Fragment Programs to render FBO texture
-
-  if ($hasShader)
-  {
+  if ($hasShader) {
     my $version = $OpenGL::Shader::VERSION;
     printf("Using OpenGL::Shader v$version\n");
     my $types = OpenGL::Shader->GetTypes();
     my @types = keys(%$types);
     printf("This installation supports the following shader types: %s\n", join(',', @types));
-
     # Use OpenGL::Shader
-    $Shader = new OpenGL::Shader();
-    if (!$Shader)
-    {
+    $Shader = OpenGL::Shader->new();
+    if (!$Shader) {
       printf("Unable to instantiate OpenGL::Shader\n");
       return;
     }
-
     my $type = $Shader->GetType();
     my $ext = lc($type);
-
-    my $stat = $Shader->LoadFiles("fragment.$ext","vertex.$ext");
-    if (!$stat)
-    {
+    my $shaders = $ext2shaders{$ext};
+    my $stat = !$shaders ? "Shader: unknown extension '$ext'" : $Shader->Load(@$shaders);
+    if (!$stat) {
       my $ver = $Shader->GetVersion();
       print "Using OpenGL::Shader('$type') v$ver\n";
       return;
-    }
-    else
-    {
+    } else {
       print "$stat\n";
-    }
-  }
-  # Fall back to doing it manually
-  elsif ($hasFragProg)
-  {
-    printf("Using native OpenGL ARB Shader functions\n");
-    ($VertexProgID,$FragProgID) = glGenProgramsARB_p(2);
-
-    # NOP Vertex shader
-    my $VertexProg = qq
-      {uniform vec4 center;
-      uniform mat4 xform;
-      void main(void)
-      {
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-        gl_Position *= xform;
-        // Calc texcoord values
-        vec4 pos = gl_Vertex;
-        float d = sqrt(pos.x * pos.x + pos.y * pos.y);
-        float a = atan(pos.x/pos.y) / 3.1415;
-        if (a < 0.0) a += 1.0;
-        a *= 2.0;
-        a -= float(int(a));
-        pos -= center;
-        float h = pos.z;
-        h = abs(2.0 * atan(h/d) / 3.1415);
-        gl_TexCoord[0].x = a;
-        gl_TexCoord[0].y = h;
-      }
-    };
-
-    glBindProgramARB(GL_VERTEX_PROGRAM_ARB, $VertexProgID);
-    glProgramStringARB_p(GL_VERTEX_PROGRAM_ARB, $VertexProg);
-
-    if (DO_TESTS)
-    {
-      my $format = glGetProgramivARB_p(GL_VERTEX_PROGRAM_ARB,
-        GL_PROGRAM_FORMAT_ARB);
-      printf("glGetProgramivARB_p format: '#%04X'\n",$format);
-
-      my @params = glGetProgramEnvParameterdvARB_p(GL_VERTEX_PROGRAM_ARB,0);
-      my $params = join(', ',@params);
-      print "glGetProgramEnvParameterdvARB_p: $params\n";
-
-      @params = glGetProgramEnvParameterfvARB_p(GL_VERTEX_PROGRAM_ARB,0);
-      $params = join(', ',@params);
-      print "glGetProgramEnvParameterfvARB_p: $params\n";
-
-      my $vprog = glGetProgramStringARB_p(GL_VERTEX_PROGRAM_ARB);
-      print "Vertex Prog: $vprog\n";
-    }
-
-    # Lazy Metallic Fragment shader
-    my $FragProg = qq
-      {uniform vec4 surfacecolor;
-      void main (void)
-      {
-         float v = 2.0 * gl_TexCoord[0].y;
-         v = 1.01 - abs(1.0 - v);  // Some cards have a rounding error
-         gl_FragColor = vec4(v,v,v, 1.0) * surfacecolor;
-      }
-    };
-
-    glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, $FragProgID);
-    glProgramStringARB_p(GL_FRAGMENT_PROGRAM_ARB, $FragProg);
-
-    if (DO_TESTS)
-    {
-      my $fprog = glGetProgramStringARB_p(GL_FRAGMENT_PROGRAM_ARB);
-      print "Fragment Prog: $fprog\n";
     }
   }
 }
@@ -836,44 +835,21 @@ sub cbRenderScene
 
     # Run shader programs for texture.
     # If installed, use OpenGL::Shader
-    if ($Shader)
-    {
+    if ($Shader) {
       $Shader->Enable();
       $Shader->SetVector('center',0.0,0.0,2.0,0.0);
       $Shader->SetMatrix('xform',$xform);
       $Shader->SetVector('surfacecolor',1.0,0.5,0.0,1.0);
     }
-    # Otherwise, do it manually
-    elsif ($hasFragProg)
-    {
-      glEnable(GL_VERTEX_PROGRAM_ARB);
-      glEnable(GL_FRAGMENT_PROGRAM_ARB);
-
-      glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 0, 0.0,0.0,2.0,0.0);
-
-      glProgramLocalParameter4fvARB_c(GL_VERTEX_PROGRAM_ARB, 1, $xform->offset(0));
-      glProgramLocalParameter4fvARB_c(GL_VERTEX_PROGRAM_ARB, 2, $xform->offset(4));
-      glProgramLocalParameter4fvARB_c(GL_VERTEX_PROGRAM_ARB, 3, $xform->offset(8));
-      glProgramLocalParameter4fvARB_c(GL_VERTEX_PROGRAM_ARB, 4, $xform->offset(12));
-
-      glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB, 5, 1.0,0.5,0.0,1.0);
-    }
 
     glColor3f(1.0, 1.0, 1.0);
-    #glutSolidTeapot(0.25);
     glutWireTeapot(0.25);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     glBindTexture(GL_TEXTURE_2D, $TextureID_FBO);
     glGenerateMipmapEXT(GL_TEXTURE_2D);
 
-    if ($Shader)
-    {
+    if ($Shader) {
       $Shader->Disable();
-    }
-    elsif ($hasFragProg)
-    {
-      glDisable(GL_FRAGMENT_PROGRAM_ARB);
-      glDisable(GL_VERTEX_PROGRAM_ARB);
     }
 
     glPopAttrib();
@@ -884,37 +860,27 @@ sub cbRenderScene
   # Enables, disables or otherwise adjusts as
   # appropriate for our current settings.
 
-  if ($Texture_On)
-  {
+  if ($Texture_On) {
     glEnable(GL_TEXTURE_2D);
-  }
-  else
-  {
+  } else {
     glDisable(GL_TEXTURE_2D);
   }
-  if ($Light_On)
-  {
+  if ($Light_On) {
     glEnable(GL_LIGHTING);
-  }
-  else
-  {
+  } else {
     glDisable(GL_LIGHTING);
   }
-  if ($Alpha_Add)
-  {
+  if ($Alpha_Add) {
     glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-  }
-  else
-  {
+  } else {
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   }
   # If we're blending, we don't want z-buffering.
-  if ($Blend_On)
-  {
+  if ($Blend_On) {
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-  }
-  else
-  {
+  } else {
+    glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
   }
 
@@ -936,40 +902,27 @@ sub cbRenderScene
 
 
   # Update Rainbow Cube Face
-  for (my $i=0; $i<scalar(@rainbow); $i++)
-  {
+  for (my $i=0; $i<scalar(@rainbow); $i++) {
     $rainbow[$i] += $rainbow_inc[$i];
-    if ($rainbow[$i] < 0)
-    {
+    if ($rainbow[$i] < 0) {
       $rainbow[$i] = 0.0;
-    }
-    elsif ($rainbow[$i] > 1)
-    {
+    } elsif ($rainbow[$i] > 1) {
       $rainbow[$i] = 1.0;
-    }
-    else
-    {
+    } else {
       next;
     }
     $rainbow_inc[$i] = -$rainbow_inc[$i];
   }
 
-  if ($hasVBO)
-  {
+  if ($hasVBO) {
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, $ColorObjID);
-    my $color_map = glMapBufferARB_p(GL_ARRAY_BUFFER_ARB,
-      GL_WRITE_ONLY_ARB,GL_FLOAT);
-    my $buffer = glGetBufferPointervARB_p(GL_ARRAY_BUFFER_ARB,
-      GL_BUFFER_MAP_POINTER_ARB,GL_FLOAT);
-    $color_map->assign($rainbow_offset,@rainbow);
-    glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-  }
-  else
-  {
+    glMapBufferARB_c(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
     $colors->assign($rainbow_offset,@rainbow);
-    glColorPointer_p(4, $colors);
+    glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+  } else {
+    $colors->assign($rainbow_offset,@rainbow);
   }
-
+  glColorPointer_p(4, $colors);
 
   # Render cube
   glViewport(0, 0, $Window_Width, $Window_Height);
@@ -978,16 +931,22 @@ sub cbRenderScene
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  for (my $i=0; $i<scalar(@indices); $i+=3)
-  {
-    glDrawArrays(GL_TRIANGLES, $i, 3);
+  glVertexPointer_p(3, $verts);
+  glNormalPointer_p($norms);
+  glTexCoordPointer_p(2, $texcoords);
+  if ($hasVBO) {
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $IndexObjID);
   }
+  glDrawElements_c(GL_TRIANGLES, scalar(@indices), GL_UNSIGNED_INT, $hasVBO ? 0 : $indices->ptr);
 
+  if ($hasVBO) {
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+  }
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
-
 
   # Move back to the origin (for the text, below).
   glLoadIdentity();
@@ -1045,12 +1004,23 @@ sub cbRenderScene
 
   # Make sure we can read the FPS section by first placing a
   # dark, mostly opaque backdrop rectangle.
-  glColor4f(0.2,0.2,0.2,0.75);
-  glBegin(GL_TRIANGLES);
-  for (my $i=0; $i<scalar(@fpsbox_coords); $i+=3) {
-    glVertex3f(@fpsbox_coords[$i..$i+2]);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer_p(3, $fpsbox_coords);
+  glNormalPointer_p($fpsbox_norms);
+  glColorPointer_p(4, $fpsbox_colours);
+  if ($hasVBO) {
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $FpsIndObjID);
   }
-  glEnd();
+  glDrawElements_c(GL_TRIANGLES, scalar(@fpsbox_indices), GL_UNSIGNED_INT, $hasVBO ? 0 : $fpsbox_indices->ptr);
+  if ($hasVBO) {
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+  }
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 
   glColor4f(0.9,0.2,0.2,.75);
   $buf = sprintf "FPS: %f F: %2d", $FrameRate, $FrameCount;
@@ -1090,7 +1060,7 @@ sub Capture
   glDisable( GL_DEPTH_TEST );
   glDisable( GL_CULL_FACE );
   glDisable( GL_STENCIL_TEST );
- 
+
   glViewport( 0, 0, $w, $h );
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
@@ -1099,7 +1069,7 @@ sub Capture
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();
-  
+
   glPixelZoom( 1, 1 );
 
   # Save
@@ -1133,7 +1103,7 @@ sub Inset
   # Using OpenGL::Image and ImageMagick to read/modify/draw pixels
   if ($hasIM_635)
   {
-    my $frame = new OpenGL::Image(engine=>'Magick',
+    my $frame = OpenGL::Image->new(engine=>'Magick',
       width=>$Inset_Width, height=>$Inset_Height);
     die $@ if $@;
     my($fmt,$size) = $frame->Get('gl_format','gl_type');
@@ -1157,7 +1127,7 @@ sub Inset
   else
   {
     my $len = $Inset_Width * $Inset_Height * 4;
-    my $oga = new OpenGL::Array($len,GL_UNSIGNED_BYTE);
+    my $oga = OpenGL::Array->new($len,GL_UNSIGNED_BYTE);
 
     glReadPixels_c( $Capture_X, $Capture_Y, $Inset_Width, $Inset_Height,
       GL_RGBA, GL_UNSIGNED_BYTE, $oga->ptr() );
@@ -1173,7 +1143,7 @@ sub Save
 
   if ($hasImage)
   {
-    my $frame = new OpenGL::Image(width=>$w, height=>$h);
+    my $frame = OpenGL::Image->new(width=>$w, height=>$h);
     my($fmt,$size) = $frame->Get('gl_format','gl_type');
 
     glReadPixels_c( 0, 0, $w, $h, $fmt, $size, $frame->Ptr() );
@@ -1186,8 +1156,7 @@ sub Save
 }
 
 # Cleanup routine
-sub ourCleanup
-{
+sub ourCleanup {
   print "Starting cleanup ...\n";
   # Disable app
   glutHideWindow();
@@ -1202,13 +1171,10 @@ sub ourCleanup
   ReleaseResources();
 
   # Now you can destroy window
-  if (defined($gameMode))
-  {
+  if (defined($gameMode)) {
     print "Leaving game mode.\n";
     glutLeaveGameMode();
-  }
-  else
-  {
+  } else {
     print "Destroying window.\n";
     glutDestroyWindow($Window_ID);
   }
@@ -1216,43 +1182,29 @@ sub ourCleanup
   print "Cleanup completed.\n";
 }
 
-sub ReleaseResources
-{
-  return if (!defined($Window_ID));
+sub ReleaseResources {
+  return if !defined $Window_ID;
 
-  if ($hasFBO)
-  {
+  if ($hasFBO) {
     # Release resources
     glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
-
-    glDeleteRenderbuffersEXT_p( $RenderBufferID ) if ($RenderBufferID);
-    glDeleteFramebuffersEXT_p( $FrameBufferID ) if ($FrameBufferID);
+    glDeleteRenderbuffersEXT_p( $RenderBufferID ) if $RenderBufferID;
+    glDeleteFramebuffersEXT_p( $FrameBufferID ) if $FrameBufferID;
   }
 
-  if ($Shader)
-  {
+  if ($Shader) {
     undef($Shader);
   }
-  elsif ($hasFragProg)
-  {
-    glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
-    glDeleteProgramsARB_p( $VertexProgID ) if ($VertexProgID);
 
-    glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, 0);
-    glDeleteProgramsARB_p( $FragProgID ) if ($FragProgID);
-  }
-
-  if ($hasVBO)
-  {
+  if ($hasVBO) {
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-    glDeleteBuffersARB_p($VertexObjID) if ($VertexObjID);
-    glDeleteBuffersARB_p($NormalObjID) if ($NormalObjID);
-    glDeleteBuffersARB_p($ColorObjID) if ($ColorObjID);
-    glDeleteBuffersARB_p($TexCoordObjID) if ($TexCoordObjID);
-
+    glDeleteBuffersARB_p($VertexObjID) if $VertexObjID;
+    glDeleteBuffersARB_p($NormalObjID) if $NormalObjID;
+    glDeleteBuffersARB_p($ColorObjID) if $ColorObjID;
+    glDeleteBuffersARB_p($TexCoordObjID) if $TexCoordObjID;
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    glDeleteBuffersARB_p($IndexObjID) if ($IndexObjID);
+    glDeleteBuffersARB_p($IndexObjID) if $IndexObjID;
   }
 
   glDeleteTextures_p($TextureID_image,$TextureID_FBO);
@@ -1273,13 +1225,6 @@ sub cbKeyPressed
   elsif ($c eq 'B')
   {
     $Blend_On = !$Blend_On;
-    if (!$Blend_On)
-    {
-      glDisable(GL_BLEND);
-    }
-    else {
-      glEnable(GL_BLEND);
-    }
   }
   elsif ($c eq 'K')
   {
@@ -1637,20 +1582,15 @@ foreach my $ext (sort @extensions)
   print("    $stat\n") if ($stat && $stat !~ m|^$ext |);
 }
 
-if (!OpenGL::glpCheckExtension('GL_ARB_vertex_buffer_object'))
-{
+if (!OpenGL::glpCheckExtension('GL_ARB_vertex_buffer_object')) {
   # Perl 5.10 crashes on VBOs!
   $hasVBO = ($PERL_VERSION !~ m|^5\.10\.|);
 }
 
-if (!OpenGL::glpCheckExtension('GL_EXT_framebuffer_object'))
-{
+if (!OpenGL::glpCheckExtension('GL_EXT_framebuffer_object')) {
   $hasFBO = 1;
   $FBO_On = 1;
-
-  if (!OpenGL::glpCheckExtension('GL_ARB_fragment_program'))
-  {
-    $hasFragProg = 1;
+  if (!OpenGL::glpCheckExtension('GL_ARB_fragment_program')) {
     $FBO_On++;
   }
 }

@@ -8,7 +8,7 @@ App::Greple::tee - eşleşen metni harici komut sonucu ile değiştiren modül
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Varsayılan olarak, komut tek bir süreç olarak yürütülür ve eşleşen tüm
 
     İki veya daha fazla ardışık satırsonu karakterini tek bir karakterde birleştirir.
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    [teip(1)](http://man.he.net/man1/teip)'in **--offload** seçeneği farklı bir modül olan **-Mline**'da uygulanmaktadır.
+    [teip(1)](http://man.he.net/man1/teip)'in **--offload** seçeneği farklı bir modül olan [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**) içinde uygulanmaktadır.
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    **line** modülünü sadece çift sayılı satırları işlemek için de aşağıdaki gibi kullanabilirsiniz.
+    **-ML** modülünü sadece çift sayılı satırları işlemek için aşağıdaki gibi de kullanabilirsiniz.
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Daha sonra CR karakterini [tr(1)](http://man.he.net/man1/tr) komutu veya başka 
 
 Başlık olmayan satırlardaki dizeler için grep yapmak istediğiniz bir durumu düşünün. Örneğin, `docker image ls` komutundan Docker görüntü adlarını aramak, ancak başlık satırını bırakmak isteyebilirsiniz. Bunu aşağıdaki komutla yapabilirsiniz.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-`-Mline -L 2:` seçeneği sondan ikinci satırları alır ve bunları `grep perl` komutuna gönderir. Girdi ve çıktı satırlarının sayısı değiştiği için --discrete seçeneği gereklidir, ancak komut yalnızca bir kez çalıştırıldığı için performans açısından bir dezavantajı yoktur.
+`-ML 2:` seçeneği sondan ikinci satırları alır ve bunları `grep perl` komutuna gönderir. Girdi ve çıktı satırlarının sayısı değiştiği için --discrete seçeneği gereklidir, ancak komut yalnızca bir kez çalıştırıldığı için performans açısından bir dezavantajı yoktur.
 
 Aynı şeyi **teip** komutuyla yapmaya çalışırsanız, `teip -l 2- -- grep` hata verecektir çünkü çıktı satırlarının sayısı girdi satırlarının sayısından azdır. Ancak elde edilen sonuçta bir sorun yoktur.
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

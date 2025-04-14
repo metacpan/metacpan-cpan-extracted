@@ -10,7 +10,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -76,17 +76,17 @@ replaced with spaces.
 
 Combines two or more consecutive newline characters into one.
 
-=item B<-Mline> B<--offload> I<command>
+=item B<-ML> B<--offload> I<command>
 
 L<teip(1)>'s B<--offload> option is implemented in the different
-module B<-Mline>.
+module L<App::Greple::L> (B<-ML>).
 
-    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-You can also use the B<line> module to process only even-numbered
-lines as follows.
+You can also use the B<-ML> module to process only even-numbered lines
+as follows.
 
-    greple -Mtee cat -n -- -Mline 2::2
+    greple -Mtee cat -n -- -ML 2::2
 
 =back
 
@@ -204,9 +204,9 @@ non-header lines. For example, you may want to search for Docker image
 names from the C<docker image ls> command, but leave the header line.
 You can do it by following command.
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-Option C<-Mline -L 2:> retrieves the second to last lines and sends
+Option C<-ML 2:> retrieves the second to last lines and sends
 them to the C<grep perl> command.  The option --discrete is required
 because the number of lines of input and output changes, but since the
 command is only executed once, there is no performance drawback.
@@ -245,7 +245,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

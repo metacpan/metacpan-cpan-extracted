@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Env
 
+1.088 2025-04-13T22:16:49Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.087 2025-01-03T05:03:56Z
 	* refresh distro
 	* move to BRIANDFOY user

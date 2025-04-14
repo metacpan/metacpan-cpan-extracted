@@ -1,61 +1,440 @@
 # Copyright (c) 2023 [--user-name]
 # MIT License
 
-class HTTP::Tiny::Message {
+class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   allow HTTP::Tiny::Daemon;
   
   version_from HTTP::Tiny;
   
-  use HTTP::Tiny::Headers;
   use Hash;
+  use HTTP::Tiny::Headers;
+  use HTTP::Tiny::Upload;
+  use HTTP::Tiny::Asset::Memory;
+  use HTTP::Tiny::Content::Single;
+  use HTTP::Tiny::Parameters;
+  use HTTP::Tiny::Upload;
+  use JSON;
   
   # Fields
-  has headers : ro protected HTTP::Tiny::Headers;
+  has content : ro HTTP::Tiny::Content;
   
-  has content_buffer : protected StringBuffer;
+  has max_line_size : ro int;
+  
+  has max_message_size : ro int;
+  
+  has version : ro string;
+  
+  has error : ro Hash;
+  
+  # Undocumented Fields
+  has state : string;
+  
+  has finished : byte;
+  
+  has fix : byte;
+  
+  has body_params : HTTP::Tiny::Parameters;
+  
+  has limit : byte;
+  
+  has json : object;
+  
+  has raw_size : int;
+  
+  has buffer : string;
+  
+  has _cache : Hash;
+  
+  # Old Fields
+  has content_buffer : StringBuffer;
   
   # Instance Methods
-  method content : string () {
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->{version} //= "1.1";
+    
+    if ($self->{max_message_size} < 0) {
+      $self->{max_message_size} = 16777216;
+    }
+    
+    if ($self->{max_line_size} < 0) {
+      $self->{max_line_size} = 8192;
+    }
+    $self->{content} = HTTP::Tiny::Content::Single->new;
+    
+    $self->{_cache} = Hash->new;
+  }
+  
+  method content_v0 : string () {
     return $self->{content_buffer}->to_string;
   }
   
-  method error : Hash () {
+  method body : string () {
     
-    die "TODO.";
+    my $content = $self->content;
+    
+    return $content->is_multipart ? "" : $content->(HTTP::Tiny::Content::Single)->asset->slurp;
   }
   
-  method start_line_size : int () {
-    die "TODO";
-  }
-  
-  method version : string () {
+  method set_body : void ($body : string) {
+    
+    my $content = $self->content;
+    if ($content->is_multipart) {
+      my $content = HTTP::Tiny::Content::Single->new;
+      $self->{content} = $content;
+      my $asset = HTTP::Tiny::Asset::Memory->new;
+      $asset->add_chunk($body);
+      $content->set_asset($asset);
+    }
     
   }
   
-  method is_finished : int () {
+  method body_params : HTTP::Tiny::Parameters () {
     
-    die "TODO";
+    if ($self->{body_params}) {
+      return $self->{body_params};
+    }
+    
+    my $params = $self->{body_params} = HTTP::Tiny::Parameters->new;
+    
+    # "application/x-www-form-urlencoded"
+    my $type = $self->headers->content_type // "";
+    if (Re->m($type, ["application/x-www-form-urlencoded", "i"])) {
+      $params->parse($self->content->(HTTP::Tiny::Content::Single)->asset->slurp);
+    }
+    
+    # "multipart/form-data"
+    elsif (Re->m($type, ["multipart/form-data", "i"])) {
+      my $formdata = $self->_parse_formdata;
+      for my $_ (@$formdata) {
+        $params->append([$_->(object[])->[0], $_->(object[])->[1]]);
+      }
+    }
+    
+    return $params;
+  }
+  
+  method _parse_formdata : object[] ($upload : int = 0) {
+    
+  }
+  
+  method body_size : int () {
+    
+    return $self->content->body_size;
+  }
+  
+  method build_body : string () {
+    
+    $self->_build("get_body_chunk");
+  }
+  
+  method build_headers : string () {
+    $self->_build("get_header_chunk");
+  }
+  
+  method build_start_line : string () {
+    $self->_build("get_start_line_chunk");
+  }
+  
+  method cookie : HTTP::Tiny::Cookie ($name : string) {
+    
+    return (HTTP::Tiny::Cookie)$self->_cache("cookies", 0, $name);
+  }
+  
+  method cookies : HTTP::Tiny::Cookie[] () { die "Not implemented."; }
+  
+  method set_error : void ($error : Hash) {
+    
+    $self->{error} = $error;
+    
+    $self->finish;
+  }
+  
+  method every_cookie : HTTP::Tiny::Cookie[] ($name : string) {
+    return (HTTP::Tiny::Cookie[])$self->_cache("cookies", 1, $name);
+  }
+  
+  method every_upload : HTTP::Tiny::Upload[] ($name : string) {
+    return (HTTP::Tiny::Upload[])$self->_cache("uploads", 1, $name);
+  }
+  
+  method extract_start_line : int ($str_ref : string[]) { die "Not implemented."; }
+  
+  method finish : void () {
+    
+    $self->{state} = "finished";
+    
+    unless ($self->{finished}) {
+      $self->emit("finish");
+      $self->{finished}++;
+    }
+  }
+  
+  method fix_headers : void () {
+    
+    if ($self->{fix}++) {
+      return;
+    }
+    
+    # Content-Length or Connection (unless chunked transfer encoding is used)
+    my $content = $self->content;
+    my $headers = $content->headers;
+    if    ($content->is_multipart)                           { $headers->remove("Content-Length"); }
+    elsif ($content->is_chunked || $headers->content_length) { return; }
+    if    ($content->is_dynamic)                             { $headers->set_connection("close"); }
+    else                                                     { $headers->set_content_length($self->body_size); }
   }
   
   method get_body_chunk : string ($offset : int) {
     
-    die "TODO";
+    $self->emit("progress", [(object)"body", $offset]);
+    my $chunk = $self->content->get_body_chunk($offset);
+    if (!$chunk || length $chunk) {
+      return $chunk;
+    }
+    
+    $self->finish;
+    
+    return $chunk;
   }
   
   method get_header_chunk : string ($offset : int) {
     
-    die "TODO";
+    $self->emit("progress", [(object)"headers", $offset]);
+    
+    $self->fix_headers;
+    
+    return $self->content->get_header_chunk($offset);
   }
   
-  method get_start_line_chunk : string ($offset : int) {
-    
-    die "TODO";
-  }
+  method get_start_line_chunk : string ($offset : int) { die "Not implemented."; }
   
   method header_size : int () {
     
-    die "TODO";
+    $self->fix_headers;
+    
+    return $self->content->header_size;
   }
+  
+  method headers : HTTP::Tiny::Headers () {
+    return $self->content->headers;
+  }
+  
+  method is_finished : int () {
+    
+    return ($self->{state} // "") eq "finished";
+  }
+  
+  method is_limit_exceeded : int () { return $self->{limit}; }
+  
+  method json : object () {
+    
+    if ($self->content->is_multipart) {
+      return undef;
+    }
+    
+    my $data = $self->{json} //= JSON->new->decode($self->body);
+    
+    return $data;
+  }
+  
+  method parse : void ($chunk : string) {
+    
+    if ($self->{error}) {
+      return;
+    }
+    
+    $self->{raw_size} += length $chunk;
+    
+    $self->{buffer} .= $chunk;
+
+    # Start-line
+    unless ($self->{state}) {
+      
+      # Check start-line size
+      my $len = Fn->index($self->{buffer}, "\x0a");
+      if ($len < 0) {
+        $len = length $self->{buffer};
+      }
+      if ($len > $self->max_line_size) {
+        $self->_limit("Maximum start-line size exceeded");
+        return;
+      }
+      my $buffer_ref = [$self->{buffer}];
+      if ($self->extract_start_line($buffer_ref)) {
+        $self->{state} = "content";
+      }
+      $self->{buffer} = $buffer_ref->[0];
+    }
+    
+    # Content
+    my $state = $self->{state} // "";
+    if ($state eq "content" || $state eq "finished") {
+      my $buffer = $self->{buffer};
+      $self->{buffer} = undef;
+      my $content = $self->content;
+      $content->parse($buffer);
+      $self->{content} = $content;
+    }
+    
+    # Check message size
+    my $max = $self->max_message_size;
+    if ($max && $max < $self->{raw_size}) {
+      $self->_limit("Maximum message size exceeded");
+      return;
+    }
+    
+    # Check header size
+    if ($self->headers->is_limit_exceeded) {
+      $self->_limit("Maximum header size exceeded");
+      return;
+    }
+    
+    # Check buffer size
+    if ($self->content->is_limit_exceeded) {
+      $self->_limit("Maximum buffer size exceeded");
+      return;
+    }
+    
+    $self->emit("progress");
+    
+    if ($self->content->is_finished) {
+      $self->finish;
+    }
+  }
+  
+  method _limit : void ($message : string) {
+    ++$self->{limit};
+    $self->set_error(Hash->new({message => $message}));
+  }
+  
+  method save_to : void ($path : string) {
+    
+    my $content = $self->content;
+    
+    if ($content->is_multipart) {
+      die "Multipart content cannot be saved to files";
+    }
+    $content->(HTTP::Tiny::Content::Single)->asset->move_to($path);
+  }
+  
+  method start_line_size : int () { die "Not implemented."; }
+  
+  method text : string () {
+    
+    my $body = $self->body;
+    
+    return $body;
+  }
+  
+  method to_string : string () {
+    
+    return $self->build_start_line . $self->build_headers . $self->build_body;
+  }
+  
+  method upload : HTTP::Tiny::Upload ($name : string) { return (HTTP::Tiny::Upload)$self->_cache("uploads", 0, $name); }
+  
+  method uploads : HTTP::Tiny::Upload[] () {
+    
+    my $uploads = List->new(new HTTP::Tiny::Upload[0]);
+    for my $data (@{$self->_parse_formdata(1)}) {
+      my $upload = HTTP::Tiny::Upload->new({
+        name     => $data->(object[])->[0],
+        filename => $data->(object[])->[2],
+        asset    => $data->(object[])->[1]->(HTTP::Tiny::Content::Single)->asset,
+        headers  => $data->(object[])->[1]->(HTTP::Tiny::Content)->headers
+      });
+      $uploads->push($upload);
+    }
+    
+    return $uploads->to_array->(HTTP::Tiny::Upload[]);
+  }
+  
+  method _build : string ($method : string) {
+    
+    my $buffer = StringBuffer->new;
+    my $offset = 0;
+    
+    while (1) {
+      
+      my $chunk = (string)undef;
+      if ($method eq "get_body_chunk") {
+        $chunk = $self->get_body_chunk($offset);
+      }
+      elsif ($method eq "get_header_chunk") {
+        $chunk = $self->get_header_chunk($offset);
+      }
+      elsif ($method eq "get_start_line_chunk") {
+        $chunk = $self->get_start_line_chunk($offset);
+      }
+      
+      # No chunk yet, try again
+      unless ($chunk) {
+        next;
+      }
+      
+      # End of part
+      my $len = length $chunk;
+      unless ($len) {
+        last;
+      }
+      
+      $offset += $len;
+      $buffer->push($chunk);
+    }
+    
+    return $buffer->to_string;
+  }
+  
+  method _cache : object ($method : string, $all : int, $name : string) {
+    
+    # Cache objects by name
+    my $caches = (Hash)$self->{_cache}->get($method);
+    
+    unless ($caches) {
+      $caches = Hash->new;
+      
+      my $items = (object[])undef;
+      if ($method eq "uploads") {
+        $items = $self->uploads;
+      }
+      elsif ($method eq "cookies") {
+        $items = $self->cookies;
+      }
+      
+      for my $_ (@$items) {
+        my $name = (string)undef;
+        if ($method eq "uploads") {
+          $name = $_->(HTTP::Tiny::Upload)->name;
+        }
+        elsif ($method eq "cookies") {
+          $name = $_->(HTTP::Tiny::Cookie)->name;
+        }
+        
+        my $list = (List)$caches->get($name);
+        unless ($list) {
+          $list = List->new;
+        }
+        $list->push($_);
+      }
+    }
+    
+    my $objects_list = $caches->get($name)->(List) // List->new;
+    my $objects = $objects_list->to_array;
+    
+    if ($all) {
+      return $objects;
+    }
+    else {
+      if (@$objects > 0) {
+        return $objects->[@$objects - 1];
+      }
+      else {
+        return undef;
+      }
+    }
+  }
+  
 }
 
 __END__

@@ -41,7 +41,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -57,6 +58,6 @@
          "web" : "https://github.com/briandfoy/module-extract-namespaces"
       }
    },
-   "version" : "1.025",
+   "version" : "1.026",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

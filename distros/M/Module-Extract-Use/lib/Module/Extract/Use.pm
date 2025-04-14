@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 
 =encoding utf8
 
@@ -348,7 +348,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
+Copyright © 2008-2025, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This project is under the Artistic License 2.0.
 

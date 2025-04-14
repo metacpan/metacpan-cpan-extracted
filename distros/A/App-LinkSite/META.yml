@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Feature::Compat::Class: '0.06'
+  Feature::Compat::Class: '0.07'
   File::Find: '0'
   File::ShareDir: '0'
   FindBin: '0'
@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-linksite/issues
   repository: git://github.com/davorg-cpan/app-linksite.git
-version: v0.0.13
+version: v0.0.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

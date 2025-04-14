@@ -1,10 +1,14 @@
 #!dmake
 
+DEF = "ERROR: no DEF given. Please run: 'perl Makefile.PL verbose' and report result"
+INC = "ERROR: no INC given. Please run: 'perl Makefile.PL verbose' and report result"
+LIB = "ERROR: no LIB given. Please run: 'perl Makefile.PL verbose' and report result"
+
 CC=gcc.exe
-CCFLAGS=-DWIN32 -DHAVE_FREEGLUT
+CCFLAGS=-DWIN32 $(INC) $(DEF)
 
 LINK=g++.exe
-LDFLAGS=-L../FreeGLUT -lfreeglut -L/usr/lib/W32API -lopengl32
+LDFLAGS=$(LIB)
 
 
 all: glversion.txt

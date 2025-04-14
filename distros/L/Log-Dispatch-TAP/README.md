@@ -4,7 +4,7 @@ Log::Dispatch::TAP - Log to TAP output
 
 # VERSION
 
-version v0.2.1
+version v0.2.2
 
 # SYNOPSIS
 
@@ -44,10 +44,6 @@ Since v0.2.0, the this module requires Perl v5.14 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
-If you need this module on Perl v5.10, please use one of the v0.1.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
-
 # SEE ALSO
 
 [Log::Log4perl::Appender::TAP](https://metacpan.org/pod/Log%3A%3ALog4perl%3A%3AAppender%3A%3ATAP)
@@ -68,6 +64,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -77,7 +78,7 @@ and [Log::Dispatch::TestDiag](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3ATe
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2023 by Robert Rothenberg.
+This software is Copyright (c) 2020-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

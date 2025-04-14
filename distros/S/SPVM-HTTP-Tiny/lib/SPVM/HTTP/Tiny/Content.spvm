@@ -15,27 +15,41 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
   }
   
   # Fields
-  has auto_decompress : ro byte;
+  has auto_decompress : wo byte;
+  method auto_decompress : int () {
+    my $_ = $self->{auto_decompress};
+    if ($_ < 0) {
+      die "auto_decompress field is not yet specified.";
+    }
+    return $_;
+  }
   
-  has auto_relax : ro byte;
+  has auto_relax : wo byte;
+  method auto_relax : int () {
+    my $_ = $self->{auto_relax};
+    if ($_ < 0) {
+      die "auto_relax field is not yet specified.";
+    }
+    return $_;
+  }
   
   has relaxed : ro byte;
   
-  has skip_body : ro byte;
+  has skip_body : rw byte;
   
-  has headers : ro HTTP::Tiny::Headers;
+  has headers : rw HTTP::Tiny::Headers;
   
   has max_buffer_size : ro int;
   
   has max_leftover_size : ro int;
   
+  # Undocumented Fields
   has body_buffer : string;
   
   has eof : byte;
   
   has state : string;
   
-  # Undocumented Fields
   has dynamic : byte;
   
   has header_buffer : string;
@@ -103,7 +117,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
   
   method body_contains : int ($chunk : string) { die "Not impelmented"; }
   
-  method body_size : long () { die "Not impelmented."; }
+  method body_size : int () { die "Not impelmented."; }
   
   method boundary : string () {
     
@@ -186,13 +200,13 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     return length $self->{header_buffer};
   }
   
-  method headers_contain : int ($offset : int) {
+  method headers_contain : int ($chunk : string) {
     
     $self->_headers;
     
     my $header_buffer = $self->{header_buffer};
     
-    return Fn->index($header_buffer, $offset) >= 0;
+    return Fn->index($header_buffer, $chunk) >= 0;
   }
   
   method is_chunked : int () {

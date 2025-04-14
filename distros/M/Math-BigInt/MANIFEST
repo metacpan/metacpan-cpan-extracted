@@ -249,9 +249,9 @@ xt/author/dparts-mbi.t
 xt/author/dparts-mbr.t
 xt/author/eparts-mbf.t
 xt/author/eparts-mbi.t
-xt/author/fparts-mbf.t
-xt/author/fparts-mbi.t
-xt/author/fparts-mbr.t
+xt/author/fparts-numerator-denominator-mbf.t
+xt/author/fparts-numerator-denominator-mbi.t
+xt/author/fparts-numerator-denominator-mbr.t
 xt/author/from_base-mbi-mbr-mbf.t
 xt/author/from_base_num-mbi.t
 xt/author/from_bin-mbf.t
@@ -264,6 +264,9 @@ xt/author/from_dec-mbi-mbf.t
 xt/author/from_dec-mbi-mbr.t
 xt/author/from_dec-mbi.t
 xt/author/from_dec-mbr.t
+xt/author/from_fp80-mbf.t
+xt/author/from_fp80-mbi.t
+xt/author/from_fp80-mbr.t
 xt/author/from_hex-mbf.t
 xt/author/from_hex-mbi-mbf.t
 xt/author/from_hex-mbi-mbr.t
@@ -452,6 +455,9 @@ xt/author/to_bin-mbf.t
 xt/author/to_bin-mbi.t
 xt/author/to_bin-mbr.t
 xt/author/to_bytes-mbi-mbr-mbf.t
+xt/author/to_fp80-mbf.t
+xt/author/to_fp80-mbi.t
+xt/author/to_fp80-mbr.t
 xt/author/to_hex-mbf.t
 xt/author/to_hex-mbi.t
 xt/author/to_hex-mbr.t

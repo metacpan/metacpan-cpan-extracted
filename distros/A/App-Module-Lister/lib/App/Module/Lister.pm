@@ -2,7 +2,7 @@
 package App::Module::Lister;
 use strict;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 

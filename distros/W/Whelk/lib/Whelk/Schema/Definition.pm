@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '1.03';
+$Whelk::Schema::Definition::VERSION = '1.04';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
@@ -109,10 +109,6 @@ sub _openapi_dump_extra_rules
 		%result = (%result, %{$rule->openapi});
 	}
 
-	if ($self->nullable) {
-		$result{nullable} = JSON::PP::true;
-	}
-
 	return \%result;
 }
 
@@ -157,8 +153,8 @@ sub inhale_or_error
 			if ref $error_sub eq 'CODE';
 
 		# generic error in case $error_sub was not passed or did not throw
-		my $class = ref $self;
-		die "incorrect data for $class ($inhaled): " . Dumper($data);
+		local $Data::Dumper::Sortkeys = 1;
+		die "incorrect data: " . Dumper({schema => $self, data => $data, hint => $inhaled});
 	}
 
 	return undef;
@@ -181,7 +177,21 @@ sub openapi_schema
 sub openapi_dump
 {
 	my ($self, $obj, %hints) = @_;
-	...;
+
+	# incomplete, must be complimented in child classes
+	my $res = {
+		%{$self->_openapi_dump_extra_rules},
+	};
+
+	if (defined $self->description) {
+		$res->{description} = $self->description;
+	}
+
+	if ($self->nullable) {
+		$res->{nullable} = JSON::PP::true;
+	}
+
+	return $res;
 }
 
 sub exhale
@@ -343,6 +353,9 @@ Must be implemented in a subclass.
 
 Returns the structure which describes this type for the OpenAPI document.
 Should not be called directly, as it is called by L</openapi_schema>.
+
+Base class implementation returns some partial data, so it may be handy to call
+it while reimplementing.
 
 =head2 openapi_schema
 

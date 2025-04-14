@@ -1,3 +1,8 @@
+0.06 2025-04-13T13:43:23+02:00
+ - Fix doc with leader support.
+ - Fix sort of frequency.
+ - Improve placing of frequency.
+
 0.05 2025-01-30T14:05:45+01:00
  - Add -f option to print frequency.
  - Add check of first field definition.

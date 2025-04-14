@@ -8,7 +8,7 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -52,15 +52,15 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
     将两个或多个连续换行符合并为一个。
 
-- **-Mline** **--offload** _command_
+- **-ML** **--offload** _command_
 
-    [teip(1)](http://man.he.net/man1/teip) 的 **--offload** 选项在不同的模块 **-Mline** 中实现。
+    [teip(1)](http://man.he.net/man1/teip) 的 **--offload** 选项在不同的模块 [App::Greple::L](https://metacpan.org/pod/App%3A%3AGreple%3A%3AL) (**-ML**) 中实现。
 
-        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+        greple -Mtee cat -n -- -ML --offload 'seq 10 20'
 
-    你也可以使用 **line** 模块只处理偶数行，如下所示。
+    你也可以使用 **-ML** 模块只处理偶数行，如下所示。
 
-        greple -Mtee cat -n -- -Mline 2::2
+        greple -Mtee cat -n -- -ML 2::2
 
 # LEGACIES
 
@@ -145,9 +145,9 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
 考虑一下要从非标题行中搜索字符串的情况。例如，你可能想搜索 `docker image ls` 命令中的 Docker 镜像名称，但要保留标题行。你可以通过以下命令来实现。
 
-    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+    greple -Mtee grep perl -- -ML 2: --discrete --all
 
-选项 `-Mline -L 2:` 会检索倒数第二行，并将其发送给 `grep perl` 命令。需要使用选项 --discrete 是因为输入和输出的行数会发生变化，但由于命令只执行一次，因此不会影响性能。
+选项 `-ML 2:` 检索倒数第二行，并将其发送给 `grep perl` 命令。需要使用选项 --discrete 是因为输入和输出的行数会发生变化，但由于命令只执行一次，因此不会影响性能。
 
 如果尝试用 **teip** 命令做同样的事情，`teip -l 2- -- grep` 会出错，因为输出行数少于输入行数。不过，得到的结果没有问题。
 
@@ -179,7 +179,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

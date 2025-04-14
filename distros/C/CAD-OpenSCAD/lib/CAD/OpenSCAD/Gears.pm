@@ -3,7 +3,7 @@ use strict; use warnings;
 use Object::Pad;
 use CAD::OpenSCAD::Math;
 
-our $VERSION='0.10';
+our $VERSION='0.13';
 	
 our $Math=new Math;
 		

@@ -19,8 +19,6 @@ extract_modules - determine which Perl modules a given file uses
 
 our $VERSION = '1.104';
 
-getopts('ecjl0', \my %opts);
-
 =head1 SYNOPSIS
 
 Given Perl files, extract and report the Perl modules included
@@ -95,70 +93,78 @@ string eval.
 
 =cut
 
-# if no parameters are passed, give usage information
-unless( @ARGV ) {
-	pod2usage( msg => 'Please supply at least one filename to analyze' );
-	exit;
-	}
+run(@ARGV) unless caller;
 
-use Data::Dumper;
-my( $object, $method, $sub );
-my @classes = qw( Module::Extract::Use Module::ExtractUse );
-my %methods = (
-	'Module::Extract::Use' => [ 'get_modules_with_details', sub {
-		[ $_[0]->module, $_[0]->version ];
-		} ],
-	'Module::ExtractUse' => [ 'extract_use', sub {
-		say Dumper( \@_ );
-		[ $_[0], undef ];
-		} ],
-	);
+sub run {
+	my @args = @_;
+	getopts('ecjl0', \my %opts);
 
-foreach my $module ( @classes ) {
-	eval "require $module";
-	next if $@;
-	( $object, $method, $sub ) = ( $module->new, @{ $methods{$module} } );
-	}
-
-die "No usable file scanner module found; exiting...\n" .
-	"Install one of these modules to make this program work:\n" .
-	join( "\n\t", sort keys %methods ) .
-	"\n"
-	unless defined $object;
-
-
-my @Grand_modules;
-foreach my $file ( @ARGV ) {
-	unless ( -r $file ) {
-		printf STDERR "Could not read $file\n";
-		next;
+	# if no parameters are passed, give usage information
+	unless( @args ) {
+		pod2usage( msg => 'Please supply at least one filename to analyze' );
+		exit;
 		}
 
-	my @modules = $object->$method( $file );
-	my $ref = ref $modules[0] ? $modules[0] : \@modules;
-	push @Grand_modules, map { $sub->( $_ ) } @$ref;
+	use Data::Dumper;
+	my( $object, $method, $sub );
+	my @classes = qw( Module::Extract::Use Module::ExtractUse );
+	my %methods = (
+		'Module::Extract::Use' => [ 'get_modules_with_details', sub {
+			[ $_[0]->module, $_[0]->version ];
+			} ],
+		'Module::ExtractUse' => [ 'extract_use', sub {
+			say Dumper( \@_ );
+			[ $_[0], undef ];
+			} ],
+		);
 
-	# remove core modules
-	@Grand_modules =
-		grep { ! defined Module::CoreList->first_release( $_->[0] ) }
-		@Grand_modules
-		if $opts{e};
+	foreach my $module ( @classes ) {
+		eval "require $module";
+		next if $@;
+		( $object, $method, $sub ) = ( $module->new, @{ $methods{$module} } );
+		}
 
-	next if $opts{j} || $opts{l} || $opts{0} || $opts{c}; # do these after
+	die "No usable file scanner module found; exiting...\n" .
+		"Install one of these modules to make this program work:\n" .
+		join( "\n\t", sort keys %methods ) .
+		"\n"
+		unless defined $object;
 
-	# Handle this here because we want the filename
-	long_list( $file, @Grand_modules )
+
+	my @Grand_modules;
+	foreach my $file ( @args ) {
+		unless ( -r $file ) {
+			printf STDERR "Could not read $file\n";
+			next;
+			}
+
+		my @modules = $object->$method( $file );
+		my $ref = ref $modules[0] ? $modules[0] : \@modules;
+		push @Grand_modules, map { $sub->( $_ ) } @$ref;
+
+		# remove core modules
+		@Grand_modules =
+			grep { ! defined Module::CoreList->first_release( $_->[0] ) }
+			@Grand_modules
+			if $opts{e};
+
+		next if $opts{j} || $opts{l} || $opts{0} || $opts{c}; # do these after
+
+		# Handle this here because we want the filename
+		long_list( $file, @Grand_modules )
+		}
+
+	# Handle these options after going through all the files
+	   if( $opts{l} or $opts{0} ) { short_list( \%opts, @Grand_modules ) }
+	elsif( $opts{j} )             { json_list(  \%opts, @Grand_modules ) }
+	elsif( $opts{c} )             { cpan_file(  \%opts, @Grand_modules ) }
 	}
-
-# Handle these options after going through all the files
-   if( $opts{l} or $opts{0} ) { short_list( @Grand_modules ) }
-elsif( $opts{j} )             { json_list(  @Grand_modules ) }
-elsif( $opts{c} )             { cpan_file(  @Grand_modules ) }
 
 sub short_list {
 	state $Seen = {};
+	my $opts = shift;
 
-	my $glue = $opts{0} ? "\000" : "\n";
+	my $glue = $opts->{0} ? "\000" : "\n";
 	print join( $glue,
 		grep( { ! $Seen->{$_}++ } sort map { $_->[0] } @_ ),
 		''
@@ -167,8 +173,9 @@ sub short_list {
 
 sub json_list {
 	state $Seen = {};
+	my $opts = shift;
 
-	my $glue = $opts{0} ? "\000" : "\n";
+	my $glue = $opts->{0} ? "\000" : "\n";
 	print
 		"[\n\t",
 		join( ",\n\t",
@@ -183,6 +190,7 @@ sub json_list {
 
 sub cpan_file {
 	state $Seen = {};
+	my $opts = shift;
 
 	foreach my $module ( @_ ) {
 		printf "requires '%s'", $module->[0];
@@ -219,6 +227,8 @@ sub long_list {
 	}
 
 }
+
+=back
 
 =head1 AUTHORS
 

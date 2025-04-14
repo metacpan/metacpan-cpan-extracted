@@ -41,7 +41,7 @@ die $@ if $@;
 
 can_ok($LIB, '_ilog2');
 
-# int(log(x) / log(2)
+# int(log(x) / log(2))
 
 sub ilog2 {
     my $x = shift;

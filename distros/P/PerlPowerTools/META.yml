@@ -7,6 +7,7 @@ build_requires:
   Test::More: '1'
   Test::Pod: '0'
   Test::Warnings: '0'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/briandfoy/PerlPowerTools/issues
   homepage: https://www.perlpowertools.com/
   repository: https://github.com/briandfoy/PerlPowerTools
-version: '1.049'
+version: '1.051'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

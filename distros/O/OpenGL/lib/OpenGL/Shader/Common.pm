@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ OpenGL::Shader::Common - base class for use with OpenGL::Shader
 
   # Instantiate a shader
   use OpenGL::Shader;
-  my $shdr = new OpenGL::Shader();
+  my $shdr = OpenGL::Shader->new();
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ This module provides a base class for OpenGL shader types.
 Example usage:
 
   use OpenGL::Shader;
-  my $shdr = new OpenGL::Shader();
+  my $shdr = OpenGL::Shader->new();
 
   ##########
   # Methods defined in this module:
@@ -180,16 +180,13 @@ sub LoadFiles
   my($self,$fragment_file,$vertex_file) = @_;
 
   my $fragment = '';
-  if ($fragment_file)
-  {
+  if ($fragment_file) {
     return "Does not exist: $fragment_file" if (!-e $fragment_file);
     $fragment = $self->read_file($fragment_file);
     return "Empty fragment file" if (!$fragment);
   }
-
   my $vertex = '';
-  if ($fragment_file)
-  {
+  if ($vertex_file) {
     return "Does not exist: $vertex_file" if (!-e $vertex_file);
     $vertex = $self->read_file($vertex_file);
     return "Empty vertex file" if (!$vertex);
