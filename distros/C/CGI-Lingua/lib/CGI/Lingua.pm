@@ -3,13 +3,13 @@ package CGI::Lingua;
 use warnings;
 use strict;
 
-use Config::Auto;
+use Config::Abstraction;
 use Log::Abstraction;
 use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.71
+Version 0.72
 
 =cut
 
@@ -176,7 +176,7 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'}) && (my $config = Config::Auto::parse($params->{'config_file'}))) {
+	if(exists($params->{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $params->{'config_file'})->all())) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
 		if($config->{$class}) {
 			$config = $config->{$class};
@@ -1114,7 +1114,9 @@ sub _load_geoip
 {
 	my $self = shift;
 
-	if(($^O eq 'MSWin32') || (-r '/usr/local/share/GeoIP/GeoIP.dat') || (-r '/usr/share/GeoIP/GeoIP.dat')) {
+	# For Windows, see http://www.cpantesters.org/cpan/report/54117bd0-6eaf-1014-8029-ee20cb952333
+	if((($^O eq 'MSWin32') && (-r 'c:/GeoIP/GeoIP.dat')) ||
+	   ((-r '/usr/local/share/GeoIP/GeoIP.dat') || (-r '/usr/share/GeoIP/GeoIP.dat'))) {
 		# Don't use 'eval { use ... ' as recommended by Perlcritic
 		# See https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
 		eval 'require Geo::IP';
@@ -1356,13 +1358,15 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
-	# FIXME: add caller's function
-	# if(($level eq 'warn') || ($level eq 'notice')) {
-		push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
-	# }
+	if(scalar(@messages)) {
+		# FIXME: add caller's function
+		# if(($level eq 'warn') || ($level eq 'notice')) {
+			push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
+		# }
 
-	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(join('', grep defined, @messages));
+		if(my $logger = $self->{'logger'}) {
+			$self->{'logger'}->$level(join('', grep defined, @messages));
+		}
 	}
 }
 
@@ -1387,11 +1391,14 @@ sub _trace {
 }
 
 # Emit a warning message somewhere
-sub _warn {
+sub _warn
+{
 	my $self = shift;
 	my $params = Params::Get::get_params('warning', @_);
 
-	$self->_log('warn', $params->{'warning'});
+	if($params->{'warning'}) {
+		$self->_log('warn', $params->{'warning'});
+	}
 }
 
 =head1 AUTHOR

@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Version
 
+1.119 2025-04-14T18:42:03Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.118 2025-01-22T14:18:12Z
 	* refresh dist
 

@@ -127,7 +127,7 @@ BEGIN {
 		);
 	};
 
-our $VERSION   = '3.011';
+our $VERSION   = '3.012';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };

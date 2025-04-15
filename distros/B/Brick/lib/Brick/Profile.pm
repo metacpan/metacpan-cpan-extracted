@@ -8,7 +8,7 @@ use Carp qw(carp);
 
 use Brick;
 
-$VERSION = '0.903';
+$VERSION = '0.904';
 
 =encoding utf8
 

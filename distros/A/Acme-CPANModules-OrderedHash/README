@@ -3,9 +3,9 @@ NAME
     hash data type
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::OrderedHash
+    This document describes version 0.004 of Acme::CPANModules::OrderedHash
     (from Perl distribution Acme-CPANModules-OrderedHash), released on
-    2023-10-06.
+    2025-04-15.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -35,33 +35,25 @@ DESCRIPTION
 
 ACME::CPANMODULES ENTRIES
     Tie::IxHash
-        Author: CHORNY <https://metacpan.org/author/CHORNY>
-
     Hash::Ordered
-        Author: DAGOLDEN <https://metacpan.org/author/DAGOLDEN>
-
     Tie::Hash::Indexed
-        Author: MHX <https://metacpan.org/author/MHX>
-
         Provides two interfaces: tied hash and OO.
 
     Tie::LLHash
-        Author: XAERXESS <https://metacpan.org/author/XAERXESS>
-
     Tie::StoredOrderHash
-        Author: TFM <https://metacpan.org/author/TFM>
-
     Array::OrdHash
-        Author: WOWASURIN <https://metacpan.org/author/WOWASURIN>
-
         Provide something closest to PHP's associative array, where you can
         refer elements by key or by numeric index, and insertion order is
         remembered.
 
     List::Unique::DeterministicOrder
-        Author: SLAFFAN <https://metacpan.org/author/SLAFFAN>
-
         Provide a list, not hash.
+
+    Tree::RB::XS
+        Multi-purpose tree data structure which can record insertion order
+        and act as an ordered hash. Use "track_recent => 1,
+        keys_in_recent_order => 1" options. Can be used as a tied hash, or
+        as an object (faster).
 
 BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
@@ -79,7 +71,7 @@ BENCHMARKED MODULES
 
     Array::OrdHash 1.03
 
-    List::Unique::DeterministicOrder 0.004
+    Tree::RB::XS 0.19
 
 BENCHMARK PARTICIPANTS
     *   Tie::IxHash (perl_code)
@@ -106,9 +98,9 @@ BENCHMARK PARTICIPANTS
 
         Array::OrdHash
 
-    *   List::Unique::DeterministicOrder (perl_code) [no_iterate]
+    *   Tree::RB::XS (perl_code)
 
-        List::Unique::DeterministicOrder
+        Tree::RB::XS
 
 BENCHMARK DATASETS
     *   insert 1000 pairs
@@ -121,9 +113,9 @@ BENCHMARK DATASETS
 
 BENCHMARK SAMPLE RESULTS
   Sample benchmark #1
-    Run on: perl: *v5.38.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
-    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
-    version 5.4.0-91-generic*.
+    Run on: perl: *v5.40.1*, CPU: *AMD Ryzen 5 7535HS with Radeon Graphics
+    (6 cores)*, OS: *GNU/Linux Ubuntu version 24.10*, OS kernel: *Linux
+    version 6.11.0-8-generic*.
 
     Benchmark command (default options):
 
@@ -133,37 +125,37 @@ BENCHMARK SAMPLE RESULTS
 
      #table1#
      {dataset=>"insert 1000 pairs"}
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                      | p_tags     | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Tie::StoredOrderHash             |            |       360 |     2.78  |                 0.00% |               197.99% | 1.1e-06 |      20 |
-     | Tie::LLHash                      |            |       380 |     2.6   |                 6.60% |               179.55% | 1.3e-05 |      20 |
-     | Array::OrdHash                   |            |       540 |     1.9   |                49.87% |                98.83% | 3.2e-06 |      20 |
-     | Tie::Hash::Indexed               |            |       700 |     2     |                81.84% |                63.87% | 7.2e-05 |      22 |
-     | Tie::IxHash                      |            |       676 |     1.48  |                87.57% |                58.87% | 9.9e-07 |      20 |
-     | Hash::Ordered                    |            |       884 |     1.13  |               145.25% |                21.50% | 1.1e-06 |      21 |
-     | List::Unique::DeterministicOrder | no_iterate |      1070 |     0.931 |               197.99% |                 0.00% |   8e-07 |      21 |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant          | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Tie::StoredOrderHash |       539 |     1.85  |                 0.00% |               528.45% | 1.4e-06 |      22 |
+     | Tie::LLHash          |       640 |     1.6   |                19.19% |               427.28% | 3.4e-06 |      20 |
+     | Array::OrdHash       |       889 |     1.12  |                64.84% |               281.24% | 9.6e-07 |      20 |
+     | Tie::IxHash          |      1080 |     0.928 |                99.73% |               214.65% | 6.1e-07 |      20 |
+     | Hash::Ordered        |      1460 |     0.684 |               170.98% |               131.92% | 4.1e-07 |      20 |
+     | Tie::Hash::Indexed   |      1600 |     0.62  |               196.91% |               111.67% | 9.6e-07 |      20 |
+     | Tree::RB::XS         |      3400 |     0.3   |               528.45% |                 0.00% | 5.4e-07 |      21 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
     The above result formatted in Benchmark.pm style:
 
-                         Rate  T:S   T:L   TH:I   A:O   T:I   H:O   LU:D no_iterate 
-      T:S               360/s    --   -6%   -28%  -31%  -46%  -59%             -66% 
-      T:L               380/s    6%    --   -23%  -26%  -43%  -56%             -64% 
-      TH:I              700/s   38%   30%     --   -5%  -26%  -43%             -53% 
-      A:O               540/s   46%   36%     5%    --  -22%  -40%             -51% 
-      T:I               676/s   87%   75%    35%   28%    --  -23%             -37% 
-      H:O               884/s  146%  130%    76%   68%   30%    --             -17% 
-      LU:D no_iterate  1070/s  198%  179%   114%  104%   58%   21%               -- 
+              Rate   T:S   T:L   A:O   T:I   H:O  TH:I  TR:X 
+      T:S    539/s    --  -13%  -39%  -49%  -63%  -66%  -83% 
+      T:L    640/s   15%    --  -29%  -42%  -57%  -61%  -81% 
+      A:O    889/s   65%   42%    --  -17%  -38%  -44%  -73% 
+      T:I   1080/s   99%   72%   20%    --  -26%  -33%  -67% 
+      H:O   1460/s  170%  133%   63%   35%    --   -9%  -56% 
+      TH:I  1600/s  198%  158%   80%   49%   10%    --  -51% 
+      TR:X  3400/s  516%  433%  273%  209%  128%  106%    -- 
  
      Legends:
-       A:O : p_tags= participant=Array::OrdHash
-       H:O : p_tags= participant=Hash::Ordered
-       LU:D no_iterate: p_tags=no_iterate participant=List::Unique::DeterministicOrder
-       T:I : p_tags= participant=Tie::IxHash
-       T:L : p_tags= participant=Tie::LLHash
-       T:S : p_tags= participant=Tie::StoredOrderHash
-       TH:I : p_tags= participant=Tie::Hash::Indexed
+       A:O: participant=Array::OrdHash
+       H:O: participant=Hash::Ordered
+       T:I: participant=Tie::IxHash
+       T:L: participant=Tie::LLHash
+       T:S: participant=Tie::StoredOrderHash
+       TH:I: participant=Tie::Hash::Indexed
+       TR:X: participant=Tree::RB::XS
 
     The above result presented as chart:
 
@@ -171,37 +163,37 @@ BENCHMARK SAMPLE RESULTS
 
      #table2#
      {dataset=>"insert 1000 pairs + delete"}
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                      | p_tags     | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Tie::IxHash                      |            |        17 |     58.8  |                 0.00% |              3799.19% | 4.1e-05 |      20 |
-     | Tie::StoredOrderHash             |            |       200 |      5    |              1070.77% |               233.04% | 1.1e-05 |      20 |
-     | Tie::LLHash                      |            |       220 |      4.6  |              1191.67% |               201.87% | 1.4e-05 |      21 |
-     | Array::OrdHash                   |            |       279 |      3.59 |              1537.64% |               138.10% | 2.8e-06 |      21 |
-     | Hash::Ordered                    |            |       370 |      2.7  |              2087.76% |                78.23% | 4.9e-06 |      20 |
-     | List::Unique::DeterministicOrder | no_iterate |       604 |      1.66 |              3450.01% |                 9.84% | 5.1e-07 |      20 |
-     | Tie::Hash::Indexed               |            |       663 |      1.51 |              3799.19% |                 0.00% |   6e-07 |      20 |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant          | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Tie::IxHash          |        31 |    32     |                 0.00% |              5838.76% | 4.8e-05 |      21 |
+     | Tie::StoredOrderHash |       310 |     3.3   |               875.00% |               509.10% | 8.6e-06 |      21 |
+     | Tie::LLHash          |       376 |     2.66  |              1098.31% |               395.59% | 2.5e-06 |      20 |
+     | Array::OrdHash       |       440 |     2.3   |              1289.81% |               327.31% | 6.1e-06 |      20 |
+     | Hash::Ordered        |       610 |     1.6   |              1854.01% |               203.93% | 1.9e-06 |      20 |
+     | Tie::Hash::Indexed   |      1060 |     0.946 |              3272.21% |                76.11% | 5.7e-07 |      20 |
+     | Tree::RB::XS         |      1900 |     0.54  |              5838.76% |                 0.00% | 6.3e-07 |      20 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
     The above result formatted in Benchmark.pm style:
 
-                        Rate   T:I   T:S   T:L   A:O   H:O   LU:D no_iterate  TH:I  
-      T:I               17/s     --  -91%  -92%  -93%  -95%             -97%   -97% 
-      T:S              200/s  1076%    --   -8%  -28%  -46%             -66%   -69% 
-      T:L              220/s  1178%    8%    --  -21%  -41%             -63%   -67% 
-      A:O              279/s  1537%   39%   28%    --  -24%             -53%   -57% 
-      H:O              370/s  2077%   85%   70%   32%    --             -38%   -44% 
-      LU:D no_iterate  604/s  3442%  201%  177%  116%   62%               --    -9% 
-      TH:I             663/s  3794%  231%  204%  137%   78%               9%     -- 
+              Rate    T:I   T:S   T:L   A:O   H:O  TH:I  TR:X 
+      T:I     31/s     --  -89%  -91%  -92%  -95%  -97%  -98% 
+      T:S    310/s   869%    --  -19%  -30%  -51%  -71%  -83% 
+      T:L    376/s  1103%   24%    --  -13%  -39%  -64%  -79% 
+      A:O    440/s  1291%   43%   15%    --  -30%  -58%  -76% 
+      H:O    610/s  1900%  106%   66%   43%    --  -40%  -66% 
+      TH:I  1060/s  3282%  248%  181%  143%   69%    --  -42% 
+      TR:X  1900/s  5825%  511%  392%  325%  196%   75%    -- 
  
      Legends:
-       A:O : p_tags= participant=Array::OrdHash
-       H:O : p_tags= participant=Hash::Ordered
-       LU:D no_iterate: p_tags=no_iterate participant=List::Unique::DeterministicOrder
-       T:I : p_tags= participant=Tie::IxHash
-       T:L : p_tags= participant=Tie::LLHash
-       T:S : p_tags= participant=Tie::StoredOrderHash
-       TH:I : p_tags= participant=Tie::Hash::Indexed
+       A:O: participant=Array::OrdHash
+       H:O: participant=Hash::Ordered
+       T:I: participant=Tie::IxHash
+       T:L: participant=Tie::LLHash
+       T:S: participant=Tie::StoredOrderHash
+       TH:I: participant=Tie::Hash::Indexed
+       TR:X: participant=Tree::RB::XS
 
     The above result presented as chart:
 
@@ -212,23 +204,25 @@ BENCHMARK SAMPLE RESULTS
      +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
      | participant          | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
      +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Tie::LLHash          |      45   |      22   |                 0.00% |               206.84% | 4.1e-05 |      21 |
-     | Tie::StoredOrderHash |      46   |      21.7 |                 2.02% |               200.75% | 9.4e-06 |      20 |
-     | Array::OrdHash       |      51.4 |      19.5 |                13.93% |               169.32% | 1.4e-05 |      21 |
-     | Tie::IxHash          |      65.1 |      15.4 |                44.41% |               112.47% | 9.4e-06 |      20 |
-     | Tie::Hash::Indexed   |      97.5 |      10.3 |               116.20% |                41.93% | 9.3e-06 |      20 |
-     | Hash::Ordered        |     140   |       7.2 |               206.84% |                 0.00% | 6.4e-05 |      20 |
+     | Tie::StoredOrderHash |      71   |     14    |                 0.00% |               508.52% |   2e-05 |      20 |
+     | Tie::LLHash          |      75.4 |     13.3  |                 5.52% |               476.69% | 1.2e-05 |      24 |
+     | Array::OrdHash       |      87.2 |     11.5  |                22.04% |               398.65% |   1e-05 |      20 |
+     | Tie::IxHash          |     107   |      9.36 |                49.51% |               307.02% | 2.5e-06 |      20 |
+     | Tie::Hash::Indexed   |     171   |      5.85 |               139.18% |               154.42% |   5e-06 |      21 |
+     | Hash::Ordered        |     250   |      4    |               250.17% |                73.78% | 6.1e-06 |      20 |
+     | Tree::RB::XS         |     435   |      2.3  |               508.52% |                 0.00% | 8.2e-07 |      20 |
      +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
     The above result formatted in Benchmark.pm style:
 
-              Rate   T:L   T:S   A:O   T:I  TH:I   H:O 
-      T:L     45/s    --   -1%  -11%  -29%  -53%  -67% 
-      T:S     46/s    1%    --  -10%  -29%  -52%  -66% 
-      A:O   51.4/s   12%   11%    --  -21%  -47%  -63% 
-      T:I   65.1/s   42%   40%   26%    --  -33%  -53% 
-      TH:I  97.5/s  113%  110%   89%   49%    --  -30% 
-      H:O    140/s  205%  201%  170%  113%   43%    -- 
+              Rate   T:S   T:L   A:O   T:I  TH:I   H:O  TR:X 
+      T:S     71/s    --   -4%  -17%  -33%  -58%  -71%  -83% 
+      T:L   75.4/s    5%    --  -13%  -29%  -56%  -69%  -82% 
+      A:O   87.2/s   21%   15%    --  -18%  -49%  -65%  -80% 
+      T:I    107/s   49%   42%   22%    --  -37%  -57%  -75% 
+      TH:I   171/s  139%  127%   96%   60%    --  -31%  -60% 
+      H:O    250/s  250%  232%  187%  134%   46%    --  -42% 
+      TR:X   435/s  508%  478%  400%  306%  154%   73%    -- 
  
      Legends:
        A:O: participant=Array::OrdHash
@@ -237,6 +231,7 @@ BENCHMARK SAMPLE RESULTS
        T:L: participant=Tie::LLHash
        T:S: participant=Tie::StoredOrderHash
        TH:I: participant=Tie::Hash::Indexed
+       TR:X: participant=Tree::RB::XS
 
     The above result presented as chart:
 
@@ -244,37 +239,37 @@ BENCHMARK SAMPLE RESULTS
 
      #table4#
      {dataset=>"insert 1000 pairs + return keys 100 times"}
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | participant                      | p_tags     | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | Tie::StoredOrderHash             |            |      10.7 |     93.2  |                 0.00% |               845.55% | 5.8e-05   |      20 |
-     | Tie::LLHash                      |            |      12   |     86    |                 8.76% |               769.40% |   0.00011 |      20 |
-     | Array::OrdHash                   |            |      14   |     70    |                32.35% |               614.46% |   0.0001  |      20 |
-     | Tie::IxHash                      |            |      16.2 |     61.8  |                50.70% |               527.45% | 5.4e-05   |      20 |
-     | Tie::Hash::Indexed               |            |      24   |     41    |               124.79% |               320.64% |   0.0001  |      20 |
-     | Hash::Ordered                    |            |      78.3 |     12.8  |               629.18% |                29.67% | 4.2e-06   |      20 |
-     | List::Unique::DeterministicOrder | no_iterate |     101   |      9.85 |               845.55% |                 0.00% | 2.2e-06   |      22 |
-     +----------------------------------+------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     +----------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | participant          | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | Tie::StoredOrderHash |      17   |     58    |                 0.00% |              1439.14% | 6.1e-05   |      20 |
+     | Tie::LLHash          |      20   |     50    |                16.39% |              1222.37% | 7.3e-05   |      20 |
+     | Array::OrdHash       |      25   |     40    |                44.54% |               964.81% |   0.00011 |      21 |
+     | Tie::IxHash          |      26.8 |     37.3  |                54.99% |               893.08% | 3.3e-05   |      20 |
+     | Tie::Hash::Indexed   |      44   |     23    |               154.54% |               504.67% | 2.7e-05   |      20 |
+     | Hash::Ordered        |     135   |      7.43 |               678.48% |                97.71% | 7.1e-06   |      20 |
+     | Tree::RB::XS         |     270   |      3.8  |              1439.14% |                 0.00% | 4.3e-06   |      20 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
     The above result formatted in Benchmark.pm style:
 
-                         Rate  T:S   T:L   A:O   T:I   TH:I   H:O   LU:D no_iterate 
-      T:S              10.7/s    --   -7%  -24%  -33%   -56%  -86%             -89% 
-      T:L                12/s    8%    --  -18%  -28%   -52%  -85%             -88% 
-      A:O                14/s   33%   22%    --  -11%   -41%  -81%             -85% 
-      T:I              16.2/s   50%   39%   13%    --   -33%  -79%             -84% 
-      TH:I               24/s  127%  109%   70%   50%     --  -68%             -75% 
-      H:O              78.3/s  628%  571%  446%  382%   220%    --             -23% 
-      LU:D no_iterate   101/s  846%  773%  610%  527%   316%   29%               -- 
+              Rate    T:S    T:L   A:O   T:I  TH:I   H:O  TR:X 
+      T:S     17/s     --   -13%  -31%  -35%  -60%  -87%  -93% 
+      T:L     20/s    15%     --  -19%  -25%  -54%  -85%  -92% 
+      A:O     25/s    44%    25%    --   -6%  -42%  -81%  -90% 
+      T:I   26.8/s    55%    34%    7%    --  -38%  -80%  -89% 
+      TH:I    44/s   152%   117%   73%   62%    --  -67%  -83% 
+      H:O    135/s   680%   572%  438%  402%  209%    --  -48% 
+      TR:X   270/s  1426%  1215%  952%  881%  505%   95%    -- 
  
      Legends:
-       A:O : p_tags= participant=Array::OrdHash
-       H:O : p_tags= participant=Hash::Ordered
-       LU:D no_iterate: p_tags=no_iterate participant=List::Unique::DeterministicOrder
-       T:I : p_tags= participant=Tie::IxHash
-       T:L : p_tags= participant=Tie::LLHash
-       T:S : p_tags= participant=Tie::StoredOrderHash
-       TH:I : p_tags= participant=Tie::Hash::Indexed
+       A:O: participant=Array::OrdHash
+       H:O: participant=Hash::Ordered
+       T:I: participant=Tie::IxHash
+       T:L: participant=Tie::LLHash
+       T:S: participant=Tie::StoredOrderHash
+       TH:I: participant=Tie::Hash::Indexed
+       TR:X: participant=Tree::RB::XS
 
     The above result presented as chart:
 
@@ -286,50 +281,45 @@ BENCHMARK SAMPLE RESULTS
     Result formatted as table:
 
      #table5#
-     +----------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
-     | participant                      | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +----------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
-     | List::Unique::DeterministicOrder |      16.2 |               8.5 |                 0.00% |               110.26% | 7.7e-06 |      20 |
-     | Hash::Ordered                    |      15.9 |               8.2 |                 1.50% |               107.15% |   6e-06 |      20 |
-     | Tie::Hash::Indexed               |      15.5 |               7.8 |                 4.57% |               101.06% | 4.9e-06 |      22 |
-     | Array::OrdHash                   |      15   |               7.3 |                 7.86% |                94.94% | 1.1e-05 |      20 |
-     | Tie::IxHash                      |      14.9 |               7.2 |                 8.49% |                93.81% |   9e-06 |      20 |
-     | Tie::LLHash                      |      13.6 |               5.9 |                18.93% |                76.79% | 7.4e-06 |      20 |
-     | Tie::StoredOrderHash             |      10.7 |               3   |                51.34% |                38.93% | 5.9e-06 |      20 |
-     | perl -e1 (baseline)              |       7.7 |               0   |               110.26% |                 0.00% | 3.4e-05 |      20 |
-     +----------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | participant          | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | Hash::Ordered        |        14 |                 6 |                 0.00% |                80.85% |   0.00011 |      20 |
+     | Tie::Hash::Indexed   |        13 |                 5 |                 3.99% |                73.91% | 9.5e-05   |      21 |
+     | Array::OrdHash       |        13 |                 5 |                 9.26% |                65.51% | 9.4e-05   |      20 |
+     | Tree::RB::XS         |        12 |                 4 |                 9.34% |                65.39% | 9.6e-05   |      20 |
+     | Tie::LLHash          |        12 |                 4 |                12.48% |                60.77% | 8.7e-05   |      20 |
+     | Tie::IxHash          |        12 |                 4 |                13.93% |                58.73% | 3.8e-05   |      20 |
+     | Tie::StoredOrderHash |        10 |                 2 |                39.06% |                30.05% |   0.0001  |      20 |
+     | perl -e1 (baseline)  |         8 |                 0 |                80.85% |                 0.00% | 7.8e-05   |      21 |
+     +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
     The above result formatted in Benchmark.pm style:
 
-                              Rate  LU:D   H:O  TH:I  A:O  T:I   T:L   T:S  perl -e1 (baseline) 
-      LU:D                  61.7/s    --   -1%   -4%  -7%  -8%  -16%  -33%                 -52% 
-      H:O                   62.9/s    1%    --   -2%  -5%  -6%  -14%  -32%                 -51% 
-      TH:I                  64.5/s    4%    2%    --  -3%  -3%  -12%  -30%                 -50% 
-      A:O                   66.7/s    7%    6%    3%   --   0%   -9%  -28%                 -48% 
-      T:I                   67.1/s    8%    6%    4%   0%   --   -8%  -28%                 -48% 
-      T:L                   73.5/s   19%   16%   13%  10%   9%    --  -21%                 -43% 
-      T:S                   93.5/s   51%   48%   44%  40%  39%   27%    --                 -28% 
-      perl -e1 (baseline)  129.9/s  110%  106%  101%  94%  93%   76%   38%                   -- 
+                              Rate  H:O  TH:I  A:O  TR:X   T:L   T:I   T:S  perl -e1 (baseline) 
+      H:O                   71.4/s   --   -7%  -7%  -14%  -14%  -14%  -28%                 -42% 
+      TH:I                  76.9/s   7%    --   0%   -7%   -7%   -7%  -23%                 -38% 
+      A:O                   76.9/s   7%    0%   --   -7%   -7%   -7%  -23%                 -38% 
+      TR:X                  83.3/s  16%    8%   8%    --    0%    0%  -16%                 -33% 
+      T:L                   83.3/s  16%    8%   8%    0%    --    0%  -16%                 -33% 
+      T:I                   83.3/s  16%    8%   8%    0%    0%    --  -16%                 -33% 
+      T:S                  100.0/s  39%   30%  30%   19%   19%   19%    --                 -19% 
+      perl -e1 (baseline)  125.0/s  75%   62%  62%   50%   50%   50%   25%                   -- 
  
      Legends:
-       A:O: mod_overhead_time=7.3 participant=Array::OrdHash
-       H:O: mod_overhead_time=8.2 participant=Hash::Ordered
-       LU:D: mod_overhead_time=8.5 participant=List::Unique::DeterministicOrder
-       T:I: mod_overhead_time=7.2 participant=Tie::IxHash
-       T:L: mod_overhead_time=5.9 participant=Tie::LLHash
-       T:S: mod_overhead_time=3 participant=Tie::StoredOrderHash
-       TH:I: mod_overhead_time=7.8 participant=Tie::Hash::Indexed
+       A:O: mod_overhead_time=5 participant=Array::OrdHash
+       H:O: mod_overhead_time=6 participant=Hash::Ordered
+       T:I: mod_overhead_time=4 participant=Tie::IxHash
+       T:L: mod_overhead_time=4 participant=Tie::LLHash
+       T:S: mod_overhead_time=2 participant=Tie::StoredOrderHash
+       TH:I: mod_overhead_time=5 participant=Tie::Hash::Indexed
+       TR:X: mod_overhead_time=4 participant=Tree::RB::XS
        perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
     The above result presented as chart:
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
-
-BENCHMARK NOTES
-    Hash::Ordered has strong performance in iterating and returning keys,
-    while List::Unique::DeterministicOrder is strong in insertion and
-    deletion (or Tie::Hash::Indexed if you're looking for actual hash type).
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -389,6 +379,9 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Michael Conrad <mike@nrdvana.net>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -406,7 +399,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

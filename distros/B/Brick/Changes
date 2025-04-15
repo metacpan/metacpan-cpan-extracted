@@ -1,5 +1,8 @@
 Revision history for Perl module Brick
 
+0.904 2025-04-14T19:00:24Z
+	* require a newer version.pm for v5.10.1 tests
+
 0.903 2025-01-03T06:57:50Z
 	* refresh distro and move to BRIANDFOY
 

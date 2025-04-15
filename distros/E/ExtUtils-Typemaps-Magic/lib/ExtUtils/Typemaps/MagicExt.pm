@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::MagicExt;
-$ExtUtils::Typemaps::MagicExt::VERSION = '0.007';
+$ExtUtils::Typemaps::MagicExt::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -11,17 +11,23 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGICEXT', code => <<'END');
 	{
-	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
 		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
 	}
 END
+	$self->add_inputmap(xstype => 'T_MAGICEXT_BASE', code => <<'END');
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	if (magic && magic->mg_virtual)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+	}
+END
+
 
 	$self->add_outputmap(xstype => 'T_MAGICEXT', code => <<'END');
 	{
@@ -39,7 +45,7 @@ sub minimum_pxs {
 
 1;
 
-# ABSTRACT: Typemap for storing objects in magic
+# ABSTRACT: Typemap for storing objects in magic pointer
 
 __END__
 
@@ -49,11 +55,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Typemaps::MagicExt - Typemap for storing objects in magic
+ExtUtils::Typemaps::MagicExt - Typemap for storing objects in magic pointer
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -98,7 +104,7 @@ This is useful to create objects that handle thread cloning correctly and effect
 
 This typemap requires L<ExtUtils::ParseXS|ExtUtils::ParseXS> C<3.50> or higher as a build dependency.
 
-If your module supports perls older than C<5.14>, it is recommended to include F<ppport.h> to provide C<mg_findext>. E.g.
+On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>. E.g.
 
  #define NEED_mg_findext
  #include "ppport.h"

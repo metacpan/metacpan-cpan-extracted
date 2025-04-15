@@ -4,6 +4,7 @@ author:
   - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -25,10 +26,9 @@ requires:
   Test::Output: '0'
   feature: '0'
   perl: '5.010'
-  version: '0.86'
 resources:
   bugtracker: https://github.com/briandfoy/module-extract-declaredminimumperl/issues
   homepage: https://github.com/briandfoy/module-extract-declaredminimumperl
   repository: https://github.com/briandfoy/module-extract-declaredminimumperl
-version: '1.026'
+version: '1.027'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

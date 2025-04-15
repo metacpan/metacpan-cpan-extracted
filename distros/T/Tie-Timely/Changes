@@ -1,5 +1,8 @@
 Revision history for Perl module Time::Timely
 
+1.027 2025-04-14T17:40:59Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.026 2025-01-04T05:19:55Z
 	* refresh distro and move to BRIANDFOY
 

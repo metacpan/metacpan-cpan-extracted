@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::MySQL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for MySQL-specific code
 use version;
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.1.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -13,6 +13,7 @@ extends 'DBIx::OnlineDDL::Helper::Base';
 use Types::Standard qw( Bool );
 
 use DBI::Const::GetInfoType;
+use DBIx::ParseError::MySQL;
 use List::Util qw( first );
 use Sub::Util  qw( set_subname );
 
@@ -104,25 +105,7 @@ sub post_connection_stmts {
 
 sub is_error_retryable {
     my ($self, $error) = @_;
-
-    # Disable /x flag to allow for whitespace within string, but turn it on for newlines
-    # and comments.
-    return $error =~ m<
-        # Locks
-        (?-x:deadlock found)|
-        (?-x:wsrep detected deadlock/conflict)|
-        (?-x:lock wait timeout exceeded)|
-
-        # Connections
-        (?-x:mysql server has gone away)|
-        (?-x:lost connection to mysql server)|
-
-        # Queries
-        (?-x:query execution was interrupted)|
-
-        # Failovers
-        (?-x:wsrep has not yet prepared node for application use)
-    >xi;
+    return DBIx::ParseError::MySQL->new($error)->is_transient;
 }
 
 sub create_table_sql {
@@ -202,6 +185,24 @@ sub has_conflicting_triggers_on_table {
     }
 }
 
+sub has_triggers_on_table_to_be_copied {
+    my ($self, $table_name) = @_;
+    my $mmver = $self->mmver;
+    # Multiple triggers aren't allowed on MySQL 5.6, so there's nothing to copy
+    return 0 if $mmver < 5.007;
+
+    # Look for anything that isn't a leftover OnlineDDL trigger name.
+    return $self->dbh_runner(run => set_subname '_has_non_onlineddl_triggers_on_table', sub {
+        $_->selectrow_array(
+            'SELECT trigger_name FROM information_schema.triggers WHERE '.join(' AND ',
+                'event_object_schema = DATABASE()',
+                'event_object_table = ?',
+                'trigger_name NOT LIKE ?',
+            ), undef, $table_name, "\%${table_name}\\_onlineddl\\_\%"
+        );
+    });
+}
+
 sub find_new_trigger_identifier {
     my ($self, $trigger_name) = @_;
 
@@ -220,7 +221,7 @@ sub modify_trigger_dml_stmts {
 
     # Ignore errors
     $stmts->{delete_for_update} =~ s/^DELETE/DELETE IGNORE/;
-    $stmts->{delete_for_update} =~ s/^DELETE/DELETE IGNORE/;
+    $stmts->{delete_for_delete} =~ s/^DELETE/DELETE IGNORE/;
 }
 
 # Keep Base->analyze_table
@@ -251,6 +252,25 @@ sub swap_tables {
     $self->dbh_runner_do(
         "RENAME TABLE $orig_table_name_quote TO $old_table_name_quote, $new_table_name_quote TO $orig_table_name_quote"
     );
+}
+
+sub get_trigger_data {
+    my ($self, $table_name) = @_;
+    my $mmver = $self->mmver;
+    # Multiple triggers aren't allowed on MySQL 5.6, so there's nothing to copy
+    return 0 if $mmver < 5.007;
+
+    # Look for anything that isn't a leftover OnlineDDL trigger name.
+    $self->dbh_runner(run => set_subname '_non_onlineddl_triggers_on_table', sub {
+        $_->{FetchHashKeyName} = 'NAME_lc';
+        $self->vars->{existing_triggers} = $_->selectall_hashref(
+            'SELECT * FROM information_schema.triggers WHERE '.join(' AND ',
+                'event_object_schema = DATABASE()',
+                'event_object_table = ?',
+                'trigger_name NOT LIKE ?',
+            ), 'trigger_name', undef, $table_name, "\%${table_name}\\_onlineddl\\_\%"
+        );
+    });
 }
 
 ### NOTE: The typical SQL in DBD::mysql is badly optimized for MySQL 5 and very large sets
@@ -458,7 +478,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version v1.0.1
+version v1.1.0
 
 =head1 DESCRIPTION
 
@@ -475,7 +495,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2024 by Grant Street Group.
+This software is Copyright (c) 2018 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

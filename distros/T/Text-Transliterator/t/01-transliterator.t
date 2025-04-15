@@ -20,9 +20,15 @@ is_deeply(\@nums, \@nb_translated, "nb of translations");
 my $last_num = $tr->(@copy);
 is($last_num, $nb_translated[-1], "result in scalar context");
 
-$tr = Text::Transliterator->new("abc", "xyz", "r");
-my @new_strings = $tr->(@strings);
-is_deeply(\@new_strings, \@translated, "'r' modifier");
+SKIP: {
+  skip "no 'r' modifier before v1.14" if !$^V or $^V lt v5.14.0;
+
+  $tr = Text::Transliterator->new("abc", "xyz", "r");
+  my @new_strings = $tr->(@strings);
+  is_deeply(\@new_strings, \@translated, "'r' modifier");
+}
+
+
 
 $tr = Text::Transliterator->new({a => 'x', b => 'y', c => 'z'});
 @copy = @strings;

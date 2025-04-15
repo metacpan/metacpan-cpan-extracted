@@ -412,7 +412,7 @@ subtest 'Sublanguage Handling' => sub {
 };
 
 subtest 'should load config file if provided' => sub {
-	my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml');
+	my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml', TMPDIR => 1);
 	print $fh "---\nsupported: fr\n";
 	close $fh;
 
@@ -420,6 +420,5 @@ subtest 'should load config file if provided' => sub {
 	is($info->{'supported'}, 'fr', 'Config file loaded correctly');
 	unlink $config_file;
 };
-
 
 done_testing();

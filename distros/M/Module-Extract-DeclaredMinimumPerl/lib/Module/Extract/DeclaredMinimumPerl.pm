@@ -7,7 +7,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 
 =encoding utf8
 

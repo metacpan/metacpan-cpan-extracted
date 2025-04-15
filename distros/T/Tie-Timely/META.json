@@ -32,7 +32,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "version" : "0.86"
          }
       },
       "test" : {
@@ -53,6 +54,6 @@
          "web" : "https://github.com/briandfoy/tie-timely"
       }
    },
-   "version" : "1.026",
+   "version" : "1.027",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

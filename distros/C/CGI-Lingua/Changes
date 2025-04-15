@@ -1,5 +1,11 @@
 Revision history for CGI-Lingua
 
+0.72	Mon Apr 14 07:18:18 EDT 2025
+	Stop empty entries from appearing in the log
+	Windows can sometimes give an error about opening GeoIP.dat, so workaround that
+		http://www.cpantesters.org/cpan/report/54117bd0-6eaf-1014-8029-ee20cb952333
+	Use Config::Abstraction instead of Config::Auto
+
 0.71	Thu Apr  3 07:55:44 EDT 2025
 	Use Log::Abstraction
 	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY

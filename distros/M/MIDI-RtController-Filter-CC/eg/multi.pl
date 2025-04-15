@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# PERL_FUTURE_DEBUG=1 perl eg/control-change.pl
-
 use curry;
 use MIDI::RtController ();
 use MIDI::RtController::Filter::CC ();
@@ -10,45 +8,65 @@ use Object::Destroyer ();
 my $input_names = shift || 'keyboard,pad,joystick'; # midi controller devices
 my $output_name = shift || 'usb'; # midi output
 
-my %filters = (
-    1 => { # mod-wheel
+my @filters = (
+    { # mod-wheel
+        control => 1,
         port => 'pad',
         event => 'control_change', #[qw(note_on note_off)],
+        trigger => 25,
         type => 'breathe',
         time_step => 0.25,
     },
-    # 13 => { # delay time
+    # { # delay time
         # port => 'joystick',
         # type => 'breathe',
+        # control => 13,
+        # trigger => 25,
         # time_step => 0.5,
         # range_bottom => 10,
         # range_top => 100,
     # },
-    # 14 => { # waveform modulate
-        # port => 'joystick',
-        # type => 'breathe',
-        # time_step => 0.25,
-        # range_bottom => 10,
-        # range_top => 100,
-    # },
-    22 => { # noise
+    { # noise down
         port => 'joystick',
-        type => 'ramp',
+        type => 'ramp_down',
+        control => 22,
+        trigger => 27,
+        time_step => 0.5,
+        range_bottom => 0,
+        range_top => 40,
+        initial_point => 40,
+    },
+    { # noise up
+        port => 'joystick',
+        type => 'ramp_up',
+        control => 22,
+        trigger => 26,
         time_step => 0.5,
         range_bottom => 0,
         range_top => 40,
     },
-    # 26 => { # filter e.g. release
+    # { # filter e.g. release
         # port => 'joystick',
         # type => 'breathe',
+        # control => 26,
         # time_step => 0.5,
         # range_bottom => 10,
         # range_top => 127,
     # },
-    # 77 => {  # oscillator 1 waveform
+    # { # oscillator 1 waveform
         # port => 'joystick',
-        # type => 'single',
-        # value => 18, # 0: sawtooth, 18: square
+        # control => 77,
+        # trigger => 26,
+        # value => 0, # 0: saw, 18: squ, 36: tri, 54: sin, 72 vox
+    # },
+    # { # waveform modulate
+        # port => 'joystick',
+        # type => 'breathe',
+        # control => 14,
+        # trigger => 27,
+        # time_step => 0.25,
+        # range_bottom => 10,
+        # range_top => 100,
     # },
 );
 
@@ -56,51 +74,17 @@ my @inputs = split /,/, $input_names;
 my $name = $inputs[0];
 
 # open the inputs
-my %controllers;
-my $control = MIDI::RtController->new(
-    input   => $name,
-    output  => $output_name,
-    verbose => 1,
-);
-$controllers{$name}->{rtc}    = $control;
-$controllers{$name}->{filter} = MIDI::RtController::Filter::CC->new(
-    rtc => $control
-);
-for my $i (@inputs[1 .. $#inputs]) {
-    $controllers{$i}->{rtc} = MIDI::RtController->new(
-        input    => $i,
-        loop     => $control->loop,
-        midi_out => $control->midi_out,
-        verbose  => 1,
-    );
-    $controllers{$i}->{filter} = MIDI::RtController::Filter::CC->new(
-        rtc => $controllers{$i}->{rtc}
-    );
-}
+my $controllers = MIDI::RtController::open_controllers($input_names, $output_name);
 
-# add the filters
-for my $cc (keys %filters) {
-    my %params = $filters{$cc}->%*;
-    my $port   = delete $params{port}  || $control->input;
-    my $type   = delete $params{type}  || 'single';
-    my $event  = delete $params{event} || 'all';
-    my $filter = $controllers{$port}->{filter};
-    $filter->control($cc);
-    for my $param (keys %params) {
-        $filter->$param($params{$param});
-    }
-    my $method = "curry::$type";
-    $controllers{$port}->{rtc}->add_filter($type, $event => $filter->$method);
-}
+MIDI::RtController::Filter::CC::add_filters(\@filters, $controllers);
 
-$control->run;
+$controllers->{$name}->run;
 
 # ...and now trigger a MIDI message!
 
 # XXX maybe needed?
 END: {
-    for my $i (@inputs) {
-        Object::Destroyer->new($controllers{$i}->{rtc}, 'delete');
-        Object::Destroyer->new($controllers{$i}->{filter}, 'delete');
+    for my $i (@$controllers) {
+        Object::Destroyer->new($i, 'delete');
     }
 }

@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Types::Common::Numeric" => 0,
     "Types::MIDI" => 0,
     "Types::Standard" => 0,
+    "curry" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0605",
+  "VERSION" => "0.0900",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Types::Common::Numeric" => 0,
   "Types::MIDI" => 0,
   "Types::Standard" => 0,
+  "curry" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

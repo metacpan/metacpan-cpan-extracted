@@ -3,18 +3,19 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0605';
+our $VERSION = '0.0900';
 
 use v5.36;
 
 use strictures 2;
+use curry;
 use IO::Async::Timer::Countdown ();
 use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
 use Types::MIDI qw(Channel Velocity);
-use Types::Common::Numeric qw(PositiveNum);
-use Types::Standard qw(Bool Num);
+use Types::Common::Numeric qw(NegativeNum PositiveNum);
+use Types::Standard qw(Bool Num Maybe);
 use namespace::clean;
 
 
@@ -41,8 +42,15 @@ has control => (
 
 has value => (
     is      => 'rw',
-    isa     => Num,
-    default => 1,
+    isa     => Maybe[Num],
+    default => undef,
+);
+
+
+has trigger => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
 );
 
 
@@ -69,7 +77,7 @@ has range_top => (
 
 has range_step => (
     is      => 'rw',
-    isa     => PositiveNum,
+    isa     => NegativeNum | PositiveNum,
     default => 1,
 );
 
@@ -102,15 +110,42 @@ has running => (
 );
 
 
+sub add_filters ($filters, $controllers) {
+    for my $params (@$filters) {
+        my $port = delete $params->{port};
+        next unless $port; # skip unnamed entries
+        my $type = delete $params->{type} || 'single';
+        my $event = delete $params->{event} || 'all';
+        my $filter = __PACKAGE__->new(
+            rtc => $controllers->{$port}
+        );
+        for my $param (keys %$params) {
+            $filter->$param($params->{$param});
+        }
+        my $method = "curry::$type";
+        $controllers->{$port}->add_filter($type, $event => $filter->$method);
+    }
+}
+
+
 sub single ($self, $device, $dt, $event) {
-    my $cc = [ 'control_change', $self->channel, $self->control, $self->value ];
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+
+    my $value = $self->value || $val;
+    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
     $self->rtc->send_it($cc);
-    return 0;
+    return 1;
 }
 
 
 sub breathe ($self, $device, $dt, $event) {
     return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     $self->running(1);
 
     my $it = Iterator::Breathe->new(
@@ -136,6 +171,11 @@ sub breathe ($self, $device, $dt, $event) {
 
 sub scatter ($self, $device, $dt, $event) {
     return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     $self->running(1);
 
     my $value  = $self->initial_point;
@@ -158,6 +198,11 @@ sub scatter ($self, $device, $dt, $event) {
 
 sub stair_step ($self, $device, $dt, $event) {
     return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     $self->running(1);
 
     my $it = Iterator::Breathe->new(
@@ -198,8 +243,13 @@ sub stair_step ($self, $device, $dt, $event) {
 }
 
 
-sub ramp ($self, $device, $dt, $event) {
+sub ramp_up ($self, $device, $dt, $event) {
     return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     $self->running(1);
 
     my $value = $self->initial_point;
@@ -229,6 +279,43 @@ sub ramp ($self, $device, $dt, $event) {
     return 0;
 }
 
+
+sub ramp_down ($self, $device, $dt, $event) {
+    return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
+    $self->running(1);
+
+    my $value = $self->initial_point;
+
+    $self->rtc->loop->add(
+        IO::Async::Timer::Countdown->new(
+            delay     => $self->time_step,
+            on_expire => sub {
+                my $c = shift;
+
+                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                $self->rtc->send_it($cc);
+
+                $value -= $self->range_step;
+
+                if ($value < $self->range_bottom) {
+                    $c->stop;
+                    $self->running(0);
+                }
+                else {
+                    $c->start;
+                }
+            },
+        )->start
+    );
+
+    return 0;
+}
+
 1;
 
 __END__
@@ -243,7 +330,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0605
+version 0.0900
 
 =head1 SYNOPSIS
 
@@ -325,11 +412,22 @@ Default: C<1> (mod-wheel)
   $value = $filter->value;
   $filter->value($number);
 
-Return or set the control change value. This is a generic setting that
-can be used by filters to set state. This often a whole number between
-C<0> and C<127>, but can take any number.
+Return or set the MIDI event value. This is a generic setting that can
+be used by filters to set or retrieve state. This often a whole number
+between C<0> and C<127>, but can take any number.
 
-Default: C<0>
+Default: C<undef>
+
+=head2 trigger
+
+  $trigger = $filter->trigger;
+  $filter->trigger($number);
+
+Return or set the trigger. This is a generic setting that
+can be used by filters to set or retrieve state. This often a whole
+number between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
 
 =head2 initial_point
 
@@ -413,12 +511,41 @@ Default: C<0>
 
 Return a new C<MIDI::RtController::Filter::CC> object.
 
+=head2 add_filters
+
+  $control->add_filters($filters, $controllers);
+
+Add B<filters> to controller instances. The B<filters> are given as an
+array reference of hash references, like:
+
+  [
+    { # mod-wheel
+      port => 'keyboard',        # what is controlling it
+      type => 'breathe',         # the type of filter
+      event => 'control_change', # or [qw(note_on note_off)] etc
+      control => 1,              # what is being controlled
+      trigger => 25,             # what triggers the controlling
+      time_step => 0.25,          # a parameter
+    },
+    ...
+  ]
+
+The C<port>, C<type>, and C<event> keys are metadata. All other keys
+are assumed to be object attributes to set.
+
+The B<controllers> come from L<MIDI::RtController/open_controllers>.
+
+=head1 FILTERS
+
 =head2 single
 
   $control->add_filter('single', all => $filter->curry::single);
 
 This filter sets a single B<control> change message, over the MIDI
 B<channel> once.
+
+If B<trigger> is set, the filter checks that against the MIDI event
+C<note> to see if the filter should be applied.
 
 =head2 breathe
 
@@ -431,6 +558,10 @@ a B<control> change message, over the MIDI B<channel> every iteration.
 Passing C<all> means that any MIDI event will cause this filter to be
 triggered.
 
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
 =head2 scatter
 
   $control->add_filter('scatter', all => $filter->curry::scatter);
@@ -442,6 +573,10 @@ B<control> change message, over the MIDI B<channel>, every iteration.
 The B<initial_point> is used as the first CC# message, then the
 randomization takes over.
 
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
 =head2 stair_step
 
   $control->add_filter('stair_step', all => $filter->curry::stair_step);
@@ -451,13 +586,31 @@ the fist CC# message, then adds B<step_up> or subtracts B<step_down>
 from that number successively, sending the value as a B<control>
 change message, over the MIDI B<channel>, every iteration.
 
-=head2 ramp
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
-  $control->add_filter('ramp', all => $filter->curry::ramp);
+=head2 ramp_up
 
-This filter ramps-up (or down) a B<control> change message, over the
-MIDI B<channel>, from B<range_bottom> until the B<range_top> is
-reached.
+  $control->add_filter('ramp_up', all => $filter->curry::ramp_up);
+
+This filter ramps-up a B<control> change message, over the MIDI
+B<channel>, from B<range_bottom> until the B<range_top> is reached.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
+=head2 ramp_down
+
+  $control->add_filter('ramp_down', all => $filter->curry::ramp_down);
+
+This filter ramps-down a B<control> change message, over the MIDI
+B<channel>, from B<range_top> until the B<range_bottom> is reached.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head1 SEE ALSO
 

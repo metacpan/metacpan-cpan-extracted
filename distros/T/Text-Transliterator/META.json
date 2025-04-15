@@ -34,11 +34,11 @@
    "provides" : {
       "Text::Transliterator" : {
          "file" : "lib/Text/Transliterator.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Text::Transliterator::Unaccent" : {
          "file" : "lib/Text/Transliterator/Unaccent.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/damil/Text-Transliterator"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl module App::scriptdist
 
+1.006 2025-04-14T18:07:03Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.005 2025-01-09T07:15:45Z
 	* refresh distro
 

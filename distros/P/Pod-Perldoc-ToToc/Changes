@@ -1,5 +1,8 @@
 Revision history for Perl module Pod::Perldoc::ToToc
 
+1.126 2025-04-14T18:55:29Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.125 2025-01-10T05:40:15Z
 	* refresh distro and move to BRIANDFOY
 

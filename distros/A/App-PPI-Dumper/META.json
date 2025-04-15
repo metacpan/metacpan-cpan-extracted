@@ -40,7 +40,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "1",
-            "Test::Output" : "0"
+            "Test::Output" : "0",
+            "version" : "0.86"
          }
       }
    },
@@ -56,6 +57,6 @@
          "web" : "https://github.com/briandfoy/app-ppi-dumper"
       }
    },
-   "version" : "1.025",
+   "version" : "1.026",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

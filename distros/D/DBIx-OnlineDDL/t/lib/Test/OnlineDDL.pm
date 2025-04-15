@@ -184,16 +184,22 @@ sub onlineddl_test ($$&) {
                 last;
             }
 
+            # Running through DELETEs while UPDATEs are running on the same rows could cause some
+            # weird race conditions where the row re-appears, due to the trigger's REPLACE statement.
+            # Better to skip these, if we find a before_swap hook.
+
             # DELETE
-            $row = $del_rs->first;
-            $del_rs->reset;
-            return $dbh unless $row;
+            unless ($oddl->coderef_hooks && $oddl->coderef_hooks->{before_swap}) {
+                $row = $del_rs->first;
+                $del_rs->reset;
+                return $dbh unless $row;
 
-            $id_str = join(', ', map { "$_ = ".($row->get_column($_) // 'NULL') } sort @id_columns);
+                $id_str = join(', ', map { "$_ = ".($row->get_column($_) // 'NULL') } sort @id_columns);
 
-            $row->delete;
-            $row_count--;
-            note "During $method: Deleted $id_str" if $ONLINEDDL_TEST_DEBUG;
+                $row->delete;
+                $row_count--;
+                note "During $method: Deleted $id_str" if $ONLINEDDL_TEST_DEBUG;
+            }
 
             # SQLite has an odd trigger bug where an UPDATE and a DELETE on the same ID (possibly
             # within the same connection) causes the UPDATE to happen on the new table, but not

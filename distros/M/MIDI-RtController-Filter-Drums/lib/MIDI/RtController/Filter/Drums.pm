@@ -5,14 +5,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0201';
 
 use strictures 2;
 use List::SomeUtils qw(first_index);
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
 use Moo;
-use Types::Standard qw(ArrayRef Num);
+use Types::Standard qw(ArrayRef Num Maybe);
 use namespace::clean;
 
 
@@ -21,6 +21,20 @@ has rtc => (
     is  => 'ro',
     isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
     required => 1,
+);
+
+
+has value => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
+);
+
+
+has trigger => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
 );
 
 
@@ -55,7 +69,10 @@ sub _drum_parts ($self, $note) {
     return $part;
 }
 sub drums ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     return 1 unless $ev eq 'note_on';
     my $part = $self->_drum_parts($note);
     my $d = MIDI::Drummer::Tiny->new(
@@ -87,7 +104,7 @@ MIDI::RtController::Filter::Drums - RtController drum filters
 
 =head1 VERSION
 
-version 0.0106
+version 0.0201
 
 =head1 SYNOPSIS
 
@@ -119,6 +136,28 @@ filter for the drums.
 
 The required L<MIDI::RtController> instance provided in the
 constructor.
+
+=head2 value
+
+  $value = $filter->value;
+  $filter->value($number);
+
+Return or set the MIDI event value. This is a generic setting that can
+be used by filters to set or retrieve state. This often a whole number
+between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
+
+=head2 trigger
+
+  $trigger = $filter->trigger;
+  $filter->trigger($number);
+
+Return or set the trigger. This is a generic setting that
+can be used by filters to set or retrieve state. This often a whole
+number between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
 
 =head2 bars
 
@@ -156,6 +195,10 @@ not.
 =head2 drums
 
 Play the drums.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-Drums
 
+0.0201 2025-04-14 10:13:14
+  - Fix logic.
+
+0.0200 2025-04-14 08:51:37
+  - Add the trigger and value attributes for filter conditioning.
+
 0.0106 2025-04-09 19:30:25
   - Improve documentation.
 

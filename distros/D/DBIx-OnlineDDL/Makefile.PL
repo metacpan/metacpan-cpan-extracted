@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Class::Load" => 0,
     "DBI::Const::GetInfoType" => 0,
     "DBIx::BatchChunker" => 0,
+    "DBIx::ParseError::MySQL" => 0,
     "Eval::Reversible" => 0,
     "List::Util" => "1.44",
     "Moo" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "DBI" => 0,
+    "DBI" => "1.635",
     "DBIx::Class::Core" => 0,
     "DBIx::Class::Schema" => 0,
     "Env" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v1.0.1",
+  "VERSION" => "v1.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,11 +64,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Load" => 0,
-  "DBI" => 0,
+  "DBI" => "1.635",
   "DBI::Const::GetInfoType" => 0,
   "DBIx::BatchChunker" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,
+  "DBIx::ParseError::MySQL" => 0,
   "Env" => 0,
   "Eval::Reversible" => 0,
   "Exporter" => 0,

@@ -1,6 +1,7 @@
 requires 'Class::Load';
 requires 'DBI::Const::GetInfoType';
 requires 'DBIx::BatchChunker';
+requires 'DBIx::ParseError::MySQL';
 requires 'Eval::Reversible';
 requires 'List::Util', '1.44';
 requires 'Moo';
@@ -19,7 +20,7 @@ on test => sub {
     requires 'strict';
     requires 'utf8';
 
-    requires 'DBI';
+    requires 'DBI', '1.635';
     requires 'DBIx::Class::Core';
     requires 'DBIx::Class::Schema';
     requires 'Env';

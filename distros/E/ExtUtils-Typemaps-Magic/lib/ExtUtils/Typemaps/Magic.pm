@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Magic;
-$ExtUtils::Typemaps::Magic::VERSION = '0.007';
+$ExtUtils::Typemaps::Magic::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -11,11 +11,7 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGIC', code => <<'END');
 	{
-	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
@@ -23,7 +19,7 @@ sub new {
 	}
 END
 
-	$self->add_outputmap(xstype => 'T_MAGIC', code => '	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);');
+	$self->add_outputmap(xstype => 'T_MAGIC', code => '	sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);');
 
 	return $self;
 }
@@ -44,7 +40,7 @@ ExtUtils::Typemaps::Magic - Typemap for storing objects in magic
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -68,7 +64,7 @@ C<ExtUtils::Typemaps::Magic> is a typemap bundle that provides C<T_MAGIC>, a dro
 
 =head1 DEPENDENCIES
 
-If your module supports perls older than C<5.14>, it is recommended to include F<ppport.h> to provide C<mg_findext>. E.g.
+On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>. E.g.
 
  #define NEED_mg_findext
  #include "ppport.h"

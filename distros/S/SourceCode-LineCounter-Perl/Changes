@@ -1,5 +1,8 @@
 Revision history for Perl module Sourcecode::LineCounter::Perl
 
+1.024 2025-04-14T18:07:24Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.023 2025-02-09T02:01:42Z
 	* refresh dist and move to BRIANDFOY
 

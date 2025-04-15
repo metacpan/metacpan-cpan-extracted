@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0204';
+$MIDI::RtController::Filter::Math::VERSION = '0.0301';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -9,7 +9,7 @@ use v5.36;
 use strictures 2;
 use Moo;
 use Types::MIDI qw(Channel);
-use Types::Standard qw(Num);
+use Types::Standard qw(Num Maybe);
 use namespace::clean;
 
 
@@ -25,6 +25,20 @@ has channel => (
     is  => 'rw',
     isa => Channel,
     default => sub { 0 },
+);
+
+
+has value => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
+);
+
+
+has trigger => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
 );
 
 
@@ -74,12 +88,15 @@ sub _stair_step_notes ($self, $note) {
 }
 
 sub stair_step ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_stair_step_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
-        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $vel ]);
+        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
     return 0;
 }
@@ -98,7 +115,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0204
+version 0.0301
 
 =head1 SYNOPSIS
 
@@ -142,6 +159,28 @@ constructor.
 The current MIDI channel (0-15, drums=9).
 
 Default: C<0>
+
+=head2 value
+
+  $value = $filter->value;
+  $filter->value($number);
+
+Return or set the MIDI event value. This is a generic setting that can
+be used by filters to set or retrieve state. This often a whole number
+between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
+
+=head2 trigger
+
+  $trigger = $filter->trigger;
+  $filter->trigger($number);
+
+Return or set the trigger. This is a generic setting that
+can be used by filters to set or retrieve state. This often a whole
+number between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
 
 =head2 delay
 
@@ -197,6 +236,10 @@ not.
 =head2 stair_step
 
 Notes are played from the event note, in up-down, stair-step fashion.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0700 2025-04-15 01:09:46
+    - Add the open_controllers() utility function.
+
 0.0604 2025-04-13 00:31:46
     - Make the eg/multi.pl program generically useful.
 

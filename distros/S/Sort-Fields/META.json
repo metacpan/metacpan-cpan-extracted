@@ -36,7 +36,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -52,6 +53,6 @@
          "web" : "https://github.com/briandfoy/sort-fields"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

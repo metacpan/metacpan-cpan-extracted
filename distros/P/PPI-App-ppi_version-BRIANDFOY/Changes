@@ -1,5 +1,11 @@
 Revision history for Perl module PPI::App::ppi_version::BDFOY
 
+1.007 2025-04-14T18:24:32Z
+	* require a newer version.pm for v5.10.1 tests
+
+1.006 2025-04-14T18:23:29Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.006 2025-01-25T16:56:29Z
 	* lets try PAUSE indexing with separate modules for each name
 

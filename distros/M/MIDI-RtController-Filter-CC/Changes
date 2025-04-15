@@ -1,5 +1,27 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0900 2025-04-15 01:11:11
+  - Add the add_filters() utility function.
+  - Improve documentation.
+
+0.0802 2025-04-14 21:35:39
+  - Default to controller value in the single filter.
+  - Add the eg/continuous.pl program.
+  - The single filter returns true, and stops further filtering.
+
+0.0801 2025-04-14 15:24:59
+  - Improve the eg/multi.pl program as usual...
+
+0.0800 2025-04-14 14:51:34
+  - Modify the ramp filter into up/down.
+  - Improve the eg/multi.pl program.
+
+0.0701 2025-04-14 10:14:51
+  - Fix logic.
+
+0.0700 2025-04-14 08:21:57
+  - Enable trigger and value conditioning.
+
 0.0605 2025-04-13 23:45:54
   - Start the ramp filter at the initial-point.
   - Improve the eg/multi.pl program of course.

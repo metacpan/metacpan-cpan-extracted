@@ -1,5 +1,8 @@
 Revision history for Perl module App::rhich
 
+1.007 2025-04-14T17:43:12Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.006 2025-01-08T03:05:31Z
 	* first release of a little program I use instead of which(1).
 	My version takes a regex and looks in all the directories.

@@ -1,6 +1,18 @@
 Changelog for DBIx-OnlineDDL
 
-v1.0.1 2024-10-02T18:48:27
+v1.1.0 2025-04-14T19:49:13
+ - Pull request #8: SRE-8980 (Brendan Byrd)
+ - Update README / LICENSE / Makefile (Brendan Byrd)
+ - Fix race conditions with UPDATE/DELETE in before_swap unit test (Brendan
+   Byrd)
+ - Use DBIx::ParseError::MySQL, instead of hard-coded REs in
+   MySQL->is_error_retryable (Brendan Byrd)
+ - Fix DELETE IGNORE bug in modify_trigger_dml_stmts (Brendan Byrd)
+ - Fix add_fks_back_to_child_tables_stmts to actually return statements
+   (Brendan Byrd)
+ - Add step to re-add existing triggers to swapped table (Brendan Byrd)
+
+v1.0.1 2024-10-02T18:41:50
  - Pod::Coverage fixes (Brendan Byrd)
  - Pull request #7: Patch - SRE-8473 (Brendan Byrd)
  - Fix up unit tests to handle MySQL 8 / Test2 / BatchChunker changes

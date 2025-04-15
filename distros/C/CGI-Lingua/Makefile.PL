@@ -110,7 +110,7 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
-    	'Config::Auto' => 0,
+    	'Config::Abstraction' => 0,
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
 	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
@@ -130,7 +130,7 @@ WriteMakefile(
 	'Sys::Syslog' => 0,
 	'HTTP::BrowserDetect' => 0,
 	'Net::Subnet' => 0,
-	'Class::Autouse' => 0,
+	'Class::Autouse' => 0
     }, dist => $dist,
     clean               => { FILES => 'CGI-Lingua-* t/online.enabled' },
     META_MERGE		=> {

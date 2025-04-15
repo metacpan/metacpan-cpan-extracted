@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/continuous.pl
 eg/control-change.pl
 eg/multi.pl
 lib/MIDI/RtController/Filter/CC.pm

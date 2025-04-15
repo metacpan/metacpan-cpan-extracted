@@ -21,9 +21,10 @@ no_index:
 requires:
   Carp: '0'
   perl: '5.008'
+  version: '0.86'
 resources:
   bugtracker: https://github.com/briandfoy/tie-timely/issues
   homepage: https://github.com/briandfoy/tie-timely
   repository: https://github.com/briandfoy/tie-timely
-version: '1.026'
+version: '1.027'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

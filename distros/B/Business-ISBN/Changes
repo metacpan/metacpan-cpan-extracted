@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN
 
+3.012 2025-04-14T18:53:47Z
+	* require a newer version.pm for v5.10.1 tests
+
 3.011 2025-01-04T03:01:58Z
 	* add SECURITY.md; no code changes
 

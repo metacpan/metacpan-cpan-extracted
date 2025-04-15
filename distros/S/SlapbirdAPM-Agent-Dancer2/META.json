@@ -42,6 +42,7 @@
             "JSON::MaybeXS" : "1.004008",
             "LWP::Protocol::https" : "6.14",
             "LWP::UserAgent" : "6.77",
+            "POSIX" : "0",
             "System::Info" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0.31",
@@ -63,6 +64,6 @@
          "url" : "https://github.com/mollusc-labs/slapbird"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

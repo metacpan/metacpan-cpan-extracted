@@ -16,10 +16,16 @@ $tr->(my $copy = $string);
 is $copy, "il etait une bergere", "basic test";
 
 
-$tr = Text::Transliterator::Unaccent->new(modifiers => 'r');
 
-my @results = $tr->(  "la belle hétaïre", "était sans vêtements");
-is_deeply \@results, ["la belle hetaire", "etait sans vetements"], "with 'r' modifier";
+SKIP: {
+  skip "no 'r' modifier before v1.14" if !$^V or $^V lt v5.14.0;
+
+  $tr = Text::Transliterator::Unaccent->new(modifiers => 'r');
+
+  my @results = $tr->(  "la belle hétaïre", "était sans vêtements");
+  is_deeply \@results, ["la belle hetaire", "etait sans vetements"], "with 'r' modifier";
+}
+
 
 
 if ($want_benchmarks) {

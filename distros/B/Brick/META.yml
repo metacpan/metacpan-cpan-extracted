@@ -6,6 +6,7 @@ build_requires:
   Test::Data: '0'
   Test::More: '1'
   Test::Output: '0'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/briandfoy/brick/issues
   homepage: https://github.com/briandfoy/brick
   repository: https://github.com/briandfoy/brick
-version: '0.903'
+version: '0.904'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

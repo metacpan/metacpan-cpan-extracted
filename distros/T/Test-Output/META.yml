@@ -5,6 +5,7 @@ author:
 build_requires:
   Test::More: '1'
   Test::Tester: '0.107'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/briandfoy/test-output/issues
   homepage: https://github.com/briandfoy/test-output
   repository: https://github.com/briandfoy/test-output
-version: '1.035'
+version: '1.036'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

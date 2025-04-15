@@ -113,6 +113,7 @@ onlineddl_test 'Existing triggers' => 'Track' => sub {
 
     if ($should_execute) {
         try_ok { $online_ddl->execute } 'Execute works';
+        ok $helper->has_triggers_on_table_to_be_copied('track'), 'Still has existing triggers';
     }
     else {
         like(

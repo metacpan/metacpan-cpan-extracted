@@ -1,5 +1,8 @@
 Revision history for Perl module Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors
 
+0.117 2025-04-14T18:46:04Z
+	* require a newer version.pm for v5.10.1 tests
+
 0.116 2025-01-14T12:24:40Z
 	* refresh distro and move to BRIANDFOY
 

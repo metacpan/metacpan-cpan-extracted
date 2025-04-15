@@ -36,13 +36,13 @@
             "Test::More" : "0",
             "Test::Output" : "0",
             "feature" : "0",
-            "perl" : "5.010",
-            "version" : "0.86"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/module-extract-declaredminimumperl"
       }
    },
-   "version" : "1.026",
+   "version" : "1.027",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -42,6 +42,7 @@
             "Types::Common::Numeric" : "0",
             "Types::MIDI" : "0",
             "Types::Standard" : "0",
+            "curry" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.36.0",
             "strictures" : "2"
@@ -68,7 +69,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-CC"
       }
    },
-   "version" : "0.0605",
+   "version" : "0.0900",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

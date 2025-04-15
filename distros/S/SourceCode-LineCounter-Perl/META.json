@@ -37,7 +37,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "1",
-            "Test::Output" : "0"
+            "Test::Output" : "0",
+            "version" : "0.86"
          }
       }
    },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/briandfoy/sourcecode-linecounter-perl"
       }
    },
-   "version" : "1.023",
+   "version" : "1.024",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

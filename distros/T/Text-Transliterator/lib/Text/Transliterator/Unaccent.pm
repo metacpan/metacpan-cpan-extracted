@@ -2,7 +2,7 @@ package Text::Transliterator::Unaccent;
 use warnings;
 use strict;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use Text::Transliterator;
 use Unicode::UCD        qw(charinfo charscript charblock);

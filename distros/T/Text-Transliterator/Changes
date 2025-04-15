@@ -1,5 +1,7 @@
 Revision history for Text-Transliterator
 
+1.06 14.04.2025
+  - fix tests for perl versions lt v5.14.0
 
 1.05 09.02.2025
   - support for the 'r' modifier (returning the list of transliterated strings)

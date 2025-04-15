@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::MagicBuf;
-$ExtUtils::Typemaps::MagicBuf::VERSION = '0.007';
+$ExtUtils::Typemaps::MagicBuf::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -11,11 +11,7 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGICBUF', code =>  <<'END');
 	{
-	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
@@ -23,14 +19,19 @@ sub new {
 	}
 END
 
-	$self->add_outputmap(xstype => 'T_MAGICBUF', code => '	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, sizeof(*$var));');
+	$self->add_outputmap(xstype => 'T_MAGICBUF', code => <<'END');
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
+	magic->mg_len = sizeof(*$var);
+	}
+END
 
 	return $self;
 }
 
 1;
 
-# ABSTRACT: Typemap for storing objects in magic
+# ABSTRACT: Typemap for storing objects in magic buffer
 
 __END__
 
@@ -40,11 +41,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Typemaps::MagicBuf - Typemap for storing objects in magic
+ExtUtils::Typemaps::MagicBuf - Typemap for storing objects in magic buffer
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -68,7 +69,7 @@ C<ExtUtils::Typemaps::MagicBuf> is a typemap bundle that provides C<T_MAGICBUF>,
 
 =head1 DEPENDENCIES
 
-If your module supports perls older than C<5.14>, it is recommended to include F<ppport.h> to provide C<mg_findext>. E.g.
+On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>. E.g.
 
  #define NEED_mg_findext
  #include "ppport.h"

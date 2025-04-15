@@ -4,6 +4,7 @@ author:
   - 'Joseph N. Hall <jnh@cpan.org>'
 build_requires:
   Test::More: '1'
+  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -24,5 +25,5 @@ resources:
   bugtracker: https://github.com/briandfoy/sort-fields/issues
   homepage: https://github.com/briandfoy/sort-fields
   repository: https://github.com/briandfoy/sort-fields
-version: '1.002'
+version: '1.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

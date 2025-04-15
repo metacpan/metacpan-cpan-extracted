@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Output
 
+1.036 2025-04-14T19:24:32Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.035 2025-01-03T06:45:21Z
 	* distro refresh and move to BRIANDFOY
 

@@ -44,7 +44,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "1",
-            "Test::Tester" : "0.107"
+            "Test::Tester" : "0.107",
+            "version" : "0.86"
          }
       }
    },
@@ -60,6 +61,6 @@
          "web" : "https://github.com/briandfoy/test-output"
       }
    },
-   "version" : "1.035",
+   "version" : "1.036",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

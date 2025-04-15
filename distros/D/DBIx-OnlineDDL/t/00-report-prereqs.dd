@@ -21,6 +21,7 @@ do { my $x = {
                                       'Class::Load' => '0',
                                       'DBI::Const::GetInfoType' => '0',
                                       'DBIx::BatchChunker' => '0',
+                                      'DBIx::ParseError::MySQL' => '0',
                                       'Eval::Reversible' => '0',
                                       'List::Util' => '1.44',
                                       'Moo' => '0',
@@ -38,7 +39,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'DBI' => '0',
+                                   'DBI' => '1.635',
                                    'DBIx::Class::Core' => '0',
                                    'DBIx::Class::Schema' => '0',
                                    'Env' => '0',

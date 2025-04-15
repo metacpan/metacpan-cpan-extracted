@@ -1,5 +1,8 @@
 Revision history for Linux-FD
 
+0.017     2025-04-14 23:10:19+02:00 Europe/Brussels
+          - Update Signal typemap
+
 0.016     2024-01-30 19:27:36+01:00 Europe/Brussels
           - Adapt to C89 style XS arguments
           - Use Signal typemap

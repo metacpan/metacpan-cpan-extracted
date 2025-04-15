@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0301';
 
 use strictures 2;
 use Array::Circular ();
@@ -19,7 +19,7 @@ use Music::Note ();
 use Music::ToRoman ();
 use Music::VoiceGen ();
 use Types::MIDI qw(Channel);
-use Types::Standard qw(ArrayRef Num Str);
+use Types::Standard qw(ArrayRef Num Maybe Str);
 use namespace::clean;
 
 
@@ -42,6 +42,20 @@ has channel => (
     is  => 'rw',
     isa => Channel,
     default => sub { 0 },
+);
+
+
+has value => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
+);
+
+
+has trigger => (
+    is      => 'rw',
+    isa     => Maybe[Num],
+    default => undef,
 );
 
 
@@ -119,12 +133,15 @@ sub _pedal_notes ($self, $note) {
     return $self->pedal, $note, $note + 7;
 }
 sub pedal_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_pedal_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
-        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $vel ]);
+        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
     return 0;
 }
@@ -145,9 +162,12 @@ sub _chord_notes ($self, $note) {
     return @notes;
 }
 sub chord_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_chord_notes($note);
-    $self->rtc->send_it([ $ev, $self->channel, $_, $vel ]) for @notes;
+    $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
     return 0;
 }
 
@@ -156,13 +176,16 @@ sub _delay_notes ($self, $note) {
     return ($note) x $self->feedback;
 }
 sub delay_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_delay_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
-        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $vel ]);
-        $vel -= $self->velocity;
+        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
+        $val -= $self->velocity;
     }
     return 0;
 }
@@ -174,9 +197,12 @@ sub _offset_notes ($self, $note) {
     return @notes;
 }
 sub offset_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_offset_notes($note);
-    $self->rtc->send_it([ $ev, $self->channel, $_, $vel ]) for @notes;
+    $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
     return 0;
 }
 
@@ -194,19 +220,22 @@ sub _walk_notes ($self, $note) {
     return map { $voice->rand } 1 .. $self->feedback;
 }
 sub walk_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_walk_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
-        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $vel ]);
+        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
     return 0;
 }
 
 
 sub _arp_notes ($self, $note) {
-    $self->feedback(2) if $self->feedback < 2;;
+    $self->feedback(2) if $self->feedback < 2;
     my @tmp = $self->arp->@*;
     if (@tmp >= 2 * $self->feedback) { # double, on/off note event
         shift @tmp;
@@ -227,11 +256,14 @@ sub _arp_notes ($self, $note) {
     return @notes;
 }
 sub arp_tone ($self, $device, $dt, $event) {
-    my ($ev, $chan, $note, $vel) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
     my @notes = $self->_arp_notes($note);
     my $delay_time = 0;
     for my $n (@notes) {
-        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $vel ]);
+        $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
         $delay_time += $self->delay;
     }
     return 1;
@@ -251,7 +283,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0204
+version 0.0301
 
 =head1 SYNOPSIS
 
@@ -303,6 +335,28 @@ Which is the MIDI-number for G below middle-C.
 The current MIDI channel (0-15, drums=9).
 
 Default: C<0>
+
+=head2 value
+
+  $value = $filter->value;
+  $filter->value($number);
+
+Return or set the MIDI event value. This is a generic setting that can
+be used by filters to set or retrieve state. This often a whole number
+between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
+
+=head2 trigger
+
+  $trigger = $filter->trigger;
+  $filter->trigger($number);
+
+Return or set the trigger. This is a generic setting that
+can be used by filters to set or retrieve state. This often a whole
+number between C<0> and C<127>, but can take any number.
+
+Default: C<undef>
 
 =head2 delay
 
@@ -411,29 +465,53 @@ Default: C<pedal, $note, $note + 7 semitones>
 
 Where B<pedal> is the object attribute.
 
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
 =head2 chord_tone
 
 Play a diatonic chord based on the given event note, B<key> and
 B<scale> attributes.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head2 delay_tone
 
 Play a delayed note, or series of notes, based on the given event
 note, and the B<delay> and B<feedback> attributes.
 
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
 =head2 offset_tone
 
 Play a note and an offset note given the B<offset> value.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head2 walk_tone
 
 Play a chaotically walking, quasi-melody starting with the event note.
 The number of notes in the "melody" is the B<feedback> setting.
 
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
 =head2 arp_tone
 
 Play a series of subsequently pressed notes based on the B<feedback>
 setting.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
 
 =head1 SEE ALSO
 

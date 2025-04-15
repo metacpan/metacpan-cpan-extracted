@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::Errors
 
+1.194 2025-04-14T17:59:04Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.193 2025-01-03T05:32:09Z
 	* refresh distro and move to BRIANDFOY
 

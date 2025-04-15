@@ -1,5 +1,8 @@
 Revision history for Perl extension Sort::Fields
 
+1.003 2025-04-14T18:54:51Z
+	* require a newer version.pm for v5.10.1 tests
+
 1.002 2025-01-27T12:38:26Z
 	* refresh distro and move to BRIANDFOY
 

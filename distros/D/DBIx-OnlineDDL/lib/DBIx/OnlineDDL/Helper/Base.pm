@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::Base;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for RDBMS-specific code
 use version;
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.1.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -261,6 +261,19 @@ sub has_conflicting_triggers_on_table {
     die sprintf "Not sure how to check for table triggers for %s systems!", shift->dbms_name;
 }
 
+#pod =head2 has_triggers_on_table_to_be_copied
+#pod
+#pod     $helper->has_triggers_on_table_to_be_copied($table_name);
+#pod
+#pod Return true if triggers exist on the given table that won't conflict with the operation,
+#pod but will need to be copied over to the new table.
+#pod
+#pod =cut
+
+sub has_triggers_on_table_to_be_copied {
+    die sprintf "Not sure how to check for table triggers for %s systems!", shift->dbms_name;
+}
+
 #pod =head2 find_new_trigger_identifier
 #pod
 #pod     $trigger_name = $helper->find_new_trigger_identifier($trigger_name);
@@ -341,6 +354,79 @@ sub swap_tables {
         $dbh->do("ALTER TABLE $orig_table_name_quote RENAME TO $old_table_name_quote");
         $dbh->do("ALTER TABLE $new_table_name_quote RENAME TO $orig_table_name_quote");
     });
+}
+
+#pod =head2 get_trigger_data
+#pod
+#pod     $helper->get_trigger_data($table_name) if $helper->has_triggers_on_table_to_be_copied($table_name);
+#pod
+#pod Acquires trigger data for the given table and stashes it in C<< $helper->vars >> for
+#pod later use.
+#pod
+#pod =cut
+
+sub get_trigger_data {
+    die sprintf "Not sure how to check for table triggers for %s systems!", shift->dbms_name;
+}
+
+#pod =head2 add_triggers_back_to_table
+#pod
+#pod     @stmts = $helper->add_triggers_back_to_table($orig_table_name) if
+#pod         $helper->has_triggers_on_table_to_be_copied($new_table_name);
+#pod
+#pod Return a list of statements needed to add triggers to the given table.  These will be run through
+#pod L<DBIx::OnlineDDL/dbh_runner_do>.
+#pod
+#pod Only used if L</has_triggers_on_table_to_be_copied> is true.
+#pod
+#pod =cut
+
+sub add_triggers_back_to_table {
+    my ($self, $table_name) = @_;
+    my $dbh = $self->dbh;
+
+    my $triggers = $self->vars->{existing_triggers} // return;
+
+    my $table_name_quote = $dbh->quote_identifier($table_name);
+
+    my @stmts;
+    foreach my $trigger_name (
+        sort {
+            # Sort by: BEFORE/AFTER, INSERT/UPDATE/DELETE, action order (important!), name
+            ( $triggers->{$a}{action_timing}      cmp $triggers->{$b}{action_timing}      ) ||
+            ( $triggers->{$a}{event_manipulation} cmp $triggers->{$b}{event_manipulation} ) ||
+            (($triggers->{$a}{action_order} // 0) <=> ($triggers->{$b}{action_order} // 0)) ||
+            ($a cmp $b)
+        }
+        keys %$triggers
+    ) {
+        my $trigger = $triggers->{$trigger_name};
+
+        my $trigger_name_quote = $dbh->quote_identifier($trigger_name);
+        push @stmts, "DROP TRIGGER IF EXISTS $trigger_name_quote";
+
+        my $sql = 'CREATE ';
+        if ($trigger->{definer}) {
+            my $definer_quote =
+                join '@',
+                map { $dbh->quote_identifier($_) }
+                split(/\@/, $trigger->{definer}, 2)
+            ;
+            $sql .= "DEFINER = $definer_quote ";
+        }
+        $sql .= "TRIGGER $trigger_name_quote ";
+        $sql .= join(' ',
+            $trigger->{action_timing},
+            $trigger->{event_manipulation},
+            'ON', $table_name_quote,
+            'FOR EACH', $trigger->{action_orientation},
+        );
+        $sql .= "\n".$trigger->{action_statement};
+
+        push @stmts, $sql;
+    }
+
+    return @stmts;
 }
 
 #pod =head2 foreign_key_info
@@ -463,7 +549,7 @@ sub add_fks_back_to_child_tables_stmts {
         # Ignore self-joined FKs
         next if $fk->{fk_table_name} eq $self->table_name || $fk->{fk_table_name} eq $self->new_table_name;
 
-        $self->dbh_runner_do(join ' ',
+        push @stmts, join(' ',
             "ALTER TABLE",
             $dbh->quote_identifier( $fk->{fk_table_name} ),
             "ADD CONSTRAINT",
@@ -501,7 +587,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version v1.0.1
+version v1.1.0
 
 =head1 DESCRIPTION
 
@@ -611,6 +697,13 @@ Only used if L</dbms_uses_global_fk_namespace> is true.
 
 Return true if triggers exist on the given table that would conflict with the operation.
 
+=head2 has_triggers_on_table_to_be_copied
+
+    $helper->has_triggers_on_table_to_be_copied($table_name);
+
+Return true if triggers exist on the given table that won't conflict with the operation,
+but will need to be copied over to the new table.
+
 =head2 find_new_trigger_identifier
 
     $trigger_name = $helper->find_new_trigger_identifier($trigger_name);
@@ -644,6 +737,23 @@ Run the DDL statement to re-analyze the table, typically C<ANALYZE TABLE>.
 Runs the SQL to swap the tables in a safe and atomic manner.  The default ANSI SQL
 solution is to run two C<ALTER TABLE> statements in a transaction, but only if the RDBMS
 supports transactional DDL.
+
+=head2 get_trigger_data
+
+    $helper->get_trigger_data($table_name) if $helper->has_triggers_on_table_to_be_copied($table_name);
+
+Acquires trigger data for the given table and stashes it in C<< $helper->vars >> for
+later use.
+
+=head2 add_triggers_back_to_table
+
+    @stmts = $helper->add_triggers_back_to_table($orig_table_name) if
+        $helper->has_triggers_on_table_to_be_copied($new_table_name);
+
+Return a list of statements needed to add triggers to the given table.  These will be run through
+L<DBIx::OnlineDDL/dbh_runner_do>.
+
+Only used if L</has_triggers_on_table_to_be_copied> is true.
 
 =head2 foreign_key_info
 
@@ -698,7 +808,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2024 by Grant Street Group.
+This software is Copyright (c) 2018 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 
