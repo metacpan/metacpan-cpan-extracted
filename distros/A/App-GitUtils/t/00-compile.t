@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/GitUtils.pm'
@@ -14,6 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/gu',
+    'script/gu-calc-committing-total-size',
+    'script/gu-list-committing-large-files',
     'script/this-repo'
 );
 

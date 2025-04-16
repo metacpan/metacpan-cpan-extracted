@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Slurp;
-$ExtUtils::Typemaps::Slurp::VERSION = '0.003';
+$ExtUtils::Typemaps::Slurp::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ ExtUtils::Typemaps::Slurp - Typemap for slurping arguments
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

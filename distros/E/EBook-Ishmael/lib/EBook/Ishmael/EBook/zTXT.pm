@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -80,10 +80,12 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift // 'UTF-8';
 
 	my $self = {
 		Source       => undef,
 		Metadata     => EBook::Ishmael::EBook::Metadata->new,
+		Encoding     => $enc,
 		_pdb         => undef,
 		_version     => undef,
 		_recnum      => undef,
@@ -158,7 +160,7 @@ sub html {
 	my $self = shift;
 	my $out  = shift;
 
-	my $html = decode('UTF-8', text2html($self->_text));
+	my $html = decode($self->{Encoding}, text2html($self->_text));
 
 	if (defined $out) {
 		open my $fh, '>', $out
@@ -178,7 +180,7 @@ sub raw {
 	my $self = shift;
 	my $out  = shift;
 
-	my $raw = decode('UTF-8', $self->_text);
+	my $raw = decode($self->{Encoding}, $self->_text);
 
 	if (defined $out) {
 		open my $fh, '>', $out

@@ -8,6 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
+use Config::Abstraction;
 use File::Spec;
 use Log::Abstraction;
 use Params::Get;
@@ -32,11 +33,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.97
+Version 0.98
 
 =cut
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 =head1 SYNOPSIS
 
@@ -135,14 +136,12 @@ sub new
 	} else {
 		# If there is an odd number of arguments, treat it as an error
 		croak(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
 	}
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-			return;
 		}
 
 		# FIXME: this only works when no arguments are given
@@ -153,7 +152,7 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
+	if(exists($args{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $args{'config_file'})->all())) {
 		# my $config = YAML::XS::LoadFile($args{'config_file'});
 		if($config->{$class}) {
 			$config = $config->{$class};
@@ -162,12 +161,11 @@ sub new
 	}
 
 	if(defined($args{'expect'})) {
-		if(ref($args{expect}) ne 'ARRAY') {
-			Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
-			return;
-		}
-		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
+		# if(ref($args{expect}) ne 'ARRAY') {
+			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
+		# }
+		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
 	}
 
 	if(my $logger = $args{'logger'}) {
@@ -1444,7 +1442,6 @@ sub logdir {
 		}
 		$self->_warn("Invalid logdir: $dir");
 		Carp::croak("Invalid logdir: $dir");
-		return;
 	}
 
 	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
@@ -1910,7 +1907,7 @@ sub _log
 		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 
-	if(my $logger = $self->{'logger'}) {
+	if(scalar(@messages) && (my $logger = $self->{'logger'})) {
 		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
@@ -1996,8 +1993,8 @@ sub AUTOLOAD
 	# Allow the AUTOLOAD feature to be disabled
 	Carp::croak(__PACKAGE__, ": Unknown method $method") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
 
-	# Ensure the method is called on the correct package object
-	return unless ref($self) eq __PACKAGE__;
+	# Ensure the method is called on the correct package object or a subclass
+	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
 	# Delegate to the param method
 	return $self->param($method);

@@ -1,0 +1,442 @@
+NAME
+    Types::JSONSchema - somewhat experimental conversion of JSON Schema
+    schemas into Type::Tiny type constraints
+
+SYNOPSIS
+      use JSON qw( decode_json );
+      use Types::JSONSchema qw( schema_to_type );
+  
+      my $schema = decode_json q( {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://example.com/product.schema.json",
+        "title": "Product",
+        "description": "A product from Acme's catalog",
+        "type": "object",
+        "properties": {
+          "productId": {
+            "description": "The unique identifier for a product",
+            "type": "integer"
+          },
+          "productName": {
+            "description": "Name of the product",
+            "type": "string"
+          },
+          "price": {
+            "description": "The price of the product",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "tags": {
+            "description": "Tags for the product",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [ "productId", "productName", "price" ]
+      } );
+  
+      my $data = decode_json q( {
+        "productId": 1,
+        "productName": "A green door",
+        "price": 12.50,
+        "tags": [ "home", "green" ]
+      } );
+  
+      my $type = schema_to_type( $schema );
+      if ( $type->check($data) ) {
+        print "All good!\n";
+      }
+
+DESCRIPTION
+    This is a Type::Library exporting Type::Tiny type constraints, but also
+    exports some useful functions and constants.
+
+    Nothing is exported by default. You need to request things explicitly.
+
+      use Types::JSONSchema qw( json_eq schema_to_type :types );
+
+  Functions
+    `json_eq( $x, $y )`
+        Checks if the two values are considered equal/equivalent by JSON
+        Schema's rules.
+
+    schema_to_type( $schema )
+        Given a JSON Schema as a hashref, converts that to a type constraint.
+
+        As a shortcut, schema_to_type( true ) returns Any and schema_to_type(
+        false ) returns ~Any.
+
+        Limitation: $ref cannot be used to refer to external schemas or
+        arbitrary relative JSON pointers, only to the root schema (as '#') and
+        schemas defined in $defs (as '#/$defs/foo', etc or using their $anchor
+        or $id).
+
+        Limitation: The error messages from these type constraints are very
+        opaque and don't give you much of an idea *why* a value failed to
+        validate. This will be addressed in a future version.
+
+        Limitation: infinite loops are not detected.
+
+    json_safe_dumper( @things )
+        Like Data::Dumper. Despite the name, dumps Perl code, not JSON for a
+        data structure. Can't handle cyclical data structures, blessed objects
+        (except JBoolean), or any other data structures not found in JSON. The
+        advantage of using this over Data::Dumper is that it preserves the
+        `created_as_number`, `created_as_string`, `is_bool` results for
+        non-reference scalars. Hashrefs are always output sorted by key.
+
+        This is internally used by the JEnum and JConst type constraints for
+        serializing values into generated Perl code.
+
+    jpointer_escape( $str )
+        Escapes special characters based on JSON Pointer rules. Returns the
+        escaped string.
+
+  Constants
+    `true`
+    `false`
+
+  Types
+    It is not anticipated that you'd normally use these types directly, but
+    they may be found in the output of `schema_to_type`.
+
+   General
+    JSRef[`key, `hashref]
+        A type which refers to a type defined in a hashref. At run-time, when
+        the type is being checked, the type will be looked up in the hashref
+        by its key.
+
+    JSScope[`inner]
+        Establishes a scope for JItems and JProperties which may not always
+        work outside the scope!
+
+    JAllOf[`a, `b, ...]
+        Values meet this type constraint if they meet all the inner type
+        constraints.
+
+    JAnyOf[`a, `b, ...]
+        Values meet this type constraint if they meet any of the inner type
+        constraints.
+
+    JOneOf[`a, `b, ...]
+        Values meet this type constraint if they meet exactly one of the inner
+        type constraints.
+
+    JNot[`a]
+        Values meet this type constraint if they fail to meet the inner type
+        constraint.
+
+    JIf[ `a, JThen[`b], JElse[`c] ]
+        Values which meet ``a` are also expected to meet ``b`. Values which
+        fail to meet ``a` are expected to meet ``c`.
+
+        If either the JThen or JElse are omitted, Any is assumed.
+
+    JThen[`a, `b, ...]
+        Intended for use with JIf. If used on its own, acts like JAllOf.
+
+    JElse[`a, `b, ...]
+        Intended for use with JIf. If used on its own, acts like JAllOf.
+
+    JEnum[`a, `b, `c...]
+        Checks that the value is exactly equal to one of the given values, by
+        JSON Schema's definition of equality. (In particular, two arrayrefs
+        are equal if their items are equal, and two hashrefs are equal if
+        their keys and values are equal.)
+
+    JConst[`a]
+        Effectively means the same as JEnum, but only accepts one value.
+
+   Number
+    Although these type constraints are useful for numbers, they do not
+    actually check the value being constrained is a number, meaning they can
+    be used with non-numeric data such as strings which can be numified ("76
+    trombones" numifies to 76) or overloaded objects. If you need to also
+    check that the value is a number or integer, you can combine these type
+    constraint with other type constraints, like JAllOf[ JNumber,
+    JMultipleOf[2] ].
+
+    JMultipleOf[`n]
+        Checks that if the value is an integer multiple of n.
+
+        The parameter must be a non-zero positive number but does not itself
+        need to be an integer.
+
+    JMaximum[`n]
+        Checks that the value is less than or equal to n.
+
+    JExclusiveMaximum[`n]
+        Checks that the value is less than n.
+
+    JMinimum[`n]
+        Checks that the value is greater than or equal to n.
+
+    JExclusiveMinimum[`n]
+        Checks that the value is greater than n.
+
+   String
+    Although these type constraints are useful for strings, they do not
+    actually check that the value being tested is a string, meaning they can
+    be used with any non-strings that can be stringified, such as overloaded
+    objects. If you also need to check that the value is a string, you can
+    combine these type constraints with other type constraints, like JAllOf[
+    JString, JMinLength[1], JMaxLength[255] ].
+
+    JMaxLength[`n]
+        Checks that the value is at most n characters long.
+
+    JMinLength[`n]
+        Checks that the value is at least n characters long.
+
+    JPattern[`re]
+        Checks that the value is a string matching the regular expression.
+        Regular expressions can either be a `qr/.../` quoted regexp, or given
+        as a string.
+
+        As with normal Perl regexp rules, the pattern is not implicitly
+        anchored to the start and end of the string.
+
+        Contrary to the notice earlier, the implementation *does* currently
+        check that the value is a string, though this is subject to change in
+        the future.
+
+   Array
+    Although these type constraints are useful for arrayrefs, they do not
+    actually check that the value being tested is an arrayref, meaning they
+    can also be used with overloaded objects. If you also need to check that
+    the value is an arrayref, you can combine these type constraints with
+    other type constraints, like JAllOf[ JArray, JMinItems[1] ].
+
+    JMaxItems[`n]
+        Checks that the array has at most n elements.
+
+    JMinItems[`n]
+        Checks that the array has at least n elements.
+
+    JUniqueItems
+        Checks that all items in the array are unique, using JSON Schema's
+        notion of equality.
+
+    JItems[`i, [`a, `b, ...], `u, `c, `min, `max]
+        Checks that all items in the array are of type i.
+
+        If a length-n arrayref of additional types is provided as the second
+        parameter, then the first n elements of the array being checked are
+        compared to those types in order instead. (Like `prefixItems` in JSON
+        Schema.)
+
+        If a type constraint is given as the third parameter, any array items
+        which are so-far unchecked within this scope (see JScope) will be
+        checked against this type. (Like `unevaluatedItems` in JSON Schema.)
+
+        If a type constraint is given as the fourth parameter, then the array
+        being checked is expected to contain at least one element meeting that
+        type constraint. (Like `contains` in JSON Schema.)
+
+        If minimum and maximum numbers are provided as the fifth and sixth
+        parameters, these work with the fourth parameter to alter how many
+        occurances are expected of the elements matching that type. (Like
+        `minContains` and `maxContains` in JSON Schema.)
+
+        Any parameter may be undef.
+
+        For example, an array containing all numbers: JAllOf[ JArray,
+        JItems[JNumber] ]
+
+        Or an array containing at least two numbers, but perhaps mixed with
+        other values: JAllOf[ JArray, JItems[undef, undef, undef, JNumber, 2]
+        ]
+
+        Or an array containing all numbers, apart from the first element which
+        is a mathematical operation: JAllOf[ JArray, JItems[ JNumber, [
+        JEnum[qw( + - * / )] ] ] ]
+
+   Object
+    Although these type constraints are useful for hashrefs ("objects" in JSON
+    parlance), they do not actually check that the value being tested is a
+    hashref, meaning they can also be used with overloaded objects, blessed
+    hashrefs, etc. If you also need to check that the value is a hashref, you
+    can combine these type constraints with other type constraints, like
+    JAllOf[ JObject, JRequired['id'] ].
+
+    JMaxProperties[`n]
+        Checks that the hash has at most n key-value pairs.
+
+    JMinProperties[`n]
+        Checks that the hash has at least n key-value pairs.
+
+    JRequired[`a, `b, ...]
+        Checks that the strings given as parameters exist as keys in the hash.
+
+    JDependentRequired[`k, `a, `b, ...]
+        Checks that if k exists as a key in the hash, the others do too. If k
+        is absent, the others are not required.
+
+    JProperties[`h1, `h2, `a, `u]
+        The first parameter is an arrayref of key-type pairs, similar to Dict
+        from Types::Standard. For example, JProperties[ [ foo => JString, bar
+        => JNumber ] ] will check that if the hash contains a key "foo", its
+        value is a string, and if the hash contains a key "bar", its value is
+        a number. It does not require either key to be present. (You can use
+        JAllOf and JRequired for that!)
+
+        The second parameter is an arrayref of pattern-type pairs, similar to
+        the first parameter except that hash keys are matched against each
+        pattern as a regexp. For example, to check that any hash keys called
+        "*_id" are numeric, use JProperties[ [], [ '_id$' => JNumber ] ].
+
+        The third parameter is a type constraint to match against any
+        additional values in the hash. For example, if a hash has a string
+        name but all other values are expected to be numeric, you could use
+        JProperties[ [ name => JString ], [], JNumber ]. If you additionally
+        wanted to permit private-use hash keys with a leading underscore:
+        JProperties[ [ name => JString ], [ '^_' => JAny ], JNumber ].
+
+        If a type constraint is given as the fourth parameter, any hash values
+        which are so-far unchecked within this scope (see JScope) will be
+        checked against this type. (Like `unevaluatedProperties` in JSON
+        Schema.)
+
+    JPropertyNames[`a]
+        Checks that all keys within the hash meet the type constraint
+        parameter.
+
+    JDependentSchema[ `key, JThen[`inner] ]
+        If the value being tested is a hashref with the given key, checks that
+        the value being tested also meets the inner type constraint.
+
+        For example:
+
+          my $type = JDependentSchema[ 'foo', JThen[Tied] ];
+          my $href = { foo => 42 };
+          tie( %$href, 'Some::Class' );
+  
+          # Because this hashref has a "foo" key, we check the hashref is
+          # tied. (Note we're not checking the value 42 is tied!)
+          $type->assert_valid( $href );
+  
+          # This doesn't have a "foo" key so doesn't need to be tied.
+          $type->assert_valid( { agent => 86 } );
+  
+          # This will die because it has a "foo" key but isn't tied.
+          $type->assert_valid( { agent => 86, foo => 99 } );
+
+        *Warning:* for efficiency, this does not actually check that the value
+        is a hashref. This allows it to be composed in interesting ways.
+
+        JAllOf[ JObject, JDependentSchema[ 'foo', JThen[...] ] ] can be used
+        to check that the value is a hashref and also conditionally obeys the
+        inner type constraint.
+
+        JIf[ JObject, JThen[ JDependentSchema[ 'foo', JThen[...] ] ] ] can be
+        used to check the value conditionally obeys the inner type constraint
+        when it's a hashref, but passes when it's not a hashref.
+
+   Format
+    The following are additional constraints which can be added to strings to
+    constrain their format. Many of them are not properly implemented and
+    simply accept all strings, but may still be useful as documentation.
+
+    FmtDateTime
+        Strings such as '2025-04-04 07:00:00'. Implemented.
+
+    FmtDate
+        Strings such as '2025-04-04'. Implemented.
+
+    FmtTime
+        Strings such as '07:00:00' or '07:00'. Implemented.
+
+    FmtDuration
+        Strings such as 'P1D12H'. Not implemented.
+
+    FmtEmail
+        Strings such as 'foo@example.net'. Implemented.
+
+    FmtIdnEmail
+        Strings such as 'foo@exämple.net'. Not implemented.
+
+    FmtHostname
+        Strings such as 'example.net'. Implemented.
+
+    FmtIdnHostname
+        Strings such as 'exämple.net'. Not implemented.
+
+    FmtIpv4
+        Strings such as '10.0.0.1'. Implemented.
+
+    FmtIpv6
+        Strings such as '2001:db8:3333:4444:5555:6666:7777:8888'. Implemented.
+
+    FmtUri
+        Strings such as 'https://example.net/'. Implemented.
+
+    FmtUriReference
+        Strings such as 'https://example.net/' or a relative URI reference.
+        Not implemented.
+
+    FmtIri
+        Strings such as 'https://exämple.net/'. Not implemented.
+
+    FmtIriReference
+        Strings such as 'https://exämple.net/' or a relative IRI reference.
+        Not implemented.
+
+    FmtUuid
+        Strings such as '0811a85e-5ef1-4962-9d1e-13adeef73be3'. Not
+        implemented.
+
+    FmtUriTemplate
+        Strings such as 'https://example.net/{user}'. Not implemented.
+
+    FmtJsonPointer
+        Strings such as '/foo/0'. Not implemented.
+
+    FmtRelativeJsonPointer
+        Strings such as '0#'. Not implemented.
+
+    FmtRegex
+        Strings such as '^[Hh]ello$'. Not implemented.
+
+  Variables
+    $Types::JSONSchema::OPTIMIZE
+        When true, attempts to optimize type constraints in certain ways. For
+        example, JIf[JObject,JThen[Foo]] & JIf[JObject,JThen[Bar],JElse[Baz]]
+        might become JIf[JObject,JThen[Foo,Bar],JElse[Baz]].
+
+        It is believed that the optimization shouldn't affect the outcome of
+        any type checks, but in some cases the order certain checks are done
+        (`unevaluatedProperties` and `unevaluatedItems` in particular) may
+        affect the overall result. Optimization is not believed to break this,
+        but not every possible edge case has been tested.
+
+        You can disable these optimizations by doing this:
+
+          BEGIN {
+            $Types::JSONSchema::OPTIMIZE = false;
+         };
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-types-jsonschema/issues>.
+
+SEE ALSO
+    Types::JSONSchema::PrimativeTypes.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

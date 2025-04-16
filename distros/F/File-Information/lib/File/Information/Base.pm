@@ -25,7 +25,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -135,7 +135,11 @@ my %_properties = (
 
     fetchurl    => {loader => \&_load_aggregate, sources => [qw(:self tagpool_file_original_url xattr_xdg_origin_url zonetransfer_hosturl)]},
 
+    boring      => {loader => \&_load_aggregate, sources => [qw(size_boring ::Link link_basename_boring)], rawtype => 'bool', towards => 1},
+
     # TODO: displaycolour icontext charset (hash) (mediatype / encoding)
+
+    size_boring => {loader => \&_load_size_boring, rawtype => 'bool'},
 
     data_tagdb_size         => {loader => \&_load_data_tagdb},
     data_tagdb_displayname  => {loader => \&_load_data_tagdb},
@@ -620,6 +624,16 @@ sub _load_readonly {
     $pv->{$key} = {raw => $v};
 }
 
+sub _load_size_boring {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{$opts{lifecycle}} //= {};
+    my $size;
+
+    $size = $self->get('size', %opts, default => undef, as => 'raw');
+    return unless defined $size;
+    $pv->{size_boring} = {raw => $size < $self->instance->{boring_sizelimit}};
+}
+
 sub _load_data_tagdb {
     my ($self) = @_;
     my $pv_current  = ($self->{properties_values} //= {})->{current} //= {};
@@ -717,7 +731,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -787,6 +801,17 @@ Most commonly it will be C<[]>.
 The following keys for B<aggregated values> are supported:
 
 =over
+
+=item C<boring>
+
+Whether the file is boring or not.
+A boring file is a file a user normally don't want to interact with.
+Such files include very small files, generated files (such as thumbnails, or object files)
+as well as lock files, temporary files and similar.
+
+The boring attribute can be used as a hint for displaying, as well as indexing data.
+The attribute may be used with caution in context of backups as even boring files might be important after restore.
+This attribute does not reflect importantce but how likely the user wants to directly interact with the file.
 
 =item C<comment>
 

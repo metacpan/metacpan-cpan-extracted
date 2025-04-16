@@ -20,10 +20,9 @@ use Scalar::Util qw(weaken);
 
 use File::Information::Lock;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; require File::ValueFile::Simple::Writer; 1;};
-my $HAVE_UUID_TINY = eval {require UUID::Tiny; 1;};
 
 my %_properties = (
     tagpool_pool_path => {loader => \&_load_tagpool, rawtype => 'filename'},
@@ -199,9 +198,7 @@ sub file_add {
         }
 
         unless (defined $file->{uuid}) {
-            if ($HAVE_UUID_TINY) {
-                $file->{uuid} = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_RANDOM());
-            }
+            $file->{uuid} = Data::Identifier->random(type => 'uuid')->uuid;
         }
 
         $invalid ||= !defined($file->{uuid});
@@ -369,7 +366,7 @@ File::Information::Tagpool - generic module for extracting information from file
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

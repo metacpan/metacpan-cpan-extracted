@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::OpaqueObj;
-$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.003';
+$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -13,19 +13,40 @@ sub new {
 	$self->add_inputmap(xstype => 'T_OPAQUEOBJ', code => <<'END');
     {
 		SV * sv = $arg;
-		if (SvROK(sv) && sv_derived_from(sv, \"$ntype\"))
+		if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
 			$var = ($type)SvPV_nolen(SvRV(sv));
 		else
 			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
     }
 END
 
+	$self->add_inputmap(xstype => 'T_OPAQUEOBJ_MAYBE', code => <<'END');
+	{
+		SV * sv = $arg;
+		if (SvOK(sv)) {
+			if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
+				$var = ($type)SvPV_nolen(SvRV(sv));
+			else
+				croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+		} else
+			$var = NULL;
+	}
+END
+
 	$self->add_outputmap(xstype => 'T_OPAQUEOBJ', code => <<'END');
 	{
-		sv_setref_pvn($arg, \"$ntype\", (const char*)$var, sizeof(*$var));
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
 		SvREADONLY_on(SvRV($arg));
 	}
 END
+
+	$self->add_outputmap(xstype => 'T_OPAQUEOBJ_MAYBE', code => <<'END');
+	if (SvOK($var)) {
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
+		SvREADONLY_on(SvRV($arg));
+	}
+END
+
 
 	return $self;
 }
@@ -46,7 +67,7 @@ ExtUtils::Typemaps::OpaqueObj - Typemap for storing objects as a string referenc
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

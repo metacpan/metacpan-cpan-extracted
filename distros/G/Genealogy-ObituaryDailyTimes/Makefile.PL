@@ -31,6 +31,8 @@ my $prereqs = {
 	'autodie' => 0,
 	'constant' => 0,
 	'Carp' => 0,
+	'Config::Abstraction' => 0,
+	'Data::Reuse' => 0,
 	'Database::Abstraction' => 0.04,
 	'DBD::SQLite' => 0,
 	'DBD::SQLite::Constants' => 0,
@@ -82,6 +84,7 @@ WriteMakefile(
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
 	TEST_REQUIRES => {
+		'FindBin' => 0,
 		'Test::Carp' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,

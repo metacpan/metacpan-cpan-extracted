@@ -4,9 +4,6 @@
 class HTTP::Tiny::URL {
   version_from HTTP::Tiny;
   
-  allow HTTP::Tiny;
-  allow HTTP::Tiny::Handle;
-  
   use StringBuffer;
   use Re;
   use HTTP::Tiny::URL;

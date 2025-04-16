@@ -113,6 +113,8 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     
     $self->{buffer} = "";
     
+    $self->{pre_buffer} = "";
+    
   }
   
   method body_contains : int ($chunk : string) { die "Not impelmented"; }
@@ -188,7 +190,11 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     
     my $header_buffer = $self->{header_buffer};
     
-    my $chunk = Fn->substr($header_buffer, $offset, 131072 - $offset);
+    my $header_buffer_length = length $header_buffer;
+    
+    my $max = ($header_buffer_length <= 131072) ? $header_buffer_length : 131072;
+    
+    my $chunk = Fn->substr($header_buffer, $offset, $max - $offset);
     
     return $chunk;
   }
@@ -310,12 +316,15 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     my $len = 0;
     eval { $len = Fn->to_int($content_length); }
     
-    if (my $need = ($len - $self->{size}) > 0) {
+    if ((my $need = ($len - $self->{size})) > 0) {
       my $len   = length $self->{buffer};
       if ($need > $len) {
         $need = $len;
       }
-      my $chunk = Fn->substr($self->{buffer}, 0, $need, "");
+      
+      my $chunk = Fn->substr($self->{buffer}, 0, $need);
+      $self->{buffer} = Fn->substr($self->{buffer}, $need);
+      
       $self->_decompress($chunk);
       $self->{size} += length $chunk;
     }
@@ -351,7 +360,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     return $progress;
   }
   
-  method write : void ($chunk : string, $cb : object) {
+  method write : void ($chunk : string, $cb : HTTP::Tiny::EventEmitter::Callback) {
     
     $self->{dynamic} = 1;
     
@@ -369,7 +378,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     
   }
   
-  method write_chunk : void ($chunk : string, $cb : object) {
+  method write_chunk : void ($chunk : string, $cb : HTTP::Tiny::EventEmitter::Callback) {
     
     unless ($self->{chunked}) {
       $self->headers->set_transfer_encoding("chunked");
@@ -569,6 +578,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
   protected method _parse_until_body : void ($chunk : string) {
     
     $self->{raw_size} += length($chunk = $chunk // "");
+    $self->{pre_buffer} //= "";
     $self->{pre_buffer} .= $chunk;
     
     $self->{state} = $self->{state} // "headers";

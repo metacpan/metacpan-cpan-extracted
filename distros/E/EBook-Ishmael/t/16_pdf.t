@@ -13,7 +13,7 @@ use EBook::Ishmael::ImageID;
 my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
 
 unless ($TEST_PDF) {
-	plan skip_all => "TEST_PDF set to 0, or poppler utils are not installed";
+	plan skip_all => "TEST_PDF set to 0 or poppler utils are not installed";
 }
 
 my $PDF = File::Spec->catfile(qw/t data gpl3.pdf/);

@@ -21,43 +21,43 @@ no_index:
 provides:
   File::Information:
     file: lib/File/Information.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Base:
     file: lib/File/Information/Base.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Deep:
     file: lib/File/Information/Deep.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Editor:
     file: lib/File/Information/Editor.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Filesystem:
     file: lib/File/Information/Filesystem.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Inode:
     file: lib/File/Information/Inode.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Link:
     file: lib/File/Information/Link.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Lock:
     file: lib/File/Information/Lock.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Remote:
     file: lib/File/Information/Remote.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::Tagpool:
     file: lib/File/Information/Tagpool.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::VerifyBase:
     file: lib/File/Information/VerifyBase.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::VerifyResult:
     file: lib/File/Information/VerifyResult.pm
-    version: v0.7.0
+    version: v0.8.0
   File::Information::VerifyTestResult:
     file: lib/File/Information/VerifyTestResult.pm
-    version: v0.7.0
+    version: v0.8.0
 recommends:
   Audio::Scan: '1.01'
   Config::INI: '0.029'
@@ -73,7 +73,6 @@ recommends:
   OpenOffice::OODoc: '2.125'
   PDF::API2: '2.044'
   URI::file: '4.21'
-  UUID::Tiny: '1.04'
   Unix::Mknod: '0.04'
   XML::Simple: '2.25'
 requires:
@@ -85,7 +84,7 @@ requires:
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/File-Information.git
-version: v0.07
+version: v0.08
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

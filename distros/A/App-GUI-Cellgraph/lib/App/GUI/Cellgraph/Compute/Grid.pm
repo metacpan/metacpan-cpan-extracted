@@ -7,6 +7,9 @@ use warnings;
 use Wx;
 use Benchmark;
 
+my $rules_tab;
+sub set_rules_tab { $rules_tab = $_[0] if ref $_[0] eq 'App::GUI::Cellgraph::Frame::Tab::Rules' }
+
 sub create {
     my ($state, $grid_size, $sketch_length) = @_;
     return unless defined $grid_size and ref $state eq 'HASH' and exists $state->{'global'}{'input_size'};
@@ -65,6 +68,7 @@ sub create {
                                                          ($half_grid_size + $odd_grid_size);
     my %subrule_from_pattern = map {$_ => $result_calc->subrules->effective_pattern_nr( $_ )} $result_calc->subrules->all_pattern;
     my %result_from_subrule  = map {$_ => $result_calc->get_subrule_result( $_ )} $result_calc->subrules->index_iterator;
+    my @subrule_occur = ((0) x $result_calc->subrules->independent_count);
 
     my @action_result_from_subrule = @{$state->{'action'}{'result_list'}};
     my @action_spread_from_subrule = @{$state->{'action'}{'spread_list'}};
@@ -90,7 +94,7 @@ sub create {
                    '  @prev_states = @cell_states;'."\n";
 
 
-    my $code_end = '  @cell_states = map { '.$next_result.' } 0 .. '.($grid_size-1).";\n\n".
+    my $code_end = '  @cell_states = map { $subrule_occur[ $subrule_nr[$_] ]++;'.$next_result.' } 0 .. '.($grid_size-1).";\n\n".
                    '  $state_grid->[$row_nr] = [@cell_states];'."\n".'}';
 
     if ($state->{'global'}{'action_rules_apply'}){
@@ -141,10 +145,11 @@ sub create {
               .  '    $subrule_nr[$x_pos] = '.$eval_pattern.";\n  }\n\n";
     }
 
-    #say $code . $code_end;
-    my $result = eval( $code . $code_end);
+
+    my $result = eval( $code . $code_end); # say $code . $code_end;
     say "compile in code:\n$code\n\n error: $@" if $@;
     # say "got grid in:",timestr( timediff(Benchmark->new, $t0) );
+    $rules_tab->update_subrule_occurance( @subrule_occur );
 
     if ($sketch_length){
         $state_grid->[$_] = [@empty_row] for $compute_rows .. $grid_size - 1;

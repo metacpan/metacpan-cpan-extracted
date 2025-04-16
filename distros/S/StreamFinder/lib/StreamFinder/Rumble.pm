@@ -4,7 +4,7 @@ StreamFinder::Rumble - Fetch actual raw streamable URLs from Rumble.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2024 by
+This module is Copyright (C) 2017-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -27,7 +27,7 @@ file.
 	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $video = new StreamFinder::Rumble($ARGV[0], -keep => 
-			['mp4', 'webm', 'any']);
+			['mp4', 'webm', 'm3u8', 'any']);
 
 	die "Invalid URL or no streams found!\n"  unless ($video);
 
@@ -113,8 +113,9 @@ L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 =over 4
 
 =item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes>] 
-[, "-quality" => I<quality>] [, "-bitrate" => I<bitrate>] 
-[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+[, I<-quality> => I<quality>] [, I<-bitrate> => I<bitrate>] 
+[, I<-secure> [ => 0|1 ]] [, I<-order> => I<"quality"|"ext">] 
+[, I<-debug> [ => 0|1|2 ]])
 
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
@@ -144,6 +145,14 @@ If both I<-quality> and I<-bitrate> options are specified, video streams
 will be limited to the most restrictive limit.
 
 DEFAULT I<-quality> is accept streams without resolution limit.
+
+The optional I<-order> argument specifies what order to return streams.  
+The choices are:  I<"quality"> means include all streams of a given quality 
+(resolution) in I<-keep> order before ones of lower quality.  I<"ext"> means 
+include all streams of a given extension (ie. mp4 - see I<-keep> option) in 
+descending quality before ones with a different extension.
+
+DEFAULT I<"quality">
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
 If 1 then only secure ("https://") streams will be returned.
@@ -326,7 +335,7 @@ L<http://search.cpan.org/dist/StreamFinder-Rumble/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Jim Turner.
+Copyright 2017-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -398,6 +407,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?quality$/o) {
 			shift;
 			$self->{'quality'} = (defined $_[0]) ? shift : 0;
+		} elsif ($_[0] =~ /^\-?order$/o) {
+			shift;
+			$self->{'order'} = (defined $_[0]) ? shift : 'quality';
 		} elsif ($_[0] =~ /^\-?bitrate$/o) {
 			shift;
 			$self->{'bitrate'} = (defined $_[0]) ? shift : 0;
@@ -408,7 +420,7 @@ sub new
 	if (!defined($okStreams[0]) && defined($self->{'keep'})) {
 		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
-	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
+	@okStreams = (qw(mp4 webm m3u8 any))  unless (defined $okStreams[0]);
 	$self->{'quality'} = 32767  unless (defined($self->{'quality'}) && $self->{'quality'} =~ /^[0-9]+$/);
 	$self->{'bitrate'} = 32767  unless (defined($self->{'bitrate'}) && $self->{'bitrate'} =~ /^[0-9]+$/);
 
@@ -542,48 +554,80 @@ sub new
 			}
 		}
 		if ($html) {
+			my @streams = ();
+			my %ext = ();
+			my %quality = ();
+			my %qualities = ();
+			my %streamHash = ();  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
+			my $ext;
+
 			$html =~ s#\\\/#\/#gs;
-			if ($DEBUG > 1 && open DBG, ">/tmp/rumble_embed.htm") {
-				print DBG $html;
-				close DBG;
-			}
 			$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
 			my $url2 = ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#s) ? $1 : undef;
 			$html =~ s#^.+\"u\"\:\{##s;
-			my %streamsets;
 			#PARSE OUT ALL STREAMS (CLASS IS EITHER "mp4", "webm", "###" (RESOLUTION) OR OTHER.
 			#SINCE THE STREAMS OF EACH RESOLUTION ARE OFTEN REPEATED UNDER "mp4", "webm", or "<other>"
-			#BASED ON THEIR EXTENSION, WE CONVERT THE NON-RESOLUTION ONES TO VERY LOW NUMBERS (<=30)
-			#IN ORDER FOR THEM TO BE SORTED LAST (FOR GIVEN CLASS, WE WANT HIGHEST RESOLUTIONS FIRST!:
-			my $lowclass;
+			#BASED ON THEIR EXTENSION!:
 			while ($html =~ s#^.+?\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##so) {
-				$lowclass = 30;
-				my ($class, $stream) = ($1, $2);
+				my ($quality, $stream) = ($1, $2);
 				my $bitrate = ($html =~ m#\"bitrate\"\:(\d+)#o) ? $1 : 0;
-				print STDERR "...class=$class= bitrate=$bitrate= stream=$stream= lowclass=$lowclass=\n"  if ($DEBUG);
+				print STDERR "...quality=$quality= bitrate=$bitrate= stream=$stream=\n"  if ($DEBUG);
 				next  if ($bitrate > $self->{'bitrate'});
+				next  if ($stream =~ /\.[A-Z]aa\.(?:mp4|webm)$/);
 
 				for (my $i=0;$i<=$#okStreams;$i++) {
-					if ($class =~ /$okStreams[$i]/) {
-						$class = $lowclass;
-						$lowclass -= 1;
+					if ($stream =~ /\.$okStreams[$i]\b/) {
+						$ext = $okStreams[$i];
+						last;
 					}
 				}
-				$class = 1  if ($lowclass == 30 && $class =~ /\D/io);
-				push @{$streamsets{$class}}, $stream;
+				$quality = 1  if ($ext =~ /aac/o);  #MAKE AUDIO-ONLY STREAMS LOWEST QUALITY TO SORT LAST.
+				if ($quality =~ /\D/) {
+					if ($quality =~ /audio/o) {
+						$quality = 1;
+					} elsif ($quality =~ /(?:hls|auto)/o) {
+						$quality = ($self->{'order'} =~ /ext/i) ? ($self->{'quality'}-1) : 10;
+					} else {
+						$quality = 5;
+					}
+				}
+				next  if ($quality > $self->{'quality'});  #EXCLUDE ANY HIGHER-RES THAN SELECTED QUALITY.
+
+				$quality{$stream} = $quality;
+				$ext{$stream} = $ext;
+				$qualities{$quality} = 1;
+				push @streams, $stream;
 			}
 			print STDERR "--Max resolution=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."=\n"  if ($DEBUG);
-			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
-			foreach my $streamtype (@okStreams) {
-				print STDERR "\n--keep type=$streamtype:\n"  if ($DEBUG);
-				foreach my $class (sort { $b <=> $a } keys %streamsets) { #SORT BY CLASS:
-					print STDERR "----class=$class:\n"  if ($DEBUG);
-					foreach my $stream (@{$streamsets{$class}}) {  #THEN BY RESOLUTION:
-						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
-							print STDERR "------found stream=$stream=\n"  if ($DEBUG);
+
+			if ($self->{'order'} =~ /ext/i) {
+				print STDERR "--order streams by kept extensions:\n"  if ($DEBUG);
+				foreach my $ext (@okStreams) {
+					print STDERR "\n--keep extension=$ext:\n"  if ($DEBUG);
+					foreach my $quality (sort { $b <=> $a } keys %qualities) {
+						foreach my $stream (@streams) {
+							print STDERR "------found($quality) stream=$stream=\n"  if ($DEBUG);
+							next  unless ($quality{$stream} == $quality &&
+									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
 							unless (defined $streamHash{$stream}
-									|| ($self->{'secure'} && $stream !~ /^https/o)
-									|| $class > $self->{'quality'}) {
+									|| ($self->{'secure'} && $stream !~ /^https/o)) {
+								push @{$self->{'streams'}}, $stream;
+								$streamHash{$stream} = $stream;
+							}
+						}
+					}
+				}
+			} else {
+				print STDERR "--order streams by qualities:\n"  if ($DEBUG);
+				foreach my $quality (sort { $b <=> $a } keys %qualities) {
+					print STDERR "\n--keep quality=$quality:\n"  if ($DEBUG);
+					foreach my $ext (@okStreams) {
+						foreach my $stream (@streams) {
+							print STDERR "------found($ext) stream=$stream=\n"  if ($DEBUG);
+							next  unless ($quality{$stream} == $quality && 
+									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
+							unless (defined $streamHash{$stream}
+									|| ($self->{'secure'} && $stream !~ /^https/o)) {
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -591,6 +635,7 @@ sub new
 					}
 				}
 			}
+
 			if ($html =~ m#\"author\"\:\{\"name\"\:\"([^\"]+)\"\,\"url\"\:\"([^\"]+)#s) {
 				$self->{'artist'} ||= $1;
 				$self->{'albumartist'} ||= $2;

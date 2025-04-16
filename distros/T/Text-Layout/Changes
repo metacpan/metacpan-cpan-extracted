@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.041	2025-04-15
+
+	Add named destinations (experimental).
+
 0.040	2025-04-11
 
 	Add named destinations (experimental).

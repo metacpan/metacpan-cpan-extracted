@@ -4082,7 +4082,8 @@ sub delete_worksheet_conditional_formatting_area{
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
-# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.   
+# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4118,7 +4119,7 @@ sub get_workbook{
 # Convert the workbook from the requested content into files in different formats.
 # 
 # @File  string (required)  File to upload  
-# @format  string   The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  
+# @format  string (required)  The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  
 # @password  string   The password needed to open an Excel file.  
 # @outPath  string   Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  
 # @storageName  string   The storage name where the file is situated.  
@@ -4128,7 +4129,8 @@ sub get_workbook{
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
 # @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
 # @sheetName  string     
-# @pageIndex  int      
+# @pageIndex  int     
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4174,7 +4176,8 @@ sub put_convert_workbook{
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
-# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.   
+# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4212,7 +4215,8 @@ sub post_workbook_save_as{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4288,7 +4292,8 @@ sub post_convert_workbook_to_png{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4326,7 +4331,8 @@ sub post_convert_workbook_to_docx{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4364,7 +4370,8 @@ sub post_convert_workbook_to_pptx{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4402,7 +4409,8 @@ sub post_convert_workbook_to_html{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4440,7 +4448,8 @@ sub post_convert_workbook_to_markdown{
 # @File  string (required)  File to upload  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4551,7 +4560,8 @@ sub post_convert_workbook_to_csv{
 #
 # 
 # 
-# @convertWorksheetOptions  ConvertWorksheetOptions (required)     
+# @convertWorksheetOptions  ConvertWorksheetOptions (required)    
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4586,7 +4596,8 @@ sub post_convert_worksheet_to_image{
 #
 # 
 # 
-# @convertWorkbookOptions  ConvertWorkbookOptions (required)     
+# @convertWorkbookOptions  ConvertWorkbookOptions (required)    
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4617,6 +4628,76 @@ sub post_convert_workbook{
 }
 
 #
+# CheckWrokbookExternalReferenceRequest
+#
+# Export Excel internal elements or the workbook itself to various format files.
+# 
+# @checkExternalReferenceOptions  CheckExternalReferenceOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CheckWrokbookExternalReferenceRequest',
+            description => 'CheckWrokbookExternalReference Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'check_wrokbook_external_reference' } = { 
+    	summary => 'Export Excel internal elements or the workbook itself to various format files.',
+        params => $params,
+        returns => 'CheckedExternalReferenceResponse',
+    };
+}
+#
+# @return CheckedExternalReferenceResponse
+#
+sub check_wrokbook_external_reference{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CheckedExternalReferenceResponse', $response);
+    return $_response_object;
+}
+
+#
+# CheckWorkbookFormulaErrorsRequest
+#
+# 
+# 
+# @formulaErrorOptions  CheckFormulaErrorOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CheckWorkbookFormulaErrorsRequest',
+            description => 'CheckWorkbookFormulaErrors Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'check_workbook_formula_errors' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CheckedFormulaErrorsResponse',
+    };
+}
+#
+# @return CheckedFormulaErrorsResponse
+#
+sub check_workbook_formula_errors{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CheckedFormulaErrorsResponse', $response);
+    return $_response_object;
+}
+
+#
 # PostExportRequest
 #
 # Export Excel internal elements or the workbook itself to various format files.
@@ -4626,7 +4707,8 @@ sub post_convert_workbook{
 # @format  string   The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  
 # @password  string   The password needed to open an Excel file.  
 # @checkExcelRestriction  boolean   Whether check restriction of excel file when user modify cells related objects.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {
@@ -4793,7 +4875,8 @@ sub post_workbook_import_xml{
 # @importOption  ImportOption   Import option. They are include of ImportCSVDataOption, ImportBatchDataOption, ImportPictureOption, ImportStringArrayOption, Import2DimensionStringArrayOption, and so on.    
 # @folder  string   The folder where the file is situated.  
 # @storageName  string   The storage name where the file is situated.  
-# @region  string   The regional settings for workbook.   
+# @region  string   The regional settings for workbook.  
+# @FontsLocation  string   Use Custom fonts.   
 #
 {
     my $params = {

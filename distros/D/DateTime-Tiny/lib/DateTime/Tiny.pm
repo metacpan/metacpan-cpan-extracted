@@ -3,7 +3,7 @@ use warnings;
 package DateTime::Tiny;
 # ABSTRACT:  A date object, with as little code as possible
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use overload 'bool' => sub () { 1 };
 use overload '""'   => 'as_string';
@@ -276,7 +276,7 @@ DateTime::Tiny - A date object, with as little code as possible
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -488,7 +488,7 @@ adopted it as a caretaker maintainer.
 
 L<DateTime>, L<Date::Tiny>, L<Time::Tiny>, L<Config::Tiny>, L<ali.as>
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

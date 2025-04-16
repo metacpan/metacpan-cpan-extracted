@@ -1,10 +1,21 @@
+Database-Abstraction
+====================
+
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/database-abstraction)
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/Database-Abstraction/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Database-Abstraction?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/Database-Abstraction.svg)](http://search.cpan.org/~nhorne/Database-Abstraction/)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/ntpdate/ntpdate.yml?branch=master)
+![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+Database+Environment+#perl+#ORM&url=https://github.com/nigelhorne/database-abstraction&via=nigelhorne)
+
 # NAME
 
 Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.25
+Version 0.26
 
 # DESCRIPTION
 
@@ -68,6 +79,9 @@ entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no\_entry' to the constructor, for legacy
 reasons it's enabled by default.
 The key column's default name is 'entry', but it can be overridden by the 'id' parameter.
+
+Arrays are made read-only before being returned.
+To disable that, pass `no_fixate` to the constructor.
 
 CSV files that are not no\_entry can have empty lines or comment lines starting with '#',
 to make them more readable.

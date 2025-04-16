@@ -71,7 +71,8 @@ sub new {
 # GetWorkbookRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
 # GetWorkbookRequest.region : The regional settings for workbook.  ,
 # GetWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
-# GetWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.   
+# GetWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.  ,
+# GetWorkbookRequest.FontsLocation : Use Custom fonts.   
 
 {
     my $params = {
@@ -158,6 +159,10 @@ sub run_http_request {
 
     if(defined $self->page_tall_fit_on_per_sheet){
         $query_params->{'pageTallFitOnPerSheet'} = $client->to_query_value($self->page_tall_fit_on_per_sheet);      
+    }
+
+    if(defined $self->fonts_location){
+        $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
     } 
     my $_body_data;
     # authentication setting, if any
@@ -260,6 +265,13 @@ __PACKAGE__->method_documentation({
      	description => 'The page tall fit on worksheet.',
      	format => '',
      	read_only => '',
+     		},
+     'fonts_location' => {
+     	datatype => 'string',
+     	base_name => 'FontsLocation',
+     	description => 'Use Custom fonts.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -277,7 +289,8 @@ __PACKAGE__->attribute_map( {
     'check_excel_restriction' => 'checkExcelRestriction',
     'region' => 'region',
     'page_wide_fit_on_per_sheet' => 'pageWideFitOnPerSheet',
-    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet' 
+    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet',
+    'fonts_location' => 'FontsLocation' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

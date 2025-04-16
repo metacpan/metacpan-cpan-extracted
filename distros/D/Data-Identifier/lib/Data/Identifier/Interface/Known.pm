@@ -14,25 +14,39 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
+
+my @_subobjects = qw(db extractor store fii);
 
 
 sub known {
     my ($pkg, $class, %opts) = @_;
     my $as = $opts{as} // 'raw';
     my ($list, %extra) = eval {$pkg->_known_provider($class)};
+    my $listas = $opts{listas};
 
     if (defined $list) {
         if ($extra{not_identifiers}) {
-            if ($as eq 'raw' || (defined($extra{rawtype}) && $as eq $extra{rawtype})) {
-                return @{$list};
+            if (!defined($listas)) {
+                if ($as eq 'raw' || (defined($extra{rawtype}) && $as eq $extra{rawtype})) {
+                    return @{$list};
+                }
             }
         } else {
+            my @res;
+
             if ($opts{skip_invalid}) {
-                return grep {defined} map {eval {$_->Data::Identifier::as($as, %opts{qw(db extractor no_defaults)}, %extra{qw(rawtype)})}} @{$list};
+                @res = grep {defined} map {eval {$_->Data::Identifier::as($as, %opts{@_subobjects, qw(no_defaults)}, %extra{qw(rawtype)})}} @{$list};
             } else {
-                return map {$_->Data::Identifier::as($as, %opts{qw(db extractor no_defaults)}, %extra{qw(rawtype)})} @{$list};
+                @res = map {$_->Data::Identifier::as($as, %opts{@_subobjects, qw(no_defaults)}, %extra{qw(rawtype)})} @{$list};
             }
+
+            if (defined($listas)) {
+                require Data::Identifier::Cloudlet;
+                return Data::Identifier::Cloudlet->new(root => \@res, %opts{@_subobjects})->as($listas, %opts{@_subobjects});
+            }
+
+            return @res;
         }
     }
 
@@ -62,7 +76,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -143,6 +157,21 @@ It is common to set this to C<[]> to return an empty list when this method would
 
 An instance of L<Data::URIID>. See L<Data::Identifier/as> for more details.
 
+=item C<fii>
+
+A L<File::Information> instance.
+
+=item C<listas>
+
+The package the list should be returned as.
+
+Supported values are those as C<$as> of L<Data::Identifier::Cloudlet/as>.
+All restrictions of L<Data::Identifier::Cloudlet/new> apply.
+Defaults to C<undef>.
+
+B<Note:>
+This option is experimental.
+
 =item C<no_defaults>
 
 See L<Data::Identifier/as> for the use of C<no_defaults>.
@@ -151,6 +180,10 @@ See L<Data::Identifier/as> for the use of C<no_defaults>.
 
 If set true, entries that cannot satisfy the given requirements (most likely C<as>)
 are skipped from the output without C<die>ing.
+
+=item C<store>
+
+A L<File::FStore> instance.
 
 =back
 

@@ -1,6 +1,9 @@
+Genealogy::ObituaryDailyTimes
+=============================
+
 [![Appveyor status](https://ci.appveyor.com/api/projects/status/w2kcdehjtofvt55t?svg=true)](https://ci.appveyor.com/project/nigelhorne/genealogy-obituarydailytimes)
 [![CPAN](https://img.shields.io/cpan/v/Genealogy-ObituaryDailyTimes.svg)](http://search.cpan.org/~nhorne/Genealogy-ObituaryDailyTimes/)
-[![Github Actions Status](https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/actions)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/genealogy-obituarydailytimes/test.yml?branch=master)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/7086407966497872/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/7086407966497872/heads/master/)
 [![Kwalitee](https://cpants.cpanauthors.org/dist/Genealogy-ObituaryDailyTimes.png)](http://cpants.cpanauthors.org/dist/Genealogy-ObituaryDailyTimes)
 [![Travis Status](https://www.travis-ci.com/nigelhorne/Genealogy-ObituaryDailyTimes.svg?branch=master)](https://www.travis-ci.com/nigelhorne/Genealogy-ObituaryDailyTimes)
@@ -12,9 +15,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
-Version 0.15
+Version 0.16
 
 # SYNOPSIS
+
+Looks up obituaries from the Obituary Daily Times and other places.
 
     use Genealogy::ObituaryDailyTimes;
     my $info = Genealogy::ObituaryDailyTimes->new();
@@ -31,7 +36,17 @@ Creates a Genealogy::ObituaryDailyTimes object.
 Accepts the following optional arguments:
 
 - `cache` - Passed to [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
-- `directory` - The directory containing the file obituaries.sql
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
+
+- `directory`
+
+    The directory containing the file obituaries.sql.
+    If only one argument is given to `new()`, it is taken to be `directory`.
+
 - `logger` - Passed to [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
 
 ## search

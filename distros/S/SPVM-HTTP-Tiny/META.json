@@ -54,6 +54,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

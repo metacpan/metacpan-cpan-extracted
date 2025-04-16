@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/GitUtils.pm','script/gu','script/this-repo'];
+my $filenames = ['lib/App/GitUtils.pm','script/gu','script/gu-calc-committing-total-size','script/gu-list-committing-large-files','script/this-repo'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

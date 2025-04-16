@@ -45,7 +45,7 @@ subtest 'CGI::Info' => sub {
 		};
 
 		subtest 'should load config file if provided' => sub {
-			my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml');
+			my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml', TMPDIR => 1);
 			print $fh "---\nmax_upload_size: 100\n";
 			close $fh;
 
@@ -54,8 +54,12 @@ subtest 'CGI::Info' => sub {
 			unlink $config_file;
 		};
 
-		subtest 'should reject non-ARRAY expect parameter' => sub {
-			throws_ok { CGI::Info->new(expect => {}) } qr/expect must be a reference/, 'Rejects non-array expect';
+		# Expect is deprecated
+		# subtest 'should reject non-ARRAY expect parameter' => sub {
+			# throws_ok { CGI::Info->new(expect => {}) } qr/expect must be a reference/, 'Rejects non-array expect';
+		# };
+		subtest 'expect has been deprecated' => sub {
+			throws_ok { CGI::Info->new(expect => {}) } qr/expect has been deprecated/, 'Rejects non-array expect';
 		};
 	};
 
@@ -72,8 +76,13 @@ subtest 'CGI::Info' => sub {
 		subtest 'should handle CGI environment' => sub {
 			mock_env({ SCRIPT_NAME => '/cgi-bin/test.cgi', DOCUMENT_ROOT => '/var/www' }, sub {
 				my $info = CGI::Info->new();
-				is $info->script_name, 'test.cgi', 'Correct script name from SCRIPT_NAME';
-				like $info->script_path, qr/\/var\/www\/cgi-bin\/test\.cgi/, 'Script path constructed correctly';
+				is($info->script_name(), 'test.cgi', 'Correct script name from SCRIPT_NAME');
+				if($^O eq 'MSWin32') {
+					like($info->script_path(), qr/\\var\\www\\cgi-bin\\test\.cgi/, 'Script path constructed correctly');
+				} else {
+					# http://www.cpantesters.org/cpan/report/00f6f172-6d25-1014-9d67-b345cf55203a
+					like($info->script_path(), qr/\/var\/www\/cgi-bin\/test\.cgi/, 'Script path constructed correctly');
+				}
 			});
 		};
 	};
@@ -86,7 +95,7 @@ subtest 'CGI::Info' => sub {
 				QUERY_STRING => 'name=John&age=30'
 			}, sub {
 				my $info = CGI::Info->new();
-				my $params = $info->params;
+				my $params = $info->params();
 				is $params->{name}, 'John', "GET param 'name' correct";
 				is $params->{age}, '30', "GET param 'age' correct";
 			});
@@ -94,12 +103,12 @@ subtest 'CGI::Info' => sub {
 
 		subtest 'should block SQL injection attempts' => sub {
 			mock_env({
-		GATEWAY_INTERFACE => 'CGI/1.1',
+				GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
 				QUERY_STRING => 'id=1%27%20OR%201=1--'
 			}, sub {
 				my $info = CGI::Info->new(allow => { id => qr/^\d+$/ });
-				my $params = $info->params;
+				my $params = $info->params();
 				is $info->status, 422, 'Status 422 on SQL injection';
 				ok !defined $params->{id}, 'Blocked malicious parameter';
 			});
@@ -107,7 +116,7 @@ subtest 'CGI::Info' => sub {
 
 		subtest 'should handle multipart form uploads' => sub {
 			mock_env({
-		GATEWAY_INTERFACE => 'CGI/1.1',
+				GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'POST',
 				CONTENT_TYPE	=> 'multipart/form-data; boundary=----boundary',
 				CONTENT_LENGTH => 1000
@@ -122,9 +131,9 @@ subtest 'CGI::Info' => sub {
 
 		subtest 'should reject oversized uploads' => sub {
 			mock_env({
-		GATEWAY_INTERFACE => 'CGI/1.1',
+				GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'POST',
-				CONTENT_TYPE   => 'application/x-www-form-urlencoded',
+				CONTENT_TYPE => 'application/x-www-form-urlencoded',
 				CONTENT_LENGTH => 600 * 1024	# 600KB
 			}, sub {
 				my $info = CGI::Info->new(max_upload => 500);	# 500KB limit
@@ -138,9 +147,9 @@ subtest 'CGI::Info' => sub {
 	subtest 'Security Checks' => sub {
 		subtest 'should block XSS attempts' => sub {
 			mock_env({
-		GATEWAY_INTERFACE => 'CGI/1.1',
+				GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
-				QUERY_STRING   => 'comment=<script>alert(1)</script>'
+				QUERY_STRING => 'comment=<script>alert(1)</script>'
 			}, sub {
 				my $info = CGI::Info->new();
 				my $params = $info->params;
@@ -150,9 +159,9 @@ subtest 'CGI::Info' => sub {
 
 		subtest 'should prevent directory traversal' => sub {
 			mock_env({
-		GATEWAY_INTERFACE => 'CGI/1.1',
+				GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
-				QUERY_STRING  => 'file=../../etc/passwd'
+				QUERY_STRING => 'file=../../etc/passwd'
 			}, sub {
 				my $info = new_ok('CGI::Info');
 				my $params = $info->params();
@@ -165,7 +174,7 @@ subtest 'CGI::Info' => sub {
 		subtest 'should detect mobile devices' => sub {
 			mock_env({ HTTP_USER_AGENT => 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1' }, sub {
 				my $info = CGI::Info->new();
-				ok $info->is_mobile, 'iPhone detected as mobile';
+				ok($info->is_mobile(), 'iPhone detected as mobile');
 			});
 		};
 
@@ -202,7 +211,7 @@ subtest 'CGI::Info' => sub {
 				my $info = new_ok('CGI::Info');
 				is($info->test(), 'value', 'AUTOLOAD delegates to param');
 				$info = CGI::Info->new('auto_load' => 0);
-				throws_ok { $info->test() } qr/Unknown method/, 'auto_load can be disabled';
+				throws_ok { $info->test() } qr/Unknown method/, 'AUTOLOAD can be disabled';
 			});
 		};
 	};

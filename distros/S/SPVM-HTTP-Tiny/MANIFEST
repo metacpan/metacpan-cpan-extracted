@@ -5,6 +5,7 @@
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
+helper/generate_header_methods.pl
 lib/SPVM/HTTP/Tiny.pm
 lib/SPVM/HTTP/Tiny.spvm
 lib/SPVM/HTTP/Tiny/Asset.pm
@@ -33,6 +34,8 @@ lib/SPVM/HTTP/Tiny/Date.pm
 lib/SPVM/HTTP/Tiny/Date.spvm
 lib/SPVM/HTTP/Tiny/EventEmitter.pm
 lib/SPVM/HTTP/Tiny/EventEmitter.spvm
+lib/SPVM/HTTP/Tiny/EventEmitter/Callback.pm
+lib/SPVM/HTTP/Tiny/EventEmitter/Callback.spvm
 lib/SPVM/HTTP/Tiny/Handle.pm
 lib/SPVM/HTTP/Tiny/Handle.spvm
 lib/SPVM/HTTP/Tiny/Headers.pm
@@ -49,8 +52,6 @@ lib/SPVM/HTTP/Tiny/Path.pm
 lib/SPVM/HTTP/Tiny/Path.spvm
 lib/SPVM/HTTP/Tiny/Response.pm
 lib/SPVM/HTTP/Tiny/Response.spvm
-lib/SPVM/HTTP/Tiny/Status.pm
-lib/SPVM/HTTP/Tiny/Status.spvm
 lib/SPVM/HTTP/Tiny/Transaction.pm
 lib/SPVM/HTTP/Tiny/Transaction.spvm
 lib/SPVM/HTTP/Tiny/Transaction/HTTP.pm

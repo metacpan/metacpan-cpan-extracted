@@ -184,6 +184,8 @@ docs/ChartPointsResponse.md
 docs/ChartResponse.md
 docs/ChartsResponse.md
 docs/CheckBoxResponse.md
+docs/CheckedExternalReferenceResponse.md
+docs/CheckedFormulaErrorsResponse.md
 docs/ColumnResponse.md
 docs/ColumnsResponse.md
 docs/ComboBoxResponse.md
@@ -321,6 +323,8 @@ docs/PivotTables.md
 docs/AddTextOptions.md
 docs/BaseOperateOptions.md
 docs/CharacterCountOptions.md
+docs/CheckExternalReferenceOptions.md
+docs/CheckFormulaErrorOptions.md
 docs/CombinationSourceData.md
 docs/ConvertTextOptions.md
 docs/ConvertWorkbookOptions.md
@@ -547,6 +551,8 @@ docs/PostConvertWorkbookToSQLRequest.md
 docs/PostConvertWorkbookToCSVRequest.md
 docs/PostConvertWorksheetToImageRequest.md
 docs/PostConvertWorkbookRequest.md
+docs/CheckWrokbookExternalReferenceRequest.md
+docs/CheckWorkbookFormulaErrorsRequest.md
 docs/PostExportRequest.md
 docs/PostWorkbookExportXMLRequest.md
 docs/PostWorkbookImportJsonRequest.md
@@ -975,6 +981,8 @@ lib/AsposeCellsCloud/Object/ChartPointsResponse.pm
 lib/AsposeCellsCloud/Object/ChartResponse.pm
 lib/AsposeCellsCloud/Object/ChartsResponse.pm
 lib/AsposeCellsCloud/Object/CheckBoxResponse.pm
+lib/AsposeCellsCloud/Object/CheckedExternalReferenceResponse.pm
+lib/AsposeCellsCloud/Object/CheckedFormulaErrorsResponse.pm
 lib/AsposeCellsCloud/Object/ColumnResponse.pm
 lib/AsposeCellsCloud/Object/ColumnsResponse.pm
 lib/AsposeCellsCloud/Object/ComboBoxResponse.pm
@@ -1112,6 +1120,8 @@ lib/AsposeCellsCloud/Object/PivotTables.pm
 lib/AsposeCellsCloud/Object/AddTextOptions.pm
 lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
 lib/AsposeCellsCloud/Object/CharacterCountOptions.pm
+lib/AsposeCellsCloud/Object/CheckExternalReferenceOptions.pm
+lib/AsposeCellsCloud/Object/CheckFormulaErrorOptions.pm
 lib/AsposeCellsCloud/Object/CombinationSourceData.pm
 lib/AsposeCellsCloud/Object/ConvertTextOptions.pm
 lib/AsposeCellsCloud/Object/ConvertWorkbookOptions.pm
@@ -1338,6 +1348,8 @@ lib/AsposeCellsCloud/Request/PostConvertWorkbookToSQLRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorksheetToImageRequest.pm
 lib/AsposeCellsCloud/Request/PostConvertWorkbookRequest.pm
+lib/AsposeCellsCloud/Request/CheckWrokbookExternalReferenceRequest.pm
+lib/AsposeCellsCloud/Request/CheckWorkbookFormulaErrorsRequest.pm
 lib/AsposeCellsCloud/Request/PostExportRequest.pm
 lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm
 lib/AsposeCellsCloud/Request/PostWorkbookImportJsonRequest.pm

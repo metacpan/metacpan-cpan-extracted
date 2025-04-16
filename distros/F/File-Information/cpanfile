@@ -21,7 +21,6 @@ recommends "MIME::Base64" => "3.15";
 recommends "OpenOffice::OODoc" => "2.125";
 recommends "PDF::API2" => "2.044";
 recommends "URI::file" => "4.21";
-recommends "UUID::Tiny" => "1.04";
 recommends "Unix::Mknod" => "0.04";
 recommends "XML::Simple" => "2.25";
 

@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::Workbook;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **FileName** | **string** | Gets and sets the current file name.  |
-**Links** | **ARRAY[Link]** |  |
+**Links** | **ARRAY[Link]** | A property of type List Link  named Links is specified to be serialized as an XmlElement with the tag "link". |
 **Worksheets** | **LinkElement** | Gets the  collection in the spreadsheet.  |
 **DefaultStyle** | **LinkElement** | Gets or sets the default  object of the workbook.  |
 **DocumentProperties** | **LinkElement** |  |

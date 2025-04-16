@@ -2,6 +2,7 @@ bin/create_db.PL
 bin/extract
 bin/ml_from_cache
 Changes
+config.yaml
 lib/Genealogy/ObituaryDailyTimes.pm
 lib/Genealogy/ObituaryDailyTimes/obituaries.pm
 LICENSE

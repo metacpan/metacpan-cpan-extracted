@@ -3,8 +3,10 @@
 use strict;
 use warnings;
 
+use File::Spec;
 use File::Temp qw(tempdir);
-use Test::Most tests => 8;
+use FindBin qw($Bin);
+use Test::Most;
 
 # Module loads
 BEGIN { use_ok('Genealogy::ObituaryDailyTimes') }
@@ -117,6 +119,14 @@ subtest 'Testing _create_url() private method' => sub {
 	throws_ok {
 		Genealogy::ObituaryDailyTimes::_create_url($mock_obit);
 	} qr/Invalid source/, 'Throws error for invalid source';
+};
+
+subtest 'Test loading configuration from a file' => sub {
+	my $config_file = File::Spec->catfile($Bin, File::Spec->updir(), 'config.yaml');
+
+	my $obj = Genealogy::ObituaryDailyTimes->new(config_file => $config_file);
+
+	cmp_ok($obj->{'directory'}, 'eq', '/', 'Can read configuration in from a file');
 };
 
 # End tests

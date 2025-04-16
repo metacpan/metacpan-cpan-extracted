@@ -59,7 +59,8 @@ sub new {
 
 
 # Run Operation Request
-# PostConvertWorkbookRequest.convertWorkbookOptions :    
+# PostConvertWorkbookRequest.convertWorkbookOptions :   ,
+# PostConvertWorkbookRequest.FontsLocation : Use Custom fonts.   
 
 {
     my $params = {
@@ -96,7 +97,9 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('application/json');
  
- 
+    if(defined $self->fonts_location){
+        $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
+    } 
     my $_body_data;
 
     # body params
@@ -120,12 +123,20 @@ __PACKAGE__->method_documentation({
      	description => '',
      	format => '',
      	read_only => '',
+     		},
+     'fonts_location' => {
+     	datatype => 'string',
+     	base_name => 'FontsLocation',
+     	description => 'Use Custom fonts.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
 
 __PACKAGE__->attribute_map( {
-    'convert_workbook_options' => 'convertWorkbookOptions' 
+    'convert_workbook_options' => 'convertWorkbookOptions',
+    'fonts_location' => 'FontsLocation' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

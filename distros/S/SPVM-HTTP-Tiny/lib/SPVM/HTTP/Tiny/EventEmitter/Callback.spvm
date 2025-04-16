@@ -1,0 +1,10 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::EventEmitter::Callback : interface_t {
+  version_from HTTP::Tiny;
+  
+  # Interface Methods
+  method : void ($that : object, $args : object[]);
+  
+}

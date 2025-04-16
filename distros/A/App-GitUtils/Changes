@@ -1,3 +1,12 @@
+0.087   2025-04-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: gu-list-committing-large-files,
+          gu-calc-committing-total-size.
+
+        - Add functions: status(), list_committing_large_files(),
+          calc_committing_total_size().
+
+
 0.086   2022-07-30  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] [subcommand info] chdir to git dir first when executing 'git

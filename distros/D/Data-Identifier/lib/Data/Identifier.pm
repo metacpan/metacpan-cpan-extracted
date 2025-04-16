@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -267,7 +267,7 @@ sub new {
                 $opts{displayname} //= sub { $from->displayname };
                 $type = 'ise';
                 $id   = $id->ise;
-            } elsif ($id->isa('File::FStore::File') || $id->isa('File::FStore::Adder')) {
+            } elsif ($id->isa('File::FStore::File') || $id->isa('File::FStore::Adder') || $id->isa('File::FStore::Base')) {
                 $type = 'ise';
                 $id = $id->contentise;
             } elsif ($id->isa('Business::ISBN')) {
@@ -660,6 +660,7 @@ sub namespace {
 }
 
 
+#@returns __PACKAGE__
 sub register {
     my ($self) = @_;
     $registered{$self->{type}->uuid}{$self->{id}} = $self;
@@ -669,6 +670,8 @@ sub register {
         my $v = $self->$f(default => undef) // next;
         $registered{$well_known{$type_name}->uuid}{$v} = $self;
     }
+
+    return $self;
 }
 
 
@@ -784,7 +787,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -874,7 +877,7 @@ In this case not all options might be supported. Currently it is possible to con
 L<Data::Identifier>,
 L<Data::URIID::Colour>, L<Data::URIID::Service>, L<Data::URIID::Result>,
 L<Data::TagDB::Tag>,
-L<File::FStore::File>, L<File::FStore::Adder> (see limitations of L<File::FStore::Adder/contentise>),
+L<File::FStore::Base> (see limitations of L<File::FStore::Base/contentise>),
 and L<Business::ISBN>. If C<$id> is not a reference it is parsed as with C<ise>.
 
 The following type names are currently well known:
@@ -1210,11 +1213,15 @@ This call is only valid for identifiers that are types.
 
     $identifier->register;
 
+    use constant WK_SOME_ID => Data::Identifier->new(...)->register;
+
 Registers the identifier for deduplication.
 This can be used to register much used identifiers and types
 early in an application to increase performance.
 However, note that once registered an identifier object is cached for
 the life time of the process.
+
+This method returns C<$identifier> (since v0.12).
 
 =head2 userdata
 

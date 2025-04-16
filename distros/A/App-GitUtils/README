@@ -2,13 +2,17 @@ NAME
     App::GitUtils - Day-to-day command-line utilities for git
 
 VERSION
-    This document describes version 0.086 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2022-07-30.
+    This document describes version 0.087 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2025-04-16.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
 
     *   gu
+
+    *   gu-calc-committing-total-size
+
+    *   gu-list-committing-large-files
 
     *   this-repo
 
@@ -16,6 +20,39 @@ SYNOPSIS
     more convenient when working with git con the command-line.
 
 FUNCTIONS
+  calc_committing_total_size
+    Usage:
+
+     calc_committing_total_size(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Calculate the total sizes of files to add/delete/modify.
+
+    To be used in pre-commit script, for example.
+
+    Some applications: Github limits commit total size to 2GB.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   include_untracked => *bool* (default: 1)
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   clone_to_bare
     Usage:
 
@@ -78,6 +115,45 @@ FUNCTIONS
 
         If not specified, will assume current directory is inside git
         repository and will search ".git" upwards.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_committing_large_files
+    Usage:
+
+     list_committing_large_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check that added/modified files in staged/unstaged do not exceed a
+    certain size.
+
+    Will return an enveloped result with payload true containing
+    added/modified files in staged/unstaged that are larger than a certain
+    specified "max_size".
+
+    To be used in a pre-commit script, for example.
+
+    Some applications: Github for example warns when a file is above 50MB
+    and rejects when a file is above 100MB in size.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   max_size* => *datasize*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -243,6 +319,33 @@ FUNCTIONS
 
     Return value: (any)
 
+  status
+    Usage:
+
+     status() -> [$status_code, $reason, $payload, \%result_meta]
+
+    Run "git status" and return information as a data structure.
+
+    Currently incomplete!
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
 ENVIRONMENT
   GITUTILS_TRACE
     Boolean. If set to true, will produce additional log statements using
@@ -282,8 +385,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,10 @@
+v0.12  2025-04-16Z
+    - Added better support for File::FStore::Base
+    - Let $identifier->register return $identifier
+    - Improved documentation
+    - Added experimental support for listas in known()
+    - Improved tests
+
 v0.11  2025-04-10Z
     - Improved/corrected identifier validation
 

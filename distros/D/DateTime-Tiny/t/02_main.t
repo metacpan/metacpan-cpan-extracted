@@ -78,8 +78,9 @@ SKIP: {
 	my $dt = $date->DateTime;
 	isa_ok( $dt, 'DateTime' );
 	# DateTime::Locale version 1.00 changes "C" to "en-US-POSIX".
-	my $expected = eval { DateTime::Locale->VERSION(1) } ? "en-US-POSIX" : "C";
-	is( $dt->locale->id,      $expected,  '->locale ok'   );
+	# And version 1.33 changes to "en-US".
+	my %expected = map { $_ => 1 } qw(C en-US-POSIX en-US);
+	ok( $expected{ $dt->locale->id }, '->locale ok' );
 	is( $dt->time_zone->name, 'floating', '->timezone ok' );
 
 	# Compare accessor results

@@ -7,6 +7,13 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.008001	2025-04-15
+
+ [ Bug Fixes ]
+ - The Optional type constraint on its own, will now be treated the same as
+   Optional[Any]. Previously when used for named parameters, it would fail
+   to generate predicate methods.
+
 2.008000	2025-03-31
 
  [ Packaging ]

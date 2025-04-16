@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/unicode-tussle"
       }
    },
-   "version" : "1.121",
+   "version" : "1.122",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

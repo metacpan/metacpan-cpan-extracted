@@ -17,7 +17,7 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 
 #@returns Data::Identifier
@@ -320,7 +320,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,12 @@ Name | Type | Description | Notes
 **EnableHTTPCompression** | **boolean** | whether http compression is to be used. |
 **RefreshChartCache** | **boolean** | Indicates whether refreshing chart cache data |
 **SortNames** | **boolean** | Indicates whether sorting defined names before saving file. |
-**ValidateMergedAreas** | **boolean** | Indicates whether validate merged areas before saving the file.The default value is false.             |  
+**ValidateMergedAreas** | **boolean** | Indicates whether validate merged areas before saving the file.The default value is false.             |
+**MergeAreas** | **boolean** |  |
+**SortExternalNames** | **boolean** |  |
+**CheckExcelRestriction** | **boolean** |  |
+**UpdateSmartArt** | **boolean** |  |
+**EncryptDocumentProperties** | **boolean** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

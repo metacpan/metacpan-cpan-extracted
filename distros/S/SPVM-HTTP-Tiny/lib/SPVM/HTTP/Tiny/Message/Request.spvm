@@ -4,10 +4,6 @@
 class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
   version_from HTTP::Tiny;
   
-  allow HTTP::Tiny;
-  allow HTTP::Tiny::Handle;
-  allow HTTP::Tiny::Daemon;
-  
   use HTTP::Tiny::Headers;
   use Digest::SHA;
   use HTTP::Tiny::Cookie::Request;
@@ -41,6 +37,8 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
     my $options_h = Hash->new($options);
     
     my $self = new HTTP::Tiny::Message::Request;
+    
+    $self->SUPER::init;
     
     $self->{method} = $options_h->delete_or_default_string("method", undef);
     
@@ -188,9 +186,15 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
     
     $self->emit(progress => [(object)"start_line", $offset]);
     
-    return Fn->substr($self->{start_buffer}, $offset, 131072);
+    my $start_buffer_length = length $self->{start_buffer};
+    
+    my $max = ($start_buffer_length <= 131072) ? $start_buffer_length : 131072;
+    
+    my $chunk = Fn->substr($self->{start_buffer}, $offset, $max - $offset);
+    
+    return $chunk;
   }
-
+  
   method is_handshake : int () { return Fn->lc($self->headers->upgrade // "") eq "websocket"; }
   
   method is_secure : int () {

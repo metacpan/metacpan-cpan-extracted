@@ -15,10 +15,24 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   use HTTP::Tiny::Upload;
   use JSON;
   
+  # Enumerations
+  private enum {
+    MAX_LINE_SIZE_DEFAULT = 8192,
+  }
+  
   # Fields
   has content : ro HTTP::Tiny::Content;
   
-  has max_line_size : ro int;
+  has max_line_size : wo int;
+  
+  method max_line_size : int () {
+    
+    if ($self->{max_line_size} < 0) {
+      $self->{max_line_size} = &MAX_LINE_SIZE_DEFAULT;
+    }
+    
+    return $self->{max_line_size};
+  }
   
   has max_message_size : ro int;
   
@@ -46,10 +60,12 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   has _cache : Hash;
   
   # Old Fields
-  has content_buffer : StringBuffer;
+  has content_buffer : rw StringBuffer;
   
   # Instance Methods
   protected method init : void ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
     
     $self->{version} //= "1.1";
     
@@ -57,12 +73,18 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
       $self->{max_message_size} = 16777216;
     }
     
-    if ($self->{max_line_size} < 0) {
-      $self->{max_line_size} = 8192;
+    if ($options_h->exists("max_line_size")) {
+      $self->{max_line_size} = $options_h->get_int("max_line_size");
     }
+    else {
+      $self->{max_line_size} = -1;
+    }
+    
     $self->{content} = HTTP::Tiny::Content::Single->new;
     
     $self->{_cache} = Hash->new;
+    
+    $self->{buffer} = "";
   }
   
   method content_v0 : string () {
@@ -125,15 +147,17 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   
   method build_body : string () {
     
-    $self->_build("get_body_chunk");
+    return $self->_build("get_body_chunk");
   }
   
   method build_headers : string () {
-    $self->_build("get_header_chunk");
+    
+    return $self->_build("get_header_chunk");
   }
   
   method build_start_line : string () {
-    $self->_build("get_start_line_chunk");
+    
+    return $self->_build("get_start_line_chunk");
   }
   
   method cookie : HTTP::Tiny::Cookie ($name : string) {
@@ -204,7 +228,9 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
     
     $self->fix_headers;
     
-    return $self->content->get_header_chunk($offset);
+    my $chunk = $self->content->get_header_chunk($offset);
+    
+    return $chunk;
   }
   
   method get_start_line_chunk : string ($offset : int) { die "Not implemented."; }
@@ -247,7 +273,7 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
     $self->{raw_size} += length $chunk;
     
     $self->{buffer} .= $chunk;
-
+    
     # Start-line
     unless ($self->{state}) {
       
@@ -256,6 +282,7 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
       if ($len < 0) {
         $len = length $self->{buffer};
       }
+      
       if ($len > $self->max_line_size) {
         $self->_limit("Maximum start-line size exceeded");
         return;
@@ -358,14 +385,14 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
     while (1) {
       
       my $chunk = (string)undef;
-      if ($method eq "get_body_chunk") {
-        $chunk = $self->get_body_chunk($offset);
+      if ($method eq "get_start_line_chunk") {
+        $chunk = $self->get_start_line_chunk($offset);
       }
       elsif ($method eq "get_header_chunk") {
         $chunk = $self->get_header_chunk($offset);
       }
-      elsif ($method eq "get_start_line_chunk") {
-        $chunk = $self->get_start_line_chunk($offset);
+      elsif ($method eq "get_body_chunk") {
+        $chunk = $self->get_body_chunk($offset);
       }
       
       # No chunk yet, try again

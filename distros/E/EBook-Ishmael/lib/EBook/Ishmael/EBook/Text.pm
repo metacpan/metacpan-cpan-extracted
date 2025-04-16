@@ -1,9 +1,10 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
+use Encode qw(decode);
 use File::Basename;
 use File::Spec;
 
@@ -26,10 +27,12 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift // 'UTF-8';
 
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		Encode   => $enc,
 	};
 
 	bless $self, $class;
@@ -51,8 +54,12 @@ sub html {
 
 	open my $rh, '<', $self->{Source}
 		or die "Failed to open $self->{Source} for reading: $!\n";
-	binmode $rh, ':encoding(UTF-8)';
-	my $html = text2html(do { local $/ = undef; readline $rh });
+	my $html = text2html(
+		decode(
+			$self->{Encode},
+			do { local $/ = undef; <$rh> }
+		)
+	);
 	close $rh;
 
 	if (defined $out) {
@@ -75,8 +82,10 @@ sub raw {
 
 	open my $rh, '<', $self->{Source}
 		or die "Failed to open $self->{Source} for reading: $!\n";
-	binmode $rh, ':encoding(UTF-8)';
-	my $raw = do { local $/ = undef; readline $rh };
+	my $raw = decode(
+		$self->{Encode},
+		do { local $/ = undef; <$rh> }
+	);
 	close $rh;
 
 	if (defined $out) {

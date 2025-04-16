@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 25.3
+    version: 25.4
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -397,6 +397,10 @@ provides:
     file: lib/AsposeCellsCloud/Object/ChartsResponse.pm
   AsposeCellsCloud::Object::CheckBoxResponse:
     file: lib/AsposeCellsCloud/Object/CheckBoxResponse.pm
+  AsposeCellsCloud::Object::CheckedExternalReferenceResponse:
+    file: lib/AsposeCellsCloud/Object/CheckedExternalReferenceResponse.pm
+  AsposeCellsCloud::Object::CheckedFormulaErrorsResponse:
+    file: lib/AsposeCellsCloud/Object/CheckedFormulaErrorsResponse.pm
   AsposeCellsCloud::Object::ColumnResponse:
     file: lib/AsposeCellsCloud/Object/ColumnResponse.pm
   AsposeCellsCloud::Object::ColumnsResponse:
@@ -671,6 +675,10 @@ provides:
     file: lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
   AsposeCellsCloud::Object::CharacterCountOptions:
     file: lib/AsposeCellsCloud/Object/CharacterCountOptions.pm
+  AsposeCellsCloud::Object::CheckExternalReferenceOptions:
+    file: lib/AsposeCellsCloud/Object/CheckExternalReferenceOptions.pm
+  AsposeCellsCloud::Object::CheckFormulaErrorOptions:
+    file: lib/AsposeCellsCloud/Object/CheckFormulaErrorOptions.pm
   AsposeCellsCloud::Object::CombinationSourceData:
     file: lib/AsposeCellsCloud/Object/CombinationSourceData.pm
   AsposeCellsCloud::Object::ConvertTextOptions:
@@ -1123,6 +1131,10 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostConvertWorksheetToImageRequest.pm
   AsposeCellsCloud::Request::PostConvertWorkbookRequest:
     file: lib/AsposeCellsCloud/Request/PostConvertWorkbookRequest.pm
+  AsposeCellsCloud::Request::CheckWrokbookExternalReferenceRequest:
+    file: lib/AsposeCellsCloud/Request/CheckWrokbookExternalReferenceRequest.pm
+  AsposeCellsCloud::Request::CheckWorkbookFormulaErrorsRequest:
+    file: lib/AsposeCellsCloud/Request/CheckWorkbookFormulaErrorsRequest.pm
   AsposeCellsCloud::Request::PostExportRequest:
     file: lib/AsposeCellsCloud/Request/PostExportRequest.pm
   AsposeCellsCloud::Request::PostWorkbookExportXMLRequest:
@@ -1626,5 +1638,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 25.3
+version: 25.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+4.06  2025-04-15T17:25:00+00:00
+      - Proposed patch for this FAIL report, thanks Andreas J. Koenig.
+      https://www.cpantesters.org/cpan/report/50dde750-1736-11f0-8297-ce01b18213f0
+
 4.05  2025-04-02T17:40:00+00:00
       - Updated doc about color names of line.
 

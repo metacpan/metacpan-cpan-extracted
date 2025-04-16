@@ -523,6 +523,9 @@ sub funeral_notices
 		}
 		# print "$last\n";
 	}
+	if($last eq 'oneill') {
+		$real_last = "O'Neill";
+	}
 	if($content =~ /"Click here to view the tribute page for (.+?) $real_last.*?"/is) {
 		my $first = $1;
 		my ($place, $age, $newspaper, $date);
@@ -561,7 +564,7 @@ sub funeral_notices
 		$last = normalise_name($last);
 		queue($first, $last, $maiden, $age, $place, $date, $newspaper, 'L', $url) if($last =~ /^[A-Z]/);
 		# print Data::Dumper->new([\@queue])->Dump();
-	} else {
+	} elsif($content !~ /By request this notice has been.+removed from our site/is) {
 		die "Can't parse $url";
 	}
 }
@@ -604,7 +607,6 @@ sub queue($$$$$$$$$)
 	# Add entry to queue
 	push @queue, \%columns;
 }
-
 
 sub flush($)
 {

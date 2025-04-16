@@ -1,4 +1,5 @@
 .perltidyrc
+Changes
 lib/Net/EPP.pm
 lib/Net/EPP/Client.pm
 lib/Net/EPP/Frame.pm
@@ -42,9 +43,7 @@ lib/Net/EPP/Protocol.pm
 lib/Net/EPP/ResponseCodes.pm
 lib/Net/EPP/Simple.pm
 Makefile.PL
-MANIFEST
-Net-EPP-0.27/META.json
-Net-EPP-0.27/META.yml
+MANIFEST			This list of files
 README.md
 t/use.t
 tidy.sh

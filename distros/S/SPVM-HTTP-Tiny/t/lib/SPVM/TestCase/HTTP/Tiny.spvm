@@ -25,6 +25,10 @@ class TestCase::HTTP::Tiny {
       return 0;
     }
     
+    unless ($res->status == 200 || $res->status == 301) {
+      return 0;
+    }
+    
     return 1;
   }
   

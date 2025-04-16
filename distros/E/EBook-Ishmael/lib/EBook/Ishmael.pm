@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -38,16 +38,18 @@ Usage:
   $0 [options] file [output]
 
 Options:
-  -d|--dumper=<dumper>   Specify dumper to use for formatting text
-  -e|--encoding=<enc>    Print text output in specified encoding
-  -f|--format=<format>   Specify ebook format
-  -w|--width=<width>     Specify output line width
-  -H|--html              Dump ebook HTML
-  -c|--cover             Dump ebook cover image
-  -g|--image             Dump ebook images
-  -i|--identify          Identify ebook format
-  -m|--metadata[=<form>] Print ebook metadata
-  -r|--raw               Dump the raw, unformatted ebook text
+  -d|--dumper=<dumper>      Specify dumper to use for formatting text
+  -e|--encoding=<enc>       Print text output in specified encoding
+  -I|--file-encoding=<enc>  Specify ebook character encoding
+  -f|--format=<format>      Specify ebook format
+  -w|--width=<width>        Specify output line width
+  -t|--text                 Dump formatted ebook text
+  -H|--html                 Dump ebook HTML
+  -c|--cover                Dump ebook cover image
+  -g|--image                Dump ebook images
+  -i|--identify             Identify ebook format
+  -m|--metadata[=<form>]    Print ebook metadata
+  -r|--raw                  Dump the raw, unformatted ebook text
 
   -h|--help      Print help message
   -v|--version   Print version/copyright info
@@ -98,27 +100,30 @@ sub init {
 	my $class = shift;
 
 	my $self = {
-		Ebook  => undef,
-		Mode   => MODE_TEXT,
-		Dumper => $ENV{ISHMAEL_DUMPER},
-		Encode => $ENV{ISHMAEL_ENCODING},
-		Format => undef,
-		Output => undef,
-		Width  => 80,
-		Meta   => undef,
+		Ebook   => undef,
+		Mode    => MODE_TEXT,
+		Dumper  => $ENV{ISHMAEL_DUMPER},
+		Encode  => $ENV{ISHMAEL_ENCODING},
+		FileEnc => undef,
+		Format  => undef,
+		Output  => undef,
+		Width   => 80,
+		Meta    => undef,
 	};
 
 	Getopt::Long::config('bundling');
 	GetOptions(
-		'dumper|d=s'   => \$self->{Dumper},
-		'encoding|e=s' => \$self->{Encode},
-		'format|f=s'   => \$self->{Format},
-		'width|w=i'    => \$self->{Width},
-		'html|H'       => sub { $self->{Mode} = MODE_HTML },
-		'cover|c'      => sub { $self->{Mode} = MODE_COVER },
-		'image|g'      => sub { $self->{Mode} = MODE_IMAGE },
-		'identify|i'   => sub { $self->{Mode} = MODE_ID },
-		'metadata|m:s' => sub {
+		'dumper|d=s'        => \$self->{Dumper},
+		'encoding|e=s'      => \$self->{Encode},
+		'file-encoding|I=s' => \$self->{FileEnc},
+		'format|f=s'        => \$self->{Format},
+		'width|w=i'         => \$self->{Width},
+		'text|t'            => sub { $self->{Mode} = MODE_TEXT },
+		'html|H'            => sub { $self->{Mode} = MODE_HTML },
+		'cover|c'           => sub { $self->{Mode} = MODE_COVER },
+		'image|g'           => sub { $self->{Mode} = MODE_IMAGE },
+		'identify|i'        => sub { $self->{Mode} = MODE_ID },
+		'metadata|m:s'      => sub {
 			# Some DWIMery that if the given argument is not a valid metadata
 			# format, assume the user meant for it be a file argument and put
 			# it back into @ARGV.
@@ -130,7 +135,7 @@ sub init {
 				unshift @ARGV, $_[1];
 			}
 		},
-		'raw|r'        => sub { $self->{Mode} = MODE_RAW_TIME },
+		'raw|r'             => sub { $self->{Mode} = MODE_RAW_TIME },
 		'help|h'    => sub { print $HELP;        exit 0; },
 		'version|v' => sub { print $VERSION_MSG; exit 0; },
 	) or die "Error in command line arguments\n$HELP";
@@ -162,6 +167,10 @@ sub init {
 
 	if (defined $self->{Encode} and not defined find_encoding($self->{Encode})) {
 		die "'$self->{Encode}' is an invalid character encoding\n";
+	}
+
+	if (defined $self->{FileEnc} and not defined find_encoding($self->{FileEnc})) {
+		die "'$self->{FileEnc}' is an invalid character encoding\n";
 	}
 
 	bless $self, $class;

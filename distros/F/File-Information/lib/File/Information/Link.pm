@@ -7,7 +7,7 @@
 
 package File::Information::Link;
 
-use v5.10;
+use v5.16;
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ use Data::Identifier::Generate v0.08;
 use File::Information::Inode;
 use File::Information::Deep;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -42,6 +42,7 @@ my %_dot_comments_rating = (
 my %_properties = (
     link_basename       => {loader => \&_load_basename},
     link_basename_clean => {loader => \&_load_basename},
+    link_basename_boring=> {loader => \&_load_basename, rawtype => 'bool'},
     link_dotfile        => {loader => \&_load_basename, rawtype => 'bool'},
 );
 
@@ -216,9 +217,20 @@ sub _load_basename {
     my ($self) = @_;
     my $basename = File::Basename::basename($self->{path});
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $boring_extension = $self->instance->{boring_extension};
+    my $boring;
 
     $pv->{link_basename} = {raw => $basename};
     $pv->{link_dotfile}  = {raw => !!($basename =~ /^\./)};
+
+    $boring ||= $basename =~ /thumb/i;
+    $boring ||= $basename =~ /[\~\#]$/;
+
+    if ($basename =~ /\.([^\.]+)$/) {
+        $boring ||= $boring_extension->{fc($1)};
+    }
+
+    $pv->{link_basename_boring} = {raw => $boring};
 
     $basename =~ s/(.)(?:\.tar)?\.[^\.]+$/$1/;
     $basename =~ s/^[a-z]+\.[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\.(.)/$1/;
@@ -266,7 +278,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

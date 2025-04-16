@@ -8,9 +8,9 @@ use App::GitUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-30'; # DATE
+our $DATE = '2025-04-16'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.087'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
@@ -43,21 +43,27 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.086 of gu (from Perl distribution App-GitUtils), released on 2022-07-30.
+This document describes version 0.087 of gu (from Perl distribution App-GitUtils), released on 2025-04-16.
 
 =head1 SYNOPSIS
 
-% B<gu clone-to-bare> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--target-dir>=I<dirname>]
+B<gu> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<gu info> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+B<gu> B<L<--subcommands|/"--subcommands">>
 
-% B<gu post-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+B<gu> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-% B<gu pre-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+B<gu clone-to-bare> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--target-dir|/"--target-dir=s">>=I<L<dirname|Sah::Schema::dirname>>]
 
-% B<gu rh> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
+B<gu info> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
-% B<gu run-hook> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
+B<gu post-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+B<gu pre-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+B<gu rh> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+
+B<gu run-hook> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
 
 =head1 SUBCOMMANDS
 
@@ -393,7 +399,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/gLtTcp7C8L.conf>, F</home/s1/gLtTcp7C8L.conf>, or F</etc/gLtTcp7C8L.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/gu.conf>, F</home/u1/gu.conf>, or F</etc/gu.conf>.
 
 All found files will be read and merged.
 
@@ -426,8 +432,6 @@ List of available configuration parameters:
 
 =head2 Common for all subcommands
 
- format (see --format)
- naked_res (see --naked-res)
 
 =head2 Configuration for subcommand clone-to-bare
 
@@ -458,17 +462,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 GLTTCP7C8L_OPT => str
+=head2 GU_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/gLtTcp7C8L.conf>
+=head2 /home/u1/.config/gu.conf
 
-F</home/s1/gLtTcp7C8L.conf>
+=head2 /home/u1/gu.conf
 
-F</etc/gLtTcp7C8L.conf>
+=head2 /etc/gu.conf
 
 =head1 HOMEPAGE
 
@@ -502,7 +506,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

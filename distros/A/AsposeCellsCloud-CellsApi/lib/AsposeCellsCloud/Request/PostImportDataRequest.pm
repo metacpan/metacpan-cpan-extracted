@@ -63,7 +63,8 @@ sub new {
 # PostImportDataRequest.importOption : Import option. They are include of ImportCSVDataOption, ImportBatchDataOption, ImportPictureOption, ImportStringArrayOption, Import2DimensionStringArrayOption, and so on.    ,
 # PostImportDataRequest.folder : The folder where the file is situated.  ,
 # PostImportDataRequest.storageName : The storage name where the file is situated.  ,
-# PostImportDataRequest.region : The regional settings for workbook.   
+# PostImportDataRequest.region : The regional settings for workbook.  ,
+# PostImportDataRequest.FontsLocation : Use Custom fonts.   
 
 {
     my $params = {
@@ -114,6 +115,10 @@ sub run_http_request {
 
     if(defined $self->region){
         $query_params->{'region'} = $client->to_query_value($self->region);      
+    }
+
+    if(defined $self->fonts_location){
+        $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
     } 
     my $_body_data;
 
@@ -166,6 +171,13 @@ __PACKAGE__->method_documentation({
      	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
+     		},
+     'fonts_location' => {
+     	datatype => 'string',
+     	base_name => 'FontsLocation',
+     	description => 'Use Custom fonts.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -175,7 +187,8 @@ __PACKAGE__->attribute_map( {
     'import_option' => 'importOption',
     'folder' => 'folder',
     'storage_name' => 'storageName',
-    'region' => 'region' 
+    'region' => 'region',
+    'fonts_location' => 'FontsLocation' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::DataCleansing;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Ranges** | **ARRAY[Range]** |  |
+**Ranges** | **ARRAY[Range]** | A property named "Ranges" of type IList Range with a default value of an empty List of Range objects. |
 **NeedFillData** | **boolean** | Represents whether the data needs to be populated. |
 **DataFill** | **DataFill** | Represents data fill. |  
 

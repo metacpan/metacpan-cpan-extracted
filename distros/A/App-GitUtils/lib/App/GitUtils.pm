@@ -9,9 +9,9 @@ use Cwd qw(getcwd abs_path);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-30'; # DATE
+our $DATE = '2025-04-16'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.087'; # VERSION
 
 our %SPEC;
 
@@ -20,32 +20,28 @@ $SPEC{':package'} = {
     summary => 'Day-to-day command-line utilities for git',
 };
 
-our %argopt_dir = (
+our %argspecopt_dir = (
     dir => {
         summary => 'A directory inside git repo',
         schema => 'dirname*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If not specified, will assume current directory is inside git repository and
 will search `.git` upwards.
 
-_
+MARKDOWN
     },
 );
 
-our %args_common = (
-    %argopt_dir,
-);
-
-our %arg_target_dir = (
+our %argspec_target_dir = (
     target_dir => {
         summary => 'Target repo directory',
         schema => 'dirname*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If not specified, defaults to `$repodir.bare/`.
 
-_
+MARKDOWN
     },
 );
 
@@ -86,7 +82,7 @@ sub _search_git_dir {
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Information include:
 - Path of the git directory
@@ -97,13 +93,16 @@ Will return status 412 if working directory is not inside a git repository. Will
 return status 500 on errors, e.g. if `git` command cannot recognize the
 repository.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecopt_dir,
     },
     deps => {
         prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub info {
     my %args = @_;
@@ -132,11 +131,14 @@ $SPEC{list_hooks} = {
     v => 1.1,
     summary => 'List available hooks for the repository',
     args => {
-        %args_common,
+        %argspecopt_dir,
     },
     deps => {
         prog => 'git',
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub list_hooks {
     my %args = @_;
@@ -159,7 +161,7 @@ sub list_hooks {
 $SPEC{run_hook} = {
     v => 1.1,
     summary => 'Run a hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -167,9 +169,9 @@ Basically the same as:
 
 except can be done anywhere inside git repo and provides tab completion.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecopt_dir,
         name => {
             summary => 'Hook name, e.g. post-commit',
             schema => ['str*', match => '\A[A-Za-z0-9-]+\z'],
@@ -181,6 +183,9 @@ _
     deps => {
         prog => 'git',
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub run_hook {
     my %args = @_;
@@ -202,7 +207,7 @@ sub run_hook {
 $SPEC{post_commit} = {
     v => 1.1,
     summary => 'Run post-commit hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -210,10 +215,13 @@ Basically the same as:
 
 except can be done anywhere inside git repo.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecopt_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub post_commit {
     run_hook(name => 'post-commit');
@@ -222,7 +230,7 @@ sub post_commit {
 $SPEC{pre_commit} = {
     v => 1.1,
     summary => 'Run pre-commit hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -230,10 +238,13 @@ Basically the same as:
 
 except can be done anywhere inside git repo.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecopt_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub pre_commit {
     run_hook(name => 'pre-commit');
@@ -243,9 +254,12 @@ $SPEC{clone_to_bare} = {
     v => 1.1,
     summary => 'Clone repository to a bare repository',
     args => {
-        %args_common,
-        %arg_target_dir,
+        %argspecopt_dir,
+        %argspec_target_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub clone_to_bare {
     require IPC::System::Options;
@@ -274,6 +288,239 @@ sub clone_to_bare {
     [200];
 }
 
+$SPEC{status} = {
+    v => 1.1,
+    summary => 'Run "git status" and return information as a data structure',
+    description => <<'MARKDOWN',
+
+Currently incomplete!
+
+MARKDOWN
+    args => {
+    },
+};
+sub status {
+    require IPC::System::Options;
+
+    my %args = @_;
+
+    my $stdout;
+    IPC::System::Options::system(
+        {log=>1, die=>1, capture_stdout => \$stdout},
+        "git", "status",
+    );
+
+    my $res = [200, "OK", {}];
+    $stdout =~ /^On branch (.+)/ or do {
+        log_warn "Can't extract branch name";
+    };
+    $res->[2]{branch} = $1;
+    my @stdout_lines = split /^/m, $stdout;
+
+    LIST_STAGED:
+    {
+        my $in_staged;
+        my (@new_files, @modified, @deleted);
+        for my $line (@stdout_lines) {
+            if (!$in_staged) {
+                if ($line =~ /^Changes to be committed:/) {
+                    $in_staged = 1;
+                    next;
+                }
+            } elsif ($in_staged == 1) {
+                if ($line =~ /^\S/) {
+                    $in_staged = 2;
+                    next;
+                } elsif (my ($op, $path) = $line =~ /^\s+(new file:|modified:|deleted: )\s\s\s(.+)\R/) {
+                    if ($op eq 'new file:') {
+                        push @new_files, $path;
+                    } elsif ($op eq 'modified:') {
+                        push @modified, $path;
+                    } elsif ($op eq 'deleted: ') {
+                        push @deleted, $path;
+                    }
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{staged} = {
+            new_files => \@new_files,
+            modified => \@modified,
+            deleted => \@deleted,
+        };
+    } # LIST_STAGED
+
+    LIST_UNSTAGED:
+    {
+        my $in_unstaged;
+        my (@new_files, @modified, @deleted);
+        for my $line (@stdout_lines) {
+            if (!$in_unstaged) {
+                if ($line =~ /^Changes not staged for commit:/) {
+                    $in_unstaged = 1;
+                    next;
+                }
+            } elsif ($in_unstaged == 1) {
+                if ($line =~ /^\S/) {
+                    $in_unstaged = 2;
+                    next;
+                } elsif (my ($op, $path) = $line =~ /^\s+(new file:|modified:|deleted: )\s\s\s(.+)\R/) {
+                    if ($op eq 'new file:') {
+                        push @new_files, $path;
+                    } elsif ($op eq 'modified:') {
+                        push @modified, $path;
+                    } elsif ($op eq 'deleted: ') {
+                        push @deleted, $path;
+                    }
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{unstaged} = {
+            new_files => \@new_files,
+            modified => \@modified,
+            deleted => \@deleted,
+        };
+    } # LIST_UNSTAGED
+
+    LIST_UNTRACKED:
+    {
+        my $in_untracked;
+        my (@paths);
+        for my $line (@stdout_lines) {
+            if (!$in_untracked) {
+                if ($line =~ /^Untracked files:/) {
+                    $in_untracked = 1;
+                    next;
+                }
+            } elsif ($in_untracked == 1) {
+                if ($line =~ /^\S/) {
+                    $in_untracked = 2;
+                    next;
+                } elsif (my ($path) = $line =~ /^\t(.+)\R/) {
+                    push @paths, $path;
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{untracked} = \@paths;
+    } # LIST_UNTRACKED
+
+    $res;
+}
+
+$SPEC{list_committing_large_files} = {
+    v => 1.1,
+    summary => 'Check that added/modified files in staged/unstaged do not exceed a certain size',
+    description => <<'MARKDOWN',
+
+Will return an enveloped result with payload true containing added/modified
+files in staged/unstaged that are larger than a certain specified `max_size`.
+
+To be used in a pre-commit script, for example.
+
+Some applications: Github for example warns when a file is above 50MB and
+rejects when a file is above 100MB in size.
+
+MARKDOWN
+    args => {
+        max_size => {
+            schema => 'datasize*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub list_committing_large_files {
+    my %args = @_;
+    my $max_size = $args{max_size} or return [400, "Please specify max_size"];
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    my @files;
+    for my $file (
+        @{ $res->[2]{staged}{new_files} },
+        @{ $res->[2]{staged}{modified} },
+        @{ $res->[2]{unstaged}{new_files} },
+        @{ $res->[2]{unstaged}{modified} },
+    ) {
+        my $size = -s $file;
+        push @files, $file if $size > $max_size;
+    }
+    [200, "OK", \@files];
+}
+
+sub _calc_totsize_recurse {
+    require File::Find;
+
+    my $path = shift;
+    my $totsize = 0;
+
+    File::Find::find(
+        sub {
+            unless (-d $_) {
+                $totsize += -s $_;
+            }
+        },
+        $path,
+    );
+    $totsize;
+}
+
+$SPEC{calc_committing_total_size} = {
+    v => 1.1,
+    summary => 'Calculate the total sizes of files to add/delete/modify',
+    description => <<'MARKDOWN',
+
+To be used in pre-commit script, for example.
+
+Some applications: Github limits commit total size to 2GB.
+
+MARKDOWN
+    args => {
+        include_untracked => {
+            schema => 'bool*',
+            default => 1,
+        },
+    },
+};
+sub calc_committing_total_size {
+    my %args = @_;
+    my $include_untracked = $args{include_untracked} // 1;
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    # TODO: calculate deleted
+
+    my $totsize = 0;
+    for my $file (
+        @{ $res->[2]{staged}{new_files} },
+        @{ $res->[2]{staged}{modified} },
+        @{ $res->[2]{unstaged}{new_files} },
+        @{ $res->[2]{unstaged}{modified} },
+    ) {
+        my $size = -s $file;
+        $totsize += $size;
+    }
+
+    if ($include_untracked) {
+        for my $file (@{ $res->[2]{untracked} }) {
+            if ($file =~ m!/\z!) {
+                $totsize += _calc_totsize_recurse($file);
+            } else {
+                $totsize += -s $file;
+            }
+        }
+    }
+
+    [200, "OK", $totsize];
+}
+
 1;
 # ABSTRACT: Day-to-day command-line utilities for git
 
@@ -289,7 +536,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.086 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-07-30.
+This document describes version 0.087 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-04-16.
 
 =head1 SYNOPSIS
 
@@ -299,6 +546,10 @@ This distribution provides the following command-line utilities:
 
 =item * L<gu>
 
+=item * L<gu-calc-committing-total-size>
+
+=item * L<gu-list-committing-large-files>
+
 =item * L<this-repo>
 
 =back
@@ -307,6 +558,44 @@ These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
 
 =head1 FUNCTIONS
+
+
+=head2 calc_committing_total_size
+
+Usage:
+
+ calc_committing_total_size(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Calculate the total sizes of files to addE<sol>deleteE<sol>modify.
+
+To be used in pre-commit script, for example.
+
+Some applications: Github limits commit total size to 2GB.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<include_untracked> => I<bool> (default: 1)
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 clone_to_bare
@@ -381,6 +670,48 @@ A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
 will search C<.git> upwards.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 list_committing_large_files
+
+Usage:
+
+ list_committing_large_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Check that addedE<sol>modified files in stagedE<sol>unstaged do not exceed a certain size.
+
+Will return an enveloped result with payload true containing added/modified
+files in staged/unstaged that are larger than a certain specified C<max_size>.
+
+To be used in a pre-commit script, for example.
+
+Some applications: Github for example warns when a file is above 50MB and
+rejects when a file is above 100MB in size.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<max_size>* => I<datasize>
+
+(No description)
 
 
 =back
@@ -566,6 +897,33 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+
+
+=head2 status
+
+Usage:
+
+ status() -> [$status_code, $reason, $payload, \%result_meta]
+
+Run "git status" and return information as a data structure.
+
+Currently incomplete!
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 =head1 ENVIRONMENT
 
 =head2 GITUTILS_TRACE
@@ -615,7 +973,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

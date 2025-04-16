@@ -39,7 +39,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -55,6 +56,6 @@
          "web" : "https://github.com/briandfoy/business-isbn-data"
       }
    },
-   "version" : "20250411.001",
+   "version" : "20250416.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -18,11 +18,11 @@ use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
 use Data::Identifier v0.08;
+use Data::Identifier::Generate;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
-my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_CONFIG_INI_READER  = eval {require Config::INI::Reader; 1;};
 
@@ -76,6 +76,8 @@ my %_properties = (
     magic_valuefile_version => {loader => \&_load_magic, rawtype => 'uuid'},
     magic_valuefile_format  => {loader => \&_load_magic, rawtype => 'ise'},
     db_inode_tag            => {loader => \&_load_db,    rawtype => 'Data::TagDB::Tag'},
+    content_sha_3_512_uuid  => {loader => \&_load_contentise, rawtype => 'uuid'},
+    content_sha_1_160_sha_3_512_uuid => {loader => \&_load_contentise, rawtype => 'uuid'},
 );
 
 $_properties{$_}{rawtype} = 'unixts' foreach qw(st_atime st_mtime st_ctime);
@@ -96,30 +98,6 @@ if ($HAVE_XATTR) {
     $_properties{'xattr_utag_final_file_hash_size'} = {loader => \&_load_redirect, redirect => 'xattr_utag_final_file_hash'};
 
     $_properties{'ntfs_'.lc($_)} = {loader => \&_load_ntfs_xattr, ntfs_attribute => $_, rawtype => 'bool'} foreach keys %_ntfs_attributes;
-}
-
-if ($HAVE_UUID_TINY) {
-    $_properties{content_sha_3_512_uuid} = {loader => sub {
-            my ($self, $key, %opts) = @_;
-            my $lifecycle = $opts{lifecycle};
-            my $digest = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
-            if (defined $digest) {
-                my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '66d488c0-3b19-4e6c-856f-79edf2484f37', $digest);
-                (($self->{properties_values} //= {})->{$lifecycle} //= {})->{$key} = {raw => $uuid};
-            }
-        }, rawtype => 'uuid'};
-    $_properties{content_sha_1_160_sha_3_512_uuid} = {loader => sub {
-            my ($self, $key, %opts) = @_;
-            my $lifecycle = $opts{lifecycle};
-            my $digest_sha_1_160 = $self->digest('sha-1-160', as => 'utag', lifecycle => $lifecycle, default => undef);
-            my $digest_sha_3_512 = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
-            if (defined($digest_sha_1_160) && defined($digest_sha_3_512)) {
-                my $digest = $digest_sha_1_160.' '.$digest_sha_3_512;
-                $digest =~ s/^v0 /v0m /;
-                my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '66d488c0-3b19-4e6c-856f-79edf2484f37', $digest);
-                (($self->{properties_values} //= {})->{$lifecycle} //= {})->{$key} = {raw => $uuid};
-            }
-        }, rawtype => 'uuid'};
 }
 
 if ($HAVE_FILE_VALUEFILE) {
@@ -469,6 +447,26 @@ sub _load_stat {
         }
 
         $self->{_loaded_stat} = 1;
+    }
+}
+
+sub _load_contentise {
+    my ($self, $key, %opts) = @_;
+    my $lifecycle = $opts{lifecycle};
+    my $pv = ($self->{properties_values} //= {})->{$lifecycle} //= {};
+    my $digest_sha_1_160 = $self->digest('sha-1-160', as => 'utag', lifecycle => $lifecycle, default => undef);
+    my $digest_sha_3_512 = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
+
+    if (defined $digest_sha_3_512) {
+        my $id = Data::Identifier::Generate->generic(namespace => '66d488c0-3b19-4e6c-856f-79edf2484f37', input => $digest_sha_3_512);
+        $pv->{content_sha_3_512_uuid} = {raw => $id->uuid};
+    }
+
+    if (defined($digest_sha_1_160) && defined($digest_sha_3_512)) {
+        my $digest = $digest_sha_1_160.' '.$digest_sha_3_512;
+        $digest =~ s/^v0 /v0m /;
+        my $id = Data::Identifier::Generate->generic(namespace => '66d488c0-3b19-4e6c-856f-79edf2484f37', input => $digest);
+        $pv->{content_sha_1_160_sha_3_512_uuid} = {raw => $id->uuid};
     }
 }
 
@@ -920,7 +918,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

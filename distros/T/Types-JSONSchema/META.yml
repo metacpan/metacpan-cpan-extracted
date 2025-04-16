@@ -1,0 +1,54 @@
+---
+abstract: 'somewhat experimental conversion of JSON Schema schemas into Type::Tiny type constraints'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  JSON::PP: '0'
+  Path::Tiny: '0'
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-JSONSchema
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::JSONSchema:
+    file: lib/Types/JSONSchema.pm
+    version: '0.001000'
+  Types::JSONSchema::PrimativeTypes:
+    file: lib/Types/JSONSchema/PrimativeTypes.pm
+    version: '0.001000'
+requires:
+  Regexp::Common: '0'
+  Regexp::Common::Email::Address: '0'
+  Regexp::Common::time: '0'
+  Regexp::Util: '0'
+  Type::Tiny: '2.008000'
+  URI::Escape: '0'
+  perl: '5.036000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Types-JSONSchema/project
+  bugtracker: https://github.com/tobyink/p5-types-jsonschema/issues
+  homepage: https://metacpan.org/release/Types-JSONSchema
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-jsonschema.git
+version: '0.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

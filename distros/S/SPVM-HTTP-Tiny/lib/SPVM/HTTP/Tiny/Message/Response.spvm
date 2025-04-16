@@ -4,15 +4,8 @@
 class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   version_from HTTP::Tiny;
   
-  allow HTTP::Tiny::Handle;
-  allow HTTP::Tiny;
-  allow HTTP::Tiny::Daemon;
-  
   use HTTP::Tiny::Cookie::Response;
   use HTTP::Tiny::Date;
-  
-  # Old classes
-  use HTTP::Tiny::Status;
   
   # Class Variables
   our $MESSAGES_H : Hash of string;
@@ -85,26 +78,23 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   }
   
   # Fields
-  has code: ro int;
+  has code: rw int;
   
-  has message : string;
+  has message : rw string;
   
-  has max_message_size : int;
+  has max_message_size : rw int;
+  
+  method max_message_size_default : int () { return 2147483647; }
   
   # Undocumented Fields
   has start_buffer : string;
-  
-  # Old Fields
-  has protocol : ro string;
-  
-  has success : ro byte;
   
   # Class Methods
   static method new : HTTP::Tiny::Message::Response () {
     
     my $self = new HTTP::Tiny::Message::Response;
     
-    $self->{protocol} = "HTTP/1.1";
+    $self->SUPER::init;
     
     $self->{content_buffer} = StringBuffer->new;
     
@@ -112,49 +102,12 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
     
     $self->content->set_headers(HTTP::Tiny::Headers->new);
     
-    $self->{max_message_size} = 2147483647;
+    $self->{max_message_size} = -1;
     
     return $self;
   }
   
   # Instance Methods
-  method message : string () {
-    
-    my $status = $self->{code};
-    
-    my $message = HTTP::Tiny::Status->status_message($status);
-    
-    return $message;
-  }
-  
-  method build_start_line : string () {
-    
-    my $status = $self->{code};
-    
-    my $message = $self->message;
-    
-    my $start_line = "HTTP/1.1 $status $message\x0d\x0a";
-    
-    return $start_line;
-  }
-  
-  method build_headers : string () {
-    # TODO
-    
-    return undef;
-  }
-  
-  method build_body : string (){
-    # TODO
-    
-    return undef;
-  }
-  
-  method parse : void ($chunk : string) {
-    
-    die "TODO";
-  }
-  
   method cookies : HTTP::Tiny::Cookie::Response[] () {
     
     # Parse cookies

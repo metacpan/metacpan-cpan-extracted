@@ -47,6 +47,10 @@ my %IMAGES = (
 	azw3  => 2,
 );
 
+my %CUSTOM_ENC = map { $_ => 1 } qw(
+	html pdb txt ztxt
+);
+
 my $tmpout = do {
 	my ($fh, $tmp) = tempfile(UNLINK => 1);
 	close $fh;
@@ -124,6 +128,12 @@ for my $f (@FILES) { SKIP: {
 	$ishmael = EBook::Ishmael->init();
 
 	ok($ishmael->run, "cp1252 -r w/ $file ok");
+
+	if (exists $CUSTOM_ENC{ $file }) {
+		@ARGV = (qw(-r -I UTF-8), $f, $tmpout);
+		$ishmael = EBook::Ishmael->init();
+		ok($ishmael->run, "-I w/ $file ok");
+	}
 
 	@ARGV = ('-c', $f, $tmpout);
 	$ishmael = EBook::Ishmael->init();

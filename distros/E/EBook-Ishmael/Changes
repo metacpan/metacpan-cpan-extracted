@@ -1,5 +1,15 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.06  Apr 15 2025
+  - Added -I|--file-encoding option: Specify the character encoding of the ebook
+    file's text. This option only applies to ebook formats that do not specify
+    their character encoding.
+    - The addition of this option means that non-UTF-8 PalmDocs, zTXTs, and
+      plain text files are now better supported.
+  - Added -t|--text option: Manually specify formatted text dump mode (the
+    default mode).
+  - Fix typos in documentation.
+
 1.05  Apr 01 2025
   - Fix indefinite hang in formatted text dump for pre-5.34 perls.
   - Fix character mapping errors in -e option.

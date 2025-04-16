@@ -77,7 +77,7 @@ use vars qw( $VERSION );
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-$VERSION = '2.004';
+$VERSION = '2.005';
 
 use DBI;
 

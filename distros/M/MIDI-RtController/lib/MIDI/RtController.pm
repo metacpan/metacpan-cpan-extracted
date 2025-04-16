@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0700';
+our $VERSION = '0.0702';
 
 use Moo;
 use strictures 2;
@@ -166,15 +166,14 @@ sub run ($self) {
 
 sub open_controllers ($inputs, $output, $verbose) {
     my %controllers;
-    my @inputs = split /,/, $inputs;
-    my $name = $inputs[0];
+    my $name = $inputs->[0];
     my $control = __PACKAGE__->new(
         input   => $name,
         output  => $output,
         verbose => $verbose,
     );
     $controllers{$name} = $control;
-    for my $i (@inputs[1 .. $#inputs]) {
+    for my $i (@$inputs[1 .. $#$inputs]) {
         $controllers{$i} = __PACKAGE__->new(
             input    => $i,
             loop     => $control->loop,
@@ -199,7 +198,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0700
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -340,10 +339,17 @@ Run the asynchronous B<loop>!
 
 =head2 open_controllers
 
-  $controllers = $control->open_controllers($inputs, $output);
+  $controllers = MIDI::RtController::open_controllers(
+    \@inputs, $output_name, $verbose
+  );
 
 Return a hash reference of C<MIDI::RtController> instances, keyed by
-a comma-separated string of MIDI input controller device names.
+each input (given by an array reference of MIDI controller device
+names like C<[keyboard,pad,joystick]>).
+
+The B<output_name> (e.g. C<usb>) is used for the MIDI output device
+for each instance. The B<verbose> Boolean flag is passed to the
+instances.
 
 =head1 THANK YOU
 

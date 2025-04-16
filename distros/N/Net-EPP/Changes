@@ -1,0 +1,5 @@
+Revision history for perl module Net::EPP:
+
+0.28 - 2025-04-16
+  - added this file.
+  - fixed the XML namespace URI of the RGP extension in Net::EPP::Frame::ObjectSpec.

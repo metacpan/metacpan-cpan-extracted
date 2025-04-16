@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::SaveFilesToCloudResult;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SavedFiles** | **ARRAY[Link]** |  |
+**SavedFiles** | **ARRAY[Link]** | This class has a property named SavedFiles of type List Link. |
 **Description** | **string** |  |
 **OutFileList** | **ARRAY[DataSource]** |  |  
 

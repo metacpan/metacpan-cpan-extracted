@@ -4,6 +4,8 @@ use warnings;
 use strict;
 
 use Carp;
+use Config::Abstraction;
+use Data::Reuse;
 use File::Spec;
 use Module::Info;
 use Genealogy::ObituaryDailyTimes::obituaries;
@@ -22,13 +24,15 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
+
+Looks up obituaries from the Obituary Daily Times and other places.
 
     use Genealogy::ObituaryDailyTimes;
     my $info = Genealogy::ObituaryDailyTimes->new();
@@ -48,7 +52,16 @@ Accepts the following optional arguments:
 
 =item * C<cache> - Passed to L<Database::Abstraction>
 
-=item * C<directory> - The directory containing the file obituaries.sql
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
+=item * C<directory>
+
+The directory containing the file obituaries.sql.
+If only one argument is given to C<new()>, it is taken to be C<directory>.
 
 =item * C<logger> - Passed to L<Database::Abstraction>
 
@@ -56,9 +69,19 @@ Accepts the following optional arguments:
 
 =cut
 
-sub new {
+sub new
+{
 	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
+
+	# Handle hash or hashref arguments
+	if(ref($_[0]) eq 'HASH') {
+		%args = %{$_[0]};
+	} elsif((scalar(@_) % 2) == 0) {
+		%args = @_;
+	} elsif(scalar(@_) == 1) {
+		$args{'directory'} = shift;
+	}
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
@@ -72,6 +95,15 @@ sub new {
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
+	}
+
+	# Load the configuration from a config file, if provided
+	if(exists($args{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $args{'config_file'})->all())) {
+		# my $config = YAML::XS::LoadFile($args{'config_file'});
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		%args = (%{$config}, %args);
 	}
 
 	my $directory = $args{'directory'} || $Database::Abstraction{'defaults'}{'directory'};
@@ -130,7 +162,7 @@ sub search
 		return;
 	}
 
-	$self->{'obituaries'} ||= Genealogy::ObituaryDailyTimes::obituaries->new(no_entry => 1, %{$self});
+	$self->{'obituaries'} ||= Genealogy::ObituaryDailyTimes::obituaries->new(no_entry => 1, no_fixate => 1, %{$self});
 
 	if(!defined($self->{'obituaries'})) {
 		Carp::croak("Can't open the obituaries database");
@@ -145,6 +177,7 @@ sub search
 	}
 	if(defined(my $obit = $self->{'obituaries'}->fetchrow_hashref($params))) {
 		$obit->{'url'} = _create_url($obit);
+		Data::Reuse::fixate(%{$obit});
 		return $obit;
 	}
 	return;	# undef

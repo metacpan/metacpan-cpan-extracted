@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -92,10 +92,12 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
 
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		Encode   => $enc,
 		_dom     => undef,
 	};
 
@@ -106,6 +108,7 @@ sub new {
 	$self->{_dom} = XML::LibXML->load_html(
 		location => $file,
 		recover => 2,
+		encoding => $self->{Encode},
 	);
 
 	$self->_read_metadata;

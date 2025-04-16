@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0902 2025-04-15 10:40:11
+  - Align the eg/multi.pl program with RtController.
+
+0.0901 2025-04-15 09:35:59
+  - Fix docs.
+
 0.0900 2025-04-15 01:11:11
   - Add the add_filters() utility function.
   - Improve documentation.

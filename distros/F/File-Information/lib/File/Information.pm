@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -42,7 +42,7 @@ sub new {
         }
     }
 
-    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit mountinfo_path);
+    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit mountinfo_path boring_sizelimit boring_extension);
 
     $self->{digest_sizelimit} //= 512*1024*1024; # 512MB
 
@@ -51,6 +51,19 @@ sub new {
     } else {
         $self->{digest_sizelimit} =  int($self->{digest_sizelimit}); # ensure it's an int. This will also set to 0 in case of error.
         $self->{digest_sizelimit} = 0 if $self->{digest_sizelimit} < 0;
+    }
+
+    $self->{boring_sizelimit} //= 128;
+    $self->{boring_sizelimit}   = int($self->{boring_sizelimit});
+
+    $self->{boring_extension} //= [qw(o bakX old orig part rej swp tmp dpkg-dist dpkg-old ucf-dist ucf-new ucf-old rpmnew rpmorig rpmsave)];
+    $self->{boring_extension}   = [split/(?:\s*,\s*|\s+)/, $self->{boring_extension}] unless ref $self->{boring_extension};
+
+    $self->{boring_extension}   = {map {fc($_) => 1} @{$self->{boring_extension}}};
+
+    if (defined(my $boring_extension_add = $opts{boring_extension_add})) {
+        $boring_extension_add = [split/(?:\s*,\s*|\s+)/, $boring_extension_add] unless ref $boring_extension_add;
+        $self->{boring_extension}{fc($_)} = 1 foreach @{$boring_extension_add};
     }
 
     if (defined $opts{digest_unsafe}) {
@@ -505,7 +518,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -557,6 +570,26 @@ An instance of L<Data::URIID> used to create related objects.
 =item C<db>
 
 An instance of L<Data::TagDB> used to interact with a database.
+
+=item C<boring_extension>
+
+A list of file name extensions considered boring.
+This is a list (arrayref) of extensions (with no leading dot).
+Duplicates are eliminated.
+Defaults to a list suitable for most cases.
+To disable set to C<[]> and keep C<boring_extension_add> unset.
+
+=item C<boring_extension_add>
+
+Same as C<boring_extension>,
+however does only add entries and does not remove the default entries or those provided by C<boring_extension>.
+
+=item C<boring_sizelimit>
+
+The limit (in bytes) for boring files.
+A file is considered boring if it is smaller than this limit (or any other boring rule applies).
+To disable, set this value to C<-1>.
+The default is adequate for most usecases. It is no bigger than 512KB (likely much lower).
 
 =item C<tagpool_rc>
 

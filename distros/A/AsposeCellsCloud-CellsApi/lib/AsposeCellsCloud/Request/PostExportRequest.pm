@@ -64,7 +64,8 @@ sub new {
 # PostExportRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
 # PostExportRequest.password : The password needed to open an Excel file.  ,
 # PostExportRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
-# PostExportRequest.region : The regional settings for workbook.   
+# PostExportRequest.region : The regional settings for workbook.  ,
+# PostExportRequest.FontsLocation : Use Custom fonts.   
 
 {
     my $params = {
@@ -119,6 +120,10 @@ sub run_http_request {
 
     if(defined $self->region){
         $query_params->{'region'} = $client->to_query_value($self->region);      
+    }
+
+    if(defined $self->fonts_location){
+        $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
     } 
     my $_body_data;
  
@@ -181,6 +186,13 @@ __PACKAGE__->method_documentation({
      	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
+     		},
+     'fonts_location' => {
+     	datatype => 'string',
+     	base_name => 'FontsLocation',
+     	description => 'Use Custom fonts.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -191,7 +203,8 @@ __PACKAGE__->attribute_map( {
     'format' => 'format',
     'password' => 'password',
     'check_excel_restriction' => 'checkExcelRestriction',
-    'region' => 'region' 
+    'region' => 'region',
+    'fonts_location' => 'FontsLocation' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 my %_valid_new_opts = (
     db          => 'Data::TagDB',
@@ -194,7 +194,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -254,8 +254,9 @@ This module accepts all types as long as they implement a method alike L<Data::I
 
 This is true for at least
 L<Data::Identifier>,
-L<Data::TagDB::Tag>, and
-L<Data::URIID::Base> (which many L<Data::URIID> related packages inherit from).
+L<Data::TagDB::Tag>,
+L<Data::URIID::Base> (which many L<Data::URIID> related packages inherit from), and
+L<File::FStore::Base> (as long as they implement L<File::FStore::Base/contentise>).
 
 The ISE value returned is internally used as the primary key (for deduplication and equality checks).
 
@@ -301,7 +302,7 @@ Also some packages need special options to be passed to be available.
 If C<$cl> is or may not be a L<Data::Identifier::Cloudlet> this method tries to convert it to one first.
 If C<$cl> is a collection without the root/entry flag, then all entries are considered root entries.
 
-If C<$identifier> is a C<$as> (see also C<rawtype> below) then C<$identifier> is returned as-is,
+If C<$cl> is a C<$as> (see also C<rawtype> below) then C<$cl> is returned as-is,
 even if C<$as> would not be supported otherwise.
 
 See also:

@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-my $min_ver = 1.36;
+my $min_ver = 1.41;
 eval "use Map::Tube::London $min_ver";
 plan skip_all => "Map::Tube::London $min_ver required for this test" if $@;
 

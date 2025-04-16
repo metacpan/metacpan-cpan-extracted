@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -33,9 +33,11 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Config::Abstraction" : "0",
             "DBD::SQLite" : "0",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "Data::Reuse" : "0",
             "Database::Abstraction" : "0.04",
             "Error::Simple" : "0",
             "ExtUtils::MakeMaker" : "6.64",
@@ -63,6 +65,7 @@
       },
       "test" : {
          "requires" : {
+            "FindBin" : "0",
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
@@ -87,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

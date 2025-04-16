@@ -1,3 +1,7 @@
+0.011 2025-04-16
+  [Internal Changes]
+    * Implement internal classes.
+    * Remove some internal classes.
 0.010 2025-04-14
   [Requirement Changes]
     * Require MIME::Base64 1.003.

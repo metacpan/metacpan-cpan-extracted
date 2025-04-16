@@ -561,6 +561,7 @@ sub new
 
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
+	$url =~ s/\?list\=.*$//;  #yt-dlp SEEMS TO JUST HANG ON "lists" (TRYING TO FETCH A LIST OF VIDEOS?!).
 	(my $url2fetch = $url);
 	$self->{'_isaYtPage'} = 1;
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;

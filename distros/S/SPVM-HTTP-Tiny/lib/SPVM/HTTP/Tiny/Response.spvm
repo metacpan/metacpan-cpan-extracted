@@ -8,7 +8,6 @@ class HTTP::Tiny::Response {
   allow HTTP::Tiny;
   
   use HTTP::Tiny::Headers;
-  use HTTP::Tiny::Status;
   
   has response : HTTP::Tiny::Message::Response;
   
@@ -27,7 +26,11 @@ class HTTP::Tiny::Response {
     
     my $res = $self->{response};
     
-    return $res->protocol;
+    my $version = $res->version;
+    
+    my $protocol = "HTTP/$version";
+    
+    return $protocol;
   }
   
   method status : int () {
@@ -39,21 +42,18 @@ class HTTP::Tiny::Response {
   
   method success : int () {
     
-    my $status = $self->status;
+    my $res = $self->{response};
     
-    my $success = 0;
-    if ($status >= 200 & $status < 300) {
-      $success = 1;
-    }
+    my $success = $res->is_success;
     
     return $success;
   }
   
   method reason : string () {
     
-    my $status = $self->status;
+    my $res = $self->{response};
     
-    my $reason = HTTP::Tiny::Status->status_message($status);
+    my $reason = $res->message;
     
     return $reason;
   }
@@ -69,7 +69,9 @@ class HTTP::Tiny::Response {
     
     my $res = $self->{response};
     
-    my $content = $res->content_v0;
+    # my $content = $res->content_v0;
+    
+    my $content = $res->content->(HTTP::Tiny::Content::Single)->asset->slurp;
     
     return $content;
   }

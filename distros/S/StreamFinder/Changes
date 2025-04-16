@@ -711,3 +711,10 @@ Revision history for StreamFinder
         - StreamFinder::SermonAudio - Fix failure to return description 
         field and sometimes incorrect icon and image URLs due to slight changes 
         to their site.  Also try harder to find description.
+2.44    - StreamFinder::Rumble - Add "-order" option & refactor to better deal 
+        with their recent addition of m3u8(hls) streams; and, if accepted, 
+        force audio-only (aac) stream-option to last (for use if no streams 
+        fall within the user's max. bandwidth/quality limit options.  Also 
+        exclude their new "video-only" streams ("*.[A-Z]aa.mp4*" urls).
+        - StreamFinder::Youtube - Strip "?list=..." part off Youtube video urls 
+        to prevent fetch "hanging" issue.

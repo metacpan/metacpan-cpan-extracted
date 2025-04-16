@@ -21,19 +21,19 @@ name: ExtUtils-Typemaps-Misc
 provides:
   ExtUtils::Typemaps::IntObj:
     file: lib/ExtUtils/Typemaps/IntObj.pm
-    version: '0.003'
+    version: '0.004'
   ExtUtils::Typemaps::Misc:
     file: lib/ExtUtils/Typemaps/Misc.pm
-    version: '0.003'
+    version: '0.004'
   ExtUtils::Typemaps::OpaqueObj:
     file: lib/ExtUtils/Typemaps/OpaqueObj.pm
-    version: '0.003'
+    version: '0.004'
   ExtUtils::Typemaps::PackedVal:
     file: lib/ExtUtils/Typemaps/PackedVal.pm
-    version: '0.003'
+    version: '0.004'
   ExtUtils::Typemaps::Slurp:
     file: lib/ExtUtils/Typemaps/Slurp.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   ExtUtils::Typemaps: '0'
   parent: '0'
@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/extutils-typemaps-misc/issues
   repository: git://github.com/Leont/extutils-typemaps-misc.git
-version: '0.003'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.004'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

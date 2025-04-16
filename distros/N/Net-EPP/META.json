@@ -4,7 +4,7 @@
       "Gavin Brown <gavin.brown@fastmail.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,6 +52,6 @@
          "web" : "https://github.com/gbxyz/perl-net-epp"
       }
    },
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

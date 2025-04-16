@@ -7,7 +7,7 @@ use Net::EPP::ResponseCodes;
 use Net::EPP::Simple;
 use strict;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 1;
 

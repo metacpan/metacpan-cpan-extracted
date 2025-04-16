@@ -16,7 +16,7 @@ use parent 'File::Information::Base';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %_properties = (
     pdf_version     => {loader => \&_load_pdf},
@@ -372,7 +372,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

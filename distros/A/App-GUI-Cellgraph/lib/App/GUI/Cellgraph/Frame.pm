@@ -8,14 +8,14 @@ use Wx::AUI;
 
 package App::GUI::Cellgraph::Frame;
 use base qw/Wx::Frame/;
-use App::GUI::Cellgraph::Widget::ProgressBar;
-use App::GUI::Cellgraph::Frame::Panel::General;
-use App::GUI::Cellgraph::Frame::Panel::Start;
-use App::GUI::Cellgraph::Frame::Panel::Rules;
-use App::GUI::Cellgraph::Frame::Panel::Action;
-use App::GUI::Cellgraph::Frame::Panel::Color;
-use App::GUI::Cellgraph::Frame::Part::Board;
 use App::GUI::Cellgraph::Dialog::About;
+use App::GUI::Cellgraph::Frame::Tab::General;
+use App::GUI::Cellgraph::Frame::Tab::Start;
+use App::GUI::Cellgraph::Frame::Tab::Rules;
+use App::GUI::Cellgraph::Frame::Tab::Action;
+use App::GUI::Cellgraph::Frame::Tab::Color;
+use App::GUI::Cellgraph::Frame::Panel::Board;
+use App::GUI::Cellgraph::Widget::ProgressBar;
 use App::GUI::Cellgraph::Settings;
 use App::GUI::Cellgraph::Config;
 
@@ -35,22 +35,22 @@ sub new {
 
     # create GUI parts
     $self->{'tabs'}            = Wx::AuiNotebook->new( $self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
-    $self->{'panel'}{'global'} = App::GUI::Cellgraph::Frame::Panel::General->new( $self->{'tabs'}, $sr_calc );
-    $self->{'panel'}{'start'}  = App::GUI::Cellgraph::Frame::Panel::Start->new(  $self->{'tabs'} );
-    $self->{'panel'}{'rules'}  = App::GUI::Cellgraph::Frame::Panel::Rules->new(  $self->{'tabs'}, $sr_calc );
-    $self->{'panel'}{'action'} = App::GUI::Cellgraph::Frame::Panel::Action->new( $self->{'tabs'}, $sr_calc );
-    $self->{'panel'}{'color'}  = App::GUI::Cellgraph::Frame::Panel::Color->new(  $self->{'tabs'}, $self->{'config'} );
-    $self->{'panel_names'} = [keys %{$self->{'panel'}}];
-    $self->{'panel'}{$_}->set_callback( sub { $self->sketch( $_[0] ) } ) for @{$self->{'panel_names'}};
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'global'}, 'General Settings');
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'start'},  'Starting Row');
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'rules'},  'State Rules');
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'action'}, 'Action Rules');
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'color'},  'Colors');
+    $self->{'tab'}{'global'} = App::GUI::Cellgraph::Frame::Tab::General->new( $self->{'tabs'}, $sr_calc );
+    $self->{'tab'}{'start'}  = App::GUI::Cellgraph::Frame::Tab::Start->new(  $self->{'tabs'} );
+    $self->{'tab'}{'rules'}  = App::GUI::Cellgraph::Frame::Tab::Rules->new(  $self->{'tabs'}, $sr_calc );
+    $self->{'tab'}{'action'} = App::GUI::Cellgraph::Frame::Tab::Action->new( $self->{'tabs'}, $sr_calc );
+    $self->{'tab'}{'color'}  = App::GUI::Cellgraph::Frame::Tab::Color->new(  $self->{'tabs'}, $self->{'config'} );
+    $self->{'tab_names'} = [keys %{$self->{'tab'}}];
+    $self->{'tab'}{$_}->set_callback( sub { $self->sketch( $_[0] ) } ) for @{$self->{'tab_names'}};
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'global'}, 'General Settings');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'start'},  'Starting Row');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'rules'},  'State Rules');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'action'}, 'Action Rules');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'color'},  'Colors');
     $self->{'tabs'}{'selected'} = 0;
-    $self->{'progress'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 320, 10, $self->{'panel'}{'color'}->get_active_colors);
+    $self->{'progress_bar'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 320, 10, $self->{'tab'}{'color'}->get_active_colors);
 
-    $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self, 700 );
+    $self->{'board'}               = App::GUI::Cellgraph::Frame::Panel::Board->new( $self, 700 );
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
     $self->{'btn'}{'draw'} = $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[50, 40] );
 
@@ -58,7 +58,7 @@ sub new {
         $self->{'tabs'}{'selected'} = $self->{'tabs'}->GetSelection unless $self->{'tabs'}->GetSelection == $self->{'tabs'}->GetPageCount - 1;
     });
     Wx::Event::EVT_CLOSE( $self, sub {
-        $self->{'panel'}{'color'}->update_config;
+        $self->{'tab'}{'color'}->update_config;
         $self->{'config'}->save();
         $self->{'dialog'}{$_}->Destroy() for qw/about/; # interface function
         $_[1]->Skip(1)
@@ -121,7 +121,7 @@ sub new {
     my $paint_lbl = Wx::StaticText->new( $self, -1, 'Grid Status:' );
     my $draw_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     $draw_sizer->Add( $paint_lbl,                  0, $all_attr, 15 );
-    $draw_sizer->Add( $self->{'progress'},         0, &Wx::wxALIGN_CENTER_VERTICAL, 10 );
+    $draw_sizer->Add( $self->{'progress_bar'},         0, &Wx::wxALIGN_CENTER_VERTICAL, 10 );
     $draw_sizer->AddSpacer(5);
     $draw_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
     $draw_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
@@ -169,20 +169,19 @@ sub update_recent_settings_menu {
 
 sub init {
     my ($self) = @_;
-    $self->{'panel'}{ $_ }->init() for @{$self->{'panel_names'}};
+    $self->{'tab'}{ $_ }->init() for @{$self->{'tab_names'}};
     $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 0);
     $self->set_settings_save(1);
 }
 
-sub get_state    { return { map { $_ => $_[0]->{'panel'}{$_}->get_state } @{$_[0]->{'panel_names'}} }}
-sub get_settings { return { map { $_ => $_[0]->{'panel'}{$_}->get_settings } @{$_[0]->{'panel_names'}} }}
+sub get_state    { return { map { $_ => $_[0]->{'tab'}{$_}->get_state } @{$_[0]->{'tab_names'}} }}
+sub get_settings { return { map { $_ => $_[0]->{'tab'}{$_}->get_settings } @{$_[0]->{'tab_names'}} }}
 
 sub set_settings {
     my ($self, $settings) = @_;
-    $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
+    $self->{'tab'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'tab_names'}};
     $self->spread_setting_changes;
-    $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
 }
 
 sub set_settings_save {
@@ -193,28 +192,28 @@ sub set_settings_save {
 
 sub spread_setting_changes {
     my ($self, $settings) = @_;
-    my $global = (ref $settings eq 'HASH') ? $settings->{'global'} : $self->{'panel'}{'global'}->get_settings;
-    $self->{'panel'}{'color'}->set_state_count( $global->{'state_count'} );
-    $self->{'panel'}{'color'}->set_settings( $settings->{'color'} ) if ref $settings eq 'HASH';
-    $self->{'panel'}{'global'}->set_settings( $settings->{'global'} ) if ref $settings eq 'HASH';
-    my @state_colors = $self->{'panel'}{'color'}->get_active_colors;
-    $self->{'panel'}{'start'}->update_cell_colors( @state_colors );
-    $self->{'panel'}{'rules'}->regenerate_rules( @state_colors );
-    $self->{'panel'}{'action'}->regenerate_rules( @state_colors );
-    $self->{'progress'}->set_colors( @state_colors );
+    my $global = (ref $settings eq 'HASH') ? $settings->{'global'} : $self->{'tab'}{'global'}->get_settings;
+    $self->{'tab'}{'color'}->set_state_count( $global->{'state_count'} );
+    $self->{'tab'}{'color'}->set_settings( $settings->{'color'} ) if ref $settings eq 'HASH';
+    $self->{'tab'}{'global'}->set_settings( $settings->{'global'} ) if ref $settings eq 'HASH';
+    my @state_colors = $self->{'tab'}{'color'}->get_active_colors;
+    $self->{'tab'}{'start'}->update_cell_colors( @state_colors );
+    $self->{'tab'}{'rules'}->regenerate_rules( @state_colors );
+    $self->{'tab'}{'action'}->regenerate_rules( @state_colors );
+    $self->{'progress_bar'}->set_colors( @state_colors );
 }
 sub sketch {
     my ($self) = @_;
     $self->spread_setting_changes();
     $self->{'board'}->sketch( $self->get_state );
-    $self->{'progress'}->reset;
+    $self->{'progress_bar'}->reset;
     $self->set_settings_save( 0 );
 }
 sub draw {
     my ($self) = @_;
     $self->spread_setting_changes();
     $self->{'board'}->draw( $self->get_state );
-    $self->{'progress'}->full;
+    $self->{'progress_bar'}->full;
 }
 
 sub open_settings_dialog {

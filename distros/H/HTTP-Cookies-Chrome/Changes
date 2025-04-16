@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Cookies::Chrome
 
+2.005 2025-04-16T06:41:18Z
+	* require a newer version.pm for v5.10.1 tests
+
 2.004 2025-02-11T16:16:32Z
 	* removed some stray debugging statements
 	* fixed a problem with MANIFEST referring to an old file (#12)

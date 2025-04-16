@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -61,10 +61,12 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift // 'UTF-8';
 
 	my $self = {
 		Source       => undef,
 		Metadata     => EBook::Ishmael::EBook::Metadata->new,
+		Encoding     => $enc,
 		_pdb         => undef,
 		_compression => undef,
 		_textlen     => undef,
@@ -129,7 +131,7 @@ sub html {
 	my $out  = shift;
 
 	my $html = decode(
-		'UTF-8',
+		$self->{Encoding},
 		text2html(
 			join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
 		),
@@ -154,7 +156,7 @@ sub raw {
 	my $out  = shift;
 
 	my $raw = decode(
-		'UTF-8',
+		$self->{Encoding},
 		join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
 	);
 

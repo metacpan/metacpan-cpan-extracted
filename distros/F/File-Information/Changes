@@ -1,3 +1,7 @@
+v0.08  2025-04-15Z
+    - Added property "boring"
+    - Removed dependency on UUID::Tiny
+
 v0.07  2025-04-11Z
     - Fixed error with too old versions of PDF::API2
     - Added no_defaults support to digest calculation to query but not calculate digests

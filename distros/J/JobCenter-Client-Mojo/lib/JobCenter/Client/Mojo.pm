@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.47'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -25,11 +25,12 @@ use Encode qw(encode_utf8 decode_utf8);
 use File::Basename;
 use IO::Handle;
 use POSIX ();
+use Scalar::Util qw(weaken);
 use Storable;
 use Sys::Hostname;
 
 # from cpan
-use JSON::RPC2::TwoWay 0.05;
+use JSON::RPC2::TwoWay 0.07;
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
 use JSON::MaybeXS qw(JSON);
@@ -109,8 +110,19 @@ sub connect {
 		$self->ioloop->stop;
 	});
 
+	my $debug = do {
+		weaken(my $self = $self);
+		$self->{debug} ? sub {
+			if ($self->{log}) {
+				$self->log->debug(@_);
+			} else {
+				warn join(' ', @_)."\n";
+			}
+		} : undef
+	};
+
 	my $rpc = JSON::RPC2::TwoWay->new(
-		debug => $self->{debug},
+		debug => $debug,
 		json => $self->{jsonobject},
 	) or croak 'no rpc?';
 	$rpc->register('greetings', sub { $self->rpc_greetings(@_) }, notification => 1);

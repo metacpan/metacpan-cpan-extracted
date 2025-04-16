@@ -18,4 +18,5 @@ t/01_load.t
 t/02_uuid.t
 t/10_mixandmatch.t
 t/20_generate.t
+t/30_cloudlet.t
 xt/author/pod-syntax.t

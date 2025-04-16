@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9909 2025-04-16T08:51:03Z
+
+    - make sure to use GNU Make
+    - fix .xlaterc read bug
+    - introduce experimental "xlate -J" option
+
 0.9908 2025-03-17T00:40:36Z
 
     - install App::Greple::L

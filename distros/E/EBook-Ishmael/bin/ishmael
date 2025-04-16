@@ -106,11 +106,35 @@ Can also be set by the C<ISHMAEL_ENCODING> environment variable.
 
 If not specified, the default encoding is C<utf8>.
 
+=item B<-I>|B<--file-encoding>=I<enc>
+
+Specify the input file's character encoding. This option only works for the
+following ebook formats, where it can be impossible in some situations for
+B<ishmael> to determine the text character encoding.
+
+=over 4
+
+=item HTML
+
+=item PalmDoc
+
+=item zTXT
+
+=item Text
+
+=back
+
+For a list of supported encodings, please consult the Perl documentation for
+L<Encode::Supported>.
+
+The default character encoding can vary depending on the ebook format, but is
+usually C<UTF-8>.
+
 =item B<-f>|B<--format>=I<format>
 
 Instead of trying to determine the given ebook format via a series of
 heuristics, manually specify the format. The following are valid options
-(caes does not matter):
+(case does not matter):
 
 =over 4
 
@@ -149,6 +173,11 @@ heuristics, manually specify the format. The following are valid options
 =item B<-w>|B<--width>=I<width>
 
 Specify the formatted text line width. Defaults to C<80>.
+
+=item B<-t>|B<--text>
+
+Dump the formatted text contents of the ebook. This is equivalent to running
+B<ishmael> without specifying a dump mode.
 
 =item B<-H>|B<--html>
 

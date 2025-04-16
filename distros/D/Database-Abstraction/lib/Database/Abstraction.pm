@@ -53,11 +53,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 DESCRIPTION
 
@@ -125,6 +125,9 @@ entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no_entry' to the constructor, for legacy
 reasons it's enabled by default.
 The key column's default name is 'entry', but it can be overridden by the 'id' parameter.
+
+Arrays are made read-only before being returned.
+To disable that, pass C<no_fixate> to the constructor.
 
 CSV files that are not no_entry can have empty lines or comment lines starting with '#',
 to make them more readable.
@@ -349,6 +352,7 @@ sub new {
 	# Re-seen keys take precedence, so defaults come first
 	return bless {
 		no_entry => 0,
+		no_fixate => 0,
 		id => 'entry',
 		cache_duration => '1 hour',
 		max_slurp_size => DEFAULT_MAX_SLURP_SIZE,
@@ -623,7 +627,7 @@ sub _open
 		}
 	}
 
-	# TODO: fixate $self->{'data'} if $self->{'data'}
+	Data::Reuse::fixate(%{$self->{'data'}}) if($self->{'data'} && (ref($self->{'data'} eq 'HASH')));
 
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
@@ -648,7 +652,7 @@ sub selectall_hashref {
 	my $self = shift;
 
 	my @rc = $self->selectall_hash(@_);
-	Data::Reuse::fixate(@rc);
+	Data::Reuse::fixate(@rc) if(!$self->{'no_fixate'});
 	return \@rc;
 }
 
@@ -1210,7 +1214,7 @@ sub AUTOLOAD {
 		if($cache) {
 			$cache->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
-		Data::Reuse::fixate(@rc);
+		Data::Reuse::fixate(@rc) if(!$self->{'no_fixate'});
 		return @rc;
 	}
 	my $rc = $sth->fetchrow_array();	# Return the first match only

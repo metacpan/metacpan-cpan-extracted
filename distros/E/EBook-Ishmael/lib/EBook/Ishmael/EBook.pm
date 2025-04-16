@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -62,12 +62,13 @@ sub new {
 	my $class = shift;
 	my $file  = shift;
 	my $type  = shift // ebook_id($file);
+	my $enc   = shift;
 
 	if (not defined $type) {
 		die "Could not identify $file format\n";
 	}
 
-	my $obj = $EBOOK_FORMATS{ $type }->new($file);
+	my $obj = $EBOOK_FORMATS{ $type }->new($file, $enc);
 
 	return $obj;
 
@@ -97,12 +98,14 @@ all (mostly) share the same API.
 
 =head1 METHODS
 
-=head2 $e = EBook::Ishmael::EBook->new($file, [ $type ])
+=head2 $e = EBook::Ishmael::EBook->new($file, $type, $enc)
 
 Reads C<$file> and returns some ebook object, the exact class will depend the on
 the format of C<$file> or C<$type>. C<$type> is the name of the format you would
 like to read C<$file> as. If not specified, C<new()> will try to identify
-C<$file>'s format automatically via a series of heuristics.
+C<$file>'s format automatically via a series of heuristics. C<$enc> is an
+optional argument specify the character encoding to read the ebook format as, if
+the ebook format supports user-specified encodings.
 
 =head2 $html = $e->html([$out])
 

@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+0.98	Tue Apr 15 13:39:22 EDT 2025
+	Allow AUTOLOAD in subclasses
+	Use Config::Abstraction instead of Config::Auto
+	Fix http://www.cpantesters.org/cpan/report/00f6f172-6d25-1014-9d67-b345cf55203a
+
 0.97	Fri Mar 28 07:56:10 EDT 2025
 	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
 	Added config_file argument to new()
