@@ -7,10 +7,15 @@ use parent qw( Alien::Base );
 use Path::Tiny;
 use File::ShareDir::Dist qw( dist_share );
 
-our $VERSION = '1.000000';
+our $VERSION = '1.001001';
 
 sub bin_dir { path( dist_share __PACKAGE__ )->child('bin') }
-sub uv  { path( (shift)->bin_dir )->child('uv') }
+
+sub uv  {
+  my $share = path( (shift)->bin_dir )->child('uv');
+  return (-x $share ? $share : qx{ command -v uv | sed -e 's/^.*=//' | tr -d '\n' });
+}
+
 sub uvx { path( (shift)->bin_dir )->child('uvx') }
 
 1;
@@ -37,6 +42,8 @@ Alien::ultraviolet - Alien package for Python uv
 =head1 DESCRIPTION
 
 L<Alien::ultraviolet> downloads and installs uv.
+
+However, setting C<ALIEN_ULTRAVIOLET_INSTALL_TYPE=system> will force use of system uv.
 
 =head1 METHODS
 

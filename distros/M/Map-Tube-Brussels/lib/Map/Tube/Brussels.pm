@@ -16,7 +16,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.0');
+our $VERSION = version->declare('v0.2.0');
 
 =encoding utf8
 
@@ -107,11 +107,15 @@ C<'alt>' for C<nametype>, Dutch-language place names will be used.
 Other values will throw an error.
 
 
-=head1 METHODS
-
 =head2 nametype( )
 
 This yields the nametype that was specified with the constructor call, or '' if none.
+
+
+=head2 xml( )
+
+This read-only accessor returns whatever was specified as the XML source at
+construction.
 
 
 =head1 MAP DATA FORMAT

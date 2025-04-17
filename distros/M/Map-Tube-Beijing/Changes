@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
+0.12.5 2025-04-17
+  - Corrections to documentation.
+  - Fixed spelling of a station name.
+  - Require Map::Tube 4.04.
+
 0.12.4 2025-02-17
   - Require Map::Tube 3.94.
   - Remove support for Perl 5.10 because of test failing for Perl < 5.11.

@@ -41,7 +41,7 @@ My::App::Test->init_code;
 for (@warnings) {
   like $_, q{/My::App::Test::\w+>> Can't find string terminator '"' anywhere before EOF at /}, 'The correct warning gets raised syntax error';
 };
-isn't 'My::App::Test'->can('test_syntax_error_overwrite'), undef, "The existing code was kept";
+isnt 'My::App::Test'->can('test_syntax_error_overwrite'), undef, "The existing code was kept";
 is 'My::App::Test'->can('test_syntax_error'), undef, "No code was defined for 'test_syntax_error' because of the syntax error";
 My::App::Test::test_syntax_error_overwrite();
 is $::existing, 1, "test_syntax_error_overwrite() is still the same code";

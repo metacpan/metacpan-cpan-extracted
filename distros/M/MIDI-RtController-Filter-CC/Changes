@@ -1,5 +1,12 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0904 2025-04-16 10:46:18
+  - Fix the eg/continuous.pl program.
+
+0.0903 2025-04-16 10:39:52
+  - Fix attribute Types.
+  - Improve documentation.
+
 0.0902 2025-04-15 10:40:11
   - Align the eg/multi.pl program with RtController.
 

@@ -163,7 +163,10 @@ sub render {
 
 		$c = ref($pdf) . '::NamedDestination';
 		my $dest = $c->new($pdf);
-		$dest->goto( $page, xyz => (undef,undef,undef) );
+		$dest->goto( $page,
+			     xyz => ( $x - $fragment->{width},
+				      $y + $self->{_currentsize},
+				      undef ) );
 		$pdf->named_destination( 'Dests', $target, $dest );
 	    }
 	}

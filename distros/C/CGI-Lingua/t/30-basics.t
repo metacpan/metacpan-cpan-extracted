@@ -80,14 +80,16 @@ subtest 'Localhost IP' => sub {
 
 # Time zone detection
 subtest 'Time Zone' => sub {
-	local %ENV = %{$mock_env};
+	if(-e 't/online.enabled') {	# Fix http://www.cpantesters.org/cpan/report/cf983ce4-17db-11f0-894c-9c582d706e6a
+		local %ENV = %{$mock_env};
 
-	my $lingua = CGI::Lingua->new(
-		supported => ['en'],
-		cache => $cache,
-	);
+		my $lingua = CGI::Lingua->new(
+			supported => ['en'],
+			cache => $cache,
+		);
 
-	is($lingua->time_zone(), 'America/New_York', 'Time zone from mocked ip-api.com');
+		is($lingua->time_zone(), 'America/New_York', 'Time zone from ip-api.com');
+	}
 };
 
 # Unsupported languages

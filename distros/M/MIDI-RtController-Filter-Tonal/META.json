@@ -73,7 +73,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-Tonal"
       }
    },
-   "version" : "0.0301",
+   "version" : "0.0302",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -19,6 +19,7 @@ requires 'File::Slurper'                  => '0.014';
 requires 'File::Spec'                     => '3.84';
 requires 'Readonly'                       => '2.05';
 requires 'Data::Walk'                     => '2.01';
+test_requires 'Try::Tiny'                 => '0.32';
 
 test_requires 'DBI'                       => '1.643';
 test_requires 'Test2::V0'                 => '0.000145';
@@ -31,5 +32,6 @@ test_requires 'Rose::DB::Object::Loader'  => '0.799';
 test_requires 'Sub::Override'             => '0.12';
 test_requires 'Try::Tiny'                 => '0.32';
 test_requires 'autodie'                   => '2.37';
+test_requires  'Test::mysqld'             => '1.0030';
 
 WriteAll;

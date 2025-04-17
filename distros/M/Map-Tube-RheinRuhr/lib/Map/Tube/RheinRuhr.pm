@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.2.1');
+our $VERSION = version->declare('v0.2.2');
 
 =encoding utf8
 
@@ -37,7 +37,7 @@ with 'Map::Tube';
 	use Map::Tube::RheinRuhr;
 	my $tube = Map::Tube::RheinRuhr->new( );
 
-	my $route = $tube->get_shortest_route('xxxx', 'yyyy');
+	my $route = $tube->get_shortest_route( 'Barbarossaplatz', 'Essen Hbf' );
 
     print "Route: $route\n";
 

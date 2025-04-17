@@ -3,7 +3,8 @@ package Bio::MUST::Drivers;
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::VERSION = '0.242720';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
+$Bio::MUST::Drivers::VERSION = '0.251060';
 use strict;
 use warnings;
 
@@ -28,7 +29,7 @@ Bio::MUST::Drivers - Bio::MUST classes for driving external programs
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 
@@ -49,7 +50,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arnaud DI FRANCO Amandine BERTRAND Loic MEUNIER
+=for stopwords Arnaud DI FRANCO Amandine BERTRAND Loic MEUNIER Valerian LUPO
 
 =over 4
 
@@ -64,6 +65,10 @@ Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 =item *
 
 Loic MEUNIER <loic.meunier@doct.uliege.be>
+
+=item *
+
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =back
 

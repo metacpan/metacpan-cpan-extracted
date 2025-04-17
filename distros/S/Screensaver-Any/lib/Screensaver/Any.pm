@@ -1,8 +1,5 @@
 package Screensaver::Any;
 
-our $DATE = '2019-09-04'; # DATE
-our $VERSION = '0.007'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,26 +9,50 @@ use Exporter::Rinci qw(import);
 use File::Which qw(which);
 use IPC::System::Options 'system', 'readpipe', -log=>1;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-04-17'; # DATE
+our $DIST = 'Screensaver-Any'; # DIST
+our $VERSION = '0.008'; # VERSION
+
 my $known_screensavers = [qw/kde gnome cinnamon xscreensaver/];
 my $sch_screensaver = ['str', in=>$known_screensavers];
 our %arg_screensaver = (
     screensaver => {
         summary => 'Explicitly set screensaver program to use',
         schema => $sch_screensaver,
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 The default, when left undef, is to detect what screensaver is running,
 
-_
+MARKDOWN
     },
 );
+
+sub _find_qdbus {
+    require File::Which;
+
+    my @paths;
+    if (my $path = File::Which::which("qdbus")) {
+        log_trace "qdbus found in PATH: $path";
+        push @paths, $path;
+    } else {
+        for my $dir ("/usr/lib/qt6/bin", "/usr/lib/qt5/bin") {
+            if ((-d $dir) && (-x "$dir/qdbus")) {
+                log_trace "qdbus found in $dir";
+                push @paths, "$dir/qdbus";
+            }
+        }
+    }
+
+    @paths;
+}
 
 our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'Common interface to screensaver/screenlocker functions',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This module provides common functions related to screensaver.
 
@@ -39,19 +60,19 @@ Supported screensavers: KDE Plasma's kscreenlocker (`kde`), GNOME screensaver
 (`gnome`), Cinnamon screensaver (`cinnamon`), and `xscreensaver`. Support for
 more screensavers, e.g. Windows is more than welcome.
 
-_
+MARKDOWN
 };
 
 $SPEC{'detect_screensaver'} = {
     v => 1.1,
     summary => 'Detect which screensaver program is currently running',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Will return a string containing name of screensaver program, e.g. `kde`,
 `gnome`, `cinnamon`, `xscreensaver`. Will return undef if no known screensaver
 is detected.
 
-_
+MARKDOWN
     result_naked => 1,
     result => {
         schema => $sch_screensaver,
@@ -79,13 +100,15 @@ sub detect_screensaver {
   KDE:
     {
         log_trace "Checking qdbus program ...";
-        unless (which("qdbus")) {
+        my @paths = _find_qdbus();
+
+        unless (@paths) {
             log_trace "qdbus doesn't exist";
             last;
         }
-        log_trace "qdbus exists";
+        log_trace "qdbus exists at $paths[0]";
         system({capture_stdout=>\my $dummy_out, capture_stderr=>\my $dummy_err},
-               "qdbus", "org.kde.screensaver");
+               $paths[0], "org.kde.screensaver");
         if ($?) {
             log_trace "Couldn't check org.kde.screensaver dbus service";
             last;
@@ -261,7 +284,7 @@ sub get_screensaver_timeout {
 $SPEC{set_screensaver_timeout} = {
     v => 1.1,
     summary => 'Set screensaver idle timeout',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 * xscreensaver
 
@@ -291,8 +314,7 @@ $SPEC{set_screensaver_timeout} = {
 
   modifies the line, save the file.
 
-
-_
+MARKDOWN
     args => {
         %arg_screensaver,
         timeout => {
@@ -404,7 +426,9 @@ sub activate_screensaver {
     my $screensaver = $args{screensaver} // detect_screensaver();
 
     if ($screensaver eq 'kde') {
-        system "qdbus", "org.kde.screensaver", "/ScreenSaver", "Lock";
+        my @paths = _find_qdbus();
+        die "Can't find qdbus" unless @paths;
+        system $paths[0], "org.kde.screensaver", "/ScreenSaver", "Lock";
         if ($?) { return [500, "Failed"] } else { return [200, "OK"] }
     }
 
@@ -429,7 +453,7 @@ sub activate_screensaver {
 $SPEC{deactivate_screensaver} = {
     v => 1.1,
     summary => 'Deactivate screensaver and unblank the screen',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If screen is not being blank (screensaver is not activated) then nothing
 happens. If screen is being blanked (screensaver is activated) then unblank the
@@ -440,7 +464,7 @@ xscreensaver, deactivating won't unlock the screen and user will need to unlock
 the screen herself first. Some other screensavers, like GNOME/cinnamon, will
 happily unlock the screen automatically.
 
-_
+MARKDOWN
     args => {
         %arg_screensaver,
     },
@@ -485,7 +509,9 @@ sub screensaver_is_active {
     my $screensaver = $args{screensaver} // detect_screensaver();
 
     if ($screensaver eq 'kde') {
-        my $res = `qdbus org.kde.screensaver /ScreenSaver GetActive`;
+        my @paths = _find_qdbus();
+        die "Can't find qdbus" unless @paths;
+        my $res = `$paths[0] org.kde.screensaver /ScreenSaver GetActive`;
         if ($res =~ /true/) {
             return [200, "OK", 1];
         } elsif ($res =~ /false/) {
@@ -527,7 +553,7 @@ sub screensaver_is_active {
 $SPEC{prevent_screensaver_activated} = {
     v => 1.1,
     summary => 'Prevent screensaver from being activated by resetting idle timer',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 You can use this function to prevent screensaver from being activated, if it is
 not yet being activated. This is usually done by resetting the idle counter.
@@ -540,7 +566,7 @@ activated.
 
 If screensaver is already activated, then nothing happens.
 
-_
+MARKDOWN
 };
 sub prevent_screensaver_activated {
     my %args = @_;
@@ -548,7 +574,9 @@ sub prevent_screensaver_activated {
     my $screensaver = $args{screensaver} // detect_screensaver();
 
     if ($screensaver eq 'kde') {
-        system "qdbus", "org.kde.screensaver", "/ScreenSaver", "SimulateUserActivity";
+        my @paths = _find_qdbus();
+        die "Can't find qdbus" unless @paths;
+        system $paths[0], "org.kde.screensaver", "/ScreenSaver", "SimulateUserActivity";
         return $? ? [500, "Failed"] : [200];
     }
 
@@ -587,7 +615,7 @@ Screensaver::Any - Common interface to screensaver/screenlocker functions
 
 =head1 VERSION
 
-This document describes version 0.007 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2019-09-04.
+This document describes version 0.008 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2025-04-17.
 
 =head1 DESCRIPTION
 
@@ -614,7 +642,7 @@ command like C<< dbus-send --type=method_call --dest=org.gnome.ScreenSaver
 
 Usage:
 
- activate_screensaver(%args) -> [status, msg, payload, meta]
+ activate_screensaver(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Activate screensaver immediately and lock screen.
 
@@ -630,16 +658,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -649,7 +678,7 @@ Return value:  (any)
 
 Usage:
 
- deactivate_screensaver(%args) -> [status, msg, payload, meta]
+ deactivate_screensaver(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Deactivate screensaver and unblank the screen.
 
@@ -674,16 +703,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -713,7 +743,7 @@ Return value:  (str)
 
 Usage:
 
- disable_screensaver(%args) -> [status, msg, payload, meta]
+ disable_screensaver(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Disable screensaver so screen will not go blank or lock after being idle.
 
@@ -729,16 +759,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -748,7 +779,7 @@ Return value:  (any)
 
 Usage:
 
- enable_screensaver(%args) -> [status, msg, payload, meta]
+ enable_screensaver(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Enable screensaver that has been previously disabled.
 
@@ -764,16 +795,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -783,7 +815,7 @@ Return value:  (any)
 
 Usage:
 
- get_screensaver_timeout(%args) -> [status, msg, payload, meta]
+ get_screensaver_timeout(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get screensaver idle timeout, in number of seconds.
 
@@ -799,16 +831,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: Timeout value, in seconds (float)
 
@@ -818,7 +851,7 @@ Return value: Timeout value, in seconds (float)
 
 Usage:
 
- prevent_screensaver_activated() -> [status, msg, payload, meta]
+ prevent_screensaver_activated() -> [$status_code, $reason, $payload, \%result_meta]
 
 Prevent screensaver from being activated by resetting idle timer.
 
@@ -839,12 +872,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -854,7 +887,7 @@ Return value:  (any)
 
 Usage:
 
- screensaver_is_active(%args) -> [status, msg, payload, meta]
+ screensaver_is_active(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if screensaver is being activated.
 
@@ -870,16 +903,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -889,7 +923,7 @@ Return value:  (any)
 
 Usage:
 
- screensaver_is_enabled(%args) -> [status, msg, payload, meta]
+ screensaver_is_enabled(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether screensaver is enabled.
 
@@ -905,16 +939,17 @@ Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -924,7 +959,7 @@ Return value:  (any)
 
 Usage:
 
- set_screensaver_timeout(%args) -> [status, msg, payload, meta]
+ set_screensaver_timeout(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Set screensaver idle timeout.
 
@@ -934,7 +969,7 @@ Examples:
 
 =item * Set timeout to 5 minutes:
 
- set_screensaver_timeout( timeout => 300);
+ set_screensaver_timeout(timeout => 300);
 
 =back
 
@@ -986,16 +1021,17 @@ The default, when left undef, is to detect what screensaver is running,
 
 Value.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: Timeout value, in seconds (float)
 
@@ -1007,6 +1043,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Screensave
 
 Source repository is at L<https://github.com/perlancar/perl-Screensaver-Any>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Screensaver-Any>
@@ -1014,16 +1079,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

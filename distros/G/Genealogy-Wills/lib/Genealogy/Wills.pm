@@ -3,6 +3,7 @@ package Genealogy::Wills;
 use warnings;
 use strict;
 use Carp;
+use Data::Reuse;
 use File::Spec;
 use Module::Info;
 use Scalar::Util;
@@ -15,11 +16,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -125,7 +126,7 @@ sub search {
 		return;
 	}
 
-	$self->{'wills'} ||= Genealogy::Wills::wills->new(no_entry => 1, %{$self});
+	$self->{'wills'} ||= Genealogy::Wills::wills->new(no_entry => 1, no_fixate => 1, %{$self});
 
 	if(!defined($self->{'wills'})) {
 		Carp::croak("Can't open the wills database");
@@ -140,6 +141,7 @@ sub search {
 	}
 	my $will = $self->{'wills'}->fetchrow_hashref($params);
 	$will->{'url'} = 'https://' . $will->{'url'};
+	Data::Reuse::fixate(%{$will});
 	return $will;
 }
 

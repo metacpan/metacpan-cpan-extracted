@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<tube name="Métro de Tolouse">
+<tube name="Toulouse métro, tram et funiculaire">
   <lines>
     <line id="tou_A" name="A" color="#FD2A17"/>
     <line id="tou_B" name="B" color="#FFDA37"/>

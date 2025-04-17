@@ -1,3 +1,8 @@
+0.07 2025-04-16T13:09:02+02:00
+ - Add DESCRIPTION to doc.
+ - Add new example to marc-list doc.
+ - Improve abstract of module.
+
 0.06 2025-04-13T13:43:23+02:00
  - Fix doc with leader support.
  - Fix sort of frequency.

@@ -9,9 +9,9 @@
     <line id="VRR_102" name="102" color="#806CB1"/>
     <!-- Essen -->
     <line id="VRR_103" name="103" color="#F9CE06"/>
-    <!-- Essen -->
+    <!-- Mülheim, Borbeck -->
     <line id="VRR_104" name="104" color="#D2B500"/>
-    <!-- Essen -->
+    <!-- Essen, Borbeck -->
     <line id="VRR_105" name="105" color="#B6CC00"/>
     <!-- Essen, Gelsenkirchen -->
     <line id="VRR_107" name="107" color="#D3141C"/>
@@ -65,7 +65,7 @@
     <line id="VRR_S2" name="S2" color="#019043"/>
     <!-- Kaarst, Neuss, Düsseldorf, Erkrath, Mettmann, Wuppertal -->
     <line id="VRR_S28" name="S28" color="#019043"/>
-    <!-- Oberhausen, Mülheum, Essen, Hattingen -->
+    <!-- Oberhausen, Mülheim, Essen, Hattingen -->
     <line id="VRR_S3" name="S3" color="#019043"/>
     <!-- Dortmund, Wickede, Unna -->
     <line id="VRR_S4" name="S4" color="#019043"/>
@@ -113,7 +113,7 @@
     <line id="VRR_U70" name="U70" color="#5EB6D3"/>
     <!-- Düsseldorf -->
     <line id="VRR_U71" name="U71" color="#52D3F7"/>
-    <!-- Düsseldorf -->
+    <!-- Düsseldorf, Ratingen -->
     <line id="VRR_U72" name="U72" color="#3DC7CB"/>
     <!-- Düsseldorf -->
     <line id="VRR_U73" name="U73" color="#2F6AB9"/>
@@ -175,9 +175,9 @@
     <station id="vrr_10207" name="Bessemerstr." line="VRR_102:7" link="vrr_10206,vrr_10208"/>
     <station id="vrr_10208" name="Mühlenstr." line="VRR_102:8" link="vrr_10207,vrr_10209"/>
     <station id="vrr_10209" name="Buchenberg" line="VRR_102:9" link="vrr_10208,vrr_10210"/>
-    <station id="vrr_10210" name="Aktienstr. (Mülheim)" line="VRR_102:10" link="vrr_10209,vrr_10211"/>
+    <station id="vrr_10210" name="Aktienstr." line="VRR_102:10,VRR_104:9" link="vrr_10209,vrr_10211,vrr_10408,vrr_10410"/>
     <station id="vrr_10211" name="Mülheim Hbf" line="VRR_102:11,VRR_901:1,VRR_S1:22,VRR_S3:4,VRR_U18:17" link="vrr_10210,vrr_10212,vrr_11219,vrr_s121,vrr_s123,vrr_u1816"/>
-    <station id="vrr_10212" name="Stadtmitte Mülheim" line="VRR_102:12,VRR_112:23,VRR_901:2" link="vrr_10211,vrr_10213,vrr_11222,vrr_11224"/>
+    <station id="vrr_10212" name="Stadtmitte" line="VRR_102:12,VRR_104:13,VRR_112:23,VRR_901:2" link="vrr_10211,vrr_10213,vrr_10412,vrr_10414"/>
     <station id="vrr_10213" name="Schloss Broich" line="VRR_102:13,VRR_901:3" link="vrr_10212,vrr_10214,vrr_90104"/>
     <station id="vrr_10214" name="Broicher Mitte" line="VRR_102:14" link="vrr_10213,vrr_10215"/>
     <station id="vrr_10215" name="Thüringer Str." line="VRR_102:15" link="vrr_10214,vrr_10216"/>
@@ -198,7 +198,7 @@
     <station id="vrr_10312" name="Fliegenbusch" line="VRR_103:12,VRR_105:8" link="vrr_10311,vrr_10313,vrr_10507"/>
     <station id="vrr_10313" name="Borbeck Süd Bf" line="VRR_103:13,VRR_105:9,VRR_S9:14" link="vrr_101_1032,vrr_10310,vrr_10312,vrr_10314"/>
     <station id="vrr_10314" name="Bockmühle" line="VRR_103:14,VRR_105:10" link="vrr_10313,vrr_10315"/>
-    <station id="vrr_10315" name="Essen Röntgenstr." line="VRR_103:15,VRR_105:11" link="vrr_101_1012,vrr_10314"/>
+    <station id="vrr_10315" name="Röntgenstr. (Essen)" line="VRR_103:15,VRR_105:11" link="vrr_101_1012,vrr_10314"/>
     <station id="vrr_10322" name="Hollestr." line="VRR_103:22,VRR_109:13" link="vrr_101_1017,vrr_10323"/>
     <station id="vrr_10323" name="Wasserturm" line="VRR_103:23,VRR_109:14" link="vrr_10322,vrr_10324"/>
     <station id="vrr_10324" name="Wörthstr." line="VRR_103:24,VRR_109:15" link="vrr_10323,vrr_10325"/>
@@ -216,13 +216,11 @@
     <station id="vrr_10405" name="Nordstr. (Mülheim)" line="VRR_104:5" link="vrr_10404,vrr_10406"/>
     <station id="vrr_10406" name="Kirchberg" line="VRR_104:6" link="vrr_10405,vrr_10407"/>
     <station id="vrr_10407" name="Kreuzfeldstr." line="VRR_104:7" link="vrr_10406,vrr_10408"/>
-    <station id="vrr_10408" name="Eichenberg" line="VRR_104:8" link="vrr_10407,vrr_10409"/>
-    <station id="vrr_10409" name="Aktienstr. (Essen)" line="VRR_104:9" link="vrr_10408,vrr_10410"/>
-    <station id="vrr_10410" name="Rotkreuzzentrum" line="VRR_104:10" link="vrr_10409,vrr_10411"/>
-    <station id="vrr_10411" name="Friedrich-Ebert-Str. (Essen)" line="VRR_104:11" link="vrr_10410,vrr_10412"/>
-    <station id="vrr_10412" name="Rathausmarkt (Essen)" line="VRR_104:12" link="vrr_10411,vrr_10413"/>
-    <station id="vrr_10413" name="Stadtmitte Essen" line="VRR_104:13" link="vrr_10412,vrr_10414"/>
-    <station id="vrr_10414" name="Kaiserplatz (Essen)" line="VRR_104:14" link="vrr_10413"/>
+    <station id="vrr_10408" name="Eichenberg" line="VRR_104:8" link="vrr_10210,vrr_10407"/>
+    <station id="vrr_10410" name="Rotkreuzzentrum" line="VRR_104:10" link="vrr_10210,vrr_10411"/>
+    <station id="vrr_10411" name="Friedrich-Ebert-Str." line="VRR_104:11,VRR_112:21" link="vrr_10410,vrr_10412,vrr_11220"/>
+    <station id="vrr_10412" name="Rathausmarkt" line="VRR_104:12,VRR_112:22" link="vrr_10212,vrr_10411"/>
+    <station id="vrr_10414" name="Kaiserplatz" line="VRR_104:14,VRR_112:24" link="vrr_10212,vrr_11225"/>
     <!-- 105 -->
     <station id="vrr_10501" name="Frintrop Unterstr." line="VRR_105:1" link="vrr_10502"/>
     <station id="vrr_10502" name="Im Neerfeld" line="VRR_105:2" link="vrr_10501,vrr_10503"/>
@@ -306,11 +304,8 @@
     <station id="vrr_11217" name="Dümptener Str." line="VRR_112:17" link="vrr_11216,vrr_11218"/>
     <station id="vrr_11218" name="Marienplatz" line="VRR_112:18" link="vrr_11217,vrr_11219"/>
     <station id="vrr_11219" name="Mülheim West" line="VRR_112:19,VRR_S3:3" link="vrr_10211,vrr_11218,vrr_11220,vrr_s121"/>
-    <station id="vrr_11220" name="Sandstr." line="VRR_112:20" link="vrr_11219,vrr_11221"/>
-    <station id="vrr_11221" name="Friedrich-Ebert-Str. (Mülheim)" line="VRR_112:21" link="vrr_11220,vrr_11222"/>
-    <station id="vrr_11222" name="Rathausmarkt (Mülheim)" line="VRR_112:22" link="vrr_10212,vrr_11221"/>
-    <station id="vrr_11224" name="Kaiserplatz (Mülheim)" line="VRR_112:24" link="vrr_10212,vrr_11225"/>
-    <station id="vrr_11225" name="St.-Marien-Hospital" line="VRR_112:25" link="vrr_11224,vrr_11226"/>
+    <station id="vrr_11220" name="Sandstr." line="VRR_112:20" link="vrr_10411,vrr_11219"/>
+    <station id="vrr_11225" name="St.-Marien-Hospital" line="VRR_112:25" link="vrr_10414,vrr_11226"/>
     <station id="vrr_11226" name="Sportzentrum Südstraße" line="VRR_112:26" link="vrr_11225,vrr_11227"/>
     <station id="vrr_11227" name="Kuhlendahl" line="VRR_112:27" link="vrr_11226,vrr_11228"/>
     <station id="vrr_11228" name="Oppspring" line="VRR_112:28" link="vrr_11227,vrr_11229"/>
@@ -403,7 +398,7 @@
     <!-- 305 -->
     <station id="vrr_30501" name="Höntrop Kirche" line="VRR_305:1,VRR_310:1" link="vrr_30502"/>
     <station id="vrr_30502" name="Brucknerstr." line="VRR_305:2,VRR_310:2" link="vrr_30501,vrr_30503"/>
-    <station id="vrr_30503" name="Bochum Röntgenstr." line="VRR_305:3,VRR_310:3" link="vrr_30502,vrr_30504"/>
+    <station id="vrr_30503" name="Röntgenstr. (Bochum)" line="VRR_305:3,VRR_310:3" link="vrr_30502,vrr_30504"/>
     <station id="vrr_30504" name="Leibnizstr." line="VRR_305:4,VRR_310:4" link="vrr_30503,vrr_30505"/>
     <station id="vrr_30505" name="Engelsburger Str." line="VRR_305:5,VRR_310:5" link="vrr_30504,vrr_30506"/>
     <station id="vrr_30506" name="Erzstr." line="VRR_305:6,VRR_310:6" link="vrr_30234,vrr_30505"/>
@@ -727,7 +722,7 @@
     <station id="vrr_s104" name="Hilden" line="VRR_S1:4" link="vrr_s103,vrr_s105"/>
     <station id="vrr_s105" name="Eller" line="VRR_S1:5" link="vrr_70130,vrr_s104"/>
     <station id="vrr_s110" name="Wehrhahn" line="VRR_S1:10,VRR_S11:5,VRR_S6:14,VRR_U71:12,VRR_U72:18,VRR_U73:17,VRR_U83:10" link="vrr_70410,vrr_70412,vrr_70618,vrr_70806"/>
-    <station id="vrr_s114" name="Flughafen (Düsseldorf) Bf" line="VRR_S1:14,VRR_SKYTRA:1" link="vrr_70501,vrr_s115,vrr_skytra02"/>
+    <station id="vrr_s114" name="Düsseldorf Flughafen Bf" line="VRR_S1:14,VRR_SKYTRA:1" link="vrr_70501,vrr_s115,vrr_skytra02"/>
     <station id="vrr_s115" name="Angermund" line="VRR_S1:15" link="vrr_s114,vrr_s116"/>
     <station id="vrr_s116" name="Rahm" line="VRR_S1:16" link="vrr_s115,vrr_s117"/>
     <station id="vrr_s117" name="Großenbaum" line="VRR_S1:17" link="vrr_s116,vrr_s118"/>
@@ -747,7 +742,7 @@
     <station id="vrr_s138" name="Dorstfeld" line="VRR_S1:38,VRR_S2:14,VRR_S4:5" link="vrr_s137,vrr_s139,vrr_s213,vrr_s404,vrr_s406"/>
     <station id="vrr_s139" name="Dortmund Hbf" line="VRR_S1:39,VRR_S2:15,VRR_S5:1,VRR_U41:19,VRR_U45:6,VRR_U47:10,VRR_U49:4" link="vrr_s138,vrr_s502,vrr_u4118,vrr_u4120"/>
     <!-- S11 -->
-    <station id="vrr_s1101" name="Flughafen (Düsseldorf) Terminal" line="VRR_S11:1,VRR_SKYTRA:4" link="vrr_70501,vrr_skytra03"/>
+    <station id="vrr_s1101" name="Düsseldorf Flughafen Terminal" line="VRR_S11:1,VRR_SKYTRA:4" link="vrr_70501,vrr_skytra03"/>
     <station id="vrr_s812" name="Friedrichstadt" line="VRR_S11:7,VRR_S28:11,VRR_S8:12" link="vrr_70412,vrr_s811"/>
     <station id="vrr_s811" name="Bilk" line="VRR_S11:8,VRR_S28:10,VRR_S8:11,VRR_U71:19,VRR_U72:25,VRR_U73:24,VRR_U83:17" link="vrr_70418,vrr_70921,vrr_s812,vrr_u7118,vrr_u7120"/>
     <station id="vrr_s808" name="Rheinpark-Center" line="VRR_S11:11,VRR_S28:7,VRR_S8:8" link="vrr_70601,vrr_s807"/>
@@ -783,7 +778,7 @@
     <station id="vrr_s2817" name="Mettmann Zentrum" line="VRR_S28:17" link="vrr_s2816,vrr_s2818"/>
     <station id="vrr_s2818" name="Mettmann Stadtwald" line="VRR_S28:18" link="vrr_s2817,vrr_s2819"/>
     <station id="vrr_s2819" name="Hahnenfurth/Düssel" line="VRR_S28:19" link="vrr_s2818,vrr_s820"/>
-    <station id="vrr_s820" name="Vohwinkel" line="VRR_S28:20,VRR_S68:17,VRR_S8:20,VRR_S9:26,VRR_SCHWEB:1" link="vrr_s2819,vrr_s819,vrr_s821,vrr_s925,vrr_schweb02"/>
+    <station id="vrr_s820" name="Vohwinkel Bf" line="VRR_S28:20,VRR_S68:17,VRR_S8:20,VRR_S9:26" link="vrr_s2819,vrr_s819,vrr_s821,vrr_s925" other_link="vohwinkel:vrr_schweb01"/>
     <station id="vrr_s821" name="Sonnborn" line="VRR_S28:21,VRR_S8:21,VRR_S9:27" link="vrr_s820,vrr_s822"/>
     <station id="vrr_s822" name="Zoologischer Garten Wuppertal" line="VRR_S28:22,VRR_S8:22,VRR_S9:28" link="vrr_s821,vrr_s823"/>
     <station id="vrr_s823" name="Steinbeck" line="VRR_S28:23,VRR_S8:23,VRR_S9:29" link="vrr_s713,vrr_s822"/>
@@ -888,7 +883,8 @@
     <station id="vrr_s924" name="Rosenhügel" line="VRR_S9:24" link="vrr_s923,vrr_s925"/>
     <station id="vrr_s925" name="Aprath" line="VRR_S9:25" link="vrr_s820,vrr_s924"/>
     <!-- Schwebebahn -->
-    <station id="vrr_schweb02" name="Bruch" line="VRR_SCHWEB:2" link="vrr_s820,vrr_schweb03"/>
+    <station id="vrr_schweb01" name="Vohwinkel Schwebebahn" line="VRR_SCHWEB:1" link="vrr_schweb02" other_link="vohwinkel:vrr_s820"/>
+    <station id="vrr_schweb02" name="Bruch" line="VRR_SCHWEB:2" link="vrr_schweb01,vrr_schweb03"/>
     <station id="vrr_schweb03" name="Hammerstein" line="VRR_SCHWEB:3" link="vrr_schweb02,vrr_schweb04"/>
     <station id="vrr_schweb04" name="Sonnborner Str." line="VRR_SCHWEB:4" link="vrr_schweb03,vrr_schweb05"/>
     <station id="vrr_schweb05" name="Zoo &amp; Stadion" line="VRR_SCHWEB:5" link="vrr_schweb04,vrr_schweb06"/>
@@ -1056,7 +1052,7 @@
     <station id="vrr_u4405" name="Geschwister-Scholl-Str." line="VRR_U44:5" link="vrr_u4216,vrr_u4404"/>
     <station id="vrr_u4415" name="Poth" line="VRR_U44:15" link="vrr_u4334,vrr_u4416"/>
     <station id="vrr_u4416" name="Auf dem Brümmer" line="VRR_U44:16" link="vrr_s404,vrr_u4415"/>
-    <station id="vrr_u4418" name="Walberstr./Schulmuseum" line="VRR_U44:18" link="vrr_s404"/>
+    <station id="vrr_u4418" name="Walbertstr./Schulmuseum" line="VRR_U44:18" link="vrr_s404"/>
     <!-- U45 -->
     <station id="vrr_u4511" name="Westfalenpark" line="VRR_U45:11,VRR_U49:9" link="vrr_u4123,vrr_u4512,vrr_u4910"/>
     <station id="vrr_u4512" name="Remydamm" line="VRR_U45:12" link="vrr_u4511,vrr_u4513"/>

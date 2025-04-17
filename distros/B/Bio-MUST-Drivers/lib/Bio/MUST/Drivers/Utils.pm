@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Utils;
 # ABSTRACT: Utility functions for drivers
-$Bio::MUST::Drivers::Utils::VERSION = '0.242720';
+$Bio::MUST::Drivers::Utils::VERSION = '0.251060';
 use strict;
 use warnings;
 use autodie;
@@ -36,7 +36,7 @@ Bio::MUST::Drivers::Utils - Utility functions for drivers
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ package Text::Layout;
 
 use Carp;
 
- our $VERSION = "0.041";
+ our $VERSION = "0.042";
 
 =head1 NAME
 
@@ -277,7 +277,7 @@ A C<strut> is a markup element that has bounding box dimensions but no
 ink dimensions.
 
 Note that strut markup elements may only occur as closed elements,
-i.e., C<< <img/> >>.
+i.e., C<< <strut/> >>.
 
 =over 8
 

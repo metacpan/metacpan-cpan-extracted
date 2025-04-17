@@ -1,5 +1,8 @@
 Revision history for CGI-Lingua
 
+0.73	Wed Apr 16 07:10:29 EDT 2025
+	Fix http://www.cpantesters.org/cpan/report/cf983ce4-17db-11f0-894c-9c582d706e6a
+
 0.72	Mon Apr 14 07:18:18 EDT 2025
 	Stop empty entries from appearing in the log
 	Windows can sometimes give an error about opening GeoIP.dat, so workaround that

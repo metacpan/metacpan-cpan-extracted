@@ -15,7 +15,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = version->declare('v0.1.0');
+our $VERSION = version->declare('v0.1.1');
 
 =encoding utf8
 

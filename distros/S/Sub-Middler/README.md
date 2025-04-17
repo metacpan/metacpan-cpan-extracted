@@ -6,6 +6,31 @@ Sub::Middler - Middleware subroutine chaining
 
 ```perl
 use strict;
+use warings;
+use Sub::Middler;
+
+
+my @array;
+my %hash;
+my $scalar;
+
+# append results in variables
+my $head=linker 
+  # Short cut to store (copy/append) in array
+  \@array       
+  # Short cut to modifiy inputs
+  =>\sub { $_*=2 for @{$_[0]}},
+  # Short cut to store in hash
+  =>\%hash,
+  # Short cut to stringyfiy and append to scalar
+  =>\$scalar;
+
+
+$head->([1,2,3,4,], sub {...})
+#         inputs      ready cb
+
+
+use strict;
 use warnings;
 use Sub::Middler;
 
@@ -69,7 +94,11 @@ know what you're doing.
 
 As a general guide it's suggested the last argument to a stage be a subroutine
 reference to allow callbacks and asynchronous usage. Instead of a flat list of
-multiple inputs into a stage, it is suggested to also contain these in a array
+multiple inputs into a stage, it is suggested to also contain these in an array
+
+From v0.4.0, shortcuts can be used to to bypass writing the nestled
+subroutines subroutines for some common use cases. A reference to a
+SCALAR/ARRAY/HASH/CODE can be used instead of custom middleware
 
 # API
 
@@ -80,10 +109,32 @@ linker mw1, ..., dispatch
 ```
 
 From v0.3.0, the `linker` subroutine is exported and will do an inline build
-and link for a given middlewares and dispatch routine
+and link for a given middleware and dispatch routine
 
 The return value is the head of the linked chain, and is equivalent to created
 a `Sub::Middler` object, adding middleware, and the calling the link method.
+
+## Short Cuts
+
+Instead of writing custom middleware, references to variables and CODE can be
+used instead.
+
+If an array reference is used, all elements from the first argument will be
+appended to the array
+
+If an hash reference is used, the elements from the first argument will be
+treated as key value pairs and set the corresponding elements in the target
+hash
+
+If a scalar reference is use, the elements from the first argument will be
+converted to strings and appending to the target variable
+
+If a reference is a CODE reference is used, the underlying subroutine is
+expected to modify the first argument elements in place. The return value is
+not used.
+
+In all the above cases, the next link in the chain is automatically called with
+the same arguments, making chaining and saving intermediate values easy
 
 ## Managing a chain
 

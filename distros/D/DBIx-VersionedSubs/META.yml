@@ -3,23 +3,32 @@ abstract: 'all your code are belong into the DB'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-VersionedSubs
 no_index:
   directory:
     - t
     - inc
 requires:
-  Class::Data::Inheritable: 0
-  DBD::SQLite: 1.09
-  HTTP::Server::Simple: 0
-  Template: 0
-version: 0.08
+  Class::Data::Inheritable: '0'
+  DBD::SQLite: '1.09'
+  DBI: '0'
+  HTTP::Server::Simple: '0'
+  Template: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/Corion/DBIx-VersionedSubs/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/DBIx-VersionedSubs.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,0 +1,5 @@
+v0.01  XXXZ
+    - Initial release
+    - Basic API
+    - Imported default/backup values from tagpool
+    - Support for reading data from a number of other object types

@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Lyon.
 
+0.62.3 2025-04-17
+  - Fix typo in station name.
+  - Added one station.
+  - Unified map name.
+  - Require Map::Tube 4.04.
+
 0.62.2 2025-02-17
   - Require Map::Tube 3.94 and adapt tests accordingly.
   - Remove support for Perl 5.10 because of test failing for Perl < 5.11.

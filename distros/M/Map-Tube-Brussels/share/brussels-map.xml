@@ -20,8 +20,6 @@
     <line id="BX_39" name="39" color="#E43C2E"/>
     <!-- Tram -->
     <line id="BX_4" name="4" color="#EA4F80"/>
-    <!-- Tram -->
-    <line id="BX_44" name="44" color="#FFCC35"/>
     <!-- Metro -->
     <line id="BX_5" name="5" color="#F6A90B"/>
     <!-- Tram -->
@@ -59,14 +57,14 @@
     <station id="bx_106" name="Tomberg" line="BX_1:6" link="bx_105,bx_107"/>
     <station id="bx_107" name="Gribaumont" line="BX_1:7" link="bx_106,bx_108"/>
     <station id="bx_108" name="Joséphine-Charlotte" line="BX_1:8" link="bx_107,bx_109"/>
-    <station id="bx_109" name="Montgomery" line="BX_1:9,BX_25:14,BX_39:1,BX_44:1,BX_7:18,BX_81:1" link="bx_108,bx_110,bx_3902,bx_522,bx_717"/>
+    <station id="bx_109" name="Montgomery" line="BX_1:9,BX_25:14,BX_39:1,BX_7:18,BX_81:1" link="bx_108,bx_110,bx_3902,bx_522,bx_717"/>
     <station id="bx_110" name="Merode" line="BX_1:10,BX_5:21,BX_81:2" link="bx_109,bx_111,bx_522,bx_8103"/>
     <station id="bx_111" name="Schuman" line="BX_1:11,BX_5:20" link="bx_110,bx_112"/>
     <station id="bx_112" name="Maelbeek" name_alt="Maalbeek" line="BX_1:12,BX_5:19" link="bx_111,bx_113"/>
     <station id="bx_113" name="Arts-Loi" name_alt="Kunst-Wet" line="BX_1:13,BX_2:7,BX_5:18,BX_6:7" link="bx_112,bx_114,bx_206,bx_208"/>
     <station id="bx_114" name="Parc" name_alt="Park" line="BX_1:14,BX_5:17,BX_92:12,BX_93:21" link="bx_113,bx_115,bx_9211,bx_9213"/>
     <station id="bx_115" name="Gare Centrale" name_alt="Centraal Station" line="BX_1:15,BX_5:16" link="bx_114,bx_116"/>
-    <station id="bx_116" name="De Brouckère" line="BX_1:16,BX_10:18,BX_4:3,BX_5:15" link="bx_115,bx_117,bx_204,bx_404"/>
+    <station id="bx_116" name="De Brouckère" line="BX_1:16,BX_10:20,BX_4:3,BX_5:15" link="bx_115,bx_117,bx_204,bx_404"/>
     <station id="bx_117" name="Sainte-Catherine" name_alt="Sint-Katelijne" line="BX_1:17,BX_5:14" link="bx_116,bx_118"/>
     <station id="bx_118" name="Comte de Flandre" name_alt="Graaf van Vlaanderen" line="BX_1:18,BX_5:13" link="bx_117,bx_119"/>
     <station id="bx_119" name="Étangs Noirs" name_alt="Zwarte Vijvers" line="BX_1:19,BX_5:12" link="bx_118,bx_120"/>
@@ -83,23 +81,25 @@
     <station id="bx_1008" name="Zavelput" line="BX_10:8" link="bx_1007,bx_1009"/>
     <station id="bx_1009" name="Ancre" name_alt="Anker" line="BX_10:9" link="bx_1008,bx_706"/>
     <station id="bx_706" name="Heembeek" line="BX_10:10,BX_35:5,BX_7:6" link="bx_1009,bx_705,bx_707"/>
-    <station id="bx_707" name="Docks Bruxsel" line="BX_10:11,BX_35:6,BX_7:7" link="bx_1012,bx_706,bx_708"/>
-    <station id="bx_1012" name="Mabru" line="BX_10:12" link="bx_1013,bx_707"/>
-    <station id="bx_1013" name="Jules de Trooz" line="BX_10:13,BX_62:13,BX_93:13" link="bx_1012,bx_1014,bx_6212,bx_9312"/>
-    <station id="bx_1014" name="Masui" line="BX_10:14,BX_62:14,BX_93:14" link="bx_1013,bx_1015,bx_2523"/>
-    <station id="bx_1015" name="Thomas" line="BX_10:15,BX_25:24,BX_55:14" link="bx_1014,bx_2523,bx_401"/>
-    <station id="bx_401" name="Gare du Nord" name_alt="Noordstation" line="BX_10:16,BX_25:25,BX_4:1,BX_55:15" link="bx_1015,bx_204"/>
-    <station id="bx_204" name="Rogier" line="BX_10:17,BX_2:4,BX_25:26,BX_4:2,BX_55:16,BX_6:4" link="bx_116,bx_203,bx_205,bx_401"/>
-    <station id="bx_404" name="Bourse" name_alt="Beurs" line="BX_10:19,BX_4:4" link="bx_116,bx_405"/>
-    <station id="bx_405" name="Anneessens" line="BX_10:20,BX_4:5" link="bx_404,bx_406"/>
-    <station id="bx_406" name="Lemonnier" line="BX_10:21,BX_4:6,BX_51:21,BX_82:17" link="bx_213,bx_405,bx_5120"/>
-    <station id="bx_213" name="Gare du Midi" name_alt="Zuidstation" line="BX_10:22,BX_2:13,BX_4:7,BX_51:22,BX_6:13,BX_81:21,BX_82:18" link="bx_212,bx_214,bx_406,bx_8120,bx_8122"/>
-    <station id="bx_212" name="Porte de Hal" name_alt="Hallepoort" line="BX_10:23,BX_2:12,BX_4:8,BX_6:12" link="bx_211,bx_213,bx_409"/>
-    <station id="bx_409" name="Parvis de Saint-Gilles" name_alt="Sint-Gillesvoorplein" line="BX_10:24,BX_4:9" link="bx_212,bx_410"/>
-    <station id="bx_410" name="Horta" line="BX_10:25,BX_4:10" link="bx_409,bx_411"/>
-    <station id="bx_411" name="Albert" line="BX_10:26,BX_18:1,BX_4:11" link="bx_1802,bx_410,bx_412,bx_413"/>
-    <station id="bx_413" name="Vanderkindere" line="BX_10:27,BX_4:13,BX_7:33,BX_92:24" link="bx_411,bx_412,bx_414,bx_732,bx_9223"/>
-    <station id="bx_732" name="Churchill" line="BX_10:28,BX_7:32" link="bx_413,bx_731"/>
+    <station id="bx_707" name="Docks Bruxsel" line="BX_10:11,BX_35:6,BX_7:7" link="bx_706,bx_708"/>
+    <station id="bx_708" name="Princesse Élisabeth" name_alt="Prinses Elisabeth" line="BX_10:12,BX_7:8,BX_92:2" link="bx_1013,bx_707,bx_709,bx_9201"/>
+    <station id="bx_1013" name="Verboekhoven" line="BX_10:13,BX_55:10,BX_92:3" link="bx_1014,bx_5509,bx_708,bx_9204"/>
+    <station id="bx_1014" name="Pavillon" name_alt="Paviljoen" line="BX_10:14,BX_55:11" link="bx_1013,bx_1015"/>
+    <station id="bx_1015" name="Gallait" line="BX_10:15,BX_55:12" link="bx_1014,bx_1016"/>
+    <station id="bx_1016" name="Liedts" line="BX_10:16,BX_25:23,BX_55:13,BX_62:15,BX_93:15" link="bx_1015,bx_1017,bx_2522,bx_6214"/>
+    <station id="bx_1017" name="Thomas" line="BX_10:17,BX_25:24,BX_55:14" link="bx_1016,bx_401"/>
+    <station id="bx_401" name="Gare du Nord" name_alt="Noordstation" line="BX_10:18,BX_25:25,BX_4:1,BX_55:15" link="bx_1017,bx_204"/>
+    <station id="bx_204" name="Rogier" line="BX_10:19,BX_2:4,BX_25:26,BX_4:2,BX_55:16,BX_6:4" link="bx_116,bx_203,bx_205,bx_401"/>
+    <station id="bx_404" name="Bourse" name_alt="Beurs" line="BX_10:21,BX_4:4" link="bx_116,bx_405"/>
+    <station id="bx_405" name="Anneessens" line="BX_10:22,BX_4:5" link="bx_404,bx_406"/>
+    <station id="bx_406" name="Lemonnier" line="BX_10:23,BX_4:6,BX_51:21,BX_82:17" link="bx_213,bx_405,bx_5120"/>
+    <station id="bx_213" name="Gare du Midi" name_alt="Zuidstation" line="BX_10:24,BX_2:13,BX_4:7,BX_51:22,BX_6:13,BX_81:21,BX_82:18" link="bx_212,bx_214,bx_406,bx_8120,bx_8122"/>
+    <station id="bx_212" name="Porte de Hal" name_alt="Hallepoort" line="BX_10:25,BX_2:12,BX_4:8,BX_6:12" link="bx_211,bx_213,bx_409"/>
+    <station id="bx_409" name="Parvis de Saint-Gilles" name_alt="Sint-Gillesvoorplein" line="BX_10:26,BX_4:9" link="bx_212,bx_410"/>
+    <station id="bx_410" name="Horta" line="BX_10:27,BX_4:10" link="bx_409,bx_411"/>
+    <station id="bx_411" name="Albert" line="BX_10:28,BX_18:1,BX_4:11" link="bx_1802,bx_410,bx_412,bx_413"/>
+    <station id="bx_413" name="Vanderkindere" line="BX_10:29,BX_4:13,BX_7:33,BX_92:24" link="bx_411,bx_412,bx_414,bx_732,bx_9223"/>
+    <station id="bx_732" name="Churchill" line="BX_10:30,BX_7:32" link="bx_413,bx_731"/>
     <!-- 18 -->
     <station id="bx_1802" name="Jupiter" line="BX_18:2" link="bx_1803,bx_411"/>
     <station id="bx_1803" name="Altitude Cent" name_alt="Hoogte Honderd" line="BX_18:3" link="bx_1802,bx_1804"/>
@@ -107,15 +107,14 @@
     <station id="bx_1805" name="Roosendael" line="BX_18:5" link="bx_1804,bx_1806"/>
     <station id="bx_1806" name="Bens" line="BX_18:6" link="bx_1805,bx_1807"/>
     <station id="bx_1807" name="Xavier de Bue" line="BX_18:7" link="bx_1806,bx_417"/>
-    <station id="bx_417" name="Globe" line="BX_18:8,BX_4:17,BX_97:25" link="bx_1807,bx_1809,bx_416,bx_418,bx_9228"/>
+    <station id="bx_417" name="Globe" line="BX_18:8,BX_4:17" link="bx_1807,bx_1809,bx_416,bx_418"/>
     <station id="bx_1809" name="Rittweger" line="BX_18:9" link="bx_1810,bx_417"/>
     <station id="bx_1810" name="Jeanne Herreman" line="BX_18:10" link="bx_1809,bx_1811"/>
-    <station id="bx_1811" name="Uccle Calevoet" line="BX_18:11" link="bx_1810,bx_1812"/>
-    <station id="bx_1812" name="Ukkel Kalevoet" line="BX_18:12" link="bx_1811,bx_1813"/>
-    <station id="bx_1813" name="Engeland" line="BX_18:13" link="bx_1812,bx_1814"/>
-    <station id="bx_1814" name="Bourdon" line="BX_18:14" link="bx_1813,bx_1815"/>
-    <station id="bx_1815" name="Crématorium" name_alt="Crematorium" line="BX_18:15" link="bx_1814,bx_1816"/>
-    <station id="bx_1816" name="Van Haelen" line="BX_18:16" link="bx_1815"/>
+    <station id="bx_1811" name="Uccle Calevoet" name_alt="Ukkel Kalevoet" line="BX_18:11" link="bx_1810,bx_1812"/>
+    <station id="bx_1812" name="Engeland" line="BX_18:12" link="bx_1811,bx_1813"/>
+    <station id="bx_1813" name="Bourdon" line="BX_18:13" link="bx_1812,bx_1814"/>
+    <station id="bx_1814" name="Crématorium" name_alt="Crematorium" line="BX_18:14" link="bx_1813,bx_1815"/>
+    <station id="bx_1815" name="Van Haelen" line="BX_18:15" link="bx_1814"/>
     <!-- 19 -->
     <station id="bx_703" name="De Wand" line="BX_19:1,BX_35:2,BX_7:3" link="bx_3501,bx_702,bx_704"/>
     <station id="bx_702" name="Saint-Lambert" name_alt="Sint-Lambertus" line="BX_19:2,BX_62:2,BX_7:2" link="bx_623,bx_625,bx_703"/>
@@ -137,19 +136,19 @@
     <station id="bx_206" name="Madou" line="BX_2:6,BX_6:6" link="bx_113,bx_205"/>
     <station id="bx_208" name="Trône" name_alt="Troon" line="BX_2:8,BX_6:8" link="bx_113,bx_209"/>
     <station id="bx_209" name="Porte de Namur" name_alt="Naamsepoort" line="BX_2:9,BX_6:9" link="bx_208,bx_210"/>
-    <station id="bx_210" name="Louise" name_alt="Louiza" line="BX_2:10,BX_6:10,BX_8:1,BX_92:17,BX_93:26,BX_97:1" link="bx_209,bx_211,bx_802,bx_9216"/>
+    <station id="bx_210" name="Louise" name_alt="Louiza" line="BX_2:10,BX_6:10,BX_8:2,BX_92:17,BX_93:26,BX_97:1" link="bx_209,bx_211,bx_801,bx_803"/>
     <station id="bx_211" name="Hôtel des Monnaies" name_alt="Munthof" line="BX_2:11,BX_6:11" link="bx_210,bx_212"/>
     <station id="bx_214" name="Clemenceau" line="BX_2:14,BX_6:14" link="bx_213,bx_215"/>
     <station id="bx_215" name="Delacroix" line="BX_2:15,BX_6:15" link="bx_121,bx_214"/>
     <station id="bx_218" name="Osseghem" name_alt="Ossegem" line="BX_2:18,BX_6:18" link="bx_120,bx_219"/>
     <!-- 25 -->
-    <station id="bx_815" name="Boondael Gare" name_alt="Boondaal Station" line="BX_25:1,BX_8:15" link="bx_814,bx_816"/>
-    <station id="bx_814" name="Brésil" name_alt="Brasilie" line="BX_25:2,BX_8:14" link="bx_813,bx_815" name_alt1="Brazilie"/>
-    <station id="bx_813" name="Marie-José" line="BX_25:3,BX_8:13" link="bx_812,bx_814"/>
-    <station id="bx_812" name="Solbosch" name_alt="Solbos" line="BX_25:4,BX_8:12" link="bx_811,bx_813"/>
-    <station id="bx_811" name="ULB" line="BX_25:5,BX_8:11" link="bx_810,bx_812"/>
-    <station id="bx_810" name="Jeanne" name_alt="Johanna" line="BX_25:6,BX_8:10" link="bx_725,bx_811"/>
-    <station id="bx_725" name="Buyl" line="BX_25:7,BX_7:25,BX_8:9" link="bx_724,bx_726,bx_811"/>
+    <station id="bx_816" name="Boondael Gare" name_alt="Boondaal Station" line="BX_25:1,BX_8:16" link="bx_815,bx_817"/>
+    <station id="bx_815" name="Brésil" name_alt="Brasilie" line="BX_25:2,BX_8:15" link="bx_814,bx_816" name_alt1="Brazilie"/>
+    <station id="bx_814" name="Marie-José" line="BX_25:3,BX_8:14" link="bx_813,bx_815"/>
+    <station id="bx_813" name="Solbosch" name_alt="Solbos" line="BX_25:4,BX_8:13" link="bx_812,bx_814"/>
+    <station id="bx_812" name="ULB" line="BX_25:5,BX_8:12" link="bx_811,bx_813"/>
+    <station id="bx_811" name="Jeanne" name_alt="Johanna" line="BX_25:6,BX_8:11" link="bx_725,bx_812"/>
+    <station id="bx_725" name="Buyl" line="BX_25:7,BX_7:25,BX_8:10" link="bx_724,bx_726,bx_812"/>
     <station id="bx_724" name="Roffiaen" line="BX_25:8,BX_7:24" link="bx_723,bx_725"/>
     <station id="bx_723" name="Etterbeek Gare" name_alt="Etterbeek Station" line="BX_25:9,BX_7:23" link="bx_722,bx_724"/>
     <station id="bx_722" name="VUB" line="BX_25:10,BX_7:22" link="bx_721,bx_723"/>
@@ -163,20 +162,19 @@
     <station id="bx_2519" name="Bienfaiteurs" name_alt="Weldoeners" line="BX_25:19,BX_62:19" link="bx_2518,bx_2520"/>
     <station id="bx_2520" name="Coteaux" name_alt="Wijnheuvelen" line="BX_25:20,BX_62:18" link="bx_2519,bx_2521"/>
     <station id="bx_2521" name="Robiano" line="BX_25:21,BX_62:17,BX_92:7" link="bx_2520,bx_2522,bx_9206,bx_9208"/>
-    <station id="bx_2522" name="Lefrancq" line="BX_25:22,BX_62:16,BX_93:16" link="bx_2521,bx_2523,bx_9208"/>
-    <station id="bx_2523" name="Liedts" line="BX_25:23,BX_55:13,BX_62:15,BX_93:15" link="bx_1014,bx_1015,bx_2522,bx_5512"/>
+    <station id="bx_2522" name="Lefrancq" line="BX_25:22,BX_62:16,BX_93:16" link="bx_1016,bx_2521,bx_9208"/>
     <!-- 35 -->
     <station id="bx_3501" name="Esplanade" line="BX_35:1" link="bx_703"/>
     <station id="bx_704" name="Araucaria" line="BX_35:3,BX_7:4" link="bx_703,bx_705"/>
     <station id="bx_705" name="Buissonnets" name_alt="Braambosjes" line="BX_35:4,BX_7:5" link="bx_704,bx_706"/>
     <!-- 39 -->
-    <station id="bx_3902" name="GJ Martin" line="BX_39:2,BX_44:2" link="bx_109,bx_3903"/>
-    <station id="bx_3903" name="Léopold II" name_alt="Leopold II" line="BX_39:3,BX_44:3" link="bx_3902,bx_3904"/>
-    <station id="bx_3904" name="Jules César" name_alt="Julius Caesar" line="BX_39:4,BX_44:4" link="bx_3903,bx_3905"/>
-    <station id="bx_3905" name="Chien Vert" name_alt="Groene Hond" line="BX_39:5,BX_44:5" link="bx_3904,bx_828"/>
-    <station id="bx_828" name="Musée du Tram" name_alt="Trammuseum" line="BX_39:6,BX_44:6,BX_8:28" link="bx_3905,bx_3907,bx_827,bx_829"/>
-    <station id="bx_3907" name="De Villalobar" line="BX_39:7,BX_44:7" link="bx_3908,bx_828"/>
-    <station id="bx_3908" name="Madoux" line="BX_39:8,BX_44:8" link="bx_3907,bx_3909,bx_4409"/>
+    <station id="bx_3902" name="GJ Martin" line="BX_39:2" link="bx_109,bx_3903"/>
+    <station id="bx_3903" name="Léopold II" name_alt="Leopold II" line="BX_39:3" link="bx_3902,bx_3904"/>
+    <station id="bx_3904" name="Jules César" name_alt="Julius Caesar" line="BX_39:4" link="bx_3903,bx_3905"/>
+    <station id="bx_3905" name="Chien Vert" name_alt="Groene Hond" line="BX_39:5" link="bx_3904,bx_828"/>
+    <station id="bx_828" name="Musée du Tram" name_alt="Trammuseum" line="BX_39:6,BX_8:28" link="bx_3905,bx_3907,bx_827,bx_829"/>
+    <station id="bx_3907" name="De Villalobar" line="BX_39:7" link="bx_3908,bx_828"/>
+    <station id="bx_3908" name="Madoux" line="BX_39:8" link="bx_3907,bx_3909"/>
     <station id="bx_3909" name="Rue au Bois" name_alt="Bosstraat" line="BX_39:9" link="bx_3908,bx_3910"/>
     <station id="bx_3910" name="Aviation" name_alt="Luchtvaart" line="BX_39:10" link="bx_3909,bx_3911"/>
     <station id="bx_3911" name="Escrime" name_alt="Schermkunst" line="BX_39:11" link="bx_101,bx_3910"/>
@@ -193,20 +191,10 @@
     <station id="bx_414" name="Messidor" line="BX_4:14,BX_92:25" link="bx_413,bx_415"/>
     <station id="bx_415" name="Boetendael" line="BX_4:15,BX_92:26" link="bx_414,bx_416"/>
     <station id="bx_416" name="Héros" name_alt="Helden" line="BX_4:16,BX_92:27" link="bx_415,bx_417,bx_9228"/>
-    <station id="bx_418" name="Wagon" name_alt="Wagen" line="BX_4:18,BX_97:24" link="bx_417,bx_419"/>
-    <station id="bx_419" name="Égide van Ophem" line="BX_4:19,BX_97:23" link="bx_418,bx_420"/>
-    <station id="bx_420" name="Carrefour Stalle" name_alt="Kruispunt Stalle" line="BX_4:20,BX_82:34,BX_97:22" link="bx_419,bx_421,bx_8233,bx_8235"/>
+    <station id="bx_418" name="Wagon" name_alt="Wagen" line="BX_4:18" link="bx_417,bx_419"/>
+    <station id="bx_419" name="Égide van Ophem" line="BX_4:19" link="bx_418,bx_420"/>
+    <station id="bx_420" name="Carrefour Stalle" name_alt="Kruispunt Stalle" line="BX_4:20" link="bx_419,bx_421"/>
     <station id="bx_421" name="Stalle Parking" line="BX_4:21" link="bx_420"/>
-    <!-- 44 -->
-    <station id="bx_4409" name="Trois Couleurs" name_alt="Drie Kleuren" line="BX_44:9" link="bx_3908,bx_4410"/>
-    <station id="bx_4410" name="Auderghem Forêt" name_alt="Oudergem Woud" line="BX_44:10" link="bx_4409,bx_4411"/>
-    <station id="bx_4411" name="Drêve des Brûlées" name_alt="Verbrandendreef" line="BX_44:11" link="bx_4410,bx_4412"/>
-    <station id="bx_4412" name="Tire aux Pigeons" name_alt="Duivenschieting" line="BX_44:12" link="bx_4411,bx_4413"/>
-    <station id="bx_4413" name="Quatre Bras" name_alt="Vier Armen" line="BX_44:13" link="bx_4412,bx_4414"/>
-    <station id="bx_4414" name="Ravenstein" line="BX_44:14" link="bx_4413,bx_4415"/>
-    <station id="bx_4415" name="Brusselstesteenweg" line="BX_44:15" link="bx_4414,bx_4416"/>
-    <station id="bx_4416" name="Oppemstraat" line="BX_44:16" link="bx_4415,bx_4417"/>
-    <station id="bx_4417" name="Tervuren Station" line="BX_44:17" link="bx_4416"/>
     <!-- 5 -->
     <station id="bx_501" name="Erasme" name_alt="Erasmus" line="BX_5:1" link="bx_502"/>
     <station id="bx_502" name="Eddy Merckx" line="BX_5:2" link="bx_501,bx_503"/>
@@ -225,9 +213,9 @@
     <station id="bx_529" name="Herrmann-Debroux" line="BX_5:29,BX_8:24" link="bx_528,bx_823,bx_825"/>
     <!-- 51 -->
     <station id="bx_902" name="Stade" name_alt="Stadion" line="BX_51:1,BX_9:2,BX_93:1" link="bx_5102,bx_626,bx_903"/>
-    <station id="bx_5102" name="Stiénon" line="BX_51:2,BX_93:2" link="bx_5103,bx_902,bx_9303"/>
-    <station id="bx_5103" name="Polyclinique Brugmann" name_alt="Poliklink Brugmann" line="BX_51:3" link="bx_5102,bx_5104"/>
-    <station id="bx_5104" name="Hôpital Brugmann" name_alt="Brugmann-Ziekenhuis" line="BX_51:4,BX_93:4" link="bx_1905,bx_5103,bx_9303"/>
+    <station id="bx_5102" name="Stiénon" line="BX_51:2,BX_93:2" link="bx_5103,bx_902"/>
+    <station id="bx_5103" name="Polyclinique Brugmann" name_alt="Poliklink Brugmann" line="BX_51:3,BX_93:3" link="bx_5102,bx_5104" name_alt1="Polikliniek Brugmann"/>
+    <station id="bx_5104" name="Hôpital Brugmann" name_alt="Brugmann-Ziekenhuis" line="BX_51:4,BX_93:4" link="bx_1905,bx_5103"/>
     <station id="bx_5107" name="Démineurs" name_alt="Ontmijners" line="BX_51:7" link="bx_1906,bx_5108"/>
     <station id="bx_5108" name="Woeste" line="BX_51:8" link="bx_5107,bx_5109"/>
     <station id="bx_5109" name="Odon Warland" line="BX_51:9" link="bx_5108,bx_620"/>
@@ -237,7 +225,7 @@
     <station id="bx_5114" name="Sainctelette" line="BX_51:14" link="bx_202,bx_203"/>
     <station id="bx_5116" name="Marguerite Duras" line="BX_51:16" link="bx_203,bx_5117"/>
     <station id="bx_5117" name="Porte de Flandre" name_alt="Vlaamsepoort" line="BX_51:17" link="bx_5116,bx_5118"/>
-    <station id="bx_5118" name="Portte de Ninove" name_alt="Ninoofsepoort" line="BX_51:18" link="bx_5117,bx_5119"/>
+    <station id="bx_5118" name="Porte de Ninove" name_alt="Ninoofsepoort" line="BX_51:18" link="bx_5117,bx_5119"/>
     <station id="bx_5119" name="Arts et Métiers" line="BX_51:19,BX_82:15" link="bx_5118,bx_5120,bx_8214"/>
     <station id="bx_5120" name="Porte d'Anderlecht" name_alt="Anderlechtsepoort" line="BX_51:20,BX_82:16" link="bx_406,bx_5119"/>
     <!-- 55 -->
@@ -249,10 +237,7 @@
     <station id="bx_5506" name="Tilleul" name_alt="Linde" line="BX_55:6" link="bx_5505,bx_5507"/>
     <station id="bx_5507" name="Helmet" line="BX_55:7" link="bx_5506,bx_5508"/>
     <station id="bx_5508" name="Foyer Schaarbeekois" name_alt="Schaarbeekse Haard" line="BX_55:8" link="bx_5507,bx_5509"/>
-    <station id="bx_5509" name="Waelhem" line="BX_55:9" link="bx_5508,bx_5510"/>
-    <station id="bx_5510" name="Verboekhoven" line="BX_55:10,BX_92:3" link="bx_5509,bx_5511,bx_708,bx_9204"/>
-    <station id="bx_5511" name="Pavillon" name_alt="Paviljoen" line="BX_55:11" link="bx_5510,bx_5512"/>
-    <station id="bx_5512" name="Gallait" line="BX_55:12" link="bx_2523,bx_5511"/>
+    <station id="bx_5509" name="Waelhem" line="BX_55:9" link="bx_1013,bx_5508"/>
     <!-- 6 -->
     <station id="bx_621" name="Pannenhuis" line="BX_6:21" link="bx_620,bx_622"/>
     <station id="bx_622" name="Bockstael" line="BX_6:22,BX_62:9,BX_93:9" link="bx_6208,bx_621,bx_6210,bx_623"/>
@@ -263,8 +248,10 @@
     <station id="bx_6207" name="Foyer Jettois" name_alt="Jetse Haard" line="BX_62:7,BX_93:7" link="bx_1906,bx_6208"/>
     <station id="bx_6208" name="Jacobs Fontaine" line="BX_62:8,BX_93:8" link="bx_6207,bx_622"/>
     <station id="bx_6210" name="Moorslede" line="BX_62:10,BX_93:10" link="bx_6211,bx_622"/>
-    <station id="bx_6211" name="Princesse Clémentine" name_alt="Prinses Clementina" line="BX_62:11,BX_93:11" link="bx_6210,bx_6212,bx_9312"/>
-    <station id="bx_6212" name="Marie-Christine" name_alt="Maria-Christina" line="BX_62:12" link="bx_1013,bx_6211"/>
+    <station id="bx_6211" name="Princesse Clémentine" name_alt="Prinses Clementina" line="BX_62:11,BX_93:11" link="bx_6210,bx_6212"/>
+    <station id="bx_6212" name="Marie-Christine" name_alt="Maria-Christina" line="BX_62:12,BX_93:12" link="bx_6211,bx_6213"/>
+    <station id="bx_6213" name="Jules de Trooz" line="BX_62:13,BX_93:13" link="bx_6212,bx_6214"/>
+    <station id="bx_6214" name="Masui" line="BX_62:14,BX_93:14" link="bx_1016,bx_6213"/>
     <station id="bx_714" name="Léopold III" name_alt="Leopold III" line="BX_62:22,BX_7:14" link="bx_6223,bx_713,bx_715"/>
     <station id="bx_6223" name="Pentathlon" line="BX_62:23" link="bx_6224,bx_714"/>
     <station id="bx_6224" name="Evere Shopping" line="BX_62:24" link="bx_6223,bx_6225"/>
@@ -273,26 +260,25 @@
     <station id="bx_6228" name="Bourget" line="BX_62:28" link="bx_6227,bx_6229"/>
     <station id="bx_6229" name="Eurocontrol" line="BX_62:29" link="bx_6228"/>
     <!-- 7 -->
-    <station id="bx_708" name="Princesse Élisabeth" name_alt="Prinses Elisabeth" line="BX_7:8,BX_92:2" link="bx_5510,bx_707,bx_709,bx_9201"/>
     <station id="bx_709" name="Demolder" line="BX_7:9" link="bx_708,bx_710"/>
     <station id="bx_710" name="Hôpital Paul Brien" name_alt="Paul Brien-Ziekenhuis" line="BX_7:10" link="bx_709,bx_711"/>
     <station id="bx_711" name="Louis Bertrand" line="BX_7:11" link="bx_710,bx_712"/>
     <station id="bx_712" name="Héliotropes" name_alt="Heliotropen" line="BX_7:12" link="bx_711,bx_713"/>
     <station id="bx_713" name="Chazal" line="BX_7:13" link="bx_712,bx_714"/>
-    <station id="bx_726" name="Cambre-Étoile" name_alt="Ter Kameren-Ster" line="BX_7:26,BX_8:8" link="bx_725,bx_727"/>
-    <station id="bx_727" name="Legrand" line="BX_7:27,BX_8:7,BX_93:32" link="bx_726,bx_728,bx_806"/>
+    <station id="bx_726" name="Cambre-Étoile" name_alt="Ter Kameren-Ster" line="BX_7:26,BX_8:9" link="bx_725,bx_727"/>
+    <station id="bx_727" name="Legrand" line="BX_7:27,BX_8:8,BX_93:32" link="bx_726,bx_728,bx_807"/>
     <station id="bx_728" name="Bascule" line="BX_7:28" link="bx_727,bx_729"/>
     <station id="bx_729" name="Longchamp" line="BX_7:29" link="bx_728,bx_730"/>
     <station id="bx_730" name="Gossart" line="BX_7:30" link="bx_729,bx_731"/>
     <station id="bx_731" name="Cavell" line="BX_7:31" link="bx_730,bx_732"/>
     <!-- 8 -->
-    <station id="bx_802" name="Stéphanie" name_alt="Stefania" line="BX_8:2,BX_92:18,BX_93:27,BX_97:2" link="bx_210,bx_803,bx_9219"/>
-    <station id="bx_803" name="Defacqz" line="BX_8:3,BX_93:28" link="bx_802,bx_804"/>
-    <station id="bx_804" name="Bailli" name_alt="Baljuw" line="BX_8:4,BX_81:11,BX_93:29" link="bx_803,bx_805,bx_8110,bx_8112"/>
-    <station id="bx_805" name="Vleurgat" line="BX_8:5,BX_93:30" link="bx_804,bx_806"/>
-    <station id="bx_806" name="Abbaye" name_alt="Abdij" line="BX_8:6,BX_93:31" link="bx_727,bx_805"/>
-    <station id="bx_816" name="Hippodrome de Boitsfort" name_alt="Renbaan van Bosvoorde" line="BX_8:16" link="bx_815,bx_817"/>
-    <station id="bx_817" name="Coccinelles" name_alt="Lieveheersbeestjes" line="BX_8:17" link="bx_816,bx_818"/>
+    <station id="bx_801" name="Poelaert" line="BX_8:1,BX_92:16,BX_93:25" link="bx_210,bx_9215"/>
+    <station id="bx_803" name="Stéphanie" name_alt="Stefania" line="BX_8:3,BX_92:18,BX_93:27,BX_97:2" link="bx_210,bx_804,bx_9219"/>
+    <station id="bx_804" name="Defacqz" line="BX_8:4,BX_93:28" link="bx_803,bx_805"/>
+    <station id="bx_805" name="Bailli" name_alt="Baljuw" line="BX_8:5,BX_81:11,BX_93:29" link="bx_804,bx_806,bx_8110,bx_8112"/>
+    <station id="bx_806" name="Vleurgat" line="BX_8:6,BX_93:30" link="bx_805,bx_807"/>
+    <station id="bx_807" name="Abbaye" name_alt="Abdij" line="BX_8:7,BX_93:31" link="bx_727,bx_806"/>
+    <station id="bx_817" name="Hippodrome de Boitsfort" name_alt="Renbaan van Bosvoorde" line="BX_8:17" link="bx_816,bx_818"/>
     <station id="bx_818" name="Boitsfort Gare" name_alt="Bosvoorde Station" line="BX_8:18" link="bx_817,bx_819"/>
     <station id="bx_819" name="Delleur" line="BX_8:19" link="bx_818,bx_820"/>
     <station id="bx_820" name="Wiener" line="BX_8:20" link="bx_819,bx_821"/>
@@ -313,8 +299,8 @@
     <station id="bx_8107" name="Germoir" name_alt="Mouterij" line="BX_81:7" link="bx_8106,bx_8108"/>
     <station id="bx_8108" name="Levure" name_alt="Gist" line="BX_81:8" link="bx_8107,bx_8109"/>
     <station id="bx_8109" name="Flagey" line="BX_81:9" link="bx_8108,bx_8110"/>
-    <station id="bx_8110" name="Dautzenberg" line="BX_81:10" link="bx_804,bx_8109"/>
-    <station id="bx_8112" name="Trinité" name_alt="Drievuldigheid" line="BX_81:12" link="bx_804,bx_8113"/>
+    <station id="bx_8110" name="Dautzenberg" line="BX_81:10" link="bx_805,bx_8109"/>
+    <station id="bx_8112" name="Trinité" name_alt="Drievuldigheid" line="BX_81:12" link="bx_805,bx_8113"/>
     <station id="bx_8113" name="Janson" line="BX_81:13,BX_92:20,BX_97:4" link="bx_8112,bx_8114,bx_9219,bx_9221"/>
     <station id="bx_8114" name="Moris" line="BX_81:14,BX_97:5" link="bx_8113,bx_8115"/>
     <station id="bx_8115" name="Lombardie" name_alt="Lombardije" line="BX_81:15,BX_97:6" link="bx_8114,bx_8116"/>
@@ -352,20 +338,11 @@
     <station id="bx_8221" name="Imprimerie" name_alt="Drukkerij" line="BX_82:21" link="bx_8119,bx_8222"/>
     <station id="bx_8222" name="Orban" line="BX_82:22" link="bx_8221,bx_8223"/>
     <station id="bx_8223" name="Wiels" line="BX_82:23,BX_97:11" link="bx_8222,bx_8224,bx_9710"/>
-    <station id="bx_8224" name="Union" line="BX_82:24,BX_97:12" link="bx_8223,bx_8225"/>
-    <station id="bx_8225" name="Châtaignes" name_alt="Kastanjes" line="BX_82:25,BX_97:13" link="bx_8224,bx_8226"/>
-    <station id="bx_8226" name="Zaman-Forest National" name_alt="Zaman-Vorst Nationaal" line="BX_82:26,BX_97:14" link="bx_8225,bx_8227"/>
-    <station id="bx_8227" name="Monaco" line="BX_82:27,BX_97:15" link="bx_8226,bx_8228"/>
-    <station id="bx_8228" name="Forest Centre" name_alt="Vorst Centrum" line="BX_82:28,BX_97:16" link="bx_8227,bx_8229"/>
-    <station id="bx_8229" name="Saint-Denis" name_alt="Sint-Denijs" line="BX_82:29,BX_97:17" link="bx_8228,bx_8230"/>
-    <station id="bx_8230" name="Max Waller" line="BX_82:30,BX_97:18" link="bx_8229,bx_8231"/>
-    <station id="bx_8231" name="Bempt" line="BX_82:31,BX_97:19" link="bx_8230,bx_8232"/>
-    <station id="bx_8232" name="Neerstalle" line="BX_82:32,BX_97:20" link="bx_8231,bx_8233"/>
-    <station id="bx_8233" name="Merlo" line="BX_82:33,BX_97:21" link="bx_420,bx_8232"/>
-    <station id="bx_8235" name="Keyenbempt" line="BX_82:35" link="bx_420,bx_8236"/>
-    <station id="bx_8236" name="Rodts" line="BX_82:36" link="bx_8235,bx_8237"/>
-    <station id="bx_8237" name="Grand'Route" name_alt="Grote Baan" line="BX_82:37" link="bx_8236,bx_8238"/>
-    <station id="bx_8238" name="Drogenbos Château" name_alt="Drogenbos Kasteel" line="BX_82:38" link="bx_8237"/>
+    <station id="bx_8224" name="Union" line="BX_82:24" link="bx_8223,bx_8225"/>
+    <station id="bx_8225" name="Châtaignes" name_alt="Kastanjes" line="BX_82:25" link="bx_8224,bx_8226"/>
+    <station id="bx_8226" name="Zaman-Forest National" name_alt="Zaman-Vorst Nationaal" line="BX_82:26" link="bx_8225,bx_8227"/>
+    <station id="bx_8227" name="Monaco" line="BX_82:27" link="bx_8226,bx_8228"/>
+    <station id="bx_8228" name="Forest Centre" name_alt="Vorst Centrum" line="BX_82:28" link="bx_8227"/>
     <!-- 9 -->
     <station id="bx_903" name="Palfijn" line="BX_9:3" link="bx_902,bx_904"/>
     <station id="bx_904" name="De Heyn" line="BX_9:4" link="bx_903,bx_905"/>
@@ -387,7 +364,7 @@
     <station id="bx_924" name="Grand-Bigard" name_alt="Groot-Bijgaarden" line="BX_9:24" link="bx_923"/>
     <!-- 92 -->
     <station id="bx_9201" name="Schaerbeek Gare" name_alt="Schaerbeek Station" line="BX_92:1" link="bx_708"/>
-    <station id="bx_9204" name="Eenens" line="BX_92:4" link="bx_5510,bx_9205"/>
+    <station id="bx_9204" name="Eenens" line="BX_92:4" link="bx_1013,bx_9205"/>
     <station id="bx_9205" name="Pogge" line="BX_92:5" link="bx_9204,bx_9206"/>
     <station id="bx_9206" name="Église Saint-Servais" name_alt="Sint-Servaaskerk" line="BX_92:6" link="bx_2521,bx_9205"/>
     <station id="bx_9208" name="Sainte-Marie" name_alt="Sint-Maria" line="BX_92:8,BX_93:17" link="bx_2521,bx_2522,bx_9209"/>
@@ -395,15 +372,14 @@
     <station id="bx_9211" name="Congrès" name_alt="Congres" line="BX_92:11,BX_93:20" link="bx_114,bx_205"/>
     <station id="bx_9213" name="Palais" name_alt="Paleizen" line="BX_92:13,BX_93:22" link="bx_114,bx_9214"/>
     <station id="bx_9214" name="Royale" name_alt="Koning" line="BX_92:14,BX_93:23" link="bx_9213,bx_9215"/>
-    <station id="bx_9215" name="Petit Sablon" name_alt="Kleine Zavel" line="BX_92:15,BX_93:24" link="bx_9214,bx_9216"/>
-    <station id="bx_9216" name="Poelaert" line="BX_92:16,BX_93:25" link="bx_210,bx_9215"/>
-    <station id="bx_9219" name="Faider" line="BX_92:19,BX_97:3" link="bx_802,bx_8113"/>
+    <station id="bx_9215" name="Petit Sablon" name_alt="Kleine Zavel" line="BX_92:15,BX_93:24" link="bx_801,bx_9214"/>
+    <station id="bx_9219" name="Faider" line="BX_92:19,BX_97:3" link="bx_803,bx_8113"/>
     <station id="bx_9221" name="Ma Campagne" line="BX_92:21" link="bx_8113,bx_9222"/>
     <station id="bx_9222" name="Darwin" line="BX_92:22" link="bx_9221,bx_9223"/>
     <station id="bx_9223" name="Molière" line="BX_92:23" link="bx_413,bx_9222"/>
-    <station id="bx_9228" name="Marlow" line="BX_92:28,BX_97:26" link="bx_416,bx_417,bx_9229"/>
-    <station id="bx_9229" name="Wolvendael" line="BX_92:29,BX_97:27" link="bx_9228,bx_9230"/>
-    <station id="bx_9230" name="Dieweg" line="BX_92:30,BX_97:28" link="bx_9229,bx_9231"/>
+    <station id="bx_9228" name="Marlow" line="BX_92:28" link="bx_416,bx_9229"/>
+    <station id="bx_9229" name="Wolvendael" line="BX_92:29" link="bx_9228,bx_9230"/>
+    <station id="bx_9230" name="Dieweg" line="BX_92:30" link="bx_9229,bx_9231"/>
     <station id="bx_9231" name="Thévenet" line="BX_92:31" link="bx_9230,bx_9232"/>
     <station id="bx_9232" name="Lancaster" line="BX_92:32" link="bx_9231,bx_9233"/>
     <station id="bx_9233" name="Gare de Saint-Job" name_alt="Station Sint-Job" line="BX_92:33" link="bx_9232,bx_9234"/>
@@ -411,8 +387,6 @@
     <station id="bx_9235" name="Alphonse XIII" line="BX_92:35" link="bx_9234,bx_9236"/>
     <station id="bx_9236" name="Fort-Jaco" line="BX_92:36" link="bx_9235"/>
     <!-- 93 -->
-    <station id="bx_9303" name="Kufferath" line="BX_93:3" link="bx_5102,bx_5104"/>
-    <station id="bx_9312" name="Outre-Ponts" name_alt="Over de Bruggen" line="BX_93:12" link="bx_1013,bx_6211"/>
     <!-- 97 -->
     <station id="bx_9708" name="Combaz" line="BX_97:8" link="bx_8116,bx_9709"/>
     <station id="bx_9709" name="Rochefort" line="BX_97:9" link="bx_9708,bx_9710"/>

@@ -144,7 +144,7 @@
     <!-- 18 -->
     <!-- 19 -->
     <station id="osl_1902" name="Bogstadveien" line="OSL_19:2" link="osl_119,osl_1903"/>
-    <station id="osl_1903" name="Homannsbyen" line="OSL_19:3" link="osl_1712,osl_1902"/>
+    <station id="osl_1903" name="Homansbyen" line="OSL_19:3" link="osl_1712,osl_1902"/>
     <!-- 2 -->
     <station id="osl_201" name="Østerås" line="OSL_2:1" link="osl_202"/>
     <station id="osl_202" name="Lijordet" line="OSL_2:2" link="osl_201,osl_203"/>

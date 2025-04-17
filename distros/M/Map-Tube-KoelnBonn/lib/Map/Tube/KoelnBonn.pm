@@ -14,13 +14,13 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.92.2');
+our $VERSION = version->declare('v0.92.3');
 
 =encoding utf8
 
 =head1 NAME
 
-Map::Tube::KoelnBonn - Interface to the Koeln-Bonn U- and S-Bahn and tram maps
+Map::Tube::KoelnBonn - Interface to the Koeln-Bonn (Cologne/Bonn) area U- and S-Bahn and tram maps
 
 =cut
 
@@ -35,9 +35,9 @@ with 'Map::Tube';
 =head1 SYNOPSIS
 
     use Map::Tube::KoelnBonn;
-    my $tube = Map::Tube::KoelnBonn->new();
+	my $tube = Map::Tube::KoelnBonn->new( );
 
-    my $route = $tube->get_shortest_route('Wurzerstr.', 'Plittersdorf');
+	my $route = $tube->get_shortest_route( 'Wurzerstr.', 'Plittersdorf' );
 
     print "Route: $route\n";
 
@@ -53,14 +53,14 @@ All interesting methods are provided by the role L<Map::Tube>.
 =head2 CONSTRUCTOR
 
     use Map::Tube::KoelnBonn;
-    my $tube = Map::Tube::KoelnBonn->new();
+	my $tube = Map::Tube::KoelnBonn->new( );
 
 The only argument, C<xml>, is optional; if specified, it should be a code ref
 to a function that returns either the path the XML map file, or a string
 containing this XML content. The default is the path to F<koelnbonn-map.xml>
 that is a part of this distribution. For further information see L<Map::Tube>.
 
-=head2 xml()
+=head2 xml( )
 
 This read-only accessor returns whatever was specified as the XML source at
 construction.

@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::KoelnBonn.
 
+0.92.3 2025-04-17
+  - Make spelling in documentation more consistent.
+  - Fixed a station name.
+  - Require Map::Tube 4.04.
+
 0.92.2 2025-02-17
   - Require Map::Tube 3.94 and adapt tests accordingly.
   - Remove support for Perl 5.10 because of test failing for Perl < 5.11.

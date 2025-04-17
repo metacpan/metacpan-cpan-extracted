@@ -1,5 +1,11 @@
 Revision history for perl module Net::EPP::Server:
 
+0.006 - 2025-04-16
+  - remove debugging code from write_log()
+
+0.005 - 2025-04-16
+  - support logging using log_dir.
+
 0.004 - 2025-03-24
   - avoid exception when client doesn't use <clTRID> in commands.
 

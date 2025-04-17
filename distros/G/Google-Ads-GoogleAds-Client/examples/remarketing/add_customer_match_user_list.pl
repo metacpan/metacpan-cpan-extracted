@@ -107,8 +107,8 @@ sub create_customer_match_user_list {
       name        => "Customer Match list #" . uniqid(),
       description =>
         "A list of customers that originated from email and physical addresses",
-      # Customer Match user lists can use a membership life span of 10000 to
-      # indicate unlimited; otherwise normal values apply.
+      # Membership life span must be between 0 and 540 days inclusive. See:
+      # https://developers.google.com/google-ads/api/reference/rpc/latest/UserList#membership_life_span
       # Set the membership life span to 30 days.
       membershipLifeSpan => 30,
       # Set the upload key type to indicate the type of identifier that will be
@@ -250,7 +250,7 @@ sub add_users_to_customer_match_user_list {
 
 # Retrieves, checks, and prints the status of the offline user data job.
 # [START add_customer_match_user_list_4]
-sub check_job_status() {
+sub check_job_status {
   my ($api_client, $customer_id, $offline_user_data_job_resource_name) = @_;
 
   my $search_query =
@@ -260,7 +260,7 @@ sub check_job_status() {
     "offline_user_data_job.customer_match_user_list_metadata.user_list " .
     "FROM offline_user_data_job " .
     "WHERE offline_user_data_job.resource_name = " .
-    "$offline_user_data_job_resource_name LIMIT 1";
+    "'$offline_user_data_job_resource_name' LIMIT 1";
 
   my $search_request =
     Google::Ads::GoogleAds::V19::Services::GoogleAdsService::SearchGoogleAdsRequest
@@ -292,7 +292,7 @@ sub check_job_status() {
     print_customer_match_user_list_info($api_client, $customer_id,
       $offline_user_data_job->{customerMatchUserListMetadata}{userList});
   } elsif ($status eq FAILED) {
-    print "Failure reason: $offline_user_data_job->{failure_reason}";
+    print "Failure reason: $offline_user_data_job->{failureReason}";
   } elsif (grep /$status/, (PENDING, RUNNING)) {
     print
       "To check the status of the job periodically, use the following GAQL " .

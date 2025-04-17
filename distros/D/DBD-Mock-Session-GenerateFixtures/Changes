@@ -4,3 +4,5 @@
     - no changes, add Exporter::NoWork to Makefile.PL
 0.04    2024-04-30
     - no changes, add abstarct Makefile.PL and changes file
+0.08   2025-05-17
+    - support for mysql and rose db

@@ -59,6 +59,12 @@ DISTRIBUTIONS
       overload 0
       perl 5.006
       strict 0
+  Class-Accessor-Lite-0.08
+    pathname: K/KA/KAZUHO/Class-Accessor-Lite-0.08.tar.gz
+    provides:
+      Class::Accessor::Lite 0.08
+    requirements:
+      ExtUtils::MakeMaker 6.36
   Class-Data-Inheritable-0.10
     pathname: R/RS/RSHERER/Class-Data-Inheritable-0.10.tar.gz
     provides:
@@ -891,6 +897,16 @@ DISTRIBUTIONS
       perl 5.008
       strict 0
       warnings 0
+  File-Copy-Recursive-0.45
+    pathname: D/DM/DMUEY/File-Copy-Recursive-0.45.tar.gz
+    provides:
+      File::Copy::Recursive 0.45
+    requirements:
+      Cwd 0
+      ExtUtils::MakeMaker 0
+      File::Copy 0
+      File::Glob 0
+      File::Spec 0
   File-ShareDir-1.118
     pathname: R/RE/REHSACK/File-ShareDir-1.118.tar.gz
     provides:
@@ -1802,6 +1818,17 @@ DISTRIBUTIONS
       Test::Builder 0.13
       Test::Builder::Tester 1.02
       perl 5.006
+  Test-mysqld-1.0030
+    pathname: S/SO/SONGMU/Test-mysqld-1.0030.tar.gz
+    provides:
+      Test::mysqld 1.0030
+    requirements:
+      Class::Accessor::Lite 0
+      DBI 0
+      File::Copy::Recursive 0
+      File::Temp 0
+      Module::Build::Tiny 0.035
+      perl 5.008001
   Text-Diff-1.45
     pathname: N/NE/NEILB/Text-Diff-1.45.tar.gz
     provides:

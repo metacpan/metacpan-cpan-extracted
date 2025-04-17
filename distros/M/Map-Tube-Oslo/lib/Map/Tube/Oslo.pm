@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.1');
+our $VERSION = version->declare('v0.1.2');
 
 =encoding utf8
 
@@ -37,7 +37,7 @@ with 'Map::Tube';
 	use Map::Tube::Oslo;
 	my $tube = Map::Tube::Oslo->new();
 
-	my $route = $tube->get_shortest_route( 'Slussen', 'Solna strand');
+	my $route = $tube->get_shortest_route( 'Slottet', 'Skillebekk');
 
     print "Route: $route\n";
 

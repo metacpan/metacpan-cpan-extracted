@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::RheinRuhr.
 
+0.2.2 2025-04-17
+  - Fixed station names.
+  - Fixed trajectory for line 104.
+  - Require Map::Tube 4.04.
+
 0.2.1 2025-03-20
   - Disambiguate station names, fix corresponding links.
 

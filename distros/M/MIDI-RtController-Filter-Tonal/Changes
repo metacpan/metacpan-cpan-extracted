@@ -1,5 +1,10 @@
 Revision history for MIDI-RtController-Filter-Tonal
 
+0.0302 2025-04-17 01:15:56
+  - Improve documentation.
+  - Improve the eg/tester.pl program.
+  - Fix up the walk_tone filter logic.
+
 0.0301 2025-04-14 10:14:10
   - Fix logic.
 

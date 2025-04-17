@@ -1,3 +1,15 @@
+1.001001 - 2025-04-16
+
+  [ENHANCEMENTS]
+
+  * replace ALIEN_INSTALL_TYPE with ALIEN_ULTRAVIOLET_INSTALL_TYPE
+
+1.001000 - 2025-04-16
+
+  [NEW FEATURES]
+
+  * support ALIEN_INSTALL_TYPE=system to force+assume use of system uv
+
 1.000000 - 2025-02-06
 
   [NEW FEATURES]

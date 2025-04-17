@@ -18,7 +18,7 @@ my $map = new_ok( 'Map::Tube::Toulouse' );
 #   print STDERR "*******\n";
 # }
 
-is( $map->name( ), 'Métro de Tolouse', 'Name of map does not match' );
+is( $map->name( ), 'Toulouse métro, tram et funiculaire', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };
 like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );

@@ -2,15 +2,11 @@
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs { 'Test::Pod' => '1.22' };
 
-if(not $ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-# Ensure a recent version of Test::Pod
-my $min_tp = 1.22;
-eval "use Test::Pod $min_tp";
-plan(skip_all => "Test::Pod $min_tp required for testing POD") if $@;
+Test::Pod->import();
 
 all_pod_files_ok();

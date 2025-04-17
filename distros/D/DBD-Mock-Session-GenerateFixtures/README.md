@@ -24,6 +24,8 @@ This not a part form DBD::Mock::Session distribution just a wrapper around it.
 	# Case 4: Providing an array reference containing mock data
 	my $mock_dumper = DBD::Mock::Session::GenerateFixtures->new({ data => \@mock_data });
 	my $dbh = $mock_dumper->get_dbh();
+
+	# this was test agasint Mysql with Rose::Db for moe details please see t/17_test_rose_db_with_mysql.t
 	# Your code using the mock DBD
 ```
 # Installation

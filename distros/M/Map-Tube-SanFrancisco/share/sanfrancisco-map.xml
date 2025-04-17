@@ -51,7 +51,7 @@
     <station id="sf_red11" name="Embarcadero" line="SF_BLUE:10,SF_GREEN:14,SF_J:1,SF_K:1,SF_L:1,SF_M:1,SF_N:5,SF_RED:11,SF_S:1,SF_YELLOW:15" link="sf_n04,sf_red10,sf_red12" other_link="walk:sf_f15"/>
     <station id="sf_red12" name="Montgomery" line="SF_BLUE:11,SF_GREEN:15,SF_J:2,SF_K:2,SF_L:2,SF_M:2,SF_N:6,SF_RED:12,SF_S:2,SF_YELLOW:16" link="sf_red11,sf_red13" other_link="walk:sf_f17"/>
     <station id="sf_red13" name="Powell" line="SF_BLUE:12,SF_GREEN:16,SF_J:3,SF_K:3,SF_L:3,SF_M:3,SF_N:7,SF_RED:13,SF_S:3,SF_YELLOW:17" link="sf_red12,sf_red14" other_link="walk:sf_f19,walk:sf_powell01"/>
-    <station id="sf_red14" name="Civic Center" line="SF_BLUE:13,SF_GREEN:17,SF_J:4,SF_K:4,SF_L:4,SF_M:4,SF_N:8,SF_RED:14,SF_S:4,SF_YELLOW:18" link="sf_j05,sf_red13,sf_red15" other_link="walk:sf_f22,walk:sf_f36"/>
+    <station id="sf_red14" name="Civic Center" name_alt="walk" name_alt1="Market &amp; Hyde" line="SF_BLUE:13,SF_GREEN:17,SF_J:4,SF_K:4,SF_L:4,SF_M:4,SF_N:8,SF_RED:14,SF_S:4,SF_YELLOW:18" link="sf_j05,sf_red13,sf_red15" other_link="walk:sf_f22,walk:sf_f36"/>
     <station id="sf_red15" name="16th St &amp; Mission" line="SF_BLUE:14,SF_GREEN:18,SF_RED:15,SF_YELLOW:19" link="sf_red14,sf_red16"/>
     <station id="sf_red16" name="24th St &amp; Mission" line="SF_BLUE:15,SF_GREEN:19,SF_RED:16,SF_YELLOW:20" link="sf_red15,sf_red17"/>
     <station id="sf_red17" name="Glen Park" line="SF_BLUE:16,SF_GREEN:20,SF_RED:17,SF_YELLOW:21" link="sf_red16,sf_red18"/>
@@ -64,7 +64,7 @@
     <station id="sf_califo04" name="California &amp; Battery" line="SF_CALIFO:4" link="sf_califo03,sf_califo05"/>
     <station id="sf_califo05" name="California &amp; Sansome" line="SF_CALIFO:5" link="sf_califo04,sf_califo06"/>
     <station id="sf_califo06" name="California &amp; Montgomery" line="SF_CALIFO:6" link="sf_califo05,sf_califo07"/>
-    <station id="sf_califo07" name="California &amp; Kearney" line="SF_CALIFO:7" link="sf_califo06,sf_califo08"/>
+    <station id="sf_califo07" name="California &amp; Kearny" line="SF_CALIFO:7" link="sf_califo06,sf_califo08"/>
     <station id="sf_califo08" name="California &amp; Grant" line="SF_CALIFO:8" link="sf_califo07,sf_califo09"/>
     <station id="sf_califo09" name="California &amp; Stockton" line="SF_CALIFO:9" link="sf_califo08,sf_califo10"/>
     <station id="sf_califo10" name="California &amp; Powell" line="SF_CALIFO:10,SF_POWELL:8,SF_POWELL1:8" link="sf_califo09,sf_califo11,sf_powell07,sf_powell09"/>
@@ -115,12 +115,12 @@
     <station id="sf_f36" name="Market &amp; Hyde" line="SF_F:36" link="sf_f22" other_link="walk:sf_red14"/>
     <station id="sf_f37" name="Market &amp; Taylor" line="SF_F:37" link="sf_f20"/>
     <station id="sf_f38" name="Market &amp; Stockton" line="SF_F:38" link="sf_f39"/>
-    <station id="sf_f39" name="Market &amp; Kearney" line="SF_F:39" link="sf_f40"/>
+    <station id="sf_f39" name="Market &amp; Kearny" line="SF_F:39" link="sf_f40"/>
     <station id="sf_f40" name="Market &amp; New Montgomery" line="SF_F:40" link="sf_f41"/>
     <station id="sf_f41" name="Market &amp; Battery" line="SF_F:41" link="sf_f42"/>
     <station id="sf_f42" name="Market &amp; Drumm" line="SF_F:42" link="sf_f14"/>
     <!-- Green Line -->
-    <station id="sf_green01" name="Beryessa/North San José" line="SF_GREEN:1,SF_ORANGE:21" link="sf_green02"/>
+    <station id="sf_green01" name="Berryessa/North San José" line="SF_GREEN:1,SF_ORANGE:21" link="sf_green02"/>
     <station id="sf_green02" name="Milpitas" line="SF_GREEN:2,SF_ORANGE:20" link="sf_green01,sf_green03"/>
     <station id="sf_green03" name="Warm Springs/South Fremont" line="SF_GREEN:3,SF_ORANGE:19" link="sf_green02,sf_green04"/>
     <station id="sf_green04" name="Fremont" line="SF_GREEN:4,SF_ORANGE:18" link="sf_green03,sf_green05"/>
@@ -187,7 +187,7 @@
     <station id="sf_m12" name="Right of way/Ocean" line="SF_M:12" link="sf_k11,sf_m13"/>
     <station id="sf_m13" name="Right of way/Eucalyptus" line="SF_M:13" link="sf_m12,sf_m14"/>
     <station id="sf_m14" name="Stonestown Galleria" line="SF_M:14" link="sf_m13,sf_m15"/>
-    <station id="sf_m15" name="San Francisco State University" line="SF_M:15" link="sf_m14,sf_m16"/>
+    <station id="sf_m15" name="SF State" line="SF_M:15" link="sf_m14,sf_m16"/>
     <station id="sf_m16" name="19th Ave &amp; Junipero Serra" line="SF_M:16" link="sf_m18"/>
     <station id="sf_m17" name="19th Ave &amp; Randolph" line="SF_M:17" link="sf_m15"/>
     <station id="sf_m18" name="Randolph &amp; Arch" line="SF_M:18" link="sf_m17,sf_m19"/>
@@ -271,8 +271,7 @@
     <station id="sf_powell30" name="Hyde &amp; Chestnut" line="SF_POWELL:30" link="sf_powell29,sf_powell31"/>
     <station id="sf_powell31" name="Hyde &amp; Bay" line="SF_POWELL:31" link="sf_powell30,sf_powell32"/>
     <station id="sf_powell32" name="Hyde &amp; North Point" line="SF_POWELL:32" link="sf_powell31,sf_powell33"/>
-    <station id="sf_powell33" name="Hyde &amp; Beach" line="SF_POWELL:33" link="sf_powell32,sf_powell34"/>
-    <station id="sf_powell34" name="Fisherman’s Wharf" line="SF_POWELL:34" link="sf_powell33"/>
+    <station id="sf_powell33" name="Hyde &amp; Beach" line="SF_POWELL:33" link="sf_powell32"/>
     <!-- Powell-Mason Line -->
     <station id="sf_powell115" name="Mason &amp; Pacific" line="SF_POWELL1:15" link="sf_powell116,sf_powell12"/>
     <station id="sf_powell116" name="Mason &amp; Broadway" line="SF_POWELL1:16" link="sf_powell115,sf_powell117"/>

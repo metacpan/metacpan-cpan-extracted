@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.242720';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.251060';
 use 5.018;                      # to avoid a crash due to call to "can" below
 use Moose::Role;
 
@@ -169,6 +169,7 @@ sub blastdbcmd {
         return;
     }
 
+    # TODO: allow for auto-restore of long ids?
     return Stash->load( $out->filename );
 }
 
@@ -185,7 +186,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 

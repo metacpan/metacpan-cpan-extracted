@@ -1,5 +1,9 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.09 - 2025-04-16
+
+ - Add an option to allow empty lines in YAML prefix.
+
 1.08 - 2024-10-30
 
  - Add a new yaml_metadata hook to receive the parsed YAML.

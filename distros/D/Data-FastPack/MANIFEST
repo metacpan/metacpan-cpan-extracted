@@ -1,18 +1,19 @@
 Changes
-Data-FastPack-v0.0.1.tar.gz
 lib/Data/FastPack.pm
 lib/Data/FastPack.pod
 lib/Data/FastPack/App.pm
 lib/Data/FastPack/Meta.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 share/js/01-fastpack.js
 share/js/fastpack-test.js
 share/js/msgpack.min.js
+share/js/test.html
 t/01-fastpack.t
-t/02-app.t
 t/02-app.t.dis
+t/03-name.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

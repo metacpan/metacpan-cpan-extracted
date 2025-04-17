@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Oslo
 
+0.1.2 2025-04-17
+  - Fixed typo in station name.
+  - Require Map::Tube 4.04.
+
 0.1.1 2025-02-27
   - Fixed error in README.
   - Bumped required Map::Tube version.

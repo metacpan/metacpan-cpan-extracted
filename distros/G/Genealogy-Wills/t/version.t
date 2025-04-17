@@ -8,4 +8,3 @@ use Test::Most;
 
 Test::Version->import();
 version_all_ok();
-done_testing();

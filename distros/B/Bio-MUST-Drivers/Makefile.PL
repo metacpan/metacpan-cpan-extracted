@@ -13,11 +13,15 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Bio-MUST-Drivers",
+  "EXE_FILES" => [
+    "bin/annotate-ali.pl"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Bio::MUST::Drivers",
   "PREREQ_PM" => {
     "App::Provision::Tiny" => "0.0402",
+    "Array::Utils" => 0,
     "Bio::FastParsers" => 0,
     "Bio::FastParsers::Base" => 0,
     "Bio::FastParsers::Blast::Table" => 0,
@@ -32,10 +36,12 @@ my %WriteMakefileArgs = (
     "Bio::MUST::Core::GeneticCode" => 0,
     "Bio::MUST::Core::Seq" => 0,
     "Bio::MUST::Core::SeqId" => 0,
+    "Bio::MUST::Core::Utils" => 0,
     "Carp" => 0,
     "Const::Fast" => 0,
     "Exporter::Easy" => 0,
     "File::Temp" => 0,
+    "Getopt::Euclid" => 0,
     "IPC::System::Simple" => 0,
     "List::AllUtils" => 0,
     "Modern::Perl" => 0,
@@ -59,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Files" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.242720",
+  "VERSION" => "0.251060",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,6 +74,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::Provision::Tiny" => "0.0402",
+  "Array::Utils" => 0,
   "Bio::FastParsers" => 0,
   "Bio::FastParsers::Base" => 0,
   "Bio::FastParsers::Blast::Table" => 0,
@@ -82,10 +89,12 @@ my %FallbackPrereqs = (
   "Bio::MUST::Core::GeneticCode" => 0,
   "Bio::MUST::Core::Seq" => 0,
   "Bio::MUST::Core::SeqId" => 0,
+  "Bio::MUST::Core::Utils" => 0,
   "Carp" => 0,
   "Const::Fast" => 0,
   "Exporter::Easy" => 0,
   "File::Temp" => 0,
+  "Getopt::Euclid" => 0,
   "IPC::System::Simple" => 0,
   "List::AllUtils" => 0,
   "Modern::Perl" => 0,

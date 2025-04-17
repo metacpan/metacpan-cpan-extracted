@@ -1,7 +1,8 @@
 package Bio::MUST::Drivers::CdHit;
 # ABSTRACT: Bio::MUST driver for running the CD-HIT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::CdHit::VERSION = '0.242720';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
+$Bio::MUST::Drivers::CdHit::VERSION = '0.251060';
 use Moose;
 use namespace::autoclean;
 
@@ -10,8 +11,10 @@ use feature qw(say);
 
 # use Smart::Comments;
 
+use Array::Utils qw(:all);
 use Carp;
 use IPC::System::Simple qw(system);
+use List::AllUtils qw(sort_by);
 use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 use Tie::IxHash;
@@ -146,6 +149,66 @@ sub BUILD {
     return;
 }
 
+# TODO: test this
+sub filter_clusters {
+    my $self = shift;
+    my $list = shift;
+    my $key  = shift // 'classic';
+
+    my $cluster = 1;
+    my %new_cluster_for;
+
+    CLUSTER:
+    for my $repr ( $self->all_cluster_names ) {
+
+        my @members = map { $_->full_id } @{ $self->seq_ids_for($repr) };
+
+        # start to fill in the hash if no members
+        if ( scalar @members == 0 ) {
+            $new_cluster_for{$cluster} = {
+                representatives => [$repr   ],
+                members         => [@members]
+            };
+
+            $cluster++;
+            next CLUSTER;
+        }
+
+        # ... otherwise select a repr. seq. included in list
+        else {
+            # merge repr and members
+            push @members, $repr;
+            # and sort by sequence length
+            my @sorted_ids = map { $_->full_id } sort_by { length($_->seq) }
+                map { $self->seqs->get_seq_with_id($_) } @members;
+
+            my @new_reprs
+                =   intersect( @$list, @sorted_ids ) && $key eq 'classic'
+                ? ( intersect( @$list, @sorted_ids ) )[0]   # @sorted_ids order
+                :   intersect( @$list, @sorted_ids ) && $key eq 'all'
+                ?   intersect( @$list, @sorted_ids )
+                :                      $sorted_ids[0]
+            ;
+
+            my @new_members
+                = $key eq 'classic' ? grep { $_ ne $new_reprs[0] } @sorted_ids
+                : $key eq 'all'     ? array_minus(@sorted_ids, @new_reprs)
+                : ()
+            ;
+
+            $new_cluster_for{$cluster} = {
+                representatives => [@new_reprs  ],
+                members         => [@new_members]
+            };
+
+            $cluster++;
+            next CLUSTER;    # useless
+        }
+    }
+
+    return \%new_cluster_for;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -159,7 +222,7 @@ Bio::MUST::Drivers::CdHit - Bio::MUST driver for running the CD-HIT program
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 
@@ -173,11 +236,21 @@ version 0.242720
 
 Denis BAURAIN <denis.baurain@uliege.be>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Amandine BERTRAND
+=for stopwords Amandine BERTRAND Valerian LUPO
+
+=over 4
+
+=item *
 
 Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+
+=item *
+
+Valerian LUPO <valerian.lupo@uliege.be>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

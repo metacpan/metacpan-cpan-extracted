@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use feature ":all";
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.1";
 
 
 use Data::JPack;
@@ -32,24 +32,32 @@ sub add_to_jpack_container {
 
   my @outputs;
   for(js_paths){
-    my $out_path=$jpack->next_file_name();
+    my $out_path=$jpack->next_file_name($_);
+    next unless $out_path;
 
     say STDERR "OUTPUT PATH IS $out_path";
 
-    my $data=do {
-      local $/=undef;
-      open my $fh,"<", $_;
-      <$fh>
-    };
-    $data=$jpack->encode($data);
-
-
-    my $dir=dirname $out_path;
-    make_path $dir;
-    open my $fh, ">", $out_path;
-    print $fh $data;
-    push @outputs, $out_path;
+    $jpack->encode_file($_,$out_path);
+    push @outputs, $out_path;    #
   }
+
+  ##################################
+  #   my $data=do {                #
+  #     local $/=undef;            #
+  #     open my $fh,"<", $_;       #
+  #     <$fh>                      #
+  #   };                           #
+  #   $data=$jpack->encode($data); #
+  #                                #
+  #                                #
+  #   my $dir=dirname $out_path;   #
+  #   make_path $dir;              #
+  #   open my $fh, ">", $out_path; #
+  #   print $fh $data;             #
+  #   push @outputs, $out_path;    #
+  # }                              #
+  ##################################
+  #
   @outputs;
 }
 

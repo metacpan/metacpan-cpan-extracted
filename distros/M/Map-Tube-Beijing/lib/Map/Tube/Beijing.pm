@@ -16,7 +16,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.12.4');
+our $VERSION = version->declare('v0.12.5');
 
 =encoding utf8
 
@@ -94,7 +94,7 @@ L<Map::Tube>.
 =head2 CONSTRUCTOR
 
     use Map::Tube::Beijing;
-    my $tube_chin = Map::Tube::Beijing->new();
+	my $tube_chin = Map::Tube::Beijing->new( );
     my $tube_pinyin = Map::Tube::Beijing->new( nametype => 'alt' );
 
 This will read the tube information from the shared file F<beijing-map.xml>,
@@ -103,12 +103,15 @@ which is part of the distribution. Without argument, full Chinese characters
 transliteration into Western characters will be used. Other values will throw
 an error.
 
-
-=head1 METHODS
-
 =head2 nametype( )
 
 This yields the nametype that was specified with the constructor call, or '' if none.
+
+
+=head2 xml( )
+
+This read-only accessor returns whatever was specified as the XML source at
+construction.
 
 
 =head1 MAP DATA FORMAT

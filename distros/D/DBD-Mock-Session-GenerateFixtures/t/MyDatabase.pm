@@ -33,27 +33,6 @@ sub db_handle {
 	return $dbh;
 }
 
-sub build_rose_db {
-
-
-	my $db = DB->new(
-		domain => 'development',
-		type   => 'main'
-	) or die 'can not generetae db oject';
-	my $dbh = $db->dbh();
-
-
-	my $loader = Rose::DB::Object::Loader->new(
-		db           => $db,
-		class_prefix => 'DB'
-	) or die "Failed to create loader: $@";
-	#die 'aici';
-	$loader->make_modules(module_dir => './t') or die 'Failed to make classes:';
-
-	return ($db, $dbh);
-
-}
-
 sub build_tests_db {
 	my $dbh = shift;
 
@@ -155,6 +134,50 @@ SQL
 		$sth->execute(@$media);
 	}
 
+}
+
+sub build_mysql_db {
+	my $dbh = shift;
+
+	my $sql_media_type = <<"SQL";
+	CREATE TABLE IF NOT EXISTS media_types (
+    id INT NOT NULL AUTO_INCREMENT,
+    media_type VARCHAR(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+SQL
+
+	$dbh->do($sql_media_type);
+
+	my $sql_license = <<"SQL";
+CREATE TABLE IF NOT EXISTS licenses (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    allows_commercial TINYINT(1) NOT NULL,
+    PRIMARY KEY (id)
+);
+SQL
+
+	$dbh->do($sql_license);
+
+	my $sql_media = <<"SQL";
+CREATE TABLE IF NOT EXISTS media (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    source VARCHAR(511) NOT NULL,
+    attribution VARCHAR(255) NOT NULL,
+    media_type_id INT NOT NULL,
+    license_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (media_type_id) REFERENCES media_types(id),
+    FOREIGN KEY (license_id) REFERENCES licenses(id)
+);
+SQL
+
+	$dbh->do($sql_media);
+
+	return 1;
 }
 
 1;

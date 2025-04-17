@@ -37,5 +37,5 @@ is My::App::Test::func(), 'value 1',"Builtin code gets called";
 
 My::App::Test->init_code;
 
-isn't \&My::App::Test::func, $old_func, "Function address has changed";
+isnt \&My::App::Test::func, $old_func, "Function address has changed";
 is My::App::Test::func(), 'value 2', "New code from database gets called";

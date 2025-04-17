@@ -46,9 +46,9 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.000000",
+   "version" : "1.001001",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.83",
+      "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
          "share" : {
             "HTTP::Tiny" : "0.044",

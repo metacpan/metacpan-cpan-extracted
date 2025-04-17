@@ -5,6 +5,8 @@ use warnings;
 
 use Rose::DB;
 use base qw(Rose::DB);
+use Data::Dumper;
+use Test::mysqld;
 
 # Use a private registry for this class
 __PACKAGE__->use_private_registry;
@@ -21,6 +23,28 @@ __PACKAGE__->register_db(
 		AutoCommit   => 1,
 		PrintError   => 0,
 		sqlite_trace => 1,
+	}
+);
+
+our $mysqld = Test::mysqld->new(
+	my_cnf => {
+		'skip-networking' => '',
+		'user'            => $ENV{USER},
+	}
+) or die "Failed to start Test::mysqld: $Test::mysqld::errstr";
+
+
+__PACKAGE__->register_db(
+	domain          => 'mysql_test',
+	type            => 'mysql_test',
+	driver          => 'mysql',
+	dsn             => $mysqld->dsn(dbname => 'test'),
+	username        => 'root',
+	password        => '',
+	connect_options => {
+		RaiseError => 1,
+		AutoCommit => 1,
+		PrintError => 0,
 	}
 );
 

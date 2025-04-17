@@ -1,5 +1,5 @@
 ---
-abstract: 'Base class and script for creating of some MARC field value unique list.'
+abstract: 'Tool to get MARC leader of field/subfield unique list.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-List
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-List
-version: '0.06'
+version: '0.07'

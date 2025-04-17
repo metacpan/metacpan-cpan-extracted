@@ -1,3 +1,4 @@
+.gitignore
 Changes
 eg/create.pl
 eg/lib/My/App.pm
@@ -10,11 +11,15 @@ eg/update.pl
 lib/DBIx/VersionedSubs.pm
 lib/DBIx/VersionedSubs/AutoLoad.pm
 lib/DBIx/VersionedSubs/Hash.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml			Module meta-data (added by MakeMaker)
+README
+README.mkdn
+t/00-load.t
 t/01_overload.t
 t/01_setup.t
 t/01_setup_autoload.t
@@ -30,8 +35,15 @@ t/03_package.t
 t/03_strict.t
 t/03_syntax_error.t
 t/04_hash_namespace.t
-t/99-manifest.t
-t/99-pod.t
-t/99-todo.t
-t/99-unix-text.t
-t/99-versions.t
+testrules.yml
+xt/99-changes.t
+xt/99-compile.t
+xt/99-manifest.t
+xt/99-minimumversion.t
+xt/99-pod.t
+xt/99-test-prerequisites.t
+xt/99-todo.t
+xt/99-unix-text.t
+xt/99-versions.t
+xt/copyright.t
+xt/meta-lint.t

@@ -18,12 +18,14 @@ ok $middler, "New object";
 
 
 # Fail non code ref for register
-$@=undef;
-eval {
-  $middler->register("asdf");
-};
-my $e=$@;
-ok $e =~ /Middleware must be a CODE reference/, "register fail";
+####################################################################
+# $@=undef;                                                        #
+# eval {                                                           #
+#   $middler->register("asdf");                                    #
+# };                                                               #
+# my $e=$@;                                                        #
+# ok $e =~ /Middleware must be a CODE reference/, "register fail"; #
+####################################################################
 
 
 
@@ -41,14 +43,16 @@ for my $v (1..3){
 }
 
 
-# Fail non code ref for link
-$@=undef;
-eval {
-  $middler->link("noncode", qw<extra args>);
-};
-
-$e=$@;
-ok $e =~ /A CODE reference is requred when linking middleware/, "link fail";
+################################################################################
+# # Fail non code ref for link                                                 #
+# $@=undef;                                                                    #
+# eval {                                                                       #
+#   $middler->link("noncode", qw<extra args>);                                 #
+# };                                                                           #
+#                                                                              #
+# $e=$@;                                                                       #
+# ok $e =~ /A CODE reference is requred when linking middleware/, "link fail"; #
+################################################################################
 
 
 # Test the linking lexical linking of extra arguments at link time.

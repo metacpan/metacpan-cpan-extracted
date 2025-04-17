@@ -1,5 +1,9 @@
 Revision history for Genealogy::Wills
 
+0.07	Wed Apr 16 07:47:03 EDT 2025
+	Use Test::HTTPStatus
+	Use Data::Reuse
+
 0.06	Fri Jan 10 16:10:24 EST 2025
 	search() can now just take one parameter which is the last name
 	More handling of broken smokers

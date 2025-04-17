@@ -31,6 +31,7 @@ foreach my $dir(@dirs) {
 my $prereqs = {
 	'autodie' => 0,
 	'Carp' => 0,
+	'Data::Reuse' => 0,
 	'Database::Abstraction' => 0.04,
 	'DBD::SQLite' => 0,
 	'DBD::SQLite::Constants' => 0,
@@ -54,6 +55,7 @@ unless(defined($ENV{'AUTOMATED_TESTING'})) {
 	$prereqs->{'LWP::Protocol::https'} = 0;
 	$prereqs->{'LWP::UserAgent::WithCache'} = 0;
 	$prereqs->{'Lingua::EN::NameCase'} = 0;
+	$prereqs->{'Test::HTTPStatus'} = 0;
 	$prereqs->{'Try::Tiny'} = 0;
 }
 

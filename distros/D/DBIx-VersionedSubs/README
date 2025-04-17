@@ -1,0 +1,42 @@
+DBIx::VersionedSubs - all your code are belong into the DB
+
+
+This document describes version 0.09.
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+
+
+
+SEE ALSO
+
+The Everything Engine, L<http://everydevel.everything2.com/>
+
+AUTHOR
+
+Max Maischein, E<lt>corion@cpan.orgE<gt>
+
+LICENSE
+
+This module is licensed under the same terms as Perl itself.
+

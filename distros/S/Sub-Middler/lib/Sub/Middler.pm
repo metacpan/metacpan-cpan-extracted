@@ -5,7 +5,7 @@ use warnings;
 use feature "refaliasing";
 
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 use Export::These qw<linker>;
 
 sub new {
@@ -18,7 +18,7 @@ sub register {
   no warnings "experimental";
 	\my @middleware=$_[0];	#self
 	my $sub=$_[1];
-  die "Middleware must be a CODE reference" unless ref($sub) eq "CODE";
+  #die "Middleware must be a CODE reference" unless ref($sub) eq "CODE";
 	push @middleware, $sub;
 	return $_[0]; #allow chaining
 }
@@ -30,18 +30,26 @@ sub register {
 # Link together sub and give each one an index 
 # Required argument is the 'dispatcher' which is the end point to call
 # 
+sub _sink_sub;
 sub link {
   no warnings "experimental";
 
-  die "A CODE reference is requred when linking middleware" unless(@_ >=2 and ref $_[1] eq "CODE");
+  #die "A CODE reference is required when linking middleware" unless(@_ >=2 and ref $_[1] eq "CODE");
   
-	\my @middleware=shift;	#self;
 
-	my $dispatcher=shift;
+	\my @self=shift;	#self;
+
+	my $dispatcher=_sink_sub shift, 1;
+
 
   my @args=@_;
 
 	my @mw;  # The generated subs
+
+  my @middleware=@self;
+  for(@middleware){
+    $_=_sink_sub $_;
+  }
 
 	for my $i (reverse 0..@middleware-1){
 		my $maker=$middleware[$i];
@@ -63,6 +71,105 @@ sub  linker {
   
 }
 
+sub _sink_sub {
+  my $in=$_[0];
+  my $is_dispatch=$_[1];
+
+  return $in if ref $in eq "CODE";
+
+  my $wrap=sub {
+    my $next=shift;
+    my $out;
+
+    for (ref $in){
+
+
+      if(/SCALAR/){
+        $out=$is_dispatch
+        ?sub {
+          $$in.="@{$_[0]}";
+          $_[1] and $_[1]->(); # Auto call call back
+        }
+        :sub {
+          #Convert into string
+          $$in.="@{$_[0]}";
+          &$next;
+        }
+      }
+
+      elsif(/ARRAY/){
+
+        $out=$is_dispatch
+        ?sub {
+          # Copy and append into array,
+          push @$in, @{$_[0]};
+          $_[1] and $_[1]->();
+        }
+        :sub {
+          # Copy and append into array,
+          push @$in, @{$_[0]};
+          &$next;
+        }
+      }
+
+      elsif(/HASH/) {
+        $out=$is_dispatch
+        ?sub {
+          #  copy into hash
+          for (my $i=0; $i<$_[0]->@*; $i+=2){
+            $in->{$_[0][$i]}=$_[0][$i+1];
+          }
+          ############################
+          # for my($k,$v)(@{$_[0]}){ #
+          #   $in->{$k}=$v;          #
+          # }                        #
+          ############################
+          $_[1] and $_[1]->();
+        }
+        :sub {
+          #  copy into hash
+          for (my $i=0; $i<$_[0]->@*; $i+=2){
+            $in->{$_[0][$i]}=$_[0][$i+1];
+          }
+          ############################
+          # for my($k,$v)(@{$_[0]}){ #
+          #   $in->{$k}=$v;          #
+          # }                        #
+          ############################
+          &$next;
+        }
+      }
+
+
+      elsif(/REF/){
+        my $r=$$in; 
+        if(ref $r eq "CODE"){
+          # treat a ref to a code ref as 
+          $out=$is_dispatch
+          ?sub {
+            my @res=&$r;
+            $_[1] and $_[1]->();
+          }
+
+          :sub {
+            my @res=&$r;
+            #$next->(@res);
+            &$next;
+          }
+        }
+        else {
+          die "should not get here";
+        }
+      }
+      else {
+        die "Could not link unkown reference: ". ref $in; 
+      }
+    }
+    $out;
+  };
+  $is_dispatch?$wrap->():$wrap;
+}
+
 1;
 
 =head1 NAME
@@ -70,6 +177,31 @@ sub  linker {
 Sub::Middler - Middleware subroutine chaining
 
 =head1 SYNOPSIS
+
+  use strict;
+  use warings;
+  use Sub::Middler;
+
+  
+  my @array;
+  my %hash;
+  my $scalar;
+
+  # append results in variables
+  my $head=linker 
+    # Short cut to store (copy/append) in array
+    \@array       
+    # Short cut to modifiy inputs
+    =>\sub { $_*=2 for @{$_[0]}},
+    # Short cut to store in hash
+    =>\%hash,
+    # Short cut to stringyfiy and append to scalar
+    =>\$scalar;
+  
+
+  $head->([1,2,3,4,], sub {...})
+  #         inputs      ready cb
+
 
   use strict;
   use warnings;
@@ -134,8 +266,11 @@ know what you're doing.
 
 As a general guide it's suggested the last argument to a stage be a subroutine
 reference to allow callbacks and asynchronous usage. Instead of a flat list of
-multiple inputs into a stage, it is suggested to also contain these in a array
+multiple inputs into a stage, it is suggested to also contain these in an array
 
+From v0.4.0, shortcuts can be used to to bypass writing the nestled
+subroutines subroutines for some common use cases. A reference to a
+SCALAR/ARRAY/HASH/CODE can be used instead of custom middleware
 
 =head1 API
 
@@ -144,11 +279,36 @@ multiple inputs into a stage, it is suggested to also contain these in a array
   linker mw1, ..., dispatch
 
 From v0.3.0, the C<linker> subroutine is exported and will do an inline build
-and link for a given middlewares and dispatch routine
+and link for a given middleware and dispatch routine
 
 The return value is the head of the linked chain, and is equivalent to created
 a C<Sub::Middler> object, adding middleware, and the calling the link method.
 
+
+=head2 Short Cuts
+
+  
+Instead of writing custom middleware, references to variables and CODE can be
+used instead.
+
+If an array reference is used, all elements from the first argument will be
+appended to the array
+
+If an hash reference is used, the elements from the first argument will be
+treated as key value pairs and set the corresponding elements in the target
+hash
+
+If a scalar reference is use, the elements from the first argument will be
+converted to strings and appending to the target variable
+
+
+If a reference is a CODE reference is used, the underlying subroutine is
+expected to modify the first argument elements in place. The return value is
+not used.
+
+
+In all the above cases, the next link in the chain is automatically called with
+the same arguments, making chaining and saving intermediate values easy
 
 
 =head2 Managing a chain

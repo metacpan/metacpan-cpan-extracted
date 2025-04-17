@@ -62,7 +62,7 @@ CLOUDFLARE: {
 		]);
 		ok(defined($l));
 		ok($l->isa('CGI::Lingua'));
-		ok($l->country() eq 'us');
+		cmp_ok($l->country(), 'eq', 'us', 'Detect IPv6 address as in the US');
 	} else {
 		SKIP: {
 			skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');

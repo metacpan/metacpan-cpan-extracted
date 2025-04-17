@@ -1,6 +1,25 @@
+0.014   2025-04-17  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Find qdbus in alternate location for other actions.
+
+
+0.013   2025-04-17  Released-By: PERLANCAR; Urgency: high
+
+        [bugfix]
+
+        - Proc::Find's find_proc() returns arrayref, not list.
+
+        [clipboard manager klipper]
+
+        - Try looking for qdbus at several locations (testing on Ubuntu 22.10),
+          also check dbus-daemon for klipper.
+
+
 0.012   2024-08-30  Released-By: PERLANCAR; Urgency: medium
 
-        - internal] Make some variables available outside of package:
+        [internal]
+
+        - Make some variables available outside of package:
           $known_clipboard_managers, $sch_clipboard_manager.
 
 

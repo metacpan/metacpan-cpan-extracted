@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Mafft;
 # ABSTRACT: Bio::MUST driver for running the MAFFT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::Mafft::VERSION = '0.242720';
+$Bio::MUST::Drivers::Mafft::VERSION = '0.251060';
 use Moose;
 use namespace::autoclean;
 
@@ -86,7 +86,7 @@ sub _mafft {
     my $pgm = 'mafft';      # linsi, ginsi,... do not work
     my $final_args = $mode eq 'align_all' ? "$args_str $infile" : "$infile $args_str";
     my $cmd = "$pgm $opt_for{$mode} $final_args > $outfile 2> /dev/null";
-    #### $cmd
+    ### $cmd
 
     # try to robustly execute mafft
     my $ret_code = system( [ 0, 1, 127 ], $cmd);
@@ -125,7 +125,7 @@ Bio::MUST::Drivers::Mafft - Bio::MUST driver for running the MAFFT program
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   Module::Build: '0.42'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: App-NetdiscoX-Web-Plugin-RANCID
 provides:
   App::NetdiscoX::Web::Plugin::RANCID:
     file: lib/App/NetdiscoX/Web/Plugin/RANCID.pm
-    version: '2.006001'
+    version: '3.000000'
 requires:
   App::Netdisco: '2.042009'
   Dancer: '1.3132'
@@ -32,7 +32,7 @@ resources:
   MailingList: https://lists.sourceforge.net/lists/listinfo/netdisco-users
   bugtracker: https://github.com/netdisco/nd2-web-plugin-rancid/issues
   homepage: http://netdisco.org/
-  license: http://opensource.org/licenses/bsd-license.php
+  license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/netdisco/nd2-web-plugin-rancid
-version: '2.006001'
+version: '3.000000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

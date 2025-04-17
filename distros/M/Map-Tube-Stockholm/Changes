@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Stockholm
 
+0.1.2 2025-04-17
+  - Fixed some station names.
+  - Require Map::Tube 4.04.
+
 0.1.1 2025-02-20
   - Augmented documentation.
 

@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Barcelona
 
+0.77  Thu Apr 17 09:35:00 2025
+      - Proposed patch for FAIL report, thanks Andreas J. König.
+      http://www.cpantesters.org/cpan/report/2f908182-1a6c-11f0-a2b9-c97c5b7394a8
+
 0.76  Fri Aug 30 15:40:00 2019
       - Moved author test scripts to xt/ subfolder.
 

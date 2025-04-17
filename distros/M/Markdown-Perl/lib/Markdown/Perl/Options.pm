@@ -10,7 +10,7 @@ use English;
 use Exporter 'import';
 use List::Util 'any', 'all', 'pairs';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT_OK = qw(validate_options);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -431,6 +431,19 @@ _make_option(
   _enum(qw(strict loose lenient lax)), (
     github => 'loose',
   ));
+
+=pod
+
+=head3 B<yaml_file_metadata_allows_empty_lines> I<(boolean, default: false)>
+
+YAML document at the beginning of a Markdown file can contain empty lines. Note
+that with this some reasonable Markdown documents can be interpreted as YAML so
+you should set this value to true only if you expect to use YAML metadata with
+your files.
+
+=cut
+
+_make_option(yaml_file_metadata_allows_empty_lines => 0, _boolean);
 
 =pod
 

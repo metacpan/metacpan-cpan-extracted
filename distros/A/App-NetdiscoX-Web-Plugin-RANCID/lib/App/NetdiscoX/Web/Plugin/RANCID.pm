@@ -3,7 +3,7 @@ package App::NetdiscoX::Web::Plugin::RANCID;
 use strict;
 use warnings;
 
-our $VERSION = '2.006001';
+our $VERSION = '3.000000';
 
 use Dancer ':syntax';
 
@@ -73,80 +73,23 @@ __END__
 
 App::NetdiscoX::Web::Plugin::RANCID - Link to device backups in RANCID/WebSVN
 
-=head1 SYNOPSIS
+=head1 DEPRECATED
 
- # in your ~/environments/deployment.yml file
+This plugin is deprecated and no longer maintained!
 
- extra_web_plugins:
-   - X::RANCID
+Please use the External Links feature which is built-in to Netdisco itself.
+You can use this feature to create a templated hyperlink, and use tags or
+custom fields to replicate the GROUP.
 
- plugin_rancid:
-   location: 'https://websvn.example.com/websvn/filedetails.php?repname=rancid&path=/%GROUP%/configs/%DEVICE%'
+L<https://github.com/netdisco/netdisco/wiki/Configuration#external_links>
 
-=head1 Description
+For example in your Netdisco C<deployment.yml> configuration file:
 
-This is a plugin for the L<App::Netdisco> network management application.
-It adds a row to the Device Details page named "RANCID" with a link to
-your local RANCID/WebSVN installation hosting the device configuration
-backups.
-
-=head1 Configuration
-
-Create an entry in your C<~/environments/deployment.yml> file named
-"C<plugin_rancid>", containing the following settings:
-
-=head2 location
-
-Value: String, Required.
-
-Name of the server hosting your local WebSVN installation. This should
-also include the path under which backup files are stored for the devices.
-
-The text "C<%DEVICE%>" B<must> be included, and it will be substituted with
-the name or IP of the device. That is, this setting must be a complete link to
-a RANCID web page, only with the device name or ip changed to be
-"C<%DEVICE%>".
-
-The text "C<%GROUP%>" will be replaced with the group name for this device, if
-known to Netdisco. This uses the same configuration as for
-L<App::Netdisco::Worker::Plugin::MakeRancidConf>, an example of which is below:
-
- rancid:
-   by_ip:           [ other ]
-   by_hostname:     'group:grp-reversedns'
-   groups:
-     aerohive:      'group:grp-hiveos'
-     switch:        [ 'name:.*[Ss][Ww].*' ]
-     rtr:           [ 'name:[rR]tr.*' ]
-     ap:            [ 'name:[aA][pP].*' ]
-
-Briefly, each group value is a list of rules for matching devices similar to
-those used by any C<*_only> configuration item. You can provide an IP, subnet
-or prefix, regular expression to match a device name, or device attribute and
-regular expression as in the above example.
-
-The device DNS name is used, or if missing the device SNMP sysName. Adding the
-group to the list in C<by_ip> will make the link include the device IP
-instead of the name. Adding the group to the list in C<by_hostname> will
-use the device FQDN minus the C<domain_suffix> config item (i.e. the hostname).
-C<by_hostname> will take precedence over C<by_ip>.
-
-=head2 open_in_same_window
-
-Value: Boolean. Default: false.
-
-If set to true, the hyperlink is configured to open the WebSVN page in the
-same browser window or tab as Netdisco.
-
-=head1 SEE ALSO
-
-L<App::Netdisco::Worker::Plugin::MakeRancidConf>
-
-L<http://www.shrubbery.net/rancid/>
-
-L<https://websvnphp.github.io/>
-
-L<https://github.com/viewvc/viewvc/>
+ external_links:
+   device:
+     - url: 'https://websvn.example.com/websvn/filedetails.php?repname=rancid&path=/configs/[% device %]'
+       displayname: 'RANCID WebSVN'
+       only: '192.0.2.0/24'
 
 =head1 AUTHOR
 
@@ -154,7 +97,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2013,2019 by The Netdisco Developer Team.
+This software is copyright (c) 2013,2019-2025 by The Netdisco Developer Team.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:

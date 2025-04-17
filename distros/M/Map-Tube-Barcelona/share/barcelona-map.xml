@@ -15,29 +15,29 @@
   </lines>
 
   <stations>
-    <station id="TRINITAT-NOVA"     name="Trinitat Nova"       line="L3,L4,L11"   link="L04-02,L11-04,L03-25"/>
-    <station id="VALL-D'HEBRON"     name="Vall d'Hebron"       line="L3,L5"       link="L03-21,L03-19,L05-02"/>
-    <station id="DIAGONAL"          name="Diagonal"            line="L3,L5,L6,L7" link="L03-16,L05-13,L05-15,PASSEIG-DE-GRACIA,GRACIA,CATALUNYA"/>
-    <station id="PASSEIG-DE-GRACIA" name="Passeig de Gràcia"   line="L2,L3,L4"    link="L02-14,UNIVERSITAT,L04-09,URQUINAONA,DIAGONAL,CATALUNYA"/>
-    <station id="CATALUNYA"         name="Catalunya"           line="L1,L3,L6,L7" link="PASSEIG-DE-GRACIA,L03-12,URQUINAONA,DIAGONAL"/>
-    <station id="PARAL-LEL"         name="Paral-lel"           line="L2,L3"       link="L02-17,L03-09,L03-11"/>
-    <station id="ESPANYA"           name="Espanya"             line="L1,L3,L8"    link="L03-07,L03-09,L08-10,L01-18"/>
-    <station id="SANTS-ESTACIA"     name="Sants Estació"       line="L3,L5"       link="L03-05,L03-07,L05-16,PLACA-DE-SANTS"/>
-    <station id="VERDAGUER"         name="Verdaguer"           line="L4,L5"       link="L04-07,L04-09,DIAGONAL"/>
-    <station id="URQUINAONA"        name="Urquinaona"          line="L1,L4"       link="PASSEIG-DE-GRACIA,L04-12,L01-13,CATALUNYA"/>
-    <station id="FONDO"             name="Fondo"               line="L9:4,L1"     link="L01-02,L09-03,L09-05"/>
-    <station id="BON-PASTOR"        name="Bon Pastor"          line="L9:6,L10"    link="L09-05,ONZE-DE-SETEMBRE,L10-03"/>
-    <station id="ONZE-DE-SETEMBRE"  name="Onze de Setembre"    line="L9:7,L10"    link="BON-PASTOR,LA-SAGRERA"/>
-    <station id="LA-SAGRERA"        name="La Sagrera"          line="L5,L9:8,L10" link="ONZE-DE-SETEMBRE,L01-07,L05-08,L05-10"/>
-    <station id="GORG"              name="Gorg"                line="L2,L10"      link="L02-02,L02-04,L10-02"/>
-    <station id="CLOT"              name="Clot"                line="L1,L2"       link="L01-09,L01-11,L02-09,L02-11"/>
-    <station id="UNIVERSITAT"       name="Universitat"         line="L1,L2"       link="PASSEIG-DE-GRACIA,L02-17,CATALUNYA,L01-17"/>
-    <station id="PLACA-DE-SANTS"    name="Placa de Sants"      line="L1,L5"       link="SANTS-ESTACIA,L01-19,L01-21,L05-19"/>
-    <station id="AV-CARRILET"       name="Av Carrilet"         line="L1,L8"       link="L01-26,L01-28,L08-04,L08-06"/>
-    <station id="GRACIA"            name="Gracia"              line="L6,L7"       link="L07-04,L06-06,DIAGONAL"/>
-    <station id="SAGRADA-FAMILIA"   name="Sagrada Familia"     line="L2,L5"       link="L02-11,L02-13,L05-11,L05-13"/>
-    <station id="LA-PAU"            name="La Pau"              line="L2,L4"       link="L02-06,L02-08,L04-20"/>
-    <station id="MARAGALL"          name="Maragall"            line="L4,L5"       link="L04-03,L04-05,L05-06,L05-08"/>
+    <station id="TRINITAT-NOVA"     name="Trinitat Nova"       line="L3,L4,L11"      link="L04-02,L11-04,L03-25"/>
+    <station id="VALL-D'HEBRON"     name="Vall d'Hebron"       line="L3,L5"          link="L03-21,L03-19,L05-02"/>
+    <station id="DIAGONAL"          name="Diagonal"            line="L3,L5,L6,L7"    link="L03-16,VERDAGUER,L05-15,PASSEIG-DE-GRACIA,GRACIA,CATALUNYA"/>
+    <station id="PASSEIG-DE-GRACIA" name="Passeig de Gràcia"   line="L2,L3,L4"       link="L02-14,UNIVERSITAT,L04-09,URQUINAONA,DIAGONAL,CATALUNYA"/>
+    <station id="CATALUNYA"         name="Catalunya"           line="L1,L3,L6,L7"    link="PASSEIG-DE-GRACIA,L03-12,URQUINAONA,DIAGONAL"/>
+    <station id="PARAL-LEL"         name="Paral-lel"           line="L2,L3"          link="L02-17,L03-09,L03-11"/>
+    <station id="ESPANYA"           name="Espanya"             line="L1,L3,L8"       link="L03-07,L03-09,L08-10,L01-18"/>
+    <station id="SANTS-ESTACIA"     name="Sants Estació"       line="L3,L5"          link="L03-05,L03-07,L05-16,PLACA-DE-SANTS"/>
+    <station id="VERDAGUER"         name="Verdaguer"           line="L4,L5"          link="L04-07,L04-09,DIAGONAL"/>
+    <station id="URQUINAONA"        name="Urquinaona"          line="L1,L4"          link="PASSEIG-DE-GRACIA,L04-12,L01-13,CATALUNYA"/>
+    <station id="FONDO"             name="Fondo"               line="L9:4,L1"        link="L01-02,L09-03,L09-05"/>
+    <station id="BON-PASTOR"        name="Bon Pastor"          line="L9:6,L10"       link="L09-05,ONZE-DE-SETEMBRE,L10-03"/>
+    <station id="ONZE-DE-SETEMBRE"  name="Onze de Setembre"    line="L9:7,L10"       link="BON-PASTOR,LA-SAGRERA"/>
+    <station id="LA-SAGRERA"        name="La Sagrera"          line="L1,L5,L9:8,L10" link="ONZE-DE-SETEMBRE,L01-07,L05-08,L05-10"/>
+    <station id="GORG"              name="Gorg"                line="L2,L10"         link="L02-02,L02-04,L10-02"/>
+    <station id="CLOT"              name="Clot"                line="L1,L2"          link="L01-09,L01-11,L02-09,L02-11"/>
+    <station id="UNIVERSITAT"       name="Universitat"         line="L1,L2"          link="PASSEIG-DE-GRACIA,L02-17,CATALUNYA,L01-17"/>
+    <station id="PLACA-DE-SANTS"    name="Placa de Sants"      line="L1,L5"          link="SANTS-ESTACIA,L01-19,L01-21,L05-19"/>
+    <station id="AV-CARRILET"       name="Av Carrilet"         line="L1,L8"          link="L01-26,L01-28,L08-04,L08-06"/>
+    <station id="GRACIA"            name="Gracia"              line="L6,L7"          link="L07-04,L06-06,DIAGONAL"/>
+    <station id="SAGRADA-FAMILIA"   name="Sagrada Familia"     line="L2,L5"          link="L02-11,L02-13,L05-11,VERDAGUER"/>
+    <station id="LA-PAU"            name="La Pau"              line="L2,L4"          link="L02-06,L02-08,L04-20"/>
+    <station id="MARAGALL"          name="Maragall"            line="L4,L5"          link="L04-03,L04-05,L05-06,L05-08"/>
 
     <station id="L01-02"  name="Santa Coloma"                  line="L1"  link="FONDO,L01-03"/>
     <station id="L01-03"  name="Baro de Viver"                 line="L1"  link="L01-02,L01-04"/>
@@ -116,7 +116,6 @@
     <station id="L05-08"  name="Congres"                       line="L5"  link="MARAGALL,LA-SAGRERA"/>
     <station id="L05-10"  name="Camp de L'Arpa"                line="L5"  link="LA-SAGRERA,L05-11"/>
     <station id="L05-11"  name="Sant Pau Dos de Maig"          line="L5"  link="L05-10,SAGRADA-FAMILIA"/>
-    <station id="L05-13"  name="Verdaguer"                     line="L5"  link="SAGRADA-FAMILIA,DIAGONAL"/>
     <station id="L05-15"  name="Hospital Clinic"               line="L5"  link="DIAGONAL,L05-16"/>
     <station id="L05-16"  name="Entenca"                       line="L5"  link="L05-15,SANTS-ESTACIA"/>
     <station id="L05-19"  name="Badal"                         line="L5"  link="PLACA-DE-SANTS,L05-20"/>

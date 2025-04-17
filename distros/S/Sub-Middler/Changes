@@ -1,5 +1,16 @@
 Revision history for Perl extension Sub::Middler.
 
+v0.4.0 2025-03-02
+  [features]
+    - new 'short cuts' can be used to build chains
+    - target variables via referencew to store intermediate results
+    - new wrapper for simple subs to be used as a link in chain without full double sub definition
+    - All argumenst to chain elements now contained as an array in first argument. Second argument is optional callback
+    - backward compatible with existing versions (without short cut subs)
+  [changes]
+    - inhernt support for callbacks, allows asynchronous usage, with less user defined behavniour
+
+
 v0.3.0 2025-02-10
   [feature]
   - Added linker sub routine. Single call 'factory' type subroutine to link

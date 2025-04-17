@@ -74,7 +74,7 @@ my @inputs = split /,/, $input_names;
 my $name = $inputs[0];
 
 # open the inputs
-my $controllers = MIDI::RtController::open_controllers(\@inputs, $output_name);
+my $controllers = MIDI::RtController::open_controllers(\@inputs, $output_name, 1);
 
 MIDI::RtController::Filter::CC::add_filters(\@filters, $controllers);
 

@@ -47,7 +47,10 @@ my $report_m6;
 my $report_xml;
 
 {
-    my $db = $db_tmp_class->new( seqs => file('test', 'protdb.fasta') );
+    my $db = $db_tmp_class->new(
+        seqs => file('test', 'protdb.fasta'),
+        args => { prefix_id => 'seq' }
+    );
     cmp_ok $db->type, 'eq', 'prot', 'got expected -db_type';
     $basename = $db->filename;
     ok(-e "$basename.$_", "wrote db file with expected suffix: $_")
@@ -196,6 +199,15 @@ sub filter {
     # unstable gap positions in XML report alignments
     return q{} if $line =~ m/<Hsp_qseq>/xms;
     return q{} if $line =~ m/<Hsp_midline>/xms;
+
+    # unstable evalue (and bitscore) in tabular (and XML) reports
+    return q{} if $line =~ m/\bseq52\b/xms;
+    return q{} if $line =~ m/<Hsp_evalue>/xms;
+    return q{} if $line =~ m/<Hsp_bit-score>/xms;
+    return q{} if $line =~ m/<Hsp_score>22[89]/xms;
+
+    # unstable hits in XML reports
+    return if $line =~ m/<Hit_num>3[45]/xms .. $line =~ m{</Hit>}xms;
 
     return $line;
 }

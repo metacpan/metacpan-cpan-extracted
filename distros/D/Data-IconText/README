@@ -1,0 +1,18 @@
+Data::IconText
+-----------------
+
+This module provides an interface for icon text.
+An icon text is a single character that can be rendered alike an icon for a given object.
+
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

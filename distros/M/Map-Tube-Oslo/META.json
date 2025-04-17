@@ -4,7 +4,7 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::Oslo" : {
          "file" : "lib/Map/Tube/Oslo.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Oslo@rt.cpan.org"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

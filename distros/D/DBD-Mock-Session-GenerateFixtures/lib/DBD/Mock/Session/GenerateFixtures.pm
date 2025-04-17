@@ -16,8 +16,9 @@ use File::Slurper qw (read_text);
 use File::Spec;
 use Readonly;
 use Data::Walk;
+use Try::Tiny;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -35,6 +36,9 @@ Readonly::Hash my %MOCKED_DBI_METHODS => (
 	selectrow_arrayref => 'DBI::db::selectrow_arrayref',
 	selectrow_hashref  => 'DBI::db::selectrow_hashref',
 	fetch              => 'DBI::st::fetch',
+	prepare_cached     => 'DBI::db::prepare_cached',
+	prepare            => 'DBI::db::prepare',
+	mocked_prepare     => 'DBD::Mock::db::prepare'
 );
 
 sub new {
@@ -63,12 +67,12 @@ sub _initialize {
 
 	$self->_set_fixtures_file($args_for{file});
 	$self->{override_flag} = 0;
+	$override              = Sub::Override->new();
+	$self->{override}      = $override;
 
 	if (my $dbh = $args_for{dbh}) {
 		$self->{dbh}           = $dbh;
-		$override              = Sub::Override->new();
 		$self->{bind_params}   = [];
-		$self->{override}      = $override;
 		$self->{override_flag} = 1;
 		$self->_override_dbi_methods();
 		$self->{result} = [];
@@ -123,6 +127,9 @@ sub _override_dbi_methods {
 	$self->_override_dbi_selectrow_arrayref($MOCKED_DBI_METHODS{selectrow_arrayref});
 	$self->_override_dbi_selectrow_hashref($MOCKED_DBI_METHODS{selectrow_hashref});
 	$self->_override_dbi_fecth($MOCKED_DBI_METHODS{fetch});
+	$self->_override_dbi_prepare_cached($MOCKED_DBI_METHODS{prepare_cached});
+	$self->_override_dbi_prepare($MOCKED_DBI_METHODS{prepare});
+	$self->_override_dbi_mocked_prepare($MOCKED_DBI_METHODS{mocked_prepare});
 
 	return $self;
 }
@@ -160,10 +167,15 @@ sub _override_dbi_execute {
 		sub {
 			my ($sth, @args) = @_;
 
-			my $sql = $sth->{Statement};
-
-			my $col_names = $sth->{NAME};
-			my $retval    = $orig_execute->($sth, @args);
+			my $sql    = $sth->{Statement};
+			my $retval = $orig_execute->($sth, @args);
+			my $col_names;
+			try {
+				$col_names = $sth->{NAME};
+			} catch {
+				my $error = $_;
+				say  $error;
+			};
 
 			my $rows       = $sth->rows();
 			my $query_data = {
@@ -537,6 +549,68 @@ sub _override_dbi_fecth {
 	return $self;
 }
 
+sub _override_dbi_prepare_cached {
+	my $self           = shift;
+	my $prepare_cached = shift;
+
+	my $original_prepare_cached = \&$prepare_cached;
+	$self->get_override_object()->replace(
+		$prepare_cached,
+		sub {
+			my ($dbh, $sql, $attr, $if_active) = @_;
+
+			$sql = $self->_normalize_sql($sql);
+			return $original_prepare_cached->($dbh, $sql, $attr, $if_active);
+		}
+	);
+	return $self;
+}
+
+sub _override_dbi_prepare {
+	my $self    = shift;
+	my $prepare = shift;
+
+	my $original_prepare = \&$prepare;
+	$self->get_override_object()->replace(
+		$prepare,
+		sub {
+			my ($dbh, $sql, $attr) = @_;
+
+			$sql = $self->_normalize_sql($sql);
+			return $original_prepare->($dbh, $sql, $attr);
+		}
+	);
+
+	return $self;
+}
+
+sub _override_dbi_mocked_prepare {
+	my $self           = shift;
+	my $mocked_prepare = shift;
+
+	my $original_mocked_prepare = \&$mocked_prepare;
+	$self->get_override_object()->replace(
+		$mocked_prepare,
+		sub {
+			my ($dbh, $sql) = @_;
+
+			$sql = $self->_normalize_sql($sql);
+			return $original_mocked_prepare->($dbh, $sql);
+		}
+	);
+
+	return $self;
+}
+
+sub _normalize_sql {
+	my ($self, $sql) = @_;
+
+	$sql =~ s/\s+/ /g;
+	$sql =~ s/^\s+|\s+$//g;
+
+	return $sql;
+}
+
 sub _get_current_record_column_names {
 	my $self = shift;
 
@@ -798,6 +872,30 @@ Overrides the C<selectrow_hashref> method of C<DBI::db> in order to capture the 
 =head2 _override_dbi_fecth($sth, @args)
 
 Overrides the C<fetch> method of C<DBI::st>
+
+=head2 _override_dbi_prepare
+
+  _override_dbi_prepare($prepare);
+
+  This method overrides the `DBI::db::prepare` method. It customizes how SQL statements are prepared for execution
+
+=head2 _override_dbi_prepare_cached
+
+	_override_dbi_prepare_cached($prepare_cached);
+
+	This method overrides the `DBI::db::prepare_cached` method. It provides a mechanism for caching prepared statements to optimize repeated queries.
+
+=head2 _override_dbi_mocked_prepare
+
+	_override_dbi_mocked_prepare($mocked_prepare);
+
+	This method overrides the `DBD::Mock::db::prepare` method. It is used for testing purposes to mock the behavior of statement preparation.
+
+=head2 _normalize_sql
+
+	_normalize_sql($sql);
+
+	This method normalizes an SQL query string by removing extra whitespace and trimming leading or trailing spaces.
 
 =head2 _get_current_record_column_names()
 

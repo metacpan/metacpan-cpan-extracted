@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use curry;
 use MIDI::RtController ();
 use MIDI::RtController::Filter::CC ();
 use Object::Destroyer ();
@@ -30,18 +29,7 @@ my $control = MIDI::RtController->new(
     verbose => 1,
 );
 
-# add the filters
-for my $params (@filters) {
-    my $port   = delete $params->{port}  || $control->input;
-    my $type   = delete $params->{type}  || 'single';
-    my $event  = delete $params->{event} || 'all';
-    my $filter = MIDI::RtController::Filter::CC->new(rtc => $control);
-    for my $param (keys %$params) {
-        $filter->$param($params->{$param});
-    }
-    my $method = "curry::$type";
-    $control->add_filter($type, $event => $filter->$method);
-}
+MIDI::RtController::Filter::CC::add_filters(\@filters, { $in => $control });
 
 $control->run;
 

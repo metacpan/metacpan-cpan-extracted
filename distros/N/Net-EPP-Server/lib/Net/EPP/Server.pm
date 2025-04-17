@@ -2,8 +2,12 @@ package Net::EPP::Server;
 # ABSTRACT: A simple EPP server implementation.
 use Carp;
 use Crypt::OpenSSL::Random;
+use Cwd qw(abs_path);
 use DateTime;
 use Digest::SHA qw(sha512_hex);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Slurp qw(write_file);
 use IO::Socket::SSL;
 use List::Util qw(any none);
 use Mozilla::CA;
@@ -83,6 +87,7 @@ sub run {
         'timeout'           => delete($args{'timeout'})  || 30,
         'client_ca_file'    => delete($args{'client_ca_file'}),
         'xsd_file'          => delete($args{'xsd_file'}),
+        'log_dir'           => delete($args{'log_dir'}),
     };
 
     if ($self->{'epp'}->{'client_ca_file'}) {
@@ -135,6 +140,7 @@ sub init_session {
         'session_id'    => $self->generate_svTRID,
         'remote_addr'   => inet_ntop(4 == length($socket->peeraddr) ? AF_INET : AF_INET6, $socket->peeraddr),
         'remote_port'   => $socket->peerport,
+        'counter'       => 0,
     };
 
     if ($socket->peer_certificate) {
@@ -179,6 +185,10 @@ sub main_loop_iteration {
 
     $self->send_frame($socket, $response);
 
+    $session->{'counter'}++;
+
+    $self->write_log($session, $xml, $response);
+
     if ('greeting' eq $response->documentElement->firstChild->localName) {
         return OK;
 
@@ -186,6 +196,25 @@ sub main_loop_iteration {
         return $response->getElementsByTagName('result')->item(0)->getAttribute('code');
 
     }
+}
+
+#
+# write the command and response to the log
+#
+sub write_log {
+    my ($self, $session, $command, $response) = @_;
+
+    return unless exists($self->{'epp'}->{'log_dir'});
+
+    my $dir = File::Spec->catdir(
+        abs_path($self->{'epp'}->{'log_dir'}),
+        $session->{'session_id'}
+    );
+
+    make_path($dir, { mode => 0700});
+
+    write_file(File::Spec->catfile($dir, sprintf(q{%016u-command.xml}, $session->{'counter'})), $command);
+    write_file(File::Spec->catfile($dir, sprintf(q{%016u-response.xml}, $session->{'counter'})), $response);
 }
 
 #
@@ -715,7 +744,7 @@ Net::EPP::Server - A simple EPP server implementation.
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -833,6 +862,9 @@ provided, clients will not be required to use a certificate.
 =item * C<xsd_file> (optional), which is the location on disk of an XSD file
 which should be used to validate all frames received from clients. This XSD
 file can include other XSD files using C<E<lt>importE<gt>>.
+
+item * C<log_dir> (optional), which is the location on disk where log files
+will be written.
 
 =back
 

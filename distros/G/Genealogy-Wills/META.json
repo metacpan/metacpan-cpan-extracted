@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -36,6 +36,7 @@
             "DBD::SQLite" : "0",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "Data::Reuse" : "0",
             "Database::Abstraction" : "0.04",
             "Error::Simple" : "0",
             "ExtUtils::MakeMaker" : "6.64",
@@ -53,6 +54,7 @@
             "Lingua::EN::NameCase" : "0",
             "Module::Info" : "0",
             "Scalar::Util" : "0",
+            "Test::HTTPStatus" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0",
             "perl" : "5.006002"
@@ -83,6 +85,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -11,8 +11,8 @@ BEGIN {
 	use strict;
 	use warnings;
 	sub new {
-		my ($class, %args) = @_;
-		return bless \%args, $class;
+		my $class = shift;
+		return bless {}, $class;
 	}
 	sub selectall_hashref {
 		# Return mock data

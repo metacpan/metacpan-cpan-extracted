@@ -55,7 +55,7 @@
     <station id="vrs_s184" name="Bayenthalgürtel" line="vrs_16:33,vrs_17:6" link="vrs_s183,vrs_s185" />
     <station id="vrs_s036" name="Bensberg" line="vrs_1:1" link="vrs_s035" />
     <station id="vrr_s623" name="Berghausen" line="vrs_S6:1" link="vrr_s624" />  <!-- overlap with RheinRuhr -->
-    <station id="vrs_s324" name="Langenfeld-Bergisch Gladbach" line="vrs_S11:1" link="vrs_s323" />
+    <station id="vrs_s324" name="Bergisch Gladbach" line="vrs_S11:1" link="vrs_s323" />
     <station id="vrs_s247" name="Bergstr." line="vrs_61:21,vrs_62:3" link="vrs_s246,vrs_s248" />
     <station id="vrs_s167" name="Berrenrather Str. / Gürtel" line="vrs_13:22" link="vrs_s166,vrs_s168" />
     <station id="vrs_s267" name="Bertha-von-Suttner-Platz / Beethovenhaus" line="vrs_62:14,vrs_65:11,vrs_66:25,vrs_67:16" link="vrs_s256,vrs_s257,vrs_s268" />

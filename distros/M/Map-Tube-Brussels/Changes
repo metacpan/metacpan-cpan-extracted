@@ -1,4 +1,10 @@
 Revision history for Perl extension Map::Tube::Brussels
 
+0.2.0 2025-04-17
+  - Corrections to documentation.
+  - Fixed stations' spellings.
+  - Updated some line information.
+  - Require Map::Tube 4.04.
+
 0.1.0 2025-03-18
   - initial release

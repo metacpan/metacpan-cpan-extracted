@@ -17,7 +17,7 @@ use Markdown::Perl::HTML 'html_escape', 'decode_entities', 'remove_disallowed_ta
 use Markdown::Perl::Util ':all';
 use YAML::Tiny;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =pod
 
@@ -367,7 +367,8 @@ sub _parse_yaml_metadata {
   my ($this) = @_;
 
   # At this point, pos(md) is guaranteed to be 0.
-  if ($this->{md} =~ m/ ^ ---\n (?<YAML> (?: .+\n )+? ) (?: --- | \.\.\. ) \n /gxc) {  ## no critic (ProhibitUnusedCapture)
+  my $line_re = $this->get_yaml_file_metadata_allows_empty_lines ? qr/.*\n/ : qr/.+\n/;
+  if ($this->{md} =~ m/ ^ ---\n (?<YAML> (?: $line_re )+? ) (?: --- | \.\.\. ) \n /gxc) {  ## no critic (ProhibitUnusedCapture)
     my $metadata = eval { YAML::Tiny->read_string($+{YAML}) };
     if ($EVAL_ERROR) {
       pos($this->{md}) = 0;

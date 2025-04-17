@@ -18,7 +18,7 @@ my $map = new_ok( 'Map::Tube::Lyon' );
 #   print STDERR "*******\n";
 # }
 
-is( $map->name( ), 'Métro, funiculaires et tramways de Lyon', 'Name of map does not match' );
+is( $map->name( ), 'Lyon métro, funiculaires et tramways', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };
 like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
@@ -44,7 +44,7 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]),  'Map::Tube::Node' );
-  is( scalar(@stations), 141, 'Number of stations incorrect for map' );
+  is( scalar(@stations), 142, 'Number of stations incorrect for map' );
   like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Alfred.*Viviani$), 'Stations not correct for map' );
 }
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0902';
+our $VERSION = '0.0904';
 
 use v5.36;
 
@@ -42,14 +42,14 @@ has control => (
 
 has value => (
     is      => 'rw',
-    isa     => Maybe[Num],
+    isa     => Velocity, # no CC# in Types::MIDI yet
     default => undef,
 );
 
 
 has trigger => (
     is      => 'rw',
-    isa     => Maybe[Num],
+    isa     => Velocity, # no CC# in Types::MIDI yet
     default => undef,
 );
 
@@ -63,14 +63,14 @@ has initial_point => (
 
 has range_bottom => (
     is      => 'rw',
-    isa     => Num,
+    isa     => Velocity, # no CC# msg value in Types::MIDI yet
     default => 0,
 );
 
 
 has range_top => (
     is      => 'rw',
-    isa     => Num,
+    isa     => Velocity, # no CC# msg value in Types::MIDI yet
     default => 127,
 );
 
@@ -330,7 +330,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0902
+version 0.0904
 
 =head1 SYNOPSIS
 
@@ -517,22 +517,24 @@ Return a new C<MIDI::RtController::Filter::CC> object.
 
   MIDI::RtController::Filter::CC::add_filters(\@filters, $controllers);
 
-Add an array reference of B<filters> to controller instances. For example:
+Add an array reference of B<filters> to controller instances. For
+example:
 
   [
     { # mod-wheel
       port => 'keyboard',        # what is controlling it
       type => 'breathe',         # the type of filter
       event => 'control_change', # or [qw(note_on note_off)] etc
-      control => 1,              # what is being controlled
-      trigger => 25,             # what triggers the controlling
-      time_step => 0.25,          # a parameter
+      control => 1,              # what CC# is being controlled
+      trigger => 25,             # what CC# triggers the controlling
+      time_step => 0.25,         # a parameter
     },
     ...
   ]
 
-In this list, the C<port>, C<type>, and C<event> keys are metadata.
-All other keys are assumed to be object attributes to set.
+In this list, C<port> and C<type> are required, and C<event> is
+optional. These keys are metadata, and all others are assumed to be
+object attributes to set.
 
 The B<controllers> come from L<MIDI::RtController/open_controllers>
 and is a hash reference of C<MIDI::RtController> instances keyed by a

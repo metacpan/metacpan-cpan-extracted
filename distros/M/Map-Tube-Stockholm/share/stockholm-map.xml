@@ -46,8 +46,8 @@
   </lines>
   <stations>
     <!-- 40 -->
-    <station id="st_4001" name="Uppsala centrum" line="ST_40:1" link="st_4002"/>
-    <station id="st_4002" name="Arlanda centrum" line="ST_40:2" link="st_4001,st_4003"/>
+    <station id="st_4001" name="Uppsala centralstation" line="ST_40:1" link="st_4002"/>
+    <station id="st_4002" name="Arlanda central" line="ST_40:2" link="st_4001,st_4003"/>
     <station id="st_4003" name="Upplands Väsby" line="ST_40:3,ST_41:3,ST_42:3" link="st_4002,st_4004,st_4102"/>
     <station id="st_4004" name="Rotebro" line="ST_40:4,ST_41:4,ST_42:4" link="st_4003,st_4005"/>
     <station id="st_4005" name="Norrviken" line="ST_40:5,ST_41:5,ST_42:5" link="st_4004,st_4006"/>

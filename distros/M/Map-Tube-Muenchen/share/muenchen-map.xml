@@ -95,7 +95,7 @@
     <station id="mvg_1610" name="Hopfenstr." line="MVG_16:10,MVG_17:15" link="mvg_1611,mvg_s116"/>
     <station id="mvg_1611" name="Hauptbahnhof Nord" line="MVG_16:11,MVG_17:16,MVG_20:15,MVG_21:11" link="mvg_1610,mvg_1919,mvg_2014,mvg_u108" other_link="walk_hbfns:mvg_1818"/>
     <station id="mvg_u108" name="Hauptbahnhof" line="MVG_16:12,MVG_17:17,MVG_19:18,MVG_20:18,MVG_S1:17,MVG_S2:23,MVG_S3:15,MVG_S4:16,MVG_S6:17,MVG_S7:9,MVG_S8:18,MVG_U1:8,MVG_U2:13,MVG_U4:5,MVG_U5:7,MVG_U7:8,MVG_U8:8" link="mvg_1611,mvg_1818,mvg_1919,mvg_s116,mvg_u107,mvg_u109,mvg_u212,mvg_u404,mvg_u406"/>
-    <station id="mvg_u406" name="Karlsplatz" line="MVG_16:13,MVG_17:18,MVG_18:19,MVG_27:14,MVG_28:11,MVG_S1:18,MVG_S2:24,MVG_S3:16,MVG_S4:17,MVG_S6:18,MVG_S7:10,MVG_S8:19,MVG_U4:6,MVG_U5:8" link="mvg_1818,mvg_2713,mvg_u108,mvg_u109,mvg_u312,mvg_u313" other_link="walk_kn:mvg_1919,walk_ks:mvg_2017"/>
+    <station id="mvg_u406" name="Karlsplatz" line="MVG_16:13,MVG_17:18,MVG_18:19,MVG_20:17,MVG_27:14,MVG_28:11,MVG_S1:18,MVG_S2:24,MVG_S3:16,MVG_S4:17,MVG_S6:18,MVG_S7:10,MVG_S8:19,MVG_U4:6,MVG_U5:8" link="mvg_1818,mvg_2713,mvg_u108,mvg_u109,mvg_u312,mvg_u313"/>
     <station id="mvg_u109" name="Sendlinger Tor" line="MVG_16:14,MVG_17:19,MVG_18:20,MVG_27:15,MVG_28:12,MVG_U1:9,MVG_U2:14,MVG_U3:14,MVG_U6:11,MVG_U7:9,MVG_U8:9" link="mvg_1615,mvg_u108,mvg_u110,mvg_u313,mvg_u315,mvg_u406"/>
     <station id="mvg_1615" name="Müllerstr." line="MVG_16:15,MVG_17:20,MVG_18:21" link="mvg_1616,mvg_u109,mvg_u110"/>
     <station id="mvg_1616" name="Reichenbachplatz" line="MVG_16:16,MVG_17:21" link="mvg_1615,mvg_s120"/>
@@ -169,7 +169,7 @@
     <station id="mvg_1906" name="Lohensteinstr." line="MVG_19:6" link="mvg_1905,mvg_1907"/>
     <station id="mvg_1907" name="Willibaldplatz" line="MVG_19:7" link="mvg_1906,mvg_1908"/>
     <station id="mvg_1908" name="Agnes-Bernauer-Str." line="MVG_19:8" link="mvg_1810,mvg_1907"/>
-    <station id="mvg_1919" name="Karlsplatz Nord" line="MVG_19:19,MVG_20:16,MVG_21:12" link="mvg_1611,mvg_1920,mvg_2017,mvg_u108" other_link="walk_kn:mvg_u406"/>
+    <station id="mvg_1919" name="Karlsplatz Nord" line="MVG_19:19,MVG_20:16,MVG_21:12" link="mvg_1611,mvg_1920,mvg_u406,mvg_u108"/>
     <station id="mvg_1920" name="Lenbachplatz" line="MVG_19:20,MVG_21:13" link="mvg_1919,mvg_1921"/>
     <station id="mvg_1921" name="Marienplatz/Theatinerstr." line="MVG_19:21,MVG_21:14" link="mvg_1920,mvg_1922" other_link="walk_mt:mvg_u313"/>
     <station id="mvg_1922" name="Nationaltheater" line="MVG_19:22,MVG_21:15" link="mvg_1921,mvg_1923"/>
@@ -188,14 +188,13 @@
     <station id="mvg_2004" name="Wintrichring" line="MVG_20:4" link="mvg_2003,mvg_2005"/>
     <station id="mvg_2005" name="Hanauer Str." line="MVG_20:5" link="mvg_2004,mvg_u103"/>
     <station id="mvg_u103" name="Westfriedhof" line="MVG_20:6,MVG_21:2,MVG_U1:3,MVG_U7:3" link="mvg_2005,mvg_2007,mvg_u102,mvg_u104"/>
-    <station id="mvg_2007" name="Borstel" line="MVG_20:7,MVG_21:3" link="mvg_2008,mvg_2101,mvg_u103"/>
+    <station id="mvg_2007" name="Borstei" line="MVG_20:7,MVG_21:3" link="mvg_2008,mvg_2101,mvg_u103"/>
     <station id="mvg_2008" name="Olympiapark West" line="MVG_20:8,MVG_21:4" link="mvg_2007,mvg_2009"/>
     <station id="mvg_2009" name="Heideckstr." line="MVG_20:9,MVG_21:5" link="mvg_1216,mvg_2008"/>
     <station id="mvg_2011" name="Hochschule München" line="MVG_20:11,MVG_21:7" link="mvg_1216,mvg_2012"/>
     <station id="mvg_2012" name="Sandstr." line="MVG_20:12,MVG_21:8" link="mvg_2011,mvg_u107"/>
     <station id="mvg_u107" name="Stiglmaierplatz" line="MVG_20:13,MVG_21:9,MVG_U1:7,MVG_U7:7" link="mvg_2012,mvg_2014,mvg_u106,mvg_u108"/>
     <station id="mvg_2014" name="Karlstr." line="MVG_20:14,MVG_21:10" link="mvg_1611,mvg_u107"/>
-    <station id="mvg_2017" name="Karlsplatz Süd" line="MVG_20:17" link="mvg_u108" other_link="walk_ks:mvg_u406"/>
     <!-- 21 -->
     <station id="mvg_2101" name="Stadtwerke München" line="MVG_21:1" link="mvg_u103"/>
     <station id="mvg_2120" name="Wörthstr." line="MVG_21:20,MVG_25:2" link="mvg_s121,mvg_u409,mvg_u512"/>

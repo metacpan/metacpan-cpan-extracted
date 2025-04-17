@@ -4,7 +4,7 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "4.03",
+            "Map::Tube" : "4.04",
             "Moo" : "0",
             "namespace::clean" : "0",
             "perl" : "5.012"
@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::SanFrancisco" : {
          "file" : "lib/Map/Tube/SanFrancisco.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-SanFrancisco@rt.cpan.org"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

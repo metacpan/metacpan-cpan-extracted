@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database::Temporary;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.242720';
+$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.251060';
 use Moose;
 use namespace::autoclean;
 
@@ -19,6 +19,18 @@ extends 'Bio::MUST::Core::Ali::Temporary';
 with 'Bio::MUST::Drivers::Roles::Blastable';
 
 
+## no critic (ProhibitUnusedPrivateSubroutines)
+
+# overload Ali::Temporary default builder
+# Note: an id prefix longer than 3 letters is needed to avoid casing issues
+# when building BLAST databases (e.g., seq1234 is left untouched but seq12345
+# becomes SEQ12345, which prevents restore_ids to work properly).
+sub _build_args {
+    return { clean => 1, degap => 1, id_prefix => 'temp' };
+}
+
+## use critic
+
 # overload equivalent attribute in plain Database
 sub remote {
     return 0;
@@ -34,6 +46,7 @@ sub BUILD {
     my $in = $self->filename;
     my $dbtype = $self->type;
 
+    # TODO: modify all drivers to print the native errors for easy debugging
     # create makeblastdb command
     # -parse_seqids now required for blastdbcmd to work (side effects?)
     my $pgm = file($ENV{BMD_BLAST_BINDIR}, 'makeblastdb');
@@ -94,7 +107,7 @@ Bio::MUST::Drivers::Blast::Database::Temporary - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,8 @@
 use alienfile;
 
 # idiomatic way to make sure we always install/update?
-probe [ q{ sh -c 'exit 127' } ];
+probe [ sprintf q{ sh -c 'exit %d' },
+  (($ENV{ALIEN_ULTRAVIOLET_INSTALL_TYPE} and $ENV{ALIEN_ULTRAVIOLET_INSTALL_TYPE} eq 'system') ? 0 : 127) ];
  
 share {
   start_url 'https://astral.sh/uv/install.sh';
@@ -10,7 +11,6 @@ share {
 
   build [
     [ q{ mkdir -p %{alien.install.prefix}/bin } ],
-
     [ q{ INSTALLER_NO_MODIFY_PATH=1 UV_INSTALL_DIR=%{alien.install.prefix}/bin . %{alien.install.extract}/uv-installer.sh } ],
   ];
 };

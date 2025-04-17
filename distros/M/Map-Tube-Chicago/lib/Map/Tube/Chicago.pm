@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.1');
+our $VERSION = version->declare('v0.2.0');
 
 =encoding utf8
 
@@ -45,10 +45,11 @@ with 'Map::Tube';
 
 This module allows to find the shortest route between any two given tube or tram
 stations in Chicago. All interesting methods are provided by the role L<Map::Tube>.
-Since many stations in Chicago haaving the same name are in fact different stations,
-this module disambiguates the names by attaching (A), (B) etc. This also applies to
-stations of the same name where an interchange is possible but requires a walk
-checking out from one station and checking in at another (of the same name).
+Since many stations in Chicago having the same name are in fact different stations,
+this module disambiguates these names by attaching the parenthesized line name.
+This also applies to stations of the same name where an interchange is possible
+but requires a walk checking out from one station and checking in at another (of
+the same name).
 
 =head1 METHODS
 

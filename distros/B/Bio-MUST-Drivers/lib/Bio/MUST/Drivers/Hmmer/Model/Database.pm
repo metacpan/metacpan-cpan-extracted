@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Hmmer::Model::Database;
 # ABSTRACT: Internal class for HMMER3 driver
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::Hmmer::Model::Database::VERSION = '0.242720';
+$Bio::MUST::Drivers::Hmmer::Model::Database::VERSION = '0.251060';
 use Moose;
 use namespace::autoclean;
 
@@ -45,7 +45,7 @@ Bio::MUST::Drivers::Hmmer::Model::Database - Internal class for HMMER3 driver
 
 =head1 VERSION
 
-version 0.242720
+version 0.251060
 
 =head1 SYNOPSIS
 

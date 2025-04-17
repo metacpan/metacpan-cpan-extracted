@@ -1,10 +1,14 @@
 NAME
-    marc-list - Script to get MARC field/subfield unique list.
+    marc-list - Tool to get MARC leader of field/subfield unique list.
 
 SYNOPSIS
      marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
 
 DESCRIPTION
+    Tool to fetch unique list of some field in MARC collection file. It
+    could filter leader, control and data fields. There is possibility to
+    add frequency for each item in list.
+
     It supports MARC XML files now.
 
 ARGUMENTS
@@ -40,9 +44,12 @@ ARGUMENTS
     *       "module_version"
 
 EXAMPLE1
-     marc-list __MARC.xml__ 008
+     marc-lisr __MARC.xml__ leader
 
 EXAMPLE2
+     marc-list __MARC.xml__ 008
+
+EXAMPLE3
      marc-list __MARC.xml__ 015 a
 
 REPOSITORY
@@ -59,5 +66,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

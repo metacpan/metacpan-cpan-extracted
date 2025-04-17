@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<tube name="Métro, funiculaires et tramways de Lyon">
+<tube name="Lyon métro, funiculaires et tramways">
   <lines>
     <line id="ly_A"  name="A"  color="#E1001A"/>
     <line id="ly_B"  name="B"  color="#0094D7"/>
@@ -92,7 +92,8 @@
     <station id="ly_s071" name="Université Lyon 1" line="ly_T1:23,ly_T4:2" link="ly_s070,ly_s072"/>
     <station id="ly_s072" name="La Doua - Gaston Berger" line="ly_T1:24,ly_T4:1" link="ly_s071,ly_s073"/>
     <station id="ly_s073" name="INSA - Einstein" line="ly_T1:25" link="ly_s072,ly_s074"/>
-    <station id="ly_s074" name="Croix-Luizet" line="ly_T1:26" link="ly_s073"/>
+    <station id="ly_s074" name="Croix-Luizet" line="ly_T1:26" link="ly_s073,ly_s148"/>
+    <station id="ly_s148" name="IUT Feyssine" line="ly_T1:27" link="ly_s074"/>
 
     <station id="ly_s075" name="Centre Berthelot - Sciences Po Lyon" line="ly_T2:5" link="ly_s001,ly_s020"/>
     <station id="ly_s076" name="Garibaldi - Berthelot" line="ly_T2:7" link="ly_s020,ly_s077"/>
@@ -168,7 +169,7 @@
     <station id="ly_s141" name="Vinatier" line="ly_T6:13" link="ly_s083,ly_s142"/>
     <station id="ly_s142" name="Hôpitaux Est - Pinel" line="ly_T6:14" link="ly_s141"/>
 
-    <station id="ly_s143" name="Décine OL Vallée" line="ly_T7:4" link="ly_s106"/>
+    <station id="ly_s143" name="Décines OL Vallée" line="ly_T7:4" link="ly_s106"/>
 
     <station id="ly_s144" name="Meyzieu Z.I." line="ly_RE:3" link="ly_s014,ly_s145"/>
     <station id="ly_s145" name="Aéroport Lyon - Saint Exupéry" line="ly_RE:4" link="ly_s144"/>

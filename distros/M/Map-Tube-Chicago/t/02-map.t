@@ -17,5 +17,5 @@ my @routes = <DATA>;
 ok_map_routes( $map, \@routes );
 
 __DATA__
-Route 1|Armitage (A)|Polk|Armitage (A), Sedgwick (A), Chicago (B), Merch Mart, Washington/Wells,Clinton (A), Morgan (B), Ashland (A), Polk
-Route 2|35TH/ARCHER|sox-35th|35th/Archer, Ashland (B), Halsted (A), Roosevelt, Cermak-Chinatown, Sox-35th
+Route 1|Armitage (Brown Line)|Polk|Armitage (Brown Line), Sedgwick (Brown Line), Chicago (Brown Line), Merch Mart, Washington/Wells, Clinton (Green/Pink Line), Morgan (Pink Line), Ashland (Green/Pink Line), Polk
+Route 2|35TH/ARCHER|sox-35th|35th/Archer, Ashland (Orange Line), Halsted (Orange Line), Roosevelt, Cermak-Chinatown, Sox-35th

@@ -1,0 +1,37 @@
+---
+abstract: 'module for working icon text'
+author:
+  - 'Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>'
+build_requires:
+  Test::Exception: '0.30'
+  Test::More: '1.3'
+  Test::Warn: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-IconText
+no_index:
+  directory:
+    - t
+provides:
+  Data::IconText:
+    file: lib/Data/IconText.pm
+    version: v0.1.0
+requires:
+  Carp: '1.35'
+  Data::Identifier: v0.12.0
+  Encode: '3.19'
+  File::Spec: '3.84'
+  Scalar::Util: '1.62'
+  perl: v5.20.0
+resources:
+  repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-IconText.git
+version: v0.01
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

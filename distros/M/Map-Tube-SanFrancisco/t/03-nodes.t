@@ -48,7 +48,7 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]), 'Map::Tube::Node' );
-  is( scalar(@stations), 271, 'Number of stations incorrect for map' );
+  is( scalar(@stations), 270, 'Number of stations incorrect for map' );
   like( join( ',', sort map { $_->name( ) } @stations ),  qr(^12th St/Oakland.*Moscone$), 'Stations not correct for map' );
 }
 

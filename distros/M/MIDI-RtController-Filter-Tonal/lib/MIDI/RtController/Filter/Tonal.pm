@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use strictures 2;
 use Array::Circular ();
@@ -217,16 +217,26 @@ sub _walk_notes ($self, $note) {
         pitches   => \@pitches,
         intervals => $self->intervals,
     );
-    return map { $voice->rand } 1 .. $self->feedback;
+    my @notes = map { $voice->rand } 1 .. $self->feedback;
+    return @notes;
 }
 sub walk_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
     return 0 if defined $self->trigger && $note != $self->trigger;
     return 0 if defined $self->value && $val != $self->value;
 
-    my @notes = $self->_walk_notes($note);
+    # make sure the note_on and note_off notes are the same
+    my $notes = $self->arp;
+    if (@$notes) {
+        $self->arp([]);
+    }
+    else {
+        @$notes = $self->_walk_notes($note);
+        $self->arp($notes);
+    }
+
     my $delay_time = 0;
-    for my $n (@notes) {
+    for my $n (@$notes) {
         $delay_time += $self->delay;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
@@ -283,7 +293,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -413,15 +423,15 @@ The name of the musical scale.
   $intervals = $filter->intervals;
   $filter->intervals(\@intervals);
 
-The voice intervals used by L<Music::VoiceGen> and the C<chord_tone>
-filter.
+The voice intervals used by the C<walk_tone> filter.
 
 =head2 arp
 
   $arp = $filter->arp;
   $filter->arp(\@notes);
 
-The list of MIDI numbered pitches used by the C<arp_tone> filter.
+A list of MIDI numbered pitches used by the C<arp_tone> and
+C<walk_tone> filters.
 
 =head2 arp_types
 

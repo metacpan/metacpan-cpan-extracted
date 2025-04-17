@@ -252,7 +252,7 @@
              name_alt="北辛安"
              name="Beixin'an"
              line="L_line11:3"
-             link="s_jinanqiao,s_xinshougangshougangpark30" />
+             link="s_jinanqiao,s_xinshougang" />
     <station id="s_beixinqiao"
              name_alt="北新桥"
              name="Beixinqiao"
@@ -1873,9 +1873,9 @@
              name="Xinjiekou"
              line="L_line4:13"
              link="s_pinganli,s_xizhimen" />
-    <station id="s_xinshougangshougangpark30"
+    <station id="s_xinshougang"
              name_alt="新首钢"
-             name="Xinshougang (Shougang Park)[30]"
+             name="Xinshougang"
              line="L_line11:4"
              link="s_beixinan" />
     <station id="s_xisi"

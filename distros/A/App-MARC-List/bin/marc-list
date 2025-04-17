@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::List;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Run.
 exit App::MARC::List->new->run;
@@ -24,13 +24,17 @@ __END__
 
 =head1 NAME
 
-marc-list - Script to get MARC field/subfield unique list.
+marc-list - Tool to get MARC leader of field/subfield unique list.
 
 =head1 SYNOPSIS
 
  marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
 
 =head1 DESCRIPTION
+
+Tool to fetch unique list of some field in MARC collection file.
+It could filter leader, control and data fields.
+There is possibility to add frequency for each item in list.
 
 It supports MARC XML files now.
 
@@ -73,9 +77,13 @@ Required for data fields.
 
 =head1 EXAMPLE1
 
- marc-list __MARC.xml__ 008
+ marc-lisr __MARC.xml__ leader
 
 =head1 EXAMPLE2
+
+ marc-list __MARC.xml__ 008
+
+=head1 EXAMPLE3
 
  marc-list __MARC.xml__ 015 a
 
@@ -97,6 +105,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut
