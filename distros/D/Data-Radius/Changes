@@ -1,3 +1,9 @@
+1.2.9 2025-04-16
+
+ - Enforce read-only mode when reading the dictionary file
+ - Fix Message-Authenticator calculation for challenge responses
+ - Add support for ipv4prefix and ipv6prefix types according to RFC 6572
+
 1.2.8 2024-07-15
 
  - enable Message-Authenticator by default and place it as the first attribute,

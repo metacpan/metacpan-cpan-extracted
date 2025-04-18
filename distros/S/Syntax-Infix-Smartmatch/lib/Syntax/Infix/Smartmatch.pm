@@ -1,5 +1,5 @@
 package Syntax::Infix::Smartmatch;
-$Syntax::Infix::Smartmatch::VERSION = '0.010';
+$Syntax::Infix::Smartmatch::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Syntax::Infix::Smartmatch - Smartmatch done right
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

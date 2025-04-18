@@ -21,7 +21,7 @@ sub new {
     $self->{logfile} //= "client.log";
 
     if (not $self->{url}) {
-	$self->{host} ||= "localhost";
+	$self->{host} ||= "127.0.0.1";
 	$self->{url} = "opc.tcp://$self->{host}";
 	$self->{url} .= ":$self->{port}" if $self->{port};
     }
@@ -214,7 +214,8 @@ Create a new test client instance.
 
 =item $args{host}
 
-Hostname or IP of the server. Defaults to localhost.
+Hostname or IP of the server.
+Defaults to 127.0.0.1.
 
 =item $args{port}
 

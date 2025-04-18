@@ -32,13 +32,13 @@ t/line-stations.t
 t/map.t
 t/not_ok_map.t
 t/ok_map.t
-t/ok_map_forked.t
+t/ok_map_other_link.t
 t/ok_map_functions.t
 t/ok_map_routes.t
 t/preferred-route.t
 t/Sample.pm
-t/Forked.pm
-t/forked-map.xml
+t/OtherLink.pm
+t/other-link-map.xml
 t/sample.xml
 t/lib/BadSample.pm
 t/lib/Sample.pm

@@ -3,7 +3,7 @@ use 5.034 ; use warnings ;
 use Time::HiRes qw [ gettimeofday tv_interval ] ;
 my ${ dt_start } = [ gettimeofday ] ; 
 use Encode qw[ decode_utf8 encode_utf8 ] ; 
-use Getopt::Std ; getopts ',L:2:P' , \my %o  ; 
+use Getopt::Std ; getopts ',c:2:b:p' , \my %o  ; 
 use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 use List::Util qw[ min max uniq ] ; 
@@ -15,7 +15,10 @@ no warnings ;
 use warnings ; 
 
 $ARGV[0] //= 8 ; 
-$o{L} //= 100 ;  # 「ページ指定」受付最大文字列長さ
+$o{c} //= 100 ;  # 「ページ指定」受付最大文字列長さ
+$o{b} //= 1 ; 
+ # 入力ファイルがもしもAdobe生成されたときに「ページサイズと処理」で「複数」の指定を受けたあとだったときに
+ # 2や 4などの適切な値(1枚辺りの元のページ数)を指定する
 my $p1 ; # 元のPDFファイルの最初のページ番号
 my $p2 ; # 元のPDFファイルの最後のページ番号
 my $p2a ; # $p2+1 以下の、 $p2a - $p1 が4の倍数となる最大の数。
@@ -26,6 +29,7 @@ exit if map {say "'$_' seems not a numbper."} grep { ! looks_like_number $_ } ($
 exit if  $p1 > $p2 && say "'$p1 <= $p2' does not hold." ;
 
 
+ 
 # 最後に出力する紙の処理 および 出力枚数の算出
 my $pr = ($p2-$p1+1) % 4 ; # reminder 余り
 $p2a = $p2 - $pr + 1 ; 
@@ -38,11 +42,12 @@ my $o0 = ''  ; # 出力文字列　仮格納
 my $o1 = ''  ; # 出力文字列
 my $L = 0 ; # 出力した行数
 
-
-* con = $o{','} ? sub { $_[0] .. $_[1] } : sub { "$_[0]-$_[1]" } ; # 関数を定義。-でつなげるか、,でつなげるか
+sub M ($) ; 
+* M = ($o{b} // 1 ) eq 1 ? sub ($) { $_[0] } : sub ($) { ( $_[0] - 1 ) * $o{b} + 1 } ; 
+* con = $o{','} ? sub { map { M $_ } $_[0] .. $_[1] } : sub { ( M $_[0] ) . '-' . ( M $_[1] ) } ; # 関数を定義。-でつなげるか、,でつなげるか
 * con2 = sub { $p2a < $p2 ? join "," , con ($p2a,$p2)  : "$p2" } ;
 
-if ( $o{P} ) {
+if ( $o{p} ) {
   my @P ; 
   my $out = "pdftk INPUT.pdf cat " ; 
   $p=$p1-1;splice @P,@P/2,0,$p+1..($p+=4)for 1..$q;$out .= join" ",@P ;
@@ -55,11 +60,11 @@ if ( $o{P} ) {
 }
 
 
-say CYAN + (map { join '', 1..9,($_% 10 ) } ( 1..$o{L}/10) ) , 1..$o{L} % 10 if ($o{2}//'')ne"0"; # 文字列長さの定規
+say CYAN + (map { join '', 1..9,($_% 10 ) } ( 1..$o{c}/10) ) , 1..$o{c} % 10 if ($o{2}//'')ne"0"; # 文字列長さの定規
 for ( 1 .. $q ) {
   @P0 = @P1  ;
   splice @P0 , @P0/2 , 0 , con($p,$p+3) ; # $p . "-" . ($p+3) ; # 試しに1度に4ページ挿入。
-  if ( length ( $o0 = join "," , @P0 ) > $o{L} ) 
+  if ( length ( $o0 = join "," , @P0 ) > $o{c} ) 
     { say $o1 ; $o0 = '' ; @P1 = () ; @P0 = con($p,$p+3) ; $L++ }  ; # 長すぎたら出力。
   splice @P1 , @P1/2 , 0 , con($p++,$p++) , con($p++,$p++) ;
   $o1 = $o0 ;  
@@ -118,12 +123,13 @@ sub HELP_MESSAGE {
                # 21-22,25-26,29-30,33-34,37-40,35-36,31-32,27-28,23-24
 オプション :
  -,     : ハイフン(-)で区切らない。この場合、Adobe Acrobatでのコンマで区切られた部分が26個までという制約に注意。
- -L n   : 未指定だと n=100 。「ページ指定」は100文字以下の制限があるので、指定文字列の各長さを制限する。
- -P     : pdftk を使う場合のコマンド文を出力する。
+ -c n   : 未指定だと n=100 。「ページ指定」は100文字以下の制限があるので、指定文字列の各長さを制限する。
+ -p     : pdftk を使う場合のコマンド文を出力する。
  -2 0   : 最初の n 文字の定規と 最後の標準エラー出力の2次情報を出力しないようにする。
  --help : このオンラインヘルプの文面を表示する。
 
 開発メモ : 
   * ローマ数字指定に対応していない。(pdftkなどのコマンド出力を利用するなどの方法が考えられる。)
   * コマンド文の 12567834 -P 1852 は、 8190 文字を出力した。
+
 =cut

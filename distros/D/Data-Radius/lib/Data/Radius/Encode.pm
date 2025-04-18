@@ -55,6 +55,8 @@ my %encode_map = (
     signed      => \&encode_signed,
     ipaddr      => \&encode_ipaddr,
     ipv6addr    => \&encode_ipv6addr,
+    ipv4prefix  => \&encode_ipv4prefix,
+    ipv6prefix  => \&encode_ipv6prefix,
     avpair      => \&encode_avpair,
     'combo-ip'  => \&encode_combo_ip,
     octets      => \&encode_octets,
@@ -68,6 +70,7 @@ my %encode_map = (
 if (!defined inet_pton(AF_INET6, '::1')) {
     require Net::IP;
     $encode_map{ipv6addr} = \&encode_ipv6addr_pp,
+    $encode_map{ipv6prefix} = \&encode_ipv6prefix_pp,
 }
 
 sub encode_string {
@@ -239,6 +242,90 @@ sub encode_tlv {
     }
 
     return join('', @list);
+}
+
+sub encode_ipv4prefix {
+    my ($value, $attr) = @_;
+
+    my ($ip, $prefix_len);
+    if ($value =~ /^(\d+\.\d+\.\d+\.\d+)(?:\/(\d+))?$/) {
+        ($ip, $prefix_len) = ($1, $2 || 0);
+    }
+    else {
+        _error("Invalid IPv4 prefix format for attribute '$attr->{name}'. Expected format: ip/prefix-length or just ip");
+        return undef;
+    }
+
+    if ($prefix_len < 0 || $prefix_len > 32) {
+        _error("Invalid prefix length for IPv4 prefix in attribute '$attr->{name}'. Must be between 0 and 32");
+        return undef;
+    }
+
+    my $ip_bin = inet_pton(AF_INET, $ip);
+    unless (defined $ip_bin) {
+        _error("Invalid IPv4 address format for attribute '$attr->{name}': $ip");
+        return undef;
+    }
+
+    return pack('Ca*', $prefix_len, $ip_bin);
+}
+
+sub encode_ipv6prefix {
+    my ($value, $attr) = @_;
+
+    my ($ip, $prefix_len);
+    if ($value =~ /^([0-9a-fA-F:]+)(?:\/(\d+))?$/) {
+        ($ip, $prefix_len) = ($1, $2 || 0);
+    }
+    else {
+        _error("Invalid IPv6 prefix format for attribute '$attr->{name}'. Expected format: ipv6/prefix-length or just ipv6");
+        return undef;
+    }
+
+    if ($prefix_len < 0 || $prefix_len > 128) {
+        _error("Invalid prefix length for IPv6 prefix in attribute '$attr->{name}'. Must be between 0 and 128");
+        return undef;
+    }
+
+    my $ip_bin = inet_pton(AF_INET6, $ip);
+    unless (defined $ip_bin) {
+        _error("Invalid IPv6 address format for attribute '$attr->{name}': $ip");
+        return undef;
+    }
+
+    return pack('Ca*', $prefix_len, $ip_bin);
+}
+
+sub encode_ipv6prefix_pp {
+    my ($value, $attr) = @_;
+
+    my ($ip, $prefix_len);
+    if ($value =~ /^([0-9a-fA-F:]+)(?:\/(\d+))?$/) {
+        ($ip, $prefix_len) = ($1, $2 || 0);
+    }
+    else {
+        _error("Invalid IPv6 prefix format for attribute '$attr->{name}'. Expected format: ipv6/prefix-length or just ipv6");
+        return undef;
+    }
+
+    if ($prefix_len < 0 || $prefix_len > 128) {
+        _error("Invalid prefix length for IPv6 prefix in attribute '$attr->{name}'. Must be between 0 and 128");
+        return undef;
+    }
+
+    my $expanded_value = Net::IP::ip_expand_address($ip, 6);
+    unless ($expanded_value) {
+        _error("Invalid IPv6 address format for attribute '$attr->{name}': $ip");
+        return undef;
+    }
+
+    my $bin_value = Net::IP::ip_iptobin($expanded_value, 6);
+    unless (defined $bin_value) {
+        _error("Failed to convert IPv6 address to binary for attribute '$attr->{name}': $ip");
+        return undef;
+    }
+
+    return pack('CB*', $prefix_len, $bin_value);
 }
 
 # main exported function

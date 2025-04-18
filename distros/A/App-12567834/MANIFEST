@@ -5,5 +5,7 @@ INSTALL
 Makefile.PL
 MANIFEST			This list of files
 README
+README.md
+WORK1.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

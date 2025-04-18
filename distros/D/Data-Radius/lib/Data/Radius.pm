@@ -3,7 +3,7 @@ package Data::Radius;
 use strict;
 use warnings;
 
-our $VERSION = '1.2.8';
+our $VERSION = '1.2.9';
 
 =head1 NAME
 

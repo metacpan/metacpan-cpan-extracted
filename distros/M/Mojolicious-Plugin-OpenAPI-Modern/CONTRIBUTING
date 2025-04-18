@@ -82,12 +82,6 @@ Detailed instructions for doing that is available here:
 
 https://help.github.com/articles/creating-a-pull-request
 
-All pull requests for this distribution will be automatically tested on Linux
-by Travis at: https://travis-ci.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern
-Results will be visible in the pull request on GitHub. Follow the appropriate
-links for details when tests fail. Changes will not be mergeable until all
-tests pass.
-
 Generated files such as README, CONTRIBUTING, Makefile.PL, LICENSE etc should
 *not* be included in your pull request, as they will be updated automatically
 during the next release.
@@ -106,4 +100,4 @@ request to the .mailmap file to contain the correct mapping.
 
 
 This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.015
-from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.164.
+from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.166.

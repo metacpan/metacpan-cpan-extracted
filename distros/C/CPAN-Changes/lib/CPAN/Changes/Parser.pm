@@ -2,7 +2,7 @@ package CPAN::Changes::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.500004';
+our $VERSION = '0.500005';
 $VERSION =~ tr/_//d;
 
 use Module::Runtime qw(use_module);

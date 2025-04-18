@@ -42,6 +42,8 @@ my %decode_map = (
     signed      => \&decode_signed,
     ipaddr      => \&decode_ipaddr,
     ipv6addr    => \&decode_ipv6addr,
+    ipv4prefix  => \&decode_ipv4prefix,
+    ipv6prefix  => \&decode_ipv6prefix,
     avpair      => \&decode_avpair,
     'combo-ip'  => \&decode_combo_ip,
     octets      => \&decode_octets,
@@ -158,6 +160,30 @@ sub decode_tlv {
     }
 
     return \@list;
+}
+
+sub decode_ipv4prefix {
+    my $value = shift;
+    # Format: <prefix-length><ipv4-address>
+    # prefix-length is 1 byte, ipv4-address is 4 bytes
+    return undef if length($value) != 5;
+
+    my ( $prefix_len, $ip ) = unpack('Ca*', $value);
+    my $ip_str = inet_ntop(AF_INET, $ip);
+
+    return "$ip_str/$prefix_len";
+}
+
+sub decode_ipv6prefix {
+    my $value = shift;
+    # Format: <prefix-length><ipv6-address>
+    # prefix-length is 1 byte, ipv6-address is 16 bytes
+    return undef if length($value) != 17;
+
+    my ( $prefix_len, $ip ) = unpack('Ca*', $value);
+    my $ip_str = inet_ntop(AF_INET6, $ip);
+
+    return "$ip_str/$prefix_len";
 }
 
 sub decode {

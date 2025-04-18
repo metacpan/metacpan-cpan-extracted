@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION    = '4.06';
+$Test::Map::Tube::VERSION    = '4.07';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Module for testing Map::Tube data and features.
 
 =head1 VERSION
 
-Version 4.06
+Version 4.07
 
 =head1 DESCRIPTION
 
@@ -705,10 +705,10 @@ sub ok_stations_linked_share_lines($;$) {
                     ) {
             my $stationct = grep { exists( $rawinfo->{station_served_by_lines}{$_}{$line} ) }
                             keys %{ $rawinfo->{station_linked_to_stations}{$station} };
-    		$stationct	 += grep { exists( $rawinfo->{station_served_by_lines}{$_}{$line} ) }
-    						keys %{ $rawinfo->{station_linked_from_stations}{$station} };
+            $stationct   += grep { exists( $rawinfo->{station_served_by_lines}{$_}{$line} ) }
+                            keys %{ $rawinfo->{station_linked_from_stations}{$station} };
             ( $ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
-    											   "Line id $line at station id $station serves neither a linked nor a linking station",
+                                                   "Line id $line at station id $station serves neither a linked nor a linking station",
                                                    \@results, $max_msg
                                                  ) unless $stationct;
         }
@@ -1157,7 +1157,7 @@ sub ok_stations_linked($;$) {
 
     my %linked;
     for my $id( sort keys %{ $map->{nodes} } ) {
-    	$linked{$_}{$id}++ for ( sort grep { ( $_ ne '' ) && !exists( $map->{nodes}->{$_} ) } split( /\,/, $map->{nodes}->{$id}->{link} ) );
+        $linked{$_}{$id}++ for ( sort grep { ( $_ ne '' ) && !exists( $map->{nodes}->{$_} ) } split( /\,/, $map->{nodes}->{$id}->{link} ) );
     }
 
     ($ok, @results ) = _emit_diagnostics( $name, wantarray, $ok,
@@ -1485,9 +1485,9 @@ sub _prepare_xml_map {
   my $xml = XML::Twig->new( );
   $xml->parsefile( $map->xml( ) );
   my $root = $xml->root( );
-  my( %line_names,    			   %line_names_uc,				  %line_ids_defined, %line_ids_used,
-      %line_ids_indexed,		   %line_id_has_indices,		  %other_link_used,
-      %station_names,			   %station_ids_defined,		  %station_ids_used,
+  my( %line_names,                 %line_names_uc,                %line_ids_defined, %line_ids_used,
+      %line_ids_indexed,           %line_id_has_indices,          %other_link_used,
+      %station_names,              %station_ids_defined,          %station_ids_used,
       %station_linked_to_stations, %station_linked_from_stations, %station_served_by_lines,
       %station_line_count,
     );
@@ -1515,7 +1515,7 @@ sub _prepare_xml_map {
     $station_names{$name} //= [ ];
     push( @{ $station_names{$name} }, $id );
     $station_ids_defined{$id}++;
-    $station_ids_used{$_}++ 					for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
+    $station_ids_used{$_}++                     for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
     $station_linked_to_stations{$id}{$_}   |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
     $station_linked_from_stations{$_}{$id} |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->att('link') );
 
@@ -1537,8 +1537,8 @@ sub _prepare_xml_map {
         my( $ol, $target ) = split( /:/, $other_link );
         $other_link_used{$ol}++;
         $station_ids_used{$target}++;
-    	$station_linked_to_stations{$id}{$target}	|= 2;
-    	$station_linked_from_stations{$target}{$id} |= 2;
+        $station_linked_to_stations{$id}{$target}   |= 2;
+        $station_linked_from_stations{$target}{$id} |= 2;
         $station_served_by_lines{$id}{$ol}          |= 2;
       }
     }
@@ -1546,20 +1546,20 @@ sub _prepare_xml_map {
     $station = $station->next_sibling( );
   }
 
-  $map->{_rawinfo} = { line_names    				=> \%line_names,
-    				   line_names_uc				=> \%line_names_uc,
-    				   line_ids_defined 			=> \%line_ids_defined,
-    				   line_ids_used				=> \%line_ids_used,
-    				   line_ids_indexed 			=> \%line_ids_indexed,
+  $map->{_rawinfo} = { line_names                   => \%line_names,
+                       line_names_uc                => \%line_names_uc,
+                       line_ids_defined             => \%line_ids_defined,
+                       line_ids_used                => \%line_ids_used,
+                       line_ids_indexed             => \%line_ids_indexed,
                        line_id_has_indices          => \%line_id_has_indices,
-    				   station_names				=> \%station_names,
+                       station_names                => \%station_names,
                        station_ids_defined          => \%station_ids_defined,
-    				   station_ids_used 			=> \%station_ids_used,
-    				   station_line_count			=> \%station_line_count,
+                       station_ids_used             => \%station_ids_used,
+                       station_line_count           => \%station_line_count,
                        other_link_used              => \%other_link_used,
-    				   station_linked_to_stations	=> \%station_linked_to_stations,
-    				   station_linked_from_stations => \%station_linked_from_stations,
-    				   station_served_by_lines		=> \%station_served_by_lines,
+                       station_linked_to_stations   => \%station_linked_to_stations,
+                       station_linked_from_stations => \%station_linked_from_stations,
+                       station_served_by_lines      => \%station_served_by_lines,
                      };
   return $map;
 }
@@ -1572,9 +1572,9 @@ sub _prepare_json_map {
   plan skip_all => 'Map::Tube::Utils required (should have been installed along with Map::Tube)' if $@;
 
   my $map = shift;
-  my( %line_names,    			   %line_names_uc,				  %line_ids_defined, %line_ids_used,
-      %line_ids_indexed,		   %line_id_has_indices,		  %other_link_used,
-      %station_names,			   %station_ids_defined,		  %station_ids_used,
+  my( %line_names,                 %line_names_uc,                %line_ids_defined, %line_ids_used,
+      %line_ids_indexed,           %line_id_has_indices,          %other_link_used,
+      %station_names,              %station_ids_defined,          %station_ids_used,
       %station_linked_to_stations, %station_linked_from_stations, %station_served_by_lines,
       %station_line_count,
     );
@@ -1601,7 +1601,7 @@ sub _prepare_json_map {
     $station_names{$name} //= [ ];
     push( @{ $station_names{$name} }, $id );
     $station_ids_defined{$id}++;
-    $station_ids_used{$_}++ 					for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
+    $station_ids_used{$_}++                     for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
     $station_linked_to_stations{$id}{$_}   |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
     $station_linked_from_stations{$_}{$id} |= 1 for map { ( split(/:/) )[0] } split( /,/, $station->{link} );
 
@@ -1622,27 +1622,27 @@ sub _prepare_json_map {
         my( $ol, $target ) = split( /:/, $other_link );
         $other_link_used{$ol}++;
         $station_ids_used{$target}++;
-    	$station_linked_to_stations{$id}{$target}	|= 2;
-    	$station_linked_from_stations{$target}{$id} |= 2;
-    	$station_served_by_lines{$id}{$ol}			|= 2;
+        $station_linked_to_stations{$id}{$target}   |= 2;
+        $station_linked_from_stations{$target}{$id} |= 2;
+        $station_served_by_lines{$id}{$ol}          |= 2;
       }
     }
   }
 
-  $map->{_rawinfo} = { line_names    				=> \%line_names,
-    				   line_names_uc				=> \%line_names_uc,
-    				   line_ids_defined 			=> \%line_ids_defined,
-    				   line_ids_used				=> \%line_ids_used,
-    				   line_ids_indexed 			=> \%line_ids_indexed,
-    				   line_id_has_indices			=> \%line_id_has_indices,
-    				   station_names				=> \%station_names,
-    				   station_ids_defined			=> \%station_ids_defined,
-    				   station_ids_used 			=> \%station_ids_used,
-    				   station_line_count			=> \%station_line_count,
+  $map->{_rawinfo} = { line_names                   => \%line_names,
+                       line_names_uc                => \%line_names_uc,
+                       line_ids_defined             => \%line_ids_defined,
+                       line_ids_used                => \%line_ids_used,
+                       line_ids_indexed             => \%line_ids_indexed,
+                       line_id_has_indices          => \%line_id_has_indices,
+                       station_names                => \%station_names,
+                       station_ids_defined          => \%station_ids_defined,
+                       station_ids_used             => \%station_ids_used,
+                       station_line_count           => \%station_line_count,
                        other_link_used              => \%other_link_used,
-    				   station_linked_to_stations	=> \%station_linked_to_stations,
-    				   station_linked_from_stations => \%station_linked_from_stations,
-    				   station_served_by_lines		=> \%station_served_by_lines,
+                       station_linked_to_stations   => \%station_linked_to_stations,
+                       station_linked_from_stations => \%station_linked_from_stations,
+                       station_served_by_lines      => \%station_served_by_lines,
                      };
   return $map;
 }

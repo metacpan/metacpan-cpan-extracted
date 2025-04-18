@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-OpenAPI-Modern
 
+0.015     2025-04-17 18:56:32Z
+          - add config option "document_uri", to allow explicitly setting the
+            canonical uri of the OpenAPI document
+
 0.014     2025-01-26 20:26:39Z
           - fix usage of JSON::Schema::Modern::Result objects, in preparation
             for an upcoming deprecation of boolean overloads

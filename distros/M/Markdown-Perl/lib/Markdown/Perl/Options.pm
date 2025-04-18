@@ -447,6 +447,22 @@ _make_option(yaml_file_metadata_allows_empty_lines => 0, _boolean);
 
 =pod
 
+=head3 B<yaml_parser> I<(enum, default: YAML::Tiny)>
+
+Defines the YAML parser being used for the YAML metadata. Only the default
+L<YAML::Tiny> is installed by default with this program so if you use any other
+value you should make sure that the corresponding module is installed.
+
+Supported values: L<YAML::Tiny>, L<YAML::PP>, and L<YAML::PP::LibYAML>.
+
+=cut
+
+_make_option(
+  yaml_parser => 'YAML::Tiny',
+  _enum(qw(YAML::Tiny YAML::PP YAML::PP::LibYAML)));
+
+=pod
+
 =head2 Options controlling the rendering of top-level blocks
 
 =head3 B<code_blocks_info> I<(enum, default: language)>

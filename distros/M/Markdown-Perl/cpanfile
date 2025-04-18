@@ -42,6 +42,7 @@ on 'test' => sub {
   requires 'JSON';
   requires 'Test2::V0';
   requires 'Text::Diff';
+  requires 'YAML::PP';
 };
 
 on 'develop' => sub {

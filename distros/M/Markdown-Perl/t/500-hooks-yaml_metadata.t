@@ -88,8 +88,6 @@ EOF
   my $hook_called = 0;
   sub hook_multi_line {
     $hook_called = 1;
-    # The output does not have the blank line between the two paragraphs. It is
-    # unclear if this is correct or a bug in YAML::Tiny.
     is($_[0], { title => 'some title', notes => "This is a paragraph\nThis is another paragraph.\n"}, 'read multi-line YAML');
   }
   $p->set_hooks(yaml_metadata => \&hook_multi_line);
@@ -108,6 +106,17 @@ EOF
 
   $p->convert($yaml, yaml_file_metadata_allows_empty_lines => 1);
   ok($hook_called, "Hook for multi-line was called.");
+
+  my $hook_called2 = 0;
+  sub hook_multi_line2 {
+    $hook_called2 = 1;
+    # YAMLP::PP keeps the two newlines, YAML::Tiny does not.
+    is($_[0], { title => 'some title', notes => "This is a paragraph\n\nThis is another paragraph.\n"}, 'read multi-line YAML::PP');
+  }
+
+  $p->set_hooks(yaml_metadata => \&hook_multi_line2);
+  $p->convert($yaml, yaml_file_metadata_allows_empty_lines => 1, yaml_parser => 'YAML::PP');
+  ok($hook_called2, "Hook for multi-line with YAML::PP was called.");
 }
 
 done_testing;

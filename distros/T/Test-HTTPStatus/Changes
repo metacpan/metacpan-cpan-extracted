@@ -1,5 +1,9 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.10	Thu Apr 17 07:52:28 EDT 2025
+	Fix GitHub URL (RT#163754 - SREZIC)
+	Fix http://www.cpantesters.org/cpan/report/37119888-165c-11f0-98b0-b3c3213a625c
+
 2.09	Fri Apr  4 08:01:10 EDT 2025
 	Fix logic on when to use GET after HEAD as failed
 

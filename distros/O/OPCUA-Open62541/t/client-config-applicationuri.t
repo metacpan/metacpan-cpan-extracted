@@ -6,7 +6,7 @@ use Test::More;
 BEGIN {
     if (OPCUA::Open62541::ClientConfig->can('setApplicationUri')) {
 	plan tests => 14;
-    } else {
+    } elsif (not $^C) {
 	plan skip_all => 'open62541 has no client config applicationUri';
     }
 }

@@ -363,20 +363,41 @@ sub _parse_blocks {  ## no critic (RequireArgUnpacking)
   return;
 }
 
+sub _load_yaml_module {
+  my ($module_name) = @_;
+  if (!eval "require $module_name; 1") {  ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    croak "Cannot load module $module_name: ${EVAL_ERROR}";
+  }
+  return;
+}
+
+sub _call_yaml_parser {
+  my ($this, $yaml) = @_;
+  my $parser = $this->get_yaml_parser;
+  my $metadata;
+  if ($parser eq 'YAML::Tiny') {
+    return eval { YAML::Tiny->read_string($yaml)->[0] };
+  } elsif ($parser eq 'YAML::PP' || $parser eq 'YAML::PP::LibYAML') {
+    _load_yaml_module($parser);
+    return eval { ($parser->new()->load_string($yaml))[0] };
+  }
+  croak "Unsupported YAML parser: $parser";
+}
+
 sub _parse_yaml_metadata {
   my ($this) = @_;
 
   # At this point, pos(md) is guaranteed to be 0.
   my $line_re = $this->get_yaml_file_metadata_allows_empty_lines ? qr/.*\n/ : qr/.+\n/;
   if ($this->{md} =~ m/ ^ ---\n (?<YAML> (?: $line_re )+? ) (?: --- | \.\.\. ) \n /gxc) {  ## no critic (ProhibitUnusedCapture)
-    my $metadata = eval { YAML::Tiny->read_string($+{YAML}) };
+    my $metadata = $this->_call_yaml_parser($+{YAML});
     if ($EVAL_ERROR) {
       pos($this->{md}) = 0;
       carp 'YAML Metadata (Markdown frontmatter) is invalid' if $this->get_warn_for_unused_input();
       return;
     }
     if (exists($this->{pmarkdown}{hooks}{yaml_metadata})) {
-      $this->{pmarkdown}{hooks}{yaml_metadata}->($metadata->[0]);
+      $this->{pmarkdown}{hooks}{yaml_metadata}->($metadata);
     }
   }
   return;

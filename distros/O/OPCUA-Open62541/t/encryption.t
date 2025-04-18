@@ -30,10 +30,18 @@ BEGIN {
 
     plan tests =>
 	OPCUA::Open62541::Test::Server::planning() +
-	OPCUA::Open62541::Test::Client::planning() + 269;
+	OPCUA::Open62541::Test::Client::planning() + 278;
 }
 use Test::LeakTrace;
 use Test::NoWarnings;
+
+my $buildinfo;
+{
+    my $server = OPCUA::Open62541::Test::Server->new();
+    $server->start();
+    ok($buildinfo = $server->{config}->getBuildInfo(), "buildinfo");
+}
+note explain $buildinfo;
 
 my $ca = OPCUA::Open62541::Test::CA->new();
 $ca->setup();
@@ -101,7 +109,12 @@ sub _setup {
     return ($client, $server);
 }
 
+# security policy Basic128Rsa15 has been disabled
+# https://github.com/open62541/open62541/commit/0a485919909f9db2be916b5ee7c57c3e98c85aa9
 my $secpol = "Basic128Rsa15";
+$secpol = "Basic256Sha256"
+  if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[0-3]\.([0-9]+)/ &&
+  $1 >= 14);
 
 # test client connect no validation success
 {
@@ -145,7 +158,12 @@ my $secpol = "Basic128Rsa15";
 }
 
 # test client connect no CRL fail
-{
+SKIP: {
+    # https://github.com/open62541/open62541/commit/68142484a35a2a83ef083098ed533abbcc5e98f4
+    skip "empty certificate revocation lists allow by open62541 1.3.15", 29
+      if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[0-3]\.([0-9]+)/ &&
+      $1 >= 15);
+
     my ($client, $server) = _setup(
 	client_trustList => [$ca->{certs}{ca_server}{cert_pem}]
     );
@@ -169,7 +187,12 @@ my $secpol = "Basic128Rsa15";
     is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
        "client connect not trusted fail");
 
-    ok($client->{log}->loggrep("Receiving the response failed with StatusCode BadCertificateUntrusted"),
+    # https://github.com/open62541/open62541/commit/19ecf3e5627ae1d0c20ce661aee8e0164b03d86c
+    my $error = "BadCertificateUntrusted";
+    $error = "BadCertificateChainIncomplete"
+      if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[0-3]\.([0-9]+)/ &&
+      $1 >= 13);
+    ok($client->{log}->loggrep("Receiving the response failed with StatusCode $error"),
        "client: statuscode untrusted");
 
     $client->stop;
@@ -257,7 +280,12 @@ my $secpol = "Basic128Rsa15";
     is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
        'client connect validation server not trusted fail');
 
-    ok($server->{log}->loggrep('failed with error BadCertificateUntrusted'),
+    # https://github.com/open62541/open62541/commit/19ecf3e5627ae1d0c20ce661aee8e0164b03d86c
+    my $error = "BadCertificateUntrusted";
+    $error = "BadCertificateChainIncomplete"
+      if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[0-3]\.([0-9]+)/ &&
+      $1 >= 13);
+    ok($server->{log}->loggrep("failed with error $error"),
        'server: statuscode untrusted');
 
     $client->stop;
@@ -268,7 +296,8 @@ my $secpol = "Basic128Rsa15";
 SKIP: {
     # https://marc.info/?l=libressl&m=169307453205178&w=2
     skip "self signed client/server certificate not supported by LibreSSL", 27
-	if eval { Net::SSLeay::LIBRESSL_VERSION_NUMBER() };
+	if eval { Net::SSLeay::LIBRESSL_VERSION_NUMBER() &&
+	Net::SSLeay::LIBRESSL_VERSION_NUMBER() < 0x30900000 };
 
     my ($client, $server) = _setup(
 	client_name           => 'client_selfsigned',
@@ -278,7 +307,7 @@ SKIP: {
     );
 
     is($client->{client}->connect($client->url()), STATUSCODE_GOOD,
-       'client connect validation server success');
+       'client connect validation self signed success');
 
     $client->stop;
     $server->stop;

@@ -22,7 +22,7 @@ name: Crypt-Credentials
 provides:
   Crypt::Credentials:
     file: lib/Crypt/Credentials.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   Crypt::AuthEnc::GCM: '0'
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-credentials/issues
   repository: git://github.com/Leont/crypt-credentials.git
-version: '0.005'
-x_generated_by_perl: v5.40.0
+version: '0.006'
+x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

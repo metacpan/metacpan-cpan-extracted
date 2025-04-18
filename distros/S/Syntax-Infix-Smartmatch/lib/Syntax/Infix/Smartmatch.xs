@@ -35,6 +35,10 @@ SV* S_newSV_type_mortal(pTHX_ svtype type) {
 #define OP_CHECK_MUTEX_UNLOCK NOOP
 #endif
 
+#ifndef PERLSI_SMARTMATCH
+#define PERLSI_SMARTMATCH PERLSI_UNDEF
+#endif
+
 #define pragma_base "Syntax::Infix::Smartmatch/"
 #define pragma_name pragma_base "enabled"
 #define pragma_name_length (sizeof(pragma_name) - 1)
@@ -143,6 +147,7 @@ STATIC bool S_do_smartmatch(pTHX_ SV* d, SV* e) {
 		/* ~~ sub */
 		else if (SvTYPE(SvRV(e)) == SVt_PVCV) {
 			dSP;
+			PUSHSTACKi(PERLSI_SMARTMATCH);
 			ENTER_with_name("smartmatch_array_elem_test");
 			PUSHMARK(SP);
 			PUSHs(d);
@@ -152,6 +157,7 @@ STATIC bool S_do_smartmatch(pTHX_ SV* d, SV* e) {
 			bool result = c == 0 ? FALSE : SvTRUEx(POPs);
 			PUTBACK;
 			LEAVE_with_name("smartmatch_array_elem_test");
+			POPSTACK;
 			return result;
 		}
 		/* ~~ @array */

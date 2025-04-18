@@ -18,7 +18,8 @@ subtest no_url => sub {
 
 subtest bad_url => sub {
 	my $status = Test::HTTPStatus::_get_status('foo');
-	is( $status->{status}, undef, 'HTTP Server Error' );
+
+	is($status->{status}, undef, 'HTTP Server Error');
 };
 
 done_testing();

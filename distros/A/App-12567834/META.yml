@@ -20,5 +20,5 @@ no_index:
 resources:
   bugtracker: https://github.com/tulamili/App-12567834/issues
   repository: https://github.com/tulamili/App-12567834.git
-version: '0.021'
+version: '0.022'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

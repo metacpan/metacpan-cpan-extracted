@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+4.07  2025-04-17T15:50:00+00:00
+      - Renamed Forked test to OtherLink test to be more explicit.
+
 4.06  2025-04-15T17:25:00+00:00
       - Proposed patch for this FAIL report, thanks Andreas J. Koenig.
       https://www.cpantesters.org/cpan/report/50dde750-1736-11f0-8297-ce01b18213f0

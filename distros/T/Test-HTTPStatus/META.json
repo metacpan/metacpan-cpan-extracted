@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>, Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -56,9 +56,9 @@
       },
       "homepage" : "https://metacpan.org/release/Test-HTTPStatus",
       "repository" : {
-         "url" : "https://github.com/username/Test-HTTPStatus"
+         "url" : "https://github.com/nigelhorne/Test-HTTPStatus"
       }
    },
-   "version" : "2.09",
+   "version" : "2.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

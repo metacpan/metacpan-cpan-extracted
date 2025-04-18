@@ -71,7 +71,7 @@ sub _load_file {
 
     return undef if ( $included_files{$file} );
 
-    my $fh = IO::File->new($file)
+    my $fh = IO::File->new($file, 'r')
         || warn sprintf('Failed to open file "%s": %s', $file, $!);
 
     $included_files{$file} = 1;

@@ -1,5 +1,5 @@
 package Crypt::Credentials;
-$Crypt::Credentials::VERSION = '0.005';
+$Crypt::Credentials::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -25,7 +25,8 @@ sub new {
 		for my $key (@{ $args{keys} }) {
 			my $length = length $key;
 			croak "Invalid key size($length)" if $length != 16 && $length != 24 && $length != 32;
-			if (eval { $class->_get($check_file, $key) } // '' eq 'OK') {
+			my $tag = eval { $class->_get($check_file, $key) } // '';
+			if ($tag eq 'OK') {
 				$real_key = $key;
 				last;
 			}
@@ -179,7 +180,7 @@ Crypt::Credentials - Manage credential files
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

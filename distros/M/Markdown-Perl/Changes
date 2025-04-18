@@ -1,8 +1,13 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.10 - 2025-04-17
+
+ - Support YAML::PP and YAML::PP::LibYAML as YAML parsers as YAML::Tiny has
+   limitations in terms of supported YAML syntax (fix #6).
+
 1.09 - 2025-04-16
 
- - Add an option to allow empty lines in YAML prefix.
+ - Add an option to allow empty lines in YAML prefix (partial fix to #6).
 
 1.08 - 2024-10-30
 
@@ -10,7 +15,7 @@ Revision history for pmarkdown and the Markdown::Perl module.
 
 1.07 - 2024-05-25
 
- - Allow to specify a link content through the resolve_link_ref hook.
+ - Allow to specify a link content through the resolve_link_ref hook (fix #1).
 
 1.06 - 2024-05-17
 

@@ -3,10 +3,9 @@ package Array::Contains;
 use 5.010_001;
 use strict;
 use warnings;
-use diagnostics;
 use mro 'c3';
 use English;
-our $VERSION = 2.8;
+our $VERSION = 2.9;
 use Carp;
 
 require Exporter;
@@ -87,7 +86,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Rene Schickbauer
+Copyright (C) 2017-2025 by Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.0 or,

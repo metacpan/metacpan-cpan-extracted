@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Victoria;
 
-$Map::Tube::London::Line::Victoria::VERSION   = '1.41';
+$Map::Tube::London::Line::Victoria::VERSION   = '1.42';
 $Map::Tube::London::Line::Victoria::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Victoria - London Tube Map: Victoria Line.
 
 =head1 VERSION
 
-Version 1.41
+Version 1.42
 
 =head1 DESCRIPTION
 

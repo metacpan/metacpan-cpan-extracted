@@ -27,6 +27,7 @@ sub new {
     my $self = { @_ };
     $self->{timeout} //= 10;
     $self->{logfile} //= "server.log";
+    $self->{host} ||= "127.0.0.1";
 
     ok($self->{server} = OPCUA::Open62541::Server->new(), "server: new");
     ok($self->{config} = $self->{server}->getConfig(), "server: get config");
@@ -59,6 +60,10 @@ sub start {
 	ident => "OPC UA server",
     ), "server: test logger");
     ok($self->{log}->file($self->{logfile}), "server: log file");
+
+    if ($self->{host} && $self->{config}->can("setCustomHostname")) {
+	$self->{config}->setCustomHostname($self->{host});
+    }
 
     ok($self->{port} ||= empty_port(), "server: empty port");
     note("going to configure server on port $self->{port}");
@@ -530,6 +535,12 @@ argument.
 Certificate in DER format for signing and encryption.
 If I<certificate> and I<privateKey> are set, the server config will be
 configured with the relevant security policies.
+
+=item $args{host}
+
+Hostname or IP of the server.
+Defaults to 127.0.0.1.
+Can be turned off with 0.
 
 =item $args{privateKey}
 

@@ -31,15 +31,14 @@ my $openapi_preamble = {
   },
 };
 
-my $abs_uri = sub ($t) {
-  Mojo::URL->new->host($t->tx->req->headers->host)->scheme('http');
-};
+my $doc_uri = Mojo::URL->new('http://example.com/api');
 
 subtest 'validate_request helper' => sub {
   my $t = Test::Mojo->new(
     'BasicApp',
     {
       openapi => {
+        document_uri => $doc_uri,
         schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML')} });
 openapi: 3.1.0
 info:
@@ -110,7 +109,7 @@ YAML
           {
             instanceLocation => '/request/uri/path',
             keywordLocation => '/paths',
-            absoluteKeywordLocation => $t->$abs_uri->fragment('/paths')->to_string,
+            absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
             error => 'no match found for request URI "/foo/hi/there"',
           },
         ],
@@ -150,7 +149,7 @@ YAML
           {
             instanceLocation => '/request/method',
             keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
-            absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
             error => 'missing operation for HTTP method "get"',
           },
         ],
@@ -191,7 +190,7 @@ YAML
           {
             instanceLocation => '/request/uri/path/foo_id',
             keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-            absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern))),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern))),
             error => 'pattern does not match',
           },
         ],
@@ -233,7 +232,7 @@ YAML
           {
             instanceLocation => '/request/body',
             keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)),
-            absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern))),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern))),
             error => 'pattern does not match',
           },
         ],
@@ -288,7 +287,7 @@ YAML
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses 500 content application/json schema)),
-          absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id} post responses 500 content application/json schema)))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses 500 content application/json schema)))->to_string,
           error => 'response body not permitted',
         },
       ],
@@ -328,7 +327,7 @@ YAML
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /skip_validate_request get responses 200 content text/plain schema)),
-          absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /skip_validate_request get responses 200 content text/plain schema)))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /skip_validate_request get responses 200 content text/plain schema)))->to_string,
           error => 'response body not permitted',
         },
       ],

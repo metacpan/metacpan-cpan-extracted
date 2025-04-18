@@ -1,5 +1,8 @@
 Revision history for Syntax-Infix-Smartmatch
 
+0.011     2025-04-17 13:29:44+02:00 Europe/Brussels
+          - Push a new stack when testing against a CV
+
 0.010     2024-09-20 14:46:37+02:00 Europe/Brussels
           - Adapt to the removal of smartmatch in core
 

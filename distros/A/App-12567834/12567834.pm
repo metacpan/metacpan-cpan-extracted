@@ -1,6 +1,6 @@
 package App::12567834 ;  
-our $VERSION = '0.021' ; 
-our $DATE = '2025-04-02T15:10+09:00' ; 
+our $VERSION = '0.022' ; 
+our $DATE = '2025-04-17T20:00+09:00' ; 
 
 =encoding utf8
 
@@ -46,7 +46,9 @@ To learn more about how it works, run the help option using 12567834 --help.
 =head1 SEE ALSO
 
 12567834 --help
+
 man 12567834
+
 perldoc 12567834
 
 =cut

@@ -4,7 +4,7 @@ package IO::Interactive;
 use strict;
 use warnings;
 
-$IO::Interactive::VERSION = '1.026';
+$IO::Interactive::VERSION = '1.027';
 
 sub is_interactive {
     my ($out_handle) = (@_, select);    # Default to default output handle

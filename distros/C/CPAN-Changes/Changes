@@ -1,5 +1,8 @@
 Revision history for perl module CPAN::Changes
 
+0.500005 - 2025-04-17
+  - fix Test::CPAN::Changes on perl 5.10 without upgrading version.pm
+
 0.500004 - 2024-05-02
   - fix tests on Windows
 

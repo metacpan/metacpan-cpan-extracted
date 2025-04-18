@@ -25,7 +25,7 @@ Check the HTTP status for a resource.
 =cut
 
 use v5.10.1;	# Mojolicious is v5.10.1 and later
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use parent 'Test::Builder::Module';
 
@@ -140,7 +140,7 @@ sub http_ok {
 
 	my $status = $hash->{status};
 
-	if(defined $expected and $expected eq $status ) {
+	if(defined($expected) && ($expected eq $status)) {
 		$Test->ok( 1, "Expected [$expected], got [$status] for [$url]" );
 	} elsif( $status == NO_URL ) {
 		$Test->ok( 0, "[$url] does not appear to be anything" );

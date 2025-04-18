@@ -3,7 +3,7 @@
 use 5.006;
 use strict; use warnings;
 use lib 't/';
-use Forked;
+use OtherLink;
 use Test::Map::Tube tests => 1;
 
 my $routes =
@@ -12,4 +12,4 @@ my $routes =
    "Route 2|A4|A1|A4,A2,A1",
 ];
 
-ok_map_routes(Forked->new, $routes);
+ok_map_routes(OtherLink->new, $routes);

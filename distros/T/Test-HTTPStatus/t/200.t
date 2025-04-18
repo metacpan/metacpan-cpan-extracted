@@ -2,12 +2,14 @@ use Test::More 0.98;
 
 use_ok('Test::HTTPStatus');
 
+use Test::RequiresInternet ('www.perl.org' => 'https');
+
 subtest http => sub {
-try_it( 'http://blogs.perl.org/' );
+	try_it( 'http://blogs.perl.org/' );
 };
 
 subtest https => sub {
-try_it( 'https://www.perl.org/' );
+	try_it( 'https://www.perl.org/' );
 };
 
 done_testing();

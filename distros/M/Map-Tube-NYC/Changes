@@ -1,5 +1,10 @@
 Revision history for Map::Tube::NYC
 
+0.71  Thu Apr 17 11:15:00 2025
+      - Updated dependency on Map::Tube v4.06.
+      - Proposed patch for FAIL report, thanks Andreas J. König.
+      http://www.cpantesters.org/cpan/report/415a9a00-1a6d-11f0-9bc5-83a3f2272de7
+
 0.70  Tue Sep 03 10:25:00 2019
       - Moved author test scripts to xt/ subfolder.
 

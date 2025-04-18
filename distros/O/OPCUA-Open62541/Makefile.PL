@@ -37,6 +37,29 @@ check_lib(
 check_lib(
     function		=> "
 	UA_ServerConfig serverConfig;
+	(void)serverConfig.secureChannelPKI;
+	(void)serverConfig.sessionPKI;",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/server.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_ServerConfig_PKI');
+check_lib(
+    function		=> "
+	UA_ServerConfig serverConfig;
+	UA_CertificateVerification verifyX509;
+	(void)UA_AccessControl_default(&serverConfig,
+	    0, &verifyX509, NULL, 0, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/plugin/accesscontrol_default.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_AccessControl_default_verifyX509');
+check_lib(
+    function		=> "
+	UA_ServerConfig serverConfig;
 	(void)UA_AccessControl_defaultWithLoginCallback(&serverConfig,
 	    0, NULL, NULL, 0, NULL, NULL, NULL);",
     not_execute		=> 1,
@@ -50,6 +73,16 @@ check_lib(
     lib			=> 'c',
     header		=> [qw(pwd.h unistd.h)],
 ) and push @have, uc('crypt_checkpass');
+check_lib(
+    function		=> "
+	(void)UA_Client_sendAsyncBrowseNextRequest(NULL, NULL, NULL,
+	    NULL, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/client_highlevel_async.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_Client_sendAsyncBrowseNextRequest');
 check_lib(
     function		=> "
 	UA_ClientConfig clientConfig;

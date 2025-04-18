@@ -9,7 +9,7 @@ use Map::Tube::London;
 
 my $map = Map::Tube::London->new;
 
-ok_map($map);
+ok_map($map, { ok_lines_run_through => { exclude => 'Street' } } );
 ok_map_functions($map);
 
 my @routes = <DATA>;

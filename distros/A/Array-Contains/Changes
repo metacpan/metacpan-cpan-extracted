@@ -1,5 +1,8 @@
 Revision history for Perl extension Array::Contains.
 
+2.9  Fri Apr 18 09:00:00 2025
+    - Remove "use diagnostics" as this has apparently problems on some Cygwin installations
+
 2.8  Thu Oct 04 15:00:00 2018
     - Tester reported we can use a lower minimum perl version.
 

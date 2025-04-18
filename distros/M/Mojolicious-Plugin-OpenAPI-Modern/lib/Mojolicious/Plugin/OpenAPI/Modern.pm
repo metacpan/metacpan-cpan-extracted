@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.013-3-g0ebee66
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.014-3-g24c0911
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -69,8 +69,12 @@ sub _process_configs ($config) {
     die 'missing config: one of schema, filename';
   }
 
+  my %config_copy = %$config;
+  delete @config_copy{qw(schema document_filename document_uri after_response)};
+  warn 'unrecognized config option(s): ', join(', ', keys %config_copy) if keys %config_copy;
+
   return {
-    openapi_uri    => $config->{document_filename} // '',
+    openapi_uri    => $config->{document_uri} // $config->{document_filename} // '',
     openapi_schema => $schema,
   };
 }
@@ -100,7 +104,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -131,17 +135,29 @@ There are many features to come.
 
 The literal, unblessed Perl data structure containing the OpenAPI document. See
 L<OpenAPI::Modern/openapi_schema>; passed to the L<OpenAPI::Modern> constructor.
+
+Only used if L</openapi_obj> is not provided.
+
+=head2 document_uri
+
+A uri (string or Mojo::URL object) which identifies the OpenAPI document, and is used for resolving
+any relative URIs within the document (as well as locations in any error objects from validation).
+Note: as of OpenAPI 3.2, you can also set this value within the document itself, using the C<$self>
+keyword.
+
 Only used if L</openapi_obj> is not provided.
 
 =head2 document_filename
 
 A filename indicating from where to load the OpenAPI document. Supports YAML and json file formats.
-Only used if L</schema> is not provided; also passed to the L<OpenAPI::Modern> constructor as
-C<openapi_uri>. Only used if L</openapi_obj> is not provided.
+Only used if L</schema> is not provided; this value will also be used as the L</document_uri> if one
+was not explicitly provided.
+
+Only used if L</openapi_obj> is not provided.
 
 =head2 openapi_obj
 
-An L<OpenAPI::Modern> object to use
+An L<OpenAPI::Modern> object to use. If provided, all other options above are ignored.
 
 =head2 after_response
 

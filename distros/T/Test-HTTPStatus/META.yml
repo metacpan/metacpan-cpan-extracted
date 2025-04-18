@@ -9,9 +9,9 @@ build_requires:
   Test::Needs: '0'
   Test::RequiresInternet: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,6 +31,6 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-HTTPStatus
   homepage: https://metacpan.org/release/Test-HTTPStatus
-  repository: https://github.com/username/Test-HTTPStatus
-version: '2.09'
+  repository: https://github.com/nigelhorne/Test-HTTPStatus
+version: '2.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

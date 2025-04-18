@@ -33,5 +33,5 @@ requires:
   File::Spec: '0'
   Socket: '2.021'
   perl: '5.010000'
-version: v1.2.8
+version: v1.2.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

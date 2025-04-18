@@ -17,12 +17,14 @@ WriteMakefile(
 	ABSTRACT	 => 'Test HTTP status codes of URLs',
 	AUTHOR	 => 'brian d foy <bdfoy@cpan.org>, Nigel Horne <njh@bandsman.co.uk>',
 	LICENSE	=> 'artistic_2',
-	PREREQ_PM	=> {					 # Required dependencies
-		# 'HTTP::SimpleLinkChecker' => 0,	 # Specify minimum version if needed
+	PL_FILES	=> {}, CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64	# Minimum version for TEST_REQUIRES
+	}, PREREQ_PM	=> {				 # Required dependencies
+		# 'HTTP::SimpleLinkChecker' => 0,	# Specify minimum version if needed
 		'Mojo::URL'			=> 0,
 		'Mojo::UserAgent' => 0,
 		'Test::Builder::Module' => 0,
-		'Carp'				 => 0,
+		'Carp'			 => 0,
 		'warnings'			 => 0,
 	},
 	TEST_REQUIRES => {					# Dependencies needed for testing
@@ -35,11 +37,11 @@ WriteMakefile(
 		resources => {
 			homepage => 'https://metacpan.org/release/Test-HTTPStatus',
 			bugtracker => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-HTTPStatus',
-			repository => 'https://github.com/username/Test-HTTPStatus', # Update as necessary
+			repository => 'https://github.com/nigelhorne/Test-HTTPStatus', # Update as necessary
 		},
 	},
-	EXE_FILES	=> [],					 # Executable scripts (if any)
-	MIN_PERL_VERSION => '5.10.1',		 # Minimum Perl version
-	clean		=> { FILES => 'Test-HTTPStatus-*' }, # Files to clean
+	EXE_FILES	=> [],		 # Executable scripts (if any)
+	MIN_PERL_VERSION => '5.10.1',	 # Minimum Perl version
+	clean	=> { FILES => 'Test-HTTPStatus-*' }, # Files to clean
 	dist => $dist
 );

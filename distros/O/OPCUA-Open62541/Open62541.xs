@@ -2694,7 +2694,8 @@ unpack_UA_UsernamePasswordLogin_List(UA_UsernamePasswordLogin **outList,
 	}
 }
 
-#ifdef HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK
+#if defined(HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK) || \
+    !defined(HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509)
 
 #ifdef HAVE_CRYPT_CHECKPASS
 
@@ -3553,8 +3554,15 @@ UA_ServerConfig_setDefaultWithSecurityPolicies(conf, portNumber, certificate, \
 
 	/* accept all certificates as fallback ? */
 	if (trustList == NULL && issuerList == NULL && revocationList == NULL) {
+#ifdef HAVE_UA_SERVERCONFIG_PKI
+		UA_CertificateVerification_AcceptAll(
+		    &conf->svc_serverconfig->secureChannelPKI);
+		UA_CertificateVerification_AcceptAll(
+		    &conf->svc_serverconfig->sessionPKI);
+#else
 		UA_CertificateVerification_AcceptAll(
 		    &conf->svc_serverconfig->certificateVerification);
+#endif /* HAVE_UA_SERVERCONFIG_PKI */
 	}
     OUTPUT:
 	RETVAL
@@ -3587,13 +3595,20 @@ UA_ServerConfig_setAccessControl_default(config, allowAnonymous, \
 	    usernamePasswordLogin);
 	if (loginSize > 0 && optUserTokenPolicyUri == NULL)
 		CROAK("UsernamePasswordLogin needs userTokenPolicyUri");
+#ifdef HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509
 	RETVAL = UA_AccessControl_default(config->svc_serverconfig,
 	    allowAnonymous, optVerifyX509, optUserTokenPolicyUri,
 	    loginSize, loginList);
+#else
+	RETVAL = UA_AccessControl_default(config->svc_serverconfig,
+	    allowAnonymous, optUserTokenPolicyUri,
+	    loginSize, loginList);
+#endif /* HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509 */
     OUTPUT:
 	RETVAL
 
-#ifdef HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK
+#if defined(HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK) || \
+    !defined(HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509)
 
 UA_StatusCode
 UA_ServerConfig_setAccessControl_defaultWithLoginCallback(config, \
@@ -3642,9 +3657,15 @@ UA_ServerConfig_setAccessControl_defaultWithLoginCallback(config, \
 		CROAK("Callback '%s' is not CODE reference and unknown check",
 		    SvPV_nolen(loginCallback));
 	}
+#ifdef HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509
 	RETVAL = UA_AccessControl_defaultWithLoginCallback(
 	    config->svc_serverconfig, allowAnonymous, optVerifyX509,
 	    optUserTokenPolicyUri, loginSize, loginList, callback, context);
+#else
+	RETVAL = UA_AccessControl_defaultWithLoginCallback(
+	    config->svc_serverconfig, allowAnonymous,
+	    optUserTokenPolicyUri, loginSize, loginList, callback, context);
+#endif /* HAVE_UA_ACCESSCONTROL_DEFAULT_VERIFYX509 */
     OUTPUT:
 	RETVAL
 
@@ -3725,7 +3746,7 @@ UA_ServerConfig_setServerUrls(config, ...)
 		    XS_unpack_UA_String(ST(i));
 	}
 
-#endif
+#endif /* HAVE_UA_SERVERCONFIG_SERVERURLS */
 
 void
 UA_ServerConfig_setEndpointDescriptions(config, endpointsSV)
@@ -4495,10 +4516,15 @@ UA_Client_sendAsyncBrowseNextRequest(client, request, callback, data, \
 	ClientCallbackData		ccd;
     CODE:
 	ccd = newClientCallbackData(callback, ST(0), data);
+#ifdef HAVE_UA_CLIENT_SENDASYNCBROWSENEXTREQUEST
+	RETVAL = UA_Client_sendAsyncBrowseNextRequest(client->cl_client,
+	    request, clientAsyncBrowseNextCallback, ccd, outoptReqId);
+#else
 	RETVAL = UA_Client_sendAsyncRequest(client->cl_client, request,
 	    &UA_TYPES[UA_TYPES_BROWSENEXTREQUEST],
 	    (UA_ClientAsyncServiceCallback)clientAsyncBrowseNextCallback,
 	    &UA_TYPES[UA_TYPES_BROWSENEXTRESPONSE], ccd, outoptReqId);
+#endif /* HAVE_UA_CLIENT_SENDASYNCBROWSENEXTREQUEST */
 	if (RETVAL != UA_STATUSCODE_GOOD)
 		deleteClientCallbackData(ccd);
 	if (outoptReqId != NULL)
@@ -4555,10 +4581,8 @@ UA_Client_sendAsyncReadRequest(client, request, callback, data, outoptReqId)
 	ClientCallbackData		ccd;
     CODE:
 	ccd = newClientCallbackData(callback, ST(0), data);
-	RETVAL = UA_Client_sendAsyncRequest(client->cl_client, request,
-	    &UA_TYPES[UA_TYPES_READREQUEST],
-	    (UA_ClientAsyncServiceCallback)clientAsyncReadCallback,
-	    &UA_TYPES[UA_TYPES_READRESPONSE], ccd, outoptReqId);
+	RETVAL = UA_Client_sendAsyncReadRequest(client->cl_client, request,
+	    clientAsyncReadCallback, ccd, outoptReqId);
 	if (RETVAL != UA_STATUSCODE_GOOD)
 		deleteClientCallbackData(ccd);
 	if (outoptReqId != NULL)

@@ -1,5 +1,9 @@
 Revision history for Map::Tube::London
 
+1.42  2025-04-17
+      - Updated dependency on Map::Tube v4.07.
+      - Updated unit test to ignore the STREET link for now.
+
 1.41  2024-12-18
       - Updated dependency on Map::Tube v3.89.
       - Updated map data between Hatton Cross and Heathrow Terminal 2 & 3.

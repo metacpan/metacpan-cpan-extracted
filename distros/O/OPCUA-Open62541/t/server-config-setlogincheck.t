@@ -10,7 +10,7 @@ BEGIN {
     if (OPCUA::Open62541::ServerConfig->can(
 	'setAccessControl_defaultWithLoginCallback')) {
 	plan tests => 57;
-    } else {
+    } elsif (not $^C) {
 	plan skip_all => 'open62541 has no server config '.
 	    'setAccessControl_defaultWithLoginCallback';
     }
